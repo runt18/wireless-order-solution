@@ -16,6 +16,7 @@ import org.marker.weixin.msg.Msg4Text;
 
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
@@ -160,7 +161,36 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注
 				WeixinMemberDao.interest(msg.getToUserName(), msg.getFromUserName());
-				session.callback(createNavi(msg));
+				int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+				List<Promotion> welcome = PromotionDao.getByCond(StaffDao.getAdminByRestaurant(restaurantId), 
+													   new PromotionDao.ExtraCond().setType(Promotion.Type.WELCOME).addStatus(Promotion.Status.PROGRESS));
+				
+				//检查是否有欢迎活动，没有则显示导航页，有则显示欢迎活动
+				if(welcome.isEmpty()){
+					session.callback(createNavi(msg));
+				}else{
+					Promotion promotion = welcome.get(0);
+					StringBuilder desc = new StringBuilder();
+					//活动时间
+					desc.append("活动时间：" + promotion.getDateRange().getOpeningFormat() + " 至 " + promotion.getDateRange().getEndingFormat()).append("\n");
+					//活动规则
+					String rule;
+					if(promotion.getRule() == Promotion.Rule.ONCE){
+						rule = "活动期内单次消费积分满" + promotion.getPoint() + "即可领取【" + promotion.getCouponType().getName() + "】";
+					}else if(promotion.getRule() == Promotion.Rule.TOTAL){
+						rule = "活动期内累计消费积分满" + promotion.getPoint() + "即可领取【" + promotion.getCouponType().getName() + "】";
+					}else if(promotion.getRule() == Promotion.Rule.FREE){
+						rule = "活动期内免费领取【" + promotion.getCouponType().getName() + "】";
+					}else{
+						rule = "";
+					}
+					desc.append("\n亲。。。在活动期间内激活会员账号即可参与【" + promotion.getTitle() + "】活动" + (!rule.isEmpty() ? "，" : "") + rule).append("\n");
+					desc.append("\n点击激活会员账号>>>>");
+					
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item(promotion.getTitle() + "(火热进行中...)", desc.toString(), 
+							 					   								  promotion.hasImage() ? promotion.getImage().getObjectUrl() : "", 
+							 					   								  createUrl(msg, WEIXIN_MEMBER))));
+				}
 				
 			}else if(msg.getEvent() == Event.UNSUBSCRIBE){
 				//会员取消关注
@@ -187,6 +217,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					List<Coupon> coupons = CouponDao.getByCond(staff, 
 															   new CouponDao.ExtraCond().addPromotionStatus(Promotion.Status.PUBLISH)
 															   							.addPromotionStatus(Promotion.Status.PROGRESS)
+															   							.setPromotionType(Promotion.Type.NORMAL)
 															   							.setMember(WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName())), null);
 					
 					if(coupons.isEmpty()){
@@ -201,11 +232,11 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 							desc.append("活动时间：" + coupon.getPromotion().getDateRange().getOpeningFormat() + " 至 " + coupon.getPromotion().getDateRange().getEndingFormat()).append("\n");
 							//活动规则
 							String rule;
-							if(coupon.getPromotion().getType() == Promotion.Type.ONCE){
+							if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
 								rule = "活动期内单次消费积分满" + coupon.getPromotion().getPoint() + "即可领取【" + coupon.getName() + "】";
-							}else if(coupon.getPromotion().getType() == Promotion.Type.TOTAL){
+							}else if(coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
 								rule = "活动期内累计消费积分满" + coupon.getPromotion().getPoint() + "即可领取【" + coupon.getName() + "】";
-							}else if(coupon.getPromotion().getType() == Promotion.Type.FREE){
+							}else if(coupon.getPromotion().getRule() == Promotion.Rule.FREE){
 								rule = "活动期内免费领取【" + coupon.getName() + "】";
 							}else{
 								rule = "";
@@ -218,9 +249,9 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 							if(coupon.getDrawProgress().isOk()){
 								tip = "亲。。。你已符合优惠券领取条件，马上点击领取【" + coupon.getName() + "】";
 							}else{
-								if(coupon.getPromotion().getType() == Promotion.Type.ONCE && coupon.getDrawProgress().getPoint() != 0){
+								if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE && coupon.getDrawProgress().getPoint() != 0){
 									tip = "亲。。。您最近最多的单次消费积分是" + coupon.getDrawProgress().getPoint() + "，要加油哦:-)";
-								}else if(coupon.getPromotion().getType() == Promotion.Type.TOTAL && coupon.getDrawProgress().getPoint() != 0){
+								}else if(coupon.getPromotion().getRule() == Promotion.Rule.TOTAL && coupon.getDrawProgress().getPoint() != 0){
 									tip = "亲。。。您最近累计消费积分是" + coupon.getDrawProgress().getPoint() + "，要加油哦:-)";
 								}else{
 									tip = "";

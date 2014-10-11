@@ -55,8 +55,8 @@ public class OperatePromotionAction extends DispatchAction{
 		try{
 			
 			Promotion.CreateBuilder promotionCreateBuilder;
-			if(Promotion.Type.valueOf(Integer.parseInt(pType)) == Promotion.Type.DISPLAY_ONLY){
-				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, 
+			if(Promotion.Rule.valueOf(Integer.parseInt(pType)) == Promotion.Rule.DISPLAY_ONLY){
+				promotionCreateBuilder = Promotion.CreateBuilder.newInstance4Display(title, 
 																			 new DateRange(beginDate, endDate), 
 																			 body,
 																			 entire);
@@ -68,10 +68,10 @@ public class OperatePromotionAction extends DispatchAction{
 				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, 
 																			 new DateRange(beginDate, endDate),
 																			 body,
-																			 Promotion.Type.valueOf(Integer.parseInt(pType)),
+																			 Promotion.Rule.valueOf(Integer.parseInt(pType)),
 																			 typeInsertBuilder,
 																			 entire);
-				if(point != null && !point.isEmpty() && Promotion.Type.valueOf(Integer.parseInt(pType)) != Promotion.Type.FREE){
+				if(point != null && !point.isEmpty() && Promotion.Rule.valueOf(Integer.parseInt(pType)) != Promotion.Rule.FREE){
 					promotionCreateBuilder.setPoint(Integer.parseInt(point));
 				}
 				
@@ -130,7 +130,7 @@ public class OperatePromotionAction extends DispatchAction{
 			
 			
 			Promotion.UpdateBuilder promotionUpdateBuilder;
-			if(Promotion.Type.valueOf(Integer.parseInt(pType)) == Promotion.Type.DISPLAY_ONLY){
+			if(Promotion.Rule.valueOf(Integer.parseInt(pType)) == Promotion.Rule.DISPLAY_ONLY){
 				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(new DateRange(beginDate, endDate))
 										 .setTitle(title)
 										 .setBody(body, entire);
@@ -390,7 +390,7 @@ public class OperatePromotionAction extends DispatchAction{
 		StringBuilder pTree = new StringBuilder();
 		try{
 			
-				String p_create = children(staff, new PromotionDao.ExtraCond().setStatus(Status.CREATED));
+				String p_create = children(staff, new PromotionDao.ExtraCond().addStatus(Status.CREATED));
 				if(!p_create.isEmpty()){
 					pTree.append("{")
 					.append("text:'已创建'")
@@ -401,7 +401,7 @@ public class OperatePromotionAction extends DispatchAction{
 				}
 
 				
-				String publish = children(staff, new PromotionDao.ExtraCond().setStatus(Status.PUBLISH));
+				String publish = children(staff, new PromotionDao.ExtraCond().addStatus(Status.PUBLISH));
 				if(!publish.isEmpty()){
 					if(!pTree.toString().isEmpty()){
 						pTree.append(",");
@@ -414,7 +414,7 @@ public class OperatePromotionAction extends DispatchAction{
 					.append("}");	
 				}
 				
-				String progress = children(staff, new PromotionDao.ExtraCond().setStatus(Status.PROGRESS));
+				String progress = children(staff, new PromotionDao.ExtraCond().addStatus(Status.PROGRESS));
 				if(!progress.isEmpty()){
 					if(!pTree.toString().isEmpty()){
 						pTree.append(",");
@@ -427,7 +427,7 @@ public class OperatePromotionAction extends DispatchAction{
 					.append("}");	
 				}
 	
-				String finish = children(staff, new PromotionDao.ExtraCond().setStatus(Status.FINISH));
+				String finish = children(staff, new PromotionDao.ExtraCond().addStatus(Status.FINISH));
 				if(!finish.isEmpty()){
 					if(!pTree.toString().isEmpty()){
 						pTree.append(",");
@@ -463,7 +463,7 @@ public class OperatePromotionAction extends DispatchAction{
 			.append(",leaf:true")
 			.append(",status:" + p_List.get(i).getStatus().getVal())
 			.append(",title:'" + p_List.get(i).getTitle() + "'")
-			.append(",pType:" + p_List.get(i).getType().getVal())
+			.append(",pType:" + p_List.get(i).getRule().getVal())
 			.append(",id:" + p_List.get(i).getId())
 			.append("}");
 		}
