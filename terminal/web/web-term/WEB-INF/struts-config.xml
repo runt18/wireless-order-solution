@@ -91,10 +91,6 @@
 		<action path="/InsertMenu"
 			type="com.wireless.Actions.menuMgr.basic.InsertMenuAction" scope="request">
 		</action>
-		<action path="/ImageFileUpload"
-			type="com.wireless.Actions.menuMgr.basic.ImageFileUploadAction"
-			scope="request">
-		</action>
 		<action path="/QuerySupplier"
 			type="com.wireless.Actions.supplierMgr.QuerySupplierAction" scope="request">
 		</action>
