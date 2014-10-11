@@ -28,6 +28,7 @@ public enum ErrorType {
 	 *  SERVICE_RATE : 7250 - 7299
 	 *  PROMOTION : 7200 - 7249
 	 *  OSS_IMAGE : 7150 - 7199
+	 *  PRICE_PLAN : 7100 - 7149
 	 */
 	UNKNOWN(1, "unknown"),
 	PROTOCOL(2, "protocol"),
@@ -55,7 +56,8 @@ public enum ErrorType {
 	REGION(24, "region"),
 	SERVICE_RATE(25, "service_rate"),
 	PROMOTION(26, "promotion"),
-	OSS_IMAGE(27, "oss_image");
+	OSS_IMAGE(27, "oss_image"),
+	PRICE_PLAN(28, "price_plan");
 	
 	private final String desc;
 	

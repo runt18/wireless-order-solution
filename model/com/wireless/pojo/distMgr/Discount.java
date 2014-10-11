@@ -166,7 +166,7 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 		
 		@Override
 		public String toString(){
-			return "status(val = " + val + ", desc = " + desc + ")";
+			return desc;
 		}
 		
 		public static Type valueOf(int val){

@@ -117,9 +117,9 @@ public class Coupon implements Jsonable{
 		
 		public boolean isOk(){
 			if(coupon.getStatus() == Coupon.Status.PUBLISHED && coupon.getPromotion().getStatus() == Promotion.Status.PROGRESS){
-				if(coupon.getPromotion().getType() == Promotion.Type.FREE){
+				if(coupon.getPromotion().getRule() == Promotion.Rule.FREE){
 					return true;
-				}else if(coupon.getPromotion().getType() == Promotion.Type.ONCE || coupon.getPromotion().getType() == Promotion.Type.TOTAL){
+				}else if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE || coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
 					return point >= coupon.getPromotion().getPoint();
 				}else{
 					return false;
@@ -131,7 +131,7 @@ public class Coupon implements Jsonable{
 		
 		@Override
 		public String toString(){
-			return coupon.getPromotion().getTitle() + ", " + coupon.getPromotion().getType().toString() + coupon.getPromotion().getPoint() + ", 当前积分" + point;
+			return coupon.getPromotion().getTitle() + ", " + coupon.getPromotion().getRule().toString() + coupon.getPromotion().getPoint() + ", 当前积分" + point;
 		}
 
 		@Override

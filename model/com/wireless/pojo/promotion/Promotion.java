@@ -17,30 +17,37 @@ public class Promotion implements Jsonable{
 		private final String title;
 		private final String body;
 		private final String entire;
-		private final Type type;
+		private final Rule rule;
 		private int point;
+		private Type type = Type.NORMAL;
 		private final CouponType.InsertBuilder typeBuilder;
 		private final SortedList<Member> members = SortedList.newInstance();
 		
-		private CreateBuilder(String title, DateRange range, String body, Type type, CouponType.InsertBuilder typeBuilder, String entire){
+		private CreateBuilder(String title, DateRange range, String body, Rule type, CouponType.InsertBuilder typeBuilder, String entire){
 			this.title = title;
 			this.range = range;
 			this.body = body;
 			this.entire = entire;
-			this.type = type;
+			this.rule = type;
 			this.typeBuilder = typeBuilder;
 		}
 		
-		public static CreateBuilder newInstance(String title, DateRange range, String body, Type type, CouponType.InsertBuilder typeBuilder, String entire){
-			if(type == Type.DISPLAY_ONLY){
-				throw new IllegalArgumentException("【" + Type.DISPLAY_ONLY.desc + "】类型不能创建优惠券");
+		public static CreateBuilder newInstance(String title, DateRange range, String body, Rule rule, CouponType.InsertBuilder typeBuilder, String entire){
+			if(rule == Rule.DISPLAY_ONLY){
+				throw new IllegalArgumentException("【" + Rule.DISPLAY_ONLY.desc + "】类型不能创建优惠券");
 			}
-			CreateBuilder instance = new CreateBuilder(title, range, body, type, typeBuilder, entire);
+			CreateBuilder instance = new CreateBuilder(title, range, body, rule, typeBuilder, entire);
 			return instance;
 		}
 		
-		public static CreateBuilder newInstance(String title, DateRange range, String body, String entire){
-			CreateBuilder instance = new CreateBuilder(title, range, body, Type.DISPLAY_ONLY, new CouponType.InsertBuilder(title, 0, range.getEndingTime()), entire);
+		public static CreateBuilder newInstance4Display(String title, DateRange range, String body, String entire){
+			CreateBuilder instance = new CreateBuilder(title, range, body, Rule.DISPLAY_ONLY, new CouponType.InsertBuilder(title, 0, range.getEndingTime()), entire);
+			return instance;
+		}
+
+		public static CreateBuilder newInstance4Welcome(String title, DateRange range, String body, Rule rule, CouponType.InsertBuilder typeBuilder, String entire){
+			CreateBuilder instance = new CreateBuilder(title, range, body, rule, typeBuilder, entire);
+			instance.type = Type.WELCOME;
 			return instance;
 		}
 		
@@ -53,9 +60,6 @@ public class Promotion implements Jsonable{
 		}
 		
 		public CreateBuilder addMember(int memberId){
-/*			if(type == Type.DISPLAY_ONLY){
-				throw new IllegalStateException("【" + Type.DISPLAY_ONLY.desc + "】类型的优惠活动不能发放优惠券");
-			}*/
 			Member member = new Member(memberId);
 			if(!members.contains(member)){
 				members.add(member);
@@ -177,7 +181,7 @@ public class Promotion implements Jsonable{
 		}
 	}
 	
-	public static enum Type{
+	public static enum Rule{
 		DISPLAY_ONLY(1, "只展示"),
 		FREE(2, "免费领取"),
 		ONCE(3, "单次积分符合条件领取"),
@@ -185,13 +189,13 @@ public class Promotion implements Jsonable{
 		
 		private final int val;
 		private final String desc;
-		Type(int val, String desc){
+		Rule(int val, String desc){
 			this.val = val;
 			this.desc = desc;
 		}
 		
-		public static Type valueOf(int val){
-			for(Type type : values()){
+		public static Rule valueOf(int val){
+			for(Rule type : values()){
 				if(type.val == val){
 					return type;
 				}
@@ -207,6 +211,39 @@ public class Promotion implements Jsonable{
 		public String toString(){
 			return desc;
 		}
+	}
+	
+	public static enum Type{
+		
+		NORMAL(1, "normal"),	// 普通
+		WELCOME(2, "welcome");  // 激活有礼
+		
+		private final int val;
+		private final String desc;
+		
+		private Type(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return desc;
+		}
+		
+		public static Type valueOf(int val){
+			for(Type type : values()){
+				if(type.getVal() == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The type type(val = " + val + ") passed is invalid.");
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
 	}
 	
 	public static enum Status{
@@ -285,7 +322,8 @@ public class Promotion implements Jsonable{
 	private String entire;
 	private CouponType couponType;
 	private Status status = Status.CREATED;
-	private Type type = Type.FREE;
+	private Rule rule = Rule.FREE;
+	private Type type = Type.NORMAL;
 	private Oriented oriented;
 	private int point;
 	private OssImage image;
@@ -296,16 +334,17 @@ public class Promotion implements Jsonable{
 		this.title = builder.title;
 		this.body = builder.body;
 		this.entire = builder.entire;
-		this.type = builder.type;
+		this.rule = builder.rule;
 		this.point = builder.point;
-		if(builder.type != Type.DISPLAY_ONLY){
+		if(builder.rule != Rule.DISPLAY_ONLY){
 			this.couponType = builder.typeBuilder.build();
 		}
-		if(builder.members.isEmpty()){
+		if(builder.members.isEmpty() || builder.type == Type.WELCOME){
 			this.oriented = Oriented.ALL;
 		}else{
 			this.oriented = Oriented.SPECIFIC;
 		}
+		this.type = builder.type;
 		this.status = Status.CREATED;
 	}
 	
@@ -413,12 +452,20 @@ public class Promotion implements Jsonable{
 		this.status = status;
 	}
 	
-	public Type getType() {
-		return type;
+	public Rule getRule() {
+		return rule;
 	}
 	
-	public void setType(Type type) {
+	public void setRule(Rule rule) {
+		this.rule = rule;
+	}
+	
+	public void setType(Type type){
 		this.type = type;
+	}
+	
+	public Type getType(){
+		return this.type;
 	}
 	
 	public Oriented getOriented(){
@@ -488,7 +535,7 @@ public class Promotion implements Jsonable{
 		jm.putString("entire", this.entire);
 		jm.putInt("point", this.point);
 		jm.putInt("status", this.status.getVal());
-		jm.putInt("pType", this.type.getVal());
+		jm.putInt("pType", this.rule.getVal());
 		jm.putInt("oriented", this.oriented.getVal());
 		jm.putJsonable("coupon", this.couponType, 0);
 		return jm;
