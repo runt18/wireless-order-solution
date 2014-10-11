@@ -1922,7 +1922,7 @@ function initControl(){
 									materialId : thiz.getValue()
 								},
 								success : function(res, opt){
-								var jr = Ext.decode(res.responseText);
+									var jr = Ext.decode(res.responseText);
 									if(jr.success){
 										price.setValue(jr.root[0].price);
 										price.setDisabled(true);
