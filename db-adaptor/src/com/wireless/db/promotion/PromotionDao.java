@@ -34,6 +34,7 @@ public class PromotionDao {
 	public static class ExtraCond{
 		private int promotionId;
 		private List<Promotion.Status> statusList = new ArrayList<Promotion.Status>();
+		private Promotion.Rule rule;
 		private Promotion.Type type;
 		private Promotion.Oriented oriented;
 		
@@ -44,6 +45,11 @@ public class PromotionDao {
 		
 		public ExtraCond addStatus(Promotion.Status status){
 			this.statusList.add(status);
+			return this;
+		}
+		
+		public ExtraCond setRule(Promotion.Rule rule){
+			this.rule = rule;
 			return this;
 		}
 		
@@ -76,6 +82,9 @@ public class PromotionDao {
 				extraCond.append(" AND (" + psCond.toString() + ")");
 			}
 			
+			if(rule != null){
+				extraCond.append(" AND P.rule = " + rule.getVal());
+			}
 			if(type != null){
 				extraCond.append(" AND P.type = " + type.getVal());
 			}
@@ -136,6 +145,13 @@ public class PromotionDao {
 		
 		Promotion promotion = builder.build();
 		
+		//Assure the duplication welcome promotion.
+		if(promotion.getType() == Promotion.Type.WELCOME){
+			if(!getByCond(dbCon, staff, new ExtraCond().setType(Promotion.Type.WELCOME).addStatus(Promotion.Status.CREATED).addStatus(Promotion.Status.PUBLISH).addStatus(Promotion.Status.FINISH)).isEmpty()){
+				throw new BusinessException("【" + Promotion.Type.WELCOME.toString() + "】属性的活动只能创建一个", PromotionError.PROMOTION_CREATE_NOT_ALLOW);
+			}
+		}
+		
 		//Check to see whether the start date exceed now.
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DAY_OF_YEAR, -1);
@@ -149,7 +165,7 @@ public class PromotionDao {
 		//Insert the promotion.
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".promotion " +
-			  " (restaurant_id, create_date, start_date, finish_date, title, body, entire, coupon_type_id, oriented, type, point, status) " +
+			  " (restaurant_id, create_date, start_date, finish_date, title, body, entire, coupon_type_id, oriented, rule, type, point, status) " +
 			  " VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + DateUtil.format(promotion.getCreateDate(), DateUtil.Pattern.DATE) + "'," +
@@ -160,6 +176,7 @@ public class PromotionDao {
 			  "'" + promotion.getEntire() + "'," +
 			  couponTypeId + "," +
 			  promotion.getOriented().getVal() + "," +
+			  promotion.getRule().getVal() + "," +
 			  promotion.getType().getVal() + "," +
 			  promotion.getPoint() + "," +
 			  promotion.getStatus().getVal() +
@@ -271,7 +288,7 @@ public class PromotionDao {
 		}
 		
 		//Update the coupon type.
-		if(builder.isCouponTypeChanged() && original.getType() != Promotion.Type.DISPLAY_ONLY){
+		if(builder.isCouponTypeChanged() && original.getRule() != Promotion.Rule.DISPLAY_ONLY){
 			CouponTypeDao.update(dbCon, staff, builder.getCouponTypeBuilder());
 		}
 		
@@ -635,7 +652,7 @@ public class PromotionDao {
 		List<Promotion> result = new ArrayList<Promotion>();
 		
 		String sql;
-		sql = " SELECT P.promotion_id, P.restaurant_id, P.create_date, P.start_date, P.finish_date, P.title, P.body, P.entire, P.oriented, P.type, P.point, P.status, " +
+		sql = " SELECT P.promotion_id, P.restaurant_id, P.create_date, P.start_date, P.finish_date, P.title, P.body, P.entire, P.oriented, P.type, P.rule, P.point, P.status, " +
 			  " P.coupon_type_id, CT.name, " +
 			  " OI.oss_image_id, OI.image, OI.type AS oss_type " +	
 			  " FROM " + Params.dbName + ".promotion P " +
@@ -665,6 +682,7 @@ public class PromotionDao {
 			
 			promotion.setOriented(Promotion.Oriented.valueOf(dbCon.rs.getInt("oriented")));
 			promotion.setType(Promotion.Type.valueOf(dbCon.rs.getInt("type")));
+			promotion.setRule(Promotion.Rule.valueOf(dbCon.rs.getInt("rule")));
 			promotion.setPoint(dbCon.rs.getInt("point"));
 			promotion.setStatus(Promotion.Status.valueOf(dbCon.rs.getInt("status")));
 			

@@ -357,55 +357,6 @@ public class PayOrder {
 	}
 	
 	/**
-	 * Calculate the order details according to the specific table defined in order regardless of merged status. 
-	 * @param staff
-	 * 			the staff to perform this action 
-	 * @param orderToPay
-	 * 			the order with table and other condition referring to {@link ReqPayOrderParser}
-	 * @return the order after calculated
-	 * @throws BusinessException
-	 * 			Throws if one of cases below.<br>
-	 * 			1 - The order associated with table to be paid does NOT exist.<br>
-	 * 			2 - The erase price exceeds the quota.
-	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statement.
-	 */
-//	public static Order calcByTable(Staff staff, Order orderToPay) throws BusinessException, SQLException{
-//		DBCon dbCon = new DBCon();
-//		try{
-//			dbCon.connect();
-//			return calcByTable(dbCon, staff, orderToPay);
-//			
-//		}finally{
-//			dbCon.disconnect();
-//		}
-//	}
-	
-	/**
-	 * Calculate the order details according to the specific table defined in order regardless of merged status. 
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action 
-	 * @param orderToPay
-	 * 			the order along with table and other condition referring to {@link ReqPayOrderParser}
-	 * @return the order result after calculated
-	 * @throws BusinessException
-	 * 			Throws if one of cases below.<br>
-	 * 			1 - The order associated with table to be paid does NOT exist.<br>
-	 * 			2 - The erase price exceeds the quota.
-	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statement.
-	 */
-//	public static Order calcByTable(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
-//		
-//		orderToPay.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getTableByAlias(dbCon, staff, orderToPay.getDestTbl().getAliasId())));			
-//		
-//		return calc(dbCon, staff, orderToPay);		
-//
-//	}
-	
-	/**
 	 * Calculate the details to the order according to {@link Order.PayBuilder}.
 	 * @param staff
 	 * 			the staff to perform this action

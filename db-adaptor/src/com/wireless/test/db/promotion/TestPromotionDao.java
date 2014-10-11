@@ -76,7 +76,7 @@ public class TestPromotionDao {
 			String body = htmlTxt.replace("$(pic_1)", OssImageDao.getById(mStaff, promotionImg1).getObjectUrl());
 
 			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder
-																	  .newInstance("测试优惠活动", new DateRange("2015-1-1", "2015-2-1"), body, Promotion.Type.FREE, typeInsertBuilder, "hello jingjing<br>")
+																	  .newInstance("测试优惠活动", new DateRange("2015-1-1", "2015-2-1"), body, Promotion.Rule.FREE, typeInsertBuilder, "hello jingjing<br>")
 																	  //.addMember(m1.getId()).addMember(m2.getId())
 																	  ;
 			promotionId = PromotionDao.create(mStaff, promotionCreateBuilder);
@@ -268,6 +268,7 @@ public class TestPromotionDao {
 		Assert.assertEquals("promotion body", expected.getEntire(), actual.getEntire());
 		Assert.assertEquals("promotion date range", expected.getDateRange(), actual.getDateRange());
 		Assert.assertEquals("promotion status", expected.getStatus(), actual.getStatus());
+		Assert.assertEquals("promotion rule", expected.getRule(), actual.getRule());
 		Assert.assertEquals("promotion type", expected.getType(), actual.getType());
 		Assert.assertEquals("promotion oriented", expected.getOriented(), actual.getOriented());
 		

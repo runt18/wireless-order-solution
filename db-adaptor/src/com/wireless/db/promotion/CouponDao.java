@@ -29,6 +29,7 @@ public class CouponDao {
 		private int memberId;
 		private int couponTypeId;
 		private int promotionId;
+		private Promotion.Type promotionType;
 		private final List<Promotion.Status> promotionStatus = new ArrayList<Promotion.Status>();
 		
 		public ExtraCond setId(int id){
@@ -66,6 +67,11 @@ public class CouponDao {
 			return this;
 		}
 		
+		public ExtraCond setPromotionType(Promotion.Type type){
+			this.promotionType = type;
+			return this;
+		}
+		
 		public ExtraCond addPromotionStatus(Promotion.Status status){
 			this.promotionStatus.add(status);
 			return this;
@@ -99,6 +105,9 @@ public class CouponDao {
 			}
 			if(psCond.length() != 0){
 				extraCond.append(" AND (" + psCond.toString() + ")");
+			}
+			if(promotionType != null){
+				extraCond.append(" AND P.type = " + promotionType.getVal());
 			}
 			return extraCond.toString();
 		}
@@ -256,7 +265,7 @@ public class CouponDao {
 			throw new BusinessException("只有【已发布】的优惠券才可领取", PromotionError.COUPON_DRAW_NOT_ALLOW);
 		}
 		
-		if(coupon.getPromotion().getType() == Promotion.Type.DISPLAY_ONLY){
+		if(coupon.getPromotion().getRule() == Promotion.Rule.DISPLAY_ONLY){
 			throw new BusinessException("【纯展示】的优惠活动没有优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
 		}
 		
@@ -396,7 +405,7 @@ public class CouponDao {
 			coupon.setPromotion(promotion);
 
 			if(coupon.getStatus() == Coupon.Status.PUBLISHED && promotion.getStatus() == Promotion.Status.PROGRESS){
-				if(promotion.getType() == Promotion.Type.TOTAL || promotion.getType() == Promotion.Type.ONCE){
+				if(promotion.getRule() == Promotion.Rule.TOTAL || promotion.getRule() == Promotion.Rule.ONCE){
 					String sql;
 					sql = " SELECT delta_point, operate_date FROM " + Params.dbName + ".member_operation " +
 						  " WHERE 1 = 1 " +
@@ -410,11 +419,11 @@ public class CouponDao {
 						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
 						  " AND operate_date BETWEEN '" + promotion.getDateRange().getOpeningFormat() + "' AND '" + promotion.getDateRange().getEndingFormat() + "'";
 					
-					if(promotion.getType() == Promotion.Type.ONCE){
+					if(promotion.getRule() == Promotion.Rule.ONCE){
 						//String sql4LastestDraw = " SELECT draw_date FROM " + Params.dbName + ".coupon WHERE promotion_id = " + promotion.getId() + " ORDER BY draw_date DESC LIMIT 1 ";
 						//sql = " SELECT MAX(delta_point) AS max_point FROM ( " + sql + " ) AS TMP WHERE TMP.operate_date >= ( " + sql4LastestDraw + ")";
 						sql = " SELECT MAX(delta_point) AS max_point FROM ( " + sql + " ) AS TMP ";
-					}else if(promotion.getType() == Promotion.Type.TOTAL){
+					}else if(promotion.getRule() == Promotion.Rule.TOTAL){
 						sql = " SELECT SUM(delta_point) AS total_point FROM ( " + sql + " ) AS TMP ";
 					}
 					
