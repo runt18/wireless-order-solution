@@ -328,6 +328,10 @@
 			type="com.wireless.Actions.inventoryMgr.material.OperateMaterialAction"
 			scope="request" parameter="dataSource">
 		</action>
+		<action path="/OperateMaterialInit"
+			type="com.wireless.Actions.inventoryMgr.material.OperateMaterialInitlAction"
+			scope="request" parameter="dataSource">
+		</action>		
 		<action path="/QueryFoodMaterial"
 			type="com.wireless.Actions.inventoryMgr.material.QueryFoodMaterialAction"
 			scope="request" parameter="dataSource">
