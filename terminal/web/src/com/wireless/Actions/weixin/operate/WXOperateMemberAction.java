@@ -256,7 +256,6 @@ public class WXOperateMemberAction extends DispatchAction {
 			WeixinMemberDao.bind(request.getParameter("mobile"), openId, formId);
 			
 			dbCon.conn.commit();
-			jobject.initTip(true, "操作成功, 已绑定会员信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
