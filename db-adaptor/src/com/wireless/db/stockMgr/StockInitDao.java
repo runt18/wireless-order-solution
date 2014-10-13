@@ -68,7 +68,7 @@ public class StockInitDao {
 					+ " ELSE MD.stock "
 					+ "END AS deptOrTotal_stock "
 					+ " FROM  material M JOIN material_cate MC ON M.cate_id = MC.cate_id "
-					+ " LEFT JOIN wireless_order_db.material_dept MD ON MD.material_id = M.material_id"
+					+ " LEFT JOIN wireless_order_db.material_dept MD ON MD.material_id = M.material_id AND MD.dept_id = " + deptId
 					+ " WHERE M.restaurant_id = " + staff.getRestaurantId() 
 					+ (extraCond != null?extraCond:"");
 		
