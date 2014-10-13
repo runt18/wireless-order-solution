@@ -147,7 +147,7 @@ public class PromotionDao {
 		
 		//Assure the duplication welcome promotion.
 		if(promotion.getType() == Promotion.Type.WELCOME){
-			if(!getByCond(dbCon, staff, new ExtraCond().setType(Promotion.Type.WELCOME).addStatus(Promotion.Status.CREATED).addStatus(Promotion.Status.PUBLISH).addStatus(Promotion.Status.FINISH)).isEmpty()){
+			if(!getByCond(dbCon, staff, new ExtraCond().setType(Promotion.Type.WELCOME).addStatus(Promotion.Status.CREATED).addStatus(Promotion.Status.PUBLISH).addStatus(Promotion.Status.PROGRESS)).isEmpty()){
 				throw new BusinessException("【" + Promotion.Type.WELCOME.toString() + "】属性的活动只能创建一个", PromotionError.PROMOTION_CREATE_NOT_ALLOW);
 			}
 		}
