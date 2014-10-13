@@ -43,6 +43,7 @@ public class Page{
 	
 	
 	public static enum Stock{
+		INIT_MATERIAL("initMaterialPanel", "库存初始化", "InventoryManagement_Module/InitMaterialMgr.html", "../../images/businessHour.png"),
 		SUPPLIER("supplierMgr", "供应商管理", "InventoryManagement_Module/SupplierManagement.html", "../../images/supplierMgr.png"),
 		INVENTORY("inventoryBasicMgr", "原料管理", "InventoryManagement_Module/InventoryBasicManagement.html", "../../images/inventoryBasicMgr.png"),
 		FOOD_MATERIAL("foodMaterial", "菜品配料", "InventoryManagement_Module/FoodMaterialManagement.html", "../../images/foodMaterialMgr.png"),
@@ -87,7 +88,6 @@ public class Page{
 	}
 	
 	public static enum History{
-		INIT_MATERIAL("initMaterialPanel", "库存初始化", "InventoryManagement_Module/InitMaterialMgr.html", "../../images/businessHour.png"),
 		SHIBIE("businessHourMgr", "市别设置", "", "../../images/businessHour.png"),
 		HISTORY("history", "历史账单", "History_Module/HistoryStatistics.html", "../../images/history.png"),
 		BUSINESS_STATISTICS("businessSubStatistics", "营业统计", "History_Module/BusinessSubStatistics.html", "../../images/businessChart.png"),
