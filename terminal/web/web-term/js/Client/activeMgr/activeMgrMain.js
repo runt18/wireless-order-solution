@@ -77,6 +77,7 @@ function initCouponTypeWin(c){
 					operatePromotTypeWin.pId = '';
 					operatePromotTypeWin.oriented = 1;
 					Ext.getCmp('active_member_btnCommonSearch').handler({noSearch:true});
+					$("#chkSetWelcome").removeAttr("checked");
 					
 					winUnhide = true;
 					
@@ -403,6 +404,25 @@ function fnUpdatePromotion(){
 	
 }
 
+function fnCheckHaveWelcome(){
+	$.ajax({
+		url : '../../OperatePromotion.do',
+		type : 'post',
+		async:false,
+		data : {dataSource : 'HaveWelcomePage'},
+		success : function(jr, status, xhr){
+			if(jr.root.length > 0){
+				$('#spanSetWelcome').hide();
+			}else{
+				$('#spanSetWelcome').show();
+			}
+		},
+		error : function(request, status, err){
+			Ext.ux.showMsg({success : false, msg : '请求失败, 请刷新页面'});
+		}
+	}); 
+}
+
 var promotionPreviewPanel, memberCountGrid;
 var sendCouponWin, couponViewBillWin;
 var member_searchType = false;
@@ -483,6 +503,8 @@ Ext.onReady(function() {
 					}
 					promotionTree.getRootNode().getUI().show();
 				}
+				fnCheckHaveWelcome();
+				console.log(111111111)
 			},
 			click : function(e){
 				getPromotionBodyById(e.attributes.id);
@@ -1372,7 +1394,7 @@ Ext.onReady(function() {
 			}
 		},{xtype : 'tbtext', text : '&nbsp;&nbsp;'}]
 	});	
-	var memberBasicGrid = createGridPanel(
+	memberBasicGrid = createGridPanel(
 		'active_memberBasicGrid',
 		'选择参与活动的会员',
 		480,
@@ -1427,6 +1449,7 @@ Ext.onReady(function() {
 		}]
 	});	
 	
+	fnCheckHaveWelcome();
 	
 	//steps.js与Ext混用时的样式修正	
 	$('#active_beginDate').parent().width($('#active_beginDate').width() + $('#active_beginDate').next().width()+20);
