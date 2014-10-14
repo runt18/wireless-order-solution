@@ -409,7 +409,7 @@ function fnCheckHaveWelcome(){
 		url : '../../OperatePromotion.do',
 		type : 'post',
 		async:false,
-		data : {dataSource : 'HaveWelcomePage'},
+		data : {dataSource : 'hasWelcomePage'},
 		success : function(jr, status, xhr){
 			if(jr.root.length > 0){
 				$('#divSetWelcome').hide();
