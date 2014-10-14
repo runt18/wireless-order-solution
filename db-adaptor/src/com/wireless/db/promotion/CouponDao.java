@@ -482,7 +482,7 @@ public class CouponDao {
 			  " C.coupon_id, P.entire, C.restaurant_id, C.birth_date, C.draw_date, C.order_id, C.order_date, C.status, " +
 			  " C.coupon_type_id, CT.name, CT.price, CT.expired, CT.oss_image_id, " +
 			  " C.member_id, M.name AS member_name, M.mobile, M.member_card, M.`consumption_amount`, M.point, M.`base_balance`, M.`extra_balance`, MT.name AS memberTypeName, " +
-			  " C.promotion_id, P.title " +
+			  " C.promotion_id, P.title, P.oriented " +
 			  " FROM " + Params.dbName + ".coupon C " +
 			  " JOIN " + Params.dbName + ".coupon_type CT ON C.coupon_type_id = CT.coupon_type_id " +
 			  " JOIN " + Params.dbName + ".promotion P ON C.promotion_id = P.promotion_id " +
@@ -531,6 +531,7 @@ public class CouponDao {
 			
 			Promotion promotion = new Promotion(dbCon.rs.getInt("promotion_id"));
 			promotion.setTitle(dbCon.rs.getString("title"));
+			promotion.setOriented(Promotion.Oriented.valueOf(dbCon.rs.getInt("oriented")));
 			promotion.setEntire(new StringHtml(dbCon.rs.getString("entire"), StringHtml.ConvertTo.TO_HTML).toString());
 			coupon.setPromotion(promotion);
 			
