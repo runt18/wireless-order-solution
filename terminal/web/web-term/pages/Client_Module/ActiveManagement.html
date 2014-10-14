@@ -30,7 +30,7 @@
 <script type="text/javascript"
 	src="../../js/Client/activeMgr/activeMgrMain.js"></script>
 <script>
-var active_memberList = '', couponTypeId = 0, promotionType = 4;
+var active_memberList = '', couponTypeId = 0, promotionType = 4, memberBasicGrid ;
 var promotionTree, operatePromotTypeWin, winUnhide = true; //执行关闭操作时不验证数据
 var promotionDateTemplet = '<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue; font-szie:12px;font-weight:bold">活动日期 : <font color="red">{beginDate}</font>&nbsp;至&nbsp;<font color="red">{endDate}</font></div>';
 function buildPreviewHead(){
@@ -78,7 +78,7 @@ var operatePromotion = function(){
 		params.cId = couponTypeId;
 	}
 	
-	params.pType = promotionType;
+	params.pRule = promotionType;
 	params.oriented = operatePromotTypeWin.oriented;
 	params.couponName = couponName.getValue();
 	params.price = price.getValue();
@@ -91,6 +91,7 @@ var operatePromotion = function(){
 	params.members = operatePromotTypeWin.oriented == 2?active_memberList:'';
 	params.body = editBody.getValue();	
 	params.entire = entire.body.dom.innerHTML;
+	params.type = $('#chkSetWelcome').is(':checked');
 
 	promotion_uploadMask.show();
 	Ext.Ajax.request({
@@ -161,6 +162,14 @@ function fnValidSecondSteps(){
 	
 }
 
+function fnSetWelcomePage(){
+	if($('#chkSetWelcome').is(':checked')){
+		 $("#chkSetWelcome").removeAttr("checked");
+	}else{
+		$("#chkSetWelcome").attr("checked",'true');
+	}
+}
+
 $(function (){
     $("#wizard").steps({
         headerTag: "span",
@@ -183,8 +192,11 @@ $(function (){
         			
         			
         			Ext.getCmp('active_member_btnHeightSearch').handler();	
-    	    		memberBasicGrid.syncSize(); //强制计算高度
-    	    		memberBasicGrid.doLayout();//重新布局     
+        			if(memberBasicGrid){
+        	    		memberBasicGrid.syncSize(); //强制计算高度
+        	    		memberBasicGrid.doLayout();//重新布局            				
+        			}
+ 
     	    		
     	    		Ext.getCmp('threeStepEastBody').body.update(buildPreviewHead()+'<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">'+Ext.getCmp('secondStep_edit').getValue()+'</div>');
         		}
@@ -228,6 +240,10 @@ $(function (){
 	            	</div>
 	            	<div class="active_mould active_mould_default" onclick="selectPromotionModel(this, 1)">
 	            		<img alt="" src="../../images/promotionDisplayModel.png" width="230px" height="350px"><br><span ><input type="radio" name="rdo_activeMould" />模板四(无优惠劵,纯展示活动)</span>
+	            	</div>
+	            	
+	            	<div style="margin-top: 550px;" align="left">
+	            		&nbsp;&nbsp;&nbsp;<span id="spanSetWelcome" onClick="fnSetWelcomePage()"><input type="checkbox" id="chkSetWelcome" />设置为微信会员欢迎页</span>
 	            	</div>
             </div>
 				
