@@ -51,6 +51,12 @@ public class Promotion implements Jsonable{
 			return instance;
 		}
 		
+		public static CreateBuilder newInstance4Welcome(String title, DateRange range, String body, String entire){
+			CreateBuilder instance = newInstance4Display(title, range, body, entire);
+			instance.type = Type.WELCOME;
+			return instance;
+		}
+		
 		public CreateBuilder setPoint(int point){
 			if(point <= 0){
 				throw new IllegalArgumentException("积分条件不能小于0");
