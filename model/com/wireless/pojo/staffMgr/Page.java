@@ -54,7 +54,7 @@ public class Page{
 		STOCK_DISTRIBUTION("stockDistribution", "库存分布", "InventoryManagement_Module/StockDistributionReport.html", "../../images/stockDistributionReport.png"),
 		DELTA_REPORT("deltaReport", "消耗差异表", "InventoryManagement_Module/DeltaReport.html", "../../images/deltaReport.png"),
 		COST_ANALYSIS("costAnalysis", "成本分析表", "InventoryManagement_Module/CostAnalysisReport.html", "../../images/costAnalysisReport.png"),
-		STOCKIN_GENERAL("stockInGeneral", "采购汇总表", "InventoryManagement_Module/StockInGeneral.html", "../../images/costAnalysisReport.png"),
+//		STOCKIN_GENERAL("stockInGeneral", "采购汇总表", "InventoryManagement_Module/StockInGeneral.html", "../../images/costAnalysisReport.png"),
 		MONTH_SETTLE("monthSettle", "月结", "", "../../images/monthSettle.png"),
 		HISTORY_STOCKACTION("historyStockAction", "历史库单", "InventoryManagement_Module/HistoryStockAction.html", "../../images/history.png");
 		
