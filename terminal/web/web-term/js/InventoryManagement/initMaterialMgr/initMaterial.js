@@ -178,6 +178,46 @@ function initMaterialControl(){
 					}
 				});
 			}
+		},{
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;&nbsp;&nbsp;'
+		},'-',{
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;&nbsp;&nbsp;'
+		}, {
+			text : '初始化库存',
+			id : 'btnInitMaterial',
+			iconCls : 'btn_delete',
+			handler : function(){
+				Ext.Msg.show({
+					title : '重要',
+					msg : '是否清空所有库存信息?',
+					icon: Ext.MessageBox.QUESTION,
+					buttons : Ext.Msg.YESNO,
+					fn : function(e){
+						if(e == 'yes'){
+							Ext.Ajax.request({
+								url : '../../OperateMaterialInit.do',
+								params : {
+									dataSource : 'init'
+								},
+								success : function(res, opt){
+									var jr = Ext.decode(res.responseText);
+									if(jr.success){
+										Ext.example.msg(jr.title, jr.msg);
+									}else{
+										Ext.ux.showMsg({success:false, msg:'初始化失败,请联系客服'});
+									}
+									fnCheckIsInit();
+								},
+								failure : function(res, opt) {
+									Ext.ux.showMsg({success:false, msg:'操作失败, 请刷新页面后再试'});
+								}
+							});
+						}
+					}
+				});				
+			}
 		}]
 	});
 	
@@ -203,7 +243,7 @@ function initMaterialControl(){
 	});
 	
 	init_materialBasicGrid = new Ext.grid.EditorGridPanel({
-		title : '货品列表',
+		title : '货品列表 -- 单击库存列即可修改库存数量',
 		id : 'init_materialBasicGrid',
 		region : 'center',
 		store : ds,
@@ -216,6 +256,15 @@ function initMaterialControl(){
 //		selModel : new Ext.grid.RowSelectionModel(),
 		tbar : materialBasicGridTbar,
 		listeners : {
+			beforeedit : function(e){
+				$.post('../../OperateMaterialInit.do', {dataSource:'isInit'}, function(jr){
+					if(!jr.success){
+						Ext.example.msg('提示', '未初始化库存, 不能修改库存数量');
+						e.record.commit();
+						return false;					
+					}
+				});				
+			},
 			afteredit : function(e){
 				if(editData != ''){
 					editData += '<li>';
@@ -239,7 +288,15 @@ function initMaterialControl(){
 	
 }
 
+function fnCheckIsInit(){
+	$.post('../../OperateMaterialInit.do', {dataSource:'isInit'}, function(jr){
+		isInit = jr.success;
+	});
+	
+}
+
 Ext.onReady(function(){
+	fnCheckIsInit();
 	
 	initMaterialControl();
 	
