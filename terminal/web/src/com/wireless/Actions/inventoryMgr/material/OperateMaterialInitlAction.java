@@ -112,7 +112,7 @@ public class OperateMaterialInitlAction extends DispatchAction{
 					}
 					
 				}
-				jobject.initTip(true, "初始化成功");				
+				jobject.initTip(true, "保存成功");				
 			}
 
 		}catch(BusinessException e){
@@ -130,5 +130,52 @@ public class OperateMaterialInitlAction extends DispatchAction{
 
 		return null;
 	}
+	
+	public ActionForward init(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		String pin = (String) request.getAttribute("pin");
+		try{
+			StockInitDao.initStock(StaffDao.verify(Integer.parseInt(pin)));
+			jobject.initTip(true, "初始化成功");			
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		
+		return null;
+	}	
+	
+	public ActionForward isInit(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		String pin = (String) request.getAttribute("pin");
+		try{
+			if(StockInitDao.isInit(StaffDao.verify(Integer.parseInt(pin)))){
+				jobject.initTip(true, "");	
+			}else{
+				jobject.initTip(false, "");
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		
+		return null;
+	}		
 	
 }
