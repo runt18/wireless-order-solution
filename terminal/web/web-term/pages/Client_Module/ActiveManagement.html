@@ -162,7 +162,7 @@ function fnValidSecondSteps(){
 	
 }
 
-function fnSetWelcomePage(){
+function fnSetWelcomePage(thiz){
 	if($('#chkSetWelcome').is(':checked')){
 		 $("#chkSetWelcome").removeAttr("checked");
 	}else{
@@ -242,8 +242,8 @@ $(function (){
 	            		<img alt="" src="../../images/promotionDisplayModel.png" width="230px" height="350px"><br><span ><input type="radio" name="rdo_activeMould" />模板四(无优惠劵,纯展示活动)</span>
 	            	</div>
 	            	
-	            	<div style="margin-top: 550px;" align="left">
-	            		&nbsp;&nbsp;&nbsp;<span id="spanSetWelcome" onClick="fnSetWelcomePage()"><input type="checkbox" id="chkSetWelcome" />设置为微信会员欢迎页</span>
+	            	<div id="divSetWelcome" style="margin-top: 550px;" align="left">
+	            		&nbsp;&nbsp;&nbsp;<input type="checkbox" id="chkSetWelcome" /><span id="spanSetWelcome" onClick="fnSetWelcomePage(this)">设置为微信会员欢迎页</span>
 	            	</div>
             </div>
 				
