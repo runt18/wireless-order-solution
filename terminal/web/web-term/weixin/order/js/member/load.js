@@ -111,6 +111,19 @@ $(function(){
 	};
 	window.onresize = autoWidth;*/
 	
+	$.post({
+		url : '../../OperatePromotion.do',
+		data : {dataSource : 'HaveWelcomePage'},
+		success : function(jr, status, xhr){
+			if(jr.success && jr.root.length > 0){
+				haveWelcomePageId = jr.root[0].id;
+			}
+		},
+		failure : function(jr, status, xhr){
+			
+		}
+	});
+	
 	$('#txtVerifyCode').focus(function(){
 		$('html, body').animate({scrollTop: 190+($('#divMemberPrivilegeDetail').height()>=30?$('#divMemberPrivilegeDetail').height():-15)}, 'fast'); 
 	});

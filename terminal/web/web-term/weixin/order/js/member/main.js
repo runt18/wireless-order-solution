@@ -151,7 +151,26 @@ function bindMember(c){
 				dataType : 'json',
 				success : function(data, status, xhr){
 					if(data.success){
-						window.location.reload();
+						if(haveWelcomePageId){
+							$.post({
+								url : '../../QueryCoupon.do',
+								data : {dataSource : 'byCondtion', fid : Util.mp.fid, oid : Util.mp.oid, pId : haveWelcomePageId},
+								success : function(jr, status, xhr){
+									if(jr.success && jr.root.length > 0){
+										window.location.href = Util.skip('sales.html', jr.root[0].id);
+									}else{
+										window.location.reload();
+									}
+								},
+								failure : function(jr, status, xhr){
+									
+								}								
+							});
+							
+						}else{
+							window.location.reload();
+						}
+						
 					}else{
 						Util.dialog.show({title: data.title, msg: data.msg});
 					}

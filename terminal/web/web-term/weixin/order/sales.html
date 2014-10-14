@@ -208,7 +208,8 @@ $(function(){
 			}
 		},
 		error : function(xhr, errorType, error){
-			alert('加载促销信息失败.');
+			//微信帐号还未与餐厅会员绑定
+			Util.getDom('divInfoContent').innerHTML = '微信帐号还未激活';
 		}
 	});
 	
