@@ -162,7 +162,7 @@ function fnValidSecondSteps(){
 	
 }
 
-function fnSetWelcomePage(thiz){
+function fnSetWelcomePage(){
 	if($('#chkSetWelcome').is(':checked')){
 		 $("#chkSetWelcome").removeAttr("checked");
 	}else{
@@ -243,7 +243,7 @@ $(function (){
 	            	</div>
 	            	
 	            	<div id="divSetWelcome" style="margin-top: 550px;" align="left">
-	            		&nbsp;&nbsp;&nbsp;<input type="checkbox" id="chkSetWelcome" /><span id="spanSetWelcome" onClick="fnSetWelcomePage(this)">设置为微信会员欢迎页</span>
+	            		&nbsp;&nbsp;&nbsp;<input type="checkbox" id="chkSetWelcome" /><span id="spanSetWelcome" onClick="fnSetWelcomePage()">设置为微信会员欢迎页</span>
 	            	</div>
             </div>
 				
