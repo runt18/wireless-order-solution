@@ -161,4 +161,44 @@ public class QueryCouponAction extends DispatchAction{
 		}
 		return null;
 	}	
+	
+	
+	public ActionForward byCondtion(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String formId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
+		String pId = request.getParameter("pId");
+		
+		int rid = 0;
+		int mid = 0;
+		DBCon dbCon = new DBCon();
+		dbCon.connect();
+		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+		Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
+		mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, openId, formId);
+		dbCon.disconnect();
+		
+		
+		JObject jobject = new JObject();
+		try{
+			CouponDao.ExtraCond extra = new CouponDao.ExtraCond();
+			extra.setMember(mid);
+			extra.setPromotion(Integer.parseInt(pId));
+			extra.setStatus(Coupon.Status.PUBLISHED);
+			
+			List<Coupon> list = CouponDao.getByCond(staff, extra, null);
+			jobject.setRoot(list);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
+	
 }

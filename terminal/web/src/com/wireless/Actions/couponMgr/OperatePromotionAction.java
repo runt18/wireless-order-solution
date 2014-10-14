@@ -39,10 +39,11 @@ public class OperatePromotionAction extends DispatchAction{
 		String endDate = request.getParameter("endDate");
 		String body = request.getParameter("body");
 		String entire = request.getParameter("entire");
-		String pType = request.getParameter("pType");
+		String pType = request.getParameter("pRule");
 		String point = request.getParameter("point");
 		String members = request.getParameter("members");
 		String oriented = request.getParameter("oriented");
+		String type = request.getParameter("type");
 		
 		String couponName = request.getParameter("couponName");
 		String price = request.getParameter("price");
@@ -55,28 +56,53 @@ public class OperatePromotionAction extends DispatchAction{
 		try{
 			
 			Promotion.CreateBuilder promotionCreateBuilder;
-			if(Promotion.Rule.valueOf(Integer.parseInt(pType)) == Promotion.Rule.DISPLAY_ONLY){
-				promotionCreateBuilder = Promotion.CreateBuilder.newInstance4Display(title, 
-																			 new DateRange(beginDate, endDate), 
-																			 body,
-																			 entire);
-			}else{
-				CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price), DateUtil.parseDate(expiredDate)).setComment("活动优惠劵");
-				if(image != null && !image.isEmpty()){
-					typeInsertBuilder.setImage(Integer.parseInt(image));
-				}
-				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, 
-																			 new DateRange(beginDate, endDate),
-																			 body,
-																			 Promotion.Rule.valueOf(Integer.parseInt(pType)),
-																			 typeInsertBuilder,
-																			 entire);
-				if(point != null && !point.isEmpty() && Promotion.Rule.valueOf(Integer.parseInt(pType)) != Promotion.Rule.FREE){
-					promotionCreateBuilder.setPoint(Integer.parseInt(point));
+			
+			if(Boolean.parseBoolean(type)){
+				if(Promotion.Rule.valueOf(Integer.parseInt(pType)) == Promotion.Rule.DISPLAY_ONLY){
+					promotionCreateBuilder = Promotion.CreateBuilder.newInstance4Welcome(title, 
+							 new DateRange(beginDate, endDate),
+							 body,
+							 entire);						
+				}else{
+					CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price), DateUtil.parseDate(expiredDate)).setComment("活动优惠劵");
+					if(image != null && !image.isEmpty()){
+						typeInsertBuilder.setImage(Integer.parseInt(image));
+					}
+					
+					promotionCreateBuilder = Promotion.CreateBuilder.newInstance4Welcome(title, 
+							 new DateRange(beginDate, endDate),
+							 body,
+							 Promotion.Rule.valueOf(Integer.parseInt(pType)),
+							 typeInsertBuilder,
+							 entire);
+					if(point != null && !point.isEmpty() && Promotion.Rule.valueOf(Integer.parseInt(pType)) != Promotion.Rule.FREE){
+						promotionCreateBuilder.setPoint(Integer.parseInt(point));
+					}
 				}
 				
+			}else{
+				if(Promotion.Rule.valueOf(Integer.parseInt(pType)) == Promotion.Rule.DISPLAY_ONLY){
+					promotionCreateBuilder = Promotion.CreateBuilder.newInstance4Display(title, 
+																				 new DateRange(beginDate, endDate), 
+																				 body,
+																				 entire);
+				}else{
+					CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price), DateUtil.parseDate(expiredDate)).setComment("活动优惠劵");
+					if(image != null && !image.isEmpty()){
+						typeInsertBuilder.setImage(Integer.parseInt(image));
+					}
+					
+					promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, 
+							 new DateRange(beginDate, endDate),
+							 body,
+							 Promotion.Rule.valueOf(Integer.parseInt(pType)),
+							 typeInsertBuilder,
+							 entire);
+					if(point != null && !point.isEmpty() && Promotion.Rule.valueOf(Integer.parseInt(pType)) != Promotion.Rule.FREE){
+						promotionCreateBuilder.setPoint(Integer.parseInt(point));
+					}
+				}				
 			}
-			
 			
 			String[] memberList = members.split(",");
 			
@@ -113,7 +139,7 @@ public class OperatePromotionAction extends DispatchAction{
 		String endDate = request.getParameter("endDate");
 		String body = request.getParameter("body");
 		String entire = request.getParameter("entire");
-		String pType = request.getParameter("pType");
+		String pRule = request.getParameter("pRule");
 		String point = request.getParameter("point");
 		String members = request.getParameter("members");
 		String oriented = request.getParameter("oriented");
@@ -130,7 +156,7 @@ public class OperatePromotionAction extends DispatchAction{
 			
 			
 			Promotion.UpdateBuilder promotionUpdateBuilder;
-			if(Promotion.Rule.valueOf(Integer.parseInt(pType)) == Promotion.Rule.DISPLAY_ONLY){
+			if(Promotion.Rule.valueOf(Integer.parseInt(pRule)) == Promotion.Rule.DISPLAY_ONLY){
 				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(new DateRange(beginDate, endDate))
 										 .setTitle(title)
 										 .setBody(body, entire);
@@ -469,6 +495,38 @@ public class OperatePromotionAction extends DispatchAction{
 		}
 		return sb.toString();	
 
+	}	
+	
+	public ActionForward HaveWelcomePage(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		
+		JObject jobject = new JObject();
+		try{
+			PromotionDao.ExtraCond extra = new PromotionDao.ExtraCond();
+			extra.setType(Promotion.Type.WELCOME);
+			extra.addStatus(Promotion.Status.PROGRESS).addStatus(Promotion.Status.CREATED).addStatus(Promotion.Status.PUBLISH);
+			
+			List<Promotion> list = PromotionDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), extra);
+			
+			jobject.setRoot(list);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;		
+		
 	}	
 	
 }
