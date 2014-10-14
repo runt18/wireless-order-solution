@@ -110,8 +110,8 @@ $(function(){
 		 calcFloatDivs();
 	};
 	window.onresize = autoWidth;*/
-	
-	$.post('../../OperatePromotion.do', {dataSource : 'HaveWelcomePage'}, function(jr){
+	alert(screen.width)
+	$.post('../../OperatePromotion.do', {dataSource : 'hasWelcomePage', 'fid':Util.mp.fid}, function(jr){
 			if(jr.success && jr.root.length > 0){
 				haveWelcomePageId = jr.root[0].id;
 			}		
