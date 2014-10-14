@@ -412,9 +412,9 @@ function fnCheckHaveWelcome(){
 		data : {dataSource : 'HaveWelcomePage'},
 		success : function(jr, status, xhr){
 			if(jr.root.length > 0){
-				$('#spanSetWelcome').hide();
+				$('#divSetWelcome').hide();
 			}else{
-				$('#spanSetWelcome').show();
+				$('#divSetWelcome').show();
 			}
 		},
 		error : function(request, status, err){
