@@ -152,19 +152,12 @@ function bindMember(c){
 				success : function(data, status, xhr){
 					if(data.success){
 						if(haveWelcomePageId){
-							$.post({
-								url : '../../QueryCoupon.do',
-								data : {dataSource : 'byCondtion', fid : Util.mp.fid, oid : Util.mp.oid, pId : haveWelcomePageId},
-								success : function(jr, status, xhr){
+							$.post('../../QueryCoupon.do',{dataSource : 'byCondtion', fid : Util.mp.fid, oid : Util.mp.oid, pId : haveWelcomePageId},function(jr){
 									if(jr.success && jr.root.length > 0){
-										window.location.href = Util.skip('sales.html', jr.root[0].id);
+										Util.skip('sales.html', jr.root[0].couponId);
 									}else{
 										window.location.reload();
 									}
-								},
-								failure : function(jr, status, xhr){
-									
-								}								
 							});
 							
 						}else{
@@ -642,8 +635,8 @@ function getLevelChartInfo(x,point){
 	}
 	return '<span style="font-size : 14px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
 			+ (temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>' 
-			+ (temp.chargeRate >1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠, 充100送'+parseInt((temp.chargeRate-1)*100)+'元':'')  + '</font>' 
-			+ (temp.exchangeRate >1 ? '<br/>'+ '<font style="font-size: 12px;color:maroon">' + temp.exchangeRate +'倍积分特权, 消费1元积'+temp.exchangeRate+'分':'') + '</font>' 
+			+ (temp.chargeRate >1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠，</font> <br/><font style="font-size: 13px;color:maroon">充100送'+parseInt((temp.chargeRate-1)*100)+'元':'')  + '</font>' 
+			+ (temp.exchangeRate >1 ? '<br/>'+ '<font style="font-size: 12px;color:maroon">' + temp.exchangeRate +'倍积分特权，</font> <br/><font style="font-size: 13px;color:maroon">消费1元积'+temp.exchangeRate+'分':'') + '</font>' 
 			;		
 }
 
