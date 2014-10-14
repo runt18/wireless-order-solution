@@ -504,7 +504,6 @@ Ext.onReady(function() {
 					promotionTree.getRootNode().getUI().show();
 				}
 				fnCheckHaveWelcome();
-				console.log(111111111)
 			},
 			click : function(e){
 				getPromotionBodyById(e.attributes.id);
