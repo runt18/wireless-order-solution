@@ -497,10 +497,23 @@ public class OperatePromotionAction extends DispatchAction{
 
 	}	
 	
-	public ActionForward HaveWelcomePage(ActionMapping mapping, ActionForm form,
+	public ActionForward hasWelcomePage(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		String pin = (String) request.getAttribute("pin");
+		String formId = request.getParameter("fid");
+		
+		int rid = 0;
+		Staff staff;
+		if(pin != null){
+			staff = StaffDao.verify(Integer.parseInt(pin));
+		}else{
+			DBCon dbCon = new DBCon();
+			dbCon.connect();
+			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+			staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
+			dbCon.disconnect();
+		}
 		
 		JObject jobject = new JObject();
 		try{
@@ -508,13 +521,10 @@ public class OperatePromotionAction extends DispatchAction{
 			extra.setType(Promotion.Type.WELCOME);
 			extra.addStatus(Promotion.Status.PROGRESS).addStatus(Promotion.Status.CREATED).addStatus(Promotion.Status.PUBLISH);
 			
-			List<Promotion> list = PromotionDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), extra);
+			List<Promotion> list = PromotionDao.getByCond(staff, extra);
 			
 			jobject.setRoot(list);
 			
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
 		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
