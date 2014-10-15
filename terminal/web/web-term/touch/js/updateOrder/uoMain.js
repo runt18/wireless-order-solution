@@ -617,6 +617,26 @@ uo.submitUpdateOrderHandler = function(c){
 	}
 };
 
+uo.tempPayForPrintAll = function(c){
+	Util.LM.show();
+	$.post('../PrintOrder.do', {'tableID' : uo.order.table.alias, 'printType' : 1}, function(result){
+		Util.LM.hide();
+		if(result.success){
+			Util.msg.alert({
+				msg : '操作成功',
+				time : 3,
+				callback : null
+			});
+		}else{
+			Util.msg.alert({
+				title : '错误',
+				msg : result.data,
+				time : 3
+			});
+		}		
+	});
+}
+
 /**
  * 暂结
  */
