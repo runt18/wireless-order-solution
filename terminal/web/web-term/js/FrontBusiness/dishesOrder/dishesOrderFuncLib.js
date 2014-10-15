@@ -822,7 +822,7 @@ function refreshOrder(res){
 			}
 		},this);
 	}else if(eval(res.code == 3)){
-		var interval = 3;
+/*		var interval = 3;
 		var action = '<br/>点击确定返回或&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
 		new Ext.util.TaskRunner().start({
 			run: function(){
@@ -840,11 +840,12 @@ function refreshOrder(res){
 			width : 300,
 			buttons : Ext.MessageBox.OK,
 			fn : function(){
-				if(submitType != 6){
-					location.href = "TableSelect.html";
-				}
+
 			}
-		});
+		});*/
+		if(submitType != 6){
+			location.href = "TableSelect.html";
+		}
 	}else if(eval(res.code == Ext.ux.errorCode.ORDER_EXPIRED)){
 		Ext.MessageBox.INSERTUPDATE = {yes:"继续提交", no:"刷新账单"};
 		Ext.Msg.show({
@@ -1056,7 +1057,7 @@ function setButtonDisabled(s){
  * 
  */
 function skip(_c){
-	var interval = 3;
+/*	var interval = 3;
 	var action = '';
 	if(typeof(_c.href) != 'undefined'){
 		action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
@@ -1091,5 +1092,14 @@ function skip(_c){
 				}						
 			}
 		}
-	});
+	});*/
+	
+			if(typeof(_c.href) != 'undefined'){
+				var num = _c.href.indexOf('?');
+				if(num <= 0){
+					location.href = _c.href;	
+				}else{
+					setDynamicKey(_c.href.substring(0, num), _c.href.substr(num + 1));
+				}						
+			}	
 }

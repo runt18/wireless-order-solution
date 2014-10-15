@@ -126,7 +126,7 @@ function initMaterialControl(){
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;&nbsp;&nbsp;物品名称:'
 		}, {
-			id : 'txtSearchForMaterialName',
+			id : 'init_txtSearchForMaterialName',
 			xtype : 'textfield',
 			width : 100
 		}, '->', {
@@ -135,7 +135,7 @@ function initMaterialControl(){
 			iconCls : 'btn_search',
 			handler : function(){
 				var sn = init_materialCateTree.getSelectionModel().getSelectedNode();
-				var name = Ext.getCmp('txtSearchForMaterialName');
+				var name = Ext.getCmp('init_txtSearchForMaterialName');
 				var deptId = Ext.getCmp('init_deptCombo');
 				var gs = init_materialBasicGrid.getStore();
 				gs.baseParams['cateType'] = (sn == null || !sn ? '' : sn.attributes.type);
@@ -205,6 +205,8 @@ function initMaterialControl(){
 									var jr = Ext.decode(res.responseText);
 									if(jr.success){
 										Ext.example.msg(jr.title, jr.msg);
+										Ext.getCmp('init_txtSearchForMaterialName').setValue();
+										Ext.getCmp('btnSearchInitMaterial').handler();
 									}else{
 										Ext.ux.showMsg({success:false, msg:'初始化失败,请联系客服'});
 									}
@@ -218,6 +220,9 @@ function initMaterialControl(){
 					}
 				});				
 			}
+		},{
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;'
 		}]
 	});
 	
@@ -243,7 +248,7 @@ function initMaterialControl(){
 	});
 	
 	init_materialBasicGrid = new Ext.grid.EditorGridPanel({
-		title : '货品列表 -- 单击库存列即可修改库存数量',
+		title : '货品列表 -- <font color="green" size=4>单击库存列即可修改库存数量</font>',
 		id : 'init_materialBasicGrid',
 		region : 'center',
 		store : ds,
@@ -257,26 +262,29 @@ function initMaterialControl(){
 		tbar : materialBasicGridTbar,
 		listeners : {
 			beforeedit : function(e){
-				$.post('../../OperateMaterialInit.do', {dataSource:'isInit'}, function(jr){
-					if(!jr.success){
-						Ext.example.msg('提示', '未初始化库存, 不能修改库存数量');
-						e.record.commit();
-						return false;					
-					}
-				});				
+				if(!isInit){
+					return false;	
+				}
 			},
 			afteredit : function(e){
 				if(editData != ''){
 					editData += '<li>';
 				}
 				editData += (e.record.data['id'] + ',' + e.record.data['stock'] );
-			}
+			},
+			cellclick : function(grid, rowIndex, columnIndex, e) {
+		        var record = grid.getStore().getAt(rowIndex);  // Get the Record
+				$.post('../../OperateMaterialInit.do', {dataSource:'isInit'}, function(jr){
+					isInit = jr.success;
+					if(!jr.success){
+						Ext.example.msg('提示', '未初始化库存, 不能修改库存数量');
+						record.commit();
+					}
+				});			        
+		        
+		    }
 		}
 	});
-	
-	
-//	ds.load();	
-	
 	
 	init_materialBasicGrid.keys = [{
 		 key : Ext.EventObject.ENTER,

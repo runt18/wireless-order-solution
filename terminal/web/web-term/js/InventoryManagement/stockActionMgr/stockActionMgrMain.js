@@ -29,7 +29,7 @@ function stockTaskNavHandler(e){
 		var act = stockTaskNavWin.getLayout().activeItem;
 		var index = e.change + act.index;
 		
-		/***** 第二步, 选择入库单类型, 预处理 *****/
+		/***** 第一步, 选择入库单类型, 预处理 *****/
 		if(act.index == 0){
 			var select = null;
 			var type = Ext.query('input[name=\"radioStockOrderType\"]');
@@ -289,7 +289,7 @@ function stockTaskNavHandler(e){
 			stockTaskNavWin.setTitle(stockTaskNavWin.getLayout().activeItem.mt);
 		}else{
 			if(index > 1){
-				// 完成
+				// 完成时的操作
 				var id = Ext.getCmp('hideStockActionId');
 				var deptIn = Ext.getCmp('comboDeptInForStockActionBasic');
 				var supplier = Ext.getCmp('comboSupplierForStockActionBasic');
@@ -338,6 +338,9 @@ function stockTaskNavHandler(e){
 					Ext.example.msg('提示', '操作失败, 请选中货品信息.');
 					return;
 				}
+				//防止重复点击
+				btnNext.setDisabled(true);
+				
 				for(var i = 0; i < secondStepPanelCenter.getStore().getCount(); i++){
 					var temp = secondStepPanelCenter.getStore().getAt(i);
 					if(i>0){
@@ -364,6 +367,7 @@ function stockTaskNavHandler(e){
 						detail : detail
 					},
 					success : function(res, opt){
+						btnNext.setDisabled(false);
 						var jr = Ext.decode(res.responseText);
 						if(jr.success){
 							Ext.example.msg(jr.title, jr.msg);
@@ -380,6 +384,7 @@ function stockTaskNavHandler(e){
 						}
 					},
 					failure : function(res, opt){
+						btnNext.setDisabled(false);
 						Ext.ux.showMsg(Ext.decode(res.responseText));
 					}
 				});

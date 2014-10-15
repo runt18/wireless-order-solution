@@ -13,9 +13,9 @@ var dishesOrderNorthPanel = new Ext.Panel({
 			xtype : 'form',
 			layout : 'form',
 			labelWidth : 65,
-			width : 220,
+			width : 200,
 			defaults : {
-				width : 130
+				width : 110
 			}
 		}
 	},
@@ -64,9 +64,10 @@ var dishesOrderNorthPanel = new Ext.Panel({
 			html : '上限:￥<font id="fontShowEraseQuota" style="color:red;">0.00</font>'
 		}, {
 			width : 80,
+			labelWidth : 55,
 			items : [{
 				xtype : 'label',
-				width : 50,
+				width : 40,
 				fieldLabel : '服务费',
 				id : 'serviceRate',
 				style : 'font-size:15px;text-align:right;'
