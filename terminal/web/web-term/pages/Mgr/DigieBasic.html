@@ -65,6 +65,9 @@ var monthlySet = true;
 var memberTipWin;
 
 function addTab(id, title, url, callback){
+ 	if(tabs.items.length > 9){
+		tabs.remove(tabs.getComponent(1));
+	} 	
 	var tab = tabs.getComponent(id);
 	
 	if(!tab){
@@ -113,9 +116,6 @@ function addTab(id, title, url, callback){
 
 	}
 	tabs.setActiveTab(tab);
- 	if(tabs.items.length > 9){
-		tabs.remove(tabs.getComponent(1));
-	} 
  	
     if(typeof callback == 'function'){
     	callback();
