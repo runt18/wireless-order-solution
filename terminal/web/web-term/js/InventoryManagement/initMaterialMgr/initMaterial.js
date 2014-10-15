@@ -152,31 +152,40 @@ function initMaterialControl(){
 				if(!editData){
 					return;
 				}
-				init_uploadMask.show();
-				var deptId = Ext.getCmp('init_deptCombo');
-				
-				Ext.Ajax.request({
-					url : '../../OperateMaterialInit.do',
-					params : {
-						dataSource : 'updateDeptStock',
-						deptId : deptId.getValue(),
-						editData : editData
-					},
-					success : function(res, opt){
-						init_uploadMask.hide();
-						var jr = Ext.decode(res.responseText);
-						if(jr.success){
-							Ext.example.msg(jr.title, jr.msg);
-							init_materialBasicGrid.getStore().commitChanges();
-							editData = '';
-						}else{
-							Ext.ux.showMsg(jr);
-						}						
-					},
-					failure : function(res, opt){
-						Ext.ux.showMsg(Ext.decode(res.responseText));
+				$.post('../../OperateMaterialInit.do', {dataSource:'isInit'}, function(jr){
+					isInit = jr.success;
+					if(jr.success){
+						init_uploadMask.show();
+						var deptId = Ext.getCmp('init_deptCombo');
+						
+						Ext.Ajax.request({
+							url : '../../OperateMaterialInit.do',
+							params : {
+								dataSource : 'updateDeptStock',
+								deptId : deptId.getValue(),
+								editData : editData
+							},
+							success : function(res, opt){
+								init_uploadMask.hide();
+								var jr = Ext.decode(res.responseText);
+								if(jr.success){
+									Ext.example.msg(jr.title, jr.msg);
+									init_materialBasicGrid.getStore().commitChanges();
+									editData = '';
+								}else{
+									Ext.ux.showMsg(jr);
+								}						
+							},
+							failure : function(res, opt){
+								Ext.ux.showMsg(Ext.decode(res.responseText));
+							}
+						});
+					}else{
+						Ext.example.msg('提示', '未初始化库存, 不能修改库存数量');
 					}
-				});
+				});	
+				
+
 			}
 		},{
 			xtype : 'tbtext',
@@ -202,6 +211,7 @@ function initMaterialControl(){
 									dataSource : 'init'
 								},
 								success : function(res, opt){
+									fnCheckIsInit();
 									var jr = Ext.decode(res.responseText);
 									if(jr.success){
 										Ext.example.msg(jr.title, jr.msg);
@@ -210,7 +220,7 @@ function initMaterialControl(){
 									}else{
 										Ext.ux.showMsg({success:false, msg:'初始化失败,请联系客服'});
 									}
-									fnCheckIsInit();
+									
 								},
 								failure : function(res, opt) {
 									Ext.ux.showMsg({success:false, msg:'操作失败, 请刷新页面后再试'});

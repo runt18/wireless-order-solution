@@ -295,7 +295,6 @@ function createOrderFoodGridPanelTbar(){
 							Ext.Ajax.request({
 								url : '../../PrintOrder.do',
 								params : {
-									isCookie : true,
 									'tableID' : tableAliasID,
 									'printType' : 1
 								},
