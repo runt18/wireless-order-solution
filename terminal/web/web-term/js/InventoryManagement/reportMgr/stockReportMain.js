@@ -231,8 +231,8 @@ Ext.onReady(function(){
 				if(!rn){
 					cateType = '';
 				}else{
-					if(rn.attributes.typeId){
-						cateType = rn.attributes.typeId;
+					if(rn.attributes.cate){
+						cateType = rn.attributes.cate;
 					}else{
 						cateId = rn.attributes.cateId;
 					}

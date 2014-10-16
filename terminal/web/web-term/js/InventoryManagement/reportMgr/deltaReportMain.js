@@ -147,6 +147,8 @@ Ext.onReady(function(){
 	       new Ext.grid.RowNumberer(),
 	       {header: '品项名称 ', dataIndex: 'material.name'},
 	       {header: '初期数量', dataIndex: 'primeAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+	       {header: '入库总数', dataIndex: 'stockInTotal', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+	       {header: '出库总数', dataIndex: 'stockOutTotal', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
 	       {header: '期末数量', dataIndex: 'endAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
 	       {header: '理论消耗', dataIndex: 'expectAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
 	       {header: '实际消耗', dataIndex: 'actualAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
@@ -159,11 +161,12 @@ Ext.onReady(function(){
 		reader : new Ext.data.JsonReader({totalProperty: 'totalProperty', root:'root'},[
 				{name: 'material.name'},
 				{name: 'primeAmount'},
+				{name: 'stockInTotal'},
+				{name: 'stockOutTotal'},
+				{name: 'endAmount'},
 				{name: 'expectAmount'},
 				{name: 'actualAmount'},
-				{name: 'deltaAmount'},
-				{name: 'endAmount'},
-				{name: 'primeAmount'}
+				{name: 'deltaAmount'}
 		])
 	});
 

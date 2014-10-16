@@ -299,7 +299,10 @@ function stockTaskNavHandler(e){
 				var comment = Ext.getCmp('txtCommentForStockActionBasic');
 				var actualPrice = Ext.getDom('txtActualPrice');
 				var detail = '';
-				if(!oriStockDate.isValid()){
+				if(!oriStockDate.getValue()){
+					if(oriStockDate.isValid()){
+					
+					}
 					return;
 				}
 				var stockTypeList = stockTaskNavWin.stockType.split(',');
@@ -589,7 +592,7 @@ function updateStockActionHandler(){
 			Ext.getCmp('btnAuditStockAction').hide();
 		}else{
 			Ext.getCmp('sam_secondStepPanelWest').setDisabled(false);
-			Ext.getCmp('btnAuditStockAction').show();
+			Ext.getCmp('btnAuditStockAction').hide();
 		}
 	}else{
 		stockTaskNavWin.otype = Ext.ux.otype['select'];
@@ -762,12 +765,14 @@ function getCurrentDay(){
 		url : '../../QueryCurrentMonth.do',
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
-			Ext.getCmp('datetOriStockDateForStockActionBasic').setMaxValue(NewDate(jr.other.currentDay));
 			if(jr.other.minDay){
 				Ext.getCmp('datetOriStockDateForStockActionBasic').setMinValue(NewDate(jr.other.minDay));
 			}
 			if(NewDate(jr.other.currentDay) < new Date()){
 				Ext.getCmp('datetOriStockDateForStockActionBasic').setValue(NewDate(jr.other.currentDay));
+				Ext.getCmp('datetOriStockDateForStockActionBasic').setMaxValue(NewDate(jr.other.currentDay));
+			}else{
+				Ext.getCmp('datetOriStockDateForStockActionBasic').setMaxValue(new Date());
 			}
 		},
 		failure : function(res, opt){
@@ -1578,7 +1583,12 @@ function initControl(){
 					format : 'Y-m-d',
 					readOnly : false,
 					allowBlank : false,
-					blankText : '日期不能为空, 且小于当前会计月月底并大于该月最后一次盘点时间.'
+					blankText : '日期不能为空, 且小于当前会计月月底并大于该月最后一次盘点时间.',
+					listeners : {
+						blur : function(thiz){
+							thiz.clearInvalid();		
+						}
+					}
 				}]
 	    		}, {
 	    			columnWidth : 1,

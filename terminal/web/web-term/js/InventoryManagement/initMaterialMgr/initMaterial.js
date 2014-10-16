@@ -3,6 +3,41 @@
 var init_uploadMask = new Ext.LoadMask(document.body, {
 	msg : '正在保存...'
 });
+
+function initStock(){
+	Ext.Msg.show({
+		title : '是否初始化库存?',
+		msg : '初始化后将清空所有库存库单和盘点单等信息',
+		icon: Ext.MessageBox.QUESTION,
+		buttons : Ext.Msg.YESNO,
+		fn : function(e){
+			if(e == 'yes'){
+				Ext.Ajax.request({
+					url : '../../OperateMaterialInit.do',
+					params : {
+						dataSource : 'init'
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						if(jr.success){
+							isInit = true;
+							Ext.example.msg(jr.title, jr.msg);
+							Ext.getCmp('init_txtSearchForMaterialName').setValue();
+							Ext.getCmp('btnSearchInitMaterial').handler();
+						}else{
+							Ext.ux.showMsg({success:false, msg:'初始化失败,请联系客服'});
+						}
+						
+					},
+					failure : function(res, opt) {
+						Ext.ux.showMsg({success:false, msg:'操作失败, 请刷新页面后再试'});
+					}
+				});
+			}
+		}
+	});		
+}
+
 function initMaterialControl(){
 	var init_deptCombo = new Ext.form.ComboBox({
 		id : 'init_deptCombo',
@@ -101,7 +136,7 @@ function initMaterialControl(){
 							Ext.ux.showMsg(Ext.decode(res.responseText));
 						}
 	        		});
-	        		Ext.getCmp('btnSearchInitMaterial').handler();
+	        		//Ext.getCmp('btnSearchInitMaterial').handler();
 	        	}
 	        }
 		}),
@@ -134,15 +169,18 @@ function initMaterialControl(){
 			id : 'btnSearchInitMaterial',
 			iconCls : 'btn_search',
 			handler : function(){
-				var sn = init_materialCateTree.getSelectionModel().getSelectedNode();
-				var name = Ext.getCmp('init_txtSearchForMaterialName');
-				var deptId = Ext.getCmp('init_deptCombo');
-				var gs = init_materialBasicGrid.getStore();
-				gs.baseParams['cateType'] = (sn == null || !sn ? '' : sn.attributes.type);
-				gs.baseParams['cateId'] = (sn == null || !sn ? '' : sn.attributes.cateId);
-				gs.baseParams['deptId'] = deptId.getValue();
-				gs.baseParams['name'] = name.getValue();
-				gs.load();
+				if(isInit){
+					var sn = init_materialCateTree.getSelectionModel().getSelectedNode();
+					var name = Ext.getCmp('init_txtSearchForMaterialName');
+					var deptId = Ext.getCmp('init_deptCombo');
+					var gs = init_materialBasicGrid.getStore();
+					gs.baseParams['cateType'] = (sn == null || !sn ? '' : sn.attributes.type);
+					gs.baseParams['cateId'] = (sn == null || !sn ? '' : sn.attributes.cateId);
+					gs.baseParams['deptId'] = deptId.getValue();
+					gs.baseParams['name'] = name.getValue();
+					gs.load();				
+				}
+
 			}
 		}, {
 			text : '保存设置',
@@ -184,8 +222,6 @@ function initMaterialControl(){
 						Ext.example.msg('提示', '未初始化库存, 不能修改库存数量');
 					}
 				});	
-				
-
 			}
 		},{
 			xtype : 'tbtext',
@@ -198,37 +234,7 @@ function initMaterialControl(){
 			id : 'btnInitMaterial',
 			iconCls : 'btn_delete',
 			handler : function(){
-				Ext.Msg.show({
-					title : '重要',
-					msg : '是否清空所有库存信息?',
-					icon: Ext.MessageBox.QUESTION,
-					buttons : Ext.Msg.YESNO,
-					fn : function(e){
-						if(e == 'yes'){
-							Ext.Ajax.request({
-								url : '../../OperateMaterialInit.do',
-								params : {
-									dataSource : 'init'
-								},
-								success : function(res, opt){
-									fnCheckIsInit();
-									var jr = Ext.decode(res.responseText);
-									if(jr.success){
-										Ext.example.msg(jr.title, jr.msg);
-										Ext.getCmp('init_txtSearchForMaterialName').setValue();
-										Ext.getCmp('btnSearchInitMaterial').handler();
-									}else{
-										Ext.ux.showMsg({success:false, msg:'初始化失败,请联系客服'});
-									}
-									
-								},
-								failure : function(res, opt) {
-									Ext.ux.showMsg({success:false, msg:'操作失败, 请刷新页面后再试'});
-								}
-							});
-						}
-					}
-				});				
+				initStock();			
 			}
 		},{
 			xtype : 'tbtext',
@@ -286,7 +292,7 @@ function initMaterialControl(){
 		        var record = grid.getStore().getAt(rowIndex);  // Get the Record
 				$.post('../../OperateMaterialInit.do', {dataSource:'isInit'}, function(jr){
 					isInit = jr.success;
-					if(!jr.success){
+					if(!isInit){
 						Ext.example.msg('提示', '未初始化库存, 不能修改库存数量');
 						record.commit();
 					}
@@ -310,11 +316,9 @@ function fnCheckIsInit(){
 	$.post('../../OperateMaterialInit.do', {dataSource:'isInit'}, function(jr){
 		isInit = jr.success;
 	});
-	
 }
 
 Ext.onReady(function(){
-	fnCheckIsInit();
 	
 	initMaterialControl();
 	
@@ -326,4 +330,14 @@ Ext.onReady(function(){
 		frame : true,
 		items : [init_materialCateTree, init_materialBasicGrid]
 	});
+	
+	$.post('../../OperateMaterialInit.do', {dataSource:'isInit'}, function(jr){
+		isInit = jr.success;
+		if(!jr.success){
+			initStock();
+		}else{
+			Ext.getCmp('btnSearchInitMaterial').handler();
+		}		
+	});
+
 });
