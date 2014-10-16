@@ -70,8 +70,11 @@ public class StockTakeDetail implements Jsonable {
 	private float expectAmount;
 	private float deltaAmount;
 	
+	//消耗差异表字段
 	private float primeAmount;
 	private float endAmount;
+	private float stockInTotal;
+	private float stockOutTotal;
 	
 	public int getId() {
 		return id;
@@ -118,6 +121,9 @@ public class StockTakeDetail implements Jsonable {
 	public void setDeltaAmount(float deltaAmount) {
 		this.deltaAmount = deltaAmount;
 	}	
+	
+	
+	
 	public float getPrimeAmount() {
 		return primeAmount;
 	}
@@ -129,6 +135,18 @@ public class StockTakeDetail implements Jsonable {
 	}
 	public void setEndAmount(float endAmount) {
 		this.endAmount = endAmount;
+	}
+	public float getStockInTotal() {
+		return stockInTotal;
+	}
+	public void setStockInTotal(float stockInTotal) {
+		this.stockInTotal = stockInTotal;
+	}
+	public float getStockOutTotal() {
+		return stockOutTotal;
+	}
+	public void setStockOutTotal(float stockOutTotal) {
+		this.stockOutTotal = stockOutTotal;
 	}
 	
 	
@@ -196,6 +214,8 @@ public class StockTakeDetail implements Jsonable {
 		jm.putFloat("deltaAmount", this.deltaAmount);
 		jm.putFloat("primeAmount", this.primeAmount);
 		jm.putFloat("endAmount", this.endAmount);
+		jm.putFloat("stockInTotal", this.stockInTotal);
+		jm.putFloat("stockOutTotal", this.stockOutTotal);
 		return jm;
 	}
 	
