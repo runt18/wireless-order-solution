@@ -36,8 +36,10 @@ public class QueryCurrentMonthAction extends Action{
 		int m = 0;
 		DateFormat df = new SimpleDateFormat("yyyy-MM");  
 		
+		//当前月份
 		Calendar presentMonth = Calendar.getInstance();
-		Calendar accountMonth = Calendar.getInstance();
+		//会计月份
+		Calendar accountingMonth = Calendar.getInstance();
 		
 		presentMonth.setTime(df.parse(df.format(new Date())));
 		DBCon dbCon = new DBCon();
@@ -45,13 +47,13 @@ public class QueryCurrentMonthAction extends Action{
 		try{
 			//获取最近月结时间
 			monthly = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(Integer.parseInt(restaurantID));
-			accountMonth.setTime(df.parse(df.format(new Date(monthly))));
-			while(presentMonth.after(accountMonth)){
+			accountingMonth.setTime(df.parse(df.format(new Date(monthly))));
+			while(presentMonth.after(accountingMonth)){
 				m ++;
 				presentMonth.add(Calendar.MONTH, -1);
 			}
 			if(m >= 1){
-				jobject.initTip(true, (accountMonth.get(Calendar.MONTH)+1)+"");
+				jobject.initTip(true, (accountingMonth.get(Calendar.MONTH)+1)+"");
 			}else{
 				throw new BusinessException(StockError.NOT_MONTHLY_BALANCE);
 			}
@@ -63,9 +65,9 @@ public class QueryCurrentMonthAction extends Action{
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
-			accountMonth.setTimeInMillis(monthly);
-			final String date = accountMonth.get(Calendar.YEAR) + "-" + (accountMonth.get(Calendar.MONTH) + 1) + "-" + accountMonth.getActualMaximum(Calendar.DAY_OF_MONTH);
-			
+			accountingMonth.setTimeInMillis(monthly);
+			final String date = accountingMonth.get(Calendar.YEAR) + "-" + (accountingMonth.get(Calendar.MONTH) + 1) + "-" + accountingMonth.getActualMaximum(Calendar.DAY_OF_MONTH);
+			final String minDate = accountingMonth.get(Calendar.YEAR) + "-" + (accountingMonth.get(Calendar.MONTH) + 1) + "-01";
 			
 			dbCon.connect();
 			String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + restaurantID + 
@@ -88,7 +90,7 @@ public class QueryCurrentMonthAction extends Action{
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putString("currentDay", date);
-					jm.putString("minDay", minDay != null ? new SimpleDateFormat("yyyy-MM-dd").format(minDay) : null);
+					jm.putString("minDay", minDay != null ? new SimpleDateFormat("yyyy-MM-dd").format(minDay) : minDate);
 					return jm;
 				}
 

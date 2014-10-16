@@ -35,12 +35,22 @@ public class QueryDeptTreeAction extends Action{
 		DBCon dbCon = new DBCon();*/
 		String pin = (String) request.getAttribute("pin");
 		
+		String warehouse = request.getParameter("warehouse");
+		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		StringBuffer jsonSB = new StringBuffer();
 		
+		List<Department> deptList;
 		
-		List<DeptNode> depts = new DepartmentTree.Builder(DepartmentDao.getByType(staff, Department.Type.NORMAL), KitchenDao.getByType(staff, Kitchen.Type.NORMAL)).build().asDeptNodes();
+		if(warehouse != null && !warehouse.isEmpty()){
+			deptList = DepartmentDao.getDepartments4Inventory(staff);
+		}else{
+			deptList = DepartmentDao.getByType(staff, Department.Type.NORMAL);
+		}
+		
+		
+		List<DeptNode> depts = new DepartmentTree.Builder(deptList, KitchenDao.getByType(staff, Kitchen.Type.NORMAL)).build().asDeptNodes();
 		try{
 /*			String restaurantID = (String)request.getAttribute("restaurantID");
 			if(restaurantID == null){

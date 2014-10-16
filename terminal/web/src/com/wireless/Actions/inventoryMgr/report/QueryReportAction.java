@@ -59,12 +59,13 @@ public class QueryReportAction extends Action {
 				if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
 					extra += " AND M.material_id = " + materialId;
 				}
-				if(cateType.trim().isEmpty() && cateId.trim().isEmpty()){
-					
-				}else if(!cateType.trim().isEmpty() && cateId.trim().isEmpty()){
+				
+				if(cateType != null && !cateType.isEmpty()){
 					extra += " AND S.cate_type = " + cateType;
-				}else{
-					extra += " AND M.cate_id = " + cateId; 
+				}
+				
+				if(cateId != null && !cateId.isEmpty()){
+					extra += " AND M.cate_id = " + cateId;
 				}
 				
 				if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
