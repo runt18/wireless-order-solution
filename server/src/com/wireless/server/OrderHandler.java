@@ -168,7 +168,7 @@ class OrderHandler implements Runnable{
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE){
 					//handle query table request
-					response = new RespPackage(request.header, TableDao.getTables(staff, null, null), Table.TABLE_PARCELABLE_COMPLEX);
+					response = new RespPackage(request.header, TableDao.getByCond(staff, null, null), Table.TABLE_PARCELABLE_COMPLEX);
 				
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_BY_TBL){
 					//handle query order request
@@ -177,7 +177,7 @@ class OrderHandler implements Runnable{
 
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE_STATUS){
 					//handle query table status
-					Table tblToQuery = TableDao.getTableByAlias(staff, new Parcel(request.body).readParcel(Table.CREATOR).getAliasId());
+					Table tblToQuery = TableDao.getByAlias(staff, new Parcel(request.body).readParcel(Table.CREATOR).getAliasId());
 					response = new RespACK(request.header, (byte)tblToQuery.getStatus().getVal());
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
@@ -321,7 +321,7 @@ class OrderHandler implements Runnable{
 		//handle insert order request force
 		Order orderToInsert = new Parcel(request.body).readParcel(Order.CREATOR);
 		
-		Table tblToOrder = TableDao.getTableByAlias(staff, orderToInsert.getDestTbl().getAliasId());
+		Table tblToOrder = TableDao.getByAlias(staff, orderToInsert.getDestTbl().getAliasId());
 		
 		if(tblToOrder.isIdle()){
 			return doInsertOrder(staff, request);
@@ -471,7 +471,7 @@ class OrderHandler implements Runnable{
 							//Check to see whether or not any coupons associated with this member is qualified to take.
 							for(Coupon coupon : coupons){
 								coupon = CouponDao.getById(staff, coupon.getId());
-								if(coupon.getPromotion().getType() == Promotion.Type.ONCE || coupon.getPromotion().getType() == Promotion.Type.TOTAL){
+								if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE || coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
 									if(coupon.getDrawProgress().isOk()){
 										CouponDao.draw(staff, coupon.getId());
 									}
@@ -546,8 +546,8 @@ class OrderHandler implements Runnable{
 		}else if(printType.isTransTbl()){
 			Parcel p = new Parcel(request.body);
 			int orderId = p.readInt();
-			Table srcTbl = TableDao.getTableByAlias(staff, p.readParcel(Table.CREATOR).getAliasId());
-			Table destTbl = TableDao.getTableByAlias(staff, p.readParcel(Table.CREATOR).getAliasId());
+			Table srcTbl = TableDao.getByAlias(staff, p.readParcel(Table.CREATOR).getAliasId());
+			Table destTbl = TableDao.getByAlias(staff, p.readParcel(Table.CREATOR).getAliasId());
 			new PrintHandler(staff)
 				.addContent(JobContentFactory.instance().createTransContent(printType, staff, printers, orderId, srcTbl, destTbl))
 				.fireSync();
