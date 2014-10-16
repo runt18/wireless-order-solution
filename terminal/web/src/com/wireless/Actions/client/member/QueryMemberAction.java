@@ -49,7 +49,7 @@ public class QueryMemberAction extends DispatchAction {
 				extra += " AND M.member_type_id = " + memberTypes[i];
 				Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 				paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
-				final MemberType mt = MemberTypeDao.getMemberTypeById(staff, Integer.parseInt(memberTypes[i]));
+				final MemberType mt = MemberTypeDao.getById(staff, Integer.parseInt(memberTypes[i]));
 				final int mc = MemberDao.getMemberCount(paramsSet);
 				mts.add(new Jsonable() {
 					

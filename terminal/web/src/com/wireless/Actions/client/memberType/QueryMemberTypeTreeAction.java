@@ -25,7 +25,7 @@ public class QueryMemberTypeTreeAction extends Action {
 		StringBuilder tsb = new StringBuilder();
 		try{
 			String pin = (String)request.getAttribute("pin");
-			List<MemberType> list = MemberTypeDao.getMemberType(StaffDao.verify(Integer.parseInt(pin)), null, " ORDER BY A.member_type_id ");
+			List<MemberType> list = MemberTypeDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), null, " ORDER BY A.member_type_id ");
 			MemberType item = null;
 			
 			tsb.append("[");

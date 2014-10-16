@@ -37,19 +37,20 @@ public class QueryTableAction extends Action {
 			String name = request.getParameter("name");
 			String regionId = request.getParameter("regionId");
 			
-			String extraCond = "", orderClause = "";
+			String orderClause = "";
+			TableDao.ExtraCond extraCond = new TableDao.ExtraCond();
 			if(alias != null && !alias.trim().isEmpty()){
-				extraCond += (" AND TBL.table_alias = " + alias.trim());
+				extraCond.setAliasId(Integer.parseInt(alias.trim()));
 			}
 			if(name != null && !name.trim().isEmpty()){
-				extraCond += (" AND TBL.name LIKE '%" + name.trim() + "%' ");
+				extraCond.setName(name.trim());
 			}
 			if(regionId != null && !regionId.trim().isEmpty()){
-				extraCond += (" AND REGION.region_id = " + regionId);
+				extraCond.setRegion(Integer.parseInt(regionId));
 			}
 			
 			orderClause = "ORDER BY TBL.table_alias";
-			tables = TableDao.getTables(StaffDao.verify(Integer.parseInt(pin)), extraCond, orderClause);
+			tables = TableDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), extraCond, orderClause);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());

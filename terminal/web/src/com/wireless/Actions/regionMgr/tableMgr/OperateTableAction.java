@@ -12,6 +12,7 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
@@ -38,13 +39,11 @@ public class OperateTableAction extends DispatchAction{
 			String name = request.getParameter("name");
 			String alias = request.getParameter("alias");
 			String minimumCost = request.getParameter("minimumCost");
-			String serviceRate = request.getParameter("serviceRate");
 			String regionId = request.getParameter("regionId");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			Table.InsertBuilder builder = new Table.InsertBuilder(Integer.parseInt(alias), staff.getRestaurantId(),  Short.parseShort(regionId))
+			Table.InsertBuilder builder = new Table.InsertBuilder(Integer.parseInt(alias), Region.RegionId.valueOf(Short.parseShort(regionId)))
 					.setMiniCost(Integer.valueOf(minimumCost))
-					.setServiceRate(Float.valueOf(serviceRate))
 					.setTableName(name);
 			TableDao.insert(staff, builder);
 			jobject.initTip(true, "操作成功, 已添加新餐台信息.");
@@ -83,9 +82,9 @@ public class OperateTableAction extends DispatchAction{
 			String minimumCost = request.getParameter("minimumCost");
 			
 			Table.UpdateBuilder builder = new Table.UpdateBuilder(Integer.valueOf(id)).setMiniCost(Integer.valueOf(minimumCost))
-					.setRegionId(Short.valueOf(regionId))
-					.setTableName(name);
-			TableDao.updateById(StaffDao.verify(Integer.parseInt(pin)), builder.build());
+												   .setRegionId(Region.RegionId.valueOf(Short.valueOf(regionId)))
+												   .setTableName(name);
+			TableDao.update(StaffDao.verify(Integer.parseInt(pin)), builder);
 			jobject.initTip(true, "操作成功, 已修改餐台信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();

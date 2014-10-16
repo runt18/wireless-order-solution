@@ -44,7 +44,7 @@ public class QueryMemberLevelAction extends DispatchAction{
 			}
 			memberLevelList = MemberLevelDao.get(staff);
 			
-			List<MemberType> memberTypeList = MemberTypeDao.getMemberType(staff, null, null);
+			List<MemberType> memberTypeList = MemberTypeDao.getByCond(staff, null, null);
 			
 			for (int j = 0; j < memberLevelList.size(); j++) {
 					ydata.add("{y:0, level : \'" +  memberLevelList.get(j).getMemberType().getName() 

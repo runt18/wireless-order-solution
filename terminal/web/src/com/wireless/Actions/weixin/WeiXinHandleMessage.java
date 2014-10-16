@@ -22,6 +22,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.PromotionError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.Promotion;
@@ -73,6 +74,39 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					.append("?_d=" + System.currentTimeMillis())
 					.append("&m=").append(msg.getFromUserName())
 					.append("&r=").append(msg.getToUserName()).toString();
+	}
+	
+	private Msg createWelcome(Msg msg) throws SQLException, BusinessException{
+		int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+		List<Promotion> welcome = PromotionDao.getByCond(StaffDao.getAdminByRestaurant(restaurantId), 
+											   new PromotionDao.ExtraCond().setType(Promotion.Type.WELCOME).addStatus(Promotion.Status.PROGRESS));
+		
+		//检查是否有欢迎活动，没有则显示导航页，有则显示欢迎活动
+		if(welcome.isEmpty()){
+			throw new BusinessException("没有创建欢迎活动", PromotionError.PROMOTION_NOT_EXIST);
+		}else{
+			Promotion promotion = welcome.get(0);
+			StringBuilder desc = new StringBuilder();
+			//活动时间
+			desc.append("活动时间：" + promotion.getDateRange().getOpeningFormat() + " 至 " + promotion.getDateRange().getEndingFormat()).append("\n");
+			//活动规则
+			String rule;
+			if(promotion.getRule() == Promotion.Rule.ONCE){
+				rule = "活动期内单次消费积分满" + promotion.getPoint() + "即可领取【" + promotion.getCouponType().getName() + "】";
+			}else if(promotion.getRule() == Promotion.Rule.TOTAL){
+				rule = "活动期内累计消费积分满" + promotion.getPoint() + "即可领取【" + promotion.getCouponType().getName() + "】";
+			}else if(promotion.getRule() == Promotion.Rule.FREE){
+				rule = "活动期内免费领取【" + promotion.getCouponType().getName() + "】";
+			}else{
+				rule = "";
+			}
+			desc.append("\n亲。。。在活动期间内激活会员账号即可参与【" + promotion.getTitle() + "】活动" + (!rule.isEmpty() ? "，" : "") + rule).append("\n");
+			desc.append("\n点击激活会员账号>>>>");
+			
+			return new Msg4ImageText(msg).addItem(new Data4Item(promotion.getTitle() + "(火热进行中...)", desc.toString(), 
+					 					   								  promotion.hasImage() ? promotion.getImage().getObjectUrl() : "", 
+					 					   								  createUrl(msg, WEIXIN_MEMBER)));
+		}
 	}
 	
 	private Msg createNavi(Msg msg){
@@ -161,35 +195,14 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注
 				WeixinMemberDao.interest(msg.getToUserName(), msg.getFromUserName());
-				int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
-				List<Promotion> welcome = PromotionDao.getByCond(StaffDao.getAdminByRestaurant(restaurantId), 
-													   new PromotionDao.ExtraCond().setType(Promotion.Type.WELCOME).addStatus(Promotion.Status.PROGRESS));
-				
-				//检查是否有欢迎活动，没有则显示导航页，有则显示欢迎活动
-				if(welcome.isEmpty()){
-					session.callback(createNavi(msg));
-				}else{
-					Promotion promotion = welcome.get(0);
-					StringBuilder desc = new StringBuilder();
-					//活动时间
-					desc.append("活动时间：" + promotion.getDateRange().getOpeningFormat() + " 至 " + promotion.getDateRange().getEndingFormat()).append("\n");
-					//活动规则
-					String rule;
-					if(promotion.getRule() == Promotion.Rule.ONCE){
-						rule = "活动期内单次消费积分满" + promotion.getPoint() + "即可领取【" + promotion.getCouponType().getName() + "】";
-					}else if(promotion.getRule() == Promotion.Rule.TOTAL){
-						rule = "活动期内累计消费积分满" + promotion.getPoint() + "即可领取【" + promotion.getCouponType().getName() + "】";
-					}else if(promotion.getRule() == Promotion.Rule.FREE){
-						rule = "活动期内免费领取【" + promotion.getCouponType().getName() + "】";
+				try{
+					session.callback(createWelcome(msg));
+				}catch(BusinessException e){
+					if(e.getErrCode() == PromotionError.PROMOTION_NOT_EXIST){
+						session.callback(createNavi(msg));
 					}else{
-						rule = "";
+						throw e;
 					}
-					desc.append("\n亲。。。在活动期间内激活会员账号即可参与【" + promotion.getTitle() + "】活动" + (!rule.isEmpty() ? "，" : "") + rule).append("\n");
-					desc.append("\n点击激活会员账号>>>>");
-					
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item(promotion.getTitle() + "(火热进行中...)", desc.toString(), 
-							 					   								  promotion.hasImage() ? promotion.getImage().getObjectUrl() : "", 
-							 					   								  createUrl(msg, WEIXIN_MEMBER))));
 				}
 				
 			}else if(msg.getEvent() == Event.UNSUBSCRIBE){
@@ -203,15 +216,23 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					session.callback(createNavi(msg));
 					
 				}else if(msg.getEventKey().equals(PROMOTION_EVENT_KEY)){
-
+					//优惠活动
+					int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 					try{
 						WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName());
 					}catch(BusinessException | SQLException e){
-						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("亲。。。想查看餐厅的最新优惠，马上激活您的微信会员卡哦 :-(", "点击激活微信会员卡", "", createUrl(msg, WEIXIN_MEMBER))));
+						try{
+							session.callback(createWelcome(msg));
+						}catch(BusinessException e2){
+							if(e2.getErrCode() == PromotionError.PROMOTION_NOT_EXIST){
+								session.callback(new Msg4ImageText(msg).addItem(new Data4Item("亲。。。想查看餐厅的最新优惠，马上激活您的微信会员卡哦 :-(", "点击激活微信会员卡", "", createUrl(msg, WEIXIN_MEMBER))));
+							}else{
+								throw e2;
+							}
+						}
 						return;
 					}
 					
-					int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 					Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 					
 					List<Coupon> coupons = CouponDao.getByCond(staff, 

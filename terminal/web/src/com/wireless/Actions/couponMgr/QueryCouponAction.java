@@ -12,7 +12,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponDao.ExtraCond;
@@ -27,58 +26,7 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryCouponAction extends DispatchAction{
 
-/*	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		String pin = (String) request.getAttribute("pin");
-		String typeId = request.getParameter("couponTypeId");
-		String status = request.getParameter("status");
-		String memberName = request.getParameter("memberName");
-		String memberMobile = request.getParameter("memberMobile");
-		
-		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		
-		JObject jobject = new JObject();
-		List<Coupon> list = null;
-		String extra = "";
-		try{
-			if(typeId != null && !typeId.isEmpty() && !typeId.equals("-1")){
-				extra += " AND C.coupon_type_id = " + typeId;
-			}
-			if(status != null && !status.isEmpty()){
-				extra += " AND C.status = " + status;
-			}
-			if(memberMobile != null && !memberMobile.isEmpty()){
-				extra += " AND M.mobile like '%" + memberMobile + "%' ";
-			}
-			if(memberName != null && !memberName.isEmpty()){
-				extra += " AND M.name like '%" + memberName + "%' ";
-			}
-			
-			list = CouponDao.getByCond(staff, extra, null);
-			
-		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}finally{
-			if(list != null){
-				jobject.setTotalProperty(list.size());
-				list = DataPaging.getPagingData(list, isPaging, start, limit);
-				jobject.setRoot(list);
-			}
-			response.getWriter().print(jobject.toString());
-		}
-		
-		return null;
-		
-	}*/
-	public ActionForward byId(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward byId(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		String pin = (String) request.getAttribute("pin");
 		String formId = request.getParameter("fid");
 		
@@ -87,11 +35,8 @@ public class QueryCouponAction extends DispatchAction{
 		if(pin != null){
 			staff = StaffDao.verify(Integer.parseInt(pin));
 		}else{
-			DBCon dbCon = new DBCon();
-			dbCon.connect();
-			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
-			staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
-			dbCon.disconnect();
+			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
+			staff = StaffDao.getAdminByRestaurant(rid);
 		}
 		
 		String couponId = request.getParameter("couponId");
@@ -117,20 +62,15 @@ public class QueryCouponAction extends DispatchAction{
 		return null;
 	}
 	
-	public ActionForward defaultCoupon(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward defaultCoupon(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String formId = request.getParameter("fid");
 		String openId = request.getParameter("oid");
 				
 		int rid = 0;
 		int mid = 0;
-		DBCon dbCon = new DBCon();
-		dbCon.connect();
-		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
-		Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
-		mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, openId, formId);
-		dbCon.disconnect();
+		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
+		Staff staff = StaffDao.getAdminByRestaurant(rid);
+		mid = WeixinMemberDao.getBoundMemberIdByWeixin(openId, formId);
 		
 		
 		JObject jobject = new JObject();
@@ -163,21 +103,16 @@ public class QueryCouponAction extends DispatchAction{
 	}	
 	
 	
-	public ActionForward byCondtion(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward byCondtion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String formId = request.getParameter("fid");
 		String openId = request.getParameter("oid");
 		String pId = request.getParameter("pId");
 		
 		int rid = 0;
 		int mid = 0;
-		DBCon dbCon = new DBCon();
-		dbCon.connect();
-		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
-		Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
-		mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, openId, formId);
-		dbCon.disconnect();
+		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
+		Staff staff = StaffDao.getAdminByRestaurant(rid);
+		mid = WeixinMemberDao.getBoundMemberIdByWeixin(openId, formId);
 		
 		
 		JObject jobject = new JObject();
@@ -188,6 +123,9 @@ public class QueryCouponAction extends DispatchAction{
 			extra.setStatus(Coupon.Status.PUBLISHED);
 			
 			List<Coupon> list = CouponDao.getByCond(staff, extra, null);
+			for(int i = 0; i < list.size(); i++){
+				list.set(i, CouponDao.getById(staff, list.get(0).getId()));
+			}
 			jobject.setRoot(list);
 		}catch(SQLException e){
 			e.printStackTrace();

@@ -2330,7 +2330,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(orderFood.getPrice());
+			cell.setCellValue(orderFood.asFood().getPrice());
 			cell.setCellStyle(numStyle);
 			
 			cell = row.createCell(row.getLastCellNum());

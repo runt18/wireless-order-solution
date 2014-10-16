@@ -121,7 +121,7 @@ public class WXOperateMemberAction extends DispatchAction {
 				
 				final int weixinCard = WeixinMemberDao.getCardByWeixin(dbCon, openId, formId);
 				
-				final List<MemberType> list = MemberTypeDao.getMemberType(StaffDao.getAdminByRestaurant(rid), " AND MT.type = " + MemberType.Type.WEIXIN.getVal(), " ORDER BY MT.member_type_id ");
+				final List<MemberType> list = MemberTypeDao.getByCond(StaffDao.getAdminByRestaurant(rid), new MemberTypeDao.ExtraCond().setType(MemberType.Type.WEIXIN), " ORDER BY MT.member_type_id ");
 				jobject.setExtra(new Jsonable(){
 
 					@Override

@@ -63,19 +63,19 @@ public class QueryMemberTypeAction extends DispatchAction {
 			String attr = request.getParameter("attr");
 			String type = request.getParameter("type");
 			
-			String extraCond = "";
+			MemberTypeDao.ExtraCond extraCond = new MemberTypeDao.ExtraCond();
 			if(name != null && !name.trim().isEmpty()){
-				extraCond += (" AND MT.name like '%" + name.trim() + "%' ");
+				extraCond.setName(name);
 			}
 			
 			if(attr != null && !attr.trim().isEmpty()){
-				extraCond += (" AND MT.attribute = " + attr);
+				extraCond.setAttribute(MemberType.Attribute.valueOf(attr));
 			}
 			if(type != null && !type.isEmpty()){
-				extraCond += (" AND MT.type = " + type);
+				extraCond.setType(MemberType.Type.valueOf(type));
 			}
 			
-			list = MemberTypeDao.getMemberType(staff, extraCond, " ORDER BY MT.member_type_id ");
+			list = MemberTypeDao.getByCond(staff, extraCond, " ORDER BY MT.member_type_id ");
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -111,7 +111,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 		try{
 			String pin = (String)request.getAttribute("pin");
 //			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			List<MemberType> list = MemberTypeDao.getMemberType(StaffDao.verify(Integer.parseInt(pin)), null, " ORDER BY MT.member_type_id ");
+			List<MemberType> list = MemberTypeDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), null, " ORDER BY MT.member_type_id ");
 //			List<MemberLevel> levelList = MemberLevelDao.getMemberLevels(staff);
 //			List<Member> interestedMembers = MemberDao.getInterestedMember(staff, null);
 			MemberType item = null;
