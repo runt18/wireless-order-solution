@@ -337,6 +337,9 @@ public class PromotionDao {
 		
 		//Create the associated coupons if the member changed.
 		if(builder.isMemberChanged()){
+			if(original.getType() == Promotion.Type.WELCOME && promotion.getOriented() != Promotion.Oriented.ALL){
+				throw new BusinessException("【" + Promotion.Type.WELCOME.toString() + "】属性的优惠活动只能面向所有会员", PromotionError.PROMOTION_UPDATE_NOT_ALLOW);
+			}
 			CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion.getId()));
 			if(promotion.getOriented() == Promotion.Oriented.ALL){
 				//Create the coupon to all members.

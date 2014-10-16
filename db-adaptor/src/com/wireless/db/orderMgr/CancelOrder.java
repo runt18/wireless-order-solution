@@ -57,7 +57,7 @@ public class CancelOrder {
 	 */
 	public static void execByTable(DBCon dbCon, Staff staff, int tableAlias) throws BusinessException, SQLException{ 
 		
-		Table table = TableDao.getTableByAlias(dbCon, staff, tableAlias);
+		Table table = TableDao.getByAlias(dbCon, staff, tableAlias);
 		
 		int orderId = OrderDao.getOrderIdByUnPaidTable(dbCon, staff, table);
 		

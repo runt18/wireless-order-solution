@@ -38,7 +38,7 @@ public class TestMemberDao {
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getByRestaurant(40).get(0);
+			mStaff = StaffDao.getAdminByRestaurant(40);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -114,7 +114,7 @@ public class TestMemberDao {
 	
 	@Test
 	public void testMemberBasicOperation() throws BusinessException, SQLException{
-		List<MemberType> list = MemberTypeDao.getMemberType(mStaff, null, null);
+		List<MemberType> list = MemberTypeDao.getByCond(mStaff, null, null);
 		
 		MemberType memberType = null;
 		if(list.isEmpty()){

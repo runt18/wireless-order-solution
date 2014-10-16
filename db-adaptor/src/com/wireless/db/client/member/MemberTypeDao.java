@@ -8,14 +8,61 @@ import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class MemberTypeDao {
 
+	public static class ExtraCond{
+		private int id;
+		private MemberType.Type type;
+		private MemberType.Attribute attribute;
+		private String name;
+		
+		public ExtraCond setId(int id){
+			this.id = id;
+			return this;
+		}
+		
+		public ExtraCond setType(MemberType.Type type){
+			this.type = type;
+			return this;
+		}
+		
+		public ExtraCond setName(String name){
+			this.name = name;
+			return this;
+		}
+		
+		public ExtraCond setAttribute(MemberType.Attribute attribute){
+			this.attribute = attribute;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(id != 0){
+				extraCond.append(" AND MT.member_type_id = " + id);
+			}
+			if(type != null){
+				extraCond.append(" AND MT.type = " + type.getVal());
+			}
+			if(name != null){
+				extraCond.append(" AND MT.name like '%" + name.trim() + "%'");
+			}
+			if(attribute != null){
+				extraCond.append(" AND MT.attribute = " + attribute.getVal());
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	/**
 	 * Insert a new member type.
 	 * @param dbCon
@@ -71,6 +118,26 @@ public class MemberTypeDao {
 			  " AND discount_id = " + mt.getDefaultDiscount().getId();
 		dbCon.stmt.executeUpdate(sql);
 
+		//Insert the price plans associated with this member type.
+		for(PricePlan plan : mt.getPrices()){
+			sql = " INSERT INTO " + Params.dbName + ".member_type_price" +
+				  " (`member_type_id`, `price_plan_id`, `type`) VALUES (" +
+				  mt.getId() + "," +
+				  plan.getId() + "," +
+				  MemberType.PriceType.NORMAL.getVal() +
+				  ")";
+			dbCon.stmt.executeUpdate(sql);
+		}
+
+		if(mt.hasDefaultPrice()){
+			//Update the default price plan.
+			sql = " UPDATE " + Params.dbName + ".member_type_price" +
+				  " SET type = " + MemberType.PriceType.DEFAULT.getVal() +
+				  " WHERE member_type_id = " + mt.getId() +
+				  " AND price_plan_id = " + mt.getDefaultPrice().getId();
+			dbCon.stmt.executeUpdate(sql);
+		}
+		
 		return mt.getId();
 	}
 	
@@ -235,6 +302,32 @@ public class MemberTypeDao {
 				  " AND discount_id = " + mt.getDefaultDiscount().getId();
 			dbCon.stmt.executeUpdate(sql);
 		}
+		
+		if(builder.isPriceChanged() || builder.isDefaultPriceChanged()){
+			sql = " DELETE FROM " + Params.dbName + ".member_type_price WHERE member_type_id = " + mt.getId();
+			dbCon.stmt.executeUpdate(sql); 
+			
+			//Insert the price plan associated with this member type.
+			for(PricePlan price : mt.getPrices()){
+				sql = " INSERT INTO " + Params.dbName + ".member_type_price" +
+					  " (`member_type_id`, `price_plan_id`, `type`) " +
+					  " VALUES (" +
+					  mt.getId() + "," +
+					  price.getId() + "," +
+					  MemberType.PriceType.NORMAL.getVal() +
+					  ")";
+				dbCon.stmt.executeUpdate(sql);
+			}
+
+			if(mt.hasDefaultPrice()){
+				//Update the default price plan.
+				sql = " UPDATE " + Params.dbName + ".member_type_price" +
+					  " SET type = " + MemberType.PriceType.DEFAULT.getVal() +
+					  " WHERE member_type_id = " + mt.getId() +
+					  " AND price_plan_id = " + mt.getDefaultPrice().getId();
+				dbCon.stmt.executeUpdate(sql);
+			}
+		}
 	}
 	
 	/**
@@ -280,7 +373,7 @@ public class MemberTypeDao {
 	 * @throws BusinessException 
 	 * 			throws if any discount associated with the member type is NOT found
 	 */
-	public static List<MemberType> getMemberType(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static List<MemberType> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		List<MemberType> result = new ArrayList<MemberType>();
 		String sql;
 		sql = " SELECT " +
@@ -288,7 +381,7 @@ public class MemberTypeDao {
 			  " FROM " + Params.dbName + ".member_type MT " +
 			  " WHERE 1 = 1 " +
 			  " AND MT.restaurant_id = " + staff.getRestaurantId() +
-			  (extraCond != null ? extraCond : " ") +
+			  (extraCond != null ? extraCond.toString() : " ") +
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -307,6 +400,7 @@ public class MemberTypeDao {
 		dbCon.rs.close();
 		
 		for(MemberType eachType : result){
+			//Get the discount associated with this member type.
 			sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + eachType.getId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
@@ -314,6 +408,18 @@ public class MemberTypeDao {
 				eachType.addDiscount(distToMemberType);
 				if(MemberType.DiscountType.valueOf(dbCon.rs.getInt("type")) == MemberType.DiscountType.DEFAULT){
 					eachType.setDefaultDiscount(distToMemberType);
+				}
+			}
+			dbCon.rs.close();
+			
+			//Get the price plan associated with this member type.
+			sql = " SELECT price_plan_id, type FROM " + Params.dbName + ".member_type_price WHERE member_type_id = " + eachType.getId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				PricePlan price = PricePlanDao.getById(staff, dbCon.rs.getInt("price_plan_id"));
+				eachType.addPricePlan(price);
+				if(dbCon.rs.getInt("type") == MemberType.PriceType.DEFAULT.getVal()){
+					eachType.setDefaultPrice(price);
 				}
 			}
 			dbCon.rs.close();
@@ -333,11 +439,11 @@ public class MemberTypeDao {
 	 * @throws BusinessException 
 	 * 			throws if any discount associated with the member type is NOT found
 	 */
-	public static List<MemberType> getMemberType(Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static List<MemberType> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberTypeDao.getMemberType(dbCon, staff, extraCond, orderClause);
+			return MemberTypeDao.getByCond(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -357,8 +463,8 @@ public class MemberTypeDao {
 	 * @throws BusinessException
 	 * 			throws if the member type to this specified id is NOT found
 	 */
-	public static MemberType getMemberTypeById(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
-		List<MemberType> list = MemberTypeDao.getMemberType(dbCon, staff, " AND MT.member_type_id = " + id, null);
+	public static MemberType getById(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
+		List<MemberType> list = MemberTypeDao.getByCond(dbCon, staff, new ExtraCond().setId(id), null);
 		if(list.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_TYPE_NOT_EXIST);
 		}else{
@@ -378,11 +484,11 @@ public class MemberTypeDao {
 	 * @throws BusinessException
 	 * 			throws if the member type to this specified id is NOT found
 	 */
-	public static MemberType getMemberTypeById(Staff staff, int id) throws SQLException, BusinessException{
+	public static MemberType getById(Staff staff, int id) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberTypeDao.getMemberTypeById(dbCon, staff, id);
+			return MemberTypeDao.getById(dbCon, staff, id);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -421,7 +527,7 @@ public class MemberTypeDao {
 	 * 			throws if the member type does NOT exist
 	 */
 	public static MemberType getWeixinMemberType(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
-		List<MemberType> list = MemberTypeDao.getMemberType(dbCon, staff, " AND MT.type = " + MemberType.Type.WEIXIN.getVal(), null);
+		List<MemberType> list = MemberTypeDao.getByCond(dbCon, staff, new ExtraCond().setType(MemberType.Type.WEIXIN), null);
 		if(list.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_TYPE_NOT_EXIST);
 		}else{

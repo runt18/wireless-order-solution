@@ -16,7 +16,6 @@ import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.TasteGroup;
-import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
@@ -179,7 +178,7 @@ public class UpdateOrder {
 		
 		Order oriOrder = OrderDao.getById(dbCon, staff, newOrder.getId(), DateType.TODAY);
 		
-		newOrder.setDestTbl(TableDao.getTableByAlias(dbCon, staff, newOrder.getDestTbl().getAliasId()));
+		newOrder.setDestTbl(TableDao.getByAlias(dbCon, staff, newOrder.getDestTbl().getAliasId()));
 		
 		/*
 		 * If the order to update is unpaid and the table to original order is different from the new.
@@ -318,29 +317,6 @@ public class UpdateOrder {
 				  " WHERE id = " + diffResult.newOrder.getId();
 			dbCon.stmt.executeUpdate(sql);
 			
-			// Update the new table status only if the order is unpaid.
-			sql = " UPDATE " + 
-				  Params.dbName + ".table SET " +
-			      " status = " + Table.Status.BUSY.getVal() + "," +
-				  " category = " + diffResult.newOrder.getCategory().getVal() + "," +
-				  " custom_num = " + diffResult.newOrder.getCustomNum() +
-				  " WHERE " +
-				  " table_id = " + diffResult.newOrder.getDestTbl().getTableId();
-			dbCon.stmt.executeUpdate(sql);	
-			
-			// Update the original table status to idle if new table is different from the original.
-			if(!diffResult.newOrder.getDestTbl().equals(diffResult.oriOrder.getDestTbl())){
-
-				sql = " UPDATE " + 
-					  Params.dbName + ".table SET " +
-					  " status = " + Table.Status.IDLE.getVal() + "," + 
-					  " custom_num = NULL, " +
-					  " category = NULL " + 
-					  " WHERE " +
-					  " table_id = " + diffResult.oriOrder.getDestTbl().getTableId();
-				dbCon.stmt.executeUpdate(sql);				
-				
-			}				
 		}
 		
 		return diffResult;

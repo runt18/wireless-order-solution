@@ -15,14 +15,17 @@ import com.aliyun.openservices.oss.OSSClient;
 import com.aliyun.openservices.oss.OSSException;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.menuMgr.FoodDao.ExtraCond4Combo;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FoodError;
 import com.wireless.exception.OssImageError;
+import com.wireless.exception.PricePlanError;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
@@ -89,6 +92,8 @@ public class TestFoodDao {
 	public void testFoodDao() throws SQLException, BusinessException, IOException{
 
 		int foodId = 0;
+		int planId = 0;
+		
 		try {
 			String fileName = System.getProperty("user.dir") + "/src/" + TestOssImage.class.getPackage().getName().replaceAll("\\.", "/") + "/test.jpg";
 			
@@ -96,9 +101,22 @@ public class TestFoodDao {
 			int ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.FOOD_IMAGE)
 			 													    .setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
 			
+			//---------- Test to insert a price plan --------------
+			PricePlan.InsertBuilder insertPlanBuilder = new PricePlan.InsertBuilder("测试价格方案");
+			planId = PricePlanDao.insert(mStaff, insertPlanBuilder);
+			
+			PricePlan expectedPlan = insertPlanBuilder.build();
+			expectedPlan.setId(planId);
+			
+			PricePlan actualPlan = PricePlanDao.getById(mStaff, planId);
+			
+			compare(expectedPlan, actualPlan);
+			
 			Food.InsertBuilder insertBuilder = new Food.InsertBuilder("测试菜品", 15.4f, KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(0))
 													   .setImage(ossImageId)
-													   .setAliasId(100).setDesc("测试描述").setHot(true).setCommission(2.0f).setGift(true).setWeigh(false);
+													   .addPrice(planId, 4)
+													   .setAliasId(100).setDesc("测试描述")
+													   .setHot(true).setCommission(2.0f).setGift(true).setWeigh(false);
 			foodId = FoodDao.insert(mStaff, insertBuilder); 
 			
 			Food expected = insertBuilder.build();
@@ -117,6 +135,7 @@ public class TestFoodDao {
 													   .setKitchen(KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(1))
 													   .setImage(ossImageId)
 													   .setPrice(34.2f).setDesc("测试修改描述")
+													   .addPrice(planId, 5)
 													   .setHot(false).setCommission(3).setSellOut(true).setRecommend(true)
 													   .setGift(false).setWeigh(true);
 			FoodDao.update(mStaff, updateBuilder);
@@ -182,6 +201,15 @@ public class TestFoodDao {
 					}
 				}
 			}
+			if(planId != 0){
+				PricePlanDao.deleteById(mStaff, planId);
+				try{
+					PricePlanDao.getById(mStaff, planId);
+					Assert.assertTrue("failed to delete price plan", false);
+				}catch(BusinessException e){
+					Assert.assertEquals("failed to delete price plan", PricePlanError.PRICE_PLAN_NOT_EXIST, e.getErrCode());
+				}
+			}
 		}
 	}
 	
@@ -211,5 +239,14 @@ public class TestFoodDao {
 		//------- the content to thumb nail image --------
 		Assert.assertEquals("oss thumbnail type to food" + tag, OssImage.Type.THUMB_NAIL, actual.getImage().getThumbnail().getType());
 		Assert.assertEquals("oss thumbnail id to food" + tag, actual.getImage().getId(), actual.getImage().getThumbnail().getAssociatedId());
+		//------- the content to thumb nail image --------
+		Assert.assertEquals("price plan" + tag, expected.getPricePlan(), actual.getPricePlan());
+	}
+	
+	private void compare(PricePlan expected, PricePlan actual){
+		Assert.assertEquals("price plan id", expected.getId(), actual.getId());
+		Assert.assertEquals("price plan restaurant id", mStaff.getRestaurantId(), actual.getRestaurantId());
+		Assert.assertEquals("price plan name", expected.getName(), actual.getName());
+		Assert.assertEquals("price plan type", expected.getType(), actual.getType());
 	}
 }

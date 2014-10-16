@@ -12,7 +12,6 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
@@ -134,7 +133,7 @@ public class InsertOrder {
 			throw new BusinessException(StaffError.ORDER_NOT_ALLOW);
 		}
 		
-		orderToInsert.setDestTbl(TableDao.getTableByAlias(dbCon, staff, orderToInsert.getDestTbl().getAliasId()));
+		orderToInsert.setDestTbl(TableDao.getByAlias(dbCon, staff, orderToInsert.getDestTbl().getAliasId()));
 		
 		if(orderToInsert.getDestTbl().isIdle()){
 			
@@ -212,17 +211,6 @@ public class InsertOrder {
 			throw new SQLException("The id of order is not generated successfully.");
 		}				
 
-		/**
-		 * Update the table status to busy.
-		 */
-		sql = " UPDATE " + Params.dbName + ".table SET " +
-			  " status = " + Table.Status.BUSY.getVal() + ", " +
-			  " category = " + orderToInsert.getCategory().getVal() + ", " +
-			  " custom_num = " + orderToInsert.getCustomNum() +
-			  " WHERE restaurant_id = " + staff.getRestaurantId() + 
-			  " AND table_alias = " + orderToInsert.getDestTbl().getAliasId();
-		dbCon.stmt.executeUpdate(sql);
-		
 		/**
 		 * Insert the detail records to 'order_food' table
 		 */

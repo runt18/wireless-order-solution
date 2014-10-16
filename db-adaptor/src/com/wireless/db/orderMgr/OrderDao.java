@@ -251,7 +251,7 @@ public class OrderDao {
 	 *             Throws if fail to execute any SQL statement.
 	 */
 	public static Order getByTableAlias(DBCon dbCon, Staff staff, int tableAlias) throws BusinessException, SQLException {		
-		return getById(dbCon, staff, OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getTableByAlias(dbCon, staff, tableAlias)), DateType.TODAY);
+		return getById(dbCon, staff, OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getByAlias(dbCon, staff, tableAlias)), DateType.TODAY);
 	}
 	
 	/**
@@ -302,7 +302,7 @@ public class OrderDao {
 	 *             Throws if fail to execute any SQL statement.
 	 */
 	public static Order getByTableAliasDync(DBCon dbCon, Staff staff, int tableAlias) throws BusinessException, SQLException {
-		return getById(dbCon, staff, OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getTableByAlias(dbCon, staff, tableAlias)), DateType.TODAY);
+		return getById(dbCon, staff, OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getByAlias(dbCon, staff, tableAlias)), DateType.TODAY);
 	}
 	
 	/**
@@ -462,7 +462,7 @@ public class OrderDao {
 		if(dateType == DateType.TODAY){
 			sql = " SELECT " +
 				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, O.staff_id, " +
-				  " T.minimum_cost, T.status AS table_status, " +
+				  " T.minimum_cost, " +
 				  " O.waiter, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.member_operation_id, " +
@@ -513,7 +513,7 @@ public class OrderDao {
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
 			Table table = new Table();
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			table.setCategory(dbCon.rs.getShort("category"));
+			table.setCategory(Order.Category.valueOf(dbCon.rs.getShort("category")));
 			table.setTableId(dbCon.rs.getInt("table_id"));
 			if(orderInfo.isUnpaid()){
 				table.setStatus(Table.Status.IDLE);
@@ -523,7 +523,6 @@ public class OrderDao {
 			table.setTableAlias(dbCon.rs.getInt("table_alias"));
 			table.setTableName(dbCon.rs.getString("table_name"));
 			if(dateType == DateType.TODAY){
-				table.setStatus(dbCon.rs.getShort("table_status"));
 				table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			}
 			orderInfo.setDestTbl(table);

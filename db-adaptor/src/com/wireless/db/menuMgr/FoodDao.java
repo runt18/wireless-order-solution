@@ -3,6 +3,7 @@ package com.wireless.db.menuMgr;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,12 +24,59 @@ import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodStatistics;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.util.PinyinUtil;
 
 public class FoodDao {
+	
+	public static class ExtraCond4Price{
+		public static enum ShowType{
+			BY_PLAN("按方案显示"),
+			BY_FOOD("按菜品显示");
+			
+			private final String desc;
+			ShowType(String desc){
+				this.desc = desc;
+			}
+			@Override
+			public String toString(){
+				return desc;
+			}
+		}
+		
+		private final Food food;
+		private PricePlan price;
+		private ShowType type = ShowType.BY_FOOD;
+		
+		public ExtraCond4Price(Food food){
+			this.food = food;
+		}
+		
+		public ExtraCond4Price setPricePlan(PricePlan plan){
+			this.price = plan;
+			return this;
+		}
+		
+		public ExtraCond4Price setShowType(ShowType type){
+			this.type = type;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(food != null){
+				extraCond.append(" AND FPP.food_id = " + food.getFoodId());
+			}
+			if(price != null){
+				extraCond.append(" AND FPP.price_plan_id = " + price.getId());
+			}
+			return extraCond.toString();
+		}
+	}
 	
 	public static class ExtraCond4Combo{
 		private final int parentId;
@@ -162,14 +210,25 @@ public class FoodDao {
 		}
 		dbCon.rs.close();
 		
+		for(Map.Entry<PricePlan, Float> entry : f.getPricePlan().entrySet()){
+			//Check to see whether or not the price plan exist. 
+			PricePlanDao.getById(dbCon, staff, entry.getKey().getId());
+			//Insert the price to this plan. 
+			sql = " INSERT INTO " + Params.dbName + ".food_price_plan" +
+				  " (food_id, price_plan_id, price) VALUES (" +
+				  foodId + "," +
+				  entry.getKey().getId() + "," +
+				  entry.getValue().floatValue() +
+				  " ) ";
+			dbCon.stmt.executeUpdate(sql);
+		}
+		
 		//Married the oss image with this food.
 		if(f.hasImage()){
 			try{
 				//Associated the oss image with this food
 				OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(f.getImage().getId()).setAssociated(OssImage.Type.FOOD_IMAGE, foodId));
-				
 			}catch(IOException ignored){}
-			
 		}
 		
 		return foodId;
@@ -262,6 +321,10 @@ public class FoodDao {
 			}
 		}
 		dbCon.rs.close();
+		
+		//Delete the associated price plan.
+		sql = " DELETE FROM " + Params.dbName + ".food_price_plan WHERE food_id = " + foodId;
+		dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the food info
 		sql = " DELETE FROM " + Params.dbName + ".food WHERE food_id = " + foodId;
@@ -363,6 +426,7 @@ public class FoodDao {
 		}
 		f.setTemp(false);
 		
+		//Update the oss image.
 		if(builder.isImageChanged()){
 			if(f.hasImage()){
 				//Married the oss image with this food.
@@ -382,6 +446,30 @@ public class FoodDao {
 				      " oss_image_id = 0 " +
 					  " WHERE food_id = " + f.getFoodId();
 				dbCon.stmt.executeUpdate(sql);
+			}
+		}
+		
+		//Update the price plan.
+		if(builder.isPricePlanChanged()){
+			for(Map.Entry<PricePlan, Float> entry : f.getPricePlan().entrySet()){
+				//Check to see whether or not the price plan exist. 
+				PricePlanDao.getById(dbCon, staff, entry.getKey().getId());
+				//Insert or update the price to this plan. 
+				if(getPricePlan(dbCon, staff, new ExtraCond4Price(f)).isEmpty()){
+					sql = " INSERT INTO " + Params.dbName + ".food_price_plan" +
+						  " (food_id, price_plan_id, price) VALUES (" +
+						  f.getFoodId() + "," +
+						  entry.getKey().getId() + "," +
+						  entry.getValue().floatValue() +
+						  ")";
+					dbCon.stmt.executeUpdate(sql);
+				}else{
+					sql = " UPDATE " + Params.dbName + ".food_price_plan SET " +
+						  " price = " + entry.getValue().floatValue() +
+						  " WHERE food_id = " + f.getFoodId() +
+						  " AND price_plan_id = " + entry.getKey().getId();
+					dbCon.stmt.executeUpdate(sql);
+				}
 			}
 		}
 		
@@ -499,9 +587,11 @@ public class FoodDao {
 			throw new BusinessException(FoodError.FOOD_NOT_EXIST);
 		}else{
 			Food food = result.get(0);
+			//Get the detail of oss image to this food.
 			if(food.hasImage()){
 				food.setImage(OssImageDao.getById(dbCon, staff, food.getImage().getId()));
 			}
+			food.setPricePlan(getPricePlan(dbCon, staff, new ExtraCond4Price(food)));
 			return food;
 		}
 	}
@@ -1028,6 +1118,44 @@ public class FoodDao {
 		}finally{
 			dbCon.disconnect();
 		}
+	}
+	
+	/**
+	 * Get the price plan to extra condition {@link ExtraCond4Price}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond4Price}
+	 * @return the result to price plan
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static Map<PricePlan, Float> getPricePlan(DBCon dbCon, Staff staff, ExtraCond4Price extraCond) throws SQLException{
+		String sql;
+		if(extraCond.type == ExtraCond4Price.ShowType.BY_PLAN){
+			sql = " SELECT FPP.price_plan_id, IFNULL(FPP.price, -1) AS price FROM " + Params.dbName + ".price_plan PP" +
+				  " LEFT JOIN " + Params.dbName + ".food_price_plan FPP ON PP.price_plan_id = FPP.price_plan_id " +
+				  " WHERE PP.restaurant_id = " + staff.getRestaurantId() +
+				  (extraCond != null ? extraCond.toString() : "");
+		}else{
+			sql = " SELECT price_plan_id, price FROM " + Params.dbName + ".food_price_plan FPP" + 
+				  " WHERE 1 = 1 " +
+				  extraCond.toString();
+		}
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		Map<PricePlan, Float> result = new HashMap<>();
+		while(dbCon.rs.next()){
+			if(dbCon.rs.getFloat("price") >= 0){
+				result.put(new PricePlan(dbCon.rs.getInt("price_plan_id")), dbCon.rs.getFloat("price"));
+			}else{
+				result.put(new PricePlan(dbCon.rs.getInt("price_plan_id")), null);
+			}
+		}
+		dbCon.rs.close();
+		
+		return result;
 	}
 	
 	/**

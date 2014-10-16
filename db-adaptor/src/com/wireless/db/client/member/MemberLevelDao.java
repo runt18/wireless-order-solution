@@ -301,7 +301,7 @@ public class MemberLevelDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			MemberLevel level = new MemberLevel(dbCon.rs.getInt("id"));
-			MemberType type = MemberTypeDao.getMemberTypeById(staff, dbCon.rs.getInt("member_type_id"));
+			MemberType type = MemberTypeDao.getById(staff, dbCon.rs.getInt("member_type_id"));
 			level.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			level.setLevelId(dbCon.rs.getInt("level_id"));
 			level.setPointThreshold(dbCon.rs.getInt("point_threshold"));

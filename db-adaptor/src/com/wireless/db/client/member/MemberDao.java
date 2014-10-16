@@ -412,7 +412,7 @@ public class MemberDao {
 			String sql;
 			
 			//Get the member type detail to each member.
-			eachMember.getMemberType().copyFrom(MemberTypeDao.getMemberTypeById(dbCon, staff, eachMember.getMemberType().getId()));
+			eachMember.getMemberType().copyFrom(MemberTypeDao.getById(dbCon, staff, eachMember.getMemberType().getId()));
 			
 			//Get the discounts to each member
 			sql = " SELECT MD.discount_id, MD.type, D.name, D.type AS d_type FROM " + Params.dbName + ".member_type_discount MD " +
@@ -913,7 +913,7 @@ public class MemberDao {
 		Member member = builder.build();
 		// 旧会员类型是充值属性, 修改为优惠属性时, 检查是否还有余额, 有则不允许修改
 		if(builder.isMemberTypeChanged()){
-			MemberType newType = MemberTypeDao.getMemberTypeById(dbCon, staff, member.getMemberType().getId());
+			MemberType newType = MemberTypeDao.getById(dbCon, staff, member.getMemberType().getId());
 			Member oriMember = MemberDao.getById(staff, member.getId());
 			if(newType.isPoint() && oriMember.getMemberType().isCharge() && oriMember.getTotalBalance() > 0){
 				throw new BusinessException("该会员还有余额, 不允许设为优惠属性的类型会员", MemberError.UPDATE_FAIL);

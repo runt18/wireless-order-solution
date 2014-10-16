@@ -8,7 +8,8 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
+import com.wireless.exception.TableError;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.regionMgr.Table.InsertBuilder;
@@ -16,6 +17,56 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class TableDao {
 
+	public static class ExtraCond{
+		private int id;
+		private int aliasId;
+		private String name;
+		private Region.RegionId regionId;
+		
+		public ExtraCond setId(int id){
+			this.id = id;
+			return this;
+		}
+		
+		public ExtraCond setAliasId(int aliasId){
+			this.aliasId = aliasId;
+			return this;
+		}
+		
+		public ExtraCond setName(String name){
+			this.name = name;
+			return this;
+		}
+		
+		public ExtraCond setRegion(Region.RegionId regionId){
+			this.regionId = regionId;
+			return this;
+		}
+		
+		public ExtraCond setRegion(int regionId){
+			this.regionId = Region.RegionId.valueOf(regionId);
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(id != 0){
+				extraCond.append(" AND TBL.table_id = " + id);
+			}
+			if(aliasId != 0){
+				extraCond.append(" AND TBL.table_alias = " + aliasId);
+			}
+			if(name != null){
+				extraCond.append(" AND TBL.name LIKE '%" + name + "%'");
+			}
+			if(regionId != null){
+				extraCond.append(" AND REGION.region_id = " + regionId.getId());
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	/**
 	 * Get the table detail according to table id.
 	 * @param dbCon
@@ -30,11 +81,11 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to query does NOT exist
 	 */
-	public static Table getTableById(DBCon dbCon, Staff staff, int tableId) throws SQLException, BusinessException{
+	public static Table getById(DBCon dbCon, Staff staff, int tableId) throws SQLException, BusinessException{
 		
-		List<Table> result = getTables(dbCon, staff, "AND TBL.table_id = " + tableId, null);
+		List<Table> result = getByCond(dbCon, staff, new ExtraCond().setId(tableId), null);
 		if(result.isEmpty()){
-			throw new BusinessException(ProtocolError.TABLE_NOT_EXIST);
+			throw new BusinessException(TableError.TABLE_NOT_EXIST);
 		}else{
 			return result.get(0);
 		}
@@ -52,11 +103,11 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to query does NOT exist
 	 */
-	public static Table getTableById(Staff staff, int tableId) throws SQLException, BusinessException{
+	public static Table getById(Staff staff, int tableId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getTableById(dbCon, staff, tableId);
+			return getById(dbCon, staff, tableId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -66,8 +117,8 @@ public class TableDao {
 	 * Get the table detail according to table alias of a specified restaurant defined in terminal {@link Staff}.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param tableId
 	 * 			the table id to query
 	 * @return the detail to this table id
@@ -76,10 +127,10 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to query does NOT exist
 	 */
-	public static Table getTableByAlias(DBCon dbCon, Staff term, int tableAlias) throws SQLException, BusinessException{
-		List<Table> result = getTables(dbCon, term, "AND TBL.table_alias = " + tableAlias, null);
+	public static Table getByAlias(DBCon dbCon, Staff staff, int tableAlias) throws SQLException, BusinessException{
+		List<Table> result = getByCond(dbCon, staff, new ExtraCond().setAliasId(tableAlias), null);
 		if(result.isEmpty()){
-			throw new BusinessException(ProtocolError.TABLE_NOT_EXIST);
+			throw new BusinessException(TableError.TABLE_NOT_EXIST);
 		}else{
 			return result.get(0);
 		}
@@ -87,8 +138,8 @@ public class TableDao {
 	
 	/**
 	 * Get the table detail according to table alias of a specified restaurant defined in terminal {@link Staff}.
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param tableId
 	 * 			the table id to query
 	 * @return the detail to this table id
@@ -97,11 +148,11 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to query does NOT exist
 	 */
-	public static Table getTableByAlias(Staff term, int tableAlias) throws SQLException, BusinessException{
+	public static Table getByAlias(Staff staff, int tableAlias) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getTableByAlias(dbCon, term, tableAlias);
+			return getByAlias(dbCon, staff, tableAlias);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -122,21 +173,22 @@ public class TableDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<Table> getTables(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	private static List<Table> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		List<Table> result = new ArrayList<Table>();
-		String querySQL = " SELECT " +
-						  " REGION.name AS region_name, REGION.region_id, REGION.restaurant_id, " +
-						  " TBL.table_id, TBL.table_alias, TBL.name AS tbl_name, TBL.category, TBL.custom_num, " +
-						  " TBL.minimum_cost, TBL.status " + 
-						  " FROM " + Params.dbName + ".table TBL " +
-						  " LEFT JOIN " + Params.dbName + ".region REGION " +
-						  " ON REGION.region_id = TBL.region_id AND REGION.restaurant_id = TBL.restaurant_id " +
-						  " WHERE 1 = 1 " +
-						  " AND TBL.restaurant_id = " + staff.getRestaurantId() + " " +
-						  (extraCond != null ? extraCond : "") + " " + 
-						  (orderClause != null ? orderClause : "");
+		String sql;
+		sql = " SELECT " +
+			  " REGION.name AS region_name, REGION.region_id, REGION.restaurant_id, " +
+			  " TBL.table_id, TBL.table_alias, TBL.name AS tbl_name, TBL.minimum_cost, " +
+			  " O.custom_num, O.category, IFNULL(O.status, -1) AS status " + 
+			  " FROM " + Params.dbName + ".table TBL " +
+			  " LEFT JOIN " + Params.dbName + ".region REGION ON REGION.region_id = TBL.region_id AND REGION.restaurant_id = TBL.restaurant_id " +
+			  " LEFT JOIN ( SELECT * FROM " + Params.dbName + ".order WHERE restaurant_id = " + staff.getRestaurantId() + " AND status = " + Order.Status.UNPAID.getVal() + " GROUP BY table_id ) AS O ON O.table_id = TBL.table_id " + 
+			  " WHERE 1 = 1 " +
+			  " AND TBL.restaurant_id = " + staff.getRestaurantId() + " " +
+			  (extraCond != null ? extraCond : "") + " " + 
+			  (orderClause != null ? orderClause : "");
 		
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		while (dbCon.rs.next()) {
 			Table table = new Table();
@@ -146,10 +198,12 @@ public class TableDao {
 			table.setRegion(region);
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			table.setStatus(dbCon.rs.getInt("status"));
-			if(table.isBusy()){
-				table.setCategory(dbCon.rs.getInt("category"));
+			if(dbCon.rs.getInt("status") == Order.Status.UNPAID.getVal()){
+				table.setStatus(Table.Status.BUSY);
+				table.setCategory(Order.Category.valueOf(dbCon.rs.getInt("category")));
 				table.setCustomNum(dbCon.rs.getInt("custom_num"));
+			}else{
+				table.setStatus(Table.Status.IDLE);
 			}
 			table.setTableAlias(dbCon.rs.getInt("table_alias"));
 			table.setTableId(dbCon.rs.getInt("table_id"));
@@ -163,8 +217,8 @@ public class TableDao {
 	
 	/**
 	 * Get the tables according to a specified restaurant defined in {@link Staff} and other condition.
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param extraCond
 	 * 			the extra condition
 	 * @param orderClause
@@ -173,117 +227,68 @@ public class TableDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<Table> getTables(Staff term, String extraCond, String orderClause) throws SQLException{
+	public static List<Table> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getTables(dbCon, term, extraCond, orderClause);
+			return getByCond(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * Update the general information to a specified table according to table id defined in table {@link Table}.
+	 * Update the general information to a specified table according to builder {@link Table#UpdateBuilder}.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
-	 * @param tblToUpdate the table {@link Table} to update
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder the builder update table
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			if the table to update does NOT exist
 	 */
-	public static void updateById(DBCon dbCon, Staff term, Table tblToUpdate) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff staff, Table.UpdateBuilder builder) throws SQLException, BusinessException{
+		Table tblToUpdate = builder.build();
+		
 		String updateSQL = " UPDATE " + Params.dbName + ".table SET " +
-						   " region_id = " + tblToUpdate.getRegion().getId() + "," +
-						   " name = '" + tblToUpdate.getName() + "'," +
-						   " minimum_cost = " + tblToUpdate.getMinimumCost() + "," +
-						   " custom_num = " + tblToUpdate.getCustomNum() +
+						   " table_id = " + tblToUpdate.getTableId() +
+						   (builder.isRegionChanged() ? " ,region_id = " + tblToUpdate.getRegion().getId() : "")+
+						   (builder.isNameChanged() ? " ,name = '" + tblToUpdate.getName() + "'" : "") +
+						   (builder.isMiniCostChanged() ? " ,minimum_cost = " + tblToUpdate.getMinimumCost() : "") +
 						   " WHERE " +
 						   " table_id = " + tblToUpdate.getTableId();
-		int rowAffected = dbCon.stmt.executeUpdate(updateSQL);
-		if(rowAffected != 1){
-			throw new BusinessException(ProtocolError.TABLE_NOT_EXIST);
+		if(dbCon.stmt.executeUpdate(updateSQL) == 0){
+			throw new BusinessException(TableError.TABLE_NOT_EXIST);
 		}
 	}
 	
 	/**
-	 * Update the general information to a specified table according to table id defined in table {@link Table}.
-	 * @param term
-	 * 			the terminal
-	 * @param tblToUpdate the table {@link Table} to update
+	 * Update the general information to a specified table according to builder {@link Table#UpdateBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder the builder update table
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			if the table to update does NOT exist
 	 */
-	public static void updateById(Staff term, Table tblToUpdate) throws SQLException, BusinessException{
+	public static void update(Staff staff, Table.UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			updateById(dbCon, term, tblToUpdate);
+			update(dbCon, staff, builder);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * Insert a new table to a specified restaurant.
-	 * The alias id to new table must be unique in a restaurant.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param term
-	 * 			the terminal
-	 * @param tblToInsert
-	 * 			the table to insert
-	 * @return the id to table just created
-	 * @throws SQLException
-	 * 			if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			if the alias id to new table has been exist before
-	 */
-	private static int insert(DBCon dbCon, Staff term, Table tblToInsert) throws SQLException, BusinessException{
-		
-		String sql;
-		
-		sql = " SELECT * FROM " + Params.dbName + ".table " +
-			  " WHERE " +
-			  " restaurant_id = " + term.getRestaurantId() + 
-			  " AND " + 
-			  " table_alias = " + tblToInsert.getAliasId();
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			throw new BusinessException(ProtocolError.TABLE_EXIST);
-		}
-		dbCon.rs.close();
-		sql = " INSERT INTO " + Params.dbName + ".table " +
-		 	  "(`table_alias`, `restaurant_id`, `name`, `region_id`, `minimum_cost`, `custom_num`) VALUES( " +
-			  tblToInsert.getAliasId() + ", " + 
-			  tblToInsert.getRestaurantId() + ", " +
-			  "'" + tblToInsert.getName() + "', " +
-			  tblToInsert.getRegion().getId() + ", " +
-			  tblToInsert.getMinimumCost() + "," +
-			  tblToInsert.getCustomNum() +
-			  " ) ";
-		
-		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-		//Get the generated id to this new table. 
-		dbCon.rs = dbCon.stmt.getGeneratedKeys();
-		if(dbCon.rs.next()){
-			return dbCon.rs.getInt(1);
-		}else{
-			throw new SQLException("The id of new table is not generated successfully.");
-		}
-		
-	}
-	
-	/**
-	 * Insert a new table to a specified restaurant according to insertion builder.
+	 * Insert a new table to a specified restaurant according to insert builder {@link Table#InsertBuilder}.
 	 * The alias id to new table must be unique in a restaurant.
 	 * @param staff
-	 * 			the terminal
+	 * 			the staff to perform this action
 	 * @param builder
 	 * 			the insertion builder 
 	 * @return the table to insert along with id just generated if insert successfully
@@ -292,7 +297,7 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the alias id to new table has been exist before
 	 */
-	public static Table insert(Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insert(Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -317,10 +322,35 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the alias id to new table has been exist before
 	 */
-	public static Table insert(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insert(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
+		
 		Table tblToInsert = builder.build();
-		tblToInsert.setTableId(insert(dbCon, staff, tblToInsert));
-		return tblToInsert;
+		
+		String sql;
+		
+		sql = " SELECT * FROM " + Params.dbName + ".table WHERE restaurant_id = " + staff.getRestaurantId() + " AND table_alias = " + tblToInsert.getAliasId() + " LIMIT 1 ";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			throw new BusinessException(TableError.DUPLICATED_TABLE_ALIAS);
+		}
+		dbCon.rs.close();
+		sql = " INSERT INTO " + Params.dbName + ".table " +
+		 	  "(`table_alias`, `restaurant_id`, `name`, `region_id`, `minimum_cost`) VALUES( " +
+			  tblToInsert.getAliasId() + ", " + 
+			  staff.getRestaurantId() + ", " +
+			  "'" + tblToInsert.getName() + "', " +
+			  tblToInsert.getRegion().getId() + ", " +
+			  tblToInsert.getMinimumCost() + 
+			  " ) ";
+		
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		//Get the generated id to this new table. 
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		if(dbCon.rs.next()){
+			return dbCon.rs.getInt(1);
+		}else{
+			throw new SQLException("The id of new table is not generated successfully.");
+		}
 	}
 	
 	/**
@@ -337,8 +367,8 @@ public class TableDao {
 	 * 			if the table to delete does NOT exist
 	 */
 	public static void deleteById(DBCon dbCon, Staff staff, int tableId) throws SQLException, BusinessException{
-		if(delete(dbCon, " AND TBL.table_id = " + tableId) == 0){
-			throw new BusinessException("删除的餐台不存在");
+		if(delete(dbCon, staff, new ExtraCond().setId(tableId)) == 0){
+			throw new BusinessException(TableError.TABLE_NOT_EXIST);
 		}
 	}
 	
@@ -377,8 +407,8 @@ public class TableDao {
 	 * 			if the table to delete does NOT exist
 	 */
 	public static void deleteByAliasId(DBCon dbCon, Staff staff, int tableAlias) throws SQLException, BusinessException{
-		if(delete(dbCon, " AND TBL.restaurant_id = " + staff.getRestaurantId() + " AND TBL.table_alias = " + tableAlias) == 0){
-			throw new BusinessException("删除的餐台不存在");
+		if(delete(dbCon, staff, new ExtraCond().setAliasId(tableAlias)) == 0){
+			throw new BusinessException(TableError.TABLE_NOT_EXIST);
 		}
 	}
 	
@@ -414,9 +444,20 @@ public class TableDao {
 	 * @return the amount of tables to delete
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static int delete(DBCon dbCon, Staff staff, String extraCond) throws SQLException{
-		return delete(dbCon, " AND TBL.restaurant_id = " + staff.getRestaurantId() + (extraCond != null ? extraCond : ""));
+	public static int delete(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		int amount = 0;
+		for(Table table : getByCond(dbCon, staff, extraCond, null)){
+			if(table.isBusy()){
+				throw new BusinessException("【" + Table.Status.BUSY.getDesc() +	 "】状态的餐厅不能删除", TableError.TABLE_DELETE_NOT_ALLOW);
+			}
+			String sql;
+			sql = " DELETE FROM " + Params.dbName + ".table WHERE table_id = " + table.getTableId();
+			dbCon.stmt.executeUpdate(sql);
+			amount++;
+		}
+		return amount;
 	}
 	
 	/**
@@ -428,31 +469,22 @@ public class TableDao {
 	 * @return the amount of tables to delete
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static int delete(Staff staff, String extraCond) throws SQLException{
+	public static int delete(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return delete(dbCon, staff, extraCond);
+			dbCon.conn.setAutoCommit(false);
+			int amount = delete(dbCon, staff, extraCond);
+			dbCon.conn.commit();
+			return amount;
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
-	}
-	
-	/**
-	 * Delete the table according to extra condition.
-	 * @param extraCond
-	 * 			the extra condition
-	 * @return the amount of tables to delete
-	 * @throws SQLException
-	 * 			if failed to execute any SQL statement
-	 */
-	private static int delete(DBCon dbCon, String extraCond) throws SQLException{
-		String sql;
-		sql = " DELETE TBL FROM " + Params.dbName + ".table AS TBL " +
-			  " WHERE 1 = 1 " +
-			  (extraCond != null ? extraCond : "");
-		return dbCon.stmt.executeUpdate(sql);
 	}
 	
 	/**

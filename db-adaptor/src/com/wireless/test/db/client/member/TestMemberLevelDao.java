@@ -43,7 +43,7 @@ public class TestMemberLevelDao {
 	
 	@Test
 	public void testMemberLevelDao() throws SQLException, BusinessException{
-		List<MemberType> list = MemberTypeDao.getMemberType(mStaff, null, null);
+		List<MemberType> list = MemberTypeDao.getByCond(mStaff, null, null);
 		MemberType memberType = null;
 		if(list.isEmpty()){
 			throw new BusinessException("You don't add any member type!!!");

@@ -10,6 +10,7 @@ import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.FoodDao.ExtraCond4Combo;
+import com.wireless.db.menuMgr.FoodDao.ExtraCond4Price;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -424,9 +425,12 @@ public class OrderFoodDao {
 		
 		for(OrderFood of : result){
 			if(extraCond.dateType.isToday()){
+				//Get the details to the combo.
 				if(of.asFood().isCombo()){
 					of.asFood().setChildFoods(FoodDao.getComboByCond(dbCon, staff, new ExtraCond4Combo(of.asFood().getFoodId())));
 				}
+				//Get the detail to associated price plan.
+				of.asFood().setPricePlan(FoodDao.getPricePlan(dbCon, staff, new ExtraCond4Price(of.asFood())));
 			}
 			if(of.getTasteGroup() != null){
 				of.setTasteGroup(TasteGroupDao.getById(staff, of.getTasteGroup().getGroupId(), extraCond.dateType));

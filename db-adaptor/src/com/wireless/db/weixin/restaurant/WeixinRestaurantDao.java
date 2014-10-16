@@ -184,7 +184,7 @@ public class WeixinRestaurantDao {
 			wr.setWeixinAppId(dbCon.rs.getString("app_id"));
 			wr.setWeixinAppSecret(dbCon.rs.getString("app_secret"));
 			String info = dbCon.rs.getString("weixin_info");
-			if(!info.isEmpty()){
+			if(info != null && !info.isEmpty()){
 				wr.setWeixinInfo(new StringHtml(info, StringHtml.ConvertTo.TO_HTML).toString());
 			}
 			wr.setWeixinSerial(dbCon.rs.getString("weixin_serial"));

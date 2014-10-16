@@ -43,7 +43,7 @@ public class TestCommitOrderDao {
 	@Test
 	public void testCommitOrder() throws BusinessException, BusinessException, SQLException{
 		
-		Table tblToInsert = TableDao.getTables(mStaff, null, null).get(0);
+		Table tblToInsert = TableDao.getByCond(mStaff, null, null).get(0);
 		List<Food> foods = FoodDao.getPureByCond(mStaff, null, null);
 		
 		//Cancel the order associated with table inserted if it exist before.
@@ -153,7 +153,7 @@ public class TestCommitOrderDao {
 		}
 		
 		//Check the associated table detail
-		Table tbl = TableDao.getTableByAlias(mStaff, actual.getDestTbl().getAliasId());
+		Table tbl = TableDao.getByAlias(mStaff, actual.getDestTbl().getAliasId());
 		//Check the status to associated table
 		Assert.assertEquals("the status to associated table", tbl.getStatus().getVal(), Table.Status.BUSY.getVal());
 		//Check the custom number to associated table

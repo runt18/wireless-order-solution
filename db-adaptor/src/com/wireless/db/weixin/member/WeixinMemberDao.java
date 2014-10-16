@@ -204,7 +204,7 @@ public class WeixinMemberDao {
 		}catch(BusinessException e){
 			//Insert a new if the member associated with this mobile does NOT exist. 
 			if(e.getErrCode().equals(MemberError.MEMBER_NOT_EXIST)){
-				memberId = MemberDao.insert(dbCon, staff, new Member.InsertBuilder("微信会员", mobile, MemberTypeDao.getWeixinMemberType(staff).getId()));
+				memberId = MemberDao.insert(dbCon, staff, new Member.InsertBuilder("微信会员", mobile, MemberTypeDao.getWeixinMemberType(dbCon, staff).getId()));
 			}else{
 				throw e;
 			}
@@ -226,59 +226,6 @@ public class WeixinMemberDao {
 		return memberId;
 	}
 	
-//	/**
-//	 * update the new mobile to weixin serial which has been bound
-//	 * @param mobile
-//	 * 			the mobile to update
-//	 * @param weixinMemberSerial
-//	 * 			the weixin serial to update mobile
-//	 * @param weixinRestaurantSerial
-//	 * 			the weixin restaurant serial
-//	 * @throws SQLException
-//	 * 			throws if failed to execute any SQL statement
-//	 * @throws BusinessException
-//	 * 			throws if the weixin serial is NOT bound<br>
-//	 * 			throws if the weixin serial has NOT been interested before<br>
-//	 * 			throws if the mobile to update has been exist before
-//	 */
-//	public static void updateMobile(String mobile, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
-//		DBCon dbCon = new DBCon();
-//		try{
-//			dbCon.connect();
-//			updateMobile(dbCon, mobile, weixinMemberSerial, weixinRestaurantSerial);
-//		}finally{
-//			dbCon.disconnect();
-//		}
-//	}
-	
-//	/**
-//	 * update the new mobile to weixin serial which has been bound
-//	 * @param dbCon
-//	 * 			the database connection
-//	 * @param mobile
-//	 * 			the mobile to update
-//	 * @param weixinMemberSerial
-//	 * 			the weixin serial to update mobile
-//	 * @param weixinRestaurantSerial
-//	 * 			the weixin restaurant serial
-//	 * @throws SQLException
-//	 * 			throws if failed to execute any SQL statement
-//	 * @throws BusinessException
-//	 * 			throws if the weixin serial is NOT bound<br>
-//	 * 			throws if the weixin serial has NOT been interested before<br>
-//	 * 			throws if the mobile to update has been exist before
-//	 */
-//	public static void updateMobile(DBCon dbCon, String mobile, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
-//		int memberId = getBoundMemberIdByWeixin(dbCon, weixinMemberSerial, weixinRestaurantSerial);
-//		int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, weixinRestaurantSerial);
-//		Staff staff = StaffDao.getByRestaurant(dbCon, restaurantId).get(0);
-//		Member member = MemberDao.getById(dbCon, staff, memberId);
-//		member.setMobile(mobile);
-//		MemberDao.checkValid(dbCon, staff, member);
-//		String updateSQL = " UPDATE " + Params.dbName + ".member SET mobile = " + "'" + member.getMobile() + "' WHERE member_id = " + member.getId(); 
-//		dbCon.stmt.executeUpdate(updateSQL);
-////		MemberDao.update(dbCon, staff, new Member.UpdateBuilder(memberId, restaurantId).setMobile(mobile));
-//	}
 	
 	/**
 	 * Cancel the weixin member.

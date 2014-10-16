@@ -7,6 +7,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.serviceRate.ServicePlanDao;
 import com.wireless.db.system.SystemDao;
@@ -20,7 +21,6 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
-import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
@@ -289,31 +289,17 @@ public class PayOrder {
 			dbCon.stmt.executeUpdate(sql);			
 
 			//Update each food's discount & unit price.
-			for(OrderFood food : orderCalculated.getOrderFoods()){
+			for(OrderFood of : orderCalculated.getOrderFoods()){
 				sql = " UPDATE " + Params.dbName + ".order_food " +
 					  " SET " +
-					  " food_id = " + food.getFoodId() +
-					  " ,discount = " + food.getDiscount() + 
-					  " ,unit_price = " + food.asFood().getPrice() +
+					  " food_id = " + of.getFoodId() +
+					  " ,discount = " + of.getDiscount() + 
+					  " ,unit_price = " + of.getPrice() +
 					  " WHERE order_id = " + orderCalculated.getId() + 
-					  " AND food_id = " + food.getFoodId();
+					  " AND food_id = " + of.getFoodId();
 				dbCon.stmt.executeUpdate(sql);				
 			}	
 
-			//Update the table associated with this order to IDLE in case of unpaid.
-			if(orderCalculated.isUnpaid()){
-				
-				sql = " UPDATE " + Params.dbName + ".table SET " +
-					  " status = " + Table.Status.IDLE.getVal() + 
-					  " ,custom_num = NULL " +
-					  " ,category = NULL " +
-					  " WHERE " +
-  			  		  " restaurant_id = " + orderCalculated.getRestaurantId() + " AND " +
-					  " table_alias = " + orderCalculated.getDestTbl().getAliasId();
-				dbCon.stmt.executeUpdate(sql);				
-						
-			}
-			
 			//Update the member status if settled by member.
 			if(orderCalculated.isSettledByMember()){
 				
@@ -476,6 +462,13 @@ public class PayOrder {
 			}
 		}
 		
+		if(payBuilder.hasPricePlan()){
+			if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
+				//TODO
+			}else{
+				orderToCalc.setPricePlan(PricePlanDao.getById(dbCon, staff, payBuilder.getPlanId()));
+			}
+		}
 
 		float cancelPrice = 0;
 		//Calculate the cancel price to this order.

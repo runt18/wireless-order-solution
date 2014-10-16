@@ -12,11 +12,13 @@ import org.junit.Test;
 
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.SortedList;
 import com.wireless.test.db.TestInit;
@@ -45,6 +47,8 @@ public class TestMemberTypeDao {
 		assertEquals("member type desc", expected.getDesc(), actual.getDesc());
 		assertEquals("member type default discount", expected.getDefaultDiscount(), actual.getDefaultDiscount());
 		assertEquals("member type associated discounts", SortedList.newInstance(expected.getDiscounts()), SortedList.newInstance(actual.getDiscounts()));
+		assertEquals("member type default price", expected.getDefaultPrice(), actual.getDefaultPrice());
+		assertEquals("member type associated prices", SortedList.newInstance(expected.getPrices()), SortedList.newInstance(actual.getPrices()));
 	}
 	
 	@Test
@@ -52,6 +56,7 @@ public class TestMemberTypeDao {
 		int memberTypeId = 0;
 		try{
 			List<Discount> discounts = DiscountDao.getAll(mStaff);
+			List<PricePlan> prices = PricePlanDao.getByCond(mStaff, null);
 			
 			//Test to insert a new member type
 			MemberType.InsertBuilder builder = new MemberType.InsertBuilder(mStaff.getRestaurantId(), "测试会员类型", discounts.get(0))
@@ -59,13 +64,15 @@ public class TestMemberTypeDao {
 															 .setInitialPoint(100)
 															 .setExchangeRate(1.1f)
 															 .setDesc("测试描述")
-															 .addDiscount(discounts.get(1));
+															 .addDiscount(discounts.get(1))
+															 .addPrice(prices.get(0))
+															 .setDefaultPrice(prices.get(0));
 			
 			MemberType expected = builder.build();
 			memberTypeId = MemberTypeDao.insert(mStaff, builder);
 			expected.setId(memberTypeId);
 			
-			MemberType actual = MemberTypeDao.getMemberTypeById(mStaff, memberTypeId);
+			MemberType actual = MemberTypeDao.getById(mStaff, memberTypeId);
 			compare(expected, actual);
 			
 			//Test to update the member type just created
@@ -77,18 +84,19 @@ public class TestMemberTypeDao {
 																   .setExchangeRate(0.4f)
 																   .setDesc("修改描述")
 																   .setDefaultDiscount(discounts.get(1))
-																   .addDiscount(discounts.get(0));
+																   .addDiscount(discounts.get(0))
+																   .setDefaultPrice(prices.get(0));
 			MemberTypeDao.update(mStaff, updateBuilder);
 			
 			expected = updateBuilder.build();
-			actual = MemberTypeDao.getMemberTypeById(mStaff, memberTypeId);
+			actual = MemberTypeDao.getById(mStaff, memberTypeId);
 			compare(expected, actual);
 						
 		}finally{
 			if(memberTypeId != 0){
 				MemberTypeDao.deleteById(mStaff, memberTypeId);
 				try{
-					MemberTypeDao.getMemberTypeById(mStaff, memberTypeId);
+					MemberTypeDao.getById(mStaff, memberTypeId);
 					assertTrue("fail to delete member type", false);
 				}catch(BusinessException ingored){}
 				

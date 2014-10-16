@@ -31,7 +31,6 @@ import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
-import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.printScheme.PStyle;
@@ -369,7 +368,7 @@ public class RestaurantDao {
 			Staff staff = initStaff(dbCon, restaurant.getId(), builder.getPwd());
 			
 			//Insert '商品' material category
-			initMaterialCate(dbCon, restaurant.getId());
+			//initMaterialCate(dbCon, restaurant.getId());
 			
 			//Insert the '大牌', '中牌', '例牌' and popular tastes
 			initTastes(dbCon, staff);
@@ -502,15 +501,15 @@ public class RestaurantDao {
 	}
 	
 	private static void initTable(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
-		TableDao.insert(staff, new Table.InsertBuilder(1, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
-		TableDao.insert(staff, new Table.InsertBuilder(2, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
-		TableDao.insert(staff, new Table.InsertBuilder(3, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
-		TableDao.insert(staff, new Table.InsertBuilder(5, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
-		TableDao.insert(staff, new Table.InsertBuilder(6, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
-		TableDao.insert(staff, new Table.InsertBuilder(7, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
-		TableDao.insert(staff, new Table.InsertBuilder(8, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
-		TableDao.insert(staff, new Table.InsertBuilder(9, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
-		TableDao.insert(staff, new Table.InsertBuilder(10, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
+		TableDao.insert(staff, new Table.InsertBuilder(1, Region.RegionId.REGION_1));
+		TableDao.insert(staff, new Table.InsertBuilder(2, Region.RegionId.REGION_1));
+		TableDao.insert(staff, new Table.InsertBuilder(3, Region.RegionId.REGION_1));
+		TableDao.insert(staff, new Table.InsertBuilder(5, Region.RegionId.REGION_1));
+		TableDao.insert(staff, new Table.InsertBuilder(6, Region.RegionId.REGION_1));
+		TableDao.insert(staff, new Table.InsertBuilder(7, Region.RegionId.REGION_1));
+		TableDao.insert(staff, new Table.InsertBuilder(8, Region.RegionId.REGION_1));
+		TableDao.insert(staff, new Table.InsertBuilder(9, Region.RegionId.REGION_1));
+		TableDao.insert(staff, new Table.InsertBuilder(10, Region.RegionId.REGION_1));
 	}
 	
 	private static void initRegion(DBCon dbCon, Staff staff) throws SQLException{
@@ -767,17 +766,17 @@ public class RestaurantDao {
 		return StaffDao.getById(dbCon, staffId);
 	}
 	
-	private static void initMaterialCate(DBCon dbCon, int restaurantId) throws SQLException{
-		String sql;
-		sql = " INSERT INTO " + Params.dbName + ".material_cate " +
-			  "(`restaurant_id`, `name`, `type`)" +
-			  " VALUES(" +
-			  restaurantId + "," +
-			  "'" + MaterialCate.Type.GOOD.getText() + "'," +
-			  MaterialCate.Type.GOOD.getValue() +
-			  " ) ";
-		dbCon.stmt.executeUpdate(sql);
-	}
+//	private static void initMaterialCate(DBCon dbCon, int restaurantId) throws SQLException{
+//		String sql;
+//		sql = " INSERT INTO " + Params.dbName + ".material_cate " +
+//			  "(`restaurant_id`, `name`, `type`)" +
+//			  " VALUES(" +
+//			  restaurantId + "," +
+//			  "'" + MaterialCate.Type.GOOD.getText() + "'," +
+//			  MaterialCate.Type.GOOD.getValue() +
+//			  " ) ";
+//		dbCon.stmt.executeUpdate(sql);
+//	}
 	
 	public static void deleteById(int restaurantId) throws SQLException{
 		DBCon dbCon = new DBCon();

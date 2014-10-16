@@ -60,22 +60,12 @@ public class TransTblDao {
 	 */
 	public static int exec(DBCon dbCon, Staff staff, Table srcTbl, Table destTbl) throws SQLException, BusinessException{		
 		
-		srcTbl = TableDao.getTableByAlias(dbCon, staff, srcTbl.getAliasId());
+		srcTbl = TableDao.getByAlias(dbCon, staff, srcTbl.getAliasId());
 
-		destTbl = TableDao.getTableByAlias(dbCon, staff, destTbl.getAliasId());
+		destTbl = TableDao.getByAlias(dbCon, staff, destTbl.getAliasId());
 
-		/**
-		 * Need to assure two conditions before table transfer 
-		 * 1 - the source table remains in busy or merged 
-		 * 2 - the destination table is idle or merged now
-		 */
-		if(srcTbl.isMerged()){
-			throw new BusinessException("The source table(restaurant_id = " + srcTbl.getRestaurantId() +
-										", alias_id=" + srcTbl.getAliasId() + ")" +
-										" wants to transfer is merged.", 
-										ProtocolError.TABLE_MERGED);
 			
-		}else if(srcTbl.isIdle()) {
+		if(srcTbl.isIdle()) {
 			throw new BusinessException("The source table(restaurant_id = " + srcTbl.getRestaurantId() +
 										", alias_id = " + srcTbl.getAliasId() + ")" +
 										" wants to transfer is IDLE.",
@@ -87,15 +77,9 @@ public class TransTblDao {
 										" wants to be transferred is BUSY.", 
 										ProtocolError.TABLE_BUSY);
 
-		}else if(destTbl.isMerged()){
-			throw new BusinessException("The destination table(restaurant_id = " + destTbl.getRestaurantId() +
-									    ", alias_id = " + destTbl.getAliasId() + ")" +
-									    " wants to be transferred is merged.", 
-									    ProtocolError.TABLE_MERGED);
-
 		}else {
 
-			int orderID = OrderDao.getOrderIdByUnPaidTable(dbCon, staff, srcTbl);
+			int orderId = OrderDao.getOrderIdByUnPaidTable(dbCon, staff, srcTbl);
 
 			try{
 				
@@ -108,37 +92,12 @@ public class TransTblDao {
 							 " table_id = " + destTbl.getTableId() + ", " +
 							 " table_alias = " + destTbl.getAliasId() + ", " +
 							 " table_name = " + "'" + destTbl.getName() + "'" +
-							 " WHERE id = " + orderID;
+							 " WHERE id = " + orderId;
 				dbCon.stmt.executeUpdate(sql);
 
-				// Update the destination table to busy
-				sql = " UPDATE " + 
-					  Params.dbName + ".table SET " +
-					  " status = " + Table.Status.BUSY.getVal() + ", " +
-					  " category = " + srcTbl.getCategory().getVal() + ", " +
-					  " custom_num = " + srcTbl.getCustomNum() + 
-					  " WHERE restaurant_id = " + destTbl.getRestaurantId() + 
-					  " AND " +
-					  " table_alias = " + destTbl.getAliasId();
-				
-				dbCon.stmt.executeUpdate(sql);
-			
-
-				// update the source table status to idle
-				sql = " UPDATE " + 
-				      Params.dbName + ".table SET " +
-				      " status = " + Table.Status.IDLE.getVal() + "," + 
-				      " custom_num = NULL," +
-					  " category = NULL " + 
-				      " WHERE " +
-				      " restaurant_id = " + srcTbl.getRestaurantId() + 
-				      " AND " +
-				      " table_alias = " + srcTbl.getAliasId();
-				dbCon.stmt.executeUpdate(sql);
-				
 				dbCon.conn.commit();
 
-				return orderID;
+				return orderId;
 				
 			}catch(SQLException e){
 				dbCon.conn.rollback();
