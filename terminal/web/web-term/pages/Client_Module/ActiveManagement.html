@@ -54,11 +54,13 @@ var promotion_uploadMask = new Ext.LoadMask(document.body, {
 	msg : '正在保存活动...'
 });
 var operatePromotion = function(){
-	
-	if(active_memberList == ''){
+	if(operatePromotTypeWin.oriented == 2 && active_memberList == ''){
 		Ext.example.msg('提示', '请选择参与活动的会员');
 		return false;
+	}else{
+		active_memberList = '';
 	}
+	
 	var params = {};
 	var title = Ext.getCmp('active_title');
 	var beginDate = Ext.getCmp('active_beginDate');
@@ -79,7 +81,7 @@ var operatePromotion = function(){
 	}
 	
 	params.pRule = promotionType;
-	params.oriented = operatePromotTypeWin.oriented;
+	params.oriented = operatePromotTypeWin.oriented?operatePromotTypeWin.oriented:1;
 	params.couponName = couponName.getValue();
 	params.price = price.getValue();
 	params.expiredDate = expiredDate.getValue().format('Y-m-d');
@@ -88,7 +90,7 @@ var operatePromotion = function(){
 	params.beginDate = beginDate.getValue().format('Y-m-d');
 	params.endDate = endDate.getValue().format('Y-m-d');
 	params.point = point.getValue();
-	params.members = operatePromotTypeWin.oriented == 2?active_memberList:'';
+	params.members = active_memberList;
 	params.body = editBody.getValue();	
 	params.entire = entire.body.dom.innerHTML;
 	params.type = $('#chkSetWelcome').is(':checked');
