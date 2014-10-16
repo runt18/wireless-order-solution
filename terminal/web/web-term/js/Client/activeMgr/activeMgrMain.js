@@ -197,10 +197,7 @@ function getPromotionBodyById(id){
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
-				Ext.getCmp('promotionPreviewBody').body.update('<div style="text-align:center; font-size: 30px; font-weight: bold; word-wrap:break-word; color: #D2691E;">' + jr.root[0].title + '</div>' +
-																'<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue; font-szie:15px;font-weight:bold">活动日期 : <font color="red">' + jr.root[0].promotionBeginDate + '</font>&nbsp;至&nbsp;<font color="red">' + jr.root[0].promotionEndDate + '</font></div>' +
-																promotionRule(jr.root[0].pType, jr.root[0].point) +
-																jr.root[0].body);
+				Ext.getCmp('promotionPreviewBody').body.update(jr.root[0].entire);
 				if(jr.root[0].coupon){
 					Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:left; margin: 10px 10px 10px 20px;float:left;"><img height="160"  src="' + (jr.root[0].coupon.ossImage?jr.root[0].coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg') + '" /></div>'
 																+ '<div style="float:left;vertical-align: middle;line-height: 40px;"><br><span style="margin-top: 15px;">' + jr.root[0].coupon.name + '</span><br><span >面额 : ' + jr.root[0].coupon.price + ' 元</span><br><span >到期 : ' + jr.root[0].coupon.expiredFormat + '</span></div>');							
@@ -380,7 +377,7 @@ function fnUpdatePromotion(){
 		Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
 		return;
 	}	
-	promotionType = node.attributes.pType;
+	promotionType = node.attributes.pRule;
 	choosePromotionModel();
 	initCouponTypeWin({type : 'update'});
 	operatePromotTypeWin.pId = node.attributes.id;
@@ -496,11 +493,16 @@ Ext.onReady(function() {
 				if(rn.length == 0){
 					promotionTree.getRootNode().getUI().hide();
 				}else{
-					for(var i = (rn.length - 1); i >= 0; i--){
+/*					for(var i = (rn.length - 1); i >= 0; i--){
+						console.log(rn[i].text)
 						if(typeof rn[i].attributes.expired != 'undefined'){
 							rn[i].setText('<font style="color:#808080">' + rn[i].text + '&nbsp;(已过期)</font>');
 						}
-					}
+						if(rn[i].attributes.pType == 2){
+							console.log(11)
+							rn[i].setText('<font style="color:#808080">' + rn[i].text + '&nbsp;(欢迎活动)</font>');
+						}
+					}*/
 					promotionTree.getRootNode().getUI().show();
 				}
 				fnCheckHaveWelcome();
