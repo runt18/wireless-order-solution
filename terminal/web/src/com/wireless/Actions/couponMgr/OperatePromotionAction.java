@@ -484,12 +484,22 @@ public class OperatePromotionAction extends DispatchAction{
 			if(i > 0){
 				sb.append(",");
 			}
+			String text = p_List.get(i).getTitle();
+			if(p_List.get(i).getType() == Promotion.Type.WELCOME){
+				text += "<font color=\"red\"> -- 欢迎活动</font>";
+			}
+			
+			if(p_List.get(i).getStatus() == Promotion.Status.FINISH){
+				text += "<font color=\"red\"> -- 已过期</font>";
+			}
+			
 			sb.append("{")
-			.append("text:'" + p_List.get(i).getTitle() + "'")
+			.append("text:'" + text + "'")
 			.append(",leaf:true")
 			.append(",status:" + p_List.get(i).getStatus().getVal())
 			.append(",title:'" + p_List.get(i).getTitle() + "'")
-			.append(",pType:" + p_List.get(i).getRule().getVal())
+			.append(",pRule:" + p_List.get(i).getRule().getVal())
+			.append(",pType:" + p_List.get(i).getType().getVal())
 			.append(",id:" + p_List.get(i).getId())
 			.append("}");
 		}
