@@ -176,6 +176,7 @@ public class StockReportDao {
 						stockReport.setPrimeAmount(primeAmountCon.rs.getFloat("remaining"));
 					}else{
 						stockReport.setPrimeAmount(0);
+						
 					}
 				}finally{
 					primeAmountCon.disconnect();
