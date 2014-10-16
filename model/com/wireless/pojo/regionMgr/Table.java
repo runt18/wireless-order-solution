@@ -17,57 +17,28 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	 */
 	public static class InsertBuilder{
 		private final int tableAlias;
-		private final int restaurantId;
-		private final short regionId;
+		private final Region.RegionId regionId;
 		private String tableName;
-		private float serviceRate;
 		private int miniCost;
 		
-		public InsertBuilder(int tableAlias, int restaurantId, short regionId){
+		InsertBuilder(int tableAlias, short regionId){
 			this.tableAlias = tableAlias;
-			this.restaurantId = restaurantId;
+			this.regionId = Region.RegionId.valueOf(regionId);
+		}
+
+		public InsertBuilder(int tableAlias, Region.RegionId regionId){
+			this.tableAlias = tableAlias;
 			this.regionId = regionId;
 		}
 
+		
 		public Table build(){
 			return new Table(this);
 		}
 		
-		public int getTableAlias() {
-			return tableAlias;
-		}
-
-		public int getRestaurantId() {
-			return restaurantId;
-		}
-
-		public short getRegionId() {
-			return regionId;
-		}
-
-		public String getTableName() {
-			if(tableName == null){
-				tableName = "";
-			}
-			return tableName;
-		}
-
 		public InsertBuilder setTableName(String tableName) {
 			this.tableName = tableName;
 			return this;
-		}
-
-		public float getServiceRate() {
-			return serviceRate;
-		}
-
-		public InsertBuilder setServiceRate(float serviceRate) {
-			this.serviceRate = serviceRate;
-			return this;
-		}
-
-		public int getMiniCost() {
-			return miniCost;
 		}
 
 		public InsertBuilder setMiniCost(int miniCost) {
@@ -77,14 +48,14 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	}
 	
 	/**
-	 * The helper class to create the table object used in update {@link TableDao#updateById}
+	 * The helper class to create the table object used in update {@link TableDao#}
 	 */
 	public static class UpdateBuilder{
 		private final int tableId;
 		
-		private short regionId = Region.RegionId.REGION_1.getId();
+		private Region.RegionId regionId;
 		private String tableName;
-		private int miniCost;
+		private int miniCost = -1;
 		
 		public Table build(){
 			return new Table(this);
@@ -94,35 +65,28 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 			this.tableId = tableId;
 		}
 
-		public int getTableId() {
-			return tableId;
+		public boolean isRegionChanged(){
+			return this.regionId != null;
 		}
-
-		public short getRegionId() {
-			return regionId;
-		}
-
-		public UpdateBuilder setRegionId(short regionId) {
+		
+		public UpdateBuilder setRegionId(Region.RegionId regionId) {
 			this.regionId = regionId;
 			return this;
 		}
 
-		public String getTableName() {
-			if(tableName == null){
-				tableName = "";
-			}
-			return tableName;
+		public boolean isNameChanged(){
+			return this.tableName != null;
 		}
-
+		
 		public UpdateBuilder setTableName(String name) {
 			this.tableName = name;
 			return this;
 		}
 
-		public int getMiniCost() {
-			return miniCost;
+		public boolean isMiniCostChanged(){
+			return this.miniCost >= 0;
 		}
-
+		
 		public UpdateBuilder setMiniCost(int miniCost) {
 			this.miniCost = miniCost;
 			return this;
@@ -190,18 +154,17 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	}
 	
 	private Table(InsertBuilder builder){
-		setTableAlias(builder.getTableAlias());
-		setRestaurantId(builder.getRestaurantId());
-		setRegion(new Region(builder.getRegionId(), null));
-		setMinimumCost(builder.getMiniCost());
-		setTableName(builder.getTableName());
+		setTableAlias(builder.tableAlias);
+		setRegion(new Region(builder.regionId.getId(), null));
+		setMinimumCost(builder.miniCost);
+		setTableName(builder.tableName);
 	}
 	
 	private Table(UpdateBuilder builder){
-		setMinimumCost(builder.getMiniCost());
-		setRegion(new Region(builder.getRegionId(), null));
-		setTableId(builder.getTableId());
-		setTableName(builder.getTableName());
+		setMinimumCost(builder.miniCost);
+		setRegion(new Region(builder.regionId.getId(), null));
+		setTableId(builder.tableId);
+		setTableName(builder.tableName);
 	}
 	
 	public int getTableId() {
@@ -266,10 +229,6 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		this.category = category;
 	}
 	
-	public void setCategory(int category) {
-		this.category = Category.valueOf(category);
-	}
-	
 	public boolean isNormal(){
 		return category == Category.NORMAL;
 	}
@@ -284,10 +243,6 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	
 	public void setStatus(Status status){
 		this.status = status;
-	}
-	
-	public void setStatus(int statusVal) {
-		this.status = Status.valueOf(statusVal);
 	}
 	
 	public boolean isIdle(){

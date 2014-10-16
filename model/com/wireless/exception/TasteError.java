@@ -16,10 +16,10 @@ public class TasteError extends ErrorEnum{
 		
 	}
 	private static ErrorCode build(int code, String desc){
-		return build(ErrorType.FOOD, code, desc, ErrorLevel.ERROR);
+		return build(ErrorType.TASTE, code, desc, ErrorLevel.ERROR);
 	}
 	public static ErrorCode valueOf(int code){
-		return valueOf(ErrorType.FOOD, code);
+		return valueOf(ErrorType.TASTE, code);
 	}
 	
 }

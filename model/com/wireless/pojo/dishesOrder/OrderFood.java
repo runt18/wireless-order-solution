@@ -15,6 +15,7 @@ import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
@@ -59,7 +60,10 @@ public class OrderFood implements Parcelable, Jsonable {
 	//indicates the order food is gift
 	private boolean isGift = false;
 	
-	//the discount to this food
+	//the price plan to this order food
+	private PricePlan mPricePlan;
+	
+	//the discount to this order food
 	private float mDiscount = 1;	 
 	
 	final static int MAX_ORDER_AMOUNT = Short.MAX_VALUE;
@@ -249,7 +253,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	 * @return the unit price to this order food
 	 */
 	private float getUnitPrice(){
-		return NumericUtil.roundFloat(mFood.getPrice() + (!hasTasteGroup() || mFood.isWeigh() ? 0 : mTasteGroup.getPrice()));
+		return NumericUtil.roundFloat(mPricePlan != null ? mFood.getPrice(mPricePlan) : mFood.getPrice() + (!hasTasteGroup() || mFood.isWeigh() ? 0 : mTasteGroup.getPrice()));
 	}
 	
 	/**
@@ -495,6 +499,10 @@ public class OrderFood implements Parcelable, Jsonable {
 		return isRepaid;
 	}
 	
+	void setPricePlan(PricePlan pricePlan){
+		this.mPricePlan = pricePlan;
+	}
+	
 	/**
 	 * Set the discount to this order food.
 	 * @param discount the discount to set
@@ -544,7 +552,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	public float getPrice(){
-		return mFood.getPrice();
+		return getUnitPrice();
 	}
 	
 	public Kitchen getKitchen(){
@@ -808,8 +816,8 @@ public class OrderFood implements Parcelable, Jsonable {
 		jm.putBoolean(Key4Json.IS_RETURN.key, this.getCount() < 0 ? true : false);
 		jm.putFloat(Key4Json.DISCOUNT.key, this.mDiscount);
 		jm.putFloat(Key4Json.COUNT.key, this.getCount());
-		jm.putFloat(Key4Json.UNIT_PRICE.key, this.getPrice());
-		jm.putFloat(Key4Json.ACTUAL_PRICE.key, this.getPrice());
+		jm.putFloat(Key4Json.UNIT_PRICE.key, this.asFood().getPrice());
+		jm.putFloat(Key4Json.ACTUAL_PRICE.key, this.asFood().getPrice());
 		jm.putFloat(Key4Json.TOTAL_PRICE.key, this.calcPrice());
 		jm.putJsonable(Key4Json.TASTE_GROUP.key, this.getTasteGroup(), 0);
 		jm.putFloat(Key4Json.TOTAL_PRICE_BEFORE_DISCOUNT.key, this.calcPriceBeforeDiscount());

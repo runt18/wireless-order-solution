@@ -9,6 +9,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.menuMgr.PricePlan;
 
 public class MemberType implements Jsonable, Parcelable{
 	
@@ -84,6 +85,41 @@ public class MemberType implements Jsonable, Parcelable{
 		}
 	}
 	
+	public static enum PriceType{
+		NORMAL(1, "普通"),
+		DEFAULT(2, "默认");
+		
+		private final int val;
+		private final String desc;
+		
+		PriceType(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public static PriceType valueOf(int val){
+			for(PriceType type : values()){
+				if(type.val == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The val(" + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return val;
+		}
+		
+		public String getDesc(){
+			return desc;
+		}
+		
+		@Override
+		public String toString(){
+			return desc;
+		}
+	}
+	
 	public static enum Attribute{
 		
 		CHARGE(0, "充值"),		//充值
@@ -130,6 +166,8 @@ public class MemberType implements Jsonable, Parcelable{
 		
 		private Type type = Type.NORMAL;
 		private List<Discount> discounts = new ArrayList<Discount>();
+		private PricePlan defaultPrice;
+		private List<PricePlan> prices = new ArrayList<PricePlan>();
 		private float exchangeRate = 1;
 		private float chargeRate = 1;
 		private Attribute attribute = Attribute.POINT;
@@ -152,6 +190,19 @@ public class MemberType implements Jsonable, Parcelable{
 			if(!discounts.contains(discount)){
 				discounts.add(discount);
 			}
+			return this;
+		}
+		
+		public InsertBuilder addPrice(PricePlan price){
+			if(!prices.contains(price)){
+				prices.add(price);
+			}
+			return this;
+		}
+		
+		public InsertBuilder setDefaultPrice(PricePlan defaultPrice){
+			this.defaultPrice = defaultPrice;
+			addPrice(defaultPrice);
 			return this;
 		}
 		
@@ -199,6 +250,8 @@ public class MemberType implements Jsonable, Parcelable{
 		private String name;
 		private Discount defaultDiscount;
 		private List<Discount> discounts = new ArrayList<Discount>();
+		private PricePlan defaultPrice;
+		private List<PricePlan> prices = new ArrayList<PricePlan>();
 		private float exchangeRate = -1;
 		private float chargeRate = -1;
 		private Attribute attribute;
@@ -232,11 +285,32 @@ public class MemberType implements Jsonable, Parcelable{
 		}
 		
 		public boolean isDiscountChanged(){
-			return discounts.isEmpty();
+			return !discounts.isEmpty();
 		}
 		
 		public boolean isDefaultDiscountChanged(){
 			return defaultDiscount != null;
+		}
+		
+		public UpdateBuilder setDefaultPrice(PricePlan defaultPrice){
+			this.defaultPrice = defaultPrice;
+			addPrice(defaultPrice);
+			return this;
+		}
+		
+		public UpdateBuilder addPrice(PricePlan price){
+			if(!prices.contains(price)){
+				prices.add(price);
+			}
+			return this;
+		}
+		
+		public boolean isPriceChanged(){
+			return !prices.isEmpty();
+		}
+		
+		public boolean isDefaultPriceChanged(){
+			return defaultPrice != null;
 		}
 		
 		public UpdateBuilder setExchangeRate(float exchangeRate){
@@ -307,6 +381,8 @@ public class MemberType implements Jsonable, Parcelable{
 	private Type type = Type.NORMAL;
 	private List<Discount> discounts = new ArrayList<Discount>();
 	private Discount defaultDiscount = new Discount();
+	private List<PricePlan> prices = new ArrayList<PricePlan>();
+	private PricePlan defaultPrice;
 	private float exchangeRate;
 	private float chargeRate;
 	private Attribute attribute;
@@ -319,6 +395,8 @@ public class MemberType implements Jsonable, Parcelable{
 		setType(builder.type);
 		setDiscounts(builder.discounts);
 		setDefaultDiscount(builder.defaultDiscount);
+		setPrices(builder.prices);
+		setDefaultPrice(builder.defaultPrice);
 		setExchangeRate(builder.exchangeRate);
 		setChargeRate(builder.chargeRate);
 		setAttribute(builder.attribute);
@@ -331,6 +409,8 @@ public class MemberType implements Jsonable, Parcelable{
 		setName(builder.name);
 		setDiscounts(builder.discounts);
 		setDefaultDiscount(builder.defaultDiscount);
+		setPrices(builder.prices);
+		setDefaultPrice(builder.defaultPrice);
 		setExchangeRate(builder.exchangeRate);
 		setChargeRate(builder.chargeRate);
 		setAttribute(builder.attribute);
@@ -350,6 +430,8 @@ public class MemberType implements Jsonable, Parcelable{
 			setType(src.getType());
 			setDiscounts(src.getDiscounts());
 			setDefaultDiscount(src.getDefaultDiscount());
+			setPrices(src.getPrices());
+			setDefaultPrice(src.getDefaultPrice());
 			setExchangeRate(src.getExchangeRate());
 			setChargeRate(src.getChargeRate());
 			setAttribute(src.getAttribute());
@@ -429,6 +511,35 @@ public class MemberType implements Jsonable, Parcelable{
 	public void setDefaultDiscount(Discount defaultDiscount) {
 		addDiscount(defaultDiscount);
 		this.defaultDiscount = defaultDiscount;
+	}
+
+	public void setPrices(List<PricePlan> plans){
+		if(plans != null){
+			this.prices.clear();
+			this.prices.addAll(plans);
+		}
+	}
+
+	public List<PricePlan> getPrices(){
+		return Collections.unmodifiableList(prices);
+	}
+	
+	public void addPricePlan(PricePlan plan){
+		if(!prices.contains(plan)){
+			prices.add(plan);
+		}
+	}
+	
+	public void setDefaultPrice(PricePlan defaultPrice){
+		this.defaultPrice = defaultPrice;
+	}
+	
+	public PricePlan getDefaultPrice(){
+		return this.defaultPrice;
+	}
+	
+	public boolean hasDefaultPrice(){
+		return this.defaultPrice != null;
 	}
 	
 	public float getChargeRate() {
