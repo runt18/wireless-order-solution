@@ -1132,6 +1132,28 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
+	public static Map<PricePlan, Float> getPricePlan(Staff staff, ExtraCond4Price extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getPricePlan(dbCon, staff, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}		
+	}
+	
+	/**
+	 * Get the price plan to extra condition {@link ExtraCond4Price}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond4Price}
+	 * @return the result to price plan
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
 	public static Map<PricePlan, Float> getPricePlan(DBCon dbCon, Staff staff, ExtraCond4Price extraCond) throws SQLException{
 		String sql;
 		if(extraCond.type == ExtraCond4Price.ShowType.BY_PLAN){
