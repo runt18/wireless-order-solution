@@ -1157,22 +1157,27 @@ public class FoodDao {
 	public static Map<PricePlan, Float> getPricePlan(DBCon dbCon, Staff staff, ExtraCond4Price extraCond) throws SQLException{
 		String sql;
 		if(extraCond.type == ExtraCond4Price.ShowType.BY_PLAN){
-			sql = " SELECT FPP.price_plan_id, IFNULL(FPP.price, -1) AS price FROM " + Params.dbName + ".price_plan PP" +
+			sql = " SELECT PP.name, PP.type, FPP.price_plan_id, IFNULL(FPP.price, -1) AS price FROM " + Params.dbName + ".price_plan PP" +
 				  " LEFT JOIN " + Params.dbName + ".food_price_plan FPP ON PP.price_plan_id = FPP.price_plan_id " +
 				  " WHERE PP.restaurant_id = " + staff.getRestaurantId() +
 				  (extraCond != null ? extraCond.toString() : "");
 		}else{
-			sql = " SELECT price_plan_id, price FROM " + Params.dbName + ".food_price_plan FPP" + 
+			sql = " SELECT name, type, FPP.price_plan_id, price FROM " + Params.dbName + ".food_price_plan FPP" +
+				  " JOIN " + Params.dbName + ".price_plan PP ON PP.price_plan_id = FPP.price_plan_id " +
 				  " WHERE 1 = 1 " +
-				  extraCond.toString();
+				  " AND PP.restaurant_id = " + staff.getRestaurantId() +
+				  (extraCond != null ? extraCond.toString() : "");
 		}
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		Map<PricePlan, Float> result = new HashMap<>();
 		while(dbCon.rs.next()){
+			PricePlan pp = new PricePlan(dbCon.rs.getInt("price_plan_id"));
+			pp.setName(dbCon.rs.getString("name"));
+			pp.setType(PricePlan.Type.valueOf(dbCon.rs.getInt("type")));
 			if(dbCon.rs.getFloat("price") >= 0){
-				result.put(new PricePlan(dbCon.rs.getInt("price_plan_id")), dbCon.rs.getFloat("price"));
+				result.put(pp, dbCon.rs.getFloat("price"));
 			}else{
-				result.put(new PricePlan(dbCon.rs.getInt("price_plan_id")), null);
+				result.put(pp, null);
 			}
 		}
 		dbCon.rs.close();

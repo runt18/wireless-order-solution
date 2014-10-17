@@ -115,7 +115,7 @@ public class TestFoodDao {
 			Food.InsertBuilder insertBuilder = new Food.InsertBuilder("测试菜品", 15.4f, KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(0))
 													   .setImage(ossImageId)
 													   .addPrice(planId, 4)
-													   .setAliasId(100).setDesc("测试描述")
+													   .setAliasId(200).setDesc("测试描述")
 													   .setHot(true).setCommission(2.0f).setGift(true).setWeigh(false);
 			foodId = FoodDao.insert(mStaff, insertBuilder); 
 			
@@ -131,7 +131,7 @@ public class TestFoodDao {
 			ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.FOOD_IMAGE)
 			    												.setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
 
-			Food.UpdateBuilder updateBuilder = new Food.UpdateBuilder(foodId).setAliasId(100).setName("测试修改菜品")
+			Food.UpdateBuilder updateBuilder = new Food.UpdateBuilder(foodId).setAliasId(1001).setName("测试修改菜品")
 													   .setKitchen(KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(1))
 													   .setImage(ossImageId)
 													   .setPrice(34.2f).setDesc("测试修改描述")
