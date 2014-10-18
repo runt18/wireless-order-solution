@@ -631,6 +631,8 @@ public class MemberType implements Jsonable, Parcelable{
 		}
 		jm.putJsonable("discount", this.defaultDiscount, 0);
 		jm.putJsonableList("discounts", this.discounts, 0);
+		jm.putJsonableList("pricePlans", this.prices, flag);
+		jm.putJsonable("pricePlan", this.defaultPrice, flag);
 		
 		return jm;
 	}

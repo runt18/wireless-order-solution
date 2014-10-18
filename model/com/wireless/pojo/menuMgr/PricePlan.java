@@ -1,7 +1,10 @@
 package com.wireless.pojo.menuMgr;
 
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 
-public class PricePlan implements Comparable<PricePlan> {
+
+public class PricePlan implements Jsonable, Comparable<PricePlan> {
 
 	public static class InsertBuilder{
 		private final Type type;
@@ -132,6 +135,21 @@ public class PricePlan implements Comparable<PricePlan> {
 		}else{
 			return 0;
 		}
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putString("name", this.name);
+//		jm.putInt("type", this.type.getVal());
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
