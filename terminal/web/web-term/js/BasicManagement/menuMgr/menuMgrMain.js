@@ -689,7 +689,6 @@ function foodOperation(type){
 			},
 			success : function(response){
 				var jr = Ext.util.JSON.decode(response.responseText);
-				console.log(jr)
 				for (var i = 0; i < jr.root.length; i++) {
 					if(jr.root[i].price >= 0){
 						document.getElementById('chbForFoodAlias' + jr.root[i].id).checked = true;
@@ -3105,7 +3104,6 @@ Ext.onReady(function() {
 		success : function(response){
 			var jr = Ext.util.JSON.decode(response.responseText);
 			pricePlanCmp = jr.root;
-			console.log(pricePlanCmp)
 		},
 		failure : function(){
 		

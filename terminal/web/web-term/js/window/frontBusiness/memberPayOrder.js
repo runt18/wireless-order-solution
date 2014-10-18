@@ -488,7 +488,6 @@ function memberPayOrderToBindData(_c){
 		discountCbo.setValue(discountMsg['id']);
 	} 
 	
-	console.log(memberType.pricePlans)
 	if(memberType.pricePlans && memberType.pricePlans.length > 0){
 		pricePlanCbo.getEl().up('.x-form-item').setDisplayed(true);
 		pricePlanCbo.store.loadData(memberType.pricePlans);
