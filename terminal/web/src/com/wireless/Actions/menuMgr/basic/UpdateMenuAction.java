@@ -28,6 +28,8 @@ public class UpdateMenuAction extends Action {
 			String foodID = request.getParameter("foodID");
 			String foodName = request.getParameter("foodName");
 			String foodPrice = request.getParameter("foodPrice");
+			String foodPrices = request.getParameter("foodPrices");
+			
 			String kitchenID = request.getParameter("kitchenID");
 			String foodDesc = request.getParameter("foodDesc");
 			String isSpecial = request.getParameter("isSpecial");
@@ -71,6 +73,14 @@ public class UpdateMenuAction extends Action {
 				builder.setCommission(Float.parseFloat(commission));
 			}else{
 				builder.setCommission(false);
+			}
+			
+			if(foodPrices != null && !foodPrices.isEmpty()){
+				String[] food_prices = foodPrices.split("&");
+				for (String p : food_prices) {
+					String[] planPrice = p.split(",");
+					builder.addPrice(Integer.parseInt(planPrice[0]), Integer.parseInt(planPrice[1]));
+				}
 			}
 			
 			FoodDao.update(staff, builder);

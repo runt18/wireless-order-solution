@@ -38,6 +38,7 @@ public class InsertMenuAction extends Action {
 			String foodAliasId = request.getParameter("foodAliasID");
 			String foodName = request.getParameter("foodName");
 			String foodPrice = request.getParameter("foodPrice");
+			String foodPrices = request.getParameter("foodPrices");
 			
 			String kitchenId = request.getParameter("kitchenID");
 			String foodDesc = request.getParameter("foodDesc");
@@ -71,6 +72,14 @@ public class InsertMenuAction extends Action {
 			
 			if(Boolean.valueOf(isCommission)){
 				builder.setCommission(Float.parseFloat(commission));
+			}
+			
+			if(foodPrices != null && !foodPrices.isEmpty()){
+				String[] food_prices = foodPrices.split("&");
+				for (String p : food_prices) {
+					String[] planPrice = p.split(",");
+					builder.addPrice(Integer.parseInt(planPrice[0]), Integer.parseInt(planPrice[1]));
+				}
 			}
 			
 			FoodDao.insert(staff, builder);

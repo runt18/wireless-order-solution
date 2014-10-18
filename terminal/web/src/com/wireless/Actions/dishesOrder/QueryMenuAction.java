@@ -2,6 +2,8 @@ package com.wireless.Actions.dishesOrder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +17,7 @@ import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.FoodTasteDao;
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
@@ -23,6 +26,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
@@ -313,5 +317,71 @@ public class QueryMenuAction extends DispatchAction {
 		}
 		return null;
 	}
+	
+	public ActionForward getPricePlan(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jobject = new JObject();
+		List<? extends Jsonable> root = new ArrayList<Jsonable>();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			root = PricePlanDao.getByCond(staff, null);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			jobject.setRoot(root);
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
+	
+	public ActionForward getFoodPrices(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jobject = new JObject();
+		List<Jsonable> root = new ArrayList<Jsonable>();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			String foodId = request.getParameter("foodId");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			FoodDao.ExtraCond4Price extraCond = new FoodDao.ExtraCond4Price(new Food(Integer.parseInt(foodId)));
+			
+			final Map<PricePlan, Float> map = FoodDao.getPricePlan(staff, extraCond);
+			
+			Set<PricePlan> set = map.keySet();
+
+			for (final PricePlan key : set) {
+
+				Jsonable j = new Jsonable() {
+					
+					@Override
+					public JsonMap toJsonMap(int flag) {
+						JsonMap jm = new JsonMap();
+						jm.putJsonable(key, 0);
+						jm.putFloat("price", map.get(key) != null?  map.get(key) : -1);
+						return jm;
+					}
+					
+					@Override
+					public void fromJsonMap(JsonMap jsonMap, int flag) {
+						
+					}
+				};
+				root.add(j);
+
+			}
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			jobject.setRoot(root);
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}		
+	
 	
 }

@@ -26,6 +26,7 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberLevel;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryMemberTypeAction extends DispatchAction {
@@ -132,6 +133,8 @@ public class QueryMemberTypeAction extends DispatchAction {
 				.append(",initialPoint:" + item.getInitialPoint())
 				.append(",attributeValue:" + item.getAttribute().getVal())
 				.append(",desc:'" + item.getDesc() + "'")
+				.append(",pricePlans:[" + priceChildren(item.getPrices()) + "]" )
+				.append(",pricePlan:" + (item.getDefaultPrice() != null?item.getDefaultPrice().getId() : -1))
 				.append(",discounts:[" + children(item.getDiscounts()) + "]" )
 				.append(",discount:" + item.getDefaultDiscount().getId())
 				.append("}");				
@@ -235,13 +238,28 @@ public class QueryMemberTypeAction extends DispatchAction {
 				sb.append(",");
 			}
 			sb.append("{")
-			.append("discountId:" + items.get(i).getId())
-			.append(",discountName:'" + items.get(i).getName() + "'")
+			.append("discountID:" + items.get(i).getId())
+			.append(",text:'" + items.get(i).getName() + "'")
 			.append("}");
 		}
 		return sb;	
 
 	}	
+	
+	private StringBuilder priceChildren(List<PricePlan> items){
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < items.size(); i++) {
+			if(i > 0){
+				sb.append(",");
+			}
+			sb.append("{")
+			.append("id:" + items.get(i).getId())
+			.append(",name:'" + items.get(i).getName() + "'")
+			.append("}");
+		}
+		return sb;	
+
+	}		
 	
 	public ActionForward notBelongType(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)

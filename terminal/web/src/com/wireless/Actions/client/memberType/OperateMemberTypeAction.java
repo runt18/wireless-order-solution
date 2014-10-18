@@ -15,6 +15,7 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateMemberTypeAction extends DispatchAction{
@@ -40,6 +41,7 @@ public class OperateMemberTypeAction extends DispatchAction{
 			String restaurantID = (String) request.getAttribute("restaurantID");
 			String typeName = request.getParameter("typeName");
 			String discountID = request.getParameter("discountID");
+			String pricePlanId = request.getParameter("pricePlanId");
 			String exchangeRate = request.getParameter("exchangeRate");
 			String initialPoint = request.getParameter("initialPoint");
 			String chargeRate = request.getParameter("chargeRate");
@@ -47,6 +49,7 @@ public class OperateMemberTypeAction extends DispatchAction{
 			String desc = request.getParameter("desc");
 			
 			String memberDiscountCheckeds = request.getParameter("memberDiscountCheckeds");
+			String memberPricePlanCheckeds = request.getParameter("memberPricePlanCheckeds");
 			
 			String[] mDiscountCheckedList = null;
 			
@@ -66,6 +69,14 @@ public class OperateMemberTypeAction extends DispatchAction{
 			for (String s : mDiscountCheckedList) {
 				insert.addDiscount(new Discount(Integer.parseInt(s)));
 			}
+			
+			if(!memberPricePlanCheckeds.trim().isEmpty()){
+				for (String s : memberPricePlanCheckeds.split(",")) {
+					insert.addPrice(new PricePlan(Integer.parseInt(s)));
+				}
+				
+				insert.setDefaultPrice(new PricePlan(Integer.parseInt(pricePlanId)));
+			}			
 			
 			MemberTypeDao.insert(staff, insert);
 			jobject.initTip(true, "操作成功, 已添加新会员类型.");
@@ -101,12 +112,15 @@ public class OperateMemberTypeAction extends DispatchAction{
 			String typeID = request.getParameter("typeID");
 			String typeName = request.getParameter("typeName");
 			String discountID = request.getParameter("discountID");
+			String pricePlanId = request.getParameter("pricePlanId");
 			String initialPoint = request.getParameter("initialPoint");
 			String exchangeRate = request.getParameter("exchangeRate");
 			String chargeRate = request.getParameter("chargeRate");
 			String attr = request.getParameter("attr");
 			String desc = request.getParameter("desc");
+			
 			String memberDiscountCheckeds = request.getParameter("memberDiscountCheckeds");
+			String memberPricePlanCheckeds = request.getParameter("memberPricePlanCheckeds");
 			
 			String[] mDiscountCheckedList = null;
 			
@@ -140,6 +154,14 @@ public class OperateMemberTypeAction extends DispatchAction{
 			for (String s : mDiscountCheckedList) {
 				update.addDiscount(new Discount(Integer.parseInt(s)));
 			}
+			
+			if(!memberPricePlanCheckeds.trim().isEmpty()){
+				for (String s : memberPricePlanCheckeds.split(",")) {
+					update.addPrice(new PricePlan(Integer.parseInt(s)));
+				}
+				
+				update.setDefaultPrice(new PricePlan(Integer.parseInt(pricePlanId)));
+			}	
 			
 			MemberTypeDao.update(staff, update);
 			jobject.initTip(true, "操作成功, 已修改会员类型信息.");
