@@ -9,6 +9,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PricePlanError;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -16,9 +17,15 @@ public class PricePlanDao {
 
 	public static class ExtraCond{
 		private int id;
+		private MemberType memberType;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
+			return this;
+		}
+		
+		public ExtraCond setMemberType(MemberType memberType){
+			this.memberType = memberType;
 			return this;
 		}
 		
@@ -27,6 +34,11 @@ public class PricePlanDao {
 			StringBuilder extraCond = new StringBuilder(); 
 			if(id != 0){
 				extraCond.append(" AND PP.price_plan_id = " + id);
+			}
+			if(memberType != null){
+				String sql;
+				sql = " SELECT price_plan_id FROM " + Params.dbName + ".member_type_price WHERE member_type_id = " + memberType.getId();
+				extraCond.append(" AND PP.price_plan_id IN (" + sql + ")");
 			}
 			return extraCond.toString();
 		}
