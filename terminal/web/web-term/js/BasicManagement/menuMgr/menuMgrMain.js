@@ -592,6 +592,79 @@ function foodOperation(type){
 	var btnPreviousFood = Ext.getCmp('btnPreviousFood');
 	var btnNextFood = Ext.getCmp('btnNextFood');
 	
+	Ext.getCmp('food_pricePlans').removeAll();
+	
+	for (var i = 0; i < pricePlanCmp.length; i++) {
+		//FIXME
+		var checkBoxId = 'chbForFoodAlias' + pricePlanCmp[i].id,  numberfieldId = 'numBasicForPrice' + pricePlanCmp[i].id;
+		Ext.getCmp('food_pricePlans').add({
+			border : true,
+			frame : true,
+			layout : 'column',
+			items : [{
+				width : 140,
+//				columnWidth : 0.44,
+				xtype : 'label',
+				html : '&nbsp;'
+			},{
+				width : 17,
+//				columnWidth : 0.06,
+	 	    	xtype : 'checkbox',
+	 	    	style : 'top:0px !important;',
+	 	    	id : checkBoxId,
+	 	    	hideLabel : true,
+	 	    	listeners : {
+	 	    		render : function(thiz){
+	 	    			thiz.getEl().dom.parentNode.style.paddingTop = '8px';
+	 	    		},
+	 	    		check : function(checkbox, checked){
+	 	    			var numForAlias = Ext.getCmp(numberfieldId);
+						if(checked){
+							numForAlias.enable();
+							numForAlias.focus(true, 100);
+						}else{
+							numForAlias.disable();
+							numForAlias.clearInvalid();
+						}
+					},
+					focus : function(){
+						var numForAlias = Ext.getCmp(numberfieldId);
+						if(document.getElementById(checkBoxId).checked){
+							
+							numForAlias.disable();
+						}else{
+							numForAlias.enable();
+							numForAlias.focus(true, 100);
+						}
+					}
+	 	    	}
+			},{
+				width : 55,
+//				columnWidth : 0.2,
+				xtype : 'label',
+				text : pricePlanCmp[i].name + ':'
+			},{
+//				columnWidth : 0.3,
+	 	    	xtype : 'numberfield',
+	 	    	id : numberfieldId,
+	 	    	style : 'text-align:right;',
+	 	    	decimalPrecision : 2,
+	 	    	allowBlank : false,
+	 	    	maxValue : 99999.99,
+	 	    	minValue : 0.00,
+	 	    	width : 85,
+	 	    	disabled : true,
+	 	    	validator : function(v){
+	 	    		if(v >= 0.00 && v <= 99999.99){
+	 	    	    	return true;
+	 	    	    }else{
+	 	    	    	return '价格需在 0.00  至 99999.99 之间!';
+	 	    	    }
+	 	    	}
+			}]
+		});					
+	}	
+	
 	if(typeof(type) == 'string' && type == mmObj.operation.insert){
 		foWin.setTitle('添加菜品');
 		foodOperationWin.otype = mmObj.operation.insert;
@@ -606,7 +679,30 @@ function foodOperation(type){
 		btnSaveForOW.setDisabled(true);
 		
 		resetbBasicOperation();
+		
 	}else if(typeof(type) == 'string' && type == mmObj.operation.update){
+		Ext.Ajax.request({
+			url : "../../QueryMenu.do",
+			params : {
+				dataSource : 'getFoodPrices',
+				foodId : selRowData.id
+			},
+			success : function(response){
+				var jr = Ext.util.JSON.decode(response.responseText);
+				console.log(jr)
+				for (var i = 0; i < jr.root.length; i++) {
+					if(jr.root[i].price >= 0){
+						document.getElementById('chbForFoodAlias' + jr.root[i].id).checked = true;
+						Ext.getCmp('numBasicForPrice' + jr.root[i].id).setValue(jr.root[i].price);	
+						Ext.getCmp('numBasicForPrice' + jr.root[i].id).enable();
+					}
+				}
+			},
+			failure : function(){
+			
+			}
+		});		
+		
 		resetbBasicOperation(selRowData);
 		foWin.setTitle(selRowData.name);
 		foodOperationWin.otype = mmObj.operation.update;
@@ -1066,26 +1162,6 @@ var basicOperationPanel = new Ext.Panel({
 		 		}]
 		 	}, {
 		 		columnWidth : 1
-		 	}, {
-		 		columnWidth : .5,
-		 	    items : [{
-		 	    	xtype : 'numberfield',
-		 	    	id : 'numBasicForPrice',
-		 	    	style : 'text-align:right;',
-		 	    	fieldLabel : '价格',
-		 	    	decimalPrecision : 2,
-		 	    	allowBlank : false,
-		 	    	maxValue : 99999.99,
-		 	    	minValue : 0.00,
-		 	    	width : 80,
-		 	    	validator : function(v){
-		 	    		if(v >= 0.00 && v <= 99999.99){
-		 	    	    	return true;
-		 	    	    }else{
-		 	    	    	return '价格需在 0.00  至 99999.99 之间!';
-		 	    	    }
-		 	    	}
-		 	    }]
 		 	},{
 		 	    items : [{
 		 	    	xtype : 'checkbox',
@@ -1134,10 +1210,35 @@ var basicOperationPanel = new Ext.Panel({
 		 		}]
 		 	}, {
 		 		columnWidth : .5,
+		 	    items : [{
+		 	    	xtype : 'numberfield',
+		 	    	id : 'numBasicForPrice',
+		 	    	style : 'text-align:right;',
+		 	    	fieldLabel : '价格',
+		 	    	decimalPrecision : 2,
+		 	    	allowBlank : false,
+		 	    	maxValue : 99999.99,
+		 	    	minValue : 0.00,
+		 	    	width : 80,
+		 	    	validator : function(v){
+		 	    		if(v >= 0.00 && v <= 99999.99){
+		 	    	    	return true;
+		 	    	    }else{
+		 	    	    	return '价格需在 0.00  至 99999.99 之间!';
+		 	    	    }
+		 	    	}
+		 	    }]
+		 	}, {
+		 		columnWidth : .5,
 		 		items : [{
 		 			xtype : 'hidden',
 		 			id : 'txtBasicForPinyin'
 		 		}]
+		 	},{
+		 		columnWidth : 1,
+		 		id : 'food_pricePlans',
+		 		items : []
+		 		
 		 	}, {
 		 		columnWidth : .5,
 		 	    items : [{
@@ -1573,6 +1674,7 @@ function basicOperationBasicHandler(c){
 	var kitchenID = '';
 	var cfg = Ext.getCmp('combinationFoodGrid');
 	var stockStatus = Ext.getCmp('comboBasicForStockStatus');
+	var foodPrices = '';
 		
 	if(!foodName.isValid() || !foodPrice.isValid() || !foodKitchenAlias.isValid()){
 //		Ext.getCmp('foodOperationWinTab').setActiveTab('basicOperationTab');
@@ -1589,6 +1691,17 @@ function basicOperationBasicHandler(c){
 		}
 	}else if(c.type == mmObj.operation.update){
 		isCombination = (typeof(c.data) != 'undefined' && typeof(c.data.combination) != 'undefined' ? c.data.combination : false);
+	}
+	
+	
+	for (var i = 0; i < pricePlanCmp.length; i++) {
+		var checked = document.getElementById('chbForFoodAlias' + pricePlanCmp[i].id).checked;
+		if(checked){
+			if(foodPrices){
+				foodPrices += '&';
+			}
+			foodPrices += (pricePlanCmp[i].id + ',' + Ext.getCmp('numBasicForPrice'+pricePlanCmp[i].id).getValue());  
+		}
 	}
 	
 /*	for(var i = 0; i < kitchenData.length; i++){
@@ -1615,6 +1728,7 @@ function basicOperationBasicHandler(c){
 			foodAliasID : document.getElementById('chbForFoodAlias').checked?foodAliasID.getValue():'',
 			foodPinyin : foodPinyin.getValue(),
 			foodPrice : foodPrice.getValue(),
+			foodPrices : foodPrices,
 			kitchenID : foodKitchenAlias.getValue(),
 			foodDesc : foodDesc.getValue().trim(),
 			isSpecial : isSpecial.getValue(),
@@ -2897,6 +3011,7 @@ function setButtonStateOne(s){
 
 var bar = {treeId : 'kitchenTreeForSreach', option :[{name : '修改', fn : "floatBarUpdateHandler()"}, {name : '删除', fn : "floatBarDeleteHandler()"}, {name : '置顶', fn : "floatBarSetTopHandler()"}]};
 
+var pricePlanCmp;
 
 Ext.onReady(function() {
 
@@ -2981,5 +3096,20 @@ Ext.onReady(function() {
 	
 	initDeptComboData();
 	initKitchenComboData();
+	
+	Ext.Ajax.request({
+		url : "../../QueryMenu.do",
+		params : {
+			dataSource : 'getPricePlan'
+		},
+		success : function(response){
+			var jr = Ext.util.JSON.decode(response.responseText);
+			pricePlanCmp = jr.root;
+			console.log(pricePlanCmp)
+		},
+		failure : function(){
+		
+		}
+	});
 });
 showFloatOption(bar);

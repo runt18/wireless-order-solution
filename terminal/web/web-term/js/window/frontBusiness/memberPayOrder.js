@@ -101,11 +101,11 @@ Ext.onReady(function(){
 				layout : 'form',
 				labelWidth : 70,
 				labelAlign : 'right',
-				columnWidth : .25,
+				columnWidth : .21,
 				defaults : {
 					xtype : 'label',
-					width : 100,
-					style : 'fontSize:15px;'
+					width : 80,
+					style : 'fontSize:14px;'
 				}
 			},
 			items : [{
@@ -222,6 +222,58 @@ Ext.onReady(function(){
 						}
 					}
 				}]
+			}, 
+			{
+				items : [{
+					xtype : 'combo',
+					id : 'mpo_txtPricePlanForPayOrder',
+					readOnly : false,
+					forceSelection : true,
+					disabled : false,
+					fieldLabel : '价格方案',
+					store : new Ext.data.JsonStore({
+						fields : [ 'id', 'name' ]
+					}),
+					valueField : 'id',
+					displayField : 'name',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					listeners : {
+						select : function(thiz){
+							Ext.Ajax.request({
+								url : '../../QueryOrderFromMemberPay.do',
+								params : {
+									st : 1,
+									sv :  Ext.getCmp('mpo_numMemberMobileForPayOrder').getValue(),
+									pricePlanId : thiz.getValue(),
+//									couponId : Ext.getCmp('mpo_couponForPayOrder').getValue(),
+									orderID : orderID
+								},
+								success : function(res, opt){
+									var jr = Ext.decode(res.responseText);
+									if(jr.success){
+										var no = jr.other.newOrder;
+										jr.other.member = mpo_memberDetailData.member; 
+										memberPayOrderToBindData({
+											data : jr
+										});	
+										mpo_memberDetailData.newOrder = no;
+										checkOut_actualPrice = no['actualPrice'];
+//										Ext.getCmp('mpo_txtMemberPriceForPayOrder').setText(no['actualPrice'].toFixed(2));
+										Ext.getDom('mpo_txtPayMoneyForPayOrder').text = no['actualPrice'].toFixed(2);
+									}else{
+										Ext.example.msg(jr.title, jr.msg);
+									}
+								},
+								failure : function(res, opt){
+									Ext.ux.showMsg(Ext.decode(res.responseText));
+								}
+							});
+						}
+					}
+				}]
 			}, {
 				items : [{
 					xtype : 'combo',
@@ -240,17 +292,7 @@ Ext.onReady(function(){
 					selectOnFocus : true
 				}]
 			}, {
-				items : [{
-					xtype : 'numberfield',
-					id : 'mpo_numCustomNumberForPayOrder',
-					fieldLabel : '就餐人数',
-					value : 1,
-					allowBlank : false,
-					maxValue : 65535,
-					minValue : 1,
-					disabled : false
-				}]
-			}, {
+				columnWidth : .21,
 				items : [{
 					xtype : 'combo',
 					id : 'mpo_couponForPayOrder',
@@ -299,6 +341,19 @@ Ext.onReady(function(){
 							});
 						}
 					}
+				}]
+			}, {
+				columnWidth : .14,
+				items : [{
+					xtype : 'numberfield',
+					id : 'mpo_numCustomNumberForPayOrder',
+					fieldLabel : '就餐人数',
+					value : 1,
+					width : 40,
+					allowBlank : false,
+					maxValue : 65535,
+					minValue : 1,
+					disabled : false
 				}]
 			}]
 		}, 
@@ -374,19 +429,13 @@ function loadSystemSetting(_c){
 function memberPayOrderToBindData(_c){
 	_c = _c == null || typeof _c == 'undefined' ? {} : _c;
 	
-//	var mobile = Ext.getCmp('mpo_numMemberMobileForPayOrder');
-//	var memberCard = Ext.getCmp('mpo_numMemberCardAliasForPayOrder');
-	
 	var name = Ext.getCmp('mpo_txtNameForPayOrder');
 	var type = Ext.getCmp('mpo_txtTypeForPayOrder');
 	var totalBalance = Ext.getCmp('mpo_txtTotalBalanceForPayOrder');
 	var totalPoint = Ext.getCmp('mpo_txtTotalPointForPayOrder');
-//	var baseBalance = Ext.getCmp('mpo_txtBaseBalanceForPayOrder');
-//	var extraBalance = Ext.getCmp('mpo_txtExtraBalanceForPayOrder');
 	var discountCbo = Ext.getCmp('mpo_txtDiscountForPayOrder');
-//	var discountRate = Ext.getCmp('mpo_txtDiscountRateForPayOrder');
-//	var orderPrice = Ext.getCmp('mpo_txtOrderPriceForPayOrder');
-//	var memberPrice = Ext.getCmp('mpo_txtMemberPriceForPayOrder');
+	var pricePlanCbo = Ext.getCmp('mpo_txtPricePlanForPayOrder');
+	
 	var payManner = Ext.getCmp('mpo_comPayMannerForPayOrder');
 	var payMoney = $('#mpo_txtPayMoneyForPayOrder');
 	var customNum = Ext.getCmp('mpo_numCustomNumberForPayOrder');
@@ -406,7 +455,10 @@ function memberPayOrderToBindData(_c){
 	var newOrder = typeof data.newOrder == 'undefined' ? {} : data.newOrder;
 	
 	var coupons = typeof data.coupons == 'undefined' ? null : data.coupons;
+	
 	coupon.getEl().up('.x-form-item').setDisplayed(false);
+	pricePlanCbo.getEl().up('.x-form-item').setDisplayed(false);
+	
 	if(coupons){
 		coupon.getEl().up('.x-form-item').setDisplayed(true);
 		var list = [[-1,'不使用']];
@@ -419,17 +471,12 @@ function memberPayOrderToBindData(_c){
 	}
 	
 	
-//	mobile.setValue(member['mobile']);
-//	memberCard.setValue(member['memberCard']);
 	name.setText(typeof member['name'] != 'undefined'?member['name']:'----');
 	type.setText(typeof memberType['name'] != 'undefined'?memberType['name']:'----');
 	totalBalance.setText(typeof member['totalBalance'] != 'undefined'?member['totalBalance']:'----');
 	totalPoint.setText(typeof member['point'] != 'undefined'?member['point']:'----');
-//	baseBalance.setValue(member['baseBalance']);
-//	extraBalance.setValue(member['extraBalance']);
 	customNum.setValue(typeof newOrder['customNum'] == 'undefined' || newOrder['customNum'] < 1 ? 1 : newOrder['customNum']);
 
-//	discountRate.setValue('--');
 	
 	var discounts = [];
 	for (var i = 0; i < discountMsgs.length; i++) {
@@ -439,6 +486,13 @@ function memberPayOrderToBindData(_c){
 	if(discountCbo.getValue() == ""){
 		discountCbo.store.loadData(discounts);
 		discountCbo.setValue(discountMsg['id']);
+	} 
+	
+	console.log(memberType.pricePlans)
+	if(memberType.pricePlans && memberType.pricePlans.length > 0){
+		pricePlanCbo.getEl().up('.x-form-item').setDisplayed(true);
+		pricePlanCbo.store.loadData(memberType.pricePlans);
+		pricePlanCbo.setValue(memberType.pricePlan.id);
 	}
 
 	
@@ -455,13 +509,9 @@ function memberPayOrderToBindData(_c){
 	
 	if(typeof newOrder['orderFoods'] != 'undefined'){
 		mpo_orderFoodGrid.getStore().loadData({root:newOrder['orderFoods']});
-//		orderPrice.setText(newOrder['actualPriceBeforeDiscount'].toFixed(2));
-//		memberPrice.setText(newOrder['actualPrice'].toFixed(2));
 		payMoney.html(newOrder['actualPrice'].toFixed(2));
 	}else{
 		mpo_orderFoodGrid.getStore().removeAll();
-//		orderPrice.setText('----');
-//		memberPrice.setText('----');
 		payMoney.html('0.00');
 	}
 }
@@ -724,6 +774,7 @@ function memberPayOrderHandler(_c){
 	var payManner = Ext.getCmp('mpo_comPayMannerForPayOrder');
 	var customNum = Ext.getCmp('mpo_numCustomNumberForPayOrder');
 	var chooseDiscount = Ext.getCmp('mpo_txtDiscountForPayOrder');
+	var choosePricePlan = Ext.getCmp('mpo_txtPricePlanForPayOrder');
 	var chooseCoupon = Ext.getCmp('mpo_couponForPayOrder');
 	var eraseQuota = document.getElementById("txtMemberEraseQuota");
 	
@@ -758,7 +809,7 @@ function memberPayOrderHandler(_c){
 			comment : '',
 			serviceRate : (order['serviceRate'] * 100),
 			eraseQuota : eraseQuota?(eraseQuota.value?eraseQuota.value:0):0,
-//			pricePlanID : order['pricePlan']['id'],
+			pricePlanID : choosePricePlan.getValue(),
 			customNum : customNum.getValue()
 		},
 		success : function(res, opt){

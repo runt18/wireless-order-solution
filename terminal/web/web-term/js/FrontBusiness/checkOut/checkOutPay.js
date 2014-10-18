@@ -219,7 +219,7 @@ function memberPay(){
 	if(!bindMemberWin){
 		bindMemberWin = new Ext.Window({
 			title : '会员结账',
-			width : 800,
+			width : 850,
 			height : 500,
 			modal : true,
 			closable : false,

@@ -494,12 +494,10 @@ Ext.onReady(function() {
 					promotionTree.getRootNode().getUI().hide();
 				}else{
 /*					for(var i = (rn.length - 1); i >= 0; i--){
-						console.log(rn[i].text)
 						if(typeof rn[i].attributes.expired != 'undefined'){
 							rn[i].setText('<font style="color:#808080">' + rn[i].text + '&nbsp;(已过期)</font>');
 						}
 						if(rn[i].attributes.pType == 2){
-							console.log(11)
 							rn[i].setText('<font style="color:#808080">' + rn[i].text + '&nbsp;(欢迎活动)</font>');
 						}
 					}*/
