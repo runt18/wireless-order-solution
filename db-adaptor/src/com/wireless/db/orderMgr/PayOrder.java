@@ -1,6 +1,7 @@
 package com.wireless.db.orderMgr;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
@@ -21,6 +22,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
@@ -463,10 +465,20 @@ public class PayOrder {
 		}
 		
 		if(payBuilder.hasPricePlan()){
+			final List<PricePlan> result;
 			if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
-				//TODO
+				//Get the associated with this member type and plan id
+				result = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(payBuilder.getPricePlanId())
+																						  .setMemberType(MemberDao.getById(dbCon, staff, payBuilder.getMemberId()).getMemberType()));
 			}else{
-				orderToCalc.setPricePlan(PricePlanDao.getById(dbCon, staff, payBuilder.getPlanId()));
+				//FIXME
+				result = new ArrayList<PricePlan>();
+			}
+			
+			if(result.isEmpty()){
+				throw new BusinessException(StaffError.PRICE_PLAN_NOT_ALLOW);
+			}else{
+				orderToCalc.setPricePlan(result.get(0));
 			}
 		}
 
