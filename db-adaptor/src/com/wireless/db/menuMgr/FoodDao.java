@@ -169,14 +169,10 @@ public class FoodDao {
 	 * @param builder
 	 * 			the builder to insert a new food
 	 * @return the id to food just inserted
-	 * @throws Exception 
-	 * @throws ClientException 
-	 * @throws OSSException 
 	 * @throws BusinessException 
 	 * @throws SQLException 
-	 * @throws IOException 
 	 */
-	public static int insert(DBCon dbCon, Staff staff, Food.InsertBuilder builder) throws OSSException, ClientException, SQLException, BusinessException{
+	public static int insert(DBCon dbCon, Staff staff, Food.InsertBuilder builder) throws SQLException, BusinessException{
 		String sql;
 		Food f = builder.build();
 

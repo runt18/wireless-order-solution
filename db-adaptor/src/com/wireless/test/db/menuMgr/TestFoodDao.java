@@ -44,7 +44,7 @@ public class TestFoodDao {
 				OssImage.Params.instance().getOssParam().ACCESS_OSS_ID, 
 				OssImage.Params.instance().getOssParam().ACCESS_OSS_KEY);
 		try {
-			mStaff = StaffDao.getByRestaurant(26).get(0);
+			mStaff = StaffDao.getAdminByRestaurant(26);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

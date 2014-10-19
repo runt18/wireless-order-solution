@@ -204,8 +204,7 @@ public class CalcBillStatisticsDao {
 			  " AND restaurant_id = " + staff.getRestaurantId() + 
 			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
-			  " GROUP BY " +
-			  " pay_type ";
+			  " GROUP BY pay_type ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			int payType = dbCon.rs.getInt("pay_type");

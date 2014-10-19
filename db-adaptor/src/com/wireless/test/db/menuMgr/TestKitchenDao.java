@@ -26,7 +26,7 @@ public class TestKitchenDao {
 	public static void beforeClass() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getByRestaurant(26).get(0);
+			mStaff = StaffDao.getAdminByRestaurant(26);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

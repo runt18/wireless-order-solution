@@ -279,7 +279,8 @@ public class PayOrder {
 				  " ,pay_type = " + orderCalculated.getPaymentType().getVal() +  
 				  " ,settle_type = " + orderCalculated.getSettleType().getVal() + 
 				  " ,discount_id = " + orderCalculated.getDiscount().getId() + 
-				  " ,service_id = " + orderCalculated.getServiceId() +
+				  (orderCalculated.hasPricePlan() ? " ,price_plan_id = " + orderCalculated.getPricePlan().getId() : "") +
+				  (orderCalculated.hasServicePlan() ? " ,service_plan_id = " + orderCalculated.getServicePlan().getPlanId() : "") +
 				  " ,service_rate = " + orderCalculated.getServiceRate() + 
 				  " ,status = " + (orderCalculated.isUnpaid() ? Order.Status.PAID.getVal() : Order.Status.REPAID.getVal()) +  
 				  (orderCalculated.isUnpaid() ? (" ,seq_id = " + orderCalculated.getSeqId()) : "") +
@@ -296,7 +297,7 @@ public class PayOrder {
 					  " SET " +
 					  " food_id = " + of.getFoodId() +
 					  " ,discount = " + of.getDiscount() + 
-					  " ,unit_price = " + of.getPrice() +
+					  " ,unit_price = " + of.getFoodPrice() +
 					  " WHERE order_id = " + orderCalculated.getId() + 
 					  " AND food_id = " + of.getFoodId();
 				dbCon.stmt.executeUpdate(sql);				
@@ -409,7 +410,7 @@ public class PayOrder {
 		//If the service plan is set, use to get the rate to region belongs to this order
 		if(payBuilder.hasServicePlan()){
 			ServicePlan sp = ServicePlanDao.getByRegion(dbCon, staff, payBuilder.getServicePlanId(), orderToCalc.getRegion());
-			orderToCalc.setServiceId(sp.getPlanId());
+			orderToCalc.setServicePlan(sp);
 			if(sp.hasRates()){
 				orderToCalc.setServiceRate(sp.getRates().get(0).getRate());
 			}else{
@@ -417,7 +418,7 @@ public class PayOrder {
 			}
 		}else{
 			ServicePlan sp = ServicePlanDao.getDefaultByRegion(dbCon, staff, orderToCalc.getRegion());
-			orderToCalc.setServiceId(sp.getPlanId());
+			orderToCalc.setServicePlan(sp);
 			if(sp.hasRates()){
 				orderToCalc.setServiceRate(sp.getRates().get(0).getRate());
 			}else{		
@@ -467,7 +468,7 @@ public class PayOrder {
 		if(payBuilder.hasPricePlan()){
 			final List<PricePlan> result;
 			if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
-				//Get the associated with this member type and plan id
+				//Get the price plan associated with this member type and plan id
 				result = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(payBuilder.getPricePlanId())
 																						  .setMemberType(MemberDao.getById(dbCon, staff, payBuilder.getMemberId()).getMemberType()));
 			}else{

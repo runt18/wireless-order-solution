@@ -15,9 +15,11 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 
@@ -466,15 +468,14 @@ public class OrderDao {
 				  " O.waiter, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.member_operation_id, " +
-				  " O.settle_type, O.pay_type, O.category, O.status, O.service_id, O.service_rate, O.comment, " +
+				  " O.settle_type, O.pay_type, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
 				  " O.discount_id, DIST.name AS discount_name, " +
+				  " O.price_plan_id, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.coupon_price, O.total_price, O.actual_price " +
 				  " FROM " + 
 				  Params.dbName + ".order O " +
-				  " LEFT JOIN " + Params.dbName + ".table T " +
-				  " ON O.table_id = T.table_id " +
-				  " LEFT JOIN " + Params.dbName + ".discount DIST " +
-				  " ON O.discount_id = DIST.discount_id " +
+				  " LEFT JOIN " + Params.dbName + ".table T ON O.table_id = T.table_id " +
+				  " LEFT JOIN " + Params.dbName + ".discount DIST ON O.discount_id = DIST.discount_id " +
 				  " WHERE 1 = 1 " + 
 				  " AND O.restaurant_id = " + staff.getRestaurantId() + " " +
 				  (extraCond != null ? extraCond : "") + " " +
@@ -486,7 +487,7 @@ public class OrderDao {
 				  " OH.waiter, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
 				  " OH.member_operation_id, OH.coupon_price, " +
-				  " OH.settle_type, OH.pay_type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, OH.comment, " +
+				  " OH.settle_type, OH.pay_type, OH.category, OH.status, OH.service_rate, OH.comment, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + ".order_history OH " + 
 				  " WHERE 1 = 1 " + 
@@ -503,19 +504,19 @@ public class OrderDao {
 		List<Order> result = new ArrayList<Order>();
 		
 		while(dbCon.rs.next()) {
-			Order orderInfo = new Order();
-			orderInfo.setId(dbCon.rs.getInt("id"));
-			orderInfo.setSeqId(dbCon.rs.getInt("seq_id"));
-			orderInfo.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
-			orderInfo.setWaiter(dbCon.rs.getString("waiter"));
+			Order order = new Order();
+			order.setId(dbCon.rs.getInt("id"));
+			order.setSeqId(dbCon.rs.getInt("seq_id"));
+			order.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+			order.setWaiter(dbCon.rs.getString("waiter"));
 			
-			orderInfo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			orderInfo.setStatus(dbCon.rs.getInt("status"));
+			order.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			order.setStatus(dbCon.rs.getInt("status"));
 			Table table = new Table();
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			table.setCategory(Order.Category.valueOf(dbCon.rs.getShort("category")));
 			table.setTableId(dbCon.rs.getInt("table_id"));
-			if(orderInfo.isUnpaid()){
+			if(order.isUnpaid()){
 				table.setStatus(Table.Status.IDLE);
 			}else{
 				table.setStatus(Table.Status.BUSY);
@@ -525,43 +526,45 @@ public class OrderDao {
 			if(dateType == DateType.TODAY){
 				table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			}
-			orderInfo.setDestTbl(table);
-			orderInfo.getRegion().setRegionId(dbCon.rs.getShort("region_id"));
-			orderInfo.getRegion().setName(dbCon.rs.getString("region_name"));
+			order.setDestTbl(table);
+			order.getRegion().setRegionId(dbCon.rs.getShort("region_id"));
+			order.getRegion().setName(dbCon.rs.getString("region_name"));
 
-			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
-			orderInfo.setCategory(dbCon.rs.getShort("category"));
+			order.setCustomNum(dbCon.rs.getShort("custom_num"));
+			order.setCategory(dbCon.rs.getShort("category"));
 			
-			int discountId = dbCon.rs.getInt("discount_id");
-			if(discountId != 0){
-				Discount discount = new Discount(discountId);
-				if(dateType == DateType.TODAY){
-					discount.setName(dbCon.rs.getString("discount_name"));
-				}
-				orderInfo.setDiscount(discount);
-			}
-			
-			orderInfo.setPaymentType(dbCon.rs.getShort("pay_type"));
-			orderInfo.setSettleType(dbCon.rs.getShort("settle_type"));
-			if(orderInfo.isSettledByMember()){
-				orderInfo.setMemberOperationId(dbCon.rs.getInt("member_operation_id"));
-			}
-			orderInfo.setStatus(dbCon.rs.getInt("status"));
 			if(dateType == DateType.TODAY){
-				orderInfo.setServiceId(dbCon.rs.getInt("service_id"));
+				if(dbCon.rs.getInt("discount_id") != 0){
+					Discount discount = new Discount(dbCon.rs.getInt("discount_id"));
+					discount.setName(dbCon.rs.getString("discount_name"));
+					order.setDiscount(discount);
+				}
+				if(dbCon.rs.getInt("service_plan_id") != 0){
+					order.setServicePlan(new ServicePlan(dbCon.rs.getInt("service_plan_id")));
+				}
+				if(dbCon.rs.getInt("price_plan_id") != 0){
+					order.setPricePlan(new PricePlan(dbCon.rs.getInt("price_plan_id")));
+				}
 			}
-			orderInfo.setServiceRate(dbCon.rs.getFloat("service_rate"));
-			orderInfo.setComment(dbCon.rs.getString("comment"));
-			orderInfo.setGiftPrice(dbCon.rs.getFloat("gift_price"));
-			orderInfo.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
-			orderInfo.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
-			orderInfo.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
-			orderInfo.setErasePrice(dbCon.rs.getInt("erase_price"));
-			orderInfo.setCouponPrice(dbCon.rs.getFloat("coupon_price"));
-			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
-			orderInfo.setActualPrice(dbCon.rs.getFloat("actual_price"));
 			
-			result.add(orderInfo);
+			order.setPaymentType(dbCon.rs.getShort("pay_type"));
+			order.setSettleType(dbCon.rs.getShort("settle_type"));
+			if(order.isSettledByMember()){
+				order.setMemberOperationId(dbCon.rs.getInt("member_operation_id"));
+			}
+			order.setStatus(dbCon.rs.getInt("status"));
+			order.setServiceRate(dbCon.rs.getFloat("service_rate"));
+			order.setComment(dbCon.rs.getString("comment"));
+			order.setGiftPrice(dbCon.rs.getFloat("gift_price"));
+			order.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
+			order.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
+			order.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
+			order.setErasePrice(dbCon.rs.getInt("erase_price"));
+			order.setCouponPrice(dbCon.rs.getFloat("coupon_price"));
+			order.setTotalPrice(dbCon.rs.getFloat("total_price"));
+			order.setActualPrice(dbCon.rs.getFloat("actual_price"));
+			
+			result.add(order);
 		}
 
 		dbCon.rs.close();
