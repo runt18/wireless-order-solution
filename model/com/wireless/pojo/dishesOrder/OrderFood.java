@@ -253,7 +253,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	 * @return the unit price to this order food
 	 */
 	private float getUnitPrice(){
-		return NumericUtil.roundFloat(mPricePlan != null ? mFood.getPrice(mPricePlan) : mFood.getPrice() + (!hasTasteGroup() || mFood.isWeigh() ? 0 : mTasteGroup.getPrice()));
+		return NumericUtil.roundFloat(getFoodPrice() + (!hasTasteGroup() || mFood.isWeigh() ? 0 : mTasteGroup.getPrice()));
 	}
 	
 	/**
@@ -549,6 +549,10 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	public String getName(){
 		return mFood.getName();
+	}
+	
+	public float getFoodPrice(){
+		return mFood.getPrice(mPricePlan);
 	}
 	
 	public float getPrice(){
