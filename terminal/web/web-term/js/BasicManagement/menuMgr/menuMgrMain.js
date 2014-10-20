@@ -595,7 +595,6 @@ function foodOperation(type){
 	Ext.getCmp('food_pricePlans').removeAll();
 	
 	for (var i = 0; i < pricePlanCmp.length; i++) {
-		//FIXME
 		var checkBoxId = 'chbForFoodAlias' + pricePlanCmp[i].id,  numberfieldId = 'numBasicForPrice' + pricePlanCmp[i].id;
 		Ext.getCmp('food_pricePlans').add({
 			border : true,
@@ -610,15 +609,15 @@ function foodOperation(type){
 				width : 17,
 //				columnWidth : 0.06,
 	 	    	xtype : 'checkbox',
-	 	    	style : 'top:0px !important;',
 	 	    	id : checkBoxId,
+	 	    	relativePrice : numberfieldId,
 	 	    	hideLabel : true,
 	 	    	listeners : {
 	 	    		render : function(thiz){
-	 	    			thiz.getEl().dom.parentNode.style.paddingTop = '8px';
+	 	    			thiz.getEl().dom.parentNode.style.paddingTop = '7px';
 	 	    		},
 	 	    		check : function(checkbox, checked){
-	 	    			var numForAlias = Ext.getCmp(numberfieldId);
+	 	    			var numForAlias = Ext.getCmp(checkbox.relativePrice);
 						if(checked){
 							numForAlias.enable();
 							numForAlias.focus(true, 100);
@@ -627,8 +626,8 @@ function foodOperation(type){
 							numForAlias.clearInvalid();
 						}
 					},
-					focus : function(){
-						var numForAlias = Ext.getCmp(numberfieldId);
+					focus : function(thiz){
+						var numForAlias = Ext.getCmp(thiz.relativePrice);
 						if(document.getElementById(checkBoxId).checked){
 							
 							numForAlias.disable();
