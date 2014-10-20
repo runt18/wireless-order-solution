@@ -1053,6 +1053,8 @@ function initKeyBoardEvent(){
 }
 
 var dishesOrderEastPanel, centerPanel;
+var commitOperate;
+	
 Ext.onReady(function() {
 	
 	var menuTabPanel = new Ext.TabPanel({
@@ -1128,5 +1130,10 @@ Ext.onReady(function() {
 		refreshOrderHandler(true);
 	}
 	
+	commitOperate = new Ext.LoadMask(document.body, {
+	    msg  : '正在提交操作,请稍等......',
+	    disabled : false,
+	    removeMask : true
+	});		
 	
 });

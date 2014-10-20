@@ -878,6 +878,7 @@ function refreshOrder(res){
 function submitRepaidOrderHandler(_c){
 	var orderFoods = _c.grid.order.orderFoods;
 	if(orderFoods.length > 0){
+		commitOperate.show();
 		//var foodPara = Wireless.ux.createOrder({orderFoods: orderFoods, dataType : 3});
 		var payMannerOut = null;
 		var payManner = document.getElementsByName('radioPayType');
@@ -923,6 +924,7 @@ function submitRepaidOrderHandler(_c){
 			},
 			success : function(response, options) {
 				var resultJSON = Ext.util.JSON.decode(response.responseText);
+				commitOperate.hide();
 				if (resultJSON.success == true) {
 					if(!_c.notPrint){
 						var tempMask = new Ext.LoadMask(document.body, {
@@ -985,6 +987,8 @@ function submitSingleOrderHandler(_c){
 	orderDataModel.orderDate = (typeof _c.grid.order == 'undefined' ? '' : _c.grid.order.orderDate);
 	
 	setButtonDisabled(true);
+	commitOperate.show();
+	
 	Ext.Ajax.request({
 		url : '../../InsertOrder.do',
 		params : {
@@ -997,6 +1001,7 @@ function submitSingleOrderHandler(_c){
 			var jr = Ext.util.JSON.decode(response.responseText);
 			_c.title = jr.title;
 			_c.msg = jr.msg;
+			
 			if (jr.success == true) {
 				skip(_c);
 			} else {
@@ -1004,6 +1009,7 @@ function submitSingleOrderHandler(_c){
 				jr.reCommitData.commitType = 23;
 				refreshOrder(jr);
 				setButtonDisabled(false);
+				commitOperate.hide();
 			}
 		},
 		failure : function(response, options) {
