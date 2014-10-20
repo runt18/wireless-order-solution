@@ -84,7 +84,10 @@ public class QueryOrderFromMemberPayAction extends Action{
 			if(pricePlanId != null && !pricePlanId.trim().isEmpty() && !pricePlanId.equals("-1")){
 				payBuilder.setPricePlanId(Integer.parseInt(pricePlanId));
 			}else{
-				payBuilder.setPricePlanId(membersByType.get(0).getMemberType().getDefaultPrice().getId());
+				if(membersByType.get(0).getMemberType().getDefaultPrice() != null){
+					payBuilder.setPricePlanId(membersByType.get(0).getMemberType().getDefaultPrice().getId());
+				}
+				
 			}
 			
 			if(couponId != null && !couponId.trim().isEmpty() && !couponId.equals("-1")){
