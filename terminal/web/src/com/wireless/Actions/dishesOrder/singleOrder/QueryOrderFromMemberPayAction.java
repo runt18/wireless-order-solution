@@ -38,6 +38,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 			String discountId = request.getParameter("discountId");
 			String pricePlanId = request.getParameter("pricePlanId");
 			String couponId = request.getParameter("couponId");
+			String servicePlanId = request.getParameter("servicePlanId");
 			String sv = request.getParameter("sv");
 			//0 : 根据手机或卡号; 1 : 根据手机号
 			String s_type = request.getParameter("st");
@@ -84,10 +85,14 @@ public class QueryOrderFromMemberPayAction extends Action{
 			if(pricePlanId != null && !pricePlanId.trim().isEmpty() && !pricePlanId.equals("-1")){
 				payBuilder.setPricePlanId(Integer.parseInt(pricePlanId));
 			}else{
-				if(membersByType.get(0).getMemberType().getDefaultPrice() != null){
+				if(membersByType.get(0).getMemberType().getDefaultPrice() != null && !pricePlanId.equals("-1")){
 					payBuilder.setPricePlanId(membersByType.get(0).getMemberType().getDefaultPrice().getId());
 				}
 				
+			}
+			
+			if(servicePlanId != null && !servicePlanId.isEmpty()){
+				payBuilder.setServicePlan(Integer.parseInt(servicePlanId));
 			}
 			
 			if(couponId != null && !couponId.trim().isEmpty() && !couponId.equals("-1")){
