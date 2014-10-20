@@ -251,7 +251,7 @@ public class MemberType implements Jsonable, Parcelable{
 		private Discount defaultDiscount;
 		private List<Discount> discounts = new ArrayList<Discount>();
 		private PricePlan defaultPrice;
-		private List<PricePlan> prices = new ArrayList<PricePlan>();
+		private List<PricePlan> prices;
 		private float exchangeRate = -1;
 		private float chargeRate = -1;
 		private Attribute attribute;
@@ -299,14 +299,22 @@ public class MemberType implements Jsonable, Parcelable{
 		}
 		
 		public UpdateBuilder addPrice(PricePlan price){
+			if(prices == null){
+				prices = new ArrayList<PricePlan>();
+			}
 			if(!prices.contains(price)){
 				prices.add(price);
 			}
 			return this;
 		}
 		
+		public UpdateBuilder setEmptyPrice(){
+			prices = new ArrayList<PricePlan>();
+			return this;
+		}
+		
 		public boolean isPriceChanged(){
-			return !prices.isEmpty();
+			return prices != null;
 		}
 		
 		public boolean isDefaultPriceChanged(){
