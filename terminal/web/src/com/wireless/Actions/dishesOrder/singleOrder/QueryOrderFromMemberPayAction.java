@@ -80,15 +80,14 @@ public class QueryOrderFromMemberPayAction extends Action{
 				payBuilder.setDiscountId(Integer.valueOf(discountId));
 			}else{
 				payBuilder.setDiscountId(membersByType.get(0).getMemberType().getDefaultDiscount().getId());
+				
+				if(membersByType.get(0).getMemberType().getDefaultPrice() != null){
+					payBuilder.setPricePlanId(membersByType.get(0).getMemberType().getDefaultPrice().getId());
+				}
 			}
 			
 			if(pricePlanId != null && !pricePlanId.trim().isEmpty() && !pricePlanId.equals("-1")){
 				payBuilder.setPricePlanId(Integer.parseInt(pricePlanId));
-			}else{
-				if(membersByType.get(0).getMemberType().getDefaultPrice() != null && !pricePlanId.equals("-1")){
-					payBuilder.setPricePlanId(membersByType.get(0).getMemberType().getDefaultPrice().getId());
-				}
-				
 			}
 			
 			if(servicePlanId != null && !servicePlanId.isEmpty()){
