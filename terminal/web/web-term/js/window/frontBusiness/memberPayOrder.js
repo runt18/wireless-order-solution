@@ -3,6 +3,41 @@ var mpo_orderFoodGrid;
 var mpo_memberPayOrderSreachMemberCardWin;
 var mpo_memberPayOrderRechargeWin;
 var mpo_payMannerData = [[1, '现金'], [2, '刷卡'], [3, '会员余额']];
+var mpo_servicePlanData = [], mpo_pricePlanData = [];
+
+
+function reloadMemberPay(){
+	Ext.Ajax.request({
+		url : '../../QueryOrderFromMemberPay.do',
+		params : {
+			st : 1,
+			sv :  Ext.getCmp('mpo_numMemberMobileForPayOrder').getValue(),
+			discountId : Ext.getCmp('mpo_txtDiscountForPayOrder').getValue(),
+			pricePlanId : Ext.getCmp('mpo_txtPricePlanForPayOrder').getValue(),
+			servicePlanId : Ext.getCmp('mpo_comboServicePlan').getValue(),
+			couponId : Ext.getCmp('mpo_couponForPayOrder').getValue(),
+			orderID : orderID
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				var no = jr.other.newOrder;
+				jr.other.member = mpo_memberDetailData.member; 
+				memberPayOrderToBindData({
+					data : jr
+				});	
+				mpo_memberDetailData.newOrder = no;
+				checkOut_actualPrice = no['actualPrice'];
+				Ext.getDom('mpo_txtPayMoneyForPayOrder').text = no['actualPrice'].toFixed(2);
+			}else{
+				Ext.example.msg(jr.title, jr.msg);
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});	
+}
 
 Ext.onReady(function(){
 	var contetntDiv = document.getElementById('divMemberPayOrderContent');
@@ -101,7 +136,7 @@ Ext.onReady(function(){
 				layout : 'form',
 				labelWidth : 70,
 				labelAlign : 'right',
-				columnWidth : .21,
+				columnWidth : .2,
 				defaults : {
 					xtype : 'label',
 					width : 80,
@@ -169,6 +204,18 @@ Ext.onReady(function(){
 					text : '----'
 				}]
 			}, {
+				items : [{
+					xtype : 'numberfield',
+					id : 'mpo_numCustomNumberForPayOrder',
+					fieldLabel : '就餐人数',
+					value : 1,
+					width : 50,
+					allowBlank : false,
+					maxValue : 65535,
+					minValue : 1,
+					disabled : false
+				}]
+			}, {
 				columnWidth : 1
 			}, 
 			{
@@ -190,35 +237,7 @@ Ext.onReady(function(){
 					selectOnFocus : true,
 					listeners : {
 						select : function(thiz){
-							Ext.Ajax.request({
-								url : '../../QueryOrderFromMemberPay.do',
-								params : {
-									st : 1,
-									sv :  Ext.getCmp('mpo_numMemberMobileForPayOrder').getValue(),
-									discountId : thiz.getValue(),
-//									couponId : Ext.getCmp('mpo_couponForPayOrder').getValue(),
-									orderID : orderID
-								},
-								success : function(res, opt){
-									var jr = Ext.decode(res.responseText);
-									if(jr.success){
-										var no = jr.other.newOrder;
-										jr.other.member = mpo_memberDetailData.member; 
-										memberPayOrderToBindData({
-											data : jr
-										});	
-										mpo_memberDetailData.newOrder = no;
-										checkOut_actualPrice = no['actualPrice'];
-//										Ext.getCmp('mpo_txtMemberPriceForPayOrder').setText(no['actualPrice'].toFixed(2));
-										Ext.getDom('mpo_txtPayMoneyForPayOrder').text = no['actualPrice'].toFixed(2);
-									}else{
-										Ext.example.msg(jr.title, jr.msg);
-									}
-								},
-								failure : function(res, opt){
-									Ext.ux.showMsg(Ext.decode(res.responseText));
-								}
-							});
+							reloadMemberPay();
 						}
 					}
 				}]
@@ -242,35 +261,30 @@ Ext.onReady(function(){
 					selectOnFocus : true,
 					listeners : {
 						select : function(thiz){
-							Ext.Ajax.request({
-								url : '../../QueryOrderFromMemberPay.do',
-								params : {
-									st : 1,
-									sv :  Ext.getCmp('mpo_numMemberMobileForPayOrder').getValue(),
-									pricePlanId : thiz.getValue(),
-//									couponId : Ext.getCmp('mpo_couponForPayOrder').getValue(),
-									orderID : orderID
-								},
-								success : function(res, opt){
-									var jr = Ext.decode(res.responseText);
-									if(jr.success){
-										var no = jr.other.newOrder;
-										jr.other.member = mpo_memberDetailData.member; 
-										memberPayOrderToBindData({
-											data : jr
-										});	
-										mpo_memberDetailData.newOrder = no;
-										checkOut_actualPrice = no['actualPrice'];
-//										Ext.getCmp('mpo_txtMemberPriceForPayOrder').setText(no['actualPrice'].toFixed(2));
-										Ext.getDom('mpo_txtPayMoneyForPayOrder').text = no['actualPrice'].toFixed(2);
-									}else{
-										Ext.example.msg(jr.title, jr.msg);
-									}
-								},
-								failure : function(res, opt){
-									Ext.ux.showMsg(Ext.decode(res.responseText));
-								}
-							});
+							reloadMemberPay();
+						}
+					}
+				}]
+			},{
+				items : [{
+					xtype : 'combo',
+					id : 'mpo_comboServicePlan',
+					width : 85,
+					readOnly : false,
+					fieldLabel : '服务费方案',
+					forceSelection : true,
+					store : new Ext.data.SimpleStore({
+						fields : ['planId', 'name']
+					}),
+					valueField : 'planId',
+					displayField : 'name',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					listeners : {
+						select : function(thiz){
+							reloadMemberPay();
 						}
 					}
 				}]
@@ -292,7 +306,6 @@ Ext.onReady(function(){
 					selectOnFocus : true
 				}]
 			}, {
-				columnWidth : .21,
 				items : [{
 					xtype : 'combo',
 					id : 'mpo_couponForPayOrder',
@@ -311,49 +324,9 @@ Ext.onReady(function(){
 					selectOnFocus : true,
 					listeners : {
 						select : function(thiz){
-							Ext.Ajax.request({
-								url : '../../QueryOrderFromMemberPay.do',
-								params : {
-									st : 1,
-									sv :  Ext.getCmp('mpo_numMemberMobileForPayOrder').getValue(),
-									discountId : Ext.getCmp('mpo_txtDiscountForPayOrder').getValue(),
-									couponId : thiz.getValue(),
-									orderID : orderID
-								},
-								success : function(res, opt){
-									var jr = Ext.decode(res.responseText);
-									if(jr.success){
-										var no = jr.other.newOrder;
-										jr.other.member = mpo_memberDetailData.member; 
-										memberPayOrderToBindData({
-											data : jr
-										});	
-										mpo_memberDetailData.newOrder = no;
-//										Ext.getCmp('mpo_txtMemberPriceForPayOrder').setText(no['actualPrice'].toFixed(2));
-										Ext.getDom('mpo_txtPayMoneyForPayOrder').value = no['actualPrice'].toFixed(2);
-									}else{
-										Ext.example.msg(jr.title, jr.msg);
-									}
-								},
-								failure : function(res, opt){
-									Ext.ux.showMsg(Ext.decode(res.responseText));
-								}
-							});
+							reloadMemberPay();
 						}
 					}
-				}]
-			}, {
-				columnWidth : .14,
-				items : [{
-					xtype : 'numberfield',
-					id : 'mpo_numCustomNumberForPayOrder',
-					fieldLabel : '就餐人数',
-					value : 1,
-					width : 40,
-					allowBlank : false,
-					maxValue : 65535,
-					minValue : 1,
-					disabled : false
 				}]
 			}]
 		}, 
@@ -428,6 +401,36 @@ function loadSystemSetting(_c){
  */
 function memberPayOrderToBindData(_c){
 	_c = _c == null || typeof _c == 'undefined' ? {} : _c;
+	var servicePlan = Ext.getCmp('mpo_comboServicePlan');
+	
+	if(mpo_servicePlanData.length == 0){
+		Ext.Ajax.request({
+			url : '../../QueryServicePlan.do',
+			params : {dataSource : 'planTree'},
+			success : function(res, opt){
+				var jr = Ext.decode(res.responseText);
+				var defaultId='', reserved='';
+				for(var i = 0; i < jr.length; i++){
+					mpo_servicePlanData.push([jr[i]['planId'], jr[i]['text']]);
+					if(jr[i]['status'] == 2){
+						defaultId = jr[i]['planId'];
+					}else if(jr[i]['type'] == 2){
+						reserved = jr[i]['planId'];
+					}
+				}
+				if(defaultId == ''){
+					defaultId = reserved;
+				}
+				servicePlan.store.loadData(mpo_servicePlanData);
+				
+				servicePlan.setValue(defaultId);
+			},
+			fialure : function(res, opt){
+				servicePlan.store.loadData(mpo_servicePlanData);
+			}
+		});		
+	}
+
 	
 	var name = Ext.getCmp('mpo_txtNameForPayOrder');
 	var type = Ext.getCmp('mpo_txtTypeForPayOrder');
@@ -439,6 +442,7 @@ function memberPayOrderToBindData(_c){
 	var payManner = Ext.getCmp('mpo_comPayMannerForPayOrder');
 	var payMoney = $('#mpo_txtPayMoneyForPayOrder');
 	var customNum = Ext.getCmp('mpo_numCustomNumberForPayOrder');
+	
 	if(Ext.getCmp('txtMemberEraseQuota')){
 		Ext.getCmp('txtMemberEraseQuota').setValue();
 	}
@@ -483,16 +487,24 @@ function memberPayOrderToBindData(_c){
 		discounts.push([discountMsgs[i].id, discountMsgs[i].name]);
 	}
 	
-	if(discountCbo.getValue() == ""){
+	if(!discountCbo.getValue()){
 		discountCbo.store.loadData(discounts);
 		discountCbo.setValue(discountMsg['id']);
 	} 
 	
-	if(memberType.pricePlans && memberType.pricePlans.length > 0){
+	if(mpo_pricePlanData.length == 0){
+		if(memberType.pricePlans && memberType.pricePlans.length > 0){
+			pricePlanCbo.getEl().up('.x-form-item').setDisplayed(true);
+			mpo_pricePlanData = memberType.pricePlans; 
+			memberType.pricePlans.unshift({id : '-1', name : '普通价'});
+			pricePlanCbo.store.loadData(memberType.pricePlans);
+			pricePlanCbo.setValue(memberType.pricePlan.id);
+		}		
+	}else{
 		pricePlanCbo.getEl().up('.x-form-item').setDisplayed(true);
-		pricePlanCbo.store.loadData(memberType.pricePlans);
-		pricePlanCbo.setValue(memberType.pricePlan.id);
 	}
+	
+
 
 	
 	payManner.setDisabled(true);
@@ -582,6 +594,8 @@ function memberPayOrderToLoadData(c){
 					if(jr.other.members && jr.other.members.length > 1){
 						getMoreThenUnique('<a href="javascript:memberPayOrderToLoadData({otype:1, mobile:'+ jr.other.members[0].mobile +'})" style="font-size:17px;">会员名称 : ' + jr.other.members[0].name + '</a></br><a href="javascript:memberPayOrderToLoadData({otype:1, mobile:'+ jr.other.members[1].mobile +'})" style="font-size:17px;">会员名称 : ' + jr.other.members[1].name + '</a>');
 					}else{
+						mpo_servicePlanData = [];
+						mpo_pricePlanData = [];
 						memberPayOrderToBindData({
 							data : jr
 						});						

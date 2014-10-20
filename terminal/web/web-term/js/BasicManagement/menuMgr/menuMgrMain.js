@@ -598,23 +598,23 @@ function foodOperation(type){
 		var checkBoxId = 'chbForFoodAlias' + pricePlanCmp[i].id,  numberfieldId = 'numBasicForPrice' + pricePlanCmp[i].id;
 		Ext.getCmp('food_pricePlans').add({
 			border : true,
-			frame : true,
+//			frame : true,
 			layout : 'column',
 			items : [{
-				width : 140,
-//				columnWidth : 0.44,
+//				width : 130,
+				columnWidth : 0.44,
 				xtype : 'label',
 				html : '&nbsp;'
 			},{
-				width : 17,
-//				columnWidth : 0.06,
+//				width : 17,
+				columnWidth : 0.06,
 	 	    	xtype : 'checkbox',
 	 	    	id : checkBoxId,
 	 	    	relativePrice : numberfieldId,
 	 	    	hideLabel : true,
 	 	    	listeners : {
 	 	    		render : function(thiz){
-	 	    			thiz.getEl().dom.parentNode.style.paddingTop = '7px';
+//	 	    			thiz.getEl().dom.parentNode.style.paddingTop = '5px';
 	 	    		},
 	 	    		check : function(checkbox, checked){
 	 	    			var numForAlias = Ext.getCmp(checkbox.relativePrice);
@@ -626,9 +626,10 @@ function foodOperation(type){
 							numForAlias.clearInvalid();
 						}
 					},
+					//解决第一次点击无效
 					focus : function(thiz){
 						var numForAlias = Ext.getCmp(thiz.relativePrice);
-						if(document.getElementById(checkBoxId).checked){
+						if(document.getElementById(thiz.id).checked){
 							
 							numForAlias.disable();
 						}else{
@@ -638,12 +639,12 @@ function foodOperation(type){
 					}
 	 	    	}
 			},{
-				width : 55,
-//				columnWidth : 0.2,
+//				width : 62,
+				columnWidth : 0.2,
 				xtype : 'label',
 				text : pricePlanCmp[i].name + ':'
 			},{
-//				columnWidth : 0.3,
+				columnWidth : 0.27,
 	 	    	xtype : 'numberfield',
 	 	    	id : numberfieldId,
 	 	    	style : 'text-align:right;',
