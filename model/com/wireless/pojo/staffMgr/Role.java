@@ -294,7 +294,11 @@ public class Role implements Jsonable, Parcelable{
 		public UpdateBuilder addPrivilege(Privilege.Code code) {
 			Privilege privilege = new Privilege(code);
 			if(!this.privileges.contains(privilege)){
-				this.privileges.add(privilege);
+				if(code == Privilege.Code.PRICE_PLAN){
+					this.privileges.add(new Privilege4Price());
+				}else{
+					this.privileges.add(privilege);
+				}
 			}
 			return this;
 		}
