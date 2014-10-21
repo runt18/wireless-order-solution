@@ -20,16 +20,17 @@ CREATE TABLE IF NOT EXISTS `wireless_order_db`.`oss_image` (
   `image` VARCHAR(100) NOT NULL,
   `image_crc` INT UNSIGNED NOT NULL,
   `type` TINYINT NOT NULL,
-  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below.' /* comment truncated */ /*1 - single
-2 - married*/,
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below.\n1 - single\n2 - married',
   `associated_id` INT NOT NULL,
-  `associated_serial` VARCHAR(45) NULL,
+  `associated_serial` VARCHAR(100) NULL,
   `associated_serial_crc` INT UNSIGNED NULL,
+  `oss_thumbnail_id` INT NULL DEFAULT NULL,
   `last_modified` DATETIME NOT NULL,
   PRIMARY KEY (`oss_image_id`),
   INDEX `ix_restaurant_id` (`restaurant_id` ASC),
   INDEX `ix_associated_id` (`associated_id` ASC),
   INDEX `ix_associated_serial_crc` (`associated_serial_crc` ASC),
+  INDEX `ix_thumbnail_id` (`oss_thumbnail_id` ASC),
   INDEX `ix_image_crc` (`image_crc` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -67,6 +68,28 @@ ADD INDEX `ix_oss_image_id` (`oss_image_id` ASC);
 UPDATE wireless_order_db.food F
 JOIN wireless_order_db.oss_image OI ON F.food_id = OI.associated_id AND OI.type = 4
 SET F.oss_image_id = OI.oss_image_id;
+
+-- -----------------------------------------------------
+-- Add the field 'oss_image_id' & 'entire' to table 'promotion'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`promotion` 
+ADD COLUMN `entire` TEXT NOT NULL AFTER `body`,
+ADD COLUMN `oss_image_id` INT NULL AFTER `coupon_type_id`,
+ADD INDEX `ix_oss_image_id` (`oss_image_id` ASC);
+
+-- -----------------------------------------------------
+-- Drop the filed 'weixin_logo' to table 'weixin_restaurant'
+-- Add the field 'weixin_logo' to table 'weixin_restaurant'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`weixin_restaurant` 
+DROP COLUMN `weixin_logo`;
+ALTER TABLE `wireless_order_db`.`weixin_restaurant` 
+ADD COLUMN `weixin_logo` INT NULL DEFAULT NULL AFTER `status`,
+ADD INDEX `ix_weixin_logo` (`weixin_logo` ASC);
+
+ALTER TABLE `wireless_order_db`.`promotion` 
+ADD COLUMN `oriented` TINYINT NOT NULL DEFAULT 1 COMMENT 'the oriented as below.\n1 - all\n2 - specific'
+AFTER `entire`;
 
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
 
