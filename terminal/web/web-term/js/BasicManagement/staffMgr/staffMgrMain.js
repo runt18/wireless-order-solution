@@ -1077,13 +1077,18 @@ Ext.onReady(function() {
 				Ext.getDom('change').innerHTML = '&nbsp;';
 				if(roleGrid.getSelectionModel().getSelected()){
 					var checkedNodes = privilegeTree.getChecked();
-					var discount = '', privilege = '';
+					var discount = '', pricePlan = '', privilege = '';
 					for(var i=0;i<checkedNodes.length;i++){
 						if(checkedNodes[i].attributes.isDiscount){
 							if(discount != ''){
 								discount += ',';
 							}
 							discount += checkedNodes[i].attributes.discountId;
+						}else if(checkedNodes[i].attributes.isPricePlan){
+							if(pricePlan != ''){
+								pricePlan += ',';
+							}
+							pricePlan += checkedNodes[i].attributes.planId;						
 						}else{
 							if(privilege != ''){
 								privilege += ',';
@@ -1098,6 +1103,7 @@ Ext.onReady(function() {
 							isCookie : true,
 							dataSource : 'updatePrivilege',
 							discounts : discount,
+							pricePlans : pricePlan,
 							privileges : privilege,
 							roleId : beforeSelected == null?roleGrid.getSelectionModel().getSelected().data.id : beforeSelected
 						},
