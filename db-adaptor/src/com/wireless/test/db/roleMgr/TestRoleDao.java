@@ -9,13 +9,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Privilege.Code;
+import com.wireless.pojo.staffMgr.Privilege4Price;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Role.Category;
 import com.wireless.pojo.staffMgr.Role.InsertBuilder;
@@ -59,6 +62,14 @@ public class TestRoleDao {
 					Assert.assertTrue("privilege discount", actual.getPrivileges().get(index).getDiscounts().indexOf(expectedDiscount) >= 0);
 				}
 			}
+			if(expected.getPrivileges().get(index).getCode() == Code.PRICE_PLAN){
+				List<PricePlan> expectedPricePlans = ((Privilege4Price)expected.getPrivileges().get(index)).getPricePlans();
+				List<PricePlan> actualPricePlans = ((Privilege4Price)actual.getPrivileges().get(index)).getPricePlans();
+				Assert.assertEquals("amount of privilege price plan", expectedPricePlans.size(), actualPricePlans.size());
+				for(PricePlan expectedPlan : expectedPricePlans){
+					Assert.assertTrue("privilege price plan", actualPricePlans.indexOf(expectedPlan) >= 0);
+				}
+			}
 		}	
 	}
 	
@@ -66,21 +77,10 @@ public class TestRoleDao {
 	public void testRoleDao() throws SQLException, BusinessException{
 		//get all discount
 		List<Discount> discounts = DiscountDao.getAll(mStaff);
+		List<PricePlan> pricePlans = PricePlanDao.getByCond(mStaff, null);
 		int roleId = 0;
 		
 		try{
-//			//创建默认角色
-//			DefAdminBuilder builder = new DefAdminBuilder(mStaff.getRestaurantId());
-//			
-//			roleId = RoleDao.insertRole(mStaff, builder);
-//			
-//			//期望值
-//			Role expected = builder.build();
-//			expected.setId(roleId);
-//			//实际
-//			Role actual = RoleDao.getRoleById(mStaff, roleId);
-//			//对比
-//			compare(expected, actual);
 			
 			//创建新角色
 			InsertBuilder newBuilder = new InsertBuilder(mStaff.getRestaurantId(), "副部长")
@@ -88,9 +88,10 @@ public class TestRoleDao {
 										   .addPrivilege(Privilege.Code.ADD_FOOD)
 										   .addPrivilege(Privilege.Code.BASIC)
 										   .addDiscount(discounts.get(0))
-										   .addDiscount(discounts.get(1));
+										   .addDiscount(discounts.get(1))
+										   .addPricePlan(pricePlans.get(0));
 			
-			roleId = RoleDao.insertRole(mStaff, newBuilder);
+			roleId = RoleDao.insert(mStaff, newBuilder);
 			
 			Role expected = newBuilder.build();
 			expected.setId(roleId);
@@ -106,7 +107,7 @@ public class TestRoleDao {
 													   .addPrivilege(Privilege.Code.CHECK_ORDER)
 													   .addDiscount(discounts.get(1));
 			
-			RoleDao.updateRole(mStaff, updateBuilder);
+			RoleDao.update(mStaff, updateBuilder);
 			actual = RoleDao.getyById(mStaff, roleId);
 			expected = updateBuilder.build();
 			

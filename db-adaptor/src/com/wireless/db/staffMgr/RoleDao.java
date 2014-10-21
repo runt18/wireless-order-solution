@@ -7,12 +7,14 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Privilege.Code;
+import com.wireless.pojo.staffMgr.Privilege4Price;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Role.Category;
 import com.wireless.pojo.staffMgr.Role.InsertBuilder;
@@ -124,30 +126,7 @@ public class RoleDao {
 		dbCon.rs.close();
 		
 		for(Role role : roles){
-			//Get the privileges to each role
-			sql = " SELECT " +
-				  " P.pri_id, P.pri_code, P.cate, RP.restaurant_id " + 
-				  " FROM " + Params.dbName + ".role_privilege RP " +
-				  " JOIN " + Params.dbName + ".privilege P ON RP.pri_id = P.pri_id " +
-				  " WHERE RP.role_id = " + role.getId();
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			while(dbCon.rs.next()){
-				Privilege privilege = new Privilege(dbCon.rs.getInt("pri_id"),
-													Code.valueOf(dbCon.rs.getInt("pri_code")),
-													dbCon.rs.getInt("restaurant_id"));
-				
-				role.addPrivilege(privilege);
-			}
-			dbCon.rs.close();
-			
-			//Get the allowed discounts in case of the discount privilege
-			for(Privilege privilege : role.getPrivileges()){
-				if(privilege.getCode() == Code.DISCOUNT){
-					for(Discount discount : DiscountDao.getByRole(dbCon, staff, role)){
-						privilege.addDiscount(discount);
-					}
-				}
-			}
+			role.setPrivileges(PrivilegeDao.getByCond(dbCon, staff, new PrivilegeDao.ExtraCond().setRole(role)));
 		}
 		
 		return roles;
@@ -186,13 +165,13 @@ public class RoleDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int insertRole(Staff staff, InsertBuilder builder) throws SQLException{
+	public static int insert(Staff staff, InsertBuilder builder) throws SQLException{
 		DBCon dbCon = new DBCon();
 		
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			int roleId = insertRole(dbCon, staff, builder);
+			int roleId = insert(dbCon, staff, builder);
 			dbCon.conn.commit();
 			return roleId;
 		}catch(SQLException e){
@@ -215,7 +194,7 @@ public class RoleDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int insertRole(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException{
+	public static int insert(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException{
 		String sql;
 		int roleId;
 		sql = "INSERT INTO " + Params.dbName + ".role(restaurant_id, name, type, cate) " +
@@ -233,7 +212,8 @@ public class RoleDao {
 			throw new SQLException("The id is not generated successfully.");
 		}
 		dbCon.rs.close();
-		//关联权限和折扣
+		
+		//Insert the associated privileges, discounts and price plans.
 		insertPrivileges(dbCon, staff, roleId, builder.getPrivileges());
 		
 		return roleId;
@@ -257,6 +237,7 @@ public class RoleDao {
 				  staff.getRestaurantId() + ")";
 			dbCon.stmt.executeUpdate(sql);
 			
+			//Insert the associated discounts.
 			if(privilege.getCode() == Code.DISCOUNT){
 				for (Discount discount : privilege.getDiscounts()) {
 					//Check to see whether the discount exist
@@ -270,10 +251,26 @@ public class RoleDao {
 					}
 					dbCon.rs.close();
 					if(isExist){
-						sql = " INSERT INTO " + Params.dbName + ".role_discount(role_id, discount_id) " +
+						sql = " INSERT INTO " + Params.dbName + ".role_discount (role_id, discount_id) " +
 							  " VALUES(" +
 							  roleId + ", " +
 							  discount.getId() + ")";
+						dbCon.stmt.executeUpdate(sql);
+					}
+				}
+			}
+			
+			//Insert the associated price plans.
+			if(privilege.getCode() == Code.PRICE_PLAN){
+				for(PricePlan pricePlan : ((Privilege4Price)privilege).getPricePlans()){
+					//Check to see whether the price plan exist
+					if(PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(pricePlan.getId())).isEmpty()){
+						continue;
+					}else{
+						sql = " INSERT INTO " + Params.dbName + ".role_price_plan (role_id, price_plan_id) " +
+							  " VALUES( " +
+							  roleId + "," +
+							  pricePlan.getId() + ")";
 						dbCon.stmt.executeUpdate(sql);
 					}
 				}
@@ -292,12 +289,12 @@ public class RoleDao {
 	 * @throws BusinessException
 	 * 			throws if the role to update does NOT exist
 	 */
-	public static void updateRole(Staff staff, Role.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(Staff staff, Role.UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.conn.setAutoCommit(false);
 			dbCon.connect();
-			updateRole(dbCon, staff, builder);
+			update(dbCon, staff, builder);
 			dbCon.conn.commit();
 		}catch(SQLException | BusinessException e){
 			dbCon.conn.rollback();
@@ -322,7 +319,7 @@ public class RoleDao {
 	 * 			<li>the role to update does NOT exist
 	 * 			<li>the role to update belongs to reserved
 	 */
-	public static void updateRole(DBCon dbCon, Staff staff, Role.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff staff, Role.UpdateBuilder builder) throws SQLException, BusinessException{
 
 		Role role = builder.build();
 
@@ -351,8 +348,13 @@ public class RoleDao {
 			//删除权限关联
 			sql = " DELETE FROM " + Params.dbName + ".role_privilege WHERE role_id = " + role.getId();
 			dbCon.stmt.executeUpdate(sql);
+			
 			//删除折扣关联
 			sql = " DELETE FROM " + Params.dbName + ".role_discount WHERE role_id = " + role.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			//删除价格方案关联
+			sql = " DELETE FROM " + Params.dbName + ".role_price_plan WHERE role_id = " + role.getId();
 			dbCon.stmt.executeUpdate(sql);
 			
 			//重新关联权限和折扣
@@ -392,8 +394,13 @@ public class RoleDao {
 		//删除权限关联
 		sql = "DELETE FROM " + Params.dbName + ".role_privilege WHERE role_id = " + roleId;
 		dbCon.stmt.executeUpdate(sql);
+		
 		//删除折扣关联
 		sql = "DELETE FROM " + Params.dbName + ".role_discount WHERE role_id = " + roleId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//删除价格方案关联
+		sql = "DELETE FROM " + Params.dbName + ".role_price_plan WHERE role_id = " + roleId;
 		dbCon.stmt.executeUpdate(sql);
 		
 	}

@@ -126,11 +126,21 @@ public class TestFoodDao {
 			
 			compare(foodId, expected, actual, "insert food");
 
+			//---------- Test to update a price plan --------------
+			PricePlan.UpdateBuilder updatePlanBuilder = new PricePlan.UpdateBuilder(planId).setName("修改价格方案");
+			PricePlanDao.update(mStaff, updatePlanBuilder);
+			
+			expectedPlan = updatePlanBuilder.build();
+			expectedPlan.setType(actualPlan.getType());
+			actualPlan = PricePlanDao.getById(mStaff, planId);
+			
+			compare(expectedPlan, actualPlan);
+			
 			//---------- Test to update the food --------------
 			int oriImageId = ossImageId;
 			ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.FOOD_IMAGE)
 			    												.setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
-
+			
 			Food.UpdateBuilder updateBuilder = new Food.UpdateBuilder(foodId).setAliasId(1001).setName("测试修改菜品")
 													   .setKitchen(KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(1))
 													   .setImage(ossImageId)

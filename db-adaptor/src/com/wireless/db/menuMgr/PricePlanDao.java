@@ -11,6 +11,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.PricePlanError;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.menuMgr.PricePlan;
+import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class PricePlanDao {
@@ -18,6 +19,8 @@ public class PricePlanDao {
 	public static class ExtraCond{
 		private int id;
 		private MemberType memberType;
+		private Role role;
+		private String roleCond;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -26,6 +29,11 @@ public class PricePlanDao {
 		
 		public ExtraCond setMemberType(MemberType memberType){
 			this.memberType = memberType;
+			return this;
+		}
+		
+		public ExtraCond setRole(Role role){
+			this.role = role;
 			return this;
 		}
 		
@@ -39,6 +47,9 @@ public class PricePlanDao {
 				String sql;
 				sql = " SELECT price_plan_id FROM " + Params.dbName + ".member_type_price WHERE member_type_id = " + memberType.getId();
 				extraCond.append(" AND PP.price_plan_id IN (" + sql + ")");
+			}
+			if(role != null){
+				extraCond.append(" AND price_plan_id IN(" + roleCond + ")");
 			}
 			return extraCond.toString();
 		}
@@ -92,6 +103,53 @@ public class PricePlanDao {
 			return dbCon.rs.getInt(1);
 		}else{
 			throw new SQLException("The id of new price plan is not generated successfully.");
+		}
+	}
+	
+	/**
+	 * Update the price plan according to specific builder {@link PricePlan#UpdateBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the update builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the price plan to update does NOT exist
+	 */
+	public static void update(Staff staff, PricePlan.UpdateBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			update(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update the price plan according to specific builder {@link PricePlan#UpdateBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the update builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the price plan to update does NOT exist
+	 */
+	public static void update(DBCon dbCon, Staff staff, PricePlan.UpdateBuilder builder) throws SQLException, BusinessException{
+		PricePlan pricePlan = builder.build();
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".price_plan SET " +
+			  " price_plan_id = " + pricePlan.getId() +
+			  (builder.isNameChanged() ? ",name = '" + pricePlan.getName() + "'" : "") +
+			  (builder.isTypeChanged() ? " ,type = " + pricePlan.getType().getVal() : "") +
+			  " WHERE price_plan_id = " + pricePlan.getId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(PricePlanError.PRICE_PLAN_NOT_EXIST);
 		}
 	}
 	
@@ -174,6 +232,18 @@ public class PricePlanDao {
 	 */
 	public static List<PricePlan> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
+		
+		if(extraCond != null && extraCond.role != null){
+			sql = "SELECT * FROM " + Params.dbName + ".role_price_plan WHERE role_id = " + extraCond.role.getId() + " LIMIT 1 ";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				extraCond.roleCond = " SELECT price_plan_id FROM " + Params.dbName + ".role_price_plan WHERE role_id = " + extraCond.role.getId();
+			}else{
+				extraCond.roleCond = " SELECT price_plan_id FROM " + Params.dbName + ".price_plan WHERE restaurant_id = " + staff.getRestaurantId();
+			}
+			dbCon.rs.close();
+		}
+		
 		sql = " SELECT * FROM " + Params.dbName + ".price_plan PP " +
 		      " WHERE 1 = 1 " +
 			  " AND PP.restaurant_id = " + staff.getRestaurantId() +

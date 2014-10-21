@@ -749,19 +749,19 @@ public class RestaurantDao {
 		Staff staff = new Staff();
 		staff.setRestaurantId(restaurantId);
 		//insert '管理员' role
-		int adminRoleId = RoleDao.insertRole(dbCon, staff, new Role.AdminBuilder(restaurantId));
+		int adminRoleId = RoleDao.insert(dbCon, staff, new Role.AdminBuilder(restaurantId));
 		//insert '管理员' staff
 		int staffId = StaffDao.insert(dbCon, staff, new Staff.AdminBuilder(pwd, new Role(adminRoleId)));
 		//insert '老板' role
-		RoleDao.insertRole(dbCon, staff, new Role.BossBuilder(restaurantId));
+		RoleDao.insert(dbCon, staff, new Role.BossBuilder(restaurantId));
 		//insert '财务' role
-		RoleDao.insertRole(dbCon, staff, new Role.FinancerBuilder(restaurantId));
+		RoleDao.insert(dbCon, staff, new Role.FinancerBuilder(restaurantId));
 		//insert '店长' role
-		RoleDao.insertRole(dbCon, staff, new Role.ManagerBuilder(restaurantId));
+		RoleDao.insert(dbCon, staff, new Role.ManagerBuilder(restaurantId));
 		//insert '收银员' role
-		RoleDao.insertRole(dbCon, staff, new Role.CashierBuilder(restaurantId));
+		RoleDao.insert(dbCon, staff, new Role.CashierBuilder(restaurantId));
 		//insert '服务员' role
-		RoleDao.insertRole(dbCon, staff, new Role.DefWaiterBuilder(restaurantId));
+		RoleDao.insert(dbCon, staff, new Role.DefWaiterBuilder(restaurantId));
 		
 		return StaffDao.getById(dbCon, staffId);
 	}
