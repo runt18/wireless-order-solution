@@ -1,7 +1,6 @@
 package com.wireless.db.orderMgr;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
@@ -468,12 +467,12 @@ public class PayOrder {
 		if(payBuilder.hasPricePlan()){
 			final List<PricePlan> result;
 			if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
-				//Get the price plan associated with this member type and plan id
+				//Get the price plan allowed by this member type and plan id.
 				result = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(payBuilder.getPricePlanId())
 																						  .setMemberType(MemberDao.getById(dbCon, staff, payBuilder.getMemberId()).getMemberType()));
 			}else{
-				//FIXME
-				result = new ArrayList<PricePlan>();
+				//Get the price plan allowed by role to the staff perform payment.
+				result = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(payBuilder.getPricePlanId()).setRole(staff.getRole()));
 			}
 			
 			if(result.isEmpty()){
