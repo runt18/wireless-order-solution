@@ -99,22 +99,18 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 				customNum = 1;
 			}
 			
-			if(ofFgm.hasOrderFood()){
-				if(forceInsert){
-					//强制下单
-					new CommitOrderTask(ofFgm.buildNewOrder(tableAlias, customNum), Type.INSERT_ORDER_FORCE).execute();
-				}else{
-					Order reqOrder = ofFgm.buildRequestOrder(tableAlias, customNum);
-					if(reqOrder.getId() != 0){
-						//改单
-						new CommitOrderTask(reqOrder, Type.UPDATE_ORDER).execute();
-					}else{
-						//下单
-						new CommitOrderTask(reqOrder, Type.INSERT_ORDER).execute();
-					}
-				}
+			if(forceInsert){
+				//强制下单
+				new CommitOrderTask(ofFgm.buildNewOrder(tableAlias, customNum), Type.INSERT_ORDER_FORCE).execute();
 			}else{
-				Toast.makeText(OrderActivity.this, "您还未点菜，不能下单", Toast.LENGTH_SHORT).show();
+				Order reqOrder = ofFgm.buildRequestOrder(tableAlias, customNum);
+				if(reqOrder.getId() != 0){
+					//改单
+					new CommitOrderTask(reqOrder, Type.UPDATE_ORDER).execute();
+				}else{
+					//下单
+					new CommitOrderTask(reqOrder, Type.INSERT_ORDER).execute();
+				}
 			}
 			
 		} else {
