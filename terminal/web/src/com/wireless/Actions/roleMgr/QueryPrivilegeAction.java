@@ -13,17 +13,20 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.PrivilegeDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Page;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Privilege.Code;
+import com.wireless.pojo.staffMgr.Privilege4Price;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -69,7 +72,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			root = PrivilegeDao.getByCond(staff, null, null);
+			root = PrivilegeDao.getByCond(staff, null);
 			if(root.size() > 0){
 				tree.append("[");
 				for (int i = 0; i < root.size(); i++) {
@@ -94,6 +97,28 @@ public class QueryPrivilegeAction extends DispatchAction{
 							children.append("}");
 						}
 						tree.append(",children : [" + children.toString() + "]");
+					}else if(root.get(i).getCode() == Code.PRICE_PLAN){
+						List<PricePlan> list = PricePlanDao.getByCond(staff, null);
+						if(!list.isEmpty()){
+							tree.append("leaf:false");
+							StringBuilder children = new StringBuilder();
+							
+							for (int j = 0; j < list.size(); j++) {
+								if(j>0){
+									children.append(",");
+								}
+								children.append("{");
+								children.append("checked:false");
+								children.append(",leaf:true");
+								children.append(",text:'" + list.get(j).getName() + "'");
+								children.append("}");
+							}
+							tree.append(",children : [" + children.toString() + "]");
+						}else{
+							tree.append("leaf:true");
+							tree.append(",hidden:true");
+						}
+						
 					}else{
 						tree.append("leaf:true");
 					}
@@ -296,7 +321,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 				rolePrivilege = role.getPrivileges();
 			}
 			//获取所有权限和不是会员类型的所有折扣
-			root = PrivilegeDao.getByCond(staff, null, null);
+			root = PrivilegeDao.getByCond(staff, null);
 			if(root.size() > 0){
 				tree.append("[");
 				for (int i = 0; i < root.size(); i++) {
@@ -343,6 +368,34 @@ public class QueryPrivilegeAction extends DispatchAction{
 								children.append("}");
 							}
 							tree.append(",children : [" + children.toString() + "]");
+						}else if(root.get(i).getCode() == Code.PRICE_PLAN){
+							List<PricePlan> plans = ((Privilege4Price)root.get(i)).getPricePlans();
+							if(plans.isEmpty()){
+								tree.append("leaf:true");
+								tree.append(",hidden:true");
+							}else{
+								tree.append("leaf:false");
+								StringBuilder children = new StringBuilder();
+								for (int j = 0; j < plans.size(); j++) {
+									if(j>0){
+										children.append(",");
+									}
+									children.append("{");
+									children.append("leaf:true");
+									children.append(",text:'" + plans.get(j).getName() + "'");			
+															
+									int planIndex = ((Privilege4Price)(rolePrivilege.get(index))).getPricePlans().indexOf(plans.get(j));
+									if(planIndex >= 0){
+										children.append(",checked:true");
+									}else{
+										children.append(",checked:false");
+									}
+									children.append(",isPricePlan:true");
+									children.append(",planId:'" + plans.get(j).getId() + "'");
+									children.append("}");									
+								}
+								tree.append(",children : [" + children.toString() + "]");
+							}
 						}else{
 							tree.append("leaf:true");
 						}
@@ -372,6 +425,28 @@ public class QueryPrivilegeAction extends DispatchAction{
 								children.append("}");
 							}
 							tree.append(",children : [" + children.toString() + "]");
+						}else if(root.get(i).getCode() == Code.PRICE_PLAN){
+							List<PricePlan> plans = ((Privilege4Price)root.get(i)).getPricePlans();
+							if(plans.isEmpty()){
+								tree.append("leaf:true");
+								tree.append(",hidden:true");
+							}else{
+								tree.append("leaf:false");
+								StringBuilder children = new StringBuilder();
+								for (int j = 0; j < plans.size(); j++) {
+									if(j>0){
+										children.append(",");
+									}
+									children.append("{");
+									children.append("leaf:true");
+									children.append(",text:'" + plans.get(j).getName() + "'");			
+									children.append(",checked:false");
+									children.append(",isPricePlan:true");
+									children.append(",planId:'" + plans.get(j).getId() + "'");
+									children.append("}");									
+								}
+								tree.append(",children : [" + children.toString() + "]");								
+							}
 						}else{
 							tree.append("leaf:true");
 						}

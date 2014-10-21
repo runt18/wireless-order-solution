@@ -16,6 +16,7 @@ import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Privilege.Code;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Role.InsertBuilder;
@@ -42,7 +43,7 @@ public class OperateRoleAction extends DispatchAction{
 			}
 
 			
-			RoleDao.insertRole(staff, builder);
+			RoleDao.insert(staff, builder);
 			
 			jobject.initTip(true, "添加成功");
 			
@@ -74,8 +75,8 @@ public class OperateRoleAction extends DispatchAction{
 			UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(roleId))
 										.setName(roleName);
 		
-			RoleDao.updateRole(staff, builder);
-			jobject.initTip(true, "添加成功");
+			RoleDao.update(staff, builder);
+			jobject.initTip(true, "修改成功");
 			
 		}catch(SQLException e){
 			e.printStackTrace();
@@ -94,6 +95,7 @@ public class OperateRoleAction extends DispatchAction{
 		String roleId = request.getParameter("roleId");
 		String privileges = request.getParameter("privileges");
 		String discounts = request.getParameter("discounts");
+		String pricePlans = request.getParameter("pricePlans");
 		JObject jobject = new JObject();
 		
 		try{
@@ -118,7 +120,14 @@ public class OperateRoleAction extends DispatchAction{
 				}
 			}
 			
-			RoleDao.updateRole(staff, updateBuilder);
+			if(pricePlans != null && !pricePlans.isEmpty()){
+				String[] pricePlanArray = pricePlans.split(",");
+				for (String planId : pricePlanArray) {
+					updateBuilder.addPricePlan(new PricePlan(Integer.parseInt(planId)));
+				}				
+			}
+			
+			RoleDao.update(staff, updateBuilder);
 			jobject.initTip(true, "修改成功");
 			
 		}catch(BusinessException e){
