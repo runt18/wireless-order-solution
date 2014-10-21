@@ -309,6 +309,9 @@ public class PricePlanDao {
 			//Delete the associated food price to this plan.
 			sql = " DELETE FROM " + Params.dbName + ".food_price_plan WHERE price_plan_id = " + plan.getId();
 			dbCon.stmt.executeUpdate(sql);
+			//Delete the associated role price plan to this plan.
+			sql = " DELETE FROM " + Params.dbName + ".role_price_plan WHERE price_plan_id = " + plan.getId();
+			dbCon.stmt.executeUpdate(sql);
 			amount++;
 		}
 		return amount;
