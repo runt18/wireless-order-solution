@@ -8,6 +8,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Privilege.Code;
 import com.wireless.pojo.util.SortedList;
 
@@ -249,6 +250,18 @@ public class Role implements Jsonable, Parcelable{
 			return this;
 		}
 		
+		public InsertBuilder addPricePlan(PricePlan pricePlan){
+			int index = privileges.indexOf(new Privilege(Privilege.Code.PRICE_PLAN));
+			if(index < 0){
+				Privilege4Price privilege = new Privilege4Price();
+				privilege.addPricePlan(pricePlan);
+				privileges.add(privilege);
+			}else{
+				((Privilege4Price)privileges.get(index)).addPricePlan(pricePlan);
+			}
+			return this;
+		}
+		
 		public Role build(){
 			return new Role(this);
 		}
@@ -294,6 +307,18 @@ public class Role implements Jsonable, Parcelable{
 				privileges.add(privilege);
 			}else{
 				privileges.get(index).addDiscount(discount);
+			}
+			return this;
+		}
+
+		public UpdateBuilder addPricePlan(PricePlan pricePlan){
+			int index = privileges.indexOf(new Privilege(Privilege.Code.PRICE_PLAN));
+			if(index < 0){
+				Privilege4Price privilege = new Privilege4Price();
+				privilege.addPricePlan(pricePlan);
+				privileges.add(privilege);
+			}else{
+				((Privilege4Price)privileges.get(index)).addPricePlan(pricePlan);
 			}
 			return this;
 		}
@@ -375,8 +400,11 @@ public class Role implements Jsonable, Parcelable{
 		privileges.clear();
 	}
 	
-	public void addAllPrivileges(List<Privilege> list){
-		privileges.addAll(list);
+	public void setPrivileges(List<Privilege> privileges){
+		if(privileges != null){
+			this.privileges.clear();
+			this.privileges.addAll(privileges);
+		}
 	}
 	
 	public List<Privilege> getPrivileges(){
@@ -390,11 +418,11 @@ public class Role implements Jsonable, Parcelable{
 	}
 	
 	public boolean hasPrivilege(Privilege.Code code){
-		return privileges.contains(new Privilege(0, code, 0));
+		return privileges.contains(new Privilege(0, code));
 	}
 	
 	public List<Discount> getDiscounts(){
-		int index = privileges.indexOf(new Privilege(0, Code.DISCOUNT, 0));
+		int index = privileges.indexOf(new Privilege(0, Code.DISCOUNT));
 		if(index >= 0){
 			return privileges.get(index).getDiscounts();
 		}else{

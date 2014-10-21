@@ -25,6 +25,38 @@ public class PricePlan implements Jsonable, Comparable<PricePlan> {
 		}
 	}
 	
+	public static class UpdateBuilder{
+		private final int id;
+		private String name;
+		private Type type;
+		
+		public UpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		public UpdateBuilder setName(String name){
+			this.name = name;
+			return this;
+		}
+		
+		public boolean isNameChanged(){
+			return this.name != null;
+		}
+		
+		public boolean isTypeChanged(){
+			return this.type != null;
+		}
+		
+		public UpdateBuilder setType(Type type){
+			this.type = type;
+			return this;
+		}
+		
+		public PricePlan build(){
+			return new PricePlan(this);
+		}
+	}
+	
 	public static enum Type{
 		
 		NORMAL(1, "normal"),	// 普通
@@ -68,6 +100,12 @@ public class PricePlan implements Jsonable, Comparable<PricePlan> {
 	}
 
 	private PricePlan(InsertBuilder builder){
+		setType(builder.type);
+		setName(builder.name);
+	}
+	
+	private PricePlan(UpdateBuilder builder){
+		setId(builder.id);
 		setType(builder.type);
 		setName(builder.name);
 	}

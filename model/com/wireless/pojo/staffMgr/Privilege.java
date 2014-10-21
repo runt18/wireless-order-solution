@@ -66,11 +66,12 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 		ADD_FOOD(1000, Cate.FRONT_BUSINESS, 1, "点菜"),
 		CANCEL_FOOD(1001, Cate.FRONT_BUSINESS, 2, "退菜"),
 		DISCOUNT(1002, Cate.FRONT_BUSINESS, 3, "折扣"),
-		GIFT(1003, Cate.FRONT_BUSINESS, 4, "赠送"),
-		RE_PAYMENT(1004, Cate.FRONT_BUSINESS, 7, "反结帐"),
-		PAYMENT(1005, Cate.FRONT_BUSINESS, 6, "结帐"),
-		CHECK_ORDER(1006, Cate.FRONT_BUSINESS, 8, "查看账单"),
-		TEMP_PAYMENT(1007, Cate.FRONT_BUSINESS, 5, "暂结"),
+		GIFT(1003, Cate.FRONT_BUSINESS, 5, "赠送"),
+		RE_PAYMENT(1004, Cate.FRONT_BUSINESS, 8, "反结帐"),
+		PAYMENT(1005, Cate.FRONT_BUSINESS, 7, "结帐"),
+		CHECK_ORDER(1006, Cate.FRONT_BUSINESS, 9, "查看账单"),
+		TEMP_PAYMENT(1007, Cate.FRONT_BUSINESS, 6, "暂结"),
+		PRICE_PLAN(1008, Cate.FRONT_BUSINESS, 4, "价格方案"),
 		BASIC(2000, Cate.BASIC, 1, "后台"),
 		INVENTORY(5000, Cate.INVENTORY, 1, "库存"),
 		HISTORY(4000, Cate.HISTORY, 1, "历史"),
@@ -151,10 +152,9 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 		
 	}
 	
-	public Privilege(int id, Code code, int restaurantId){
+	public Privilege(int id, Code code){
 		setId(id);
 		setCode(code);
-		setRestaurantId(restaurantId);
 	}
 	
 	public Privilege(Code code){
