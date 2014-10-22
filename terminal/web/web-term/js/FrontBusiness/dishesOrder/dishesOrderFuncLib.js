@@ -924,7 +924,6 @@ function submitRepaidOrderHandler(_c){
 			},
 			success : function(response, options) {
 				var resultJSON = Ext.util.JSON.decode(response.responseText);
-				commitOperate.hide();
 				if (resultJSON.success == true) {
 					if(!_c.notPrint){
 						var tempMask = new Ext.LoadMask(document.body, {
@@ -950,6 +949,7 @@ function submitRepaidOrderHandler(_c){
 						skip({href : 'Bills.html', msg : resultJSON.data});
 					}
 				} else {
+					commitOperate.hide();
 					orderPanel.buttons[0].setDisabled(false);
 					orderPanel.buttons[1].setDisabled(false);
 					orderPanel.buttons[5].setDisabled(false);
