@@ -312,6 +312,10 @@ public class PricePlanDao {
 			//Delete the associated role price plan to this plan.
 			sql = " DELETE FROM " + Params.dbName + ".role_price_plan WHERE price_plan_id = " + plan.getId();
 			dbCon.stmt.executeUpdate(sql);
+			//Delete the associated memberType price plan to this plan.
+			sql = " DELETE FROM " + Params.dbName + ".member_type_price WHERE price_plan_id = " + plan.getId();
+			dbCon.stmt.executeUpdate(sql);			
+			
 			amount++;
 		}
 		return amount;
