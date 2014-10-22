@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="jquery/jquery-1.8.2.min.js"></script>
+<script type="text/javascript">
+$(function(){
+		$.ajax({
+	        url: "http://api.dianping.com/v1/deal/get_deals_by_business_id?appkey=6373481645&sign=993637179B47241D7B6F5E6959637B55A3E9683C&business_id=19276866&city=%E5%B9%BF%E5%B7%9E",
+	        type:'get', 
+	        dataType:'json',
+	        async:false ,
+	        success: function(data){
+	        	console.log(data);
+	        	$('name').val(data.deals[0].title);
+	        	$('current_price').val(data.deals[0].title);
+	        	$('name').val(data.deals[0].image_url);
+			}
+		}); 
+	
+});
+
+</script>
+</head>
+<body >
+	<div align="center">
+	
+		商品名称:<label id="name"></label><br>
+		商品价钱:<label id="price"></label><br>
+		预览:<img id="image" alt="" src="">
+	</div>
+
+
+</body>
+</html>
