@@ -354,6 +354,51 @@ public class TableDao {
 	}
 	
 	/**
+	 * Insert tables according to specific builder {@link Table#BatchInsertBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the insert builder
+	 * @return the amount to table inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int insert(Staff staff, Table.BatchInsertBuilder builder) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return insert(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Insert tables according to specific builder {@link Table#BatchInsertBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the insert builder
+	 * @return the amount to table inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int insert(DBCon dbCon, Staff staff, Table.BatchInsertBuilder builder) throws SQLException{
+		int amount = 0;
+		for(Table.InsertBuilder singleBuilder : builder.build()){
+			try{
+				insert(dbCon, staff, singleBuilder);
+				amount++;
+			}catch(BusinessException e){
+				e.printStackTrace();
+			}
+		}
+		return amount;
+	}
+	
+	/**
 	 * Delete a table according to table id.
 	 * @param dbCon
 	 * 			the database connection
