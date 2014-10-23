@@ -1,5 +1,8 @@
 package com.wireless.pojo.regionMgr;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
@@ -11,6 +14,45 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	
 	public final static byte TABLE_PARCELABLE_COMPLEX = 0;
 	public final static byte TABLE_PARCELABLE_SIMPLE = 1;
+	
+	public static class BatchInsertBuilder{
+		private final int start;
+		private final int end;
+		private final Region.RegionId regionId;
+		
+		private boolean skip4;
+		private boolean skip7;
+		
+		public BatchInsertBuilder(int start, int end, Region.RegionId regionId){
+			this.start = start;
+			this.end = end;
+			this.regionId = regionId;
+		}
+		
+		public BatchInsertBuilder setSkip4(boolean onOff){
+			this.skip4 = onOff;
+			return this;
+		}
+		
+		public BatchInsertBuilder setSkip7(boolean onOff){
+			this.skip7 = onOff;
+			return this;
+		}
+		
+		public List<InsertBuilder> build(){
+			List<InsertBuilder> result = new ArrayList<InsertBuilder>();
+			for(int i = start; i < end; i++){
+				if(skip4 && i % 4 == 0){
+					continue;
+				}else if(skip7 && i % 7 == 0){
+					continue;
+				}else{
+					result.add(new InsertBuilder(start, regionId));
+				}
+			}
+			return result;
+		}
+	}
 	
 	/**
 	 * The helper class to create the table object to perform insert {@link TableDao#insert)}
