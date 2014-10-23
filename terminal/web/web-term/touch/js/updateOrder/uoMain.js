@@ -761,8 +761,7 @@ uo.cd = {
 		$.ajax({
 			url : '../QueryDiscount.do',
 			data : {
-				dataSource : 'role',
-				roleId : staffData.role.id
+				dataSource : 'role'
 			},
 			dataType : 'json',
 			success : function(data, status, xhr){
