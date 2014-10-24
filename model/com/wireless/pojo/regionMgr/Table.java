@@ -41,13 +41,13 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		
 		public List<InsertBuilder> build(){
 			List<InsertBuilder> result = new ArrayList<InsertBuilder>();
-			for(int i = start; i < end; i++){
-				if(skip4 && i % 4 == 0){
+			for(int tableAlias = start; tableAlias <= end; tableAlias++){
+				if(skip4 && tableAlias % 4 == 0){
 					continue;
-				}else if(skip7 && i % 7 == 0){
+				}else if(skip7 && tableAlias % 7 == 0){
 					continue;
 				}else{
-					result.add(new InsertBuilder(start, regionId));
+					result.add(new InsertBuilder(tableAlias, regionId));
 				}
 			}
 			return result;
@@ -311,8 +311,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		return "table(" +
 			   "id = " + getTableId() + 
 			   ", alias_id = " + getAliasId() +
-			   ", restaurant_id = " + getRestaurantId() +
-			   ", name = " + (tableName != null ? tableName : "") + ")";
+			   ", restaurant_id = " + getRestaurantId() + ")";
 	}
 	
 	@Override
