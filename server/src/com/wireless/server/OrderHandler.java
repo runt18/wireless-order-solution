@@ -20,7 +20,6 @@ import com.wireless.db.foodGroup.CalcFoodGroupDao;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.frontBusiness.TransTblDao;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.orderMgr.CancelOrder;
 import com.wireless.db.orderMgr.InsertOrder;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.PayOrder;
@@ -196,12 +195,6 @@ class OrderHandler implements Runnable{
 					//handle the table transfer request 
 					response = doTransTable(staff, request);
 					
-				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
-					//handle the cancel order request
-					Table tblToCancel = new Parcel(request.body).readParcel(Table.CREATOR);
-					CancelOrder.execByTable(staff, tblToCancel.getAliasId());
-					response = new RespACK(request.header);
-
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER || request.header.type == Type.PAY_TEMP_ORDER){
 					//handle the pay order request
 					response = doPayOrder(staff, request);

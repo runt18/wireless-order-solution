@@ -2,6 +2,7 @@ package com.wireless.print.content;
 
 import com.wireless.pojo.billStatistics.IncomeByCharge;
 import com.wireless.pojo.billStatistics.IncomeByDept;
+import com.wireless.pojo.billStatistics.IncomeByPay.PaymentIncome;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
@@ -64,47 +65,19 @@ public class ShiftContent extends ConcreteContent {
 		
 		//generate the shift detail string
 		StringBuilder var1 = new StringBuilder();
-		var1.append(new Grid4ItemsContent(new String[]{"收款", "账单数", "金额", "实收"}, pos4Item, mPrintType, mStyle) + "\r\n");
+		var1.append(new Grid4ItemsContent(new String[]{"收款", "账单数", "金额", "实收"}, pos4Item, mPrintType, mStyle) + SEP);
 		
-		var1.append(new Grid4ItemsContent(
-				new String[]{"现金", 
-				 		     Integer.toString(mShiftDetail.getCashAmount()), 
-							 Float.toString(mShiftDetail.getCashTotalIncome()), 
-							 Float.toString(mShiftDetail.getCashActualIncome())
+		for(PaymentIncome paymentIncome : mShiftDetail.getIncomeByPay().getPaymentIncomes()){
+			var1.append(new Grid4ItemsContent(
+							new String[]{ 
+								paymentIncome.getPayType().getName(), 
+					 			Integer.toString(paymentIncome.getAmount()), 
+							    Float.toString(paymentIncome.getTotal()), 
+								Float.toString(paymentIncome.getActual())
 							}, 
-				pos4Item, mPrintType, mStyle).toString() + "\r\n");
+						pos4Item, mPrintType, mStyle).toString() + SEP);
+		}
 		
-		var1.append(new Grid4ItemsContent(
-				new String[]{"刷卡", 
-				 		     Integer.toString(mShiftDetail.getCreditCardAmount()), 
-							 Float.toString(mShiftDetail.getCreditTotalIncome()), 
-							 Float.toString(mShiftDetail.getCreditActualIncome())
-							}, 
-				pos4Item, mPrintType, mStyle).toString() + "\r\n");
-		
-		var1.append(new Grid4ItemsContent(
-				new String[]{"会员", 
-							 Integer.toString(mShiftDetail.getMemberCardAmount()), 
-							 Float.toString(mShiftDetail.getMemberTotalIncome()), 
-							 Float.toString(mShiftDetail.getMemberActualIncome())
-							}, 
-				pos4Item, mPrintType, mStyle).toString() + "\r\n");
-		
-		var1.append(new Grid4ItemsContent(
-				new String[]{"签单", 
-							 Integer.toString(mShiftDetail.getSignAmount()), 
-							 Float.toString(mShiftDetail.getSignTotalIncome()), 
-							 Float.toString(mShiftDetail.getSignActualIncome())
-							}, 
-				pos4Item, mPrintType, mStyle).toString() + "\r\n");
-		
-		var1.append(new Grid4ItemsContent(
-				new String[]{"挂账", 
-							 Integer.toString(mShiftDetail.getHangAmount()), 
-							 Float.toString(mShiftDetail.getHangTotalIncome()), 
-							 Float.toString(mShiftDetail.getHangActualIncome())
-							 }, 
-				pos4Item, mPrintType, mStyle).toString());
 		
 		//replace the $(var_1) with the shift detail
 		mTemplate = mTemplate.replace(PVar.VAR_1, var1);		

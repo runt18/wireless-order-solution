@@ -57,21 +57,21 @@ public class ReceiptContent extends ConcreteContent {
 		mTemplate = mTemplate.replace(PVar.PRINT_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()));
 		
 		//replace the "$(pay_manner)"
-		String payManner;
-		if(mOrder.isPayByCash()){
-			payManner = "(现金)";			
-		}else if(mOrder.isPayByCreditCard()){
-			payManner = "(刷卡)";			
-		}else if(mOrder.isPayByHang()){
-			payManner = "(挂账)";			
-		}else if(mOrder.isPayByMember()){
-			payManner = "(会员卡)";			
-		}else if(mOrder.isPayBySign()){
-			payManner = "(签单)";			
+		final String payment;
+		if(mOrder.getPaymentType().isCash()){
+			payment = "(现金)";			
+		}else if(mOrder.getPaymentType().isCreditCard()){
+			payment = "(刷卡)";			
+		}else if(mOrder.getPaymentType().isHang()){
+			payment = "(挂账)";			
+		}else if(mOrder.getPaymentType().isMember()){
+			payment = "(会员卡)";			
+		}else if(mOrder.getPaymentType().isSign()){
+			payment = "(签单)";			
 		}else{
-			payManner = "(现金)";	
+			payment = "(现金)";	
 		}
-		mTemplate = mTemplate.replace(PVar.PAY_MANNER, payManner);
+		mTemplate = mTemplate.replace(PVar.PAY_MANNER, payment);
 		
 		//replace the "$(order_cate)"
 		mTemplate = mTemplate.replace(PVar.ORDER_CATE, "");
@@ -153,7 +153,7 @@ public class ReceiptContent extends ConcreteContent {
 			 .append("赠送：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.calcGiftPrice()));
 	
 		StringBuilder line2 = new StringBuilder();
-		if(mOrder.isPayByCash() && !isTempReceipt && mOrder.getReceivedCash() != 0){
+		if(mOrder.getPaymentType().isCash() && !isTempReceipt && mOrder.getReceivedCash() != 0){
 			float chargeMoney = NumericUtil.roundFloat(mOrder.getReceivedCash() - mOrder.getActualPrice());
 			
 			line2.append("找零：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(chargeMoney))
