@@ -2,8 +2,7 @@ package com.wireless.pojo.billStatistics.repaid;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.Order.PayType;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
@@ -15,7 +14,7 @@ public class RepaidStatistics implements Jsonable{
 	private float mTotalPrice = 0;	
 	private float mActualPrice = 0;
 	private float mRepaidPrice = 0;
-	private Order.PayType mPaymentType = PayType.CASH;	
+	private PayType mPaymentType = PayType.CASH;	
 	private Staff staff;
 	
 	
@@ -70,10 +69,6 @@ public class RepaidStatistics implements Jsonable{
 		this.mRepaidPrice = mRepaidPrice;
 	}
 	
-	public void setPaymentType(int payTypeVal){
-		this.mPaymentType = PayType.valueOf(payTypeVal);
-	}
-	
 	public void setPaymentType(PayType payType){
 		this.mPaymentType = payType;
 	}
@@ -110,8 +105,8 @@ public class RepaidStatistics implements Jsonable{
 		jm.putFloat("actualPrice", this.mActualPrice);
 		jm.putFloat("totalPrice", this.mTotalPrice);
 		jm.putFloat("repaidPrice", this.mRepaidPrice);
-		jm.putInt("payTypeValue", this.mPaymentType.getVal());
-		jm.putString("payTypeText", this.mPaymentType.getDesc());
+		jm.putInt("payTypeValue", this.mPaymentType.getId());
+		jm.putString("payTypeText", this.mPaymentType.getName());
 		jm.putFloat("oldTotalPrice", NumericUtil.roundFloat(this.mTotalPrice - this.mRepaidPrice));
 		jm.putFloat("oldActualPrice", NumericUtil.roundFloat(this.mActualPrice - this.mRepaidPrice));
 		jm.putString("operateStaff", this.getStaff().getName());

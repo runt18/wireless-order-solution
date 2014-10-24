@@ -1,174 +1,106 @@
 package com.wireless.pojo.billStatistics;
 
+import java.util.Collections;
+import java.util.List;
+
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.pojo.util.SortedList;
 
 
 public class IncomeByPay{
 	
 	public final static IncomeByPay DUMMY = new IncomeByPay();
+
+	public static class PaymentIncome implements Comparable<PaymentIncome>{
+		private final PayType payType;
+		private final int amount;
+		private final float total;
+		private final float actual;
+		
+		public PaymentIncome(PayType payType, int amount, float total, float actual){
+			this.payType = payType;
+			this.amount = amount;
+			this.total = total;
+			this.actual = actual;
+		}
+
+		public PayType getPayType() {
+			return payType;
+		}
+
+		public int getAmount() {
+			return amount;
+		}
+
+		public float getTotal() {
+			return total;
+		}
+
+		public float getActual() {
+			return actual;
+		}
+
+		@Override
+		public int compareTo(PaymentIncome o) {
+			return payType.compareTo(o.payType);
+		}
+	}
 	
-	private int mCashAmount;			//现金账单数
-	private float mCashIncome;			//现金金额
-	private float mCashActual;			//现金实收
+	private final List<PaymentIncome> paymentIncomes = SortedList.newInstance();
 	
-	private int mCreditCardAmount;		//刷卡账单数
-	private float mCreditCardIncome;	//刷卡金额
-	private float mCreditCardActual;	//刷卡实收
+//	private int mCashAmount;			//现金账单数
+//	private float mCashIncome;			//现金金额
+//	private float mCashActual;			//现金实收
+//	
+//	private int mCreditCardAmount;		//刷卡账单数
+//	private float mCreditCardIncome;	//刷卡金额
+//	private float mCreditCardActual;	//刷卡实收
+//	
+//	private int mMemeberCardAmount;		//会员卡账单数
+//	private float mMemberCardIncome;	//会员卡金额
+//	private float mMemberCardActual;	//会员卡实收
+//	
+//	private int mSignAmount;			//签单账单数
+//	private float mSignIncome;			//签单金额
+//	private float mSignActual;			//签单实收
+//	
+//	private int mHangAmount;			//挂账账单数
+//	private float mHangIncome;			//挂账金额
+//	private float mHangActual;			//挂账实收
 	
-	private int mMemeberCardAmount;		//会员卡账单数
-	private float mMemberCardIncome;	//会员卡金额
-	private float mMemberCardActual;	//会员卡实收
+	public List<PaymentIncome> getPaymentIncomes(){
+		return Collections.unmodifiableList(paymentIncomes);
+	}
 	
-	private int mSignAmount;			//签单账单数
-	private float mSignIncome;			//签单金额
-	private float mSignActual;			//签单实收
-	
-	private int mHangAmount;			//挂账账单数
-	private float mHangIncome;			//挂账金额
-	private float mHangActual;			//挂账实收
+	public void addPaymentIncome(PaymentIncome paymentIncome){
+		if(paymentIncome != null){
+			paymentIncomes.add(paymentIncome);
+		}
+	}
 	
 	public int getOrderAmount(){
-		return getCashAmount() + 
-			   getCreditCardAmount() + 
-			   getMemberCardAmount() + 
-			   getHangAmount() +
-			   getSignAmount();
+		int amount = 0;
+		for(PaymentIncome eachIncome : paymentIncomes){
+			amount += eachIncome.amount;
+		}
+		return amount;
 	}
 	
-	public void setCashAmount(int cashAmount){
-		this.mCashAmount = cashAmount;
-	}
-	
-	public int getCashAmount(){
-		return this.mCashAmount;
-	}
-	
-	public float getCashActual() {
-		return this.mCashActual;
-	}
-
-	public void setCashActual(float cashActual) {
-		this.mCashActual = cashActual;
-	}
-
-	public float getCashIncome() {
-		return mCashIncome;
-	}
-
-	public void setCashIncome(float cashIncome) {
-		this.mCashIncome = cashIncome;
-	}
-	
-	public int getCreditCardAmount() {
-		return mCreditCardAmount;
-	}
-
-	public void setCreditCardAmount(int creditCardAmount) {
-		this.mCreditCardAmount = creditCardAmount;
-	}
-
-	public float getCreditCardIncome() {
-		return mCreditCardIncome;
-	}
-
-	public void setCreditCardIncome(float creditCardIncome) {
-		this.mCreditCardIncome = creditCardIncome;
-	}
-
-	public float getCreditCardActual(){
-		return this.mCreditCardActual;
-	}
-	
-	public void setCreditCardActual(float creditCardActual) {
-		this.mCreditCardActual = creditCardActual;
-	}
-
-	public int getMemberCardAmount() {
-		return mMemeberCardAmount;
-	}
-
-	public void setMemeberCardAmount(int memeberCardAmount) {
-		this.mMemeberCardAmount = memeberCardAmount;
-	}
-
-	public float getMemberCardIncome() {
-		return mMemberCardIncome;
-	}
-
-	public void setMemberCardIncome(float memberCardIncome) {
-		this.mMemberCardIncome = memberCardIncome;
-	}
-
-	public float getMemberCardActual() {
-		return mMemberCardActual;
-	}
-
-	public void setMemberCardActual(float memberCardActual) {
-		this.mMemberCardActual = memberCardActual;
-	}
-
-	public int getSignAmount() {
-		return mSignAmount;
-	}
-
-	public void setSignAmount(int signAmount) {
-		this.mSignAmount = signAmount;
-	}
-
-	public float getSignIncome() {
-		return mSignIncome;
-	}
-
-	public void setSignIncome(float signIncome) {
-		this.mSignIncome = signIncome;
-	}
-
-	public float getSignActual() {
-		return mSignActual;
-	}
-
-	public void setSignActual(float signActual) {
-		this.mSignActual = signActual;
-	}
-
-	public int getHangAmount() {
-		return mHangAmount;
-	}
-
-	public void setHangAmount(int hangAmount) {
-		this.mHangAmount = hangAmount;
-	}
-
-	public float getHangIncome() {
-		return mHangIncome;
-	}
-
-	public void setHangIncome(float hangIncome) {
-		this.mHangIncome = hangIncome;
-	}
-
-	public float getHangActual() {
-		return mHangActual;
-	}
-
-	public void setHangActual(float hangActual) {
-		this.mHangActual = hangActual;
-	}
-
 	public float getTotalActual() {
-		return NumericUtil.roundFloat(getCashActual() + 
-									getCreditCardActual() + 
-									getMemberCardActual() + 
-									getSignActual() + 
-									getHangActual());
+		float actual = 0;
+		for(PaymentIncome eachIncome : paymentIncomes){
+			actual += eachIncome.actual;
+		}
+		return NumericUtil.roundFloat(actual);
 	}
 
 	public float getTotalIncome() {
-		return NumericUtil.roundFloat(getCashIncome() + 
-								   getCreditCardIncome() + 
-								   getMemberCardIncome() + 
-								   getSignIncome() + 
-								   getHangIncome());
+		float total = 0;
+		for(PaymentIncome eachIncome : paymentIncomes){
+			total += eachIncome.total;
+		}
+		return NumericUtil.roundFloat(total);
 	}
 
 }

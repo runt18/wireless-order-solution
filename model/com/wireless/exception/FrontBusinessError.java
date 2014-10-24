@@ -11,6 +11,7 @@ public class FrontBusinessError extends ErrorEnum {
 	public static final ErrorCode EXCEED_ERASE_QUOTA = build(9197, "操作失败, 抹数金额超过上限");
 	public final static ErrorCode ORDER_NOT_EXIST = build(9196, "账单不存在");
 	public final static ErrorCode ORDER_EXPIRED = build(9195, "账单已过期");
+	public final static ErrorCode MIXED_PAYMENT_NOT_EQUALS_TO_ACTUAL = build(9194, "混合结账的金额不等于账单的实收金额");
 	
 	private FrontBusinessError(){
 		

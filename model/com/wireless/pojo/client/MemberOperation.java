@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.util.DateUtil;
 
 public class MemberOperation implements Jsonable {
@@ -134,7 +134,7 @@ public class MemberOperation implements Jsonable {
 	private long operateDate;
 	private OperationType operateType;
 	private float payMoney;
-	private Order.PayType payType;
+	private PayType payType;
 	private int orderId;
 	private int couponId;
 	private float couponMoney;
@@ -202,8 +202,8 @@ public class MemberOperation implements Jsonable {
 			jm.putInt("operateTypeValue", this.operateType.getValue());
 		}
 		if (this.payType != null) {
-			jm.putString("payTypeText", this.payType.getDesc());
-			jm.putInt("payTypeValue", this.payType.getVal());
+			jm.putString("payTypeText", this.payType.getName());
+			jm.putInt("payTypeValue", this.payType.getId());
 			jm.putFloat("payMoney", this.payMoney);
 		}
 		if (this.chargeType != null) {
@@ -350,11 +350,11 @@ public class MemberOperation implements Jsonable {
 		return this.orderId;
 	}
 
-	public Order.PayType getPayType() {
+	public PayType getPayType() {
 		return this.payType;
 	}
 
-	public void setPayType(Order.PayType type) {
+	public void setPayType(PayType type) {
 		this.payType = type;
 	}
 

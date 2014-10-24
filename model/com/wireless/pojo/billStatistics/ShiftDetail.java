@@ -44,6 +44,14 @@ public class ShiftDetail implements Jsonable{
 		return offDuty;
 	}
 	
+	public IncomeByPay getIncomeByPay(){
+		if(this.incomeByPay != null){
+			return this.incomeByPay;
+		}else{
+			return IncomeByPay.DUMMY;
+		}
+	}
+	
 	public int getOrderAmount() {
 		if(incomeByPay != null){
 			return incomeByPay.getOrderAmount();
@@ -56,125 +64,6 @@ public class ShiftDetail implements Jsonable{
 		this.incomeByPay = incomeByPay;
 	}
 	
-	public int getCashAmount() {
-		if(incomeByPay != null){
-			return incomeByPay.getCashAmount();
-		}else{
-			return 0;
-		}
-	}
-	
-	public float getCashTotalIncome() {
-		if(incomeByPay != null){
-			return incomeByPay.getCashIncome();
-		}else{
-			return 0;
-		}
-	}
-	
-	public float getCashActualIncome() {
-		if(incomeByPay != null){
-			return incomeByPay.getCashActual();
-		}else{
-			return 0;
-		}
-	}
-	
-	public int getCreditCardAmount() {
-		if(incomeByPay != null){
-			return incomeByPay.getCreditCardAmount();
-		}else{
-			return 0;
-		}
-	}
-	
-	public float getCreditTotalIncome() {
-		if(incomeByPay != null){
-			return incomeByPay.getCreditCardIncome();
-		}else{
-			return 0;
-		}
-	}
-	
-	public float getCreditActualIncome() {
-		if(incomeByPay != null){
-			return incomeByPay.getCreditCardActual();
-		}else{
-			return 0;
-		}
-	}
-	
-	public int getMemberCardAmount() {
-		if(incomeByPay != null){
-			return incomeByPay.getMemberCardAmount();
-		}else{
-			return 0;
-		}
-	}
-	
-	public float getMemberTotalIncome() {
-		if(incomeByPay != null){
-			return incomeByPay.getMemberCardIncome();
-		}else{
-			return 0;
-		}
-	}
-	
-	public float getMemberActualIncome() {
-		if(incomeByPay != null){
-			return incomeByPay.getMemberCardActual();
-		}else{
-			return 0;
-		}
-	}
-	
-	public int getSignAmount() {
-		if(incomeByPay != null){
-			return incomeByPay.getSignAmount();
-		}else{
-			return 0;
-		}
-	}
-	
-	public float getSignTotalIncome() {
-		if(incomeByPay != null){
-			return incomeByPay.getSignIncome();
-		}else{
-			return 0;
-		}
-	}
-	
-	public float getSignActualIncome() {
-		if(incomeByPay != null){
-			return incomeByPay.getSignActual();
-		}else{
-			return 0;
-		}
-	}
-	
-	public int getHangAmount() {
-		if(incomeByPay != null){
-			return incomeByPay.getHangAmount();
-		}else{
-			return 0;
-		}
-	}
-	
-	public float getHangTotalIncome() {
-		if(incomeByPay != null){
-			return incomeByPay.getHangIncome();
-		}else{
-			return 0;
-		}
-	}
-	
-	public float getHangActualIncome() {
-		if(incomeByPay != null){
-			return incomeByPay.getHangActual();
-		}else{
-			return 0;
-		}
-	}
 	
 	public float getTotalActual() {
 		if(incomeByPay != null){
@@ -387,20 +276,21 @@ public class ShiftDetail implements Jsonable{
 		jm.putFloat("totalIncome", this.getTotalIncome());
 		jm.putInt("orderAmount", this.getOrderAmount());
 		
-		jm.putFloat("cashIncome2", this.getCashActualIncome());
-		jm.putInt("cashAmount", this.getCashAmount());
-		
-		jm.putFloat("creditCardIncome2", this.getCreditActualIncome());
-		jm.putInt("creditCardAmount", this.getCreditCardAmount());
-		
-		jm.putFloat("hangIncome2", this.getHangActualIncome());
-		jm.putInt("hangAmount", this.getHangAmount());
-		
-		jm.putFloat("signIncome2", this.getSignActualIncome());
-		jm.putInt("signAmount", this.getSignAmount());
-		
-		jm.putInt("memberAmount", this.getMemberCardAmount());
-		jm.putFloat("memberActual", this.getMemberActualIncome());
+		//FIXME
+//		jm.putFloat("cashIncome2", this.getCashActualIncome());
+//		jm.putInt("cashAmount", this.getCashAmount());
+//		
+//		jm.putFloat("creditCardIncome2", this.getCreditActualIncome());
+//		jm.putInt("creditCardAmount", this.getCreditCardAmount());
+//		
+//		jm.putFloat("hangIncome2", this.getHangActualIncome());
+//		jm.putInt("hangAmount", this.getHangAmount());
+//		
+//		jm.putFloat("signIncome2", this.getSignActualIncome());
+//		jm.putInt("signAmount", this.getSignAmount());
+//		
+//		jm.putInt("memberAmount", this.getMemberCardAmount());
+//		jm.putFloat("memberActual", this.getMemberActualIncome());
 		
 		jm.putFloat("discountIncome", this.getDiscountIncome());
 		
@@ -423,11 +313,12 @@ public class ShiftDetail implements Jsonable{
 		jm.putInt("cancelAmount", this.getCancelAmount());
 		jm.putInt("giftAmount", this.getGiftAmount());
 		jm.putInt("discountAmount", this.getDiscountAmount());
-		jm.putFloat("signIncome", this.getSignTotalIncome());
-		jm.putFloat("hangIncome", this.getHangTotalIncome());
-		jm.putFloat("creditCardIncome", this.getCreditTotalIncome());
-		jm.putFloat("cashIncome", this.getCashTotalIncome());
-		jm.putFloat("memberIncome", this.getMemberTotalIncome());
+		//FIXME
+//		jm.putFloat("signIncome", this.getSignTotalIncome());
+//		jm.putFloat("hangIncome", this.getHangTotalIncome());
+//		jm.putFloat("creditCardIncome", this.getCreditTotalIncome());
+//		jm.putFloat("cashIncome", this.getCashTotalIncome());
+//		jm.putFloat("memberIncome", this.getMemberTotalIncome());
 		jm.putFloat("memberChargeByCash", this.getIncomeByCharge().getActualCashCharge());
 		jm.putFloat("memberChargeByCard", this.getIncomeByCharge().getActualCreditCardCharge());
 		jm.putFloat("memberAccountCharge", this.getIncomeByCharge().getTotalAccountCharge());
