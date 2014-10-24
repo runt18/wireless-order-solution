@@ -2,6 +2,7 @@ package com.wireless.test.db.regionMgr;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -14,6 +15,7 @@ import com.wireless.exception.TableError;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.SortedList;
 import com.wireless.test.db.TestInit;
 
 public class TestTableDao {
@@ -82,6 +84,41 @@ public class TestTableDao {
 					Assert.assertEquals("failed to delete the table", TableError.TABLE_NOT_EXIST, e.getErrCode());
 				}
 			}
+		}
+	}
+	
+	@Test
+	public void testBatchInsertDao() throws BusinessException, SQLException{
+		final int start = 10000;
+		final int end = 10010;
+		try{
+			Table.BatchInsertBuilder insertBuilder = new Table.BatchInsertBuilder(start, end, Region.RegionId.REGION_1);
+			TableDao.insert(mStaff, insertBuilder);
+			
+			List<Table> expected = SortedList.newInstance();
+			for(Table.InsertBuilder singleBuilder :insertBuilder.build()){
+				Table t = singleBuilder.build();
+				t.setRestaurantId(mStaff.getRestaurantId());
+				expected.add(t);
+			}
+			
+			List<Table> actual = SortedList.newInstance();
+			for(int i = start; i <= end; i++){
+				actual.add(TableDao.getByAlias(mStaff, i));
+			}
+			
+			Assert.assertEquals(expected, actual);
+		}finally{
+			for(int i = start; i <= end; i++){
+				TableDao.deleteByAliasId(mStaff, i);
+				try{
+					TableDao.getByAlias(mStaff, i);
+					Assert.assertTrue("failed to delete table[" + i + "]", false);
+				}catch(BusinessException e){
+					Assert.assertEquals("failed to delete table[" + i + "]", TableError.TABLE_NOT_EXIST, e.getErrCode());
+				}
+			}
+			
 		}
 	}
 }
