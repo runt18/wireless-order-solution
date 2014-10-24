@@ -22,6 +22,7 @@ import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
@@ -88,11 +89,11 @@ public class PayOrderAction extends Action{
 				settleType = Order.SettleType.NORMAL;
 			}
 			
-			Order.PayType payType;
+			PayType payType;
 			if(request.getParameter("payManner") != null){
-				payType = Order.PayType.valueOf(Integer.parseInt(request.getParameter("payManner")));
+				payType = new PayType(Integer.parseInt(request.getParameter("payManner")));
 			}else{
-				payType = Order.PayType.CASH;
+				payType = PayType.CASH;
 			}
 			
 			Member member = null;
@@ -114,7 +115,7 @@ public class PayOrderAction extends Action{
 			}
 			
 			//Get the cash income if the pay manner is "现金"
-			if(payType == Order.PayType.CASH){
+			if(payType.equals(PayType.CASH)){
 				payBuilder.setReceivedCash(Float.parseFloat(request.getParameter("cashIncome")));
 			}
 			

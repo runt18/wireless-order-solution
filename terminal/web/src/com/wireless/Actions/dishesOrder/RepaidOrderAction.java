@@ -17,7 +17,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.Order.PayType;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -63,7 +63,7 @@ public class RepaidOrderAction extends Action{
 			UpdateOrder.execById(staff, JObject.parse(Order.JSON_CREATOR, Order.ORDER_JSONABLE_4_COMMIT_UPDATE, request.getParameter("commitOrderData")));
 			
 			//get the pay manner to this order
-			Order.PayBuilder payBuilder = Order.PayBuilder.build(orderId, PayType.valueOf(Integer.parseInt(request.getParameter("payType"))));
+			Order.PayBuilder payBuilder = Order.PayBuilder.build(orderId, new PayType(Integer.parseInt(request.getParameter("payType"))));
 
 			//get the custom number to this order
 			payBuilder.setCustomNum(Integer.parseInt(request.getParameter("customNum")));

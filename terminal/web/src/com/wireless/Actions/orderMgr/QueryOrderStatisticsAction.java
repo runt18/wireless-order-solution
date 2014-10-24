@@ -18,8 +18,8 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.dishesOrder.OrderSummary;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
@@ -90,7 +90,7 @@ public class QueryOrderStatisticsAction extends Action {
 			}
 			if(comboPayType != null && !comboPayType.equals("-1")){
 				//按结帐方式
-				extraCond.setPayType(PayType.valueOf(Integer.parseInt(comboPayType)));
+				extraCond.setPayType(new PayType(Integer.parseInt(comboPayType)));
 			}
 			if(common != null && !common.isEmpty()){
 				extraCond.setComment(common);
@@ -120,8 +120,8 @@ public class QueryOrderStatisticsAction extends Action {
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			list = OrderDao.getPureOrder(staff, extraCond, orderClause);
-			totalList = OrderDao.getPureOrder(staff, extraCond, null);
+			list = OrderDao.getPureByCond(staff, extraCond, orderClause);
+			totalList = OrderDao.getPureByCond(staff, extraCond, null);
 			
 			OrderSummary summary = OrderDao.getOrderSummary(staff, extraCond, dateTypeEnmu);
 			

@@ -90,7 +90,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 			//活动时间
 			desc.append("活动时间：" + promotion.getDateRange().getOpeningFormat() + " 至 " + promotion.getDateRange().getEndingFormat()).append("\n");
 			//活动规则
-			String rule;
+			final String rule;
 			if(promotion.getRule() == Promotion.Rule.ONCE){
 				rule = "活动期内单次消费积分满" + promotion.getPoint() + "即可领取【" + promotion.getCouponType().getName() + "】";
 			}else if(promotion.getRule() == Promotion.Rule.TOTAL){
@@ -150,10 +150,25 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		}catch(SQLException e){
 			memberItem.setTitle("会员资料");
 		}
-		
 		memberItem.setUrl(createUrl(msg, WEIXIN_MEMBER));
 		memberItem.setPicUrl(WEIXIN_MEMBER_ICON);
 		naviItem.addItem(memberItem);
+
+		try{
+			int memberId = WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName());
+			System.out.println(memberId);
+			List<Coupon> coupons = CouponDao.getByCond(StaffDao.getAdminByRestaurant(restaurant.getId()), new CouponDao.ExtraCond().setMember(memberId).setPromotionType(Promotion.Type.WELCOME).setStatus(Coupon.Status.PUBLISHED), null);
+			if(!coupons.isEmpty()){
+				Data4Item welcome = new Data4Item();
+				welcome.setTitle("激活有礼");
+				welcome.setUrl(createUrl(msg, WEIXIN_COUPON) + "&e=" + coupons.get(0).getId());
+				welcome.setPicUrl(WEIXIN_FOOD_ICON);
+				naviItem.addItem(welcome);
+			}
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+		}
+		
 		
 		Data4Item intrcItem = new Data4Item();
 		intrcItem.setTitle("餐厅简介");
@@ -216,7 +231,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					session.callback(createNavi(msg));
 					
 				}else if(msg.getEventKey().equals(PROMOTION_EVENT_KEY)){
-					//优惠活动
+					//最新优惠
 					int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 					try{
 						WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName());

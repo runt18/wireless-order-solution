@@ -21,6 +21,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -74,7 +75,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 				throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 			}
 			membersByType.set(0, MemberDao.getById(staff, membersByType.get(0).getId()));
-			Order.PayBuilder payBuilder = Order.PayBuilder.build4Member(Integer.valueOf(orderID), membersByType.get(0), Order.PayType.CASH);
+			Order.PayBuilder payBuilder = Order.PayBuilder.build4Member(Integer.valueOf(orderID), membersByType.get(0), PayType.CASH);
 			
 			if(discountId != null && !discountId.trim().isEmpty()){
 				payBuilder.setDiscountId(Integer.valueOf(discountId));

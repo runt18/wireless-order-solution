@@ -3289,7 +3289,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		list = OrderDao.getPureOrder(staff, extraCond, orderClause);
+		list = OrderDao.getPureByCond(staff, extraCond, orderClause);
 		
 		String title = "历史账单";
 		

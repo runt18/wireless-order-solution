@@ -161,7 +161,9 @@ public class OperateMemberTypeAction extends DispatchAction{
 				}
 				
 				update.setDefaultPrice(new PricePlan(Integer.parseInt(pricePlanId)));
-			}	
+			}else{
+				update.setEmptyPrice();
+			}
 			
 			MemberTypeDao.update(staff, update);
 			jobject.initTip(true, "操作成功, 已修改会员类型信息.");
