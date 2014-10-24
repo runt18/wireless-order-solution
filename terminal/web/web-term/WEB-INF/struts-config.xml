@@ -35,9 +35,6 @@
 		<action path="/QueryMenu" type="com.wireless.Actions.dishesOrder.QueryMenuAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/CancelOrder"
-			type="com.wireless.Actions.tableSelect.CancelOrderAction" scope="request">
-		</action>
 		<action path="/InsertOrder"
 			type="com.wireless.Actions.dishesOrder.InsertOrderAction" scope="request">
 		</action>
