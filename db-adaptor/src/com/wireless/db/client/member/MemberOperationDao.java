@@ -17,7 +17,7 @@ import com.wireless.exception.MemberError;
 import com.wireless.pojo.client.MOSummary;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
-import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
@@ -55,7 +55,7 @@ public class MemberOperationDao {
 			  Params.dbName + ".member_operation " +
 			  "(" +
 			  " restaurant_id, staff_id, staff_name, member_id, member_card, member_name, member_mobile," +
-			  " operate_seq, operate_date, operate_type, pay_type, pay_money, order_id, charge_type, charge_money, " +
+			  " operate_seq, operate_date, operate_type, pay_type_id, pay_money, order_id, charge_type, charge_money, " +
 			  " coupon_id, coupon_money, coupon_name, " +
 			  " delta_base_money, delta_extra_money, delta_point, "	+
 			  " remaining_base_money, remaining_extra_money, remaining_point, comment "	+
@@ -71,7 +71,7 @@ public class MemberOperationDao {
 		      "'" + mo.getOperateSeq() + "'," +
 		      "'" + DateUtil.format(mo.getOperateDate()) + "'," + 
 		      mo.getOperationType().getValue() + "," + 
-		      (mo.getOperationType() == OperationType.CONSUME ? mo.getPayType().getVal() : "NULL") + "," +
+		      (mo.getOperationType() == OperationType.CONSUME ? mo.getPayType().getId() : "NULL") + "," +
 		      (mo.getOperationType() == OperationType.CONSUME ? mo.getPayMoney() : "NULL") + "," + 
 		      (mo.getOperationType() == OperationType.CONSUME ? mo.getOrderId() : "NULL") + "," +
 		      (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : (mo.getOperationType() == OperationType.REFUND ? mo.getChargeType().getValue() : "NULL")) + "," + 
@@ -168,13 +168,15 @@ public class MemberOperationDao {
 		sql = " SELECT " +
 			  " MO.id, MO.restaurant_id, MO.staff_id, MO.staff_name, " +
 			  " MO.member_id, MO.member_card, MO.member_name, MO.member_mobile, " +
-			  " MO.operate_seq, MO.operate_date, MO.operate_type, MO.pay_type, MO.pay_money, MO.order_id, MO.charge_type, MO.charge_money,"	+
+			  " MO.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, MO.pay_money, " +
+			  " MO.operate_seq, MO.operate_date, MO.operate_type, MO.order_id, MO.charge_type, MO.charge_money,"	+
 			  " MO.delta_base_money, MO.delta_extra_money, MO.delta_point, " +
 			  " MO.remaining_base_money, MO.remaining_extra_money, MO.remaining_point, MO.comment, " +
 			  " MO.coupon_id, MO.coupon_money, MO.coupon_name, " +
 			  " M.member_type_id " +
 			  " FROM " + Params.dbName + ".member_operation MO " +
 			  " JOIN " + Params.dbName + ".member M ON MO.member_id = M.member_id "	+
+			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = MO.pay_type_id " +
 			  " WHERE 1 = 1 " +
 			  " AND MO.restaurant_id = " + staff.getRestaurantId();
 		sql = SQLUtil.bindSQLParams(sql, params);
@@ -192,7 +194,9 @@ public class MemberOperationDao {
 			mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			mo.setOperationType(dbCon.rs.getShort("operate_type"));
 			if(mo.getOperationType() == OperationType.CONSUME){
-				mo.setPayType(Order.PayType.valueOf(dbCon.rs.getShort("pay_type")));
+				PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
+				payType.setName(dbCon.rs.getString("pay_type_name"));
+				mo.setPayType(payType);
 				mo.setPayMoney(dbCon.rs.getFloat("pay_money"));
 				mo.setOrderId(dbCon.rs.getInt("order_id"));
 			}
@@ -393,12 +397,14 @@ public class MemberOperationDao {
 		sql = " SELECT " +
 			  " MO.id, MO.restaurant_id, MO.staff_id, MO.staff_name, " +
 			  " MO.member_id, MO.member_card, MO.member_name, MO.member_mobile, " +
-			  " MO.operate_seq, MO.operate_date, MO.operate_type, MO.pay_type, MO.pay_money, MO.order_id, MO.charge_type, MO.charge_money," +
+			  " MO.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, MO.pay_money, " +
+			  " MO.operate_seq, MO.operate_date, MO.operate_type, MO.order_id, MO.charge_type, MO.charge_money," +
 			  " MO.delta_base_money, MO.delta_extra_money, MO.delta_point, " +
 			  " MO.remaining_base_money, MO.remaining_extra_money, MO.remaining_point, MO.comment, " +
 			  " MO.coupon_id, MO.coupon_money, MO.coupon_name " +
-			  " FROM member_operation_history MO " +
-			  " WHERE 1=1 " +
+			  " FROM member_operation_history MO " + 
+			  " JOIN pay_type PT ON MO.pay_type_id = PT.pay_type_id " +
+			  " WHERE 1 = 1 " +
 			  " AND MO.restaurant_id = " + staff.getRestaurantId();
 		sql = SQLUtil.bindSQLParams(sql, params);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -415,7 +421,9 @@ public class MemberOperationDao {
 			mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			mo.setOperationType(dbCon.rs.getShort("operate_type"));
 			if(mo.getOperationType() == OperationType.CONSUME){
-				mo.setPayType(Order.PayType.valueOf(dbCon.rs.getShort("pay_type")));
+				PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
+				payType.setName(dbCon.rs.getString("pay_type_name"));
+				mo.setPayType(payType);
 				mo.setPayMoney(dbCon.rs.getFloat("pay_money"));
 				mo.setOrderId(dbCon.rs.getInt("order_id"));
 			}

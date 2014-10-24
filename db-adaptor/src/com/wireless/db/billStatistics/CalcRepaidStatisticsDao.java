@@ -15,6 +15,7 @@ import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByEachDay;
 import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByStaff;
 import com.wireless.pojo.billStatistics.repaid.RepaidStatistics;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DateType;
@@ -100,16 +101,18 @@ public class CalcRepaidStatisticsDao {
 		List<RepaidStatistics> result = new ArrayList<RepaidStatistics>();
 		while(dbCon.rs.next()){
 			RepaidStatistics each = new RepaidStatistics();
-			Staff oStaff = new Staff();
 			each.setId(dbCon.rs.getInt("order_id"));
 			each.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			each.setActualPrice(dbCon.rs.getFloat("actual_price"));
 			each.setTotalPrice(dbCon.rs.getFloat("total_price"));
 			each.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
-			each.setPaymentType(dbCon.rs.getInt("pay_type"));
-			oStaff.setId(dbCon.rs.getInt("staff_id"));
-			oStaff.setName(dbCon.rs.getString("waiter"));
-			each.setStaff(oStaff);
+			PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
+			payType.setName(dbCon.rs.getString("pay_type_name"));
+			each.setPaymentType(payType);
+			Staff operator = new Staff();
+			operator.setId(dbCon.rs.getInt("staff_id"));
+			operator.setName(dbCon.rs.getString("waiter"));
+			each.setStaff(operator);
 			result.add(each);
 		}
 		dbCon.rs.close();
@@ -261,12 +264,12 @@ public class CalcRepaidStatisticsDao {
 	private static String makeSql4RepaidFood(Staff staff, DutyRange range, ExtraCond extraCond){
 		String sql;
 		sql = " SELECT " +
-			  " OF.dept_id, OF.staff_id, OF.waiter, OF.order_date, OF.order_id, O.repaid_price detail_repaid_price, O.total_price, O.actual_price, O.pay_type, " +
+			  " OF.dept_id, OF.staff_id, OF.waiter, OF.order_date, OF.order_id, O.repaid_price detail_repaid_price, O.total_price, O.actual_price, " + 
+			  " O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, " +
 			  " ABS(OF.order_count) AS repaid_amount, " +
 			  " ABS((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount) AS repaid_price " +
 			  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
-			  " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O " +
-			  " ON 1 = 1 " +
+			  " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " +
 			  " AND OF.order_id = O.id " +
 			  " AND O.restaurant_id = " + staff.getRestaurantId() +
 			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +

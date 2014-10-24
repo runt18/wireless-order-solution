@@ -26,6 +26,7 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.Discount.Type;
 import com.wireless.pojo.menuMgr.Food;
@@ -1177,7 +1178,7 @@ public class MemberDao {
 	 *			1 - the consume price exceeds total balance to this member account<br>
 	 *			2 - the member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(DBCon dbCon, Staff staff, int memberId, float consumePrice, Coupon coupon, Order.PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(DBCon dbCon, Staff staff, int memberId, float consumePrice, Coupon coupon, PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		Member member = getById(dbCon, staff, memberId);
 		
@@ -1222,7 +1223,7 @@ public class MemberDao {
 	 * @param coupon
 	 * 			the coupon to use, null means no coupon 
 	 * @param payType
-	 * 			the payment type referred to {@link Order.PayType}
+	 * 			the payment type referred to {@link PayType}
 	 * @param orderId
 	 * 			the associated order id to this consumption
 	 * @return the member operation to the consumption operation
@@ -1233,7 +1234,7 @@ public class MemberDao {
 	 *			<li>the consume price exceeds total balance to this member account<br>
 	 *			<li>the member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(Staff staff, int memberId, float consumePrice, Coupon coupon, Order.PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(Staff staff, int memberId, float consumePrice, Coupon coupon, PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		DBCon dbCon = new DBCon();
 		try{

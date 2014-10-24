@@ -25,7 +25,7 @@ import com.wireless.pojo.client.MemberComment;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.test.db.TestInit;
@@ -279,15 +279,15 @@ public class TestMemberDao {
 		expect.charge(100, 120, ChargeType.CASH);
 		
 		//使用会员卡余额消费
-		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, null,Order.PayType.MEMBER, 10);
-		expect.consume(50, null, Order.PayType.MEMBER);
+		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, null, PayType.MEMBER, 10);
+		expect.consume(50, null, PayType.MEMBER);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 		
 		//使用现金消费
-		mo = MemberDao.consume(mStaff, expect.getId(), 50, null, Order.PayType.CASH, 10);
-		expect.consume(50, null, Order.PayType.CASH);
+		mo = MemberDao.consume(mStaff, expect.getId(), 50, null, PayType.CASH, 10);
+		expect.consume(50, null, PayType.CASH);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));

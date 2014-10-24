@@ -12,8 +12,9 @@ import com.wireless.exception.FrontBusinessError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.dishesOrder.OrderSummary;
+import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Region;
@@ -171,7 +172,7 @@ public class OrderDao {
 				filterCond.append(" AND TIME(" + orderTbl + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
 			}
 			if(payType != null){
-				filterCond.append(" AND " + orderTbl + ".pay_type = " + payType.getVal());
+				filterCond.append(" AND " + orderTbl + ".pay_type_id = " + payType.getId());
 			}
 			if(comment != null){
 				filterCond.append(" AND " + orderTbl + ".comment LIKE '%" + comment + "%'");
@@ -433,11 +434,15 @@ public class OrderDao {
 	 */
 	public static List<Order> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 
-		List<Order> result = getPureOrder(dbCon, staff, extraCond.toString(), orderClause, extraCond.dateType);
+		List<Order> result = getPureByCond(dbCon, staff, extraCond, orderClause);
 		
 		for(Order eachOrder : result){
 			//Get the order foods to each order.
 			eachOrder.setOrderFoods(OrderFoodDao.getDetail(dbCon, staff, new OrderFoodDao.ExtraCond(extraCond.dateType).setOrderId(eachOrder.getId())));	
+			//Get the mixed payment detail.
+			if(eachOrder.getPaymentType().isMixed()){
+				eachOrder.setMixedPayment(MixedPaymentDao.get(dbCon, staff, new MixedPaymentDao.ExtraCond(extraCond.dateType, eachOrder)));
+			}
 		}
 		
 		return result;
@@ -459,16 +464,16 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static List<Order> getPureOrder(DBCon dbCon, Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException{
+	private static List<Order> getPureByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
-		if(dateType == DateType.TODAY){
+		if(extraCond.dateType == DateType.TODAY){
 			sql = " SELECT " +
 				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, O.staff_id, " +
 				  " T.minimum_cost, " +
 				  " O.waiter, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.member_operation_id, " +
-				  " O.settle_type, O.pay_type, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
+				  " O.settle_type, O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
 				  " O.discount_id, DIST.name AS discount_name, " +
 				  " O.price_plan_id, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.coupon_price, O.total_price, O.actual_price " +
@@ -476,23 +481,25 @@ public class OrderDao {
 				  Params.dbName + ".order O " +
 				  " LEFT JOIN " + Params.dbName + ".table T ON O.table_id = T.table_id " +
 				  " LEFT JOIN " + Params.dbName + ".discount DIST ON O.discount_id = DIST.discount_id " +
+				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
 				  " WHERE 1 = 1 " + 
 				  " AND O.restaurant_id = " + staff.getRestaurantId() + " " +
-				  (extraCond != null ? extraCond : "") + " " +
+				  (extraCond != null ? extraCond.toString() : "") + " " +
 				  (orderClause != null ? orderClause : "");
 			
-		}else if(dateType == DateType.HISTORY){
+		}else if(extraCond.dateType == DateType.HISTORY){
 			sql = " SELECT " +
 				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
 				  " OH.waiter, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
 				  " OH.member_operation_id, OH.coupon_price, " +
-				  " OH.settle_type, OH.pay_type, OH.category, OH.status, OH.service_rate, OH.comment, " +
+				  " OH.settle_type, OH.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, OH.category, OH.status, OH.service_rate, OH.comment, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + ".order_history OH " + 
+				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON OH.pay_type_id = OH.pay_type_id " +
 				  " WHERE 1 = 1 " + 
 				  " AND OH.restaurant_id = " + staff.getRestaurantId() + " " +
-				  (extraCond != null ? extraCond : "") + " " +
+				  (extraCond != null ? extraCond.toString() : "") + " " +
 				  (orderClause != null ? orderClause : "");
 		}else{
 			throw new IllegalArgumentException("The query type passed to query order is NOT valid.");
@@ -523,7 +530,7 @@ public class OrderDao {
 			}
 			table.setTableAlias(dbCon.rs.getInt("table_alias"));
 			table.setTableName(dbCon.rs.getString("table_name"));
-			if(dateType == DateType.TODAY){
+			if(extraCond.dateType == DateType.TODAY){
 				table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			}
 			order.setDestTbl(table);
@@ -533,7 +540,7 @@ public class OrderDao {
 			order.setCustomNum(dbCon.rs.getShort("custom_num"));
 			order.setCategory(dbCon.rs.getShort("category"));
 			
-			if(dateType == DateType.TODAY){
+			if(extraCond.dateType == DateType.TODAY){
 				if(dbCon.rs.getInt("discount_id") != 0){
 					Discount discount = new Discount(dbCon.rs.getInt("discount_id"));
 					discount.setName(dbCon.rs.getString("discount_name"));
@@ -547,7 +554,9 @@ public class OrderDao {
 				}
 			}
 			
-			order.setPaymentType(dbCon.rs.getShort("pay_type"));
+			PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
+			payType.setName(dbCon.rs.getString("pay_type_name"));
+			order.setPaymentType(payType);
 			order.setSettleType(dbCon.rs.getShort("settle_type"));
 			if(order.isSettledByMember()){
 				order.setMemberOperationId(dbCon.rs.getInt("member_operation_id"));
@@ -584,11 +593,11 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Order> getPureOrder(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+	public static List<Order> getPureByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getPureOrder(dbCon, staff, extraCond.toString(), orderClause, extraCond.dateType);
+			return getPureByCond(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -673,7 +682,89 @@ public class OrderDao {
 		}
 		
 	}
+
+	/**
+	 * Delete the order according to extra condition
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the order amount to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int deleteByCond(Staff staff, ExtraCond extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			int amount = deleteByCond(dbCon, staff, extraCond);
+			dbCon.conn.commit();
+			return amount;
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
+	/**
+	 * Delete the order according to extra condition
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the order amount to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+		int amount = 0;
+		for(Order order : getPureByCond(dbCon, staff, extraCond, null)){
+			String sql;
+
+			//Delete the records to normal taste group. 
+			sql = " DELETE FROM " + Params.dbName + ".normal_taste_group" +
+			      " WHERE " +
+				  " normal_taste_group_id IN (" +
+					  " SELECT normal_taste_group_id " +
+					  " FROM " + Params.dbName + ".order_food OF " +
+					  " JOIN " + Params.dbName + ".taste_group TG ON OF.taste_group_id = TG.taste_group_id " +
+					  " WHERE 1 = 1 " + 
+					  " AND OF.order_id = " + order.getId() +
+					  " AND TG.normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
+				  " ) ";
+			dbCon.stmt.executeUpdate(sql);
+			
+			//Delete the records to taste group.
+			sql = " DELETE FROM " + Params.dbName + ".taste_group " +
+			      " WHERE taste_group_id IN (" +
+					  " SELECT taste_group_id FROM " + Params.dbName + ".order_food " +
+				      " WHERE " + 
+					  " order_id = " + order.getId() +
+					  " AND " +
+					  " taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
+				  " ) ";
+			dbCon.stmt.executeUpdate(sql);
+			
+			//delete the records related to the order id and food id in "order_food" table
+			sql = " DELETE FROM `" + Params.dbName + "`.`order_food` WHERE order_id = " + order.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			//delete the corresponding order record in "order" table
+			sql = " DELETE FROM `" + Params.dbName + "`.`order` WHERE id = " + order.getId();
+			dbCon.stmt.executeUpdate(sql);
+
+			//Delete the associated mixed payment.
+			MixedPaymentDao.delete(dbCon, staff, order.getId());
+			
+			amount++;
+		}
+		return amount;
+	}
 
 	/**
 	 * Get the order id according to the specific unpaid table.
@@ -807,7 +898,7 @@ public class OrderDao {
 	private static ArchiveResult archive(DBCon dbCon, Staff staff, String paidOrder) throws SQLException{
 		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
 				"`cancel_price`, `discount_price`, `gift_price`, `coupon_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
-				"`waiter`, `settle_type`, `pay_type`, `category`, `member_operation_id`, `staff_id`, " +
+				"`waiter`, `settle_type`, `pay_type_id`, `category`, `member_operation_id`, `staff_id`, " +
 				"`region_id`, `region_name`, `table_alias`, `table_name`, `service_rate`, `comment`";
 		
 		String sql;

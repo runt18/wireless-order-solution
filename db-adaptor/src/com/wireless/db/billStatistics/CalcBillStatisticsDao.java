@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.orderMgr.PayTypeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
@@ -25,6 +26,7 @@ import com.wireless.pojo.billStatistics.IncomeByFood;
 import com.wireless.pojo.billStatistics.IncomeByGift;
 import com.wireless.pojo.billStatistics.IncomeByKitchen;
 import com.wireless.pojo.billStatistics.IncomeByPay;
+import com.wireless.pojo.billStatistics.IncomeByPay.PaymentIncome;
 import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.pojo.billStatistics.IncomeTrendByDept;
@@ -32,6 +34,7 @@ import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -196,48 +199,34 @@ public class CalcBillStatisticsDao {
 		//Get amount of paid order to each pay type during this period.
 		String sql;
 		sql = " SELECT " +
-			  " pay_type, COUNT(*) AS amount, ROUND(SUM(total_price), 2) AS total, ROUND(SUM(actual_price), 2) AS actual " +
-			  " FROM " +
-			  Params.dbName + "." + extraCond.orderTbl + " O " +
+			  " O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, " +
+			  " COUNT(*) AS amount, ROUND(SUM(O.total_price), 2) AS total, ROUND(SUM(O.actual_price), 2) AS actual " +
+			  " FROM " + Params.dbName + "." + extraCond.orderTbl + " O " +
+			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
 			  " WHERE 1 = 1 " +
 			  (extraCond != null ? extraCond.toString() : "") +
-			  " AND restaurant_id = " + staff.getRestaurantId() + 
-			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			  " AND (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
-			  " GROUP BY pay_type ";
+			  " AND O.restaurant_id = " + staff.getRestaurantId() + 
+			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			  " AND (O.status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
+			  " GROUP BY O.pay_type_id ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			int payType = dbCon.rs.getInt("pay_type");
+			PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
+			payType.setName(dbCon.rs.getString("pay_type_name"));
 			int amount = dbCon.rs.getInt("amount");
 			float total = dbCon.rs.getFloat("total");
 			float actual = dbCon.rs.getFloat("actual");
-			if(payType == Order.PayType.CASH.getVal()){
-				incomeByPay.setCashAmount(amount);
-				incomeByPay.setCashIncome(total);
-				incomeByPay.setCashActual(actual);
-				
-			}else if(payType == Order.PayType.CREDIT_CARD.getVal()){
-				incomeByPay.setCreditCardAmount(amount);
-				incomeByPay.setCreditCardIncome(total);
-				incomeByPay.setCreditCardActual(actual);
-				
-			}else if(payType == Order.PayType.MEMBER.getVal()){
-				incomeByPay.setMemeberCardAmount(amount);
-				incomeByPay.setMemberCardIncome(total);
-				incomeByPay.setMemberCardActual(actual);
-				
-			}else if(payType == Order.PayType.HANG.getVal()){
-				incomeByPay.setHangAmount(amount);
-				incomeByPay.setHangIncome(total);
-				incomeByPay.setHangActual(actual);
-				
-			}else if(payType == Order.PayType.SIGN.getVal()){
-				incomeByPay.setSignAmount(amount);
-				incomeByPay.setSignIncome(total);
-				incomeByPay.setSignActual(actual);
-			}			
+			incomeByPay.addPaymentIncome(new IncomeByPay.PaymentIncome(payType, amount, total, actual));
 		}
 		dbCon.rs.close();
+
+		//Append the designed and member payment type if NOT contained within the result.
+		for(PayType payType : PayTypeDao.getByCond(dbCon, staff, new PayTypeDao.ExtraCond().addType(PayType.Type.DESIGNED).addType(PayType.Type.MEMBER))){
+			PaymentIncome reserved = new PaymentIncome(payType, 0, 0, 0);
+			if(!incomeByPay.getPaymentIncomes().contains(reserved)){
+				incomeByPay.addPaymentIncome(reserved);
+			}
+		}
 		
 		return incomeByPay;
 	}

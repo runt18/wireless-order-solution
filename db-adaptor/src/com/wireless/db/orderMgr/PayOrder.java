@@ -17,6 +17,7 @@ import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.dishesOrder.MixedPayment;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -193,16 +194,29 @@ public class PayOrder {
 	 * @throws BusinessException
 	 * 			throws if one of cases below
 	 * 			<li>failed to calculate the order referred to {@link PayOrder#calcById}
-	 * 			<li>the consume price exceeds total balance to this member account in case of normal consumption.
-	 * 		    <li>perform the member repaid consumption.
+	 * 			<li>the consume price exceeds total balance to this member account in case of normal consumption
+	 * 		    <li>perform the member repaid consumption
+	 * 			<li>the sum of each payment NOT equals to the actual price in case of mixed payment
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
 	private static Order doPrepare(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws BusinessException, SQLException{
 		Order orderCalculated = calc(dbCon, staff, payBuilder);
 		
+		//Get the payment type.
+		orderCalculated.setPaymentType(PayTypeDao.getById(dbCon, staff, payBuilder.getPaymentType().getId()));
+
+		//Check to see whether the sum of each payment equals to actual price of the order.
+		if(orderCalculated.getPaymentType().isMixed()){
+			if(payBuilder.getMixedPayment().getPrice() == orderCalculated.getActualPrice()){
+				orderCalculated.setMixedPayment(payBuilder.getMixedPayment());
+			}else{
+				throw new BusinessException(FrontBusinessError.MIXED_PAYMENT_NOT_EQUALS_TO_ACTUAL);
+			}
+		}
+		
 		//Set the received cash if less than actual price.
-		if(orderCalculated.isPayByCash() && payBuilder.getReceivedCash() < orderCalculated.getActualPrice()){
+		if(orderCalculated.getPaymentType().isCash() && payBuilder.getReceivedCash() < orderCalculated.getActualPrice()){
 			orderCalculated.setReceivedCash(orderCalculated.getActualPrice());
 		}
 		
@@ -275,7 +289,7 @@ public class PayOrder {
 				  " ,total_price = " + orderCalculated.getTotalPrice() +  
 				  " ,actual_price = " + orderCalculated.getActualPrice() + 
 				  " ,custom_num = " + orderCalculated.getCustomNum() + 
-				  " ,pay_type = " + orderCalculated.getPaymentType().getVal() +  
+				  " ,pay_type_id = " + orderCalculated.getPaymentType().getId() +  
 				  " ,settle_type = " + orderCalculated.getSettleType().getVal() + 
 				  " ,discount_id = " + orderCalculated.getDiscount().getId() + 
 				  (orderCalculated.hasPricePlan() ? " ,price_plan_id = " + orderCalculated.getPricePlan().getId() : "") +
@@ -290,6 +304,11 @@ public class PayOrder {
 				
 			dbCon.stmt.executeUpdate(sql);			
 
+			//Insert the mixed payment detail.
+			if(orderCalculated.getPaymentType().isMixed()){
+				MixedPaymentDao.insert(dbCon, staff, new MixedPayment.InsertBuilder(orderCalculated).setPayments(orderCalculated.getMixedPayment().getPayments()));
+			}
+			
 			//Update each food's discount & unit price.
 			for(OrderFood of : orderCalculated.getOrderFoods()){
 				sql = " UPDATE " + Params.dbName + ".order_food " +
@@ -380,6 +399,7 @@ public class PayOrder {
 	 * 			<li>the erase price exceeds the quota 
 	 * 			<li>the order to this id does NOT exist
 	 * 			<li>the staff has no privilege to use the requested discount
+	 * 			<li>the payment type does NOT exist
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
@@ -467,19 +487,20 @@ public class PayOrder {
 		if(payBuilder.hasPricePlan()){
 			final List<PricePlan> result;
 			if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
-				//Get the price plan allowed by this member type and plan id.
+				//Get the price plan allowed by this member type and matched plan id.
 				result = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(payBuilder.getPricePlanId())
 																						  .setMemberType(MemberDao.getById(dbCon, staff, payBuilder.getMemberId()).getMemberType()));
-			}else{
-				//Get the price plan allowed by role to the staff perform payment.
-				result = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(payBuilder.getPricePlanId()).setRole(staff.getRole()));
+				if(result.isEmpty()){
+					throw new BusinessException(StaffError.PRICE_PLAN_NOT_ALLOW);
+				}else{
+					orderToCalc.setPricePlan(result.get(0));
+				}
 			}
-			
-			if(result.isEmpty()){
-				throw new BusinessException(StaffError.PRICE_PLAN_NOT_ALLOW);
-			}else{
-				orderToCalc.setPricePlan(result.get(0));
-			}
+//			else{
+//				//Get the price plan allowed by role to the staff perform payment.
+//				result = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(payBuilder.getPricePlanId()).setRole(staff.getRole()));
+//			}
+
 		}
 
 		float cancelPrice = 0;
@@ -561,7 +582,6 @@ public class PayOrder {
 		orderToCalc.setCustomNum(payBuilder.getCustomNum());
 		orderToCalc.setSettleType(payBuilder.getSettleType());
 		orderToCalc.setReceivedCash(payBuilder.getReceivedCash());
-		orderToCalc.setPaymentType(payBuilder.getPaymentType());
 		orderToCalc.setComment(payBuilder.getComment());
 	}
 	

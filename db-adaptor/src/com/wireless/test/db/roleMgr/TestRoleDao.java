@@ -105,7 +105,8 @@ public class TestRoleDao {
 													   .setName("经理")
 													   .addPrivilege(Privilege.Code.BASIC)
 													   .addPrivilege(Privilege.Code.CHECK_ORDER)
-													   .addDiscount(discounts.get(1));
+													   .addDiscount(discounts.get(1))
+													   .addPricePlan(pricePlans.get(0));
 			
 			RoleDao.update(mStaff, updateBuilder);
 			actual = RoleDao.getyById(mStaff, roleId);

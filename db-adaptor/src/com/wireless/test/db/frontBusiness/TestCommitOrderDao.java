@@ -10,15 +10,17 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.orderMgr.CancelOrder;
 import com.wireless.db.orderMgr.InsertOrder;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.orderMgr.PayOrder;
 import com.wireless.db.orderMgr.UpdateOrder;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.FrontBusinessError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
@@ -34,7 +36,7 @@ public class TestCommitOrderDao {
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getByRestaurant(37).get(0);
+			mStaff = StaffDao.getAdminByRestaurant(37);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -43,86 +45,127 @@ public class TestCommitOrderDao {
 	@Test
 	public void testCommitOrder() throws BusinessException, BusinessException, SQLException{
 		
-		Table tblToInsert = TableDao.getByCond(mStaff, null, null).get(0);
-		List<Food> foods = FoodDao.getPureByCond(mStaff, null, null);
+		int orderId = 0;
 		
-		//Cancel the order associated with table inserted if it exist before.
 		try{
-			CancelOrder.execByTable(mStaff, tblToInsert.getAliasId());
-		}catch(BusinessException e){
+			Table tblToInsert = TableDao.getByCond(mStaff, new TableDao.ExtraCond().setStatus(Table.Status.IDLE), null).get(0);
+			List<Food> foods = FoodDao.getPureByCond(mStaff, null, null);
 			
+			Order expectedOrder = new Order();
+			expectedOrder.setDestTbl(tblToInsert);
+			expectedOrder.setCustomNum(10);
+			expectedOrder.setCategory(Order.Category.NORMAL);
+			
+			OrderFood of;
+			of = new OrderFood(foods.get(0));
+			of.setCount(1.35f);
+			expectedOrder.addFood(of, mStaff);
+			
+			of = new OrderFood(foods.get(1));
+			of.setCount(2.35f);
+			expectedOrder.addFood(of, mStaff);
+			
+			//-----------Test to insert a new order---------------------------
+			orderId = InsertOrder.exec(mStaff, expectedOrder).getId();
+			
+			Order actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+			
+			compareOrder4Commit(expectedOrder, actualOrder);
+			
+			//-----------Test to update the order---------------------------
+			expectedOrder.removeAll(mStaff);
+			
+			of = new OrderFood(foods.get(1));
+			of.setCount(1.35f);
+			expectedOrder.addFood(of, mStaff);
+			
+			of = new OrderFood(foods.get(2));
+			of.setCount(2.35f);
+			expectedOrder.addFood(of, mStaff);
+			
+			UpdateOrder.execById(mStaff, expectedOrder);
+			
+			actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
+			
+			compareOrder4Commit(expectedOrder, actualOrder);
+			
+			//-----------Test to update the order---------------------------
+			expectedOrder.removeAll(mStaff);
+			
+			of = new OrderFood(foods.get(0));
+			of.setCount(1.35f);
+			expectedOrder.addFood(of, mStaff);
+			
+			of = new OrderFood(foods.get(1));
+			of.setCount(2.35f);
+			expectedOrder.addFood(of, mStaff);
+			
+			UpdateOrder.execById(mStaff, expectedOrder);
+			
+			actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
+			
+			compareOrder4Commit(expectedOrder, actualOrder);
+			
+			//-----------Test to pay the order---------------------------
+			Order.PayBuilder payBuilder = Order.PayBuilder.build(orderId, PayType.CASH);
+			PayOrder.pay(mStaff, payBuilder);
+			
+			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+			compare4Payment(payBuilder, expectedOrder, actualOrder);
+			
+			//-----------Test to re-pay the order using mixed payment---------------------------
+			float cash = actualOrder.getActualPrice() / 2;
+			float creditCard = actualOrder.getActualPrice() - cash;
+			payBuilder = Order.PayBuilder.build(orderId, PayType.MIXED).addPayment(PayType.CASH, cash).addPayment(PayType.CREDIT_CARD, creditCard);
+			PayOrder.pay(mStaff, payBuilder);
+			
+			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+			compare4MixedPayment(payBuilder, expectedOrder, actualOrder);
+			
+		}finally{
+			if(orderId != 0){
+				OrderDao.deleteByCond(mStaff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(orderId));
+				try{
+					//Check to see whether the order is deleted.
+					OrderDao.getById(mStaff, orderId, DateType.TODAY);
+					Assert.assertTrue("failed to delete order", false);
+				}catch(BusinessException e){
+					Assert.assertEquals("failed to delete the order", FrontBusinessError.ORDER_NOT_EXIST, e.getErrCode());
+				}
+			}
 		}
 		
-		Order expectedOrder = new Order();
-		expectedOrder.setDestTbl(tblToInsert);
-		expectedOrder.setCustomNum(10);
-		expectedOrder.setCategory(Order.Category.NORMAL);
-		
-		OrderFood of;
-		of = new OrderFood(foods.get(0));
-		of.setCount(1.35f);
-		expectedOrder.addFood(of, mStaff);
-		
-		of = new OrderFood(foods.get(1));
-		of.setCount(2.35f);
-		expectedOrder.addFood(of, mStaff);
-		
-		//---------------------------------------------------------------
-		//Insert a new order
-		Order actualOrder = InsertOrder.exec(mStaff, expectedOrder);
-		
-		actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
-		
-		compareOrder(expectedOrder, actualOrder);
-		
-		//---------------------------------------------------------------
-		//Update
-		expectedOrder.removeAll(mStaff);
-		
-		of = new OrderFood(foods.get(1));
-		of.setCount(1.35f);
-		expectedOrder.addFood(of, mStaff);
-		
-		of = new OrderFood(foods.get(2));
-		of.setCount(2.35f);
-		expectedOrder.addFood(of, mStaff);
-		
-		UpdateOrder.execById(mStaff, expectedOrder);
-		
-		actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
-		
-		compareOrder(expectedOrder, actualOrder);
-		
-		//---------------------------------------------------------------
-		//Update
-		expectedOrder.removeAll(mStaff);
-		
-		of = new OrderFood(foods.get(0));
-		of.setCount(1.35f);
-		expectedOrder.addFood(of, mStaff);
-		
-		of = new OrderFood(foods.get(1));
-		of.setCount(2.35f);
-		expectedOrder.addFood(of, mStaff);
-		
-		UpdateOrder.execById(mStaff, expectedOrder);
-		
-		actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
-		
-		compareOrder(expectedOrder, actualOrder);
-		
-		//------------------------------------------------------------------
-		//Cancel the order associated with table inserted after test.
-		CancelOrder.execByTable(mStaff, actualOrder.getDestTbl().getAliasId());
-		try{
-			OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
-			Assert.assertTrue("failed to cancel order", false);
-		}catch(BusinessException e){
-			
-		}
 	}
 	
-	private void compareOrder(Order expected, Order actual) throws BusinessException, SQLException{
+	private void compare4MixedPayment(Order.PayBuilder payBuilder, Order expected, Order actual){
+		//Check the associated table
+		Assert.assertEquals("the payment to order", payBuilder.getPaymentType(), actual.getPaymentType());
+		//Check the custom number
+		Assert.assertEquals("the custom number to order", payBuilder.getCustomNum(), actual.getCustomNum());
+		//Check the settle type
+		Assert.assertEquals("the settle to order", payBuilder.getSettleType(), actual.getSettleType());
+		//Check the total price
+		Assert.assertEquals("the total price to order", expected.calcTotalPrice(), actual.getTotalPrice(), 0.01);
+		//Check the order status
+		Assert.assertEquals("the status to order", Order.Status.REPAID, actual.getStatus());
+		//Check the mixed payment
+		Assert.assertEquals("the mixed payment to order", payBuilder.getMixedPayment(), actual.getMixedPayment());
+	}
+	
+	private void compare4Payment(Order.PayBuilder payBuilder, Order expected, Order actual){
+		//Check the associated table
+		Assert.assertEquals("the payment to order", payBuilder.getPaymentType(), actual.getPaymentType());
+		//Check the custom number
+		Assert.assertEquals("the custom number to order", payBuilder.getCustomNum(), actual.getCustomNum());
+		//Check the settle type
+		Assert.assertEquals("the settle to order", payBuilder.getSettleType(), actual.getSettleType());
+		//Check the total price
+		Assert.assertEquals("the total price to order", expected.calcTotalPrice(), actual.getTotalPrice(), 0.01);
+		//Check the order status
+		Assert.assertEquals("the status to order", Order.Status.PAID, actual.getStatus());
+	}
+	
+	private void compareOrder4Commit(Order expected, Order actual) throws BusinessException, SQLException{
 		
 		//Check the associated table
 		Assert.assertEquals("the table to order", expected.getDestTbl(), actual.getDestTbl());
@@ -134,13 +177,7 @@ public class TestCommitOrderDao {
 		Comparator<OrderFood> comp = new Comparator<OrderFood>(){
 			@Override
 			public int compare(OrderFood arg0, OrderFood arg1) {
-				if(arg0.getId() < arg1.getId()){
-					return -1;
-				}else if(arg0.getId() > arg1.getId()){
-					return 1;
-				}else{
-					return 0;
-				}
+				return arg0.asFood().compareTo(arg1.asFood());
 			}
 		};
 		List<OrderFood> expectedFoods = SortedList.newInstance(expected.getOrderFoods(), comp);

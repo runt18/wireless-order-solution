@@ -22,6 +22,7 @@ public class TableDao {
 		private int aliasId;
 		private String name;
 		private Region.RegionId regionId;
+		private Table.Status status;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -35,6 +36,11 @@ public class TableDao {
 		
 		public ExtraCond setName(String name){
 			this.name = name;
+			return this;
+		}
+		
+		public ExtraCond setStatus(Table.Status status){
+			this.status = status;
 			return this;
 		}
 		
@@ -62,6 +68,13 @@ public class TableDao {
 			}
 			if(regionId != null){
 				extraCond.append(" AND REGION.region_id = " + regionId.getId());
+			}
+			if(status != null){
+				if(status == Table.Status.BUSY){
+					extraCond.append(" AND O.status IS NOT NULL ");
+				}else if(status == Table.Status.IDLE){
+					extraCond.append(" AND O.status IS NULL ");
+				}
 			}
 			return extraCond.toString();
 		}
@@ -179,7 +192,8 @@ public class TableDao {
 		sql = " SELECT " +
 			  " REGION.name AS region_name, REGION.region_id, REGION.restaurant_id, " +
 			  " TBL.table_id, TBL.table_alias, TBL.name AS tbl_name, TBL.minimum_cost, " +
-			  " O.custom_num, O.category, IFNULL(O.status, -1) AS status " + 
+			  " O.custom_num, O.category, " + 
+			  " IF(O.status IS NULL, " + Table.Status.IDLE.getVal() + "," + Table.Status.BUSY.getVal() + ") AS tbl_status " + 
 			  " FROM " + Params.dbName + ".table TBL " +
 			  " LEFT JOIN " + Params.dbName + ".region REGION ON REGION.region_id = TBL.region_id AND REGION.restaurant_id = TBL.restaurant_id " +
 			  " LEFT JOIN ( SELECT * FROM " + Params.dbName + ".order WHERE restaurant_id = " + staff.getRestaurantId() + " AND status = " + Order.Status.UNPAID.getVal() + " GROUP BY table_id ) AS O ON O.table_id = TBL.table_id " + 
@@ -198,7 +212,7 @@ public class TableDao {
 			table.setRegion(region);
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			if(dbCon.rs.getInt("status") == Order.Status.UNPAID.getVal()){
+			if(dbCon.rs.getInt("tbl_status") == Table.Status.BUSY.getVal()){
 				table.setStatus(Table.Status.BUSY);
 				table.setCategory(Order.Category.valueOf(dbCon.rs.getInt("category")));
 				table.setCustomNum(dbCon.rs.getInt("custom_num"));

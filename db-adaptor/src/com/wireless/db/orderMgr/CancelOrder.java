@@ -10,7 +10,7 @@ import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 
-public class CancelOrder {
+class CancelOrder {
 	
 	/**
 	 * Cancel the unpaid order according the specific terminal and table.
