@@ -33,10 +33,21 @@ public class MixedPaymentDao {
 		}
 	}
 	
+	/**
+	 * Insert the mixed payment according to specific builder {@link MixedPayment#InsertBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the mixed payment builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
 	static void insert(DBCon dbCon, Staff staff, MixedPayment.InsertBuilder builder) throws SQLException{
 		MixedPayment mixedPayment = builder.build();
 		
-		delete(dbCon, staff, mixedPayment.getOrderId());
+		delete(dbCon, staff, new ExtraCond(DateType.TODAY, mixedPayment.getOrderId()));
 		
 		for(Entry<PayType, Float> entry : mixedPayment.getPayments().entrySet()){
 			String sql;
@@ -50,6 +61,17 @@ public class MixedPaymentDao {
 		}
 	}
 	
+	/**
+	 * Get the mixed payment according to extra condition {@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return 
+	 * @throws SQLException
+	 */
 	static MixedPayment get(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		
 		MixedPayment result = new MixedPayment();
@@ -71,10 +93,48 @@ public class MixedPaymentDao {
 		return result; 
 	}
 	
-	static int delete(DBCon dbCon, Staff staff, int orderId) throws SQLException{
+	/**
+	 * Delete the mixed payment to specific extra condition {@link ExtraCond}
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param orderId
+	 * 			
+	 * @return
+	 * @throws SQLException
+	 */
+	static int delete(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
-		sql = " DELETE FROM " + Params.dbName + ".mixed_payment WHERE order_id = " + orderId;
+		sql = " DELETE FROM " + Params.dbName + ".mixed_payment WHERE 1 = 1 " + (extraCond != null ? extraCond.toString() : "");
 		return dbCon.stmt.executeUpdate(sql);
+	}
+
+	public static class ArchiveResult{
+		private final int amount;
+		public ArchiveResult(int amount) {
+			this.amount = amount;
+		}
+		public int getAmount(){
+			return this.amount;
+		}
+		@Override
+		public String toString(){
+			return amount + " mixed payment record(s) are moved to history";
+		}
+	}
+	
+	public static ArchiveResult archive(DBCon dbCon, String paidOrder) throws SQLException{
+		final String item = "order_id, pay_type_id, price";
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".mixed_payment_history " +
+			  " ( " + item + " ) " +
+			  " SELECT order_id, pay_type_id, price FROM " + Params.dbName + ".mixed_payment WHERE order_id IN (" + paidOrder + ")";
+		dbCon.stmt.executeUpdate(sql);
+		
+		sql = " DELETE FROM " + Params.dbName + ".mixed_payment WHERE order_id IN (" + paidOrder + ")";
+		return new ArchiveResult(dbCon.stmt.executeUpdate(sql));
+		
 	}
 	
 }

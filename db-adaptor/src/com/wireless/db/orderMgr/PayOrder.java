@@ -100,7 +100,7 @@ public class PayOrder {
 					sql = " UPDATE " + Params.dbName + ".order_food " +
 						  " SET " +
 						  " discount = " + food.getDiscount() + ", " +
-						  " unit_price = " + food.asFood().getPrice() +
+						  " unit_price = " + food.getFoodPrice() +
 						  " WHERE order_id = " + orderCalculated.getId() + 
 						  " AND food_id = " + food.getFoodId();
 					dbCon.stmt.executeUpdate(sql);				
@@ -203,10 +203,6 @@ public class PayOrder {
 	private static Order doPrepare(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws BusinessException, SQLException{
 		Order orderCalculated = calc(dbCon, staff, payBuilder);
 		
-		//Get the payment type.
-		orderCalculated.setPaymentType(PayTypeDao.getById(dbCon, staff, payBuilder.getPaymentType().getId()));
-
-		//Check to see whether the sum of each payment equals to actual price of the order.
 		if(orderCalculated.getPaymentType().isMixed()){
 			if(payBuilder.getMixedPayment().getPrice() == orderCalculated.getActualPrice()){
 				orderCalculated.setMixedPayment(payBuilder.getMixedPayment());
@@ -418,9 +414,20 @@ public class PayOrder {
 		//Get all the details of order to be calculated.
 		Order orderToCalc = OrderDao.getById(staff, payBuilder.getOrderId(), DateType.TODAY);
 		
-		//Set the order calculate parameters.
-		setOrderCalcParams(orderToCalc, payBuilder);
-
+		//Set the erase price.
+		orderToCalc.setErasePrice(payBuilder.getErasePrice());
+		//Set the custom number.
+		orderToCalc.setCustomNum(payBuilder.getCustomNum());
+		//Set the settle type.
+		orderToCalc.setSettleType(payBuilder.getSettleType());
+		//Set the received cash.
+		orderToCalc.setReceivedCash(payBuilder.getReceivedCash());
+		//Set the comment.
+		orderToCalc.setComment(payBuilder.getComment());
+		
+		//Get the payment type.
+		orderToCalc.setPaymentType(PayTypeDao.getById(dbCon, staff, payBuilder.getPaymentType().getId()));
+		
 		//If the coupon is set, get the coupon price to this order.
 		if(payBuilder.hasCoupon()){
 			orderToCalc.setCouponPrice(CouponDao.getById(dbCon, staff, payBuilder.getCouponId()).getPrice());
@@ -575,14 +582,6 @@ public class PayOrder {
 			
 		
 		return orderToCalc;
-	}
-	
-	private static void setOrderCalcParams(Order orderToCalc, PayBuilder payBuilder){
-		orderToCalc.setErasePrice(payBuilder.getErasePrice());
-		orderToCalc.setCustomNum(payBuilder.getCustomNum());
-		orderToCalc.setSettleType(payBuilder.getSettleType());
-		orderToCalc.setReceivedCash(payBuilder.getReceivedCash());
-		orderToCalc.setComment(payBuilder.getComment());
 	}
 	
 }

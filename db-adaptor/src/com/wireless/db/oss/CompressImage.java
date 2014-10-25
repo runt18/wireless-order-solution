@@ -1,6 +1,5 @@
 package com.wireless.db.oss;
 
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -10,6 +9,7 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
+import com.wireless.pojo.oss.Dimension;
 import com.wireless.pojo.oss.OssImage;
 
 public class CompressImage {

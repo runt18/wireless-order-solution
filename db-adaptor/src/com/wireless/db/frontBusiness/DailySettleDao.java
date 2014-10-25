@@ -10,6 +10,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.orderMgr.MixedPaymentDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.orderMgr.TasteGroupDao;
@@ -50,6 +51,7 @@ public class DailySettleDao {
 		private OrderDao.ArchiveResult orderArchive;
 		private OrderFoodDao.ArchiveResult orderFoodArchive;
 		private TasteGroupDao.ArchiveResult tgArchive;
+		private MixedPaymentDao.ArchiveResult mixedArchive;
 		
 		Result(){
 			
@@ -86,6 +88,7 @@ public class DailySettleDao {
 
 			StringBuilder resultInfo = new StringBuilder();
 			resultInfo.append("info : " + orderArchive.getAmount() + " record(s) are moved from \"order\" to \"order_history\"").append(sep);
+			resultInfo.append("info : " + mixedArchive.getAmount() + " record(s) are moved from \"mixed_payment\" to \"mixed_payment_history\"").append(sep);
 			resultInfo.append("info : " + orderFoodArchive.getAmount() + " record(s) are moved from \"order_food\" to \"order_food_history\"").append(sep);
 			resultInfo.append("info : " + getTotalShift() + " record(s) are moved from \"shift\" to \"shift_history\"").append(sep);
 			resultInfo.append("info : " + 
@@ -151,12 +154,13 @@ public class DailySettleDao {
 		}
 		dbCon.rs.close();		
 		
-		int totalOrder = 0, totalOrderFood = 0, totalShift = 0, maxOrderId = 0, maxOrderFoodId = 0;
+		int totalOrder = 0, totalMixedPayment = 0, totalOrderFood = 0, totalShift = 0, maxOrderId = 0, maxOrderFoodId = 0;
 		int maxTgId = 0, maxNTgId = 0;
 		for(Staff staff : staffs){			
 			Result eachResult = exec(dbCon, staff, SettleType.AUTO_MATION);
 			
 			totalOrder += eachResult.orderArchive != null ? eachResult.orderArchive.getAmount() : 0;
+			totalMixedPayment += eachResult.mixedArchive.getAmount();
 			maxOrderId = eachResult.orderArchive != null ? eachResult.orderArchive.getMaxId() : 0; 
 			totalOrderFood += eachResult.orderFoodArchive != null ? eachResult.orderFoodArchive.getAmount() : 0;
 			maxOrderFoodId = eachResult.orderFoodArchive != null ? eachResult.orderFoodArchive.getMaxId() : 0;
@@ -169,6 +173,7 @@ public class DailySettleDao {
 		result.orderArchive = new OrderDao.ArchiveResult(maxOrderId, totalOrder);
 		result.orderFoodArchive = new OrderFoodDao.ArchiveResult(maxOrderFoodId, totalOrderFood);
 		result.tgArchive = new TasteGroupDao.ArchiveResult(0, 0, maxTgId, maxNTgId);
+		result.mixedArchive = new MixedPaymentDao.ArchiveResult(totalMixedPayment);
 		result.setTotalShift(totalShift);
 		result.setElapsedTime((int)(System.currentTimeMillis() - beginTime) / 1000);
 		
@@ -308,6 +313,8 @@ public class DailySettleDao {
 			OrderDao.Result orderResult = OrderDao.archive(dbCon, staff);
 			result.orderArchive = orderResult.getOrderArchive();
 			result.orderFoodArchive = orderResult.getOrderFoodArchive();
+			result.tgArchive = orderResult.getTgArchive();
+			result.mixedArchive = orderResult.getMixedArchive();
 			
 			//Archive the shift records.
 			ShiftDao.archive(dbCon, staff);

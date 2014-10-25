@@ -759,7 +759,7 @@ public class OrderDao {
 			dbCon.stmt.executeUpdate(sql);
 
 			//Delete the associated mixed payment.
-			MixedPaymentDao.delete(dbCon, staff, order.getId());
+			MixedPaymentDao.delete(dbCon, staff, new MixedPaymentDao.ExtraCond(DateType.TODAY, order.getId()));
 			
 			amount++;
 		}
@@ -811,21 +811,28 @@ public class OrderDao {
 		private final OrderDao.ArchiveResult orderArchive;
 		private final OrderFoodDao.ArchiveResult ofArchive;
 		private final TasteGroupDao.ArchiveResult tgArchive;
+		private final MixedPaymentDao.ArchiveResult mixedArchive;
 		
-		Result(OrderDao.ArchiveResult orderArchive, OrderFoodDao.ArchiveResult orderFoodArchive, TasteGroupDao.ArchiveResult tgArchive){
+		Result(OrderDao.ArchiveResult orderArchive, MixedPaymentDao.ArchiveResult mixedArchive, OrderFoodDao.ArchiveResult orderFoodArchive, TasteGroupDao.ArchiveResult tgArchive){
 			this.orderArchive = orderArchive;
+			this.mixedArchive = mixedArchive;
 			this.ofArchive = orderFoodArchive;
 			this.tgArchive = tgArchive;
 		}
 		
 		Result(){
 			orderArchive = new OrderDao.ArchiveResult(0, 0);
+			mixedArchive = new MixedPaymentDao.ArchiveResult(0);
 			ofArchive = new OrderFoodDao.ArchiveResult(0, 0);
 			tgArchive = new TasteGroupDao.ArchiveResult(0, 0, 0, 0);
 		}
 		
 		public OrderDao.ArchiveResult getOrderArchive(){
 			return this.orderArchive;
+		}
+
+		public MixedPaymentDao.ArchiveResult getMixedArchive(){
+			return this.mixedArchive;
 		}
 		
 		public OrderFoodDao.ArchiveResult getOrderFoodArchive(){
@@ -839,7 +846,6 @@ public class OrderDao {
 	
 	public static Result archive(DBCon dbCon, Staff staff) throws SQLException{
 		StringBuilder paidOrderCond = new StringBuilder();
-		
 		
 		String sql;
 		//Get the amount and id to paid orders
@@ -856,16 +862,19 @@ public class OrderDao {
 		if(paidOrderCond.length() > 0){
 			paidOrderCond.deleteCharAt(paidOrderCond.length() - 1);
 
-			//Archive the taste group
+			//Archive the taste group.
 			TasteGroupDao.ArchiveResult tgArchive = TasteGroupDao.archive(dbCon, staff, paidOrderCond.toString());
 			
-			//Archive the order food
+			//Archive the order food.
 			OrderFoodDao.ArchiveResult ofArchive = OrderFoodDao.archive(dbCon, staff, paidOrderCond.toString());
 
-			//Archive the order
+			//Archive the mixed payment.
+			MixedPaymentDao.ArchiveResult mixedArchive = MixedPaymentDao.archive(dbCon, paidOrderCond.toString());
+
+			//Archive the order.
 			OrderDao.ArchiveResult orderArchive = OrderDao.archive(dbCon, staff, paidOrderCond.toString());
 			
-			return new Result(orderArchive, ofArchive, tgArchive);
+			return new Result(orderArchive, mixedArchive, ofArchive, tgArchive);
 			
 		}else{
 			return new Result();

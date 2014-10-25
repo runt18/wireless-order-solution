@@ -1,6 +1,5 @@
 package com.wireless.test.db.oss;
 
-import java.awt.Dimension;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +16,7 @@ import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.OssImageError;
+import com.wireless.pojo.oss.Dimension;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
