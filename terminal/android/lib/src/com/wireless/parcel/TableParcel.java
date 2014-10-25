@@ -3,6 +3,7 @@ package com.wireless.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.NumericUtil;
 
@@ -32,8 +33,8 @@ public class TableParcel extends Table implements Parcelable {
 		this.setRestaurantId(in.readInt());
 		this.setTableId(in.readInt());
 		this.setTableAlias(in.readInt());
-		this.setCategory((short)in.readInt());
-		this.setStatus((short)in.readInt());
+		this.setCategory(Order.Category.valueOf(in.readInt()));
+		this.setStatus(Table.Status.valueOf(in.readInt()));
 		this.setCustomNum((short)in.readInt());
 		this.setTableName(in.readString());
 		this.getRegion().setRegionId((short)in.readInt());

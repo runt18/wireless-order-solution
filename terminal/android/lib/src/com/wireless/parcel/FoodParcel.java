@@ -32,7 +32,7 @@ public class FoodParcel implements Parcelable{
 			mSrcFood.setPinyin(in.readString());
 			mSrcFood.setPinyinShortcut(in.readString());
 			mSrcFood.setDesc(in.readString());
-			mSrcFood.setImage(in.readString());
+			mSrcFood.setImage(OssImageParcel.CREATOR.createFromParcel(in).asImage());
 			
 			//un-marshal the most popular taste references
 			List<TasteParcel> popTasteParcels = in.createTypedArrayList(TasteParcel.CREATOR);
@@ -94,7 +94,7 @@ public class FoodParcel implements Parcelable{
 			dest.writeString(mSrcFood.getPinyin());
 			dest.writeString(mSrcFood.getPinyinShortcut());
 			dest.writeString(mSrcFood.getDesc());
-			dest.writeString(mSrcFood.getImage());
+			new OssImageParcel(mSrcFood.getImage()).writeToParcel(dest, flags);
 			
 			//marshal the most popular taste references
 			List<TasteParcel> popTasteParcels = new ArrayList<TasteParcel>(mSrcFood.getPopTastes().size());
