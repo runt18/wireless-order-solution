@@ -27,6 +27,7 @@ import com.wireless.pack.Type;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.view.BillFoodListView;
@@ -195,10 +196,10 @@ public class TableDetailActivity extends Activity {
 		mOrderToPay.setSettleType(Order.SettleType.NORMAL);
 
 		// 根据付款方式显示"现金"或"刷卡"
-		if (mOrderToPay.isPayByCash()) {
+		if (mOrderToPay.getPaymentType().isCash()) {
 			((RadioButton) view.findViewById(R.id.radioButton_cash_payBill)).setChecked(true);
 
-		} else if (mOrderToPay.isPayByCreditCard()) {
+		} else if (mOrderToPay.getPaymentType().isCreditCard()) {
 			((RadioButton) view.findViewById(R.id.radioButton_creditCard_payBill)).setChecked(true);
 
 		}
@@ -210,9 +211,9 @@ public class TableDetailActivity extends Activity {
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 
 				if (checkedId == R.id.radioButton_cash_payBill) {
-					mOrderToPay.setPaymentType(Order.PayType.CASH);
+					mOrderToPay.setPaymentType(PayType.CASH);
 				} else {
-					mOrderToPay.setPaymentType(Order.PayType.CREDIT_CARD);
+					mOrderToPay.setPaymentType(PayType.CREDIT_CARD);
 				}
 
 			}
