@@ -304,7 +304,7 @@ public class StartupActivity extends Activity {
 																		 		  Params.IMG_STORE_PATH + 
 																		 		  food.getImage()))));
 						
-						edit.putString(Integer.toString(food.getFoodId()), food.getImage());			
+						edit.putString(Integer.toString(food.getFoodId()), food.getImage().getImage());			
 						
 					}catch(IOException e){
 						Log.e("", e.getMessage());
