@@ -1,6 +1,5 @@
 package com.wireless.pojo.oss;
 
-import java.awt.Dimension;
 import java.io.InputStream;
 
 import com.wireless.json.JsonMap;

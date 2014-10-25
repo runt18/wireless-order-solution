@@ -75,7 +75,16 @@ public class IncomeByPay{
 	
 	public void addPaymentIncome(PaymentIncome paymentIncome){
 		if(paymentIncome != null){
-			paymentIncomes.add(paymentIncome);
+			int index = paymentIncomes.indexOf(paymentIncome);
+			if(index < 0){
+				paymentIncomes.add(paymentIncome);
+			}else{
+				PaymentIncome original = paymentIncomes.get(index);
+				paymentIncomes.set(index, new PaymentIncome(paymentIncome.payType, 
+														    original.amount + paymentIncome.amount, 
+														    original.total + paymentIncome.total, 
+														    original.actual + paymentIncome.actual));
+			}
 		}
 	}
 	
