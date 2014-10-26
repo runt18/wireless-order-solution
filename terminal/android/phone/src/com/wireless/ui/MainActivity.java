@@ -43,6 +43,7 @@ import android.widget.Toast;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
@@ -312,12 +313,12 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		if(mDialogType == DIALOG_INSERT_ORDER){
 			//Jump to order activity
 			Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-			intent.putExtra(OrderActivity.KEY_TABLE_ID, String.valueOf(selectedTable.getAliasId()));
+			intent.putExtra(OrderActivity.KEY_TABLE_ID, new TableParcel(selectedTable));
 			startActivity(intent);
 		}else if(mDialogType == DIALOG_BILL_ORDER){
 			//Jump to bill activity
 			Intent intent = new Intent(MainActivity.this, BillActivity.class);
-			intent.putExtra(BillActivity.KEY_TABLE_ID, String.valueOf(selectedTable.getAliasId()));
+			intent.putExtra(BillActivity.KEY_TABLE_ID, new TableParcel(selectedTable));
 			startActivity(intent);
 		}
 	}

@@ -24,19 +24,21 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.Type;
+import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.view.BillFoodListView;
 
 public class TableDetailActivity extends Activity {
 	
-	public static final String KEY_TABLE_ID = "TableAmount";
+	public static final String KEY_TABLE_ID = TableDetailActivity.class.getName() + ".TableKey";
 	
-	private int mTblAlias;
+	private Table mSelectedTable;
 	private Order mOrderToPay;
 	private Handler mHandler;
 	BillFoodListView mBillFoodListView;
@@ -49,7 +51,7 @@ public class TableDetailActivity extends Activity {
 		
 		mBillFoodListView = (BillFoodListView)findViewById(R.id.listView_food_bill);
 		
-		mTblAlias = getIntent().getIntExtra(KEY_TABLE_ID, -1);
+		mSelectedTable = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
 	
 		TextView titleTextView = (TextView) findViewById(R.id.toptitle);
 		titleTextView.setVisibility(View.VISIBLE);
@@ -103,7 +105,7 @@ public class TableDetailActivity extends Activity {
 			public void onClick(View v) {
 				//jump to change order activity with the activity_table alias id if the activity_table is busy
 				Intent intent = new Intent(TableDetailActivity.this, OrderActivity.class);
-				intent.putExtra(OrderActivity.KEY_TABLE_ID, String.valueOf(mTblAlias));
+				intent.putExtra(OrderActivity.KEY_TABLE_ID, new TableParcel(mSelectedTable));
 				startActivity(intent);
 			}
 		});
@@ -112,7 +114,7 @@ public class TableDetailActivity extends Activity {
 	@Override
 	protected void onStart(){
 		super.onStart();
-		new QueryOrderTask(mTblAlias).execute();
+		new QueryOrderTask(mSelectedTable.getAliasId()).execute();
 	}
 	
 	/**
@@ -120,8 +122,7 @@ public class TableDetailActivity extends Activity {
 	 */
 	private static class DiscountHandler extends Handler{
 		private WeakReference<TableDetailActivity> mActivity;
-		DiscountHandler(TableDetailActivity activity)
-		{
+		DiscountHandler(TableDetailActivity activity){
 			mActivity = new WeakReference<TableDetailActivity>(activity);
 		}
 		@Override
@@ -134,7 +135,11 @@ public class TableDetailActivity extends Activity {
 			//set the actual price
 			((TextView) theActivity.findViewById(R.id.txtView_actualValue_bill)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(Math.round(theActivity.mOrderToPay.calcTotalPrice())));
 			//set the activity_table ID
-			((TextView) theActivity.findViewById(R.id.txtView_tableAlias_bill)).setText(String.valueOf(theActivity.mOrderToPay.getDestTbl().getAliasId()));
+			if(theActivity.mOrderToPay.getDestTbl().getName().length() != 0){
+				((TextView) theActivity.findViewById(R.id.txtView_tableName_bill)).setText(theActivity.mOrderToPay.getDestTbl().getName());
+			}else{
+				((TextView) theActivity.findViewById(R.id.txtView_tableName_bill)).setText(String.valueOf(theActivity.mOrderToPay.getDestTbl().getAliasId()) + "∫≈Ã®");
+			}
 			//set the amount of customer
 			((TextView) theActivity.findViewById(R.id.txtView_peopleValue_bill)).setText(String.valueOf(theActivity.mOrderToPay.getCustomNum()));
 		}

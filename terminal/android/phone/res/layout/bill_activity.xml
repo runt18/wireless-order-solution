@@ -16,27 +16,27 @@
         android:background="@drawable/bg02" >
 
         <TextView
-            android:id="@+id/platform"
+            android:id="@+id/txtView_tblName_bill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dip"
-            android:text="台号:"
+            android:text="餐台:"
             android:textColor="#000000"
             android:textSize="20sp" >
         </TextView>
 
         <TextView
-            android:id="@+id/txtView_tableAlias_bill"
+            android:id="@+id/txtView_tableName_bill"
             android:layout_width="90dip"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dip"
-            android:layout_toRightOf="@id/platform"
+            android:layout_toRightOf="@id/txtView_tblName_bill"
             android:background="#00000000"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:textColor="#000000"
+            android:textColor="@color/red"
             android:textSize="20sp" >
         </TextView>
 
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="110dip"
-            android:layout_toRightOf="@id/platform"
+            android:layout_toRightOf="@id/txtView_tblName_bill"
             android:text="人数:"
             android:textColor="#000000"
             android:textSize="20sp" >
@@ -127,9 +127,8 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="50dp"
             android:src="@drawable/change_order_selector" />
-
     </RelativeLayout>
-    
+
     <RelativeLayout
         android:id="@+id/relativeLayout_bottom_bill"
         android:layout_width="match_parent"

@@ -28,13 +28,14 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.view.BillFoodListView;
 
 public class BillActivity extends Activity {
 
-	public static final String KEY_TABLE_ID = "TableAmount";
-	
+	public static final String KEY_TABLE_ID = BillActivity.class.getName() + ".TableKey";
+
 	private Order mOrderToPay;
 
 	private Handler mHandler;
@@ -61,8 +62,11 @@ public class BillActivity extends Activity {
 			//set the actual price
 			((TextView)theActivity.findViewById(R.id.txtView_actualValue_bill)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(Math.round(theActivity.mOrderToPay.calcTotalPrice())));
 			//set the activity_table ID
-			((TextView)theActivity.findViewById(R.id.txtView_tableAlias_bill)).setText(String.valueOf(theActivity.mOrderToPay.getDestTbl().getAliasId()));
-			//set the amount of customer
+			if(theActivity.mOrderToPay.getDestTbl().getName().length() != 0){
+				((TextView) theActivity.findViewById(R.id.txtView_tableName_bill)).setText(theActivity.mOrderToPay.getDestTbl().getName());
+			}else{
+				((TextView) theActivity.findViewById(R.id.txtView_tableName_bill)).setText(String.valueOf(theActivity.mOrderToPay.getDestTbl().getAliasId()) + "∫≈Ã®");
+			}			//set the amount of customer
 			((TextView)theActivity.findViewById(R.id.txtView_peopleValue_bill)).setText(String.valueOf(theActivity.mOrderToPay.getCustomNum()));
 		}
 	};
@@ -74,7 +78,9 @@ public class BillActivity extends Activity {
 
 		mHandler = new BillHandler(this);
 		
-		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(KEY_TABLE_ID))).execute();
+		Table selectedTable = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
+		
+		new QueryOrderTask(selectedTable.getAliasId()).execute();
 
 		/**
 		 * "∑µªÿ"Button

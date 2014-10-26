@@ -888,7 +888,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			reqOrder.setId(mOriOrder.getId());
 			reqOrder.setOrderDate(mOriOrder.getOrderDate());
 			reqOrder.setCustomNum(customNum);
-			reqOrder.setDestTbl(new Table(tableAlias));
+			reqOrder.setDestTbl(new Table.AliasBuilder(tableAlias).build());
 			
 			//如果有新点菜，则添加进账单
 			if(!mNewFoodList.isEmpty()){
@@ -907,8 +907,16 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		}
 	}
 	
+	public Order buildRequestOrder(Table table, int customNum){
+		return buildRequestOrder(table.getAliasId(), customNum);
+	}
+	
 	public Order buildNewOrder(int tableAlias, int customNum){
 		return new Order(mNewFoodList, tableAlias, customNum);
+	}
+	
+	public Order buildNewOrder(Table table, int customNum){
+		return new Order(mNewFoodList, table.getAliasId(), customNum);
 	}
 	
 	public boolean hasOrderFood(){

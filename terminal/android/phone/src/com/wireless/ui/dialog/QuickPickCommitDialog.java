@@ -329,7 +329,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 		
 		InsertOrderForceTask(int tableAlias, PrintOption printOption) {
 			super(WirelessOrder.loginStaff, mReqOrder, Type.INSERT_ORDER_FORCE, printOption);
-			mReqOrder.setDestTbl(new Table(tableAlias));
+			mReqOrder.setDestTbl(new Table.AliasBuilder(tableAlias).build());
 		}
 		
 		InsertOrderForceTask(int tableAlias) {

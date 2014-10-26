@@ -22,12 +22,14 @@ import com.wireless.exception.FrontBusinessError;
 import com.wireless.fragment.OrderFoodFragment;
 import com.wireless.fragment.OrderFoodFragment.OnOrderChangedListener;
 import com.wireless.pack.Type;
+import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.regionMgr.Table;
 
 public class OrderActivity extends FragmentActivity implements OnOrderChangedListener{
 	
-	public static final String KEY_TABLE_ID = "TableAmount";
+	public static final String KEY_TABLE_ID = OrderActivity.class.getName() + ".tableKey";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +55,14 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		});
 		
 		//set the table No
-		final EditText tblNoEditTxt = ((EditText)findViewById(R.id.editText_orderActivity_tableNum));
-		tblNoEditTxt.setText((getIntent().getExtras().getString(KEY_TABLE_ID)));
+		final TextView txtViewTblName = ((TextView)findViewById(R.id.txtView_orderActivity_tableName));
+		final Table selectedTable = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
+		if(selectedTable.getName().length() != 0){
+			txtViewTblName.setText(selectedTable.getName());
+		}else{
+			txtViewTblName.setText(selectedTable.getAliasId() + "号台");
+		}
+		
 		//set the default customer to 1
 		((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText("1");
 		
@@ -75,7 +83,7 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		//Add OrderFoodFragment
 		FragmentTransaction fgTrans = getSupportFragmentManager().beginTransaction();
 		fgTrans.add(R.id.frameLayout_container_orderFood, 
-				    OrderFoodFragment.newInstance(Integer.valueOf(getIntent().getExtras().getString(KEY_TABLE_ID))),
+				    OrderFoodFragment.newInstance(selectedTable.getAliasId()),
 				    OrderFoodFragment.TAG).commit();
 		
 	}
@@ -83,39 +91,31 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 	private void commit(boolean forceInsert){
 		OrderFoodFragment ofFgm = (OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG);
 		//下单逻辑
-		String tableIdString = ((EditText)findViewById(R.id.editText_orderActivity_tableNum)).getText().toString();
+		TableParcel table = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
 		
-		//如果餐台非空则继续，否则提示
-		if(tableIdString.trim().length() != 0){
-				
-			int tableAlias = Integer.parseInt(tableIdString);
-			
-			int customNum;
-			String custNumString = ((EditText)findViewById(R.id.editText_orderActivity_customerNum)).getText().toString();
-			//如果人数为空，则默认为1
-			if(custNumString.length() != 0){
-				customNum = Integer.parseInt(custNumString);
-			}else{
-				customNum = 1;
-			}
-			
-			if(forceInsert){
-				//强制下单
-				new CommitOrderTask(ofFgm.buildNewOrder(tableAlias, customNum), Type.INSERT_ORDER_FORCE).execute();
-			}else{
-				Order reqOrder = ofFgm.buildRequestOrder(tableAlias, customNum);
-				if(reqOrder.getId() != 0){
-					//改单
-					new CommitOrderTask(reqOrder, Type.UPDATE_ORDER).execute();
-				}else{
-					//下单
-					new CommitOrderTask(reqOrder, Type.INSERT_ORDER).execute();
-				}
-			}
-			
-		} else {
-			Toast.makeText(OrderActivity.this, "请输入正确的餐台号", Toast.LENGTH_SHORT).show();
+		int customNum;
+		String custNumString = ((EditText)findViewById(R.id.editText_orderActivity_customerNum)).getText().toString();
+		//如果人数为空，则默认为1
+		if(custNumString.length() != 0){
+			customNum = Integer.parseInt(custNumString);
+		}else{
+			customNum = 1;
 		}
+		
+		if(forceInsert){
+			//强制下单
+			new CommitOrderTask(ofFgm.buildNewOrder(table, customNum), Type.INSERT_ORDER_FORCE).execute();
+		}else{
+			Order reqOrder = ofFgm.buildRequestOrder(table, customNum);
+			if(reqOrder.getId() != 0){
+				//改单
+				new CommitOrderTask(reqOrder, Type.UPDATE_ORDER).execute();
+			}else{
+				//下单
+				new CommitOrderTask(reqOrder, Type.INSERT_ORDER).execute();
+			}
+		}
+			
 	}
 	
 	@Override
@@ -210,7 +210,11 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 	public void onOrderChanged(Order oriOrder, List<OrderFood> newFoodList) {
 		if(oriOrder != null){
 			//set the table ID
-			((EditText)findViewById(R.id.editText_orderActivity_tableNum)).setText(Integer.toString(oriOrder.getDestTbl().getAliasId()));
+			if(oriOrder.getDestTbl().getName().length() != 0){
+				((TextView)findViewById(R.id.txtView_orderActivity_tableName)).setText(oriOrder.getDestTbl().getName());
+			}else{
+				((TextView)findViewById(R.id.txtView_orderActivity_tableName)).setText(Integer.toString(oriOrder.getDestTbl().getAliasId()) + "号台");
+			}
 			//set the amount of customer
 			((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(oriOrder.getCustomNum()));	
 		}

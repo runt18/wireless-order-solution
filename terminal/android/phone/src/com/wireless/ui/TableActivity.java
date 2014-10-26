@@ -45,6 +45,8 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.lib.task.QueryTableStatusTask;
+import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.ui.dialog.AskTableDialog;
@@ -283,7 +285,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 				
 			final List<Map<String, ?>> contents = new ArrayList<Map<String, ?>>();
 			for(Table tbl : mFilterTable){
-				HashMap<String, Object> map = new HashMap<String, Object>();
+				Map<String, Object> map = new HashMap<String, Object>();
 				map.put(ITEM_THE_TABLE, tbl);
 				map.put(ITEM_TAG_ID, tbl.getAliasId());
 				map.put(ITEM_TAG_CUSTOM, tbl.getCustomNum());
@@ -348,7 +350,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 				public View getView(int position, View convertView, ViewGroup parent){
 					View view = super.getView(position, convertView, parent);
 					final Map<String, ?> map = contents.get(position);
-					view.setTag(map.get(ITEM_TAG_ID));
+					view.setTag(map.get(ITEM_THE_TABLE));
 					/*
 					 * set different activity_table state's name color with state 
 					 */
@@ -376,10 +378,8 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 					((ImageButton)view.findViewById(R.id.add_table)).setOnClickListener(new OnClickListener(){			
 						@Override
 						public void onClick(View v) {
-							final int tableAlias = (Integer)map.get(ITEM_TAG_ID);
-							
 							Intent intent = new Intent(theActivity, OrderActivity.class);
-							intent.putExtra(OrderActivity.KEY_TABLE_ID, String.valueOf(tableAlias));
+							intent.putExtra(OrderActivity.KEY_TABLE_ID, new TableParcel((Table)map.get(ITEM_THE_TABLE)));
 							theActivity.startActivity(intent);
 							
 						}
@@ -540,20 +540,42 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		mListView.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				final int tableAlias = (Integer)view.getTag();
-				new QueryTableStatusTask(tableAlias) {					
+				new QueryTableStatusTask(WirelessOrder.loginStaff, (Table)view.getTag()) {	
+					private ProgressDialog _progDialog;
+
 					@Override
-					void OnQueryTblStatus(Table.Status status) {
-						if(status == Table.Status.BUSY){
-							//Jump to TableDetailActivity in case of busy
+					protected void onPreExecute(){
+						_progDialog = ProgressDialog.show(TableActivity.this, "", "查询" + mTblToQuery.getAliasId() + "号餐台信息...请稍候", true);
+					}
+					
+					@Override
+					public void onSuccess(Table table){
+						if(table.getStatus() == Table.Status.BUSY){
+							//Jump to TableDetailActivity in case of busy.
 							Intent intent = new Intent(TableActivity.this, TableDetailActivity.class);
-							intent.putExtra(TableDetailActivity.KEY_TABLE_ID, tableAlias);
+							intent.putExtra(TableDetailActivity.KEY_TABLE_ID, new TableParcel(table));
 							startActivity(intent);
 						}else{
-							//Prompt user in case of idle
-							Toast.makeText(TableActivity.this, tableAlias + "号餐台当前是空闲状态", Toast.LENGTH_SHORT).show();
+							//Jump to this order activity in case of idle.
+							Intent intent = new Intent(TableActivity.this, OrderActivity.class);
+							intent.putExtra(OrderActivity.KEY_TABLE_ID, new TableParcel(table));
+							startActivity(intent);
 						}
-					}
+						_progDialog.dismiss();
+					};
+					
+					@Override
+					public void onFail(BusinessException e){
+						new AlertDialog.Builder(TableActivity.this).setTitle("提示")
+																   .setMessage(e.getMessage())
+																   .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+																	   public void onClick(DialogInterface dialog, int id) {
+																		   dialog.dismiss();
+																	   }
+																   }).show();
+						_progDialog.dismiss();
+					};
+					
 				}.execute();
 
 			}
@@ -810,52 +832,6 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 			Toast.makeText(getApplicationContext(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
 
 		}
-		
-	}
-	/**
-	 * 请求获得餐台的状态
-	 */
-	private abstract class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
-
-		private ProgressDialog _progDialog;
-
-		QueryTableStatusTask(int tableAlias){
-			super(WirelessOrder.loginStaff, tableAlias);
-		}
-		
-		@Override
-		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(TableActivity.this, "", "查询" + mTblToQuery.getAliasId() + "号餐台信息...请稍候", true);
-		}
-		
-		/**
-		 * 如果相应的操作不符合条件（比如要改单的餐台还未下单），
-		 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
-		 */
-		@Override
-		protected void onPostExecute(Table.Status tblStatus){
-			//make the progress dialog disappeared
-			_progDialog.dismiss();
-			/**
-			 * Prompt user message if any error occurred.
-			 * Otherwise perform the corresponding action.
-			 */
-			if(mErrMsg != null){
-				new AlertDialog.Builder(TableActivity.this)
-				.setTitle("提示")
-				.setMessage(mErrMsg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-					}
-				}).show();
-				
-			}else{			
-				OnQueryTblStatus(tblStatus);
-			}
-		}	
-		
-		abstract void OnQueryTblStatus(Table.Status status);
 		
 	}
 

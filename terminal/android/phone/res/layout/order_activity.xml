@@ -12,7 +12,7 @@
         layout="@layout/topbar" />
 
     <RelativeLayout
-        android:id="@+id/relativeLayout1_orderActivity"
+        android:id="@+id/relativeLayout_top_orderActivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -21,30 +21,28 @@
         android:descendantFocusability="afterDescendants" >
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/txtView_tablePrompt_orderActivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dip"
-            android:text="台号:"
+            android:text="餐台:"
             android:textColor="#000000"
             android:textSize="20sp" />
 
-        <EditText
-            android:id="@+id/editText_orderActivity_tableNum"
+        <TextView
+            android:id="@+id/txtView_orderActivity_tableName"
             android:layout_width="100dip"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
+            android:layout_marginTop="1dip"
             android:layout_marginLeft="5dip"
-            android:layout_toRightOf="@id/textView1"
-            android:background="@drawable/kuangbg"
-            android:digits="0123456789."
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:inputType="number"
+            android:layout_centerVertical="true"
+            android:layout_alignBottom="@+id/txtView_tablePrompt_orderActivity"
+            android:layout_toRightOf="@+id/txtView_tablePrompt_orderActivity"
             android:singleLine="true"
-            android:textColor="#000000"
-            android:textSize="20sp" />
+            android:textColor="@color/red"
+            android:textSize="20sp"
+            android:text="adfad" />
 
         <TextView
             android:id="@+id/textView2"
@@ -52,7 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="110dip"
-            android:layout_toRightOf="@id/textView1"
+            android:layout_toRightOf="@id/txtView_tablePrompt_orderActivity"
             android:text="人数:"
             android:textColor="#000000"
             android:textSize="20sp" />
@@ -79,6 +77,6 @@
         android:id="@+id/frameLayout_container_orderFood"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/relativeLayout1_orderActivity" />
+        android:layout_below="@+id/relativeLayout_top_orderActivity" />
 
 </RelativeLayout>
