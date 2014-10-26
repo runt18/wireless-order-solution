@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -100,7 +101,7 @@ public class PrintOrderAction extends Action{
 					tableID = Integer.parseInt(request.getParameter("tableID"));
 					dbCon.connect();
 					Table table = TableDao.getByAlias(dbCon, staff, tableID);
-					orderId = com.wireless.db.orderMgr.OrderDao.getOrderIdByUnPaidTable(dbCon, staff, table);
+					orderId = OrderDao.getByTableAlias(dbCon, staff, table.getAliasId()).getId();
 				}
 			}
 
