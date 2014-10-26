@@ -79,7 +79,7 @@ public class TransTblDao {
 
 		}else {
 
-			int orderId = OrderDao.getOrderIdByUnPaidTable(dbCon, staff, srcTbl);
+			int orderId = OrderDao.getByTableAlias(dbCon, staff, srcTbl.getAliasId()).getId();
 
 			try{
 				

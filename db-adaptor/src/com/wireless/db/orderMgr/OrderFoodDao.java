@@ -199,7 +199,7 @@ public class OrderFoodDao {
 	 *             throws if fail to execute the SQL statement
 	 */
 	public static List<OrderFood> getSingleDetailByTable(DBCon dbCon, Staff staff, Table tbl) throws BusinessException, SQLException {
-		int orderId = OrderDao.getOrderIdByUnPaidTable(dbCon, staff, tbl);
+		int orderId = OrderDao.getByTableAlias(dbCon, staff, tbl.getAliasId()).getId();
 		return getSingleDetail(dbCon, staff, new ExtraCond(DateType.TODAY).setOrderId(orderId), null);
 	}
 	

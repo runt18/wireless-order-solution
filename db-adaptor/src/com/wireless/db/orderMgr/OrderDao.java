@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -235,9 +234,7 @@ public class OrderDao {
 	}
 	
 	/**
-	 * Get the unpaid order detail information to the specific restaurant and table 
-	 * regardless of the merged status.
-	 * 
+	 * Get the unpaid order detail information to the specific restaurant and table. 
 	 * @param dbCon
 	 *            the database connection
 	 * @param staff
@@ -246,80 +243,27 @@ public class OrderDao {
 	 *            the table alias id to query
 	 * @return Order the order detail information
 	 * @throws BusinessException
-	 *             Throws if one of cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The table to query does NOT exist.<br>
-	 *             - The unpaid order to this table does NOT exist.
+	 *             throws if the un-paid order to this table does NOT exist 
 	 * @throws SQLException
-	 *             Throws if fail to execute any SQL statement.
+	 *             throws if fail to execute any SQL statement.
 	 */
 	public static Order getByTableAlias(DBCon dbCon, Staff staff, int tableAlias) throws BusinessException, SQLException {		
-		return getById(dbCon, staff, OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getByAlias(dbCon, staff, tableAlias)), DateType.TODAY);
-	}
+		List<Order> result = getByCond(dbCon, staff, new OrderDao.ExtraCond(DateType.TODAY).setTableAlias(tableAlias).addStatus(Order.Status.UNPAID), null);
+		if(result.isEmpty()){
+			throw new BusinessException(FrontBusinessError.ORDER_NOT_EXIST);
+		}else{
+			return result.get(0);
+		}	}
 	
 	/**
-	 * Get the unpaid order detail information to the specific restaurant and
-	 * table. If the table is merged, get its parent order, otherwise get the
-	 * order of its own.
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param tableAlias
-	 *            the table alias id to query
-	 * @return Order the order detail information
-	 * @throws BusinessException
-	 *             throws if one of cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The table to query does NOT exist.<br>
-	 *             - The unpaid order to this table does NOT exist.
-	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement
-	 */
-	public static Order getByTableAliasDync(Staff staff, int tableAlias) throws BusinessException, SQLException {		
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getByTableAliasDync(dbCon, staff, tableAlias);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the unpaid order detail information to the specific restaurant and
-	 * table. If the table is merged, get its parent order, otherwise get the
-	 * order of its own.
-	 * 
-	 * @param dbCon
-	 *            the database connection
+	 * Get the unpaid order detail information to the specific restaurant and table. 
 	 * @param staff
 	 *            the staff to perform this action
 	 * @param tableAlias
 	 *            the table alias id to query
 	 * @return Order the order detail information
 	 * @throws BusinessException
-	 *             Throws if one of cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The table to query does NOT exist.<br>
-	 *             - The unpaid order to this table does NOT exist.
-	 * @throws SQLException
-	 *             Throws if fail to execute any SQL statement.
-	 */
-	public static Order getByTableAliasDync(DBCon dbCon, Staff staff, int tableAlias) throws BusinessException, SQLException {
-		return getById(dbCon, staff, OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getByAlias(dbCon, staff, tableAlias)), DateType.TODAY);
-	}
-	
-	/**
-	 * Get the unpaid order detail information to the specific restaurant and table regardless of the merged status.
-	 * @param staff
-	 *            the staff to perform this action
-	 * @param tableAlias
-	 *            the table alias id to query
-	 * @return Order the order detail information
-	 * @throws BusinessException
-	 *             throws if one of cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The table to query does NOT exist.<br>
-	 *             - The unpaid order to this table does NOT exist.
+	 *             throws if the un-paid order to this table does NOT exist 
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement.
 	 */
@@ -766,47 +710,6 @@ public class OrderDao {
 		return amount;
 	}
 
-	/**
-	 * Get the order id according to the specific unpaid table.
-	 * @param dbCon 
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param table 
-	 * 			the table information containing the alias id and associated restaurant id
-	 * @return the unpaid order id to this table if exist
-	 * @throws BusinessException 
-	 * 			throws if either of cases below<br>
-	 * 			<li>the table to query is IDLE<br>
-	 * 			<li>the unpaid order to this table does NOT exist<br>
-	 * @throws SQLException 
-	 * 			throws if fail to execute any SQL statement
-	 */
-	public static int getOrderIdByUnPaidTable(DBCon dbCon, Staff staff, Table table) throws BusinessException, SQLException{
-		
-		String sql;
-		
-		//Get the order id associated with this table.
-		int orderId;
-		
-		sql = " SELECT " +
-			  " id " +
-			  " FROM " + Params.dbName + ".order " +
-			  " WHERE " +
-			  " table_alias = " + table.getAliasId() +
-			  " AND restaurant_id = " + staff.getRestaurantId() +
-			  " AND status = " + Order.Status.UNPAID.getVal();
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			orderId = dbCon.rs.getInt("id");
-		}else{
-			throw new BusinessException("The un-paid order id to table(alias_id = " + table.getAliasId() + ", restaurant_id = " + table.getRestaurantId() + ") does NOT exist.", FrontBusinessError.ORDER_NOT_EXIST);
-		}
-		dbCon.rs.close();
-		
-		return orderId;
-	}
-	
 	public static class Result{
 		private final OrderDao.ArchiveResult orderArchive;
 		private final OrderFoodDao.ArchiveResult ofArchive;
