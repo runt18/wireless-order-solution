@@ -172,7 +172,7 @@ class OrderHandler implements Runnable{
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_BY_TBL){
 					//handle query order request
 					Table tableToQuery = new Parcel(request.body).readParcel(Table.CREATOR);
-					response = new RespPackage(request.header, OrderDao.getByTableAliasDync(staff, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
+					response = new RespPackage(request.header, OrderDao.getByTableAlias(staff, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
 
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE_STATUS){
 					//handle query table status

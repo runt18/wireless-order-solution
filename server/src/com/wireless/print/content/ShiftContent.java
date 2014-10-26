@@ -99,7 +99,7 @@ public class ShiftContent extends ConcreteContent {
 			StringBuilder var3 = new StringBuilder();
 			var3.append(new Grid4ItemsContent(new String[]{ "²¿ÃÅ", "ÕÛ¿Û", "ÔùËÍ", "½ð¶î" }, pos4Item, mPrintType, mStyle).toString());
 			for(IncomeByDept deptIncome : mShiftDetail.getDeptIncome()){
-				var3.append("\r\n");
+				var3.append(SEP);
 				var3.append(new Grid4ItemsContent(
 						new String[]{ deptIncome.getDept().getName(), 
 									  Float.toString(deptIncome.getDiscount()),
