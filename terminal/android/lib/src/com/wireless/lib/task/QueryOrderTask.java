@@ -14,6 +14,7 @@ import com.wireless.pack.req.ReqQueryOrderByTable;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.FoodMenu;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
@@ -39,7 +40,7 @@ public abstract class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 		Order order = null;
 		try{
 			//根据tableID请求数据
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrderByTable(mStaff, mTblAlias));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrderByTable(mStaff, new Table.AliasBuilder(mTblAlias)));
 			if(resp.header.type == Type.ACK){
 				order = new Parcel(resp.body).readParcel(Order.CREATOR);
 				
