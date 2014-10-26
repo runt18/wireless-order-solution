@@ -14,6 +14,19 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	
 	public final static byte TABLE_PARCELABLE_COMPLEX = 0;
 	public final static byte TABLE_PARCELABLE_SIMPLE = 1;
+	public final static byte TABLE_PARCELABLE_4_QUERY = 2;
+	
+	public static class AliasBuilder{
+		private final int aliasId;
+		
+		public AliasBuilder(int aliasId){
+			this.aliasId = aliasId;
+		}
+		
+		public Table build(){
+			return new Table(this);
+		}
+	}
 	
 	public static class BatchInsertBuilder{
 		private final int start;
@@ -191,8 +204,12 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		
 	}
 	
-	public Table(int tableAlias){
-		this.tableAlias = tableAlias;
+	public Table(int id){
+		this.tableId = id;
+	}
+	
+	private Table(AliasBuilder builder){
+		setTableAlias(builder.aliasId);
 	}
 	
 	private Table(InsertBuilder builder){
@@ -337,6 +354,10 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		if(flag == TABLE_PARCELABLE_SIMPLE){
 			dest.writeShort(this.tableAlias);
 			
+		}else if(flag == TABLE_PARCELABLE_4_QUERY){
+			dest.writeShort(this.tableAlias);
+			dest.writeString(this.tableName);
+			
 		}else if(flag == TABLE_PARCELABLE_COMPLEX){
 			dest.writeShort(this.tableAlias);
 			dest.writeString(this.tableName);
@@ -353,6 +374,10 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		short flag = source.readByte();
 		if(flag == TABLE_PARCELABLE_SIMPLE){
 			this.tableAlias = source.readShort();
+			
+		}else if(flag == TABLE_PARCELABLE_4_QUERY){
+			this.tableAlias = source.readShort();
+			this.tableName = source.readString();
 			
 		}else if(flag == TABLE_PARCELABLE_COMPLEX){
 			this.tableAlias = source.readShort();
