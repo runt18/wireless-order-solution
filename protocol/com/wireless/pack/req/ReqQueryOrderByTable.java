@@ -6,25 +6,11 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqQueryOrderByTable extends RequestPackage {
-	/******************************************************
-	* Design the query order request looks like below
-	* <Header>
-	* mode : type : seq : reserved : pin[6] : len[2]
-	* mode - ORDER_BUSSINESS
-	* type - QUERY_ORDER
-	* seq - auto calculated and filled in
-	* reserved - 0x00
-	* pin[6] - auto calculated and filled in
-	* len[2] - 0x02, 0x00
-	* <Table>
-	* table[2]
-	* table[2] - 2-byte indicating the table id
-	*******************************************************/
-	public ReqQueryOrderByTable(Staff staff, int tableAlias){
+	public ReqQueryOrderByTable(Staff staff, Table.AliasBuilder builder){
 		super(staff);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_ORDER_BY_TBL;
-		fillBody(new Table(tableAlias), Table.TABLE_PARCELABLE_SIMPLE);
+		fillBody(builder.build(), Table.TABLE_PARCELABLE_SIMPLE);
 	} 
 
 }
