@@ -1717,6 +1717,18 @@ function resetbBasicOperation(_d){
 	
 	stockStatus.setValue(typeof(data.stockStatusValue) == 'undefined' ? 1 : data.stockStatusValue);
 	
+	
+	for (var i = 0; i < food_pricePlans.length; i++) {
+		var checkBoxId = 'chbForFoodAlias' + food_pricePlans[i].id,  numberfieldId = 'numBasicForPrice' + food_pricePlans[i].id;
+		if(Ext.getDom(checkBoxId).checked){
+			Ext.getDom(checkBoxId).checked = false;
+			Ext.getCmp(checkBoxId).fireEvent('check', Ext.getCmp(checkBoxId), false);
+			
+			Ext.getCmp(numberfieldId).setValue();
+			Ext.getCmp(numberfieldId).clearInvalid();
+		}
+	}
+	
 	foodName.focus(true, 100);
 	foodName.clearInvalid();
 	foodPinyin.clearInvalid();
@@ -2992,7 +3004,7 @@ var btnTaste = new Ext.ux.ImageButton({
 });
 
 var btnPricePlan = new Ext.ux.ImageButton({
-	imgPath : '',
+	imgPath : '../../images/btnAddPricePlan.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '价格方案',
@@ -3132,7 +3144,7 @@ function setButtonStateOne(s){
 
 
 
-
+//价格方案
 function pricePlanRenderer (){
 	return ''
 		   + '<a href="javascript:updatePricePlanHandler()">修改</a>'
@@ -3261,7 +3273,7 @@ function initPricePlanWin(){
 			text : '修改',
 			iconCls : 'btn_edit',
 			handler : function(){
-				updateCancelReasonHandler();
+				updatePricePlanHandler();
 			}
 		}, '-', {
 			text : '删除',
