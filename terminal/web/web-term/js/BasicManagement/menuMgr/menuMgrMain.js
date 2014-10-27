@@ -3510,10 +3510,10 @@ Ext.onReady(function() {
 			}, btnAddKitchen, { 
 				xtype:'tbtext', 
 				text : '&nbsp;&nbsp;&nbsp;&nbsp;' 
-			},btnAddDept, { 
+			},btnAddDept/*, { 
 				xtype:'tbtext', 
 				text : '&nbsp;&nbsp;&nbsp;&nbsp;' 
-			},btnPricePlan]
+			},btnPricePlan*/]
 		}),
 		keys : [{
 			key : Ext.EventObject.ENTER,
