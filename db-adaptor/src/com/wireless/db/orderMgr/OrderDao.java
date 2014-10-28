@@ -38,7 +38,7 @@ public class OrderDao {
 		private PayType payType;		//按付款类型
 		private String comment;			//按备注
 		private int staffId;			//按员工
-		private List<Order.Status> statusList = new ArrayList<Order.Status>();	//按状态状态
+		private final List<Order.Status> statusList = new ArrayList<Order.Status>();	//按状态状态
 		
 		private boolean isRepaid;		//是否有反结帐
 		private boolean isDiscount;		//是否有折扣

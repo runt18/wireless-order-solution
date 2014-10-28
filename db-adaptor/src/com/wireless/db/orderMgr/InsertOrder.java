@@ -215,15 +215,7 @@ public class InsertOrder {
 		 * Insert the detail records to 'order_food' table
 		 */
 		for(OrderFood foodToInsert : orderToInsert.getOrderFoods()){
-			
 			OrderFoodDao.insertExtra(dbCon, staff, new OrderFoodDao.ExtraBuilder(orderToInsert.getId(), foodToInsert));
-			
-			//FIXME Insert the temporary food to menu.
-//			if(foodToInsert.isTemp()){
-//				try{
-//					FoodDao.insert(dbCon, staff, new Food.InsertBuilder(foodToInsert.getName(), foodToInsert.getPrice(), foodToInsert.getKitchen()).setTemp(true));
-//				}catch(BusinessException ingored){}
-//			}
 		}
 	}
 }

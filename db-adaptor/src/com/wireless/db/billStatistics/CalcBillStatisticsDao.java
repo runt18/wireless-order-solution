@@ -199,10 +199,25 @@ public class CalcBillStatisticsDao {
 	 */
 	public static IncomeByPay calcIncomeByPayType(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{		
 		
-		IncomeByPay incomeByPay = new IncomeByPay();
+		IncomeByPay incomeByPay;
+		
+		String sql;
+		//Calculate the order amount.
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + extraCond.orderTbl + " O " + 
+			  " WHERE 1 = 1 " +
+			  (extraCond != null ? extraCond.toString() : "") +
+			  " AND O.restaurant_id = " + staff.getRestaurantId() +
+			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			  " AND (O.status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			incomeByPay = new IncomeByPay(dbCon.rs.getInt(1));
+		}else{
+			incomeByPay = new IncomeByPay(0);
+		}
+		dbCon.rs.close();
 		
 		//Calculate the single payment to each pay type.
-		String sql;
 		sql = " SELECT " +
 			  " O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, " +
 			  " COUNT(*) AS amount, ROUND(SUM(O.total_price), 2) AS total, ROUND(SUM(O.actual_price), 2) AS actual " +

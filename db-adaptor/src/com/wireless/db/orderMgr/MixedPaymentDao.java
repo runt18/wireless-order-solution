@@ -31,6 +31,15 @@ public class MixedPaymentDao {
 			}
 			this.orderId = orderId;
 		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(orderId != 0){
+				extraCond.append(" AND order_id = " + orderId);
+			}
+			return extraCond.toString();
+		}
 	}
 	
 	/**
@@ -106,7 +115,7 @@ public class MixedPaymentDao {
 	 */
 	static int delete(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
-		sql = " DELETE FROM " + Params.dbName + ".mixed_payment WHERE 1 = 1 " + (extraCond != null ? extraCond.toString() : "");
+		sql = " DELETE FROM " + Params.dbName + "." + extraCond.mixedPaymentTbl + " WHERE 1 = 1 " + (extraCond != null ? extraCond.toString() : "");
 		return dbCon.stmt.executeUpdate(sql);
 	}
 
