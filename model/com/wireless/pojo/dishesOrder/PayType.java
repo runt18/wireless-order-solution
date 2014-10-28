@@ -1,10 +1,12 @@
 package com.wireless.pojo.dishesOrder;
 
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 
 
-public class PayType implements Parcelable, Comparable<PayType>{
+public class PayType implements Parcelable, Comparable<PayType>, Jsonable{
 
 	private static class ReservedType extends PayType{
 		public ReservedType(int id, String name, Type type) {
@@ -252,6 +254,21 @@ public class PayType implements Parcelable, Comparable<PayType>{
 		}else{
 			return 0;
 		}
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putString("name", this.name);
+		jm.putInt("typeValue", this.getType().getVal());
+		
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 	
 }

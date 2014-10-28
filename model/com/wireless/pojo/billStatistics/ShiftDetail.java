@@ -313,12 +313,9 @@ public class ShiftDetail implements Jsonable{
 		jm.putInt("cancelAmount", this.getCancelAmount());
 		jm.putInt("giftAmount", this.getGiftAmount());
 		jm.putInt("discountAmount", this.getDiscountAmount());
-		//FIXME
-//		jm.putFloat("signIncome", this.getSignTotalIncome());
-//		jm.putFloat("hangIncome", this.getHangTotalIncome());
-//		jm.putFloat("creditCardIncome", this.getCreditTotalIncome());
-//		jm.putFloat("cashIncome", this.getCashTotalIncome());
-//		jm.putFloat("memberIncome", this.getMemberTotalIncome());
+		
+		jm.putJsonable(this.getIncomeByPay(), flag);
+		
 		jm.putFloat("memberChargeByCash", this.getIncomeByCharge().getActualCashCharge());
 		jm.putFloat("memberChargeByCard", this.getIncomeByCharge().getActualCreditCardCharge());
 		jm.putFloat("memberAccountCharge", this.getIncomeByCharge().getTotalAccountCharge());

@@ -9,6 +9,7 @@ public class Page{
 		TASTE("tasteMgr", "口味管理", "BasicManagement_Module/TasteManagement.html", "../../images/menuMgr.png"),
 		PRINT("printMgr", "打印方案", "BasicManagement_Module/PrintScheme.html", "../../images/printerMgr.png"),
 		CANCELREASON("cancelReason", "退菜原因", "", "../../images/cancelFoodReason.png"),
+		PAYTYPE("payTypeMgr", "付款方式", "", "../../images/payTypeMgr.png"),
 		REGION("regionMgr", "区域管理", "BasicManagement_Module/RegionManagement.html", "../../images/regionMgr.png");
 		
 		private String mgrId;

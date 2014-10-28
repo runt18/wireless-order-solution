@@ -3,16 +3,18 @@ package com.wireless.pojo.billStatistics;
 import java.util.Collections;
 import java.util.List;
 
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.util.SortedList;
 
 
-public class IncomeByPay{
+public class IncomeByPay implements Jsonable{
 	
 	public final static IncomeByPay DUMMY = new IncomeByPay(0);
 
-	public static class PaymentIncome implements Comparable<PaymentIncome>{
+	public static class PaymentIncome implements Comparable<PaymentIncome>, Jsonable{
 		private final PayType payType;
 		private final int amount;
 		private final float total;
@@ -44,6 +46,21 @@ public class IncomeByPay{
 		@Override
 		public int compareTo(PaymentIncome o) {
 			return payType.compareTo(o.payType);
+		}
+
+		@Override
+		public JsonMap toJsonMap(int flag) {
+			JsonMap jm = new JsonMap();
+			jm.putString("payType", this.payType.getName());
+			jm.putFloat("total", this.total);
+			jm.putFloat("actual", this.actual);
+			jm.putInt("amount", this.amount);
+			return jm;
+		}
+
+		@Override
+		public void fromJsonMap(JsonMap jsonMap, int flag) {
+			
 		}
 	}
 	
@@ -91,6 +108,18 @@ public class IncomeByPay{
 			total += eachIncome.total;
 		}
 		return NumericUtil.roundFloat(total);
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putJsonableList("paymentIncomes", this.paymentIncomes, flag);
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 
 }
