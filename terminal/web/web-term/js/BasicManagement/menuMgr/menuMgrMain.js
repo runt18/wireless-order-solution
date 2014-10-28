@@ -612,9 +612,11 @@ function foodOperation(type){
 	 	    			var numForAlias = Ext.getCmp(checkbox.relativePrice);
 						if(checked){
 							numForAlias.enable();
+							numForAlias.input_disabled = false;
 							numForAlias.focus(true, 100);
 						}else{
 							numForAlias.disable();
+							numForAlias.input_disabled = true;
 							numForAlias.clearInvalid();
 						}
 					},
@@ -622,7 +624,6 @@ function foodOperation(type){
 					focus : function(thiz){
 						var numForAlias = Ext.getCmp(thiz.relativePrice);
 						if(document.getElementById(thiz.id).checked){
-							
 							numForAlias.disable();
 						}else{
 							numForAlias.enable();
@@ -644,14 +645,23 @@ function foodOperation(type){
 	 	    	allowBlank : false,
 	 	    	maxValue : 99999.99,
 	 	    	minValue : 0.00,
-	 	    	width : 85,
+	 	    	width : 80,
 	 	    	disabled : true,
+	 	    	input_disabled : true,//防止tab键也可以focus已经disable的输入框
 	 	    	validator : function(v){
 	 	    		if(v >= 0.00 && v <= 99999.99){
 	 	    	    	return true;
 	 	    	    }else{
 	 	    	    	return '价格需在 0.00  至 99999.99 之间!';
 	 	    	    }
+	 	    	},
+	 	    	listeners : {
+	 	    		focus : function(thiz){
+	 	    			if(thiz.input_disabled){
+	 	    				thiz.setDisabled(true);
+	 	    				thiz.input_disabled = true;
+	 	    			}
+	 	    		}
 	 	    	}
 	 		}]		
 		});
@@ -691,6 +701,7 @@ function foodOperation(type){
 						document.getElementById('chbForFoodAlias' + jr.root[i].id).checked = true;
 						Ext.getCmp('numBasicForPrice' + jr.root[i].id).setValue(jr.root[i].price);	
 						Ext.getCmp('numBasicForPrice' + jr.root[i].id).enable();
+						Ext.getCmp('numBasicForPrice' + jr.root[i].id).input_disabled = false;
 					}
 				}
 			},
@@ -3458,48 +3469,14 @@ var food_pricePlans;
 Ext.onReady(function() {
 
 	initKitchenTreeForSreach();
-	
-	//menuMgrOnLoad();
-/*	Ext.Ajax.request({
-		url : "../../QueryMenu.do",
-		params : {
-			dataSource : 'kitchens',
-			restaurantID : restaurantID,
-			type : 3
-		},
-		success : function(response, options) {
-			var resultJSON = Ext.decode(response.responseText);
-			if (resultJSON.success == true) {
-				kitchenData = resultJSON.root;
-				for(var i = 0; i < kitchenData.length; i++){
-					kitchenTreeForSreach.getRootNode().appendChild(new Ext.tree.TreeNode({
-						text : kitchenData[i].name,
-						alias : kitchenData[i].alias,
-						leaf : true
-					}));
-				}
-			} else {
-				Ext.MessageBox.show({
-					msg : resultJSON.msg,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
-			}
-		},
-		failure : function(response, options) {
-			
-		}
-	});*/
 	initMenuGrid();
 	
 	new Ext.Panel({
 		renderTo : 'divMenu',
 		layout : 'fit',
-		//width : parseInt(Ext.getDom('divMenu').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divMenu').parentElement.style.height.replace(/px/g,'')),
 		items : [ {
 			layout : 'border',
-//			items : [kitchenTreeForSreach, menuGrid, displayInfoPanel]
 			items : [kitchenTreeForSreach, menuGrid]
 		} ],
 		tbar : new Ext.Toolbar({
@@ -3510,10 +3487,10 @@ Ext.onReady(function() {
 			}, btnAddKitchen, { 
 				xtype:'tbtext', 
 				text : '&nbsp;&nbsp;&nbsp;&nbsp;' 
-			},btnAddDept/*, { 
+			},btnAddDept, { 
 				xtype:'tbtext', 
 				text : '&nbsp;&nbsp;&nbsp;&nbsp;' 
-			},btnPricePlan*/]
+			},btnPricePlan]
 		}),
 		keys : [{
 			key : Ext.EventObject.ENTER,
@@ -3530,10 +3507,6 @@ Ext.onReady(function() {
 	
 	foodOperationWin.operation == mmObj.operation.select;
 	foodOperationWin.render(document.body);
-//	var foWinTab = Ext.getCmp('foodOperationWinTab');
-//	foWinTab.setActiveTab('tasteOperationTab');
-//	foWinTab.setActiveTab('materialOperationTab');
-//	foWinTab.setActiveTab('combinationOperationTab');
 	
 	deptWinShow();
 	
@@ -3547,5 +3520,6 @@ Ext.onReady(function() {
 	
 	//初始化操作价格方案控件
 	initPricePlanWin();
+	
 });
 showFloatOption(bar);
