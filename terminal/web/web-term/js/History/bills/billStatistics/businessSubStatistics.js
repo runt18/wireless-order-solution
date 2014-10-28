@@ -204,6 +204,14 @@ var businessSub_trModel = '<tr>'
 			+ '<td class="text_right">{3}</td>'
 			+ '<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 5, deptId : {4}, deptName : \'{5}\'})">查看详情</a></td>'
 			+ '</tr>';
+			
+var trPayIncomeModel = '<tr>'
+			+ '<th>{0}</th>'
+			+ '<td class="text_right">{1}</td>'
+			+ '<td class="text_right">{2}</td>'
+			+ '<td class="text_right">{3}</td>'
+			+ '</tr>';			
+			
 var businessSub_titleRegionName = '', businessSub_panelDrag = false;
 var businessSub_chartPanel, businessSub_generalPanelHeight, businessSub_chartPanelHeight, businessSub_highChart;
 var business_chartData;
@@ -307,32 +315,39 @@ Ext.onReady(function(){
 							);
 						}	
 					}
+					
+					var trPayTypeContent='<tr>'
+					  + '<th class="table_title text_center">收款方式</th>'
+					  + '<th class="table_title text_center">账单数</th>'
+					  + '<th class="table_title text_center">应收总额</th>'
+					  + '<th class="table_title text_center">实收总额</th>'
+					  + '</tr>';
 						
+					//输出付款方式集合
+					var totalCount = 0, totalShouldPay = 0, totalActual = 0, trPayIncomeData;
+					for(var i = 0; i < businessSub_business.paymentIncomes.length; i++){
+						var temp = businessSub_business.paymentIncomes[i];
+						totalCount += temp.amount;
+						totalShouldPay += temp.total;
+						totalActual += temp.actual;
+						
+						trPayTypeContent += (String.format(trPayIncomeModel, 
+								temp.payType, 
+								temp.amount, 
+								temp.total.toFixed(2), 
+								temp.actual.toFixed(2)
+							)
+						);
+						
+					}
+					//汇总
+					trPayTypeContent += (String.format(trPayIncomeModel, 
+						'总计', 
+						totalCount, 
+						totalShouldPay.toFixed(2), 
+						totalActual.toFixed(2)
+					));
 				
-					
-					Ext.getDom('businessSub_bssiCashAmount').innerHTML = businessSub_business.cashAmount;
-					Ext.getDom('businessSub_bssiCashIncome').innerHTML = businessSub_business.cashIncome.toFixed(2);
-					Ext.getDom('businessSub_bssiCashIncome2').innerHTML = businessSub_business.cashIncome2.toFixed(2);
-					
-					Ext.getDom('businessSub_bssiCreditCardAmount').innerHTML = businessSub_business.creditCardAmount;
-					Ext.getDom('businessSub_bssiCreditCardIncome').innerHTML = businessSub_business.creditCardIncome.toFixed(2);
-					Ext.getDom('businessSub_bssiCreditCardIncome2').innerHTML = businessSub_business.creditCardIncome2.toFixed(2);
-					
-					Ext.getDom('businessSub_bssiMemeberCardAmount').innerHTML = businessSub_business.memberAmount;
-					Ext.getDom('businessSub_bssiMemeberCardIncome').innerHTML = businessSub_business.memberIncome.toFixed(2);
-					Ext.getDom('businessSub_bssiMemeberCardIncome2').innerHTML = businessSub_business.memberActual.toFixed(2);
-					
-					Ext.getDom('businessSub_bssiSignAmount').innerHTML = businessSub_business.signAmount;
-					Ext.getDom('businessSub_bssiSignIncome').innerHTML = businessSub_business.signIncome.toFixed(2);
-					Ext.getDom('businessSub_bssiSignIncome2').innerHTML = businessSub_business.signIncome2.toFixed(2);
-					
-					Ext.getDom('businessSub_bssiHangAmount').innerHTML = businessSub_business.hangAmount;
-					Ext.getDom('businessSub_bssiHangIncome').innerHTML = businessSub_business.hangIncome.toFixed(2);
-					Ext.getDom('businessSub_bssiHangIncome2').innerHTML = businessSub_business.hangIncome2.toFixed(2);
-					//
-					Ext.getDom('businessSub_bssiSumAmount').innerHTML = businessSub_business.orderAmount;
-					Ext.getDom('businessSub_bssiSumIncome').innerHTML = businessSub_business.totalIncome.toFixed(2);
-					Ext.getDom('businessSub_bssiSumIncome2').innerHTML = businessSub_business.totalActual.toFixed(2);
 					
 					Ext.getDom('businessSub_bssiEraseAmount').innerHTML = businessSub_business.eraseAmount;
 					Ext.getDom('businessSub_bssiEraseIncome').innerHTML = businessSub_business.eraseIncome.toFixed(2);
@@ -365,8 +380,9 @@ Ext.onReady(function(){
 					Ext.getDom('bussiMemberRefund').innerHTML = businessSub_business.memberRefund.toFixed();
 					Ext.getDom('bussiMemberAccountRefund').innerHTML = businessSub_business.memberAccountRefund.toFixed(2);
 					
-					Ext.getDom('businessStatisticsDeptGeneral').innerHTML = trContent;
+					Ext.getDom('businessStatisticsSummary').innerHTML = trPayTypeContent;
 					
+					Ext.getDom('businessStatisticsDeptGeneral').innerHTML = trContent;
 					
 					businessSub_showChart({
 						jdata : jr,
@@ -428,7 +444,7 @@ Ext.onReady(function(){
 			region : 'west',
 			frame : true,
 			width : '50%',
-			contentEl : 'businessStatisticsSummary'
+			contentEl : 'divBusinessStatisticsSummary'
 		},{
 			region : 'center',
 			frame : true,
@@ -517,5 +533,7 @@ Ext.onReady(function(){
 	if(Ext.getCmp('businessSubStatisticsPanel').getHeight() - 440 > 250){
 		businessSub_chartPanel.expand();
 	}
+	
+//	Ext.getDom('divBusinessStatisticsSummary').parentNode.style.overflowY = 'auto';
 	
 });

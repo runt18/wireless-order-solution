@@ -30,6 +30,13 @@ Ext.onReady(function(){
 				+ '<td class="text_right">{2}</td>'
 				+ '<td class="text_right">{3}</td>'
 				+ '</tr>';
+				
+	var trPayIncomeModel = '<tr>'
+				+ '<th>{0}</th>'
+				+ '<td class="text_right">{1}</td>'
+				+ '<td class="text_right">{2}</td>'
+				+ '<td class="text_right">{3}</td>'
+				+ '</tr>';				
 	
 	var pelement = Ext.query('#businessStatisticsDIV')[0].parentElement;
 	var mw = parseInt(pelement.style.width);
@@ -83,7 +90,8 @@ Ext.onReady(function(){
 			region : 'west',
 			width : '50%',
 			frame : true,
-			contentEl : 'businessStatisticsSummaryInformation'
+			height : 800,
+			contentEl : 'divBusinessStatisticsSummaryInformation'
 		}, {
 			region : 'center',
 			frame : true,
@@ -207,30 +215,6 @@ Ext.onReady(function(){
 
 								Ext.getDom('bssiOrderAmount').innerHTML = business.orderAmount;
 								
-								Ext.getDom('bssiCashAmount').innerHTML = business.cashAmount;
-								Ext.getDom('bssiCashIncome').innerHTML = business.cashIncome.toFixed(2);
-								Ext.getDom('bssiCashIncome2').innerHTML = business.cashIncome2.toFixed(2);
-								
-								Ext.getDom('bssiCreditCardAmount').innerHTML = business.creditCardAmount;
-								Ext.getDom('bssiCreditCardIncome').innerHTML = business.creditCardIncome.toFixed(2);
-								Ext.getDom('bssiCreditCardIncome2').innerHTML = business.creditCardIncome2.toFixed(2);
-								
-								Ext.getDom('bssiMemeberCardAmount').innerHTML = business.memberAmount;
-								Ext.getDom('bssiMemeberCardIncome').innerHTML = business.memberIncome.toFixed(2);
-								Ext.getDom('bssiMemeberCardIncome2').innerHTML = business.memberActual.toFixed(2);
-								
-								Ext.getDom('bssiSignAmount').innerHTML = business.signAmount;
-								Ext.getDom('bssiSignIncome').innerHTML = business.signIncome.toFixed(2);
-								Ext.getDom('bssiSignIncome2').innerHTML = business.signIncome2.toFixed(2);
-								
-								Ext.getDom('bssiHangAmount').innerHTML = business.hangAmount;
-								Ext.getDom('bssiHangIncome').innerHTML = business.hangIncome.toFixed(2);
-								Ext.getDom('bssiHangIncome2').innerHTML = business.hangIncome2.toFixed(2);
-								//
-								Ext.getDom('bssiSumAmount').innerHTML = business.orderAmount;
-								Ext.getDom('bssiSumIncome').innerHTML = business.totalIncome.toFixed(2);
-								Ext.getDom('bssiSumIncome2').innerHTML = business.totalActual.toFixed(2);
-								
 								Ext.getDom('bssiEraseAmount').innerHTML = business.eraseAmount;
 								Ext.getDom('bssiEraseIncome').innerHTML = business.eraseIncome.toFixed(2);
 								
@@ -251,6 +235,40 @@ Ext.onReady(function(){
 								
 								Ext.getDom('bssiServiceAmount').innerHTML = business.serviceAmount;
 								Ext.getDom('bssiServiceIncome').innerHTML = business.serviceIncome.toFixed(2);
+								
+								
+								var trPayTypeContent='<tr>'
+								  + '<th class="table_title text_center">收款方式</th>'
+								  + '<th class="table_title text_center">账单数</th>'
+								  + '<th class="table_title text_center">应收总额</th>'
+								  + '<th class="table_title text_center">实收总额</th>'
+								  + '</tr>';								
+								//输出付款方式集合
+								var totalCount = 0, totalShouldPay = 0, totalActual = 0, trPayIncomeData;
+								for(var i = 0; i < business.paymentIncomes.length; i++){
+									var temp = business.paymentIncomes[i];
+									totalCount += temp.amount;
+									totalShouldPay += temp.total;
+									totalActual += temp.actual;
+									
+									trPayTypeContent += (String.format(trPayIncomeModel, 
+											temp.payType, 
+											temp.amount, 
+											temp.total.toFixed(2), 
+											temp.actual.toFixed(2)
+										)
+									);
+									
+								}
+								//汇总
+								trPayTypeContent += (String.format(trPayIncomeModel, 
+									'总计', 
+									totalCount, 
+									totalShouldPay.toFixed(2), 
+									totalActual.toFixed(2)
+								));
+								
+								Ext.getDom('businessStatisticsSummaryPayIncome').innerHTML = trPayTypeContent;
 								
 							}else{
 								Ext.ux.showMsg(jr);								
@@ -326,6 +344,9 @@ Ext.onReady(function(){
 			}
 		}
 	});
+	
+	
+	Ext.getDom('divBusinessStatisticsSummaryInformation').parentNode.style.overflowY = 'auto';
 
 });
 

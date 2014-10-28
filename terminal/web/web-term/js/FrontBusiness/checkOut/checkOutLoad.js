@@ -381,6 +381,140 @@ function fnRemberIsFastOrInput(type){
 	}	
 }
 
+
+function fnMixedPay(){
+	if(!mixedPayWin){
+		mixedPayWin = new Ext.Window({
+			title : '混合结账',
+			id : 'checkOut_mixedPay',
+			closable : false, //是否可关闭
+			resizable : false, //大小调整
+			modal : true,
+			width : 260,			
+			items : [{
+				id : 'mixedPayTypePanel',
+				layout : 'column',
+				frame : true,
+				border : true,
+			 	defaults : {
+			 		xtype : 'panel',
+			 		layout : 'form',
+			 		labelWidth : 90
+			 	},
+			 	items : []
+		 	}],
+			bbar : ['->',{
+				text : '结账',
+				id : 'btnPayInputRecipt',
+				iconCls : 'btn_save',
+				handler : function(e){
+					payTypeCash ='';
+					for (var i = 0; i < payTypeData.length; i++) {
+						var checked = document.getElementById('chbForPayType' + payTypeData[i].id).checked;
+						if(checked){
+							if(payTypeCash){
+								payTypeCash += '&';
+							}
+							payTypeCash += (payTypeData[i].id + ',' + Ext.getCmp('numForPayType'+payTypeData[i].id).getValue());  
+						}
+					}	
+					paySubmit(100);
+					mixedPayWin.hide();
+					
+				}				
+			},{
+				text : '关闭',
+				id : 'btnCloseInputReciptWin',
+				iconCls : 'btn_close',
+				handler : function(e){
+					mixedPayWin.hide();
+				}				
+			}],
+			keys : [{
+				 key : Ext.EventObject.ENTER,
+				 fn : function(){ 
+					 Ext.getCmp('btnPayInputRecipt').handler();
+				 },
+				 scope : this 
+			}],
+			listeners : {
+				beforeshow : function(){
+				
+				}
+			}
+		});
+	}
+
+	Ext.getCmp('mixedPayTypePanel').removeAll();
+	
+	for (var i = 0; i < payTypeData.length; i++) {
+		var checkBoxId = 'chbForPayType' + payTypeData[i].id,  numberfieldId = 'numForPayType' + payTypeData[i].id;
+		Ext.getCmp('mixedPayTypePanel').add({
+	 		columnWidth : .12,	
+	 	    items : [{
+	 	    	xtype : 'checkbox',
+	 	    	id : checkBoxId,
+	 	    	relativePrice : numberfieldId,
+	 	    	style : 'height: 20px;width: 20px;vertical-align: middle;',
+	 	    	hideLabel : true,
+	 	    	listeners : {
+	 	    		render : function(thiz){
+	 	    			thiz.getEl().dom.parentNode.style.paddingTop = '5px';
+	 	    		},
+	 	    		check : function(checkbox, checked){
+	 	    			var numForAlias = Ext.getCmp(checkbox.relativePrice);
+						if(checked){
+							numForAlias.enable();
+							numForAlias.focus(true, 100);
+						}else{
+							numForAlias.disable();
+							numForAlias.clearInvalid();
+						}
+					},
+					//解决第一次点击无效
+					focus : function(thiz){
+						var numForAlias = Ext.getCmp(thiz.relativePrice);
+						if(document.getElementById(thiz.id).checked){
+							
+							numForAlias.disable();
+						}else{
+							numForAlias.enable();
+							numForAlias.focus(true, 100);
+						}
+					}
+	 	    	}
+	 	    }]			 		
+	 	});				
+	 	
+		Ext.getCmp('mixedPayTypePanel').add({
+	 		columnWidth : .88,
+	 		items : [{
+	 			xtype : 'numberfield',
+	 	    	id : numberfieldId,
+	 	    	fieldLabel : '<font style="font-size:20px;text-align:right">' + payTypeData[i].name +'</font>',
+	 	    	style : 'text-align:right;font-size:19px;height:20px;',
+	 	    	decimalPrecision : 2,
+	 	    	allowBlank : false,
+	 	    	maxValue : 99999.99,
+	 	    	minValue : 0.00,
+	 	    	width : 85,
+	 	    	disabled : true,
+	 	    	validator : function(v){
+	 	    		if(v >= 0.00 && v <= 99999.99){
+	 	    	    	return true;
+	 	    	    }else{
+	 	    	    	return '价格需在 0.00  至 99999.99 之间!';
+	 	    	    }
+	 	    	}
+	 		}]		
+		});			 	
+	}
+
+	Ext.getCmp('mixedPayTypePanel').doLayout();
+	
+	mixedPayWin.show();
+}
+
 function showInputReciptWin(){
 	
 	if(!inputReciptWin){

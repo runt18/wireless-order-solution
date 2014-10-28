@@ -353,8 +353,17 @@ Ext.onReady(function() {
 			paySubmit(6);
 		}
 	}]);
-//	Ext.ux.checkSmStat();
 	
+	
+	Ext.Ajax.request({
+		url : '../../QueryPayType.do',
+		params : {dataSource : 'exceptMember'},
+		success : function(res){
+			var jr = Ext.decode(res.responseText);
+			payTypeData = jr.root;
+		},
+		failure : function(){}
+	});	
 });
 
 function setFormButtonStatus(_s){

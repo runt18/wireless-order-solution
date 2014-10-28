@@ -33,7 +33,7 @@ function dutyRangeStatDetalHandler(){
 				title : '营业统计 -- <font style="color:green;">历史</font> -- '+(statType == 1?'交班人':'交款人')+':&nbsp;<font style="color:red;">' + gs['staffName'] + '</font>',
 				id : 'dutyRangeStatWin',
 				width : 885,
-				height : 555,
+				height : 580,
 				closable : false,
 				modal : true,
 				resizable : false,	

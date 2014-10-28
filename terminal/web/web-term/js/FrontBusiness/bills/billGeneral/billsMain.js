@@ -440,14 +440,12 @@ Ext.onReady(function(){
 				xtype : 'combo',
 				forceSelection : true,
 				width : 80,
-				value : -1,
 				id : 'comboPayType',
-				store : new Ext.data.SimpleStore({
-					fields : [ 'value', 'text' ],
-					data : [[-1, '全部'], [1, '现金' ], [2, '刷卡' ], [3, '会员卡' ], [4, '签单' ], [5, '挂账' ]]
+				store : new Ext.data.JsonStore({
+					fields : [ 'id', 'name' ]
 				}),
-				valueField : 'value',
-				displayField : 'text',
+				valueField : 'id',
+				displayField : 'name',
 				typeAhead : true,
 				mode : 'local',
 				triggerAction : 'all',
@@ -455,12 +453,27 @@ Ext.onReady(function(){
 				allowBlank : false,
 				readOnly : false,
 				listeners : {
+					render : function(thiz){
+						Ext.Ajax.request({
+							url : '../../QueryPayType.do',
+							params : {dataSource : 'allPayType'},
+							success : function(res){
+								var jr = Ext.decode(res.responseText);
+								jr.root.unshift({id:-1, name:'全部'});
+								thiz.getStore().loadData(jr.root);
+								thiz.setValue(-1);
+							},
+							failure : function(){
+							
+							}
+						});
+					},
 					select : function(){
 						if(searchType){
 							Ext.getCmp('fontBill_search').handler();
 						}
 					}
-				}					
+				}				
 			},
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{xtype : 'tbtext', text : '操作员工:'},

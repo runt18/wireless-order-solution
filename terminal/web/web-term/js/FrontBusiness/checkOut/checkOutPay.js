@@ -85,7 +85,8 @@ var paySubmit = function(submitType) {
 					"comment" : Ext.getDom("remark").value,
 					"servicePlan" : servicePlan,
 					'eraseQuota' : eraseQuota == ''?0:eraseQuota,
-					'customNum' : customNum
+					'customNum' : customNum,
+					'payTypeCash' : payTypeCash
 //					'pricePlanID' : calcPricePlanID,
 //					'customNum' : Ext.getCmp('numCustomNum').getValue()
 				},
@@ -164,7 +165,7 @@ var paySubmit = function(submitType) {
 										});
 									}
 								}
-							}).show(document.body);						
+							}).show(document.body);		
 						}
 					} else {
 						var dataInfo = resultJSON.data;
