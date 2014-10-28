@@ -57,7 +57,9 @@ public class DailySettleStatDetailAction extends Action {
 					JsonMap jm = new JsonMap();
 					jm.putInt("allBillCount", result.getOrderAmount());
 
-					jm.putInt("cashBillCount", result.getCashAmount());
+					jm.putJsonable(result.getIncomeByPay(), flag);
+					
+/*					jm.putInt("cashBillCount", result.getCashAmount());
 					jm.putFloat("cashAmount", result.getCashTotalIncome());
 					jm.putFloat("cashActual", result.getCashActualIncome());
 
@@ -75,7 +77,7 @@ public class DailySettleStatDetailAction extends Action {
 
 					jm.putInt("hangBillCount", result.getHangAmount());
 					jm.putFloat("hangAmount", result.getHangTotalIncome());
-					jm.putFloat("hangActual", result.getHangActualIncome());
+					jm.putFloat("hangActual", result.getHangActualIncome());*/
 
 					jm.putFloat("discountAmount", result.getDiscountIncome());
 					jm.putInt("discountBillCount", result.getDiscountAmount());

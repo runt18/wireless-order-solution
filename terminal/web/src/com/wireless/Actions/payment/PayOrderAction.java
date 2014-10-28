@@ -117,6 +117,14 @@ public class PayOrderAction extends Action{
 			//Get the cash income if the pay manner is "现金"
 			if(payType.equals(PayType.CASH)){
 				payBuilder.setReceivedCash(Float.parseFloat(request.getParameter("cashIncome")));
+			}else if(payType.equals(PayType.MIXED)){
+				String payTypeCashs = request.getParameter("payTypeCash");
+				
+				String payTypeCashList[] = payTypeCashs.split("&");
+				for (String pt : payTypeCashList) {
+					String payTypeCash[] = pt.split(",");
+					payBuilder.addPayment(new PayType(Integer.parseInt(payTypeCash[0])), Float.parseFloat(payTypeCash[1]));
+				}
 			}
 			
 			if(request.getParameter("discountID") != null && !request.getParameter("discountID").isEmpty() && !request.getParameter("discountID").equals("-1")){

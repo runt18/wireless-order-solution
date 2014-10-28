@@ -48,6 +48,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
+import com.wireless.pojo.billStatistics.IncomeByPay.PaymentIncome;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
@@ -57,7 +58,6 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Department.DeptId;
@@ -929,26 +929,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 				cell.setCellValue(item.getTotalAmount());
 				cell.setCellStyle(normalNumStyle);
 				
-				
-				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getIncomeByPay().getCashActual());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getIncomeByPay().getCreditCardActual());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getIncomeByPay().getMemberCardActual());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getIncomeByPay().getHangActual());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getIncomeByPay().getSignActual());
-				cell.setCellStyle(numStyle);
+				for (PaymentIncome p : item.getIncomeByPay().getPaymentIncomes()) {
+					cell = row.createCell(row.getLastCellNum());
+					cell.setCellValue(p.getActual());
+					cell.setCellStyle(numStyle);
+				}
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByDiscount().getTotalDiscount());
@@ -1142,105 +1127,36 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("实收总额");
 		cell.setCellStyle(headerStyle);
 		
-		// 现金
-		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		row.setHeight((short) 350);
+		List<PaymentIncome> paymentIncomes = business.getIncomeByPay().getPaymentIncomes();
 		
-		cell = row.createCell(0);
-		cell.setCellValue("现金");
-		cell.setCellStyle(strStyle);
+		int totalAmount = 0;
+		float totalShouldPay = 0;
+		float totalActual = 0;
 		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getCancelAmount());
-		cell.setCellStyle(normalNumStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getCashTotalIncome());
-		cell.setCellStyle(numStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getCashActualIncome());
-		cell.setCellStyle(numStyle);
-		
-		// 刷卡
-		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		row.setHeight((short) 350);
-		
-		cell = row.createCell(0);
-		cell.setCellValue("刷卡");
-		cell.setCellStyle(strStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getCreditCardAmount());
-		cell.setCellStyle(normalNumStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getCreditTotalIncome());
-		cell.setCellStyle(numStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getCreditActualIncome());
-		cell.setCellStyle(numStyle);
-		
-		// 会员卡
-		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		row.setHeight((short) 350);
-		
-		cell = row.createCell(0);
-		cell.setCellValue("会员卡");
-		cell.setCellStyle(strStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getMemberCardAmount());
-		cell.setCellStyle(normalNumStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getMemberTotalIncome());
-		cell.setCellStyle(numStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getMemberActualIncome());
-		cell.setCellStyle(numStyle);
-		
-		// 签单
-		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		row.setHeight((short) 350);
-		
-		cell = row.createCell(0);
-		cell.setCellValue("签单");
-		cell.setCellStyle(strStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getSignAmount());
-		cell.setCellStyle(normalNumStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getSignTotalIncome());
-		cell.setCellStyle(numStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getSignActualIncome());
-		cell.setCellStyle(numStyle);
-		
-		// 挂账
-		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		row.setHeight((short) 350);
-		
-		cell = row.createCell(0);
-		cell.setCellValue("挂账");
-		cell.setCellStyle(strStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getHangAmount());
-		cell.setCellStyle(normalNumStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getHangTotalIncome());
-		cell.setCellStyle(numStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getHangActualIncome());
-		cell.setCellStyle(numStyle);
+		for (PaymentIncome p : paymentIncomes) {
+			totalAmount += p.getAmount();
+			totalShouldPay += p.getTotal();
+			totalActual += p.getActual();
+			
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);		
+			
+			cell = row.createCell(0);
+			cell.setCellValue(p.getPayType().getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(p.getAmount());
+			cell.setCellStyle(normalNumStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(p.getTotal());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(p.getActual());
+			cell.setCellStyle(numStyle);
+		}
 		
 		// 合计
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -1251,15 +1167,15 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(strStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getOrderAmount());
+		cell.setCellValue(totalAmount);
 		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getTotalIncome());
+		cell.setCellValue(totalShouldPay);
 		cell.setCellStyle(numStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getTotalActual());
+		cell.setCellValue(totalActual);
 		cell.setCellStyle(numStyle);
 		
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -3184,7 +3100,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell.setCellStyle(numStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(repaid.getPaymentType().getDesc());
+			cell.setCellValue(repaid.getPaymentType().getName());
 			cell.setCellStyle(strStyle);
 			
 		}
@@ -3262,7 +3178,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			
 			if(comboPayType != null && !comboPayType.equals("-1")){
 				//按结帐方式
-				extraCond.setPayType(PayType.valueOf(Integer.parseInt(comboPayType)));
+				extraCond.setPayType(new com.wireless.pojo.dishesOrder.PayType(Integer.parseInt(comboPayType)));
 			}
 		}
 		if(common != null && !common.isEmpty()){
@@ -3425,7 +3341,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(o.getPaymentType().getDesc());
+			cell.setCellValue(o.getPaymentType().getName());
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
