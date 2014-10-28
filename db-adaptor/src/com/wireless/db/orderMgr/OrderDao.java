@@ -440,7 +440,7 @@ public class OrderDao {
 				  " OH.settle_type, OH.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, OH.category, OH.status, OH.service_rate, OH.comment, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + ".order_history OH " + 
-				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON OH.pay_type_id = OH.pay_type_id " +
+				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = OH.pay_type_id " +
 				  " WHERE 1 = 1 " + 
 				  " AND OH.restaurant_id = " + staff.getRestaurantId() + " " +
 				  (extraCond != null ? extraCond.toString() : "") + " " +

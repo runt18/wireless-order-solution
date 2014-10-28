@@ -203,7 +203,7 @@ public class CalcBillStatisticsDao {
 		
 		String sql;
 		//Calculate the order amount.
-		sql = " SELECT COUNT(*) FROM " + Params.dbName + extraCond.orderTbl + " O " + 
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + "." + extraCond.orderTbl + " O " + 
 			  " WHERE 1 = 1 " +
 			  (extraCond != null ? extraCond.toString() : "") +
 			  " AND O.restaurant_id = " + staff.getRestaurantId() +
