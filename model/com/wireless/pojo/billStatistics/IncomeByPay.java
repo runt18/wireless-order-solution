@@ -10,7 +10,7 @@ import com.wireless.pojo.util.SortedList;
 
 public class IncomeByPay{
 	
-	public final static IncomeByPay DUMMY = new IncomeByPay();
+	public final static IncomeByPay DUMMY = new IncomeByPay(0);
 
 	public static class PaymentIncome implements Comparable<PaymentIncome>{
 		private final PayType payType;
@@ -47,27 +47,12 @@ public class IncomeByPay{
 		}
 	}
 	
+	private final int orderAmount;
 	private final List<PaymentIncome> paymentIncomes = SortedList.newInstance();
 	
-//	private int mCashAmount;			//现金账单数
-//	private float mCashIncome;			//现金金额
-//	private float mCashActual;			//现金实收
-//	
-//	private int mCreditCardAmount;		//刷卡账单数
-//	private float mCreditCardIncome;	//刷卡金额
-//	private float mCreditCardActual;	//刷卡实收
-//	
-//	private int mMemeberCardAmount;		//会员卡账单数
-//	private float mMemberCardIncome;	//会员卡金额
-//	private float mMemberCardActual;	//会员卡实收
-//	
-//	private int mSignAmount;			//签单账单数
-//	private float mSignIncome;			//签单金额
-//	private float mSignActual;			//签单实收
-//	
-//	private int mHangAmount;			//挂账账单数
-//	private float mHangIncome;			//挂账金额
-//	private float mHangActual;			//挂账实收
+	public IncomeByPay(int orderAmount){
+		this.orderAmount = orderAmount;
+	}
 	
 	public List<PaymentIncome> getPaymentIncomes(){
 		return Collections.unmodifiableList(paymentIncomes);
@@ -89,11 +74,7 @@ public class IncomeByPay{
 	}
 	
 	public int getOrderAmount(){
-		int amount = 0;
-		for(PaymentIncome eachIncome : paymentIncomes){
-			amount += eachIncome.amount;
-		}
-		return amount;
+		return orderAmount;
 	}
 	
 	public float getTotalActual() {
