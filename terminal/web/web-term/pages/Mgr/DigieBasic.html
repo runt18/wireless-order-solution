@@ -283,6 +283,16 @@ Ext.onReady(function(){
 							businessHourWin.show();
 							businessHourWin.center();
 							Ext.getCmp('btnRefreshBHGrid').handler();
+						}else if(e.attributes.mId == "payTypeMgr"){
+							if(typeof getPayType == 'undefined'){
+								$.getScript("../../js/BasicManagement/payTypeMgr/payTypeMgr.js",function(){
+									getPayType();//这个函数是在new.js里面的，当点击click后运行这个函数
+								});								
+							}else{
+								getPayType();
+							}
+
+
 						}
 					}
 				}

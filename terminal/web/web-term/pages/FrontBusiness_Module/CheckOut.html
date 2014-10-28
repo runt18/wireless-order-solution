@@ -98,11 +98,12 @@
 	var checkOutGrid, checkOutStore, checkOutColumnModel;
 	var tableGroupTab;
 	
-	var timerCheckParams, tableDate;
+	var timerCheckParams, tableDate, payTypeData;
 	var isPaying = false;
 	var checkOut_actualPrice ;
-	//输入收款窗口
-	var inputReciptWin;
+	//输入收款窗口&混合结账窗口
+	var inputReciptWin, mixedPayWin;
+	var payTypeCash ='';
 	
 	//获取餐台信息
 	$.ajax({
@@ -218,6 +219,11 @@
 				</tr>
 				<tr style="height: 43px;">
 					<td colspan="2" align="center">
+						<input type="button" value="混合结账"  class="payOrderButtonUnCommon" onclick="fnMixedPay()"></input>
+					</td>		
+				</tr>					
+				<tr style="height: 43px;">
+					<td colspan="2" align="center">
 						<input type="button" value="暂结(-)" class="payOrderButtonUnCommon" onclick="paySubmit(6)"></input>
 					</td>						
 				</tr>
@@ -226,7 +232,6 @@
 						<input type="button" value="返回"  class="payOrderButtonUnCommon" onclick="javascript:location.href = 'TableSelect.html';"></input>
 					</td>		
 				</tr>				
-				
 				
 			</table>
 	</div>
