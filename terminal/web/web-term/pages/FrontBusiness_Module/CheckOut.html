@@ -103,7 +103,8 @@
 	var checkOut_actualPrice ;
 	//输入收款窗口&混合结账窗口
 	var inputReciptWin, mixedPayWin;
-	var payTypeCash ='';
+	//计算混合结账
+	var payTypeCash ='', payMoneyCalc = {};
 	
 	//获取餐台信息
 	$.ajax({
