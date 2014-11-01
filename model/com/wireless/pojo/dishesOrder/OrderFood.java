@@ -27,6 +27,42 @@ public class OrderFood implements Parcelable, Jsonable {
 	public final static byte OF_PARCELABLE_4_COMMIT = 0;
 	public final static byte OF_PARCELABLE_4_QUERY = 1;
 	
+	public static enum Operation{
+		ADD(1, "加菜"),
+		CANCEL(2, "退菜"),
+		SWITCH(3, "转菜");
+		
+		private final int val;
+		private final String desc;
+		
+		Operation(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public static Operation valueOf(int val){
+			for(Operation operation : values()){
+				if(operation.val == val){
+					return operation;
+				}
+			}
+			throw new IllegalArgumentException("The operation(val = " + val + ") passed is invalid.");
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
+	
 	//the id to this order food
 	private long id;
 	
@@ -38,6 +74,9 @@ public class OrderFood implements Parcelable, Jsonable {
 
 	//the waiter to this order food
 	private String mWaiter;
+	
+	//the operation to this order food
+	private Operation operation;
 	
 	//the taste group to this order food
 	private TasteGroup mTasteGroup;							
@@ -82,6 +121,14 @@ public class OrderFood implements Parcelable, Jsonable {
 		return mFood;
 	}
 	
+	public Operation getOperation(){
+		return this.operation;
+	}
+	
+	public void setOperation(Operation operation){
+		this.operation = operation;
+	}
+	
 	public void addCombo(ComboOrderFood comboFood){
 		if(combo == null){
 			combo = new ArrayList<ComboOrderFood>();
@@ -93,8 +140,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		if(combo != null){
 			return Collections.unmodifiableList(combo);
 		}else{
-			List<ComboOrderFood> result = Collections.emptyList();
-			return result;
+			return Collections.emptyList();
 		}
 	}
 	
