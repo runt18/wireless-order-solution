@@ -36,7 +36,7 @@ public class TestCommitOrderDao {
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getAdminByRestaurant(37);
+			mStaff = StaffDao.getAdminByRestaurant(40);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -46,12 +46,14 @@ public class TestCommitOrderDao {
 	public void testCommitOrder() throws BusinessException, BusinessException, SQLException{
 		
 		int orderId = 0;
+		final List<Table> idleTables = TableDao.getByCond(mStaff, new TableDao.ExtraCond().setStatus(Table.Status.IDLE), null);
+		final List<Table> busyTables = TableDao.getByCond(mStaff, new TableDao.ExtraCond().setStatus(Table.Status.BUSY), null);
 		
 		try{
-			Table tblToInsert = TableDao.getByCond(mStaff, new TableDao.ExtraCond().setStatus(Table.Status.IDLE), null).get(0);
+			Table tblToInsert = idleTables.get(0);
 			List<Food> foods = FoodDao.getPureByCond(mStaff, null, null);
 			
-			Order expectedOrder = new Order();
+			Order expectedOrder = new Order(0);
 			expectedOrder.setDestTbl(tblToInsert);
 			expectedOrder.setCustomNum(10);
 			expectedOrder.setCategory(Order.Category.NORMAL);
@@ -66,7 +68,7 @@ public class TestCommitOrderDao {
 			expectedOrder.addFood(of, mStaff);
 			
 			//-----------Test to insert a new order---------------------------
-			orderId = InsertOrder.exec(mStaff, expectedOrder).getId();
+			orderId = InsertOrder.exec(mStaff, new Order.InsertBuilder(new Table.AliasBuilder(tblToInsert.getAliasId())).addAll(expectedOrder.getOrderFoods(), mStaff).setCustomNum(expectedOrder.getCustomNum())).getId();
 			
 			Order actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
 			
@@ -83,9 +85,9 @@ public class TestCommitOrderDao {
 			of.setCount(2.35f);
 			expectedOrder.addFood(of, mStaff);
 			
-			UpdateOrder.execById(mStaff, expectedOrder);
+			UpdateOrder.exec(mStaff, new Order.UpdateBuilder(orderId, actualOrder.getOrderDate()).addAll(expectedOrder.getOrderFoods(), mStaff));
 			
-			actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
+			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
 			
 			compareOrder4Commit(expectedOrder, actualOrder);
 			
@@ -100,19 +102,64 @@ public class TestCommitOrderDao {
 			of.setCount(2.35f);
 			expectedOrder.addFood(of, mStaff);
 			
-			UpdateOrder.execById(mStaff, expectedOrder);
+			UpdateOrder.exec(mStaff, new Order.UpdateBuilder(orderId, actualOrder.getOrderDate()).addAll(expectedOrder.getOrderFoods(), mStaff));
 			
 			actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
 			
 			compareOrder4Commit(expectedOrder, actualOrder);
+
+			//-----------Test to transfer food---------------------------
+			OrderFood transferFood1 = actualOrder.getOrderFoods().get(0);
+			OrderFood transferFood2 = actualOrder.getOrderFoods().get(1);
 			
+			if(!busyTables.isEmpty()){
+				Table tblToTransfer = busyTables.get(0);
+				Order expectedTransferOrder = OrderDao.getByTableAlias(mStaff, tblToTransfer.getAliasId());
+				
+				expectedTransferOrder.addFood(transferFood1, mStaff);
+				
+				OrderDao.transfer(mStaff, new Order.TransferBuilder(orderId, new Table.AliasBuilder(tblToTransfer.getAliasId())).add(transferFood1));
+
+				expectedOrder.remove(transferFood1, mStaff);
+				
+				actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+
+				compareOrder4Commit(expectedOrder, actualOrder);
+
+				Order actualTransferOrder = OrderDao.getByTableAlias(mStaff, tblToTransfer.getAliasId());
+				compareOrder4Commit(expectedTransferOrder, actualTransferOrder);
+				
+			}
+			
+			if(!idleTables.isEmpty()){
+				Table tblToTransfer = idleTables.get(1);
+				Order expectedTransferOrder = new Order(0);
+				expectedTransferOrder.setDestTbl(tblToTransfer);
+				
+				expectedTransferOrder.addFood(transferFood2, mStaff);
+				
+				OrderDao.transfer(mStaff, new Order.TransferBuilder(orderId, new Table.AliasBuilder(tblToTransfer.getAliasId())).add(transferFood2));
+
+				expectedOrder.remove(transferFood2, mStaff);
+				
+				actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+
+				compareOrder4Commit(expectedOrder, actualOrder);
+
+				Order actualTransferOrder = OrderDao.getByTableAlias(mStaff, tblToTransfer.getAliasId());
+				compareOrder4Commit(expectedTransferOrder, actualTransferOrder);
+				
+				OrderDao.deleteByCond(mStaff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(actualTransferOrder.getId()));
+			}
+			
+
 			//-----------Test to pay the order---------------------------
 			Order.PayBuilder payBuilder = Order.PayBuilder.build(orderId, PayType.CASH);
 			PayOrder.pay(mStaff, payBuilder);
 			
 			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
 			compare4Payment(payBuilder, expectedOrder, actualOrder);
-			
+
 			//-----------Test to re-pay the order using mixed payment---------------------------
 			float cash = actualOrder.getActualPrice() / 2;
 			float creditCard = actualOrder.getActualPrice() - cash;

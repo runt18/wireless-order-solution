@@ -19,6 +19,7 @@ import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.TasteGroup;
+import com.wireless.pojo.dishesOrder.OrderFood.Operation;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
@@ -440,7 +441,7 @@ public class OrderFoodDao {
 		return result;
 	}
 	
-	public static class ExtraBuilder{
+	static class ExtraBuilder{
 		private final int orderId;
 		private final OrderFood extra;
 		private boolean isPaid = false;
@@ -448,6 +449,7 @@ public class OrderFoodDao {
 		public ExtraBuilder(int orderId, OrderFood extra){
 			this.orderId = orderId;
 			this.extra = extra;
+			this.extra.setOperation(Operation.ADD);
 		}
 		
 		public ExtraBuilder setPaid(boolean isPaid){
@@ -481,7 +483,7 @@ public class OrderFoodDao {
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".order_food " +
 			  " ( " + 
-			  " `restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
+			  " `restaurant_id`, `order_id`, `operation`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 			  " `discount`, `taste_group_id`, " +
 			  " `dept_id`, `kitchen_id`, " +
 			  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, `is_gift`, " +
@@ -491,6 +493,7 @@ public class OrderFoodDao {
 			  "(" +
 			  staff.getRestaurantId() + ", " +
 			  builder.orderId + ", " +
+			  builder.extra.getOperation().getVal() + "," +
 			  builder.extra.getFoodId() + ", " +
 			  builder.extra.getCount() + ", " + 
 			  builder.extra.asFood().getPrice() + ", " + 
@@ -517,6 +520,80 @@ public class OrderFoodDao {
 //				FoodDao.insert(dbCon, staff, new Food.InsertBuilder(builder.extra.getName(), builder.extra.getPrice(), builder.extra.getKitchen()).setTemp(true));
 //			}catch(BusinessException ingored){}
 //		}
+	}
+	
+	static class TransferBuilder{
+		
+		private final CancelBuilder cancelBuilder;;
+		
+		public TransferBuilder(int orderId, OrderFood foodOut){
+			cancelBuilder = new CancelBuilder(orderId, foodOut);
+			cancelBuilder.cancel.setOperation(Operation.SWITCH);
+		}
+		
+		public CancelBuilder asCancel(){
+			return this.cancelBuilder;
+		}
+	}
+	
+	static class CancelBuilder{
+		private final int orderId;
+		private final OrderFood cancel;
+		private boolean isPaid = false;
+		private CancelReason reason;
+		
+		public CancelBuilder(int orderId, OrderFood cancel){
+			this.orderId = orderId;
+			this.cancel = cancel;
+			this.cancel.setOperation(Operation.CANCEL);
+		}
+		
+		public CancelBuilder setPaid(boolean isPaid){
+			this.isPaid = isPaid;
+			return this;
+		}
+		
+		public CancelBuilder setReason(CancelReason reason){
+			this.reason = reason;
+			return this;
+		}
+		
+		public boolean hasReason(){
+			return this.reason != null;
+		}
+	}
+	
+	static void insertCancelled(DBCon dbCon, Staff staff, CancelBuilder builder) throws SQLException{
+		String sql;
+		sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
+			  " ( " +
+			  " `restaurant_id`, `order_id`, `operation`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
+			  " `discount`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`, " +
+			  " `dept_id`, `kitchen_id`, " +
+			  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, `is_gift`) VALUES (" +
+			  staff.getRestaurantId() + ", " +
+			  builder.orderId + ", " +
+			  builder.cancel.getOperation().getVal() + "," +
+			  builder.cancel.getFoodId() + ", " +
+			  "-" + builder.cancel.getCount() + ", " + 
+			  builder.cancel.asFood().getPrice() + ", " + 
+			  builder.cancel.asFood().getCommission() + "," +
+			  "'" + builder.cancel.getName() + "', " + 
+			  builder.cancel.asFood().getStatus() + ", " +
+			  builder.cancel.getDiscount() + ", " +
+			  (builder.cancel.hasTasteGroup() ? builder.cancel.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
+			  (builder.cancel.hasCancelReason() ? builder.cancel.getCancelReason().getId() : CancelReason.NO_REASON) + ", " +
+			  (builder.cancel.hasCancelReason() ? "'" + builder.cancel.getCancelReason().getReason() + "'" : "NULL") + ", " +
+			  builder.cancel.getKitchen().getDept().getId() + ", " +
+			  builder.cancel.getKitchen().getId() + ", " +
+			  staff.getId() + ", " +
+			  "'" + staff.getName() + "', " +
+			  " NOW(), " + 
+			  (builder.cancel.isTemp() ? 1 : 0) + ", " +
+			  (builder.isPaid ? 1 : 0) + ", " +
+			  (builder.cancel.isGift() ? 1 : 0 ) +
+			 " ) ";
+		dbCon.stmt.executeUpdate(sql);	
 	}
 	
 	/**
@@ -607,7 +684,7 @@ public class OrderFoodDao {
 	
 	static ArchiveResult archive(DBCon dbCon, Staff staff, String paidOrder) throws SQLException{
 		
-		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `order_date`, `order_count`," + 
+		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `operation`, `food_id`, `order_date`, `order_count`," + 
 				"`unit_price`, `commission`, `name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
 				"`discount`, `dept_id`, `kitchen_id`, " +
 				"`staff_id`, `waiter`, `is_temporary`, `is_paid`, `is_gift`";

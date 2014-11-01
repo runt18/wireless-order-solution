@@ -19,14 +19,12 @@ import com.wireless.util.DateType;
 public class InsertOrder {
 	
 	/**
-	 * Insert a new order according to the specific order detail information.
+	 * Insert a new order according to the specific builder {@link Order#InsertBuilder}.
 	 * 
 	 * @param staff
 	 *            the staff to perform this action
-	 * @param orderToInsert
-	 *            the order information submitted by terminal, refer to class
-	 *            "ReqInsertOrder" for more detail about what information the
-	 *            order contains
+	 * @param builder
+	 *			  the builder to insert order
 	 * @throws BusinessException
 	 *             throws if one of cases below
 	 *             <li>the table associated with this order does NOT exist
@@ -37,14 +35,14 @@ public class InsertOrder {
 	 *             throws if fail to execute any SQL statement
 	 * @return Order completed information to inserted order
 	 */
-	public static Order exec(Staff staff, Order orderToInsert) throws BusinessException, SQLException{
+	public static Order exec(Staff staff, Order.InsertBuilder builder) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();
 		
 		try{
 			dbCon.connect();
 			
-			return exec(dbCon, staff, orderToInsert);
+			return exec(dbCon, staff, builder);
 			
 		}finally{
 			dbCon.disconnect();
@@ -52,16 +50,14 @@ public class InsertOrder {
 	}
 	
 	/**
-	 * Insert a new order according to the specific order detail information.
+	 * Insert a new order according to the specific builder {@link Order#InsertBuilder}.
 	 * 
 	 * @param dbCon
 	 * 			  the database connection
 	 * @param staff
 	 *            the staff to perform this action
-	 * @param orderToInsert
-	 *            the order information submitted by terminal, refer to class
-	 *            "ReqInsertOrder" for more detail about what information the
-	 *            order contains
+	 * @param builder
+	 * 			  the builder to insert order
 	 * @throws BusinessException
 	 *             throws if one of cases below
 	 *             <li>the table associated with this order does NOT exist
@@ -72,7 +68,9 @@ public class InsertOrder {
 	 *             throws if fail to execute any SQL statement
 	 * @return Order completed information to inserted order
 	 */
-	public static Order exec(DBCon dbCon, Staff staff, Order orderToInsert) throws BusinessException, SQLException{
+	public static Order exec(DBCon dbCon, Staff staff, Order.InsertBuilder builder) throws BusinessException, SQLException{
+		
+		Order orderToInsert = builder.build();
 		
 		doPrepare(dbCon, staff, orderToInsert);
 		
@@ -92,10 +90,6 @@ public class InsertOrder {
 		}catch(SQLException e){
 			dbCon.conn.rollback();
 			throw e;
-			
-		}catch(Exception e){
-			dbCon.conn.rollback();
-			throw new SQLException(e);
 			
 		}finally{
 			dbCon.conn.setAutoCommit(isAutoCommit);

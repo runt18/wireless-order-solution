@@ -6,11 +6,14 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.dishesOrder.TasteGroup;
@@ -544,6 +547,85 @@ public class OrderDao {
 			return getPureByCond(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Transfer the order food according to specific builder {@link Order#TransferBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the transfer builder
+	 * @throws BusinessException
+	 * 			
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void transfer(Staff staff, Order.TransferBuilder builder) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			transfer(dbCon, staff, builder);
+			dbCon.conn.commit();
+			
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Transfer the order food according to specific builder {@link Order#TransferBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the transfer builder
+	 * @throws BusinessException
+	 * 			
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void transfer(DBCon dbCon, Staff staff, Order.TransferBuilder builder) throws BusinessException, SQLException{
+		Order source = OrderDao.getById(dbCon, staff, builder.getSourceOrderId(), DateType.TODAY);
+		
+		if(source.getDestTbl().getAliasId() == builder.getDestTbl().getAliasId()){
+			throw new BusinessException("菜品不能转到相同餐台");
+		}
+		
+		//Assert the food to transfer out does exist and the amount is less than the original.
+		for(OrderFood foodOut : builder.getTransferFoods()){
+			int index = source.getOrderFoods().indexOf(foodOut);
+			if(index < 0){
+				throw new BusinessException("菜品【" + FoodDao.getPureById(dbCon, staff, foodOut.getFoodId()).getName() + "】不在账单中");
+			}else{
+				if(source.getOrderFoods().get(index).getCount() < foodOut.getCount()){
+					throw new BusinessException("菜品【" + source.getOrderFoods().get(index).getName() + "】的转菜数量大过已有数量");
+				}
+			}
+		}
+		
+		//Transfer out the foods from source order.
+		for(OrderFood foodOut : builder.getTransferFoods()){
+			OrderFoodDao.insertCancelled(dbCon, staff, new OrderFoodDao.TransferBuilder(source.getId(), foodOut).asCancel());
+		}
+
+		//Transfer the foods out to destination table.
+		Table destTbl = TableDao.getByAlias(dbCon, staff, builder.getDestTbl().getAliasId());
+		if(destTbl.isIdle()){
+			//Insert a new if the destination table is idle.
+			InsertOrder.exec(dbCon, staff, new Order.InsertBuilder(new Table.AliasBuilder(destTbl.getAliasId())).addAll(builder.getTransferFoods(), staff));
+			
+		}else if(destTbl.isBusy()){
+			//Update the order if the destination table is busy.
+			Order destOrder = getByTableAlias(dbCon, staff, destTbl.getAliasId());
+			destOrder.addFoods(builder.getTransferFoods(), staff);
+			UpdateOrder.exec(dbCon, staff, new Order.UpdateBuilder(destOrder.getId(), destOrder.getOrderDate()).addAll(destOrder.getOrderFoods(), staff));
 		}
 	}
 	
