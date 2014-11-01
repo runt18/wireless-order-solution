@@ -408,18 +408,31 @@ function fnMixedPay(){
 				id : 'btnPayInputRecipt',
 				iconCls : 'btn_save',
 				handler : function(e){
-					payTypeCash ='';
-					for (var i = 0; i < payTypeData.length; i++) {
-						var checked = document.getElementById('chbForPayType' + payTypeData[i].id).checked;
-						if(checked){
-							if(payTypeCash){
-								payTypeCash += '&';
+					var mixedPayMoney = Ext.get('shouldPay').dom.innerHTML;
+ 	    			for(var pay in payMoneyCalc){
+ 	    				if(typeof payMoneyCalc[pay] != 'boolean'){
+ 	    					mixedPayMoney -= payMoneyCalc[pay];
+ 	    				}
+ 	    			}					
+					
+					if(mixedPayMoney != 0){
+						Ext.example.msg('提示', '混合结账的金额不等于账单的实收金额');
+					}else{
+						payTypeCash ='';
+						for (var i = 0; i < payTypeData.length; i++) {
+							var checked = document.getElementById('chbForPayType' + payTypeData[i].id).checked;
+							if(checked && Ext.getCmp('numForPayType'+payTypeData[i].id).getValue()){
+								if(payTypeCash){
+									payTypeCash += '&';
+								}
+								payTypeCash += (payTypeData[i].id + ',' + Ext.getCmp('numForPayType'+payTypeData[i].id).getValue());  
 							}
-							payTypeCash += (payTypeData[i].id + ',' + Ext.getCmp('numForPayType'+payTypeData[i].id).getValue());  
-						}
-					}	
-					paySubmit(100);
-					mixedPayWin.hide();
+						}						
+						
+						paySubmit(100);
+						mixedPayWin.hide();					
+					}
+
 					
 				}				
 			},{
@@ -428,6 +441,7 @@ function fnMixedPay(){
 				iconCls : 'btn_close',
 				handler : function(e){
 					mixedPayWin.hide();
+					payMoneyCalc = {};
 				}				
 			}],
 			keys : [{
@@ -464,10 +478,23 @@ function fnMixedPay(){
 	 	    		check : function(checkbox, checked){
 	 	    			var numForAlias = Ext.getCmp(checkbox.relativePrice);
 						if(checked){
+							payMoneyCalc[checkbox.relativePrice] = true;
+							
+		 	    			var mixedPayMoney = Ext.get('shouldPay').dom.innerHTML;
+		 	    			for(var pay in payMoneyCalc){
+		 	    				if(typeof payMoneyCalc[pay] != 'boolean'){
+		 	    					mixedPayMoney -= payMoneyCalc[pay];
+		 	    				}
+		 	    			}
+		 	    			numForAlias.setValue(mixedPayMoney < 0? 0 : mixedPayMoney);							
+							
 							numForAlias.enable();
 							numForAlias.focus(true, 100);
 						}else{
+							payMoneyCalc[checkbox.relativePrice] = false;
+							
 							numForAlias.disable();
+							numForAlias.setValue();		
 							numForAlias.clearInvalid();
 						}
 					},
@@ -505,6 +532,13 @@ function fnMixedPay(){
 	 	    	    }else{
 	 	    	    	return '价格需在 0.00  至 99999.99 之间!';
 	 	    	    }
+	 	    	},
+	 	    	listeners : {
+	 	    		blur : function(thiz){
+	 	    			if(thiz.getValue()){
+	 	    				payMoneyCalc[thiz.id] = thiz.getValue();
+	 	    			}
+	 	    		}
 	 	    	}
 	 		}]		
 		});			 	
@@ -513,6 +547,7 @@ function fnMixedPay(){
 	Ext.getCmp('mixedPayTypePanel').doLayout();
 	
 	mixedPayWin.show();
+	
 }
 
 function showInputReciptWin(){
