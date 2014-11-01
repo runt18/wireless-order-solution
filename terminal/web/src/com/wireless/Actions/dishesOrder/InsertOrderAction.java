@@ -35,29 +35,49 @@ public class InsertOrderAction extends Action{
 		try {
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			
-			int type = Integer.parseInt(request.getParameter("type"));
-			
 			String jsonText = request.getParameter("commitOrderData");
-			Order orderToInsert = JObject.parse(Order.JSON_CREATOR, type, jsonText);
 			
+			int type = Integer.parseInt(request.getParameter("type"));
+
 			String notPrint = request.getParameter("notPrint");
+			final PrintOption printOption;
+			if(notPrint != null && Boolean.valueOf(notPrint)){
+				printOption = PrintOption.DO_NOT_PRINT;
+			}else{
+				printOption = PrintOption.DO_PRINT;
+			}
 			
-			ProtocolPackage resp = ServerConnector.instance().ask(
-										new ReqInsertOrder(staff,
-											orderToInsert,
-											(type == 1) ? Type.INSERT_ORDER : (type == 7) ? Type.UPDATE_ORDER : Type.INSERT_ORDER_FORCE,
-											notPrint != null && Boolean.valueOf(notPrint) ? PrintOption.DO_NOT_PRINT : PrintOption.DO_PRINT
-										));
+//			ProtocolPackage resp = ServerConnector.instance().ask(
+//										new ReqInsertOrder(staff,
+//											orderToInsert,
+//											(type == 1) ? Type.INSERT_ORDER : (type == 7) ? Type.UPDATE_ORDER : Type.INSERT_ORDER_FORCE,
+//											notPrint != null && Boolean.valueOf(notPrint) ? PrintOption.DO_NOT_PRINT : PrintOption.DO_PRINT
+//										));
+			
+			final ProtocolPackage resp;
+			if(type == 1){
+				Order.InsertBuilder builder = JObject.parse(Order.InsertBuilder.JSON_CREATOR, 0, jsonText);
+				resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, printOption));
+				
+			}else if(type == 7){
+				Order.UpdateBuilder builder = JObject.parse(Order.UpdateBuilder.JSON_CREATOR, 0, jsonText);
+				resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, printOption));
+				
+			}else{
+				Order.InsertBuilder builder = JObject.parse(Order.InsertBuilder.JSON_CREATOR, 0, jsonText);
+				builder.setForce(true);
+				resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, printOption));
+			}
 			
 			if(resp.header.type == Type.ACK){
-				jobject.initTip(true, (orderToInsert.getDestTbl().getAliasId() + "号餐台下单成功."));
+				jobject.initTip(true, ("下单成功."));
 				
 			}else if(resp.header.type == Type.NAK){
 				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
 				jobject.initTip(false, errCode.getCode(), errCode.getDesc());
 				
 			}else{
-				jobject.initTip(false, (orderToInsert.getDestTbl().getAliasId() + "号餐台下单不成功，请重新确认."));
+				jobject.initTip(false, ("下单不成功，请重新确认."));
 			}
 			
 		}catch(BusinessException e){

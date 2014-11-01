@@ -60,7 +60,7 @@ public class RepaidOrderAction extends Action{
 //			orderToUpdate.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
 
 			//update the order
-			UpdateOrder.execById(staff, JObject.parse(Order.JSON_CREATOR, Order.ORDER_JSONABLE_4_COMMIT_UPDATE, request.getParameter("commitOrderData")));
+			UpdateOrder.exec(staff, JObject.parse(Order.UpdateBuilder.JSON_CREATOR, 0, request.getParameter("commitOrderData")));
 			
 			//get the pay manner to this order
 			Order.PayBuilder payBuilder = Order.PayBuilder.build(orderId, new PayType(Integer.parseInt(request.getParameter("payType"))));
