@@ -191,6 +191,10 @@ class OrderHandler implements Runnable{
 					//handle update order request
 					response = doUpdateOrder(staff, request);
 
+				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.TRANSFER_ORDER_FOOD){
+					//handle the transfer order food
+					response = doTransOrderFood(staff, request);
+					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.TRANS_TABLE){
 					//handle the table transfer request 
 					response = doTransTable(staff, request);
@@ -290,9 +294,8 @@ class OrderHandler implements Runnable{
 	private RespPackage doInsertOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		//handle insert order request 
 		List<Printer> printers = PrinterDao.getPrinters(staff);
-		Order orderToInsert = new Parcel(request.body).readParcel(Order.CREATOR);
 		
-		orderToInsert = InsertOrder.exec(staff, orderToInsert);
+		Order orderToInsert = InsertOrder.exec(staff, new Parcel(request.body).readParcel(Order.InsertBuilder.CREATOR));
 		
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
 			new PrintHandler(staff)
@@ -312,18 +315,21 @@ class OrderHandler implements Runnable{
 	
 	private RespPackage doInsertOrderForce(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		//handle insert order request force
-		Order orderToInsert = new Parcel(request.body).readParcel(Order.CREATOR);
+		Order newOrder = new Parcel(request.body).readParcel(Order.InsertBuilder.CREATOR).build();
 		
-		Table tblToOrder = TableDao.getByAlias(staff, orderToInsert.getDestTbl().getAliasId());
+		Table tblToOrder = TableDao.getByAlias(staff, newOrder.getDestTbl().getAliasId());
 		
 		if(tblToOrder.isIdle()){
 			return doInsertOrder(staff, request);
 			
 		}else if(tblToOrder.isBusy()){
-			Order orderToUpdate = OrderDao.getByTableAlias(staff, tblToOrder.getAliasId());
-			orderToUpdate.addFoods(orderToInsert.getOrderFoods(), staff);
+			Order oriOrder = OrderDao.getByTableAlias(staff, tblToOrder.getAliasId());
 			
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, orderToUpdate, Type.UPDATE_ORDER, PrintOption.valueOf(request.header.reserved)));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, 
+																					 new Order.UpdateBuilder(oriOrder.getId(), oriOrder.getOrderDate())
+																							  .addAll(oriOrder.getOrderFoods(), staff)
+																							  .addAll(newOrder.getOrderFoods(), staff), 
+																					 PrintOption.valueOf(request.header.reserved)));
 			if(resp.header.type == Type.NAK){
 				throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 			}else{
@@ -337,8 +343,7 @@ class OrderHandler implements Runnable{
 	
 	private RespPackage doUpdateOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
 		//handle update order request
-		Order orderToUpdate = new Parcel(request.body).readParcel(Order.CREATOR);
-		DiffResult diffResult = UpdateOrder.execById(staff, orderToUpdate);
+		DiffResult diffResult = UpdateOrder.exec(staff, new Parcel(request.body).readParcel(Order.UpdateBuilder.CREATOR));
 		List<Printer> printers = PrinterDao.getPrinters(staff);
 		
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
@@ -394,17 +399,14 @@ class OrderHandler implements Runnable{
 
 			}
 
-			//print the transfer
-			printHandler.addContent(JobContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, 
-																						 staff,
-																						 printers,
-																						 diffResult.newOrder.getId(), 
-																						 diffResult.oriOrder.getDestTbl(),
-																						 diffResult.newOrder.getDestTbl()));
-
 			//Fire to execute print action.
 			printHandler.fireAsync();
 		}
+		return new RespACK(request.header);
+	}
+	
+	private RespPackage doTransOrderFood(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+		OrderDao.transfer(staff, new Parcel(request.body).readParcel(Order.TransferBuilder.CREATOR));
 		return new RespACK(request.header);
 	}
 	
