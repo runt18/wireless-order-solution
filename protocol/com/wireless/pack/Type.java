@@ -29,6 +29,7 @@ public final class Type{
 	public final static byte MATCH_PIN = 21;
 	public final static byte PAY_TEMP_ORDER = 22;
 	public final static byte INSERT_ORDER_FORCE = 23;
+	public final static byte TRANSFER_ORDER_FOOD = 24;
 	
 	/* belong to member */
 	public final static byte QUERY_MEMBER = 1;

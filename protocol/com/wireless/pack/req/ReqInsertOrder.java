@@ -14,55 +14,33 @@ public class ReqInsertOrder extends RequestPackage {
 	 * @param type indicates insert or update request
 	 * @param reserved indicates whether to print or NOT
 	 */
-	public ReqInsertOrder(Staff staff, Order reqOrder, byte type, PrintOption printOption){
+	public ReqInsertOrder(Staff staff, Order.InsertBuilder builder, PrintOption printOption){
 		
 		super(staff);
 		
-		check(reqOrder, type, printOption);
-		
 		header.mode = Mode.ORDER_BUSSINESS;
-		header.type = type;
+		header.type = builder.isForce() ? Type.INSERT_ORDER_FORCE : Type.INSERT_ORDER;
 		header.reserved = printOption.getVal();
 
-		fillBody(reqOrder, Order.ORDER_PARCELABLE_4_COMMIT);
+		fillBody(builder, Order.ORDER_PARCELABLE_4_INSERT);
 	}
 	
 	/**
 	 * Make the insert or update order request package
 	 * @param reqOrder the order detail information
 	 * @param type indicates insert or update request
+	 * @param reserved indicates whether to print or NOT
 	 */
-	public ReqInsertOrder(Staff staff, Order reqOrder, byte type){
-		this(staff, reqOrder, type, PrintOption.DO_PRINT);
-	}	
-	
-	/**
-	 * Make the insert order request package with default request configuration
-	 * @param reqOrder the order detail information
-	 */
-	public ReqInsertOrder(Staff staff, Order reqOrder){
-		this(staff, reqOrder, Type.INSERT_ORDER);
-	}	
-	
-	private void check(Order reqOrder, byte type, PrintOption printOption){
+	public ReqInsertOrder(Staff staff, Order.UpdateBuilder builder, PrintOption printOption){
 		
-		if(type == Type.INSERT_ORDER || type == Type.INSERT_ORDER_FORCE){
-			if(reqOrder.getDestTbl() == null){
-				throw new IllegalArgumentException("The table to insert order request can NOT be null.");
-			}
-		}else if(type == Type.UPDATE_ORDER){
-			if(reqOrder.getId() == 0){
-				throw new IllegalArgumentException("The order id to update request can NOT be zero.");
-			}
-			if(reqOrder.getDestTbl() == null){
-				throw new IllegalArgumentException("The table to update order request can NOT be null.");
-			}
-			if(reqOrder.getOrderDate() == 0){
-				throw new IllegalArgumentException("The order date to update order request can NOT be zero.");
-			}
-		}else{
-			throw new IllegalArgumentException();
-		}
+		super(staff);
+		
+		header.mode = Mode.ORDER_BUSSINESS;
+		header.type = Type.UPDATE_ORDER;
+		header.reserved = printOption.getVal();
+
+		fillBody(builder, Order.ORDER_PARCLEABLE_4_UPDATE);
 	}
+	
 	
 }
