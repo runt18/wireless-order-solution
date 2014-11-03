@@ -4,7 +4,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -154,22 +153,54 @@ public class AskTableDialog extends DialogFragment {
 		return fgm;
 	}
 	
+	public static AskTableDialog newInstance(int parentFgmId){
+		AskTableDialog fgm = new AskTableDialog();
+		Bundle bundle = new Bundle();
+		bundle.putInt(PARENT_FGM_ID_KEY, parentFgmId);
+		fgm.setArguments(bundle);
+		return fgm;
+	}
+	
+	private final static String PARENT_FGM_ID_KEY = "ParentFgmIdKey";
+	
 	private ViewHandler mViewHanlder;
 	
 	private String mFilterCond; 
 	
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        // Verify that the host activity implements the callback interface
-        try {
-            // Instantiate the NoticeDialogListener so we can send events to the host
-        	mOnTableSelectedListener = (OnTableSelectedListener) activity;
-        } catch (ClassCastException e) {
-            // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(activity.toString() + " must implement OnTableSelectedListener");
-        }
-    }
+//    @Override
+//    public void onAttach(Activity activity) {
+//        super.onAttach(activity);
+//        // Verify that the host activity implements the callback interface
+//        try {
+//            // Instantiate the NoticeDialogListener so we can send events to the host
+//        	mOnTableSelectedListener = (OnTableSelectedListener) activity;
+//        } catch (ClassCastException ignored) {
+//            // The activity doesn't implement the interface, throw exception
+//            // throw new ClassCastException(activity.toString() + " must implement OnTableSelectedListener");
+//        }
+//    }
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		if(getArguments() != null && getArguments().containsKey(PARENT_FGM_ID_KEY)){
+			try{
+				// Instantiate the mOnTableSelectedListener so we can send events to the host
+				mOnTableSelectedListener = (OnTableSelectedListener)getFragmentManager().findFragmentById(getArguments().getInt(PARENT_FGM_ID_KEY));
+			}catch(ClassCastException e){
+				throw new ClassCastException(getFragmentManager().findFragmentById(getArguments().getInt(PARENT_FGM_ID_KEY)).toString() + " must implement OnTableSelectedListener");
+			}
+		}else{
+	        // Verify that the host activity implements the callback interface
+	        try {
+	            // Instantiate the NoticeDialogListener so we can send events to the host
+	        	mOnTableSelectedListener = (OnTableSelectedListener) getActivity();
+	        } catch (ClassCastException ignored) {
+	            // The activity doesn't implement the interface, throw exception
+	            throw new ClassCastException(getActivity().toString() + " must implement OnTableSelectedListener");
+	        }
+		}
+	}
 	
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {

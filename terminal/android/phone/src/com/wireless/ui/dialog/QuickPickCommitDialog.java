@@ -34,7 +34,6 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.Type;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayBuilder;
@@ -180,12 +179,13 @@ public class QuickPickCommitDialog extends DialogFragment{
 			public void onClick(View v) {
 				mIsPayOrder = false;
 				try{
-//					short tableAlias = Short.parseShort(tableText.getText().toString());
-//					new QueryAndCommitOrderTask(tableAlias, PrintOption.DO_NOT_PRINT).execute();
 					new InsertOrderForceTask(Short.parseShort(tableText.getText().toString()), PrintOption.DO_NOT_PRINT).execute();
 
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
+					
+				} catch (BusinessException e) {
+					Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -198,8 +198,12 @@ public class QuickPickCommitDialog extends DialogFragment{
 				mIsTempPay = true;
 				try{
 					new InsertOrderForceTask(Short.parseShort(tableText.getText().toString())).execute();
+					
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
+					
+				} catch (BusinessException e) {
+					Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -212,8 +216,12 @@ public class QuickPickCommitDialog extends DialogFragment{
 				mIsTempPay = false;
 				try{
 					new InsertOrderForceTask(Short.parseShort(tableText.getText().toString())).execute();
+					
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
+					
+				} catch (BusinessException e) {
+					Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -236,6 +244,10 @@ public class QuickPickCommitDialog extends DialogFragment{
 					try{
 						short tableAlias = Short.parseShort(tableText.getText().toString());
 						new InsertOrderForceTask(tableAlias).execute();
+						
+					}catch (BusinessException e) {
+						Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+							
 					}catch(NumberFormatException e){
 						Toast.makeText(getActivity(), "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
 					}
@@ -327,12 +339,12 @@ public class QuickPickCommitDialog extends DialogFragment{
 
 		private ProgressDialog mProgDialog;
 		
-		InsertOrderForceTask(int tableAlias, PrintOption printOption) {
-			super(WirelessOrder.loginStaff, mReqOrder, Type.INSERT_ORDER_FORCE, printOption);
+		InsertOrderForceTask(int tableAlias, PrintOption printOption) throws BusinessException {
+			super(WirelessOrder.loginStaff, new Order.InsertBuilder(new Table.AliasBuilder(tableAlias)).addAll(mReqOrder.getOrderFoods(), WirelessOrder.loginStaff).setForce(true), printOption);
 			mReqOrder.setDestTbl(new Table.AliasBuilder(tableAlias).build());
 		}
 		
-		InsertOrderForceTask(int tableAlias) {
+		InsertOrderForceTask(int tableAlias) throws BusinessException {
 			this(tableAlias, PrintOption.DO_PRINT);
 		}
 		

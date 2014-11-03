@@ -16,20 +16,22 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.fragment.OrderFoodFragment;
+import com.wireless.fragment.OrderFoodFragment.OnCommitListener;
 import com.wireless.fragment.OrderFoodFragment.OnOrderChangedListener;
-import com.wireless.pack.Type;
 import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.regionMgr.Table;
 
-public class OrderActivity extends FragmentActivity implements OnOrderChangedListener{
+public class OrderActivity extends FragmentActivity implements OnOrderChangedListener, OnCommitListener{
 	
 	public static final String KEY_TABLE_ID = OrderActivity.class.getName() + ".tableKey";
+	
+	private ProgressDialog mProgressDialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -102,20 +104,16 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 			customNum = 1;
 		}
 		
-		if(forceInsert){
-			//强制下单
-			new CommitOrderTask(ofFgm.buildNewOrder(table, customNum), Type.INSERT_ORDER_FORCE).execute();
-		}else{
-			Order reqOrder = ofFgm.buildRequestOrder(table, customNum);
-			if(reqOrder.getId() != 0){
-				//改单
-				new CommitOrderTask(reqOrder, Type.UPDATE_ORDER).execute();
+		try{
+			if(forceInsert){
+				//强制下单
+				ofFgm.commitForce(new Table.AliasBuilder(table.getAliasId()), customNum, PrintOption.DO_PRINT);
 			}else{
-				//下单
-				new CommitOrderTask(reqOrder, Type.INSERT_ORDER).execute();
+				ofFgm.commit(new Table.AliasBuilder(table.getAliasId()), customNum, PrintOption.DO_PRINT);
 			}
+		}catch(BusinessException e){			
+			Toast.makeText(OrderActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
-			
 	}
 	
 	@Override
@@ -143,69 +141,6 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		}
 	}
 
-	private class CommitOrderTask extends com.wireless.lib.task.CommitOrderTask{
-
-		private ProgressDialog mProgressDialog;
-
-		public CommitOrderTask(Order reqOrder, byte type) {
-			super(WirelessOrder.loginStaff, reqOrder, type);
-		}
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			mProgressDialog = ProgressDialog.show(OrderActivity.this, "", "正在提交账单信息...请稍候");
-		}
-
-		@Override
-		protected void onSuccess(Order reqOrder){
-			mProgressDialog.dismiss();			
-			Toast.makeText(OrderActivity.this, reqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
-			finish();
-		}
-		
-		@Override
-		protected void onFail(BusinessException e, Order reqOrder){
-			mProgressDialog.dismiss();	
-			
-			if(e.getErrCode().equals(FrontBusinessError.ORDER_EXPIRED)){
-				//如果返回是账单过期的错误状态，表示账单已有更新
-				//则提示用户重新请求账单，再次确认提交
-				new AlertDialog.Builder(OrderActivity.this)
-					.setTitle("提示")
-					.setMessage(e.getMessage())
-					.setPositiveButton("继续提交", 
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,	int which){
-								commit(true);
-							}
-						})
-					.setNeutralButton("刷新账单",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,	int which){
-								((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).refresh();
-							}
-						})
-					.show();
-			}else{
-				new AlertDialog.Builder(OrderActivity.this)
-				.setTitle("提示")
-				.setMessage(e.getMessage())
-				.setNeutralButton("刷新账单",
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog,	int which){
-							((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).refresh();
-						}
-					})
-				.show();
-			}
-		}
-		
-	}
-
 	@Override
 	public void onOrderChanged(Order oriOrder, List<OrderFood> newFoodList) {
 		if(oriOrder != null){
@@ -218,6 +153,59 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 			//set the amount of customer
 			((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(oriOrder.getCustomNum()));	
 		}
+	}
+
+	@Override
+	public void preCommit() {
+		mProgressDialog = ProgressDialog.show(OrderActivity.this, "", "正在提交账单信息...请稍候");		
+	}
+
+	@Override
+	public void postSuccess(Order order) {
+		mProgressDialog.dismiss();			
+		Toast.makeText(OrderActivity.this, order.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
+		finish();		
+	}
+
+	@Override
+	public void postFailed(BusinessException e, Order order) {
+		mProgressDialog.dismiss();	
+		
+		if(e.getErrCode().equals(FrontBusinessError.ORDER_EXPIRED)){
+			//如果返回是账单过期的错误状态，表示账单已有更新
+			//则提示用户重新请求账单，再次确认提交
+			new AlertDialog.Builder(OrderActivity.this)
+				.setTitle("提示")
+				.setMessage(e.getMessage())
+				.setPositiveButton("继续提交", 
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,	int which){
+							commit(true);
+						}
+					})
+				.setNeutralButton("刷新账单",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,	int which){
+							((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).refresh();
+						}
+					})
+				.show();
+		}else{
+			new AlertDialog.Builder(OrderActivity.this)
+			.setTitle("提示")
+			.setMessage(e.getMessage())
+			.setNeutralButton("刷新账单",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog,	int which){
+						((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).refresh();
+					}
+				})
+			.show();
+		}
+		
 	}
 	
 }

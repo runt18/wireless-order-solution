@@ -2,6 +2,7 @@ package com.wireless.fragment;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -39,15 +40,18 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
+import com.wireless.lib.task.TransOrderFoodTask;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.parcel.TasteGroupParcel;
 import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.PickFoodActivity;
@@ -60,13 +64,16 @@ import com.wireless.ui.dialog.AskCancelAmountDialog.OnCancelAmountChangedListene
 import com.wireless.ui.dialog.AskOrderAmountDialog;
 import com.wireless.ui.dialog.AskOrderAmountDialog.ActionType;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
+import com.wireless.ui.dialog.AskTableDialog;
+import com.wireless.ui.dialog.AskTableDialog.OnTableSelectedListener;
 import com.wireless.ui.dialog.SetOrderAmountDialog;
 import com.wireless.ui.dialog.SetOrderAmountDialog.OnAmountChangedListener;
 
 public class OrderFoodFragment extends Fragment implements OnCancelAmountChangedListener,
 														   OnAmountChangedListener,
 														   OnAmountAddedListener,
-														   OnFoodPickedListener{
+														   OnFoodPickedListener,
+														   OnTableSelectedListener{
 
 	public static interface OnButtonClickedListener{
 		public void onPickFoodClicked();
@@ -76,9 +83,17 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		public void onOrderChanged(Order oriOrder, List<OrderFood> newFoodList);
 	}
 	
+	public static interface OnCommitListener{
+		public void preCommit();
+		public void postSuccess(Order order);
+		public void postFailed(BusinessException e, Order order);
+	}
+	
 	private OnButtonClickedListener mBtnClickedListener;
 	
 	private OnOrderChangedListener mOrderChangedListener;
+	
+	private OnCommitListener mCommitListener;
 	
 	public final static int PICK_FOOD = 0;
 	public final static int PICK_TASTE = 1;
@@ -115,6 +130,9 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	
 	//选中要操作的菜品
 	private OrderFood mSelectedFood;
+	
+	//要转菜的菜品
+	private List<OrderFood> mTransFoods = new ArrayList<OrderFood>();
 	
 	//已点菜品信息
 	private Order mOriOrder;
@@ -522,25 +540,32 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						
 						@Override
 						public void onClick(View v) {
-							new AlertDialog.Builder(getActivity())
-							.setTitle("提示")
-							.setMessage("催" + of.getName() + "吗？")
-							.setNeutralButton("是", new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,	int which){
-										of.setHurried(true);
-										Toast.makeText(getActivity(), "催菜成功", Toast.LENGTH_SHORT).show();	
-										mFoodListHandler.sendEmptyMessage(0);
+							new AlertDialog
+							   .Builder(getActivity())
+							   .setTitle(of.getName())
+							   .setItems(new String[] { of.isHurried() ? "取消催菜" : "催菜", "转菜" }, new DialogInterface.OnClickListener(){
+
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									mSelectedFood = of;
+									if(which == 0){
+										//催菜
+										if(mSelectedFood.isHurried()){
+											mSelectedFood.setHurried(false);
+										}else{
+											mSelectedFood.setHurried(true);
+											Toast.makeText(getActivity(), "催菜成功", Toast.LENGTH_SHORT).show();	
+										}
+									}else if(which == 1){
+										mTransFoods.clear();
+										mTransFoods.add(mSelectedFood);
+										AskTableDialog.newInstance(getId()).show(getFragmentManager(), AskTableDialog.TAG);
 									}
-								})
-								.setNegativeButton("否", new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,	int which){
-										of.setHurried(false);
-										mFoodListHandler.sendEmptyMessage(0);
-									}
-								})
-								.show();	
+									mFoodListHandler.sendEmptyMessage(0);
+								}
+								   
+							   }).setNegativeButton("返回", null).show();
+							
 						}
 						
 					});
@@ -764,6 +789,24 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 
 					}
 				});
+				
+				if(mOriOrder != null){
+					//全单转菜Button
+					popupLayout.findViewById(R.id.button_orderActivity_operate_popup_transfer).setOnClickListener(new View.OnClickListener() {
+	
+						@Override
+						public void onClick(View arg0) {
+							mTransFoods.clear();
+							mTransFoods.addAll(mOriOrder.getOrderFoods());
+							AskTableDialog.newInstance(getId()).show(getFragmentManager(), AskTableDialog.TAG);
+							mPopup.dismiss();
+						}
+						
+					});
+				}else{
+					popupLayout.findViewById(R.id.button_orderActivity_operate_popup_transfer).setVisibility(View.GONE);
+				}
+				
 			}
 		}
 	}
@@ -794,6 +837,10 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		
 		try{
 			mOrderChangedListener = (OnOrderChangedListener)activity;
+		}catch(ClassCastException ignored){}
+		
+		try{
+			mCommitListener = (OnCommitListener)activity;
 		}catch(ClassCastException ignored){}
 		
 	}
@@ -881,42 +928,72 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		}
 	}
 	
-	public Order buildRequestOrder(int tableAlias, int customNum){
-		if(mOriOrder != null){
-			Order reqOrder = new Order(mOriOrder.getOrderFoods());
-			
-			reqOrder.setId(mOriOrder.getId());
-			reqOrder.setOrderDate(mOriOrder.getOrderDate());
-			reqOrder.setCustomNum(customNum);
-			reqOrder.setDestTbl(new Table.AliasBuilder(tableAlias).build());
-			
-			//如果有新点菜，则添加进账单
-			if(!mNewFoodList.isEmpty()){
-				try{
-					reqOrder.addFoods(mNewFoodList, WirelessOrder.loginStaff);
-				}catch(BusinessException e){
-					Toast.makeText(OrderFoodFragment.this.getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-				}
+	private class CommitOrderTask extends com.wireless.lib.task.CommitOrderTask{
+
+		public CommitOrderTask(Staff staff, Order.InsertBuilder builder, PrintOption printOption) {
+			super(staff, builder, printOption);
+		}
+
+		public CommitOrderTask(Staff staff, Order.UpdateBuilder builder, PrintOption printOption) {
+			super(staff, builder, printOption);
+		}
+		
+		@Override
+		protected void onPreExecute() {
+			if(mCommitListener != null){
+				mCommitListener.preCommit();
 			}
-			
-			return reqOrder;
-		//新下单
+		}
+		
+		@Override
+		protected void onSuccess(Order reqOrder) {
+			if(mCommitListener != null){
+				mCommitListener.postSuccess(reqOrder);
+			}			
+		}
+
+		@Override
+		protected void onFail(BusinessException e, Order reqOrder) {
+			if(mCommitListener != null){
+				mCommitListener.postFailed(e, reqOrder);
+			}			
+		}
+		
+	}
+	
+	public void commitForce(Table.AliasBuilder tblBuilder, int customNum, PrintOption printOption) throws BusinessException{
+		new CommitOrderTask(WirelessOrder.loginStaff, 
+						    new Order.InsertBuilder(tblBuilder).addAll(mNewFoodList, WirelessOrder.loginStaff).setCustomNum(customNum).setForce(true),
+						    printOption).execute();
+	}
+	
+	public void commit(Table.AliasBuilder tblBuilder, int customNum, PrintOption printOption) throws BusinessException{
+		if(mOriOrder != null){
+			//改单
+			new CommitOrderTask(WirelessOrder.loginStaff, 
+								new Order.UpdateBuilder(mOriOrder.getId(), mOriOrder.getOrderDate())
+										 .addAll(mNewFoodList, WirelessOrder.loginStaff)
+										 .addAll(mOriOrder.getOrderFoods(), WirelessOrder.loginStaff)
+										 .setCustomNum(customNum),
+								printOption).execute();
 		}else{
-			Order reqOrder = new Order(mNewFoodList, tableAlias, customNum);
-			return reqOrder;
+			//新下单
+			new CommitOrderTask(WirelessOrder.loginStaff, 
+								new Order.InsertBuilder(tblBuilder).addAll(mNewFoodList, WirelessOrder.loginStaff).setCustomNum(customNum),
+								printOption).execute();
 		}
 	}
 	
-	public Order buildRequestOrder(Table table, int customNum){
-		return buildRequestOrder(table.getAliasId(), customNum);
+	public List<OrderFood> getOriFoods(){
+		if(mOriOrder != null){
+			return mOriOrder.getOrderFoods();
+		}else{
+			return Collections.emptyList();
+		}
 	}
 	
-	public Order buildNewOrder(int tableAlias, int customNum){
-		return new Order(mNewFoodList, tableAlias, customNum);
-	}
-	
-	public Order buildNewOrder(Table table, int customNum){
-		return new Order(mNewFoodList, table.getAliasId(), customNum);
+	public List<OrderFood> getNewFoods(){
+		return Collections.unmodifiableList(mNewFoodList);
 	}
 	
 	public boolean hasOrderFood(){
@@ -1069,6 +1146,39 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		if(type == ActionType.MODIFY){
 			mFoodListHandler.sendEmptyMessage(0);
 		}
+	}
+
+	@Override
+	public void onTableSelected(final Table selectedTable) {
+		if(mOriOrder == null){
+			return;
+		}
+		new TransOrderFoodTask(WirelessOrder.loginStaff, new Order.TransferBuilder(mOriOrder.getId(), new Table.AliasBuilder(selectedTable.getAliasId())).addAll(mTransFoods)) {
+			
+			private ProgressDialog mProgressDialog;
+			
+			@Override
+			public void onPreExecute(){
+				mProgressDialog = ProgressDialog.show(getActivity(), "", "正在转菜...请稍后", true);
+			}
+			
+			@Override
+			protected void onSuccess() {
+				mProgressDialog.dismiss();
+				Toast.makeText(getActivity(), "菜品转至" + selectedTable.getAliasId() + "号台", Toast.LENGTH_SHORT).show();
+				mQueryOrderTask = new QueryOrderTask(mOriOrder.getDestTbl().getAliasId());
+				mQueryOrderTask.execute();
+			}
+			
+			@Override
+			protected void onFail(BusinessException e) {
+				mProgressDialog.dismiss();
+				new AlertDialog.Builder(getActivity()).setTitle("转菜失败")
+				.setMessage(e.getMessage())
+				.setNegativeButton("退出", null).show();
+			}
+		}.execute();
+			
 	}
 }
 

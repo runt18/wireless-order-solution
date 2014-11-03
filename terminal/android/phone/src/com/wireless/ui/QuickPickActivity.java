@@ -189,7 +189,9 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 			public void onClick(View v) {
 				//若未点菜，则提示。
 				if(((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).hasNewOrderFood()){
-					QuickPickCommitDialog.newCommitDialog(((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).buildRequestOrder(0, 1)).show(getSupportFragmentManager(), QuickPickCommitDialog.TAG);
+					Order reqOrder = new Order(0);
+					reqOrder.setOrderFoods(((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).getNewFoods());
+					QuickPickCommitDialog.newCommitDialog(reqOrder).show(getSupportFragmentManager(), QuickPickCommitDialog.TAG);
 				}else{
 					Toast.makeText(getApplicationContext(), "您尚未点菜", Toast.LENGTH_SHORT).show();
 				}
