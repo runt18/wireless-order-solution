@@ -10,6 +10,7 @@ import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
+import com.wireless.exception.StaffError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.dishesOrder.Order;
@@ -23,6 +24,7 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.serviceRate.ServicePlan;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 
@@ -557,7 +559,7 @@ public class OrderDao {
 	 * @param builder
 	 * 			the transfer builder
 	 * @throws BusinessException
-	 * 			
+	 * 			throws if NOT permitted to transfer food
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
@@ -587,7 +589,7 @@ public class OrderDao {
 	 * @param builder
 	 * 			the transfer builder
 	 * @throws BusinessException
-	 * 			
+	 * 			throws if NOT permitted to transfer food
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
@@ -595,6 +597,10 @@ public class OrderDao {
 		
 		if(builder.getTransferFoods().isEmpty()){
 			return;
+		}
+		
+		if(!staff.getRole().hasPrivilege(Privilege.Code.TRANSFER_FOOD)){
+			throw new BusinessException(StaffError.TRANSFER_FOOD_NOT_ALLOW);
 		}
 		
 		Order source = OrderDao.getById(dbCon, staff, builder.getSourceOrderId(), DateType.TODAY);
