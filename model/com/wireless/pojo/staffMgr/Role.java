@@ -131,6 +131,7 @@ public class Role implements Jsonable, Parcelable{
 			addPrivilege(Privilege.Code.ADD_FOOD);
 			addPrivilege(Privilege.Code.BASIC);
 			addPrivilege(Privilege.Code.CANCEL_FOOD);
+			addPrivilege(Privilege.Code.TRANSFER_FOOD);
 			addPrivilege(Privilege.Code.DISCOUNT);
 			addPrivilege(Privilege.Code.GIFT);
 			addPrivilege(Privilege.Code.HISTORY);
@@ -152,6 +153,7 @@ public class Role implements Jsonable, Parcelable{
 			setCategoty(Category.MANAGER);
 			addPrivilege(Privilege.Code.ADD_FOOD);
 			addPrivilege(Privilege.Code.CANCEL_FOOD);
+			addPrivilege(Privilege.Code.TRANSFER_FOOD);
 			addPrivilege(Privilege.Code.DISCOUNT);
 			addPrivilege(Privilege.Code.GIFT);
 			addPrivilege(Privilege.Code.RE_PAYMENT);

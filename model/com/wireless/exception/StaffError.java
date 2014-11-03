@@ -18,6 +18,7 @@ public class StaffError extends ErrorEnum{
 	public static final ErrorCode TEMP_PAYMENT_NOT_ALLOW = build(7610, "你没有暂结的权限");
 	public static final ErrorCode RESERVED_ROLE_NOT_ALLOW_MODIFY = build(7611, "系统保留的角色不能修改");
 	public static final ErrorCode RESERVED_STAFF_NOT_ALLOW_MODIFY = build(7611, "系统保留的员工不能修改");
+	public static final ErrorCode TRANSFER_FOOD_NOT_ALLOW = build(7606, "你没有转菜的权限");
 	
 	private StaffError(){
 		
