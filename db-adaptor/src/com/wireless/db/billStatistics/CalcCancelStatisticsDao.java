@@ -17,6 +17,7 @@ import com.wireless.pojo.billStatistics.cancel.CancelIncomeByEachDay;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByStaff;
 import com.wireless.pojo.crMgr.CancelReason;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.staffMgr.Staff;
@@ -383,6 +384,7 @@ public class CalcCancelStatisticsDao {
 			  " JOIN " + Params.dbName + "." + extraCond.tasteGroupTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 			  " WHERE 1 = 1 " +
 			  " AND OF.order_count < 0 " +
+			  " AND OF.operation = " + OrderFood.Operation.CANCEL.getVal() +
 			  extraCond;
 		
 		return sql;

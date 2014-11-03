@@ -59,6 +59,7 @@ public class OrderFoodDao {
 			}
 			extraCond.append(" AND " + orderTblAlias + ".cancel_price <> 0");
 			extraCond.append(" AND " + orderFoodTblAlias + ".order_count < 0");
+			extraCond.append(" AND " + orderFoodTblAlias + ".operation = " + OrderFood.Operation.CANCEL.getVal());
 			extraCond.append(super.toString());
 			
 			return extraCond.toString();
