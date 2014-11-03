@@ -2,6 +2,7 @@ package com.wireless.db.orderMgr;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -21,6 +22,7 @@ import com.wireless.pojo.dishesOrder.MixedPayment;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.serviceRate.ServicePlan;
@@ -205,7 +207,11 @@ public class PayOrder {
 		
 		if(orderCalculated.getPaymentType().isMixed()){
 			if(payBuilder.getMixedPayment().getPrice() == orderCalculated.getActualPrice()){
-				orderCalculated.setMixedPayment(payBuilder.getMixedPayment());
+				MixedPayment mixedPayment = new MixedPayment();
+				for(Map.Entry<PayType, Float> entry : payBuilder.getMixedPayment().getPayments().entrySet()){
+					mixedPayment.add(PayTypeDao.getById(dbCon, staff, entry.getKey().getId()), entry.getValue().floatValue());
+				}
+				orderCalculated.setMixedPayment(mixedPayment);
 			}else{
 				throw new BusinessException(FrontBusinessError.MIXED_PAYMENT_NOT_EQUALS_TO_ACTUAL);
 			}
@@ -516,7 +522,10 @@ public class PayOrder {
 			  " ABS(ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2)) AS cancel_price " +
 			  " FROM " + Params.dbName + ".order_food OF" + 
 			  " JOIN " + Params.dbName + ".taste_group TG ON OF.taste_group_id = TG.taste_group_id " +
-			  " WHERE OF.order_count < 0 AND OF.order_id = " + orderToCalc.getId();
+			  " WHERE 1 = 1 " + 
+			  " AND OF.order_count < 0 " +
+			  " AND OF.operation = " + OrderFood.Operation.CANCEL.getVal() +
+			  " AND OF.order_id = " + orderToCalc.getId();
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
@@ -528,10 +537,8 @@ public class PayOrder {
 		sql = " SELECT " + 
 			  " ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2) AS repaid_price " +
 			  " FROM " + Params.dbName + ".order_food OF" + 
-			  " JOIN " + Params.dbName + ".taste_group TG" +
-			  " ON " + " OF.taste_group_id = TG.taste_group_id " +
-			  " WHERE " +
-			  " OF.is_paid = 1 " + " AND " + " OF.order_id = " + orderToCalc.getId();
+			  " JOIN " + Params.dbName + ".taste_group TG ON OF.taste_group_id = TG.taste_group_id " +
+			  " WHERE OF.is_paid = 1 AND OF.order_id = " + orderToCalc.getId();
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){

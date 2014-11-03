@@ -273,7 +273,7 @@ public class OrderFoodDao {
 		String sql;
 
 		if(dateType.isHistory()){
-		sql = "SELECT OF.order_id, OF.taste_group_id, OF.is_temporary,OF.is_gift, " +
+		sql = "SELECT OF.order_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, OF.operation, " +
 				" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
 				" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
 				" OF.cancel_reason_id, IF(OF.cancel_reason_id = 1, '无原因', OF.cancel_reason) cancel_reason, " +
@@ -289,7 +289,7 @@ public class OrderFoodDao {
 				(orderClause == null ? "" : " " + orderClause);
 		
 		}else if(dateType.isToday()){
-			sql = " SELECT OF.id, OF.order_id, OF.taste_group_id, OF.is_temporary,OF.is_gift, " +
+			sql = " SELECT OF.id, OF.order_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, OF.operation, " +
 					" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
 					" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
 					" OF.cancel_reason_id, OF.cancel_reason, " +
@@ -318,6 +318,7 @@ public class OrderFoodDao {
 			of.asFood().setStatus(dbCon.rs.getShort("food_status"));
 			of.setRepaid(dbCon.rs.getBoolean("is_paid"));
 			of.setGift(dbCon.rs.getBoolean("is_gift"));
+			of.setOperation(OrderFood.Operation.valueOf(dbCon.rs.getInt("operation")));
 			
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
 			//Get the detail to taste group.

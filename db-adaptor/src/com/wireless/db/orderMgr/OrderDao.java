@@ -592,6 +592,11 @@ public class OrderDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static void transfer(DBCon dbCon, Staff staff, Order.TransferBuilder builder) throws BusinessException, SQLException{
+		
+		if(builder.getTransferFoods().isEmpty()){
+			return;
+		}
+		
 		Order source = OrderDao.getById(dbCon, staff, builder.getSourceOrderId(), DateType.TODAY);
 		
 		if(source.getDestTbl().getAliasId() == builder.getDestTbl().getAliasId()){
@@ -612,6 +617,7 @@ public class OrderDao {
 		
 		//Transfer out the foods from source order.
 		for(OrderFood foodOut : builder.getTransferFoods()){
+			OrderFoodDao.fill(dbCon, staff, foodOut);
 			OrderFoodDao.insertCancelled(dbCon, staff, new OrderFoodDao.TransferBuilder(source.getId(), foodOut).asCancel());
 		}
 
