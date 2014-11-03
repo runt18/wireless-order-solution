@@ -2,8 +2,10 @@ package com.wireless.print.content;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.Map.Entry;
 
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -57,21 +59,7 @@ public class ReceiptContent extends ConcreteContent {
 		mTemplate = mTemplate.replace(PVar.PRINT_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()));
 		
 		//replace the "$(pay_manner)"
-		final String payment;
-		if(mOrder.getPaymentType().isCash()){
-			payment = "(现金)";			
-		}else if(mOrder.getPaymentType().isCreditCard()){
-			payment = "(刷卡)";			
-		}else if(mOrder.getPaymentType().isHang()){
-			payment = "(挂账)";			
-		}else if(mOrder.getPaymentType().isMember()){
-			payment = "(会员卡)";			
-		}else if(mOrder.getPaymentType().isSign()){
-			payment = "(签单)";			
-		}else{
-			payment = "(现金)";	
-		}
-		mTemplate = mTemplate.replace(PVar.PAY_MANNER, payment);
+		mTemplate = mTemplate.replace(PVar.PAY_MANNER, "(" + mOrder.getPaymentType().getName() + ")");
 		
 		//replace the "$(order_cate)"
 		mTemplate = mTemplate.replace(PVar.ORDER_CATE, "");
@@ -105,8 +93,21 @@ public class ReceiptContent extends ConcreteContent {
 		mTemplate = mTemplate.replace(PVar.VAR_1, new FoodListContent(buildReciptFormat(), mOrder.getOrderFoods(), mPrintType, mStyle).toString());
 		
 		//replace the $(var_3) with the actual price
-		mTemplate = mTemplate.replace(PVar.VAR_3, 
-				new ExtraFormatDecorator(new RightAlignedDecorator("实收金额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getActualPrice()), mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+		StringBuilder var3 = new StringBuilder();
+		var3.append(new ExtraFormatDecorator(new RightAlignedDecorator("实收金额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getActualPrice()), mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString())
+			.append(SEP);
+		if(mOrder.getPaymentType().isMixed()){
+			StringBuilder mixedDetail = new StringBuilder();
+			for(Entry<PayType, Float> entry : mOrder.getMixedPayment().getPayments().entrySet()){
+				if(mixedDetail.length() == 0){
+					mixedDetail.append(entry.getKey().getName() + "：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(entry.getValue()));
+				}else{
+					mixedDetail.append(" ").append(entry.getKey().getName() + "：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(entry.getValue()));
+				}
+			}
+			var3.append(new RightAlignedDecorator(mixedDetail.toString(), mStyle));
+		}
+		mTemplate = mTemplate.replace(PVar.VAR_3, var3.toString());
 		
 		//generate the comment and replace the $(var_3)
 		if(mOrder.getComment().isEmpty()){
