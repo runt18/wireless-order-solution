@@ -286,7 +286,7 @@ Ext.onReady(function(){
 						}else if(e.attributes.mId == "payTypeMgr"){
 							if(typeof getPayType == 'undefined'){
 								$.getScript("../../js/BasicManagement/payTypeMgr/payTypeMgr.js",function(){
-									getPayType();//这个函数是在new.js里面的，当点击click后运行这个函数
+									getPayType();//这个函数是在payTypeMgr.js里面的，当加载完成后运行这个函数
 								});								
 							}else{
 								getPayType();
