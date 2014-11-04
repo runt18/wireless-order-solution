@@ -615,7 +615,11 @@
 		<action path="/OperatePayType"
 			type="com.wireless.Actions.orderMgr.OperatePayTypeAction"
 			scope="request" parameter="dataSource">
-		</action>							
+		</action>		
+		<action path="/TransFood"
+			type="com.wireless.Actions.dishesOrder.TransFoodAction"
+			scope="request" >
+		</action>								
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
