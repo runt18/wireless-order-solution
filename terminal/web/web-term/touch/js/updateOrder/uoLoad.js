@@ -153,6 +153,10 @@ function showOrder(){
 	$(".cancelFoodBtn").bind("click", function(){
 		cancelFood(this);
 	});
+	
+	$(".transFoodBtn").bind("click", function(){
+		transFoodForTS(this);
+	});	
 }
 
 /**

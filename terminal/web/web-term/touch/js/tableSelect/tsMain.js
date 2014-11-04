@@ -1,3 +1,65 @@
+ts.s = {
+	file : null,
+	fileValue : null,
+	init : function(c){
+		this.file = getDom(c.file);
+		if(typeof this.file.oninput != 'function'){
+			this.file.oninput = function(e){
+				ts.s.fileValue = ts.s.file.value;
+				var data = null, temp = null;
+				if(ts.s.fileValue.trim().length > 0){
+					data = [];
+					temp = tables.slice(0);
+					for(var i = 0; i < temp.length; i++){
+//						alert(temp[i].alias + ', ' + ts.s.fileValue.trim())
+						if((temp[i].alias + '').indexOf(ts.s.fileValue.trim()) != -1){
+							data.push(temp[i]);
+						}
+					}				
+				}
+				initSearchTables({
+					data : data.slice(0, 5)
+				});
+				data = null;
+				temp = null;
+			};
+		}
+		return this.file;
+	},
+	valueBack : function(){
+		this.file.value = this.file.value.substring(0, this.file.value.length - 1);
+		this.file.oninput(this.file);
+		this.file.focus();
+	},
+	select : function(){
+		this.file.select();
+	},
+	clear : function(){
+		this.file.value = '';
+		this.file.oninput(this.file);
+		this.file.select();
+	},
+	callback : function(){
+		co.s.clear();
+	}
+};
+
+
+function initSearchTables(c){
+	var html = '';
+	for (var i = 0; i < c.data.length; i++) {
+		
+		html += Templet.ts.search_boxTable.format({
+			dataIndex : c.data[i].id,
+			alias : c.data[i].alias,
+			dataClass : c.data[i].statusValue == '1' ? "\"main-box-base table-busy\"" : "\"main-box-base\"",
+			tableName : c.data[i].name == "" || typeof c.data[i].name != 'string' ? c.data[i].alias + "号桌" : c.data[i].name
+		});	
+	}
+	
+	$('#divSelectTablesForTs').html(html);
+}
+
 /**
  * 取得当前区域下不同状态的餐桌数组 
  * @param {string} type 状态类型，分为空闲（free），就餐（busy），全部状态（allStatus）
@@ -119,7 +181,7 @@ ts.selectBusyStatus = function(){
  */
 ts.selectTable = function(c){
 	updateTable({
-		alias : c.tableAlias, 
+		alias : c.tableAlias
 	});
 };
 
@@ -196,6 +258,7 @@ function inputNum(o){
 		}
 	}
 	$("#" + inputNumId).focus();	
+	getDom(inputNumId).oninput();
 }
 
 //进入点菜界面
@@ -283,7 +346,7 @@ ts.createOrderForShowMessageTS = function(){
 ts.submitForSelectTableNumTS = function(){
 	//获得餐桌号
 	var tableNo;
-	var peopleNo = 0;
+	var peopleNo = 1;
 	if($("#txtTableNumForTS") == ""){
 		tableNo = -1;
 	}else{
@@ -292,10 +355,70 @@ ts.submitForSelectTableNumTS = function(){
 	renderToCreateOrder(tableNo, peopleNo);	
 };
 
+function uo_transFood(c){
+	ts.tf.count = $('#txtFoodNumForTran').val();
+	$.post('../TransFood.do', {
+		orderId : uo.order.id,
+		aliasId : c.alias,
+		transFoods : (c.allTrans?c.allTrans:(ts.tf.id + ',' + ts.tf.count))		
+	},function(data){
+		if(data.success){
+			$('#btnCloseForSelectTableNumTS').click();
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : data.msg, 
+				time : 2
+			});				
+			//刷新已点菜
+			updateTable({
+				alias : uo.table.alias
+			});
+			ts.tf={};
+		}else{
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : data.msg, 
+				time : 2
+			});				
+		}			
+	});
+}
+
+ts.submitForSelectTableOrTransFood = function(){
+	if(ts.commitTableOrTran == 'table'){
+		ts.submitForSelectTableNumTS();
+	}else if(ts.commitTableOrTran == 'trans'){
+		uo_transFood({alias:$('#txtTableNumForTS').val()});
+	}else if(ts.commitTableOrTran == 'allTrans'){
+		uo_transFood({alias:$('#txtTableNumForTS').val(), allTrans : -1});
+	}
+}
+
+ts.toOrderFoodOrTransFood = function(alias){
+	if(ts.commitTableOrTran == 'table'){
+		renderToCreateOrder(alias, 1);
+	}else if(ts.commitTableOrTran == 'trans'){
+		uo_transFood({alias:alias});
+	}else if(ts.commitTableOrTran == 'allTrans'){
+		uo_transFood({alias:alias, allTrans : -1});
+	}
+}
+
+
 //点击工具栏上的点菜按钮，弹出桌号选择框，能够转到点菜页面
 function createOrderForTS(){
+	$('#divTransFoodNumber').hide();
+	$('#divTransFoodTableAlias > span').removeClass('trans-food-label');
+	$('#divTransFoodTableAlias > span').addClass('select-food-label');
+	ts.commitTableOrTran = 'table';
 	showSelectTableNumTS();
+	var title = "";
+	title = "请输入桌号，确定进入点菜界面";
+	$("#divTopForSelectTableNumTS").html("<div style = 'font-size: 20px; " +
+			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");	
 }
+
+
 
 /**
  * 刷新
@@ -444,10 +567,7 @@ function showSelectTableNumTS(){
 		type : 'show',
 		renderTo : 'divSelectTableNumForTs'
 	});
-	var title = "";
-	title = "请输入桌号，确定进入点菜界面";
-	$("#divTopForSelectTableNumTS").html("<div style = 'font-size: 20px; " +
-			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");
+
 	//关闭该界面
 	$("#btnCloseForSelectTableNumTS").click(function(){
 		Util.dialongDisplay({
@@ -473,7 +593,6 @@ ts.backOne = function(){
 	}
 	$("#" + inputNumId).focus();
 };
-
 /**
  * 重置数字
  */

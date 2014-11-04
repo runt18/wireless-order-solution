@@ -42,6 +42,8 @@ $(function(){
 	 * 定时器，定时刷新餐桌选择页面数据
 	 */
 	window.setInterval("initTableData()", 240000);
+	
+	ts.s.init({file : 'txtTableNumForTS'});
 });
 
 /**
@@ -133,7 +135,7 @@ function updateTable(c){
 		type : 'post',
 		data : {
 			alias : c.alias,
-			random : Math.random(),
+			random : Math.random()
 		},
 //		async : false,
 		success : function(data, status, xhr){
@@ -146,7 +148,7 @@ function updateTable(c){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : err, 
-				time : 2,
+				time : 2
 			});
 		}
 	});

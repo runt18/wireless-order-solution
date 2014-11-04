@@ -11,6 +11,11 @@ var Templet={
 			+ '<div style="font-weight : bold; margin-top : 20px;">{tableName}</div>'
 			+ '<div style="color: #462B77; font-size: 10px;">{alias}</div>'
 			+ '</div>',
+		search_boxTable : '<div data-index={dataIndex} data-alias={alias} class={dataClass} style="text-align : center;" '
+			+ 'onclick="ts.toOrderFoodOrTransFood({alias})">'
+			+ '<div style="font-weight : bold; margin-top : 20px;">{tableName}</div>'
+			+ '<div style="color: #462B77; font-size: 10px;">{alias}</div>'
+			+ '</div>',			
 		region : '<div class="button-base" data-value={value} data-type="region-select" '
 			+ 'onClick="ts.findTableByRegion({event:this, regionId:{value}})">{text}</div>'
 	},
@@ -64,7 +69,7 @@ var Templet={
 			+ '<td>{actualPrice}</td>'
 			+ '<td>{totalPrice}</td>'
 			+ '<td>{orderDateFormat}</td>'
-			+ '<td><div class="button-base cancelFoodBtn" id="btnuo{dataIndex}">退菜</div></td>'
+			+ '<td><span class="button-base cancelFoodBtn" id="btnuo{dataIndex}">退</span>&nbsp;<span class="button-base transFoodBtn" id="btntrans{dataIndex}">转</span></td>'
 			+ '<td>{waiter}</td>'
 			+ '</tr>',
 		changeDiscount : '<div data-value={id} class="main-box-base" onClick="uo.cd.select({id:{id}})">{name}</div>'

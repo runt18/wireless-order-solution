@@ -226,6 +226,44 @@ uo.cf.save = function(){
 	}
 };
 
+function transFoodForTS(o){
+	$('#divTransFoodNumber').show();
+	$('#divTransFoodTableAlias > span').removeClass('select-food-label');
+	$('#divTransFoodTableAlias > span').addClass('trans-food-label');
+	ts.commitTableOrTran = 'trans';
+	var rowId, foodName;
+	rowId = "truoFood" + o.id.substring(8, o.id.length);
+	foodName = $("#" + rowId).find("td").eq(1).text();
+	ts.tf.id = document.getElementById(rowId).getAttribute("data-value");
+	ts.tf.count = $("#" + rowId).find("td").eq(2).text();	
+	$('#txtFoodNumForTran').val(parseInt(ts.tf.count));
+	showSelectTableNumTS();
+	var title = "";
+	title = foodName +" -- 请输入桌号，菜品数量确定转菜";
+	$("#divTopForSelectTableNumTS").html("<div style = 'font-size: 15px; " +
+			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");	
+			
+	$('#txtFoodNumForTran').focus(function(){
+		inputNumId  = "txtFoodNumForTran";
+	});		
+	
+	$('#txtTableNumForTS').focus(function(){
+		inputNumId  = "txtTableNumForTS";
+	});		
+}
+
+function allTransFoodForTS(){
+	$('#divTransFoodNumber').hide();
+	$('#divTransFoodTableAlias > span').removeClass('trans-food-label');
+	$('#divTransFoodTableAlias > span').addClass('select-food-label');
+	ts.commitTableOrTran = 'allTrans';
+	showSelectTableNumTS();
+	var title = "";
+	title = "请输入桌号，确定全部转菜";
+	$("#divTopForSelectTableNumTS").html("<div style = 'font-size: 20px; " +
+			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");		
+}
+
 /**
  * 取消退菜
  * @param {string} rowId 所在行号id

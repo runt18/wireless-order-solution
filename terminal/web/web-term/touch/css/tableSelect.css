@@ -64,8 +64,8 @@
 }
 
 #divSelectTableNumForTs{
-	width: 350px;
-	height: 430px;
+	width: 410px;
+	height: 410px;
 	border: 2px solid #fff;
 	background-color: #6395EC;
 	position: absolute;
@@ -128,8 +128,23 @@
 	padding-left: 2px;
 	background-color: yellow;
 }
+
+.trans-food-number{
+	height: 40px !important; 
+	width: 60px; 
+	font-size: 20px !important;
+	padding-left: 2px;
+	background-color: yellow;
+}
 .table-busy{
 	background-color: #FF0;
 }
 
+.trans-food-label{
+	font-size: 15px; font-weight: bold; margin-left: 2px;
+}
+
+.select-food-label{
+	font-size: 25px; font-weight: bold; margin-left: 80px;
+}
 

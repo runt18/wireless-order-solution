@@ -31,7 +31,10 @@ var ln={
 var ts={
 	table : {},
 	rn : {},
-	tt : {}	
+	tt : {},
+	tf : {},
+	searchTable : false,
+	commitTableOrTran : 'table'
 }
 //下单操作包
 var co={
@@ -187,11 +190,15 @@ $(document).bind("click",function(e){
 		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick= "uo.cancelForUO()">返回</div>
   		<div class="div-full">&nbsp;</div>
   		<!-- <div class="button-base" style="margin-left: 2px; width: 120px;" onClick="uo.inputForPay()">快速结账</div> -->
-  		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="uo.saveForUO()">确定修改</div>
+  		<!-- <div class="button-base" style="margin-left: 2px; width: 120px;" onClick="uo.saveForUO()">确定修改</div> -->
+   		<div class="button-base" style="margin-left: 2px;" onClick="uo.goToCreateOrder()">点菜</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="uo.tempPayForUO()">暂结</div> 		
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.cd.show()">折扣</div>
+  		
+   		<div class="button-base" style="margin-left: 2px;" onClick="uo.tempPayForUO()">转台</div> 		
+  		<div class="button-base" style="margin-left: 2px;" onClick="allTransFoodForTS()">全单转菜</div> 	
+  			
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.showdivKeyboardPeopleForUO({type : 'setCountForPeople'})">人数</div>
-  		<div class="button-base" style="margin-left: 2px;" onClick="uo.goToCreateOrder()">点菜</div>
-  		<div class="button-base" style="margin-left: 2px;" onClick="uo.tempPayForUO()">暂结</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.tempPayForPrintAll()">补打总单</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="Util.scroll({otype: 'up', content: 'divCenterForUpdateOrder', size: 80})">上翻</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="Util.scroll({otype: 'down', content: 'divCenterForUpdateOrder', size: 80})">下翻</div>
@@ -228,6 +235,7 @@ $(document).bind("click",function(e){
 			</div>
 		</div>
   	</div>
+  	
   	<div id="divCenterForCreateOrde" class="box-horizontal">
   		<div id="divCFCONewFood" style=""> </div>
     	<div id="divCFCOHandler" style="">
@@ -401,12 +409,20 @@ $(document).bind("click",function(e){
 	</div>
 </div>
 
+
 <div id="divSelectTableNumForTs" class="content-box-base">
 	<div id="divTopForSelectTableNumTS"></div>
 	<div id="divMainForSelectTableNumTS">
 		<div id="divLeftForSelectTableNumTS">
-			<span style="font-size: 25px; font-weight: bold; margin-left: 5px;">桌号：</span>
-			<input type="text" id="txtTableNumForTS" class="table-number"/>
+			<div id="divTransFoodTableAlias" style="float: left;">
+				<span class="trans-food-label">桌号：</span>
+				<input type="text" id="txtTableNumForTS" class="trans-food-number"/>
+			</div>
+			<div id="divTransFoodNumber" style="float: left;" >
+				<span class="trans-food-label">数量：</span>
+				<input type="text" id="txtFoodNumForTran" class="trans-food-number"/>
+			</div>		
+			<div style="width:330px;float: left;margin-left: 30px;margin-top: 20px;">	
 			<div class="button-base" onClick="inputNum(this)">7</div>
 			<div class="button-base" onClick="inputNum(this)">8</div>
 			<div class="button-base" onClick="inputNum(this)">9</div>
@@ -418,16 +434,29 @@ $(document).bind("click",function(e){
 			<div class="button-base" onClick="inputNum(this)">3</div>
 			<div class="button-base" onClick="inputNum(this)" style="width: 164px;">0</div>
 			<div class="button-base" onClick="inputNum(this)">00</div>
+			</div>
 		</div>
 		<div id="divRightForSelectTableNumTS">
 			<div class="button-base" style="margin-top: 1px;" onClick="ts.backOne()">&lt;--</div>
 			<div class="button-base" onClick="ts.backAll()">&lt;&lt;</div>
 			<div class="button-base" id="btnCloseForSelectTableNumTS">关闭</div>
-			<div class="button-base" style="height: 130px; line-height: 130px;" onClick="ts.submitForSelectTableNumTS()">确定</div>
+			<div class="button-base" style="height: 130px; line-height: 130px;" onClick="ts.submitForSelectTableOrTransFood()">确定</div>
 		</div>
 	</div>
-</div>		
-
+	<div id="divSelectTablesForTs" style="	width: 105px;float:left;height: 410px;border: 2px solid #fff;background-color: #6395EC;position: absolute;margin-left: 410px;margin-top: -62px;">
+<!-- 		<div style="width: 90px;
+					height: 70px;
+					margin: 5px 0 0 5px;
+					float: left;
+					background: #87CEEA;
+					font-weight: bold;
+					font-size: 16px;
+					padding: 3px;
+					position: relative;">
+		</div> -->
+	</div>
+</div>	
+	
 <div id="divShowMessageForTableSelect" class="content-box-base">
 	<div id="divTopForShowMessageTS">
 		<span style="color: white;"><strong>请输入桌号及人数</strong></span>
