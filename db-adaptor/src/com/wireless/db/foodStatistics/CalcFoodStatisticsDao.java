@@ -70,7 +70,7 @@ public class CalcFoodStatisticsDao {
 			dbCon.rs.close();
 			
 			//Calculate the order count to each food
-			//CalcOrderCntDao.exec(dbCon);
+			CalcOrderCntDao.exec(dbCon);
 			
 			//Calculate the weight to each food
 			CalcFoodWeightDao.exec(dbCon);

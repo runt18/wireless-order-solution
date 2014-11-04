@@ -11,7 +11,7 @@ public class CalcOrderCntDao {
 	 * Calculate order count to each food from the bill history.
 	 * @return The amount of statistics record would be written to database. 
 	 * @throws SQLException
-	 * 			Throws if failed to execute the SQL statement.
+	 * 			throws if failed to execute the SQL statement
 	 */
 	public static void exec() throws SQLException{
 		DBCon dbCon = new DBCon();
@@ -25,12 +25,11 @@ public class CalcOrderCntDao {
 	
 	/**
 	 * Calculate order count to each food from the bill history.
-	 * Note that the database should be connected before invoking this method. 
 	 * @param dbCon
-	 * 			The database base connection
+	 * 			the database base connection
 	 * @return The amount of statistics record would be written to database. 
 	 * @throws SQLException
-	 * 			Throws if failed to execute the SQL statement.
+	 * 			throws if failed to execute the SQL statement
 	 */
 	public static void exec(DBCon dbCon) throws SQLException{
 		
