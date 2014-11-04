@@ -8,9 +8,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.Type;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
@@ -164,7 +164,10 @@ public final class ShoppingCart {
 					reqOrder.addFood(newFood, WirelessOrder.loginStaff);
 				}
 			}
-			new CommitOrderTask(reqOrder, Type.UPDATE_ORDER, commitListener).execute();
+			new CommitOrderTask(new Order.UpdateBuilder(mOriOrder.getId(), mOriOrder.getOrderDate())
+										 .addAll(mOriOrder.getOrderFoods(), WirelessOrder.loginStaff)
+										 .addAll(getNewFoods(), WirelessOrder.loginStaff), 
+								commitListener).execute();
 			
 		}else{
 			checkCommitValid();
@@ -175,7 +178,10 @@ public final class ShoppingCart {
 					reqOrder.addFood(newFood, WirelessOrder.loginStaff);
 				}
 			}
-			new CommitOrderTask(reqOrder, Type.INSERT_ORDER, commitListener).execute();
+			new CommitOrderTask(new Order.InsertBuilder(new Table.AliasBuilder(mDestTable.getAliasId()))
+										 .setCustomNum(mDestTable.getCustomNum())
+										 .addAll(getNewFoods(), WirelessOrder.loginStaff), 
+								commitListener).execute();
 		}
 	}
 	
@@ -633,10 +639,16 @@ public final class ShoppingCart {
 		
 		private final Order mReqOrder;
 		
-		CommitOrderTask(Order reqOrder, byte type, OnCommitListener commitListener){
-			super(WirelessOrder.loginStaff, reqOrder, type);
+		CommitOrderTask(Order.InsertBuilder builder, OnCommitListener commitListener){
+			super(WirelessOrder.loginStaff, builder, PrintOption.DO_PRINT);
 			mCommitListener = commitListener;
-			mReqOrder = reqOrder;
+			mReqOrder = builder.build();
+		}
+		
+		CommitOrderTask(Order.UpdateBuilder builder, OnCommitListener commitListener){
+			super(WirelessOrder.loginStaff, builder, PrintOption.DO_PRINT);
+			mCommitListener = commitListener;
+			mReqOrder = builder.build();
 		}
 		
 		@Override
