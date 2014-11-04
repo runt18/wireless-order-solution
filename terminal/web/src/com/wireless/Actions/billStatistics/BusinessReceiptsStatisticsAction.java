@@ -20,6 +20,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
+import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
 import com.wireless.util.DataPaging;
@@ -138,7 +139,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				});
 			}
 			
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jobject.toString(IncomeByPay.PAY_TYPE_FOR_STATISTICS));
 		}
 		return null;
 	}

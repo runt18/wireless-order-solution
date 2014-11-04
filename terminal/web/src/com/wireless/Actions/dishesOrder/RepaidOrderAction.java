@@ -27,6 +27,7 @@ public class RepaidOrderAction extends Action{
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		PrintWriter out = null;
 		int orderId = Integer.parseInt(request.getParameter("orderId"));
+		String payType_money = request.getParameter("payType_money");
 		try {
 			// 解决后台中文传到前台乱码
 			
@@ -81,6 +82,14 @@ public class RepaidOrderAction extends Action{
 			String comment = request.getParameter("comment");
 			if(comment != null){
 				payBuilder.setComment(comment.substring(0, comment.length() < 20 ? comment.length() : 20));
+			}
+			
+			if(PayType.MIXED.getId() == Integer.parseInt(request.getParameter("payType"))){
+				String payTypes[] = payType_money.split("&");
+				for (String p : payTypes) {
+					String payType[] = p.split(",");
+					payBuilder.addPayment(new PayType(Integer.parseInt(payType[0])), Float.parseFloat(payType[1]));
+				}
 			}
 			
 			//pay order
