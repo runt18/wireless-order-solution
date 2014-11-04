@@ -187,47 +187,16 @@ function initBusinessReceipsGrid(c){
 	if(c.data == null || typeof c.data == 'undefined'){
 		c.data = {successProperty : true, totalProperty:2, root: []};
 	}
-	var receivablesStatResultStore = new Ext.data.Store({
-//		proxy : new Ext.data.HttpProxy({
-//			url : "../../BusinessReceiptsStatistics.do"
-//		}),
-		proxy : new Ext.data.MemoryProxy(c.data),
-//		baseParams : {
-//			dataSource : 'normal',
-//			restaurantID : restaurantID,
-//			isPaging : true,
-//			StatisticsType : 'History'
-//		},
-		reader : new Ext.data.JsonReader({
-			totalProperty : "totalProperty",
-			root : "root"
-		}, [ {
+	
+	var receivablesStatResultStoreRecords = [{
 			name : "totalIncome"
 		}, {
 			name : 'offDutyToDate'
 		}, {
 			name : "orderAmount"
-		}, {
-			name : "cashAmount"
-		}, {
-			name : "cashIncome2"
-		}, {
-			name : "creditCardAmount"
-		},{
-			name : "creditCardIncome2"
-		}, {
-			name : "hangAmount"
-		}, {
-			name : "hangIncome2"
-		}, {
-			name : "signAmount"
-		}, {
-			name : "signIncome2"
-		}, {
-			name : "memberAmount"
-		}, {
-			name : "memberActual"
-		}, {
+	}];
+		
+	var receivablesStatResultStoreRecords2 = [{
 			name : "paidIncome"
 		}, {
 			name : "discountIncome"
@@ -251,12 +220,9 @@ function initBusinessReceipsGrid(c){
 			name : "totalActualCharge"
 		}, {
 			name : "totalActualRefund"
-		}
-		])
-	});
+	}];
 	
-	// 2，栏位模型
-	var receivablesStatResultColumnModel = new Ext.grid.ColumnModel([
+	var receivablesStatResultColumnModelRecords = [
 		new Ext.grid.RowNumberer(), {
 			header : '日期',
 			dataIndex : 'offDutyToDate',
@@ -278,37 +244,40 @@ function initBusinessReceipsGrid(c){
 			dataIndex : 'orderAmount',
 			align : 'right',
 			width : 70
-		}, {
-			header : '现金',
-			dataIndex : 'cashIncome2',
+	}];
+	
+	console.log(business_receipts_payType)
+	
+	for (var i = 0; i < business_receipts_payType.length; i++) {
+		receivablesStatResultStoreRecords.push({name : 'payType'+business_receipts_payType[i].id});
+		receivablesStatResultColumnModelRecords.push({
+			header : business_receipts_payType[i].name,
+			dataIndex : 'payType'+business_receipts_payType[i].id,
 			renderer : Ext.ux.txtFormat.gridDou,
 			align : 'right',
 			width : 100
-		}, {
-			header : '刷卡',
-			dataIndex : 'creditCardIncome2',
-			renderer : Ext.ux.txtFormat.gridDou,
-			align : 'right',
-			width : 70
-		}, {
-			header : '会员',
-			dataIndex : 'memberActual',
-			renderer : Ext.ux.txtFormat.gridDou,
-			align : 'right',
-			width : 70
-		}, {
-			header : '挂账',
-			dataIndex : 'hangIncome2',
-			renderer : Ext.ux.txtFormat.gridDou,
-			align : 'right',
-			width : 70
-		}, {
-			header : '签单',
-			dataIndex : 'signIncome2',
-			renderer : Ext.ux.txtFormat.gridDou,
-			align : 'right',
-			width : 70
-		}, {
+		});
+	}
+	
+	var receivablesStatResultStore = new Ext.data.Store({
+//		proxy : new Ext.data.HttpProxy({
+//			url : "../../BusinessReceiptsStatistics.do"
+//		}),
+		proxy : new Ext.data.MemoryProxy(c.data),
+//		baseParams : {
+//			dataSource : 'normal',
+//			restaurantID : restaurantID,
+//			isPaging : true,
+//			StatisticsType : 'History'
+//		},
+		reader : new Ext.data.JsonReader({
+			totalProperty : "totalProperty",
+			root : "root"
+		},receivablesStatResultStoreRecords.concat(receivablesStatResultStoreRecords2))
+	});
+	
+
+	var receivablesStatResultColumnModelRecords2 = [{
 			header : '折扣',
 			dataIndex : 'discountIncome',
 			renderer : Ext.ux.txtFormat.gridDou,
@@ -356,8 +325,9 @@ function initBusinessReceipsGrid(c){
 			renderer : Ext.ux.txtFormat.gridDou,
 			align : 'right',
 			width : 90
-		}
-	]);
+	}];
+	// 2，栏位模型
+	var receivablesStatResultColumnModel = new Ext.grid.ColumnModel(receivablesStatResultColumnModelRecords.concat(receivablesStatResultColumnModelRecords2));
 	
 	var receipts_beginDate = new Ext.form.DateField({
 		xtype : 'datefield',	
@@ -513,7 +483,24 @@ var receipts_setStatisticsDate = function(){
 };
 
 var receipt_hours;
+var business_receipts_payType;
+
 Ext.onReady(function(){
+	//获取总共的付款方式, 动态生成columnModel & Store的Records
+	$.ajax({
+		url : '../../QueryPayType.do',
+		type : 'post',
+		async:false,
+		data : {
+			dataSource : 'allPayType'
+		},
+		success : function(jr, status, xhr){
+			business_receipts_payType = jr.root;
+		},
+		error : function(request, status, err){
+		}
+	}); 	
+	
 	southPanel = new Ext.Panel({
 		contentEl : 'businessReceiptsChart',
 		region : 'south'

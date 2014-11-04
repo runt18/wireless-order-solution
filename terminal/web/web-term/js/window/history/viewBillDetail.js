@@ -20,6 +20,19 @@ function setOrderDetail(orderDetail){
 	Ext.getDom('cancelPriceBV').innerHTML = '￥' + orderDetail['cancelPrice'].toFixed(2);
 	var couponPrice = isNaN(orderDetail['couponPrice'])?0:orderDetail['couponPrice'];
 	Ext.getDom('couponBV').innerHTML = '￥' + couponPrice.toFixed(2);
+	
+	if(orderDetail['mixedPayment'] && orderDetail['mixedPayment'].payTypes.length > 0){
+		var mixedPayTypes = '(';
+		for (var i = 0; i < orderDetail['mixedPayment'].payTypes.length; i++) {
+			if(i > 0){
+				mixedPayTypes += ', ';
+			}
+			mixedPayTypes += orderDetail['mixedPayment'].payTypes[i].name + ':' + orderDetail['mixedPayment'].payTypes[i].money + '元';
+		}
+		mixedPayTypes += ')';
+		Ext.getDom('billDetail_mixedPay').innerHTML = mixedPayTypes;
+	}
+	
 }
 
 function load(){
@@ -209,14 +222,14 @@ Ext.onReady(function(){
 	});
 	var viewBillAddPanel = new Ext.Panel({
 		region : 'south',
-		height : 90,
+		height : 110,
 		frame : true,
 		border : false,
 		items : [new Ext.Panel({
 			xtype : 'panel',
 			layout : 'column',
 			//height : Ext.isIE ? 90 : 110 ,
-			height : 90,
+			height : 110,
 			defaults : {
 				columnWidth : .16,
 				defaults : {
@@ -303,6 +316,15 @@ Ext.onReady(function(){
 				items : [{
 					style : 'text-align:left;font-size: 25px;margin-bottom: 3px;color:green',
 					id : 'actrualPayBV'
+				}]
+			}, {
+				columnWidth : 1
+			}, {
+				columnWidth : 1,
+				items : [{
+					id : 'billDetail_mixedPay',
+					style : 'color:#15428B;text-align:left;font-size: 15px;margin-bottom: 3px;float:right;',
+					html : ''
 				}]
 			}]
 		})]

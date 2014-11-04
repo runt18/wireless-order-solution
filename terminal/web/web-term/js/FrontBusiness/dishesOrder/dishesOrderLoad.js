@@ -83,7 +83,29 @@ function loadSingleOrderData(resultJSON){
 				Ext.getCmp('serviceRate').setText(orderSingleData.other.order.serviceRate * 100);
 				Ext.getCmp('repaid_comboServicePlan').setValue(orderSingleData.other.order.servicePlanId);
 				
-				
+				if(orderSingleData.other.order.payTypeValue == 100){
+					for (var j = 0; j < orderSingleData.other.order.mixedPayment.payTypes.length; j++) {
+						var temp_payType = orderSingleData.other.order.mixedPayment.payTypes[j];
+						for (var i = 0; i < repaid_payType.length; i++) {
+							if(Ext.getDom('repaid_chbForPayType' + repaid_payType[i].id).value == temp_payType.pId){
+								Ext.getCmp('repaid_chbForPayType' + repaid_payType[i].id).setValue(true);
+								Ext.getCmp('repaid_numForPayType' + repaid_payType[i].id).enable();
+								Ext.getCmp('repaid_numForPayType' + repaid_payType[i].id).setValue(temp_payType.money);
+								break;
+							}
+						}						
+					}
+				}
+/*				else{
+					for (var i = 0; i < repaid_payType.length; i++) {
+						if(Ext.getDom('repaid_chbForPayType' + repaid_payType[i].id).value == orderSingleData.other.order.payTypeValue){
+							Ext.getCmp('repaid_chbForPayType' + repaid_payType[i].id).setValue(true);
+							Ext.getCmp('repaid_numForPayType' + repaid_payType[i].id).enable();
+							Ext.getCmp('repaid_numForPayType' + repaid_payType[i].id).setValue(orderSingleData.other.order.actualPrice);
+						}
+					}
+				}*/	
+
 				
 				Ext.Ajax.request({
 					url : '../../QueryDiscountTree.do',

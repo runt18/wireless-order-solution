@@ -1,11 +1,16 @@
 var payTypeWin, payTypeOperatePanel, payTypeGrid;
 
 //付款方式管理
-function payTypeRenderer (){
-	return ''
-		   + '<a href="javascript:updatePayTypeHandler()">修改</a>'
-		   + '&nbsp;&nbsp;&nbsp;&nbsp;'
-		   + '<a href="javascript:deletePayTypeHandler()">删除</a>';
+function payTypeRenderer (v, m, r, ri, ci, s){
+	if(r.get('typeValue') == 2){
+		return '----';
+	}else{
+		return ''
+			   + '<a href="javascript:updatePayTypeHandler()">修改</a>'
+			   + '&nbsp;&nbsp;&nbsp;&nbsp;'
+			   + '<a href="javascript:deletePayTypeHandler()">删除</a>';	
+	}
+
 }
 
 function updatePayTypeHandler(){
@@ -150,8 +155,8 @@ function initPayTypeWin(){
 				['名称', 'name'],
 				['操作', 'operation', 60, 'center', 'payTypeRenderer']
 			],
-			['id', 'name'],
-			[['dataSource', 'onlyExtra']],
+			['id', 'name', 'typeValue'],
+			[['dataSource', 'exceptMember']],
 			0,
 			'',
 			payTypeGridTbar
@@ -292,7 +297,7 @@ function getPayType(){
 	Ext.Ajax.request({
 		url : "../../QueryPayType.do",
 		params : {
-			dataSource : 'onlyExtra'
+			dataSource : 'exceptMember'
 		},
 		success : function(response){
 			var jr = Ext.util.JSON.decode(response.responseText);

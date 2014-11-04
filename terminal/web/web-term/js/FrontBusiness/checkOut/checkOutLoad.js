@@ -403,10 +403,16 @@ function fnMixedPay(){
 			 	},
 			 	items : []
 		 	}],
-			bbar : ['->',{
+			bbar : [{
+				text : '暂结',
+				iconCls : 'btn_save',
+				handler : function(e){
+					paySubmit(6);
+				}
+			},'->',{
 				text : '结账',
 				id : 'btnPayInputRecipt',
-				iconCls : 'btn_save',
+				iconCls : 'btn_app',
 				handler : function(e){
 					var mixedPayMoney = Ext.get('shouldPay').dom.innerHTML;
  	    			for(var pay in payMoneyCalc){

@@ -1,168 +1,225 @@
-﻿//反结账单头
-var dishesOrderNorthPanel = new Ext.Panel({
-	hidden : !isRepaid,
-	region : 'north',
-	height : 62,
-	frame : true,
-	layout : 'column',
-	defaults : {
-		xtype : 'panel',
+﻿
+
+//反结账单头
+function repaid_initNorthPanel(){
+
+	dishesOrderNorthPanel = new Ext.Panel({
+		hidden : !isRepaid,
+		region : 'north',
+		height : 62,
+		frame : true,
 		layout : 'column',
-		columnWidth : 1,
 		defaults : {
-			xtype : 'form',
-			layout : 'form',
-			labelWidth : 65,
-			width : 200,
-			defaults : {
-				width : 110
-			}
-		}
-	},
-	items : [{
-		items : [{
-			items : [{
-				xtype : 'textfield',
-				id : 'txtSettleTypeFormat',
-				fieldLabel : '结账方式',
-				value : '一般/会员',
-				disabled : true
-			}]
-		}, {
-			items : [{
-				xtype : 'combo',
-				id : 'comboDiscount',
-				fieldLabel : '折扣方案',
-				readOnly : false,
-				forceSelection : true,
-				store : new Ext.data.JsonStore({
-					root : 'root',
-					fields : [ 'discountID', 'discountName']
-				}),
-				valueField : 'discountID',
-				displayField : 'discountName',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true
-			}]
-		}, {
-			width : 135,
-			items : [{
-				xtype : 'numberfield',
-				id : 'numErasePrice',
-				fieldLabel : '抹数金额',
-				width : 60,
-				minValue : 0,
-				value : 0
-			}]
-		}, {
 			xtype : 'panel',
-			width : 150,
-			id : 'panelShowEraseQuota',
-			style : 'font-size:18px;',
-			html : '上限:￥<font id="fontShowEraseQuota" style="color:red;">0.00</font>'
-		}, {
-			width : 80,
-			labelWidth : 55,
-			items : [{
-				xtype : 'label',
-				width : 40,
-				fieldLabel : '服务费',
-				id : 'serviceRate',
-				style : 'font-size:15px;text-align:right;'
-			}]
-		}, {
-			width : 40,
-			items : [{
-				xtype : 'panel',
-				style : 'font-size:15px;',
-				html : '%'
-			}]
-		}, {
-			items : [{
-				xtype : 'combo',
-				id : 'repaid_comboServicePlan',
-				fieldLabel : '服务费方案',
-				readOnly : false,
-				forceSelection : true,
-				store : new Ext.data.JsonStore({
-					fields : [ 'planId', 'planName']
-				}),
-				valueField : 'planId',
-				displayField : 'planName',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true				
-			}]
-		}]
-	}, {
-		defaults : {
-			labelWidth : 1,
-			labelSeparator : ' '
+			layout : 'column',
+//			columnWidth : 1,
+			defaults : {
+				xtype : 'form',
+				layout : 'form',
+				labelWidth : 65,
+				width : 200,
+				defaults : {
+					width : 110
+				}
+			}
 		},
 		items : [{
-			xtype : 'label',
-			width : 65,
-			text : '收款方式:'
-		}, {
-			width : 80,
+			columnWidth : 1,
 			items : [{
-				xtype : 'radio',
-				name : 'radioPayType',
-				boxLabel : '现金结账',
-				inputValue : '1'
+				items : [{
+					xtype : 'textfield',
+					id : 'txtSettleTypeFormat',
+					fieldLabel : '结账方式',
+					value : '一般/会员',
+					disabled : true
+				}]
+			}, {
+				items : [{
+					xtype : 'combo',
+					id : 'comboDiscount',
+					fieldLabel : '折扣方案',
+					readOnly : false,
+					forceSelection : true,
+					store : new Ext.data.JsonStore({
+						root : 'root',
+						fields : [ 'discountID', 'discountName']
+					}),
+					valueField : 'discountID',
+					displayField : 'discountName',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true
+				}]
+			}, {
+				width : 135,
+				items : [{
+					xtype : 'numberfield',
+					id : 'numErasePrice',
+					fieldLabel : '抹数金额',
+					width : 60,
+					minValue : 0,
+					value : 0
+				}]
+			}, {
+				xtype : 'panel',
+				width : 150,
+				id : 'panelShowEraseQuota',
+				style : 'font-size:18px;',
+				html : '上限:￥<font id="fontShowEraseQuota" style="color:red;">0.00</font>'
+			}, {
+				width : 80,
+				labelWidth : 55,
+				items : [{
+					xtype : 'label',
+					width : 40,
+					fieldLabel : '服务费',
+					id : 'serviceRate',
+					style : 'font-size:15px;text-align:right;'
+				}]
+			}, {
+				width : 40,
+				items : [{
+					xtype : 'panel',
+					style : 'font-size:15px;',
+					html : '%'
+				}]
+			}, {
+				items : [{
+					xtype : 'combo',
+					id : 'repaid_comboServicePlan',
+					fieldLabel : '服务费方案',
+					readOnly : false,
+					forceSelection : true,
+					store : new Ext.data.JsonStore({
+						fields : [ 'planId', 'planName']
+					}),
+					valueField : 'planId',
+					displayField : 'planName',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true				
+				}]
 			}]
 		}, {
-			width : 80,
+			columnWidth : 0.15,
 			items : [{
-				xtype : 'radio',
-				name : 'radioPayType',
-				boxLabel : '刷卡结账',
-				inputValue : '2'
+				xtype : 'label',
+				width : 65,
+				text : '收款方式:'
+			},{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 80,
+				id : 'repaid_comboPayType',
+				store : new Ext.data.JsonStore({
+					fields : [ 'id', 'name' ]
+				}),
+				valueField : 'id',
+				displayField : 'name',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false,
+				listeners : {
+					render : function(thiz){
+						var cmb_repaid_payType = repaid_payType.concat();
+						cmb_repaid_payType.push({id:100, name:'混合结账'});
+						thiz.getStore().loadData(cmb_repaid_payType);
+						thiz.setValue(primaryOrderData.other.order.payTypeValue);
+					},
+					select : function(thiz){
+						if(thiz.getValue() == 100){
+							if(Ext.getCmp('repaid_mixedPayTypePanel').hasCheckbox){
+								Ext.getCmp('repaid_mixedPayTypePanel').show();
+							}else{
+								initPaytypeCheckboxs();
+							}
+							
+						}else{
+							Ext.getCmp('repaid_mixedPayTypePanel').hide();
+						}
+					}
+				}				
+			},{
+				xtype : 'label',
+				width : 20,
+				html : '&nbsp;'
 			}]
 		}, {
-			width : 80,
-			items : [{
-				xtype : 'radio',
-				name : 'radioPayType',
-				boxLabel : '会员消费',
-				inputValue : '3',
-				disabled : true
-			}]
-		}, {
-			width : 60,
-			items : [{
-				xtype : 'radio',
-				name : 'radioPayType',
-				boxLabel : '签单',
-				inputValue : '4'
-			}]
-		}, {
-			width : 75,
-			items : [{
-				xtype : 'radio',
-				name : 'radioPayType',
-				boxLabel : '挂账',
-				inputValue : '5'
-			}]
-		}, {
-			xtype : 'form',
-			labelWidth : 60,
-			labelSeparator : ':',
-			items : [{
-				xtype : 'textfield',
-				id : 'remark',
-				fieldLabel : '备注',
-				width : 420
-			}]
+			columnWidth : 0.8,
+			id : 'repaid_mixedPayTypePanel',
+			items : []
 		}]
-	}]
-});
+	});
+	
+	//如果账单是混合结账就立即生成付款checkbox
+	if(primaryOrderData.other.order.payTypeValue == 100){
+		initPaytypeCheckboxs();
+	}
+}
 
+function initPaytypeCheckboxs(){
+	for (var i = 0; i < repaid_payType.length; i++) {
+		var checkBoxId = 'repaid_chbForPayType' + repaid_payType[i].id,  numberfieldId = 'repaid_numForPayType' + repaid_payType[i].id;
+		if(i > 0){
+			Ext.getCmp('repaid_mixedPayTypePanel').add({
+				xtype : 'label',
+				width : 15,
+				html : '&nbsp;'
+			});				
+		}
+		Ext.getCmp('repaid_mixedPayTypePanel').add({
+			width : (repaid_payType[i].name.length * 23),
+ 	    	xtype : 'checkbox',
+ 	    	id : checkBoxId,
+ 	    	inputValue : repaid_payType[i].id,
+ 	    	relativePrice : numberfieldId,
+ 	    	boxLabel : repaid_payType[i].name + ':',
+ 	    	listeners : {
+ 	    		check : function(checkbox, checked){
+ 	    			var numForAlias = Ext.getCmp(checkbox.relativePrice);
+					if(checked){
+						numForAlias.enable();
+						numForAlias.focus(true, 100);
+					}else{
+						numForAlias.disable();
+						numForAlias.setValue();		
+						numForAlias.clearInvalid();
+					}
+				},
+				//解决第一次点击无效
+				focus : function(thiz){
+					var numForAlias = Ext.getCmp(thiz.relativePrice);
+					if(document.getElementById(thiz.id).checked){
+						numForAlias.disable();
+					}else{
+						numForAlias.enable();
+						numForAlias.focus(true, 100);
+					}
+				}
+ 	    	}
+	 	});				
+	 	
+		Ext.getCmp('repaid_mixedPayTypePanel').add({
+			xtype : 'numberfield',
+			id : numberfieldId,
+			disabled : true,
+			width : 70,
+			minValue : 0
+		});			 	
+	}
+	Ext.getCmp('repaid_mixedPayTypePanel').doLayout();
+	Ext.getCmp('repaid_mixedPayTypePanel').hasCheckbox = true;
+}
 
-
+//如果是反结账则生成状态栏
+if(isRepaid){
+	repaid_initNorthPanel();
+}
 
 var btnPushBack = new Ext.ux.ImageButton({
 	imgPath : "../../images/UserLogout.png",
@@ -1054,9 +1111,9 @@ function initKeyBoardEvent(){
 
 var dishesOrderEastPanel, centerPanel;
 var commitOperate;
+
 	
 Ext.onReady(function() {
-	
 	var menuTabPanel = new Ext.TabPanel({
 		id : 'menuTabPanel',
 		activeItem : 0,

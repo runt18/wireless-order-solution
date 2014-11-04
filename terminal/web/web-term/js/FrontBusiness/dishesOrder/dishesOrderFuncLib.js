@@ -880,16 +880,21 @@ function submitRepaidOrderHandler(_c){
 	if(orderFoods.length > 0){
 		commitOperate.show();
 		//var foodPara = Wireless.ux.createOrder({orderFoods: orderFoods, dataType : 3});
-		var payMannerOut = null;
-		var payManner = document.getElementsByName('radioPayType');
-		for(var i = 0; i < payManner.length; i++){
-			if(payManner[i].checked == true ){
-				payMannerOut = payManner[i].value;
-				break;
+		var commit_payType = Ext.getCmp('repaid_comboPayType').getValue();
+		
+		var payType_money = '';
+		for (var i = 0; i < repaid_payType.length; i++) {
+			if(Ext.getCmp('repaid_chbForPayType' + repaid_payType[i].id).getValue()){
+				if(payType_money){
+					payType_money += '&';
+				}
+				payType_money += (repaid_payType[i].id + ',' + Ext.getCmp('repaid_numForPayType' + repaid_payType[i].id).getValue());
 			}
 		}
 		
-		var commentOut = dishesOrderNorthPanel.findById("remark").getValue();
+		
+		
+		var commentOut = '';
 		var discountID = Ext.getCmp('comboDiscount');
 		var servicePlan = Ext.getCmp('repaid_comboServicePlan');
 		var erasePrice = Ext.getCmp('numErasePrice');
@@ -915,7 +920,8 @@ function submitRepaidOrderHandler(_c){
 				'orderId' : _c.grid.order["id"],
 				'discountID' : discountID.getValue(),
 				'servicePlan' : servicePlan.getValue(),
-				"payType" : payMannerOut,
+				"payType" : commit_payType,
+				'payType_money' : payType_money,
 				"memberID" : _c.grid.order['memberID'],
 				"comment" : commentOut,
 				'erasePrice' : erasePrice.getValue(),
