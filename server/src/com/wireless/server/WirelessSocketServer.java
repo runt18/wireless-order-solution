@@ -15,7 +15,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.tiling.scheduling.DailyIterator;
-import org.tiling.scheduling.MonthlyIterator;
 import org.tiling.scheduling.Scheduler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -212,13 +211,14 @@ public class WirelessSocketServer {
 				if(nl.item(0) != null){
 					String[] sweepTime = nl.item(0).getFirstChild().getNodeValue().split(",");
 					
-					int dayOfMonth = Integer.parseInt(sweepTime[0]);
+					//int dayOfMonth = Integer.parseInt(sweepTime[0]);
 					int hourOfDay = Integer.parseInt(sweepTime[1]);
 					int minute = Integer.parseInt(sweepTime[2]);
 					int second = Integer.parseInt(sweepTime[3]);
 					//schedule the sweep db task
 					scheDbTask.schedule(new SweepDBTask(), 
-										new MonthlyIterator(dayOfMonth, hourOfDay, minute, second));
+										//new MonthlyIterator(dayOfMonth, hourOfDay, minute, second)
+										new DailyIterator(hourOfDay, minute, second));
 				}
 				
 				
