@@ -66,6 +66,7 @@
 	border-collapse : collapse;
 	font-size : 12px;
 	background-color: #FFFFFF;
+	width: 100%;
 }
 
 .tb_base tr{
