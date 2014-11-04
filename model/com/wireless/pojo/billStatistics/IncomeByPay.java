@@ -13,6 +13,10 @@ import com.wireless.pojo.util.SortedList;
 public class IncomeByPay implements Jsonable{
 	
 	public final static IncomeByPay DUMMY = new IncomeByPay(0);
+	//日结, 交班等..
+	public static final byte  PAY_TYPE_FOR_DAILY= 0;
+	//报表
+	public static final byte PAY_TYPE_FOR_STATISTICS = 1;
 
 	public static class PaymentIncome implements Comparable<PaymentIncome>, Jsonable{
 		private final PayType payType;
@@ -113,7 +117,13 @@ public class IncomeByPay implements Jsonable{
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
-		jm.putJsonableList("paymentIncomes", this.paymentIncomes, flag);
+		if(flag == PAY_TYPE_FOR_DAILY){
+			jm.putJsonableList("paymentIncomes", this.paymentIncomes, flag);
+		}else if(flag == PAY_TYPE_FOR_STATISTICS){
+			for (PaymentIncome p : paymentIncomes) {
+				jm.putFloat("payType" + p.getPayType().getId(), p.getActual());
+			}			
+		}
 		return jm;
 	}
 

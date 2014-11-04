@@ -1,15 +1,19 @@
 package com.wireless.pojo.dishesOrder;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.util.NumericUtil;
 
-public class MixedPayment implements Parcelable{
+public class MixedPayment implements Parcelable, Jsonable{
 	
 	public static class InsertBuilder{
 		private final int orderId;
@@ -118,5 +122,38 @@ public class MixedPayment implements Parcelable{
 	public String toString(){
 		return "(" + orderId + ")" + mixed;
 				
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("orderId", this.getOrderId());
+		List<Jsonable> js = new ArrayList<>();
+		for (final Entry<PayType, Float> entry : this.getPayments().entrySet()) {
+			js.add(new Jsonable() {
+				
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap pt = new JsonMap();
+					pt.putInt("pId", entry.getKey().getId());
+					pt.putString("name", entry.getKey().getName());
+					pt.putFloat("money", entry.getValue());
+					return pt;
+				}
+				
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+			});
+
+		}
+		jm.putJsonableList("payTypes", js, flag);
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 }

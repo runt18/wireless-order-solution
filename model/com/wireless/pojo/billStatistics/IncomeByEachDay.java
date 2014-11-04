@@ -165,6 +165,8 @@ public class IncomeByEachDay implements Jsonable{
 		jm.putFloat("totalIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getTotalIncome());
 		jm.putInt("orderAmount", this.getTotalAmount());
 		
+		jm.putJsonable(this.getIncomeByPay(), flag);
+		
 		//FIXME
 //		jm.putFloat("cashIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getCashActual());
 //		jm.putInt("cashAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getCashAmount());
