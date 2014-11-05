@@ -553,6 +553,56 @@ public class OrderDao {
 	}
 	
 	/**
+	 * Repaid the order according to specific builder {@link Order#RepaidBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to repaid order {@link Order#RepaidBuilder}
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the staff has no privilege for re-payment
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void repaid(Staff staff, Order.RepaidBuilder builder) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			repaid(dbCon, staff, builder);
+			dbCon.conn.commit();
+		}catch(SQLException | BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Repaid the order according to specific builder {@link Order#RepaidBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to repaid order {@link Order#RepaidBuilder}
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the staff has no privilege for re-payment
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void repaid(DBCon dbCon, Staff staff, Order.RepaidBuilder builder) throws BusinessException, SQLException{
+		if(staff.getRole().hasPrivilege(Privilege.Code.RE_PAYMENT)){
+			UpdateOrder.exec(dbCon, staff, builder.getUpdateBuilder());
+			PayOrder.pay(dbCon, staff, builder.getPayBuilder());
+		}else{
+			throw new BusinessException(StaffError.PAYMENT_NOT_ALLOW);
+		}
+	}
+	
+	/**
 	 * Transfer the order food according to specific builder {@link Order#TransferBuilder}.
 	 * @param staff
 	 * 			the staff to perform this action

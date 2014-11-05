@@ -67,8 +67,15 @@ public class UpdateOrder {
 		
 		try{
 			dbCon.connect();
-			return exec(dbCon, staff, builder);
-
+			dbCon.conn.setAutoCommit(false);
+			DiffResult result = exec(dbCon, staff, builder);
+			dbCon.conn.commit();
+			return result;
+			
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+			
 		}finally{
 			dbCon.disconnect();
 		}
@@ -99,26 +106,7 @@ public class UpdateOrder {
 	 *             throws if fail to execute any SQL statement
 	 */
 	public static DiffResult exec(DBCon dbCon, Staff staff, Order.UpdateBuilder builder) throws BusinessException, SQLException{
-		
-		boolean isAutoCommit = dbCon.conn.getAutoCommit();
-		
-		try{
-			dbCon.conn.setAutoCommit(false);
-			
-			DiffResult diffResult = doUpdate(dbCon, staff, doPrepare(dbCon, staff, builder), builder);
-			
-			dbCon.conn.commit();
-			
-			return diffResult;
-			
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
-			
-		}finally{
-			dbCon.conn.setAutoCommit(isAutoCommit);
-		}
-		
+		return doUpdate(dbCon, staff, doPrepare(dbCon, staff, builder), builder);
 	}
 	
 	/**

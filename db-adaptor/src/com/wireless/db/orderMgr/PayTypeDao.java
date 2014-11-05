@@ -258,13 +258,19 @@ public class PayTypeDao {
 
 		String sql;
 		
-		if(extraCond != null){
-			extraCond.restaurantId = staff.getRestaurantId();
+		if(extraCond == null){
+			extraCond = new ExtraCond();
+			for(PayType.Type type : PayType.Type.values()){
+				extraCond.addType(type);
+			}
 		}
 		
+		extraCond.restaurantId = staff.getRestaurantId();
+		
 		sql = " SELECT * FROM " + Params.dbName + ".pay_type" + 
-			  " WHERE 1 = 1 " + 
-			  (extraCond != null ? extraCond.toString() : " AND restaurant_id = " + staff.getRestaurantId());
+			  " WHERE 1 = 1 " +
+			  extraCond.toString();
+			  //(extraCond != null ? extraCond.toString() : " AND restaurant_id = " + staff.getRestaurantId());
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		List<PayType> result = new ArrayList<PayType>();

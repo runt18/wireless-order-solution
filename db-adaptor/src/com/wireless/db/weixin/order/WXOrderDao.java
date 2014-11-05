@@ -1,138 +1,187 @@
 package com.wireless.db.weixin.order;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
-import com.wireless.exception.BusinessException;
+import com.wireless.db.Params;
+import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.weixin.order.WXOrder;
-import com.wireless.pojo.weixin.order.WXOrderFood;
 
 public class WXOrderDao {
 	
+	public static class ExtraCond{
+		private int code;
+		private WXOrder.Status status;
+		private WXOrder.Type type;
+		private String weixinSerial;
+		
+		public ExtraCond setCode(int code){
+			this.code = code;
+			return this;
+		}
+		
+		public ExtraCond setStatus(WXOrder.Status status){
+			this.status = status;
+			return this;
+		}
+		
+		public ExtraCond setType(WXOrder.Type type){
+			this.type = type;
+			return this;
+		}
+		
+		public ExtraCond setWeixin(String weixinSerial){
+			this.weixinSerial = weixinSerial;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(code != 0){
+				extraCond.append(" AND code = " + code);
+			}
+			if(weixinSerial != null){
+				extraCond.append(" AND weixin_serial = '" + weixinSerial + "' AND weixin_serial_crc = CRC32('" + weixinSerial + "')");
+			}
+			if(type != null){
+				extraCond.append(" AND type = " + type.getVal());
+			}
+			if(status != null){
+				extraCond.append(" AND status = " + status.getVal());
+			}
+			return extraCond.toString();
+		}
+	}
+
 	/**
-	 * 定制标识码
+	 * Insert the new weixin order for inside according to builder {@link WXOrder#InsertBuilder4Inside}
 	 * @param dbCon
-	 * @param rid
-	 * @return
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder {@link WXOrder#InsertBuilder4Inside}
+	 * @return the id to weixin order just inserted
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	static int defineCode(DBCon dbCon, int rid) throws SQLException{
+	public static int insert(DBCon dbCon, Staff staff, WXOrder.InsertBuilder4Inside builder) throws SQLException{
+		
+		WXOrder wxOrder = builder.build();
+		
+		//Make the previous inside committed orders invalid.
+		for(WXOrder order : getByCond(dbCon, staff, new ExtraCond().setWeixin(wxOrder.getWeixinSerial()).setType(WXOrder.Type.INSIDE).setStatus(WXOrder.Status.COMMITTED))){
+			update(dbCon, staff, new WXOrder.UpdateBuilder(order.getId()).setStatus(WXOrder.Status.INVALID));
+		}
+
+		//Insert the new inside order.
+		return insert(dbCon, staff, wxOrder);
+	}
+	
+	private static int insert(DBCon dbCon, Staff staff, WXOrder wxOrder) throws SQLException{
+		
+		String sql;
+		
+		//Generate the operation code.
+		sql = " SELECT MAX(code) + 1 FROM " + Params.dbName + ".weixin_order WHERE restaurant_id = " + staff.getRestaurantId();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		int code = 0;
-		boolean has = true;
-		String srid = "{rid}", scode = "{code}";
-		String querySQL = "SELECT COUNT(id) FROM weixin_order WHERE restaurant_id = " + srid + " AND code = " + scode;
-		ResultSet res = null;
-		do{
-			has = true;
-			code = (int) (Math.random() * 10000);
-			if(code > 1000 && code < 9999){
-				res = dbCon.stmt.executeQuery(querySQL.replace(srid, rid+"").replace(scode, code+""));
-				if(res != null && res.next() && res.getInt(1) == 0){
-					has = false;
-				}
-			}
-		}while(has);
-		if(res != null){
-			res.close();
-			res = null;
+		if(dbCon.rs.next()){
+			code = dbCon.rs.getInt(1);
 		}
-		return code;
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param food
-	 * @throws SQLException
-	 */
-	public static void insertWXOrderFood(DBCon dbCon, WXOrderFood food) throws SQLException{
-		String insertSQL = "INSERT INTO weixin_order_food (weixin_order_id, food_id, food_count)"
-			+ " VALUES("
-			+ food.getOrderId() + ","
-			+ food.getFoodId() + ","
-			+ food.getFoodCount()
-			+ ")";
-		dbCon.stmt.executeUpdate(insertSQL);
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param weixinRestaurantSerial
-	 * @param weixinMemberSerial
-	 * @param order
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	public static WXOrder insert(DBCon dbCon, String weixinRestaurantSerial, String weixinMemberSerial, WXOrder.InsertBuilder ib)
-		throws SQLException, BusinessException{
-		WXOrder order = ib.build();
-		WXOrderFood tempOrderFood = null;
+		dbCon.rs.close();
 		
-		// TODO 处理账单信息, 新增或合拼
+		//Insert the weixin order.
+		sql = " INSERT INTO " + Params.dbName + ".`weixin_order` " +
+			  " (restaurant_id, weixin_serial, weixin_serial_crc, birth_date, status, type, code) " +
+			  " VALUES( " +
+			  staff.getRestaurantId() + ","	+
+			  "'" + wxOrder.getWeixinSerial() + "'," +
+			  "CRC32('" + wxOrder.getWeixinSerial() + "'),"	+
+			  "'" + DateUtil.format(wxOrder.getBirthDate()) + "'," +
+			  wxOrder.getStatus().getVal() + "," +
+			  wxOrder.getType().getVal() + "," +
+			  code +
+			  " ) ";
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		int orderId;
+		if(dbCon.rs.next()){
+			orderId = dbCon.rs.getInt(1);
+		}else{
+			throw new SQLException("The id to wx order is NOT generated successfully.");
+		}
+		dbCon.rs.close();
 		
-		
-		int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(weixinRestaurantSerial);
-		String insertSQL = "";
-		// 生成标识码
-		order.setCode(defineCode(dbCon, rid));
-		order.setRid(rid);
-		order.setMemberSerial(weixinMemberSerial);
-		order.setBirthDate(new Date().getTime());
-		order.setStatus(WXOrder.Status.NO_USED);
-		
-		insertSQL = "INSERT INTO `weixin_order`"
-			+ " (restaurant_id, weixin_serial, weixin_serial_crc, birth_date, status, code) "
-			+ " VALUES("
-			+ order.getRid() + ","
-			+ "'" + order.getMemberSerial() + "',"
-			+ "CRC32('" + order.getMemberSerial() + "'),"
-			+ "'" + order.getBirthDateFormat() + "',"
-			+ order.getStatus().getValue() + ","
-			+ order.getCode()
-			+ ")";
-		dbCon.stmt.executeUpdate(insertSQL, Statement.RETURN_GENERATED_KEYS);
-		ResultSet res = dbCon.stmt.getGeneratedKeys();
-		if(res != null && res.next()){
-			order.setId(res.getInt(1));
+		//Insert the associated order foods.
+		for(OrderFood of : wxOrder.getFoods()){
+			sql = " INSERT INTO " + Params.dbName + ".wx_order_food " +
+				  " (wx_order_id, food_id, food_account) VALUES( " +
+				  orderId + "," +
+				  of.getFoodId() + "," +
+				  of.getCount() + 
+				  ")";
+			dbCon.stmt.executeUpdate(sql);
 		}
 		
-		if(order.getFoods() != null){
-			for(int i = 0; i < order.getFoods().size(); i++){
-				tempOrderFood = order.getFoods().get(i);
-				tempOrderFood.setOrderId(order.getId());
-				insertWXOrderFood(dbCon, tempOrderFood);
-			}
-		}
+		return orderId;
+	}
+	
+	static void update(DBCon dbCon, Staff staff, WXOrder.UpdateBuilder builder) throws SQLException{
 		
-		return order;
+		WXOrder wxOrder = builder.build();
+		
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".wx_order SET " +
+			  " id = " + wxOrder.getId() +
+			  (builder.isStatusChanged() ? " ,status = " + wxOrder.getStatus().getVal() : "") +
+			  " WHERE id = " + wxOrder.getId();
+		
+		dbCon.stmt.executeUpdate(sql);
 	}
 	
-	/**
-	 * 
-	 * @param rSerial
-	 * @param mSerial
-	 * @param ib
-	 * @return
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	public static WXOrder insert(String rSerial, String mSerial, WXOrder.InsertBuilder ib) throws SQLException, BusinessException{
-		DBCon dbCon = null;
-		try{
-			dbCon = new DBCon();
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			WXOrder order = insert(dbCon, rSerial, mSerial, ib);;
-			dbCon.conn.commit();
-			return order;
-		}finally{
-			if(dbCon != null) dbCon.disconnect();
+	public static List<WXOrder> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+		String sql;
+		sql = " SELECT * FROM " + Params.dbName + ".wx_order " +
+			  " WHERE 1 = 1 " +
+			  " AND restaurant_id = " + staff.getRestaurantId() +
+			  (extraCond != null ? extraCond.toString() : "");
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
+		List<WXOrder> result = new ArrayList<WXOrder>();
+		while(dbCon.rs.next()){
+			WXOrder wxOrder = new WXOrder(dbCon.rs.getInt("id"));
+			wxOrder.setRestaurant(dbCon.rs.getInt("restaurant_id"));
+			wxOrder.setStatus(WXOrder.Status.valueOf(dbCon.rs.getInt("status")));
+			wxOrder.setType(WXOrder.Type.valueOf(dbCon.rs.getInt("type")));
+			wxOrder.setCode(dbCon.rs.getInt("code"));
+			wxOrder.setBirthDate(dbCon.rs.getLong("birth_date"));
+			wxOrder.setWeixinSerial(dbCon.rs.getString("weixin_serial"));
+			result.add(wxOrder);
 		}
+		dbCon.rs.close();
+		return result;
 	}
 	
+	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+		int amount = 0;
+		for(WXOrder wxOrder : getByCond(dbCon, staff, extraCond)){
+			String sql;
+			//Delete the wx order.
+			sql = " DELETE FROM " + Params.dbName + ".wx_order WHERE id = " + wxOrder.getId();
+			dbCon.stmt.executeUpdate(sql);
+			//Delete the associated order food.
+			sql = " DELETE FROM " + Params.dbName + ".wx_order_food WHERE wx_order_id = " + wxOrder.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			amount++;
+		}
+		return amount;
+	}
 }

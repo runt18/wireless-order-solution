@@ -49,7 +49,15 @@ public class PayOrder {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return payTemp(dbCon, staff, payBuilder);
+			dbCon.conn.setAutoCommit(false);
+			Order order = payTemp(dbCon, staff, payBuilder);
+			dbCon.conn.commit();
+			return order;
+			
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+			
 		}finally{
 			dbCon.disconnect();
 		}
@@ -79,46 +87,34 @@ public class PayOrder {
 	
 	private static Order doTmpPayment(DBCon dbCon, Staff staff, Order orderCalculated) throws SQLException{
 		
-		boolean isAutoCommit = dbCon.conn.getAutoCommit();
-		
-		try{
-			dbCon.conn.setAutoCommit(false);
+		String sql;
+		//Update the discount to this order.
+		sql = " UPDATE " + Params.dbName + ".order SET " +
+			  " staff_id = " + staff.getId() + ", " +
+			  " waiter = '" + staff.getName() + "', " +
+			  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
+			  " status = " + Order.Status.UNPAID.getVal() + ", " + 
+		   	  " order_date = NOW() " + 
+			  " WHERE 1 = 1 " +
+			  " AND id = " + orderCalculated.getId() +
+			  " AND status = " + Order.Status.UNPAID.getVal();
 			
-			String sql;
-			//Update the discount to this order.
-			sql = " UPDATE " + Params.dbName + ".order SET " +
-				  " staff_id = " + staff.getId() + ", " +
-				  " waiter = '" + staff.getName() + "', " +
-				  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
-				  " status = " + Order.Status.UNPAID.getVal() + ", " + 
-			   	  " order_date = NOW() " + 
-				  " WHERE 1 = 1 " +
-				  " AND id = " + orderCalculated.getId() +
-				  " AND status = " + Order.Status.UNPAID.getVal();
-				
-			if(dbCon.stmt.executeUpdate(sql) > 0 ){			
-				//Update each food's discount & unit price to this order.
-				for(OrderFood food : orderCalculated.getOrderFoods()){
-					sql = " UPDATE " + Params.dbName + ".order_food " +
-						  " SET " +
-						  " discount = " + food.getDiscount() + ", " +
-						  " unit_price = " + food.getFoodPrice() +
-						  " WHERE order_id = " + orderCalculated.getId() + 
-						  " AND food_id = " + food.getFoodId();
-					dbCon.stmt.executeUpdate(sql);				
-				}	
-			}
-			
-			dbCon.conn.commit();
-
-			return orderCalculated;
-			
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
-		}finally{
-			dbCon.conn.setAutoCommit(isAutoCommit);
+		if(dbCon.stmt.executeUpdate(sql) > 0 ){			
+			//Update each food's discount & unit price to this order.
+			for(OrderFood food : orderCalculated.getOrderFoods()){
+				sql = " UPDATE " + Params.dbName + ".order_food " +
+					  " SET " +
+					  " discount = " + food.getDiscount() + ", " +
+					  " unit_price = " + food.getFoodPrice() +
+					  " WHERE order_id = " + orderCalculated.getId() + 
+					  " AND food_id = " + food.getFoodId();
+				dbCon.stmt.executeUpdate(sql);				
+			}	
 		}
+		
+		dbCon.conn.commit();
+
+		return orderCalculated;
 
 	}
 	
@@ -145,7 +141,15 @@ public class PayOrder {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return pay(dbCon, staff, payBuilder);
+			dbCon.conn.setAutoCommit(false);
+			Order order = pay(dbCon, staff, payBuilder);
+			dbCon.conn.commit();
+			
+			return order;
+			
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
 			
 		}finally{
 			dbCon.disconnect();
@@ -198,24 +202,11 @@ public class PayOrder {
 	 * 			<li>failed to calculate the order referred to {@link PayOrder#calcById}
 	 * 			<li>the consume price exceeds total balance to this member account in case of normal consumption
 	 * 		    <li>perform the member repaid consumption
-	 * 			<li>the sum of each payment NOT equals to the actual price in case of mixed payment
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
 	private static Order doPrepare(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws BusinessException, SQLException{
 		Order orderCalculated = calc(dbCon, staff, payBuilder);
-		
-		if(orderCalculated.getPaymentType().isMixed()){
-			if(payBuilder.getMixedPayment().getPrice() == orderCalculated.getActualPrice()){
-				MixedPayment mixedPayment = new MixedPayment();
-				for(Map.Entry<PayType, Float> entry : payBuilder.getMixedPayment().getPayments().entrySet()){
-					mixedPayment.add(PayTypeDao.getById(dbCon, staff, entry.getKey().getId()), entry.getValue().floatValue());
-				}
-				orderCalculated.setMixedPayment(mixedPayment);
-			}else{
-				throw new BusinessException(FrontBusinessError.MIXED_PAYMENT_NOT_EQUALS_TO_ACTUAL);
-			}
-		}
 		
 		//Set the received cash if less than actual price.
 		if(orderCalculated.getPaymentType().isCash() && payBuilder.getReceivedCash() < orderCalculated.getActualPrice()){
@@ -261,106 +252,84 @@ public class PayOrder {
 	 * @param payBuilder
 	 * @return
 	 * @throws SQLException
+	 * @throws BusinessException 
 	 */
-	private static Order doPayment(DBCon dbCon, Staff staff, Order orderCalculated, PayBuilder payBuilder) throws SQLException{
+	private static Order doPayment(DBCon dbCon, Staff staff, Order orderCalculated, PayBuilder payBuilder) throws SQLException, BusinessException{
 		
 		String sql;
 		
-		boolean isAutoCommit = dbCon.conn.getAutoCommit();
-		
-		/**
-		 * Put all the INSERT statements into a database transition so as to assure 
-		 * the status to both table and order is consistent. 
-		 */
-		try{
+		//Update the order.
+		sql = " UPDATE " + Params.dbName + ".order SET " +
+			  " id = " + orderCalculated.getId() +
+			  " ,staff_id = " + staff.getId() + 
+			  " ,waiter = '" + staff.getName() + "'" +
+			  " ,category = " + orderCalculated.getCategory().getVal() + 
+			  " ,gift_price = " + orderCalculated.getGiftPrice() + 
+			  " ,discount_price = " + orderCalculated.getDiscountPrice() + 
+			  " ,cancel_price = " + orderCalculated.getCancelPrice() + 
+			  " ,repaid_price =  " + orderCalculated.getRepaidPrice() + 
+			  " ,erase_price = " + orderCalculated.getErasePrice() + 
+			  " ,coupon_price = " + orderCalculated.getCouponPrice() + 
+			  " ,total_price = " + orderCalculated.getTotalPrice() +  
+			  " ,actual_price = " + orderCalculated.getActualPrice() + 
+			  " ,custom_num = " + orderCalculated.getCustomNum() + 
+			  " ,pay_type_id = " + orderCalculated.getPaymentType().getId() +  
+			  " ,settle_type = " + orderCalculated.getSettleType().getVal() + 
+			  " ,discount_id = " + orderCalculated.getDiscount().getId() + 
+			  (orderCalculated.hasPricePlan() ? " ,price_plan_id = " + orderCalculated.getPricePlan().getId() : "") +
+			  (orderCalculated.hasServicePlan() ? " ,service_plan_id = " + orderCalculated.getServicePlan().getPlanId() : "") +
+			  " ,service_rate = " + orderCalculated.getServiceRate() + 
+			  " ,status = " + (orderCalculated.isUnpaid() ? Order.Status.PAID.getVal() : Order.Status.REPAID.getVal()) +  
+			  (orderCalculated.isUnpaid() ? (" ,seq_id = " + orderCalculated.getSeqId()) : "") +
+		   	  " ,order_date = NOW() " + 
+			  " ,comment = '" + orderCalculated.getComment() + "'" + 
+			  " WHERE " +
+			  " id = " + orderCalculated.getId();
 			
-			dbCon.conn.setAutoCommit(false);	
-			
-			//Update the order.
-			sql = " UPDATE " + Params.dbName + ".order SET " +
-				  " id = " + orderCalculated.getId() +
-				  " ,staff_id = " + staff.getId() + 
-				  " ,waiter = '" + staff.getName() + "'" +
-				  " ,category = " + orderCalculated.getCategory().getVal() + 
-				  " ,gift_price = " + orderCalculated.getGiftPrice() + 
-				  " ,discount_price = " + orderCalculated.getDiscountPrice() + 
-				  " ,cancel_price = " + orderCalculated.getCancelPrice() + 
-				  " ,repaid_price =  " + orderCalculated.getRepaidPrice() + 
-				  " ,erase_price = " + orderCalculated.getErasePrice() + 
-				  " ,coupon_price = " + orderCalculated.getCouponPrice() + 
-				  " ,total_price = " + orderCalculated.getTotalPrice() +  
-				  " ,actual_price = " + orderCalculated.getActualPrice() + 
-				  " ,custom_num = " + orderCalculated.getCustomNum() + 
-				  " ,pay_type_id = " + orderCalculated.getPaymentType().getId() +  
-				  " ,settle_type = " + orderCalculated.getSettleType().getVal() + 
-				  " ,discount_id = " + orderCalculated.getDiscount().getId() + 
-				  (orderCalculated.hasPricePlan() ? " ,price_plan_id = " + orderCalculated.getPricePlan().getId() : "") +
-				  (orderCalculated.hasServicePlan() ? " ,service_plan_id = " + orderCalculated.getServicePlan().getPlanId() : "") +
-				  " ,service_rate = " + orderCalculated.getServiceRate() + 
-				  " ,status = " + (orderCalculated.isUnpaid() ? Order.Status.PAID.getVal() : Order.Status.REPAID.getVal()) +  
-				  (orderCalculated.isUnpaid() ? (" ,seq_id = " + orderCalculated.getSeqId()) : "") +
-			   	  " ,order_date = NOW() " + 
-				  " ,comment = '" + orderCalculated.getComment() + "'" + 
-				  " WHERE " +
-				  " id = " + orderCalculated.getId();
-				
-			dbCon.stmt.executeUpdate(sql);			
+		dbCon.stmt.executeUpdate(sql);			
 
-			//Insert the mixed payment detail.
-			if(orderCalculated.getPaymentType().isMixed()){
-				MixedPaymentDao.insert(dbCon, staff, new MixedPayment.InsertBuilder(orderCalculated).setPayments(orderCalculated.getMixedPayment().getPayments()));
-			}
-			
-			//Update each food's discount & unit price.
-			for(OrderFood of : orderCalculated.getOrderFoods()){
-				sql = " UPDATE " + Params.dbName + ".order_food " +
-					  " SET " +
-					  " food_id = " + of.getFoodId() +
-					  " ,discount = " + of.getDiscount() + 
-					  " ,unit_price = " + of.getFoodPrice() +
-					  " WHERE order_id = " + orderCalculated.getId() + 
-					  " AND food_id = " + of.getFoodId();
-				dbCon.stmt.executeUpdate(sql);				
-			}	
-
-			//Update the member status if settled by member.
-			if(orderCalculated.isSettledByMember()){
-				
-				MemberOperation mo;
-				
-				if(orderCalculated.isUnpaid()){
-					//Perform the consumption.
-					mo = MemberDao.consume(dbCon, staff, 
-										   payBuilder.getMemberId(), 
-										   orderCalculated.getActualPrice(), 
-										   payBuilder.hasCoupon() ? CouponDao.getById(dbCon, staff, payBuilder.getCouponId()) : null,
-										   orderCalculated.getPaymentType(),
-										   orderCalculated.getId());
-					orderCalculated.setMemberOperationId(mo.getId());
-
-				}else{
-					throw new BusinessException("Repaid to member is NOT supported.");
-				}
-				
-				sql = " UPDATE " + Params.dbName + ".order SET " +
-					  " member_operation_id = " + mo.getId() +
-					  " WHERE id = " + orderCalculated.getId();
-				dbCon.stmt.executeUpdate(sql);
-			}
-			
-			dbCon.conn.commit();		
-			
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
-			
-		}catch(Exception e){
-			dbCon.conn.rollback();
-			throw new SQLException(e);
-			
-		}finally{
-			dbCon.conn.setAutoCommit(isAutoCommit);
+		//Insert the mixed payment detail.
+		if(orderCalculated.getPaymentType().isMixed()){
+			MixedPaymentDao.insert(dbCon, staff, new MixedPayment.InsertBuilder(orderCalculated).setPayments(orderCalculated.getMixedPayment().getPayments()));
 		}
+		
+		//Update each food's discount & unit price.
+		for(OrderFood of : orderCalculated.getOrderFoods()){
+			sql = " UPDATE " + Params.dbName + ".order_food " +
+				  " SET " +
+				  " food_id = " + of.getFoodId() +
+				  " ,discount = " + of.getDiscount() + 
+				  " ,unit_price = " + of.getFoodPrice() +
+				  " WHERE order_id = " + orderCalculated.getId() + 
+				  " AND food_id = " + of.getFoodId();
+			dbCon.stmt.executeUpdate(sql);				
+		}	
+
+		//Update the member status if settled by member.
+		if(orderCalculated.isSettledByMember()){
+			
+			MemberOperation mo;
+			
+			if(orderCalculated.isUnpaid()){
+				//Perform the consumption.
+				mo = MemberDao.consume(dbCon, staff, 
+									   payBuilder.getMemberId(), 
+									   orderCalculated.getActualPrice(), 
+									   payBuilder.hasCoupon() ? CouponDao.getById(dbCon, staff, payBuilder.getCouponId()) : null,
+									   orderCalculated.getPaymentType(),
+									   orderCalculated.getId());
+				orderCalculated.setMemberOperationId(mo.getId());
+
+			}else{
+				throw new BusinessException("Repaid to member is NOT supported.");
+			}
+			
+			sql = " UPDATE " + Params.dbName + ".order SET " +
+				  " member_operation_id = " + mo.getId() +
+				  " WHERE id = " + orderCalculated.getId();
+			dbCon.stmt.executeUpdate(sql);
+		}
+			
 		
 		return orderCalculated;
 	}
@@ -402,6 +371,7 @@ public class PayOrder {
 	 * 			<li>the order to this id does NOT exist
 	 * 			<li>the staff has no privilege to use the requested discount
 	 * 			<li>the payment type does NOT exist
+	 * 			<li>the sum of each payment NOT equals to the actual price in case of mixed payment
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
@@ -418,7 +388,7 @@ public class PayOrder {
 		}
 		
 		//Get all the details of order to be calculated.
-		Order orderToCalc = OrderDao.getById(staff, payBuilder.getOrderId(), DateType.TODAY);
+		Order orderToCalc = OrderDao.getById(dbCon, staff, payBuilder.getOrderId(), DateType.TODAY);
 		
 		//Set the erase price.
 		orderToCalc.setErasePrice(payBuilder.getErasePrice());
@@ -586,7 +556,19 @@ public class PayOrder {
 		orderToCalc.setTotalPrice(totalPrice);
 		//Set the actual price
 		orderToCalc.setActualPrice(actualPrice);
-			
+	
+		//Set the mixed payment detail.
+		if(orderToCalc.getPaymentType().isMixed()){
+			if(payBuilder.getMixedPayment().getPrice() == orderToCalc.getActualPrice()){
+				MixedPayment mixedPayment = new MixedPayment();
+				for(Map.Entry<PayType, Float> entry : payBuilder.getMixedPayment().getPayments().entrySet()){
+					mixedPayment.add(PayTypeDao.getById(dbCon, staff, entry.getKey().getId()), entry.getValue().floatValue());
+				}
+				orderToCalc.setMixedPayment(mixedPayment);
+			}else{
+				throw new BusinessException(FrontBusinessError.MIXED_PAYMENT_NOT_EQUALS_TO_ACTUAL);
+			}
+		}
 		
 		return orderToCalc;
 	}
