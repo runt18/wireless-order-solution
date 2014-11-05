@@ -19,23 +19,27 @@ public abstract class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 	
 	private BusinessException mBusinessException;
 	
-	private final Order mReqOrder;
+	private Order.InsertBuilder mInsertBuilder;
+	private Order.UpdateBuilder mUpdateBuilder;
 	
+	private final Order mReqOrder;
 	private final byte mType;
 	private final Staff mStaff;
 	private final PrintOption mPrintOption;
 	
-	public CommitOrderTask(Staff staff, Order reqOrder, byte type, PrintOption printOption){
-		mReqOrder = reqOrder;
-		mType = type;
+	public CommitOrderTask(Staff staff, Order.InsertBuilder builder, PrintOption printOption){
+		mInsertBuilder = builder;
+		mReqOrder = builder.build();
+		mType = builder.isForce() ? Type.INSERT_ORDER_FORCE : Type.INSERT_ORDER;
 		mPrintOption = printOption;
 		mStaff = staff;
 	}
 	
-	public CommitOrderTask(Staff staff, Order reqOrder, byte type){
-		mReqOrder = reqOrder;
-		mType = type;
-		mPrintOption = PrintOption.DO_PRINT;
+	public CommitOrderTask(Staff staff, Order.UpdateBuilder builder, PrintOption printOption){
+		mUpdateBuilder = builder;
+		mReqOrder = builder.build();
+		mType = Type.UPDATE_ORDER;
+		mPrintOption = printOption;
 		mStaff = staff;
 	}
 	
@@ -47,7 +51,12 @@ public abstract class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 	protected Void doInBackground(Void... args) {
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(mStaff, mReqOrder, mType, mPrintOption));
+			ProtocolPackage resp;
+			if(mType == Type.INSERT_ORDER || mType == Type.INSERT_ORDER_FORCE){
+				resp = ServerConnector.instance().ask(new ReqInsertOrder(mStaff, mInsertBuilder, mPrintOption));
+			}else{
+				resp = ServerConnector.instance().ask(new ReqInsertOrder(mStaff, mUpdateBuilder, mPrintOption));
+			}
 			if(resp.header.type == Type.NAK){
 				mBusinessException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 			}
