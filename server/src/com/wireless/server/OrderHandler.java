@@ -18,7 +18,6 @@ import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
 import com.wireless.db.foodGroup.CalcFoodGroupDao;
 import com.wireless.db.frontBusiness.QueryMenu;
-import com.wireless.db.frontBusiness.TransTblDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.InsertOrder;
 import com.wireless.db.orderMgr.OrderDao;
@@ -416,19 +415,16 @@ class OrderHandler implements Runnable{
 	}
 	
 	private RespPackage doTransTable(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
-		Table[] tables = new Parcel(request.body).readParcelArray(Table.CREATOR);
-		if(tables != null){
-			Table srcTbl = tables[0];
-			Table destTbl = tables[1];
-			
-			int orderId = TransTblDao.exec(staff, srcTbl, destTbl);
-			List<Printer> printers = PrinterDao.getPrinters(staff);
-			
-			new PrintHandler(staff)
-				.addContent(JobContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, staff, printers, orderId, srcTbl, destTbl))
-				.fireAsync();
-			
-		}
+		Table.TransferBuilder builder = new Parcel(request.body).readParcel(Table.TransferBuilder.CREATOR);
+		int orderId = TableDao.transfer(staff, builder);
+		List<Printer> printers = PrinterDao.getPrinters(staff);
+		
+		Table srcTbl = TableDao.getByAlias(staff, builder.getSrcTbl().getAliasId());
+		Table destTbl = TableDao.getByAlias(staff, builder.getDestTbl().getAliasId());
+		
+		new PrintHandler(staff)
+			.addContent(JobContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, staff, printers, orderId, srcTbl, destTbl))
+			.fireAsync();
 		
 		return new RespACK(request.header);
 	}
