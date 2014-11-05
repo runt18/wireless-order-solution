@@ -724,33 +724,24 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 			mProgDialog = ProgressDialog.show(TableActivity.this, "", "正在交换数据...请稍后", true);
 		}		
 	
-		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则执行请求餐台的操作。
-		 */
-		@Override
-		protected void onPostExecute(Void nothing){
-			
+		protected void onSuccess(){
 			mProgDialog.dismiss();
-			
-			/**
-			 * Prompt user message if any error occurred.
-			 */		
-			if(mErrMsg != null){
-				new AlertDialog.Builder(TableActivity.this)
+			Toast.makeText(getApplicationContext(), "换台成功", Toast.LENGTH_SHORT).show();
+			new QueryRegionTask().execute();
+		};
+		
+		protected void onFail(BusinessException e){
+			mProgDialog.dismiss();
+			new AlertDialog.Builder(TableActivity.this)
 				.setTitle("提示")
-				.setMessage(mErrMsg)
+				.setMessage(e.getDesc())
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
 					}
 				}).show();
-			}else{		
-				Toast.makeText(getApplicationContext(), "换台成功", Toast.LENGTH_SHORT).show();
-				new QueryRegionTask().execute();
-			}
 		}
+		
 	}
 	
 	/**
