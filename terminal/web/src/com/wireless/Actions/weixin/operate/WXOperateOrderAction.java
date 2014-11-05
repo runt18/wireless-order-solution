@@ -36,7 +36,7 @@ public class WXOperateOrderAction extends DispatchAction {
 			String foods = request.getParameter("foods");
 			
 			WXOrder.InsertBuilder ib = new WXOrder.InsertBuilder();
-			ib.setMemberSerial(oid).setFoods(WXOrder.unserializeByInsert(foods));
+			ib.setWeixinSerial(oid).setFoods(WXOrder.unserializeByInsert(foods));
 			final WXOrder order = WXOrderDao.insert(fid, oid, ib);
 			order.setFoods(null);
 			jobject.setExtra(new Jsonable(){

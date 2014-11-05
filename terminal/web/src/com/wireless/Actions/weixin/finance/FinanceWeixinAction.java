@@ -68,6 +68,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
+import com.wireless.pojo.billStatistics.IncomeByPay.PaymentIncome;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -380,18 +381,12 @@ public class FinanceWeixinAction extends Action {
 		content.append("结束时间:" + new SimpleDateFormat("M月d日 HH:mm").format(DateUtil.parseDate(detail.getOffDuty())) + "\n");
 		
 		content.append("-------------------\n")
-			   .append(grid3Item(new String[]{"收款", "账单数", "金额"}, new int[]{10, 20}) + "\n")
-			   .append(grid3Item(new String[]{"现金", Integer.toString(detail.getCashAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getCashActualIncome())}, new int[]{10, 16}) + "\n")
-			   .append(grid3Item(new String[]{"刷卡", Integer.toString(detail.getCreditCardAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getCreditActualIncome())}, new int[]{10, 16}) + "\n");
+			   .append(grid3Item(new String[]{"收款", "账单数", "金额"}, new int[]{10, 20}) + "\n");
 		
-		if(detail.getMemberCardAmount() > 0){
-			content.append(grid3Item(new String[]{"会员", Integer.toString(detail.getMemberCardAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getMemberActualIncome())}, new int[]{10, 16}) + "\n");
-		}
-		if(detail.getSignAmount() > 0){
-			content.append(grid3Item(new String[]{"签单", Integer.toString(detail.getSignAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getSignActualIncome())}, new int[]{10, 16}) + "\n");
-		}
-		if(detail.getHangAmount() > 0){
-			content.append(grid3Item(new String[]{"挂账", Integer.toString(detail.getHangAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getHangActualIncome())}, new int[]{10, 16}) + "\n");
+		for(PaymentIncome income : detail.getIncomeByPay().getPaymentIncomes()){
+			if(income.getAmount() > 0){
+				content.append(grid3Item(new String[]{income.getPayType().getName(), Integer.toString(income.getAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(income.getActual())}, new int[]{10, 16}) + "\n");
+			}
 		}
 		
 		content.append("-------------------\n").append(grid2Item("部门", "销售额", 18)).append("\n");

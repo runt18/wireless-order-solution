@@ -1,6 +1,5 @@
 package com.wireless.Actions.dishesOrder;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,15 +10,19 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.orderMgr.PayOrder;
-import com.wireless.db.orderMgr.UpdateOrder;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.exception.BusinessException;
+import com.wireless.exception.ErrorCode;
 import com.wireless.json.JObject;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqRepayOrder;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.sccon.ServerConnector;
 
 public class RepaidOrderAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -61,7 +64,7 @@ public class RepaidOrderAction extends Action{
 //			orderToUpdate.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
 
 			//update the order
-			UpdateOrder.exec(staff, JObject.parse(Order.UpdateBuilder.JSON_CREATOR, 0, request.getParameter("commitOrderData")));
+			//UpdateOrder.exec(staff, JObject.parse(Order.UpdateBuilder.JSON_CREATOR, 0, request.getParameter("commitOrderData")));
 			
 			//get the pay manner to this order
 			Order.PayBuilder payBuilder = Order.PayBuilder.build(orderId, new PayType(Integer.parseInt(request.getParameter("payType"))));
@@ -93,20 +96,21 @@ public class RepaidOrderAction extends Action{
 			}
 			
 			//pay order
-			PayOrder.pay(staff, payBuilder);
+			//PayOrder.pay(staff, payBuilder);
 			
-			jsonResp = jsonResp.replace("$(result)", "true");	
-			jsonResp = jsonResp.replace("$(value)", orderId + "号账单修改成功");
+			ProtocolPackage resp = ServerConnector.instance().ask(
+					new ReqRepayOrder(staff, 
+							new Order.RepaidBuilder(JObject.parse(Order.UpdateBuilder.JSON_CREATOR, 0, request.getParameter("commitOrderData")), payBuilder), 
+									PrintOption.DO_PRINT));
 			
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");		
-			jsonResp = jsonResp.replace("$(value)", e.getDesc());	
+			if(resp.header.type == Type.ACK){
+				jsonResp = jsonResp.replace("$(result)", "true");	
+				jsonResp = jsonResp.replace("$(value)", orderId + "号账单修改成功");
+			}else{
+				jsonResp = jsonResp.replace("$(result)", "false");		
+				jsonResp = jsonResp.replace("$(value)", new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());	
+			}
 			
-		}catch(IOException e){
-			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "账单修改失败，请重新确认");
 		}finally{
 			out.write(jsonResp);
 		}
