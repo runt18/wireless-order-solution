@@ -38,6 +38,7 @@ import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
+import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pack.resp.RespACK;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
@@ -202,6 +203,10 @@ class OrderHandler implements Runnable{
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER || request.header.type == Type.PAY_TEMP_ORDER){
 					//handle the pay order request
 					response = doPayOrder(staff, request);
+					
+				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.RE_PAY_ORDER){
+					//handle the repaid order request
+					response = doRepayOrder(staff, request);
 					
 				}else if(request.header.mode == Mode.PRINT && request.header.type == Type.PRINT_CONTENT){
 					//handle the print request
@@ -425,6 +430,19 @@ class OrderHandler implements Runnable{
 			
 		}
 		
+		return new RespACK(request.header);
+	}
+	
+	private RespPackage doRepayOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+		Order.RepaidBuilder builder = new Parcel(request.body).readParcel(Order.RepaidBuilder.CREATOR);
+		OrderDao.repaid(staff, builder);
+		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
+			try{
+				ServerConnector.instance().ask(ReqPrintContent.buildReqPrintReceipt(staff, builder.getUpdateBuilder().build().getId()));
+			}catch(IOException ignored){
+				ignored.printStackTrace();
+			}
+		}
 		return new RespACK(request.header);
 	}
 	
