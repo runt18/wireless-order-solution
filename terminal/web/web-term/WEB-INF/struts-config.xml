@@ -67,9 +67,6 @@
 		<action path="/QueryDetail" type="com.wireless.Actions.orderMgr.QueryDetailAction"
 			scope="request">
 		</action>
-		<action path="/QueryShift" type="com.wireless.Actions.shift.QueryShiftAction"
-			scope="request">
-		</action>
 		<action path="/DoShift" type="com.wireless.Actions.shift.DoShiftAction"
 			scope="request">
 		</action>
