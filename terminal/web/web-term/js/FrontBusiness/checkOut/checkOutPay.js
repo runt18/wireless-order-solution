@@ -41,7 +41,10 @@ var paySubmit = function(submitType) {
 			if (submitType == 6) {
 				tempPay = "true";
 				payManner = 1;
-			} else {
+			}else if(submitType == 101){
+				tempPay = "true";
+				payManner = 100;		
+			}else {
 				tempPay = "";
 				payManner = submitType;
 			}
@@ -99,7 +102,7 @@ var paySubmit = function(submitType) {
 						var interval = 5;
 						var action = '';
 						
-						if (submitType == 6) {
+						if (submitType == 6 || submitType == 101) {
 							Ext.example.msg('提示', dataInfo);
 							setFormButtonStatus(false);
 						}else{

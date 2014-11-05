@@ -7,7 +7,7 @@
 				title : '营业统计 -- <font style="color:green;">历史</font>',
 				id : 'dailySettleStatWin',
 				width : 885,
-				height : 580,
+				height : 600,
 				closable : false,
 				modal : true,
 				resizable : false,	

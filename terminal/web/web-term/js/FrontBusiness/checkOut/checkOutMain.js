@@ -340,6 +340,7 @@ Ext.onReady(function() {
 		checkOutMainPanel.doLayout();
 	}
 	
+	//快捷键
 	new Ext.KeyMap(document.body, [{
 		key: 107,
 		scope : this,
@@ -350,7 +351,12 @@ Ext.onReady(function() {
 		key: 109,
 		scope : this,
 		fn: function(){
-			paySubmit(6);
+			if(isMixedPay){
+				Ext.getCmp('btnTempMixedPayInputRecipt').handler();
+			}else{
+				paySubmit(6);
+			}
+			
 		}
 	}]);
 	

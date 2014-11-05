@@ -173,7 +173,7 @@ function initPaytypeCheckboxs(){
 			});				
 		}
 		Ext.getCmp('repaid_mixedPayTypePanel').add({
-			width : (repaid_payType[i].name.length * 23),
+			width : (repaid_payType[i].name.length * 25),
  	    	xtype : 'checkbox',
  	    	id : checkBoxId,
  	    	inputValue : repaid_payType[i].id,
@@ -183,9 +183,21 @@ function initPaytypeCheckboxs(){
  	    		check : function(checkbox, checked){
  	    			var numForAlias = Ext.getCmp(checkbox.relativePrice);
 					if(checked){
+						payMoneyCalc[checkbox.relativePrice] = true;
+						
+	 	    			var mixedPayMoney = primaryOrderData.other.order.actualPrice;
+	 	    			for(var pay in payMoneyCalc){
+	 	    				if(typeof payMoneyCalc[pay] != 'boolean'){
+	 	    					mixedPayMoney -= payMoneyCalc[pay];
+	 	    				}
+	 	    			}
+	 	    			numForAlias.setValue(mixedPayMoney < 0? 0 : mixedPayMoney);							
+						
 						numForAlias.enable();
 						numForAlias.focus(true, 100);
 					}else{
+						payMoneyCalc[checkbox.relativePrice] = false;
+						
 						numForAlias.disable();
 						numForAlias.setValue();		
 						numForAlias.clearInvalid();
@@ -209,7 +221,14 @@ function initPaytypeCheckboxs(){
 			id : numberfieldId,
 			disabled : true,
 			width : 70,
-			minValue : 0
+			minValue : 0,
+ 	    	listeners : {
+ 	    		blur : function(thiz){
+ 	    			if(thiz.getValue()){
+ 	    				payMoneyCalc[thiz.id] = thiz.getValue();
+ 	    			}
+ 	    		}
+ 	    	}
 		});			 	
 	}
 	Ext.getCmp('repaid_mixedPayTypePanel').doLayout();

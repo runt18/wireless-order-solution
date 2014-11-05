@@ -66,7 +66,7 @@ function showViewBillWin(){
 		layout : 'fit',
 		title : '查看账单',
 		width : 510,
-		height : 550,
+		height : 555,
 		resizable : false,
 		closable : false,
 		modal : true,

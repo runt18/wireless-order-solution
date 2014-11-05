@@ -383,6 +383,7 @@ function fnRemberIsFastOrInput(type){
 
 
 function fnMixedPay(){
+	isMixedPay = true;
 	if(!mixedPayWin){
 		mixedPayWin = new Ext.Window({
 			title : '混合结账',
@@ -405,13 +406,36 @@ function fnMixedPay(){
 		 	}],
 			bbar : [{
 				text : '暂结',
+				id : 'btnTempMixedPayInputRecipt',
 				iconCls : 'btn_save',
 				handler : function(e){
-					paySubmit(6);
+					var mixedPayMoney = Ext.get('shouldPay').dom.innerHTML;
+ 	    			for(var pay in payMoneyCalc){
+ 	    				if(typeof payMoneyCalc[pay] != 'boolean'){
+ 	    					mixedPayMoney -= payMoneyCalc[pay];
+ 	    				}
+ 	    			}					
+					
+					if(mixedPayMoney != 0){
+						Ext.example.msg('提示', '混合结账的金额不等于账单的实收金额');
+					}else{
+						payTypeCash ='';
+						for (var i = 0; i < payTypeData.length; i++) {
+							var checked = document.getElementById('chbForPayType' + payTypeData[i].id).checked;
+							if(checked && Ext.getCmp('numForPayType'+payTypeData[i].id).getValue()){
+								if(payTypeCash){
+									payTypeCash += '&';
+								}
+								payTypeCash += (payTypeData[i].id + ',' + Ext.getCmp('numForPayType'+payTypeData[i].id).getValue());  
+							}
+						}						
+						
+						paySubmit(101);
+					}
 				}
 			},'->',{
 				text : '结账',
-				id : 'btnPayInputRecipt',
+				id : 'btnMixedPayInputRecipt',
 				iconCls : 'btn_app',
 				handler : function(e){
 					var mixedPayMoney = Ext.get('shouldPay').dom.innerHTML;
@@ -438,8 +462,6 @@ function fnMixedPay(){
 						paySubmit(100);
 						mixedPayWin.hide();					
 					}
-
-					
 				}				
 			},{
 				text : '关闭',
@@ -453,13 +475,13 @@ function fnMixedPay(){
 			keys : [{
 				 key : Ext.EventObject.ENTER,
 				 fn : function(){ 
-					 Ext.getCmp('btnPayInputRecipt').handler();
+					 Ext.getCmp('btnMixedPayInputRecipt').handler();
 				 },
 				 scope : this 
 			}],
 			listeners : {
-				beforeshow : function(){
-				
+				hide : function(){
+					isMixedPay = false;
 				}
 			}
 		});
@@ -629,7 +651,7 @@ function showInputReciptWin(){
 			}],
 			bbar : ['->',{
 				text : '结账',
-				id : 'btnPayInputRecipt',
+				id : 'btnMixedPayInputRecipt',
 				iconCls : 'btn_save',
 				handler : function(e){
 					paySubmit(1);
@@ -646,7 +668,7 @@ function showInputReciptWin(){
 			keys : [{
 				 key : Ext.EventObject.ENTER,
 				 fn : function(){ 
-					 Ext.getCmp('btnPayInputRecipt').handler();
+					 Ext.getCmp('btnMixedPayInputRecipt').handler();
 				 },
 				 scope : this 
 			}],

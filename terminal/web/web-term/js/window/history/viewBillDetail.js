@@ -318,12 +318,10 @@ Ext.onReady(function(){
 					id : 'actrualPayBV'
 				}]
 			}, {
-				columnWidth : 1
-			}, {
 				columnWidth : 1,
 				items : [{
 					id : 'billDetail_mixedPay',
-					style : 'color:#15428B;text-align:left;font-size: 15px;margin-bottom: 3px;float:right;',
+					style : 'color:#15428B;text-align:left;font-size: 13px;margin-bottom: 3px;float:right;',
 					html : ''
 				}]
 			}]

@@ -871,6 +871,93 @@ function refreshOrder(res){
 	}
 };
 
+function submitRepaidOrderMain(_c){
+	commitOperate.show();
+	var commentOut = '';
+	var discountID = Ext.getCmp('comboDiscount');
+	var servicePlan = Ext.getCmp('repaid_comboServicePlan');
+	var erasePrice = Ext.getCmp('numErasePrice');
+	
+	if(typeof sysSetting.setting != 'undefined' && erasePrice.getValue() > sysSetting.setting.eraseQuota){
+		Ext.example.msg('提示', '抹数金额不能大于系统设置,请重新输入.');
+		return;
+	}
+	orderPanel.buttons[0].setDisabled(true);
+	orderPanel.buttons[1].setDisabled(true);
+	orderPanel.buttons[5].setDisabled(true);
+	
+	orderDataModel.tableAlias = _c.grid.order.table.alias;
+	orderDataModel.customNum = _c.grid.order['customNum'];
+	orderDataModel.orderFoods = _c.grid.order.orderFoods;
+	orderDataModel.categoryValue = _c.grid.order["categoryValue"];
+	orderDataModel.id = _c.grid.order["id"];
+	orderDataModel.orderDate =  _c.grid.order["orderDate"];
+	
+	Ext.Ajax.request({
+		url : "../../RepaidOrder.do",
+		params : {
+			'orderId' : _c.grid.order["id"],
+			'discountID' : discountID.getValue(),
+			'servicePlan' : servicePlan.getValue(),
+			"payType" : _c.commit_payType,
+			'payType_money' : _c.payType_money,
+			"memberID" : _c.grid.order['memberID'],
+			"comment" : commentOut,
+			'erasePrice' : erasePrice.getValue(),
+			"commitOrderData" : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
+			'customNum' : _c.grid.order['customNum']
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			if (resultJSON.success == true) {
+				if(!_c.notPrint){
+					var tempMask = new Ext.LoadMask(document.body, {
+						msg : '正在打印请稍候.......',
+						remove : true
+					});
+					Ext.Ajax.request({
+						url : "../../PrintOrder.do",
+						params : {
+							"orderID" : Request["orderID"],
+							'printType' : 3
+						},
+						success : function(response, options) {
+							tempMask.hide();
+							skip({href : 'Bills.html', msg : '提交并打印成功'});
+						},
+						failure : function(response, options) {
+							tempMask.hide();
+							Ext.ux.showMsg(Ext.decode(response.responseText));
+						}
+					});
+				}else{
+					skip({href : 'Bills.html', msg : resultJSON.data});
+				}
+			} else {
+				commitOperate.hide();
+				orderPanel.buttons[0].setDisabled(false);
+				orderPanel.buttons[1].setDisabled(false);
+				orderPanel.buttons[5].setDisabled(false);
+				Ext.MessageBox.show({
+					msg : resultJSON.data,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			}
+		},
+		failure : function(response, options) {
+			orderPanel.buttons[0].setDisabled(false);
+			orderPanel.buttons[1].setDisabled(false);
+			orderPanel.buttons[5].setDisabled(false);
+			Ext.MessageBox.show({
+				msg : "Unknow page error",
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
+		}
+	});	
+}
+
 /**
  * 反结账时调用
  * @param {} _c
@@ -878,105 +965,37 @@ function refreshOrder(res){
 function submitRepaidOrderHandler(_c){
 	var orderFoods = _c.grid.order.orderFoods;
 	if(orderFoods.length > 0){
-		commitOperate.show();
 		//var foodPara = Wireless.ux.createOrder({orderFoods: orderFoods, dataType : 3});
 		var commit_payType = Ext.getCmp('repaid_comboPayType').getValue();
-		
-		var payType_money = '';
-		for (var i = 0; i < repaid_payType.length; i++) {
-			if(Ext.getCmp('repaid_chbForPayType' + repaid_payType[i].id).getValue()){
-				if(payType_money){
-					payType_money += '&';
+		_c.commit_payType = commit_payType;
+		if(commit_payType == 100){
+			var mixedPayMoney = primaryOrderData.other.order.actualPrice;
+			for(var pay in payMoneyCalc){
+				if(typeof payMoneyCalc[pay] != 'boolean'){
+					mixedPayMoney -= payMoneyCalc[pay];
 				}
-				payType_money += (repaid_payType[i].id + ',' + Ext.getCmp('repaid_numForPayType' + repaid_payType[i].id).getValue());
-			}
-		}
-		
-		
-		
-		var commentOut = '';
-		var discountID = Ext.getCmp('comboDiscount');
-		var servicePlan = Ext.getCmp('repaid_comboServicePlan');
-		var erasePrice = Ext.getCmp('numErasePrice');
-		
-		if(typeof sysSetting.setting != 'undefined' && erasePrice.getValue() > sysSetting.setting.eraseQuota){
-			Ext.example.msg('提示', '抹数金额不能大于系统设置,请重新输入.');
-			return;
-		}
-		orderPanel.buttons[0].setDisabled(true);
-		orderPanel.buttons[1].setDisabled(true);
-		orderPanel.buttons[5].setDisabled(true);
-		
-		orderDataModel.tableAlias = _c.grid.order.table.alias;
-		orderDataModel.customNum = _c.grid.order['customNum'];
-		orderDataModel.orderFoods = orderFoods;
-		orderDataModel.categoryValue = _c.grid.order["categoryValue"];
-		orderDataModel.id = _c.grid.order["id"];
-		orderDataModel.orderDate =  _c.grid.order["orderDate"];
-		
-		Ext.Ajax.request({
-			url : "../../RepaidOrder.do",
-			params : {
-				'orderId' : _c.grid.order["id"],
-				'discountID' : discountID.getValue(),
-				'servicePlan' : servicePlan.getValue(),
-				"payType" : commit_payType,
-				'payType_money' : payType_money,
-				"memberID" : _c.grid.order['memberID'],
-				"comment" : commentOut,
-				'erasePrice' : erasePrice.getValue(),
-				"commitOrderData" : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
-				'customNum' : _c.grid.order['customNum']
-			},
-			success : function(response, options) {
-				var resultJSON = Ext.util.JSON.decode(response.responseText);
-				if (resultJSON.success == true) {
-					if(!_c.notPrint){
-						var tempMask = new Ext.LoadMask(document.body, {
-							msg : '正在打印请稍候.......',
-							remove : true
-						});
-						Ext.Ajax.request({
-							url : "../../PrintOrder.do",
-							params : {
-								"orderID" : Request["orderID"],
-								'printType' : 3
-							},
-							success : function(response, options) {
-								tempMask.hide();
-								skip({href : 'Bills.html', msg : '提交并打印成功'});
-							},
-							failure : function(response, options) {
-								tempMask.hide();
-								Ext.ux.showMsg(Ext.decode(response.responseText));
-							}
-						});
-					}else{
-						skip({href : 'Bills.html', msg : resultJSON.data});
+			}					
+			
+			var payType_money = '';
+			if(mixedPayMoney != 0){
+				Ext.example.msg('提示', '混合结账的金额不等于账单的实收金额');
+				return;
+			}else{
+				for (var i = 0; i < repaid_payType.length; i++) {
+					if(Ext.getCmp('repaid_chbForPayType' + repaid_payType[i].id).getValue()){
+						if(payType_money){
+							payType_money += '&';
+						}
+						payType_money += (repaid_payType[i].id + ',' + Ext.getCmp('repaid_numForPayType' + repaid_payType[i].id).getValue());
 					}
-				} else {
-					commitOperate.hide();
-					orderPanel.buttons[0].setDisabled(false);
-					orderPanel.buttons[1].setDisabled(false);
-					orderPanel.buttons[5].setDisabled(false);
-					Ext.MessageBox.show({
-						msg : resultJSON.data,
-						width : 300,
-						buttons : Ext.MessageBox.OK
-					});
 				}
-			},
-			failure : function(response, options) {
-				orderPanel.buttons[0].setDisabled(false);
-				orderPanel.buttons[1].setDisabled(false);
-				orderPanel.buttons[5].setDisabled(false);
-				Ext.MessageBox.show({
-					msg : "Unknow page error",
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
-			}
-		});
+				_c.payType_money = payType_money;
+				submitRepaidOrderMain(_c);
+			}		
+		}else{
+			submitRepaidOrderMain(_c);
+		}
+		
 	}
 }
 
