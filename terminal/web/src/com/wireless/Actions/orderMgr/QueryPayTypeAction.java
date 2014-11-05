@@ -79,6 +79,29 @@ public class QueryPayTypeAction extends DispatchAction {
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
-	}		
+	}
+	
+	public ActionForward exceptMixed(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		String pin = (String) request.getAttribute("pin");
+		try{
+			List<PayType> list = PayTypeDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), new PayTypeDao.ExtraCond()
+																							.addType(PayType.Type.DESIGNED)
+																							.addType(PayType.Type.EXTRA)
+																							.addType(PayType.Type.MEMBER));
+			jobject.setRoot(list);
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
 
 }
