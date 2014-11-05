@@ -222,14 +222,14 @@ Ext.onReady(function(){
 	});
 	var viewBillAddPanel = new Ext.Panel({
 		region : 'south',
-		height : 110,
+		height : 120,
 		frame : true,
 		border : false,
 		items : [new Ext.Panel({
 			xtype : 'panel',
 			layout : 'column',
 			//height : Ext.isIE ? 90 : 110 ,
-			height : 110,
+			height : 120,
 			defaults : {
 				columnWidth : .16,
 				defaults : {
@@ -321,7 +321,7 @@ Ext.onReady(function(){
 				columnWidth : 1,
 				items : [{
 					id : 'billDetail_mixedPay',
-					style : 'color:#15428B;text-align:left;font-size: 13px;margin-bottom: 3px;float:right;',
+					style : 'color:#15428B;text-align:left;font-size: 15px;margin-bottom: 3px;float:right;',
 					html : ''
 				}]
 			}]

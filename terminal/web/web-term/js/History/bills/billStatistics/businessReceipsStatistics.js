@@ -246,8 +246,6 @@ function initBusinessReceipsGrid(c){
 			width : 70
 	}];
 	
-	console.log(business_receipts_payType)
-	
 	for (var i = 0; i < business_receipts_payType.length; i++) {
 		receivablesStatResultStoreRecords.push({name : 'payType'+business_receipts_payType[i].id});
 		receivablesStatResultColumnModelRecords.push({
@@ -492,7 +490,7 @@ Ext.onReady(function(){
 		type : 'post',
 		async:false,
 		data : {
-			dataSource : 'allPayType'
+			dataSource : 'exceptMixed'
 		},
 		success : function(jr, status, xhr){
 			business_receipts_payType = jr.root;

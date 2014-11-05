@@ -288,7 +288,7 @@ Ext.onReady(function(){
 				iconCls : 'icon_tb_exoprt_excel',
 				handler : function(){
 					var paramsOnDuty = '', paramsOffDuty;
-					if(queryPattern == 1){
+					if(queryPattern == 1 || queryPattern == 3){
 						if(!beginDate.isValid() || !endDate.isValid()){
 							return;
 						}
