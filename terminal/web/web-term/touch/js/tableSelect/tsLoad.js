@@ -51,7 +51,6 @@ $(function(){
  * freeTables存放空闲餐桌，busyTables存放就餐餐桌
  */
 function initTableData(){
-//	alert("TTT");
 	$('#spanStaffNameForDisplayToTS').html(staffData.staffName);
 	// 加载菜单数据
 	$.ajax({

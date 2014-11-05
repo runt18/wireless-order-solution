@@ -1,3 +1,4 @@
+//餐台选择匹配
 ts.s = {
 	file : null,
 	fileValue : null,
@@ -230,6 +231,8 @@ function handleTableForTS(c){
  * @param {object} o
  */
 function inputNum(o){
+	
+	inputNumVal = $("#" + inputNumId).val();
 	inputNumVal += o.innerHTML;
 	$("#" + inputNumId).val(inputNumVal);
 	//判断人数是否超过限定
@@ -238,7 +241,7 @@ function inputNum(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '人数超过限定，请重新输入.', 
-				time : 2,
+				time : 2
 			});
 			inputNumVal = "";
 			$("#" + inputNumId).val(inputNumVal);
@@ -251,14 +254,16 @@ function inputNum(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '桌号超过限定，请重新输入.', 
-				time : 2,
+				time : 2
 			});
 			inputNumVal = "";
 			$("#" + inputNumId).val(inputNumVal);
 		}
 	}
-	$("#" + inputNumId).focus();	
-	getDom(inputNumId).oninput();
+	$("#" + inputNumId).focus();
+	if(getDom(inputNumId).oninput){
+		getDom(inputNumId).oninput();
+	}
 }
 
 //进入点菜界面
@@ -273,8 +278,9 @@ function renderToCreateOrder(tableNo, peopleNo){
 			type:'hide', 
 			renderTo:'divShowMessageForTableSelect'
 		});
-		inputNumVal = "1";
-		$("#txtTableNumForTS").val(inputNumVal);
+		inputNumVal = "";
+		$("#txtTableNumForTS").val();
+		$('#divSelectTablesForTs').html("");
 		$("#txtPeopleNumForSM").val(inputNumVal);
 		
 		//同时操作餐台时,选中状态没变化的餐桌处理
@@ -355,6 +361,31 @@ ts.submitForSelectTableNumTS = function(){
 	renderToCreateOrder(tableNo, peopleNo);	
 };
 
+function ts_transTable(c){
+	$.post('../TransTable.do', {
+		oldTableAlias : uo.table.alias,
+		newTableAlias : c.alias
+	},function(data){
+		if(data.success){
+			$('#btnCloseForSelectTableNumTS').click();
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : data.msg, 
+				time : 2
+			});				
+			//返回主界面
+			Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+			initTableData();			
+		}else{
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : data.msg, 
+				time : 2
+			});				
+		}			
+	});	
+}
+
 function uo_transFood(c){
 	ts.tf.count = $('#txtFoodNumForTran').val();
 	$.post('../TransFood.do', {
@@ -391,6 +422,8 @@ ts.submitForSelectTableOrTransFood = function(){
 		uo_transFood({alias:$('#txtTableNumForTS').val()});
 	}else if(ts.commitTableOrTran == 'allTrans'){
 		uo_transFood({alias:$('#txtTableNumForTS').val(), allTrans : -1});
+	}else if(ts.commitTableOrTran == 'transTable'){
+		ts_transTable({alias:$('#txtTableNumForTS').val()})
 	}
 }
 
@@ -401,6 +434,8 @@ ts.toOrderFoodOrTransFood = function(alias){
 		uo_transFood({alias:alias});
 	}else if(ts.commitTableOrTran == 'allTrans'){
 		uo_transFood({alias:alias, allTrans : -1});
+	}else if(ts.commitTableOrTran == 'transTable'){
+		ts_transTable({alias:alias})
 	}
 }
 
@@ -576,6 +611,7 @@ function showSelectTableNumTS(){
 		});
 		inputNumVal = "";
 		$("#txtTableNumForTS").val("");
+		$('#divSelectTablesForTs').html("");
 	});
 	$("#txtTableNumForTS").select();
 	inputNumId  = "txtTableNumForTS";
@@ -592,6 +628,9 @@ ts.backOne = function(){
 		$("#" + inputNumId).val(inputNumVal);
 	}
 	$("#" + inputNumId).focus();
+	if(getDom(inputNumId).oninput){
+		getDom(inputNumId).oninput();
+	}	
 };
 /**
  * 重置数字

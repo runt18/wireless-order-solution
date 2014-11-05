@@ -69,7 +69,7 @@ var Templet={
 			+ '<td>{actualPrice}</td>'
 			+ '<td>{totalPrice}</td>'
 			+ '<td>{orderDateFormat}</td>'
-			+ '<td><span class="button-base cancelFoodBtn" id="btnuo{dataIndex}">退</span>&nbsp;<span class="button-base transFoodBtn" id="btntrans{dataIndex}">转</span></td>'
+			+ '<td><span class="button-base cancelFoodBtn" id="btnuo{dataIndex}">退菜</span>&nbsp;<span class="button-base transFoodBtn" id="btntrans{dataIndex}">转菜</span></td>'
 			+ '<td>{waiter}</td>'
 			+ '</tr>',
 		changeDiscount : '<div data-value={id} class="main-box-base" onClick="uo.cd.select({id:{id}})">{name}</div>'
@@ -761,5 +761,30 @@ function logout(){
 			initStaffContent();
 		}
 	});
+}
+
+function checkDot(num)
+{
+	var dot = num.indexOf(".");
+	if(dot != -1){
+	    var dotCnt = num.substring(dot+1,dot+2);
+	    var dotCnt2 = num.substring(dot+2);
+	    if(dotCnt >= 1 || dotCnt2 >= 1){
+	        return true;
+	    }else{
+	    	return false;
+	    }
+	}else{
+		return false;
+	}
+}
+function isDecimal (s) {
+ //var regu = "^([0-9]*)$";
+ var regu = "^([0-9]*[.0-9])$"; // 小数测试
+ var re = new RegExp(regu);
+ if (s.search(re) != -1)
+  return true;
+ else
+  return false;
 }
 

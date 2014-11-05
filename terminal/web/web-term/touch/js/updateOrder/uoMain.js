@@ -171,14 +171,16 @@ uo.cf.save = function(){
 		foodName = $("#" + rowId).find("td").eq(1).text();
 		actualPrice = $("#" + rowId).find("td").eq(4).text();
 		totalPrice = actualPrice * (-num);
-		htmlcancel = "<tr><td style = 'background: #FFA07A'>退</td>" +
+		
+/*		加上退菜信息
+ * 		htmlcancel = "<tr><td style = 'background: #FFA07A'>退</td>" +
 				"<td style = 'background: #FFA07A'>" + foodName + "</td>" +
 				"<td style = 'background: #FFA07A'>" + (-num).toFixed(2) + "</td>" +
 				"<td colspan = '7' style = 'background: #FFA07A'> " +
 				"退菜原因：" + selectingCancelReason.reason + "</td>" + 
 						"</tr>";
 		
-		$("#" + rowId).after(htmlcancel);
+		$("#" + rowId).after(htmlcancel);*/
 		//把相关数据加到退菜信息对象
 		uoCancelFood.id = document.getElementById(rowId).getAttribute("data-value");
 		uoCancelFood.foodName = foodName;
@@ -202,6 +204,9 @@ uo.cf.save = function(){
 		});
 		inputNumValUO = "";
 		$("#" + inputNumIdUO).val(inputNumValUO);
+		uo.canceling = true;
+		uo.saveForUO();
+/*		
 		//把按钮值由退菜改为取消退菜
 		var btnReasonToggle;
 		btnReasonToggle = $("#" + rowId).find("td").eq(7).find("div"); 
@@ -222,7 +227,7 @@ uo.cf.save = function(){
 				cancelFood(this);
 			});
 		});
-		
+		*/
 	}
 };
 
@@ -236,18 +241,18 @@ function transFoodForTS(o){
 	foodName = $("#" + rowId).find("td").eq(1).text();
 	ts.tf.id = document.getElementById(rowId).getAttribute("data-value");
 	ts.tf.count = $("#" + rowId).find("td").eq(2).text();	
-	$('#txtFoodNumForTran').val(parseInt(ts.tf.count));
+	$('#txtFoodNumForTran').val(checkDot(ts.tf.count)?ts.tf.count : parseInt(ts.tf.count));
 	showSelectTableNumTS();
 	var title = "";
 	title = foodName +" -- 请输入桌号，菜品数量确定转菜";
 	$("#divTopForSelectTableNumTS").html("<div style = 'font-size: 15px; " +
 			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");	
 			
-	$('#txtFoodNumForTran').focus(function(){
+	$('#txtFoodNumForTran').click(function(){
 		inputNumId  = "txtFoodNumForTran";
 	});		
 	
-	$('#txtTableNumForTS').focus(function(){
+	$('#txtTableNumForTS').click(function(){
 		inputNumId  = "txtTableNumForTS";
 	});		
 }
@@ -260,6 +265,18 @@ function allTransFoodForTS(){
 	showSelectTableNumTS();
 	var title = "";
 	title = "请输入桌号，确定全部转菜";
+	$("#divTopForSelectTableNumTS").html("<div style = 'font-size: 20px; " +
+			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");		
+}
+
+function uo_transTableForTS(){
+	$('#divTransFoodNumber').hide();
+	$('#divTransFoodTableAlias > span').removeClass('trans-food-label');
+	$('#divTransFoodTableAlias > span').addClass('select-food-label');
+	ts.commitTableOrTran = 'transTable';
+	showSelectTableNumTS();
+	var title = "";
+	title = "请输入桌号，确定转台";
 	$("#divTopForSelectTableNumTS").html("<div style = 'font-size: 20px; " +
 			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");		
 }
@@ -597,15 +614,28 @@ uo.submitUpdateOrderHandler = function(c){
 							uo.printTemp = false;
 							uo.tempPayForUO();
 						}else{
-							Util.msg.alert({
-								title : data.title,
-								msg : data.msg, 
-								time : 3,
-								fn : function(btn){
-									Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
-									initTableData();
-								}
-							});
+							if(uo.canceling){
+								updateTable({
+									alias : uo.table.alias
+								});
+								Util.msg.alert({
+									title : data.title,
+									msg : '退菜成功', 
+									time : 2
+								});		
+								uo.canceling = false;
+							}else{
+								Util.msg.alert({
+									title : data.title,
+									msg : data.msg, 
+									time : 3,
+									fn : function(btn){
+										Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+										initTableData();
+									}
+								});							
+							}
+
 						}
 
 					}else{
