@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
+import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqTransTbl;
@@ -14,9 +14,9 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public class TransTblTask extends AsyncTask<Void, Void, Void>{
+public abstract class TransTblTask extends AsyncTask<Void, Void, Void>{
 
-	protected String mErrMsg;
+	protected BusinessException mBusinessException;
 	
 	private final Table mSrcTbl;
 	
@@ -34,30 +34,28 @@ public class TransTblTask extends AsyncTask<Void, Void, Void>{
 	protected Void doInBackground(Void... args) {
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(mStaff, new Table[]{mSrcTbl, mDestTbl}));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(mStaff, new Table.TransferBuilder(new Table.AliasBuilder(mSrcTbl.getAliasId()), new Table.AliasBuilder(mDestTbl.getAliasId()))));
 			if(resp.header.type == Type.NAK){
-
-				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
-				
-				if(errCode.equals(ProtocolError.TABLE_NOT_EXIST)){
-					mErrMsg = mSrcTbl.getAliasId() + "或" + mDestTbl.getAliasId() + "号台信息不存在";
-					
-				}else if(errCode.equals(ProtocolError.TABLE_IDLE)){
-					mErrMsg = "原" + mSrcTbl.getAliasId() + "号台是空闲状态";
-					
-				}else if(errCode.equals(ProtocolError.TABLE_BUSY)){
-					mErrMsg = "新" + mDestTbl.getAliasId() + "号台是就餐状态，请跟餐厅经理确认";
-					
-				}else{
-					mErrMsg = mSrcTbl.getAliasId() + "号台转至" + mDestTbl.getAliasId() + "号台不成功";
-				}
+				mBusinessException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
 			}			
 		}catch(IOException e){
-			mErrMsg = e.getMessage();
+			mBusinessException = new BusinessException(e.getMessage());
 		}
 		
 		return null;
 		
 	}
 
+	@Override
+	protected final void onPostExecute(Void arg0){
+		if(mBusinessException != null){
+			onFail(mBusinessException);
+		}else{
+			onSuccess();
+		}
+	}
+	
+	protected abstract void onSuccess();
+	
+	protected abstract void onFail(BusinessException e);
 }
