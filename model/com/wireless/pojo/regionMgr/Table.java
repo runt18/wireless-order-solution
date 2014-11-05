@@ -28,6 +28,59 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		}
 	}
 	
+	public static class TransferBuilder implements Parcelable{
+		private Table srcTbl;
+		private Table destTbl;
+		
+		private TransferBuilder(){
+			
+		}
+		
+		public TransferBuilder(AliasBuilder src, AliasBuilder dest){
+			srcTbl = src.build();
+			destTbl = dest.build();
+		}
+		
+		public Table getSrcTbl(){
+			return this.srcTbl;
+		}
+		
+		public Table getDestTbl(){
+			return this.destTbl;
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flag) {
+			dest.writeParcel(srcTbl, Table.TABLE_PARCELABLE_SIMPLE);
+			dest.writeParcel(destTbl, Table.TABLE_PARCELABLE_SIMPLE);
+		}
+
+		@Override
+		public void createFromParcel(Parcel source) {
+			srcTbl = source.readParcel(Table.CREATOR);
+			destTbl = source.readParcel(Table.CREATOR);
+		}
+		
+		public final static Parcelable.Creator<TransferBuilder> CREATOR = new Parcelable.Creator<TransferBuilder>() {
+			
+			@Override
+			public TransferBuilder[] newInstance(int size) {
+				return new TransferBuilder[size];
+			}
+			
+			@Override
+			public TransferBuilder newInstance() {
+				return new TransferBuilder();
+			}
+		};
+		
+		@Override
+		public String toString(){
+			return srcTbl.getName() + "->" + destTbl.getName();
+		}
+
+	}
+	
 	public static class BatchInsertBuilder{
 		private final int start;
 		private final int end;
@@ -252,7 +305,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	
 	public String getName() {
 		if(tableName == null){
-			return "";
+			return tableAlias + "号台";
 		}
 		return tableName;
 	}
