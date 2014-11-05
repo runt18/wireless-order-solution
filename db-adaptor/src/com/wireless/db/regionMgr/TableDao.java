@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.TableError;
 import com.wireless.pojo.dishesOrder.Order;
@@ -543,6 +544,91 @@ public class TableDao {
 			throw e;
 		}finally{
 			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Transfer the table to another one.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the table transfer builder {@link Table#TransferBuilder}
+	 * @return the order id associated with the destination table after table transfer 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if either of cases below
+	 * 			<li>the source table is IDLE
+	 * 			<li>the destination table is BUSY
+	 **/
+	public static int transfer(Staff staff, Table.TransferBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			int orderId = transfer(dbCon, staff, builder);
+			dbCon.conn.commit();
+			return orderId;
+			
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Transfer the table to another one.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the table transfer builder {@link Table#TransferBuilder}
+	 * @return the order id associated with the destination table after table transfer 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if either of cases below
+	 * 			<li>the source table is IDLE
+	 * 			<li>the destination table is BUSY
+	 **/
+	public static int transfer(DBCon dbCon, Staff staff, Table.TransferBuilder builder) throws SQLException, BusinessException{
+		
+		Table srcTbl = builder.getSrcTbl();
+		Table destTbl = builder.getDestTbl();
+		
+		srcTbl = TableDao.getByAlias(dbCon, staff, srcTbl.getAliasId());
+
+		destTbl = TableDao.getByAlias(dbCon, staff, destTbl.getAliasId());
+
+			
+		if(srcTbl.isIdle()) {
+			throw new BusinessException("【" + srcTbl.getName() + "】是空闲状态, 不能转至【" + destTbl.getName() + "】",
+										TableError.TABLE_TRANSFER_ERROR);
+
+		}else if(destTbl.isBusy()) {
+			throw new BusinessException("【" + destTbl.getName() + "】是就餐状态, " + "【" + srcTbl.getName() + "】不能转至【" + destTbl.getName() + "】", 
+										TableError.TABLE_TRANSFER_ERROR);
+
+		}else {
+
+			int orderId = OrderDao.getByTableAlias(dbCon, staff, srcTbl.getAliasId()).getId();
+
+			// update the order
+			String sql = " UPDATE "	+ 
+						 Params.dbName	+ ".order " +
+						 " SET " + 
+						 " table_id = " + destTbl.getTableId() + ", " +
+						 " table_alias = " + destTbl.getAliasId() + ", " +
+						 " table_name = " + "'" + destTbl.getName() + "'" +
+						 " WHERE id = " + orderId;
+			dbCon.stmt.executeUpdate(sql);
+
+
+			return orderId;
 		}
 	}
 	
