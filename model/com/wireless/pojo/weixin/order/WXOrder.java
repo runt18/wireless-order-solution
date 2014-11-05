@@ -1,194 +1,257 @@
 package com.wireless.pojo.weixin.order;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.dishesOrder.OrderFood;
 
 public class WXOrder implements Jsonable{
-	public enum Status{
-		NO_USED(1, "未使用"),
-		USED(2, "已使用");
+	
+	public static enum Status{
+		INVALID(1, "已失效"),
+		COMMITTED(2, "已下单");
 		
-		private int value;
-		private String text;
+		private final int val;
+		private final String desc;
 		Status(int value, String text){
-			this.value = value;
-			this.text = text;
+			this.val = value;
+			this.desc = text;
 		}
-		public int getValue(){
-			return this.value;
+		public int getVal(){
+			return this.val;
 		}
-		public String getText(){
-			return this.text;
+		
+		public String getDesc(){
+			return this.desc;
 		}
+		
 		public static Status valueOf(int value){
-			for(Status temp : values()){
-				if(temp.value == value){
-					return temp;
+			for(Status status : values()){
+				if(status.val == value){
+					return status;
 				}
 			}
 			throw new IllegalArgumentException("The val(" + value + ") is invalid.");
 		}
 	}
 	
-	public static class Builder{
-		public Builder(){
-			this.data = new WXOrder();
-		}
-		protected WXOrder data;
-		public Builder setMemberSerial(String serial){
-			data.setMemberSerial(serial);
-			return this;
-		}
-		public Builder setFoods(List<WXOrderFood> foods){
-			data.setFoods(foods);
-			return this;
-		}
-//		public Builder setStatus(Status status){
-//			data.setStatus(status);
-//			return this;
-//		}
-//		public Builder setStatus(int status){
-//			data.setStatus(status);
-//			return this;
-//		}
-		public WXOrder build(){
-			return data.clone();
-		}
-	}
-	public static class InsertBuilder extends Builder{
+	public static enum Type{
+		INSIDE(1, "店内"),
+		BOOK(2, "预订"),
+		TAKE_OUT(3, "外卖");
 		
+		private final int val;
+		private final String desc;
+		
+		Type(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public static Type valueOf(int val){
+			for(Type type : values()){
+				if(type.val == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The type(val = " + val + ") pass id invalid.");
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
 	}
 	
-	private int rid;
+	public static class UpdateBuilder{
+		private final int id;
+		private Status status;
+		
+		public UpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		public UpdateBuilder setStatus(Status status){
+			this.status = status;
+			return this;
+		}
+		
+		public boolean isStatusChanged(){
+			return this.status != null;
+		}
+		
+		public WXOrder build(){
+			return new WXOrder(this);
+		}
+	}
+	
+	public static abstract class InsertBuilder{
+		private final String weixinSerial;
+		private final Type type;
+		private final Status status;
+		private final WXOrder order = new WXOrder(0);
+		
+		InsertBuilder(String weixinSerial, Type type, Status status){
+			this.weixinSerial = weixinSerial;
+			this.type = type;
+			this.status = status;
+		}
+		
+		public InsertBuilder add(OrderFood foodToAdd) throws BusinessException{
+			this.order.addFood(foodToAdd);
+			return this;
+		}
+		
+		public InsertBuilder addAll(List<OrderFood> foodsToAdd) throws BusinessException{
+			for(OrderFood of : foodsToAdd){
+				add(of);
+			}
+			return this;
+		}
+		
+		public WXOrder build(){
+			return new WXOrder(this);
+		}
+	} 
+	
+	public static class InsertBuilder4Inside extends InsertBuilder{
+		public InsertBuilder4Inside(String weixinSerial){
+			super(weixinSerial, Type.INSIDE, Status.COMMITTED);
+		}
+	}
+	
 	private int id;
-	private String memberSerial;
+	private String weixinSerial;
 	private long birthDate;
 	private int code;
+	private Type type;
 	private Status status;
-	private Restaurant restaurant;
-	private List<WXOrderFood> foods;
+	private int restaurantId;
+	private final List<OrderFood> foods = new ArrayList<OrderFood>();
 	
-	public int getRid() {
-		return rid;
+	private WXOrder(UpdateBuilder builder){
+		setId(builder.id);
+		setStatus(builder.status);
 	}
-	public void setRid(int rid) {
-		this.rid = rid;
+	
+	private WXOrder(InsertBuilder builder){
+		setWeixinSerial(builder.weixinSerial);
+		setType(builder.type);
+		setStatus(builder.status);
 	}
+	
+	public WXOrder(int id){
+		this.id = id;
+	}
+	
 	public int getId() {
 		return id;
 	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}
-	public String getMemberSerial() {
-		return memberSerial;
+	
+	public String getWeixinSerial() {
+		return weixinSerial;
 	}
-	public void setMemberSerial(String memberSerial) {
-		this.memberSerial = memberSerial;
+	
+	public void setWeixinSerial(String weixinSerial) {
+		this.weixinSerial = weixinSerial;
 	}
+	
 	public long getBirthDate() {
 		return birthDate;
 	}
-	public String getBirthDateFormat() {
-		return DateUtil.format(birthDate);
-	}
+	
 	public void setBirthDate(long birthDate) {
 		this.birthDate = birthDate;
 	}
+	
 	public int getCode() {
 		return code;
 	}
+	
 	public void setCode(int code) {
 		this.code = code;
 	}
+	
 	public Status getStatus() {
 		return status;
 	}
+	
+	public void setType(Type type){
+		this.type = type;
+	}
+	
+	public Type getType(){
+		return this.type;
+	}
+	
 	public void setStatus(Status status) {
 		this.status = status;
 	}
-	public void setStatus(int status) {
-		this.status = Status.valueOf(status);
-	}
-	public Restaurant getRestaurant() {
-		return restaurant;
-	}
-	public void setRestaurant(Restaurant restaurant) {
-		this.restaurant = restaurant;
-	}
-	public List<WXOrderFood> getFoods() {
-		return foods;
-	}
-	public void setFoods(List<WXOrderFood> foods) {
-		this.foods = foods;
+	
+	public int getRestaurantId() {
+		return restaurantId;
 	}
 	
-	@Override
-	protected WXOrder clone() {
-		WXOrder clone = new WXOrder();
-		clone.setRid(this.rid);
-		clone.setId(this.id);
-		clone.setMemberSerial(this.memberSerial);
-		clone.setBirthDate(this.birthDate);
-		clone.setCode(this.code);
-		clone.setStatus(this.status);
-		clone.setRestaurant(this.restaurant);
-		clone.setFoods(this.getFoods());
+	public void setRestaurant(int restaurantId) {
+		this.restaurantId = restaurantId;
+	}
+	
+	public List<OrderFood> getFoods() {
+		return Collections.unmodifiableList(foods);
+	}
+
+	public void addFood(OrderFood foodToAdd) throws BusinessException{
+		//Check to see whether the food to add is already contained. 
+		int index = foods.indexOf(foodToAdd);
 		
-		return clone;
+		//如果新添加的菜品在原来菜品List中已经存在相同的菜品，则累加数量
+		//否则添加到菜品列表
+		if(index >= 0){
+			foods.get(index).addCount(foodToAdd.getCount());
+		}else{
+			foods.add(foodToAdd);
+		}
+	}
+	
+	public void addFoods(List<OrderFood> foodsToAdd) throws BusinessException{
+		for(OrderFood of : foodsToAdd){
+			addFood(of);
+		}
+	}
+	
+	public void setFoods(List<OrderFood> foods) throws BusinessException {
+		this.foods.clear();
+		addFoods(foods);
 	}
 	
 	@Override
 	public String toString(){
-		return "id=" + id + ", restaurantId=" + rid + ", memberSerial=" + memberSerial
-				+ ", code=" + code;
+		return "id=" + id +
+			   ", memberSerial=" + weixinSerial	+
+			   ", code=" + code;
 	}
 	
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
-		jm.putInt("id", this.id);
-		jm.putInt("rid", this.rid);
-		jm.putString("memberSerial", this.memberSerial);
-		jm.putLong("birthDate", this.birthDate);
-		jm.putString("birthDateFormat", this.getBirthDateFormat());
-		jm.putInt("statusValue", this.status.getValue());
-		jm.putString("statusText", this.status.getText());
-		jm.putInt("code", this.code);
-		jm.putJsonable("restaurant", restaurant, 0);
 		
 		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
-	}
-	
-	/**
-	 * 解析前台回传数据(新插入菜品格式)
-	 * @param data
-	 * @return
-	 */
-	public static List<WXOrderFood> unserializeByInsert(String data){
-		List<WXOrderFood> list = new ArrayList<WXOrderFood>();
-		if(data != null && data.trim().length() > 0){
-			WXOrderFood tfood = null;
-			String[] tstr = null;
-			String[] items = data.split("<<si>>");
-			for(int i = 0; i < items.length; i++){
-				tstr = items[i] == null ? null : items[i].split("<<sa>>");
-				if(tstr != null && tstr.length == 2){
-					tfood = new WXOrderFood(Integer.valueOf(tstr[0]), Integer.valueOf(tstr[1]));
-					list.add(tfood);
-				}
-			}
-		}
-		return list;
 	}
 	
 }

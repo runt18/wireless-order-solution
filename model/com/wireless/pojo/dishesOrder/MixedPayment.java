@@ -128,7 +128,7 @@ public class MixedPayment implements Parcelable, Jsonable{
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putInt("orderId", this.getOrderId());
-		List<Jsonable> js = new ArrayList<>();
+		List<Jsonable> js = new ArrayList<Jsonable>();
 		for (final Entry<PayType, Float> entry : this.getPayments().entrySet()) {
 			js.add(new Jsonable() {
 				
