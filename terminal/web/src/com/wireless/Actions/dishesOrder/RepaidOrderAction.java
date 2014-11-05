@@ -40,32 +40,6 @@ public class RepaidOrderAction extends Action{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.RE_PAYMENT);
 			
-//			//get the id to this order
-//			orderId = Integer.parseInt(request.getParameter("orderID"));
-//			Order orderToUpdate = new Order(orderId);
-//			
-//			//get the pay type to this order
-//			SettleType settleType = SettleType.valueOf(Integer.parseInt(request.getParameter("payType")));
-//			orderToUpdate.setSettleType(settleType);	
-//			//get the pay manner to this order
-//			PayType payType = PayType.valueOf(Integer.parseInt(request.getParameter("payManner")));
-//			orderToUpdate.setPaymentType(payType);
-//
-//			//get the food string to this order
-//			orderToUpdate.setOrderFoods(Util.toFoodArray(request.getParameter("foods")));
-//			
-//			//get the category to this order
-//			orderToUpdate.setCategory(Short.parseShort(request.getParameter("category")));
-//			
-//			//get the table alias to this order
-//			orderToUpdate.getDestTbl().setTableAlias(Integer.valueOf(request.getParameter("tableAlias")));
-//			
-//			//get the custom number to this order
-//			orderToUpdate.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
-
-			//update the order
-			//UpdateOrder.exec(staff, JObject.parse(Order.UpdateBuilder.JSON_CREATOR, 0, request.getParameter("commitOrderData")));
-			
 			//get the pay manner to this order
 			Order.PayBuilder payBuilder = Order.PayBuilder.build(orderId, new PayType(Integer.parseInt(request.getParameter("payType"))));
 
@@ -94,9 +68,6 @@ public class RepaidOrderAction extends Action{
 					payBuilder.addPayment(new PayType(Integer.parseInt(payType[0])), Float.parseFloat(payType[1]));
 				}
 			}
-			
-			//pay order
-			//PayOrder.pay(staff, payBuilder);
 			
 			ProtocolPackage resp = ServerConnector.instance().ask(
 					new ReqRepayOrder(staff, 
