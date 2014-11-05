@@ -910,29 +910,7 @@ function submitRepaidOrderMain(_c){
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (resultJSON.success == true) {
-				if(!_c.notPrint){
-					var tempMask = new Ext.LoadMask(document.body, {
-						msg : '正在打印请稍候.......',
-						remove : true
-					});
-					Ext.Ajax.request({
-						url : "../../PrintOrder.do",
-						params : {
-							"orderID" : Request["orderID"],
-							'printType' : 3
-						},
-						success : function(response, options) {
-							tempMask.hide();
-							skip({href : 'Bills.html', msg : '提交并打印成功'});
-						},
-						failure : function(response, options) {
-							tempMask.hide();
-							Ext.ux.showMsg(Ext.decode(response.responseText));
-						}
-					});
-				}else{
-					skip({href : 'Bills.html', msg : resultJSON.data});
-				}
+				skip({href : 'Bills.html', msg : resultJSON.data});
 			} else {
 				commitOperate.hide();
 				orderPanel.buttons[0].setDisabled(false);
@@ -969,29 +947,31 @@ function submitRepaidOrderHandler(_c){
 		var commit_payType = Ext.getCmp('repaid_comboPayType').getValue();
 		_c.commit_payType = commit_payType;
 		if(commit_payType == 100){
-			var mixedPayMoney = primaryOrderData.other.order.actualPrice;
+/*			var mixedPayMoney = primaryOrderData.other.order.actualPrice;
 			for(var pay in payMoneyCalc){
 				if(typeof payMoneyCalc[pay] != 'boolean'){
 					mixedPayMoney -= payMoneyCalc[pay];
 				}
 			}					
 			
-			var payType_money = '';
+			
 			if(mixedPayMoney != 0){
 				Ext.example.msg('提示', '混合结账的金额不等于账单的实收金额');
 				return;
 			}else{
-				for (var i = 0; i < repaid_payType.length; i++) {
-					if(Ext.getCmp('repaid_chbForPayType' + repaid_payType[i].id).getValue()){
-						if(payType_money){
-							payType_money += '&';
-						}
-						payType_money += (repaid_payType[i].id + ',' + Ext.getCmp('repaid_numForPayType' + repaid_payType[i].id).getValue());
+
+			}	*/
+			var payType_money = '';
+			for (var i = 0; i < repaid_payType.length; i++) {
+				if(Ext.getCmp('repaid_chbForPayType' + repaid_payType[i].id).getValue()){
+					if(payType_money){
+						payType_money += '&';
 					}
+					payType_money += (repaid_payType[i].id + ',' + Ext.getCmp('repaid_numForPayType' + repaid_payType[i].id).getValue());
 				}
-				_c.payType_money = payType_money;
-				submitRepaidOrderMain(_c);
-			}		
+			}
+			_c.payType_money = payType_money;
+			submitRepaidOrderMain(_c);			
 		}else{
 			submitRepaidOrderMain(_c);
 		}
