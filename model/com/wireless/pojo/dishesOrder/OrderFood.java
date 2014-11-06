@@ -824,6 +824,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		IS_GIFT("isGift", "是否赠送"),
 		IS_HANG("isHangup", "是否叫起"),
 		IS_COMMISSION("isCommission", "是否提成"),
+		IS_TRANSFER("isTransfer", "是否转菜"),
 		IS_RETURN("isReturn", "是否退菜"),
 		DISCOUNT("discount", "折扣"),
 		COUNT("count", "数量"),
@@ -863,6 +864,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		jm.putBoolean(Key4Json.IS_HURRIED.key, this.isHurried);
 		jm.putBoolean(Key4Json.IS_HANG.key, this.isHangup);
 		jm.putBoolean(Key4Json.IS_GIFT.key, this.isGift);
+		jm.putBoolean(Key4Json.IS_TRANSFER.key, this.operation == Operation.TRANSFER);
 		jm.putBoolean(Key4Json.IS_COMMISSION.key, this.mFood.isCommission());
 		jm.putBoolean(Key4Json.IS_RETURN.key, this.getCount() < 0 ? true : false);
 		jm.putFloat(Key4Json.DISCOUNT.key, this.mDiscount);
