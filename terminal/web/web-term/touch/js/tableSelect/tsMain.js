@@ -445,6 +445,8 @@ function createOrderForTS(){
 	$('#divTransFoodNumber').hide();
 	$('#divTransFoodTableAlias > span').removeClass('trans-food-label');
 	$('#divTransFoodTableAlias > span').addClass('select-food-label');
+	$("#txtTableNumForTS").val("");
+	$('#divSelectTablesForTs').html("");	
 	ts.commitTableOrTran = 'table';
 	showSelectTableNumTS();
 	var title = "";

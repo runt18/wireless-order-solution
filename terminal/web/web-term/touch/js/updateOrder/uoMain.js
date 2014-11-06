@@ -236,6 +236,8 @@ function transFoodForTS(o){
 	$('#divTransFoodTableAlias > span').removeClass('select-food-label');
 	$('#divTransFoodTableAlias > span').addClass('trans-food-label');
 	ts.commitTableOrTran = 'trans';
+	$("#txtTableNumForTS").val("");
+	$('#divSelectTablesForTs').html("");	
 	var rowId, foodName;
 	rowId = "truoFood" + o.id.substring(8, o.id.length);
 	foodName = $("#" + rowId).find("td").eq(1).text();
@@ -262,6 +264,8 @@ function allTransFoodForTS(){
 	$('#divTransFoodTableAlias > span').removeClass('trans-food-label');
 	$('#divTransFoodTableAlias > span').addClass('select-food-label');
 	ts.commitTableOrTran = 'allTrans';
+	$("#txtTableNumForTS").val("");
+	$('#divSelectTablesForTs').html("");	
 	showSelectTableNumTS();
 	var title = "";
 	title = "请输入桌号，确定全部转菜";
@@ -274,6 +278,8 @@ function uo_transTableForTS(){
 	$('#divTransFoodTableAlias > span').removeClass('trans-food-label');
 	$('#divTransFoodTableAlias > span').addClass('select-food-label');
 	ts.commitTableOrTran = 'transTable';
+	$("#txtTableNumForTS").val("");
+	$('#divSelectTablesForTs').html("");	
 	showSelectTableNumTS();
 	var title = "";
 	title = "请输入桌号，确定转台";
