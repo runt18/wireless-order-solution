@@ -3223,7 +3223,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			HourRange hr = new HourRange(businessHourBeg, businessHourEnd, DateUtil.Pattern.HOUR);
 			extraCond.setHourRange(hr);
 		}
-		String orderClause = " ORDER BY "+ extraCond.orderTbl +".order_date ASC ";
+		String orderClause = " ORDER BY "+ extraCond.orderTblAlias +".order_date ASC ";
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		

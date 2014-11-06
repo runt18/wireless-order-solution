@@ -102,7 +102,7 @@ public class QueryOrderStatisticsAction extends Action {
 				extraCond.setTableName(tableName);
 			}
 			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
-				extraCond.setStaffId(Integer.parseInt(staffId));
+				extraCond.setStaff(Integer.parseInt(staffId));
 			}
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(Region.RegionId.valueOf(Short.parseShort(region)));
@@ -116,7 +116,7 @@ public class QueryOrderStatisticsAction extends Action {
 			extraCond.addStatus(Order.Status.PAID);
 			extraCond.addStatus(Order.Status.REPAID);
 			
-			String orderClause = " ORDER BY "+ extraCond.orderTbl +".order_date ASC " + " LIMIT " + start + "," + limit;
+			String orderClause = " ORDER BY "+ extraCond.orderTblAlias +".order_date ASC " + " LIMIT " + start + "," + limit;
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
