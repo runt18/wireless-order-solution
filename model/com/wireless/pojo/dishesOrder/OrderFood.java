@@ -831,6 +831,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		ACTUAL_PRICE("actualPrice", "实收"),
 		TOTAL_PRICE("totalPrice", "应收"),
 		TASTE_GROUP("tasteGroup", "口味"),
+		OPERATION("operation", "操作"),
 		TOTAL_PRICE_BEFORE_DISCOUNT("totalPriceBeforeDiscount", "应收(折扣前)");
 		
 		Key4Json(String key, String desc){
@@ -870,6 +871,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		jm.putFloat(Key4Json.ACTUAL_PRICE.key, this.asFood().getPrice());
 		jm.putFloat(Key4Json.TOTAL_PRICE.key, this.calcPrice());
 		jm.putJsonable(Key4Json.TASTE_GROUP.key, this.getTasteGroup(), 0);
+		jm.putString(Key4Json.OPERATION.key, this.getOperation() != null? this.getOperation().getDesc() : "点菜");
 		jm.putFloat(Key4Json.TOTAL_PRICE_BEFORE_DISCOUNT.key, this.calcPriceBeforeDiscount());
 		
 		return jm;
