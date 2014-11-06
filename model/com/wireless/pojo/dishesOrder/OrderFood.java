@@ -30,7 +30,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	public static enum Operation{
 		ADD(1, "加菜"),
 		CANCEL(2, "退菜"),
-		SWITCH(3, "转菜");
+		TRANSFER(3, "转菜");
 		
 		private final int val;
 		private final String desc;
