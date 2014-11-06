@@ -530,7 +530,7 @@ public class OrderFoodDao {
 		
 		public TransferBuilder(int orderId, OrderFood foodOut){
 			cancelBuilder = new CancelBuilder(orderId, foodOut);
-			cancelBuilder.cancel.setOperation(Operation.SWITCH);
+			cancelBuilder.cancel.setOperation(Operation.TRANSFER);
 		}
 		
 		public CancelBuilder asCancel(){

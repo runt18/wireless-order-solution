@@ -31,7 +31,9 @@ import com.wireless.util.DateType;
 public class OrderDao {
 
 	public static class ExtraCond{
-		public final String orderTbl;
+		public final String orderTblAlias;
+		private final String orderFoodTbl;
+		
 		private final DateType dateType;
 		private int orderId = -1;		//按账单号
 		private int seqId = -1;			//按流水号
@@ -51,13 +53,16 @@ public class OrderDao {
 		private boolean isCancelled;	//是否有退菜
 		private boolean isErased;		//是否有抹数
 		private boolean isCoupon;		//是否有使用优惠券
+		private boolean isTransfer;		//是否有转菜
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
 			if(dateType == DateType.TODAY){
-				orderTbl = "O";
+				orderTblAlias = "O";
+				orderFoodTbl = "order_food";
 			}else{
-				orderTbl = "OH";
+				orderTblAlias = "OH";
+				orderFoodTbl = "order_food_history";
 			}
 		}
 		
@@ -76,8 +81,13 @@ public class OrderDao {
 			return this;
 		}
 		
-		public ExtraCond setStaffId(int staffId){
+		public ExtraCond setStaff(int staffId){
 			this.staffId = staffId;
+			return this;
+		}
+		
+		public ExtraCond setStaff(Staff staff){
+			this.staffId = staff.getId();
 			return this;
 		}
 		
@@ -146,43 +156,48 @@ public class OrderDao {
 			return this;
 		}
 		
+		public ExtraCond isTransfer(boolean onOff){
+			this.isTransfer = onOff;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 
 			StringBuilder filterCond = new StringBuilder();
 			
 			if(orderId > 0){
-				filterCond.append(" AND " + orderTbl + ".id = " + orderId);
+				filterCond.append(" AND " + orderTblAlias + ".id = " + orderId);
 			}
 			if(seqId > 0){
-				filterCond.append(" AND " + orderTbl + ".seq_id = " + seqId);
+				filterCond.append(" AND " + orderTblAlias + ".seq_id = " + seqId);
 			}
 			if(tableAlias > 0){
-				filterCond.append(" AND " + orderTbl + ".table_alias = " + tableAlias);
+				filterCond.append(" AND " + orderTblAlias + ".table_alias = " + tableAlias);
 			}
 			if(staffId > 0){
-				filterCond.append(" AND " + orderTbl + ".staff_id = " + staffId);
+				filterCond.append(" AND " + orderTblAlias + ".staff_id = " + staffId);
 			}
 			if(tableName != null){
-				filterCond.append(" AND " + orderTbl + ".table_name LIKE '%" + tableName + "%'");
+				filterCond.append(" AND " + orderTblAlias + ".table_name LIKE '%" + tableName + "%'");
 			}
 			if(regionId != null){
-				filterCond.append(" AND " + orderTbl + ".region_id = " + regionId.getId());
+				filterCond.append(" AND " + orderTblAlias + ".region_id = " + regionId.getId());
 			}
 			if(orderRange != null){
-				filterCond.append(" AND " + orderTbl + ".order_date BETWEEN '" + orderRange.getOnDutyFormat() + "' AND '" + orderRange.getOffDutyFormat() + "'");
+				filterCond.append(" AND " + orderTblAlias + ".order_date BETWEEN '" + orderRange.getOnDutyFormat() + "' AND '" + orderRange.getOffDutyFormat() + "'");
 			}
 			if(hourRange != null){
-				filterCond.append(" AND TIME(" + orderTbl + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
+				filterCond.append(" AND TIME(" + orderTblAlias + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
 			}
 			if(payType != null){
-				filterCond.append(" AND " + orderTbl + ".pay_type_id = " + payType.getId());
+				filterCond.append(" AND " + orderTblAlias + ".pay_type_id = " + payType.getId());
 			}
 			if(comment != null){
-				filterCond.append(" AND " + orderTbl + ".comment LIKE '%" + comment + "%'");
+				filterCond.append(" AND " + orderTblAlias + ".comment LIKE '%" + comment + "%'");
 			}
 			if(!statusList.isEmpty()){
-				filterCond.append(" AND " + orderTbl + ".status IN(");
+				filterCond.append(" AND " + orderTblAlias + ".status IN(");
 				for(Order.Status status : statusList){
 					filterCond.append(status.getVal() + ",");
 				}
@@ -190,22 +205,26 @@ public class OrderDao {
 				filterCond.append(")");
 			}
 			if(isRepaid){
-				filterCond.append(" AND " + orderTbl + ".status = " + Order.Status.REPAID.getVal());
+				filterCond.append(" AND " + orderTblAlias + ".status = " + Order.Status.REPAID.getVal());
 			}
 			if(isDiscount){
-				filterCond.append(" AND " + orderTbl + ".discount_price > 0");
+				filterCond.append(" AND " + orderTblAlias + ".discount_price > 0");
 			}
 			if(isGift){
-				filterCond.append(" AND " + orderTbl + ".gift_price > 0");
+				filterCond.append(" AND " + orderTblAlias + ".gift_price > 0");
 			}
 			if(isCancelled){
-				filterCond.append(" AND " + orderTbl + ".cancel_price > 0");
+				filterCond.append(" AND " + orderTblAlias + ".cancel_price > 0");
 			}
 			if(isErased){
-				filterCond.append(" AND " + orderTbl + ".erase_price > 0");
+				filterCond.append(" AND " + orderTblAlias + ".erase_price > 0");
 			}
 			if(isCoupon){
-				filterCond.append(" AND " + orderTbl + ".coupon_price > 0");
+				filterCond.append(" AND " + orderTblAlias + ".coupon_price > 0");
+			}
+			if(isTransfer){
+				final String sql = " SELECT order_id FROM " + Params.dbName + "." + orderFoodTbl + " WHERE operation = " + OrderFood.Operation.TRANSFER.getVal();;
+				filterCond.append(" AND " + orderTblAlias + ".id IN( " + sql + ")");
 			}
 			return filterCond.toString();
 		}
