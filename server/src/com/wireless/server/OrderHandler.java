@@ -414,30 +414,18 @@ class OrderHandler implements Runnable{
 		return new RespACK(request.header);
 	}
 	
-	private RespPackage doTransTable(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+	private RespPackage doTransTable(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		Table.TransferBuilder builder = new Parcel(request.body).readParcel(Table.TransferBuilder.CREATOR);
 		int orderId = TableDao.transfer(staff, builder);
-		List<Printer> printers = PrinterDao.getPrinters(staff);
-		
-		Table srcTbl = TableDao.getByAlias(staff, builder.getSrcTbl().getAliasId());
-		Table destTbl = TableDao.getByAlias(staff, builder.getDestTbl().getAliasId());
-		
-		new PrintHandler(staff)
-			.addContent(JobContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, staff, printers, orderId, srcTbl, destTbl))
-			.fireAsync();
-		
+		ServerConnector.instance().ask(ReqPrintContent.buildReqPrintTransTbl(staff, orderId, builder.getSrcTbl(), builder.getDestTbl()));
 		return new RespACK(request.header);
 	}
 	
-	private RespPackage doRepayOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+	private RespPackage doRepayOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		Order.RepaidBuilder builder = new Parcel(request.body).readParcel(Order.RepaidBuilder.CREATOR);
 		OrderDao.repaid(staff, builder);
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
-			try{
-				ServerConnector.instance().ask(ReqPrintContent.buildReqPrintReceipt(staff, builder.getUpdateBuilder().build().getId()));
-			}catch(IOException ignored){
-				ignored.printStackTrace();
-			}
+			ServerConnector.instance().ask(ReqPrintContent.buildReqPrintReceipt(staff, builder.getUpdateBuilder().build().getId()));
 		}
 		return new RespACK(request.header);
 	}
