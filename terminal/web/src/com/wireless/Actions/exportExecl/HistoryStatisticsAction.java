@@ -39,6 +39,7 @@ import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderFoodDao;
+import com.wireless.db.orderMgr.PayTypeDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
@@ -59,6 +60,7 @@ import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -801,6 +803,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(15, 3000);
 		sheet.setColumnWidth(16, 3000);
 		
+		List<PayType> payTypeList = PayTypeDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), new PayTypeDao.ExtraCond()
+		.addType(PayType.Type.DESIGNED)
+		.addType(PayType.Type.EXTRA)
+		.addType(PayType.Type.MEMBER));		
+		
+		
 		// 报表头
 		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 16));
 		// 冻结行
@@ -849,7 +857,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("账单数");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+/*		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("现金");
 		cell.setCellStyle(headerStyle);
 		
@@ -867,7 +875,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("签单");
-		cell.setCellStyle(headerStyle);
+		cell.setCellStyle(headerStyle);*/
+		for (PayType payType : payTypeList) {
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(payType.getName());
+			cell.setCellStyle(headerStyle);			
+		}
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("折扣");
@@ -929,11 +942,20 @@ public class HistoryStatisticsAction extends DispatchAction{
 				cell.setCellValue(item.getTotalAmount());
 				cell.setCellStyle(normalNumStyle);
 				
-				for (PaymentIncome p : item.getIncomeByPay().getPaymentIncomes()) {
-					cell = row.createCell(row.getLastCellNum());
-					cell.setCellValue(p.getActual());
-					cell.setCellStyle(numStyle);
+				if(item.getIncomeByPay().getPaymentIncomes().size() > 0){
+					for (PaymentIncome p : item.getIncomeByPay().getPaymentIncomes()) {
+						cell = row.createCell(row.getLastCellNum());
+						cell.setCellValue(p.getActual());
+						cell.setCellStyle(numStyle);
+					}					
+				}else{
+					for (int i = 0; i < payTypeList.size(); i++) {
+						cell = row.createCell(row.getLastCellNum());
+						cell.setCellValue("0.00");
+						cell.setCellStyle(numStyle);							
+					}
 				}
+
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByDiscount().getTotalDiscount());
