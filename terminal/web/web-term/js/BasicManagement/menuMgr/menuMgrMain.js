@@ -3490,7 +3490,7 @@ Ext.onReady(function() {
 			},btnAddDept, { 
 				xtype:'tbtext', 
 				text : '&nbsp;&nbsp;&nbsp;&nbsp;' 
-			}/*,btnPricePlan*/]
+			},btnPricePlan]
 		}),
 		keys : [{
 			key : Ext.EventObject.ENTER,

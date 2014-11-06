@@ -982,6 +982,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					    ['口味','tasteGroup.tastePref'],
 					    ['口味价钱','tasteGroup.tastePrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 					    ['厨房','kitchen.name', 60],
+					    ['操作类型','operation', 60],
 					    ['服务员','waiter', 60],
 					    ['退菜原因', 'cancelReason.reason']
 					],
@@ -1021,8 +1022,9 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 								selTabContentGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '';
 								selTabContentGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '';
 								selTabContentGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '';
-								selTabContentGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '总金额 :';
-								selTabContentGrid.getView().getCell(store.getCount()-1, 9).innerHTML = jr.other.order.actualPrice.toFixed(2);
+								selTabContentGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '';
+								selTabContentGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '总金额 :';
+								selTabContentGrid.getView().getCell(store.getCount()-1, 10).innerHTML = jr.other.order.actualPrice.toFixed(2);
 							},
 							failure : function(){
 							

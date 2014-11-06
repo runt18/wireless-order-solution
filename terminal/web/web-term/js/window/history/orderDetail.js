@@ -31,6 +31,7 @@ Ext.onReady(function(){
 		    ['口味','tasteGroup.tastePref'],
 		    ['口味价钱','tasteGroup.tastePrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 		    ['厨房','kitchen.name', 60],
+		    ['操作类型','operation', 60],
 		    ['反结账','isRepaid', 60, 'center', 'detailIsPaidRenderer'],
 		    ['赠送','isGift', 60, 'center', 'detailIsGiftRenderer'],
 		    ['服务员','waiter', 60],
@@ -38,7 +39,7 @@ Ext.onReady(function(){
 		],
 		['orderDateFormat', 'name', 'unitPrice', 'count', 'discount',
 		 'tasteGroup.tastePref', 'tasteGroup.tastePrice', 'kitchen.name', 'waiter', 'cancelReason.reason', 
-		 'isGift', 'isReturn', 'isRepaid', 'isCommission'],
+		 'isGift', 'isReturn', 'isRepaid', 'isCommission', 'operation'],
 	    [ ['orderID', orderId], ['queryType', queryType != 'null'? queryType : 'History']],
 	    billDetailpageRecordCount,
 	    ''
