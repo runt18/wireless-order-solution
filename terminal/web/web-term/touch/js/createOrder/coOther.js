@@ -267,9 +267,7 @@ co.tf.back = function(){
 };
 
 
-/**
- * 
- */
+//弹出助记码
 co.s.foodAlias = function(){
 	Util.dialongDisplay({
 		renderTo : 'divFoodAlias',
@@ -277,6 +275,8 @@ co.s.foodAlias = function(){
 	});
 	$("#txtFoodAlias").focus();
 };
+
+
 co.s.findByAlias = function(c){
 	var alias = getDom('txtFoodAlias');
 	var data = null, temp = null;

@@ -516,6 +516,18 @@ uo.backAll = function(){
 	$("#" + inputNumIdUO).focus();
 };
 
+uo.backOne = function(){
+	var tempNum;
+	tempNum = $("#" + inputNumIdUO).val();
+	if(tempNum.length > 0){
+		inputNumValUO = tempNum.substring(0, tempNum.length-1);
+		$("#" + inputNumIdUO).val(inputNumValUO);
+	}
+	$("#" + inputNumIdUO).focus();
+	
+	
+};
+
 
 /**
  * 加一按钮
@@ -806,6 +818,80 @@ uo.ip.back = function(){
 	$("#numInputReceipt").val();
 	$('#txtReciptReturn').val();
 };
+
+//弹出会员暂结
+uo.mPay.show = function(){
+	inputNumIdUO = "txtMemberPhoneOrCard";
+	Util.dialongDisplay({
+		renderTo : 'divMemberTempPay',
+		type : 'show'
+	});
+	$("#txtMemberPhoneOrCard").focus();
+};
+
+//关闭会员暂结
+uo.mPay.back = function(){
+	Util.dialongDisplay({
+		renderTo : 'divMemberTempPay',
+		type : 'hide'
+	});
+	getDom('txtMemberPhoneOrCard').value = '';
+	inputNumValUO = '';
+};
+
+//会员暂结
+uo.mPay.tempPay = function(){
+	var memberPhoneOrCard = $('#txtMemberPhoneOrCard').val(); 
+	if(!memberPhoneOrCard || isNaN(memberPhoneOrCard)){
+		Util.msg.alert({
+			title : '提示',
+			msg : '请输入有效数字', 
+			time : 2,
+			fn : function(){
+				$('#txtMemberPhoneOrCard').focus();
+			}
+		});			
+		return;
+	}
+	Util.LM.show();
+	$.post('../QueryOrderFromMemberPay.do', {
+		orderID:uo.order.id,
+		st:0,
+		sv:memberPhoneOrCard	
+	}, function(data){
+		if(data.success){
+			$.post('../PayOrder.do', {
+				orderID : uo.order.id,
+				payType : 2,
+				tempPay : true,
+				cashIncome : data.other.newOrder.totalPrice,
+				memberID : data.other.member.id
+			}, function(result){
+				result = eval("(" + result + ")");
+				Util.LM.hide();
+				if(result.success){
+					uo.mPay.back();
+				}
+				Util.msg.alert({
+					title : '提示',
+					msg : result.data, 
+					time : 2
+				});	
+			});			
+		}else{
+			Util.LM.hide();
+			Util.msg.alert({
+				title : data.title,
+				msg : data.msg, 
+				time : 2,
+				fn : function(){
+					$('#txtMemberPhoneOrCard').focus();
+				}
+			});				
+		}
+	});
+	
+}
 
 /**
  * 设置折扣

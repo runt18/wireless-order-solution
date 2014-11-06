@@ -57,6 +57,7 @@ var uo={
 	updateOrder : [],
 	cf : {},
 	ip : {},
+	mPay : {},
 	printTemp : false,
 	canceling : false
 }
@@ -187,7 +188,7 @@ $(document).bind("click",function(e){
 	</div>
 	<div id="divDescForUpdateOrder" class="div-desc">
 	</div>
-	<div id="divSouthForUpdateOrder" class="box-horizontal">
+	<div id="divSouthForUpdateOrder" class="box-horizontal" style="height: 60px;">
 		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick= "uo.cancelForUO()">返回</div>
   		<div class="div-full">&nbsp;</div>
   		<!-- <div class="button-base" style="margin-left: 2px; width: 120px;" onClick="uo.inputForPay()">快速结账</div> -->
@@ -197,13 +198,22 @@ $(document).bind("click",function(e){
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.cd.show()">折扣</div>
   		
    		<div class="button-base" style="margin-left: 2px;" onClick="uo_transTableForTS()">转台</div> 		
-  		<div class="button-base" style="margin-left: 2px;" onClick="allTransFoodForTS()">全单转菜</div> 	
-  			
+  		<div class="button-base" style="margin-left: 2px;" onClick="allTransFoodForTS()">全单转菜</div>
+  		
+  		<div class="button-base" style="margin-left: 2px;" onClick="javascript:$('#uo_more').show();">更多</div> 	
+<!--   		<div id="uo_more" style="position : relative;z-index:9999;visibility :hidden; ;bottom: 120px;right: 80px;">
+      		<div  class="button-base" onClick="">全单口味</div>
+      		<div style="margin-top: 2px;" class="button-base" onClick="">全单叫起</div>
+      	</div>  --> 			
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.showdivKeyboardPeopleForUO({type : 'setCountForPeople'})">人数</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.tempPayForPrintAll()">补打总单</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="uo.mPay.show()">会员暂结</div>
+  		
   		<div class="button-base" style="margin-left: 2px;" onClick="Util.scroll({otype: 'up', content: 'divCenterForUpdateOrder', size: 80})">上翻</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="Util.scroll({otype: 'down', content: 'divCenterForUpdateOrder', size: 80})">下翻</div>
+
 	</div>
+
 </div>
 
 <div id="divChangeDiscountForUpdateOrder" class="content-box-base box-vertical">
@@ -600,7 +610,30 @@ $(document).bind("click",function(e){
 			<div class="button-base" style="line-height: 60px; width: 49%;" onClick="co.s.findByAlias({renderTo : 'divFoodAlias'})">确定</div>
 			<div class="button-base" style="line-height: 60px; width: 49%; margin-left: 2%;" onClick="co.fa.back()">关闭</div>
 		</div>
+</div>
 
+<div id="divMemberTempPay" class="content-box-base" style="background: #4682B4; border: 1px solid #FFF;">
+		<div style="color: #FFF; font-weight: bold; font-size: 20px; line-height : 60px;height : 60px;padding-right: 2px;">
+			会员手机号/卡号:<input id="txtMemberPhoneOrCard" type="text" style="width: 180px; height: 50px; background: yellow; font-weight: bold; font-size: 25px">
+		</div>
+		<div id="divNumForFoodAlias" style="margin-left: 55px;">
+			<div class="button-base" onClick="inputNumUO(this)">7</div>
+			<div class="button-base" onClick="inputNumUO(this)">8</div>
+			<div class="button-base" onClick="inputNumUO(this)">9</div>
+			<div class="button-base" onClick="inputNumUO(this)">4</div>
+			<div class="button-base" onClick="inputNumUO(this)">5</div>
+			<div class="button-base" onClick="inputNumUO(this)">6</div>
+			<div class="button-base" onClick="inputNumUO(this)">1</div>
+			<div class="button-base" onClick="inputNumUO(this)">2</div>
+			<div class="button-base" onClick="inputNumUO(this)">3</div>
+			<div class="button-base" onClick="inputNumUO(this)">0</div>
+			<div class="button-base" onClick="uo.backOne()">&laquo;</div>
+			<div class="button-base" onClick="uo.backAll()">&laquo;&laquo;</div>
+		</div>
+		<div class="box-horizontal" style="line-height:60px; width: 100%;">
+			<div class="button-base" style="line-height: 60px; width: 49%;" onClick="uo.mPay.tempPay()">暂结</div>
+			<div class="button-base" style="line-height: 60px; width: 49%; margin-left: 2%;" onClick="uo.mPay.back()">取消</div>
+		</div>
 </div>
 
 <div id="divInputForPay">
