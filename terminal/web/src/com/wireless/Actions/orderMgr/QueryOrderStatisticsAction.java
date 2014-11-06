@@ -79,6 +79,9 @@ public class QueryOrderStatisticsAction extends Action {
 				}else if(comboVal == 6){
 					//是否有优惠劵
 					extraCond.isCoupon(true);
+				}else if(comboVal == 7){
+					//是否有转菜
+					extraCond.isTransfer(true);
 				}
 			}
 			
