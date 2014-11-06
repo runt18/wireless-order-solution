@@ -39,7 +39,7 @@ Ext.onReady(function(){
 		],
 		['orderDateFormat', 'name', 'unitPrice', 'count', 'discount',
 		 'tasteGroup.tastePref', 'tasteGroup.tastePrice', 'kitchen.name', 'waiter', 'cancelReason.reason', 
-		 'isGift', 'isReturn', 'isRepaid', 'isCommission', 'operation'],
+		 'isGift', 'isReturn', 'isRepaid','isTransfer', 'isCommission', 'operation'],
 	    [ ['orderID', orderId], ['queryType', queryType != 'null'? queryType : 'History']],
 	    billDetailpageRecordCount,
 	    ''

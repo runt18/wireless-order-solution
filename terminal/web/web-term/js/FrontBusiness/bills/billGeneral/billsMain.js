@@ -627,6 +627,19 @@ Ext.onReady(function(){
 		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
 			xtype : 'radio',
 			name : 'conditionRadio',
+			boxLabel : '转菜',
+			inputValue : 7,
+			listeners : {
+				check : function(e){
+					if(e.getValue()){
+						foodStatus = 'isTransfer';
+						searchAdditionFilter = e.getId();
+					}
+				}
+			}
+		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
+			xtype : 'radio',
+			name : 'conditionRadio',
 			boxLabel : '抹数',
 			inputValue : 5,
 			listeners : {
