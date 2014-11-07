@@ -68,7 +68,7 @@ public class CalcDiscountStatisticsDao {
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
 			if(staffId > 0){
-				extraCond.append(" AND O.staff_id = " + staffId);
+				extraCond.append(" AND O.discount_staff_id = " + staffId);
 			}
 			if(deptId != null){
 				extraCond.append(" AND OF.dept_id = " + deptId.getVal());
@@ -112,7 +112,7 @@ public class CalcDiscountStatisticsDao {
 			o.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			o.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
 			o.setActualPrice(dbCon.rs.getFloat("actual_price"));
-			o.setWaiter(dbCon.rs.getString("waiter"));
+			o.setDiscounter(dbCon.rs.getString("discount_staff"));
 			o.setComment(dbCon.rs.getString("comment"));
 			Table t = new Table(dbCon.rs.getInt("table_id"));
 			t.setTableAlias(dbCon.rs.getInt("table_alias"));
@@ -245,13 +245,13 @@ public class CalcDiscountStatisticsDao {
 	public static List<DiscountIncomeByStaff> calcDiscountIncomeByStaff(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		String sql;
 		sql = " SELECT " +
-			  " TMP.staff_id, MAX(TMP.waiter) AS staff_name, " +
+			  " TMP.discount_staff_id, MAX(TMP.discount_staff) AS staff_name, " +
 			  " COUNT(*) AS discount_amount, " +
 			  " ROUND(SUM(TMP.discount_price), 2) AS discount_price " +
 			  " FROM (" +
 			  makeSql4Discount(staff, range, extraCond) +
 			  " ) AS TMP " +
-			  " GROUP BY TMP.staff_id ";
+			  " GROUP BY TMP.discount_staff_id ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		List<DiscountIncomeByStaff> result = new ArrayList<DiscountIncomeByStaff>();
@@ -335,7 +335,7 @@ public class CalcDiscountStatisticsDao {
 	private static String makeSql4Discount(Staff staff, DutyRange range, ExtraCond extraCond){
 		String sql;
 		sql = " SELECT " +
-			  " O.id, O.order_date, O.waiter, O.staff_id, O.discount_price,O.actual_price, O.comment , O.table_alias, O.table_name, O.table_id, D.name, D.dept_id, D.type" +
+			  " O.id, O.order_date, O.discount_staff, O.discount_staff_id, O.discount_price, O.actual_price, O.comment, O.table_alias, O.table_name, O.table_id, D.name, D.dept_id, D.type " +
 			  " FROM " + Params.dbName + "." + extraCond.orderTbl + " O " +
 			  " JOIN " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " +
 			  " ON OF.order_id = O.id " +

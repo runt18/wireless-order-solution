@@ -396,12 +396,13 @@ public class PayOrder {
 			Member member = MemberDao.getById(dbCon, staff, payBuilder.getMemberId());
 			if(payBuilder.hasMemberDiscount()){
 				//Check to see whether the member discount id is valid.
-				int index = member.getMemberType().getDiscounts().indexOf(new Discount(payBuilder.getMemberDiscountId()));
-				if(index < 0){
-					throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
-				}else{
-					orderToCalc.setDiscount(member.getMemberType().getDiscounts().get(index));
+				for(Discount discount : member.getMemberType().getDiscounts()){
+					if(discount.getId() == payBuilder.getMemberId()){
+						orderToCalc.setDiscount(discount);
+						break;
+					}
 				}
+				throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
 			}else{
 				//Just use the member default discount.
 				orderToCalc.setDiscount(member.getMemberType().getDefaultDiscount());
