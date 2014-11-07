@@ -75,7 +75,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 				throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 			}
 			membersByType.set(0, MemberDao.getById(staff, membersByType.get(0).getId()));
-			Order.PayBuilder payBuilder = Order.PayBuilder.build4Member(Integer.valueOf(orderID), membersByType.get(0), PayType.CASH);
+			Order.PayBuilder payBuilder = Order.PayBuilder.build4PointMember(Integer.valueOf(orderID), membersByType.get(0), PayType.CASH);
 			
 			if(discountId != null && !discountId.trim().isEmpty()){
 				payBuilder.setDiscountId(Integer.valueOf(discountId));

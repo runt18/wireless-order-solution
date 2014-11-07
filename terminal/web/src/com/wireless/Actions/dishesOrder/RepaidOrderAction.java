@@ -41,13 +41,10 @@ public class RepaidOrderAction extends Action{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.RE_PAYMENT);
 			
 			//get the pay manner to this order
-			Order.PayBuilder payBuilder = Order.PayBuilder.build(orderId, new PayType(Integer.parseInt(request.getParameter("payType"))));
+			Order.PayBuilder payBuilder = Order.PayBuilder.build4Normal(orderId, new PayType(Integer.parseInt(request.getParameter("payType"))));
 
 			//get the custom number to this order
 			payBuilder.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
-			
-			//get the discount type to this order
-			payBuilder.setDiscountId(Integer.parseInt(request.getParameter("discountID")));
 			
 			//get the service rate to this order
 			payBuilder.setServicePlan(Integer.parseInt(request.getParameter("servicePlan")));

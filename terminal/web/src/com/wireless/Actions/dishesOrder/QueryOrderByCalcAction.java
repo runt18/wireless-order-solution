@@ -43,7 +43,6 @@ public class QueryOrderByCalcAction extends Action{
 			String tid = request.getParameter("tableID");
 			String oid = request.getParameter("orderID");
 			String calc = request.getParameter("calc");
-			String discountId = request.getParameter("discountID");
 			String eraseQuota = request.getParameter("eraseQuota");
 			String servicePlan = request.getParameter("servicePlan");
 			String customNum = request.getParameter("customNum");
@@ -60,24 +59,21 @@ public class QueryOrderByCalcAction extends Action{
 			}
 			
 			if(calc != null && Boolean.valueOf(calc)){
-				Order.PayBuilder payParam = Order.PayBuilder.build(order.getId());
-				if(discountId != null && !discountId.trim().isEmpty()){
-					payParam.setDiscountId(Integer.valueOf(discountId));
-				}
+				Order.PayBuilder payBuilder = Order.PayBuilder.build4Normal(order.getId());
 				if(eraseQuota != null && !eraseQuota.trim().isEmpty()){
-					payParam.setErasePrice(Integer.valueOf(eraseQuota));
+					payBuilder.setErasePrice(Integer.valueOf(eraseQuota));
 				}
 				if(customNum != null && !customNum.trim().isEmpty() && Integer.valueOf(customNum.trim()) > 0){
-					payParam.setCustomNum(Short.valueOf(customNum));
+					payBuilder.setCustomNum(Short.valueOf(customNum));
 				}
 				if(servicePlan != null && !servicePlan.trim().isEmpty()){
-					payParam.setServicePlan(Integer.parseInt(servicePlan));
+					payBuilder.setServicePlan(Integer.parseInt(servicePlan));
 				}
 				
-				order.copyFrom(PayOrder.calc(staff, payParam));
+				order.copyFrom(PayOrder.calc(staff, payBuilder));
 				
 			}else{
-				Order.PayBuilder payParam = Order.PayBuilder.build(order.getId());
+				Order.PayBuilder payParam = Order.PayBuilder.build4Normal(order.getId());
 				payParam.setCustomNum(order.getCustomNum());
 				order.copyFrom(PayOrder.calc(staff, payParam));
 			}

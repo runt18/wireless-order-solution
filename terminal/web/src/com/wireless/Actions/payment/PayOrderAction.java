@@ -109,9 +109,9 @@ public class PayOrderAction extends Action{
 				    }
 				}
 				member = MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID")));
-				payBuilder = Order.PayBuilder.build4Member(orderId, member, payType, sendSMS);
+				payBuilder = Order.PayBuilder.build4PointMember(orderId, member, payType, sendSMS);
 			}else{
-				payBuilder = Order.PayBuilder.build(orderId, payType);
+				payBuilder = Order.PayBuilder.build4Normal(orderId, payType);
 			}
 			
 			//Get the cash income if the pay manner is "现金"
