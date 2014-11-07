@@ -982,7 +982,17 @@ uo.cd = {
 			orderId : uo.order.id,
 			discountId : select.getAttribute('data-value')
 		}, function(data){
-			uo.cd.back();
+			if(data.success){
+				Util.msg.alert({
+					title : '提示',
+					msg : '更改成功', 
+					time : 2,
+					fn : function(){
+						uo.cd.back();		
+					}
+				});			
+			}
+			
 		});
 /*		uo.tempPayForUO({
 			discountId : select.getAttribute('data-value'),
