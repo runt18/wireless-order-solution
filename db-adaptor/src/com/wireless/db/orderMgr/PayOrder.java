@@ -396,13 +396,17 @@ public class PayOrder {
 			Member member = MemberDao.getById(dbCon, staff, payBuilder.getMemberId());
 			if(payBuilder.hasMemberDiscount()){
 				//Check to see whether the member discount id is valid.
+				boolean isExist = false;
 				for(Discount discount : member.getMemberType().getDiscounts()){
 					if(discount.getId() == payBuilder.getMemberDiscountId()){
 						orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, payBuilder.getMemberDiscountId()));
+						isExist = true;
 						break;
 					}
 				}
-				throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
+				if(!isExist){
+					throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
+				}
 			}else{
 				//Just use the member default discount.
 				orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, member.getMemberType().getDefaultDiscount().getId()));
