@@ -398,14 +398,14 @@ public class PayOrder {
 				//Check to see whether the member discount id is valid.
 				for(Discount discount : member.getMemberType().getDiscounts()){
 					if(discount.getId() == payBuilder.getMemberId()){
-						orderToCalc.setDiscount(discount);
+						orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, payBuilder.getMemberId()));
 						break;
 					}
 				}
 				throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
 			}else{
 				//Just use the member default discount.
-				orderToCalc.setDiscount(member.getMemberType().getDefaultDiscount());
+				orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, member.getMemberType().getDefaultDiscount().getId()));
 			}
 		}else{
 			try{
