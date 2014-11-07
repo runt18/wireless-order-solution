@@ -716,7 +716,7 @@ uo.tempPayForPrintAll = function(c){
 		}else{
 			Util.msg.alert({
 				title : '错误',
-				msg : result.data,
+				msg : result.msg,
 				time : 3
 			});
 		}		

@@ -193,6 +193,11 @@ $(document).bind("click",function(e){
   		<div class="div-full">&nbsp;</div>
   		<!-- <div class="button-base" style="margin-left: 2px; width: 120px;" onClick="uo.inputForPay()">快速结账</div> -->
   		<!-- <div class="button-base" style="margin-left: 2px; width: 120px;" onClick="uo.saveForUO()">确定修改</div> -->
+  		<div id="divUpdateOrderMore" class="updateOrderMore">
+	  		<div class="button-base"  onClick="uo.showdivKeyboardPeopleForUO({type : 'setCountForPeople'})">人数</div>
+	  		<div class="button-base"  onClick="uo.tempPayForPrintAll()">补打总单</div>
+	  		<div class="button-base"  onClick="uo.mPay.show()">会员暂结</div>      		
+      	</div>    		
    		<div class="button-base" style="margin-left: 2px;" onClick="uo.goToCreateOrder()">点菜</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.tempPayForUO()">暂结</div> 		
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.cd.show()">折扣</div>
@@ -200,15 +205,8 @@ $(document).bind("click",function(e){
    		<div class="button-base" style="margin-left: 2px;" onClick="uo_transTableForTS()">转台</div> 		
   		<div class="button-base" style="margin-left: 2px;" onClick="allTransFoodForTS()">全单转菜</div>
   		
-  		<div class="button-base" style="margin-left: 2px;" onClick="javascript:$('#uo_more').show();">更多</div> 	
-<!--   		<div id="uo_more" style="position : relative;z-index:9999;visibility :hidden; ;bottom: 120px;right: 80px;">
-      		<div  class="button-base" onClick="">全单口味</div>
-      		<div style="margin-top: 2px;" class="button-base" onClick="">全单叫起</div>
-      	</div>  --> 			
-  		<div class="button-base" style="margin-left: 2px;" onClick="uo.showdivKeyboardPeopleForUO({type : 'setCountForPeople'})">人数</div>
-  		<div class="button-base" style="margin-left: 2px;" onClick="uo.tempPayForPrintAll()">补打总单</div>
-  		<div class="button-base" style="margin-left: 2px;" onClick="uo.mPay.show()">会员暂结</div>
-  		
+  		<div id="btnUpdateOrderMore" class="button-base" style="margin-left: 2px;" >更多</div> 	
+			
   		<div class="button-base" style="margin-left: 2px;" onClick="Util.scroll({otype: 'up', content: 'divCenterForUpdateOrder', size: 80})">上翻</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="Util.scroll({otype: 'down', content: 'divCenterForUpdateOrder', size: 80})">下翻</div>
 
@@ -259,7 +257,6 @@ $(document).bind("click",function(e){
 	      	<!-- <div class="button-base" onClick="co.ot.show({type:1})">全单口味</div> -->
 	      	<!-- <div class="button-base" >催菜</div> -->
 	      	<div class="button-base" onClick="co.foodHangup({type:2})">叫起</div>
-	      	<!-- <div class="button-base" onClick="co.foodHangup({type:1})">全单叫起</div> -->
 	      	<div id="divCFCOHandlerMore" class="button-base" >更多</div>
 	      	
 	      	<div id="divCFCOHandlerMoreContent" style="position : relative;top : -61px;left: 80px;z-index:9999;display : none;">

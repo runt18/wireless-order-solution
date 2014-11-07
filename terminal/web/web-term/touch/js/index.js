@@ -537,7 +537,29 @@ $(function(){
 		}
 	);
 	
+	$('#btnUpdateOrderMore').toggle(
+		function(){
+			$('#divUpdateOrderMore').show();
+		},
+		function(){
+			$('#divUpdateOrderMore').hide();
+		}
+	);	
+	
 	$('#divFoodTasteFloat').width($('#divFoodTasteFloat').width() - 390);
+
+	//事件冒泡
+   $(document).bind('click',function(e){
+		if($('#divUpdateOrderMore').is(':visible')){
+			//直接hide()会导致toggle()不可用
+			$('#btnUpdateOrderMore').click();
+		}
+		if($('#divCFCOHandlerMoreContent').is(':visible')){
+			$('#divCFCOHandlerMore').click();
+		}			
+    });
+
+	
 	
 });
 

@@ -51,10 +51,6 @@ co.clear = function(){
 	co.newFood = [];
 	co.callback = null;
 	co.initNewFoodContent();
-	if($('#divCFCOHandlerMoreContent').is(':visible')){
-		$('#divCFCOHandlerMore').click();
-	}
-	
 };
 /**
  * 菜品操作返回
@@ -283,10 +279,6 @@ co.foodHangup = function(c){
 			data : data
 		});
 	}
-	//FIXME用区域以外法
-	if($('#divCFCOHandlerMoreContent').is(':visible')){
-		$('#divCFCOHandlerMore').click();
-	}	
 };
 
 co.giftFood = function(c){
@@ -387,11 +379,6 @@ co.ot.show = function(c){
 	co.ot.newTaste = foodTasteGroup;
 	
 	co.ot.initNewTasteContent();
-	
-	//FIXME用区域以外法
-	if($('#divCFCOHandlerMoreContent').is(':visible')){
-		$('#divCFCOHandlerMore').click();
-	}	
 };
 /**
  * 口味操作返回
