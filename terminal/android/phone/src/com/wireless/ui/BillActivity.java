@@ -22,11 +22,11 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.lib.task.DiscountOrderTask;
 import com.wireless.pack.Type;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
-import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.NumericUtil;
@@ -118,7 +118,7 @@ public class BillActivity extends Activity {
 		((ImageView) findViewById(R.id.btn_payTmpOrder_Bill)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				showBillDialog(Type.PAY_TEMP_ORDER);
+				new PayOrderTask(Order.PayBuilder.build4Normal(mOrderToPay.getId(), mOrderToPay.getPaymentType()).setTemp(true)).execute();
 			}
 		});
 		
@@ -181,7 +181,8 @@ public class BillActivity extends Activity {
 		// 取得自定义的view
 		View view = LayoutInflater.from(this).inflate(R.layout.bill_activity_pay_cate, null);
 		
-		((RadioGroup)view.findViewById(R.id.radioGroup_payCate_payBill)).setVisibility(View.GONE);
+		view.findViewById(R.id.radioGroup_payCate_payBill).setVisibility(View.GONE);
+		view.findViewById(R.id.relativeLayout_payCate_payBill).setVisibility(View.GONE);
 		
 		//根据discount数量添加Radio Button
 		RadioGroup discountsGroup = (RadioGroup) view.findViewById(R.id.radioGroup_discount_payBill);
@@ -207,11 +208,28 @@ public class BillActivity extends Activity {
 				.setPositiveButton("打折", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog,	int which) {
-						Order.PayBuilder payBuilder = Order.PayBuilder.build(mOrderToPay.getId(), mOrderToPay.getPaymentType())
-															    .setTemp(true)
-															    .setDiscountId(mOrderToPay.getDiscount().getId())
-																.setPrintOption(PrintOption.DO_NOT_PRINT);
-						new PayOrderTask(payBuilder).execute();
+						new DiscountOrderTask(WirelessOrder.loginStaff, new Order.DiscountBuilder(mOrderToPay.getId(), mOrderToPay.getDiscount().getId())) {
+							
+							private ProgressDialog mProgDialog;
+
+							@Override
+							protected void onPreExecute() {
+								mProgDialog = ProgressDialog.show(BillActivity.this, "", "提交折扣信息...请稍候", true);
+							}
+							
+							@Override
+							protected void onSuccess() {
+								mProgDialog.dismiss();
+								Toast.makeText(BillActivity.this, "打折成功", Toast.LENGTH_SHORT).show();
+								new QueryOrderTask(mOrderToPay.getDestTbl().getAliasId()).execute();
+							}
+							
+							@Override
+							protected void onFail(BusinessException e) {
+								mProgDialog.dismiss();
+								Toast.makeText(BillActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+							}
+						}.execute();
 					}
 				})
 				.setNegativeButton("取消", null)
@@ -226,6 +244,9 @@ public class BillActivity extends Activity {
 
 		// 取得自定义的view
 		View view = LayoutInflater.from(this).inflate(R.layout.bill_activity_pay_cate, null);
+
+		view.findViewById(R.id.radioGroup_discount_payBill).setVisibility(View.GONE);
+		view.findViewById(R.id.relativeLayout_discount_payBill).setVisibility(View.GONE);
 
 		// 设置为一般的结帐方式
 		mOrderToPay.setSettleType(Order.SettleType.NORMAL);
@@ -243,7 +264,6 @@ public class BillActivity extends Activity {
 
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-
 				if (checkedId == R.id.radioButton_cash_payBill) {
 					mOrderToPay.setPaymentType(PayType.CASH);
 				} else {
@@ -253,36 +273,32 @@ public class BillActivity extends Activity {
 			}
 		});
 
-		//根据discount数量添加Radio Button
-		RadioGroup discountsGroup = (RadioGroup) view.findViewById(R.id.radioGroup_discount_payBill);
-		
-		// 折扣方式方式添加事件监听器
-		discountsGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				Discount distToUse = (Discount)group.findViewById(checkedId).getTag();
-				mOrderToPay.setDiscount(distToUse);
-			}
-		});
-		
-		for(Discount discount : WirelessOrder.loginStaff.getRole().getDiscounts()){
-			RadioButton radioBtn = new RadioButton(BillActivity.this);
-			radioBtn.setTag(discount);
-			radioBtn.setText(discount.getName());
-			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		}
+//		//根据discount数量添加Radio Button
+//		RadioGroup discountsGroup = (RadioGroup) view.findViewById(R.id.radioGroup_discount_payBill);
+//		
+//		// 折扣方式方式添加事件监听器
+//		discountsGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//			@Override
+//			public void onCheckedChanged(RadioGroup group, int checkedId) {
+//				Discount distToUse = (Discount)group.findViewById(checkedId).getTag();
+//				mOrderToPay.setDiscount(distToUse);
+//			}
+//		});
+//		
+//		for(Discount discount : WirelessOrder.loginStaff.getRole().getDiscounts()){
+//			RadioButton radioBtn = new RadioButton(BillActivity.this);
+//			radioBtn.setTag(discount);
+//			radioBtn.setText(discount.getName());
+//			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//		}
 
-
-		new AlertDialog.Builder(this).setTitle(payCate == Type.PAY_ORDER ? "结帐" : "暂结")
+		new AlertDialog.Builder(this).setTitle("结帐")
 			.setView(view)
 			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog,	int which) {
 					// 执行结账异步线程
-					Order.PayBuilder payBuilder = Order.PayBuilder.build(mOrderToPay.getId(), mOrderToPay.getPaymentType())
-														    .setTemp(payCate == Type.PAY_TEMP_ORDER)
-														    .setDiscountId(mOrderToPay.getDiscount().getId());
-					new PayOrderTask(payBuilder).execute();
+					new PayOrderTask(Order.PayBuilder.build4Normal(mOrderToPay.getId(), mOrderToPay.getPaymentType())).execute();
 				}
 			})
 			.setNegativeButton("取消", null)

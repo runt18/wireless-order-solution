@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,8 +22,8 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.lib.task.DiscountOrderTask;
 import com.wireless.pack.Type;
-import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -91,22 +90,19 @@ public class TableDetailActivity extends Activity {
 		((ImageView) findViewById(R.id.imgView_payTmpOrder_bill)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				showBillDialog(Type.PAY_TEMP_ORDER);
+				new PayOrderTask(Order.PayBuilder.build4Normal(mOrderToPay.getId(), mOrderToPay.getPaymentType()).setTemp(true)).execute();
 			}
 			
 		});
 		
 		/**
-		 * "改单"Button
+		 * "折扣"Button
 		 */
-		((ImageView)findViewById(R.id.imgView_chgOrder_bill)).setOnClickListener(new View.OnClickListener() {
+		((ImageView)findViewById(R.id.imgView_discount_bill)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				//jump to change order activity with the activity_table alias id if the activity_table is busy
-				Intent intent = new Intent(TableDetailActivity.this, OrderActivity.class);
-				intent.putExtra(OrderActivity.KEY_TABLE_ID, new TableParcel(mSelectedTable));
-				startActivity(intent);
+				showDiscountDialog();
 			}
 		});
 	}
@@ -187,6 +183,66 @@ public class TableDetailActivity extends Activity {
 							.show();
 		}
 	}
+	
+	private void showDiscountDialog(){
+		// 取得自定义的view
+		View view = LayoutInflater.from(this).inflate(R.layout.bill_activity_pay_cate, null);
+		
+		view.findViewById(R.id.radioGroup_payCate_payBill).setVisibility(View.GONE);
+		view.findViewById(R.id.relativeLayout_payCate_payBill).setVisibility(View.GONE);
+		
+		//根据discount数量添加Radio Button
+		RadioGroup discountsGroup = (RadioGroup) view.findViewById(R.id.radioGroup_discount_payBill);
+		
+		// 折扣方式方式添加事件监听器
+		discountsGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				Discount distToUse = (Discount)group.findViewById(checkedId).getTag();
+				mOrderToPay.setDiscount(distToUse);
+			}
+		});
+		
+		for(Discount discount : WirelessOrder.loginStaff.getRole().getDiscounts()){
+			RadioButton radioBtn = new RadioButton(TableDetailActivity.this);
+			radioBtn.setTag(discount);
+			radioBtn.setText(discount.getName());
+			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		}
+		
+		new AlertDialog.Builder(this).setTitle("折扣")
+				.setView(view)
+				.setPositiveButton("打折", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog,	int which) {
+						new DiscountOrderTask(WirelessOrder.loginStaff, new Order.DiscountBuilder(mOrderToPay.getId(), mOrderToPay.getDiscount().getId())) {
+							
+							private ProgressDialog mProgDialog;
+
+							@Override
+							protected void onPreExecute() {
+								mProgDialog = ProgressDialog.show(TableDetailActivity.this, "", "提交折扣信息...请稍候", true);
+							}
+							
+							@Override
+							protected void onSuccess() {
+								mProgDialog.dismiss();
+								Toast.makeText(TableDetailActivity.this, "打折成功", Toast.LENGTH_SHORT).show();
+								new QueryOrderTask(mOrderToPay.getDestTbl().getAliasId()).execute();
+							}
+							
+							@Override
+							protected void onFail(BusinessException e) {
+								mProgDialog.dismiss();
+								Toast.makeText(TableDetailActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+							}
+						}.execute();
+					}
+				})
+				.setNegativeButton("取消", null)
+				.show();
+	}
+	
 	/**
 	 * 付款弹出框
 	 * 
@@ -197,6 +253,9 @@ public class TableDetailActivity extends Activity {
 		// 取得自定义的view
 		View view = LayoutInflater.from(this).inflate(R.layout.bill_activity_pay_cate, null);
 
+		view.findViewById(R.id.radioGroup_discount_payBill).setVisibility(View.GONE);
+		view.findViewById(R.id.relativeLayout_discount_payBill).setVisibility(View.GONE);
+		
 		// 设置为一般的结帐方式
 		mOrderToPay.setSettleType(Order.SettleType.NORMAL);
 
@@ -224,36 +283,13 @@ public class TableDetailActivity extends Activity {
 			}
 		});
 		
-		
-		//根据discount数量添加Radio Button
-		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup_discount_payBill);
-		
-		// 折扣方式方式添加事件监听器
-		radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				Object obj = group.findViewById(checkedId).getTag();
-				mOrderToPay.setDiscount((Discount)obj);
-			}
-		});
-		
-		for(Discount discount : WirelessOrder.loginStaff.getRole().getDiscounts()){
-			RadioButton radioBtn = new RadioButton(TableDetailActivity.this);
-			radioBtn.setTag(discount);
-			radioBtn.setText(discount.getName());
-			radioGroup.addView(radioBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		}
-
-		new AlertDialog.Builder(this).setTitle(payCate == Type.PAY_ORDER ? "结帐" : "暂结")
+		new AlertDialog.Builder(this).setTitle("结帐")
 			.setView(view)
 			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog,	int which) {
 					// 执行结账异步线程
-					Order.PayBuilder payBuilder = Order.PayBuilder.build(mOrderToPay.getId(), mOrderToPay.getPaymentType())
-												   .setDiscountId(mOrderToPay.getDiscount().getId())
-												   .setTemp(payCate == Type.PAY_TEMP_ORDER);
-					new PayOrderTask(payBuilder).execute();
+					new PayOrderTask(Order.PayBuilder.build4Normal(mOrderToPay.getId(), mOrderToPay.getPaymentType())).execute();
 				}
 			})
 			.setNegativeButton("取消", null)

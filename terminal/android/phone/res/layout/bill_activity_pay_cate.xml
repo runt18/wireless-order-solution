@@ -6,6 +6,7 @@
     android:orientation="vertical" >
 
     <RelativeLayout
+        android:id="@+id/relativeLayout_payCate_payBill"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="40dip" >
@@ -64,6 +65,7 @@
         android:src="@drawable/line" />
 
     <RelativeLayout
+        android:id="@+id/relativeLayout_discount_payBill"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="40dip" >

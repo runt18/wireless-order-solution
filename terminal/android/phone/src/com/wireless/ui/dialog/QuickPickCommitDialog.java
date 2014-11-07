@@ -405,7 +405,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 		@Override
 		public void onSuccess(Order order){
 			mProgressDialog.dismiss();
-			new PayOrderTask(Order.PayBuilder.build(order.getId()).setTemp(mIsTempPay)).execute();
+			new PayOrderTask(Order.PayBuilder.build4Normal(order.getId()).setTemp(mIsTempPay)).execute();
 		}
 		
 		@Override 
