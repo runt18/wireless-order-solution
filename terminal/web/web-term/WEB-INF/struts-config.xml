@@ -202,18 +202,11 @@
 			type="com.wireless.Actions.distMgr.discount.QueryDiscountTreeAction"
 			scope="request">
 		</action>
-		<action path="/InsertDiscount"
-			type="com.wireless.Actions.distMgr.discount.InsertDiscountAction"
-			scope="request">
-		</action>
-		<action path="/UpdateDiscount"
-			type="com.wireless.Actions.distMgr.discount.UpdateDiscountAction"
-			scope="request">
-		</action>
-		<action path="/DeleteDiscount"
-			type="com.wireless.Actions.distMgr.discount.DeleteDiscountAction"
-			scope="request">
-		</action>
+		<action path="/OperateDiscount"
+			type="com.wireless.Actions.distMgr.discount.OperateDiscountAction"
+			scope="request" parameter="dataSource">
+		</action>		
+		
 		<action path="/QueryDiscountPlan"
 			type="com.wireless.Actions.distMgr.discountPlan.QueryDiscountPlanAction"
 			scope="request">
