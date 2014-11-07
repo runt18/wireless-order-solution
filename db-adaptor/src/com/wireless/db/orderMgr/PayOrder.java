@@ -397,8 +397,8 @@ public class PayOrder {
 			if(payBuilder.hasMemberDiscount()){
 				//Check to see whether the member discount id is valid.
 				for(Discount discount : member.getMemberType().getDiscounts()){
-					if(discount.getId() == payBuilder.getMemberId()){
-						orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, payBuilder.getMemberId()));
+					if(discount.getId() == payBuilder.getMemberDiscountId()){
+						orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, payBuilder.getMemberDiscountId()));
 						break;
 					}
 				}
