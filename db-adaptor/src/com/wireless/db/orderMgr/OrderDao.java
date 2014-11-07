@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
@@ -438,7 +440,7 @@ public class OrderDao {
 			sql = " SELECT " +
 				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, O.staff_id, " +
 				  " T.minimum_cost, " +
-				  " O.waiter, " +
+				  " O.waiter, O.discount_staff, O.discount_date, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.member_operation_id, " +
 				  " O.settle_type, O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
@@ -458,7 +460,7 @@ public class OrderDao {
 		}else if(extraCond.dateType == DateType.HISTORY){
 			sql = " SELECT " +
 				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
-				  " OH.waiter, " +
+				  " OH.waiter, OH.discount_staff, OH.discount_date, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
 				  " OH.member_operation_id, OH.coupon_price, " +
 				  " OH.settle_type, OH.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, OH.category, OH.status, OH.service_rate, OH.comment, " +
@@ -484,6 +486,8 @@ public class OrderDao {
 			order.setSeqId(dbCon.rs.getInt("seq_id"));
 			order.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			order.setWaiter(dbCon.rs.getString("waiter"));
+			order.setDiscounter(dbCon.rs.getString("discount_staff"));
+			order.setDiscountDate(dbCon.rs.getLong("discount_date"));
 			
 			order.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			order.setStatus(dbCon.rs.getInt("status"));
@@ -708,6 +712,89 @@ public class OrderDao {
 			destOrder.addFoods(builder.getTransferFoods(), staff);
 			UpdateOrder.exec(dbCon, staff, new Order.UpdateBuilder(destOrder.getId(), destOrder.getOrderDate()).addAll(destOrder.getOrderFoods(), staff));
 		}
+	}
+
+	/**
+	 * Discount the order to specific builder {@link Order#DiscountBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to discount order
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below.
+	 * 			<li>the discount is NOT permitted by this staff
+	 * 			<li>the order does NOT exist
+	 */
+	public static void discount(Staff staff, Order.DiscountBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			discount(dbCon, staff, builder);
+			dbCon.conn.commit();
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Discount the order to specific builder {@link Order#DiscountBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to discount order
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below.
+	 * 			<li>the discount is NOT permitted by this staff
+	 * 			<li>the order does NOT exist
+	 */
+	public static void discount(DBCon dbCon, Staff staff, Order.DiscountBuilder builder) throws SQLException, BusinessException{
+
+		final List<Discount> discounts;
+		if(builder.getMemberId() != 0){
+			discounts = DiscountDao.getByCond(dbCon, staff, new DiscountDao.ExtraCond().setMemberType(MemberDao.getById(dbCon, staff, builder.getMemberId()).getMemberType()).setDiscountId(builder.getDiscountId()), DiscountDao.ShowType.BY_PLAN);
+		}else{
+			discounts = DiscountDao.getByCond(dbCon, staff, new DiscountDao.ExtraCond().setRole(staff.getRole()).setDiscountId(builder.getDiscountId()), DiscountDao.ShowType.BY_PLAN);
+		}
+		
+		if(discounts.isEmpty()){
+			throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
+		}
+		
+		Order order = OrderDao.getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
+		order.setDiscount(discounts.get(0));
+		
+		String sql;
+		
+		//Update the order discount.
+		sql = " UPDATE " + Params.dbName + ".order SET id = " + order.getId() +
+			  (builder.getMemberId() == 0 ? ",discount_staff_id = " + staff.getId() : "") +
+			  (builder.getMemberId() == 0 ? ",discount_staff = '" + staff.getName() + "'" : "") +
+  			  (builder.getMemberId() == 0 ? ",discount_date = NOW() " : "") +
+			  " ,discount_id = " + order.getDiscount().getId() + 
+			  " WHERE id = " + order.getId();
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Update each food's discount & unit price.
+		for(OrderFood of : order.getOrderFoods()){
+			sql = " UPDATE " + Params.dbName + ".order_food " +
+				  " SET " +
+				  " food_id = " + of.getFoodId() +
+				  " ,discount = " + of.getDiscount() + 
+				  " ,unit_price = " + of.getFoodPrice() +
+				  " WHERE order_id = " + order.getId() + 
+				  " AND food_id = " + of.getFoodId();
+			dbCon.stmt.executeUpdate(sql);				
+		}		
 	}
 	
 	/**

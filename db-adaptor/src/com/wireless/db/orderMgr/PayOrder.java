@@ -75,48 +75,49 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
-	 * 			throws if failed to execute {@link#calcById} or has no privilege to do temporary payment
+	 * 			throws if failed to execute {@link this#calc} or has no privilege to do temporary payment
 	 */
 	public static Order payTemp(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws SQLException, BusinessException{
 		if(staff.getRole().hasPrivilege(Privilege.Code.TEMP_PAYMENT)){
-			return doTmpPayment(dbCon, staff, calc(dbCon, staff, payBuilder));
+			//return doTmpPayment(dbCon, staff, calc(dbCon, staff, payBuilder));
+			return calc(dbCon, staff, payBuilder);
 		}else{
 			throw new BusinessException(StaffError.TEMP_PAYMENT_NOT_ALLOW);
 		}
 	}
 	
-	private static Order doTmpPayment(DBCon dbCon, Staff staff, Order orderCalculated) throws SQLException{
-		
-		String sql;
-		//Update the discount to this order.
-		sql = " UPDATE " + Params.dbName + ".order SET " +
-			  " staff_id = " + staff.getId() + ", " +
-			  " waiter = '" + staff.getName() + "', " +
-			  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
-			  " status = " + Order.Status.UNPAID.getVal() + ", " + 
-		   	  " order_date = NOW() " + 
-			  " WHERE 1 = 1 " +
-			  " AND id = " + orderCalculated.getId() +
-			  " AND status = " + Order.Status.UNPAID.getVal();
-			
-		if(dbCon.stmt.executeUpdate(sql) > 0 ){			
-			//Update each food's discount & unit price to this order.
-			for(OrderFood food : orderCalculated.getOrderFoods()){
-				sql = " UPDATE " + Params.dbName + ".order_food " +
-					  " SET " +
-					  " discount = " + food.getDiscount() + ", " +
-					  " unit_price = " + food.getFoodPrice() +
-					  " WHERE order_id = " + orderCalculated.getId() + 
-					  " AND food_id = " + food.getFoodId();
-				dbCon.stmt.executeUpdate(sql);				
-			}	
-		}
-		
-		dbCon.conn.commit();
-
-		return orderCalculated;
-
-	}
+//	private static Order doTmpPayment(DBCon dbCon, Staff staff, Order orderCalculated) throws SQLException{
+//		
+//		String sql;
+//		//Update the discount to this order.
+//		sql = " UPDATE " + Params.dbName + ".order SET " +
+//			  " staff_id = " + staff.getId() + ", " +
+//			  " waiter = '" + staff.getName() + "', " +
+//			  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
+//			  " status = " + Order.Status.UNPAID.getVal() + ", " + 
+//		   	  " order_date = NOW() " + 
+//			  " WHERE 1 = 1 " +
+//			  " AND id = " + orderCalculated.getId() +
+//			  " AND status = " + Order.Status.UNPAID.getVal();
+//			
+//		if(dbCon.stmt.executeUpdate(sql) > 0 ){			
+//			//Update each food's discount & unit price to this order.
+//			for(OrderFood food : orderCalculated.getOrderFoods()){
+//				sql = " UPDATE " + Params.dbName + ".order_food " +
+//					  " SET " +
+//					  " discount = " + food.getDiscount() + ", " +
+//					  " unit_price = " + food.getFoodPrice() +
+//					  " WHERE order_id = " + orderCalculated.getId() + 
+//					  " AND food_id = " + food.getFoodId();
+//				dbCon.stmt.executeUpdate(sql);				
+//			}	
+//		}
+//		
+//		dbCon.conn.commit();
+//
+//		return orderCalculated;
+//
+//	}
 	
 	
 	/**
@@ -387,8 +388,37 @@ public class PayOrder {
 			throw new BusinessException(FrontBusinessError.EXCEED_ERASE_QUOTA);
 		}
 		
-		//Get all the details of order to be calculated.
+		//Get all the details of order.
 		Order orderToCalc = OrderDao.getById(dbCon, staff, payBuilder.getOrderId(), DateType.TODAY);
+		
+		//Set the discount details to this order.
+		if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
+			Member member = MemberDao.getById(dbCon, staff, payBuilder.getMemberId());
+			if(payBuilder.hasMemberDiscount()){
+				//Check to see whether the member discount id is valid.
+				int index = member.getMemberType().getDiscounts().indexOf(new Discount(payBuilder.getMemberDiscountId()));
+				if(index < 0){
+					throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
+				}else{
+					orderToCalc.setDiscount(member.getMemberType().getDiscounts().get(index));
+				}
+			}else{
+				//Just use the member default discount.
+				orderToCalc.setDiscount(member.getMemberType().getDefaultDiscount());
+			}
+		}else{
+			try{
+				orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, orderToCalc.getDiscount().getId()));
+			}catch(BusinessException e){
+				//Use the default if discount not set before.
+				if(e.getErrCode() == DiscountError.DISCOUNT_NOT_EXIST){
+					orderToCalc.setDiscount(DiscountDao.getDefault(dbCon, staff));
+				}else{
+					throw e;
+				}
+			}
+		}
+
 		
 		//Set the erase price.
 		orderToCalc.setErasePrice(payBuilder.getErasePrice());
@@ -425,45 +455,6 @@ public class PayOrder {
 				orderToCalc.setServiceRate(sp.getRates().get(0).getRate());
 			}else{		
 				orderToCalc.setServiceRate(0);
-			}
-		}
-		
-		if(payBuilder.hasDiscount()){
-			
-			List<Discount> allowDiscounts;
-			if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
-				//Get the allowed discounts to the member type if paid by member.
-				allowDiscounts = DiscountDao.getByCond(dbCon, staff, 
-													   new DiscountDao.ExtraCond().setMemberType(MemberDao.getById(dbCon, staff, payBuilder.getMemberId()).getMemberType()).setDiscountId(payBuilder.getDiscountId()), 
-													   DiscountDao.ShowType.BY_PLAN);
-			}else{
-				//Get the allowed discounts to role if paid by normal.
-				allowDiscounts = DiscountDao.getByCond(dbCon, staff, 
-													   new DiscountDao.ExtraCond().setRole(staff.getRole()).setDiscountId(payBuilder.getDiscountId()),
-													   DiscountDao.ShowType.BY_PLAN);
-
-			}
-			
-			if(allowDiscounts.isEmpty()){
-				throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
-			}else{
-				orderToCalc.setDiscount(allowDiscounts.get(0));
-			}
-			
-		}else{
-			//If the discount NOT set, just use the original.
-			if(orderToCalc.getDiscount() == Discount.EMPTY){
-				orderToCalc.setDiscount(DiscountDao.getDefault(dbCon, staff));
-			}else{
-				try{
-					orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, orderToCalc.getDiscount().getId()));
-				}catch(BusinessException e){
-					if(e.getErrCode() == DiscountError.DISCOUNT_NOT_EXIST){
-						orderToCalc.setDiscount(DiscountDao.getDefault(dbCon, staff));
-					}else{
-						throw e;
-					}
-				}
 			}
 		}
 		

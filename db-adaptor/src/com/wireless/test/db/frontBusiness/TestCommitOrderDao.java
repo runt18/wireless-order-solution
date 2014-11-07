@@ -154,7 +154,7 @@ public class TestCommitOrderDao {
 			
 
 			//-----------Test to pay the order---------------------------
-			Order.PayBuilder payBuilder = Order.PayBuilder.build(orderId, PayType.CASH);
+			Order.PayBuilder payBuilder = Order.PayBuilder.build4Normal(orderId, PayType.CASH);
 			PayOrder.pay(mStaff, payBuilder);
 			
 			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
@@ -163,7 +163,7 @@ public class TestCommitOrderDao {
 			//-----------Test to re-pay the order using mixed payment---------------------------
 			float cash = actualOrder.getActualPrice() / 2;
 			float creditCard = actualOrder.getActualPrice() - cash;
-			payBuilder = Order.PayBuilder.build(orderId, PayType.MIXED).addPayment(PayType.CASH, cash).addPayment(PayType.CREDIT_CARD, creditCard);
+			payBuilder = Order.PayBuilder.build4Normal(orderId, PayType.MIXED).addPayment(PayType.CASH, cash).addPayment(PayType.CREDIT_CARD, creditCard);
 			PayOrder.pay(mStaff, payBuilder);
 			
 			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
