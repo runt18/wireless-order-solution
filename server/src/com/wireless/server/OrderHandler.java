@@ -199,6 +199,10 @@ class OrderHandler implements Runnable{
 					//handle the table transfer request 
 					response = doTransTable(staff, request);
 					
+				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.DISCOUNT_ORDER){
+					//handle the discount order request
+					response = doDiscountOrder(staff, request);
+					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER || request.header.type == Type.PAY_TEMP_ORDER){
 					//handle the pay order request
 					response = doPayOrder(staff, request);
@@ -421,6 +425,11 @@ class OrderHandler implements Runnable{
 		return new RespACK(request.header);
 	}
 	
+	private RespPackage doDiscountOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+		OrderDao.discount(staff, new Parcel(request.body).readParcel(Order.DiscountBuilder.CREATOR));
+		return new RespACK(request.header);
+	}
+	
 	private RespPackage doRepayOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		Order.RepaidBuilder builder = new Parcel(request.body).readParcel(Order.RepaidBuilder.CREATOR);
 		OrderDao.repaid(staff, builder);
@@ -431,7 +440,7 @@ class OrderHandler implements Runnable{
 	}
 	
 	private RespPackage doPayOrder(final Staff staff, ProtocolPackage request)  throws SQLException, BusinessException{
-		final Order.PayBuilder payParam = new Parcel(request.body).readParcel(Order.PayBuilder.CREATOR);
+		final Order.PayBuilder payBuilder = new Parcel(request.body).readParcel(Order.PayBuilder.CREATOR);
 		
 		List<Printer> printers = PrinterDao.getPrinters(staff);
 		
@@ -440,30 +449,30 @@ class OrderHandler implements Runnable{
 		 * Otherwise perform the pay action and print receipt 
 		 */
 		if(request.header.type == Type.PAY_TEMP_ORDER){
-			if(payParam.getPrintOption() == PrintOption.DO_PRINT){
+			if(payBuilder.getPrintOption() == PrintOption.DO_PRINT){
 				new PrintHandler(staff)
 					.addContent(JobContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, 
 																				  staff,
 																				  printers,
-																				  PayOrder.payTemp(staff, payParam)))
+																				  PayOrder.payTemp(staff, payBuilder)))
 					.fireAsync();
 			}else{
-				PayOrder.payTemp(staff, payParam);
+				PayOrder.payTemp(staff, payBuilder);
 			}
 			
 		}else{
 			
-			final Order order = PayOrder.pay(staff, payParam);
+			final Order order = PayOrder.pay(staff, payBuilder);
 			
 			//Perform SMS notification to member coupon dispatch & member upgrade in another thread
 			//so that not affect the order payment.
-			if(payParam.getSettleType() == Order.SettleType.MEMBER){
+			if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
 				WirelessSocketServer.threadPool.execute(new Runnable(){
 					@Override
 					public void run() {
 						try{
 							//Perform this coupon draw.
-							List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(payParam.getMemberId())
+							List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(payBuilder.getMemberId())
 																									   .addPromotionStatus(Promotion.Status.PROGRESS), null);
 							//Check to see whether or not any coupons associated with this member is qualified to take.
 							for(Coupon coupon : coupons){
@@ -480,9 +489,9 @@ class OrderHandler implements Runnable{
 						
 						try{
 							//Perform the member upgrade
-							Msg4Upgrade msg4Upgrade = MemberLevelDao.upgrade(staff, payParam.getMemberId());
+							Msg4Upgrade msg4Upgrade = MemberLevelDao.upgrade(staff, payBuilder.getMemberId());
 
-							if(payParam.isSendSMS()){
+							if(payBuilder.isSendSMS()){
 								MemberOperation mo = MemberOperationDao.getTodayById(staff, order.getMemberOperationId());
 								//Send SMS if perform member consumption
 								SMS.send(staff, mo.getMemberMobile(), new Msg4Consume(mo));
