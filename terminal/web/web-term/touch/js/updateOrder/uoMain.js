@@ -977,13 +977,20 @@ uo.cd = {
 		var select = $('#{0} > div[addr=centent] > div[class*={1}]'.format(this.el, this.selectClass));
 		if(select.length != 1) return;
 		select = select[0];
-		uo.tempPayForUO({
+		$.post('../OperateDiscount.do', {
+			dataSource : 'setDiscount',
+			orderId : uo.order.id,
+			discountId : select.getAttribute('data-value')
+		}, function(data){
+			uo.cd.back();
+		});
+/*		uo.tempPayForUO({
 			discountId : select.getAttribute('data-value'),
 			isPrint : false,
 			callback : function(data){
 				uo.cd.back();
 			}
-		});
+		});*/
 	}
 };
 

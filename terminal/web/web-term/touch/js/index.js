@@ -72,7 +72,7 @@ var Templet={
 			+ '<td><span class="button-base cancelFoodBtn" id="btnuo{dataIndex}">退菜</span>&nbsp;<span class="button-base transFoodBtn" id="btntrans{dataIndex}">转菜</span></td>'
 			+ '<td>{waiter}</td>'
 			+ '</tr>',
-		changeDiscount : '<div data-value={id} class="main-box-base" onClick="uo.cd.select({id:{id}})">{name}</div>'
+		changeDiscount : '<div data-value={id} class="main-box-base {selected}" onClick="uo.cd.select({id:{id}})">{name}</div>'
 	},
 	ss : {
 		dept : '<div class="button-base" data-value={value} data-type="dept-select" '
