@@ -21,6 +21,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.dishesOrder.PrintOption;
@@ -98,6 +99,7 @@ public class PayOrderAction extends Action{
 			
 			Member member = null;
 			if(settleType == Order.SettleType.MEMBER){
+				String discountID = request.getParameter("");
 				boolean sendSMS = false;
 				//Send SMS if paid by charge member.
 				for(Cookie cookie : request.getCookies()){
@@ -108,8 +110,18 @@ public class PayOrderAction extends Action{
 				    	}
 				    }
 				}
+				int discount = 0;
+				if(discountID != null && !discountID.isEmpty()){
+					discount = Integer.parseInt(discountID);
+				}
 				member = MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID")));
-				payBuilder = Order.PayBuilder.build4PointMember(orderId, member, payType, sendSMS);
+				
+				if(member.getMemberType().getAttribute() == MemberType.Attribute.CHARGE){
+					payBuilder = Order.PayBuilder.build4ChargeMember(orderId, member, discount, sendSMS);
+				}else{
+					payBuilder = Order.PayBuilder.build4PointMember(orderId, member,payType, discount, sendSMS);
+				}
+				
 			}else{
 				payBuilder = Order.PayBuilder.build4Normal(orderId, payType);
 			}
@@ -125,10 +137,6 @@ public class PayOrderAction extends Action{
 					String payTypeCash[] = pt.split(",");
 					payBuilder.addPayment(new PayType(Integer.parseInt(payTypeCash[0])), Float.parseFloat(payTypeCash[1]));
 				}
-			}
-			
-			if(request.getParameter("discountID") != null && !request.getParameter("discountID").isEmpty() && !request.getParameter("discountID").equals("-1")){
-				payBuilder.setDiscountId(Integer.parseInt(request.getParameter("discountID")));
 			}
 			
 			if(request.getParameter("pricePlanID") != null && !request.getParameter("pricePlanID").isEmpty() && !request.getParameter("pricePlanID").equals("-1")){

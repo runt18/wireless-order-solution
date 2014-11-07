@@ -20,6 +20,7 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.promotion.Coupon;
@@ -36,9 +37,9 @@ public class QueryOrderFromMemberPayAction extends Action{
 		try{
 			String pin = (String)request.getAttribute("pin");
 			String orderID = request.getParameter("orderID");
-			String discountId = request.getParameter("discountId");
 			String pricePlanId = request.getParameter("pricePlanId");
 			String couponId = request.getParameter("couponId");
+			String discountID = request.getParameter("discountID");
 			String servicePlanId = request.getParameter("servicePlanId");
 			String sv = request.getParameter("sv");
 			//0 : 根据手机或卡号; 1 : 根据手机号
@@ -75,20 +76,24 @@ public class QueryOrderFromMemberPayAction extends Action{
 				throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 			}
 			membersByType.set(0, MemberDao.getById(staff, membersByType.get(0).getId()));
-			Order.PayBuilder payBuilder = Order.PayBuilder.build4PointMember(Integer.valueOf(orderID), membersByType.get(0), PayType.CASH);
-			
-			if(discountId != null && !discountId.trim().isEmpty()){
-				payBuilder.setDiscountId(Integer.valueOf(discountId));
-			}else{
-				payBuilder.setDiscountId(membersByType.get(0).getMemberType().getDefaultDiscount().getId());
-				
-				if(membersByType.get(0).getMemberType().getDefaultPrice() != null){
-					payBuilder.setPricePlanId(membersByType.get(0).getMemberType().getDefaultPrice().getId());
-				}
+			int discount = 0;
+			if(discountID != null && !discountID.isEmpty()){
+				discount = Integer.parseInt(discountID);
 			}
+			Order.PayBuilder payBuilder;
+			if(membersByType.get(0).getMemberType().getAttribute() == MemberType.Attribute.POINT){
+				payBuilder = Order.PayBuilder.build4PointMember(Integer.valueOf(orderID), membersByType.get(0), PayType.CASH, discount, false);
+			}else{
+				payBuilder = Order.PayBuilder.build4ChargeMember(Integer.valueOf(orderID), membersByType.get(0), discount);
+			}
+			
 			
 			if(pricePlanId != null && !pricePlanId.trim().isEmpty() && !pricePlanId.equals("-1")){
 				payBuilder.setPricePlanId(Integer.parseInt(pricePlanId));
+			}else{
+				if(membersByType.get(0).getMemberType().getDefaultPrice() != null){
+					payBuilder.setPricePlanId(membersByType.get(0).getMemberType().getDefaultPrice().getId());
+				}				
 			}
 			
 			if(servicePlanId != null && !servicePlanId.isEmpty()){
