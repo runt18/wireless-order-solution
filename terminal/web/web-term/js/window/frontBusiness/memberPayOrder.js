@@ -12,7 +12,7 @@ function reloadMemberPay(){
 		params : {
 			st : 1,
 			sv :  Ext.getCmp('mpo_numMemberMobileForPayOrder').getValue(),
-			discountId : Ext.getCmp('mpo_txtDiscountForPayOrder').getValue(),
+			discountID : Ext.getCmp('mpo_txtDiscountForPayOrder').getValue(),
 			pricePlanId : Ext.getCmp('mpo_txtPricePlanForPayOrder').getValue(),
 			servicePlanId : Ext.getCmp('mpo_comboServicePlan').getValue(),
 			couponId : Ext.getCmp('mpo_couponForPayOrder').getValue(),
@@ -237,7 +237,25 @@ Ext.onReady(function(){
 					selectOnFocus : true,
 					listeners : {
 						select : function(thiz){
-							reloadMemberPay();
+							Ext.Ajax.request({
+								url : '../../OperateDiscount.do',
+								params : {
+									dataSource : 'setDiscount',
+									orderId : orderMsg.id, 
+									memberId : mpo_memberDetailData.member.id,
+									discountId : thiz.getValue() 
+								},
+								success : function(res){
+									var jr = Ext.decode(res.responseText);
+									if(jr.success){
+										reloadMemberPay();
+									}else{
+										Ext.example.msg(jr.title, jr.msg);
+									}
+								},
+								failure : function(res){}
+							});							
+							
 						}
 					}
 				}]
@@ -814,10 +832,10 @@ function memberPayOrderHandler(_c){
 			orderID : order['id'],
 			cashIncome : order['actualPrice'],
 			payType : 2,
-			discountID : chooseDiscount.getValue(),
 			couponID : chooseCoupon.getValue(),
 			payManner : payManner.getValue(),
 			tempPay : _c.tempPay,
+			discountID : chooseDiscount.getValue(),
 			memberID : member['id'],
 			comment : '',
 			serviceRate : (order['serviceRate'] * 100),

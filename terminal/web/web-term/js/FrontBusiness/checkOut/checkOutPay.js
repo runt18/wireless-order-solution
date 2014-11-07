@@ -81,7 +81,6 @@ var paySubmit = function(submitType) {
 					"orderID" : orderMsg.id,
 					"cashIncome" : submitPrice,
 					"payType" : payType,
-					'discountID' : calcDiscountID,
 					"payManner" : payManner,
 					"tempPay" : tempPay,
 					"memberID" : actualMemberID,

@@ -38,7 +38,25 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 		listeners : {
 			select : function(thiz, record, index) {
 				calcDiscountID = thiz.getValue();
-				refreshCheckOutData();
+				Ext.Ajax.request({
+					url : '../../OperateDiscount.do',
+					params : {
+						dataSource : 'setDiscount',
+						orderId : orderMsg.id, 
+						discountId : calcDiscountID 
+					},
+					success : function(res){
+						var jr = Ext.decode(res.responseText);
+						if(jr.success){
+							refreshCheckOutData();
+						}else{
+							Ext.example.msg(jr.title, jr.msg);
+						}
+					},
+					failure : function(res){}
+				});
+				
+				
 			}
 		}
 	},{

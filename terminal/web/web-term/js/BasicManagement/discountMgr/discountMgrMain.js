@@ -11,9 +11,10 @@ function deleteDiscountPlanHandler(){
 		function(e){
 			if(e == 'yes'){
 				Ext.Ajax.request({
-					url : '../../DeleteDiscount.do',
+					url : '../../OperateDiscount.do',
 					params : {
 						restaurantID : restaurantID,
+						dataSource : 'delete',
 						discountID : sn.attributes.discountID
 					},
 					success : function(res, opt){
@@ -429,16 +430,16 @@ Ext.onReady(function(){
 					var rate = Ext.getCmp('numDiscountRate');
 					var isDefault = Ext.getCmp('chbIsDefault');
 					
-					var actionURL = '';
+					var dataSource = '';
 					//判断是否有效
 					if(!name.isValid() || !rate.isValid()){
 						return;
 					}
 					
 					if(addProgramWin.operationType == dmObj.operation.insert){
-						actionURL = '../../InsertDiscount.do';
+						dataSource = 'insert';
 					}else if(addProgramWin.operationType == dmObj.operation.update){
-						actionURL = '../../UpdateDiscount.do';
+						dataSource = 'update';
 					}else{
 						return;
 					}
@@ -449,9 +450,10 @@ Ext.onReady(function(){
 					btnCancel.setDisabled(true);
 					
 					Ext.Ajax.request({
-						url : actionURL,
+						url : '../../OperateDiscount.do',
 						params : {
 							restaurantID : restaurantID,
+							dataSource : dataSource,
 							discountID : id.getValue(),
 							discountName : name.getValue(),
 							rate : rate.getValue(),
