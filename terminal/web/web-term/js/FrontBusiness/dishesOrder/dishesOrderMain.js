@@ -1226,14 +1226,16 @@ Ext.onReady(function() {
 	var orderFoodTitle = null;
 	if(isRepaid){
 		orderFoodTitle = '反结账 -- <span style="padding-left:2px; color:red;">'+orderID+'</span>&nbsp;号帐单'
+		if(primaryOrderData.other.order.discount){
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;当前折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';
+		}
+		if(primaryOrderData.other.order.discounter){
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣人:<font color="green">'+ primaryOrderData.other.order.discounter +'</font>';
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣时间:<font color="green">'+ primaryOrderData.other.order.discountDate +'</font>';
+		}		
 	}
-	if(primaryOrderData.other.order.discount){
-		orderFoodTitle += '&nbsp;&nbsp;&nbsp;当前折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';
-	}
-	if(primaryOrderData.other.order.discounter){
-		orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣人:<font color="green">'+ primaryOrderData.other.order.discounter +'</font>';
-		orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣时间:<font color="green">'+ primaryOrderData.other.order.discountDate +'</font>';
-	}
+	
+
 	
 	var billModCenterPanel = new Ext.Panel({
 		id : "billModCenterPanel",

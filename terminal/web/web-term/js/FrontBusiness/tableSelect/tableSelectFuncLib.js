@@ -360,9 +360,7 @@ function memberPointConsume(c){
 			url : '../../QueryMember.do',
 			params : {
 				dataSource : 'normal',
-				restaurantID : restaurantID,
-				mobile : c.read == 1 ? mobile.getValue() : '',
-				memberCard : c.read == 2 ? card.getValue() : ''
+				memberCardOrMobile : c.read == 2 ? card.getValue() : mobile.getValue() 
 			},
 			success : function(res, opt){
 				var jr = Ext.decode(res.responseText);
@@ -371,6 +369,7 @@ function memberPointConsume(c){
 						memberPointConsumeWin.member = jr.root[0];
 						memberPointConsumeWinSetData(memberPointConsumeWin.member);
 						Ext.example.msg('提示', '<font style="color:red;">'+memberPointConsumeWin.member['name']+'</font> 会员信息读取成功.');
+						consumePoint.focus();
 					}else{
 						Ext.example.msg('提示', '该会员信息不存在, 请重新输入条件后重试.');
 						memberPointConsumeWin.member = null;
@@ -407,10 +406,9 @@ function memberPointConsume(c){
 					Ext.Msg.show({
 						title : '会员积分消费成功',
 						buttons : Ext.Msg.OK,
-						msg : '<div style="font-size:30px; max-width:320px; color: #15428B;">原有积分:' + Ext.util.Format.usMoney(memberPointConsumeWin.member['point']).replace('$', '')
-							+'<br>消费积分:' + Ext.util.Format.usMoney(consumePoint.getValue()).replace('$', '')
-							+'<br>当前积分:' + Ext.util.Format.usMoney(memberPointConsumeWin.member['point'] - consumePoint.getValue()).replace('$', '')
-							+'</div>'
+						msg : '<font size=4>原有积分: ' + memberPointConsumeWin.member['point'] + '</font>'
+							+'<br><font size=4>消费积分: ' + consumePoint.getValue() + '</font>'
+							+'<br><font size=4>当前积分: ' + (memberPointConsumeWin.member['point'] - consumePoint.getValue()) + '</font>'
 					});
 					memberPointConsumeWin.hide();
 				}else{

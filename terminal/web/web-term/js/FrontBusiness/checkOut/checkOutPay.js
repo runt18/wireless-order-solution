@@ -98,7 +98,7 @@ var paySubmit = function(submitType) {
 					var dataInfo = resultJSON.data;
 					
 					if (resultJSON.success == true) {
-						var interval = 5;
+						var interval = 3;
 						var action = '';
 						
 						if (submitType == 6 || submitType == 101) {

@@ -1415,7 +1415,7 @@ var btnMemberPointConsume = new Ext.ux.ImageButton({
 						}]
 					}, {
 						xtype : 'panel',
-						html : '<input type="button" value="读手机号码" onClick="memberPointConsume({otype:1, read:1})">'
+						html : '<input type="button" value="读手机号码" onClick="memberPointConsume({otype:1, read:1})">&nbsp;&nbsp;'
 							+ '<input type="button" value="读会员卡" onClick="memberPointConsume({otype:1, read:2})">'
 					}, {
 						items : [{
