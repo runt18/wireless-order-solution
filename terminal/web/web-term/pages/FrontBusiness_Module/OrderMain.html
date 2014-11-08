@@ -43,6 +43,44 @@
 	
 	var reloadData, tableDate, repaid_payType;
 	
+	function queryOrderDetail(){
+		$.ajax({
+			url : '../../QueryOrder.do',
+			type : 'post',
+			async:false,
+			data : params,
+			success : function(jr, status, xhr){
+				jr.root = jr.other?jr.other.order.orderFoods : [];
+				primaryOrderData = jr;
+				if(jr.success){
+					orderID = primaryOrderData.other.order.id;
+					isRepaid = eval(primaryOrderData.other.order.statusValue) != 0;
+					isFree = false;
+					
+					if(isRepaid){
+						$.ajax({
+							url : '../../QueryPayType.do',
+							type : 'post',
+							async:false,
+							data : {
+								dataSource : 'exceptMember'
+							},
+							success : function(jr, status, xhr){
+								repaid_payType = jr.root;
+							},
+							error : function(request, status, err){
+							}
+						}); 					
+					}
+				}
+	
+			},
+			error : function(request, status, err){
+				alert(request.msg);
+			}
+		}); 	
+	}	
+	
 	//获取餐台信息
 	$.ajax({
 		url : "../../QueryTable.do",
@@ -89,43 +127,9 @@
 		},
 		error : function(request, status, err){
 		}
-	}); 	
-	
-	$.ajax({
-		url : '../../QueryOrder.do',
-		type : 'post',
-		async:false,
-		data : params,
-		success : function(jr, status, xhr){
-			jr.root = jr.other?jr.other.order.orderFoods : [];
-			primaryOrderData = jr;
-			if(jr.success){
-				orderID = primaryOrderData.other.order.id;
-				isRepaid = eval(primaryOrderData.other.order.statusValue) != 0;
-				isFree = false;
-				
-				if(isRepaid){
-					$.ajax({
-						url : '../../QueryPayType.do',
-						type : 'post',
-						async:false,
-						data : {
-							dataSource : 'exceptMember'
-						},
-						success : function(jr, status, xhr){
-							repaid_payType = jr.root;
-						},
-						error : function(request, status, err){
-						}
-					}); 					
-				}
-			}
+	});
 
-		},
-		error : function(request, status, err){
-			alert(request.msg);
-		}
-	}); 
+	queryOrderDetail();
 	
 	
 	// global variable
