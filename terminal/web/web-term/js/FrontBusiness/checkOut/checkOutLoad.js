@@ -44,7 +44,7 @@ function checkDot(c)
  */
 function loadOrderBasicMsg(){
 	calcDiscountID = orderMsg.discount.id; // i
-	document.getElementById('spanDisplayCurrentDiscount').innerHTML = orderMsg.discount.name;
+//	document.getElementById('spanDisplayCurrentDiscount').innerHTML = orderMsg.discount.name;
 	
 	document.getElementById('spanDisplayCurrentServiceRate').innerHTML = (orderMsg.serviceRate*100)+'%';
 //	document.getElementById("serviceCharge").value = orderMsg.serviceRate * 100;
@@ -79,10 +79,16 @@ function loadOrderBasicMsg(){
 	}
 //	document.getElementById("spanSumFoodCount").innerHTML = sumFoodCount.toFixed(2);;
 	
-	checkOutMainPanel.setTitle('结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>');
+	var payOrderTitle = '结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>';
 	if(orderMsg.category != 4){
-		checkOutMainPanel.setTitle(checkOutMainPanel.title + ' -- 餐桌号:<font color="red" size=3>' + orderMsg.table.alias + '</font>&nbsp;' + (tableDate.name?'<font color="red" size=3>(' + tableDate.name +')</font>' :''));
+		payOrderTitle += (' -- 餐桌号:<font color="red" size=3>' + orderMsg.table.alias + '</font>&nbsp;' + (tableDate.name?'<font color="red" size=3>(' + tableDate.name +')</font>' :''));
 	}
+	payOrderTitle += '&nbsp;&nbsp;&nbsp;<font size=3>当前折扣:</font> <font style="color:green;font-size:15px;font-weight:bold;">'+ orderMsg.discount.name + '</font>'
+	if(orderMsg.discounter){
+		payOrderTitle += '&nbsp;&nbsp;&nbsp;<font size=3>折扣人:</font> <font style="color:green;font-size:15px;font-weight:bold;">'+ orderMsg.discounter + '</font>';
+		payOrderTitle += '&nbsp;&nbsp;&nbsp;<font size=3>折扣时间:</font> <font style="color:green;font-size:15px;font-weight:bold;">'+ orderMsg.discountDate + '</font>';
+	}
+	checkOutMainPanel.setTitle(payOrderTitle);
 	
 	Ext.getCmp('txtEraseQuota').setValue();
 }

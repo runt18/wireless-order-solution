@@ -14,9 +14,6 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 	height : 30,
 	items : [{
 		xtype : 'tbtext',
-		text : '&nbsp;&nbsp;<font style="font-size:18px;">当前折扣方案:</font>&nbsp;<span id="spanDisplayCurrentDiscount" style="color:rgb(21, 66, 139); font-weight:bold;font-size:18px; ">&nbsp;&nbsp;</span>'
-	}, {
-		xtype : 'tbtext',
 		text : '&nbsp;&nbsp;&nbsp;<font style="font-size:18px;">折扣方案:</font>&nbsp;&nbsp;'
 	}, {
 		xtype : 'combo',
@@ -55,8 +52,6 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 					},
 					failure : function(res){}
 				});
-				
-				
 			}
 		}
 	},{

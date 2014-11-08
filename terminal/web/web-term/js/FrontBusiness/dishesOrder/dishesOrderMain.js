@@ -49,7 +49,29 @@ function repaid_initNorthPanel(){
 					typeAhead : true,
 					mode : 'local',
 					triggerAction : 'all',
-					selectOnFocus : true
+					selectOnFocus : true,
+					listeners : {
+						select : function(thiz, record, index) {
+							Ext.Ajax.request({
+								url : '../../OperateDiscount.do',
+								params : {
+									dataSource : 'setDiscount',
+									orderId : orderID, 
+									discountId : thiz.getValue() 
+								},
+								success : function(res){
+									var jr = Ext.decode(res.responseText);
+									if(jr.success){
+										queryOrderDetail();
+										setRepaidOrderTitle();
+									}else{
+										Ext.example.msg(jr.title, jr.msg);
+									}
+								},
+								failure : function(res){}
+							});
+						}
+					}
 				}]
 			}, {
 				width : 135,
@@ -1128,6 +1150,23 @@ function initKeyBoardEvent(){
 	}]);
 }
 
+	
+function setRepaidOrderTitle(){
+	var orderFoodTitle = null;
+	if(isRepaid){
+		orderFoodTitle = '反结账 -- <span style="padding-left:2px; color:red;">'+orderID+'</span>&nbsp;号帐单'
+	}
+	if(primaryOrderData.other.order.discount){
+		orderFoodTitle += '&nbsp;&nbsp;&nbsp;当前折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';
+	}
+	if(primaryOrderData.other.order.discounter){
+		orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣人:<font color="green">'+ primaryOrderData.other.order.discounter +'</font>';
+		orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣时间:<font color="green">'+ primaryOrderData.other.order.discountDate +'</font>';
+	}
+	
+	Ext.getCmp('billModCenterPanel').setTitle(orderFoodTitle);	
+}
+
 var dishesOrderEastPanel, centerPanel;
 var commitOperate;
 
@@ -1183,12 +1222,25 @@ Ext.onReady(function() {
 			}
 		}
 	});
+	
+	var orderFoodTitle = null;
+	if(isRepaid){
+		orderFoodTitle = '反结账 -- <span style="padding-left:2px; color:red;">'+orderID+'</span>&nbsp;号帐单'
+	}
+	if(primaryOrderData.other.order.discount){
+		orderFoodTitle += '&nbsp;&nbsp;&nbsp;当前折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';
+	}
+	if(primaryOrderData.other.order.discounter){
+		orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣人:<font color="green">'+ primaryOrderData.other.order.discounter +'</font>';
+		orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣时间:<font color="green">'+ primaryOrderData.other.order.discountDate +'</font>';
+	}
+	
 	var billModCenterPanel = new Ext.Panel({
 		id : "billModCenterPanel",
+		title : orderFoodTitle,
 		region : "center",
 		layout : "border",
 		frame : false,
-		title : isRepaid ? '&nbsp;<span style="padding-left:2px; color:red;">'+orderID+'</span>&nbsp;号帐单' : null,
 		items : [ centerPanel ]
 	});
 
