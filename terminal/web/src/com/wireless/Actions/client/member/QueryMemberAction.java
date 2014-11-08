@@ -126,6 +126,7 @@ public class QueryMemberAction extends DispatchAction {
 			String memberType = request.getParameter("memberType");
 			String memberTypeAttr = request.getParameter("memberTypeAttr");
 			String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
+			String memberCardOrMobile = request.getParameter("memberCardOrMobile");
 //			String totalBalance = request.getParameter("usedBalance");
 			String MaxTotalMemberCost = request.getParameter("MaxTotalMemberCost");
 			String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
@@ -149,6 +150,10 @@ public class QueryMemberAction extends DispatchAction {
 				
 				if(memberCardOrMobileOrName != null && !memberCardOrMobileOrName.trim().isEmpty())
 					extraCond.setFuzzyName(memberCardOrMobileOrName);
+				
+				if(memberCardOrMobile != null && !memberCardOrMobile.isEmpty()){
+					extraCond.setMobileOrCard(memberCardOrMobile);
+				}
 				
 				if(MinTotalMemberCost != null && !MinTotalMemberCost.isEmpty()){
 					extraCond.greaterTotalConsume(Integer.parseInt(MinTotalMemberCost));
