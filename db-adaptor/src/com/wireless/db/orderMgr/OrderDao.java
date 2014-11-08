@@ -279,7 +279,8 @@ public class OrderDao {
 			throw new BusinessException(FrontBusinessError.ORDER_NOT_EXIST);
 		}else{
 			return result.get(0);
-		}	}
+		}
+	}
 	
 	/**
 	 * Get the unpaid order detail information to the specific restaurant and table. 
@@ -487,7 +488,7 @@ public class OrderDao {
 			order.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			order.setWaiter(dbCon.rs.getString("waiter"));
 			order.setDiscounter(dbCon.rs.getString("discount_staff"));
-			order.setDiscountDate(dbCon.rs.getTimestamp("discount_date") != null?dbCon.rs.getTimestamp("discount_date").getTime():0);
+			order.setDiscountDate(dbCon.rs.getTimestamp("discount_date") != null ? dbCon.rs.getTimestamp("discount_date").getTime() : 0);
 			
 			order.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			order.setStatus(dbCon.rs.getInt("status"));

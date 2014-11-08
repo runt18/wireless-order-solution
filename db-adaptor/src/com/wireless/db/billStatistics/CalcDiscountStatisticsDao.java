@@ -245,7 +245,7 @@ public class CalcDiscountStatisticsDao {
 	public static List<DiscountIncomeByStaff> calcDiscountIncomeByStaff(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		String sql;
 		sql = " SELECT " +
-			  " TMP.discount_staff_id, MAX(TMP.discount_staff) AS staff_name, " +
+			  " TMP.discount_staff_id, MAX(IFNULL(TMP.discount_staff, '其他')) AS staff_name, " +
 			  " COUNT(*) AS discount_amount, " +
 			  " ROUND(SUM(TMP.discount_price), 2) AS discount_price " +
 			  " FROM (" +
