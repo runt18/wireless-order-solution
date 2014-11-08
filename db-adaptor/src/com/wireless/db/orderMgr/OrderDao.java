@@ -487,7 +487,7 @@ public class OrderDao {
 			order.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			order.setWaiter(dbCon.rs.getString("waiter"));
 			order.setDiscounter(dbCon.rs.getString("discount_staff"));
-			order.setDiscountDate(dbCon.rs.getLong("discount_date"));
+			order.setDiscountDate(dbCon.rs.getTimestamp("discount_date").getTime());
 			
 			order.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			order.setStatus(dbCon.rs.getInt("status"));
