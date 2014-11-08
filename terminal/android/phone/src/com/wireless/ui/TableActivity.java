@@ -673,7 +673,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		});
 		
 		// 创建点击餐台状态后弹出区域的View
-		View popupView = getLayoutInflater().inflate(R.layout.region_popup_wnd, null);
+		View popupView = getLayoutInflater().inflate(R.layout.region_popup_wnd, (ViewGroup)getWindow().getDecorView(), false);
 
 		// 创建与这个View关联的pop-up window
 		mPopWnd = new PopupWindow(popupView, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);

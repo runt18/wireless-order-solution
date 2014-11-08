@@ -308,7 +308,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 			public View getView(int position, View convertView, ViewGroup parent) {
 				View view;
 				if(convertView == null){
-					view = LayoutInflater.from(getActivity()).inflate(R.layout.quick_pick_commit_dialog_item, null);
+					view = LayoutInflater.from(getActivity()).inflate(R.layout.quick_pick_commit_dialog_item, parent, false);
 				}else{
 					view = convertView;
 				}

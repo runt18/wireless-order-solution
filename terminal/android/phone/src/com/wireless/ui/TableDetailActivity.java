@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -186,7 +187,7 @@ public class TableDetailActivity extends Activity {
 	
 	private void showDiscountDialog(){
 		// 取得自定义的view
-		View view = LayoutInflater.from(this).inflate(R.layout.bill_activity_pay_cate, null);
+		View view = LayoutInflater.from(this).inflate(R.layout.bill_activity_pay_cate, (ViewGroup)getWindow().getDecorView(), false);
 		
 		view.findViewById(R.id.radioGroup_payCate_payBill).setVisibility(View.GONE);
 		view.findViewById(R.id.relativeLayout_payCate_payBill).setVisibility(View.GONE);
@@ -234,8 +235,12 @@ public class TableDetailActivity extends Activity {
 							@Override
 							protected void onFail(BusinessException e) {
 								mProgDialog.dismiss();
-								Toast.makeText(TableDetailActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-							}
+								new AlertDialog.Builder(TableDetailActivity.this)
+												.setTitle("提示")
+												.setMessage(e.getMessage())
+												.setPositiveButton("确定", null)
+												.show();
+								}
 						}.execute();
 					}
 				})
@@ -251,7 +256,7 @@ public class TableDetailActivity extends Activity {
 	public void showBillDialog(final byte payCate) {
 
 		// 取得自定义的view
-		View view = LayoutInflater.from(this).inflate(R.layout.bill_activity_pay_cate, null);
+		View view = LayoutInflater.from(this).inflate(R.layout.bill_activity_pay_cate, (ViewGroup)getWindow().getDecorView(), false);
 
 		view.findViewById(R.id.radioGroup_discount_payBill).setVisibility(View.GONE);
 		view.findViewById(R.id.relativeLayout_discount_payBill).setVisibility(View.GONE);
