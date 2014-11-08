@@ -166,7 +166,9 @@ function showDescForUpdateOrder(){
 	var html = "";
 	html = "<div>" +
 //	"<span style = 'margin-left: 500px;'>菜品数量：" + uoFood.length + "</span>" +
-	"<span style = 'margin-left: 500px;'>消费总额：</span>" + "<span id = 'spanTotalPriceUO'></span>" +	
+	"<span style = 'margin-left: 200px;'>消费总额：</span>" + "<span id = 'spanTotalPriceUO'></span>" +	
+	(uo.order.discount?"<span style = 'margin-left: 20px;'>当前折扣：" + uo.order.discount.name +"</span>" : "") +
+	(uo.order.discounter ? "<span style = 'margin-left: 20px;'>折扣人：" + uo.order.discounter + "</span><span style = 'margin-left: 20px;'>折扣时间：" + uo.order.discountDate + "</span>" : "") +
 	"</div>";
 	$("#divDescForUpdateOrder").html(html);
 	$("#spanTotalPriceUO").html(uo.getTotalPriceUO().toFixed(2) + "元");

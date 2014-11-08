@@ -985,12 +985,21 @@ uo.cd = {
 			if(data.success){
 				Util.msg.alert({
 					title : '提示',
-					msg : '更改成功', 
+					msg : '打折成功', 
 					time : 2,
 					fn : function(){
+						updateTable({
+							alias : uo.table.alias
+						});						
 						uo.cd.back();		
 					}
 				});			
+			}else{
+				Util.msg.alert({
+					title : '提示',
+					msg : '打折失败, 请刷新页面重试', 
+					time : 2
+				});					
 			}
 			
 		});
