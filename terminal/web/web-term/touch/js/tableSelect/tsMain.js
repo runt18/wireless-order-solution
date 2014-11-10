@@ -232,7 +232,7 @@ function handleTableForTS(c){
  */
 function inputNum(o){
 	
-	inputNumVal = $("#" + inputNumId).val();
+//	inputNumVal = $("#" + inputNumId).val();
 	inputNumVal += o.innerHTML;
 	$("#" + inputNumId).val(inputNumVal);
 	//判断人数是否超过限定
@@ -611,12 +611,12 @@ function showSelectTableNumTS(){
 			type : 'hide',
 			renderTo : 'divSelectTableNumForTs'
 		});
-		inputNumVal = "";
+		inputNumValUO = "";
 		$("#txtTableNumForTS").val("");
 		$('#divSelectTablesForTs').html("");
 	});
 	$("#txtTableNumForTS").select();
-	inputNumId  = "txtTableNumForTS";
+	inputNumIdUO  = "txtTableNumForTS";
 }
 
 /**

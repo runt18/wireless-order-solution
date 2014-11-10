@@ -249,13 +249,15 @@ function transFoodForTS(o){
 	title = foodName +" -- 请输入桌号，菜品数量确定转菜";
 	$("#divTopForSelectTableNumTS").html("<div style = 'font-size: 15px; " +
 			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");	
+	
+	inputNumIdUO  = "txtTableNumForTS";
 			
 	$('#txtFoodNumForTran').click(function(){
-		inputNumId  = "txtFoodNumForTran";
+		inputNumIdUO  = "txtFoodNumForTran";
 	});		
 	
 	$('#txtTableNumForTS').click(function(){
-		inputNumId  = "txtTableNumForTS";
+		inputNumIdUO  = "txtTableNumForTS";
 	});		
 }
 
@@ -457,6 +459,7 @@ uo.cancelForUO = function(){
  * @param {object} o 触发该函数的按钮对象 
  */
 function inputNumUO(o){
+	inputNumValUO = $("#" + inputNumIdUO).val();
 	//设置输入框的显示值（原有值加上输入值）
 	inputNumValUO += o.innerHTML;
 	$("#" + inputNumIdUO).val(inputNumValUO);
@@ -505,6 +508,11 @@ function inputNumUO(o){
 			$("#" + inputNumIdUO).val(1);
 		}
 	}
+	
+	if(getDom(inputNumIdUO).oninput){
+		getDom(inputNumIdUO).oninput();
+	}	
+	
 }
 
 /**
@@ -524,7 +532,9 @@ uo.backOne = function(){
 		$("#" + inputNumIdUO).val(inputNumValUO);
 	}
 	$("#" + inputNumIdUO).focus();
-	
+	if(getDom(inputNumIdUO).oninput){
+		getDom(inputNumIdUO).oninput();
+	}	
 	
 };
 
