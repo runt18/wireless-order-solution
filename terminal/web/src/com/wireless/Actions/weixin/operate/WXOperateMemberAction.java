@@ -63,12 +63,11 @@ public class WXOperateMemberAction extends DispatchAction {
 
 			dbCon.connect();
 			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
-			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, openId, formId);
-			
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			final Restaurant restaurant = RestaurantDao.getById(dbCon, rid);
 			
-			final Member member = MemberDao.getById(dbCon, StaffDao.getAdminByRestaurant(rid), mid);
-			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getAdminByRestaurant(rid), mid);
+			final Member member = MemberDao.getByWxSerial(dbCon, staff, openId);
+			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getAdminByRestaurant(rid), member.getId());
 			
 			final int rank = ((mr.getTotal() - mr.getRank()) * 100)/mr.getTotal();
 			
@@ -90,9 +89,9 @@ public class WXOperateMemberAction extends DispatchAction {
 				}
 			};				
 			
-			final List<Coupon> couponList = CouponDao.getByCond(StaffDao.getAdminByRestaurant(rid), new CouponDao.ExtraCond().setMember(mid).setStatus(Coupon.Status.DRAWN), null);
+			final List<Coupon> couponList = CouponDao.getByCond(StaffDao.getAdminByRestaurant(rid), new CouponDao.ExtraCond().setMember(member.getId()).setStatus(Coupon.Status.DRAWN), null);
 			
-			final int weixinCard = WeixinMemberDao.getCardByWeixin(dbCon, openId, formId);
+			final int weixinCard = member.getWeixin().getCard();
 			
 			jobject.setExtra(new Jsonable(){
 
