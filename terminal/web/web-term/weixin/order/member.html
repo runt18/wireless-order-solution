@@ -49,23 +49,48 @@ var totalMath = 0;
 <div id="divMemberContent" class="main-box">
 
 <ul class="m-b-list">
-	<!-- <li class="box-horizontal" onclick="Util.skip('member_data_dateil.html')"> -->
 	<li class="box-horizontal">
-		<div style="width:45%">会员名: <span id="spanMemberName">--</span></div>
-		<div>手机号: <span id="spanMemberMobile">--</span></div>
+		<div style="width: 45%">会员名: <span id="spanMemberName">--</span></div>
+		<div id="divWeixinMemberPhone" style="text-align: right;width: 55%">手机号: <span id="spanMemberMobile">--</span></div>
+		<div id="divBindWeixinMember" style="text-align: right;width: 55%">绑定手机号&nbsp;&gt;</div>
 	</li>
-<!-- 	<li class="box-horizontal">
-		<div>手机号: <span id="spanMemberMobile">--</span></div>
-		<div class="event"><a onclick="Util.dialog.show({ msg : '重新绑定手机号需要到前台办理.' })">重新绑定</a>&nbsp;&gt;</div>
-	</li> -->
+	<li>
+		<div id="divToBindWeixinMember" style="display: none;width: 100%;">
+			<ul class="m-b-list">
+				<li class="none-line" style="line-height: 50px;padding-top: 10px;">
+					手机号: <input id="txtVerifyMobile" type="number" maxlength="11"/>
+				</li>
+				<li class="none-line" style="line-height: 50px;">
+					<div style="width:100%;">
+						验证码: <input id="txtVerifyCode" type="number" maxlength="4" style="width:70px;"/>
+						<span id="btnVerifyCode" style="color: blue;font-size: 13px;" ></span>
+					</div>
+				<li class="none-line">
+					<div id="btnGetVerifyCode" style="height: 55px;width: 100%;text-align: center;" >
+						<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="getVerifyCode({event:this})">获取验证码</a>	
+					</div>	
+					<div id="btnBindMember" style="margin-top: 3px;height: 55px;width: 100%;text-align: center;display: none;" >
+						<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="bindMember({event:this})">确认绑定</a>	
+					</div>							
+				</li>
+				<li >
+					<span style="margin-left: 5px;font-size: 18px;">注: 可到前台激活或绑定原会员卡</span>
+					<div id="divMemberPrivilegeDetail" style="width: 100%;border: 1px dashed darkgray;margin-bottom: 2px;">
+						<span style="margin-left: 5px;font-size: 19px;">激活成为微信会员，可享受:</span>
+						<ul id="ulMemberPrivilegeDetail" ></ul>
+					</div>
+				</li>					
+			</ul>
+		</div>
+	</li>	
 </ul>
 </div>
 
 <div id="divMemberBalanceAndPiont" class="main-box">
 <ul class="m-b-list">
 	<li class="box-horizontal none-line" >
-		<div style="width:45%">余&nbsp;&nbsp;额: <span id="spanMemberTotalBalance" style="color:#26a9d0;">--.--</span>&nbsp;元</div>
-		<div >积&nbsp;&nbsp;分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
+		<div style="width:50%">余&nbsp;&nbsp;额: <span id="spanMemberTotalBalance" style="color:#26a9d0;">--.--</span>&nbsp;元</div>
+		<div style="width:50%;text-align: right;">积&nbsp;&nbsp;分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
 	</li>
 </ul>
 </div>
@@ -130,9 +155,7 @@ var totalMath = 0;
 		<div class="event">更多等级&nbsp;&gt;</div>
 	</li>
 	<li style="overflow: hidden;"><div></div>
-		<div id="divMemberLevelChart" style="height: 320px;display:none;"></div>
-		<!-- <div id="divMemberTypeDesc" style="display:none;"> </div>-->
-		
+		<div id="divMemberLevelChart" style="height: 100px;display:none;"></div>
 	</li>
 </ul>
 </div>
@@ -186,69 +209,10 @@ var totalMath = 0;
 	
 </div>
 
-<div id="divMemberPrivilegeDetail" class="main-box" style="margin-top: 10px;padding-top: 5px;padding-bottom: 5px;display: none;">
-	<span style="margin-left: 5px;font-size: 19px;">激活成为微信会员，可享受:</span>
-	<ul id="ulMemberPrivilegeDetail" ></ul>
-</div>
-
-<div id="divVerifyAndBind" class="main-box" style="margin-top: 10px;">
-<ul class="m-b-list" >
-	<li class="box-horizontal" >
-		<!-- <div style="line-height: 55px;" onclick="javascript:$('#ulVerifyAndBind').hide();">激活后可享受更多优惠</div> -->
-		<div id="btn_activate" style="margin-top: 3px;height: 55px;width: 100%;text-align: center;" >
-			<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="showMemberBind()">激活</a>	
-		
-		</div>
-	</li>
-	<li id="ulVerifyAndBind" style="display: none;">
-	<ul class="m-b-list">
-		<li class="none-line" style="line-height: 50px;padding-top: 10px;">
-			手机号: <input id="txtVerifyMobile" type="number" maxlength="11"/>
-		</li>
-		<li class="none-line" style="line-height: 50px;">
-			<div style="width:100%;">
-				验证码: <input id="txtVerifyCode" type="number" maxlength="4" style="width:70px;"/>
-				<span id="btnVerifyCode" style="color: blue;font-size: 13px;" ></span>
-<!-- 				<input id="btnGetVerifyCode" type="button" value="获取验证码" onClick="getVerifyCode({event:this})">
-				<input id="btnBindMember" type="button" value="确认绑定"  style="display: none;"  onClick="bindMember({event:this})"> -->
-			</div>
-		<li class="none-line">
-			<div id="btnGetVerifyCode" style="height: 55px;width: 100%;text-align: center;" >
-				<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="getVerifyCode({event:this})">获取验证码</a>	
-			</div>	
-			<div id="btnBindMember" style="margin-top: 3px;height: 55px;width: 100%;text-align: center;display: none;" >
-				<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="bindMember({event:this})">确认绑定</a>	
-			</div>							
-		</li>
-	</ul>
-	</li>
-	<li class="box-horizontal" >
-		<span style="margin-left: 5px;font-size: 18px;">注: 可到前台激活或绑定原会员卡</span>
-	</li>		
-</ul>
-</div>
-
-<div id="divResetMobile" class="main-box">
-<ul class="m-b-list">
-	<li class="none-line title">重新绑定手机号码</li>
-	<li class="none-line" style="line-height: 50px;">
-		新号码: <input id="txtVerifyMobileByReset" type="text" maxlength="11"/>
-	</li>
-	<li class="none-line" style="line-height: 50px;">
-		验证码: <input id="txtVerifyCodeByReset" type="number" maxlength="4" style="width:80px;"/>
-		<!-- <button id="btnVerifyCodeByReset" onClick="getVerifyCodeByReset({event:this})">点击获取验证码</button> -->
-		<a href="#" onClick="getVerifyCodeByReset({event:this})">点击获取验证码</a>
-	</li>
-	<li style="text-align: center;">
-		<input id="btnBindMemberByReset" type="button" value="确认绑定" disabled onClick="bindMemberByReset({event:this})">
-	</li>
-</ul>
-</div>
-
 
 <div id="divInsertBefore"></div>
 <div id="divOccupyHtml" style="height :400px;"></div>
-<div class="footer">&copy; 2014 技术支持：智易科技</div>
+<div class="footer">&copy; 技术支持：志易科技</div>
 <div style="height: 45px;">&nbsp;</div>
  
 </body>
