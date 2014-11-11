@@ -134,102 +134,11 @@ var checkOutMainPanel = new Ext.Panel({
 var checkOutForm = new Ext.form.FormPanel({
 	frame : true,
 	border : false,
-	items : [
-	checkOutMainPanel
-//	, 
-//	{
-//		layout : 'column',
-//		border : false,
-//		items : [{
-//			html : '<div>&nbsp;&nbsp;</div>',
-//			id : 'placeHolderCOF3',
-//			width : 150
-//		}, {
-//			border : false,
-//			contentEl : 'payInfo'
-//		} ]
-//	}
-/*	, {
-		layout : 'column',
-		border : false,
-		items : [ {
-			html : '<div>&nbsp;&nbsp;</div>',
-			id : 'placeHolderCOF4',
-			width : 150
-		},{
-			layout : 'form',
-			border : false,
-			labelSeparator : '：',
-			labelWidth : 40,
-			width : 450,
-			items : [ {
-				xtype : 'textarea',
-				fieldLabel : '备注',
-				id : 'remark',
-				anchor : '%100'
-			} ]
-		} ]
-	} */
-	],
+	items : [checkOutMainPanel],
 	buttonAlign : 'center',
-	buttons : [ 
-/*	{
-		text : '签单',
-		disabled : true,
-		handler : function() {
-			paySubmit(4);
-		}
-	}, {
-		text : '挂账',
-		disabled : true,
-		handler : function() {
-			paySubmit(5);
-		}
-	}
-	, {
-		text : '会员结账',
-		disabled : true,
-		handler : function() {
-			memberPay();
-		}
-	},{
-		text : '现金结账(+)',
-		disabled : true,
-		handler : function() {
-			paySubmit(1);
-		}
-	}, {
-		text : '刷卡结账',
-		disabled : true,
-		handler : function() {
-			paySubmit(2);
-		}
-	}, {
-		text : '会员卡结账',
-		hidden : true,
-		handler : function() {
-			paySubmit(3);
-		}
-	}, {
-		text : '暂结(-)',
-		disabled : true,
-		handler : function() {
-			paySubmit(6);
-		}
-	}, {
-		text : '返回',
-		disabled : true,
-		handler : function() {
-			location.href = 'TableSelect.html';
-		}
-	}*/
-	],
+	buttons : [],
 	listeners : {
 		afterlayout : function(thiz) {
-//			thiz.findById('placeHolderCOF1').setWidth((thiz.getInnerWidth() - 1000) / 2);
-//			thiz.findById('placeHolderCOF2').setWidth((thiz.getInnerWidth() - 989) / 2);
-//			thiz.findById('placeHolderCOF3').setWidth((thiz.getInnerWidth() - 989) / 2);
-//			thiz.findById('placeHolderCOF4').setWidth((thiz.getInnerWidth() - 989) / 2);
 			checkOutMainPanel.setHeight(thiz.getInnerHeight());
 			if(eval(category == 4)){
 				if(tableGroupTab != null && typeof tableGroupTab != 'undefined'){

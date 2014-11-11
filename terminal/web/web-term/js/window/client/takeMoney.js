@@ -79,30 +79,7 @@ Ext.onReady(function(){
 				    '<input type="button" value="读会员卡" onClick="takeMoneyLoadMemberData({read:2})" style="cursor:pointer; width:80px;" />',
 				    '</div>'
 				].join('')
-			},
-/*			{
-				columnWidth : .15,
-				items : [{
-					xtype : 'button',
-					text : '读手机号码',
-					handler : function(){
-						takeMoneyLoadMemberData({read:1});
-					}
-				}]
-
-			},
-			{
-				columnWidth : .15,
-				items : [{
-					xtype : 'button',
-					text : '读会员卡',
-					handler : function(){
-						takeMoneyLoadMemberData({read:2});
-					}
-				}]
-
-			},*/
-			{
+			},{
 				columnWidth : 1
 			},
 			{
@@ -261,7 +238,7 @@ function takeMoneyLoadMemberData(c){
 		url : '../../QueryMember.do',
 		params : {
 			dataSource : 'normal',
-			memberCardOrMobileOrName : c.read == 1 ? mobile.getValue() : (c.read == 2 ? card.getValue() : '')
+			memberCardOrMobile : c.read == 1 ? mobile.getValue() : (c.read == 2 ? card.getValue() : '')
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);

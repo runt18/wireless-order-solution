@@ -53,7 +53,6 @@ Ext.onReady(function(){
 			xtype : 'panel',
 			layout : 'column',
 			defaults : {
-				//xtype : 'panel',
 				layout : 'form',
 				labelWidth : 80,
 				labelAlign : 'right',
@@ -77,6 +76,8 @@ Ext.onReady(function(){
 				    '</div>'
 				].join('')
 			},{
+				columnWidth : 1
+			},{
 				items : [{
 					id : 'rd_numBaseBalance',
 					fieldLabel : '收款总额',
@@ -94,15 +95,7 @@ Ext.onReady(function(){
 					fieldLabel : '当前积分',
 					disabled : true
 				}]
-			},
-/*			{
-				items : [{
-					id : 'rd_numExtraBalance',
-					fieldLabel : '赠送余额',
-					disabled : true
-				}]
-			}, */
-			{
+			},{
 				items : [{
 					id : 'rd_numPayMannerMoney',
 					fieldLabel : '实收金额' + Ext.ux.txtFormat.xh,
@@ -133,17 +126,8 @@ Ext.onReady(function(){
 					id : 'rd_numRechargeMoney',
 					fieldLabel : '账户充额' + Ext.ux.txtFormat.xh,
 					allowBlank : false
-					//disabled : true
 				}]
-			}, 
-/*			{
-				items : [{
-					id : 'rd_numGiftMoney',
-					fieldLabel : '赠送金额',
-					disabled : true
-				}]
-			}, */
-			{
+			},{
 				items : [{
 					xtype : 'combo',
 					id : 'rd_comboRechargeType',
@@ -163,15 +147,7 @@ Ext.onReady(function(){
 					selectOnFocus : true,
 					allowBlank : false
 				}]
-			}, 
-/*			{
-				items : [{
-					id : 'rd_numGiftPoint',
-					fieldLabel : '赠送积分',
-					disabled : true
-				}]
-			}, */
-			{
+			},{
 				columnWidth : 1,
 				items : [{
 					xtype : 'textfield',
@@ -282,7 +258,7 @@ function rechargeLoadMemberData(c){
 		url : '../../QueryMember.do',
 		params : {
 			dataSource : 'normal',
-			memberCardOrMobileOrName : c.read == 1 ? mobile.getValue() : (c.read == 2 ? card.getValue() : '')
+			memberCardOrMobile : c.read == 1 ? mobile.getValue() : (c.read == 2 ? card.getValue() : '')
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
@@ -321,7 +297,6 @@ function rechargeBindMemberData(data){
 	var memberCard = Ext.getCmp('rd_numMemberCardForRecharge');
 	var totalBalance = Ext.getCmp('rd_numTotalBalance');
 	var baseBalance = Ext.getCmp('rd_numBaseBalance');
-	//var extraBalance = Ext.getCmp('rd_numExtraBalance');
 	var totalPoint = Ext.getCmp('rd_numTotalPoint');
 	var name = Ext.getCmp('rd_txtMemberName');
 	var memberType = Ext.getCmp('rd_txtMmeberType');
@@ -336,15 +311,11 @@ function rechargeBindMemberData(data){
 	var rechargeType = Ext.getCmp('rd_comboRechargeType');
 	var rechargePayMannerMoney = Ext.getCmp('rd_numPayMannerMoney');
 	var rechargeComment = Ext.getCmp('rd_txtRechargeComment');
-	//var rechargeGiftMoney = Ext.getCmp('rd_numGiftMoney');
-	//var rechargeGiftPoint = Ext.getCmp('rd_numGiftPoint');
 	
 	rechargeMoney.setValue();
 	rechargeType.setValue(1);
 	rechargePayMannerMoney.setValue();
 	rechargeComment.setValue();
-	//rechargeGiftMoney.setValue();
-	//rechargeGiftPoint.setValue();
 	
 	data = data == null || typeof data == 'undefined' ? {} : data;
 	var memberTypeData = typeof data['memberType'] == 'undefined' ? {} : data['memberType'];
@@ -353,7 +324,6 @@ function rechargeBindMemberData(data){
 	memberCard.setValue(data['memberCard']);
 	totalBalance.setValue(data['totalBalance']);
 	baseBalance.setValue(data['baseBalance']);
-	//extraBalance.setValue(data['extraBalance']);
 	totalPoint.setValue(data['point']);
 	name.setValue(data['name']);
 	memberType.setValue(memberTypeData['name']);

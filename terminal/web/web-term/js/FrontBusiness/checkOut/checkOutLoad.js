@@ -599,7 +599,6 @@ function showInputReciptWin(){
 				border : true,
 				labelWidth : 120,
 				labelAlign : 'right',
-//				height : Ext.isIE ? 150 : null,
 				items : [{
 					xtype : 'textfield',
 					id : 'txtShouldToRecipt',
@@ -627,8 +626,7 @@ function showInputReciptWin(){
 						}
 					},
 					listeners : {
-						'render': {
-						    fn: function(c){
+						'render': function(c){
 						        c.getEl().on(
 						            'keyup',
 						            function() {
@@ -640,10 +638,15 @@ function showInputReciptWin(){
 						            	 
 						            }
 						        );
-						    },
-						    scope: this
-						 
-						}						
+								new Ext.KeyMap('txtInputRecipt', [{
+									key : 13,
+									scope : this,
+									fn : function(){
+										Ext.getCmp('btnMixedPayInputRecipt').handler();
+									}
+								}]);						        
+						    }
+						    
 					}
 					
 				},{
@@ -660,6 +663,9 @@ function showInputReciptWin(){
 				id : 'btnMixedPayInputRecipt',
 				iconCls : 'btn_save',
 				handler : function(e){
+					if(!Ext.getCmp('txtInputRecipt').isValid()){
+						return;
+					}
 					paySubmit(1);
 					inputReciptWin.hide();
 				}				
@@ -670,13 +676,6 @@ function showInputReciptWin(){
 				handler : function(e){
 					inputReciptWin.hide();
 				}				
-			}],
-			keys : [{
-				 key : Ext.EventObject.ENTER,
-				 fn : function(){ 
-					 Ext.getCmp('btnMixedPayInputRecipt').handler();
-				 },
-				 scope : this 
 			}],
 			listeners : {
 				hide : function(){
