@@ -16,7 +16,6 @@ import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberLevelDao;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -295,12 +294,11 @@ public class QueryMemberTypeAction extends DispatchAction {
 			String openId = request.getParameter("oid");
 			String formId = request.getParameter("fid");
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
-			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(openId, formId);
 			Staff staff = StaffDao.getAdminByRestaurant(rid); 
 			List<MemberLevel> list = MemberLevelDao.get(staff);
 			
 			for (final MemberLevel ml : list) {
-				final List<Member> mlists = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setMemberType(ml.getMemberType().getId()).setId(mid), null);
+				final List<Member> mlists = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setMemberType(ml.getMemberType().getId()).setWeixinSerial(openId), null);
 				if(mlists.size() > 0){
 					extra.putJsonable("member", mlists.get(0), 0);
 				}

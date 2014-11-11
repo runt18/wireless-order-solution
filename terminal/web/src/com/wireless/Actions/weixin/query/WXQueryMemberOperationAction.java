@@ -14,10 +14,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -128,10 +128,10 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			
 			// 获取餐厅编号
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
-			// 获取会员编号
-			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, memberSerial, restaurantSerial);
 			//
-			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
+			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
+			// 获取会员编号
+			int mid = MemberDao.getByWxSerial(dbCon, staff, memberSerial).getId();
 			
 			// 查询条件(核心)
 			String extra = "";
@@ -188,10 +188,10 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			
 			// 获取餐厅编号
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
-			// 获取会员编号
-			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, memberSerial, restaurantSerial);
 			//
-			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
+			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
+			// 获取会员编号
+			int mid = MemberDao.getByWxSerial(dbCon, staff, memberSerial).getId();
 			
 			// 查询条件(核心)
 			String extra = "";
@@ -322,10 +322,10 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			String restaurantSerial = request.getParameter("fid"), memberSerial = request.getParameter("oid");
 			// 获取餐厅编号
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
-			// 获取会员编号
-			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, memberSerial, restaurantSerial);
 			//
-			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
+			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
+			// 获取会员编号
+			int mid = MemberDao.getByWxSerial(dbCon, staff, memberSerial).getId();
 			
 			List<Coupon> couponList = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(mid).setStatus(Coupon.Status.DRAWN), null);
 			for(int i = 0; i < couponList.size(); i++){

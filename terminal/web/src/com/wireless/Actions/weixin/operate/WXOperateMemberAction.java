@@ -29,6 +29,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.client.WeixinMember;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.VerifySMS;
@@ -100,7 +101,7 @@ public class WXOperateMemberAction extends DispatchAction {
 					JsonMap jm = new JsonMap();
 					jm.putJsonable("member", j, 0);
 					jm.putJsonable("restaurant", restaurant, 0);
-					jm.putInt("status", WeixinMemberDao.Status.BOUND.getVal());
+					jm.putInt("status", WeixinMember.Status.BOUND.getVal());
 					jm.putInt("weixinCard", weixinCard);
 					if(!couponList.isEmpty()){
 						jm.putBoolean("hasCoupon", true);
@@ -128,7 +129,7 @@ public class WXOperateMemberAction extends DispatchAction {
 					public JsonMap toJsonMap(int flag) {
 						JsonMap jm = new JsonMap();
 						jm.putJsonableList("memberType", list, 0);
-						jm.putInt("status", WeixinMemberDao.Status.INTERESTED.getVal());
+						jm.putInt("status", WeixinMember.Status.INTERESTED.getVal());
 						jm.putInt("weixinCard", weixinCard);
 						return jm;
 					}

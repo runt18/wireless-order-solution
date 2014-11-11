@@ -12,11 +12,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -67,17 +67,15 @@ public class QueryCouponAction extends DispatchAction{
 		String openId = request.getParameter("oid");
 				
 		int rid = 0;
-		int mid = 0;
 		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
 		Staff staff = StaffDao.getAdminByRestaurant(rid);
-		mid = WeixinMemberDao.getBoundMemberIdByWeixin(openId, formId);
 		
 		
 		JObject jobject = new JObject();
 		List<Coupon> list = new ArrayList<>();
 		try{
 			CouponDao.ExtraCond extra = new ExtraCond();
-			extra.setMember(mid);
+			extra.setMember(MemberDao.getByWxSerial(staff, openId));
 			extra.addPromotionStatus(Promotion.Status.PROGRESS);
 			extra.addPromotionStatus(Promotion.Status.PUBLISH);
 			
@@ -109,16 +107,14 @@ public class QueryCouponAction extends DispatchAction{
 		String pId = request.getParameter("pId");
 		
 		int rid = 0;
-		int mid = 0;
 		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
 		Staff staff = StaffDao.getAdminByRestaurant(rid);
-		mid = WeixinMemberDao.getBoundMemberIdByWeixin(openId, formId);
 		
 		
 		JObject jobject = new JObject();
 		try{
 			CouponDao.ExtraCond extra = new CouponDao.ExtraCond();
-			extra.setMember(mid);
+			extra.setMember(MemberDao.getByWxSerial(staff, openId));
 			extra.setPromotion(Integer.parseInt(pId));
 			extra.setStatus(Coupon.Status.PUBLISHED);
 			

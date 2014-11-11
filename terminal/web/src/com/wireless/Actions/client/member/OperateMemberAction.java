@@ -23,6 +23,7 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.sms.SMS;
 import com.wireless.sms.msg.Msg4Charge;
@@ -67,7 +68,7 @@ public class OperateMemberAction extends DispatchAction{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			Member.InsertBuilder ib = new Member.InsertBuilder(name, mobile, Integer.valueOf(memberTypeId));
-			ib.setBirthday(birthday)
+			ib.setBirthday(DateUtil.parseDate(birthday))
 			  .setSex(Member.Sex.valueOf(Integer.valueOf(sex)))
 			  .setMemberCard(memberCard)
 //			  .setTele(tele)
