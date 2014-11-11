@@ -153,7 +153,7 @@ public class WeixinMemberDao {
 
 		//Clear the original member relationship. 
 		sql = " UPDATE " + Params.dbName + ".weixin_member SET " +
-			  " member_id = NULL " +
+			  " member_id = 0 " +
 			  " ,status = " + WeixinMember.Status.INTERESTED.getVal() +
 			  " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
@@ -346,8 +346,12 @@ public class WeixinMemberDao {
 		while(dbCon.rs.next()){
 			WeixinMember weixinMember = new WeixinMember(dbCon.rs.getInt("weixin_card"));
 			weixinMember.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			weixinMember.setBindDate(dbCon.rs.getTimestamp("bind_date").getTime());
-			weixinMember.setInterestedDate(dbCon.rs.getTimestamp("interest_date").getTime());
+			if(dbCon.rs.getTimestamp("bind_date") != null){
+				weixinMember.setBindDate(dbCon.rs.getTimestamp("bind_date").getTime());
+			}
+			if(dbCon.rs.getTimestamp("interest_date") != null){
+				weixinMember.setInterestedDate(dbCon.rs.getTimestamp("interest_date").getTime());
+			}
 			weixinMember.setStatus(WeixinMember.Status.valueOf(dbCon.rs.getInt("status")));
 			weixinMember.setWeixinMemberSerial(dbCon.rs.getString("weixin_serial"));
 			result.add(weixinMember);
