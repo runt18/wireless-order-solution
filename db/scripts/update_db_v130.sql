@@ -164,6 +164,34 @@ WHERE order_count < 0;
 UPDATE wireless_order_db.order_food_history SET operation = 2
 WHERE order_count < 0;
 
+-- -----------------------------------------------------
+-- Add the field 'discount_date', 'discount_staff' & 'discount_staff_id' to table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` 
+ADD COLUMN `discount_date` DATETIME NULL DEFAULT NULL AFTER `discount_id`,
+ADD COLUMN `discount_staff` VARCHAR(45) NULL DEFAULT NULL AFTER `discount_date`,
+ADD COLUMN `discount_staff_id` INT NULL DEFAULT NULL AFTER `discount_staff`;
+
+UPDATE wireless_order_db.order SET discount_price = discount_price
+,discount_date = order_date
+,discount_staff = waiter
+,discount_staff_id = staff_id
+WHERE discount_price > 0;
+
+-- -----------------------------------------------------
+-- Add the field 'discount_date', 'discount_staff' & 'discount_staff_id' to table 'order_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` 
+ADD COLUMN `discount_date` DATETIME NULL DEFAULT NULL AFTER `custom_num`,
+ADD COLUMN `discount_staff` VARCHAR(45) NULL DEFAULT NULL AFTER `discount_date`,
+ADD COLUMN `discount_staff_id` INT NULL DEFAULT NULL AFTER `discount_staff`;
+
+UPDATE wireless_order_db.order_history SET discount_price = discount_price
+,discount_date = order_date
+,discount_staff = waiter
+,discount_staff_id = staff_id
+WHERE discount_price > 0;
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
 
 
