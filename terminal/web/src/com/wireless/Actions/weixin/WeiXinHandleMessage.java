@@ -142,22 +142,14 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		naviItem.addItem(specialFoodItem);
 		
 		Data4Item memberItem = new Data4Item();
-		try{
-			WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName());
-			memberItem.setTitle("会员资料");
-		}catch(BusinessException e){
-			memberItem.setTitle("会员资料 | 请绑定会员");
-		}catch(SQLException e){
-			memberItem.setTitle("会员资料");
-		}
+		memberItem.setTitle("会员资料");
 		memberItem.setUrl(createUrl(msg, WEIXIN_MEMBER));
 		memberItem.setPicUrl(WEIXIN_MEMBER_ICON);
 		naviItem.addItem(memberItem);
 
 		try{
-			int memberId = WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName());
-			System.out.println(memberId);
-			List<Coupon> coupons = CouponDao.getByCond(StaffDao.getAdminByRestaurant(restaurant.getId()), new CouponDao.ExtraCond().setMember(memberId).setPromotionType(Promotion.Type.WELCOME).setStatus(Coupon.Status.PUBLISHED), null);
+			Staff staff = StaffDao.getAdminByRestaurant(restaurant.getId());
+			List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(MemberDao.getByWxSerial(staff, msg.getFromUserName())).setPromotionType(Promotion.Type.WELCOME).setStatus(Coupon.Status.PUBLISHED), null);
 			if(!coupons.isEmpty()){
 				Data4Item welcome = new Data4Item();
 				welcome.setTitle("激活有礼");
@@ -209,7 +201,8 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 			
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注
-				WeixinMemberDao.interest(msg.getToUserName(), msg.getFromUserName());
+				Staff staff = StaffDao.getAdminByRestaurant(WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
+				WeixinMemberDao.interest(staff, msg.getFromUserName());
 				try{
 					session.callback(createWelcome(msg));
 				}catch(BusinessException e){
@@ -222,7 +215,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 				
 			}else if(msg.getEvent() == Event.UNSUBSCRIBE){
 				//会员取消关注
-				WeixinMemberDao.cancel(msg.getFromUserName(), msg.getToUserName());
+				//WeixinMemberDao.cancel(msg.getFromUserName(), msg.getToUserName());
 				
 			}else if(msg.getEvent() == Event.CLICK){
 
@@ -233,20 +226,6 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 				}else if(msg.getEventKey().equals(PROMOTION_EVENT_KEY)){
 					//最新优惠
 					int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
-					try{
-						WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName());
-					}catch(BusinessException | SQLException e){
-						try{
-							session.callback(createWelcome(msg));
-						}catch(BusinessException e2){
-							if(e2.getErrCode() == PromotionError.PROMOTION_NOT_EXIST){
-								session.callback(new Msg4ImageText(msg).addItem(new Data4Item("亲。。。想查看餐厅的最新优惠，马上激活您的微信会员卡哦 :-(", "点击激活微信会员卡", "", createUrl(msg, WEIXIN_MEMBER))));
-							}else{
-								throw e2;
-							}
-						}
-						return;
-					}
 					
 					Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 					
@@ -254,7 +233,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 															   new CouponDao.ExtraCond().addPromotionStatus(Promotion.Status.PUBLISH)
 															   							.addPromotionStatus(Promotion.Status.PROGRESS)
 															   							.setPromotionType(Promotion.Type.NORMAL)
-															   							.setMember(WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName())), null);
+															   							.setMember(MemberDao.getByWxSerial(staff, msg.getFromUserName())), null);
 					
 					if(coupons.isEmpty()){
 						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("亲。。。暂时还没有优惠活动哦", "请留意我们的微信优惠通知哦", "", "")));
@@ -357,26 +336,23 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					
 				}else if(msg.getEventKey().equals(MEMBER_EVENT_KEY)){
 					//会员信息
-					int memberId;
 					try{
-						memberId = WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName());
+						Member member = MemberDao.getByWxSerial(StaffDao.getAdminByRestaurant(WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())), msg.getFromUserName());
+						StringBuilder title = new StringBuilder();
+						title.append("亲爱的" + member.getName());
+						if(member.getTotalBalance() > 0){
+							title.append("，您的余额" + NumericUtil.float2String2(member.getTotalBalance()) + "元");
+						}
+						if(member.getTotalPoint() > 0){
+							title.append("，可用积分" + NumericUtil.float2String2(member.getTotalPoint()) + "分");
+						}
+						
+						session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title.toString(), "点击查看您的更多信息", "", createUrl(msg, WEIXIN_MEMBER))));
+						
 					}catch(BusinessException | SQLException e){
-						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("亲。。。您的微信会员卡还未激活哦 :-(", "点击激活您的微信会员卡", "", createUrl(msg, WEIXIN_MEMBER))));
-						return;
+						//session.callback(new Msg4ImageText(msg).addItem(new Data4Item("亲。。。您的微信会员卡还未激活哦 :-(", "点击激活您的微信会员卡", "", createUrl(msg, WEIXIN_MEMBER))));
+						session.callback(new Msg4ImageText(msg).addItem(new Data4Item(e.getMessage(), "", "", "")));
 					}
-					
-					Member member = MemberDao.getById(StaffDao.getAdminByRestaurant(WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())), memberId);
-					
-					StringBuilder title = new StringBuilder();
-					title.append("亲爱的" + member.getName());
-					if(member.getTotalBalance() > 0){
-						title.append("，您的余额" + NumericUtil.float2String2(member.getTotalBalance()) + "元");
-					}
-					if(member.getTotalPoint() > 0){
-						title.append("，可用积分" + NumericUtil.float2String2(member.getTotalPoint()) + "分");
-					}
-					
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title.toString(), "点击查看您的更多信息", "", createUrl(msg, WEIXIN_MEMBER))));
 						
 				}
 			}
