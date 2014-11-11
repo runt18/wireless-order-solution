@@ -3,87 +3,77 @@ package com.wireless.test.db.weixin.member;
 import java.beans.PropertyVetoException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.List;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.CalcWeixinSignature;
 import com.wireless.db.weixin.member.WeixinMemberDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.WeixinMemberError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.client.WeixinMember;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 
 public class TestWeixinMemberDao {
 	
-	private static final String WEIXIN_RESTAURANT_SERIAL = "oACWTjsRKuGYTjEpEyG7fPTg06fc";
 	private static final String WEIXIN_MEMBER_SERIAL = "oACWTjsRKuGYTjEpEyG7fPTg06fd";
 	
+	private static Staff mStaff;
+	
 	@BeforeClass
-	public static void initDbParam() throws PropertyVetoException{
+	public static void initDbParam() throws PropertyVetoException, SQLException, BusinessException{
 		TestInit.init();
+		mStaff = StaffDao.getAdminByRestaurant(40);
 	}
 	
 	@Test
 	public void testWeixinMemberDao() throws SQLException, BusinessException, NoSuchAlgorithmException{
-		final String account = "blt";
-		final String timestamp = "2013-9-11 7:48:00";
-		final String nonce = "jingyang";
-		WeixinRestaurantDao.verify(account, CalcWeixinSignature.calc(RestaurantDao.getByAccount(account).getAccount(), timestamp, nonce), timestamp, nonce);
-		WeixinRestaurantDao.bind(WEIXIN_RESTAURANT_SERIAL, account);
 
-		Restaurant restaurant = RestaurantDao.getByAccount(account);
-		Staff staff = StaffDao.getAdminByRestaurant(restaurant.getId());
-		
+		int weixinCard = 0;
 		try{
-			WeixinMemberDao.interest(WEIXIN_RESTAURANT_SERIAL, WEIXIN_MEMBER_SERIAL);
-			List<Member> memberList = MemberDao.getByCond(staff, null, null);
+			//--------Test to interest a weixin member---------------
+			int memberId = WeixinMemberDao.interest(mStaff, WEIXIN_MEMBER_SERIAL);
 			
-			if(!memberList.isEmpty()){
-				//Test to bind the exist member
-				WeixinMemberDao.bind(memberList.get(0).getMobile(), WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
-				Assert.assertEquals("bind exist member", memberList.get(0).getId(), WeixinMemberDao.getBoundMemberIdByWeixin(WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL));
-				
-				//String mobileToUpdate = Long.valueOf((Long.parseLong(memberList.get(0).getMobile()) + 1)).toString();
-				//Test to change the bound mobile of exist member 
-				//WeixinMemberDao.updateMobile(mobileToUpdate, WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
-				//Assert.assertEquals("change the mobile to exist member", mobileToUpdate, MemberDao.getById(staff, memberList.get(0).getId()).getMobile());
-				
-			}
+			Member actual = MemberDao.getById(mStaff, memberId);
+			weixinCard = actual.getWeixin().getCard();
 			
-			int memberId = 0;
-			try{
-				//Test to bind a new member
-				memberId = WeixinMemberDao.bind("18520590932", WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
-				
-				Member memberJustInserted = MemberDao.getById(staff, WeixinMemberDao.getBoundMemberIdByWeixin(WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL)); 
-				
-				Assert.assertEquals("id to new member just bound", memberId, memberJustInserted.getId());
-				Assert.assertEquals("name to new member just bound", "微信会员", memberJustInserted.getName());
-				Assert.assertEquals("mobile to new member just bound", "18520590932", memberJustInserted.getMobile());
-				Assert.assertEquals("type to new member just bound", MemberType.Type.WEIXIN, memberJustInserted.getMemberType().getType());
-				
-			}finally{
-				if(memberId != 0){
-					MemberDao.deleteById(staff, memberId);
-				}
+			Assert.assertEquals("member id to weixin", memberId, actual.getId());
+			Assert.assertEquals("member name to weixin", "微信会员", actual.getName());
+			MemberType expectedType = MemberTypeDao.getWeixinMemberType(mStaff);
+			Assert.assertEquals("member type id to weixin", expectedType.getId(), actual.getMemberType().getId());
+			Assert.assertEquals("member type to weixin", expectedType.getType(), actual.getMemberType().getType());
+			Assert.assertEquals("member type to weixin", expectedType.getName(), actual.getMemberType().getName());
+			Assert.assertEquals("serial to weixin member", WEIXIN_MEMBER_SERIAL, actual.getWeixin().getSerial());
+			Assert.assertEquals("card to weixin member", MemberDao.getByCond(mStaff, new MemberDao.ExtraCond().setWeixinCard(actual.getWeixin().getCard()), null).get(0).getId(), actual.getId());
+			
+			//----------Test to bind a weixin member----------------
+			int boundMemberId = WeixinMemberDao.bind(mStaff, new WeixinMember.BindBuilder(WEIXIN_MEMBER_SERIAL, "18520590932"));
+			if(boundMemberId != memberId){
+				Member expected = MemberDao.getByCond(mStaff, new MemberDao.ExtraCond().setMobile("18520590932"), null).get(0);
+				actual = MemberDao.getByCond(mStaff, new MemberDao.ExtraCond().setWeixinCard(weixinCard), null).get(0);
+				Assert.assertEquals("member id after bound", expected.getId(), actual.getId());
+				Assert.assertEquals("serial to weixin member", WEIXIN_MEMBER_SERIAL, actual.getWeixin().getSerial());
 			}
 			
 		}finally{
-			WeixinMemberDao.cancel(WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
-			try{
-				WeixinMemberDao.getBoundMemberIdByWeixin(WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
-			}catch(BusinessException e){
-				Assert.assertEquals("failed to cancel weixin member", WeixinMemberError.WEIXIN_MEMBER_NOT_BOUND, e.getErrCode());
+			if(weixinCard != 0){
+				
+				MemberDao.deleteByCond(mStaff, new MemberDao.ExtraCond().setWeixinCard(weixinCard));
+				
+				Assert.assertTrue("failed to delete member associated with weixin", MemberDao.getByCond(mStaff, new MemberDao.ExtraCond().setWeixinCard(weixinCard), null).isEmpty());
+				
+				try{
+					WeixinMemberDao.getBySerial(mStaff, WEIXIN_MEMBER_SERIAL);
+					Assert.assertTrue("failed to delete the weixin member", false);
+				}catch(BusinessException e){
+					Assert.assertEquals("failed to delete the weixin member", WeixinMemberError.WEIXIN_INFO_NOT_EXIST, e.getErrCode());
+				}
 			}
 		}
 	}

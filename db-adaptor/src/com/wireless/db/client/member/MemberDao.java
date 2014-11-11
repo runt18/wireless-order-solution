@@ -25,6 +25,7 @@ import com.wireless.pojo.client.MemberComment.CommitBuilder;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.client.WeixinMember;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.distMgr.Discount;
@@ -117,6 +118,8 @@ public class MemberDao {
 		private int minTotalConsume;
 		private int maxTotalConsume;
 		private DutyRange range;
+		private int weixinCard;
+		private String weixinSerial;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -132,6 +135,16 @@ public class MemberDao {
 			this.mobile = mobile;
 			return this;
 		} 
+		
+		public ExtraCond setWeixinSerial(String weixinSerial){
+			this.weixinSerial = weixinSerial;
+			return this;
+		}
+		
+		public ExtraCond setWeixinCard(int weixinCard){
+			this.weixinCard = weixinCard;
+			return this;
+		}
 		
 		public ExtraCond setMobileOrCard(String mobileOrCard){
 			this.mobileOrCard = mobileOrCard;
@@ -150,39 +163,23 @@ public class MemberDao {
 		
 		public ExtraCond greaterConsume(int amount){
 			this.minConsumeAmount = amount;
-//			this.maxConsumeAmount = 0;
 			return this;
 		}
 		
 		public ExtraCond lessConsume(int amount){
 			this.maxConsumeAmount = amount;
-//			this.minConsumeAmount = 0;
 			return this;
 		}
 		
-/*		public ExtraCond setConsumeRange(int min, int max){
-			this.minConsumeAmount = min;
-			this.maxConsumeAmount = max;
-			return this;
-		}*/
-		
 		public ExtraCond greaterTotalConsume(int totalConsume){
 			this.minTotalConsume = totalConsume;
-//			this.maxTotalConsume = 0;
 			return this;
 		}
 		
 		public ExtraCond lessTotalConsume(int totalConsume){
 			this.maxTotalConsume = totalConsume;
-//			this.minTotalConsume = 0;
 			return this;
 		}
-		
-/*		public ExtraCond setTotalConsume(int min, int max){
-			this.minTotalConsume = min;
-			this.maxTotalConsume = max;
-			return this;
-		}*/
 		
 		public ExtraCond setRange(DutyRange range){
 			this.range = range;
@@ -203,6 +200,12 @@ public class MemberDao {
 			}
 			if(mobile != null){
 				extraCond.append(" AND M.mobile_crc = CRC32('" + mobile + "') AND M.mobile = '" + mobile + "'");
+			}
+			if(weixinCard != 0){
+				extraCond.append(" AND WM.weixin_card = " + weixinCard);
+			}
+			if(weixinSerial != null){
+				extraCond.append(" AND WM.weixin_serial = '" + weixinSerial + "' AND weixin_serial_crc = CRC32('" + weixinSerial + "')");
 			}
 			if(mobileOrCard != null){
 				extraCond.append(" AND (M.mobile = '" + mobileOrCard + "' OR M.member_card = '" + mobileOrCard + "')");
@@ -543,9 +546,11 @@ public class MemberDao {
 			  " M.total_consumption, M.total_point, M.total_charge, " +
 			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
 			  " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, " +
-			  " MT.member_type_id, MT.name AS member_type_name, MT.attribute, MT.exchange_rate, MT.charge_rate, MT.type, MT.initial_point " +
+			  " MT.member_type_id, MT.name AS member_type_name, MT.attribute, MT.exchange_rate, MT.charge_rate, MT.type, MT.initial_point, " +
+			  " WM.weixin_card " +
 			  " FROM " + Params.dbName + ".member M " +
 			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " +
+			  " LEFT JOIN " + Params.dbName + ".weixin_member WM ON WM.member_id = M.member_id " +
 			  " WHERE 1 = 1 " +
 			  " AND M.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond : " ") +
@@ -590,6 +595,10 @@ public class MemberDao {
 			memberType.setType(dbCon.rs.getInt("type"));
 			memberType.setInitialPoint(dbCon.rs.getInt("initial_point"));
 			member.setMemberType(memberType);
+			
+			if(dbCon.rs.getInt("weixin_card") != 0){
+				member.setWeixin(new WeixinMember(dbCon.rs.getInt("weixin_card")));
+			}
 			
 			result.add(member);
 		}
@@ -674,11 +683,15 @@ public class MemberDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static Member getById(DBCon dbCon, Staff staff, int memberId) throws BusinessException, SQLException{
-		List<Member> ml = MemberDao.getDetail(dbCon, staff, new ExtraCond().setId(memberId), null);
-		if(ml.isEmpty()){
+		List<Member> result = MemberDao.getDetail(dbCon, staff, new ExtraCond().setId(memberId), null);
+		if(result.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
-			return ml.get(0);
+			Member member = result.get(0);
+			if(member.hasWeixin()){
+				member.setWeixin(WeixinMemberDao.getByCard(dbCon, staff, member.getWeixin().getCard()));
+			}
+			return member;
 		}
 	}
 	
@@ -768,6 +781,10 @@ public class MemberDao {
 			dbCon.disconnect();
 		}
 	}
+
+	public static void cancel(DBCon dbCon, Staff staff, String weixinSerial) throws SQLException{
+		
+	}
 	
 	/**
 	 * Insert a new member.
@@ -805,10 +822,10 @@ public class MemberDao {
 
 		//检查是否信息有重复
 		//Check to see whether the mobile or member card is duplicated.
-		if(!getByCond(dbCon, staff, new ExtraCond().setMobile(member.getMobile()).toString(), null).isEmpty()){
+		if(member.hasMobile() && !getByCond(dbCon, staff, new ExtraCond().setMobile(member.getMobile()), null).isEmpty()){
 			throw new BusinessException(MemberError.MOBLIE_DUPLICATED);
 		}
-		if(member.hasMemberCard() && !getByCond(dbCon, staff, new ExtraCond().setCard(member.getMemberCard()).toString(), null).isEmpty()){
+		if(member.hasMemberCard() && !getByCond(dbCon, staff, new ExtraCond().setCard(member.getMemberCard()), null).isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_CARD_DUPLICATED);
 		}
 		
@@ -1001,33 +1018,101 @@ public class MemberDao {
 	}
 	
 	/**
-	 * Delete the member and associated member operation (today & history) according to id
+	 * Delete the member according to extra condition{@link ExtraCond}. 
 	 * @param staff
-	 * 			the terminal
-	 * @param memberId
-	 * 			the member id to delete
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the amount to member deleted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member type associated with member does NOT exist
 	 */
-	public static void deleteById(Staff staff, int memberId) throws SQLException {
+	public static int deleteByCond(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberDao.deleteById(dbCon, staff, memberId);
+			int amount = deleteByCond(dbCon, staff, extraCond);
 			dbCon.conn.commit();
-			
-		}catch(SQLException e){
+			return amount;
+		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
 			throw e;
-			
 		}finally{
 			dbCon.disconnect();
 		}
 	}
+	
+	/**
+	 * Delete the member according to extra condition{@link ExtraCond}. 
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the amount to member deleted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member type associated with member does NOT exist
+	 */
+	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		int amount = 0;
+		for(Member member : getByCond(dbCon, staff, extraCond, null)){
+			String sql;
+			//Delete the coupon associated with this member
+			CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setMember(member.getId()));
+			
+			//Delete the interested member.
+			sql = " DELETE FROM " + Params.dbName + ".interested_member WHERE member_id = " + member.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			//Delete the member comment.
+			sql = " DELETE FROM " + Params.dbName + ".member_comment WHERE member_id = " + member.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			//Delete the member operation.
+			//sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE member_id = " + memberId;
+			//dbCon.stmt.executeUpdate(sql);
+			
+			//Delete the member operation history.
+			//sql = " DELETE FROM " + Params.dbName + ".member_operation_history WHERE member_id = " + memberId;
+			//dbCon.stmt.executeUpdate(sql);
+			
+			//Delete the weixin member associated with this member.
+			WeixinMemberDao.deleteByCond(dbCon, staff, new WeixinMemberDao.ExtraCond().setMember(member));
+			
+			//Delete the member
+			sql = " DELETE FROM " + Params.dbName + ".member WHERE member_id = " + member.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			amount++;
+		}
+		return amount;
+	}
+	
+	/**
+	 * Delete the member to specific id
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberId
+	 * 			the member id to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the member to delete does NOT exist
+	 */
+	public static void deleteById(Staff staff, int memberId) throws SQLException, BusinessException {
+		if(deleteByCond(staff, new ExtraCond().setId(memberId)) == 0){
+			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
+		}
+	}
 
 	/**
-	 * Delete the member and associated member operation (today & history) according to id
+	 * Delete the member to specific id
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -1036,38 +1121,13 @@ public class MemberDao {
 	 * 			the member id to delete
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the member to delete does NOT exist
 	 */
-	public static void deleteById(DBCon dbCon, Staff staff, int memberId) throws SQLException{
-		String sql;
-		//Delete the coupon associated with this member
-		CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setMember(memberId));
-		
-		//Delete the interested member.
-		sql = " DELETE FROM " + Params.dbName + ".interested_member WHERE member_id = " + memberId;
-		dbCon.stmt.executeUpdate(sql);
-		
-		//Delete the member comment.
-		sql = " DELETE FROM " + Params.dbName + ".member_comment WHERE member_id = " + memberId;
-		dbCon.stmt.executeUpdate(sql);
-		
-		//Delete the member operation.
-		//sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE member_id = " + memberId;
-		//dbCon.stmt.executeUpdate(sql);
-		
-		//Delete the member operation history.
-		//sql = " DELETE FROM " + Params.dbName + ".member_operation_history WHERE member_id = " + memberId;
-		//dbCon.stmt.executeUpdate(sql);
-		
-		//Change the weixin status to be interested if exist
-		sql = " UPDATE " + Params.dbName + ".weixin_member SET " +
-			  " status = " + WeixinMemberDao.Status.INTERESTED.getVal() +
-			  " WHERE member_id = " + memberId;
-		dbCon.stmt.executeUpdate(sql);
-		
-		//Delete the member
-		sql = " DELETE FROM " + Params.dbName + ".member WHERE member_id = " + memberId;
-		dbCon.stmt.executeUpdate(sql);
-		
+	public static void deleteById(DBCon dbCon, Staff staff, int memberId) throws SQLException, BusinessException{
+		if(deleteByCond(dbCon, staff, new ExtraCond().setId(memberId)) == 0){
+			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
+		}
 	}
 	
 	/**
