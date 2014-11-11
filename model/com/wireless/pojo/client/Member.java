@@ -101,14 +101,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	public static class InsertBuilder{
-		private Member data;
+		private final Member data = new Member();
+		
 		public InsertBuilder(String name, String mobile, int memberTypeId){
-			this.data = new Member();
 			this.data.setName(name);
 			this.data.setMobile(mobile);
 			this.data.setMemberType(new MemberType(memberTypeId));
 		}
-		
+
 		public InsertBuilder setSex(Sex sex){
 			this.data.setSex(sex);
 			return this;
@@ -118,10 +118,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			return this;
 		}
 		public InsertBuilder setBirthday(long birthday){
-			this.data.setBirthday(birthday);
-			return this;
-		}
-		public InsertBuilder setBirthday(String birthday){
 			this.data.setBirthday(birthday);
 			return this;
 		}
@@ -319,11 +315,12 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private long createDate;			// 创建时间
 	private MemberType memberType;		// 会员类型
 	private String memberCard;			// 会员卡号
-	private boolean attentioned = false;
+	
+	private WeixinMember weixin;		// 微信信息
 	//Ta喜欢的菜品
-	private List<Food> favorFoods = new ArrayList<Food>();
+	private final List<Food> favorFoods = new ArrayList<Food>();
 	//向Ta推荐的菜品
-	private List<Food> recommendFoods = new ArrayList<Food>();
+	private final List<Food> recommendFoods = new ArrayList<Food>();
 	
 	//会员的公开评论
 	private SortedList<MemberComment> publicComments = SortedList.newInstance(new Comparator<MemberComment>(){
@@ -340,6 +337,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}	
 	
 	});
+	
 	private MemberComment privateComment;	//某个员工的私有评论
 	
 	private Member(){
@@ -773,7 +771,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.putString("memberCard", this.memberCard);
 		jm.putJsonableList("publicComment", this.publicComments, 0);
 		jm.putJsonable("privateComment", this.privateComment, 0);
-		jm.putBoolean("acctendtioned", this.attentioned);
 		return jm;
 	}
 
@@ -854,6 +851,18 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		this.memberCard = memberCard;
 	}
 	
+	public void setWeixin(WeixinMember weixin){
+		this.weixin = weixin;
+	}
+	
+	public WeixinMember getWeixin(){
+		return this.weixin;
+	}
+	
+	public boolean hasWeixin(){
+		return this.weixin != null;
+	}
+	
 	public String getName() {
 		if(name == null){
 			name = "";
@@ -896,20 +905,16 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		this.mobile = mobile;
 	}
 	
+	public boolean hasMobile(){
+		return this.mobile.trim().length() != 0;
+	}
+	
 	public long getBirthday() {
 		return birthday;
 	}
 	
 	public void setBirthday(long birthday) {
 		this.birthday = birthday;
-	}
-	
-	public void setBirthday(String birthday) {
-		if(birthday != null && birthday.trim().length() > 0){
-			this.birthday = DateUtil.parseDate(birthday);
-		}else{
-			this.birthday = 0;
-		}
 	}
 	
 	public String getIdCard() {
@@ -1092,13 +1097,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			this.recommendFoods.clear();
 			this.recommendFoods.addAll(recommendFoods);
 		}
-	}
-	public boolean getAttentioned() {
-		return attentioned;
-	}
-
-	public void setAttentioned(boolean attentioned) {
-		this.attentioned = attentioned;
 	}
 
 	@Override
