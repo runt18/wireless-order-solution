@@ -1128,7 +1128,7 @@ public class MemberDao {
 			//dbCon.stmt.executeUpdate(sql);
 			
 			//Delete the weixin member associated with this member.
-			WeixinMemberDao.deleteByCond(dbCon, staff, new WeixinMemberDao.ExtraCond().setMember(member));
+			//WeixinMemberDao.deleteByCond(dbCon, staff, new WeixinMemberDao.ExtraCond().setMember(member));
 			
 			//Delete the member
 			sql = " DELETE FROM " + Params.dbName + ".member WHERE member_id = " + member.getId();
