@@ -1355,7 +1355,7 @@ fieldset.x-panel-collapsed .x-fieldset-bwrap {
         
 .ext-gecko .x-window-body .x-form-item {
     -moz-outline: none;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .ext-gecko .x-form-item {
