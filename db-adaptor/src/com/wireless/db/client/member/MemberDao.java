@@ -648,6 +648,51 @@ public class MemberDao {
 	}
 	
 	/**
+	 * Get the member according to weixin serial.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param weixinSerial
+	 * 			the member serial to search
+	 * @return the member associated with this id
+	 * @throws BusinessException
+	 * 			throws if the member to this weixin serial is NOT found
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static Member getByWxSerial(Staff staff, String weixinSerial) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByWxSerial(dbCon, staff, weixinSerial);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the member according to weixin serial.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param weixinSerial
+	 * 			the member serial to search
+	 * @return the member associated with this id
+	 * @throws BusinessException
+	 * 			throws if the member to this weixin serial is NOT found
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static Member getByWxSerial(DBCon dbCon, Staff staff, String weixinSerial) throws SQLException, BusinessException{
+		List<Member> result = getByCond(dbCon, staff, new ExtraCond().setWeixinSerial(weixinSerial), null);
+		if(result.isEmpty()){
+			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
+		}else{
+			return result.get(0);
+		}
+	}
+	
+	/**
 	 * Get the member according to member id.
 	 * @param staff
 	 * 			the staff to perform this action
