@@ -23,12 +23,10 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.WeixinMemberError;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.client.WeixinMember;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -67,6 +65,8 @@ public class WXOperateMemberAction extends DispatchAction {
 			final Restaurant restaurant = RestaurantDao.getById(dbCon, rid);
 			
 			final Member member = MemberDao.getByWxSerial(dbCon, staff, openId);
+			member.setMemberType(MemberTypeDao.getById(dbCon, staff, member.getMemberType().getId()));
+			
 			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getAdminByRestaurant(rid), member.getId());
 			
 			final int rank = ((mr.getTotal() - mr.getRank()) * 100)/mr.getTotal();
@@ -100,7 +100,7 @@ public class WXOperateMemberAction extends DispatchAction {
 					JsonMap jm = new JsonMap();
 					jm.putJsonable("member", j, 0);
 					jm.putJsonable("restaurant", restaurant, 0);
-					jm.putInt("status", WeixinMember.Status.BOUND.getVal());
+					jm.putInt("status", member.getMobile() != null && !member.getMobile().isEmpty()?WeixinMember.Status.BOUND.getVal():WeixinMember.Status.INTERESTED.getVal());
 					jm.putInt("weixinCard", weixinCard);
 					if(!couponList.isEmpty()){
 						jm.putBoolean("hasCoupon", true);
@@ -116,10 +116,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			});
 			
 		}catch(BusinessException e){
-			
-			if(e.getErrCode() == WeixinMemberError.WEIXIN_MEMBER_NOT_BOUND){
-				
-				final int weixinCard = WeixinMemberDao.getCardByWeixin(dbCon, openId, formId);
+/*				final int weixinCard = WeixinMemberDao.getCardByWeixin(dbCon, openId, formId);
 				
 				final List<MemberType> list = MemberTypeDao.getByCond(StaffDao.getAdminByRestaurant(rid), new MemberTypeDao.ExtraCond().setType(MemberType.Type.WEIXIN), " ORDER BY MT.member_type_id ");
 				jobject.setExtra(new Jsonable(){
@@ -138,11 +135,9 @@ public class WXOperateMemberAction extends DispatchAction {
 						
 					}
 					
-				});				
-			}else{
+				});		*/		
 				e.printStackTrace();
 				jobject.initTip(e);
-			}
 			
 		}catch(SQLException e){
 			e.printStackTrace();
@@ -243,17 +238,20 @@ public class WXOperateMemberAction extends DispatchAction {
 		DBCon dbCon = new DBCon();
 		try{
 			String openId = request.getParameter("oid");
-			String formId = request.getParameter("fid");
+			String fromId = request.getParameter("fid");
 			String codeId = request.getParameter("codeId");
 			String code = request.getParameter("code");
 			
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
+			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
+			Staff staff = StaffDao.getAdminByRestaurant(rid);
+			
 			// 验证验证码
 			VerifySMSDao.verify(dbCon, new VerifyBuilder(Integer.valueOf(codeId), Integer.valueOf(code)));
 			
-			WeixinMemberDao.bind(request.getParameter("mobile"), openId, formId);
+			WeixinMemberDao.bind(dbCon, staff, new WeixinMember.BindBuilder(openId, request.getParameter("mobile")));
 			
 			dbCon.conn.commit();
 		}catch(BusinessException e){
@@ -315,7 +313,7 @@ public class WXOperateMemberAction extends DispatchAction {
 	}
 	
 	/**
-	 * 
+	 * 微信前台绑定
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -323,7 +321,7 @@ public class WXOperateMemberAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward weixinFrontBind(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+/*	public ActionForward weixinFrontBind(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		
@@ -364,4 +362,5 @@ public class WXOperateMemberAction extends DispatchAction {
 		}
 		return null;
 	}	
+	*/
 }
