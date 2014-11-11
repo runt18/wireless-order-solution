@@ -85,7 +85,6 @@ function getVerifyCode(c){
 		success : function(data, status, xhr){
 			if(data.success){
 				verifyCode = data.other.code;
-				Util.lineTD($('#divVerifyAndBind > div[data-type=detail]'), 'show');
 				var interval = null, time = 60;
 				interval = window.setInterval(function(){
 					if(time == 0){
@@ -131,7 +130,7 @@ function bindMember(c){
 	}
 	
 	//确认绑定后跳到页眉
-	$('html, body').animate({scrollTop: 0}, 'fast',function(){
+/*	$('html, body').animate({scrollTop: 0}, 'fast',function(){
 		if(!c.bind){
 			//防止两次绑定
 			c.bind = true;
@@ -177,6 +176,47 @@ function bindMember(c){
 		}
 
 	});
+	*/
+	setBtnDisabled(true);
+	$.ajax({
+		url : '../../WXOperateMember.do',
+		type : 'post',
+		data : {
+			dataSource : 'bind',
+			oid : Util.mp.oid,
+			fid : Util.mp.fid,
+			codeId : verifyCode.id,
+			code : code.val().trim(),
+			mobile : mobile.val().trim()
+		},
+		dataType : 'json',
+		success : function(data, status, xhr){
+			if(data.success){
+/*				if(haveWelcomePageId){
+					$.post('../../QueryCoupon.do',{dataSource : 'byCondtion', fid : Util.mp.fid, oid : Util.mp.oid, pId : haveWelcomePageId},function(jr){
+							if(jr.success && jr.root.length > 0){
+								Util.skip('sales.html', jr.root[0].couponId);
+							}else{
+								window.location.reload();
+							}
+					});
+					
+				}else{
+					window.location.reload();
+				}*/
+				
+				window.location.reload();
+				
+			}else{
+				Util.dialog.show({title: data.title, msg: data.msg});
+			}
+			setBtnDisabled(false);
+		},
+		error : function(data, errotType, eeor){
+			setBtnDisabled(false);
+			Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+		}
+	});	
 	
 
 }
@@ -185,7 +225,6 @@ function bindMember(c){
  */
 function resetMobile(){
 	$('#divMemberContent').css('display', 'none');
-	$('#divResetMobile').css('display', 'block');
 }
 function getVerifyCodeByReset(c){
 	c = c == null ? {} : c;
@@ -295,7 +334,7 @@ function toggleConsumeDetails(){
 	var mainView = $('#divConsumeDetails');
 	var tbody = mainView.find('table > tbody');
 	var templet = '<tr class="d-list-item-consume">'
-		+ '<td>{date}</td>'
+		+ '<td style="text-align: center;">{date}</td>'
 		+ '<td>{balance}</td>'
 		+ '<td>{point}</td>'
 		+ '</tr>';
@@ -353,7 +392,7 @@ function toggleRechargeDetails(){
 	var mainView = $('#divRechargeDetails');
 	var tbody = mainView.find('table > tbody');
 	var templet = '<tr class="d-list-item">'
-		+ '<td>{date}</td>'
+		+ '<td style="text-align: center;">{date}</td>'
 		+ '<td>{chargeMoney}</td>'
 		+ '<td>{deltaTotalMoney}</td>'
 		+ '</tr>';
@@ -569,7 +608,13 @@ function toggleMemberLevel(){
 				toggleMemberLevel.load = function(){
 					Util.lm.show();
 					$('html, body').animate({scrollTop: 0});
-					$('html, body').animate({scrollTop: 310+$('#divMemberPointContent').height()+$('#divMemberBalanceContent').height()}, 'fast');					
+					var height = 350;
+					height += $('#divMemberPointContent').height();
+					height += $('#divMemberBalanceContent').height();
+					if($('#divToBindWeixinMember').is(':visible')){
+						height += $('#divToBindWeixinMember').height();
+					}
+					$('html, body').animate({scrollTop: height}, 'fast');					
 					$.post('../../QueryMemberLevel.do', {dataSource : 'chart', rid:member.restaurant.id}, function(result){
 						if(result.success){
 							mainView.prepend('<h3>会员等级列表</h3>');
@@ -582,6 +627,9 @@ function toggleMemberLevel(){
 					
 							yAxisData = chartDatas.data;
 							
+							//动态变化chart高度
+							$('#divMemberLevelChart').height(yAxisData.length * (window.screen.width > 320 ? 70 : 95) + 140);
+							
 							var chartMinAndMax;
 							
 							if(yAxisData[yAxisData.length-1].x >= currentMemberLevelData.x){
@@ -589,6 +637,7 @@ function toggleMemberLevel(){
 							}else{
 								chartMinAndMax = currentMemberLevelData.x;
 							}
+							//添加用户等级位置
 							yAxisData.push(currentMemberLevelData);
 							
 							member_loadMemberTypeChart({minY:-chartMinAndMax * 0.15, maxY:chartMinAndMax * 1.2, series:yAxisData});
@@ -633,11 +682,23 @@ function getLevelChartInfo(x,point){
 			}
 		}	
 	}
-	return '<span style="font-size : 14px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
+	
+	var pointFormat;
+	if(window.screen.width > 320){
+		pointFormat = '<span style="font-size : 14px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
+			+ (temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>'
+			+ (temp.chargeRate > 1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠，充100送'+parseInt((temp.chargeRate*100 - 100))+'元':'')  + '</font>' 
+			+ (temp.exchangeRate > 1 ? '<br/>'+ '<font style="font-size: 12px;color:maroon">' + temp.exchangeRate +'倍积分特权，消费1元积'+temp.exchangeRate+'分':'') + '</font>' 			
+			;
+	}else{
+		pointFormat = '<span style="font-size : 14px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
 			+ (temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>' 
-			+ (temp.chargeRate >1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠，</font> <br/><font style="font-size: 13px;color:maroon">充100送'+parseInt((temp.chargeRate-1)*100)+'元':'')  + '</font>' 
-			+ (temp.exchangeRate >1 ? '<br/>'+ '<font style="font-size: 12px;color:maroon">' + temp.exchangeRate +'倍积分特权，</font> <br/><font style="font-size: 13px;color:maroon">消费1元积'+temp.exchangeRate+'分':'') + '</font>' 
-			;		
+			+ (temp.chargeRate > 1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠，</font> <br/><font style="font-size: 13px;color:maroon">充100送'+parseInt((temp.chargeRate*100 - 100))+'元':'')  + '</font>' 
+			+ (temp.exchangeRate > 1 ? '<br/>'+ '<font style="font-size: 12px;color:maroon">' + temp.exchangeRate +'倍积分特权，</font> <br/><font style="font-size: 13px;color:maroon">消费1元积'+temp.exchangeRate+'分':'') + '</font>' 
+			;
+	}
+	
+	return pointFormat;		
 }
 
 function member_loadMemberTypeChart(c){
@@ -691,7 +752,7 @@ function member_loadMemberTypeChart(c){
 						cursor : 'pointer',
 						dataLabels : {
 							x: 10,
-							y : 23,							
+							y : 37,							
 							align : 'left',
 							enabled : true,
 							style : {
@@ -719,3 +780,4 @@ function member_loadMemberTypeChart(c){
 			};
 			new Highcharts.Chart(chart);
 }
+
