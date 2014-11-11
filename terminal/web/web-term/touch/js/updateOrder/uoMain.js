@@ -384,8 +384,9 @@ uo.showdivKeyboardPeopleForUO = function(c){
  * 确定修改餐桌人数
  */
 uo.saveForChangePeople = function(){
-	var num;
-	num = parseInt($("#" + inputNumIdUO).val());
+	
+	var num = $("#" + inputNumIdUO).val();
+	
 	//关闭该界面
 	Util.dialongDisplay({
 		type : 'hide',
@@ -397,6 +398,8 @@ uo.saveForChangePeople = function(){
 	//更改页面端的的人数
 	$("#customNumForUO").html("用餐人数：" + num);	
 	$("#divLeftForKeyboardPeopleForUO > div[class*=isSave]").unbind("click");
+	uo.updateCustom = true;
+	uo.saveForUO();
 };
 
 /**
@@ -414,14 +417,12 @@ uo.saveForUO = function(){
 	}else{
 		for(var x = 0; x < uoFood.length; x++){
 			for(var y = 0; y < uoCancelFoods.length; y++){
-				//alert(JSON.stringify(uoCancelFoods[y]));//return;
 				if(uoFood[x].id == uoCancelFoods[y].id && uoFood[x].tasteGroup.tastePref == uoCancelFoods[y].dishes){
 					uoFood[x].count = parseFloat(uoFood[x].count + uoCancelFoods[y].count).toFixed(2);
 					uoFood[x].cancelReason = uoCancelFoods[y].reason;
 				}
 			}
 		}
-//		uoCancelFoods = [];
 		uo.updateOrder = uoFood;
 		//对更新的菜品和人数进行提交
 		uo.submitUpdateOrderHandler(uoFood);	
@@ -459,7 +460,7 @@ uo.cancelForUO = function(){
  * @param {object} o 触发该函数的按钮对象 
  */
 function inputNumUO(o){
-	inputNumValUO = $("#" + inputNumIdUO).val();
+	inputNumValUO = $("#" + inputNumIdUO).val() != 0 ? $("#" + inputNumIdUO).val() : "";
 	//设置输入框的显示值（原有值加上输入值）
 	inputNumValUO += o.innerHTML;
 	$("#" + inputNumIdUO).val(inputNumValUO);
@@ -643,15 +644,22 @@ uo.submitUpdateOrderHandler = function(c){
 							uo.tempPayForUO();
 						}else{
 							if(uo.canceling){
-								updateTable({
-									alias : uo.table.alias
-								});
 								Util.msg.alert({
 									title : data.title,
 									msg : '退菜成功', 
 									time : 2
 								});		
 								uo.canceling = false;
+							}else if(uo.updateCustom){
+								updateTable({
+									alias : uo.table.alias
+								});
+								Util.msg.alert({
+									title : data.title,
+									msg : '修改成功', 
+									time : 2
+								});	
+								uo.updateCustom = false;
 							}else{
 								Util.msg.alert({
 									title : data.title,
@@ -686,8 +694,6 @@ uo.submitUpdateOrderHandler = function(c){
 								title : data.title,
 								msg : data.msg, 
 								fn : function(btn){
-	/*								Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
-									initTableData();*/
 									return;
 								}
 							});
