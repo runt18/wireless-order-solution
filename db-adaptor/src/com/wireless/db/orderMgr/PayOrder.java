@@ -391,9 +391,26 @@ public class PayOrder {
 		//Get all the details of order.
 		Order orderToCalc = OrderDao.getById(dbCon, staff, payBuilder.getOrderId(), DateType.TODAY);
 		
-		//Set the discount details to this order.
+		//Set the discount & price plan details to this order.
 		if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
 			Member member = MemberDao.getById(dbCon, staff, payBuilder.getMemberId());
+			//Set the price plan associated with the member to this order.
+			if(payBuilder.hasPricePlan()){
+				final List<PricePlan> result;
+				if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
+					//Get the price plan allowed by this member type and matched plan id.
+					result = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(payBuilder.getPricePlanId()).setMemberType(member.getMemberType()));
+					if(result.isEmpty()){
+						throw new BusinessException(StaffError.PRICE_PLAN_NOT_ALLOW);
+					}else{
+						orderToCalc.setPricePlan(result.get(0));
+					}
+				}
+			}else{
+				orderToCalc.setPricePlan(member.getMemberType().getDefaultPrice());
+			}
+			
+			//Set the discount associated with the member to this order.
 			if(payBuilder.hasMemberDiscount()){
 				//Check to see whether the member discount id is valid.
 				boolean isExist = false;
@@ -463,25 +480,6 @@ public class PayOrder {
 			}
 		}
 		
-		if(payBuilder.hasPricePlan()){
-			final List<PricePlan> result;
-			if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
-				//Get the price plan allowed by this member type and matched plan id.
-				result = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(payBuilder.getPricePlanId())
-																						  .setMemberType(MemberDao.getById(dbCon, staff, payBuilder.getMemberId()).getMemberType()));
-				if(result.isEmpty()){
-					throw new BusinessException(StaffError.PRICE_PLAN_NOT_ALLOW);
-				}else{
-					orderToCalc.setPricePlan(result.get(0));
-				}
-			}
-//			else{
-//				//Get the price plan allowed by role to the staff perform payment.
-//				result = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(payBuilder.getPricePlanId()).setRole(staff.getRole()));
-//			}
-
-		}
-
 		float cancelPrice = 0;
 		//Calculate the cancel price to this order.
 		sql = " SELECT " + 
