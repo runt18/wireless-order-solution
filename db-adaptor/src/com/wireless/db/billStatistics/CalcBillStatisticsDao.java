@@ -220,7 +220,7 @@ public class CalcBillStatisticsDao {
 		//Calculate the single payment to each pay type.
 		sql = " SELECT " +
 			  " O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, " +
-			  " COUNT(*) AS amount, ROUND(SUM(O.total_price), 2) AS total, ROUND(SUM(O.actual_price), 2) AS actual " +
+			  " COUNT(*) AS amount, ROUND(SUM(O.total_price), 2) AS total_income, ROUND(SUM(O.actual_price), 2) AS actual_income " +
 			  " FROM " + Params.dbName + "." + extraCond.orderTbl + " O " +
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
 			  " WHERE 1 = 1 " +
@@ -235,8 +235,8 @@ public class CalcBillStatisticsDao {
 			PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
 			payType.setName(dbCon.rs.getString("pay_type_name"));
 			int amount = dbCon.rs.getInt("amount");
-			float total = dbCon.rs.getFloat("total");
-			float actual = dbCon.rs.getFloat("actual");
+			float total = dbCon.rs.getFloat("total_income");
+			float actual = dbCon.rs.getFloat("actual_income");
 			incomeByPay.addPaymentIncome(new IncomeByPay.PaymentIncome(payType, amount, total, actual));
 		}
 		dbCon.rs.close();
@@ -244,7 +244,7 @@ public class CalcBillStatisticsDao {
 		//Calculate the mixed payment income to each pay type.
 		sql = " SELECT " +
 			  " MP.pay_type_id, IFNULL(MAX(PT.name), '其他') AS pay_type_name, " +
-			  " COUNT(*) AS amount, ROUND(SUM(MP.price), 2) AS total, ROUND(SUM(MP.price), 2) AS actual " +
+			  " COUNT(*) AS amount, ROUND(SUM(MP.price), 2) AS total_income, ROUND(SUM(MP.price), 2) AS actual_income " +
 			  " FROM " + Params.dbName + "." + extraCond.orderTbl + " O " +
 			  " JOIN " + Params.dbName + "." + extraCond.mixedTbl + " MP ON O.id = MP.order_id " +
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON MP.pay_type_id = PT.pay_type_id " +
@@ -261,8 +261,8 @@ public class CalcBillStatisticsDao {
 			PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
 			payType.setName(dbCon.rs.getString("pay_type_name"));
 			int amount = dbCon.rs.getInt("amount");
-			float total = dbCon.rs.getFloat("total");
-			float actual = dbCon.rs.getFloat("actual");
+			float total = dbCon.rs.getFloat("total_income");
+			float actual = dbCon.rs.getFloat("actual_income");
 			incomeByPay.addPaymentIncome(new IncomeByPay.PaymentIncome(payType, amount, total, actual));
 		}
 		dbCon.rs.close();

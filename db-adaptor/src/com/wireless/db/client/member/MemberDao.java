@@ -648,6 +648,51 @@ public class MemberDao {
 	}
 	
 	/**
+	 * Get the member according to weixin card.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param weixinCard
+	 * 			the member weixin card to search
+	 * @return the member associated with this id
+	 * @throws BusinessException
+	 * 			throws if the member to this weixin card is NOT found
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static Member getByWxCard(Staff staff, int weixinCard) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByWxCard(dbCon, staff, weixinCard);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the member according to weixin card.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param weixinCard
+	 * 			the member weixin card to search
+	 * @return the member associated with this id
+	 * @throws BusinessException
+	 * 			throws if the member to this weixin card is NOT found
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static Member getByWxCard(DBCon dbCon, Staff staff, int weixinCard) throws SQLException, BusinessException{
+		List<Member> result = getByCond(dbCon, staff, new ExtraCond().setWeixinCard(weixinCard), null);
+		if(result.isEmpty()){
+			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
+		}else{
+			return fill(dbCon, staff, result.get(0));
+		}
+	}
+	
+	/**
 	 * Get the member according to weixin serial.
 	 * @param staff
 	 * 			the staff to perform this action
@@ -688,7 +733,7 @@ public class MemberDao {
 		if(result.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
-			return result.get(0);
+			return fill(dbCon, staff, result.get(0));
 		}
 	}
 	
@@ -732,12 +777,15 @@ public class MemberDao {
 		if(result.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
-			Member member = result.get(0);
-			if(member.hasWeixin()){
-				member.setWeixin(WeixinMemberDao.getByCard(dbCon, staff, member.getWeixin().getCard()));
-			}
-			return member;
+			return fill(dbCon, staff, result.get(0));
 		}
+	}
+	
+	private static Member fill(DBCon dbCon, Staff staff, Member member) throws SQLException, BusinessException{
+		if(member.hasWeixin()){
+			member.setWeixin(WeixinMemberDao.getByCard(dbCon, staff, member.getWeixin().getCard()));
+		}
+		return member;
 	}
 	
 	/**
@@ -752,11 +800,11 @@ public class MemberDao {
 	 * 			throws the member to this card does NOT exist
 	 */
 	public static Member getByCard(DBCon dbCon, Staff staff, String cardAlias) throws SQLException, BusinessException{
-		List<Member> ml = MemberDao.getDetail(dbCon, staff, new ExtraCond().setCard(cardAlias), null);
-		if(ml.isEmpty()){
+		List<Member> result = MemberDao.getDetail(dbCon, staff, new ExtraCond().setCard(cardAlias), null);
+		if(result.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
-			return ml.get(0);
+			return fill(dbCon, staff, result.get(0));
 		}
 	}
 	
@@ -799,7 +847,7 @@ public class MemberDao {
 		if(result.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
-			return result.get(0);
+			return fill(dbCon, staff, result.get(0));
 		}
 	}
 	
