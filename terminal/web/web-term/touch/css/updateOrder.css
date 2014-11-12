@@ -49,7 +49,7 @@
 	border-top: 1px solid #fff;
 }
 .cancelFoodBtn{
-	padding : 20px;
+	padding : 20px 15px;
 	width: 45%; 
 	height: 60px;
 	margin: 2px 0px;
@@ -60,7 +60,7 @@
 	height: 60px;
 	margin: 2px 0px;
 	line-height: 60px;
-	padding : 20px;
+	padding : 20px 15px;
 }
 
 #divKeyboardNumForUO{

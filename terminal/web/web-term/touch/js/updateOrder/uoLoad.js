@@ -125,14 +125,14 @@ function showNorthForUpdateOrder(){
  */
 function showOrder(){
 	var html = "<tr>" +
-				"<th style = 'width: 4%'></th>" +
+				"<th style = 'width: 2%'></th>" +
 				"<th style = 'width: 24%'>菜名</th>" +
 				"<th style = 'width: 6%'>数量</th>" +
 				"<th style = 'width: 22%'>口味</th>" +
 				"<th style = 'width: 6%'>单价</th>" +
 				"<th style = 'width: 6%'>总价</th>" +
 				"<th style = 'width: 10%'>时间</th>" +
-				"<th>操作</th>" +
+				"<th style = 'width: 15%'>操作</th>" +
 				"<th>服务员</th>" +
 			"</tr>";
 	for(var i = 0; i < uoFood.length; i++){

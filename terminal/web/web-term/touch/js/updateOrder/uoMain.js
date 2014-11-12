@@ -362,6 +362,7 @@ uo.showdivKeyboardPeopleForUO = function(c){
 		//设定输入框的id和初始显示信息
 		inputNumIdUO = 'txtPeopleNumForUO';
 		inputNumValUO = $("#customNumForUO").html().substring(5);
+		uo.selectAll = true;
 		$("#" + inputNumIdUO).val(inputNumValUO);
 		$("#" + inputNumIdUO).select();
 		inputNumValUO = "";
@@ -460,9 +461,15 @@ uo.cancelForUO = function(){
  * @param {object} o 触发该函数的按钮对象 
  */
 function inputNumUO(o){
-	inputNumValUO = $("#" + inputNumIdUO).val() != 0 ? $("#" + inputNumIdUO).val() : "";
+	if(uo.selectAll){
+		inputNumValUO = "";
+	}else{
+		inputNumValUO = $("#" + inputNumIdUO).val() != 0 ? $("#" + inputNumIdUO).val() : "";
+	}
+	
 	//设置输入框的显示值（原有值加上输入值）
 	inputNumValUO += o.innerHTML;
+	uo.selectAll = false;
 	$("#" + inputNumIdUO).val(inputNumValUO);
 	$("#" + inputNumIdUO).focus();
 	//判断退菜数目是否合法
