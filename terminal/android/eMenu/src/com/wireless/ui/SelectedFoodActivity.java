@@ -353,12 +353,8 @@ public class SelectedFoodActivity extends Activity
 						button2.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								try {
-									orderFood.addCount(orderFood.getDelta());
-									mFoodListHandler.sendEmptyMessage(0);
-								} catch (BusinessException e) {
-									Toast.makeText(SelectedFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-								}
+								orderFood.addCount(orderFood.getDelta());
+								mFoodListHandler.sendEmptyMessage(0);
 							}
 						});
 					}else{
