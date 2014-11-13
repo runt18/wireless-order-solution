@@ -56,7 +56,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 			if(sv != null && !sv.trim().isEmpty()){
 				
 				if(Integer.parseInt(s_type) == 0){
-					extra.setMobileOrCard(sv);
+					extra.setFuzzyName(sv);
 					membersByType = MemberDao.getByCond(staff, extra, null);					
 				}else{
 					extra.setMobile(sv);
