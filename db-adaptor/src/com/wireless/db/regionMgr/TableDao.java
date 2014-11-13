@@ -193,7 +193,7 @@ public class TableDao {
 		sql = " SELECT " +
 			  " REGION.name AS region_name, REGION.region_id, REGION.restaurant_id, " +
 			  " TBL.table_id, TBL.table_alias, TBL.name AS tbl_name, TBL.minimum_cost, " +
-			  " O.custom_num, O.category, " + 
+			  " O.custom_num, O.category, O.id, " + 
 			  " IF(O.status IS NULL, " + Table.Status.IDLE.getVal() + "," + Table.Status.BUSY.getVal() + ") AS tbl_status " + 
 			  " FROM " + Params.dbName + ".table TBL " +
 			  " LEFT JOIN " + Params.dbName + ".region REGION ON REGION.region_id = TBL.region_id AND REGION.restaurant_id = TBL.restaurant_id " +
@@ -217,6 +217,7 @@ public class TableDao {
 				table.setStatus(Table.Status.BUSY);
 				table.setCategory(Order.Category.valueOf(dbCon.rs.getInt("category")));
 				table.setCustomNum(dbCon.rs.getInt("custom_num"));
+				table.setOrderId(dbCon.rs.getInt("id"));
 			}else{
 				table.setStatus(Table.Status.IDLE);
 			}
