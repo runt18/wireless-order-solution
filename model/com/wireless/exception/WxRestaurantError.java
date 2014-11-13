@@ -1,6 +1,6 @@
 package com.wireless.exception;
 
-public class WeixinRestaurantError extends ErrorEnum{
+public class WxRestaurantError extends ErrorEnum{
 	
 	/* cord range : 7550 - 7599 */
 	public static final ErrorCode WEIXIN_RESTAURANT_VERIFY_FAIL = build(7550, "餐厅帐号与微信服务器验证不成功");
@@ -8,16 +8,16 @@ public class WeixinRestaurantError extends ErrorEnum{
 	public static final ErrorCode WEIXIN_UPDATE_INFO_FAIL = build(7548, "操作失败, 未修改微信餐厅简介信息.");
 	public static final ErrorCode WEIXIN_RESTAURANT_NOT_EXIST = build(7549, "微信餐厅信息不存在.");
 	
-	private WeixinRestaurantError(){
+	private WxRestaurantError(){
 		
 	}
 	
 	private static ErrorCode build(int code, String desc){
-		return build(ErrorType.WEIXIN_RESTAURANT, code, desc, ErrorLevel.ERROR);
+		return build(ErrorType.WX_RESTAURANT, code, desc, ErrorLevel.ERROR);
 	}
 	
 	public static ErrorCode valueOf(int code){
-		return valueOf(ErrorType.WEIXIN_RESTAURANT, code);
+		return valueOf(ErrorType.WX_RESTAURANT, code);
 	}
 
 }

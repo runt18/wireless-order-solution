@@ -9,11 +9,11 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.OrderFood;
 
-public class WXOrder implements Jsonable{
+public class WxOrder implements Jsonable{
 	
 	public static enum Status{
 		INVALID(1, "已失效"),
-		COMMITTED(2, "已下单");
+		COMMITTED(2, "已提交");
 		
 		private final int val;
 		private final String desc;
@@ -88,8 +88,8 @@ public class WXOrder implements Jsonable{
 			return this.status != null;
 		}
 		
-		public WXOrder build(){
-			return new WXOrder(this);
+		public WxOrder build(){
+			return new WxOrder(this);
 		}
 	}
 	
@@ -97,7 +97,7 @@ public class WXOrder implements Jsonable{
 		private final String weixinSerial;
 		private final Type type;
 		private final Status status;
-		private final WXOrder order = new WXOrder(0);
+		private final WxOrder order = new WxOrder(0);
 		
 		InsertBuilder(String weixinSerial, Type type, Status status){
 			this.weixinSerial = weixinSerial;
@@ -117,14 +117,24 @@ public class WXOrder implements Jsonable{
 			return this;
 		}
 		
-		public WXOrder build(){
-			return new WXOrder(this);
+		public WxOrder build(){
+			return new WxOrder(this);
 		}
 	} 
 	
 	public static class InsertBuilder4Inside extends InsertBuilder{
 		public InsertBuilder4Inside(String weixinSerial){
 			super(weixinSerial, Type.INSIDE, Status.COMMITTED);
+		}
+		
+		public InsertBuilder4Inside add(OrderFood foodToAdd) throws BusinessException{
+			super.add(foodToAdd);
+			return this;
+		}
+		
+		public InsertBuilder4Inside addAll(List<OrderFood> foodsToAdd) throws BusinessException{
+			super.addAll(foodsToAdd);
+			return this;
 		}
 	}
 	
@@ -137,18 +147,19 @@ public class WXOrder implements Jsonable{
 	private int restaurantId;
 	private final List<OrderFood> foods = new ArrayList<OrderFood>();
 	
-	private WXOrder(UpdateBuilder builder){
+	private WxOrder(UpdateBuilder builder){
 		setId(builder.id);
 		setStatus(builder.status);
 	}
 	
-	private WXOrder(InsertBuilder builder){
+	private WxOrder(InsertBuilder builder){
 		setWeixinSerial(builder.weixinSerial);
 		setType(builder.type);
 		setStatus(builder.status);
+		setFoods(builder.order.getFoods());
 	}
 	
-	public WXOrder(int id){
+	public WxOrder(int id){
 		this.id = id;
 	}
 	
@@ -212,7 +223,7 @@ public class WXOrder implements Jsonable{
 		return Collections.unmodifiableList(foods);
 	}
 
-	public void addFood(OrderFood foodToAdd) throws BusinessException{
+	public void addFood(OrderFood foodToAdd){
 		//Check to see whether the food to add is already contained. 
 		int index = foods.indexOf(foodToAdd);
 		
@@ -225,13 +236,13 @@ public class WXOrder implements Jsonable{
 		}
 	}
 	
-	public void addFoods(List<OrderFood> foodsToAdd) throws BusinessException{
+	public void addFoods(List<OrderFood> foodsToAdd) {
 		for(OrderFood of : foodsToAdd){
 			addFood(of);
 		}
 	}
 	
-	public void setFoods(List<OrderFood> foods) throws BusinessException {
+	public void setFoods(List<OrderFood> foods)  {
 		this.foods.clear();
 		addFoods(foods);
 	}

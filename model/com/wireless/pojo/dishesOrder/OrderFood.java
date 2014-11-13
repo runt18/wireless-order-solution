@@ -191,17 +191,15 @@ public class OrderFood implements Parcelable, Jsonable {
 	/**
 	 * Add the order amount to order food.
 	 * @param countToAdd the count to add
-	 * @throws BusinessException
-	 * 			throws if the count to add exceeds {@link MAX_ORDER_AMOUNT}
 	 */
-	public void addCount(float countToAdd) throws BusinessException{
+	public void addCount(float countToAdd){
 		if(countToAdd >= 0){
 			float amount = mCurCnt + countToAdd; 
 			if(amount <= MAX_ORDER_AMOUNT){
 				//mLastCnt = mCurCnt;
 				mCurCnt = amount;
 			}else{
-				throw new BusinessException("对不起，\"" + mFood.getName() + "\"每次最多只能点" + MAX_ORDER_AMOUNT + "份");
+				mCurCnt = MAX_ORDER_AMOUNT;
 			}
 			
 		}else{

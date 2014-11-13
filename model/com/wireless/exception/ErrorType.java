@@ -31,6 +31,7 @@ public enum ErrorType {
 	 *  PRICE_PLAN : 7100 - 7149
 	 *  TABLE : 7050 - 7099
 	 *  PAY_TYPE : 7000 - 7049
+	 *  WX_ORDER : 6959 - 6999
 	 */
 	UNKNOWN(1, "unknown"),
 	PROTOCOL(2, "protocol"),
@@ -50,9 +51,9 @@ public enum ErrorType {
 	PRINT_SCHEME(16, "print scheme"),
 	STAFF(17, "staff"),
 	DEVICE(18, "device"),
-	WEIXIN_FINANCE(19, "weixin_finance"),
-	WEIXIN_RESTAURANT(20, "weixin_restaurant"),
-	WEIXIN_MEMBER(21, "weixin_member"),
+	WX_FINANCE(19, "weixin_finance"),
+	WX_RESTAURANT(20, "weixin_restaurant"),
+	WX_MEMBER(21, "weixin_member"),
 	SMS(22, "sms"),
 	MODULE(23, "module"),
 	REGION(24, "region"),
@@ -61,7 +62,8 @@ public enum ErrorType {
 	OSS_IMAGE(27, "oss_image"),
 	PRICE_PLAN(28, "price_plan"),
 	TABLE(29, "table"),
-	PAY_TYPE(30, "pay_type");
+	PAY_TYPE(30, "pay_type"),
+	WX_ORDER(31, "wx_order");
 	
 	private final String desc;
 	
