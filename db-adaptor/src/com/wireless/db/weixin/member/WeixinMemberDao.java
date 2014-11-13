@@ -11,7 +11,7 @@ import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
-import com.wireless.exception.WeixinMemberError;
+import com.wireless.exception.WxMemberError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.WeixinMember;
 import com.wireless.pojo.staffMgr.Staff;
@@ -245,7 +245,7 @@ public class WeixinMemberDao {
 				  " WHERE weixin_card = " + weixinMember.getCard();
 			
 			if(dbCon.stmt.executeUpdate(sql) == 0){
-				throw new BusinessException(WeixinMemberError.WEIXIN_INFO_NOT_EXIST);
+				throw new BusinessException(WxMemberError.WEIXIN_INFO_NOT_EXIST);
 			}
 		}
 
@@ -293,7 +293,7 @@ public class WeixinMemberDao {
 	public static WeixinMember getBySerial(DBCon dbCon, Staff staff, String serial) throws SQLException, BusinessException{
 		List<WeixinMember> result = getByCond(dbCon, staff, new ExtraCond().setSerial(serial));
 		if(result.isEmpty()){
-			throw new BusinessException(WeixinMemberError.WEIXIN_INFO_NOT_EXIST);
+			throw new BusinessException(WxMemberError.WEIXIN_INFO_NOT_EXIST);
 		}else{
 			return result.get(0);
 		}
@@ -316,7 +316,7 @@ public class WeixinMemberDao {
 	public static WeixinMember getByCard(DBCon dbCon, Staff staff, int card) throws SQLException, BusinessException{
 		List<WeixinMember> result = getByCond(dbCon, staff, new ExtraCond().setCard(card));
 		if(result.isEmpty()){
-			throw new BusinessException(WeixinMemberError.WEIXIN_INFO_NOT_EXIST);
+			throw new BusinessException(WxMemberError.WEIXIN_INFO_NOT_EXIST);
 		}else{
 			return result.get(0);
 		}

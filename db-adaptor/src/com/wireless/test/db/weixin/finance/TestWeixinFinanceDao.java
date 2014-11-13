@@ -10,7 +10,7 @@ import org.junit.Test;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.weixin.finance.WeixinFinanceDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.WeixinFinanceError;
+import com.wireless.exception.WxFinanceError;
 import com.wireless.test.db.TestInit;
 
 public class TestWeixinFinanceDao {
@@ -33,7 +33,7 @@ public class TestWeixinFinanceDao {
 		try{
 			WeixinFinanceDao.bind(WEIXIN_SERIAL, "demo", "1demo@123");
 		}catch(BusinessException e){
-			Assert.assertEquals("binding not correct", WeixinFinanceError.ACCOUNT_PWD_NOT_MATCH, e.getErrCode());
+			Assert.assertEquals("binding not correct", WxFinanceError.ACCOUNT_PWD_NOT_MATCH, e.getErrCode());
 		}
 	}
 }

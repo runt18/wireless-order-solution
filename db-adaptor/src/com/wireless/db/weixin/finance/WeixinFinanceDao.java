@@ -6,7 +6,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.WeixinFinanceError;
+import com.wireless.exception.WxFinanceError;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Role;
 
@@ -73,7 +73,7 @@ public class WeixinFinanceDao {
 			restaurantId = dbCon.rs.getInt("id");
 		}else{
 			dbCon.rs.close();
-			throw new BusinessException(WeixinFinanceError.ACCOUNT_PWD_NOT_MATCH);
+			throw new BusinessException(WxFinanceError.ACCOUNT_PWD_NOT_MATCH);
 		}
 		dbCon.rs.close();
 		
@@ -229,7 +229,7 @@ public class WeixinFinanceDao {
 		if(dbCon.rs.next()){
 			restaurantId = dbCon.rs.getInt("restaurant_id");
 		}else{
-			throw new BusinessException(WeixinFinanceError.WEIXIN_SERIAL_NOT_BOUND);
+			throw new BusinessException(WxFinanceError.WEIXIN_SERIAL_NOT_BOUND);
 		}
 		dbCon.rs.close();
 		

@@ -12,7 +12,7 @@ import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.weixin.CalcWeixinSignature;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.WeixinRestaurantError;
+import com.wireless.exception.WxRestaurantError;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
@@ -101,7 +101,7 @@ public class WeixinRestaurantDao {
 			  (builder.isWeixinSecretChanged() ? " ,app_secret = '" + wr.getWeixinAppSecret() + "'" : "") +
 			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException(WeixinRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
+			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
 		}
 		
 		//Associated with the logo oss image.
@@ -154,7 +154,7 @@ public class WeixinRestaurantDao {
 	public static WeixinRestaurant get(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		List<WeixinRestaurant> result = getByCond(dbCon, staff, null, null);
 		if(result.isEmpty()){
-			throw new BusinessException(WeixinRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
+			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
 		}else{
 			WeixinRestaurant wr = result.get(0);
 			if(wr.hasWeixinLogo()){
@@ -249,11 +249,11 @@ public class WeixinRestaurantDao {
 				  " WHERE restaurant_id = " + restaurant.getId();
 			
 			if(dbCon.stmt.executeUpdate(sql) == 0){
-				throw new BusinessException(WeixinRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
+				throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
 			}
 			
 		}else{
-			throw new BusinessException(WeixinRestaurantError.WEIXIN_RESTAURANT_VERIFY_FAIL);
+			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_VERIFY_FAIL);
 		}
 	}
 	
@@ -406,7 +406,7 @@ public class WeixinRestaurantDao {
 				   " WHERE restaurant_id = " + restaurant.getId();
 			
 			if(dbCon.stmt.executeUpdate(sql) == 0){
-				throw new BusinessException(WeixinRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
+				throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
 			}
 		}
 	}
@@ -453,7 +453,7 @@ public class WeixinRestaurantDao {
 		if(dbCon.rs.next()){
 			restaurantId = dbCon.rs.getInt("restaurant_id");
 		}else{
-			throw new BusinessException(WeixinRestaurantError.WEIXIN_RESTAURANT_NOT_BOUND);
+			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_BOUND);
 		}
 		return restaurantId;
 	}
