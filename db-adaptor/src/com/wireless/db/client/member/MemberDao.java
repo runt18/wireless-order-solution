@@ -109,7 +109,6 @@ public class MemberDao {
 		private int id;
 		private String card;
 		private String mobile;
-		private String mobileOrCard;
 		private String name;
 		private String fuzzy;
 		private int memberTypeId;
@@ -146,11 +145,6 @@ public class MemberDao {
 			return this;
 		}
 		
-		public ExtraCond setMobileOrCard(String mobileOrCard){
-			this.mobileOrCard = mobileOrCard;
-			return this;
-		} 
-		
 		public ExtraCond setFuzzyName(String fuzzy){
 			this.fuzzy = fuzzy;
 			return this;
@@ -186,29 +180,42 @@ public class MemberDao {
 			return this;
 		}
 		
+		private String cond4Card(String card){
+			return card != null ? (" M.member_card_crc = CRC32('" + card + "') AND M.member_card = '" + card + "'") : "";
+		}
+		
+		private String cond4WeixinCard(String weixinCard, boolean defVal){
+			try{
+				return weixinCard != null ? (" WM.weixin_card = " + Integer.parseInt(weixinCard)) : "";
+			}catch(NumberFormatException ignored){
+				return defVal ? " 1 = 1 " : " 0 = 1 ";
+			}
+		}
+		
+		private String cond4Mobile(String mobile){
+			return mobile != null ? (" M.mobile_crc = CRC32('" + mobile + "') AND M.mobile = '" + mobile + "'") : "";
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
 			if(fuzzy != null){
-				extraCond.append(" AND (M.name LIKE '%" + fuzzy + "%' OR M.member_card LIKE '%" + fuzzy + "%' OR M.mobile LIKE '%" + fuzzy + "%')");
+				extraCond.append(" AND (M.name LIKE '%" + fuzzy + "%' OR (" + cond4Card(fuzzy) + ") OR (" + cond4WeixinCard(fuzzy, false) + ") OR (" + cond4Mobile(fuzzy) + "))");
 			}
 			if(id > 0){
 				extraCond.append(" AND M.member_id = " + id);
 			}
 			if(card != null){
-				extraCond.append(" AND M.member_card_crc = CRC32('" + card + "') AND M.member_card = '" + card + "'");
+				extraCond.append(" AND " + cond4Card(card));
 			}
 			if(mobile != null){
-				extraCond.append(" AND M.mobile_crc = CRC32('" + mobile + "') AND M.mobile = '" + mobile + "'");
+				extraCond.append(" AND " + cond4Mobile(mobile));
 			}
 			if(weixinCard != 0){
-				extraCond.append(" AND WM.weixin_card = " + weixinCard);
+				extraCond.append(" AND " + cond4WeixinCard(Integer.toString(weixinCard), true));
 			}
 			if(weixinSerial != null){
 				extraCond.append(" AND WM.weixin_serial = '" + weixinSerial + "' AND weixin_serial_crc = CRC32('" + weixinSerial + "')");
-			}
-			if(mobileOrCard != null){
-				extraCond.append(" AND (M.mobile = '" + mobileOrCard + "' OR M.member_card = '" + mobileOrCard + "')");
 			}
 			
 			if(name != null){
