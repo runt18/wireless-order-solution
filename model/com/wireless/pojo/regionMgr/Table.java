@@ -248,6 +248,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	private int restaurantId;
 	private String tableName;
 	private float minimumCost;
+	private int orderId;
 	private int customNum;
 	private Category category = Category.NORMAL;;
 	private Status status = Status.IDLE;
@@ -376,6 +377,14 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		this.region = region;
 	}
 
+	public void setOrderId(int orderId){
+		this.orderId = orderId;
+	}
+	
+	public int getOrderId(){
+		return this.orderId;
+	}
+	
 	@Override
 	public String toString(){
 		return "table(" +
