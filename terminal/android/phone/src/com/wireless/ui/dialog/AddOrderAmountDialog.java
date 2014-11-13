@@ -121,9 +121,7 @@ public class AddOrderAmountDialog extends DialogFragment {
 					}
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "您输入的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
-				} catch (BusinessException e) {
-					Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-				}					
+				} 		
 			}
 		});
 		

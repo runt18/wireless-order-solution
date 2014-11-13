@@ -754,9 +754,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 
 											}catch(NumberFormatException e){
 												Toast.makeText(getActivity(), "您输入的分席数量不正确", Toast.LENGTH_SHORT).show();
-											} catch (BusinessException e) {
-												Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-											}
+											} 
 										}
 		
 									})
