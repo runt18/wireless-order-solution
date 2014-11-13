@@ -8,7 +8,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -16,7 +15,6 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 
@@ -61,22 +59,11 @@ public class QueryOrderAction extends Action {
 				}
 			}			
 			
-			final StringBuilder idList = new StringBuilder();
-			for(OrderFood of : order.getOrderFoods()){
-				if(idList.length() > 0){
-					idList.append(",");
-				}
-				idList.append(of.getFoodId());
-				
-				of.getKitchen().copyFrom(KitchenDao.getById(staff, of.getKitchen().getId()));
-			}
-			
 			jobject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putJsonable("order", order, 0);
-					jm.putString("idList", idList.toString());
 					return jm;
 				}
 
