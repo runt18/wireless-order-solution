@@ -238,12 +238,12 @@ function takeMoneyLoadMemberData(c){
 		url : '../../QueryMember.do',
 		params : {
 			dataSource : 'normal',
-			memberCardOrMobile : c.read == 1 ? mobile.getValue() : (c.read == 2 ? card.getValue() : '')
+			memberCardOrMobileOrName : c.read == 1 ? mobile.getValue() : (c.read == 2 ? card.getValue() : '')
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
-				if(jr.root.length == 1){
+				if(jr.root.length >= 1){
 					rechargeOperateData = jr.root[0];
 					if(rechargeOperateData.memberType.attributeValue == 0){
 						Ext.example.msg('提示', '会员信息读取成功.');

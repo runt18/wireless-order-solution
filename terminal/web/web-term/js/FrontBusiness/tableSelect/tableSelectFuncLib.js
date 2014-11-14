@@ -360,12 +360,12 @@ function memberPointConsume(c){
 			url : '../../QueryMember.do',
 			params : {
 				dataSource : 'normal',
-				memberCardOrMobile : c.read == 2 ? card.getValue() : mobile.getValue() 
+				memberCardOrMobileOrName : c.read == 2 ? card.getValue() : mobile.getValue() 
 			},
 			success : function(res, opt){
 				var jr = Ext.decode(res.responseText);
 				if(jr.success){
-					if(jr.root.length == 1){
+					if(jr.root.length >= 1){
 						memberPointConsumeWin.member = jr.root[0];
 						memberPointConsumeWinSetData(memberPointConsumeWin.member);
 						Ext.example.msg('提示', '<font style="color:red;">'+memberPointConsumeWin.member['name']+'</font> 会员信息读取成功.');
