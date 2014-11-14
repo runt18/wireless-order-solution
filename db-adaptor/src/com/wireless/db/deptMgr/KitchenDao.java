@@ -449,6 +449,28 @@ public class KitchenDao {
 	
 	/**
 	 * Get the kitchens to a specified restaurant defined in {@link Staff} and other extra condition {@link ExtraCond}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the list holding the kitchen result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Kitchen> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the kitchens to a specified restaurant defined in {@link Staff} and other extra condition {@link ExtraCond}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
