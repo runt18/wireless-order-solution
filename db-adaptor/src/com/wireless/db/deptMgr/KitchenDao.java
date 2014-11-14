@@ -16,6 +16,62 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class KitchenDao {
 	
+	public static class ExtraCond{
+		private int id;
+		private Department.DeptId deptId;
+		private Kitchen.Type type;
+		private boolean isAllowTemp;
+		private boolean isContainsImage;
+
+		public ExtraCond setId(int id){
+			this.id = id;
+			return this;
+		}
+		
+		public ExtraCond setDeptId(Department.DeptId deptId){
+			this.deptId = deptId;
+			return this;
+		}
+		
+		public ExtraCond setAllowTemp(boolean isAllowTemp){
+			this.isAllowTemp = isAllowTemp;
+			return this;
+		}
+		
+		public ExtraCond setType(Kitchen.Type type){
+			this.type = type;
+			return this;
+		}
+		
+		public ExtraCond setContainsImage(boolean containsImage){
+			this.isContainsImage = containsImage;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(id != 0){
+				extraCond.append(" AND K.kitchen_id = " + id);
+			}
+			if(deptId != null){
+				extraCond.append(" AND K.dept_id = " + deptId.getVal());
+			}
+			if(isAllowTemp){
+				extraCond.append(" AND K.is_allow_temp = 1 ");
+			}
+			if(type != null){
+				extraCond.append(" AND K.type = " + type.getVal());
+			}
+			if(isContainsImage){
+				String sql;
+				sql = " SELECT kitchen_id FROM " + Params.dbName + ".food WHERE oss_image_id IS NOT NULL AND restaurant_id = K.restaurant_id GROUP BY kitchen_id ";
+				extraCond.append(" AND K.kitchen_id IN (" + sql + ")");
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	/**
 	 * Move the kitchen up to another.  
 	 * @param staff
@@ -311,7 +367,7 @@ public class KitchenDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Kitchen> getByType(DBCon dbCon, Staff staff, Kitchen.Type type) throws SQLException{
-		return getByCond(dbCon, staff, " AND K.type = " + type.getVal(), null);
+		return getByCond(dbCon, staff, new ExtraCond().setType(type), null);
 	}
 	
 	/**
@@ -351,7 +407,7 @@ public class KitchenDao {
 	 * 			throws if the kitchen to this id does NOT exist
 	 */
 	public static Kitchen getById(DBCon dbCon, Staff staff, int kitchenId) throws SQLException, BusinessException{
-		List<Kitchen> result = getByCond(dbCon, staff, " AND K.kitchen_id = " + kitchenId, null);
+		List<Kitchen> result = getByCond(dbCon, staff, new ExtraCond().setId(kitchenId), null);
 		if(result.isEmpty()){
 			throw new BusinessException(DeptError.KITCHEN_NOT_EXIST);
 		}else{
@@ -388,11 +444,11 @@ public class KitchenDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Kitchen> getByAllowTemp(DBCon dbCon, Staff staff) throws SQLException{
-		return getByCond(dbCon, staff, " AND K.is_allow_temp = 1 ", null);
+		return getByCond(dbCon, staff, new ExtraCond().setAllowTemp(true), null);
 	}
 	
 	/**
-	 * Get the kitchens to a specified restaurant defined in {@link Staff} and other extra condition.
+	 * Get the kitchens to a specified restaurant defined in {@link Staff} and other extra condition {@link ExtraCond}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -405,7 +461,7 @@ public class KitchenDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static List<Kitchen> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	public static List<Kitchen> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		List<Kitchen> result = new ArrayList<Kitchen>();
 		String sql;
 		sql = " SELECT " +
@@ -416,7 +472,7 @@ public class KitchenDao {
 			  " JOIN " + Params.dbName + ".department D ON K.dept_id = D.dept_id AND K.restaurant_id = D.restaurant_id " +
 		  	  " WHERE 1=1 " +
 			  " AND K.restaurant_id = " + staff.getRestaurantId() +
-		  	  (extraCond == null ? "" : extraCond) + " " +
+		  	  (extraCond == null ? "" : extraCond.toString()) + " " +
 		  	  (orderClause == null ? " ORDER BY K.display_id " : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
@@ -471,7 +527,7 @@ public class KitchenDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Kitchen> getByDept(DBCon dbCon, Staff staff, Department.DeptId deptId) throws SQLException{
-		return getByCond(dbCon, staff, " AND K.dept_id = " + deptId.getVal(), null);
+		return getByCond(dbCon, staff, new ExtraCond().setDeptId(deptId), null);
 	}
 	
 	/**
