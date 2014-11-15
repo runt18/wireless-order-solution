@@ -430,7 +430,11 @@ public class PayOrder {
 			}
 		}else{
 			try{
-				orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, orderToCalc.getDiscount().getId()));
+				if(orderToCalc.getDiscountDate() == 0){
+					orderToCalc.setDiscount(DiscountDao.getDefault(dbCon, staff));
+				}else{
+					orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, orderToCalc.getDiscount().getId()));
+				}
 			}catch(BusinessException e){
 				//Use the default if discount not set before.
 				if(e.getErrCode() == DiscountError.DISCOUNT_NOT_EXIST){

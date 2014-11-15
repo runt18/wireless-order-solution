@@ -183,6 +183,57 @@ public class WxOrderDao {
 	}
 	
 	/**
+	 * Get the wx order to specific wx code.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param code
+	 * 			the code to wx order
+	 * @return the wx order to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the wx order to this id does NOT exist
+	 * 			<li>any food belongs to this wx order does NOT exist
+	 */
+	public static WxOrder getByCode(Staff staff, int code) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCode(dbCon, staff, code);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the wx order to specific wx code.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param code
+	 * 			the code to wx order
+	 * @return the wx order to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the wx order to this id does NOT exist
+	 * 			<li>any food belongs to this wx order does NOT exist
+	 */
+	public static WxOrder getByCode(DBCon dbCon, Staff staff, int code) throws SQLException, BusinessException{
+		List<WxOrder> result = getByCond(dbCon, staff, new ExtraCond().setCode(code));
+		if(result.isEmpty()){
+			throw new BusinessException(WxOrderError.WX_ORDER_NOT_EXIST);
+		}else{
+			WxOrder wxOrder = result.get(0);
+			wxOrder.addFoods(getDetail(dbCon, staff, wxOrder.getId()));
+			return wxOrder;
+		}
+	}
+	
+	/**
 	 * Get the wx order to specific id.
 	 * @param staff
 	 * 			the staff to perform this action
