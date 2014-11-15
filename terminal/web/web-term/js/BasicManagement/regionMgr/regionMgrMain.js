@@ -21,7 +21,7 @@ function operateTableDataHandler(c){
 		id.setValue(data['id']);
 		alias.setValue(data['alias']);
 		name.setValue(data['name']);
-		region.setValue(regionData['id']);
+		region.setValue(typeof regionData['id'] == 'undefined' ? (Ext.ux.getSelNode(regionTree)?(Ext.ux.getSelNode(regionTree).id != '-1'?Ext.ux.getSelNode(regionTree).id:'') : '') : regionData['id']);
 		minimumCost.setValue(typeof data['minimumCost'] == 'undefined' ? 0 : data['minimumCost']);
 		serviceRate.setValue(typeof data['serviceRate'] == 'undefined' ? 0 : data['serviceRate']);
 		
@@ -38,44 +38,96 @@ function operateTableDataHandler(c){
 /**
  * 新增餐台信息
  */
-function insertTableBasicHandler(){
+function operateTableBasicHandler(type){
 	Ext.getCmp('btnSaveOperateTable').setVisible(true);
-	Ext.getCmp('numTableAlias').setDisabled(false);
-	tableBasicWin.center();
-	tableBasicWin.show();
-	tableBasicWin.setTitle('新增餐台信息');
-	tableBasicWin.otype = Ext.ux.otype['insert'];
-	operateTableDataHandler({
-		otype : Ext.ux.otype['set']
-	});
-}
+	if(type == 'batch'){
+		Ext.getCmp('numTableAlias').hide();	
+		Ext.getCmp('numTableAlias').getEl().up('.x-form-item').setDisplayed(false);
+		
+		Ext.getCmp('txtTableName').hide();	
+		Ext.getCmp('txtTableName').getEl().up('.x-form-item').setDisplayed(false);
+		
+		Ext.getCmp('numTableAliasBegin').show();	
+		Ext.getCmp('numTableAliasBegin').getEl().up('.x-form-item').setDisplayed(true);	
+		
+		Ext.getCmp('numTableAliasEnd').show();	
+		Ext.getCmp('numTableAliasEnd').getEl().up('.x-form-item').setDisplayed(true);
+		
+		Ext.getCmp('numMinimumCost').hide();	
+		Ext.getCmp('numMinimumCost').getEl().up('.x-form-item').setDisplayed(false);		
+		
+		Ext.getCmp('region_skipNumber').show();	
+		
+		Ext.getCmp('numTableAliasBegin').setValue();
+		Ext.getCmp('numTableAliasEnd').setValue();
+		Ext.getCmp('numTableAliasBegin').clearInvalid();
+		Ext.getCmp('numTableAliasEnd').clearInvalid();
+		tableBasicWin.setTitle('批量添加餐台信息');
+		tableBasicWin.otype = 'batch';
+		operateTableDataHandler({
+			otype : Ext.ux.otype['set']
+		});		
+		
+	}else if(type == 'add' || type == 'update'){
+		Ext.getCmp('numTableAlias').show();	
+		Ext.getCmp('numTableAlias').getEl().up('.x-form-item').setDisplayed(true);
+		
+		
+		Ext.getCmp('txtTableName').show();	
+		Ext.getCmp('txtTableName').getEl().up('.x-form-item').setDisplayed(true);
+		
+		Ext.getCmp('numTableAliasBegin').hide();	
+		Ext.getCmp('numTableAliasBegin').getEl().up('.x-form-item').setDisplayed(false);	
+		
+		Ext.getCmp('numTableAliasEnd').hide();	
+		Ext.getCmp('numTableAliasEnd').getEl().up('.x-form-item').setDisplayed(false);
+		
+		Ext.getCmp('numMinimumCost').show();	
+		Ext.getCmp('numMinimumCost').getEl().up('.x-form-item').setDisplayed(true);			
+		
+		Ext.getCmp('region_skipNumber').hide();	
+		
+		if(type == 'add'){
+			Ext.getCmp('numTableAlias').setDisabled(false);
+			Ext.getCmp('btnSaveOperateTable').setDisabled(false);
+			tableBasicWin.setTitle('新增餐台信息');
+			tableBasicWin.otype = Ext.ux.otype['insert'];
 
-/**
- * 修改餐台信息
- */
-function updateTableBasicHandler(){
-	var data = Ext.ux.getSelData(tableBasicGrid);
-	if(!data){
-		Ext.example.msg('提示', '操作失败, 请选中一条记录再操作.');
-		return;
+			operateTableDataHandler({
+				otype : Ext.ux.otype['set']
+			});
+			Ext.getCmp('numTableAlias').focus(true, 100);
+		}else{
+			var data = Ext.ux.getSelData(tableBasicGrid);
+			if(!data){
+				Ext.example.msg('提示', '操作失败, 请选中一条记录再操作.');
+				return;
+			}
+			if(data['statusValue'] == 1){
+				Ext.example.msg('提示', '该台正在就餐, 只能查看不允许修改.');
+				Ext.getCmp('btnSaveOperateTable').setDisabled(true);		
+			}else{
+				Ext.getCmp('btnSaveOperateTable').setDisabled(false);
+			}
+			Ext.getCmp('numTableAlias').setDisabled(true);		
+			
+			tableBasicWin.setTitle('修改餐台信息');
+			tableBasicWin.otype = Ext.ux.otype['update'];
+			operateTableDataHandler({
+				otype : Ext.ux.otype['set'],
+				data : data
+			});	
+			Ext.getCmp('txtTableName').focus(true, 100);
+		}
+		
+		
 	}
-	if(data['statusValue'] == 1){
-		Ext.example.msg('提示', '该台正在就餐, 只能查看不允许修改.');
-		Ext.getCmp('btnSaveOperateTable').setDisabled(true);		
-	}else{
-		Ext.getCmp('btnSaveOperateTable').setDisabled(false);
-	}
-	Ext.getCmp('numTableAlias').setDisabled(true);
-	tableBasicWin.center();
+
 	tableBasicWin.show();
-	tableBasicWin.setTitle('修改餐台信息');
-	tableBasicWin.otype = Ext.ux.otype['update'];
-	operateTableDataHandler({
-		otype : Ext.ux.otype['set'],
-		data : data
-	});
+
+	tableBasicWin.center();
 	
-	
+	Ext.getCmp('numTableAliasBegin').focus(true, 100);
 }
 
 /**
@@ -190,7 +242,6 @@ function updateRegionHandler(c){
 								Ext.example.msg(jr.title, jr.msg);
 								operateRegionWin.hide();
 								regionTree.getRootNode().reload();
-//								Ext.getCmp('btnSearchForTable').handler();
 							}else{
 								Ext.ux.showMsg(jr);
 							}
@@ -274,7 +325,7 @@ function deleteRegionHandler(){
  
 function tableBasicGridOperateRenderer(v, m, r, ri, ci, s){
 	return ''
-		+ '<a href="javascript:updateTableBasicHandler();">修改</a>'
+		+ '<a href="javascript:operateTableBasicHandler(\'update\');">修改</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 		+ '<a href="javascript:deleteTableBasicHandler();">删除</a>';
 }
@@ -296,6 +347,7 @@ function initTree(){
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		root : new Ext.tree.AsyncTreeNode({
 			text : '全部',
+			id : -1,
 			regionId : -1,
 			loader : new Ext.tree.TreeLoader({
 				dataUrl : '../../QueryRegion.do',
@@ -389,10 +441,16 @@ function initGrid(){
 			id : 'txtSearchForTableName',
 			width : 100
 		}, '->', {
+				text : '批量添加',
+				iconCls : 'btn_app',
+				handler : function(){
+					operateTableBasicHandler('batch');
+				}
+			}, {
 				text : '添加',
 				iconCls : 'btn_add',
 				handler : function(){
-					insertTableBasicHandler();
+					operateTableBasicHandler('add');
 				}
 			},{
 			text : '搜索',
@@ -453,7 +511,7 @@ function initGrid(){
 		Ext.getCmp('btnSearchForTable').handler();
 	});
 	tableBasicGrid.on('rowdblclick', function(){
-		updateTableBasicHandler();
+		operateTableBasicHandler('update');
 	});
 	
 	
@@ -462,7 +520,6 @@ function initGrid(){
  * 
  */
 function initWin(){
-	tableBasicWin = Ext.getCmp('region_tableBasicWin');
 	if(!tableBasicWin){
 		tableBasicWin = new Ext.Window({
 			id : 'region_tableBasicWin',
@@ -490,6 +547,28 @@ function initWin(){
 					xtype : 'hidden',
 					id : 'hideTableId'
 				}, {
+					xtype : 'numberfield',
+					id : 'numTableAliasBegin',
+					fieldLabel : '开始编号',
+					allowBlank : false,
+					listeners : {
+						render : function(thiz){
+							thiz.hide();
+							thiz.getEl().up('.x-form-item').setDisplayed(false);						
+						}
+					}
+				}, {
+					xtype : 'numberfield',
+					id : 'numTableAliasEnd',
+					fieldLabel : '结束编号',
+					allowBlank : false,
+					listeners : {
+						render : function(thiz){
+							thiz.hide();
+							thiz.getEl().up('.x-form-item').setDisplayed(false);						
+						}
+					}
+				},{
 					xtype : 'numberfield',
 					id : 'numTableAlias',
 					fieldLabel : '编号',
@@ -534,6 +613,41 @@ function initWin(){
 							return true;
 						}
 					}
+				}, {
+					id : 'region_skipNumber',
+					width : 270,
+					hidden : true,
+					layout : 'column',
+					frame : true,
+					border : false,
+					frame : false,
+					defaults : {
+						columnWidth : .33,
+						labelWidth : 70
+					},
+					items : [{
+						columnWidth : .25,
+						xtype : 'label',
+						html : '尾号剔除:&nbsp; '
+					},{
+						items : [{
+							xtype : 'checkbox',
+							name : 'tableSkip',
+							id : 'rdoRecordAlive',
+							inputValue : 4,
+							hideLabel : true,
+							boxLabel : '避免尾号4'
+						}]
+					}, {
+						items : [{
+							xtype : 'checkbox',
+							name : 'tableSkip',
+							inputValue : 7,
+							hideLabel : true,
+							boxLabel : '避免尾号7'
+						}]
+					}]
+						
 				}]
 			}],
 			keys : [{
@@ -560,6 +674,7 @@ function initWin(){
 					var region = Ext.getCmp('comboTableRegion');
 					var minimumCost = Ext.getCmp('numMinimumCost');
 					var serviceRate = Ext.getCmp('numServiceRate');
+					var skips = '';
 					
 					if(!region.isValid() || !minimumCost.isValid() || !serviceRate.isValid()){
 						return;
@@ -568,26 +683,47 @@ function initWin(){
 						if(!alias.isValid()){
 							return;
 						}
+					}else if(tableBasicWin.otype == 'batch'){
+						if(!Ext.getCmp('numTableAliasBegin').isValid() || !Ext.getCmp('numTableAliasEnd').isValid()){
+							return;
+						}	
+						var rSkipSelecteds = document.getElementsByName('tableSkip');
+						for (var i = 0; i < rSkipSelecteds.length; i++) {
+							if(rSkipSelecteds[i].checked){
+								if(skips){
+									skips += ',';
+								}
+								skips += rSkipSelecteds[i].value;
+							}							
+						}
 					}
 					
 					Ext.Ajax.request({
 						url : '../../OperateTable.do',
 						params : {
 							dataSource : tableBasicWin.otype.toLowerCase(),
-							
 							alias : alias.getValue(),
+							beginAlias : Ext.getCmp('numTableAliasBegin').getValue(),
+							endAlias : Ext.getCmp('numTableAliasEnd').getValue(),
 							id : id.getValue(),
 							name : name.getValue(),
-							regionId : region.getValue(),
+							regionId : (region.getValue()?region.getValue():0),
 							minimumCost : minimumCost.getValue(),
-							serviceRate : serviceRate.getValue()
+							serviceRate : serviceRate.getValue(),
+							skips : skips
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
+							var lastAlias = alias.getValue();
 							if(jr.success){
-								tableBasicWin.hide();
+//								tableBasicWin.hide();
 								Ext.example.msg(jr.title, jr.msg);
 								Ext.getCmp('btnSearchForTable').handler();
+								operateTableDataHandler({
+									otype : Ext.ux.otype['set']
+								});
+								alias.setValue(lastAlias + 1)
+								name.focus(true, 100);
 							}else{
 								Ext.ux.showMsg(jr);
 							}
@@ -609,6 +745,8 @@ function initWin(){
 	}
 	tableBasicWin.render(document.body);
 }
+
+
 
 //----------
 

@@ -1,4 +1,6 @@
-﻿// deselect the selected table
+﻿
+var select_getMemberByCertainWin;
+// deselect the selected table
 function deselectTable() {
 	if (selectedTable != "") {
 		var temp = null;
@@ -335,6 +337,9 @@ switchTableStatus = function(_s){
 };
 
 function memberPointConsume(c){
+	if(typeof select_getMemberByCertainWin != 'undefined'){
+		select_getMemberByCertainWin.hide();
+	}		
 	if(c == null || typeof c == ' undefined' || c.otype == 'undefined'){
 		return;
 	}
@@ -360,16 +365,19 @@ function memberPointConsume(c){
 			url : '../../QueryMember.do',
 			params : {
 				dataSource : 'normal',
+				sType : c.sType,
 				memberCardOrMobileOrName : c.read == 2 ? card.getValue() : mobile.getValue() 
 			},
 			success : function(res, opt){
 				var jr = Ext.decode(res.responseText);
 				if(jr.success){
-					if(jr.root.length >= 1){
+					if(jr.root.length == 1){
 						memberPointConsumeWin.member = jr.root[0];
 						memberPointConsumeWinSetData(memberPointConsumeWin.member);
 						Ext.example.msg('提示', '<font style="color:red;">'+memberPointConsumeWin.member['name']+'</font> 会员信息读取成功.');
 						consumePoint.focus();
+					}else if(jr.root.length > 1){
+						select_getMemberByCertain(c);
 					}else{
 						Ext.example.msg('提示', '该会员信息不存在, 请重新输入条件后重试.');
 						memberPointConsumeWin.member = null;
@@ -395,7 +403,6 @@ function memberPointConsume(c){
 		Ext.Ajax.request({
 			url : '../../OperateMember.do',
 			params : {
-				isCookie : true,
 				dataSource : 'consumePoint',
 				memberId : memberPointConsumeWin.member['id'],
 				point : consumePoint.getValue()
@@ -421,6 +428,35 @@ function memberPointConsume(c){
 		});
 	}
 }
+
+function select_getMemberByCertain(c){
+	
+	select_getMemberByCertainWin = new Ext.Window({
+		closable : false, //是否可关闭
+		resizable : false, //大小调整
+		title : '请选择号码来源',
+		modal : true,
+		width : 120,			
+		items : [{
+			xtype : 'panel',
+			frame : true,
+			border : true,
+			//0: 模糊搜索, 1 : 根据手机号, 2: 微信卡号, 3:实体卡号
+			html:'<a href="javascript:memberPointConsume({otype:'+ c.otype +',read:'+ c.read +', sType :1})" style="font-size:18px;">手机号</a>'
+				+'</br><a href="javascript:memberPointConsume({otype:'+ c.otype +',read:'+ c.read +', sType :2})" style="font-size:18px;">微信卡号</a>'
+				+'</br><a href="javascript:memberPointConsume({otype:'+ c.otype +',read:'+ c.read +', sType :3})" style="font-size:18px;">实体卡号</a>'
+		}],
+		bbar : ['->',{
+			text : '取消',
+			iconCls : 'btn_close',
+			handler : function(e){
+				select_getMemberByCertainWin.hide();
+			}				
+		}]	
+	});
+	select_getMemberByCertainWin.show();
+}
+
 /**
  * 
  * @param data

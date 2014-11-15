@@ -1,4 +1,4 @@
-var rd_rechargeSreachMemberCardWin;
+var rd_rechargeSreachMemberCardWin, take_getMemberByCertainWin;
 var rechargeOperateData;
 Ext.onReady(function(){
 
@@ -206,7 +206,9 @@ Ext.onReady(function(){
 	
 });	
 function takeMoneyLoadMemberData(c){
-	
+	if(typeof take_getMemberByCertainWin != 'undefined'){
+		take_getMemberByCertainWin.hide();
+	}	
 	c = c == null || typeof c == 'undefined' ? {} : c;
 	
 	var mobile = Ext.getCmp('tm_numMemberMobileForTakeMoney');
@@ -238,12 +240,13 @@ function takeMoneyLoadMemberData(c){
 		url : '../../QueryMember.do',
 		params : {
 			dataSource : 'normal',
+			sType : c.otype,
 			memberCardOrMobileOrName : c.read == 1 ? mobile.getValue() : (c.read == 2 ? card.getValue() : '')
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
-				if(jr.root.length >= 1){
+				if(jr.root.length == 1){
 					rechargeOperateData = jr.root[0];
 					if(rechargeOperateData.memberType.attributeValue == 0){
 						Ext.example.msg('提示', '会员信息读取成功.');
@@ -255,6 +258,8 @@ function takeMoneyLoadMemberData(c){
 						rechargeOperateData = null;
 						rechargeBindMemberData();
 					}
+				}else if(jr.root.length > 1){
+					take_getMemberByCertain(c);
 				}else{
 					Ext.example.msg('提示', '该会员信息不存在, 请重新输入条件后重试.');
 					rechargeOperateData = null;
@@ -271,6 +276,34 @@ function takeMoneyLoadMemberData(c){
 		}
 	});
 }	
+
+function take_getMemberByCertain(c){
+	
+	take_getMemberByCertainWin = new Ext.Window({
+		closable : false, //是否可关闭
+		resizable : false, //大小调整
+		title : '请选择号码来源',
+		modal : true,
+		width : 120,			
+		items : [{
+			xtype : 'panel',
+			frame : true,
+			border : true,
+			//0: 模糊搜索, 1 : 根据手机号, 2: 微信卡号, 3:实体卡号
+			html:'<a href="javascript:takeMoneyLoadMemberData({otype:1,read:'+ c.read +'})" style="font-size:18px;">手机号</a>'
+				+'</br><a href="javascript:takeMoneyLoadMemberData({otype:2,read:'+ c.read +'})" style="font-size:18px;">微信卡号</a>'
+				+'</br><a href="javascript:takeMoneyLoadMemberData({otype:3,read:'+ c.read +'})" style="font-size:18px;">实体卡号</a>'
+		}],
+		bbar : ['->',{
+			text : '取消',
+			iconCls : 'btn_close',
+			handler : function(e){
+				take_getMemberByCertainWin.hide();
+			}				
+		}]	
+	});
+	take_getMemberByCertainWin.show();
+}
 
 function rechargeBindMemberData(data){
 	var mobile = Ext.getCmp('tm_numMemberMobileForTakeMoney');

@@ -1884,8 +1884,9 @@ function basicOperationBasicHandler(c){
 						var bToolBar = Ext.getCmp('menuMgrGrid').getBottomToolbar();
 						bToolBar.moveLast();
 					}else{
-						Ext.Msg.confirm(jr.titile, jr.msg + '\n是否继续添加?', function(e){
-							if(e == 'yes'){
+						Ext.example.msg(jr.title, "添加成功, 请继续添加下一个菜品或关闭");
+/*						Ext.Msg.confirm(jr.titile, jr.msg + '\n是否继续添加?', function(e){
+							if(e == 'yes'){*/
 								var faid = foodAliasID.getValue();
 								var kaid = foodKitchenAlias.getValue();	
 								
@@ -1916,10 +1917,10 @@ function basicOperationBasicHandler(c){
 								
 								foodName.focus(true, 100);
 	
-							}else{
+/*							}else{
 								Ext.getCmp('foodOperationWin').hide();
 							}
-						}, this);
+						}, this);*/
 					}
 				}else if(c.type == mmObj.operation.update){
 					if(c.hide == true){

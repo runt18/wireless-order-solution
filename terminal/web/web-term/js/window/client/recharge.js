@@ -1,4 +1,4 @@
-var rd_rechargeSreachMemberCardWin;
+var rd_rechargeSreachMemberCardWin, charge_getMemberByCertainWin;
 var rechargeOperateData;
 Ext.onReady(function(){
 	var pe = Ext.query('#divMemberRechargeContent')[0].parentElement;
@@ -227,6 +227,9 @@ Ext.onReady(function(){
  * @param c
  */
 function rechargeLoadMemberData(c){
+	if(typeof charge_getMemberByCertainWin != 'undefined'){
+		charge_getMemberByCertainWin.hide();
+	}	
 	c = c == null || typeof c == 'undefined' ? {} : c;
 	
 	var mobile = Ext.getCmp('rd_numMemberMobileForRecharge');
@@ -258,12 +261,13 @@ function rechargeLoadMemberData(c){
 		url : '../../QueryMember.do',
 		params : {
 			dataSource : 'normal',
+			sType : c.otype,
 			memberCardOrMobileOrName : c.read == 1 ? mobile.getValue() : (c.read == 2 ? card.getValue() : '')
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
-				if(jr.root.length >= 1){
+				if(jr.root.length == 1){
 					rechargeOperateData = jr.root[0];
 					if(rechargeOperateData.memberType.attributeValue == 0){
 						Ext.example.msg('提示', '会员信息读取成功.');
@@ -275,6 +279,8 @@ function rechargeLoadMemberData(c){
 						rechargeOperateData = null;
 						rechargeBindMemberData();
 					}
+				}else if(jr.root.length >= 1){
+					charge_getMemberByCertain(c);
 				}else{
 					Ext.example.msg('提示', '该会员信息不存在, 请重新输入条件后重试.');
 					rechargeOperateData = null;
@@ -290,6 +296,34 @@ function rechargeLoadMemberData(c){
 			Ext.ux.showMsg(Ext.decode(res.responseText));
 		}
 	});
+}
+
+function charge_getMemberByCertain(c){
+	
+	charge_getMemberByCertainWin = new Ext.Window({
+		closable : false, //是否可关闭
+		resizable : false, //大小调整
+		title : '请选择号码来源',
+		modal : true,
+		width : 120,			
+		items : [{
+			xtype : 'panel',
+			frame : true,
+			border : true,
+			//0: 模糊搜索, 1 : 根据手机号, 2: 微信卡号, 3:实体卡号
+			html:'<a href="javascript:rechargeLoadMemberData({otype:1,read:'+ c.read +'})" style="font-size:18px;">手机号</a>'
+				+'</br><a href="javascript:rechargeLoadMemberData({otype:2,read:'+ c.read +'})" style="font-size:18px;">微信卡号</a>'
+				+'</br><a href="javascript:rechargeLoadMemberData({otype:3,read:'+ c.read +'})" style="font-size:18px;">实体卡号</a>'
+		}],
+		bbar : ['->',{
+			text : '取消',
+			iconCls : 'btn_close',
+			handler : function(e){
+				charge_getMemberByCertainWin.hide();
+			}				
+		}]	
+	});
+	charge_getMemberByCertainWin.show();
 }
 
 function rechargeBindMemberData(data){
@@ -380,7 +414,6 @@ function rechargeControlCenter(_c){
 		url : '../../OperateMember.do',
 		params : {
 			dataSource : 'charge',
-			isCookie : true,
 			memberID : rechargeOperateData.id,
 			rechargeMoney : rechargeMoney.getValue(),
 			rechargeType : rechargeType.getValue(),
