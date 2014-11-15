@@ -259,6 +259,15 @@ function initTakeMoneyWin(){
 				show : function(thiz){
 					var data = Ext.ux.getSelData(memberBasicGrid);
 					var id = data && data['memberType']['attributeValue'] == 0 ? data['id'] : '';
+					var task = {
+						run : function(){
+							if(typeof takeMoneyNumberFocus == 'function'){
+								takeMoneyNumberFocus();
+								Ext.TaskMgr.stop(this);
+							}
+						},
+						interval: 200
+					};	
 					thiz.center();
 					thiz.load({
 						url : '../window/client/takeMoney.jsp',
@@ -267,6 +276,7 @@ function initTakeMoneyWin(){
 							memberMobile : id
 						}
 					});
+					Ext.TaskMgr.start(task);
 				}
 			},
 			bbar : [{
