@@ -387,4 +387,9 @@ function takeMoneyControlCenter(_c){
 		}
 	});
 }
+
+//输入手机号
+function takeMoneyNumberFocus(){
+	Ext.getCmp('tm_numMemberMobileForTakeMoney').focus(true, 100);
+}
 	
