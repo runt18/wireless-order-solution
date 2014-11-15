@@ -1118,10 +1118,22 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 					},
 					show : function(thiz){
 						thiz.center();
+						var task = {
+							run : function(){
+								if(typeof rechargeNumberFocus == 'function'){
+									rechargeNumberFocus();
+									Ext.TaskMgr.stop(this);
+								}
+							},
+							interval: 200
+						};
+					
+												
 						thiz.load({
 							url : '../window/client/recharge.jsp',
 							scripts : true
 						});
+						Ext.TaskMgr.start(task);
 					}
 				},
 				bbar : [{
@@ -1171,6 +1183,7 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 			Ext.getCmp('chbFrontSendCharge').setValue(false);
 		}
 		table_memberRechargeWin.show();
+
 	}
 });
 
@@ -1352,13 +1365,13 @@ var btnMemberPointConsume = new Ext.ux.ImageButton({
 				closable : false,
 				modal : true,
 				resizable : false,
-				width : 200,
+				width : 210,
 				items : [{
 					xtype : 'panel',
 					frame : true,
 					defaults : {
 						xtype : 'form',
-						labelWidth : 60,
+						labelWidth : 70,
 						defaults : {
 							width : 100
 						}
@@ -1381,22 +1394,22 @@ var btnMemberPointConsume = new Ext.ux.ImageButton({
 						items : [{
 							xtype : 'numberfield',
 							id : 'numMemberMobileForConsumePoint',
-							fieldLabel : '手机号码',
-							regex : Ext.ux.RegText.mobile.reg,
-							regexText : Ext.ux.RegText.mobile.error,
+							fieldLabel : '手机/会员卡',
+							allowBlank : false,
 							listeners : {
 								render : function(thiz){
 									new Ext.KeyMap(thiz.getId(), [{
 										key : Ext.EventObject.ENTER,
 										scope : this,
 										fn : function(){
-											memberPointConsume({otype:1, read:1});
+											memberPointConsume({otype:1});
 										}
 									}]);
 								}
 							}
 						}]
-					}, {
+					}, 
+/*					{
 						items : [{
 							xtype : 'numberfield',
 							id : 'numMemberCardForConsumePoint',
@@ -1413,10 +1426,10 @@ var btnMemberPointConsume = new Ext.ux.ImageButton({
 								}
 							}
 						}]
-					}, {
+					}, */
+					{
 						xtype : 'panel',
-						html : '<input type="button" value="读手机号码" onClick="memberPointConsume({otype:1, read:1})">&nbsp;&nbsp;'
-							+ '<input type="button" value="读会员卡" onClick="memberPointConsume({otype:1, read:2})">'
+						html : '&nbsp;&nbsp;<input type="button" value="读取会员" onClick="memberPointConsume({otype:1, read:1})">'
 					}, {
 						items : [{
 							xtype : 'numberfield',
@@ -1476,6 +1489,8 @@ var btnMemberPointConsume = new Ext.ux.ImageButton({
 			
 		}
 		memberPointConsumeWin.show();
+		
+		Ext.getCmp('numMemberMobileForConsumePoint').focus(true, 100);
 	}
 });
 

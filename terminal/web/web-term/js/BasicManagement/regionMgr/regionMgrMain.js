@@ -18,12 +18,20 @@ function operateTableDataHandler(c){
 	if(c.otype == Ext.ux.otype['set']){
 		var data = typeof c.data == 'undefined' ? {} : c.data;
 		var regionData = typeof data.region == 'undefined' ? {} : data.region;  
+		var rSkipSelecteds = document.getElementsByName('tableSkip');
+		
 		id.setValue(data['id']);
 		alias.setValue(data['alias']);
 		name.setValue(data['name']);
 		region.setValue(typeof regionData['id'] == 'undefined' ? (Ext.ux.getSelNode(regionTree)?(Ext.ux.getSelNode(regionTree).id != '-1'?Ext.ux.getSelNode(regionTree).id:'') : '') : regionData['id']);
 		minimumCost.setValue(typeof data['minimumCost'] == 'undefined' ? 0 : data['minimumCost']);
 		serviceRate.setValue(typeof data['serviceRate'] == 'undefined' ? 0 : data['serviceRate']);
+		
+		for (var i = 0; i < rSkipSelecteds.length; i++) {
+			if(rSkipSelecteds[i].checked){
+				rSkipSelecteds[i].checked = false;
+			}							
+		}		
 		
 		alias.clearInvalid();
 		name.clearInvalid();
@@ -719,11 +727,17 @@ function initWin(){
 //								tableBasicWin.hide();
 								Ext.example.msg(jr.title, jr.msg);
 								Ext.getCmp('btnSearchForTable').handler();
-								operateTableDataHandler({
-									otype : Ext.ux.otype['set']
-								});
-								alias.setValue(lastAlias + 1)
-								name.focus(true, 100);
+								
+								if(tableBasicWin.otype.toLowerCase() == 'insert'){
+									operateTableDataHandler({
+										otype : Ext.ux.otype['set']
+									});
+									alias.setValue(lastAlias + 1)
+									name.focus(true, 100);										
+								}else{
+									tableBasicWin.hide();
+								}
+
 							}else{
 								Ext.ux.showMsg(jr);
 							}

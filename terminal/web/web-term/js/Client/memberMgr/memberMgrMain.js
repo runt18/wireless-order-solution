@@ -147,7 +147,7 @@ function initRechargeWin(){
 			modal : true,
 			resizable : false,
 			width : 680,
-			height : 350,
+			height : 300,
 			keys : [{
 				key : Ext.EventObject.ESC,
 				scope : this,
@@ -161,15 +161,25 @@ function initRechargeWin(){
 				},
 				show : function(thiz){
 					var data = Ext.ux.getSelData(memberBasicGrid);
-					var mobile = data != false && data['memberType']['attributeValue'] == 0 ? data['mobile'] : '';
+					var id = data && data['memberType']['attributeValue'] == 0 ? data['id'] : '';
+					var task = {
+						run : function(){
+							if(typeof rechargeNumberFocus == 'function'){
+								rechargeNumberFocus();
+								Ext.TaskMgr.stop(this);
+							}
+						},
+						interval: 200
+					};					
 					thiz.center();
 					thiz.load({
 						url : '../window/client/recharge.jsp',
 						scripts : true,
 						params : {
-							memberMobile : mobile
+							memberMobile : id
 						}
 					});
+					Ext.TaskMgr.start(task);
 				}
 			},
 			bbar : [{
@@ -248,13 +258,13 @@ function initTakeMoneyWin(){
 				},
 				show : function(thiz){
 					var data = Ext.ux.getSelData(memberBasicGrid);
-					var mobile = data != false && data['memberType']['attributeValue'] == 0 ? data['mobile'] : '';
+					var id = data && data['memberType']['attributeValue'] == 0 ? data['id'] : '';
 					thiz.center();
 					thiz.load({
 						url : '../window/client/takeMoney.jsp',
 						scripts : true,
 						params : {
-							memberMobile : mobile
+							memberMobile : id
 						}
 					});
 				}

@@ -1,5 +1,4 @@
 ﻿
-var select_getMemberByCertainWin;
 // deselect the selected table
 function deselectTable() {
 	if (selectedTable != "") {
@@ -336,29 +335,21 @@ switchTableStatus = function(_s){
 	tableListReflash(node);
 };
 
-function memberPointConsume(c){
-	if(typeof select_getMemberByCertainWin != 'undefined'){
-		select_getMemberByCertainWin.hide();
+var memberPointConsume = function(c){
+	if(typeof Ext.ux.select_getMemberByCertainWin != 'undefined'){
+		Ext.ux.select_getMemberByCertainWin.hide();
 	}		
 	if(c == null || typeof c == ' undefined' || c.otype == 'undefined'){
 		return;
 	}
 	
 	var mobile = Ext.getCmp('numMemberMobileForConsumePoint');
-	var card = Ext.getCmp('numMemberCardForConsumePoint');
 	var consumePoint = Ext.getCmp('numConsumePointForConsumePoint');
 	if(c.otype == 1){
 		// load data
-		if(typeof c.read != 'number' && c.read != 1 && c.read != 2){
-			Ext.example.msg('提示', '操作失败, 程序异常, 请联系客服人员.');
-			return;			
-		}else if(c.read == 1 && (mobile.getRawValue() == '' || !mobile.isValid())){
-			Ext.example.msg('提示', '请输入11位手机号码.');
-			mobile.focus(mobile, true);
-			return;
-		}else if(c.read == 2 && card.getRawValue() == ''){
-			Ext.example.msg('提示', '会员卡号.');
-			card.focus(mobile, true);
+		if(mobile.getRawValue() == ''){
+			Ext.example.msg('提示', '请输入查找条件.');
+			mobile.focus(true, 100);
 			return;
 		}
 		Ext.Ajax.request({
@@ -366,7 +357,7 @@ function memberPointConsume(c){
 			params : {
 				dataSource : 'normal',
 				sType : c.sType,
-				memberCardOrMobileOrName : c.read == 2 ? card.getValue() : mobile.getValue() 
+				memberCardOrMobileOrName : mobile.getValue() 
 			},
 			success : function(res, opt){
 				var jr = Ext.decode(res.responseText);
@@ -377,7 +368,8 @@ function memberPointConsume(c){
 						Ext.example.msg('提示', '<font style="color:red;">'+memberPointConsumeWin.member['name']+'</font> 会员信息读取成功.');
 						consumePoint.focus();
 					}else if(jr.root.length > 1){
-						select_getMemberByCertain(c);
+						c.callback = memberPointConsume;
+						Ext.ux.select_getMemberByCertain(c);
 					}else{
 						Ext.example.msg('提示', '该会员信息不存在, 请重新输入条件后重试.');
 						memberPointConsumeWin.member = null;
@@ -429,33 +421,6 @@ function memberPointConsume(c){
 	}
 }
 
-function select_getMemberByCertain(c){
-	
-	select_getMemberByCertainWin = new Ext.Window({
-		closable : false, //是否可关闭
-		resizable : false, //大小调整
-		title : '请选择号码来源',
-		modal : true,
-		width : 120,			
-		items : [{
-			xtype : 'panel',
-			frame : true,
-			border : true,
-			//0: 模糊搜索, 1 : 根据手机号, 2: 微信卡号, 3:实体卡号
-			html:'<a href="javascript:memberPointConsume({otype:'+ c.otype +',read:'+ c.read +', sType :1})" style="font-size:18px;">手机号</a>'
-				+'</br><a href="javascript:memberPointConsume({otype:'+ c.otype +',read:'+ c.read +', sType :2})" style="font-size:18px;">微信卡号</a>'
-				+'</br><a href="javascript:memberPointConsume({otype:'+ c.otype +',read:'+ c.read +', sType :3})" style="font-size:18px;">实体卡号</a>'
-		}],
-		bbar : ['->',{
-			text : '取消',
-			iconCls : 'btn_close',
-			handler : function(e){
-				select_getMemberByCertainWin.hide();
-			}				
-		}]	
-	});
-	select_getMemberByCertainWin.show();
-}
 
 /**
  * 
@@ -466,12 +431,12 @@ function memberPointConsumeWinSetData(data){
 	var name = Ext.getCmp('numMemberNameForConsumePoint');
 	var memberType = Ext.getCmp('numMemberTypeForConsumePoint');
 	var mobile = Ext.getCmp('numMemberMobileForConsumePoint');
-	var card = Ext.getCmp('numMemberCardForConsumePoint');
 	var point = Ext.getCmp('numMemberPointForConsumePoint');
 	
 	name.setValue(data['name']);
 	memberType.setValue(typeof data['memberType'] != 'undefined' ? data['memberType']['name'] : '');
-	mobile.setValue(data['mobile']);
-	card.setValue(data['memberCard']);
+	mobile.setValue(data['mobile']?data['mobile']:data['memberCard']);
 	point.setValue(data['point']);
+	
+	mobile.clearInvalid();
 }

@@ -1,4 +1,4 @@
-var rd_rechargeSreachMemberCardWin, charge_getMemberByCertainWin;
+var rd_rechargeSreachMemberCardWin;
 var rechargeOperateData;
 Ext.onReady(function(){
 	var pe = Ext.query('#divMemberRechargeContent')[0].parentElement;
@@ -7,7 +7,7 @@ Ext.onReady(function(){
 	var memeberMobile = new Ext.form.NumberField({
 		xtype : 'numberfield',
 		id : 'rd_numMemberMobileForRecharge',
-		fieldLabel : '手机号码' + Ext.ux.txtFormat.xh,
+		fieldLabel : '手机号码/卡号' + Ext.ux.txtFormat.xh,
 		disabled : false,
 		listeners : {
 			render : function(thiz){
@@ -19,17 +19,15 @@ Ext.onReady(function(){
 					}
 				}]);
 				if(rd_rechargeMemberMobile != null && rd_rechargeMemberMobile != '' && rd_rechargeMemberMobile != 'null'){
-					thiz.setValue(rd_rechargeMemberMobile);
-					rechargeLoadMemberData({read:1});
+					rechargeLoadMemberData();
 				}
 			}
 		}
 	});
 	var memeberCard = {
 		xtype : 'numberfield',
-		id : 'rd_numMemberCardForRecharge',
 		fieldLabel : '会员卡号',
-		disabled : false,
+		disabled : true,
 		blankText : '会员卡不能为空, 请刷卡.',
 		listeners : {
 			render : function(thiz){
@@ -63,16 +61,16 @@ Ext.onReady(function(){
 				}
 			},
 			items : [{
+				columnWidth : .3,
+				html : '&nbsp;'
+			},{
+				labelWidth : 100,
 				items : [memeberMobile]
-			}, {
-				items : [memeberCard]
 			}, {
 				xtype : 'panel',
 				columnWidth : .3,
 				html : ['<div class="x-form-item" >',
-				    '<input type="button" value="读手机号码" onClick="rechargeLoadMemberData({read:1})" style="cursor:pointer; width:80px;" />',
-				    '&nbsp;&nbsp;',
-				    '<input type="button" value="读会员卡" onClick="rechargeLoadMemberData({read:2})" style="cursor:pointer; width:80px;" />',
+				    '&nbsp;&nbsp;&nbsp;<input type="button" value="读取会员" onClick="rechargeLoadMemberData()" style="cursor:pointer; width:80px;" />',
 				    '</div>'
 				].join('')
 			},{
@@ -189,15 +187,15 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtMemberIDCard',
-					fieldLabel : '身份证',
+					id : 'rd_numMemberCardForRecharge',
+					fieldLabel : '实体卡号',
 					disabled : true
 				}]
 			}, {
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtMemberCompany',
-					fieldLabel : '公司',
+					id : 'rd_numWeixinMemberCard',
+					fieldLabel : '微信会员卡',
 					disabled : true
 				}]
 			}, {
@@ -227,17 +225,19 @@ Ext.onReady(function(){
  * @param c
  */
 function rechargeLoadMemberData(c){
-	if(typeof charge_getMemberByCertainWin != 'undefined'){
-		charge_getMemberByCertainWin.hide();
-	}	
+	if(typeof Ext.ux.select_getMemberByCertainWin != 'undefined'){
+		Ext.ux.select_getMemberByCertainWin.hide();
+	}
 	c = c == null || typeof c == 'undefined' ? {} : c;
 	
 	var mobile = Ext.getCmp('rd_numMemberMobileForRecharge');
-	var card = Ext.getCmp('rd_numMemberCardForRecharge');
-	if(typeof c.read != 'number'){
-		Ext.example.msg('提示', '操作失败, 程序异常, 请联系客服人员.');
+	if(!rd_rechargeMemberMobile && mobile.getValue() == ''){
+		Ext.example.msg('提示', '操作失败, 请输入查找条件.');
+		mobile.focus(true, 100);
 		return;			
-	}else if(c.read != 1 && c.read != 2){
+	}
+/*	
+	else if(c.read != 1 && c.read != 2){
 		Ext.example.msg('提示', '操作失败, 程序异常, 请联系客服人员.');
 		return;		
 	}else if(c.read == 1 && (mobile.getRawValue() == '' || !mobile.isValid())){
@@ -250,7 +250,7 @@ function rechargeLoadMemberData(c){
 		Ext.example.msg('提示', '请输入会员卡号.');
 		card.focus(mobile, true);
 		return;
-	}
+	}*/
 	
 	var rd_mask_load_recharge = new Ext.LoadMask(document.body, {
 		msg : '正在读卡, 请稍后......',
@@ -261,10 +261,12 @@ function rechargeLoadMemberData(c){
 		url : '../../QueryMember.do',
 		params : {
 			dataSource : 'normal',
-			sType : c.otype,
-			memberCardOrMobileOrName : c.read == 1 ? mobile.getValue() : (c.read == 2 ? card.getValue() : '')
+			id : rd_rechargeMemberMobile?rd_rechargeMemberMobile:'',
+			sType : c.sType,
+			memberCardOrMobileOrName : mobile.getValue()
 		},
 		success : function(res, opt){
+			rd_mask_load_recharge.hide();
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
 				if(jr.root.length == 1){
@@ -272,7 +274,7 @@ function rechargeLoadMemberData(c){
 					if(rechargeOperateData.memberType.attributeValue == 0){
 						Ext.example.msg('提示', '会员信息读取成功.');
 						rechargeBindMemberData(rechargeOperateData);
-						Ext.getCmp('rd_numPayMannerMoney').focus(100, true);
+						Ext.getCmp('rd_numPayMannerMoney').focus(true, 100);
 						Ext.getCmp('rd_numRechargeMoney').clearInvalid();
 					}else{
 						Ext.example.msg('提示', '非充值属性会员不允许充值, 请重新刷卡.');
@@ -280,7 +282,8 @@ function rechargeLoadMemberData(c){
 						rechargeBindMemberData();
 					}
 				}else if(jr.root.length >= 1){
-					charge_getMemberByCertain(c);
+					c.callback = rechargeLoadMemberData;
+					Ext.ux.select_getMemberByCertain(c);
 				}else{
 					Ext.example.msg('提示', '该会员信息不存在, 请重新输入条件后重试.');
 					rechargeOperateData = null;
@@ -289,7 +292,7 @@ function rechargeLoadMemberData(c){
 			}else{
 				Ext.ux.showMsg(jr);
 			}
-			rd_mask_load_recharge.hide();
+			
 		},
 		failure : function(res, opt){
 			rd_mask_load_recharge.hide();
@@ -298,33 +301,6 @@ function rechargeLoadMemberData(c){
 	});
 }
 
-function charge_getMemberByCertain(c){
-	
-	charge_getMemberByCertainWin = new Ext.Window({
-		closable : false, //是否可关闭
-		resizable : false, //大小调整
-		title : '请选择号码来源',
-		modal : true,
-		width : 120,			
-		items : [{
-			xtype : 'panel',
-			frame : true,
-			border : true,
-			//0: 模糊搜索, 1 : 根据手机号, 2: 微信卡号, 3:实体卡号
-			html:'<a href="javascript:rechargeLoadMemberData({otype:1,read:'+ c.read +'})" style="font-size:18px;">手机号</a>'
-				+'</br><a href="javascript:rechargeLoadMemberData({otype:2,read:'+ c.read +'})" style="font-size:18px;">微信卡号</a>'
-				+'</br><a href="javascript:rechargeLoadMemberData({otype:3,read:'+ c.read +'})" style="font-size:18px;">实体卡号</a>'
-		}],
-		bbar : ['->',{
-			text : '取消',
-			iconCls : 'btn_close',
-			handler : function(e){
-				charge_getMemberByCertainWin.hide();
-			}				
-		}]	
-	});
-	charge_getMemberByCertainWin.show();
-}
 
 function rechargeBindMemberData(data){
 	var mobile = Ext.getCmp('rd_numMemberMobileForRecharge');
@@ -336,8 +312,6 @@ function rechargeBindMemberData(data){
 	var memberType = Ext.getCmp('rd_txtMmeberType');
 	var sex = Ext.getCmp('rd_txtMemberSex');
 	var birthday = Ext.getCmp('rd_txtMemberBirthday');
-	var IDCard = Ext.getCmp('rd_txtMemberIDCard');
-	var company = Ext.getCmp('rd_txtMemberCompany');
 	var contactAddress = Ext.getCmp('rd_txtMemberContactAddress');
 	var comment = Ext.getCmp('rd_txtMemberComment');
 	
@@ -354,7 +328,7 @@ function rechargeBindMemberData(data){
 	data = data == null || typeof data == 'undefined' ? {} : data;
 	var memberTypeData = typeof data['memberType'] == 'undefined' ? {} : data['memberType'];
 	
-	mobile.setValue(data['mobile']);
+	mobile.setValue(data['mobile']?data['mobile']:data['memberCard']);
 	memberCard.setValue(data['memberCard']);
 	totalBalance.setValue(data['totalBalance']);
 	baseBalance.setValue(data['baseBalance']);
@@ -363,11 +337,13 @@ function rechargeBindMemberData(data){
 	memberType.setValue(memberTypeData['name']);
 	sex.setValue(data['sexText']);
 	birthday.setValue(data['birthdayFormat']);
-	IDCard.setValue(data['idCard']);
-	company.setValue(data['company']);
 	contactAddress.setValue(data['contactAddress']);
 	comment.setValue(data['comment']);
 	
+}
+
+function rechargeNumberFocus(){
+	Ext.getCmp('rd_numMemberMobileForRecharge').focus(true, 100);
 }
 
 /**
@@ -431,7 +407,7 @@ function rechargeControlCenter(_c){
 				Ext.example.msg(jr.title, jr.msg);
 				if(typeof _c.callback == 'function'){
 					jr.data = {
-						memberCard : Ext.getCmp('rd_numMemberCardForRecharge').getValue()	
+						memberCard : Ext.getCmp('rd_numMemberMobileForRecharge').getValue()	
 					};
 					_c.callback(jr);
 				}

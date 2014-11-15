@@ -770,6 +770,41 @@ Ext.ux.TabCloseMenu = function(){
     }
 };
 
+
+//查找出多条会员信息时
+Ext.ux.select_getMemberByCertainCallback = {};
+Ext.ux.select_getMemberByCertain = function(c){
+	console.log(c)
+	Ext.ux.select_getMemberByCertainCallback = c.callback;
+	Ext.ux.select_getMemberByCertainWin = new Ext.Window({
+		closable : false, //是否可关闭
+		resizable : false, //大小调整
+		title : '有多条会员信息相符合, 请选择输入号码的来源:',
+		modal : true,
+		width : 300,			
+		items : [{
+			xtype : 'panel',
+			frame : true,
+			border : true,
+			//0: 模糊搜索, 1 : 根据手机号, 2: 微信卡号, 3:实体卡号
+			html:'<div align="center"><a href="javascript:Ext.ux.select_getMemberByCertainCallback({otype:'+ c.otype +', sType:1})" style="font-size:18px;">手机号</a>'
+				+'&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:Ext.ux.select_getMemberByCertainCallback({otype:'+ c.otype +', sType:2})" style="font-size:18px;">微信卡号</a>'
+				+'&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:Ext.ux.select_getMemberByCertainCallback({otype:'+ c.otype +', sType:3})" style="font-size:18px;">实体卡号</a>'
+				+'</div>'
+		}],
+		bbar : ['->',{
+			text : '取消',
+			iconCls : 'btn_close',
+			handler : function(e){
+				Ext.ux.select_getMemberByCertainWin.hide();
+			}				
+		}]	
+	});
+	Ext.ux.select_getMemberByCertainWin.show();
+}
+
+
+
 Ext.ux.cr = Ext.ux.createRocord;
 
 var TableRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'customNum', 'minimumCost', 'serviceRate', 'categoryValue',
