@@ -108,9 +108,11 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		public List<InsertBuilder> build(){
 			List<InsertBuilder> result = new ArrayList<InsertBuilder>();
 			for(int tableAlias = start; tableAlias <= end; tableAlias++){
-				if(skip4 && tableAlias % 4 == 0){
+				String alias = String.valueOf(tableAlias);
+				int lastTblAlias = Integer.parseInt(alias.substring(alias.length() - 1));
+				if(skip4 && lastTblAlias / 4 == 1 && lastTblAlias % 4 == 0){
 					continue;
-				}else if(skip7 && tableAlias % 7 == 0){
+				}else if(skip7 && lastTblAlias / 7 == 1 && lastTblAlias % 7 == 0){
 					continue;
 				}else{
 					result.add(new InsertBuilder(tableAlias, regionId));

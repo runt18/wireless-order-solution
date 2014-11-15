@@ -7,9 +7,14 @@ import java.util.List;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.dishesOrder.OrderFood;
 
-public class WxOrder implements Jsonable{
+public class WxOrder implements Jsonable, Parcelable{
+	
+	public final static int WX_ORDER_PARCELABLE_SIMPLE = 0;
+	public final static int WX_ORDER_PARCELABLE_COMPLEX = 1;
 	
 	public static enum Status{
 		INVALID(1, "已失效"),
@@ -264,5 +269,54 @@ public class WxOrder implements Jsonable{
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
 	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == WX_ORDER_PARCELABLE_SIMPLE){
+			dest.writeInt(getId());
+			dest.writeInt(getCode());
+			
+		}else if(flag == WX_ORDER_PARCELABLE_COMPLEX){
+			dest.writeInt(getId());
+			dest.writeInt(getCode());
+			dest.writeString(getWeixinSerial());
+			dest.writeLong(getBirthDate());
+			dest.writeByte(getType().getVal());
+			dest.writeByte(getStatus().getVal());
+			dest.writeParcelList(getFoods(), OrderFood.OF_PARCELABLE_4_QUERY);
+		}
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == WX_ORDER_PARCELABLE_SIMPLE){
+			setId(source.readInt());
+			setCode(source.readInt());
+			
+		}else if(flag == WX_ORDER_PARCELABLE_COMPLEX){
+			setId(source.readInt());
+			setCode(source.readInt());
+			setWeixinSerial(source.readString());
+			setBirthDate(source.readLong());
+			setType(WxOrder.Type.valueOf(source.readByte()));
+			setStatus(WxOrder.Status.valueOf(source.readByte()));
+			setFoods(source.readParcelList(OrderFood.CREATOR));
+		}
+	}
 	
+	public final static Parcelable.Creator<WxOrder> CREATOR = new Parcelable.Creator<WxOrder>(){
+
+		@Override
+		public WxOrder newInstance() {
+			return new WxOrder(0);
+		}
+		
+		@Override
+		public WxOrder[] newInstance(int size){
+			return new WxOrder[size];
+		}
+		
+	};
 }
