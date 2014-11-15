@@ -5,12 +5,13 @@ var Templet = {
 		+ '</div>'
 		+ '<div data-r="c" class="box-food-list-c">'
 			+ '<div data-r="t"><b>{name}</b></div>'
-			+ '<div data-r="m">价格: <span>￥{unitPrice}</span></div>'
-			+ '<div data-r="b">积分: <font>{point}</font></div>'
+			+ '<div data-r="m"><span>￥{unitPrice}</span></div>'
+			+ '<div data-r="b"><font>{point}</font>人点过</div>'
 		+ '</div>'
 		+ '<div data-r="r" class="box-horizontal box-food-list-r">'
-			+ '<div data-r="l" data-type="count" data-value="{id}" style="display:{display}">{count}</div>'
-			+ '<div data-r="r" onclick="operateFood({otype:\'add\', id:{id}, event:this})">+</div>'
+			//+ '<div data-r="l" data-type="count" data-value="{id}" style="display:{display}">{count}</div>'
+			//+ '<div data-r="r" onclick="operateFood({otype:\'add\', id:{id}, event:this})">+</div>'
+			+ '<div data-r="r" {selected} data-value="{id}" onclick="operateFood({otype:\'add\', id:{id}, event:this})"></div>'
 		+ '</div>'
 		+ '</div>',
 	shoppingBox : '<div data-value="{id}" class="div-fl-f-sc-box box-horizontal">'
@@ -19,12 +20,23 @@ var Templet = {
 			+ '<div>价格: <span>￥{unitPrice}</span></div>'
 		+ '</div>'
 		+ '<div data-type="cut" onclick="operateFood({otype:\'cut\', id:{id}, event:this})">-</div>'
-		+ '<div data-type="add" onclick="operateFood({otype:\'add\', id:{id}, event:this})">+</div>'
+		+ '<div data-type="plus" onclick="operateFood({otype:\'plus\', id:{id}, event:this})">+</div>'
 		+ '<div data-type="count">{count}</div>'
 		+ '</div>',
 	deptBox : '<div data-value="{id}" onclick="filtersKitchen(this)">{name}</div>',
-	kitchenBox : '<div data-value="{id}" onclick="filtersFood(this)">{name}</div>'
+	kitchenBox2 : '<div data-value="{id}" onclick="filtersFood(this)">{name}</div>',
+	kitchenBox : '<li><a data-value="{id}" onclick="filtersFood2(this)">{name}</a></li>'
 };
+
+function changeImg(e){
+	if($(e).hasClass("select-food")){
+		$(e).removeClass("select-food");
+		return false;
+	}else{
+		$(e).addClass("select-food");
+		return true;
+	}
+}
 
 function initView(){
 	var height = document.documentElement.clientHeight;
@@ -88,16 +100,17 @@ function initFoodData(c){
 					html.push(Templet.foodBox.format({
 						id : temp.id,
 						img : temp.img.thumbnail,
-						name : temp.name,
+						name : (temp.name.length > 7? temp.name.substring(0,6)+"…" : temp.name),
 						unitPrice : temp.unitPrice.toFixed(2),
 						point : parseInt(temp.unitPrice),
 						count : count,
+						selected : count > 0 ? 'class="select-food"' : '',
 						display : count > 0 ? 'block' : 'none'
 					}));
 				}
 				count = null;
 				Util.getDom('divOperateFoodPaging').insertAdjacentHTML('beforeBegin', html.join(''));
-				Util.getDom('divOperateFoodPaging').innerHTML = '点击加载更多.';
+//				Util.getDom('divOperateFoodPaging').innerHTML = '点击加载更多.';
 			}else{
 				Util.getDom('divOperateFoodPaging').innerHTML = '没有记录.';
 			}
@@ -123,6 +136,25 @@ function initDeptData(){
 		},
 		success : function(data, status, xhr){
 			params.kitchenData = data.root;
+			var temp, html = [], kitchenList = $('#ulKitchenList');
+			if(params.kitchenData.length > 0){
+				//html.push('<li><a data-value="-1" class="li-k-title" onclick="filtersFood2(this)">全部厨房</a></li>');
+				
+				//默认显示第一个厨房的菜品
+				params.kitchenId = params.kitchenData[0].id; 
+				initFoodData();
+				
+				for(var i = 0; i < params.kitchenData.length; i++){
+					temp = params.kitchenData[i];
+					html.push(Templet.kitchenBox.format({
+						id : temp.id,
+						name : temp.name.substring(0, 4)
+					}));
+				}
+			}
+			kitchenList.html(html.join(''));
+			temp = null;
+			html = null;			
 		},
 		error : function(xhr, errorType, error){
 			Util.dialog.show({ msg : '加载分厨信息失败.' });
@@ -136,7 +168,6 @@ $(function(){
 	
 	initEvent();
 	
-	initFoodData();
-	
+	//获取厨房后再获取菜品
 	initDeptData();
 });

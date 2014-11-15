@@ -16,7 +16,7 @@ var params = {
 	foodData : [],
 	orderData : [],
 	dataSource : 'normal',
-	isPaging : true,
+	isPaging : false,//默认不分页
 	start : 0,
 	limit : 10,
 	kitchenData : {},
@@ -27,6 +27,74 @@ var params = {
 <script type="text/javascript" src="./js/food/load.js"></script>
 <script type="text/javascript" src="./js/food/main.js"></script>
 
+<style type="text/css">
+.panel {
+  position: absolute;
+  top: -1px;
+  bottom: 45px;
+  left: 0;
+  width: 80px;
+  background-color: #333;
+  /*FIXME*/
+  overflow-y: auto; 
+/*   -webkit-transform: translate3d(-120px, 0, 0);
+  transform: translate3d(-120px, 0, 0); */
+}
+.nav-aside {
+  line-height: 40px;
+}
+.nav-aside li {
+  border-bottom: 1px solid #222;
+  color: #fff;
+}
+.nav-aside li a {
+  color: #fff;
+  padding: 0 5px;
+  display: block;
+  font-weight: bold;
+  font-size: 15px;
+}
+.li-k-title{
+	line-height: 35px;
+	border-bottom: 2px solid #fb7251 !important;
+	text-align: center;
+	font-size: 15px;
+	font-weight: bold;
+}
+.sale-food-list{
+	width: 140px;
+	background-size: 100%;
+	float: left;margin-left: 5px;position: relative;
+}
+
+.sale-food-border{
+	width: 50px;
+	height: 25px;
+	position: absolute;
+	right: 20px;
+	bottom: 8px;
+	font-size: 25px;
+	color: firebrick;
+/* 	margin-bottom: 10px; */
+}
+.sale-food-sorder{
+/*	width: 25px;
+	height: 15px;
+	position: absolute;
+	right: 25px;
+	bottom: 5px;
+	font-size: 15px;
+	color: firebrick;
+ 	margin-bottom: 10px; */
+ 	float: right;
+ 	margin-top: 48px;
+}
+
+.sale-food-sorder >input{
+	font-size: 12px;
+}
+
+</style>
 </head>
 <body>
 
@@ -60,17 +128,17 @@ var params = {
 	<div id="divButtonForSC" class="hewarp">
 		<ul>
 			<li style="width:33.33%">
-				<a href="javascript:operateFood({otype:'claer'});" title="会员中心"> 
+				<a href="javascript:operateFood({otype:'claer'});" > 
 				<i class="foundicon-remove fcolor1"></i>清&nbsp;空
 				</a>
 			</li>
 			<li style="width:33.33%">
-				<a href="javascript:operateShoppingCart({event:this, otype:'confirm'});" title="店铺首页">
+				<a href="javascript:operateShoppingCart({event:this, otype:'confirm'});" >
 				<i class="foundicon-checkmark fcolor2"></i>下&nbsp;单
 				</a>
 			</li>
 			<li style="width:33.33%">
-				<a href="javascript:operateShoppingCart({event:this, otype:'hide'});" title="会员中心"> 
+				<a href="javascript:operateShoppingCart({event:this, otype:'hide'});" > 
 				<i class="foundicon-left-arrow fcolor3"></i>返&nbsp;回
 				</a>
 			</li>
@@ -79,7 +147,13 @@ var params = {
 </div>
 
 <div id="divMainView" class="box-vertical">
-	<div id="divFoodList" class="div-full">
+	<section class="panel" id="panelNav" >
+		<ul class="nav-aside" id="ulKitchenList">
+			<li class="li-k-title"><a href="#">全部厨房</a></li>
+		</ul>
+	</section> 
+
+	<div id="divFoodList" class="div-full" style="margin-left: 80px;">
 		<!-- 
 			<div class="box-horizontal box-food-list">
 				<div data-r="l">
@@ -96,9 +170,10 @@ var params = {
 				</div>
 			</div>
 		 -->
-		<div id="divOperateFoodPaging" onclick="loadFoodPaging()">&nbsp;</div>
-		<!-- <div class="footer">&copy; 2014 技术支持：智易科技</div> -->
+		<!-- <div id="divOperateFoodPaging" onclick="loadFoodPaging()">&nbsp;</div> -->
+		<div id="divOperateFoodPaging" >&nbsp;</div>
 	</div>
+	
 	<div id="divBottomNav" class="hewarp">
 		<ul class="swiper-wrapper">
 			<li class="index swiper-slide">
@@ -106,11 +181,16 @@ var params = {
 				<i class="foundicon-home fcolor6"></i>首&nbsp;页
 				</a>
 			</li>
-			<li class="order swiper-slide">
+			<li class="user swiper-slide">
+				<a href="javascript:Util.skip('sales.html');" title="会员中心"> 
+				<i class="foundicon-offsale fcolor1"></i>优惠信息
+				</a>
+			</li>			
+<!-- 			<li class="order swiper-slide">
 				<a href="javascript:operateKitchenSearch({event:this, otype:'show'});" title="分厨">
 				<i class="foundicon-search fcolor5"></i>分&nbsp;类
 				</a>
-			</li>
+			</li> -->
 			<li class="special swiper-slide">
 				<a href="javascript:operateShoppingCart({event:this, otype:'show'});" title="购物车">
 				<i class="foundicon-cart fcolor2"><div id="spanDisplayFoodCount"></div></i>购物车
@@ -131,11 +211,7 @@ var params = {
 				<i class="foundicon-user fcolor3"></i>会员中心
 				</a>
 			</li>
-			<li class="user swiper-slide">
-				<a href="javascript:Util.skip('sales.html');" title="会员中心"> 
-				<i class="foundicon-offsale fcolor1"></i>优惠信息
-				</a>
-			</li>
+
 		</ul>
 	</div>
 </div>
@@ -152,12 +228,39 @@ tw = li.length > 5 ? parseInt(tw / 5) : parseInt(tw / li.length);
 for(var i = 0;i < li.length; i++){
 	li[i].style.width = tw + 'px';
 }
+
 </script>
 
 <div id="divFoodShowAbout">
-	<div data-region="img" class="d-fsa-img"><div></div></div>
-	<div data-region="msg" class="d-fsa-msg"></div>
-	<div data-region="desc" class="d-fsa-desc"></div>
+	<div data-region="img" class="d-fsa-img" >
+		<div data-type="img" style="position: relative;">
+			<div style="height: 25px;background-color: rgba(0, 0, 0, 0.198039);width: 100%;padding-top: 3px;font-weight: bolder;color: white;font-size: 20px;">
+				&nbsp;<span>波斯卡特庄园干红葡萄酒</span><span style="margin-right: 5px;float: right;color: #ff6600">￥238</span>
+			</div>
+			<!-- <div class="sale-food-order">下单</div> -->
+			<span class="sale-food-border" ><input type="button" value="下单" style="font-size: 17px;"> </span>
+		</div>
+	</div>
+	
+	<div  class="d-fsa-desc">点了这个菜的客人还点了:</div>
+
+	<div style="height:100px;overflow-x:auto;overflow-y:hidden;background-color: white;">
+	    <div style="width:9999px;">
+	        <div class="sale-food-list" style="background-image: url(http://digie-image-test.oss.aliyuncs.com/FoodImage/40/20141009094809909.jpg) ;">
+				<div style="height: 20px;background-color: rgba(0, 0, 0, 0.198039);width: 100%;padding-top: 3px;color: white;">波斯卡特葡萄酒<span style="margin-right: 5px;float: right;color: #ff6600">￥238</span></div>
+				<span class="sale-food-sorder" ><input type="button" value="下单" onclick="saleOrderFood({otype:'order', id:12919, event:this})"> </span>      	
+	        </div>
+	        <div class="sale-food-list" style="background-image: url(http://digie-image-test.oss.aliyuncs.com/FoodImage/40/20141009094840176.jpg) ;">
+				<div style="height: 20px;background-color: rgba(0, 0, 0, 0.198039);width: 100%;padding-top: 3px;color: white;">波斯卡特葡萄酒<span style="margin-right: 5px;float: right;color: #ff6600">￥238</span></div>
+				<span class="sale-food-sorder" ><input type="button" value="下单√" onclick="saleOrderFood({otype:'order', id:25537, event:this})"> </span>      	
+	        </div>
+<!-- 	        <div class="sale-food-list">
+				<div style="height: 20px;background-color: rgba(0, 0, 0, 0.198039);width: 100%;padding-top: 3px;color: white;">波斯卡特葡萄酒<span style="margin-right: 5px;float: right;color: #ff6600">￥238</span></div>
+				<span class="sale-food-sorder" ><input type="button" value="下单" > </span>      	
+	        </div>
+	        <div class="sale-food-list"></div> -->
+	    </div>	
+	</div>
 	<div data-region="mask" class="d-fsa-mask div-full" onclick="foodShowAbout({event:this, otype:'hide'})"></div>
 </div>
 

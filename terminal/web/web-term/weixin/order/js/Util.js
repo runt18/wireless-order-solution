@@ -138,11 +138,12 @@ Util.dialog = {
 	id : 'div-loadmask-m-dialog',
 	tid : 'div-loadmask-m-dialog-t',
 	mid : 'div-loadmask-m-dialog-m',
+	btn : {yesno : '<button onclick="Util.dialog.event(\'yes\');">确定</button>&nbsp;&nbsp;<button onclick="Util.dialog.event(\'cancel\');">取消</button>', yes : '<button onclick="Util.dialog.event(\'yes\');">确定</button>'},
 	templet : '<div id="{id}" class="div-mask div-mask-dialog"><div class="dialog">'
 		+ '<div id={tid} class="dialog-title">{title}</div>'
 		+ '<div id={mid} class="dialog-msg">{msg}</div>'
 		+ '<div class="dialog-button">'
-			+ '<button onclick="Util.dialog.event(\'yes\');">确定</button>&nbsp;&nbsp;<button onclick="Util.dialog.event(\'cancel\');">取消</button>'
+			+  '<button onclick="Util.dialog.event(\'yes\');">确定</button>&nbsp;&nbsp;<button id="dialog_cancel" onclick="Util.dialog.event(\'cancel\');">取消</button>'
 		+ '</div>'
 		+ '</div>'
 		+ '</div>',
@@ -157,6 +158,11 @@ Util.dialog = {
 		}
 		Util.getDom(Util.dialog.tid).innerHTML = typeof c.title == 'string' ? c.title : '温馨提示';
 		Util.getDom(Util.dialog.mid).innerHTML = typeof c.msg == 'string' ? c.msg : '';
+		if(c.btn && c.btn == 'yes'){
+			$('#dialog_cancel').hide();
+		}else{
+			$('#dialog_cancel').show();
+		}
 	},
 	event : function(btn){
 		this.hide();
