@@ -133,6 +133,7 @@ public class QueryMemberAction extends DispatchAction {
 			String consumptionMaxAmount = request.getParameter("consumptionMaxAmount");
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
+			String searchType = request.getParameter("sType");
 			
 //			String point = request.getParameter("point");
 //			String usedPoint = request.getParameter("usedPoint");
@@ -148,7 +149,15 @@ public class QueryMemberAction extends DispatchAction {
 					extraCond.setMemberType(Integer.parseInt(memberType));
 				
 				if(memberCardOrMobileOrName != null && !memberCardOrMobileOrName.trim().isEmpty()){
-					extraCond.setFuzzyName(memberCardOrMobileOrName);
+					if(searchType == null){
+						extraCond.setFuzzyName(memberCardOrMobileOrName);
+					}else if(searchType.equals("1")){
+						extraCond.setMobile(memberCardOrMobileOrName);
+					}else if(searchType.equals("2")){
+						extraCond.setWeixinCard(Integer.parseInt(memberCardOrMobileOrName));
+					}else if(searchType.equals("3")){
+						extraCond.setCard(memberCardOrMobileOrName);
+					}
 				}
 				
 				if(MinTotalMemberCost != null && !MinTotalMemberCost.isEmpty()){

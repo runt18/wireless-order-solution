@@ -42,14 +42,14 @@ public class QueryOrderFromMemberPayAction extends Action{
 			String discountID = request.getParameter("discountID");
 			String servicePlanId = request.getParameter("servicePlanId");
 			String sv = request.getParameter("sv");
-			//0 : 根据手机或卡号; 1 : 根据手机号
+			//0: 模糊搜索, 1 : 根据手机号, 2: 微信卡号, 3:实体卡号
 			String s_type = request.getParameter("st");
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 
 			
-			List<Member> membersByType;
+			List<Member> membersByType = null;
 			
 			MemberDao.ExtraCond extra = new MemberDao.ExtraCond();
 			
@@ -58,15 +58,15 @@ public class QueryOrderFromMemberPayAction extends Action{
 				if(Integer.parseInt(s_type) == 0){
 					extra.setFuzzyName(sv);
 					membersByType = MemberDao.getByCond(staff, extra, null);					
-				}else{
+				}else if(Integer.parseInt(s_type) == 1){
 					extra.setMobile(sv);
 					membersByType = MemberDao.getByCond(staff, extra, null);
-					
-					if(membersByType.isEmpty()){
-						extra.setMobile(null);
-						extra.setCard(sv);
-						membersByType = MemberDao.getByCond(staff, extra, null);
-					}
+				}else if(Integer.parseInt(s_type) == 2){
+					extra.setWeixinCard(Integer.parseInt(sv));
+					membersByType = MemberDao.getByCond(staff, extra, null);
+				}else if(Integer.parseInt(s_type) == 3){
+					extra.setCard(sv);
+					membersByType = MemberDao.getByCond(staff, extra, null);
 				}
 
 				if(membersByType.isEmpty()){

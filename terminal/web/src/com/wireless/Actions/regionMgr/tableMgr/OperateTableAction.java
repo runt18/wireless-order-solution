@@ -130,4 +130,52 @@ public class OperateTableAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 批量增加
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward batch(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		
+		JObject jobject = new JObject();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			String beginAlias = request.getParameter("beginAlias");
+			String endAlias = request.getParameter("endAlias");
+			String skips = request.getParameter("skips");
+			String regionId = request.getParameter("regionId");
+			
+			Table.BatchInsertBuilder insertBuilder = new Table.BatchInsertBuilder(Integer.parseInt(beginAlias), Integer.parseInt(endAlias), Region.RegionId.valueOf(Integer.parseInt(regionId)));
+			if(skips != null && !skips.isEmpty()){
+				String skipNum[] = skips.split(","); 
+				for (String num : skipNum) {
+					if(num.equals("4")){
+						insertBuilder.setSkip4(true);
+					}else if(num.equals("7")){
+						insertBuilder.setSkip7(true);
+					}
+				}
+			}
+			
+			TableDao.insert(StaffDao.verify(Integer.parseInt(pin)), insertBuilder);
+			
+			jobject.initTip(true, "操作成功, 已批量添加餐台信息.");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 }

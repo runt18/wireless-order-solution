@@ -16,13 +16,11 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
-import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -93,8 +91,10 @@ public class WXQueryDeptAction extends DispatchAction{
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			
 			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
-			DepartmentTree deptTree = new DepartmentTree.Builder(FoodDao.getPureFoods(staff)).build();
-			jobject.setRoot(deptTree.asKitchenList());
+			
+			List<Kitchen> list = KitchenDao.getByCond(staff, new KitchenDao.ExtraCond().setContainsImage(true), null);
+			
+			jobject.setRoot(list);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
