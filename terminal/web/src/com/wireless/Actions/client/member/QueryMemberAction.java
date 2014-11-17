@@ -149,7 +149,7 @@ public class QueryMemberAction extends DispatchAction {
 					extraCond.setMemberType(Integer.parseInt(memberType));
 				
 				if(memberCardOrMobileOrName != null && !memberCardOrMobileOrName.trim().isEmpty()){
-					if(searchType == null){
+					if(searchType == null || searchType.isEmpty()){
 						extraCond.setFuzzyName(memberCardOrMobileOrName);
 					}else if(searchType.equals("1")){
 						extraCond.setMobile(memberCardOrMobileOrName);
