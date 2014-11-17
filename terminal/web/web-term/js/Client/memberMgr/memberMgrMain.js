@@ -293,12 +293,6 @@ function initTakeMoneyWin(){
 						isPrint : Ext.getCmp('chbPrintTakeMoney').getValue(),
 						callback : function(_c){
 							takeMoneyWin.hide();
-//							var st = Ext.getCmp('mr_comboMemberSearchType');
-//							st.setValue(2);
-//							st.fireEvent('select', st, null, null);
-//							var n = Ext.getCmp('numberSearchValueByNumber');
-//							n.setValue(_c.data.memberCard);
-//							Ext.getCmp('btnSearchMember').handler();
 						}
 					});
 				}
