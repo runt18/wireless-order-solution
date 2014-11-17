@@ -1,7 +1,7 @@
 package com.wireless.pojo.client;
 
 
-public class WeixinMember {
+public class WxMember {
 	
 	public static class BindBuilder{
 		private final String serial;
@@ -27,8 +27,8 @@ public class WeixinMember {
 			this.serial = serial;
 		}
 		
-		public WeixinMember build(){
-			return new WeixinMember(this);
+		public WxMember build(){
+			return new WxMember(this);
 		}
 	}
 	
@@ -76,12 +76,12 @@ public class WeixinMember {
 	private String weixinMemberSerial;
 	private Status status;
 	
-	private WeixinMember(InsertBuilder builder){
+	private WxMember(InsertBuilder builder){
 		setWeixinMemberSerial(builder.serial);
 		setStatus(Status.BOUND);
 	}
 	
-	public WeixinMember(int card){
+	public WxMember(int card){
 		this.card = card;
 	}
 	
@@ -148,10 +148,10 @@ public class WeixinMember {
 	
 	@Override
 	public boolean equals(Object obj){
-		if(obj == null || !(obj instanceof WeixinMember)){
+		if(obj == null || !(obj instanceof WxMember)){
 			return false;
 		}else{
-			return card == ((WeixinMember)obj).card;
+			return card == ((WxMember)obj).card;
 		}
 	}
 	

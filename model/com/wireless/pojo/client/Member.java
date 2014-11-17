@@ -107,6 +107,17 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			
 		}
 		
+		public static InsertBuilder build4Weixin(String name, MemberType memberType){
+			return build4Weixin(name, memberType.getId());
+		}
+		
+		public static InsertBuilder build4Weixin(String name, int memberTypeId){
+			InsertBuilder builder = new InsertBuilder();
+			builder.data.setName(name);
+			builder.data.setMemberType(new MemberType(memberTypeId));
+			return builder;
+		}
+		
 		public static InsertBuilder build4Mobile(String name, String mobile, int memberTypeId){
 			InsertBuilder builder = new InsertBuilder();
 			builder.data.setName(name);
@@ -330,7 +341,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private MemberType memberType;		// 会员类型
 	private String memberCard;			// 会员卡号
 	
-	private WeixinMember weixin;		// 微信信息
+	private WxMember weixin;		// 微信信息
 	//Ta喜欢的菜品
 	private final List<Food> favorFoods = new ArrayList<Food>();
 	//向Ta推荐的菜品
@@ -866,11 +877,11 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		this.memberCard = memberCard.replaceFirst("^(0+)", "");
 	}
 	
-	public void setWeixin(WeixinMember weixin){
+	public void setWeixin(WxMember weixin){
 		this.weixin = weixin;
 	}
 	
-	public WeixinMember getWeixin(){
+	public WxMember getWeixin(){
 		return this.weixin;
 	}
 	
@@ -913,6 +924,9 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	public String getMobile() {
+		if(mobile == null){
+			return "";
+		}
 		return mobile;
 	}
 	
@@ -921,7 +935,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	public boolean hasMobile(){
-		return this.mobile.trim().length() != 0;
+		return this.getMobile().trim().length() != 0;
 	}
 	
 	public long getBirthday() {
