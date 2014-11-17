@@ -170,6 +170,10 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			this.data.setMemberCard(card);
 			return this;
 		}
+		public InsertBuilder setMobile(String mobile){
+			this.data.setMobile(mobile);
+			return this;
+		}
 		public Member build(){
 			return this.data;
 		}
