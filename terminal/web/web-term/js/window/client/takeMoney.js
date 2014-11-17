@@ -84,24 +84,28 @@ Ext.onReady(function(){
 			{
 				items : [{
 					id : 'tm_numBaseBalance',
+					cls : 'disableInput',
 					fieldLabel : '收款总额',
 					disabled : true
 				}]
 			}, {
 				items : [{
 					id : 'tm_numTotalBalance',
+					cls : 'disableInput',
 					fieldLabel : '账户余额',
 					disabled : true
 				}]
 			}, {
 				items : [{
 					id : 'tm_numTotalPoint',
+					cls : 'disableInput',
 					fieldLabel : '当前积分',
 					disabled : true
 				}]
 			}, {
 				items : [{
 					id : 'tm_numPayMannerMoney',
+					cls : 'disableInput',
 					fieldLabel : '实退金额' + Ext.ux.txtFormat.xh,
 					allowBlank : false,
 					listeners : {
@@ -133,6 +137,7 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					id : 'tm_numTakeMoney',
+					cls : 'disableInput',
 					fieldLabel : '账户扣额' + Ext.ux.txtFormat.xh,
 					allowBlank : false
 					//disabled : true
@@ -286,7 +291,7 @@ function takeMoneyLoadMemberData(c){
 function rechargeBindMemberData(data){
 	var mobile = Ext.getCmp('tm_numMemberMobileForTakeMoney');
 	var memberCard = Ext.getCmp('tm_numMemberCardForTakeMoney');
-	var weixinCard = Ext.getCmp('');
+	var weixinCard = Ext.getCmp('tm_numWeixinMemberCard');
 	var totalBalance = Ext.getCmp('tm_numTotalBalance');
 	var baseBalance = Ext.getCmp('tm_numBaseBalance');
 	//var extraBalance = Ext.getCmp('tm_numExtraBalance');

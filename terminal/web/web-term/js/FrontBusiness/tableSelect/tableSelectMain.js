@@ -1434,6 +1434,7 @@ var btnMemberPointConsume = new Ext.ux.ImageButton({
 						items : [{
 							xtype : 'numberfield',
 							id : 'numMemberPointForConsumePoint',
+							cls : 'disableInput',
 							fieldLabel : '当前积分',
 							disabled : true
 						}]
@@ -1441,6 +1442,7 @@ var btnMemberPointConsume = new Ext.ux.ImageButton({
 						items : [{
 							xtype : 'numberfield',
 							id : 'numConsumePointForConsumePoint',
+							cls : 'disableInput',
 							fieldLabel : '消费积分',
 							allowBlank : false,
 							validator : function(v){

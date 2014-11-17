@@ -80,24 +80,28 @@ Ext.onReady(function(){
 			},{
 				items : [{
 					id : 'rd_numBaseBalance',
+					cls : 'disableInput',
 					fieldLabel : '收款总额',
 					disabled : true
 				}]
 			}, {	
 				items : [{
 					id : 'rd_numTotalBalance',
+					cls : 'disableInput',
 					fieldLabel : '账户余额',
 					disabled : true
 				}]
 			}, {
 				items : [{
 					id : 'rd_numTotalPoint',
+					cls : 'disableInput',
 					fieldLabel : '当前积分',
 					disabled : true
 				}]
 			},{
 				items : [{
 					id : 'rd_numPayMannerMoney',
+					cls : 'disableInput',
 					fieldLabel : '实收金额' + Ext.ux.txtFormat.xh,
 					allowBlank : false,
 					listeners : {
@@ -124,6 +128,7 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					id : 'rd_numRechargeMoney',
+					cls : 'disableInput',
 					fieldLabel : '账户充额' + Ext.ux.txtFormat.xh,
 					allowBlank : false
 				}]
