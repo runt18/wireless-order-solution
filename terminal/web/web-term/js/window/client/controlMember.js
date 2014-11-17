@@ -311,6 +311,7 @@ function cm_operationMemberData(c){
 	var name = Ext.getCmp('cm_txtMemberName');
 	var mobile = Ext.getCmp('cm_txtMemberMobile');
 	var memberCard = Ext.getCmp('cm_numberMemberCard');
+	var weixinCard = Ext.getCmp('cm_weixinMemberCard');
 
 	
 	var sex = Ext.getCmp('cm_comboMemberSex');
@@ -344,6 +345,7 @@ function cm_operationMemberData(c){
 		name.setValue(data['name']);
 		mobile.setValue(data['mobile']);
 		memberCard.setValue(data['memberCard']);
+		weixinCard.setValue(data['weixinCard']);
 		sex.setValue(typeof data['sexValue'] == 'undefined' ? 0 : data['sexValue']);
 		if(eval(data['birthday'] > 0)){
 			birthday.setValue(new Date(eval(data['birthday'])));

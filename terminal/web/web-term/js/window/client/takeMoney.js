@@ -233,7 +233,7 @@ function takeMoneyLoadMemberData(c){
 		url : '../../QueryMember.do',
 		params : {
 			dataSource : 'normal',
-			id : tm_rechargeMemberMobile != 'null'?tm_rechargeMemberMobile : '',
+			id : (tm_rechargeMemberMobile != 'null' && tm_rechargeMemberMobile != null)?tm_rechargeMemberMobile : '',
 			sType : c.sType,
 			memberCardOrMobileOrName : mobile.getValue()
 		},
@@ -277,6 +277,7 @@ function takeMoneyLoadMemberData(c){
 function rechargeBindMemberData(data){
 	var mobile = Ext.getCmp('tm_numMemberMobileForTakeMoney');
 	var memberCard = Ext.getCmp('tm_numMemberCardForTakeMoney');
+	var weixinCard = Ext.getCmp('');
 	var totalBalance = Ext.getCmp('tm_numTotalBalance');
 	var baseBalance = Ext.getCmp('tm_numBaseBalance');
 	//var extraBalance = Ext.getCmp('tm_numExtraBalance');
@@ -309,7 +310,7 @@ function rechargeBindMemberData(data){
 	memberCard.setValue(data['memberCard']);
 	totalBalance.setValue(data['totalBalance']);
 	baseBalance.setValue(data['baseBalance']);
-	//extraBalance.setValue(data['extraBalance']);
+	weixinCard.setValue(data['weixinCard']);
 	totalPoint.setValue(data['point']);
 	name.setValue(data['name']);
 	memberType.setValue(memberTypeData['name']);
