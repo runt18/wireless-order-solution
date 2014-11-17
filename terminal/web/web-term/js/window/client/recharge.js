@@ -242,21 +242,6 @@ function rechargeLoadMemberData(c){
 		mobile.focus(true, 100);
 		return;			
 	}
-/*	
-	else if(c.read != 1 && c.read != 2){
-		Ext.example.msg('提示', '操作失败, 程序异常, 请联系客服人员.');
-		return;		
-	}else if(c.read == 1 && (mobile.getRawValue() == '' || !mobile.isValid())){
-		// memberMobile
-		Ext.example.msg('提示', '请输入11位手机号码.');
-		mobile.focus(mobile, true);
-		return;
-	}else if(c.read == 2 && card.getRawValue() == ''){
-		// memberCard
-		Ext.example.msg('提示', '请输入会员卡号.');
-		card.focus(mobile, true);
-		return;
-	}*/
 	
 	var rd_mask_load_recharge = new Ext.LoadMask(document.body, {
 		msg : '正在读卡, 请稍后......',
@@ -275,6 +260,7 @@ function rechargeLoadMemberData(c){
 			rd_mask_load_recharge.hide();
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
+				rd_rechargeMemberMobile = null;
 				if(jr.root.length == 1){
 					rechargeOperateData = jr.root[0];
 					if(rechargeOperateData.memberType.attributeValue == 0){

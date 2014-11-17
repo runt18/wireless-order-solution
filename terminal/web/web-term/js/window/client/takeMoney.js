@@ -247,6 +247,7 @@ function takeMoneyLoadMemberData(c){
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
+			tm_rechargeMemberMobile = null;
 			if(jr.success){
 				tm_mask_load_recharge.hide();
 				if(jr.root.length == 1){
@@ -254,7 +255,7 @@ function takeMoneyLoadMemberData(c){
 					if(rechargeOperateData.memberType.attributeValue == 0){
 						Ext.example.msg('提示', '会员信息读取成功.');
 						rechargeBindMemberData(rechargeOperateData);
-						Ext.getCmp('tm_numPayMannerMoney').focus(100, true);
+						Ext.getCmp('tm_numPayMannerMoney').focus(true, 200);
 						Ext.getCmp('tm_numTakeMoney').clearInvalid();
 					}else{
 						Ext.example.msg('提示', '非充值属性会员不允许取款, 请重新刷卡.');
