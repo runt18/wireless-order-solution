@@ -324,4 +324,9 @@ public class TestMemberDao {
 	public void testCalcRecommendFoods() throws SQLException{
 		MemberDao.calcRecommendFoods();
 	}
+	
+	@Test
+	public void testMemberUpgrade() throws SQLException, BusinessException{
+//		System.out.println(MemberDao.upgrade());
+	}
 }

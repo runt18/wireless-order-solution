@@ -117,7 +117,7 @@ public class MemberDao {
 		private int minTotalConsume;
 		private int maxTotalConsume;
 		private DutyRange range;
-		private int weixinCard;
+		private String weixinCard;
 		private String weixinSerial;
 		
 		public ExtraCond setId(int id){
@@ -140,7 +140,7 @@ public class MemberDao {
 			return this;
 		}
 		
-		public ExtraCond setWeixinCard(int weixinCard){
+		public ExtraCond setWeixinCard(String weixinCard){
 			this.weixinCard = weixinCard;
 			return this;
 		}
@@ -191,7 +191,7 @@ public class MemberDao {
 		
 		private String cond4WeixinCard(String weixinCard, boolean defVal){
 			try{
-				return weixinCard != null ? (" WM.weixin_card = " + Integer.parseInt(weixinCard)) : "";
+				return weixinCard != null ? (" WM.weixin_card = " + weixinCard) : "";
 			}catch(NumberFormatException ignored){
 				return defVal ? " 1 = 1 " : " 0 = 1 ";
 			}
@@ -216,8 +216,8 @@ public class MemberDao {
 			if(mobile != null){
 				extraCond.append(" AND " + cond4Mobile(mobile));
 			}
-			if(weixinCard != 0){
-				extraCond.append(" AND " + cond4WeixinCard(Integer.toString(weixinCard), true));
+			if(weixinCard != null){
+				extraCond.append(" AND " + cond4WeixinCard(weixinCard, true));
 			}
 			if(weixinSerial != null){
 				extraCond.append(" AND WM.weixin_serial = '" + weixinSerial + "' AND weixin_serial_crc = CRC32('" + weixinSerial + "')");
@@ -671,7 +671,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Member getByWxCard(Staff staff, int weixinCard) throws SQLException, BusinessException{
+	public static Member getByWxCard(Staff staff, String weixinCard) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -695,7 +695,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Member getByWxCard(DBCon dbCon, Staff staff, int weixinCard) throws SQLException, BusinessException{
+	public static Member getByWxCard(DBCon dbCon, Staff staff, String weixinCard) throws SQLException, BusinessException{
 		List<Member> result = getByCond(dbCon, staff, new ExtraCond().setWeixinCard(weixinCard), null);
 		if(result.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);

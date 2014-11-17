@@ -35,13 +35,13 @@ public class TestWeixinMemberDao {
 	@Test
 	public void testWeixinMemberDao() throws SQLException, BusinessException, NoSuchAlgorithmException{
 
-		int weixinCard = 0;
+		String weixinCard = "";
 		try{
 			//--------Test to interest a weixin member---------------
 			int memberId = WxMemberDao.interest(mStaff, WEIXIN_MEMBER_SERIAL);
 			
 			Member actual = MemberDao.getById(mStaff, memberId);
-			weixinCard = actual.getWeixin().getCard();
+			weixinCard = actual.getWeixin().getCard()+"";
 			
 			Assert.assertEquals("member id to weixin", memberId, actual.getId());
 			Assert.assertEquals("member name to weixin", "微信会员", actual.getName());
@@ -61,7 +61,7 @@ public class TestWeixinMemberDao {
 			Assert.assertEquals("card to weixin member", weixinCard, actual.getWeixin().getCard());
 			
 		}finally{
-			if(weixinCard != 0){
+			if(weixinCard != null){
 				
 				MemberDao.deleteByCond(mStaff, new MemberDao.ExtraCond().setWeixinCard(weixinCard));
 				
