@@ -761,6 +761,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.putLong("birthday", this.birthday);
 		jm.putString("birthdayFormat", this.birthday != 0 ? DateUtil.formatToDate(this.birthday) : "");
 		jm.putString("idCard", this.idCard);
+		jm.putString("weixinCard", this.weixin != null?this.weixin.getCard() + "":"");
 		jm.putString("company", this.company);
 		//jm.put("tastePref", this.tastePref);
 		//jm.put("taboo", this.taboo);

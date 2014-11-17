@@ -10,6 +10,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.util.DateUtil;
 
 public class WxOrder implements Jsonable, Parcelable{
 	
@@ -262,7 +263,12 @@ public class WxOrder implements Jsonable, Parcelable{
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
-		
+		jm.putInt("id", this.id);
+		jm.putInt("code", this.code);
+		jm.putString("date", DateUtil.format(this.birthDate));
+		jm.putInt("type", this.type.getVal());
+		jm.putInt("statusVal", this.status.getVal());
+		jm.putString("statusDesc", this.status.getDesc());
 		return jm;
 	}
 	@Override
