@@ -98,6 +98,7 @@ function showKeyboardNumForUO(foodName, dishes){
 	$("#" + inputNumIdUO).val(count);
 	$("#" + inputNumIdUO).select();
 	
+	uo.selectAll = true;
 	//点击取消界面按钮
 	$("#btnCloseForKeyboardNumUO").click(function(){
 		Util.dialongDisplay({
@@ -333,8 +334,11 @@ uo.showdivKeyboardPeopleForUO = function(c){
 		//设定输入框的id和初始显示信息
 		inputNumIdUO = 'txtPeopleNumForUO';
 		inputNumValUO = 1;
+		
 		$("#" + inputNumIdUO).val(inputNumValUO);
 		$("#" + inputNumIdUO).select();
+		
+		uo.selectAll = true;
 		inputNumValUO = "";
 		//取消按钮
 		$("#btnCloseForPeopleKeyboardUO").click(function(){
@@ -651,6 +655,9 @@ uo.submitUpdateOrderHandler = function(c){
 							uo.tempPayForUO();
 						}else{
 							if(uo.canceling){
+								updateTable({
+									alias : uo.table.alias
+								});								
 								Util.msg.alert({
 									title : data.title,
 									msg : '退菜成功', 
