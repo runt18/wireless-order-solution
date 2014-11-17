@@ -9,6 +9,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.DateUtil;
 
@@ -19,7 +20,8 @@ public class WxOrder implements Jsonable, Parcelable{
 	
 	public static enum Status{
 		INVALID(1, "已失效"),
-		COMMITTED(2, "已提交");
+		COMMITTED(2, "已提交"),
+		ORDER_ATTACHED(3, "已下单");
 		
 		private final int val;
 		private final String desc;
@@ -79,6 +81,7 @@ public class WxOrder implements Jsonable, Parcelable{
 	
 	public static class UpdateBuilder{
 		private final int id;
+		private int orderId;
 		private Status status;
 		
 		public UpdateBuilder(int id){
@@ -92,6 +95,20 @@ public class WxOrder implements Jsonable, Parcelable{
 		
 		public boolean isStatusChanged(){
 			return this.status != null;
+		}
+		
+		public UpdateBuilder setOrder(int orderId){
+			this.orderId = orderId;
+			return this;
+		}
+		
+		public UpdateBuilder setOrder(Order order){
+			this.orderId = order.getId();
+			return this;
+		}
+		
+		public boolean isOrderChanged(){
+			return this.orderId != 0;
 		}
 		
 		public WxOrder build(){
@@ -148,6 +165,7 @@ public class WxOrder implements Jsonable, Parcelable{
 	private String weixinSerial;
 	private long birthDate;
 	private int code;
+	private int orderId;
 	private Type type;
 	private Status status;
 	private int restaurantId;
@@ -156,6 +174,7 @@ public class WxOrder implements Jsonable, Parcelable{
 	private WxOrder(UpdateBuilder builder){
 		setId(builder.id);
 		setStatus(builder.status);
+		setOrderId(builder.orderId);
 	}
 	
 	private WxOrder(InsertBuilder builder){
@@ -199,6 +218,14 @@ public class WxOrder implements Jsonable, Parcelable{
 	
 	public void setCode(int code) {
 		this.code = code;
+	}
+	
+	public void setOrderId(int orderId){
+		this.orderId = orderId;
+	}
+	
+	public int getOrderId(){
+		return this.orderId;
 	}
 	
 	public Status getStatus() {

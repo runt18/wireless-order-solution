@@ -103,12 +103,26 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	public static class InsertBuilder{
 		private final Member data = new Member();
 		
-		public InsertBuilder(String name, String mobile, int memberTypeId){
-			this.data.setName(name);
-			this.data.setMobile(mobile);
-			this.data.setMemberType(new MemberType(memberTypeId));
+		private InsertBuilder(){
+			
 		}
-
+		
+		public static InsertBuilder build4Mobile(String name, String mobile, int memberTypeId){
+			InsertBuilder builder = new InsertBuilder();
+			builder.data.setName(name);
+			builder.data.setMobile(mobile);
+			builder.data.setMemberType(new MemberType(memberTypeId));
+			return builder;
+		}
+		
+		public static InsertBuilder build4Card(String name, String card, int memberTypeId){
+			InsertBuilder builder = new InsertBuilder();
+			builder.data.setName(name);
+			builder.data.setMemberCard(card);
+			builder.data.setMemberType(new MemberType(memberTypeId));
+			return builder;
+		}
+		
 		public InsertBuilder setSex(Sex sex){
 			this.data.setSex(sex);
 			return this;
@@ -849,7 +863,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	public void setMemberCard(String memberCard) {
-		this.memberCard = memberCard;
+		this.memberCard = memberCard.replaceFirst("^(0+)", "");
 	}
 	
 	public void setWeixin(WeixinMember weixin){
