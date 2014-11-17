@@ -1125,7 +1125,7 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 									Ext.TaskMgr.stop(this);
 								}
 							},
-							interval: 200
+							interval: 300
 						};
 					
 												
