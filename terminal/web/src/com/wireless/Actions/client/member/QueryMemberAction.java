@@ -154,7 +154,7 @@ public class QueryMemberAction extends DispatchAction {
 					}else if(searchType.equals("1")){
 						extraCond.setMobile(memberCardOrMobileOrName);
 					}else if(searchType.equals("2")){
-						extraCond.setWeixinCard(Integer.parseInt(memberCardOrMobileOrName));
+						extraCond.setWeixinCard(memberCardOrMobileOrName);
 					}else if(searchType.equals("3")){
 						extraCond.setCard(memberCardOrMobileOrName);
 					}
