@@ -545,40 +545,13 @@ function memberPayOrderToBindData(_c){
 	}
 }
 
-function getMemberByCertain(){
-	memberMoreThenUniqueWin = new Ext.Window({
-		closable : false, //是否可关闭
-		resizable : false, //大小调整
-		title : '请选择号码来源',
-		modal : true,
-		width : 120,			
-		items : [{
-			xtype : 'panel',
-			frame : true,
-			border : true,
-			//0: 模糊搜索, 1 : 根据手机号, 2: 微信卡号, 3:实体卡号
-			html:'<a href="javascript:memberPayOrderToLoadData({otype:1})" style="font-size:18px;">手机号</a>'
-				+'</br><a href="javascript:memberPayOrderToLoadData({otype:2})" style="font-size:18px;">微信卡号</a>'
-				+'</br><a href="javascript:memberPayOrderToLoadData({otype:3})" style="font-size:18px;">实体卡号</a>'
-		}],
-		bbar : ['->',{
-			text : '取消',
-			iconCls : 'btn_close',
-			handler : function(e){
-				memberMoreThenUniqueWin.hide();
-			}				
-		}]	
-	});
-	memberMoreThenUniqueWin.show();
-}
-
 /**
  * 
  * @param c
  */
 function memberPayOrderToLoadData(c){
-	if(typeof memberMoreThenUniqueWin != 'undefined'){
-		memberMoreThenUniqueWin.hide();
+	if(typeof Ext.ux.select_getMemberByCertainWin != 'undefined'){
+		Ext.ux.select_getMemberByCertainWin.hide();
 	}
 	c = c == null || typeof c == 'undefined' ? {} : c;
 	
@@ -601,7 +574,7 @@ function memberPayOrderToLoadData(c){
 		url : '../../QueryOrderFromMemberPay.do',
 		params : {
 			orderID : orderID,
-			st : c.otype,
+			st : c.sType,
 			sv : mobile.getValue()
 		},
 		success : function(res, opt){
@@ -613,7 +586,8 @@ function memberPayOrderToLoadData(c){
 //					Ext.getCmp('mpo_couponForPayOrder').setValue();
 					Ext.getCmp('mpo_txtDiscountForPayOrder').setValue();
 					if(jr.other.members && jr.other.members.length > 1){
-						getMemberByCertain();
+						c.callback = memberPayOrderToLoadData;
+						Ext.ux.select_getMemberByCertain(c);
 					}else{
 						mpo_servicePlanData = [];
 						mpo_pricePlanData = [];

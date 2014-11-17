@@ -7,7 +7,7 @@ Ext.onReady(function(){
 	var mh = parseInt(pe.style.height);
 	var memeberMobile = new Ext.form.NumberField({
 		xtype : 'numberfield',
-		id : 'tm_numMemberMobileForTakeMoney',
+		id : 'tm_memberInfoRecharge',
 		fieldLabel : '手机号码/卡号' + Ext.ux.txtFormat.xh,
 		disabled : false,
 		listeners : {
@@ -175,9 +175,9 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					xtype : 'textfield',
-					id : 'tm_txtMemberBirthday',
+					id : 'tm_numMemberMobileForTakeMoney',
 					cls : 'disableInput',
-					fieldLabel : '生日',
+					fieldLabel : '手机',
 					disabled : true
 				}]
 			}, {
@@ -197,7 +197,15 @@ Ext.onReady(function(){
 					disabled : true
 				}]
 			}, {
-				columnWidth : 1,
+				items : [{
+					xtype : 'textfield',
+					id : 'tm_txtMemberBirthday',
+					cls : 'disableInput',
+					fieldLabel : '生日',
+					disabled : true
+				}]
+			}, {
+				columnWidth : 0.62,
 				items : [{
 					xtype : 'textfield',
 					id : 'tm_txtMemberContactAddress',
@@ -217,7 +225,7 @@ function takeMoneyLoadMemberData(c){
 	}	
 	c = c == null || typeof c == 'undefined' ? {} : c;
 	
-	var mobile = Ext.getCmp('tm_numMemberMobileForTakeMoney');
+	var mobile = Ext.getCmp('tm_memberInfoRecharge');
 	if(tm_rechargeMemberMobile == 'null' && mobile.getValue() == ''){
 		Ext.example.msg('提示', '操作失败, 请输入查找条件.');
 		mobile.focus(true, 100);
@@ -381,7 +389,7 @@ function takeMoneyControlCenter(_c){
 				Ext.example.msg(jr.title, jr.msg);
 				if(typeof _c.callback == 'function'){
 					jr.data = {
-						memberCard : Ext.getCmp('tm_numMemberMobileForTakeMoney').getValue()	
+						memberCard : Ext.getCmp('tm_memberInfoRecharge').getValue()	
 					};
 					_c.callback(jr);
 				}
@@ -398,6 +406,6 @@ function takeMoneyControlCenter(_c){
 
 //输入手机号
 function takeMoneyNumberFocus(){
-	Ext.getCmp('tm_numMemberMobileForTakeMoney').focus(true, 100);
+	Ext.getCmp('tm_memberInfoRecharge').focus(true, 100);
 }
 	

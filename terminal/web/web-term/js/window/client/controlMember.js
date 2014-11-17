@@ -4,11 +4,7 @@ Ext.onReady(function(){
 		id : 'cm_numberMemberCard',
 		//inputType : 'password',
 		fieldLabel : '会员卡',
-		disabled : false,
-		maxLength : 10,
-		maxLengthText : '请输入10位会员卡号',
-		minLength : 10,
-		minLengthText : '请输入10位会员卡号'
+		disabled : false
 	};
 	
 	new Ext.Panel({
@@ -463,25 +459,14 @@ function operateMemberHandler(c){
 	var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');
 	var rechargeType = Ext.getCmp('rd_comboFirstRechargeType');
 	
-	if(cm_obj.otype.toLowerCase() == Ext.ux.otype['update'].toLowerCase()){
-		// 验证旧类型为充值属性(后台验证)
-/*		if(c.data['memberType']['attributeValue'] == 0){
-			for(var i = 0; i < membetType.store.getCount(); i++){
-				if(membetType.store.getAt(i).get('id') == membetType.getValue()){
-					if(membetType.store.getAt(i).get('attributeValue') != c.data['memberType']['attributeValue']){
-						if(c.data['totalBalance'] > 0){
-							Ext.example.msg('提示', '该会员还有余额, 不允许设置为优惠属性的类型会员');
-							return;
-						}
-					}
-					break;
-				}
-			}
-		}*/
+	if(cm_obj.otype.toLowerCase() == Ext.ux.otype['insert'].toLowerCase()){
+		if(!memberMobile.getValue() && !Ext.getCmp('cm_numberMemberCard').getValue()){
+			Ext.example.msg('提示', '至少要输入手机或会员卡号');
+			return;
+		}
 	}
 	
-	if(!memberName.isValid() || !memberMobile.isValid() 
-		|| !membetType.isValid() || !memberSex.isValid()){
+	if(!memberName.isValid() || !membetType.isValid() || !memberSex.isValid()){
 		return;
 	}
 	

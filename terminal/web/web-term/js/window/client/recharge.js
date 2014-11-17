@@ -8,7 +8,7 @@ Ext.onReady(function(){
 	var mh = parseInt(pe.style.height);
 	var memeberMobile = new Ext.form.NumberField({
 		xtype : 'numberfield',
-		id : 'rd_numMemberMobileForRecharge',
+		id : 'rd_memberInfoRecharge',
 		fieldLabel : '手机号码/卡号' + Ext.ux.txtFormat.xh,
 		disabled : false,
 		listeners : {
@@ -152,7 +152,7 @@ Ext.onReady(function(){
 				items : [{
 					xtype : 'textfield',
 					id : 'rd_txtRechargeComment',
-					fieldLabel : '备注',
+					fieldLabel : '充值说明',
 					width : 540
 				}]
 			}, {
@@ -185,9 +185,9 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtMemberBirthday',
+					id : 'rd_numMemberMobileForRecharge',
 					cls : 'disableInput',
-					fieldLabel : '生日',
+					fieldLabel : '手机',
 					disabled : true
 				}]
 			}, {
@@ -207,16 +207,14 @@ Ext.onReady(function(){
 					disabled : true
 				}]
 			}, {
-				columnWidth : 1,
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtMemberContactAddress',
-					fieldLabel : '联系地址',
-					width : 540,
+					id : 'rd_txtMemberBirthday',
+					fieldLabel : '生日',
 					disabled : true
 				}]
 			}, {
-				columnWidth : 1,
+				columnWidth : 0.62,
 				items : [{
 					xtype : 'textfield',
 					id : 'rd_txtMemberComment',
@@ -238,7 +236,7 @@ function rechargeLoadMemberData(c){
 	}
 	c = c == null || typeof c == 'undefined' ? {} : c;
 	
-	var mobile = Ext.getCmp('rd_numMemberMobileForRecharge');
+	var mobile = Ext.getCmp('rd_memberInfoRecharge');
 	if(!rd_rechargeMemberMobile && mobile.getValue() == ''){
 		Ext.example.msg('提示', '操作失败, 请输入查找条件.');
 		mobile.focus(true, 100);
@@ -321,7 +319,6 @@ function rechargeBindMemberData(data){
 	var memberType = Ext.getCmp('rd_txtMmeberType');
 	var sex = Ext.getCmp('rd_txtMemberSex');
 	var birthday = Ext.getCmp('rd_txtMemberBirthday');
-	var contactAddress = Ext.getCmp('rd_txtMemberContactAddress');
 	var comment = Ext.getCmp('rd_txtMemberComment');
 	
 	var rechargeMoney = Ext.getCmp('rd_numRechargeMoney');
@@ -347,13 +344,12 @@ function rechargeBindMemberData(data){
 	memberType.setValue(memberTypeData['name']);
 	sex.setValue(data['sexText']);
 	birthday.setValue(data['birthdayFormat']);
-	contactAddress.setValue(data['contactAddress']);
 	comment.setValue(data['comment']);
 	
 }
 
 function rechargeNumberFocus(){
-	Ext.getCmp('rd_numMemberMobileForRecharge').focus(true, 100);
+	Ext.getCmp('rd_memberInfoRecharge').focus(true, 100);
 }
 
 /**
@@ -417,7 +413,7 @@ function rechargeControlCenter(_c){
 				Ext.example.msg(jr.title, jr.msg);
 				if(typeof _c.callback == 'function'){
 					jr.data = {
-						memberCard : Ext.getCmp('rd_numMemberMobileForRecharge').getValue()	
+						memberCard : Ext.getCmp('rd_memberInfoRecharge').getValue()	
 					};
 					_c.callback(jr);
 				}

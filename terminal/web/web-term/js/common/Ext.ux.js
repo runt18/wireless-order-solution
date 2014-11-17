@@ -774,7 +774,6 @@ Ext.ux.TabCloseMenu = function(){
 //查找出多条会员信息时
 Ext.ux.select_getMemberByCertainCallback = {};
 Ext.ux.select_getMemberByCertain = function(c){
-	console.log(c)
 	Ext.ux.select_getMemberByCertainCallback = c.callback;
 	Ext.ux.select_getMemberByCertainWin = new Ext.Window({
 		closable : false, //是否可关闭
