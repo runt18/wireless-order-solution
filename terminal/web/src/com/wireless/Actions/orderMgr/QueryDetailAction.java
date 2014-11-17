@@ -43,14 +43,14 @@ public class QueryDetailAction extends Action {
 			
 			
 			if (queryType.equals("Today")) {
-				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.TODAY).setOrderId(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
+				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.TODAY).setOrder(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
 			}else if (queryType.equals("TodayByTbl")) {
 				Table t = new Table();
 				t.setRestaurantId(Integer.valueOf(restaurantID));
 				t.setTableAlias(Integer.valueOf(talias));
 				list = OrderFoodDao.getSingleDetailByTable(staff, t);
 			}else {
-				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.HISTORY).setOrderId(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
+				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.HISTORY).setOrder(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
 			}
 		}catch(BusinessException e){
 			e.printStackTrace();

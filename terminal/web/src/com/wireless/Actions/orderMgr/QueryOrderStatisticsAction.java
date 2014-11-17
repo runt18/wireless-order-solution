@@ -123,8 +123,8 @@ public class QueryOrderStatisticsAction extends Action {
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			list = OrderDao.getPureByCond(staff, extraCond, orderClause);
-			totalList = OrderDao.getPureByCond(staff, extraCond, null);
+			list = OrderDao.getByCond(staff, extraCond, orderClause);
+			totalList = OrderDao.getByCond(staff, extraCond, null);
 			
 			OrderSummary summary = OrderDao.getOrderSummary(staff, extraCond, dateTypeEnmu);
 			

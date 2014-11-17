@@ -19,7 +19,7 @@ import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.member.WeixinMemberDao;
+import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
@@ -202,7 +202,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注
 				Staff staff = StaffDao.getAdminByRestaurant(WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
-				WeixinMemberDao.interest(staff, msg.getFromUserName());
+				WxMemberDao.interest(staff, msg.getFromUserName());
 				try{
 					session.callback(createWelcome(msg));
 				}catch(BusinessException e){

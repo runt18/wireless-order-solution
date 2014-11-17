@@ -20,14 +20,14 @@ import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.VerifySMSDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.member.WeixinMemberDao;
+import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.WeixinMember;
+import com.wireless.pojo.client.WxMember;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.VerifySMS;
@@ -100,7 +100,7 @@ public class WXOperateMemberAction extends DispatchAction {
 					JsonMap jm = new JsonMap();
 					jm.putJsonable("member", j, 0);
 					jm.putJsonable("restaurant", restaurant, 0);
-					jm.putInt("status", member.getMobile() != null && !member.getMobile().isEmpty()?WeixinMember.Status.BOUND.getVal():WeixinMember.Status.INTERESTED.getVal());
+					jm.putInt("status", member.getMobile() != null && !member.getMobile().isEmpty()?WxMember.Status.BOUND.getVal():WxMember.Status.INTERESTED.getVal());
 					jm.putInt("weixinCard", weixinCard);
 					if(!couponList.isEmpty()){
 						jm.putBoolean("hasCoupon", true);
@@ -251,7 +251,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			// 验证验证码
 			VerifySMSDao.verify(dbCon, new VerifyBuilder(Integer.valueOf(codeId), Integer.valueOf(code)));
 			
-			WeixinMemberDao.bind(dbCon, staff, new WeixinMember.BindBuilder(openId, request.getParameter("mobile")));
+			WxMemberDao.bind(dbCon, staff, new WxMember.BindBuilder(openId, request.getParameter("mobile")));
 			
 			dbCon.conn.commit();
 		}catch(BusinessException e){
