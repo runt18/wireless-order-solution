@@ -152,6 +152,7 @@ Ext.onReady(function(){
 				items : [{
 					xtype : 'textfield',
 					id : 'tm_txtMemberName',
+					cls : 'disableInput',
 					fieldLabel : '会员名称',
 					disabled : true
 				}]
@@ -159,6 +160,7 @@ Ext.onReady(function(){
 				items : [{
 					xtype : 'textfield',
 					id : 'tm_txtMmeberType',
+					cls : 'disableInput',
 					fieldLabel : '会员类别',
 					disabled : true
 				}]
@@ -166,6 +168,7 @@ Ext.onReady(function(){
 				items : [{
 					xtype : 'textfield',
 					id : 'tm_txtMemberSex',
+					cls : 'disableInput',
 					fieldLabel : '性别',
 					disabled : true
 				}]
@@ -173,6 +176,7 @@ Ext.onReady(function(){
 				items : [{
 					xtype : 'textfield',
 					id : 'tm_txtMemberBirthday',
+					cls : 'disableInput',
 					fieldLabel : '生日',
 					disabled : true
 				}]
@@ -180,6 +184,7 @@ Ext.onReady(function(){
 				items : [{
 					xtype : 'textfield',
 					id : 'tm_numMemberCardForTakeMoney',
+					cls : 'disableInput',
 					fieldLabel : '实体卡号',
 					disabled : true
 				}]
@@ -187,6 +192,7 @@ Ext.onReady(function(){
 				items : [{
 					xtype : 'textfield',
 					id : 'tm_numWeixinMemberCard',
+					cls : 'disableInput',
 					fieldLabel : '微信会员卡',
 					disabled : true
 				}]

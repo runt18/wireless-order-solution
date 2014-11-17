@@ -233,7 +233,16 @@ Ext.onReady(function(){
 		}, {
 			items : [{
 				xtype : 'numberfield',
+				id : 'cm_weixinMemberCard',
+				cls : 'disableInput',
+				fieldLabel : '微信会员卡',
+				disabled : true
+			}]
+		}, {
+			items : [{
+				xtype : 'numberfield',
 				id : 'cm_numberTotalBalance',
+				cls : 'disableInput',
 				fieldLabel : '账户余额',
 				disabled : true,
 				value : 0.00
@@ -242,6 +251,7 @@ Ext.onReady(function(){
 			items : [{
 				xtype : 'numberfield',
 				id : 'cm_numberBaseBalance',
+				cls : 'disableInput',
 				fieldLabel : '基本余额',
 				disabled : true,
 				value : 0.00
@@ -251,6 +261,7 @@ Ext.onReady(function(){
 			items : [{
 				xtype : 'numberfield',
 				id : 'cm_numberExtraBalance',
+				cls : 'disableInput',
 				fieldLabel : '赠送余额',
 				disabled : true,
 				value : 0.00
@@ -259,6 +270,7 @@ Ext.onReady(function(){
 			items : [{
 				xtype : 'numberfield',
 				id : 'cm_numberUsedBalance',
+				cls : 'disableInput',
 				fieldLabel : '累计消费',
 				disabled : true,
 				value : 0.00
@@ -267,6 +279,7 @@ Ext.onReady(function(){
 			items : [{
 				xtype : 'numberfield',
 				id : 'cm_numberUserPoint',
+				cls : 'disableInput',
 				fieldLabel : '累计积分',
 				disabled : true,
 				value : 0.00
@@ -275,6 +288,7 @@ Ext.onReady(function(){
 			items : [{
 				xtype : 'numberfield',
 				id : 'cm_numberMmeberPoint',
+				cls : 'disableInput',
 				fieldLabel : '当前积分',
 				disabled : true,
 				value : 0.00
