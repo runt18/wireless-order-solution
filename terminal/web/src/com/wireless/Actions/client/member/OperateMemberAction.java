@@ -67,14 +67,23 @@ public class OperateMemberAction extends DispatchAction{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			Member.InsertBuilder ib = new Member.InsertBuilder(name, mobile, Integer.valueOf(memberTypeId));
+			Member.InsertBuilder ib = null;
+			if(memberCard != null && !memberCard.isEmpty()){
+				ib = Member.InsertBuilder.build4Card(name, memberCard, Integer.valueOf(memberTypeId)); 
+				if(mobile != null && !mobile.isEmpty()){
+					ib.setMobile(mobile);
+				}
+			}else if(mobile != null && !mobile.isEmpty()){
+				ib = Member.InsertBuilder.build4Mobile(name, mobile, Integer.valueOf(memberTypeId));
+				if(memberCard != null && !memberCard.isEmpty()){
+					ib.setMemberCard(memberCard);
+				}				
+			}
+			
 			ib.setBirthday(DateUtil.parseDate(birthday))
 			  .setSex(Member.Sex.valueOf(Integer.valueOf(sex)))
 			  .setMemberCard(memberCard)
-//			  .setTele(tele)
 			  .setCompany(company)
-//			  .setPrivateComment(privateComment)
-//			  .setPublicComment(publicComment)
 			  .setContactAddr(addr)
 			  .setSex(Member.Sex.valueOf(Integer.valueOf(sex)));
 			
