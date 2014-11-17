@@ -278,7 +278,9 @@ public class OrderDao {
 		if(result.isEmpty()){
 			throw new BusinessException(FrontBusinessError.ORDER_NOT_EXIST);
 		}else{
-			return result.get(0);
+			Order order = result.get(0);
+			fillDetail(dbCon, staff, order, DateType.TODAY);
+			return order;
 		}
 	}
 	
@@ -358,66 +360,21 @@ public class OrderDao {
 		if(results.isEmpty()){
 			throw new BusinessException("The order(id = " + orderId + ") does NOT exist.", FrontBusinessError.ORDER_NOT_EXIST);
 		}else{
-			return results.get(0);
+			Order order = results.get(0);
+			fillDetail(dbCon, staff, order, dateType);
+			return order;
 		}
 	}
 	
-	/**
-	 * Get the order detail information according to the specific extra condition and order clause. 
-	 * @param staff
-	 * 			  the staff to perform this action
-	 * @param extraCond
-	 *            the extra condition to query
-	 * @param orderClause
-	 * 			  the order clause to query
-	 * @return the list holding the result to each order detail information
-	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement
-	 * @throws BusinessException 
-	 * 			   throws if any associated taste group is NOT found
-	 */
-	public static List<Order> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getByCond(dbCon, staff, extraCond, orderClause);
-		}finally{
-			dbCon.disconnect();
+	private static void fillDetail(DBCon dbCon, Staff staff, Order order, DateType dateType) throws SQLException, BusinessException{
+		//Get the order foods to each order.
+		order.setOrderFoods(OrderFoodDao.getDetail(dbCon, staff, new OrderFoodDao.ExtraCond(dateType).setOrder(order)));	
+		//Get the mixed payment detail.
+		if(order.getPaymentType().isMixed()){
+			order.setMixedPayment(MixedPaymentDao.get(dbCon, staff, new MixedPaymentDao.ExtraCond(dateType, order)));
 		}
 	}
 	
-	/**
-	 * Get the order detail information according to the specific extra condition and order clause. 
-	 * 
-	 * @param dbCon
-	 *            the database connection
-	 * @param staff
-	 * 			  the staff to perform this action
-	 * @param extraCond
-	 *            the extra condition to query
-	 * @param orderClause
-	 * 			  the order clause to query
-	 * @return the list holding the result to each order detail information
-	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement
-	 * @throws BusinessException 
-	 * 			   throws if any associated taste group is NOT found
-	 */
-	public static List<Order> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
-
-		List<Order> result = getPureByCond(dbCon, staff, extraCond, orderClause);
-		
-		for(Order eachOrder : result){
-			//Get the order foods to each order.
-			eachOrder.setOrderFoods(OrderFoodDao.getDetail(dbCon, staff, new OrderFoodDao.ExtraCond(extraCond.dateType).setOrderId(eachOrder.getId())));	
-			//Get the mixed payment detail.
-			if(eachOrder.getPaymentType().isMixed()){
-				eachOrder.setMixedPayment(MixedPaymentDao.get(dbCon, staff, new MixedPaymentDao.ExtraCond(extraCond.dateType, eachOrder)));
-			}
-		}
-		
-		return result;
-	}
 	
 	/**
 	 * Get the pure order according to specified restaurant and extra condition.
@@ -435,7 +392,7 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static List<Order> getPureByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+	private static List<Order> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
 		if(extraCond.dateType == DateType.TODAY){
 			sql = " SELECT " +
@@ -555,10 +512,10 @@ public class OrderDao {
 	}
 
 	/**
-	 * Get the pure order according to extra condition and order clause.
+	 * Get the pure order according to extra condition {@link ExtraCond} and order clause.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param extraCond
+	 * @param extraCond {@link ExtraCond}
 	 * 			the extra condition
 	 * @param orderClause
 	 * 			the order clause
@@ -566,11 +523,11 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Order> getPureByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+	public static List<Order> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getPureByCond(dbCon, staff, extraCond, orderClause);
+			return getByCond(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -918,7 +875,7 @@ public class OrderDao {
 	 */
 	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		int amount = 0;
-		for(Order order : getPureByCond(dbCon, staff, extraCond, null)){
+		for(Order order : getByCond(dbCon, staff, extraCond, null)){
 			String sql;
 
 			//Delete the records to normal taste group. 

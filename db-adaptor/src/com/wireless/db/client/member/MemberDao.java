@@ -181,7 +181,12 @@ public class MemberDao {
 		}
 		
 		private String cond4Card(String card){
-			return card != null ? (" M.member_card_crc = CRC32('" + card + "') AND M.member_card = '" + card + "'") : "";
+			if(card != null){
+				String cardExcludeZero = card.replaceFirst("^(0+)", "");
+				return (" M.member_card_crc = CRC32('" + cardExcludeZero + "') AND M.member_card = '" + cardExcludeZero + "'");
+			}else{
+				return "";
+			}
 		}
 		
 		private String cond4WeixinCard(String weixinCard, boolean defVal){

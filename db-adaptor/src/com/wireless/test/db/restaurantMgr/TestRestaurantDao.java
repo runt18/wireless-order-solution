@@ -206,7 +206,7 @@ public class TestRestaurantDao {
 	
 	private void compareMemberType(Staff staff) throws SQLException{
 		try{
-			MemberTypeDao.getWeixinMemberType(staff);
+			MemberTypeDao.getWxMemberType(staff);
 		}catch(BusinessException e){
 			Assert.assertTrue("failed to insert a weixin member type", false);
 		}

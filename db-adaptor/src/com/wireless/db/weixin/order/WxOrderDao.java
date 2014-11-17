@@ -10,6 +10,7 @@ import com.wireless.db.Params;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.WxOrderError;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.order.WxOrder;
@@ -19,6 +20,7 @@ public class WxOrderDao {
 	public static class ExtraCond{
 		private int id;
 		private int code;
+		private int orderId;
 		private WxOrder.Status status;
 		private WxOrder.Type type;
 		private String weixinSerial;
@@ -30,6 +32,16 @@ public class WxOrderDao {
 		
 		public ExtraCond setCode(int code){
 			this.code = code;
+			return this;
+		}
+		
+		public ExtraCond setOrder(int orderId){
+			this.orderId = orderId;
+			return this;
+		}
+		
+		public ExtraCond setOrder(Order order){
+			this.orderId = order.getId();
 			return this;
 		}
 		
@@ -56,6 +68,9 @@ public class WxOrderDao {
 			}
 			if(code != 0){
 				extraCond.append(" AND code = " + code);
+			}
+			if(orderId != 0){
+				extraCond.append(" AND order_id = " + orderId);
 			}
 			if(weixinSerial != null){
 				extraCond.append(" AND weixin_serial = '" + weixinSerial + "' AND weixin_serial_crc = CRC32('" + weixinSerial + "')");
@@ -177,6 +192,7 @@ public class WxOrderDao {
 		sql = " UPDATE " + Params.dbName + ".weixin_order SET " +
 			  " wx_order_id = " + wxOrder.getId() +
 			  (builder.isStatusChanged() ? " ,status = " + wxOrder.getStatus().getVal() : "") +
+			  (builder.isOrderChanged() ? " ,order_id = " + wxOrder.getOrderId() : "") +
 			  " WHERE wx_order_id = " + wxOrder.getId();
 		
 		dbCon.stmt.executeUpdate(sql);
@@ -326,6 +342,7 @@ public class WxOrderDao {
 			wxOrder.setStatus(WxOrder.Status.valueOf(dbCon.rs.getInt("status")));
 			wxOrder.setType(WxOrder.Type.valueOf(dbCon.rs.getInt("type")));
 			wxOrder.setCode(dbCon.rs.getInt("code"));
+			wxOrder.setOrderId(dbCon.rs.getInt("order_id"));
 			wxOrder.setBirthDate(dbCon.rs.getLong("birth_date"));
 			wxOrder.setWeixinSerial(dbCon.rs.getString("weixin_serial"));
 			result.add(wxOrder);

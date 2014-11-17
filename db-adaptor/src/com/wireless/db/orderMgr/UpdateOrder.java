@@ -146,7 +146,7 @@ public class UpdateOrder {
 		
 		//Check to see whether the new order is expired.
 		if(newOrder.getOrderDate() != 0 && newOrder.getOrderDate() < oriOrder.getOrderDate()){
-			OrderFood of = OrderFoodDao.getSingleDetail(dbCon, staff, new OrderFoodDao.ExtraCond(DateType.TODAY).setOrderId(newOrder.getId()), " ORDER BY OF.id DESC LIMIT 1 ").get(0);
+			OrderFood of = OrderFoodDao.getSingleDetail(dbCon, staff, new OrderFoodDao.ExtraCond(DateType.TODAY).setOrder(newOrder.getId()), " ORDER BY OF.id DESC LIMIT 1 ").get(0);
 			long deltaSeconds = (System.currentTimeMillis() - of.getOrderDate()) / 1000;
 			throw new BusinessException("\"" + of.getWaiter() + "\"" + (deltaSeconds >= 60 ? ((deltaSeconds / 60) + "分钟") : (deltaSeconds + "秒")) + "前修改了账单, 请重新确认", FrontBusinessError.ORDER_EXPIRED);
 		}

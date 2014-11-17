@@ -504,11 +504,11 @@ public class MemberTypeDao {
 	 * @throws BusinessException
 	 * 			throws if the member type does NOT exist
 	 */
-	public static MemberType getWeixinMemberType(Staff staff) throws SQLException, BusinessException{
+	public static MemberType getWxMemberType(Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getWeixinMemberType(dbCon, staff);
+			return getWxMemberType(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -526,7 +526,7 @@ public class MemberTypeDao {
 	 * @throws BusinessException
 	 * 			throws if the member type does NOT exist
 	 */
-	public static MemberType getWeixinMemberType(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+	public static MemberType getWxMemberType(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		List<MemberType> list = MemberTypeDao.getByCond(dbCon, staff, new ExtraCond().setType(MemberType.Type.WEIXIN), null);
 		if(list.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_TYPE_NOT_EXIST);

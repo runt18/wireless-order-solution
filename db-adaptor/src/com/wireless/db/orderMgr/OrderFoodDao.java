@@ -17,6 +17,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.ComboOrderFood;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.dishesOrder.OrderFood.Operation;
@@ -93,7 +94,12 @@ public class OrderFoodDao {
 			}
 		}
 		
-		public ExtraCond setOrderId(int orderId){
+		public ExtraCond setOrder(Order order){
+			this.orderId = order.getId();
+			return this;
+		}
+		
+		public ExtraCond setOrder(int orderId){
 			this.orderId = orderId;
 			return this;
 		}
@@ -202,7 +208,7 @@ public class OrderFoodDao {
 	 */
 	public static List<OrderFood> getSingleDetailByTable(DBCon dbCon, Staff staff, Table tbl) throws BusinessException, SQLException {
 		int orderId = OrderDao.getByTableAlias(dbCon, staff, tbl.getAliasId()).getId();
-		return getSingleDetail(dbCon, staff, new ExtraCond(DateType.TODAY).setOrderId(orderId), null);
+		return getSingleDetail(dbCon, staff, new ExtraCond(DateType.TODAY).setOrder(orderId), null);
 	}
 	
 	/**

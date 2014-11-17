@@ -146,7 +146,7 @@ public class WeixinMemberDao {
 		List<Member> associatedMembers = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(weixinSerial), null);
 		final int memberId;
 		if(associatedMembers.isEmpty()){
-			memberId = MemberDao.insert(dbCon, staff, new Member.InsertBuilder("微信会员", "", MemberTypeDao.getWeixinMemberType(dbCon, staff).getId()));
+			memberId = MemberDao.insert(dbCon, staff, new Member.InsertBuilder("微信会员", "", MemberTypeDao.getWxMemberType(dbCon, staff).getId()));
 		}else{
 			memberId = associatedMembers.get(0).getId();
 		}

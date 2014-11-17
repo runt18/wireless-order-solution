@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -114,30 +113,23 @@ public class TestMemberDao {
 	
 	@Test
 	public void testMemberBasicOperation() throws BusinessException, SQLException{
-		List<MemberType> list = MemberTypeDao.getByCond(mStaff, null, null);
 		
-		MemberType memberType = null;
-		if(list.isEmpty()){
-			throw new BusinessException("You don't add any member type!!!");
-		}else{
-			memberType = list.get(0);
-		}
-		
+		MemberType memberType = MemberTypeDao.getWxMemberType(mStaff);
 		int memberId = 0;
 		
 		try{
 			
 			//Insert a new member
-			Member.InsertBuilder builder = new Member.InsertBuilder("张三", "13694260535", memberType.getId())
-													 .setSex(Sex.FEMALE)
-													 .setBirthday(DateUtil.parseDate("1981-03-15"))
-													 .setCompany("Digie Co.,Ltd")
-													 .setContactAddr("广州市东圃镇晨晖商务大厦")
-													 .setIdCard("440711198103154818")
-													 .setMemberCard("100010000")
-													 .setPrivateComment("嫉妒咸鱼")
-													 .setPublicComment("喜欢甜品")
-													 .setTele("020-87453214");
+			Member.InsertBuilder builder = Member.InsertBuilder.build4Mobile("张三", "13694260535", memberType.getId())
+													 		   .setSex(Sex.FEMALE)
+													 		   .setBirthday(DateUtil.parseDate("1981-03-15"))
+													 		   .setCompany("Digie Co.,Ltd")
+													 		   .setContactAddr("广州市东圃镇晨晖商务大厦")
+													 		   .setIdCard("440711198103154818")
+													 		   .setMemberCard("100010000")
+													 		   .setPrivateComment("嫉妒咸鱼")
+													 		   .setPublicComment("喜欢甜品")
+													 		   .setTele("020-87453214");
 			
 			memberId = MemberDao.insert(mStaff, builder);
 			

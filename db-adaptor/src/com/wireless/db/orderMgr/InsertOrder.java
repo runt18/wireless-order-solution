@@ -148,7 +148,7 @@ public class InsertOrder {
 			
 		}else if(orderToInsert.getDestTbl().isBusy()){
 			Order order = OrderDao.getByTableAlias(dbCon, staff, orderToInsert.getDestTbl().getAliasId());
-			OrderFood of = OrderFoodDao.getSingleDetail(dbCon, staff, new OrderFoodDao.ExtraCond(DateType.TODAY).setOrderId(order.getId()), " ORDER BY OF.id DESC LIMIT 1 ").get(0);
+			OrderFood of = OrderFoodDao.getSingleDetail(dbCon, staff, new OrderFoodDao.ExtraCond(DateType.TODAY).setOrder(order.getId()), " ORDER BY OF.id DESC LIMIT 1 ").get(0);
 			long deltaSeconds = (System.currentTimeMillis() - of.getOrderDate()) / 1000;
 			throw new BusinessException("\"" + of.getWaiter() + "\"" + (deltaSeconds >= 60 ? ((deltaSeconds / 60) + "分钟") : (deltaSeconds + "秒")) + "前修改了账单, 是否继续提交?", FrontBusinessError.ORDER_EXPIRED);
 			

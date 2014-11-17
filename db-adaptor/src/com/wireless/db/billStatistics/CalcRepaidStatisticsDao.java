@@ -275,6 +275,7 @@ public class CalcRepaidStatisticsDao {
 			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND OF.is_paid = 1 " +
 			  " JOIN " + Params.dbName + "." + extraCond.tasteGroupTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = O.pay_type_id " + 
 			  " WHERE 1 = 1 " +
 			  extraCond;
 		

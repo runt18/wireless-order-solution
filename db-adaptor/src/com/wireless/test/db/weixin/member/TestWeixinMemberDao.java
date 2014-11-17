@@ -45,7 +45,7 @@ public class TestWeixinMemberDao {
 			
 			Assert.assertEquals("member id to weixin", memberId, actual.getId());
 			Assert.assertEquals("member name to weixin", "微信会员", actual.getName());
-			MemberType expectedType = MemberTypeDao.getWeixinMemberType(mStaff);
+			MemberType expectedType = MemberTypeDao.getWxMemberType(mStaff);
 			Assert.assertEquals("member type id to weixin", expectedType.getId(), actual.getMemberType().getId());
 			Assert.assertEquals("member type to weixin", expectedType.getType(), actual.getMemberType().getType());
 			Assert.assertEquals("member type to weixin", expectedType.getName(), actual.getMemberType().getName());
