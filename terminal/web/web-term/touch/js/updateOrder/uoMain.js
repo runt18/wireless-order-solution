@@ -882,13 +882,29 @@ uo.mPay.tempPay = function(){
 		st:0,
 		sv:memberPhoneOrCard	
 	}, function(data){
+		if(typeof data == 'string'){
+			data = eval("(" + data + ")");	
+		}
 		if(data.success){
+			var result_member;
+			if(data.other.members){
+				result_member = data.other.members[0];
+			}else if(data.other.member){
+				result_member = data.other.member;
+			}else{
+				Util.msg.alert({
+					title : '提示',
+					msg : '无对应的会员, 请重新输入条件', 
+					time : 2
+				});	
+				return;
+			}
 			$.post('../PayOrder.do', {
 				orderID : uo.order.id,
 				payType : 2,
 				tempPay : true,
 				cashIncome : data.other.newOrder.totalPrice,
-				memberID : data.other.member.id
+				memberID : result_member.id
 			}, function(result){
 				result = eval("(" + result + ")");
 				Util.LM.hide();

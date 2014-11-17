@@ -57,7 +57,7 @@ function initTableData(){
 		url : '../QueryTable.do',
 		type : 'post',
 		data : {
-			random : Math.random(),
+			random : Math.random()
 		},
 		success : function(data, status, xhr){
 			tables = [];
@@ -110,7 +110,7 @@ function initTableData(){
 				Util.msg.alert({
 					title : data.title,
 					msg : data.msg,
-					time : 2,
+					time : 2
 				});
 			}
 		},
@@ -118,7 +118,7 @@ function initTableData(){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : err, 
-				time : 2,
+				time : 2
 			});
 		}
 	});	
