@@ -210,6 +210,7 @@ Ext.onReady(function(){
 	});
 	
 });	
+
 function takeMoneyLoadMemberData(c){
 	if(typeof Ext.ux.select_getMemberByCertainWin != 'undefined'){
 		Ext.ux.select_getMemberByCertainWin.hide();

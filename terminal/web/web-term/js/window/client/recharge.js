@@ -1,5 +1,7 @@
 var rd_rechargeSreachMemberCardWin;
 var rechargeOperateData;
+
+
 Ext.onReady(function(){
 	var pe = Ext.query('#divMemberRechargeContent')[0].parentElement;
 	var mw = parseInt(pe.style.width);
