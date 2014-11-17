@@ -13,7 +13,7 @@ import com.wireless.db.Params;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
-import com.wireless.db.weixin.member.WeixinMemberDao;
+import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.ModuleError;
@@ -25,7 +25,7 @@ import com.wireless.pojo.client.MemberComment.CommitBuilder;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.client.WeixinMember;
+import com.wireless.pojo.client.WxMember;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.distMgr.Discount;
@@ -609,7 +609,7 @@ public class MemberDao {
 			member.setMemberType(memberType);
 			
 			if(dbCon.rs.getInt("weixin_card") != 0){
-				member.setWeixin(new WeixinMember(dbCon.rs.getInt("weixin_card")));
+				member.setWeixin(new WxMember(dbCon.rs.getInt("weixin_card")));
 			}
 			
 			result.add(member);
@@ -795,7 +795,7 @@ public class MemberDao {
 	
 	private static Member fill(DBCon dbCon, Staff staff, Member member) throws SQLException, BusinessException{
 		if(member.hasWeixin()){
-			member.setWeixin(WeixinMemberDao.getByCard(dbCon, staff, member.getWeixin().getCard()));
+			member.setWeixin(WxMemberDao.getByCard(dbCon, staff, member.getWeixin().getCard()));
 		}
 		return member;
 	}

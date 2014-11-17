@@ -11,12 +11,12 @@ import org.junit.Test;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.member.WeixinMemberDao;
+import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.client.WeixinMember;
+import com.wireless.pojo.client.WxMember;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 
@@ -38,7 +38,7 @@ public class TestWeixinMemberDao {
 		int weixinCard = 0;
 		try{
 			//--------Test to interest a weixin member---------------
-			int memberId = WeixinMemberDao.interest(mStaff, WEIXIN_MEMBER_SERIAL);
+			int memberId = WxMemberDao.interest(mStaff, WEIXIN_MEMBER_SERIAL);
 			
 			Member actual = MemberDao.getById(mStaff, memberId);
 			weixinCard = actual.getWeixin().getCard();
@@ -54,7 +54,7 @@ public class TestWeixinMemberDao {
 			Assert.assertEquals("member id to getByWxCard", memberId, MemberDao.getByWxCard(mStaff, weixinCard).getId());
 			
 			//----------Test to bind a weixin member----------------
-			WeixinMemberDao.bind(mStaff, new WeixinMember.BindBuilder(WEIXIN_MEMBER_SERIAL, "18520590931"));
+			WxMemberDao.bind(mStaff, new WxMember.BindBuilder(WEIXIN_MEMBER_SERIAL, "18520590931"));
 			Member expected = MemberDao.getByMobile(mStaff, "18520590931");
 			actual = MemberDao.getByWxSerial(mStaff, WEIXIN_MEMBER_SERIAL);
 			Assert.assertEquals("member id after bound", expected.getId(), actual.getId());
