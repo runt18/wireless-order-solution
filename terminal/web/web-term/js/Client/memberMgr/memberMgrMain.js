@@ -169,7 +169,7 @@ function initRechargeWin(){
 								Ext.TaskMgr.stop(this);
 							}
 						},
-						interval: 200
+						interval: 300
 					};					
 					thiz.center();
 					thiz.load({
@@ -917,7 +917,7 @@ function treeInit(){
 			leaf : false,
 			border : true,
 			expanded : true,
-			MemberTypeId : -1,
+			memberTypeId : -1,
 			listeners : {
 				load : function(thiz){
 					memberTypeData.root = [];
@@ -1313,6 +1313,7 @@ function winInit(){
 									type : 'SET',
 									data : data
 								});
+								focusToAddMember();
 								Ext.TaskMgr.stop(this);
 							}
 						},

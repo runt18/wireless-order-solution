@@ -380,7 +380,8 @@ function cm_operationMemberData(c){
 		if(typeof data['memberType'] != 'undefined'){
 			memberType.setValue(data['memberType']['id']);
 		}else{
-			memberType.setValue();
+//			memberType.setValue();
+			memberType.setValue(Ext.ux.getSelNode(memberTypeTree)?(Ext.ux.getSelNode(memberTypeTree).attributes.memberTypeId != '-1'?Ext.ux.getSelNode(memberTypeTree).attributes.memberTypeId:'') : '');
 		}
 		
 /*		if(data['name']){
@@ -505,4 +506,8 @@ function operateMemberHandler(c){
 		}
 	});
 	
+}
+
+function focusToAddMember(){
+	Ext.getCmp('cm_txtMemberName').focus(true, 100);
 }
