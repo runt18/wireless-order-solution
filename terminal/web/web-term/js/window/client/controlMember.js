@@ -6,7 +6,6 @@ Ext.onReady(function(){
 		fieldLabel : '会员卡',
 		disabled : false
 	};
-	
 	new Ext.Panel({
 		id : 'panelControlMemberContent',
 		renderTo : 'divControlMemberContent',
