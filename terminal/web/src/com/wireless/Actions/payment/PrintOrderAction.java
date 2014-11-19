@@ -173,6 +173,9 @@ public class PrintOrderAction extends Action{
 				case 13:
 					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_HISTORY_PAYMENT_RECEIPT);
 					break;
+				case 14:
+					reqPrintContent = ReqPrintContent.buildReqPrintSummaryPatch(staff, orderId);
+					break;
 				default:
 					reqPrintContent = null;
 					break;
