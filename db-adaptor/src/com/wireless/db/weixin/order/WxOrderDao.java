@@ -128,7 +128,11 @@ public class WxOrderDao {
 		
 		//Make the previous inside committed orders invalid.
 		for(WxOrder order : getByCond(dbCon, staff, new ExtraCond().setWeixin(wxOrder.getWeixinSerial()).setType(WxOrder.Type.INSIDE).setStatus(WxOrder.Status.COMMITTED))){
-			update(dbCon, staff, new WxOrder.UpdateBuilder(order.getId()).setStatus(WxOrder.Status.INVALID));
+			try{
+				update(dbCon, staff, new WxOrder.UpdateBuilder(order.getId()).setStatus(WxOrder.Status.INVALID));
+			}catch(BusinessException ignored){
+				ignored.printStackTrace();
+			}
 		}
 
 		//Insert the new inside order.
@@ -140,7 +144,7 @@ public class WxOrderDao {
 		String sql;
 		
 		//Generate the operation code.
-		sql = " SELECT MAX(code) + 1 FROM " + Params.dbName + ".weixin_order WHERE restaurant_id = " + staff.getRestaurantId();
+		sql = " SELECT IFNULL(MAX(code) + 1, 1) FROM " + Params.dbName + ".weixin_order WHERE restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		int code = 0;
 		if(dbCon.rs.next()){
@@ -162,9 +166,9 @@ public class WxOrderDao {
 			  " ) ";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
-		int orderId;
+		int wxOrderId;
 		if(dbCon.rs.next()){
-			orderId = dbCon.rs.getInt(1);
+			wxOrderId = dbCon.rs.getInt(1);
 		}else{
 			throw new SQLException("The id to wx order is NOT generated successfully.");
 		}
@@ -174,17 +178,30 @@ public class WxOrderDao {
 		for(OrderFood of : wxOrder.getFoods()){
 			sql = " INSERT INTO " + Params.dbName + ".weixin_order_food " +
 				  " (wx_order_id, food_id, food_count) VALUES( " +
-				  orderId + "," +
+				  wxOrderId + "," +
 				  of.getFoodId() + "," +
 				  of.getCount() + 
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
 		
-		return orderId;
+		return wxOrderId;
 	}
 	
-	static void update(DBCon dbCon, Staff staff, WxOrder.UpdateBuilder builder) throws SQLException{
+	/**
+	 * Update the wx order according to specific builder {@link WxOrder#UpdateBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the update builder {@link WxOrder#UpdateBuilder}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the wx order to update does NOT exist
+	 */
+	public static void update(DBCon dbCon, Staff staff, WxOrder.UpdateBuilder builder) throws SQLException, BusinessException{
 		
 		WxOrder wxOrder = builder.build();
 		
@@ -195,7 +212,9 @@ public class WxOrderDao {
 			  (builder.isOrderChanged() ? " ,order_id = " + wxOrder.getOrderId() : "") +
 			  " WHERE wx_order_id = " + wxOrder.getId();
 		
-		dbCon.stmt.executeUpdate(sql);
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(WxOrderError.WX_ORDER_NOT_EXIST);
+		}
 	}
 	
 	/**

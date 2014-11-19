@@ -10,6 +10,7 @@ import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.StaffError;
@@ -28,6 +29,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.util.DateType;
 
 public class OrderDao {
@@ -372,6 +374,10 @@ public class OrderDao {
 		//Get the mixed payment detail.
 		if(order.getPaymentType().isMixed()){
 			order.setMixedPayment(MixedPaymentDao.get(dbCon, staff, new MixedPaymentDao.ExtraCond(dateType, order)));
+		}
+		//Get the associated wx orders.
+		for(WxOrder wxOrder : WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setOrder(order))){
+			order.addWxOrder(wxOrder);
 		}
 	}
 	

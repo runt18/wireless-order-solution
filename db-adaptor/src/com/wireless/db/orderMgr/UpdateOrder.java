@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.StaffError;
@@ -15,6 +16,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.util.DateType;
 
 public class UpdateOrder {
@@ -40,27 +42,20 @@ public class UpdateOrder {
 	}
 	
 	/**
-	 * Update the order in a db transition according to the specific order id. 
-	 * 
-	 * @param terminal 
+	 * Update the order according to specific builder {@link Order#UpdateBuilder}.
+	 * @param staff 
 	 * 			the staff to perform this action
 	 * @param builder
 	 *          the builder to update order {@link Order#UpdateBuilder}
-	 * 
-	 * @return The update result containing two orders below.<br>
-	 *         - The extra order.<br>
-	 *         - The canceled order.
+	 * @return the difference result {@link DiffResult} between the original and new
 	 * @throws BusinessException
-	 *             throws if one of the cases below
-	 *             <li>the terminal is NOT attached to any restaurant
-	 *             <li>the terminal is expired
+	 *             throws if one of the cases below<br>
 	 *             <li>the order to this id does NOT exist
 	 *             <li>the order to this id is expired
 	 *             <li>any food to this order does NOT exist
 	 *             <li>any taste to this order does NOT exist
-	 *             <li>exceed the gift quota
 	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement.
+	 *             throws if fail to execute any SQL statement
 	 */
 	public static DiffResult exec(Staff staff, Order.UpdateBuilder builder) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();	
@@ -82,26 +77,20 @@ public class UpdateOrder {
 	}
 	
 	/**
-	 * Update the order according to the specific order id. Note that the method
-	 * should be invoked before database connected.
-	 * 
-	 * @param terminal 
+	 * Update the order according to specific builder {@link Order#UpdateBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff 
 	 * 			the staff to perform this action
 	 * @param builder
 	 *          the builder to update order {@link Order#UpdateBuilder}
-	 * 
-	 * @return the update result containing two orders below
-	 *         <li>the extra order
-	 *         <li>the canceled order
+	 * @return the difference result {@link DiffResult} between the original and new
 	 * @throws BusinessException
 	 *             throws if one of the cases below<br>
-	 *             <li>the terminal is NOT attached to any restaurant
-	 *             <li>the terminal is expired
 	 *             <li>the order to this id does NOT exist
 	 *             <li>the order to this id is expired
 	 *             <li>any food to this order does NOT exist
 	 *             <li>any taste to this order does NOT exist
-	 *             <li>exceed the gift quota
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
@@ -175,7 +164,7 @@ public class UpdateOrder {
 	 * @param staff
 	 * 			the terminal
 	 * @param newOrder
-	 * @return the difference between original order and the new
+	 * @return the difference {@link DiffResult} between original order and the new
  	 * @throws BusinessException 
  	 * 			throws if one of the cases below
  	 * 			<li>the order to this id does NOT exist
@@ -184,7 +173,6 @@ public class UpdateOrder {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * 
-	 * @see DiffResult
 	 */
 	private static DiffResult doUpdate(DBCon dbCon, Staff staff, DiffResult diffResult, Order.UpdateBuilder builder) throws SQLException{
 		
@@ -211,10 +199,17 @@ public class UpdateOrder {
 			  " order_date = NOW(), " +
 			  " staff_id = " + staff.getId() + ", " +
 			  " waiter = " + "'" + staff.getName() + "' " +
-			  " WHERE " +
-			  " id = " + diffResult.newOrder.getId();
+			  " WHERE id = " + diffResult.newOrder.getId();
 		dbCon.stmt.executeUpdate(sql);
 		
+		//Attach the associated weixin orders.
+		for(WxOrder wxOrder: diffResult.newOrder.getWxOrders()){
+			try{
+				WxOrderDao.update(dbCon, staff, new WxOrder.AttachBuilder(wxOrder, diffResult.newOrder).asBuilder());
+			}catch(BusinessException ignored){
+				ignored.printStackTrace();
+			}
+		}
 		return diffResult;
 	}
 	

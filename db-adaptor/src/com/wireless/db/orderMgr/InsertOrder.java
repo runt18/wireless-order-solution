@@ -6,6 +6,7 @@ import java.sql.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.ProtocolError;
@@ -14,6 +15,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.util.DateType;
 
 public class InsertOrder {
@@ -41,9 +43,13 @@ public class InsertOrder {
 		
 		try{
 			dbCon.connect();
-			
-			return exec(dbCon, staff, builder);
-			
+			dbCon.conn.setAutoCommit(false);
+			Order order = exec(dbCon, staff, builder);
+			dbCon.conn.commit();
+			return order;
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -73,27 +79,8 @@ public class InsertOrder {
 		Order orderToInsert = builder.build();
 		
 		doPrepare(dbCon, staff, orderToInsert);
-		
-		/**
-		 * Put all the INSERT statements into a database transition so as to assure 
-		 * the status to both table and order is consistent. 
-		 */
-		boolean isAutoCommit = dbCon.conn.getAutoCommit();
-		try{				
 			
-			dbCon.conn.setAutoCommit(false);
-			
-			doInsert(dbCon, staff, orderToInsert);
-			
-			dbCon.conn.commit();
-			
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
-			
-		}finally{
-			dbCon.conn.setAutoCommit(isAutoCommit);
-		}
+		doInsert(dbCon, staff, orderToInsert);
 		
 		return orderToInsert;		
 
@@ -143,12 +130,8 @@ public class InsertOrder {
 				}
 			}
 
-			//Set the default discount.
-			//orderToInsert.setDiscount(DiscountDao.getDefault(dbCon, staff));
-			
 		}else if(orderToInsert.getDestTbl().isBusy()){
-			Order order = OrderDao.getByTableAlias(dbCon, staff, orderToInsert.getDestTbl().getAliasId());
-			OrderFood of = OrderFoodDao.getSingleDetail(dbCon, staff, new OrderFoodDao.ExtraCond(DateType.TODAY).setOrder(order.getId()), " ORDER BY OF.id DESC LIMIT 1 ").get(0);
+			OrderFood of = OrderFoodDao.getSingleDetail(dbCon, staff, new OrderFoodDao.ExtraCond(DateType.TODAY).setOrder(orderToInsert.getDestTbl().getOrderId()), " ORDER BY OF.id DESC LIMIT 1 ").get(0);
 			long deltaSeconds = (System.currentTimeMillis() - of.getOrderDate()) / 1000;
 			throw new BusinessException("\"" + of.getWaiter() + "\"" + (deltaSeconds >= 60 ? ((deltaSeconds / 60) + "分钟") : (deltaSeconds + "秒")) + "前修改了账单, 是否继续提交?", FrontBusinessError.ORDER_EXPIRED);
 			
@@ -205,11 +188,18 @@ public class InsertOrder {
 			throw new SQLException("The id of order is not generated successfully.");
 		}				
 
-		/**
-		 * Insert the detail records to 'order_food' table
-		 */
+		//Insert the detail records to 'order_food' table.
 		for(OrderFood foodToInsert : orderToInsert.getOrderFoods()){
 			OrderFoodDao.insertExtra(dbCon, staff, new OrderFoodDao.ExtraBuilder(orderToInsert.getId(), foodToInsert));
+		}
+		
+		//Associated the weixin order.
+		for(WxOrder wxOrder : orderToInsert.getWxOrders()){
+			try{
+				WxOrderDao.update(dbCon, staff, new WxOrder.AttachBuilder(WxOrderDao.getByCode(dbCon, staff, wxOrder.getCode()), orderToInsert).asBuilder());
+			}catch(BusinessException ignored){
+				ignored.printStackTrace();
+			}
 		}
 	}
 }

@@ -145,6 +145,11 @@ public class MemberDao {
 			return this;
 		}
 		
+		public ExtraCond setWeixinCard(int weixinCard){
+			this.weixinCard = Integer.toString(weixinCard);
+			return this;
+		}
+		
 		public ExtraCond setFuzzyName(String fuzzy){
 			this.fuzzy = fuzzy;
 			return this;
@@ -191,7 +196,7 @@ public class MemberDao {
 		
 		private String cond4WeixinCard(String weixinCard, boolean defVal){
 			try{
-				return weixinCard != null ? (" WM.weixin_card = " + weixinCard) : "";
+				return weixinCard != null ? (" WM.weixin_card = " + Integer.parseInt(weixinCard)) : "";
 			}catch(NumberFormatException ignored){
 				return defVal ? " 1 = 1 " : " 0 = 1 ";
 			}

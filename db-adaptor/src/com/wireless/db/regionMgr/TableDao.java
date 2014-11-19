@@ -621,10 +621,12 @@ public class TableDao {
 			// update the order
 			String sql = " UPDATE "	+ 
 						 Params.dbName	+ ".order " +
-						 " SET " + 
-						 " table_id = " + destTbl.getTableId() + ", " +
-						 " table_alias = " + destTbl.getAliasId() + ", " +
-						 " table_name = " + "'" + destTbl.getName() + "'" +
+						 " SET id = " + orderId +
+						 " ,table_id = " + destTbl.getTableId() + 
+						 " ,table_alias = " + destTbl.getAliasId() + 
+						 " ,table_name = " + "'" + destTbl.getName() + "'" +
+						 " ,region_id = " + destTbl.getRegion().getId() + 
+						 " ,region_name = '" + destTbl.getRegion().getName() + "'" +
 						 " WHERE id = " + orderId;
 			dbCon.stmt.executeUpdate(sql);
 
