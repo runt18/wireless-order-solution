@@ -32,6 +32,7 @@ public final class Type{
 	public final static byte TRANSFER_ORDER_FOOD = 24;
 	public final static byte RE_PAY_ORDER = 25;
 	public final static byte DISCOUNT_ORDER = 26;
+	public final static byte QUERY_WX_ORDER = 27;
 	
 	/* belong to member */
 	public final static byte QUERY_MEMBER = 1;
