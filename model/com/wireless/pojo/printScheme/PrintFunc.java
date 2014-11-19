@@ -328,7 +328,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	public boolean isTypeMatched(PType typeToCompare){
 		if(mType == PType.PRINT_ORDER){ 
 			return typeToCompare == PType.PRINT_ORDER || 
-				   typeToCompare == PType.PRINT_ALL_EXTRA_FOOD;
+				   typeToCompare == PType.PRINT_ALL_EXTRA_FOOD ||
+				   typeToCompare == PType.PRINT_ORDER_PATCH;
 			
 		}else if(mType == PType.PRINT_ORDER_DETAIL){
 			return typeToCompare == PType.PRINT_ORDER_DETAIL || 

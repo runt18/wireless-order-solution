@@ -79,10 +79,26 @@ public class WxOrder implements Jsonable, Parcelable{
 		}
 	}
 	
+	public static class AttachBuilder{
+		private final UpdateBuilder builder;
+		
+		public AttachBuilder(WxOrder wxOrder, Order order){
+			builder = new UpdateBuilder(wxOrder).setOrder(order).setStatus(Status.ORDER_ATTACHED);
+		}
+		
+		public UpdateBuilder asBuilder(){
+			return this.builder;
+		}
+	}
+	
 	public static class UpdateBuilder{
 		private final int id;
 		private int orderId;
 		private Status status;
+		
+		public UpdateBuilder(WxOrder wxOrder){
+			this.id = wxOrder.getId();
+		}
 		
 		public UpdateBuilder(int id){
 			this.id = id;
