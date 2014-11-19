@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.client.member.MemberCommentDao;
@@ -31,8 +32,10 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.DeviceDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
+import com.wireless.exception.WxOrderError;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
@@ -60,6 +63,7 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Device;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.print.scheme.JobContentFactory;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.sms.SMS;
@@ -169,6 +173,10 @@ class OrderHandler implements Runnable{
 					//handle query table request
 					response = new RespPackage(request.header, TableDao.getByCond(staff, null, null), Table.TABLE_PARCELABLE_COMPLEX);
 				
+				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_WX_ORDER){
+					//handle the query wx order
+					response = doQueryWxOrder(staff, request);
+					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_BY_TBL){
 					//handle query order request
 					Table tableToQuery = new Parcel(request.body).readParcel(Table.CREATOR);
@@ -299,6 +307,21 @@ class OrderHandler implements Runnable{
 		}		
 	}
 	
+	private RespPackage doQueryWxOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+		List<WxOrder> result = new ArrayList<WxOrder>();
+		for(WxOrder wxOrder : new Parcel(request.body).readParcelList(WxOrder.CREATOR)){
+			wxOrder = WxOrderDao.getByCode(staff, wxOrder.getCode());
+			if(wxOrder.getStatus() == WxOrder.Status.COMMITTED){
+				result.add(wxOrder);
+			}
+		}
+		if(result.isEmpty()){
+			throw new BusinessException(WxOrderError.WX_ORDER_NOT_EXIST);
+		}else{
+			return new RespPackage(request.header, result, WxOrder.WX_ORDER_PARCELABLE_COMPLEX);
+		}
+	}
+	
 	private RespPackage doInsertOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		//handle insert order request 
 		List<Printer> printers = PrinterDao.getPrinters(staff);
@@ -336,7 +359,8 @@ class OrderHandler implements Runnable{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, 
 																					 new Order.UpdateBuilder(oriOrder.getId(), oriOrder.getOrderDate())
 																							  .addAll(oriOrder.getOrderFoods(), staff)
-																							  .addAll(newOrder.getOrderFoods(), staff), 
+																							  .addAll(newOrder.getOrderFoods(), staff)
+																							  .setWxOrders(newOrder.getWxOrders()), 
 																					 PrintOption.valueOf(request.header.reserved)));
 			if(resp.header.type == Type.NAK){
 				throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));

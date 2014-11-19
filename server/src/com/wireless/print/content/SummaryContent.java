@@ -46,6 +46,10 @@ public class SummaryContent extends ConcreteContent {
 			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(
 															new CenterAlignedDecorator("加菜总单", mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 			
+		}else if(mPrintType == PType.PRINT_ORDER_PATCH){
+			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(
+															new CenterAlignedDecorator("补打总单", mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+			
 		}else if(mPrintType == PType.PRINT_ALL_CANCELLED_FOOD){
 			//char[] format = { 0x1D, 0x21, 0x03 };
 			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("退  菜  总  单 !", mStyle), 
