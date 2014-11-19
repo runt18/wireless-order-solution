@@ -379,8 +379,12 @@ function cm_operationMemberData(c){
 		if(typeof data['memberType'] != 'undefined'){
 			memberType.setValue(data['memberType']['id']);
 		}else{
-//			memberType.setValue();
-			memberType.setValue(Ext.ux.getSelNode(memberTypeTree)?(Ext.ux.getSelNode(memberTypeTree).attributes.memberTypeId != '-1'?Ext.ux.getSelNode(memberTypeTree).attributes.memberTypeId:'') : '');
+			if(typeof memberTypeTree != 'undefined'){
+				memberType.setValue(Ext.ux.getSelNode(memberTypeTree)?(Ext.ux.getSelNode(memberTypeTree).attributes.memberTypeId != '-1'?Ext.ux.getSelNode(memberTypeTree).attributes.memberTypeId:'') : '');
+			}else{
+				memberType.setValue();
+			}
+			
 		}
 		
 /*		if(data['name']){

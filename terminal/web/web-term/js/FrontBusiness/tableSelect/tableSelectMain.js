@@ -1215,6 +1215,7 @@ var btnControlMember = new Ext.ux.ImageButton({
 										type : 'SET',
 										data : data
 									});
+									focusToAddMember();
 									Ext.TaskMgr.stop(this);
 								}
 							},

@@ -164,7 +164,9 @@ function initRechargeWin(){
 					var task = {
 						run : function(){
 							if(typeof rechargeNumberFocus == 'function'){
-								rechargeNumberFocus();
+								if(!id){
+									rechargeNumberFocus();
+								}
 								Ext.TaskMgr.stop(this);
 							}
 						},
@@ -261,7 +263,9 @@ function initTakeMoneyWin(){
 					var task = {
 						run : function(){
 							if(typeof takeMoneyNumberFocus == 'function'){
-								takeMoneyNumberFocus();
+								if(!id){
+									takeMoneyNumberFocus();
+								}
 								Ext.TaskMgr.stop(this);
 							}
 						},

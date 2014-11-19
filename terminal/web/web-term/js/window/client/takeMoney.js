@@ -320,7 +320,7 @@ function rechargeBindMemberData(data){
 	data = data == null || typeof data == 'undefined' ? {} : data;
 	var memberTypeData = typeof data['memberType'] == 'undefined' ? {} : data['memberType'];
 	
-	mobile.setValue(data['mobile']? data['mobile'] :data['memberCard']);
+	mobile.setValue(data['mobile']);
 	memberCard.setValue(data['memberCard']);
 	totalBalance.setValue(data['totalBalance']);
 	baseBalance.setValue(data['baseBalance']);
