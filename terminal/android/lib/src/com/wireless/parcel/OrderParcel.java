@@ -1,5 +1,6 @@
 package com.wireless.parcel;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.pojo.weixin.order.WxOrder;
 
 public class OrderParcel implements Parcelable{
 
@@ -45,6 +47,10 @@ public class OrderParcel implements Parcelable{
 				orderFoods.add(foodParcel.asOrderFood());
 			}
 			mSrcOrder.setOrderFoods(orderFoods);
+			//unmarshal the wx orders
+			for(WxOrderParcel wxOrderParcel : in.createTypedArrayList(WxOrderParcel.CREATOR)){
+				mSrcOrder.addWxOrder(wxOrderParcel.asWxOrder());
+			}
 		}else{
 			mSrcOrder = null;
 		}
@@ -84,11 +90,17 @@ public class OrderParcel implements Parcelable{
 			parcel.writeInt(NumericUtil.float2Int(mSrcOrder.getTotalPrice()));
 			parcel.writeInt(NumericUtil.float2Int(mSrcOrder.getActualPrice()));
 			//marshal the foods
-			List<OrderFoodParcel> foodParcels = new LinkedList<OrderFoodParcel>();
+			List<OrderFoodParcel> foodParcels = new ArrayList<OrderFoodParcel>(mSrcOrder.getOrderFoods().size());
 			for(OrderFood of : mSrcOrder.getOrderFoods()){
 				foodParcels.add(new OrderFoodParcel(of));
 			}
 			parcel.writeTypedList(foodParcels);
+			//marshal the wx orders
+			List<WxOrderParcel> wxOrderParcels = new ArrayList<WxOrderParcel>(mSrcOrder.getWxOrders().size());
+			for(WxOrder wxOrder : mSrcOrder.getWxOrders()){
+				wxOrderParcels.add(new WxOrderParcel(wxOrder));
+			}
+			parcel.writeTypedList(wxOrderParcels);
 		}
 	}
 
