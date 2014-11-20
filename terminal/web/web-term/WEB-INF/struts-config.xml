@@ -609,6 +609,10 @@
 		<action path="/TransFood"
 			type="com.wireless.Actions.dishesOrder.TransFoodAction"
 			scope="request" >
+		</action>	
+		<action path="/WXQueryOrder"
+			type="com.wireless.Actions.weixin.query.WxQueryOrderAction"
+			scope="request" parameter="dataSource">
 		</action>								
 	</action-mappings>
 
