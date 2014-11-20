@@ -215,7 +215,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}
 		
 		public boolean isMobileChanged(){
-			return this.mobile != null;
+			return this.mobile != null && !this.mobile.isEmpty();
 		}
 		
 		public UpdateBuilder setMemberTypeId(int memberTypeId){
@@ -312,7 +312,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}
 		
 		public boolean isMemberCardChanged(){
-			return this.memberCard != null;
+			return this.memberCard != null && !this.memberCard.isEmpty();
 		}
 		
 		public Member build(){
