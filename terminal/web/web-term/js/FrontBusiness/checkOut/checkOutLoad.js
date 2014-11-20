@@ -113,7 +113,7 @@ function loadWeixinOrderWin(){
 			id : 'checkOut_weixinOrder',
 			closable : false, //是否可关闭
 			resizable : false, //大小调整
-			width : 500,	
+			width : 520,	
 			items : []	
 		});
 	}
@@ -126,7 +126,7 @@ function loadWeixinOrderDetail(){
 			if(foods){
 				foods += "，";
 			}
-			foods += weixinOrders[i].foods[j].name;
+			foods += (weixinOrders[i].foods[j].name + ' (' + weixinOrders[i].foods[j].count + ')');
 		}
 		
 		var item = {
@@ -143,14 +143,14 @@ function loadWeixinOrderDetail(){
 				xtype : 'label',
 				text : '时间:'
 			},{
-				columnWidth : .39,
+				columnWidth : .38,
 				xtype : 'label',
 				style : 'font-size:15px;font-weight:bold;color:green;',
 				text : weixinOrders[i].date
 			},{
-				columnWidth : 0.21,
+				columnWidth : 0.22,
 				xtype : 'label',
-				text : '会员(微信号):'
+				text : '会员(微信卡号):'
 			},{
 				columnWidth : 0.3,
 				xtype : 'label',
@@ -166,7 +166,7 @@ function loadWeixinOrderDetail(){
 			},{
 				columnWidth : 0.9,
 				xtype : 'label',
-				style : 'font-size:15px;font-weight:bold;color:green;',
+				style : 'font-size:15px;font-weight:bold;',
 				text : foods
 			}]			
 		}
