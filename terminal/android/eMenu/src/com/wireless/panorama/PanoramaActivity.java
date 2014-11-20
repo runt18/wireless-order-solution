@@ -725,7 +725,7 @@ public class PanoramaActivity extends Activity implements ExhibitPopupWindow.OnE
 						Food food = (Food) view.getTag();
 						if(food != null){
 							ImageView image = (ImageView) view.findViewById(R.id.imageView_panorama_bottom_item);
-							mImageFetcher.loadImage(food.getImage(), image);
+							mImageFetcher.loadImage(food.getImage().getImage(), image);
 							
 							((TextView)view.findViewById(R.id.textView_panorama_bottom_item_name)).setText(food.getName());
 							((TextView)view.findViewById(R.id.textView_panorama_bottom_item_price)).setText("￥" + NumericUtil.float2String2(food.getPrice()));

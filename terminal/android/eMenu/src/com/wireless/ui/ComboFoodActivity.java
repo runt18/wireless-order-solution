@@ -82,7 +82,7 @@ public class ComboFoodActivity extends Activity{
 			 */
 			case ORDER_FOOD_CHANGED:
 				mFoodNameTextView.setText(activity.mShowingFood.getName());
-				activity.mBigImageFetcher.loadImage(activity.mShowingFood.getImage(), activity.mFoodImageView);
+				activity.mBigImageFetcher.loadImage(activity.mShowingFood.getImage().getImage(), activity.mFoodImageView);
 				//显示当前菜的排号
 				((TextView)activity.findViewById(R.id.TextView02)).setText("" + msg.arg1+"/" + activity.mComboFoodsAmount + " ");
 
@@ -141,7 +141,7 @@ public class ComboFoodActivity extends Activity{
 				if(mFoodImageView.getHeight() > 0)
 				{
 					mBigImageFetcher.setImageSize(mFoodImageView.getWidth(), mFoodImageView.getHeight());
-					mBigImageFetcher.loadImage(mShowingFood.getImage(), mFoodImageView);
+					mBigImageFetcher.loadImage(mShowingFood.getImage().getImage(), mFoodImageView);
 
 					mFoodImageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 				}
@@ -200,7 +200,7 @@ public class ComboFoodActivity extends Activity{
 			foodView.setPadding(0, 0, 3, 3);
 			foodView.setLayoutParams(lp);
 			image.setScaleType(ScaleType.CENTER_CROP);
-			mImageFetcher.loadImage(f.getImage(), image);
+			mImageFetcher.loadImage(f.getImage().getImage(), image);
 			linearLyaout.addView(foodView);
 			
 			//设置套菜点击侦听

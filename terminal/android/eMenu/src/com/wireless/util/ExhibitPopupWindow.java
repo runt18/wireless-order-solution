@@ -106,7 +106,7 @@ public class ExhibitPopupWindow extends PopupWindow {
 							
 							ImageView imgView = (ImageView) foodView.findViewById(R.id.imageView_galleryFgm_combo_item);
 							imgView.setScaleType(ScaleType.CENTER_CROP);
-							mFetcher.loadImage(food.getImage(), imgView );
+							mFetcher.loadImage(food.getImage().getImage(), imgView );
 							
 							comboLayout.addView(foodView);
 							foodView.setTag(food);

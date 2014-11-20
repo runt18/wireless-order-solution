@@ -241,7 +241,7 @@ public class PanoramaItemFragment extends Fragment{
 				@Override
 				public void onGlobalLayout() {
 					if(imageView.getWidth() > 0 && imageView.getHeight() > 0){
-						mImageFetcher.loadImage(food.getImage(), imageView);
+						mImageFetcher.loadImage(food.getImage().getImage(), imageView);
 						imageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 					}
 				}

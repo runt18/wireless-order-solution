@@ -252,7 +252,7 @@ public class SelectedFoodActivity extends Activity
 				((TextView)activity.findViewById(R.id.txtView_selectedFoodPrice_pickedFood)).setText(NumericUtil.float2String2(mDisplayedFood.getPrice()) + "元");
 				ImageView foodImgView = (ImageView)activity.findViewById(R.id.imageView_selected_food_pickedFood);
 				if(mDisplayedFood.hasImage()){
-					activity.mImageFetcher.loadImage(mDisplayedFood.getImage(), foodImgView);
+					activity.mImageFetcher.loadImage(mDisplayedFood.getImage().getImage(), foodImgView);
 				}else{
 					foodImgView.setImageResource(R.drawable.null_pic);
 				}

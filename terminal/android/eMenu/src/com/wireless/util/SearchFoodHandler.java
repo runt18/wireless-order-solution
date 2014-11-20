@@ -239,7 +239,7 @@ public class SearchFoodHandler extends Handler{
 				ImageView foodImage = (ImageView) view.findViewById(R.id.imageView_main_search_list_item);
 				if(food.hasImage())
 				{
-					mFetcherForSearch.loadImage(food.getImage(), foodImage);
+					mFetcherForSearch.loadImage(food.getImage().getImage(), foodImage);
 				} else foodImage.setImageResource(R.drawable.null_pic_small);
 				
 

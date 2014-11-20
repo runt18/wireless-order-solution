@@ -443,7 +443,7 @@ public class RankListActivity extends Activity {
 			OrderFood of = ((OrderFoodParcel) msg.getData().getParcelable(RankListActivity.CURRENT_FOOD)).asOrderFood();
 			
 			if(of.asFood().hasImage()){
-				activity.mImageFetcher.loadImage(of.asFood().getImage(), mImageView);
+				activity.mImageFetcher.loadImage(of.asFood().getImage().getImage(), mImageView);
 			}else{
 				mImageView.setImageResource(R.drawable.null_pic);
 			}

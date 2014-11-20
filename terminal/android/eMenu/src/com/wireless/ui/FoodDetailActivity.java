@@ -98,7 +98,7 @@ public class FoodDetailActivity extends Activity{
 			public void onGlobalLayout() {
 				if(mFoodImageView.getHeight() > 0){
 					imgFetcher.setImageSize(mFoodImageView.getWidth(), mFoodImageView.getHeight());
-					imgFetcher.loadImage(mOrderFood.asFood().getImage(), mFoodImageView);
+					imgFetcher.loadImage(mOrderFood.asFood().getImage().getImage(), mFoodImageView);
 					mFoodImageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 				}
 			}
@@ -175,7 +175,7 @@ public class FoodDetailActivity extends Activity{
 				childLayout.setLayoutParams(lp);
 				ImageView imageView = (ImageView) childLayout.findViewById(R.id.imgView_food_recommendFoodItem);
 				imageView.setScaleType(ScaleType.CENTER_CROP);
-				imageFetcher.loadImage(f.getImage(), imageView);
+				imageFetcher.loadImage(f.getImage().getImage(), imageView);
 				//显示推荐菜名称
 				((TextView) childLayout.findViewById(R.id.txtView_foodName_recommendFoodItem)).setText(f.getName());
 				//显示推荐菜价钱

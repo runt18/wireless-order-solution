@@ -72,7 +72,7 @@ public abstract class ImageWorker {
      * @param data The URL of the image to download.
      * @param imageView The ImageView to bind the downloaded image to.
      */
-    public void loadImage(Object data, ImageView imageView) {
+    public void loadImage(String data, ImageView imageView) {
         if(data == null){
             return;
         }

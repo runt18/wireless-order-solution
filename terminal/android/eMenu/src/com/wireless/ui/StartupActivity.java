@@ -302,7 +302,7 @@ public class StartupActivity extends Activity {
 						picOutputStream.writeTo(new BufferedOutputStream(
 													new FileOutputStream(new File(android.os.Environment.getExternalStorageDirectory().getPath() + 
 																		 		  Params.IMG_STORE_PATH + 
-																		 		  food.getImage()))));
+																		 		  food.getImage().getImage()))));
 						
 						edit.putString(Integer.toString(food.getFoodId()), food.getImage().getImage());			
 						
