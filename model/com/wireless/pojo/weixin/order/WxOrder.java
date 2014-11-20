@@ -307,6 +307,20 @@ public class WxOrder implements Jsonable, Parcelable{
 	}
 	
 	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof WxOrder)){
+			return false;
+		}else{
+			return this.id == ((WxOrder)obj).id;
+		}
+	}
+	
+	@Override
+	public int hashCode(){
+		return id * 31 + 17;
+	}
+	
+	@Override
 	public String toString(){
 		return "id=" + id +
 			   ", memberSerial=" + weixinSerial	+
@@ -380,4 +394,5 @@ public class WxOrder implements Jsonable, Parcelable{
 		}
 		
 	};
+	
 }
