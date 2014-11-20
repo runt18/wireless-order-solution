@@ -362,7 +362,7 @@ public class WxOrderDao {
 			wxOrder.setType(WxOrder.Type.valueOf(dbCon.rs.getInt("type")));
 			wxOrder.setCode(dbCon.rs.getInt("code"));
 			wxOrder.setOrderId(dbCon.rs.getInt("order_id"));
-			wxOrder.setBirthDate(dbCon.rs.getLong("birth_date"));
+			wxOrder.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
 			wxOrder.setWeixinSerial(dbCon.rs.getString("weixin_serial"));
 			result.add(wxOrder);
 		}
