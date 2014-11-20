@@ -98,11 +98,11 @@
 	var checkOutGrid, checkOutStore, checkOutColumnModel;
 	var tableGroupTab;
 	
-	var timerCheckParams, tableDate, payTypeData;
+	var timerCheckParams, tableDate, payTypeData, weixinOrders;
 	var isPaying = false;
 	var checkOut_actualPrice ;
-	//输入收款窗口&混合结账窗口
-	var inputReciptWin, mixedPayWin;
+	//输入收款窗口 & 混合结账窗口 & 微信账单
+	var inputReciptWin, mixedPayWin, weixinOrderDetailWin;
 	//计算混合结账
 	var payTypeCash ='', payMoneyCalc = {}, isMixedPay = false;
 	
@@ -235,6 +235,10 @@
 				</tr>				
 				
 			</table>
+	</div>
+	
+	<div id="divWeixinOrderWin" style="height: 200px;width: 300px;background-color: gray;color:white">
+	
 	</div>
 	
 </body>
