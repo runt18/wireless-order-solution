@@ -78,8 +78,7 @@ function loadOrderBasicMsg(){
 		sumFoodCount += checkOutData.root[i].count;
 	}
 //	document.getElementById("spanSumFoodCount").innerHTML = sumFoodCount.toFixed(2);;
-	
-	var payOrderTitle = '结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>';
+	var payOrderTitle = '结账 -- 账单号:<font color="red">' + orderMsg.id + '</font> ' + (orderMsg.isWeixinOrder?'(<span id="showWeixinOrder" style="font-size:15px;font-weight:bold;color:green;text-decoration:underline">微信账单</span>)' : '');
 	if(orderMsg.category != 4){
 		payOrderTitle += (' -- 餐桌号:<font color="red" size=3>' + orderMsg.table.alias + '</font>&nbsp;' + (tableDate.name?'<font color="red" size=3>(' + tableDate.name +')</font>' :''));
 	}
@@ -91,7 +90,93 @@ function loadOrderBasicMsg(){
 	checkOutMainPanel.setTitle(payOrderTitle);
 	
 	Ext.getCmp('txtEraseQuota').setValue();
+	
+	$('#showWeixinOrder').hover(function(){
+		if(!weixinOrderDetailWin.loadOrder){
+			loadWeixinOrderDetail();
+			weixinOrderDetailWin.loadOrder = true;
+		}
+		weixinOrderDetailWin.setPosition($('#showWeixinOrder').position().left + 475, $('#showWeixinOrder').position().top + 60);
+		weixinOrderDetailWin.show();		
+		
+	}, function(){
+		weixinOrderDetailWin.hide();
+	});	
+	
 }
+
+
+//加载微信账单的基本信息
+function loadWeixinOrderWin(){
+	if(!weixinOrderDetailWin){
+		weixinOrderDetailWin = new Ext.Window({
+			id : 'checkOut_weixinOrder',
+			closable : false, //是否可关闭
+			resizable : false, //大小调整
+			width : 500,	
+			items : []	
+		});
+	}
+}
+
+function loadWeixinOrderDetail(){
+	for (var i = 0; i < weixinOrders.length; i++) {
+		var foods = '';
+		for (var j = 0; j < weixinOrders[i].foods.length; j++) {
+			if(foods){
+				foods += "，";
+			}
+			foods += weixinOrders[i].foods[j].name;
+		}
+		
+		var item = {
+			layout : 'column',
+			frame : true,
+			border : true,
+		 	defaults : {
+		 		labelWidth : 60,
+		 		labelAlign : 'right',
+		 		style : 'font-size:15px;margin-bottom:5px;'
+		 	},				
+			items : [{
+				columnWidth : .1,
+				xtype : 'label',
+				text : '时间:'
+			},{
+				columnWidth : .39,
+				xtype : 'label',
+				style : 'font-size:15px;font-weight:bold;color:green;',
+				text : weixinOrders[i].date
+			},{
+				columnWidth : 0.21,
+				xtype : 'label',
+				text : '会员(微信号):'
+			},{
+				columnWidth : 0.3,
+				xtype : 'label',
+				style : 'font-size:15px;font-weight:bold;color:green;',
+				text : weixinOrders[i].member.name.substring(0,3) + (weixinOrders[i].member.weixinCard?'--' + weixinOrders[i].member.weixinCard : '')
+			},{
+				columnWidth : 1
+			},
+			{
+				columnWidth : 0.1,
+				xtype : 'label',
+				text : '菜品:'
+			},{
+				columnWidth : 0.9,
+				xtype : 'label',
+				style : 'font-size:15px;font-weight:bold;color:green;',
+				text : foods
+			}]			
+		}
+		
+		weixinOrderDetailWin.add(item);
+	}
+	weixinOrderDetailWin.doLayout();
+}
+
+
 
 /**
  * 加载系统设置
@@ -690,6 +775,22 @@ function showInputReciptWin(){
 	inputReciptWin.show();
 	Ext.getCmp('txtShouldToRecipt').setValue(Ext.get('shouldPay').dom.innerHTML);
 	Ext.getCmp('txtInputRecipt').focus(true, 100);
+}
+
+function getWeixinOrders(){
+	Ext.Ajax.request({
+		url : '../../WXQueryOrder.do',
+		params: {dataSource : 'getByOrder', orderId : tableID},
+		success : function(res){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				weixinOrders = jr.root;
+			}
+		},
+		failure : function(){
+		
+		}
+	});
 }
 
 

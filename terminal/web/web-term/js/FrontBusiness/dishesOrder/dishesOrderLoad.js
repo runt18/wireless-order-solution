@@ -318,7 +318,7 @@ function createOrderFoodGridPanelTbar(){
 								url : '../../PrintOrder.do',
 								params : {
 									'tableID' : tableAliasID,
-									'printType' : 1
+									'printType' : 14
 								},
 								success : function(response, options) {
 									tempMask.hide();
@@ -502,7 +502,6 @@ function initPasswordWin(){
 				layout : 'form',
 				frame : true,
 				labelWidth : 40,
-//				items : [numCount, txtPassword]
 				items : [numCount]
 			}],
 			bbar : ['->', {

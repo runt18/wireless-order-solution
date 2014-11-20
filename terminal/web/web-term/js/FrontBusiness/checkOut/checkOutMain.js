@@ -262,6 +262,8 @@ Ext.onReady(function() {
 		checkOutMainPanel.doLayout();
 	}
 	
+	loadWeixinOrderWin();
+	
 	//快捷键
 	new Ext.KeyMap(document.body, [{
 		key: 107,
@@ -291,7 +293,9 @@ Ext.onReady(function() {
 			payTypeData = jr.root;
 		},
 		failure : function(){}
-	});	
+	});
+	
+	getWeixinOrders();
 });
 
 function setFormButtonStatus(_s){
