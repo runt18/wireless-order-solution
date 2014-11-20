@@ -735,7 +735,7 @@ uo.submitUpdateOrderHandler = function(c){
 
 uo.tempPayForPrintAll = function(c){
 	Util.LM.show();
-	$.post('../PrintOrder.do', {'tableID' : uo.order.table.alias, 'printType' : 1}, function(result){
+	$.post('../PrintOrder.do', {'tableID' : uo.order.table.alias, 'printType' : 14}, function(result){
 		Util.LM.hide();
 		if(result.success){
 			Util.msg.alert({
