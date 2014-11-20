@@ -69,4 +69,9 @@ public class TestWeixinOrderDao {
 			}
 		}
 	}
+	
+	@Test
+	public void testCleanup() throws SQLException, BusinessException{
+		System.out.println(WxOrderDao.cleanup());
+	}
 }

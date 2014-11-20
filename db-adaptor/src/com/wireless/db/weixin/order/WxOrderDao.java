@@ -9,12 +9,17 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.WxOrderError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.order.WxOrder;
+import com.wireless.util.DateType;
 
 public class WxOrderDao {
 	
@@ -128,7 +133,7 @@ public class WxOrderDao {
 		WxOrder wxOrder = builder.build();
 		
 		//Make the previous inside committed orders invalid.
-		for(WxOrder order : getByCond(dbCon, staff, new ExtraCond().setWeixin(wxOrder.getWeixinSerial()).setType(WxOrder.Type.INSIDE).setStatus(WxOrder.Status.COMMITTED))){
+		for(WxOrder order : getByCond(dbCon, staff, new ExtraCond().setWeixin(wxOrder.getWeixinSerial()).setType(WxOrder.Type.INSIDE).setStatus(WxOrder.Status.COMMITTED), null)){
 			try{
 				update(dbCon, staff, new WxOrder.UpdateBuilder(order.getId()).setStatus(WxOrder.Status.INVALID));
 			}catch(BusinessException ignored){
@@ -259,7 +264,7 @@ public class WxOrderDao {
 	 * 			<li>any food belongs to this wx order does NOT exist
 	 */
 	public static WxOrder getByCode(DBCon dbCon, Staff staff, int code) throws SQLException, BusinessException{
-		List<WxOrder> result = getByCond(dbCon, staff, new ExtraCond().setCode(code));
+		List<WxOrder> result = getByCond(dbCon, staff, new ExtraCond().setCode(code), null);
 		if(result.isEmpty()){
 			throw new BusinessException(WxOrderError.WX_ORDER_NOT_EXIST);
 		}else{
@@ -310,7 +315,7 @@ public class WxOrderDao {
 	 * 			<li>any food belongs to this wx order does NOT exist
 	 */
 	public static WxOrder getById(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
-		List<WxOrder> result = getByCond(dbCon, staff, new ExtraCond().setId(id));
+		List<WxOrder> result = getByCond(dbCon, staff, new ExtraCond().setId(id), null);
 		if(result.isEmpty()){
 			throw new BusinessException(WxOrderError.WX_ORDER_NOT_EXIST);
 		}else{
@@ -346,12 +351,13 @@ public class WxOrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<WxOrder> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+	public static List<WxOrder> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".weixin_order " +
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
-			  (extraCond != null ? extraCond.toString() : "");
+			  (extraCond != null ? extraCond.toString() : " ") +
+			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		List<WxOrder> result = new ArrayList<WxOrder>();
@@ -423,17 +429,47 @@ public class WxOrderDao {
 	 */
 	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		int amount = 0;
-		for(WxOrder wxOrder : getByCond(dbCon, staff, extraCond)){
-			String sql;
-			//Delete the wx order.
-			sql = " DELETE FROM " + Params.dbName + ".weixin_order WHERE wx_order_id = " + wxOrder.getId();
-			dbCon.stmt.executeUpdate(sql);
-			//Delete the associated order food.
-			sql = " DELETE FROM " + Params.dbName + ".weixin_order_food WHERE wx_order_id = " + wxOrder.getId();
-			dbCon.stmt.executeUpdate(sql);
-			
-			amount++;
+		for(WxOrder wxOrder : getByCond(dbCon, staff, extraCond, null)){
+			if(OrderDao.getByCond(dbCon, staff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(wxOrder.getOrderId()), null).isEmpty()){
+				String sql;
+				//Delete the wx order.
+				sql = " DELETE FROM " + Params.dbName + ".weixin_order WHERE wx_order_id = " + wxOrder.getId();
+				dbCon.stmt.executeUpdate(sql);
+				//Delete the associated order food.
+				sql = " DELETE FROM " + Params.dbName + ".weixin_order_food WHERE wx_order_id = " + wxOrder.getId();
+				dbCon.stmt.executeUpdate(sql);
+				
+				amount++;
+			}
 		}
 		return amount;
+	}
+	
+	public static class Result{
+		public final int amount;
+		private final int elapsed;
+		Result(int amount, int elapsed){
+			this.amount = amount;
+			this.elapsed = elapsed;
+		}
+		@Override
+		public String toString(){
+			return "remove " + amount + " wx order(s) takes " + elapsed + " sec.";
+		}
+	}
+	
+	public static Result cleanup() throws SQLException, BusinessException{
+		long beginTime = System.currentTimeMillis();
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			int amount = 0;
+			for(Restaurant restaurant : RestaurantDao.getByCond(null, null)){
+				amount += deleteByCond(dbCon, StaffDao.getAdminByRestaurant(dbCon, restaurant.getId()), null);
+			}
+			return new Result(amount, (int)(System.currentTimeMillis() - beginTime) / 1000);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 }

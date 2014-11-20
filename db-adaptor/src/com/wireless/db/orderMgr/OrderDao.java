@@ -170,7 +170,7 @@ public class OrderDao {
 
 			StringBuilder filterCond = new StringBuilder();
 			
-			if(orderId > 0){
+			if(orderId >= 0){
 				filterCond.append(" AND " + orderTblAlias + ".id = " + orderId);
 			}
 			if(seqId > 0){
@@ -376,7 +376,7 @@ public class OrderDao {
 			order.setMixedPayment(MixedPaymentDao.get(dbCon, staff, new MixedPaymentDao.ExtraCond(dateType, order)));
 		}
 		//Get the associated wx orders.
-		for(WxOrder wxOrder : WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setOrder(order))){
+		for(WxOrder wxOrder : WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setOrder(order), null)){
 			order.addWxOrder(wxOrder);
 		}
 	}
@@ -398,7 +398,7 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static List<Order> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+	public static List<Order> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
 		if(extraCond.dateType == DateType.TODAY){
 			sql = " SELECT " +
