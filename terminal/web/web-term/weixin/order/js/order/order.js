@@ -28,14 +28,13 @@ $(function(){
 			var html = [];
 			for(var i = 0; i < data.root.length; i++){
 				var temp = data.root[i];
-				
-				var totalPrice = 0, count = temp.orderFoods.length, foods = '';
-				for (var j = 0; j < temp.orderFoods.length; j++) {
-					totalPrice += temp.orderFoods[j].totalPrice;
+				var totalPrice = 0, count = temp.foods.length, foods = '';
+				for (var j = 0; j < temp.foods.length; j++) {
+					totalPrice += temp.foods[j].totalPrice;
 					if(foods){
 						foods += ',';
 					}
-					foods += temp.orderFoods[j].name;
+					foods += temp.foods[j].name;
 				}
 				
 				html.push(Templet.mainBox.format({
