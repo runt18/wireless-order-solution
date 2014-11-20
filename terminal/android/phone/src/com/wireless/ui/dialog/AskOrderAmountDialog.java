@@ -12,13 +12,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
+import android.text.Selection;
 import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
@@ -63,7 +62,7 @@ public class AskOrderAmountDialog extends DialogFragment {
 		ActionType(int val, String desc){
 			this.val = val;
 			this.desc = desc;
-		}
+		} 
 		
 		public static ActionType valueOf(int val){
 			for(ActionType type : values()){
@@ -255,15 +254,24 @@ public class AskOrderAmountDialog extends DialogFragment {
 		}
 		
 		// 点击数量EditText后全选内容并弹出软键盘
-		countEditText.setOnTouchListener(new OnTouchListener() {
+//		countEditText.setOnTouchListener(new OnTouchListener() {
+//			@Override
+//			public boolean onTouch(View v, MotionEvent event) {
+//				countEditText.selectAll();
+//				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+//				imm.showSoftInput(v, 0);
+//				return true;
+//			}
+//
+//		});
+		countEditText.setOnClickListener(new OnClickListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				countEditText.selectAll();
+			public void onClick(final View v) {
+				countEditText.setText(countEditText.getText());
+				Selection.selectAll(countEditText.getText());
 				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.showSoftInput(v, 0);
-				return true;
 			}
-
 		});
 
 		// 数量加按钮

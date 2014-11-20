@@ -24,7 +24,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -51,6 +50,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.ui.dialog.AskTableDialog;
 import com.wireless.ui.dialog.AskTableDialog.OnTableSelectedListener;
+import com.wireless.ui.dialog.AskWxOrderDialog;
 
 public class MainActivity extends FragmentActivity implements OnTableSelectedListener{
 
@@ -231,9 +231,10 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 					break;
 					
 				case 8:
-					//关于
-					intent = new Intent(MainActivity.this, MemberListActivity.class);
-					startActivity(intent);
+					//会员
+					//intent = new Intent(MainActivity.this, MemberListActivity.class);
+					//startActivity(intent);
+					AskWxOrderDialog.newInstance().show(getSupportFragmentManager(), AskWxOrderDialog.TAG);
 					break;
 				}
 			}
@@ -586,12 +587,12 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		AskLoginDialog() {
 			super(MainActivity.this, R.style.FullHeightDialog);
 			setContentView(R.layout.login_dialog);
-			getWindow().getAttributes().width = (int) (getWindow().getWindowManager().getDefaultDisplay().getWidth()* 0.85);
+			getWindow().getAttributes().width = (int) (getWindow().getWindowManager().getDefaultDisplay().getWidth() * 0.85);
 			getWindow().getAttributes().height = (int) (getWindow().getWindowManager().getDefaultDisplay().getHeight() * 0.5);
 			getWindow().setBackgroundDrawableResource(android.R.color.transparent);//设置背景透明
-			final EditText pwdEdtTxt = (EditText)findViewById(R.id.pwd);
+			final EditText pwdEdtTxt = (EditText)findViewById(R.id.editTxt_pwd_login_dialog);
 	        
-	        final TextView staffTxtView = (TextView)findViewById(R.id.staffname);
+	        final TextView staffTxtView = (TextView)findViewById(R.id.txtView_staffName_login_dialog);
 	        
 	        /**
 	         * 帐号输入框显示员工列表
@@ -602,7 +603,8 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 					if(_popupWindow.isShowing()){
 						_popupWindow.dismiss();
 					}else{
-						_popupWindow.showAsDropDown(findViewById(R.id.click), -330, 15);
+						//_popupWindow.showAsDropDown(findViewById(R.id.imgView_login_dialog), -330, 15);
+						_popupWindow.showAsDropDown(findViewById(R.id.relativeLayout_account_login_dialog));
 					}					
 				}
 			});
@@ -610,25 +612,25 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 	        /**
 	         * 下拉箭头显示员工信息列表
 	         */
-	        ((ImageView)findViewById(R.id.click)).setOnClickListener(new View.OnClickListener() {				
+	        ((ImageView)findViewById(R.id.imgView_login_dialog)).setOnClickListener(new View.OnClickListener() {				
 				@Override
 				public void onClick(View v) {
 					if(_popupWindow.isShowing()){
 						_popupWindow.dismiss();
 					}else{
-						_popupWindow.showAsDropDown(v, -330, 15);
+						_popupWindow.showAsDropDown(findViewById(R.id.relativeLayout_account_login_dialog));
 					}					
 				}
-			});
+			});  
 	        
 	        // 获取自定义布局文件的视图
-			View popupWndView = getLayoutInflater().inflate(R.layout.login_popup_wnd, null, false);
+			View popupWndView = getLayoutInflater().inflate(R.layout.login_popup_wnd, (ViewGroup)AskLoginDialog.this.getWindow().getDecorView(), false);
 			// 创建PopupWindow实例
-			_popupWindow = new PopupWindow(popupWndView, 380, 200, true);
+			_popupWindow = new PopupWindow(popupWndView, getWindow().getAttributes().width - 28, 200, true);
 			_popupWindow.setOutsideTouchable(true);
 			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
 			
-			ListView staffLstView = (ListView)popupWndView.findViewById(R.id.loginpopuwindow);
+			ListView staffLstView = (ListView)popupWndView.findViewById(R.id.listView_loginPopup);
 			_staffAdapter = new StaffsAdapter();
 			staffLstView.setAdapter(_staffAdapter);
 
@@ -652,7 +654,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 				@Override
 				public void onClick(View v) {
 				
-					TextView errTxtView = (TextView)findViewById(R.id.error);
+					TextView errTxtView = (TextView)findViewById(R.id.txtView_error_login_dialog);
 					
 					try {
 						//Convert the password into MD5
@@ -678,7 +680,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 						}
 						
 					}catch(NoSuchAlgorithmException e) {
-						errTxtView.setText(e.getMessage());;
+						errTxtView.setText(e.getMessage());
 					}
 				}
 			});
@@ -687,9 +689,9 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		
 		@Override
 		public void onAttachedToWindow(){
-			((TextView)findViewById(R.id.error)).setText("");
-			((EditText)findViewById(R.id.pwd)).setText("");
-	        ((TextView)findViewById(R.id.staffname)).setText("");
+			((TextView)findViewById(R.id.txtView_error_login_dialog)).setText("");
+			((EditText)findViewById(R.id.editTxt_pwd_login_dialog)).setText("");
+	        ((TextView)findViewById(R.id.txtView_staffName_login_dialog)).setText("");
 	        if(_staffAdapter != null){
 	        	_staffAdapter.notifyDataSetChanged();
 	        }
@@ -747,10 +749,10 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				if(convertView == null){
-					convertView = LayoutInflater.from(MainActivity.this).inflate(R.layout.orderpopuwindowitem, null);
-					((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs.get(position).getName());
+					convertView = getLayoutInflater().inflate(R.layout.login_popup_staff_item, parent, false);
+					((TextView)convertView.findViewById(R.id.txtView_staff_loginPopup_Item)).setText(WirelessOrder.staffs.get(position).getName());
 				}else{
-					((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs.get(position).getName());
+					((TextView)convertView.findViewById(R.id.txtView_staff_loginPopup_Item)).setText(WirelessOrder.staffs.get(position).getName());
 				}				
 				return convertView;
 			}			

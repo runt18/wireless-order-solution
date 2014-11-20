@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.wireless.exception.BusinessException;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.NumericUtil;
@@ -60,7 +59,7 @@ public class AddOrderAmountDialog extends DialogFragment {
 		
 		getDialog().setTitle("请输入" + mSelectedFood.getName() + "的数量");
 		
-		View view = inflater.inflate(R.layout.add_order_amount_dialog, null);
+		View view = inflater.inflate(R.layout.add_order_amount_dialog, container);
 		
 		//设置默认为此菜品的点菜数量
 		final EditText amountEditTxt = (EditText)view.findViewById(R.id.editText_add_amountDialog);
@@ -99,7 +98,7 @@ public class AddOrderAmountDialog extends DialogFragment {
 					 
 				}				
 			}
-		});
+		}); 
 		
 		//"确定"Button
 		Button okBtn = (Button)view.findViewById(R.id.button_add_amountDialog_left);

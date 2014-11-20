@@ -114,7 +114,7 @@ public class AskTableDialog extends DialogFragment {
 					
 					final Table tbl = filterTbls.get(position);
 					if(convertView == null){
-						View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.ask_table_dialog_item, null);
+						View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.ask_table_dialog_item, parent, false);
 						checkBox = (CheckBox) view;
 
 					}else{
@@ -205,8 +205,8 @@ public class AskTableDialog extends DialogFragment {
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		
-		View dialogView = getActivity().getLayoutInflater().inflate(R.layout.ask_table_dialog, null);
-		
+		View dialogView = getActivity().getLayoutInflater().inflate(R.layout.ask_table_dialog, (ViewGroup)getActivity().getWindow().getDecorView(), false);
+		 
 		//
 		final EditText tblNumEditTxt = (EditText)dialogView.findViewById(R.id.edtTxt_askTable_dialog);
 		tblNumEditTxt.addTextChangedListener(new TextWatcher(){
@@ -229,6 +229,28 @@ public class AskTableDialog extends DialogFragment {
 			
 		});
 		
+        // Request focus and show soft keyboard automatically
+	    tblNumEditTxt.setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+            	if(hasFocus){
+	            	tblNumEditTxt.post(new Runnable() {
+	                    @Override
+	                    public void run() {
+	                        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+	                        imm.showSoftInput(tblNumEditTxt, InputMethodManager.SHOW_IMPLICIT);
+	                    }
+	                });
+            	}
+            }
+        });
+	    dialogView.post(new Runnable(){
+			@Override
+			public void run() {
+			    tblNumEditTxt.requestFocus();
+			}
+	    });
+	    
 		//餐台名称和编号切换的Button
 		Button switchBtn = (Button)dialogView.findViewById(R.id.button_switch_askTable_dialog);
 		switchBtn.setOnClickListener(new OnClickListener(){
@@ -274,26 +296,7 @@ public class AskTableDialog extends DialogFragment {
 	    
 	    mViewHanlder = new ViewHandler(dialogView, this);
 	    
-	    Dialog dialog = builder.create();
-	    
-        // Request focus and show soft keyboard automatically
-	    tblNumEditTxt.setOnFocusChangeListener(new OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-            	if(hasFocus){
-	            	tblNumEditTxt.post(new Runnable() {
-	                    @Override
-	                    public void run() {
-	                        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-	                        imm.showSoftInput(tblNumEditTxt, InputMethodManager.SHOW_IMPLICIT);
-	                    }
-	                });
-            	}
-            }
-        });
-	    tblNumEditTxt.requestFocus();
-        
-        return dialog;
+	    return builder.create();
 	}
 	
 }

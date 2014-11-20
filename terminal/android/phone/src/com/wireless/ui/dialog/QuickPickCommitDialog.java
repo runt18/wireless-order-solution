@@ -13,12 +13,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
+import android.text.Selection;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
@@ -140,15 +140,24 @@ public class QuickPickCommitDialog extends DialogFragment{
        	tableText.requestFocus();
        
         //点击TableText后全选内容并弹出软键盘
-       	tableText.setOnTouchListener(new OnTouchListener(){
+//       	tableText.setOnTouchListener(new OnTouchListener(){
+//			@Override
+//			public boolean onTouch(View v, MotionEvent event) {
+//				tableText.selectAll();
+//				InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+//			    imm.showSoftInput(v, 0);
+//				return true;
+//			}
+//        });
+       	tableText.setOnClickListener(new OnClickListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				tableText.selectAll();
-				InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-			    imm.showSoftInput(v, 0);
-				return true;
+			public void onClick(View v) {
+				tableText.setText(tableText.getText());
+				Selection.selectAll(tableText.getText());
+				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(v, 0);
 			}
-        });
+		});
        	
        	//Refresh the table name while input the table alias.
        	tableText.addTextChangedListener(new TextWatcher() {
@@ -340,7 +349,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 		private ProgressDialog mProgDialog;
 		
 		InsertOrderForceTask(int tableAlias, PrintOption printOption) throws BusinessException {
-			super(WirelessOrder.loginStaff, new Order.InsertBuilder(new Table.AliasBuilder(tableAlias)).addAll(mReqOrder.getOrderFoods(), WirelessOrder.loginStaff).setForce(true), printOption);
+			super(WirelessOrder.loginStaff, new Order.InsertBuilder(new Table.AliasBuilder(tableAlias)).setWxOrders(mReqOrder.getWxOrders()).addAll(mReqOrder.getOrderFoods(), WirelessOrder.loginStaff).setForce(true), printOption);
 			mReqOrder.setDestTbl(new Table.AliasBuilder(tableAlias).build());
 		}
 		

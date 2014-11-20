@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/edtTxt_ask_WxOrder_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="4dp"
+        android:digits="0123456789,"
+        android:focusableInTouchMode="true"
+        android:hint="多个账单号用逗号“,”号隔开"
+        android:inputType="numberSigned"
+        android:singleLine="true" />
+
+</LinearLayout>

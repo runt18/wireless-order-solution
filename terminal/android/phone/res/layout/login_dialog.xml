@@ -15,6 +15,7 @@
         android:textSize="18sp" />
 
     <RelativeLayout
+        android:id="@+id/relativeLayout_account_login_dialog"
         android:layout_width="match_parent"
         android:layout_height="50dip"
         android:layout_marginLeft="10dip"
@@ -24,7 +25,7 @@
         android:paddingLeft="10dip" >
 
         <TextView
-            android:id="@+id/accounts"
+            android:id="@+id/txtView_account_login_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -33,18 +34,18 @@
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/staffname"
+            android:id="@+id/txtView_staffName_login_dialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="2dip"
-            android:layout_toRightOf="@id/accounts"
+            android:layout_toRightOf="@id/txtView_account_login_dialog"
             android:background="@null"
             android:textColor="#000000"
             android:textSize="18sp" />
 
         <ImageView
-            android:id="@+id/click"
+            android:id="@+id/imgView_login_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -73,7 +74,7 @@
             android:textSize="18sp" />
 
         <EditText
-            android:id="@+id/pwd"
+            android:id="@+id/editTxt_pwd_login_dialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -86,7 +87,7 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/error"
+        android:id="@+id/txtView_error_login_dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

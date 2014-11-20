@@ -1,6 +1,7 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -25,9 +26,10 @@ import com.wireless.fragment.OrderFoodFragment;
 import com.wireless.fragment.OrderFoodFragment.OnButtonClickedListener;
 import com.wireless.fragment.OrderFoodFragment.OnOrderChangedListener;
 import com.wireless.fragment.PickFoodFragment;
-import com.wireless.parcel.OrderParcel;
+import com.wireless.parcel.WxOrderParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.ui.dialog.AskOrderAmountDialog.ActionType;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.ui.dialog.QuickPickCommitDialog;
@@ -182,6 +184,21 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 		right.setText("提交");
 		right.setVisibility(View.VISIBLE);
 		
+		//将菜品添加到"已点菜"
+//		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
+//		if(orderParcel != null){
+//			((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).addFoods(orderParcel.asOrder().getOrderFoods());
+//		}
+		
+		final List<WxOrder> wxOrders = new ArrayList<WxOrder>();
+		List<WxOrderParcel> wxOrderParcels = getIntent().getParcelableArrayListExtra(WxOrderParcel.KEY_VALUE);
+		if(wxOrderParcels != null){
+			for(WxOrderParcel parcel : wxOrderParcels){
+				((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).addFoods(parcel.asWxOrder().getFoods());
+				wxOrders.add(parcel.asWxOrder());
+			}
+		}
+		
 		ImageButton commit = (ImageButton) findViewById(R.id.btn_right);
 		commit.setVisibility(View.VISIBLE);
 		commit.setOnClickListener(new OnClickListener(){
@@ -190,6 +207,9 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 				//若未点菜，则提示。
 				if(((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).hasNewOrderFood()){
 					Order reqOrder = new Order(0);
+					for(WxOrder wxOrder : wxOrders){
+						reqOrder.addWxOrder(wxOrder);
+					}
 					reqOrder.setOrderFoods(((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).getNewFoods());
 					QuickPickCommitDialog.newCommitDialog(reqOrder).show(getSupportFragmentManager(), QuickPickCommitDialog.TAG);
 				}else{
@@ -198,12 +218,6 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 			}
 		});
 
-		//将菜品添加到"已点菜"
-		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
-		if(orderParcel != null){
-			((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).addFoods(orderParcel.asOrder().getOrderFoods());
-		}
-		
 		//编号
 		((ImageButton) findViewById(R.id.imageButton_num_quickPick)).setOnClickListener(new OnClickListener(){
 			@Override
@@ -242,7 +256,11 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 			}
 		});
 
-		switchToOrderView();
+		if(((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).hasNewOrderFood()){
+			mViewHandler.sendEmptyMessage(ORDER_FOOD_FRAGMENT);
+		}else{
+			switchToOrderView();
+		}
 	}
 
 	@Override
@@ -304,7 +322,7 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 			txtViewAmount.setVisibility(View.GONE);
 		}else{
 			txtViewAmount.setVisibility(View.VISIBLE);
-			txtViewAmount.setText(newFoodList.size() + "");
+			txtViewAmount.setText(Integer.toString(newFoodList.size()));
 		}
 	}
 
