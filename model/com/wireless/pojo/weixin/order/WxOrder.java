@@ -9,6 +9,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.DateUtil;
@@ -179,6 +180,7 @@ public class WxOrder implements Jsonable, Parcelable{
 	
 	private int id;
 	private String weixinSerial;
+	private Member member;
 	private long birthDate;
 	private int code;
 	private int orderId;
@@ -218,6 +220,14 @@ public class WxOrder implements Jsonable, Parcelable{
 	
 	public void setWeixinSerial(String weixinSerial) {
 		this.weixinSerial = weixinSerial;
+	}
+	
+	public Member getMember(){
+		return member;
+	}
+	
+	public void setMember(Member member){
+		this.member = member;
 	}
 	
 	public long getBirthDate() {
