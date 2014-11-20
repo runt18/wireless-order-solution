@@ -18,10 +18,12 @@
 				/WXQueryDept.do,
 				/WXOperateMember.do,
 				/WXQueryMemberOperation.do,
+				/WXQueryOrder.do,
 				/QueryMemberType.do,
 				/QueryMemberLevel.do,
 				/QueryFood_q.do,
 				/FinanceWeixin.do,
+				/WXQueryDaZhongInfo.do,
 
 				/QueryRestaurants.do,
 				/VerifyLogin.do,
@@ -137,6 +139,10 @@
 			<param-name>oss_outer_point</param-name>
 			<param-value>oss.aliyuncs.com</param-value>
 		</init-param>
+		<init-param>
+			<param-name>oss_bucket</param-name>
+			<param-value>digie-image-test</param-value>
+		</init-param>		
 		<init-param>
 			<param-name>oss_bucket_image</param-name>
 			<param-value>food-image-test</param-value>
