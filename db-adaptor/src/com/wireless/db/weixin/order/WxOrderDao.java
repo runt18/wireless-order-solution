@@ -7,6 +7,7 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.WxOrderError;
@@ -263,7 +264,7 @@ public class WxOrderDao {
 			throw new BusinessException(WxOrderError.WX_ORDER_NOT_EXIST);
 		}else{
 			WxOrder wxOrder = result.get(0);
-			wxOrder.addFoods(getDetail(dbCon, staff, wxOrder.getId()));
+			fillDetail(dbCon, staff, wxOrder);
 			return wxOrder;
 		}
 	}
@@ -314,24 +315,23 @@ public class WxOrderDao {
 			throw new BusinessException(WxOrderError.WX_ORDER_NOT_EXIST);
 		}else{
 			WxOrder wxOrder = result.get(0);
-			wxOrder.addFoods(getDetail(dbCon, staff, wxOrder.getId()));
+			fillDetail(dbCon, staff, wxOrder);
 			return wxOrder;
 		}
 	}
 	
-	private static List<OrderFood> getDetail(DBCon dbCon, Staff staff, int wxOrderId) throws SQLException, BusinessException{
+	private static void fillDetail(DBCon dbCon, Staff staff, WxOrder wxOrder) throws SQLException, BusinessException{
 		String sql;
-		sql = " SELECT * FROM " + Params.dbName + ".weixin_order_food WHERE wx_order_id = " + wxOrderId;
+		sql = " SELECT * FROM " + Params.dbName + ".weixin_order_food WHERE wx_order_id = " + wxOrder.getId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		List<OrderFood> result = new ArrayList<OrderFood>();
 		while(dbCon.rs.next()){
 			OrderFood of = new OrderFood();
 			of.asFood().copyFrom(FoodDao.getById(staff, dbCon.rs.getInt("food_id")));
 			of.setCount(dbCon.rs.getFloat("food_count"));
-			result.add(of);
+			wxOrder.addFood(of);
 		}
 		dbCon.rs.close();
-		return result;
+		wxOrder.setMember(MemberDao.getByWxSerial(dbCon, staff, wxOrder.getWeixinSerial()));
 	}
 	
 	/**
@@ -409,6 +409,18 @@ public class WxOrderDao {
 		}
 	}
 	
+	/**
+	 * Delete the wx order to extra condition {@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @return the amount to wx order deleted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
 	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		int amount = 0;
 		for(WxOrder wxOrder : getByCond(dbCon, staff, extraCond)){
