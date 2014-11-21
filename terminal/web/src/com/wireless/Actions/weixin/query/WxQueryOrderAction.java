@@ -38,7 +38,7 @@ public class WxQueryOrderAction extends DispatchAction {
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
-			List<WxOrder> orders = WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setWeixin(oid));
+			List<WxOrder> orders = WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setWeixin(oid), " ORDER BY birth_date DESC");
 			
 			for (WxOrder wxOrder : orders) {
 				if(wxOrder.getStatus() == WxOrder.Status.COMMITTED || wxOrder.getStatus() == WxOrder.Status.ORDER_ATTACHED){
@@ -84,7 +84,7 @@ public class WxQueryOrderAction extends DispatchAction {
 				}
 				
 			}			
-			List<WxOrder> orders = WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setOrder(orderId));
+			List<WxOrder> orders = WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setOrder(orderId), null);
 			
 			for (int i = 0; i < orders.size(); i++) {
 				orders.set(i, WxOrderDao.getById(dbCon, staff, orders.get(i).getId()));
