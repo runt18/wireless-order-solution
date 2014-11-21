@@ -23,6 +23,7 @@ var params = {
 	kitchenId : -1,
 	DNSC : 'divNavKitchen-item-select'
 };
+var shopCartInit = false;
 </script>
 <script type="text/javascript" src="./js/food/load.js"></script>
 <script type="text/javascript" src="./js/food/main.js"></script>
@@ -107,7 +108,7 @@ var params = {
 </div>
 
 <div id="divShoppingCart" class="box-vertical">
-	<div id="divFoodListForSC" class="div-full">
+	<div id="divFoodListForSC">
 		<!-- 
 		<div class="div-fl-f-sc-box box-horizontal">
 			<div data-type="msg" class="div-full">
@@ -146,7 +147,7 @@ var params = {
 	</div>
 </div>
 
-<div id="divMainView" class="box-vertical">
+<div id="divMainView" class="box-vertical" >
 	<section class="panel" id="panelNav" >
 		<ul class="nav-aside" id="ulKitchenList">
 			<li class="li-k-title"><a href="#">全部厨房</a></li>

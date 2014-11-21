@@ -20,8 +20,8 @@ var Templet = {
 			+ '<div>价格: <span>￥{unitPrice}</span></div>'
 		+ '</div>'
 		+ '<div data-type="cut" onclick="operateFood({otype:\'cut\', id:{id}, event:this})">-</div>'
-		+ '<div data-type="plus" onclick="operateFood({otype:\'plus\', id:{id}, event:this})">+</div>'
 		+ '<div data-type="count">{count}</div>'
+		+ '<div data-type="plus" onclick="operateFood({otype:\'plus\', id:{id}, event:this})">+</div>'
 		+ '</div>',
 	deptBox : '<div data-value="{id}" onclick="filtersKitchen(this)">{name}</div>',
 	kitchenBox2 : '<div data-value="{id}" onclick="filtersFood(this)">{name}</div>',
@@ -170,4 +170,16 @@ $(function(){
 	
 	//获取厨房后再获取菜品
 	initDeptData();
+	
+    $(document).bind('click',function(e){
+    	var e = e || window.event; //浏览器兼容性
+        var elem = e.target || e.srcElement;
+        while (elem) { //循环判断至跟节点，防止点击的是div子元素
+            if ((elem.id && elem.id=='divShoppingCart') || elem.className=='dialog') {
+                return;
+            }
+            elem = elem.parentNode;
+        }
+		operateShoppingCart({event:this, otype:'hide'})	
+    });	
 });

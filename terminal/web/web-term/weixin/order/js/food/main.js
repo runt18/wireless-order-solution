@@ -178,6 +178,14 @@ function operateFood(c){
 								}
 								params.orderData.splice(i, 1);
 								displayOrderFoodMsg();
+								
+								//刷新购物车界面, 没有菜品时隐藏
+								if(params.orderData.length > 0){
+									$('#divShoppingCart').height(75 + params.orderData.length * 51);
+								}else{
+									operateShoppingCart({event:this, otype:'hide'});
+								}
+									
 							}
 						}
 					});
@@ -254,10 +262,11 @@ function operateShoppingCart(c){
 			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.' });
 			return;
 		}
-		if(scBox.hasClass('left-nav-hide')){
-			scBox.removeClass('left-nav-hide');			
+		if(scBox.hasClass('bottom-nav-hide')){
+			scBox.removeClass('bottom-nav-hide');			
 		}
-		scBox.addClass('left-nav-show');
+		scBox.addClass('bottom-nav-show');
+
 		for(var i = 0; i < params.orderData.length; i++){
 			temp = params.orderData[i];
 			sumCount += temp.count;
@@ -272,13 +281,20 @@ function operateShoppingCart(c){
 		scMainView.html(html.join(''));
 		sumCountView.html(parseInt(sumCount));
 		sumPriceView.html(sumPrice.toFixed(2));
+		
+//		alert(75 + scMainView.height());
+		scBox.height(75 + params.orderData.length * 51);	
+		
+		shopCartInit = true;
 	}else if(c.otype == 'hide'){
-		displayOrderFoodMsg();
-		if(scBox.hasClass('left-nav-show')){
-			scBox.removeClass('left-nav-show');
+		if(shopCartInit){
+			displayOrderFoodMsg();
+			if(scBox.hasClass('bottom-nav-show')){
+				scBox.removeClass('bottom-nav-show');
+			}
+			scBox.addClass('bottom-nav-hide');
+			scMainView.html(html.join(''));		
 		}
-		scBox.addClass('left-nav-hide');
-		scMainView.html(html.join(''));
 	}else if(c.otype == 'confirm'){
 //		Util.dialog.show({ msg : '请叫服务员照单下单.' });return;
 		

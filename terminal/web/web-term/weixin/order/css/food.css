@@ -20,6 +20,28 @@ body{
 	100%{left: -100%;} 
 }
 
+
+
+
+.bottom-nav-show{
+	-webkit-animation: bottom-nav-show .5s .01s ease both;
+}
+@-webkit-keyframes bottom-nav-show{
+	/* 0%{-webkit-transform:translateX(-100%);} 
+	100%{-webkit-transform:translateX(0);} */
+	0%{bottom: -100%;} 
+	100%{bottom: 0;}
+}
+.bottom-nav-hide{
+	-webkit-animation: bottom-nav-hide .5s 0.1s ease both;
+}
+@-webkit-keyframes bottom-nav-hide{
+	/* 0%{-webkit-transform:translateX(0);} 
+	100%{-webkit-transform:translateX(-100%);} */
+	0%{bottom: 0;}
+	100%{bottom: -100%;} 
+}
+
 /* divBottomNav--------------------------------------------- */
 #divBottomNav{
 	width: 100%;
@@ -176,20 +198,23 @@ body{
 	overflow: hidden;
 	position: absolute;
 	width: 100%;
-	height: 100%;
+/* 	height: 100%; */
 	font-size: 13px;
-	top: 0;
+/* 	top: 0; */
 	left: 0;
 	//-webkit-transform: translateX(-100%);
-	left: -100%;
+	bottom: -100%;
 	z-index: 999 !important;
 	background-color: #eee;
 }
 #divShoppingCart > div{
 	width: 100%;
 }
+
+
 #divFoodListForSC{
 	overflow-y: auto;
+		border-top: 2px solid black;
 }
 #divSumForSC{
 	border-top: 1px solid #aaa;
@@ -232,6 +257,7 @@ body{
 	font-family : "courier",Georgia,Serif;
 	border-left: 1px solid #aaa;
 }
+
 .div-fl-f-sc-box > div[data-type=count]{
 	width: 50px;
 	font-size: 26px;
@@ -240,6 +266,7 @@ body{
 	text-align: center;
 	background: #7ed2eb;
 	color: #fff;
+	border-left: 1px solid #aaa;
 }
 .div-fl-f-sc-box b {
 color:#000000;
