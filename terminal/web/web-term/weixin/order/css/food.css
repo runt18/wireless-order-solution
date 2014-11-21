@@ -203,7 +203,8 @@ body{
 /* 	top: 0; */
 	left: 0;
 	//-webkit-transform: translateX(-100%);
-	bottom: -100%;
+	left: -100%;
+	bottom : 0;
 	z-index: 999 !important;
 	background-color: #eee;
 }

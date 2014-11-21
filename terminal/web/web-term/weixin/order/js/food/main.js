@@ -262,10 +262,10 @@ function operateShoppingCart(c){
 			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.' });
 			return;
 		}
-		if(scBox.hasClass('bottom-nav-hide')){
-			scBox.removeClass('bottom-nav-hide');			
+		if(scBox.hasClass('left-nav-hide')){
+			scBox.removeClass('left-nav-hide');			
 		}
-		scBox.addClass('bottom-nav-show');
+		scBox.addClass('left-nav-show');
 
 		for(var i = 0; i < params.orderData.length; i++){
 			temp = params.orderData[i];
@@ -289,10 +289,10 @@ function operateShoppingCart(c){
 	}else if(c.otype == 'hide'){
 		if(shopCartInit){
 			displayOrderFoodMsg();
-			if(scBox.hasClass('bottom-nav-show')){
-				scBox.removeClass('bottom-nav-show');
+			if(scBox.hasClass('left-nav-show')){
+				scBox.removeClass('left-nav-show');
 			}
-			scBox.addClass('bottom-nav-hide');
+			scBox.addClass('left-nav-hide');
 			scMainView.html(html.join(''));		
 		}
 	}else if(c.otype == 'confirm'){
@@ -329,7 +329,7 @@ function operateShoppingCart(c){
 								operateShoppingCart({otype:'hide'});
 								Util.getDom('divFoodListForSC').innerHTML = '';
 								
-								Util.dialog.show({ msg : data.msg + '<br>菜单标识码是: ' + data.other.order.code + '', btn : 'yes' });
+								Util.dialog.show({ msg : data.msg + '<br><font style="font-weight:bold;">订单号是: ' + data.other.order.code + '</font>', btn : 'yes' });
 							}else{
 								Util.dialog.show({ msg : data.msg });
 							}
