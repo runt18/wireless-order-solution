@@ -113,7 +113,7 @@ function loadWeixinOrderWin(){
 			id : 'checkOut_weixinOrder',
 			closable : false, //是否可关闭
 			resizable : false, //大小调整
-			width : 520,	
+			width : 480,	
 			items : []	
 		});
 	}
@@ -139,23 +139,23 @@ function loadWeixinOrderDetail(){
 		 		style : 'font-size:15px;margin-bottom:5px;'
 		 	},				
 			items : [{
-				columnWidth : .1,
+				columnWidth : .11,
 				xtype : 'label',
 				text : '时间:'
 			},{
-				columnWidth : .38,
+				columnWidth : .40,
 				xtype : 'label',
 				style : 'font-size:15px;font-weight:bold;color:green;',
 				text : weixinOrders[i].date
 			},{
-				columnWidth : 0.22,
+				columnWidth : 0.11,
 				xtype : 'label',
-				text : '会员(微信卡号):'
+				text : '会员:'
 			},{
-				columnWidth : 0.3,
+				columnWidth : 0.38,
 				xtype : 'label',
 				style : 'font-size:15px;font-weight:bold;color:green;',
-				text : weixinOrders[i].member.name.substring(0,3) + (weixinOrders[i].member.weixinCard?'--' + weixinOrders[i].member.weixinCard : '')
+				text : weixinOrders[i].member.name + (weixinOrders[i].member.weixinCard?' (' + weixinOrders[i].member.weixinCard +')' : '')
 			},{
 				columnWidth : 1
 			},
