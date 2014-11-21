@@ -6,7 +6,7 @@ var Templet = {
 		+ '<div data-r="c" class="box-food-list-c">'
 			+ '<div data-r="t"><b>{name}</b></div>'
 			+ '<div data-r="m"><span>￥{unitPrice}</span></div>'
-			+ '<div data-r="b"><font>{point}</font>人点过</div>'
+			+ '<div data-r="b"><font>{foodCnt}</font>人点过</div>'
 		+ '</div>'
 		+ '<div data-r="r" class="box-horizontal box-food-list-r">'
 			//+ '<div data-r="l" data-type="count" data-value="{id}" style="display:{display}">{count}</div>'
@@ -102,7 +102,7 @@ function initFoodData(c){
 						img : temp.img.thumbnail,
 						name : (temp.name.length > 7? temp.name.substring(0,6)+"…" : temp.name),
 						unitPrice : temp.unitPrice.toFixed(2),
-						point : parseInt(temp.unitPrice),
+						foodCnt : parseInt(temp.foodCnt),
 						count : count,
 						selected : count > 0 ? 'class="select-food"' : '',
 						display : count > 0 ? 'block' : 'none'

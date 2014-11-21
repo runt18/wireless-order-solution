@@ -1,8 +1,8 @@
 var Templet = {
 		
-	mainBox: '<div class="box-order">' +
-				'<div><div style="height: 20px;">' +
-						'<div style="float: left;font-weight: bold">订单号:{code}</div>' +
+	mainBox: '<div class="box-order {orderBorder}">' +
+				'<div class="{orderClass}"><div style="height: 20px;">' +
+						'<div style="float: left;">订单号:{code}</div>' +
 						'<div style="float: right;color:#26a9d0;">{status}</div>' +
 				'</div></div>' +
 				'<div>点单日期: <span style="font-weight: bold">{orderDate}</span></div>' +
@@ -44,7 +44,9 @@ $(function(){
 					totalPrice : totalPrice,
 					count : count,
 					foods : foods,
-					display : temp.statusVal == 1 ? 'hidden="hidden"' : ''
+					display : temp.statusVal == 1 ? 'hidden="hidden"' : '',
+					orderClass : temp.statusVal == 2?'box-order-commit' : '',
+					orderBorder : temp.statusVal == 2?'orderBorder_commit' : 'orderBorder_invalid'
 				}));
 			}
 			$('#divWeixinOrderList').before(html.join(''));

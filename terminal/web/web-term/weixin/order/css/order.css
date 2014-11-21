@@ -2,11 +2,20 @@
 	margin: 10px auto 0 auto;
 	width: 90%;
 	background: #fff;
-	border: 1px solid #ddd;
 	font-size: 15px;
 	line-height: 20px;
 	border-radius : 8px;
+	
 }
+
+.orderBorder_commit{
+	border: 1px solid green;
+}
+
+.orderBorder_invalid{
+	border: 1px solid #ddd;
+}
+
 .box-order > div{
 	width: calc(100% - 20px); 
 	min-height: 16px; 
@@ -14,10 +23,11 @@
 	border-bottom: 1px solid #eee;
 }
 
-.box-order > div:first-child{
+.box-order-commit{
 	font-size: 20px;
-	padding-top: 10px; 
-	padding-bottom: 10px;	
+	font-weight : bold;
+	padding-top: 10px !important; 
+	padding-bottom: 10px !important;	
 }
 
 .box-order > div:last-child{
