@@ -45,19 +45,34 @@ IF NOT EXIST www GOTO www_not_exist
 
 Rem copy the web-term files
 :web_term_files
-IF EXIST terminal\web\web-term GOTO web_term_exist
-IF NOT EXIST terminal\web\web-term GOTO web_term_not_exist
+IF EXIST terminal\web\target\web-term GOTO web_term_exist
+IF NOT EXIST terminal\web\target\web-term GOTO web_term_not_exist
 :web_term_exist
 	@echo copying the web-term files...
-	@xcopy /s/y terminal\web\web-term dist\www\web-term\ > nul
+	@xcopy /s/y terminal\web\target\web-term dist\www\web-term\ > nul
 
-	GOTO android_apk
+	GOTO wx_term_files
 
 :web_term_not_exist
 	@echo the web term files missing
 	@pause
 	GOTO end
 
+Rem copy the wx-term files
+:wx_term_files
+IF EXIST terminal\weixin\target\wx-term GOTO wx_term_exist
+IF NOT EXIST terminal\weixin\target\wx-term GOTO wx_term_not_exist
+:wx_term_exist
+	@echo copying the wx-term files...
+	@xcopy /s/y terminal\weixin\target\wx-term dist\www\wx-term\ > nul
+
+	GOTO android_apk
+
+:wx_term_not_exist
+	@echo the wx term files missing
+	@pause
+	GOTO end
+	
 Rem copy the AndroidManifest.xml and apk file
 :android_apk
 IF EXIST terminal\android\phone\bin\WirelessOrderTerminal_Android.apk GOTO apk_exist
@@ -68,7 +83,7 @@ IF NOT EXIST terminal\android\phone\bin\WirelessOrderTerminal_Android.apk GOTO a
 	@copy terminal\android\phone\version.php dist\www\ota\android\phone > nul
 	@copy terminal\android\phone\AndroidManifest.xml dist\www\ota\android\phone > nul
 	@copy terminal\android\phone\bin\WirelessOrderTerminal_Android.apk dist\www\ota\android\phone > nul
-	GOTO android_pad_apk
+	GOTO android_eMenu_apk
 :apk_not_exist
 	@echo the android phone apk file missing
 	@pause
