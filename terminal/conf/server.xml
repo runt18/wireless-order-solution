@@ -137,6 +137,10 @@
                prefix="localhost_access_log." suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" resolveHosts="false"/>
 
+		<Context docBase="web-term" path="/web-term" reloadable="true" />
+
+		<Context docBase="wx-term" path="/wx-term" reloadable="true" />	   
+
       </Host>
     </Engine>
   </Service>
