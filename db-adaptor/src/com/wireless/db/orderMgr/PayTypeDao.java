@@ -362,10 +362,12 @@ public class PayTypeDao {
 	public static int delete(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		int amount = 0;
 		for(PayType type : getByCond(dbCon, staff, extraCond)){
-			String sql;
-			sql = " DELETE FROM " + Params.dbName + ".pay_type WHERE pay_type_id = " + type.getId();
-			dbCon.stmt.executeUpdate(sql);
-			amount++;
+			if(type.getType() == PayType.Type.EXTRA){
+				String sql;
+				sql = " DELETE FROM " + Params.dbName + ".pay_type WHERE pay_type_id = " + type.getId();
+				dbCon.stmt.executeUpdate(sql);
+				amount++;
+			}
 		}
 		return amount;
 	}
