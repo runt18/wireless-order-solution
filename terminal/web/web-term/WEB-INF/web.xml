@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
-<web-app>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+          http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	version="3.0">
 	<display-name>WirelessOrderWeb</display-name>
 	<filter>
 		<filter-name>whiteList</filter-name>
@@ -8,51 +10,51 @@
 		<init-param>
 			<param-name>skipVerify</param-name>
 			<param-value>
-				/WXQueryInfo.do,
-				/WXOperateInfo.do,
-				/WXOperateMaterial.do,
-				/WXOperateOrder.do,
-				
-				/WXEntry.do,
-				/WXQueryFood.do,
-				/WXQueryDept.do,
-				/WXOperateMember.do,
-				/WXQueryMemberOperation.do,
-				/WXQueryOrder.do,
-				/QueryMemberType.do,
-				/QueryMemberLevel.do,
-				/QueryFood_q.do,
-				/FinanceWeixin.do,
-				/WXQueryDaZhongInfo.do,
+					/WXQueryInfo.do,
+					/WXOperateInfo.do,
+					/WXOperateMaterial.do,
+					/WXOperateOrder.do,
 
-				/QueryRestaurants.do,
-				/VerifyLogin.do,
-				/LoginOut.do,
+					/WXEntry.do,
+					/WXQueryFood.do,
+					/WXQueryDept.do,
+					/WXOperateMember.do,
+					/WXQueryMemberOperation.do,
+					/WXQueryOrder.do,
+					/QueryMemberType.do,
+					/QueryMemberLevel.do,
+					/QueryFood_q.do,
+					/FinanceWeixin.do,
+					/WXQueryDaZhongInfo.do,
 
-				/OperateStaff.do,
-				/QueryStaff.do,
-				/QueryOTA.do,
-				/OperatePromotion.do,
-				/QueryCoupon.do,
-				/OperateCoupon.do,
-				
-				/Login.html,
-				/LoginAdmin.html,
-				/PersonLoginTimeout.html,
-				/FrontBusinessProtal.html,
-				/BillModify.html,
-				/Bills.html,
-				/CheckOut.html,
-				/OrderMain.html,
-				/TableSelect.html,
-				/MgrCenter.html,
-				/DeviceMgr.html,
-				/RestaurantMgr.html,
-				/MemberConsumeDetails.html,
-				/MemberRechargeDetails.html,
-				/DigieBasic.html,
+					/QueryRestaurants.do,
+					/VerifyLogin.do,
+					/LoginOut.do,
 
-			</param-value>
+					/OperateStaff.do,
+					/QueryStaff.do,
+					/QueryOTA.do,
+					/OperatePromotion.do,
+					/QueryCoupon.do,
+					/OperateCoupon.do,
+
+					/Login.html,
+					/LoginAdmin.html,
+					/PersonLoginTimeout.html,
+					/FrontBusinessProtal.html,
+					/BillModify.html,
+					/Bills.html,
+					/CheckOut.html,
+					/OrderMain.html,
+					/TableSelect.html,
+					/MgrCenter.html,
+					/DeviceMgr.html,
+					/RestaurantMgr.html,
+					/MemberConsumeDetails.html,
+					/MemberRechargeDetails.html,
+					/DigieBasic.html,
+
+				</param-value>
 		</init-param>
 
 	</filter>
@@ -88,7 +90,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>127.0.0.1</param-value>
+			<param-value>192.168.180.100</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -100,7 +102,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
-			<param-value>root</param-value>
+			<param-value>HelloZ315</param-value>
 		</init-param>
 		<!-- Below is the configuration parameters to socket -->
 		<init-param>
@@ -142,7 +144,7 @@
 		<init-param>
 			<param-name>oss_bucket</param-name>
 			<param-value>digie-image-test</param-value>
-		</init-param>		
+		</init-param>
 		<init-param>
 			<param-name>oss_bucket_image</param-name>
 			<param-value>food-image-test</param-value>
