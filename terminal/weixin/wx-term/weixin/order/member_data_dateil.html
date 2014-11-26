@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
+<title>会员个人资料</title>
+<link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/member.css">
+<link type="text/css" rel="stylesheet" href="./css/mbar.css">
+<link type="text/css" rel="stylesheet" href="./css/general_foundicons.css">
+<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="./js/Util.js"></script>
+
+<script type="text/javascript" src="./js/member/member_data_dateil.js"></script>
+
+</head>
+<body>
+
+<section>
+	<article class="main-box">
+	<ul class="m-b-list">
+		<li class="box-horizontal">
+			会员名: <span id="spanMemberName">--</span>
+		</li>
+		<li>
+			手机号: <span id="spanMemberMobile">--</span>
+		</li>
+		<li>
+			性&nbsp;&nbsp;别: 
+			<span onclick="this.childNodes[0].checked=true;"><input type="radio" name="radioMemberSex" value=0>&nbsp;男</span>&nbsp;&nbsp;
+			<span onclick="this.childNodes[0].checked=true;"><input type="radio" name="radioMemberSex" value=1>&nbsp;女</span>
+		</li>
+		<li>
+			生&nbsp;&nbsp;日:
+			<select id="selBrithYear" style="width:65px;"></select>&nbsp;年&nbsp;
+			<select id="selBrithMonth" style="width:45px;"></select>&nbsp;月&nbsp;
+			<select id="selBrithDay" style="width:45px;"></select>&nbsp;日&nbsp;
+		</li>
+	</ul>
+	</article>
+	<article class="main-box">
+		<div style="padding:5px;">注意: 重新绑定手机号需要到前台办理.</div>
+	</article>
+</section>
+
+<footer> 
+	<div class="footer">&copy; 技术支持：志易科技</div>
+	<div style="height: 45px;">&nbsp;</div>
+</footer>
+
+</body>
+</html>

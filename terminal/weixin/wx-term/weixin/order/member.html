@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
+<title>会员中心</title>
+
+<link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/member.css">
+<link type="text/css" rel="stylesheet" href="./css/mbar.css">
+<link type="text/css" rel="stylesheet" href="./css/general_foundicons.css">
+<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
+
+<script type='text/javascript' src='../../jquery/highcharts.js'></script>
+<script type="text/javascript" src="./js/Util.js"></script>
+<script type="text/javascript">
+var member = {}, verifyCode = {}, verifyMobile = '', currentMemberLevelData={}, memberLevelData=[], haveWelcomePageId;
+var params = {
+	MobileCode : {
+		code : /^1[3,5,8][0-9]{9}$/,
+		text : '请输入 11 位纯数字的有效手机号码.'
+	},
+	UserNameCode : {
+		code : /^([^x00-xff]{2,16})|([a-zA-z][a-zA-z0-9]{3,17})$/,
+		text : '请输入至少两个中文字或<br>字母开头4至18位的会员名称.'
+	},
+	VerifyCode : {
+		code : /^[0-9]{4}$/,
+		text : '请输入 4 位纯数字验证码.'
+	}
+};
+var colors = ['orange', 'red', 'green'];
+
+var totalMath = 0;
+</script>
+<script type="text/javascript" src="./js/member/load.js"></script>
+<script type="text/javascript" src="./js/member/main.js"></script>
+</head>
+<body>
+
+<div id="divMemberCard" class="main-box">
+<div data-type="r">
+	<!-- <div id="divRestaurantName" data-type="top">--</div> -->
+	<div id="divWXMemberCard" data-type="bottom">微信卡号:1000000</div>
+	<div id="divMemberTypeName" data-type="bottom">未激活</div>
+</div>
+</div>
+
+<div id="divMemberContent" class="main-box">
+
+<ul class="m-b-list">
+	<li class="box-horizontal">
+		<div style="width: 45%">会员名: <span id="spanMemberName">--</span></div>
+		<div id="divWeixinMemberPhone" style="text-align: right;width: 55%">手机号: <span id="spanMemberMobile">--</span></div>
+		<div id="divBindWeixinMember" style="text-align: right;width: 55%">绑定手机号&nbsp;&gt;</div>
+	</li>
+	<li>
+		<div id="divToBindWeixinMember" style="display: none;width: 100%;">
+			<ul class="m-b-list">
+				<li class="none-line" style="line-height: 50px;padding-top: 10px;">
+					手机号: <input id="txtVerifyMobile" type="number" maxlength="11"/>
+				</li>
+				<li class="none-line" style="line-height: 50px;">
+					<div style="width:100%;">
+						验证码: <input id="txtVerifyCode" type="number" maxlength="4" style="width:70px;"/>
+						<span id="btnVerifyCode" style="color: blue;font-size: 13px;" ></span>
+					</div>
+				<li class="none-line">
+					<div id="btnGetVerifyCode" style="height: 55px;width: 100%;text-align: center;" >
+						<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="getVerifyCode({event:this})">获取验证码</a>	
+					</div>	
+					<div id="btnBindMember" style="margin-top: 3px;height: 55px;width: 100%;text-align: center;display: none;" >
+						<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="bindMember({event:this})">确认绑定</a>	
+					</div>							
+				</li>
+				<li >
+					<span style="margin-left: 5px;font-size: 18px;">注: 可到前台激活或绑定原会员卡</span>
+					<div id="divMemberPrivilegeDetail" style="width: 100%;border: 1px dashed darkgray;margin-bottom: 2px;">
+						<span style="margin-left: 5px;font-size: 19px;">激活成为微信会员，可享受:</span>
+						<ul id="ulMemberPrivilegeDetail" ></ul>
+					</div>
+				</li>					
+			</ul>
+		</div>
+	</li>	
+</ul>
+</div>
+
+<div id="divMemberBalanceAndPiont" class="main-box">
+<ul class="m-b-list">
+	<li class="box-horizontal none-line" >
+		<div style="width:50%">余&nbsp;&nbsp;额: <span id="spanMemberTotalBalance" style="color:#26a9d0;">--.--</span>&nbsp;元</div>
+		<div style="width:50%;text-align: right;">积&nbsp;&nbsp;分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
+	</li>
+</ul>
+</div>
+
+<div id="divMemberPointContent" class="main-box">
+<ul class="m-b-list">
+	<li class="box-horizontal none-line" onclick="toggleConsumeDetails()">
+		<div >最近消费: <span id="spanNearByCost" style="color:#FF4500;">0</span>&nbsp;元</div>
+		<div class="event">消费记录&nbsp;&gt;</div>
+	</li>
+	<li>
+		<div id="divConsumeDetails" style="display:none; width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;	">
+			<table id="table_consumeDetails" class="d-list" >
+				<thead>
+				<tr class="d-list-title">
+					<td style="width:50%;text-align: center;">消费时间</td>
+					<td style="width:25%;">金额</td>
+					<td style="width:25%;">积分</td>
+				</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</li>
+</ul>
+</div>
+
+<div id="divMemberBalanceContent" class="main-box">
+<ul class="m-b-list">
+	<li class="box-horizontal none-line" onclick="toggleRechargeDetails()">
+		<div >最近充值: <span id="spanNearByCharge" style="color:#FF4500;">0</span>&nbsp;元</div>
+		<div class="event">充值记录&nbsp;&gt;</div>
+	</li>
+	<li>
+		<div id="divRechargeDetails" style="display:none;width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;">
+			<table class="d-list">
+				<thead>
+				<tr class="d-list-title">
+					<td style="width:50%;text-align: center;">充值时间</td>
+					<td style="width:25%;">实收</td>
+					<td style="width:25%;">实充</td>
+				</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</li>
+</ul>
+</div>
+
+<div id="divMemberTypeContent" class="main-box">
+<ul class="m-b-list">
+	<li class="box-horizontal">
+		<div >等&nbsp;&nbsp;级: <span id="spanMemberTypeName" >--.--</span>&nbsp;<font id="fontMemberDiscount" style="color : red;font-size: 13px;font-weight: bold;">8.8折扣</font></div>
+		<!-- <div class="event">完善资料&nbsp;&gt;</div> -->
+		
+	</li>
+	<li class="box-horizontal none-line" onclick="toggleMemberLevel()">
+		<div style="font-size: 13px;font-weight: bold;">累计积分:<font id="fontMemberPoint" style="color : red;">0</font>分<span id="span_currentMemberDefeat">,打败了<font id="fontDefeatMemberCount" style="color : red;">0</font><font style="color : red;">%</font>的会员</span></div>
+		<div class="event">更多等级&nbsp;&gt;</div>
+	</li>
+	<li style="overflow: hidden;"><div></div>
+		<div id="divMemberLevelChart" style="height: 100px;display:none;"></div>
+	</li>
+</ul>
+</div>
+
+<div id="divCurrentMemberTypeDesc" class="main-box">
+	<div style="margin: 10px;">
+		<span>会员特权:</span>
+		<span id="spanCurrentMemberTypeDesc" style="font-size: 15px;color:maroon"></span>
+	</div> 
+</div>
+
+<div id="divMemberCouponContent" class="main-box">
+<ul class="m-b-list">
+	<li id="li_myCoupon" class="box-horizontal none-line" onclick="toggleCouponContent()">
+		<div>我的优惠券</div>
+		<div id="divMyCoupon" class="event">&nbsp;<font>&gt;</font></div>
+	</li>
+	<li style="overflow: hidden;padding-bottom: 3px;">
+		<div id="divMemberCouponContentView" style="display:none; width:100%;" >
+			<div id="divMemberCouponContentViews"></div>	
+		</div>
+	</li>
+</ul>
+</div>
+
+<div id="divMemberCouponConsume" class="main-box">
+<ul class="m-b-list">
+	<li class="box-horizontal none-line" onclick="toggleCouponConsumeDetails()">
+		<div>优惠券消费记录</div>
+		<div class="event">&nbsp;&gt;</div>
+	</li>
+	<li>
+		<div id="divMemberCouponConsumeDetails" style="display:none;width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;">
+			<table class="d-list">
+				<thead>
+				<tr class="d-list-title">
+					<td style="width:50%;text-align: center;">日期</td>
+					<td style="width:25%;">消费金额</td>
+					<td style="width:25%;">优惠金额</td>
+				</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>	
+	</li>
+</ul>
+</div>
+
+<div>
+	
+</div>
+
+
+<div id="divInsertBefore"></div>
+<div id="divOccupyHtml" style="height :400px;"></div>
+<div class="footer">&copy; 技术支持：志易科技</div>
+<div style="height: 45px;">&nbsp;</div>
+ 
+</body>
+</html>

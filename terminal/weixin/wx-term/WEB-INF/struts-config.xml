@@ -1,0 +1,621 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN" "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<struts-config>
+	<form-beans />
+	<global-exceptions />
+	<global-forwards />
+
+	<action-mappings>
+		<action path="/QueryOTA" type="com.wireless.Actions.ota.QueryOTAction"
+			scope="request">
+		</action>
+		<action path="/QueryRegion" type="com.wireless.Actions.regionMgr.QueryRegionAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateRegion"
+			type="com.wireless.Actions.regionMgr.OperateRegionAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/QueryTable"
+			type="com.wireless.Actions.regionMgr.tableMgr.QueryTableAction"
+			scope="request">
+		</action>
+		<action path="/OperateTable"
+			type="com.wireless.Actions.regionMgr.tableMgr.OperateTableAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryOrder"
+			type="com.wireless.Actions.dishesOrder.QueryOrderAction" scope="request">
+		</action>
+		<action path="/QueryOrderByCalc"
+			type="com.wireless.Actions.dishesOrder.QueryOrderByCalcAction" scope="request">
+		</action>
+
+		<action path="/QueryMenu" type="com.wireless.Actions.dishesOrder.QueryMenuAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/InsertOrder"
+			type="com.wireless.Actions.dishesOrder.InsertOrderAction" scope="request">
+		</action>
+		<action path="/PrintOrder" type="com.wireless.Actions.payment.PrintOrderAction"
+			scope="request">
+		</action>
+		<action path="/PayOrder" type="com.wireless.Actions.payment.PayOrderAction"
+			scope="request">
+		</action>
+		<action path="/QueryStaff" type="com.wireless.Actions.login.QueryStaffAction"
+			scope="request">
+		</action>
+		<action path="/OperateStaff" type="com.wireless.Actions.login.OperateStaffAction"
+			scope="request">
+
+		</action>
+		<action path="/TransTable"
+			type="com.wireless.Actions.tableSelect.TransTableAction" scope="request">
+		</action>
+		<action path="/QueryRestaurant" type="com.wireless.Actions.login.QueryRestaurantAction"
+			scope="request">
+		</action>
+		<action path="/QueryOrderStatistics"
+			type="com.wireless.Actions.orderMgr.QueryOrderStatisticsAction"
+			scope="request">
+		</action>
+		<action path="/RepaidOrder"
+			type="com.wireless.Actions.dishesOrder.RepaidOrderAction" scope="request">
+		</action>
+		<action path="/QueryDetail" type="com.wireless.Actions.orderMgr.QueryDetailAction"
+			scope="request">
+		</action>
+		<action path="/DoShift" type="com.wireless.Actions.shift.DoShiftAction"
+			scope="request">
+		</action>
+		<action path="/DoPayment" type="com.wireless.Actions.shift.DoPaymentAction"
+			scope="request">
+		</action>
+		<action path="/QueryMenuMgr"
+			type="com.wireless.Actions.menuMgr.basic.QueryMenuMgrAction" scope="request">
+		</action>
+		<action path="/UpdateMenu"
+			type="com.wireless.Actions.menuMgr.basic.UpdateMenuAction" scope="request">
+		</action>
+		<action path="/DeleteMenu"
+			type="com.wireless.Actions.menuMgr.basic.DeleteMenuAction" scope="request">
+		</action>
+		<action path="/InsertMenu"
+			type="com.wireless.Actions.menuMgr.basic.InsertMenuAction" scope="request">
+		</action>
+		<action path="/QuerySupplier"
+			type="com.wireless.Actions.supplierMgr.QuerySupplierAction" scope="request">
+		</action>
+		<action path="/DeleteSupplier"
+			type="com.wireless.Actions.supplierMgr.DeleteSupplierAction" scope="request">
+		</action>
+		<action path="/InsertSupplier"
+			type="com.wireless.Actions.supplierMgr.InsertSupplierAction" scope="request">
+		</action>
+		<action path="/UpdateSupplier"
+			type="com.wireless.Actions.supplierMgr.UpdateSupplierAction" scope="request">
+		</action>
+		<action path="/QueryKitchen"
+			type="com.wireless.Actions.deptMgr.kitchenMgr.QueryKitchenAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/UpdateKitchen"
+			type="com.wireless.Actions.deptMgr.kitchenMgr.UpdateKitchenAction"
+			scope="request">
+		</action>
+		<action path="/OperateKitchen"
+			type="com.wireless.Actions.deptMgr.kitchenMgr.OperateKitchenAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryDept" type="com.wireless.Actions.deptMgr.QueryDeptAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateDept" type="com.wireless.Actions.deptMgr.OperateDeptAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/InsertFoodMaterial"
+			type="com.wireless.Actions.menuMgr.material.InsertFoodMaterialAction"
+			scope="request">
+		</action>
+		<action path="/UpdateFoodMaterial"
+			type="com.wireless.Actions.menuMgr.material.UpdateFoodMaterialAction"
+			scope="request">
+		</action>
+		<action path="/DeleteFoodMaterial"
+			type="com.wireless.Actions.menuMgr.material.DeleteFoodMaterialAction"
+			scope="request">
+		</action>
+		<action path="/QueryTaste" type="com.wireless.Actions.tasteMgr.QueryTasteAction"
+			scope="request">
+		</action>
+		<action path="/OperateTaste" type="com.wireless.Actions.tasteMgr.OperateTasteAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/InsertStaff" type="com.wireless.Actions.staffMgr.InsertStaffAction"
+			scope="request">
+		</action>
+		<action path="/DeleteStaff" type="com.wireless.Actions.staffMgr.DeleteStaffAction"
+			scope="request">
+		</action>
+		<action path="/UpdateStaff" type="com.wireless.Actions.staffMgr.UpdateStaffAction"
+			scope="request">
+		</action>
+		<action path="/DailySettleCheck"
+			type="com.wireless.Actions.dailySettle.DailySettleCheckAction" scope="request">
+		</action>
+		<action path="/DailySettleExec"
+			type="com.wireless.Actions.dailySettle.DailySettleExecAction" scope="request">
+		</action>
+		<action path="/QueryHistory"
+			type="com.wireless.Actions.billHistory.QueryHistoryAction" scope="request">
+		</action>
+		<action path="/dailySettleStat"
+			type="com.wireless.Actions.billHistory.DailySettleStatisticsAction"
+			scope="request">
+		</action>
+		<action path="/dailySettleStatDetail"
+			type="com.wireless.Actions.billHistory.DailySettleStatDetailAction"
+			scope="request">
+		</action>
+		<action path="/BusinessReceiptsStatistics"
+			type="com.wireless.Actions.billStatistics.BusinessReceiptsStatisticsAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/BusinessStatistics"
+			type="com.wireless.Actions.billStatistics.BusinessStatisticsAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/SalesSubStatistics"
+			type="com.wireless.Actions.billHistory.SalesSubStatisticsAction"
+			scope="request">
+		</action>
+		<action path="/QueryDeptTree" type="com.wireless.Actions.deptMgr.QueryDeptTreeAction"
+			scope="request">
+		</action>
+		<action path="/QueryCancelledFood"
+			type="com.wireless.Actions.billHistory.QueryCancelledFoodAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryFoodTaste"
+			type="com.wireless.Actions.menuMgr.taste.QueryFoodTasteAction" scope="request">
+		</action>
+		<action path="/QueryFoodCombination"
+			type="com.wireless.Actions.menuMgr.combo.QueryFoodCombinationAction"
+			scope="request">
+		</action>
+		<action path="/UpdateFoodCombination"
+			type="com.wireless.Actions.menuMgr.combo.UpdateFoodCombinationAction"
+			scope="request">
+		</action>
+		<action path="/UpdatePriceTail"
+			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request">
+		</action>
+		<action path="/QuerySystemSetting"
+			type="com.wireless.Actions.system.QuerySystemSettingAction" scope="request">
+		</action>
+		<action path="/UpdatePriceTail"
+			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request">
+		</action>
+		<action path="/QueryDiscountTree"
+			type="com.wireless.Actions.distMgr.discount.QueryDiscountTreeAction"
+			scope="request">
+		</action>
+		<action path="/OperateDiscount"
+			type="com.wireless.Actions.distMgr.discount.OperateDiscountAction"
+			scope="request" parameter="dataSource">
+		</action>		
+		
+		<action path="/QueryDiscountPlan"
+			type="com.wireless.Actions.distMgr.discountPlan.QueryDiscountPlanAction"
+			scope="request">
+		</action>
+		<action path="/UpdateDiscountPlan"
+			type="com.wireless.Actions.distMgr.discountPlan.UpdateDiscountPlanAction"
+			scope="request">
+		</action>
+		<action path="/UpdateDiscountPlanRate"
+			type="com.wireless.Actions.distMgr.discountPlan.UpdateDiscountPlanRateAction"
+			scope="request">
+		</action>
+		<action path="/QueryDailySettleByNow"
+			type="com.wireless.Actions.dailySettle.QueryDailySettleByNowAction"
+			scope="request">
+		</action>
+		<action path="/QueryMemberType"
+			type="com.wireless.Actions.client.memberType.QueryMemberTypeAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateMemberType"
+			type="com.wireless.Actions.client.memberType.OperateMemberTypeAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryMember"
+			type="com.wireless.Actions.client.member.QueryMemberAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/OperateMember"
+			type="com.wireless.Actions.client.member.OperateMemberAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/QueryCancelReason"
+			type="com.wireless.Actions.menuMgr.cencalReason.QueryCancelReasonAction"
+			scope="request">
+		</action>
+		<action path="/QueryCancelReasonTree"
+			type="com.wireless.Actions.menuMgr.cencalReason.QueryCancelReasonTreeAction"
+			scope="request">
+		</action>
+		<action path="/UpdateCancelReason"
+			type="com.wireless.Actions.menuMgr.cencalReason.UpdateCancelReasonAction"
+			scope="request">
+		</action>
+		<action path="/InsertCancelReason"
+			type="com.wireless.Actions.menuMgr.cencalReason.InsertCancelReasonAction"
+			scope="request">
+		</action>
+		<action path="/DeleteCancelReason"
+			type="com.wireless.Actions.menuMgr.cencalReason.DeleteCancelReasonAction"
+			scope="request">
+		</action>
+		<action path="/ExportHistoryStatisticsToExecl"
+			type="com.wireless.Actions.exportExecl.HistoryStatisticsAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/ExportTodayStatisticsToExecl"
+			type="com.wireless.Actions.exportExecl.TodayStatisticsAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/DutyRangeStat"
+			type="com.wireless.Actions.billStatistics.DutyRangeStatisticsAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/PaymentStat"
+			type="com.wireless.Actions.billStatistics.PaymentStatisticsAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryOrderFromMemberPay"
+			type="com.wireless.Actions.dishesOrder.singleOrder.QueryOrderFromMemberPayAction"
+			scope="request">
+		</action>
+		<action path="/QueryMemberOperation"
+			type="com.wireless.Actions.client.member.QueryMemberOperationAction"
+			scope="request">
+		</action>
+		<action path="/QueryMemberOperationSummary"
+			type="com.wireless.Actions.client.member.QueryMemberOperationSummaryAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateRestaurant"
+			type="com.wireless.Actions.restaurantMgr.OperateRestaurantAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/RestaurantQueryByID"
+			type="com.wireless.Actions.restaurantMgr.RestaurantQueryByIDAction"
+			scope="request">
+		</action>
+		<action path="/QueryMaterialDept"
+			type="com.wireless.Actions.inventoryMgr.material.QueryMaterialDeptAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryMaterialCate"
+			type="com.wireless.Actions.inventoryMgr.materialCate.QueryMaterialCateAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateMaterialCate"
+			type="com.wireless.Actions.inventoryMgr.materialCate.OperateMaterialCateAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryMaterial"
+			type="com.wireless.Actions.inventoryMgr.material.QueryMaterialAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateMaterial"
+			type="com.wireless.Actions.inventoryMgr.material.OperateMaterialAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateMaterialInit"
+			type="com.wireless.Actions.inventoryMgr.material.OperateMaterialInitlAction"
+			scope="request" parameter="dataSource">
+		</action>		
+		<action path="/QueryFoodMaterial"
+			type="com.wireless.Actions.inventoryMgr.material.QueryFoodMaterialAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateFoodMaterial"
+			type="com.wireless.Actions.inventoryMgr.foodMaterial.OperateFoodMaterialAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryStockAction"
+			type="com.wireless.Actions.inventoryMgr.stockAction.QueryStockActionAction"
+			scope="request">
+		</action>
+		<action path="/OperateStockAction"
+			type="com.wireless.Actions.inventoryMgr.stockAction.OperateStockActionAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryStockTake"
+			type="com.wireless.Actions.inventoryMgr.stockTake.QueryStockTakeAction"
+			scope="request">
+		</action>
+		<action path="/OperateStockTake"
+			type="com.wireless.Actions.inventoryMgr.stockTake.OperateStockTakeAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryReport"
+			type="com.wireless.Actions.inventoryMgr.report.QueryReportAction"
+			scope="request">
+		</action>
+		<action path="/QueryStockDetailReport"
+			type="com.wireless.Actions.inventoryMgr.report.QueryStockDetailReportAction"
+			scope="request">
+		</action>
+		<action path="/QueryStockActionDetail"
+			type="com.wireless.Actions.inventoryMgr.stockAction.QueryStockActionDetailAction"
+			scope="request">
+		</action>
+		<action path="/QueryMaterialDept"
+			type="com.wireless.Actions.inventoryMgr.material.QueryMaterialDeptAction"
+			scope="request">
+		</action>
+		<action path="/QueryDeltaReport"
+			type="com.wireless.Actions.inventoryMgr.report.QueryDeltaReportAction"
+			scope="request">
+		</action>
+		<action path="/QueryCostAnalyzeReport"
+			type="com.wireless.Actions.inventoryMgr.report.QueryCostAnalyzeReportAction"
+			scope="request">
+		</action>
+		<action path="/UpdateCurrentMonth"
+			type="com.wireless.Actions.inventoryMgr.monthlySettle.UpdateCurrentMonthAction"
+			scope="request">
+		</action>
+		<action path="/QueryCurrentMonth"
+			type="com.wireless.Actions.inventoryMgr.monthlySettle.QueryCurrentMonthAction"
+			scope="request">
+		</action>
+		<action path="/QueryPrinterTree"
+			type="com.wireless.Actions.printScheme.QueryPrinterTreeAction" scope="request">
+		</action>
+		<action path="/QueryPrintFunc"
+			type="com.wireless.Actions.printScheme.QueryPrintFuncAction" scope="request">
+		</action>
+		<action path="/OperatePrintFunc"
+			type="com.wireless.Actions.printScheme.OperatePrintFuncAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/OperatePrinter"
+			type="com.wireless.Actions.printScheme.OperatePrinterAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/VerifyStaff" type="com.wireless.Actions.login.VerifyStaffAction"
+			scope="request">
+		</action>
+		<action path="/QueryDynamicKey" type="com.wireless.Actions.login.QueryDynamicKeyAction"
+			scope="request">
+		</action>
+		<action path="/QueryRole" type="com.wireless.Actions.roleMgr.QueryRoleAction"
+			scope="request">
+		</action>
+		<action path="/QueryPrivilege"
+			type="com.wireless.Actions.roleMgr.QueryPrivilegeAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/OperateRole" type="com.wireless.Actions.roleMgr.OperateRoleAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryRestaurants"
+			type="com.wireless.Actions.restaurantMgr.QueryRestaurantAction"
+			scope="request">
+		</action>
+		<action path="/VerifyLogin" type="com.wireless.Actions.login.VerifyLoginAction"
+			scope="request">
+		</action>
+		<action path="/LoginOut" type="com.wireless.Actions.login.LoginOutAction"
+			scope="request">
+		</action>
+		<action path="/QueryDevice" type="com.wireless.Actions.deviceMgr.QueryDeviceAction"
+			scope="request">
+		</action>
+		<action path="/OperateDevice"
+			type="com.wireless.Actions.deviceMgr.OperateDeviceAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/QueryDiscount"
+			type="com.wireless.Actions.distMgr.discount.QueryDiscountAction"
+			scope="request" parameter="dataSource">
+		</action>
+
+		<action path="/WXEntry" type="com.wireless.Actions.weixin.EntryAction"
+			scope="request">
+		</action>
+		<action path="/QueryFood_q"
+			type="com.wireless.Actions.weixin.query.QueryFoodAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/WXOperateMember"
+			type="com.wireless.Actions.weixin.query.WXOperateMemberAction" scope="request"
+			parameter="dataSource">
+		</action>
+
+		<action path="/QueryBillboard" type="com.wireless.Actions.system.QueryBillboardAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateBillboard"
+			type="com.wireless.Actions.system.OperateBillboardAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/FinanceWeixin" type="com.wireless.Actions.weixin.finance.FinanceWeixinAction"
+			scope="request">
+		</action>
+		<action path="/FinanceQRCode" type="com.wireless.Actions.weixin.finance.FinanceQRCodeAction"
+			scope="request">
+		</action>
+		<action path="/QueryTasteCate"
+			type="com.wireless.Actions.menuMgr.taste.QueryFoodTasteCategoryAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateTasteCate"
+			type="com.wireless.Actions.menuMgr.taste.OperateFoodTasteCategoryAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateMemberLevel"
+			type="com.wireless.Actions.client.memberLevel.OperateMemberLevelAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryMemberLevel"
+			type="com.wireless.Actions.client.memberLevel.QueryMemberLevelAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryRepaidStatistics"
+			type="com.wireless.Actions.dishesOrder.QueryRepaidReportAction"
+			scope="request" parameter="dataSource">
+		</action>
+
+		<action path="/WXEntry" type="com.wireless.Actions.weixin.EntryAction"
+			scope="request">
+		</action>
+		<action path="/WXQueryFood"
+			type="com.wireless.Actions.weixin.query.WXQueryFoodAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/WXQueryDept"
+			type="com.wireless.Actions.weixin.query.WXQueryDeptAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/WXOperateMember"
+			type="com.wireless.Actions.weixin.operate.WXOperateMemberAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/WXOperateInfo"
+			type="com.wireless.Actions.weixin.operate.WXOperateInfoAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/WXQueryInfo"
+			type="com.wireless.Actions.weixin.query.WXQueryInfoAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/WXOperateOrder"
+			type="com.wireless.Actions.weixin.operate.WXOperateOrderAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/WXQueryMemberOperation"
+			type="com.wireless.Actions.weixin.query.WXQueryMemberOperationAction"
+			scope="request" parameter="dataSource">
+		</action>
+
+		<action path="/QueryCommissionStatistics"
+			type="com.wireless.Actions.dishesOrder.QueryCommissionStatisticsAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryCommissionTotal"
+			type="com.wireless.Actions.dishesOrder.QueryCommissionTotalAction"
+			scope="request">
+		</action>
+
+		<action path="/QueryCouponType"
+			type="com.wireless.Actions.couponMgr.QueryCouponTypeAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/OperateCouponType"
+			type="com.wireless.Actions.couponMgr.OperateCouponTypeAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/QueryCoupon" type="com.wireless.Actions.couponMgr.QueryCouponAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateCoupon"
+			type="com.wireless.Actions.couponMgr.OperateCouponAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/OperateSellOutFood"
+			type="com.wireless.Actions.menuMgr.basic.OperateSellOutFoodAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QuerySmsDetail" type="com.wireless.Actions.smsMgr.QuerySmsDetailAction"
+			scope="request">
+		</action>
+		<action path="/QuerySmsStat" type="com.wireless.Actions.smsMgr.QuerySmsStatAction"
+			scope="request">
+		</action>
+		<action path="/OperateSms" type="com.wireless.Actions.smsMgr.OperateSmsAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryModule" type="com.wireless.Actions.moduleMgr.QueryModuleAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/AutoLogin" type="com.wireless.Actions.login.AutoLoginAction"
+			scope="request">
+		</action>
+		<action path="/RepaidOrder"
+			type="com.wireless.Actions.dishesOrder.RepaidOrderAction" scope="request">
+		</action>
+		<action path="/QueryBusinessHour"
+			type="com.wireless.Actions.system.QueryBusinessHourAction" scope="request">
+		</action>
+		<action path="/OperateBusinessHour"
+			type="com.wireless.Actions.system.OperateBusinessHourAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/SaleStatisticChart"
+			type="com.wireless.Actions.billStatistics.SalesSubStatisticsChartAction"
+			scope="request">
+		</action>
+		<action path="/QueryGiftStatistic"
+			type="com.wireless.Actions.billStatistics.QueryGiftStatisticAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryDiscountStatistics"
+			type="com.wireless.Actions.distMgr.discount.QueryDiscountStatisticsAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryServicePlan"
+			type="com.wireless.Actions.servicePlan.QueryServicePlanAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/OperateServicePlan"
+			type="com.wireless.Actions.servicePlan.OperateServicePlanAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperatePromotion"
+			type="com.wireless.Actions.couponMgr.OperatePromotionAction"
+			scope="request" parameter="dataSource">
+		</action>		
+		<action path="/OperateImage"
+			type="com.wireless.Actions.imagesMgr.OperateImageAction"
+			scope="request" parameter="dataSource">
+		</action>		
+		<action path="/QueryStockInGeneral"
+			type="com.wireless.Actions.inventoryMgr.report.QueryStockInGeneralAction"
+			scope="request" >
+		</action>			
+		<action path="/OperatePricePlan"
+			type="com.wireless.Actions.menuMgr.basic.OperatePricePlanAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/WXQueryDaZhongInfo"
+			type="com.wireless.Actions.init.QueryDazhongDataAction"
+			scope="request" parameter="dataSource">
+		</action>			
+		<action path="/QueryPayType"
+			type="com.wireless.Actions.orderMgr.QueryPayTypeAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperatePayType"
+			type="com.wireless.Actions.orderMgr.OperatePayTypeAction"
+			scope="request" parameter="dataSource">
+		</action>		
+		<action path="/TransFood"
+			type="com.wireless.Actions.dishesOrder.TransFoodAction"
+			scope="request" >
+		</action>	
+		<action path="/WXQueryOrder"
+			type="com.wireless.Actions.weixin.query.WxQueryOrderAction"
+			scope="request" parameter="dataSource">
+		</action>								
+	</action-mappings>
+
+	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
+
+</struts-config>

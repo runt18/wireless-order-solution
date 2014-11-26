@@ -1,0 +1,80 @@
+*{margin:0; padding:0;}
+.div-full{
+	box-flex: 1; 
+	-webkit-box-flex: 1;
+}
+.box-vertical, .box-horizontal{
+	display: box;
+	display: -webkit-box;
+}
+.box-vertical{
+	box-orient: vertical;
+	-webkit-box-orient: vertical;
+}
+.box-horizontal{
+	box-orient: horizontal;
+	-webkit-box-orient: horizontal;
+}
+@-webkit-keyframes line-show-inDownBig{
+	0%{opacity:0;} 100%{opacity:1;}
+}
+.m-b-line-hide{
+	-webkit-animation: line-hide-inDownBig .3s ease both;
+}
+@-webkit-keyframes line-hide-inDownBig{
+	0%{opacity:1;} 100%{opacity:0;}
+}
+/******************************/
+.div-mask{display: none; z-index:1000; position: absolute; height: 100%; width: 100%; left:0; top:0;}
+.div-mask-dialog{background: rgba(0,0,0, .5);}
+.dialog{ position: fixed; min-height: 100px; width: 260px; left:50%; top:50%; margin: 0px 0 0 -130px; background: #fff; }
+.dialog-title{ text-align: center; font-size: 23px; color: #4aaaa5; font-weight: bold; line-height: 45px; padding: 0 0 0 10px; }
+.dialog-msg{ font-size: 18px; line-height: 23px; padding: 0 0 0 10px;  }
+.dialog-button{ line-height: 45px; padding: 0 0 0 10px; text-align: center;}
+.dialog-button > button{ border:0; background:#4aaaa5; color: #FFF; text-align: center; font-size: 18px; width: 100px; height: 30px; margin: 10px 0 0 0;}
+.div-mask-ld{background: rgba(0,0,0, 0);}
+.div-mask-ld > div[class=img]{position: fixed; height:50px; width:50px; left:50%; top:50%; margin: -25px; background: rgba(255,255,255,1); border: 1px solid #eee; border-radius: 2px;}
+/******************************/
+.main-box{
+	margin: 5px auto 5px auto;
+	width: 96%;
+	background-color: #fff;
+	border: 1px solid darkgray;
+	font-size: 16px;
+	border-radius: 5px;
+}
+
+.m-b-line-show{
+	display: block !important;
+	-webkit-animation: line-show-inDownBig .3s ease both;
+}
+
+.m-b-list{
+	padding: 0 10px 0 10px;
+	/* color: #999999; */
+}
+.m-b-list > li{
+	line-height: 50px;
+	border-bottom: 1px solid #eee;
+}
+.m-b-list > li[class*=title]{
+	text-align:center; font-size:16px; color: #000; font-weight: bold;
+}
+.m-b-list > li[class*=none-line]{
+	border-bottom: 0;
+}
+.m-b-list > li:last-child{
+	border-bottom: 0;
+}
+.m-b-list > li > div[class*=event]{
+	width: 30%;
+	text-align: right;
+	color: #595959;
+}
+.m-b-list > li > div:first-child{
+	width: 70%;
+}
+.m-b-list > li span{
+	color: #000;
+	font-weight: bold;
+}

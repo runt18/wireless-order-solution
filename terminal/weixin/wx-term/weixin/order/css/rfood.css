@@ -1,0 +1,22 @@
+.box-s-f-b{
+	margin: 10px auto 0 auto;
+	width: 90%;
+	background: #fff;
+	border: 1px solid #ddd;
+	font-size: 12px;
+}
+.box-s-f-b > div{
+	width: calc(100% - 20px); 
+	min-height: 16px; 
+	padding: 5px 10px 5px 10px;
+	border-bottom: 1px solid #eee;
+}
+
+.box-s-f-b > div:first-child{
+	height: 180px; 
+	padding-top: 10px; 
+	padding-bottom: 10px;
+}
+.box-s-f-b > div:last-child{
+	border-bottom: 0;
+}
