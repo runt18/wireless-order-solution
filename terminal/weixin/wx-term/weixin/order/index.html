@@ -24,9 +24,21 @@
 			success : function(data, statuc, xhr){
 				Util.getDom('imgRestaurantHeader').src = data.other.logo;
 				var rInfo = data.other.rInfo;
-				$('#spanRestaurantName').text(rInfo.name);
-				$('#spanRestaurantPhone1').text(rInfo.tele1);
-				$('#spanRestaurantAdress').text(rInfo.address);
+				
+				
+ 				if(rInfo.tele1 || rInfo.address){
+					$('#divRestaurantInfo').show();
+					if(rInfo.tele1){
+						$('#spanRestaurantPhone1').parent().show();
+						$('#spanRestaurantPhone1').text(rInfo.tele1);	
+					}
+					if(rInfo.address){
+						$('#spanRestaurantAdress').parent().show();
+						$('#spanRestaurantAdress').text(rInfo.address);					
+					}
+					$('#spanRestaurantName').text(rInfo.name);
+				}
+ 
 				
 			},
 			error : function(xhr, errorType, error){
@@ -92,7 +104,7 @@
 		</ul>
 	</div>
 	<!-- 栏目 END -->
-	<div class="bgstyle">
+	<div id="divRestaurantInfo" class="bgstyle">
 		<div class="clearfix merchant moreindex moreshow">
 <!-- 			<div class="merchantlogo fl">
 				<img src="./images/logo.jpg" alt="商家logo">
@@ -102,11 +114,11 @@
 				<strong id="spanRestaurantName">利雅园酒家</strong> 
 				<div class="em_mobile">
 					<font>电话:</font>
-					<span id="spanRestaurantPhone1" >138 8888 8888</span><span id="spanRestaurantPhone2" ></span>
+					<span id="spanRestaurantPhone1" ></span><span id="spanRestaurantPhone2" ></span>
 <!-- 					| <a href="tel:138 8888 8888"><i class="foundicon-phone fcolor1"></i></a> -->
 				</div>
 				<div class="em_mobile">
-					<font>地址：</font><span id="spanRestaurantAdress">广州天河区大观南路A101</span>
+					<font>地址：</font><span id="spanRestaurantAdress"></span>
 				</div>				
 			</div>
 		</div>

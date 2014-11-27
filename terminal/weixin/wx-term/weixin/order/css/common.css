@@ -113,6 +113,10 @@ button,input,select,textarea {
 	cursor: pointer;
 }
 
+#divRestaurantInfo{
+	display: none;
+}
+
 .width1000 {
 	width: 1000px;
 	margin: 0 auto;
@@ -657,6 +661,7 @@ i.takeback_1 {
 }
 
 .em_mobile {
+	display: none;
 	font-size: 15px;
 	color: #666;
 	bottom: -21px;
