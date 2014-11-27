@@ -427,17 +427,6 @@
 			scope="request" parameter="dataSource">
 		</action>
 
-		<action path="/WXEntry" type="com.wireless.Actions.weixin.EntryAction"
-			scope="request">
-		</action>
-		<action path="/QueryFood_q"
-			type="com.wireless.Actions.weixin.query.QueryFoodAction" scope="request"
-			parameter="dataSource">
-		</action>
-		<action path="/WXOperateMember"
-			type="com.wireless.Actions.weixin.query.WXOperateMemberAction" scope="request"
-			parameter="dataSource">
-		</action>
 
 		<action path="/QueryBillboard" type="com.wireless.Actions.system.QueryBillboardAction"
 			scope="request" parameter="dataSource">
@@ -445,12 +434,6 @@
 		<action path="/OperateBillboard"
 			type="com.wireless.Actions.system.OperateBillboardAction" scope="request"
 			parameter="dataSource">
-		</action>
-		<action path="/FinanceWeixin" type="com.wireless.Actions.weixin.finance.FinanceWeixinAction"
-			scope="request">
-		</action>
-		<action path="/FinanceQRCode" type="com.wireless.Actions.weixin.finance.FinanceQRCodeAction"
-			scope="request">
 		</action>
 		<action path="/QueryTasteCate"
 			type="com.wireless.Actions.menuMgr.taste.QueryFoodTasteCategoryAction"
@@ -473,37 +456,6 @@
 			scope="request" parameter="dataSource">
 		</action>
 
-		<action path="/WXEntry" type="com.wireless.Actions.weixin.EntryAction"
-			scope="request">
-		</action>
-		<action path="/WXQueryFood"
-			type="com.wireless.Actions.weixin.query.WXQueryFoodAction" scope="request"
-			parameter="dataSource">
-		</action>
-		<action path="/WXQueryDept"
-			type="com.wireless.Actions.weixin.query.WXQueryDeptAction" scope="request"
-			parameter="dataSource">
-		</action>
-		<action path="/WXOperateMember"
-			type="com.wireless.Actions.weixin.operate.WXOperateMemberAction"
-			scope="request" parameter="dataSource">
-		</action>
-		<action path="/WXOperateInfo"
-			type="com.wireless.Actions.weixin.operate.WXOperateInfoAction" scope="request"
-			parameter="dataSource">
-		</action>
-		<action path="/WXQueryInfo"
-			type="com.wireless.Actions.weixin.query.WXQueryInfoAction" scope="request"
-			parameter="dataSource">
-		</action>
-		<action path="/WXOperateOrder"
-			type="com.wireless.Actions.weixin.operate.WXOperateOrderAction"
-			scope="request" parameter="dataSource">
-		</action>
-		<action path="/WXQueryMemberOperation"
-			type="com.wireless.Actions.weixin.query.WXQueryMemberOperationAction"
-			scope="request" parameter="dataSource">
-		</action>
 
 		<action path="/QueryCommissionStatistics"
 			type="com.wireless.Actions.dishesOrder.QueryCommissionStatisticsAction"
@@ -610,10 +562,6 @@
 			type="com.wireless.Actions.dishesOrder.TransFoodAction"
 			scope="request" >
 		</action>	
-		<action path="/WXQueryOrder"
-			type="com.wireless.Actions.weixin.query.WxQueryOrderAction"
-			scope="request" parameter="dataSource">
-		</action>								
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
