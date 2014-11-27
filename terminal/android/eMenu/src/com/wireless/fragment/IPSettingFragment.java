@@ -56,7 +56,7 @@ public class IPSettingFragment extends PreferenceFragment implements OnPreferenc
         }
         
         Preference deviceIdPref = findPreference(getString(R.string.ip_device_id_key));
-        deviceIdPref.setSummary(DeviceUtil.getDeviceId(getActivity()));
+        deviceIdPref.setSummary(DeviceUtil.getDeviceId(getActivity(), DeviceUtil.Type.PAD));
 	}
 
 	/**

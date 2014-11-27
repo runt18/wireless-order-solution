@@ -495,6 +495,18 @@ public final class ShoppingCart {
 	}
 	
 	/**
+	 * Return the price to new foods.
+	 * @return the price to new foods
+	 */
+	public float getNewPrice(){
+		if(mNewOrder != null){
+			return mNewOrder.calcTotalPrice();
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
 	 * Return all foods to shopping cart.
 	 * @return all foods to shopping cart
 	 */

@@ -557,45 +557,55 @@ public class SelectedFoodActivity extends Activity
 			
 			@Override
 			public void onClick(View v) {
-				try {
-					ShoppingCart.instance().pay(new OnPayListener(){
-						
-						private ProgressDialog mProgressDialog;
+				new AlertDialog.Builder(SelectedFoodActivity.this).setTitle("请输入退菜数量")
+				   .setMessage("共点菜" + ShoppingCart.instance().getAllFoods().size() + "个，合计" + ShoppingCart.instance().getTotalPrice() + "元，确定结账？")
+				   .setNeutralButton("确定", new DialogInterface.OnClickListener() {
+					   @Override
+					   public void onClick(DialogInterface dialog, int whichButton) {
+							try {
+								
+								ShoppingCart.instance().pay(new OnPayListener(){
+									
+									private ProgressDialog mProgressDialog;
 
-						@Override
-						public void onPrePay(Order orderToPay) {
-							mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this,"", "正在暂结" + orderToPay.getDestTbl().getAliasId() + "号账单信息...请稍候");
-						}
-						
-						@Override
-						public void onSuccess(Order orderToPay) {
-							mProgressDialog.dismiss();
-							new AlertDialog.Builder(SelectedFoodActivity.this)
-								.setTitle("提示")
-								.setMessage(orderToPay.getDestTbl().getAliasId() + "号餐台暂结成功，请等待服务员结账...")
-								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
 									@Override
-									public void onClick(DialogInterface dialog,	int which){
-										onBackPressed();
+									public void onPrePay(Order orderToPay) {
+										mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this,"", "正在暂结" + orderToPay.getDestTbl().getAliasId() + "号账单信息...请稍候");
 									}
-								})
-								.show();
-						}
+									
+									@Override
+									public void onSuccess(Order orderToPay) {
+										mProgressDialog.dismiss();
+										new AlertDialog.Builder(SelectedFoodActivity.this)
+											.setTitle("提示")
+											.setMessage(orderToPay.getDestTbl().getName() + "结账成功，请等待服务员结账...")
+											.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+												@Override
+												public void onClick(DialogInterface dialog,	int which){
+													onBackPressed();
+												}
+											})
+											.show();
+									}
 
-						@Override
-						public void onFail(BusinessException e) {
-							mProgressDialog.dismiss();
-							new AlertDialog.Builder(SelectedFoodActivity.this)
-								.setTitle("提示")
-								.setMessage(e.getMessage())
-								.setNeutralButton("确定", null)
-								.show();
-						}
-						
-					});
-				} catch (BusinessException e) {
-					Toast.makeText(SelectedFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-				}
+									@Override
+									public void onFail(BusinessException e) {
+										mProgressDialog.dismiss();
+										new AlertDialog.Builder(SelectedFoodActivity.this)
+											.setTitle("提示")
+											.setMessage(e.getMessage())
+											.setNeutralButton("确定", null)
+											.show();
+									}
+									
+								});
+							} catch (BusinessException e) {
+								Toast.makeText(SelectedFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+							}
+					   }
+				   })
+				   .setNegativeButton("取消", null)
+				   .show();
 			}
 		});
 		

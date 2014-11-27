@@ -40,6 +40,7 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.util.DeviceUtil;
 
 public class StartupActivity extends Activity {
 	private TextView mMsgTxtView;
@@ -144,7 +145,7 @@ public class StartupActivity extends Activity {
 	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask{
 		
 		QueryStaffTask(){
-			super(StartupActivity.this);
+			super(StartupActivity.this, DeviceUtil.Type.PAD);
 		}
 		
 		/**
@@ -248,10 +249,10 @@ public class StartupActivity extends Activity {
 					if(image == null){
 						downloadQueue.add(food);
 						
-					}else if(!image.equals(food.getImage())){
+					}else if(!image.equals(food.getImage().getImage())){
 						downloadQueue.add(food);
 						
-					}else if(!new File(android.os.Environment.getExternalStorageDirectory().getPath() + Params.IMG_STORE_PATH + food.getImage()).exists()){
+					}else if(!new File(android.os.Environment.getExternalStorageDirectory().getPath() + Params.IMG_STORE_PATH + food.getImage().getImage()).exists()){
 						downloadQueue.add(food);										
 					}										
 				}
