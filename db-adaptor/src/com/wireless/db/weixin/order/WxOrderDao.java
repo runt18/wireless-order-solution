@@ -338,7 +338,28 @@ public class WxOrderDao {
 		dbCon.rs.close();
 		wxOrder.setMember(MemberDao.getByWxSerial(dbCon, staff, wxOrder.getWeixinSerial()));
 	}
-	
+	/**
+	 * Get the weixin order according to specific extra condition{@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @return the result to wx order
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<WxOrder> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+		
+	}	
 	/**
 	 * Get the weixin order according to specific extra condition{@link ExtraCond}.
 	 * @param dbCon
