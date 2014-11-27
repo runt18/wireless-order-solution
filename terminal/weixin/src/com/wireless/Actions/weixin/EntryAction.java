@@ -56,7 +56,11 @@ public class EntryAction extends Action{
 							Menu.delete(token);
 							menu.set1stButton(new Button.ClickBuilder("餐厅导航", WeiXinHandleMessage.NAVI_EVENT_KEY).build());
 							menu.set2ndButton(new Button.ClickBuilder("最新优惠", WeiXinHandleMessage.PROMOTION_EVENT_KEY).build());
-							menu.set3rdButton(new Button.ClickBuilder("会员信息", WeiXinHandleMessage.MEMBER_EVENT_KEY).build());
+							
+							menu.set3rdButton(new Button.ClickBuilder("我的", "AAA")
+											.addChild(new Button.ClickBuilder("我的订单", WeiXinHandleMessage.ORDER_EVENT_KEY))
+											.addChild(new Button.ClickBuilder("我的会员卡", WeiXinHandleMessage.MEMBER_EVENT_KEY))
+											.build());
 							if(menu.create(token).isOk()){
 								//Record the app id & secret.
 								WeixinRestaurantDao.update(StaffDao.getAdminByRestaurant(RestaurantDao.getByAccount(account).getId()), 
@@ -87,7 +91,7 @@ public class EntryAction extends Action{
 		DefaultSession session = DefaultSession.newInstance();
 		try{
 			String account = request.getParameter("account");
-			session.addOnHandleMessageListener(new WeiXinHandleMessage(session, account, "http://" + request.getLocalAddr() + "/web-term"));
+			session.addOnHandleMessageListener(new WeiXinHandleMessage(session, account, "http://" + request.getLocalAddr() + "/wx-term"));
 			session.process(is, os);
 		}finally{
 			session.close();

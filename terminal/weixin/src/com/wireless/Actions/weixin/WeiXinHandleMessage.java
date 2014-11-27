@@ -20,6 +20,7 @@ import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
+import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
@@ -29,6 +30,7 @@ import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
 
 public class WeiXinHandleMessage extends HandleMessageAdapter {
@@ -39,6 +41,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	private final String WEIXIN_ABOUT;
 	private final String WEIXIN_MEMBER;
 	private final String WEIXIN_COUPON;
+	private final String WEIXIN_ORDER;
 	
 	private final String WEIXIN_FOOD_ICON;
 	private final String WEIXIN_RFOOD_ICON;
@@ -48,6 +51,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	public final static String NAVI_EVENT_KEY = "navi_event_key";
 	public final static String PROMOTION_EVENT_KEY = "promotion_event_key";
 	public final static String MEMBER_EVENT_KEY = "member_event_key";
+	public final static String ORDER_EVENT_KEY = "order_event_key";
 	
 	private final DefaultSession session;
 	private final String account;
@@ -61,6 +65,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		this.WEIXIN_ABOUT = root + "/weixin/order/about.html";
 		this.WEIXIN_MEMBER = root + "/weixin/order/member.html";
 		this.WEIXIN_COUPON = root + "/weixin/order/sales.html";
+		this.WEIXIN_ORDER = root + "/weixin/order/orderList.html";
 		
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
 		this.WEIXIN_RFOOD_ICON = root + "/weixin/order/images/icon_rfood.png";
@@ -354,6 +359,23 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 						session.callback(new Msg4ImageText(msg).addItem(new Data4Item(e.getMessage(), "", "", "")));
 					}
 						
+				}else if(msg.getEventKey().equals(ORDER_EVENT_KEY)){
+					int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+					
+					Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
+					
+					List<WxOrder> orders = WxOrderDao.getByCond(staff, new WxOrderDao.ExtraCond().setWeixin(msg.getFromUserName()).setStatus(WxOrder.Status.COMMITTED), " ORDER BY birth_date DESC");
+					
+					String title, description = "";
+					
+					if(!orders.isEmpty()){
+						title = "您的最新订单号是: " + orders.get(0).getCode(); 
+						description = "点击查看所有订单";
+						session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title, description, "", createUrl(msg, WEIXIN_ORDER))));
+					}else{
+						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("暂无订单", description, "", "")));
+					}
+					
 				}
 			}
 			

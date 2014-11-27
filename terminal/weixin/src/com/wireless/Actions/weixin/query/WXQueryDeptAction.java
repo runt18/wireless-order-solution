@@ -16,11 +16,13 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -92,7 +94,20 @@ public class WXQueryDeptAction extends DispatchAction{
 			
 			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
 			
-			List<Kitchen> list = KitchenDao.getByCond(staff, new KitchenDao.ExtraCond().setContainsImage(true), null);
+			List<Kitchen> list = new ArrayList<>(); 
+			
+			String extraCond = " AND FOOD.restaurant_id = " + rid, orderClause = " ORDER BY FOOD.food_alias";
+			extraCond += " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
+			extraCond += " AND (FOOD.status & " + Food.RECOMMEND + ") <> 0";
+			extraCond += " AND (FOOD.oss_image_id <> 0) ";
+			List<Food> foods = FoodDao.getPureByCond(extraCond, orderClause);
+			if(!foods.isEmpty()){
+				Kitchen star = new Kitchen(-10);
+				star.setName("明星菜");
+				list.add(star);
+			}
+			
+			list.addAll(KitchenDao.getByCond(staff, new KitchenDao.ExtraCond().setContainsImage(true), null));
 			
 			jobject.setRoot(list);
 			
