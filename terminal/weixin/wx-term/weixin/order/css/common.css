@@ -33,7 +33,7 @@ address,cite,dfn,em,var {
 button,input,select,textarea {
 	font-size: 100%;
 } 
-/* 使得表单元素在 ie 下能继承字体大小 */
+/* 浣垮緱琛ㄥ崟鍏冪礌鍦�ie 涓嬭兘缁ф壙瀛椾綋澶у皬 */
 .fl {
 	float: left;
 	overflow: hidden;
@@ -120,7 +120,7 @@ button,input,select,textarea {
 	*zoom: 1;
 }
 
-/* 右边隐藏的内容 */
+/* 鍙宠竟闅愯棌鐨勫唴瀹�*/
 .moveright {
 	display: none;
 }
@@ -185,7 +185,7 @@ button,input,select,textarea {
 }
 /* banner END */
 
-/* 栏目 */
+/* 鏍忕洰 */
 .indexsub li {
 	width: 50%;
 	float: left;
@@ -195,10 +195,14 @@ button,input,select,textarea {
 .indexsub .subtype {
 	height: 50px;
 	margin: 2px;
-	color: #fff;
+	color: #fff ;
 	padding: 10px;
 	position: relative;
 	
+}
+
+.indexsub .subtype a{
+	color: #fff ;
 }
 
 .indexsub .subtype em {
@@ -289,9 +293,9 @@ button,input,select,textarea {
 .bg6 del {
 	width: 80px;
 }
-/* 栏目 END */
+/* 鏍忕洰 END */
 
-/* 热门商品 */
+/* 鐑棬鍟嗗搧 */
 .titlestyle {
 	margin: 10px 10px 0 10px;
 	box-shadow: 0px 0px 4px #eee;
@@ -350,9 +354,9 @@ button,input,select,textarea {
 .indexgoodslist img {
 	width: 100%;
 }
-/* 热门商品 END */
+/* 鐑棬鍟嗗搧 END */
 
-/* 公告 */
+/* 鍏憡 */
 .indexnotice {
 	background: #EEEEEE;
 	border-bottom: 1px solid #FF9933;
@@ -360,9 +364,9 @@ button,input,select,textarea {
 	color: #666;
 	font-size: 14px;
 }
-/* 公告 END */
+/* 鍏憡 END */
 
-/* 商品列表页 */
+/* 鍟嗗搧鍒楄〃椤�*/
 
 /* banner  */
 .bannerswiper {
@@ -460,7 +464,7 @@ button,input,select,textarea {
 	overflow: hidden;
 	border-top: 1px solid #fff;
 	background: #f8f8f8;
-	margin: 20px 0px 50px 0px;
+	margin: 10px 0px 50px 0px;
 }
 
 .footerwarp {
@@ -574,7 +578,7 @@ button,input,select,textarea {
 }
 
 .userinfo {
-	margin-left: 90px;
+	margin-left: 10px;
 }
 
 .mreinfo {
@@ -653,17 +657,22 @@ i.takeback_1 {
 }
 
 .em_mobile {
-	position: absolute;
-	font-size: 12px;
+	font-size: 15px;
 	color: #666;
 	bottom: -21px;
 	z-index: 10;
+	line-height: 20px;
 }
 
 .em_mobile a {
-	font-size: 12px;
+	font-size: 15px;
 	color: #666;
 	margin-left: 5px;
+}
+
+.em_mobile i {
+	font-size: 18px;
+	position: absolute;
 }
 
 .inventory {
