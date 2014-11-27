@@ -23,6 +23,11 @@
 			},
 			success : function(data, statuc, xhr){
 				Util.getDom('imgRestaurantHeader').src = data.other.logo;
+				var rInfo = data.other.rInfo;
+				$('#spanRestaurantName').text(rInfo.name);
+				$('#spanRestaurantPhone1').text(rInfo.tele1);
+				$('#spanRestaurantAdress').text(rInfo.address);
+				
 			},
 			error : function(xhr, errorType, error){
 				alert('加载店铺形象失败.');
@@ -94,14 +99,14 @@
 			</div> -->
 			<div class="userinfo p_re embox">
 <!-- 				<div class="shopopen">营业中</div>  -->
-				<strong>利雅园酒家</strong> 
+				<strong id="spanRestaurantName">利雅园酒家</strong> 
 				<div class="em_mobile">
 					<font>电话:</font>
-					<a href="tel:138 8888 8888">138 8888 8888</a>
+					<span id="spanRestaurantPhone1" >138 8888 8888</span><span id="spanRestaurantPhone2" ></span>
 <!-- 					| <a href="tel:138 8888 8888"><i class="foundicon-phone fcolor1"></i></a> -->
 				</div>
 				<div class="em_mobile">
-					<font>地址：</font>广州天河区大观南路A101
+					<font>地址：</font><span id="spanRestaurantAdress">广州天河区大观南路A101</span>
 				</div>				
 			</div>
 		</div>
