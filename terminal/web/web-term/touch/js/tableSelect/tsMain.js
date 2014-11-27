@@ -192,37 +192,64 @@ ts.selectTable = function(c){
 function handleTableForTS(c){
 	var table = c.table;
 	if(table != null){
-		//判断是否为已点菜餐桌
-		if(table.statusText == "就餐"){	
-			//判断餐桌是否已经改变状态
-			if(!$(c.event).hasClass('table-busy')){
-				initTableData();
-			}
-			uo.show({
-				table : table
-			});
-		}else{
-			//判断餐桌是否已经改变状态
-			if($(c.event).hasClass('table-busy')){
-				initTableData();
-			}
-			Util.dialongDisplay({
-				type : 'show', 
-				renderTo : 'divShowMessageForTableSelect',
-			});
-			//关闭该界面
-			$("#btnCancelForShowMessageTS").click(function (){
-				Util.dialongDisplay({
-					type:'hide', 
-					renderTo:'divShowMessageForTableSelect'
+		//更新状态后, 如果是查台, 则执行不同操作
+		if(ts.commitTableOrTran == "lookup"){
+			if(table.statusText == "就餐"){	
+				//判断餐桌是否已经改变状态
+				if(!$(c.event).hasClass('table-busy')){
+					initTableData();
+				}
+				$('#btnCloseForSelectTableNumTS').click();
+				uo.show({
+					table : table
 				});
-				inputNumVal = "";
-				$("#txtPeopleNumForSM").val("1");
-			});
-			$("#txtTableNumForSM").val(table.alias);
-			$("#txtPeopleNumForSM").select();
-			inputNumId  = "txtPeopleNumForSM";
-		}	
+				
+			}else{
+				//把table信息放到全局变量中, 方便callback调用
+				ts.table = table;
+				Util.msg.alert({
+					title : '温馨提示',
+					msg : c.table.alias + '号餐桌还未开台, 请选择操作.', 
+					btnEnter : '开台',
+					buttons : 'YESBACK',
+					returnCallback : function(){$('#txtTableNumForTS').focus();},
+					certainCallback : function(){ts.commitTableOrTran = 'table';renderToCreateOrder(ts.table.alias, 1);}
+				});					
+			}			
+		}else{
+			//判断是否为已点菜餐桌
+			if(table.statusText == "就餐"){	
+				//判断餐桌是否已经改变状态
+				if(!$(c.event).hasClass('table-busy')){
+					initTableData();
+				}
+				uo.show({
+					table : table
+				});
+			}else{
+				//判断餐桌是否已经改变状态
+				if($(c.event).hasClass('table-busy')){
+					initTableData();
+				}
+				Util.dialongDisplay({
+					type : 'show', 
+					renderTo : 'divShowMessageForTableSelect',
+				});
+				//关闭该界面
+				$("#btnCancelForShowMessageTS").click(function (){
+					Util.dialongDisplay({
+						type:'hide', 
+						renderTo:'divShowMessageForTableSelect'
+					});
+					inputNumVal = "";
+					$("#txtPeopleNumForSM").val("1");
+				});
+				$("#txtTableNumForSM").val(table.alias);
+				$("#txtPeopleNumForSM").select();
+				inputNumId  = "txtPeopleNumForSM";
+			}			
+		}
+	
 	}
 }
 
@@ -424,6 +451,10 @@ ts.submitForSelectTableOrTransFood = function(){
 		uo_transFood({alias:$('#txtTableNumForTS').val(), allTrans : -1});
 	}else if(ts.commitTableOrTran == 'transTable'){
 		ts_transTable({alias:$('#txtTableNumForTS').val()})
+	}else if(ts.commitTableOrTran == 'lookup'){
+		updateTable({
+			alias : $('#txtTableNumForTS').val()
+		});
 	}
 }
 
@@ -436,6 +467,10 @@ ts.toOrderFoodOrTransFood = function(alias){
 		uo_transFood({alias:alias, allTrans : -1});
 	}else if(ts.commitTableOrTran == 'transTable'){
 		ts_transTable({alias:alias})
+	}else if(ts.commitTableOrTran == 'lookup'){
+		updateTable({
+			alias : alias
+		});		
 	}
 }
 
@@ -451,6 +486,21 @@ function createOrderForTS(){
 	showSelectTableNumTS();
 	var title = "";
 	title = "请输入桌号，确定进入点菜界面";
+	$("#divTopForSelectTableNumTS").html("<div style = 'font-size: 20px; " +
+			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");	
+}
+
+//弹出桌号选择框，能够转到菜品查看
+function createOrderForLookup(){
+	$('#divTransFoodNumber').hide();
+	$('#divTransFoodTableAlias > span').removeClass('trans-food-label');
+	$('#divTransFoodTableAlias > span').addClass('select-food-label');
+	$("#txtTableNumForTS").val("");
+	$('#divSelectTablesForTs').html("");	
+	ts.commitTableOrTran = 'lookup';
+	showSelectTableNumTS();
+	var title = "";
+	title = "请输入桌号，查看已下单菜品";
 	$("#divTopForSelectTableNumTS").html("<div style = 'font-size: 20px; " +
 			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");	
 }
@@ -614,6 +664,7 @@ function showSelectTableNumTS(){
 		inputNumValUO = "";
 		$("#txtTableNumForTS").val("");
 		$('#divSelectTablesForTs').html("");
+		ts.commitTableOrTran = 'table';
 	});
 	$("#txtTableNumForTS").select();
 	inputNumIdUO  = "txtTableNumForTS";

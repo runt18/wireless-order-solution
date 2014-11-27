@@ -317,8 +317,8 @@ Util.msg = {
 			+ (typeof c.time == 'number' ? '<div data-type="time">&nbsp;</div>' : '')
 			+ '<div data-type="button" class="box-horizontal">'
 				+ '<div class="div-full"></div>'
-				+ '<div class="button-base" style="width:150px;" onClick="Util.msg.save({event:\'yes\', id:\''+id+'\'})">'+ (typeof c.btnEnter != 'undefined'? c.btnEnter : "确定") +'</div>'
-				+ (typeof c.buttons == 'string' && c.buttons.toUpperCase() == 'YESBACK' ? '<div class="button-base" style="width:150px; margin-left:20px;" onClick="Util.msg.hide({event:\'back\', id:\''+id+'\'})">返回</div>' : '')
+				+ '<div class="button-base" style="width:150px;" onClick="Util.msg.save({event:\'yes\', id:\''+id+'\', callback:' + c.certainCallback +'})">'+ (typeof c.btnEnter != 'undefined'? c.btnEnter : "确定") +'</div>'
+				+ (typeof c.buttons == 'string' && c.buttons.toUpperCase() == 'YESBACK' ? '<div class="button-base" style="width:150px; margin-left:20px;" onClick="Util.msg.hide({event:\'back\', id:\''+id+'\', callback:' + c.returnCallback +'})">返回</div>' : '')
 				+ '<div class="div-full"></div>'
 			+ '</div>'
 			+ '</div>';
@@ -344,6 +344,10 @@ Util.msg = {
 			event : 'yes',
 			id : c.id
 		});
+		
+		if(typeof c.callback == 'function'){
+			c.callback();
+		}
 	},
 	hide : function(c){
 		Util.dialongDisplay({
@@ -354,6 +358,10 @@ Util.msg = {
 		this.fireEvent(c.event, c.id);
 		this.clearEvent(c.id);
 		this.clearInterval(c.id);
+		
+		if(typeof c.callback == 'function'){
+			c.callback();
+		}
 	},
 	alert : function(c){
 		var content = this.createContent({
@@ -362,7 +370,9 @@ Util.msg = {
 			fn : c.fn,
 			buttons : c.buttons,
 			btnEnter : c.btnEnter,
-			time : c.time
+			time : c.time,
+			returnCallback : c.returnCallback,
+			certainCallback : c.certainCallback
 		});
 		document.body.insertAdjacentHTML('beforeEnd', content.content);
 		Util.dialongDisplay({
