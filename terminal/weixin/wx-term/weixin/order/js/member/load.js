@@ -18,7 +18,6 @@ $(function(){
 				//会员卡号
 				$('#divWXMemberCard').html('微信卡号:'+data.other.weixinCard);
 				
-
 				if(data.other.status == 2){
 					$('#divWeixinMemberPhone').show()
 					$('#divBindWeixinMember').hide();
@@ -54,7 +53,6 @@ $(function(){
 					}
 				});					
 				
-				
 				$('#divMemberCard').css('display', 'block');
 				$('#divMemberContent').css('display', 'block');
 				$('#divMemberTypeContent').css('display', 'block');
@@ -77,7 +75,7 @@ $(function(){
 				initMemberMsg({data:member});
 				
 				//添加会员等级当前位置
-				currentMemberLevelData = {y : 0, memberTypeName : '您的积分', currentPoint:true, x:member.totalPoint, pointThreshold:member.totalPoint, discount:{type :2},chargeRate:-1, exchangeRate:-1, marker:{symbol:'url(../../images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
+				currentMemberLevelData = {y : 0, memberTypeName : '您的积分', currentPoint:true, x:member.totalPoint, pointThreshold:member.totalPoint, discount:{type :2},chargeRate:-1, exchangeRate:-1, marker:{symbol:'url(images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
 				
 				//设置会员排名
 				if(member.rank > 0){
@@ -130,7 +128,7 @@ $(function(){
 		function(){
 			
 			$('#divToBindWeixinMember').show();
-			$('html, body').animate({scrollTop: 190}, 'fast'); 
+			$('html, body').animate({scrollTop: 200}, 'fast'); 
 			weixinPhoneFocus();			
 		},
 		function(){

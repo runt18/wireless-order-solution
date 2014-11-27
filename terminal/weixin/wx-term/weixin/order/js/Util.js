@@ -138,8 +138,8 @@ Util.dialog = {
 	id : 'div-loadmask-m-dialog',
 	tid : 'div-loadmask-m-dialog-t',
 	mid : 'div-loadmask-m-dialog-m',
-	btn : {yesno : '<button onclick="Util.dialog.event(\'yes\');">确定</button>&nbsp;&nbsp;<button onclick="Util.dialog.event(\'cancel\');">取消</button>', yes : '<button onclick="Util.dialog.event(\'yes\');">确定</button>'},
-	templet : '<div id="{id}" class="div-mask div-mask-dialog"><div class="dialog">'
+//	btn : {yesno : '<button onclick="Util.dialog.event(\'yes\');">确定</button>&nbsp;&nbsp;<button onclick="Util.dialog.event(\'cancel\');">取消</button>', yes : '<button onclick="Util.dialog.event(\'yes\');">确定</button>'},
+	templet : '<div id="{id}" class="div-mask div-mask-dialog dialong-show"><div class="dialog">'
 		+ '<div id={tid} class="dialog-title">{title}</div>'
 		+ '<div id={mid} class="dialog-msg">{msg}</div>'
 		+ '<div class="dialog-button">'

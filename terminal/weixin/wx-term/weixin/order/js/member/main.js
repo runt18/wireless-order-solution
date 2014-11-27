@@ -615,7 +615,11 @@ function toggleMemberLevel(){
 						height += $('#divToBindWeixinMember').height();
 					}
 					$('html, body').animate({scrollTop: height}, 'fast');					
-					$.post('../../QueryMemberLevel.do', {dataSource : 'chart', rid:member.restaurant.id}, function(result){
+					$.post('../../WXQueryMemberOperation.do', {dataSource : 'chart', rid:member.restaurant.id}, function(result){
+						if(typeof result == 'string'){
+							result = eval('(' + result + ')');
+						}
+						
 						if(result.success){
 							mainView.prepend('<h3>会员等级列表</h3>');
 							mainView.css('margin-left', '-40%');

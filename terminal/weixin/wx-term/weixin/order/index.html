@@ -12,7 +12,7 @@
 	<script type="text/javascript" src="./js/Util.js"></script>
 	<script type="text/javascript">
 	$(function(){
-		Util.lbar('', function(html){ $(document.body).append(html);  });
+		//Util.lbar('', function(html){ $(document.body).append(html);  });
 		$.ajax({
 			url : '../../WXQueryInfo.do',
 			dataType : 'json',
@@ -59,7 +59,6 @@
 			</li>
 			<li class="s2 bg2">
 				<div class="subtype" onclick="Util.skip('sales.html')">
-<!-- 				<div class="subtype"> -->
 					<em class="foundicon-offsale fontsize1"> </em> <del>优惠信息</del>
 				</div>	
 			</li>
@@ -73,7 +72,7 @@
 					<em class="foundicon-quote fontsize1"></em> <span></span> <del>店铺简介</del>
 				</div>
 			</li>
-			<li class="s4 bg4">
+<!-- 			<li class="s4 bg4">
 				<div class="subtype" onclick="Util.skip('rfood.html')">
 					<em class="foundicon-heart fontsize1"></em> <span></span> <del>特色菜品</del>
 				</div>
@@ -82,7 +81,7 @@
 				<div class="subtype" onclick="navBottomSwiper.swipeNext()">
 					<em class="foundicon-page fontsize1"></em> <span></span> <del>查看更多</del>
 				</div>
-			</li>
+			</li> -->
 		</ul>
 	</div>
 	<!-- 栏目 END -->

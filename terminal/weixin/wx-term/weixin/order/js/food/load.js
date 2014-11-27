@@ -3,10 +3,10 @@ var Templet = {
 		+ '<div data-r="l">'
 			+ '<div onclick="foodShowAbout({id:{id}, event:this, otype:\'show\'})" style="background-image: url({img});"></div>'
 		+ '</div>'
-		+ '<div data-r="c" class="box-food-list-c">'
+		+ '<div data-r="c" class="box-food-list-c" onclick="fireOperateFood(this)">'
 			+ '<div data-r="t"><b>{name}</b></div>'
 			+ '<div data-r="m"><span>￥{unitPrice}</span></div>'
-			+ '<div data-r="b"><font>{point}</font>人点过</div>'
+			+ '<div data-r="b" class={orderAction}><font>{foodCnt}</font>人点过</div>'
 		+ '</div>'
 		+ '<div data-r="r" class="box-horizontal box-food-list-r">'
 			//+ '<div data-r="l" data-type="count" data-value="{id}" style="display:{display}">{count}</div>'
@@ -20,12 +20,12 @@ var Templet = {
 			+ '<div>价格: <span>￥{unitPrice}</span></div>'
 		+ '</div>'
 		+ '<div data-type="cut" onclick="operateFood({otype:\'cut\', id:{id}, event:this})">-</div>'
-		+ '<div data-type="plus" onclick="operateFood({otype:\'plus\', id:{id}, event:this})">+</div>'
 		+ '<div data-type="count">{count}</div>'
+		+ '<div data-type="plus" onclick="operateFood({otype:\'plus\', id:{id}, event:this})">+</div>'
 		+ '</div>',
 	deptBox : '<div data-value="{id}" onclick="filtersKitchen(this)">{name}</div>',
 	kitchenBox2 : '<div data-value="{id}" onclick="filtersFood(this)">{name}</div>',
-	kitchenBox : '<li><a data-value="{id}" onclick="filtersFood2(this)">{name}</a></li>'
+	kitchenBox : '<li><a data-value="{id}" onclick="filtersFood2(this)" class={star}>{name}</a></li>'
 };
 
 function changeImg(e){
@@ -37,6 +37,11 @@ function changeImg(e){
 		return true;
 	}
 }
+
+function fireOperateFood(thiz){
+	operateFood({otype:'add', id:$($(thiz).next().find('div[data-r=r]')[0]).attr('data-value'), event:$(thiz).next().find('div[data-r=r]')[0]});
+}
+
 
 function initView(){
 	var height = document.documentElement.clientHeight;
@@ -79,6 +84,11 @@ function initFoodData(c){
 		start : typeof c.start != 'undefined' ? c.start : params.start,
 		limit : typeof c.limit != 'undefined' ? c.limit : params.limit
 	};
+	//当点击的是明星菜时, 调用别的方法
+	if(params.kitchenId && params.kitchenId == -10){
+		requestParams.dataSource = 'isRecommend';
+	}
+	
 	Util.lm.show();
 	$.ajax({
 		url : '../../WXQueryFood.do',
@@ -101,11 +111,12 @@ function initFoodData(c){
 						id : temp.id,
 						img : temp.img.thumbnail,
 						name : (temp.name.length > 7? temp.name.substring(0,6)+"…" : temp.name),
-						unitPrice : temp.unitPrice.toFixed(2),
-						point : parseInt(temp.unitPrice),
+						unitPrice : temp.unitPrice,
+						foodCnt : parseInt(temp.foodCnt),
 						count : count,
 						selected : count > 0 ? 'class="select-food"' : '',
-						display : count > 0 ? 'block' : 'none'
+						display : count > 0 ? 'block' : 'none',
+						orderAction : temp.foodCnt > 0 ? '' : 'html-hide'
 					}));
 				}
 				count = null;
@@ -148,6 +159,7 @@ function initDeptData(){
 					temp = params.kitchenData[i];
 					html.push(Templet.kitchenBox.format({
 						id : temp.id,
+						star : temp.id == -10 ? 'star-kitchen-name' : '',
 						name : temp.name.substring(0, 4)
 					}));
 				}
@@ -170,4 +182,18 @@ $(function(){
 	
 	//获取厨房后再获取菜品
 	initDeptData();
+	
+    $(document).bind('click',function(e){
+    	var e = e || window.event; //浏览器兼容性
+        var elem = e.target || e.srcElement;
+        while (elem) { //循环判断至跟节点，防止点击的是div子元素
+            if ((elem.id && elem.id=='divShoppingCart') || elem.className=='dialog') {
+                return;
+            }
+            elem = elem.parentNode;
+        }
+		operateShoppingCart({event:this, otype:'hide'})	
+    });	
+    
+    htmlHeight = document.body.clientHeight;
 });

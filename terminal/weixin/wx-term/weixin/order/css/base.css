@@ -27,13 +27,24 @@
 /******************************/
 .div-mask{display: none; z-index:1000; position: absolute; height: 100%; width: 100%; left:0; top:0;}
 .div-mask-dialog{background: rgba(0,0,0, .5);}
-.dialog{ position: fixed; min-height: 100px; width: 260px; left:50%; top:50%; margin: 0px 0 0 -130px; background: #fff; }
-.dialog-title{ text-align: center; font-size: 23px; color: #4aaaa5; font-weight: bold; line-height: 45px; padding: 0 0 0 10px; }
-.dialog-msg{ font-size: 18px; line-height: 23px; padding: 0 0 0 10px;  }
-.dialog-button{ line-height: 45px; padding: 0 0 0 10px; text-align: center;}
+.dialog{ position: fixed; min-height: 100px; width: 260px; left:50%; top:50%; margin: 0px 0 0 -130px; background: #fff;border-radius: 10px; }
+/* .dialog-title{ text-align: center; font-size: 23px; color: #4aaaa5; font-weight: bold; line-height: 45px; padding: 0 0 0 10px; } */
+.dialog-title{font-size:17px; font-weight:bold; color : white; background-color: dimgray;text-align: center;line-height: 30px;border-top-left-radius:9px;border-top-right-radius:9px;}
+.dialog-msg{ font-size: 18px; line-height: 23px; padding: 10px 0 0 10px;  }
+.dialog-button{ line-height: 30px; padding: 0 0 0 10px; text-align: center;}
 .dialog-button > button{ border:0; background:#4aaaa5; color: #FFF; text-align: center; font-size: 18px; width: 100px; height: 30px; margin: 10px 0 0 0;}
 .div-mask-ld{background: rgba(0,0,0, 0);}
 .div-mask-ld > div[class=img]{position: fixed; height:50px; width:50px; left:50%; top:50%; margin: -25px; background: rgba(255,255,255,1); border: 1px solid #eee; border-radius: 2px;}
+
+.dialong-show {
+z-index: 99999;
+-webkit-animation: dl-bounceIn .3s .01s ease both;
+}
+@-webkit-keyframes dl-bounceIn{
+	0%{opacity:0; -webkit-transform:scale(0);}
+	75%{opacity:1; -webkit-transform:scale(1.1);}
+	100%{opacity:1; -webkit-transform:scale(1);}
+}
 /******************************/
 .main-box{
 	margin: 5px auto 5px auto;
@@ -77,4 +88,8 @@
 .m-b-list > li span{
 	color: #000;
 	font-weight: bold;
+}
+
+.html-hide{
+	display: none;
 }

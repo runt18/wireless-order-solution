@@ -1,3 +1,4 @@
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script type="text/javascript" src="./js/idangerous.swiper-2.4.2.min.js"></script>
 <div id="bottomToolbar">
 	<div class="hewarp">
@@ -17,17 +18,13 @@
 					<i class="foundicon-user fcolor3"></i>会员中心
 				</a>
 			</li>
-			<li class="special swiper-slide">
-				<a href="javascript:Util.skip('rfood.html');" title="特色菜品">
-				<i class="foundicon-heart fcolor2"></i>特色菜品
-				</a>
-			</li>
+
 			<li class="user swiper-slide">
 				<a href="javascript:window.location.reload();" title="刷新">
 				<i class="foundicon-refresh fcolor3"></i>刷新
 				</a>
 			</li>
-			<li class="offsale swiper-slide">
+<!-- 			<li class="offsale swiper-slide">
 				<a href="javascript:Util.skip('sales.html');" title="优惠信息"> 
 				<i class="foundicon-offsale fcolor1"></i>优惠信息
 				</a>
@@ -37,6 +34,11 @@
 				<i class="foundicon-quote fcolor1"></i>店铺简介
 				</a>
 			</li>
+			<li class="special swiper-slide">
+				<a href="javascript:Util.skip('rfood.html');" title="特色菜品">
+				<i class="foundicon-heart fcolor2"></i>特色菜品
+				</a>
+			</li> -->			
 		</ul>
 	</div>
 </div>
@@ -48,7 +50,7 @@ var navBottomSwiper = new Swiper('#bottomToolbar > div[class=hewarp]', {
 });
 var li = $('#bottomToolbar li');
 var tw = $('#bottomToolbar').width();
-tw = li.length > 5 ? parseInt(tw / 5) : parseInt(tw / li.length);
+tw = li.length > 4 ? parseInt(tw / 4) : parseInt(tw / li.length);
 for(var i = 0;i < li.length; i++){
 	li[i].style.width = tw + 'px';
 }

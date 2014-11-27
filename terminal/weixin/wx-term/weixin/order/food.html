@@ -23,6 +23,8 @@ var params = {
 	kitchenId : -1,
 	DNSC : 'divNavKitchen-item-select'
 };
+var shopCartInit = false;
+var htmlHeight;
 </script>
 <script type="text/javascript" src="./js/food/load.js"></script>
 <script type="text/javascript" src="./js/food/main.js"></script>
@@ -94,6 +96,11 @@ var params = {
 	font-size: 12px;
 }
 
+.star-kitchen-name{
+	color : red !important;
+	font-size: 18px !important;
+}
+
 </style>
 </head>
 <body>
@@ -107,7 +114,7 @@ var params = {
 </div>
 
 <div id="divShoppingCart" class="box-vertical">
-	<div id="divFoodListForSC" class="div-full">
+	<div id="divFoodListForSC">
 		<!-- 
 		<div class="div-fl-f-sc-box box-horizontal">
 			<div data-type="msg" class="div-full">
@@ -146,7 +153,7 @@ var params = {
 	</div>
 </div>
 
-<div id="divMainView" class="box-vertical">
+<div id="divMainView" class="box-vertical" >
 	<section class="panel" id="panelNav" >
 		<ul class="nav-aside" id="ulKitchenList">
 			<li class="li-k-title"><a href="#">全部厨房</a></li>
@@ -177,28 +184,18 @@ var params = {
 	<div id="divBottomNav" class="hewarp">
 		<ul class="swiper-wrapper">
 			<li class="index swiper-slide">
-				<a href="javascript:Util.skip('index.html');" title="店铺首页">
+				<a href="javascript:Util.skip('index.html');" >
 				<i class="foundicon-home fcolor6"></i>首&nbsp;页
 				</a>
 			</li>
 			<li class="user swiper-slide">
-				<a href="javascript:Util.skip('sales.html');" title="会员中心"> 
-				<i class="foundicon-offsale fcolor1"></i>优惠信息
+				<a href="javascript:Util.skip('orderList.html');"> 
+				<i class="foundicon-star fcolor1"></i>我的订单
 				</a>
 			</li>			
-<!-- 			<li class="order swiper-slide">
-				<a href="javascript:operateKitchenSearch({event:this, otype:'show'});" title="分厨">
-				<i class="foundicon-search fcolor5"></i>分&nbsp;类
-				</a>
-			</li> -->
 			<li class="special swiper-slide">
 				<a href="javascript:operateShoppingCart({event:this, otype:'show'});" title="购物车">
 				<i class="foundicon-cart fcolor2"><div id="spanDisplayFoodCount"></div></i>购物车
-				</a>
-			</li>
-			<li class="special swiper-slide">
-				<a href="javascript:Util.skip('rfood.html');" title="特色菜品">
-				<i class="foundicon-heart fcolor2"></i>特色菜品
 				</a>
 			</li>
 			<li class="user swiper-slide">
@@ -206,11 +203,21 @@ var params = {
 				<i class="foundicon-refresh fcolor3"></i>刷&nbsp;新
 				</a>
 			</li>
-			<li class="user swiper-slide">
+			<li class="special swiper-slide">
+<!-- 				<a href="javascript:Util.skip('rfood.html');" title="特色菜品">
+				<i class="foundicon-heart fcolor2"></i>特色菜品
+				</a> -->
+			</li>
+<!-- 			<li class="user swiper-slide">
 				<a href="javascript:Util.skip('member.html');" title="会员中心"> 
 				<i class="foundicon-user fcolor3"></i>会员中心
 				</a>
 			</li>
+ 			<li class="order swiper-slide">
+				<a href="javascript:operateKitchenSearch({event:this, otype:'show'});" title="分厨">
+				<i class="foundicon-search fcolor5"></i>分&nbsp;类
+				</a>
+			</li> -->			
 
 		</ul>
 	</div>
@@ -224,7 +231,7 @@ var navBottomSwiper = new Swiper('#divBottomNav', {
 });
 var li = $('#divBottomNav li');
 var tw = $('#divBottomNav').width();
-tw = li.length > 5 ? parseInt(tw / 5) : parseInt(tw / li.length);
+tw = li.length > 4 ? parseInt(tw / 4) : parseInt(tw / li.length);
 for(var i = 0;i < li.length; i++){
 	li[i].style.width = tw + 'px';
 }
@@ -234,15 +241,16 @@ for(var i = 0;i < li.length; i++){
 <div id="divFoodShowAbout">
 	<div data-region="img" class="d-fsa-img" >
 		<div data-type="img" style="position: relative;">
-			<div style="height: 25px;background-color: rgba(0, 0, 0, 0.198039);width: 100%;padding-top: 3px;font-weight: bolder;color: white;font-size: 20px;">
-				&nbsp;<span>波斯卡特庄园干红葡萄酒</span><span style="margin-right: 5px;float: right;color: #ff6600">￥238</span>
+			<div class="recommend-food-detail">
+				&nbsp;<span id="recommendFoodName" data-type="n">菜名</span>
+				<span id="recommendFoodPrice" data-type="p" style="margin-right: 5px;float: right;color: #ff6600">￥88</span>
 			</div>
-			<!-- <div class="sale-food-order">下单</div> -->
-			<span class="sale-food-border" ><input type="button" value="下单" style="font-size: 17px;"> </span>
+			<div class="recommend-food-order" onclick="saleOrderFood({otype:'order', id:46712, event:this})">下单</div>
+			<!-- <span class="sale-food-border" ><input type="button" value="下单" style="font-size: 17px;"> </span> -->
 		</div>
 	</div>
-	
-	<div  class="d-fsa-desc">点了这个菜的客人还点了:</div>
+	<div data-region=desc class="d-fsa-desc">暂无简介</div>
+<!-- 	<div  class="d-fsa-desc">点了这个菜的客人还点了:</div>
 
 	<div style="height:100px;overflow-x:auto;overflow-y:hidden;background-color: white;">
 	    <div style="width:9999px;">
@@ -254,13 +262,8 @@ for(var i = 0;i < li.length; i++){
 				<div style="height: 20px;background-color: rgba(0, 0, 0, 0.198039);width: 100%;padding-top: 3px;color: white;">波斯卡特葡萄酒<span style="margin-right: 5px;float: right;color: #ff6600">￥238</span></div>
 				<span class="sale-food-sorder" ><input type="button" value="下单√" onclick="saleOrderFood({otype:'order', id:25537, event:this})"> </span>      	
 	        </div>
-<!-- 	        <div class="sale-food-list">
-				<div style="height: 20px;background-color: rgba(0, 0, 0, 0.198039);width: 100%;padding-top: 3px;color: white;">波斯卡特葡萄酒<span style="margin-right: 5px;float: right;color: #ff6600">￥238</span></div>
-				<span class="sale-food-sorder" ><input type="button" value="下单" > </span>      	
-	        </div>
-	        <div class="sale-food-list"></div> -->
 	    </div>	
-	</div>
+	</div> -->
 	<div data-region="mask" class="d-fsa-mask div-full" onclick="foodShowAbout({event:this, otype:'hide'})"></div>
 </div>
 

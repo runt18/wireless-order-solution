@@ -25,17 +25,17 @@ function filtersFood(e){
 	});
 }
 
+//点击厨房测试筛选菜品
 function filtersFood2(e){
 	if($(e).hasClass(params.DNSC)){ return; }
 	var kitchenBodyList = $('#ulKitchenList').find('a');
-	console.log(kitchenBodyList.length)
 	for(var i = 0; i < kitchenBodyList.length; i++){
 		$(kitchenBodyList[i]).removeClass(params.DNSC);
 	}
 	
 	var kitchenId = parseInt(e.getAttribute('data-value'));
-	console.log(kitchenId)
-	if(kitchenId > 0){ $(e).addClass(params.DNSC); }
+	//明星菜是-10
+	if(kitchenId > -11){ $(e).addClass(params.DNSC); }
 	
 	params.kitchenId = kitchenId;
 	params.start = 0;
@@ -79,7 +79,7 @@ function loadFoodPaging(){
 }
 
 function saleOrderFood(c){
-	c.event.value = "下单√";
+	c.event.innerHTML = "下单√";
 	var sl = $('div[class*=box-food-list-r] > div[data-r=r]');
 	for(var i = 0; i < sl.length; i++){
 		if(parseInt(sl[i].getAttribute('data-value')) == c.id){
@@ -178,6 +178,14 @@ function operateFood(c){
 								}
 								params.orderData.splice(i, 1);
 								displayOrderFoodMsg();
+								
+								//刷新购物车界面, 没有菜品时隐藏
+								if(params.orderData.length > 0){
+									$('#divShoppingCart').height('auto');
+								}else{
+									operateShoppingCart({event:this, otype:'hide'});
+								}
+									
 							}
 						}
 					});
@@ -250,14 +258,16 @@ function operateShoppingCart(c){
 	var html = [], temp;
 	
 	if(c.otype == 'show'){
+		
 		if(params.orderData.length == 0){
-			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.' });
+			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.', btn : 'yes'});
 			return;
 		}
 		if(scBox.hasClass('left-nav-hide')){
 			scBox.removeClass('left-nav-hide');			
 		}
 		scBox.addClass('left-nav-show');
+
 		for(var i = 0; i < params.orderData.length; i++){
 			temp = params.orderData[i];
 			sumCount += temp.count;
@@ -272,59 +282,67 @@ function operateShoppingCart(c){
 		scMainView.html(html.join(''));
 		sumCountView.html(parseInt(sumCount));
 		sumPriceView.html(sumPrice.toFixed(2));
-	}else if(c.otype == 'hide'){
-		displayOrderFoodMsg();
-		if(scBox.hasClass('left-nav-show')){
-			scBox.removeClass('left-nav-show');
+		
+		
+		//当菜品列表高过屏幕高度时, 固定列表div的高度
+		if((82 + params.orderData.length * 51) > htmlHeight){
+			scBox.height(htmlHeight);
+			scMainView.height(htmlHeight - 82);
+		}else{
+			scMainView.height('auto');
+			scBox.height(82 + params.orderData.length * 51);
+			
 		}
-		scBox.addClass('left-nav-hide');
-		scMainView.html(html.join(''));
+		
+		
+		shopCartInit = true;
+	}else if(c.otype == 'hide'){
+		if(shopCartInit){
+			displayOrderFoodMsg();
+			if(scBox.hasClass('left-nav-show')){
+				scBox.removeClass('left-nav-show');
+			}
+			scBox.addClass('left-nav-hide');
+			scMainView.html(html.join(''));		
+		}
 	}else if(c.otype == 'confirm'){
 //		Util.dialog.show({ msg : '请叫服务员照单下单.' });return;
 		
 		if(params.orderData.length == 0){
-			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.' });
+			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.', btn : 'yes'});
 			return;
 		}
-		
-		Util.dialog.show({
-			msg : '是否确定下单?',
-			callback : function(btn){
-				if(btn == 'yes'){
-					var foods = "";
-					for(var i = 0; i < params.orderData.length; i++){
-						temp = params.orderData[i];
-						if(i > 0) foods += '&';
-						foods += (temp.id + ',' + temp.count);
-					}
-					$.ajax({
-						url : '../../WXOperateOrder.do',
-						dataType : 'json',
-						type : 'post',
-						data : {
-							dataSource : 'insertOrder',
-							oid : Util.mp.oid,
-							fid : Util.mp.fid,
-							foods : foods
-						},
-						success : function(data, status, xhr){
-							if(data.success){
-								params.orderData = [];
-								operateShoppingCart({otype:'hide'});
-								Util.getDom('divFoodListForSC').innerHTML = '';
-								
-								Util.dialog.show({ msg : data.msg + '<br>菜单标识码是: ' + data.other.order.code + '', btn : 'yes' });
-							}else{
-								Util.dialog.show({ msg : data.msg });
-							}
-						},
-						error : function(xhr, errorType, error){
-							Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
-						}
-					});
+		var foods = "";
+		for(var i = 0; i < params.orderData.length; i++){
+			temp = params.orderData[i];
+			if(i > 0) foods += '&';
+			foods += (temp.id + ',' + temp.count);
+		}
+		$.ajax({
+			url : '../../WXOperateOrder.do',
+			dataType : 'json',
+			type : 'post',
+			data : {
+				dataSource : 'insertOrder',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid,
+				foods : foods
+			},
+			success : function(data, status, xhr){
+				if(data.success){
+					params.orderData = [];
+					operateShoppingCart({otype:'hide'});
+					Util.getDom('divFoodListForSC').innerHTML = '';
+					
+					Util.dialog.show({title : '请呼叫服务员确认订单', msg : '<font style="font-weight:bold;font-size:25px;">订单号: ' + data.other.order.code + '</font>', btn : 'yes' });
+				}else{
+					Util.dialog.show({ msg : data.msg });
 				}
+			},
+			error : function(xhr, errorType, error){
+				Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
 			}
-		});		
+		});
 		
 	}
 }
@@ -332,6 +350,17 @@ function operateShoppingCart(c){
 function foodShowAbout(c){
 	var box = $('#divFoodShowAbout');
 	if(c.otype == 'show'){
+		box.find('div:first-child > div[data-type=img] > div[class=recommend-food-order]').html('下单');
+		box.find('div:first-child > div[data-type=img] > div[class=recommend-food-order]').click(function(){
+			saleOrderFood({otype:"order", id:c.id, event:this})
+		});
+		for(var i = 0; i < params.orderData.length; i++){
+			if(params.orderData[i].id == c.id){
+				box.find('div:first-child > div[data-type=img] > div[class=recommend-food-order]').html('下单√');
+				break;
+			}
+		}			
+		
 		box.removeClass('left-nav-hide').addClass('left-nav-show');
 		var temp;
 		for(var i = 0; i < params.foodData.length; i++){
@@ -341,11 +370,14 @@ function foodShowAbout(c){
 					'background' : 'url({0})'.format(temp.img.image),
 					'background-size' : '100% 100%'
 				});
-				//box.find('div[data-region=msg]').html('&nbsp;'+ temp.name + '&nbsp;&nbsp;&nbsp;&nbsp;￥'+ temp.unitPrice);
-				//box.find('div[data-region=desc]').html(typeof temp.desc == 'string' && temp.desc.trim().length > 0 ? '&nbsp;&nbsp;&nbsp;&nbsp;'+temp.desc : '暂无简介');
+				$('#recommendFoodPrice').text('￥' + temp.unitPrice);
+				$('#recommendFoodName').text(temp.name);
+				
+				box.find('div[data-region=desc]').html(typeof temp.desc == 'string' && temp.desc.trim().length > 0 ? temp.desc : '暂无简介');
 				break;
 			}
 		}
+	
 	}else if(c.otype == 'hide'){
 		box.removeClass('left-nav-show').addClass('left-nav-hide');
 	}
