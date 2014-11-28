@@ -40,6 +40,7 @@ public class MemberOperationDao {
 		private String name;
 		private final List<MemberOperation.OperationType> operationTypes = new ArrayList<MemberOperation.OperationType>();
 		private DutyRange operationDate;
+		private boolean containsCoupon;
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
@@ -112,6 +113,11 @@ public class MemberOperationDao {
 			return this;
 		}
 		
+		public ExtraCond setContainsCoupon(boolean onOff){
+			this.containsCoupon = onOff;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			final StringBuilder extraCond = new StringBuilder();
@@ -149,6 +155,9 @@ public class MemberOperationDao {
 			}
 			if(name != null){
 				extraCond.append(" AND MO.member_name LIKE '%" + name.trim() + "%'");
+			}
+			if(containsCoupon){
+				extraCond.append(" AND MO.coupon_id > 0 AND MO.operate_type = " + OperationType.CONSUME.getValue());
 			}
 			return extraCond.toString();
 		}
