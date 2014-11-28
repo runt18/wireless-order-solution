@@ -8,6 +8,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.BillBoardDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
@@ -15,6 +16,7 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.oss.OssImage;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.system.BillBoard;
 
 public class WXQueryInfoAction extends DispatchAction{
@@ -70,6 +72,8 @@ public class WXQueryInfoAction extends DispatchAction{
 				logo = oss.getObjectUrl();
 			}
 			
+			final Restaurant rInfo = RestaurantDao.getById(restaurantId);
+			
 			final String logoPath = logo;
 			jobject.setExtra(new Jsonable(){
 
@@ -77,6 +81,7 @@ public class WXQueryInfoAction extends DispatchAction{
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putString("logo", logoPath);
+					jm.putJsonable("rInfo", rInfo, flag);
 					return jm;
 				}
 

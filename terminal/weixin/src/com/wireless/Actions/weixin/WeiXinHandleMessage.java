@@ -106,7 +106,6 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 				rule = "";
 			}
 			desc.append("\n亲。。。在活动期间内激活会员账号即可参与【" + promotion.getTitle() + "】活动" + (!rule.isEmpty() ? "，" : "") + rule).append("\n");
-			desc.append("\n点击激活会员账号>>>>");
 			
 			return new Msg4ImageText(msg).addItem(new Data4Item(promotion.getTitle() + "(火热进行中...)", desc.toString(), 
 					 					   								  promotion.hasImage() ? promotion.getImage().getObjectUrl() : "", 

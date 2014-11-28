@@ -32,6 +32,7 @@ import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 
 public class WXQueryMemberOperationAction extends DispatchAction{
@@ -138,32 +139,37 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			// 获取会员编号
 			int mid = MemberDao.getByWxSerial(dbCon, staff, memberSerial).getId();
 			
+			MemberOperationDao.ExtraCond extraCond4Today = new MemberOperationDao.ExtraCond(DateType.TODAY);
+			MemberOperationDao.ExtraCond extraCond4History = new MemberOperationDao.ExtraCond(DateType.HISTORY);
+			
+			extraCond4Today.setMember(mid);
+			extraCond4History.setMember(mid);
 			// 查询条件(核心)
-			String extra = "";
 			if(type == 1){
 				// 获取今日消费记录 
-				extra = " AND MO.member_id = " + mid + " AND MO.operate_type = " + MemberOperation.OperationType.CONSUME.getValue();
+				extraCond4Today.addOperationType(MemberOperation.OperationType.CONSUME);
+				extraCond4History.addOperationType(MemberOperation.OperationType.CONSUME);
 			}else if(type == 2){
 				// 获取今日充值记录 
-				extra = " AND MO.member_id = " + mid + " AND MO.operate_type = " + MemberOperation.OperationType.CHARGE.getValue();
+				extraCond4Today.addOperationType(MemberOperation.OperationType.CHARGE);
+				extraCond4History.addOperationType(MemberOperation.OperationType.CHARGE);
 			}else if(type == 3){
-				// 获取今日优惠券使用记录 
-				extra = " AND MO.member_id = " + mid + " AND MO.operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + " AND MO.coupon_id > 0 ";
+				// 获取今日优惠券使用记录
+				extraCond4Today.addOperationType(MemberOperation.OperationType.CONSUME).setContainsCoupon(true);
+				extraCond4History.addOperationType(MemberOperation.OperationType.CONSUME).setContainsCoupon(true);
 			}
 			
 			// 查询记录数
 			int queryCount = 5;
-			// 
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
-			params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY MO.operate_date DESC ");
-			params.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, 0);
-			params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount);
+			
+			String orderClause = " ORDER BY MO.operate_date DESC " + " LIMIT " + 0 + "," + queryCount;
 			//
-			details = MemberOperationDao.getToday(dbCon, staff, params);
+			details = MemberOperationDao.getByCond(staff, extraCond4Today, orderClause);
 			// 当日数据不足查询记录数时, 获取历史数据填充满
 			if(details.size() < 5){
 				params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount - details.size());
-				details.addAll(MemberOperationDao.getHistory(dbCon, staff, params));
+				orderClause = " ORDER BY MO.operate_date DESC " + " LIMIT " + 0 + "," + (queryCount - details.size());
+				details.addAll(MemberOperationDao.getByCond(staff, extraCond4History, orderClause));
 			}
 			jobject.setRoot(details);
 		}catch(BusinessException e){	
@@ -189,7 +195,6 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			List<MemberOperation> chargeDetail = new ArrayList<MemberOperation>();
 			List<MemberOperation> consumeDetail = new ArrayList<MemberOperation>();
 			List<MemberOperation> couponDetail = new ArrayList<MemberOperation>();
-			Map<Object, Object> params = new HashMap<Object, Object>();
 			
 			// 获取餐厅编号
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
@@ -199,57 +204,50 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			int mid = MemberDao.getByWxSerial(dbCon, staff, memberSerial).getId();
 			
 			// 查询条件(核心)
-			String extra = "";
-			extra = " AND MO.member_id = " + mid + " AND MO.operate_type = " + MemberOperation.OperationType.CHARGE.getValue();
+			
+			MemberOperationDao.ExtraCond extraCond4Today = new MemberOperationDao.ExtraCond(DateType.TODAY);
+			MemberOperationDao.ExtraCond extraCond4History = new MemberOperationDao.ExtraCond(DateType.HISTORY);
+			
+			extraCond4Today.setMember(mid);
+			extraCond4History.setMember(mid);
+			
+			extraCond4Today.addOperationType(MemberOperation.OperationType.CHARGE);
+			extraCond4History.addOperationType(MemberOperation.OperationType.CHARGE);
 			
 			// 查询记录数
-			int queryCount = 1;
-			// 
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
-			params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY MO.operate_date DESC ");
-			params.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, 0);
-			params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount);
+			int queryCount = 1;		
+			String orderClause = " ORDER BY MO.operate_date DESC " + " LIMIT " + 0 + "," + queryCount;
+
+			
+			
 			//
-			chargeDetail = MemberOperationDao.getToday(dbCon, staff, params);
+			chargeDetail = MemberOperationDao.getByCond(staff, extraCond4Today, orderClause);
 			// 当日数据不足查询记录数时, 获取历史数据填充满
 			if(chargeDetail.size() < 1){
-				params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount - chargeDetail.size());
-				chargeDetail.addAll(MemberOperationDao.getHistory(dbCon, staff, params));
+				chargeDetail.addAll(MemberOperationDao.getByCond(staff, extraCond4History, orderClause));
 			}
 			
 			
 			//查询消费记录
+			extraCond4Today.clearOperationType().addOperationType(MemberOperation.OperationType.CONSUME);
+			extraCond4History.clearOperationType().addOperationType(MemberOperation.OperationType.CONSUME);
 			
-			extra = " AND MO.member_id = " + mid + " AND MO.operate_type = " + MemberOperation.OperationType.CONSUME.getValue();
-			// 
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
-			params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY MO.operate_date DESC ");
-			params.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, 0);
-			params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount);
-			//
-			consumeDetail = MemberOperationDao.getToday(dbCon, staff, params);
+			consumeDetail = MemberOperationDao.getByCond(staff, extraCond4Today, orderClause);
 			// 当日数据不足查询记录数时, 获取历史数据填充满
 			if(consumeDetail.size() < 1){
-				params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount - consumeDetail.size());
-				consumeDetail.addAll(MemberOperationDao.getHistory(dbCon, staff, params));
+				consumeDetail.addAll(MemberOperationDao.getByCond(staff, extraCond4History, orderClause));
 			}
 			
 			//查询优惠劵
 			
-			extra = " AND MO.member_id = " + mid + " AND MO.operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + " AND MO.coupon_id > 0 ";
-			// 
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
-			params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY MO.operate_date DESC ");
-			params.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, 0);
-			params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount);
-			//
-			couponDetail = MemberOperationDao.getToday(dbCon, staff, params);
+			extraCond4Today.setContainsCoupon(true);
+			extraCond4History.setContainsCoupon(true);
+			
+			couponDetail = MemberOperationDao.getByCond(staff, extraCond4Today, orderClause);
 			// 当日数据不足查询记录数时, 获取历史数据填充满
 			if(couponDetail.size() < 1){
-				params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount - couponDetail.size());
-				couponDetail.addAll(MemberOperationDao.getHistory(dbCon, staff, params));
+				couponDetail.addAll(MemberOperationDao.getByCond(staff, extraCond4History, orderClause));
 			}
-			
 			
 			final MemberOperation charge_mo;
 			if(!chargeDetail.isEmpty()){
