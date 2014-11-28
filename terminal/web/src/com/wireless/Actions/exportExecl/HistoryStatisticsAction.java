@@ -1641,66 +1641,43 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String detailOperate = request.getParameter("detailOperate");
 		//String total = request.getParameter("total");
 		
-		List<MemberOperation> list = null;
-		String extraCond = null, orderClause = null;
-		extraCond = " AND MO.restaurant_id = " + staff.getRestaurantId();
-		
+		final MemberOperationDao.ExtraCond extraCond;
+		if(dataSource.equalsIgnoreCase("today")){
+			extraCond = new MemberOperationDao.ExtraCond(DateType.TODAY);
+		}else{
+			extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
+		}
 		if(memberMobile != null && !memberMobile.trim().isEmpty()){
-			extraCond += (" AND MO.member_mobile like '%" + memberMobile.trim() + "%'");
+			extraCond.setMobile(memberMobile);
 		}
 		if(memberCard != null && !memberCard.trim().isEmpty()){
-			extraCond += (" AND MO.member_card like '%" + memberCard.trim() + "%'");
+			extraCond.setCard(memberCard);
 		}
 		if(memberName != null && !memberName.trim().isEmpty()){
-			extraCond += (" AND MO.member_name like '%" + memberName.trim() + "%'");
+			extraCond.setName(memberName);
 		}
 		if(memberType != null && !memberType.trim().isEmpty()){
-			extraCond += (" AND M.member_type_id = " + memberType);
+			extraCond.setMemberType(Integer.parseInt(memberType));
 		}
 		if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
-			extraCond += (" AND MO.operate_type = " + detailOperate);
+			extraCond.addOperationType(OperationType.valueOf(Integer.parseInt(detailOperate)));
 		}else{
 			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
-				List<OperationType> types = OperationType.typeOf(Integer.parseInt(operateType));
-				String extra = "";
-				for (int i = 0; i < types.size(); i++) {
-					if(i == 0){
-						extra += " MO.operate_type = " + types.get(i).getValue();
-					}else{
-						extra += " OR MO.operate_type = " + types.get(i).getValue();
-					}
+				for(OperationType type : OperationType.typeOf(Integer.parseInt(operateType))){
+					extraCond.addOperationType(type);
 				}
-				if(Integer.parseInt(operateType) == OperationType.POINT_ADJUST.getType()){
-					extra += " OR MO.operate_type = " + OperationType.CONSUME.getValue();
-				}
-				extraCond += " AND(" + extra + ")";
 			}
 		}
-		orderClause = " ORDER BY MO.operate_date ";
 		
-		Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
-		countSet = new HashMap<Object, Object>();
-		if(dataSource.equalsIgnoreCase("today")){
-			countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-			countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-		}else if(dataSource.equalsIgnoreCase("history")){
-			if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
-				extraCond += (" AND MO.operate_date >= '" + onDuty + "'");
-				extraCond += (" AND MO.operate_date <= '" + offDuty + "'");
-			}
-			countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-			countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+		if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
+			extraCond.setOperateDate(new DutyRange(onDuty, offDuty));
 		}
-		paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-		paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
 		
-		if(dataSource.equalsIgnoreCase("today")){
-			list = MemberOperationDao.getToday(staff, paramsSet);
-		}else if(dataSource.equalsIgnoreCase("history")){
-			list = MemberOperationDao.getHistory(staff, paramsSet);
-		}
+		String orderClause = " ORDER BY MO.operate_date ";
+
+		final List<MemberOperation> list = MemberOperationDao.getByCond(staff, extraCond, orderClause);
 		MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
-		if(list != null && !list.isEmpty()){
+		if(!list.isEmpty()){
 			sum.setChargeType(list.get(0).getChargeType());
 			sum.setComment(list.get(0).getComment());
 			sum.setOperationType(list.get(0).getOperationType());
@@ -1894,61 +1871,34 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String offDuty = request.getParameter("offDuty");
 		//String total = request.getParameter("total");
 		
-		List<MemberOperation> list = null;
-		String extraCond = null, orderClause = null;
-		extraCond = " AND MO.restaurant_id = " + staff.getRestaurantId();
+		final MemberOperationDao.ExtraCond extraCond;
+		if(dataSource.equalsIgnoreCase("today")){
+			extraCond = new MemberOperationDao.ExtraCond(DateType.TODAY);
+		}else{
+			extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
+		}
 		
 		if(memberMobile != null && !memberMobile.trim().isEmpty()){
-			extraCond += (" AND MO.member_mobile like '%" + memberMobile.trim() + "%'");
+			extraCond.setMobile(memberMobile);
 		}
 		if(memberCard != null && !memberCard.trim().isEmpty()){
-			extraCond += (" AND MO.member_card like '%" + memberCard.trim() + "%'");
+			extraCond.setCard(memberCard);
 		}
 		if(memberName != null && !memberName.trim().isEmpty()){
-			extraCond += (" AND MO.member_name like '%" + memberName.trim() + "%'");
+			extraCond.setName(memberName);
 		}
 		if(memberType != null && !memberType.trim().isEmpty()){
-			extraCond += (" AND M.member_type_id = " + memberType);
+			extraCond.setMemberType(Integer.parseInt(memberType));
 		}
 		if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
-			List<OperationType> types = OperationType.typeOf(Integer.parseInt(operateType));
-			String extra = "";
-			for (int i = 0; i < types.size(); i++) {
-				if(i == 0){
-					extra += " MO.operate_type = " + types.get(i).getValue();
-				}else{
-					extra += " OR MO.operate_type = " + types.get(i).getValue();
-				}
+			for(OperationType type : OperationType.typeOf(Integer.parseInt(operateType))){
+				extraCond.addOperationType(type);
 			}
-			if(Integer.parseInt(operateType) == OperationType.POINT_ADJUST.getType()){
-				extra += " OR MO.operate_type = " + OperationType.CONSUME.getValue();
-			}
-			extraCond += " AND(" + extra + ")";
 		}
 		
-		orderClause = " ORDER BY MO.operate_date ";
+		String orderClause = " ORDER BY MO.operate_date ";
+		final List<MemberOperation> list = MemberOperationDao.getByCond(staff, extraCond, orderClause);
 		
-		Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
-		countSet = new HashMap<Object, Object>();
-		if(dataSource.equalsIgnoreCase("today")){
-			countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-			countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-		}else if(dataSource.equalsIgnoreCase("history")){
-			if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
-				extraCond += (" AND MO.operate_date >= '" + onDuty + "'");
-				extraCond += (" AND MO.operate_date <= '" + offDuty + "'");
-			}
-			countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-			countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-		}
-		paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-		paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-		
-		if(dataSource.equalsIgnoreCase("today")){
-			list = MemberOperationDao.getToday(staff, paramsSet);
-		}else if(dataSource.equalsIgnoreCase("history")){
-			list = MemberOperationDao.getHistory(staff, paramsSet);
-		}
 		MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
 		if(list != null && !list.isEmpty()){
 			sum.setChargeType(list.get(0).getChargeType());

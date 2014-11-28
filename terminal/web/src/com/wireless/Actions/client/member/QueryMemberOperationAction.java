@@ -1,8 +1,6 @@
 package com.wireless.Actions.client.member;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,12 +15,13 @@ import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.SQLUtil;
+import com.wireless.util.DateType;
 
 public class QueryMemberOperationAction extends Action{
 
@@ -33,13 +32,11 @@ public class QueryMemberOperationAction extends Action{
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		String isPaging = request.getParameter("isPaging");
-		List<MemberOperation> list = null;
 		try{
 			
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = (String)request.getAttribute("restaurantID");
 			String dataSource = request.getParameter("dataSource");
 			String memberMobile = request.getParameter("memberMobile");
 			String memberCard = request.getParameter("memberCard");
@@ -51,73 +48,48 @@ public class QueryMemberOperationAction extends Action{
 			String offDuty = request.getParameter("offDuty");
 			String total = request.getParameter("total");
 			
-			String extraCond = null, orderClause = null;
-			extraCond = " AND MO.restaurant_id = " + restaurantID;
+			final MemberOperationDao.ExtraCond extraCond;
+			if(dataSource.equalsIgnoreCase("today")){
+				extraCond = new MemberOperationDao.ExtraCond(DateType.TODAY);
+			}else{
+				extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
+			}
+
 			
 			if(memberMobile != null && !memberMobile.trim().isEmpty()){
-				extraCond += (" AND MO.member_mobile like '%" + memberMobile.trim() + "%'");
+				extraCond.setMobile(memberMobile);
 			}
 			if(memberCard != null && !memberCard.trim().isEmpty()){
-				extraCond += (" AND MO.member_card like '%" + memberCard.trim() + "%'");
+				extraCond.setCard(memberCard);
 			}
 			if(memberName != null && !memberName.trim().isEmpty()){
-				extraCond += (" AND MO.member_name like '%" + memberName.trim() + "%'");
+				extraCond.setName(memberName);
 			}
 			if(memberType != null && !memberType.trim().isEmpty()){
-				extraCond += (" AND M.member_type_id = " + memberType);
+				extraCond.setMemberType(Integer.parseInt(memberType));
 			}
 
 			if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
-				extraCond += (" AND MO.operate_type = " + detailOperate);
+				extraCond.addOperationType(OperationType.valueOf(detailOperate));
 			}else{
 				if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
-					List<OperationType> types = OperationType.typeOf(Integer.parseInt(operateType));
-					String extra = "";
-					for (int i = 0; i < types.size(); i++) {
-						if(i == 0){
-							extra += " MO.operate_type = " + types.get(i).getValue();
-						}else{
-							extra += " OR MO.operate_type = " + types.get(i).getValue();
-						}
+					for(OperationType type : OperationType.typeOf(Integer.parseInt(operateType))){
+						extraCond.addOperationType(type);
 					}
-					if(Integer.parseInt(operateType) == OperationType.POINT_ADJUST.getType()){
-						extra += " OR MO.operate_type = " + OperationType.CONSUME.getValue();
-					}
-					extraCond += " AND(" + extra + ")";
 				}
 			}
 			
-			orderClause = " ORDER BY MO.operate_date ";
-			
-			Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
 			if(isPaging != null && isPaging.trim().equals("true")){
-				countSet = new HashMap<Object, Object>();
-				if(dataSource.equalsIgnoreCase("today")){
-					countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-					countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-					jobject.setTotalProperty(MemberOperationDao.getTodayCount(countSet));
-				}else if(dataSource.equalsIgnoreCase("history")){
-					if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
-						extraCond += (" AND MO.operate_date >= '" + onDuty + "'");
-						extraCond += (" AND MO.operate_date <= '" + offDuty + "'");
-					}
-					countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-					countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-					jobject.setTotalProperty(MemberOperationDao.getHistoryCount(countSet));
+				if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
+					extraCond.setOperateDate(new DutyRange(onDuty, offDuty));
 				}
-				paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, start);
-				paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, limit);
-			}
-			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-			
-			if(dataSource.equalsIgnoreCase("today")){
-				list = MemberOperationDao.getToday(staff, paramsSet);
-			}else if(dataSource.equalsIgnoreCase("history")){
-				list = MemberOperationDao.getHistory(staff, paramsSet);
+				jobject.setTotalProperty(MemberOperationDao.getAmountByCond(staff, extraCond));
 			}
 			
-			if(list != null && !list.isEmpty()){
+			String orderClause = " ORDER BY MO.operate_date " + " LIMIT " + start + "," + limit;
+			final List<MemberOperation> list = MemberOperationDao.getByCond(staff, extraCond, orderClause);
+			
+			if(!list.isEmpty()){
 				MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
 				sum.setChargeType(list.get(0).getChargeType());
 				sum.setComment(list.get(0).getComment());
