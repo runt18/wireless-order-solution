@@ -106,10 +106,11 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 				rule = "";
 			}
 			desc.append("\n亲。。。在活动期间内激活会员账号即可参与【" + promotion.getTitle() + "】活动" + (!rule.isEmpty() ? "，" : "") + rule).append("\n");
-			
+			Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
+			List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(MemberDao.getByWxSerial(staff, msg.getFromUserName())).setPromotionType(Promotion.Type.WELCOME).setStatus(Coupon.Status.PUBLISHED), null);			
 			return new Msg4ImageText(msg).addItem(new Data4Item(promotion.getTitle() + "(火热进行中...)", desc.toString(), 
 					 					   								  promotion.hasImage() ? promotion.getImage().getObjectUrl() : "", 
-					 					   								  createUrl(msg, WEIXIN_MEMBER)));
+					 					   								  createUrl(msg, WEIXIN_COUPON) + "&e=" + coupons.get(0).getId()));
 		}
 	}
 	
@@ -151,21 +152,6 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		memberItem.setPicUrl(WEIXIN_MEMBER_ICON);
 		naviItem.addItem(memberItem);
 
-		try{
-			Staff staff = StaffDao.getAdminByRestaurant(restaurant.getId());
-			List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(MemberDao.getByWxSerial(staff, msg.getFromUserName())).setPromotionType(Promotion.Type.WELCOME).setStatus(Coupon.Status.PUBLISHED), null);
-			if(!coupons.isEmpty()){
-				Data4Item welcome = new Data4Item();
-				welcome.setTitle("激活有礼");
-				welcome.setUrl(createUrl(msg, WEIXIN_COUPON) + "&e=" + coupons.get(0).getId());
-				welcome.setPicUrl(WEIXIN_FOOD_ICON);
-				naviItem.addItem(welcome);
-			}
-		}catch(BusinessException | SQLException e){
-			e.printStackTrace();
-		}
-		
-		
 		Data4Item intrcItem = new Data4Item();
 		intrcItem.setTitle("餐厅简介");
 		intrcItem.setUrl(createUrl(msg, WEIXIN_ABOUT));
