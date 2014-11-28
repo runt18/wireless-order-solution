@@ -117,6 +117,12 @@ public class MemberOperationDao {
 			this.containsCoupon = onOff;
 			return this;
 		}
+
+		public ExtraCond clearOperationType(){
+			this.operationTypes.clear();
+			return this;
+		}
+		
 		
 		@Override
 		public String toString(){
