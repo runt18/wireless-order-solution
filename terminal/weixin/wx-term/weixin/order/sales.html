@@ -84,7 +84,7 @@
 
 .hasCoupon{
 	top : -100px;
-	left : 200px;
+	left : 175px;
 	position:relative;
 }
 </style>
@@ -129,6 +129,9 @@ function customerPoint(pType, drawProgress, point){
 
 function getCouponByPid(id){
 	$.post('../../WXQueryCoupon.do', {couponId:id,fid : Util.mp.fid, dataSource:'draw'},function(result){
+		if(typeof result == 'string'){
+			result = eval('(' + result +')');
+		}
 		if(result.success){
 			$('#divHasCoupon').show();
 			$('#div_getCouponBtn').hide();	
@@ -141,7 +144,7 @@ function getCouponByPid(id){
 }
 
 var couponTemplet = '<div class="box">' +
-					'<div class="box_in" ><img src="{couponImg}"><div id="divHasCoupon" style="display:none"><img src="../../images/hasCoupon.png" class="hasCoupon"></div></div>' + 
+					'<div class="box_in" ><img src="{couponImg}"><div id="divHasCoupon" style="display:none"><img src="images/hasCoupon.png" class="hasCoupon"></div></div>' + 
 					'<br><span style="margin-top: 15px;">{name}</span><br><span >面额 : {cPrice} 元</span><br><span >到期 : {expiredTime}</span>' +
 					'</div>';
 
