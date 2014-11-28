@@ -17,7 +17,6 @@ import com.wireless.exception.DiscountError;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.MixedPayment;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayBuilder;
@@ -309,26 +308,20 @@ public class PayOrder {
 		//Update the member status if settled by member.
 		if(orderCalculated.isSettledByMember()){
 			
-			MemberOperation mo;
 			
 			if(orderCalculated.isUnpaid()){
 				//Perform the consumption.
-				mo = MemberDao.consume(dbCon, staff, 
+				MemberDao.consume(dbCon, staff, 
 									   payBuilder.getMemberId(), 
 									   orderCalculated.getActualPrice(), 
 									   payBuilder.hasCoupon() ? CouponDao.getById(dbCon, staff, payBuilder.getCouponId()) : null,
 									   orderCalculated.getPaymentType(),
 									   orderCalculated.getId());
-				orderCalculated.setMemberOperationId(mo.getId());
 
 			}else{
 				throw new BusinessException("Repaid to member is NOT supported.");
 			}
 			
-			sql = " UPDATE " + Params.dbName + ".order SET " +
-				  " member_operation_id = " + mo.getId() +
-				  " WHERE id = " + orderCalculated.getId();
-			dbCon.stmt.executeUpdate(sql);
 		}
 			
 		

@@ -494,9 +494,6 @@ public class OrderDao {
 			payType.setName(dbCon.rs.getString("pay_type_name"));
 			order.setPaymentType(payType);
 			order.setSettleType(dbCon.rs.getShort("settle_type"));
-			if(order.isSettledByMember()){
-				order.setMemberOperationId(dbCon.rs.getInt("member_operation_id"));
-			}
 			order.setStatus(dbCon.rs.getInt("status"));
 			order.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			order.setComment(dbCon.rs.getString("comment"));
@@ -1025,7 +1022,7 @@ public class OrderDao {
 		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
 				"`discount_staff`, `discount_staff_id`, `discount_date`," +
 				"`cancel_price`, `discount_price`, `gift_price`, `coupon_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
-				"`waiter`, `settle_type`, `pay_type_id`, `category`, `member_operation_id`, `staff_id`, " +
+				"`waiter`, `settle_type`, `pay_type_id`, `category`, `staff_id`, " +
 				"`region_id`, `region_name`, `table_alias`, `table_name`, `service_rate`, `comment`";
 		
 		String sql;

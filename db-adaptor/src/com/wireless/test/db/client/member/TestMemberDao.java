@@ -28,6 +28,7 @@ import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.test.db.TestInit;
+import com.wireless.util.DateType;
 
 public class TestMemberDao {
 	
@@ -263,7 +264,7 @@ public class TestMemberDao {
 		//CalcBillStatisticsDao.calcIncomeByCharge(mStaff, range, DateType.TODAY);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
-		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
 	}
 	
 	private void testConsume(Member expect) throws BusinessException, SQLException{
@@ -275,14 +276,14 @@ public class TestMemberDao {
 		expect.consume(50, null, PayType.MEMBER);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
-		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
 		
 		//使用现金消费
 		mo = MemberDao.consume(mStaff, expect.getId(), 50, null, PayType.CASH, 10);
 		expect.consume(50, null, PayType.CASH);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
-		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
 			
 	}
 	
@@ -291,7 +292,7 @@ public class TestMemberDao {
 		expect.pointConsume(20);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
-		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
 	}
 	
 	private void testAdjustPoint(Member expect) throws SQLException, BusinessException{
@@ -299,7 +300,7 @@ public class TestMemberDao {
 		expect.adjustPoint(10, AdjustType.INCREASE);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
-		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
 	}
 	
 	private void testAdjustBalance(Member expect) throws SQLException, BusinessException{
@@ -307,7 +308,7 @@ public class TestMemberDao {
 		expect.adjustBalance(10);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
-		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
 	}
 	
 	@Test

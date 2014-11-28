@@ -38,6 +38,7 @@ import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sms.msg.Msg;
 
+@SuppressWarnings("restriction")
 public final class SMS {
 	
 	private final static String API_KEY = "api:1f93e050d9f9dcb083c4c2782074d67b";
@@ -162,7 +163,7 @@ public final class SMS {
         DefaultHttpClient client = new DefaultHttpClient();
 
         client.addRequestInterceptor(new HttpRequestInterceptor() {
-            @Override
+			@Override
             public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
                 request.addHeader("Accept-Encoding", "gzip");
                 request.addHeader("Authorization", "Basic " + new BASE64Encoder().encode(API_KEY.getBytes("utf-8")));
