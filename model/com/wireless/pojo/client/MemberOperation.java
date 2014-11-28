@@ -16,9 +16,12 @@ public class MemberOperation implements Jsonable {
 	 * @author WuZY
 	 */
 	public static enum OperationType {
-		CHARGE(2, 1, "充值", "CZ"), CONSUME(1, 2, "消费", "XF"), POINT_CONSUME(3,
-				3, "积分消费", "JFXF"), POINT_ADJUST(3, 4, "积分调整", "JFTZ"), BALANCE_ADJUST(
-				4, 5, "金额调整", "CZTZ"), REFUND(2, 6, "取款", "QK");
+		CHARGE(2, 1, "充值", "CZ"),
+		CONSUME(1, 2, "消费", "XF"), 
+		POINT_CONSUME(3, 3, "积分消费", "JFXF"), 
+		POINT_ADJUST(3, 4, "积分调整", "JFTZ"),
+		BALANCE_ADJUST(4, 5, "金额调整", "CZTZ"), 
+		REFUND(2, 6, "取款", "QK");
 
 		private final int type;
 		private final int value; //
