@@ -129,54 +129,6 @@ function bindMember(c){
 		return;
 	}
 	
-	//确认绑定后跳到页眉
-/*	$('html, body').animate({scrollTop: 0}, 'fast',function(){
-		if(!c.bind){
-			//防止两次绑定
-			c.bind = true;
-			c.event = typeof c.event == 'undefined' ? document.getElementById('btnBindMember') : c.event;
-			setBtnDisabled(true);
-			$.ajax({
-				url : '../../WXOperateMember.do',
-				type : 'post',
-				data : {
-					dataSource : 'bind',
-					oid : Util.mp.oid,
-					fid : Util.mp.fid,
-					codeId : verifyCode.id,
-					code : code.val().trim(),
-					mobile : mobile.val().trim()
-				},
-				dataType : 'json',
-				success : function(data, status, xhr){
-					if(data.success){
-						if(haveWelcomePageId){
-							$.post('../../QueryCoupon.do',{dataSource : 'byCondtion', fid : Util.mp.fid, oid : Util.mp.oid, pId : haveWelcomePageId},function(jr){
-									if(jr.success && jr.root.length > 0){
-										Util.skip('sales.html', jr.root[0].couponId);
-									}else{
-										window.location.reload();
-									}
-							});
-							
-						}else{
-							window.location.reload();
-						}
-						
-					}else{
-						Util.dialog.show({title: data.title, msg: data.msg});
-					}
-					setBtnDisabled(false);
-				},
-				error : function(data, errotType, eeor){
-					setBtnDisabled(false);
-					Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
-				}
-			});		
-		}
-
-	});
-	*/
 	setBtnDisabled(true);
 	$.ajax({
 		url : '../../WXOperateMember.do',
@@ -192,19 +144,6 @@ function bindMember(c){
 		dataType : 'json',
 		success : function(data, status, xhr){
 			if(data.success){
-/*				if(haveWelcomePageId){
-					$.post('../../QueryCoupon.do',{dataSource : 'byCondtion', fid : Util.mp.fid, oid : Util.mp.oid, pId : haveWelcomePageId},function(jr){
-							if(jr.success && jr.root.length > 0){
-								Util.skip('sales.html', jr.root[0].couponId);
-							}else{
-								window.location.reload();
-							}
-					});
-					
-				}else{
-					window.location.reload();
-				}*/
-				
 				window.location.reload();
 				
 			}else{

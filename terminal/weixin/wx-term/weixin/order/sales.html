@@ -128,7 +128,7 @@ function customerPoint(pType, drawProgress, point){
 }
 
 function getCouponByPid(id){
-	$.post('../../OperateCoupon.do', {couponId:id,fid : Util.mp.fid, dataSource:'draw'},function(result){
+	$.post('../../WXQueryCoupon.do', {couponId:id,fid : Util.mp.fid, dataSource:'draw'},function(result){
 		if(result.success){
 			$('#divHasCoupon').show();
 			$('#div_getCouponBtn').hide();	
@@ -163,7 +163,7 @@ $(function(){
 	}
 	
 	$.ajax({
-		url : '../../QueryCoupon.do',
+		url : '../../WXQueryCoupon.do',
 		dataType : 'json',
 		type : 'post',
 		data : params,

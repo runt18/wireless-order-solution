@@ -59,7 +59,11 @@
 		<action path="/WXQueryOrder"
 			type="com.wireless.Actions.weixin.query.WxQueryOrderAction"
 			scope="request" parameter="dataSource">
-		</action>								
+		</action>		
+		<action path="/WXQueryCoupon"
+			type="com.wireless.Actions.weixin.query.WXQueryCouponAction"
+			scope="request" parameter="dataSource">
+		</action>									
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 
