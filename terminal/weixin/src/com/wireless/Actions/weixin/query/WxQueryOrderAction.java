@@ -26,9 +26,6 @@ public class WxQueryOrderAction extends DispatchAction {
 	
 	public ActionForward getByMember(ActionMapping mapping, ActionForm form, 
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");		
-		
 		String oid = request.getParameter("oid");
 		String fid = request.getParameter("fid");
 		DBCon dbCon = null;
@@ -68,9 +65,6 @@ public class WxQueryOrderAction extends DispatchAction {
 	
 	public ActionForward getByOrder(ActionMapping mapping, ActionForm form, 
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");		
-		
 		String tid = request.getParameter("orderId");
 		String pin = (String) request.getAttribute("pin");
 		DBCon dbCon = null;

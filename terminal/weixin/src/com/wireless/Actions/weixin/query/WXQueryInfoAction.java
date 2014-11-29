@@ -33,8 +33,6 @@ public class WXQueryInfoAction extends DispatchAction{
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
@@ -59,8 +57,6 @@ public class WXQueryInfoAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward initData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
 			int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));

@@ -312,9 +312,6 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward hasCouponDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
-		
 		JObject jobject = new JObject();
 //		String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
 		DBCon dbCon = null;
@@ -355,8 +352,6 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 	public ActionForward chart(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");		
 		String webMemberLevelChart = request.getParameter("webMemberLevelChart");
 		JObject jobject = new JObject();
 		List<String> ydata = new ArrayList<String>();

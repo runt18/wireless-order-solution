@@ -32,8 +32,6 @@ public class WXQueryFoodAction extends DispatchAction{
 	public ActionForward isRecommend(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");		
 		JObject jobject = new JObject();
 		try{
 			String fid = request.getParameter("fid");
@@ -73,8 +71,6 @@ public class WXQueryFoodAction extends DispatchAction{
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		List<Food> root = null;
 		

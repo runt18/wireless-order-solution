@@ -29,8 +29,6 @@ import com.wireless.pojo.staffMgr.Staff;
 public class WXQueryDeptAction extends DispatchAction{
 	
 	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		DBCon dbCon = null;
 		try{
@@ -80,8 +78,6 @@ public class WXQueryDeptAction extends DispatchAction{
 	public ActionForward kitchen(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		
 		DBCon dbCon = null;
