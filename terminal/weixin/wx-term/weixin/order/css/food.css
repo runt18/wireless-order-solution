@@ -321,7 +321,8 @@ color:#ff6600;
 	font-size: 13px;
 }
 .d-fsa-mask{
-	height: calc(100% - 230px);
+	/* height: calc(100% - 230px) !important; */
+	height: 60%;
 	background: rgba(0, 0, 0, .5);
 }
 

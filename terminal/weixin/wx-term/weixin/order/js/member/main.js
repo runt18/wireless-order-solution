@@ -571,7 +571,7 @@ function toggleMemberLevel(){
 							yAxisData = chartDatas.data;
 							
 							//动态变化chart高度
-							$('#divMemberLevelChart').height(yAxisData.length * (window.screen.width > 320 ? 70 : 95) + 140);
+							$('#divMemberLevelChart').height(yAxisData.length * (document.body.clientWidth > 330 ? 70 : 95) + 140);
 							
 							var chartMinAndMax;
 							
@@ -627,7 +627,7 @@ function getLevelChartInfo(x,point){
 	}
 	
 	var pointFormat;
-	if(window.screen.width > 320){
+	if(document.body.clientWidth > 330){
 		pointFormat = '<span style="font-size : 14px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
 			+ (temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>'
 			+ (temp.chargeRate > 1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠，充100送'+parseInt((temp.chargeRate*100 - 100))+'元':'')  + '</font>' 
