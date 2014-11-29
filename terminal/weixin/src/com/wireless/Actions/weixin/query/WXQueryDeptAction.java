@@ -92,11 +92,11 @@ public class WXQueryDeptAction extends DispatchAction{
 			
 			List<Kitchen> list = new ArrayList<>(); 
 			
-			String extraCond = " AND FOOD.restaurant_id = " + rid, orderClause = " ORDER BY FOOD.food_alias";
+			String extraCond = " AND FOOD.restaurant_id = " + rid;
 			extraCond += " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
 			extraCond += " AND (FOOD.status & " + Food.RECOMMEND + ") <> 0";
 			extraCond += " AND (FOOD.oss_image_id <> 0) ";
-			List<Food> foods = FoodDao.getPureByCond(extraCond, orderClause);
+			List<Food> foods = FoodDao.getPureByCond(extraCond, null);
 			if(!foods.isEmpty()){
 				Kitchen star = new Kitchen(-10);
 				star.setName("明星菜");
