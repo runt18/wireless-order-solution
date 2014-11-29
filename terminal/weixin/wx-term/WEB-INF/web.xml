@@ -4,6 +4,14 @@
           http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	version="3.0">
 	<display-name>WirelessOrderWeixin</display-name>
+	<filter>
+		  <filter-name>filter</filter-name> 
+		  <filter-class>com.wireless.filter.RequestFilter</filter-class> 
+	</filter>
+	<filter-mapping>
+		  <filter-name>filter</filter-name> 
+		  <url-pattern>*.do</url-pattern> 
+	</filter-mapping>	
 	<servlet>
 		<servlet-name>action</servlet-name>
 		<servlet-class>com.wireless.Actions.init.InitServlet</servlet-class>
@@ -26,7 +34,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>192.168.180.100</param-value>
+			<param-value>127.0.0.1</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -38,7 +46,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
-			<param-value>HelloZ315</param-value>
+			<param-value>root</param-value>
 		</init-param>
 		<!-- Below is the configuration parameters to socket -->
 		<init-param>
