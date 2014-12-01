@@ -39,6 +39,7 @@ public class OperateRestaurantAction extends DispatchAction {
 		String info = request.getParameter("info");
 		String tele1 = request.getParameter("tele1");
 		String tele2 = request.getParameter("tele2");
+		String dianping = request.getParameter("dianping");
 		String address = request.getParameter("address");
 		String recordAlive = request.getParameter("recordAlive");
 		String expireDate = request.getParameter("expireDate");
@@ -51,6 +52,11 @@ public class OperateRestaurantAction extends DispatchAction {
 												.setRestaurantInfo(info)
 												.setTele1(tele1)
 												.setTele2(tele2);
+			
+			if(dianping != null && !dianping.isEmpty()){
+				builder.setDianpingId(Integer.parseInt(dianping));
+			}
+			
 			if(moduleCheckeds != null && !moduleCheckeds.isEmpty() ){
 				String[] modules = moduleCheckeds.split(",");
 				for (String module : modules) {
@@ -81,6 +87,7 @@ public class OperateRestaurantAction extends DispatchAction {
 		String info = request.getParameter("info");
 		String tele1 = request.getParameter("tele1");
 		String tele2 = request.getParameter("tele2");
+		String dianping = request.getParameter("dianping");
 		String address = request.getParameter("address");
 		String recordAlive = request.getParameter("recordAlive");
 		String expireDate = request.getParameter("expireDate");
@@ -96,6 +103,10 @@ public class OperateRestaurantAction extends DispatchAction {
 					.setRecordAlive(RecordAlive.valueOf(Integer.parseInt(recordAlive)))
 					.setExpireDate(DateUtil.parseDate(expireDate))
 					.setRestaurantInfo(info);
+			
+			if(dianping != null && !dianping.isEmpty()){
+				builder.setDianpingId(Integer.parseInt(dianping));
+			}
 			
 			if(pwd != null && !pwd.isEmpty()){
 				builder.setPwd(pwd);
