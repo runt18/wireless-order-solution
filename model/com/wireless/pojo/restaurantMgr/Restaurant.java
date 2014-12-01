@@ -28,6 +28,7 @@ public class Restaurant implements Parcelable, Jsonable{
 		private String tele1;
 		private String tele2;
 		private String address;
+		private int dianpingId;
 		private final List<Module> modules = new ArrayList<Module>();
 		
 		public InsertBuilder(String account, String restaurantName, long expireDate, String pwd){
@@ -67,6 +68,11 @@ public class Restaurant implements Parcelable, Jsonable{
 			return this.pwd;
 		}
 		
+		public InsertBuilder setDianpingId(int dianpingId){
+			this.dianpingId = dianpingId;
+			return this;
+		}
+		
 		public InsertBuilder addModule(Module.Code code){
 			Module module = new Module(code);
 			if(!modules.contains(module)){
@@ -92,6 +98,7 @@ public class Restaurant implements Parcelable, Jsonable{
 		private String tele1;
 		private String tele2;
 		private String address;
+		private int dianpingId;
 		private final List<Module> modules = SortedList.newInstance(); 
 		
 		public UpdateBuilder(int id, String account){
@@ -119,6 +126,15 @@ public class Restaurant implements Parcelable, Jsonable{
 		
 		public boolean isExpireDateChanged(){
 			return this.expireDate != 0;
+		}
+		
+		public UpdateBuilder setDianpingId(int dianpingId){
+			this.dianpingId = dianpingId;
+			return this;
+		}
+		
+		public boolean isDianpingIdChanged(){
+			return this.dianpingId != 0;
 		}
 		
 		public UpdateBuilder setPwd(String pwd){
@@ -279,6 +295,7 @@ public class Restaurant implements Parcelable, Jsonable{
 	private float liveness;
 	private long birthDate;
 	private long expireDate;
+	private int dianpingId;
 	private final List<Module> modules = new ArrayList<Module>();
 	
 	public Restaurant(){
@@ -298,6 +315,7 @@ public class Restaurant implements Parcelable, Jsonable{
 		setTele2(builder.tele2);
 		setAddress(builder.address);
 		setExpireDate(builder.expireDate);
+		setDianpingId(builder.dianpingId);
 		String now = new SimpleDateFormat(DateUtil.Pattern.DATE.getPattern(), Locale.getDefault()).format(new Date());
 		try {
 			setBirthDate(new SimpleDateFormat(DateUtil.Pattern.DATE.getPattern(), Locale.getDefault()).parse(now).getTime());
@@ -308,6 +326,7 @@ public class Restaurant implements Parcelable, Jsonable{
 	private Restaurant(UpdateBuilder builder){
 		setId(builder.id);
 		setAccount(builder.account);
+		setDianpingId(builder.dianpingId);
 		setName(builder.restaurantName);
 		setInfo(builder.restaurantInfo);
 		setRecordAlive(builder.recordAlive.getSeconds());
@@ -351,6 +370,14 @@ public class Restaurant implements Parcelable, Jsonable{
 		if(restaurantName != null){
 			this.restaurantName = restaurantName;
 		}
+	}
+	
+	public int getDianpingId(){
+		return this.dianpingId;
+	}
+	
+	public void setDianpingId(int dianpingId){
+		this.dianpingId = dianpingId;
 	}
 	
 	public String getInfo() {
