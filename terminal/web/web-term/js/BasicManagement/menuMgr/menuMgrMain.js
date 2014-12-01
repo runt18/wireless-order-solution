@@ -1558,6 +1558,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	items : [{
 		 	    		xtype : 'button',
 		 	    		id : 'btnUploadFoodImage',
+		 	    		hidden : true,
 		 	        	text : '上传图片',
 		 	        	handler : function(e){
 		 	        		var check = true;
@@ -1926,7 +1927,13 @@ function basicOperationBasicHandler(c){
 					if(c.hide == true){
 						Ext.getCmp('foodOperationWin').hide();
 					}
-					Ext.example.msg(jr.title, jr.msg);
+					
+					if(foodOperationWin.uploadImage){
+						Ext.example.msg('提示', '图片上传并应用成功');
+					}else{
+						Ext.example.msg(jr.title, jr.msg);
+					}
+					
 					foodName.setValue(foodName.getValue().trim());
 					foodDesc.setValue(foodDesc.getValue().trim());
 					Ext.getCmp('menuMgrGrid').getStore().each(function(record){
@@ -1965,7 +1972,7 @@ function basicOperationBasicHandler(c){
 			}
 			
 			foodOperationWin.foodImage = '';
-			
+			foodOperationWin.uploadImage = false;
 		},
 		failure : function(res, opt) {
 			Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
@@ -2017,8 +2024,6 @@ function uploadFoodImage(c){
 			foodImageUpdateLoaddingMask.hide();
 			var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
 			if(eval(jr.success)){
-				Ext.example.msg(jr.title, jr.msg);
-				
 				if(c.arrt.type == mmObj.operation.img.upload){
 					foodOperationWin.foodImage = jr.root[0].imageId;
 					Ext.getCmp('menuMgrGrid').getStore().each(function(record){
@@ -2032,6 +2037,9 @@ function uploadFoodImage(c){
 				
 				if(typeof(c.arrt) != 'undefined' && typeof(c.arrt.type) != 'undefined' && c.arrt.type == mmObj.operation.img.del)
 					refreshFoodImageMsg();
+				
+				//Ext.example.msg(jr.title, jr.msg);  不提示成功, 直接应用
+				Ext.getCmp('btnAppForOW').handler();
 				
 			}else{
 				Ext.ux.showMsg(jr);
@@ -2081,11 +2089,6 @@ function getImageFile(){
 		inputType : 'file',
 		listeners : {
 			render : function(e){
-/*				if(Ext.isIE){
-					e.el.dom.size = 30;
-				}else{
-					e.el.dom.size = 40;
-				}*/
 				Ext.get('txtImgFile').on('change', function(){
 					try{
 						if(Ext.isIE){
@@ -2129,6 +2132,12 @@ function getImageFile(){
  	        	    				var reader = new FileReader();
  	        	    				reader.onload = function(evt){img.src = evt.target.result;};
  	        	    				reader.readAsDataURL(file.files[0]);
+ 	        	    				
+ 	        	    				//获取图片后, 确认无错误立即上传
+ 	        	    				foodOperationWin.uploadImage = true;
+ 	        	    				Ext.getCmp('btnUploadFoodImage').handler();
+ 	        	    				
+ 	        	    				
  	        	    			}else{
  	        	    				file.value = '';
  	        	    				Ext.example.msg('提示', '操作失败,选择的图片类型不正确,请重新选择!');

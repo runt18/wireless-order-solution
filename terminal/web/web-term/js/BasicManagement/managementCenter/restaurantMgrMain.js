@@ -106,6 +106,7 @@ var restaurantAddWin = new Ext.Window({
 				var tele1 = Ext.getCmp('txtTele1').getValue();
 				var tele2 = Ext.getCmp('txtTele2').getValue();
 				var address = Ext.getCmp('txtAddress').getValue();
+				var dianping = Ext.getCmp('txtDianping').getValue();
 				var recordAlive = '';
 				var info = Ext.getCmp('txtInfo').getValue();
 				
@@ -133,6 +134,7 @@ var restaurantAddWin = new Ext.Window({
 						tele1 : tele1,
 						tele2 : tele2,
 						address : address,
+						dianping : dianping,
 						recordAlive : recordAlive,
 						expireDate : expireDate.getValue().format('Y-m-d'),
 						moduleCheckeds : getChecked(document.getElementsByName('modules')),
@@ -229,6 +231,11 @@ var restaurantAddWin = new Ext.Window({
 			regex : Ext.ux.RegText.tel.reg,
 			regexText : Ext.ux.RegText.tel.error
 				
+		},{
+			xtype : 'numberfield',
+			fieldLabel : '大众点评ID',
+			width : 140,
+			id : 'txtDianping'
 		},{
 			xtype : 'textfield',
 			fieldLabel : '地址',
@@ -332,6 +339,7 @@ var restaurantAddWin = new Ext.Window({
 			
 			Ext.getCmp('txtTele1').setValue('');
 			Ext.getCmp('txtTele2').setValue('');
+			Ext.getCmp('txtDianping').setValue();
 			Ext.getCmp('txtAddress').setValue('');
 			Ext.getCmp('txtInfo').setValue('');
 			Ext.getCmp('rdoRecordAlive').checked = true;
@@ -583,6 +591,7 @@ function optRestaurantHandler(c){
 			Ext.getCmp('txtTele1').setValue(data.tele1);
 			Ext.getCmp('txtTele2').setValue(data.tele2);
 			Ext.getCmp('txtAddress').setValue(data.address);
+			Ext.getCmp('txtDianping').setValue(!data.dianping? "" : data.dianping);
 			Ext.getCmp('dataExpireDate').setValue(data.expireDate);
 			Ext.getCmp('txtInfo').setValue(data.info);
 			Ext.getCmp('txtAccount').focus(true, 100);
@@ -649,6 +658,8 @@ Ext.onReady(function(){
 			name : 'smsRemain'
 		},{
 			name : 'moduleDescs'
+		}, {
+			name : 'dianping'
 		}])
 	});
 	
