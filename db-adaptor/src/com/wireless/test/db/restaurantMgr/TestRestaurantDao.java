@@ -62,7 +62,8 @@ public class TestRestaurantDao {
 															 .setAddress("测试地址")
 															 .setRestaurantInfo("测试信息")
 															 .setTele1("1333333333")
-															 .setTele2("020-85473215");
+															 .setTele2("020-85473215")
+															 .setDianpingId(1002);
 			restaurantId = RestaurantDao.insert(builder);
 			
 			Restaurant expected = builder.build();
@@ -127,6 +128,7 @@ public class TestRestaurantDao {
 														 		   .setAddress("测试地址2")
 														 		   .setTele1("测试号码2")
 														 		   .setTele2("测试号码2")
+														 		   .setDianpingId(1003)
 														 		   .setRecordAlive(RecordAlive.ONE_YEAR)
 														 		   .setExpireDate(new SimpleDateFormat("yyyy-MM-dd").parse("2015-01-01").getTime())
 														 		   .addModule(Module.Code.INVENTORY)
@@ -139,6 +141,9 @@ public class TestRestaurantDao {
 			}
 			if(updateBuilder.isTele1Changed()){
 				expected.setTele1(updateBuilder.build().getTele1());
+			}
+			if(updateBuilder.isDianpingIdChanged()){
+				expected.setDianpingId(updateBuilder.build().getDianpingId());
 			}
 			if(updateBuilder.isRestaurantNameChanged()){
 				expected.setName(updateBuilder.build().getName());
@@ -413,6 +418,7 @@ public class TestRestaurantDao {
 		Assert.assertEquals("restaurant birth date", expected.getBirthDate(), actual.getBirthDate());
 		Assert.assertEquals("restaurant expire date", expected.getExpireDate(), actual.getExpireDate());
 		Assert.assertEquals("restaurant record alive", expected.getRecordAlive(), actual.getRecordAlive());
+		Assert.assertEquals("resturant dianping id", expected.getDianpingId(), actual.getDianpingId());
 		Assert.assertEquals("init modules", expected.getModules(), actual.getModules());
 	}
 }

@@ -185,6 +185,7 @@ public class RestaurantDao {
 			restaurant.setRecordAlive(dbCon.rs.getInt("record_alive"));
 			restaurant.setInfo(dbCon.rs.getString("restaurant_info"));
 			restaurant.setName(dbCon.rs.getString("restaurant_name"));
+			restaurant.setDianpingId(dbCon.rs.getInt("dianping_id"));
 			restaurant.setTele1(dbCon.rs.getString("tele1"));
 			restaurant.setTele2(dbCon.rs.getString("tele2"));
 			restaurant.setAddress(dbCon.rs.getString("address"));
@@ -266,6 +267,7 @@ public class RestaurantDao {
 			  (builder.isAccountChanged() ? " ,account = '" + restaurant.getAccount() + "'" : "") +
 			  (builder.isRestaurantNameChanged() ? " ,restaurant_name = '" + restaurant.getName() + "'" : "") +
 			  (builder.isRestaurantInfoChanged() ? " ,restaurant_info = '" + restaurant.getInfo() + "'" : "") +
+			  (builder.isDianpingIdChanged() ? " ,dianping_id = " + restaurant.getDianpingId() : "") +
 			  (builder.isTele1Changed() ? " ,tele1 = '" + restaurant.getTele1() + "'" : "") +
 			  (builder.isTele2Changed() ? " ,tele2 = '" + restaurant.getTele2() + "'" : "") +
 			  (builder.isAddressChanged() ? " ,address = '" + restaurant.getAddress() + "'" : "") +
@@ -342,7 +344,7 @@ public class RestaurantDao {
 			
 			//Create the new restaurant
 			sql = " INSERT INTO " + Params.dbName + ".restaurant " +
-				  " (account, birth_date, restaurant_name, restaurant_info, tele1, tele2, address, record_alive, expire_date) " +
+				  " (account, birth_date, restaurant_name, restaurant_info, tele1, tele2, address, record_alive, expire_date, dianping_id) " +
 				  " VALUES(" +
 				  "'" + restaurant.getAccount() + "'," +
 				  "'" + DateUtil.format(restaurant.getBirthDate()) + "'," +
@@ -352,7 +354,8 @@ public class RestaurantDao {
 				  "'" + restaurant.getTele2() + "'," +
 				  "'" + restaurant.getAddress() + "'," +
 				  restaurant.getRecordAlive() + "," +
-				  "'" + DateUtil.format(restaurant.getExpireDate()) + "'" +			  
+				  "'" + DateUtil.format(restaurant.getExpireDate()) + "'," +
+				  restaurant.getDianpingId() + 
 				  " ) ";
 			
 			dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -366,9 +369,6 @@ public class RestaurantDao {
 			
 			//Insert the staff
 			Staff staff = initStaff(dbCon, restaurant.getId(), builder.getPwd());
-			
-			//Insert '商品' material category
-			//initMaterialCate(dbCon, restaurant.getId());
 			
 			//Insert the '大牌', '中牌', '例牌' and popular tastes
 			initTastes(dbCon, staff);

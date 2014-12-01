@@ -27,7 +27,7 @@ public class WxOrderDao {
 		private int id;
 		private int code;
 		private int orderId;
-		private WxOrder.Status status;
+		private final List<WxOrder.Status> status = new ArrayList<WxOrder.Status>();
 		private WxOrder.Type type;
 		private String weixinSerial;
 		
@@ -51,8 +51,8 @@ public class WxOrderDao {
 			return this;
 		}
 		
-		public ExtraCond setStatus(WxOrder.Status status){
-			this.status = status;
+		public ExtraCond addStatus(WxOrder.Status status){
+			this.status.add(status);
 			return this;
 		}
 		
@@ -84,8 +84,16 @@ public class WxOrderDao {
 			if(type != null){
 				extraCond.append(" AND type = " + type.getVal());
 			}
-			if(status != null){
-				extraCond.append(" AND status = " + status.getVal());
+			final StringBuilder statusCond = new StringBuilder();
+			for(WxOrder.Status s : status){
+				if(statusCond.length() == 0){
+					statusCond.append(s.getVal());
+				}else{
+					statusCond.append("," + s.getVal());
+				}
+			}
+			if(statusCond.length() != 0){
+				extraCond.append(" AND status IN ( " + statusCond.toString() + ")");
 			}
 			return extraCond.toString();
 		}
@@ -133,7 +141,7 @@ public class WxOrderDao {
 		WxOrder wxOrder = builder.build();
 		
 		//Make the previous inside committed orders invalid.
-		for(WxOrder order : getByCond(dbCon, staff, new ExtraCond().setWeixin(wxOrder.getWeixinSerial()).setType(WxOrder.Type.INSIDE).setStatus(WxOrder.Status.COMMITTED), null)){
+		for(WxOrder order : getByCond(dbCon, staff, new ExtraCond().setWeixin(wxOrder.getWeixinSerial()).setType(WxOrder.Type.INSIDE).addStatus(WxOrder.Status.COMMITTED), null)){
 			try{
 				update(dbCon, staff, new WxOrder.UpdateBuilder(order.getId()).setStatus(WxOrder.Status.INVALID));
 			}catch(BusinessException ignored){
@@ -150,7 +158,7 @@ public class WxOrderDao {
 		String sql;
 		
 		//Generate the operation code.
-		sql = " SELECT IFNULL(MAX(code) + 1, 1) FROM " + Params.dbName + ".weixin_order WHERE restaurant_id = " + staff.getRestaurantId();
+		sql = " SELECT IFNULL(MAX(code) + 1, 100) FROM " + Params.dbName + ".weixin_order WHERE restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		int code = 0;
 		if(dbCon.rs.next()){
@@ -485,6 +493,7 @@ public class WxOrderDao {
 		try{
 			dbCon.connect();
 			int amount = 0;
+			//Delete all the invalid and committed wx order.
 			for(Restaurant restaurant : RestaurantDao.getByCond(null, null)){
 				amount += deleteByCond(dbCon, StaffDao.getAdminByRestaurant(dbCon, restaurant.getId()), null);
 			}

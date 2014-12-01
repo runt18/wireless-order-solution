@@ -406,7 +406,6 @@ public class OrderDao {
 				  " T.minimum_cost, " +
 				  " O.waiter, O.discount_staff, O.discount_date, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
-				  " O.member_operation_id, " +
 				  " O.settle_type, O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
 				  " O.discount_id, DIST.name AS discount_name, " +
 				  " O.price_plan_id, " +

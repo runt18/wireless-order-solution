@@ -25,6 +25,7 @@ public class SweepDB {
 	public static final class Result{
 		private int elapsedTime;					//the elapsed time to sweep db
 		private int totalExpiredOrder;				//the expired amount of order
+		private int totalExpiredWxOrder;			//the expired amount of wx order
 		private int totalExpiredOrderDetail;		//the expired amount of order food
 		private int totalExpiredTG;					//the expired amount of taste group records 
 		private int totalExpiredNormalTG;			//the expired amount of normal taste group records
@@ -42,6 +43,7 @@ public class SweepDB {
 			taskInfo.append("Sweeper task starts on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new java.util.Date())).append(sep);
 			taskInfo.append("info : ").append(totalExpiredOrderDetail).append(" record(s) are deleted from \"order_food_history\" table").append(sep);
 			taskInfo.append("info : ").append(totalExpiredOrder).append(" record(s) are deleted from \"order_history\" table").append(sep);
+			taskInfo.append("info : ").append(totalExpiredWxOrder).append(" record(s) are deleted from \"wx_order\" table").append(sep);
 			taskInfo.append("info : ").append(totalExpiredTG).append(" record(s) are deleted from \"taste_group_history\" table").append(sep);
 			taskInfo.append("info : ").append(totalExpiredNormalTG).append(" record(s) are deleted from \"normal_taste_group_history\" table").append(sep);
 			taskInfo.append("info : ").append(totalExpiredShift).append(" record(s) are deleted from \"shift_history\" table").append(sep);
@@ -82,32 +84,30 @@ public class SweepDB {
 			
 			result.totalExpiredOrder = dbCon.stmt.executeUpdate(sql);
 			
+			// Delete the wx order which has been expired.
+			sql = " DELETE WO FROM " + Params.dbName + ".weixin_order AS WO " +
+				  " LEFT JOIN " + Params.dbName + ".order_history AS OH ON WO.order_id = OH.id " +
+				  " WHERE OH.id IS NULL ";
+			
+			result.totalExpiredWxOrder = dbCon.stmt.executeUpdate(sql);
+			
 			// Delete the history order food which has been expired.
-			sql = " DELETE OFH FROM " + 
-				  Params.dbName + ".order_food_history AS OFH " +
-				  " LEFT JOIN " +
-				  Params.dbName + ".order_history AS OH " +
-				  " ON OFH.order_id = OH.id " +
+			sql = " DELETE OFH FROM " + Params.dbName + ".order_food_history AS OFH " +
+				  " LEFT JOIN " + Params.dbName + ".order_history AS OH ON OFH.order_id = OH.id " +
 				  " WHERE OH.id IS NULL ";
 			
 			result.totalExpiredOrderDetail = dbCon.stmt.executeUpdate(sql);
 			
 			// Delete the history taste group which has been expired.
-			sql = " DELETE TGH FROM " + 
-				  Params.dbName + ".taste_group_history AS TGH " +
-				  " LEFT JOIN " +
-				  Params.dbName + ".order_food_history AS OFH " +
-				  " ON TGH.taste_group_id = OFH.taste_group_id " +
+			sql = " DELETE TGH FROM " + Params.dbName + ".taste_group_history AS TGH " +
+				  " LEFT JOIN " + Params.dbName + ".order_food_history AS OFH ON TGH.taste_group_id = OFH.taste_group_id " +
 				  " WHERE OFH.taste_group_id IS NULL ";
 			
 			result.totalExpiredTG = dbCon.stmt.executeUpdate(sql);
 			
 			// Delete the history normal taste group which has been expired.
-			sql = " DELETE NTGH FROM " + 
-				  Params.dbName + ".normal_taste_group_history AS NTGH " +
-				  " LEFT JOIN " +
-				  Params.dbName + ".taste_group_history AS TGH " +
-				  " ON NTGH.normal_taste_group_id = TGH.normal_taste_group_id " +
+			sql = " DELETE NTGH FROM " + Params.dbName + ".normal_taste_group_history AS NTGH " +
+				  " LEFT JOIN " + Params.dbName + ".taste_group_history AS TGH ON NTGH.normal_taste_group_id = TGH.normal_taste_group_id " +
 				  " WHERE TGH.normal_taste_group_id IS NULL ";
 			result.totalExpiredNormalTG = dbCon.stmt.executeUpdate(sql);
 			
