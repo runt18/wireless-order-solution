@@ -8,6 +8,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,15 +20,58 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.DBCon;
+import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.pojo.restaurantMgr.Restaurant;
+
 public class WXQueryDianpingDataAction extends DispatchAction{
 
 	public ActionForward getAllGroupBuying(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		String data = HttpRequest("http://api.dianping.com/v1/deal/get_deals_by_business_id?appkey=6373481645&sign=0A9ED601541CD4BB86D18BF4B685FCF7FB230B02&business_id=6177898&city=%E4%B8%8A%E6%B5%B7");
-		response.getWriter().print(data);
+		String fid = request.getParameter("fid");
+		DBCon dbCon = null;
 		
-		
+		try {
+			dbCon = new DBCon();
+			dbCon.connect();
+			Restaurant restaurant = RestaurantDao.getById(dbCon, WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid));
+
+	    	String appkey = "6373481645";  
+	    	String secret = "21dcd218a828460bbea7d1977d7140a8";  
+//	    	String apiUrl = "http://api.dianping.com/v1/deal/get_deals_by_business_id";  
+	    	  
+	    	// 创建参数表  
+	    	Map<String, String> paramMap = new HashMap<String, String>();  
+	    	paramMap.put("city", "广州");  
+	    	paramMap.put("business_id",restaurant.getDianpingId()+"");
+	    	  
+	    	// 对参数名进行字典排序  
+	    	String[] keyArray = paramMap.keySet().toArray(new String[0]);  
+	    	Arrays.sort(keyArray);  
+	    	  
+	    	// 拼接有序的参数名-值串  
+	    	StringBuilder stringBuilder = new StringBuilder();  
+	    	stringBuilder.append(appkey);  
+	    	for (String key : keyArray)  
+	    	{  
+	    	    stringBuilder.append(key).append(paramMap.get(key));  
+	    	}  
+	    	  
+	    	stringBuilder.append(secret);  
+	    	String codes = stringBuilder.toString();  
+	    	String sign = org.apache.commons.codec.digest.DigestUtils.shaHex(codes).toUpperCase();
+	    	
+			String data = HttpRequest("http://api.dianping.com/v1/deal/get_deals_by_business_id?appkey=6373481645&sign="+sign+"&business_id=" + restaurant.getDianpingId() +"&city=%E5%B9%BF%E5%B7%9E");
+			
+//			System.out.println(JSON.parseObject(data).getString("status"));
+			response.getWriter().print(data);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			dbCon.disconnect();
+		}
 		return null;
 	}
 	

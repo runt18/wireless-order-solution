@@ -1,9 +1,20 @@
 package com.wireless.Actions.weixin;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.marker.weixin.DefaultSession;
 import org.marker.weixin.HandleMessageAdapter;
@@ -14,6 +25,7 @@ import org.marker.weixin.msg.Msg4Event.Event;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 
+import com.alibaba.fastjson.JSON;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.PromotionDao;
@@ -47,13 +59,13 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	private final String WEIXIN_FOOD_ICON;
 	private final String WEIXIN_RFOOD_ICON;
 	private final String WEIXIN_ABOUT_ICON;
-	private final String WEIXIN_MEMBER_ICON;
 	private final String WEIXIN_DIANPING_ICON;
 	
 	public final static String NAVI_EVENT_KEY = "navi_event_key";
 	public final static String PROMOTION_EVENT_KEY = "promotion_event_key";
 	public final static String MEMBER_EVENT_KEY = "member_event_key";
 	public final static String ORDER_EVENT_KEY = "order_event_key";
+	public final static String ZHUAN_EVENT_KEY = "zhuan_event_key";
 	
 	private final DefaultSession session;
 	private final String account;
@@ -73,7 +85,6 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
 		this.WEIXIN_RFOOD_ICON = root + "/weixin/order/images/icon_rfood.png";
 		this.WEIXIN_ABOUT_ICON = root + "/weixin/order/images/icon_about.png";
-		this.WEIXIN_MEMBER_ICON = root + "/weixin/order/images/icon_member.png";
 		this.WEIXIN_DIANPING_ICON = root + "/weixin/order/images/dianping.png";
 	}
 	
@@ -151,7 +162,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		naviItem.addItem(specialFoodItem);
 		
 		
-		if(restaurant.getDianpingId() > 0){
+		if(restaurant.getDianpingId() > 0 && hasDianping(restaurant.getDianpingId())){
 			Data4Item dianpingItem = new Data4Item();
 			dianpingItem.setTitle("大众点评");
 			dianpingItem.setUrl(createUrl(msg, WEIXIN_DIANPING));
@@ -369,6 +380,8 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("暂无订单", description, "", "")));
 					}
 					
+				}else if(msg.getEventKey().equals(ZHUAN_EVENT_KEY)){
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("您有一次抽奖机会", "点击开始玩大转盘", "", "http://www.weixinrs.com/wx/xydzp0-5840.html?&wid=5165")));					
 				}
 			}
 			
@@ -376,5 +389,90 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 *获取大众点评数据
+	 */
+	private String HttpRequest(String requestUrl) {
+        StringBuffer sb = new StringBuffer();
+        InputStream ips = getInputStream(requestUrl);
+        InputStreamReader isreader = null;
+        try {
+            isreader = new InputStreamReader(ips, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        BufferedReader bufferedReader = new BufferedReader(isreader);
+        String temp = null;
+        try {
+            while ((temp = bufferedReader.readLine()) != null) {
+                sb.append(temp);
+            }
+            bufferedReader.close();
+            isreader.close();
+            ips.close();
+            ips = null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+	
+    private InputStream getInputStream(String requestUrl) {
+        URL url = null;
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            url = new URL(requestUrl);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoInput(true);
+            conn.setRequestMethod("GET");
+            conn.connect();
+ 
+            in = conn.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return in;
+    }	
+    
+    private boolean hasDianping(int businessId){
+    	String appkey = "6373481645";  
+    	String secret = "21dcd218a828460bbea7d1977d7140a8";  
+//    	String apiUrl = "http://api.dianping.com/v1/deal/get_deals_by_business_id";  
+    	  
+    	// 创建参数表  
+    	Map<String, String> paramMap = new HashMap<String, String>();  
+    	paramMap.put("city", "广州");  
+    	paramMap.put("business_id",businessId+"");
+    	  
+    	// 对参数名进行字典排序  
+    	String[] keyArray = paramMap.keySet().toArray(new String[0]);  
+    	Arrays.sort(keyArray);  
+    	  
+    	// 拼接有序的参数名-值串  
+    	StringBuilder stringBuilder = new StringBuilder();  
+    	stringBuilder.append(appkey);  
+    	for (String key : keyArray)  
+    	{  
+    	    stringBuilder.append(key).append(paramMap.get(key));  
+    	}  
+    	  
+    	stringBuilder.append(secret);  
+    	String codes = stringBuilder.toString();  
+    	String sign = org.apache.commons.codec.digest.DigestUtils.shaHex(codes).toUpperCase();    	
+    	
+		String data = HttpRequest("http://api.dianping.com/v1/deal/get_deals_by_business_id?appkey=6373481645&sign="+sign+"&business_id=" + businessId +"&city=%E5%B9%BF%E5%B7%9E");
+		
+		if(JSON.parseObject(data).getString("status").equals("OK")){
+			return true;
+		}else{
+			return false;
+		}    	
+    }
 	
 }
