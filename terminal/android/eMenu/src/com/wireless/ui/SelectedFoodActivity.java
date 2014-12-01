@@ -557,7 +557,7 @@ public class SelectedFoodActivity extends Activity
 			
 			@Override
 			public void onClick(View v) {
-				new AlertDialog.Builder(SelectedFoodActivity.this).setTitle("请输入退菜数量")
+				new AlertDialog.Builder(SelectedFoodActivity.this).setTitle("请确定呼叫服务员结账")
 				   .setMessage("共点菜" + ShoppingCart.instance().getAllFoods().size() + "个，合计" + ShoppingCart.instance().getTotalPrice() + "元，确定结账？")
 				   .setNeutralButton("确定", new DialogInterface.OnClickListener() {
 					   @Override
@@ -612,103 +612,116 @@ public class SelectedFoodActivity extends Activity
 		//下单按钮 
 		((Button) findViewById(R.id.imageButton_submit_pickedFood)).setOnClickListener(new OnClickListener(){
 			@Override
-			public void onClick(final View v) {				
-				try{
-					ShoppingCart.instance().commit(new OnCommitListener(){
-						
-						private ProgressDialog mProgressDialog;
-						@Override
-						public void onPreCommit(Order reqOrder) {
-							mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this,"", "查询" + reqOrder.getDestTbl().getAliasId() + "号账单信息...请稍候");
-						}
-
-						@Override
-						public void onSuccess(Order reqOrder) {
-							mProgressDialog.dismiss();
-							
-							Toast.makeText(SelectedFoodActivity.this, reqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
-							
-							v.postDelayed(new Runnable(){
-
-								@Override
-								public void run() {
-									onBackPressed();
-								}
-							}, 100);
-						}
-						
-						@Override
-						public void onFail(BusinessException e){
-							if(ShoppingCart.instance().hasOriOrder()){
-
-								if(e.getErrCode().equals(ProtocolError.TABLE_IDLE)){
-									//如果是改单，并且返回是餐台空闲的错误状态，
-									//则提示用户，并清空购物车中的原账单
-									new AlertDialog.Builder(SelectedFoodActivity.this)
-										.setTitle("提示")
-										.setMessage(ShoppingCart.instance().getDestTable().getAliasId() + "号餐台已经结帐，已点菜信息将刷新，新点菜信息将会保留")
-										.setNeutralButton("确定",
-											new DialogInterface.OnClickListener() {
-												@Override
-												public void onClick(DialogInterface dialog,	int which){
-													ShoppingCart.instance().refresh();
-												}
-											})
-										.show();
-
-									
-								}else if(e.getErrCode().equals(FrontBusinessError.ORDER_EXPIRED)){
-									//如果是改单，并且返回是账单过期的错误状态，
-									//则提示用户重新请求账单，再次确认提交
-									new AlertDialog.Builder(SelectedFoodActivity.this)
-										.setTitle("提示")
-										.setMessage(ShoppingCart.instance().getDestTable().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
-										.setNeutralButton("确定",
-											new DialogInterface.OnClickListener() {
-												@Override
-												public void onClick(DialogInterface dialog,	int which){
-													ShoppingCart.instance().refresh();
-												}
-											})
-										.show();
-									
-								}else{
-									new AlertDialog.Builder(SelectedFoodActivity.this)
-										.setTitle("提示")
-										.setMessage(e.getMessage())
-										.setNeutralButton("确定", null)
-										.show();
-								}
-							}else{
-								if(e.getErrCode().equals(ProtocolError.TABLE_BUSY)){
-									//如果是新下单，并且返回是餐台就餐的错误状态，
-									//则提示用户重新请求账单，再次确认提交
-									new AlertDialog.Builder(SelectedFoodActivity.this)
-										.setTitle("提示")
-										.setMessage(ShoppingCart.instance().getDestTable().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
-										.setNeutralButton("确定",
-											new DialogInterface.OnClickListener() {
-												@Override
-												public void onClick(DialogInterface dialog,	int which){
-													ShoppingCart.instance().refresh();
-												}
-											})
-										.show();
-								}else{
-									new AlertDialog.Builder(SelectedFoodActivity.this)
-										.setTitle("提示")
-										.setMessage(e.getMessage())
-										.setNeutralButton("确定", null)
-										.show();
-								}
-							}
-						}						
-					});
-					
-				}catch(BusinessException e){
-					Toast.makeText(SelectedFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+			public void onClick(final View v) {		
+				if(ShoppingCart.instance().getNewFoods().size() == 0){
+					Toast.makeText(SelectedFoodActivity.this, "您还没有点菜", Toast.LENGTH_SHORT).show();
+					return;
 				}
-				
+				new AlertDialog.Builder(SelectedFoodActivity.this).setTitle("请确定下单")
+				   .setMessage("新点菜" + ShoppingCart.instance().getNewFoods().size() + "个，小计" + ShoppingCart.instance().getNewPrice() + "元，确定下单？")
+				   .setNeutralButton("确定", new DialogInterface.OnClickListener() {
+					   @Override
+					   public void onClick(DialogInterface dialog, int whichButton) {
+							try{
+
+								ShoppingCart.instance().commit(new OnCommitListener(){
+									
+									private ProgressDialog mProgressDialog;
+									@Override
+									public void onPreCommit(Order reqOrder) {
+										mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this,"", "查询号账单信息...请稍候");
+									}
+
+									@Override
+									public void onSuccess(Order reqOrder) {
+										mProgressDialog.dismiss();
+										
+										Toast.makeText(SelectedFoodActivity.this, ShoppingCart.instance().getDestTable().getName() + "下单成功", Toast.LENGTH_SHORT).show();
+										
+										v.postDelayed(new Runnable(){
+
+											@Override
+											public void run() {
+												onBackPressed();
+											}
+										}, 100);
+									}
+									
+									@Override
+									public void onFail(BusinessException e){
+										if(ShoppingCart.instance().hasOriOrder()){
+
+											if(e.getErrCode().equals(ProtocolError.TABLE_IDLE)){
+												//如果是改单，并且返回是餐台空闲的错误状态，
+												//则提示用户，并清空购物车中的原账单
+												new AlertDialog.Builder(SelectedFoodActivity.this)
+													.setTitle("提示")
+													.setMessage(ShoppingCart.instance().getDestTable().getName() + "已经结帐，已点菜信息将刷新，新点菜信息将会保留")
+													.setNeutralButton("确定",
+														new DialogInterface.OnClickListener() {
+															@Override
+															public void onClick(DialogInterface dialog,	int which){
+																ShoppingCart.instance().refresh();
+															}
+														})
+													.show();
+
+												
+											}else if(e.getErrCode().equals(FrontBusinessError.ORDER_EXPIRED)){
+												//如果是改单，并且返回是账单过期的错误状态，
+												//则提示用户重新请求账单，再次确认提交
+												new AlertDialog.Builder(SelectedFoodActivity.this)
+													.setTitle("提示")
+													.setMessage(ShoppingCart.instance().getDestTable().getName() + "的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
+													.setNeutralButton("确定",
+														new DialogInterface.OnClickListener() {
+															@Override
+															public void onClick(DialogInterface dialog,	int which){
+																ShoppingCart.instance().refresh();
+															}
+														})
+													.show();
+												
+											}else{
+												new AlertDialog.Builder(SelectedFoodActivity.this)
+													.setTitle("提示")
+													.setMessage(e.getMessage())
+													.setNeutralButton("确定", null)
+													.show();
+											}
+										}else{
+											if(e.getErrCode().equals(ProtocolError.TABLE_BUSY)){
+												//如果是新下单，并且返回是餐台就餐的错误状态，
+												//则提示用户重新请求账单，再次确认提交
+												new AlertDialog.Builder(SelectedFoodActivity.this)
+													.setTitle("提示")
+													.setMessage(ShoppingCart.instance().getDestTable().getName() + "的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
+													.setNeutralButton("确定",
+														new DialogInterface.OnClickListener() {
+															@Override
+															public void onClick(DialogInterface dialog,	int which){
+																ShoppingCart.instance().refresh();
+															}
+														})
+													.show();
+											}else{
+												new AlertDialog.Builder(SelectedFoodActivity.this)
+													.setTitle("提示")
+													.setMessage(e.getMessage())
+													.setNeutralButton("确定", null)
+													.show();
+											}
+										}
+									}						
+								});
+								
+							}catch(BusinessException e){
+								Toast.makeText(SelectedFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+							}
+					   }
+				   })
+				   .setNegativeButton("取消", null)
+				   .show();
 			}
 		});
 		

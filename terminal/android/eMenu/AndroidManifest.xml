@@ -22,11 +22,10 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:screenOrientation="landscape" >
+        android:screenOrientation="sensorLandscape" >
         <activity
             android:name="com.wireless.ui.StartupActivity"
             android:label="@string/app_name"
-            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,41 +37,33 @@
             android:name="com.wireless.ui.MainActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
-            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
             android:name="com.wireless.ui.FullScreenActivity"
-            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateHidden|stateAlwaysHidden" >
         </activity>
         <activity
             android:name="com.wireless.ui.FoodDetailActivity"
-            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
         </activity>
         <activity
             android:name="com.wireless.ui.SelectedFoodActivity"
-            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
             android:name="com.wireless.ui.ComboFoodActivity"
-            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
             android:name="com.wireless.ui.RankListActivity"
-            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Light.NoTitleBar" >
         </activity>
-        <activity
-            android:name="com.wireless.ui.SettingsActivity"
-            android:screenOrientation="landscape" >
+        <activity android:name="com.wireless.ui.SettingsActivity" >
         </activity>
         <activity android:name="com.wireless.ui.ChooseModelActivity" >
         </activity>
