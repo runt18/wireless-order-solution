@@ -22,7 +22,7 @@ function linkToDazhong(id){
 $(function(){
 	Util.lbar('', function(html){ $(document.body).append(html);  });
 	$.ajax({
-		url : '../../WXQueryDaZhongInfo.do',
+		url : '../../WXQueryDianping.do',
 		dataType : 'json',
 		data : {
 			dataSource : 'getAllGroupBuying',
