@@ -562,6 +562,7 @@ public class Restaurant implements Parcelable, Jsonable{
 			jm.putString("info", this.restaurantInfo);
 			jm.putString("tele1", this.tele1);
 			jm.putString("tele2", this.tele2);
+			jm.putInt("dianping", this.dianpingId);
 			jm.putString("address", this.address);
 			jm.putFloat("liveness", this.liveness);
 			jm.putJsonableList("modules", this.modules, 0);
