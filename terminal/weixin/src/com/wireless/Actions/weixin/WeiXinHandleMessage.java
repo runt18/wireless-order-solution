@@ -42,11 +42,13 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	private final String WEIXIN_MEMBER;
 	private final String WEIXIN_COUPON;
 	private final String WEIXIN_ORDER;
+	private final String WEIXIN_DIANPING;
 	
 	private final String WEIXIN_FOOD_ICON;
 	private final String WEIXIN_RFOOD_ICON;
 	private final String WEIXIN_ABOUT_ICON;
 	private final String WEIXIN_MEMBER_ICON;
+	private final String WEIXIN_DIANPING_ICON;
 	
 	public final static String NAVI_EVENT_KEY = "navi_event_key";
 	public final static String PROMOTION_EVENT_KEY = "promotion_event_key";
@@ -66,11 +68,13 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		this.WEIXIN_MEMBER = root + "/weixin/order/member.html";
 		this.WEIXIN_COUPON = root + "/weixin/order/sales.html";
 		this.WEIXIN_ORDER = root + "/weixin/order/orderList.html";
+		this.WEIXIN_DIANPING = root + "/weixin/order/dianping.html";
 		
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
 		this.WEIXIN_RFOOD_ICON = root + "/weixin/order/images/icon_rfood.png";
 		this.WEIXIN_ABOUT_ICON = root + "/weixin/order/images/icon_about.png";
 		this.WEIXIN_MEMBER_ICON = root + "/weixin/order/images/icon_member.png";
+		this.WEIXIN_DIANPING_ICON = root + "/weixin/order/images/dianping.png";
 	}
 	
 	private String createUrl(Msg msg, String url){
@@ -146,11 +150,15 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		specialFoodItem.setPicUrl(WEIXIN_RFOOD_ICON);
 		naviItem.addItem(specialFoodItem);
 		
-		Data4Item memberItem = new Data4Item();
-		memberItem.setTitle("会员资料");
-		memberItem.setUrl(createUrl(msg, WEIXIN_MEMBER));
-		memberItem.setPicUrl(WEIXIN_MEMBER_ICON);
-		naviItem.addItem(memberItem);
+		
+		if(restaurant.getDianpingId() > 0){
+			Data4Item dianpingItem = new Data4Item();
+			dianpingItem.setTitle("大众点评");
+			dianpingItem.setUrl(createUrl(msg, WEIXIN_DIANPING));
+			dianpingItem.setPicUrl(WEIXIN_DIANPING_ICON);
+			naviItem.addItem(dianpingItem);			
+		}
+
 
 		Data4Item intrcItem = new Data4Item();
 		intrcItem.setTitle("餐厅简介");
@@ -349,7 +357,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					
 					Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 					
-					List<WxOrder> orders = WxOrderDao.getByCond(staff, new WxOrderDao.ExtraCond().setWeixin(msg.getFromUserName()).setStatus(WxOrder.Status.COMMITTED), " ORDER BY birth_date DESC");
+					List<WxOrder> orders = WxOrderDao.getByCond(staff, new WxOrderDao.ExtraCond().setWeixin(msg.getFromUserName()).addStatus(WxOrder.Status.COMMITTED), " ORDER BY birth_date DESC");
 					
 					String title, description = "";
 					
