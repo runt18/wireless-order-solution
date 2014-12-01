@@ -59,7 +59,7 @@ public class ReceiptContent extends ConcreteContent {
 		mTemplate = mTemplate.replace(PVar.PRINT_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()));
 		
 		//replace the "$(pay_manner)"
-		mTemplate = mTemplate.replace(PVar.PAY_MANNER, "(" + mOrder.getPaymentType().getName() + ")");
+		mTemplate = mTemplate.replace(PVar.PAY_MANNER, "(" + mOrder.getPaymentType().getName() + ")" + (mOrder.hasWxOrder() ? "(Î¢ÐÅÏÂµ¥)" : ""));
 		
 		//replace the "$(order_cate)"
 		mTemplate = mTemplate.replace(PVar.ORDER_CATE, "");

@@ -69,6 +69,7 @@ import com.wireless.sccon.ServerConnector;
 import com.wireless.sms.SMS;
 import com.wireless.sms.msg.Msg4Consume;
 import com.wireless.sms.msg.Msg4Upgrade;
+import com.wireless.util.DateType;
 /**
  * @author yzhang
  *
@@ -516,7 +517,7 @@ class OrderHandler implements Runnable{
 							Msg4Upgrade msg4Upgrade = MemberLevelDao.upgrade(staff, payBuilder.getMemberId());
 
 							if(payBuilder.isSendSMS()){
-								MemberOperation mo = MemberOperationDao.getTodayById(staff, order.getMemberOperationId());
+								MemberOperation mo = MemberOperationDao.getByOrder(staff, order.getId());
 								//Send SMS if perform member consumption
 								SMS.send(staff, mo.getMemberMobile(), new Msg4Consume(mo));
 								//Send SMS if member upgrade
@@ -541,7 +542,7 @@ class OrderHandler implements Runnable{
 				printHandler.addContent(JobContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, 
 																								staff, 
 																								printers,
-																								order.getMemberOperationId()));
+																								MemberOperationDao.getByOrder(staff, order.getId())));
 			}
 			
 			printHandler.fireAsync();
@@ -600,7 +601,7 @@ class OrderHandler implements Runnable{
 		}else if(printType.isMember()){
 			int moId = new Parcel(request.body).readInt();
 			new PrintHandler(staff)
-				.addContent(JobContentFactory.instance().createMemberReceiptContent(printType, staff, printers, moId))
+				.addContent(JobContentFactory.instance().createMemberReceiptContent(printType, staff, printers, MemberOperationDao.getById(staff, DateType.TODAY, moId)))
 				.fireAsync();
 		}
 		

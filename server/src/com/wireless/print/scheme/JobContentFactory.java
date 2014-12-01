@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.wireless.db.DBCon;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.PaymentDao;
@@ -324,7 +323,7 @@ public class JobContentFactory {
 		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
 	
-	public Content createMemberReceiptContent(PType printType, Staff staff, List<Printer> printers, int moId) throws BusinessException, SQLException{
+	public Content createMemberReceiptContent(PType printType, Staff staff, List<Printer> printers, MemberOperation mo) throws BusinessException, SQLException{
 		
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
@@ -333,8 +332,6 @@ public class JobContentFactory {
 		for(Printer printer : printers){
 			for(PrintFunc func : printer.getPrintFuncs()){
 				if(func.isTypeMatched(printType) && func.isRegionMatched(regionToCompare)){
-					
-					MemberOperation mo = MemberOperationDao.getTodayById(staff, moId);
 					
 					Member member = MemberDao.getById(staff, mo.getMemberId());
 					//Print the member receipt only if member type belongs to charge.
