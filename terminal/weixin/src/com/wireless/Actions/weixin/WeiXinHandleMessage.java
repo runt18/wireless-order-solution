@@ -85,7 +85,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
 		this.WEIXIN_RFOOD_ICON = root + "/weixin/order/images/icon_rfood.png";
 		this.WEIXIN_ABOUT_ICON = root + "/weixin/order/images/icon_about.png";
-		this.WEIXIN_DIANPING_ICON = root + "/weixin/order/images/dianping.png";
+		this.WEIXIN_DIANPING_ICON = root + "/weixin/order/images/dianping1.png";
 	}
 	
 	private String createUrl(Msg msg, String url){
@@ -164,7 +164,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		
 		if(restaurant.getDianpingId() > 0 && hasDianping(restaurant.getDianpingId())){
 			Data4Item dianpingItem = new Data4Item();
-			dianpingItem.setTitle("大众点评");
+			dianpingItem.setTitle("大众团购");
 			dianpingItem.setUrl(createUrl(msg, WEIXIN_DIANPING));
 			dianpingItem.setPicUrl(WEIXIN_DIANPING_ICON);
 			naviItem.addItem(dianpingItem);			
@@ -468,7 +468,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
     	
 		String data = HttpRequest("http://api.dianping.com/v1/deal/get_deals_by_business_id?appkey=6373481645&sign="+sign+"&business_id=" + businessId +"&city=%E5%B9%BF%E5%B7%9E");
 		
-		if(JSON.parseObject(data).getString("status").equals("OK")){
+		if(JSON.parseObject(data).getString("status").equals("OK") && !JSON.parseObject(data).getString("count").equals("0")){
 			return true;
 		}else{
 			return false;
