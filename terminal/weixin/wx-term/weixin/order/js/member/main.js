@@ -589,9 +589,6 @@ function toggleMemberLevel(){
 								mainView.css('height', 'auto');
 								mainView.append('<div>会员等级建立中...</div>');
 							}
-							
-
-							
 						}else{
 							mainView.css('height', 'auto');
 							mainView.append('<div>会员等级建立中...</div>');
