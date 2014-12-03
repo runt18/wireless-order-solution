@@ -10,18 +10,16 @@ import org.apache.struts.action.ActionMapping;
 import org.marker.weixin.api.QRCode;
 import org.marker.weixin.api.Token;
 
-import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.staffMgr.Staff;
 
 public class FinanceQRCodeAction extends Action {
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
-		Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
-		final String codeUrl = new QRCode().setSceneId(staff.getRestaurantId()).createUrl(Token.newInstance(FinanceWeixinAction.APP_ID, FinanceWeixinAction.APP_SECRET));
+	    String callbackFunName = request.getParameter("callbackparam");
+	    String restaurantId = request.getParameter("restaurantId");
+		final String codeUrl = new QRCode().setSceneId(Integer.parseInt(restaurantId)).createUrl(Token.newInstance(FinanceWeixinAction.APP_ID, FinanceWeixinAction.APP_SECRET));
 		JObject jObj = new JObject();
 		jObj.setExtra(new Jsonable(){
 
@@ -37,7 +35,8 @@ public class FinanceQRCodeAction extends Action {
 				
 			}
 		});
-		response.getWriter().print(jObj.toString());
+		response.setContentType("text/plain");
+		response.getWriter().print(callbackFunName + "(" + jObj.toString() + ")");
 		return null;
 	}
 }
