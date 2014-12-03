@@ -60,6 +60,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	private final String WEIXIN_RFOOD_ICON;
 	private final String WEIXIN_ABOUT_ICON;
 	private final String WEIXIN_DIANPING_ICON;
+	private final String WEIXIN_DEFAULT_LOGO;
 	
 	public final static String NAVI_EVENT_KEY = "navi_event_key";
 	public final static String PROMOTION_EVENT_KEY = "promotion_event_key";
@@ -86,6 +87,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		this.WEIXIN_RFOOD_ICON = root + "/weixin/order/images/icon_rfood.png";
 		this.WEIXIN_ABOUT_ICON = root + "/weixin/order/images/icon_about.png";
 		this.WEIXIN_DIANPING_ICON = root + "/weixin/order/images/dianping1.png";
+		this.WEIXIN_DEFAULT_LOGO = "http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxLogo/default.jpg";
 	}
 	
 	private String createUrl(Msg msg, String url){
@@ -141,10 +143,10 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 			if(wr.getWeixinLogo() != null){
 				mainItem = new Data4Item(restaurant.getName(), "", wr.getWeixinLogo().getObjectUrl(), createUrl(msg, WEIXIN_INDEX)); 
 			}else{
-				mainItem = new Data4Item(restaurant != null ? restaurant.getName() : "", "点击查看主页", "", createUrl(msg, WEIXIN_INDEX));
+				mainItem = new Data4Item(restaurant != null ? restaurant.getName() : "", "点击查看主页", WEIXIN_DEFAULT_LOGO, createUrl(msg, WEIXIN_INDEX));
 			}
 		} catch (SQLException | BusinessException e) {
-			mainItem = new Data4Item(restaurant != null ? restaurant.getName() : "", "点击查看主页", "", createUrl(msg, WEIXIN_INDEX));
+			mainItem = new Data4Item(restaurant != null ? restaurant.getName() : "", "点击查看主页", WEIXIN_DEFAULT_LOGO, createUrl(msg, WEIXIN_INDEX));
 		}
 		
 		naviItem.addItem(mainItem);
@@ -377,7 +379,8 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 						description = "点击查看所有订单";
 						session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title, description, "", createUrl(msg, WEIXIN_ORDER))));
 					}else{
-						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("暂无订单", description, "", "")));
+						description = "点击去自助点餐";
+						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("暂无订单", description, "", createUrl(msg, WEIXIN_FOOD))));
 					}
 					
 				}else if(msg.getEventKey().equals(ZHUAN_EVENT_KEY)){
