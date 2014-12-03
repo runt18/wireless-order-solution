@@ -161,8 +161,8 @@ Ext.onReady(function(){
 	});
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
     //Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
-    getOperatorName('../../', function(staff){
-    	restaurantID = staff.restaurantId;
+    getOperatorName('../../', function(staff, restaurant){
+    	restaurantID = restaurant.id;
     });
 	var tree = new Ext.tree.TreePanel({
 		region : 'center',
