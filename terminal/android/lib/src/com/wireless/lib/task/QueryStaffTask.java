@@ -26,15 +26,19 @@ public abstract class QueryStaffTask extends AsyncTask<Void, Void, List<Staff>>{
 	
 	private final Context mContext;
 	
+	private final DeviceUtil.Type mDeviceType;
+	
 	private final boolean mTestFlag;
 	
-	public QueryStaffTask(Context context){
+	public QueryStaffTask(Context context, DeviceUtil.Type deviceType){
 		mContext = context;
+		mDeviceType = deviceType;
 		mTestFlag = false;
 	}
 	
-	public QueryStaffTask(Context context, boolean testFlag){
+	public QueryStaffTask(Context context, DeviceUtil.Type deviceType, boolean testFlag){
 		mContext = context;
+		mDeviceType = deviceType;
 		mTestFlag = testFlag;
 	}
 	
@@ -47,7 +51,7 @@ public abstract class QueryStaffTask extends AsyncTask<Void, Void, List<Staff>>{
 		List<Staff> staffs = new ArrayList<Staff>();
 		try{
 
-			String deviceId = mTestFlag ? "11111111" : DeviceUtil.getDeviceId(mContext);
+			String deviceId = mTestFlag ? "11111111" : DeviceUtil.getDeviceId(mContext, mDeviceType);
 			
 			if(deviceId != null){
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff(new Device(deviceId)));

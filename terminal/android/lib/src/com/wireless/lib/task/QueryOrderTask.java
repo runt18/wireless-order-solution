@@ -44,18 +44,6 @@ public abstract class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 			if(resp.header.type == Type.ACK){
 				order = new Parcel(resp.body).readParcel(Order.CREATOR);
 				
-				//Get the detail to each order food
-//				for(OrderFood eachOrderFood : order.getOrderFoods()){
-					//eachOrderFood.asFood().copyFrom(mFoodMenu.foods.find(eachOrderFood.asFood()));
-					
-//					if(eachOrderFood.hasNormalTaste()){
-//						//Get the normal taste detail to each order food
-//						for(Taste eachNormalTaste : eachOrderFood.getTasteGroup().getNormalTastes()){
-//							eachNormalTaste.copyFrom(mFoodMenu.tastes.get(mFoodMenu.tastes.indexOf(eachNormalTaste)));
-//						}
-//					}
-//				}
-				
 			}else{
 				
 				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
