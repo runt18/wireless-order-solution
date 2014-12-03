@@ -51,6 +51,7 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.ui.dialog.AskTableDialog;
 import com.wireless.ui.dialog.AskTableDialog.OnTableSelectedListener;
 import com.wireless.ui.dialog.AskWxOrderDialog;
+import com.wireless.util.DeviceUtil;
 
 public class MainActivity extends FragmentActivity implements OnTableSelectedListener{
 
@@ -135,7 +136,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		String[] iconDesc = { 
 							 "点菜", "快速点菜", "查看", 
 							 "结账", "快速沽清", "设置", 
-							 "菜谱更新", "注销", "会员" 
+							 "菜谱更新", "注销", "微信点菜" 
 							};
 
 		// 生成动态数组，并且转入数据
@@ -527,7 +528,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		private final boolean _isMenuUpdate;
 		
 		QueryStaffTask(boolean isMenuUpdate){
-			super(MainActivity.this);
+			super(MainActivity.this, DeviceUtil.Type.MOBILE);
 			_isMenuUpdate = isMenuUpdate;
 		}
 		

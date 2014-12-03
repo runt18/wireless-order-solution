@@ -25,6 +25,7 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.util.DeviceUtil;
 
 public class StartupActivity extends Activity {
 
@@ -148,12 +149,12 @@ public class StartupActivity extends Activity {
 		}
 
 		QueryStaffTask(){
-			super(StartupActivity.this);
+			super(StartupActivity.this, DeviceUtil.Type.MOBILE);
 			mTestFlag = false;
 		}
 		
 		public QueryStaffTask(boolean testFlag){
-			super(StartupActivity.this, testFlag);
+			super(StartupActivity.this, DeviceUtil.Type.MOBILE, testFlag);
 			mTestFlag = testFlag;
 		}
 		

@@ -257,6 +257,12 @@ public class PickFoodFragment extends Fragment{
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("Ёф");
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.green));
+				
+			}else if(food.isSpecial()){
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("ль");
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.green));
+				
 			}else{
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
 			}

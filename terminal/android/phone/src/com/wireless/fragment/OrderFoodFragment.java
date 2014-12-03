@@ -230,7 +230,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				
 				List<Map<String, ?>> pickedFoodDatas = new ArrayList<Map<String, ?>>();
 				for(OrderFood of : ofFgm.mOriOrder.getOrderFoods(comp)){
-					if(of.getCount() != 0f){
+					if(of.getCount() > 0f){
 						Map<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, of.getName());
@@ -995,19 +995,27 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	}
 	
 	public boolean hasOrderFood(){
-		if(mOriOrder != null){
-			for(OrderFood of : mOriOrder.getOrderFoods()){
-				if(of.getCount() > 0){
-					return true;
-				}
-			}
+//		if(mOriOrder != null){
+//			for(OrderFood of : mOriOrder.getOrderFoods()){
+//				if(of.getCount() > 0){
+//					return true;
+//				}
+//			}
+//		}
+//
+//		for(OrderFood of : mNewFoodList){
+//			if(of.getCount() > 0){
+//				return true;
+//			}
+//		}
+		
+		if(mOriOrder != null && !mOriOrder.getOrderFoods().isEmpty()){
+			return true;
+		}else if(!mNewFoodList.isEmpty()){
+			return true;
+		}else{
+			return false;
 		}
-		for(OrderFood of : mNewFoodList){
-			if(of.getCount() > 0){
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	public boolean hasOriginalOrder(){

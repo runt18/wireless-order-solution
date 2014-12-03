@@ -133,7 +133,7 @@ public class NetworkSettingFragment extends Fragment {
 		});
 		
 		//œ‘ æ…Ë±∏±‡∫≈
-		_deviceIdEdtTxt.setText(DeviceUtil.getDeviceId(getActivity()));
+		_deviceIdEdtTxt.setText(DeviceUtil.getDeviceId(getActivity(), DeviceUtil.Type.MOBILE));
 		
 		TextView title = (TextView) view.findViewById(R.id.toptitle);
 		title.setVisibility(View.VISIBLE);
