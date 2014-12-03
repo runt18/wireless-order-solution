@@ -106,6 +106,8 @@ public class OperateRestaurantAction extends DispatchAction {
 			
 			if(dianping != null && !dianping.isEmpty()){
 				builder.setDianpingId(Integer.parseInt(dianping));
+			}else{
+				builder.setDianpingId(0);
 			}
 			
 			if(pwd != null && !pwd.isEmpty()){
