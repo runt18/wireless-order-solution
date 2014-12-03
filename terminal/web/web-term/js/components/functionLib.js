@@ -263,7 +263,7 @@ function getOperatorName(actionPath, callback) {
 					document.getElementById("restaurantName").innerHTML = jr.other.restaurant.name;
 					
 					if(typeof callback == 'function'){
-						callback(jr.other.staff);
+						callback(jr.other.staff, jr.other.restaurant);
 					}
 				}
 			}else{

@@ -1181,18 +1181,29 @@ function warnModule(msg){
 var verifyCodeWin;
 function showWeixinVerifyCode(){
 	$('#weixinVerifyCode').html();
-	Ext.Ajax.request({
-		url : '../../FinanceQRCode.do',
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
+	wx.lm.show();
+	
+	//使用JQuery跨域调用action
+	$.ajax({
+	    type : "get",
+	    async:false,
+	    url : "http://wx.e-tones.net/wx-term/FinanceQRCode.do?restaurantId="+restaurantID,
+	    dataType : "jsonp",
+	    jsonp: "callbackparam",//服务端用于接收callback调用的function名的参数
+	    jsonpCallback:"success_jsonpCallback",//(可选)callback的function名称, 不设置时有默认的名称
+	    success : function(json){
+	    	wx.lm.hide();
+			var jr = json;
 			var img = '<img alt="" src="'+ jr.other.qrcode_url +'" width="480px" height="480px">';
 			$('#weixinVerifyCode').html(img);
-		},
-		fialure : function(res, opt){
-			wx.lm.hide();
-			Ext.ux.showMsg(res.responseText);
-		}
-	});
+			verifyCodeWin.show();
+	    },
+	    error:function(){
+	    	wx.lm.hide();
+	    	Ext.ux.showMsg({title : '提示', msg:'请求超时'});
+	    }
+	});	
+	
 	if(!verifyCodeWin){
 		verifyCodeWin = new Ext.Window({
 			title : '志易云服务验证二维码',
@@ -1207,8 +1218,5 @@ function showWeixinVerifyCode(){
 			})]
 		});		
 	}
-	
-	verifyCodeWin.show();
-	
 }
 
