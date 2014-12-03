@@ -560,9 +560,6 @@ function toggleMemberLevel(){
 						}
 						
 						if(result.success){
-							mainView.prepend('<h3>会员等级列表</h3>');
-							mainView.css('margin-left', '-40%');
-							
 							memberLevelData = result.root;
 							memberLevelData.push(currentMemberLevelData);
 							
@@ -570,20 +567,30 @@ function toggleMemberLevel(){
 					
 							yAxisData = chartDatas.data;
 							
-							//动态变化chart高度
-							$('#divMemberLevelChart').height(yAxisData.length * (document.body.clientWidth > 330 ? 70 : 95) + 140);
-							
-							var chartMinAndMax;
-							
-							if(yAxisData[yAxisData.length-1].x >= currentMemberLevelData.x){
-								chartMinAndMax = yAxisData[yAxisData.length-1].x;
+							if(yAxisData.length > 0){
+								mainView.prepend('<h3>会员等级列表</h3>');
+								mainView.css('margin-left', '-40%');
+								
+								//动态变化chart高度
+								$('#divMemberLevelChart').height(yAxisData.length * (document.body.clientWidth > 330 ? 70 : 95) + 140);
+								
+								var chartMinAndMax;
+								
+								if(yAxisData[yAxisData.length-1].x >= currentMemberLevelData.x){
+									chartMinAndMax = yAxisData[yAxisData.length-1].x;
+								}else{
+									chartMinAndMax = currentMemberLevelData.x;
+								}
+								//添加用户等级位置
+								yAxisData.push(currentMemberLevelData);
+								
+								member_loadMemberTypeChart({minY:-chartMinAndMax * 0.15, maxY:chartMinAndMax * 1.2, series:yAxisData});								
 							}else{
-								chartMinAndMax = currentMemberLevelData.x;
+								mainView.css('height', 'auto');
+								mainView.append('<div>会员等级建立中...</div>');
 							}
-							//添加用户等级位置
-							yAxisData.push(currentMemberLevelData);
 							
-							member_loadMemberTypeChart({minY:-chartMinAndMax * 0.15, maxY:chartMinAndMax * 1.2, series:yAxisData});
+
 							
 						}else{
 							mainView.css('height', 'auto');
