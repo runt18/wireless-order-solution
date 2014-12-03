@@ -1183,6 +1183,21 @@ function showWeixinVerifyCode(){
 	$('#weixinVerifyCode').html();
 	wx.lm.show();
 	
+	if(!verifyCodeWin){
+		verifyCodeWin = new Ext.Window({
+			title : '志易云服务验证二维码',
+			closable : true,
+			resizeble : false,
+			closeAction : 'hide',
+			modal : true,
+			width : 500,
+			height : 500,
+			items : [new Ext.Panel({
+				contentEl : 'weixinVerifyCode'
+			})]
+		});		
+	}
+	
 	//使用JQuery跨域调用action
 	$.ajax({
 	    type : "get",
@@ -1202,21 +1217,6 @@ function showWeixinVerifyCode(){
 	    	wx.lm.hide();
 	    	Ext.ux.showMsg({title : '提示', msg:'请求超时'});
 	    }
-	});	
-	
-	if(!verifyCodeWin){
-		verifyCodeWin = new Ext.Window({
-			title : '志易云服务验证二维码',
-			closable : true,
-			resizeble : false,
-			closeAction : 'hide',
-			modal : true,
-			width : 500,
-			height : 500,
-			items : [new Ext.Panel({
-				contentEl : 'weixinVerifyCode'
-			})]
-		});		
-	}
+	});		
 }
 
