@@ -118,7 +118,7 @@ function changeCouponModel(type){
 		couponName.setValue();
 		price.setValue();	
 	}
-	couponTypeId = type;
+//	couponTypeId = type;
 	couponName.clearInvalid();
 	price.clearInvalid();
 	couponName.focus();
@@ -340,6 +340,8 @@ function operatePromotionData(data){
 	if(promotionType > 1){
 		Ext.getDom('radioSelfCoupon').checked = true; 
 		couponTypeId = data.coupon.id;
+		couponName.setValue(data.coupon.name);
+		price.setValue(data.coupon.price);
 		expiredDate.setValue(data.coupon.expiredFormat);
 		Ext.getCmp('couponTypeBox').setImg(data.coupon.ossImage?data.coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg');
 	}
