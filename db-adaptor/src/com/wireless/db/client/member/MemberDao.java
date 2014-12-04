@@ -24,6 +24,7 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberComment.CommitBuilder;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
+import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.client.WxMember;
 import com.wireless.pojo.dishesOrder.Order;
@@ -36,6 +37,7 @@ import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 
 public class MemberDao {
@@ -1322,6 +1324,109 @@ public class MemberDao {
 		String sql;
 		sql = " DELETE FROM " + Params.dbName + ".interested_member WHERE member_id = " + memberId + " AND " + " staff_id = " + staff.getId();
 		dbCon.stmt.executeUpdate(sql);
+	}
+	
+	/**
+	 * Perform the re-consume operation to a member.
+	 * @param dbCon	
+	 * 			the database connection
+	 * @param staff	
+	 * 			the staff to perform this action
+	 * @param memberId 
+	 * 			the id to member account
+	 * @param consumePrice	
+	 * 			the price to consume
+	 * @param coupon
+	 * 			the coupon to use, null means no coupon
+	 * @param payType
+	 * 			the payment type referred to {@link Order.PayType}
+	 * @param orderId
+	 * 			the associated order id to this consumption
+	 * @return the member operation to the consumption operation
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 * @throws BusinessException
+	 *	 		throws if one of cases below occurred<br>
+	 *			1 - the consume price exceeds total balance to this member account<br>
+	 *			2 - the member account to consume is NOT found.
+	 */
+	public static MemberOperation reConsume(Staff staff, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			MemberOperation mo = reConsume(dbCon, staff, memberId, consumePrice, payType, orderId);
+			dbCon.conn.commit();
+			return mo;
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform the re-consume operation to a member.
+	 * @param dbCon	
+	 * 			the database connection
+	 * @param staff	
+	 * 			the staff to perform this action
+	 * @param memberId 
+	 * 			the id to member account
+	 * @param consumePrice	
+	 * 			the price to consume
+	 * @param coupon
+	 * 			the coupon to use, null means no coupon
+	 * @param payType
+	 * 			the payment type referred to {@link Order.PayType}
+	 * @param orderId
+	 * 			the associated order id to this consumption
+	 * @return the member operation to the consumption operation
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 * @throws BusinessException
+	 *	 		throws if one of cases below occurred<br>
+	 *			1 - the consume price exceeds total balance to this member account<br>
+	 *			2 - the member account to consume is NOT found.
+	 */
+	public static MemberOperation reConsume(DBCon dbCon, Staff staff, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
+		List<MemberOperation> mos = MemberOperationDao.getByCond(dbCon, staff, 
+														   		 new MemberOperationDao.ExtraCond(DateType.TODAY)
+																  					   .setOrder(orderId)
+																  					   .addOperationType(OperationType.CONSUME).addOperationType(OperationType.RE_CONSUME),
+																 " ORDER BY id DESC LIMIT 1 ");
+		if(mos.isEmpty()){
+			throw new BusinessException("没有找到相应的消费记录", MemberError.OPERATION_NOT_EXIST);
+		}else{
+			MemberOperation lastConsumption = mos.get(0);
+			
+			Member member = getById(dbCon, staff, memberId);
+			
+			//Perform the consume operation and get the related member operation.
+			MemberOperation mo = member.reConsume(consumePrice, payType, lastConsumption);
+			
+			//Set the associate order id
+			mo.setOrderId(orderId);
+			
+			//Insert the member operation to this consumption operation.
+			MemberOperationDao.insert(dbCon, staff, mo);
+			
+			//Update the base & extra balance and point.
+			String sql = " UPDATE " + Params.dbName + ".member SET" + 
+						 " consumption_amount = " + member.getConsumptionAmount() +
+						 " ,last_consumption = '" + DateUtil.format(System.currentTimeMillis(), DateUtil.Pattern.DATE_TIME) + "'" +
+						 " ,used_balance = " + member.getUsedBalance() +  
+						 " ,base_balance = " + member.getBaseBalance() +  
+						 " ,extra_balance = " + member.getExtraBalance() + 
+						 " ,total_consumption = " + member.getTotalConsumption() + 
+						 " ,total_point = " + member.getTotalPoint() +  
+						 " ,point = " + member.getPoint() +
+						 " WHERE member_id = " + memberId;
+			dbCon.stmt.executeUpdate(sql);
+			
+			return mo;
+		}
 	}
 	
 	/**

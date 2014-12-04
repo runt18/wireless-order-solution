@@ -271,20 +271,35 @@ public class TestMemberDao {
 		MemberDao.charge(mStaff, expect.getId(), 100, 120, ChargeType.CASH);
 		expect.charge(100, 120, ChargeType.CASH);
 		
+		final int orderId = 10;
+		
 		//使用会员卡余额消费
-		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, null, PayType.MEMBER, 10);
+		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, null, PayType.MEMBER, orderId);
 		expect.consume(50, null, PayType.MEMBER);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
 		
 		//使用现金消费
-		mo = MemberDao.consume(mStaff, expect.getId(), 50, null, PayType.CASH, 10);
+		mo = MemberDao.consume(mStaff, expect.getId(), 50, null, PayType.CASH, orderId);
 		expect.consume(50, null, PayType.CASH);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
-			
+		
+		//使用会员卡余额反结账
+		expect.reConsume(50, PayType.MEMBER, mo);
+		mo = MemberDao.reConsume(mStaff, expect.getId(), 50, PayType.MEMBER, orderId);
+		
+		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
+		
+		//使用现金反结账
+		expect.reConsume(50, PayType.CASH, mo);
+		mo = MemberDao.reConsume(mStaff, expect.getId(), 50, PayType.CASH, orderId);
+		
+		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
 	}
 	
 	private void testPointConsume(Member expect) throws SQLException, BusinessException{

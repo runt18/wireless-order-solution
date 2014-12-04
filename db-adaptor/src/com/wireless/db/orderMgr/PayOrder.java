@@ -308,18 +308,16 @@ public class PayOrder {
 		//Update the member status if settled by member.
 		if(orderCalculated.isSettledByMember()){
 			
-			
 			if(orderCalculated.isUnpaid()){
-				//Perform the consumption.
-				MemberDao.consume(dbCon, staff, 
-									   payBuilder.getMemberId(), 
-									   orderCalculated.getActualPrice(), 
-									   payBuilder.hasCoupon() ? CouponDao.getById(dbCon, staff, payBuilder.getCouponId()) : null,
-									   orderCalculated.getPaymentType(),
-									   orderCalculated.getId());
+				//Perform the member consumption.
+				MemberDao.consume(dbCon, staff, payBuilder.getMemberId(), orderCalculated.getActualPrice(), 
+								  payBuilder.hasCoupon() ? CouponDao.getById(dbCon, staff, payBuilder.getCouponId()) : null,
+								  orderCalculated.getPaymentType(),
+								  orderCalculated.getId());
 
 			}else{
-				throw new BusinessException("Repaid to member is NOT supported.");
+				//Perform this member re-consumption.
+				MemberDao.reConsume(dbCon, staff, payBuilder.getMemberId(), orderCalculated.getActualPrice(), orderCalculated.getPaymentType(), orderCalculated.getId());
 			}
 			
 		}

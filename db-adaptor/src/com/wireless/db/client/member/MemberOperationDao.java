@@ -10,6 +10,7 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.MemberError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.client.MOSummary;
 import com.wireless.pojo.client.Member;
@@ -214,9 +215,9 @@ public class MemberOperationDao {
 		      "'" + mo.getOperateSeq() + "'," +
 		      "'" + DateUtil.format(mo.getOperateDate()) + "'," + 
 		      mo.getOperationType().getValue() + "," + 
-		      (mo.getOperationType() == OperationType.CONSUME ? mo.getPayType().getId() : "NULL") + "," +
-		      (mo.getOperationType() == OperationType.CONSUME ? mo.getPayMoney() : "NULL") + "," + 
-		      (mo.getOperationType() == OperationType.CONSUME ? mo.getOrderId() : "NULL") + "," +
+		      (mo.getOperationType() == OperationType.CONSUME || mo.getOperationType() == OperationType.RE_CONSUME ? mo.getPayType().getId() : "NULL") + "," +
+		      (mo.getOperationType() == OperationType.CONSUME || mo.getOperationType() == OperationType.RE_CONSUME ? mo.getPayMoney() : "NULL") + "," + 
+		      (mo.getOperationType() == OperationType.CONSUME || mo.getOperationType() == OperationType.RE_CONSUME ? mo.getOrderId() : "NULL") + "," +
 		      (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : (mo.getOperationType() == OperationType.REFUND ? mo.getChargeType().getValue() : "NULL")) + "," + 
 		      (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeMoney() : (mo.getOperationType() == OperationType.REFUND ? mo.getChargeMoney() : "NULL")) + "," +
 		      mo.getCouponId() + "," +
@@ -329,7 +330,7 @@ public class MemberOperationDao {
 			mo.setOperateSeq(dbCon.rs.getString("operate_seq"));
 			mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			mo.setOperationType(dbCon.rs.getShort("operate_type"));
-			if(mo.getOperationType() == OperationType.CONSUME){
+			if(mo.getOperationType() == OperationType.CONSUME || mo.getOperationType() == OperationType.RE_CONSUME){
 				PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
 				payType.setName(dbCon.rs.getString("pay_type_name"));
 				mo.setPayType(payType);
@@ -424,7 +425,7 @@ public class MemberOperationDao {
 	public static MemberOperation getById(DBCon dbCon, Staff staff, DateType dateType, int id) throws SQLException, BusinessException{
 		List<MemberOperation> result = getByCond(dbCon, staff, new ExtraCond(DateType.TODAY).setId(id), null);
 		if(result.isEmpty()){
-			throw new BusinessException("");
+			throw new BusinessException(MemberError.OPERATION_NOT_EXIST);
 		}else{
 			return result.get(0);
 		}
@@ -447,7 +448,7 @@ public class MemberOperationDao {
 	public static MemberOperation getByOrder(DBCon dbCon, Staff staff, int orderId) throws SQLException, BusinessException{
 		List<MemberOperation> result = getByCond(dbCon, staff, new ExtraCond(DateType.TODAY).setOrder(orderId).addOperationType(OperationType.CONSUME), null);
 		if(result.isEmpty()){
-			throw new BusinessException("");
+			throw new BusinessException(MemberError.OPERATION_NOT_EXIST);
 		}else{
 			return result.get(0);
 		}
