@@ -439,6 +439,37 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	/**
+	 * Perform the re-consumption operation to this member account in case of paid by member.
+	 * 
+	 * @param consumePrice
+	 *            the amount to consume price
+	 * @param payType
+	 * 			  the pay type referred to {@link PayType}
+	 * @param lastConsumption
+	 * 			  the last consumption used to restore the account
+	 * @return the member operation to this consumption
+	 * @throws BusinessException
+	 *             throws if the consume price exceeds total balance to this member account
+	 */
+	public MemberOperation reConsume(float consumePrice, PayType payType, MemberOperation lastConsumption) throws BusinessException{
+
+		//还原结账前的账户状态
+		baseBalance += lastConsumption.getDeltaBaseMoney();
+		extraBalance += lastConsumption.getDeltaExtraMoney();
+		usedBalance -= lastConsumption.getDeltaTotalMoney();
+		consumptionAmount--;
+		totalConsumption -= lastConsumption.getDeltaTotalMoney();
+		point -= lastConsumption.getDeltaPoint();
+		totalPoint -= lastConsumption.getDeltaPoint();
+		
+		//重新执行会员结账
+		MemberOperation mo = consume(consumePrice, null, payType);
+		mo.setOperationType(OperationType.RE_CONSUME);
+		
+		return mo;
+	}
+	
+	/**
 	 * Perform the consumption operation to this member account in case of paid by member.
 	 * 
 	 * @param consumePrice

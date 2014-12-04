@@ -21,7 +21,8 @@ public class MemberOperation implements Jsonable {
 		POINT_CONSUME(3, 3, "积分消费", "JFXF"), 
 		POINT_ADJUST(3, 4, "积分调整", "JFTZ"),
 		BALANCE_ADJUST(4, 5, "金额调整", "CZTZ"), 
-		REFUND(2, 6, "取款", "QK");
+		REFUND(2, 6, "取款", "QK"),
+		RE_CONSUME(3, 7, "反结账", "FJZ");
 
 		private final int type;
 		private final int value; //

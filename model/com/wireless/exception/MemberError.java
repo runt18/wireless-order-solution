@@ -27,21 +27,11 @@ public class MemberError extends ErrorEnum{
 	public static final ErrorCode ADJUST_POINT_FAIL = build(9788, "操作失败, 会员积分调整失败, 请检查数据格式.");
 	public static final ErrorCode CONSUME_POINT_FAIL = build(9787, "操作失败, 会员积分消费失败, 请检查数据格式.");
 	
-	/* memberCard 9700 - 9749 */
-//	public static final ErrorCode CARD_INSERT_FAIL = build(9749, "操作失败, 添加新会员卡信息失败, 请尝试更换其他会员卡.");
-//	public static final ErrorCode CARD_DELETE_FAIL = build(9748, "操作失败, 删除会员卡信息失败, 请检查数据内容正确.");
-//	public static final ErrorCode CARD_UPDATE_FAIL = build(9747, "操作失败, 修改会员卡信息失败, 请检查数据内容正确.");
-//	public static final ErrorCode CARD_UPDATE_STATUS = build(9746, "操作失败, 修改会员卡状态失败.");
-//	public static final ErrorCode CARD_STATUS_IS_ACTIVE = build(9745, "操作失败, 该会员卡已被使用.");
-//	public static final ErrorCode CARD_STATUS_IS_DISABLE = build(9744, "操作失败, 该会员卡已被禁用.");
-//	public static final ErrorCode CARD_STATUS_IS_LOST = build(9743, "操作失败, 该会员卡已被挂失.");
-//	public static final ErrorCode CARD_IS_EQUAL = build(9742, "操作失败, 新旧卡一样, 无需修改.");
-	
 	/* memberOperation 9650 - 9699 */
 	public static final ErrorCode OPERATION_INSERT = build(9699, "操作失败, 添加充值操作日志失败, 请联系客服人员!");
 	public static final ErrorCode OPERATION_DELETE = build(9698, "操作失败, 删除充值操作日志失败, 请联系客服人员!");
 	public static final ErrorCode OPERATION_UPDATE = build(9697, "操作失败, 修改充值操作日志失败, 请联系客服人员!");
-	public static final ErrorCode OPERATION_SEARCH = build(9696, "操作失败, 查询不到对应的操作日志, 请联系客服人员!");
+	public static final ErrorCode OPERATION_NOT_EXIST = build(9696, "操作失败, 查询不到对应的操作日志, 请联系客服人员!");
 	
 	/* memberType 9620 - 9649 */
 	public static final ErrorCode TYPE_INSERT = build(9649, "操作失败, 添加会员类型信息失败, 请检查数据内容是否正确.");
