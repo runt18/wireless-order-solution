@@ -124,7 +124,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 			}
 			desc.append("\n亲。。。在活动期间内激活会员账号即可参与【" + promotion.getTitle() + "】活动" + (!rule.isEmpty() ? "，" : "") + rule).append("\n");
 			Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
-			List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(MemberDao.getByWxSerial(staff, msg.getFromUserName())).setPromotionType(Promotion.Type.WELCOME).setStatus(Coupon.Status.PUBLISHED), null);			
+			List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(MemberDao.getByWxSerial(staff, msg.getFromUserName())).setPromotionType(Promotion.Type.WELCOME), null);			
 			return new Msg4ImageText(msg).addItem(new Data4Item(promotion.getTitle() + "(火热进行中...)", desc.toString(), 
 					 					   								  promotion.hasImage() ? promotion.getImage().getObjectUrl() : "", 
 					 					   								  createUrl(msg, WEIXIN_COUPON) + "&e=" + coupons.get(0).getId()));
