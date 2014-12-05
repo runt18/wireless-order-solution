@@ -215,12 +215,11 @@ function operateFood(c){
 	}
 }
 function displayOrderFoodMsg(c){
-	var sumCount = 0, sumPrice = 0, temp, has = false;
+	var sumPrice = 0, temp, has = false;
 	for(var i = 0; i < params.orderData.length; i++){
-		sumCount += params.orderData[i].count;
 		sumPrice += params.orderData[i].unitPrice * params.orderData[i].count;
 	}
-	Util.getDom('spanSumCountForSC').innerHTML = parseInt(sumCount);
+	Util.getDom('spanSumCountForSC').innerHTML = params.orderData.length;
 	Util.getDom('spanSumPriceForSC').innerHTML = sumPrice.toFixed(2);
 	
 	var display = Util.getDom('spanDisplayFoodCount');
@@ -253,7 +252,7 @@ function displayOrderFoodMsg(c){
 
 function operateShoppingCart(c){
 	var scBox = $('#divShoppingCart'), scMainView = $('#divFoodListForSC');
-	var sumCount = 0, sumCountView = $('#spanSumCountForSC');
+	var sumCountView = $('#spanSumCountForSC');
 	var sumPrice = 0, sumPriceView = $('#spanSumPriceForSC');
 	var html = [], temp;
 	
@@ -270,7 +269,6 @@ function operateShoppingCart(c){
 
 		for(var i = 0; i < params.orderData.length; i++){
 			temp = params.orderData[i];
-			sumCount += temp.count;
 			sumPrice += (temp.unitPrice * temp.count);
 			html.push(Templet.shoppingBox.format({
 				id : temp.id,
@@ -280,21 +278,19 @@ function operateShoppingCart(c){
 			}));
 		}
 		scMainView.html(html.join(''));
-		sumCountView.html(parseInt(sumCount));
+		sumCountView.html(params.orderData.length);
 		sumPriceView.html(sumPrice.toFixed(2));
 		
 		
 		//当菜品列表高过屏幕高度时, 固定列表div的高度
-		if((82 + params.orderData.length * 51) > htmlHeight){
+		if((87 + params.orderData.length * 51) > htmlHeight){
 			scBox.height(htmlHeight);
-			scMainView.height(htmlHeight - 82);
+			scMainView.height(htmlHeight - 87);
 		}else{
 			scMainView.height('auto');
-			scBox.height(82 + params.orderData.length * 51);
+			scBox.height(87 + params.orderData.length * 51);
 			
 		}
-		
-		
 		shopCartInit = true;
 	}else if(c.otype == 'hide'){
 		if(shopCartInit){
@@ -312,6 +308,9 @@ function operateShoppingCart(c){
 			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.', btn : 'yes'});
 			return;
 		}
+		
+		Util.lm.show();
+		
 		var foods = "";
 		for(var i = 0; i < params.orderData.length; i++){
 			temp = params.orderData[i];
@@ -329,6 +328,7 @@ function operateShoppingCart(c){
 				foods : foods
 			},
 			success : function(data, status, xhr){
+				Util.lm.hide();
 				if(data.success){
 					params.orderData = [];
 					operateShoppingCart({otype:'hide'});
@@ -340,6 +340,7 @@ function operateShoppingCart(c){
 				}
 			},
 			error : function(xhr, errorType, error){
+				Util.lm.hide();
 				Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
 			}
 		});
