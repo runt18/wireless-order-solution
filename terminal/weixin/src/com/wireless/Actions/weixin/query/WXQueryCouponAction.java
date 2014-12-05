@@ -14,7 +14,6 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
@@ -82,11 +81,7 @@ public class WXQueryCouponAction extends DispatchAction{
 			
 			List<Coupon> coupons = CouponDao.getByCond(staff, extra, null);
 			if(!coupons.isEmpty()){
-				Coupon coupon = coupons.get(0);
-				if(coupon.getCouponType().getImage() != null){
-					coupon.getCouponType().setImage(OssImageDao.getById(staff, coupon.getCouponType().getImage().getId()));
-				} 
-				list.add(coupon);
+				list.add(CouponDao.getById(staff, coupons.get(0).getId()));
 			}
 			jobject.setRoot(list);
 		}catch(SQLException e){
