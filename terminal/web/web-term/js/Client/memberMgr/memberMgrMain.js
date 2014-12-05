@@ -1855,7 +1855,10 @@ function m_memberTypeWinInit(){
 							return;
 						}
 					}else{
-						pricePlan.clearInvalid();
+						if(pricePlan){
+							pricePlan.clearInvalid();
+						}
+						
 					}
 					
 					var save = Ext.getCmp('btnSaveMemberType');
@@ -1871,7 +1874,7 @@ function m_memberTypeWinInit(){
 							typeID : typeID.getValue(),
 							typeName : typeName.getValue(),
 							discountID : discount.getValue(),
-							pricePlanId : pricePlan.getValue(),
+							pricePlanId : pricePlan?pricePlan.getValue() : '',
 							exchangeRate : exchangeRate.getValue(),
 							initialPoint : initialPoint.getValue(),
 							chargeRate : chargeRate.getValue(),
@@ -1914,7 +1917,6 @@ function m_memberTypeWinInit(){
 					//获得价格方案时, 重新渲染
 					
 					if(document.getElementsByName('memberDiscount').length == 0){
-						console.log(115)
 						for (var i = 0; i < discountData.length; i++) {
 							var c = {items : [{
 								xtype : "checkbox", 
@@ -1940,13 +1942,11 @@ function m_memberTypeWinInit(){
 							}
 							Ext.getCmp('formMemberDiscount').doLayout();
 						}
-						console.log(116)
 						Ext.getCmp('formMemberDiscount').add(defaultMemberTypeDiscount);
 					}
 					
 					if(pricePlanData.length > 0 && document.getElementsByName('memberPricePlan').length == 0){
 						for (var i = 0; i < pricePlanData.length; i++) {
-							console.log(112)
 							var c = {items : [{
 								xtype : "checkbox", 
 								name : "memberPricePlan",
@@ -1969,9 +1969,10 @@ function m_memberTypeWinInit(){
 							if((i+1)%6 == 0){
 								Ext.getCmp('formMemberPricePlan').add({columnWidth : 1});
 							}
-							Ext.getCmp('formMemberPricePlan').doLayout();
 						}
-						Ext.getCmp('formMemberPricePlan').add(defaultMemberTypePricePlan);					
+						Ext.getCmp('formMemberPricePlan').add(defaultMemberTypePricePlan);		
+//						Ext.getCmp('formMemberPricePlan').syncSize();
+						Ext.getCmp('formMemberPricePlan').doLayout();
 					}else{
 						Ext.getCmp('formMemberPricePlan').hide();
 					}						
@@ -2070,7 +2071,9 @@ function bindMemberTypeData(d){
 	chargeRate.clearInvalid();
 	initialPoint.clearInvalid();
 	discount.clearInvalid();
-	pricePlan.clearInvalid();
+	if(pricePlan){
+		pricePlan.clearInvalid();
+	}
 };
 
 function getChecked(checkeds, checkBoxs){
