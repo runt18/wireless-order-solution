@@ -54,10 +54,12 @@ var promotion_uploadMask = new Ext.LoadMask(document.body, {
 	msg : '正在保存活动...'
 });
 var operatePromotion = function(){
-	if(operatePromotTypeWin.oriented == 2 && active_memberList == ''){
+	
+	
+	if(operatePromotTypeWin.oriented == 2 && !active_memberList){
 		Ext.example.msg('提示', '请选择参与活动的会员');
 		return false;
-	}else{
+	}else if(operatePromotTypeWin.oriented == 1){
 		active_memberList = '';
 	}
 	
@@ -91,6 +93,7 @@ var operatePromotion = function(){
 	params.endDate = endDate.getValue().format('Y-m-d');
 	params.point = point.getValue();
 	params.members = active_memberList;
+	
 	params.body = editBody.getValue();	
 	params.entire = entire.body.dom.innerHTML;
 	params.type = $('#chkSetWelcome').is(':checked');
