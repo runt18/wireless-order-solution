@@ -134,7 +134,7 @@ public class Restaurant implements Parcelable, Jsonable{
 		}
 		
 		public boolean isDianpingIdChanged(){
-			return this.dianpingId != 0;
+			return this.dianpingId != -1;
 		}
 		
 		public UpdateBuilder setPwd(String pwd){
