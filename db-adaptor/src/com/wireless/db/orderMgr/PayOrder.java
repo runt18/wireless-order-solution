@@ -320,7 +320,7 @@ public class PayOrder {
 				MemberDao.reConsume(dbCon, staff, payBuilder.getMemberId(), orderCalculated.getActualPrice(), orderCalculated.getPaymentType(), orderCalculated.getId());
 			}
 			
-		}
+		}  
 			
 		
 		return orderCalculated;
