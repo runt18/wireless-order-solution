@@ -357,11 +357,14 @@ function operatePromotionData(data){
 		var gs = Ext.getCmp('active_memberBasicGrid').getStore();
 		gs.on('load', function(store, records, options){
 			active_memberList = '';
-			for (var i = 0; i < records.length; i++) {
-				if(i > 0){
-					active_memberList += ",";
-				}
-				active_memberList += records[i].get('id');
+			//选中全部会员时, 不用传
+			if(operatePromotTypeWin.oriented != 1){
+				for (var i = 0; i < records.length; i++) {
+					if(i > 0){
+						active_memberList += ",";
+					}
+					active_memberList += records[i].get('id');
+				}				
 			}
 		});		
 		gs.loadData({
@@ -1312,8 +1315,8 @@ Ext.onReady(function() {
 					render : function(e){
 						Ext.getDom('rdoSendAllMember').onclick = function(){
 							e.setValue(true);
-							Ext.getCmp('active_member_btnCommonSearch').handler();
 							operatePromotTypeWin.oriented = e.inputValue;
+							Ext.getCmp('active_member_btnCommonSearch').handler();
 						};
 					}
 				}
@@ -1419,6 +1422,7 @@ Ext.onReady(function() {
 	
 	memberBasicGrid.store.on('load', function(store, records, options){
 		active_memberList = '';
+		
 		for (var i = 0; i < records.length; i++) {
 			if(i > 0){
 				active_memberList += ",";
