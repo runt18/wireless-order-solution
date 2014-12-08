@@ -458,7 +458,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		extraBalance += lastConsumption.getDeltaExtraMoney();
 		usedBalance -= lastConsumption.getDeltaTotalMoney();
 		consumptionAmount--;
-		totalConsumption -= lastConsumption.getDeltaTotalMoney();
+		totalConsumption -= lastConsumption.getPayMoney();
 		point -= lastConsumption.getDeltaPoint();
 		totalPoint -= lastConsumption.getDeltaPoint();
 		
