@@ -34,6 +34,7 @@
 	
 	var tableAliasID = Request['tableAliasID'];
 	var orderID = Request['orderID'];
+	var orderType = Request['orderType'];
 	var isRepaid = false, isFree = true, tableCategory = 1,  isGroup = false;
 	
 	var primaryOrderData;
@@ -41,7 +42,7 @@
 	
 	var giftRender = {checkeds : [], id : 0};
 	
-	var reloadData, tableDate, repaid_payType;
+	var reloadData, tableDate, repaid_payType, re_member;
 	
 	function queryOrderDetail(){
 		$.ajax({
@@ -58,19 +59,46 @@
 					isFree = false;
 					
 					if(isRepaid){
-						$.ajax({
-							url : '../../QueryPayType.do',
-							type : 'post',
-							async:false,
-							data : {
-								dataSource : 'exceptMember'
-							},
-							success : function(jr, status, xhr){
-								repaid_payType = jr.root;
-							},
-							error : function(request, status, err){
-							}
-						}); 					
+						if(orderType == 'common'){
+							$.ajax({
+								url : '../../QueryPayType.do',
+								type : 'post',
+								async:false,
+								data : {
+									dataSource : 'exceptMember'
+								},
+								success : function(jr, status, xhr){
+									repaid_payType = jr.root;
+								},
+								error : function(request, status, err){
+								}
+							}); 							
+						}else{
+							//根据order获取member
+							$.ajax({
+								url : '../../QueryMember.do',
+								type : 'post',
+								async:false,
+								data : {
+									dataSource : 'byOrder',
+									orderId : orderID
+								},
+								success : function(jr, status, xhr){
+									re_member = jr.root[0];
+									
+									//积分会员可选付款方式, 充值会员只能用卡
+									if(re_member.memberType['attributeValue'] == 1){//积分
+										repaid_payType = [{"id":1,"name":"现金","typeValue":2},{"id":2,"name":"刷卡","typeValue":2}];
+
+									}else if(re_member.memberType['attributeValue'] == 0){//充值
+										repaid_payType = [{"id":3,"name":"会员卡","typeValue":3}];
+									}
+									
+								},
+								error : function(request, status, err){
+								}
+							});							
+						}
 					}
 				}
 	
