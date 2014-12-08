@@ -9,7 +9,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.MemberError;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
@@ -134,22 +133,6 @@ public class CouponDao {
 
 		Coupon coupon = builder.build();
 
-		//Check to see whether the coupon type exist or expired.
-		coupon.getCouponType().copyFrom(CouponTypeDao.getById(dbCon, staff, coupon.getCouponType().getId()));
-		if(coupon.getCouponType().isExpired()){
-			throw new BusinessException(PromotionError.COUPON_EXPIRED);
-		}
-		
-		//Check to see whether the member exist.
-		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE member_id = " + coupon.getMember().getId();
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			if(dbCon.rs.getInt(1) == 0){
-				throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
-			}
-		}
-		dbCon.rs.close();
-		
 		//Insert a new coupon.
 		sql = " INSERT INTO " + Params.dbName + ".coupon " +
 			  "(`restaurant_id`, `coupon_type_id`, `promotion_id`, `birth_date`, `member_id`, `status`) VALUES(" +
@@ -178,8 +161,15 @@ public class CouponDao {
 	 * @return the amount to coupon assigned to member
 	 * @throws SQLException 
 	 * 			throws if database can NOT be connected
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if any cases below
+	 * 			<li>the coupon type does NOT exist or has been expired
+	 * 			<li>the coupon type has expired
+	 * 			<li>the member does NOT exist 
 	 */
-	public static int create(Staff staff, Coupon.CreateBuilder builder) throws SQLException{
+	public static int create(Staff staff, Coupon.CreateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -198,12 +188,33 @@ public class CouponDao {
 	 * @param builder
 	 * 			the insert all builder
 	 * @return the amount to coupon assigned to member
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if any cases below
+	 * 			<li>the coupon type does NOT exist or has been expired
+	 * 			<li>the coupon type has expired
+	 * 			<li>the member does NOT exist
 	 */
-	public static int create(DBCon dbCon, Staff staff, Coupon.CreateBuilder builder){
+	public static int create(DBCon dbCon, Staff staff, Coupon.CreateBuilder builder) throws SQLException, BusinessException{
+		final Promotion promotion = PromotionDao.getById(dbCon, staff, builder.getPromotionId());
+		if(promotion.getStatus() == Promotion.Status.FINISH){
+			throw new BusinessException("【" + promotion.getTitle() + "】已经结束, 不能创建优惠券", PromotionError.COUPON_CREATE_NOT_ALLOW);
+		}
+		
+		//Check to see whether the coupon type is expired.
+		final CouponType couponType = CouponTypeDao.getById(dbCon, staff, builder.getCouponTypeId());
+		if(couponType.isExpired()){
+			throw new BusinessException(PromotionError.COUPON_EXPIRED);
+		}
 		int amount = 0;
-		for(Coupon.InsertBuilder eachBuilder : builder.build()){
+		for(Member member : builder.getMembers()){
 			try{
-				insert(dbCon, staff, eachBuilder);
+				//Check to see whether the member exist.
+				if(MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setId(member.getId()), null).isEmpty()){
+					continue;
+				}
+				insert(dbCon, staff, new Coupon.InsertBuilder(couponType, member, promotion));
 				amount++;
 			}catch(BusinessException | SQLException e){
 				e.printStackTrace();

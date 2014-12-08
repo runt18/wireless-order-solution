@@ -222,10 +222,11 @@ public class PayOrder {
 				member.checkConsume(orderCalculated.getActualPrice(), 
 									payBuilder.hasCoupon() ? CouponDao.getById(dbCon, staff, payBuilder.getCouponId()) : null, 
 									orderCalculated.getPaymentType());
-			}else{
-				//Check to see whether be able to perform repaid consumption.
-				throw new BusinessException("Repaid to member consumption is NOT supported.");
 			}
+//			else{
+//				//Check to see whether be able to perform repaid consumption.
+//				throw new BusinessException("Repaid to member consumption is NOT supported.");
+//			}
 			
 		}
 		
