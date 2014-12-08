@@ -34,6 +34,7 @@ public class RepaidOrderAction extends Action{
 		PrintWriter out = null;
 		int orderId = Integer.parseInt(request.getParameter("orderId"));
 		String payType_money = request.getParameter("payType_money");
+		String sType = request.getParameter("settleType");
 		try {
 			out = response.getWriter();
 			
@@ -41,19 +42,15 @@ public class RepaidOrderAction extends Action{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.RE_PAYMENT);
 			
-
-			//判断是否会员反结账
-			PayType payType4Pay;
+			//结账类型
+			Order.SettleType settleType = Order.SettleType.valueOf(Integer.parseInt(sType));
 			
-			if(PayType.MEMBER.getId() == Integer.parseInt(request.getParameter("payType"))){
-				payType4Pay = PayType.MEMBER; 
-			}else{
-				payType4Pay = new PayType(Integer.parseInt(request.getParameter("payType")));
-			}
+			//付款类型
+			PayType payType4Pay = new PayType(Integer.parseInt(request.getParameter("payType")));
 			
 			Order.PayBuilder payBuilder;
 			//get the pay manner to this order
-			if(payType4Pay == PayType.MEMBER){
+			if(settleType == Order.SettleType.MEMBER){
 				Member member = MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID")));
 				
 				if(member.getMemberType().getAttribute() == MemberType.Attribute.CHARGE){
@@ -62,7 +59,7 @@ public class RepaidOrderAction extends Action{
 					payBuilder = Order.PayBuilder.build4PointMember(orderId, member,payType4Pay, Integer.parseInt(request.getParameter("discountID")), false);
 				}				
 			}else{
-				payBuilder = Order.PayBuilder.build4Normal(orderId, new PayType(Integer.parseInt(request.getParameter("payType"))));
+				payBuilder = Order.PayBuilder.build4Normal(orderId, payType4Pay);
 			}
 			
 			//get the custom number to this order
