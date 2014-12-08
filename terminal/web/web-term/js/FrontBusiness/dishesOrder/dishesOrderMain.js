@@ -85,26 +85,19 @@ function repaid_initNorthPanel(){
 				}]
 			}, {
 				xtype : 'panel',
-				width : 150,
+				width : 130,
 				id : 'panelShowEraseQuota',
 				style : 'font-size:18px;',
 				html : '上限:￥<font id="fontShowEraseQuota" style="color:red;">0.00</font>'
 			}, {
-				width : 80,
-				labelWidth : 55,
+				width : 100,
+				labelWidth : 40,
 				items : [{
 					xtype : 'label',
 					width : 40,
 					fieldLabel : '服务费',
 					id : 'serviceRate',
 					style : 'font-size:15px;text-align:right;'
-				}]
-			}, {
-				width : 40,
-				items : [{
-					xtype : 'panel',
-					style : 'font-size:15px;',
-					html : '%'
 				}]
 			}, {
 				items : [{
@@ -156,6 +149,15 @@ function repaid_initNorthPanel(){
 						thiz.getStore().loadData(cmb_repaid_payType);
 						thiz.setValue(primaryOrderData.other.order.payTypeValue);
 						
+						//积分会员可选付款方式, 充值会员只能用卡
+						if(re_member){
+							if(re_member.memberType['attributeValue'] == 1){//积分
+								thiz.setDisabled(false);
+
+							}else if(re_member.memberType['attributeValue'] == 0){//充值
+								thiz.setDisabled(true);
+							}
+						}
 					},
 					select : function(thiz){
 						if(thiz.getValue() == 100){
