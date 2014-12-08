@@ -17,6 +17,7 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberDao.ActiveExtraCond;
 import com.wireless.db.client.member.MemberDao.IdleExtraCond;
+import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -25,6 +26,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
@@ -276,6 +278,44 @@ public class QueryMemberAction extends DispatchAction {
 			jobject.setRoot(list);
 			
 			jobject.setExtra(ActiveExtraCond.instance());	
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
+	
+	/**
+	 * 根据order获取member
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward byOrder(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		String pin = (String) request.getAttribute("pin");
+		String orderId = request.getParameter("orderId");
+		
+		try{
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			MemberOperation mo = MemberOperationDao.getByOrder(staff, Integer.parseInt(orderId));
+			Member m = MemberDao.getById(staff, mo.getMemberId());
+			List<Member> list = new ArrayList<Member>();
+			list.add(m);
+			jobject.setRoot(list);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();

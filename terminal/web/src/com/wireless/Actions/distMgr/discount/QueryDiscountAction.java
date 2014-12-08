@@ -15,6 +15,7 @@ import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
@@ -57,18 +58,19 @@ public class QueryDiscountAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward normal(ActionMapping mapping, ActionForm form,
+	public ActionForward getByMemberType(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
-		
+		JObject jobject = new JObject();
+		String memberType = request.getParameter("memberTypeId");
 		try{
-			
+			Staff staff = StaffDao.verify(Integer.parseInt((String) request.getAttribute("pin")));
+			List<Discount> root = DiscountDao.getByMemberType(staff, new MemberType(Integer.parseInt(memberType)));
+			jobject.setRoot(root);
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print("");
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
@@ -85,9 +87,6 @@ public class QueryDiscountAction extends DispatchAction{
 	public ActionForward tree(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
-		
 		DBCon dbCon = new DBCon();
 		StringBuffer tsb = new StringBuffer();
 		try{
