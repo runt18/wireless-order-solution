@@ -18,8 +18,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.printScheme.PrintLossDao;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.print.content.Content;
 
 /**
  * The monitor is designed to wait for the control command to the wireless order socket.<br>
@@ -255,7 +255,7 @@ class MonitorStatus extends Thread{
 				status += "Thread pool statistics: $(working) working,  $(queued) queued,  $(largest) largest,  $(completed) completed" + sep;
 				//status += "Db connection pool status: $(init_pool_size) init,  $(min_pool_size) min,  $(max_pool_size) max,  $(busy_pool_size) busy,  $(idle_pool_size) idle" + sep;
 				status += "Printer status: $(restaurant_printer) restaurant(s),  $(printer_socket) socket(s)" + sep;
-				status += "Print loss status: $(restaurant_loss) restaurant(s),  $(printer_loss) receipt(s)";
+				status += "Print loss status: $(print_loss_status)";
 				
 				//replace the thread pool status
 				status = status.replace("$(core)", Integer.toString(WirelessSocketServer.threadPool.getCorePoolSize()));
@@ -297,18 +297,12 @@ class MonitorStatus extends Thread{
 				//calculate the number of the printer sockets and replace the printer sockets status
 				status = status.replace("$(printer_socket)", Integer.toString(sockAmount));
 				
-				//get the amount of restaurant to print loss and calculate the number of the receipt loss
-				restaurantAmount = 0;
-				int lossAmount = 0;
-				for(Entry<Restaurant, List<Content>> entry : PrinterLosses.instance().stat()){
-					restaurantAmount++;
-					lossAmount += entry.getValue().size();
-				}
-				//replace the amount to restaurant which has print loss
-				status = status.replace("$(restaurant_loss)", Integer.toString(restaurantAmount));
-				
 				//replace the number of receipt to print loss
-				status = status.replace("$(printer_loss)", Integer.toString(lossAmount));
+				try {
+					status = status.replace("$(print_loss_status)", PrintLossDao.stat().toString());
+				} catch (SQLException ignored) {
+					ignored.printStackTrace();
+				}
 				
 				//write to the log file
 				statusWriter.write(status);

@@ -45,12 +45,6 @@ public abstract class ConcreteContent implements Content {
 	}
 	
 	@Override
-	public int getId(){
-		//TODO
-		return 0;
-	}
-	
-	@Override
 	public byte[] toBytes(){
 		try{
 			return toString().getBytes("GBK");

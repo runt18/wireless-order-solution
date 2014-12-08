@@ -3,7 +3,6 @@ package com.wireless.print.scheme;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
@@ -44,8 +43,6 @@ public class JobContentFactory {
 
 	private static class JobCombinationContent implements Content{
 
-		private static final AtomicInteger mIdGenerator = new AtomicInteger(0);
-		
 		private final ContentCombinator mCombinator = new ContentCombinator();
 		
 		JobCombinationContent(List<JobContent> jobContents){
@@ -62,11 +59,6 @@ public class JobContentFactory {
 					bytesToJobAmount[1] = (byte)((jobAmount & 0x0000FF00) >> 8);
 					return bytesToJobAmount;
 				}
-
-				@Override
-				public int getId() {
-					return 0;
-				}
 				
 			});
 			
@@ -78,13 +70,6 @@ public class JobContentFactory {
 		public byte[] toBytes() {
 			return mCombinator.toBytes();
 		}
-
-		@Override
-		public int getId() {
-			mIdGenerator.compareAndSet(Integer.MAX_VALUE, 0);
-			return mIdGenerator.incrementAndGet();
-		}
-		
 	}
 	
 	private final static JobContentFactory mInstance = new JobContentFactory();

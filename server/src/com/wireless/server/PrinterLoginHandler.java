@@ -6,9 +6,11 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.printScheme.PrintLossDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.Mode;
@@ -17,6 +19,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPrintLogin;
+import com.wireless.pojo.printScheme.PrintLoss;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.print.content.Content;
@@ -123,12 +126,20 @@ public class PrinterLoginHandler implements Runnable{
 						PrinterConnections.instance().add(restaurant, sock);
 						
 						//Perform to print the lost receipt in case of NOT empty
-						List<Content> printLosses = PrinterLosses.instance().get(restaurant);
-						if(!printLosses.isEmpty()){
-							PrinterLosses.instance().remove(restaurant);
-							new PrintHandler(staff, printLosses).fireAsync();
+						List<Content> lostContents = new ArrayList<Content>();
+						for(final PrintLoss loss : PrintLossDao.getByCond(dbCon, staff, null)){
+							lostContents.add(new Content(){
+								@Override
+								public byte[] toBytes() {
+									return loss.getContent();
+								}
+							});
+							PrintLossDao.deleteById(dbCon, staff, loss.getId());
 						}
 						
+						if(!lostContents.isEmpty()){
+							new PrintHandler(staff, lostContents).fireAsync();
+						}
 					//}else{
 					//	throw new BusinessException("The password is not correct.", ErrorCode.PWD_NOT_MATCH);
 					//}						

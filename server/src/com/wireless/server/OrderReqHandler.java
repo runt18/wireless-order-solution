@@ -31,8 +31,7 @@ class OrderReqHandler implements Runnable{
 					if(connection != null){
 						try{
 							connection.close();
-						}catch(IOException ex){}
-						connection = null;
+						}catch(IOException igonred){}
 					}
 				}
 			}

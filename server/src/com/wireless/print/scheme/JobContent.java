@@ -71,11 +71,6 @@ public class JobContent implements Content{
 			System.arraycopy(mBytesToContent, 0, result, 2, mBytesToContent.length);
 			return result;
 		}
-
-		@Override
-		public int getId() {
-			return 0;
-		}
 	}
 	
 	/**
@@ -90,22 +85,12 @@ public class JobContent implements Content{
 			public byte[] toBytes(){
 				return new byte[]{ (byte)mRepeat };
 			}
-
-			@Override
-			public int getId() {
-				return 0;
-			}
 		};
 		
 		Content orderIdContent = new Content(){
 			@Override
 			public byte[] toBytes() {
 				return new byte[4];
-			}
-
-			@Override
-			public int getId() {
-				return 0;
 			}
 		};
 		
@@ -123,11 +108,6 @@ public class JobContent implements Content{
 				bytesToPrintTime[7] = (byte)((mPrintTime & 0xFF00000000000000L) >> 56);
 				return bytesToPrintTime;
 			}
-
-			@Override
-			public int getId() {
-				return 0;
-			}
 			
 		};
 		
@@ -143,11 +123,6 @@ public class JobContent implements Content{
 	@Override
 	public String toString(){
 		return null;
-	}
-
-	@Override
-	public int getId() {
-		return 0;
 	}
 	
 }
