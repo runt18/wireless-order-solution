@@ -5,6 +5,13 @@
 	<artifactId>db-adaptor</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
+	<repositories>
+		<repository>
+			<id>jfrog.org</id>
+			<name>jfrog</name>
+			<url>http://repo.jfrog.org/artifactory/libs-releases/</url>
+		</repository>
+	</repositories>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
@@ -31,9 +38,9 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>com.github.xuwei-k</groupId>
+			<groupId>gui.ava</groupId>
 			<artifactId>html2image</artifactId>
-			<version>0.1.0</version>
+			<version>0.9</version>
 		</dependency>
 
 		<dependency>
