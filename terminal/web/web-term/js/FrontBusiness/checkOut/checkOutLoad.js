@@ -602,7 +602,7 @@ function fnMixedPay(){
 		 	    			var mixedPayMoney = Ext.get('shouldPay').dom.innerHTML;
 		 	    			for(var pay in payMoneyCalc){
 		 	    				if(typeof payMoneyCalc[pay] != 'boolean'){
-		 	    					mixedPayMoney -= payMoneyCalc[pay];
+		 	    					mixedPayMoney = (mixedPayMoney * 10000 - payMoneyCalc[pay] * 10000)/10000; 
 		 	    				}
 		 	    			}
 		 	    			numForAlias.setValue(mixedPayMoney < 0? 0 : mixedPayMoney);							
@@ -779,8 +779,8 @@ function showInputReciptWin(){
 
 function getWeixinOrders(){
 	Ext.Ajax.request({
-		url : '../../WXQueryOrder.do',
-		params: {dataSource : 'getByOrder', orderId : tableID},
+		url : '../../QueryCommissionStatistics.do',
+		params: {dataSource : 'getWeixinUserByOrder', orderId : tableID},
 		success : function(res){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
