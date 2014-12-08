@@ -187,16 +187,58 @@ public class Promotion implements Jsonable{
 		}
 	}
 	
-	public static enum Rule{
-		DISPLAY_ONLY(1, "只展示"),
-		FREE(2, "免费领取"),
-		ONCE(3, "单次积分符合条件领取"),
-		TOTAL(4, "累计积分符合条件领取");
+	private static enum DrawType{
+		NONE(1, "不能领取"),
+		AUTO(2, "自动领取"),
+		MANUAL(3, "手动领取");
 		
 		private final int val;
 		private final String desc;
-		Rule(int val, String desc){
+		
+		DrawType(int val, String desc){
 			this.val = val;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
+	
+	private static enum DrawAmount{
+		NONE(1, "不能领取"),
+		SINGLE(2, "单次领取"),
+		MULTI(3, "多次领取");
+		
+		private final int val;
+		private final String desc;
+		
+		DrawAmount(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
+	
+	public static enum Rule{
+		DISPLAY_ONLY(1, DrawType.NONE, DrawAmount.NONE,"只展示"),
+		FREE(2, DrawType.MANUAL, DrawAmount.SINGLE, "免费领取"),
+		ONCE(3, DrawType.AUTO, DrawAmount.MULTI, "单次积分符合条件领取"),
+		TOTAL(4, DrawType.AUTO, DrawAmount.SINGLE, "累计积分符合条件领取");
+		
+		private final int val;
+		private final DrawType drawType;
+		private final DrawAmount drawAmount;
+		private final String desc;
+		Rule(int val, DrawType drawType, DrawAmount drawAmount, String desc){
+			this.val = val;
+			this.drawType = drawType;
+			this.drawAmount = drawAmount;
 			this.desc = desc;
 		}
 		
@@ -213,6 +255,14 @@ public class Promotion implements Jsonable{
 			return this.val;
 		}
 		
+		public DrawType getDrawType(){
+			return this.drawType;
+		}
+		
+		public DrawAmount getDrawAmount(){
+			return this.drawAmount;
+		}
+		
 		@Override
 		public String toString(){
 			return desc;
@@ -221,8 +271,8 @@ public class Promotion implements Jsonable{
 	
 	public static enum Type{
 		
-		NORMAL(1, "normal"),	// 普通
-		WELCOME(2, "welcome");  // 激活有礼
+		NORMAL(1, "normal"),	// 普通活动
+		WELCOME(2, "welcome");  // 欢迎活动
 		
 		private final int val;
 		private final String desc;

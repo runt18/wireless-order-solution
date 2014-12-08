@@ -1,6 +1,5 @@
 package com.wireless.pojo.promotion;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,6 +21,14 @@ public class Coupon implements Jsonable{
 			this.couponTypeId = couponTypeId;
 			this.promotionId = promotionId;
 		}
+
+		public int getCouponTypeId(){
+			return this.couponTypeId;
+		}
+		
+		public int getPromotionId(){
+			return this.promotionId;
+		}
 		
 		public CreateBuilder addMember(int memberId){
 			Member member = new Member(memberId);
@@ -37,24 +44,21 @@ public class Coupon implements Jsonable{
 			return this;
 		}
 		
-		public List<InsertBuilder> build(){
-			List<InsertBuilder> builders = new ArrayList<InsertBuilder>();
-			for(Member member : members){
-				builders.add(new InsertBuilder(couponTypeId, member.getId(), promotionId));
-			}
-			return Collections.unmodifiableList(builders);
+		public List<Member> getMembers(){
+			return Collections.unmodifiableList(members);
 		}
+		
 	}
 	
 	public static class InsertBuilder{
-		private final int couponTypeId;
-		private final int promotionId;
-		private final int memberId;
+		private final CouponType couponType;
+		private final Promotion promotion;
+		private final Member member;
 		
-		public InsertBuilder(int couponTypeId, int memberId, int promotionId){
-			this.couponTypeId = couponTypeId;
-			this.memberId = memberId;
-			this.promotionId = promotionId;
+		public InsertBuilder(CouponType couponType, Member member, Promotion promotion){
+			this.couponType = couponType;
+			this.member = member;
+			this.promotion = promotion;
 		}
 		
 		public Coupon build(){
@@ -161,10 +165,16 @@ public class Coupon implements Jsonable{
 	private final DrawProgress drawProgress = new DrawProgress(0, this);
 	
 	private Coupon(InsertBuilder builder){
-		setCouponType(new CouponType(builder.couponTypeId));
-		setMember(new Member(builder.memberId));
-		setPromotion(new Promotion(builder.promotionId));
-		setStatus(Status.CREATED);
+		setCouponType(builder.couponType);
+		setMember(builder.member);
+		setPromotion(builder.promotion);
+		if(builder.promotion.getStatus() == Promotion.Status.CREATED){
+			setStatus(Status.CREATED);
+		}else if(builder.promotion.getStatus() == Promotion.Status.PUBLISH || builder.promotion.getStatus() == Promotion.Status.PROGRESS){
+			setStatus(Status.PUBLISHED);
+		}else{
+			throw new IllegalArgumentException("the status to promotion is invalid");
+		}
 		setBirthDate(System.currentTimeMillis());
 	}
 	
