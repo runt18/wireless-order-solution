@@ -50,15 +50,18 @@ var logOutBut = new Ext.ux.ImageButton({
 
 function billOptModifyHandler(rowindex) {
 	var data = Ext.ux.getSelData(billsGrid);
+	var orderType = 'common';
 	if(data['category'] == 4){
 		Ext.example.msg('提示', '团体餐桌暂不允许反结账.');
 		return;
 	}
 	if(data['settleTypeValue'] == 2){
-		Ext.example.msg('提示', '会员结账单暂不允许反结账.');
-		return;
+/*		Ext.example.msg('提示', '会员结账单暂不允许反结账.');
+		return;*/
+		orderType = 'member';
 	}
-	setDynamicKey('OrderMain.html', 'orderID=' + data['id']);
+	
+	setDynamicKey('OrderMain.html', 'orderID=' + data['id'] +'&orderType=' + orderType);
 };
 
 function showViewBillWin(){

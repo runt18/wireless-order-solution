@@ -897,15 +897,16 @@ function submitRepaidOrderMain(_c){
 		url : "../../RepaidOrder.do",
 		params : {
 			'orderId' : _c.grid.order["id"],
+			'memberID' : re_member.id,
 			'discountID' : discountID.getValue(),
 			'servicePlan' : servicePlan.getValue(),
 			"payType" : _c.commit_payType,
 			'payType_money' : _c.payType_money,
-			"memberID" : _c.grid.order['memberID'],
 			"comment" : commentOut,
 			'erasePrice' : erasePrice.getValue(),
 			"commitOrderData" : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
-			'customNum' : _c.grid.order['customNum']
+			'customNum' : _c.grid.order['customNum'],
+			'settleType' : re_member?2:1
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
@@ -924,11 +925,13 @@ function submitRepaidOrderMain(_c){
 			}
 		},
 		failure : function(response, options) {
+			commitOperate.hide();
 			orderPanel.buttons[0].setDisabled(false);
 			orderPanel.buttons[1].setDisabled(false);
 			orderPanel.buttons[5].setDisabled(false);
 			Ext.MessageBox.show({
-				msg : "Unknow page error",
+				title : '提示',
+				msg : "请求超时, 请刷新后再试",
 				width : 300,
 				buttons : Ext.MessageBox.OK
 			});

@@ -96,23 +96,21 @@ function loadSingleOrderData(resultJSON){
 						}						
 					}
 				}
-/*				else{
-					for (var i = 0; i < repaid_payType.length; i++) {
-						if(Ext.getDom('repaid_chbForPayType' + repaid_payType[i].id).value == orderSingleData.other.order.payTypeValue){
-							Ext.getCmp('repaid_chbForPayType' + repaid_payType[i].id).setValue(true);
-							Ext.getCmp('repaid_numForPayType' + repaid_payType[i].id).enable();
-							Ext.getCmp('repaid_numForPayType' + repaid_payType[i].id).setValue(orderSingleData.other.order.actualPrice);
-						}
-					}
-				}*/	
 
-				
+				//会员反结账, 根据会员类型获取折扣
+				var getDisParam = {dataSource : 'role'};
+				if(orderType == 'member'){
+					getDisParam = {dataSource : 'getByMemberType', memberTypeId : re_member.memberType.id}
+				}
 				Ext.Ajax.request({
-					url : '../../QueryDiscountTree.do',
+					url : '../../QueryDiscount.do',
+					params : getDisParam,
 					success : function(res, opt) {
-						discountData = eval(res.responseText);
+						var jr = Ext.decode(res.responseText);
+						discountData = jr.root
+						
 						var discount = Ext.getCmp('comboDiscount');
-						discount.store.loadData({root:discountData});
+						discount.store.loadData(jr);
 						discount.setValue(orderSingleData.other.order.discount.id);
 						//利用缓时来选中收款方式, 否则不能选中
 						var payManner = document.getElementsByName('radioPayType');
@@ -349,7 +347,6 @@ function createOrderFoodGridPanelTbar(){
 										Ext.Ajax.request({
 											url : '../../PrintOrder.do',
 											params : {
-												isCookie : true,
 												'tableID' : tableAliasID,
 												'printType' : 2
 											},

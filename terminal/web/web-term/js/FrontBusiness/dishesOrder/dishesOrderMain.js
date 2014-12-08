@@ -42,10 +42,10 @@ function repaid_initNorthPanel(){
 					forceSelection : true,
 					store : new Ext.data.JsonStore({
 						root : 'root',
-						fields : [ 'discountID', 'discountName']
+						fields : [ 'id', 'name']
 					}),
-					valueField : 'discountID',
-					displayField : 'discountName',
+					valueField : 'id',
+					displayField : 'name',
 					typeAhead : true,
 					mode : 'local',
 					triggerAction : 'all',
@@ -149,9 +149,13 @@ function repaid_initNorthPanel(){
 				listeners : {
 					render : function(thiz){
 						var cmb_repaid_payType = repaid_payType.concat();
-						cmb_repaid_payType.push({id:100, name:'混合结账'});
+						//如果是会员结账就不用添加混合
+						if(orderType == 'common'){
+							cmb_repaid_payType.push({id:100, name:'混合结账'});
+						}
 						thiz.getStore().loadData(cmb_repaid_payType);
 						thiz.setValue(primaryOrderData.other.order.payTypeValue);
+						
 					},
 					select : function(thiz){
 						if(thiz.getValue() == 100){
@@ -160,7 +164,6 @@ function repaid_initNorthPanel(){
 							}else{
 								initPaytypeCheckboxs();
 							}
-							
 						}else{
 							Ext.getCmp('repaid_mixedPayTypePanel').hide();
 						}
@@ -1156,6 +1159,11 @@ function setRepaidOrderTitle(){
 	if(isRepaid){
 		orderFoodTitle = '反结账 -- <span style="padding-left:2px; color:red;">'+orderID+'</span>&nbsp;号帐单'
 	}
+	
+	if(re_member){
+		orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <font color="green">'+ re_member.name +'</font>';
+	}
+	
 	if(primaryOrderData.other.order.discount){
 		orderFoodTitle += '&nbsp;&nbsp;&nbsp;当前折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';
 	}
@@ -1226,6 +1234,10 @@ Ext.onReady(function() {
 	var orderFoodTitle = null;
 	if(isRepaid){
 		orderFoodTitle = '反结账 -- <span style="padding-left:2px; color:red;">'+orderID+'</span>&nbsp;号帐单'
+		if(re_member){
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <font color="green">'+ re_member.name +'</font>';
+		}
+		
 		if(primaryOrderData.other.order.discount){
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;当前折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';
 		}
