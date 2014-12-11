@@ -1163,7 +1163,7 @@ function setRepaidOrderTitle(){
 	}
 	
 	if(re_member){
-		orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <font color="green">'+ re_member.name +'</font>';
+		orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
 	}
 	
 	if(primaryOrderData.other.order.discount){
@@ -1175,11 +1175,108 @@ function setRepaidOrderTitle(){
 	}
 	
 	Ext.getCmp('billModCenterPanel').setTitle(orderFoodTitle);	
+	
+	$('.re_showMemberDetail').hover(function(){
+		if(!re_memberDetailWin.loadMember){
+			loadMemberDetail();
+			re_memberDetailWin.loadMember = true;
+		}
+		re_memberDetailWin.setPosition($('.re_showMemberDetail').position().left, $('.re_showMemberDetail').position().top + 70);
+		re_memberDetailWin.show();		
+		
+	}, function(){
+		re_memberDetailWin.hide();
+	});		
+}
+
+//加载会员显示窗口
+function loadMemberDetailWin(){
+	if(!re_memberDetailWin){
+		re_memberDetailWin = new Ext.Window({
+			id : 'repaid_memberDetailWin',
+			closable : false, //是否可关闭
+			resizable : false, //大小调整
+			width : 280,	
+			items : []	
+		});
+	}
+}
+
+//加载会员的基本信息
+function loadMemberDetail(){
+		
+	var item = {
+		layout : 'form',
+		frame : true,
+		border : true,
+	 	defaults : {
+	 		width : 130,
+	 		disabled : true,
+	 		labelStyle: 'font-weight:bold;font-size:15px;text-align:right;',
+	 		style : 'font-size:15px;font-weight:bold;margin-bottom:5px;color:green;'
+	 	},				
+		items : [{
+			id : 're_memberPhone',
+			xtype : 'numberfield',
+			fieldLabel : '手机号',
+			value : re_member.mobile,
+			listeners : {
+				render : function(thiz){
+					if(!re_member.mobile){
+						thiz.getEl().up('.x-form-item').setDisplayed(false);
+					}else{
+						thiz.getEl().up('.x-form-item').setDisplayed(true);
+					}
+				}
+			}
+		},{
+			id : 're_memberCard',
+			xtype : 'numberfield',
+			fieldLabel : '实体卡',
+			value : re_member.memberCard,
+			listeners : {
+				render : function(thiz){
+					if(!re_member.memberCard){
+						thiz.getEl().up('.x-form-item').setDisplayed(false);
+					}else{
+						thiz.getEl().up('.x-form-item').setDisplayed(true);
+					}
+				}
+			}
+		},{
+			id : 're_memberWeixinCard',
+			xtype : 'numberfield',
+			fieldLabel : '微信卡号',
+			value : re_member.weixinCard,
+			listeners : {
+				render : function(thiz){
+					if(!re_member.weixinCard){
+						thiz.getEl().up('.x-form-item').setDisplayed(false);
+					}else{
+						thiz.getEl().up('.x-form-item').setDisplayed(true);
+					}
+				}
+			}
+		}]			
+	}
+	
+	re_memberDetailWin.add(item);
+	
+	re_memberDetailWin.doLayout();
+	
 }
 
 var dishesOrderEastPanel, centerPanel;
 var commitOperate;
 
+function showDetail(){
+	if(!re_memberDetailWin.loadMember){
+		loadMemberDetail();
+		re_memberDetailWin.loadMember = true;
+	}
+	re_memberDetailWin.setPosition($('#re_showMemberDetail').position().left, $('#re_showMemberDetail').position().top + 70);
+	re_memberDetailWin.show();		
+}
 	
 Ext.onReady(function() {
 	var menuTabPanel = new Ext.TabPanel({
@@ -1237,7 +1334,7 @@ Ext.onReady(function() {
 	if(isRepaid){
 		orderFoodTitle = '反结账 -- <span style="padding-left:2px; color:red;">'+orderID+'</span>&nbsp;号帐单'
 		if(re_member){
-			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <font color="green">'+ re_member.name +'</font>';
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
 		}
 		
 		if(primaryOrderData.other.order.discount){
@@ -1246,7 +1343,8 @@ Ext.onReady(function() {
 		if(primaryOrderData.other.order.discounter){
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣人:<font color="green">'+ primaryOrderData.other.order.discounter +'</font>';
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣时间:<font color="green">'+ primaryOrderData.other.order.discountDate +'</font>';
-		}		
+		}	
+		
 	}
 	
 
@@ -1259,7 +1357,7 @@ Ext.onReady(function() {
 		frame : false,
 		items : [ centerPanel ]
 	});
-
+	
 	initMainView(null, billModCenterPanel, null);
 	
 	getOperatorName("../../");
@@ -1273,6 +1371,22 @@ Ext.onReady(function() {
 	if(!isFree && !isRepaid){
 		refreshOrderHandler(true);
 	}
+	
+	//加载会员信息窗口
+	loadMemberDetailWin();
+	
+	//显示会员信息
+	$('.re_showMemberDetail').hover(function(){
+		if(!re_memberDetailWin.loadMember){
+			loadMemberDetail();
+			re_memberDetailWin.loadMember = true;
+		}
+		re_memberDetailWin.setPosition($('.re_showMemberDetail').position().left, $('.re_showMemberDetail').position().top + 70);
+		re_memberDetailWin.show();		
+		
+	}, function(){
+		re_memberDetailWin.hide();
+	});	
 	
 	commitOperate = new Ext.LoadMask(document.body, {
 	    msg  : '正在提交操作,请稍等......',

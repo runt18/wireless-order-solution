@@ -1,6 +1,6 @@
 function cdd_deltaPointRenderer(v, md, r, ri, ci, store){
-	if(v == 2 || v == 3 || v == 4){
-		var deltaPoint = parseInt(r.get('deltaPoint'));
+	var deltaPoint = parseInt(r.get('deltaPoint'));
+	if(v == 2 || v == 3 || v == 4 || v == 7){
 		if(deltaPoint < 0){
 			return "<font color='red' size='4'>"+ deltaPoint + "</font>";
 		}else{
@@ -9,20 +9,22 @@ function cdd_deltaPointRenderer(v, md, r, ri, ci, store){
 	}else{
 		return '--';
 	}
+	
 }
 function cdd_remainingPointRenderer(v, md, r, ri, ci, store){
-	if(v == 2 || v == 3 || v == 4){
+	if(v == 2 || v == 3 || v == 4 || v == 7){
 		return parseInt(r.get('remainingPoint'));
 	}else{
 		return '--';
 	}
 }
 function cdd_deltaTotalMoneyRenderer(v, md, r, ri, ci, store){
-	if(v == 1 || v == 2 || v == 5 || v== 6){
-		if(v == 2){
+	var deltaTotalMoney = parseInt(r.get('deltaTotalMoney'));
+	if(v == 1 || v == 2 || v == 5 || v == 6 || v == 7){
+		
+		if(v == 2 || v == 7){
 			return '--';
 		}else{
-			var deltaTotalMoney = parseInt(r.get('deltaTotalMoney'));
 			if(deltaTotalMoney < 0){
 				return "<font color='red' size='4'>"+ Ext.ux.txtFormat.gridDou(deltaTotalMoney) + "</font>";
 			}else{
@@ -32,10 +34,11 @@ function cdd_deltaTotalMoneyRenderer(v, md, r, ri, ci, store){
 	}else{
 		return '--';
 	}
+	
 }
 function cdd_remainingTotalMoneyRenderer(v, md, r, ri, ci, store){
-	if(v == 1 || v == 2 || v == 6){
-		if(v == 2 && r.get('member')['memberType']['attributeValue'] == 1){
+	if(v == 1 || v == 2 || v == 6 || v == 7){
+		if((v == 2 || v == 7) && r.get('member')['memberType']['attributeValue'] == 1){
 			return '--';
 		}else{
 			return Ext.ux.txtFormat.gridDou(r.get('remainingTotalMoney'));			
@@ -47,7 +50,7 @@ function cdd_remainingTotalMoneyRenderer(v, md, r, ri, ci, store){
 function cdd_payMoneyRenderer(v, md, r, ri, ci, store){
 	if(v == 1 || v == 6){
 		return Ext.ux.txtFormat.gridDou(r.get('chargeMoney'));
-	}else if(v == 2 || v == 5){
+	}else if(v == 2 || v == 5 || v == 7){
 		return Ext.ux.txtFormat.gridDou(r.get('payMoney'));
 	}else{
 		return '--';
@@ -56,7 +59,7 @@ function cdd_payMoneyRenderer(v, md, r, ri, ci, store){
 function cdd_payTypeRenderer(v, md, r, ri, ci, store){
 	if(v == 1 || v == 6){
 		return r.get('chargeTypeText');
-	}else if(v == 2 || v == 5){
+	}else if(v == 2 || v == 5 || v == 7){
 		return r.get('payTypeText');
 	}else{
 		return '--';
