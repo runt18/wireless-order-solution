@@ -26,3 +26,7 @@
 	box-shadow: 3px 5px 10px black;
 	behavior: url(../css/PIE.htc);
 }
+
+.re_showMemberDetail{
+	font-size:15px;font-weight:bold;color:green;text-decoration:underline;
+}
