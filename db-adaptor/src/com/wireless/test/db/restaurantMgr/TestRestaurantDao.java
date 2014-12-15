@@ -122,7 +122,8 @@ public class TestRestaurantDao {
 			compareBusinessHour(staff);
 			
 			//Update a restaurant
-			Restaurant.UpdateBuilder updateBuilder = new Restaurant.UpdateBuilder(restaurantId, "test2")
+			Restaurant.UpdateBuilder updateBuilder = new Restaurant.UpdateBuilder(restaurantId)
+																   .setAccount("test2")
 														 		   .setPwd("test2@123")
 														 		   .setRestaurantInfo("测试信息2")
 														 		   .setAddress("测试地址2")
@@ -136,6 +137,9 @@ public class TestRestaurantDao {
 			
 			RestaurantDao.update(updateBuilder);
 			
+			if(updateBuilder.isAccountChanged()){
+				expected.setAccount(updateBuilder.build().getAccount());
+			}
 			if(updateBuilder.isTele2Changed()){
 				expected.setTele2(updateBuilder.build().getTele2());
 			}

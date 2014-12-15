@@ -432,7 +432,7 @@ public class MemberOperationDao {
 	}
 	
 	/**
-	 * Get the member operation to specific order id.
+	 * Get the last consumption member operation to specific order id.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -446,7 +446,7 @@ public class MemberOperationDao {
 	 * 			throws if the member operation to this order id does NOT exist
 	 */
 	public static MemberOperation getByOrder(DBCon dbCon, Staff staff, int orderId) throws SQLException, BusinessException{
-		List<MemberOperation> result = getByCond(dbCon, staff, new ExtraCond(DateType.TODAY).setOrder(orderId).addOperationType(OperationType.CONSUME), null);
+		List<MemberOperation> result = getByCond(dbCon, staff, new MemberOperationDao.ExtraCond(DateType.TODAY).setOrder(orderId).addOperationType(OperationType.CONSUME).addOperationType(OperationType.RE_CONSUME)," ORDER BY id DESC LIMIT 1 ");
 		if(result.isEmpty()){
 			throw new BusinessException(MemberError.OPERATION_NOT_EXIST);
 		}else{

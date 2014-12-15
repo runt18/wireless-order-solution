@@ -18,6 +18,7 @@ import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.StringHtml;
 
 public class CouponDao {
@@ -293,6 +294,11 @@ public class CouponDao {
 			if(dbCon.stmt.executeUpdate(sql) == 0){
 				throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
 			}
+			
+			if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
+				insert(dbCon, staff, new Coupon.InsertBuilder(coupon.getCouponType(), coupon.getMember(), coupon.getPromotion()));
+			}
+			
 		}else{
 			throw new BusinessException("优惠券还没符合领取条件", PromotionError.COUPON_DRAW_NOT_ALLOW);
 		}
@@ -412,30 +418,41 @@ public class CouponDao {
 
 			coupon.setCouponType(CouponTypeDao.getById(dbCon, staff, coupon.getCouponType().getId()));
 			coupon.setMember(MemberDao.getById(dbCon, staff, coupon.getMember().getId()));
-			Promotion promotion = PromotionDao.getById(dbCon, staff, coupon.getPromotion().getId());
-			coupon.setPromotion(promotion);
+			coupon.setPromotion(PromotionDao.getById(dbCon, staff, coupon.getPromotion().getId()));
 
-			if(coupon.getStatus() == Coupon.Status.PUBLISHED && promotion.getStatus() == Promotion.Status.PROGRESS){
-				if(promotion.getRule() == Promotion.Rule.TOTAL || promotion.getRule() == Promotion.Rule.ONCE){
+			if(coupon.getStatus() == Coupon.Status.PUBLISHED && coupon.getPromotion().getStatus() == Promotion.Status.PROGRESS){
+				if(coupon.getPromotion().getRule() == Promotion.Rule.TOTAL || coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
 					String sql;
 					sql = " SELECT delta_point, operate_date FROM " + Params.dbName + ".member_operation " +
 						  " WHERE 1 = 1 " +
 						  " AND member_id = " + coupon.getMember().getId() +
 						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
-						  " AND operate_date BETWEEN '" + promotion.getDateRange().getOpeningFormat() + "' AND '" + promotion.getDateRange().getEndingFormat() + "'" +
+						  " AND operate_date BETWEEN '" + coupon.getPromotion().getDateRange().getOpeningFormat() + "' AND '" + coupon.getPromotion().getDateRange().getEndingFormat() + "'" +
 						  " UNION " +
 						  " SELECT delta_point, operate_date FROM " + Params.dbName + ".member_operation_history " +
 						  " WHERE 1 = 1 " +
 						  " AND member_id = " + coupon.getMember().getId() +
 						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
-						  " AND operate_date BETWEEN '" + promotion.getDateRange().getOpeningFormat() + "' AND '" + promotion.getDateRange().getEndingFormat() + "'";
+						  " AND operate_date BETWEEN '$(begin_operate_date)' AND '" + coupon.getPromotion().getDateRange().getEndingFormat() + "'";
 					
-					if(promotion.getRule() == Promotion.Rule.ONCE){
-						//String sql4LastestDraw = " SELECT draw_date FROM " + Params.dbName + ".coupon WHERE promotion_id = " + promotion.getId() + " ORDER BY draw_date DESC LIMIT 1 ";
-						//sql = " SELECT MAX(delta_point) AS max_point FROM ( " + sql + " ) AS TMP WHERE TMP.operate_date >= ( " + sql4LastestDraw + ")";
+					if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
+						String sql4LastDraw;
+						sql4LastDraw = " SELECT draw_date FROM " + Params.dbName + ".coupon WHERE 1 = 1 " + 
+								  	   " AND promotion_id = " + coupon.getPromotion().getId() +
+								  	   " AND member_id = " + coupon.getMember().getId() +
+								  	   " AND status = " + Coupon.Status.DRAWN.getVal() +
+								  	   " ORDER BY draw_date DESC LIMIT 1 ";
+						dbCon.rs = dbCon.stmt.executeQuery(sql4LastDraw);
+						if(dbCon.rs.next()){
+							sql = sql.replace("$(begin_operate_date)", DateUtil.format(dbCon.rs.getTimestamp("draw_date").getTime(), DateUtil.Pattern.DATE_TIME));
+						}else{
+							sql = sql.replace("$(begin_operate_date)", coupon.getPromotion().getDateRange().getOpeningFormat());
+						}
+						dbCon.rs.close();
 						sql = " SELECT MAX(delta_point) AS max_point FROM ( " + sql + " ) AS TMP ";
-					}else if(promotion.getRule() == Promotion.Rule.TOTAL){
-						sql = " SELECT SUM(delta_point) AS total_point FROM ( " + sql + " ) AS TMP ";
+						
+					}else if(coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
+						sql = " SELECT SUM(delta_point) AS total_point FROM ( " + sql.replace("$(begin_operate_date)", coupon.getPromotion().getDateRange().getOpeningFormat()) + " ) AS TMP ";
 					}
 					
 					dbCon.rs = dbCon.stmt.executeQuery(sql);

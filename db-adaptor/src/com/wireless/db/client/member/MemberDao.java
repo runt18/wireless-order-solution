@@ -24,7 +24,6 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberComment.CommitBuilder;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
-import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.client.WxMember;
 import com.wireless.pojo.dishesOrder.Order;
@@ -37,7 +36,6 @@ import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 
 public class MemberDao {
@@ -1391,42 +1389,33 @@ public class MemberDao {
 	 *			2 - the member account to consume is NOT found.
 	 */
 	public static MemberOperation reConsume(DBCon dbCon, Staff staff, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
-		List<MemberOperation> mos = MemberOperationDao.getByCond(dbCon, staff, 
-														   		 new MemberOperationDao.ExtraCond(DateType.TODAY)
-																  					   .setOrder(orderId)
-																  					   .addOperationType(OperationType.CONSUME).addOperationType(OperationType.RE_CONSUME),
-																 " ORDER BY id DESC LIMIT 1 ");
-		if(mos.isEmpty()){
-			throw new BusinessException("没有找到相应的消费记录", MemberError.OPERATION_NOT_EXIST);
-		}else{
-			MemberOperation lastConsumption = mos.get(0);
-			
-			Member member = getById(dbCon, staff, memberId);
-			
-			//Perform the consume operation and get the related member operation.
-			MemberOperation mo = member.reConsume(consumePrice, payType, lastConsumption);
-			
-			//Set the associate order id
-			mo.setOrderId(orderId);
-			
-			//Insert the member operation to this consumption operation.
-			MemberOperationDao.insert(dbCon, staff, mo);
-			
-			//Update the base & extra balance and point.
-			String sql = " UPDATE " + Params.dbName + ".member SET" + 
-						 " consumption_amount = " + member.getConsumptionAmount() +
-						 " ,last_consumption = '" + DateUtil.format(System.currentTimeMillis(), DateUtil.Pattern.DATE_TIME) + "'" +
-						 " ,used_balance = " + member.getUsedBalance() +  
-						 " ,base_balance = " + member.getBaseBalance() +  
-						 " ,extra_balance = " + member.getExtraBalance() + 
-						 " ,total_consumption = " + member.getTotalConsumption() + 
-						 " ,total_point = " + member.getTotalPoint() +  
-						 " ,point = " + member.getPoint() +
-						 " WHERE member_id = " + memberId;
-			dbCon.stmt.executeUpdate(sql);
-			
-			return mo;
-		}
+		MemberOperation lastConsumption = MemberOperationDao.getByOrder(dbCon, staff, orderId);
+		
+		Member member = getById(dbCon, staff, memberId);
+		
+		//Perform the consume operation and get the related member operation.
+		MemberOperation mo = member.reConsume(consumePrice, payType, lastConsumption);
+		
+		//Set the associate order id
+		mo.setOrderId(orderId);
+		
+		//Insert the member operation to this consumption operation.
+		MemberOperationDao.insert(dbCon, staff, mo);
+		
+		//Update the base & extra balance and point.
+		String sql = " UPDATE " + Params.dbName + ".member SET" + 
+					 " consumption_amount = " + member.getConsumptionAmount() +
+					 " ,last_consumption = '" + DateUtil.format(System.currentTimeMillis(), DateUtil.Pattern.DATE_TIME) + "'" +
+					 " ,used_balance = " + member.getUsedBalance() +  
+					 " ,base_balance = " + member.getBaseBalance() +  
+					 " ,extra_balance = " + member.getExtraBalance() + 
+					 " ,total_consumption = " + member.getTotalConsumption() + 
+					 " ,total_point = " + member.getTotalPoint() +  
+					 " ,point = " + member.getPoint() +
+					 " WHERE member_id = " + memberId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		return mo;
 	}
 	
 	/**

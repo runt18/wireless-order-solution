@@ -85,40 +85,6 @@ public class PayOrder {
 		}
 	}
 	
-//	private static Order doTmpPayment(DBCon dbCon, Staff staff, Order orderCalculated) throws SQLException{
-//		
-//		String sql;
-//		//Update the discount to this order.
-//		sql = " UPDATE " + Params.dbName + ".order SET " +
-//			  " staff_id = " + staff.getId() + ", " +
-//			  " waiter = '" + staff.getName() + "', " +
-//			  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
-//			  " status = " + Order.Status.UNPAID.getVal() + ", " + 
-//		   	  " order_date = NOW() " + 
-//			  " WHERE 1 = 1 " +
-//			  " AND id = " + orderCalculated.getId() +
-//			  " AND status = " + Order.Status.UNPAID.getVal();
-//			
-//		if(dbCon.stmt.executeUpdate(sql) > 0 ){			
-//			//Update each food's discount & unit price to this order.
-//			for(OrderFood food : orderCalculated.getOrderFoods()){
-//				sql = " UPDATE " + Params.dbName + ".order_food " +
-//					  " SET " +
-//					  " discount = " + food.getDiscount() + ", " +
-//					  " unit_price = " + food.getFoodPrice() +
-//					  " WHERE order_id = " + orderCalculated.getId() + 
-//					  " AND food_id = " + food.getFoodId();
-//				dbCon.stmt.executeUpdate(sql);				
-//			}	
-//		}
-//		
-//		dbCon.conn.commit();
-//
-//		return orderCalculated;
-//
-//	}
-	
-	
 	/**
 	 * Perform to pay an order according to {@link Order.PayBuilder}.
 	 * @param dbCon
