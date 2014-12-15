@@ -95,8 +95,9 @@ public class OperateRestaurantAction extends DispatchAction {
 		
 		JObject jobject = new JObject();
 		try{
-			Restaurant.UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(id), account);
-			builder.setRestaurantName(name)
+			Restaurant.UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(id));
+			builder.setAccount(account)
+					.setRestaurantName(name)
 					.setTele1(tele1)
 					.setTele2(tele2)
 					.setAddress(address)
@@ -152,13 +153,14 @@ public class OperateRestaurantAction extends DispatchAction {
 			
 			Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(id));
 			
-			Restaurant.UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(id), restaurant.getAccount());
-			builder.setTele1(tele1)
-					.setTele2(tele2)
-					.setAddress(address)
-					.setRestaurantInfo(restaurant_info)
-					.setRecordAlive(Restaurant.RecordAlive.valueOfSeconds(restaurant.getRecordAlive()))
-					.setRestaurantName(restaurant.getName());
+			Restaurant.UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(id))
+														.setAccount(restaurant.getAccount())
+														.setTele1(tele1)
+														.setTele2(tele2)
+														.setAddress(address)
+														.setRestaurantInfo(restaurant_info)
+														.setRecordAlive(Restaurant.RecordAlive.valueOfSeconds(restaurant.getRecordAlive()))
+														.setRestaurantName(restaurant.getName());
 			
 			RestaurantDao.update(builder);
 			
