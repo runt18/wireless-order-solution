@@ -31,12 +31,12 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.print.content.Content;
 import com.wireless.print.content.ContentCombinator;
-import com.wireless.print.content.MemberReceiptContent;
-import com.wireless.print.content.OrderDetailContent;
-import com.wireless.print.content.ReceiptContent;
-import com.wireless.print.content.ShiftContent;
-import com.wireless.print.content.SummaryContent;
-import com.wireless.print.content.TransTableContent;
+import com.wireless.print.content.concrete.MemberReceiptContent;
+import com.wireless.print.content.concrete.OrderDetailContent;
+import com.wireless.print.content.concrete.ReceiptContent;
+import com.wireless.print.content.concrete.ShiftContent;
+import com.wireless.print.content.concrete.SummaryContent;
+import com.wireless.print.content.concrete.TransTableContent;
 import com.wireless.util.DateType;
 
 public class JobContentFactory {
@@ -59,7 +59,7 @@ public class JobContentFactory {
 					bytesToJobAmount[1] = (byte)((jobAmount & 0x0000FF00) >> 8);
 					return bytesToJobAmount;
 				}
-				
+
 			});
 			
 			//Append each job contents
@@ -309,32 +309,38 @@ public class JobContentFactory {
 	}
 	
 	public Content createMemberReceiptContent(PType printType, Staff staff, List<Printer> printers, MemberOperation mo) throws BusinessException, SQLException{
-		
-		List<JobContent> jobContents = new ArrayList<JobContent>();
-		
-		Region regionToCompare = new Region(Region.RegionId.REGION_1.getId(), "", staff.getRestaurantId());
-		
-		for(Printer printer : printers){
-			for(PrintFunc func : printer.getPrintFuncs()){
-				if(func.isTypeMatched(printType) && func.isRegionMatched(regionToCompare)){
-					
-					Member member = MemberDao.getById(staff, mo.getMemberId());
-					//Print the member receipt only if member type belongs to charge.
-					if(member.getMemberType().getAttribute() == Attribute.CHARGE){
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			
+			List<JobContent> jobContents = new ArrayList<JobContent>();
+			
+			Region regionToCompare = new Region(Region.RegionId.REGION_1.getId(), "", staff.getRestaurantId());
+			
+			for(Printer printer : printers){
+				for(PrintFunc func : printer.getPrintFuncs()){
+					if(func.isTypeMatched(printType) && func.isRegionMatched(regionToCompare)){
 						
-						mo.setMember(MemberDao.getById(staff, mo.getMemberId()));
-						Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
-						jobContents.add(new JobContent(printer, func.getRepeat(), printType,
-													   new MemberReceiptContent(restaurant, staff.getName(), mo, 
-															   					mo.getOrderId() != 0 ? OrderDao.getById(staff, mo.getOrderId(), DateType.TODAY) : null, 
-															   					printType, printer.getStyle())));
-
-					}					
+						Member member = MemberDao.getById(dbCon, staff, mo.getMemberId());
+						//Print the member receipt only if member type belongs to charge.
+						if(member.getMemberType().getAttribute() == Attribute.CHARGE){
+							
+							mo.setMember(MemberDao.getById(dbCon, staff, mo.getMemberId()));
+							Restaurant restaurant = RestaurantDao.getById(dbCon, staff.getRestaurantId());
+							jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+														   new MemberReceiptContent(restaurant, staff.getName(), mo, 
+																   					mo.getOrderId() != 0 ? OrderDao.getById(dbCon, staff, mo.getOrderId(), DateType.TODAY) : null, 
+																   					printType, printer.getStyle())));
+	
+						}					
+					}
 				}
 			}
+				
+			return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
+		}finally{
+			dbCon.disconnect();
 		}
-		
-		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
 	
 	public Content createTransContent(PType printType, Staff staff, List<Printer> printers, int orderId, Table srcTbl, Table destTbl){

@@ -1,4 +1,4 @@
-package com.wireless.print.content;
+package com.wireless.print.content.concrete;
 
 import java.text.SimpleDateFormat;
 
@@ -9,6 +9,9 @@ import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.print.content.decorator.CenterAlignedDecorator;
+import com.wireless.print.content.decorator.ExtraFormatDecorator;
+import com.wireless.print.content.decorator.RightAlignedDecorator;
 
 public class MemberReceiptContent extends ConcreteContent {
 
@@ -62,7 +65,7 @@ public class MemberReceiptContent extends ConcreteContent {
 		}
 
 		
-		if(mMo.getOperationType() == OperationType.CONSUME){
+		if(mMo.getOperationType() == OperationType.CONSUME || mMo.getOperationType() == OperationType.RE_CONSUME){
 			
 			if(mMo.getDeltaPoint() > 0){
 			

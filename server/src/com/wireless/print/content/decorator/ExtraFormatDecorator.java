@@ -1,25 +1,26 @@
-package com.wireless.print.content;
+package com.wireless.print.content.decorator;
 
 import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.print.content.concrete.ConcreteContent;
 
 public class ExtraFormatDecorator extends ConcreteContentDecorator {
 
-	static class FormatDescriptor{
+	public static class FormatDescriptor{
 		
 		private final Format wire;		//针式打印机
 		private final Format thermal;	//热敏打印机
 		
-		FormatDescriptor(Format wire, Format thermal){
+		public FormatDescriptor(Format wire, Format thermal){
 			this.wire = wire;
 			this.thermal = thermal;
 		}
 	}
 	
-	static class Format{
+	public static class Format{
 		private final char[] header;
 		private final char[] tail;
 		
-		Format(char[] header, char[] tail){
+		public Format(char[] header, char[] tail){
 			this.header = header;
 			this.tail = tail;
 		}
@@ -77,7 +78,7 @@ public class ExtraFormatDecorator extends ConcreteContentDecorator {
 	}
 	
 	public ExtraFormatDecorator(ConcreteContent content, FormatDescriptor desc){
-		this(content.toString(), content.mStyle, desc);
+		this(content.toString(), content.getStyle(), desc);
 	}
 	
 	public ExtraFormatDecorator(ConcreteContent content, Format format) {

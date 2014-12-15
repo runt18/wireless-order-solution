@@ -1,4 +1,4 @@
-package com.wireless.print.content;
+package com.wireless.print.content.concrete;
 
 import java.util.Comparator;
 

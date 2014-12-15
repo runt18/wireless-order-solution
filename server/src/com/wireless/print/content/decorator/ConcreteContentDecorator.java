@@ -1,7 +1,8 @@
-package com.wireless.print.content;
+package com.wireless.print.content.decorator;
 
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
+import com.wireless.print.content.concrete.ConcreteContent;
 
 public abstract class ConcreteContentDecorator extends ConcreteContent{
 	
@@ -18,7 +19,7 @@ public abstract class ConcreteContentDecorator extends ConcreteContent{
 	}
 	
 	protected ConcreteContentDecorator(ConcreteContent content){
-		super(content.mPrintType, content.mStyle);
+		super(content.getPrintType(), content.getStyle());
 		_content = content;		
 	}	
 	

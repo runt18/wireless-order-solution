@@ -1,4 +1,4 @@
-package com.wireless.print.content;
+package com.wireless.print.content.concrete;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -12,8 +12,11 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PVar;
-import com.wireless.print.content.FoodDetailContent.DisplayConfig;
-import com.wireless.print.content.FoodDetailContent.DisplayItem;
+import com.wireless.print.content.concrete.FoodDetailContent.DisplayConfig;
+import com.wireless.print.content.concrete.FoodDetailContent.DisplayItem;
+import com.wireless.print.content.decorator.CenterAlignedDecorator;
+import com.wireless.print.content.decorator.ExtraFormatDecorator;
+import com.wireless.print.content.decorator.RightAlignedDecorator;
 import com.wireless.server.WirelessSocketServer;
 
 public class ReceiptContent extends ConcreteContent {

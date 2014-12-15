@@ -1,9 +1,10 @@
-package com.wireless.print.content;
+package com.wireless.print.content.concrete;
 
 import java.io.UnsupportedEncodingException;
 
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
+import com.wireless.print.content.Content;
 
 
 public abstract class ConcreteContent implements Content {
@@ -20,9 +21,9 @@ public abstract class ConcreteContent implements Content {
 	
 	final String mSeperatorLine;
 	
-	final int mLen;
-	final PStyle mStyle;
-	final PType mPrintType;
+	protected final int mLen;
+	protected final PStyle mStyle;
+	protected final PType mPrintType;
 	
 	protected ConcreteContent(PType printType, PStyle style){
 		
@@ -60,4 +61,5 @@ public abstract class ConcreteContent implements Content {
 	public PStyle getStyle(){
 		return mStyle;
 	}
+	
 }

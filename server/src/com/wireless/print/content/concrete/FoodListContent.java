@@ -1,11 +1,11 @@
-package com.wireless.print.content;
+package com.wireless.print.content.concrete;
 
 import java.util.List;
 
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
-import com.wireless.print.content.FoodDetailContent.DisplayConfig;
+import com.wireless.print.content.concrete.FoodDetailContent.DisplayConfig;
 
 public class FoodListContent extends ConcreteContent {
 

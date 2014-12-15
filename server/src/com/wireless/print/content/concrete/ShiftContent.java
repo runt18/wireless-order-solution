@@ -1,4 +1,4 @@
-package com.wireless.print.content;
+package com.wireless.print.content.concrete;
 
 import com.wireless.pojo.billStatistics.IncomeByCharge;
 import com.wireless.pojo.billStatistics.IncomeByDept;
@@ -8,6 +8,9 @@ import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PVar;
+import com.wireless.print.content.decorator.CenterAlignedDecorator;
+import com.wireless.print.content.decorator.ExtraFormatDecorator;
+import com.wireless.print.content.decorator.RightAlignedDecorator;
 import com.wireless.server.WirelessSocketServer;
 
 public class ShiftContent extends ConcreteContent {

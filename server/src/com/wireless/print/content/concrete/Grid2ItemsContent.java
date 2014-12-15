@@ -1,10 +1,11 @@
-package com.wireless.print.content;
+package com.wireless.print.content.concrete;
 
 import java.io.UnsupportedEncodingException;
 
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
-import com.wireless.print.content.ExtraFormatDecorator.Format;
+import com.wireless.print.content.decorator.ExtraFormatDecorator;
+import com.wireless.print.content.decorator.ExtraFormatDecorator.Format;
 
 
 public class Grid2ItemsContent extends ConcreteContent {

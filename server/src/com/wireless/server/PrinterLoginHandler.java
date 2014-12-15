@@ -12,6 +12,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.printScheme.PrintLossDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
@@ -112,8 +113,7 @@ public class PrinterLoginHandler implements Runnable{
 					//check to see whether the password is matched or not
 					//if(pwd.equals(dbCon.rs.getString("pwd"))){
 						
-						Staff staff = new Staff();
-						staff.setRestaurantId(restaurant.getId());
+						final Staff staff = StaffDao.getAdminByRestaurant(dbCon, restaurant.getId());
 						
 						//respond with the related kitchen information
 						new RespPrintLogin(loginReq.header, 
@@ -137,9 +137,7 @@ public class PrinterLoginHandler implements Runnable{
 							PrintLossDao.deleteById(dbCon, staff, loss.getId());
 						}
 						
-						if(!lostContents.isEmpty()){
-							new PrintHandler(staff, lostContents).fireAsync();
-						}
+						new PrintHandler(staff).processLost(lostContents);
 					//}else{
 					//	throw new BusinessException("The password is not correct.", ErrorCode.PWD_NOT_MATCH);
 					//}						

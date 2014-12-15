@@ -1,4 +1,4 @@
-package com.wireless.print.content;
+package com.wireless.print.content.concrete;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -10,6 +10,8 @@ import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PVar;
+import com.wireless.print.content.decorator.CenterAlignedDecorator;
+import com.wireless.print.content.decorator.ExtraFormatDecorator;
 import com.wireless.server.WirelessSocketServer;
 
 public class OrderDetailContent extends ConcreteContent {

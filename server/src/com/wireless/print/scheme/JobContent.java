@@ -71,6 +71,7 @@ public class JobContent implements Content{
 			System.arraycopy(mBytesToContent, 0, result, 2, mBytesToContent.length);
 			return result;
 		}
+
 	}
 	
 	/**
@@ -108,7 +109,7 @@ public class JobContent implements Content{
 				bytesToPrintTime[7] = (byte)((mPrintTime & 0xFF00000000000000L) >> 56);
 				return bytesToPrintTime;
 			}
-			
+
 		};
 		
 		return new ContentCombinator().append(new StringContent(mPrinter.getName()))
@@ -124,5 +125,5 @@ public class JobContent implements Content{
 	public String toString(){
 		return null;
 	}
-	
+
 }

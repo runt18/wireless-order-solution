@@ -2,6 +2,8 @@ package com.wireless.server;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -10,8 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.wireless.db.printScheme.PrinterConnectionDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.req.ReqPing;
+import com.wireless.pojo.printScheme.PrinterConnection;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 
 public class PrinterConnections {
@@ -65,6 +71,15 @@ public class PrinterConnections {
 			socks.add(sockToAdd);
 			mConnections.put(restaurant, socks);
 		}
+		//store the host address to printer server just login
+		try {
+			if(!sockToAdd.getLocalAddress().isLoopbackAddress() && !sockToAdd.getLocalAddress().isAnyLocalAddress()){
+				PrinterConnectionDao.insert(StaffDao.getAdminByRestaurant(restaurant.getId()), new PrinterConnection.InsertBuilder(sockToAdd.getInetAddress().getHostAddress(), sockToAdd.getLocalAddress().getHostAddress()));
+			}
+		} catch (SQLException | BusinessException ignored) {
+			ignored.printStackTrace();
+		}
+
 	}
 	
 	/**
@@ -86,7 +101,15 @@ public class PrinterConnections {
 	public boolean remove(Restaurant restaurant, Socket sockToRemove){
 		List<Socket> socks = mConnections.get(restaurant);
 		if(socks != null){
-			return socks.remove(sockToRemove);
+			boolean result = socks.remove(sockToRemove);
+			if(get(restaurant).isEmpty()){
+				try {
+					PrinterConnectionDao.deleteLocal(StaffDao.getAdminByRestaurant(restaurant.getId()));
+				} catch (UnknownHostException | SQLException | BusinessException e) {
+					e.printStackTrace();
+				}
+			}
+			return result;
 		}else{
 			return false;
 		}
@@ -110,10 +133,10 @@ public class PrinterConnections {
 			}catch(IOException e){
 				try{
 					sock.close();
-				}catch(IOException ex){
+				}catch(IOException ignored){
 					
 				}finally{
-					socks.remove(sock);
+					remove(restaurant, sock);
 				}
 			}
 		}

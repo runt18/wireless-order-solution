@@ -1,4 +1,4 @@
-package com.wireless.print.content;
+package com.wireless.print.content.concrete;
 
 import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -6,7 +6,7 @@ import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.print.content.FoodDetailContent.DisplayConfig;
+import com.wireless.print.content.concrete.FoodDetailContent.DisplayConfig;
 
 public class ComboDetailContent extends ConcreteContent {
 
