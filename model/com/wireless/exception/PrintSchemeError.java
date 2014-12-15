@@ -9,6 +9,7 @@ public class PrintSchemeError extends ErrorEnum{
 	public static final ErrorCode DUPLICATE_FUNC_TYPE = build(7652, "操作失败, 你操作的打印功能已存在.");
 	public static final ErrorCode FUNC_TYPE_NOT_EXIST = build(7653, "操作失败, 你操作的打印功能不存在.");
 	public static final ErrorCode PRINT_LOSS_NOT_EXIST = build(7654, "你查找的打印内容不存在.");
+	public static final ErrorCode PRINT_SERVER_NOT_EXIST = build(7654, "你查找的打印服务不存在.");
 	
 	private PrintSchemeError(){
 		

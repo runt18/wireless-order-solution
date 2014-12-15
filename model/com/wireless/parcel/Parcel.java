@@ -262,6 +262,57 @@ public final class Parcel {
 	}
 	
     /**
+     * Read a byte array from the parcel at the current position.
+     */
+	public byte[] readBytes(){
+		if(readByte() != 0){
+			// Get the length of string.
+			int length = (mRawData[mDataPosition] & 0x000000FF) | 
+						 ((mRawData[mDataPosition + 1] & 0x000000FF) << 8) |
+			 			 ((mRawData[mDataPosition + 2] & 0x000000FF) << 16) |
+			 			 ((mRawData[mDataPosition + 3] & 0x000000FF) << 32);
+
+			mDataPosition += 4;
+			
+			byte[] val = new byte[length];
+			System.arraycopy(mRawData, mDataPosition, val, 0, length);
+			
+			mDataPosition += length;
+			return val;
+			
+		}else{
+			return null;
+		}
+	}
+	
+    /**
+     * Write a byte array into the parcel at the current dataPosition(),
+     * growing data capacity if needed.
+     */
+	public void writeBytes(byte[] val){
+		if(val != null){
+			
+			writeByte(1);
+			
+			allocate(4 + val.length);
+			
+			// Assign the length of string
+			mRawData[mDataPosition] = (byte)(val.length & 0x000000FF);
+			mRawData[mDataPosition + 1] = (byte)((val.length & 0x0000FF00) >> 8);
+			mRawData[mDataPosition + 2] = (byte)((val.length & 0x00FF0000) >> 16);
+			mRawData[mDataPosition + 3] = (byte)((val.length & 0xFF000000) >> 32);
+			mDataPosition += 4;
+		
+			// Assign the value of string
+			System.arraycopy(val, 0, mRawData, mDataPosition, val.length);
+			mDataPosition += val.length;
+			
+		}else{
+			writeByte(0);
+		}
+	}
+	
+    /**
      * Read a particular object type from the parcel at the current dataPosition(). 
      * The object <em>must</em> have previously been written via {@link #writeParcel} with the same
      * object type.

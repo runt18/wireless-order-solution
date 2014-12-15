@@ -89,7 +89,7 @@ public class Restaurant implements Parcelable, Jsonable{
 	//The helper class to update a restaurant
 	public static class UpdateBuilder{
 		private final int id;
-		private final String account;
+		private String account;
 		private String restaurantName;
 		private long expireDate;
 		private String pwd;
@@ -101,11 +101,15 @@ public class Restaurant implements Parcelable, Jsonable{
 		private int dianpingId;
 		private final List<Module> modules = SortedList.newInstance(); 
 		
-		public UpdateBuilder(int id, String account){
+		public UpdateBuilder(int id){
 			this.id = id;
-			this.account = account;
 		}
 
+		public UpdateBuilder setAccount(String account){
+			this.account = account;
+			return this;
+		}
+		
 		public boolean isAccountChanged(){
 			return this.account != null;
 		}
@@ -325,20 +329,40 @@ public class Restaurant implements Parcelable, Jsonable{
 	
 	private Restaurant(UpdateBuilder builder){
 		setId(builder.id);
-		setAccount(builder.account);
-		setDianpingId(builder.dianpingId);
-		setName(builder.restaurantName);
-		setInfo(builder.restaurantInfo);
-		setRecordAlive(builder.recordAlive.getSeconds());
-		setTele1(builder.tele1);
-		setTele2(builder.tele2);
-		setAddress(builder.address);
-		setExpireDate(builder.expireDate);
+		if(builder.isAccountChanged()){
+			setAccount(builder.account);
+		}
+		if(builder.isDianpingIdChanged()){
+			setDianpingId(builder.dianpingId);
+		}
+		if(builder.isRestaurantNameChanged()){
+			setName(builder.restaurantName);
+		}
+		if(builder.isRestaurantInfoChanged()){
+			setInfo(builder.restaurantInfo);
+		}
+		if(builder.isRecordAliveChanged()){
+			setRecordAlive(builder.recordAlive.getSeconds());
+		}
+		if(builder.isTele1Changed()){
+			setTele1(builder.tele1);
+		}
+		if(builder.isTele2Changed()){
+			setTele2(builder.tele2);
+		}
+		if(builder.isAddressChanged()){
+			setAddress(builder.address);
+		}
+		if(builder.isExpireDateChanged()){
+			setExpireDate(builder.expireDate);
+		}
 		String now = new SimpleDateFormat(DateUtil.Pattern.DATE.getPattern(), Locale.getDefault()).format(new Date());
 		try {
 			setBirthDate(new SimpleDateFormat(DateUtil.Pattern.DATE.getPattern(), Locale.getDefault()).parse(now).getTime());
 		} catch (ParseException ignored) {}
-		setModule(builder.modules);
+		if(builder.isModuleChanged()){
+			setModule(builder.modules);
+		}
 	}
 	
 	public int getId() {
