@@ -489,7 +489,7 @@ public class MemberOperationDao {
 	public static int getAmountByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
 		sql = " SELECT COUNT(*) " +
-			  " FROM " + Params.dbName + ".member_operation MO " +
+			  " FROM " + Params.dbName + "." + extraCond.moTbl + " MO " +
 			  " JOIN " + Params.dbName + ".member M ON MO.member_id = M.member_id "	+
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = MO.pay_type_id " +
 			  " WHERE 1 = 1 " +

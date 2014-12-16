@@ -153,6 +153,48 @@ public class WxOrderDao {
 		return insert(dbCon, staff, wxOrder);
 	}
 	
+	/**
+	 * Insert the new weixin order for take out according to builder {@link WxOrder#InsertBuilder4Takeout}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder {@link WxOrder#InsertBuilder4Takeout}
+	 * @return the id to weixin order just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int insert(Staff staff, WxOrder.InsertBuilder4Takeout builder) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			int wxOrderId = insert(dbCon, staff, builder);
+			dbCon.conn.commit();
+			return wxOrderId;
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Insert the new weixin order for take out according to builder {@link WxOrder#InsertBuilder4Takeout}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder {@link WxOrder#InsertBuilder4Takeout}
+	 * @return the id to weixin order just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int insert(DBCon dbCon, Staff staff, WxOrder.InsertBuilder4Takeout builder) throws SQLException{
+		return insert(dbCon, staff, builder.build());
+	}
+	
 	private static int insert(DBCon dbCon, Staff staff, WxOrder wxOrder) throws SQLException{
 		
 		String sql;
