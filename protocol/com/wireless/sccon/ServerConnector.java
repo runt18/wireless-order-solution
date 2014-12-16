@@ -45,4 +45,13 @@ public class ServerConnector{
 	public ProtocolPackage ask(RequestPackage req, int timeout) throws IOException{
 		return new Session(req, timeout).execute(_netAddr, _netPort);
 	}
+	
+	/**
+	 * Ask the server to get the result. This function is synchronized.
+	 * The thread call this function would be blocked until receiving the
+	 * response in the receive thread. 
+	 **/
+	public ProtocolPackage ask(String addr, RequestPackage req, int timeout) throws IOException{
+		return new Session(req, timeout).execute(addr, _netPort);
+	}
 }
