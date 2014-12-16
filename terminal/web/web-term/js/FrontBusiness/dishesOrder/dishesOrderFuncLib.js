@@ -897,7 +897,7 @@ function submitRepaidOrderMain(_c){
 		url : "../../RepaidOrder.do",
 		params : {
 			'orderId' : _c.grid.order["id"],
-			'memberID' : re_member.id,
+			'memberID' : re_member?re_member.id:'',
 			'discountID' : discountID.getValue(),
 			'servicePlan' : servicePlan.getValue(),
 			"payType" : _c.commit_payType,
