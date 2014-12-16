@@ -162,6 +162,22 @@ public class WxOrder implements Jsonable, Parcelable{
 		}
 	} 
 	
+	public static class InsertBuilder4Takeout extends InsertBuilder{
+		public InsertBuilder4Takeout(String weixinSerial){
+			super(weixinSerial, Type.TAKE_OUT, Status.COMMITTED);
+		}
+		
+		public InsertBuilder4Takeout add(OrderFood foodToAdd) throws BusinessException{
+			super.add(foodToAdd);
+			return this;
+		}
+		
+		public InsertBuilder4Takeout addAll(List<OrderFood> foodsToAdd) throws BusinessException{
+			super.addAll(foodsToAdd);
+			return this;
+		}
+	}
+	
 	public static class InsertBuilder4Inside extends InsertBuilder{
 		public InsertBuilder4Inside(String weixinSerial){
 			super(weixinSerial, Type.INSIDE, Status.COMMITTED);
