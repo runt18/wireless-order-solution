@@ -502,7 +502,7 @@ class OrderHandler implements Runnable{
 					public void run() {
 						try{
 							//Perform this coupon draw.
-							List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(payBuilder.getMemberId())
+							List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(payBuilder.getMemberId()).setStatus(Coupon.Status.PUBLISHED)
 																									   .addPromotionStatus(Promotion.Status.PROGRESS), null);
 							//Check to see whether or not any coupons associated with this member is qualified to take.
 							for(Coupon coupon : coupons){
