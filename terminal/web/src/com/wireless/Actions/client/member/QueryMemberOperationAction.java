@@ -48,14 +48,26 @@ public class QueryMemberOperationAction extends Action{
 			String offDuty = request.getParameter("offDuty");
 			String total = request.getParameter("total");
 			
-			final MemberOperationDao.ExtraCond extraCond;
+			MemberOperationDao.ExtraCond extraCond = null;
+			
+			DateType dy;
+			
 			if(dataSource.equalsIgnoreCase("today")){
-				extraCond = new MemberOperationDao.ExtraCond(DateType.TODAY);
+				dy = DateType.TODAY;
 			}else{
-				extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
+				dy = DateType.HISTORY;
 			}
 
-			
+			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
+				if(Integer.valueOf(operateType) == OperationType.CONSUME.getType()){
+					extraCond = new MemberOperationDao.ExtraCond4Consume(dy);
+				}else{
+					extraCond = new MemberOperationDao.ExtraCond(dy);
+				}
+			}else{
+				extraCond = new MemberOperationDao.ExtraCond(dy);
+			}
+
 			if(memberMobile != null && !memberMobile.trim().isEmpty()){
 				extraCond.setMobile(memberMobile);
 			}
