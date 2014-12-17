@@ -2,9 +2,9 @@ package com.wireless.print.content.concrete;
 
 import java.text.SimpleDateFormat;
 
-import com.wireless.pojo.client.MemberOperation;
-import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.member.MemberOperation;
+import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.restaurantMgr.Restaurant;

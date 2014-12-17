@@ -8,10 +8,10 @@ import java.text.SimpleDateFormat;
 
 import org.tiling.scheduling.SchedulerTask;
 
-import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.foodAssociation.CalcFoodAssociationDao;
 import com.wireless.db.foodStatistics.CalcFoodStatisticsDao;
 import com.wireless.db.frontBusiness.DailySettleDao;
+import com.wireless.db.member.MemberDao;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.printScheme.PrintLossDao;
 import com.wireless.db.promotion.PromotionDao;
