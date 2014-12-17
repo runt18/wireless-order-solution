@@ -38,10 +38,10 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.parcel.MemberParcel;
 import com.wireless.parcel.OrderParcel;
-import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberComment;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberComment;
 import com.wireless.pojo.menuMgr.Food;
 
 public class MemberDetailActivity extends FragmentActivity {
@@ -435,7 +435,7 @@ public class MemberDetailActivity extends FragmentActivity {
 			final CheckBox checkBox;
 			
 			if(convertView == null){
-				View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.member_detail_food_item, null);
+				View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.member_detail_food_item, parent, false);
 				checkBox = (CheckBox) view;
 			}else{
 				checkBox = (CheckBox)convertView;

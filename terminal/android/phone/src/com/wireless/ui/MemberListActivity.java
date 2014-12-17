@@ -34,7 +34,7 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.parcel.MemberParcel;
-import com.wireless.pojo.client.Member;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.util.SortedList;
 
 public class MemberListActivity extends FragmentActivity {
@@ -299,7 +299,7 @@ public class MemberListActivity extends FragmentActivity {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final View layout;
 			if(convertView == null){
-				layout = LayoutInflater.from(getApplicationContext()).inflate(R.layout.member_list_item, null);
+				layout = LayoutInflater.from(getApplicationContext()).inflate(R.layout.member_list_item, parent, false);
 			}else{
 				layout = convertView;
 			}
