@@ -2,7 +2,7 @@ package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.pojo.client.MemberComment;
+import com.wireless.pojo.member.MemberComment;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqCommitMemberComment extends RequestPackage {

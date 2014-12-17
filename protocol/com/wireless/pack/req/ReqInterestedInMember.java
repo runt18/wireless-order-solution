@@ -2,7 +2,7 @@ package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.pojo.client.Member;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqInterestedInMember extends RequestPackage {
