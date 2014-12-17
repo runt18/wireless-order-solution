@@ -17,8 +17,8 @@ import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.MOSummary;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
-import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.member.MemberOperation.OperationType;
+import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
@@ -27,6 +27,40 @@ import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 
 public class MemberOperationDao {
+	
+	public static class ExtraCond4Consume extends ExtraCond{
+
+		public ExtraCond4Consume(DateType dateType) {
+			super(dateType);
+		}
+		
+		@Override
+		public String toString(){
+			final StringBuilder extraCond = new StringBuilder();
+			StringBuilder operateTypeCond = new StringBuilder();
+			for(MemberOperation.OperationType type : super.operationTypes){
+				if(operateTypeCond.length() == 0){
+					operateTypeCond.append(type.getValue());
+				}else{
+					operateTypeCond.append("," + type.getValue());
+				}
+			}
+			
+			if(operateTypeCond.length() != 0){
+				extraCond.append(" AND MO.operate_type IN (" + operateTypeCond.toString() + ")");
+			}
+			
+			if(super.operationDate != null){
+				extraCond.append(" AND MO.operate_date BETWEEN '" + super.operationDate.getOnDutyFormat() + "' AND '" + super.operationDate.getOffDutyFormat() + "'");
+			}	
+			
+			extraCond.append(" AND EXISTS( SELECT 1 FROM wireless_order_db.member_operation_history MO2 " +
+							" WHERE 1 = 1 AND MO.order_id = MO2.order_id GROUP BY MO2.order_id HAVING MAX(MO2.id) = MO.id)");
+			
+			return extraCond.toString();
+		}
+		
+	}
 	
 	public static class ExtraCond{
 		private final DateType dateType;
