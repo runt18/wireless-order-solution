@@ -15,8 +15,8 @@ import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 

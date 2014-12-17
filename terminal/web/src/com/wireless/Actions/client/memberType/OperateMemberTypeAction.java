@@ -8,13 +8,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.client.member.MemberTypeDao;
+import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.member.MemberType;
+import com.wireless.pojo.member.MemberType.Attribute;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
 

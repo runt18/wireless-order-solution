@@ -12,19 +12,19 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.client.member.MemberLevelDao;
-import com.wireless.db.client.member.MemberTypeDao;
+import com.wireless.db.member.MemberDao;
+import com.wireless.db.member.MemberLevelDao;
+import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberLevel;
-import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberLevel;
+import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
 

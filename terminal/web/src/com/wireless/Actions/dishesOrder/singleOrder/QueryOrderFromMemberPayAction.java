@@ -10,7 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.PayOrder;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -19,10 +19,10 @@ import com.wireless.exception.MemberError;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.staffMgr.Staff;
 

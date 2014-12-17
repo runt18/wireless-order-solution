@@ -12,13 +12,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.client.MOSummary;
-import com.wireless.pojo.client.MemberOperation;
-import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.member.MOSummary;
+import com.wireless.pojo.member.MemberOperation;
+import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;

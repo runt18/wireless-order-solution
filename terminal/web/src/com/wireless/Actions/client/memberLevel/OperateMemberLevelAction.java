@@ -10,13 +10,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.client.member.MemberLevelDao;
+import com.wireless.db.member.MemberLevelDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.client.MemberLevel;
-import com.wireless.pojo.client.MemberLevel.InsertBuilder;
-import com.wireless.pojo.client.MemberLevel.UpdateBuilder;
+import com.wireless.pojo.member.MemberLevel;
+import com.wireless.pojo.member.MemberLevel.InsertBuilder;
+import com.wireless.pojo.member.MemberLevel.UpdateBuilder;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateMemberLevelAction extends DispatchAction{

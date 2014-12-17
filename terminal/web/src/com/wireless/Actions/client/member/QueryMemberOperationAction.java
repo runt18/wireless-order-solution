@@ -10,16 +10,16 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.member.MemberDao;
+import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
-import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberOperation;
-import com.wireless.pojo.client.MemberOperation.OperationType;
-import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberOperation;
+import com.wireless.pojo.member.MemberType;
+import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 
