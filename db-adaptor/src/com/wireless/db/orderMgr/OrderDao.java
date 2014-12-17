@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.member.MemberDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.weixin.order.WxOrderDao;

@@ -9,7 +9,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PricePlanError;
-import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;

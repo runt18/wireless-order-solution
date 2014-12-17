@@ -1,4 +1,4 @@
-package com.wireless.test.db.client.member;
+package com.wireless.test.db.member;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
@@ -6,18 +6,18 @@ import java.sql.SQLException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.wireless.db.member.MemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.test.db.TestInit;
 
-public class TestMemberUpgrade {
-	
+public class TestMemberRecommendFoods {
 	@BeforeClass
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 	}
 	
 	@Test
-	public void testMemberUpgrade() throws SQLException, BusinessException{
-		//System.out.println(MemberDao.upgrade());
+	public void testMemberRecommendFoods() throws SQLException{
+		MemberDao.calcRecommendFoods();
 	}
 }

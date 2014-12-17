@@ -12,11 +12,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;

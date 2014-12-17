@@ -15,7 +15,7 @@ import javax.imageio.ImageIO;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.member.MemberDao;
 import com.wireless.db.oss.CompressImage;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;

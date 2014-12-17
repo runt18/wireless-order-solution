@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import com.aliyun.openservices.oss.OSSClient;
 import com.aliyun.openservices.oss.OSSException;
-import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.member.MemberDao;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponTypeDao;
@@ -24,7 +24,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.OssImageError;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.billStatistics.DateRange;
-import com.wireless.pojo.client.Member;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;

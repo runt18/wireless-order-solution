@@ -1,7 +1,7 @@
 package com.wireless.sms.msg;
 
-import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberLevel;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberLevel;
 import com.wireless.pojo.sms.SMSDetail;
 
 public class Msg4Upgrade extends Msg{

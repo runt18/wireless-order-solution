@@ -1,7 +1,7 @@
 package com.wireless.sms.msg;
 
-import com.wireless.pojo.client.MemberOperation;
-import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.member.MemberOperation;
+import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.sms.SMSDetail;
 import com.wireless.pojo.util.NumericUtil;
 

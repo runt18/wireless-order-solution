@@ -7,13 +7,13 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.client.member.MemberTypeDao;
+import com.wireless.db.member.MemberDao;
+import com.wireless.db.member.MemberTypeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.WxMemberError;
-import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.WxMember;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.WxMember;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class WxMemberDao {

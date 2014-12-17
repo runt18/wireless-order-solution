@@ -8,15 +8,15 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.client.member.MemberTypeDao;
+import com.wireless.db.member.MemberDao;
+import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
-import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.client.WxMember;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberType;
+import com.wireless.pojo.member.WxMember;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 

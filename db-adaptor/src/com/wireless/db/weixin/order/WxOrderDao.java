@@ -7,15 +7,19 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.member.MemberDao;
+import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.MemberError;
 import com.wireless.exception.WxOrderError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.TakeoutAddress;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.order.WxOrder;
@@ -108,8 +112,10 @@ public class WxOrderDao {
 	 * @return the id to weixin order just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the member to this weixin serial does NOT exist
 	 */
-	public static int insert(Staff staff, WxOrder.InsertBuilder4Inside builder) throws SQLException{
+	public static int insert(Staff staff, WxOrder.InsertBuilder4Inside builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -135,8 +141,10 @@ public class WxOrderDao {
 	 * @return the id to weixin order just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the member to this weixin serial does NOT exist
 	 */
-	public static int insert(DBCon dbCon, Staff staff, WxOrder.InsertBuilder4Inside builder) throws SQLException{
+	public static int insert(DBCon dbCon, Staff staff, WxOrder.InsertBuilder4Inside builder) throws SQLException, BusinessException{
 		
 		WxOrder wxOrder = builder.build();
 		
@@ -162,8 +170,10 @@ public class WxOrderDao {
 	 * @return the id to weixin order just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the take-out address to this order does NOT exist
 	 */
-	public static int insert(Staff staff, WxOrder.InsertBuilder4Takeout builder) throws SQLException{
+	public static int insert(Staff staff, WxOrder.InsertBuilder4Takeout builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -190,14 +200,45 @@ public class WxOrderDao {
 	 * @return the id to weixin order just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the take-out address to this order does NOT exist
 	 */
-	public static int insert(DBCon dbCon, Staff staff, WxOrder.InsertBuilder4Takeout builder) throws SQLException{
-		return insert(dbCon, staff, builder.build());
+	public static int insert(DBCon dbCon, Staff staff, WxOrder.InsertBuilder4Takeout builder) throws SQLException, BusinessException{
+		WxOrder wxOrder = builder.build();
+		
+		Member member = MemberDao.getByWxSerial(dbCon, staff, wxOrder.getWeixinSerial());
+		if(TakeoutAddressDao.getByCond(dbCon, staff, new TakeoutAddressDao.ExtraCond().setMember(member).setId(wxOrder.getTakeoutAddress().getId())).isEmpty()){
+			throw new BusinessException("外卖地址信息不属于此会员", WxOrderError.WX_TAKE_OUT_ORDER_NOT_ALLOW);
+		}
+		
+		wxOrder.setTakoutAddress(TakeoutAddressDao.getById(dbCon, staff, wxOrder.getTakeoutAddress().getId()));
+		
+		int id = insert(dbCon, staff, wxOrder);
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".weixin_order SET " +
+			  " wx_order_id = " + id +
+			  " ,address_id = " + wxOrder.getTakeoutAddress().getId() +
+			  " ,address = '" + wxOrder.getTakeoutAddress().getAddress() + "'" +
+			  " WHERE wx_order_id = " + id;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Update the last used to take-out address
+		sql = " UPDATE " + Params.dbName + ".take_out_address SET " +
+			  " last_used = NOW() " +
+			  " WHERE id = " + wxOrder.getTakeoutAddress().getId();
+		dbCon.stmt.executeUpdate(sql);
+		
+		return id;
 	}
 	
-	private static int insert(DBCon dbCon, Staff staff, WxOrder wxOrder) throws SQLException{
+	private static int insert(DBCon dbCon, Staff staff, WxOrder wxOrder) throws SQLException, BusinessException{
 		
 		String sql;
+		
+		//Check to see whether the member to this weixin serial exist.
+		if(MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(wxOrder.getWeixinSerial()), null).isEmpty()){
+			throw new BusinessException("微信序列号对应的会员不存在", MemberError.MEMBER_NOT_EXIST);
+		}
 		
 		//Generate the operation code.
 		sql = " SELECT IFNULL(MAX(code) + 1, 100) FROM " + Params.dbName + ".weixin_order WHERE restaurant_id = " + staff.getRestaurantId();
@@ -437,6 +478,11 @@ public class WxOrderDao {
 			wxOrder.setRestaurant(dbCon.rs.getInt("restaurant_id"));
 			wxOrder.setStatus(WxOrder.Status.valueOf(dbCon.rs.getInt("status")));
 			wxOrder.setType(WxOrder.Type.valueOf(dbCon.rs.getInt("type")));
+			if(wxOrder.getType() == WxOrder.Type.TAKE_OUT){
+				TakeoutAddress address = new TakeoutAddress(dbCon.rs.getInt("address_id"));
+				address.setAddress(dbCon.rs.getString("address"));
+				wxOrder.setTakoutAddress(address);
+			}
 			wxOrder.setCode(dbCon.rs.getInt("code"));
 			wxOrder.setOrderId(dbCon.rs.getInt("order_id"));
 			wxOrder.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());

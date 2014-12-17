@@ -1,4 +1,4 @@
-package com.wireless.test.db.client.member;
+package com.wireless.test.db.member;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -10,20 +10,20 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.member.MemberType;
+import com.wireless.pojo.member.MemberType.Attribute;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.SortedList;
 import com.wireless.test.db.TestInit;
 
-public class TestMemberTypeDao {
+public class TestMemberType {
 	private static Staff mStaff;
 	
 	@BeforeClass

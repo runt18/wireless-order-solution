@@ -1,4 +1,4 @@
-package com.wireless.test.db.client.member;
+package com.wireless.test.db.member;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -9,28 +9,28 @@ import java.sql.SQLException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.client.member.MemberCommentDao;
-import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.client.member.MemberDao.ActiveExtraCond;
-import com.wireless.db.client.member.MemberOperationDao;
-import com.wireless.db.client.member.MemberTypeDao;
+import com.wireless.db.member.MemberCommentDao;
+import com.wireless.db.member.MemberDao;
+import com.wireless.db.member.MemberOperationDao;
+import com.wireless.db.member.MemberTypeDao;
+import com.wireless.db.member.MemberDao.ActiveExtraCond;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.Member.AdjustType;
-import com.wireless.pojo.client.Member.Sex;
-import com.wireless.pojo.client.MemberComment;
-import com.wireless.pojo.client.MemberOperation;
-import com.wireless.pojo.client.MemberOperation.ChargeType;
-import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberComment;
+import com.wireless.pojo.member.MemberOperation;
+import com.wireless.pojo.member.MemberType;
+import com.wireless.pojo.member.Member.AdjustType;
+import com.wireless.pojo.member.Member.Sex;
+import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.DateType;
 
-public class TestMemberDao {
+public class TestMember {
 	
 	private static Staff mStaff;
 	
