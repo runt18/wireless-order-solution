@@ -26,7 +26,7 @@ import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 
 import com.alibaba.fastjson.JSON;
-import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.member.MemberDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -36,7 +36,7 @@ import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
-import com.wireless.pojo.client.Member;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Restaurant;
