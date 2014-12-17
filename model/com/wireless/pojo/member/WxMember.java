@@ -1,4 +1,4 @@
-package com.wireless.pojo.client;
+package com.wireless.pojo.member;
 
 
 public class WxMember {

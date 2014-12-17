@@ -11,13 +11,7 @@ public class MemberError extends ErrorEnum{
 	 *  coupon :			
 	 */
 	/* member 9750 - 9799 */
-	public static final ErrorCode UNKNOWN = build(ErrorEnum.UNKNOWN_CODE, "操作失败, 未知错误.");
-	public static final ErrorCode INSERT_FAIL = build(9799, "操作失败, 添加新会员资料失败, 请检查数据内容是否正确.");
 	public static final ErrorCode UPDATE_FAIL = build(9798, "操作失败, 修改会员资料失败, 请检查数据内容是否正确.");
-	public static final ErrorCode DELETE_FAIL = build(9797, "操作失败, 删除会员资料失败, 请检查数据内容是否正确.");
-	public static final ErrorCode REMOVE_CLIENT = build(9796, "操作失败, 删除客户资料绑定失败.");
-	public static final ErrorCode BINDING_CLIENT = build(9795, "操作失败, 绑定客户资料失败.");
-	public static final ErrorCode UPDATE_BALANCE = build(9794, "操作失败, 修改会员金额信息失败.");
 	public static final ErrorCode UPDATE_POINT = build(9793, "操作失败, 修改会员积分信息失败.");
 	public static final ErrorCode MEMBER_NOT_EXIST = build(9792, "操作失败, 查找的会员不存在.");
 	public static final ErrorCode EXCEED_POINT = build(9791, "操作失败, 积分余额不足.");
@@ -48,6 +42,7 @@ public class MemberError extends ErrorEnum{
 	public static final ErrorCode MEMBER_LEVEL_MORE_POINT = build(9616, "操作失败, 积分必须小于高等级的");
 	public static final ErrorCode MEMBER_LEVEL_HIGHEST = build(9617, "操作失败, 积分必须最高等级的");
 
+	public static final ErrorCode TAKE_OUT_ADDRESS_NOT_EXIST = build(9617, "外卖地址不存在");
 	
 	private MemberError(){
 		

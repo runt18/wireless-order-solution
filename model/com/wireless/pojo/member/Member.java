@@ -1,4 +1,4 @@
-package com.wireless.pojo.client;
+package com.wireless.pojo.member;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,9 +11,9 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
-import com.wireless.pojo.client.MemberOperation.ChargeType;
-import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.member.MemberOperation.ChargeType;
+import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.util.DateUtil;

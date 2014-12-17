@@ -9,9 +9,10 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
-import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.TakeoutAddress;
 import com.wireless.pojo.util.DateUtil;
 
 public class WxOrder implements Jsonable, Parcelable{
@@ -163,8 +164,16 @@ public class WxOrder implements Jsonable, Parcelable{
 	} 
 	
 	public static class InsertBuilder4Takeout extends InsertBuilder{
-		public InsertBuilder4Takeout(String weixinSerial){
+		private final TakeoutAddress address;
+		
+		public InsertBuilder4Takeout(String weixinSerial, int addressId){
 			super(weixinSerial, Type.TAKE_OUT, Status.COMMITTED);
+			this.address = new TakeoutAddress(addressId);
+		}
+		
+		public InsertBuilder4Takeout(String weixinSerial, TakeoutAddress address){
+			super(weixinSerial, Type.TAKE_OUT, Status.COMMITTED);
+			this.address = address;
 		}
 		
 		public InsertBuilder4Takeout add(OrderFood foodToAdd) throws BusinessException{
@@ -204,6 +213,7 @@ public class WxOrder implements Jsonable, Parcelable{
 	private Status status;
 	private int restaurantId;
 	private final List<OrderFood> foods = new ArrayList<OrderFood>();
+	private TakeoutAddress address;
 	
 	private WxOrder(UpdateBuilder builder){
 		setId(builder.id);
@@ -216,6 +226,9 @@ public class WxOrder implements Jsonable, Parcelable{
 		setType(builder.type);
 		setStatus(builder.status);
 		setFoods(builder.order.getFoods());
+		if(builder.type == Type.TAKE_OUT){
+			setTakoutAddress(((InsertBuilder4Takeout)builder).address);
+		}
 	}
 	
 	public WxOrder(int id){
@@ -244,6 +257,14 @@ public class WxOrder implements Jsonable, Parcelable{
 	
 	public void setMember(Member member){
 		this.member = member;
+	}
+	
+	public TakeoutAddress getTakeoutAddress(){
+		return this.address;
+	}
+	
+	public void setTakoutAddress(TakeoutAddress address){
+		this.address = address;
 	}
 	
 	public long getBirthDate() {

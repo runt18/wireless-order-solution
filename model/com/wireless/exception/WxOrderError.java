@@ -4,6 +4,7 @@ public class WxOrderError extends ErrorEnum{
 	
 	/* cord range : 6959 - 6999 */
 	public static final ErrorCode WX_ORDER_NOT_EXIST = build(9659, "微信账单不存在");
+	public static final ErrorCode WX_TAKE_OUT_ORDER_NOT_ALLOW = build(9660, "微信外卖账单下单失败");
 	
 	private WxOrderError(){
 		

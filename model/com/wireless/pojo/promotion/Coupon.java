@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.client.Member;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.SortedList;
 
