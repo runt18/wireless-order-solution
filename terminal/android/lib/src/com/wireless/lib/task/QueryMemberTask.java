@@ -13,7 +13,7 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryMember;
 import com.wireless.parcel.Parcel;
-import com.wireless.pojo.client.Member;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 

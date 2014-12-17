@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.req.ReqCommitMemberComment;
-import com.wireless.pojo.client.MemberComment;
+import com.wireless.pojo.member.MemberComment;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 

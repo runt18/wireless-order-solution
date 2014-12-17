@@ -10,7 +10,7 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryMemberDetail;
 import com.wireless.parcel.Parcel;
-import com.wireless.pojo.client.Member;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.staffMgr.Staff;
