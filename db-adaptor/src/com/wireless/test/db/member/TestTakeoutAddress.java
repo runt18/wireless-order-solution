@@ -35,7 +35,7 @@ public class TestTakeoutAddress {
 		int addressId = 0;
 		Member member = MemberDao.getByCond(mStaff, null, null).get(0);
 		try{
-			TakeoutAddress.InsertBuilder builder = new TakeoutAddress.InsertBuilder(member, "测试外卖地址");
+			TakeoutAddress.InsertBuilder builder = new TakeoutAddress.InsertBuilder(member, "测试外卖地址", "18520590932");
 			addressId = TakeoutAddressDao.insert(mStaff, builder);
 			
 			TakeoutAddress expected = builder.build();
@@ -43,6 +43,7 @@ public class TestTakeoutAddress {
 			
 			Assert.assertEquals(expected.getMemberId(), actual.getMemberId());
 			Assert.assertEquals(expected.getAddress(), actual.getAddress());
+			Assert.assertEquals(expected.getTele(), actual.getTele());
 		}finally{
 			if(addressId != 0){
 				TakeoutAddressDao.deleteById(mStaff, addressId);

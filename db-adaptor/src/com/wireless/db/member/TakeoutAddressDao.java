@@ -83,9 +83,10 @@ public class TakeoutAddressDao {
 		TakeoutAddress address = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".take_out_address" +
-			  " (member_id, address) VALUES( " +
+			  " (member_id, address, tele) VALUES( " +
 			  address.getMemberId() + "," +
-			  "'" + address.getAddress() + "'" +
+			  "'" + address.getAddress() + "'," +
+			  "'" + address.getTele() + "'" +
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -161,13 +162,15 @@ public class TakeoutAddressDao {
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".take_out_address " +
 			  " WHERE 1 = 1 " +
-			  (extraCond != null ? extraCond.toString() : "");
+			  (extraCond != null ? extraCond.toString() : "") +
+			  " ORDER BY last_used DESC ";
 		
 		final List<TakeoutAddress> result = new ArrayList<>();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			TakeoutAddress address = new TakeoutAddress(dbCon.rs.getInt("id"));
 			address.setAddress(dbCon.rs.getString("address"));
+			address.setTele(dbCon.rs.getString("tele"));
 			address.setMemberId(dbCon.rs.getInt("member_id"));
 			if(dbCon.rs.getTimestamp("last_used") != null){
 				address.setLastUsed(dbCon.rs.getTimestamp("last_used").getTime());
