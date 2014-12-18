@@ -629,14 +629,14 @@ public class SelectedFoodActivity extends Activity
 									private ProgressDialog mProgressDialog;
 									@Override
 									public void onPreCommit(Order reqOrder) {
-										mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this,"", "查询号账单信息...请稍候");
+										mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this, "", "查询号账单信息...请稍候");
 									}
 
 									@Override
 									public void onSuccess(Order reqOrder) {
 										mProgressDialog.dismiss();
 										
-										Toast.makeText(SelectedFoodActivity.this, ShoppingCart.instance().getDestTable().getName() + "下单成功", Toast.LENGTH_SHORT).show();
+										Toast.makeText(SelectedFoodActivity.this, "下单成功", Toast.LENGTH_SHORT).show();
 										
 										v.postDelayed(new Runnable(){
 

@@ -66,7 +66,7 @@
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@+id/imageButton_submit_pickedFood"
-                android:background="@drawable/pay_temp_selector"
+                android:background="@drawable/pay_order_selector"
                 android:textColor="@color/white" />
 
             <Button
