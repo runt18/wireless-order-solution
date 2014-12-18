@@ -83,10 +83,11 @@ public class TakeoutAddressDao {
 		TakeoutAddress address = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".take_out_address" +
-			  " (member_id, address, tele) VALUES( " +
+			  " (member_id, address, tele, name) VALUES( " +
 			  address.getMemberId() + "," +
 			  "'" + address.getAddress() + "'," +
-			  "'" + address.getTele() + "'" +
+			  "'" + address.getTele() + "'," +
+			  "'" + address.getName() + "'" +
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -172,6 +173,7 @@ public class TakeoutAddressDao {
 			address.setAddress(dbCon.rs.getString("address"));
 			address.setTele(dbCon.rs.getString("tele"));
 			address.setMemberId(dbCon.rs.getInt("member_id"));
+			address.setName(dbCon.rs.getString("name"));
 			if(dbCon.rs.getTimestamp("last_used") != null){
 				address.setLastUsed(dbCon.rs.getTimestamp("last_used").getTime());
 			}
