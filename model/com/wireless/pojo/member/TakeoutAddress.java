@@ -6,17 +6,20 @@ public class TakeoutAddress {
 		private final int memberId;
 		private final String address;
 		private final String tele;
+		private final String name;
 		
-		public InsertBuilder(Member member, String address, String tele){
+		public InsertBuilder(Member member, String address, String tele, String name){
 			this.memberId = member.getId();
 			this.address = address;
 			this.tele = tele;
+			this.name = name;
 		}
 		
-		public InsertBuilder(int memberId, String address, String tele){
+		public InsertBuilder(int memberId, String address, String tele, String name){
 			this.memberId = memberId;
 			this.address = address;
 			this.tele = tele;
+			this.name = name;
 		}
 		
 		public TakeoutAddress build(){
@@ -29,12 +32,14 @@ public class TakeoutAddress {
 	private int memberId;
 	private String address;
 	private String tele;
+	private String name;
 	private long lastUsed;
 	
 	private TakeoutAddress(InsertBuilder builder){
 		setMemberId(builder.memberId);
 		setAddress(builder.address);
 		setTele(builder.tele);
+		setName(builder.name);
 	}
 	
 	public TakeoutAddress(int id){
@@ -77,6 +82,17 @@ public class TakeoutAddress {
 	
 	public void setTele(String tele){
 		this.tele = tele;
+	}
+	
+	public String getName(){
+		if(this.name == null){
+			return "";
+		}
+		return this.name;
+	}
+	
+	public void setName(String name){
+		this.name = name;
 	}
 	
 	public long getLastUsed() {
