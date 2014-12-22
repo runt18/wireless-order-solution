@@ -31,10 +31,6 @@ CString g_NewProgPath;
 //2 - Run new setup program silently 
 int g_DoQuitProg = 0;
 
-map<int, CString> g_Departments;
-map<int, CString> g_Kitchens;
-map<int, CString> g_Regions;
-
 //the name of the restaurant
 static CString g_Restaurant = _T("e点通");
 
@@ -75,22 +71,9 @@ static UINT indicators[] =
 
 // CMainFrame construction/destruction
 
-CMainFrame::CMainFrame() : m_pStatusView(NULL), m_pPrinterView(NULL), m_UpdateWaitTime(10), m_TimerID(0)
+CMainFrame::CMainFrame() : m_pStatusView(NULL), m_UpdateWaitTime(10), m_TimerID(0)
 {
 	// TODO: add member initialization code here
-	//initialize the kitchens, "厨房1" to "厨房10"
-	for(int i = 0; i < 10; i++){
-		CString kitchen;
-		kitchen.Format(_T("厨房%d"), i + 1);
-		g_Kitchens.insert(map<int, CString>::value_type(i, kitchen));
-	}
-
-	//initialize the regions, "区域1" to "区域10"
-	for(int i = 0; i < 10; i++){
-		CString region;
-		region.Format(_T("区域%d"), i + 1);
-		g_Regions.insert(map<int, CString>::value_type(i, region));
-	}
 }
 
 CMainFrame::~CMainFrame()
@@ -154,19 +137,19 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext){
 		return FALSE;
 
 	//creat the status view
-	if (!m_wndSplitter.CreateView(0, 0, RUNTIME_CLASS(CStatusView), CSize(1, rect.Height() - 150), pContext))
+	if (!m_wndSplitter.CreateView(0, 0, RUNTIME_CLASS(CStatusView), CSize(1, rect.Height()), pContext))
 	{
 		m_wndSplitter.DestroyWindow();
 		return FALSE;
 	}
 	m_pStatusView = (CStatusView*)m_wndSplitter.GetPane(0, 0);
 
-	if (!m_wndSplitter.CreateView(1, 0, RUNTIME_CLASS(CPrinterView), CSize(1, 150), pContext))
+	if (!m_wndSplitter.CreateView(1, 0, RUNTIME_CLASS(CEditView), CSize(1, 150), pContext))
 	{
 		m_wndSplitter.DestroyWindow();
 		return FALSE;
 	}
-	m_pPrinterView = (CPrinterView*)m_wndSplitter.GetPane(1, 0);
+	m_wndSplitter.HideRow(1);
 
 	//get the path of the gui.exe
 	GetModuleFileName(NULL, g_ConfPath.GetBufferSetLength(MAX_PATH + 1), MAX_PATH);
@@ -278,47 +261,7 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 	//as well as a <auto_update> tag and set the on to true
 	//and then run the pserver
 	if(fin.good()){
-		TiXmlDocument confDoc;
-		fin >> confDoc;
-
-		TiXmlElement* pRoot = TiXmlHandle(&confDoc).FirstChildElement(ConfTags::CONF_ROOT).Element();
-		if(pRoot){
-
-			//FIXME!!!
-			//the code below is only used to upload the print server
-			//should be removed in future
-			string confVer = pRoot->Attribute(ConfTags::CONF_VER);
-			//If the configure file version is 1.2, add the  upload attribute so as to upload the printer to server
-			if(confVer == "1.2"){
-				//change to the latest version
-				pRoot->SetAttribute(ConfTags::CONF_VER, CONF_VER);
-				//add the  upload attribute
-				pRoot->SetAttribute(ConfTags::UPLOAD_PRINTER, ConfTags::ON);
-
-				ofstream fout(g_ConfPath);
-				if(fout.good()){
-					fout.seekp(ios::beg);
-					fout << confDoc;
-				}
-				fout.flush();
-				fout.close();
-
-			}else if(confVer == "1.3" && pRoot->Attribute(ConfTags::UPLOAD_PRINTER)){
-				//remove the upload attribute 
-				pRoot->RemoveAttribute(ConfTags::UPLOAD_PRINTER);
-
-				ofstream fout(g_ConfPath);
-				if(fout.good()){
-					fout.seekp(ios::beg);
-					fout << confDoc;
-				}
-				fout.flush();
-				fout.close();
-			}		
-		}
-		ostringstream os;
-		os << confDoc;
-		PServer::instance().run(pMainFrame, istringstream(os.str()));
+		PServer::instance().run(pMainFrame, g_ConfPath.GetBuffer(0));
 		fin.close();
 
 	}else{
@@ -339,9 +282,8 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 		ofstream fout(g_ConfPath);
 		fout << confDoc;
 		fout.close();
-		ostringstream os;
-		os << confDoc;
-		PServer::instance().run(pMainFrame, istringstream(os.str()));
+
+		PServer::instance().run(pMainFrame, g_ConfPath.GetBuffer(0));
 	}
 
 	//check to see if new version exist
@@ -379,42 +321,6 @@ void CMainFrame::OnPrintReport(int type, const TCHAR* msg){
 	}
 }
 
-//void CMainFrame::OnRetrieveDept(const std::vector<Department>& depts){
-//	g_Departments.clear();
-//	for(unsigned int i = 0; i < depts.size(); i++){
-//		//convert the string from ANSI to UNICODE
-//		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, depts[i].name.c_str(), -1, NULL, 0);
-//		boost::shared_ptr<wchar_t> pDeptName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-//		MultiByteToWideChar (CP_ACP, 0, depts[i].name.c_str(), -1, pDeptName.get(), dwNum);
-//		g_Departments.insert(map<int, CString>::value_type(depts[i].dept_id, pDeptName.get()));
-//	}
-//	m_pPrinterView->Update();
-//}
-//
-//void CMainFrame::OnRetrieveKitchen(const std::vector<Kitchen>& kitchens){
-//	g_Kitchens.clear();
-//	for(unsigned int i = 0; i < kitchens.size(); i++){
-//		//convert the string from ANSI to UNICODE
-//		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, NULL, 0);
-//		boost::shared_ptr<wchar_t> pKitchenName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-//		MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, pKitchenName.get(), dwNum);
-//		g_Kitchens.insert(map<int, CString>::value_type(kitchens[i].alias_id, pKitchenName.get()));
-//	}
-//	m_pPrinterView->Update();
-//}
-//
-//void CMainFrame::OnRetrieveRegion(const std::vector<Region>& regions){
-//	g_Regions.clear();
-//	for(unsigned int i = 0; i < regions.size(); i++){
-//		//convert the string from ANSI to UNICODE
-//		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, NULL, 0);
-//		boost::shared_ptr<wchar_t> pRegionName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-//		MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, pRegionName.get(), dwNum);
-//		g_Regions.insert(map<int, CString>::value_type(regions[i].alias_id, pRegionName.get()));
-//	}
-//	m_pPrinterView->Update();
-//}
-
 void CMainFrame::OnRestaurantLogin(const TCHAR* pRestaurantName, const TCHAR* pProgramVer){
 	_PROG_VER_ = pProgramVer;
 	g_Restaurant = pRestaurantName;
@@ -431,20 +337,20 @@ void CMainFrame::OnRestaurantLogin(const TCHAR* pRestaurantName, const TCHAR* pP
 }
 
 void CMainFrame::OnSize(UINT nType, int cx, int cy) {
-	if (m_wndSplitter.GetSafeHwnd())
-	{
+//	if (m_wndSplitter.GetSafeHwnd())
+//	{
 		//Hide the queue if visible
-		if(m_pStatusView)
-			m_wndSplitter.HideRow(1, 0);
-	}
+//		if(m_pStatusView)
+//			m_wndSplitter.HideRow(1);
+//	}
 	//Now only the main splitter gets resized
 	CFrameWnd::OnSize(nType, cx, cy);
-	if (m_wndSplitter.GetSafeHwnd())
-	{
+//	if (m_wndSplitter.GetSafeHwnd())
+//	{
 		//Restore the queue
-		if(m_pStatusView)
-			m_wndSplitter.ShowRow(1);
-	}
+//		if(m_pStatusView)
+//			m_wndSplitter.ShowRow(1);
+//	}
 }
 void CMainFrame::OnNetworkSetting()
 {

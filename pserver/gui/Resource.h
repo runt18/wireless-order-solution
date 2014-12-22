@@ -9,7 +9,6 @@
 #define IDR_MAINFRAME                   128
 #define IDR_guiTYPE                     129
 #define IDR_OUTPUTCONTEXT               130
-#define IDR_OPE_PRINER_MATRIX           131
 #define IDI_SYS_TRAY_OK                 135
 #define IDR_SYS_TRAY                    136
 #define IDI_SYS_TRAY_FAIL               139
@@ -50,8 +49,6 @@
 #define ID_NET_SETTING                  32774
 #define ID_NETWORK                      32775
 #define ID_SET_PRINTER                  32776
-#define ID_ADD_PRINTER                  32777
-#define ID_DEL_PRINTER                  32778
 #define ID_32781                        32781
 #define ID_AUTO_RUN                     32782
 #define ID__32783                       32783

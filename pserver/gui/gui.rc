@@ -98,15 +98,6 @@ BEGIN
     END
 END
 
-IDR_OPE_PRINER_MATRIX MENU 
-BEGIN
-    POPUP "OpePrinterMatrix"
-    BEGIN
-        MENUITEM "添加打印机",                       ID_ADD_PRINTER
-        MENUITEM "删除打印机",                       ID_DEL_PRINTER
-    END
-END
-
 IDR_SYS_TRAY MENU 
 BEGIN
     POPUP ""
@@ -204,10 +195,10 @@ BEGIN
         BLOCK "080403a8"
         BEGIN
             VALUE "CompanyName", "广州智易科技有限公司"
-            VALUE "FileDescription", "打印服务界面程序"
+            VALUE "FileDescription", "志易云打印服务程序"
             VALUE "FileVersion", "0.9.0.0"
             VALUE "InternalName", "gui.exe"
-            VALUE "LegalCopyright", "版权所有 (C) <广州智易科技有限公司> 保留所有权利。"
+            VALUE "LegalCopyright", "版权所有 (C) <广州志易信息科技有限公司> 保留所有权利。"
             VALUE "OriginalFilename", "gui.exe"
             VALUE "ProductName", "Digi-e 打印服务程序"
             VALUE "ProductVersion", "0.9.0.0"

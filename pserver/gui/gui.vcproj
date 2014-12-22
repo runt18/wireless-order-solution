@@ -235,14 +235,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\PrinterListCtrl.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PrinterView.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ProgressBar.cpp"
 				>
 			</File>
@@ -314,14 +306,6 @@
 			</File>
 			<File
 				RelativePath=".\NetSettingDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PrinterListCtrl.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PrinterView.h"
 				>
 			</File>
 			<File

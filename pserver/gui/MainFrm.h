@@ -6,11 +6,10 @@
 
 #include "SystemTray.h"
 #include "StatusView.h"
-#include "PrinterView.h"
 #include "splitex.h"
 #include "ProgressBar.h"
 #include "../pserver/inc/IPrintReport.h"
-
+using namespace std;
 
 class CMainFrame : public CFrameWnd,
 				   public IPReport
@@ -24,7 +23,6 @@ protected: // create from serialization only
 // Attributes
 public:
 	CStatusView* m_pStatusView;
-	CPrinterView* m_pPrinterView;
 	CSystemTray m_TrayIcon;
 
 // Operations
@@ -61,9 +59,6 @@ public:
 	afx_msg void OnStartPrinter();
 	virtual void OnPrintReport(int type, const TCHAR* msg);
 	virtual void OnPrintExcep(int type, const TCHAR* msg);
-	//virtual void OnRetrieveDept(const std::vector<Department>& depts);
-	//virtual void OnRetrieveKitchen(const std::vector<Kitchen>& kitchens);
-	//virtual void OnRetrieveRegion(const std::vector<Region>& regions);
 	virtual void OnRestaurantLogin(const TCHAR* pRestaurantName, const TCHAR* pProgramVer);
 	afx_msg void OnNetworkSetting();
 	afx_msg void OnUpdateStartPrinter(CCmdUI* pCmdUI);
