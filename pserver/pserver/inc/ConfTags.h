@@ -11,6 +11,9 @@ public:
 	static const char* REMOTE_PORT;
 	static const char* ACCOUNT;
 	static const char* PWD;
+	static const char* BACKUP;
+	static const char* BACKUP_IP;
+	static const char* BACKUP_PORT;
 	static const char* PRINTER;
 	static const char* PRINT_NAME;
 	static const char* PRINT_FUNC;

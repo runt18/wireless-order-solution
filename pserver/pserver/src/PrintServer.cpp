@@ -22,10 +22,16 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 #include <process.h>
 #include <Mstcpip.h>
 #include <WinSpool.h>
 #include <time.h>
+
+typedef struct{
+	string address;
+	int port;
+}connection;
 
 typedef struct{
 	int major;
@@ -47,11 +53,13 @@ public:
 
 }VERSION;
 
-static const string _PROG_VER_ = "1.0.7";
+static const string _PROG_VER_ = "1.0.8";
 //the queue to print job
 static queue<PrintJob> g_jobQueue;
 //the critical section to the print job queue
 static CRITICAL_SECTION g_csJobQueue;
+//the file path to XML doc
+static wstring g_ConfFilePath;
 //the XML doc to config file
 static TiXmlDocument g_Conf;
 //critical section to synchronize the thread's life
@@ -109,35 +117,201 @@ PServer& PServer::instance(){
 }
 
 /*******************************************************************************
+* Function Name  : parseConnection
+* Description    : parse the string to printer connections
+* Input          : value - the connections value
+* Output         : backupConnections - the backup printer connections
+* Return         : None
+*******************************************************************************/
+static void parseConnection(const string& value, vector<connection>& backupConnections){
+
+	vector<string> splitResult;
+	Util::split(value, splitResult, ",");
+	
+	for(vector<string>::iterator iter = splitResult.begin(); iter != splitResult.end(); iter++){
+		vector<string> splitConnection;
+		Util::split((*iter), splitConnection, ":");
+		connection conn;
+		if(splitConnection.size() == 2){
+			conn.address = splitConnection.at(0);
+			conn.port = atoi(splitConnection.at(1).c_str());
+			backupConnections.push_back(conn);
+		}else if(splitConnection.size() == 1){
+			conn.address = splitConnection.at(0);
+			backupConnections.push_back(conn);
+		}
+	}
+}
+
+/*******************************************************************************
+* Function Name  : checkBackups
+* Description    : check the backup servers
+* Input          : pReport - the call back functions
+				   hostAddr - the ota host address
+				   hostPort - the ota host port
+* Output         : backupConnections - the connectins to backup server
+* Return         : TRUE - if succeed to check the backup servers, otherwise false
+*******************************************************************************/
+static BOOL checkBackups(IPReport* pReport, const wstring& hostAddr, const int hostPort, vector<connection>& backupConnections){
+	HINTERNET  hSession = NULL, hConnect = NULL, hRequest = NULL;
+	DWORD dwSize = 0;
+	DWORD dwDownloaded = 0;
+	BOOL  bResults = FALSE;
+
+	// Use WinHttpOpen to obtain a session handle.
+	hSession = WinHttpOpen( _T("Digi-e Printer Server"),  
+		WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
+		WINHTTP_NO_PROXY_NAME, 
+		WINHTTP_NO_PROXY_BYPASS, 0 );
+
+
+	// Specify an HTTP server.
+	if( hSession )
+		hConnect = WinHttpConnect( hSession, hostAddr.c_str(), hostPort, 0 );
+
+	// Create an HTTP request handle.
+	if( hConnect )
+		hRequest = WinHttpOpenRequest( hConnect, _T("GET"), _T("/pserver/backup.php"),
+		NULL, WINHTTP_NO_REFERER, 
+		WINHTTP_DEFAULT_ACCEPT_TYPES, 
+		0);
+
+	// Send a request.
+	if( hRequest )
+		bResults = WinHttpSendRequest( hRequest,
+		WINHTTP_NO_ADDITIONAL_HEADERS, 0,
+		WINHTTP_NO_REQUEST_DATA, 0, 
+		0, 0 );
+
+
+	// End the request.
+	if( bResults )
+		bResults = WinHttpReceiveResponse( hRequest, NULL );
+
+	// Check the status code.
+	DWORD dwStatusCode = 0;
+
+	if( bResults ){ 
+		dwSize = 4;
+		bResults = WinHttpQueryHeaders( hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER,
+			NULL, &dwStatusCode, &dwSize, NULL );
+	}
+
+	// Keep checking for data until there is nothing left.
+	string value;
+	if(bResults && dwStatusCode == 200){
+		do{
+			// Check for available data.
+			dwSize = 0;
+			if( !WinHttpQueryDataAvailable( hRequest, &dwSize ) ){
+#ifdef _DEBUG
+				TCHAR buf[256];
+				swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("获取备用服务器错误：Error %u in WinHttpQueryDataAvailable."), GetLastError());
+				if(pReport){
+					bResults = FALSE;
+					pReport->OnPrintExcep(0, buf);
+				}
+#endif // _DEBUG
+			}
+
+			// Allocate space for the buffer.
+			boost::shared_ptr<char> pOutBuffer(new char[dwSize + 1], boost::checked_array_deleter<char>());
+			if( !pOutBuffer.get() )	{
+#ifdef _DEBUG
+				if(pReport){
+					bResults = FALSE;
+					pReport->OnPrintExcep(0, _T("获取备用服务器错误：Out of memory to get the version info."));
+				}
+#endif
+			}else{
+				// Read the data.
+				ZeroMemory( pOutBuffer.get(), dwSize + 1 );
+
+				if( !WinHttpReadData( hRequest, (LPVOID)pOutBuffer.get(), dwSize, &dwDownloaded ) ){
+#ifdef _DEBUG
+					TCHAR buf[256];
+					swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("获取备用服务器错误：Error %u in WinHttpReadData."), GetLastError());
+					if(pReport){
+						bResults = FALSE;
+						pReport->OnPrintExcep(0, buf);
+					}
+#endif
+
+				}else{
+					value.append(pOutBuffer.get(), dwSize);
+				}
+
+			}
+		} while( dwSize > 0 );
+
+	}else{
+#ifdef _DEBUG
+		TCHAR buf[256];
+		swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("获取备用服务器错误：%d"), dwStatusCode);
+		if(pReport){
+			bResults = FALSE;
+			pReport->OnPrintExcep(0, buf);
+		}
+#endif // _DEBUG
+	}
+
+
+	// close any open handles.
+	if( hRequest ) WinHttpCloseHandle( hRequest );
+	if( hConnect ) WinHttpCloseHandle( hConnect );
+	if( hSession ) WinHttpCloseHandle( hSession );
+
+	//check to see if need to update
+	if(bResults){
+		parseConnection(value, backupConnections);
+		if(backupConnections.empty()){
+			return FALSE;
+		}else{
+			TiXmlElement* pRoot = TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).Element();
+			if(pRoot){
+				//remove all original backup connections
+				TiXmlElement* pBackup = TiXmlHandle(pRoot).FirstChildElement(ConfTags::BACKUP).Element();
+				for(pBackup; pBackup != NULL; pBackup = TiXmlHandle(pRoot).FirstChildElement(ConfTags::BACKUP).Element()){
+					pRoot->RemoveChild(pBackup);
+				}
+				//add the backup connections to xml configuration file
+				for(vector<connection>::iterator iter = backupConnections.begin(); iter != backupConnections.end(); iter++){
+					TiXmlElement* pBackup = new TiXmlElement(ConfTags::BACKUP);
+					pBackup->SetAttribute(ConfTags::BACKUP_IP, (*iter).address);
+					pBackup->SetAttribute(ConfTags::BACKUP_PORT, (*iter).port);
+					pRoot->LinkEndChild(pBackup);
+				}
+				//save the xml configuration file
+				ofstream fout(g_ConfFilePath.c_str());
+				fout << g_Conf;
+				fout.close();								
+			}
+			return TRUE;
+		}
+	}else{
+		return FALSE;
+	}
+}
+
+/*******************************************************************************
 * Function Name  : split
 * Description    : split the version string into VERSION struct
 * Input          : verStr - the version string
 * Output         : None
 * Return         : the converted VERSION struct
 *******************************************************************************/
-static VERSION splitVer(const string& verStr){
-
-	string ver(verStr);
-	string delimiter = ".";
-
+static VERSION parseVersion(const string& verStr){
 	VERSION result;
-	size_t pos = 0;
-	string token;
-	int count = 0;
-	while ((pos = ver.find(delimiter)) != string::npos) {
-		token = ver.substr(0, pos);
-		std::cout << token << std::endl;
-		if(count == 0){
-			result.major = atoi(token.c_str());
-		}else if(count == 1){
-			result.minor = atoi(token.c_str());
-		}
-		count++;
-		ver.erase(0, pos + delimiter.length());
+
+	vector<string> splitResult;
+
+	Util::split(verStr, splitResult, ".");
+
+	if(splitResult.size() == 3){
+		result.major = atoi(splitResult.at(0).c_str());
+		result.minor = atoi(splitResult.at(1).c_str());
+		result.revision = atoi(splitResult.at(2).c_str());
 	}
-
-	result.revision = atoi(ver.c_str());
-
 	return result;
 }
 
@@ -256,8 +430,8 @@ static BOOL checkVer(IPReport* pReport, const wstring& hostAddr, const int hostP
 
 	//check to see if need to update
 	if(bResults){
-		newVer = splitVer(ver);
-		VERSION oriVer = splitVer(_PROG_VER_);
+		newVer = parseVersion(ver);
+		VERSION oriVer = parseVersion(_PROG_VER_);
 
 
 		//return true to update if the new major is greater than the original
@@ -736,34 +910,29 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 
 	IPReport* pReport = reinterpret_cast<IPReport*>(pvParam);
 
-	struct sockaddr_in clientService;
-	// The sockaddr_in structure specifies the address family,
-	// IP address, and port of the server to be connected to.
-	clientService.sin_family = AF_INET;
-
 	string account;
 	string pwd;
-	string serv_name;
+	vector<connection> servers;
 
 	//get the remote IP address, port, account and password from the config XML configuration file
 	TiXmlElement* pRemote = TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::REMOTE).Element();
 	if(pRemote){
-		//get the IP address
-		serv_name = pRemote->Attribute(ConfTags::REMOTE_IP);
-		if(!serv_name.empty()){
-
-
-		}else{
+		connection masterConnection;
+		//get the IP address to master connection
+		string master = pRemote->Attribute(ConfTags::REMOTE_IP);
+		if(master.empty()){
 			if(pReport){
 				pReport->OnPrintExcep(0, _T("请设置连接服务器的地址"));
 			}
 			return 1;
+		}else{
+			masterConnection.address = master;
 		}
 		
-		//get the port
+		//get the port to master connection
 		int port = 0;
 		if(TIXML_NO_ATTRIBUTE != pRemote->QueryIntAttribute(ConfTags::REMOTE_PORT, &port)){
-			clientService.sin_port = htons(port);
+			masterConnection.port = port;
 		}else{
 			if(pReport){
 				pReport->OnPrintExcep(0, _T("请设置连接服务器的端口"));
@@ -779,6 +948,8 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 			}
 			return 1;
 		}
+
+		servers.push_back(masterConnection);
 
 		//get the password for the account
 		pwd = pRemote->Attribute(ConfTags::PWD);
@@ -796,6 +967,28 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 		return 1;
 	}
 
+	//Get the backup servers.
+	TiXmlElement* pBackup = TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::BACKUP).Element();
+	for(pBackup; pBackup != NULL; pBackup = pBackup->NextSiblingElement(ConfTags::BACKUP)){
+		connection backupConnection;
+
+		//get the backup address
+		string backup = pBackup->Attribute(ConfTags::BACKUP_IP);
+		if(backup.empty()){
+			continue;
+		}else{
+			backupConnection.address = backup;
+		}
+
+		//get the port
+		int port = 0;
+		if(TIXML_NO_ATTRIBUTE != pRemote->QueryIntAttribute(ConfTags::BACKUP_PORT, &port)){
+			backupConnection.port = port;
+		}else{
+			continue;
+		}
+		servers.push_back(backupConnection);
+	}
 
 	HANDLE waitForEvents[2] = { g_hLoginEvent, g_hEndLoginEvent };
 
@@ -843,130 +1036,165 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 				os << _T("设置连接KeepAlive间隔失败: ") << WSAGetLastError();
 				pReport->OnPrintExcep(0, os.str().c_str());
 			}
+		
+			bool isConnectionOk = false;
 
-			struct addrinfo hints, *res = NULL;
-			memset(&hints, 0, sizeof(hints));
-			hints.ai_socktype = SOCK_STREAM;
-			hints.ai_family = AF_INET;
-			hints.ai_protocol = IPPROTO_TCP;
-			//convert the host name to ip address
-			if(getaddrinfo(serv_name.c_str(), NULL, &hints, &res) != 0) {
+			for(vector<connection>::iterator iter = servers.begin(); iter != servers.end(); iter++){
+				connection printerConnection = (*iter);
+
 				if(pReport){
-					wstring s = _T("无法解释域名\"") + Util::s2ws(serv_name) + _T("\"");
-					pReport->OnPrintExcep(0, s.c_str());
-					//notify the recover thread to run if fail to convert the host name
-					SetEvent(g_hRecoverEvent);
+					wstring s = _T("正尝试连接\"") + Util::s2ws(printerConnection.address) + _T("\"...请稍后");
+					pReport->OnPrintReport(0, s.c_str());
 				}
 
-			}else{
-				clientService.sin_addr.s_addr = ((struct sockaddr_in*)res->ai_addr)->sin_addr.s_addr;
-				// Connect to server.
-				int iResult = connect(g_ConnectSocket, (SOCKADDR*) &clientService, sizeof(clientService));
+				struct sockaddr_in clientService;
+				// The sockaddr_in structure specifies the address family,
+				// IP address, and port of the server to be connected to.
+				clientService.sin_family = AF_INET;
+				clientService.sin_port = htons(printerConnection.port);
 
-				//in the case not connected, notify the recover thread to login again
-				//otherwise login to the server and notify the print manager thread to run
-				if(iResult == SOCKET_ERROR){
+				struct addrinfo hints, *res = NULL;
+				memset(&hints, 0, sizeof(hints));
+				hints.ai_socktype = SOCK_STREAM;
+				hints.ai_family = AF_INET;
+				hints.ai_protocol = IPPROTO_TCP;
+				//convert the host name to ip address
+				if(getaddrinfo(printerConnection.address.c_str(), NULL, &hints, &res) != 0) {
 					if(pReport){
-						wostringstream os;
-						os << _T("无法连接服务器: ") << WSAGetLastError();
-						pReport->OnPrintExcep(0, os.str().c_str());
+						wstring s = _T("无法解释域名\"") + Util::s2ws(printerConnection.address) + _T("\"");
+						pReport->OnPrintExcep(0, s.c_str());
 					}
-					//notify the recover thread to run
-					SetEvent(g_hRecoverEvent);
+
 				}else{
+					clientService.sin_addr.s_addr = ((struct sockaddr_in*)res->ai_addr)->sin_addr.s_addr;
+					// Connect to server.
+					int iResult = connect(g_ConnectSocket, (SOCKADDR*) &clientService, sizeof(clientService));
 
-					//send the user name and pwd to try logging in the remote server
-					ReqPrinterLogin reqLogin(account.c_str(), pwd.c_str());
-					int iResult = Protocol::send(g_ConnectSocket, reqLogin);
-					if(iResult != SOCKET_ERROR){
-						//check to see if login successfully
-						//if login successfully, responds with an ACK,
-						//otherwise responds with a NAK along with an error code
-						ProtocolPackage loginResp;
-						iResult = Protocol::recv(g_ConnectSocket, 256, loginResp);
+					//in the case not connected, notify the recover thread to login again
+					//otherwise login to the server and notify the print manager thread to run
+					if(iResult == SOCKET_ERROR){
+						if(pReport){
+							wostringstream os;
+							os << _T("无法连接服务器\"") << Util::s2ws(printerConnection.address) << _T("\": ")<< WSAGetLastError();
+							pReport->OnPrintExcep(0, os.str().c_str());
+						}
+					}else{
+
+						//send the user name and pwd to try logging in the remote server
+						ReqPrinterLogin reqLogin(account.c_str(), pwd.c_str());
+						int iResult = Protocol::send(g_ConnectSocket, reqLogin);
 						if(iResult != SOCKET_ERROR){
-							//check whether the sequence no is matched or not
-							if(loginResp.header.seq == reqLogin.header.seq){
-								//check the type to see it's an ACK or NAK
-								if(loginResp.header.type == Type::ACK){
-									wstring restaurant;
-									wstring otaHost;
-									int otaPort;
-									
-									RespParse::parsePrintLogin(loginResp, restaurant, otaHost, otaPort);
+							//check to see if login successfully
+							//if login successfully, responds with an ACK,
+							//otherwise responds with a NAK along with an error code
+							ProtocolPackage loginResp;
+							iResult = Protocol::recv(g_ConnectSocket, 256, loginResp);
+							if(iResult != SOCKET_ERROR){
+								//check whether the sequence no is matched or not
+								if(loginResp.header.seq == reqLogin.header.seq){
+									//check the type to see it's an ACK or NAK
+									if(loginResp.header.type == Type::ACK){
+										wstring restaurant;
+										wstring otaHost;
+										int otaPort;
 
-									//check to see whether need to perform ota update
-									VERSION newVer; 
-									if(checkVer(pReport, otaHost, otaPort, newVer)){
-										checkProgram(pReport, otaHost, otaPort, newVer);
-									}else{
-										if(pReport && newVer.isValid()){
-											wostringstream wos;
-											wos << _T("目前版本(") << newVer.toString() <<  _T(")已经是最新程序");
-											pReport->OnPrintExcep(0, wos.str().c_str());
-										}
-									}
+										RespParse::parsePrintLogin(loginResp, restaurant, otaHost, otaPort);
 
-									if(pReport){
-										wostringstream os;
-										os << _T("\"") << restaurant << _T("\"") << _T("登录成功");
-										pReport->OnPrintReport(0, os.str().c_str());
-										pReport->OnRestaurantLogin(restaurant.c_str(), Util::s2ws(_PROG_VER_).c_str());
-									}
-									//notify the print manager thread to run
-									SetEvent(g_hPrintMgrEvent);
-								}else{
-									//show user the message according to the error code
-									if(pReport){
-										if(loginResp.header.reserved == ErrorCode::ACCOUNT_NOT_EXIST){
-											pReport->OnPrintExcep(0, _T("登录失败，用户名不存在"));
-										}else if(loginResp.header.reserved == ErrorCode::PWD_NOT_MATCH){
-											pReport->OnPrintExcep(0, _T("登录失败，密码不正确"));
+										//check to see whether need to perform ota update
+										VERSION newVer; 
+										if(checkVer(pReport, otaHost, otaPort, newVer)){
+											checkProgram(pReport, otaHost, otaPort, newVer);
 										}else{
-											pReport->OnPrintExcep(0, _T("登录失败"));
+											if(pReport){
+												wostringstream wos;
+												wos << _T("目前版本(") << Util::s2ws(_PROG_VER_) <<  _T(")已经是最新程序");
+												pReport->OnPrintExcep(0, wos.str().c_str());
+											}
 										}
-										closesocket(g_ConnectSocket);
-										g_ConnectSocket = INVALID_SOCKET;
-										//notify the recover thread to run
-										SetEvent(g_hRecoverEvent);
+										
+										//check the backup servers
+										vector<connection> backupConnections;
+										if(checkBackups(pReport, otaHost, otaPort, backupConnections)){
+											wstring backups;
+											for(vector<connection>::iterator iter = backupConnections.begin(); iter != backupConnections.end(); iter++){
+												if(!backups.empty()){
+													backups.append(_T(","));
+												}
+												backups.append(_T("\"")).append(Util::s2ws((*iter).address)).append(_T("\""));
+											}
+											wostringstream wos;
+											wos << _T("获取备用服务器") << backups;
+											if(pReport){
+												pReport->OnPrintExcep(0, wos.str().c_str());
+											}
+										}
+
+										if(pReport){
+											wostringstream os;
+											os << _T("\"") << restaurant << _T("\"") << _T("登录") << _T("\"") << Util::s2ws(printerConnection.address) << _T("\"") << _T("成功");
+											pReport->OnPrintReport(0, os.str().c_str());
+											pReport->OnRestaurantLogin(restaurant.c_str(), Util::s2ws(_PROG_VER_).c_str());
+										}
+										//notify the print manager thread to run
+										SetEvent(g_hPrintMgrEvent);
+										isConnectionOk = true;
+									}else{
+										//show user the message according to the error code
+										if(pReport){
+											if(loginResp.header.reserved == ErrorCode::ACCOUNT_NOT_EXIST){
+												pReport->OnPrintExcep(0, _T("登录失败，用户名不存在"));
+											}else if(loginResp.header.reserved == ErrorCode::PWD_NOT_MATCH){
+												pReport->OnPrintExcep(0, _T("登录失败，密码不正确"));
+											}else{
+												pReport->OnPrintExcep(0, _T("登录失败"));
+											}
+											closesocket(g_ConnectSocket);
+											g_ConnectSocket = INVALID_SOCKET;
+										}
 									}
+								}else{
+									if(pReport){
+										pReport->OnPrintExcep(0, _T("登录失败，数据包的序列号不正确"));
+									}
+									closesocket(g_ConnectSocket);
+									g_ConnectSocket = INVALID_SOCKET;
 								}
 							}else{
 								if(pReport){
-									pReport->OnPrintExcep(0, _T("登录失败，数据包的序列号不正确"));
+									wostringstream os;
+									os << _T("接收登录回复确认失败: ") << WSAGetLastError();
+									pReport->OnPrintExcep(0, os.str().c_str());
 								}
 								closesocket(g_ConnectSocket);
 								g_ConnectSocket = INVALID_SOCKET;
-								//notify the recover thread to run
-								SetEvent(g_hRecoverEvent);
 							}
 						}else{
 							if(pReport){
 								wostringstream os;
-								os << _T("接收登录回复确认失败: ") << WSAGetLastError();
+								os << _T("发送登录请求失败: ") << WSAGetLastError();
 								pReport->OnPrintExcep(0, os.str().c_str());
 							}
 							closesocket(g_ConnectSocket);
 							g_ConnectSocket = INVALID_SOCKET;
-							//notify the recover thread to run
-							SetEvent(g_hRecoverEvent);
 						}
-					}else{
-						if(pReport){
-							wostringstream os;
-							os << _T("发送登录请求失败: ") << WSAGetLastError();
-							pReport->OnPrintExcep(0, os.str().c_str());
-						}
-						closesocket(g_ConnectSocket);
-						g_ConnectSocket = INVALID_SOCKET;
-						//notify the recover thread to run
-						SetEvent(g_hRecoverEvent);
 					}
 				}
-			}
 
-			if(res){
-				freeaddrinfo(res);
+				if(res){
+					freeaddrinfo(res);
+				}
+				
+				//try to connection the next server after 5s if failed
+				if(isConnectionOk){
+					break;
+				}else{
+					Sleep(1000);
+				}
+			}
+			
+			//notify the recover thread to run if fail to establish the connection to server
+			if(!isConnectionOk){
+				SetEvent(g_hRecoverEvent);
 			}
 
 			ResetEvent(g_hLoginEvent);
@@ -1022,11 +1250,11 @@ static unsigned __stdcall RecoverProc(LPVOID pvParam){
 				   The other threads are used to print the data. The amount of these 
 				   threads is determined by the configuration XML file.
 * Input          : pReport - the call back reporter
-				   in_conf - the input stream containing the configuration info
+				   confFilePath - the file path to XML configuration file
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void PServer::run(IPReport* pReport, istream& in_conf){
+void PServer::run(IPReport* pReport, const wchar_t* confFilePath){
 
 	EnterCriticalSection(&g_csThreadLife);
 	_ASSERT(pReport);
@@ -1045,20 +1273,9 @@ void PServer::run(IPReport* pReport, istream& in_conf){
 		}
 
 		//get the config file
-		TiXmlElement* pRoot = g_Conf.RootElement();
-		if(pRoot){
-			g_Conf.RemoveChild(pRoot);
-		}
-		in_conf >> g_Conf;
-
-		//FIXME!!! should be removed in next version
-		pRoot = TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).Element();
-		if(pRoot){
-			//upload the printer server if upload attribute exist
-			if(pRoot->Attribute(ConfTags::UPLOAD_PRINTER)){
-				portPrinter(pReport);
-			}
-		}
+		g_Conf.Clear();
+		g_ConfFilePath = confFilePath;
+		fstream(confFilePath) >> g_Conf;
 
 		//initialize the event resources
 		g_hPrintConsumerEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -1089,647 +1306,8 @@ void PServer::run(IPReport* pReport, istream& in_conf){
 
 		//notify the login thread to run
 		SetEvent(g_hLoginEvent);
-
-
 	}
 	LeaveCriticalSection(&g_csThreadLife);
-
-}
-
-/*******************************************************************************
-* Function Name  : uploadPrinter
-* Description    : Port the schemes of each printer to server
-* Input          : IPReport the printer report
-* Output         : None
-* Return         : None
-*******************************************************************************/
-void PServer::portPrinter(IPReport* pReport){
-
-	vector< boost::shared_ptr<PrinterInstance> > printInstances;
-
-	//extract each printer's name and supported functions from the configuration file
-	TiXmlElement* pPrinter = TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::PRINTER).Element();
-	for(pPrinter; pPrinter != NULL; pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER)){
-		//get the printer name
-		wstring name = Util::s2ws(string(pPrinter->Attribute(ConfTags::PRINT_NAME)));
-		//get the printer function code
-		int func = Reserved::PRINT_UNKNOWN;
-		pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
-		//get the printer style
-		int style = PRINT_STYLE_UNKNOWN;
-		pPrinter->QueryIntAttribute(ConfTags::PRINT_STYLE, &style);
-		//get the regions
-		vector<int> regions;
-		int isOn = 0;
-		pPrinter->QueryIntAttribute(ConfTags::REGION_ALL, &isOn);
-		if(isOn == 1){
-			regions.push_back(Region::REGION_ALL);
-		}else{
-			pPrinter->QueryIntAttribute(ConfTags::REGION_1, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_1);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_2, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_2);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_3, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_3);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_4, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_4);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_5, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_5);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_6, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_6);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_7, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_7);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_8, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_8);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_9, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_9);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_10, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_10);
-			}
-		}
-		//get the kitchens
-		vector<int> kitchens;
-		isOn = 0;
-		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_ALL, &isOn);
-		if(isOn == 1){
-			kitchens.push_back(Kitchen::KITCHEN_ALL);
-		}else{
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_TEMP, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_TEMP);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_1, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_1);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_2, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_2);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_3, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_3);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_4, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_4);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_5, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_5);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_6, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_6);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_7, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_7);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_8, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_8);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_9, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_9);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_10, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_10);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_11, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_11);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_12, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_12);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_13, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_13);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_14, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_14);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_15, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_15);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_16, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_16);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_17, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_17);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_18, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_18);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_19, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_19);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_20, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_20);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_21, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_21);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_22, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_22);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_23, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_23);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_24, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_24);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_25, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_25);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_26, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_26);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_27, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_27);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_28, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_28);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_29, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_29);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_30, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_30);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_31, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_31);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_32, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_32);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_33, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_33);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_34, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_34);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_35, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_35);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_36, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_36);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_37, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_37);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_38, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_38);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_39, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_39);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_40, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_40);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_41, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_41);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_42, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_42);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_43, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_43);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_44, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_44);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_45, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_45);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_46, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_46);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_47, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_47);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_48, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_48);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_49, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_49);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_50, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_50);
-			}
-
-		}
-
-		//get the departments
-		vector<int> depts;
-		isOn = 0;
-		pPrinter->QueryIntAttribute(ConfTags::DEPT_ALL, &isOn);
-		if(isOn == 1){
-			depts.push_back(Department::DEPT_ALL);
-		}else{
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_1, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_1);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_2, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_2);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_3, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_3);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_4, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_4);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_5, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_5);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_6, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_6);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_7, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_7);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_8, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_8);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_9, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_9);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_10, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_10);
-			}
-		}
-
-		//get the repeat number
-		int repeat = 1;
-		pPrinter->QueryIntAttribute(ConfTags::PRINT_REPEAT, &repeat);
-
-		vector< boost::shared_ptr<PrinterInstance> >::iterator it = printInstances.begin();
-		for(it; it != printInstances.end(); it++){
-			if(name == (*it)->name){
-				break;
-			}				
-		}
-
-		if(it == printInstances.end()){
-			//create the printer instance and put it to the vector if not be found in the exist printer instances
-			boost::shared_ptr<PrinterInstance> pPI(new PrinterInstance(name.c_str(), style, NULL));
-			pPI->addFunc(func, regions, kitchens, depts, repeat);
-			printInstances.push_back(pPI);
-
-		}else{
-			//just add the function to the exist printer instance
-			(*it)->addFunc(func, regions, kitchens, depts, repeat);
-		}
-	}
-
-	wstring account = Util::s2ws(TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::REMOTE).Element()->Attribute(ConfTags::ACCOUNT));
-
-	for(vector< boost::shared_ptr<PrinterInstance> >::iterator it = printInstances.begin(); it != printInstances.end(); it++){
-
-		HINTERNET  hSession = NULL, hConnect = NULL, hRequest = NULL;
-		DWORD dwSize = 0;
-		DWORD dwDownloaded = 0;
-		BOOL  bResults = FALSE;
-
-		// Use WinHttpOpen to obtain a session handle.
-		hSession = WinHttpOpen( _T("Digi-e Printer Server"),  
-			WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
-			WINHTTP_NO_PROXY_NAME, 
-			WINHTTP_NO_PROXY_BYPASS, 0 );
-
-		wstring root = _T("/web-term/");
-
-		// Specify an HTTP server.
-		if( hSession ){
-			//get the remote IP address, port, account and password from the config XML configuration file
-			wstring serv_name = Util::s2ws(TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::REMOTE).Element()->Attribute(ConfTags::REMOTE_IP));
-			int port = 10080;
-			if(serv_name == _T("e-tones.net") || serv_name == _T("www.e-tones.net")){
-				port = 10080;
-			}else if(serv_name == _T("localhost") || serv_name == _T("127.0.0.1")){
-				port = 8080;
-				root = _T("/WirelessOrderWeb/");
-			}else{
-				port = 80;
-			}
-			hConnect = WinHttpConnect( hSession, serv_name.c_str(), port, 0 );
-		}
-	
-		wostringstream wos;
-		wos << root << _T("OperatePrinter.do?skipVerify&dataSource=port")
-			<< _T("&account=") << account
-			<< _T("&printerName=") + (*it)->name 
-			<< _T("&style=") << (*it)->style;
-
-		// Create an HTTP request handle to upload the printer
-		if( hConnect )
-			//hRequest = WinHttpOpenRequest( hConnect, _T("GET"), _T("/WirelessOrderWeb/OperatePrinter.do?skipVerify&dataSource=port&account=bctxt&printerName=GP80250-201&style=2"),
-			hRequest = WinHttpOpenRequest( hConnect, _T("GET"), wos.str().c_str(),
-										   NULL, WINHTTP_NO_REFERER, 
-										   WINHTTP_DEFAULT_ACCEPT_TYPES, 
-										   0);
-
-		// Send a request.
-		if( hRequest )
-			bResults = WinHttpSendRequest( hRequest,
-			WINHTTP_NO_ADDITIONAL_HEADERS, 0,
-			WINHTTP_NO_REQUEST_DATA, 0, 
-			0, 0 );
-
-
-		// End the request.
-		if( bResults )
-			bResults = WinHttpReceiveResponse( hRequest, NULL );
-
-		// Check the status code.
-		DWORD dwStatusCode = 0;
-		if( bResults ){ 
-			dwSize = 4;
-			bResults = WinHttpQueryHeaders( hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER, NULL, &dwStatusCode, &dwSize, NULL );
-		}
-
-		string info;
-		if(bResults && dwStatusCode == 200){
-			info.erase();
-			do{
-				// Check for available data.
-				dwSize = 0;
-				if( !WinHttpQueryDataAvailable( hRequest, &dwSize ) ){
-					TCHAR buf[256];
-					swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("上传打印机失败：Error %u in WinHttpQueryDataAvailable."), GetLastError());
-					if(pReport){
-						bResults = FALSE;
-						pReport->OnPrintExcep(0, buf);
-					}
-				}
-
-				// Allocate space for the buffer.
-				boost::shared_ptr<char> pOutBuffer(new char[dwSize + 1], boost::checked_array_deleter<char>());
-				if( !pOutBuffer.get() )	{
-					if(pReport){
-						bResults = FALSE;
-						pReport->OnPrintExcep(0, _T("上传打印机失败：Out of memory to get the version info."));
-					}
-				}else{
-					// Read the data.
-					ZeroMemory( pOutBuffer.get(), dwSize + 1 );
-
-					if( !WinHttpReadData( hRequest, (LPVOID)pOutBuffer.get(), dwSize, &dwDownloaded ) ){
-						TCHAR buf[256];
-						swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("上传打印机失败：Error %u in WinHttpReadData."), GetLastError());
-						if(pReport){
-							bResults = FALSE;
-							pReport->OnPrintExcep(0, buf);
-						}
-
-					}else{
-						info.append(pOutBuffer.get(), dwSize);
-					}
-
-				}
-			} while( dwSize > 0 );
-
-			if(pReport){
-				pReport->OnPrintReport(0, Util::s2ws(info).c_str());
-			}
-		}else{
-			if(pReport){
-				TCHAR buf[256];
-				swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("上传打印机失败：Error %u in WinHttpReadData."), GetLastError());
-				bResults = FALSE;
-				pReport->OnPrintExcep(0, buf);
-			}
-		}
-
-		//Upload each print scheme
-		vector<PrintFunc>::iterator iter_func = (*it)->funcs.begin();
-		for(iter_func; iter_func != (*it)->funcs.end(); iter_func++){
-
-			hRequest = NULL;
-
-			//Generate the department request string
-			wostringstream wos_dept;
-			vector<int>::iterator iter_dept = find(iter_func->depts.begin(), iter_func->depts.end(), Department::DEPT_ALL);
-			if(iter_dept != iter_func->depts.end()){
-				wos_dept << _T("");
-			}else{
-				wos_dept << _T("");
-				iter_dept = iter_func->depts.begin();
-				int count = 0;
-				for(iter_dept; iter_dept != iter_func->depts.end(); iter_dept++){
-					if(count > 0){
-						wos_dept << _T(",");
-					}
-					wos_dept << (*iter_dept);
-					count++;
-				}
-
-			}
-
-			//Generate the kitchen request string
-			wostringstream wos_kitchen;
-			vector<int>::iterator iter_kitchen = find(iter_func->kitchens.begin(), iter_func->kitchens.end(), Kitchen::KITCHEN_ALL);
-			if(iter_kitchen != iter_func->kitchens.end()){
-				wos_kitchen << _T("");
-			}else{
-				wos_kitchen << _T("");
-				iter_kitchen = iter_func->kitchens.begin();
-				int count = 0;
-				for(iter_kitchen; iter_kitchen != iter_func->kitchens.end(); iter_kitchen++){
-					if((*iter_kitchen) != Kitchen::KITCHEN_TEMP){
-						if(count > 0){
-							wos_kitchen << _T(",");
-						}
-						wos_kitchen << (*iter_kitchen);
-						count++;
-					}
-				}
-			}
-
-			//Generate the region request string
-			wostringstream wos_region;
-			vector<int>::iterator iter_region = find(iter_func->regions.begin(), iter_func->regions.end(), Region::REGION_ALL);
-			if(iter_region != iter_func->regions.end()){
-				wos_region << _T("");
-			}else{
-				iter_region = iter_func->regions.begin();
-				int count = 0;
-				for(iter_region; iter_region != iter_func->regions.end(); iter_region++){
-					if(count > 0){
-						wos_region << _T(",");
-					}
-					wos_region << (*iter_region);
-					count++;
-				}
-			}
-
-			wostringstream wos;
-			wos << root << _T("OperatePrintFunc.do?skipVerify&dataSource=port") 
-				<< _T("&account=") << account
-				<< _T("&printerName=") + (*it)->name 
-				<< _T("&repeat=") << iter_func->repeat
-				<< _T("&kitchens=") << wos_kitchen.str()
-				<< _T("&regions=") << wos_region.str()
-				<< _T("&dept=") << wos_dept.str()
-				<< _T("&pType=") << iter_func->code;
-
-			// Create an HTTP request handle to upload the printer
-			if( hConnect )
-				//hRequest = WinHttpOpenRequest( hConnect, _T("GET"), _T("/WirelessOrderWeb/OperatePrinter.do?skipVerify&dataSource=port&account=bctxt&printerName=GP80250-201&style=2"),
-				hRequest = WinHttpOpenRequest( hConnect, _T("GET"), wos.str().c_str(),
-				NULL, WINHTTP_NO_REFERER, 
-				WINHTTP_DEFAULT_ACCEPT_TYPES, 
-				0);
-
-			// Send a request.
-			if( hRequest )
-				bResults = WinHttpSendRequest( hRequest,
-				WINHTTP_NO_ADDITIONAL_HEADERS, 0,
-				WINHTTP_NO_REQUEST_DATA, 0, 
-				0, 0 );
-
-
-			// End the request.
-			if( bResults )
-				bResults = WinHttpReceiveResponse( hRequest, NULL );
-
-			// Check the status code.
-			DWORD dwStatusCode = 0;
-			if( bResults ){ 
-				dwSize = 4;
-				bResults = WinHttpQueryHeaders( hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER, NULL, &dwStatusCode, &dwSize, NULL );
-			}
-
-			string info;
-			if(bResults && dwStatusCode == 200){
-				info.erase();
-				do{
-					// Check for available data.
-					dwSize = 0;
-					if( !WinHttpQueryDataAvailable( hRequest, &dwSize ) ){
-						TCHAR buf[256];
-						swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("上传打印方案失败：Error %u in WinHttpQueryDataAvailable."), GetLastError());
-						if(pReport){
-							bResults = FALSE;
-							pReport->OnPrintExcep(0, buf);
-						}
-					}
-
-					// Allocate space for the buffer.
-					boost::shared_ptr<char> pOutBuffer(new char[dwSize + 1], boost::checked_array_deleter<char>());
-					if( !pOutBuffer.get() )	{
-						if(pReport){
-							bResults = FALSE;
-							pReport->OnPrintExcep(0, _T("上传打印方案失败：Out of memory to get the version info."));
-						}
-					}else{
-						// Read the data.
-						ZeroMemory( pOutBuffer.get(), dwSize + 1 );
-
-						if( !WinHttpReadData( hRequest, (LPVOID)pOutBuffer.get(), dwSize, &dwDownloaded ) ){
-							TCHAR buf[256];
-							swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("上传打印方案失败：Error %u in WinHttpReadData."), GetLastError());
-							if(pReport){
-								bResults = FALSE;
-								pReport->OnPrintExcep(0, buf);
-							}
-
-						}else{
-							info.append(pOutBuffer.get(), dwSize);
-						}
-
-					}
-				} while( dwSize > 0 );
-
-				if(pReport){
-					pReport->OnPrintReport(0, Util::s2ws(info).c_str());
-				}
-			}else{
-				if(pReport){
-					TCHAR buf[256];
-					swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("上传打印方案失败：Error %u in WinHttpReadData."), GetLastError());
-					bResults = FALSE;
-					pReport->OnPrintExcep(0, buf);
-				}
-			}
-
-		}
-
-		// close any open handles.
-		if( hRequest ) WinHttpCloseHandle( hRequest );
-		if( hConnect ) WinHttpCloseHandle( hConnect );
-		if( hSession ) WinHttpCloseHandle( hSession );
-	}
 
 }
 

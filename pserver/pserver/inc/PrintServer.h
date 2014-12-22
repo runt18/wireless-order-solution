@@ -8,7 +8,6 @@
 
 #include "IPrintReport.h"
 #include "PrintJob.h"
-#include <iostream>
 #include <queue>
 using namespace std;
 
@@ -16,7 +15,7 @@ class PServer{
 
 public:
 	~PServer(){};
-	PSERVER_DLL_API void run(IPReport* pReport, istream& in_conf);
+	PSERVER_DLL_API void run(IPReport* pReport, const wchar_t* confPath);
 	PSERVER_DLL_API void terminate();
 	PSERVER_DLL_API static PServer& instance();
 

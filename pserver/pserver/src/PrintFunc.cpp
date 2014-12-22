@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "../inc/PrintFunc.h"
 #include "../../protocol/inc/Reserved.h"
-#include "../../protocol/inc/Kitchen.h"
 
 PrintFunc::PrintFunc(){
 	code = Reserved::PRINT_UNKNOWN;
