@@ -133,6 +133,8 @@ public abstract class CheckVersionTask extends AsyncTask<Void, Void, Boolean>{
 		   
 	   }catch(IOException e){
 		   return Boolean.FALSE;
+	   }catch(BusinessException e){
+		   return Boolean.FALSE;
 		   
 	   }finally{
 		   if(conn != null){

@@ -59,6 +59,8 @@ public abstract class QueryMemberDetailTask extends AsyncTask<Void, Void, Member
 			}
 		}catch (IOException e) {
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		
 		return null;

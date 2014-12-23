@@ -29,6 +29,8 @@ public abstract class InterestedInMemberTask extends AsyncTask<Void, Void, Void>
 			ServerConnector.instance().ask(new ReqInterestedInMember(mStaff, mMember));
 		}catch (IOException e) {
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		return null;
 	}

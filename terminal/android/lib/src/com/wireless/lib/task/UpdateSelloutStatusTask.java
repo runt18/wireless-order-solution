@@ -48,6 +48,8 @@ public abstract class UpdateSelloutStatusTask extends AsyncTask<Void, Void, Void
 			}
 		}catch(IOException e){
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		
 		return null;

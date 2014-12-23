@@ -40,6 +40,8 @@ public abstract class QueryRegionTask extends AsyncTask<Void, Void, List<Region>
 			}
 		}catch(IOException e){
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		
 		return Collections.unmodifiableList(regions);

@@ -50,6 +50,8 @@ public abstract class QueryTableStatusTask extends AsyncTask<Void, Void, Table>{
 			
 		}catch(IOException e){
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		
 		return mTblToQuery;

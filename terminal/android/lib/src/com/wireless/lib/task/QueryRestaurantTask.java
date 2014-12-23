@@ -38,6 +38,8 @@ public abstract class QueryRestaurantTask extends AsyncTask<Void, Void, Restaura
 			}
 		}catch(IOException e){
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		
 		return restaurant;

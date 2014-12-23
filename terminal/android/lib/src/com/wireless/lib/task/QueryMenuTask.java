@@ -42,6 +42,8 @@ public abstract class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 			}
 		}catch(IOException e){
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		
 		return foodMenu;

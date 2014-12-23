@@ -39,6 +39,8 @@ public abstract class QueryInterestedMemberTask extends AsyncTask<Void, Void, Li
 			}
 		}catch (IOException e) {
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		return Collections.unmodifiableList(members);
 	}

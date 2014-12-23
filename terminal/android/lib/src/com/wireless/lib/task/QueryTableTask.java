@@ -42,6 +42,8 @@ public abstract class QueryTableTask extends AsyncTask<Void, Void, List<Table>>{
 			}
 		}catch(IOException e){
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		
 		return Collections.unmodifiableList(tables);

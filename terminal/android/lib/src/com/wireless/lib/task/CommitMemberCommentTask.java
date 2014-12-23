@@ -28,6 +28,8 @@ public class CommitMemberCommentTask extends AsyncTask<Void, Void, Void>{
 			ServerConnector.instance().ask(new ReqCommitMemberComment(mStaff, mMemberComment));
 		}catch (IOException e) {
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		return null;
 	}

@@ -29,6 +29,8 @@ public class CancelInterestedInMemberTask extends AsyncTask<Void, Void, Void>{
 			ServerConnector.instance().ask(new ReqCancelInterestedInMember(mStaff, mMember));
 		}catch (IOException e) {
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		return null;
 	}

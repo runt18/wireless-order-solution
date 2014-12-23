@@ -1,7 +1,6 @@
 package com.wireless.lib.task;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,50 +10,46 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.ReqQueryMember;
+import com.wireless.pack.req.ReqQueryBackup;
 import com.wireless.parcel.Parcel;
-import com.wireless.pojo.member.Member;
-import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public abstract class QueryMemberTask extends AsyncTask<Void, Void, List<Member>>{
-
-	private final Staff mStaff;
+public abstract class QueryBackupTask extends AsyncTask<Void, Void, List<ServerConnector.Connector>>{
 	
 	private BusinessException mBusinessException;
 	
-	public QueryMemberTask(Staff staff){
-		mStaff = staff;
+	public QueryBackupTask(){
+
 	}
 	
 	@Override
-	protected List<Member> doInBackground(Void... args) {
-		List<Member> members = new ArrayList<Member>();
+	protected List<ServerConnector.Connector> doInBackground(Void... args) {
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMember(mStaff));
+			//根据tableID请求数据
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryBackup());
 			if(resp.header.type == Type.ACK){
-				members.addAll(new Parcel(resp.body).readParcelList(Member.CREATOR));
+				return new Parcel(resp.body).readParcelList(ServerConnector.Connector.CREATOR);
 			}else{
 				mBusinessException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 			}
-		}catch (IOException e) {
+		}catch(IOException e){
 			mBusinessException = new BusinessException(e.getMessage());
 		} catch (BusinessException e) {
 			mBusinessException = e;
 		}
-		return Collections.unmodifiableList(members);
+		return Collections.emptyList();
 	}
 	
 	@Override
-	protected final void onPostExecute(List<Member> members){
+	protected final void onPostExecute(List<ServerConnector.Connector> result){
 		if(mBusinessException != null){
 			onFail(mBusinessException);
 		}else{
-			onSuccess(members);
+			onSuccess(result);
 		}
 	}
 	
-	public abstract void onSuccess(List<Member> members);
+	public abstract void onSuccess(List<ServerConnector.Connector> result);
 	
 	public abstract void onFail(BusinessException e);
 }

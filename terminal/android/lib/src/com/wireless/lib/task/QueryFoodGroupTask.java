@@ -88,6 +88,8 @@ public class QueryFoodGroupTask extends AsyncTask<Void, Void, List<Pager>>{
 		}catch(IOException e){
 			mBusinessException = new BusinessException(e.getMessage());
 			
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		
 		return pagers;

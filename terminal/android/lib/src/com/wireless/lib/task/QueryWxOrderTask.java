@@ -43,6 +43,8 @@ public abstract class QueryWxOrderTask extends AsyncTask<Void, Void, List<WxOrde
 			
 		}catch(IOException e){
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		return result;
 	}

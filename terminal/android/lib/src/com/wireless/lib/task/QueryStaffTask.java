@@ -77,6 +77,8 @@ public abstract class QueryStaffTask extends AsyncTask<Void, Void, List<Staff>>{
 			
 		}catch(SecurityException e){
 			mBusinessException = new BusinessException(e.getMessage());
+		} catch (BusinessException e) {
+			mBusinessException = e;
 		}
 		
 		return Collections.unmodifiableList(staffs);

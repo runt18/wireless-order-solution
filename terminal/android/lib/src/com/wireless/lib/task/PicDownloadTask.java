@@ -12,6 +12,7 @@ import java.util.List;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqOTAUpdate;
@@ -95,7 +96,8 @@ public abstract class PicDownloadTask extends AsyncTask<Void, PicDownloadTask.Pr
 		   
 	    }catch(IOException e){
 	    	Log.e("PicDownloadTask", e.getMessage());	    	
-	    	
+	    } catch (BusinessException e) {
+			Log.e("PicDownloadTask", e.getMessage());
 	    }finally{
 		   if(conn != null){
 			   conn.disconnect();
