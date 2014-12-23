@@ -86,7 +86,7 @@ public class TestWeixinOrderDao {
 			OrderFood of2 = new OrderFood(foods.get(1));
 			of2.setCount(2);
 			
-			addressId = TakeoutAddressDao.insert(mStaff, new TakeoutAddress.InsertBuilder(MemberDao.getByWxSerial(mStaff, WEIXIN_MEMBER_SERIAL), "测试外卖地址", "18520590932"));
+			addressId = TakeoutAddressDao.insert(mStaff, new TakeoutAddress.InsertBuilder(MemberDao.getByWxSerial(mStaff, WEIXIN_MEMBER_SERIAL), "测试外卖地址", "18520590932", "Vincent"));
 					
 			WxOrder.InsertBuilder4Takeout insertBuilder = new WxOrder.InsertBuilder4Takeout(WEIXIN_MEMBER_SERIAL, TakeoutAddressDao.getById(mStaff, addressId)).add(of1).add(of2);
 			wxOrderId = WxOrderDao.insert(mStaff, insertBuilder);
