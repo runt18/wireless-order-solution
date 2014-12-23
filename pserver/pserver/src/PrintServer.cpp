@@ -1188,7 +1188,7 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 				if(isConnectionOk){
 					break;
 				}else{
-					Sleep(1000);
+					Sleep(3000);
 				}
 			}
 			
