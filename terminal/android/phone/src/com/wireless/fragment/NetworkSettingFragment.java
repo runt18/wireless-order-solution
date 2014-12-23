@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.pack.req.ReqPing;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.sccon.ServerConnector;
@@ -77,7 +78,7 @@ public class NetworkSettingFragment extends Fragment {
 				// 提交修改
 				editor.commit();
 
-				ServerConnector.instance().setNetAddr(s.toString());
+				ServerConnector.instance().setMaster(new ServerConnector.Connector(s.toString(), Integer.parseInt(_portEdtTxt.getText().toString())));
 			}
 
 			@Override
@@ -104,7 +105,7 @@ public class NetworkSettingFragment extends Fragment {
 					// 提交修改
 					editor.commit();
 	
-					ServerConnector.instance().setNetPort(Integer.parseInt(s.toString()));
+					ServerConnector.instance().setMaster(new ServerConnector.Connector(_ipEdtTxt.getText().toString(), Integer.parseInt(s.toString())));
 				}catch(NumberFormatException e){
 					
 				}
@@ -196,8 +197,10 @@ public class NetworkSettingFragment extends Fragment {
 		@Override
 		protected String doInBackground(Void... params) {
 			try {
-				ServerConnector.instance().ask(new ReqPing());
+				ServerConnector.instance().ask(new ServerConnector.Connector(_ipEdtTxt.getText().toString(), Integer.parseInt(_portEdtTxt.getText().toString())), new ReqPing(), 2000);
 			} catch (IOException e) {
+				_errMsg = "网络连接失败，请检查网络参数是否正确。";
+			} catch (BusinessException e) {
 				_errMsg = "网络连接失败，请检查网络参数是否正确。";
 			}
 			return _errMsg;

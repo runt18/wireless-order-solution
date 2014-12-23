@@ -25,6 +25,7 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.sccon.ServerConnector.Connector;
 import com.wireless.util.DeviceUtil;
 
 public class StartupActivity extends Activity {
@@ -43,18 +44,22 @@ public class StartupActivity extends Activity {
 		 * 返回缺省值表示配置文件还未创建，需要初始化配置文件
 		 */
 		if(sharedPrefs.contains(Params.IP_ADDR)){
-			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR,	Params.DEF_IP_ADDR));
-			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT)); 
-
+			ServerConnector.instance().setMaster(new ServerConnector.Connector(sharedPrefs.getString(Params.IP_ADDR, Params.DEF_IP_ADDR),
+																			   sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT)));
+			
+			String backups = sharedPrefs.getString(Params.BACKUP_CONNECTOR, Params.DEF_BACKUP_CONNECTOR);
+			for(String connector : backups.split(",")){
+				String addr = connector.substring(0, connector.indexOf(":"));
+				String port = connector.substring(connector.indexOf(":") + 1);
+				ServerConnector.instance().addBackup(new ServerConnector.Connector(addr, Integer.parseInt(port)));
+			}
 		} else {
 			sharedPrefs.edit()// 获取编辑器
 						.putString(Params.IP_ADDR, Params.DEF_IP_ADDR)
 						.putInt(Params.IP_PORT, Params.DEF_IP_PORT)
-						.putInt(Params.CONN_TIME_OUT, Params.TIME_OUT_10s)
 						.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN)
 						.commit();// 提交修改
-			ServerConnector.instance().setNetAddr(Params.DEF_IP_ADDR);
-			ServerConnector.instance().setNetPort(Params.DEF_IP_PORT); 
+			ServerConnector.instance().setMaster(new ServerConnector.Connector(Params.DEF_IP_ADDR, Params.DEF_IP_PORT));
 		}
 
 		setContentView(R.layout.startup_activity);
@@ -74,15 +79,7 @@ public class StartupActivity extends Activity {
 				
 				@Override
 				public void onCheckVersionPass() {
-					try {
-						if(getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("test")){
-							new QueryStaffTask(JUST_4_TEST).execute();
-						}else{
-							new QueryStaffTask().execute();
-						}
-					} catch (NameNotFoundException e) {
-						new QueryStaffTask().execute();
-					}
+					new QueryBackupTask().execute();
 				}					
 			}.execute();
 		} else {
@@ -136,6 +133,56 @@ public class StartupActivity extends Activity {
 
 	}
 
+	private class QueryBackupTask extends com.wireless.lib.task.QueryBackupTask{
+		@Override
+		protected void onPreExecute() {
+			_msgTxtView.setText("正在更新备用服务器...请稍后");
+		}
+		
+		@Override
+		public void onSuccess(List<Connector> result) {
+			StringBuilder backups = new StringBuilder();
+			for(ServerConnector.Connector backup : result){
+				ServerConnector.instance().addBackup(backup);
+				if(backups.length() > 0){
+					backups.append(",");
+				}
+				backups.append(backup.getAddress() + ":" + backup.getPort());
+			}
+			if(backups.length() > 0){
+				getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit().putString(Params.BACKUP_CONNECTOR, backups.toString()).commit();
+			}
+			
+			try {
+				if(getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("test")){
+					new QueryStaffTask(JUST_4_TEST).execute();
+				}else{
+					new QueryStaffTask().execute();
+				}
+			} catch (NameNotFoundException e) {
+				new QueryStaffTask().execute();
+			}
+		}
+
+		@Override
+		public void onFail(BusinessException e) {
+			new AlertDialog.Builder(
+					StartupActivity.this)
+					.setTitle("提示")
+					.setMessage(e.getMessage())
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,	int id) {
+									Intent intent = new Intent(StartupActivity.this, MainActivity.class);
+									startActivity(intent);
+									finish();
+								}
+							})
+					.show();
+		}
+		
+	}
+	
 	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask {
 
 		private final boolean mTestFlag;
