@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.req.RequestPackage;
 
@@ -22,7 +24,7 @@ public class Session{
 		this._timeout = timeout;
 	}
 
-	public ProtocolPackage execute(String addr, int port) throws IOException{
+	public ProtocolPackage execute(String addr, int port) throws IOException, BusinessException{
 		Socket sock = null;
 		DataInputStream in = null;
 		DataOutputStream out = null;
@@ -43,7 +45,7 @@ public class Session{
 			if(_request.header.seq == _response.header.seq){
 				return _response;
 			}else{
-				throw new IOException("应答数据包的序列号不匹配");
+				throw new BusinessException("应答数据包的序列号不匹配", ProtocolError.PACKAGE_SEQ_NO_NOT_MATCH);
 			}
 			
 		}catch(IOException e){

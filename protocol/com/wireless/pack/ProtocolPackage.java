@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.ProtocolError;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
  
@@ -93,7 +95,7 @@ public class ProtocolPackage {
 	 * @param out
 	 *            the output steam to write the data
 	 * @throws IOException
-	 *             Throws if any error occurs while sending package
+	 *             throws if any error occurs while sending package
 	 */
 	public void writeToStream(OutputStream out) throws IOException{
 		
@@ -129,17 +131,18 @@ public class ProtocolPackage {
 	
 	/**
 	 * Read the data from the input stream.
-	 * 
 	 * @param in
-	 *            the input stream to read the data
+	 *          the input stream to read the data
 	 * @param timeout
-	 *            read time out, 0 means no time out
-	 * @return the package parsed by wireless order protocol
+	 *          read time out, 0 means no time out
 	 * @throws IOException
-	 *             Throws if any error occurs while reading data from socket or
-	 *             the received data doesn't reach the EOF, or timeout
+	 *         	throws if any error occurs while reading data from socket
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the received data does NOT reach the EOF, or timeout
+	 * 			<li>the length field to header does NOT match the length to body 
 	 */
-	public void readFromStream(InputStream in, long timeout) throws IOException{
+	public void readFromStream(InputStream in, long timeout) throws IOException, BusinessException{
 		
 		byte[] bytesToReceive = new byte[0];
 		
@@ -213,11 +216,11 @@ public class ProtocolPackage {
 			
 			//Check if expected request length(calculated by length field to header) is equal to the actual length.				
 			if(!isLengthMatched()){
-				throw new IOException("The length calculated by header length field doesn't match the its body length.");
+				throw new BusinessException(ProtocolError.PACKAGE_LENGTH_NOT_MATCH);
 			}
 			
 		}else{
-			throw new IOException("The received package doesn't reach the EOP.");
+			throw new BusinessException(ProtocolError.PACKAGE_NOT_REACH_EOF);
 		}
 	}
 	
