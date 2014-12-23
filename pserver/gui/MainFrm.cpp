@@ -315,7 +315,6 @@ void CMainFrame::OnPrintExcep(int type, const TCHAR* msg){
 }
 
 void CMainFrame::OnPrintReport(int type, const TCHAR* msg){
-	m_TrayIcon.SetIcon(IDI_SYS_TRAY_OK);
 	if(m_pStatusView){
 		m_pStatusView->ShowStatus(msg, 0);
 	}
@@ -332,6 +331,7 @@ void CMainFrame::OnRestaurantLogin(const TCHAR* pRestaurantName, const TCHAR* pP
 	}
 	SetWindowText(title);
 	m_TrayIcon.SetTooltipText(title);
+	m_TrayIcon.SetIcon(IDI_SYS_TRAY_OK);
 
 	//CChkUpdate::instance().check(_PROG_VER_, this, ifstream(g_ConfPath));
 }
