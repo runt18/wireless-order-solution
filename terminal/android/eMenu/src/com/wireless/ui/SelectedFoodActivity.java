@@ -40,7 +40,6 @@ import com.wireless.common.ShoppingCart.OnPayListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
-import com.wireless.exception.ProtocolError;
 import com.wireless.fragment.PickTasteFragment;
 import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
 import com.wireless.ordermenu.R;
@@ -651,23 +650,7 @@ public class SelectedFoodActivity extends Activity
 									public void onFail(BusinessException e){
 										if(ShoppingCart.instance().hasOriOrder()){
 
-											if(e.getErrCode().equals(ProtocolError.TABLE_IDLE)){
-												//如果是改单，并且返回是餐台空闲的错误状态，
-												//则提示用户，并清空购物车中的原账单
-												new AlertDialog.Builder(SelectedFoodActivity.this)
-													.setTitle("提示")
-													.setMessage(ShoppingCart.instance().getDestTable().getName() + "已经结帐，已点菜信息将刷新，新点菜信息将会保留")
-													.setNeutralButton("确定",
-														new DialogInterface.OnClickListener() {
-															@Override
-															public void onClick(DialogInterface dialog,	int which){
-																ShoppingCart.instance().refresh();
-															}
-														})
-													.show();
-
-												
-											}else if(e.getErrCode().equals(FrontBusinessError.ORDER_EXPIRED)){
+											if(e.getErrCode().equals(FrontBusinessError.ORDER_EXPIRED)){
 												//如果是改单，并且返回是账单过期的错误状态，
 												//则提示用户重新请求账单，再次确认提交
 												new AlertDialog.Builder(SelectedFoodActivity.this)
@@ -690,27 +673,11 @@ public class SelectedFoodActivity extends Activity
 													.show();
 											}
 										}else{
-											if(e.getErrCode().equals(ProtocolError.TABLE_BUSY)){
-												//如果是新下单，并且返回是餐台就餐的错误状态，
-												//则提示用户重新请求账单，再次确认提交
-												new AlertDialog.Builder(SelectedFoodActivity.this)
-													.setTitle("提示")
-													.setMessage(ShoppingCart.instance().getDestTable().getName() + "的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
-													.setNeutralButton("确定",
-														new DialogInterface.OnClickListener() {
-															@Override
-															public void onClick(DialogInterface dialog,	int which){
-																ShoppingCart.instance().refresh();
-															}
-														})
-													.show();
-											}else{
-												new AlertDialog.Builder(SelectedFoodActivity.this)
-													.setTitle("提示")
-													.setMessage(e.getMessage())
-													.setNeutralButton("确定", null)
-													.show();
-											}
+											new AlertDialog.Builder(SelectedFoodActivity.this)
+												.setTitle("提示")
+												.setMessage(e.getMessage())
+												.setNeutralButton("确定", null)
+												.show();
 										}
 									}						
 								});

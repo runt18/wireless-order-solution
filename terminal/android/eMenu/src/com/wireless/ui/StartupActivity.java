@@ -64,8 +64,7 @@ public class StartupActivity extends Activity {
 			editor.commit();//提交修改
 			
 		}else{		
-			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR,Params.DEF_IP_ADDR));
-			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
+			ServerConnector.instance().setMaster(new ServerConnector.Connector(sharedPrefs.getString(Params.IP_ADDR,Params.DEF_IP_ADDR), sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT)));
 		}
     	
 		//初始化购物车的数据
