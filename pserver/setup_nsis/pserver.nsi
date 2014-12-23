@@ -10,7 +10,7 @@
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
 ; MUI 1.67 compatible ------
-!include "MUI.nsh"
+!include "MUI2.nsh"
 ; Kill process
 !include "nsProcess.nsh"
 ; 
