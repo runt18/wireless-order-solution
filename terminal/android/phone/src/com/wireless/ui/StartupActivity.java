@@ -38,6 +38,8 @@ public class StartupActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		ServerConnector.instance().init();
+		
 		SharedPreferences sharedPrefs = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
 		/*
 		 * getString()第二个参数为缺省值，如果preference中不存在该key，将返回缺省值，
@@ -47,12 +49,6 @@ public class StartupActivity extends Activity {
 			ServerConnector.instance().setMaster(new ServerConnector.Connector(sharedPrefs.getString(Params.IP_ADDR, Params.DEF_IP_ADDR),
 																			   sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT)));
 			
-			String backups = sharedPrefs.getString(Params.BACKUP_CONNECTOR, Params.DEF_BACKUP_CONNECTOR);
-			for(String connector : backups.split(",")){
-				String addr = connector.substring(0, connector.indexOf(":"));
-				String port = connector.substring(connector.indexOf(":") + 1);
-				ServerConnector.instance().addBackup(new ServerConnector.Connector(addr, Integer.parseInt(port)));
-			}
 		} else {
 			sharedPrefs.edit()// 获取编辑器
 						.putString(Params.IP_ADDR, Params.DEF_IP_ADDR)
@@ -141,15 +137,22 @@ public class StartupActivity extends Activity {
 		
 		@Override
 		public void onSuccess(List<Connector> result) {
-			StringBuilder backups = new StringBuilder();
-			for(ServerConnector.Connector backup : result){
-				ServerConnector.instance().addBackup(backup);
-				if(backups.length() > 0){
-					backups.append(",");
+			if(result.isEmpty()){
+				String backups = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getString(Params.BACKUP_CONNECTOR, Params.DEF_BACKUP_CONNECTOR);
+				for(String connector : backups.split(",")){
+					String addr = connector.substring(0, connector.indexOf(":"));
+					String port = connector.substring(connector.indexOf(":") + 1);
+					ServerConnector.instance().addBackup(new ServerConnector.Connector(addr, Integer.parseInt(port)));
 				}
-				backups.append(backup.getAddress() + ":" + backup.getPort());
-			}
-			if(backups.length() > 0){
+			}else{
+				StringBuilder backups = new StringBuilder();
+				for(ServerConnector.Connector backup : result){
+					ServerConnector.instance().addBackup(backup);
+					if(backups.length() > 0){
+						backups.append(",");
+					}
+					backups.append(backup.getAddress() + ":" + backup.getPort());
+				}
 				getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit().putString(Params.BACKUP_CONNECTOR, backups.toString()).commit();
 			}
 			

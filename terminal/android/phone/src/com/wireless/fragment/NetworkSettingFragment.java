@@ -41,6 +41,7 @@ public class NetworkSettingFragment extends Fragment {
 	private int _port;
 
 	private EditText _ipEdtTxt;
+	private TextView _backupTextView;
 	private EditText _portEdtTxt;
 	private TextView _deviceIdEdtTxt;
 
@@ -49,9 +50,17 @@ public class NetworkSettingFragment extends Fragment {
 		View view = inflater.inflate(R.layout.network_setting, container, false);
 
 		_ipEdtTxt = (EditText) view.findViewById(R.id.edtTxt_ip_setting);
+		_backupTextView = (TextView) view.findViewById(R.id.textView_backup_network);
 		_portEdtTxt = (EditText) view.findViewById(R.id.edtTxt_port_setting);
 		_deviceIdEdtTxt = (TextView) view.findViewById(R.id.txtView_deviceId_setting);
 
+		//显示备用服务器
+		StringBuilder backups = new StringBuilder();
+		for(ServerConnector.Connector connector : ServerConnector.instance().getBackups()){
+			backups.append(connector.getAddress() + ":" + connector.getPort()).append(System.getProperty("line.separator"));
+		}
+		_backupTextView.setText(backups.toString());
+		
 		//获取文件保存的网络设置值
 		SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Params.PREFS_NAME,	Context.MODE_PRIVATE);
 		_address = sharedPreferences.getString(Params.IP_ADDR, Params.DEF_IP_ADDR);
