@@ -2,21 +2,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical" >
+    android:background="@color/white" >
 
     <include
         android:id="@+id/top"
         layout="@layout/topbar" />
 
     <RelativeLayout
-        android:id="@+id/r1"
-        android:layout_width="fill_parent"
+        android:id="@+id/relativeLayout_ip_setting_network"
+        android:layout_width="match_parent"
         android:layout_height="60dip"
         android:layout_below="@id/top" >
 
         <TextView
-            android:id="@+id/ip"
+            android:id="@+id/textView_ip_setting_network"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dip"
@@ -31,28 +30,65 @@
             android:id="@+id/edtTxt_ip_setting"
             android:layout_width="400dip"
             android:layout_height="wrap_content"
-            android:layout_below="@id/ip"
+            android:layout_below="@id/textView_ip_setting_network"
             android:layout_marginLeft="20dip"
             android:layout_marginTop="2dip"
             android:background="@null"
             android:hint="请输入服务器地址"
-            android:textColor="#FF6600"
             android:singleLine="true"
+            android:textColor="#FF6600"
             android:textSize="15sp" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/line" />
     </RelativeLayout>
 
-    <ImageView
-        android:id="@+id/l1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/r1"
-        android:src="@drawable/line" />
+    <RelativeLayout
+        android:id="@+id/relativeLayout_backup_network"
+        android:layout_width="match_parent"
+        android:layout_height="80dip"
+        android:layout_below="@id/relativeLayout_ip_setting_network" >
+
+        <TextView
+            android:id="@+id/textView_backupLabel_network"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dip"
+            android:layout_marginTop="2dip"
+            android:singleLine="true"
+            android:text="备用服务器"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:typeface="sans" />
+
+        <TextView
+            android:id="@+id/textView_backup_network"
+            android:layout_width="400dip"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_backupLabel_network"
+            android:layout_marginLeft="20dip"
+            android:layout_marginTop="2dip"
+            android:background="@null"
+            android:hint="请输入服务器端口\nadsfasdfadf\nadfadfasdf"
+            android:textColor="#FF6600"
+            android:textSize="15sp" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/line" />
+    </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/r2"
-        android:layout_width="fill_parent"
+        android:id="@+id/relativeLayout_port_network"
+        android:layout_width="match_parent"
         android:layout_height="60dip"
-        android:layout_below="@id/l1" >
+        android:layout_below="@id/relativeLayout_backup_network" >
 
         <TextView
             android:id="@+id/port"
@@ -60,11 +96,11 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dip"
             android:layout_marginTop="2dip"
+            android:singleLine="true"
             android:text="服务器端口"
             android:textColor="#000000"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:singleLine="true"
             android:typeface="sans" />
 
         <EditText
@@ -76,26 +112,25 @@
             android:layout_marginTop="2dip"
             android:background="@null"
             android:hint="请输入服务器端口"
+            android:inputType="numberSigned"
             android:textColor="#FF6600"
-            android:textSize="15sp"
-            android:inputType="numberSigned" />
+            android:textSize="15sp" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/line" />
     </RelativeLayout>
 
-    <ImageView
-        android:id="@+id/l2"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/r2"
-        android:src="@drawable/line" />
-
     <RelativeLayout
-        android:id="@+id/r3"
-        android:layout_width="fill_parent"
+        android:id="@+id/relativeLayout_serial_network"
+        android:layout_width="match_parent"
         android:layout_height="60dip"
-        android:layout_below="@id/l2" >
+        android:layout_below="@id/relativeLayout_port_network" >
 
         <TextView
-            android:id="@+id/apn"
+            android:id="@+id/textView_serial_network"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dip"
@@ -110,20 +145,19 @@
             android:id="@+id/txtView_deviceId_setting"
             android:layout_width="400dip"
             android:layout_height="wrap_content"
-            android:layout_below="@id/apn"
+            android:layout_below="@id/textView_serial_network"
             android:layout_marginLeft="20dip"
             android:layout_marginTop="2dip"
             android:background="@null"
             android:textColor="#FF6600"
             android:textSize="15sp" />
-    </RelativeLayout>
 
-    <ImageView
-        android:id="@+id/l3"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/r3"
-        android:src="@drawable/line" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/line" />
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/relativeLayout_testNetwork_setting"
