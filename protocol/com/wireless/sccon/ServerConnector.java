@@ -95,6 +95,10 @@ public class ServerConnector{
 		return _instance;
 	}
 	
+	public void init(){
+		backupConnectors.clear();
+	}
+	
 	public void setMaster(Connector master){
 		this.masterConnector = master;
 	}
@@ -109,6 +113,10 @@ public class ServerConnector{
 		for(Connector backup : backupConnectors){
 			backup.success = 0;
 		}
+	}
+	
+	public List<Connector> getBackups(){
+		return new ArrayList<Connector>(backupConnectors);
 	}
 	
 	/**

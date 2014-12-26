@@ -48,24 +48,17 @@ public class Session{
 				throw new BusinessException("应答数据包的序列号不匹配", ProtocolError.PACKAGE_SEQ_NO_NOT_MATCH);
 			}
 			
-		}catch(IOException e){
-			e.printStackTrace();
-			throw new IOException("请求未成功，请检查网络信号或重新连接");
-			
 		}finally{
 			//close the socket connection finally
 			try{
 				if(in != null){
 					in.close();
-					in = null;
 				}
 				if(out != null){
 					out.close();
-					out = null;
 				}
 				if(sock != null){
 					sock.close();
-					sock = null;
 				}
 			}catch(IOException e){
 				e.printStackTrace();
