@@ -8,6 +8,9 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.printScheme.PrintLossDao;
@@ -38,14 +41,18 @@ import com.wireless.print.content.Content;
  */
 public class PrinterLoginHandler implements Runnable{
 	
-	private boolean _isRunning = false;
-    private ServerSocket _server = null;
+	private boolean _isRunning;
+    private ServerSocket _server;
+    private ScheduledThreadPoolExecutor _scheduledPool;
     
     void kill(){
     	if(_server != null){
     		try{
     			_server.close();
     		}catch(IOException e){}
+    	}
+    	if(_scheduledPool != null){
+    		_scheduledPool.shutdownNow();
     	}
     	_server = null;
     	_isRunning = false;
@@ -64,6 +71,7 @@ public class PrinterLoginHandler implements Runnable{
 		InputStream in = null;
 		OutputStream out = null;
 		_isRunning = true;
+		_scheduledPool = new ScheduledThreadPoolExecutor(2);
 		
 		while(_isRunning){
 			ProtocolPackage loginReq = new ProtocolPackage();
@@ -126,18 +134,35 @@ public class PrinterLoginHandler implements Runnable{
 						PrinterConnections.instance().add(restaurant, sock);
 						
 						//Perform to print the lost receipt in case of NOT empty
-						List<Content> lostContents = new ArrayList<Content>();
-						for(final PrintLoss loss : PrintLossDao.getByCond(dbCon, staff, null)){
-							lostContents.add(new Content(){
-								@Override
-								public byte[] toBytes() {
-									return loss.getContent();
+						final Callable<Void> printLostTask = new Callable<Void>() {
+							@Override
+							public Void call() throws Exception {
+								DBCon dbCon = new DBCon();
+								try{
+									dbCon.connect();
+									final List<Content> lostContents = new ArrayList<Content>();
+									for(final PrintLoss loss : PrintLossDao.getByCond(dbCon, staff, null)){
+										lostContents.add(new Content(){
+											@Override
+											public byte[] toBytes() {
+												return loss.getContent();
+											}
+										});
+										PrintLossDao.deleteById(dbCon, staff, loss.getId());
+									}
+									new PrintHandler(staff).processLost(lostContents);
+										
+								}finally{
+									dbCon.disconnect();
 								}
-							});
-							PrintLossDao.deleteById(dbCon, staff, loss.getId());
-						}
+								return null;
+							}
+						};
 						
-						new PrintHandler(staff).processLost(lostContents);
+						//Perform this print lost task again after 10s in order to prevent missing any lost.
+						_scheduledPool.schedule(printLostTask, 0, TimeUnit.SECONDS);
+						_scheduledPool.schedule(printLostTask, 10, TimeUnit.SECONDS);
+
 					//}else{
 					//	throw new BusinessException("The password is not correct.", ErrorCode.PWD_NOT_MATCH);
 					//}						
@@ -155,15 +180,7 @@ public class PrinterLoginHandler implements Runnable{
 					throw new BusinessException("The mode or type doesn't belong to print service");
 				}					
 				
-			}catch(BusinessException e){
-				e.printStackTrace();
-				dealWithFailure(in, out, sock, loginReq);
-				
-			}catch(IOException e){
-				e.printStackTrace();
-				dealWithFailure(in, out, sock, loginReq);
-				
-			}catch(SQLException e){
+			}catch(BusinessException | IOException | SQLException e){
 				e.printStackTrace();
 				dealWithFailure(in, out, sock, loginReq);
 				

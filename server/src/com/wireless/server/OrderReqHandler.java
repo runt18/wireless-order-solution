@@ -20,7 +20,7 @@ class OrderReqHandler implements Runnable{
     
 	public void run(){
 		try{
-			_server = new ServerSocket(WirelessSocketServer.listen);
+			_server = new ServerSocket(WirelessSocketServer.socket_listen);
 			Socket connection = null;
 			_isRunning = true;
 			while(_isRunning){

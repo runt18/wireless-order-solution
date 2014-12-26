@@ -3,8 +3,7 @@
 	<!-- the name of db -->
 	<db>wireless_order_db</db>
 	<!-- the ip address of the db host -->
-	<!-- <host>42.121.54.177</host> -->
-    <host>192.168.180.100</host>
+	<host>42.121.54.177</host> 
 	<!-- the port that the db is listened on -->
 	<port>3306</port>
 	<!-- the db account -->
@@ -17,6 +16,8 @@
 	<printer_listen>44444</printer_listen>
 	<!-- the port listened on socket for monitor -->
 	<monitor_listen>33333</monitor_listen>
+	<!-- the backup connector -->
+	<!-- <backup ip="ts.e-tones.net" port="55555"/> -->
 	<!-- the template to print order -->
 	<print_template func="1">		
 		<file style="3" path="ptemp/order_76mm"/><!-- 76mm -->

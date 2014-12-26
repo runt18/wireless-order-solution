@@ -15,6 +15,7 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.wireless.db.DBCon;
@@ -48,9 +49,14 @@ public class MonitorHandler implements Runnable{
 	
 	private boolean _isRunning = false;
 	private ServerSocket _server = null;
+	private ScheduledThreadPoolExecutor _scheduleMonitor;
 	
 	public void kill(){
 		_isRunning = false;
+		if(_scheduleMonitor != null){
+			_scheduleMonitor.shutdownNow();
+			_scheduleMonitor = null;
+		}
 		if(_server != null){
 			try{
 				_server.close();
@@ -60,28 +66,23 @@ public class MonitorHandler implements Runnable{
 	
 	public void run(){
 		try{
-			MonitorStatus ms = null;
-			//InetAddress localHost = InetAddress.getByName("localhost");
-			//listened on port of local host for the print login service
+			//only accept the connection from local host
 			_server = new ServerSocket(WirelessSocketServer.monitor_listen, 0, InetAddress.getByName("localhost"));
 			InputStream in = null;
 			OutputStream out = null;
 			Socket connection = null;
 			String response = null;
-			String sep = System.getProperty("line.separator");
+			final String sep = System.getProperty("line.separator");
 			_isRunning = true;
 			while(_isRunning){
 				try{
 					connection = _server.accept();
-					//only accept the connection from local host
-//					if(!connection.getInetAddress().equals(localHost)){
-//						continue;
-//					}					
+					
 					in = new BufferedInputStream(new DataInputStream(connection.getInputStream()));
 					out = new BufferedOutputStream(new DataOutputStream(connection.getOutputStream()));
-					byte[] rec_buf = new byte[256];
-					int bytesToRead = in.read(rec_buf);
-					String cmd = new String(rec_buf, 0, bytesToRead);
+					byte[] recBuf = new byte[256];
+					int bytesToRead = in.read(recBuf);
+					String cmd = new String(recBuf, 0, bytesToRead);
 					cmd = cmd.split("\n")[0];
 					//check if command is "start_monitor"
 					if(cmd.startsWith(Cmd.SMonitor)){
@@ -105,33 +106,25 @@ public class MonitorHandler implements Runnable{
 								}
 							}
 						}
-						if(ms == null){
-							ms = new MonitorStatus();
-							ms.setInterval(interval);
-							ms.start();
-							response = "ok..." + Cmd.SMonitor + "(interval:" + interval + "ms)" + sep;
-						}else{
-							response = "error..." + Cmd.SMonitor + sep;
-							response += "monitor status has been running" + sep;
+						if(_scheduleMonitor != null){
+							_scheduleMonitor.shutdownNow();
 						}
+						_scheduleMonitor = new ScheduledThreadPoolExecutor(1);
+						_scheduleMonitor.scheduleAtFixedRate(new MonitorTask(), 0, interval, TimeUnit.MILLISECONDS);
+						response = "ok..." + Cmd.SMonitor + "(interval:" + interval + "ms)" + sep;
+						
 					//check if the command is "kill_monitor"
 					}else if(cmd.startsWith(Cmd.KMonitor)){
-						if(ms != null){
-							ms.kill();
-							ms = null;
-							response = "ok..." + Cmd.KMonitor + sep;
-						}else{
-							response = "error..." + Cmd.KMonitor + sep;
-							response += "monitor status hasn't started" + sep;
+						if(_scheduleMonitor != null){
+							_scheduleMonitor.shutdownNow();
+							_scheduleMonitor = null;
 						}
+						response = "ok..." + Cmd.KMonitor + sep;
+
 					//check if the command is "kill_socket"
 					}else if(cmd.startsWith(Cmd.KSocket)){
 						//terminate the monitor status thread
 						response = "ok..." + Cmd.KSocket + sep;
-						if(ms != null){
-							ms.kill();
-							response += "stop the monitor status" + sep;
-						}
 						//terminate the monitor thread
 						if(WirelessSocketServer.monitorHandler != null){
 							WirelessSocketServer.monitorHandler.kill();
@@ -187,20 +180,17 @@ public class MonitorHandler implements Runnable{
 							out.write(response.getBytes());
 							out.flush();
 							out.close();
-						}catch(IOException e){}
-						out = null;
+						}catch(IOException ignored){}
 					}
 					if(in != null){
 						try{
 							in.close();
-						}catch(IOException e){}
-						in = null;
+						}catch(IOException ignored){}
 					}
 					if(connection != null){
 						try{
 							connection.close();
-						}catch(IOException e){}
-						connection = null;
+						}catch(IOException ignored){}
 					}
 				}
 			}
@@ -216,58 +206,37 @@ public class MonitorHandler implements Runnable{
  * This class is to log the socket status (such as the thread pool status)
  * to a log file (named "status.log") every specific seconds. *
  */
-class MonitorStatus extends Thread{
-	private boolean _isRunning = false;
-	private long _interval = 1000;
-	
-	MonitorStatus(){
-		this.setPriority(Thread.MIN_PRIORITY);
-	}
-	
-	void setInterval(long interval){
-		if(interval > 0)
-			_interval = interval;
-	}
-	
-	void kill(){
-		_isRunning = false;
-	}
-	
-	boolean isRunning(){
-		return _isRunning;
-	}
+class MonitorTask implements Runnable{
 	
 	public void run(){
-		_isRunning = true;
-		String sep = System.getProperty("line.separator");
-		while(_isRunning){		
-			try{
-				File parent = new File("log/");
-				if(!parent.exists()){
-					parent.mkdir();
-				}
-				File statusFile = new File("log/status.log");
-				if(!statusFile.exists()){
-					statusFile.createNewFile();
-				}	
-				FileWriter statusWriter = new FileWriter(statusFile);
-				String status = "Thread pool status: $(core) core,  $(max) max,  $(alive)s alive,  $(queue_size) queues" + sep;
-				status += "Thread pool statistics: $(working) working,  $(queued) queued,  $(largest) largest,  $(completed) completed" + sep;
-				//status += "Db connection pool status: $(init_pool_size) init,  $(min_pool_size) min,  $(max_pool_size) max,  $(busy_pool_size) busy,  $(idle_pool_size) idle" + sep;
-				status += "Printer status: $(restaurant_printer) restaurant(s),  $(printer_socket) socket(s)" + sep;
-				status += "Print loss status: $(print_loss_status)";
-				
-				//replace the thread pool status
-				status = status.replace("$(core)", Integer.toString(WirelessSocketServer.threadPool.getCorePoolSize()));
-				status = status.replace("$(max)", Integer.toString(WirelessSocketServer.threadPool.getMaximumPoolSize()));
-				status = status.replace("$(alive)", Long.toString(WirelessSocketServer.threadPool.getKeepAliveTime(TimeUnit.SECONDS)));
-				status = status.replace("$(queue_size)", Integer.toString(WirelessSocketServer.threadPool.getQueue().size() + WirelessSocketServer.threadPool.getQueue().remainingCapacity()));
-				status = status.replace("$(working)", Integer.toString(WirelessSocketServer.threadPool.getActiveCount()));
-				status = status.replace("$(queued)", Integer.toString(WirelessSocketServer.threadPool.getQueue().size()));
-				status = status.replace("$(largest)", Integer.toString(WirelessSocketServer.threadPool.getLargestPoolSize()));
-				status = status.replace("$(completed)", Long.toString(WirelessSocketServer.threadPool.getCompletedTaskCount()));
-				
-				//replace the db connection pool status
+		final String sep = System.getProperty("line.separator");
+		try{
+			File parent = new File("log/");
+			if(!parent.exists()){
+				parent.mkdir();
+			}
+			File statusFile = new File("log/status.log");
+			if(!statusFile.exists()){
+				statusFile.createNewFile();
+			}	
+			FileWriter statusWriter = new FileWriter(statusFile);
+			String status = "Thread pool status: $(core) core,  $(max) max,  $(alive)s alive,  $(queue_size) queues" + sep;
+			status += "Thread pool statistics: $(working) working,  $(queued) queued,  $(largest) largest,  $(completed) completed" + sep;
+			//status += "Db connection pool status: $(init_pool_size) init,  $(min_pool_size) min,  $(max_pool_size) max,  $(busy_pool_size) busy,  $(idle_pool_size) idle" + sep;
+			status += "Printer status: $(restaurant_printer) restaurant(s),  $(printer_socket) socket(s)" + sep;
+			status += "Print loss status: $(print_loss_status)";
+			
+			//replace the thread pool status
+			status = status.replace("$(core)", Integer.toString(WirelessSocketServer.threadPool.getCorePoolSize()));
+			status = status.replace("$(max)", Integer.toString(WirelessSocketServer.threadPool.getMaximumPoolSize()));
+			status = status.replace("$(alive)", Long.toString(WirelessSocketServer.threadPool.getKeepAliveTime(TimeUnit.SECONDS)));
+			status = status.replace("$(queue_size)", Integer.toString(WirelessSocketServer.threadPool.getQueue().size() + WirelessSocketServer.threadPool.getQueue().remainingCapacity()));
+			status = status.replace("$(working)", Integer.toString(WirelessSocketServer.threadPool.getActiveCount()));
+			status = status.replace("$(queued)", Integer.toString(WirelessSocketServer.threadPool.getQueue().size()));
+			status = status.replace("$(largest)", Integer.toString(WirelessSocketServer.threadPool.getLargestPoolSize()));
+			status = status.replace("$(completed)", Long.toString(WirelessSocketServer.threadPool.getCompletedTaskCount()));
+			
+			//replace the db connection pool status
 //				status = status.replace("$(init_pool_size)", Integer.toString(DBCon.getPoolSource().getInitialPoolSize()));
 //				status = status.replace("$(min_pool_size)", Integer.toString(DBCon.getPoolSource().getMinPoolSize()));
 //				status = status.replace("$(max_pool_size)", Integer.toString(DBCon.getPoolSource().getMaxPoolSize()));
@@ -281,39 +250,35 @@ class MonitorStatus extends Thread{
 //				}catch(SQLException e){
 //					status = status.replace("$(idle_pool_size)", "0");
 //				}
-				
-				//calculate the amount of restaurant and printer sockets
-				int restaurantAmount = 0;
-				int sockAmount = 0;
-				for(Entry<Restaurant, List<Socket>> entry : PrinterConnections.instance().stat()){
-					if(!entry.getValue().isEmpty()){
-						restaurantAmount++;
-						sockAmount += entry.getValue().size();
-					}
+			
+			//calculate the amount of restaurant and printer sockets
+			int restaurantAmount = 0;
+			int sockAmount = 0;
+			for(Entry<Restaurant, List<Socket>> entry : PrinterConnections.instance().stat()){
+				if(!entry.getValue().isEmpty()){
+					restaurantAmount++;
+					sockAmount += entry.getValue().size();
 				}
-				//replace the amount to restaurant which logged in printer server  
-				status = status.replace("$(restaurant_printer)", Integer.toString(restaurantAmount));
-				
-				//calculate the number of the printer sockets and replace the printer sockets status
-				status = status.replace("$(printer_socket)", Integer.toString(sockAmount));
-				
-				//replace the number of receipt to print loss
-				try {
-					status = status.replace("$(print_loss_status)", PrintLossDao.stat().toString());
-				} catch (SQLException ignored) {
-					ignored.printStackTrace();
-				}
-				
-				//write to the log file
-				statusWriter.write(status);
-				statusWriter.close();
-				try{
-					Thread.sleep(_interval);
-				}catch(InterruptedException e){}
-				
-			}catch(IOException e){
-				e.printStackTrace();
 			}
-		}						
+			//replace the amount to restaurant which logged in printer server  
+			status = status.replace("$(restaurant_printer)", Integer.toString(restaurantAmount));
+			
+			//calculate the number of the printer sockets and replace the printer sockets status
+			status = status.replace("$(printer_socket)", Integer.toString(sockAmount));
+			
+			//replace the number of receipt to print loss
+			try {
+				status = status.replace("$(print_loss_status)", PrintLossDao.stat().toString());
+			} catch (SQLException ignored) {
+				ignored.printStackTrace();
+			}
+			
+			//write to the log file
+			statusWriter.write(status);
+			statusWriter.close();
+			
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 }

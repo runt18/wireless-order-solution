@@ -4,7 +4,9 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,7 +35,7 @@ import com.wireless.task.SweepDBTask;
 public class WirelessSocketServer {
 
 	//the version of the wireless socket server
-	static final String VERSION = "1.1.8";
+	static final String VERSION = "1.2.0";
 	//the OTA server address
 	static String OTA_IP = ""; 
 	//the OTA server port
@@ -45,11 +47,13 @@ public class WirelessSocketServer {
 	//the port to database
 	static String port = "3306";
 	//the listened port to the wireless order socket
-	static int listen = 55555;
+	static int socket_listen = 55555;
 	//the listened port to the printer socket
 	static int printer_listen = 44444;
 	//the listened port to the monitor
 	static int monitor_listen = 33333;
+	//the backup connector
+	static final List<ServerConnector.Connector> backups = new ArrayList<>();
 	//the user name to database
     static String user = "";   
     //the password to database
@@ -61,7 +65,7 @@ public class WirelessSocketServer {
     static int blockQueueSize = 200;
 	
     //the hash map holding the information is as below
-    public static final Map<PType, Map<PStyle, String>> printTemplates = new HashMap<PType, Map<PStyle, String>>();    
+    public static final Map<PType, Map<PStyle, String>> printTemplates = new HashMap<>();    
     
     //the thread pool
     static ThreadPoolExecutor threadPool = null;
@@ -119,7 +123,7 @@ public class WirelessSocketServer {
 				
 				nl = doc.getElementsByTagName("listen");
 				if(nl.item(0) != null){
-					listen = Integer.parseInt(nl.item(0).getFirstChild().getNodeValue());
+					socket_listen = Integer.parseInt(nl.item(0).getFirstChild().getNodeValue());
 				}
 				
 				nl = doc.getElementsByTagName("printer_listen");
@@ -130,6 +134,11 @@ public class WirelessSocketServer {
 				nl = doc.getElementsByTagName("monitor_listen");
 				if(nl.item(0) != null){
 					monitor_listen = Integer.parseInt(nl.item(0).getFirstChild().getNodeValue());
+				}
+				
+				nl = doc.getElementsByTagName("backup");
+				for(int i = 0; i < nl.getLength(); i++){
+					backups.add(new ServerConnector.Connector(((Element)nl.item(i)).getAttribute("ip"), Integer.parseInt(((Element)nl.item(i)).getAttribute("port"))));
 				}
 				
 				nl = doc.getElementsByTagName("print_template");
@@ -184,8 +193,7 @@ public class WirelessSocketServer {
 					OTA_Port = portTag.item(0) != null ? portTag.item(0).getFirstChild().getNodeValue() : "";
 				}
 				
-				ServerConnector.instance().setNetAddr("localhost");
-				ServerConnector.instance().setNetPort(WirelessSocketServer.listen);
+				ServerConnector.instance().setMaster(new ServerConnector.Connector("localhost", WirelessSocketServer.socket_listen));
 				
 				threadPool = new ThreadPoolExecutor(coolPoolSize,
 						  							maxPoolSize,

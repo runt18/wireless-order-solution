@@ -35,6 +35,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
+import com.wireless.exception.IOError;
 import com.wireless.exception.WxOrderError;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
@@ -101,7 +102,7 @@ class OrderHandler implements Runnable{
 			// Get the request from socket stream.
 			request.readFromStream(in, _timeout);
 			
-			RespPackage response = null;
+			final RespPackage response;
 			
 			if(request.header.mode == Mode.TEST && request.header.type == Type.PING){
 				//handle the ping test request
@@ -120,6 +121,10 @@ class OrderHandler implements Runnable{
 				Device device = DeviceDao.getWorkingDeviceById(new Parcel(request.body).readParcel(Device.CREATOR).getDeviceId());
 				response = new RespPackage(request.header, StaffDao.getByRestaurant(device.getRestaurantId()), Staff.ST_PARCELABLE_COMPLEX);
 				
+			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_BACKUP_SERVER){
+				//handle the query backup connectors
+				response = new RespPackage(request.header, WirelessSocketServer.backups, 0);
+			
 			}else{
 				
 			    // Extract the staff and restaurant id from header of request package
@@ -265,6 +270,9 @@ class OrderHandler implements Runnable{
 						MemberCommentDao.commit(staff, CommitBuilder.newPrivateBuilder(staff.getId(), comment.getMember().getId(), comment.getComment()));
 					}
 					response = new RespACK(request.header);
+					
+				}else{
+					response = new RespNAK(request.header);
 				}
 			}
 
@@ -278,9 +286,16 @@ class OrderHandler implements Runnable{
 			
 			e.printStackTrace();
 			
-		}catch(IOException | SQLException e){
+		}catch(SQLException e){
 			try{
 				new RespNAK(request.header, new BusinessException(e.getMessage()).getErrCode()).writeToStream(out);
+			}catch(IOException ignored){}
+			
+			e.printStackTrace();
+			
+		}catch(IOException e){
+			try{
+				new RespNAK(request.header, IOError.IO_ERROR).writeToStream(out);
 			}catch(IOException ignored){}
 			
 			e.printStackTrace();

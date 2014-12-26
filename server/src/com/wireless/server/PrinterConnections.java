@@ -130,7 +130,7 @@ public class PrinterConnections {
 				new ReqPing().writeToStream(sock.getOutputStream());
 				new ProtocolPackage().readFromStream(sock.getInputStream(), 3 * 1000);
 				
-			}catch(IOException e){
+			}catch(IOException | BusinessException e){
 				try{
 					sock.close();
 				}catch(IOException ignored){
