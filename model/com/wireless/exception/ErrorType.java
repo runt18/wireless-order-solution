@@ -63,7 +63,8 @@ public enum ErrorType {
 	PRICE_PLAN(28, "price_plan"),
 	TABLE(29, "table"),
 	PAY_TYPE(30, "pay_type"),
-	WX_ORDER(31, "wx_order");
+	WX_ORDER(31, "wx_order"),
+	IO_ERROR(32, "IO Error");
 	
 	private final String desc;
 	
