@@ -37,8 +37,7 @@ public class InitServlet extends ActionServlet {
 									 	    getServletConfig().getInitParameter("oss_inner_point"), 
 									 	    getServletConfig().getInitParameter("oss_outer_point")));
 		
-		ServerConnector.instance().setNetAddr(getServletConfig().getInitParameter("socket_host"));
-		ServerConnector.instance().setNetPort(Integer.parseInt(getServletConfig().getInitParameter("socket_port")));
+		ServerConnector.instance().setMaster(new ServerConnector.Connector(getServletConfig().getInitParameter("socket_host"), Integer.parseInt(getServletConfig().getInitParameter("socket_port"))));
 		
 		super.init();
 	}
