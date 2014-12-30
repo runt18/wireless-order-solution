@@ -969,9 +969,9 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		if(mOriOrder != null){
 			//¸Äµ¥
 			new CommitOrderTask(WirelessOrder.loginStaff, 
-								new Order.UpdateBuilder(mOriOrder.getId(), mOriOrder.getOrderDate())
-										 .addAll(mNewFoodList, WirelessOrder.loginStaff)
-										 .addAll(mOriOrder.getOrderFoods(), WirelessOrder.loginStaff)
+								new Order.UpdateBuilder(mOriOrder)
+										 .addOri(mOriOrder.getOrderFoods())
+										 .addNew(mNewFoodList, WirelessOrder.loginStaff)
 										 .setCustomNum(customNum),
 								printOption).execute();
 		}else{
