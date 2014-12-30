@@ -377,9 +377,9 @@ class OrderHandler implements Runnable{
 			Order oriOrder = OrderDao.getByTableAlias(staff, tblToOrder.getAliasId());
 			
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, 
-																					 new Order.UpdateBuilder(oriOrder.getId(), oriOrder.getOrderDate())
-																							  .addAll(oriOrder.getOrderFoods(), staff)
-																							  .addAll(newOrder.getOrderFoods(), staff)
+																					 new Order.UpdateBuilder(oriOrder)
+																							  .addOri(oriOrder.getOrderFoods())
+																							  .addNew(newOrder.getOrderFoods(), staff)
 																							  .setWxOrders(newOrder.getWxOrders()), 
 																					 PrintOption.valueOf(request.header.reserved)));
 			if(resp.header.type == Type.NAK){
