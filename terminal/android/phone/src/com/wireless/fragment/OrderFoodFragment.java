@@ -1060,10 +1060,12 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	 */
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
 		private ProgressDialog mProgressDialog;
-
+		private final int mTblAlias;
+		
 		QueryOrderTask(int tableAlias){
 			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
 			mProgressDialog = ProgressDialog.show(getActivity(), "", "正在读取账单...请稍后", true);
+			mTblAlias = tableAlias;
 		}
 		
 		@Override
@@ -1081,12 +1083,12 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		public void onFail(BusinessException e){
 			mProgressDialog.dismiss();
 			
-			if(mBusinessException.getErrCode().equals(FrontBusinessError.ORDER_NOT_EXIST)){
+			if(e.getErrCode().equals(FrontBusinessError.ORDER_NOT_EXIST)){
 				mOriOrder = null;
 				
 			}else{
 				new AlertDialog.Builder(getActivity()).setTitle("更新账单失败")
-					.setMessage(mBusinessException.getMessage())
+					.setMessage(e.getMessage())
 					.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {

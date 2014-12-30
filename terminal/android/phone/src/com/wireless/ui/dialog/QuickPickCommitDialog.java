@@ -401,14 +401,17 @@ public class QuickPickCommitDialog extends DialogFragment{
 	
 	private class QueryAndPayOrderTask extends com.wireless.lib.task.QueryOrderTask{
 		
+		private final int mTblAlias;
+		
 		public QueryAndPayOrderTask(int tableAlias) {
 			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
+			mTblAlias = tableAlias;
 		}
 
 		private ProgressDialog mProgressDialog;
 		@Override
 		protected void onPreExecute(){
-			mProgressDialog = ProgressDialog.show(getActivity(), "", "查询" + mTblAlias + "号餐台的信息...请稍候", true);
+			mProgressDialog = ProgressDialog.show(getActivity(), "", "查询号餐台的信息...请稍候", true);
 		}
 		
 		@Override
@@ -421,7 +424,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 		public void onFail(BusinessException e){
 			mProgressDialog.dismiss();
 			new AlertDialog.Builder(getActivity())
-				.setTitle(mBusinessException.getMessage())
+				.setTitle(e.getMessage())
 				.setMessage("菜品已添加，但结账请求失败，是否重试？")
 				.setPositiveButton("重试", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {

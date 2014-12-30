@@ -327,7 +327,7 @@ public class BillActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(BillActivity.this, "", "查询" + mTblAlias + "号餐台的信息...请稍候", true);
+			_progDialog = ProgressDialog.show(BillActivity.this, "", "查询号餐台的信息...请稍候", true);
 		}
 		
 		@Override
@@ -347,7 +347,7 @@ public class BillActivity extends Activity {
 			//如果请求账单信息失败，则跳转会MainActivity
 			new AlertDialog.Builder(BillActivity.this)
 				.setTitle("提示")
-				.setMessage(mBusinessException.getMessage())
+				.setMessage(e.getMessage())
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
