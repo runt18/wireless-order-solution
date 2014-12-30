@@ -164,9 +164,9 @@ public final class ShoppingCart {
 					reqOrder.addFood(newFood, WirelessOrder.loginStaff);
 				}
 			}
-			new CommitOrderTask(new Order.UpdateBuilder(mOriOrder.getId(), mOriOrder.getOrderDate())
-										 .addAll(mOriOrder.getOrderFoods(), WirelessOrder.loginStaff)
-										 .addAll(getNewFoods(), WirelessOrder.loginStaff), 
+			new CommitOrderTask(new Order.UpdateBuilder(mOriOrder)
+										 .addOri(mOriOrder.getOrderFoods())
+										 .addNew(getNewFoods(), WirelessOrder.loginStaff), 
 								commitListener).execute();
 			
 		}else{
