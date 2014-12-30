@@ -18,9 +18,9 @@ import com.wireless.sccon.ServerConnector;
 
 public abstract class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 
-	protected BusinessException mBusinessException;
+	private BusinessException mBusinessException;
 	
-	protected int mTblAlias;
+	private int mTblAlias;
 
 	@SuppressWarnings("unused")
 	private final FoodMenu mFoodMenu;
