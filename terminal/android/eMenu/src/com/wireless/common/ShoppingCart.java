@@ -120,7 +120,7 @@ public final class ShoppingCart {
 			
 			@Override
 			public void onSuccess(Order reqOrder) {
-				new com.wireless.lib.task.QueryOrderTask(WirelessOrder.loginStaff, reqOrder.getDestTbl().getAliasId(), WirelessOrder.foodMenu){
+				new com.wireless.lib.task.QueryOrderTask(WirelessOrder.loginStaff, mDestTable.getAliasId(), WirelessOrder.foodMenu){
 					@Override
 					public void onSuccess(Order order){
 						new PayOrderTask(order, payListener).execute();
@@ -128,7 +128,7 @@ public final class ShoppingCart {
 					@Override
 					public void onFail(BusinessException e){
 						if(payListener != null){
-							payListener.onFail(mBusinessException);
+							payListener.onFail(e);
 						}
 					}
 				}.execute();
