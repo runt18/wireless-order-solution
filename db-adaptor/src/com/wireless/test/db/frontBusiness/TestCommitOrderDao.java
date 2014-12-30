@@ -85,7 +85,7 @@ public class TestCommitOrderDao {
 			of.setCount(2.35f);
 			expectedOrder.addFood(of, mStaff);
 			
-			UpdateOrder.exec(mStaff, new Order.UpdateBuilder(orderId, actualOrder.getOrderDate()).addAll(expectedOrder.getOrderFoods(), mStaff));
+			UpdateOrder.exec(mStaff, new Order.UpdateBuilder(actualOrder).addNew(expectedOrder.getOrderFoods(), mStaff));
 			
 			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
 			
@@ -102,7 +102,7 @@ public class TestCommitOrderDao {
 			of.setCount(2.35f);
 			expectedOrder.addFood(of, mStaff);
 			
-			UpdateOrder.exec(mStaff, new Order.UpdateBuilder(orderId, actualOrder.getOrderDate()).addAll(expectedOrder.getOrderFoods(), mStaff));
+			UpdateOrder.exec(mStaff, new Order.UpdateBuilder(actualOrder).addNew(expectedOrder.getOrderFoods(), mStaff));
 			
 			actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
 			
@@ -134,6 +134,7 @@ public class TestCommitOrderDao {
 			if(!idleTables.isEmpty()){
 				Table tblToTransfer = idleTables.get(1);
 				Order expectedTransferOrder = new Order(0);
+				expectedTransferOrder.setCustomNum(1);
 				expectedTransferOrder.setDestTbl(tblToTransfer);
 				
 				expectedTransferOrder.addFood(transferFood2, mStaff);

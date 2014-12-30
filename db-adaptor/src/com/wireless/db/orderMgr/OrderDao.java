@@ -669,8 +669,7 @@ public class OrderDao {
 		}else if(destTbl.isBusy()){
 			//Update the order if the destination table is busy.
 			Order destOrder = getByTableAlias(dbCon, staff, destTbl.getAliasId());
-			destOrder.addFoods(builder.getTransferFoods(), staff);
-			UpdateOrder.exec(dbCon, staff, new Order.UpdateBuilder(destOrder.getId(), destOrder.getOrderDate()).addAll(destOrder.getOrderFoods(), staff));
+			UpdateOrder.exec(dbCon, staff, new Order.UpdateBuilder(destOrder).addOri(destOrder.getOrderFoods()).addNew(builder.getTransferFoods(), staff));
 		}
 	}
 
