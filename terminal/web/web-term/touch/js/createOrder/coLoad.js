@@ -187,7 +187,7 @@ co.showKitchenPaging = function(){
 	});	
 	
 	//FIXME 厨房分页
-	if(co.kitchenPagingData.length > 9){
+	if(co.kitchenPagingData.length > 8){
 		co.kitchenPagingLimit = 8;
 		$('#divKitchenPagingNext').show();
 		$('#divKitchenPagingPrevious').show();
