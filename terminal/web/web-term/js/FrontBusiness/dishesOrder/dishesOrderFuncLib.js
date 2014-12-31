@@ -536,6 +536,7 @@ function orderGiftFoodOperationHandler(c){
 				record.set('isGift', false);
 				orderFood_formatFoodName(record, 'displayFoodName', 'name', 1);
 			}	
+			break;
 		}
 
 	}
@@ -987,6 +988,7 @@ function submitRepaidOrderHandler(_c){
  */
 function submitSingleOrderHandler(_c){
 	var orderFoods = _c.grid.order.orderFoods;
+	
 	orderDataModel.tableAlias = tableAliasID;
 	orderDataModel.customNum = 1;
 	orderDataModel.orderFoods = (typeof _c.commitType != 'undefined'? frontNewOrderFood : orderFoods);
