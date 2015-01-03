@@ -3,7 +3,7 @@
 	<!-- the name of db -->
 	<db>wireless_order_db</db>
 	<!-- the ip address of the db host -->
-	<host>42.121.54.177</host> 
+	<host>192.168.180.100</host> 
 	<!-- the port that the db is listened on -->
 	<port>3306</port>
 	<!-- the db account -->
@@ -26,6 +26,7 @@
 	</print_template>
 	<!-- the template to print order detail -->
 	<print_template func="2">
+		<file style="4" path="ptemp/order_detail_5040mm"/><!-- label 50mm * 40mm -->
 		<file style="3" path="ptemp/order_detail_76mm"/><!-- 76mm -->
 		<file style="2" path="ptemp/order_detail_80mm"/><!-- 80mm -->
 		<file style="1" path="ptemp/order_detail_58mm"/><!-- 58mm -->
