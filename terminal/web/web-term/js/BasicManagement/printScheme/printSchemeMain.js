@@ -823,6 +823,12 @@ if(!printerWin){
 					inputValue : 3,
 					hideLabel : true,
 					boxLabel : '76mm'
+				}, {
+					xtype : 'radio',
+					name : 'pStyle',
+					inputValue : 4,
+					hideLabel : true,
+					boxLabel : '标签(50mm * 50mm)'
 				}]
 				
 			},{
@@ -1075,8 +1081,10 @@ function operatePrinterHandler(c){
 			styles[0].checked = true;
 		}else if(styles[1].value == sn.attributes.styleValue){
 			styles[1].checked = true;
-		}else{
+		}else if(styles[2].value == sn.attributes.styleValue){
 			styles[2].checked = true;
+		}else if(styles[3].value == sn.attributes.styleValue){
+			styles[3].checked = true;
 		}
 		
 		if(sn.attributes.isEnabled ){
