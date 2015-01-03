@@ -828,7 +828,7 @@ if(!printerWin){
 					name : 'pStyle',
 					inputValue : 4,
 					hideLabel : true,
-					boxLabel : '标签(50mm * 50mm)'
+					boxLabel : '标签(50mm * 40mm)'
 				}]
 				
 			},{
