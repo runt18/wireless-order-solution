@@ -1,0 +1,9 @@
+CLS
+SIZE 50 mm, 40 mm
+GAP 2mm,0
+TEXT 20,20,"TSS24.BF2",0,1,2,"$(table) $(print_date)"
+TEXT 20,90,"TSS24.BF2",0,2,3,"$(food_name)" 
+TEXT 20,180,"TSS24.BF2",0,1,2,"服务员:$(waiter)" 
+TEXT 20,250,"TSS24.BF2",0,1,2,"数量:$(custom_num)  价钱:$(food_price)" 
+PRINT 1,1
+
