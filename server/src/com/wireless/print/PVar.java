@@ -5,6 +5,7 @@ public final class PVar{
 	public final static String RESTAURANT = "$(restaurant)";
 	public final static String ORDER_ID = "$(order_id)";
 	public final static String FOOD_NAME = "$(food_name)";
+	public final static String FOOD_TASTE = "$(food_taste)";
 	public final static String FOOD_PRICE = "$(food_price)";
 	public final static String WAITER_NAME = "$(waiter)";
 	public final static String PRINT_DATE = "$(print_date)";
