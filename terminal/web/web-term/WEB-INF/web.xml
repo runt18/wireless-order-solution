@@ -15,6 +15,7 @@
 					/VerifyLogin.do,
 					/QueryStaff.do,
 					/QueryOTA.do,
+					/OperateStaff.do,
 
 					/Login.html,
 					/LoginAdmin.html,
@@ -122,14 +123,6 @@
 		<init-param>
 			<param-name>oss_bucket</param-name>
 			<param-value>digie-image-test</param-value>
-		</init-param>
-		<init-param>
-			<param-name>oss_bucket_image</param-name>
-			<param-value>food-image-test</param-value>
-		</init-param>
-		<init-param>
-			<param-name>oss_bucket_finance</param-name>
-			<param-value>weixin-finance-test</param-value>
 		</init-param>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
