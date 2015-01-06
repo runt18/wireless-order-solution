@@ -1,6 +1,4 @@
-﻿
-
-//反结账单头
+﻿//反结账单头
 function repaid_initNorthPanel(){
 
 	dishesOrderNorthPanel = new Ext.Panel({
