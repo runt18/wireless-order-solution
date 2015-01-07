@@ -187,7 +187,7 @@ class OrderHandler implements Runnable{
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_BY_TBL){
 					//handle query order request
 					Table tableToQuery = new Parcel(request.body).readParcel(Table.CREATOR);
-					response = new RespPackage(request.header, OrderDao.getByTableAlias(staff, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
+					response = new RespPackage(request.header, OrderDao.getByTableId(staff, tableToQuery.getId()), Order.ORDER_PARCELABLE_4_QUERY);
 
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE_STATUS){
 					//handle query table status
@@ -374,7 +374,7 @@ class OrderHandler implements Runnable{
 			return doInsertOrder(staff, request);
 			
 		}else if(tblToOrder.isBusy()){
-			Order oriOrder = OrderDao.getByTableAlias(staff, tblToOrder.getAliasId());
+			Order oriOrder = OrderDao.getByTableId(staff, tblToOrder.getId());
 			
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, 
 																					 new Order.UpdateBuilder(oriOrder)
