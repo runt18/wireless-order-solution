@@ -6,7 +6,7 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqQueryOrderByTable extends RequestPackage {
-	public ReqQueryOrderByTable(Staff staff, Table.AliasBuilder builder){
+	public ReqQueryOrderByTable(Staff staff, Table.Builder builder){
 		super(staff);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_ORDER_BY_TBL;
