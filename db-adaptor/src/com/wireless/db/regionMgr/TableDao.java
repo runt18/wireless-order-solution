@@ -13,6 +13,7 @@ import com.wireless.exception.TableError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.regionMgr.Table.Category;
 import com.wireless.pojo.regionMgr.Table.InsertBuilder;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -24,6 +25,7 @@ public class TableDao {
 		private String name;
 		private Region.RegionId regionId;
 		private Table.Status status;
+		private final List<Category> categorys = new ArrayList<Category>();
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -55,6 +57,11 @@ public class TableDao {
 			return this;
 		}
 		
+		public ExtraCond addCategory(Category category){
+			categorys.add(category);
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -69,6 +76,17 @@ public class TableDao {
 			}
 			if(regionId != null){
 				extraCond.append(" AND REGION.region_id = " + regionId.getId());
+			}
+			StringBuilder categoryCond = new StringBuilder();
+			for(Category category : categorys){
+				if(categoryCond.length() == 0){
+					categoryCond.append(category.getVal());
+				}else{
+					categoryCond.append(",").append(category.getVal());
+				}
+			}
+			if(categoryCond.length() != 0){
+				extraCond.append("AND TBL.category IN (" + categoryCond.toString() + ")");
 			}
 			if(status != null){
 				if(status == Table.Status.BUSY){
@@ -191,9 +209,9 @@ public class TableDao {
 		List<Table> result = new ArrayList<Table>();
 		String sql;
 		sql = " SELECT " +
-			  " REGION.name AS region_name, REGION.region_id, REGION.restaurant_id, " +
-			  " TBL.table_id, TBL.table_alias, TBL.name AS tbl_name, TBL.minimum_cost, " +
-			  " O.custom_num, O.category, O.id, " + 
+			  " REGION.name AS region_name, REGION.region_id, " +
+			  " TBL.restaurant_id, TBL.table_id, TBL.table_alias, TBL.name AS tbl_name, TBL.category, TBL.minimum_cost, " +
+			  " O.custom_num, O.id, " + 
 			  " IF(O.status IS NULL, " + Table.Status.IDLE.getVal() + "," + Table.Status.BUSY.getVal() + ") AS tbl_status " + 
 			  " FROM " + Params.dbName + ".table TBL " +
 			  " LEFT JOIN " + Params.dbName + ".region REGION ON REGION.region_id = TBL.region_id AND REGION.restaurant_id = TBL.restaurant_id " +
@@ -215,14 +233,14 @@ public class TableDao {
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			if(dbCon.rs.getInt("tbl_status") == Table.Status.BUSY.getVal()){
 				table.setStatus(Table.Status.BUSY);
-				table.setCategory(Order.Category.valueOf(dbCon.rs.getInt("category")));
+				table.setCategory(Category.valueOf(dbCon.rs.getInt("category")));
 				table.setCustomNum(dbCon.rs.getInt("custom_num"));
 				table.setOrderId(dbCon.rs.getInt("id"));
 			}else{
 				table.setStatus(Table.Status.IDLE);
 			}
 			table.setTableAlias(dbCon.rs.getInt("table_alias"));
-			table.setTableId(dbCon.rs.getInt("table_id"));
+			table.setId(dbCon.rs.getInt("table_id"));
 			table.setTableName(dbCon.rs.getString("tbl_name"));
 			result.add(table);
 		}
@@ -269,12 +287,12 @@ public class TableDao {
 		Table tblToUpdate = builder.build();
 		
 		String updateSQL = " UPDATE " + Params.dbName + ".table SET " +
-						   " table_id = " + tblToUpdate.getTableId() +
+						   " table_id = " + tblToUpdate.getId() +
 						   (builder.isRegionChanged() ? " ,region_id = " + tblToUpdate.getRegion().getId() : "")+
 						   (builder.isNameChanged() ? " ,name = '" + tblToUpdate.getName() + "'" : "") +
 						   (builder.isMiniCostChanged() ? " ,minimum_cost = " + tblToUpdate.getMinimumCost() : "") +
 						   " WHERE " +
-						   " table_id = " + tblToUpdate.getTableId();
+						   " table_id = " + tblToUpdate.getId();
 		if(dbCon.stmt.executeUpdate(updateSQL) == 0){
 			throw new BusinessException(TableError.TABLE_NOT_EXIST);
 		}
@@ -297,6 +315,61 @@ public class TableDao {
 			update(dbCon, staff, builder);
 		}finally{
 			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Insert a fast table to specific builder{@link Table#InsertBuilder4Fast}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to insert a joined table
+	 * @return the table id to just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int insert(DBCon dbCon, Staff staff, Table.InsertBuilder4Fast builder) throws SQLException{
+		return insert(dbCon, staff, builder.build());
+	}
+	
+	/**
+	 * Insert a take out table to specific builder{@link Table#InsertBuilder4Takeout}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to insert a joined table
+	 * @return the table id to just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int insert(DBCon dbCon, Staff staff, Table.InsertBuilder4Takeout builder) throws SQLException{
+		return insert(dbCon, staff, builder.build());
+	}
+	
+	/**
+	 * Insert a joined table to specific builder{@link Table#InsertBuilder4Join}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to insert a joined table
+	 * @return the table id to just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the name to joined table is duplicated
+	 */
+	public static int insert(DBCon dbCon, Staff staff, Table.InsertBuilder4Join builder) throws SQLException, BusinessException{
+		Table joinedTbl = builder.build();
+		if(getByCond(dbCon, staff, new ExtraCond().addCategory(Category.JOIN).setName(joinedTbl.getName()), null).isEmpty()){
+			return insert(dbCon, staff, builder.build());
+		}else{
+			throw new BusinessException("新拆台【" + joinedTbl.getName() + "】已存在，请选用其他的餐台名称", TableError.TABLE_INSERT_NOT_ALLOW);
 		}
 	}
 	
@@ -324,6 +397,36 @@ public class TableDao {
 	}
 	
 	/**
+	 * Insert a new table to a specified restaurant according to builder{@link Table#InsertBuilder}.
+	 * The alias id to new table must be unique in a restaurant.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the insertion builder 
+	 * @return the table to insert along with id just generated if insert successfully
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the alias id to new table has been exist before
+	 */
+	public static int insert(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
+		Table tblToInsert = builder.build();
+		
+		if(tblToInsert.getCategory().isNormal()){
+			String sql = " SELECT * FROM " + Params.dbName + ".table WHERE restaurant_id = " + staff.getRestaurantId() + " AND table_alias = " + tblToInsert.getAliasId() + " LIMIT 1 ";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				throw new BusinessException(TableError.DUPLICATED_TABLE_ALIAS);
+			}
+			dbCon.rs.close();
+		}
+		
+		return insert(dbCon, staff, tblToInsert);
+	}
+	
+	/**
 	 * Insert a new table to a specified restaurant according to insertion builder.
 	 * The alias id to new table must be unique in a restaurant.
 	 * @param dbCon
@@ -335,27 +438,18 @@ public class TableDao {
 	 * @return the table to insert along with id just generated if insert successfully
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			if the alias id to new table has been exist before
 	 */
-	public static int insert(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
-		
-		Table tblToInsert = builder.build();
+	private static int insert(DBCon dbCon, Staff staff, Table tblToInsert) throws SQLException{
 		
 		String sql;
 		
-		sql = " SELECT * FROM " + Params.dbName + ".table WHERE restaurant_id = " + staff.getRestaurantId() + " AND table_alias = " + tblToInsert.getAliasId() + " LIMIT 1 ";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			throw new BusinessException(TableError.DUPLICATED_TABLE_ALIAS);
-		}
-		dbCon.rs.close();
 		sql = " INSERT INTO " + Params.dbName + ".table " +
-		 	  "(`table_alias`, `restaurant_id`, `name`, `region_id`, `minimum_cost`) VALUES( " +
-			  tblToInsert.getAliasId() + ", " + 
+		 	  "(`table_alias`, `restaurant_id`, `name`, `region_id`, `category`, `minimum_cost`) VALUES( " +
+			  (tblToInsert.getCategory().isNormal() ? tblToInsert.getAliasId() : "NULL") + ", " + 
 			  staff.getRestaurantId() + ", " +
 			  "'" + tblToInsert.getName() + "', " +
-			  tblToInsert.getRegion().getId() + ", " +
+			  (tblToInsert.getCategory().isTakeout() || tblToInsert.getCategory().isFast() ? "NULL" : tblToInsert.getRegion().getId()) + ", " +
+			  tblToInsert.getCategory().getVal() + "," +
 			  tblToInsert.getMinimumCost() + 
 			  " ) ";
 		
@@ -514,7 +608,7 @@ public class TableDao {
 				throw new BusinessException("【" + Table.Status.BUSY.getDesc() +	 "】状态的餐厅不能删除", TableError.TABLE_DELETE_NOT_ALLOW);
 			}
 			String sql;
-			sql = " DELETE FROM " + Params.dbName + ".table WHERE table_id = " + table.getTableId();
+			sql = " DELETE FROM " + Params.dbName + ".table WHERE table_id = " + table.getId();
 			dbCon.stmt.executeUpdate(sql);
 			amount++;
 		}
@@ -616,13 +710,13 @@ public class TableDao {
 
 		}else {
 
-			int orderId = OrderDao.getByTableAlias(dbCon, staff, srcTbl.getAliasId()).getId();
+			int orderId = OrderDao.getByTableId(dbCon, staff, srcTbl.getId()).getId();
 
 			// update the order
 			String sql = " UPDATE "	+ 
 						 Params.dbName	+ ".order " +
 						 " SET id = " + orderId +
-						 " ,table_id = " + destTbl.getTableId() + 
+						 " ,table_id = " + destTbl.getId() + 
 						 " ,table_alias = " + destTbl.getAliasId() + 
 						 " ,table_name = " + "'" + destTbl.getName() + "'" +
 						 " ,region_id = " + destTbl.getRegion().getId() + 

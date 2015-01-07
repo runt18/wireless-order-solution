@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.InsertOrder;
 import com.wireless.db.orderMgr.OrderDao;
@@ -18,6 +19,7 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
+import com.wireless.exception.TableError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
@@ -43,7 +45,108 @@ public class TestCommitOrderDao {
 	}
 	
 	@Test
-	public void testCommitOrder() throws BusinessException, BusinessException, SQLException{
+	public void testCommit4Fast() throws BusinessException, SQLException{
+		int orderId = 0;
+		try{
+			
+			List<Food> foods = FoodDao.getPureByCond(mStaff, null, null);
+			
+			Order expectedOrder = new Order(0);
+			expectedOrder.setCustomNum(10);
+			expectedOrder.setCategory(Order.Category.FAST);
+			
+			OrderFood of;
+			of = new OrderFood(foods.get(0));
+			of.setCount(1.35f);
+			expectedOrder.addFood(of, mStaff);
+			
+			of = new OrderFood(foods.get(1));
+			of.setCount(2.35f);
+			expectedOrder.addFood(of, mStaff);
+			
+			//-----------Test to insert a new fast order---------------------------
+			final int fastNo = 1;
+			orderId = InsertOrder.exec(mStaff, Order.InsertBuilder.newInstance4Fast(fastNo)
+																  .addAll(expectedOrder.getOrderFoods(), mStaff).setCustomNum(expectedOrder.getCustomNum())).getId();
+			
+			Order actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+			
+			compare4FastCommit(expectedOrder, actualOrder, fastNo);
+			
+			//-----------Test to pay the order---------------------------
+			Order.PayBuilder payBuilder = Order.PayBuilder.build4Normal(orderId, PayType.CASH);
+			PayOrder.pay(mStaff, payBuilder);
+			
+			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+			compare4Payment(payBuilder, expectedOrder, actualOrder);
+			
+		}finally{
+			if(orderId != 0){
+				OrderDao.deleteByCond(mStaff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(orderId));
+				try{
+					//Check to see whether the order is deleted.
+					OrderDao.getById(mStaff, orderId, DateType.TODAY);
+					Assert.assertTrue("failed to delete order", false);
+				}catch(BusinessException e){
+					Assert.assertEquals("failed to delete the order", FrontBusinessError.ORDER_NOT_EXIST, e.getErrCode());
+				}
+			}
+		}
+	}
+	
+	@Test
+	public void testCommit4Join() throws BusinessException, SQLException{
+		int orderId = 0;
+		try{
+			final Table table = TableDao.getByCond(mStaff, null, null).get(0);
+			
+			List<Food> foods = FoodDao.getPureByCond(mStaff, null, null);
+			
+			Order expectedOrder = new Order(0);
+			expectedOrder.setDestTbl(table);
+			expectedOrder.setCustomNum(10);
+			expectedOrder.setCategory(Order.Category.JOIN);
+			
+			OrderFood of;
+			of = new OrderFood(foods.get(0));
+			of.setCount(1.35f);
+			expectedOrder.addFood(of, mStaff);
+			
+			of = new OrderFood(foods.get(1));
+			of.setCount(2.35f);
+			expectedOrder.addFood(of, mStaff);
+			
+			//-----------Test to insert a new joined order---------------------------
+			orderId = InsertOrder.exec(mStaff, Order.InsertBuilder.newInstance4Join(new Table.AliasBuilder(table.getAliasId()), Table.InsertBuilder4Join.Suffix.A)
+																  .addAll(expectedOrder.getOrderFoods(), mStaff).setCustomNum(expectedOrder.getCustomNum())).getId();
+			
+			Order actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+			
+			compare4JoinCommit(expectedOrder, actualOrder, Table.InsertBuilder4Join.Suffix.A);
+			
+			//-----------Test to pay the order---------------------------
+			Order.PayBuilder payBuilder = Order.PayBuilder.build4Normal(orderId, PayType.CASH);
+			PayOrder.pay(mStaff, payBuilder);
+			
+			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+			compare4Payment(payBuilder, expectedOrder, actualOrder);
+			
+		}finally{
+			if(orderId != 0){
+				OrderDao.deleteByCond(mStaff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(orderId));
+				try{
+					//Check to see whether the order is deleted.
+					OrderDao.getById(mStaff, orderId, DateType.TODAY);
+					Assert.assertTrue("failed to delete order", false);
+				}catch(BusinessException e){
+					Assert.assertEquals("failed to delete the order", FrontBusinessError.ORDER_NOT_EXIST, e.getErrCode());
+				}
+			}
+		}
+	}
+	
+	@Test
+	public void testCommit() throws BusinessException, SQLException{
 		
 		int orderId = 0;
 		final List<Table> idleTables = TableDao.getByCond(mStaff, new TableDao.ExtraCond().setStatus(Table.Status.IDLE), null);
@@ -51,6 +154,8 @@ public class TestCommitOrderDao {
 		
 		try{
 			Table tblToInsert = idleTables.get(0);
+			OrderDao.deleteByCond(mStaff, new OrderDao.ExtraCond(DateType.TODAY).setTableAlias(tblToInsert.getAliasId()));
+			
 			List<Food> foods = FoodDao.getPureByCond(mStaff, null, null);
 			
 			Order expectedOrder = new Order(0);
@@ -72,7 +177,7 @@ public class TestCommitOrderDao {
 			
 			Order actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
 			
-			compareOrder4Commit(expectedOrder, actualOrder);
+			compare4Commit(expectedOrder, actualOrder);
 			
 			//-----------Test to update the order---------------------------
 			expectedOrder.removeAll(mStaff);
@@ -89,7 +194,7 @@ public class TestCommitOrderDao {
 			
 			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
 			
-			compareOrder4Commit(expectedOrder, actualOrder);
+			compare4Commit(expectedOrder, actualOrder);
 			
 			//-----------Test to update the order---------------------------
 			expectedOrder.removeAll(mStaff);
@@ -106,7 +211,7 @@ public class TestCommitOrderDao {
 			
 			actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
 			
-			compareOrder4Commit(expectedOrder, actualOrder);
+			compare4Commit(expectedOrder, actualOrder);
 
 			//-----------Test to transfer food---------------------------
 			OrderFood transferFood1 = actualOrder.getOrderFoods().get(0);
@@ -114,7 +219,7 @@ public class TestCommitOrderDao {
 			
 			if(!busyTables.isEmpty()){
 				Table tblToTransfer = busyTables.get(0);
-				Order expectedTransferOrder = OrderDao.getByTableAlias(mStaff, tblToTransfer.getAliasId());
+				Order expectedTransferOrder = OrderDao.getByTableId(mStaff, tblToTransfer.getId());
 				
 				expectedTransferOrder.addFood(transferFood1, mStaff);
 				
@@ -124,10 +229,10 @@ public class TestCommitOrderDao {
 				
 				actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
 
-				compareOrder4Commit(expectedOrder, actualOrder);
+				compare4Commit(expectedOrder, actualOrder);
 
-				Order actualTransferOrder = OrderDao.getByTableAlias(mStaff, tblToTransfer.getAliasId());
-				compareOrder4Commit(expectedTransferOrder, actualTransferOrder);
+				Order actualTransferOrder = OrderDao.getByTableId(mStaff, tblToTransfer.getId());
+				compare4Commit(expectedTransferOrder, actualTransferOrder);
 				
 			}
 			
@@ -145,10 +250,10 @@ public class TestCommitOrderDao {
 				
 				actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
 
-				compareOrder4Commit(expectedOrder, actualOrder);
+				compare4Commit(expectedOrder, actualOrder);
 
-				Order actualTransferOrder = OrderDao.getByTableAlias(mStaff, tblToTransfer.getAliasId());
-				compareOrder4Commit(expectedTransferOrder, actualTransferOrder);
+				Order actualTransferOrder = OrderDao.getByTableId(mStaff, tblToTransfer.getId());
+				compare4Commit(expectedTransferOrder, actualTransferOrder);
 				
 				OrderDao.deleteByCond(mStaff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(actualTransferOrder.getId()));
 			}
@@ -200,7 +305,22 @@ public class TestCommitOrderDao {
 		Assert.assertEquals("the mixed payment to order", payBuilder.getMixedPayment(), actual.getMixedPayment());
 	}
 	
-	private void compare4Payment(Order.PayBuilder payBuilder, Order expected, Order actual){
+	private void compare4Payment(Order.PayBuilder payBuilder, Order expected, Order actual) throws SQLException{
+		if(expected.getCategory().isNormal()){
+			try{
+				TableDao.getById(mStaff, expected.getDestTbl().getId());
+			}catch(BusinessException e){
+				Assert.assertTrue("the table is removed after payment", false);
+			}
+			
+		}else if(expected.getCategory().isJoin() || expected.getCategory().isTakeout() || expected.getCategory().isFast()){
+			try{
+				TableDao.getById(mStaff, expected.getDestTbl().getId());
+				Assert.assertTrue("the temporary 【" + expected.getCategory().getDesc() + "】 table NOT be removed after payment", false);
+			}catch(BusinessException e){
+				Assert.assertEquals("the temporary 【" + expected.getCategory().getDesc() + "】 table NOT be removed after payment", TableError.TABLE_NOT_EXIST, e.getErrCode());
+			}
+		}
 		//Check the associated table
 		Assert.assertEquals("the payment to order", payBuilder.getPaymentType(), actual.getPaymentType());
 		//Check the custom number
@@ -208,12 +328,13 @@ public class TestCommitOrderDao {
 		//Check the settle type
 		Assert.assertEquals("the settle to order", payBuilder.getSettleType(), actual.getSettleType());
 		//Check the total price
+		expected.setDiscount(DiscountDao.getDefault(mStaff));
 		Assert.assertEquals("the total price to order", expected.calcTotalPrice(), actual.getTotalPrice(), 0.01);
 		//Check the order status
 		Assert.assertEquals("the status to order", Order.Status.PAID, actual.getStatus());
 	}
 	
-	private void compareOrder4Commit(Order expected, Order actual) throws BusinessException, SQLException{
+	private void compare4Commit(Order expected, Order actual) throws BusinessException, SQLException{
 		
 		//Check the associated table
 		Assert.assertEquals("the table to order", expected.getDestTbl(), actual.getDestTbl());
@@ -238,12 +359,41 @@ public class TestCommitOrderDao {
 		}
 		
 		//Check the associated table detail
-		Table tbl = TableDao.getByAlias(mStaff, actual.getDestTbl().getAliasId());
+		Table tbl = TableDao.getById(mStaff, actual.getDestTbl().getId());
 		//Check the status to associated table
 		Assert.assertEquals("the status to associated table", tbl.getStatus().getVal(), Table.Status.BUSY.getVal());
 		//Check the custom number to associated table
 		Assert.assertEquals("the custom number to associated table", tbl.getCustomNum(), actual.getCustomNum());
 		//Check the category to associated table
 		Assert.assertEquals("the category to associated table", tbl.getCategory().getVal(), actual.getCategory().getVal());
+	}
+	
+	private void compare4JoinCommit(Order expected, Order actual, Table.InsertBuilder4Join.Suffix suffix) throws BusinessException, SQLException{
+		Table tbl = TableDao.getById(mStaff, actual.getDestTbl().getId());
+		expected.getDestTbl().setId(tbl.getId());
+		expected.getDestTbl().setTableName(expected.getDestTbl().getAliasId() + suffix.getVal());
+		expected.getDestTbl().setTableAlias(tbl.getAliasId());
+		expected.getDestTbl().setCategory(Table.Category.JOIN);
+		//Check the name to joined table
+		Assert.assertEquals("the name to joined table", expected.getDestTbl().getName(), tbl.getName());
+		//Check the category to joined table
+		Assert.assertEquals("the category to joined table", expected.getDestTbl().getCategory(), actual.getDestTbl().getCategory());
+		
+		compare4Commit(expected, actual);
+	}
+	
+	private void compare4FastCommit(Order expected, Order actual, int fastNo) throws BusinessException, SQLException{
+		Table tbl = TableDao.getById(mStaff, actual.getDestTbl().getId());
+		expected.getDestTbl().setId(tbl.getId());
+		expected.getDestTbl().setTableName("快餐#" + fastNo);
+		expected.getDestTbl().setTableAlias(tbl.getAliasId());
+		expected.getDestTbl().setCategory(Table.Category.FAST);
+		expected.getDestTbl().setRestaurantId(tbl.getRestaurantId());
+		//Check the name to joined table
+		Assert.assertEquals("the name to fast table", expected.getDestTbl().getName(), tbl.getName());
+		//Check the category to joined table
+		Assert.assertEquals("the category to fast table", expected.getDestTbl().getCategory(), actual.getDestTbl().getCategory());
+		
+		compare4Commit(expected, actual);
 	}
 }

@@ -13,6 +13,7 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.order.WxOrder;
@@ -78,7 +79,7 @@ public class InsertOrder {
 		
 		Order orderToInsert = builder.build();
 		
-		doPrepare(dbCon, staff, orderToInsert);
+		doPrepare(dbCon, staff, orderToInsert, builder.getSuffix(), builder.getFastNo());
 			
 		doInsert(dbCon, staff, orderToInsert);
 		
@@ -107,14 +108,30 @@ public class InsertOrder {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	private static void doPrepare(DBCon dbCon, Staff staff, Order orderToInsert) throws BusinessException, SQLException{
+	private static void doPrepare(DBCon dbCon, Staff staff, Order orderToInsert, Table.InsertBuilder4Join.Suffix suffix, int fastNo) throws BusinessException, SQLException{
 		
 		//Check to see whether the staff has the privilege to add the food 
 		if(!staff.getRole().hasPrivilege(Privilege.Code.ADD_FOOD)){
 			throw new BusinessException(StaffError.ORDER_NOT_ALLOW);
 		}
 		
-		orderToInsert.setDestTbl(TableDao.getByAlias(dbCon, staff, orderToInsert.getDestTbl().getAliasId()));
+		if(orderToInsert.getCategory().isNormal()){
+			orderToInsert.setDestTbl(TableDao.getByAlias(dbCon, staff, orderToInsert.getDestTbl().getAliasId()));
+			
+		}else if(orderToInsert.getCategory().isJoin()){
+			//Create the temporary table with the suffix for joined
+			int joinedTblId = TableDao.insert(dbCon, staff, new Table.InsertBuilder4Join(TableDao.getByAlias(dbCon, staff, orderToInsert.getDestTbl().getAliasId()), suffix));
+			orderToInsert.setDestTbl(TableDao.getById(dbCon, staff, joinedTblId));
+			
+		}else if(orderToInsert.getCategory().isTakeout()){
+			//Create the temporary table for take out
+			int takeoutTblId = TableDao.insert(dbCon, staff, new Table.InsertBuilder4Takeout());
+			orderToInsert.setDestTbl(TableDao.getById(dbCon, staff, takeoutTblId));
+			
+		}else if(orderToInsert.getCategory().isFast()){
+			int fastTblId = TableDao.insert(dbCon, staff, new Table.InsertBuilder4Fast(fastNo));
+			orderToInsert.setDestTbl(TableDao.getById(dbCon, staff, fastTblId));
+		}
 		
 		if(orderToInsert.getDestTbl().isIdle()){
 			
@@ -165,11 +182,11 @@ public class InsertOrder {
 			  " `restaurant_id`, `category`, `region_id`, `region_name`, " +
 			  " `table_id`, `table_alias`, `table_name`, " +
 			  " `birth_date`, `order_date`, `custom_num`, `staff_id`, `waiter`, `discount_id`) VALUES (" +
-			  orderToInsert.getDestTbl().getRestaurantId() + ", " + 
+			  staff.getRestaurantId() + ", " + 
 			  orderToInsert.getCategory().getVal() + ", " +
 			  orderToInsert.getRegion().getId() + ", '" +
 			  orderToInsert.getRegion().getName() + "', " +
-			  orderToInsert.getDestTbl().getTableId() + ", " +
+			  orderToInsert.getDestTbl().getId() + ", " +
 			  orderToInsert.getDestTbl().getAliasId() + ", " +
 			  "'" + orderToInsert.getDestTbl().getName() + "'" + ", " +
 			  " NOW() " + ", " + 

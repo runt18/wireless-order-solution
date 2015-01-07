@@ -10,6 +10,7 @@ import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.serviceRate.ServicePlanDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
@@ -180,20 +181,13 @@ public class PayOrder {
 		}
 		
 		if(orderCalculated.isSettledByMember()){
-			
 			Member member = MemberDao.getById(dbCon, staff, payBuilder.getMemberId());
-			
 			if(orderCalculated.isUnpaid()){
 				//Check to see whether be able to perform consumption.
 				member.checkConsume(orderCalculated.getActualPrice(), 
 									payBuilder.hasCoupon() ? CouponDao.getById(dbCon, staff, payBuilder.getCouponId()) : null, 
 									orderCalculated.getPaymentType());
 			}
-//			else{
-//				//Check to see whether be able to perform repaid consumption.
-//				throw new BusinessException("Repaid to member consumption is NOT supported.");
-//			}
-			
 		}
 		
 		//Calculate the sequence id to this order in case of unpaid.
@@ -272,6 +266,11 @@ public class PayOrder {
 			dbCon.stmt.executeUpdate(sql);				
 		}	
 
+		//Delete the temporary table if the category belongs to joined or take out.
+		if(orderCalculated.getCategory().isJoin() || orderCalculated.getCategory().isTakeout() || orderCalculated.getCategory().isFast()){
+			TableDao.deleteById(dbCon, staff, orderCalculated.getDestTbl().getId());
+		}
+		
 		//Update the member status if settled by member.
 		if(orderCalculated.isSettledByMember()){
 			

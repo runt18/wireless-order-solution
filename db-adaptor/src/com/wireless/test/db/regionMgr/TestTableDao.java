@@ -33,7 +33,7 @@ public class TestTableDao {
 	}
 	
 	private void compare(Table expected, Table actual){
-		Assert.assertEquals("table id", expected.getTableId(), actual.getTableId());
+		Assert.assertEquals("table id", expected.getId(), actual.getId());
 		Assert.assertEquals("table_alias", expected.getAliasId(), actual.getAliasId());
 		Assert.assertEquals("table category", expected.getCategory(), actual.getCategory());
 		Assert.assertEquals("table custom number", expected.getCustomNum(), actual.getCustomNum());
@@ -55,10 +55,10 @@ public class TestTableDao {
 			tableId = TableDao.insert(mStaff, builder);
 			
 			Table expected = builder.build();
-			expected.setTableId(tableId);
+			expected.setId(tableId);
 			expected.setRestaurantId(mStaff.getRestaurantId());
 			
-			Table actual = TableDao.getById(mStaff, expected.getTableId());
+			Table actual = TableDao.getById(mStaff, expected.getId());
 			
 			compare(expected, actual);
 			
@@ -70,7 +70,7 @@ public class TestTableDao {
 			expected.setRestaurantId(mStaff.getRestaurantId());
 			expected.setTableAlias(actual.getAliasId());
 
-			actual = TableDao.getById(mStaff, expected.getTableId());
+			actual = TableDao.getById(mStaff, expected.getId());
 			
 			compare(expected, actual);
 

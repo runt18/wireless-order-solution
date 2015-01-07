@@ -17,6 +17,7 @@ import com.wireless.exception.StaffError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.Order.Category;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.dishesOrder.PayType;
@@ -42,6 +43,7 @@ public class OrderDao {
 		private int orderId = -1;		//按账单号
 		private int seqId = -1;			//按流水号
 		private int tableAlias = -1;	//按餐台号
+		private int tableId = -1;		//按餐台号
 		private String tableName;		//按餐台名称
 		private Region.RegionId regionId;	//按区域
 		private DutyRange orderRange;	//按结账日期
@@ -77,6 +79,11 @@ public class OrderDao {
 		
 		public ExtraCond setSeqId(int seqId){
 			this.seqId = seqId;
+			return this;
+		}
+		
+		public ExtraCond setTableId(int tableId){
+			this.tableId = tableId;
 			return this;
 		}
 		
@@ -179,6 +186,9 @@ public class OrderDao {
 			if(tableAlias > 0){
 				filterCond.append(" AND " + orderTblAlias + ".table_alias = " + tableAlias);
 			}
+			if(tableId > 0){
+				filterCond.append(" AND " + orderTblAlias + ".table_id = " + tableId);
+			}
 			if(staffId > 0){
 				filterCond.append(" AND " + orderTblAlias + ".staff_id = " + staffId);
 			}
@@ -275,7 +285,54 @@ public class OrderDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement.
 	 */
-	public static Order getByTableAlias(DBCon dbCon, Staff staff, int tableAlias) throws BusinessException, SQLException {		
+	public static Order getByTableId(DBCon dbCon, Staff staff, int tableId) throws BusinessException, SQLException {		
+		List<Order> result = getByCond(dbCon, staff, new OrderDao.ExtraCond(DateType.TODAY).setTableId(tableId).addStatus(Order.Status.UNPAID), null);
+		if(result.isEmpty()){
+			throw new BusinessException(FrontBusinessError.ORDER_NOT_EXIST);
+		}else{
+			Order order = result.get(0);
+			fillDetail(dbCon, staff, order, DateType.TODAY);
+			return order;
+		}
+	}
+	
+	/**
+	 * Get the unpaid order detail information to the specific restaurant and table. 
+	 * @param staff
+	 *            the staff to perform this action
+	 * @param tableAlias
+	 *            the table alias id to query
+	 * @return Order the order detail information
+	 * @throws BusinessException
+	 *             throws if the un-paid order to this table does NOT exist 
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement.
+	 */
+	public static Order getByTableId(Staff staff, int tableId) throws BusinessException, SQLException {		
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();			
+			return getByTableId(dbCon, staff, tableId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the unpaid order detail information to the specific restaurant and table. 
+	 * @param dbCon
+	 *            the database connection
+	 * @param staff
+	 *            the staff to perform this action
+	 * @param tableAlias
+	 *            the table alias id to query
+	 * @return Order the order detail information
+	 * @throws BusinessException
+	 *             throws if the un-paid order to this table does NOT exist 
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement.
+	 */
+	private static Order getByTableAlias(DBCon dbCon, Staff staff, int tableAlias) throws BusinessException, SQLException {		
 		List<Order> result = getByCond(dbCon, staff, new OrderDao.ExtraCond(DateType.TODAY).setTableAlias(tableAlias).addStatus(Order.Status.UNPAID), null);
 		if(result.isEmpty()){
 			throw new BusinessException(FrontBusinessError.ORDER_NOT_EXIST);
@@ -298,18 +355,14 @@ public class OrderDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement.
 	 */
-	public static Order getByTableAlias(Staff staff, int tableAlias) throws BusinessException, SQLException {		
-
+	private static Order getByTableAlias(Staff staff, int tableAlias) throws BusinessException, SQLException {		
 		DBCon dbCon = new DBCon();
 		try{
-			
 			dbCon.connect();			
 			return getByTableAlias(dbCon, staff, tableAlias);
-			
 		}finally{
 			dbCon.disconnect();
 		}
-
 	}
 	
 	/**
@@ -453,11 +506,11 @@ public class OrderDao {
 			order.setDiscountDate(dbCon.rs.getTimestamp("discount_date") != null ? dbCon.rs.getTimestamp("discount_date").getTime() : 0);
 			
 			order.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			order.setStatus(dbCon.rs.getInt("status"));
+			order.setStatus(Order.Status.valueOf(dbCon.rs.getInt("status")));
 			Table table = new Table();
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			table.setCategory(Order.Category.valueOf(dbCon.rs.getShort("category")));
-			table.setTableId(dbCon.rs.getInt("table_id"));
+			table.setCategory(Table.Category.valueOf(dbCon.rs.getShort("category")));
+			table.setId(dbCon.rs.getInt("table_id"));
 			if(order.isUnpaid()){
 				table.setStatus(Table.Status.IDLE);
 			}else{
@@ -473,7 +526,7 @@ public class OrderDao {
 			order.getRegion().setName(dbCon.rs.getString("region_name"));
 
 			order.setCustomNum(dbCon.rs.getShort("custom_num"));
-			order.setCategory(dbCon.rs.getShort("category"));
+			order.setCategory(Category.valueOf(dbCon.rs.getShort("category")));
 			
 			if(extraCond.dateType == DateType.TODAY){
 				if(dbCon.rs.getInt("discount_id") != 0){
@@ -493,7 +546,7 @@ public class OrderDao {
 			payType.setName(dbCon.rs.getString("pay_type_name"));
 			order.setPaymentType(payType);
 			order.setSettleType(dbCon.rs.getShort("settle_type"));
-			order.setStatus(dbCon.rs.getInt("status"));
+			order.setStatus(Order.Status.valueOf(dbCon.rs.getInt("status")));
 			order.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			order.setComment(dbCon.rs.getString("comment"));
 			order.setGiftPrice(dbCon.rs.getFloat("gift_price"));
@@ -913,6 +966,15 @@ public class OrderDao {
 
 			//Delete the associated mixed payment.
 			MixedPaymentDao.delete(dbCon, staff, new MixedPaymentDao.ExtraCond(DateType.TODAY, order.getId()));
+			
+			//Delete the temporary table in case of joined or take out
+			if(order.getCategory().isJoin() || order.getCategory().isTakeout()){
+				try {
+					TableDao.deleteById(dbCon, staff, order.getDestTbl().getId());
+				} catch (BusinessException ignored) {
+					ignored.printStackTrace();
+				}
+			}
 			
 			amount++;
 		}
