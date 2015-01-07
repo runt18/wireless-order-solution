@@ -19,12 +19,11 @@ import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.dishesOrder.OrderFood.Operation;
+import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
@@ -182,11 +181,11 @@ public class OrderFoodDao {
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
 	 */
-	public static List<OrderFood> getSingleDetailByTable(Staff staff, Table tbl) throws BusinessException, SQLException {
+	public static List<OrderFood> getSingleDetailByTableId(Staff staff, int tblId) throws BusinessException, SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getSingleDetailByTable(dbCon, staff, tbl);
+			return getSingleDetailByTableId(dbCon, staff, tblId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -206,8 +205,8 @@ public class OrderFoodDao {
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
 	 */
-	public static List<OrderFood> getSingleDetailByTable(DBCon dbCon, Staff staff, Table tbl) throws BusinessException, SQLException {
-		int orderId = OrderDao.getByTableAlias(dbCon, staff, tbl.getAliasId()).getId();
+	public static List<OrderFood> getSingleDetailByTableId(DBCon dbCon, Staff staff, int tblId) throws BusinessException, SQLException {
+		int orderId = OrderDao.getByTableId(dbCon, staff, tblId).getId();
 		return getSingleDetail(dbCon, staff, new ExtraCond(DateType.TODAY).setOrder(orderId), null);
 	}
 	
