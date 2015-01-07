@@ -99,7 +99,7 @@ public class PayOrderAction extends Action{
 			
 			Member member = null;
 			if(settleType == Order.SettleType.MEMBER){
-				String discountID = request.getParameter("");
+				String discountID = request.getParameter("discountID");
 				boolean sendSMS = false;
 				//Send SMS if paid by charge member.
 				for(Cookie cookie : request.getCookies()){

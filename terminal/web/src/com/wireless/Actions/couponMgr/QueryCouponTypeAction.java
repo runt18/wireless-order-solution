@@ -15,6 +15,7 @@ import com.wireless.db.promotion.CouponTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.promotion.CouponType;
+import com.wireless.pojo.util.DateUtil;
 
 public class QueryCouponTypeAction extends DispatchAction{
 
@@ -36,7 +37,7 @@ public class QueryCouponTypeAction extends DispatchAction{
 				tree.append(",leaf:true");
 				tree.append(",couponTypeId:" + list.get(i).getId());
 				tree.append(",price:" + list.get(i).getPrice());
-				tree.append(",date:'" + list.get(i).getExpiredFormat()+ "'");
+				tree.append(",date:'" + DateUtil.formatToDate(list.get(i).getExpired()) + "'");
 				tree.append(",desc:'" + list.get(i).getComment() + "'");
 				tree.append(",image:'" + list.get(i).getImage()+ "'");
 				if(list.get(i).isExpired()){
@@ -78,7 +79,7 @@ public class QueryCouponTypeAction extends DispatchAction{
 					tree.append(",leaf:true");
 					tree.append(",couponTypeId:" + list.get(i).getId());
 					tree.append(",price:" + list.get(i).getPrice());
-					tree.append(",date:'" + list.get(i).getExpiredFormat()+ "'");
+					tree.append(",date:'" + DateUtil.formatToDate(list.get(i).getExpired()) + "'");
 					tree.append(",desc:'" + list.get(i).getComment() + "'");
 					tree.append(",image:'" + list.get(i).getImage()+ "'");
 					tree.append("}");
