@@ -7,7 +7,6 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
-import com.wireless.pojo.dishesOrder.Order.Category;
 import com.wireless.pojo.util.NumericUtil;
 
 public class Table implements Parcelable, Comparable<Table>, Jsonable{
@@ -15,6 +14,18 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	public final static byte TABLE_PARCELABLE_COMPLEX = 0;
 	public final static byte TABLE_PARCELABLE_SIMPLE = 1;
 	public final static byte TABLE_PARCELABLE_4_QUERY = 2;
+	
+	public static class Builder{
+		private final int tableId;
+		
+		public Builder(int tableId){
+			this.tableId = tableId;
+		}
+		
+		public Table build(){
+			return new Table(this);
+		}
+	}
 	
 	public static class AliasBuilder{
 		private final int aliasId;
@@ -122,6 +133,86 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		}
 	}
 	
+	public static class InsertBuilder4Fast{
+		private final InsertBuilder builder;
+		
+		public InsertBuilder4Fast(int fastNo){
+			if(fastNo < 0){
+				throw new IllegalArgumentException("快餐号不能小于0");
+			}
+			builder = new InsertBuilder(0, null);
+			builder.category = Category.FAST;
+			builder.tableName = "快餐#" + fastNo;
+		}
+		
+		public Table build(){
+			return new Table(this);
+		}
+	}
+	
+	public static class InsertBuilder4Takeout{
+		private final InsertBuilder builder;
+		
+		public InsertBuilder4Takeout(){
+			builder = new InsertBuilder(0, null);
+			builder.category = Category.TAKE_OUT;
+		}
+		
+		public Table build(){
+			return new Table(this);
+		}
+	}
+	
+	public static class InsertBuilder4Join{
+		public static enum Suffix{
+			A("A"), B("B"), C("C"), D("D"), E("E"), F("F"), G("G");
+			
+			private final String val;
+			Suffix(String val){
+				this.val = val;
+			}
+			
+			public static Suffix valueOf(String val, int i){
+				for(Suffix suffix : values()){
+					if(suffix.val.equals(val)){
+						return suffix;
+					}
+				}
+				throw new IllegalArgumentException("the suffix(val = " + val + ") is invalid");
+			}
+			
+			public String getVal(){
+				return this.val;
+			}
+			
+			@Override
+			public String toString(){
+				return val;
+			}
+		}
+		private final Table parent;
+		private final InsertBuilder builder;
+		
+		public InsertBuilder4Join(Table parent, Table.InsertBuilder4Join.Suffix suffix){
+			this.parent = parent;
+			this.builder = new InsertBuilder(0, parent.getRegion().getId());
+			this.builder.setTableName(parent.tableAlias + suffix.val);
+			this.builder.category = Category.JOIN;
+		}
+		
+		public InsertBuilder4Join(Table parent, String suffix){
+			this(parent, Suffix.valueOf(suffix, 0));
+		}
+		
+		public Table build(){
+			return builder.build();
+		}
+		
+		public Table parent(){
+			return this.parent;
+		}
+	}
+	
 	/**
 	 * The helper class to create the table object to perform insert {@link TableDao#insert)}
 	 */
@@ -130,6 +221,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		private final Region.RegionId regionId;
 		private String tableName;
 		private int miniCost;
+		private Category category = Category.NORMAL;
 		
 		InsertBuilder(int tableAlias, short regionId){
 			this.tableAlias = tableAlias;
@@ -205,6 +297,63 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	}
 	
 	/**
+	 * 餐台类型
+	 * 1 - 一般, 2 - 外卖， 3 - 拆台
+	 */
+	public static enum Category{
+		NORMAL(1, "一般"),
+		TAKE_OUT(2,	"外卖"),
+		JOIN(3, "拆台"),
+		FAST(4, "快餐");
+		
+		private final int val;
+		private final String desc;
+		
+		Category(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "category(val = " + val + ",desc = " + desc + ")";
+		}
+		
+		public static Category valueOf(int val){
+			for(Category category : values()){
+				if(category.val == val){
+					return category;
+				}
+			}
+			throw new IllegalArgumentException("The category(val = " + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return val;
+		}
+		
+		public String getDesc(){
+			return desc;
+		}
+		
+		public boolean isNormal(){
+			return this == NORMAL;
+		}
+		
+		public boolean isTakeout(){
+			return this == TAKE_OUT;
+		}
+		
+		public boolean isJoin(){
+			return this == JOIN;
+		}
+		
+		public boolean isFast(){
+			return this == FAST;
+		}
+	}
+	
+	/**
 	 * 餐台状态
 	 * 1 - 空闲, 2 - 就餐
 	 */
@@ -264,6 +413,10 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		this.tableId = id;
 	}
 	
+	private Table(Builder builder){
+		setId(builder.tableId);
+	}
+	
 	private Table(AliasBuilder builder){
 		setTableAlias(builder.aliasId);
 	}
@@ -273,20 +426,35 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		setRegion(new Region(builder.regionId.getId(), null));
 		setMinimumCost(builder.miniCost);
 		setTableName(builder.tableName);
+		setCategory(builder.category);
+	}
+	
+	private Table(InsertBuilder4Takeout builder){
+		setTableAlias(builder.builder.tableAlias);
+		setMinimumCost(builder.builder.miniCost);
+		setTableName(builder.builder.tableName);
+		setCategory(builder.builder.category);
+	}
+	
+	private Table(InsertBuilder4Fast builder){
+		setTableAlias(builder.builder.tableAlias);
+		setMinimumCost(builder.builder.miniCost);
+		setTableName(builder.builder.tableName);
+		setCategory(builder.builder.category);
 	}
 	
 	private Table(UpdateBuilder builder){
 		setMinimumCost(builder.miniCost);
 		setRegion(new Region(builder.regionId.getId(), null));
-		setTableId(builder.tableId);
+		setId(builder.tableId);
 		setTableName(builder.tableName);
 	}
 	
-	public int getTableId() {
+	public int getId() {
 		return tableId;
 	}
 	
-	public void setTableId(int tableId) {
+	public void setId(int tableId) {
 		this.tableId = tableId;
 	}
 	
@@ -344,14 +512,6 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		this.category = category;
 	}
 	
-	public boolean isNormal(){
-		return category == Category.NORMAL;
-	}
-	
-	public boolean isMerged(){
-		return category == Category.MERGER_TBL;
-	}
-	
 	public Status getStatus() {
 		return status;
 	}
@@ -390,7 +550,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	@Override
 	public String toString(){
 		return "table(" +
-			   "id = " + getTableId() + 
+			   "id = " + getId() + 
 			   ", alias_id = " + getAliasId() +
 			   ", restaurant_id = " + getRestaurantId() + ")";
 	}
@@ -416,13 +576,16 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == TABLE_PARCELABLE_SIMPLE){
+			dest.writeInt(this.tableId);
 			dest.writeShort(this.tableAlias);
 			
 		}else if(flag == TABLE_PARCELABLE_4_QUERY){
+			dest.writeInt(this.tableId);
 			dest.writeShort(this.tableAlias);
 			dest.writeString(this.tableName);
 			
 		}else if(flag == TABLE_PARCELABLE_COMPLEX){
+			dest.writeInt(this.tableId);
 			dest.writeShort(this.tableAlias);
 			dest.writeString(this.tableName);
 			dest.writeParcel(this.region, Region.REGION_PARCELABLE_SIMPLE);
@@ -437,13 +600,16 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	public void createFromParcel(Parcel source) {
 		short flag = source.readByte();
 		if(flag == TABLE_PARCELABLE_SIMPLE){
+			this.tableId = source.readInt();
 			this.tableAlias = source.readShort();
 			
 		}else if(flag == TABLE_PARCELABLE_4_QUERY){
+			this.tableId = source.readInt();
 			this.tableAlias = source.readShort();
 			this.tableName = source.readString();
 			
 		}else if(flag == TABLE_PARCELABLE_COMPLEX){
+			this.tableId = source.readInt();
 			this.tableAlias = source.readShort();
 			this.tableName = source.readString();
 			this.region = source.readParcel(Region.CREATOR);

@@ -30,6 +30,9 @@ public class Promotion implements Jsonable{
 			this.entire = entire;
 			this.rule = type;
 			this.typeBuilder = typeBuilder;
+			if(typeBuilder.build().getExpired() < range.getEndingTime()){
+				throw new IllegalArgumentException("优惠券的有效时间应该大于活动的结束时间");
+			}
 		}
 		
 		public static CreateBuilder newInstance(String title, DateRange range, String body, Rule rule, CouponType.InsertBuilder typeBuilder, String entire){

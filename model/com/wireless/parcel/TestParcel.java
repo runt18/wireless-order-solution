@@ -25,6 +25,7 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.regionMgr.Table.Category;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Role;
@@ -349,7 +350,7 @@ public class TestParcel {
 		expected.setRegion(new Region(Region.RegionId.REGION_10.getId()));
 		expected.setMinimumCost(23.4f);
 		expected.setStatus(Table.Status.IDLE);
-		expected.setCategory(Order.Category.NORMAL);
+		expected.setCategory(Category.NORMAL);
 		expected.setCustomNum(13);
 		
 		Parcel p = new Parcel();

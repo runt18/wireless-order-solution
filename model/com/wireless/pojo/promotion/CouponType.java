@@ -201,10 +201,6 @@ public class CouponType implements Jsonable{
 		return expired;
 	}
 	
-	public String getExpiredFormat() {
-		return DateUtil.formatToDate(expired);
-	}
-	
 	public void setExpired(long expired) {
 		if(expired >= 0){
 			this.expired = expired;
