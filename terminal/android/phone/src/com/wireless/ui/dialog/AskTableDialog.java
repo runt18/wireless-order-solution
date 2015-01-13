@@ -24,12 +24,21 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
+import com.wireless.lib.task.CommitOrderTask;
+import com.wireless.lib.task.QueryTableTask;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.regionMgr.Table.InsertBuilder4Join.Suffix;
 import com.wireless.ui.R;
 
 public class AskTableDialog extends DialogFragment {
@@ -40,9 +49,18 @@ public class AskTableDialog extends DialogFragment {
 		 * @param selectedTable the activity_table selected
 		 */
 		public void onTableSelected(Table selectedTable);
+		
+		/**
+		 * Called when the joined table and the suffix is selected
+		 * @param parent
+		 * @param suffix
+		 */
+		public void onJoinedSelected(Table parent, Table.InsertBuilder4Join.Suffix suffix);
 	}
 	
 	private OnTableSelectedListener mOnTableSelectedListener;
+
+	private final boolean hasJoined;
 	
 	public final static String TAG = "AskTableDialog";
 	
@@ -73,7 +91,6 @@ public class AskTableDialog extends DialogFragment {
 					}
 				}
 			}
-			GridView tblGridView = (GridView)mDialogView.get().findViewById(R.id.gridView_askTable_dialog);
 			
 			if(matchedTbl != null){
 				if(matchedTbl.getName().length() != 0){
@@ -84,7 +101,10 @@ public class AskTableDialog extends DialogFragment {
 			}else{
 				mDialogFgm.get().getDialog().setTitle("选择餐台");
 			}
-			
+
+			final GridView tblGridView = (GridView)mDialogView.get().findViewById(R.id.gridView_askTable_dialog);
+			final GridView suffixGridView = (GridView)mDialogView.get().findViewById(R.id.gridView_joinedSuffix_askTable_dialog);
+
 			//只显示前6个关联餐台
 			while(filterTbls.size() > 6){
 				filterTbls.remove(filterTbls.size() - 1);
@@ -116,7 +136,6 @@ public class AskTableDialog extends DialogFragment {
 					if(convertView == null){
 						View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.ask_table_dialog_item, parent, false);
 						checkBox = (CheckBox) view;
-
 					}else{
 						checkBox = (CheckBox)convertView;
 					}
@@ -133,12 +152,84 @@ public class AskTableDialog extends DialogFragment {
 
 						@Override
 						public void onClick(View v) {
-							if(mDialogFgm.get().mOnTableSelectedListener != null){
-								mDialogFgm.get().mOnTableSelectedListener.onTableSelected(tbl);
+							ToggleButton joinToggle = (ToggleButton)mDialogFgm.get().getDialog().findViewById(R.id.toggleButton_switch_askTable_dialog);
+							if(mDialogFgm.get().hasJoined && joinToggle.isChecked()){
+								if(tbl.getCategory().isNormal()){
+									tblGridView.setVisibility(View.GONE);
+									suffixGridView.setTag(tbl);
+									suffixGridView.setVisibility(View.VISIBLE);
+								}else{
+									Toast.makeText(suffixGridView.getContext(), "【" + tbl.getName() + "】是【" + tbl.getCategory().getDesc() + "】类型，不能进行拆台操作", Toast.LENGTH_SHORT).show();
+								}
+							}else{
+								if(mDialogFgm.get().mOnTableSelectedListener != null){
+									mDialogFgm.get().mOnTableSelectedListener.onTableSelected(tbl);
+								}
+								mDialogFgm.get().dismiss();
 							}
-							mDialogFgm.get().dismiss();
 						}
 						
+					});
+					
+					return checkBox;
+				}
+				
+			});
+			
+			suffixGridView.setAdapter(new BaseAdapter(){
+
+				@Override
+				public int getCount() {
+					return Table.InsertBuilder4Join.Suffix.values().length;
+				}
+
+				@Override
+				public Object getItem(int position) {
+					return Table.InsertBuilder4Join.Suffix.values()[position];
+				}
+
+				@Override
+				public long getItemId(int position) {
+					return position;
+				}
+
+				@Override
+				public View getView(int position, View convertView, ViewGroup parent) {
+					
+					CheckBox checkBox;
+					
+					final Suffix suffix = Table.InsertBuilder4Join.Suffix.values()[position];
+					if(convertView == null){
+						View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.ask_table_dialog_item, parent, false);
+						checkBox = (CheckBox) view;
+					}else{
+						checkBox = (CheckBox)convertView;
+					}
+					
+					//设置拆台后缀
+					checkBox.setText(suffix.getVal());
+					
+					//设置点击处理回调函数
+					checkBox.setOnClickListener(new OnClickListener(){
+						@Override
+						public void onClick(View v) {
+							final Table parent = (Table)suffixGridView.getTag();
+							new CommitOrderTask(WirelessOrder.loginStaff, Order.InsertBuilder.newInstance4Join(new Table.Builder(parent.getId()), suffix), PrintOption.DO_PRINT) {
+								@Override
+								protected void onSuccess(final Order reqOrder) {
+									if(mDialogFgm.get().mOnTableSelectedListener != null){
+										mDialogFgm.get().mOnTableSelectedListener.onTableSelected(reqOrder.getDestTbl());
+									}
+									mDialogFgm.get().getDialog().dismiss();
+								}
+								
+								@Override
+								protected void onFail(BusinessException e, Order reqOrder) {
+									Toast.makeText(suffixGridView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+								}
+							}.execute();
+
+						}
 					});
 					
 					return checkBox;
@@ -148,13 +239,22 @@ public class AskTableDialog extends DialogFragment {
 		}
 	}
 	
+	private AskTableDialog(boolean hasJoined){
+		this.hasJoined = hasJoined;
+	}
+	
+	public static AskTableDialog newInstanceWithJoined(){
+		AskTableDialog fgm = new AskTableDialog(true);
+		return fgm;
+	}
+	
 	public static AskTableDialog newInstance(){
-		AskTableDialog fgm = new AskTableDialog();
+		AskTableDialog fgm = new AskTableDialog(false);
 		return fgm;
 	}
 	
 	public static AskTableDialog newInstance(int parentFgmId){
-		AskTableDialog fgm = new AskTableDialog();
+		AskTableDialog fgm = new AskTableDialog(false);
 		Bundle bundle = new Bundle();
 		bundle.putInt(PARENT_FGM_ID_KEY, parentFgmId);
 		fgm.setArguments(bundle);
@@ -166,19 +266,6 @@ public class AskTableDialog extends DialogFragment {
 	private ViewHandler mViewHanlder;
 	
 	private String mFilterCond; 
-	
-//    @Override
-//    public void onAttach(Activity activity) {
-//        super.onAttach(activity);
-//        // Verify that the host activity implements the callback interface
-//        try {
-//            // Instantiate the NoticeDialogListener so we can send events to the host
-//        	mOnTableSelectedListener = (OnTableSelectedListener) activity;
-//        } catch (ClassCastException ignored) {
-//            // The activity doesn't implement the interface, throw exception
-//            // throw new ClassCastException(activity.toString() + " must implement OnTableSelectedListener");
-//        }
-//    }
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -207,13 +294,31 @@ public class AskTableDialog extends DialogFragment {
 		
 		View dialogView = getActivity().getLayoutInflater().inflate(R.layout.ask_table_dialog, (ViewGroup)getActivity().getWindow().getDecorView(), false);
 		 
+		final QueryTableTask tableTask = new QueryTableTask(WirelessOrder.loginStaff) {
+			
+			@Override
+			protected void onSuccess(List<Table> tables) {
+				WirelessOrder.tables.clear();
+				WirelessOrder.tables.addAll(tables);
+				Toast.makeText(getActivity(), "更新餐台信息成功", Toast.LENGTH_SHORT).show();
+			}
+			
+			@Override
+			protected void onFail(BusinessException e) {
+				Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();				
+			}
+		};
+		tableTask.execute();
+		
 		//
 		final EditText tblNumEditTxt = (EditText)dialogView.findViewById(R.id.edtTxt_askTable_dialog);
 		tblNumEditTxt.addTextChangedListener(new TextWatcher(){
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,	int after) {
-				
+				if(!tableTask.isCancelled()){
+					tableTask.cancel(true);
+				}
 			}
 
 			@Override
@@ -251,19 +356,36 @@ public class AskTableDialog extends DialogFragment {
 			}
 	    });
 	    
-		//餐台名称和编号切换的Button
-		Button switchBtn = (Button)dialogView.findViewById(R.id.button_switch_askTable_dialog);
-		switchBtn.setOnClickListener(new OnClickListener(){
+		//是否拆台的ToggleButton
+		final ToggleButton switchBtn = (ToggleButton)dialogView.findViewById(R.id.toggleButton_switch_askTable_dialog);
+	    if(hasJoined){
+	    	switchBtn.setVisibility(View.VISIBLE);
+	    }else{
+	    	switchBtn.setVisibility(View.GONE);
+	    }
+		switchBtn.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton button, boolean isCheck) {
+				((GridView)getDialog().findViewById(R.id.gridView_askTable_dialog)).setVisibility(View.VISIBLE);
+				((GridView)getDialog().findViewById(R.id.gridView_joinedSuffix_askTable_dialog)).setVisibility(View.GONE);
+			}
+		});
+		
+		//台名和台号切换Button
+		final Button switchInputBtn = (Button)dialogView.findViewById(R.id.button_switchInput_askTable_dialog);
+		switchInputBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				int inputType = tblNumEditTxt.getInputType();
 				if((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_NUMBER){
 					tblNumEditTxt.setInputType(InputType.TYPE_CLASS_TEXT);
 					tblNumEditTxt.setHint("请输入餐台名称");
+					switchInputBtn.setText("台号");
 					
 				}else if((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_TEXT){
 					tblNumEditTxt.setInputType(InputType.TYPE_CLASS_NUMBER);
 					tblNumEditTxt.setHint("请输入餐台编号");
+					switchInputBtn.setText("台名");
 				}
 			}
 		});
@@ -277,9 +399,18 @@ public class AskTableDialog extends DialogFragment {
 		            	if(mOnTableSelectedListener != null){
 		            		if(mOnTableSelectedListener != null){
 		            			try{
-				            		Table tbl = new Table();
-				            		tbl.setTableAlias(Integer.parseInt(tblNumEditTxt.getText().toString()));
-			            			mOnTableSelectedListener.onTableSelected(tbl);
+		            				Table selectedTable = null;
+				            		for(Table table : WirelessOrder.tables){
+				            			if(table.getAliasId() == Integer.parseInt(tblNumEditTxt.getText().toString())){
+				            				selectedTable = table;
+				            				break;
+				            			}
+				            		}
+				            		if(selectedTable != null){
+				            			mOnTableSelectedListener.onTableSelected(selectedTable);
+				            		}else{
+				            			Toast.makeText(getActivity(), "您输入的台号" + tblNumEditTxt.getText().toString() + "不正确，请重新输入" , Toast.LENGTH_SHORT).show();
+				            		}
 		            			}catch(NumberFormatException e){
 		    						Toast.makeText(getActivity(), "您输入的台号" + tblNumEditTxt.getText().toString() + "格式不正确，请重新输入" , Toast.LENGTH_SHORT).show();
 		    					}
@@ -287,11 +418,7 @@ public class AskTableDialog extends DialogFragment {
 		            	}
 		            }
 	           })
-	           .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-		            public void onClick(DialogInterface dialog, int id) {
-		            	dismiss();
-		            }
-	            }); 
+	           .setNegativeButton("取消", null); 
 	    
 	    
 	    mViewHanlder = new ViewHandler(dialogView, this);

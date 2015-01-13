@@ -46,6 +46,7 @@ import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.regionMgr.Table.InsertBuilder4Join.Suffix;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.ui.dialog.AskTableDialog;
@@ -185,7 +186,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 					//下单
 					//showDialog(DIALOG_INSERT_ORDER);
 					mDialogType = DIALOG_INSERT_ORDER;
-					AskTableDialog.newInstance().show(getSupportFragmentManager(), AskTableDialog.TAG);
+					AskTableDialog.newInstanceWithJoined().show(getSupportFragmentManager(), AskTableDialog.TAG);
 					break;
 
 					//快点
@@ -325,6 +326,12 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		}
 	}
 
+	@Override
+	public void onJoinedSelected(Table parent, Suffix suffix) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	/**
 	 * 判断是哪一个Activity返回的
 	 */
@@ -760,5 +767,6 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 			
 		}
 	}
+
 	
 }

@@ -81,7 +81,7 @@ public class BillActivity extends Activity {
 		
 		Table selectedTable = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
 		
-		new QueryOrderTask(selectedTable.getAliasId()).execute();
+		new QueryOrderTask(new Table.Builder(selectedTable.getId())).execute();
 
 		/**
 		 * "返回"Button
@@ -222,7 +222,7 @@ public class BillActivity extends Activity {
 							protected void onSuccess() {
 								mProgDialog.dismiss();
 								Toast.makeText(BillActivity.this, "打折成功", Toast.LENGTH_SHORT).show();
-								new QueryOrderTask(mOrderToPay.getDestTbl().getAliasId()).execute();
+								new QueryOrderTask(new Table.Builder(mOrderToPay.getDestTbl().getId())).execute();
 							}
 							
 							@Override
@@ -318,8 +318,8 @@ public class BillActivity extends Activity {
 
 		private ProgressDialog _progDialog;
 	
-		QueryOrderTask(int tableAlias){
-			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
+		QueryOrderTask(Table.Builder tblBuilder){
+			super(WirelessOrder.loginStaff, tblBuilder);
 		}
 		
 		/**

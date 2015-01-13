@@ -43,6 +43,7 @@ import com.wireless.exception.FrontBusinessError;
 import com.wireless.lib.task.TransOrderFoodTask;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
+import com.wireless.parcel.TableParcel;
 import com.wireless.parcel.TasteGroupParcel;
 import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.Order;
@@ -51,6 +52,7 @@ import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.regionMgr.Table.InsertBuilder4Join.Suffix;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
@@ -119,6 +121,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	private boolean isMulti = false;
 	
 	private QueryOrderTask mQueryOrderTask;
+	
+	private QuerySellOutTask mQuerySelloutTask;
 	
 	private FoodListHandler mFoodListHandler;
 	
@@ -809,18 +813,10 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		}
 	}
 	
-	public static OrderFoodFragment newInstance(){
+	public static OrderFoodFragment newInstance(Table table){
 		OrderFoodFragment fgm = new OrderFoodFragment();
 		Bundle bundle = new Bundle();
-		bundle.putInt(TBL_ALIAS_KEY, Integer.MIN_VALUE);
-		fgm.setArguments(bundle);
-		return fgm;
-	}
-		
-	public static OrderFoodFragment newInstance(int tableAlias){
-		OrderFoodFragment fgm = new OrderFoodFragment();
-		Bundle bundle = new Bundle();
-		bundle.putInt(TBL_ALIAS_KEY, tableAlias);
+		bundle.putParcelable(TBL_ALIAS_KEY, new TableParcel(table));
 		fgm.setArguments(bundle);
 		return fgm;
 	}
@@ -860,16 +856,17 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		super.onActivityCreated(savedInstanceState);
 		
 		//执行请求更新沽清菜品
-		new QuerySellOutTask().execute();
+		mQuerySelloutTask = new QuerySellOutTask();
+		mQuerySelloutTask.execute();
 		
-		Bundle bundle = getArguments();
-		if(bundle != null){
-			int tableAlias = bundle.getInt(TBL_ALIAS_KEY);
-			if(tableAlias >= 0){
-				mQueryOrderTask = new QueryOrderTask(tableAlias);
+		//请求账单信息
+		if(getArguments() != null){
+			TableParcel tableParcel = getArguments().getParcelable(TBL_ALIAS_KEY);
+			if(tableParcel != null){
+				mQueryOrderTask = new QueryOrderTask(new Table.Builder(tableParcel.getId()));
 				mQueryOrderTask.execute();
 			}
-		}
+		}		
 	}
 	
 	@Override
@@ -877,6 +874,9 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		super.onDestroy();
 		if(mQueryOrderTask != null){
 			mQueryOrderTask.cancel(true);
+		}
+		if(mQuerySelloutTask != null){
+			mQuerySelloutTask.cancel(true);
 		}
 	}
 	
@@ -959,13 +959,13 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		
 	}
 	
-	public void commitForce(Table.AliasBuilder tblBuilder, int customNum, PrintOption printOption) throws BusinessException{
+	public void commitForce(Table.Builder tblBuilder, int customNum, PrintOption printOption) throws BusinessException{
 		new CommitOrderTask(WirelessOrder.loginStaff, 
 						    new Order.InsertBuilder(tblBuilder).addAll(mNewFoodList, WirelessOrder.loginStaff).setCustomNum(customNum).setForce(true),
 						    printOption).execute();
 	}
 	
-	public void commit(Table.AliasBuilder tblBuilder, int customNum, PrintOption printOption) throws BusinessException{
+	public void commit(Table.Builder tblBuilder, int customNum, PrintOption printOption) throws BusinessException{
 		if(mOriOrder != null){
 			//改单
 			new CommitOrderTask(WirelessOrder.loginStaff, 
@@ -1030,9 +1030,9 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	 * Refresh the original order.
 	 */
 	public void refresh(){
-		int tableAlias = getArguments().getInt(TBL_ALIAS_KEY);
-		if(tableAlias >= 0){
-			mQueryOrderTask = new QueryOrderTask(tableAlias);
+		TableParcel tableParcel = getArguments().getParcelable(TBL_ALIAS_KEY);
+		if(tableParcel != null){
+			mQueryOrderTask = new QueryOrderTask(new Table.Builder(tableParcel.getId()));
 			mQueryOrderTask.execute();
 		}
 	}
@@ -1060,12 +1060,12 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	 */
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
 		private ProgressDialog mProgressDialog;
-		private final int mTblAlias;
+		private final Table.Builder mTblBuilder;
 		
-		QueryOrderTask(int tableAlias){
-			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
+		QueryOrderTask(Table.Builder tblBuilder){
+			super(WirelessOrder.loginStaff, tblBuilder);
 			mProgressDialog = ProgressDialog.show(getActivity(), "", "正在读取账单...请稍后", true);
-			mTblAlias = tableAlias;
+			mTblBuilder = tblBuilder;
 		}
 		
 		@Override
@@ -1092,7 +1092,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							mQueryOrderTask = new QueryOrderTask(mTblAlias);
+							mQueryOrderTask = new QueryOrderTask(mTblBuilder);
 							mQueryOrderTask.execute();
 						}
 					})
@@ -1174,7 +1174,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			protected void onSuccess() {
 				mProgressDialog.dismiss();
 				Toast.makeText(getActivity(), "菜品转至" + selectedTable.getAliasId() + "号台", Toast.LENGTH_SHORT).show();
-				mQueryOrderTask = new QueryOrderTask(mOriOrder.getDestTbl().getAliasId());
+				mQueryOrderTask = new QueryOrderTask(new Table.Builder(mOriOrder.getDestTbl().getId()));
 				mQueryOrderTask.execute();
 			}
 			
@@ -1187,6 +1187,11 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			}
 		}.execute();
 			
+	}
+
+	@Override
+	public void onJoinedSelected(Table parent, Suffix suffix) {
+		
 	}
 }
 

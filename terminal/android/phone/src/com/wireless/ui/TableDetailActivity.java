@@ -111,7 +111,7 @@ public class TableDetailActivity extends Activity {
 	@Override
 	protected void onStart(){
 		super.onStart();
-		new QueryOrderTask(mSelectedTable.getAliasId()).execute();
+		new QueryOrderTask(new Table.Builder(mSelectedTable.getId())).execute();
 	}
 	
 	/**
@@ -229,7 +229,7 @@ public class TableDetailActivity extends Activity {
 							protected void onSuccess() {
 								mProgDialog.dismiss();
 								Toast.makeText(TableDetailActivity.this, "¥Ú’€≥…π¶", Toast.LENGTH_SHORT).show();
-								new QueryOrderTask(mOrderToPay.getDestTbl().getAliasId()).execute();
+								new QueryOrderTask(new Table.Builder(mOrderToPay.getDestTbl().getId())).execute();
 							}
 							
 							@Override
@@ -309,8 +309,8 @@ public class TableDetailActivity extends Activity {
 
 		private ProgressDialog _progDialog;
 	
-		QueryOrderTask(int tableAlias){
-			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
+		QueryOrderTask(Table.Builder tblBuilder){
+			super(WirelessOrder.loginStaff, tblBuilder);
 		}
 		
 		/**

@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.TableError;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayBuilder;
@@ -80,11 +81,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 			for(Table tbl : WirelessOrder.tables){
 				if(tbl.getAliasId() == tableAlias){
 					txtViewTblName.setVisibility(View.VISIBLE);
-					if(tbl.getName().length() > 0){
-						txtViewTblName.setText(tbl.getName());
-					}else{
-						txtViewTblName.setText(tbl.getAliasId() + "号台");
-					}
+					txtViewTblName.setText(tbl.getName());
 					break;
 				}
 			}
@@ -188,8 +185,12 @@ public class QuickPickCommitDialog extends DialogFragment{
 			public void onClick(View v) {
 				mIsPayOrder = false;
 				try{
-					new InsertOrderForceTask(Short.parseShort(tableText.getText().toString()), PrintOption.DO_NOT_PRINT).execute();
-
+					Table table = findByAlias(Short.parseShort(tableText.getText().toString()));
+					if(table != null){
+						new InsertOrderForceTask(table, PrintOption.DO_NOT_PRINT).execute();
+					}else{
+						throw new BusinessException(TableError.TABLE_NOT_EXIST);
+					}
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
 					
@@ -206,7 +207,12 @@ public class QuickPickCommitDialog extends DialogFragment{
 				mIsPayOrder = true;
 				mIsTempPay = true;
 				try{
-					new InsertOrderForceTask(Short.parseShort(tableText.getText().toString())).execute();
+					Table table = findByAlias(Short.parseShort(tableText.getText().toString()));
+					if(table != null){
+						new InsertOrderForceTask(table).execute();
+					}else{
+						throw new BusinessException(TableError.TABLE_NOT_EXIST);
+					}
 					
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
@@ -224,7 +230,12 @@ public class QuickPickCommitDialog extends DialogFragment{
 				mIsPayOrder = true;
 				mIsTempPay = false;
 				try{
-					new InsertOrderForceTask(Short.parseShort(tableText.getText().toString())).execute();
+					Table table = findByAlias(Short.parseShort(tableText.getText().toString()));
+					if(table != null){
+						new InsertOrderForceTask(table).execute();
+					}else{
+						throw new BusinessException(TableError.TABLE_NOT_EXIST);
+					}
 					
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
@@ -251,9 +262,12 @@ public class QuickPickCommitDialog extends DialogFragment{
 					mIsPayOrder = false;
 					mIsTempPay = false;
 					try{
-						short tableAlias = Short.parseShort(tableText.getText().toString());
-						new InsertOrderForceTask(tableAlias).execute();
-						
+						Table table = findByAlias(Short.parseShort(tableText.getText().toString()));
+						if(table != null){
+							new InsertOrderForceTask(table).execute();
+						}else{
+							throw new BusinessException(TableError.TABLE_NOT_EXIST);
+						}
 					}catch (BusinessException e) {
 						Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 							
@@ -340,6 +354,15 @@ public class QuickPickCommitDialog extends DialogFragment{
        	
        	return view;
 	}
+
+	private Table findByAlias(int tableAlias){
+		for(final Table table : WirelessOrder.tables){
+			if(table.getAliasId() == tableAlias){
+				return table;
+			}
+		}
+		return null;
+	}
 	
 	/**
 	 * 执行下单的请求操作
@@ -348,13 +371,13 @@ public class QuickPickCommitDialog extends DialogFragment{
 
 		private ProgressDialog mProgDialog;
 		
-		InsertOrderForceTask(int tableAlias, PrintOption printOption) throws BusinessException {
-			super(WirelessOrder.loginStaff, new Order.InsertBuilder(new Table.AliasBuilder(tableAlias)).setWxOrders(mReqOrder.getWxOrders()).addAll(mReqOrder.getOrderFoods(), WirelessOrder.loginStaff).setForce(true), printOption);
-			mReqOrder.setDestTbl(new Table.AliasBuilder(tableAlias).build());
+		InsertOrderForceTask(Table table, PrintOption printOption) throws BusinessException {
+			super(WirelessOrder.loginStaff, new Order.InsertBuilder(new Table.Builder(table.getId())).setWxOrders(mReqOrder.getWxOrders()).addAll(mReqOrder.getOrderFoods(), WirelessOrder.loginStaff).setForce(true), printOption);
+			mReqOrder.setDestTbl(table);
 		}
 		
-		InsertOrderForceTask(int tableAlias) throws BusinessException {
-			this(tableAlias, PrintOption.DO_PRINT);
+		InsertOrderForceTask(Table table) throws BusinessException {
+			this(table, PrintOption.DO_PRINT);
 		}
 		
 		/**
@@ -371,7 +394,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 			//Perform to pay order in case the flag is true,
 			//otherwise back to the main activity and show the message
 			if(mIsPayOrder){
-				new QueryAndPayOrderTask(mReqOrder.getDestTbl().getAliasId()).execute();
+				new QueryAndPayOrderTask(new Table.Builder(mReqOrder.getDestTbl().getId())).execute();
 				
 			}else{
 				dismiss();
@@ -401,11 +424,11 @@ public class QuickPickCommitDialog extends DialogFragment{
 	
 	private class QueryAndPayOrderTask extends com.wireless.lib.task.QueryOrderTask{
 		
-		private final int mTblAlias;
+		private final Table.Builder mTblBuilder;
 		
-		public QueryAndPayOrderTask(int tableAlias) {
-			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
-			mTblAlias = tableAlias;
+		public QueryAndPayOrderTask(Table.Builder tblBuilder) {
+			super(WirelessOrder.loginStaff, tblBuilder);
+			mTblBuilder = tblBuilder;
 		}
 
 		private ProgressDialog mProgressDialog;
@@ -428,7 +451,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 				.setMessage("菜品已添加，但结账请求失败，是否重试？")
 				.setPositiveButton("重试", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						new QueryAndPayOrderTask(mTblAlias).execute();
+						new QueryAndPayOrderTask(mTblBuilder).execute();
 					}
 				})
 				.setNegativeButton("退出", new DialogInterface.OnClickListener() {

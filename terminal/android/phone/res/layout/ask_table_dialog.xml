@@ -6,17 +6,16 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_height="wrap_content" >
 
         <EditText
             android:id="@+id/edtTxt_askTable_dialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
+            android:layout_toLeftOf="@+id/toggleButton_switch_askTable_dialog"
             android:digits="0123456789"
             android:focusableInTouchMode="true"
             android:hint="请输入餐台编号"
@@ -24,18 +23,30 @@
             android:singleLine="true" />
 
         <Button
-            android:id="@+id/button_switch_askTable_dialog"
+            android:id="@+id/button_switchInput_askTable_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@+id/edtTxt_askTable_dialog"
             android:layout_alignRight="@+id/edtTxt_askTable_dialog"
             android:layout_alignTop="@+id/edtTxt_askTable_dialog"
-            android:layout_alignBottom="@+id/edtTxt_askTable_dialog"
+            android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
+            android:text="台名" >
+        </Button>
+
+        <ToggleButton
+            android:id="@+id/toggleButton_switch_askTable_dialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/edtTxt_askTable_dialog"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/edtTxt_askTable_dialog"
             android:layout_marginBottom="2dp"
             android:layout_marginRight="2dp"
-            android:text="切换" >
-        </Button>
+            android:layout_marginTop="2dp"
+            android:textOff="拆台"
+            android:textOn="拆台" >
+        </ToggleButton>
     </RelativeLayout>
 
     <GridView
@@ -45,6 +56,16 @@
         android:horizontalSpacing="2dp"
         android:numColumns="3"
         android:verticalSpacing="2dp" >
+    </GridView>
+
+    <GridView
+        android:id="@+id/gridView_joinedSuffix_askTable_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:horizontalSpacing="2dp"
+        android:numColumns="3"
+        android:verticalSpacing="2dp"
+        android:visibility="gone" >
     </GridView>
 
 </LinearLayout>

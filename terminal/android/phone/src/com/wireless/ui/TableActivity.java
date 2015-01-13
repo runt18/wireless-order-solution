@@ -49,6 +49,7 @@ import com.wireless.lib.task.QueryTableStatusTask;
 import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.regionMgr.Table.InsertBuilder4Join.Suffix;
 import com.wireless.ui.dialog.AskTableDialog;
 import com.wireless.ui.dialog.AskTableDialog.OnTableSelectedListener;
 import com.wireless.ui.view.PullListView;
@@ -829,6 +830,11 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 	@Override
 	public void onTableSelected(Table destTbl) {
 		new TransTblTask(mSrcTbl, destTbl).execute();
+	}
+
+	@Override
+	public void onJoinedSelected(Table parent, Suffix suffix) {
+		
 	}	
 
 }

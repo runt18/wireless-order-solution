@@ -85,7 +85,7 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		//Add OrderFoodFragment
 		FragmentTransaction fgTrans = getSupportFragmentManager().beginTransaction();
 		fgTrans.add(R.id.frameLayout_container_orderFood, 
-				    OrderFoodFragment.newInstance(selectedTable.getAliasId()),
+				    OrderFoodFragment.newInstance(selectedTable),
 				    OrderFoodFragment.TAG).commit();
 		
 	}
@@ -107,9 +107,9 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		try{
 			if(forceInsert){
 				//强制下单
-				ofFgm.commitForce(new Table.AliasBuilder(table.getAliasId()), customNum, PrintOption.DO_PRINT);
+				ofFgm.commitForce(new Table.Builder(table.getId()), customNum, PrintOption.DO_PRINT);
 			}else{
-				ofFgm.commit(new Table.AliasBuilder(table.getAliasId()), customNum, PrintOption.DO_PRINT);
+				ofFgm.commit(new Table.Builder(table.getId()), customNum, PrintOption.DO_PRINT);
 			}
 		}catch(BusinessException e){			
 			Toast.makeText(OrderActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
