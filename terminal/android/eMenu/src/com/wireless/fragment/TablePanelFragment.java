@@ -449,7 +449,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 
 		@Override
 		public long getItemId(int position) {
-			return _tables.get(position).getTableId();
+			return _tables.get(position).getId();
 		}
 
 		@Override

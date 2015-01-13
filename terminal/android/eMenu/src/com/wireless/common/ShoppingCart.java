@@ -120,7 +120,7 @@ public final class ShoppingCart {
 			
 			@Override
 			public void onSuccess(Order reqOrder) {
-				new com.wireless.lib.task.QueryOrderTask(WirelessOrder.loginStaff, mDestTable.getAliasId(), WirelessOrder.foodMenu){
+				new com.wireless.lib.task.QueryOrderTask(WirelessOrder.loginStaff, new Table.Builder(mDestTable.getId())){
 					@Override
 					public void onSuccess(Order order){
 						new PayOrderTask(order, payListener).execute();
@@ -178,7 +178,7 @@ public final class ShoppingCart {
 					reqOrder.addFood(newFood, WirelessOrder.loginStaff);
 				}
 			}
-			new CommitOrderTask(new Order.InsertBuilder(new Table.AliasBuilder(mDestTable.getAliasId()))
+			new CommitOrderTask(new Order.InsertBuilder(new Table.Builder(mDestTable.getId()))
 										 .setCustomNum(mDestTable.getCustomNum())
 										 .addAll(getNewFoods(), WirelessOrder.loginStaff), 
 								commitListener).execute();
@@ -420,7 +420,7 @@ public final class ShoppingCart {
 	public void setDestTable(Table table) {
 		mDestTable = table;
 		if(table != null){
-			new com.wireless.lib.task.QueryOrderTask(WirelessOrder.loginStaff, table.getAliasId(), WirelessOrder.foodMenu){
+			new com.wireless.lib.task.QueryOrderTask(WirelessOrder.loginStaff, new Table.Builder(table.getId())){
 				@Override
 				public void onSuccess(Order order){
 					setOriOrder(order);
