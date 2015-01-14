@@ -400,7 +400,6 @@ function billModifyOnLoad() {
 	Ext.Ajax.request({
 		url : "../../QueryOrder.do",
 		params : {
-			isCookie : true,
 			restaurantID : restaurantID,
 			orderID : orderID,
 			queryType: 'Today'

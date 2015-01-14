@@ -23,7 +23,8 @@ function operateTableDataHandler(c){
 		id.setValue(data['id']);
 		alias.setValue(data['alias']);
 		name.setValue(data['name']);
-		region.setValue(typeof regionData['id'] == 'undefined' ? (Ext.ux.getSelNode(regionTree)?(Ext.ux.getSelNode(regionTree).id != '-1'?Ext.ux.getSelNode(regionTree).id:'') : '') : regionData['id']);
+		
+		region.setValue(typeof regionData['id'] == 'undefined' ? (Ext.ux.getSelNode(regionTree)?(Ext.ux.getSelNode(regionTree).id != '-1'?Ext.ux.getSelNode(regionTree).attributes.regionId:'') : '') : regionData['id']);
 		minimumCost.setValue(typeof data['minimumCost'] == 'undefined' ? 0 : data['minimumCost']);
 		serviceRate.setValue(typeof data['serviceRate'] == 'undefined' ? 0 : data['serviceRate']);
 		
@@ -232,9 +233,11 @@ function updateRegionHandler(c){
 						return;
 					}
 					var dataSource='';
-					if(c.otype == 'insert'){
+					alert(operateRegionWin.otype)
+					
+					if(operateRegionWin.otype == 'insert'){
 						dataSource = 'insert';
-					}else if(c.otype == 'update'){
+					}else if(operateRegionWin.otype == 'update'){
 						dataSource = 'update';
 					}
 					Ext.Ajax.request({
