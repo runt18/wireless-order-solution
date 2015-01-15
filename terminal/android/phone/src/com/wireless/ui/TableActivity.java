@@ -288,9 +288,13 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 			for(Table tbl : mFilterTable){
 				Map<String, Object> map = new HashMap<String, Object>();
 				map.put(ITEM_THE_TABLE, tbl);
-				map.put(ITEM_TAG_ID, tbl.getAliasId());
+				if(tbl.getAliasId() != 0){
+					map.put(ITEM_TAG_ID, tbl.getAliasId() + "(" + tbl.getName() + ")");
+				}else{
+					map.put(ITEM_TAG_ID, tbl.getName());
+				}
 				map.put(ITEM_TAG_CUSTOM, tbl.getCustomNum());
-				map.put(ITEM_TAG_TBL_NAME, tbl.getName());
+				map.put(ITEM_TAG_TBL_NAME, "");
 				map.put(ITEM_TAG_STATE, tbl.getStatus());
 				map.put(ITEM_TAG_STATE_NAME, tbl.isIdle() ? "¿ÕÏÐ" : "¾Í²Í");
 				contents.add(map);
