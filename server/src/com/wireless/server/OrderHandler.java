@@ -360,8 +360,11 @@ class OrderHandler implements Runnable{
 																		     printers,
 																		     orderToInsert));
 		}
-		
-		return new RespACK(request.header);
+		if(orderToInsert.getCategory().isJoin()){
+			return new RespPackage(request.header, orderToInsert.getDestTbl(), Table.TABLE_PARCELABLE_4_QUERY);
+		}else{
+			return new RespACK(request.header);
+		}
 	}
 	
 	private RespPackage doInsertOrderForce(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{

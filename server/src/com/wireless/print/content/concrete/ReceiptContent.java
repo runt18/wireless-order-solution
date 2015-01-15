@@ -77,8 +77,10 @@ public class ReceiptContent extends ConcreteContent {
 		//replace the "$(waiter)"
 		mTemplate = mTemplate.replace(PVar.WAITER_NAME, mWaiter);
 		
-		String tblName;
-		if(mOrder.getDestTbl().getName().isEmpty()){
+		final String tblName;
+		if(mOrder.getDestTbl().getAliasId() == 0){
+			tblName = mOrder.getDestTbl().getName();
+		}else if(mOrder.getDestTbl().getName().isEmpty()){
 			tblName = Integer.toString(mOrder.getDestTbl().getAliasId());
 		}else{
 			tblName = mOrder.getDestTbl().getAliasId() + "(" + mOrder.getDestTbl().getName() + ")";

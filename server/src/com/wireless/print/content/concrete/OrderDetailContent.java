@@ -61,31 +61,31 @@ public class OrderDetailContent extends ConcreteContent {
 			if(mPrintType == PType.PRINT_ORDER_DETAIL){
 				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("µã²Ë" + (mParent.isHangup() ? "½ÐÆð" : "") + "µ¥(ÏêÏ¸)-" + tblName, mStyle), 
+															new CenterAlignedDecorator("µã²Ë" + (mParent.isHangup() ? "½ÐÆð" : "") + "·Öµ¥-" + tblName, mStyle), 
 															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 				
 			}else if(mPrintType == PType.PRINT_EXTRA_FOOD_DETAIL){
 				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("¼Ó²Ë" + (mParent.isHangup() ? "½ÐÆð" : "") + "µ¥(ÏêÏ¸)-" + tblName, mStyle),
+															new CenterAlignedDecorator("¼Ó²Ë" + (mParent.isHangup() ? "½ÐÆð" : "") + "·Öµ¥-" + tblName, mStyle),
 															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 				
 			}else if(mPrintType == PType.PRINT_CANCELLED_FOOD_DETAIL){
 				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("!!!ÍË²Ëµ¥(ÏêÏ¸)!!!-" + tblName, mStyle), 
+															new CenterAlignedDecorator("!!!ÍË²Ë·Öµ¥!!!-" + tblName, mStyle), 
 															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 				
 			}else if(mPrintType == PType.PRINT_HURRIED_FOOD){
 				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("´ß²Ëµ¥(ÏêÏ¸)!!!-" + tblName, mStyle), 
+															new CenterAlignedDecorator("´ß²Ë·ÖÏ¸!!!-" + tblName, mStyle), 
 															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 				
 			}else{
 				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 														new ExtraFormatDecorator(
-																new CenterAlignedDecorator("µã²Ëµ¥(ÏêÏ¸)-" + tblName, mStyle),
+																new CenterAlignedDecorator("µã²Ë·ÖÏ¸-" + tblName, mStyle),
 																ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 			}
 
