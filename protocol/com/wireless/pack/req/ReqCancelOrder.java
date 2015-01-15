@@ -20,7 +20,7 @@ public class ReqCancelOrder extends RequestPackage{
 	* table[2]
 	* table[2] - 2-byte indicates the table id 
 	*******************************************************/
-	public ReqCancelOrder(Staff staff, Table.AliasBuilder builder){
+	public ReqCancelOrder(Staff staff, Table.Builder builder){
 		super(staff);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.CANCEL_ORDER;
