@@ -3,7 +3,6 @@ package com.wireless.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.NumericUtil;
 
@@ -16,7 +15,7 @@ public class TableParcel extends Table implements Parcelable {
 	public TableParcel(Table table){
 		if(table != null){
 			this.setRestaurantId(table.getRestaurantId());
-			this.setTableId(table.getTableId());
+			this.setId(table.getId());
 			this.setTableAlias(table.getAliasId());
 			this.setCategory(table.getCategory());
 			this.setStatus(table.getStatus());
@@ -31,9 +30,9 @@ public class TableParcel extends Table implements Parcelable {
 	
 	private TableParcel(Parcel in){
 		this.setRestaurantId(in.readInt());
-		this.setTableId(in.readInt());
+		this.setId(in.readInt());
 		this.setTableAlias(in.readInt());
-		this.setCategory(Order.Category.valueOf(in.readInt()));
+		this.setCategory(Table.Category.valueOf(in.readInt()));
 		this.setStatus(Table.Status.valueOf(in.readInt()));
 		this.setCustomNum((short)in.readInt());
 		this.setTableName(in.readString());
@@ -68,7 +67,7 @@ public class TableParcel extends Table implements Parcelable {
 		}else{
 			parcel.writeInt(0);
 			parcel.writeInt(this.getRestaurantId());
-			parcel.writeInt(this.getTableId());
+			parcel.writeInt(this.getId());
 			parcel.writeInt(this.getAliasId());
 			parcel.writeInt(this.getCategory().getVal());
 			parcel.writeInt(this.getStatus().getVal());

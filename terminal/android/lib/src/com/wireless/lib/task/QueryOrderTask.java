@@ -11,7 +11,6 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryOrderByTable;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
@@ -20,16 +19,12 @@ public abstract class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 
 	private BusinessException mBusinessException;
 	
-	private int mTblAlias;
+	private final Table.Builder mTblBuilder;
 
-	@SuppressWarnings("unused")
-	private final FoodMenu mFoodMenu;
-	
 	private final Staff mStaff;
 	
-	public QueryOrderTask(Staff staff, int tableAlias, FoodMenu foodMenu){
-		mTblAlias = tableAlias;
-		mFoodMenu = foodMenu;
+	public QueryOrderTask(Staff staff, Table.Builder tblBuilder){
+		mTblBuilder = tblBuilder;
 		mStaff = staff;
 	}	
 	
@@ -38,7 +33,7 @@ public abstract class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 		Order order = null;
 		try{
 			//根据tableID请求数据
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrderByTable(mStaff, new Table.AliasBuilder(mTblAlias)));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrderByTable(mStaff, mTblBuilder));
 			if(resp.header.type == Type.ACK){
 				order = new Parcel(resp.body).readParcel(Order.CREATOR);
 			}else{

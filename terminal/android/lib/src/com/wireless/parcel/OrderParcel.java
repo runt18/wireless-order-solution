@@ -10,6 +10,7 @@ import android.os.Parcelable;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.dishesOrder.Order.Category;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.weixin.order.WxOrder;
 
@@ -32,7 +33,7 @@ public class OrderParcel implements Parcelable{
 			mSrcOrder = new Order(in.readInt());
 			mSrcOrder.setSettleType(in.readInt());
 			mSrcOrder.setPaymentType(new PayType(in.readInt()));
-			mSrcOrder.setCategory((short)in.readInt());
+			mSrcOrder.setCategory(Category.valueOf(in.readInt()));
 			mSrcOrder.setServiceRate(NumericUtil.int2Float(in.readInt()));
 			mSrcOrder.setId(in.readInt());
 			mSrcOrder.setRestaurantId(in.readInt());

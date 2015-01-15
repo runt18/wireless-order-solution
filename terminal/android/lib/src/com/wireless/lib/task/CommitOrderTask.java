@@ -12,6 +12,7 @@ import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PrintOption;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
@@ -57,7 +58,9 @@ public abstract class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 			}else{
 				resp = ServerConnector.instance().ask(new ReqInsertOrder(mStaff, mUpdateBuilder, mPrintOption));
 			}
-			if(resp.header.type == Type.NAK){
+			if(resp.header.type == Type.ACK && mReqOrder.getCategory().isJoin()){
+				mReqOrder.setDestTbl(new Parcel(resp.body).readParcel(Table.CREATOR));
+			}else if(resp.header.type == Type.NAK){
 				mBusinessException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 			}
 		}catch(IOException e){
