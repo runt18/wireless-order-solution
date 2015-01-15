@@ -3,6 +3,7 @@ package com.wireless.pojo.regionMgr;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
@@ -193,14 +194,17 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		private final Table parent;
 		private final InsertBuilder builder;
 		
-		public InsertBuilder4Join(Table parent, Table.InsertBuilder4Join.Suffix suffix){
+		public InsertBuilder4Join(Table parent, Table.InsertBuilder4Join.Suffix suffix) throws BusinessException{
+			if(parent.getCategory().isJoin()){
+				throw new BusinessException("【" + parent.getName() + "】是已拆台状态，不能再进行拆台操作");
+			}
 			this.parent = parent;
 			this.builder = new InsertBuilder(0, parent.getRegion().getId());
-			this.builder.setTableName(parent.tableAlias + suffix.val);
+			this.builder.setTableName(parent.tableAlias + suffix.val + "(搭" + parent.getName() + ")");
 			this.builder.category = Category.JOIN;
 		}
 		
-		public InsertBuilder4Join(Table parent, String suffix){
+		public InsertBuilder4Join(Table parent, String suffix) throws BusinessException{
 			this(parent, Suffix.valueOf(suffix, 0));
 		}
 		
