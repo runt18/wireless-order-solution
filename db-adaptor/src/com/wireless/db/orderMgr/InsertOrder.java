@@ -116,11 +116,11 @@ public class InsertOrder {
 		}
 		
 		if(orderToInsert.getCategory().isNormal()){
-			orderToInsert.setDestTbl(TableDao.getByAlias(dbCon, staff, orderToInsert.getDestTbl().getAliasId()));
+			orderToInsert.setDestTbl(TableDao.getById(dbCon, staff, orderToInsert.getDestTbl().getId()));
 			
 		}else if(orderToInsert.getCategory().isJoin()){
 			//Create the temporary table with the suffix for joined
-			int joinedTblId = TableDao.insert(dbCon, staff, new Table.InsertBuilder4Join(TableDao.getByAlias(dbCon, staff, orderToInsert.getDestTbl().getAliasId()), suffix));
+			int joinedTblId = TableDao.insert(dbCon, staff, new Table.InsertBuilder4Join(TableDao.getById(dbCon, staff, orderToInsert.getDestTbl().getId()), suffix));
 			orderToInsert.setDestTbl(TableDao.getById(dbCon, staff, joinedTblId));
 			
 		}else if(orderToInsert.getCategory().isTakeout()){

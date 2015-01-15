@@ -38,7 +38,7 @@ public class TestCommitOrderDao {
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getAdminByRestaurant(40);
+			mStaff = StaffDao.getAdminByRestaurant(37);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -117,7 +117,7 @@ public class TestCommitOrderDao {
 			expectedOrder.addFood(of, mStaff);
 			
 			//-----------Test to insert a new joined order---------------------------
-			orderId = InsertOrder.exec(mStaff, Order.InsertBuilder.newInstance4Join(new Table.AliasBuilder(table.getAliasId()), Table.InsertBuilder4Join.Suffix.A)
+			orderId = InsertOrder.exec(mStaff, Order.InsertBuilder.newInstance4Join(new Table.Builder(table.getId()), Table.InsertBuilder4Join.Suffix.A)
 																  .addAll(expectedOrder.getOrderFoods(), mStaff).setCustomNum(expectedOrder.getCustomNum())).getId();
 			
 			Order actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
@@ -173,7 +173,7 @@ public class TestCommitOrderDao {
 			expectedOrder.addFood(of, mStaff);
 			
 			//-----------Test to insert a new order---------------------------
-			orderId = InsertOrder.exec(mStaff, new Order.InsertBuilder(new Table.AliasBuilder(tblToInsert.getAliasId())).addAll(expectedOrder.getOrderFoods(), mStaff).setCustomNum(expectedOrder.getCustomNum())).getId();
+			orderId = InsertOrder.exec(mStaff, new Order.InsertBuilder(new Table.Builder(tblToInsert.getId())).addAll(expectedOrder.getOrderFoods(), mStaff).setCustomNum(expectedOrder.getCustomNum())).getId();
 			
 			Order actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
 			
@@ -371,7 +371,7 @@ public class TestCommitOrderDao {
 	private void compare4JoinCommit(Order expected, Order actual, Table.InsertBuilder4Join.Suffix suffix) throws BusinessException, SQLException{
 		Table tbl = TableDao.getById(mStaff, actual.getDestTbl().getId());
 		expected.getDestTbl().setId(tbl.getId());
-		expected.getDestTbl().setTableName(expected.getDestTbl().getAliasId() + suffix.getVal());
+		expected.getDestTbl().setTableName(expected.getDestTbl().getAliasId() + suffix.getVal() + "(搭" + expected.getDestTbl().getName() + ")");
 		expected.getDestTbl().setTableAlias(tbl.getAliasId());
 		expected.getDestTbl().setCategory(Table.Category.JOIN);
 		//Check the name to joined table

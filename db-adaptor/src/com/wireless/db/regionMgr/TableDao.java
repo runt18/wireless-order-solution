@@ -367,7 +367,7 @@ public class TableDao {
 	public static int insert(DBCon dbCon, Staff staff, Table.InsertBuilder4Join builder) throws SQLException, BusinessException{
 		Table joinedTbl = builder.build();
 		if(getByCond(dbCon, staff, new ExtraCond().addCategory(Category.JOIN).setName(joinedTbl.getName()), null).isEmpty()){
-			return insert(dbCon, staff, builder.build());
+			return insert(dbCon, staff, joinedTbl);
 		}else{
 			throw new BusinessException("新拆台【" + joinedTbl.getName() + "】已存在，请选用其他的餐台名称", TableError.TABLE_INSERT_NOT_ALLOW);
 		}

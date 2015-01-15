@@ -25,6 +25,7 @@ import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.menuMgr.PricePlan;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
@@ -266,9 +267,10 @@ public class PayOrder {
 			dbCon.stmt.executeUpdate(sql);				
 		}	
 
-		//Delete the temporary table if the category belongs to joined or take out.
-		if(orderCalculated.getCategory().isJoin() || orderCalculated.getCategory().isTakeout() || orderCalculated.getCategory().isFast()){
-			TableDao.deleteById(dbCon, staff, orderCalculated.getDestTbl().getId());
+		//Delete the temporary table if the category belongs to joined, take out or fast.
+		final Table table = orderCalculated.getDestTbl();
+		if(table.getCategory().isJoin() || table.getCategory().isTakeout() || table.getCategory().isFast()){
+			TableDao.deleteById(dbCon, staff, table.getId());
 		}
 		
 		//Update the member status if settled by member.

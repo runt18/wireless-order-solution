@@ -318,52 +318,6 @@ public class OrderDao {
 		}
 	}
 	
-	/**
-	 * Get the unpaid order detail information to the specific restaurant and table. 
-	 * @param dbCon
-	 *            the database connection
-	 * @param staff
-	 *            the staff to perform this action
-	 * @param tableAlias
-	 *            the table alias id to query
-	 * @return Order the order detail information
-	 * @throws BusinessException
-	 *             throws if the un-paid order to this table does NOT exist 
-	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement.
-	 */
-	private static Order getByTableAlias(DBCon dbCon, Staff staff, int tableAlias) throws BusinessException, SQLException {		
-		List<Order> result = getByCond(dbCon, staff, new OrderDao.ExtraCond(DateType.TODAY).setTableAlias(tableAlias).addStatus(Order.Status.UNPAID), null);
-		if(result.isEmpty()){
-			throw new BusinessException(FrontBusinessError.ORDER_NOT_EXIST);
-		}else{
-			Order order = result.get(0);
-			fillDetail(dbCon, staff, order, DateType.TODAY);
-			return order;
-		}
-	}
-	
-	/**
-	 * Get the unpaid order detail information to the specific restaurant and table. 
-	 * @param staff
-	 *            the staff to perform this action
-	 * @param tableAlias
-	 *            the table alias id to query
-	 * @return Order the order detail information
-	 * @throws BusinessException
-	 *             throws if the un-paid order to this table does NOT exist 
-	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement.
-	 */
-	private static Order getByTableAlias(Staff staff, int tableAlias) throws BusinessException, SQLException {		
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();			
-			return getByTableAlias(dbCon, staff, tableAlias);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
 	
 	/**
 	 * Get the order detail information according to the specific order id. Note
@@ -456,7 +410,7 @@ public class OrderDao {
 		if(extraCond.dateType == DateType.TODAY){
 			sql = " SELECT " +
 				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, O.staff_id, " +
-				  " T.minimum_cost, " +
+				  " T.minimum_cost, IFNULL(T.category, 1) AS tbl_category, " +
 				  " O.waiter, O.discount_staff, O.discount_date, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.settle_type, O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
@@ -507,10 +461,8 @@ public class OrderDao {
 			
 			order.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			order.setStatus(Order.Status.valueOf(dbCon.rs.getInt("status")));
-			Table table = new Table();
+			Table table = new Table(dbCon.rs.getInt("table_id"));
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			table.setCategory(Table.Category.valueOf(dbCon.rs.getShort("category")));
-			table.setId(dbCon.rs.getInt("table_id"));
 			if(order.isUnpaid()){
 				table.setStatus(Table.Status.IDLE);
 			}else{
@@ -520,6 +472,7 @@ public class OrderDao {
 			table.setTableName(dbCon.rs.getString("table_name"));
 			if(extraCond.dateType == DateType.TODAY){
 				table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
+				table.setCategory(Table.Category.valueOf(dbCon.rs.getShort("tbl_category")));
 			}
 			order.setDestTbl(table);
 			order.getRegion().setRegionId(dbCon.rs.getShort("region_id"));
@@ -717,11 +670,11 @@ public class OrderDao {
 		Table destTbl = TableDao.getByAlias(dbCon, staff, builder.getDestTbl().getAliasId());
 		if(destTbl.isIdle()){
 			//Insert a new if the destination table is idle.
-			InsertOrder.exec(dbCon, staff, new Order.InsertBuilder(new Table.AliasBuilder(destTbl.getAliasId())).addAll(builder.getTransferFoods(), staff));
+			InsertOrder.exec(dbCon, staff, new Order.InsertBuilder(new Table.Builder(destTbl.getId())).addAll(builder.getTransferFoods(), staff));
 			
 		}else if(destTbl.isBusy()){
 			//Update the order if the destination table is busy.
-			Order destOrder = getByTableAlias(dbCon, staff, destTbl.getAliasId());
+			Order destOrder = getByTableId(dbCon, staff, destTbl.getId());
 			UpdateOrder.exec(dbCon, staff, new Order.UpdateBuilder(destOrder).addOri(destOrder.getOrderFoods()).addNew(builder.getTransferFoods(), staff));
 		}
 	}
@@ -1083,7 +1036,7 @@ public class OrderDao {
 				"`discount_staff`, `discount_staff_id`, `discount_date`," +
 				"`cancel_price`, `discount_price`, `gift_price`, `coupon_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
 				"`waiter`, `settle_type`, `pay_type_id`, `category`, `staff_id`, " +
-				"`region_id`, `region_name`, `table_alias`, `table_name`, `service_rate`, `comment`";
+				"`region_id`, `region_name`, `table_id`, `table_alias`, `table_name`, `service_rate`, `comment`";
 		
 		String sql;
 		//Move the paid order from "order" to "order_history".
