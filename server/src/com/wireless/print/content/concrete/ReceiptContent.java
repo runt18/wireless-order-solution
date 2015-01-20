@@ -138,8 +138,7 @@ public class ReceiptContent extends ConcreteContent {
 			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new CenterAlignedDecorator("ª∂”≠ƒ˙‘Ÿ¥Œπ‚¡Ÿ", mStyle).toString());
 		}
 		
-		
-		return mTemplate;
+		return mPrintType == PType.PRINT_RECEIPT ? mTemplate + EJECT : mTemplate;
 	}
 	
 	/**

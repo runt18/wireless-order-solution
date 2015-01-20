@@ -16,8 +16,10 @@ public abstract class ConcreteContent implements Content {
 	private final static String LINE_58MM = "--------------------------------";
 	private final static String LINE_76MM = "---------------------------------------";
 	private final static String LINE_80MM = "-----------------------------------------------";
+	
 	final static String SEP = "\r\n";
 	final static String CUT = new String(new char[]{ 0x1b, 0x6d });
+	final static String EJECT = new String(new char[]{ 0x1b, 0x70, 0x00, 0x10, 0x10 });
 	
 	final String mSeperatorLine;
 	
