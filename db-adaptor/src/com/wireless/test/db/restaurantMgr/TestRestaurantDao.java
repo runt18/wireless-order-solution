@@ -3,6 +3,7 @@ package com.wireless.test.db.restaurantMgr;
 import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyVetoException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,7 +56,7 @@ public class TestRestaurantDao {
 	}
 	
 	@Test
-	public void testRestaurantDao() throws SQLException, ParseException, BusinessException{
+	public void testRestaurantDao() throws SQLException, ParseException, BusinessException, NoSuchAlgorithmException{
 		int restaurantId = 0;
 		try{
 			Restaurant.InsertBuilder builder = new Restaurant.InsertBuilder("test_account", "测试餐厅", new SimpleDateFormat("yyyy-MM-dd").parse("2014-01-01").getTime(), "test@123")
@@ -133,7 +134,8 @@ public class TestRestaurantDao {
 														 		   .setRecordAlive(RecordAlive.ONE_YEAR)
 														 		   .setExpireDate(new SimpleDateFormat("yyyy-MM-dd").parse("2015-01-01").getTime())
 														 		   .addModule(Module.Code.INVENTORY)
-														 		   .addModule(Module.Code.MEMBER);
+														 		   .addModule(Module.Code.MEMBER)
+														 		   .resetRSA();
 			
 			RestaurantDao.update(updateBuilder);
 			
@@ -169,6 +171,10 @@ public class TestRestaurantDao {
 			}
 			if(updateBuilder.isAccountChanged()){
 				expected.setAccount(updateBuilder.build().getAccount());
+			}
+			if(updateBuilder.isRSAChanged()){
+				expected.setPublicKey(updateBuilder.build().getPublicKey());
+				expected.setPrivateKey(updateBuilder.build().getPrivateKey());
 			}
 			
 			actual = RestaurantDao.getById(restaurantId);
@@ -423,6 +429,8 @@ public class TestRestaurantDao {
 		Assert.assertEquals("restaurant expire date", expected.getExpireDate(), actual.getExpireDate());
 		Assert.assertEquals("restaurant record alive", expected.getRecordAlive(), actual.getRecordAlive());
 		Assert.assertEquals("resturant dianping id", expected.getDianpingId(), actual.getDianpingId());
+		Assert.assertEquals("restaurant rsa public key", expected.getPublicKey(), actual.getPublicKey());
+		Assert.assertEquals("restaurant rsa private key", expected.getPrivateKey(), actual.getPrivateKey());
 		Assert.assertEquals("init modules", expected.getModules(), actual.getModules());
 	}
 }

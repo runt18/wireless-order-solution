@@ -197,7 +197,9 @@ public class RestaurantDao {
 			if(dbCon.rs.getTimestamp("birth_date") != null){
 				restaurant.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
 			}
-
+			restaurant.setPublicKey(dbCon.rs.getString("public_key"));
+			restaurant.setPrivateKey(dbCon.rs.getString("private_key"));
+			
 			result.add(restaurant);
 		}
 		dbCon.rs.close();
@@ -275,6 +277,7 @@ public class RestaurantDao {
 			  (builder.isAddressChanged() ? " ,address = '" + restaurant.getAddress() + "'" : "") +
 			  (builder.isRecordAliveChanged() ? " ,record_alive = " + restaurant.getRecordAlive() + "" : "") +
 			  (builder.isExpireDateChanged() ? " ,expire_date = '" + DateUtil.format(restaurant.getExpireDate()) + "'" : "") +
+			  (builder.isRSAChanged() ? " ,public_key = '" + restaurant.getPublicKey() + "', private_key = '" + restaurant.getPrivateKey() + "'" : "") +
 			  " WHERE id = " + builder.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -346,7 +349,7 @@ public class RestaurantDao {
 			
 			//Create the new restaurant
 			sql = " INSERT INTO " + Params.dbName + ".restaurant " +
-				  " (account, birth_date, restaurant_name, restaurant_info, tele1, tele2, address, record_alive, expire_date, dianping_id) " +
+				  " (account, birth_date, restaurant_name, restaurant_info, tele1, tele2, address, record_alive, expire_date, dianping_id, public_key, private_key) " +
 				  " VALUES(" +
 				  "'" + restaurant.getAccount() + "'," +
 				  "'" + DateUtil.format(restaurant.getBirthDate()) + "'," +
@@ -357,7 +360,9 @@ public class RestaurantDao {
 				  "'" + restaurant.getAddress() + "'," +
 				  restaurant.getRecordAlive() + "," +
 				  "'" + DateUtil.format(restaurant.getExpireDate()) + "'," +
-				  restaurant.getDianpingId() + 
+				  restaurant.getDianpingId() + "," +
+				  "'" + restaurant.getPublicKey() + "'," +
+				  "'" + restaurant.getPrivateKey() + "'" +
 				  " ) ";
 			
 			dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -365,7 +370,7 @@ public class RestaurantDao {
 			if(dbCon.rs.next()){
 				restaurant.setId(dbCon.rs.getInt(1));
 			}else{
-				throw new SQLException("The id of printer is not generated successfully.");
+				throw new SQLException("The id of restaurant is not generated successfully.");
 			}
 			dbCon.rs.close();
 			
