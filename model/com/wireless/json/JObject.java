@@ -8,7 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wireless.exception.BusinessException;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class JObject implements Jsonable {
 	
