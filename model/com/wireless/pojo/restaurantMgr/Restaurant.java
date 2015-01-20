@@ -1,5 +1,6 @@
 package com.wireless.pojo.restaurantMgr;
 
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.token.RSACoder;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.SortedList;
 
@@ -30,13 +32,15 @@ public class Restaurant implements Parcelable, Jsonable{
 		private String address;
 		private int dianpingId;
 		private final List<Module> modules = new ArrayList<Module>();
+		private final RSACoder coder;
 		
-		public InsertBuilder(String account, String restaurantName, long expireDate, String pwd){
+		public InsertBuilder(String account, String restaurantName, long expireDate, String pwd) throws NoSuchAlgorithmException{
 			this.account = account;
 			this.restaurantName = restaurantName;
 			this.expireDate = expireDate;
 			this.pwd = pwd;
 			modules.add(new Module(Module.Code.BASIC));
+			coder = new RSACoder();
 		}
 		
 		public InsertBuilder setRestaurantInfo(String info){
@@ -100,6 +104,7 @@ public class Restaurant implements Parcelable, Jsonable{
 		private String address;
 		private int dianpingId;
 		private final List<Module> modules = SortedList.newInstance(); 
+		private RSACoder coder;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
@@ -215,6 +220,15 @@ public class Restaurant implements Parcelable, Jsonable{
 			return !modules.isEmpty();
 		}
 		
+		public UpdateBuilder resetRSA() throws NoSuchAlgorithmException{
+			this.coder = new RSACoder();
+			return this;
+		}
+		
+		public boolean isRSAChanged(){
+			return this.coder != null;
+		}
+		
 		public Restaurant build(){
 			return new Restaurant(this);
 		}
@@ -300,6 +314,8 @@ public class Restaurant implements Parcelable, Jsonable{
 	private long birthDate;
 	private long expireDate;
 	private int dianpingId;
+	private String publicKey;
+	private String privateKey;
 	private final List<Module> modules = new ArrayList<Module>();
 	
 	public Restaurant(){
@@ -325,6 +341,8 @@ public class Restaurant implements Parcelable, Jsonable{
 			setBirthDate(new SimpleDateFormat(DateUtil.Pattern.DATE.getPattern(), Locale.getDefault()).parse(now).getTime());
 		} catch (ParseException ignored) {}
 		setModule(builder.modules);
+		setPublicKey(builder.coder.getPublicKey());
+		setPrivateKey(builder.coder.getPrivateKey());
 	}
 	
 	private Restaurant(UpdateBuilder builder){
@@ -362,6 +380,10 @@ public class Restaurant implements Parcelable, Jsonable{
 		} catch (ParseException ignored) {}
 		if(builder.isModuleChanged()){
 			setModule(builder.modules);
+		}
+		if(builder.isRSAChanged()){
+			setPublicKey(builder.coder.getPublicKey());
+			setPrivateKey(builder.coder.getPrivateKey());
 		}
 	}
 	
@@ -499,6 +521,26 @@ public class Restaurant implements Parcelable, Jsonable{
 		}
 	}
 
+	public String getPublicKey(){
+		return this.publicKey;
+	}
+	
+	public void setPublicKey(String publicKey){
+		this.publicKey = publicKey;
+	}
+	
+	public boolean hasRSA(){
+		return this.publicKey != null && this.privateKey != null;
+	}
+	
+	public String getPrivateKey(){
+		return this.privateKey;
+	}
+	
+	public void setPrivateKey(String privateKey){
+		this.privateKey = privateKey;
+	}
+	
 	public void addModule(Module module){
 		if(!modules.contains(module)){
 			modules.add(module);
