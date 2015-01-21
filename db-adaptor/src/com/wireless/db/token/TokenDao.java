@@ -177,6 +177,7 @@ public class TokenDao {
 	 * Verify the token.
 	 * @param builder
 	 * 			the builder to verify token
+	 * @return the id to next valid token 
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
