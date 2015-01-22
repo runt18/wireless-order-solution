@@ -250,7 +250,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						Map<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, of.getName()); 
-						map.put(ITEM_FOOD_AMOUNT, String.valueOf(of.getCount()));
+						map.put(ITEM_FOOD_AMOUNT, String.valueOf(Math.abs(of.getDelta())));
 						map.put(ITEM_FOOD_PRICE, NumericUtil.float2String2(of.calcUnitPrice() * Math.abs(of.getDelta())));
 						map.put(ITEM_FOOD_TASTE, of.hasCancelReason() ? of.getCancelReason().getReason() : "无退菜原因");
 						map.put(ITEM_THE_FOOD, of);
@@ -258,13 +258,13 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						map.put(ITEM_IS_DELTA, true);
 						pickedFoodDatas.add(map);
 						
-					}else if(of.getDelta() < 0f){
+					}else if(of.getDelta() < 0f && of.asFood().isWeigh()){
 						Map<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, of.getName()); 
-						map.put(ITEM_FOOD_AMOUNT, String.valueOf(of.getCount()));
-						map.put(ITEM_FOOD_PRICE, NumericUtil.float2String2(of.calcUnitPrice() * Math.abs(of.getDelta())));
-						map.put(ITEM_FOOD_TASTE, "加" + NumericUtil.float2String2(Math.abs(of.getDelta())) + "份");
+						map.put(ITEM_FOOD_AMOUNT, "+" + String.valueOf(Math.abs(of.getDelta())));
+						map.put(ITEM_FOOD_PRICE, "+" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(of.calcUnitPrice() * Math.abs(of.getDelta())));
+						map.put(ITEM_FOOD_TASTE, "称重确认");
 						map.put(ITEM_THE_FOOD, of);
 						map.put(ITEM_FOOD_DELTA, Float.valueOf(of.getDelta()));
 						map.put(ITEM_IS_DELTA, true);
@@ -448,12 +448,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				cancelImgView.setBackgroundResource(R.drawable.tuicai_selector);
 				
 				//"加菜"Button
-				ImageView addImgView = (ImageView) layout.findViewById(R.id.imgView_right_orderFoodListView_childItem);
-				if(of.asFood().isWeigh()){
-					addImgView.setBackgroundResource(R.drawable.weight_selector);
-				}else{
-					addImgView.setBackgroundResource(R.drawable.amount_selector);
-				}
+				ImageView rightImgView = (ImageView) layout.findViewById(R.id.imgView_right_orderFoodListView_childItem);
 				
 				//"取消退菜"or"取消加菜"Button
 				Button restoreBtn = (Button) layout.findViewById(R.id.button_orderFoodListView_childItem_restore);
@@ -463,9 +458,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					//delta > 0 表示是退菜
 					if((Float)map.get(ITEM_FOOD_DELTA) > 0f){
 						cancelImgView.setVisibility(View.INVISIBLE);
-						addImgView.setVisibility(View.INVISIBLE);
+						rightImgView.setVisibility(View.INVISIBLE);
 						
-						((TextView) layout.findViewById(R.id.txtView_amountValue_orderChildItem)).setText(NumericUtil.float2String2(of.getDelta()));
 						layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.VISIBLE);
 						//'取消退菜'按钮
 						restoreBtn.setText("取消退菜");
@@ -479,17 +473,16 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 							}
 						});
 						
-					}else if((Float)map.get(ITEM_FOOD_DELTA) < 0f){
-						//delta < 0 表示是加菜
+					}else if((Float)map.get(ITEM_FOOD_DELTA) < 0f && of.asFood().isWeigh()){
+						//delta < 0 表示是称重数量
 						cancelImgView.setVisibility(View.INVISIBLE);
-						addImgView.setVisibility(View.INVISIBLE);
+						rightImgView.setVisibility(View.INVISIBLE);
 						
 						//layout.setBackgroundColor(Color.LTGRAY);
 						((TextView)layout.findViewById(R.id.txtView_taste_orderChildItem)).setTextColor(getResources().getColor(R.color.green));
-						((TextView) layout.findViewById(R.id.txtView_amountValue_orderChildItem)).setText(NumericUtil.float2String2(Math.abs(of.getDelta())));
 						layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.INVISIBLE);
-						//'取消加菜'按钮
-						restoreBtn.setText("取消加菜");
+						//'取消称重'按钮
+						restoreBtn.setText("取消称重");
 						restoreBtn.setVisibility(View.VISIBLE); 
 						restoreBtn.setOnClickListener(new View.OnClickListener() {
 							@Override
@@ -503,22 +496,32 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				} else {
 					//Delta不存在表示菜品没有变化
 					
-					if((Float)map.get(ITEM_FOOD_DELTA) < 0f){
-						//delta < 0 表示是加菜, 只显示加菜Button
-						cancelImgView.setVisibility(View.INVISIBLE);
-						addImgView.setVisibility(View.VISIBLE);
-						
-					}else if((Float)map.get(ITEM_FOOD_DELTA) > 0f){
-						//delta > 0 表示是退菜, 只显示退菜Button
-						cancelImgView.setVisibility(View.VISIBLE);
-						addImgView.setVisibility(View.INVISIBLE);
-					}else{
-						//delta == 0表示普通状态, 显示加/退菜Button
-						cancelImgView.setVisibility(View.VISIBLE);
-						addImgView.setVisibility(View.VISIBLE);
-					}
-					
+					cancelImgView.setVisibility(View.VISIBLE);
+					rightImgView.setVisibility(View.VISIBLE);
 					restoreBtn.setVisibility(View.INVISIBLE);
+					
+					if(of.asFood().isWeigh()){
+						rightImgView.setBackgroundResource(R.drawable.weight_selector);
+						//"称重"操作
+						rightImgView.setOnClickListener(new View.OnClickListener() {				
+							@Override
+							public void onClick(View v) {
+								AddOrderAmountDialog.newInstance(of, getId()).show(getFragmentManager(), AddOrderAmountDialog.TAG);
+							}
+						});
+						
+					}else{
+						rightImgView.setBackgroundResource(R.drawable.amount_selector);
+						//"转菜"操作
+						rightImgView.setOnClickListener(new View.OnClickListener() {				
+							@Override
+							public void onClick(View v) {
+								mTransFoods.clear();
+								mTransFoods.add(of);
+								AskTableDialog.newInstance(getId()).show(getFragmentManager(), AskTableDialog.TAG);
+							}
+						});
+					}
 					
 					//show the order amount to each food
 					((TextView) layout.findViewById(R.id.txtView_amountValue_orderChildItem)).setText(NumericUtil.float2String2(of.getCount()));
@@ -528,14 +531,6 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						@Override
 						public void onClick(View v) {
 							AskCancelAmountDialog.newInstance(of, getId()).show(getFragmentManager(), AskCancelAmountDialog.TAG);
-						}
-					});
-					
-					//"加菜"操作
-					addImgView.setOnClickListener(new View.OnClickListener() {				
-						@Override
-						public void onClick(View v) {
-							AddOrderAmountDialog.newInstance(of, getId()).show(getFragmentManager(), AddOrderAmountDialog.TAG);
 						}
 					});
 					
