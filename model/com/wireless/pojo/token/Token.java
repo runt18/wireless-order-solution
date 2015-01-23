@@ -10,41 +10,50 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 public class Token implements Jsonable{
 	
 	public static class InsertBuilder{
-		private final String account;
-		private final byte[] encryptedCreateToken;
-		private final long lastModified;
+		private final int restaurantId;
 		
-		public InsertBuilder(String account, byte[] createToken, long lastModified){
-			this.account = account;
-			this.encryptedCreateToken = createToken;
-			this.lastModified = lastModified;
-		}
-
-		public String getAccount(){
-			return this.account;
+		public InsertBuilder(int restaurantId){
+			this.restaurantId = restaurantId;
 		}
 		
-		public byte[] getEncryptedCreateToken(){
-			return this.encryptedCreateToken;
+		public InsertBuilder(Restaurant restaurant){
+			this.restaurantId = restaurant.getId();
 		}
 		
-		public long getLastModified(){
-			return this.lastModified;
+		public int getRestaurantId(){
+			return this.restaurantId;
 		}
 		
 	}
 	
-	public static class FailedInsertBuilder{
+	public static class GenerateBuilder{
+		private final String account;
+		private final int code;
+		
+		public GenerateBuilder(String account, int code){
+			this.account = account;
+			this.code = code;
+		}
+		
+		public String getAccount(){
+			return this.account;
+		}
+		
+		public int getCode(){
+			return this.code;
+		}
+		
+	}
+	
+	public static class FailedGenerateBuilder{
 		private final String account;
 		private final byte[] failedEncryptedToken;
-		private final byte[] createdEncryptedToken;
-		private final long lastModified;
+		private final int code;
 		
-		public FailedInsertBuilder(byte[] failedEncryptedToken, String account, byte[] createdEncryptedToken, long lastModified){
+		public FailedGenerateBuilder(byte[] failedEncryptedToken, String account, int code){
 			this.account = account;
 			this.failedEncryptedToken = failedEncryptedToken;
-			this.createdEncryptedToken = createdEncryptedToken;
-			this.lastModified = lastModified;
+			this.code = code;
 		}
 		
 		public String getAccount(){
@@ -55,8 +64,8 @@ public class Token implements Jsonable{
 			return this.failedEncryptedToken;
 		}
 		
-		public InsertBuilder getTokenBuilder(){
-			return new InsertBuilder(account, createdEncryptedToken, lastModified);
+		public GenerateBuilder getTokenBuilder(){
+			return new GenerateBuilder(account, code);
 		}
 	}
 	
@@ -81,6 +90,8 @@ public class Token implements Jsonable{
 	public static class UpdateBuilder{
 		private final int id;
 		private int restaurantId;
+		private Status status;
+		private int code = -1;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
@@ -100,8 +111,57 @@ public class Token implements Jsonable{
 			return restaurantId != 0;
 		}
 		
+		public UpdateBuilder setStatus(Status status){
+			this.status = status;
+			return this;
+		}
+		
+		public boolean isStatusChanged(){
+			return this.status != null;
+		}
+		
+		public UpdateBuilder setCode(int code){
+			this.code = code;
+			return this;
+		}
+		
+		public boolean isCodeChanged(){
+			return this.code < 0;
+		}
+		
 		public Token build(){
 			return new Token(this);
+		}
+	}
+	
+	public static enum Status{
+		DYN_CODE(1, "已生成动态验证码"),
+		TOKEN(2, "已生成Token");
+		
+		private final int val;
+		private final String desc;
+		
+		Status(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		public static Status valueOf(int val){
+			for(Status status : values()){
+				if(status.val == val){
+					return status;
+				}
+			}
+			throw new IllegalArgumentException("The status(val = " + val + ") is invalid.");
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
 		}
 	}
 	
@@ -109,10 +169,14 @@ public class Token implements Jsonable{
 	private Restaurant restaurant;
 	private long birthDate;
 	private long lastModified;
+	private int code;
+	private Status status;
 	
 	private Token(UpdateBuilder builder){
 		setId(builder.id);
 		setRestaurant(new Restaurant(builder.restaurantId));
+		setStatus(builder.status);
+		setCode(builder.code);
 	}
 	
 	public Token(int id){
@@ -149,6 +213,26 @@ public class Token implements Jsonable{
 	
 	public void setLastModified(long lastModified) {
 		this.lastModified = lastModified;
+	}
+	
+	public int getCode(){
+		return this.code;
+	}
+	
+	public void setCode(int code){
+		this.code = code;
+	}
+	
+	public Status getStatus(){
+		return this.status;
+	}
+	
+	public void setStatus(Status status){
+		this.status = status;
+	}
+	
+	public boolean isCodeExpired(){
+		return System.currentTimeMillis() - this.lastModified >= 10 * 60 * 1000;
 	}
 	
 	public byte[] encrypt() throws BusinessException{
