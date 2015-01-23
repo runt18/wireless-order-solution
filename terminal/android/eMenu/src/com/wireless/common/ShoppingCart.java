@@ -166,7 +166,8 @@ public final class ShoppingCart {
 			}
 			new CommitOrderTask(new Order.UpdateBuilder(mOriOrder)
 										 .addOri(mOriOrder.getOrderFoods())
-										 .addNew(getNewFoods(), WirelessOrder.loginStaff), 
+										 .addNew(getNewFoods(), WirelessOrder.loginStaff)
+										 .setCustomNum(mDestTable.getCustomNum()), 
 								commitListener).execute();
 			
 		}else{
@@ -672,6 +673,10 @@ public final class ShoppingCart {
 		
 		@Override
 		protected void onSuccess(Order reqOrder){
+			if(mCommitListener != null){	
+				mCommitListener.onSuccess(reqOrder);
+			}
+			
 			//如果是锁定餐台状态则重新设置锁定的餐台，否则清除餐台数据
 			SharedPreferences pref = mContext.getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
 			if(pref.getBoolean(Params.TABLE_FIXED, false)){
@@ -684,9 +689,7 @@ public final class ShoppingCart {
 			if(!pref.getBoolean(Params.STAFF_FIXED, false)){
 				setStaff(null);
 			}
-			if(mCommitListener != null){	
-				mCommitListener.onSuccess(reqOrder);
-			}
+
 		}
 		
 		@Override
