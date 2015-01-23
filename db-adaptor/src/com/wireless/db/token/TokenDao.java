@@ -17,9 +17,34 @@ public class TokenDao {
 
 	public static class ExtraCond{
 		private int id;
+		private final List<Token.Status> status = new ArrayList<Token.Status>();
+		private int code;
+		private int restaurantId;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
+			return this;
+		}
+		
+		public ExtraCond addStatus(Token.Status status){
+			if(!this.status.contains(status)){
+				this.status.add(status);
+			}
+			return this;
+		}
+		
+		public ExtraCond setCode(int code){
+			this.code = code;
+			return this;
+		}
+		
+		public ExtraCond setRestaurant(int restaurantId){
+			this.restaurantId = restaurantId;
+			return this;
+		}
+		
+		public ExtraCond setRestaurant(Restaurant restaurant){
+			this.restaurantId = restaurant.getId();
 			return this;
 		}
 		
@@ -29,24 +54,36 @@ public class TokenDao {
 			if(id != 0){
 				extraCond.append(" AND token_id = " + id);
 			}
+			StringBuilder statusCond = new StringBuilder();
+			for(Token.Status s : status){
+				if(statusCond.length() == 0){
+					statusCond.append(s.getVal());
+				}else{
+					statusCond.append(",").append(s.getVal());
+				}
+			}
+			if(statusCond.length() != 0){
+				extraCond.append(" AND status IN (" + statusCond.toString() + ")");
+			}
+			if(code != 0){
+				extraCond.append(" AND code = " + code);
+			}
+			if(restaurantId != 0){
+				extraCond.append(" AND restaurant_id = " + restaurantId);
+			}
 			return extraCond.toString();
 		}
 	}
 	
 	/**
-	 * Insert the token.
-	 * @param dbCon
-	 * 			the database connection
+	 * Insert a new token with the dynamic code to verify.
 	 * @param builder
-	 * 			the insert builder {@link Token#InsertBuilder}
-	 * @return the token id just inserted
+	 * 			the builder to insert a new token
+	 * @return the id to token
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if cases below
-	 * 			<li>the account does NOT exist
-	 * 			<li>the create token is NOT qualified to be decrypted by private key
-	 * 			<li>the create token is NOT matched both account and code
+	 * 			throws if the account does NOT exist
 	 */
 	public static int insert(Token.InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
@@ -59,34 +96,101 @@ public class TokenDao {
 	}
 	
 	/**
-	 * Insert the token.
+	 * Insert a new token with the dynamic code to verify.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param builder
-	 * 			the insert builder {@link Token#InsertBuilder}
+	 * 			the builder to insert a new token
+	 * @return the id to token
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the account does NOT exist
+	 */
+	public static int insert(DBCon dbCon, Token.InsertBuilder builder) throws SQLException, BusinessException{
+		Restaurant restaurant = RestaurantDao.getById(dbCon, builder.getRestaurantId());
+		int code;
+		do{
+			code = (int)Math.round(Math.random()*(999999 - 100000) + 100000);
+		}while(!getByCond(dbCon, new ExtraCond().addStatus(Token.Status.DYN_CODE).setRestaurant(builder.getRestaurantId()).setCode(code)).isEmpty());
+		
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".token " +
+			  " (restaurant_id, birth_date, last_modified, code, status ) VALUES (" +
+			  restaurant.getId() + "," +
+			  " NOW(), " +
+			  " NOW(), " +
+			  code + "," +
+			  Token.Status.DYN_CODE.getVal() +
+			  ")";
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		int tokenId = 0;
+		if(dbCon.rs.next()){
+			tokenId = dbCon.rs.getInt(1);
+		}else{
+			throw new SQLException("The id of token is not generated successfully.");
+		}
+		dbCon.rs.close();
+		
+		return tokenId;
+	}
+	
+	/**
+	 * Generate the token to builder {@link Token#GenerateBuilder}.
+	 * @param builder
+	 * 			the insert builder {@link Token#GenerateBuilder}
 	 * @return the token id just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if cases below
 	 * 			<li>the account does NOT exist
-	 * 			<li>the create token is NOT qualified to be decrypted by private key
-	 * 			<li>the create token is NOT matched the last modified
+	 * 			<li>the dynamic code is incorrect or NOT exist 
+	 * 			<li>the dynamic code is expired
 	 */
-	public static int insert(DBCon dbCon, Token.InsertBuilder builder) throws SQLException, BusinessException{
+	public static int generate(Token.GenerateBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return generate(dbCon, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Generate the token to builder {@link Token#GenerateBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param builder
+	 * 			the insert builder {@link Token#GenerateBuilder}
+	 * @return the token id just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the account does NOT exist
+	 * 			<li>the dynamic code is incorrect or NOT exist 
+	 * 			<li>the dynamic code is expired
+	 */
+	public static int generate(DBCon dbCon, Token.GenerateBuilder builder) throws SQLException, BusinessException{
 		
 		Restaurant restaurant = RestaurantDao.getByAccount(dbCon, builder.getAccount());
-		
-		Token createToken = new Token(0);
-		createToken.setRestaurant(restaurant);
-		createToken.decrypt(builder.getEncryptedCreateToken());
-
-		if(createToken.getLastModified() == builder.getLastModified()){
-			return insert(dbCon, restaurant);
+		//Check to see whether the dynamic code is correct.
+		final List<Token> result = getByCond(dbCon, new ExtraCond().addStatus(Token.Status.DYN_CODE).setRestaurant(restaurant).setCode(builder.getCode()));
+		if(result.isEmpty()){
+			throw new BusinessException(TokenError.DYN_CODE_INCORRECT);
 		}else{
-			throw new BusinessException("新建Token的时间戳跟系统验证的不一致", TokenError.LAST_MODIFIED_NOT_MATCH);
+			Token token = result.get(0);
+			//Check to see whether the dynamic code is expired.
+			if(token.isCodeExpired()){
+				throw new BusinessException(TokenError.DYN_CODE_EXPIRE);
+			}else{
+				update(dbCon, new Token.UpdateBuilder(token.getId()).setStatus(Token.Status.TOKEN).setCode(0));
+				return token.getId();
+			}
 		}
-
 	}
 	
 	/**
@@ -103,12 +207,12 @@ public class TokenDao {
 	 * 			<li>the create token is NOT qualified to be decrypted by private key
 	 * 			<li>the create token is NOT matched the last modified	 
 	 **/
-	public static int failedInsert(Token.FailedInsertBuilder builder) throws SQLException, BusinessException{
+	public static int failedGenerate(Token.FailedGenerateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			int tokenId = failedInsert(dbCon, builder);
+			int tokenId = failedGenerate(dbCon, builder);
 			dbCon.conn.commit();
 			return tokenId;
 			
@@ -137,7 +241,7 @@ public class TokenDao {
 	 * 			<li>the create token is NOT qualified to be decrypted by private key
 	 * 			<li>the create token is NOT matched the last modified	 
 	 **/
-	private static int failedInsert(DBCon dbCon, Token.FailedInsertBuilder builder) throws SQLException, BusinessException{
+	private static int failedGenerate(DBCon dbCon, Token.FailedGenerateBuilder builder) throws SQLException, BusinessException{
 		Restaurant restaurant = RestaurantDao.getByAccount(dbCon, builder.getAccount());
 		
 		//Delete the failed token if it can be decrypted by the related private key.
@@ -148,29 +252,8 @@ public class TokenDao {
 		deleteById(dbCon, failedToken.getId());
 		
 		//Insert the new encrypted token.
-		return insert(dbCon, builder.getTokenBuilder());
+		return generate(dbCon, builder.getTokenBuilder());
 				
-	}
-	
-	private static int insert(DBCon dbCon, Restaurant restaurant) throws SQLException{
-		String sql;
-		sql = " INSERT INTO " + Params.dbName + ".token " +
-			  " (restaurant_id, birth_date, last_modified ) VALUES (" +
-			  restaurant.getId() + "," +
-			  " NOW(), " +
-			  " NOW() " + 
-			  ")";
-		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-		dbCon.rs = dbCon.stmt.getGeneratedKeys();
-		int tokenId = 0;
-		if(dbCon.rs.next()){
-			tokenId = dbCon.rs.getInt(1);
-		}else{
-			throw new SQLException("The id of token is not generated successfully.");
-		}
-		dbCon.rs.close();
-		
-		return tokenId;
 	}
 	
 	/**
@@ -248,6 +331,8 @@ public class TokenDao {
 		sql = " UPDATE " + Params.dbName + ".token SET " +
 			  " token_id = token_id " +
 			  (builder.isRestaurantChanged() ? " ,restaurant_id = " + token.getRestaurant().getId() : "") +
+			  (builder.isStatusChanged() ? " ,status = " + token.getStatus().getVal() : "") +
+			  (builder.isCodeChanged() ? " ,code = " + token.getCode() : "") +
 			  " ,last_modified = NOW() " +
 			  " WHERE token_id = " + token.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -317,6 +402,8 @@ public class TokenDao {
 			token.setRestaurant(new Restaurant(dbCon.rs.getInt("restaurant_id")));
 			token.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
 			token.setLastModified(dbCon.rs.getTimestamp("last_modified").getTime());
+			token.setStatus(Token.Status.valueOf(dbCon.rs.getInt("status")));
+			token.setCode(dbCon.rs.getInt("code"));
 			result.add(token);
 		}
 		dbCon.rs.close();

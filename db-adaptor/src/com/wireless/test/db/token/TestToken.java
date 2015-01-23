@@ -26,7 +26,6 @@ public class TestToken {
 	public void testTokenDao() throws SQLException, BusinessException, NoSuchAlgorithmException, InterruptedException{
 		int tokenId = 0;
 		try{
-			long lastModified = System.currentTimeMillis();
 			Restaurant r1 = RestaurantDao.getByAccount("liyy");
 			if(!r1.hasRSA()){
 				RestaurantDao.update(new Restaurant.UpdateBuilder(r1.getId()).resetRSA());
@@ -42,48 +41,58 @@ public class TestToken {
 			Token r2Token = new Token(0);
 			r2Token.setRestaurant(r2);
 			
-			//Test the public key is NOT matched the private.
-			r2Token.setLastModified(lastModified);
+			//Test to create a new token.
+			tokenId = TokenDao.insert(new Token.InsertBuilder(r1));
+			int code = TokenDao.getById(tokenId).getCode();
+			
+			//Test the dynamic code is incorrect.
 			try{			
-				TokenDao.insert(new Token.InsertBuilder(r1.getAccount(), r2Token.encrypt(), lastModified));
+				TokenDao.generate(new Token.GenerateBuilder(r1.getAccount(), code + 1));
 			}catch(BusinessException e){
-				Assert.assertEquals("fail to test the public & private key NOT matched", TokenError.TOKEN_DECRYPT_FAIL, e.getErrCode());
+				Assert.assertEquals("fail to test dynamic code is incorrect", TokenError.DYN_CODE_INCORRECT, e.getErrCode());
 			}
 			
-			//Test the encrypted token is NOT matched the last modified.
-			r1Token.setLastModified(lastModified + 1);
-			try{			
-				TokenDao.insert(new Token.InsertBuilder(r1.getAccount(), r1Token.encrypt(), lastModified));
-			}catch(BusinessException e){
-				Assert.assertEquals("fail to test the last modified NOT matched", TokenError.LAST_MODIFIED_NOT_MATCH, e.getErrCode());
-			}
+			//Test the dynamic code is expired.
+//			r1Token.setLastModified(lastModified + 1);
+//			try{			
+//				TokenDao.generate(new Token.GenerateBuilder(r1.getAccount(), r1Token.encrypt(), lastModified));
+//			}catch(BusinessException e){
+//				Assert.assertEquals("fail to test the last modified NOT matched", TokenError.LAST_MODIFIED_NOT_MATCH, e.getErrCode());
+//			}
 			
-			//Test to insert a new token successfully.
-			r1Token.setLastModified(lastModified);
-			byte[] encryptedToken = r1Token.encrypt();
-			
-			tokenId = TokenDao.insert(new Token.InsertBuilder(r1.getAccount(), encryptedToken, lastModified));
+			//Test to generate a token successfully.
+			tokenId = TokenDao.generate(new Token.GenerateBuilder(r1.getAccount(), code));
 			
 			Token actual = TokenDao.getById(tokenId);
 			r1Token.setId(tokenId);
 			r1Token.setLastModified(actual.getLastModified());
+			r1Token.setStatus(Token.Status.TOKEN);
 			compareToken(r1Token, actual);
 	
-			//Test to failed insert a new token using wrong failed token.
+			int failedTokenId = tokenId;
+			//Test to failed generate a new token using wrong failed encrypted token.
+			tokenId = TokenDao.insert(new Token.InsertBuilder(r1));
+			code = TokenDao.getById(tokenId).getCode();
 			byte[] failedEncryptedToken = r2Token.encrypt();
-			lastModified = System.currentTimeMillis();
-			r1Token.setLastModified(lastModified);
 			try{
-				TokenDao.failedInsert(new Token.FailedInsertBuilder(failedEncryptedToken, r1.getAccount(), r1Token.encrypt(), lastModified));
-				Assert.assertTrue("failed to test failed insert a new token using wrong failed token", false);
+				TokenDao.failedGenerate(new Token.FailedGenerateBuilder(failedEncryptedToken, r1.getAccount(), code));
+				Assert.assertTrue("failed to test failed insert a new token using wrong failed encrypted token", false);
 			}catch(BusinessException e){
-				Assert.assertEquals("failed to test failed insert a new token using wrong failed token", TokenError.TOKEN_DECRYPT_FAIL, e.getErrCode());
+				Assert.assertEquals("failed to test failed insert a new token using wrong failed encrypted token", TokenError.TOKEN_DECRYPT_FAIL, e.getErrCode());
 			}
 			
-			//Test to failed insert a new token successfully.
+			//Test to failed generate a new token using wrong code.
 			failedEncryptedToken = r1Token.encrypt();
-			int failedTokenId = tokenId;
-			tokenId = TokenDao.failedInsert(new Token.FailedInsertBuilder(failedEncryptedToken, r1.getAccount(), r1Token.encrypt(), lastModified));
+			try{
+				TokenDao.failedGenerate(new Token.FailedGenerateBuilder(failedEncryptedToken, r1.getAccount(), code + 1));
+				Assert.assertTrue("failed to test failed insert a new token using wrong code", false);
+			}catch(BusinessException e){
+				Assert.assertEquals("failed to test failed insert a new token using wrong code", TokenError.DYN_CODE_INCORRECT, e.getErrCode());
+			}
+			
+			//Test to failed generate a new token successfully.
+			failedEncryptedToken = r1Token.encrypt();
+			tokenId = TokenDao.failedGenerate(new Token.FailedGenerateBuilder(failedEncryptedToken, r1.getAccount(), code));
 			
 			try{
 				TokenDao.getById(failedTokenId);
@@ -108,7 +117,7 @@ public class TestToken {
 			
 			//Test to verify the token using the wrong last modified.
 			try{
-				r1Token.setLastModified(lastModified + 1);
+				r1Token.setLastModified(actualLastModified + 1);
 				TokenDao.verify(new Token.VerifyBuilder(r1.getAccount(), r1Token.encrypt()));
 				Assert.assertTrue("failed to test verify token using the wrong last modified", false);
 			}catch(BusinessException e){
@@ -139,7 +148,6 @@ public class TestToken {
 				Assert.assertTrue("failed to test verify the next token after verification", false);
 			}
 			
-			
 		}finally{
 			if(tokenId != 0){
 				TokenDao.deleteById(tokenId);
@@ -156,5 +164,6 @@ public class TestToken {
 		Assert.assertEquals("token id", expected.getId(), actual.getId());
 		Assert.assertEquals("token restaurant", expected.getRestaurant(), actual.getRestaurant());
 		Assert.assertEquals("token last modified", expected.getLastModified(), actual.getLastModified());
+		Assert.assertEquals("token status", expected.getStatus(), actual.getStatus());
 	}
 }
