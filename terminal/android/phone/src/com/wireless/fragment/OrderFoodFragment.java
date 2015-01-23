@@ -332,7 +332,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		
 		@Override
 		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-			final View layout = super.getChildView(groupPosition, childPosition, isLastChild,	convertView, parent);;
+			final View layout = super.getChildView(groupPosition, childPosition, isLastChild,	convertView, parent);
 			
 			Map<String, ?> map = mChildData.get(groupPosition).get(childPosition);
 			final OrderFood of = (OrderFood) map.get(ITEM_THE_FOOD);
@@ -511,7 +511,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						});
 						
 					}else{
-						rightImgView.setBackgroundResource(R.drawable.amount_selector);
+						rightImgView.setBackgroundResource(R.drawable.transfer_selector);
 						//"×ª²Ë"²Ù×÷
 						rightImgView.setOnClickListener(new View.OnClickListener() {				
 							@Override
