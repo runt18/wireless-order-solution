@@ -47,7 +47,7 @@ public class OrderDetailContent extends ConcreteContent {
 		if(getStyle() == PStyle.PRINT_STYLE_50MM_40MM){
 			mPrintTemplate = mPrintTemplate.replace(PVar.TABLE_ID, mOrder.getDestTbl().getName());
 			mPrintTemplate = mPrintTemplate.replace(PVar.PRINT_DATE, DateUtil.format(System.currentTimeMillis()));
-			mPrintTemplate = mPrintTemplate.replace(PVar.FOOD_NAME, mParent.getName());
+			mPrintTemplate = mPrintTemplate.replace(PVar.FOOD_NAME, (getPrintType() == PType.PRINT_CANCELLED_FOOD_DETAIL ? "(ÍË)" : "") + mParent.getName());
 			mPrintTemplate = mPrintTemplate.replace(PVar.FOOD_TASTE, mParent.hasTasteGroup() ? mParent.getTasteGroup().getPreference() : "");
 			mPrintTemplate = mPrintTemplate.replace(PVar.WAITER_NAME, mWaiter);
 			mPrintTemplate = mPrintTemplate.replace(PVar.CUSTOM_NUM, Integer.toString(mOrder.getCustomNum()));

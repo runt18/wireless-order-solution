@@ -119,7 +119,7 @@ public class WirelessSocketServer {
 					password = nl.item(0).getFirstChild().getNodeValue();
 				}
 				
-				DBCon.init(host, port, database, user, password);
+				DBCon.init(host, port, database, user, password, true);
 				
 				nl = doc.getElementsByTagName("listen");
 				if(nl.item(0) != null){
