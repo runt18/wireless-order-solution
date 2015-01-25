@@ -15,7 +15,7 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.staffMgr.Staff.InsertBuilder;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class InsertStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,

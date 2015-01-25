@@ -19,7 +19,7 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.Material.MonthlyChangeTypeUpdateBuilder;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class OperateMaterialAction extends DispatchAction {
 	

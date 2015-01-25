@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class DeleteStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,

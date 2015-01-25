@@ -15,7 +15,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.FoodTaste;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class QueryFoodTasteAction extends Action{
 

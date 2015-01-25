@@ -28,8 +28,8 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.WebParams;
 import com.wireless.sccon.ServerConnector;
-import com.wireless.util.WebParams;
 
 public class PrintOrderAction extends Action{
 

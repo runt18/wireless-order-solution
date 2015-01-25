@@ -16,8 +16,8 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.util.WebParams;
 import com.wireless.util.DataPaging;
-import com.wireless.util.WebParams;
 
 public class QueryTasteAction extends Action {
 	

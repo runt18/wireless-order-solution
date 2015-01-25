@@ -25,7 +25,8 @@ public class InitServlet extends ActionServlet {
 					   getServletConfig().getInitParameter("db_port"), 
 					   getServletConfig().getInitParameter("db_name"),
 					   getServletConfig().getInitParameter("db_user"), 
-					   getServletConfig().getInitParameter("db_pwd"));
+					   getServletConfig().getInitParameter("db_pwd"),
+					   false);
 			
 		} catch (PropertyVetoException e) {
 			throw new ServletException(e);

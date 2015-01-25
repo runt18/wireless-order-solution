@@ -14,7 +14,7 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.system.SystemSetting;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class QuerySystemSettingAction extends Action{
 

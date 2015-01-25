@@ -16,7 +16,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.supplierMgr.Supplier;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class QuerySupplierAction extends Action {
 

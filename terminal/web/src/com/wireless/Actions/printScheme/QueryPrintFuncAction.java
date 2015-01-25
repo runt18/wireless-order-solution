@@ -16,7 +16,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.printScheme.PrintFunc;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class QueryPrintFuncAction extends Action{
 

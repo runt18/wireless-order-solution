@@ -19,7 +19,7 @@ import com.wireless.pojo.staffMgr.Device.InsertBuilder;
 import com.wireless.pojo.staffMgr.Device.Model;
 import com.wireless.pojo.staffMgr.Device.Status;
 import com.wireless.pojo.staffMgr.Device.UpdateBuilder;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class OperateDeviceAction extends DispatchAction{
 

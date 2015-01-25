@@ -19,9 +19,9 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.WebParams;
 import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
-import com.wireless.util.WebParams;
 
 public class QueryMaterialCateAction extends DispatchAction{
 

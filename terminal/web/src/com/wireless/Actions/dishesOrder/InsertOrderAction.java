@@ -21,8 +21,8 @@ import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.WebParams;
 import com.wireless.sccon.ServerConnector;
-import com.wireless.util.WebParams;
 
 
 public class InsertOrderAction extends Action{

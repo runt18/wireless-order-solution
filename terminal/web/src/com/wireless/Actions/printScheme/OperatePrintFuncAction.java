@@ -23,7 +23,7 @@ import com.wireless.pojo.printScheme.PrintFunc.DetailBuilder;
 import com.wireless.pojo.printScheme.PrintFunc.SummaryBuilder;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class OperatePrintFuncAction extends DispatchAction{
 

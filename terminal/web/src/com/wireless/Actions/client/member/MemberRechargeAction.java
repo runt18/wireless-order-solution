@@ -20,8 +20,8 @@ import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.WebParams;
 import com.wireless.sccon.ServerConnector;
-import com.wireless.util.WebParams;
 
 public class MemberRechargeAction extends Action{
 	

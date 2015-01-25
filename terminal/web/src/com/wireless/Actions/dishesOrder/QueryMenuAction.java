@@ -29,8 +29,8 @@ import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.WebParams;
 import com.wireless.util.DataPaging;
-import com.wireless.util.WebParams;
 
 public class QueryMenuAction extends DispatchAction {
 	/**

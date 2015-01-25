@@ -13,7 +13,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class OperateMaterialCateAction extends DispatchAction {
 	

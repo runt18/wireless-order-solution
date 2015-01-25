@@ -24,10 +24,10 @@ import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.WebParams;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.sms.SMS;
 import com.wireless.sms.msg.Msg4Charge;
-import com.wireless.util.WebParams;
 
 public class OperateMemberAction extends DispatchAction{
 	

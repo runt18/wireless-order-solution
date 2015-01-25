@@ -19,7 +19,7 @@ import com.wireless.pojo.stockMgr.StockTake.CateType;
 import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTake.UpdateStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail.InsertStockTakeDetail;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class OperateStockTakeAction extends DispatchAction{
 

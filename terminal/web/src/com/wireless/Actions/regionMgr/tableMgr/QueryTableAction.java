@@ -15,8 +15,8 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.util.WebParams;
 import com.wireless.util.DataPaging;
-import com.wireless.util.WebParams;
 
 public class QueryTableAction extends Action {
 	

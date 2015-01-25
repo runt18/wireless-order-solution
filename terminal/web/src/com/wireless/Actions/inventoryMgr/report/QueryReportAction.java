@@ -21,7 +21,7 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockReport;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class QueryReportAction extends Action {
 

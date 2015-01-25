@@ -16,7 +16,7 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.util.WebParams;
 
 public class OperatePrinterAction extends DispatchAction{
 

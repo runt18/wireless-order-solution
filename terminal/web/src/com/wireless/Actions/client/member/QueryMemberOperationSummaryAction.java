@@ -20,8 +20,8 @@ import com.wireless.pojo.member.MOSummary;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.WebParams;
 import com.wireless.util.SQLUtil;
-import com.wireless.util.WebParams;
 
 public class QueryMemberOperationSummaryAction extends DispatchAction{
 	

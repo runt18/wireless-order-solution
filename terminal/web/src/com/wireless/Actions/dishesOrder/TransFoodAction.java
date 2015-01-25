@@ -23,9 +23,9 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.WebParams;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.DateType;
-import com.wireless.util.WebParams;
 
 public class TransFoodAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
