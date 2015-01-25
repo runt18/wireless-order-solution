@@ -7,43 +7,111 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.alibaba.druid.pool.DruidDataSource;
+
 public class DBCon {
 	//open the database
-	public Connection conn;
+	public final Connection conn;
 	public Statement stmt;
 	
 	public ResultSet rs;
 	
-//	private static final ComboPooledDataSource DB_POOL = new ComboPooledDataSource();
+	private static DruidDataSource dbPool;
 	
-	public static void init(String dbHost, String dbPort, String dbName, String user, String pwd) throws PropertyVetoException{
+	public static void init(String dbHost, String dbPort, String dbName, String user, String pwd, boolean usingPool) throws PropertyVetoException{
 		Params.dbHost = dbHost;
 		Params.dbPort = Integer.parseInt(dbPort);
 		Params.dbUser = user;
 		Params.dbName = dbName;
 		Params.dbPwd = pwd;
 		Params.dbUrl = "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName + "?useUnicode=true&characterEncoding=utf8";
-//		DB_POOL.setDriverClass("com.mysql.jdbc.Driver");
-//		DB_POOL.setJdbcUrl(Params.dbUrl);
-//		DB_POOL.setUser(user);
-//		DB_POOL.setPassword(pwd);
-//		//DB_POOL.setConnectionCustomizerClassName("com.wireless.db.VerboseConnectionCustomizer");
-//		//DB_POOL.setDebugUnreturnedConnectionStackTraces(true);
-//		//DB_POOL.setUnreturnedConnectionTimeout(180);
-//		DB_POOL.setIdleConnectionTestPeriod(3600);
-//		DB_POOL.setTestConnectionOnCheckin(true);
-//		DB_POOL.setPreferredTestQuery("SELECT COUNT(*) FROM " + dbName + ".restaurant");
+		if(usingPool){
+			dbPool = new DruidDataSource();
+			//dbPool.setDriverClassName("com.mysql.jdbc.Driver");
+			dbPool.setUrl(Params.dbUrl);
+			dbPool.setUsername(user);
+			dbPool.setPassword(pwd);
+			dbPool.setInitialSize(1);
+	        dbPool.setMaxActive(30);
+	        dbPool.setMinIdle(1);
+	        //创建物理连接失败后不进行重试
+	        dbPool.setConnectionErrorRetryAttempts(0);
+	        //配置获取连接等待超时的时间, 获取失败后直接退出
+	        dbPool.setMaxWait(0);
+	        //配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+	        dbPool.setTimeBetweenEvictionRunsMillis(300 * 1000); // 30秒
+	        //配置一个连接在池中最小生存的时间，单位是毫秒
+	        dbPool.setMinEvictableIdleTimeMillis(600 * 1000); // 60秒
+	        //申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效
+	        dbPool.setTestWhileIdle(true);
+	        //申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能
+	        dbPool.setTestOnBorrow(false);
+	        //归还连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能
+	        dbPool.setTestOnReturn(false);
+	        dbPool.setValidationQuery("SELECT 1");
+		}else{        
+			dbPool = null;
+		}
 	}
 	
 	public DBCon() throws SQLException{
-		//conn = DB_POOL.getConnection();
-		try{
-			Class.forName("com.mysql.jdbc.Driver");
-		}catch(ClassNotFoundException e){
-			throw new SQLException(e);
+		if(dbPool != null){
+			conn = dbPool.getConnection();
+		}else{
+			conn = DriverManager.getConnection(Params.dbUrl, Params.dbUser, Params.dbPwd);
+		}
+	}
+	
+	public static class PoolStat{
+		public final int initPool;
+		public final int maxActive;
+		public final int minIdle;
+		public final int poolCount;
+		public final int activeCount;
+		public final long logicConnect;
+		public final long logicClose;
+		public final long physicalConnect;
+		public final long physicalClose;
+		
+		PoolStat(){
+			this.initPool = 0;
+			this.maxActive = 0;
+			this.minIdle = 0;
+			this.poolCount = 0;
+			this.activeCount = 0;
+			this.logicConnect = 0;
+			this.logicClose = 0;
+			this.physicalConnect = 0;
+			this.physicalClose = 0;
 		}
 		
-		conn = DriverManager.getConnection(Params.dbUrl, Params.dbUser, Params.dbPwd);   
+		PoolStat(int initPool, int maxActive, int minIdle, int poolCount, int activeCount, long logicConnect, long logicClose, long physicalConnect, long physicalClose){
+			this.initPool = initPool;
+			this.maxActive = maxActive;
+			this.minIdle = minIdle;
+			this.poolCount = poolCount;
+			this.activeCount = activeCount;
+			this.logicConnect = logicConnect;
+			this.logicClose = logicClose;
+			this.physicalConnect = physicalConnect;
+			this.physicalClose = physicalClose;
+		}
+	}
+	
+	public static PoolStat getPoolStat(){
+		if(dbPool != null){
+			return new PoolStat(dbPool.getInitialSize(),
+								dbPool.getMaxActive(),
+								dbPool.getMinIdle(),
+								dbPool.getPoolingCount(),
+								dbPool.getActiveCount(),
+								dbPool.getConnectCount(),
+								dbPool.getCloseCount(),
+								dbPool.getCreateCount(),
+								dbPool.getDestroyCount());
+		}else{
+			return new PoolStat();
+		}
 	}
 	
 	public void connect() throws SQLException{
@@ -66,7 +134,6 @@ public class DBCon {
 			}
 			if(conn != null){
 				conn.close();
-				conn = null;
 			}
 		}catch(SQLException e){
 			System.err.println(e.toString());
@@ -74,7 +141,7 @@ public class DBCon {
 	}
 	
 	public static void destroy() throws SQLException{
-//		DataSources.destroy(DB_POOL);
+		dbPool.close();
 	}
 
 }
