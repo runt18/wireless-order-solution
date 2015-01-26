@@ -194,7 +194,6 @@ window.onload=function(){
 			if(YBZ_win){
 				YBZ_win.close();
 			}
-			console.log('close')
 			$('#'+$(this).attr('data-for')).focus();
 			
 //			document.getElementById($(this).attr('data-for')).style.display="block";
@@ -800,7 +799,6 @@ function handleTableForTS(c){
 				if(c.event && $(c.event).attr('data-theme') != 'e'){
 					initTableData();
 				}
-				console.log('已点菜')
 				//去已点菜界面
 				location.href="#orderFoodListMgr";
 				uo.show({

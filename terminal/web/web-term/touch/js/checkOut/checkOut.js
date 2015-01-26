@@ -223,8 +223,6 @@ uo.back = function(){
  * 加载退菜原因
  */
 uo.loadCancelReasonData = function(data){
-//	console.log('cdata')
-//	console.log(data)
 	uo.selectingCancelReason = null;
 	var html = '';
 	for (var i = 0; i < data.length; i++) {
