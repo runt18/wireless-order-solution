@@ -1,0 +1,18 @@
+/*µÇÂ½ÈËÐÅÏ¢*/
+.loginName{
+	width: 110px;
+	height: 60px;
+	float: left;
+}
+
+.loginName span[class=staff-roleName]{
+	font-size: 14px;
+}
+
+.loginName span[class=ui-btn-inner]{
+	padding: .5em 10px;
+}
+
+.ln-selected{
+	background-color: red !important;
+}

@@ -1,0 +1,368 @@
+/*
+替代原来1114行的按钮top 3px
+*/
+.ui-header .ui-btn-left,
+.ui-header .ui-btn-right,
+.ui-footer .ui-btn-left,
+.ui-footer .ui-btn-right,
+.ui-header-fixed.ui-fixed-hidden .ui-btn-left,
+.ui-header-fixed.ui-fixed-hidden .ui-btn-right { position: absolute;top:initial;}
+
+/*
+替换原2694行listview的padding行高
+*/
+.ui-li .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li {
+padding: 0 15px;
+display: block;
+}
+
+/*
+2835行滑块开关大小
+*/
+div.ui-slider-switch {
+	display: inline-block;
+	height: 32px;
+	width: 7em;
+	margin: .5em 0;
+	top: 0;
+}
+
+/*
+2985行隐藏table Columns选择
+*/
+.ui-table-columntoggle-btn{
+	float: right;
+	margin-bottom: .8em;
+	display: none;
+}
+
+/*
+2294行, z-index修改popup层高于数字键盘控件
+*/
+.ui-popup-screen {
+	background-image: url(data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==);
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 1px;
+	position: absolute;
+	filter: Alpha(Opacity=0);
+	opacity: 0;
+	z-index: 1198;
+}
+.ui-popup-container {
+	z-index: 1199;
+	display: inline-block;
+	position: absolute;
+	padding: 0;
+	outline: 0;
+}
+
+
+
+/*
+易笔字black.css 47行隐藏关闭
+*/
+.d-close {
+	top: 4px;
+	right: 4px;
+	_z-index: 1;
+	width: 20px;
+	height: 20px;
+	_font-size: 0;
+	_line-height: 0;
+	text-indent: -9999em;
+	background-position: 0 -112px;
+	display: none !important;
+}
+
+/*隐藏易笔字关闭按钮  
+.d-state-highlight:last-child{
+	display: none;
+}
+*/
+
+html { overflow-y: hidden;}
+
+.bottomBarFullWidth > .ui-controlgroup-controls{
+	width: 100%;
+}
+
+/*把底部的按钮文字放大*/
+.bottomBtnFont{
+	margin-left: 2px !important;
+	min-width: 80px;
+	line-height: 36px;
+}
+.bottomBtnFont > span{
+	font-size: 20px !important;
+}
+
+/*头部*/
+.tableBasicMsg, .tableStatus{
+	width: 100px;
+	height: 62px;
+}
+
+.tableBasicMsg > span{
+	font-size: 18px !important;
+	padding: 0.6em 0px;
+}
+
+.tableStatus > span{
+	font-size: 18px !important;
+	padding: 1em 0px;
+}
+
+/*弹出框按钮*/
+.countPopbottomBtn{
+	margin-left: 1px !important;
+	width: 49%;
+}
+.countPopbottomBtn > span{
+	font-size: 20px !important;
+}
+
+/*开台&点菜按钮*/
+.tablePopbottomBtn{
+	margin-left: 1px !important;
+	width: 32.5%;
+}
+.tablePopbottomBtn > span{
+	font-size: 20px !important;
+}
+
+
+/*口味*/
+.tasteCmp{
+	width: 80px;
+	height: 60px;
+}
+
+/*
+餐台
+*/
+.tableCmp{
+	width: 100px;
+	height: 60px;
+}
+
+.moreTasteCmp{
+	width: 80px;
+	line-height: 60px;	
+}
+
+.moreTasteCmp > span{
+	font-size: 18px !important;
+	padding: initial;
+	text-align: left;
+}
+
+.tasteCmp > span, .tableCmp > span{
+	font-size: 18px !important;
+	padding-left: initial;
+	padding-right: initial;	
+}
+
+/*口味组选择*/
+.tastePopTopBtn{
+	margin-left: 2px !important;
+	width : 110px;
+}
+.tastePopTopBtn > span{
+	font-size: 20px !important;
+}
+
+/*口味组分页按钮*/
+.tasteGroupPage{
+	height: 48px !important;
+}
+.tasteGroupPage > span{
+	padding: 15px 25px !important;
+}
+
+/*口味分页按钮*/
+.tastePopBottomBtn{
+	margin-left: 2px !important;
+	width : 100px;
+}
+.tastePopBottomBtn > span{
+	font-size: 20px !important;
+}
+
+
+/*部门和厨房*/
+.deptKitBtnFont{
+	width: 87px;
+	line-height: 60px;
+}
+.deptKitBtnFont > span{
+	font-size: 18px !important;
+	padding: initial;
+}
+
+/*厨房部门分页*/
+.deptKitBtnFontPage{
+	height: 61px !important;
+	width: 40px;
+}
+.deptKitBtnFontPage > span{
+	margin-top : 10px;
+	padding: 0.6em 0px;
+}
+
+/*菜品*/
+.food-style{
+	width: 90px;
+	height: 65px;
+}
+.food-style > span{
+	font-size: 18px !important;
+	padding: initial;
+	text-align: left;
+}
+
+/*菜品操作*/
+.orderOperBtn {
+	width: 95px;
+	line-height: 49px;	
+}
+.orderOperBtn > span{
+	padding: initial;
+}
+
+/*菜品分页*/
+.foodsPaging{
+	height: 58px !important;
+	width: 80px !important;
+}
+.foodsPaging > span{
+	padding: 23px 30px !important;
+}
+
+.ui-controlgroup, fieldset.ui-controlgroup {
+	padding: 0;
+	margin: 0 0;
+	zoom: 1;
+}
+
+/*底部信息汇总栏, 用float形式悬浮在footer上*/
+.bottomGeneralBar{
+	width: 100%;
+	float:left;
+	line-height: 25px;
+	background-color: darkgray;
+	color: black;font-weight: bold;text-shadow:none;
+	top : -30px;
+}
+
+/*口味信息栏, 用float形式悬浮在footer上*/
+.bottomTastesBar{
+	width: 100%;
+	float:left;
+	line-height: 25px;
+	background-color: darkgray;
+	color: black;font-weight: bold;text-shadow:none;
+	top : -25px;
+	position: inherit;
+}
+
+
+/*订单管理table的行高*/
+.infoTableMgr{}
+.infoTableMgr td{
+	line-height: 40px;
+}
+
+/*订单详情*/
+.orderDetailGreneral{
+	border-top: 1px dashed gray;
+	border-bottom: 1px dashed gray;
+}
+
+.orderDetailGreneral td{
+	min-width: 270px;
+	line-height: 35px;
+	border-bottom: 1px solid gray;
+}
+
+.orderDetailGreneral th{
+	min-width: 20px;
+}
+
+/*赠送图标*/
+.ui-icon-forFree{
+	background-image: url(../../images/forFree.png);
+}
+
+/*回删单个字按钮*/
+.btnDeleteWord > span{
+	height: 25px !important;
+	width: 30px !important;
+}
+
+
+.closeSearchFood > span{
+	font-size: 20px !important;
+}
+
+.tempFoodKitchen{
+	line-height: 60px;
+}
+
+.tempFoodKitchen > a{
+	font-size: 20px !important;
+}
+
+/* .orderFoodCommonTasteClose{
+	line-height: 40px;
+} */
+
+.orderFoodCommonTasteClose > span{
+	font-size: 17px !important;
+}
+
+
+.countInputStyle{
+	font-size: 15px !important;
+	font-weight: bold;
+}
+
+.numberInputStyle{
+	font-size: 20px !important;
+	font-weight: bold;
+}
+
+.commonTasteFloat{
+	z-index: 2;
+	position: absolute; 
+	/* top: 130px;  */
+	bottom : 90px;
+	left: 35%; 
+	width: 65%;
+	display: none;
+	background-color: white;
+}
+
+/*区域按钮文字放大*/
+.regionBtn{
+	width: 110px;
+	margin: 3px 5px;
+}
+.regionBtn > span{
+	font-size: 20px !important;
+	padding-left: initial;
+	padding-right: initial;
+}
+
+/*普通提示*/
+.toptip{
+	min-width:150px;z-index: 1202;position: absolute; top: 10px;background-color: white;
+	box-shadow: 0 0 12px rgba(0,0,0,.6);
+	padding: 0 10px;
+	border-radius : 10px;
+	text-align: center;
+	font-weight: bold;
+}
+
+
