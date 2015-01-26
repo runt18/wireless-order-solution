@@ -113,7 +113,6 @@ Util.padding = function(c){
 			//
 			this.dom = getDom(this.renderTo);
 			this.clearContent();
-//			console.log(this.displayId )
 			this.showMsg();
 			//
 			var ch = this.dom.clientHeight, cw = this.dom.clientWidth;
@@ -251,8 +250,9 @@ Util.to.scroll = function(c){
 	if(!c){
 		c = {};
 	}
+	console.log(c)
 	var dom = document.getElementById(c.content);
-//	console.log('top, hei'+dom.scrollTop+',' + dom.scrollHeight)
+	console.log('top, hei'+dom.scrollTop+',' + dom.scrollHeight)
 	if(c.otype.toLowerCase() == 'up'){
 		if(dom.scrollTop < 50){
 			$(dom).animate({scrollTop: 0}, 'fast');
@@ -270,7 +270,7 @@ Util.to.scroll = function(c){
 	}
 };
 
-//新版分页
+//外卖分页
 Util.to.padding = function(c){
 	if(c == null || typeof c.renderTo == 'undefined' || typeof c.templet != 'function'){
 		return;
@@ -280,7 +280,7 @@ Util.to.padding = function(c){
 		templet : c.templet,
 		dom : null,
 		start : 0,
-		limit : c.limit,
+		limit : 30,
 		data : [],
 		length : 0,
 		pageData : [],
@@ -328,22 +328,15 @@ Util.to.padding = function(c){
 		init : function(ic){
 			ic = ic == null ? {data:[]} : ic;
 			
-//			console.log('renddiv')
-//			console.log(this.renderTo)
-			
 			this.dom = $('#'+this.renderTo);
 			this.clearContent();
-			this.showMsg();			
+			
 			//
 			var ch = this.dom[0].clientHeight, cw = this.dom[0].clientWidth;
 			
-//			console.log(this.dom)
 //			console.log('ch+cw:' +ch + ',' +cw)
-//			console.log('limit:'+this.limit)
+			this.limit = parseInt(ch / (65 + 20)) * parseInt(cw / (90 + 12));
 			
-			if(!this.limit){
-				this.limit = parseInt(ch / (65 + 20)) * parseInt(cw / (90 + 12));
-			}
 			//
 			this.data = ic.data == null || typeof ic.data == 'undefined' ? [] : ic.data;
 			this.length = this.data.length;
@@ -376,9 +369,6 @@ Util.to.padding = function(c){
 					}
 				}
 				temp = null;
-/*				console.log('html')
-				console.log(html)*/
-				
 				this.dom.html(html).trigger('create');
 				
 				if(c.around){
@@ -419,8 +409,8 @@ Util.to.padding = function(c){
 	return obj;
 };
 
-//新版消息弹框
-Util.msg = {
+//外卖消息弹框
+Util.to.msg = {
 	event : [],
 	interval : [],
 	fireEvent : function(btn, id){
@@ -457,26 +447,14 @@ Util.msg = {
 						    '<div data-type="time" style="text-align: center;color: red;"></div>'+
 						    '<div data-role="content" data-theme="d" class="ui-corner-bottom ui-content">'+
 						    	'<h2 class="ui-title">'+c.msg+'</h2>'+
-						        '<a onclick="Util.msg.save({event:\'yes\', id:\''+id+'\'})" data-role="button" ' +(hasBack ? 'data-inline="true"': "") +' data-theme="b" >'+ (typeof c.btnEnter != 'undefined'? c.btnEnter : "确定") +'</a>'+
-						        (hasBack ? '<a href="javascript:Util.msg.hide({event:\'back\', id:\''+id+'\', callback:' + c.returnCallback +'})" data-role="button" data-inline="true" >取消</a>' : '')+
+						        '<a onclick="Util.to.msg.save({event:\'yes\', id:\''+id+'\'})" data-role="button" ' +(hasBack ? 'data-inline="true"': "") +' data-theme="b" >'+ (typeof c.btnEnter != 'undefined'? c.btnEnter : "确定") +'</a>'+
+						        (hasBack ? '<a href="javascript:Util.to.msg.hide({event:\'back\', id:\''+id+'\', callback:' + c.returnCallback +'})" data-role="button" data-inline="true" >取消</a>' : '')+
 						    '</div>'+
 						'</div>	';
 		return {
 			id : id,
 			content : content
 		};
-	},
-	createTopTip : function(c){
-		var id = this.createId();
-		var content = '<div id="'+ id +'" class="ui-content-all toptip slidedown in" ><p>'+ c.msg +'</p></div>';
-		$('body').append(content);
-		$('#'+id).css('left', (document.body.clientWidth - $('#'+id).width()) / 2);
-		setTimeout(function(){
-			$('#'+id).addClass('reverse').addClass('out');
-			setTimeout(function(){
-				$('#'+id).remove();	
-			}, 200);	
-		}, 2000);		
 	},
 	createId : function(){
 		var id = null;
@@ -492,19 +470,15 @@ Util.msg = {
 	},
 	save : function(c){
 		//关闭消息框
-		$('#'+c.id).popup({
-			afterclose : function(){
-				//销毁dom
-				$('#'+c.id).remove();
-				$('#'+c.id).parent().remove();
-				
-				Util.msg.fireEvent(c.event, c.id);
-				Util.msg.clearEvent(c.id);
-				Util.msg.clearInterval(c.id);					
-			}
-		});
 		$('#'+c.id).popup('close');
-	
+		//销毁dom
+		$('#'+c.id).remove();
+		$('#'+c.id).parent().remove();
+		
+		this.fireEvent(c.event, c.id);
+		this.clearEvent(c.id);
+		this.clearInterval(c.id);
+		
 	},
 	hide : function(c){
 		//关闭消息框
@@ -519,64 +493,57 @@ Util.msg = {
 		}
 	},
 	alert : function(c){
+		var content = this.createContent({
+			title : c.title,
+			msg : c.msg,
+			buttons : c.buttons, //yes or yesback
+			btnEnter : c.btnEnter,
+			time : c.time,
+			returnCallback : c.returnCallback,
+			certainCallback : c.certainCallback
+		});
+		//把消息框加入指定page底部
+		$('#' + c.appendTo).append(content.content);
+		//动态创建组件
+		$('#' + content.id).trigger("create");
+		//声明为popup
+		$('#' + content.id).popup();
+		//添加弹出样式
+		$('#' + content.id).parent().addClass("pop").addClass("in");
+		//弹出组件
+		$('#' + content.id).popup('open');
 		
-		if(c.topTip){
-			this.createTopTip(c);
-		}else{
-			var content = this.createContent({
-				title : c.title,
-				msg : c.msg,
-				buttons : c.buttons, //yes or yesback
-				btnEnter : c.btnEnter,
-				time : c.time,
-				returnCallback : c.returnCallback,
-				certainCallback : c.certainCallback
+		if(typeof c.fn == 'function'){
+			this.event.push({
+				id : content.id,
+				fn : c.fn
 			});
-			//把消息框加入指定page底部
-			$('#' + c.renderTo).append(content.content);
-			//动态创建组件
-			$('#' + content.id).trigger("create");
-			//声明为popup
-			$('#' + content.id).popup();
-			//添加弹出样式
-			$('#' + content.id).parent().addClass("pop").addClass("in");
-			//弹出组件
-			$('#' + content.id).popup('open');
-			
-			if(typeof c.fn == 'function'){
-				this.event.push({
-					id : content.id,
-					fn : c.fn
-				});
-			}
-			
-			if(typeof c.certainCallback == 'function'){
-				this.event.push({
-					id : content.id,
-					fn : c.certainCallback
-				});
-			}		
-			
-			if(typeof c.time == 'number'){
-				var to = null, t = c.time;
-				to = setInterval(function(){
-					if(t == 0){
-						//销毁
-						Util.msg.save({id: content.id});
-						to = null;
-						return;
-					}
-					$('#'+content.id+' > div[data-type=time]').html(t + ' 秒后自动关闭.');
-					t--;
-				}, 1000);
-				this.interval.push({
-					id : content.id,
-					interval : to
-				});
-			}			
 		}
 		
-
+		if(typeof c.certainCallback == 'function'){
+			this.event.push({
+				id : content.id,
+				fn : c.certainCallback
+			});
+		}		
+		
+		if(typeof c.time == 'number'){
+			var to = null, t = c.time;
+			to = setInterval(function(){
+				if(t == 0){
+					//销毁
+					Util.to.msg.hide({id: content.id});
+					to = null;
+					return;
+				}
+				$('#'+content.id+' > div[data-type=time]').html(t + ' 秒后自动关闭.');
+				t--;
+			}, 1000);
+			this.interval.push({
+				id : content.id,
+				interval : to
+			});
+		}
 	}
 };
 
@@ -640,136 +607,134 @@ Util.dialongDisplay = function(c){
 	}
 };
 /**
- * 旧版消息弹框
+ * 
  */
-//Util.msg = {
-//	event : [],
-//	interval : [],
-//	fireEvent : function(btn, id){
-//		for(var i = 0; i < this.event.length; i++){
-//			if(this.event[i].id == id && typeof this.event[i].fn == 'function'){
-//				this.event[i].fn(btn);
-//				break;
-//			}
-//		}
-//	},
-//	clearEvent : function(id){
-//		for(var i = 0; i < this.event.length; i++){
-//			if(this.event[i].id == id){
-//				this.event.splice(i, 1);
-//				break;
-//			}
-//		}
-//	},
-//	clearInterval : function(id){
-//		for(var i = 0; i < this.interval.length; i++){
-//			if(this.interval[i].id == id){
-//				clearInterval(this.interval[i].interval);
-//				this.interval.splice(i, 1);
-//				break;
-//			}
-//		}
-//	},
-//	createContent : function(c){
-//		var id = this.createId();
-//		var content = '<div id="'+id+'" class="box-vertical msg-base">'
-//			+ '<div data-type="title">'+(typeof c.title != 'string' || $.trim(c.title).length == 0 ? '温馨提示' : c.title)+'</div>'
-//			+ '<div data-type="content">'+c.msg+'</div>'
-//			+ (typeof c.time == 'number' ? '<div data-type="time">&nbsp;</div>' : '')
-//			+ '<div data-type="button" class="box-horizontal">'
-//				+ '<div class="div-full"></div>'
-//				+ '<div class="button-base" style="width:150px;" onClick="Util.msg.save({event:\'yes\', id:\''+id+'\', callback:' + c.certainCallback +'})">'+ (typeof c.btnEnter != 'undefined'? c.btnEnter : "确定") +'</div>'
-//				+ (typeof c.buttons == 'string' && c.buttons.toUpperCase() == 'YESBACK' ? '<div class="button-base" style="width:150px; margin-left:20px;" onClick="Util.msg.hide({event:\'back\', id:\''+id+'\', callback:' + c.returnCallback +'})">返回</div>' : '')
-//				+ '<div class="div-full"></div>'
-//			+ '</div>'
-//			+ '</div>';
-//		return {
-//			id : id,
-//			content : content
-//		};
-//	},
-//	createId : function(){
-//		var id = null;
-//		var dom = null;
-//		while(true){
-//			id = 'divMsg-' + parseInt(Math.random() * 10000);
-//			dom = getDom(id);
-//			if(!dom)
-//				break;
-//		}
-//		dom = null;
-//		return id;
-//	},
-//	save : function(c){
-//		this.hide({
-//			event : 'yes',
-//			id : c.id
-//		});
-//		
-//		if(typeof c.callback == 'function'){
-//			c.callback();
-//		}
-//	},
-//	hide : function(c){
-//		Util.dialongDisplay({
-//			renderTo : c.id,
-//			type : 'hide',
-//			remove : true
-//		});
-//		this.fireEvent(c.event, c.id);
-//		this.clearEvent(c.id);
-//		this.clearInterval(c.id);
-//		
-//		if(typeof c.callback == 'function'){
-//			c.callback();
-//		}
-//	},
-//	alert : function(c){
-//		var content = this.createContent({
-//			title : c.title,
-//			msg : c.msg,
-//			fn : c.fn,
-//			buttons : c.buttons,
-//			btnEnter : c.btnEnter,
-//			time : c.time,
-//			returnCallback : c.returnCallback,
-//			certainCallback : c.certainCallback
-//		});
-//		document.body.insertAdjacentHTML('beforeEnd', content.content);
-//		Util.dialongDisplay({
-//			renderTo : content.id,
-//			type : 'show'
-//		});
-//		if(typeof c.fn == 'function'){
-//			this.event.push({
-//				id : content.id,
-//				fn : c.fn
-//			});
-//		}
-//		if(typeof c.time == 'number'){
-//			var to = null, t = c.time;
-//			to = setInterval(function(){
-//				if(t == 0){
-//					Util.msg.clearInterval(c.id);
-//					Util.msg.hide({
-//						event : 'yes', 
-//						id : content.id
-//					});
-//					to = null;
-//					return;
-//				}
-//				$('#'+content.id+' > div[data-type=time]').html(t + ' 秒后自动关闭.');
-//				t--;
-//			}, 1000);
-//			this.interval.push({
-//				id : content.id,
-//				interval : to
-//			});
-//		}
-//	}
-//};
-//
-
+Util.msg = {
+	event : [],
+	interval : [],
+	fireEvent : function(btn, id){
+		for(var i = 0; i < this.event.length; i++){
+			if(this.event[i].id == id && typeof this.event[i].fn == 'function'){
+				this.event[i].fn(btn);
+				break;
+			}
+		}
+	},
+	clearEvent : function(id){
+		for(var i = 0; i < this.event.length; i++){
+			if(this.event[i].id == id){
+				this.event.splice(i, 1);
+				break;
+			}
+		}
+	},
+	clearInterval : function(id){
+		for(var i = 0; i < this.interval.length; i++){
+			if(this.interval[i].id == id){
+				clearInterval(this.interval[i].interval);
+				this.interval.splice(i, 1);
+				break;
+			}
+		}
+	},
+	createContent : function(c){
+		var id = this.createId();
+		var content = '<div id="'+id+'" class="box-vertical msg-base">'
+			+ '<div data-type="title">'+(typeof c.title != 'string' || $.trim(c.title).length == 0 ? '温馨提示' : c.title)+'</div>'
+			+ '<div data-type="content">'+c.msg+'</div>'
+			+ (typeof c.time == 'number' ? '<div data-type="time">&nbsp;</div>' : '')
+			+ '<div data-type="button" class="box-horizontal">'
+				+ '<div class="div-full"></div>'
+				+ '<div class="button-base" style="width:150px;" onClick="Util.msg.save({event:\'yes\', id:\''+id+'\', callback:' + c.certainCallback +'})">'+ (typeof c.btnEnter != 'undefined'? c.btnEnter : "确定") +'</div>'
+				+ (typeof c.buttons == 'string' && c.buttons.toUpperCase() == 'YESBACK' ? '<div class="button-base" style="width:150px; margin-left:20px;" onClick="Util.msg.hide({event:\'back\', id:\''+id+'\', callback:' + c.returnCallback +'})">返回</div>' : '')
+				+ '<div class="div-full"></div>'
+			+ '</div>'
+			+ '</div>';
+		return {
+			id : id,
+			content : content
+		};
+	},
+	createId : function(){
+		var id = null;
+		var dom = null;
+		while(true){
+			id = 'divMsg-' + parseInt(Math.random() * 10000);
+			dom = getDom(id);
+			if(!dom)
+				break;
+		}
+		dom = null;
+		return id;
+	},
+	save : function(c){
+		this.hide({
+			event : 'yes',
+			id : c.id
+		});
+		
+		if(typeof c.callback == 'function'){
+			c.callback();
+		}
+	},
+	hide : function(c){
+		Util.dialongDisplay({
+			renderTo : c.id,
+			type : 'hide',
+			remove : true
+		});
+		this.fireEvent(c.event, c.id);
+		this.clearEvent(c.id);
+		this.clearInterval(c.id);
+		
+		if(typeof c.callback == 'function'){
+			c.callback();
+		}
+	},
+	alert : function(c){
+		var content = this.createContent({
+			title : c.title,
+			msg : c.msg,
+			fn : c.fn,
+			buttons : c.buttons,
+			btnEnter : c.btnEnter,
+			time : c.time,
+			returnCallback : c.returnCallback,
+			certainCallback : c.certainCallback
+		});
+		document.body.insertAdjacentHTML('beforeEnd', content.content);
+		Util.dialongDisplay({
+			renderTo : content.id,
+			type : 'show'
+		});
+		if(typeof c.fn == 'function'){
+			this.event.push({
+				id : content.id,
+				fn : c.fn
+			});
+		}
+		if(typeof c.time == 'number'){
+			var to = null, t = c.time;
+			to = setInterval(function(){
+				if(t == 0){
+					Util.msg.clearInterval(c.id);
+					Util.msg.hide({
+						event : 'yes', 
+						id : content.id
+					});
+					to = null;
+					return;
+				}
+				$('#'+content.id+' > div[data-type=time]').html(t + ' 秒后自动关闭.');
+				t--;
+			}, 1000);
+			this.interval.push({
+				id : content.id,
+				interval : to
+			});
+		}
+	}
+};
 /**
  * 
  */
@@ -814,7 +779,7 @@ Util.toggleToolbarDisplay = function(c){
 /**
  * 
  */
-/*Util.LM = (function(){
+Util.LM = (function(){
 	var $ = {
 		isDisplay : false,
 		id : 'lm-content-'+parseInt(Math.round(1-1000)),
@@ -859,9 +824,9 @@ Util.toggleToolbarDisplay = function(c){
 		}
 	};
 	return $;
-})();*/
+})();
 
-Util.LM = {
+/*Util.LM = {
 	show : function(c){
 		var msg = "请求发送中...";
 		if(c && c.msg){
@@ -873,13 +838,13 @@ Util.LM = {
 	hide : function(){
 		$.mobile.hidePageLoadingMsg();
 	}
-};
+};*/
 
 /**
  * cookies操作
  */
 function setcookie(name,value){  
-    var Days = 365 * 30; 
+    var Days = 365 * 30;  
     var exp  = new Date();  
     exp.setTime(exp.getTime() + Days*24*60*60*1000);  
     document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();  
@@ -899,24 +864,4 @@ function delcookie(name){
     exp.setTime(exp.getTime() - 1);  
     var cval=getCookie(name);  
     if(cval!=null) document.cookie= name + "="+cval+";expires="+exp.toGMTString();  
-}
-
-/**
- * 检查是否为小数
- * @param num
- * @returns {Boolean}
- */
-function checkDot(num){
-	var dot = num.indexOf(".");
-	if(dot != -1){
-	    var dotCnt = num.substring(dot+1,dot+2);
-	    var dotCnt2 = num.substring(dot+2);
-	    if(dotCnt >= 1 || dotCnt2 >= 1){
-	        return true;
-	    }else{
-	    	return false;
-	    }
-	}else{
-		return false;
-	}
 }

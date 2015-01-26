@@ -140,6 +140,7 @@ co.insertFood = function(c){
  * 选中菜品
  */
 co.selectNewFood = function(c){
+	console.log(c)
 	if(c == null || typeof c.foodId != 'number'){
 		return;
 	}

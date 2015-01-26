@@ -7,6 +7,7 @@ co.initNewFoodContent = function(c){
 		co.newFood.push(c.record);
 		c.data = c.record;
 	}
+	console.log(co.newFood)
 	var html = [], sumCount = 0, sumPrice = 0;
 	var temp = null, tempUnitPrice = 0;
 	for(var i = 0; i < co.newFood.length; i++){
@@ -69,6 +70,7 @@ co.initNewFoodContent = function(c){
  * @param c
  */
 co.initDeptContent = function(c){
+	console.log(deptData.root);
 	var dc = getDom('divSelectDeptForOrder');
 	var html = '';
 	
@@ -116,6 +118,8 @@ co.deptGetPreviousPage = function(){
  * @param c
  */
 co.initKitchenContent = function(c){
+	console.log(kitchenData.root);
+	
 	c = c == null || typeof c == 'undefined' ? {} : c;
 	//
 	var sl = $('div[data-type=dept-select]');

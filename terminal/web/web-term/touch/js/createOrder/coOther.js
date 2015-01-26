@@ -40,7 +40,7 @@ co.s = {
 						name : c.data.name,
 						unitPrice : c.data.unitPrice,
 						click : 'co.insertFood({foodId:'+c.data.id+', callback:co.s.callback})',
-						foodState : (c.data.status & 1 << 3) != 0 ? '赠' : (c.data.status & 1 << 2) != 0 ? '停' : '',
+						foodState : (c.data.status & 1 << 3) != 0 ? '赠' : ((c.data.status & 1 << 2) != 0 ? '停' : ''),
 						color : (c.data.status & 1 << 3) != 0 ? 'green' : 'FireBrick'
 					});
 				}
