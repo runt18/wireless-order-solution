@@ -233,7 +233,6 @@ function updateRegionHandler(c){
 						return;
 					}
 					var dataSource='';
-					alert(operateRegionWin.otype)
 					
 					if(operateRegionWin.otype == 'insert'){
 						dataSource = 'insert';
