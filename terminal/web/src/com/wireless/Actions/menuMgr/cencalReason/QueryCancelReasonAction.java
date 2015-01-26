@@ -30,7 +30,7 @@ public class QueryCancelReasonAction extends Action{
 			
 			list = CancelReasonDao.get(StaffDao.verify(Integer.parseInt(pin)));
 			list = (list != null ? list : new ArrayList<CancelReason>());
-			list.add(0, new CancelReason(1, "无原因", 0));
+//			list.add(0, new CancelReason(1, "无原因", 0));
 			
 		}catch(BusinessException e){
 			e.printStackTrace();

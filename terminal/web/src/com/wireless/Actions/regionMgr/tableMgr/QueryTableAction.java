@@ -33,12 +33,17 @@ public class QueryTableAction extends Action {
 		
 		try{
 			String pin = (String)request.getAttribute("pin");
+			String tableId = request.getParameter("tableID");
 			String alias = request.getParameter("alias");
 			String name = request.getParameter("name");
 			String regionId = request.getParameter("regionId");
 			
 			String orderClause = "";
 			TableDao.ExtraCond extraCond = new TableDao.ExtraCond();
+			
+			if(tableId != null && !tableId.trim().isEmpty()){
+				extraCond.setId(Integer.parseInt(tableId.trim()));
+			}			
 			if(alias != null && !alias.trim().isEmpty()){
 				extraCond.setAliasId(Integer.parseInt(alias.trim()));
 			}

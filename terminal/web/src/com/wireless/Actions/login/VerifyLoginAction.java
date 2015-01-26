@@ -1,8 +1,5 @@
 package com.wireless.Actions.login;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,7 +20,6 @@ public class VerifyLoginAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		JObject jobject = new JObject();
-		Map<Object, Object> other = new HashMap<Object, Object>();
 		try{        
 /*			Cookie[] cookies = request.getCookies();
 			if(cookies != null){
@@ -45,8 +41,6 @@ public class VerifyLoginAction extends Action {
 			if(pin != null){
 				final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 				
-				other.put("staff", staff);
-				other.put("sessionId", request.getSession().getId());
 				jobject.setExtra(new Jsonable(){
 
 					@Override

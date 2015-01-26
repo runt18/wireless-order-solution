@@ -10,9 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.orderMgr.OrderDao;
-import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
@@ -25,7 +23,6 @@ import com.wireless.parcel.Parcel;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.WebParams;
@@ -37,7 +34,6 @@ public class PrintOrderAction extends Action{
 		
 		JObject jobject = new JObject();
 		int tableID = 0;
-		DBCon dbCon = new DBCon();
 		try {
 			/**
 			 * The parameters looks like below.
@@ -99,8 +95,9 @@ public class PrintOrderAction extends Action{
 			}else{				
 				if(request.getParameter("tableID") != null){
 					tableID = Integer.parseInt(request.getParameter("tableID"));
-					dbCon.connect();
-					Table table = TableDao.getByAlias(dbCon, staff, tableID);
+					orderId = OrderDao.getByTableId(staff, tableID).getId();
+//					Table table = TableDao.getByAlias(dbCon, staff, tableID);
+					
 					orderId = OrderDao.getByTableAlias(dbCon, staff, table.getAliasId()).getId();
 				}
 			}
@@ -240,7 +237,6 @@ public class PrintOrderAction extends Action{
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 未知错误, 请联系客服人员.");
 		}finally{
-			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
