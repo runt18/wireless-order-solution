@@ -14,6 +14,7 @@ import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Privilege;
@@ -101,6 +102,9 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	//the price plan to this order food
 	private PricePlan mPricePlan;
+	
+	//the unit to this order food
+	private FoodUnit mFoodUnit;
 	
 	//the discount to this order food
 	private float mDiscount = 1;	 
@@ -547,6 +551,10 @@ public class OrderFood implements Parcelable, Jsonable {
 		this.mPricePlan = pricePlan;
 	}
 	
+	public void setFoodUnit(FoodUnit foodUnit){
+		this.mFoodUnit = foodUnit;
+	}
+	
 	/**
 	 * Set the discount to this order food.
 	 * @param discount the discount to set
@@ -596,7 +604,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	public float getFoodPrice(){
-		return mFood.getPrice(mPricePlan);
+		return mFood.getPrice(mPricePlan, mFoodUnit);
 	}
 	
 	public float getPrice(){
