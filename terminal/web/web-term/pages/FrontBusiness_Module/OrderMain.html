@@ -34,6 +34,7 @@
 	var Request = new URLParaQuery();
 	
 	var tableAliasID = Request['tableAliasID'];
+	var tableID = Request['tableID'];
 	var orderID = Request['orderID'];
 	var orderType = Request['orderType'];
 	var isRepaid = false, isFree = true, tableCategory = 1,  isGroup = false;
@@ -133,9 +134,10 @@
 			queryType: 'Today'
 		};
 	}else{
-		params = {'tableID' : tableAliasID};
+		params = {'tableID' : tableDate.id};
 	}
-//验证员工权限	
+	
+	//验证员工权限	
 	$.ajax({
 		url : "../../QueryStaff.do",
 		type : 'post',
