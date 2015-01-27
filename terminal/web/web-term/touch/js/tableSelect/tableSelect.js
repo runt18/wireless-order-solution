@@ -98,7 +98,7 @@ $(function(){
 					renderTo : 'tableSelectMgr',
 					time : 3,
 					fn : function(){
-						location.href = 'login.html';
+						location.href = 'index.html';
 					}
 				});
 				return;
@@ -111,7 +111,7 @@ $(function(){
 				renderTo : 'tableSelectMgr',
 				time : 3,
 				fn : function(){
-					location.href = 'login.html';
+					location.href = 'index.html';
 				}
 			});
 			return;
@@ -493,7 +493,9 @@ ts.openTableAction = function(){
 		return;
 	}
 	
-	orderDataModel.tableAlias = ts.table.alias;
+	Util.LM.show();
+	
+	orderDataModel.tableID = ts.table.id;
 	orderDataModel.customNum = customNum;
 	orderDataModel.orderFoods = [];
 	orderDataModel.categoryValue =  ts.table.categoryValue;
@@ -503,6 +505,7 @@ ts.openTableAction = function(){
 		type : 1,
 		notPrint : false
 	}, function(result){
+		Util.LM.hide();
 		if (result.success) {
 			ts.closeTableWithPeople();
 			initTableData();
@@ -510,6 +513,11 @@ ts.openTableAction = function(){
 				msg : '开台成功!',
 				topTip : true
 			});
+		}else{
+			Util.msg.alert({
+				msg : result.msg,
+				topTip : true
+			});			
 		}
 	});
 	
@@ -1053,7 +1061,7 @@ function loginOut(){
 	$.ajax({
 		url : '../LoginOut.do',
 		success : function(data, status, xhr){
-			location.href = "login.html";
+			location.href = "index.html";
 		}
 	});	
 	

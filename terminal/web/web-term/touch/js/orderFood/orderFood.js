@@ -1700,7 +1700,7 @@ of.submit = function(c){
 	
 	Util.LM.show();
 	
-	orderDataModel.tableAlias = of.table.alias;
+	orderDataModel.tableID = of.table.id;
 	orderDataModel.customNum = of.table.customNum;
 	orderDataModel.orderFoods = (typeof c.commitType != 'undefined'? of.newFood.slice(0) : foodData);
 	orderDataModel.categoryValue =  of.table.categoryValue;
@@ -1727,7 +1727,7 @@ of.submit = function(c){
 							data : {
 								calc:false,
 								serviceRate:0,
-								tableID:of.table.alias
+								tableID:of.table.id
 							},
 							dataType : 'text',
 							success : function(results, status, xhr){
@@ -1860,6 +1860,5 @@ function isNeedWriter(c){
 }
 
 function isNeedNumKeyboard(c){
-	
 	$('#isKeyboard4Taste').checkboxradio('refresh');
 }

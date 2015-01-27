@@ -476,7 +476,7 @@ Util.msg = {
 			setTimeout(function(){
 				$('#'+id).remove();	
 			}, 200);	
-		}, 2000);		
+		}, 2500);		
 	},
 	createId : function(){
 		var id = null;

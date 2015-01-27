@@ -740,7 +740,7 @@ uo.saveForUO = function(){
 uo.submitUpdateOrderHandler = function(c){
 	var orderFoods = c;
 	if(orderFoods.length > 0){
-		orderDataModel.tableAlias = uo.table.alias;
+		orderDataModel.tableID = uo.table.id;
 		orderDataModel.customNum = uo.customNum;
 		orderDataModel.orderFoods = orderFoods;
 		orderDataModel.categoryValue = uo.order.categoryValue;
