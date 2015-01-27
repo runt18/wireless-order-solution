@@ -315,7 +315,7 @@ function createOrderFoodGridPanelTbar(){
 							Ext.Ajax.request({
 								url : '../../PrintOrder.do',
 								params : {
-									'tableID' : tableAliasID,
+									'tableID' : tableDate.id,
 									'printType' : 14
 								},
 								success : function(response, options) {
@@ -347,7 +347,7 @@ function createOrderFoodGridPanelTbar(){
 										Ext.Ajax.request({
 											url : '../../PrintOrder.do',
 											params : {
-												'tableID' : tableAliasID,
+												'tableID' : tableDate.id,
 												'printType' : 2
 											},
 											success : function(response, options) {

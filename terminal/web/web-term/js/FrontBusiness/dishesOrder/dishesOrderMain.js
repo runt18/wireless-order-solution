@@ -476,7 +476,7 @@ function refreshHaveTasteHandler(){
 			var gt = tasteGroup.normalTasteContent[i];
 			if(gt != null && typeof gt != 'undefined'){
 				for(var j = 0; j < tasteMenuData.root.length; j++){
-					if(eval(tasteMenuData.root[j].taste.alias) == gt.taste.alias){
+					if(tasteMenuData.root[j].taste.alias == gt.alias){
 						hd.root.push(tasteMenuData.root[j]);
 						break;
 					}
@@ -946,7 +946,7 @@ var orderPanel = new Ext.Panel({
 			if(isGroup){
 				href = 'CheckOut.html?'+ 'orderID=' + orderID + '&category=' + tableCategory;
 			}else{
-				href = 'CheckOut.html?'+ 'tableID=' + tableAliasID+ '&personCount=1';
+				href = 'CheckOut.html?'+ 'tableID=' + tableDate.id+ '&personCount=1';
 			}
 			submitOrderHandler({
 				notPrint : true,
@@ -961,7 +961,7 @@ var orderPanel = new Ext.Panel({
 			if(isGroup){
 				href = 'CheckOut.html?'+ 'orderID=' + orderID + '&category=' + tableCategory;
 			}else{
-				href = 'CheckOut.html?'+ 'tableID=' + tableAliasID+ '&personCount=1';
+				href = 'CheckOut.html?'+ 'tableID=' + tableDate.id+ '&personCount=1';
 			}
 			submitOrderHandler({
 				href : href			

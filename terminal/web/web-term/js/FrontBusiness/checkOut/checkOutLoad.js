@@ -430,7 +430,7 @@ showCancelFoodDetail = function(){
 							limit : 200,
 							start : 0,
 							queryType : 'TodayByTbl',
-							tableAlias : tableID
+							tableID : tableID
 						},
 						success : function(response, options){
 							createCancelFoodDetail(Ext.decode(response.responseText));
@@ -780,7 +780,7 @@ function showInputReciptWin(){
 function getWeixinOrders(){
 	Ext.Ajax.request({
 		url : '../../QueryCommissionStatistics.do',
-		params: {dataSource : 'getWeixinUserByOrder', orderId : tableID},
+		params: {dataSource : 'getWeixinUserByOrder', tableID : tableID},
 		success : function(res){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){

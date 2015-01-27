@@ -279,6 +279,7 @@ function tableListReflash(node) {
 									setDynamicKey("OrderMain.html", 'restaurantID=' + restaurantID
 											+ "&ts=0"
 											+ "&tableAliasID=" + selectedTable
+											+ '&tableID=' + temp.id
 											+ "&category=" + CATE_NORMAL);
 //								}else{
 //									lm.hide();
@@ -292,7 +293,7 @@ function tableListReflash(node) {
 //						});
 
 					} else {
-						setDynamicKey("CheckOut.html", 'restaurantID=' + restaurantID+ "&tableID=" + selectedTable);
+						setDynamicKey("CheckOut.html", 'restaurantID=' + restaurantID+ "&tableID=" + temp.id);
 					}
 					break;
 				}

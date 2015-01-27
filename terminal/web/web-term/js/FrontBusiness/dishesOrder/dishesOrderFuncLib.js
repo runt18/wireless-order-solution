@@ -34,6 +34,7 @@ function orderGroupDisplayRefresh(_c){
 function orderSingleTasteOperationHandler(_c){
 	
 	var or = Ext.ux.getSelData(_c.grid);
+	//新选中的口味
 	var htgs = haveTasteGrid.getStore();
 	var tasteGroup = {
 		tastePref : '无口味',
@@ -42,23 +43,24 @@ function orderSingleTasteOperationHandler(_c){
 			name : ''
 		}
 	};			
-	// 
-	for(var i = 0; i < htgs.data.length; i++){
-		var v = htgs.data.get(i).data;
-		tasteGroup.normalTaste.name += ((i > 0 ? ';' : '') + v.taste.name);
-		tasteGroup.normalTasteContent.push(v.taste);
-	}
 	// 修改原数据
 	for(var i = 0; i < _c.grid.order.orderFoods.length; i++){
-		if(compareDataType(_c.grid.order.orderFoods[i], or)){
+		if(_c.grid.order.orderFoods[i].id == or['id']){
 			if(compareTasteGroup(_c.grid.order.orderFoods[i].tasteGroup, or['tasteGroup'])){
+				//生成新口味 
+				for(var w = 0; w < htgs.data.length; w++){
+					var v = htgs.data.get(w).data;
+					tasteGroup.normalTaste.name += ((w > 0 || tasteGroup.normalTaste.name ? ';' : '') + v.taste.name);
+					tasteGroup.normalTasteContent.push(v.taste);
+				}				
+				
 				tasteGroup.tastePref = tasteGroup.normalTaste.name.length > 0 ? tasteGroup.normalTaste.name : '无口味';
 				_c.grid.order.orderFoods[i].tasteGroup = tasteGroup;
 				break;
 			}
 		}
 	}
-	// 合并重复数据
+	// 合并菜品重复数据
 	var tempData = {root:[]};
 	for(var i = 0; i < _c.grid.order.orderFoods.length; i++){
 		
@@ -754,7 +756,7 @@ function refreshOrderHandler(c){
 	Ext.Ajax.request({
 		url : '../../QueryOrder.do',
 		params : {
-			'tableID' : tableAliasID
+			'tableID' : tableDate.id
 		},
 		success : function(response, options) {
 			var jr = Ext.util.JSON.decode(response.responseText);
@@ -989,7 +991,7 @@ function submitRepaidOrderHandler(_c){
 function submitSingleOrderHandler(_c){
 	var orderFoods = _c.grid.order.orderFoods;
 	
-	orderDataModel.tableAlias = tableAliasID;
+	orderDataModel.tableID = tableDate.id;
 	orderDataModel.customNum = 1;
 	orderDataModel.orderFoods = (typeof _c.commitType != 'undefined'? frontNewOrderFood : orderFoods);
 	orderDataModel.categoryValue = tableCategory;

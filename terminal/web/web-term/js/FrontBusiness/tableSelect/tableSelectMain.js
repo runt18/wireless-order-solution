@@ -11,9 +11,9 @@ var dishesOrderImgBut = new Ext.ux.ImageButton({
 				temp = tableStatusListTSDisplay[i];
 				if (temp.alias == selectedTable) {
 					if (temp.statusValue == TABLE_BUSY) {
-						setDynamicKey("OrderMain.html", 'tableAliasID=' + temp.alias);
+						setDynamicKey("OrderMain.html", 'tableAliasID=' + temp.alias + '&tableID=' + temp.id);
 					} else if (temp.statusValue == TABLE_IDLE) {
-						setDynamicKey("OrderMain.html", 'tableAliasID=' + selectedTable);
+						setDynamicKey("OrderMain.html", 'tableAliasID=' + selectedTable + '&tableID=' + temp.id);
 					}
 					break;
 				}
@@ -38,7 +38,7 @@ var checkOutImgBut = new Ext.ux.ImageButton({
 					if (temp.statusValue == TABLE_IDLE) {
 						Ext.example.msg('提示', '<font color="red">操作失败, 此桌没有下单, 不能结账, 请重新确认.</font>');
 					} else {
-						setDynamicKey("CheckOut.html", 'tableID=' + selectedTable);
+						setDynamicKey("CheckOut.html", 'tableID=' + temp.id);
 					}
 					break;
 				}
@@ -987,7 +987,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					    ['退菜原因', 'cancelReason.reason']
 					],
 					OrderFoodRecord.getKeys(),
-					[ ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.alias], ['restaurantID', restaurantID]],
+					[ ['queryType', 'TodayByTbl'], ['tableID', selTabContent.id], ['restaurantID', restaurantID]],
 					pageSize,
 					''
 				);
@@ -1003,7 +1003,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					if(store.getCount() > 0){
 						Ext.Ajax.request({
 							url : '../../QueryOrderByCalc.do',
-							params : {tableID : selectedTable, calc : false},
+							params : {tableID : selTabContent.id, calc : false},
 							success : function(res, opt){
 								var jr = Ext.decode(res.responseText);
 								
@@ -1080,7 +1080,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 			selTabContentWin.show();
 			selTabContentWin.center();
 			var tpStore = selTabContentGrid.getStore();
-			tpStore.baseParams.tableAlias = selTabContent.alias;
+			tpStore.baseParams.tableID = selTabContent.id;
 			tpStore.baseParams.queryType = 'TodayByTbl';
 			tpStore.baseParams.restaurantID = restaurantID;
 			tpStore.load({
@@ -1997,9 +1997,9 @@ Ext.onReady(function() {
 							temp = tableStatusListTSDisplay[i];
 							if (temp.alias == alias.getValue()) {
 								if (temp.statusValue == TABLE_BUSY) {
-									setDynamicKey("OrderMain.html", 'tableAliasID=' + alias.getValue());
+									setDynamicKey("OrderMain.html", 'tableAliasID=' + alias.getValue() + '&tableID=' + temp.id);
 								} else if (temp.statusValue == TABLE_IDLE) {
-									setDynamicKey("OrderMain.html", 'tableAliasID=' + alias.getValue());
+									setDynamicKey("OrderMain.html", 'tableAliasID=' + alias.getValue() + '&tableID=' + temp.id);
 //										alias.selectText();
 //										Ext.example.msg('提示', '该餐台已结账, 请重新输入.');
 								}
@@ -2031,7 +2031,7 @@ Ext.onReady(function() {
 							temp = tableStatusListTSDisplay[i];
 							if (temp.alias == alias.getValue()) {
 								if (temp.statusValue == TABLE_BUSY) {
-									setDynamicKey("CheckOut.html", 'tableID=' + alias.getValue());
+									setDynamicKey("CheckOut.html", 'tableID=' + temp.id);
 								} else if (temp.statusValue == TABLE_IDLE) {
 									alias.selectText();
 									Ext.example.msg('提示', '该餐台已结账, 请重新输入.');

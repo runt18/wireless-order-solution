@@ -441,6 +441,7 @@ function oOrderGroup(_c){
 									setDynamicKey("OrderMain.html", 'restaurantID=' + restaurantID
 										+ "&category=" + 4
 										+ "&tableAliasID=" + tables[0].alias
+										+ "&tableID=" + tables[0].id
 										+ "&orderID=" + jr.other.orderID
 										+ "&ts=" + 1);  // 团体操作暂定为都是改单操作
 								}else if(orderGroupWin.otype == 2){
