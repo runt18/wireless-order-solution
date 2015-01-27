@@ -50,6 +50,11 @@ public class DBCon {
 	        dbPool.setTestOnReturn(false);
 	        dbPool.setValidationQuery("SELECT 1");
 		}else{        
+			try{
+				Class.forName("com.mysql.jdbc.Driver");
+			}catch(ClassNotFoundException ignored){
+				ignored.printStackTrace();
+			}
 			dbPool = null;
 		}
 	}

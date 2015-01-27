@@ -166,4 +166,9 @@ public class TestToken {
 		Assert.assertEquals("token last modified", expected.getLastModified(), actual.getLastModified());
 		Assert.assertEquals("token status", expected.getStatus(), actual.getStatus());
 	}
+	
+	@Test
+	public void testCleanup() throws SQLException{
+		System.out.println(TokenDao.cleanup());
+	}
 }

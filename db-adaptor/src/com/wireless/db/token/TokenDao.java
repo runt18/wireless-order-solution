@@ -459,4 +459,19 @@ public class TokenDao {
 		return amount;
 	}
 	
+	public static int cleanup() throws SQLException{
+		DBCon dbCon = new DBCon();
+		int amount = 0;
+		try{
+			dbCon.connect();
+			//Delete the tokens still be dynamic code status.
+			amount += deleteByCond(dbCon, new ExtraCond().addStatus(Token.Status.DYN_CODE));
+			//Delete the token whose last modified exceed 30 days.
+			amount += dbCon.stmt.executeUpdate(" DELETE FROM " + Params.dbName + ".token WHERE DATE_SUB(NOW(), INTERVAL 30 DAY) > last_modified ");
+			return amount;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 }

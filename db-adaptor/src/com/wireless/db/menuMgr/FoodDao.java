@@ -23,6 +23,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodStatistics;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.oss.OssImage;
@@ -206,6 +207,11 @@ public class FoodDao {
 		}
 		dbCon.rs.close();
 		
+		//Insert the associated food units
+		for(FoodUnit foodUnit : f.getFoodUnits()){
+			FoodUnitDao.insert(dbCon, staff, new FoodUnit.InsertBuilder(foodId, foodUnit.getPrice(), foodUnit.getUnit()));
+		}
+		
 		for(Map.Entry<PricePlan, Float> entry : f.getPricePlan().entrySet()){
 			//Check to see whether or not the price plan exist. 
 			PricePlanDao.getById(dbCon, staff, entry.getKey().getId());
@@ -321,6 +327,9 @@ public class FoodDao {
 		//Delete the associated price plan.
 		sql = " DELETE FROM " + Params.dbName + ".food_price_plan WHERE food_id = " + foodId;
 		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the associated food unit
+		FoodUnitDao.deleteByCond(dbCon, staff, new FoodUnitDao.ExtraCond().addFood(foodId));
 		
 		//Delete the food info
 		sql = " DELETE FROM " + Params.dbName + ".food WHERE food_id = " + foodId;
@@ -466,6 +475,14 @@ public class FoodDao {
 						  " AND price_plan_id = " + entry.getKey().getId();
 					dbCon.stmt.executeUpdate(sql);
 				}
+			}
+		}
+		
+		//Update the food unit.
+		if(builder.isFoodUnitChanged()){
+			FoodUnitDao.deleteByCond(dbCon, staff, new FoodUnitDao.ExtraCond().addFood(f.getFoodId()));
+			for(FoodUnit unit : f.getFoodUnits()){
+				FoodUnitDao.insert(dbCon, staff, new FoodUnit.InsertBuilder(f.getFoodId(), unit.getPrice(), unit.getUnit()));
 			}
 		}
 		
@@ -1041,7 +1058,8 @@ public class FoodDao {
 		List<Food> pureFoods = getPureByCond(dbCon, staff, extraCond, orderClause);
 
 		StringBuilder foodCond = new StringBuilder();
-
+		FoodUnitDao.ExtraCond extraCond4Unit = new FoodUnitDao.ExtraCond();
+		
 		for(Food f : pureFoods){
 			foods.put(f.getFoodId(), f);
 			if(foodCond.length() == 0){
@@ -1053,6 +1071,8 @@ public class FoodDao {
 			//Generate the pinyin to each food
 			f.setPinyin(PinyinUtil.cn2Spell(f.getName()));
 			f.setPinyinShortcut(PinyinUtil.cn2FirstSpell(f.getName()));
+			
+			extraCond4Unit.addFood(f);
 		}
 		
 		if(foodCond.length() > 0){
@@ -1068,7 +1088,6 @@ public class FoodDao {
 				  " ORDER BY FTR.rank ";
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			
 			while(dbCon.rs.next()){
 				Food f = foods.get(dbCon.rs.getInt("food_id"));
 				if(f != null){
@@ -1077,8 +1096,15 @@ public class FoodDao {
 					f.addPopTaste(t);
 				}
 			}
-			
 			dbCon.rs.close();
+			
+			//Get the associated food units to each food.
+			for(final FoodUnit foodUnit : FoodUnitDao.getByCond(dbCon, staff, extraCond4Unit)){
+				Food f = foods.get(foodUnit.getFoodId());
+				if(f != null){
+					f.addFoodUnit(foodUnit);
+				}
+			}
 		}
 		
 		//Get the combo detail to each food if belongs to combo. 

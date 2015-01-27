@@ -15,6 +15,7 @@ import com.aliyun.openservices.oss.OSSClient;
 import com.aliyun.openservices.oss.OSSException;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.menuMgr.FoodUnitDao;
 import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.menuMgr.FoodDao.ExtraCond4Combo;
 import com.wireless.db.oss.OssImageDao;
@@ -116,7 +117,8 @@ public class TestFoodDao {
 													   .setImage(ossImageId)
 													   .addPrice(planId, 4)
 													   .setAliasId(200).setDesc("测试描述")
-													   .setHot(true).setCommission(2.0f).setGift(true).setWeigh(false);
+													   .setHot(true).setCommission(2.0f).setGift(true).setWeigh(false)
+													   .addUnit(2.5f, "半只");
 			foodId = FoodDao.insert(mStaff, insertBuilder); 
 			
 			Food expected = insertBuilder.build();
@@ -147,7 +149,8 @@ public class TestFoodDao {
 													   .setPrice(34.2f).setDesc("测试修改描述")
 													   .addPrice(planId, 5)
 													   .setHot(false).setCommission(3).setSellOut(true).setRecommend(true)
-													   .setGift(false).setWeigh(true);
+													   .setGift(false).setWeigh(true)
+													   .addUnit(3f, "份");
 			FoodDao.update(mStaff, updateBuilder);
 			
 			expected = updateBuilder.build();
@@ -210,6 +213,9 @@ public class TestFoodDao {
 					}catch(OSSException ignored){
 					}
 				}
+				if(original.hasFoodUnit()){
+					Assert.assertTrue("failed to delete the associated food unit", FoodUnitDao.getByCond(mStaff, new FoodUnitDao.ExtraCond().addFood(original)).isEmpty());
+				}
 			}
 			if(planId != 0){
 				PricePlanDao.deleteById(mStaff, planId);
@@ -240,6 +246,13 @@ public class TestFoodDao {
 		Assert.assertEquals("hot : " + tag, expected.isHot(), actual.isHot());
 		Assert.assertEquals("gift : " + tag, expected.isGift(), actual.isGift());
 		Assert.assertEquals("commission : " + tag, expected.getCommission(), actual.getCommission(), 0.01);
+		//------- the content to associated food units --------
+		for(int i = 0; i < expected.getFoodUnits().size(); i++){
+			//Assert.assertEquals("food unit id", expected.getFoodUnits().get(0).getId(), actual.getFoodUnits().get(0).getId());
+			Assert.assertEquals("associated food id to unit", foodId, actual.getFoodUnits().get(0).getFoodId());
+			Assert.assertEquals("food unit price", expected.getFoodUnits().get(0).getPrice(), actual.getFoodUnits().get(0).getPrice(), 0.01);
+			Assert.assertEquals("food unit", expected.getFoodUnits().get(0).getUnit(), actual.getFoodUnits().get(0).getUnit());
+		}
 		//------- the content to associated image --------
 		Assert.assertEquals("oss image type to food : " + tag, OssImage.Type.FOOD_IMAGE, actual.getImage().getType());
 		Assert.assertEquals("oss image associated id to food : " + tag, actual.getFoodId(), actual.getImage().getAssociatedId());
