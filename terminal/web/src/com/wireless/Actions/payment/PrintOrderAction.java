@@ -96,9 +96,6 @@ public class PrintOrderAction extends Action{
 				if(request.getParameter("tableID") != null){
 					tableID = Integer.parseInt(request.getParameter("tableID"));
 					orderId = OrderDao.getByTableId(staff, tableID).getId();
-//					Table table = TableDao.getByAlias(dbCon, staff, tableID);
-					
-					orderId = OrderDao.getByTableAlias(dbCon, staff, table.getAliasId()).getId();
 				}
 			}
 

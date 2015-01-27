@@ -42,8 +42,6 @@ public class TransFoodAction extends Action{
 			
 			Order.TransferBuilder builder = new Order.TransferBuilder(Integer.parseInt(orderId), new Table.AliasBuilder(Integer.parseInt(aliasId)));
 			
-//			Order.TransferBuilder builder = new Order.TransferBuilder(Integer.parseInt(orderId), new Table.Builder(Integer.parseInt(tableId)));
-			
 			Order actualOrder = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY);
 			
 			if(transFoods != null && transFoods.equals("-1")){

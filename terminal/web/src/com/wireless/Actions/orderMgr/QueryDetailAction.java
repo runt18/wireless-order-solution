@@ -16,7 +16,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
@@ -37,18 +36,14 @@ public class QueryDetailAction extends Action {
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String orderID = request.getParameter("orderID");
-			String restaurantID = (String)request.getAttribute("restaurantID");
-			String talias = request.getParameter("tableAlias");
+			String tableID = request.getParameter("tableID");
 			String queryType = request.getParameter("queryType");
 			
 			
 			if (queryType.equals("Today")) {
 				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.TODAY).setOrder(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
 			}else if (queryType.equals("TodayByTbl")) {
-				Table t = new Table();
-				t.setRestaurantId(Integer.valueOf(restaurantID));
-				t.setTableAlias(Integer.valueOf(talias));
-				list = OrderFoodDao.getSingleDetailByTable(staff, t);
+				list = OrderFoodDao.getSingleDetailByTableId(staff, Integer.parseInt(tableID));
 			}else {
 				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.HISTORY).setOrder(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
 			}

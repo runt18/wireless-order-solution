@@ -211,7 +211,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 	
 	public ActionForward getWeixinUserByOrder(ActionMapping mapping, ActionForm form, 
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String tid = request.getParameter("orderId");
+		String tid = request.getParameter("tableID");
 		String pin = (String) request.getAttribute("pin");
 		DBCon dbCon = null;
 		JObject jobject = new JObject();
@@ -222,7 +222,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 			int orderId = 0;
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			if(tid != null && !tid.trim().isEmpty()){
-				Table table = TableDao.getByAlias(staff, Integer.parseInt(tid));
+				Table table = TableDao.getById(staff, Integer.parseInt(tid));
 				if(table.isBusy()){
 					orderId = table.getOrderId();
 				}else{

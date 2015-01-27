@@ -39,7 +39,7 @@ public class QueryOrderByCalcAction extends Action{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
 			if(tid != null && !tid.trim().isEmpty()){
-				Table table = TableDao.getByAlias(staff, Integer.parseInt(tid));
+				Table table = TableDao.getById(staff, Integer.parseInt(tid));
 				if(table.isBusy()){
 					payBuilder = Order.PayBuilder.build4Normal(table.getOrderId()).setCustomNum(table.getCustomNum());
 				}else{
