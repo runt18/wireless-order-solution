@@ -4,7 +4,7 @@ var lg = {
 	staffPaging : {}
 };
 
-var allStaff = '<a data-role="button" data-inline="true" class="loginName" onclick="selectedName(this)" data-value="{staffId}" data-theme="c">{staffName}</a>';
+var allStaff = '<a data-role="button" data-inline="true" class="loginName" onclick="selectedName(this)" data-value="{staffId}" data-theme="c"><div>{staffName}</div></a>';
 
 $(function(){
 	$(".numkeyboard").ioskeyboard({
@@ -18,13 +18,15 @@ $(function(){
 	});
 	
 	
-	
+	Util.LM.show();
 	if (getcookie("digie_restaurant") != ""){
 		var restaurant = JSON.parse(getcookie("digie_restaurant"));
 		lg.restaurant = restaurant;
+		$('#txtRestaurantName').text(lg.restaurant.name);
 		$.ajax({
 			url : '../VerifyLogin.do',
 			success : function(data, status, xhr){
+				Util.LM.hide();
 				if(data.success){
 					location.href = 'tableSelect.html';	
 				}else{	
@@ -32,10 +34,13 @@ $(function(){
 				}
 			},
 			error : function(request, status, error){
+				Util.Lm.hide();
 				initStaffContent();
 			}
 		});
 	}else{
+		Util.LM.hide();
+		$('#popupLogin').show();
 		$('#txtRestaurantAccount').focus();
 	}	
 	
@@ -56,7 +61,10 @@ function staffLoginHandler(){
 	if(!pwd.val()){
 		Util.msg.alert({
 			msg : '请输入密码.',
-			renderTo : 'staffLoginPage'
+			renderTo : 'staffLoginPage',
+			fn : function(){
+				pwd.focus();
+			}
 		});
 		return;
 	}
@@ -160,27 +168,29 @@ function initStaffContent(c){
 			Util.LM.hide();
 			if(data.success){
 				lg.staffs = data.root;
+				
+//				data.root = data.root.splice(17);
 	            $.mobile.changePage("#staffLoginPage",
-	                    { transition: "slide" });
+	                    { transition: "fade" });
 	            
-				if(data.root.length > 8){
-					$('#divAllStaffForUserLogin').height(170);
-					$('#divNextStaff').css('visibility', 'visible');
-					$('#divLastStaff').css('visibility', 'visible');
+				if(data.root.length > 20){
+					$('#staffPaddingBar').show();
 				}
+				$('#divAllStaffForUserLogin').height(75 * Math.ceil(data.root.length/5));
+				$('#selectStaffCmp').height($('#selectStaffCmp-popup').height());
 				
 				lg.staffPaging = Util.to.padding({
 					renderTo : "divAllStaffForUserLogin",
 					data : data.root,
-					limit : 16, 
+					limit : 20, 
 					templet : function(c){
 						return allStaff.format({
 							staffId : c.data.staffID,
-							staffName : c.data.staffName + '<br><span class="staff-roleName">(' + c.data.roleName + ')</span>',
+							staffName : c.data.staffName ,
 						});
 					}
 				});
-				lg.staffPaging.getFirstPage({around : true});		
+				lg.staffPaging.getFirstPage();		
 				
 				$('.loginName').click(function(){
 					$('.loginName').attr('data-theme', 'c');
@@ -205,36 +215,37 @@ function initStaffContent(c){
 	});
 }
 
-function getPreviousPage(){
-	lg.staffPaging.getPreviousPage({around : true});
-    //绑定点击事件
-	$('.loginName').click(function(){
-		$('.loginName').attr('data-theme', 'c');
-		$(this).attr('data-theme', 'b');
-		$('.loginName').buttonMarkup( "refresh" );
-	});	 	
-}
-
-function getNextPage(){
-	lg.staffPaging.getNextPage({around : true});
-    //绑定点击事件
-	$('.loginName').click(function(){
-		$('.loginName').attr('data-theme', 'c');
-		$(this).attr('data-theme', 'b');
-		$('.loginName').buttonMarkup( "refresh" );
-	});	 	
-}
-
+/**
+ * 选择员工
+ * @param thiz
+ */
 function selectedName(thiz){
 	var btn = $(thiz);
 	for (var i = 0; i < lg.staffs.length; i++) {
 		if(parseInt(btn.attr('data-value')) == lg.staffs[i].staffID){
 			lg.staff = lg.staffs[i];
 		}
-	}	
+	}
+	setTimeout(function(){
+		$('#loginPassword').val('');
+		$('#loginPassword').focus();		
+	}, 200);
+	$('#selectStaffCmp').popup('close');
+	$('#lab4StaffName').text(btn.text());
 	
-	$('#loginEmployee').val(btn.text());
-	$('#loginPassword').val('');
-	$('#loginPassword').focus();
+
+}
+
+/**
+ * 打开员工选择
+ */
+function openStaffSelectCmp(){
+	lg.staffPaging.init({
+		data : lg.staffs
+	});
+	lg.staffPaging.getFirstPage();
+	$('#selectStaffCmp').parent().addClass("pop").addClass("in");
+	$('#selectStaffCmp').popup('open');
+	
 }
 	
