@@ -51,7 +51,6 @@ public class QueryOrderAction extends Action {
 				}
 			}else{
 				if(tid != null && !tid.trim().isEmpty()){
-//					order = OrderDao.getByTableAlias(staff, Integer.parseInt(tid));
 					order = OrderDao.getByTableId(staff, Integer.parseInt(tid));
 				} else if (oid != null && !oid.trim().isEmpty()){
 					order = OrderDao.getById(staff, Integer.valueOf(oid), DateType.TODAY);
