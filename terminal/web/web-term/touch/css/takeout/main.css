@@ -76,11 +76,13 @@ div.ui-slider-switch {
 	display: none !important;
 }
 
-/*Òþ²ØÒ×±Ê×Ö¹Ø±Õ°´Å¥  
+/*
+Òþ²ØÒ×±Ê×Ö¹Ø±Õ°´Å¥  
+*/
 .d-state-highlight:last-child{
 	display: none;
 }
-*/
+
 
 html { overflow-y: hidden;}
 
@@ -213,13 +215,17 @@ html { overflow-y: hidden;}
 
 /*²ËÆ·*/
 .food-style{
-	width: 90px;
-	height: 65px;
+	width: 100px;
+	height: 70px;
+	margin-right: 0px !important;
+	margin-left: 7px !important;
 }
+
 .food-style > span{
 	font-size: 18px !important;
 	padding: initial;
 	text-align: left;
+	white-space: initial;
 }
 
 /*²ËÆ·²Ù×÷*/

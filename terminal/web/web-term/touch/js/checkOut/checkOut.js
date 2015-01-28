@@ -216,7 +216,7 @@ uo.show = function(c){
  * 返回
  */
 uo.back = function(){
-	location.href = '/web-term/touch/tableSelect.html';
+	ts.loadData();
 }
 
 /**
@@ -265,7 +265,8 @@ uo.openCancelFoodCmp = function(c){
 	
 	$('#numberKeyboard').show();
 	
-	$('#inputCancelFoodSet').focus();
+	firstTimeInput = true;
+	$('#inputCancelFoodSet').select();
 }
 
 /**
@@ -659,7 +660,7 @@ uo.openMoreOperate = function(){
 				$('#orderCustomerCountSet').popup('open');
 				firstTimeInput = true;
 				focusInput = 'inputOrderCustomerCountSet';
-				$('#inputOrderCustomerCountSet').focus();
+				$('#inputOrderCustomerCountSet').select();
 			}else if(uo.tempPayForPrintAllAction){
 				Util.LM.show();
 				$.post('../PrintOrder.do', {'tableID' : uo.order.table.id, 'printType' : 14}, function(result){
@@ -875,7 +876,6 @@ uo.cancelForUO = function(){
 	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
 		uoCancelFoods = [];
 		uoFood = [];
-//		Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
 		uo.back();
 	}else{
 		Util.msg.alert({
@@ -886,7 +886,6 @@ uo.cancelForUO = function(){
 				if(btn == 'yes'){
 					uoCancelFoods = [];
 					uoFood = [];
-//					Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
 					uo.back();
 				}
 			}

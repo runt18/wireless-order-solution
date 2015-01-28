@@ -298,7 +298,6 @@ co.s.findByAlias = function(c){
 	alias.value = "";
 	data = null;
 	temp = null;
-	
 };
 co.fa = {};
 co.fa.back = function(){

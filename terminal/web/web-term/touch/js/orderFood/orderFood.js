@@ -49,7 +49,7 @@ of.s = {
 				templet : function(c){
 					return foodCmpTemplet.format({
 						id : c.data.id,
-						name : c.data.name,
+						name : c.data.name.substring(0, 10),
 						unitPrice : c.data.unitPrice,
 						click : 'of.insertFood({foodId:' + c.data.id + ', callback:of.s.callback})',
 						sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
@@ -96,8 +96,8 @@ var tastesDate = [];
 var deptCmpTemplet = '<a href="javascript: of.initKitchenContent({deptId:{id}})" data-role="button" data-inline="true" class="deptKitBtnFont" data-type="deptCmp" data-value="{id}" >{name}</a>';
 var kitchenCmpTemplet = '<a data-role="button" data-inline="true" class="deptKitBtnFont" data-type="kitchenCmp" data-value={id} onclick="of.findFoodByKitchen({event:this, kitchenId:{id}})">{name}</a>';	
 var foodCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-value={id} onclick="{click}">' +
-						'<div>{name}<br>￥{unitPrice}<br>' +
-						'<font style="color:red;">{sellout}</font><font style="color:green;">{gift}</font>'+
+						'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
+							'<div style="position:absolute;right:0;bottom:0;font-size:20px;"><font color="FireBrick">{sellout}</font><font style="color:green;">{gift}</font></div>'+
 						'</div>'+
 					  '</a>'
 var orderFoodCmpTemplet = '	<li data-icon={isGift} data-index={dataIndex} data-theme="c" data-value={id} data-type="orderFoodCmp" onclick="of.selectNewFood({event:this, foodId:{id}})" ><a >'+
@@ -237,7 +237,7 @@ of.initKitchenContent = function(c){
 			templet : function(c){
 				return foodCmpTemplet.format({
 					id : c.data.id,
-					name : c.data.name,
+					name : c.data.name.substring(0, 10),
 					unitPrice : c.data.unitPrice,
 					click : 'of.insertFood({foodId:' + c.data.id + '})',
 					sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
@@ -258,6 +258,9 @@ of.initKitchenContent = function(c){
 	}	
 };
 
+/**
+ * 但div还没设置完成高度时不断刷新
+ */
 function keepLoadFoodData(){
 	
 	if(!$('#foodsCmp').html()){
@@ -459,9 +462,6 @@ of.insertFood = function(c){
 	if(typeof c.callback == 'function'){
 		c.callback();
 	}
-	
-	//of.ot.initBarForCommomFloatTaste(c);
-
 };
 
 /**
@@ -541,12 +541,14 @@ of.initNewFoodContent = function(c){
 		var select = $('#orderFoodsCmp > li[data-value='+c.data.id+']');
 		if(select.length > 0){
 			select.attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
-//			getDom('divCFCONewFood').scrollTop = getDom('divCFCONewFood').scrollHeight / of.newFood.length * select.attr('data-index');
+			$('#divOrderFoodsCmp').animate({
+				scrollTop: document.getElementById('divOrderFoodsCmp').scrollHeight / of.newFood.length * select.attr('data-index')
+			}, 'fast');
 		}else{
-			getDom('divCFCONewFood').scrollTop = 0;
+			$('#divOrderFoodsCmp').animate({scrollTop: 0}, 'fast');
 		}
 	}else{
-//		getDom('divCFCONewFood').scrollTop = 0;
+		$('#divOrderFoodsCmp').animate({scrollTop: 0}, 'fast');
 	}
 };
 
@@ -605,7 +607,7 @@ of.operateFoodCount = function(c){
 			
 			firstTimeInput = true;
 			$('#inputOrderFoodCountSet').val(data.count);
-			$('#inputOrderFoodCountSet').focus();
+			$('#inputOrderFoodCountSet').select();
 			
 			of.selectedOrderFood = data;
 			
@@ -814,8 +816,6 @@ function operateOrderFoodTaste(c){
 		closeFoodCommonTaste();
 		if(of.searchFooding){
 			YBZ_win.close();
-//			$('#searchFoodWriterOn')[0].selectedIndex = 0;
-//			$('#searchFoodWriterOn').slider('refresh');			
 		}
 /*		$.ajax({
 			url : '../QueryFoodTaste.do',
@@ -834,11 +834,21 @@ function operateOrderFoodTaste(c){
 			error : function(request, status, err){}
 		}); */
 		
+//		var commonTastesGroup = null;
+		
 		for (var i = 0; i < of.tasteGroups.length; i++) {
 			if(of.tasteGroups[i].id == -10){//表示常用
+				of.tasteGroups[i].name = '常用口味';
 				of.tasteGroups[i].items = of.commonTastes;
 			}
 		}
+		
+/*		if(!commonTastesGroup){
+			of.tasteGroups.unshift({
+				id : -10,
+				items : of.commonTastes				
+			});
+		}*/
 		
 		//赋值给口味数据组
 		tastesDate = of.commonTastes;
@@ -859,12 +869,22 @@ function operateOrderFoodTaste(c){
 			tg = null;
 		}	
 	}else{
-		if(of.ot.allBillTaste){
+		for (var i = 0; i < of.tasteGroups.length; i++) {
+			if(of.tasteGroups[i].id == -10){//表示常用
+				of.tasteGroups[i].name = '所有口味';
+				of.tasteGroups[i].items = of.allTastes;
+			}
+		}		
+/*		if(of.ot.allBillTaste){
 			foodTasteGroup = foodTasteGroup.concat(of.ot.allBillTaste);
 			tastesDate = foodTasteGroup;
 		}else{
 			tastesDate = of.allTastes;
+		}*/
+		if(of.ot.allBillTaste){
+			foodTasteGroup = foodTasteGroup.concat(of.ot.allBillTaste);
 		}
+		tastesDate = of.allTastes;
 	}
 	
 	//全单口味则只把全单类型的放入
@@ -1504,16 +1524,27 @@ of.tf.saveTempFood = function(){
 	var count = $('#tempFoodCount');
 	
 	if(!name.val()){
+		Util.msg.alert({
+			topTip : true,
+			msg : '请临时菜名称'
+		});		
+		name.focus();
 		return;
 	}
 	
 	if(!price.val()){
-		price.val(0)
+		Util.msg.alert({
+			topTip : true,
+			msg : '请填写价格'
+		});
+		price.focus();
+		return;	
 	}else if(isNaN(price.val()) || parseFloat(price.val()) < 0){
 		Util.msg.alert({
 			topTip : true,
 			msg : '请填写正确的价格'
 		});
+		price.focus();
 		return;		
 	}
 
@@ -1675,6 +1706,64 @@ function scrolldown(c){
 		$('#divOrderFoodsCmp').animate({scrollTop: dom.scrollTop + (typeof c.size == 'number' ? c.size : 50 * 3)}, 'fast');
 	}	
 }
+
+/**
+ * 打开助记码
+ */
+of.openAliasOrderFood = function(){
+	setTimeout(function(){
+		$('#txtFoodAlias').focus();
+	}, 300);
+	
+	$('#orderFoodByAliasCmp').popup('open');
+	$('#orderFoodByAliasCmp').parent().addClass("pop").addClass("in");	
+	
+
+}
+
+/**
+ * 关闭助记码
+ */
+of.closeAliasOrderFood = function(){
+	$('#orderFoodByAliasCmp').popup('close');
+	
+	$('#txtFoodAlias').val("");
+}
+
+/**
+ * 助记码点菜
+ */
+of.findByAliasAction = function(c){
+	var alias = $('#txtFoodAlias');
+	if(!alias.val()){
+		Util.msg.alert({
+			msg : '请填写助记码',
+			topTip : true
+		});
+		alias.focus();
+		return;
+	}
+	
+	var data = null, temp = null;
+	temp = of.foodList.slice(0);
+	for(var i = 0; i < temp.length; i++){
+		if(temp[i].alias == alias.val()){
+			data = temp[i];
+		}
+	}
+	if(data == null){
+		Util.msg.alert({
+			topTip : true,
+			msg : '此编码无对应菜品'
+		});
+		alias.focus();
+	}else{
+		of.insertFood({foodId : data.id});
+	}
+	alias.val("");
+	data = null;
+	temp = null;
+};
 
 /**
  * 账单提交

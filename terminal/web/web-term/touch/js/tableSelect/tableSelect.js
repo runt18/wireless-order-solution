@@ -68,7 +68,7 @@ $(function(){
 				/**
 				 * 定时器，定时刷新餐桌选择页面数据
 				 */
-				window.setInterval("initTableData()", 240000);
+				window.setInterval("initTableData()", 240 * 1000);
 				//加载基础数据
 				initTableData();
 				initFoodData();	
@@ -98,7 +98,7 @@ $(function(){
 					renderTo : 'tableSelectMgr',
 					time : 3,
 					fn : function(){
-						location.href = 'index.html';
+						location.href = 'index.htm';
 					}
 				});
 				return;
@@ -111,7 +111,7 @@ $(function(){
 				renderTo : 'tableSelectMgr',
 				time : 3,
 				fn : function(){
-					location.href = 'index.html';
+					location.href = 'index.htm';
 				}
 			});
 			return;
@@ -382,6 +382,8 @@ ts.transTable = function(c){
 				msg : data.msg, 
 				topTip : true
 			});
+			//返回主界面
+			ts.loadData();
 		}else{
 			Util.msg.alert({
 				title : '提示',
@@ -562,7 +564,6 @@ ts.createTableWithPeople = function(){
 	}
 	
 	ts.renderToCreateOrder(ts.table.alias, customNum);
-	$('#inputTableCustomerCountSet').val(1);
 }
 
 /**
@@ -623,7 +624,10 @@ ts.createOrderForShowMessageTS = function(){
 //进入点菜界面
 ts.renderToCreateOrder = function(tableNo, peopleNo){
 	if(tableNo > 0){
+		//关闭台操作popup
 		uo.closeTransOrderFood();
+		//设置餐台人数为默认
+		$('#inputTableCustomerCountSet').val(1);
 		
 		var theTable = getTableByAlias(tableNo);
 		//同时操作餐台时,选中状态没变化的餐桌处理
@@ -1055,13 +1059,22 @@ function toOrderFoodPage(table){
 	of.initNewFoodContent();
 }
 
+/**
+ * 通过其他界面返回餐台选择
+ */
+ts.loadData = function(){
+	location.href = '#tableSelectMgr';
+	initTableData();
+	of.loadFoodDateAction = window.setInterval("keepLoadTableData()", 500);	
+}
+
 
 function loginOut(){
 	Util.LM.show();
 	$.ajax({
 		url : '../LoginOut.do',
 		success : function(data, status, xhr){
-			location.href = "index.html";
+			location.href = "index.htm";
 		}
 	});	
 	
