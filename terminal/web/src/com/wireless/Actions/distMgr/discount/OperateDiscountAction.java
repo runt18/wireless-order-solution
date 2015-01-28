@@ -9,27 +9,38 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateDiscountAction extends DispatchAction{
 
 	public ActionForward setDiscount(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws BusinessException, Exception{
-		String orderId = request.getParameter("orderId");
-		String discountId = request.getParameter("discountId");
-		String memberId = request.getParameter("memberId");
+		final int orderId = Integer.parseInt(request.getParameter("orderId"));
+		final int discountId = Integer.parseInt(request.getParameter("discountId"));
+		final int memberId;
+		if(request.getParameter("memberId") != null && !request.getParameter("memberId").isEmpty()){
+			memberId = Integer.parseInt(request.getParameter("memberId"));
+		}else{
+			memberId = 0;
+		}
 		String pin = (String) request.getAttribute("pin");
+		
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		JObject jobject = new JObject();
 		try {
-			Order.DiscountBuilder builder = new Order.DiscountBuilder(Integer.parseInt(orderId), Integer.parseInt(discountId));
-			if(memberId != null && !memberId.isEmpty()){
-				builder.setMember(Integer.parseInt(memberId));
+			final Order.DiscountBuilder builder;
+			if(memberId != 0){
+				builder = new Order.DiscountBuilder(orderId, MemberDao.getById(staff, memberId));
+			}else{
+				builder = new Order.DiscountBuilder(orderId, discountId);
 			}
 			OrderDao.discount(StaffDao.verify(Integer.parseInt(pin)), builder);
 		}catch(BusinessException e){
