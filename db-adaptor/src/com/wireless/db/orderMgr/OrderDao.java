@@ -415,7 +415,7 @@ public class OrderDao {
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.settle_type, O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
 				  " O.discount_id, DIST.name AS discount_name, " +
-				  " O.price_plan_id, " +
+				  " O.price_plan_id, O.member_id, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.coupon_price, O.total_price, O.actual_price " +
 				  " FROM " + 
 				  Params.dbName + ".order O " +
@@ -493,6 +493,7 @@ public class OrderDao {
 				if(dbCon.rs.getInt("price_plan_id") != 0){
 					order.setPricePlan(new PricePlan(dbCon.rs.getInt("price_plan_id")));
 				}
+				order.setMemberId(dbCon.rs.getInt("member_id"));
 			}
 			
 			PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
@@ -742,10 +743,11 @@ public class OrderDao {
 		
 		//Update the order discount.
 		sql = " UPDATE " + Params.dbName + ".order SET id = " + order.getId() +
-			  (builder.getMemberId() == 0 ? ",discount_staff_id = " + staff.getId() : "") +
-			  (builder.getMemberId() == 0 ? ",discount_staff = '" + staff.getName() + "'" : "") +
-  			  (builder.getMemberId() == 0 ? ",discount_date = NOW() " : "") +
+			  " ,discount_staff_id = " + staff.getId() +
+			  " ,discount_staff = '" + staff.getName() + "'" +
+  			  " ,discount_date = NOW() " +
 			  " ,discount_id = " + order.getDiscount().getId() + 
+			  " ,member_id = " + builder.getMemberId() +
 			  " WHERE id = " + order.getId();
 		dbCon.stmt.executeUpdate(sql);
 		

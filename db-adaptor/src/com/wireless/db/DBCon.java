@@ -36,12 +36,12 @@ public class DBCon {
 	        dbPool.setMinIdle(1);
 	        //创建物理连接失败后不进行重试
 	        dbPool.setConnectionErrorRetryAttempts(0);
-	        //配置获取连接等待超时的时间, 获取失败后直接退出
-	        dbPool.setMaxWait(0);
+	        //配置获取连接等待超时的时间
+	        dbPool.setMaxWait(10 * 1000);
 	        //配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
-	        dbPool.setTimeBetweenEvictionRunsMillis(300 * 1000); // 30秒
+	        dbPool.setTimeBetweenEvictionRunsMillis(300 * 1000); // 300秒
 	        //配置一个连接在池中最小生存的时间，单位是毫秒
-	        dbPool.setMinEvictableIdleTimeMillis(600 * 1000); // 60秒
+	        dbPool.setMinEvictableIdleTimeMillis(600 * 1000); // 600秒
 	        //申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效
 	        dbPool.setTestWhileIdle(true);
 	        //申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能
