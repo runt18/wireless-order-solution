@@ -695,9 +695,9 @@ public class TableDao {
 		Table srcTbl = builder.getSrcTbl();
 		Table destTbl = builder.getDestTbl();
 		
-		srcTbl = TableDao.getByAlias(dbCon, staff, srcTbl.getAliasId());
+		srcTbl = TableDao.getById(dbCon, staff, srcTbl.getId());
 
-		destTbl = TableDao.getByAlias(dbCon, staff, destTbl.getAliasId());
+		destTbl = TableDao.getById(dbCon, staff, destTbl.getId());
 
 			
 		if(srcTbl.isIdle()) {
@@ -724,6 +724,10 @@ public class TableDao {
 						 " WHERE id = " + orderId;
 			dbCon.stmt.executeUpdate(sql);
 
+			//Delete the source table if belongs to temporary.
+			if(srcTbl.getCategory().isTemporary()){
+				deleteById(dbCon, staff, srcTbl.getId());
+			}
 
 			return orderId;
 		}
