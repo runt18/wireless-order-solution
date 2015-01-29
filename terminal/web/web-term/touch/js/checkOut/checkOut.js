@@ -1044,7 +1044,7 @@ uo.goToCreateOrder = function(){
 	//判断页面信息是否有改动
 	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
 		//FIXME 每点一次餐台都去更新菜品
-		initFoodData();
+//		initFoodData();
 		
 		of.show({
 			table : uo.table,
