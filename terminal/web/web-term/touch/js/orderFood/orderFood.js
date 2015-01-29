@@ -1409,13 +1409,15 @@ function searchFood(ope){
 }
 
 function closeSearchFood(){
+	of.searchFooding = false;	
+	
 	$('#searchFoodInput').val('');
 	
 	YBZ_win.close();
 	$('#normalOperateFoodCmp').show();
 	$('#searchFoodCmp').hide();
 	
-	of.searchFooding = false;	
+	
 }
 
 /**
@@ -1609,6 +1611,8 @@ function foodCommonTasteLoad(){
 	//在搜索时, 口味显示在上方
 	if(of.searchFooding){
 		$('#divFoodTasteFloat').css({top : '130px', bottom : 'initial'});
+	}else{
+		$('#divFoodTasteFloat').css({top : 'initial', bottom : '90px'});
 	}
 	
 	$('#divFoodTasteFloat').show();

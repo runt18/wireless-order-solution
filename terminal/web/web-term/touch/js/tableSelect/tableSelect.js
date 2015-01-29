@@ -61,7 +61,7 @@ $(function(){
 	$.ajax({
 		url : '../VerifyLogin.do',
 		success : function(data, status, xhr){
-			Util.LM.hide();	
+			
 			if(data.success){
 				//刷新时去除#
 				if(location.href.indexOf('#') > 0){
@@ -74,10 +74,12 @@ $(function(){
 				/**
 				 * 定时器，定时刷新餐桌选择页面数据
 				 */
-				window.setInterval("initTableData()", 240 * 1000);
+				window.setInterval("initTableData()", 20 * 60 * 1000);
 				//加载基础数据
+				Util.LM.show();
+				initFoodData();
 				initTableData();
-				initFoodData();	
+	
 				
 				//验证员工权限	
 				$.ajax({
@@ -99,6 +101,7 @@ $(function(){
 					}
 				}); 				
 			}else{	
+				Util.LM.hide();	
 				Util.msg.alert({
 					msg : '请先登录',
 					topTip : true
@@ -298,7 +301,9 @@ function initFoodData(){
 				items : of.allTastes		
 			});
 			
-		});			
+		});		
+		
+		Util.LM.hide();	
 		
 	});	
 }
@@ -382,17 +387,19 @@ ts.s = {
  * @param c  当前台号alias, 转去的台号oldAlias
  */
 ts.transTable = function(c){
-	var oldTableAlias;
+	var oldTable;
 	if(c && c.oldAlias){
-		oldTableAlias = c.oldAlias;
+		oldTable = getTableByAlias(c.oldAlias);
 	}else{
-		oldTableAlias = uo.table.alias;
+		oldTable = uo.table;
 	}
+	
+	var newTable = getTableByAlias(c.alias);
 	
 	$.post('../OperateTable.do', {
 		dataSource : 'transTable',
-		oldTableAlias : oldTableAlias,
-		newTableAlias : c.alias
+		oldTableId : oldTable.id,
+		newTableId : newTable.id
 	},function(data){
 		if(data.success){
 			uo.closeTransOrderFood();
