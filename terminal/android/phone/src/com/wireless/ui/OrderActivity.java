@@ -59,11 +59,7 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		//set the table No
 		final TextView txtViewTblName = ((TextView)findViewById(R.id.txtView_orderActivity_tableName));
 		final Table selectedTable = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
-		if(selectedTable.getName().length() != 0){
-			txtViewTblName.setText(selectedTable.getName());
-		}else{
-			txtViewTblName.setText(selectedTable.getAliasId() + "号台");
-		}
+		txtViewTblName.setText(selectedTable.getName());
 		
 		//set the default customer to 1
 		((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText("1");
@@ -144,12 +140,8 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 	@Override
 	public void onOrderChanged(Order oriOrder, List<OrderFood> newFoodList) {
 		if(oriOrder != null){
-			//set the table ID
-			if(oriOrder.getDestTbl().getName().length() != 0){
-				((TextView)findViewById(R.id.txtView_orderActivity_tableName)).setText(oriOrder.getDestTbl().getName());
-			}else{
-				((TextView)findViewById(R.id.txtView_orderActivity_tableName)).setText(Integer.toString(oriOrder.getDestTbl().getAliasId()) + "号台");
-			}
+			//set the table name
+			((TextView)findViewById(R.id.txtView_orderActivity_tableName)).setText(oriOrder.getDestTbl().getName());
 			//set the amount of customer
 			((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(oriOrder.getCustomNum()));	
 		}
@@ -163,7 +155,8 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 	@Override
 	public void postSuccess(Order order) {
 		mProgressDialog.dismiss();			
-		Toast.makeText(OrderActivity.this, order.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
+		final Table table = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
+		Toast.makeText(OrderActivity.this, table.getName() + "下单成功", Toast.LENGTH_SHORT).show();
 		finish();		
 	}
 

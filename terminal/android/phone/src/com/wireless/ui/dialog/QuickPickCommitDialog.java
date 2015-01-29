@@ -402,7 +402,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 				Intent intent = new Intent(getActivity(), MainActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				getActivity().startActivity(intent);
-				Toast.makeText(getActivity(), reqOrder.getDestTbl().getAliasId() + "号台下单成功。", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), mReqOrder.getDestTbl().getName() + "下单成功", Toast.LENGTH_SHORT).show();
 			}
 		}
 		

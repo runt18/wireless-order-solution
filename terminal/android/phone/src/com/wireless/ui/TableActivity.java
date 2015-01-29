@@ -545,12 +545,13 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		mListView.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				new QueryTableStatusTask(WirelessOrder.loginStaff, (Table)view.getTag()) {	
+				final Table selectedTable = (Table)view.getTag();
+				new QueryTableStatusTask(WirelessOrder.loginStaff, new Table.Builder(selectedTable.getId())) {	
 					private ProgressDialog _progDialog;
 
 					@Override
 					protected void onPreExecute(){
-						_progDialog = ProgressDialog.show(TableActivity.this, "", "查询" + mTblToQuery.getAliasId() + "号餐台信息...请稍候", true);
+						_progDialog = ProgressDialog.show(TableActivity.this, "", "查询" + selectedTable.getName() + "信息...请稍候", true);
 					}
 					
 					@Override
@@ -558,12 +559,12 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 						if(table.getStatus() == Table.Status.BUSY){
 							//Jump to TableDetailActivity in case of busy.
 							Intent intent = new Intent(TableActivity.this, TableDetailActivity.class);
-							intent.putExtra(TableDetailActivity.KEY_TABLE_ID, new TableParcel(table));
+							intent.putExtra(TableDetailActivity.KEY_TABLE_ID, new TableParcel(selectedTable));
 							startActivity(intent);
 						}else{
 							//Jump to this order activity in case of idle.
 							Intent intent = new Intent(TableActivity.this, OrderActivity.class);
-							intent.putExtra(OrderActivity.KEY_TABLE_ID, new TableParcel(table));
+							intent.putExtra(OrderActivity.KEY_TABLE_ID, new TableParcel(selectedTable));
 							startActivity(intent);
 						}
 						_progDialog.dismiss();
@@ -717,8 +718,8 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 	private class TransTblTask extends com.wireless.lib.task.TransTblTask{
 		private ProgressDialog mProgDialog;
 		
-		TransTblTask(Table srcTbl, Table destTbl){
-			super(WirelessOrder.loginStaff, srcTbl, destTbl);
+		TransTblTask(Table.Builder srcBuilder, Table.Builder destBuilder){
+			super(WirelessOrder.loginStaff, srcBuilder, destBuilder);
 		}
 		
 		/**
@@ -833,7 +834,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 
 	@Override
 	public void onTableSelected(Table destTbl) {
-		new TransTblTask(mSrcTbl, destTbl).execute();
+		new TransTblTask(new Table.Builder(mSrcTbl.getId()), new Table.Builder(destTbl.getId())).execute();
 	}
 
 	@Override

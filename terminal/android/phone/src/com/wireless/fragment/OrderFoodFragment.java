@@ -141,7 +141,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	//已点菜品信息
 	private Order mOriOrder;
 	
-	private final static String TBL_ALIAS_KEY = "TableAliasKey";
+	private final static String TBL_KEY = "TableKey";
 
 	/*
 	 * 显示点菜的列表的handler 负责更新点菜的显示
@@ -811,7 +811,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	public static OrderFoodFragment newInstance(Table table){
 		OrderFoodFragment fgm = new OrderFoodFragment();
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(TBL_ALIAS_KEY, new TableParcel(table));
+		bundle.putParcelable(TBL_KEY, new TableParcel(table));
 		fgm.setArguments(bundle);
 		return fgm;
 	}
@@ -856,7 +856,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		
 		//请求账单信息
 		if(getArguments() != null){
-			TableParcel tableParcel = getArguments().getParcelable(TBL_ALIAS_KEY);
+			TableParcel tableParcel = getArguments().getParcelable(TBL_KEY);
 			if(tableParcel != null){
 				mQueryOrderTask = new QueryOrderTask(new Table.Builder(tableParcel.getId()));
 				mQueryOrderTask.execute();
@@ -1025,7 +1025,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	 * Refresh the original order.
 	 */
 	public void refresh(){
-		TableParcel tableParcel = getArguments().getParcelable(TBL_ALIAS_KEY);
+		TableParcel tableParcel = getArguments().getParcelable(TBL_KEY);
 		if(tableParcel != null){
 			mQueryOrderTask = new QueryOrderTask(new Table.Builder(tableParcel.getId()));
 			mQueryOrderTask.execute();
