@@ -48,7 +48,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 			
 		}
 		
-		public TransferBuilder(AliasBuilder src, AliasBuilder dest){
+		public TransferBuilder(Builder src, Builder dest){
 			srcTbl = src.build();
 			destTbl = dest.build();
 		}
@@ -354,6 +354,10 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		
 		public boolean isFast(){
 			return this == FAST;
+		}
+		
+		public boolean isTemporary(){
+			return isJoin() || isFast() || isTakeout();
 		}
 	}
 	
