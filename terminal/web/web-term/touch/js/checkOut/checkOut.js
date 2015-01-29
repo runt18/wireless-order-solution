@@ -597,6 +597,8 @@ uo.closeTransOrderFood = function(){
 	}else if(ts.commitTableOrTran == 'apartTable'){
 		//隐藏拆台
 		$('#divSelectTablesSuffixForTs').hide();
+		//显示餐台选择
+		$('#divSelectTablesForTs').show();
 	}else if(ts.commitTableOrTran == 'member'){
 		//显示为台号信息
 		$("#txtTableNumForTS").attr("placeholder", "填写台号");
