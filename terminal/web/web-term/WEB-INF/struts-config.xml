@@ -51,9 +51,6 @@
 			scope="request">
 
 		</action>
-		<action path="/OperateTable"
-			type="com.wireless.Actions.tableSelect.OperateTableAction" scope="request" parameter="dataSource">
-		</action>
 		<action path="/QueryRestaurant" type="com.wireless.Actions.login.QueryRestaurantAction"
 			scope="request">
 		</action>
