@@ -191,7 +191,7 @@ class OrderHandler implements Runnable{
 
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE_STATUS){
 					//handle query table status
-					Table tblToQuery = TableDao.getByAlias(staff, new Parcel(request.body).readParcel(Table.CREATOR).getAliasId());
+					Table tblToQuery = TableDao.getById(staff, new Parcel(request.body).readParcel(Table.CREATOR).getId());
 					response = new RespACK(request.header, (byte)tblToQuery.getStatus().getVal());
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
@@ -371,7 +371,7 @@ class OrderHandler implements Runnable{
 		//handle insert order request force
 		Order newOrder = new Parcel(request.body).readParcel(Order.InsertBuilder.CREATOR).build();
 		
-		Table tblToOrder = TableDao.getByAlias(staff, newOrder.getDestTbl().getAliasId());
+		Table tblToOrder = TableDao.getById(staff, newOrder.getDestTbl().getId());
 		
 		if(tblToOrder.isIdle()){
 			return doInsertOrder(staff, request);
@@ -466,7 +466,7 @@ class OrderHandler implements Runnable{
 	private RespPackage doTransTable(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		Table.TransferBuilder builder = new Parcel(request.body).readParcel(Table.TransferBuilder.CREATOR);
 		int orderId = TableDao.transfer(staff, builder);
-		ServerConnector.instance().ask(ReqPrintContent.buildReqPrintTransTbl(staff, orderId, builder.getSrcTbl(), builder.getDestTbl()));
+		ServerConnector.instance().ask(ReqPrintContent.buildReqPrintTransTbl(staff, orderId, new Table.Builder(builder.getSrcTbl().getId()), new Table.Builder(builder.getDestTbl().getId())));
 		return new RespACK(request.header);
 	}
 	
@@ -590,8 +590,8 @@ class OrderHandler implements Runnable{
 		}else if(printType.isTransTbl()){
 			Parcel p = new Parcel(request.body);
 			int orderId = p.readInt();
-			Table srcTbl = TableDao.getByAlias(staff, p.readParcel(Table.CREATOR).getAliasId());
-			Table destTbl = TableDao.getByAlias(staff, p.readParcel(Table.CREATOR).getAliasId());
+			Table srcTbl = TableDao.getById(staff, p.readParcel(Table.CREATOR).getId());
+			Table destTbl = TableDao.getById(staff, p.readParcel(Table.CREATOR).getId());
 			new PrintHandler(staff).process(JobContentFactory.instance().createTransContent(printType, staff, printers, orderId, srcTbl, destTbl));
 			
 		}else if(printType.isShift()){
