@@ -895,6 +895,7 @@ function handleTableForTS(c){
 				$('#tableCustomerCountSetTitle').text(c.table.name + ' -- 输入人数');
 				$('#tableCustomerCountSet').parent().addClass("pop").addClass("in");
 				$('#tableCustomerCountSet').popup('open');
+				$('#inputTableCustomerCountSet').focus();
 				$('#inputTableCustomerCountSet').select();				
 			}			
 		}
