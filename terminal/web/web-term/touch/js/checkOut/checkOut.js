@@ -267,6 +267,7 @@ uo.openCancelFoodCmp = function(c){
 	$('#numberKeyboard').show();
 	
 	firstTimeInput = true;
+	$('#inputCancelFoodSet').focus();
 	$('#inputCancelFoodSet').select();
 }
 
@@ -815,6 +816,7 @@ uo.openMoreOperate = function(){
 				$('#orderCustomerCountSet').popup('open');
 				firstTimeInput = true;
 				focusInput = 'inputOrderCustomerCountSet';
+				$('#inputOrderCustomerCountSet').focus();
 				$('#inputOrderCustomerCountSet').select();
 			}else if(uo.tempPayForPrintAllAction){
 				Util.LM.show();

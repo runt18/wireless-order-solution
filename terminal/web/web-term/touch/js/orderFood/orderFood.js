@@ -103,11 +103,11 @@ var foodCmpTemplet = '<a data-role="button" data-corners="false" data-inline="tr
 						'</div>'+
 					  '</a>'
 var orderFoodCmpTemplet = '	<li data-icon={isGift} data-index={dataIndex} data-theme="c" data-value={id} data-type="orderFoodCmp" onclick="of.selectNewFood({event:this, foodId:{id}})" ><a >'+
-								'<h1 style="font-size:20px;">{name} X {count}</h1>' +
+								'<h1 style="font-size:20px;">{name}</h1>' +
 								'<span style="color:green;">{tasteDisplay}</span>' +
 								'<div>' +
 									'<span style="float: left;color: red;">{foodStatus}</span>' +
-									'<span style="float: right;">￥{unitPrice}</span>' +
+									'<span style="float: right;">￥{unitPrice}  X <font color="green">{count}</font></span>' +
 								'</div>' +
 							'</a></li>';
 
@@ -497,13 +497,11 @@ of.initNewFoodContent = function(c){
 				foodStatus += '临时菜';
 			}
 		}
-		
-		
 		var orderFoodHtmlData = {
 			dataIndex : i,
 			id : temp.id,
 			name : temp.name,
-			count : temp.count.toFixed(2),
+			count : temp.count,
 			unitPrice : tempUnitPrice.toFixed(2),
 			totalPrice : tempUnitPrice.toFixed(2),
 			foodStatus : foodStatus,
@@ -609,6 +607,7 @@ of.operateFoodCount = function(c){
 			
 			firstTimeInput = true;
 			$('#inputOrderFoodCountSet').val(data.count);
+			$('#inputOrderFoodCountSet').focus();
 			$('#inputOrderFoodCountSet').select();
 			
 			of.selectedOrderFood = data;

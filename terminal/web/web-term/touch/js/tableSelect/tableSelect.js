@@ -462,9 +462,7 @@ ts.submitForSelectTableOrTransFood = function(){
 		$('#divSelectTablesSuffixForTs').show();
 		ts.table.alias = $('#txtTableNumForTS').val();
 	}else if(ts.commitTableOrTran == 'member'){//会员
-		$('#divSelectTablesForTs').hide();
-		$('#divSelectTablesSuffixForTs').show();
-		ts.table.alias = $('#txtTableNumForTS').val();
+		uo.useMemberForOrderAction();
 	}
 }
 
