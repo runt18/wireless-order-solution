@@ -451,7 +451,6 @@ uo.transFoodForTS = function(c){
 	
 	//打开控件
 	uo.openTransOrderFood();
-	
 }
 
 /**
@@ -489,6 +488,81 @@ uo.transTableForTS = function(){
 	uo.openTransOrderFood();
 }
 
+
+/**
+ * 设置控件为会员
+ */
+uo.useMemberForOrder = function(){
+	//隐藏数量输入
+	$('#td4TxtFoodNumForTran').hide();
+	ts.commitTableOrTran = 'member';
+	
+	$("#txtTableNumForTS").val("");
+	//设置为会员输入
+	$("#txtTableNumForTS").attr("placeholder", "请输入会员卡号或手机号");
+	
+	$('#transSomethingTitle').html("请输入会员资料, 确定使用会员");
+	
+	//打开控件
+	uo.openTransOrderFood();
+}
+
+/**
+ * 登陆会员
+ */
+uo.useMemberForOrderAction = function(){
+	var member = $('#txtTableNumForTS');
+	if(!member.val()){
+		return;
+	}else if(member.val() <= 0 || isNaN(member.val())){
+		return;
+	}
+	Util.LM.show();
+	$.post('../QueryMember.do', {
+		dataSource : 'normal',
+		memberCardOrMobileOrName : member
+	}, function(result){
+		if(result.success){
+			$.post('../OperateDiscount.do', {
+				dataSource : 'setDiscount',
+				orderId : uo.order.id,
+				memberId : result.root[0].id
+			}, function(data){
+				Util.LM.hide();
+				if(data.success){
+					//异步刷新账单
+					initOrderData({table : uo.table});
+					Util.msg.alert({
+						topTip : true,
+						msg : '会员使用中...'
+					});	
+				}else{
+					Util.msg.alert({
+						title : '提示',
+						msg : '使用会员失败, 请刷新页面重试', 
+						renderTo : 'orderFoodListMgr',
+						time : 2
+					});					
+				}
+			});				
+		}else{
+			Util.LM.hide();
+			Util.msg.alert({
+				title : '提示',
+				msg : '未找到对应会员, 请输入正确信息', 
+				renderTo : 'orderFoodListMgr',
+				time : 2,
+				fn : function(){
+					$('#txtTableNumForTS').focus();
+				}
+			});
+			
+		}
+	});
+	
+}
+
+
 /**
  * 转菜操作
  */
@@ -523,6 +597,9 @@ uo.closeTransOrderFood = function(){
 	}else if(ts.commitTableOrTran == 'apartTable'){
 		//隐藏拆台
 		$('#divSelectTablesSuffixForTs').hide();
+	}else if(ts.commitTableOrTran == 'member'){
+		//显示为台号信息
+		$("#txtTableNumForTS").attr("placeholder", "填写台号");
 	}
 	
 	//操作设置为默认
@@ -891,7 +968,7 @@ uo.submitUpdateOrderHandler = function(c){
 								fn : function(btn){
 									if(btn == 'yes'){
 										uoCancelFoods = [];
-										uo.updateOrderHandler();
+										initOrderData({table : uo.table});
 									}
 								}
 							});

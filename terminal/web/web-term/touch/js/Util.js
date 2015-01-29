@@ -455,7 +455,7 @@ Util.msg = {
 		var content = '<div data-role="popup" id="'+id+'" data-theme="c" data-dismissible="false" style="min-width:200px;" class="ui-corner-all">'+
 						    '<div data-role="header" class="ui-corner-top ui-header ui-bar-b" data-theme="b"><h1 class="ui-title" role="heading" aria-level="1">'+(typeof c.title != 'string' || $.trim(c.title).length == 0 ? '温馨提示' : c.title)+'</h1></div>'+
 						    '<div data-type="time" style="text-align: center;color: red;"></div>'+
-						    '<div data-role="content" data-theme="d" class="ui-corner-bottom ui-content">'+
+						    '<div data-role="content" data-theme="d" class="ui-corner-bottom ui-content" align="center">'+
 						    	'<h2 class="ui-title">'+c.msg+'</h2>'+
 						        '<a onclick="Util.msg.save({event:\'yes\', id:\''+id+'\'})" data-role="button" ' +(hasBack ? 'data-inline="true"': "") +' data-theme="b" >'+ (typeof c.btnEnter != 'undefined'? c.btnEnter : "确定") +'</a>'+
 						        (hasBack ? '<a href="javascript:Util.msg.hide({event:\'back\', id:\''+id+'\', callback:' + c.returnCallback +'})" data-role="button" data-inline="true" >取消</a>' : '')+
