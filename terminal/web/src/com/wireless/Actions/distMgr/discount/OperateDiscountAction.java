@@ -23,7 +23,7 @@ public class OperateDiscountAction extends DispatchAction{
 	public ActionForward setDiscount(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws BusinessException, Exception{
 		final int orderId = Integer.parseInt(request.getParameter("orderId"));
-		final int discountId = Integer.parseInt(request.getParameter("discountId"));
+		final int discountId = Integer.parseInt(request.getParameter("discountId") != null?request.getParameter("discountId"):"0");
 		final int memberId;
 		if(request.getParameter("memberId") != null && !request.getParameter("memberId").isEmpty()){
 			memberId = Integer.parseInt(request.getParameter("memberId"));
