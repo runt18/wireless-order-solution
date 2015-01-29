@@ -1646,9 +1646,9 @@ Ext.onReady(function() {
 						btnSave.setDisabled(true);
 						btnCancel.setDisabled(true);
 						Ext.Ajax.request({
-							url : "../../TransTable.do",
+							url : "../../OperateTable.do",
 							params : {
-								
+								dataSource : 'transTable',
 								"oldTableAlias" : selectedTable,
 								"newTableAlias" : inputTableNbr
 							},
