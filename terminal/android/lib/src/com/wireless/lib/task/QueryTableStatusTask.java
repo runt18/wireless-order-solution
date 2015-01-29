@@ -22,14 +22,9 @@ public abstract class QueryTableStatusTask extends AsyncTask<Void, Void, Table>{
 	
 	private final Staff mStaff;
 	
-	public QueryTableStatusTask(Staff staff, Table table){
+	public QueryTableStatusTask(Staff staff, Table.Builder builder){
 		mStaff = staff;
-		mTblToQuery = table;
-	}
-	
-	public QueryTableStatusTask(Staff staff, int tableAlias){
-		mStaff = staff;
-		mTblToQuery = new Table.AliasBuilder(tableAlias).build();
+		mTblToQuery = builder.build();
 	}
 	
 	/**

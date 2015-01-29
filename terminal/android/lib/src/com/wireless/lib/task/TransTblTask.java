@@ -18,15 +18,15 @@ public abstract class TransTblTask extends AsyncTask<Void, Void, Void>{
 
 	protected BusinessException mBusinessException;
 	
-	private final Table mSrcTbl;
+	private final Table.Builder mSrcBuilder;
 	
-	private final Table mDestTbl;
+	private final Table.Builder mDestBuilder;
 	
 	private final Staff mStaff;
 	
-	public TransTblTask(Staff staff, Table srcTbl, Table destTbl){
-		mSrcTbl = srcTbl;
-		mDestTbl = destTbl;
+	public TransTblTask(Staff staff, Table.Builder srcBuilder, Table.Builder destBuilder){
+		mSrcBuilder = srcBuilder;
+		mDestBuilder = destBuilder;
 		mStaff = staff;
 	}
 	
@@ -34,7 +34,7 @@ public abstract class TransTblTask extends AsyncTask<Void, Void, Void>{
 	protected Void doInBackground(Void... args) {
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(mStaff, new Table.TransferBuilder(new Table.AliasBuilder(mSrcTbl.getAliasId()), new Table.AliasBuilder(mDestTbl.getAliasId()))));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(mStaff, new Table.TransferBuilder(mSrcBuilder, mDestBuilder)));
 			if(resp.header.type == Type.NAK){
 				mBusinessException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
 			}			
