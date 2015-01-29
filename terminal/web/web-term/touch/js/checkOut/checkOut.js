@@ -519,6 +519,8 @@ uo.useMemberForOrder = function(){
 	$("#txtTableNumForTS").val("");
 	//设置为会员输入
 	$("#txtTableNumForTS").attr("placeholder", "请输入会员卡号或手机号");
+	//显示回删
+	$('#td4CmpDeleteWord').show();
 	
 	$('#transSomethingTitle').html("请输入会员资料, 确定使用会员");
 	
@@ -637,6 +639,8 @@ uo.closeTransOrderFood = function(){
 	}else if(ts.commitTableOrTran == 'member'){
 		//显示为台号信息
 		$("#txtTableNumForTS").attr("placeholder", "填写台号");
+		//隐藏回删
+		$('#td4CmpDeleteWord').hide();
 	}
 	
 	//操作设置为默认

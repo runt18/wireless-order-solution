@@ -362,7 +362,12 @@ function test(){
    		</td>     		
 		<td id="td4OpenTablePeople" style="display: none;">
    			<input id="openTablePeople" type="text" placeholder="填写就餐人数" class="numberInputStyle">
-   		</td>  			
+   		</td>  	
+   		<td id="td4CmpDeleteWord" style="display: none;">
+			<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:inherit;">
+			    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('txtTableNumForTS')">D</a>
+			</div>		    		
+   		</td>   				
    	</tr>
     </table>
     <hr>
@@ -663,8 +668,8 @@ function test(){
 	    </div>
 	</div>		
 	
-	<div id="addTempTasteCmpShadow" for="addTempTasteCmp" style="z-index: 1;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%; background: #DDD;display: none;" ></div>
-	<div id="addTempTasteCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 2;position: absolute; top: 100px; left: 50%; margin: -100px 0px 0px -250px;min-width:500px;display: none;background-color: white;" align="center">
+	<div id="addTempTasteCmpShadow" for="addTempTasteCmp" style="z-index: 1101;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%; background: #DDD;display: none;" ></div>
+	<div id="addTempTasteCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: -100px 0px 0px -250px;min-width:500px;display: none;background-color: white;" align="center">
 	<!-- <div id="addTempTasteCmp" data-role="popup"  data-theme="c" data-dismissible="false" style="min-width:550px;" class="ui-corner-all" align="center"> -->
 	    <div data-role="header" data-theme="b" class="ui-corner-top">
 	        <h1>添加临时口味</h1>
@@ -701,8 +706,8 @@ function test(){
 	    </div>			
 	</div>	
 	<!-- <div class="ui-popup-screen in" id="addTempFoodCmp-screen" style="display: none;"></div> -->
-	<div id="addTempFoodCmpShadow" for="addTempFoodCmp" style="z-index: 1;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%; background: #DDD;display: none;" ></div>
-	<div id="addTempFoodCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 2;position: absolute; top: 100px; left: 50%; margin: -100px 0px 0px -250px;min-width:400px;display: none;background-color: white;" align="center">
+	<div id="addTempFoodCmpShadow" for="addTempFoodCmp" style="z-index: 1101;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%; background: #DDD;display: none;" ></div>
+	<div id="addTempFoodCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: -100px 0px 0px -250px;min-width:400px;display: none;background-color: white;" align="center">
 	    <div data-role="header" data-theme="b" class="ui-corner-top">
 	        <h1>添加临时菜</h1>
 	    </div>
