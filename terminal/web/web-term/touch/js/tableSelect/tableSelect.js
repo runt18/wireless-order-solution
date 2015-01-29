@@ -160,6 +160,14 @@ window.onload=function(){
 		focusInput = this.id;
 	});	
 	
+	$('#searchFoodInput').focus(function(){
+		focusInput = this.id;
+		if(this.id == 'searchFoodInput'){
+			of.s.fireEvent();
+		}		
+	});
+	
+	
 	//打开手写板
 	$(".handWriteCmp").change(function(){
 		//$(this).val() 得到当前选中的值
@@ -309,7 +317,6 @@ ts.s = {
 		this.file = document.getElementById(c.file);
 		if(typeof this.file.oninput != 'function'){
 			this.file.oninput = function(e){
-
 				ts.s.fileValue = ts.s.file.value;
 				//数字键盘触发, 除了开台和点餐转台和会员
 				if(ts.commitTableOrTran != 'openTable' && ts.commitTableOrTran != 'tableTransTable' && ts.commitTableOrTran != 'member'){
@@ -344,8 +351,11 @@ ts.s = {
 		return this.file;
 	},
 	valueBack : function(){
-		this.file.value = this.file.value.substring(0, this.file.value.length - 1);
-		this.file.oninput(this.file);
+		if(this.file.value){
+			this.file.value = this.file.value.substring(0, this.file.value.length - 1);
+			this.file.oninput(this.file);			
+		}
+
 		this.file.focus();
 	},
 	select : function(){
@@ -417,7 +427,8 @@ ts.toOrderFoodOrTransFood = function(c){
 		ts.transTable({alias:c.alias})
 	}else if(ts.commitTableOrTran == 'lookup'){
 		updateTable({
-			alias : c.id
+			id : c.id,
+			alias : c.alias
 		});		
 	}else if(ts.commitTableOrTran == 'apartTable'){
 		$('#divSelectTablesForTs').hide();

@@ -61,8 +61,10 @@ of.s = {
 		return this.file;
 	},
 	valueBack : function(){
-		this.file.value = this.file.value.substring(0, this.file.value.length - 1);
-		this.file.oninput(this.file);
+		if(this.file.value){
+			this.file.value = this.file.value.substring(0, this.file.value.length - 1);
+			this.file.oninput(this.file);			
+		}
 		this.file.focus();
 	},
 	onInput : function(){
