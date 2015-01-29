@@ -36,12 +36,12 @@ public class ReqPrintContent extends RequestPackage{
 		return req;
 	}
 	
-	public static ReqPrintContent buildReqPrintTransTbl(Staff staff, int orderId, Table srcTbl, Table destTbl){
+	public static ReqPrintContent buildReqPrintTransTbl(Staff staff, int orderId, Table.Builder srcTbl, Table.Builder destTbl){
 		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_TRANSFER_TABLE);
 		Parcel p = new Parcel();
 		p.writeInt(orderId);
-		p.writeParcel(srcTbl, Table.TABLE_PARCELABLE_SIMPLE);
-		p.writeParcel(destTbl, Table.TABLE_PARCELABLE_SIMPLE);
+		p.writeParcel(srcTbl.build(), Table.TABLE_PARCELABLE_SIMPLE);
+		p.writeParcel(destTbl.build(), Table.TABLE_PARCELABLE_SIMPLE);
 		req.body = p.marshall();
 		return req;
 	}
