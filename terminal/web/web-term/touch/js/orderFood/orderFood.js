@@ -111,7 +111,7 @@ var orderFoodCmpTemplet = '	<li data-icon={isGift} data-index={dataIndex} data-t
 								'</div>' +
 							'</a></li>';
 
-var tasteCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>￥{price}</div></a>';
+var tasteCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>';
 
 var choosedTasteCmpTemplet = '<a onclick="removeTaste({event: this, id: {id}})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id}><div>{name}<br>￥{price}</div></a>';
 
@@ -999,7 +999,7 @@ function initTasteCmp(c){
 				id : c.data.taste.id,
 				name : c.data.taste.name,
 				click : "chooseTaste({event: this, id: "+ c.data.taste.id +"})",
-				price : c.data.taste.price,
+				price : c.data.taste.calcValue == 1?(c.data.taste.rate * 100) + '%' : ('￥'+ c.data.taste.price),
 				theme : theme//是否选中
 			});
 		}
