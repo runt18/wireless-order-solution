@@ -196,13 +196,13 @@ public class OperateTableAction extends DispatchAction{
 		try {
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			
-			int srcTblAlias = Integer.parseInt(request.getParameter("oldTableAlias"));
-			int destTblAlias = Integer.parseInt(request.getParameter("newTableAlias"));
+			int srcTblId = Integer.parseInt(request.getParameter("oldTableId"));
+			int destTblId = Integer.parseInt(request.getParameter("newTableId"));
 
 			// print the transfer table receipt
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(staff, new Table.TransferBuilder(new Table.AliasBuilder(srcTblAlias), new Table.AliasBuilder(destTblAlias))));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(staff, new Table.TransferBuilder(new Table.Builder(srcTblId), new Table.Builder(destTblId))));
 			if(resp.header.type == Type.ACK){
-				jobject.initTip(true, "操作成功, 原 " + srcTblAlias + " 号台转至新 " + destTblAlias + " 号台成功.");
+				jobject.initTip(true, "转台成功.");
 			}else{
 				jobject.initTip(false, new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
 			}
