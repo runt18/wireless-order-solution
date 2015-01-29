@@ -49,7 +49,7 @@ $(function(){
 				dataIndex : c.index,
 				id : c.data.id,
 				click : 'ts.selectTable({event : this, id : '+ c.data.id +',tableAlias :'+ c.data.alias +'})',
-				alias : c.data.alias,
+				alias : c.data.alias && c.data.alias != 0?c.data.alias:'<font color="green">搭台</font>',
 				theme : c.data.statusValue == '1' ? "e" : "c",
 				name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name
 			});				

@@ -389,7 +389,8 @@ ts.submitForSelectTableNumTS = function(){
 };
 
 function ts_transTable(c){
-	$.post('../TransTable.do', {
+	$.post('../OperateTable.do', {
+		dataSource : 'transTable',
 		oldTableAlias : uo.table.alias,
 		newTableAlias : c.alias
 	},function(data){
@@ -577,9 +578,10 @@ ts.tt.submit = function(){
 	if(oldflag && newflag){
 		Util.LM.show();
 		$.ajax({
-			url : '../TransTable.do',
+			url : '../OperateTable.do',
 			type : 'post',
 			data : {
+				dataSource : 'transTable',
 				oldTableAlias : oldTable,
 				newTableAlias : newTable
 			},
