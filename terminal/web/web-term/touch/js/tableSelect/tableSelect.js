@@ -311,8 +311,8 @@ ts.s = {
 			this.file.oninput = function(e){
 
 				ts.s.fileValue = ts.s.file.value;
-				//数字键盘触发, 除了开台和点餐转台
-				if(ts.commitTableOrTran != 'openTable' && ts.commitTableOrTran != 'tableTransTable'){
+				//数字键盘触发, 除了开台和点餐转台和会员
+				if(ts.commitTableOrTran != 'openTable' && ts.commitTableOrTran != 'tableTransTable' && ts.commitTableOrTran != 'member'){
 					var data = null, temp = null;
 					if(ts.s.fileValue.trim().length > 0){
 						data = [];
@@ -430,23 +430,27 @@ ts.toOrderFoodOrTransFood = function(c){
  * 确定精确的搜索条件
  */
 ts.submitForSelectTableOrTransFood = function(){
-	if(ts.commitTableOrTran == 'table'){
+	if(ts.commitTableOrTran == 'table'){//普通选台
 		ts.submitForSelectTableNumTS();
-	}else if(ts.commitTableOrTran == 'trans'){
+	}else if(ts.commitTableOrTran == 'trans'){//单条转菜
 		uo.transFood({alias:$('#txtTableNumForTS').val()});
-	}else if(ts.commitTableOrTran == 'allTrans'){
+	}else if(ts.commitTableOrTran == 'allTrans'){//全单转菜
 		uo.transFood({alias:$('#txtTableNumForTS').val(), allTrans : -1});
-	}else if(ts.commitTableOrTran == 'transTable'){
+	}else if(ts.commitTableOrTran == 'transTable'){//转台
 		ts.transTable({alias:$('#txtTableNumForTS').val()})
-	}else if(ts.commitTableOrTran == 'tableTransTable'){
+	}else if(ts.commitTableOrTran == 'tableTransTable'){//前台转台
 		ts.transTable({alias:$('#numToOtherTable').val(), oldAlias:$('#txtTableNumForTS').val()})
-	}else if(ts.commitTableOrTran == 'lookup'){
+	}else if(ts.commitTableOrTran == 'lookup'){//查台
 		updateTable({
 			alias : $('#txtTableNumForTS').val()
 		});
-	}else if(ts.commitTableOrTran == 'openTable'){
+	}else if(ts.commitTableOrTran == 'openTable'){//开台
 		ts.createOrderForShowMessageTS();
-	}else if(ts.commitTableOrTran == 'apartTable'){
+	}else if(ts.commitTableOrTran == 'apartTable'){//拆台
+		$('#divSelectTablesForTs').hide();
+		$('#divSelectTablesSuffixForTs').show();
+		ts.table.alias = $('#txtTableNumForTS').val();
+	}else if(ts.commitTableOrTran == 'member'){//会员
 		$('#divSelectTablesForTs').hide();
 		$('#divSelectTablesSuffixForTs').show();
 		ts.table.alias = $('#txtTableNumForTS').val();
