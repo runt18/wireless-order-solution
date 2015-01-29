@@ -78,7 +78,7 @@ public class WXQueryDianpingDataAction extends DispatchAction{
 	
 	
 	private static String HttpRequest(String requestUrl) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         InputStream ips = getInputStream(requestUrl);
         InputStreamReader isreader = null;
         try {
