@@ -83,6 +83,25 @@ function initOrderData(c){
 					uo.uoFood.push( data.other.order.orderFoods[x]);
 				}
 				uoOther = data.other;*/
+				if(uo.order.memberId > 0){
+					$.ajax({
+						url : '../QueryMember.do',
+						type : 'post',
+						data : {
+							dataSource : 'normal',
+							id : uo.order.memberId
+						},
+						async : false,
+						success : function(data, status, xhr){
+							if(data.success){
+								uo.orderMember = data.root[0];
+							}
+						}
+					});
+				}else{
+					uo.orderMember = null;
+				}
+				
 				uo.showOrder();
 				uo.showDescForUpdateOrder();
 			    c.createrOrder == 'createrOrder' ? of.show({
@@ -125,10 +144,10 @@ uo.showOrder = function(){
 		html += orderFoodListCmpTemplet.format({
 			dataIndex : i + 1,
 			id : uo.order.orderFoods[i].id,
-			name : uo.order.orderFoods[i].name + (uo.order.orderFoods[i].isGift?'&nbsp;[<font style="font-weight:bold;">已赠送</font>]':''),
+			name : uo.order.orderFoods[i].name,
 			count : uo.order.orderFoods[i].count.toFixed(2),
 			tastePref : uo.order.orderFoods[i].tasteGroup.tastePref,
-			actualPrice : (uo.order.orderFoods[i].actualPrice + uo.order.orderFoods[i].tasteGroup.tastePrice).toFixed(2),
+			actualPrice : (uo.order.orderFoods[i].actualPrice + uo.order.orderFoods[i].tasteGroup.tastePrice).toFixed(2) + (uo.order.orderFoods[i].isGift?'&nbsp;[<font style="font-weight:bold;">已赠送</font>]':''),
 			totalPrice : uo.order.orderFoods[i].totalPrice.toFixed(2),
 			orderDateFormat : uo.order.orderFoods[i].orderDateFormat.substring(11),
 			waiter : uo.order.orderFoods[i].waiter 
@@ -136,8 +155,6 @@ uo.showOrder = function(){
 	}			
 	
 	$('#orderFoodListBody').html(html).trigger('create');
-	
-//	$('#orderFoodListBody tr').css('height', '50px');
 	
 	uo.showNorthForUpdateOrder();	
 }
@@ -169,10 +186,11 @@ uo.showNorthForUpdateOrder = function(){
  */
 uo.showDescForUpdateOrder = function(){
 	var html = "";
-	html = (uo.order.discount?"<span style = 'margin-left: 20px;'>当前折扣：" + uo.order.discount.name +"</span>" : "") +
-	(uo.order.discounter ? "<span style = 'margin-left: 20px;'>折扣人：" + uo.order.discounter + "</span><span style = 'margin-left: 20px;'>折扣时间：" + uo.order.discountDate + "</span>" : "") ;
-	$("#divDescForUpdateOrder").html(html);
-	$("#spanTotalPriceUO").html('消费总额：'+ uo.getTotalPriceUO().toFixed(2) + "元");
+	html = (uo.orderMember?"<span style = 'margin-left: 20px;'>当前会员：" + uo.orderMember.name +"</span>" : "") +
+		(uo.order.discount?"<span style = 'margin-left: 20px;'>当前折扣：" + uo.order.discount.name +"</span>" : "") +
+		(uo.order.discounter ? "<span style = 'margin-left: 20px;'>折扣人：" + uo.order.discounter + "</span><span style = 'margin-left: 20px;'>折扣时间：" + uo.order.discountDate + "</span>" : "") ;
+		$("#divDescForUpdateOrder").html(html);
+		$("#spanTotalPriceUO").html('消费总额：'+ uo.getTotalPriceUO().toFixed(2) + "元");
 }
 /**
  * 取得初始的消费总额
@@ -514,16 +532,28 @@ uo.useMemberForOrder = function(){
 uo.useMemberForOrderAction = function(){
 	var member = $('#txtTableNumForTS');
 	if(!member.val()){
+		Util.msg.alert({
+			msg : '请输入会员信息', 
+			topTip : true
+		});			
+		member.focus();
 		return;
 	}else if(member.val() <= 0 || isNaN(member.val())){
+		Util.msg.alert({
+			msg : '请输入正确的会员信息', 
+			topTip : true
+		});			
+		firstTimeInput = true;
+		member.focus();
+		member.select();	
 		return;
 	}
 	Util.LM.show();
 	$.post('../QueryMember.do', {
 		dataSource : 'normal',
-		memberCardOrMobileOrName : member
+		memberCardOrMobileOrName : member.val()
 	}, function(result){
-		if(result.success){
+		if(result.success && result.root.length > 0){
 			$.post('../OperateDiscount.do', {
 				dataSource : 'setDiscount',
 				orderId : uo.order.id,
@@ -533,9 +563,10 @@ uo.useMemberForOrderAction = function(){
 				if(data.success){
 					//异步刷新账单
 					initOrderData({table : uo.table});
+					uo.closeTransOrderFood();
 					Util.msg.alert({
 						topTip : true,
-						msg : '会员使用中...'
+						msg : '会员注入成功'
 					});	
 				}else{
 					Util.msg.alert({
@@ -558,8 +589,11 @@ uo.useMemberForOrderAction = function(){
 				}
 			});
 			
-		}
+		}	
 	});
+	
+	
+
 	
 }
 

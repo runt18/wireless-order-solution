@@ -1438,6 +1438,8 @@ of.tf = {
  */
 function addTempFood(){
 	of.tf.initTempKitchen();
+	//默认选中第一个厨房
+	of.tf.selectedKitchen = of.tempKitchens[0].id
     	
 	focusInput = "tempFoodPrice";
 	
