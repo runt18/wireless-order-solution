@@ -10,7 +10,8 @@ var uo = {
 	order : {},
 	uoFood : [],
 	reasons : [],
-	discounts : []
+	discounts : [],
+	selectedFood : {}
 };
 
 
@@ -29,7 +30,7 @@ function initSearchTables(c){
 		html += tableCmpTemplet.format({
 			dataIndex : i,
 			id : c.data[i].id,
-			click : 'ts.toOrderFoodOrTransFood('+ c.data[i].alias +')',
+			click : 'ts.toOrderFoodOrTransFood({alias:'+ c.data[i].alias +',id:'+ c.data[i].id +'})',
 			alias : c.data[i].alias,
 			theme : c.data[i].statusValue == '1' ? "e" : "c",
 			name : c.data[i].name == "" || typeof c.data[i].name != 'string' ? c.data[i].alias + "号桌" : c.data[i].name
@@ -51,7 +52,7 @@ var orderFoodListCmpTemplet = '<tr>'
 	+ 		'<div data-role="controlgroup" data-type="horizontal" >'
     + 			'<a onclick="uo.openCancelFoodCmp({event:this})" data-index={dataIndex} data-role="button" data-theme="b">退菜</a>'
     +			'<a onclick="uo.transFoodForTS({event:this})" data-index={dataIndex} data-role="button" data-theme="b">转菜</a>'
-    +			'<a onclick="" data-index={dataIndex} data-role="button" data-theme="b">更多</a>'
+    +			'<a onclick="uo.openOrderFoodOtherOperate({event:this})" data-index={dataIndex} data-role="button" data-theme="b"  data-rel="popup"  data-transition="pop" href="#orderFoodMoreOperateCmp">更多</a>'
     +		'</div>'
 	+ '<td>{waiter}</td>'
 	+ '</tr>';	
@@ -154,7 +155,7 @@ uo.showNorthForUpdateOrder = function(){
 	}
 	uo.customNum = uo.order.customNum;
 	
-	html = "<div><span style = 'margin : 10px 250px 10px 10px; font-size : 24px; color : red; font-weight : bold;'>已点菜页面</span>" +
+	html = "<div><span style = 'margin : 10px 250px 10px 10px; font-size : 24px;font-weight : bold;'>已点菜页面</span>" +
 			"<span style = 'margin: 10px;'>账单号：" + uo.order.id + " </span>" +
 			"<span style = 'margin: 10px;'>餐台号：" + uo.order.table.alias + " </span>" +
 			"<span style = 'margin: 10px;'>餐台名： " + tableName + "</span>" +
@@ -357,6 +358,78 @@ uo.cancelFoodAction = function(){
 		uo.saveForUO();
 	}
 }
+/**
+ * 打开称重
+ */
+uo.openWeighOperate = function(){
+	setTimeout(function(){
+		$('#inputOrderFoodWeigh').focus();
+	}, 250);
+	$('#orderFoodWeighCmp').parent().addClass('popup').addClass('in');
+	$('#orderFoodWeighCmp').popup('open');
+	//显示菜名
+	$('#weighFoodName').text(uo.selectedFood.name);
+}
+
+/**
+ * 关闭称重
+ */
+uo.closeWeighOperate = function(){
+	$('#orderFoodWeighCmp').popup('close');
+	$('#inputOrderFoodWeigh').val('');
+	//删除动作
+	delete uo.weighOperate;
+}
+
+/**
+ * 称重操作
+ */
+uo.openWeighaction = function(){
+	var count = $('#inputOrderFoodWeigh');
+	if(!count.val()){
+		Util.msg.alert({
+			msg : '请输入称重数量',
+			topTip : true
+		});
+		count.focus();
+		return;
+	}else if(isNaN(count.val())){
+		Util.msg.alert({
+			msg : '请输入正确的称重数量',
+			topTip : true
+		});
+		count.focus();
+		return;
+	}else if(count.val() < uo.selectedFood.count){
+		Util.msg.alert({
+			msg : '称重数量不能少于原有数量',
+			topTip : true
+		});
+		count.focus();
+		return;
+	}
+	
+	uo.selectedFood.count = count.val();
+	//对更新的菜品和人数进行提交
+	uo.submitUpdateOrderHandler(uo.order.orderFoods);	
+}
+
+/**
+ * 打开更多操作
+ */
+uo.openOrderFoodOtherOperate = function(c){
+	console.log('更多')
+	uo.selectedFood = uo.order.orderFoods[parseInt($(c.event).attr('data-index'))-1];
+	$('#orderFoodMoreOperateCmp').popup({
+		afterclose : function(){
+			console.log('closeaction:'+uo.weighOperate)
+			
+			if(uo.weighOperate){
+				uo.openWeighOperate();
+			}
+		}
+	});
+}
 
 /**
  * 设置控件为转菜
@@ -447,6 +520,9 @@ uo.closeTransOrderFood = function(){
 		//隐藏转去台
 		$('#td4ToOtherTable').hide();
 		$('#numToOtherTable').val('');		
+	}else if(ts.commitTableOrTran == 'apartTable'){
+		//隐藏拆台
+		$('#divSelectTablesSuffixForTs').hide();
 	}
 	
 	//操作设置为默认
@@ -776,11 +852,19 @@ uo.submitUpdateOrderHandler = function(c){
 								});											
 								uo.canceling = false;
 							}else if(uo.updateCustom){
+								Util.msg.alert({
+									topTip : true,
+									msg : '账单修改成功'
+								});	
 								initOrderData({table : uo.table});
 								uo.closeOperatePeople();
-								
-	
-								
+							}else if(uo.weighOperate){
+								Util.msg.alert({
+									topTip : true,
+									msg : '账单修改成功'
+								});	
+								initOrderData({table : uo.table});
+								uo.closeWeighOperate();
 							}else{
 								Util.msg.alert({
 									title : data.title,
@@ -813,9 +897,8 @@ uo.submitUpdateOrderHandler = function(c){
 							});
 						}else{
 							Util.msg.alert({
-								title : data.title,
 								msg : data.msg, 
-								renderTo : 'orderFoodListMgr'
+								topTip : true
 							});
 						}
 

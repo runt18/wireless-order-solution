@@ -48,7 +48,7 @@ $(function(){
 			return tableCmpTemplet.format({
 				dataIndex : c.index,
 				id : c.data.id,
-				click : 'ts.selectTable({event : this, tableAlias :'+ c.data.alias +'})',
+				click : 'ts.selectTable({event : this, id : '+ c.data.id +',tableAlias :'+ c.data.alias +'})',
 				alias : c.data.alias,
 				theme : c.data.statusValue == '1' ? "e" : "c",
 				name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name
@@ -63,6 +63,12 @@ $(function(){
 		success : function(data, status, xhr){
 			Util.LM.hide();	
 			if(data.success){
+				//刷新时去除#
+				if(location.href.indexOf('#') > 0){
+					location.href = 'tableSelect.html';
+					return;
+				}
+				
 				$('#spanStaffNameForDisplayToTS').html('服务员: '+ data.other.staff.staffName);
 				
 				/**
@@ -95,26 +101,22 @@ $(function(){
 			}else{	
 				Util.msg.alert({
 					msg : '请先登录',
-					renderTo : 'tableSelectMgr',
-					time : 3,
-					fn : function(){
-						location.href = 'index.htm';
-					}
+					topTip : true
 				});
-				return;
+				setTimeout(function(){
+					location.href = 'index.htm';
+				}, 2000);
 			}
 		},
 		error : function(request, status, error){
 			Util.LM.hide();	
 			Util.msg.alert({
-				msg : '请先登录',
-				renderTo : 'tableSelectMgr',
-				time : 3,
-				fn : function(){
-					location.href = 'index.htm';
-				}
+				msg : '操作有误,请刷新页面',
+				topTip : true
 			});
-			return;
+			setTimeout(function(){
+				location.href = 'index.htm';
+			}, 2000);
 		}
 	});
 	
@@ -326,6 +328,12 @@ ts.s = {
 							data : data.slice(0, 8)
 						});					
 					}
+					//如果是拆台则关闭后缀
+					if(ts.commitTableOrTran == 'apartTable'){
+						$('#divSelectTablesSuffixForTs').hide();
+						$('#divSelectTablesForTs').show();
+					}
+					
 					data = null;
 					temp = null;					
 				}
@@ -371,7 +379,8 @@ ts.transTable = function(c){
 		oldTableAlias = uo.table.alias;
 	}
 	
-	$.post('../TransTable.do', {
+	$.post('../OperateTable.do', {
+		dataSource : 'transTable',
 		oldTableAlias : oldTableAlias,
 		newTableAlias : c.alias
 	},function(data){
@@ -397,19 +406,23 @@ ts.transTable = function(c){
 /**
  * 搜索出来的结果点击直接提交
  */
-ts.toOrderFoodOrTransFood = function(alias){
+ts.toOrderFoodOrTransFood = function(c){
 	if(ts.commitTableOrTran == 'table'){
-		ts.renderToCreateOrder(alias, 1);
+		ts.renderToCreateOrder(c.alias, 1);
 	}else if(ts.commitTableOrTran == 'trans'){
-		uo.transFood({alias:alias});
+		uo.transFood({alias:c.alias});
 	}else if(ts.commitTableOrTran == 'allTrans'){
-		uo.transFood({alias:alias, allTrans : -1});
+		uo.transFood({alias:c.alias, allTrans : -1});
 	}else if(ts.commitTableOrTran == 'transTable'){
-		ts.transTable({alias:alias})
+		ts.transTable({alias:c.alias})
 	}else if(ts.commitTableOrTran == 'lookup'){
 		updateTable({
-			alias : alias
+			alias : c.id
 		});		
+	}else if(ts.commitTableOrTran == 'apartTable'){
+		$('#divSelectTablesForTs').hide();
+		$('#divSelectTablesSuffixForTs').show();
+		ts.table.id = c.id;
 	}
 }
 
@@ -433,6 +446,10 @@ ts.submitForSelectTableOrTransFood = function(){
 		});
 	}else if(ts.commitTableOrTran == 'openTable'){
 		ts.createOrderForShowMessageTS();
+	}else if(ts.commitTableOrTran == 'apartTable'){
+		$('#divSelectTablesForTs').hide();
+		$('#divSelectTablesSuffixForTs').show();
+		ts.table.alias = $('#txtTableNumForTS').val();
 	}
 }
 
@@ -542,6 +559,49 @@ ts.createOrderForLookup = function (){
 }
 
 /**
+ * 设置为拆台
+ */
+ts.openApartTable = function(){
+	//隐藏数量输入
+	$('#td4TxtFoodNumForTran').hide();
+	ts.commitTableOrTran = 'apartTable';
+	
+	$("#txtTableNumForTS").val("");
+	
+	$('#transSomethingTitle').html("请输入桌号，确认拆台");
+	
+	//打开控件
+	uo.openTransOrderFood();		
+}
+
+
+/**
+ * 拆台
+ */
+ts.openApartTableAction = function(s){
+	Util.LM.show();
+	$.post('../OperateTable.do', {
+		dataSource : 'apartTable',
+		tableID : ts.table.id,
+		suffix : s
+	}, function(result){
+		Util.LM.hide();
+		if(result.success){
+			uo.closeTransOrderFood();
+			location.href = '#orderFoodListMgr';
+			uo.show({
+				table : result.root[0]
+			});
+		}else{
+			Util.msg.alert({
+				msg : result.msg,
+				topTip : true
+			});
+		}
+	});		
+}
+
+/**
  * 查台后开台操作
  */
 ts.createTableWithPeople = function(){
@@ -582,6 +642,7 @@ ts.closeTableWithPeople = function(){
  */
 ts.selectTable = function(c){
 	updateTable({
+		id : c.id,
 		alias : c.tableAlias,
 		event : c.event
 	});
@@ -739,6 +800,7 @@ function updateTable(c){
 		url : '../QueryTable.do',
 		type : 'post',
 		data : {
+			tableID : !c.alias || c.alias == 0?c.id : '', 
 			alias : c.alias,
 			random : Math.random()
 		},

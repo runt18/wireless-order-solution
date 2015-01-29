@@ -4,12 +4,6 @@
 <meta charset="UTF-8">
 <title>餐台选择</title>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
-<script type="text/javascript">
-	//刷新时去除#
-	if(location.href.indexOf('#') > 0){
-		location.href = 'tableSelect.html';
-	}
-</script>
 <link rel="stylesheet" href="css/common/jquery.mobile-1.3.2.css">
 <!-- 数字键盘 -->
 <link rel="stylesheet" href="css/calculate/datouwang.css">
@@ -82,7 +76,7 @@ function test(){
     	<a data-role="button" data-theme="e" data-inline="true" data-type="region" class="regionBtn" onclick="ts.addTables({event:this, id:-1})">全部区域</a>
     	<div style="height: 470px;overflow-y: auto;overflow-x: hidden;">
     	<div id="divSelectRegionForTS">
-	    	<a data-role="button" data-inline="true" class="regionBtn" onclick="">区域1</a>
+	    	<!-- <a data-role="button" data-inline="true" class="regionBtn" onclick="">区域1</a> -->
     	</div>
    		</div>
      </div>
@@ -105,6 +99,7 @@ function test(){
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<!-- <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.openTableAction()">点菜</a> -->
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.createOrderForLookup()">查台</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.openApartTable()">拆台</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="initTableData()" >刷新</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.transTableForTS()">转台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="test()">沽清</a>
@@ -221,12 +216,19 @@ function test(){
         	<li class="tempFoodKitchen"><a >八八折</a></li>
         </ul>
 	</div>	
-	
+	 <!-- 账单更多操作 -->
 	<div data-role="popup" id="updateFoodOtherOperateCmp" data-theme="d">
         <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
             <li class="tempFoodKitchen" onclick="uo.showOperatePeople()"><a >人数</a></li>
             <li class="tempFoodKitchen" onclick="uo.tempPayForPrintAll()"><a >补打总单</a></li>
             <li class="tempFoodKitchen" onclick="uo.allTransFoodForTS()"><a >全单转菜</a></li>
+        </ul>
+	</div>		
+	
+     <!-- 单条已点菜更多操作 -->
+	<div data-role="popup" id="orderFoodMoreOperateCmp" data-theme="d">
+        <ul data-role="listview" data-inset="true" style="min-width:100px;" data-theme="b">
+            <li style="line-height: 40px;" onclick="uo.weighOperate=true;$('#orderFoodMoreOperateCmp').popup('close')"><a >称重</a></li>
         </ul>
 	</div>		
 
@@ -266,6 +268,46 @@ function test(){
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.saveForChangePeople()">确定</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeOperatePeople()">取消</a>		 
+			 </div>
+	    </div>
+	</div>		
+	
+	<div id="orderFoodWeighCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
+	    <div data-role="header" data-theme="b" class="ui-corner-top">
+	        <h1>输入称重--<span id="weighFoodName"></span></h1>
+	    </div>
+	    <div style="max-height: 300px; overflow-y: auto;">
+			<div id="calculator4OrderCustomerCount" class="calculator">
+				<div class="top">
+					<span class="clear">+</span>
+					<span class="inputs">
+						<input id="inputOrderFoodWeigh" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodWeigh')">
+					</span>
+					<span class="clear">-</span>
+				</div>
+				<div class="keys">
+					<span>7</span>
+					<span>8</span>
+					<span>9</span>
+					<span>0</span>
+					
+					<span>4</span>
+					<span>5</span>
+					<span>6</span>
+					<span>.</span>
+					
+					<span>1</span>
+					<span>2</span>
+					<span>3</span>
+					<span class="clear">C</span>
+				</div>
+			</div>		    
+	    
+		</div>	
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.openWeighaction()">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeWeighOperate()">取消</a>		 
 			 </div>
 	    </div>
 	</div>		
@@ -330,6 +372,15 @@ function test(){
 			</a>    -->
 				
 	</div>
+	<div id="divSelectTablesSuffixForTs" style="display: none;"  align="left">
+			<a onclick="ts.openApartTableAction('A')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">A</a>
+			<a onclick="ts.openApartTableAction('B')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">B</a>
+			<a onclick="ts.openApartTableAction('C')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">C</a>
+			<a onclick="ts.openApartTableAction('D')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">D</a>
+			<a onclick="ts.openApartTableAction('E')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">E</a>
+			<a onclick="ts.openApartTableAction('F')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">F</a>
+			<a onclick="ts.openApartTableAction('G')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">G</a>     
+	</div>	
 	<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
 		 <div data-role="controlgroup" data-type="horizontal" data-corners="false" class="bottomBarFullWidth ui-bar-b" >
 			 <a  data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn" onclick="ts.submitForSelectTableOrTransFood()">确定</a>
@@ -421,7 +472,7 @@ function test(){
 					 
 				 </div>		
 		     </div>
-		     <!-- 更多操作 -->
+		     <!-- 点菜更多操作 -->
 			<div data-role="popup" id="orderFoodOtherOperateCmp" data-theme="d">
 		        <ul data-role="listview" data-inset="true" style="min-width:130px;" data-theme="b">
 		            <li class="tempFoodKitchen" onclick="of.allBillTasteAction=true;$('#orderFoodOtherOperateCmp').popup('close')"><a >全单口味</a></li>
