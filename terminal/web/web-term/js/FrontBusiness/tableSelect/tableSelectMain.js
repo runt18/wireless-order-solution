@@ -1629,17 +1629,25 @@ Ext.onReady(function() {
 						Ext.example.msg('提示', '<font color="red">操作失败, 原台和转至新台一样, 请重新输入新台台号.</font>');
 						return;
 					}
-					var tableIndex = -1;
+					var newTable = null;
+					var oldTable = null;
 					for( var i = 0; i < tableStatusListTS.length; i++){
 						if (tableStatusListTS[i].alias == inputTableNbr) {
-							tableIndex = i;
+							newTable = tableStatusListTS[i];
 							break;
 						}
 					}
 					
-					if(tableIndex == -1){
+					for( var i = 0; i < tableStatusListTS.length; i++){
+						if (tableStatusListTS[i].alias == selectedTable) {
+							oldTable = tableStatusListTS[i];
+							break;
+						}
+					}
+					
+					if(!newTable){
 						Ext.example.msg('提示', '<font color="red">操作失败, 您输入的台号不存在, 请重新输入.</font>');
-					}else if(tableStatusListTS[tableIndex].statusValue == TABLE_BUSY) {
+					}else if(newTable.statusValue == TABLE_BUSY) {
 						Ext.example.msg('提示', '<font color="red">操作失败, 您输入的台号为就餐状态, 不能转台, 请重新输入.</font>');
 					} else {
 						var btnSave = Ext.getCmp('btnTableChange');
@@ -1650,8 +1658,8 @@ Ext.onReady(function() {
 							url : "../../OperateTable.do",
 							params : {
 								dataSource : 'transTable',
-								"oldTableAlias" : selectedTable,
-								"newTableAlias" : inputTableNbr
+								"oldTableId" : oldTable.id,
+								"newTableId" : newTable.id
 							},
 							success : function(response, options) {
 								var jr = Ext.decode(response.responseText);
