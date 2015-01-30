@@ -945,6 +945,7 @@ var paymentBut = new Ext.ux.ImageButton({
 
 var selTabContentGrid = null;
 var selTabContentWin = null;
+var detailTableId = ''
 var btnOrderDetail = new Ext.ux.ImageButton({
 	imgPath : '../../images/TableOrderDetail.png',
 	imgWidth : 50,
@@ -956,6 +957,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
 				if (tableStatusListTSDisplay[i].alias == selectedTable) {
 					selTabContent = tableStatusListTSDisplay[i];
+					detailTableId = tableStatusListTSDisplay[i].id;
 					break;
 				}
 			}
@@ -993,7 +995,6 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 				);
 				selTabContentGrid.frame = false;
 				selTabContentGrid.border = false;
-				
 				selTabContentGrid.getStore().on('load', function(store, records, options){
 					store.add(new Ext.data.Record({'orderDateFormat':'汇总', 'name':'-----', 'unitPrice':0, 'count':0, 'tasteGroup.tastePref':'', 'tasteGroup.tastePrice':'', 'kitchen.name':'', 'waiter': '', 'cancelReason.reason':''}));
 					var sumRow;
@@ -1003,7 +1004,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					if(store.getCount() > 0){
 						Ext.Ajax.request({
 							url : '../../QueryOrderByCalc.do',
-							params : {tableID : selTabContent.id, calc : false},
+							params : {tableID : detailTableId, calc : false},
 							success : function(res, opt){
 								var jr = Ext.decode(res.responseText);
 								
