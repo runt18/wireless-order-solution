@@ -173,6 +173,9 @@ function initStaffContent(c){
 	            $.mobile.changePage("#staffLoginPage",
 	                    { transition: "fade" });
 	            
+	            //设置餐厅名字
+	            $('#lab4RestaurantName').text(lg.restaurant.name);
+	            
 				if(data.root.length > 20){
 					$('#staffPaddingBar').show();
 				}

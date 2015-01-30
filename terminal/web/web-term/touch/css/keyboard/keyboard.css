@@ -79,6 +79,7 @@ user-select: none;
 #keyboard_5xbogf8c li:nth-child(11),#keyboard_5xbogf8c li:nth-child(43),#keyboard_5xbogf8c li:nth-child(22)  {
     background: rgba(188,188,188,.5);
     font-size: 0.20em;
+    font-weight:bold;
     width: 5em;
     height: 3.5em;
     line-height:3.5em;

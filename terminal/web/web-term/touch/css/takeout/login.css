@@ -1,3 +1,14 @@
+/*
+替代原来1114行的按钮top 3px
+*/
+.ui-header .ui-btn-left,
+.ui-header .ui-btn-right,
+.ui-footer .ui-btn-left,
+.ui-footer .ui-btn-right,
+.ui-header-fixed.ui-fixed-hidden .ui-btn-left,
+.ui-header-fixed.ui-fixed-hidden .ui-btn-right { position: absolute;top:initial;}
+
+
 /*登陆人信息*/
 .loginName{
 	width: 110px;

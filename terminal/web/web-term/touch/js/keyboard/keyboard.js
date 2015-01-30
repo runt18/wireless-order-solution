@@ -41,7 +41,7 @@ this.each(function(){
     "<li>8</li>"+
     "<li>9</li>"+
     "<li>0</li>"+
-    "<li>←</li>"+
+    "<li>删除</li>"+
     "<li>Q</li>"+
     "<li>W</li>"+
     "<li>E</li>"+
@@ -62,8 +62,8 @@ this.each(function(){
     "<li>J</li>"+
     "<li>K</li>"+
     "<li>L</li>"+
-    "<li>Exit</li>"+
-    "<li>CapsLock</li>"+
+    "<li>关闭键盘</li>"+
+    "<li>大/小写锁定</li>"+
     "<li>Z</li>"+
     "<li>X</li>"+
     "<li>C</li>"+
@@ -73,7 +73,7 @@ this.each(function(){
     "<li>M</li>"+
     "<li><span>-</span><span>_</span></li>"+
     "<li><span>/</span><span>.</span></li>"+
-    "<li>Clear</li>"+
+    "<li>清空</li>"+
     "<div id='keyboard_5xbogf8c_left'></div>"+
     "<div id='keyboard_5xbogf8c_right'></div>"+
   "</ul>");    
@@ -106,7 +106,7 @@ this.each(function(){
     var keyele = $(this);
     var keytext = keyele.text();
     var evebool = true;    
-    if(keytext==="CapsLock"){
+    if(keytext==="大/小写锁定"){
         activeinputele[0].focus();
         if(shiftbool){
             keyele.css({background:"rgba(255,255,255,.9)"});
@@ -118,17 +118,17 @@ this.each(function(){
         
         evebool = false;
     }
-    if(keytext==="Exit"||keytext.length<1){
+    if(keytext==="关闭键盘"||keytext.length<1){
         simulateKeyEvent(activeinputele[0],13);
         exit();
         evebool = false;
     }
-    if(keytext==="←"){
+    if(keytext==="删除"){
         activeinputele[0].focus();
         backspace();
         evebool = false;
     }
-    if(keytext==="Clear"){
+    if(keytext==="清空"){
         activeinputele[0].focus();
         keyclear();
         evebool = false;
@@ -152,7 +152,6 @@ this.each(function(){
             var newbabkground = oldbabkground-colorchangeStep;
             if(newbabkground<colorchangeMin){
                 newbabkground = colorchangeMin;
-                alert("min")
             }
              $(this).css("background","rgba("+newbabkground+","+newbabkground+","+newbabkground+",.9)");
         }

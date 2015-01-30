@@ -43,9 +43,18 @@
 	
 </div>
 <div id="staffLoginPage" data-role="page" align="center" data-theme="e">
-	<div data-role="header" data-position="fixed" data-theme="b" style="line-height: 35px;height: 40px;">
-		<span id="txtRestaurantName" class="ui-btn-left">利雅园餐厅</span>
-	</div>
+<!-- 	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b" style="height: 55px;font-size: 20px;">
+		<div data-role="controlgroup" class="ui-btn-left " data-type="horizontal">
+			<div style="float: left;">Digie<br>智易</div>
+			<div style="float: left;line-height: 50px;margin-left: 30px;font-size: 30px;">一个简单, 智易的餐饮管理系统</div>
+			<div style="float: left;margin-left: 30px;">
+				<img src="images/guanggao.jpg">
+			</div>
+		</div>
+		<div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+			<div >400-8999-5553<br>客服   850774706</div>
+		</div>		
+	</div> -->
 	<!-- 员工列表 -->
      <div id="selectStaffCmp" data-role="popup" data-theme="c" style="width:650px;border: initial;" class="ui-corner-all" align="center">
 		<div data-role="header" data-theme="b" class="ui-corner-top">
@@ -62,16 +71,17 @@
 		</div>			
      </div>
 
-   	<div data-role="content" id="popupLogin" class="ui-corner-all" style="width: 450px;margin-top: 100px;" data-theme="a">
-        <div style="padding:0px 40px;" >
-            <!-- <input type="text" name="user" id="loginEmployee" value="" placeholder="员工姓名" data-theme="a" disabled="" style="font-size: 23px;font-weight: bolder;"> -->
+     <div id="popupLogin" class="ui-corner-all" style="width: 450px;margin-top: 100px;">
+		<div data-role="header" data-theme="b" class="ui-corner-top">
+			<font id="lab4RestaurantName" size="6"></font>
+		</div>    	
+        <div style="padding: 10px 40px;background-color: #111;border-bottom-right-radius: 10px;border-bottom-left-radius: 10px;" >
            	<a onclick="openStaffSelectCmp()" data-rel="popup" data-role="button" data-inline="true" data-transition="pop" data-theme="b">选择员工</a>
-  				<label id="lab4StaffName" style="font-size: 25px;font-weight: bold;color: green;"></label>
+  				<label id="lab4StaffName" style="font-size: 25px;font-weight: bold;color: white;"></label>
             <input type="password"  name="pass" id="loginPassword" value="" placeholder="密码" data-theme="a" class="numkeyboard">
             <button type="button" data-theme="b" data-icon="check" onclick="staffLoginHandler()">登陆</button>
         </div>
-	</div>	     
-     
+	</div>
 </div>
 
 </body>
