@@ -31,7 +31,7 @@ function initSearchTables(c){
 			dataIndex : i,
 			id : c.data[i].id,
 			click : 'ts.toOrderFoodOrTransFood({alias:'+ c.data[i].alias +',id:'+ c.data[i].id +'})',
-			alias : c.data[i].alias,
+			alias : c.data[i].alias && c.data[i].alias != 0?c.data[i].alias:'<font color="green">搭台</font>',
 			theme : c.data[i].statusValue == '1' ? "e" : "c",
 			name : c.data[i].name == "" || typeof c.data[i].name != 'string' ? c.data[i].alias + "号桌" : c.data[i].name
 		});	
@@ -43,7 +43,7 @@ function initSearchTables(c){
 var orderFoodListCmpTemplet = '<tr>'
 	+ '<td>{dataIndex}</td>'
 	+ '<td ><div style="height: 45px;overflow: hidden;">{name}</div></td>'
-	+ '<td>{count}</td>'
+	+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
 	+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
 	+ '<td>{actualPrice}</td>'
 //	+ '<td>{totalPrice}</td>'
@@ -52,7 +52,7 @@ var orderFoodListCmpTemplet = '<tr>'
 	+ 		'<div data-role="controlgroup" data-type="horizontal" >'
     + 			'<a onclick="uo.openCancelFoodCmp({event:this})" data-index={dataIndex} data-role="button" data-theme="b">退菜</a>'
     +			'<a onclick="uo.transFoodForTS({event:this})" data-index={dataIndex} data-role="button" data-theme="b">转菜</a>'
-    +			'<a onclick="uo.openOrderFoodOtherOperate({event:this})" data-index={dataIndex} data-role="button" data-theme="b"  data-rel="popup"  data-transition="pop" href="#orderFoodMoreOperateCmp">更多</a>'
+    +			'<a onclick="uo.openOrderFoodOtherOperate({event:this})" data-index={dataIndex} data-role="button" data-theme="b"  data-rel="popup"  data-transition="pop" href="#{hasWeigh}">更多</a>'
     +		'</div>'
 	+ '<td>{waiter}</td>'
 	+ '</tr>';	
@@ -146,6 +146,8 @@ uo.showOrder = function(){
 			id : uo.order.orderFoods[i].id,
 			name : uo.order.orderFoods[i].name,
 			count : uo.order.orderFoods[i].count.toFixed(2),
+			isWeight : (uo.order.orderFoods[i].status & 1 << 7) != 0 ? 'initial' : 'none',
+			hasWeigh : (uo.order.orderFoods[i].status & 1 << 7) != 0 ?'orderFoodMoreOperateCmp':'',
 			tastePref : uo.order.orderFoods[i].tasteGroup.tastePref,
 			actualPrice : (uo.order.orderFoods[i].actualPrice + uo.order.orderFoods[i].tasteGroup.tastePrice).toFixed(2) + (uo.order.orderFoods[i].isGift?'&nbsp;[<font style="font-weight:bold;">已赠送</font>]':''),
 			totalPrice : uo.order.orderFoods[i].totalPrice.toFixed(2),
@@ -308,8 +310,6 @@ uo.cancelFoodAction = function(){
 	
 	//取得退菜数目并进行判定
 	var num = $("#inputCancelFoodSet").val();
-	
-	
 	if(num <= 0){
 		Util.msg.alert({
 			msg : '退菜数目不正确', 
@@ -383,22 +383,44 @@ uo.cancelFoodAction = function(){
 uo.openWeighOperate = function(){
 	setTimeout(function(){
 		$('#inputOrderFoodWeigh').focus();
+		//显示菜名
+		$('#weighFoodName').text(uo.selectedFood.name);		
 	}, 250);
 	$('#orderFoodWeighCmp').parent().addClass('popup').addClass('in');
 	$('#orderFoodWeighCmp').popup('open');
-	//显示菜名
-	$('#weighFoodName').text(uo.selectedFood.name);
+
 }
 
 /**
  * 关闭称重
  */
 uo.closeWeighOperate = function(){
-	$('#orderFoodWeighCmp').popup('close');
 	$('#inputOrderFoodWeigh').val('');
+	$('#orderFoodWeighCmp').popup('close');
+	$('#orderFoodWeighCmp').popup('close');
 	//删除动作
 	delete uo.weighOperate;
 }
+
+
+/**
+ * 打开更多操作
+ */
+uo.openOrderFoodOtherOperate = function(c){
+	uo.selectedFood = uo.order.orderFoods[parseInt($(c.event).attr('data-index'))-1];
+}
+
+/**
+ * 去称重
+ */
+uo.weighAction = function(){
+	uo.weighOperate=true;
+	
+	setTimeout(function(){
+		uo.openWeighOperate();
+	}, 250);
+	$('#orderFoodMoreOperateCmp').popup('close');
+};
 
 /**
  * 称重操作
@@ -431,23 +453,6 @@ uo.openWeighaction = function(){
 	uo.selectedFood.count = count.val();
 	//对更新的菜品和人数进行提交
 	uo.submitUpdateOrderHandler(uo.order.orderFoods);	
-}
-
-/**
- * 打开更多操作
- */
-uo.openOrderFoodOtherOperate = function(c){
-	console.log('更多')
-	uo.selectedFood = uo.order.orderFoods[parseInt($(c.event).attr('data-index'))-1];
-	$('#orderFoodMoreOperateCmp').popup({
-		afterclose : function(){
-			console.log('closeaction:'+uo.weighOperate)
-			
-			if(uo.weighOperate){
-				uo.openWeighOperate();
-			}
-		}
-	});
 }
 
 /**

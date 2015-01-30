@@ -13,6 +13,19 @@ var of = {
 	newFood : []
 };
 
+of.searchFoodCompare = function (obj1, obj2) {
+    var val1 = obj1.foodCnt;
+    var val2 = obj2.foodCnt;
+    if (val1 < val2) {
+        return -1;
+    } else if (val1 > val2) {
+        return 1;
+    } else {
+        return 0;
+    }            
+} 
+
+
 //餐台选择匹配
 of.s = {
 	file : null,
@@ -32,6 +45,9 @@ of.s = {
 						}
 					}				
 				}
+				
+				data = data.sort(of.searchFoodCompare);
+				
 				of.s.foodPaging.init({
 					data : data,
 					callback : function(){
@@ -430,6 +446,8 @@ of.insertFood = function(c){
 		if(jr.success && jr.root.length > 0){
 			of.commonTastes = jr.root;
 			foodCommonTasteLoad();
+		}else{
+			$('#divFoodTasteFloat').hide();
 		}		
 	});
 	
@@ -439,6 +457,7 @@ of.insertFood = function(c){
 		if(of.newFood[i].id == data.id){
 			has = true;
 			of.newFood[i].count++;
+			of.selectedOrderFood = of.newFood[i];
 			break;
 		}
 	}
@@ -1589,6 +1608,7 @@ of.tf.saveTempFood = function(){
 
 //常用口味
 function foodCommonTasteLoad(){
+	of.ot.choosedTastes = [];
 	var html = '';
 	for (var i = 0; i < of.commonTastes.length; i++) {
 		html += tasteCmpTemplet.format({
@@ -1692,6 +1712,7 @@ function chooseOrderFoodCommonTaste(c){
 			break; 
 		}
 	}
+	
 	of.initNewFoodContent({
 		data : of.selectedOrderFood
 	});	
@@ -1773,6 +1794,26 @@ of.findByAliasAction = function(c){
 };
 
 /**
+ * 打开更多操作
+ */
+of.openMoreOperate = function(){
+	console.log('设置close')
+	$('#orderOtherOperateCmp').popup({
+		afterclose: function (event, ui) { 
+			console.log('closeing')
+			if(uo.orderNotPrint){
+				of.submit({notPrint : true});	
+			}
+		}
+	});	
+}
+
+of.test = function(){
+	uo.orderNotPrint=true;
+	$('#orderOtherOperateCmp').popup('close');
+}
+
+/**
  * 账单提交
  */
 of.submit = function(c){
@@ -1792,7 +1833,6 @@ of.submit = function(c){
 		isFree = true;
 		foodData = of.newFood.slice(0);
 	}
-	
 	
 	Util.LM.show();
 	
@@ -1909,7 +1949,12 @@ of.submit = function(c){
 						});
 						
 						if(of.callback != null && typeof of.callback == 'function'){
-							of.callback();
+								delete uo.orderNotPrint;
+//							setTimeout(function(){
+								of.callback();
+								
+//							}, 250);
+							
 						}else{//没有回调函数直接退回主界面
 							uo.back();
 						}						

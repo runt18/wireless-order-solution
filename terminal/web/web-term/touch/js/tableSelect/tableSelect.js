@@ -56,6 +56,8 @@ $(function(){
 		}
 	});
  		
+	
+	
 	Util.LM.show();		
 	
 	$.ajax({
@@ -77,8 +79,8 @@ $(function(){
 				window.setInterval("initTableData()", 20 * 60 * 1000);
 				//加载基础数据
 				Util.LM.show();
-				initFoodData();
 				initTableData();
+				initFoodData();
 	
 				
 				//验证员工权限	
@@ -231,6 +233,8 @@ function initFoodData(){
 			dataSource : 'foodList'
 		},
 		success : function(data, status, xhr){
+			Util.LM.hide();	
+			
 			var deptNodes = data.root;
 			
 			of.foodList = data.other.foodList;
@@ -268,7 +272,7 @@ function initFoodData(){
 			$.ajax({
 				url : '../QueryMenu.do',
 				type : 'post',
-				async:false,
+//				async:false,
 				data : {
 					dataSource : 'tastes'
 				},
@@ -317,14 +321,19 @@ function initFoodData(){
 					});
 				},
 				error : function(request, status, err){
-					alert(request.msg);
+					Util.msg.alert({
+						msg : request.msg,
+						renderTo : 'tableSelectMgr'
+					});
 				}
 			}); 
 
-			Util.LM.hide();	
 		},
 		error : function(request, status, err){
-			alert(request.msg);
+			Util.msg.alert({
+				msg : request.msg,
+				renderTo : 'tableSelectMgr'
+			});
 		}
 	}); 
 	
@@ -352,7 +361,9 @@ ts.s = {
 						data = [];
 						temp = tables.slice(0);
 						for(var i = 0; i < temp.length; i++){
-							if((temp[i].alias + '').indexOf(ts.s.fileValue.trim()) != -1){
+							if((temp[i].name + '').indexOf(ts.s.fileValue.trim()) != -1){
+								data.push(temp[i]);
+							}else if((temp[i].alias + '').indexOf(ts.s.fileValue.trim()) != -1){
 								data.push(temp[i]);
 							}
 						}				
