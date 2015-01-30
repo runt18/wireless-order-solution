@@ -52,7 +52,7 @@ var orderFoodListCmpTemplet = '<tr>'
 	+ 		'<div data-role="controlgroup" data-type="horizontal" >'
     + 			'<a onclick="uo.openCancelFoodCmp({event:this})" data-index={dataIndex} data-role="button" data-theme="b">退菜</a>'
     +			'<a onclick="uo.transFoodForTS({event:this})" data-index={dataIndex} data-role="button" data-theme="b">转菜</a>'
-    +			'<a onclick="uo.openOrderFoodOtherOperate({event:this})" data-index={dataIndex} data-role="button" data-theme="b"  data-rel="popup"  data-transition="pop" href="#{hasWeigh}">更多</a>'
+    +			'<a  data-index={dataIndex} data-role="button" data-theme="b"  data-rel="popup"  data-transition="pop" >更多</a>'
     +		'</div>'
 	+ '<td>{waiter}</td>'
 	+ '</tr>';	
