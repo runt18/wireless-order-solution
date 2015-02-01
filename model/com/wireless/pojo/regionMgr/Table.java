@@ -483,7 +483,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	}
 	
 	public String getName() {
-		if(tableName == null){
+		if(tableName == null || tableName.trim().length() == 0){
 			return tableAlias + "号台";
 		}
 		return tableName;
