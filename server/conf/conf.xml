@@ -12,6 +12,8 @@
 	<pwd>HelloZ315</pwd>
 	<!-- the port listened on socket for terminal -->
     <listen>55555</listen>
+	<!-- the backup server -->
+    <backup ip="192.168.1.110" port="55555"/>
 	<!-- the port listened on socket for printer -->
 	<printer_listen>44444</printer_listen>
 	<!-- the port listened on socket for monitor -->
