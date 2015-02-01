@@ -141,12 +141,7 @@ public class AskTableDialog extends DialogFragment {
 					}
 					
 					//设置餐台名称
-					if(tbl.getName().length() == 0){
-						checkBox.setText(Integer.toString(tbl.getAliasId()));
-					}else{
-						checkBox.setText(tbl.getName());
-					}
-					
+					checkBox.setText(tbl.getName());
 					//设置点击处理回调函数
 					checkBox.setOnClickListener(new OnClickListener(){
 
