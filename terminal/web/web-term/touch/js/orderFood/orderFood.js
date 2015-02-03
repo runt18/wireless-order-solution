@@ -1374,16 +1374,18 @@ function searchFood(ope){
 			return;
 		}
 		
+		of.searchFooding = true;
+		
 		YBZ_open(document.getElementById('searchFoodInput'));
 		
 		$('#normalOperateFoodCmp').hide();
 		$('#searchFoodCmp').show();	
-		$('#searchFoodInput').focus();
 		
-		of.searchFooding = true;
+		setTimeout(function(){
+			$('#searchFoodInput').focus();
+		}, 250);
+		
 	}else{
-		
-		
 		var kitchen = $('#kitchensCmp > a[data-theme=b]');
 		if(kitchen.length > 0){
 			kitchen.click();
@@ -1395,7 +1397,6 @@ function searchFood(ope){
 		
 		closeSearchFood();
 	}
-
 }
 
 function closeSearchFood(){
@@ -1454,13 +1455,8 @@ function addTempFood(){
 	$('#addTempFoodCmp').show();
 	$('#addTempFoodCmpShadow').show();
 	
-//	if(of.searchFooding){
-//		YBZ_open(document.getElementById('tempFoodName'));
-//		$('#tempFoodWriterOn')[0].selectedIndex = 1;
-//		$('#tempFoodWriterOn').slider('refresh');
-//	}	
-	
 	$('#tempFoodName').focus();
+	
 }
 
 /**
@@ -1472,18 +1468,6 @@ of.tf.closeTempFood = function(){
 	$('#tempFoodName').val('');
 	$('#tempFoodPrice').val('');
 	$('#tempFoodCount').val(1);
-	
-//	var numSelect = $(".numberKeyboard");
-//	for (var i = 0; i < numSelect.length; i++) {
-//		numSelect[i].selectedIndex = 0;
-//	}
-//	numSelect.slider('refresh'); 
-//	
-//	var ybzSelect = $(".handWriteCmp");
-//	for (var i = 0; i < ybzSelect.length; i++) {
-//		ybzSelect[i].selectedIndex = 0;
-//	}	
-//	ybzSelect.slider('refresh'); 
 	
 	//关闭键盘
 	$('#numberKeyboard').hide();	
