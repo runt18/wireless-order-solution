@@ -280,7 +280,6 @@ of.initKitchenContent = function(c){
  * 但div还没设置完成高度时不断刷新
  */
 function keepLoadFoodData(){
-	
 	if(!$('#foodsCmp').html()){
 		of.initKitchenContent({deptId:-1});
 	}else{
@@ -339,7 +338,7 @@ of.show = function(c){
 	
 	of.table = c.table;
 	of.order = typeof c.order != 'undefined' ? c.order : null;
-	of.callback = typeof c.callback == 'function' ? c.callback : null;
+	of.afterCommitFn = typeof c.callback == 'function' ? c.callback : null;
 	
 	//加载菜品数据
 	toOrderFoodPage(of.table);	
@@ -412,12 +411,6 @@ of.insertFood = function(c){
 	}
 	//
 	var data = null;
-//	for(var i = 0; i < of.fp.getPageData().length; i++){
-//		if(of.fp.getPageData()[i].id == c.foodId){
-//			data = of.fp.getPageData()[i];
-//			break;
-//		}
-//	}
 	for(var i = 0; i < of.foodList.length; i++){
 		if(of.foodList[i].id == c.foodId){
 			//返回连接空数组的副本
@@ -712,17 +705,16 @@ of.deleteFood = function(){
  *  type: 1:全单叫起 2:单个叫起
  */
 of.foodHangup = function(c){
-	//去除动作标记
-	delete of.allBillHandupAction	
-	
 	if(c == null || typeof c.type != 'number'){
 		return;
 	}
 	
 	if(c.type == 1){
+		//关闭更多控件
+		$('#orderFoodOtherOperateCmp').popup('close');
+		
 		var isHangup;
 		for(var i = 0; i < of.newFood.length; i++){
-//			of.newFood[i].isHangup = typeof of.newFood[i].isHangup != 'boolean' ? true : of.newFood[i].isHangup ? of.newFood[i].isHangup : !of.newFood[i].isHangup;
 			if(i == 0){
 				isHangup = typeof of.newFood[i].isHangup != 'boolean' ? true : !of.newFood[0].isHangup;
 			}
@@ -742,7 +734,8 @@ of.foodHangup = function(c){
 		data.isHangup = typeof data.isHangup != 'boolean' ? true : !data.isHangup;;
 		of.initNewFoodContent({
 			data : data
-		});
+		});			
+
 	}
 };
 
@@ -773,30 +766,13 @@ of.giftFood = function(c){
 	});
 };
 
-
-/**
- * 打开更多操作
- */
-of.openOrderFoodOtherOperate = function(){
-	$('#orderFoodOtherOperateCmp').popup({
-		afterclose : function(){
-			if(of.allBillTasteAction){
-				operateOrderFoodTaste({type:1});
-			}else if(of.allBillHandupAction){
-				of.foodHangup({type : 1})
-			}
-		}
-	});
-}
-
-
 /**
  * 口味操作 
  * type : 1全单, 2单个口味
  */
 function operateOrderFoodTaste(c){
-	//去除动作标记
-	delete of.allBillTasteAction	
+//	//去除动作标记
+//	delete of.allBillTasteAction	
 	var foodContent = $('#orderFoodsCmp > li[data-theme=e]');
 	if(c.type == 2 && foodContent.length != 1){
 		Util.msg.alert({
@@ -837,24 +813,6 @@ function operateOrderFoodTaste(c){
 		if(of.searchFooding){
 			YBZ_win.close();
 		}
-/*		$.ajax({
-			url : '../QueryFoodTaste.do',
-			type : 'post',
-			async:false,
-			data : {
-				foodID:of.selectedOrderFood.id
-			},
-			success : function(jr, status, xhr){
-				if(jr.root.length > 0){
-					of.commonTastes = jr.root;
-				}else{
-					of.commonTastes = of.allTastes;
-				}
-			},
-			error : function(request, status, err){}
-		}); */
-		
-//		var commonTastesGroup = null;
 		
 		for (var i = 0; i < of.tasteGroups.length; i++) {
 			if(of.tasteGroups[i].id == -10){//表示常用
@@ -889,6 +847,9 @@ function operateOrderFoodTaste(c){
 			tg = null;
 		}	
 	}else{
+		//关闭更多控件
+		$('#orderFoodOtherOperateCmp').popup('close');
+		
 		for (var i = 0; i < of.tasteGroups.length; i++) {
 			if(of.tasteGroups[i].id == -10){//表示常用
 				of.tasteGroups[i].name = '所有口味';
@@ -904,7 +865,7 @@ function operateOrderFoodTaste(c){
 		if(of.ot.allBillTaste){
 			foodTasteGroup = foodTasteGroup.concat(of.ot.allBillTaste);
 		}
-		tastesDate = of.allTastes;
+		tastesDate = of.allTastes;			
 	}
 	
 	//全单口味则只把全单类型的放入
@@ -915,8 +876,18 @@ function operateOrderFoodTaste(c){
 	initTasteCmp();
 	initChoosedTasteCmp();
 	
-	$('#orderFoodTasteCmp').popup('open');
-	$('#orderFoodTasteCmp').parent().addClass("pop").addClass("in");
+	//单项口味不用延迟
+	if(c.type == 2){
+		$('#orderFoodTasteCmp').popup('open');
+		$('#orderFoodTasteCmp').parent().addClass("pop").addClass("in");		
+	}else{
+		setTimeout(function(){
+			$('#orderFoodTasteCmp').popup('open');
+			$('#orderFoodTasteCmp').parent().addClass("pop").addClass("in");
+		},250);		
+	}
+	
+
 };
 /**
  * 口味操作返回
@@ -1728,9 +1699,7 @@ function scrolldown(c){
 	if(dom.scrollHeight == dom.scrollTop){
 	}else if(dom.scrollHeight - dom.scrollTop < 50){
 		dom.scrollTop = dom.scrollHeight;
-		//$('#divOrderFoodsCmp').animate({scrollTop: dom.scrollHeight}, 'fast');
 	}else{
-		//dom.scrollTop = dom.scrollTop + (typeof c.size == 'number' ? c.size : 50 * 3);
 		$('#divOrderFoodsCmp').animate({scrollTop: dom.scrollTop + (typeof c.size == 'number' ? c.size : 50 * 3)}, 'fast');
 	}	
 }
@@ -1793,25 +1762,17 @@ of.findByAliasAction = function(c){
 	temp = null;
 };
 
+
 /**
- * 打开更多操作
+ * 下单不打印
  */
-of.openMoreOperate = function(){
-	console.log('设置close')
-	$('#orderOtherOperateCmp').popup({
-		afterclose: function (event, ui) { 
-			console.log('closeing')
-			if(uo.orderNotPrint){
-				of.submit({notPrint : true});	
-			}
-		}
-	});	
+of.orderWithNoPrint = function(){
+	$('#orderOtherOperateCmp').popup('close');
+	setTimeout(function(){
+		of.submit({notPrint : true});	
+	}, 250);
 }
 
-of.test = function(){
-	uo.orderNotPrint=true;
-	$('#orderOtherOperateCmp').popup('close');
-}
 
 /**
  * 账单提交
@@ -1884,16 +1845,19 @@ of.submit = function(c){
 										dataType : 'text',
 										success : function(result, status, xhr){
 											Util.LM.hide();
-											result = eval("(" + result + ")");
+											if(typeof result == "string"){
+												result = eval("(" + result + ")");
+											}
 											if(result.success){
 												Util.msg.alert({
 													topTip : true,
 													msg : result.data,
 												});
-												if(of.callback != null && typeof of.callback == 'function'){
-													of.callback();
-												}
-												of.back();
+												//暂结应该是没有回调方法的
+												console.log('暂结')
+//												if(of.afterCommitFn != null && typeof of.afterCommitFn == 'function'){
+//													of.afterCommitFn();
+//												}
 				//								initOrderData({table : uo.table});
 											}else{
 												Util.msg.alert({
@@ -1948,13 +1912,8 @@ of.submit = function(c){
 							topTip : true,
 						});
 						
-						if(of.callback != null && typeof of.callback == 'function'){
-								delete uo.orderNotPrint;
-//							setTimeout(function(){
-								of.callback();
-								
-//							}, 250);
-							
+						if(of.afterCommitFn != null && typeof of.afterCommitFn == 'function'){
+								of.afterCommitFn();
 						}else{//没有回调函数直接退回主界面
 							uo.back();
 						}						

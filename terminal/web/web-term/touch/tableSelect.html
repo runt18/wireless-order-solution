@@ -18,6 +18,7 @@
 <script type="text/javascript" src="js/Util.js"></script>
 <script type="text/javascript" src="js/orderFood/orderFood.js"></script>
 <script type="text/javascript" src="js/checkOut/checkOut.js"></script>
+<script type="text/javascript" src="js/stopSet/stopSet.js"></script>
 <script type="text/javascript" src="js/tableSelect/tableSelect.js"></script>
 <script type="text/javascript" src="../extjs/wireless.ux.js"></script>
 <link rel="stylesheet" href="css/takeout/main.css">
@@ -107,7 +108,7 @@ function test(){
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.createOrderForLookup()">查台</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.openApartTable()">拆台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.transTableForTS()">转台</a>
-			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="test()">沽清</a>
+			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.stopSellMgr()">沽清</a>
 			<a href="javascript: ts.tp.getPreviousPage()" data-role="button" data-inline="true" class="bottomBtnFont">上一页</a>
 			<a href="javascript: ts.tp.getNextPage()" data-role="button" data-inline="true" class="bottomBtnFont">下一页</a>		 
 		 </div>
@@ -475,7 +476,7 @@ function test(){
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="addTempTaste()">手写口味</a>
 					 <a id="giftFoodOperate" style="display: none;" data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.giftFood()">赠送</a>	
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.foodHangup({type:2})">叫起</a>
-					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" data-rel="popup"  data-transition="pop" href="#orderFoodOtherOperateCmp" onclick="of.openOrderFoodOtherOperate()">更多</a>
+					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" data-rel="popup"  data-transition="pop" href="#orderFoodOtherOperateCmp">更多</a>
 					 <!--<a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="operateOrderFoodTaste({type:1})">全单口味</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.foodHangup({type : 1})">全单叫起</a>
 					 <a onclick="foodCommonTasteLoad()" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-transition="pop" data-theme="b">数字键盘</a> -->
@@ -485,8 +486,8 @@ function test(){
 		     <!-- 点菜更多操作 -->
 			<div data-role="popup" id="orderFoodOtherOperateCmp" data-theme="d">
 		        <ul data-role="listview" data-inset="true" style="min-width:130px;" data-theme="b">
-		            <li class="tempFoodKitchen" onclick="of.allBillTasteAction=true;$('#orderFoodOtherOperateCmp').popup('close')"><a >全单口味</a></li>
-		            <li class="tempFoodKitchen" onclick="of.allBillHandupAction=true;$('#orderFoodOtherOperateCmp').popup('close')"><a >全单叫起</a></li>
+		            <li class="tempFoodKitchen" onclick="operateOrderFoodTaste({type:1})"><a >全单口味</a></li>
+		            <li class="tempFoodKitchen" onclick="of.foodHangup({type : 1})"><a >全单叫起</a></li>
 		        </ul>
 			</div>		     
 		     
@@ -519,11 +520,10 @@ function test(){
 			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 			 	
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.submit({notPrint : false})">下单</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.submit({notPrint : true})">下单不打印</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="searchFood('on')">搜索</a>
 			 	<a onclick="addTempFood()" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-transition="pop" data-theme="b" class="bottomBtnFont" >临时菜</a>
-			 	<!-- <a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#orderOtherOperateCmp" onclick="of.openMoreOperate()">更多</a> -->
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#orderOtherOperateCmp">更多</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.foodPaging.getPreviousPage()">上一页</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.foodPaging.getNextPage()">下一页</a>
 <!-- 			 	<a onclick="of.foodPaging.getPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="foodsPaging">L</a>
@@ -534,7 +534,7 @@ function test(){
 		<!-- 下单更多操作 -->
 		<div data-role="popup" id="orderOtherOperateCmp" data-theme="d">
 	        <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-	            <li class="tempFoodKitchen" onclick="of.test()"><a >下单不打印</a></li>
+	            <li class="tempFoodKitchen" onclick="of.orderWithNoPrint()"><a >下单不打印</a></li>
 	        </ul>
 		</div>		
 		<div id="searchFoodCmp" style="height: 60px;padding-top: 25px;display: none;">		
@@ -811,6 +811,78 @@ function test(){
 	</div>	
 </div>
 
+<!-- 沽清界面 -->
+<div data-role="page" id="stopSellMgr" >
+	<div class="ui-grid-a" style="width: 100%;background-color: skyblue;border-bottom:1px solid white;">
+		<div class="ui-block-a" data-role="controlgroup" data-corners="false" style="width:102px;">
+			 <a id="divBtnSellFood" data-role="button" data-inline="true" class="tableStatus" onclick="ss.searchData({event:this, isStop:false})">在售菜品</a>
+			 <a data-role="button" data-inline="true" class="tableStatus" onclick="ss.searchData({event:this,isStop:true})">沽清菜品</a>		 
+		</div>
+		<div class="ui-block-b" style="width: -webkit-calc(100% - 102px);">
+			<!-- 部门 -->
+			 <div id="depts4StopSellCmp" data-role="controlgroup" data-type="horizontal"></div>		
+			<!-- 厨房 -->
+			 <div id="kitchens4StopSellCmp" data-role="controlgroup" data-type="horizontal" ></div>					 		
+		</div>	
+
+	</div>
+	<div id="stopSellCmp" class="ui-grid-a" style="height: 470px;overflow: hidden;">
+	     <div id="divFoods4StopSellCmp" class="ui-block-a" style="width: 350px;height: inherit;overflow-y: auto;background-color: skyblue;border-right: 1px solid white;">
+	     	<!--已点菜列表  -->
+			<ul id="toStopSellFoodCmp" data-role="listview" data-theme="d" data-inset="true"></ul>		    	
+	     </div>
+	     
+	     <!-- 菜品列表 -->
+	     <div id="foods4StopSellCmp" class="ui-block-b" style="width: -webkit-calc(100% - 350px);background-color: skyblue;"></div>			
+	</div>
+	
+	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
+		<div class="bottomGeneralBar">
+			<div id="count4StopSellFoods" style="float: left;margin-left: 20px;">总数量: 4份, 合计: ￥300.50</div>
+			<div id="foods4StopSellCmp-padding-msg" style="float: right;margin-right: 20px;">共0项, 第1/1页, 每页?项</div>
+		</div>	
+		
+		<div id="normalOperateFood4StopSellCmp" style="height: 60px;padding-top: 25px;">		
+			<div data-role="controlgroup" class="ui-btn-left " data-type="horizontal">
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.back()">返回</a>
+			 	<a onclick="Util.to.scroll({content:'divFoods4StopSellCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
+			 	<a onclick="Util.to.scroll({content:'divFoods4StopSellCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>
+			 </div>
+			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+			 	
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : true})">沽清</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : false})">开售</a>
+			 	<!-- <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a> -->
+			 	<!-- <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="searchFood('on')">搜索</a> -->
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.tp.getPreviousPage()">上一页</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.tp.getNextPage()">下一页</a>
+			 </div>
+
+		</div>
+		<div id="searchFoods4StopSellCmp" style="height: 60px;padding-top: 25px;display: none;">		
+			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal" style="margin-right: 460px;">
+			 <table>
+			 	<tr>
+			 		<td>
+			 			<input id="searchFoods4StopSellInput"  type="text" placeholder="输入菜名"  style="font-size: 20px;font-weight: bold;width: 150px;">
+			 		</td>
+			 		<td>
+						<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:60px;" align="center">
+						    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="of.s.valueBack()">D</a>
+						</div>			 		
+			 		</td>
+			 		<td>
+			 			<a data-role="button" data-inline="true" class="bottomBtnFont" style="margin-top: -5px;" onclick="addTempFood()">临时菜</a>
+			 			<a data-role="button" data-inline="true" class="bottomBtnFont" style="margin-top: -5px;" onclick="of.submit({notPrint : false})">下单</a>
+			 			<a data-role="button" data-inline="true" class="bottomBtnFont" style="margin-top: -5px;" onclick="searchFood()">关闭</a>
+			 		</td>
+			 	</tr>
+			 </table>
+			 </div>
+		 </div>		 
+		 
+	</div>	
+</div>
 
 </body>
 

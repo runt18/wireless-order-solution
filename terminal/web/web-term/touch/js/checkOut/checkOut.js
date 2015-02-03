@@ -52,7 +52,7 @@ var orderFoodListCmpTemplet = '<tr>'
 	+ 		'<div data-role="controlgroup" data-type="horizontal" >'
     + 			'<a onclick="uo.openCancelFoodCmp({event:this})" data-index={dataIndex} data-role="button" data-theme="b">退菜</a>'
     +			'<a onclick="uo.transFoodForTS({event:this})" data-index={dataIndex} data-role="button" data-theme="b">转菜</a>'
-    +			'<a  data-index={dataIndex} data-role="button" data-theme="b"  data-rel="popup"  data-transition="pop" >更多</a>'
+    +			'<a  data-index={dataIndex} data-role="button" data-theme="b"  data-rel="popup"  data-transition="pop" onclick="uo.openOrderFoodOtherOperate({event:this})">更多</a>'
     +		'</div>'
 	+ '<td>{waiter}</td>'
 	+ '</tr>';	
@@ -175,9 +175,9 @@ uo.showNorthForUpdateOrder = function(){
 	uo.customNum = uo.order.customNum;
 	
 	html = "<div><span style = 'margin : 10px 250px 10px 10px; font-size : 24px;font-weight : bold;'>已点菜页面</span>" +
-			"<span style = 'margin: 10px;'>账单号：" + uo.order.id + " </span>" +
-			"<span style = 'margin: 10px;'>餐台号：" + uo.order.table.alias + " </span>" +
 			"<span style = 'margin: 10px;'>餐台名： " + tableName + "</span>" +
+			"<span style = 'margin: 10px;'>餐台号：" + uo.order.table.alias + " </span>" +
+			"<span style = 'margin: 10px;'>账单号：" + uo.order.id + " </span>" +
 			"<span style = 'margin: 10px;' id='customNumForUO'>用餐人数：" + uo.customNum + "</span>" +			
 		"</div>";
 	$("#divNorthForUpdateOrder").html(html);
@@ -377,6 +377,34 @@ uo.cancelFoodAction = function(){
 		uo.saveForUO();
 	}
 }
+
+/**
+ * 打开已点菜中单条菜更多操作
+ */
+uo.openOrderFoodOtherOperate = function(c){
+	//获取选中行
+	uo.selectedFood = uo.order.orderFoods[parseInt($(c.event).attr('data-index'))-1];
+	//FIXME 不是称重不弹出更多
+	if((uo.selectedFood.status & 1 << 7) != 0 ){
+		$('#orderFoodMoreOperateCmp').popup('open');
+		//动态使用popup时要动态设置popup控件位置
+		$('#orderFoodMoreOperateCmp-popup').css({top:$(c.event).position().top, left:$(c.event).position().left});
+		
+	}
+}
+
+/**
+ * 去称重
+ */
+uo.weighAction = function(){
+	uo.weighOperate=true;
+	//关闭更多控件,打开称重
+	$('#orderFoodMoreOperateCmp').popup('close');
+	setTimeout(function(){
+		uo.openWeighOperate();
+	}, 250);
+};
+
 /**
  * 打开称重
  */
@@ -388,7 +416,6 @@ uo.openWeighOperate = function(){
 	}, 250);
 	$('#orderFoodWeighCmp').parent().addClass('popup').addClass('in');
 	$('#orderFoodWeighCmp').popup('open');
-
 }
 
 /**
@@ -397,30 +424,9 @@ uo.openWeighOperate = function(){
 uo.closeWeighOperate = function(){
 	$('#inputOrderFoodWeigh').val('');
 	$('#orderFoodWeighCmp').popup('close');
-	$('#orderFoodWeighCmp').popup('close');
 	//删除动作
 	delete uo.weighOperate;
 }
-
-
-/**
- * 打开更多操作
- */
-uo.openOrderFoodOtherOperate = function(c){
-	uo.selectedFood = uo.order.orderFoods[parseInt($(c.event).attr('data-index'))-1];
-}
-
-/**
- * 去称重
- */
-uo.weighAction = function(){
-	uo.weighOperate=true;
-	
-	setTimeout(function(){
-		uo.openWeighOperate();
-	}, 250);
-	$('#orderFoodMoreOperateCmp').popup('close');
-};
 
 /**
  * 称重操作
@@ -493,7 +499,6 @@ uo.allTransFoodForTS = function (){
 	
 	//打开控件
 	uo.openTransOrderFood();	
-
 }
 
 /**
@@ -1059,8 +1064,6 @@ uo.goToCreateOrder = function(){
 			table : uo.table,
 			order : uo.order,
 			callback : function(){
-				/*initTableData();
-				uo.cancelForUO();*/
 				location.href = '#orderFoodListMgr';
 				//异步刷新账单
 				initOrderData({table : uo.table});

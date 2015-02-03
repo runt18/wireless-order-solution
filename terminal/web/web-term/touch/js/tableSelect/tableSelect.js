@@ -32,9 +32,12 @@ $(function(){
 	//点菜界面高度
 	$('#orderFoodCenterCmp').height(document.body.clientHeight - 210);
 	document.getElementById('foodsCmp').style.height = (document.body.clientHeight - 210)+'px';		
+	//沽清菜界面高度
+	$('#stopSellCmp').height(document.body.clientHeight - 125);	
+	document.getElementById('foods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
+	document.getElementById('divFoods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
 	//已点菜界面高度
 	$('#orderFoodListCmp').height(document.body.clientHeight - 125);
-//	$('#orderFoodLists').height(document.body.clientHeight - 125);
 	//餐厅选择界面高度
 	$('#tableAndRegionsCmp').height(document.body.clientHeight - 86);
 	
@@ -80,8 +83,7 @@ $(function(){
 				//加载基础数据
 				Util.LM.show();
 				initTableData();
-				initFoodData();
-	
+				initFoodData({firstTime:true});
 				
 				//验证员工权限	
 				$.ajax({
@@ -94,7 +96,6 @@ $(function(){
 					success : function(jr, status, xhr){
 						if(jr.success){
 							if(jr.other.havePrivileges != null){
-//								Wireless.ux.staffGift = true;
 								$('#giftFoodOperate').show();
 							}
 						}
@@ -222,13 +223,14 @@ window.onload=function(){
 
 }
 
-function initFoodData(){
+function initFoodData(c){
+	c = c || {};
 	Util.LM.show();
 	//加载菜品列表
 	$.ajax({
 		url : '../QueryMenu.do',
 		type : 'post',
-		async:false,
+		async: c.firstTime?false : true,
 		data : {
 			dataSource : 'foodList'
 		},
@@ -263,70 +265,72 @@ function initFoodData(){
 				}
 			}	
 			
-			//加载临时厨房
-			$.post('../QueryMenu.do', {dataSource:'isAllowTempKitchen'}, function(data){
-				of.tempKitchens = data.root;
-			});
-			
-			//加载所有口味
-			$.ajax({
-				url : '../QueryMenu.do',
-				type : 'post',
-//				async:false,
-				data : {
-					dataSource : 'tastes'
-				},
-				success : function(result, status, xhr){
-					var tastes = result;
-					
-					of.allTastes = [];
-					
-					var data = [];
-					if(tastes.root.length > 0){
-						data.push({
-							id : tastes.root[0].taste.cateValue,
-							name : tastes.root[0].taste.cateText,
-							items : []
+			if(c.firstTime){
+				//加载临时厨房
+				$.post('../QueryMenu.do', {dataSource:'isAllowTempKitchen'}, function(data){
+					of.tempKitchens = data.root;
+				});
+				
+				//加载所有口味
+				$.ajax({
+					url : '../QueryMenu.do',
+					type : 'post',
+					data : {
+						dataSource : 'tastes'
+					},
+					success : function(result, status, xhr){
+						var tastes = result;
+						
+						of.allTastes = [];
+						
+						var data = [];
+						if(tastes.root.length > 0){
+							data.push({
+								id : tastes.root[0].taste.cateValue,
+								name : tastes.root[0].taste.cateText,
+								items : []
+							});
+						}
+						var has = true, temp = {};
+						for(var i = 0; i < tastes.root.length; i++){
+							
+							of.allTastes.push(tastes.root[i]);
+							
+							has = false;
+							for(var k = 0; k < data.length; k++){
+								if(tastes.root[i].taste.cateValue == data[k].id){
+									data[k].items.push(tastes.root[i]);
+									has = true;
+									break;
+								}
+							}
+							if(!has){
+								temp = {
+										id : tastes.root[i].taste.cateValue,
+										name : tastes.root[i].taste.cateText,
+										items : []
+								};
+								temp.items.push(tastes.root[i]);
+								data.push(temp);
+							}
+						}	
+						
+						of.tasteGroups = data;
+						of.tasteGroups.unshift({
+							id : -10,
+							name : '常用口味',
+							items : of.allTastes		
+						});
+					},
+					error : function(request, status, err){
+						Util.msg.alert({
+							msg : request.msg,
+							renderTo : 'tableSelectMgr'
 						});
 					}
-					var has = true, temp = {};
-					for(var i = 0; i < tastes.root.length; i++){
-						
-						of.allTastes.push(tastes.root[i]);
-						
-						has = false;
-						for(var k = 0; k < data.length; k++){
-							if(tastes.root[i].taste.cateValue == data[k].id){
-								data[k].items.push(tastes.root[i]);
-								has = true;
-								break;
-							}
-						}
-						if(!has){
-							temp = {
-								id : tastes.root[i].taste.cateValue,
-								name : tastes.root[i].taste.cateText,
-								items : []
-							};
-							temp.items.push(tastes.root[i]);
-							data.push(temp);
-						}
-					}	
-					
-					of.tasteGroups = data;
-					of.tasteGroups.unshift({
-						id : -10,
-						name : '常用口味',
-						items : of.allTastes		
-					});
-				},
-				error : function(request, status, err){
-					Util.msg.alert({
-						msg : request.msg,
-						renderTo : 'tableSelectMgr'
-					});
-				}
-			}); 
+				}); 
+			}
+			
 
 		},
 		error : function(request, status, err){
@@ -733,7 +737,13 @@ ts.createOrderForShowMessageTS = function(){
 	renderToCreateOrder(tableNo, peopleNo);
 };
 
-
+/**
+ * 去沽清界面
+ */
+ts.stopSellMgr = function(){
+	location.href = '#stopSellMgr';
+	ss.entry();
+}
 
 //进入点菜界面
 ts.renderToCreateOrder = function(tableNo, peopleNo){
@@ -1081,27 +1091,6 @@ function showRegion(temp, pageNow){
 }
 
 /**
- * 定义分页函数
- * @param {int} start 开始下标
- * @param {int} limit 一页最多显示的数目
- * @param {object} tempObject 需要分页的数组对象
- * @param {boolean} isPaging 是否需要分页
- * @returns {object} pageRoot 已经完成分页的数组对象
- */
-/*function getPagingData(start, limit, tempObject, isPaging){
-    var pageRoot = [];
-    if(tempObject.length != 0 && isPaging){ 
-    	var dataIndex = start, dataSize = limit;		
-    	dataSize = (dataIndex + dataSize) > tempObject.length ? dataSize - ((dataIndex + dataSize) - tempObject.length) : dataSize;			
-    	pageRoot = tempObject.slice(dataIndex, dataIndex + dataSize);	
-    }else{
-    	pageRoot = tempObject;
-    }	
-	return pageRoot;
-}*/
-
-
-/**
  * 点击区域，显示不同状态的餐桌数组
  * @param {object} o 
  */
@@ -1169,7 +1158,13 @@ function toOrderFoodPage(table){
 	//渲染数据
 	of.initDeptContent();
 	
-	of.loadFoodDateAction = window.setInterval("keepLoadFoodData()", 500);
+	of.loadFoodDateAction = window.setInterval(function(){
+		if(!$('#foodsCmp').html()){
+			of.initKitchenContent({deptId:-1});
+		}else{
+			clearInterval(of.loadFoodDateAction);
+		}
+	}, 400);
 	
 	of.initKitchenContent({deptId:-1});
 	
