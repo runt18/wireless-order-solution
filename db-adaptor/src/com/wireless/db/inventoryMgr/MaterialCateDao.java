@@ -181,7 +181,9 @@ public class MaterialCateDao {
 		String querySQL = "SELECT COUNT(*) FROM material WHERE cate_id = " + id;
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt(1) > 0){
-			throw new BusinessException(MaterialError.CATE_DELETE_FAIL_HAS_CHILD);
+			//throw new BusinessException(MaterialError.CATE_DELETE_FAIL_HAS_CHILD);
+			String deleteAll = "DELETE FROM material WHERE cate_id = " + id;
+			dbCon.stmt.executeUpdate(deleteAll);
 		}
 		String deleteSQL = "DELETE FROM material_cate WHERE cate_id = " + id;
 		count = dbCon.stmt.executeUpdate(deleteSQL);
