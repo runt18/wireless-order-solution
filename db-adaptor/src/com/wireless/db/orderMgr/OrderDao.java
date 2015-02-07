@@ -16,6 +16,7 @@ import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.Category;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -661,14 +662,16 @@ public class OrderDao {
 			}
 		}
 		
+		Table destTbl = TableDao.getByAlias(dbCon, staff, builder.getDestTbl().getAliasId());
+		
 		//Transfer out the foods from source order.
 		for(OrderFood foodOut : builder.getTransferFoods()){
 			OrderFoodDao.fill(dbCon, staff, foodOut);
+			foodOut.setCancelReason(CancelReason.newTemporary("【" + staff.getName() + "】从【" + source.getDestTbl().getName() + "】转至【" + destTbl.getName() + "】"));
 			OrderFoodDao.insertCancelled(dbCon, staff, new OrderFoodDao.TransferBuilder(source.getId(), foodOut).asCancel());
 		}
 
 		//Transfer the foods out to destination table.
-		Table destTbl = TableDao.getByAlias(dbCon, staff, builder.getDestTbl().getAliasId());
 		if(destTbl.isIdle()){
 			//Insert a new if the destination table is idle.
 			InsertOrder.exec(dbCon, staff, new Order.InsertBuilder(new Table.Builder(destTbl.getId())).addAll(builder.getTransferFoods(), staff));

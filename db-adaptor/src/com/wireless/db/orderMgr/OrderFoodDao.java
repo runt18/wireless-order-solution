@@ -547,7 +547,6 @@ public class OrderFoodDao {
 		private final int orderId;
 		private final OrderFood cancel;
 		private boolean isPaid = false;
-		private CancelReason reason;
 		
 		public CancelBuilder(int orderId, OrderFood cancel){
 			this.orderId = orderId;
@@ -560,14 +559,6 @@ public class OrderFoodDao {
 			return this;
 		}
 		
-		public CancelBuilder setReason(CancelReason reason){
-			this.reason = reason;
-			return this;
-		}
-		
-		public boolean hasReason(){
-			return this.reason != null;
-		}
 	}
 	
 	static void insertCancelled(DBCon dbCon, Staff staff, CancelBuilder builder) throws SQLException{
@@ -620,8 +611,8 @@ public class OrderFoodDao {
 	 * 			<li>and taste does NOT exist
 	 */
 	static void fill(DBCon dbCon, Staff staff, OrderFood src) throws SQLException, BusinessException{
-		//Get the details to cancel reason if contained.
-		if(src.hasCancelReason()){
+		//Get the details to cancel reason if contained and not temporary.
+		if(src.hasCancelReason() && !src.getCancelReason().isTemp()){
 			src.setCancelReason(CancelReasonDao.getById(dbCon, staff, src.getCancelReason().getId()));
 		}
 		
