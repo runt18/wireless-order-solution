@@ -165,9 +165,9 @@ public class MemberType implements Jsonable, Parcelable{
 		private final Discount defaultDiscount;
 		
 		private Type type = Type.NORMAL;
-		private List<Discount> discounts = new ArrayList<Discount>();
+		private final List<Discount> discounts = new ArrayList<Discount>();
 		private PricePlan defaultPrice;
-		private List<PricePlan> prices = new ArrayList<PricePlan>();
+		private final List<PricePlan> prices = new ArrayList<PricePlan>();
 		private float exchangeRate = 1;
 		private float chargeRate = 1;
 		private Attribute attribute = Attribute.POINT;

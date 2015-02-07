@@ -504,7 +504,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	public boolean hasCancelReason(){
-		return mCancelReason == null ? false : mCancelReason.hasReason();
+		return mCancelReason != null;
 	}
 	
 	public long getId(){
@@ -600,7 +600,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	public String getName(){
-		return mFood.getName();
+		return mFood.getName() + (mFoodUnit != null ? "(" + mFoodUnit.getUnit() + ")" : "");
 	}
 	
 	public float getFoodPrice(){

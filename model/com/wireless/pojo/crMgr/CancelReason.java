@@ -12,10 +12,11 @@ public class CancelReason implements Parcelable, Jsonable{
 	
 	public final static int NO_REASON = 1;
 	
-	private int id = NO_REASON;
+	private int id;
 	private int restaurantId;
 	private String reason;
-
+	private boolean isTemp;
+	
 	public static enum DefaultCR{
 		DEF_CR_1("上菜慢"),
 		DEF_CR_2("点错菜"),
@@ -83,10 +84,19 @@ public class CancelReason implements Parcelable, Jsonable{
 	public CancelReason(int id){
 		this.id = id;
 	}
+	
+	public static CancelReason newTemporary(String reason){
+		CancelReason cr = new CancelReason();
+		cr.isTemp = true;
+		cr.reason = reason;
+		return cr;
+	}
+	
 	public CancelReason(String reason, int restaurantId){
 		this.reason = reason;
 		this.restaurantId = restaurantId;
 	}
+	
 	public CancelReason(int id, String reason, int restaurantId){
 		this.restaurantId = restaurantId;
 		this.id = id;
@@ -96,26 +106,36 @@ public class CancelReason implements Parcelable, Jsonable{
 	public int getId() {
 		return id;
 	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 	public int getRestaurantID() {
 		return restaurantId;
 	}
+	
 	public void setRestaurantID(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
+	
 	public String getReason() {
 		if(reason == null){
 			reason = "";
 		}
 		return reason;
 	}
+	
 	public void setReason(String reason) {
 		this.reason = reason;
 	}
+	
 	public boolean hasReason(){
 		return id != NO_REASON;
+	}
+	
+	public boolean isTemp(){
+		return isTemp;
 	}
 	
 	@Override
