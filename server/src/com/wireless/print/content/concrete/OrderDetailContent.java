@@ -50,7 +50,7 @@ public class OrderDetailContent extends ConcreteContent {
 			mPrintTemplate = mPrintTemplate.replace(PVar.FOOD_NAME, (getPrintType() == PType.PRINT_CANCELLED_FOOD_DETAIL ? "(ÍË)" : "") + mParent.getName());
 			mPrintTemplate = mPrintTemplate.replace(PVar.FOOD_TASTE, mParent.hasTasteGroup() ? mParent.getTasteGroup().getPreference() : "");
 			mPrintTemplate = mPrintTemplate.replace(PVar.WAITER_NAME, mWaiter);
-			mPrintTemplate = mPrintTemplate.replace(PVar.CUSTOM_NUM, Integer.toString(mOrder.getCustomNum()));
+			mPrintTemplate = mPrintTemplate.replace(PVar.CUSTOM_NUM, NumericUtil.float2String2(mParent.getCount()));
 			mPrintTemplate = mPrintTemplate.replace(PVar.FOOD_PRICE, NumericUtil.float2String2(mParent.getPrice()));
 			
 		}else{

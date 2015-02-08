@@ -135,7 +135,9 @@ public class ReceiptContent extends ConcreteContent {
 		if(ending.length() != 0){
 			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, ending.toString());
 		}else{
-			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new CenterAlignedDecorator("欢迎您再次光临", mStyle).toString());
+			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new String(new char[]{0x1B, 0x61, 0x01}) + new QRCodeContent(getPrintType(), getStyle(), String.valueOf(mOrder.getId())) + 
+																		  SEP + 
+																		  new String(new char[]{0x1B, 0x61, 0x00}) + new CenterAlignedDecorator("欢迎您再次光临", mStyle).toString());
 		}
 		
 		return mPrintType == PType.PRINT_RECEIPT ? mTemplate + EJECT : mTemplate;

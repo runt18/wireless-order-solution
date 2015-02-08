@@ -520,7 +520,7 @@ class OrderHandler implements Runnable{
 					public void run() {
 						try{
 							//Perform this coupon draw.
-							List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(payBuilder.getMemberId()).setStatus(Coupon.Status.PUBLISHED)
+							List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(order.getMemberId()).setStatus(Coupon.Status.PUBLISHED)
 																									   .addPromotionStatus(Promotion.Status.PROGRESS), null);
 							//Check to see whether or not any coupons associated with this member is qualified to take.
 							for(Coupon coupon : coupons){
@@ -537,7 +537,7 @@ class OrderHandler implements Runnable{
 						
 						try{
 							//Perform the member upgrade
-							Msg4Upgrade msg4Upgrade = MemberLevelDao.upgrade(staff, payBuilder.getMemberId());
+							Msg4Upgrade msg4Upgrade = MemberLevelDao.upgrade(staff, order.getMemberId());
 
 							if(payBuilder.isSendSMS()){
 								MemberOperation mo = MemberOperationDao.getByOrder(staff, order.getId());
