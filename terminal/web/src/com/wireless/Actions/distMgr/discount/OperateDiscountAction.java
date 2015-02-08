@@ -38,9 +38,9 @@ public class OperateDiscountAction extends DispatchAction{
 		try {
 			final Order.DiscountBuilder builder;
 			if(memberId != 0){
-				builder = new Order.DiscountBuilder(orderId, MemberDao.getById(staff, memberId));
+				builder = Order.DiscountBuilder.build4Member(orderId, MemberDao.getById(staff, memberId));
 			}else{
-				builder = new Order.DiscountBuilder(orderId, discountId);
+				builder = Order.DiscountBuilder.build4Normal(orderId, discountId);
 			}
 			OrderDao.discount(StaffDao.verify(Integer.parseInt(pin)), builder);
 		}catch(BusinessException e){
