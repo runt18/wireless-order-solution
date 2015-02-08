@@ -734,7 +734,11 @@ public class OrderDao {
 		final List<PricePlan> prices;
 		if(builder.getMemberId() != 0){
 			Member m = MemberDao.getById(dbCon, staff, builder.getMemberId());
-			prices = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(builder.getPricePlanId()).setMemberType(m.getMemberType()));
+			if(builder.hasPricePlan()){
+				prices = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(builder.getPricePlanId()).setMemberType(m.getMemberType()));
+			}else{
+				prices = null;
+			}
 			discounts = DiscountDao.getByCond(dbCon, staff, new DiscountDao.ExtraCond().setMemberType(m.getMemberType()).setDiscountId(builder.getDiscountId()), DiscountDao.ShowType.BY_PLAN);
 		}else{
 			discounts = DiscountDao.getByCond(dbCon, staff, new DiscountDao.ExtraCond().setRole(staff.getRole()).setDiscountId(builder.getDiscountId()), DiscountDao.ShowType.BY_PLAN);
