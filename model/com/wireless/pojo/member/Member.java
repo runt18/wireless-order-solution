@@ -425,11 +425,15 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	 * @param payType
 	 * 			the payment type referred to {@link PayType}
 	 * @throws BusinessException
-	 *             throws if the consume price exceeds total balance to this member account
+	 *          throws if any cases below
+	 *          <li>the consume price exceeds total balance to this member account
+	 *          <li>the point member is NOT allowed to pay by balance   
 	 */
 	public void checkConsume(float consumePrice, Coupon coupon, PayType payType) throws BusinessException{
-		
-		if(payType.equals(PayType.MEMBER)){
+		if(memberType.isPoint() && payType.equals(PayType.MEMBER)){
+			throw new BusinessException("【积分会员】不能使用【会员卡】结账");
+			
+		}else if(memberType.isCharge() && payType.equals(PayType.MEMBER)){
 			float couponPrice = coupon != null ? coupon.getPrice() : 0; 
 			if(getTotalBalance() < consumePrice - couponPrice){
 				//Check to see whether the balance of member account is enough or NOT in case of unpaid.
