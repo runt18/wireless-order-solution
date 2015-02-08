@@ -9,6 +9,7 @@ import com.wireless.db.Params;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
@@ -24,6 +25,7 @@ import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
@@ -729,10 +731,14 @@ public class OrderDao {
 	public static void discount(DBCon dbCon, Staff staff, Order.DiscountBuilder builder) throws SQLException, BusinessException{
 
 		final List<Discount> discounts;
+		final List<PricePlan> prices;
 		if(builder.getMemberId() != 0){
-			discounts = DiscountDao.getByCond(dbCon, staff, new DiscountDao.ExtraCond().setMemberType(MemberDao.getById(dbCon, staff, builder.getMemberId()).getMemberType()).setDiscountId(builder.getDiscountId()), DiscountDao.ShowType.BY_PLAN);
+			Member m = MemberDao.getById(dbCon, staff, builder.getMemberId());
+			prices = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(builder.getPricePlanId()).setMemberType(m.getMemberType()));
+			discounts = DiscountDao.getByCond(dbCon, staff, new DiscountDao.ExtraCond().setMemberType(m.getMemberType()).setDiscountId(builder.getDiscountId()), DiscountDao.ShowType.BY_PLAN);
 		}else{
 			discounts = DiscountDao.getByCond(dbCon, staff, new DiscountDao.ExtraCond().setRole(staff.getRole()).setDiscountId(builder.getDiscountId()), DiscountDao.ShowType.BY_PLAN);
+			prices = null;
 		}
 		
 		if(discounts.isEmpty()){
@@ -742,6 +748,14 @@ public class OrderDao {
 		Order order = OrderDao.getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
 		order.setDiscount(discounts.get(0));
 		
+		if(prices != null){
+			if(prices.isEmpty()){
+				throw new BusinessException(StaffError.PRICE_PLAN_NOT_ALLOW);
+			}else{
+				order.setPricePlan(prices.get(0));
+			}
+		}
+		
 		String sql;
 		
 		//Update the order discount.
@@ -749,7 +763,8 @@ public class OrderDao {
 			  " ,discount_staff_id = " + staff.getId() +
 			  " ,discount_staff = '" + staff.getName() + "'" +
   			  " ,discount_date = NOW() " +
-			  " ,discount_id = " + order.getDiscount().getId() + 
+			  " ,discount_id = " + order.getDiscount().getId() +
+			  (order.hasPricePlan() ? " ,price_plan_id = " + order.getPricePlan().getId() : "") +
 			  " ,member_id = " + builder.getMemberId() +
 			  " WHERE id = " + order.getId();
 		dbCon.stmt.executeUpdate(sql);

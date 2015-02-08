@@ -1,14 +1,12 @@
 package com.wireless.db.orderMgr;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.member.MemberDao;
-import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.serviceRate.ServicePlanDao;
@@ -22,9 +20,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
-import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.member.Member;
-import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.staffMgr.Privilege;
@@ -182,7 +178,7 @@ public class PayOrder {
 		}
 		
 		if(orderCalculated.isSettledByMember()){
-			Member member = MemberDao.getById(dbCon, staff, payBuilder.getMemberId());
+			Member member = MemberDao.getById(dbCon, staff, orderCalculated.getMemberId());
 			if(orderCalculated.isUnpaid()){
 				//Check to see whether be able to perform consumption.
 				member.checkConsume(orderCalculated.getActualPrice(), 
@@ -278,14 +274,14 @@ public class PayOrder {
 			
 			if(orderCalculated.isUnpaid()){
 				//Perform the member consumption.
-				MemberDao.consume(dbCon, staff, payBuilder.getMemberId(), orderCalculated.getActualPrice(), 
+				MemberDao.consume(dbCon, staff, orderCalculated.getMemberId(), orderCalculated.getActualPrice(), 
 								  payBuilder.hasCoupon() ? CouponDao.getById(dbCon, staff, payBuilder.getCouponId()) : null,
 								  orderCalculated.getPaymentType(),
 								  orderCalculated.getId());
 
 			}else{
 				//Perform this member re-consumption.
-				MemberDao.reConsume(dbCon, staff, payBuilder.getMemberId(), orderCalculated.getActualPrice(), orderCalculated.getPaymentType(), orderCalculated.getId());
+				MemberDao.reConsume(dbCon, staff, orderCalculated.getMemberId(), orderCalculated.getActualPrice(), orderCalculated.getPaymentType(), orderCalculated.getId());
 			}
 			
 		}  
@@ -350,57 +346,19 @@ public class PayOrder {
 		//Get all the details of order.
 		Order orderToCalc = OrderDao.getById(dbCon, staff, payBuilder.getOrderId(), DateType.TODAY);
 		
-		//Set the discount & price plan details to this order.
-		if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
-			Member member = MemberDao.getById(dbCon, staff, payBuilder.getMemberId());
-			//Set the price plan associated with the member to this order.
-			if(payBuilder.hasPricePlan()){
-				final List<PricePlan> result;
-				if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
-					//Get the price plan allowed by this member type and matched plan id.
-					result = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(payBuilder.getPricePlanId()).setMemberType(member.getMemberType()));
-					if(result.isEmpty()){
-						throw new BusinessException(StaffError.PRICE_PLAN_NOT_ALLOW);
-					}else{
-						orderToCalc.setPricePlan(result.get(0));
-					}
-				}
+		//Set the discount.
+		try{
+			if(orderToCalc.getDiscountDate() == 0){
+				orderToCalc.setDiscount(DiscountDao.getDefault(dbCon, staff));
 			}else{
-				orderToCalc.setPricePlan(member.getMemberType().getDefaultPrice());
+				orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, orderToCalc.getDiscount().getId()));
 			}
-			
-			//Set the discount associated with the member to this order.
-			if(payBuilder.hasMemberDiscount()){
-				//Check to see whether the member discount id is valid.
-				boolean isExist = false;
-				for(Discount discount : member.getMemberType().getDiscounts()){
-					if(discount.getId() == payBuilder.getMemberDiscountId()){
-						orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, payBuilder.getMemberDiscountId()));
-						isExist = true;
-						break;
-					}
-				}
-				if(!isExist){
-					throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
-				}
+		}catch(BusinessException e){
+			//Use the default if discount not set before.
+			if(e.getErrCode() == DiscountError.DISCOUNT_NOT_EXIST){
+				orderToCalc.setDiscount(DiscountDao.getDefault(dbCon, staff));
 			}else{
-				//Just use the member default discount.
-				orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, member.getMemberType().getDefaultDiscount().getId()));
-			}
-		}else{
-			try{
-				if(orderToCalc.getDiscountDate() == 0){
-					orderToCalc.setDiscount(DiscountDao.getDefault(dbCon, staff));
-				}else{
-					orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, orderToCalc.getDiscount().getId()));
-				}
-			}catch(BusinessException e){
-				//Use the default if discount not set before.
-				if(e.getErrCode() == DiscountError.DISCOUNT_NOT_EXIST){
-					orderToCalc.setDiscount(DiscountDao.getDefault(dbCon, staff));
-				}else{
-					throw e;
-				}
+				throw e;
 			}
 		}
 
