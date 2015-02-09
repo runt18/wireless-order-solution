@@ -12,19 +12,8 @@ var of = {
 	calculator : {},
 	newFood : []
 };
-
-of.searchFoodCompare = function (obj1, obj2) {
-    var val1 = obj1.foodCnt;
-    var val2 = obj2.foodCnt;
-    if (val1 < val2) {
-        return -1;
-    } else if (val1 > val2) {
-        return 1;
-    } else {
-        return 0;
-    }            
-} 
-
+//不同条件下选出的口味
+var tastesDate = [];
 
 //餐台选择匹配
 of.s = {
@@ -102,14 +91,6 @@ of.s = {
 	}
 };
 
-window.onresize = function(){
-	//动态高度
-	$('#orderFoodCenterCmp').height(document.body.clientHeight - 210);
-	document.getElementById('foodsCmp').style.height = (document.body.clientHeight - 210)+'px';
-}
-
-
-var tastesDate = [];
 
 var deptCmpTemplet = '<a href="javascript: of.initKitchenContent({deptId:{id}})" data-role="button" data-inline="true" class="deptKitBtnFont" data-type="deptCmp" data-value="{id}" >{name}</a>';
 var kitchenCmpTemplet = '<a data-role="button" data-inline="true" class="deptKitBtnFont" data-type="kitchenCmp" data-value={id} onclick="of.findFoodByKitchen({event:this, kitchenId:{id}})">{name}</a>';	
@@ -134,6 +115,18 @@ var choosedTasteCmpTemplet = '<a onclick="removeTaste({event: this, id: {id}})" 
 var tasteGroupCmpTemplet = '<a data-role="button" data-inline="true" class="tastePopTopBtn" data-value={id} data-index={index} data-theme="{theme}" onclick="initTasteCmp({event:this, id:{id}})">{name}</a>';
 
 
+//设置搜索出来的菜品的排序依据, 按点击次数
+of.searchFoodCompare = function (obj1, obj2) {
+    var val1 = obj1.foodCnt;
+    var val2 = obj2.foodCnt;
+    if (val1 < val2) {
+        return -1;
+    } else if (val1 > val2) {
+        return 1;
+    } else {
+        return 0;
+    }            
+} 
 
 /**
  * 设置当前输入框
@@ -167,7 +160,7 @@ of.initDeptContent = function(){
 			});
 		}
 	}	
-		//FIXME 部门分页
+	//显示部门分页按钮
 	if(of.depts.root.length > 9){
 		html += '<a href="javascript:of.deptGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
 				'<a href="javascript:of.deptGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>';
@@ -244,7 +237,7 @@ of.initKitchenContent = function(c){
 	}
 	temp = null;
 	
-	//FIXME 厨房分页
+	//显示厨房分页
 	of.showKitchenPaging();
 	
 	if(!of.foodPaging){
@@ -322,7 +315,8 @@ of.showKitchenPaging = function(){
 			});
 		}
 	}
-		//FIXME 部门分页
+	
+	//显示分页按钮
 	if(of.kitchenPagingData.length > 9){
 		html += '<a href="javascript:of.kitchenGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
 				'<a href="javascript:of.kitchenGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>';
@@ -1838,7 +1832,7 @@ of.submit = function(c){
 													msg : result.data,
 												});
 												//暂结应该是没有回调方法的
-												console.log('暂结')
+//												console.log('暂结')
 //												if(of.afterCommitFn != null && typeof of.afterCommitFn == 'function'){
 //													of.afterCommitFn();
 //												}

@@ -54,6 +54,7 @@ var orderFoodListCmpTemplet = '<tr>'
     +			'<a onclick="uo.transFoodForTS({event:this})" data-index={dataIndex} data-role="button" data-theme="b">转菜</a>'
     +			'<a  data-index={dataIndex} data-role="button" data-theme="b"  data-rel="popup"  data-transition="pop" onclick="uo.openOrderFoodOtherOperate({event:this})">更多</a>'
     +		'</div>'
+    +'</td>'
 	+ '<td>{waiter}</td>'
 	+ '</tr>';	
 
@@ -231,7 +232,38 @@ uo.show = function(c){
 	//异步刷新账单
 	initOrderData({table : c.table});
 	uo.table = c.table;
+	
+	//设置会员动态popup控件
+	uo.setMemberReadCmp();
+	
+	//会员读卡
+    $('#txtMemberInfo4Read').bind('keypress',function(event){
+        if(event.keyCode == "13")    
+        {
+        	readMemberByCondtion();
+        }
+    });	
 };
+
+//设置会员动态popup控件
+uo.setMemberReadCmp = function(){
+	if($('#paymentMgr .payment_searchMemberType').length > 0){
+		$('#paymentMgr .payment_searchMemberType').remove();
+	}	
+	if($('#orderFoodListMgr .payment_searchMemberType').length == 0){
+		$('#orderFoodListMgr').append(payment_searchMemberTypeTemplet);
+	}	
+	
+	if($('#paymentMgr .payment_popupPricePlanCmp4Member').length > 0){
+		$('#paymentMgr .payment_popupPricePlanCmp4Member').remove();
+	}	
+	if($('#orderFoodListMgr .payment_popupPricePlanCmp4Member').length == 0){
+		$('#orderFoodListMgr').append(payment_popupDiscountCmp4MemberTemplet);
+	}	
+	if($('#orderFoodListMgr .payment_popupDiscountCmp4Member').length == 0){
+		$('#orderFoodListMgr').append($('#payment_popupDiscountCmp4Member')[0]);
+	}		
+}
 
 /**
  * 返回
@@ -624,6 +656,7 @@ uo.openTransOrderFood = function (){
 	$('#numberKeyboard').show();
 	
 	$('#txtTableNumForTS').focus();
+	
 }
 
 /**
@@ -651,6 +684,12 @@ uo.closeTransOrderFood = function(){
 		$("#txtTableNumForTS").attr("placeholder", "填写台号");
 		//隐藏回删
 		$('#td4CmpDeleteWord').hide();
+	}else if(ts.commitTableOrTran == 'lookup'){
+		//隐藏结账按钮
+		$('#ts_toPaymentMgr').hide();
+		$('#certain4searchTableCmps .ui-btn-text').html('确定');
+		//去除3个按钮并排
+		$('#searchTableCmpsFoot a').removeClass('tablePopbottomBtn');		
 	}
 	
 	//操作设置为默认

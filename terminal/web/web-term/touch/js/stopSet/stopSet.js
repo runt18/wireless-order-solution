@@ -5,13 +5,15 @@ var ss = {
 	allStopFood : []
 };
 
+//显示菜品的条件, 沽清或开售
 ss.extra = '';
+//符合条件的菜品
 ss.iteratorData = [];
 
 var stopSellFoodTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-value={id} onclick="{click}">' +
 							'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
 							'</div>'+
-						'</a>'
+						'</a>';
 
 var dept4StopSellCmpTemplet = '<a href="javascript: ss.initKitchenContent({deptId:{id}})" data-role="button" data-inline="true" class="deptKitBtnFont" data-type="dept4StopSellCmp" data-value="{id}" >{name}</a>';
 var kitchen4StopSellCmpTemplet = '<a data-role="button" data-inline="true" class="deptKitBtnFont" data-type="kitchen4StopSellCmp" data-value={id} onclick="ss.findFoodByKitchen({event:this, kitchenId:{id}})">{name}</a>';
@@ -71,7 +73,6 @@ ss.updateData = function(c){
 			ss.stoptp.init({
 				data : data.root
 			});
-//			ss.allStopFood = data.root;
 		},
 		error : function(request, status, err) {
 			Util.LM.hide();
@@ -129,7 +130,8 @@ ss.initDeptContent = function(){
 			});
 		}
 	}	
-		//FIXME 部门分页
+	
+	//显示分页按钮
 	if(of.depts.root.length > 9){
 		html += '<a href="javascript:ss.deptGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
 				'<a href="javascript:ss.deptGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>';
@@ -206,7 +208,6 @@ ss.initKitchenContent = function(c){
 	}
 	temp = null;
 	
-	//FIXME 厨房分页
 	ss.showKitchenPaging();
 	ss.iteratorData = tempFoodData;
 	ss.showFoodByCond();	
@@ -237,7 +238,7 @@ ss.showKitchenPaging = function(){
 			});
 		}
 	}
-		//FIXME 部门分页
+	//显示分页按钮
 	if(ss.kitchenPagingData.length > 9){
 		html += '<a href="javascript:ss.kitchenGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
 				'<a href="javascript:ss.kitchenGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>';
@@ -361,8 +362,6 @@ ss.findFoodByKitchen = function(c){
  * 沽清入口
  */
 ss.entry = function(){
-	Util.sellOutCond = true;
-	
 	ss.init();
 	
 	ss.updateData();
@@ -376,7 +375,6 @@ ss.entry = function(){
 
 
 ss.back = function(){
-	Util.sellOutCond = false;
 	location.href = '#tableSelectMgr';
 	
 	ss.newFood = [];
@@ -385,11 +383,12 @@ ss.back = function(){
 	ss.initNewFoodContent();
 	
 	$('.tableStatus').attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
-//	updateFoodData();
 	ss.extra = '';
 };
 
-
+/**
+ * 点击头部导航栏显示相关菜品
+ */
 ss.searchData = function(c){
 	ss.newFood = [];
 	ss.cancelSellOutFood = [];

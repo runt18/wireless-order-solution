@@ -28,7 +28,21 @@ var ts={
 
 var regionCmpTemplet = '<a data-role="button" data-inline="true" class="regionBtn" onclick="">{name}</a>';
 
+var payment_searchMemberTypeTemplet = '<div data-role="popup" id="payment_searchMemberType" data-theme="d" class="payment_searchMemberType">'+
+'<ul id="payment_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
+'<li data-role="divider" data-theme="e" style="line-height: 30px;">选择号码来源:</li>'+
+'<li  class="popupButtonList" onclick="readMemberByCondtion(1)"><a >手机卡</a></li>'+
+'<li  class="popupButtonList" onclick="readMemberByCondtion(3)"><a >会员实体卡</a></li>'+
+'<li  class="popupButtonList" onclick="readMemberByCondtion(2)"><a >微信卡</a></li>'+
+'</ul></div>'; 
+
+var payment_popupDiscountCmp4MemberTemplet = '<div data-role="popup" id="payment_popupDiscountCmp4Member" data-theme="d" class="payment_popupDiscountCmp4Member">'+
+    		'<ul id="payment_discountList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>'+
+    	'</div>'
+
 $(function(){
+	//餐厅选择界面高度
+	$('#tableAndRegionsCmp').height(document.body.clientHeight - 86);	
 	//点菜界面高度
 	$('#orderFoodCenterCmp').height(document.body.clientHeight - 210);
 	document.getElementById('foodsCmp').style.height = (document.body.clientHeight - 210)+'px';		
@@ -38,8 +52,9 @@ $(function(){
 	document.getElementById('divFoods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
 	//已点菜界面高度
 	$('#orderFoodListCmp').height(document.body.clientHeight - 125);
-	//餐厅选择界面高度
-	$('#tableAndRegionsCmp').height(document.body.clientHeight - 86);
+	//结账界面高度 & 菜品列表高度
+	$('#paymentCmp').height(document.body.clientHeight - 86);	
+	$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
 	
 	/**
 	 * 餐桌分页包
@@ -137,7 +152,37 @@ $(function(){
 });	
 
 
+/**
+ * 通过其他界面返回餐台选择
+ */
+ts.loadData = function(){
+	location.href = '#tableSelectMgr';
+	initTableData();
+	of.loadFoodDateAction = window.setInterval("keepLoadTableData()", 500);	
+}
+
+//设置搜索出来的餐台升序, 按名称长短
+ts.searchTableCompareByName = function (obj1, obj2) {
+    var val1 = obj1.name.length;
+    var val2 = obj2.name.length;
+    if (val1 > val2) {
+        return 1;
+    } else if (val1 < val2) {
+        return -1;
+    } else {
+        return 0;
+    }            
+} 
+
 window.onload=function(){
+	
+YBZ_win_title = "手写板";//手写板名称
+YBZ_follow = false;//手写板吸附在输入框附近 false 右下角打开
+YBZ_skin = "black";
+//default||aero||chrome||opera||simple||idialog||twitter||blue||black||green
+YBZ_tipsopen = false;//是否在网页输入框中加入手写提示
+YBZ_fixed = true;//是否固定手写窗口	
+	
 	
 	$('input[data-type=txt]').focus(function(){
 		//if(getcookie('isNeedWriter') == 'true'){
@@ -219,10 +264,76 @@ window.onload=function(){
 		}
 	});	
 
+	//快捷键
+	$(document).keydown(function(event){
+		if($.mobile.activePage.attr( "id" ) == 'paymentMgr'){//结账界面中使用
+	    	if(event.which == "109") {//减号 
+				if(isMixedPay){
+					mixPayAction(true);
+				}else{
+					paySubmit(6);
+				}
+	    	}else if(event.which == "107"){//加号
+				if(isMixedPay){
+					mixPayAction();
+				}else{
+					paySubmit(1);
+				}
+	    	}      		
+		}else if($.mobile.activePage.attr( "id" ) == 'tableSelectMgr'){//餐厅选择界面使用
+	    	if(event.which == "107"){//加号
+				if(ts.commitTableOrTran != 'lookup'){
+					ts.createOrderForLookup();
+				}else{
+					ts.submitForSelectTableOrTransFood();
+				}
+	    	}else if(event.which == "13"){//回车
+	    		ts.toPaymentMgr();
+	    	}  			
+		}
+	});	
 	
-
+	//渲染会员读取窗口
+	$('#readMemberWin').trigger('create').trigger('refresh');	
+	
 }
 
+
+/**
+ * 输入台号后直接结账
+ */
+ts.toPaymentMgr = function(){
+	var tableInfo = $('#txtTableNumForTS').val();
+	var tableId;
+	if(isNaN(tableInfo)){
+		var temp = tables.slice(0);
+		var table4Search = [];
+		for(var i = 0; i < temp.length; i++){
+			if((temp[i].name + '').indexOf(tableInfo.toUpperCase()) != -1){
+				table4Search.push(temp[i]);
+			}
+		}	
+		table4Search = table4Search.sort(ts.searchTableCompareByName);
+		tableId = table4Search[0].id;
+	}
+	updateTable({
+		toPay : true,
+		id : tableId,
+		alias : !tableId?tableInfo:''
+	});	
+}
+
+//改变窗口时
+window.onresize = function(){
+	//动态高度
+	$('#orderFoodCenterCmp').height(document.body.clientHeight - 210);
+	document.getElementById('foodsCmp').style.height = (document.body.clientHeight - 210)+'px';
+}
+
+/**
+ * 更新菜品列表
+ * @param c
+ */
 function initFoodData(c){
 	c = c || {};
 	Util.LM.show();
@@ -343,10 +454,6 @@ function initFoodData(c){
 	
 }
 
-
-
-
-
 /**
  * 餐台选择匹配
  */
@@ -365,7 +472,7 @@ ts.s = {
 						data = [];
 						temp = tables.slice(0);
 						for(var i = 0; i < temp.length; i++){
-							if((temp[i].name + '').indexOf(ts.s.fileValue.trim()) != -1){
+							if((temp[i].name + '').indexOf(ts.s.fileValue.trim().toUpperCase()) != -1){
 								data.push(temp[i]);
 							}else if((temp[i].alias + '').indexOf(ts.s.fileValue.trim()) != -1){
 								data.push(temp[i]);
@@ -504,7 +611,7 @@ ts.submitForSelectTableOrTransFood = function(){
 	}else if(ts.commitTableOrTran == 'apartTable'){//拆台
 		$('#divSelectTablesForTs').hide();
 		$('#divSelectTablesSuffixForTs').show();
-		ts.table.alias = $('#txtTableNumForTS').val();
+		ts.table = getTableByAlias($('#txtTableNumForTS').val());
 	}else if(ts.commitTableOrTran == 'member'){//会员
 		uo.useMemberForOrderAction();
 	}
@@ -598,14 +705,20 @@ ts.openTableAction = function(){
 	});
 	
 }
-
 /**
  * 设置为查台
  */
 ts.createOrderForLookup = function (){
+
+	ts.commitTableOrTran = 'lookup';
 	//隐藏数量输入
 	$('#td4TxtFoodNumForTran').hide();
-	ts.commitTableOrTran = 'lookup';
+	//增加结账按钮
+	$('#ts_toPaymentMgr').show();
+	$('#certain4searchTableCmps').buttonMarkup('refresh');
+	$('#certain4searchTableCmps .ui-btn-text').html('点菜(+)');
+	//设置为3个按钮并排
+	$('#searchTableCmpsFoot a').addClass('tablePopbottomBtn');
 	
 	$("#txtTableNumForTS").val("");
 	
@@ -714,7 +827,6 @@ ts.submitForSelectTableNumTS = function(){
 	var peopleNo = 1;
 	if($("#txtTableNumForTS").val()){
 		tableNo = parseInt($("#txtTableNumForTS").val());
-		
 	}else{
 		tableNo = -1;
 	}
@@ -855,7 +967,8 @@ function getStatusTables(type, tempTables){
 }
 
 /**
- * 根据alias,返回table的最新状态
+ * 根据alias或id返回table的最新状态
+ * toPay : 是否去结账界面
  */
 function updateTable(c){
 	var table = null;
@@ -873,7 +986,13 @@ function updateTable(c){
 				table = data.root[0];
 			}
 			c.table = table;
-			handleTableForTS(c);
+			if(c.toPay){
+				//关闭选台
+				uo.closeTransOrderFood();
+				showPaymentMgr(c)
+			}else{
+				handleTableForTS(c);
+			}
 		},
 		error : function(request, status, err){
 			Util.msg.alert({
@@ -1120,24 +1239,13 @@ ts.addTables = function(o){
     for(x in statusTable){
     	if(o.id == -1){
     		tempForRegion.push(statusTable[x]);
-//    		$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
-//    		$("#divAllArea").css("backgroundColor", "#FFA07A");
     	}else if(statusTable[x].region.id == o.id){
     		tempForRegion.push(statusTable[x]);
-//    		$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
-//    	    $("#divAllArea").css("backgroundColor", "#4EEE99");
     	    ts.rn.selectingId = o.id;
-//    	    $("#" + o.id).css("backgroundColor", "#FFA07A");
     	} 
      }  
     temp = tempForRegion;
     //改变区域选中色
-//    if(temp.length == 0){
-//    	$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
-//	    $("#divAllArea").css("backgroundColor", "#4EEE99");
-//	    $("#" + o.id).css("backgroundColor", "#FFA07A");
-//    }
-    
 	$('#tableAndRegionsCmp a[data-type=region]').attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
 	
 	$(o.event).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
@@ -1172,15 +1280,8 @@ function toOrderFoodPage(table){
 }
 
 /**
- * 通过其他界面返回餐台选择
+ * 注销操作
  */
-ts.loadData = function(){
-	location.href = '#tableSelectMgr';
-	initTableData();
-	of.loadFoodDateAction = window.setInterval("keepLoadTableData()", 500);	
-}
-
-
 function loginOut(){
 	Util.LM.show();
 	$.ajax({

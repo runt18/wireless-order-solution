@@ -7,45 +7,45 @@
 <meta http-equiv="pragma" content="no-cache"> 
 <meta http-equiv="cache-control" content="no-cache"> 
 <meta http-equiv="expires" content="0">	
+
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
-
+<!-- jquery mobile -->
 <link rel="stylesheet" href="css/common/jquery.mobile-1.3.2.css">
-<!-- 数字键盘 -->
-<link rel="stylesheet" href="css/calculate/datouwang.css">
-
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="js/common/jquery.mobile-1.3.2.js"></script>
+<!-- 数字键盘样式 -->
+<link rel="stylesheet" href="css/calculate/datouwang.css">
+<!-- 自定义样式 -->
+<link rel="stylesheet" href="css/takeout/main.css">
+<!-- 工具类 -->
 <script type="text/javascript" src="js/Util.js"></script>
+<script type="text/javascript" src="../extjs/wireless.ux.js"></script>
+
 <script type="text/javascript" src="js/orderFood/orderFood.js"></script>
 <script type="text/javascript" src="js/checkOut/checkOut.js"></script>
 <script type="text/javascript" src="js/stopSet/stopSet.js"></script>
+<script type="text/javascript" src="js/payment/payment.js"></script>
 <script type="text/javascript" src="js/tableSelect/tableSelect.js"></script>
-<script type="text/javascript" src="../extjs/wireless.ux.js"></script>
-<link rel="stylesheet" href="css/takeout/main.css">
 
 <!--引入易笔字核心脚本(utf-8编码)-->
 <script src="http://www.yibizi.com/ybz_core/core/ybz.min.js"></script>
+<!-- <script src="js/yibizi.js"></script> -->
 <script>
-YBZ_win_title = "手写板";//手写板名称
-YBZ_follow = false;//手写板吸附在输入框附近 false 右下角打开
-YBZ_skin = "black";
-//default||aero||chrome||opera||simple||idialog||twitter||blue||black||green
-YBZ_tipsopen = false;//是否在网页输入框中加入手写提示
-YBZ_fixed = true;//是否固定手写窗口
-
 //数字键盘触发的input事件
 var numKeyBoardFireEvent;
 
-var staffData={staffID:0, staffName:''};
 //登录操作包
 var ln={
-	restaurant : {}
+	restaurant : {},
+	staffData={staffID:0, staffName:''}
 }
 
+//数字键盘对应的<input>
 var focusInput = "inputTableCustomerCountSet";
 
+//口味动态弹出时鼠标范围
 var mouseOutFoodSelect = false;
-
+//鼠标离开菜品列表点击时,动态口味关闭
 $(document).bind("click",function(e){ 
 	var target = $(e.target); 
 	if(mouseOutFoodSelect){
@@ -57,13 +57,6 @@ $(document).bind("click",function(e){
 	}
 
 }) 
-
-function test(){
-	Util.msg.alert({
-		msg : '没有该餐桌，请重新输入一个桌号.', 
-		topTip : true
-	});
-}
 
 </script>
 
@@ -104,7 +97,6 @@ function test(){
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loginOut()">注销</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="location.reload()" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-		 	<!-- <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.openTableAction()">点菜</a> -->
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.createOrderForLookup()">查台</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.openApartTable()">拆台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.transTableForTS()">转台</a>
@@ -208,9 +200,10 @@ function test(){
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.goToCreateOrder()">点菜</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.tempPayForUO()">暂结</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="showPaymentMgr({table:uo.table})">结账</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#popupDiscountCmp">折扣</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.transTableForTS()">转台</a>
-			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.useMemberForOrder()">会员</a>
+			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="openReadMemberByCondtionWin()">会员</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#updateFoodOtherOperateCmp" onclick="uo.openMoreOperate()">更多</a>
 			<a href="javascript: Util.to.scroll({content:'orderFoodListCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
 			<a href="javascript: Util.to.scroll({content:'orderFoodListCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>		 
@@ -318,7 +311,7 @@ function test(){
 	    </div>
 	</div>		
 
-	<div id="cancelFoodSetShadow" for="transFoodCmp" style="z-index: 1101;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%; background: #DDD;display: none;" ></div>
+	<div id="cancelFoodSetShadow" for="cancelFoodSet" style="z-index: 1101;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%; background: #DDD;display: none;" ></div>
 	<div id="cancelFoodSet" class="ui-overlay-shadow ui-corner-all" style="max-width:650px;z-index: 1102;position: absolute; top: 150px; left: 45%; margin: -100px 0px 0px -250px;background-color: white;display: none;" align="center">	
 	<!-- <div id="cancelFoodSet" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:650px;" class="ui-corner-all" align="center"> -->
 	    <div data-role="header" data-theme="b" class="ui-corner-top" style="line-height: 35px;">
@@ -358,7 +351,7 @@ function test(){
     <table id="divTransFoodTableAlias" style="width:90%">
    	<tr>
    		<td>
-   			<input id="txtTableNumForTS" type="text" placeholder="填写台号" class="numberInputStyle">
+   			<input id="txtTableNumForTS" onkeyup="value=value.replace(/[+]/g,'')" type="text" placeholder="填写台号" class="numberInputStyle">
    		</td>
    		<td id="td4TxtFoodNumForTran">
    			<input id="txtFoodNumForTran" type="text" placeholder="填写菜品数量" class="numberInputStyle">
@@ -393,15 +386,16 @@ function test(){
 			<a onclick="ts.openApartTableAction('G')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">G</a>     
 	</div>	
 	<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
-		 <div data-role="controlgroup" data-type="horizontal" data-corners="false" class="bottomBarFullWidth ui-bar-b" >
-			 <a  data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn" onclick="ts.submitForSelectTableOrTransFood()">确定</a>
-			 <a  data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn" onclick="uo.closeTransOrderFood()">取消</a>		 
+		 <div id="searchTableCmpsFoot" data-role="controlgroup" data-type="horizontal" data-corners="false" class="bottomBarFullWidth ui-bar-b barBottomBeCorner" >
+		 	<a id="ts_toPaymentMgr" data-role="button" data-theme="b" data-inline="true" style="display: none;"  onclick="ts.toPaymentMgr()">结账(Enter)</a>
+			<a id="certain4searchTableCmps" data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn" onclick="ts.submitForSelectTableOrTransFood()">确定</a>
+			<a  data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn" onclick="uo.closeTransOrderFood()">取消</a>		 
 		 </div>
     </div>
 </div>		
 
 
-<div id="numberKeyboard" class="ui-overlay-shadow ui-corner-all" style="z-index: 1103;position: absolute;background-color: white;right: 0;bottom: 0;display: none;" align="center">
+<div id="numberKeyboard" class="ui-overlay-shadow ui-corner-all" style="z-index: 1200;position: absolute;background-color: white;right: 0;bottom: 0;display: none;" align="center">
     <div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="line-height: 30px;">
         	数字键盘
     </div>
@@ -883,6 +877,330 @@ function test(){
 		 
 	</div>	
 </div>
+
+<!-- 结账界面 -->
+<div data-role="page" id="paymentMgr" data-theme="e">
+	<div id="paymentCmp" class="ui-grid-a">
+		<div class="ui-block-a" style="width:350px;height:800px;border-right: 2px solid gray;">
+			<table id="orderDetialTable"  data-theme="c" data-role="table" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr" >
+		         <thead>
+		           <tr class="ui-bar-d">
+		             <th >收款</th>
+		             <th>金额</th>
+		             <th >操作</th>
+		           </tr>
+		         </thead>
+		         <tbody>	
+		         	<tr>
+		         		<td >实收:</td>
+		         		<td id="totalPrice" style="color: green;">0.00</td>
+		         		<td>----</td>
+		         	</tr>
+		         	<tr>
+		         		<td>应收:</td>
+		         		<td id="shouldPay">0.00</td>
+		         		<td>----</td>
+		         	</tr>
+		         	<tr>
+		         		<td>赠送:</td>
+		         		<td id="forFree">0.00</td>
+		         		<td>----</td>
+		         	</tr>
+		         	<tr>
+		         		<td>折扣:</td>
+		         		<td id="discountPrice">0.00</td>
+		         		<td>----</td>
+		         	</tr>
+		         	<tr>
+		         		<td>退菜:</td>
+		         		<td id="spanCancelFoodAmount">0.00</td>
+		         		<td ><label id="lab_replaceBtn">----</label><a id="spanSeeCancelFoodAmount" href="#" style="display: none;" onclick="loadOrderDetail();lookupOrderDetailByType('detail_cancel')">查看</a></td>
+		         	</tr>	
+		         	<tr id="tr4EraseQuota">
+		         		<td colspan="2" style="width: 200px;line-height: 60px;font-size: 22px;text-align: right;" >抹数金额(上限:￥<font id="font_showEraseQuota" color="red">--</font>)：</td>
+		         		<td width="80" style="padding-right: 5px;">
+		         			<input id="txtEraseQuota">
+		         		</td>
+		         	</tr>
+		         	<tr>
+		         		<td style="width: 90px;line-height: 60px;">备注:</td>
+		         		<td colspan="2" style="padding-right: 5px;">
+		         			<input id="remark">
+		         		</td>
+		         	</tr>	         	
+		         </tbody>
+		    </table>	    
+		    <!-- 按钮 -->
+		    <div align="center">
+		    	<a data-role="button" data-theme="b" data-inline="true" style="width: 45%;" onclick="paySubmit(1)">现金(+)</a>
+		    	<a data-role="button" data-theme="b" data-inline="true" style="width: 45%;" onclick="paySubmit(2)">刷卡</a>
+		    	<a data-role="button" data-theme="b" data-inline="true" style="width: 45%;" onclick="paySubmit(4)">签单</a>
+		    	<a data-role="button" data-theme="b" data-inline="true" style="width: 45%;" onclick="paySubmit(5)">挂账</a>		    	
+		    	<a data-role="button" data-theme="b" onclick="openInputReciptWin()">现金结账</a>
+		    	<a data-role="button" data-theme="b" data-rel="popup" data-position-to="window" data-transition="pop" onclick="paySubmit(3)">会员余额</a>
+		    	<a data-role="button" data-theme="b" onclick="loadMix()" data-rel="popup" data-position-to="window" data-transition="pop">其他结账</a>
+		    	<a data-role="button" data-theme="b" onclick="paySubmit(6)">暂结(-)</a>
+		    </div>
+		    
+		</div>
+		<div class="ui-block-b" data-role="content" style="width : -webkit-calc(100% - 350px);height:800px;">
+			<div id="divNorthForUpdateOrder"  data-role="header" data-tap-toggle="false" data-theme="b" style="height: 36px;overflow: hidden;">
+				<span id="orderIdInfo" style="line-height: 35px;float: left;margin-left: 5px;">
+					结账 -- 账单号:<font color="#f7c942">-----</font>
+				</span>
+				<span id="orderTableInfo" style="line-height: 35px;float: left;margin-left: 20px;">
+					 餐桌号:<font color="#f7c942">-- (---)</font>
+				</span>
+				<span style="line-height: 35px;float: left;margin-left: 20px;">
+					 当前服务费: <font id="spanDisplayCurrentServiceRate" color="#f7c942">--</font>
+				</span>
+				<span style="line-height: 35px;float: left;margin-left: 20px;">
+					 人数 : <font id="orderCustomNum" color="#f7c942">1</font>
+				</span>
+			</div>
+			<div id="payment_orderFoodListCmp" style="overflow-y: auto;">
+			<table id="orderFoodsTable"  data-theme="c" data-role="table" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr" >
+		         <thead>
+		           <tr class="ui-bar-d">
+		             <th style="width: 5px;"></th>
+		             <th style="width: 25%;">菜名</th>
+		             <th >数量</th>
+		             <th style="width: 15%;">口味</th>
+		             <th >口味价钱</th>
+		             <th >单价</th>
+					 <th >折扣率</th>
+					 <th >总价</th>
+					 <th >时间</th>
+					 <th >服务员</th>             
+		           </tr>
+		         </thead>
+		         <tbody id="payment_orderFoodListBody">	
+<!-- 		         	<tr>
+		         		<td>1</td>
+		         		<td >龙虾排骨</td>
+		         		<td >1</td>
+		         		<td>无口味</td>
+		         		<td>0.00</td>
+		         		<td>8.88</td>
+		         		<td>0.5</td>
+		         		<td >11.5</td>
+		         		<td>14:23:23</td>
+		         		<td>管理员</td>
+		         	</tr> -->
+		         </tbody>
+		    </table>	
+		    </div>		
+		</div>
+	</div>
+	
+	
+	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
+		<div  class="bottomGeneralBar" style="background-color:#f7c942">
+			<div id="divDescForUpdateOrder" style="float: right;">
+				<span id="orderMemberDesc" style="float: left;margin-right: 20px;"></span>			
+				<span id="orderDiscountDesc" style="float: left;margin-right: 20px;">
+					当前折扣: <font color="green" >----</font>
+				</span>						
+			</div>
+		</div>		
+		 <a data-role="button" data-inline="true" class="bottomBtnFont" href="#tableSelectMgr">返回</a>
+		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupDiscountCmp">折扣</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupServiceCmp">服务费</a>
+			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="openReadMemberByCondtionWin()">会员</a>
+			<a href="javascript: Util.to.scroll({content:'payment_orderFoodListCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
+			<a href="javascript: Util.to.scroll({content:'payment_orderFoodListCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>			
+		 </div>
+	</div>	
+	
+	<div data-role="popup" id="payment_popupDiscountCmp" data-theme="d" >
+        <ul id="payment_discountCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>
+	</div>	
+	<div data-role="popup" id="payment_popupServiceCmp" data-theme="d" >
+        <ul id="payment_serviceCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>
+	</div>	
+	
+	
+	
+	<div  id="lookupOrderDetail" data-role="popup"  data-overlay-theme="e" data-theme="d" data-dismissible="false" style="" class="ui-corner-all" align="center">
+		<a data-rel="back" data-role="button" data-corners="false" class="ui-btn-right" data-theme="b" style="right: 0px;top:0px;background-image: -webkit-linear-gradient( top,red,maroon);">X</a>
+	    <div data-role="header" class="ui-corner-top" data-theme="b" style="height: 38px;">
+	        <h1>查看账单信息</h1>
+	    </div>
+	    <table style="width: 100%">
+	    	<tr>
+	    		<td>
+				    <div style="padding: 0 10px" align="left">
+						<fieldset data-role="controlgroup" data-type="horizontal">
+							<label>
+					        	<input type="radio" name="lookupType" data-type="detail_all" value="on" checked="checked" onclick="lookupOrderDetailByType('detail_all')">全部
+					        </label>
+					        <label>
+					        	<input type="radio" name="lookupType" data-type="detail_gift" value="on" onclick="lookupOrderDetailByType('detail_gift')">赠送
+					        </label>
+					        <label>
+					        	<input type="radio" name="lookupType" data-type="detail_discount" value="on" onclick="lookupOrderDetailByType('detail_discount')">折扣
+					        </label>
+					        <label>
+					        	<input type="radio" name="lookupType" data-type="detail_cancel" value="on" onclick="lookupOrderDetailByType('detail_cancel')">退菜
+					        </label>
+					    </fieldset>
+				    </div>	    		
+	    		</td>
+	    		<td style="text-align: right;padding-right: 20px;font-size: 30px;color: green;">
+	    			总金额 : <label id="orderDetailTotalPrice">0</label>
+	    		</td>
+	    	</tr>
+	    </table>
+
+	    <div data-theme="d" class="ui-corner-bottom ui-content">
+	    	<div style="max-height: 480px; overflow-y: auto;">
+			<table id="payment_lookupOrderDetailTable" data-role="table" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr" >
+	         <thead>
+		           <tr class="ui-bar-d">
+		             <th style="width: 10px;"></th>
+		             <th style="width: 20%;">菜名</th>
+		             <th >单价</th>
+		             <th >数量</th>
+		             <th style="width: 15%;">口味</th>
+		             <th >口味价钱</th>
+					 <th >厨房</th>
+					 <th >操作类型</th>
+					 <th >时间</th>
+					 <th >服务员</th>   
+					 <th >退菜原因</th>          
+		           </tr>
+	         </thead>
+	         <tbody id="payment_lookupOrderDetailBody">
+	         	<tr>
+	         		<td>1</td>
+	         		<td >2014-12-12 18:03:56</td>
+	         		<td >龙虾排骨</td>
+	         		<td>6.00</td>
+	         		<td >1</td>
+	         		<td><div style="height: 45px;overflow: hidden;">黄炆,拼上,即上,临叫</div></td>
+	         		<td>8.88</td>
+	         		<td>湘菜</td>
+	         		<td >退菜</td>
+	         		<td>管理员</td>
+	         		<td>上菜太慢, 太辣</td>
+	         	</tr>
+	         </tbody>
+	       </table>     
+			</div>
+	    </div>
+	</div>		
+	
+	<div id="inputReciptWin" data-role="popup"  data-overlay-theme="e" data-theme="d" data-dismissible="false" class="ui-corner-all" align="center">
+	    <div data-role="header" class="ui-corner-top" data-theme="b">
+	        <h1>输入收款显示找零</h1>
+	    </div>
+	    <div style="width: 100%;padding: 5px 10px;" >
+	    <table id="inputReciptWinTable">
+	    	<tr>
+	    		<td>消费金额:</td>
+	    		<td><label id="txtShouldPay4Return"></label></td>
+	    	</tr>
+	    	<tr>
+	    		<td>输入收款:</td>
+	    		<td><input class="numberInputStyle" id="txtInputRecipt"></td>
+	    	</tr>
+	    	<tr>
+	    		<td>找零:</td>
+	    		<td><label id="txtReciptReturn">0</label></td>
+	    	</tr>	    		    	
+	    </table>
+	    </div>
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="payInputRecipt()">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="closeInputReciptWin()">取消</a>		 
+			 </div>
+	    </div>
+	 </div>	
+	 
+	<div id="mixedPayWin" data-role="popup"  data-overlay-theme="e" data-theme="d" data-dismissible="false" class="ui-corner-all" align="center">
+	    <div data-role="header" class="ui-corner-top" data-theme="b">
+	        <h1>混合结账</h1>
+	    </div>
+	    <div style="width: 100%;padding: 5px 10px;" >
+	    <table id="mixedPayWinTable">
+	    	<tr>
+	    		<td><label><input type="checkbox" name="checkbox-0 " data-for="cashinput" onclick="mixPayCheckboxAction({event:this})">现金</label></td>
+	    		<td style="padding-right: 10px;"><input id="cashinput" style="font-size:20px;font-weight: bold;width: 170px;" disabled="disabled" onblur="setMixPayPrice({event:this, id:'cashinput'})"></td>
+	    	</tr>
+	    	<tr>
+	    		<td>
+					<label><input type="checkbox" name="checkbox-0 " data-for="cardinput" onclick="mixPayCheckboxAction({event:this})">刷卡</label>
+				</td>
+	    		<td style="padding-right: 10px;"><input id="cardinput" style="font-size:20px;font-weight: bold;;width: 170px;" disabled="disabled"></td>
+	    	</tr>
+	    	<tr>
+	    		<td>
+					<label><input type="checkbox" name="checkbox-0 " onclick="mixPayCheckboxAction({event:this})">签单</label>
+				</td>
+	    		<td style="padding-right: 10px;"><input style="font-size:20px;font-weight: bold;;width: 170px;"></td>
+	    	</tr>	    		    	
+	    </table>
+	    </div>
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+			 	 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="mixPayAction(true)">暂结</a>
+				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="mixPayAction()">结账</a>
+				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="closeMixedPayWin()">取消</a>		 
+			 </div>
+	    </div>
+	 </div>	
+</div>
+
+
+<div id="readMemberWinShadow" for="readMemberWin" class="ui-overlay-e in" style="z-index: 1101;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%;display: none;" ></div>
+<div id="readMemberWin" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 200px; left: 50%;min-width:600px; margin: -100px 0px 0px -250px;display: none;background-color: white;" align="center">	
+    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
+        	输入条件查找会员
+    </div>    
+	<div class="ui-grid-c">
+		<div class="ui-block-a" style="width: 10%"></div>
+	    <div class="ui-block-b" style="width: 50%"><input placeholder="手机号/卡号/微信卡号" data-type="num" style="font-size:20px;font-weight: bold;" id="txtMemberInfo4Read"></div>
+	    <div class="ui-block-c"><a data-role="button" id="btnReadMember" class="numberInputStyle" onclick="readMemberByCondtion()">读取会员</a></div>
+	    
+	    <div class="ui-block-a" style="line-height: 50px;font-weight: bold;font-size: 20px;">会员名称:</div>
+	    <div class="ui-block-b" style="line-height: 50px;font-weight: bold;font-size: 20px;text-align: left;"><label id="payment4MemberName">----</label></div>
+	    <div class="ui-block-c" style="line-height: 50px;font-weight: bold;font-size: 20px;">会员类型:</div>
+	    <div class="ui-block-d" style="line-height: 50px;font-weight: bold;font-size: 20px;text-align: left;height: 50px;overflow: hidden;"><label id="payment4MemberType">----</label></div>
+	    		  
+	    <div class="ui-block-a" style="line-height: 50px;font-weight: bold;font-size: 20px;">会员余额:</div>
+	    <div class="ui-block-b" style="line-height: 50px;font-weight: bold;font-size: 20px;text-align: left;"><label id="payment4MemberBalance">----</label></div>
+	    <div class="ui-block-c" style="line-height: 50px;font-weight: bold;font-size: 20px;">会员积分:</div>
+	    <div class="ui-block-d" style="line-height: 50px;font-weight: bold;font-size: 20px;text-align: left;"><label id="payment4MemberPoint">----</label></div>
+	    		    
+	    <div class="ui-block-a" style="width: 27%;">
+	    	<a data-role="button" id="link_payment_popupDiscountCmp4Member" data-icon="arrow-r" data-iconpos="right" data-rel="popup" data-transition="pop" href="#payment_popupDiscountCmp4Member"><div>选择折扣方案</div></a>
+	    </div>
+	    <div class="ui-block-b" style="width: 23%;line-height: 57px;font-size: 20px;font-weight: bold;color: green;text-align: left;"><label id="payment4MemberDiscount" data-value="">----</label></div>
+	    <div class="ui-block-c" style="width: 27%;">
+	    	<a data-role="button" id="link_payment_popupPricePlanCmp4Member" data-icon="arrow-r" data-iconpos="right" data-rel="popup" data-transition="pop" href="#payment_popupPricePlanCmp4Member"><div>选择价格方案</div></a>
+	    </div>
+	    <div class="ui-block-d" style="width: 23%;line-height: 57px;font-size: 20px;font-weight: bold;color: green;text-align: left;"><label id="payment4MemberPricePlan" data-value="">----</label></div>			      
+	</div>	    
+    
+	<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
+		 <div data-role="controlgroup" data-corners="false" data-type="horizontal" class="bottomBarFullWidth ui-bar-b barBottomBeCorner">
+			 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="setMemberToOrder()">确定</a>
+			 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="closeReadMemberByCondtionWin()">取消</a>		 
+		 </div>
+    </div>	
+ </div>	
+ 
+ 
+<!-- <div data-role="popup" id="payment_popupDiscountCmp4Member" data-theme="d" class="payment_popupDiscountCmp4Member">
+       <ul id="payment_discountList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>
+</div> -->	
+<div data-role="popup" id="payment_popupPricePlanCmp4Member" data-theme="d" class="payment_popupPricePlanCmp4Member">
+       <ul id="payment_pricePlanList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+       	<!-- <li data-icon="false" class="popupButtonList" ><a >vvvvv</a></li> -->
+       </ul>
+</div>	 
 
 </body>
 

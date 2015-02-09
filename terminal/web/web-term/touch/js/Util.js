@@ -137,26 +137,26 @@ Util.padding = function(c){
 					temp = this.data[start+i];
 					//FIXME 判断是否为沽清页面, 是就不用验证菜品状态
 //					if(Util.sellOutCond){
-					if(true){
-						this.pageData.push(temp);
-						if(temp != null){
-							html += this.templet({
-								dataIndex : i,
-								data : temp
-							});	
-						}
-					}else{
-						if((temp.status & 1 << 2) == 0){
-							this.pageData.push(temp);
-							if(temp != null){
-								html += this.templet({
-									dataIndex : i,
-									data : temp
-								});	
-							}
-	
-						}
+//					if(true){
+					this.pageData.push(temp);
+					if(temp != null){
+						html += this.templet({
+							dataIndex : i,
+							data : temp
+						});	
 					}
+//					}else{
+//						if((temp.status & 1 << 2) == 0){
+//							this.pageData.push(temp);
+//							if(temp != null){
+//								html += this.templet({
+//									dataIndex : i,
+//									data : temp
+//								});	
+//							}
+//	
+//						}
+//					}
 
 
 				}
@@ -907,6 +907,9 @@ function delcookie(name){
  * @returns {Boolean}
  */
 function checkDot(num){
+	if(!isNaN(num)){
+		num = num + ""; 
+	}
 	var dot = num.indexOf(".");
 	if(dot != -1){
 	    var dotCnt = num.substring(dot+1,dot+2);

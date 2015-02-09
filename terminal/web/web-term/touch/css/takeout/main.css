@@ -37,6 +37,14 @@ div.ui-slider-switch {
 }
 
 /*
+2971行 斑马线设置深色
+*/
+.table-stripe tbody tr:nth-child(odd) td, .table-stripe tbody tr:nth-child(odd) th {
+	background-color: rgba(0,0,0,0.04);
+	background-color: #eeeeee;
+}
+
+/*
 2294行, z-index修改popup层高于数字键盘控件
 */
 .ui-popup-screen {
@@ -88,6 +96,14 @@ html { overflow-y: hidden;}
 
 .bottomBarFullWidth > .ui-controlgroup-controls{
 	width: 100%;
+}
+
+/**
+按键底部边圆角
+*/
+.barBottomBeCorner{
+	border-bottom-right-radius : 0.6em;
+	border-bottom-left-radius : 0.6em;
 }
 
 /*把底部的按钮文字放大*/
@@ -320,6 +336,14 @@ html { overflow-y: hidden;}
 	font-size: 20px !important;
 }
 
+.popupButtonList{
+	line-height: 40px;
+}
+
+.popupButtonList > a{
+	font-size: 20px !important;
+}
+
 /* .orderFoodCommonTasteClose{
 	line-height: 40px;
 } */
@@ -369,6 +393,41 @@ html { overflow-y: hidden;}
 	border-radius : 10px;
 	text-align: center;
 	font-weight: bold;
+}
+
+#orderDetialTable td{
+	text-align: center;
+	padding: initial;
+	font-size: 25px;
+	font-weight: bold;
+}
+#orderDetialTable th{
+	text-align: center;
+}
+
+/* #orderDetialTable td:nth-child(2){
+	text-align: right;
+} */
+#payment_lookupOrderDetailTable td{
+	padding : initial;
+	color: blue;
+}
+
+#inputReciptWinTable td{
+	font-size: 25px;
+	font-weight: bold;
+}
+
+#inputReciptWinTable td:first-child{
+	text-align: right;
+}
+
+#inputReciptWinTable td:nth-child(2){
+	color: green;
+}
+
+.mixPayInputFont{
+	font-size:20px;font-weight: bold;width: 170px;
 }
 
 
