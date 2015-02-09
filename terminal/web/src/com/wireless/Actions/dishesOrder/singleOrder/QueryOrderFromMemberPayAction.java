@@ -39,7 +39,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 			String orderID = request.getParameter("orderID");
 			String pricePlanId = request.getParameter("pricePlanId");
 			String couponId = request.getParameter("couponId");
-			String discountID = request.getParameter("discountID");
+//			String discountID = request.getParameter("discountID");
 			String servicePlanId = request.getParameter("servicePlanId");
 			String sv = request.getParameter("sv");
 			//0: 模糊搜索, 1 : 根据手机号, 2: 微信卡号, 3:实体卡号
@@ -76,16 +76,19 @@ public class QueryOrderFromMemberPayAction extends Action{
 				throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 			}
 			membersByType.set(0, MemberDao.getById(staff, membersByType.get(0).getId()));
-			int discount = 0;
-			if(discountID != null && !discountID.isEmpty()){
-				discount = Integer.parseInt(discountID);
-			}
+//			int discount = 0;
+//			if(discountID != null && !discountID.isEmpty()){
+//				discount = Integer.parseInt(discountID);
+//			}
 			Order.PayBuilder payBuilder;
+			PayType payType;
 			if(membersByType.get(0).getMemberType().getAttribute() == MemberType.Attribute.POINT){
-				payBuilder = Order.PayBuilder.build4PointMember(Integer.valueOf(orderID), membersByType.get(0), PayType.CASH, discount, false);
+				payType = PayType.CASH;
 			}else{
-				payBuilder = Order.PayBuilder.build4ChargeMember(Integer.valueOf(orderID), membersByType.get(0), discount);
+				payType = PayType.MEMBER;
 			}
+			
+			payBuilder = Order.PayBuilder.build4Member(Integer.valueOf(orderID), payType, false);
 			
 			
 			if(pricePlanId != null && !pricePlanId.trim().isEmpty() && !pricePlanId.equals("-1")){

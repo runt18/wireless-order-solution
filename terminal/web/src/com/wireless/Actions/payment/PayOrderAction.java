@@ -12,7 +12,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.member.MemberDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
@@ -23,8 +22,6 @@ import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.dishesOrder.PrintOption;
-import com.wireless.pojo.member.Member;
-import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
@@ -32,7 +29,7 @@ public class PayOrderAction extends Action{
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		String jsonResp = "{success:$(result), data:'$(value)'}";
+		String jsonResp = "{\"success\":$(result), \"data\":\"$(value)\"}";
 		PrintWriter out = null;
 		try {
 			
@@ -97,9 +94,9 @@ public class PayOrderAction extends Action{
 				payType = PayType.CASH;
 			}
 			
-			Member member = null;
+//			Member member = null;
 			if(settleType == Order.SettleType.MEMBER){
-				String discountID = request.getParameter("discountID");
+//				String discountID = request.getParameter("discountID");
 				boolean sendSMS = false;
 				//Send SMS if paid by charge member.
 				for(Cookie cookie : request.getCookies()){
@@ -110,17 +107,20 @@ public class PayOrderAction extends Action{
 				    	}
 				    }
 				}
-				int discount = 0;
-				if(discountID != null && !discountID.isEmpty()){
-					discount = Integer.parseInt(discountID);
-				}
-				member = MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID")));
+//				int discount = 0;
+//				if(discountID != null && !discountID.isEmpty()){
+//					discount = Integer.parseInt(discountID);
+//				}
+//				member = MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID")));
 				
-				if(member.getMemberType().getAttribute() == MemberType.Attribute.CHARGE){
-					payBuilder = Order.PayBuilder.build4ChargeMember(orderId, member, discount, sendSMS);
-				}else{
-					payBuilder = Order.PayBuilder.build4PointMember(orderId, member,payType, discount, sendSMS);
-				}
+				payBuilder = Order.PayBuilder.build4Member(orderId, payType, sendSMS);
+				
+//				if(member.getMemberType().getAttribute() == MemberType.Attribute.CHARGE){
+//					payBuilder = Order.PayBuilder.build4ChargeMember(orderId, member, discount, sendSMS);
+//					
+//				}else{
+//					payBuilder = Order.PayBuilder.build4PointMember(orderId, member,payType, discount, sendSMS);
+//				}
 				
 			}else{
 				payBuilder = Order.PayBuilder.build4Normal(orderId, payType);
@@ -221,7 +221,7 @@ public class PayOrderAction extends Action{
 		}finally{
 			//just for debug
 			//System.out.println(jsonResp);
-			out.write(jsonResp);
+			out.print(jsonResp);
 			out.flush();
 			out.close();
 		}

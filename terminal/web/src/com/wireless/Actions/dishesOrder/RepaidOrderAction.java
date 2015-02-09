@@ -10,7 +10,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.member.MemberDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.ErrorCode;
 import com.wireless.json.JObject;
@@ -21,8 +20,6 @@ import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.dishesOrder.PrintOption;
-import com.wireless.pojo.member.Member;
-import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
@@ -51,13 +48,15 @@ public class RepaidOrderAction extends Action{
 			Order.PayBuilder payBuilder;
 			//get the pay manner to this order
 			if(settleType == Order.SettleType.MEMBER){
-				Member member = MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID")));
+//				Member member = MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID")));
+//				
+//				if(member.getMemberType().getAttribute() == MemberType.Attribute.CHARGE){
+//					payBuilder = Order.PayBuilder.build4ChargeMember(orderId, member, Integer.parseInt(request.getParameter("discountID")), false);
+//				}else{
+//					payBuilder = Order.PayBuilder.build4PointMember(orderId, member,payType4Pay, Integer.parseInt(request.getParameter("discountID")), false);
+//				}
 				
-				if(member.getMemberType().getAttribute() == MemberType.Attribute.CHARGE){
-					payBuilder = Order.PayBuilder.build4ChargeMember(orderId, member, Integer.parseInt(request.getParameter("discountID")), false);
-				}else{
-					payBuilder = Order.PayBuilder.build4PointMember(orderId, member,payType4Pay, Integer.parseInt(request.getParameter("discountID")), false);
-				}				
+				payBuilder = Order.PayBuilder.build4Member(orderId, payType4Pay, false);
 			}else{
 				payBuilder = Order.PayBuilder.build4Normal(orderId, payType4Pay);
 			}

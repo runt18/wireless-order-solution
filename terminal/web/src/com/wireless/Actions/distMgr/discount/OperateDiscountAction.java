@@ -24,6 +24,7 @@ public class OperateDiscountAction extends DispatchAction{
 			HttpServletRequest request, HttpServletResponse response) throws BusinessException, Exception{
 		final int orderId = Integer.parseInt(request.getParameter("orderId"));
 		final int discountId = Integer.parseInt(request.getParameter("discountId") != null?request.getParameter("discountId"):"0");
+		String pricePlanId = request.getParameter("pricePlan");
 		final int memberId;
 		if(request.getParameter("memberId") != null && !request.getParameter("memberId").isEmpty()){
 			memberId = Integer.parseInt(request.getParameter("memberId"));
@@ -38,7 +39,12 @@ public class OperateDiscountAction extends DispatchAction{
 		try {
 			final Order.DiscountBuilder builder;
 			if(memberId != 0){
-				builder = Order.DiscountBuilder.build4Member(orderId, MemberDao.getById(staff, memberId));
+				int pricePlan = 0;
+				if(pricePlanId != null && !pricePlanId.trim().isEmpty()){
+					builder = Order.DiscountBuilder.build4Member(orderId, MemberDao.getById(staff, memberId), discountId, pricePlan);
+				}else{
+					builder = null;
+				}
 			}else{
 				builder = Order.DiscountBuilder.build4Normal(orderId, discountId);
 			}

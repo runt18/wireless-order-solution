@@ -136,6 +136,7 @@ public class QueryMemberAction extends DispatchAction {
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
 			String searchType = request.getParameter("sType");
+			String forDetail = request.getParameter("forDetail");
 			
 //			String point = request.getParameter("point");
 //			String usedPoint = request.getParameter("usedPoint");
@@ -220,6 +221,10 @@ public class QueryMemberAction extends DispatchAction {
 			}
 			jobject.setTotalProperty(newList.size());
 			newList = DataPaging.getPagingData(newList, true, start, limit);
+			
+			if(!newList.isEmpty() && forDetail != null && !forDetail.isEmpty()){
+				newList.set(0, MemberDao.getById(staff, newList.get(0).getId()));
+			}
 			
 			jobject.setRoot(newList);
 			
