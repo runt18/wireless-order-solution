@@ -107,20 +107,7 @@ public class PayOrderAction extends Action{
 				    	}
 				    }
 				}
-//				int discount = 0;
-//				if(discountID != null && !discountID.isEmpty()){
-//					discount = Integer.parseInt(discountID);
-//				}
-//				member = MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID")));
-				
 				payBuilder = Order.PayBuilder.build4Member(orderId, payType, sendSMS);
-				
-//				if(member.getMemberType().getAttribute() == MemberType.Attribute.CHARGE){
-//					payBuilder = Order.PayBuilder.build4ChargeMember(orderId, member, discount, sendSMS);
-//					
-//				}else{
-//					payBuilder = Order.PayBuilder.build4PointMember(orderId, member,payType, discount, sendSMS);
-//				}
 				
 			}else{
 				payBuilder = Order.PayBuilder.build4Normal(orderId, payType);
