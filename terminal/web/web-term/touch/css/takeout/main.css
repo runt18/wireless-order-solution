@@ -413,6 +413,10 @@ html { overflow-y: hidden;}
 	color: blue;
 }
 
+#payment_lookupOrderDetailTable th{
+	padding : initial;
+}
+
 #inputReciptWinTable td{
 	font-size: 25px;
 	font-weight: bold;
@@ -428,6 +432,14 @@ html { overflow-y: hidden;}
 
 .mixPayInputFont{
 	font-size:20px;font-weight: bold;width: 170px;
+}
+
+.popupWinCloseBtn{
+	border-top-right-radius: 0.5em;
+	width: 50px;
+	height: 35px;
+	margin: -1px 0;
+	background-image: -webkit-linear-gradient( top,red,maroon);
 }
 
 

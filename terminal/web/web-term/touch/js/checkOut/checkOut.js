@@ -254,15 +254,19 @@ uo.setMemberReadCmp = function(){
 		$('#orderFoodListMgr').append(payment_searchMemberTypeTemplet);
 	}	
 	
+	if($('#paymentMgr .payment_popupDiscountCmp4Member').length > 0){
+		$('#paymentMgr .payment_popupDiscountCmp4Member').remove();
+	}	
+	if($('#orderFoodListMgr .payment_popupDiscountCmp4Member').length == 0){
+		$('#orderFoodListMgr').append(payment_popupDiscountCmp4MemberTemplet);
+	}
+	
 	if($('#paymentMgr .payment_popupPricePlanCmp4Member').length > 0){
 		$('#paymentMgr .payment_popupPricePlanCmp4Member').remove();
 	}	
 	if($('#orderFoodListMgr .payment_popupPricePlanCmp4Member').length == 0){
-		$('#orderFoodListMgr').append(payment_popupDiscountCmp4MemberTemplet);
+		$('#orderFoodListMgr').append(payment_popupPricePlanCmp4MemberTemplet);
 	}	
-	if($('#orderFoodListMgr .payment_popupDiscountCmp4Member').length == 0){
-		$('#orderFoodListMgr').append($('#payment_popupDiscountCmp4Member')[0]);
-	}		
 }
 
 /**
