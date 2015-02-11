@@ -32,8 +32,8 @@ var member4Payment, member4Display;
 //菜品列表
 var payment_orderFoodListCmpTemplet = '<tr>'
 	+ '<td>{dataIndex}</td>'
-	+ '<td ><div style="height: 45px;overflow: hidden;">{name}</div><img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
-	+ '<td>{count}</td>'
+	+ '<td ><div style="height: 45px;overflow: hidden;">{name}</div></td>'
+	+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
 	+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
 	+ '<td>{tastePrice}</td>'
 	+ '<td>{unitPrice}</td>'
@@ -52,7 +52,7 @@ var payment_lookupOrderDetailTemplet = '<tr>'
 	+ '<td><div style="height: 30px;overflow: hidden;">{tastePref}</div></td>'
 	+ '<td>{tastePrice}</td>'
 	+ '<td>{isGift}</td>'
-	+ '<td>{discountPrice}</td>'
+	+ '<td>{discount}</td>'
 	+ '<td>{kitchenName}</td>'
 	+ '<td>{operation}</td>'
 	+ '<td>{orderDateFormat}</td>'
@@ -188,11 +188,27 @@ function loadOrderBasicMsg(){
 	document.getElementById("discountPrice").innerHTML = checkDot(orderMsg.discountPrice)?parseFloat(orderMsg.discountPrice).toFixed(2) : orderMsg.discountPrice;
 	if(orderMsg.categoryValue != 4 && orderMsg.cancelPrice > 0){
 		$('#spanSeeCancelFoodAmount').show();	
-		$('#lab_replaceBtn').hide();
+		$('#lab_replaceCancelBtn').hide();
 	}else{
-		$('#lab_replaceBtn').show();
+		$('#lab_replaceCancelBtn').show();
 		$('#spanSeeCancelFoodAmount').hide();
 	}	
+	
+	if(orderMsg.giftPrice > 0){
+		$('#spanSeeGiftFoodAmount').show();	
+		$('#lab_replaceGiftBtn').hide();
+	}else{
+		$('#lab_replaceGiftBtn').show();
+		$('#spanSeeGiftFoodAmount').hide();
+	}	
+	
+	if(orderMsg.discountPrice > 0){
+		$('#spanSeeDiscountFoodAmount').show();	
+		$('#lab_replaceDiscountBtn').hide();
+	}else{
+		$('#lab_replaceDiscountBtn').show();
+		$('#spanSeeDiscountFoodAmount').hide();
+	}		
 	
 	$('#txtEraseQuota').val('');
 	
@@ -248,7 +264,7 @@ function loadOrderBasicMsg(){
 		html += payment_orderFoodListCmpTemplet.format({
 			dataIndex : i + 1,
 			id : checkOutData.root[i].id,
-			name : checkOutData.root[i].name,
+			name : checkOutData.root[i].name + ((checkOutData.root[i].status & 1 << 7) != 0 ? '[称重确认]' : ''),
 			count : checkOutData.root[i].count.toFixed(2),
 			isWeight : (checkOutData.root[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 			tastePref : checkOutData.root[i].tasteGroup.tastePref,
@@ -624,7 +640,7 @@ function lookupOrderDetailByType(type){
 	if(type == 'detail_all'){
 		lookupCondtion = "true"; 
 	}else if(type == 'detail_cancel'){
-		lookupCondtion = "tempData.count < 0";
+		lookupCondtion = "tempData.count < 0 && tempData.isTransfer != true";
 	}else if(type == 'detail_discount'){
 		lookupCondtion = "tempData.discount < 1";
 	}else if(type == 'detail_gift'){
@@ -645,7 +661,7 @@ function lookupOrderDetailByType(type){
 				count : orderFoodDetails[i].count.toFixed(2),
 				isWeight : (orderFoodDetails[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 				isGift : orderFoodDetails[i].isGift?'是':'否',	
-				discountPrice : orderFoodDetails[i].discount != 1? orderFoodDetails[i].actualPrice * orderFoodDetails[i].discount : '无',
+				discount : orderFoodDetails[i].discount,
 				tastePref : orderFoodDetails[i].tasteGroup.tastePref,
 				tastePrice : orderFoodDetails[i].tasteGroup.tastePrice,
 				unitPrice : (orderFoodDetails[i].unitPrice + orderFoodDetails[i].tasteGroup.tastePrice).toFixed(2),

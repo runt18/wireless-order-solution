@@ -1161,6 +1161,10 @@ function initTableData(){
 					}
 					tables.push(data.root[x]);
 				}
+				//设置各状态数量
+				$('#ts_freeTablesCount').text(freeTables.length);
+				$('#ts_busyTablesCount').text(busyTables.length);
+				
 				//从tables数组中，遍历得到含有餐桌的区域数组region
 				region.push(tables[0].region);
 				regionId.push(tables[0].region.id);

@@ -58,7 +58,8 @@ of.s = {
 						unitPrice : c.data.unitPrice,
 						click : 'of.insertFood({foodId:' + c.data.id + ', callback:of.s.callback})',
 						sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
-						gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''					
+						gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
+						weigh : (c.data.status & 1 << 7) != 0 ? '称' : ''				
 					});
 				}
 			});		
@@ -96,7 +97,7 @@ var deptCmpTemplet = '<a href="javascript: of.initKitchenContent({deptId:{id}})"
 var kitchenCmpTemplet = '<a data-role="button" data-inline="true" class="deptKitBtnFont" data-type="kitchenCmp" data-value={id} onclick="of.findFoodByKitchen({event:this, kitchenId:{id}})">{name}</a>';	
 var foodCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-value={id} onclick="{click}">' +
 						'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
-							'<div style="position:absolute;right:0;bottom:0;font-size:20px;"><font color="FireBrick">{sellout}</font><font style="color:green;">{gift}</font></div>'+
+							'<div style="position:absolute;right:0;bottom:0;font-size:20px;"><font color="orange">{weigh}</font><font color="FireBrick">{sellout}</font><font style="color:green;">{gift}</font></div>'+
 						'</div>'+
 					  '</a>'
 var orderFoodCmpTemplet = '	<li data-icon={isGift} data-index={dataIndex} data-theme="c" data-value={id} data-type="orderFoodCmp" onclick="of.selectNewFood({event:this, foodId:{id}})" ><a >'+
@@ -252,7 +253,8 @@ of.initKitchenContent = function(c){
 					unitPrice : c.data.unitPrice,
 					click : 'of.insertFood({foodId:' + c.data.id + '})',
 					sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
-					gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''					
+					gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
+					weigh : (c.data.status & 1 << 7) != 0 ? '称' : ''					
 				});
 			}
 		});			

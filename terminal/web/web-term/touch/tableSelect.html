@@ -83,9 +83,9 @@ $(document).bind("click",function(e){
    
 	<div data-role="popup" id="popupAllStatusCmp" data-theme="d" >
         <ul data-role="listview" data-inset="true" style="min-width:100px;" data-theme="b">
-            <li class="tempFoodKitchen" ><a onclick="ts.selectFreeStatus({event:this})">空闲台</a></li>
-            <li class="tempFoodKitchen" ><a onclick="ts.selectBusyStatus({event:this})">就餐台</a></li>
-            <li class="tempFoodKitchen" ><a onclick="ts.selectAllStatus({event:this})">全部台</a></li>
+            <li class="tempFoodKitchen" data-icon="false"><a onclick="ts.selectFreeStatus({event:this})">空闲台 - <label id="ts_freeTablesCount" style="color: #f7c942;">0</label></a></li>
+            <li class="tempFoodKitchen" data-icon="false"><a onclick="ts.selectBusyStatus({event:this})">就餐台 - <label id="ts_busyTablesCount" style="color: #f7c942;">0</label></a></li>
+            <li class="tempFoodKitchen" data-icon="false"><a onclick="ts.selectAllStatus({event:this})">全部台</a></li>
         </ul>
 	</div>	
 
@@ -201,7 +201,7 @@ $(document).bind("click",function(e){
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.goToCreateOrder()">点菜</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.tempPayForUO()">暂结</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="showPaymentMgr({table:uo.table})">结账</a>
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loadOrderDetail();lookupOrderDetailByType('detail_all');">查看详情</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loadOrderDetail();lookupOrderDetailByType('detail_all');">明细</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#popupDiscountCmp">折扣</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.transTableForTS()">转台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="openReadMemberByCondtionWin()">会员</a>
@@ -900,17 +900,17 @@ $(document).bind("click",function(e){
 		         	<tr>
 		         		<td>赠送:</td>
 		         		<td id="forFree">0.00</td>
-		         		<td>----</td>
+		         		<td ><label id="lab_replaceGiftBtn">----</label><a id="spanSeeGiftFoodAmount" href="#" style="display: none;" onclick="loadOrderDetail();lookupOrderDetailByType('detail_gift')">明细</a></td>
 		         	</tr>
 		         	<tr>
 		         		<td>折扣:</td>
 		         		<td id="discountPrice">0.00</td>
-		         		<td>----</td>
+		         		<td ><label id="lab_replaceDiscountBtn">----</label><a id="spanSeeDiscountFoodAmount" href="#" style="display: none;" onclick="loadOrderDetail();lookupOrderDetailByType('detail_discount')">明细</a></td>
 		         	</tr>
 		         	<tr>
 		         		<td>退菜:</td>
 		         		<td id="spanCancelFoodAmount">0.00</td>
-		         		<td ><label id="lab_replaceBtn">----</label><a id="spanSeeCancelFoodAmount" href="#" style="display: none;" onclick="loadOrderDetail();lookupOrderDetailByType('detail_cancel')">查看</a></td>
+		         		<td ><label id="lab_replaceCancelBtn">----</label><a id="spanSeeCancelFoodAmount" href="#" style="display: none;" onclick="loadOrderDetail();lookupOrderDetailByType('detail_cancel')">明细</a></td>
 		         	</tr>	
 		         	<tr id="tr4EraseQuota">
 		         		<td colspan="2" style="width: 200px;line-height: 60px;font-size: 22px;text-align: right;" >抹数金额(上限:￥<font id="font_showEraseQuota" color="red">--</font>)：</td>
@@ -1115,7 +1115,7 @@ $(document).bind("click",function(e){
 </div>
 
 <div id="lookupOrderDetailShadow"  for="lookupOrderDetail" class="ui-overlay-e in" style="z-index: 1101;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%;display: none;" ></div>
-<div id="lookupOrderDetail" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 200px; left: 50%;width:1200px; margin: -100px 0px 0px -600px;display: none;background-color: white;" align="center">
+<div id="lookupOrderDetail" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 200px; left: 50%;min-width:1200px; margin: -100px 0px 0px -650px;display: none;background-color: white;" align="center">
     <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
     		<div id="lookupOrderDetailHead" style="float: left;line-height: 35px;margin-left: 10px;">
 				<span id="lookupOrderDetailHead_orderId" style="line-height: 35px;float: left;margin-left: 5px;">
@@ -1167,15 +1167,15 @@ $(document).bind("click",function(e){
 	             <th style="width: 20%;">菜名</th>
 	             <th >单价</th>
 	             <th >数量</th>
-	             <th style="width: 15%;">口味</th>
+	             <th style="width: 12%;">口味</th>
 	             <th >口味价钱</th>
 	             <th >赠送</th>
-	             <th >折扣金额</th>
+	             <th >折扣率</th>
 				 <th >厨房</th>
 				 <th >操作类型</th>
 				 <th >时间</th>
 				 <th >服务员</th>   
-				 <th >退菜原因</th>          
+				 <th style="width: 18%;">退菜原因</th>          
 	           </tr>
          </thead>
          <tbody id="payment_lookupOrderDetailBody">
