@@ -205,6 +205,11 @@ public class PayOrderAction extends Action{
 			jsonResp = jsonResp.replace("$(result)", "false");
 			jsonResp = jsonResp.replace("$(value)", "实收金额格式不正确，请检查后重新提交");
 			
+		}catch(Exception e){
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", e.getMessage());
+			
 		}finally{
 			//just for debug
 			//System.out.println(jsonResp);
