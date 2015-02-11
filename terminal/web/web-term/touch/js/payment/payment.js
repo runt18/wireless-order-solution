@@ -46,9 +46,9 @@ var payment_orderFoodListCmpTemplet = '<tr>'
 //账单详细
 var payment_lookupOrderDetailTemplet = '<tr>'
 	+ '<td>{dataIndex}</td>'
-	+ '<td ><div style="height: 30px;overflow: hidden;">{name}</div><img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
+	+ '<td ><div style="height: 30px;overflow: hidden;">{name}</div></td>'
 	+ '<td>{unitPrice}</td>'
-	+ '<td>{count}</td>'
+	+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
 	+ '<td><div style="height: 30px;overflow: hidden;">{tastePref}</div></td>'
 	+ '<td>{tastePrice}</td>'
 	+ '<td>{isGift}</td>'
@@ -225,6 +225,7 @@ function loadOrderBasicMsg(){
 		});
 	}else{
 		member4Payment = null;
+		member4Display = null;
 		$('#orderMemberDesc').html('');
 	}
 	
@@ -468,8 +469,9 @@ var paySubmit = function(submitType) {
 	}	
 
 	//是否已注入会员
-	if(member4Payment && member4Payment.hadSet){
+	if(member4Display && member4Display.hadSet){
 		payType = 2;
+		actualMemberID = member4Display.id
 	}else{
 		payType = 1;
 	}
@@ -477,6 +479,12 @@ var paySubmit = function(submitType) {
 	if (submitType == 1) {
 		submitPrice = actualPrice;
 	}else if(submitType == 3){//会员结账
+		//FIXME 要加上抹数?
+		if(member4Display.totalBalance < checkOut_actualPrice){
+			Util.msg.alert({msg : '会员卡余额小于合计金额，不能结帐!', topTip:true});
+			return;			
+		}			
+		
 		//保存发送短信 & 打印二维码操作
 		if($('#memberPaymentSendSMS').attr('checked')){
 			setcookie(document.domain+'_consumeSms', true);
@@ -722,6 +730,11 @@ function payInputRecipt(){
 }
 
 function loadMix(){
+	if(member4Display && member4Display.hadSet){
+		Util.msg.alert({msg:'会员不支持混合结账', topTip:true});
+		return;
+	}
+	
 	isMixedPay = true;
 	var html='';
 	for (var i = 0; i < payTypeData.length; i++) {
@@ -747,7 +760,6 @@ function mixPayCheckboxAction(c){
 	if(curMixInput){
 		payMoneyCalc[curMixInput.attr("id")] = curMixInput.val();
 	}
-		
 	
 	var curCheckbox = $(c.event);
 	var checked = curCheckbox.attr('checked');
@@ -794,14 +806,22 @@ function setMixPayPrice(c){
 
 
 function mixPayAction(temp){
-	if(curMixInput){
-		payMoneyCalc[curMixInput.attr("id")] = curMixInput.val();
-	}
+	payMoneyCalc = {};
+	var checkboxs = $('input[name=mixPayCheckbox]');
+	for (var i = 0; i < checkboxs.length; i++) {
+		var checkbox = $(checkboxs[i]);
+		var numForAlias = $("#"+checkbox.attr('data-for'));		
+		if(checkbox.attr('checked')){
+			payMoneyCalc[checkbox.attr('data-for')] = numForAlias.val();
+		}		
+	}	
+	
 	
 	var mixedPayMoney = checkOut_actualPrice;
 		for(var pay in payMoneyCalc){
 			if(typeof payMoneyCalc[pay] != 'boolean'){
-				mixedPayMoney -= payMoneyCalc[pay];
+				//可能存在的小数问题
+				mixedPayMoney = (mixedPayMoney * 10000 - payMoneyCalc[pay] * 10000)/10000
 			}
 		}					
 	
@@ -1067,11 +1087,6 @@ function showMemberInfoWin(){
 		Util.msg.alert({msg : '账单还未注入会员, 不能使用会员结账', topTip:true});
 		return;
 	}
-	//FIXME 要加上抹数
-	if(member4Display.totalBalance < checkOut_actualPrice){
-		Util.msg.alert({msg : '会员卡余额小于合计金额，不能结帐!', topTip:true});
-		return;			
-	}	
 	
 	if(getcookie(document.domain+'_consumeSms') == "true"){
 		$('#memberPaymentSendSMS').attr('checked', true);
