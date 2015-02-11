@@ -435,7 +435,7 @@ Ext.ux.cfs = Ext.ux.checkFoodStatus;
 
 /**
  * 格式化菜品显示名称(包含状态)
- * type:0表示点菜列表,1表示已点菜列表 
+ * type:0表示点菜列表,1表示已点菜列表, 其他表示纯菜品状态 
  */
 Ext.ux.formatFoodName = function(record, iname, name, type){
 	var img = '';
@@ -452,6 +452,9 @@ Ext.ux.formatFoodName = function(record, iname, name, type){
 	}else if(type == 1){
 		if(Ext.ux.cfs.isGift(status) && record.get('isGift'))
 			img += '&nbsp;<img src="../../images/forFree.png"></img>';	
+	}else{
+		if(Ext.ux.cfs.isGift(status))
+			img += '&nbsp;<img src="../../images/forFree.png"></img>';			
 	}
 
 	if(Ext.ux.cfs.isCurrPrice(status))

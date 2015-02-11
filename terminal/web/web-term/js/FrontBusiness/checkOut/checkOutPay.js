@@ -4,8 +4,6 @@
 var paySubmit = function(submitType) {
 	if(isPaying == true){ return; }
 	// 强制计算后再结账
-//	refreshCheckOutData({
-//		callback : function(){
 			if(!checkOutListRefresh()){
 				return;
 			}
@@ -89,8 +87,6 @@ var paySubmit = function(submitType) {
 					'eraseQuota' : eraseQuota == ''?0:eraseQuota,
 					'customNum' : customNum,
 					'payTypeCash' : payTypeCash
-//					'pricePlanID' : calcPricePlanID,
-//					'customNum' : Ext.getCmp('numCustomNum').getValue()
 				},
 				success : function(response, options) {
 					isPaying = false;
@@ -177,7 +173,6 @@ var paySubmit = function(submitType) {
 							buttons : Ext.MessageBox.OK
 						});
 					}
-//					checkOutForm.buttons[7].setDisabled(false);
 					setFormButtonStatus(false);
 				},
 				failure : function(response, options) {
@@ -190,8 +185,6 @@ var paySubmit = function(submitType) {
 					});
 				}
 			});	
-//		}
-//	});
 };
 
 /**
