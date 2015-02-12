@@ -1,3 +1,4 @@
+
 package com.wireless.Actions.client.member;
 
 import java.sql.SQLException;
@@ -15,10 +16,11 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.member.MemberDao;
-import com.wireless.db.member.MemberOperationDao;
-import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.member.MemberDao.ActiveExtraCond;
 import com.wireless.db.member.MemberDao.IdleExtraCond;
+import com.wireless.db.member.MemberOperationDao;
+import com.wireless.db.member.MemberTypeDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -28,6 +30,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberType;
+import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
@@ -224,6 +227,21 @@ public class QueryMemberAction extends DispatchAction {
 			
 			if(!newList.isEmpty() && forDetail != null && !forDetail.isEmpty()){
 				newList.set(0, MemberDao.getById(staff, newList.get(0).getId()));
+				final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(newList.get(0).getId()).setStatus(Coupon.Status.DRAWN), null);
+				if(!coupons.isEmpty()){
+					jobject.setExtra(new Jsonable(){
+						@Override
+						public JsonMap toJsonMap(int flag) {
+							JsonMap jm = new JsonMap();
+							jm.putJsonableList("coupons", coupons, Coupon.COUPON_JSONABLE_SIMPLE);
+							return jm;
+						}
+						@Override
+						public void fromJsonMap(JsonMap jsonMap, int flag) {
+							
+						}
+					});					
+				}
 			}
 			
 			jobject.setRoot(newList);

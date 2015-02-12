@@ -3,7 +3,6 @@ package com.wireless.Actions.payment;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -94,10 +93,9 @@ public class PayOrderAction extends Action{
 				payType = PayType.CASH;
 			}
 			
-//			Member member = null;
 			if(settleType == Order.SettleType.MEMBER){
-//				String discountID = request.getParameter("discountID");
-				boolean sendSMS = false;
+				//FIXME 不能读取cookie
+/*				boolean sendSMS = false;
 				//Send SMS if paid by charge member.
 				for(Cookie cookie : request.getCookies()){
 				    if(cookie.getName().equals((request.getServerName() + "_consumeSms"))){
@@ -106,8 +104,8 @@ public class PayOrderAction extends Action{
 				    		break;
 				    	}
 				    }
-				}
-				payBuilder = Order.PayBuilder.build4Member(orderId, payType, sendSMS);
+				}*/
+				payBuilder = Order.PayBuilder.build4Member(orderId, payType, Boolean.parseBoolean(request.getParameter("sendSms")));
 				
 			}else{
 				payBuilder = Order.PayBuilder.build4Normal(orderId, payType);
