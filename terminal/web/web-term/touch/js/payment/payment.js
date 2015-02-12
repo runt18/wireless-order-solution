@@ -95,23 +95,8 @@ function showPaymentMgr(c){
 		}
 	});
 	
-	//会员读卡
-    $('#txtMemberInfo4Read').bind('keypress',function(event){
-        if(event.keyCode == "13")    
-        {
-        	readMemberByCondtion();
-        }
-    });	
-	
-	//找零快捷键
-    $('#txtInputRecipt').bind('keypress',function(event){
-        if(event.keyCode == "13")    
-        {
-        	payInputRecipt();
-        }
-    });	
-    
 	//设置会员动态popup控件
+	//会员信息来源
 	if($('#orderFoodListMgr .payment_searchMemberType').length > 0){
 		$('#orderFoodListMgr .payment_searchMemberType').remove();
 	}    
@@ -119,6 +104,7 @@ function showPaymentMgr(c){
 		$('#paymentMgr').append(payment_searchMemberTypeTemplet);
 	}	
 
+	//会员折扣
 	if($('#orderFoodListMgr .payment_popupDiscountCmp4Member').length > 0){
 		$('#orderFoodListMgr .payment_popupDiscountCmp4Member').remove();
 	} 
@@ -126,11 +112,20 @@ function showPaymentMgr(c){
 		$('#paymentMgr').append(payment_popupDiscountCmp4MemberTemplet);
 	}
 	
+	//会员价格方案
 	if($('#orderFoodListMgr .payment_popupPricePlanCmp4Member').length > 0){
 		$('#orderFoodListMgr .payment_popupPricePlanCmp4Member').remove();
 	}	 
 	if($('#paymentMgr .payment_popupPricePlanCmp4Member').length == 0){
 		$('#paymentMgr').append(payment_popupPricePlanCmp4MemberTemplet);
+	}		
+	
+	//优惠劵
+	if($('#orderFoodListMgr .payment_popupCouponCmp4Member').length > 0){
+		$('#orderFoodListMgr .payment_popupCouponCmp4Member').remove();
+	}	 
+	if($('#paymentMgr .payment_popupCouponCmp4Member').length == 0){
+		$('#paymentMgr').append(payment_popupCouponCmp4MemberTemplet);
 	}		
 	
 }
@@ -473,6 +468,9 @@ var paySubmit = function(submitType) {
 	
 	//普通或会员结账
 	var payType;
+	
+	//发送短信, 打印二维码
+	var sendSms, printCode;
 
 	if(eraseQuota && isNaN(eraseQuota)){
 		Util.msg.alert({msg:"请填写正确的抹数金额", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();}});
@@ -503,13 +501,17 @@ var paySubmit = function(submitType) {
 		
 		//保存发送短信 & 打印二维码操作
 		if($('#memberPaymentSendSMS').attr('checked')){
+			sendSms = true;
 			setcookie(document.domain+'_consumeSms', true);
 		}else{
+			sendSms = false;
 			setcookie(document.domain+'_consumeSms', false);
 		}
 		if($('#memberPaymentPrintCore').attr('checked')){
+			printCode = true;
 			setcookie(document.domain+'_printCore', true);
 		}else{
+			printCode = false;
 			setcookie(document.domain+'_printCore', false);
 		}
 		
@@ -547,7 +549,9 @@ var paySubmit = function(submitType) {
 			"servicePlan" : calcServicePlan,
 			'eraseQuota' : eraseQuota == ''?0:eraseQuota,
 			'customNum' : orderMsg.customNum,
-			'payTypeCash' : payTypeCash
+			'payTypeCash' : payTypeCash,
+			'sendSms' : sendSms,
+			'printCode' : printCode
 		},
 		dataType : 'json',
 		success : function(resultJSON, status, xhr){
@@ -562,9 +566,16 @@ var paySubmit = function(submitType) {
 					Util.msg.alert({msg : '结账成功!', topTip:true});
 					if(inputReciptWin){
 						closeInputReciptWin();
+						//等完全关闭后再返回
+						setTimeout(function(){
+							//返回餐台界面
+							ts.loadData();
+						}, 250);
+					}else{
+						//返回餐台界面
+						ts.loadData();						
 					}
-					//返回餐台界面
-					ts.loadData();
+
 				}
 			} else {
 				//不能同时弹出两个popup
@@ -641,6 +652,8 @@ function lookupOrderDetailByType(type){
 		lookupCondtion = "true"; 
 	}else if(type == 'detail_cancel'){
 		lookupCondtion = "tempData.count < 0 && tempData.isTransfer != true";
+		//退菜时, 显示字符为退菜
+		$('#lab4CancelReasonOrComment').html('退菜原因');
 	}else if(type == 'detail_discount'){
 		lookupCondtion = "tempData.discount < 1";
 	}else if(type == 'detail_gift'){
@@ -658,7 +671,7 @@ function lookupOrderDetailByType(type){
 				dataIndex : index,
 				id : orderFoodDetails[i].id,
 				name : orderFoodDetails[i].name,
-				count : orderFoodDetails[i].count.toFixed(2),
+				count : orderFoodDetails[i].count,
 				isWeight : (orderFoodDetails[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 				isGift : orderFoodDetails[i].isGift?'是':'否',	
 				discount : orderFoodDetails[i].discount,
@@ -700,6 +713,8 @@ function lookupOrderDetailByType(type){
 function closeLookupOrderDetailWin(){
 	$('#lookupOrderDetailShadow').hide();
 	$('#lookupOrderDetail').hide();	
+	//显示字符为备注
+	$('#lab4CancelReasonOrComment').html('备注');	
 }
 
 
@@ -915,13 +930,16 @@ function readMemberByCondtion(stype){
 						member4Display = Util.clone(member4Payment);
 					}
 					member4Payment = jr.root[0];
+					if(jr.other){
+						member4Payment.coupons = jr.other.coupons;
+					}
 					//设置为最新读取的会员
 					member4Payment.isFresh = true;
 					Util.msg.alert({msg:'会员信息读取成功.', topTip:true});
 					loadMemberInfo(member4Payment);
 				}else if(jr.root.length > 1){
 					$('#payment_searchMemberType').popup().popup('open');
-					$('#payment_searchMemberType').css({top:$('#btnReadMember').position().top - 270, left:$('#btnReadMember').position().left-150});
+					$('#payment_searchMemberType').css({top:$('#btnReadMember').position().top - 270, left:$('#btnReadMember').position().left-300});
 					$('#payment_searchMemberTypeCmp').listview().listview('refresh');
 				}else{
 					Util.msg.alert({msg:'该会员信息不存在, 请重新输入条件后重试.', renderTo : 'paymentMgr', fn : function(){
@@ -945,6 +963,9 @@ function loadMemberInfo(member){
 	$('#payment4MemberType').text(member.memberType.name);
 	$('#payment4MemberBalance').text(member.totalBalance);
 	$('#payment4MemberPoint').text(member.point);
+	$('#payment4MemberPhone').text(member.mobile?member.mobile:'----');
+	$('#payment4MemberCard').text(member.memberCard?member.memberCard:'----');	
+	
 	$('#payment4MemberDiscount').text(member.memberType.discount.name);
 	$('#payment4MemberDiscount').attr('data-value', member.memberType.discount.id);
 	
@@ -965,6 +986,21 @@ function loadMemberInfo(member){
 		}
 		$('#payment_pricePlanList4Member').html(pricePlanHtml).trigger('create');
 	}
+	
+	if(member.coupons){
+		var couponHtml = '';
+		$('#payment4MemberCoupon').text('不使用');
+		for (var i = 0; i < member.coupons.length; i++) {
+			couponHtml += '<li data-icon="false" class="popupButtonList" onclick="chooseMemberCoupon({id:'+ member.coupons[i].couponId +',name:\''+ member.coupons[i].couponType.name +'\'})"><a >'+ member.coupons[i].couponType.name +'</a></li>';
+			console.log('html')
+			console.log(couponHtml)
+		}
+		$('#payment_couponList4Member').html(couponHtml).trigger('create');		
+	}else{
+		$('#payment4MemberCoupon').hide();
+		$('#payment4MemberCoupon').attr('data-value', '');
+		$('#link_payment_popupCouponCmp4Member').hide();
+	}
 }
 
 function chooseMemberDiscount(c){
@@ -979,6 +1015,13 @@ function chooseMemberPricePlan(c){
 	var pricePlan = $('#payment4MemberPricePlan');
 	pricePlan.text(c.name);
 	pricePlan.attr('data-value', c.id);
+}
+
+function chooseMemberCoupon(c){
+	$('#payment_popupCouponCmp4Member').popup('close');
+	var coupon = $('#payment4MemberCoupon');
+	coupon.text(c.name);
+	coupon.attr('data-value', c.id);
 }
 
 /**
@@ -996,6 +1039,7 @@ function setMemberToOrder(){
 	Util.LM.show();
 	var discount = $('#payment4MemberDiscount');
 	var pricePlan = $('#payment4MemberPricePlan');
+	var coupon = $('#payment4MemberCoupon');
 	var orderId;
 	
 	if($.mobile.activePage.attr( "id" ) == 'paymentMgr'){//结账界面的orderId
@@ -1009,7 +1053,8 @@ function setMemberToOrder(){
 		orderId : orderId,
 		memberId : member4Payment.id,
 		discountId : discount.attr('data-value')?discount.attr('data-value'):'',
-		pricePlan : pricePlan.attr('data-value')?pricePlan.attr('data-value'):''
+		pricePlan : pricePlan.attr('data-value')?pricePlan.attr('data-value'):'',
+		coupon : coupon.attr('data-value')?coupon.attr('data-value'):''
 	}, function(data){
 		Util.LM.hide();
 		if(data.success){
@@ -1059,6 +1104,8 @@ function openReadMemberByCondtionWin(){
 	$('#link_payment_popupDiscountCmp4Member').buttonMarkup("refresh");
 	$('#link_payment_popupPricePlanCmp4Member').attr("data-theme", "e");
 	$('#link_payment_popupPricePlanCmp4Member').buttonMarkup("refresh");
+	$('#link_payment_popupCouponCmp4Member').attr("data-theme", "e");
+	$('#link_payment_popupCouponCmp4Member').buttonMarkup("refresh");	
 	
 	focusInput = "txtMemberInfo4Read";
 	$('#txtMemberInfo4Read').focus();
@@ -1069,15 +1116,21 @@ function closeReadMemberByCondtionWin(){
 	
 	$('#readMemberWinShadow').hide();
 	$('#readMemberWin').hide();
+	
 	$('#txtMemberInfo4Read').val('');
 	$('#payment4MemberName').text('----');
 	$('#payment4MemberType').text('----');
 	$('#payment4MemberBalance').text('----');
 	$('#payment4MemberPoint').text('----');
+	$('#payment4MemberPhone').text('----');
+	$('#payment4MemberCard').text('----');
+	
 	$('#payment4MemberDiscount').text('----');	
 	$('#payment4MemberPricePlan').text('----');
+	$('#payment4MemberCoupon').text('----');
 	$('#payment_discountList4Member').html('');
 	$('#payment_pricePlanList4Member').html('');
+	$('#payment_couponList4Member').html('');
 	
 	//如果不是已注入会员则去除最新会员标记
 	if(member4Payment && !member4Payment.hadSet){
@@ -1088,14 +1141,20 @@ function closeReadMemberByCondtionWin(){
 
 function readMemberWinToSelectDiscount(){
 	$('#payment_popupDiscountCmp4Member').popup().popup('open');
-	$('#payment_popupDiscountCmp4Member').css({top:$('#link_payment_popupDiscountCmp4Member').position().top - 270, left:$('#link_payment_popupDiscountCmp4Member').position().left-150});
+	$('#payment_popupDiscountCmp4Member').css({top:$('#link_payment_popupDiscountCmp4Member').position().top - 270, left:$('#link_payment_popupDiscountCmp4Member').position().left-300});
 	$('#payment_discountList4Member').listview().listview('refresh');	
 }
 
 function readMemberWinToSelectPricePlan(){
 	$('#payment_popupPricePlanCmp4Member').popup().popup('open');
-	$('#payment_popupPricePlanCmp4Member').css({top:$('#link_payment_popupPricePlanCmp4Member').position().top - 270, left:$('#link_payment_popupPricePlanCmp4Member').position().left-150});
+	$('#payment_popupPricePlanCmp4Member').css({top:$('#link_payment_popupPricePlanCmp4Member').position().top - 270, left:$('#link_payment_popupPricePlanCmp4Member').position().left-300});
 	$('#payment_pricePlanList4Member').listview().listview('refresh');	
+}
+
+function readMemberWinToSelectCoupon(){
+	$('#payment_popupCouponCmp4Member').popup().popup('open');
+	$('#payment_popupCouponCmp4Member').css({top:$('#link_payment_popupCouponCmp4Member').position().top - 270, left:$('#link_payment_popupCouponCmp4Member').position().left-300});
+	$('#payment_couponList4Member').listview().listview('refresh');	
 }
 
 function showMemberInfoWin(){
@@ -1123,6 +1182,8 @@ function showMemberInfoWin(){
 	$('#payment4MemberCertainType').text(member4Display.memberType.name);
 	$('#payment4MemberCertainBalance').text(member4Display.totalBalance);
 	$('#payment4MemberCertainPoint').text(member4Display.point);	
+	$('#payment4MemberCertainPhone').text(member4Display.mobile?member4Display.mobile:'----');
+	$('#payment4MemberCertainCard').text(member4Display.memberCard?member4Display.memberCard:'----');	
 	
 	$('#showMemberInfoWin').popup('open');
 }

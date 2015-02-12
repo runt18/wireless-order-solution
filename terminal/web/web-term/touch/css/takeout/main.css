@@ -134,8 +134,7 @@ html { overflow-y: hidden;}
 
 /*µ¯³ö¿ò°´Å¥*/
 .countPopbottomBtn{
-	margin-left: 1px !important;
-	width: 49%;
+	width: -webkit-calc(50% - 2px);
 }
 .countPopbottomBtn > span{
 	font-size: 20px !important;
@@ -443,3 +442,10 @@ html { overflow-y: hidden;}
 }
 
 
+.readMemberTd{
+	line-height: 50px;font-weight: bold;font-size: 20px;text-align: center;
+}
+
+.readMemberTdValue{
+	line-height: 50px;font-weight: bold;font-size: 20px;text-align: left;color: green;min-width: 120px;
+}

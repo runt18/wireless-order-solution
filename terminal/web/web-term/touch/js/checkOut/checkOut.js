@@ -236,17 +236,11 @@ uo.show = function(c){
 	//设置会员动态popup控件
 	uo.setMemberReadCmp();
 	
-	//会员读卡
-    $('#txtMemberInfo4Read').bind('keypress',function(event){
-        if(event.keyCode == "13")    
-        {
-        	readMemberByCondtion();
-        }
-    });	
 };
 
 //设置会员动态popup控件
 uo.setMemberReadCmp = function(){
+	//会员信息来源
 	if($('#paymentMgr .payment_searchMemberType').length > 0){
 		$('#paymentMgr .payment_searchMemberType').remove();
 	}	
@@ -254,6 +248,7 @@ uo.setMemberReadCmp = function(){
 		$('#orderFoodListMgr').append(payment_searchMemberTypeTemplet);
 	}	
 	
+	//折扣
 	if($('#paymentMgr .payment_popupDiscountCmp4Member').length > 0){
 		$('#paymentMgr .payment_popupDiscountCmp4Member').remove();
 	}	
@@ -261,12 +256,21 @@ uo.setMemberReadCmp = function(){
 		$('#orderFoodListMgr').append(payment_popupDiscountCmp4MemberTemplet);
 	}
 	
+	//价格方案
 	if($('#paymentMgr .payment_popupPricePlanCmp4Member').length > 0){
 		$('#paymentMgr .payment_popupPricePlanCmp4Member').remove();
 	}	
 	if($('#orderFoodListMgr .payment_popupPricePlanCmp4Member').length == 0){
 		$('#orderFoodListMgr').append(payment_popupPricePlanCmp4MemberTemplet);
 	}	
+	
+	//优惠劵
+	if($('#paymentMgr .payment_popupCouponCmp4Member').length > 0){
+		$('#paymentMgr .payment_popupCouponCmp4Member').remove();
+	}	
+	if($('#orderFoodListMgr .payment_popupCouponCmp4Member').length == 0){
+		$('#orderFoodListMgr').append(payment_popupCouponCmp4MemberTemplet);
+	}		
 }
 
 /**

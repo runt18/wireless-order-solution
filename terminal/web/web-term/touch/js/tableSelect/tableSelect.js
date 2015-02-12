@@ -44,6 +44,10 @@ var payment_popupPricePlanCmp4MemberTemplet = '<div data-role="popup" id="paymen
 		    '<ul id="payment_pricePlanList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
 		'</ul></div>';
 
+var payment_popupCouponCmp4MemberTemplet = '<div data-role="popup" id="payment_popupCouponCmp4Member" data-theme="d" class="payment_popupCouponCmp4Member">'+
+			'<ul id="payment_couponList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
+		'</ul></div>';
+
 $(function(){
 	//餐厅选择界面高度
 	$('#tableAndRegionsCmp').height(document.body.clientHeight - 86);	
@@ -302,8 +306,22 @@ YBZ_fixed = true;//是否固定手写窗口
 	//渲染会员读取窗口
 	$('#readMemberWin').trigger('create').trigger('refresh');	
 	
-		
+	//会员读卡
+    $('#txtMemberInfo4Read').on('keypress',function(event){
+        if(event.keyCode == "13")    
+        {
+        	readMemberByCondtion();
+        }
+    });		
 	
+	//找零快捷键
+    $('#txtInputRecipt').on('keypress',function(event){
+        if(event.keyCode == "13")    
+        {
+        	payInputRecipt();
+        }
+    }); 
+    
 }
 
 
@@ -1344,8 +1362,6 @@ function loginOut(){
 	});	
 	
 }
-
-
 
 
 
