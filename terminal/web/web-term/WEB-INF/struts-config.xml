@@ -611,6 +611,14 @@
 			type="com.wireless.Actions.weixin.query.WxQueryOrderAction"
 			scope="request" parameter="dataSource">
 		</action>		
+		<action path="/RestaurantLogin"
+			type="com.wireless.Actions.login.RestaurantLoginAction"
+			scope="request" >
+		</action>	
+		<action path="/VerifyRestaurant"
+			type="com.wireless.Actions.login.VerifyRestaurantAction"
+			scope="request" >
+		</action>				
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
