@@ -73,7 +73,7 @@ public class TestToken {
 			//Test to failed generate a new token using wrong failed encrypted token.
 			tokenId = TokenDao.insert(new Token.InsertBuilder(r1));
 			code = TokenDao.getById(tokenId).getCode();
-			byte[] failedEncryptedToken = r2Token.encrypt();
+			String failedEncryptedToken = r2Token.encrypt();
 			try{
 				TokenDao.failedGenerate(new Token.FailedGenerateBuilder(failedEncryptedToken, r1.getAccount(), code));
 				Assert.assertTrue("failed to test failed insert a new token using wrong failed encrypted token", false);
