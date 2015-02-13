@@ -970,7 +970,7 @@ $(document).bind("click",function(e){
 					 <th >服务员</th>             
 		           </tr>
 		         </thead>
-		         <tbody id="payment_orderFoodListBody">	
+		         <tbody id="payment_orderFoodListBody" style="font-weight:bold;color: blue">	
 <!-- 		         	<tr>
 		         		<td>1</td>
 		         		<td >龙虾排骨</td>
@@ -1000,7 +1000,9 @@ $(document).bind("click",function(e){
 			</div>
 		</div>		
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" href="#tableSelectMgr">返回</a>
+		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="refreshOrderData({calc:true})" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="toCheckoutPage()">改单</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupDiscountCmp">折扣</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupServiceCmp">服务费</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="openReadMemberByCondtionWin()">会员</a>

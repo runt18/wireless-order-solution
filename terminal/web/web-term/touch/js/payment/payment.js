@@ -647,7 +647,8 @@ function lookupOrderDetailByType(type){
 		$('input[data-type='+type+']').attr('checked', true);
 		$('input[name=lookupType]').checkboxradio('refresh');
 	}
-	
+
+	$('#lab4CancelReasonOrComment').html('备注');
 	if(type == 'detail_all'){
 		lookupCondtion = "true"; 
 	}else if(type == 'detail_cancel'){
@@ -713,8 +714,6 @@ function lookupOrderDetailByType(type){
 function closeLookupOrderDetailWin(){
 	$('#lookupOrderDetailShadow').hide();
 	$('#lookupOrderDetail').hide();	
-	//显示字符为备注
-	$('#lab4CancelReasonOrComment').html('备注');	
 }
 
 
@@ -1191,6 +1190,15 @@ function showMemberInfoWin(){
 function closeMemberInfoWin(){
 	$('#showMemberInfoWin').popup('close');
 }
+
+//改单
+function toCheckoutPage(){
+	location.href = '#orderFoodListMgr';
+	uo.show({
+		table : pm.table
+	});	
+}
+
 
 
 

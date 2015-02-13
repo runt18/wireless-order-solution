@@ -20,24 +20,58 @@ $(function(){
 	
 	Util.LM.show();
 	if (getcookie("digie_restaurant") != ""){
-		var restaurant = JSON.parse(getcookie("digie_restaurant"));
-		lg.restaurant = restaurant;
+		var account = getcookie("digie_restaurant");
+		var token = getcookie("digie_token")
+		
 		$('#txtRestaurantName').text(lg.restaurant.name);
+		
 		$.ajax({
-			url : '../VerifyLogin.do',
+			url : '../VerifyRestaurant.do',
+			data : {
+				account : account,
+				token : token
+			},			
 			success : function(data, status, xhr){
 				Util.LM.hide();
-				if(data.success){
-					location.href = 'tableSelect.html';	
+				if(data.success && data.root.length > 0){
+					//把token存入cookie
+					setcookie("digie_token", data.other.token);
+					
+					lg.restaurant = data.root[0];
+					
+					//验证员工是否登陆状态
+					$.ajax({
+						url : '../VerifyLogin.do',
+						success : function(data, status, xhr){
+							Util.LM.hide();
+							if(data.success){
+								location.href = 'tableSelect.html';	
+							}else{	
+								initStaffContent();
+							}
+						},
+						error : function(request, status, error){
+							Util.Lm.hide();
+							initStaffContent();
+						}
+					});
 				}else{	
-					initStaffContent();
+					Util.msg.alert({
+						msg : data.msg?data.msg:"",
+						renderTo : 'restaurantLoginPage',
+						fn : function(){
+							$('#txtRestaurantAccount').focus();
+						}
+					});
+					return;					
 				}
 			},
 			error : function(request, status, error){
 				Util.Lm.hide();
 				initStaffContent();
 			}
-		});
+		});		
+
 	}else{
 		Util.LM.hide();
 		$('#popupLogin').show();
@@ -75,11 +109,14 @@ function staffLoginHandler(){
 		data : {
 			pin : lg.staff.staffID,
 			comeFrom : 3,
-			pwd : MD5(pwd.val().trim())
+			pwd : MD5(pwd.val().trim()),
+			account : lg.restaurant.account,
+			token : getcookie("digie_token")
 		},
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
+				setcookie("digie_token", data.other.token);
 				location.href = 'tableSelect.html';	
 			}else{
 				Util.msg.alert({
@@ -105,7 +142,8 @@ function staffLoginHandler(){
  * 餐厅登录
  */
 function restaurantLoginHandler(){
-	var account=$('#txtRestaurantAccount');
+	var account = $('#txtRestaurantAccount');
+	var code = $('#txtRestaurantDynamicCode');
 	if(!account.val()){
 		Util.msg.alert({
 			msg : '请输入餐厅账号',
@@ -117,18 +155,33 @@ function restaurantLoginHandler(){
 		return;
 	}
 	
+	if(!code.val()){
+		Util.msg.alert({
+			msg : '请输入验证码',
+			renderTo : 'staffLoginPage',
+			fn : function(){
+				code.focus();
+			}
+		});
+		return;
+	}	
+	
 	Util.LM.show();
 	$.ajax({
-		url : '../QueryRestaurants.do',
+		url : '../RestaurantLogin.do',
 		data : {
-			account : account.val()
+			account : account.val(),
+			code : code.val(),
+			token : getcookie("digie_token")
 		},
 		dataType : 'json',
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
 				if(data.root.length != 0){
-					setcookie("digie_restaurant", JSON.stringify(data.root[0]));
+					setcookie("digie_restaurant", data.root[0].account);
+					setcookie("digie_token", data.other.token);
+					
 					lg.restaurant=data.root[0];
 					Util.LM.show();
 					initStaffContent();
@@ -142,7 +195,8 @@ function restaurantLoginHandler(){
 				}
 			}else{
 				Util.msg.alert({
-					msg : data.msg
+					msg : data.msg,
+					renderTo : 'restaurantLoginPage'
 				});
 			}
 		},

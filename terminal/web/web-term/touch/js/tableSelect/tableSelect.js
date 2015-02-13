@@ -508,7 +508,9 @@ ts.s = {
 						data = [];
 						temp = tables.slice(0);
 						for(var i = 0; i < temp.length; i++){
-							if((temp[i].name + '').indexOf(ts.s.fileValue.trim().toUpperCase()) != -1){
+							if(ts.commitTableOrTran == 'apartTable' && temp[i].alias == 0){
+								continue;
+							}else if((temp[i].name + '').indexOf(ts.s.fileValue.trim().toUpperCase()) != -1){
 								data.push(temp[i]);
 							}else if((temp[i].alias + '').indexOf(ts.s.fileValue.trim()) != -1){
 								data.push(temp[i]);
