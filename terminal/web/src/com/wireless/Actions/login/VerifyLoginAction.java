@@ -21,23 +21,8 @@ public class VerifyLoginAction extends Action {
 		
 		JObject jobject = new JObject();
 		try{        
-/*			Cookie[] cookies = request.getCookies();
-			if(cookies != null){
-				for (Cookie cookie : cookies) {
-					if(cookie.getName().equals("pin")){
-						Staff staff = StaffDao.verify(Integer.parseInt(cookie.getValue()));
-						
-						other.put("staff", staff);
-						jobject.setOther(other);
-						jobject.initTip(true, "true");
-						break;
-					}
-				}
-				if(other.isEmpty()){
-					jobject.initTip(false, "false");
-				}
-			}*/
 			String pin = (String) request.getSession().getAttribute("pin");
+	
 			if(pin != null){
 				final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 				

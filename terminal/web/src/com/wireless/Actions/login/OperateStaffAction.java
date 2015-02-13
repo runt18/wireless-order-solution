@@ -13,12 +13,14 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.token.TokenDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.token.Token;
 
 public class OperateStaffAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response)throws Exception {
@@ -26,8 +28,14 @@ public class OperateStaffAction extends Action{
 		String pin = request.getParameter("pin");
 		String name = request.getParameter("name");
 		String pwd = request.getParameter("pwd");
+		String account = request.getParameter("account");
+		String token = request.getParameter("token");
 		JObject jobject = new JObject();
+		final Staff theStaff;
 		try{
+			//再次验证token
+			int tokenId = TokenDao.verify(new Token.VerifyBuilder(account, token));
+			final Token t = TokenDao.getById(tokenId);
 			
 			Staff staff = null;
 			if(pin != null && !pin.trim().isEmpty()){
@@ -51,26 +59,34 @@ public class OperateStaffAction extends Action{
 				session.setAttribute("pin", pin);
 				session.setAttribute("restaurantID", staff.getRestaurantId()+"");
 				session.setAttribute("dynamicKey", System.currentTimeMillis() % 100000);
-				final Staff theStaff = staff;
-				jobject.setExtra(new Jsonable(){
-					@Override
-					public JsonMap toJsonMap(int flag) {
-						JsonMap jm = new JsonMap();
-						jm.putJsonable("staff", theStaff, 1);
-						return jm;
-					}
-
-					@Override
-					public void fromJsonMap(JsonMap jsonMap, int flag) {
-						
-					}
-					
-				});
+				theStaff = staff;
 				jobject.initTip(true, "登陆成功");
 			}else{
+				theStaff = null;
 				jobject.initTip(false, "密码输入错误");
 			}
 			
+			jobject.setExtra(new Jsonable(){
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					if(theStaff != null){
+						jm.putJsonable("staff", theStaff, 1);
+					}
+					try {
+						jm.putString("token", t.encrypt());
+					} catch (BusinessException e) {
+						e.printStackTrace();
+					}
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});			
 
 		}catch(BusinessException e){
 			e.printStackTrace();
