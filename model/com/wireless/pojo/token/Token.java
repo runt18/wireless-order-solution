@@ -47,10 +47,10 @@ public class Token implements Jsonable{
 	
 	public static class FailedGenerateBuilder{
 		private final String account;
-		private final byte[] failedEncryptedToken;
+		private final String failedEncryptedToken;
 		private final int code;
 		
-		public FailedGenerateBuilder(byte[] failedEncryptedToken, String account, int code){
+		public FailedGenerateBuilder(String failedEncryptedToken, String account, int code){
 			this.account = account;
 			this.failedEncryptedToken = failedEncryptedToken;
 			this.code = code;
@@ -60,7 +60,7 @@ public class Token implements Jsonable{
 			return this.account;
 		}
 		
-		public byte[] getFailedEncryptedToken(){
+		public String getFailedEncryptedToken(){
 			return this.failedEncryptedToken;
 		}
 		
@@ -71,9 +71,9 @@ public class Token implements Jsonable{
 	
 	public static class VerifyBuilder{
 		private final String account;
-		private final byte[] encryptedToken;
+		private final String encryptedToken;
 		
-		public VerifyBuilder(String account, byte[] encryptedToken){
+		public VerifyBuilder(String account, String encryptedToken){
 			this.account = account;
 			this.encryptedToken = encryptedToken;
 		}
@@ -82,7 +82,7 @@ public class Token implements Jsonable{
 			return this.account;
 		}
 		
-		public byte[] getEncryptedToken(){
+		public String getEncryptedToken(){
 			return this.encryptedToken;
 		}
 	}
@@ -126,7 +126,7 @@ public class Token implements Jsonable{
 		}
 		
 		public boolean isCodeChanged(){
-			return this.code < 0;
+			return this.code >= 0;
 		}
 		
 		public Token build(){
@@ -235,14 +235,15 @@ public class Token implements Jsonable{
 		return System.currentTimeMillis() - this.lastModified >= 10 * 60 * 1000;
 	}
 	
-	public byte[] encrypt() throws BusinessException{
+	public String encrypt() throws BusinessException{
 		RSACoder coder = new RSACoder(restaurant.getPublicKey(), restaurant.getPrivateKey());
-		return coder.encryptByPublicKey(JSON.toJSONString(this.toJsonMap(0)).getBytes());
+		return coder.encryptBASE64(coder.encryptByPublicKey(JSON.toJSONString(this.toJsonMap(0)).getBytes()));
+		
 	}
 	
-	public void decrypt(byte[] encryptedToken) throws BusinessException{
+	public void decrypt(String encryptedToken) throws BusinessException{
 		RSACoder coder = new RSACoder(restaurant.getPublicKey(), restaurant.getPrivateKey());
-		Token decryptedToken = JObject.parse(Token.JSON_CREATOR, 0, new String(coder.decryptByPrivateKey(encryptedToken)));
+		Token decryptedToken = JObject.parse(Token.JSON_CREATOR, 0, new String(coder.decryptByPrivateKey(coder.decryptBASE64(encryptedToken))));
 		copyFrom(decryptedToken);
 	}
 
