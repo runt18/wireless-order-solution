@@ -36,12 +36,15 @@ $(function(){
 			data : {
 				account : restaurantEntity.account,
 				token : token
-			},			
+			},	
+			type : 'post',
 			success : function(data, status, xhr){
 				Util.LM.hide();
 				if(data.success && data.root.length > 0){
 					//把token存入cookie
 					setcookie("digie_token", data.other.token);
+					//FIXME 更新cookie
+					setcookie("digie_restaurant", data.root[0].account);
 					
 					lg.restaurant = data.root[0];
 					
@@ -122,6 +125,7 @@ function staffLoginHandler(){
 			account : lg.restaurant.account,
 			token : getcookie("digie_token")
 		},
+		type : 'post',
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
@@ -183,6 +187,7 @@ function restaurantLoginHandler(){
 			code : code.val(),
 			token : getcookie("digie_token")
 		},
+		type : 'post',
 		dataType : 'json',
 		success : function(data, status, xhr){
 			Util.LM.hide();
