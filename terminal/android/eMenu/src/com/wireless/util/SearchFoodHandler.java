@@ -131,8 +131,8 @@ public class SearchFoodHandler extends Handler{
 				
 				}
 				//隐藏键盘
-				InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+				//InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+				//imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
 				mPopup.dismiss();
 			}
 		});
@@ -208,25 +208,26 @@ public class SearchFoodHandler extends Handler{
 							
 							if(food.isSellOut()){
 								Toast toast = Toast.makeText(mContext, "此菜已售罄", Toast.LENGTH_SHORT);
-								toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
+								toast.setGravity(Gravity.TOP | Gravity.END, 0, 100);
 								toast.show();
 							} else {
 								try {
 									OrderFood orderFood = new OrderFood(food);
 									orderFood.setCount(1f);
 									ShoppingCart.instance().addFood(orderFood);
-									if(mOnFoodAddListener != null)
+									if(mOnFoodAddListener != null){
 										mOnFoodAddListener.onFoodAdd(food);
+									}
 									//显示添加提示
 									Toast toast = Toast.makeText(mContext, food.getName() + " 已添加", Toast.LENGTH_SHORT);
-									toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
+									toast.setGravity(Gravity.TOP | Gravity.END, 0, 100);
 									toast.show();
 									
 									mPopup.dismiss();
 									mSearchEditText.setText("");
 									//隐藏键盘
-									InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-									imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+									//InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+									//imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
 									
 								} catch (BusinessException e) {
 									e.printStackTrace();

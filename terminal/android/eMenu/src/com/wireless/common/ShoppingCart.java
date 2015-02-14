@@ -155,15 +155,6 @@ public final class ShoppingCart {
 	public void commit(OnCommitListener commitListener) throws BusinessException{
 		if(mOriOrder != null){
 			checkCommitValid();
-			Order reqOrder = new Order(mOriOrder.getOrderFoods(), mDestTable.getAliasId(), mDestTable.getCustomNum());	
-			reqOrder.setId(mOriOrder.getId());
-			reqOrder.setOrderDate(mOriOrder.getOrderDate());
-			//Skip the new food in case of sell out.
-			for(OrderFood newFood : getNewFoods()){
-				if(!newFood.asFood().isSellOut()){
-					reqOrder.addFood(newFood, WirelessOrder.loginStaff);
-				}
-			}
 			new CommitOrderTask(new Order.UpdateBuilder(mOriOrder)
 										 .addOri(mOriOrder.getOrderFoods())
 										 .addNew(getNewFoods(), WirelessOrder.loginStaff)
@@ -172,13 +163,6 @@ public final class ShoppingCart {
 			
 		}else{
 			checkCommitValid();
-			Order reqOrder = new Order(null, mDestTable.getAliasId(), mDestTable.getCustomNum());			
-			//Skip the new food in case of sell out.
-			for(OrderFood newFood : getNewFoods()){
-				if(!newFood.asFood().isSellOut()){
-					reqOrder.addFood(newFood, WirelessOrder.loginStaff);
-				}
-			}
 			new CommitOrderTask(new Order.InsertBuilder(new Table.Builder(mDestTable.getId()))
 										 .setCustomNum(mDestTable.getCustomNum())
 										 .addAll(getNewFoods(), WirelessOrder.loginStaff), 

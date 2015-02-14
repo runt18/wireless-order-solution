@@ -23,7 +23,7 @@
             android:layout_marginRight="124dp"
             android:background="@drawable/search_bar"
             android:ems="10"
-            android:hint="请输入菜名搜索"
+            android:hint="请输入菜名或编号搜索"
             android:paddingLeft="8dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white" >
