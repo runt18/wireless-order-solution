@@ -31,9 +31,14 @@ public class VerifyRestaurantAction extends Action {
 		final Token tokenBean;
 		try {
 			Restaurant r;
+			if(account == null || account.trim().isEmpty()){
+				r = RestaurantDao.getById(Integer.parseInt(request.getParameter("restaurantId")));
+			}else{
+				r = RestaurantDao.getByAccount(account);
+			}
+			
 			//FIXME 过渡阶段
 			if(token == null || token.trim().isEmpty()){
-				r = RestaurantDao.getByAccount(account);
 				int tokenId = TokenDao.insert(new Token.InsertBuilder(r));
 				tokenBean = TokenDao.getById(tokenId); 
 				int code = tokenBean.getCode();
