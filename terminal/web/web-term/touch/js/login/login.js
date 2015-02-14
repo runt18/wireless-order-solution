@@ -22,13 +22,19 @@ $(function(){
 	if (getcookie("digie_restaurant") != ""){
 		var account = getcookie("digie_restaurant");
 		var token = getcookie("digie_token")
+		var restaurantEntity;
 		
-		$('#txtRestaurantName').text(lg.restaurant.name);
+		//FIXME 过渡
+		if(account.length > 10){
+			restaurantEntity = JSON.parse(account);
+		}else{
+			restaurantEntity = {account : account};
+		}
 		
 		$.ajax({
 			url : '../VerifyRestaurant.do',
 			data : {
-				account : account,
+				account : restaurantEntity.account,
 				token : token
 			},			
 			success : function(data, status, xhr){
@@ -38,6 +44,8 @@ $(function(){
 					setcookie("digie_token", data.other.token);
 					
 					lg.restaurant = data.root[0];
+					
+					$('#txtRestaurantName').text(lg.restaurant.name);
 					
 					//验证员工是否登陆状态
 					$.ajax({
@@ -60,6 +68,7 @@ $(function(){
 						msg : data.msg?data.msg:"",
 						renderTo : 'restaurantLoginPage',
 						fn : function(){
+							$('#popupLogin').show();
 							$('#txtRestaurantAccount').focus();
 						}
 					});
