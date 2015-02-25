@@ -1,5 +1,7 @@
 package com.wireless.Actions.login;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -9,12 +11,14 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.token.TokenDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.token.Token;
 
 public class AutoLoginAction extends Action{
@@ -22,22 +26,27 @@ public class AutoLoginAction extends Action{
 				
 		JObject jobject = new JObject();
 		try{
-			final Restaurant r = RestaurantDao.getById(40);
-			int tokenId = TokenDao.insert(new Token.InsertBuilder(r));
-			Token tokenBean = TokenDao.getById(tokenId); 
-			int code = tokenBean.getCode();
-			tokenId = TokenDao.generate(new Token.GenerateBuilder(r.getAccount(), code));			
-			final Token token2Save = TokenDao.getById(tokenId); 
+			final Restaurant restaurant = RestaurantDao.getById(40);
+			final Staff admin = StaffDao.getAdminByRestaurant(restaurant.getId());
+			List<Token> result = TokenDao.getByCond(new TokenDao.ExtraCond().addStatus(Token.Status.TOKEN));
+			int tokenId;
+			if(result.isEmpty()){
+				tokenId = TokenDao.insert(new Token.InsertBuilder(restaurant));
+				tokenId = TokenDao.generate(new Token.GenerateBuilder(restaurant.getAccount(), TokenDao.getById(tokenId).getCode()));			
+			}else{
+				tokenId = result.get(0).getId();
+			}
+			final Token token = TokenDao.getById(tokenId); 
 			
 			jobject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					try {
-						jm.putString("token", token2Save.encrypt());
-						jm.putString("account", r.getAccount());
-						jm.putInt("pin", 29);
-						jm.putString("password", "1");
+						jm.putString("token", token.encrypt());
+						jm.putString("account", restaurant.getAccount());
+						jm.putInt("pin", admin.getId());
+						jm.putString("password", admin.getPwd());
 					} catch (BusinessException e) {
 						e.printStackTrace();
 					}
