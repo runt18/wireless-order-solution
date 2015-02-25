@@ -364,12 +364,6 @@ public class Staff implements Parcelable, Jsonable{
 			jm.putJsonable("role", this.getRole(), flag);
 			jm.putString("roleName", this.getRole() != null ? this.getRole().getName() : "未知");
 		}
-
-
-		
-		
-		
-		//jm.put("staffPassword", this.getPwd());
 		return jm;
 	}
 
