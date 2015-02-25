@@ -37,47 +37,40 @@ import com.wireless.util.DeviceUtil;
 
 public class NetworkSettingFragment extends Fragment {
 
-	private String _address;
-	private int _port;
-
-	private EditText _ipEdtTxt;
-	private TextView _backupTextView;
-	private EditText _portEdtTxt;
-	private TextView _deviceIdEdtTxt;
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.network_setting, container, false);
 
-		_ipEdtTxt = (EditText) view.findViewById(R.id.edtTxt_ip_setting);
-		_backupTextView = (TextView) view.findViewById(R.id.textView_backup_network);
-		_portEdtTxt = (EditText) view.findViewById(R.id.edtTxt_port_setting);
-		_deviceIdEdtTxt = (TextView) view.findViewById(R.id.txtView_deviceId_setting);
+		final EditText ipEdtTxt = (EditText) view.findViewById(R.id.edtTxt_ip_setting);
+		final TextView backupTextView = (TextView) view.findViewById(R.id.textView_backup_network);
+		final EditText portEdtTxt = (EditText) view.findViewById(R.id.edtTxt_port_setting);
+		final TextView deviceIdEdtTxt = (TextView) view.findViewById(R.id.txtView_deviceId_setting);
+		final TextView accentTextView = (TextView) view.findViewById(R.id.txtView_accent_setting);
 
 		//显示备用服务器
 		StringBuilder backups = new StringBuilder();
 		for(ServerConnector.Connector connector : ServerConnector.instance().getBackups()){
-			backups.append(connector.getAddress() + ":" + connector.getPort()).append(System.getProperty("line.separator"));
+			backups.append(connector.getAddress() + ":" + connector.getPort()).append("  ");
 		}
-		_backupTextView.setText(backups.toString());
+		backupTextView.setText(backups.toString());
 		
 		//获取文件保存的网络设置值
 		SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Params.PREFS_NAME,	Context.MODE_PRIVATE);
-		_address = sharedPreferences.getString(Params.IP_ADDR, Params.DEF_IP_ADDR);
-		_port = sharedPreferences.getInt(Params.IP_PORT, Params.DEF_IP_PORT);
+		final String address = sharedPreferences.getString(Params.IP_ADDR, Params.DEF_IP_ADDR);
+		final int port = sharedPreferences.getInt(Params.IP_PORT, Params.DEF_IP_PORT);
 
 		//显示网络设置的值
-		_ipEdtTxt.setText(_address);
-		_portEdtTxt.setText(String.valueOf(_port));
+		ipEdtTxt.setText(address);
+		portEdtTxt.setText(String.valueOf(port));
 
 		//只有管理员才可以修改网络设定
 		if(WirelessOrder.loginStaff == null || WirelessOrder.loginStaff.getRole().getCategory() != Role.Category.ADMIN){
-			_ipEdtTxt.setEnabled(false);
-			_portEdtTxt.setEnabled(false);
+			ipEdtTxt.setEnabled(false);
+			portEdtTxt.setEnabled(false);
 		}
 		
 		//监听服务器IP的变化
-		_ipEdtTxt.addTextChangedListener(new TextWatcher(){
+		ipEdtTxt.addTextChangedListener(new TextWatcher(){
 
 			@Override
 			public void afterTextChanged(Editable s) {
@@ -87,7 +80,7 @@ public class NetworkSettingFragment extends Fragment {
 				// 提交修改
 				editor.commit();
 
-				ServerConnector.instance().setMaster(new ServerConnector.Connector(s.toString(), Integer.parseInt(_portEdtTxt.getText().toString())));
+				ServerConnector.instance().setMaster(new ServerConnector.Connector(s.toString(), Integer.parseInt(portEdtTxt.getText().toString())));
 			}
 
 			@Override
@@ -103,7 +96,7 @@ public class NetworkSettingFragment extends Fragment {
 		});
 		
 		//监听服务器端口的变化
-		_portEdtTxt.addTextChangedListener(new TextWatcher(){
+		portEdtTxt.addTextChangedListener(new TextWatcher(){
 
 			@Override
 			public void afterTextChanged(Editable s) {
@@ -114,7 +107,7 @@ public class NetworkSettingFragment extends Fragment {
 					// 提交修改
 					editor.commit();
 	
-					ServerConnector.instance().setMaster(new ServerConnector.Connector(_ipEdtTxt.getText().toString(), Integer.parseInt(s.toString())));
+					ServerConnector.instance().setMaster(new ServerConnector.Connector(ipEdtTxt.getText().toString(), Integer.parseInt(s.toString())));
 				}catch(NumberFormatException e){
 					
 				}
@@ -143,7 +136,32 @@ public class NetworkSettingFragment extends Fragment {
 		});
 		
 		//显示设备编号
-		_deviceIdEdtTxt.setText(DeviceUtil.getDeviceId(getActivity(), DeviceUtil.Type.MOBILE));
+		deviceIdEdtTxt.setText(DeviceUtil.getDeviceId(getActivity(), DeviceUtil.Type.MOBILE));
+		
+		//显示语音方言
+		final SharedPreferences sharedPref = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
+		accentTextView.setText(Params.Accent.valueOf(sharedPref.getString(Params.ACCENT_LANGUAGE, Params.Accent.MANDARIN.val), 0).desc);
+		view.findViewById(R.id.relativeLayout_accent_network).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new AlertDialog
+				   .Builder(getActivity())
+				   .setTitle("请选择语音方言")
+				   .setItems(new String[] { "广东话", "普通话" }, new DialogInterface.OnClickListener(){
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						if(which == 0){
+							sharedPref.edit().putString(Params.ACCENT_LANGUAGE, Params.Accent.CANTONESE.val).commit();
+						}else if(which == 1){
+							sharedPref.edit().putString(Params.ACCENT_LANGUAGE, Params.Accent.MANDARIN.val).commit();
+						}
+						accentTextView.setText(Params.Accent.valueOf(sharedPref.getString(Params.ACCENT_LANGUAGE, Params.Accent.MANDARIN.val), 0).desc);
+					}
+					   
+				   }).setNegativeButton("返回", null).show();
+			}
+		});
 		
 		TextView title = (TextView) view.findViewById(R.id.toptitle);
 		title.setVisibility(View.VISIBLE);
@@ -159,8 +177,8 @@ public class NetworkSettingFragment extends Fragment {
 		back.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (!_address.equals(_ipEdtTxt.getText().toString()) ||
-					!String.valueOf(_port).equals(_portEdtTxt.getText().toString())){
+				if (!address.equals(ipEdtTxt.getText().toString()) ||
+					!String.valueOf(port).equals(portEdtTxt.getText().toString())){
 						
 						getActivity().setResult(Activity.RESULT_OK);
 					}
@@ -179,8 +197,8 @@ public class NetworkSettingFragment extends Fragment {
 		next.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				_ipEdtTxt.setText(Params.DEF_IP_ADDR);
-				_portEdtTxt.setText(Integer.toString(Params.DEF_IP_PORT));
+				ipEdtTxt.setText(Params.DEF_IP_ADDR);
+				portEdtTxt.setText(Integer.toString(Params.DEF_IP_PORT));
 				Toast.makeText(getActivity(), "重置设置成功", Toast.LENGTH_SHORT).show();
 			}
 		});
@@ -206,7 +224,8 @@ public class NetworkSettingFragment extends Fragment {
 		@Override
 		protected String doInBackground(Void... params) {
 			try {
-				ServerConnector.instance().ask(new ServerConnector.Connector(_ipEdtTxt.getText().toString(), Integer.parseInt(_portEdtTxt.getText().toString())), new ReqPing(), 2000);
+				ServerConnector.instance().ask(new ServerConnector.Connector(((EditText)getActivity().findViewById(R.id.edtTxt_ip_setting)).getText().toString(), 
+																			  Integer.parseInt(((EditText)getActivity().findViewById(R.id.edtTxt_port_setting)).getText().toString())), new ReqPing(), 2000);
 			} catch (IOException e) {
 				_errMsg = "网络连接失败，请检查网络参数是否正确。";
 			} catch (BusinessException e) {

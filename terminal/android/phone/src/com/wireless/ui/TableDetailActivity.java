@@ -216,7 +216,7 @@ public class TableDetailActivity extends Activity {
 				.setPositiveButton("Дђел", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog,	int which) {
-						new DiscountOrderTask(WirelessOrder.loginStaff, new Order.DiscountBuilder(mOrderToPay.getId(), mOrderToPay.getDiscount().getId())) {
+						new DiscountOrderTask(WirelessOrder.loginStaff, Order.DiscountBuilder.build4Normal(mOrderToPay.getId(), mOrderToPay.getDiscount().getId())) {
 							
 							private ProgressDialog mProgDialog;
 

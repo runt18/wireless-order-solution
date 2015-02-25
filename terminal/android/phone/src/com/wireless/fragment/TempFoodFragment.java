@@ -3,15 +3,22 @@ package com.wireless.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -28,6 +35,14 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.iflytek.cloud.ErrorCode;
+import com.iflytek.cloud.InitListener;
+import com.iflytek.cloud.RecognizerResult;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.ui.RecognizerDialog;
+import com.iflytek.cloud.ui.RecognizerDialogListener;
+import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -55,9 +70,11 @@ public class TempFoodFragment extends Fragment {
 		 
 		boolean isInitialized(){
 			if(kitchenTextView != null && foodNameEditText!= null && 
-					deleteBtn != null && amountEditText!= null && priceEdittext != null)
+					deleteBtn != null && amountEditText!= null && priceEdittext != null){
 				return true;
-			else return false;
+			}else{
+				return false;
+			}
 		}
 		
 		void refresh(OrderFood food){
@@ -99,7 +116,7 @@ public class TempFoodFragment extends Fragment {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.pick_food_by_temp_fgm, null);
+		View view = inflater.inflate(R.layout.pick_food_by_temp_fgm, container, false);
 		
 		final ListView tempFoodView = (ListView) view.findViewById(R.id.listView_tempFood_fgm) ;
 		
@@ -221,7 +238,7 @@ public class TempFoodFragment extends Fragment {
 		}
 
 		@Override
-		public View getView(final int position, View convertView, ViewGroup parent) {
+		public View getView(final int position, View convertView, final ViewGroup parent) {
 			View view = convertView;
 			final OrderFood food = mTempFoods.get(position);
 
@@ -229,7 +246,7 @@ public class TempFoodFragment extends Fragment {
 			final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			//初始化view 和 holder 
 			if(view == null){
-				view = inflater.inflate(R.layout.pick_food_by_temp_item, null);
+				view = inflater.inflate(R.layout.pick_food_by_temp_item, parent, false);
 				holder = new ViewHolder();
 
 				holder.foodNameEditText = (EditText)view.findViewById(R.id.editText_foodName_tempFood_item);
@@ -243,13 +260,76 @@ public class TempFoodFragment extends Fragment {
 				holder = (ViewHolder) view.getTag();
 			}
 			
-//			默认初始化为第一个部门
+			//默认初始化为第一个部门
 			if(food.getKitchen().getId() == 0){
 				food.asFood().setKitchen(mKitchens.get(0));
 			}
-			/**
-			 * 菜名赋值
-			 */
+			
+			//设置语音输入
+			((ImageButton)view.findViewById(R.id.imgButton_foodName_tempFood_item)).setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View arg0) {
+					final RecognizerDialog iatDialog = new RecognizerDialog(getActivity(), new InitListener() {
+						@Override
+						public void onInit(int code) {
+							if (code != ErrorCode.SUCCESS) {
+								Toast.makeText(getActivity(), "初始化失败,错误码：" + code, Toast.LENGTH_SHORT).show();
+				        	}
+						}
+					});
+					// 清空参数
+					iatDialog.setParameter(SpeechConstant.PARAMS, null);
+					// 设置听写引擎
+					iatDialog.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
+					// 设置返回结果格式
+					iatDialog.setParameter(SpeechConstant.RESULT_TYPE, "json");
+					// 设置语言
+					iatDialog.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
+					// 设置语言区域
+					final String accent = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getString(Params.ACCENT_LANGUAGE, Params.Accent.MANDARIN.val); 
+					iatDialog.setParameter(SpeechConstant.ACCENT, accent);
+					// 设置语音前端点
+					iatDialog.setParameter(SpeechConstant.VAD_BOS, "4000");
+					// 设置语音后端点
+					iatDialog.setParameter(SpeechConstant.VAD_EOS, "1000");
+					// 设置标点符号
+					iatDialog.setParameter(SpeechConstant.ASR_PTT, "0");
+					// 设置音频保存路径
+					iatDialog.setParameter(SpeechConstant.ASR_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/iflytek/wavaudio.pcm");
+					
+					iatDialog.setListener(new RecognizerDialogListener(){
+						@Override
+						public void onResult(RecognizerResult results, boolean isLast) {
+							try{
+								StringBuilder result = new StringBuilder();
+								JSONObject joResult = new JSONObject(new JSONTokener(results.getResultString()));
+								JSONArray words = joResult.getJSONArray("ws");
+								for (int i = 0; i < words.length(); i++) {
+									// 转写结果词，默认使用第一个结果
+									JSONArray items = words.getJSONObject(i).getJSONArray("cw");
+									JSONObject obj = items.getJSONObject(0);
+									result.append(obj.getString("w"));
+								}
+								holder.foodNameEditText.setText(result.toString());
+							}catch(JSONException e){
+								//Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+							}
+						}
+						
+						/**
+						 * 识别回调错误.
+						 */
+						@Override
+						public void onError(SpeechError error) {
+							Toast.makeText(getActivity(), (error.getPlainDescription(true)), Toast.LENGTH_SHORT).show();
+						}
+					});
+					iatDialog.show();
+					
+					Toast.makeText(getActivity(), "您正在使用" + Params.Accent.valueOf(accent, 0).toString() + "输入", Toast.LENGTH_LONG).show();
+				}
+			});
+			
 			//设置临时菜名称前删除文本框监听器
 			if(holder.foodNameEditText.getTag() != null){
 				holder.foodNameEditText.removeTextChangedListener((TextWatcher)holder.foodNameEditText.getTag());
@@ -290,7 +370,7 @@ public class TempFoodFragment extends Fragment {
 				public void onClick(View kitchenTextView) {
 					if(mKitchens.size() > 1){
 						//设置弹出框
-						final PopupWindow popWnd = new PopupWindow(inflater.inflate(R.layout.pick_food_by_temp_fgm_popup_wnd, null), 180, LayoutParams.WRAP_CONTENT, true);
+						final PopupWindow popWnd = new PopupWindow(inflater.inflate(R.layout.pick_food_by_temp_fgm_popup_wnd, parent, false), 180, LayoutParams.WRAP_CONTENT, true);
 						popWnd.setOutsideTouchable(true);
 						popWnd.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
 						popWnd.update();
@@ -457,7 +537,7 @@ public class TempFoodFragment extends Fragment {
 
 			if(convertView == null){
 				final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = inflater.inflate(R.layout.pick_food_by_temp_fgm_pop_list_item, null);
+				view = inflater.inflate(R.layout.pick_food_by_temp_fgm_pop_list_item, parent, false);
 			}else{
 				view = convertView;
 			}

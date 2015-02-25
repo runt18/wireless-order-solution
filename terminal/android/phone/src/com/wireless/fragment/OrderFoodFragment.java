@@ -258,13 +258,17 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						map.put(ITEM_IS_DELTA, true);
 						pickedFoodDatas.add(map);
 						
-					}else if(of.getDelta() < 0f && of.asFood().isWeigh()){
+					}else if(of.getDelta() < 0f){
 						Map<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, of.getName()); 
 						map.put(ITEM_FOOD_AMOUNT, "+" + String.valueOf(Math.abs(of.getDelta())));
 						map.put(ITEM_FOOD_PRICE, "+" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(of.calcUnitPrice() * Math.abs(of.getDelta())));
-						map.put(ITEM_FOOD_TASTE, "称重确认");
+						if(of.asFood().isWeigh()){
+							map.put(ITEM_FOOD_TASTE, "称重确认");
+						}else{
+							map.put(ITEM_FOOD_TASTE, "加" + NumericUtil.float2String2(Math.abs(of.getDelta())) + "份");
+						}
 						map.put(ITEM_THE_FOOD, of);
 						map.put(ITEM_FOOD_DELTA, Float.valueOf(of.getDelta()));
 						map.put(ITEM_IS_DELTA, true);
@@ -473,16 +477,20 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 							}
 						});
 						
-					}else if((Float)map.get(ITEM_FOOD_DELTA) < 0f && of.asFood().isWeigh()){
-						//delta < 0 表示是称重数量
+					}else if((Float)map.get(ITEM_FOOD_DELTA) < 0f){
+						//delta < 0 表示是加菜数量
 						cancelImgView.setVisibility(View.INVISIBLE);
 						rightImgView.setVisibility(View.INVISIBLE);
 						
 						//layout.setBackgroundColor(Color.LTGRAY);
 						((TextView)layout.findViewById(R.id.txtView_taste_orderChildItem)).setTextColor(getResources().getColor(R.color.green));
 						layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.INVISIBLE);
-						//'取消称重'按钮
-						restoreBtn.setText("取消称重");
+						//'取消加菜'按钮
+						if(of.asFood().isWeigh()){
+							restoreBtn.setText("取消称重");
+						}else{
+							restoreBtn.setText("取消加菜");
+						}
 						restoreBtn.setVisibility(View.VISIBLE); 
 						restoreBtn.setOnClickListener(new View.OnClickListener() {
 							@Override
@@ -542,12 +550,15 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 							new AlertDialog
 							   .Builder(getActivity())
 							   .setTitle(of.getName())
-							   .setItems(new String[] { of.isHurried() ? "取消催菜" : "催菜", "转菜" }, new DialogInterface.OnClickListener(){
+							   .setItems(new String[] { "加菜", of.isHurried() ? "取消催菜" : "催菜", "转菜" }, new DialogInterface.OnClickListener(){
 
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									mSelectedFood = of;
 									if(which == 0){
+										//加菜
+										AddOrderAmountDialog.newInstance(of, getId()).show(getFragmentManager(), AddOrderAmountDialog.TAG);
+									}else if(which == 1){
 										//催菜
 										if(mSelectedFood.isHurried()){
 											mSelectedFood.setHurried(false);
@@ -555,7 +566,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 											mSelectedFood.setHurried(true);
 											Toast.makeText(getActivity(), "催菜成功", Toast.LENGTH_SHORT).show();	
 										}
-									}else if(which == 1){
+									}else if(which == 2){
+										//转菜
 										mTransFoods.clear();
 										mTransFoods.add(mSelectedFood);
 										AskTableDialog.newInstance(getId()).show(getFragmentManager(), AskTableDialog.TAG);

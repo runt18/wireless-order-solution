@@ -4,10 +4,16 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.DialogFragment;
@@ -34,6 +40,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.iflytek.cloud.ErrorCode;
+import com.iflytek.cloud.InitListener;
+import com.iflytek.cloud.RecognizerResult;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.ui.RecognizerDialog;
+import com.iflytek.cloud.ui.RecognizerDialogListener;
+import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.ComboOrderFoodParcel;
 import com.wireless.parcel.OrderFoodParcel;
@@ -227,6 +241,7 @@ public class AskOrderAmountDialog extends DialogFragment {
 		try{
 			mFoodPickedListener.add((OnFoodPickedListener)getFragmentManager().findFragmentById(getArguments().getInt(PARENT_FGM_ID_KEY)));
 		}catch (ClassCastException ignored) {}
+		
 	}
 
 	@Override
@@ -587,11 +602,11 @@ public class AskOrderAmountDialog extends DialogFragment {
 		pinzhuEdtTxt.setTag(pinzhuTxtWatcher);
 		pinzhuEdtTxt.addTextChangedListener(pinzhuTxtWatcher);
 
-		//品注删除Button
-		tasteView.findViewById(R.id.imgButton_deletePinZhu_askOrderAmount_dialog).setOnClickListener(new OnClickListener() {
+		//品注语音Button
+		tasteView.findViewById(R.id.imgButton_voicePinZhu_askOrderAmount_dialog).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				pinzhuEdtTxt.setText("");
+				voice2Pinzhu(pinzhuEdtTxt);
 			}
 		});
 		
@@ -646,6 +661,70 @@ public class AskOrderAmountDialog extends DialogFragment {
 		return tasteView;
 	}
 
+	private void voice2Pinzhu(final EditText pinzhuEdtTxt){
+		
+		//pinzhuEdtTxt.setText("");
+		
+		final RecognizerDialog iatDialog = new RecognizerDialog(getActivity(), new InitListener() {
+			@Override
+			public void onInit(int code) {
+				if (code != ErrorCode.SUCCESS) {
+					Toast.makeText(getActivity(), "初始化失败,错误码：" + code, Toast.LENGTH_SHORT).show();
+	        	}
+			}
+		});
+		// 清空参数
+		iatDialog.setParameter(SpeechConstant.PARAMS, null);
+		// 设置听写引擎
+		iatDialog.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
+		// 设置返回结果格式
+		iatDialog.setParameter(SpeechConstant.RESULT_TYPE, "json");
+		// 设置语言
+		iatDialog.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
+		// 设置语言区域
+		final String accent = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getString(Params.ACCENT_LANGUAGE, Params.Accent.MANDARIN.val); 
+		iatDialog.setParameter(SpeechConstant.ACCENT, accent);
+		// 设置语音前端点
+		iatDialog.setParameter(SpeechConstant.VAD_BOS, "4000");
+		// 设置语音后端点
+		iatDialog.setParameter(SpeechConstant.VAD_EOS, "1000");
+		// 设置标点符号
+		iatDialog.setParameter(SpeechConstant.ASR_PTT, "0");
+		// 设置音频保存路径
+		iatDialog.setParameter(SpeechConstant.ASR_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/iflytek/wavaudio.pcm");
+		
+		iatDialog.setListener(new RecognizerDialogListener(){
+			@Override
+			public void onResult(RecognizerResult results, boolean isLast) {
+				try{
+					StringBuilder result = new StringBuilder();
+					JSONObject joResult = new JSONObject(new JSONTokener(results.getResultString()));
+					JSONArray words = joResult.getJSONArray("ws");
+					for (int i = 0; i < words.length(); i++) {
+						// 转写结果词，默认使用第一个结果
+						JSONArray items = words.getJSONObject(i).getJSONArray("cw");
+						JSONObject obj = items.getJSONObject(0);
+						result.append(obj.getString("w"));
+					}
+					pinzhuEdtTxt.setText(result.toString());
+				}catch(JSONException e){
+					//Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
+			}
+			
+			/**
+			 * 识别回调错误.
+			 */
+			@Override
+			public void onError(SpeechError error) {
+				Toast.makeText(getActivity(), (error.getPlainDescription(true)), Toast.LENGTH_SHORT).show();
+			}
+		});
+		iatDialog.show();
+		
+		Toast.makeText(getActivity(), "您正在使用" + Params.Accent.valueOf(accent, 0).toString() + "输入", Toast.LENGTH_LONG).show();
+	}
+	
 	private ComboOrderFood matchComboFood(ComboFood comboFood){
 		for(ComboOrderFood cof : mSelectedFood.getCombo()){
 			if(cof.asComboFood().equals(comboFood)){
@@ -794,11 +873,11 @@ public class AskOrderAmountDialog extends DialogFragment {
 		pinzhuEdtTxt.setTag(pinzhuTextWatcher);
 		pinzhuEdtTxt.addTextChangedListener(pinzhuTextWatcher);
 		
-		//品注删除Button
-		comboTasteView.findViewById(R.id.imgButton_deletePinZhu_askOrderAmount_dialog).setOnClickListener(new OnClickListener() {
+		//品注语音Button
+		comboTasteView.findViewById(R.id.imgButton_voicePinZhu_askOrderAmount_dialog).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				pinzhuEdtTxt.setText("");
+				voice2Pinzhu(pinzhuEdtTxt);
 			}
 		});
 		

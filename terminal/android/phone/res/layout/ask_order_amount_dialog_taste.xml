@@ -32,20 +32,20 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
                 android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
                 android:layout_marginTop="4dp"
-                android:hint="品注"
+                android:hint="手写口味"
                 android:singleLine="true" />
 
             <ImageButton
-                android:id="@+id/imgButton_deletePinZhu_askOrderAmount_dialog"
+                android:id="@+id/imgButton_voicePinZhu_askOrderAmount_dialog"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignRight="@+id/edtTxt_pinzhu_askOrderAmount_dialog"
-                android:layout_centerInParent="true"
-                android:layout_marginRight="5dp"
+                android:layout_alignTop="@+id/edtTxt_pinzhu_askOrderAmount_dialog"
+                android:layout_alignBottom="@+id/edtTxt_pinzhu_askOrderAmount_dialog"
                 android:background="@null"
-                android:src="@drawable/erase_selector" />
+                android:layout_marginRight="2dp"
+                android:src="@drawable/voice_selector" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -71,7 +71,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignRight="@+id/edtTxt_pinzhuPrice_askOrderAmount_dialog"
-                android:layout_centerInParent="true"
+                android:layout_alignTop="@+id/edtTxt_pinzhuPrice_askOrderAmount_dialog"
+                android:layout_alignBottom="@+id/edtTxt_pinzhuPrice_askOrderAmount_dialog"
                 android:layout_marginRight="5dp"
                 android:background="@null"
                 android:src="@drawable/erase_selector" />

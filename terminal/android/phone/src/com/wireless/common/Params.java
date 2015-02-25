@@ -13,11 +13,8 @@ public final class Params {
 	public final static String STAFF_LOGIN_ID = "StaffPin";
 	//the last pick food category
 	public final static String LAST_PICK_CATE = "LastPickCate";
-	
-	/* the time out value */
-	public final static int TIME_OUT_10s = 0;		//10s 
-	public final static int TIME_OUT_15s = 1;		//15s
-	public final static int TIME_OUT_20s = 2;		//20s
+	//the accent to language
+	public final static String ACCENT_LANGUAGE = "AccentLanguage";
 	
 	/* the last pick food category */
 	public final static int PICK_BY_NUMBER = 0;		//编号点菜
@@ -26,7 +23,7 @@ public final class Params {
 	
 	/* the default IP address */
 	public final static String DEF_IP_ADDR = "e-tones.net";
-
+	/* the default backup IP address */
 	public final static String DEF_BACKUP_CONNECTOR = "bk.e-tones.net:55555";
 	
 	/* the default IP port */
@@ -35,4 +32,30 @@ public final class Params {
 	/* the default staff pin */
 	public final static long DEF_STAFF_LOGIN_ID = -1;
 	
+	public static enum Accent{
+		MANDARIN("mandarin", "普通话"),
+		CANTONESE("cantonese", "广东话");
+		
+		public final String val;
+		public final String desc;
+		
+		Accent(String val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public static Accent valueOf(String val, int i){
+			for(Accent accent : values()){
+				if(val.equalsIgnoreCase(accent.val)){
+					return accent;
+				}
+			}
+			throw new IllegalArgumentException("The val(val = " + val + ") passed is invalid.");
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
 }

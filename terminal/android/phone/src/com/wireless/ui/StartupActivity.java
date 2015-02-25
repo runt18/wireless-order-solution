@@ -15,6 +15,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.widget.TextView;
 
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
@@ -39,6 +41,9 @@ public class StartupActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		ServerConnector.instance().init();
+		
+		//≥ı ºªØ—∂∑…”Ô“Ù
+		SpeechUtility.createUtility(this, SpeechConstant.APPID + "=54d48ae9");
 		
 		SharedPreferences sharedPrefs = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
 		/*
@@ -157,7 +162,7 @@ public class StartupActivity extends Activity {
 			}
 			
 			try {
-				if(getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("test")){
+				if(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != 1){
 					new QueryStaffTask(JUST_4_TEST).execute();
 				}else{
 					new QueryStaffTask().execute();

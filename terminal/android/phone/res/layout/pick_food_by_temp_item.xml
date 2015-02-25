@@ -3,24 +3,40 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 
-    <EditText
-        android:id="@+id/editText_foodName_tempFood_item"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/relativeLayout_foodName_tempFood_item"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/imageButton_delete_tempFood_item"
-        android:layout_toRightOf="@+id/textView_kitchen_tempFood_item"
-        android:ems="10"
-        android:hint="请输入菜名" >
-    </EditText>
+        android:layout_toRightOf="@+id/textView_kitchen_tempFood_item" >
+
+        <EditText
+            android:id="@+id/editText_foodName_tempFood_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="手写口味"
+            android:singleLine="true" />
+
+        <ImageButton
+            android:id="@+id/imgButton_foodName_tempFood_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/editText_foodName_tempFood_item"
+            android:layout_alignTop="@+id/editText_foodName_tempFood_item"
+            android:layout_alignBottom="@+id/editText_foodName_tempFood_item"
+            android:layout_marginRight="5dp"
+            android:background="@null"
+            android:src="@drawable/voice_selector" />
+    </RelativeLayout>
 
     <EditText
         android:id="@+id/editText_tempFoodItem_amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editText_foodName_tempFood_item"
+        android:layout_alignLeft="@+id/relativeLayout_foodName_tempFood_item"
         android:layout_alignParentBottom="false"
-        android:layout_below="@+id/editText_foodName_tempFood_item"
+        android:layout_below="@+id/relativeLayout_foodName_tempFood_item"
         android:layout_toLeftOf="@+id/imageButton_delete_tempFood_item"
         android:ems="10"
         android:hint="请输入数量"
@@ -56,7 +72,7 @@
         android:ems="10"
         android:hint="请输入价格"
         android:inputType="number|numberDecimal" />
-
+
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
@@ -65,7 +81,7 @@
         android:layout_toLeftOf="@+id/editText_tempFoodItem_amount"
         android:text="数量："
         android:textAppearance="?android:attr/textAppearanceMedium" />
-
+
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"

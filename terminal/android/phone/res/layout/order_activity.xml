@@ -34,18 +34,19 @@
             android:id="@+id/txtView_orderActivity_tableName"
             android:layout_width="100dip"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dip"
-            android:layout_marginLeft="5dip"
-            android:layout_centerVertical="true"
             android:layout_alignBottom="@+id/txtView_tablePrompt_orderActivity"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:layout_marginTop="1dip"
             android:layout_toRightOf="@+id/txtView_tablePrompt_orderActivity"
+            android:background="@drawable/kuangbg"
             android:singleLine="true"
+            android:text="宏图厅"
             android:textColor="@color/red"
-            android:textSize="20sp"
-            android:text="adfad" />
+            android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/txtView_amount_orderActivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -55,22 +56,21 @@
             android:textColor="#000000"
             android:textSize="20sp" />
 
-        <EditText
+        <TextView
             android:id="@+id/editText_orderActivity_customerNum"
             android:layout_width="100dip"
             android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/txtView_tablePrompt_orderActivity"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="3dip"
-            android:layout_toRightOf="@+id/textView2"
+            android:layout_marginLeft="5dip"
+            android:layout_toRightOf="@+id/txtView_amount_orderActivity"
             android:background="@drawable/kuangbg"
-            android:digits="0123456789."
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:inputType="number"
             android:singleLine="true"
             android:textColor="#000000"
             android:textSize="20sp" >
-        </EditText>
+        </TextView>
     </RelativeLayout>
 
     <FrameLayout

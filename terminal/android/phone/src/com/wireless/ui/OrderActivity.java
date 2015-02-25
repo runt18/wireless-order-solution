@@ -3,31 +3,46 @@ package com.wireless.ui;
 import java.util.List;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
+import android.content.DialogInterface.OnShowListener;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.fragment.OrderFoodFragment;
 import com.wireless.fragment.OrderFoodFragment.OnCommitListener;
 import com.wireless.fragment.OrderFoodFragment.OnOrderChangedListener;
+import com.wireless.lib.task.TransTblTask;
 import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.regionMgr.Table.InsertBuilder4Join.Suffix;
+import com.wireless.ui.dialog.AskTableDialog;
+import com.wireless.ui.dialog.AskTableDialog.OnTableSelectedListener;
 
-public class OrderActivity extends FragmentActivity implements OnOrderChangedListener, OnCommitListener{
+public class OrderActivity extends FragmentActivity implements OnOrderChangedListener, 
+															   OnCommitListener,
+															   OnTableSelectedListener{
 	
 	public static final String KEY_TABLE_ID = OrderActivity.class.getName() + ".tableKey";
 	
@@ -60,9 +75,58 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		final TextView txtViewTblName = ((TextView)findViewById(R.id.txtView_orderActivity_tableName));
 		final Table selectedTable = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
 		txtViewTblName.setText(selectedTable.getName());
+		txtViewTblName.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				AskTableDialog.newInstance().show(getSupportFragmentManager(), AskTableDialog.TAG);
+			}
+		});
 		
 		//set the default customer to 1
-		((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText("1");
+		final TextView customerTextView = ((TextView)findViewById(R.id.editText_orderActivity_customerNum));
+		customerTextView.setText("1");
+		customerTextView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				final EditText amountEditText = new EditText(OrderActivity.this);
+				amountEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+				amountEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
+					@Override
+					public void onFocusChange(View v, boolean hasFocus) {
+		            	if(hasFocus){
+		            		amountEditText.post(new Runnable() {
+			                    @Override
+			                    public void run() {
+			                        ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(amountEditText, InputMethodManager.SHOW_IMPLICIT);
+			                    }
+			                });
+		            	}
+					}
+				});
+			 	Dialog amountDialog = new AlertDialog.Builder(OrderActivity.this)
+										 	.setTitle("请输入人数")
+										 	.setIcon(android.R.drawable.ic_dialog_info)
+										 	.setView(amountEditText)
+										 	.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+												@Override
+												public void onClick(DialogInterface dialog, int which) {
+													customerTextView.setText(amountEditText.getText());
+												}
+											})
+										 	.setNegativeButton("取消", null)
+										 	.create();
+			 	amountDialog.setOnShowListener(new OnShowListener() {
+					@Override
+					public void onShow(DialogInterface dialog) {
+						amountEditText.requestFocus();
+					}
+				});
+			 	
+			 	amountDialog.show();
+			}
+		});
 		
 		TextView rightTxtView = (TextView)findViewById(R.id.textView_right);
 		rightTxtView.setText("提交");
@@ -92,7 +156,7 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		TableParcel table = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
 		
 		int customNum;
-		String custNumString = ((EditText)findViewById(R.id.editText_orderActivity_customerNum)).getText().toString();
+		String custNumString = ((TextView)findViewById(R.id.editText_orderActivity_customerNum)).getText().toString();
 		//如果人数为空，则默认为1
 		if(custNumString.length() != 0){
 			customNum = Integer.parseInt(custNumString);
@@ -143,7 +207,7 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 			//set the table name
 			((TextView)findViewById(R.id.txtView_orderActivity_tableName)).setText(oriOrder.getDestTbl().getName());
 			//set the amount of customer
-			((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(oriOrder.getCustomNum()));	
+			((TextView)findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(oriOrder.getCustomNum()));	
 		}
 	}
 
@@ -198,6 +262,44 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 				})
 			.show();
 		}
+		
+	}
+
+	@Override
+	public void onTableSelected(final Table selectedTable) {
+		final Table dest = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
+		new TransTblTask(WirelessOrder.loginStaff, new Table.Builder(dest.getId()), new Table.Builder(selectedTable.getId())){
+			
+			private ProgressDialog mProgDialog;
+			
+			@Override
+			protected void onPreExecute(){			
+				mProgDialog = ProgressDialog.show(OrderActivity.this, "", "正在交换数据...请稍后", true);
+			}		
+		
+			protected void onSuccess(){
+				mProgDialog.dismiss();
+				Toast.makeText(getApplicationContext(), "换台成功", Toast.LENGTH_SHORT).show();
+				((TextView)findViewById(R.id.txtView_orderActivity_tableName)).setText(selectedTable.getName());
+			};
+			
+			protected void onFail(BusinessException e){
+				mProgDialog.dismiss();
+				new AlertDialog.Builder(OrderActivity.this)
+					.setTitle("提示")
+					.setMessage(e.getDesc())
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					}).show();
+			}
+			
+		}.execute();
+	}
+
+	@Override
+	public void onJoinedSelected(Table parent, Suffix suffix) {
 		
 	}
 	
