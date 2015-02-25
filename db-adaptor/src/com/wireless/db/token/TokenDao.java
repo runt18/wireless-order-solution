@@ -385,10 +385,31 @@ public class TokenDao {
 	
 	/**
 	 * Get the token according to extra condition {@link ExtraCond}
-	 * @param dbCon
 	 * @param extraCond
-	 * @return
+	 * 			the extra condition
+	 * @return the token to this extra condition
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Token> getByCond(TokenDao.ExtraCond extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the token according to extra condition {@link ExtraCond}
+	 * @param dbCon
+	 * 			the database connection
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the token to this extra condition
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Token> getByCond(DBCon dbCon, TokenDao.ExtraCond extraCond) throws SQLException{
 		String sql;
@@ -459,7 +480,21 @@ public class TokenDao {
 		return amount;
 	}
 	
-	public static int cleanup() throws SQLException{
+	public static class Result{
+		public final int amount;
+		private final int elapsed;
+		Result(int amount, int elapsed){
+			this.amount = amount;
+			this.elapsed = elapsed;
+		}
+		@Override
+		public String toString(){
+			return "remove " + amount + " token(s) takes " + elapsed + " sec.";
+		}
+	}
+	
+	public static Result cleanup() throws SQLException{
+		long beginTime = System.currentTimeMillis();
 		DBCon dbCon = new DBCon();
 		int amount = 0;
 		try{
@@ -468,7 +503,8 @@ public class TokenDao {
 			amount += deleteByCond(dbCon, new ExtraCond().addStatus(Token.Status.DYN_CODE));
 			//Delete the token whose last modified exceed 30 days.
 			amount += dbCon.stmt.executeUpdate(" DELETE FROM " + Params.dbName + ".token WHERE DATE_SUB(NOW(), INTERVAL 30 DAY) > last_modified ");
-			return amount;
+			
+			return new Result(amount, (int)(System.currentTimeMillis() - beginTime) / 1000);
 		}finally{
 			dbCon.disconnect();
 		}

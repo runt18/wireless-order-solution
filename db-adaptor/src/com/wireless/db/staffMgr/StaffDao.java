@@ -480,7 +480,7 @@ public class StaffDao {
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
-		List<Staff> result = new ArrayList<Staff>();
+		final List<Staff> result = new ArrayList<Staff>();
 		while(dbCon.rs.next()){
 			Staff staff = new Staff();
 			
