@@ -1235,7 +1235,7 @@ function addTempTaste(){
 	
 	$('#addTempTasteCmp').show();
 	$('#addTempTasteCmp').css('top', '150px');
-	$('#addTempTasteCmpShadow').show();
+	$('#shadowForPopup').show();
 	
 	//关闭弹出常用口味
 	closeFoodCommonTaste();
@@ -1265,7 +1265,7 @@ function addTempTaste(){
 
 function closeTempTaste(){
 	$('#addTempTasteCmp').hide();
-	$('#addTempTasteCmpShadow').hide();
+	$('#shadowForPopup').hide();
 	
 	$('#tempTasteName').val('');
 	$('#tempTastePrice').val('');	
@@ -1449,7 +1449,7 @@ function addTempFood(){
 	$('#lab4TempKitchen').text(of.tempKitchens[0].name);
 	
 	$('#addTempFoodCmp').show();
-	$('#addTempFoodCmpShadow').show();
+	$('#shadowForPopup').show();
 	
 	$('#tempFoodName').focus();
 	
@@ -1460,7 +1460,7 @@ function addTempFood(){
  */
 of.tf.closeTempFood = function(){
 	$('#addTempFoodCmp').hide();
-	$('#addTempFoodCmpShadow').hide();	
+	$('#shadowForPopup').hide();	
 	$('#tempFoodName').val('');
 	$('#tempFoodPrice').val('');
 	$('#tempFoodCount').val(1);

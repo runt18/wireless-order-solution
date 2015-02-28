@@ -706,13 +706,13 @@ function lookupOrderDetailByType(type){
 		$('#lookupOrderDetailHead_table').html('餐桌号:<font color="#f7c942">' + uo.table.alias + '</font>&nbsp;' + (uo.table.name?'<font color="#f7c942" >(' + uo.table.name +')</font>' :''));		
 	}	
 
-	$('#lookupOrderDetailShadow').show();
+	$('#shadowForPopup').show();
 	$('#lookupOrderDetail').show();
 	
 }
 
 function closeLookupOrderDetailWin(){
-	$('#lookupOrderDetailShadow').hide();
+	$('#shadowForPopup').hide();
 	$('#lookupOrderDetail').hide();	
 }
 
@@ -1091,7 +1091,7 @@ function openReadMemberByCondtionWin(){
 //		uo.setMemberReadCmp();
 	}	
 	
-	$('#readMemberWinShadow').show();
+	$('#shadowForPopup').show();
 	$('#readMemberWin').show();
 	
 	$('#numberKeyboard').show();
@@ -1113,7 +1113,7 @@ function openReadMemberByCondtionWin(){
 function closeReadMemberByCondtionWin(){
 	$('#numberKeyboard').hide();
 	
-	$('#readMemberWinShadow').hide();
+	$('#shadowForPopup').hide();
 	$('#readMemberWin').hide();
 	
 	$('#txtMemberInfo4Read').val('');

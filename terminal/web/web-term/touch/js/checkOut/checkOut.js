@@ -287,7 +287,7 @@ uo.loadCancelReasonData = function(data){
 	uo.selectingCancelReason = null;
 	var html = '';
 	for (var i = 0; i < data.length; i++) {
-		html += '<a data-role="button" data-index='+ i +' data-inline="true" class="regionBtn" onclick="uo.selectCancelReason({event:this})">'+ data[i].reason +'</a>';
+		html += '<a data-role="button" data-index='+ i +' data-inline="true" data-theme="c" class="regionBtn" onclick="uo.selectCancelReason({event:this})">'+ data[i].reason +'</a>';
 	}
 	$('#cancelFoodReasonCmp').html(html).trigger('create').trigger('refresh');
 	
@@ -321,7 +321,7 @@ uo.openCancelFoodCmp = function(c){
 	
 	$('#inputCancelFoodSet').val(checkDot(orderFood.count+'')?orderFood.count : parseInt(orderFood.count));
 	
-	$('#cancelFoodSetShadow').show();
+	$('#shadowForPopup').show();
 	$('#cancelFoodSet').show();
 	
 	$('#numberKeyboard').show();
@@ -337,7 +337,7 @@ uo.openCancelFoodCmp = function(c){
 uo.closeCancelFoodCmp = function(){
 	$('#inputCancelFoodSet').val('');
 	
-	$('#cancelFoodSetShadow').hide();
+	$('#shadowForPopup').hide();
 	$('#cancelFoodSet').hide();
 	
 	$('#numberKeyboard').hide();
@@ -659,7 +659,7 @@ uo.openTransOrderFood = function (){
 	
 	$('#transFoodCmp').trigger('create').trigger('refresh');
 	$('#transFoodCmp').show();
-	$('#transFoodCmpShadow').show();	
+	$('#shadowForPopup').show();	
 	
 	$('#numberKeyboard').show();
 	
@@ -704,7 +704,7 @@ uo.closeTransOrderFood = function(){
 	ts.commitTableOrTran = 'table'
 	
 	$('#transFoodCmp').hide();
-	$('#transFoodCmpShadow').hide();	
+	$('#shadowForPopup').hide();	
 	
 	$('#numberKeyboard').hide();
 	

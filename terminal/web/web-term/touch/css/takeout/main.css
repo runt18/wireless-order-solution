@@ -112,7 +112,13 @@ html { overflow-y: hidden;}
 	min-width: 80px;
 	line-height: 36px;
 }
-.bottomBtnFont > span{
+/*把顶部的按钮文字放大*/
+.topBtnFont{
+	margin-left: 2px !important;
+	min-width: 80px;
+	line-height: 20px;
+}
+.bottomBtnFont > span, .topBtnFont > span{
 	font-size: 20px !important;
 }
 
@@ -272,7 +278,7 @@ html { overflow-y: hidden;}
 	width: 100%;
 	float:left;
 	line-height: 25px;
-	background-color: darkgray;
+	background-color: #f7c942;
 	color: black;font-weight: bold;text-shadow:none;
 	top : -30px;
 }
@@ -282,7 +288,7 @@ html { overflow-y: hidden;}
 	width: 100%;
 	float:left;
 	line-height: 25px;
-	background-color: darkgray;
+	background-color: #f7c942;
 	color: black;font-weight: bold;text-shadow:none;
 	top : -25px;
 	position: inherit;
@@ -443,7 +449,7 @@ html { overflow-y: hidden;}
 
 
 .readMemberTd{
-	line-height: 50px;font-weight: bold;font-size: 20px;text-align: center;
+	line-height: 50px;font-weight: bold;font-size: 20px;text-align: center;min-width: 96px;
 }
 
 .readMemberTdValue{

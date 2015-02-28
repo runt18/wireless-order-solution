@@ -15,6 +15,8 @@ var regionId = [];
 var region = [];
 //设置当前状态类型（busy， free, allStatus）
 var statusType = "";
+//作为收银端或触摸屏时, 餐台列表的高度
+var tableListHeight = 86;
 
 //餐桌选择包,tt：转台, rn: 区域
 var ts={
@@ -22,6 +24,7 @@ var ts={
 	rn : {},
 	tt : {},
 	tf : {},
+	dailyOpe : {},
 	searchTable : false,
 	commitTableOrTran : 'table'
 }
@@ -48,9 +51,49 @@ var payment_popupCouponCmp4MemberTemplet = '<div data-role="popup" id="payment_p
 			'<ul id="payment_couponList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
 		'</ul></div>';
 
+var memberTitle = '<tr>' 
+	+ '<th class="table_title text_center">会员操作</th>'
+		+ '<th class="table_title text_center">现金</th>'
+		+ '<th class="table_title text_center">刷卡</th>'
+		+ '<th class="table_title text_center">账户实充/扣额</th>'
+		+ '</tr>';
+var memberTrModel = '<tr>'
+	+ '<th>会员充值</th>'
+	+ '<td class="text_right">{0}</td>'
+	+ '<td class="text_right">{1}</td>'
+	+ '<td class="text_right">{2}</td>'
+	+ '</tr>'
+	+ '<tr>'
+	+ '<th>会员退款</th>'
+	+ '<td class="text_right">{3}</td>'
+	+ '<td class="text_right">{4}</td>'
+	+ '<td class="text_right">{5}</td>'
+	+ '</tr>';
+var title = '<tr>'
+	+ '<th class="table_title text_center">部门汇总</th>'
+	+ '<th class="table_title text_center">折扣总额</th>'
+	+ '<th class="table_title text_center">赠送总额</th>'
+	+ '<th class="table_title text_center">应收总额</th>'
+	+ '</tr>';
+var trModel = '<tr>'
+	+ '<th>{0}</th>'
+	+ '<td class="text_right">{1}</td>'
+	+ '<td class="text_right">{2}</td>'
+	+ '<td class="text_right">{3}</td>'
+	+ '</tr>';
+
+var trPayIncomeModel = '<tr>'
+	+ '<th>{0}</th>'
+	+ '<td class="text_right">{1}</td>'
+	+ '<td class="text_right">{2}</td>'
+	+ '<td class="text_right">{3}</td>'
+	+ '</tr>';
+
 $(function(){
+	//当系统是收银端时
+	tableListHeight = 124;
 	//餐厅选择界面高度
-	$('#tableAndRegionsCmp').height(document.body.clientHeight - 86);	
+	$('#tableAndRegionsCmp').height(document.body.clientHeight - tableListHeight);	
 	//点菜界面高度
 	$('#orderFoodCenterCmp').height(document.body.clientHeight - 210);
 	document.getElementById('foodsCmp').style.height = (document.body.clientHeight - 210)+'px';		
@@ -97,7 +140,9 @@ $(function(){
 					return;
 				}
 				
-				$('#spanStaffNameForDisplayToTS').html('服务员: '+ data.other.staff.staffName);
+				ln.staffData = data.other.staff;
+				
+				$('#spanStaffNameForDisplayToTS').html('操作人: <font color="green">'+ data.other.staff.staffName + '</font>');
 				
 				/**
 				 * 定时器，定时刷新餐桌选择页面数据
@@ -1350,6 +1395,283 @@ function toOrderFoodPage(table){
 	
 	of.initNewFoodContent();
 }
+
+var printPositionOptionTemplet = '<option value={0}>{1}</option>';
+
+function getDailyInfo(c){
+	$('#dailyInfoTable').show();
+	$('#shadowForPopup').show();
+	
+	//生成打印位置
+	var html ='';
+	for (var i = 0; i < region.length; i++) {
+		html += printPositionOptionTemplet.format(region[i].id, region[i].name);
+	}
+	$('#dailyPrintPosition').html(html);
+	
+	if(getcookie(document.domain+'_paymentCheck') == 'true'){
+		$('#div4SelectionItem').show();
+		$('#check4PrintPosition').attr("checked", true).checkboxradio("refresh");
+		$('#dailyPrintPosition').val(parseInt(getcookie(document.domain+'_paymentRegion')));
+	}else{
+		$('#check4PrintPosition').attr("checked", false).checkboxradio("refresh");
+		$('#div4SelectionItem').hide();
+	}
+	$('#dailyPrintPosition').selectmenu('refresh');	
+	
+	//设置标题
+	if(c.queryType == 2){//交款
+		$('#title4DailyInfoTable').html('<font color="#f7c942">交款表</font> -- 交款人 : '+ ln.staffData.staffName);
+		$('#btnSubmitDailyOperation .ui-btn-text').html('交款');
+		ts.dailyOpe.otype = 'jiaokuan';
+	}else if(c.queryType == 0){//交班
+		$('#title4DailyInfoTable').html('<font color="#f7c942">交班表</font> -- 交班人 : '+ ln.staffData.staffName);
+		$('#btnSubmitDailyOperation .ui-btn-text').html('交班');
+		ts.dailyOpe.otype = 'jiaoban';
+	}else if(c.queryType == 1){//日结
+		$('#title4DailyInfoTable').html('<font color="#f7c942">日结表</font> -- 日结人 : '+ ln.staffData.staffName);
+		$('#btnSubmitDailyOperation .ui-btn-text').html('日结');
+		ts.dailyOpe.otype = 'rijie';
+	}
+	
+	
+	$.post('../QueryDailySettleByNow.do',{queryType : c.queryType}, function(jr){
+		if(jr.success){
+			var business = jr.other.business;
+			var deptStat = business.deptStat;
+			ts.dailyOpe.date = {
+				onDutyFormat : business.paramsOnDuty,
+				offDutyFormat : business.paramsOffDuty
+			}
+			
+			var trContent = '';
+			if(c.businessStatic != 2){
+				for(var i = 0; i < deptStat.length; i++){
+					var temp = deptStat[i];
+					trContent += (trModel.format(
+							temp.dept.name, 
+							temp.discountPrice.toFixed(2), 
+							temp.giftPrice.toFixed(2), 
+							temp.income.toFixed(2)
+						)
+					);
+				}
+			}
+			
+			var memberTrDate = memberTrModel.format(business.memberChargeByCash.toFixed(2), business.memberChargeByCard.toFixed(2), business.memberAccountCharge.toFixed(2),
+											business.memberRefund.toFixed(2), 0.00, business.memberAccountRefund.toFixed(2));
+			var table;
+			if(c.businessStatic == 2){
+				table = '<table border="1" class="tb_base">{0}{1}</table>'.format(memberTitle, memberTrDate);
+			}else{
+				table = '<table border="1" class="tb_base">{0}{1}</table><br><table border="1" class="tb_base">{2}{3}</table>'.format(memberTitle, memberTrDate, title, trContent);
+			}			
+			
+			$('#businessStatisticsSummaryInformationCenterPanel').html(table);
+			
+			$('#bssiOnDuty').html(business.paramsOnDuty);
+			$('#bssiOffDuty').html(business.paramsOffDuty);
+
+			$('#bssiOrderAmount').html(business.orderAmount);
+			
+			$('#bssiEraseAmount').html(business.eraseAmount);
+			$('#bssiEraseIncome').html(business.eraseIncome.toFixed(2));
+			
+			$('#bssiDiscountAmount').html(business.discountAmount);
+			$('#bssiDiscountIncome').html(business.discountIncome.toFixed(2));
+			
+			$('#bssiGiftAmount').html(business.giftAmount);
+			$('#bssiGiftIncome').html(business.giftIncome.toFixed(2));
+			
+			$('#bssiCouponAmount').html(business.couponAmount);
+			$('#bssiCouponIncome').html(business.couponIncome.toFixed(2));
+			
+			$('#bssiCancelAmount').html(business.cancelAmount);
+			$('#bssiCancelIncome').html(business.cancelIncome.toFixed(2));
+			
+			$('#bssiPaidAmount').html(business.paidAmount);
+			$('#bssiPaidIncome').html(business.paidIncome.toFixed(2));
+			
+			$('#bssiServiceAmount').html(business.serviceAmount);
+			$('#bssiServiceIncome').html(business.serviceIncome.toFixed(2));
+			
+			
+			var trPayTypeContent='<tr>'
+			  + '<th class="table_title text_center">收款方式</th>'
+			  + '<th class="table_title text_center">账单数</th>'
+			  + '<th class="table_title text_center">应收总额</th>'
+			  + '<th class="table_title text_center">实收总额</th>'
+			  + '</tr>';								
+			//输出付款方式集合
+			var totalCount = 0, totalShouldPay = 0, totalActual = 0, trPayIncomeData;
+			for(var i = 0; i < business.paymentIncomes.length; i++){
+				var temp = business.paymentIncomes[i];
+				totalCount += temp.amount;
+				totalShouldPay += temp.total;
+				totalActual += temp.actual;
+				
+				trPayTypeContent += (trPayIncomeModel.format(
+						temp.payType, 
+						temp.amount, 
+						temp.total.toFixed(2), 
+						temp.actual.toFixed(2)
+					)
+				);
+				
+			}
+			//汇总
+			trPayTypeContent += (trPayIncomeModel.format(
+				'总计', 
+				totalCount, 
+				totalShouldPay.toFixed(2), 
+				totalActual.toFixed(2)
+			));
+			$('#businessStatisticsSummaryPayIncome').html(trPayTypeContent);
+		}
+	});
+
+}
+//关闭交班, 日结
+function closeDailyInfoWin(){
+	$('#dailyInfoTable').hide();
+	$('#shadowForPopup').hide();
+}
+
+//显示打印区域
+function printPositionOperation(){
+	if($('#check4PrintPosition').attr('checked')){
+		$('#div4SelectionItem').show();
+	}else{
+		$('#div4SelectionItem').hide();
+	}	
+}
+
+//交班, 日结, 交款
+function submitDailyOperation(){
+	var paymentRegion = $('#dailyPrintPosition').val();
+	if($('#check4PrintPosition').attr('checked')){
+		setcookie(document.domain+'_paymentCheck', true);
+		setcookie(document.domain+'_paymentRegion', paymentRegion);
+	}else{
+		setcookie(document.domain+'_paymentCheck', false);
+	}
+	
+	if(ts.dailyOpe.otype == 'jiaoban'){
+		//交班
+		$.post('../DoShift.do', function(resultJSON){
+			if (resultJSON.success) {
+				ts.dailyOpe.omsg = resultJSON.msg;
+				ts.dailyOpe.dutyRange = resultJSON.other.dutyRange;
+				dailyOperationDaYin(4);
+				closeDailyInfoWin();
+			} else {
+				Util.msg.alert({
+					msg : resultJSON.msg,
+					renderTo : 'tableSelectMgr'
+				});
+			}		
+		});		
+	}else if(ts.dailyOpe.otype == 'rijie'){
+		// 未交班帳單檢查
+		$.post('../DailySettleCheck.do', function(resultJSON){
+			if (resultJSON.success) {
+				//日结
+				$.post('../DailySettleExec.do', function(data){
+					if (data.success) {
+						ts.dailyOpe.omsg = data.msg;
+						ts.dailyOpe.dutyRange = data.other.dutyRange;
+						dailyOperationDaYin(6);
+						closeDailyInfoWin();
+					} else {
+						Util.msg.alert({
+							msg : data.msg,
+							renderTo : 'tableSelectMgr'
+						});
+					}		
+				});			
+			} else {
+				Util.msg.alert({
+					msg : resultJSON.msg,
+					renderTo : 'tableSelectMgr',				
+					buttons : 'YESBACK',
+					certainCallback : function(btn){
+						if(btn == 'yes'){
+							$.post('../DailySettleExec.do', function(data){
+								if (data.success) {
+									ts.dailyOpe.omsg = data.msg;
+									ts.dailyOpe.dutyRange = data.other.dutyRange;
+									dailyOperationDaYin(6);
+									closeDailyInfoWin();
+								} else {
+									Util.msg.alert({
+										msg : data.msg,
+										renderTo : 'tableSelectMgr'
+									});
+								}		
+							});
+						}
+					}
+				});
+			}		
+		});		
+	}else if(ts.dailyOpe.otype == 'jiaokuan'){
+		//交款
+		$.post('../DoPayment.do', function(resultJSON){
+			if (resultJSON.success) {
+				ts.dailyOpe.omsg = resultJSON.msg;
+				ts.dailyOpe.dutyRange = resultJSON.other.dutyRange;
+				dailyOperationDaYin(12);
+				closeDailyInfoWin();
+			} else {
+				Util.msg.alert({
+					msg : resultJSON.msg,
+					renderTo : 'tableSelectMgr'
+				});
+			}		
+		});		
+	}
+
+
+	
+}
+
+
+/**
+ * 交款&交班&日结打印
+ * @param e
+ */
+function dailyOperationDaYin(printType){
+	var regionId = '';
+	if($('#check4PrintPosition').attr('checked')){
+		regionId = $('#dailyPrintPosition').val(); 
+	}
+	Util.LM.show();
+	$.post('../PrintOrder.do',{
+		onDuty : ts.dailyOpe.dutyRange.onDutyFormat,
+		offDuty : ts.dailyOpe.dutyRange.offDutyFormat,
+		'printType' : printType,
+		regionId : regionId		
+	}, function(resultJSON) {
+		Util.LM.hide();
+		Util.msg.alert({
+			msg : resultJSON.msg + (ts.dailyOpe.omsg.length > 0 ? ('<br/>'+ts.dailyOpe.omsg) : ''),
+			topTip : true
+		});
+	});
+}
+
+/**
+ * 预打
+ */
+function yuda(){
+	ts.dailyOpe.dutyRange = ts.dailyOpe.date;
+	if(ts.dailyOpe.otype == 'jiaokuan'){
+		dailyOperationDaYin(12)
+	}else{
+		dailyOperationDaYin(5);
+	}
+}
+
 
 /**
  * 注销操作

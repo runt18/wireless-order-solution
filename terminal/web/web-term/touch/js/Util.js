@@ -452,7 +452,7 @@ Util.msg = {
 		var id = this.createId();
 		var hasBack = (typeof c.buttons == 'string' && c.buttons.toUpperCase() == 'YESBACK') ? true : false;
 		
-		var content = '<div data-role="popup" id="'+id+'" data-theme="c" data-dismissible="false" style="min-width:200px;" class="ui-corner-all">'+
+		var content = '<div data-role="popup" id="'+id+'" data-theme="c" data-dismissible="false" style="min-width:200px;max-width:400px;" class="ui-corner-all">'+
 						    '<div data-role="header" class="ui-corner-top ui-header ui-bar-b" data-theme="b"><h1 class="ui-title" role="heading" aria-level="1">'+(typeof c.title != 'string' || $.trim(c.title).length == 0 ? '温馨提示' : c.title)+'</h1></div>'+
 						    '<div data-type="time" style="text-align: center;color: red;"></div>'+
 						    '<div data-role="content" data-theme="d" class="ui-corner-bottom ui-content" align="center">'+
