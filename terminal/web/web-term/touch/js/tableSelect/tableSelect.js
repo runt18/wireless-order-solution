@@ -25,6 +25,7 @@ var ts={
 	tt : {},
 	tf : {},
 	dailyOpe : {},
+	member : {},
 	searchTable : false,
 	commitTableOrTran : 'table'
 }
@@ -202,6 +203,9 @@ $(function(){
 		focusInput = this.id;
 	});		
 	
+	//获取系统相关属性
+	Util.sys.checkSmStat();
+	
 });	
 
 
@@ -341,7 +345,10 @@ YBZ_fixed = true;//是否固定手写窗口
 					ts.submitForSelectTableOrTransFood();
 				}
 	    	}else if(event.which == "13"){//回车
-	    		ts.toPaymentMgr();
+	    		if(ts.commitTableOrTran == 'lookup'){
+	    			ts.toPaymentMgr();
+	    		}
+	    		
 	    	}  			
 		}
 	});	
@@ -366,6 +373,14 @@ YBZ_fixed = true;//是否固定手写窗口
         	payInputRecipt();
         }
     }); 
+    
+	//会员充值读卡
+    $('#txtMemberCharge4Read').on('keypress',function(event){
+        if(event.keyCode == "13")    
+        {
+        	ts.member.readMemberByCondtion4Charge();
+        }
+    });	
     
 }
 
@@ -522,8 +537,6 @@ function initFoodData(c){
 					}
 				}); 
 			}
-			
-
 		},
 		error : function(request, status, err){
 			Util.msg.alert({
@@ -1396,8 +1409,11 @@ function toOrderFoodPage(table){
 	of.initNewFoodContent();
 }
 
-var printPositionOptionTemplet = '<option value={0}>{1}</option>';
 
+/**
+ * 获取交班, 日结信息
+ * @param c
+ */
 function getDailyInfo(c){
 	$('#dailyInfoTable').show();
 	$('#shadowForPopup').show();
@@ -1405,7 +1421,7 @@ function getDailyInfo(c){
 	//生成打印位置
 	var html ='';
 	for (var i = 0; i < region.length; i++) {
-		html += printPositionOptionTemplet.format(region[i].id, region[i].name);
+		html += '<option value={0}>{1}</option>'.format(region[i].id, region[i].name);
 	}
 	$('#dailyPrintPosition').html(html);
 	
@@ -1531,13 +1547,18 @@ function getDailyInfo(c){
 	});
 
 }
-//关闭交班, 日结
+
+/**
+ * 关闭交班, 日结
+ */
 function closeDailyInfoWin(){
 	$('#dailyInfoTable').hide();
 	$('#shadowForPopup').hide();
 }
 
-//显示打印区域
+/**
+ * 显示打印区域
+ */
 function printPositionOperation(){
 	if($('#check4PrintPosition').attr('checked')){
 		$('#div4SelectionItem').show();
@@ -1546,7 +1567,9 @@ function printPositionOperation(){
 	}	
 }
 
-//交班, 日结, 交款
+/**
+ * 交班, 日结, 交款操作
+ */
 function submitDailyOperation(){
 	var paymentRegion = $('#dailyPrintPosition').val();
 	if($('#check4PrintPosition').attr('checked')){
@@ -1630,9 +1653,6 @@ function submitDailyOperation(){
 			}		
 		});		
 	}
-
-
-	
 }
 
 
@@ -1672,6 +1692,374 @@ function yuda(){
 	}
 }
 
+/**
+ * 打开会员添加
+ */
+ts.member.openMemberOperationWin = function(){
+	//充值金额
+	$('#cm_numFirstCharge').on('keyup', function(){
+		var chargeMoney = $('#cm_numFirstCharge').val();
+		var actualChargeMoney = $('#cm_numFirstActualCharge');
+		actualChargeMoney.val(Math.round(chargeMoney * ts.member.chargeRate));
+	});	
+	
+	if(getcookie(document.domain+'_chargeSms') == 'true'){
+		$('#chbSendFirstCharge').attr('checked', true).checkboxradio("refresh");
+	}else{
+		$('#chbSendFirstCharge').attr('checked', false).checkboxradio("refresh");
+	}
+	
+	if(Util.sys.smsModule){
+		$('#td4ChbSendFirstCharge').show();
+		$('#lab4FirstTimeSendSms').html('发送充值信息'+(Util.sys.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Util.sys.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Util.sys.smsCount+'条, 请及时充值</font>)'));
+	}
+	
+//	var memberTypeData = [];
+	Util.LM.show();
+	$.ajax({
+		url : '../QueryMemberType.do',
+		type : 'post',
+		async:false,
+		data : {dataSource : 'normal'},
+		success : function(jr, status, xhr){
+			if(jr.success){
+//				memberTypeData = jr.root;
+				Util.LM.hide();
+				var html = '';
+				for (var i = 0; i < jr.root.length; i++) {
+					html += '<option value={id} data-attrVal={attrVal} data-chargeRate={chargeRate}>{name}</option>'.format({
+						id : jr.root[i].id,
+						attrVal : jr.root[i].attributeValue,
+						chargeRate : jr.root[i].chargeRate,
+						name : jr.root[i].name
+					});
+				}
+				$('#cm_comboMemberType').html(html).selectmenu('refresh');
+				
+				$('#addMemberInfo').show();
+				$('#shadowForPopup').show();
+				
+				$('#cm_txtMemberName').focus();
+			}else{
+				Util.msg.alert({
+					renderTo : 'tableSelectMgr',
+					msg : jr.msg
+				});
+			}
+		},
+		error : function(request, status, err){
+			Util.msg.alert({
+				renderTo : 'tableSelectMgr',
+				msg : request.msg
+			});
+		}
+	}); 		
+}
+
+/**
+ * 关闭添加会员
+ */
+ts.member.closeAddMemberWin = function(){
+	$('#addMemberInfo').hide();
+	$('#shadowForPopup').hide();
+	
+	$('#cm_txtMemberName').val('');
+	$('#cm_txtMemberMobile').val('');
+	$('#cm_numberMemberCard').val('');
+	$('#cm_dateMemberBirthday').val('');
+	$('#cm_numFirstCharge').val('');
+	$('#cm_numFirstActualCharge').val('');
+	
+	$('#numberKeyboard').hide();
+}
+
+/**
+ * 改变会员类型时
+ */
+ts.member.add_changeMemberType = function(){
+	var selected = $('#cm_comboMemberType').find('option:selected');
+	if(parseInt(selected.attr('data-attrVal')) == 0){
+		$('#tr_memberFirstTimeCharge').show();
+		$('#tr_memberFirstTimeChargePrint').show();
+		ts.member.chargeRate = parseFloat(selected.attr('data-chargeRate'));
+		setTimeout(function(){
+			$('#cm_numFirstCharge').focus();
+		}, 250);
+	}else{
+		$('#tr_memberFirstTimeCharge').hide();
+		$('#tr_memberFirstTimeChargePrint').hide();
+	}
+}
+
+/**
+ * 操作会员信息, 添加
+ * @param c
+ */
+ts.member.operateMemberHandler = function(){
+	var membetType = $('#cm_comboMemberType');
+	var memberName = $('#cm_txtMemberName');
+	var memberMobile = $('#cm_txtMemberMobile');
+	var memberCard = $('#cm_numberMemberCard');
+	var memberSex = $('#cm_comboMemberSex');
+	var birthday = $('#cm_dateMemberBirthday');
+	var firstCharge = $('#cm_numFirstCharge');
+	var firstActualCharge = $('#cm_numFirstActualCharge');
+	var rechargeType = $('#rd_comboFirstRechargeType');
+	
+	
+	if(!memberMobile.val() && !memberCard.val()){
+		Util.msg.alert({
+			topTip : true,
+			msg : '至少要输入手机或会员卡号'
+		});
+		return;
+	}	
+	
+	if($('#chbSendFirstCharge').attr('checked')){
+		setcookie(document.domain+'_chargeSms', true);
+	}else{
+		delcookie(document.domain+'_chargeSms');
+	}
+	
+	$.post('../OperateMember.do', {
+		dataSource : 'insert',
+		name : memberName.val(),
+		mobile : memberMobile.val(),
+		memberTypeId : membetType.val(),
+		sex : memberSex.val(),
+		memberCard :memberCard.val(),
+		birthday : birthday.val() ? birthday.val().format('Y-m-d') : '',
+		firstCharge : firstCharge.val(),
+		firstActualCharge : firstActualCharge.val(),
+		rechargeType : rechargeType.val(),
+		isPrint : $('#chbPrintFirstRecharge').attr('checked')?true:false,
+		sendSms : $('#chbSendFirstCharge').attr('checked')?true:false
+	}, function(jr){
+		if(jr.success){
+			ts.member.closeAddMemberWin();
+			//更新短信
+			Util.sys.checkSmStat();
+			
+			Util.msg.alert({
+				topTip : true,
+				msg : jr.msg
+			});
+		}else{
+			Util.msg.alert({
+				renderTo : 'tableSelectMgr',
+				msg : jr.msg
+			});			
+		}
+		
+		if(typeof c.callback == 'function'){
+			c.callback({}, c, jr);
+		}		
+	});
+	
+}
+
+
+/**
+ * 打开会员充值
+ */
+ts.member.openMemberChargeWin = function(){
+	//充值金额
+	$('#rd_numPayMannerMoney').on('keyup', function(){
+		var chargeMoney = $('#rd_numPayMannerMoney').val();
+		var actualChargeMoney = $('#rd_numRechargeMoney');
+		actualChargeMoney.val(Math.round(chargeMoney * ts.member.chargeRate));
+	});	
+	
+	if(getcookie(document.domain+'_chargeSms') == 'true'){
+		$('#chbSendCharge').attr('checked', true).checkboxradio("refresh");
+	}else{
+		$('#chbSendCharge').attr('checked', false).checkboxradio("refresh");
+	}
+	
+	if(Util.sys.smsModule){
+		$('#td4ChbSendCharge').show();
+		$('#lab4SendSms').html('发送充值信息'+(Util.sys.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Util.sys.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Util.sys.smsCount+'条, 请及时充值</font>)'));
+	}
+	
+	$('#memberChargeWin').show();
+	$('#shadowForPopup').show();
+	
+	$('#txtMemberCharge4Read').focus();
+}
+
+/**
+ * 关闭会员充值
+ */
+ts.member.closeMemberChargeWin = function(){
+	$('#memberChargeWin').hide();
+	$('#shadowForPopup').hide();
+	
+	ts.member.loadMemberInfo4Charge();
+	$('#txtMemberCharge4Read').val('');
+	
+	$('#numberKeyboard').hide();
+}
+
+/**
+ * 充值读取会员
+ */
+ts.member.readMemberByCondtion4Charge = function(stype){
+	var memberInfo = $('#txtMemberCharge4Read');
+	
+	if(!memberInfo.val()){
+		Util.msg.alert({msg:'请填写会员相关信息', topTip:true});
+		memberInfo.focus();
+		return;
+	}
+	
+	$('#numberKeyboard').hide();
+	
+	if(stype){
+		$('#charge_searchMemberType').popup('close');
+	}else{
+		stype = '';
+	}
+	Util.LM.show();
+	$.ajax({
+		url : "../QueryMember.do",
+		type : 'post',
+		data : {
+			dataSource:'normal',
+			sType: stype,
+			forDetail : true,
+			memberCardOrMobileOrName:memberInfo.val()
+		},
+//		async : false,
+		dataType : 'json',
+		success : function(jr, status, xhr){
+			Util.LM.hide();
+			if(jr.success){
+				if(jr.root.length == 1){
+					Util.msg.alert({msg:'会员信息读取成功.', topTip:true});
+					ts.member.rechargeMember = jr.root[0];
+					ts.member.loadMemberInfo4Charge(jr.root[0]);
+				}else if(jr.root.length > 1){
+					$('#charge_searchMemberType').popup('open');
+					$('#charge_searchMemberType').css({top:$('#btnReadMember4Charge').position().top - 270, left:$('#btnReadMember4Charge').position().left-300});
+				}else{
+					Util.msg.alert({msg:'该会员信息不存在, 请重新输入条件后重试.', renderTo : 'tableSelectMgr', fn : function(){
+						memberInfo.focus();
+					}});
+				}
+			}else{
+				Util.msg.alert({
+					msg : jr.msg,
+					renderTo : 'tableSelectMgr'
+				});
+			}
+		},
+		error : function(request, status, err){
+		}
+	}); 		
+}
+
+/**
+ * 充值时加载会员信息
+ */
+ts.member.loadMemberInfo4Charge = function(member){
+	member = member == null || typeof member == 'undefined' ? {} : member;
+	var memberType = member.memberType ? member.memberType : {};
+	
+	$('#rd_numPayMannerMoney').val('');
+	$('#rd_numRechargeMoney').val('');
+	
+	$('#rd_numBaseBalance').text(member.baseBalance?member.baseBalance:'----');
+	$('#rd_numTotalBalance').text(member.totalBalance?member.totalBalance:'----');
+	$('#rd_numTotalPoint').text(member.point?member.point:'----');
+	$('#rd_txtMemberName').text(member.name?member.name:'----');
+	$('#rd_txtMmeberType').text(memberType.name?memberType.name:'----');
+	$('#rd_txtMemberSex').text(member.sexText?member.sexText:'----');	
+	
+	$('#rd_numMemberMobileForRecharge').text(member.mobile?member.mobile:'----');
+	$('#rd_numMemberCardForRecharge').text(member.memberCard?member.memberCard:'----');	
+	$('#rd_numWeixinMemberCard').text(member.weixinCard?member.weixinCard:'----');
+	
+	if(!jQuery.isEmptyObject(member)){
+		//充值比率
+		ts.member.chargeRate = member.memberType.chargeRate;
+		$('#rd_numPayMannerMoney').focus();		
+	}
+
+}
+
+/**
+ * 充值操作
+ * @param _c
+ */
+ts.member.rechargeControlCenter = function(_c){
+	_c = _c == null || typeof _c == 'undefined' ? {} : _c;
+	
+	if(ts.member.rechargeMember == null || typeof ts.member.rechargeMember == 'undefined'){
+		Ext.example.msg('提示', '未读取会员信息, 请先刷卡.');
+		return;
+	}
+	
+	if(ts.member.rechargeMember.memberType.attributeValue != 0){
+		Ext.example.msg('提示', '优惠属性会员不允许充值, 请重新刷卡.');
+		return;
+	}
+	
+	var rechargeMoney = $('#rd_numRechargeMoney');
+	var rechargeType = $('#rd_comboRechargeType');
+	var payMannerMoney = $('#rd_numPayMannerMoney');
+//	var comment = $('#rd_txtRechargeComment');
+	
+	if(!rechargeMoney.val()){
+		Util.msg.alert({
+			topTip : true,
+			msg : '请输入充值金额'
+		});
+		return;
+	}
+	
+	if(!payMannerMoney.val()){
+		Util.msg.alert({
+			topTip : true,
+			msg : '请输入账户充额'
+		});
+		return;		
+	}
+	//设置cookie
+	if($('#chbSendCharge').attr('checked')){
+		setcookie(document.domain+'_chargeSms', true);
+	}else{
+		delcookie(document.domain+'_chargeSms');
+	}
+	
+	Util.LM.show();
+	
+	$.post('../OperateMember.do', {
+		dataSource : 'charge',
+		memberID : ts.member.rechargeMember.id,
+		rechargeMoney : rechargeMoney.val(),
+		rechargeType : rechargeType.val(),
+		payMannerMoney : payMannerMoney.val(),
+		isPrint : $('#chbPrintRecharge').attr('checked')?true:false,
+		sendSms : $('#chbSendCharge').attr('checked')?true:false	
+	}, function(jr){
+		Util.LM.hide();
+		if(jr.success){
+			ts.member.closeMemberChargeWin();
+			//更新短信
+			Util.sys.checkSmStat();
+			
+			Util.msg.alert({
+				topTip : true,
+				msg : jr.msg
+			});
+		}else{
+			Util.msg.alert({
+				renderTo : 'tableSelectMgr',
+				msg : jr.msg
+			});
+		}		
+	});
+}
 
 /**
  * 注销操作

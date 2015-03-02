@@ -43,7 +43,9 @@ String.prototype.trim = function(){
 };
 
 //工具包
-var Util = {};
+var Util = {
+	sys : {}
+};
 //FIXME 临时加的判断是否沽清页面, 数据重构后删除
 Util.sellOutCond = false;
 
@@ -876,6 +878,37 @@ Util.LM = {
 };
 
 /**
+ * 记录系统属性
+ */
+Util.sys.smsModule = false;
+Util.sys.smsCount = 0;
+Util.sys.checkSmStat = function(){
+	$.ajax({
+		url : '../QueryModule.do',
+		type : 'post',
+//		async:false,
+		data : {
+			dataSource : 'checkModule',
+			code : 4000
+		},
+		success : function(jr, status, xhr){
+			if(jr.success){
+				Util.sys.smsModule = true;
+				Util.sys.smsCount = jr.code;
+			}else{
+				Util.sys.smsModule = false;
+			}
+		},
+		error : function(request, status, err){
+			Util.msg.alert({
+				msg : request.msg,
+				topTip : true
+			})
+		}
+	}); 	
+};
+
+/**
  * cookies操作
  */
 function setcookie(name,value){  
@@ -897,7 +930,7 @@ function getcookie(name){
 function delcookie(name){  
     var exp = new Date();   
     exp.setTime(exp.getTime() - 1);  
-    var cval=getCookie(name);  
+    var cval=getcookie(name);  
     if(cval!=null) document.cookie= name + "="+cval+";expires="+exp.toGMTString();  
 }
 
@@ -939,4 +972,16 @@ Util.clone = function(myObj){
 	    myNewObj[i] = clone(myObj[i]);
 	  
 	  return myNewObj;
+}
+
+/**
+ * 只允许输入数字
+ */
+function intOnly(){
+	  var codeNum=event.keyCode;
+	  if(codeNum==8||codeNum==37||codeNum==39||(codeNum>=48&&codeNum<=57)){
+	    event.returnValue=codeNum;
+	  }else{
+	    event.returnValue=false;
+	  }
 }
