@@ -232,13 +232,12 @@ ts.searchTableCompareByName = function (obj1, obj2) {
 } 
 
 window.onload=function(){
-	
-YBZ_win_title = "手写板";//手写板名称
-YBZ_follow = false;//手写板吸附在输入框附近 false 右下角打开
-YBZ_skin = "black";
-//default||aero||chrome||opera||simple||idialog||twitter||blue||black||green
-YBZ_tipsopen = false;//是否在网页输入框中加入手写提示
-YBZ_fixed = true;//是否固定手写窗口	
+	YBZ_win_title = "手写板";//手写板名称
+	YBZ_follow = false;//手写板吸附在输入框附近 false 右下角打开
+	YBZ_skin = "black";
+	//default||aero||chrome||opera||simple||idialog||twitter||blue||black||green
+	YBZ_tipsopen = false;//是否在网页输入框中加入手写提示
+	YBZ_fixed = true;//是否固定手写窗口	
 	
 	
 	$('input[data-type=txt]').focus(function(){
@@ -382,6 +381,13 @@ YBZ_fixed = true;//是否固定手写窗口
         }
     });	
     
+	//积分消费读卡
+    $('#txtMember4PointConsume').on('keypress',function(event){
+        if(event.keyCode == "13")    
+        {
+        	ts.member.readMemberByCondtion4PointConsume();
+        }
+    });	    
 }
 
 
@@ -1696,6 +1702,7 @@ function yuda(){
  * 打开会员添加
  */
 ts.member.openMemberOperationWin = function(){
+	$('#frontPageMemberOperation').popup('close');
 	//充值金额
 	$('#cm_numFirstCharge').on('keyup', function(){
 		var chargeMoney = $('#cm_numFirstCharge').val();
@@ -1738,8 +1745,9 @@ ts.member.openMemberOperationWin = function(){
 				
 				$('#addMemberInfo').show();
 				$('#shadowForPopup').show();
-				
-				$('#cm_txtMemberName').focus();
+				setTimeout(function(){
+					$('#cm_txtMemberName').focus();
+				}, 250);
 			}else{
 				Util.msg.alert({
 					renderTo : 'tableSelectMgr',
@@ -1863,6 +1871,7 @@ ts.member.operateMemberHandler = function(){
  * 打开会员充值
  */
 ts.member.openMemberChargeWin = function(){
+	$('#frontPageMemberOperation').popup('close');
 	//充值金额
 	$('#rd_numPayMannerMoney').on('keyup', function(){
 		var chargeMoney = $('#rd_numPayMannerMoney').val();
@@ -1884,7 +1893,9 @@ ts.member.openMemberChargeWin = function(){
 	$('#memberChargeWin').show();
 	$('#shadowForPopup').show();
 	
-	$('#txtMemberCharge4Read').focus();
+	setTimeout(function(){
+		$('#txtMemberCharge4Read').focus();
+	}, 250);
 }
 
 /**
@@ -1897,7 +1908,7 @@ ts.member.closeMemberChargeWin = function(){
 	ts.member.loadMemberInfo4Charge();
 	$('#txtMemberCharge4Read').val('');
 	
-	$('#numberKeyboard').hide();
+	delete ts.member.rechargeMember;
 }
 
 /**
@@ -1911,8 +1922,6 @@ ts.member.readMemberByCondtion4Charge = function(stype){
 		memberInfo.focus();
 		return;
 	}
-	
-	$('#numberKeyboard').hide();
 	
 	if(stype){
 		$('#charge_searchMemberType').popup('close');
@@ -2060,6 +2069,159 @@ ts.member.rechargeControlCenter = function(_c){
 		}		
 	});
 }
+
+
+/**
+ * 打开 & 关闭会员积分消费
+ */
+ts.member.openMemberPointConsumeWin = function(){
+	$('#frontPageMemberOperation').popup('close');
+	
+	setTimeout(function(){
+		$('#memberPointConsume').show();
+		$('#shadowForPopup').show();
+		
+		$('#txtMember4PointConsume').focus();		
+	}, 250);
+	
+
+}
+ts.member.closeMemberPointConsumeWin = function(){
+	
+	$('#memberPointConsume').hide();
+	$('#shadowForPopup').hide();
+	
+	ts.member.loadMemberInfo4PointConsume();
+	
+	$('#txtMember4PointConsume').val('');
+}
+
+
+/**
+ * 积分消费读取会员
+ */
+ts.member.readMemberByCondtion4PointConsume = function(stype){
+	var memberInfo = $('#txtMember4PointConsume');
+	
+	if(!memberInfo.val()){
+		Util.msg.alert({msg:'请填写会员相关信息', topTip:true});
+		memberInfo.focus();
+		return;
+	}
+	
+	if(stype){
+		$('#pointConsume_searchMemberType').popup('close');
+	}else{
+		stype = '';
+	}
+	Util.LM.show();
+	$.ajax({
+		url : "../QueryMember.do",
+		type : 'post',
+		data : {
+			dataSource:'normal',
+			sType: stype,
+			forDetail : true,
+			memberCardOrMobileOrName:memberInfo.val()
+		},
+//		async : false,
+		dataType : 'json',
+		success : function(jr, status, xhr){
+			Util.LM.hide();
+			if(jr.success){
+				if(jr.root.length == 1){
+					Util.msg.alert({msg:'会员信息读取成功.', topTip:true});
+					ts.member.pointConsumeMember = jr.root[0];
+					ts.member.loadMemberInfo4PointConsume(jr.root[0]);
+				}else if(jr.root.length > 1){
+					$('#pointConsume_searchMemberType').popup('open');
+					$('#pointConsume_searchMemberType').css({top:$('#btnReadMember4PointConsume').position().top - 270, left:$('#btnReadMember4PointConsume').position().left-300});
+				}else{
+					Util.msg.alert({msg:'该会员信息不存在, 请重新输入条件后重试.', renderTo : 'tableSelectMgr', fn : function(){
+						memberInfo.focus();
+					}});
+				}
+			}else{
+				Util.msg.alert({
+					msg : jr.msg,
+					renderTo : 'tableSelectMgr'
+				});
+			}
+		},
+		error : function(request, status, err){
+		}
+	}); 		
+}
+
+
+/**
+ * 积分消费加载会员信息
+ */
+ts.member.loadMemberInfo4PointConsume = function(member){
+	member = member == null || typeof member == 'undefined' ? {} : member;
+	var memberType = member.memberType ? member.memberType : {};
+	
+	$('#numConsumePointForConsumePoint').val('');
+	
+	$('#numMemberPointForConsumePoint').text(member.point?member.point:'----');
+	$('#numMemberNameForConsumePoint').text(member.name?member.name:'----');
+	$('#numMemberTypeForConsumePoint').text(memberType.name?memberType.name:'----');
+	
+	if(!jQuery.isEmptyObject(member)){
+		$('#numConsumePointForConsumePoint').focus();		
+	}
+}
+
+/**
+ * 积分消费操作
+ */
+ts.member.memberPointConsumeAction = function(){
+	if(!ts.member.pointConsumeMember){
+		Util.msg.alert({msg : '请先输入手机号码或会员卡号读取会员信息.', topTip:true});
+		return;
+	}
+	
+	var point = $('#numConsumePointForConsumePoint');
+	if(!point.val()){
+		Util.msg.alert({msg : '请输入要消费的积分.', topTip:true});
+		point.focus();
+		return;
+	}else if(point.val() > ts.member.pointConsumeMember.point){
+		Util.msg.alert({msg:'请输入小于当前积分的消费积分的数值.', renderTo:'tableSelectMgr', fn:function(){
+			point.focus();
+		}});
+		return;
+	}
+	
+	$.post('../OperateMember.do', {
+		dataSource : 'consumePoint',
+		memberId : ts.member.pointConsumeMember.id,
+		point : point.val()		
+	}, function(jr){
+		if(jr.success){
+			Util.msg.alert({
+				title : '消费成功',
+				msg : '<font size=4>原有积分: ' + ts.member.pointConsumeMember['point'] + '</font>'
+					+'<br><font size=4 color="red">消费积分: ' + point.val()	 + '</font>'
+					+'<br><font size=4 color="green">当前积分: ' + (ts.member.pointConsumeMember['point'] - point.val()) + '</font>',
+				renderTo : 'tableSelectMgr'
+			});
+			
+/*			Util.msg.alert({
+				msg : '会员积分消费成功',
+				topTip : true
+			});*/
+			
+			ts.member.closeMemberPointConsumeWin();
+		}else{
+			Util.msg.alert({
+				msg : jr.msg,
+				renderTo : 'tableSelectMgr'
+			});
+		}		
+	});
+}
+
 
 /**
  * 注销操作

@@ -76,13 +76,20 @@ $(document).bind("click",function(e){
 			</div>
 		</div>	
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="ts.member.openMemberChargeWin()">会员充值</a>
-		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="ts.member.openMemberOperationWin()">添加会员</a>
+		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageMemberOperation">会员</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:2, businessStatic:2})">交款</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:0})">交班</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:1})">日结</a>
 		 </div>
 	</div>
+	
+	<div data-role="popup" id="frontPageMemberOperation" data-theme="d" class="payment_searchMemberType">
+		<ul id="charge_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+			<li  class="popupButtonList" onclick="ts.member.openMemberChargeWin()"><a >会员充值</a></li>
+			<li  class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
+			<li  class="popupButtonList" onclick="ts.member.openMemberOperationWin()"><a >添加会员</a></li>
+		</ul>
+	</div>	
 	
    <div id="tableAndRegionsCmp" class="ui-grid-a" style="height: 590px;background-color: rgb(135, 206, 235);">
    	<!-- 餐台数据 -->
@@ -157,7 +164,7 @@ $(document).bind("click",function(e){
 			</div>		    
 	    
 		</div>	
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
 				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.openTableAction()">开台</a>
 				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.createTableWithPeople()">点菜</a>
@@ -414,6 +421,54 @@ $(document).bind("click",function(e){
 		</ul>
 	</div>
 	
+	<!-- 积分消费 -->
+	<div id="memberPointConsume" class="ui-overlay-shadow ui-corner-all" style="width:340px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -150px;background-color: white;display: none;" align="center">	
+	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
+	        	会员积分消费
+	    </div> 
+	    <table>
+	    	<tr>
+		    	<td>
+		    		<input placeholder="手机号/卡号/微信卡号" style="font-size:20px;font-weight: bold;" id="txtMember4PointConsume">
+		    	</td>
+		    	<td width="30px">
+		    		<a data-role="button" id="btnReadMember4PointConsume" class="numberInputStyle" data-theme="b" onclick="ts.member.readMemberByCondtion4PointConsume()">读取会员</a>
+		    	</td>
+		    </tr>
+	    	<tr>
+	    		<td class="readMemberTd">会员名称:</td>
+	    		<td class="readMemberTdValue"><label id="numMemberNameForConsumePoint">----</label></td>
+	    	</tr>
+	    	<tr>
+	    		<td class="readMemberTd">会员类别:</td>
+	    		<td class="readMemberTdValue"><label id="numMemberTypeForConsumePoint">----</label></td>   		   		
+	    	</tr> 
+	    	<tr id="tr_memberFirstTimeCharge">
+	    		<td class="readMemberTd">当前积分:</td>
+	    		<td class="readMemberTdValue"><label id="numMemberPointForConsumePoint">----</label></td>   
+	    	</tr>	  
+	    	<tr id="tr_memberFirstTimeChargePrint">
+	    		<td class="readMemberTd">消费积分:</td>
+	    		<td class="readMemberTdValue"><input id="numConsumePointForConsumePoint" onkeypress="intOnly()"></td>   
+	    	</tr>	    	  
+	    </table>
+	    
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.member.memberPointConsumeAction()">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.member.closeMemberPointConsumeWin()">取消</a>		 
+			 </div>
+	    </div>	
+	</div>		
+
+	<div data-role="popup" id="pointConsume_searchMemberType" data-theme="d" class="payment_searchMemberType">
+		<ul id="pointConsume_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+			<li data-role="divider" data-theme="e" style="line-height: 30px;">选择号码来源:</li>
+			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4PointConsume(1)"><a >手机卡</a></li>
+			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4PointConsume(3)"><a >会员实体卡</a></li>
+			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4PointConsume(2)"><a >微信卡</a></li>
+		</ul>
+	</div>	
 	
 </div>
 
