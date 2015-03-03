@@ -22,11 +22,14 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.token.Token;
 
 public class AutoLoginAction extends Action{
+	
+	private final static String DEMO_ACCOUNT = "liyy";
+	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response)throws Exception {
 				
 		JObject jobject = new JObject();
 		try{
-			final Restaurant restaurant = RestaurantDao.getById(40);
+			final Restaurant restaurant = RestaurantDao.getByAccount(DEMO_ACCOUNT);
 			final Staff admin = StaffDao.getAdminByRestaurant(restaurant.getId());
 			List<Token> result = TokenDao.getByCond(new TokenDao.ExtraCond().addStatus(Token.Status.TOKEN));
 			int tokenId;
