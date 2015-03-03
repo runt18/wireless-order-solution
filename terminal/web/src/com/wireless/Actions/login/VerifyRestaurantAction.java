@@ -32,7 +32,7 @@ public class VerifyRestaurantAction extends Action {
 		try {
 			Restaurant r;
 			if(account == null || account.trim().isEmpty()){
-				r = RestaurantDao.getById(Integer.parseInt(request.getParameter("restaurantId")));
+				r = RestaurantDao.getById(Integer.parseInt(request.getParameter("restaurantID")));
 			}else{
 				r = RestaurantDao.getByAccount(account);
 			}

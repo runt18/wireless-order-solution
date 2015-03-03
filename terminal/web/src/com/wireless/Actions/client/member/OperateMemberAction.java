@@ -3,7 +3,6 @@ package com.wireless.Actions.client.member;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -58,6 +57,7 @@ public class OperateMemberAction extends DispatchAction{
 			String company = request.getParameter("company");
 			String addr = request.getParameter("addr");
 			String isPrint = request.getParameter("isPrint");
+			String sendSms = request.getParameter("sendSms");
 			String firstCharge = request.getParameter("firstCharge");
 			String firstActualCharge = request.getParameter("firstActualCharge");
 			String rechargeType = request.getParameter("rechargeType");
@@ -109,7 +109,17 @@ public class OperateMemberAction extends DispatchAction{
 						jobject.setMsg(jobject.getMsg() + "打印操作请求失败.");
 					}
 				}
-				for(Cookie cookie : request.getCookies()){
+				if(sendSms != null && Boolean.valueOf(sendSms)){
+					try{
+						//Send SMS.
+						SMS.send(staff, mo.getMemberMobile(), new Msg4Charge(mo));
+						jobject.setMsg(jobject.getMsg() + "充值短信发送成功.");
+					}catch(Exception e){
+						jobject.setMsg(jobject.getMsg() + "充值短信发送失败(" + e.getMessage() + ")");
+						e.printStackTrace();
+					}
+				}
+/*				for(Cookie cookie : request.getCookies()){
 				    if(cookie.getName().equals((request.getServerName() + "_chargeSms"))){
 				    	if(cookie.getValue().equals("true")){
 							try{
@@ -123,7 +133,7 @@ public class OperateMemberAction extends DispatchAction{
 				    	}
 					    break;
 				    }
-				}
+				}*/
 			}
 			
 		}catch(BusinessException e){
@@ -251,6 +261,7 @@ public class OperateMemberAction extends DispatchAction{
 			String rechargeType = request.getParameter("rechargeType");
 			String comment = request.getParameter("comment");
 			String isPrint = request.getParameter("isPrint");
+			String sendSms = request.getParameter("sendSms");
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -270,7 +281,7 @@ public class OperateMemberAction extends DispatchAction{
 					jobject.setMsg(jobject.getMsg() + "打印操作请求失败.");
 				}
 			}
-			for(Cookie cookie : request.getCookies()){
+/*			for(Cookie cookie : request.getCookies()){
 			    if(cookie.getName().equals((request.getServerName() + "_chargeSms"))){
 			    	if(cookie.getValue().equals("true")){
 						try{
@@ -284,8 +295,17 @@ public class OperateMemberAction extends DispatchAction{
 			    	}
 				    break;
 			    }
-			}
-
+			}*/
+			if(sendSms != null && Boolean.valueOf(sendSms)){
+				try{
+					//Send SMS.
+					SMS.send(staff, mo.getMemberMobile(), new Msg4Charge(mo));
+					jobject.setMsg(jobject.getMsg() + "充值短信发送成功.");
+				}catch(Exception e){
+					jobject.setMsg(jobject.getMsg() + "充值短信发送失败(" + e.getMessage() + ")");
+					e.printStackTrace();
+				}
+			}			
 			
 		}catch(BusinessException e){	
 			e.printStackTrace();
