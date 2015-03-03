@@ -1163,6 +1163,7 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 						}
 						rechargeControlCenter({
 							reload : true,
+							sendSms : sendSms,
 							isPrint : Ext.getCmp('ts_chbPrintRecharge').getValue(),
 							callback : function(_c){
 								table_memberRechargeWin.hide();

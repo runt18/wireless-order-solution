@@ -502,7 +502,7 @@ function fnMixedPay(){
 					var mixedPayMoney = Ext.get('shouldPay').dom.innerHTML;
  	    			for(var pay in payMoneyCalc){
  	    				if(typeof payMoneyCalc[pay] != 'boolean'){
- 	    					mixedPayMoney -= payMoneyCalc[pay];
+ 	    					mixedPayMoney = (mixedPayMoney * 10000 - payMoneyCalc[pay] * 10000)/10000; 
  	    				}
  	    			}					
 					
@@ -531,7 +531,7 @@ function fnMixedPay(){
 					var mixedPayMoney = Ext.get('shouldPay').dom.innerHTML;
  	    			for(var pay in payMoneyCalc){
  	    				if(typeof payMoneyCalc[pay] != 'boolean'){
- 	    					mixedPayMoney -= payMoneyCalc[pay];
+ 	    					mixedPayMoney = (mixedPayMoney * 10000 - payMoneyCalc[pay] * 10000)/10000; 
  	    				}
  	    			}					
 					

@@ -392,7 +392,8 @@ function rechargeControlCenter(_c){
 			rechargeType : rechargeType.getValue(),
 			payMannerMoney : payMannerMoney.getValue(),
 			comment : comment.getValue(),
-			isPrint : typeof _c.isPrint == 'boolean' ? _c.isPrint : true
+			isPrint : typeof _c.isPrint == 'boolean' ? _c.isPrint : true,
+			sendSms : typeof _c.sendSms == 'boolean' ? _c.sendSms : true,
 		},
 		success : function(res, opt){
 			mask.hide();

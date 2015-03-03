@@ -210,6 +210,7 @@ function initRechargeWin(){
 					// 跨域调用充值方法
 					rechargeControlCenter({
 						isPrint : Ext.getCmp('chbPrintRecharge').getValue(),
+						sendSms : sendSms,
 						callback : function(_c){
 							rechargeWin.hide();
 						}

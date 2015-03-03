@@ -786,24 +786,25 @@ Ext.onReady(function(){
 				xtype:'tbtext',
 				text:'&nbsp;'
 			},
-			//FIXME 
-//			btnPaymentSub, 
-//			{
-//				xtype:'tbtext',
-//				text:'&nbsp;&nbsp;&nbsp;'
-//			},			
+			//FIXME 暂时保留
+/*			btnPaymentSub, 
+			{
+				xtype:'tbtext',
+				text:'&nbsp;&nbsp;&nbsp;'
+			},	*/		
 			btnDutyRangeSub, 
 			{
 				xtype:'tbtext',
 				text:'&nbsp;&nbsp;&nbsp;'
 			},
-			btnSalesSub,
+			btnSalesSub
+/*			,
 			'->', 
 			pushBackBut, 
 			{
 				xtype:'tbtext',
 				text:'&nbsp;&nbsp;&nbsp;'
-			}
+			}*/
 			]
 		})
 	});
