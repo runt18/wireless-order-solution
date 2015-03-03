@@ -249,7 +249,11 @@ public class TokenDao {
 		failedToken.setRestaurant(restaurant);
 		failedToken.decrypt(builder.getFailedEncryptedToken());
 		
-		deleteById(dbCon, failedToken.getId());
+		try{
+			deleteById(dbCon, failedToken.getId());
+		}catch(BusinessException ignored){
+			//Skip the delete missing.
+		}
 		
 		//Insert the new encrypted token.
 		return generate(dbCon, builder.getTokenBuilder());
@@ -416,8 +420,9 @@ public class TokenDao {
 		sql = " SELECT * FROM " + Params.dbName + ".token" +
 			  " WHERE 1 = 1 " +
 			  (extraCond != null ? extraCond.toString() : "");
+		
+		final List<Token> result = new ArrayList<Token>();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		List<Token> result = new ArrayList<Token>();
 		while(dbCon.rs.next()){
 			Token token = new Token(dbCon.rs.getInt("token_id"));
 			token.setRestaurant(new Restaurant(dbCon.rs.getInt("restaurant_id")));

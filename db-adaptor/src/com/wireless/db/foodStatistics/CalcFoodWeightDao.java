@@ -53,7 +53,10 @@ public class CalcFoodWeightDao {
 			  " WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 		
-		sql = " SELECT COUNT(*) " + " FROM " + Params.dbName + ".order_history " + " WHERE " + " restaurant_id = " + restaurantId;
+		final String rangeCond = " AND OH.order_date BETWEEN DATE_SUB(NOW(), INTERVAL 90 DAY) AND NOW() ";
+		
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_history OH WHERE 1 = 1 " + 
+			  " AND OH.restaurant_id = " + restaurantId + rangeCond;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			totalOrderAmount = dbCon.rs.getInt(1);
@@ -65,7 +68,9 @@ public class CalcFoodWeightDao {
 			dbCon.stmt.execute(sql);
 			
 			//Calculate the total order food amount to this restaurant.
-			sql = " SELECT SUM(order_count) FROM " + Params.dbName + ".order_food_history WHERE restaurant_id = " + restaurantId;
+			sql = " SELECT SUM(order_count) FROM " + Params.dbName + ".order_food_history OFH " +
+				  " JOIN " + Params.dbName + ".order_history OH ON OH.id = OFH.order_id " + rangeCond +
+				  " WHERE OH.restaurant_id = " + restaurantId;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			int totalOrderFoodAmount = 0;
 			if(dbCon.rs.next()){
@@ -86,6 +91,7 @@ public class CalcFoodWeightDao {
 					  " SELECT " +
 					  " OFH.order_id, OFH.food_id, SUM(OFH.order_count) AS order_food_amount " + 
 					  " FROM " + Params.dbName + ".order_food_history OFH " +
+					  " JOIN " + Params.dbName + ".order_history OH ON OFH.order_id = OH.id " + rangeCond +
 					  " JOIN " + Params.dbName + ".food F ON OFH.food_id = F.food_id " +
 					  " WHERE 1 = 1 " + 
 					  " AND F.restaurant_id = " + restaurantId +

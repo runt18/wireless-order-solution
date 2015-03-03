@@ -44,9 +44,9 @@ public class CalcOrderCntDao {
 		sql = " SELECT " +
 			  " OFH.food_id, SUM(order_count) AS order_cnt " +
 			  " FROM " + Params.dbName + ".order_food_history OFH " +
+			  " JOIN " + Params.dbName + ".order_history OH ON OFH.order_id = OH.id AND OH.order_date BETWEEN DATE_SUB(NOW(), INTERVAL 90 DAY) AND NOW()" +
 			  " JOIN " + Params.dbName + ".food F ON OFH.food_id = F.food_id " +
 			  " WHERE OFH.food_id IS NOT NULL " +
-			  //" AND OFH.order_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 90 DAY) AND CURDATE() " +
 			  " GROUP BY OFH.food_id " +
 			  " HAVING order_cnt > 0 ";
 		

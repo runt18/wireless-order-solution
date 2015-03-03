@@ -1,7 +1,8 @@
 package com.wireless.db.foodAssociation;
 
 import java.sql.SQLException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -12,6 +13,8 @@ public class CalcFoodAssociationDao {
 	
 	//private static final int MAX_FOOD_AMOUNT_PER_CONNECTION = 3000;
 
+	private final static String rangeCond = " AND OH.order_date BETWEEN DATE_SUB(NOW(), INTERVAL 90 DAY) AND NOW() ";
+	
 	public final static class Result{
 		private final int elapsed;
 		Result(int elapsed){
@@ -45,30 +48,47 @@ public class CalcFoodAssociationDao {
 		sql = " DELETE FROM " + Params.dbName + ".food_association";
 		dbCon.stmt.executeUpdate(sql);
 		
-		List<Food> foods = FoodDao.getPureByCond(dbCon, null, null);		
-		
-		for(Food f : foods){
-			exec(dbCon, f);
+		Map<Integer, Integer> orderAmounts = new HashMap<Integer, Integer>();
+		for(Food f : FoodDao.getPureByCond(dbCon, null, null)){
+			//Get the total order amount to this restaurant.
+			Integer amount = orderAmounts.get(f.getRestaurantId());
+			if(amount != null){
+				exec(dbCon, f, amount.intValue());
+			}else{
+				sql = " SELECT COUNT(*) FROM wireless_order_db.order_history OH WHERE OH.restaurant_id = " + f.getRestaurantId() + rangeCond + "; ";
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				int orderAmount = 0;
+				if(dbCon.rs.next()){
+					orderAmount = dbCon.rs.getInt(1);
+					orderAmounts.put(f.getRestaurantId(), orderAmount);
+				}
+				dbCon.rs.close();
+				
+				exec(dbCon, f, orderAmount);
+			}
 		}
 		
 		return new Result((int)(System.currentTimeMillis() - beginTime) / 1000);
 	}
 	
-	private static void exec(DBCon dbCon, Food food) throws SQLException{
+	private static void exec(DBCon dbCon, Food food, int orderAmount) throws SQLException{
 		
 		String sql;
 		
 		//Get the id to orders contained the food
-		sql = " SELECT order_id FROM " + Params.dbName + ".order_food_history " +
-			  " WHERE " + " food_id = " + food.getFoodId() + " GROUP BY order_id ";
+		sql = " SELECT OH.id FROM " + Params.dbName + ".order_history OH " +
+			  " JOIN " + Params.dbName + ".order_food_history OFH ON OFH.order_id = OH.id " + 
+			  " WHERE 1 = 1 " +
+			  " AND OFH.food_id = " + food.getFoodId() + 
+			  rangeCond ;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		StringBuilder orderIdCond = new StringBuilder();
 		while(dbCon.rs.next()){
 			if(orderIdCond.length() != 0){
-				orderIdCond.append(",").append(dbCon.rs.getInt("order_id"));
+				orderIdCond.append(",").append(dbCon.rs.getInt("id"));
 			}else{
-				orderIdCond.append(dbCon.rs.getInt("order_id"));
+				orderIdCond.append(dbCon.rs.getInt("id"));
 			}
 		}
 		dbCon.rs.close();
@@ -114,7 +134,7 @@ public class CalcFoodAssociationDao {
 			dbCon.stmt.execute(sql);
 			
 			//Get the total order amount to this restaurant.
-			sql = " SELECT @total_order_amount := COUNT(*) FROM wireless_order_db.order_history WHERE restaurant_id IN (" + food.getRestaurantId() + "); ";
+			sql = " SET @food_id_to_calc = " + orderAmount + ";";
 			dbCon.stmt.execute(sql);
 			
 			//Get the probability to food.

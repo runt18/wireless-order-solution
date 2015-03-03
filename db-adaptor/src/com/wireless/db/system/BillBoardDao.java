@@ -1,176 +1,328 @@
 package com.wireless.db.system;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.Params;
+import com.wireless.exception.BillBoardError;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.system.BillBoard;
+import com.wireless.pojo.system.BillBoard.Status;
 import com.wireless.pojo.util.DateUtil;
 
 public class BillBoardDao {
 	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param extra
-	 * @return
-	 * @throws SQLException
-	 */
-	public static int getCount(DBCon dbCon, String extra) throws SQLException{
-		int count = 0;
-		String querySQL = "SELECT COUNT(*) "
-				+ " FROM billboard BB LEFT JOIN restaurant R ON BB.restaurant_id = R.id "
-				+ " WHERE 1=1 ";
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		if(dbCon.rs != null && dbCon.rs.next())
-			count = dbCon.rs.getInt(1);
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param extra
-	 * @return
-	 * @throws SQLException
-	 */
-	public static List<BillBoard> get(DBCon dbCon, String extra) throws SQLException{
-		List<BillBoard> list = new ArrayList<BillBoard>();
-		BillBoard item = null;
-		String querySQL = "SELECT BB.billboard_id, BB.restaurant_id, BB.title, BB.desc, BB.created, BB.expired, BB.type "
-				+ " FROM billboard BB LEFT JOIN restaurant R ON BB.restaurant_id = R.id "
-				+ " WHERE 1=1 ";
-		querySQL += (extra != null && !extra.trim().isEmpty() ? extra : "");
-		Statement stmt = dbCon.conn.createStatement();
-		ResultSet res = stmt.executeQuery(querySQL);
-		while(res != null && res.next()){
-			item = new BillBoard();
-			item.setId(res.getInt("billboard_id"));
-			item.setTitle(res.getString("title"));
-			item.setDesc(res.getString("desc"));
-			item.setCreated(res.getTimestamp("created").getTime());
-			item.setExpired(res.getTimestamp("expired").getTime());
-			item.setType(res.getInt("type"));
-			if(item.getType() == BillBoard.Type.RESTAURANT){
-				try {
-					item.setRestaurant(RestaurantDao.getById(dbCon, res.getInt("restaurant_id")));
-				} catch (BusinessException e) {
-//					e.printStackTrace();
-				}
-			}
-			
-			list.add(item);
+	public static class ExtraCond{
+		private int id;
+		private int restaurantId;
+		private Status status;
+		
+		public ExtraCond setId(int id){
+			this.id = id;
+			return this;
 		}
 		
-		res.close();
-		res = null;
-		stmt.close();
-		stmt = null;
-		item = null;
-		return list;
-	}
-	public static List<BillBoard> get(String extra) throws SQLException{
-		DBCon dbCon = null;
-		try{
-			dbCon = new DBCon();
-			dbCon.connect();
-			return get(dbCon, extra);
-		}finally{
-			if(dbCon != null) dbCon.disconnect();
+		public ExtraCond setRestaurant(int restaurantId){
+			this.restaurantId = restaurantId;
+			return this;
 		}
-	}
-	/**
-	 * 
-	 * @param dbCon
-	 * @param insert
-	 * @return
-	 * @throws SQLException
-	 */
-	public static BillBoard insert(DBCon dbCon, BillBoard.InsertBuilder insert) throws SQLException{
-		BillBoard bb = insert.build();
-		String insertSQl = "INSERT INTO billboard (title, `desc`, created, expired, type, restaurant_id) "
-				+ "VALUES("
-				+ "'" + bb.getTitle() + "',"
-				+ "'" + bb.getDesc() + "',"
-				+ "NOW(),"
-				+ "'" + DateUtil.format(bb.getExpired()) + "',"
-				+ bb.getType().getVal() + ","
-				+ (bb.getRestaurant() != null && bb.getRestaurant().getId() > 0 ? bb.getRestaurant().getId() : "null")
-				+ ")";
-		dbCon.stmt.executeUpdate(insertSQl, Statement.RETURN_GENERATED_KEYS);
-		dbCon.rs = dbCon.stmt.getGeneratedKeys();
-		if(dbCon.rs.next()) bb.setId(dbCon.rs.getInt(1));
-		return bb;
-	}
-	public static BillBoard insert(BillBoard.InsertBuilder insert) throws SQLException{
-		DBCon dbCon = null;
-		try{
-			dbCon = new DBCon();
-			dbCon.connect();
-			return insert(dbCon, insert);
-		}finally{
-			if(dbCon != null) dbCon.disconnect();
+		
+		public ExtraCond setRestaurant(Restaurant restaurant){
+			this.restaurantId = restaurant.getId();
+			return this;
 		}
+		
+		public ExtraCond setStatus(Status status){
+			this.status = status;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(id != 0){
+				extraCond.append(" AND billboard_id = " + id);
+			}
+			if(restaurantId != 0){
+				extraCond.append(" AND restaurant_id = " + restaurantId);
+			}
+			if(status != null){
+				extraCond.append(" AND status = " + status.getVal());
+			}
+			return extraCond.toString();
+		}
+		
 	}
+	
 	/**
-	 * 
-	 * @param dbCon
-	 * @param update
-	 * @return
+	 * Insert a new bill board to specific builder {@link BillBoard.InsertBuilder}.
+	 * @param builder
+	 * 			the insert builder {@link BillBoard.InsertBuilder}
+	 * @return the id to bill board just inserted
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static BillBoard update(DBCon dbCon, BillBoard.UpdateBuilder update) throws SQLException{
-		BillBoard bb = update.build();
-		String insertSQl = "UPDATE billboard SET "
-				+ " title='" + bb.getTitle() + "',"
-				+ " `desc`='" + bb.getDesc() + "',"
-				+ " expired='" + DateUtil.format(bb.getExpired()) + "',"
-				+ " type=" + bb.getType().getVal() + ","
-				+ " restaurant_id=" + (bb.getRestaurant() != null && bb.getRestaurant().getId() > 0 ? bb.getRestaurant().getId() : "null")
-				+ " WHERE billboard_id = " + bb.getId();
-		dbCon.stmt.executeUpdate(insertSQl, Statement.RETURN_GENERATED_KEYS);
-		dbCon.rs = dbCon.stmt.getGeneratedKeys();
-		if(dbCon.rs.next()) bb.setId(dbCon.rs.getInt(1));
-		return bb;
-	}
-	public static BillBoard update(BillBoard.UpdateBuilder update) throws SQLException{
-		DBCon dbCon = null;
+	public static int insert(BillBoard.InsertBuilder builder) throws SQLException{
+		DBCon dbCon = new DBCon();
 		try{
-			dbCon = new DBCon();
 			dbCon.connect();
-			return update(dbCon, update);
+			return insert(dbCon, builder);
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
+			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * 
+	 * Insert a new bill board to specific builder {@link BillBoard.InsertBuilder}.
 	 * @param dbCon
+	 * 			the database connection
+	 * @param builder
+	 * 			the insert builder {@link BillBoard.InsertBuilder}
+	 * @return the id to bill board just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int insert(DBCon dbCon, BillBoard.InsertBuilder builder) throws SQLException{
+		BillBoard billBoard = builder.build();
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".billboard " +
+			  "( title, body, created, expired, type, status, restaurant_id ) VALUES ( " +
+			  "'" + billBoard.getTitle() + "'," +
+			  "'" + billBoard.getBody() + "'," +
+			  "'" + DateUtil.format(billBoard.getCreated(), DateUtil.Pattern.DATE) + "'," +
+			  "'" + DateUtil.format(billBoard.getExpired(), DateUtil.Pattern.DATE) + "'," +
+			  billBoard.getType().getVal() + "," +
+			  billBoard.getStatus().getVal() + "," +
+			  (billBoard.getType() == BillBoard.Type.RESTAURANT ? billBoard.getRestaurantId() : " NULL ") +
+			  ")";
+		
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		int id = 0;
+		if(dbCon.rs.next()){
+			id = dbCon.rs.getInt(1);
+		}else{
+			throw new SQLException("The id of bill board is not generated successfully.");
+		}
+		dbCon.rs.close();
+		
+		return id;
+	}
+	
+	/**
+	 * Get the bill board to specific id.
 	 * @param id
+	 * 			the bill board id
+	 * @return the bill board to this id
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
+	 * 			throws if the bill board to this id does NOT exist
 	 */
-	public static void delete(DBCon dbCon, int id) throws SQLException, BusinessException{
-		String deleteSQL = "DELETE FROM billboard WHERE billboard_id = " + id;
-		if(dbCon.stmt.executeUpdate(deleteSQL) == 0){
-			throw new BusinessException("操作失败, 该记录不存在或已删除.");
-		}
-	}
-	public static void delete(int id) throws SQLException, BusinessException{
-		DBCon dbCon = null;
+	public static BillBoard getById(int id) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
 		try{
-			dbCon = new DBCon();
 			dbCon.connect();
-			delete(dbCon, id);
+			return getById(dbCon, id);
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
+			dbCon.disconnect();
 		}
 	}
 	
+	/**
+	 * Get the bill board to specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @return the bill board to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the bill board to this id does NOT exist
+	 */
+	public static BillBoard getById(DBCon dbCon, int id) throws SQLException, BusinessException{
+		List<BillBoard> result = getByCond(dbCon, new ExtraCond().setId(id));
+		if(result.isEmpty()){
+			throw new BusinessException(BillBoardError.BILL_BOARD_NOT_EXIST);
+		}else{
+			return result.get(0);
+		}
+	}
+	
+	public static List<BillBoard> getByCond(DBCon dbCon, ExtraCond extraCond) throws SQLException{
+		String sql;
+		sql = " SELECT * FROM " + Params.dbName + ".billboard WHERE 1 = 1 " + (extraCond != null ? extraCond.toString() : "");
+		final List<BillBoard> result = new ArrayList<BillBoard>();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			BillBoard item = new BillBoard(dbCon.rs.getInt("billboard_id"));
+			item.setTitle(dbCon.rs.getString("title"));
+			item.setBody(dbCon.rs.getString("body"));
+			item.setCreated(dbCon.rs.getTimestamp("created").getTime());
+			item.setExpired(dbCon.rs.getTimestamp("expired").getTime());
+			item.setType(BillBoard.Type.valueOf(dbCon.rs.getInt("type")));
+			item.setStatus(BillBoard.Status.valueOf(dbCon.rs.getInt("status")));
+			item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			result.add(item);
+		}
+		dbCon.rs.close();
+		return result;
+	}
+
+	/**
+	 * Update the bill board to update builder {@link BillBoard.UpdateBuilder}.
+	 * @param builder
+	 * 			the update builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the bill board to update does NOT exist
+	 */
+	public static void update(BillBoard.UpdateBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			update(dbCon, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update the bill board to update builder {@link BillBoard.UpdateBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param builder
+	 * 			the update builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the bill board to update does NOT exist
+	 */
+	public static void update(DBCon dbCon, BillBoard.UpdateBuilder builder) throws SQLException, BusinessException{
+		BillBoard billBoard = builder.build();
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".billboard SET " +
+			  " billboard_id = " + billBoard.getId() +
+			  (builder.isTitleChanged() ? " ,title = '" + billBoard.getTitle() + "'" : "") +
+			  (builder.isBodyChanged() ? " ,body = '" + billBoard.getBody() + "'" : "") +
+			  (builder.isExpiredChanged() ? " ,expired = '" + DateUtil.format(billBoard.getExpired()) + "'" : "") +
+			  " WHERE billboard_id = " + billBoard.getId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(BillBoardError.BILL_BOARD_NOT_EXIST);
+		}
+	}
+	
+	/**
+	 * Delete the bill board to specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param id
+	 * 			the bill board id to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the bill board to delete does NOT exist.
+	 */
+	public static void deleteById(int id) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			deleteById(dbCon, id);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Delete the bill board to specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param id
+	 * 			the bill board id to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the bill board to delete does NOT exist.
+	 */
+	public static void deleteById(DBCon dbCon, int id) throws SQLException, BusinessException{
+		if(deleteByCond(dbCon, new ExtraCond().setId(id)) == 0){
+			throw new BusinessException(BillBoardError.BILL_BOARD_NOT_EXIST);
+		}
+	}
+	
+	/**
+	 * Delete the bill board to specific extra condition {@link ExtraCond}.
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @return the amount to bill board to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int deleteByCond(ExtraCond extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return deleteByCond(dbCon, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Delete the bill board to specific extra condition {@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @return the amount to bill board to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int deleteByCond(DBCon dbCon, ExtraCond extraCond) throws SQLException{
+		int amount = 0;
+		for(BillBoard billBoard : getByCond(dbCon, extraCond)){
+			String sql = " DELETE FROM " + Params.dbName + ".billboard WHERE billboard_id = " + billBoard.getId();
+			if(dbCon.stmt.executeUpdate(sql) != 0){
+				amount++;
+			}
+		}
+		return amount;
+	}
+
+	public static class Result{
+		public final int amount;
+		private final int elapsed;
+		Result(int amount, int elapsed){
+			this.amount = amount;
+			this.elapsed = elapsed;
+		}
+		@Override
+		public String toString(){
+			return "remove " + amount + " expired bill board(s) takes " + elapsed + " sec.";
+		}
+	}
+	
+	public static Result cleanup() throws SQLException{
+		long beginTime = System.currentTimeMillis();
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			int amount = 0;
+			for(BillBoard billBoard : getByCond(dbCon, null)){
+				if(billBoard.isExpired()){
+					String sql = " DELETE FROM " + Params.dbName + ".billboard WHERE billboard_id = " + billBoard.getId();
+					if(dbCon.stmt.executeUpdate(sql) != 0){
+						amount++;
+					}
+				}
+			}
+			return new Result(amount, (int)(System.currentTimeMillis() - beginTime) / 1000);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 }

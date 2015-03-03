@@ -147,16 +147,14 @@ public class TasteRefDao {
 				" SELECT " + 
 				" OFH.order_id, OFH.food_id, NTGH.taste_id, MAX(OFH.restaurant_id) AS restaurant_id " +
 				" FROM " + Params.dbName + ".normal_taste_group_history NTGH " +
-				" JOIN " + Params.dbName + ".taste_group_history TGH " +
-				" ON NTGH.normal_taste_group_id = TGH.normal_taste_group_id " + " AND NTGH.normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
-				" JOIN " + Params.dbName + ".order_food_history OFH " +
-				" ON TGH.taste_group_id = OFH.taste_group_id " + " AND OFH.is_temporary = 0 " + " AND TGH.taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
-				" JOIN " + Params.dbName + ".food F " +
-				" ON F.food_id = OFH.food_id " +
-				" GROUP BY " + " OFH.order_id, OFH.food_id, NTGH.taste_id " +
-				" HAVING " + " SUM(OFH.order_count) > 0 " +
+				" JOIN " + Params.dbName + ".taste_group_history TGH ON NTGH.normal_taste_group_id = TGH.normal_taste_group_id " + " AND NTGH.normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
+				" JOIN " + Params.dbName + ".order_food_history OFH ON TGH.taste_group_id = OFH.taste_group_id " + " AND OFH.is_temporary = 0 " + " AND TGH.taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
+				" JOIN " + Params.dbName + ".order_history OH ON OFH.order_id = OH.id AND OH.order_date BETWEEN DATE_SUB(NOW(), INTERVAL 90 DAY) AND NOW() " +
+				" JOIN " + Params.dbName + ".food F ON F.food_id = OFH.food_id " +
+				" GROUP BY OFH.order_id, OFH.food_id, NTGH.taste_id " +
+				" HAVING SUM(OFH.order_count) > 0 " +
 				" ) AS A " +
-				" GROUP BY " + " A.food_id, A.taste_id ";
+				" GROUP BY A.food_id, A.taste_id ";
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Delete all the kitchen taste before updating.
