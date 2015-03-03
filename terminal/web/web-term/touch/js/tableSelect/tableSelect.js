@@ -1,5 +1,5 @@
 var Request = new Util_urlParaQuery();
-var systemStatus = Request["status"];
+var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 
 //全部餐桌
 var tables = [];
@@ -95,19 +95,18 @@ var trPayIncomeModel = '<tr>'
 
 $(function(){
 	//pos端
-	if(parseInt(systemStatus) == 1){
+	if(systemStatus == 1){
 		//日结,交班等
 		$('#divPosOperation').show();
 		//已点菜结账按钮
 		$('#btnPayBill').show();
 		//当系统是收银端时
-		tableListHeight = 124;
+		tableListHeight = 130;
 	}else{
 		//触摸屏
 		tableListHeight = 86;
 	}
 
-	tableListHeight = 124;
 	//餐厅选择界面高度
 	$('#tableAndRegionsCmp').height(document.body.clientHeight - tableListHeight);	
 	//点菜界面高度
@@ -194,7 +193,7 @@ $(function(){
 					topTip : true
 				});
 				setTimeout(function(){
-					location.href = 'index.htm';
+					location.href = 'verifyLogin.html?status='+systemStatus;
 				}, 2000);
 			}
 		},
@@ -205,8 +204,8 @@ $(function(){
 				topTip : true
 			});
 			setTimeout(function(){
-				location.href = 'index.htm';
-			}, 2000);
+				location.href = 'verifyLogin.html?status='+systemStatus;
+			}, 1000);
 		}
 	});
 	
@@ -358,8 +357,8 @@ window.onload=function(){
 				}else{
 					ts.submitForSelectTableOrTransFood();
 				}
-	    	}else if(event.which == "13"){//回车
-	    		if(ts.commitTableOrTran == 'lookup'){
+	    	}else if(event.which == "13"){//回车 && pos端使用
+	    		if(ts.commitTableOrTran == 'lookup' && systemStatus == 1){
 	    			ts.toPaymentMgr();
 	    		}
 	    		
@@ -854,15 +853,17 @@ ts.createOrderForLookup = function (){
 	ts.commitTableOrTran = 'lookup';
 	//隐藏数量输入
 	$('#td4TxtFoodNumForTran').hide();
-	//pos端增加结账按钮
-	if(parseInt(systemStatus) == 1){
-		$('#ts_toPaymentMgr').show();
-	}
 	
 	$('#certain4searchTableCmps').buttonMarkup('refresh');
 	$('#certain4searchTableCmps .ui-btn-text').html('点菜(+)');
-	//设置为3个按钮并排
-	$('#searchTableCmpsFoot a').addClass('tablePopbottomBtn');
+	
+	//pos端增加结账按钮
+	if(systemStatus == 1){
+		$('#ts_toPaymentMgr').show();
+		//设置为3个按钮并排
+		$('#searchTableCmpsFoot a').addClass('tablePopbottomBtn');
+	}
+
 	
 	$("#txtTableNumForTS").val("");
 	
@@ -1841,6 +1842,8 @@ ts.member.operateMemberHandler = function(){
 		return;
 	}	
 	
+	Util.LM.show();
+	
 	if($('#chbSendFirstCharge').attr('checked')){
 		setcookie(document.domain+'_chargeSms', true);
 	}else{
@@ -1863,6 +1866,9 @@ ts.member.operateMemberHandler = function(){
 	}, function(jr){
 		if(jr.success){
 			ts.member.closeAddMemberWin();
+			
+			Util.LM.show();
+			
 			//更新短信
 			Util.sys.checkSmStat();
 			
@@ -2255,7 +2261,7 @@ function loginOut(){
 	$.ajax({
 		url : '../LoginOut.do',
 		success : function(data, status, xhr){
-			location.href = "index.htm";
+			location.href = 'verifyLogin.html?status='+systemStatus;
 		}
 	});	
 	

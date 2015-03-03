@@ -1,10 +1,10 @@
 
 var Request = new Util_urlParaQuery();
-var systemStatus = Request["status"];
+var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 
 //刷新时去除#
 if(location.href.indexOf('#') > 0){
-	location.href = systemStatus?'index.htm?status='+systemStatus : 'index.htm';
+	location.href = 'verifyLogin.html?status='+systemStatus;
 }
 
 var lg = {
@@ -69,12 +69,12 @@ $(function(){
 					$('#txtRestaurantName').text(lg.restaurant.name);
 					
 					//验证员工是否登陆状态
-					$.ajax({
+/*					$.ajax({
 						url : '../VerifyLogin.do',
 						success : function(data, status, xhr){
 							Util.LM.hide();
 							if(data.success){
-								location.href = 'tableSelect.html';	
+								location.href = 'tableSelect.html?status='+systemStatus;	
 							}else{	
 								initStaffContent();
 							}
@@ -83,7 +83,8 @@ $(function(){
 							Util.Lm.hide();
 							initStaffContent();
 						}
-					});
+					});*/
+					initStaffContent();
 				}else{	
 					Util.msg.alert({
 						msg : data.msg?data.msg:"",
@@ -113,7 +114,7 @@ $(function(){
 /**
  * 登陆
  */
-function staffLoginHandler(){
+function staffLoginHandler(c){
 	var pwd=$('#loginPassword');
 	if(!lg.staff){
 		Util.msg.alert({
@@ -148,7 +149,11 @@ function staffLoginHandler(){
 			Util.LM.hide();
 			if(data.success){
 				setcookie("digie_token", data.other.token);
-				location.href = 'tableSelect.html?status=1';	
+				if(c && c.part == 'basic'){
+					location.href = '../pages/Mgr/DigieBasic.html';
+				}else{
+					location.href = 'tableSelect.html?status='+systemStatus;	
+				}
 			}else{
 				Util.msg.alert({
 					msg : data.msg,

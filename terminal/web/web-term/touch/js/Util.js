@@ -913,10 +913,9 @@ function Util_urlParaQuery() {
 	var name, value, i, key = 0;
 	var str = location.href;
 	
-	if(str.indexOf("#")){
+	if(str.indexOf("#") > 0){
 		str = str.substring(0,str.indexOf("#"));
 	}
-	
 	var num = str.indexOf("?");
 	if(num > 0){
 		str = str.substr(num + 1);
