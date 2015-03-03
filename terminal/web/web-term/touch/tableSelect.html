@@ -66,7 +66,7 @@ $(document).bind("click",function(e){
 
 <!-- 餐台选择 -->
 <div data-role="page" id="tableSelectMgr" data-theme="d">
-	<div data-role="header" data-position="fixed" data-theme="b" style="height: 44px;text-align: center;">
+	<div id="divPosOperation" data-role="header" data-position="fixed" data-theme="b" style="height: 44px;text-align: center;">
 		<div data-role="controlgroup" class="ui-btn-left " data-type="horizontal" style="margin-top: 2px;">
 			<div style="float: left;">
 				<img src="images/logo.png" height="40px">
@@ -77,6 +77,7 @@ $(document).bind("click",function(e){
 		</div>	
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageMemberOperation">会员</a>
+		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="toOrderMgrPage()">账单</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:2, businessStatic:2})">交款</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:0})">交班</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:1})">日结</a>

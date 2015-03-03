@@ -1,3 +1,6 @@
+var Request = new Util_urlParaQuery();
+var systemStatus = Request["status"];
+
 //全部餐桌
 var tables = [];
 //设置就餐餐桌数组
@@ -108,6 +111,11 @@ $(function(){
 	$('#paymentCmp').height(document.body.clientHeight - 86);	
 	$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
 	
+	//pos端
+/*	if(parseInt() == 1){
+		$('#divPosOperation').show();
+	}*/
+	
 	/**
 	 * 餐桌分页包
 	 */
@@ -137,7 +145,7 @@ $(function(){
 			if(data.success){
 				//刷新时去除#
 				if(location.href.indexOf('#') > 0){
-					location.href = 'tableSelect.html';
+					location.href = 'tableSelect.html?status='+systemStatus;
 					return;
 				}
 				
@@ -2222,6 +2230,12 @@ ts.member.memberPointConsumeAction = function(){
 	});
 }
 
+/**
+ * 新页面打开账单管理
+ */
+function toOrderMgrPage(){
+	window.open("../pages/FrontBusiness_Module/Bills.html");                 
+}
 
 /**
  * 注销操作
