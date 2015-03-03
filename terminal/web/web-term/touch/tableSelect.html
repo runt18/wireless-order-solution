@@ -527,7 +527,7 @@ $(document).bind("click",function(e){
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.goToCreateOrder()">点菜</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.tempPayForUO()">暂结</a>
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="showPaymentMgr({table:uo.table})">结账</a>
+		 	<a id="btnPayBill" data-role="button" data-inline="true" class="bottomBtnFont none" onclick="showPaymentMgr({table:uo.table})" >结账</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loadOrderDetail();lookupOrderDetailByType('detail_all');">明细</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#popupDiscountCmp">折扣</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.transTableForTS()">转台</a>
@@ -714,7 +714,7 @@ $(document).bind("click",function(e){
 	</div>	
 	<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
 		 <div id="searchTableCmpsFoot" data-role="controlgroup" data-type="horizontal" data-corners="false" class="bottomBarFullWidth ui-bar-b barBottomBeCorner" >
-		 	<a id="ts_toPaymentMgr" data-role="button" data-theme="b" data-inline="true" style="display: none;"  onclick="ts.toPaymentMgr()">结账(Enter)</a>
+		 	<a id="ts_toPaymentMgr" data-role="button" data-theme="b" data-inline="true" onclick="ts.toPaymentMgr()">结账(Enter)</a>
 			<a id="certain4searchTableCmps" data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn" onclick="ts.submitForSelectTableOrTransFood()">确定</a>
 			<a  data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn" onclick="uo.closeTransOrderFood()">取消</a>		 
 		 </div>
@@ -795,7 +795,7 @@ $(document).bind("click",function(e){
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.deleteFood()">删除</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="operateOrderFoodTaste({type:2})">口味</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="addTempTaste()">手写口味</a>
-					 <a id="giftFoodOperate" style="display: none;" data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.giftFood()">赠送</a>	
+					 <a id="giftFoodOperate" data-role="button" data-inline="true" class="orderOperBtn none" data-theme="b" onclick="of.giftFood()">赠送</a>	
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.foodHangup({type:2})">叫起</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" data-rel="popup"  data-transition="pop" href="#orderFoodOtherOperateCmp">更多</a>
 					 <!--<a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="operateOrderFoodTaste({type:1})">全单口味</a>

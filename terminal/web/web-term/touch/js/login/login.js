@@ -1,10 +1,20 @@
+
+var Request = new Util_urlParaQuery();
+var systemStatus = Request["status"];
+
+//刷新时去除#
+if(location.href.indexOf('#') > 0){
+	location.href = systemStatus?'index.htm?status='+systemStatus : 'index.htm';
+}
+
 var lg = {
-	restaurant : {},
-	staffs : [],
-	staffPaging : {}
-};
+		restaurant : {},
+		staffs : [],
+		staffPaging : {}
+	};
 
 var allStaff = '<a data-role="button" data-inline="true" class="loginName" onclick="selectedName(this)" data-value="{staffId}" data-theme="c"><div>{staffName}</div></a>';
+
 
 $(function(){
 	$(".numkeyboard").ioskeyboard({
@@ -17,6 +27,14 @@ $(function(){
 	    colorchangeMin:154//按键背影颜色的最小值，默认为RGB(154,154,154)
 	});
 	
+	//pos
+	if(parseInt(systemStatus) == 1){
+		$('#btnLogin4Pos').show();
+		$('#btnLogin4Touch').hide();
+	}else{
+		$('#btnLogin4Touch').show();
+		$('#btnLogin4Pos').hide();		
+	}
 	
 	Util.LM.show();
 	if (getcookie("digie_restaurant") != ""){
@@ -130,7 +148,7 @@ function staffLoginHandler(){
 			Util.LM.hide();
 			if(data.success){
 				setcookie("digie_token", data.other.token);
-				location.href = 'tableSelect.html';	
+				location.href = 'tableSelect.html?status=1';	
 			}else{
 				Util.msg.alert({
 					msg : data.msg,

@@ -94,6 +94,8 @@ div.ui-slider-switch {
 
 html { overflow-y: hidden;}
 
+.none {display:none;}
+
 .bottomBarFullWidth > .ui-controlgroup-controls{
 	width: 100%;
 }

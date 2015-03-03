@@ -94,7 +94,19 @@ var trPayIncomeModel = '<tr>'
 	+ '</tr>';
 
 $(function(){
-	//当系统是收银端时
+	//pos端
+	if(parseInt(systemStatus) == 1){
+		//日结,交班等
+		$('#divPosOperation').show();
+		//已点菜结账按钮
+		$('#btnPayBill').show();
+		//当系统是收银端时
+		tableListHeight = 124;
+	}else{
+		//触摸屏
+		tableListHeight = 86;
+	}
+
 	tableListHeight = 124;
 	//餐厅选择界面高度
 	$('#tableAndRegionsCmp').height(document.body.clientHeight - tableListHeight);	
@@ -110,11 +122,6 @@ $(function(){
 	//结账界面高度 & 菜品列表高度
 	$('#paymentCmp').height(document.body.clientHeight - 86);	
 	$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
-	
-	//pos端
-/*	if(parseInt() == 1){
-		$('#divPosOperation').show();
-	}*/
 	
 	/**
 	 * 餐桌分页包
@@ -847,8 +854,11 @@ ts.createOrderForLookup = function (){
 	ts.commitTableOrTran = 'lookup';
 	//隐藏数量输入
 	$('#td4TxtFoodNumForTran').hide();
-	//增加结账按钮
-	$('#ts_toPaymentMgr').show();
+	//pos端增加结账按钮
+	if(parseInt(systemStatus) == 1){
+		$('#ts_toPaymentMgr').show();
+	}
+	
 	$('#certain4searchTableCmps').buttonMarkup('refresh');
 	$('#certain4searchTableCmps .ui-btn-text').html('点菜(+)');
 	//设置为3个按钮并排
