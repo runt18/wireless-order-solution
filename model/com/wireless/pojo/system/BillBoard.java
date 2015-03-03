@@ -1,16 +1,16 @@
 package com.wireless.pojo.system;
 
+import java.text.ParseException;
+
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.util.DateUtil;
 
 public class BillBoard implements Jsonable {
 	
 	public enum Type{
 		SYSTEM(1, "系统公告"),
-		RESTAURANT(2, "餐厅通知"),
-		WX_INFO(3, "促销信息");
+		RESTAURANT(2, "餐厅通知");
 		
 		Type(int val, String desc){
 			this.val = val;
@@ -19,142 +19,280 @@ public class BillBoard implements Jsonable {
 		
 		private int val;
 		private String desc;
+		
 		public int getVal(){
 			return val;
 		}
+		
 		public String getDesc(){
 			return desc;
 		}
+		
 		public static Type valueOf(int val){
-			for(Type temp : values()){
-				if(temp.val == val){
-					return temp;
+			for(Type type : values()){
+				if(type.val == val){
+					return type;
 				}
 			}
 			throw new IllegalArgumentException("The val(" + val + ") is invalid.");
 		}
-	}
-	
-	public static class Builder{
-		public Builder(){
-			data = new BillBoard();
-		}
-		protected BillBoard data;
-		public Builder setTitle(String title){
-			data.setTitle(title);
-			return this;
-		}
-		public Builder setDesc(String desc){
-			data.setDesc(desc);
-			return this;
-		}
-		public Builder setType(Type type){
-			data.setType(type);
-			return this;
-		}
-		public Builder setType(int type) {
-			data.setType(type);
-			return this;
-		}
-		public Builder setRestaurantId(int id) {
-			data.setRestaurant(new Restaurant(id));
-			return this;
-		}
-		public Builder setExpired(long expired) {
-			data.setExpired(expired);
-			return this;
-		}
-		public BillBoard build(){
-			return data.clone();
-		}
-	}
-	
-	public static class InsertBuilder extends Builder{
 		
-	}
-	public static class UpdateBuilder extends Builder{
-		public UpdateBuilder setId(int id){
-			data.setId(id);
-			return this;
+		@Override
+		public String toString(){
+			return this.desc;
 		}
 	}
 	
+	public static enum Status{
+		CREATED(1, "已创建"),
+		READ(2, "已读");
+		
+		Status(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		private final int val;
+		private final String desc;
+		
+		public static Status valueOf(int val){
+			for(Status status : values()){
+				if(status.val == val){
+					return status;
+				}
+			}
+			throw new IllegalArgumentException("The status(" + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
 	
-	public BillBoard(){}
+	public static class InsertBuilder{
+		private final String title;
+		private final long expired;
+		private final int restaurantId;
+		private String body;
+		private final Type type;
+		
+		public static InsertBuilder build4Restaurant(String title, int restaurantId, String expired) throws ParseException{
+			return new InsertBuilder(title, expired, restaurantId);
+		}
+		
+		public static InsertBuilder build4System(String title, String expired) throws ParseException{
+			return new InsertBuilder(title, expired);
+		}
+		
+		private InsertBuilder(String title, String expired, int restaurantId) throws ParseException{
+			this.title = title;
+			this.expired = DateUtil.parseDate(expired, DateUtil.Pattern.DATE);
+			this.restaurantId = restaurantId;
+			this.type = Type.RESTAURANT;
+		}
+		
+		private InsertBuilder(String title, String expired) throws ParseException{
+			this.title = title;
+			this.expired = DateUtil.parseDate(expired, DateUtil.Pattern.DATE);
+			this.restaurantId = 0;
+			this.type = Type.SYSTEM;
+		}
+
+		public InsertBuilder setBody(String body){
+			this.body = body;
+			return this;
+		}
+		
+		public BillBoard build(){
+			return new BillBoard(this);
+		}
+	}
+	
+	public static class UpdateBuilder{
+		private final int id;
+		private String title;
+		private String body;
+		private long expired;
+		private Status status;
+		
+		public UpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		public UpdateBuilder setTitle(String title){
+			this.title = title;
+			return this;
+		}
+		
+		public boolean isTitleChanged(){
+			return this.title != null;
+		}
+		
+		public UpdateBuilder setBody(String body){
+			this.body = body;
+			return this;
+		}
+		
+		public boolean isBodyChanged(){
+			return this.body != null;
+		}
+		
+		public UpdateBuilder setExpired(String expired) throws ParseException{
+			this.expired = DateUtil.parseDate(expired, DateUtil.Pattern.DATE);
+			return this;
+		}
+		
+		public boolean isExpiredChanged(){
+			return this.expired != 0;
+		}
+		
+		public UpdateBuilder setStatus(Status status){
+			this.status = status;
+			return this;
+		}
+		
+		public boolean isStatusChanged(){
+			return this.status != null;
+		}
+		
+		public BillBoard build(){
+			return new BillBoard(this);
+		}
+	}
+	
 	
 	private int id;
 	private String title;
-	private String desc;
+	private String body;
 	private long created;
 	private long expired;
 	private Type type;
-	private Restaurant restaurant;
+	private Status status;
+	private int restaurantId;
+	
+	private BillBoard(InsertBuilder builder){
+		this.title = builder.title;
+		this.created = System.currentTimeMillis();
+		this.expired = builder.expired;
+		this.body = builder.body;
+		this.status = Status.CREATED;
+		this.type = builder.type;
+		this.restaurantId = builder.restaurantId;
+	}
+	
+	private BillBoard(UpdateBuilder builder){
+		this.id = builder.id;
+		if(builder.isTitleChanged()){
+			this.title = builder.title;
+		}
+		if(builder.isBodyChanged()){
+			this.body = builder.body;
+		}
+		if(builder.isExpiredChanged()){
+			this.expired = builder.expired;
+		}
+		if(builder.isStatusChanged()){
+			this.status = builder.status;
+		}
+	}
+	
+	public BillBoard(int id){
+		this.id = id;
+	}
 	
 	public int getId() {
 		return id;
 	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 	public String getTitle() {
 		return title;
 	}
+	
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	public String getDesc() {
-		return desc;
+	
+	public String getBody() {
+		if(body == null){
+			return "";
+		}
+		return body;
 	}
-	public void setDesc(String desc) {
-		this.desc = desc;
+	
+	public void setBody(String body) {
+		this.body = body;
 	}
+	
 	public long getCreated() {
 		return created;
 	}
+	
 	public void setCreated(long created) {
 		this.created = created;
 	}
+	
 	public long getExpired() {
 		return expired;
 	}
+	
 	public void setExpired(long expired) {
 		this.expired = expired;
 	}
+	
+	public boolean isExpired(){
+		return System.currentTimeMillis() > this.expired;
+	}
+	
 	public Type getType() {
 		return type;
 	}
+	
 	public void setType(Type type) {
 		this.type = type;
 	}
-	public void setType(int type) {
-		this.type = Type.valueOf(type);
-	}
-	public Restaurant getRestaurant() {
-		return restaurant;
-	}
-	public void setRestaurant(Restaurant restaurant) {
-		this.restaurant = restaurant;
+
+	public Status getStatus(){
+		return this.status;
 	}
 	
-	@Override
-	protected BillBoard clone() {
-		BillBoard clone = new BillBoard();
-		clone.id = this.id;
-		clone.title = this.title;
-		clone.desc = this.desc;
-		clone.created = this.created;
-		clone.expired = this.expired;
-		clone.type = this.type;
-		clone.restaurant = this.restaurant;
-		return clone;
+	public void setStatus(Status status){
+		this.status = status;
 	}
+	
+	public int getRestaurantId() {
+		return restaurantId;
+	}
+	
+	public void setRestaurantId(int restaurantId) {
+		this.restaurantId = restaurantId;
+	}
+	
 	@Override
 	public int hashCode() {
 		return id * 31 + 17;
 	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof BillBoard)){
+			return false;
+		}else{
+			return id == ((BillBoard)obj).id;
+		}
+	}
+	
 	@Override
 	public String toString() {
-		return "id : " + id + ", title: " + title;
+		return "id: " + id + ", title: " + title;
 	}
 	
 	@Override
@@ -162,14 +300,14 @@ public class BillBoard implements Jsonable {
 		JsonMap jm = new JsonMap();
 		jm.putInt("id", id);
 		jm.putString("title", title);
-		jm.putString("desc", desc);
+		jm.putString("desc", body);
 		jm.putLong("created", created);
 		jm.putString("createdFormat", DateUtil.format(created));
 		jm.putLong("expired", expired);
 		jm.putString("expiredFormat", DateUtil.format(expired));
 		jm.putInt("typeVal", type.getVal());
 		jm.putString("typeDesc", type.getDesc());
-		jm.putJsonable("restaurant", restaurant, 0);
+		jm.putInt("restaurant", restaurantId);
 		
 		return jm;
 	}

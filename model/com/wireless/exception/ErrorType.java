@@ -33,6 +33,7 @@ public enum ErrorType {
 	 *  PAY_TYPE : 7000 - 7049
 	 *  WX_ORDER : 6959 - 6999
 	 *  token_error : 6900 - 6949
+	 *  bill_board : 6859 - 6899
 	 */
 	UNKNOWN(1, "unknown"),
 	PROTOCOL(2, "protocol"),
@@ -66,7 +67,8 @@ public enum ErrorType {
 	PAY_TYPE(30, "pay_type"),
 	WX_ORDER(31, "wx_order"),
 	IO_ERROR(32, "io_error"),
-	TOKEN_ERROR(33, "token_error");
+	TOKEN_ERROR(33, "token_error"),
+	BILL_BOARD(34, "bill_board_error");
 	
 	private final String desc;
 	
