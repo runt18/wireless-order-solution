@@ -91,14 +91,17 @@ public class QueryMemberOperationAction extends Action{
 				}
 			}
 			
+			String orderClause = " ORDER BY MO.operate_date DESC " ;
+			
 			if(isPaging != null && isPaging.trim().equals("true")){
 				if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
 					extraCond.setOperateDate(new DutyRange(onDuty, offDuty));
 				}
 				jobject.setTotalProperty(MemberOperationDao.getAmountByCond(staff, extraCond));
+				
+				orderClause += " LIMIT " + start + "," + limit;
 			}
 			
-			String orderClause = " ORDER BY MO.operate_date " + " LIMIT " + start + "," + limit;
 			final List<MemberOperation> list = MemberOperationDao.getByCond(staff, extraCond, orderClause);
 			
 			if(!list.isEmpty()){
