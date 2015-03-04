@@ -12,6 +12,7 @@
 	width:100%; 
 	box-flex: 1;
 	-webkit-box-flex: 1;
+	-moz-box-flex: 1;
 }
 #divSelectDeptForOrder div[class="button-base-deptKitchen"]{
 	margin-right: 1px;

@@ -93,6 +93,21 @@ var trPayIncomeModel = '<tr>'
 	+ '<td class="text_right">{3}</td>'
 	+ '</tr>';
 
+//会员消费明细
+var memberConsumeTrTemplet = '<tr>'
+		+ '<td>{dataIndex}</td>'
+		+ '<td>{orderId}</td>'
+		+ '<td>{operateDateFormat}</td>'
+		+ '<td>{memberName}</td>'
+		+ '<td>{memberType}</td>'
+		+ '<td>{otype}</td>'
+		+ '<td class="text_right">{money}</td>'
+		+ '<td class="text_right">{deltaPoint}</td>'
+		+ '<td>{staffName}</td>'
+		+ '<td>{comment}</td>'
+		+ '</tr>';	
+
+
 $(function(){
 	//pos端
 	if(systemStatus == 1){
@@ -2245,6 +2260,127 @@ ts.member.memberPointConsumeAction = function(){
 		}		
 	});
 }
+
+/**
+ * 查询会员消费明细
+ */
+ts.member.searchMemberDetail = function(){
+	Util.LM.show();
+//	var memberType = $('#consumeDetail_memberType').val();
+	var operateType = -1;
+	var detailOpes = $('input[name=memberConsumeType]'); 
+	for (var i = 0; i < detailOpes.length; i++) {
+		
+		if($(detailOpes[i]).attr("checked")){
+			operateType = $(detailOpes[i]).attr("data-value");
+			break;
+		}
+	}
+	console.log('op:'+operateType);
+	var mobile = $('#consumeDetail_memberMobile').val();
+	var name = $('#consumeDetail_memberName').val();
+	
+	$.ajax({
+		url : '../QueryMemberOperation.do',
+		type : 'post',
+		dataType : 'json',
+		data : {
+			isPaging:false,
+			dataSource:'today',
+			memberMobile: mobile,
+			memberName: name,
+			operateType:operateType,
+			total:true				
+		},
+		success : function(result, status, xhr){
+			Util.LM.hide();
+			if(result.success){
+				var html = '';
+				for(var i = 0, index = 1; i < result.root.length; i++){
+					html += memberConsumeTrTemplet.format({
+						dataIndex : index,
+						orderId : result.root[i].orderId != 0?result.root[i].orderId:'----',
+						operateDateFormat : result.root[i].operateDateFormat,
+						memberName : result.root[i].member.name,
+						memberType : result.root[i].member.memberType.name,
+						otype : result.root[i].operateTypeText,
+						money : result.root[i].payMoney?result.root[i].payMoney:(result.root[i].deltaTotalMoney?result.root[i].deltaTotalMoney:0),	
+						deltaPoint : result.root[i].deltaPoint > 0? '+'+result.root[i].deltaPoint : result.root[i].deltaPoint,
+						staffName : result.root[i].staffName,
+						comment : result.root[i].comment
+					});	
+					index ++;
+				}	
+				
+				$('#front_memberConsumeDetailBody').html(html).trigger('create');
+			}
+		},
+		error : function(request, status, err){
+			Util.msg.alert({
+				renderTo : 'tableSelectMgr',
+				msg : request.msg
+			});
+		}
+	});		
+} 
+
+/**
+ * 打开会员消费明细
+ */
+ts.member.openMemberConsumeDetailWin = function(){
+	$('#frontPageMemberOperation').popup('close');
+	
+	$.ajax({
+		url : '../QueryMemberType.do',
+		type : 'post',
+		async:false,
+		data : {dataSource : 'normal'},
+		success : function(jr, status, xhr){
+			if(jr.success){
+				var html = '<option value=-1 >全部</option>';
+				for (var i = 0; i < jr.root.length; i++) {
+					html += '<option value={id} >{name}</option>'.format({
+						id : jr.root[i].id,
+						attrVal : jr.root[i].attributeValue,
+						chargeRate : jr.root[i].chargeRate,
+						name : jr.root[i].name
+					});
+				}
+				$('#consumeDetail_memberType').html(html).selectmenu('refresh');
+			}else{
+				Util.msg.alert({
+					renderTo : 'tableSelectMgr',
+					msg : jr.msg
+				});
+			}
+		},
+		error : function(request, status, err){
+			Util.msg.alert({
+				renderTo : 'tableSelectMgr',
+				msg : request.msg
+			});
+		}
+	});	
+	
+	ts.member.searchMemberDetail();
+	
+	$('#memberConsumeDetailWin').show();
+	$('#shadowForPopup').show();
+}
+
+/**
+ * 关闭会员消费明细
+ */
+ts.member.closeMemberConsumeDetailWin = function(){
+	$('#memberConsumeDetailWin').hide();
+	$('#shadowForPopup').hide();
+	
+//	$('#consumeDetail_memberType').val(-1).selectmenu('refresh');
+	$('#consumeDetail_memberMobile').val('');
+	$('#consumeDetail_memberName').val('');
+	$('#front_memberConsumeDetailBody').html('');
+}
+
 
 /**
  * 新页面打开账单管理

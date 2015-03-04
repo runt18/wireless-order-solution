@@ -86,15 +86,16 @@ $(document).bind("click",function(e){
 	
 	<div data-role="popup" id="frontPageMemberOperation" data-theme="d" class="payment_searchMemberType">
 		<ul id="charge_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-			<li  class="popupButtonList" onclick="ts.member.openMemberChargeWin()"><a >会员充值</a></li>
-			<li  class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
-			<li  class="popupButtonList" onclick="ts.member.openMemberOperationWin()"><a >添加会员</a></li>
+			<li class="popupButtonList" onclick="ts.member.openMemberChargeWin()"><a >会员充值</a></li>
+			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
+			<li class="popupButtonList" onclick="ts.member.openMemberOperationWin()"><a >添加会员</a></li>
+			<li class="popupButtonList" onclick="ts.member.openMemberConsumeDetailWin()"><a >消费明细</a></li>
 		</ul>
 	</div>	
 	
    <div id="tableAndRegionsCmp" class="ui-grid-a" style="height: 590px;background-color: rgb(135, 206, 235);">
    	<!-- 餐台数据 -->
-     <div id="divTableShowForSelect" class="ui-block-a" style="width: -webkit-calc(100% - 120px);height: inherit;">
+     <div id="divTableShowForSelect" class="ui-block-a" style="width: -webkit-calc(100% - 120px);width: -moz-calc(100% - 120px);height: inherit;">
     	
      </div>
      <div class="ui-block-b" style="width: 120px;height: inherit;border-left: 1px solid white;">
@@ -471,6 +472,88 @@ $(document).bind("click",function(e){
 		</ul>
 	</div>	
 	
+	<!-- 会员消费明细  -->
+	<div id="memberConsumeDetailWin" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 200px; left: 50%;width:1200px; margin: -100px 0px 0px -600px;display: none;background-color: white;" align="center">
+	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
+	    		<div id="memberConsumeDetailHead" style="float: left;line-height: 35px;margin-left: 10px;">
+					<span style="line-height: 35px;float: left;margin-left: 5px;">
+						会员消费明细 -- <font color="#f7c942">当日</font>
+					</span>
+	    		</div>
+	        	<div style="float: right">
+	  				<a onclick="ts.member.closeMemberConsumeDetailWin()" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
+	        	</div>
+	    </div>     
+	    <table style="width: 100%;border-bottom: 1px solid gray;">
+	    	<tr>
+	    		<td class="table_toolBarLab">操作类型:</td>	  
+	    		<td class="table_toolBarCmp" style="width: 300px;">
+					<fieldset data-role="controlgroup" data-type="horizontal">
+						<label>
+				        	<input type="radio" name="memberConsumeType" data-value="-1" value="on" checked="checked" onclick="ts.member.searchMemberDetail()">全部
+				        </label>
+				        <label>
+				        	<input type="radio" name="memberConsumeType" data-value="1" value="on" onclick="ts.member.searchMemberDetail()">消费
+				        </label>
+				        <label>
+				        	<input type="radio" name="memberConsumeType" data-value="2" value="on" onclick="ts.member.searchMemberDetail()">充值
+				        </label>
+				        <label>
+				        	<input type="radio" name="memberConsumeType" data-value="3" value="on" onclick="ts.member.searchMemberDetail()">积分
+				        </label>				        
+				    </fieldset>				        		
+	    		</td>
+	    		<td class="table_toolBarLab">手机号码:</td>	  
+	    		<td class="table_toolBarCmp">
+	    			<input id="consumeDetail_memberMobile" onkeypress="intOnly()">		        		
+	    		</td>	 
+	    		<td class="table_toolBarLab">会员名称:	</td>	  
+	    		<td class="table_toolBarCmp">
+	    			<input id="consumeDetail_memberName">		        		
+	    		</td>		    		 		
+	    		<td style="text-align: right;padding-right: 20px;">
+	    			<a data-role="button" data-icon="search" data-iconpos="left" data-inline="true" data-theme="b" onclick="ts.member.searchMemberDetail()">搜索</a>
+	    		</td>
+	    	</tr>
+	    </table>
+	
+	    <div data-theme="d" class="ui-corner-bottom ui-content">
+	    	<div style="max-height: 480px; overflow-y: auto;">
+			<table  data-role="table"  data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr" >
+	         <thead>
+		           <tr class="ui-bar-d">
+		             <th style="width: 25px;"></th>
+		             <th style="width: 100px;">账单号</th>
+		             <th >消费时间</th>
+		             <th >会员名称</th>
+		             <th >会员类型</th>
+		             <th >操作类型</th>
+		             <th class="text_right">金额</th>
+		             <th class="text_right">积分情况</th>
+		             <th >操作人</th>
+					 <th id="lab4CancelReasonOrComment" style="width: 250px;">备注</th>          
+		           </tr>
+	         </thead>
+	         <tbody id="front_memberConsumeDetailBody">
+	         	<tr>
+	         		<td>1</td>
+	         		<td >56487</td>
+	         		<td >2014-12-12 18:03:56</td>
+	         		<td >龙虾排骨</td>
+	         		<td >充值</td>
+	         		<td>黄炆,拼上</td>
+	         		<td>8.88</td>
+	         		<td>2.6</td>
+	         		<td>管理员</td>
+	         		<td>上菜太慢, 太辣</td>
+	         	</tr>
+	         </tbody>
+	       </table>     
+			</div>
+	    </div>
+	</div>			
+	
+	
 </div>
 
 <!-- 弹出框时, 挡住其他操作的div -->
@@ -599,7 +682,7 @@ $(document).bind("click",function(e){
 	    </div>
 	</div>		
 	
-	<div id="orderFoodWeighCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
+	<div id="orderFoodWeighCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:340px;" class="ui-corner-all" align="center">
 	    <div data-role="header" data-theme="b" class="ui-corner-top">
 	        <h1>输入称重--<span id="weighFoodName"></span></h1>
 	    </div>
@@ -631,7 +714,7 @@ $(document).bind("click",function(e){
 			</div>		    
 	    
 		</div>	
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.openWeighaction()">确定</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeWeighOperate()">取消</a>		 
@@ -755,7 +838,7 @@ $(document).bind("click",function(e){
 			 <a id="divNFCOTableBasicMsg" data-role="button" data-inline="true" class="tableBasicMsg">112<br>虞美人</a>
 			 <a data-role="button" data-inline="true" class="tableStatus">已点菜</a>		 
 		</div>
-		<div class="ui-block-b" style="width: -webkit-calc(100% - 102px);">
+		<div class="ui-block-b" style="width: -webkit-calc(100% - 102px);width: -moz-calc(100% - 102px);">
 			<!-- 部门 -->
 			 <div id="deptsCmp" data-role="controlgroup" data-type="horizontal">
 				 <!--<a data-role="button" data-inline="true" class="deptKitBtnFont">全部部门</a>
@@ -774,7 +857,7 @@ $(document).bind("click",function(e){
 	<div id="orderFoodCenterCmp" class="ui-grid-a" style="height: 470px;overflow: hidden;">
 	     <div class="ui-block-a" style="width: 35%;height: inherit;background-color: skyblue;">
 		   <div class="ui-grid-a" style="height: inherit;">
-		     <div id="divOrderFoodsCmp" class="ui-block-a" style="width: -webkit-calc(100% - 99px);height: inherit;overflow-y: auto;">
+		     <div id="divOrderFoodsCmp" class="ui-block-a" style="width: -webkit-calc(100% - 99px);width: -moz-calc(100% - 99px);height: inherit;overflow-y: auto;">
 		     	<!--已点菜列表  -->
 				<ul id="orderFoodsCmp" data-role="listview" data-theme="d" data-inset="true">
 <!-- 				    <li data-icon="forFree"><a href="#">
@@ -1132,7 +1215,7 @@ $(document).bind("click",function(e){
 			 <a id="divBtnSellFood" data-role="button" data-inline="true" class="tableStatus" onclick="ss.searchData({event:this, isStop:false})">在售菜品</a>
 			 <a data-role="button" data-inline="true" class="tableStatus" onclick="ss.searchData({event:this,isStop:true})">沽清菜品</a>		 
 		</div>
-		<div class="ui-block-b" style="width: -webkit-calc(100% - 102px);">
+		<div class="ui-block-b" style="width: -webkit-calc(100% - 102px);width: -moz-calc(100% - 102px);">
 			<!-- 部门 -->
 			 <div id="depts4StopSellCmp" data-role="controlgroup" data-type="horizontal"></div>		
 			<!-- 厨房 -->
@@ -1147,7 +1230,7 @@ $(document).bind("click",function(e){
 	     </div>
 	     
 	     <!-- 菜品列表 -->
-	     <div id="foods4StopSellCmp" class="ui-block-b" style="width: -webkit-calc(100% - 350px);background-color: skyblue;"></div>			
+	     <div id="foods4StopSellCmp" class="ui-block-b" style="width: -webkit-calc(100% - 350px);width: -moz-calc(100% - 350px);background-color: skyblue;"></div>			
 	</div>
 	
 	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
@@ -1263,7 +1346,7 @@ $(document).bind("click",function(e){
 		    </div>
 		    
 		</div>
-		<div class="ui-block-b" data-role="content" style="width : -webkit-calc(100% - 350px);height:800px;">
+		<div class="ui-block-b" data-role="content" style="width : -webkit-calc(100% - 350px);width: -moz-calc(100% - 350px);height:800px;">
 			<div id="divNorthForUpdateOrder"  data-role="header" data-tap-toggle="false" data-theme="b" style="height: 36px;overflow: hidden;">
 				<span id="orderIdInfo" style="line-height: 35px;float: left;margin-left: 5px;">
 					结账 -- 账单号:<font color="#f7c942">-----</font>

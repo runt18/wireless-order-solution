@@ -143,6 +143,7 @@ html { overflow-y: hidden;}
 /*µ¯³ö¿ò°´Å¥*/
 .countPopbottomBtn{
 	width: -webkit-calc(50% - 2px);
+	width: -moz-calc(50% - 2px);
 }
 .countPopbottomBtn > span{
 	font-size: 20px !important;
@@ -447,6 +448,7 @@ html { overflow-y: hidden;}
 	height: 35px;
 	margin: -1px 0;
 	background-image: -webkit-linear-gradient( top,red,maroon);
+	background-image: -moz-linear-gradient( top,red,maroon);
 }
 
 

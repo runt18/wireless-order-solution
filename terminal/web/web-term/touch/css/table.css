@@ -8,8 +8,8 @@
 }
 
 .text_right {
-	text-align : right;
-	padding-right : 5px;
+	text-align : right !important;
+	padding-right : 5px !important;
 }
 
 .div_context {
@@ -120,4 +120,11 @@ li[role=option] a{
 	max-width: 190px;
 }
 
+.table_toolBarLab{
+	width: 75px;
+	padding-left: 5px;
+}
 
+.table_toolBarCmp{
+	width: 130px;
+}
