@@ -7,9 +7,13 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.oss.OssImageDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BillBoardError;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.BillBoard;
 import com.wireless.pojo.system.BillBoard.Status;
 import com.wireless.pojo.util.DateUtil;
@@ -65,8 +69,9 @@ public class BillBoardDao {
 	 * @return the id to bill board just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static int insert(BillBoard.InsertBuilder builder) throws SQLException{
+	public static int insert(BillBoard.InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -85,8 +90,10 @@ public class BillBoardDao {
 	 * @return the id to bill board just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the admin to restaurant does NOT exist
 	 */
-	public static int insert(DBCon dbCon, BillBoard.InsertBuilder builder) throws SQLException{
+	public static int insert(DBCon dbCon, BillBoard.InsertBuilder builder) throws SQLException, BusinessException{
 		BillBoard billBoard = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".billboard " +
@@ -109,6 +116,16 @@ public class BillBoardDao {
 			throw new SQLException("The id of bill board is not generated successfully.");
 		}
 		dbCon.rs.close();
+		
+		//Update the associated oss image to this billboard's body.
+		final Staff staff;
+		if(billBoard.getType() == BillBoard.Type.RESTAURANT){
+			staff = StaffDao.getAdminByRestaurant(dbCon, billBoard.getRestaurantId());
+		}else{
+			staff = new Staff();
+			staff.setRestaurantId(0);
+		}
+		OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder4Html(OssImage.Type.BILL_BOARD, id).setHtml(billBoard.getBody()));
 		
 		return id;
 	}
@@ -214,6 +231,18 @@ public class BillBoardDao {
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(BillBoardError.BILL_BOARD_NOT_EXIST);
 		}
+		
+		//Update the associated oss image to this billboard's body.
+		if(builder.isBodyChanged()){
+			final Staff staff;
+			if(billBoard.getType() == BillBoard.Type.RESTAURANT){
+				staff = StaffDao.getAdminByRestaurant(dbCon, billBoard.getRestaurantId());
+			}else{
+				staff = new Staff();
+				staff.setRestaurantId(0);
+			}
+			OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder4Html(OssImage.Type.BILL_BOARD, billBoard.getId()).setHtml(billBoard.getBody()));
+		}
 	}
 	
 	/**
@@ -261,8 +290,10 @@ public class BillBoardDao {
 	 * @return the amount to bill board to delete
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+ 	 * @throws BusinessException 
+	 * 			throws if the admin to restaurant belongs to billboard deleted does NOT exist
 	 */
-	public static int deleteByCond(ExtraCond extraCond) throws SQLException{
+	public static int deleteByCond(ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -281,14 +312,25 @@ public class BillBoardDao {
 	 * @return the amount to bill board to delete
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the admin to restaurant belongs to billboard deleted does NOT exist
 	 */
-	public static int deleteByCond(DBCon dbCon, ExtraCond extraCond) throws SQLException{
+	public static int deleteByCond(DBCon dbCon, ExtraCond extraCond) throws SQLException, BusinessException{
 		int amount = 0;
 		for(BillBoard billBoard : getByCond(dbCon, extraCond)){
 			String sql = " DELETE FROM " + Params.dbName + ".billboard WHERE billboard_id = " + billBoard.getId();
 			if(dbCon.stmt.executeUpdate(sql) != 0){
 				amount++;
 			}
+			//Delete the associated oss image to this promotion
+			final Staff staff;
+			if(billBoard.getType() == BillBoard.Type.RESTAURANT){
+				staff = StaffDao.getAdminByRestaurant(dbCon, billBoard.getRestaurantId());
+			}else{
+				staff = new Staff();
+				staff.setRestaurantId(0);
+			}
+			OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.BILL_BOARD, billBoard.getId()));
 		}
 		return amount;
 	}
@@ -314,9 +356,11 @@ public class BillBoardDao {
 			int amount = 0;
 			for(BillBoard billBoard : getByCond(dbCon, null)){
 				if(billBoard.isExpired()){
-					String sql = " DELETE FROM " + Params.dbName + ".billboard WHERE billboard_id = " + billBoard.getId();
-					if(dbCon.stmt.executeUpdate(sql) != 0){
+					try{
+						deleteById(billBoard.getId());
 						amount++;
+					}catch(BusinessException ignored){
+						ignored.printStackTrace();
 					}
 				}
 			}
