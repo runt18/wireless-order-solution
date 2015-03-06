@@ -11,8 +11,14 @@
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
 <!-- jquery mobile -->
 <link rel="stylesheet" href="css/common/jquery.mobile-1.3.2.css">
+<!-- 日期插件.css -->
+<link rel="stylesheet" type="text/css" href="css/dateCmp/datebox.css" />
+
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="js/common/jquery.mobile-1.3.2.js"></script>
+<!-- 日期插件.js -->
+<script type="text/javascript" src="js/common/datebox.core.js"></script>
+<script type="text/javascript" src="js/common/jqm.datebox.language-CN.js"></script>
 <!-- 数字键盘样式 -->
 <link rel="stylesheet" href="css/calculate/datouwang.css">
 <!-- 自定义样式 -->
@@ -86,9 +92,9 @@ $(document).bind("click",function(e){
 	
 	<div data-role="popup" id="frontPageMemberOperation" data-theme="d" class="payment_searchMemberType">
 		<ul id="charge_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+			<li class="popupButtonList" onclick="ts.member.openMemberOperationWin()"><a >添加会员</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberChargeWin()"><a >会员充值</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
-			<li class="popupButtonList" onclick="ts.member.openMemberOperationWin()"><a >添加会员</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberConsumeDetailWin()"><a >消费明细</a></li>
 		</ul>
 	</div>	
@@ -289,7 +295,7 @@ $(document).bind("click",function(e){
 	    		</td>    
 	    		
 	    		<td class="readMemberTd">生日:</td>
-	    		<td><input type="date" name="date" id="cm_dateMemberBirthday" value=""></td>   
+	    		<td><input type="date" data-role="datebox" id="cm_dateMemberBirthday" data-options='{"mode": "datebox"}'></td>   
 	    		
 	    		<td class="readMemberTd">会员类型:</td>
 	    		<td class="selectionCmp" style="line-height: 20px;padding: 0 3px;">
@@ -487,7 +493,7 @@ $(document).bind("click",function(e){
 	    <table style="width: 100%;border-bottom: 1px solid gray;">
 	    	<tr>
 	    		<td class="table_toolBarLab">操作类型:</td>	  
-	    		<td class="table_toolBarCmp" style="width: 300px;">
+	    		<td class="table_toolBarCmp" style="width: 320px;">
 					<fieldset data-role="controlgroup" data-type="horizontal">
 						<label>
 				        	<input type="radio" name="memberConsumeType" data-value="-1" value="on" checked="checked" onclick="ts.member.searchMemberDetail()">全部
@@ -682,9 +688,10 @@ $(document).bind("click",function(e){
 	    </div>
 	</div>		
 	
-	<div id="orderFoodWeighCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:340px;" class="ui-corner-all" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top">
-	        <h1>输入称重--<span id="weighFoodName"></span></h1>
+	<div id="orderFoodWeighCmp" data-role="popup" data-theme="c" data-dismissible="false" class="ui-corner-all" align="center">
+	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
+	        <!-- <h1>输入称重--<span id="weighFoodName"></span></h1> -->
+	       	 输入称重--<span id="weighFoodName"></span>
 	    </div>
 	    <div style="max-height: 300px; overflow-y: auto;">
 			<div id="calculator4OrderCustomerCount" class="calculator">
@@ -725,7 +732,7 @@ $(document).bind("click",function(e){
 	<div id="shadowForPopup" style="z-index: 1101;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%; background: #DDD;display: none;" ></div>
 	<div id="cancelFoodSet" class="ui-overlay-shadow ui-corner-all" style="max-width:650px;z-index: 1102;position: absolute; top: 150px; left: 45%; margin: -100px 0px 0px -250px;background-color: white;display: none;" align="center">	
 	<!-- <div id="cancelFoodSet" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:650px;" class="ui-corner-all" align="center"> -->
-	    <div data-role="header" data-theme="b" class="ui-corner-top" style="line-height: 35px;">
+	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
 	        	请确定退菜原因和退菜数量
 	    </div>
 		<div id="calculator4CancelFood" class="calculator" style="width: inherit;" align="center">
@@ -755,7 +762,7 @@ $(document).bind("click",function(e){
 
 <div id="transFoodCmp" class="ui-overlay-shadow ui-corner-all" style="width: 460px;z-index: 1102;position: absolute; top: 160px; left: 50%; margin: -100px 0px 0px -250px;min-width:500px;background-color: white;display: none;" align="center">	
 <!-- <div id="transFoodCmp" data-role="popup"  data-theme="c" data-dismissible="false" style="max-width:900px;" align="center"> -->
-    <div id="transSomethingTitle" data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
+    <div id="transSomethingTitle" data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b win_head">
         	请输入相关信息
     </div>
     <table id="divTransFoodTableAlias" style="width:90%">
@@ -911,7 +918,7 @@ $(document).bind("click",function(e){
 	
 	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
 		<div id="divDescForCreateOrde" class="bottomGeneralBar">
-			<div style="float: left;margin-left: 20px;">总数量: 4份, 合计: ￥300.50</div>
+			<div style="float: left;margin-left: 20px;">总数量: --, 合计: ￥--.--</div>
 			<div id="foodPagingDesc" style="float: right;margin-right: 20px;">共0项, 第1/1页, 每页?项</div>
 		</div>	
 		

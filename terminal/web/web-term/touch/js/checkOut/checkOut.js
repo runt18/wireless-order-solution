@@ -189,11 +189,11 @@ uo.showNorthForUpdateOrder = function(){
  */
 uo.showDescForUpdateOrder = function(){
 	var html = "";
-	html = (uo.orderMember?"<span style = 'margin-left: 20px;'>当前会员：" + uo.orderMember.name +"</span>" : "") +
-		(uo.order.discount?"<span style = 'margin-left: 20px;'>当前折扣：" + uo.order.discount.name +"</span>" : "") +
-		(uo.order.discounter ? "<span style = 'margin-left: 20px;'>折扣人：" + uo.order.discounter + "</span><span style = 'margin-left: 20px;'>折扣时间：" + uo.order.discountDate + "</span>" : "") ;
+	html = (uo.orderMember?"<span style = 'margin-left: 20px;'>当前会员：<font color='green'>" + uo.orderMember.name +"</font></span>" : "") +
+		(uo.order.discount?"<span style = 'margin-left: 20px;'>当前折扣：<font color='green'>" + uo.order.discount.name +"</font></span>" : "") +
+		(uo.order.discounter ? "<span style = 'margin-left: 20px;'>折扣人：<font color='green'>" + uo.order.discounter + "</font></span><span style = 'margin-left: 20px;'>折扣时间：<font color='green'>" + uo.order.discountDate + "</font></span>" : "") ;
 		$("#divDescForUpdateOrder").html(html);
-		$("#spanTotalPriceUO").html('消费总额：'+ uo.getTotalPriceUO().toFixed(2) + "元");
+		$("#spanTotalPriceUO").html('消费总额：<font color="green">¥'+ uo.getTotalPriceUO().toFixed(2) + "</font>");
 }
 /**
  * 取得初始的消费总额

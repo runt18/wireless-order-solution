@@ -1864,7 +1864,6 @@ ts.member.operateMemberHandler = function(){
 	}else{
 		delcookie(document.domain+'_chargeSms');
 	}
-	
 	$.post('../OperateMember.do', {
 		dataSource : 'insert',
 		name : memberName.val(),
@@ -1879,11 +1878,9 @@ ts.member.operateMemberHandler = function(){
 		isPrint : $('#chbPrintFirstRecharge').attr('checked')?true:false,
 		sendSms : $('#chbSendFirstCharge').attr('checked')?true:false
 	}, function(jr){
+		Util.LM.hide();
 		if(jr.success){
 			ts.member.closeAddMemberWin();
-			
-			Util.LM.show();
-			
 			//更新短信
 			Util.sys.checkSmStat();
 			
@@ -2276,7 +2273,6 @@ ts.member.searchMemberDetail = function(){
 			break;
 		}
 	}
-	console.log('op:'+operateType);
 	var mobile = $('#consumeDetail_memberMobile').val();
 	var name = $('#consumeDetail_memberName').val();
 	

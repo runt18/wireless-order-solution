@@ -899,12 +899,7 @@ Util.sys.checkSmStat = function(){
 				Util.sys.smsModule = false;
 			}
 		},
-		error : function(request, status, err){
-			Util.msg.alert({
-				msg : request.msg,
-				topTip : true
-			})
-		}
+		error : function(request, status, err){}
 	}); 	
 };
 

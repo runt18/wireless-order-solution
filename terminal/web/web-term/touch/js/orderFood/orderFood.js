@@ -148,21 +148,27 @@ of.initDeptContent = function(){
 	var dc = $("#deptsCmp");
 	var html = '<a href="javascript: of.initKitchenContent({deptId:-1})" data-role="button" data-inline="true" class="deptKitBtnFont" data-value="-1" data-type="deptCmp">全部部门</a>';
 	
-	of.deptPagingLimit = of.depts.root.length > 9 ? 8 : 9;
+	//真实宽度
+	var usefullWidth = document.body.clientWidth - 220;
+	//每行显示部门的个数
+	var displayDeptCount =  parseInt(usefullWidth / 88);	
+	
+	of.deptPagingLimit = of.depts.root.length > displayDeptCount ? displayDeptCount-1 : displayDeptCount;
 	
 	var limit = of.depts.root.length >= of.deptPagingStart + of.deptPagingLimit ? of.deptPagingLimit : of.deptPagingLimit - (of.deptPagingStart + of.deptPagingLimit - of.depts.root.length);
 	
 	
 	if(of.depts.root.length > 0){
 		for (var i = 0; i < limit; i++) {
+			var dName = of.depts.root[of.deptPagingStart + i].name;
 			html += deptCmpTemplet.format({
 				id : of.depts.root[of.deptPagingStart + i].id,
-				name : of.depts.root[of.deptPagingStart + i].name
+				name : dName.length > 4? dName.substring(0, 4) : dName
 			});
 		}
 	}	
 	//显示部门分页按钮
-	if(of.depts.root.length > 9){
+	if(of.depts.root.length > displayDeptCount){
 		html += '<a href="javascript:of.deptGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
 				'<a href="javascript:of.deptGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>';
 	}	
@@ -305,21 +311,27 @@ of.showKitchenPaging = function(){
 	var kc = $("#kitchensCmp");
 	var html = '<a onclick="of.findFoodByKitchen({event:this, kitchenId:-1})" data-role="button" data-inline="true" data-type="kitchenCmp" data-value=-1 class="deptKitBtnFont">全部厨房</a>';
 	
-	of.kitchenPagingLimit = of.kitchenPagingData.length > 9 ? 8 : 9;
+	//真实宽度
+	var usefullWidth = document.body.clientWidth - 220;
+	//每行显示厨房的个数
+	var displayKitchenCount =  parseInt(usefullWidth / 88);
+	
+	of.kitchenPagingLimit = of.kitchenPagingData.length > displayKitchenCount ? displayKitchenCount-1 : displayKitchenCount;
 	
 	var limit = of.kitchenPagingData.length >= of.kitchenPagingStart + of.kitchenPagingLimit ? of.kitchenPagingLimit : of.kitchenPagingLimit - (of.kitchenPagingStart + of.kitchenPagingLimit -of.kitchenPagingData.length);
 	
 	if(of.kitchenPagingData.length > 0){
 		for (var i = 0; i < limit ; i++) {
+			var kName = of.kitchenPagingData[of.kitchenPagingStart + i].name;
 			html += kitchenCmpTemplet.format({
 				id : of.kitchenPagingData[of.kitchenPagingStart + i].id,
-				name : of.kitchenPagingData[of.kitchenPagingStart + i].name
+				name : kName.length > 4? kName.substring(0, 4) : kName
 			});
 		}
 	}
 	
 	//显示分页按钮
-	if(of.kitchenPagingData.length > 9){
+	if(of.kitchenPagingData.length > displayKitchenCount){
 		html += '<a href="javascript:of.kitchenGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
 				'<a href="javascript:of.kitchenGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>';
 	}	
@@ -532,7 +544,7 @@ of.initNewFoodContent = function(c){
 	temp = null;
 	tempUnitPrice = null;
 	if(sumCount > 0){
-		$('#divDescForCreateOrde div:first').html('总数量:{count}, 合计:￥{price}'.format({
+		$('#divDescForCreateOrde div:first').html('总数量:<font color="green">{count}</font>, 合计:<font color="green">￥{price}</font>'.format({
 			count : sumCount.toFixed(2),
 			price : sumPrice.toFixed(2)
 		}));		

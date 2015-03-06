@@ -438,6 +438,7 @@ html { overflow-y: hidden;}
 	color: green;
 }
 
+/*混合结账*/
 .mixPayInputFont{
 	font-size:20px;font-weight: bold;width: 170px;
 }
@@ -451,11 +452,15 @@ html { overflow-y: hidden;}
 	background-image: -moz-linear-gradient( top,red,maroon);
 }
 
-
+/*显示会员信息table*/
 .readMemberTd{
 	line-height: 50px;font-weight: bold;font-size: 20px;text-align: center;min-width: 96px;
 }
-
 .readMemberTdValue{
 	line-height: 50px;font-weight: bold;font-size: 20px;text-align: left;color: green;min-width: 120px;
+}
+
+/*操作窗口的头高*/
+.win_head{
+	line-height: 35px;
 }
