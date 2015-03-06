@@ -310,6 +310,7 @@ Util.to.padding = function(c){
 			}
 			this.showMsg();
 		},
+		pagedCallBack : c.pagedCallBack,//执行分页后调用
 		showMsg : function(){
 			if(this.displayId != null && this.displayId != ''){
 				var md = $('#'+this.displayId);
@@ -363,7 +364,7 @@ Util.to.padding = function(c){
 			console.log(this.data)*/
 			
 			if(!this.isEmpty()){
-				var html = '';
+				var html = [];
 				var start = this.start, limit = this.data.length >= this.start + this.limit ? this.limit : this.limit - (this.start + this.limit -this.data.length);
 				
 				var temp = null;
@@ -371,20 +372,24 @@ Util.to.padding = function(c){
 					temp = this.data[start+i];
 					this.pageData.push(temp);
 					if(temp != null){
-						html += this.templet({
+						html.push(this.templet({
 							index : i,
 							data : temp
-						});	
+						}));	
 					}
 				}
 				temp = null;
 /*				console.log('html')
 				console.log(html)*/
 				
-				this.dom.html(html).trigger('create');
+				this.dom.html(html.join("")).trigger('create');
 				
 				if(c.around){
 					this.dom.buttonMarkup( "refresh" );
+				}
+				
+				if(typeof this.pagedCallBack == 'function'){
+					this.pagedCallBack();
 				}
 				
 			}

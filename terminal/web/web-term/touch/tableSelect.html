@@ -37,36 +37,6 @@
 <!--引入易笔字核心脚本(utf-8编码)-->
 <script src="http://www.yibizi.com/ybz_core/core/ybz.min.js"></script>
 <!-- <script src="js/yibizi.js"></script> -->
-<script>
-//数字键盘触发的input事件
-var numKeyBoardFireEvent;
-
-//登录操作包
-var ln={
-	restaurant : {},
-	staffData : {staffID:0, staffName:''}
-}
-
-//数字键盘对应的<input>
-var focusInput = "inputTableCustomerCountSet";
-
-//口味动态弹出时鼠标范围
-var mouseOutFoodSelect = false;
-//鼠标离开菜品列表点击时,动态口味关闭
-$(document).bind("click",function(e){ 
-	var target = $(e.target); 
-	if(mouseOutFoodSelect){
-		if($('#divFoodTasteFloat').is(':visible')){
-	 		if(target.closest(".commonTasteFloat").length == 0){ 
-				$(".commonTasteFloat").hide(); 
-			}
-		}		
-	}
-
-}) 
-
-</script>
-
 </head>
 <body>
 
@@ -117,8 +87,8 @@ $(document).bind("click",function(e){
    
 	<div data-role="popup" id="popupAllStatusCmp" data-theme="d" >
         <ul data-role="listview" data-inset="true" style="min-width:100px;" data-theme="b">
-            <li class="tempFoodKitchen" data-icon="false"><a onclick="ts.selectFreeStatus({event:this})">空闲台 - <label id="ts_freeTablesCount" style="color: #f7c942;">0</label></a></li>
-            <li class="tempFoodKitchen" data-icon="false"><a onclick="ts.selectBusyStatus({event:this})">就餐台 - <label id="ts_busyTablesCount" style="color: #f7c942;">0</label></a></li>
+            <li class="tempFoodKitchen" data-icon="false"><a onclick="ts.selectFreeStatus({event:this})">空闲台( <label id="ts_freeTablesCount" style="color: #f7c942;">0</label> )</a></li>
+            <li class="tempFoodKitchen" data-icon="false"><a onclick="ts.selectBusyStatus({event:this})">就餐台( <label id="ts_busyTablesCount" style="color: #f7c942;">0</label> )</a></li>
             <li class="tempFoodKitchen" data-icon="false"><a onclick="ts.selectAllStatus({event:this})">全部台</a></li>
         </ul>
 	</div>	
@@ -1291,7 +1261,7 @@ $(document).bind("click",function(e){
 <!-- 结账界面 -->
 <div data-role="page" id="paymentMgr" data-theme="e">
 	<div id="paymentCmp" class="ui-grid-a">
-		<div class="ui-block-a" style="width:350px;height:800px;border-right: 2px solid gray;">
+		<div class="ui-block-a" style="width:320px;height:800px;border-right: 2px solid gray;">
 			<table id="orderDetialTable"  data-theme="c" data-role="table" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr" >
 		         <thead>
 		           <tr class="ui-bar-d">
@@ -1353,7 +1323,7 @@ $(document).bind("click",function(e){
 		    </div>
 		    
 		</div>
-		<div class="ui-block-b" data-role="content" style="width : -webkit-calc(100% - 350px);width: -moz-calc(100% - 350px);height:800px;">
+		<div class="ui-block-b" data-role="content" style="width : -webkit-calc(100% - 320px);width: -moz-calc(100% - 320px);height:800px;">
 			<div id="divNorthForUpdateOrder"  data-role="header" data-tap-toggle="false" data-theme="b" style="height: 36px;overflow: hidden;">
 				<span id="orderIdInfo" style="line-height: 35px;float: left;margin-left: 5px;">
 					结账 -- 账单号:<font color="#f7c942">-----</font>
@@ -1376,12 +1346,12 @@ $(document).bind("click",function(e){
 		             <th style="width: 25%;">菜名</th>
 		             <th >数量</th>
 		             <th style="width: 15%;">口味</th>
-		             <th >口味价钱</th>
+		             <th style="min-width: 68px;">口味价钱</th>
 		             <th >单价</th>
-					 <th >折扣率</th>
+					 <th style="min-width: 50px;">折扣率</th>
 					 <th >总价</th>
 					 <th >时间</th>
-					 <th >服务员</th>             
+					 <th style="min-width: 50px;">服务员</th>             
 		           </tr>
 		         </thead>
 		         <tbody id="payment_orderFoodListBody" style="font-weight:bold;color: blue">	
@@ -1538,7 +1508,7 @@ $(document).bind("click",function(e){
 	 
 </div>
 
-<div id="lookupOrderDetail" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 200px; left: 50%;width:1250px; margin: -100px 0px 0px -650px;display: none;background-color: white;" align="center">
+<div id="lookupOrderDetail" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 150px; left: 50%;width:1020px; margin: -100px 0px 0px -510px;display: none;background-color: white;" align="center">
     <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
     		<div id="lookupOrderDetailHead" style="float: left;line-height: 35px;margin-left: 10px;">
 				<span id="lookupOrderDetailHead_orderId" style="line-height: 35px;float: left;margin-left: 5px;">
@@ -1587,15 +1557,15 @@ $(document).bind("click",function(e){
          <thead>
 	           <tr class="ui-bar-d">
 	             <th style="width: 25px;"></th>
-	             <th style="width: 280px;">菜名</th>
+	             <th style="width: 200px;">菜名</th>
 	             <th >单价</th>
 	             <th >数量</th>
-	             <th style="width: 12%;">口味</th>
-	             <th >口味价钱</th>
+	             <th style="width: 120px;">口味</th>
+	             <th style="width: 85px;">口味价钱</th>
 	             <th >赠送</th>
 	             <th >折扣率</th>
-				 <th >厨房</th>
-				 <th >操作类型</th>
+				 <th style="width: 90px;">厨房</th>
+				 <th style="width: 85px;">操作类型</th>
 				 <th >时间</th>
 				 <th >服务员</th>   
 				 <th id="lab4CancelReasonOrComment" style="width: 350px;">备注</th>          

@@ -2,36 +2,47 @@ var Request = new Util_urlParaQuery();
 var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 
 //全部餐桌
-var tables = [];
-//设置就餐餐桌数组
-var busyTables = [];
-//设置空闲餐桌数组
-var freeTables = [];
-//当前状态下的被选中区域的餐桌数组
-var tempForRegion = [];
-//被选中区域的所有状态餐桌数组
-var tempForAllStatus = [];
-//临时餐桌数组
-var temp = [];
-//定义存在餐桌的区域id数组
-var regionId = [];
-var region = [];
-//设置当前状态类型（busy， free, allStatus）
-var statusType = "";
-//作为收银端或触摸屏时, 餐台列表的高度
-var tableListHeight = 86;
+var tables = [],
+	//设置就餐餐桌数组
+	busyTables = [],
+	//设置空闲餐桌数组
+	freeTables = [],
+	//当前状态下的被选中区域的餐桌数组
+	tempForRegion = [],
+	//被选中区域的所有状态餐桌数组
+	tempForAllStatus = [],
+	//临时餐桌数组
+	temp = [],
+	//定义存在餐桌的区域id数组
+	regionId = [],
+	region = [],
+	//设置当前状态类型（busy， free, allStatus）
+	statusType = "",
+	//作为收银端或触摸屏时, 餐台列表的高度
+	tableListHeight = 86,
+	
+	//数字键盘触发的input事件
+	numKeyBoardFireEvent,
 
-//餐桌选择包,tt：转台, rn: 区域
-var ts={
-	table : {},
-	rn : {},
-	tt : {},
-	tf : {},
-	dailyOpe : {},
-	member : {},
-	searchTable : false,
-	commitTableOrTran : 'table'
-}
+	//数字键盘对应的<input>
+	focusInput = "inputTableCustomerCountSet",
+	
+	//餐桌选择包,tt：转台, rn: 区域
+	ts={
+		table : {},
+		rn : {},
+		tt : {},
+		tf : {},
+		dailyOpe : {},
+		member : {},
+		searchTable : false,
+		commitTableOrTran : 'table'
+	},
+	//登录操作包
+	ln={
+			restaurant : {},
+			staffData : {staffID:0, staffName:''}
+	}	
 
 var regionCmpTemplet = '<a data-role="button" data-inline="true" class="regionBtn" onclick="">{name}</a>';
 
@@ -234,6 +245,19 @@ $(function(){
 	
 	//获取系统相关属性
 	Util.sys.checkSmStat();
+	
+	//鼠标离开菜品列表点击时,动态口味关闭
+	$(document).bind("click",function(e){ 
+		var target = $(e.target); 
+		if(mouseOutFoodSelect){
+			if($('#divFoodTasteFloat').is(':visible')){
+		 		if(target.closest(".commonTasteFloat").length == 0){ 
+					$(".commonTasteFloat").hide(); 
+				}
+			}		
+		}
+
+	}) 	
 	
 });	
 
@@ -1438,13 +1462,16 @@ function toOrderFoodPage(table){
 	
 	of.loadFoodDateAction = window.setInterval(function(){
 		if(!$('#foodsCmp').html()){
-			of.initKitchenContent({deptId:-1});
+			Util.LM.show();
+			$('#foodsCmp').html('加载菜品中...')
 		}else{
+			of.initKitchenContent({deptId:-1});
 			clearInterval(of.loadFoodDateAction);
+			Util.LM.hide();
 		}
 	}, 400);
 	
-	of.initKitchenContent({deptId:-1});
+//	of.initKitchenContent({deptId:-1});
 	
 	of.initNewFoodContent();
 }

@@ -51,7 +51,7 @@ for(var i = 0; i < keys.length; i++) {
 		}
 		firstTimeInput = false;
 		
-		//触发key input事件
+		//触发key input事件, eg:数字键盘触发搜索餐台
 		if(numKeyBoardFireEvent){
 			numKeyBoardFireEvent();
 		}

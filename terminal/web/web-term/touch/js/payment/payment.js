@@ -1,70 +1,70 @@
-var pm = {
-	table : {}	
-};
-
-var discountData = [],  servicePlanData = [], restaurantData = [], payTypeData=[];
-//加载显示账单基础信息
-var orderMsg;
-//赋值总额用于抹数计算
-var checkOut_actualPrice;
-
-//普通付款或混合付款
-var payType = 1, actualMemberID = -1;
-
-//付款状态
-var isPaying = false, inputReciptWin;
-
-//筛选账单明细的条件
-var lookupCondtion = "true";
-
-//当前折扣 && 服务费方案
-var calcDiscountID, calcServicePlan;
-
-//计算混合结账:提交混合结账, 记录混合结账, 设置快捷键
-var payTypeCash ='', payMoneyCalc = {}, isMixedPay = false, curMixInput;
-
-//查询出来的菜品列表
-var orderFoodDetails = [];
-
-//查找的会员
-var member4Payment, member4Display;
-
-//菜品列表
-var payment_orderFoodListCmpTemplet = '<tr>'
-	+ '<td>{dataIndex}</td>'
-	+ '<td ><div style="height: 45px;overflow: hidden;">{name}</div></td>'
-	+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
-	+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
-	+ '<td>{tastePrice}</td>'
-	+ '<td>{unitPrice}</td>'
-	+ '<td>{discount}</td>'
-	+ '<td>{totalPrice}</td>'
-	+ '<td>{orderDateFormat}</td>'
-	+ '<td>{waiter}</td>'
-	+ '</tr>';	
-
-//账单详细
-var payment_lookupOrderDetailTemplet = '<tr>'
-	+ '<td>{dataIndex}</td>'
-	+ '<td ><div style="height: 30px;overflow: hidden;">{name}</div></td>'
-	+ '<td>{unitPrice}</td>'
-	+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
-	+ '<td><div style="height: 30px;overflow: hidden;">{tastePref}</div></td>'
-	+ '<td>{tastePrice}</td>'
-	+ '<td>{isGift}</td>'
-	+ '<td>{discount}</td>'
-	+ '<td>{kitchenName}</td>'
-	+ '<td>{operation}</td>'
-	+ '<td>{orderDateFormat}</td>'
-	+ '<td>{waiter}</td>'
-	+ '<td>{cancelReason}</td>'
-	+ '</tr>';	
-
-//混合结账选项
-var maxTr = '<tr>' +
-		'<td><label><input data-theme="e" id={checkboxId} data-for={numberfieldId} type="checkbox" name="mixPayCheckbox" onclick="mixPayCheckboxAction({event:this})">{name}</label></td>'+
-		'<td style="padding-right: 10px;"><input data-theme="c" id={numberfieldId} class="mixPayInputFont numberInputStyle" disabled="disabled" ></td>'+
-		'</tr>';
+//结账界面数据对象
+var pm = {table : {}},
+	//折扣,服务费方案, 付款方式
+	discountData = [],  servicePlanData = [], payTypeData=[], restaurantData = [],
+	//加载显示账单基础信息
+	orderMsg,
+	//赋值总额用于抹数计算
+	checkOut_actualPrice,
+	
+	//普通付款或混合付款
+	payType = 1, actualMemberID = -1,
+	
+	//付款状态
+	isPaying = false, inputReciptWin,
+	
+	//筛选账单明细的条件
+	lookupCondtion = "true",
+	
+	//当前折扣 && 服务费方案
+	calcDiscountID, calcServicePlan,
+	
+	//计算混合结账:提交混合结账, 记录混合结账, 设置快捷键
+	payTypeCash ='', payMoneyCalc = {}, isMixedPay = false, curMixInput,
+	
+	//查询出来的菜品列表
+	orderFoodDetails = [],
+	
+	//查找的会员
+	member4Payment, member4Display,
+	/**
+	 * 元素模板
+	 */
+	//菜品列表
+	payment_orderFoodListCmpTemplet = '<tr>'
+		+ '<td>{dataIndex}</td>'
+		+ '<td ><div style="height: 45px;overflow: hidden;">{name}</div></td>'
+		+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
+		+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
+		+ '<td>{tastePrice}</td>'
+		+ '<td>{unitPrice}</td>'
+		+ '<td>{discount}</td>'
+		+ '<td>{totalPrice}</td>'
+		+ '<td>{orderDateFormat}</td>'
+		+ '<td>{waiter}</td>'
+		+ '</tr>',	
+	//账单详细
+	payment_lookupOrderDetailTemplet = '<tr>'
+		+ '<td>{dataIndex}</td>'
+		+ '<td ><div style="height: 30px;overflow: hidden;">{name}</div></td>'
+		+ '<td>{unitPrice}</td>'
+		+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
+		+ '<td><div style="height: 30px;overflow: hidden;">{tastePref}</div></td>'
+		+ '<td>{tastePrice}</td>'
+		+ '<td>{isGift}</td>'
+		+ '<td>{discount}</td>'
+		+ '<td>{kitchenName}</td>'
+		+ '<td>{operation}</td>'
+		+ '<td>{orderDateFormat}</td>'
+		+ '<td>{waiter}</td>'
+		+ '<td>{cancelReason}</td>'
+		+ '</tr>',
+	
+	//混合结账选项
+	maxTr = '<tr>' +
+			'<td><label><input data-theme="e" id={checkboxId} data-for={numberfieldId} type="checkbox" name="mixPayCheckbox" onclick="mixPayCheckboxAction({event:this})">{name}</label></td>'+
+			'<td style="padding-right: 10px;"><input data-theme="c" id={numberfieldId} class="mixPayInputFont numberInputStyle" disabled="disabled" ></td>'+
+			'</tr>';
 
 function showPaymentMgr(c){
 	if(!c || !c.table){
@@ -254,9 +254,9 @@ function loadOrderBasicMsg(){
 	});		
 	
 	//菜品列表
-	var html = '';
+	var html = [];
 	for(var i = 0; i < checkOutData.root.length; i++){
-		html += payment_orderFoodListCmpTemplet.format({
+		html.push(payment_orderFoodListCmpTemplet.format({
 			dataIndex : i + 1,
 			id : checkOutData.root[i].id,
 			name : checkOutData.root[i].name + ((checkOutData.root[i].status & 1 << 7) != 0 ? '[称重确认]' : ''),
@@ -269,10 +269,10 @@ function loadOrderBasicMsg(){
 			totalPrice : checkOutData.root[i].totalPrice.toFixed(2),
 			orderDateFormat : checkOutData.root[i].orderDateFormat.substring(11),
 			waiter : checkOutData.root[i].waiter 
-		});
+		}));
 	}			
 	
-	$('#payment_orderFoodListBody').html(html).trigger('create');	
+	$('#payment_orderFoodListBody').html(html.join("")).trigger('create');	
 	
 	
 }
@@ -991,8 +991,6 @@ function loadMemberInfo(member){
 		$('#payment4MemberCoupon').text('不使用');
 		for (var i = 0; i < member.coupons.length; i++) {
 			couponHtml += '<li data-icon="false" class="popupButtonList" onclick="chooseMemberCoupon({id:'+ member.coupons[i].couponId +',name:\''+ member.coupons[i].couponType.name +'\'})"><a >'+ member.coupons[i].couponType.name +'</a></li>';
-			console.log('html')
-			console.log(couponHtml)
 		}
 		$('#payment_couponList4Member').html(couponHtml).trigger('create');		
 	}else{

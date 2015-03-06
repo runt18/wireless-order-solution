@@ -244,12 +244,17 @@ html { overflow-y: hidden;}
 	margin-right: 0px !important;
 	margin-left: 7px !important;
 }
-
 .food-style > span{
 	font-size: 18px !important;
 	padding: initial;
 	text-align: left;
 	white-space: initial;
+}
+
+/*菜品显示特性字*/
+.food-status-font{
+	/* position:absolute; */
+	right:0;bottom:0;font-size:20px;
 }
 
 /*菜品操作*/

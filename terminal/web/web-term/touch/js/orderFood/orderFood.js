@@ -1,4 +1,4 @@
-
+//点菜界面数据对象
 var of = {
 	deptPaging : {},	
 	deptPagingStart : 0,
@@ -11,9 +11,40 @@ var of = {
 	commonTastes : [],
 	calculator : {},
 	newFood : []
-};
-//不同条件下选出的口味
-var tastesDate = [];
+},
+	//不同条件下选出的口味
+	tastesDate = [],
+
+	//口味动态弹出时鼠标范围
+	mouseOutFoodSelect = false,	
+	/**
+	 * 元素模板
+	 */
+	//部门列表
+	deptCmpTemplet = '<a href="javascript: of.initKitchenContent({deptId:{id}})" data-role="button" data-inline="true" class="deptKitBtnFont" data-type="deptCmp" data-value="{id}" >{name}</a>',
+	//厨房列表
+	kitchenCmpTemplet = '<a data-role="button" data-inline="true" class="deptKitBtnFont" data-type="kitchenCmp" data-value={id} onclick="of.findFoodByKitchen({event:this, kitchenId:{id}})">{name}</a>',
+	//菜品列表
+	foodCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-value={id} onclick="{click}">' +
+							'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
+								'<div class="food-status-font"><font color="orange">{weigh}</font><font color="FireBrick">{sellout}</font><font style="color:green;">{gift}</font></div>'+
+							'</div>'+
+						  '</a>',
+	//已点菜列表					  
+	orderFoodCmpTemplet = '	<li data-icon={isGift} data-index={dataIndex} data-theme="c" data-value={id} data-type="orderFoodCmp" onclick="of.selectNewFood({event:this, foodId:{id}})" ><a >'+
+									'<h1 style="font-size:20px;">{name}</h1>' +
+									'<span style="color:green;">{tasteDisplay}</span>' +
+									'<div>' +
+										'<span style="float: left;color: red;">{foodStatus}</span>' +
+										'<span style="float: right;">￥{unitPrice}  X <font color="green">{count}</font></span>' +
+									'</div>' +
+								'</a></li>',
+	//口味列表
+	tasteCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>',
+	//选中口味
+	choosedTasteCmpTemplet = '<a onclick="removeTaste({event: this, id: {id}})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id}><div>{name}<br>￥{price}</div></a>',
+	//口味组
+	tasteGroupCmpTemplet = '<a data-role="button" data-inline="true" class="tastePopTopBtn" data-value={id} data-index={index} data-theme="{theme}" onclick="initTasteCmp({event:this, id:{id}})">{name}</a>';
 
 //餐台选择匹配
 of.s = {
@@ -93,29 +124,6 @@ of.s = {
 };
 
 
-var deptCmpTemplet = '<a href="javascript: of.initKitchenContent({deptId:{id}})" data-role="button" data-inline="true" class="deptKitBtnFont" data-type="deptCmp" data-value="{id}" >{name}</a>';
-var kitchenCmpTemplet = '<a data-role="button" data-inline="true" class="deptKitBtnFont" data-type="kitchenCmp" data-value={id} onclick="of.findFoodByKitchen({event:this, kitchenId:{id}})">{name}</a>';	
-var foodCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-value={id} onclick="{click}">' +
-						'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
-							'<div style="position:absolute;right:0;bottom:0;font-size:20px;"><font color="orange">{weigh}</font><font color="FireBrick">{sellout}</font><font style="color:green;">{gift}</font></div>'+
-						'</div>'+
-					  '</a>'
-var orderFoodCmpTemplet = '	<li data-icon={isGift} data-index={dataIndex} data-theme="c" data-value={id} data-type="orderFoodCmp" onclick="of.selectNewFood({event:this, foodId:{id}})" ><a >'+
-								'<h1 style="font-size:20px;">{name}</h1>' +
-								'<span style="color:green;">{tasteDisplay}</span>' +
-								'<div>' +
-									'<span style="float: left;color: red;">{foodStatus}</span>' +
-									'<span style="float: right;">￥{unitPrice}  X <font color="green">{count}</font></span>' +
-								'</div>' +
-							'</a></li>';
-
-var tasteCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>';
-
-var choosedTasteCmpTemplet = '<a onclick="removeTaste({event: this, id: {id}})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id}><div>{name}<br>￥{price}</div></a>';
-
-var tasteGroupCmpTemplet = '<a data-role="button" data-inline="true" class="tastePopTopBtn" data-value={id} data-index={index} data-theme="{theme}" onclick="initTasteCmp({event:this, id:{id}})">{name}</a>';
-
-
 //设置搜索出来的菜品的排序依据, 按点击次数
 of.searchFoodCompare = function (obj1, obj2) {
     var val1 = obj1.foodCnt;
@@ -146,7 +154,7 @@ function setInput(id, callback){
  */
 of.initDeptContent = function(){
 	var dc = $("#deptsCmp");
-	var html = '<a href="javascript: of.initKitchenContent({deptId:-1})" data-role="button" data-inline="true" class="deptKitBtnFont" data-value="-1" data-type="deptCmp">全部部门</a>';
+	var html = ['<a href="javascript: of.initKitchenContent({deptId:-1})" data-role="button" data-inline="true" class="deptKitBtnFont" data-value="-1" data-type="deptCmp">全部部门</a>'];
 	
 	//真实宽度
 	var usefullWidth = document.body.clientWidth - 220;
@@ -161,18 +169,18 @@ of.initDeptContent = function(){
 	if(of.depts.root.length > 0){
 		for (var i = 0; i < limit; i++) {
 			var dName = of.depts.root[of.deptPagingStart + i].name;
-			html += deptCmpTemplet.format({
+			html.push(deptCmpTemplet.format({
 				id : of.depts.root[of.deptPagingStart + i].id,
 				name : dName.length > 4? dName.substring(0, 4) : dName
-			});
+			}));
 		}
 	}	
 	//显示部门分页按钮
 	if(of.depts.root.length > displayDeptCount){
-		html += '<a href="javascript:of.deptGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
-				'<a href="javascript:of.deptGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>';
+		html.push('<a href="javascript:of.deptGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
+				'<a href="javascript:of.deptGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>');
 	}	
-	$("#deptsCmp").html(html).trigger('create').trigger('refresh');	
+	$("#deptsCmp").html(html.join("")).trigger('create').trigger('refresh');	
 };
 
 /**
@@ -262,6 +270,12 @@ of.initKitchenContent = function(c){
 					gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
 					weigh : (c.data.status & 1 << 7) != 0 ? '称' : ''					
 				});
+			},
+			pagedCallBack : function(){
+				//FIXME .food-status-font中position:absolute不起作用
+				setTimeout(function(){
+					$(".food-status-font").css("position", "absolute");
+				}, 200);				
 			}
 		});			
 	}else{
@@ -282,9 +296,12 @@ of.initKitchenContent = function(c){
  */
 function keepLoadFoodData(){
 	if(!$('#foodsCmp').html()){
-		of.initKitchenContent({deptId:-1});
+		Util.LM.show();
+		$('#foodsCmp').html('加载菜品中...')
 	}else{
+		of.initKitchenContent({deptId:-1});
 		clearInterval(of.loadFoodDateAction);
+		Util.LM.hide();
 	}
 }
 
@@ -309,7 +326,7 @@ of.kitchenGetPreviousPage = function(){
 //显示厨房分页
 of.showKitchenPaging = function(){
 	var kc = $("#kitchensCmp");
-	var html = '<a onclick="of.findFoodByKitchen({event:this, kitchenId:-1})" data-role="button" data-inline="true" data-type="kitchenCmp" data-value=-1 class="deptKitBtnFont">全部厨房</a>';
+	var html = ['<a onclick="of.findFoodByKitchen({event:this, kitchenId:-1})" data-role="button" data-inline="true" data-type="kitchenCmp" data-value=-1 class="deptKitBtnFont">全部厨房</a>'];
 	
 	//真实宽度
 	var usefullWidth = document.body.clientWidth - 220;
@@ -323,19 +340,19 @@ of.showKitchenPaging = function(){
 	if(of.kitchenPagingData.length > 0){
 		for (var i = 0; i < limit ; i++) {
 			var kName = of.kitchenPagingData[of.kitchenPagingStart + i].name;
-			html += kitchenCmpTemplet.format({
+			html.push(kitchenCmpTemplet.format({
 				id : of.kitchenPagingData[of.kitchenPagingStart + i].id,
 				name : kName.length > 4? kName.substring(0, 4) : kName
-			});
+			}));
 		}
 	}
 	
 	//显示分页按钮
 	if(of.kitchenPagingData.length > displayKitchenCount){
-		html += '<a href="javascript:of.kitchenGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
-				'<a href="javascript:of.kitchenGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>';
+		html.push('<a href="javascript:of.kitchenGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
+				'<a href="javascript:of.kitchenGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>');
 	}	
-	kc.html(html).trigger('create').trigger('refresh');
+	kc.html(html.join("")).trigger('create').trigger('refresh');
 
 };
 
@@ -1029,24 +1046,24 @@ function initTasteGroupCmp(c){
 	
 	var limit = of.tasteGroups.length >= of.ot.tasteGroupPagingStart + of.ot.tasteGroupPagingLimit ? of.ot.tasteGroupPagingLimit : of.ot.tasteGroupPagingLimit - (of.ot.tasteGroupPagingStart + of.ot.tasteGroupPagingLimit - of.tasteGroups.length);
 	
-	var html = "";
+	var html = [];
 	if(of.tasteGroups.length > 0){
 		for (var i = 0; i < limit; i++) {
-			html += tasteGroupCmpTemplet.format({
+			html.push(tasteGroupCmpTemplet.format({
 				index : i,
 				id : of.tasteGroups[of.ot.tasteGroupPagingStart + i].id,
 				name : of.tasteGroups[of.ot.tasteGroupPagingStart + i].name,
 				theme : of.tasteGroups[of.ot.tasteGroupPagingStart + i].id == -10 && of.ot.allBill ==2 ? "e" : "b"
-			});
+			}));
 		}
 	}	
 	
 	if(of.tasteGroups.length > 7){
-		html += '<a onclick="tasteGroupGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="tasteGroupPage">L</a>' +
-				'<a onclick="tasteGroupGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="tasteGroupPage">R</a>';
+		html.push('<a onclick="tasteGroupGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="tasteGroupPage">L</a>' +
+				'<a onclick="tasteGroupGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="tasteGroupPage">R</a>');
 	}	
 	
-	$("#tasteGroupCmp").html(html).trigger('create');	
+	$("#tasteGroupCmp").html(html.join("")).trigger('create');	
 };
 
 /**
@@ -1425,11 +1442,11 @@ function closeSearchFood(){
 of.tf = {
 	selectedKitchen : null,
 	initTempKitchen : function(){
-		var html = '';
+		var html = [];
 		for (var i = 0; i < of.tempKitchens.length; i++) {
-			html += '<li class="tempFoodKitchen" onclick="of.tf.tempFoodSelectKitchen({event:this, id:' + of.tempKitchens[i].id +'})"><a>' + of.tempKitchens[i].name +'</a></li>';
+			html.push('<li class="tempFoodKitchen" onclick="of.tf.tempFoodSelectKitchen({event:this, id:' + of.tempKitchens[i].id +'})"><a>' + of.tempKitchens[i].name +'</a></li>');
 		}
-		$('#tempFoodKitchensCmp').html(html).trigger('create');
+		$('#tempFoodKitchensCmp').html(html.join("")).trigger('create');
 		$('#tempFoodKitchensCmp').listview('refresh');
 	}
 }

@@ -1,10 +1,4 @@
-
-window.onload = function (){ 
-} 
-
-//存放退菜的数组
-var uoCancelFoods = [];
-
+//已点菜界面数据对象
 var uo = {
 	table : {},
 	order : {},
@@ -12,54 +6,49 @@ var uo = {
 	reasons : [],
 	discounts : [],
 	selectedFood : {}
-};
-
-
-function initSearchTables(c){
-	var html = '';
-//	var click;
-//	if(ts.commitTableOrTran == 'lookup'){
-//		click = 'ts.toOrderFoodOrTransFood'; 
-//	}else if(ts.commitTableOrTran == 'frontTransTable'){
-//		click = 'ts.toOrderFoodOrTransFood';
-//	}else{
-//		click = 'ts.toOrderFoodOrTransFood';
-//	}
-	for (var i = 0; i < c.data.length; i++) {
-		
-		html += tableCmpTemplet.format({
-			dataIndex : i,
-			id : c.data[i].id,
-			click : 'ts.toOrderFoodOrTransFood({alias:'+ c.data[i].alias +',id:'+ c.data[i].id +'})',
-			alias : c.data[i].alias && c.data[i].alias != 0?c.data[i].alias:'<font color="green">搭台</font>',
-			theme : c.data[i].statusValue == '1' ? "e" : "c",
-			name : c.data[i].name == "" || typeof c.data[i].name != 'string' ? c.data[i].alias + "号桌" : c.data[i].name
-		});	
+},
+	//存放退菜的数组
+	uoCancelFoods = [],
+	/**
+	 * 元素模板
+	 */
+	//已点菜列表
+	orderFoodListCmpTemplet = '<tr>'
+		+ '<td>{dataIndex}</td>'
+		+ '<td ><div style="height: 45px;overflow: hidden;">{name}</div></td>'
+		+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
+		+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
+		+ '<td>{actualPrice}</td>'
+	//	+ '<td>{totalPrice}</td>'
+		+ '<td>{orderDateFormat}</td>'
+		+ '<td>' 
+		+ 		'<div data-role="controlgroup" data-type="horizontal" >'
+	    + 			'<a onclick="uo.openCancelFoodCmp({event:this})" data-index={dataIndex} data-role="button" data-theme="b">退菜</a>'
+	    +			'<a onclick="uo.transFoodForTS({event:this})" data-index={dataIndex} data-role="button" data-theme="b">转菜</a>'
+	    +			'<a  data-index={dataIndex} data-role="button" data-theme="b"  data-rel="popup"  data-transition="pop" onclick="uo.openOrderFoodOtherOperate({event:this})">更多</a>'
+	    +		'</div>'
+	    +'</td>'
+		+ '<td>{waiter}</td>'
+		+ '</tr>',	
+	
+	tableCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}><div>{name}<br>{alias}</div></a>';
+	
+	function initSearchTables(c){
+		var html = '';
+		for (var i = 0; i < c.data.length; i++) {
+			
+			html += tableCmpTemplet.format({
+				dataIndex : i,
+				id : c.data[i].id,
+				click : 'ts.toOrderFoodOrTransFood({alias:'+ c.data[i].alias +',id:'+ c.data[i].id +'})',
+				alias : c.data[i].alias && c.data[i].alias != 0?c.data[i].alias:'<font color="green">搭台</font>',
+				theme : c.data[i].statusValue == '1' ? "e" : "c",
+				name : c.data[i].name == "" || typeof c.data[i].name != 'string' ? c.data[i].alias + "号桌" : c.data[i].name
+			});	
+		}
+		$('#divSelectTablesForTs').html(html);
+		$('#divSelectTablesForTs a').buttonMarkup( "refresh" );
 	}
-	$('#divSelectTablesForTs').html(html);
-	$('#divSelectTablesForTs a').buttonMarkup( "refresh" );
-}
-
-var orderFoodListCmpTemplet = '<tr>'
-	+ '<td>{dataIndex}</td>'
-	+ '<td ><div style="height: 45px;overflow: hidden;">{name}</div></td>'
-	+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
-	+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
-	+ '<td>{actualPrice}</td>'
-//	+ '<td>{totalPrice}</td>'
-	+ '<td>{orderDateFormat}</td>'
-	+ '<td>' 
-	+ 		'<div data-role="controlgroup" data-type="horizontal" >'
-    + 			'<a onclick="uo.openCancelFoodCmp({event:this})" data-index={dataIndex} data-role="button" data-theme="b">退菜</a>'
-    +			'<a onclick="uo.transFoodForTS({event:this})" data-index={dataIndex} data-role="button" data-theme="b">转菜</a>'
-    +			'<a  data-index={dataIndex} data-role="button" data-theme="b"  data-rel="popup"  data-transition="pop" onclick="uo.openOrderFoodOtherOperate({event:this})">更多</a>'
-    +		'</div>'
-    +'</td>'
-	+ '<td>{waiter}</td>'
-	+ '</tr>';	
-
-var tableCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}><div>{name}<br>{alias}</div></a>';
-
 
 /**
  * 初始化菜单数据，存放在uoFood数组中

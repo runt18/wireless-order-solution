@@ -7,6 +7,7 @@ if(location.href.indexOf('#') > 0){
 	location.href = 'verifyLogin.html?status='+systemStatus;
 }
 
+//登陆界面数据对象
 var lg = {
 		restaurant : {},
 		staffs : [],
@@ -53,7 +54,7 @@ $(function(){
 			url : '../VerifyRestaurant.do',
 			data : {
 				account : restaurantEntity.account,
-				token : token
+				token : token && token != 'undefined'?token:''
 			},	
 			type : 'post',
 			success : function(data, status, xhr){
