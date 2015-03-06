@@ -1395,12 +1395,12 @@ function showTable(temp){
  */
 function showRegion(temp, pageNow){
 	//添加区域信息
-	var html = '';
+	var html = [];
 	for (var i = 0; i < temp.length; i++) {
-		html += '<a data-role="button" data-inline="true" data-type="region" class="regionBtn" onclick="ts.addTables({event:this, id:'+ temp[i].id +'})">'+ temp[i].name +'</a>'
+		html.push('<a data-role="button" data-inline="true" data-type="region" class="regionBtn" onclick="ts.addTables({event:this, id:'+ temp[i].id +'})">'+ temp[i].name +'</a>');
 	}
 	
-	$('#divSelectRegionForTS').html(html).trigger('create').trigger('refresh');
+	$('#divSelectRegionForTS').html(html.join("")).trigger('create').trigger('refresh');
 }
 
 /**
@@ -1460,18 +1460,20 @@ function toOrderFoodPage(table){
 	//渲染数据
 	of.initDeptContent();
 	
+	var index = 0;
 	of.loadFoodDateAction = window.setInterval(function(){
-		if(!$('#foodsCmp').html()){
-			Util.LM.show();
-			$('#foodsCmp').html('加载菜品中...')
-		}else{
-			of.initKitchenContent({deptId:-1});
+		if($('#foodsCmp').find("a").length > 0){
 			clearInterval(of.loadFoodDateAction);
+			if(index == 0){
+				of.initKitchenContent({deptId:-1});
+			}
 			Util.LM.hide();
+		}else{
+			index ++;
+			Util.LM.show();
+			of.initKitchenContent({deptId:-1});
 		}
 	}, 400);
-	
-//	of.initKitchenContent({deptId:-1});
 	
 	of.initNewFoodContent();
 }
@@ -1486,11 +1488,11 @@ function getDailyInfo(c){
 	$('#shadowForPopup').show();
 	
 	//生成打印位置
-	var html ='';
+	var html = [];
 	for (var i = 0; i < region.length; i++) {
-		html += '<option value={0}>{1}</option>'.format(region[i].id, region[i].name);
+		html.push('<option value={0}>{1}</option>'.format(region[i].id, region[i].name));
 	}
-	$('#dailyPrintPosition').html(html);
+	$('#dailyPrintPosition').html(html.join(""));
 	
 	if(getcookie(document.domain+'_paymentCheck') == 'true'){
 		$('#div4SelectionItem').show();
@@ -1579,12 +1581,12 @@ function getDailyInfo(c){
 			$('#bssiServiceIncome').html(business.serviceIncome.toFixed(2));
 			
 			
-			var trPayTypeContent='<tr>'
+			var trPayTypeContent = ['<tr>'
 			  + '<th class="table_title text_center">收款方式</th>'
 			  + '<th class="table_title text_center">账单数</th>'
 			  + '<th class="table_title text_center">应收总额</th>'
 			  + '<th class="table_title text_center">实收总额</th>'
-			  + '</tr>';								
+			  + '</tr>'];								
 			//输出付款方式集合
 			var totalCount = 0, totalShouldPay = 0, totalActual = 0, trPayIncomeData;
 			for(var i = 0; i < business.paymentIncomes.length; i++){
@@ -1593,7 +1595,7 @@ function getDailyInfo(c){
 				totalShouldPay += temp.total;
 				totalActual += temp.actual;
 				
-				trPayTypeContent += (trPayIncomeModel.format(
+				trPayTypeContent.push(trPayIncomeModel.format(
 						temp.payType, 
 						temp.amount, 
 						temp.total.toFixed(2), 
@@ -1603,13 +1605,13 @@ function getDailyInfo(c){
 				
 			}
 			//汇总
-			trPayTypeContent += (trPayIncomeModel.format(
+			trPayTypeContent.push(trPayIncomeModel.format(
 				'总计', 
 				totalCount, 
 				totalShouldPay.toFixed(2), 
 				totalActual.toFixed(2)
 			));
-			$('#businessStatisticsSummaryPayIncome').html(trPayTypeContent);
+			$('#businessStatisticsSummaryPayIncome').html(trPayTypeContent.join(""));
 		}
 	});
 
@@ -1793,16 +1795,16 @@ ts.member.openMemberOperationWin = function(){
 			if(jr.success){
 //				memberTypeData = jr.root;
 				Util.LM.hide();
-				var html = '';
+				var html = [];
 				for (var i = 0; i < jr.root.length; i++) {
-					html += '<option value={id} data-attrVal={attrVal} data-chargeRate={chargeRate}>{name}</option>'.format({
+					html.push('<option value={id} data-attrVal={attrVal} data-chargeRate={chargeRate}>{name}</option>'.format({
 						id : jr.root[i].id,
 						attrVal : jr.root[i].attributeValue,
 						chargeRate : jr.root[i].chargeRate,
 						name : jr.root[i].name
-					});
+					}));
 				}
-				$('#cm_comboMemberType').html(html).selectmenu('refresh');
+				$('#cm_comboMemberType').html(html.join("")).selectmenu('refresh');
 				
 				$('#addMemberInfo').show();
 				$('#shadowForPopup').show();
@@ -2318,9 +2320,9 @@ ts.member.searchMemberDetail = function(){
 		success : function(result, status, xhr){
 			Util.LM.hide();
 			if(result.success){
-				var html = '';
+				var html = [];
 				for(var i = 0, index = 1; i < result.root.length; i++){
-					html += memberConsumeTrTemplet.format({
+					html.push(memberConsumeTrTemplet.format({
 						dataIndex : index,
 						orderId : result.root[i].orderId != 0?result.root[i].orderId:'----',
 						operateDateFormat : result.root[i].operateDateFormat,
@@ -2331,11 +2333,11 @@ ts.member.searchMemberDetail = function(){
 						deltaPoint : result.root[i].deltaPoint > 0? '+'+result.root[i].deltaPoint : result.root[i].deltaPoint,
 						staffName : result.root[i].staffName,
 						comment : result.root[i].comment
-					});	
+					}));	
 					index ++;
 				}	
 				
-				$('#front_memberConsumeDetailBody').html(html).trigger('create');
+				$('#front_memberConsumeDetailBody').html(html.join("")).trigger('create');
 			}
 		},
 		error : function(request, status, err){
@@ -2360,16 +2362,16 @@ ts.member.openMemberConsumeDetailWin = function(){
 		data : {dataSource : 'normal'},
 		success : function(jr, status, xhr){
 			if(jr.success){
-				var html = '<option value=-1 >全部</option>';
+				var html = ['<option value=-1 >全部</option>'];
 				for (var i = 0; i < jr.root.length; i++) {
-					html += '<option value={id} >{name}</option>'.format({
+					html.push('<option value={id} >{name}</option>'.format({
 						id : jr.root[i].id,
 						attrVal : jr.root[i].attributeValue,
 						chargeRate : jr.root[i].chargeRate,
 						name : jr.root[i].name
-					});
+					}));
 				}
-				$('#consumeDetail_memberType').html(html).selectmenu('refresh');
+				$('#consumeDetail_memberType').html(html.join("")).selectmenu('refresh');
 			}else{
 				Util.msg.alert({
 					renderTo : 'tableSelectMgr',

@@ -275,7 +275,7 @@ of.initKitchenContent = function(c){
 				//FIXME .food-status-font中position:absolute不起作用
 				setTimeout(function(){
 					$(".food-status-font").css("position", "absolute");
-				}, 200);				
+				}, 250);				
 			}
 		});			
 	}else{
@@ -1589,22 +1589,22 @@ of.tf.saveTempFood = function(){
 //常用口味
 function foodCommonTasteLoad(){
 	of.ot.choosedTastes = [];
-	var html = '';
+	var html = [];
 	for (var i = 0; i < of.commonTastes.length; i++) {
-		html += tasteCmpTemplet.format({
+		html.push(tasteCmpTemplet.format({
 			index : i,
 			id : of.commonTastes[i].taste.id,
 			name : of.commonTastes[i].taste.name,
 			click : "chooseOrderFoodCommonTaste({event: this, id: "+ of.commonTastes[i].taste.id +"})",
 			price : of.commonTastes[i].taste.price,
 			theme : "c"
-		});		
+		}));		
 	}
 	
-	html += '<a onclick="operateOrderFoodTaste({type:2})" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">更多口味</a>' +
-			'<a onclick="addTempTaste()" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">手写口味</a>';
+	html.push('<a onclick="operateOrderFoodTaste({type:2})" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">更多口味</a>' +
+			'<a onclick="addTempTaste()" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">手写口味</a>');
 	
-	$("#divFloatFoodTastes").html(html).trigger('create');	
+	$("#divFloatFoodTastes").html(html.join("")).trigger('create');	
 	
 	$('#txtChooosedFoodName').text(of.selectedOrderFood.name);
 	

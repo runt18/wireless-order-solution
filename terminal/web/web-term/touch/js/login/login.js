@@ -61,7 +61,9 @@ $(function(){
 				Util.LM.hide();
 				if(data.success && data.root.length > 0){
 					//把token存入cookie
-					setcookie("digie_token", data.other.token);
+					if(data.other.token){
+						setcookie("digie_token", data.other.token);
+					}
 					//FIXME 更新cookie
 					setcookie("digie_restaurant", data.root[0].account);
 					
@@ -327,8 +329,6 @@ function selectedName(thiz){
 	}, 200);
 	$('#selectStaffCmp').popup('close');
 	$('#lab4StaffName').text(btn.text());
-	
-
 }
 
 /**
@@ -339,7 +339,7 @@ function openStaffSelectCmp(){
 		data : lg.staffs
 	});
 	lg.staffPaging.getFirstPage();
-	$('#selectStaffCmp').parent().addClass("pop").addClass("in");
+//	$('#selectStaffCmp').parent().addClass("pop").addClass("in");
 	$('#selectStaffCmp').popup('open');
 	
 }
