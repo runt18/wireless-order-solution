@@ -342,11 +342,12 @@ Ext.onReady(function(){
     initCancelReasonWin();
     initBusinessHourWin();
     
+    //登出
      Ext.get('btnLoginOut').on('click', function(){
 		Ext.Ajax.request({
 			url : '../../LoginOut.do',
 			success : function(){
-				location.href = '../Login.html';
+				location.href="../../touch/verifyLogin.html?status=1";
 			},
 			failure : function(){
 				
