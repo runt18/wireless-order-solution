@@ -491,7 +491,8 @@ function operateMemberHandler(c){
 			firstCharge : firstCharge.getValue(),
 			firstActualCharge : firstActualCharge.getValue(),
 			rechargeType : rechargeType.getValue(),
-			isPrint : Ext.getCmp('chbPrintFirstRecharge').getValue(),
+			isPrint : c.isPrint,
+			sendSms : c.sendSms,
 			addr : Ext.getCmp('cm_txtMemberContactAddress').getValue()
 		},
 		success : function(res, opt){

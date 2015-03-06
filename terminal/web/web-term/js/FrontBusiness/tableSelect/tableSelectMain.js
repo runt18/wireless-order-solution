@@ -1275,6 +1275,8 @@ var btnControlMember = new Ext.ux.ImageButton({
 							var btnClose = Ext.getCmp('btnCloseControlMemberBasicMsg');
 							operateMemberHandler({
 								type : 'INSERT',
+								isPrint : Ext.getCmp('chbPrintFirstRecharge').getValue(),
+								sendSms : Ext.getCmp('chbSendFirstCharge').getValue(),
 								setButtonStatus : function(s){
 									e.setDisabled(s);
 									btnClose.setDisabled(s);
@@ -1508,7 +1510,7 @@ var logOutBut = new Ext.ux.ImageButton({
 		Ext.Ajax.request({
 			url : '../../LoginOut.do',
 			success : function(){
-				location.href = '../Login.html';
+				location.href="../../touch/verifyLogin.html?status=1"
 			},
 			failure : function(){
 				

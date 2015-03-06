@@ -1383,6 +1383,8 @@ function winInit(){
 							operateMemberHandler({
 								type : memberBasicWin.otype,
 								data : memberBasicWin.otype == Ext.ux.otype['update'] ? Ext.ux.getSelData(memberBasicGrid) : null,
+								isPrint : Ext.getCmp('chbPrintFirstRecharge').getValue(),
+								sendSms : Ext.getCmp('chbSendFirstCharge').getValue(),										
 								setButtonStatus : function(s){
 									e.setDisabled(s);
 									btnClose.setDisabled(s);
