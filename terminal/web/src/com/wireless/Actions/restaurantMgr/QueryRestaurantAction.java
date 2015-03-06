@@ -15,11 +15,13 @@ import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.SMStatDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.token.TokenDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.SMStat;
+import com.wireless.pojo.token.Token;
 import com.wireless.util.DataPaging;
 
 public class QueryRestaurantAction extends Action{
@@ -66,12 +68,27 @@ public class QueryRestaurantAction extends Action{
 					for(final Restaurant rest : list) {
 						//为restaurant加上短信条数
 						final SMStat sms = SMStatDao.get(dbCon, StaffDao.getAdminByRestaurant(dbCon, rest.getId()));
+						
+						//为restaurant加上验证码个数
+						int used = 0, unUsed = 0;
+						List<Token> tokens = TokenDao.getByCond(new TokenDao.ExtraCond().setRestaurant(rest.getId()));
+						for (Token token : tokens) {
+							if(token.getStatus() == Token.Status.TOKEN){
+								used ++;
+							}else{
+								unUsed ++;
+							}
+						}
+						final int usedCode = used, unUsedCode = unUsed;
+
 						resList.add(new Jsonable() {
 							@Override
 							public JsonMap toJsonMap(int flag) {
 								JsonMap jm = new JsonMap();
 								jm.putJsonable(rest, 0);
 								jm.putInt("smsRemain", sms.getRemaining());
+								jm.putInt("usedCode", usedCode);
+								jm.putInt("unUsedCode", unUsedCode);
 								return jm;
 							}
 							
@@ -80,6 +97,7 @@ public class QueryRestaurantAction extends Action{
 								
 							}
 						});
+						
 					}
 					jobject.setTotalProperty(list.size());
 					resList = DataPaging.getPagingData(resList, isPaging, start, limit);

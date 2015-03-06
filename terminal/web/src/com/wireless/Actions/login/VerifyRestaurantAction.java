@@ -40,9 +40,10 @@ public class VerifyRestaurantAction extends Action {
 			//FIXME 过渡阶段
 			if(token == null || token.trim().isEmpty()){
 				int tokenId = TokenDao.insert(new Token.InsertBuilder(r));
-				tokenBean = TokenDao.getById(tokenId); 
-				int code = tokenBean.getCode();
-				TokenDao.generate(new Token.GenerateBuilder(r.getAccount(), code));
+				Token tempToken = TokenDao.getById(tokenId); 
+				int code = tempToken.getCode();
+				tokenId = TokenDao.generate(new Token.GenerateBuilder(r.getAccount(), code));
+				tokenBean = TokenDao.getById(tokenId);
 			}else{
 				int tokenId = TokenDao.verify(new Token.VerifyBuilder(account, token));
 				tokenBean = TokenDao.getById(tokenId);
@@ -52,8 +53,6 @@ public class VerifyRestaurantAction extends Action {
 			
 			List<Restaurant> list = new ArrayList<>();
 			list.add(r);
-			
-			jobject.setRoot(list);
 			
 			jobject.setExtra(new Jsonable(){
 				@Override
@@ -71,6 +70,7 @@ public class VerifyRestaurantAction extends Action {
 					
 				}
 			});				
+			jobject.setRoot(list);
 			
 		}catch (BusinessException e) {
 			jobject.initTip(e);

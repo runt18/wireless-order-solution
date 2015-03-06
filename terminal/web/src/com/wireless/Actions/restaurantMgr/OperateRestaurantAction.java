@@ -2,6 +2,7 @@ package com.wireless.Actions.restaurantMgr;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +15,7 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.token.TokenDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -25,6 +27,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.restaurantMgr.Restaurant.InsertBuilder;
 import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.restaurantMgr.Restaurant.UpdateBuilder;
+import com.wireless.pojo.token.Token;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
 
@@ -320,5 +323,60 @@ public class OperateRestaurantAction extends DispatchAction {
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
-	}	
+	}
+	
+	/**
+	 * 生成动态码
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward tokenCode(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String resId = request.getParameter("resId");
+		JObject jobject = new JObject();
+		try{
+			int restaurantId = Integer.parseInt(resId);
+			int tokenId = TokenDao.insert(new Token.InsertBuilder(restaurantId));
+			Token tempToken = TokenDao.getById(tokenId); 
+			final int code = tempToken.getCode();	
+			
+			//为restaurant加上验证码个数
+			int used = 0, unUsed = 0;
+			List<Token> tokens = TokenDao.getByCond(new TokenDao.ExtraCond().setRestaurant(restaurantId));
+			for (Token token : tokens) {
+				if(token.getStatus() == Token.Status.TOKEN){
+					used ++;
+				}else{
+					unUsed ++;
+				}
+			}
+			final int usedCode = used, unUsedCode = unUsed;
+			
+			jobject.setExtra(new Jsonable() {
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putInt("code", code);
+					jm.putInt("usedCode", usedCode);
+					jm.putInt("unUsedCode", unUsedCode);
+					return jm;
+				}
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+			});
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 }
