@@ -41,6 +41,8 @@ function getChecked(checkBoxs){
 	}
 	return checkeds;
 }
+
+
 function getRestaurantModules(){
 	if(document.getElementsByName('modules').length == 0){
 		for (var i = 0; i < moduleData.length; i++) {
@@ -369,7 +371,8 @@ var restaurantAddWin = new Ext.Window({
 
 function optRestaurant(){
 	return ''
-	+ "<a href = \"javascript:optRestaurantHandler({otype:'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>";
+	+ "<a href = \"javascript:optRestaurantHandler({otype:'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"
+	+ "<a href = \"javascript:displayCodeHandle()\">" + "<img src='../../images/Modify.png'/>生成验证码</a>";
 }
 
 function optSms(v){
@@ -566,6 +569,118 @@ function optSmsHandler(){
 	numAdjustSms.focus(true, 100);
 }
 
+
+
+function displayCodeHandle(){
+	var data = Ext.ux.getSelData(restaurantPanel);
+	var resId = data.id;
+	if(!displayCodeWin){
+		displayCodeWin = new Ext.Window({
+			title : '&nbsp;',
+			modal : true,
+			closable : false,
+			resizable : false,
+			width : 200,
+			height : 146,
+			layout : 'fit',
+			frame : true,
+			items : [{
+				layout : 'column',
+				frame : true,
+				defaults : {
+					columnWidth : .25,
+					layout : 'form',
+					labelWidth : 60
+				},
+				items : [ {
+					columnWidth : 1,
+					style : 'text-align:center;',
+					items : [{
+						xtype : 'label',
+						id : 'numMemberSmsForNow',
+						style : 'color:green;font-size:25px;',
+						text : 0
+					}]
+				}, {
+					columnWidth : 1,
+					items : [{
+						xtype : 'label',
+						html : '&nbsp;',
+					}]
+				},{
+					items : [{
+						xtype : 'label',
+						text : '已使用:',
+					}]
+				}, {
+					items : [{
+						xtype : 'label',
+						id : 'numUsedCode',
+						style : 'color:green;',
+						text : 0,
+					}]
+				},{
+					items : [{
+						xtype : 'label',
+						text : '未使用:',
+					}]
+				}, {
+					columnWidth : .23,
+					items : [{
+						xtype : 'label',
+						id : 'numUnUsedCode',
+						style : 'color:green;',
+						text : 0,
+					}]
+				}]
+			}],
+			bbar : ['->', {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(){
+					displayCodeWin.hide();
+				}
+			}],
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					displayCodeWin.hide();
+				}
+			}],
+			listeners : {
+				hide : function(){
+				}
+			}
+		});
+	}
+	
+	displayCodeWin.setTitle('验证码生成 -- ' + data['name']);
+	//获取验证码
+	Ext.Ajax.request({
+		url : '../../OperateRestaurant.do',
+		params : {
+			resId : resId,
+			dataSource : 'tokenCode'
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				Ext.getCmp('numMemberSmsForNow').setText(jr.other.code);
+				Ext.getCmp('numUsedCode').setText(jr.other.usedCode + '');
+				Ext.getCmp('numUnUsedCode').setText(jr.other.unUsedCode + '');
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});		
+	
+	displayCodeWin.show();
+}
+
 function optRestaurantHandler(c){
 	if(c.otype != 'undefined'){
 		if(c.otype == 'insert'){
@@ -660,6 +775,10 @@ Ext.onReady(function(){
 			name : 'moduleDescs'
 		}, {
 			name : 'dianping'
+		}, {
+			name : 'usedCode'
+		}, {
+			name : 'unUsedCode'
 		}])
 	});
 	
@@ -672,9 +791,11 @@ Ext.onReady(function(){
 		{header : '餐厅名', dataIndex : 'name', width : 150},
 		{header : '活跃度', dataIndex : 'liveness'},
 		{header : '账单有效期', dataIndex : 'recordAliveText'},
-		{header : '授权模块', dataIndex : 'moduleDescs',width : 250},
+		{header : '授权模块', dataIndex : 'moduleDescs',width : 180},
 		{header : '短信', dataIndex : 'smsRemain', align : 'right', renderer : optSms},
-		{header : '操作', dataIndex : 'optRestaurant', id : 'optRestaurant', align : 'center', renderer : optRestaurant}
+		{header : '已用验证码', dataIndex : 'usedCode', align : 'right'},
+		{header : '可用验证码', dataIndex : 'unUsedCode', align : 'right'},
+		{header : '操作', dataIndex : 'optRestaurant', id : 'optRestaurant',width : 200, align : 'center', renderer : optRestaurant}
 		
 	]);
 	
