@@ -49,8 +49,10 @@
 		</action>
 		<action path="/OperateStaff" type="com.wireless.Actions.login.OperateStaffAction"
 			scope="request">
-
 		</action>
+		<action path="/AdminLogin" type="com.wireless.Actions.login.AdminLoginAction"
+			scope="request">
+		</action>		
 		<action path="/QueryRestaurant" type="com.wireless.Actions.login.QueryRestaurantAction"
 			scope="request">
 		</action>
@@ -619,6 +621,7 @@
 			type="com.wireless.Actions.login.VerifyRestaurantAction"
 			scope="request" >
 		</action>				
+		
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
