@@ -148,7 +148,7 @@
   			if($('#verifyC').val() == vCode){
   				var pwdTran = MD5($('#password').val());
   	 			$.ajax({
-  					url : '../OperateStaff.do',
+  					url : '../AdminLogin.do',
   					type : 'post',
   					data : {
   						name : $('#name').val(),
