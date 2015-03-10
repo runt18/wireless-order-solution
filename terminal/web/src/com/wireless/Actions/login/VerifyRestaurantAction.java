@@ -36,6 +36,9 @@ public class VerifyRestaurantAction extends Action {
 			}else{
 				r = RestaurantDao.getByAccount(account);
 			}
+			if(!r.hasRSA()){
+				RestaurantDao.update(new Restaurant.UpdateBuilder(r.getId()).resetRSA());
+			}
 			
 			//FIXME 过渡阶段
 			if(token == null || token.trim().isEmpty()){

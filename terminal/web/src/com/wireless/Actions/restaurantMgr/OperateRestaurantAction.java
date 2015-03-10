@@ -2,6 +2,7 @@ package com.wireless.Actions.restaurantMgr;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -347,16 +348,19 @@ public class OperateRestaurantAction extends DispatchAction {
 			
 			//为restaurant加上验证码个数
 			int used = 0, unUsed = 0;
+			List<Token> codes = new ArrayList<>();
 			List<Token> tokens = TokenDao.getByCond(new TokenDao.ExtraCond().setRestaurant(restaurantId));
 			for (Token token : tokens) {
 				if(token.getStatus() == Token.Status.TOKEN){
 					used ++;
-				}else{
+				}else if(token.getStatus() == Token.Status.DYN_CODE && !token.isCodeExpired()){
 					unUsed ++;
+					codes.add(token);
 				}
 			}
 			final int usedCode = used, unUsedCode = unUsed;
 			
+			jobject.setRoot(codes);
 			jobject.setExtra(new Jsonable() {
 				@Override
 				public JsonMap toJsonMap(int flag) {
@@ -371,6 +375,40 @@ public class OperateRestaurantAction extends DispatchAction {
 					
 				}
 			});
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取可用验证码
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getCodes(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String resId = request.getParameter("resId");
+		JObject jobject = new JObject();
+		try{
+			int restaurantId = Integer.parseInt(resId);
+			
+			List<Token> codes = new ArrayList<>();
+			for (Token token : TokenDao.getByCond(new TokenDao.ExtraCond().setRestaurant(restaurantId))) {
+				if(token.getStatus() == Token.Status.DYN_CODE && !token.isCodeExpired()){
+					codes.add(token);
+				}
+			}
+			
+			jobject.setRoot(codes);
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);

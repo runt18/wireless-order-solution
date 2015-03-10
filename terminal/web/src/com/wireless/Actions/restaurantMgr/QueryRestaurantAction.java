@@ -75,7 +75,7 @@ public class QueryRestaurantAction extends Action{
 						for (Token token : tokens) {
 							if(token.getStatus() == Token.Status.TOKEN){
 								used ++;
-							}else{
+							}else if(token.getStatus() == Token.Status.DYN_CODE && !token.isCodeExpired()){
 								unUsed ++;
 							}
 						}

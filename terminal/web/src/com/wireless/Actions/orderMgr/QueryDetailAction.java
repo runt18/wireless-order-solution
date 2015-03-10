@@ -10,11 +10,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.orderMgr.OrderFoodDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
@@ -44,6 +47,23 @@ public class QueryDetailAction extends Action {
 				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.TODAY).setOrder(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
 			}else if (queryType.equals("TodayByTbl")) {
 				list = OrderFoodDao.getSingleDetailByTableId(staff, Integer.parseInt(tableID));
+				if(orderID != null && !orderID.trim().isEmpty()){
+					final float totalPrice = OrderDao.getById(staff, Integer.parseInt(orderID), DateType.TODAY).calcTotalPrice();
+					jobject.setExtra(new Jsonable() {
+						
+						@Override
+						public JsonMap toJsonMap(int flag) {
+							JsonMap jm = new JsonMap();
+							jm.putFloat("detailTotalPrice", totalPrice);
+							return jm;
+						}
+						
+						@Override
+						public void fromJsonMap(JsonMap jsonMap, int flag) {
+							
+						}
+					});
+				}
 			}else {
 				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.HISTORY).setOrder(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
 			}

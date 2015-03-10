@@ -38,10 +38,14 @@ public class QueryMemberOperationAction extends Action{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String dataSource = request.getParameter("dataSource");
+			
 			String memberMobile = request.getParameter("memberMobile");
 			String memberCard = request.getParameter("memberCard");
 			String memberName = request.getParameter("memberName");
 			String memberType = request.getParameter("memberType");
+			
+			String fuzzy = request.getParameter("fuzzy");
+			
 			String operateType = request.getParameter("operateType");
 			String detailOperate = request.getParameter("detailOperate");
 			String onDuty = request.getParameter("onDuty");
@@ -68,6 +72,7 @@ public class QueryMemberOperationAction extends Action{
 				extraCond = new MemberOperationDao.ExtraCond(dy);
 			}
 
+			
 			if(memberMobile != null && !memberMobile.trim().isEmpty()){
 				extraCond.setMobile(memberMobile);
 			}
@@ -80,6 +85,14 @@ public class QueryMemberOperationAction extends Action{
 			if(memberType != null && !memberType.trim().isEmpty()){
 				extraCond.setMemberType(Integer.parseInt(memberType));
 			}
+			
+			if(fuzzy != null && !fuzzy.trim().isEmpty()){
+				List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setFuzzyName(fuzzy), null);
+				for (Member member : members) {
+					extraCond.addMember(member);
+				}
+			}
+			
 
 			if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
 				extraCond.addOperationType(OperationType.valueOf(detailOperate));
