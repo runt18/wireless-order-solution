@@ -372,12 +372,17 @@ var restaurantAddWin = new Ext.Window({
 function optRestaurant(){
 	return ''
 	+ "<a href = \"javascript:optRestaurantHandler({otype:'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"
-	+ "<a href = \"javascript:displayCodeHandle()\">" + "<img src='../../images/Modify.png'/>生成验证码</a>";
+	+ "&nbsp;&nbsp;<a href = \"javascript:displayCodeHandle()\">" + "<img src='../../images/Modify.png'/>生成验证码</a>";
 }
 
 function optSms(v){
 	return ''
 	+ "<a href = \"javascript:optSmsHandler()\">" + "<img src='../../images/Modify.png'/>"+ v +"</a>";
+}
+
+function unUsedCode(v){
+	return ''
+	+ "<a href = \"javascript:displayCodesHandler()\">" + "<img src='../../images/search.gif'/>"+ v +"</a>";
 }
 
 function hideAddress(v){
@@ -573,7 +578,6 @@ function optSmsHandler(){
 
 function displayCodeHandle(){
 	var data = Ext.ux.getSelData(restaurantPanel);
-	var resId = data.id;
 	if(!displayCodeWin){
 		displayCodeWin = new Ext.Window({
 			title : '&nbsp;',
@@ -660,7 +664,7 @@ function displayCodeHandle(){
 	Ext.Ajax.request({
 		url : '../../OperateRestaurant.do',
 		params : {
-			resId : resId,
+			resId : data.id,
 			dataSource : 'tokenCode'
 		},
 		success : function(res, opt){
@@ -679,6 +683,80 @@ function displayCodeHandle(){
 	});		
 	
 	displayCodeWin.show();
+}
+
+
+function displayCodesHandler(){
+	var data = Ext.ux.getSelData(restaurantPanel);
+	if(!displayCodesWin){
+		displayCodesWin = new Ext.Window({
+			title : '&nbsp;',
+			modal : true,
+			closable : false,
+			resizable : false,
+			width : 200,
+			minHeight : 100,
+			autoHeight : true,
+//			layout : 'fit',
+			frame : true,
+			items : [{
+				layout : 'form',
+				frame : true,
+				minHeight : 150,
+				style : 'text-align:center',
+				id : 'loadUnUsedCodesCmp',
+				items : []
+			}],
+			bbar : ['->', {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(){
+					displayCodesWin.hide();
+					Ext.getCmp('loadUnUsedCodesCmp').removeAll();
+				}
+			}],
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					displayCodesWin.hide();
+					Ext.getCmp('loadUnUsedCodesCmp').removeAll();
+				}
+			}]
+		});
+	}
+	
+	displayCodesWin.setTitle('可用验证码 -- ' + data['name']);
+	//获取验证码
+	Ext.Ajax.request({
+		url : '../../OperateRestaurant.do',
+		params : {
+			resId : data.id,
+			dataSource : 'getCodes'
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success && jr.root.length > 0){
+				for (var i = 0; i < jr.root.length; i++) {
+					var c = {items : [{
+						xtype : 'label',
+						style : 'color:green;font-size:25px;',
+						text : jr.root[i].code
+					}]};
+					Ext.getCmp('loadUnUsedCodesCmp').add(c);
+				}
+				Ext.getCmp('loadUnUsedCodesCmp').doLayout();
+				
+				displayCodesWin.show();
+			}else{
+				Ext.example.msg(jr.title, "无可用验证码");
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});		
+	
 }
 
 function optRestaurantHandler(c){
@@ -725,7 +803,6 @@ function optRestaurantHandler(c){
 					}
 				}
 			}
-			
 		}
 	}
 	
@@ -784,7 +861,7 @@ Ext.onReady(function(){
 	
 	var cm = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
-		{header : '餐厅编号', dataIndex : 'id', width : 80},
+		{header : '餐厅编号', dataIndex : 'id'},
 		{header : '账户名', dataIndex : 'account'},
 		{header : '创建时间', dataIndex : 'birthDate'},
 		{header : '账号有效期', dataIndex : 'expireDate'},
@@ -794,7 +871,7 @@ Ext.onReady(function(){
 		{header : '授权模块', dataIndex : 'moduleDescs',width : 180},
 		{header : '短信', dataIndex : 'smsRemain', align : 'right', renderer : optSms},
 		{header : '已用验证码', dataIndex : 'usedCode', align : 'right'},
-		{header : '可用验证码', dataIndex : 'unUsedCode', align : 'right'},
+		{header : '可用验证码', dataIndex : 'unUsedCode', align : 'right', renderer:unUsedCode},
 		{header : '操作', dataIndex : 'optRestaurant', id : 'optRestaurant',width : 200, align : 'center', renderer : optRestaurant}
 		
 	]);
