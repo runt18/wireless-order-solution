@@ -29,6 +29,7 @@ import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.menuMgr.PricePlan;
+import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -512,6 +513,9 @@ public class OrderDao {
 				if(dbCon.rs.getInt("price_plan_id") != 0){
 					order.setPricePlan(new PricePlan(dbCon.rs.getInt("price_plan_id")));
 				}
+				if(dbCon.rs.getInt("coupon_id") != 0){
+					order.setCoupon(new Coupon(dbCon.rs.getInt("coupon_id")));
+				}
 				order.setMemberId(dbCon.rs.getInt("member_id"));
 			}
 			
@@ -762,16 +766,11 @@ public class OrderDao {
 			prices = null;
 		}
 		
-		//Check to see whether the coupon exist.
-		if(builder.hasCoupon()){
-			CouponDao.getById(dbCon, staff, builder.getCouponId());
-		}
-		
 		if(discounts.isEmpty()){
 			throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
 		}
 		
-		Order order = OrderDao.getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
+		final Order order = OrderDao.getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
 		order.setDiscount(discounts.get(0));
 		
 		if(prices != null){
@@ -780,6 +779,11 @@ public class OrderDao {
 			}else{
 				order.setPricePlan(prices.get(0));
 			}
+		}
+		
+		//Set the coupon if exist.
+		if(builder.hasCoupon()){
+			order.setCoupon(CouponDao.getById(dbCon, staff, builder.getCouponId()));
 		}
 		
 		String sql;
@@ -791,7 +795,7 @@ public class OrderDao {
   			  " ,discount_date = NOW() " +
 			  " ,discount_id = " + order.getDiscount().getId() +
 			  (order.hasPricePlan() ? " ,price_plan_id = " + order.getPricePlan().getId() : "") +
-			  (builder.hasCoupon() ? " ,coupon_id = " + builder.getCouponId() : "") +
+			  (order.hasCoupon() ? " ,coupon_id = " + order.getCoupon().getId() + " ,coupon_price = " + order.getCoupon().getPrice(): "") +
 			  " ,member_id = " + builder.getMemberId() +
 			  " WHERE id = " + order.getId();
 		dbCon.stmt.executeUpdate(sql);

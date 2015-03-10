@@ -7,7 +7,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.member.MemberDao;
-import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.serviceRate.ServicePlanDao;
 import com.wireless.db.system.SystemDao;
@@ -182,7 +181,7 @@ public class PayOrder {
 			if(orderCalculated.isUnpaid()){
 				//Check to see whether be able to perform consumption.
 				member.checkConsume(orderCalculated.getActualPrice(), 
-									payBuilder.hasCoupon() ? CouponDao.getById(dbCon, staff, payBuilder.getCouponId()) : null, 
+									orderCalculated.getCoupon(), 
 									orderCalculated.getPaymentType());
 			}
 		}
@@ -275,7 +274,7 @@ public class PayOrder {
 			if(orderCalculated.isUnpaid()){
 				//Perform the member consumption.
 				MemberDao.consume(dbCon, staff, orderCalculated.getMemberId(), orderCalculated.getActualPrice(), 
-								  payBuilder.hasCoupon() ? CouponDao.getById(dbCon, staff, payBuilder.getCouponId()) : null,
+								  orderCalculated.getCoupon(),
 								  orderCalculated.getPaymentType(),
 								  orderCalculated.getId());
 
@@ -373,14 +372,8 @@ public class PayOrder {
 		orderToCalc.setReceivedCash(payBuilder.getReceivedCash());
 		//Set the comment.
 		orderToCalc.setComment(payBuilder.getComment());
-		
 		//Get the payment type.
 		orderToCalc.setPaymentType(PayTypeDao.getById(dbCon, staff, payBuilder.getPaymentType().getId()));
-		
-		//If the coupon is set, get the coupon price to this order.
-		if(payBuilder.hasCoupon()){
-			orderToCalc.setCouponPrice(CouponDao.getById(dbCon, staff, payBuilder.getCouponId()).getPrice());
-		}
 		
 		//If the service plan is set, use to get the rate to region belongs to this order
 		if(payBuilder.hasServicePlan()){
