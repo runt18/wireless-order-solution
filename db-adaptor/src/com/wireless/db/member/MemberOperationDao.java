@@ -67,7 +67,7 @@ public class MemberOperationDao {
 		private final String moTbl;
 		
 		private int id;
-		private int memberId;
+		private final List<Integer> members = new ArrayList<Integer>();
 		private int memberTypeId;
 		private int orderId;
 		private String mobile;
@@ -91,13 +91,13 @@ public class MemberOperationDao {
 			return this;
 		}
 		
-		public ExtraCond setMember(int memberId){
-			this.memberId = memberId;
+		public ExtraCond addMember(int memberId){
+			this.members.add(memberId);
 			return this;
 		}
 		
-		public ExtraCond setMember(Member member){
-			this.memberId = member.getId();
+		public ExtraCond addMember(Member member){
+			this.members.add(member.getId());
 			return this;
 		}
 		
@@ -165,8 +165,16 @@ public class MemberOperationDao {
 			if(id != 0){
 				extraCond.append(" AND MO.id = " + id);
 			}
-			if(memberId != 0){
-				extraCond.append(" AND MO.member_id = " + memberId);
+			StringBuilder memberCond = new StringBuilder();
+			for(Integer memberId : this.members){
+				if(memberCond.length() != 0){
+					memberCond.append(",").append(memberId.intValue());
+				}else{
+					memberCond.append(memberId.intValue());
+				}
+			}
+			if(memberCond.length() != 0){
+				extraCond.append(" AND MO.member_id IN (" + memberCond + ")");
 			}
 			if(memberTypeId != 0){
 				extraCond.append(" AND M.member_type_id = " + memberTypeId);
