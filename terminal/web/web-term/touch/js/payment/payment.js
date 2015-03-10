@@ -27,6 +27,10 @@ var pm = {table : {}},
 	
 	//查找的会员
 	member4Payment, member4Display,
+	
+	//是否在使用抹数
+	usedEraseQuota = false, mouseOutNumKeyboard = true,		
+	
 	/**
 	 * 元素模板
 	 */
@@ -94,6 +98,22 @@ function showPaymentMgr(c){
 			$('#txtReciptReturn').text(0);
 		}
 	});
+	
+	//抹数联动
+	$('#txtEraseQuota').on('keyup', function(){
+		var eraseQuota = $('#txtEraseQuota').val();
+		if(eraseQuota && isNaN(eraseQuota)){
+			Util.msg.alert({msg:"请填写正确的抹数金额", topTip:true ,fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();}});
+			return;
+		}else if(!isNaN(eraseQuota) && eraseQuota > restaurantData.setting.eraseQuota){// 抹数金额
+			Util.msg.alert({msg:"抹数金额大于设置上限，不能结帐!", topTip:true,fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();}});
+			return;
+		}			
+		
+		$('#shouldPay').html(checkOut_actualPrice - eraseQuota);
+		
+	});
+	
 	
 	//设置会员动态popup控件
 	//会员信息来源
@@ -273,8 +293,6 @@ function loadOrderBasicMsg(){
 	}			
 	
 	$('#payment_orderFoodListBody').html(html.join("")).trigger('create');	
-	
-	
 }
 
 /**
@@ -507,13 +525,13 @@ var paySubmit = function(submitType) {
 			sendSms = false;
 			setcookie(document.domain+'_consumeSms', false);
 		}
-		if($('#memberPaymentPrintCore').attr('checked')){
+/*		if($('#memberPaymentPrintCore').attr('checked')){
 			printCode = true;
 			setcookie(document.domain+'_printCore', true);
 		}else{
 			printCode = false;
 			setcookie(document.domain+'_printCore', false);
-		}
+		}*/
 		
 		//用会员卡结账
 		payManner = 3;
@@ -602,18 +620,21 @@ var paySubmit = function(submitType) {
 		}
 	}); 		
 };
-	
 
-function setFormButtonStatus(disable){
-
+pm.closeKeyboard = function(){
+	if(mouseOutNumKeyboard){
+		usedEraseQuota = true;
+	}
 }
-
+	
 function loadOrderDetail(){
-	var tableId;
+	var tableId, orderId;
 	if($.mobile.activePage.attr( "id" ) == 'paymentMgr'){//结账界面中使用
 		tableId = pm.table.id;
+		orderId = pm.orderMsg.id;
 	}else if($.mobile.activePage.attr( "id" ) == 'orderFoodListMgr'){//已点菜界面使用
 		tableId = uo.table.id;
+		orderId = uo.order.id;
 	}		
 	Util.LM.show();
 	$.ajax({
@@ -621,7 +642,8 @@ function loadOrderDetail(){
 		type : 'post',
 		data : {
 			queryType:'TodayByTbl',
-			tableID: tableId
+			tableID: tableId,
+			orderID : orderId
 		},
 		async : false,
 		dataType : 'json',
@@ -629,6 +651,7 @@ function loadOrderDetail(){
 			Util.LM.hide();
 			if(jr.success){
 				orderFoodDetails = jr.root;
+				pm.detailTotalPrice = jr.other.detailTotalPrice;
 			}else{
 				Util.msg.alert({
 					msg : jr.msg,
@@ -693,7 +716,7 @@ function lookupOrderDetailByType(type){
 	}		
 	
 	//设置总价
-	$('#orderDetailTotalPrice').text(Math.abs(sumPrice));
+	$('#orderDetailTotalPrice').text(type == 'detail_all'?pm.detailTotalPrice:Math.abs(sumPrice));
 	
 	$('#payment_lookupOrderDetailBody').html(html).trigger('create');
 	
@@ -1166,14 +1189,14 @@ function showMemberInfoWin(){
 		$('#memberPaymentSendSMS').attr('checked', false)
 	}
 	
-	if(getcookie(document.domain+'_printCore') == "true"){
+/*	if(getcookie(document.domain+'_printCore') == "true"){
 		$('#memberPaymentPrintCore').attr('checked', true);
 	}else{
 		$('#memberPaymentPrintCore').attr('checked', false);
 	}	
-	
+	$('#memberPaymentPrintCore').checkboxradio('refresh');*/
 	$('#memberPaymentSendSMS').checkboxradio('refresh');
-	$('#memberPaymentPrintCore').checkboxradio('refresh');
+
 	
 	$('#payment4MemberCertainName').text(member4Display.name);
 	$('#payment4MemberCertainType').text(member4Display.memberType.name);

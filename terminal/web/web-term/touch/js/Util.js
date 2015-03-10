@@ -345,7 +345,7 @@ Util.to.padding = function(c){
 //			console.log('limit:'+this.limit)
 			
 			if(!this.limit){
-				this.limit = parseInt(ch / (65 + 18)) * parseInt(cw / (90 + 12));
+				this.limit = parseInt(ch / (65 + 18)) * parseInt(cw / (100 + 12));
 			}
 			//
 			this.data = ic.data == null || typeof ic.data == 'undefined' ? [] : ic.data;

@@ -31,7 +31,7 @@ var of = {
 							'</div>'+
 						  '</a>',
 	//已点菜列表					  
-	orderFoodCmpTemplet = '	<li data-icon={isGift} data-index={dataIndex} data-theme="c" data-value={id} data-type="orderFoodCmp" onclick="of.selectNewFood({event:this, foodId:{id}})" ><a >'+
+	orderFoodCmpTemplet = '	<li data-icon={isGift} data-index={dataIndex} data-unique={unique} data-theme="c" data-value={id} data-type="orderFoodCmp" onclick="of.selectNewFood({event:this, foodId:{id}})" ><a >'+
 									'<h1 style="font-size:20px;">{name}</h1>' +
 									'<span style="color:green;">{tasteDisplay}</span>' +
 									'<div>' +
@@ -439,7 +439,7 @@ of.insertFood = function(c){
 	for(var i = 0; i < of.foodList.length; i++){
 		if(of.foodList[i].id == c.foodId){
 			//返回连接空数组的副本
-			data = (of.foodList.concat()[i]);
+			data = Util.clone(of.foodList[i]);
 			break;
 		}
 	}
@@ -473,10 +473,16 @@ of.insertFood = function(c){
 	var has = false;
 	for(var i = 0; i < of.newFood.length; i++){
 		if(of.newFood[i].id == data.id){
-			has = true;
-			of.newFood[i].count++;
-			of.selectedOrderFood = of.newFood[i];
-			break;
+			//再对比口味和赠送属性
+			if(of.newFood[i].tasteGroup.normalTasteContent.length == 0 && !of.newFood[i].isGift){
+				has = true;
+				of.newFood[i].count++;
+				of.selectedOrderFood = of.newFood[i];
+				//重新赋值唯一标示
+				data.unique = of.newFood[i].unique;
+				break;				
+			}
+
 		}
 	}
 	if(!has){
@@ -487,11 +493,15 @@ of.insertFood = function(c){
 			price : 0,
 			normalTasteContent : []
 		};
+		//唯一表示
+		data.unique = new Date().getTime();
+		
 		of.newFood.push(data);
 		
-		//选中菜品
-		of.selectedOrderFood = data;
+		//最新添加的作为选中菜品
+		of.selectedOrderFood = of.newFood[of.newFood.length -1];
 	}
+	
 	//
 	of.initNewFoodContent({
 		data : data
@@ -510,6 +520,8 @@ of.initNewFoodContent = function(c){
 	c = c == null ? {} : c;
 	//添加临时菜
 	if(typeof c.record != 'undefined'){
+		//添加唯一标示
+		c.record.unique = new Date().getTime();
 		of.newFood.push(c.record);
 		c.data = c.record;
 	}
@@ -536,6 +548,7 @@ of.initNewFoodContent = function(c){
 		}
 		var orderFoodHtmlData = {
 			dataIndex : i,
+			unique : temp.unique,
 			id : temp.id,
 			name : temp.name,
 			count : temp.count,
@@ -575,7 +588,7 @@ of.initNewFoodContent = function(c){
 	
 	//刷新界面后重新选中点的菜
 	if(c.data != null && typeof c.data != 'undefined'){
-		var select = $('#orderFoodsCmp > li[data-value='+c.data.id+']');
+		var select = $('#orderFoodsCmp > li[data-unique='+c.data.unique+']');
 		if(select.length > 0){
 			select.attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
 			$('#divOrderFoodsCmp').animate({
@@ -619,6 +632,7 @@ of.operateFoodCount = function(c){
 		return;
 	}
 	var data = of.newFood[foodContent.attr('data-index')];
+	
 	if(typeof c.otype == 'string'){
 		if(c.otype.toLowerCase() == 'delete'){
 			Util.msg.alert({
@@ -703,10 +717,10 @@ of.saveForSetFood = function(c){
 					otype : 'delete'
 				});
 			}else{
-				var data = of.selectedOrderFood;
-				data.count = count;
+				//重新设置数量
+				of.selectedOrderFood.count = count;
 				of.initNewFoodContent({
-					data : data
+					data : of.selectedOrderFood
 				});
 			}	
 	    }  
@@ -777,7 +791,8 @@ of.giftFood = function(c){
 		return;
 	}
 	var data = of.newFood[foodContent.attr('data-index')];
-	if((data.status& 1 << 3) == 0){
+	
+	if((data.status & 1 << 3) == 0){
 		Util.msg.alert({
 			msg : '此菜品不可赠送',
 			topTip : true
@@ -1207,7 +1222,8 @@ of.ot.saveOrderFoodTaste = function(){
 		
 	}else if(of.ot.allBill == 2){
 		for(var i = 0; i < of.newFood.length; i++){
-			if(of.newFood[i].id == of.selectedOrderFood.id){
+			//用唯一标示替换id
+			if(of.newFood[i].unique == of.selectedOrderFood.unique){
 				of.newFood[i].tasteGroup = tasteGroup;
 				break; 
 			}
@@ -1687,7 +1703,8 @@ function chooseOrderFoodCommonTaste(c){
 	tasteGroup.price = tasteGroup.normalTaste.price;	
 	
 	for(var i = 0; i < of.newFood.length; i++){
-		if(of.newFood[i].id == of.selectedOrderFood.id){
+		//用唯一标示替代id
+		if(of.newFood[i].unique == of.selectedOrderFood.unique){
 			of.newFood[i].tasteGroup = tasteGroup;
 			break; 
 		}
@@ -1863,7 +1880,6 @@ of.submit = function(c){
 													msg : result.data,
 												});
 												//暂结应该是没有回调方法的
-//												console.log('暂结')
 //												if(of.afterCommitFn != null && typeof of.afterCommitFn == 'function'){
 //													of.afterCommitFn();
 //												}

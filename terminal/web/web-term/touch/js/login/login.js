@@ -101,7 +101,7 @@ $(function(){
 				}
 			},
 			error : function(request, status, error){
-				Util.Lm.hide();
+				Util.LM.hide();
 				initStaffContent();
 			}
 		});		

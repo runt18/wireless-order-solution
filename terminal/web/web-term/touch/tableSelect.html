@@ -479,11 +479,7 @@
 				        </label>				        
 				    </fieldset>				        		
 	    		</td>
-	    		<td class="table_toolBarLab">手机号码:</td>	  
-	    		<td class="table_toolBarCmp">
-	    			<input id="consumeDetail_memberMobile" onkeypress="intOnly()">		        		
-	    		</td>	 
-	    		<td class="table_toolBarLab">会员名称:	</td>	  
+	    		<td class="table_toolBarLab" style="width: 150px;">手机号/会员名/卡号:</td>	  
 	    		<td class="table_toolBarCmp">
 	    			<input id="consumeDetail_memberName">		        		
 	    		</td>		    		 		
@@ -1257,7 +1253,7 @@
 <!-- 结账界面 -->
 <div data-role="page" id="paymentMgr" data-theme="e">
 	<div id="paymentCmp" class="ui-grid-a">
-		<div class="ui-block-a" style="width:330px;height:800px;border-right: 2px solid gray;">
+		<div class="ui-block-a" style="width:330px;border-right: 2px solid gray;height: inherit;">
 			<table id="orderDetialTable"  data-theme="c" data-role="table" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr" >
 		         <thead>
 		           <tr class="ui-bar-d">
@@ -1295,7 +1291,7 @@
 		         	<tr id="tr4EraseQuota">
 		         		<td colspan="2" style="width: 200px;line-height: 60px;font-size: 22px;text-align: right;" >抹数金额(上限:￥<font id="font_showEraseQuota" color="red">--</font>)：</td>
 		         		<td width="80" style="padding-right: 5px;">
-		         			<input id="txtEraseQuota">
+		         			<input id="txtEraseQuota" class="countInputStyle" onblur="pm.closeKeyboard()" >
 		         		</td>
 		         	</tr>
 		         	<tr>
@@ -1319,7 +1315,7 @@
 		    </div>
 		    
 		</div>
-		<div class="ui-block-b" data-role="content" style="width : -webkit-calc(100% - 330px);width: -moz-calc(100% - 330px);height:800px;">
+		<div class="ui-block-b" data-role="content" style="width : -webkit-calc(100% - 330px);width: -moz-calc(100% - 330px);height: inherit;">
 			<div id="divNorthForUpdateOrder"  data-role="header" data-tap-toggle="false" data-theme="b" style="height: 36px;overflow: hidden;">
 				<span id="orderIdInfo" style="line-height: 35px;float: left;margin-left: 5px;">
 					结账 -- 账单号:<font color="#f7c942">-----</font>
@@ -1486,11 +1482,11 @@
 				        <input type="checkbox" id="memberPaymentSendSMS">是否发送短信
 				    </label>	    		
 	    		</td>
-	    		<td colspan="2">
+<!-- 	    		<td colspan="2">
 					<label>
 				        <input type="checkbox" id="memberPaymentPrintCore">是否打印二维码
 				    </label>	    		
-	    		</td>
+	    		</td> -->
 	    	</tr>	    
 	    </table>
 	    

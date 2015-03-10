@@ -214,6 +214,7 @@ ss.initKitchenContent = function(c){
 	
 	ss.showKitchenPaging();
 	ss.iteratorData = tempFoodData;
+	
 	ss.showFoodByCond();	
 	
 	
@@ -257,18 +258,6 @@ ss.showKitchenPaging = function(){
 };
 
 /**
- * 但div还没设置完成高度时不断刷新
- */
-function keepLoadFoodData(){
-	
-	if(!$('#foods4StopSellCmp').html()){
-		ss.initKitchenContent({deptId:-1});
-	}else{
-		clearInterval(ss.loadFoodDateAction);
-	}
-}
-
-/**
  * 厨房分页
  */
 ss.kitchenGetNextPage = function(){
@@ -308,7 +297,6 @@ ss.showFoodByCond = function(c){
 		data : showFoodDatas
 	});
 	ss.tp.getFirstPage();
-	
 };
 
 
@@ -379,7 +367,24 @@ ss.entry = function(){
 	
 	ss.initKitchenContent({deptId : -1});
 	
-	setTimeout("ss.searchData({event:$('#divBtnSellFood'), isStop:false})", 400);
+	/**
+	 * 没加载到菜品时不断刷新
+	 */	
+	var index = 0;	
+	ss.loadFoodDateAction = window.setInterval(function(){
+		if($('#foods4StopSellCmp').find("a").length > 0){
+			clearInterval(ss.loadFoodDateAction);
+			if(index == 0){
+				ss.searchData({event:$('#divBtnSellFood'), isStop:false})
+			}
+			Util.LM.hide();
+		}else{
+			index ++;
+			Util.LM.show();
+			ss.searchData({event:$('#divBtnSellFood'), isStop:false})
+		}
+	}, 300);
+	
 };
 
 

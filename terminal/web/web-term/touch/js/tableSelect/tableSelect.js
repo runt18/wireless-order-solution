@@ -42,81 +42,83 @@ var tables = [],
 	ln={
 			restaurant : {},
 			staffData : {staffID:0, staffName:''}
-	}	
-
-var regionCmpTemplet = '<a data-role="button" data-inline="true" class="regionBtn" onclick="">{name}</a>';
-
-var payment_searchMemberTypeTemplet = '<div data-role="popup" id="payment_searchMemberType" data-theme="d" class="payment_searchMemberType">'+
-'<ul id="payment_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
-'<li data-role="divider" data-theme="e" style="line-height: 30px;">选择号码来源:</li>'+
-'<li  class="popupButtonList" onclick="readMemberByCondtion(1)"><a >手机卡</a></li>'+
-'<li  class="popupButtonList" onclick="readMemberByCondtion(3)"><a >会员实体卡</a></li>'+
-'<li  class="popupButtonList" onclick="readMemberByCondtion(2)"><a >微信卡</a></li>'+
-'</ul></div>'; 
-
-var payment_popupDiscountCmp4MemberTemplet = '<div data-role="popup" id="payment_popupDiscountCmp4Member" data-theme="d" class="payment_popupDiscountCmp4Member">'+
-    		'<ul id="payment_discountList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>'+
-    	'</div>';
-
-var payment_popupPricePlanCmp4MemberTemplet = '<div data-role="popup" id="payment_popupPricePlanCmp4Member" data-theme="d" class="payment_popupPricePlanCmp4Member">'+
-		    '<ul id="payment_pricePlanList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
-		'</ul></div>';
-
-var payment_popupCouponCmp4MemberTemplet = '<div data-role="popup" id="payment_popupCouponCmp4Member" data-theme="d" class="payment_popupCouponCmp4Member">'+
-			'<ul id="payment_couponList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
-		'</ul></div>';
-
-var memberTitle = '<tr>' 
-	+ '<th class="table_title text_center">会员操作</th>'
-		+ '<th class="table_title text_center">现金</th>'
-		+ '<th class="table_title text_center">刷卡</th>'
-		+ '<th class="table_title text_center">账户实充/扣额</th>'
-		+ '</tr>';
-var memberTrModel = '<tr>'
-	+ '<th>会员充值</th>'
-	+ '<td class="text_right">{0}</td>'
-	+ '<td class="text_right">{1}</td>'
-	+ '<td class="text_right">{2}</td>'
-	+ '</tr>'
-	+ '<tr>'
-	+ '<th>会员退款</th>'
-	+ '<td class="text_right">{3}</td>'
-	+ '<td class="text_right">{4}</td>'
-	+ '<td class="text_right">{5}</td>'
-	+ '</tr>';
-var title = '<tr>'
-	+ '<th class="table_title text_center">部门汇总</th>'
-	+ '<th class="table_title text_center">折扣总额</th>'
-	+ '<th class="table_title text_center">赠送总额</th>'
-	+ '<th class="table_title text_center">应收总额</th>'
-	+ '</tr>';
-var trModel = '<tr>'
-	+ '<th>{0}</th>'
-	+ '<td class="text_right">{1}</td>'
-	+ '<td class="text_right">{2}</td>'
-	+ '<td class="text_right">{3}</td>'
-	+ '</tr>';
-
-var trPayIncomeModel = '<tr>'
-	+ '<th>{0}</th>'
-	+ '<td class="text_right">{1}</td>'
-	+ '<td class="text_right">{2}</td>'
-	+ '<td class="text_right">{3}</td>'
-	+ '</tr>';
-
-//会员消费明细
-var memberConsumeTrTemplet = '<tr>'
-		+ '<td>{dataIndex}</td>'
-		+ '<td>{orderId}</td>'
-		+ '<td>{operateDateFormat}</td>'
-		+ '<td>{memberName}</td>'
-		+ '<td>{memberType}</td>'
-		+ '<td>{otype}</td>'
-		+ '<td class="text_right">{money}</td>'
-		+ '<td class="text_right">{deltaPoint}</td>'
-		+ '<td>{staffName}</td>'
-		+ '<td>{comment}</td>'
-		+ '</tr>';	
+	},	
+	/**
+	 * 元素模板
+	 */
+	regionCmpTemplet = '<a data-role="button" data-inline="true" class="regionBtn" onclick="">{name}</a>',
+	
+	payment_searchMemberTypeTemplet = '<div data-role="popup" id="payment_searchMemberType" data-theme="d" class="payment_searchMemberType">'+
+	'<ul id="payment_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
+	'<li data-role="divider" data-theme="e" style="line-height: 30px;">选择号码来源:</li>'+
+	'<li  class="popupButtonList" onclick="readMemberByCondtion(1)"><a >手机卡</a></li>'+
+	'<li  class="popupButtonList" onclick="readMemberByCondtion(3)"><a >会员实体卡</a></li>'+
+	'<li  class="popupButtonList" onclick="readMemberByCondtion(2)"><a >微信卡</a></li>'+
+	'</ul></div>', 
+	
+	payment_popupDiscountCmp4MemberTemplet = '<div data-role="popup" id="payment_popupDiscountCmp4Member" data-theme="d" class="payment_popupDiscountCmp4Member">'+
+	    		'<ul id="payment_discountList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>'+
+	    	'</div>',
+	
+	payment_popupPricePlanCmp4MemberTemplet = '<div data-role="popup" id="payment_popupPricePlanCmp4Member" data-theme="d" class="payment_popupPricePlanCmp4Member">'+
+			    '<ul id="payment_pricePlanList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
+			'</ul></div>',
+	
+	payment_popupCouponCmp4MemberTemplet = '<div data-role="popup" id="payment_popupCouponCmp4Member" data-theme="d" class="payment_popupCouponCmp4Member">'+
+				'<ul id="payment_couponList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
+			'</ul></div>',
+	
+	memberTitle = '<tr>' 
+		+ '<th class="table_title text_center">会员操作</th>'
+			+ '<th class="table_title text_center">现金</th>'
+			+ '<th class="table_title text_center">刷卡</th>'
+			+ '<th class="table_title text_center">账户实充/扣额</th>'
+			+ '</tr>',
+	memberTrModel = '<tr>'
+		+ '<th>会员充值</th>'
+		+ '<td class="text_right">{0}</td>'
+		+ '<td class="text_right">{1}</td>'
+		+ '<td class="text_right">{2}</td>'
+		+ '</tr>'
+		+ '<tr>'
+		+ '<th>会员退款</th>'
+		+ '<td class="text_right">{3}</td>'
+		+ '<td class="text_right">{4}</td>'
+		+ '<td class="text_right">{5}</td>'
+		+ '</tr>',
+	title = '<tr>'
+		+ '<th class="table_title text_center">部门汇总</th>'
+		+ '<th class="table_title text_center">折扣总额</th>'
+		+ '<th class="table_title text_center">赠送总额</th>'
+		+ '<th class="table_title text_center">应收总额</th>'
+		+ '</tr>',
+	trModel = '<tr>'
+		+ '<th>{0}</th>'
+		+ '<td class="text_right">{1}</td>'
+		+ '<td class="text_right">{2}</td>'
+		+ '<td class="text_right">{3}</td>'
+		+ '</tr>',
+	
+	trPayIncomeModel = '<tr>'
+		+ '<th>{0}</th>'
+		+ '<td class="text_right">{1}</td>'
+		+ '<td class="text_right">{2}</td>'
+		+ '<td class="text_right">{3}</td>'
+		+ '</tr>',
+	
+	//会员消费明细
+	memberConsumeTrTemplet = '<tr>'
+			+ '<td>{dataIndex}</td>'
+			+ '<td>{orderId}</td>'
+			+ '<td>{operateDateFormat}</td>'
+			+ '<td>{memberName}</td>'
+			+ '<td>{memberType}</td>'
+			+ '<td>{otype}</td>'
+			+ '<td class="text_right">{money}</td>'
+			+ '<td class="text_right">{deltaPoint}</td>'
+			+ '<td>{staffName}</td>'
+			+ '<td>{comment}</td>'
+			+ '</tr>';
 
 
 $(function(){
@@ -255,6 +257,9 @@ $(function(){
 					$(".commonTasteFloat").hide(); 
 				}
 			}		
+		}else if($.mobile.activePage.attr( "id" ) == 'paymentMgr' && usedEraseQuota && mouseOutNumKeyboard){
+			$('#numberKeyboard').hide();
+			numKeyBoardFireEvent = null;
 		}
 
 	}) 	
@@ -310,10 +315,31 @@ window.onload=function(){
 			if(YBZ_win){
 				YBZ_win.close();
 			}		
-			
-			$('#numberKeyboard').show();			
+			$('#numberKeyboard').show();	
 		}
 	});	
+	
+	
+	$('#txtEraseQuota').focus(function(){
+		usedEraseQuota = false;
+		mouseOutNumKeyboard = true;
+		$('#numberKeyboard').show();	
+		//设置数字键盘触发
+		numKeyBoardFireEvent = function (){
+			$('#txtEraseQuota').keyup();
+		}
+		
+		$('#calculator4NumberKeyboard').on("mouseover", function(){
+			usedEraseQuota = false;
+			mouseOutNumKeyboard = false;
+		});
+		
+		$('#calculator4NumberKeyboard').on("mouseout", function(){
+			usedEraseQuota = true;
+			mouseOutNumKeyboard = true;
+		});			
+	});
+	
 	
 	//设置数字键盘输入
 	$('.countInputStyle').focus(function(){
@@ -443,6 +469,28 @@ window.onload=function(){
     });	    
 }
 
+//改变窗口时
+window.onresize = function(){
+
+	/**
+	 * 动态高度
+	 */	
+	//餐厅选择界面高度
+	$('#tableAndRegionsCmp').height(document.body.clientHeight - tableListHeight);	
+	//点菜界面高度
+	$('#orderFoodCenterCmp').height(document.body.clientHeight - 210);
+	document.getElementById('foodsCmp').style.height = (document.body.clientHeight - 210)+'px';		
+	//沽清菜界面高度
+	$('#stopSellCmp').height(document.body.clientHeight - 125);	
+	document.getElementById('foods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
+	document.getElementById('divFoods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
+	//已点菜界面高度
+	$('#orderFoodListCmp').height(document.body.clientHeight - 125);
+	//结账界面高度 & 菜品列表高度
+	$('#paymentCmp').height(document.body.clientHeight - 86);	
+	$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
+}
+
 
 /**
  * 输入台号后直接结账
@@ -476,13 +524,6 @@ ts.toPaymentMgr = function(){
 		id : tableId,
 		alias : !tableId?tableInfo:''
 	});	
-}
-
-//改变窗口时
-window.onresize = function(){
-	//动态高度
-	$('#orderFoodCenterCmp').height(document.body.clientHeight - 210);
-	document.getElementById('foodsCmp').style.height = (document.body.clientHeight - 210)+'px';
 }
 
 /**
@@ -2302,7 +2343,6 @@ ts.member.searchMemberDetail = function(){
 			break;
 		}
 	}
-	var mobile = $('#consumeDetail_memberMobile').val();
 	var name = $('#consumeDetail_memberName').val();
 	
 	$.ajax({
@@ -2312,10 +2352,8 @@ ts.member.searchMemberDetail = function(){
 		data : {
 			isPaging:false,
 			dataSource:'today',
-			memberMobile: mobile,
-			memberName: name,
-			operateType:operateType,
-			total:true				
+			fuzzy: name,
+			operateType:operateType		
 		},
 		success : function(result, status, xhr){
 			Util.LM.hide();
@@ -2341,6 +2379,7 @@ ts.member.searchMemberDetail = function(){
 			}
 		},
 		error : function(request, status, err){
+			Util.LM.hide();
 			Util.msg.alert({
 				renderTo : 'tableSelectMgr',
 				msg : request.msg
@@ -2400,8 +2439,6 @@ ts.member.closeMemberConsumeDetailWin = function(){
 	$('#memberConsumeDetailWin').hide();
 	$('#shadowForPopup').hide();
 	
-//	$('#consumeDetail_memberType').val(-1).selectmenu('refresh');
-	$('#consumeDetail_memberMobile').val('');
 	$('#consumeDetail_memberName').val('');
 	$('#front_memberConsumeDetailBody').html('');
 }
