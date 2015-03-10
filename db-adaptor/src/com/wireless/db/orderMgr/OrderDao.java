@@ -432,6 +432,7 @@ public class OrderDao {
 		if(extraCond.dateType == DateType.TODAY){
 			sql = " SELECT " +
 				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, O.staff_id, " +
+				  " O.temp_staff, O.temp_date, " +
 				  " T.minimum_cost, IFNULL(T.category, 1) AS tbl_category, " +
 				  " O.waiter, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
@@ -504,6 +505,10 @@ public class OrderDao {
 			order.setCategory(Category.valueOf(dbCon.rs.getShort("category")));
 			
 			if(extraCond.dateType == DateType.TODAY){
+				if(dbCon.rs.getTimestamp("temp_date") != null){
+					order.setTempDate(dbCon.rs.getTimestamp("temp_date").getTime());
+					order.setTempStaff(dbCon.rs.getString("temp_staff"));
+				}
 				if(dbCon.rs.getInt("discount_id") != 0){
 					order.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
 				}

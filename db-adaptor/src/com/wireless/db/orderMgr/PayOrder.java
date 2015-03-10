@@ -75,11 +75,22 @@ public class PayOrder {
 	 */
 	public static Order payTemp(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws SQLException, BusinessException{
 		if(staff.getRole().hasPrivilege(Privilege.Code.TEMP_PAYMENT)){
-			//return doTmpPayment(dbCon, staff, calc(dbCon, staff, payBuilder));
-			return calc(dbCon, staff, payBuilder);
+			return doTmpPayment(dbCon, staff, payBuilder);
 		}else{
 			throw new BusinessException(StaffError.TEMP_PAYMENT_NOT_ALLOW);
 		}
+	}
+	
+	private static Order doTmpPayment(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws SQLException, BusinessException{
+		//Update the temp paid staff & date.
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".order SET id = " + payBuilder.getOrderId() +
+			  " ,temp_date = NOW() " +
+			  " ,temp_staff = '" + staff.getName() + "'" +
+			  " WHERE id = " + payBuilder.getOrderId();
+		dbCon.stmt.executeUpdate(sql);
+		
+		return calc(dbCon, staff, payBuilder);
 	}
 	
 	/**
