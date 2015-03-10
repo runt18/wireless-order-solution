@@ -7,6 +7,19 @@ SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
+-- Add the field 'temp_paid_staff' & 'temp_paid_date' to table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` 
+ADD COLUMN `temp_staff` VARCHAR(45) NULL DEFAULT NULL AFTER `member_id`,
+ADD COLUMN `temp_date` DATETIME NULL DEFAULT NULL AFTER `temp_paid_staff`;
+
+-- -----------------------------------------------------
+-- Add the field 'coupon_id' to table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` 
+ADD COLUMN `coupon_id` INT NULL DEFAULT NULL AFTER `table_name`;
+
+-- -----------------------------------------------------
 -- Add the index 'ix_order_date' to table 'order_history'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_history` 
