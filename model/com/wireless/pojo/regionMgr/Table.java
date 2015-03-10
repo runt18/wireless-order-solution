@@ -412,6 +412,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	private Category category = Category.NORMAL;;
 	private Status status = Status.IDLE;
 	private Region region;
+	private boolean tempPaidFlag = false;
 	
 	public Table(){
 		
@@ -553,6 +554,14 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	
 	public int getOrderId(){
 		return this.orderId;
+	}
+	
+	public boolean isTempPaid(){
+		return this.tempPaidFlag;
+	}
+	
+	public void setTempPaid(boolean onOff){
+		this.tempPaidFlag = onOff;
 	}
 	
 	@Override
