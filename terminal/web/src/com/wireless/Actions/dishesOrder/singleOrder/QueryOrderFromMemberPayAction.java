@@ -38,7 +38,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 			String pin = (String)request.getAttribute("pin");
 			String orderID = request.getParameter("orderID");
 			String pricePlanId = request.getParameter("pricePlanId");
-			String couponId = request.getParameter("couponId");
+//			String couponId = request.getParameter("couponId");
 //			String discountID = request.getParameter("discountID");
 			String servicePlanId = request.getParameter("servicePlanId");
 			String sv = request.getParameter("sv");
@@ -103,9 +103,9 @@ public class QueryOrderFromMemberPayAction extends Action{
 				payBuilder.setServicePlan(Integer.parseInt(servicePlanId));
 			}
 			
-			if(couponId != null && !couponId.trim().isEmpty() && !couponId.equals("-1")){
-				payBuilder.setCouponId(Integer.parseInt(couponId));
-			}
+//			if(couponId != null && !couponId.trim().isEmpty() && !couponId.equals("-1")){
+//				payBuilder.setCouponId(Integer.parseInt(couponId));
+//			}
 			final Order order = PayOrder.calc(staff, payBuilder);
 			
 			

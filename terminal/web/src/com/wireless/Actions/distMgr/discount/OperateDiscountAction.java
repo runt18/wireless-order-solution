@@ -41,7 +41,8 @@ public class OperateDiscountAction extends DispatchAction{
 			if(memberId != 0){
 				int pricePlan = 0;
 				if(pricePlanId != null && !pricePlanId.trim().isEmpty()){
-					builder = Order.DiscountBuilder.build4Member(orderId, MemberDao.getById(staff, memberId), discountId, pricePlan);
+					//FIXME lack of coupon
+					builder = Order.DiscountBuilder.build4Member(orderId, MemberDao.getById(staff, memberId), discountId, pricePlan, 0);
 				}else{
 					builder = null;
 				}

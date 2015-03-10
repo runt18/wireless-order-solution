@@ -128,10 +128,6 @@ public class PayOrderAction extends Action{
 				payBuilder.setPricePlanId(Integer.parseInt(request.getParameter("pricePlanID")));
 			}
 			
-			if(request.getParameter("couponID") != null && !request.getParameter("couponID").isEmpty() && !request.getParameter("couponID").equals("-1")){
-				payBuilder.setCouponId(Integer.parseInt(request.getParameter("couponID")));
-			}
-			
 			if(request.getParameter("servicePlan") != null && !request.getParameter("servicePlan").isEmpty()){
 				payBuilder.setServicePlan(Integer.parseInt(request.getParameter("servicePlan")));
 			}
