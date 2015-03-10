@@ -10,7 +10,9 @@ import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.PricePlanDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.serviceRate.ServicePlanDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
@@ -379,13 +381,29 @@ public class OrderDao {
 	}
 	
 	private static void fillDetail(DBCon dbCon, Staff staff, Order order, DateType dateType) throws SQLException, BusinessException{
+		//Get the detail to discount.
+		if(order.hasDiscount()){
+			order.setDiscount(DiscountDao.getById(dbCon, staff, order.getDiscount().getId()));
+		}
+		//Get the detail to service plan.
+		if(order.hasServicePlan()){
+			order.setServicePlan(ServicePlanDao.getById(dbCon, staff, order.getServicePlan().getPlanId(), ServicePlanDao.ShowType.BY_PLAN));
+		}
+		//Get the detail to price plan
+		if(order.hasPricePlan()){
+			order.setPricePlan(PricePlanDao.getById(dbCon, staff, order.getPricePlan().getId()));
+		}
+		//Get the detail to coupon.
+		if(order.hasCoupon()){
+			order.setCoupon(CouponDao.getById(dbCon, staff, order.getCoupon().getId()));
+		}
 		//Get the order foods to each order.
 		order.setOrderFoods(OrderFoodDao.getDetail(dbCon, staff, new OrderFoodDao.ExtraCond(dateType).setOrder(order)));	
-		//Get the mixed payment detail.
+		//Get the detail to mixed payment.
 		if(order.getPaymentType().isMixed()){
 			order.setMixedPayment(MixedPaymentDao.get(dbCon, staff, new MixedPaymentDao.ExtraCond(dateType, order)));
 		}
-		//Get the associated wx orders.
+		//Get the detail to associated wx orders.
 		for(WxOrder wxOrder : WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setOrder(order), null)){
 			order.addWxOrder(wxOrder);
 		}
@@ -414,16 +432,16 @@ public class OrderDao {
 			sql = " SELECT " +
 				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, O.staff_id, " +
 				  " T.minimum_cost, IFNULL(T.category, 1) AS tbl_category, " +
-				  " O.waiter, O.discount_staff, O.discount_date, " +
+				  " O.waiter, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.settle_type, O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
-				  " O.discount_id, DIST.name AS discount_name, " +
+				  " O.discount_id, O.discount_staff, O.discount_date, " +
+				  " O.coupon_id, " +
 				  " O.price_plan_id, O.member_id, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.coupon_price, O.total_price, O.actual_price " +
 				  " FROM " + 
 				  Params.dbName + ".order O " +
 				  " LEFT JOIN " + Params.dbName + ".table T ON O.table_id = T.table_id " +
-				  " LEFT JOIN " + Params.dbName + ".discount DIST ON O.discount_id = DIST.discount_id " +
 				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
 				  " WHERE 1 = 1 " + 
 				  " AND O.restaurant_id = " + staff.getRestaurantId() + " " +
@@ -486,9 +504,7 @@ public class OrderDao {
 			
 			if(extraCond.dateType == DateType.TODAY){
 				if(dbCon.rs.getInt("discount_id") != 0){
-					Discount discount = new Discount(dbCon.rs.getInt("discount_id"));
-					discount.setName(dbCon.rs.getString("discount_name"));
-					order.setDiscount(discount);
+					order.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
 				}
 				if(dbCon.rs.getInt("service_plan_id") != 0){
 					order.setServicePlan(new ServicePlan(dbCon.rs.getInt("service_plan_id")));
@@ -727,6 +743,7 @@ public class OrderDao {
 	 * 			throws if cases below.
 	 * 			<li>the discount is NOT permitted by this staff
 	 * 			<li>the order does NOT exist
+	 * 			<li>the coupon does NOT exist
 	 */
 	public static void discount(DBCon dbCon, Staff staff, Order.DiscountBuilder builder) throws SQLException, BusinessException{
 
@@ -743,6 +760,11 @@ public class OrderDao {
 		}else{
 			discounts = DiscountDao.getByCond(dbCon, staff, new DiscountDao.ExtraCond().setRole(staff.getRole()).setDiscountId(builder.getDiscountId()), DiscountDao.ShowType.BY_PLAN);
 			prices = null;
+		}
+		
+		//Check to see whether the coupon exist.
+		if(builder.hasCoupon()){
+			CouponDao.getById(dbCon, staff, builder.getCouponId());
 		}
 		
 		if(discounts.isEmpty()){
@@ -769,6 +791,7 @@ public class OrderDao {
   			  " ,discount_date = NOW() " +
 			  " ,discount_id = " + order.getDiscount().getId() +
 			  (order.hasPricePlan() ? " ,price_plan_id = " + order.getPricePlan().getId() : "") +
+			  (builder.hasCoupon() ? " ,coupon_id = " + builder.getCouponId() : "") +
 			  " ,member_id = " + builder.getMemberId() +
 			  " WHERE id = " + order.getId();
 		dbCon.stmt.executeUpdate(sql);
