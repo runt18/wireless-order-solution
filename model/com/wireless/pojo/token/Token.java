@@ -300,6 +300,7 @@ public class Token implements Jsonable{
 		jm.putInt(Key4Json.TOKEN_ID.val, this.id);
 		jm.putInt(Key4Json.ACCOUNT.val, this.restaurant.getId());
 		jm.putLong(Key4Json.LAST_MODIFIED.val, this.lastModified);
+		jm.putInt("code", this.getCode());
 		return jm;
 	}
 
