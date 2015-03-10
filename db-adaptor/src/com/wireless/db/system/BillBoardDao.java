@@ -16,6 +16,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.BillBoard;
 import com.wireless.pojo.system.BillBoard.Status;
+import com.wireless.pojo.system.BillBoard.Type;
 import com.wireless.pojo.util.DateUtil;
 
 public class BillBoardDao {
@@ -24,6 +25,7 @@ public class BillBoardDao {
 		private int id;
 		private int restaurantId;
 		private Status status;
+		private Type type;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -45,6 +47,11 @@ public class BillBoardDao {
 			return this;
 		}
 		
+		public ExtraCond setType(Type type){
+			this.type = type;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -56,6 +63,9 @@ public class BillBoardDao {
 			}
 			if(status != null){
 				extraCond.append(" AND status = " + status.getVal());
+			}
+			if(type != null){
+				extraCond.append(" AND type = " + type.getVal());
 			}
 			return extraCond.toString();
 		}
