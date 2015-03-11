@@ -190,7 +190,7 @@ function URLParaQuery() {
 
 
 //从普通url获取当前桌信息
-function Util_urlParaQuery() {
+function common_urlParaQuery() {
 	var name, value, i, key = 0;
 	var str = location.href;
 	
