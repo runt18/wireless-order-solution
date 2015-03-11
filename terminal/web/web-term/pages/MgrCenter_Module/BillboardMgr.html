@@ -19,6 +19,9 @@
 <script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
 <script type="text/javascript" src="../../js/components/Encrypt.js"></script>
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
+<script type="text/javascript" src="../../extjs/examples.js"></script>
+<script type="text/javascript" src="../../extjs/ext-plugins-define.js"></script>
+
 
 <script type="text/javascript">
 	Ext.onReady(function(){
@@ -28,12 +31,23 @@
 </script>
 
 <script type="text/javascript" src="../../js/MgrCenter/billboardMain.js"></script>
+
+<style type="text/css">
+.x-window, .x-panel-ghost, .ext-el-mask, .ext-el-mask-msg, .x-mask-loading, .x-layer, .x-combo-list, .x-menu,   .x-form-invalid-tip{
+	z-index: 99999 !important;
+}
+</style>
+
 </head>
 <body>
 <script type="text/javascript" src="../../extjs/examples.js"></script>
 <div id = "north"></div>
 <div id = "center"></div>
 <div id = "south"></div>
+
+<div id="divOperateBillboard">
+	<div id="operateBillboardContent" ></div>
+</div>
 
 </body>
 </html>
