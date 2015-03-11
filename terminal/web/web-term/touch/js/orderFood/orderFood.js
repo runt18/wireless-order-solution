@@ -66,7 +66,9 @@ of.s = {
 					}				
 				}
 				
-				data = data.sort(of.searchFoodCompare);
+				if(data){
+					data = data.sort(of.searchFoodCompare);
+				}
 				
 				of.s.foodPaging.init({
 					data : data,
@@ -1445,10 +1447,10 @@ function closeSearchFood(){
 	
 	$('#searchFoodInput').val('');
 	
-	YBZ_win.close();
 	$('#normalOperateFoodCmp').show();
 	$('#searchFoodCmp').hide();
 	
+	YBZ_win.close();
 	
 }
 

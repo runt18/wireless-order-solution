@@ -11,7 +11,8 @@ if(location.href.indexOf('#') > 0){
 var lg = {
 		restaurant : {},
 		staffs : [],
-		staffPaging : {}
+		staffPaging : {},
+		bbs : []
 	};
 
 var allStaff = '<a data-role="button" data-inline="true" class="loginName" onclick="selectedName(this)" data-value="{staffId}" data-theme="c"><div>{staffName}</div></a>';
@@ -112,6 +113,11 @@ $(function(){
 		$('#txtRestaurantAccount').focus();
 	}	
 	
+});
+
+
+$(document).on("pageinit",function(event){
+	initBillboardContent({display:true});
 });
 
 /**
@@ -310,7 +316,76 @@ function initStaffContent(c){
 			});
 		}
 	});
+	
 }
+
+/**
+ * 初始化公告信息
+ */
+function initBillboardContent(c){
+	c = c || {};
+	if(!lg.restaurant.id){
+		return;
+	}
+	$.post('../QueryBillboard.do', {dataSource:'loginInfo', rid: lg.restaurant.id}, function(result){
+		if(result.success){
+			lg.bbs =  result.root;
+			var html = ['<li data-role="divider" data-theme="e">点击标题查看详情:</li>'], unRead = 0;
+			for (var i = 0; i < result.root.length; i++) {
+				html.push('<li data-index={index} data-value={id} onclick="displayBillboard(this)"> <a>{status}{title}</a></li>'.format({
+					index : i,
+					id : result.root[i].id,
+					status : result.root[i].status == 1?'<font color="red" >＊</font>':'',
+					title : result.root[i].title
+				}));
+				
+				if(result.root[i].status == 1){
+					unRead ++;
+				}
+			}
+			$('#billboardList').html(html.join("")).trigger('create').listview('refresh');
+			
+			if(unRead > 0 && c.display){
+				setTimeout(function(){
+					$('#billboardsCmp').popup('open');
+					$('#billboardsCmp').parent().addClass("slideup").addClass("in")
+					$('#billboardsCmp-popup').css({top:$('#headDisplayBillboard').position().top + 25, left:$('#headDisplayBillboard').position().left - 80});
+				}, 400);
+			}
+			
+		}
+	});
+}
+
+
+
+/**
+ * 公告
+ */
+function displayBillboard(thiz){
+	$('#billboardsCmp').popup({  
+	    afterclose: function (event, ui) {  
+	    	if(thiz){
+		    	var billboard = lg.bbs[$(thiz).attr('data-index')];
+		    	
+		    	$.post('../OperateBillboard.do', {dataSource : 'update', id : billboard.id, status : 2}).error(function() { Util.msg.alert({topTip:true, msg:'读取出错'}) });
+		    	
+		    	$('#billboardTitle').text(billboard.title);
+		    	$('#billboardDesc').html(billboard.desc);
+		    	
+		    	$('#billboardCmp').popup('open');
+
+		    	initBillboardContent();		    		
+	    	}
+	    	thiz = null;
+	    }  
+	});	
+	
+	$('#billboardsCmp').popup('close');
+	
+	
+}
+
 
 /**
  * 选择员工

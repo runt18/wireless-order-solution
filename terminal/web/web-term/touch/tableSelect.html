@@ -35,8 +35,7 @@
 <script type="text/javascript" src="js/tableSelect/tableSelect.js"></script>
 
 <!--引入易笔字核心脚本(utf-8编码)-->
-<script src="http://www.yibizi.com/ybz_core/core/ybz.min.js"></script>
-<!-- <script src="js/yibizi.js"></script> -->
+<!-- <script src="http://www.yibizi.com/ybz_core/core/ybz.min.js"></script> -->
 </head>
 <body>
 
@@ -57,6 +56,7 @@
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:2, businessStatic:2})">交款</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:0})">交班</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:1})">日结</a>
+			<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#toBasicMgr">后台</a>
 		 </div>
 	</div>
 	
@@ -68,6 +68,14 @@
 			<li class="popupButtonList" onclick="ts.member.openMemberConsumeDetailWin()"><a >消费明细</a></li>
 		</ul>
 	</div>	
+	
+	<div data-role="popup" id="toBasicMgr" data-theme="d" class="payment_searchMemberType">
+		<ul id="charge_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+			<li class="popupButtonList" ><a href="../pages/Mgr/DigieBasic.html" target="_blank">菜谱管理</a></li>
+			<li class="popupButtonList" ><a >打印设置</a></li>
+			<li class="popupButtonList" ><a >其他</a></li>
+		</ul>
+	</div>		
 	
    <div id="tableAndRegionsCmp" class="ui-grid-a" style="height: 590px;background-color: rgb(135, 206, 235);">
    	<!-- 餐台数据 -->
@@ -716,7 +724,7 @@
 	    		<!-- <a data-role="button" data-inline="true" class="regionBtn" onclick="">无原因</a> -->
 	    	</div>
     	</div>
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom" >
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.cancelFoodAction()">确定</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeCancelFoodCmp()">取消</a>		 
@@ -956,7 +964,7 @@
     	<div id="tastesCmp" class="ui-bar ui-bar-c" style="height:300px;" align="left">
 
     	</div>
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
 			<div class="bottomTastesBar">
 				<div style="float: left;margin-left: 20px;">已选口味 : </div>
 				<div id="divDescForChooseTaste" style="float: left;color: green;font-weight: bold;"></div>
@@ -1006,7 +1014,7 @@
 			</div>		    
 	    
 		</div>	
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.saveForSetFood()">确定</a>
 				 <a  data-role="button" data-inline="true" data-rel="back" class="countPopbottomBtn">取消</a>		 
@@ -1046,7 +1054,7 @@
 			</div>		    
 	    
 		</div>	
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.findByAliasAction()">确定</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.closeAliasOrderFood()">取消</a>		 
@@ -1083,7 +1091,7 @@
 	    		</td>
 	    	</tr>	    	
 	    </table>
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="saveTempTaste()">确定</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="closeTempTaste()">取消</a>		 
@@ -1149,7 +1157,7 @@
 	            <li class="tempFoodKitchen" onclick="of.tf.tempFoodSelectKitchen({event:this, id:1})"><a >临时分厨1</a></li>
 	        </ul>
 		</div>		
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom" >
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.tf.saveTempFood()">确定</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.tf.closeTempFood()">取消</a>		 
@@ -1375,7 +1383,7 @@
 				</span>						
 			</div>
 		</div>		
-		 <a data-role="button" data-inline="true" class="bottomBtnFont" href="#tableSelectMgr">返回</a>
+		 <a data-role="button" data-inline="true" class="bottomBtnFont" href="#tableSelectMgr" >返回</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="refreshOrderData({calc:true})" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="toCheckoutPage()">改单</a>

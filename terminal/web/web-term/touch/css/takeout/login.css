@@ -32,3 +32,27 @@
 .staffsPaging > span{
 	padding: 23px 30px !important;
 }
+
+/*公告按钮*/
+.btnBillboard{
+	height: 43px !important;
+	width: 110px !important;
+}
+.btnBillboard > span{
+	font-size: 20px !important;
+}
+
+
+/*操作窗口的头高*/
+.win_head{
+	line-height: 35px;
+}
+
+/*弹出框按钮*/
+.countPopbottomBtn{
+	width: -webkit-calc(50% - 2px);
+	width: -moz-calc(50% - 2px);
+}
+.countPopbottomBtn > span{
+	font-size: 20px !important;
+}

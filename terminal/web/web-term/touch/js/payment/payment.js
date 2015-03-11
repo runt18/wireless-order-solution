@@ -70,6 +70,12 @@ var pm = {table : {}},
 			'<td style="padding-right: 10px;"><input data-theme="c" id={numberfieldId} class="mixPayInputFont numberInputStyle" disabled="disabled" ></td>'+
 			'</tr>';
 
+//window.history.forward(1); 
+
+$(document).on("pagebeforehide","#paymentMgr",function(){ // 当离开结账页面时
+	$('#numberKeyboard').hide();
+});
+
 function showPaymentMgr(c){
 	if(!c || !c.table){
 		Util.msg.alert({msg : '账单不存在', topTip: true});
@@ -463,8 +469,7 @@ var paySubmit = function(submitType) {
 //	if(!checkOutListRefresh()){
 //		return;
 //	}
-	setFormButtonStatus(true);
-	var canSubmit = true;
+//	setFormButtonStatus(true);
 	var forFree = document.getElementById("forFree").innerHTML;
 	//不需要显示5秒倒数
 //	var change;
@@ -491,12 +496,11 @@ var paySubmit = function(submitType) {
 	var sendSms, printCode;
 
 	if(eraseQuota && isNaN(eraseQuota)){
-		Util.msg.alert({msg:"请填写正确的抹数金额", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();}});
+		Util.msg.alert({msg:"请填写正确的抹数金额", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();firstTimeInput = true;}});
 		return;
 	}else if(!isNaN(eraseQuota) && eraseQuota > restaurantData.setting.eraseQuota){// 抹数金额
-		setFormButtonStatus(false);
-		Util.msg.alert({msg:"抹数金额大于设置上限，不能结帐!", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();}});
-		canSubmit = false;
+//		setFormButtonStatus(false);
+		Util.msg.alert({msg:"抹数金额大于设置上限，不能结帐!", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();firstTimeInput = true;}});
 		return;
 	}	
 
@@ -546,10 +550,6 @@ var paySubmit = function(submitType) {
 	}
 
 	
-	if (!canSubmit) {
-		return false;
-	}
-	
 	Util.LM.show();
 	
 	isPaying = true;
@@ -579,7 +579,7 @@ var paySubmit = function(submitType) {
 			if (resultJSON.success == true) {
 				if (submitType == 6 || submitType == 101) {
 					Util.msg.alert({msg : dataInfo, topTip:true});
-					setFormButtonStatus(false);
+//					setFormButtonStatus(false);
 				}else{
 					Util.msg.alert({msg : '结账成功!', topTip:true});
 					if(inputReciptWin){
@@ -607,12 +607,12 @@ var paySubmit = function(submitType) {
 				}
 				
 			}
-			setFormButtonStatus(false);
+//			setFormButtonStatus(false);
 		},
 		error : function(request, status, err){
 			Util.LM.hide();
 			isPaying = false;
-			setFormButtonStatus(false);
+//			setFormButtonStatus(false);
 			Util.msg.alert({
 				msg : "结账出错, 请刷新页面后重试",
 				renderTo : 'paymentMgr'
@@ -687,7 +687,7 @@ function lookupOrderDetailByType(type){
 	}
 	
 	//账单查看
-	var html = '', sumPrice = 0;
+	var html = '';
 	for(var i = 0, index = 1; i < orderFoodDetails.length; i++){
 		var tempData = orderFoodDetails[i]; 
 		if(eval(lookupCondtion)){
@@ -710,13 +710,12 @@ function lookupOrderDetailByType(type){
 				waiter : orderFoodDetails[i].waiter 
 			});	
 			index ++;
-			sumPrice += (orderFoodDetails[i].unitPrice + orderFoodDetails[i].tasteGroup.tastePrice) * orderFoodDetails[i].count;
 		}
 
 	}		
 	
 	//设置总价
-	$('#orderDetailTotalPrice').text(type == 'detail_all'?pm.detailTotalPrice:Math.abs(sumPrice));
+	$('#orderDetailTotalPrice').text(pm.detailTotalPrice);
 	
 	$('#payment_lookupOrderDetailBody').html(html).trigger('create');
 	

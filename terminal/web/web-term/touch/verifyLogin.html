@@ -69,11 +69,19 @@
 				<img src="images/advertisement.png" height="40">
 			</div>
 		</div>
-		<div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-			<div >
+		<div id="headDisplayBillboard" data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+			<div style="float: right;">
 				<img src="images/contact.png">
 			</div>
-		</div>		
+			<div id="divDisplayBillboard" style="float: right;line-height: 25px;padding-top: 5px;border-radius:10px;">
+				<a href="#billboardsCmp" id="btnDisplayBillboard" data-rel="popup" data-role="button" data-inline="true" data-transition="slideup" data-icon="gear" data-theme="e">公告</a>
+			</div>
+		</div>	
+		
+		<!-- 公告列表 -->
+		<div data-role="popup" id="billboardsCmp" data-theme="d">
+		        <ul id="billboardList" data-role="listview" data-inset="true" style="min-width:210px;" data-theme="d"></ul>
+		</div>			
 	</div>
 	<!-- 员工列表 -->
      <div id="selectStaffCmp" data-role="popup" data-theme="c" style="width:650px;border: initial;" class="ui-corner-all" align="center">
@@ -90,6 +98,22 @@
 			 </div>
 		</div>			
      </div>
+     
+	<!-- 公告 -->
+     <div id="billboardCmp" data-role="popup" data-dismissible="false"  data-theme="c" style="width:650px;border: initial;" class="ui-corner-all">
+		<div data-role="header" data-theme="b" class="ui-corner-top win_head">
+			<span id="billboardTitle"></span>
+		</div>   
+		<div style="max-height: 400px; overflow-y: auto;">
+			<div data-role="content" id="billboardDesc" style="min-height: 300px;background-color: white;" align="left"></div>  
+		</div>			
+		<div id="staffPaddingBar" data-role="footer" data-tap-toggle="false" data-theme="b" style="height: 45px;">
+			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+				<a data-rel="back" data-role="button" data-inline="true" class="btnBillboard">我知道了</a>
+			 </div>
+		</div>			
+     </div>     
+     
 
      <div id="popupLogin" class="ui-corner-all" style="width: 450px;margin-top: 100px;">
 		<div data-role="header" data-theme="b" class="ui-corner-top">
