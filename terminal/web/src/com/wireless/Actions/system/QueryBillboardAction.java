@@ -103,7 +103,7 @@ public class QueryBillboardAction extends DispatchAction{
 			throws Exception {
 		JObject jobject = new JObject();
 		try{
-			String extra = " AND BB.expired >= NOW() AND BB.restaurant_id = " + request.getParameter("rid") + " ORDER BY created DESC ";
+//			String extra = " AND BB.expired >= NOW() AND BB.restaurant_id = " + request.getParameter("rid") + " ORDER BY created DESC ";
 //			jobject.setRoot(BillBoardDao.get(extra));
 		}catch(Exception e){
 			e.printStackTrace();
@@ -128,7 +128,7 @@ public class QueryBillboardAction extends DispatchAction{
 			throws Exception {
 		JObject jobject = new JObject();
 		try{
-			String extra = " AND BB.type = 3 AND BB.restaurant_id = " + request.getParameter("rid") + " ORDER BY created DESC ";
+//			String extra = " AND BB.type = 3 AND BB.restaurant_id = " + request.getParameter("rid") + " ORDER BY created DESC ";
 //			jobject.setRoot(BillBoardDao.get(extra));
 		}catch(Exception e){
 			e.printStackTrace();
