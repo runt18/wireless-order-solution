@@ -355,8 +355,13 @@ Ext.onReady(function(){
 		});
     }); 
     
-    
-    
+    //自动打开指定页面
+    var urlParams = new common_urlParaQuery();
+    if(urlParams.page == 1){//菜谱
+    	addTab("menuMgr", "菜谱管理", "BasicManagement_Module/MenuManagement.html");
+    }else if(urlParams.page == 2){//打印方案
+    	addTab("printMgr", "打印方案", "BasicManagement_Module/PrintScheme.html");
+    }
     
 });	
 
