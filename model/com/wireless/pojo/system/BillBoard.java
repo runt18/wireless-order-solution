@@ -307,6 +307,8 @@ public class BillBoard implements Jsonable {
 		jm.putString("expiredFormat", DateUtil.format(expired));
 		jm.putInt("typeVal", type.getVal());
 		jm.putString("typeDesc", type.getDesc());
+		jm.putInt("status", status.getVal());
+		jm.putString("stautsDesc", status.toString());		
 		jm.putInt("restaurant", restaurantId);
 		
 		return jm;
