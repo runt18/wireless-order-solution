@@ -91,14 +91,14 @@ public class BillBoard implements Jsonable {
 		
 		private InsertBuilder(String title, String expired, int restaurantId) throws ParseException{
 			this.title = title;
-			this.expired = DateUtil.parseDate(expired, DateUtil.Pattern.DATE);
+			this.expired = DateUtil.parseDate(expired, DateUtil.Pattern.DATE_TIME);
 			this.restaurantId = restaurantId;
 			this.type = Type.RESTAURANT;
 		}
 		
 		private InsertBuilder(String title, String expired) throws ParseException{
 			this.title = title;
-			this.expired = DateUtil.parseDate(expired, DateUtil.Pattern.DATE);
+			this.expired = DateUtil.parseDate(expired, DateUtil.Pattern.DATE_TIME);
 			this.restaurantId = 0;
 			this.type = Type.SYSTEM;
 		}
@@ -143,7 +143,7 @@ public class BillBoard implements Jsonable {
 		}
 		
 		public UpdateBuilder setExpired(String expired) throws ParseException{
-			this.expired = DateUtil.parseDate(expired, DateUtil.Pattern.DATE);
+			this.expired = DateUtil.parseDate(expired, DateUtil.Pattern.DATE_TIME);
 			return this;
 		}
 		
