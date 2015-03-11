@@ -1825,7 +1825,7 @@ function dailyOperationDaYin(printType){
 		Util.LM.hide();
 		if(resultJSON.success){
 			Util.msg.alert({
-				msg : resultJSON.msg + (ts.dailyOpe.omsg.length > 0 ? ('<br/>'+ts.dailyOpe.omsg) : ''),
+				msg : resultJSON.msg + (ts.dailyOpe.omsg ? ('<br/>'+ts.dailyOpe.omsg) : ''),
 				topTip : true
 			});			
 		}else{
