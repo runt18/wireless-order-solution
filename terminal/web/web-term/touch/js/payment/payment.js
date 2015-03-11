@@ -631,7 +631,7 @@ function loadOrderDetail(){
 	var tableId, orderId;
 	if($.mobile.activePage.attr( "id" ) == 'paymentMgr'){//结账界面中使用
 		tableId = pm.table.id;
-		orderId = pm.orderMsg.id;
+		orderId = orderMsg.id;
 	}else if($.mobile.activePage.attr( "id" ) == 'orderFoodListMgr'){//已点菜界面使用
 		tableId = uo.table.id;
 		orderId = uo.order.id;
