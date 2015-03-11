@@ -1823,10 +1823,18 @@ function dailyOperationDaYin(printType){
 		regionId : regionId		
 	}, function(resultJSON) {
 		Util.LM.hide();
-		Util.msg.alert({
-			msg : resultJSON.msg + (ts.dailyOpe.omsg.length > 0 ? ('<br/>'+ts.dailyOpe.omsg) : ''),
-			topTip : true
-		});
+		if(resultJSON.success){
+			Util.msg.alert({
+				msg : resultJSON.msg + (ts.dailyOpe.omsg.length > 0 ? ('<br/>'+ts.dailyOpe.omsg) : ''),
+				topTip : true
+			});			
+		}else{
+			Util.msg.alert({
+				msg : resultJSON.msg,
+				renderTo : 'tableSelectMgr'
+			});				
+		}
+
 	});
 }
 
