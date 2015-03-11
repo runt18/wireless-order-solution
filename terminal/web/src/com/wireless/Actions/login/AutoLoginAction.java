@@ -1,7 +1,5 @@
 package com.wireless.Actions.login;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,14 +29,14 @@ public class AutoLoginAction extends Action{
 		try{
 			final Restaurant restaurant = RestaurantDao.getByAccount(DEMO_ACCOUNT);
 			final Staff admin = StaffDao.getAdminByRestaurant(restaurant.getId());
-			List<Token> result = TokenDao.getByCond(new TokenDao.ExtraCond().addStatus(Token.Status.TOKEN));
+//			List<Token> result = TokenDao.getByCond(new TokenDao.ExtraCond().addStatus(Token.Status.TOKEN));
 			int tokenId;
-			if(result.isEmpty()){
+//			if(result.isEmpty()){
 				tokenId = TokenDao.insert(new Token.InsertBuilder(restaurant));
 				tokenId = TokenDao.generate(new Token.GenerateBuilder(restaurant.getAccount(), TokenDao.getById(tokenId).getCode()));			
-			}else{
-				tokenId = result.get(0).getId();
-			}
+//			}else{
+//				tokenId = result.get(0).getId();
+//			}
 			final Token token = TokenDao.getById(tokenId); 
 			
 			jobject.setExtra(new Jsonable(){
