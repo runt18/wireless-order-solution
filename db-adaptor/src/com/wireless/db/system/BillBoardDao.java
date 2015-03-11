@@ -236,6 +236,7 @@ public class BillBoardDao {
 			  " billboard_id = " + billBoard.getId() +
 			  (builder.isTitleChanged() ? " ,title = '" + billBoard.getTitle() + "'" : "") +
 			  (builder.isBodyChanged() ? " ,body = '" + billBoard.getBody() + "'" : "") +
+			  (builder.isStatusChanged() ? " ,status = " + billBoard.getStatus().getVal() : "") +
 			  (builder.isExpiredChanged() ? " ,expired = '" + DateUtil.format(billBoard.getExpired()) + "'" : "") +
 			  " WHERE billboard_id = " + billBoard.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
