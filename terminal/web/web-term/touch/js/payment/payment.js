@@ -1,5 +1,5 @@
 //结账界面数据对象
-var pm = {table : {}},
+var pm = {table : {}, payByMember:false},
 	//折扣,服务费方案, 付款方式
 	discountData = [],  servicePlanData = [], payTypeData=[], restaurantData = [],
 	//加载显示账单基础信息
@@ -71,8 +71,8 @@ var pm = {table : {}},
 			'</tr>';
 
 //window.history.forward(1); 
-
-$(document).on("pagebeforehide","#paymentMgr",function(){ // 当离开结账页面时
+//当离开结账页面时
+$(document).on("pagebeforehide","#paymentMgr",function(){ 
 	$('#numberKeyboard').hide();
 });
 
@@ -250,6 +250,10 @@ function loadOrderBasicMsg(){
 	$('#orderDiscountDesc').html(discountDesc);
 	
 	if(orderMsg.memberId && orderMsg.memberId > 0){
+		//设置会员结账按钮
+		$('#btnPayByMember .ui-btn-text').html('会员余额');
+		$('#btnPayByMember').buttonMarkup('refresh');
+		
 		$.post('../QueryMember.do', {dataSource : 'normal', id : orderMsg.memberId, forDetail : true}, function(result){
 			if(result.success){
 				member4Payment = result.root[0];
@@ -264,6 +268,9 @@ function loadOrderBasicMsg(){
 		member4Payment = null;
 		member4Display = null;
 		$('#orderMemberDesc').html('');
+		//设置会员结账按钮
+		$('#btnPayByMember .ui-btn-text').html('读取会员');
+		$('#btnPayByMember').buttonMarkup('refresh');		
 	}
 	
 	//微信账单
@@ -1094,6 +1101,12 @@ function setMemberToOrder(){
 				topTip : true,
 				msg : '会员注入成功'
 			});	
+			
+			if(pm.payByMember){
+				//打开会员结账
+				showMemberInfoWin();			
+			}
+			
 		}else{
 			Util.msg.alert({
 				msg : '使用会员失败, 请刷新页面重试', 
@@ -1178,7 +1191,9 @@ function readMemberWinToSelectCoupon(){
 
 function showMemberInfoWin(){
 	if(!member4Display || !member4Display.hadSet){
-		Util.msg.alert({msg : '账单还未注入会员, 不能使用会员结账', topTip:true});
+		/*Util.msg.alert({msg : '账单还未注入会员, 不能使用会员结账', topTip:true});*/
+		pm.payByMember = true;
+		openReadMemberByCondtionWin();
 		return;
 	}
 	
@@ -1209,6 +1224,7 @@ function showMemberInfoWin(){
 
 function closeMemberInfoWin(){
 	$('#showMemberInfoWin').popup('close');
+	pm.payByMember = false;
 }
 
 //改单

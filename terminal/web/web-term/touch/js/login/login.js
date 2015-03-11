@@ -39,9 +39,11 @@ $(function(){
 	}
 	
 	Util.LM.show();
-	if (getcookie("digie_restaurant") != ""){
+	//FIXME 过渡代码, 只有同时存在account和token才能调用Verify
+	if (getcookie("digie_restaurant") != "" || getcookie(document.domain+'_restaurant') != ""){
 		var account = getcookie("digie_restaurant");
-		var token = getcookie("digie_token")
+		var token = getcookie("digie_token");
+		var rid = getcookie(document.domain+'_restaurant');
 		var restaurantEntity;
 		
 		//FIXME 过渡
@@ -54,6 +56,7 @@ $(function(){
 		$.ajax({
 			url : '../VerifyRestaurant.do',
 			data : {
+				restaurantID : rid,
 				account : restaurantEntity.account,
 				token : token && token != 'undefined'?token:''
 			},	
