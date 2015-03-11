@@ -1629,11 +1629,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String pin = (String)request.getAttribute("pin");
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		//String restaurantID = request.getParameter("restaurantID");
+		String fuzzy = request.getParameter("fuzzy");
 		String dataSource = request.getParameter("dataSources");
-		String memberMobile = request.getParameter("memberMobile");
-		String memberCard = request.getParameter("memberCard");
-		String memberName = request.getParameter("memberName");
 		String memberType = request.getParameter("memberType");
 		String operateType = request.getParameter("operateType");
 		String onDuty = request.getParameter("onDuty");
@@ -1647,15 +1644,14 @@ public class HistoryStatisticsAction extends DispatchAction{
 		}else{
 			extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
 		}
-		if(memberMobile != null && !memberMobile.trim().isEmpty()){
-			extraCond.setMobile(memberMobile);
+		
+		if(fuzzy != null && !fuzzy.trim().isEmpty()){
+			List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setFuzzyName(fuzzy), null);
+			for (Member member : members) {
+				extraCond.addMember(member);
+			}
 		}
-		if(memberCard != null && !memberCard.trim().isEmpty()){
-			extraCond.setCard(memberCard);
-		}
-		if(memberName != null && !memberName.trim().isEmpty()){
-			extraCond.setName(memberName);
-		}
+		
 		if(memberType != null && !memberType.trim().isEmpty()){
 			extraCond.setMemberType(Integer.parseInt(memberType));
 		}
@@ -1862,14 +1858,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		//String restaurantID = request.getParameter("restaurantID");
 		String dataSource = request.getParameter("dataSources");
-		String memberMobile = request.getParameter("memberMobile");
-		String memberCard = request.getParameter("memberCard");
-		String memberName = request.getParameter("memberName");
 		String memberType = request.getParameter("memberType");
 		String operateType = request.getParameter("operateType");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
-		//String total = request.getParameter("total");
+		String fuzzy = request.getParameter("fuzzy");
 		
 		final MemberOperationDao.ExtraCond extraCond;
 		if(dataSource.equalsIgnoreCase("today")){
@@ -1878,15 +1871,13 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
 		}
 		
-		if(memberMobile != null && !memberMobile.trim().isEmpty()){
-			extraCond.setMobile(memberMobile);
+		if(fuzzy != null && !fuzzy.trim().isEmpty()){
+			List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setFuzzyName(fuzzy), null);
+			for (Member member : members) {
+				extraCond.addMember(member);
+			}
 		}
-		if(memberCard != null && !memberCard.trim().isEmpty()){
-			extraCond.setCard(memberCard);
-		}
-		if(memberName != null && !memberName.trim().isEmpty()){
-			extraCond.setName(memberName);
-		}
+		
 		if(memberType != null && !memberType.trim().isEmpty()){
 			extraCond.setMemberType(Integer.parseInt(memberType));
 		}

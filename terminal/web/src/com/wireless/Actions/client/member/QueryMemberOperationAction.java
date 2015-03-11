@@ -39,9 +39,6 @@ public class QueryMemberOperationAction extends Action{
 			
 			String dataSource = request.getParameter("dataSource");
 			
-			String memberMobile = request.getParameter("memberMobile");
-			String memberCard = request.getParameter("memberCard");
-			String memberName = request.getParameter("memberName");
 			String memberType = request.getParameter("memberType");
 			
 			String fuzzy = request.getParameter("fuzzy");
@@ -72,22 +69,13 @@ public class QueryMemberOperationAction extends Action{
 				extraCond = new MemberOperationDao.ExtraCond(dy);
 			}
 
-			
-			if(memberMobile != null && !memberMobile.trim().isEmpty()){
-				extraCond.setMobile(memberMobile);
-			}
-			if(memberCard != null && !memberCard.trim().isEmpty()){
-				extraCond.setCard(memberCard);
-			}
-			if(memberName != null && !memberName.trim().isEmpty()){
-				extraCond.setName(memberName);
-			}
 			if(memberType != null && !memberType.trim().isEmpty()){
 				extraCond.setMemberType(Integer.parseInt(memberType));
 			}
 			
 			if(fuzzy != null && !fuzzy.trim().isEmpty()){
 				List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setFuzzyName(fuzzy), null);
+				extraCond.addMember(-1);
 				for (Member member : members) {
 					extraCond.addMember(member);
 				}
