@@ -110,8 +110,8 @@ public class BillBoardDao {
 			  "( title, body, created, expired, type, status, restaurant_id ) VALUES ( " +
 			  "'" + billBoard.getTitle() + "'," +
 			  "'" + billBoard.getBody() + "'," +
-			  "'" + DateUtil.format(billBoard.getCreated(), DateUtil.Pattern.DATE) + "'," +
-			  "'" + DateUtil.format(billBoard.getExpired(), DateUtil.Pattern.DATE) + "'," +
+			  "'" + DateUtil.format(billBoard.getCreated(), DateUtil.Pattern.DATE_TIME) + "'," +
+			  "'" + DateUtil.format(billBoard.getExpired(), DateUtil.Pattern.DATE_TIME) + "'," +
 			  billBoard.getType().getVal() + "," +
 			  billBoard.getStatus().getVal() + "," +
 			  (billBoard.getType() == BillBoard.Type.RESTAURANT ? billBoard.getRestaurantId() : " NULL ") +

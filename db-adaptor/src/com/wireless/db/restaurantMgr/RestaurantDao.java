@@ -20,6 +20,7 @@ import com.wireless.db.serviceRate.ServicePlanDao;
 import com.wireless.db.sms.SMStatDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.system.BillBoardDao;
 import com.wireless.db.system.BusinessHourDao;
 import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
@@ -43,6 +44,7 @@ import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.system.BillBoard;
 import com.wireless.pojo.system.BusinessHour;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteCategory;
@@ -976,6 +978,40 @@ public class RestaurantDao {
 		dbCon.rs.close();
 		
 		return liveness;
+	}
+	
+	public static class ExpiredResult{
+		public final int amount;
+		private final int elapsed;
+		ExpiredResult(int amount, int elapsed){
+			this.amount = amount;
+			this.elapsed = elapsed;
+		}
+		@Override
+		public String toString(){
+			return "generate " + amount + " expired bill board(s) takes " + elapsed + " sec.";
+		}
+	}
+	
+	public static ExpiredResult calcExpired() throws SQLException{
+		long beginTime = System.currentTimeMillis();
+		int amount = 0;
+		for(Restaurant r : getByCond(null, null)){
+			long remaining = r.getExpireDate() - System.currentTimeMillis();
+			if(remaining > 0 && remaining <= 3600 * 24 * 1000 * 7){
+				try{
+					String body = "亲爱的【$(account)】用户，您的账户将于$(expired_date)到期，为免影响您的正常使用，请及时联络客服人员进行续费，非常感谢您对智易软件的支持:-)";
+					body = body.replace("$(account)", r.getName());
+					body = body.replace("$(expired_date)", (remaining / (3600 * 24 * 1000) + 1) + "天后(" + DateUtil.format(r.getExpireDate(), DateUtil.Pattern.DATE) + ")");
+					BillBoardDao.insert(BillBoard.InsertBuilder.build4Restaurant("餐厅账号到期提醒", r.getId(), DateUtil.format(System.currentTimeMillis() + 3600))
+															   .setBody(body));
+					amount++;
+				}catch(BusinessException | ParseException ignored){
+					ignored.printStackTrace();
+				}
+			}
+		}
+		return new ExpiredResult(amount, (int)(System.currentTimeMillis() - beginTime) / 1000);
 	}
 }
 

@@ -55,6 +55,11 @@ public class TestRestaurantDao {
 		TestInit.init();
 	}
 	
+	@Test 
+	public void testCalcExpired() throws SQLException{
+		System.out.println(RestaurantDao.calcExpired());
+	}
+	
 	@Test
 	public void testRestaurantDao() throws SQLException, ParseException, BusinessException, NoSuchAlgorithmException{
 		int restaurantId = 0;
