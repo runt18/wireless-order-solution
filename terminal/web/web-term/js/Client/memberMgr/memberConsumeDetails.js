@@ -1,5 +1,5 @@
 var mcd_mo_grid, mcd_panelMemberOperationContent;
-var mcd_search_comboOperateType, mcd_search_memberType, mcd_search_memerbMobile, mcd_search_memerbCard
+var mcd_search_comboOperateType, mcd_search_memberType, mcd_search_memerbCard
 	,mcd_search_onDuty, mcd_search_offDuty, mcd_search_memberName;
 var mcd_modal = true, queryType = 'History';
 
@@ -130,11 +130,6 @@ Ext.onReady(function(){
 			}
 		}
 	});
-	mcd_search_memerbMobile = new Ext.form.NumberField({
-		width : 100,
-		style : 'text-align:left;'
-		//value : mcd_memberOperationOnMobile
-	});
 	mcd_search_memerbCard = new Ext.form.NumberField({
 		width : 100,
 		style : 'text-align:left;'
@@ -233,10 +228,7 @@ Ext.onReady(function(){
 			text : '&nbsp;&nbsp;会员类型:'
 		}, mcd_search_memberType, {
 			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;手机号码:'
-		}, mcd_search_memerbMobile,{
-			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;会员名称:'
+			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
 		}, mcd_search_memberName, '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
@@ -247,9 +239,7 @@ Ext.onReady(function(){
 			text : '重置',
 			iconCls : 'btn_refresh',
 			handler : function(e){
-				//mcd_search_comboOperateType.setValue(-1);
 				mcd_search_memberType.setValue(-1);
-				mcd_search_memerbMobile.setValue();
 				mcd_search_memberName.setValue();
 				mcd_searchMemberOperation();
 			}
@@ -277,12 +267,11 @@ Ext.onReady(function(){
 						offDuty = mcd_search_offDuty.getValue().format('Y-m-d 23:59:59');
 					}
 					var memberType = mcd_search_memberType.getRawValue() != '' ? mcd_search_memberType.getValue() : '';
-					var url = '../../{0}?memberType={1}&memberMobile={2}&dataSource={3}&onDuty={4}&offDuty={5}&memberName={6}&dataSources={7}&operateType=1';
+					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&operateType=1';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
 							memberType > 0 ? memberType : '', 
-							mcd_search_memerbMobile.getValue(), 
 							'consumeDetail',
 							onDuty,
 							offDuty,
@@ -392,8 +381,7 @@ function mcd_searchMemberOperation(){
 	var gs = mcd_mo_grid.getStore();
 	gs.baseParams['dataSource'] = dataSource;
 	gs.baseParams['memberType'] = memberType > 0 ? memberType : '';
-	gs.baseParams['memberMobile'] = mcd_search_memerbMobile.getValue();
-	gs.baseParams['memberName'] = mcd_search_memberName.getValue();
+	gs.baseParams['fuzzy'] = mcd_search_memberName.getValue();
 	gs.baseParams['operateType'] = 1;
 	gs.baseParams['onDuty'] = onDuty;
 	gs.baseParams['offDuty'] = offDuty;

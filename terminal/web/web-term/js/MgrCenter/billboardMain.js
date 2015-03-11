@@ -18,7 +18,7 @@ var btnLogout = new Ext.ux.ImageButton({
 });
 
 var btnAddBillboard = new Ext.ux.ImageButton({
-	imgPath : '../../images/UserLogout.png',
+	imgPath : '../../images/AddCount.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	handler : function(btn){
@@ -70,7 +70,7 @@ function initWinBillboard(){
 		});
 		var restaurant = new Ext.form.ComboBox({
 			disabled : true,
-			fieldLabel : '类型',
+			fieldLabel : '餐厅选择',
 			readOnly : false,
 			forceSelection : true,
 			width : 200,
@@ -110,10 +110,9 @@ function initWinBillboard(){
 					params : {
 						dataSource : winBillboard.otype,
 						id : id.getValue(),
-						type : type.getValue(),
 						rid : restaurant.getValue(),
 						title : title.getValue(),
-						desc : desc.getValue(),
+						desc : edit.getValue(),
 						expired : expired.getValue().getTime()
 					},
 					success : function(response, options){
@@ -138,12 +137,15 @@ function initWinBillboard(){
 				winBillboard.hide();
 			}
 		});
+		
 		winBillboard = new Ext.Window({
 			title : '&nbsp;',
-			width : 300,
+			width : 800,
+			height : 700,
 			modal : true,
 			resiza : false,
 			closable : false,
+			contentEl : 'divOperateBillboard',
 			items : [{
 				xtype : 'form',
 				layout : 'form',
@@ -166,7 +168,7 @@ function initWinBillboard(){
 				if(data['typeVal'] === 2){
 					type.setValue(data['typeVal']);
 					type.fireEvent('select', type);
-					restaurant.setValue(data['restaurant']['id']);
+					restaurant.setValue(data['restaurant']);
 				}else{
 					type.setValue(1);
 					type.fireEvent('select', type);
@@ -189,13 +191,15 @@ function initWinBillboard(){
 }
 
 function operateBillboard(c){
-	initWinBillboard();
+//	initWinBillboard();
+	operateWXInfo();
 	
 	winBillboard.otype = c.otype;
 	
 	if(c.otype == 'insert'){
 		winBillboard.initData.clear();
 		winBillboard.show();
+		Ext.getCmp('title4Billboard').focus();
 	}else if(c.otype == 'update'){
 		var data = Ext.ux.getSelData(billboradGrid);
 		if(!data){
@@ -275,6 +279,224 @@ function bbGridOperateRenderer(){
 		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		   + '<a href="javascript:operateBillboard({otype:\'delete\'})">删除</a>';
 };
+
+function operateWXInfo(){
+	if(!winBillboard){
+		var id = new Ext.form.Hidden({value:0});
+		var title = new Ext.form.TextField({
+			id : 'title4Billboard',
+			fieldLabel : '标题',
+			allowBlank : false,
+			width : 200
+		});
+		var type = new Ext.form.ComboBox({
+			fieldLabel : '类型',
+			readOnly : false,
+			forceSelection : true,
+			width : 200,
+			value : 1,
+			store : new Ext.data.SimpleStore({
+				fields : [ 'value', 'text' ],
+				data : [[1, '系统公告'], [2, '餐厅通知']]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				select : function(thiz){
+					if(thiz.getValue() == 2){
+						restaurant.setDisabled(false);
+					}else{
+						restaurant.setDisabled(true);
+						restaurant.setValue();
+					}
+				}
+			}
+		});
+		var restaurant = new Ext.form.ComboBox({
+			disabled : true,
+			fieldLabel : '餐厅选择',
+			readOnly : false,
+			forceSelection : true,
+			width : 200,
+			store : new Ext.data.JsonStore({
+				fields : [ 'id', 'name' ],
+				root : 'root',
+				data : restaurantData
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true
+		});
+		var expired = new Ext.form.DateField({
+			fieldLabel : '过期时间',
+			width : 200,
+			readOnly : false,
+			allowBlank : false,
+			minValue : new Date(),
+			format : 'Y-m-d'
+		});		
+		
+		var edit = new Ext.form.HtmlEditor({
+			fieldLabel : '餐厅简介',
+			hideLabel : true,
+			width : 500,
+			height : 600,
+			enableAlignments: false,
+	        enableColors: true,
+	        enableFont: false,
+	        enableFontSize: true,
+	        enableFormat: true,
+	        enableLinks: false,
+	        enableLists: false,
+	        enableSourceEdit: true,
+//	        fontFamilies: ["宋体", "隶书", "黑体"],
+	        plugins : [new Ext.ux.plugins.HEInsertImage({
+	        	url : '../../OperateImage.do?dataSource=upload&ossType=8'
+	        })]
+		});
+		var btnPreview = new Ext.Button({
+			text : '预览',
+			listeners : {
+				render : function(thiz){
+					thiz.getEl().setWidth(100, true);
+				}
+			},
+			handler : function(){
+				center.body.update(edit.getValue());
+			}
+		});
+		var btnClear = new Ext.Button({
+			text : '清空',
+			listeners : {
+				render : function(thiz){
+					thiz.getEl().setWidth(100, true);
+				}
+			},
+			handler : function(){
+				edit.setValue();
+				center.body.update(edit.getValue());
+			}
+		});
+		var btnSave = new Ext.Button({
+			text : '保存',
+			listeners : {
+				render : function(thiz){
+					thiz.getEl().setWidth(100, true);
+				}
+			},
+			handler : function(){
+				if(!title.isValid() || !expired.isValid()){
+					return;
+				}
+				if(type.getValue() == 2 && !restaurant.isValid()){
+					return;
+				}
+				
+				Ext.Ajax.request({
+					url : '../../OperateBillboard.do',
+					params : {
+						dataSource : winBillboard.otype,
+						id : id.getValue(),
+						rid : restaurant.getValue(),
+						title : title.getValue(),
+						desc : edit.getValue(),
+						expired : expired.getValue()
+					},
+					success : function(response, options){
+						var jr = Ext.decode(response.responseText);
+						Ext.ux.showMsg(jr);
+						if(jr.success){
+							winBillboard.hide();
+							Ext.getCmp('btnSearchForBillboardGrid').handler();
+						}
+					},
+					failure : function(response, options){
+						Ext.ux.showMsg(Ext.decode(response.responseText));
+					}
+				});
+				
+			}
+		});
+		var btnClose = new Ext.Button({
+			text : '关闭',
+			listeners : {
+				render : function(thiz){
+					thiz.getEl().setWidth(100, true);
+				}
+			},
+			handler : function(){
+				winBillboard.hide();
+			}
+		});
+		var west = new Ext.form.FormPanel({
+			region : 'west',
+			width : 510,
+			items : [id, title, type, restaurant, expired, edit],
+			buttonAlign : 'center',
+			buttons : [btnPreview, btnClear, btnSave, btnClose]
+		});
+		var center = new Ext.Panel({
+			id : 'showDivHtml',
+			region : 'center',
+			style : 'background-color: #fff; border: 1px solid #ccc; padding: 5px 5px 5px 5px;',
+			bodyStyle : 'overflow-y: auto; word-wrap:break-word;',
+			html : '&nbsp;'
+		});
+		
+		winBillboard = new Ext.Window({
+			title : '&nbsp;',
+			closable : false,
+			resizeble : false,
+			modal : true,
+			width : 850,
+			items : [{
+				layout : 'border',
+				frame : true,
+				border : false,
+				height : 500,
+				items : [west, center]
+			}],
+			listeners : {
+				show : function(){
+				}
+			}
+		});
+		
+		winBillboard.initData = {
+				set : function(data){
+					data = data == null ? {} : data;
+					id.setValue(data['id']);
+					if(data['typeVal'] === 2){
+						type.setValue(data['typeVal']);
+						type.fireEvent('select', type);
+						restaurant.setValue(data['restaurant']);
+					}else{
+						type.setValue(1);
+						type.fireEvent('select', type);
+					}
+					
+					title.setValue(data['title']);
+					expired.setValue(data['expired'] > 0 ? new Date(data['expired']) : undefined);					
+					edit.setValue(data['desc']);
+					
+					title.clearInvalid();
+					expired.clearInvalid();
+				},
+				clear : function(){
+					this.set({});
+				}
+			};
+	}
+}
+
+
 
 Ext.onReady(function(){
 	loadRestaurantData();

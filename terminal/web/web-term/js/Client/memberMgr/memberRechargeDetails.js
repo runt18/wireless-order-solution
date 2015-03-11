@@ -1,5 +1,5 @@
 var mrd_mo_grid, mrd_panelMemberOperationContent;
-var mrd_search_comboOperateType, mrd_search_memberType, mrd_search_comboOperateType, mrd_search_memerbMobile, mrd_search_memerbCard
+var mrd_search_comboOperateType, mrd_search_memberType, mrd_search_comboOperateType, mrd_search_memerbCard
 	,mrd_search_onDuty, mrd_search_offDuty, mrd_search_memberName;
 var mrd_modal = true;
 Ext.onReady(function(){
@@ -77,11 +77,6 @@ Ext.onReady(function(){
 				mrd_searchMemberOperation();
 			}
 		}
-	});
-	mrd_search_memerbMobile = new Ext.form.NumberField({
-		width : 100,
-		style : 'text-align:left;'
-		//value : mrd_memberOperationOnMobile
 	});
 	mrd_search_memerbCard = new Ext.form.NumberField({
 		width : 100,
@@ -176,10 +171,7 @@ Ext.onReady(function(){
 		}, mrd_search_comboOperateType, 
 		{
 			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;手机号码:'
-		}, mrd_search_memerbMobile,{
-			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;会员名称:'
+			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
 		}, mrd_search_memberName, '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
@@ -192,7 +184,6 @@ Ext.onReady(function(){
 			handler : function(e){
 				mrd_search_comboOperateType.setValue(-1);
 				mrd_search_memberType.setValue(-1);
-				mrd_search_memerbMobile.setValue();
 				mrd_search_memberName.setValue();
 				mrd_searchMemberOperation();
 			}
@@ -220,12 +211,11 @@ Ext.onReady(function(){
 						offDuty = mrd_search_offDuty.getValue().format('Y-m-d 23:59:59');
 					}
 					var memberType = mrd_search_memberType.getRawValue() != '' ? mrd_search_memberType.getValue() : '';
-					var url = '../../{0}?memberType={1}&memberMobile={2}&dataSource={3}&onDuty={4}&offDuty={5}&memberName={6}&dataSources={7}&detailOperate={8}&operateType=2';
+					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&operateType=2';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
 							memberType > 0 ? memberType : '', 
-							mrd_search_memerbMobile.getValue(), 
 							'rechargeDetail',
 							onDuty,
 							offDuty,
@@ -335,8 +325,7 @@ function mrd_searchMemberOperation(){
 	var gs = mrd_mo_grid.getStore();
 	gs.baseParams['dataSource'] = dataSource;
 	gs.baseParams['memberType'] = memberType > 0 ? memberType : '';
-	gs.baseParams['memberMobile'] = mrd_search_memerbMobile.getValue();
-	gs.baseParams['memberName'] = mrd_search_memberName.getValue();
+	gs.baseParams['fuzzy'] = mrd_search_memberName.getValue();
 	gs.baseParams['operateType'] = 2;
 	gs.baseParams['detailOperate'] = mrd_search_comboOperateType.getRawValue() != '' ? mrd_search_comboOperateType.getValue() : '';
 	gs.baseParams['onDuty'] = onDuty;

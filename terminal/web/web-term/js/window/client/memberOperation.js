@@ -66,8 +66,7 @@ function cdd_payTypeRenderer(v, md, r, ri, ci, store){
 	}
 }
 var cdd_mo_grid, cdd_panelMemberOperationContent;
-var cdd_search_comboOperateType, cdd_search_memberType, cdd_search_memerbMobile, cdd_search_memerbCard
-	,cdd_search_onDuty, cdd_search_offDuty;
+var cdd_search_comboOperateType, cdd_search_memberType, cdd_search_memerbMobile,cdd_search_onDuty, cdd_search_offDuty;
 Ext.onReady(function(){
 	var pe = Ext.query('#divMemberOperationContent')[0].parentElement;
 	var mw = parseInt(pe.style.width);
@@ -155,10 +154,6 @@ Ext.onReady(function(){
 		style : 'text-align:left;',
 		value : cdd_memberOperationOnMobile
 	});
-	cdd_search_memerbCard = new Ext.form.NumberField({
-		width : 100,
-		style : 'text-align:left;'
-	});
 	cdd_search_onDuty = new Ext.form.DateField({
 		xtype : 'datefield',
 		width : 100,
@@ -238,11 +233,8 @@ Ext.onReady(function(){
 			text : '&nbsp;&nbsp;操作类型:'
 		}, cdd_search_comboOperateType, {
 			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;手机号码:'
-		}, cdd_search_memerbMobile,{
-			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;会员卡:'
-		}, cdd_search_memerbCard, '->', {
+			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
+		}, cdd_search_memerbMobile, '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
 			handler : function(e){
@@ -255,7 +247,6 @@ Ext.onReady(function(){
 				cdd_search_comboOperateType.setValue(-1);
 				cdd_search_memberType.setValue(-1);
 				cdd_search_memerbMobile.setValue();
-				cdd_search_memerbCard.setValue();
 				cdd_searchMemberOperation();
 			}
 		}]
@@ -360,8 +351,7 @@ function cdd_searchMemberOperation(){
 	var gs = cdd_mo_grid.getStore();
 	gs.baseParams['dataSource'] = dataSource;
 	gs.baseParams['memberType'] = memberType > 0 ? memberType : '';
-	gs.baseParams['memberMobile'] = cdd_search_memerbMobile.getValue();
-	gs.baseParams['memberCard'] = cdd_search_memerbCard.getValue();
+	gs.baseParams['fuzzy'] = cdd_search_memerbMobile.getValue();
 	gs.baseParams['operateType'] = operateType > 0 ? operateType : '';
 	gs.baseParams['onDuty'] = onDuty;
 	gs.baseParams['offDuty'] = offDuty;
