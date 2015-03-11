@@ -10,7 +10,7 @@ function reloadMemberPay(){
 	Ext.Ajax.request({
 		url : '../../QueryOrderFromMemberPay.do',
 		params : {
-			st : 1,
+			st : '',
 			sv :  Ext.getCmp('mpo_numMemberMobileForPayOrder').getValue(),
 			discountID : Ext.getCmp('mpo_txtDiscountForPayOrder').getValue(),
 			pricePlanId : Ext.getCmp('mpo_txtPricePlanForPayOrder').getValue(),
