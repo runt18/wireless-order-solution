@@ -1102,11 +1102,6 @@ function setMemberToOrder(){
 				msg : '会员注入成功'
 			});	
 			
-			if(pm.payByMember){
-				//打开会员结账
-				showMemberInfoWin();			
-			}
-			
 		}else{
 			Util.msg.alert({
 				msg : '使用会员失败, 请刷新页面重试', 
@@ -1192,7 +1187,6 @@ function readMemberWinToSelectCoupon(){
 function showMemberInfoWin(){
 	if(!member4Display || !member4Display.hadSet){
 		/*Util.msg.alert({msg : '账单还未注入会员, 不能使用会员结账', topTip:true});*/
-		pm.payByMember = true;
 		openReadMemberByCondtionWin();
 		return;
 	}
