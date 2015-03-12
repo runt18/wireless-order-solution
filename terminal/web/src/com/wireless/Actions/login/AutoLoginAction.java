@@ -1,5 +1,7 @@
 package com.wireless.Actions.login;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,21 +25,22 @@ public class AutoLoginAction extends Action{
 	
 	private final static String DEMO_ACCOUNT = "liyy";
 	
+	private static int DEMO_TOKEN_ID = 1;
+	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response)throws Exception {
 				
 		JObject jobject = new JObject();
 		try{
 			final Restaurant restaurant = RestaurantDao.getByAccount(DEMO_ACCOUNT);
 			final Staff admin = StaffDao.getAdminByRestaurant(restaurant.getId());
-//			List<Token> result = TokenDao.getByCond(new TokenDao.ExtraCond().addStatus(Token.Status.TOKEN));
-			int tokenId;
-//			if(result.isEmpty()){
-				tokenId = TokenDao.insert(new Token.InsertBuilder(restaurant));
-				tokenId = TokenDao.generate(new Token.GenerateBuilder(restaurant.getAccount(), TokenDao.getById(tokenId).getCode()));			
-//			}else{
-//				tokenId = result.get(0).getId();
-//			}
-			final Token token = TokenDao.getById(tokenId); 
+			List<Token> result = TokenDao.getByCond(new TokenDao.ExtraCond().setRestaurant(restaurant).setId(DEMO_TOKEN_ID).addStatus(Token.Status.TOKEN));
+			if(result.isEmpty()){
+				DEMO_TOKEN_ID = TokenDao.insert(new Token.InsertBuilder(restaurant));
+				DEMO_TOKEN_ID = TokenDao.generate(new Token.GenerateBuilder(restaurant.getAccount(), TokenDao.getById(DEMO_TOKEN_ID).getCode()));			
+			}else{
+				DEMO_TOKEN_ID = result.get(0).getId();
+			}
+			final Token token = TokenDao.getById(DEMO_TOKEN_ID); 
 			
 			jobject.setExtra(new Jsonable(){
 				@Override
