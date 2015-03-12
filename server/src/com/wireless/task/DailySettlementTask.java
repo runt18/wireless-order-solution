@@ -59,6 +59,9 @@ public class DailySettlementTask extends SchedulerTask{
 			//Perform to calculate restaurant liveness.
 			taskInfo.append("info : " + RestaurantDao.calcLiveness()).append(sep);
 			
+			//Perform to calculate restaurant expired.
+			taskInfo.append("info : " + RestaurantDao.calcExpired()).append(sep);
+			
 			//Perform to calculate member favor foods.
 			taskInfo.append("info : " + MemberDao.calcFavorFoods()).append(sep);
 			
