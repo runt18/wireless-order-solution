@@ -33,7 +33,7 @@ public class OperateBillboardAction extends DispatchAction{
 			String title = request.getParameter("title");
 			String desc = request.getParameter("desc");
 			String rid = request.getParameter("rid");
-			String expired = request.getParameter("expired");
+			String expired = request.getParameter("expired").replace("T", " ");
 			
 			BillBoard.InsertBuilder insertBuilder;
 			if(rid != null && !rid.trim().isEmpty()){
@@ -73,6 +73,9 @@ public class OperateBillboardAction extends DispatchAction{
 			String title = request.getParameter("title");
 			String desc = request.getParameter("desc");
 			String expired = request.getParameter("expired");
+			if(expired != null){
+				expired = expired.replace("T", " ");
+			}
 			String status = request.getParameter("status");
 			
 			BillBoard.UpdateBuilder updateBuilder = new BillBoard.UpdateBuilder(Integer.parseInt(id));
