@@ -708,11 +708,13 @@ uo.closeTransOrderFood = function(){
  */
 uo.transFood = function(c){
 	ts.tf.count = $('#txtFoodNumForTran').val();
+	Util.LM.show();
 	$.post('../TransFood.do', {
 		orderId : uo.order.id,
 		aliasId : c.alias,
 		transFoods : (c.allTrans?c.allTrans:(ts.tf.id + ',' + ts.tf.count))		
 	},function(data){
+		Util.LM.hide();
 		if(data.success){
 			uo.closeTransOrderFood();
 			Util.msg.alert({
@@ -1118,25 +1120,30 @@ uo.goToCreateOrder = function(){
  * 工具栏的取消按钮,取消对该页面的修改操作
  */
 uo.cancelForUO = function(){	
+	
+	uoCancelFoods = [];
+	uoFood = [];
+	uo.back();
+	
 	//判断页面信息是否有改动
-	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
-		uoCancelFoods = [];
-		uoFood = [];
-		uo.back();
-	}else{
-		Util.msg.alert({
-			title : '重要',
-			msg : '账单信息已修改，“确定”将不保存这些改动，是否确定？',
-			buttons : 'YESBACK',
-			fn : function(btn){
-				if(btn == 'yes'){
-					uoCancelFoods = [];
-					uoFood = [];
-					uo.back();
-				}
-			}
-		});
-	}
+//	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
+//		uoCancelFoods = [];
+//		uoFood = [];
+//		uo.back();
+//	}else{
+//		Util.msg.alert({
+//			title : '重要',
+//			msg : '账单信息已修改，“确定”将不保存这些改动，是否确定？',
+//			buttons : 'YESBACK',
+//			fn : function(btn){
+//				if(btn == 'yes'){
+//					uoCancelFoods = [];
+//					uoFood = [];
+//					uo.back();
+//				}
+//			}
+//		});
+//	}
 };
 
 

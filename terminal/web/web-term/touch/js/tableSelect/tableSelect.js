@@ -776,11 +776,23 @@ ts.transTable = function(c){
 	
 	var newTable = getTableByAlias(c.alias);
 	
+	if(!oldTable || !newTable){
+		Util.msg.alert({
+			title : '提示',
+			msg : '查找餐台出错, 请检查台号是否正确', 
+			renderTo : 'orderFoodListMgr'
+		});	
+		return;
+	}
+	
+	Util.LM.show();
+	
 	$.post('../OperateTable.do', {
 		dataSource : 'transTable',
 		oldTableId : oldTable.id,
 		newTableId : newTable.id
 	},function(data){
+		Util.LM.hide();
 		if(data.success){
 			uo.closeTransOrderFood();
 			initTableData();
@@ -797,6 +809,13 @@ ts.transTable = function(c){
 				renderTo : 'orderFoodListMgr'
 			});				
 		}			
+	}).error(function(){
+		Util.LM.hide();
+		Util.msg.alert({
+			title : '提示',
+			msg : '操作失败, 请刷新页面重试', 
+			renderTo : 'orderFoodListMgr'
+		});		
 	});	
 }
 
@@ -1029,10 +1048,17 @@ ts.openApartTableAction = function(s){
 			});
 		}else{
 			Util.msg.alert({
-				msg : result.msg,
-				topTip : true
+				msg : '操作失败, 请刷新页面后重试',
+				renderTo : 'tableSelectMgr'
 			});
 		}
+	}).error(function(){
+		Util.LM.hide();
+		Util.msg.alert({
+			title : '提示',
+			msg : '操作失败, 请刷新页面重试', 
+			renderTo : 'orderFoodListMgr'
+		});		
 	});		
 }
 

@@ -167,13 +167,20 @@ function staffLoginHandler(c){
 					location.href = 'tableSelect.html?status='+systemStatus;	
 				}
 			}else{
-				Util.msg.alert({
-					msg : data.msg,
-					renderTo : 'staffLoginPage',
-					fn : function(){
-						pwd.focus();
-					}
-				});
+				//token问题
+				if(data.code == 6901){
+					delcookie("digie_token");
+					window.location.reload();
+				}else{
+					Util.msg.alert({
+						msg : data.msg,
+						renderTo : 'staffLoginPage',
+						fn : function(){
+							pwd.focus();
+						}
+					});					
+				}
+
 			}
 		},
 		error : function(request, status, err){
