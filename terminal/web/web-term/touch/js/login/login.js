@@ -376,14 +376,20 @@ function displayBillboard(thiz){
 	    	if(thiz){
 		    	var billboard = lg.bbs[$(thiz).attr('data-index')];
 		    	
-		    	$.post('../OperateBillboard.do', {dataSource : 'update', id : billboard.id, status : 2}).error(function() { Util.msg.alert({topTip:true, msg:'读取出错'}) });
-		    	
 		    	$('#billboardTitle').text(billboard.title);
 		    	$('#billboardDesc').html(billboard.desc);
 		    	
 		    	$('#billboardCmp').popup('open');
+		    	
+		    	//设置为已读状态
+		    	if(billboard.status == 1){
+		    		$.post('../OperateBillboard.do', {dataSource : 'update', id : billboard.id, status : 2}, function(){
+		    			initBillboardContent();	
+		    		}).error(function() { Util.msg.alert({topTip:true, msg:'读取出错'}) });
+		    	}
+		    	
 
-		    	initBillboardContent();		    		
+
 	    	}
 	    	thiz = null;
 	    }  
