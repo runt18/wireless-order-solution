@@ -19,6 +19,10 @@ var allStaff = '<a data-role="button" data-inline="true" class="loginName" oncli
 
 
 $(function(){
+	//FIXME
+	delcookie("digie_token");
+	delcookie("digie_restaurant");
+	
 	$(".numkeyboard").ioskeyboard({
 	    keyboardRadix:80,//键盘大小基数，实际大小比为9.4，即设置为100时实际大小为940X330
 	    keyboardRadixMin:40,//键盘大小的最小值，默认为60，实际大小为564X198
@@ -40,9 +44,9 @@ $(function(){
 	
 	Util.LM.show();
 	//FIXME 过渡代码, 只有同时存在account和token才能调用Verify
-	if (getcookie("digie_restaurant") != "" || getcookie(document.domain+'_restaurant') != ""){
-		var account = getcookie("digie_restaurant");
-		var token = getcookie("digie_token");
+	if (getcookie(document.domain+"_digie_restaurant") != "" || getcookie(document.domain+'_restaurant') != ""){
+		var account = getcookie(document.domain+"_digie_restaurant");
+		var token = getcookie(document.domain+"_digie_token");
 		var rid = getcookie(document.domain+'_restaurant');
 		var restaurantEntity;
 		
@@ -66,10 +70,10 @@ $(function(){
 				if(data.success && data.root.length > 0){
 					//把token存入cookie
 					if(data.other.token){
-						setcookie("digie_token", data.other.token);
+						setcookie(document.domain+"_digie_token", data.other.token);
 					}
 					//FIXME 更新cookie
-					setcookie("digie_restaurant", data.root[0].account);
+					setcookie(document.domain+"_digie_restaurant", data.root[0].account);
 					
 					lg.restaurant = data.root[0];
 					
@@ -154,13 +158,13 @@ function staffLoginHandler(c){
 			comeFrom : 3,
 			pwd : MD5(pwd.val().trim()),
 			account : lg.restaurant.account,
-			token : getcookie("digie_token")
+			token : getcookie(document.domain+"_digie_token")
 		},
 		type : 'post',
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
-				setcookie("digie_token", data.other.token);
+				setcookie(document.domain+"_digie_token", data.other.token);
 				if(c && c.part == 'basic'){
 					location.href = '../pages/Mgr/DigieBasic.html';
 				}else{
@@ -169,7 +173,7 @@ function staffLoginHandler(c){
 			}else{
 				//token问题
 				if(data.code == 6901){
-					delcookie("digie_token");
+					delcookie(document.domain+"_digie_token");
 					window.location.reload();
 				}else{
 					Util.msg.alert({
@@ -227,7 +231,7 @@ function restaurantLoginHandler(){
 		data : {
 			account : account.val(),
 			code : code.val(),
-			token : getcookie("digie_token")
+			token : getcookie(document.domain+"_digie_token")
 		},
 		type : 'post',
 		dataType : 'json',
@@ -235,8 +239,8 @@ function restaurantLoginHandler(){
 			Util.LM.hide();
 			if(data.success){
 				if(data.root.length != 0){
-					setcookie("digie_restaurant", data.root[0].account);
-					setcookie("digie_token", data.other.token);
+					setcookie(document.domain+"_digie_restaurant", data.root[0].account);
+					setcookie(document.domain+"_digie_token", data.other.token);
 					
 					lg.restaurant=data.root[0];
 					Util.LM.show();
