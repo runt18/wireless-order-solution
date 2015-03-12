@@ -333,6 +333,8 @@ function initBillboardContent(c){
 	$.post('../QueryBillboard.do', {dataSource:'loginInfo', rid: lg.restaurant.id}, function(result){
 		if(result.success && result.root.length > 0){
 			$('#btnDisplayBillboard').show();
+			$('#btnDisplayBillboard .ui-btn-text').html(result.root.length +' 条公告');
+			$('#btnDisplayBillboard').buttonMarkup('refresh');	
 			lg.bbs =  result.root;
 			var html = ['<li data-role="divider" data-theme="e">点击标题查看详情:</li>'], unRead = 0;
 			for (var i = 0; i < result.root.length; i++) {
