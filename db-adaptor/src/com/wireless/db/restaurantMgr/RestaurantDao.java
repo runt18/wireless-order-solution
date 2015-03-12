@@ -1003,6 +1003,7 @@ public class RestaurantDao {
 					String body = "亲爱的【$(account)】用户，您的账户将于$(expired_date)到期，为免影响您的正常使用，请及时联络客服人员进行续费，非常感谢您对智易软件的支持:-)";
 					body = body.replace("$(account)", r.getName());
 					body = body.replace("$(expired_date)", (remaining / (3600 * 24 * 1000) + 1) + "天后(" + DateUtil.format(r.getExpireDate(), DateUtil.Pattern.DATE) + ")");
+					body = "<p><strong><span style=\"color:#632423;font-size:24px\">" + body + "</span></strong></p>";
 					BillBoardDao.insert(BillBoard.InsertBuilder.build4Restaurant("餐厅账号到期提醒", r.getId(), DateUtil.format(System.currentTimeMillis() + 3600))
 															   .setBody(body));
 					amount++;
