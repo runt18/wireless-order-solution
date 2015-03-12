@@ -4,7 +4,8 @@
  * licensing@extjs.com
  * http://www.extjs.com/license
  */
-
+//FIXME
+var batch = 30803;
 Ext.DomHelper = function(){
     var tempTableEl = null,
         emptyTags = /^(?:br|frame|hr|img|input|link|meta|range|spacer|wbr|area|param|col)$/i,
@@ -563,7 +564,7 @@ Ext.DomQuery = function(){
 	    
     
 	
-	eval("var batch = 30803;");    	
+//	eval("var batch = 30803;");    	
 
     function child(p, index){
         var i = 0,
@@ -1930,7 +1931,6 @@ Ext.EventManager = function(){
             if (o.normalized) {
                 e = e.browserEvent;
             }
-
             fn.call(scope || el, e, t, o);
         };
         if(o.target){
@@ -14810,9 +14810,10 @@ Ext.extend(Ext.Editor, Ext.Component, {
             this.field.msgTarget = 'qtip';
         }
         this.field.inEditor = true;
+        //FIXME  
         this.mon(this.field, {
             scope: this,
-            blur: this.onBlur,
+            //blur: this.onBlur,
             specialkey: this.onSpecialKey
         });
         if(this.field.grow){
@@ -39552,7 +39553,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
         var adjust = btn.getItemId() == 'increasefontsize' ? 1 : -1,
             doc = this.getDoc(),
             v = parseInt(doc.queryCommandValue('FontSize') || 2, 10);
-        if((Ext.isSafari && !Ext.isSafari2) || Ext.isChrome || Ext.isAir){
+        if((Ext.isSafari && !Ext.isSafari2) || Ext.isAir){
             
             
             if(v <= 10){
@@ -43508,6 +43509,7 @@ Ext.grid.RowSelectionModel = Ext.extend(Ext.grid.AbstractSelectionModel,  {
 
     
     onEditorKey : function(field, e){
+    	
         var k = e.getKey(), 
             newCell, 
             g = this.grid, 
@@ -44079,7 +44081,7 @@ Ext.grid.EditorGridPanel = Ext.extend(Ext.grid.GridPanel, {
 
     
     onCellDblClick : function(g, row, col){
-        this.startEditing(row, col);
+      	 this.startEditing(row, col);
     },
 
     
@@ -44130,6 +44132,7 @@ Ext.grid.EditorGridPanel = Ext.extend(Ext.grid.GridPanel, {
             }
         }
         this.view.focusCell(ed.row, ed.col);
+        //alert('sfj');
     },
 
     
@@ -44166,7 +44169,8 @@ Ext.grid.EditorGridPanel = Ext.extend(Ext.grid.GridPanel, {
                             scope: this
                         },
                         specialkey: function(field, e){
-                            this.getSelectionModel().onEditorKey(field, e);
+                        	this.getSelectionModel().onEditorKey(field, e);
+                            //this.getSelectionModel().onEditorKey(field, e);
                         },
                         complete: this.onEditComplete,
                         canceledit: this.stopEditing.createDelegate(this, [true])
