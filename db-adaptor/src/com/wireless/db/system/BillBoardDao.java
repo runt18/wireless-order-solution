@@ -18,6 +18,7 @@ import com.wireless.pojo.system.BillBoard;
 import com.wireless.pojo.system.BillBoard.Status;
 import com.wireless.pojo.system.BillBoard.Type;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.util.StringHtml;
 
 public class BillBoardDao {
 	
@@ -109,7 +110,7 @@ public class BillBoardDao {
 		sql = " INSERT INTO " + Params.dbName + ".billboard " +
 			  "( title, body, created, expired, type, status, restaurant_id ) VALUES ( " +
 			  "'" + billBoard.getTitle() + "'," +
-			  "'" + billBoard.getBody() + "'," +
+			  "'" + new StringHtml(billBoard.getBody(), StringHtml.ConvertTo.TO_NORMAL) + "'," +
 			  "'" + DateUtil.format(billBoard.getCreated(), DateUtil.Pattern.DATE_TIME) + "'," +
 			  "'" + DateUtil.format(billBoard.getExpired(), DateUtil.Pattern.DATE_TIME) + "'," +
 			  billBoard.getType().getVal() + "," +
@@ -187,7 +188,7 @@ public class BillBoardDao {
 		while(dbCon.rs.next()){
 			BillBoard item = new BillBoard(dbCon.rs.getInt("billboard_id"));
 			item.setTitle(dbCon.rs.getString("title"));
-			item.setBody(dbCon.rs.getString("body"));
+			item.setBody(new StringHtml(dbCon.rs.getString("body"), StringHtml.ConvertTo.TO_HTML).toString());
 			item.setCreated(dbCon.rs.getTimestamp("created").getTime());
 			item.setExpired(dbCon.rs.getTimestamp("expired").getTime());
 			item.setType(BillBoard.Type.valueOf(dbCon.rs.getInt("type")));
@@ -235,7 +236,7 @@ public class BillBoardDao {
 		sql = " UPDATE " + Params.dbName + ".billboard SET " +
 			  " billboard_id = " + billBoard.getId() +
 			  (builder.isTitleChanged() ? " ,title = '" + billBoard.getTitle() + "'" : "") +
-			  (builder.isBodyChanged() ? " ,body = '" + billBoard.getBody() + "'" : "") +
+			  (builder.isBodyChanged() ? " ,body = '" + new StringHtml(billBoard.getBody(), StringHtml.ConvertTo.TO_NORMAL) + "'" : "") +
 			  (builder.isStatusChanged() ? " ,status = " + billBoard.getStatus().getVal() : "") +
 			  (builder.isExpiredChanged() ? " ,expired = '" + DateUtil.format(billBoard.getExpired()) + "'" : "") +
 			  " WHERE billboard_id = " + billBoard.getId();
