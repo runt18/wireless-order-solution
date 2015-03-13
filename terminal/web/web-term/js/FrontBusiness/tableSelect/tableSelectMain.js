@@ -1510,7 +1510,7 @@ var logOutBut = new Ext.ux.ImageButton({
 		Ext.Ajax.request({
 			url : '../../LoginOut.do',
 			success : function(){
-				location.href="../../touch/verifyLogin.html?status=1"
+				location.href="../../touch/verifyLogin.jsp?status=1"
 			},
 			failure : function(){
 				
