@@ -231,7 +231,9 @@ function loadOrderBasicMsg(){
 		$('#spanSeeDiscountFoodAmount').hide();
 	}		
 	
+	//清空抹数和备注
 	$('#txtEraseQuota').val('');
+	$('#remark').val('');
 	
 	//账单基础信息
 	$('#orderIdInfo').html('结账 -- 账单号:<font color="#f7c942">' + orderMsg.id + '</font> ' + (orderMsg.isWeixinOrder?'(<span id="showWeixinOrder" style="font-size:15px;font-weight:bold;color:green;text-decoration:underline">微信账单</span>)' : ''));

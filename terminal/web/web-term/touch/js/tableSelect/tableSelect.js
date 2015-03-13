@@ -1,6 +1,7 @@
 var Request = new Util_urlParaQuery();
 var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 
+
 //全部餐桌
 var tables = [],
 	//设置就餐餐桌数组
@@ -184,7 +185,7 @@ $(function(){
 			if(data.success){
 				//刷新时去除#
 				if(location.href.indexOf('#') > 0){
-					location.href = 'tableSelect.html?status='+systemStatus;
+					location.href = 'tableSelect.jsp?status='+systemStatus;
 					return;
 				}
 				
@@ -226,7 +227,7 @@ $(function(){
 					topTip : true
 				});
 				setTimeout(function(){
-					location.href = 'verifyLogin.html?status='+systemStatus;
+					location.href = 'verifyLogin.jsp?status='+systemStatus;
 				}, 2000);
 			}
 		},
@@ -237,7 +238,7 @@ $(function(){
 				topTip : true
 			});
 			setTimeout(function(){
-				location.href = 'verifyLogin.html?status='+systemStatus;
+				location.href = 'verifyLogin.jsp?status='+systemStatus;
 			}, 1000);
 		}
 	});
@@ -2538,7 +2539,7 @@ function loginOut(){
 	$.ajax({
 		url : '../LoginOut.do',
 		success : function(data, status, xhr){
-			location.href = 'verifyLogin.html?status='+systemStatus;
+			location.href = 'verifyLogin.jsp?status='+systemStatus;
 		}
 	});	
 	

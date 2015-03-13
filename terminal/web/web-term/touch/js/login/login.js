@@ -4,7 +4,7 @@ var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 
 //刷新时去除#
 if(location.href.indexOf('#') > 0){
-	location.href = 'verifyLogin.html?status='+systemStatus;
+	location.href = 'verifyLogin.jsp?status='+systemStatus;
 }
 
 //登陆界面数据对象
@@ -91,7 +91,7 @@ $(function(){
 						success : function(data, status, xhr){
 							Util.LM.hide();
 							if(data.success){
-								location.href = 'tableSelect.html?status='+systemStatus;	
+								location.href = 'tableSelect.jsp?status='+systemStatus;	
 							}else{	
 								initStaffContent();
 							}
@@ -174,7 +174,7 @@ function staffLoginHandler(c){
 				if(c && c.part == 'basic'){
 					location.href = '../pages/Mgr/DigieBasic.html';
 				}else{
-					location.href = 'tableSelect.html?status='+systemStatus;	
+					location.href = 'tableSelect.jsp?status='+systemStatus;	
 				}
 			}else{
 				//token问题
