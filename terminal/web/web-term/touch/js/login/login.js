@@ -20,8 +20,8 @@ var allStaff = '<a data-role="button" data-inline="true" class="loginName" oncli
 
 $(function(){
 	//FIXME
-	delcookie("digie_token");
-	delcookie("digie_restaurant");
+//	delcookie("digie_token");
+//	delcookie("digie_restaurant");
 	
 	$(".numkeyboard").ioskeyboard({
 	    keyboardRadix:80,//键盘大小基数，实际大小比为9.4，即设置为100时实际大小为940X330
@@ -33,8 +33,8 @@ $(function(){
 	    colorchangeMin:154//按键背影颜色的最小值，默认为RGB(154,154,154)
 	});
 	
-	//pos
-	if(parseInt(systemStatus) == 1){
+	//pos && 体验端可以使用前后登陆
+	if(systemStatus == 1 || systemStatus == 3){
 		$('#btnLogin4Pos').show();
 		$('#btnLogin4Touch').hide();
 	}else{
@@ -44,17 +44,23 @@ $(function(){
 	
 	Util.LM.show();
 	//FIXME 过渡代码, 只有同时存在account和token才能调用Verify
-	if (getcookie(document.domain+"_digie_restaurant") != "" || getcookie(document.domain+'_restaurant') != ""){
-		var account = getcookie(document.domain+"_digie_restaurant");
+	if (getcookie("digie_restaurant") != "" || getcookie(document.domain+"_digie_restaurant") != "" || getcookie(document.domain+'_restaurant') != ""){
+//		var account = getcookie(document.domain+"_digie_restaurant");
+		var account = getcookie("digie_restaurant");
 		var token = getcookie(document.domain+"_digie_token");
 		var rid = getcookie(document.domain+'_restaurant');
 		var restaurantEntity;
+		
+		if(!account){
+			account = getcookie(document.domain+"_digie_restaurant");
+		}
 		
 		//FIXME 过渡
 		if(account.length > 10){
 			restaurantEntity = JSON.parse(account);
 		}else{
 			restaurantEntity = {account : account};
+			
 		}
 		
 		$.ajax({

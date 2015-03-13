@@ -1,5 +1,7 @@
 //点菜界面数据对象
 var of = {
+	table : {},
+	order : {},
 	deptPaging : {},	
 	deptPagingStart : 0,
 	ot : {
@@ -294,19 +296,8 @@ of.initKitchenContent = function(c){
 };
 
 /**
- * 但div还没设置完成高度时不断刷新
+ * 厨房分页
  */
-function keepLoadFoodData(){
-	if(!$('#foodsCmp').html()){
-		Util.LM.show();
-		$('#foodsCmp').html('加载菜品中...')
-	}else{
-		of.initKitchenContent({deptId:-1});
-		clearInterval(of.loadFoodDateAction);
-		Util.LM.hide();
-	}
-}
-
 of.kitchenGetNextPage = function(){
 	of.kitchenPagingStart += of.kitchenPagingLimit;
 	if(of.kitchenPagingStart > of.kitchenPagingData.length){
@@ -315,7 +306,6 @@ of.kitchenGetNextPage = function(){
 	}
 	of.showKitchenPaging();
 };
-
 of.kitchenGetPreviousPage = function(){
 	of.kitchenPagingStart -= of.kitchenPagingLimit;
 	if(of.kitchenPagingStart < 0){
@@ -325,7 +315,9 @@ of.kitchenGetPreviousPage = function(){
 	of.showKitchenPaging();
 };
 
-//显示厨房分页
+/**
+ * 显示厨房分页
+ */
 of.showKitchenPaging = function(){
 	var kc = $("#kitchensCmp");
 	var html = ['<a onclick="of.findFoodByKitchen({event:this, kitchenId:-1})" data-role="button" data-inline="true" data-type="kitchenCmp" data-value=-1 class="deptKitBtnFont">全部厨房</a>'];
@@ -358,6 +350,23 @@ of.showKitchenPaging = function(){
 
 };
 
+
+/**
+ * 但div还没设置完成高度时不断刷新
+ */
+function keepLoadFoodData(){
+	if(!$('#foodsCmp').html()){
+		Util.LM.show();
+		$('#foodsCmp').html('加载菜品中...')
+	}else{
+		of.initKitchenContent({deptId:-1});
+		clearInterval(of.loadFoodDateAction);
+		Util.LM.hide();
+	}
+}
+
+
+
 /**
  * 加载点菜页面数据
  */
@@ -365,7 +374,7 @@ of.show = function(c){
 	
 	of.table = c.table;
 	of.order = typeof c.order != 'undefined' ? c.order : null;
-	of.afterCommitFn = typeof c.callback == 'function' ? c.callback : null;
+	of.afterCommitCallback = typeof c.callback == 'function' ? c.callback : null;
 	
 	//加载菜品数据
 	toOrderFoodPage(of.table);	
@@ -1109,17 +1118,6 @@ tasteGroupGetPreviousPage = function(){
 	initTasteGroupCmp();
 };
 
-function clone(myObj){
-	  if(typeof(myObj) != 'object') return myObj;
-	  if(myObj == null) return myObj;
-	  
-	  var myNewObj = new Object();
-	  
-	  for(var i in myObj)
-	    myNewObj[i] = clone(myObj[i]);
-	  
-	  return myNewObj;
-	}
 /**
  * 保存口味
  */
@@ -1215,7 +1213,7 @@ of.ot.saveOrderFoodTaste = function(){
 				
 				//如果有临时口味则加上
 				if(tasteGroup.tmpTaste){
-					of.newFood[i].tasteGroup.tmpTaste = clone(tasteGroup.tmpTaste);
+					of.newFood[i].tasteGroup.tmpTaste = Util.clone(tasteGroup.tmpTaste);
 				}
 			}
 		}
@@ -1310,6 +1308,9 @@ function addTempTaste(){
 	$('#tempTasteName').focus();
 }
 
+/**
+ * 关闭临时口味
+ */
 function closeTempTaste(){
 	$('#addTempTasteCmp').hide();
 	$('#shadowForPopup').hide();
@@ -1441,7 +1442,9 @@ function searchFood(ope){
 		closeSearchFood();
 	}
 }
-
+/**
+ * 关闭搜索
+ */
 function closeSearchFood(){
 	of.searchFooding = false;	
 	
@@ -1451,7 +1454,6 @@ function closeSearchFood(){
 	$('#searchFoodCmp').hide();
 	
 	YBZ_win.close();
-	
 }
 
 /**
@@ -1470,7 +1472,7 @@ of.tf = {
 }
 
 /**
- * 添加临时菜
+ * 弹出添加临时菜
  */
 function addTempFood(){
 	of.tf.initTempKitchen();
@@ -1529,7 +1531,7 @@ of.tf.closeTempFood = function(){
 
 /**
  * 临时菜选择分厨
- * @param c
+ * @param c event:this, id
  */
 of.tf.tempFoodSelectKitchen = function(c){
 	this.selectedKitchen = c.id;
@@ -1604,7 +1606,9 @@ of.tf.saveTempFood = function(){
 	of.tf.closeTempFood();
 }
 
-//常用口味
+/**
+ * 弹出动态常用口味
+ */
 function foodCommonTasteLoad(){
 	of.ot.choosedTastes = [];
 	var html = [];
@@ -1636,13 +1640,18 @@ function foodCommonTasteLoad(){
 	$('#divFoodTasteFloat').show();
 }
 
-//关闭常用口味
+/**
+ * 关闭常用口味
+ */
 function closeFoodCommonTaste(){
 	$('#divFoodTasteFloat').hide();
 	$("#divFloatFoodTastes").html('');	
 }
 
-//常用口味选中
+/**
+ * 常用口味选中
+ * @param c event:当前dom, id
+ */
 function chooseOrderFoodCommonTaste(c){
 	var currentTaste = $(c.event);
 	var tdata = of.commonTastes[parseInt(currentTaste.attr('data-index'))];
@@ -1801,6 +1810,17 @@ of.orderWithNoPrint = function(){
 	}, 250);
 }
 
+/**
+ * 下单并且结账
+ */
+of.orderAndPay = function(){
+	//设置无论从哪个界面进入点菜, 下单后都会去结账界面
+	of.afterCommitCallback = function(){
+		showPaymentMgr({table:of.table});
+	};
+	of.submit({notPrint : false});	
+}
+
 
 /**
  * 账单提交
@@ -1844,7 +1864,7 @@ of.submit = function(c){
 		},
 		success : function(data, status, xhr) {
 			//下单成功时才出现倒数, 否则提示是否强制提交
-			if (data.success == true) {
+			if (data.success) {
 					if(typeof c.tempPrint != 'undefined'){
 						$.ajax({
 							url : '../QueryOrderByCalc.do',
@@ -1882,8 +1902,8 @@ of.submit = function(c){
 													msg : result.data,
 												});
 												//暂结应该是没有回调方法的
-//												if(of.afterCommitFn != null && typeof of.afterCommitFn == 'function'){
-//													of.afterCommitFn();
+//												if(of.afterCommitCallback != null && typeof of.afterCommitCallback == 'function'){
+//													of.afterCommitCallback();
 //												}
 				//								initOrderData({table : uo.table});
 											}else{
@@ -1939,8 +1959,9 @@ of.submit = function(c){
 							topTip : true,
 						});
 						
-						if(of.afterCommitFn != null && typeof of.afterCommitFn == 'function'){
-								of.afterCommitFn();
+						//从已点菜进入时, 返回已点菜界面
+						if(of.afterCommitCallback != null && typeof of.afterCommitCallback == 'function'){
+							of.afterCommitCallback();
 						}else{//没有回调函数直接退回主界面
 							uo.back();
 						}						
@@ -1974,7 +1995,10 @@ of.submit = function(c){
 	});
 };
 
-
+/**
+ * 是否需要手写板和数字键盘
+ * @param c
+ */
 function isNeedWriter(c){
 	
 	if($(c.event).attr("checked") == true){
@@ -1985,7 +2009,6 @@ function isNeedWriter(c){
 	
 	$(c.event).checkboxradio('refresh');
 }
-
 function isNeedNumKeyboard(c){
 	$('#isKeyboard4Taste').checkboxradio('refresh');
 }

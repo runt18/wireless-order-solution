@@ -39,7 +39,7 @@
 </head>
 <body>
 
-<!-- 餐台选择 -->
+<!-- 餐台选择 start -->
 <div data-role="page" id="tableSelectMgr" data-theme="d">
 	<div id="divPosOperation" data-role="header" data-theme="b" style="height: 44px;text-align: center;display: none;">
 		<div data-role="controlgroup" class="ui-btn-left " data-type="horizontal" style="margin-top: 2px;">
@@ -56,7 +56,7 @@
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:2, businessStatic:2})">交款</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:0})">交班</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:1})">日结</a>
-			<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#toBasicMgr">后台</a>
+			<a data-role="button" data-inline="true" class="topBtnFont" id="btnToBasicPage" data-rel="popup" data-transtion="pop" href="#toBasicMgr">后台</a>
 		 </div>
 	</div>
 	
@@ -73,7 +73,6 @@
 		<ul id="charge_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
 			<li class="popupButtonList" ><a href="../pages/Mgr/DigieBasic.html?page=1" target="_blank" onclick="$('#toBasicMgr').popup('close')">菜谱管理</a></li>
 			<li class="popupButtonList" ><a href="../pages/Mgr/DigieBasic.html?page=2" target="_blank" onclick="$('#toBasicMgr').popup('close')">打印设置</a></li>
-			<li class="popupButtonList" ><a href="../pages/Mgr/DigieBasic.html" target="_blank" onclick="$('#toBasicMgr').popup('close')">其他</a></li>
 		</ul>
 	</div>		
 	
@@ -535,11 +534,14 @@
 	
 	
 </div>
+<!-- end 餐台选择  -->
+
 
 <!-- 弹出框时, 挡住其他操作的div -->
 <div id="shadowForPopup" style="z-index: 1101;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%; background: #DDD;display: none;" ></div>
 
-<!-- 已点菜界面 -->
+
+<!-- 已点菜界面 start-->
 <div data-role="page" id="orderFoodListMgr" data-theme="e">
 	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b" style="height: 40px;">
 		<span id="divNorthForUpdateOrder" class="ui-btn-left" style="line-height: 40px;"></span>
@@ -582,7 +584,7 @@
 		</div>
 	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
 		<div  class="bottomGeneralBar">
-			<div id="spanTotalPriceUO" style="float: left;margin-left: 10px;">消费总额:22</div>
+			<div id="spanTotalPriceUO" style="float: left;margin-left: 10px;">消费总额:--</div>
 			<div id="divDescForUpdateOrder" style="float: right;margin-right: 20px;"></div>
 		</div>	
 		 <!-- <input type="button" value="返回" style="width: 70px;height: 70px;"> -->
@@ -733,7 +735,9 @@
 	</div>		
 	
 </div>	
+<!-- end 已点菜界面-->
 
+<!-- 系统共用餐台操作:转台,查台, 拆台等 start -->
 <div id="transFoodCmp" class="ui-overlay-shadow ui-corner-all" style="width: 460px;z-index: 1102;position: absolute; top: 160px; left: 50%; margin: -100px 0px 0px -250px;min-width:500px;background-color: white;display: none;" align="center">	
 <!-- <div id="transFoodCmp" data-role="popup"  data-theme="c" data-dismissible="false" style="max-width:900px;" align="center"> -->
     <div id="transSomethingTitle" data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b win_head">
@@ -784,8 +788,10 @@
 		 </div>
     </div>
 </div>		
+<!-- end 系统共用餐台操作-->
 
 
+<!-- 系统共用数字键盘 start -->
 <div id="numberKeyboard" class="ui-overlay-shadow ui-corner-all" style="z-index: 1200;position: absolute;background-color: white;right: 0;bottom: 0;display: none;" align="center">
     <div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="line-height: 30px;">
         	数字键盘
@@ -812,7 +818,9 @@
     
 	</div>	
 </div>	
-<!-- 点菜界面 -->
+<!-- end 系统共用数字键盘-->
+
+<!-- 点菜界面 start-->
 <div data-role="page" id="orderFoodMgr" >
 	<div class="ui-grid-a" style="width: 100%;background-color: skyblue;border-bottom:1px solid white;">
 		<div class="ui-block-a" data-role="controlgroup" data-corners="false" style="width:102px;">
@@ -901,6 +909,7 @@
 			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 			 	
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.submit({notPrint : false})">下单</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.orderAndPay()">下单并结账</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="searchFood('on')">搜索</a>
 			 	<a onclick="addTempFood()" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-transition="pop" data-theme="b" class="bottomBtnFont" >临时菜</a>
@@ -1184,8 +1193,9 @@
 		</div>  	
 	</div>	
 </div>
+<!-- end 点菜界面-->
 
-<!-- 沽清界面 -->
+<!-- 沽清界面 start -->
 <div data-role="page" id="stopSellMgr" >
 	<div class="ui-grid-a" style="width: 100%;background-color: skyblue;border-bottom:1px solid white;">
 		<div class="ui-block-a" data-role="controlgroup" data-corners="false" style="width:102px;">
@@ -1257,8 +1267,9 @@
 		 
 	</div>	
 </div>
+<!-- end 沽清界面  -->
 
-<!-- 结账界面 -->
+<!-- 结账界面 start -->
 <div data-role="page" id="paymentMgr" data-theme="e">
 	<div id="paymentCmp" class="ui-grid-a">
 		<div class="ui-block-a" style="width:330px;border-right: 2px solid gray;height: inherit;">
@@ -1507,7 +1518,9 @@
 	</div>		 
 	 
 </div>
+<!-- end 结账界面 -->
 
+<!-- 结账明细控件 start -->
 <div id="lookupOrderDetail" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 150px; left: 50%;width:1020px; margin: -100px 0px 0px -510px;display: none;background-color: white;" align="center">
     <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
     		<div id="lookupOrderDetailHead" style="float: left;line-height: 35px;margin-left: 10px;">
@@ -1592,7 +1605,9 @@
 		</div>
     </div>
 </div>	
+<!-- end 结账明细控件 -->
 
+<!-- 会员读取控件 start -->
 <div id="readMemberWin" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 180px; left: 50%;min-width:800px; margin: -100px 0px 0px -400px;display: none;background-color: white;" align="center">	
     <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
         	输入条件查找会员
@@ -1646,13 +1661,7 @@
 		 </div>
     </div>	
  </div>	
- 
-<!-- <div data-role="popup" id="payment_popupPricePlanCmp4Member" data-theme="d" class="payment_popupPricePlanCmp4Member">
-       <ul id="payment_pricePlanList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-       	<li data-icon="false" class="popupButtonList" ><a >vvvvv</a></li>
-       </ul>
-</div> -->	 
-
+<!-- end 会员读取窗口--> 
 </body>
 
 <!-- 数字键盘 -->

@@ -226,7 +226,9 @@ ss.initKitchenContent = function(c){
 };
 
 
-//显示厨房分页
+/**
+ * 显示厨房分页
+ */
 ss.showKitchenPaging = function(){
 	var kc = $("#kitchens4StopSellCmp");
 	var html = ['<a onclick="ss.findFoodByKitchen({event:this, kitchenId:-1})" data-role="button" data-inline="true" data-type="kitchen4StopSellCmp" data-value=-1 class="deptKitBtnFont">全部厨房</a>'];
@@ -383,11 +385,13 @@ ss.entry = function(){
 			Util.LM.show();
 			ss.searchData({event:$('#divBtnSellFood'), isStop:false})
 		}
-	}, 300);
+	}, 500);
 	
 };
 
-
+/**
+ * 返回餐台界面
+ */
 ss.back = function(){
 	location.href = '#tableSelectMgr';
 	

@@ -57,10 +57,10 @@ var uo = {
 function initOrderData(c){
 	// 加载菜单数据
 	$.ajax({
-		url : '../QueryOrder.do',
+		url : '../QueryOrderByCalc.do',
 		type : 'post',
 		data : {
-			tableID : c.table.id		
+			tableID : c.table.id
 		},
 //		async : false,
 		success : function(data, status, xhr){
@@ -182,7 +182,7 @@ uo.showDescForUpdateOrder = function(){
 		(uo.order.discount?"<span style = 'margin-left: 20px;'>当前折扣：<font color='green'>" + uo.order.discount.name +"</font></span>" : "") +
 		(uo.order.discounter ? "<span style = 'margin-left: 20px;'>折扣人：<font color='green'>" + uo.order.discounter + "</font></span><span style = 'margin-left: 20px;'>折扣时间：<font color='green'>" + uo.order.discountDate + "</font></span>" : "") ;
 		$("#divDescForUpdateOrder").html(html);
-		$("#spanTotalPriceUO").html('消费总额：<font color="green">¥'+ uo.getTotalPriceUO().toFixed(2) + "</font>");
+		$("#spanTotalPriceUO").html('消费总额：<font color="green">¥'+ uo.order.totalPrice + "</font>");
 }
 /**
  * 取得初始的消费总额

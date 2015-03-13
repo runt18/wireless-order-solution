@@ -122,14 +122,19 @@ var tables = [],
 
 
 $(function(){
-	//pos端
-	if(systemStatus == 1){
+	//pos端 && 体验端
+	if(systemStatus == 1 || systemStatus == 3){
 		//日结,交班等
 		$('#divPosOperation').show();
 		//已点菜结账按钮
 		$('#btnPayBill').show();
 		//当系统是收银端时
 		tableListHeight = 130;
+		
+		//体验端不开放后台
+		if(systemStatus == 3){
+			$('#btnToBasicPage').hide();
+		}
 	}else{
 		//触摸屏
 		tableListHeight = 86;
@@ -451,8 +456,8 @@ window.onload=function(){
 				}else{
 					ts.submitForSelectTableOrTransFood();
 				}
-	    	}else if(event.which == "13"){//回车 && pos端使用
-	    		if(ts.commitTableOrTran == 'lookup' && systemStatus == 1){
+	    	}else if(event.which == "13"){//回车 >> pos端 && 体验端使用 
+	    		if(ts.commitTableOrTran == 'lookup' && (systemStatus == 1 || systemStatus == 3)){
 	    			ts.toPaymentMgr();
 	    		}
 	    		
@@ -996,8 +1001,8 @@ ts.createOrderForLookup = function (){
 	$('#certain4searchTableCmps').buttonMarkup('refresh');
 	$('#certain4searchTableCmps .ui-btn-text').html('点菜(+)');
 	
-	//pos端增加结账按钮
-	if(systemStatus == 1){
+	//pos端 && 体验端增加结账按钮
+	if(systemStatus == 1 || systemStatus == 3){
 		$('#ts_toPaymentMgr').show();
 		//设置为3个按钮并排
 		$('#searchTableCmpsFoot a').addClass('tablePopbottomBtn');
