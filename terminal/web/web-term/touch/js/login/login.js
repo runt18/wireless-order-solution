@@ -17,7 +17,6 @@ var lg = {
 
 var allStaff = '<a data-role="button" data-inline="true" class="loginName" onclick="selectedName(this)" data-value="{staffId}" data-theme="c"><div>{staffName}</div></a>';
 
-
 $(function(){
 	//FIXME
 //	delcookie("digie_token");
@@ -107,8 +106,7 @@ $(function(){
 						msg : data.msg?data.msg:"",
 						renderTo : 'restaurantLoginPage',
 						fn : function(){
-							$('#popupLogin').show();
-							$('#txtRestaurantAccount').focus();
+							$('#loginRestaurantCmp').show();
 						}
 					});
 					return;					
@@ -122,8 +120,7 @@ $(function(){
 
 	}else{
 		Util.LM.hide();
-		$('#popupLogin').show();
-		$('#txtRestaurantAccount').focus();
+		$('#loginRestaurantCmp').show();
 	}	
 	
 });

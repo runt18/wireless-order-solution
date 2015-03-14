@@ -615,6 +615,7 @@
         <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
             <li class="tempFoodKitchen" onclick="uo.showOperatePeople()"><a >人数</a></li>
             <li class="tempFoodKitchen" onclick="uo.tempPayForPrintAll()"><a >补打总单</a></li>
+            <li class="tempFoodKitchen" onclick="uo.printDetailPatch()"><a >补打明细</a></li>
             <li class="tempFoodKitchen" onclick="uo.allTransFoodForTS()"><a >全单转菜</a></li>
         </ul>
 	</div>		

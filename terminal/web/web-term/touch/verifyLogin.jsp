@@ -14,7 +14,7 @@
 <!-- keyboard -->
 <link rel="stylesheet" href="css/keyboard/keyboard.css">
 <!-- 自定义样式 -->
-<link rel="stylesheet" href="css/takeout/login.css">
+<link rel="stylesheet" href="css/takeout/login.css?v=<%=v %>">
 
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="js/common/jquery.mobile-1.3.2.js"></script>
@@ -22,8 +22,8 @@
 <!--keyboard  -->
 <script type="text/javascript" src="js/keyboard/keyboard.js"></script>
 <!-- 工具类 -->
-<script type="text/javascript" src="js/Util.js"></script>
-
+<script type="text/javascript" src="js/Util.js?v=<%=v %>"></script>
+<!-- 自定义js -->
 <script type="text/javascript" src="js/login/login.js?v=<%=v %>"></script>
 
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
@@ -31,15 +31,13 @@
 <body>
 
 <div data-role="page" id="restaurantLoginPage" align="center" data-theme="e">
-<!-- 	<div data-role="header" data-position="fixed" data-theme="b" >
-		<h1>餐厅登陆</h1>
-	</div>	 -->
-	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b" style="height: 50px;font-size: 20px;">
+	<!-- 智易广告 start-->
+	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b" class="advertisementCmp">
 		<div data-role="controlgroup" class="ui-btn-left " data-type="horizontal">
-			<div style="float: left;">
+			<div class="adv_logo">
 				<img src="images/logo.png">
 			</div>
-			<div style="float: left;margin-left: 30px;padding-top: 8px;">
+			<div class="adv_msg">
 				<img src="images/advertisement.png" height="40">
 			</div>
 		</div>
@@ -49,51 +47,57 @@
 			</div>
 		</div>		
 	</div>	
-	<div data-role="content" id="popupLogin" class="ui-corner-all" style="width: 450px;display: none;" data-theme="a">
-	        <div style="padding:0px 20px;" align="center" >
-	            <input type="text" id="txtRestaurantAccount" placeholder="餐厅账号" class="numkeyboard" style="font-size: 23px;font-weight: bold;">
-	        </div>
-	        <div style="padding:0px 20px;" align="center" >
-	            <input type="text" id="txtRestaurantDynamicCode" placeholder="输入系统验证码" class="numkeyboard" style="font-size: 23px;font-weight: bold;">
-	        </div>	        
-	         <a onclick="restaurantLoginHandler()"><img src="images/login.png"></a>
-	         <!-- <a href="#staffLoginPage"><img src="images/login.png"></a> -->
+	<!-- end 智易广告 -->
+	
+	<!-- 餐厅登陆面板 -->
+	<div data-role="content" id="loginRestaurantCmp" class="ui-corner-all lgRestCmp" data-theme="a">
+        <div class="div4Input" align="center" >
+            <input type="text" id="txtRestaurantAccount" autofocus placeholder="餐厅账号" class="numkeyboard">
+        </div>
+        <div class="div4Input" align="center" >
+            <input type="text" id="txtRestaurantDynamicCode" placeholder="输入系统验证码" class="numkeyboard" onkeypress="intOnly(this)">
+        </div>	        
+         <a onclick="restaurantLoginHandler()"><img src="images/login.png"></a>
 	</div>		
 	
 </div>
+
 <div id="staffLoginPage" data-role="page" align="center" data-theme="e">
-	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b" style="height: 50px;font-size: 20px;">
+	<!-- 智易广告 start-->
+	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b" class="advertisementCmp">
 		<div data-role="controlgroup" class="ui-btn-left " data-type="horizontal">
-			<div style="float: left;">
+			<div class="adv_logo">
 				<img src="images/logo.png">
 			</div>
-			<div style="float: left;margin-left: 30px;padding-top: 8px;">
+			<div class="adv_msg">
 				<img src="images/advertisement.png" height="40">
 			</div>
 		</div>
 		<div id="headDisplayBillboard" data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-			<div style="float: right;">
-				<img src="images/contact.png">
-			</div>
-			<div id="divDisplayBillboard" style="float: right;line-height: 25px;padding-top: 5px;border-radius:10px;">
+			<div id="divDisplayBillboard" class="bb_btn">
 				<a href="#billboardsCmp" id="btnDisplayBillboard" data-rel="popup" data-role="button" data-inline="true"  data-transition="slideup" data-icon="info" data-theme="e" style="display: none;">公告</a>
 			</div>
+			<div class="adv_logo">
+				<img src="images/contact.png">
+			</div>
 		</div>	
-		
-		<!-- 公告列表 -->
-		<div data-role="popup" id="billboardsCmp" data-theme="d">
-		        <ul id="billboardList" data-role="listview" data-inset="true" style="min-width:210px;" data-theme="d"></ul>
-		</div>			
 	</div>
+	<!-- end 智易广告-->
+	
+	<!-- 公告列表 -->
+	<div data-role="popup" id="billboardsCmp" data-theme="d">
+	        <ul id="billboardList" data-role="listview" data-inset="true" style="min-width:210px;" data-theme="d"></ul>
+	</div>	
+	
 	<!-- 员工列表 -->
-     <div id="selectStaffCmp" data-role="popup" data-theme="c" style="width:650px;border: initial;" class="ui-corner-all" align="center">
+     <div id="selectStaffCmp" data-role="popup" data-theme="c" class="ui-corner-all selectStaffCmp">
 		<div data-role="header" data-theme="b" class="ui-corner-top">
 			<h1>选择员工登陆</h1>
 		</div>   
-		<div data-role="content" id="divAllStaffForUserLogin" style="max-height: 300px;background-color: white;" align="center"></div>  
+		<div data-role="content" id="divAllStaffForUserLogin" class="content" align="center"></div>  
 			<!-- <a href="#" data-role="button" data-inline="true" class="loginName" onclick="selectedName(this)" data-value="1" data-theme="c">波风水门<br>(楼面主任)</a> -->
 			
-		<div id="staffPaddingBar" data-role="footer" data-tap-toggle="false" data-theme="b" style="height: 60px;display: none;">
+		<div id="staffPaddingBar" data-role="footer" data-tap-toggle="false" data-theme="b" class="bar">
 			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 				<a onclick="lg.staffPaging.getPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="staffsPaging">L</a>
 				<a onclick="lg.staffPaging.getNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="staffsPaging">R</a>				
@@ -101,35 +105,37 @@
 		</div>			
      </div>
      
-	<!-- 公告 -->
-     <div id="billboardCmp" data-role="popup" data-dismissible="false"  data-theme="c" style="width:650px;border: initial;" class="ui-corner-all">
+	<!-- 公告列表 -->
+     <div id="billboardCmp" data-role="popup" data-dismissible="false"  data-theme="c" class="ui-corner-all billboardCmp">
 		<div data-role="header" data-theme="b" class="ui-corner-top win_head">
 			<span id="billboardTitle"></span>
 		</div>   
-		<div style="max-height: 400px; overflow-y: auto;">
-			<div data-role="content" id="billboardDesc" style="min-height: 300px;background-color: white;" align="left"></div>  
+		<div class="fixedHeight">
+			<div data-role="content" id="billboardDesc" class="bb_content" align="left"></div>  
 		</div>			
-		<div id="staffPaddingBar" data-role="footer" data-tap-toggle="false" data-theme="b" style="height: 45px;">
+		<div id="staffPaddingBar" data-role="footer" data-tap-toggle="false" data-theme="b" class="bb_bar">
 			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 				<a data-rel="back" data-role="button" data-inline="true" class="btnBillboard">我知道了</a>
 			 </div>
 		</div>			
      </div>     
      
-
-     <div id="popupLogin" class="ui-corner-all" style="width: 450px;margin-top: 100px;">
+	<!-- 员工登陆面板 -->
+     <div id="loginStaffCmp" class="ui-corner-all loginStaffCmp">
 		<div data-role="header" data-theme="b" class="ui-corner-top">
-			<font id="lab4RestaurantName" style="font-size: 30px;color:#f7c942"></font>
+			<font id="lab4RestaurantName" class="lgStaff_title"></font>
 		</div>    	
-        <div style="padding: 10px 40px;background-color: #111;border-bottom-right-radius: 10px;border-bottom-left-radius: 10px;" >
-           	<a onclick="openStaffSelectCmp()" data-rel="popup" data-role="button" data-inline="true" data-transition="pop" data-theme="b">选择员工</a>
-  				<label id="lab4StaffName" style="font-size: 25px;font-weight: bold;color: white;"></label>
+        <div class="lgStaff_content" >
+           	<a onclick="openStaffSelectCmp()" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inline="true" data-rel="popup" data-transition="pop" data-theme="b">选择员工</a>
+  				<label id="lab4StaffName" class="sName0Select"></label>
             <input type="password"  name="pass" id="loginPassword" value="" placeholder="密码" data-theme="a" class="numkeyboard">
+            <!-- 触摸屏 -->
             <div id="btnLogin4Touch" style="display: none;">
 	            <button type="button" data-theme="b" data-icon="check" onclick="staffLoginHandler()">登陆</button>
             </div>
+            <!-- pos端 -->
             <div id="btnLogin4Pos" style="display: none;">
-	            <button type="button" data-theme="b" data-inline="true" data-icon="check" onclick="staffLoginHandler({part:'basic'})">系统后台</button>
+	            <button type="button" data-theme="b" data-inline="true" data-icon="home" onclick="staffLoginHandler({part:'basic'})">系统后台</button>
 	            <button type="button" data-theme="b" data-inline="true" data-icon="check" onclick="staffLoginHandler()">前台点菜</button>
             </div>
         </div>
