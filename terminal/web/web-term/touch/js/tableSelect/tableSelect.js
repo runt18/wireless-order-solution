@@ -129,7 +129,7 @@ $(function(){
 		$('#divPosOperation').show();
 		//已点菜结账按钮
 		$('#btnPayBill').show();
-		//当系统是收银端时
+		//收银端餐台列表高度
 		tableListHeight = 130;
 		
 		//体验端不开放后台
@@ -137,8 +137,10 @@ $(function(){
 			$('#btnToBasicPage').hide();
 		}
 	}else{
-		//触摸屏
+		//触摸屏餐台列表高度
 		tableListHeight = 86;
+		//触摸屏端无下单结账
+		$('#btnOrderAndPay').hide();
 	}
 
 	//餐厅选择界面高度
