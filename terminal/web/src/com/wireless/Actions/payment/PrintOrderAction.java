@@ -170,6 +170,9 @@ public class PrintOrderAction extends Action{
 				case 14:
 					reqPrintContent = ReqPrintContent.buildReqPrintSummaryPatch(staff, orderId);
 					break;
+				case 15:
+					reqPrintContent = ReqPrintContent.buildReqPrintDetailPatch(staff, orderId);
+					break;
 				default:
 					reqPrintContent = null;
 					break;
@@ -205,6 +208,9 @@ public class PrintOrderAction extends Action{
 							break;
 						case 13:
 							jobject.initTip("操作成功, 交款对账信息打印成功.");
+							break;
+						case 15:
+							jobject.initTip("操作成功, 补打成功.");
 							break;
 						default:
 							jobject.initTip("操作成功, 打印成功.");
