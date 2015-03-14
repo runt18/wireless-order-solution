@@ -78,6 +78,14 @@ public class ReqPrintContent extends RequestPackage{
 		return req;
 	}
 	
+	public static ReqPrintContent buildReqPrintDetailPatch(Staff staff, int orderId){
+		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_ORDER_DETAIL_PATCH);
+		Parcel p = new Parcel();
+		p.writeInt(orderId);
+		req.body = p.marshall();
+		return req;
+	}
+	
 	private ReqPrintContent(Staff staff, PType printType){
 		super(staff);
 		header.mode = Mode.PRINT;
