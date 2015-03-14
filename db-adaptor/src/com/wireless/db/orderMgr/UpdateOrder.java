@@ -194,7 +194,8 @@ public class UpdateOrder {
 		 */
 		sql = " UPDATE " + 
 			  Params.dbName + ".order SET " +
-			  (builder.isCustomChanged() ? " custom_num = " + diffResult.newOrder.getCustomNum() : "") +
+			  " id = " + diffResult.newOrder.getId() + 
+			  (builder.isCustomChanged() ? " ,custom_num = " + diffResult.newOrder.getCustomNum() : "") +
 			  " ,category = " + diffResult.newOrder.getCategory().getVal() +
 			  " ,order_date = NOW() " +
 			  " ,staff_id = " + staff.getId() + 
