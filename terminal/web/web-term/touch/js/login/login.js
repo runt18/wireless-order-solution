@@ -61,13 +61,6 @@ $(function(){
 			
 		}
 		
-		//FIXME 删除相对路径cookie
-		var exp = new Date();   
-		//-1:关闭浏览器后删除, 0:立即删除, >0:不删除
-		exp.setTime(0);  
-		var cval=getcookie(document.domain+"_digie_restaurant");  
-		if(cval) document.cookie= document.domain+"_digie_restaurant" + "="+cval+";expires="+exp.toGMTString(); 
-		
 		$.ajax({
 			url : '../VerifyRestaurant.do',
 			data : {
@@ -159,9 +152,6 @@ function staffLoginHandler(c){
 		return;
 	}
 	
-	var token = getcookie(document.domain+"_digie_token");
-	delcookie(document.domain+"_digie_token");
-		
 	Util.LM.show();
 	$.ajax({
 		url : '../OperateStaff.do',
@@ -170,23 +160,23 @@ function staffLoginHandler(c){
 			comeFrom : 3,
 			pwd : MD5(pwd.val().trim()),
 			account : lg.restaurant.account,
-			token : token
+			token : getcookie(document.domain+"_digie_token")
 		},
 		type : 'post',
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
+				setcookie(document.domain+"_digie_token", data.other.token);
 				if(c && c.part == 'basic'){
 					location.href = '../pages/Mgr/DigieBasic.html';
 				}else{
 					location.href = 'tableSelect.jsp?status='+systemStatus;	
 				}
 			}else{
-				setcookie(document.domain+"_digie_token", token);
-				//token问题
-				if(data.code == 6901){
+				
+				if(data.code == 6901){//token问题
 					window.location.reload();
-				}else{
+				}else{//登陆问题
 					Util.msg.alert({
 						msg : data.msg,
 						renderTo : 'staffLoginPage',
@@ -200,7 +190,6 @@ function staffLoginHandler(c){
 		},
 		error : function(request, status, err){
 			Util.LM.hide();
-			setcookie(document.domain+"_digie_token", token);
 			Util.msg.alert({
 				msg : err,
 				renderTo : 'staffLoginPage'

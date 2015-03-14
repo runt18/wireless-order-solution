@@ -934,13 +934,17 @@ function Util_urlParaQuery() {
 /**
  * cookies操作
  */
-function setcookie(name,value){  
-    var Days = 365 * 30; 
-    var exp  = new Date();  
+function setcookie(name,value, url){  
+    var Days = 365 * 30, 
+    	exp  = new Date(),
+    	path = "";
     //js要设置毫秒, java则为秒
     exp.setTime(exp.getTime() + Days*24*60*60*1000);  
     //不设置path默认使用当前相对路径, 会导致ajax不能上传cookie
-	document.cookie = name + "=" + escape (value) + ";path=/;expires = " + exp.toGMTString();    
+    if(url){
+    	path = "path=/;";
+    }
+	document.cookie = name + "=" + escape (value) + ";" + path +"expires = " + exp.toGMTString();    
 }
 
 function getcookie(name){  
