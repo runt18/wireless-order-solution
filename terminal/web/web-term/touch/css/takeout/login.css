@@ -133,6 +133,8 @@
 .countPopbottomBtn{
 	width: -webkit-calc(50% - 2px);
 	width: -moz-calc(50% - 2px);
+	width: -ms-calc(50% - 2px);
+	width: -o-calc(50% - 2px);	
 }
 .countPopbottomBtn > span{
 	font-size: 20px !important;

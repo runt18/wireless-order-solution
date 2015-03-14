@@ -23,6 +23,8 @@
 	box-flex: 1;
 	-webkit-box-flex: 1;
 	-moz-box-flex: 1;
+	-ms-box-flex: 1;
+	-o-box-flex: 1;	
 }
 #divDescForUpdateOrder{
 	margin-right: 1px;
@@ -148,6 +150,8 @@
 #divChangeDiscountForUpdateOrder > div[addr="centent"]{
 	-webkit-box-flex: 1;
 	-moz-box-flex: 1;
+	-ms-box-flex: 1;
+	-o-box-flex: 1;	
 	overflow-y: hidden;
 }
 #divChangeDiscountForUpdateOrder > div[addr="centent"] > div{

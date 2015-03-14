@@ -80,7 +80,7 @@
 	
    <div id="tableAndRegionsCmp" class="ui-grid-a" style="height: 590px;background-color: rgb(135, 206, 235);">
    	<!-- 餐台数据 -->
-     <div id="divTableShowForSelect" class="ui-block-a" style="width: -webkit-calc(100% - 120px);width: -moz-calc(100% - 120px);height: inherit;">
+     <div id="divTableShowForSelect" class="ui-block-a" style="width: -webkit-calc(100% - 120px);width: -moz-calc(100% - 120px);width: -ms-calc(100% - 120px);width: -o-calc(100% - 120px);height: inherit;">
     	
      </div>
      <div class="ui-block-b" style="width: 120px;height: inherit;border-left: 1px solid white;">
@@ -830,7 +830,7 @@
 			 <a id="divNFCOTableBasicMsg" data-role="button" data-inline="true" class="tableBasicMsg">112<br>虞美人</a>
 			 <a data-role="button" data-inline="true" class="tableStatus">已点菜</a>		 
 		</div>
-		<div class="ui-block-b" style="width: -webkit-calc(100% - 102px);width: -moz-calc(100% - 102px);">
+		<div class="ui-block-b" style="width: -webkit-calc(100% - 102px);width: -moz-calc(100% - 102px);width: -ms-calc(100% - 102px);width: -o-calc(100% - 102px);">
 			<!-- 部门 -->
 			 <div id="deptsCmp" data-role="controlgroup" data-type="horizontal">
 				 <!--<a data-role="button" data-inline="true" class="deptKitBtnFont">全部部门</a>
@@ -849,7 +849,7 @@
 	<div id="orderFoodCenterCmp" class="ui-grid-a" style="height: 470px;overflow: hidden;">
 	     <div class="ui-block-a" style="width: 35%;height: inherit;background-color: skyblue;">
 		   <div class="ui-grid-a" style="height: inherit;">
-		     <div id="divOrderFoodsCmp" class="ui-block-a" style="width: -webkit-calc(100% - 99px);width: -moz-calc(100% - 99px);height: inherit;overflow-y: auto;">
+		     <div id="divOrderFoodsCmp" class="ui-block-a" style="width: -webkit-calc(100% - 99px);width: -moz-calc(100% - 99px);width: -ms-calc(100% - 99px);width: -o-calc(100% - 99px);height: inherit;overflow-y: auto;">
 		     	<!--已点菜列表  -->
 				<ul id="orderFoodsCmp" data-role="listview" data-theme="d" data-inset="true">
 <!-- 				    <li data-icon="forFree"><a href="#">
@@ -1205,7 +1205,7 @@
 			 <a id="divBtnSellFood" data-role="button" data-inline="true" class="tableStatus" onclick="ss.searchData({event:this, isStop:false})">在售菜品</a>
 			 <a data-role="button" data-inline="true" class="tableStatus" onclick="ss.searchData({event:this,isStop:true})">沽清菜品</a>		 
 		</div>
-		<div class="ui-block-b" style="width: -webkit-calc(100% - 102px);width: -moz-calc(100% - 102px);">
+		<div class="ui-block-b" style="width: -webkit-calc(100% - 102px);width: -moz-calc(100% - 102px);width: -ms-calc(100% - 102px);width: -o-calc(100% - 102px);">
 			<!-- 部门 -->
 			 <div id="depts4StopSellCmp" data-role="controlgroup" data-type="horizontal"></div>		
 			<!-- 厨房 -->
@@ -1220,7 +1220,7 @@
 	     </div>
 	     
 	     <!-- 菜品列表 -->
-	     <div id="foods4StopSellCmp" class="ui-block-b" style="width: -webkit-calc(100% - 350px);width: -moz-calc(100% - 350px);background-color: skyblue;"></div>			
+	     <div id="foods4StopSellCmp" class="ui-block-b" style="width: -webkit-calc(100% - 350px);width: -moz-calc(100% - 350px);width: -ms-calc(100% - 350px);width: -o-calc(100% - 350px);background-color: skyblue;"></div>			
 	</div>
 	
 	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
@@ -1337,7 +1337,7 @@
 		    </div>
 		    
 		</div>
-		<div class="ui-block-b" data-role="content" style="width : -webkit-calc(100% - 330px);width: -moz-calc(100% - 330px);height: inherit;">
+		<div class="ui-block-b" data-role="content" style="width : -webkit-calc(100% - 330px);width: -moz-calc(100% - 330px);width : -ms-calc(100% - 330px);width: -o-calc(100% - 330px);height: inherit;">
 			<div id="divNorthForUpdateOrder"  data-role="header" data-tap-toggle="false" data-theme="b" style="height: 36px;overflow: hidden;">
 				<span id="orderIdInfo" style="line-height: 35px;float: left;margin-left: 5px;">
 					结账 -- 账单号:<font color="#f7c942">-----</font>

@@ -5,6 +5,7 @@
 -webkit-user-select: none;
 -moz-user-select: none;
 -ms-user-select: none;
+-o-user-select: none;
 user-select: none;
 }
 
@@ -15,6 +16,8 @@ user-select: none;
      background: rgba(158,180,185,1);
     background: -webkit-gradient(linear, 0 50%, 100% 0,from( rgba(158,180,185,1)) ,to(rgba(169,156,173,1)),color-stop(50%, rgba(222,157,193,1)));
     background: -moz-gradient(linear, 0 50%, 100% 0,from( rgba(158,180,185,1)) ,to(rgba(169,156,173,1)),color-stop(50%, rgba(222,157,193,1)));
+    background: -ms-gradient(linear, 0 50%, 100% 0,from( rgba(158,180,185,1)) ,to(rgba(169,156,173,1)),color-stop(50%, rgba(222,157,193,1)));
+    background: -o-gradient(linear, 0 50%, 100% 0,from( rgba(158,180,185,1)) ,to(rgba(169,156,173,1)),color-stop(50%, rgba(222,157,193,1)));    
     background: linear-gradient(60deg, rgba(158,180,185,1), rgba(222,157,193,1) 50%, rgba(169,156,173,1) 100%);
     padding-left: 0.1em;
     border-radius: 0.05em;
@@ -25,9 +28,13 @@ user-select: none;
     /* right:1.8em; */
     right : -webkit-calc((100% - 750px) / 2);
     right : -moz-calc((100% - 750px) / 2);
+    right : -ms-calc((100% - 750px) / 2);
+    right : -o-calc((100% - 750px) / 2);    
     bottom:0.05em;
     -webkit-text-size-adjust:none;
     -moz-text-size-adjust:none;
+    -ms-text-size-adjust:none;
+    -o-text-size-adjust:none;    
 }
 #keyboard_5xbogf8c_left{
     position:absolute;    
