@@ -18,6 +18,7 @@ public enum PType {
 	PRINT_PAYMENT_RECEIPT(12, "交款表"),
 	PRINT_HISTORY_PAYMENT_RECEIPT(13, "历史交款表"),
 	PRINT_ORDER_PATCH(14, "补打总单"),
+	PRINT_ORDER_DETAIL_PATCH(15, "补打明细"),
 	PRINT_HISTORY_DAILY_SETTLE_RECEIPT(122, "历史日结"),
 	PRINT_HISTORY_SHIFT_RECEIPT(123, "历史交班"),
 	PRINT_DAILY_SETTLE_RECEIPT(124, "日结表"),
@@ -63,7 +64,8 @@ public enum PType {
 	
 	public boolean isDetail(){
 		return this == PType.PRINT_ORDER_DETAIL || this == PType.PRINT_EXTRA_FOOD_DETAIL || 
-				this == PType.PRINT_CANCELLED_FOOD_DETAIL || this == PType.PRINT_HURRIED_FOOD;
+				this == PType.PRINT_CANCELLED_FOOD_DETAIL || this == PType.PRINT_HURRIED_FOOD ||
+				this == PType.PRINT_ORDER_PATCH;
 	}
 	
 	public boolean isTransTbl(){
