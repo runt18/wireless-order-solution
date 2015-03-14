@@ -2,7 +2,6 @@ package com.wireless.Actions.login;
 
 import java.sql.SQLException;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -50,18 +49,11 @@ public class OperateStaffAction extends Action{
 				//再次验证token
 				int tokenId = TokenDao.verify(new Token.VerifyBuilder(account, token));
 				tokenContent = TokenDao.getById(tokenId).encrypt();
-				
-		    	Cookie cookie = new Cookie(request.getServerName() + "_digie_token",tokenContent);     
-		    	cookie.setMaxAge(365 * 30 * 24 * 60 * 60);
-		    	cookie.setPath("/");
-		    	response.addCookie(cookie);
 			}else{
 				theStaff = null;
 				tokenContent = null;
 				jobject.initTip(false, "密码输入错误");
 			}
-			
-
 			
 			jobject.setExtra(new Jsonable(){
 				@Override
@@ -70,7 +62,6 @@ public class OperateStaffAction extends Action{
 					if(theStaff != null){
 						jm.putJsonable("staff", theStaff, 1);
 					}
-					//FIXME delete
 					jm.putString("token", tokenContent);
 					return jm;
 				}
