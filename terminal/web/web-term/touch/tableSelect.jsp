@@ -27,7 +27,7 @@
 <link rel="stylesheet" href="css/takeout/main.css?v=<%=v %>">
 <link rel="stylesheet" href="css/table.css?v=<%=v %>">
 <!-- 工具类 -->
-<script type="text/javascript" src="js/Util.js"></script>
+<script type="text/javascript" src="js/Util.js?v=<%=v %>"></script>
 <script type="text/javascript" src="../extjs/wireless.ux.js"></script>
 
 <script type="text/javascript" src="js/orderFood/orderFood.js?v=<%=v %>"></script>
