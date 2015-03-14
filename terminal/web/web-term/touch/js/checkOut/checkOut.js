@@ -871,7 +871,7 @@ uo.tempPayForPrintAll = function(){
  * 补打明细
  */
 uo.printDetailPatch = function(){
-	uo.printDetailPatch = true;
+	uo.printDetailPatchAction = true;
 	//关闭后回调
 	$('#updateFoodOtherOperateCmp').popup('close');	
 }
@@ -920,7 +920,7 @@ uo.openMoreOperate = function(){
 					delete uo.tempPayForPrintAllAction;
 					if(result.success){
 						Util.msg.alert({
-							msg : '操作成功',
+							msg : result.msg,
 							topTip : true
 						});
 					}else{
@@ -939,11 +939,11 @@ uo.openMoreOperate = function(){
 						renderTo : 'orderFoodListMgr'
 					});		
 				});				
-			}else if(uo.printDetailPatch){
+			}else if(uo.printDetailPatchAction){
 				Util.LM.show();
 				$.post('../PrintOrder.do', {'tableID' : uo.order.table.id, 'printType' : 15}, function(result){
 					Util.LM.hide();
-					delete uo.printDetailPatch;
+					delete uo.printDetailPatchAction;
 					if(result.success){
 						Util.msg.alert({
 							msg : result.msg,
@@ -959,7 +959,7 @@ uo.openMoreOperate = function(){
 					}		
 				}).error(function() {
 					Util.LM.hide();
-					delete uo.printDetailPatch;
+					delete uo.printDetailPatchAction;
 					Util.msg.alert({
 						msg : '操作失败, 请联系客服',
 						renderTo : 'orderFoodListMgr'
