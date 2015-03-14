@@ -1,7 +1,6 @@
 package com.wireless.Actions.login;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +18,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.token.Token;
 
@@ -28,7 +26,6 @@ public class OperateStaffAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response)throws Exception {
 				
 		String pin = request.getParameter("pin");
-		String name = request.getParameter("name");
 		String pwd = request.getParameter("pwd");
 		String account = request.getParameter("account");
 		String token = request.getParameter("token");
@@ -36,24 +33,9 @@ public class OperateStaffAction extends Action{
 		final Staff theStaff;
 		final String tokenContent;
 		try{
-			//再次验证token
-			int tokenId = TokenDao.verify(new Token.VerifyBuilder(account, token));
-			final Token t = TokenDao.getById(tokenId);
-			
 			Staff staff = null;
 			if(pin != null && !pin.trim().isEmpty()){
 				staff = StaffDao.verify(Integer.parseInt(pin));
-			}else{
-				List<Staff> list = StaffDao.getByRestaurant(Restaurant.ADMIN);
-				for (Staff s : list) {
-					if(s.getName().equals(name)){
-						staff = s;
-						break;
-					}
-				}
-				if(staff == null){
-					jobject.initTip(false, "账号输入错误");
-				}
 			}
 			 
 			if(staff != null && staff.getPwd().equals(pwd)){
@@ -64,16 +46,22 @@ public class OperateStaffAction extends Action{
 				session.setAttribute("dynamicKey", System.currentTimeMillis() % 100000);
 				theStaff = staff;
 				jobject.initTip(true, "登陆成功");
+				
+				//再次验证token
+				int tokenId = TokenDao.verify(new Token.VerifyBuilder(account, token));
+				tokenContent = TokenDao.getById(tokenId).encrypt();
+				
+		    	Cookie cookie = new Cookie(request.getServerName() + "_digie_token",tokenContent);     
+		    	cookie.setMaxAge(365 * 30 * 24 * 60 * 60);
+		    	cookie.setPath("/");
+		    	response.addCookie(cookie);
 			}else{
 				theStaff = null;
+				tokenContent = null;
 				jobject.initTip(false, "密码输入错误");
 			}
 			
-			tokenContent = t.encrypt();
-	    	Cookie cookie = new Cookie(request.getServerName() + "_digie_token",tokenContent);     
-	    	cookie.setMaxAge(365 * 30 * 24 * 60 * 60);
-	    	cookie.setPath("/");
-	    	response.addCookie(cookie);
+
 			
 			jobject.setExtra(new Jsonable(){
 				@Override
