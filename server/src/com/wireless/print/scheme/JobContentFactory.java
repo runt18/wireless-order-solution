@@ -135,7 +135,7 @@ public class JobContentFactory {
 	}
 	
 	public Content createDetailContent(PType printType, Staff staff, List<Printer> printers, Order order) throws BusinessException, SQLException{
-		List<JobContent> jobContents = new ArrayList<JobContent>();
+		final List<JobContent> jobContents = new ArrayList<JobContent>();
 		
 		if(order.hasOrderFood() && !printers.isEmpty()){
 			

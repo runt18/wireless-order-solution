@@ -61,31 +61,37 @@ public class OrderDetailContent extends ConcreteContent {
 			if(mPrintType == PType.PRINT_ORDER_DETAIL){
 				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("点菜" + (mParent.isHangup() ? "叫起" : "") + "分单-" + tblName, mStyle), 
+															new CenterAlignedDecorator("点菜" + (mParent.isHangup() ? "叫起" : "") + "分单 - " + tblName, mStyle), 
 															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 				
+			}else if(mPrintType == PType.PRINT_ORDER_DETAIL_PATCH){
+				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
+														new ExtraFormatDecorator(
+															new CenterAlignedDecorator("补打分单 - " + tblName, mStyle), 
+															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
+			
 			}else if(mPrintType == PType.PRINT_EXTRA_FOOD_DETAIL){
 				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("加菜" + (mParent.isHangup() ? "叫起" : "") + "分单-" + tblName, mStyle),
+															new CenterAlignedDecorator("加菜" + (mParent.isHangup() ? "叫起" : "") + "分单 - " + tblName, mStyle),
 															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 				
 			}else if(mPrintType == PType.PRINT_CANCELLED_FOOD_DETAIL){
 				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("!!!退菜分单!!!-" + tblName, mStyle), 
+															new CenterAlignedDecorator("!!!退菜分单!!! - " + tblName, mStyle), 
 															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 				
 			}else if(mPrintType == PType.PRINT_HURRIED_FOOD){
 				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("催菜分细!!!-" + tblName, mStyle), 
+															new CenterAlignedDecorator("催菜分细!!! - " + tblName, mStyle), 
 															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 				
 			}else{
 				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 														new ExtraFormatDecorator(
-																new CenterAlignedDecorator("点菜分细-" + tblName, mStyle),
+																new CenterAlignedDecorator("点菜分单 - " + tblName, mStyle),
 																ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 			}
 
