@@ -64,18 +64,16 @@ public class OperateStaffAction extends Action{
 				session.setAttribute("dynamicKey", System.currentTimeMillis() % 100000);
 				theStaff = staff;
 				jobject.initTip(true, "登陆成功");
-				
-				tokenContent = t.encrypt();
-		    	Cookie cookie = new Cookie(request.getServerName() + "_digie_token",tokenContent);     
-		    	cookie.setMaxAge(365 * 30 * 24 * 60 * 60);
-		    	cookie.setPath("/");
-		    	response.addCookie(cookie);
-				
 			}else{
 				theStaff = null;
-				tokenContent = null;
 				jobject.initTip(false, "密码输入错误");
 			}
+			
+			tokenContent = t.encrypt();
+	    	Cookie cookie = new Cookie(request.getServerName() + "_digie_token",tokenContent);     
+	    	cookie.setMaxAge(365 * 30 * 24 * 60 * 60);
+	    	cookie.setPath("/");
+	    	response.addCookie(cookie);
 			
 			jobject.setExtra(new Jsonable(){
 				@Override
