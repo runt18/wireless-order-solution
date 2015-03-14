@@ -907,13 +907,13 @@ uo.closeOperatePeople = function(c){
 uo.openMoreOperate = function(){
 	$('#updateFoodOtherOperateCmp').popup({
 		afterclose: function (event, ui) { 
-			if(uo.updateCustom){
+			if(uo.updateCustom){//修改人数
 				$('#orderCustomerCountSet').popup('open');
 				firstTimeInput = true;
 				focusInput = 'inputOrderCustomerCountSet';
 				$('#inputOrderCustomerCountSet').focus();
 				$('#inputOrderCustomerCountSet').select();
-			}else if(uo.tempPayForPrintAllAction){
+			}else if(uo.tempPayForPrintAllAction){//补打总单
 				Util.LM.show();
 				$.post('../PrintOrder.do', {'tableID' : uo.order.table.id, 'printType' : 14}, function(result){
 					Util.LM.hide();
@@ -939,32 +939,41 @@ uo.openMoreOperate = function(){
 						renderTo : 'orderFoodListMgr'
 					});		
 				});				
-			}else if(uo.printDetailPatchAction){
-				Util.LM.show();
-				$.post('../PrintOrder.do', {'tableID' : uo.order.table.id, 'printType' : 15}, function(result){
-					Util.LM.hide();
-					delete uo.printDetailPatchAction;
-					if(result.success){
-						Util.msg.alert({
-							msg : result.msg,
-							topTip : true
-						});
-					}else{
-						Util.msg.alert({
-							title : '错误',
-							msg : result.msg,
-							renderTo : 'orderFoodListMgr',
-							time : 3
-						});
-					}		
-				}).error(function() {
-					Util.LM.hide();
-					delete uo.printDetailPatchAction;
-					Util.msg.alert({
-						msg : '操作失败, 请联系客服',
-						renderTo : 'orderFoodListMgr'
-					});		
-				});				
+			}else if(uo.printDetailPatchAction){//补打明细
+				Util.msg.alert({
+					msg : '是否补打明细?',
+					renderTo : 'orderFoodListMgr',
+					buttons : 'yesback',
+					certainCallback : function(){
+						Util.LM.show();
+						$.post('../PrintOrder.do', {'tableID' : uo.order.table.id, 'printType' : 15}, function(result){
+							Util.LM.hide();
+							delete uo.printDetailPatchAction;
+							if(result.success){
+								Util.msg.alert({
+									msg : result.msg,
+									topTip : true
+								});
+							}else{
+								Util.msg.alert({
+									title : '错误',
+									msg : result.msg,
+									renderTo : 'orderFoodListMgr',
+									time : 3
+								});
+							}		
+						}).error(function() {
+							Util.LM.hide();
+							delete uo.printDetailPatchAction;
+							Util.msg.alert({
+								msg : '操作失败, 请联系客服',
+								renderTo : 'orderFoodListMgr'
+							});		
+						});							
+					}
+				});
+				
+			
 			}
 		}
 	});	

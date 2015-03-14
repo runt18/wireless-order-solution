@@ -44,7 +44,6 @@ $(function(){
 	Util.LM.show();
 	//FIXME 过渡代码, 只有同时存在account和token才能调用Verify
 	if (getcookie("digie_restaurant") != "" || getcookie(document.domain+"_digie_restaurant") != "" || getcookie(document.domain+'_restaurant') != ""){
-//		var account = getcookie(document.domain+"_digie_restaurant");
 		var account = getcookie("digie_restaurant");
 		var token = getcookie(document.domain+"_digie_token");
 		var rid = getcookie(document.domain+'_restaurant');
@@ -61,6 +60,13 @@ $(function(){
 			restaurantEntity = {account : account};
 			
 		}
+		
+		//FIXME 删除相对路径cookie
+		var exp = new Date();   
+		//-1:关闭浏览器后删除, 0:立即删除, >0:不删除
+		exp.setTime(0);  
+		var cval=getcookie(document.domain+"_digie_restaurant");  
+		if(cval) document.cookie= document.domain+"_digie_restaurant" + "="+cval+";expires="+exp.toGMTString(); 
 		
 		$.ajax({
 			url : '../VerifyRestaurant.do',
@@ -153,6 +159,9 @@ function staffLoginHandler(c){
 		return;
 	}
 	
+	var token = getcookie(document.domain+"_digie_token");
+	delcookie(document.domain+"_digie_token");
+		
 	Util.LM.show();
 	$.ajax({
 		url : '../OperateStaff.do',
@@ -161,22 +170,21 @@ function staffLoginHandler(c){
 			comeFrom : 3,
 			pwd : MD5(pwd.val().trim()),
 			account : lg.restaurant.account,
-			token : getcookie(document.domain+"_digie_token")
+			token : token
 		},
 		type : 'post',
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
-				setcookie(document.domain+"_digie_token", data.other.token);
 				if(c && c.part == 'basic'){
 					location.href = '../pages/Mgr/DigieBasic.html';
 				}else{
 					location.href = 'tableSelect.jsp?status='+systemStatus;	
 				}
 			}else{
+				setcookie(document.domain+"_digie_token", token);
 				//token问题
 				if(data.code == 6901){
-					delcookie(document.domain+"_digie_token");
 					window.location.reload();
 				}else{
 					Util.msg.alert({
@@ -192,6 +200,7 @@ function staffLoginHandler(c){
 		},
 		error : function(request, status, err){
 			Util.LM.hide();
+			setcookie(document.domain+"_digie_token", token);
 			Util.msg.alert({
 				msg : err,
 				renderTo : 'staffLoginPage'
@@ -401,8 +410,6 @@ function displayBillboard(thiz){
 		    			initBillboardContent();	
 		    		}).error(function() { Util.msg.alert({topTip:true, msg:'读取出错'}) });
 		    	}
-		    	
-
 
 	    	}
 	    	thiz = null;

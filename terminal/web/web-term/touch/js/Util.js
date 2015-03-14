@@ -465,7 +465,7 @@ Util.msg = {
 						    '<div data-role="content" data-theme="d" class="ui-corner-bottom ui-content" align="center">'+
 						    	'<h2 class="ui-title">'+c.msg+'</h2>'+
 						        '<a onclick="Util.msg.save({event:\'yes\', id:\''+id+'\'})" data-role="button" ' +(hasBack ? 'data-inline="true"': "") +' data-theme="b" >'+ (typeof c.btnEnter != 'undefined'? c.btnEnter : "确定") +'</a>'+
-						        (hasBack ? '<a href="javascript:Util.msg.hide({event:\'back\', id:\''+id+'\', callback:' + c.returnCallback +'})" data-role="button" data-inline="true" >取消</a>' : '')+
+						        (hasBack ? '<a href="javascript:Util.msg.hide({event:\'back\', id:\''+id+'\', callback:' + c.returnCallback +'})" data-role="button" data-theme="c" data-inline="true" >取消</a>' : '')+
 						    '</div>'+
 						'</div>	';
 		return {
@@ -937,8 +937,10 @@ function Util_urlParaQuery() {
 function setcookie(name,value){  
     var Days = 365 * 30; 
     var exp  = new Date();  
+    //js要设置毫秒, java则为秒
     exp.setTime(exp.getTime() + Days*24*60*60*1000);  
-    document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();  
+    //不设置path默认使用当前相对路径, 会导致ajax不能上传cookie
+	document.cookie = name + "=" + escape (value) + ";path=/;expires = " + exp.toGMTString();    
 }
 
 function getcookie(name){  
@@ -952,9 +954,10 @@ function getcookie(name){
 
 function delcookie(name){  
     var exp = new Date();   
-    exp.setTime(exp.getTime() - 1);  
+    //-1:关闭浏览器后删除, 0:立即删除, >0:不删除
+    exp.setTime(0);  
     var cval=getcookie(name);  
-    if(cval!=null) document.cookie= name + "="+cval+";expires="+exp.toGMTString();  
+    if(cval!=null) document.cookie= name + "="+cval+";path=/;expires="+exp.toGMTString();  
 }
 
 /**
