@@ -333,7 +333,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			
 		}else if(mType == PType.PRINT_ORDER_DETAIL){
 			return typeToCompare == PType.PRINT_ORDER_DETAIL || 
-				   typeToCompare == PType.PRINT_EXTRA_FOOD_DETAIL;
+				   typeToCompare == PType.PRINT_EXTRA_FOOD_DETAIL ||
+				   typeToCompare == PType.PRINT_ORDER_DETAIL_PATCH;
 			
 		}else if(mType == PType.PRINT_RECEIPT){
 			return typeToCompare == PType.PRINT_RECEIPT ||

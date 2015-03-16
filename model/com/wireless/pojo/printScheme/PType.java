@@ -65,7 +65,7 @@ public enum PType {
 	public boolean isDetail(){
 		return this == PType.PRINT_ORDER_DETAIL || this == PType.PRINT_EXTRA_FOOD_DETAIL || 
 				this == PType.PRINT_CANCELLED_FOOD_DETAIL || this == PType.PRINT_HURRIED_FOOD ||
-				this == PType.PRINT_ORDER_PATCH;
+				this == PType.PRINT_ORDER_DETAIL_PATCH;
 	}
 	
 	public boolean isTransTbl(){

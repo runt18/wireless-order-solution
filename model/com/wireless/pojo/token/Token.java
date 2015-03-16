@@ -232,7 +232,7 @@ public class Token implements Jsonable{
 	}
 	
 	public boolean isCodeExpired(){
-		return System.currentTimeMillis() - this.lastModified >= 10 * 60 * 1000;
+		return System.currentTimeMillis() - this.lastModified >= 30 * 60 * 1000;
 	}
 	
 	public String encrypt() throws BusinessException{

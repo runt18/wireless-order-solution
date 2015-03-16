@@ -10,7 +10,8 @@ public class BillBoard implements Jsonable {
 	
 	public enum Type{
 		SYSTEM(1, "系统公告"),
-		RESTAURANT(2, "餐厅通知");
+		RESTAURANT(2, "餐厅通知"),
+		SYSTEM_ASSOCIATED(3, "系统关联");
 		
 		Type(int val, String desc){
 			this.val = val;
@@ -79,7 +80,12 @@ public class BillBoard implements Jsonable {
 		private final long expired;
 		private final int restaurantId;
 		private String body;
+		private int systemId;
 		private final Type type;
+		
+		public static InsertBuilder build4SystemAssociated(BillBoard systemBillBoard, int restaurantId){
+			return new InsertBuilder(systemBillBoard, restaurantId);
+		}
 		
 		public static InsertBuilder build4Restaurant(String title, int restaurantId, String expired) throws ParseException{
 			return new InsertBuilder(title, expired, restaurantId);
@@ -101,6 +107,15 @@ public class BillBoard implements Jsonable {
 			this.expired = DateUtil.parseDate(expired, DateUtil.Pattern.DATE_TIME);
 			this.restaurantId = 0;
 			this.type = Type.SYSTEM;
+		}
+		
+		private InsertBuilder(BillBoard systemBillBoard, int restaurantId){
+			this.systemId = systemBillBoard.id;
+			this.title = systemBillBoard.title;
+			this.expired = systemBillBoard.expired;
+			this.body = systemBillBoard.body;
+			this.restaurantId = restaurantId;
+			this.type = Type.SYSTEM_ASSOCIATED;
 		}
 
 		public InsertBuilder setBody(String body){
@@ -174,6 +189,7 @@ public class BillBoard implements Jsonable {
 	private Type type;
 	private Status status;
 	private int restaurantId;
+	private int systemId;
 	
 	private BillBoard(InsertBuilder builder){
 		this.title = builder.title;
@@ -182,6 +198,7 @@ public class BillBoard implements Jsonable {
 		this.body = builder.body;
 		this.status = Status.CREATED;
 		this.type = builder.type;
+		this.systemId = builder.systemId;
 		this.restaurantId = builder.restaurantId;
 	}
 	
@@ -274,6 +291,14 @@ public class BillBoard implements Jsonable {
 	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
+	}
+	
+	public void setSystemId(int systemId){
+		this.systemId = systemId;
+	}
+	
+	public int getSystemId(){
+		return this.systemId;
 	}
 	
 	@Override
