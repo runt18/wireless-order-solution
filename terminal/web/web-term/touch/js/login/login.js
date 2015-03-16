@@ -166,7 +166,7 @@ function staffLoginHandler(c){
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
-				setcookie(document.domain+"_digie_token", data.other.token);
+//				setcookie(document.domain+"_digie_token", data.other.token);
 				if(c && c.part == 'basic'){
 					location.href = '../pages/Mgr/DigieBasic.html';
 				}else{
