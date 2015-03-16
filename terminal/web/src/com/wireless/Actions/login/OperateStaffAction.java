@@ -12,13 +12,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.token.TokenDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.token.Token;
 
 
 public class OperateStaffAction extends Action{
@@ -26,7 +24,7 @@ public class OperateStaffAction extends Action{
 				
 		String pin = request.getParameter("pin");
 		String pwd = request.getParameter("pwd");
-		String account = request.getParameter("account");
+		//String account = request.getParameter("account");
 		String token = request.getParameter("token");
 		JObject jobject = new JObject();
 		final Staff theStaff;
@@ -47,8 +45,9 @@ public class OperateStaffAction extends Action{
 				jobject.initTip(true, "登陆成功");
 				
 				//再次验证token
-				int tokenId = TokenDao.verify(new Token.VerifyBuilder(account, token));
-				tokenContent = TokenDao.getById(tokenId).encrypt();
+				//int tokenId = TokenDao.verify(new Token.VerifyBuilder(account, token));
+				//tokenContent = TokenDao.getById(tokenId).encrypt();
+				tokenContent = token;
 			}else{
 				theStaff = null;
 				tokenContent = null;
