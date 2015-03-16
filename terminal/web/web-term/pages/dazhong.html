@@ -3,27 +3,9 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
-<script type="text/javascript" src="jquery/jquery-1.8.2.min.js"></script>
-<script type="text/javascript">
-$(function(){
-		$.ajax({
-	        url: "http://api.dianping.com/v1/deal/get_deals_by_business_id?appkey=6373481645&sign=993637179B47241D7B6F5E6959637B55A3E9683C&business_id=19276866&city=%E5%B9%BF%E5%B7%9E",
-	        type:'get', 
-	        dataType:'json',
-	        async:false ,
-	        success: function(data){
-	        	console.log(data);
-	        	$('name').val(data.deals[0].title);
-	        	$('current_price').val(data.deals[0].title);
-	        	$('name').val(data.deals[0].image_url);
-			}
-		}); 
-	
-});
-
-</script>
+<script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
 </head>
-<body >
+<body>
 	<div align="center">
 	
 		商品名称:<label id="name"></label><br>
@@ -33,4 +15,37 @@ $(function(){
 
 
 </body>
+<script type="text/javascript">
+
+var head= document.getElementsByTagName('head')[0];  
+var script= document.createElement('script');  
+script.type= 'text/javascript';  
+script.setAttribute('id', "zz");	
+script.onload = script.onreadystatechange = function() {
+	
+    if (!this.readyState || this.readyState === "loaded" ||    this.readyState === "complete" ) { 
+        //help();  
+        // Handle memory leak in IE 
+            script.onload = script.onreadystatechange = null;  
+            
+    } 
+};  
+script.src= 'http://api.dianping.com/v1/deal/get_deals_by_business_id?appkey=6373481645&sign=993637179B47241D7B6F5E6959637B55A3E9683C&business_id=19276866&city=%E5%B9%BF%E5%B7%9E';
+//head.appendChild(script);  
+document.getElementsByTagName('head')[0].innerHTML=script 
+console.log(script.html());
+/* 
+var head = document.getElementsByTagName("head").item(0);
+
+var oScript = document.createElement("script");
+oScript.setAttribute("src", 'http://api.dianping.com/v1/deal/get_deals_by_business_id?appkey=6373481645&sign=993637179B47241D7B6F5E6959637B55A3E9683C&business_id=19276866&city=%E5%B9%BF%E5%B7%9E');
+oScript.setAttribute("id",'zz');
+oScript.setAttribute("type","text/javascript");
+oScript.setAttribute("language","javascript");
+head.appendChild(oScript); */
+
+
+//console.log(oScript.html());
+
+</script>
 </html>
