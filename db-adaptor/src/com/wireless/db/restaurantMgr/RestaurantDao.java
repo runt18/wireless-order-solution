@@ -169,7 +169,7 @@ public class RestaurantDao {
 		}
 	}
 	
-	private static List<Restaurant> getByCond(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	public static List<Restaurant> getByCond(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		
 		List<Restaurant> result = new ArrayList<Restaurant>();
 		

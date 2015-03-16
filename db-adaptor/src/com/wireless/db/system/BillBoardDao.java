@@ -8,6 +8,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.oss.OssImageDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BillBoardError;
 import com.wireless.exception.BusinessException;
@@ -25,6 +26,7 @@ public class BillBoardDao {
 	public static class ExtraCond{
 		private int id;
 		private int restaurantId;
+		private int systemId;
 		private Status status;
 		private Type type;
 		
@@ -48,6 +50,11 @@ public class BillBoardDao {
 			return this;
 		}
 		
+		public ExtraCond setSystem(int systemId){
+			this.systemId = systemId;
+			return this;
+		}
+		
 		public ExtraCond setType(Type type){
 			this.type = type;
 			return this;
@@ -67,6 +74,9 @@ public class BillBoardDao {
 			}
 			if(type != null){
 				extraCond.append(" AND type = " + type.getVal());
+			}
+			if(systemId != 0){
+				extraCond.append(" AND system_id = " + systemId);
 			}
 			return extraCond.toString();
 		}
@@ -108,19 +118,20 @@ public class BillBoardDao {
 		BillBoard billBoard = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".billboard " +
-			  "( title, body, created, expired, type, status, restaurant_id ) VALUES ( " +
+			  "( title, body, created, expired, type, status, system_id, restaurant_id ) VALUES ( " +
 			  "'" + billBoard.getTitle() + "'," +
 			  "'" + new StringHtml(billBoard.getBody(), StringHtml.ConvertTo.TO_NORMAL) + "'," +
 			  "'" + DateUtil.format(billBoard.getCreated(), DateUtil.Pattern.DATE_TIME) + "'," +
 			  "'" + DateUtil.format(billBoard.getExpired(), DateUtil.Pattern.DATE_TIME) + "'," +
 			  billBoard.getType().getVal() + "," +
 			  billBoard.getStatus().getVal() + "," +
-			  (billBoard.getType() == BillBoard.Type.RESTAURANT ? billBoard.getRestaurantId() : " NULL ") +
+			  (billBoard.getType() == BillBoard.Type.SYSTEM_ASSOCIATED ? billBoard.getSystemId() : " NULL ") + ", " +
+			  (billBoard.getType() != BillBoard.Type.SYSTEM ? billBoard.getRestaurantId() : " NULL ") +
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
-		int id = 0;
+		final int id;
 		if(dbCon.rs.next()){
 			id = dbCon.rs.getInt(1);
 		}else{
@@ -137,6 +148,18 @@ public class BillBoardDao {
 			staff.setRestaurantId(0);
 		}
 		OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder4Html(OssImage.Type.BILL_BOARD, id).setHtml(billBoard.getBody()));
+		
+		//Insert the system billboard to each restaurant. 
+		if(billBoard.getType() == BillBoard.Type.SYSTEM){
+			billBoard.setId(id);
+			for(Restaurant eachRestaurant : RestaurantDao.getByCond(dbCon, null, null)){
+				try{
+					insert(dbCon, BillBoard.InsertBuilder.build4SystemAssociated(billBoard, eachRestaurant.getId()));
+				}catch(BusinessException | SQLException ignored){
+					ignored.printStackTrace();
+				}
+			}
+		}
 		
 		return id;
 	}
@@ -180,6 +203,16 @@ public class BillBoardDao {
 		}
 	}
 	
+	public static List<BillBoard> getByCond(ExtraCond extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 	public static List<BillBoard> getByCond(DBCon dbCon, ExtraCond extraCond) throws SQLException{
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".billboard WHERE 1 = 1 " + (extraCond != null ? extraCond.toString() : "");
@@ -193,6 +226,7 @@ public class BillBoardDao {
 			item.setExpired(dbCon.rs.getTimestamp("expired").getTime());
 			item.setType(BillBoard.Type.valueOf(dbCon.rs.getInt("type")));
 			item.setStatus(BillBoard.Status.valueOf(dbCon.rs.getInt("status")));
+			item.setSystemId(dbCon.rs.getInt("system_id"));
 			item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			result.add(item);
 		}
@@ -254,6 +288,18 @@ public class BillBoardDao {
 				staff.setRestaurantId(0);
 			}
 			OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder4Html(OssImage.Type.BILL_BOARD, billBoard.getId()).setHtml(billBoard.getBody()));
+		}
+		
+		billBoard = getById(dbCon, billBoard.getId());
+		if(billBoard.getType() == BillBoard.Type.SYSTEM){
+			deleteByCond(dbCon, new BillBoardDao.ExtraCond().setSystem(billBoard.getId()));
+			for(Restaurant eachRestaurant : RestaurantDao.getByCond(dbCon, null, null)){
+				try{
+					insert(dbCon, BillBoard.InsertBuilder.build4SystemAssociated(billBoard, eachRestaurant.getId()));
+				}catch(BusinessException | SQLException ignored){
+					ignored.printStackTrace();
+				}
+			}
 		}
 	}
 	
@@ -343,6 +389,11 @@ public class BillBoardDao {
 				staff.setRestaurantId(0);
 			}
 			OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.BILL_BOARD, billBoard.getId()));
+			
+			//Delete the associated system billboard
+			if(billBoard.getType() == BillBoard.Type.SYSTEM){
+				deleteByCond(dbCon, new ExtraCond().setSystem(billBoard.getId()));
+			}
 		}
 		return amount;
 	}
