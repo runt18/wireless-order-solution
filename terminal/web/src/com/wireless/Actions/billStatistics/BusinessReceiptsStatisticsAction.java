@@ -61,7 +61,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 			jobject.initTip(e);
 		}finally{
 			if(incomesByEachDay.size() == 1 && incomesByEachDay.get(0).getIncomeByPay() == null){
-				jobject.setRoot(null);
+				jobject.setRoot(new ArrayList<Jsonable>(0));
 				
 			}else{
 /*				IncomeByEachDay total = new IncomeByEachDay(start);

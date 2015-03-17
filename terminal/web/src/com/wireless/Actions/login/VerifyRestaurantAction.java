@@ -1,8 +1,6 @@
 package com.wireless.Actions.login;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,13 +24,14 @@ public class VerifyRestaurantAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		JObject jobject = new JObject();
-		String account = request.getParameter("account");
-		String token = request.getParameter("token");
-		final Token tokenBean;
+		final String account = request.getParameter("account");
+		final String restaurantId = request.getParameter("restaurantID");
+		final String encryptedToken = request.getParameter("token");
+		final String nextEncryptedToken;
 		try {
 			Restaurant r;
 			if(account == null || account.trim().isEmpty()){
-				r = RestaurantDao.getById(Integer.parseInt(request.getParameter("restaurantID")));
+				r = RestaurantDao.getById(Integer.parseInt(restaurantId));
 			}else{
 				r = RestaurantDao.getByAccount(account);
 			}
@@ -41,39 +40,26 @@ public class VerifyRestaurantAction extends Action {
 			}
 			
 			//FIXME 过渡阶段
-			if(token == null || token.trim().isEmpty()){
+			if(encryptedToken == null || encryptedToken.trim().isEmpty()){
 				int tokenId = TokenDao.insert(new Token.InsertBuilder(r));
-				Token tempToken = TokenDao.getById(tokenId); 
-				int code = tempToken.getCode();
-				tokenId = TokenDao.generate(new Token.GenerateBuilder(r.getAccount(), code));
-				tokenBean = TokenDao.getById(tokenId);
+				nextEncryptedToken = TokenDao.generate(new Token.GenerateBuilder(r.getAccount(), TokenDao.getById(tokenId).getCode()));
 			}else{
-				int tokenId = TokenDao.verify(new Token.VerifyBuilder(account, token));
-				tokenBean = TokenDao.getById(tokenId);
-				r = tokenBean.getRestaurant();
-
+				nextEncryptedToken = TokenDao.verify(new Token.VerifyBuilder(account, encryptedToken));
 			}
-			
-			List<Restaurant> list = new ArrayList<>();
-			list.add(r);
 			
 			jobject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
-					try {
-						jm.putString("token", tokenBean.encrypt());
-					} catch (BusinessException e) {
-						e.printStackTrace();
-					}
+					jm.putString("token", nextEncryptedToken);
 					return jm;
 				}
 				@Override
 				public void fromJsonMap(JsonMap jsonMap, int flag) {
 					
 				}
-			});				
-			jobject.setRoot(list);
+			});		
+			jobject.setRoot(r);
 			
 		}catch (BusinessException e) {
 			jobject.initTip(e);

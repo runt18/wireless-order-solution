@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.token.TokenDao;
-import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -33,27 +32,24 @@ public class AutoLoginAction extends Action{
 		try{
 			final Restaurant restaurant = RestaurantDao.getByAccount(DEMO_ACCOUNT);
 			final Staff admin = StaffDao.getAdminByRestaurant(restaurant.getId());
+			final String encryptedToken;
 			List<Token> result = TokenDao.getByCond(new TokenDao.ExtraCond().setRestaurant(restaurant).setId(DEMO_TOKEN_ID).addStatus(Token.Status.TOKEN));
 			if(result.isEmpty()){
 				DEMO_TOKEN_ID = TokenDao.insert(new Token.InsertBuilder(restaurant));
-				DEMO_TOKEN_ID = TokenDao.generate(new Token.GenerateBuilder(restaurant.getAccount(), TokenDao.getById(DEMO_TOKEN_ID).getCode()));			
+				encryptedToken = TokenDao.generate(new Token.GenerateBuilder(restaurant.getAccount(), TokenDao.getById(DEMO_TOKEN_ID).getCode()));			
 			}else{
 				DEMO_TOKEN_ID = result.get(0).getId();
+				encryptedToken = TokenDao.getById(result.get(0).getId()).encrypt();
 			}
-			final Token token = TokenDao.getById(DEMO_TOKEN_ID); 
 			
 			jobject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
-					try {
-						jm.putString("token", token.encrypt());
-						jm.putString("account", restaurant.getAccount());
-						jm.putInt("pin", admin.getId());
-						jm.putString("password", admin.getPwd());
-					} catch (BusinessException e) {
-						e.printStackTrace();
-					}
+					jm.putString("token", encryptedToken);
+					jm.putString("account", restaurant.getAccount());
+					jm.putInt("pin", admin.getId());
+					jm.putString("password", admin.getPwd());
 					return jm;
 				}
 				@Override

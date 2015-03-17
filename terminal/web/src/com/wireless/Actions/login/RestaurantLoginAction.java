@@ -1,8 +1,6 @@
 package com.wireless.Actions.login;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,31 +27,23 @@ public class RestaurantLoginAction extends Action {
 		String account = request.getParameter("account");
 		String token = request.getParameter("token");
 		String code = request.getParameter("code");
-		final Token tokenBean;
+		final String encryptedToken;
 		try {
 			Restaurant r = RestaurantDao.getByAccount(account);
 			if(!r.hasRSA()){
 				RestaurantDao.update(new Restaurant.UpdateBuilder(r.getId()).resetRSA());
 			}
 			if(token == null || token.trim().isEmpty()){
-				int tokenId = TokenDao.generate(new Token.GenerateBuilder(r.getAccount(), Integer.parseInt(code)));
-				tokenBean = TokenDao.getById(tokenId); 
+				encryptedToken = TokenDao.generate(new Token.GenerateBuilder(r.getAccount(), Integer.parseInt(code)));
 			}else{
-				int tokenId = TokenDao.failedGenerate(new Token.FailedGenerateBuilder(token, account, Integer.parseInt(code)));
-				tokenBean = TokenDao.getById(tokenId); 
+				encryptedToken = TokenDao.failedGenerate(new Token.FailedGenerateBuilder(token, account, Integer.parseInt(code)));
 			}
-			List<Restaurant> list = new ArrayList<>();
-			list.add(r);
-			jobject.setRoot(list);
+			jobject.setRoot(r);
 			jobject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
-					try {
-						jm.putString("token", tokenBean.encrypt());
-					} catch (BusinessException e) {
-						e.printStackTrace();
-					}
+					jm.putString("token", encryptedToken);
 					return jm;
 				}
 				@Override
