@@ -129,6 +129,10 @@ public class OrderDetailContent extends ConcreteContent {
 					var1.append(new ExtraFormatDecorator(new FoodDetailContent(FoodDetailContent.DISPLAY_CONFIG_4_DETAIL, mParent, mPrintType, mStyle), ExtraFormatDecorator.LARGE_FONT_VH_1X).toString()).append(SEP);
 				}
 				
+				if(mPrintType == PType.PRINT_ORDER_DETAIL_PATCH){
+					var1.insert(0, new ExtraFormatDecorator("(²¹)", mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X));
+				}
+				
 				if(mParent.hasTasteGroup()){
 					if(mPrintType == PType.PRINT_CANCELLED_FOOD_DETAIL){
 						var1.append(SEP).append(new ExtraFormatDecorator("¿ÚÎ¶£º" + mParent.getTasteGroup().getPreference(), mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X)).append(SEP);

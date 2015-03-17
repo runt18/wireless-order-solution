@@ -210,6 +210,10 @@ class OrderHandler implements Runnable{
 					//handle the transfer order food
 					response = doTransOrderFood(staff, request);
 					
+				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.GIFT_ORDER_FOOD){
+					//handle the gift order food
+					response = doGiftOrderFood(staff, request);
+						
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.TRANS_TABLE){
 					//handle the table transfer request 
 					response = doTransTable(staff, request);
@@ -455,6 +459,11 @@ class OrderHandler implements Runnable{
 			}
 
 		}
+		return new RespACK(request.header);
+	}
+	
+	private RespPackage doGiftOrderFood(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+		OrderDao.gift(staff, new Parcel(request.body).readParcel(Order.GiftBuilder.CREATOR));
 		return new RespACK(request.header);
 	}
 	
