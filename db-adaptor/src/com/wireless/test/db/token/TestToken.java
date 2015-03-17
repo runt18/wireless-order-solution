@@ -61,7 +61,7 @@ public class TestToken {
 //			}
 			
 			//Test to generate a token successfully.
-			tokenId = TokenDao.generate(new Token.GenerateBuilder(r1.getAccount(), code));
+			TokenDao.generate(new Token.GenerateBuilder(r1.getAccount(), code));
 			
 			Token actual = TokenDao.getById(tokenId);
 			r1Token.setId(tokenId);
@@ -92,7 +92,7 @@ public class TestToken {
 			
 			//Test to failed generate a new token successfully.
 			failedEncryptedToken = r1Token.encrypt();
-			tokenId = TokenDao.failedGenerate(new Token.FailedGenerateBuilder(failedEncryptedToken, r1.getAccount(), code));
+			TokenDao.failedGenerate(new Token.FailedGenerateBuilder(failedEncryptedToken, r1.getAccount(), code));
 			
 			try{
 				TokenDao.getById(failedTokenId);
@@ -117,6 +117,7 @@ public class TestToken {
 			
 			//Test to verify the token using the wrong last modified.
 			try{
+				Thread.sleep(11 * 1000);
 				r1Token.setLastModified(actualLastModified + 1);
 				TokenDao.verify(new Token.VerifyBuilder(r1.getAccount(), r1Token.encrypt()));
 				Assert.assertTrue("failed to test verify token using the wrong last modified", false);
@@ -128,13 +129,14 @@ public class TestToken {
 			Thread.sleep(500);
 			try{
 				r1Token.setLastModified(actualLastModified);
-				tokenId = TokenDao.verify(new Token.VerifyBuilder(r1.getAccount(), r1Token.encrypt()));
+				TokenDao.verify(new Token.VerifyBuilder(r1.getAccount(), r1Token.encrypt()));
 			}catch(BusinessException e){
 				Assert.assertTrue("failed to test verify token", false);
 			}
 			
 			//Test to verify the token become invalid after verification.
 			try{
+				Thread.sleep(11 * 1000);
 				TokenDao.verify(new Token.VerifyBuilder(r1.getAccount(), r1Token.encrypt()));
 				Assert.assertTrue("the token should become invalid due to last modified changed", false);
 			}catch(BusinessException e){

@@ -149,11 +149,17 @@ public class TokenDao {
 	 * 			<li>the dynamic code is incorrect or NOT exist 
 	 * 			<li>the dynamic code is expired
 	 */
-	public static int generate(Token.GenerateBuilder builder) throws SQLException, BusinessException{
+	public static String generate(Token.GenerateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return generate(dbCon, builder);
+			dbCon.conn.setAutoCommit(false);
+			String encryptedToken = generate(dbCon, builder);
+			dbCon.conn.commit();
+			return encryptedToken;
+		}catch(SQLException | BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -174,7 +180,7 @@ public class TokenDao {
 	 * 			<li>the dynamic code is incorrect or NOT exist 
 	 * 			<li>the dynamic code is expired
 	 */
-	public static int generate(DBCon dbCon, Token.GenerateBuilder builder) throws SQLException, BusinessException{
+	public static String generate(DBCon dbCon, Token.GenerateBuilder builder) throws SQLException, BusinessException{
 		
 		Restaurant restaurant = RestaurantDao.getByAccount(dbCon, builder.getAccount());
 		//Check to see whether the dynamic code is correct.
@@ -188,7 +194,7 @@ public class TokenDao {
 				throw new BusinessException(TokenError.DYN_CODE_EXPIRE);
 			}else{
 				update(dbCon, new Token.UpdateBuilder(token.getId()).setStatus(Token.Status.TOKEN).setCode(0));
-				return token.getId();
+				return getById(dbCon, token.getId()).encrypt();
 			}
 		}
 	}
@@ -207,14 +213,14 @@ public class TokenDao {
 	 * 			<li>the create token is NOT qualified to be decrypted by private key
 	 * 			<li>the create token is NOT matched the last modified	 
 	 **/
-	public static int failedGenerate(Token.FailedGenerateBuilder builder) throws SQLException, BusinessException{
+	public static String failedGenerate(Token.FailedGenerateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			int tokenId = failedGenerate(dbCon, builder);
+			String encryptedToken = failedGenerate(dbCon, builder);
 			dbCon.conn.commit();
-			return tokenId;
+			return encryptedToken;
 			
 		}catch(SQLException | BusinessException e){
 			dbCon.conn.rollback();
@@ -241,7 +247,7 @@ public class TokenDao {
 	 * 			<li>the create token is NOT qualified to be decrypted by private key
 	 * 			<li>the create token is NOT matched the last modified	 
 	 **/
-	private static int failedGenerate(DBCon dbCon, Token.FailedGenerateBuilder builder) throws SQLException, BusinessException{
+	private static String failedGenerate(DBCon dbCon, Token.FailedGenerateBuilder builder) throws SQLException, BusinessException{
 		Restaurant restaurant = RestaurantDao.getByAccount(dbCon, builder.getAccount());
 		
 		//Delete the failed token if it can be decrypted by the related private key.
@@ -272,11 +278,17 @@ public class TokenDao {
 	 * 			<li>the token to verify does NOT exist
 	 * 			<li>the last modified to token is NOT matched
 	 */
-	public static int verify(Token.VerifyBuilder builder) throws SQLException, BusinessException{
+	public static String verify(Token.VerifyBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return verify(dbCon, builder);
+			dbCon.conn.setAutoCommit(false);
+			String encryptedToken = verify(dbCon, builder);
+			dbCon.conn.commit();
+			return encryptedToken;
+		}catch(SQLException | BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -296,7 +308,7 @@ public class TokenDao {
 	 * 			<li>the token to verify does NOT exist
 	 * 			<li>the last modified to token is NOT matched
 	 */
-	public static int verify(DBCon dbCon, Token.VerifyBuilder builder) throws SQLException, BusinessException{
+	public static String verify(DBCon dbCon, Token.VerifyBuilder builder) throws SQLException, BusinessException{
 		Restaurant restaurant = RestaurantDao.getByAccount(dbCon, builder.getAccount());
 		
 		Token verifyToken = new Token(0);
@@ -309,11 +321,11 @@ public class TokenDao {
 			throw new BusinessException("验证Token不存在", TokenError.TOKEN_NOT_EXIST);
 		}else{
 			Token token = result.get(0);
-			if(token.getLastModified() != verifyToken.getLastModified()){
+			if(System.currentTimeMillis() - token.getLastModified() > 10000 && token.getLastModified() != verifyToken.getLastModified()){
 				throw new BusinessException("验证Token的时间戳不正确", TokenError.LAST_MODIFIED_NOT_MATCH);
 			}else{
 				update(dbCon, new Token.UpdateBuilder(token.getId()));
-				return token.getId();
+				return getById(dbCon, token.getId()).encrypt();
 			}
 		}
 	}
@@ -333,7 +345,7 @@ public class TokenDao {
 		Token token = builder.build();
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".token SET " +
-			  " token_id = token_id " +
+			  " token_id = " + token.getId() +
 			  (builder.isRestaurantChanged() ? " ,restaurant_id = " + token.getRestaurant().getId() : "") +
 			  (builder.isStatusChanged() ? " ,status = " + token.getStatus().getVal() : "") +
 			  (builder.isCodeChanged() ? " ,code = " + token.getCode() : "") +
@@ -382,7 +394,7 @@ public class TokenDao {
 			throw new BusinessException(TokenError.TOKEN_NOT_EXIST);
 		}else{
 			Token token = result.get(0);
-			token.setRestaurant(RestaurantDao.getById(token.getRestaurant().getId()));
+			token.setRestaurant(RestaurantDao.getById(dbCon, token.getRestaurant().getId()));
 			return token;
 		}
 	}

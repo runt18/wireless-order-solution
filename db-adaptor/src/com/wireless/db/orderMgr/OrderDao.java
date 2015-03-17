@@ -710,6 +710,32 @@ public class OrderDao {
 		}
 	}
 
+	public static void gift(DBCon dbCon, Staff staff, Order.GiftBuilder builder) throws SQLException, BusinessException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.GIFT)){
+			throw new BusinessException(StaffError.GIFT_NOT_ALLOW);
+		}
+		
+		final Order order = getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
+		
+		for(OrderFood giftedFood : builder.getGiftedFoods()){
+			int index = order.getOrderFoods().indexOf(giftedFood);
+			if(index < 0){
+				throw new BusinessException("菜品【" + FoodDao.getPureById(dbCon, staff, giftedFood.getFoodId()).getName() + "】不在账单中");
+			}else{
+				if(order.getOrderFoods().get(index).getCount() < giftedFood.getCount()){
+					throw new BusinessException("菜品【" + order.getOrderFoods().get(index).getName() + "】的赠送数量大过已有数量");
+				}
+			}
+		}
+		
+		//Cancel the order food as gift operation.
+		for(OrderFood giftFood : builder.getGiftedFoods()){
+			OrderFoodDao.fill(dbCon, staff, giftFood);
+			giftFood.setCancelReason(CancelReason.newTemporary("【" + staff.getName() + "】赠送【" + giftFood.asFood().getName() + "】"));
+			OrderFoodDao.insertCancelled(dbCon, staff, new OrderFoodDao.GiftBuilder(order.getId(), giftFood).asCancel());
+		}
+	}
+	
 	/**
 	 * Discount the order to specific builder {@link Order#DiscountBuilder}.
 	 * @param staff
