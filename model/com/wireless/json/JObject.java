@@ -115,48 +115,69 @@ public class JObject implements Jsonable {
 	public boolean isSuccess() {
 		return success;
 	}
+	
 	public void setSuccess(boolean success) {
 		this.success = success;
 	}
+	
 	public int getTotalProperty() {
 		return totalProperty;
 	}
+	
 	public void setTotalProperty(int totalProperty) {
 		this.totalProperty = totalProperty;
 	}
+	
 	public List<? extends Jsonable> getRoot() {
 		return root;
 	}
+	
 	public void setRoot(List<? extends Jsonable> root) {
 		this.root = root;
 	}
+
+	public void setRoot(Jsonable root){
+		final List<Jsonable> roots = new ArrayList<Jsonable>(1);
+		roots.add(root);
+		this.root = roots;
+	}
+	
 	public int getCode() {
 		return code;
 	}
+	
 	public void setCode(int code) {
 		this.code = code;
 	}
+	
 	public String getMsg() {
 		return msg;
 	}
+	
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}
+	
 	public String getTitle() {
 		return title;
 	}
+	
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	
 	public int getLv() {
 		return lv;
 	}
+	
 	public void setLv(int lv) {
 		this.lv = lv;
 	}
+	
 	public Jsonable getExtra() {
 		return extra;
 	}
+	
 	public void setExtra(Jsonable other) {
 		this.extra = other;
 	}
