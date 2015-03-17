@@ -710,30 +710,83 @@ public class OrderDao {
 		}
 	}
 
+	/**
+	 * Gifted the food according to specific builder {@link Order#GiftBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the gift builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the order does NOT exist
+	 * 			<li>the amount to gift exceed the one in the order
+	 */
+	public static void gift(Staff staff, Order.GiftBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			gift(dbCon, staff, builder);
+			dbCon.conn.commit();
+		}catch(SQLException | BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Gifted the food according to specific builder {@link Order#GiftBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the gift builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the order does NOT exist
+	 * 			<li>the order food can NOT be gifted
+	 * 			<li>the amount to gift exceed the one in the order
+	 */
 	public static void gift(DBCon dbCon, Staff staff, Order.GiftBuilder builder) throws SQLException, BusinessException{
+		
 		if(!staff.getRole().hasPrivilege(Privilege.Code.GIFT)){
 			throw new BusinessException(StaffError.GIFT_NOT_ALLOW);
 		}
 		
-		final Order order = getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
+		OrderFood giftedFood = builder.getGiftedFood();
+		OrderFoodDao.fill(dbCon, staff, giftedFood);
 		
-		for(OrderFood giftedFood : builder.getGiftedFoods()){
-			int index = order.getOrderFoods().indexOf(giftedFood);
-			if(index < 0){
-				throw new BusinessException("菜品【" + FoodDao.getPureById(dbCon, staff, giftedFood.getFoodId()).getName() + "】不在账单中");
-			}else{
-				if(order.getOrderFoods().get(index).getCount() < giftedFood.getCount()){
-					throw new BusinessException("菜品【" + order.getOrderFoods().get(index).getName() + "】的赠送数量大过已有数量");
-				}
+		if(!giftedFood.asFood().isGift()){
+			throw new BusinessException("菜品【" + giftedFood.getName() + "】不是可赠送菜品");
+		}
+		
+		Order order = getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
+		
+		
+		int index = order.getOrderFoods().indexOf(giftedFood);
+		if(index < 0){
+			throw new BusinessException("菜品【" + giftedFood.getName() + "】不在账单中");
+		}else{
+			if(order.getOrderFoods().get(index).getCount() < builder.getGiftedFood().getCount()){
+				throw new BusinessException("菜品【" + order.getOrderFoods().get(index).getName() + "】的赠送数量大过已有数量");
 			}
 		}
 		
 		//Cancel the order food as gift operation.
-		for(OrderFood giftFood : builder.getGiftedFoods()){
-			OrderFoodDao.fill(dbCon, staff, giftFood);
-			giftFood.setCancelReason(CancelReason.newTemporary("【" + staff.getName() + "】赠送【" + giftFood.asFood().getName() + "】"));
-			OrderFoodDao.insertCancelled(dbCon, staff, new OrderFoodDao.GiftBuilder(order.getId(), giftFood).asCancel());
-		}
+		giftedFood.setCancelReason(CancelReason.newTemporary("【" + staff.getName() + "】赠送【" + giftedFood.asFood().getName() + "】"));
+		OrderFoodDao.insertCancelled(dbCon, staff, new OrderFoodDao.GiftBuilder(order.getId(), giftedFood).asCancel());
+		
+		//Gift the order food.
+		order = getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
+		giftedFood.setGift(true);
+		UpdateOrder.exec(dbCon, staff, new Order.UpdateBuilder(order).addOri(order.getOrderFoods()).addNew(giftedFood, staff));
 	}
 	
 	/**

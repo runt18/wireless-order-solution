@@ -321,7 +321,7 @@ public class TokenDao {
 			throw new BusinessException("验证Token不存在", TokenError.TOKEN_NOT_EXIST);
 		}else{
 			Token token = result.get(0);
-			if(System.currentTimeMillis() - token.getLastModified() > 10000 && token.getLastModified() != verifyToken.getLastModified()){
+			if(System.currentTimeMillis() - token.getLastModified() > 60 * 1000 && token.getLastModified() != verifyToken.getLastModified()){
 				throw new BusinessException("验证Token的时间戳不正确", TokenError.LAST_MODIFIED_NOT_MATCH);
 			}else{
 				update(dbCon, new Token.UpdateBuilder(token.getId()));
