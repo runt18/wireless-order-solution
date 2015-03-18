@@ -1,6 +1,5 @@
 package com.wireless.Actions.system;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -32,7 +31,7 @@ public class QueryBillboardAction extends DispatchAction{
 			dbCon = new DBCon();
 			dbCon.connect();
 			
-			jobject.setRoot(BillBoardDao.getByCond(dbCon, null));
+			jobject.setRoot(BillBoardDao.getByCond(dbCon, new BillBoardDao.ExtraCond().setType(BillBoard.Type.SYSTEM)));
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -43,7 +42,7 @@ public class QueryBillboardAction extends DispatchAction{
 		return null;
 	}
 	
-	/**
+	/** 
 	 * 餐厅登陆公告
 	 * @param mapping
 	 * @param form
@@ -61,9 +60,7 @@ public class QueryBillboardAction extends DispatchAction{
 		try{
 			dbCon = new DBCon();
 			dbCon.connect();
-			List<BillBoard> bbs = new ArrayList<>();
-			bbs.addAll(BillBoardDao.getByCond(dbCon, new BillBoardDao.ExtraCond().setType(BillBoard.Type.SYSTEM)));
-			bbs.addAll(BillBoardDao.getByCond(dbCon, new BillBoardDao.ExtraCond().setRestaurant(Integer.parseInt(rid)))); 
+			List<BillBoard> bbs = BillBoardDao.getByCond(dbCon, new BillBoardDao.ExtraCond().setRestaurant(Integer.parseInt(rid))); 
 			
 			Collections.sort(bbs, new Comparator<BillBoard>() {
 				@Override
