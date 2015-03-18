@@ -34,6 +34,7 @@ public final class Type{
 	public final static byte DISCOUNT_ORDER = 26;
 	public final static byte QUERY_WX_ORDER = 27;
 	public final static byte QUERY_BACKUP_SERVER = 28;
+	public final static byte GIFT_ORDER_FOOD = 29;
 	
 	/* belong to member */
 	public final static byte QUERY_MEMBER = 1;
