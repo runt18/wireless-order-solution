@@ -535,7 +535,7 @@ Ext.onReady(function(){
 		],
 		['id', 'title', 'desc', 'created', 'createdFormat', 'expired', 'expiredFormat', 'typeVal', 'typeDesc', 'restaurant'],
 		[['isPaging', true], ['dataSource', 'normal']],
-		20,
+		'',
 		'',
 		billboradGridTbar
 	);
