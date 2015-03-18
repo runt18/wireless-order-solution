@@ -1,6 +1,5 @@
 package com.wireless.Actions.login;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -17,20 +16,8 @@ public class LoginOutAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		JObject jobject = new JObject();
 		try{
-			Cookie[] cookies = request.getCookies();
-			if(cookies.length > 0){
-				for (Cookie cookie : cookies) {
-					if(cookie.getName().equals("pin")){
-						cookie.setMaxAge(0);
-						response.addCookie(cookie);
-					}
-				}
-			}
 			HttpSession session = request.getSession();
 			session.invalidate();
-			
-
-			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);

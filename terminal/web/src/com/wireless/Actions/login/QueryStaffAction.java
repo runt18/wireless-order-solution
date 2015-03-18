@@ -100,7 +100,10 @@ public class QueryStaffAction extends Action {
 					if(restaurantID == null || restaurantID.isEmpty()){
 						restaurantID = (String) request.getSession().getAttribute("restaurantID");
 					}
-					staffList = StaffDao.getByRestaurant(Integer.parseInt(restaurantID));
+					
+					if(restaurantID != null){
+						staffList = StaffDao.getByRestaurant(Integer.parseInt(restaurantID));
+					}
 				}
 				if(restaurantID != null){
 					Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));

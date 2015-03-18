@@ -39,6 +39,8 @@ public class VerifyRestaurantAction extends Action {
 				RestaurantDao.update(new Restaurant.UpdateBuilder(r.getId()).resetRSA());
 			}
 			
+			jobject.setRoot(r);
+			
 			//FIXME 过渡阶段
 			if(encryptedToken == null || encryptedToken.trim().isEmpty()){
 				int tokenId = TokenDao.insert(new Token.InsertBuilder(r));
@@ -59,7 +61,6 @@ public class VerifyRestaurantAction extends Action {
 					
 				}
 			});		
-			jobject.setRoot(r);
 			
 		}catch (BusinessException e) {
 			jobject.initTip(e);
