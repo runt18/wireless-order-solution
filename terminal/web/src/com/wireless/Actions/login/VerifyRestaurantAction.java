@@ -2,6 +2,7 @@ package com.wireless.Actions.login;
 
 import java.sql.SQLException;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,8 +15,6 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.token.TokenDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.json.JsonMap;
-import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.token.Token;
 
@@ -35,9 +34,6 @@ public class VerifyRestaurantAction extends Action {
 			}else{
 				r = RestaurantDao.getByAccount(account);
 			}
-			if(!r.hasRSA()){
-				RestaurantDao.update(new Restaurant.UpdateBuilder(r.getId()).resetRSA());
-			}
 			
 			jobject.setRoot(r);
 			
@@ -49,18 +45,10 @@ public class VerifyRestaurantAction extends Action {
 				nextEncryptedToken = TokenDao.verify(new Token.VerifyBuilder(account, encryptedToken));
 			}
 			
-			jobject.setExtra(new Jsonable(){
-				@Override
-				public JsonMap toJsonMap(int flag) {
-					JsonMap jm = new JsonMap();
-					jm.putString("token", nextEncryptedToken);
-					return jm;
-				}
-				@Override
-				public void fromJsonMap(JsonMap jsonMap, int flag) {
-					
-				}
-			});		
+			Cookie cookie = new Cookie(request.getServerName() + "_digie_token", nextEncryptedToken);
+			cookie.setMaxAge(365*24*60*60);
+			cookie.setPath("/web-term/touch");
+			response.addCookie(cookie);
 			
 		}catch (BusinessException e) {
 			jobject.initTip(e);
