@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="css/takeout/login.css?v=<%=v %>">
 
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
-<script type="text/javascript" src="js/common/jquery.mobile-1.3.2.js"></script>
+<script type="text/javascript" src="js/common/jquery.mobile-1.3.2.min.js"></script>
 <script type="text/javascript" src="../js/components/md5.js"></script>
 <!--keyboard  -->
 <script type="text/javascript" src="js/keyboard/keyboard.js"></script>
@@ -55,7 +55,7 @@
             <input type="text" id="txtRestaurantAccount" autofocus placeholder="餐厅账号" class="numkeyboard">
         </div>
         <div class="div4Input" align="center" >
-            <input type="text" id="txtRestaurantDynamicCode" placeholder="输入系统验证码" class="numkeyboard" onkeypress="intOnly(this)">
+            <input type="text" id="txtRestaurantDynamicCode" placeholder="输入验证码( 请联系客服获取 )" class="numkeyboard" onkeypress="intOnly(this)">
         </div>	        
          <a onclick="restaurantLoginHandler()"><img src="images/login.png"></a>
 	</div>		

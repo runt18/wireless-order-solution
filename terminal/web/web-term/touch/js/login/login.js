@@ -72,40 +72,21 @@ $(function(){
 			success : function(data, status, xhr){
 				Util.LM.hide();
 				if(data.success && data.root.length > 0){
-					//把token存入cookie
-					if(data.other.token){
-						setcookie(document.domain+"_digie_token", data.other.token);
-					}
-					//FIXME 更新cookie
-					setcookie(document.domain+"_digie_restaurant", data.root[0].account);
 					
 					lg.restaurant = data.root[0];
 					
 					$('#txtRestaurantName').text(lg.restaurant.name);
 					
-					//验证员工是否登陆状态
-/*					$.ajax({
-						url : '../VerifyLogin.do',
-						success : function(data, status, xhr){
-							Util.LM.hide();
-							if(data.success){
-								location.href = 'tableSelect.jsp?status='+systemStatus;	
-							}else{	
-								initStaffContent();
-							}
-						},
-						error : function(request, status, error){
-							Util.Lm.hide();
-							initStaffContent();
-						}
-					});*/
 					initStaffContent();
 				}else{	
 					Util.msg.alert({
-						msg : data.msg?data.msg:"",
+						msg : data.msg?data.msg:"餐厅登陆失败",
 						renderTo : 'restaurantLoginPage',
 						fn : function(){
+							$('#txtRestaurantAccount').removeAttr('autofocus');
 							$('#loginRestaurantCmp').show();
+							$('#txtRestaurantAccount').val(restaurantEntity.account);
+							$('#txtRestaurantDynamicCode').focus();
 						}
 					});
 					return;					
@@ -121,6 +102,14 @@ $(function(){
 		Util.LM.hide();
 		$('#loginRestaurantCmp').show();
 	}	
+	
+	//餐厅登陆快捷方式
+    $('#txtRestaurantDynamicCode').on('keypress',function(event){
+        if(event.keyCode == "13")    
+        {
+        	restaurantLoginHandler();
+        }
+    });		
 	
 });
 
