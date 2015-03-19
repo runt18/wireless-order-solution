@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.IOError;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.req.RequestPackage;
@@ -47,6 +48,9 @@ public class Session{
 			}else{
 				throw new BusinessException("应答数据包的序列号不匹配", ProtocolError.PACKAGE_SEQ_NO_NOT_MATCH);
 			}
+			
+		}catch(IOException e){
+			throw new IOException(IOError.IO_ERROR.getDesc());
 			
 		}finally{
 			//close the socket connection finally
