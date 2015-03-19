@@ -40,6 +40,7 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
+import com.wireless.lib.task.GiftOrderFoodTask;
 import com.wireless.lib.task.TransOrderFoodTask;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
@@ -53,6 +54,7 @@ import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.regionMgr.Table.InsertBuilder4Join.Suffix;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
@@ -358,6 +360,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			}
 			if(of.isGift()){
 				detail.append("(赠)");
+			}else if(of.asFood().isGift() && WirelessOrder.loginStaff.getRole().hasPrivilege(Privilege.Code.GIFT)){
+				detail.append("(可赠)");
 			}
 			
 			detail.append(of.getName());
@@ -547,10 +551,16 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						
 						@Override
 						public void onClick(View v) {
+							final List<String> items = new ArrayList<String>();
+							items.add("加菜");
+							items.add(of.isHurried() ? "取消催菜" : "催菜");
+							if(!of.isGift() && WirelessOrder.loginStaff.getRole().hasPrivilege(Privilege.Code.GIFT) && of.asFood().isGift()){
+								items.add("赠送");
+							}
 							new AlertDialog
 							   .Builder(getActivity())
 							   .setTitle(of.getName())
-							   .setItems(new String[] { "加菜", of.isHurried() ? "取消催菜" : "催菜", "转菜" }, new DialogInterface.OnClickListener(){
+							   .setItems(items.toArray(new String[items.size()]), new DialogInterface.OnClickListener(){
 
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
@@ -566,13 +576,47 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 											mSelectedFood.setHurried(true);
 											Toast.makeText(getActivity(), "催菜成功", Toast.LENGTH_SHORT).show();	
 										}
+										mFoodListHandler.sendEmptyMessage(0);
 									}else if(which == 2){
-										//转菜
-										mTransFoods.clear();
-										mTransFoods.add(mSelectedFood);
-										AskTableDialog.newInstance(getId()).show(getFragmentManager(), AskTableDialog.TAG);
+										//TODO 赠送
+										new AlertDialog.Builder(getActivity())
+											.setTitle("提示")
+											.setMessage("确定赠送" + of.asFood().getName() + "?")
+											.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+												@Override
+												public void onClick(DialogInterface dialog,	int which){
+													try{
+														new GiftOrderFoodTask(WirelessOrder.loginStaff, new Order.GiftBuilder(mOriOrder, mSelectedFood)) {
+															private ProgressDialog mProgressDialog;
+															
+															@Override
+															public void onPreExecute(){
+																mProgressDialog = ProgressDialog.show(getActivity(), "", "正在赠送...请稍后", true);
+															}
+															
+															@Override
+															protected void onSuccess() {
+																mProgressDialog.dismiss();
+																mQueryOrderTask = new QueryOrderTask(new Table.Builder(mOriOrder.getDestTbl().getId()));
+																mQueryOrderTask.execute();
+															}
+															
+															@Override
+															protected void onFail(BusinessException e) {
+																mProgressDialog.dismiss();
+																new AlertDialog.Builder(getActivity()).setTitle("赠送失败")
+																			   .setMessage(e.getMessage())
+																			   .setNegativeButton("返回", null).show();
+															}
+														}.execute();
+													}catch(BusinessException e){
+														Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+													}
+												}
+											})
+											.setNegativeButton("取消", null)
+											.show();	
 									}
-									mFoodListHandler.sendEmptyMessage(0);
 								}
 								   
 							   }).setNegativeButton("返回", null).show();
