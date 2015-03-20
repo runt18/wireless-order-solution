@@ -172,7 +172,7 @@ html { overflow-y: hidden;}
 */
 .tableCmp{
 	width: 100px;
-	height: 60px;
+	height: 65px;
 }
 
 .moreTasteCmp{
@@ -258,6 +258,15 @@ html { overflow-y: hidden;}
 	/* position:absolute; */
 	right:0;bottom:0;font-size:20px;
 }
+/*餐台暂结*/
+.tempPayStatus{
+	/* position:absolute; 
+	right:0;bottom:16px;*/
+	font-size:15px;color: blue;
+	margin-left: 70px;
+	margin-top: -6px;
+}
+
 
 /*菜品操作*/
 .orderOperBtn {

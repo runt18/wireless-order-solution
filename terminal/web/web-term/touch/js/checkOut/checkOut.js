@@ -29,21 +29,21 @@ var uo = {
 	    +		'</div>'
 	    +'</td>'
 		+ '<td>{waiter}</td>'
-		+ '</tr>',	
+		+ '</tr>';
 	
-	tableCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}><div>{name}<br>{alias}</div></a>';
-	
+
+
 	function initSearchTables(c){
 		var html = '';
 		for (var i = 0; i < c.data.length; i++) {
-			
 			html += tableCmpTemplet.format({
 				dataIndex : i,
 				id : c.data[i].id,
 				click : 'ts.toOrderFoodOrTransFood({alias:'+ c.data[i].alias +',id:'+ c.data[i].id +'})',
 				alias : c.data[i].alias && c.data[i].alias != 0?c.data[i].alias:'<font color="green">搭台</font>',
 				theme : c.data[i].statusValue == '1' ? "e" : "c",
-				name : c.data[i].name == "" || typeof c.data[i].name != 'string' ? c.data[i].alias + "号桌" : c.data[i].name
+				name : c.data[i].name == "" || typeof c.data[i].name != 'string' ? c.data[i].alias + "号桌" : c.data[i].name,
+				tempPayStatus : c.data[i].isTempPaid? '暂结' : ''
 			});	
 		}
 		$('#divSelectTablesForTs').html(html);
@@ -181,8 +181,13 @@ uo.showDescForUpdateOrder = function(){
 	html = (uo.orderMember?"<span style = 'margin-left: 20px;'>当前会员：<font color='green'>" + uo.orderMember.name +"</font></span>" : "") +
 		(uo.order.discount?"<span style = 'margin-left: 20px;'>当前折扣：<font color='green'>" + uo.order.discount.name +"</font></span>" : "") +
 		(uo.order.discounter ? "<span style = 'margin-left: 20px;'>折扣人：<font color='green'>" + uo.order.discounter + "</font></span><span style = 'margin-left: 20px;'>折扣时间：<font color='green'>" + uo.order.discountDate + "</font></span>" : "") ;
-		$("#divDescForUpdateOrder").html(html);
-		$("#spanTotalPriceUO").html('消费总额：<font color="green">¥'+ uo.order.totalPrice + "</font>");
+	$("#divDescForUpdateOrder").html(html);
+	$("#spanTotalPriceUO").html('消费总额：<font color="green">¥'+ uo.order.totalPrice + "</font>");
+	if(uo.order.tempPayStaff){
+		$("#spanToTempPayStatus").html('暂结人：<font color="green">' + uo.order.tempPayStaff +'</font>，暂结时间：<font color="green">'+ uo.order.tempPayDate + "</font>");
+	}else{
+		$("#spanToTempPayStatus").html('');
+	}
 }
 /**
  * 取得初始的消费总额
@@ -340,26 +345,17 @@ uo.cancelFoodAction = function(){
 	//取得退菜数目并进行判定
 	var num = $("#inputCancelFoodSet").val();
 	if(num <= 0){
-		Util.msg.alert({
-			msg : '退菜数目不正确', 
-			topTip : true
-		});
+		Util.msg.tip('退菜数目不正确');
 		$("#inputCancelFoodSet").val(uo.operateFood.count);
 		$("#inputCancelFoodSet").select();
 		firstTimeInput = true;
 	}else if(isNaN(num)){
-		Util.msg.alert({
-			msg : '数字不合规范.', 
-			topTip : true
-		});
+		Util.msg.tip('数字不合规范.');
 		$("#inputCancelFoodSet").val(uo.operateFood.count);
 		$("#inputCancelFoodSet").select();
 		firstTimeInput = true;
 	}else if(num > uo.operateFood.count){
-		Util.msg.alert({
-			msg : '退菜数量不能大于原有数量', 
-			topTip : true
-		});
+		Util.msg.tip('退菜数量不能大于原有数量');
 		$("#inputCancelFoodSet").val(uo.operateFood.count);
 		$("#inputCancelFoodSet").select();
 		firstTimeInput = true;
@@ -413,25 +409,46 @@ uo.cancelFoodAction = function(){
 uo.openOrderFoodOtherOperate = function(c){
 	//获取选中行
 	uo.selectedFood = uo.order.orderFoods[parseInt($(c.event).attr('data-index'))-1];
-	//FIXME 不是称重不弹出更多
-	if((uo.selectedFood.status & 1 << 7) != 0 ){
-		$('#orderFoodMoreOperateCmp').popup('open');
-		//动态使用popup时要动态设置popup控件位置
-		$('#orderFoodMoreOperateCmp-popup').css({top:$(c.event).position().top, left:$(c.event).position().left});
-		
-	}
+	$('#orderFoodMoreOperateCmp').popup('open');
+	//动态使用popup时要动态设置popup控件位置
+	$('#orderFoodMoreOperateCmp-popup').css({top:$(c.event).position().top, left:$(c.event).position().left});
 }
+
+/**
+ * 催菜
+ */
+uo.hurriedFoodAction = function(){
+	var uoFood = uo.order.orderFoods;
+	for(var x = 0; x < uoFood.length; x++){
+		if(uoFood[x].id == uo.selectedFood.id){
+			uoFood[x].isHurried = true;
+		}
+	}	
+	$('#orderFoodMoreOperateCmp').popup('close');
+	uo.hurriedFood = true;
+	setTimeout(function(){
+		uo.submitUpdateOrderHandler({orderFoods:uoFood});
+	}, 250);	
+	
+	
+}
+
 
 /**
  * 去称重
  */
 uo.weighAction = function(){
-	uo.weighOperate=true;
-	//关闭更多控件,打开称重
-	$('#orderFoodMoreOperateCmp').popup('close');
-	setTimeout(function(){
-		uo.openWeighOperate();
-	}, 250);
+	if((uo.selectedFood.status & 1 << 7) != 0 ){
+		uo.weighOperate=true;
+		//关闭更多控件,打开称重
+		$('#orderFoodMoreOperateCmp').popup('close');
+		setTimeout(function(){
+			uo.openWeighOperate();
+		}, 250);
+	}else{
+		Util.msg.tip('此菜品不可以称重');
+	}
+	
 };
 
 /**
@@ -463,31 +480,97 @@ uo.closeWeighOperate = function(){
 uo.openWeighaction = function(){
 	var count = $('#inputOrderFoodWeigh');
 	if(!count.val()){
-		Util.msg.alert({
-			msg : '请输入称重数量',
-			topTip : true
-		});
+		Util.msg.tip('请输入称重数量');
 		count.focus();
 		return;
 	}else if(isNaN(count.val())){
-		Util.msg.alert({
-			msg : '请输入正确的称重数量',
-			topTip : true
-		});
+		Util.msg.tip('请输入正确的称重数量');
 		count.focus();
 		return;
 	}else if(count.val() < uo.selectedFood.count){
-		Util.msg.alert({
-			msg : '称重数量不能少于原有数量',
-			topTip : true
-		});
+		Util.msg.tip('称重数量不能少于原有数量');
 		count.focus();
 		return;
 	}
 	
 	uo.selectedFood.count = count.val();
 	//对更新的菜品和人数进行提交
-	uo.submitUpdateOrderHandler(uo.order.orderFoods);	
+	uo.submitUpdateOrderHandler({orderFoods:uo.order.orderFoods, notPrint:!$('#chkPrintWeigh').attr("checked")});	
+}
+
+
+
+/**
+ * 去赠送
+ */
+uo.giftAction = function(){
+	if((uo.selectedFood.status & 1 << 3) != 0 ){
+		//关闭更多控件,打开赠送
+		$('#orderFoodMoreOperateCmp').popup('close');
+		setTimeout(function(){
+			uo.openGiftOperate();
+		}, 250);
+	}else{
+		Util.msg.tip('此菜品不可以赠送');
+	}
+	
+};
+
+/**
+ * 打开赠送
+ */
+uo.openGiftOperate = function(){
+	setTimeout(function(){
+		firstTimeInput = true;
+		$('#inputOrderFoodGift').val(uo.selectedFood.count);	
+		$('#inputOrderFoodGift').select();
+		//显示菜名
+		$('#giftFoodName').text(uo.selectedFood.name);		
+	}, 250);
+	$('#orderFoodGiftCmp').parent().addClass('popup').addClass('in');
+	$('#orderFoodGiftCmp').popup('open');
+}
+
+/**
+ * 关闭赠送
+ */
+uo.closeGiftOperate = function(){
+	$('#inputOrderFoodGift').val('');
+	$('#orderFoodGiftCmp').popup('close');
+}
+
+/**
+ * 赠送操作
+ */
+uo.openGiftaction = function(){
+	var count = $('#inputOrderFoodGift');
+	if(!count.val() || isNaN(count.val()) || count.val() < 0){
+		Util.msg.tip('请输入正确的赠送数量');
+		count.focus();
+		return;
+	}else if(count.val() > uo.selectedFood.count){
+		Util.msg.tip('称重数量不能大于原有数量');
+		count.focus();
+		return;
+	}
+	
+	uo.selectedFood.count = count.val();
+	Util.LM.show();
+	//提交赠送
+	$.post('../OperateOrderFood.do', {
+		dataSource : 'giftOrderFood',
+		orderId : uo.order.id,
+		giftFood : uo.selectedFood.id +','+ uo.selectedFood.count
+	}, function(result){
+		Util.LM.hide();
+		if(result.success){
+			Util.msg.tip(result.msg);
+			initOrderData({table : uo.table});
+			uo.closeGiftOperate();
+		}else{
+			Util.msg.tip('赠送失败');
+		}
+	});
 }
 
 /**
@@ -573,17 +656,11 @@ uo.useMemberForOrder = function(){
 uo.useMemberForOrderAction = function(){
 	var member = $('#txtTableNumForTS');
 	if(!member.val()){
-		Util.msg.alert({
-			msg : '请输入会员信息', 
-			topTip : true
-		});			
+		Util.msg.tip('请输入会员信息');			
 		member.focus();
 		return;
 	}else if(member.val() <= 0 || isNaN(member.val())){
-		Util.msg.alert({
-			msg : '请输入正确的会员信息', 
-			topTip : true
-		});			
+		Util.msg.tip('请输入正确的会员信息');			
 		firstTimeInput = true;
 		member.focus();
 		member.select();	
@@ -605,10 +682,7 @@ uo.useMemberForOrderAction = function(){
 					//异步刷新账单
 					initOrderData({table : uo.table});
 					uo.closeTransOrderFood();
-					Util.msg.alert({
-						topTip : true,
-						msg : '会员注入成功'
-					});	
+					Util.msg.tip('会员注入成功');	
 				}else{
 					Util.msg.alert({
 						title : '提示',
@@ -709,7 +783,8 @@ uo.closeTransOrderFood = function(){
 uo.transFood = function(c){
 	ts.tf.count = $('#txtFoodNumForTran').val();
 	Util.LM.show();
-	$.post('../TransFood.do', {
+	$.post('../OperateOrderFood.do', {
+		dataSource : 'transFood',
 		orderId : uo.order.id,
 		aliasId : c.alias,
 		transFoods : (c.allTrans?c.allTrans:(ts.tf.id + ',' + ts.tf.count))		
@@ -717,10 +792,7 @@ uo.transFood = function(c){
 		Util.LM.hide();
 		if(data.success){
 			uo.closeTransOrderFood();
-			Util.msg.alert({
-				msg : data.msg, 
-				topTip : true
-			});			
+			Util.msg.tip(data.msg);			
 			//刷新已点菜
 			updateTable({alias : uo.table.alias});
 			ts.tf={};
@@ -767,10 +839,7 @@ uo.tempPayForUO = function(c){
 					result = eval("(" + result + ")");
 				}
 				if(result.success){
-					Util.msg.alert({
-						msg : '操作成功',
-						topTip : true
-					});
+					Util.msg.tip('操作成功');
 					
 					if(typeof c.callback == 'function'){
 						c.callback(result);
@@ -834,10 +903,7 @@ uo.chooseDiscount = function(c){
 			$('#popupDiscountCmp').popup({
 				afterclose: function (event, ui) { 
 					if(uo.discounting){
-						Util.msg.alert({
-							topTip : true,
-							msg : '打折成功'
-						});	
+						Util.msg.tip('打折成功');	
 						//异步刷新账单
 						initOrderData({table : uo.table});
 						uo.discounting = false;
@@ -919,10 +985,7 @@ uo.openMoreOperate = function(){
 					Util.LM.hide();
 					delete uo.tempPayForPrintAllAction;
 					if(result.success){
-						Util.msg.alert({
-							msg : result.msg,
-							topTip : true
-						});
+						Util.msg.tip( result.msg);
 					}else{
 						Util.msg.alert({
 							title : '错误',
@@ -950,10 +1013,7 @@ uo.openMoreOperate = function(){
 							Util.LM.hide();
 							delete uo.printDetailPatchAction;
 							if(result.success){
-								Util.msg.alert({
-									msg : result.msg,
-									topTip : true
-								});
+								Util.msg.tip( result.msg);
 							}else{
 								Util.msg.alert({
 									title : '错误',
@@ -1002,10 +1062,7 @@ uo.saveForChangePeople = function(){
 uo.saveForUO = function(){
 	//判断页面信息是否有改动
 	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
-		Util.msg.alert({
-			topTip : true,
-			msg : '账单没有修改，不能提交'
-		});
+		Util.msg.tip('账单没有修改，不能提交');
 	}else{
 		var uoFood = uo.order.orderFoods;
 		for(var x = 0; x < uoFood.length; x++){
@@ -1016,9 +1073,8 @@ uo.saveForUO = function(){
 				}
 			}
 		}
-		uo.updateOrder = uoFood;
 		//对更新的菜品和人数进行提交
-		uo.submitUpdateOrderHandler(uoFood);	
+		uo.submitUpdateOrderHandler({orderFoods:uoFood});	
 	}
 };
 
@@ -1026,7 +1082,7 @@ uo.saveForUO = function(){
  * 已点菜改单提交操作
  */
 uo.submitUpdateOrderHandler = function(c){
-	var orderFoods = c;
+	var orderFoods = c.orderFoods;
 	if(orderFoods.length > 0){
 		orderDataModel.tableID = uo.table.id;
 		orderDataModel.customNum = uo.customNum;
@@ -1041,7 +1097,8 @@ uo.submitUpdateOrderHandler = function(c){
 			type : 'post',
 			data : {
 				commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
-				type : 7
+				type : 7,
+				notPrint : c.notPrint?c.notPrint:false
 			},
 			success : function(data, status, xhr){
 				Util.LM.hide();
@@ -1054,28 +1111,23 @@ uo.submitUpdateOrderHandler = function(c){
 							uo.tempPayForUO();
 						}else{
 							if(uo.canceling){
-								Util.msg.alert({
-									topTip : true,
-									msg : '退菜成功'
-								});		
+								Util.msg.tip('退菜成功');		
 								updateTable({
 									alias : uo.table.alias
 								});											
 								uo.canceling = false;
 							}else if(uo.updateCustom){
-								Util.msg.alert({
-									topTip : true,
-									msg : '账单修改成功'
-								});	
+								Util.msg.tip('账单修改成功');	
 								initOrderData({table : uo.table});
 								uo.closeOperatePeople();
 							}else if(uo.weighOperate){
-								Util.msg.alert({
-									topTip : true,
-									msg : '账单修改成功'
-								});	
+								Util.msg.tip( '账单修改成功');	
 								initOrderData({table : uo.table});
 								uo.closeWeighOperate();
+							}else if(uo.hurriedFood){
+								Util.msg.tip( '催菜成功');	
+								initOrderData({table : uo.table});
+								delete uo.hurriedFood;
 							}else{
 								Util.msg.alert({
 									title : data.title,
@@ -1107,10 +1159,7 @@ uo.submitUpdateOrderHandler = function(c){
 								}
 							});
 						}else{
-							Util.msg.alert({
-								msg : data.msg, 
-								topTip : true
-							});
+							Util.msg.tip( data.msg);
 						}
 
 					}
@@ -1126,10 +1175,7 @@ uo.submitUpdateOrderHandler = function(c){
 			}
 		});
 	}else if(orderFoods.length == 0){
-		Util.msg.alert({
-			topTip : true,
-			msg : '没有任何菜品，不能提交'
-		});
+		Util.msg.tip('没有任何菜品，不能提交');
 	}
 };
 

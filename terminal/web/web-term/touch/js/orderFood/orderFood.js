@@ -375,11 +375,83 @@ of.show = function(c){
 	of.table = c.table;
 	of.order = typeof c.order != 'undefined' ? c.order : null;
 	of.afterCommitCallback = typeof c.callback == 'function' ? c.callback : null;
-	
+	//更新沽清
+	of.updataSelloutFoods();
 	//加载菜品数据
-	toOrderFoodPage(of.table);	
+	of.toOrderFoodPage(of.table);	
 };
+/**
+ * 展示菜品数据
+ */
+of.toOrderFoodPage = function(table){
+	//去点餐界面
+	location.href = '#orderFoodMgr';
 
+	$('#divNFCOTableBasicMsg').html(table.alias + '<br>' + table.name);
+	
+	of.table = table;
+	of.newFood = [];
+	
+	//渲染数据
+	of.initDeptContent();
+	
+	//第一次加载不成功, 继续加载直到显示
+	var index = 0;
+	of.loadFoodDateAction = window.setInterval(function(){
+		if($('#foodsCmp').find("a").length > 0){
+			clearInterval(of.loadFoodDateAction);
+			if(index == 0){
+				of.initKitchenContent({deptId:-1});
+			}
+			Util.LM.hide();
+		}else{
+			index ++;
+			Util.LM.show();
+			of.initKitchenContent({deptId:-1});
+		}
+	}, 400);
+	
+	of.initNewFoodContent();
+}
+/**
+ * 每次入点菜界面时更新沽清菜品
+ */
+of.updataSelloutFoods = function(){
+	Util.LM.show();
+	$.ajax({
+		url : '../QueryMenu.do',
+		type : 'post',
+		async:false,
+		dataType : 'json',
+		data : {
+			dataSource : 'stop'
+		},
+		success : function(result, status, xhr){
+			if(result.success){
+				var stopFoods = result.root;
+				for (var j = 0; j < of.foodList.length; j++) {
+					of.foodList[j].status &= ~(1 << 2);
+					for (var i = 0; i < stopFoods.length; i++) {
+						if(of.foodList[j].id == stopFoods[i].id){
+							of.foodList[j] = stopFoods[i];
+							break;
+						}
+					}
+				}
+				Util.LM.hide();
+			}else{
+				Util.LM.hide();
+			}
+		},
+		error : function(request, status, err){
+			Util.LM.hide();
+			Util.msg.alert({
+				renderTo : 'orderFoodMgr',
+				msg : '更新出错, 请联系客服'
+			});
+		}
+	}); 
+}
 
 
 /**
@@ -462,10 +534,7 @@ of.insertFood = function(c){
 		return;
 	}else{
 		if((data.status & 1 << 2) != 0){
-		 	Util.msg.alert({
-				msg : '此菜品已停售!',
-				topTip : true
-			}); 
+			Util.msg.tip('此菜品已停售!'); 
 			return;
 		}
 	}
@@ -636,10 +705,7 @@ of.selectNewFood = function(c){
 of.operateFoodCount = function(c){
 	var foodContent = $('#orderFoodsCmp > li[data-theme=e]');
 	if(foodContent.length != 1){
-		Util.msg.alert({
-			msg : '请选中一道菜品',
-			topTip : true
-		});
+		Util.msg.tip('请选中一道菜品');
 		return;
 	}
 	var data = of.newFood[foodContent.attr('data-index')];
@@ -774,10 +840,7 @@ of.foodHangup = function(c){
 	}else if(c.type == 2){
 		var foodContent = $('#orderFoodsCmp > li[data-theme=e]');
 		if(foodContent.length != 1){
-			Util.msg.alert({
-				msg : '请选中一道菜品',
-				topTip : true
-			});
+			Util.msg.tip('请选中一道菜品');
 			return;
 		}
 		var data = of.newFood[foodContent.attr('data-index')];
@@ -795,10 +858,7 @@ of.foodHangup = function(c){
 of.giftFood = function(c){
 	var foodContent = $('#orderFoodsCmp > li[data-theme=e]');
 	if(foodContent.length != 1){
-		Util.msg.alert({
-			msg : '请选中一道菜品',
-			topTip : true
-		});
+		Util.msg.tip('请选中一道菜品');
 		return;
 	}
 	var data = of.newFood[foodContent.attr('data-index')];
@@ -1821,6 +1881,35 @@ of.orderAndPay = function(){
 	of.submit({notPrint : false});	
 }
 
+/**
+ * 先送
+ */
+of.orderBefore = function(){
+	of.orderBeforeCallback = function(){
+		//清空已点菜
+		$('#orderFoodsCmp').html('');
+		//清空状态栏
+		$('#divDescForCreateOrde div:first').html('');
+		$('#orderFoodsCmp').listview('refresh');
+		//更新餐台
+		if(of.order == null){
+			initTableData();
+		}
+		//更新账单
+		$.post('../QueryOrderByCalc.do', {tableID : of.table.id}, function(result){
+			of.table.statusValue == 1;
+			of.order = result.other.order;
+			delete of.orderBeforeCallback;
+		});
+		
+	};
+	
+	$('#orderOtherOperateCmp').popup('close');
+	setTimeout(function(){
+		of.submit({notPrint : false});	
+	}, 250);	
+}
+
 
 /**
  * 账单提交
@@ -1962,8 +2051,13 @@ of.submit = function(c){
 						//从已点菜进入时, 返回已点菜界面
 						if(of.afterCommitCallback != null && typeof of.afterCommitCallback == 'function'){
 							of.afterCommitCallback();
-						}else{//没有回调函数直接退回主界面
-							uo.back();
+						}else{//从主界面进入
+							//先送则停留在本页面
+							if(of.orderBeforeCallback){
+								of.orderBeforeCallback();
+							}else{
+								uo.back();
+							}
 						}						
 					}
 			} else {

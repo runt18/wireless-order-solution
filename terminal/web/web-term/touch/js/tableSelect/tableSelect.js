@@ -47,7 +47,15 @@ var tables = [],
 	/**
 	 * 元素模板
 	 */
+	//区域
 	regionCmpTemplet = '<a data-role="button" data-inline="true" class="regionBtn" onclick="">{name}</a>',
+	//餐台
+	tableCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
+//	'<div>{name}<br>{alias}</div></a>';
+		'<div style="height: 70px;">{name}<br>{alias}' +
+			'<div class="tempPayStatus">{tempPayStatus}</div>'+
+		'</div>'+
+	'</a>',
 	
 	payment_searchMemberTypeTemplet = '<div data-role="popup" id="payment_searchMemberType" data-theme="d" class="payment_searchMemberType">'+
 	'<ul id="payment_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
@@ -171,12 +179,12 @@ $(function(){
 				click : 'ts.selectTable({event : this, id : '+ c.data.id +',tableAlias :'+ c.data.alias +'})',
 				alias : c.data.alias && c.data.alias != 0?c.data.alias:'<font color="green">搭台</font>',
 				theme : c.data.statusValue == '1' ? "e" : "c",
-				name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name
+				name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
+				tempPayStatus : c.data.isTempPaid? '暂结' : ''
 			});				
 		}
 	});
  		
-	
 	
 	Util.LM.show();		
 	
@@ -594,7 +602,7 @@ function initFoodData(c){
 			
 			var deptNodes = data.root;
 			
-			of.foodList = data.other.foodList;
+			of.foodList = [];
 			of.depts = {root:[]};
 			of.kitchens = {totalProperty:0, root:[]}; 
 			
@@ -604,6 +612,8 @@ function initFoodData(c){
 				for (var j = 0; j < deptNodes[i].deptNodeValue.length; j++) {
 					var kitNode = deptNodes[i].deptNodeValue[j];
 					kitNode.kitchenNodeKey.foods = kitNode.kitchenNodeValue.foodList;
+					
+					of.foodList = of.foodList.concat(kitNode.kitchenNodeValue.foodList);
 					
 					of.kitchens.root.push(kitNode.kitchenNodeKey);
 				}
@@ -1561,38 +1571,6 @@ ts.addTables = function(o){
     
     showTable(temp);
 }
-
-
-function toOrderFoodPage(table){
-	//去点餐界面
-	location.href = '#orderFoodMgr';
-
-	$('#divNFCOTableBasicMsg').html(table.alias + '<br>' + table.name);
-	
-	of.table = table;
-	of.newFood = [];
-	
-	//渲染数据
-	of.initDeptContent();
-	
-	var index = 0;
-	of.loadFoodDateAction = window.setInterval(function(){
-		if($('#foodsCmp').find("a").length > 0){
-			clearInterval(of.loadFoodDateAction);
-			if(index == 0){
-				of.initKitchenContent({deptId:-1});
-			}
-			Util.LM.hide();
-		}else{
-			index ++;
-			Util.LM.show();
-			of.initKitchenContent({deptId:-1});
-		}
-	}, 400);
-	
-	of.initNewFoodContent();
-}
-
 
 /**
  * 获取交班, 日结信息

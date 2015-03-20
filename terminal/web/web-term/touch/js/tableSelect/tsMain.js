@@ -416,7 +416,8 @@ function ts_transTable(c){
 
 function uo_transFood(c){
 	ts.tf.count = $('#txtFoodNumForTran').val();
-	$.post('../TransFood.do', {
+	$.post('../OperateOrderFood.do', {
+		dataSource : 'transFood',
 		orderId : uo.order.id,
 		aliasId : c.alias,
 		transFoods : (c.allTrans?c.allTrans:(ts.tf.id + ',' + ts.tf.count))		

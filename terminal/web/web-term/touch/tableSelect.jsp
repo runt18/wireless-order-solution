@@ -1,5 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
-<% float v = 1.0f; %>
+<% 
+	float v = 1.1f; 
+	response.setHeader("Pragma","No-cache"); 
+	response.setHeader("Cache-Control","no-cache"); 
+	response.setDateHeader("Expires", 0);  
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,7 +22,7 @@
 <link rel="stylesheet" type="text/css" href="css/dateCmp/datebox.css" />
 
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
-<script type="text/javascript" src="js/common/jquery.mobile-1.3.2.js"></script>
+<script type="text/javascript" src="js/common/jquery.mobile-1.3.2.min.js"></script>
 <!-- 日期插件.js -->
 <script type="text/javascript" src="js/common/datebox.core.js"></script>
 <script type="text/javascript" src="js/common/jqm.datebox.language-CN.js"></script>
@@ -587,6 +592,8 @@
 	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
 		<div  class="bottomGeneralBar">
 			<div id="spanTotalPriceUO" style="float: left;margin-left: 10px;">消费总额:--</div>
+			<!-- 暂结状态 -->
+			<div id="spanToTempPayStatus" style="float: left;margin-left: 20px;"></div>
 			<div id="divDescForUpdateOrder" style="float: right;margin-right: 20px;"></div>
 		</div>	
 		 <!-- <input type="button" value="返回" style="width: 70px;height: 70px;"> -->
@@ -624,6 +631,8 @@
 	<div data-role="popup" id="orderFoodMoreOperateCmp" data-theme="d">
         <ul data-role="listview" data-inset="true" style="min-width:100px;" data-theme="b">
             <li style="line-height: 40px;" onclick="uo.weighAction()"><a >称重</a></li>
+            <li style="line-height: 40px;" onclick="uo.giftAction()"><a >赠送</a></li>
+            <li style="line-height: 40px;" onclick="uo.hurriedFoodAction()"><a >催菜</a></li>
         </ul>
 	</div>		
 
@@ -672,38 +681,79 @@
 	        <!-- <h1>输入称重--<span id="weighFoodName"></span></h1> -->
 	       	 输入称重--<span id="weighFoodName"></span>
 	    </div>
-	    <div style="max-height: 300px; overflow-y: auto;">
-			<div id="calculator4OrderCustomerCount" class="calculator">
-				<div class="top">
-					<span class="clear">+</span>
-					<span class="inputs">
-						<input id="inputOrderFoodWeigh" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodWeigh')">
-					</span>
-					<span class="clear">-</span>
-				</div>
-				<div class="keys">
-					<span>7</span>
-					<span>8</span>
-					<span>9</span>
-					<span>0</span>
-					
-					<span>4</span>
-					<span>5</span>
-					<span>6</span>
-					<span>.</span>
-					
-					<span>1</span>
-					<span>2</span>
-					<span>3</span>
-					<span class="clear">C</span>
-				</div>
-			</div>		    
+		<div class="calculator">
+			<div class="top">
+				<span class="clear">+</span>
+				<span class="inputs">
+					<input id="inputOrderFoodWeigh" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodWeigh')">
+				</span>
+				<span class="clear">-</span>
+			</div>
+			<div class="keys">
+				<span>7</span>
+				<span>8</span>
+				<span>9</span>
+				<span>0</span>
+				
+				<span>4</span>
+				<span>5</span>
+				<span>6</span>
+				<span>.</span>
+				
+				<span>1</span>
+				<span>2</span>
+				<span>3</span>
+				<span class="clear">C</span>
+			</div>
+			
+			<label>
+		        <input type="checkbox" id="chkPrintWeigh" data-theme="e" checked="checked">打印称重信息
+		    </label>	
+		</div>		    
 	    
-		</div>	
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.openWeighaction()">确定</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeWeighOperate()">取消</a>		 
+			 </div>
+	    </div>
+	</div>		
+	
+	<!-- 已点菜赠送 -->
+	<div id="orderFoodGiftCmp" data-role="popup" data-theme="c" data-dismissible="false" class="ui-corner-all" align="center">
+	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
+	       	 输入赠送--<span id="giftFoodName"></span>
+	    </div>
+		<div class="calculator">
+			<div class="top">
+				<span class="clear">+</span>
+				<span class="inputs">
+					<input id="inputOrderFoodGift" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodGift')">
+				</span>
+				<span class="clear">-</span>
+			</div>
+			<div class="keys">
+				<span>7</span>
+				<span>8</span>
+				<span>9</span>
+				<span>0</span>
+				
+				<span>4</span>
+				<span>5</span>
+				<span>6</span>
+				<span>.</span>
+				
+				<span>1</span>
+				<span>2</span>
+				<span>3</span>
+				<span class="clear">C</span>
+			</div>
+		</div>		    
+	    
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.openGiftaction()">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeGiftOperate()">取消</a>		 
 			 </div>
 	    </div>
 	</div>		
@@ -928,6 +978,7 @@
 		<div data-role="popup" id="orderOtherOperateCmp" data-theme="d">
 	        <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
 	            <li class="tempFoodKitchen" onclick="of.orderWithNoPrint()"><a >下单不打印</a></li>
+	            <li class="tempFoodKitchen" onclick="of.orderBefore()"><a >先送</a></li>
 	        </ul>
 		</div>		
 		<div id="searchFoodCmp" style="height: 60px;padding-top: 25px;display: none;">		

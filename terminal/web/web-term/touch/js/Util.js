@@ -4,7 +4,7 @@ $.ajaxSetup({
 	complete:function(XMLHttpRequest,textStatus){ 
 		//通过XMLHttpRequest取得响应头
 		if(XMLHttpRequest.getResponseHeader("session_status")){ 
-			logout();
+//			logout();
 		} 
 	}
 });
@@ -582,8 +582,12 @@ Util.msg = {
 				});
 			}			
 		}
-		
-
+	}
+	,tip : function(msg){
+		this.alert({
+			msg : msg,
+			topTip : true
+		});
 	}
 };
 
