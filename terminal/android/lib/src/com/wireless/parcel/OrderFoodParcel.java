@@ -28,6 +28,7 @@ public class OrderFoodParcel implements Parcelable{
 		if(in.readInt() != 1){
 			mSrcOrderFood = new OrderFood();
 			mSrcOrderFood.asFood().setFoodId(in.readInt());
+			mSrcOrderFood.setFoodUnit(FoodUnitParcel.CREATOR.createFromParcel(in).asFoodUnit());
 			mSrcOrderFood.asFood().copyFrom(FoodParcel.CREATOR.createFromParcel(in).asFood());
 			mSrcOrderFood.setHangup(in.readInt() == 1 ? true : false);
 			mSrcOrderFood.setTemp(in.readInt() == 1 ? true : false);
@@ -69,6 +70,7 @@ public class OrderFoodParcel implements Parcelable{
 		}else{
 			parcel.writeInt(0);
 			parcel.writeInt(mSrcOrderFood.getFoodId());
+			new FoodUnitParcel(mSrcOrderFood.getFoodUnit()).writeToParcel(parcel, flags);
 			new FoodParcel(mSrcOrderFood.asFood()).writeToParcel(parcel, flags);
 			parcel.writeInt(mSrcOrderFood.isHangup() ? 1 : 0);
 			parcel.writeInt(mSrcOrderFood.isTemp() ? 1 : 0);

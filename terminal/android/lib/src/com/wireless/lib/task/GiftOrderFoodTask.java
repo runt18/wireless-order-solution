@@ -8,44 +8,36 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.ReqTransTbl;
+import com.wireless.pack.req.ReqGiftOrderFood;
 import com.wireless.parcel.Parcel;
-import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public abstract class TransTblTask extends AsyncTask<Void, Void, Void>{
+public abstract class GiftOrderFoodTask extends AsyncTask<Void, Void, Void>{
 
-	protected BusinessException mBusinessException;
-	
-	private final Table.Builder mSrcBuilder;
-	
-	private final Table.Builder mDestBuilder;
-	
+	private BusinessException mBusinessException;
 	private final Staff mStaff;
+	private final Order.GiftBuilder mBuilder;
 	
-	public TransTblTask(Staff staff, Table.Builder srcBuilder, Table.Builder destBuilder){
-		mSrcBuilder = srcBuilder;
-		mDestBuilder = destBuilder;
-		mStaff = staff;
+	public GiftOrderFoodTask(Staff staff, Order.GiftBuilder builder){
+		this.mStaff = staff;
+		this.mBuilder = builder;
 	}
 	
 	@Override
-	protected Void doInBackground(Void... args) {
-		
+	protected Void doInBackground(Void... arg0) {
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(mStaff, new Table.TransferBuilder(mSrcBuilder, mDestBuilder)));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqGiftOrderFood(mStaff, mBuilder));
 			if(resp.header.type == Type.NAK){
 				mBusinessException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
-			}			
+			}
 		}catch(IOException e){
 			mBusinessException = new BusinessException(e.getMessage());
 		} catch (BusinessException e) {
 			mBusinessException = e;
 		}
-		
 		return null;
-		
 	}
 
 	@Override

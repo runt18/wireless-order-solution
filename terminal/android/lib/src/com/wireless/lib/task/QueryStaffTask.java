@@ -48,7 +48,7 @@ public abstract class QueryStaffTask extends AsyncTask<Void, Void, List<Staff>>{
 	@Override
 	protected List<Staff> doInBackground(Void... args){
 		
-		List<Staff> staffs = new ArrayList<Staff>();
+		final List<Staff> staffs = new ArrayList<Staff>();
 		try{
 
 			String deviceId = mTestFlag ? "11111111" : DeviceUtil.getDeviceId(mContext, mDeviceType);

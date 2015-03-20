@@ -8,6 +8,7 @@ import android.os.Parcelable;
 
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.tasteMgr.Taste;
 
 public class FoodParcel implements Parcelable{
@@ -34,17 +35,25 @@ public class FoodParcel implements Parcelable{
 			mSrcFood.setDesc(in.readString());
 			mSrcFood.setImage(OssImageParcel.CREATOR.createFromParcel(in).asImage());
 			
+			//un-marshal the food unt
+			final List<FoodUnitParcel> foodUnitParcels = in.createTypedArrayList(FoodUnitParcel.CREATOR);
+			final List<FoodUnit> foodUnits = new ArrayList<FoodUnit>(foodUnitParcels.size());
+			for(FoodUnitParcel fup : foodUnitParcels){
+				foodUnits.add(fup.asFoodUnit());
+			}
+			mSrcFood.setFoodUnits(foodUnits);
+			
 			//un-marshal the most popular taste references
-			List<TasteParcel> popTasteParcels = in.createTypedArrayList(TasteParcel.CREATOR);
-			List<Taste> popTastes = new ArrayList<Taste>(popTasteParcels.size());
+			final List<TasteParcel> popTasteParcels = in.createTypedArrayList(TasteParcel.CREATOR);
+			final List<Taste> popTastes = new ArrayList<Taste>(popTasteParcels.size());
 			for(TasteParcel tp : popTasteParcels){
 				popTastes.add(tp.asTaste());
 			}
 			mSrcFood.setPopTastes(popTastes);
 			
 			//un-marshal the child foods
-			List<ComboFoodParcel> childFoodsParcels = in.createTypedArrayList(ComboFoodParcel.CREATOR);
-			List<ComboFood> childFoods = new ArrayList<ComboFood>(childFoodsParcels.size());
+			final List<ComboFoodParcel> childFoodsParcels = in.createTypedArrayList(ComboFoodParcel.CREATOR);
+			final List<ComboFood> childFoods = new ArrayList<ComboFood>(childFoodsParcels.size());
 			for(ComboFoodParcel cfp : childFoodsParcels){
 				childFoods.add(cfp.asComboFood());
 			}
@@ -96,15 +105,22 @@ public class FoodParcel implements Parcelable{
 			dest.writeString(mSrcFood.getDesc());
 			new OssImageParcel(mSrcFood.getImage()).writeToParcel(dest, flags);
 			
+			//marshal the food unit
+			final List<FoodUnitParcel> foodUnitParcels = new ArrayList<FoodUnitParcel>(mSrcFood.getFoodUnits().size());
+			for(FoodUnit foodUnit : mSrcFood.getFoodUnits()){
+				foodUnitParcels.add(new FoodUnitParcel(foodUnit));
+			}
+			dest.writeTypedList(foodUnitParcels);
+			
 			//marshal the most popular taste references
-			List<TasteParcel> popTasteParcels = new ArrayList<TasteParcel>(mSrcFood.getPopTastes().size());
+			final List<TasteParcel> popTasteParcels = new ArrayList<TasteParcel>(mSrcFood.getPopTastes().size());
 			for(Taste popTaste : mSrcFood.getPopTastes()){
 				popTasteParcels.add(new TasteParcel(popTaste));
 			}
 			dest.writeTypedList(popTasteParcels);
 			
 			//marshal the child foods
-			List<ComboFoodParcel> childFoodParcels = new ArrayList<ComboFoodParcel>(mSrcFood.getChildFoods().size());
+			final List<ComboFoodParcel> childFoodParcels = new ArrayList<ComboFoodParcel>(mSrcFood.getChildFoods().size());
 			for(ComboFood childFood : mSrcFood.getChildFoods()){
 				childFoodParcels.add(new ComboFoodParcel(childFood));
 			}
