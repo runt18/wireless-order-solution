@@ -272,7 +272,7 @@ public class Token implements Jsonable{
 	
 	@Override
 	public String toString(){
-		return JSON.toJSONString(this);
+		return JSON.toJSONString(this.toJsonMap(0));
 	}
 
 	public static enum Key4Json{

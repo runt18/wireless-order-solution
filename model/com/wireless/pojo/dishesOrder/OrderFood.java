@@ -556,6 +556,14 @@ public class OrderFood implements Parcelable, Jsonable {
 		this.mFoodUnit = foodUnit;
 	}
 	
+	public FoodUnit getFoodUnit(){
+		return this.mFoodUnit;
+	}
+	
+	public boolean hasFoodUnit(){
+		return this.mFoodUnit != null;
+	}
+	
 	/**
 	 * Set the discount to this order food.
 	 * @param discount the discount to set
@@ -605,7 +613,13 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	public float getFoodPrice(){
-		return mFood.getPrice(mPricePlan, mFoodUnit);
+		if(mPricePlan != null){
+			return mFood.getPrice(mPricePlan);
+		}else if(mFoodUnit != null){
+			return mFoodUnit.getPrice();
+		}else{
+			return mFood.getPrice();
+		}
 	}
 	
 	public float getPrice(){
@@ -622,12 +636,27 @@ public class OrderFood implements Parcelable, Jsonable {
 	 * @return true if the order food is the same ignoring taste, otherwise false
 	 */
 	public boolean equalsIgnoreTaste(OrderFood of){
-		if(isTemporary != of.isTemporary){
+		if(isGift != of.isGift){
 			return false;
+			
+		}else if(isTemporary != of.isTemporary){
+			return false;
+			
 		}else if(isTemporary && of.isTemporary){
 			return mFood.getName().equals(of.asFood().getName()) && (mFood.getPrice() == of.asFood().getPrice());
+			
 		}else{
-			return mFood.equals(of.asFood());
+			if(mFood.equals(of.asFood())){
+				if(hasFoodUnit() && of.hasFoodUnit()){
+					return mFoodUnit.equals(of.mFoodUnit);
+				}else if(!hasFoodUnit() && !of.hasFoodUnit()){
+					return true;
+				}else{
+					return false;
+				}
+			}else{
+				return false;
+			}
 		}
 	}
 	
@@ -636,13 +665,11 @@ public class OrderFood implements Parcelable, Jsonable {
 	 * @param of the order food to compared
 	 * @return true if the taste group is the same, otherwise false
 	 */
-	boolean equalsByTasteGroup(OrderFood of){
+	boolean equalsTasteGroup(OrderFood of){
 		if(hasTasteGroup() && of.hasTasteGroup()){
 			return mTasteGroup.equals(of.mTasteGroup);
-			
 		}else if(!hasTasteGroup() && !of.hasTasteGroup()){
 			return true;
-			
 		}else{
 			return false;
 		}
@@ -662,18 +689,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			
 		}else{
 			OrderFood of = (OrderFood)obj;
-			if(isGift != of.isGift){
-				return false;
-				
-			}else if(isTemporary != of.isTemporary){
-				return false;
-				
-			}else if(isTemporary && of.isTemporary){
-				return mFood.getName().equals(of.asFood().getName()) && (mFood.getPrice() == of.asFood().getPrice());
-				
-			}else{
-				return mFood.equals(of.asFood()) && equalsByTasteGroup(of);
-			}
+			return equalsIgnoreTaste(of) && equalsTasteGroup(of);
 		}
 	}
 	
@@ -723,6 +739,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			}
 			dest.writeInt(this.getFoodId());
 			dest.writeShort(this.getAliasId());
+			dest.writeParcel(this.mFoodUnit, 0);
 			dest.writeFloat(this.getDiscount());
 			dest.writeFloat(this.getCount());
 			dest.writeBoolean(this.isHangup());
@@ -743,6 +760,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			dest.writeLong(this.getId());
 			dest.writeInt(this.getFoodId());
 			dest.writeShort(this.getAliasId());
+			dest.writeParcel(this.mFoodUnit, 0);
 			dest.writeFloat(this.getCount());
 			dest.writeBoolean(this.isHangup());
 			dest.writeBoolean(this.isGift());
@@ -775,6 +793,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			}
 			mFood.setFoodId(source.readInt());
 			mFood.setAliasId(source.readShort());
+			this.setFoodUnit(source.readParcel(FoodUnit.CREATOR));
 			this.setDiscount(source.readFloat());
 			this.setCount(source.readFloat());
 			this.setHangup(source.readBoolean());
@@ -795,6 +814,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			this.setId(source.readLong());
 			mFood.setFoodId(source.readInt());
 			mFood.setAliasId(source.readShort());
+			this.setFoodUnit(source.readParcel(FoodUnit.CREATOR));
 			this.setCount(source.readFloat());
 			this.setHangup(source.readBoolean());
 			this.setGift(source.readBoolean());
