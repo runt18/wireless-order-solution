@@ -3,16 +3,23 @@ package com.wireless.fragment;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
@@ -29,6 +36,8 @@ import com.wireless.pojo.menuMgr.DepartmentTree.DeptNode;
 import com.wireless.pojo.menuMgr.DepartmentTree.KitchenNode;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
+import com.wireless.pojo.menuMgr.FoodUnit;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
 import com.wireless.ui.dialog.AskOrderAmountDialog.ActionType;
@@ -48,7 +57,7 @@ public class KitchenFragment extends Fragment {
 		BuildDepartmentHandler(KitchenFragment fragment) {
 			this.mFragment = new WeakReference<KitchenFragment>(fragment);
 		}
-		
+		 
 		@Override
 		public void handleMessage(Message msg){
 			
@@ -60,7 +69,7 @@ public class KitchenFragment extends Fragment {
 			deptLayout.removeAllViews();
 			for(final Department dept : fragment.mDeptTree.asDeptList()){
 				//解析跟图层
-				View view = LayoutInflater.from(fragment.getActivity()).inflate(R.layout.pick_food_by_kitchen_fgm_dept_item, null);
+				View view = LayoutInflater.from(fragment.getActivity()).inflate(R.layout.pick_food_by_kitchen_fgm_dept_item, (ViewGroup)fragment.getActivity().getWindow().getDecorView(), false);
 				
 				//设置该项名称
 				((TextView)view.findViewById(R.id.txtView_name_kitchenFgm_dept_item)).setText(dept.getName());
@@ -301,15 +310,36 @@ public class KitchenFragment extends Fragment {
 			gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick( AdapterView<?> parent, View view, int position, long id) {
-					Food food = (Food) view.getTag();
-					if(!food.isSellOut()){
-						((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
-						AskOrderAmountDialog.newInstance(food, ActionType.ADD, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
-						//new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener, null).show();
-					}else{
-						((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
-						
+					final Food food = (Food) view.getTag();
+					if(food.isSellOut()){
 						Toast.makeText(getActivity(), food.getName() + "已售罄", Toast.LENGTH_SHORT).show();
+						
+					}else if(food.isCurPrice()){
+						final EditText currentPriceEdtTxt = new EditText(getActivity());
+						currentPriceEdtTxt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+						Dialog currentPriceDialog = new AlertDialog.Builder(getActivity()).setTitle("请确定" + food.getName() + "的时价")
+							.setView(currentPriceEdtTxt)
+							.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									AskOrderAmountDialog.newInstance(food, FoodUnit.newInstance4CurPrice(Float.parseFloat(currentPriceEdtTxt.getText().toString())), ActionType.ADD, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
+								}
+							})
+							.setNegativeButton("取消", null)
+							.create();
+						//弹出软键盘并全选输入框内容
+						currentPriceDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+							@Override
+							public void onShow(DialogInterface arg0) {
+								currentPriceEdtTxt.setText(NumericUtil.float2String2(food.getPrice()));
+								currentPriceEdtTxt.setSelection(0, currentPriceEdtTxt.getText().length());
+		                        ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(currentPriceEdtTxt, InputMethodManager.SHOW_IMPLICIT);
+							}
+						});
+						currentPriceDialog.show();
+						
+					}else{
+						AskOrderAmountDialog.newInstance(food, ActionType.ADD, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
 					}
 				}
 			});

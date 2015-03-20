@@ -4,7 +4,10 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,6 +33,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
@@ -110,9 +114,34 @@ public class PickFoodFragment extends Fragment{
         mGridView.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Food food = (Food) view.getTag();
+				final Food food = (Food)view.getTag();
 				if(food.isSellOut()){
 					Toast.makeText(getActivity(), food.getName() + "已售罄", Toast.LENGTH_SHORT).show();
+					
+				}else if(food.isCurPrice()){
+					final EditText currentPriceEdtTxt = new EditText(getActivity());
+					currentPriceEdtTxt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+					Dialog currentPriceDialog = new AlertDialog.Builder(getActivity()).setTitle("请确定" + food.getName() + "的时价")
+						.setView(currentPriceEdtTxt)
+						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								AskOrderAmountDialog.newInstance(food, FoodUnit.newInstance4CurPrice(Float.parseFloat(currentPriceEdtTxt.getText().toString())), ActionType.ADD, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
+							}
+						})
+						.setNegativeButton("取消", null)
+						.create();
+					//弹出软键盘并全选输入框内容
+					currentPriceDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+						@Override
+						public void onShow(DialogInterface arg0) {
+							currentPriceEdtTxt.setText(NumericUtil.float2String2(food.getPrice()));
+							currentPriceEdtTxt.setSelection(0, currentPriceEdtTxt.getText().length());
+	                        ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(currentPriceEdtTxt, InputMethodManager.SHOW_IMPLICIT);
+						}
+					});
+					currentPriceDialog.show();
+					
 				}else{
 					AskOrderAmountDialog.newInstance(food, ActionType.ADD, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
 				}
@@ -242,6 +271,11 @@ public class PickFoodFragment extends Fragment{
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("停");
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.red));
+				
+			}else if(food.isCurPrice()){
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("时");
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.brown));
 				
 			}else if(food.isGift() && WirelessOrder.loginStaff.getRole().hasPrivilege(Privilege.Code.GIFT)){
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);

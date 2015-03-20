@@ -260,21 +260,21 @@ public class PickFoodActivity extends FragmentActivity
 	
 	/**
 	 * 选中菜品后添加到新点菜列表中
-	 * @param food
+	 * @param of
 	 *            选中菜品的信息
 	 */
 	@Override
-	public void onFoodPicked(OrderFood food, ActionType actionType) {
+	public void onFoodPicked(OrderFood of, ActionType actionType) {
 		if(actionType == ActionType.ADD){
 			try{
-				mTmpOrder.addFood(food, WirelessOrder.loginStaff);
+				mTmpOrder.addFood(of, WirelessOrder.loginStaff);
 				
 				TextView amountTxtView = ((TextView)findViewById(R.id.txtView_amount_left_topBar));
 				amountTxtView.setVisibility(View.VISIBLE);
 				amountTxtView.setText(mTmpOrder.getOrderFoods().size() + "");
 				
-				Toast.makeText(this, "添加"	+ (food.isHangup() ? "并叫起\"" : "\"") + food.toString() + "\"" +
-									 NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "添加"	+ (of.isHangup() ? "并叫起\"" : "\"") + of.toString() + "\"" +
+									 NumericUtil.float2String2(of.getCount()) + "份", Toast.LENGTH_SHORT).show();
 	
 			}catch(BusinessException e){
 				Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();

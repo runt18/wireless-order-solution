@@ -337,8 +337,7 @@ public class AskTableDialog extends DialogFragment {
 	            	tblNumEditTxt.post(new Runnable() {
 	                    @Override
 	                    public void run() {
-	                        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-	                        imm.showSoftInput(tblNumEditTxt, InputMethodManager.SHOW_IMPLICIT);
+	                        ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(tblNumEditTxt, InputMethodManager.SHOW_IMPLICIT);
 	                    }
 	                });
             	}

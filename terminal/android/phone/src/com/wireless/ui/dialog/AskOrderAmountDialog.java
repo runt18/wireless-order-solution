@@ -50,6 +50,7 @@ import com.iflytek.cloud.ui.RecognizerDialogListener;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.ComboOrderFoodParcel;
+import com.wireless.parcel.FoodUnitParcel;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.TasteGroupParcel;
 import com.wireless.pojo.dishesOrder.ComboOrderFood;
@@ -97,10 +98,10 @@ public class AskOrderAmountDialog extends DialogFragment {
 	public static interface OnFoodPickedListener {
 		/**
 		 * 当选中菜品后，回调此函数通知选中的Food信息
-		 * @param food
+		 * @param of
 		 *            选中Food的信息
 		 */
-		public void onFoodPicked(OrderFood food, ActionType type);
+		public void onFoodPicked(OrderFood of, ActionType type);
 
 	}
 
@@ -207,14 +208,22 @@ public class AskOrderAmountDialog extends DialogFragment {
 	
 	private int mParentFgmId;
 
-	public static AskOrderAmountDialog newInstance(Food food, ActionType actionType, int parentId) {
+	public static AskOrderAmountDialog newInstance(Food food, FoodUnit unit4Current, ActionType actionType, int parentId) {
+		if(!food.isCurPrice()){
+			throw new IllegalArgumentException(food.getName() + "不是时价菜品");
+		}
 		AskOrderAmountDialog fgm = new AskOrderAmountDialog();
 		Bundle bundles = new Bundle();
 		bundles.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(new OrderFood(food)));
+		bundles.putParcelable(FoodUnitParcel.KEY_VALUE, new FoodUnitParcel(unit4Current));
 		bundles.putInt(PARENT_FGM_ID_KEY, parentId);
 		bundles.putInt(ACTION_TYPE_KEY, actionType.val);
 		fgm.setArguments(bundles);
 		return fgm;
+	}
+	
+	public static AskOrderAmountDialog newInstance(Food food, ActionType actionType, int parentId) {
+		return newInstance(new OrderFood(food), actionType, parentId);
 	}
 
 	public static AskOrderAmountDialog newInstance(OrderFood of, ActionType actionType, int parentId) {
@@ -253,6 +262,11 @@ public class AskOrderAmountDialog extends DialogFragment {
 		OrderFoodParcel orderFoodParcel = getArguments().getParcelable(OrderFoodParcel.KEY_VALUE);
 		mSelectedFood = orderFoodParcel.asOrderFood();
 
+		FoodUnitParcel unitParcel = getArguments().getParcelable(FoodUnitParcel.KEY_VALUE);
+		if(unitParcel != null){
+			mSelectedFood.setFoodUnit(unitParcel.asFoodUnit());
+		}
+		
 		mActionType = ActionType.valueOf(getArguments().getInt(ACTION_TYPE_KEY));
 		
 		// Set title for this dialog
