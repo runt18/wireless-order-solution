@@ -56,6 +56,7 @@ import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
@@ -268,17 +269,6 @@ public class AskOrderAmountDialog extends DialogFragment {
 			countEditText.setText(NumericUtil.float2String2(mSelectedFood.getCount()));
 		}
 		
-		// 点击数量EditText后全选内容并弹出软键盘
-//		countEditText.setOnTouchListener(new OnTouchListener() {
-//			@Override
-//			public boolean onTouch(View v, MotionEvent event) {
-//				countEditText.selectAll();
-//				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-//				imm.showSoftInput(v, 0);
-//				return true;
-//			}
-//
-//		});
 		countEditText.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -491,15 +481,13 @@ public class AskOrderAmountDialog extends DialogFragment {
 
 		tasteView.setTag(R.id.combo_of_indicator_key, Boolean.FALSE);
 		
-		if (mSelectedFood.asFood().hasPopTastes()) {
+		if (mSelectedFood.asFood().hasPopTastes() || mSelectedFood.asFood().hasFoodUnit()) {
 
 			tasteGridView.setVisibility(View.VISIBLE);
 
-			final List<Taste> popTastes = new ArrayList<Taste>(mSelectedFood.asFood().getPopTastes());
-			// 只显示前8个常用口味
-//			while (popTastes.size() > 8) {
-//				popTastes.remove(popTastes.size() - 1);
-//			}
+			final List<Object> popTastes = new ArrayList<Object>();
+			popTastes.addAll(mSelectedFood.asFood().getFoodUnits());
+			popTastes.addAll(mSelectedFood.asFood().getPopTastes());
 			if(popTastes.size() <= 8){
 				tasteGridView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 			}else{
@@ -520,27 +508,47 @@ public class AskOrderAmountDialog extends DialogFragment {
 
 							@Override
 							public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
-								Taste taste = (Taste) buttonView.getTag();
-								if (mSelectedFood.getTasteGroup().contains(taste)) {
-									mSelectedFood.removeTaste(taste);
-								} else {
-									mSelectedFood.addTaste(taste);
+								if(buttonView.getTag() instanceof Taste){
+									Taste taste = (Taste) buttonView.getTag();
+									if (mSelectedFood.getTasteGroup().contains(taste)) {
+										mSelectedFood.removeTaste(taste);
+									} else {
+										mSelectedFood.addTaste(taste);
+									}
+								}else if(buttonView.getTag() instanceof FoodUnit){
+									final FoodUnit unit = (FoodUnit)buttonView.getTag();
+									if(unit.equals(mSelectedFood.getFoodUnit())){
+										mSelectedFood.setFoodUnit(null);
+									}else{
+										mSelectedFood.setFoodUnit(unit);
+									}
 								}
 								mRefreshHandler.sendEmptyMessage(0);
 							}
 						});
 					}
 					
-					Taste thisTaste = popTastes.get(position);
-					checkBox.setTag(thisTaste);
-					checkBox.setText(thisTaste.getPreference());
-
-					if (mSelectedFood.getTasteGroup().contains(thisTaste)) {
-						checkBox.setBackgroundColor(getResources().getColor(R.color.orange));
-					} else {
-						checkBox.setBackgroundColor(getResources().getColor(R.color.green));
+					if(popTastes.get(position) instanceof Taste){
+						Taste thisTaste = (Taste)popTastes.get(position);
+						checkBox.setTag(thisTaste);
+						checkBox.setText(thisTaste.getPreference());
+	
+						if (mSelectedFood.getTasteGroup().contains(thisTaste)) {
+							checkBox.setBackgroundColor(getResources().getColor(R.color.orange));
+						} else {
+							checkBox.setBackgroundColor(getResources().getColor(R.color.green));
+						}
+					}else if(popTastes.get(position) instanceof FoodUnit){
+						FoodUnit thisUnit = (FoodUnit)popTastes.get(position);
+						checkBox.setTag(thisUnit);
+						checkBox.setText(NumericUtil.float2String2(thisUnit.getPrice()) + "元/" + thisUnit.getUnit());
+	
+						if (thisUnit.equals(mSelectedFood.getFoodUnit())){
+							checkBox.setBackgroundColor(getResources().getColor(R.color.orange));
+						} else {
+							checkBox.setBackgroundColor(getResources().getColor(R.color.yellow));
+						}
 					}
-
 
 					return checkBox;
 				}

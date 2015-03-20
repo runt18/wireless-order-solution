@@ -578,7 +578,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 										}
 										mFoodListHandler.sendEmptyMessage(0);
 									}else if(which == 2){
-										//TODO 赠送
+										//赠送
 										new AlertDialog.Builder(getActivity())
 											.setTitle("提示")
 											.setMessage("确定赠送" + of.asFood().getName() + "?")
