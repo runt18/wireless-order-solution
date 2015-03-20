@@ -7,11 +7,34 @@ SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
+-- Add the field 'food_unit_id', 'food_unit', 'food_unit_price' to table 'order_food_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food_history` 
+ADD COLUMN `food_unit_id` INT NULL DEFAULT NULL AFTER `food_id`,
+ADD COLUMN `food_unit` VARCHAR(45) NULL DEFAULT NULL AFTER `food_unit_id`,
+ADD COLUMN `food_unit_price` FLOAT NULL DEFAULT NULL AFTER `food_unit`;
+
+-- -----------------------------------------------------
+-- Add the field 'food_unit_id', 'food_unit', 'food_unit_price' to table 'order_food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food` 
+ADD COLUMN `food_unit_id` INT NULL DEFAULT NULL AFTER `food_id`,
+ADD COLUMN `food_unit` VARCHAR(45) NULL DEFAULT NULL AFTER `food_unit_id`,
+ADD COLUMN `food_unit_price` FLOAT NULL DEFAULT NULL AFTER `food_unit`;
+
+-- -----------------------------------------------------
+-- Add the field 'system_id' to table 'billboard'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`billboard` 
+ADD COLUMN `system_id` INT NULL DEFAULT NULL AFTER `status`,
+ADD INDEX `ix_system_id` (`system_id` ASC);
+
+-- -----------------------------------------------------
 -- Add the field 'temp_paid_staff' & 'temp_paid_date' to table 'order'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order` 
 ADD COLUMN `temp_staff` VARCHAR(45) NULL DEFAULT NULL AFTER `member_id`,
-ADD COLUMN `temp_date` DATETIME NULL DEFAULT NULL AFTER `temp_paid_staff`;
+ADD COLUMN `temp_date` DATETIME NULL DEFAULT NULL AFTER `temp_staff`;
 
 -- -----------------------------------------------------
 -- Add the field 'coupon_id' to table 'order'
