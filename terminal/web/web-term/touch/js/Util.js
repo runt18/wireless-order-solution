@@ -947,6 +947,8 @@ function setcookie(name,value, url){
     //不设置path默认使用当前相对路径, 会导致ajax不能上传cookie
     if(url){
     	path = "path=/;";
+    }else{
+    	path = "path=/web-term/touch/;";
     }
 	document.cookie = name + "=" + escape (value) + ";" + path +"expires = " + exp.toGMTString();    
 }
