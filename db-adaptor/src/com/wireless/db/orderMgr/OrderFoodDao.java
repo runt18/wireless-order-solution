@@ -280,25 +280,27 @@ public class OrderFoodDao {
 		String sql;
 
 		if(dateType.isHistory()){
-		sql = "SELECT OF.order_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, OF.operation, " +
-				" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
-				" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
-				" OF.cancel_reason_id, IF(OF.cancel_reason_id = 1, '无原因', OF.cancel_reason) cancel_reason, " +
-				" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
-				" OF.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
-				" FROM " + Params.dbName + ".order_food_history OF " +
-				" JOIN " + Params.dbName + ".order_history O ON O.id = OF.order_id " +
-				" LEFT JOIN " + Params.dbName + ".kitchen K ON OF.kitchen_id = K.kitchen_id " +
-				" LEFT JOIN " + Params.dbName + ".department D ON D.dept_id = K.dept_id AND D.restaurant_id = K.restaurant_id " +
-				" WHERE 1 = 1 " +
-				" AND O.restaurant_id = " + staff.getRestaurantId() +
-				(extraCond == null ? "" : extraCond) +
-				(orderClause == null ? "" : " " + orderClause);
+			sql = "SELECT OF.order_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, OF.operation, " +
+					" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
+					" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
+					" OF.food_unit_id, OF.food_unit, OF.food_unit_price, " +
+					" OF.cancel_reason_id, IF(OF.cancel_reason_id = 1, '无原因', OF.cancel_reason) cancel_reason, " +
+					" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
+					" OF.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
+					" FROM " + Params.dbName + ".order_food_history OF " +
+					" JOIN " + Params.dbName + ".order_history O ON O.id = OF.order_id " +
+					" LEFT JOIN " + Params.dbName + ".kitchen K ON OF.kitchen_id = K.kitchen_id " +
+					" LEFT JOIN " + Params.dbName + ".department D ON D.dept_id = K.dept_id AND D.restaurant_id = K.restaurant_id " +
+					" WHERE 1 = 1 " +
+					" AND O.restaurant_id = " + staff.getRestaurantId() +
+					(extraCond == null ? "" : extraCond) +
+					(orderClause == null ? "" : " " + orderClause);
 		
 		}else if(dateType.isToday()){
 			sql = " SELECT OF.id, OF.order_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, OF.operation, " +
 					" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
 					" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
+					" OF.food_unit_id, OF.food_unit, OF.food_unit_price, " +
 					" OF.cancel_reason_id, OF.cancel_reason, " +
 					" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
 					" OF.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
@@ -326,6 +328,14 @@ public class OrderFoodDao {
 			of.setRepaid(dbCon.rs.getBoolean("is_paid"));
 			of.setGift(dbCon.rs.getBoolean("is_gift"));
 			of.setOperation(OrderFood.Operation.valueOf(dbCon.rs.getInt("operation")));
+			
+			if(dbCon.rs.getInt("food_unit_id") != 0){
+				FoodUnit foodUnit = new FoodUnit(dbCon.rs.getInt("food_unit_id"));
+				foodUnit.setFoodId(dbCon.rs.getInt("food_id"));
+				foodUnit.setPrice(dbCon.rs.getFloat("food_unit_price"));
+				foodUnit.setUnit(dbCon.rs.getString("food_unit"));
+				of.setFoodUnit(foodUnit);
+			}
 			
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
 			//Get the detail to taste group.
@@ -716,6 +726,7 @@ public class OrderFoodDao {
 		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `operation`, `food_id`, `order_date`, `order_count`," + 
 				"`unit_price`, `commission`, `name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
 				"`discount`, `dept_id`, `kitchen_id`, " +
+				"`food_unit_id`, `food_unit`, `food_unit_price`," +
 				"`staff_id`, `waiter`, `is_temporary`, `is_paid`, `is_gift`";
 
 		String sql;
