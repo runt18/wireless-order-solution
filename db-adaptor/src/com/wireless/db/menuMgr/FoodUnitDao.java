@@ -7,6 +7,7 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.staffMgr.Staff;
@@ -75,6 +76,14 @@ public class FoodUnitDao {
 		return unitId;
 	}
 
+	public static FoodUnit getById(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
+		List<FoodUnit> result = getByCond(dbCon, staff, new ExtraCond().setId(id));
+		if(result.isEmpty()){
+			throw new BusinessException("没找到对应的菜品单位");
+		}else{
+			return result.get(0);
+		}
+	}
 	
 	public static List<FoodUnit> getByCond(Staff staff, ExtraCond extraCond) throws SQLException {
 		DBCon dbCon = new DBCon();

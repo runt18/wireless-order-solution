@@ -22,6 +22,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood.Operation;
 import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -380,10 +381,11 @@ public class OrderFoodDao {
 	public static List<OrderFood> getDetail(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		String sql;
 
-		sql = " SELECT OF.order_id, OF.food_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, " +
+		sql = " SELECT OF.order_id, OF.food_id, OF.taste_group_id, OF.food_unit_id, OF.is_temporary, OF.is_gift, " +
 			  " MIN(OF.id) AS id, MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_id) AS kitchen_id, " + 
 			  (extraCond.dateType.isToday() ? " MAX(OF.combo_id) AS combo_id, " : "") +
 			  " MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
+			  " MAX(OF.food_unit) AS food_unit, MAX(OF.food_unit_price) AS food_unit_price, " +
 			  " MAX(OF.unit_price) AS unit_price, MAX(OF.commission) AS commission, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
 			  " MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, MAX(OF.order_date) AS pay_datetime, SUM(OF.order_count) AS order_sum " +
 			  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " " + extraCond.orderFoodTblAlias +
@@ -391,7 +393,7 @@ public class OrderFoodDao {
 			  " ON OF.order_id = O.id " +
 			  " WHERE 1 = 1 " +
 			  (extraCond == null ? "" : extraCond) +
-			  " GROUP BY OF.food_id, OF.taste_group_id, OF.is_temporary, OF.is_gift " + 
+			  " GROUP BY OF.food_id, OF.taste_group_id, OF.food_unit_id, OF.is_temporary, OF.is_gift " + 
 			  " HAVING order_sum > 0 " +
 			  " ORDER BY id ASC ";
 		
@@ -414,6 +416,13 @@ public class OrderFoodDao {
 			int tgId = dbCon.rs.getInt("taste_group_id");
 			if(tgId != TasteGroup.EMPTY_TASTE_GROUP_ID){
 				of.setTasteGroup(new TasteGroup(tgId, null, null, null));
+			}
+			if(dbCon.rs.getInt("food_unit_id") != 0){
+				FoodUnit foodUnit = new FoodUnit(dbCon.rs.getInt("food_unit_id"));
+				foodUnit.setFoodId(dbCon.rs.getInt("food_id"));
+				foodUnit.setUnit(dbCon.rs.getString("food_unit"));
+				foodUnit.setPrice(dbCon.rs.getFloat("food_unit_price"));
+				of.setFoodUnit(foodUnit);
 			}
 			of.setCount(dbCon.rs.getFloat("order_sum"));
 			of.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
@@ -440,6 +449,7 @@ public class OrderFoodDao {
 				//Get the detail to associated price plan.
 				of.asFood().setPricePlan(FoodDao.getPricePlan(dbCon, staff, new ExtraCond4Price(of.asFood())));
 			}
+			//Get the detail to taste group.
 			if(of.getTasteGroup() != null){
 				of.setTasteGroup(TasteGroupDao.getById(staff, of.getTasteGroup().getGroupId(), extraCond.dateType));
 			}
@@ -491,6 +501,7 @@ public class OrderFoodDao {
 		sql = " INSERT INTO " + Params.dbName + ".order_food " +
 			  " ( " + 
 			  " `restaurant_id`, `order_id`, `operation`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
+			  " `food_unit_id`, `food_unit`, `food_unit_price`, " +
 			  " `discount`, `taste_group_id`, " +
 			  " `dept_id`, `kitchen_id`, " +
 			  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, `is_gift`, " +
@@ -505,8 +516,11 @@ public class OrderFoodDao {
 			  builder.extra.getCount() + ", " + 
 			  builder.extra.asFood().getPrice() + ", " + 
 			  builder.extra.asFood().getCommission() + ", " +
-			  "'" + builder.extra.getName() + "', " + 
+			  "'" + builder.extra.asFood().getName() + "', " + 
 			  builder.extra.asFood().getStatus() + ", " +
+			  (builder.extra.hasFoodUnit() ? builder.extra.getFoodUnit().getId() : " NULL ") + "," +
+			  (builder.extra.hasFoodUnit() ? "'" + builder.extra.getFoodUnit().getUnit() + "'" : " NULL ") + "," +
+			  (builder.extra.hasFoodUnit() ? builder.extra.getFoodUnit().getPrice() : " NULL ") + "," +
 			  builder.extra.getDiscount() + ", " +
 			  (builder.extra.hasTasteGroup() ? builder.extra.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 			  builder.extra.getKitchen().getDept().getId() + ", " +
@@ -579,6 +593,7 @@ public class OrderFoodDao {
 		sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
 			  " ( " +
 			  " `restaurant_id`, `order_id`, `operation`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
+			  " `food_unit_id`, `food_unit`, `food_unit_price`, " +
 			  " `discount`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`, " +
 			  " `dept_id`, `kitchen_id`, " +
 			  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, `is_gift`) VALUES (" +
@@ -589,8 +604,11 @@ public class OrderFoodDao {
 			  "-" + builder.cancel.getCount() + ", " + 
 			  builder.cancel.asFood().getPrice() + ", " + 
 			  builder.cancel.asFood().getCommission() + "," +
-			  "'" + builder.cancel.getName() + "', " + 
+			  "'" + builder.cancel.asFood().getName() + "', " + 
 			  builder.cancel.asFood().getStatus() + ", " +
+			  (builder.cancel.hasFoodUnit() ? builder.cancel.getFoodUnit().getId() : " NULL ") + "," +
+			  (builder.cancel.hasFoodUnit() ? "'" + builder.cancel.getFoodUnit().getUnit() + "'" : " NULL ") + "," +
+			  (builder.cancel.hasFoodUnit() ? builder.cancel.getFoodUnit().getPrice() : " NULL ") + "," +
 			  builder.cancel.getDiscount() + ", " +
 			  (builder.cancel.hasTasteGroup() ? builder.cancel.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 			  (builder.cancel.hasCancelReason() ? builder.cancel.getCancelReason().getId() : CancelReason.NO_REASON) + ", " +

@@ -22,6 +22,16 @@ public class TestToken {
 		TestInit.init();
 	}
 	
+//	@Test
+//	public void test() throws SQLException, BusinessException{
+//		Token token = new Token(0);
+//		token.setRestaurant(RestaurantDao.getByAccount("htx"));
+//		token.decrypt("ea5QXtHftxqpYAOvp8yZ7spgv/GyBKcC10VLO3Z/ltH6f0L6niGhxhg5o0w+uah/HeKL1VEXbBv3507Hn5bzpvy/U1IW0ovQmoCtvklfR/9r2siLSpvby6dqwDzuk8zxpBuc8VmXelf+08d+i9b15V8SH7xys5EfUK3Q61oCExU=");
+//		System.out.println(token);
+//		System.out.println(token.getId());
+//		System.out.println(DateUtil.format(token.getLastModified(), DateUtil.Pattern.DATE_TIME));
+//	}
+	
 	@Test
 	public void testTokenDao() throws SQLException, BusinessException, NoSuchAlgorithmException, InterruptedException{
 		int tokenId = 0;

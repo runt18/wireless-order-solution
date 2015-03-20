@@ -12,6 +12,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.TokenError;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.token.Token;
+import com.wireless.pojo.util.DateUtil;
 
 public class TokenDao {
 
@@ -321,12 +322,18 @@ public class TokenDao {
 			throw new BusinessException("验证Token不存在", TokenError.TOKEN_NOT_EXIST);
 		}else{
 			Token token = result.get(0);
-			if(System.currentTimeMillis() - token.getLastModified() > 60 * 1000 && token.getLastModified() != verifyToken.getLastModified()){
-				throw new BusinessException("验证Token的时间戳不正确", TokenError.LAST_MODIFIED_NOT_MATCH);
-			}else{
+			//FIXME 
+			//if(System.currentTimeMillis() - token.getLastModified() > 60 * 1000 && token.getLastModified() != verifyToken.getLastModified()){
+			if(System.currentTimeMillis() - token.getLastModified() > 10 * 1000 && token.getLastModified() != verifyToken.getLastModified()){
+				//throw new BusinessException("验证Token的时间戳不正确", TokenError.LAST_MODIFIED_NOT_MATCH);
+				System.out.println(DateUtil.format(System.currentTimeMillis(), DateUtil.Pattern.DATE_TIME));
+				System.out.println(DateUtil.format(token.getLastModified(), DateUtil.Pattern.DATE_TIME) + " " + token);
+				System.out.println(DateUtil.format(verifyToken.getLastModified(), DateUtil.Pattern.DATE_TIME) + " " + verifyToken);
+			}
+			//else{
 				update(dbCon, new Token.UpdateBuilder(token.getId()));
 				return getById(dbCon, token.getId()).encrypt();
-			}
+			//}
 		}
 	}
 	
