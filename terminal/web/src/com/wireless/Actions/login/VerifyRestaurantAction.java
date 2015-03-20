@@ -47,8 +47,14 @@ public class VerifyRestaurantAction extends Action {
 			
 			Cookie cookie = new Cookie(request.getServerName() + "_digie_token", nextEncryptedToken);
 			cookie.setMaxAge(365*24*60*60);
-			cookie.setPath("/web-term/touch");
+			cookie.setPath("/web-term/touch/");
 			response.addCookie(cookie);
+			
+			//FIXME
+			Cookie cookieToken = new Cookie(request.getServerName() + "_digie_token", null);
+			cookieToken.setMaxAge(0);
+			cookieToken.setPath("/web-term/touch");
+			response.addCookie(cookieToken);
 			
 		}catch (BusinessException e) {
 			jobject.initTip(e);
