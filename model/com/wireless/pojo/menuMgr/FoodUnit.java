@@ -37,6 +37,13 @@ public class FoodUnit implements Parcelable{
 		this.unit = unit;
 	}
 	
+	public static FoodUnit newInstance4CurPrice(float price){
+		FoodUnit tmpUnit = new FoodUnit((int)System.currentTimeMillis() % Integer.MAX_VALUE);
+		tmpUnit.setUnit("时价");
+		tmpUnit.setPrice(price);
+		return tmpUnit;
+	}
+	
 	public FoodUnit(int id){
 		this.id = id;
 	}
