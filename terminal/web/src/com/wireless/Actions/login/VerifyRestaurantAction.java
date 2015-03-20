@@ -22,13 +22,13 @@ public class VerifyRestaurantAction extends Action {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
-		JObject jobject = new JObject();
+		final JObject jobject = new JObject();
 		final String account = request.getParameter("account");
 		final String restaurantId = request.getParameter("restaurantID");
 		final String encryptedToken = request.getParameter("token");
 		final String nextEncryptedToken;
 		try {
-			Restaurant r;
+			final Restaurant r;
 			if(account == null || account.trim().isEmpty()){
 				r = RestaurantDao.getById(Integer.parseInt(restaurantId));
 			}else{
@@ -46,7 +46,7 @@ public class VerifyRestaurantAction extends Action {
 			}
 			
 			Cookie cookie = new Cookie(request.getServerName() + "_digie_token", nextEncryptedToken);
-			cookie.setMaxAge(365*24*60*60);
+			cookie.setMaxAge(365 * 24 * 3600);
 			cookie.setPath("/web-term/touch/");
 			response.addCookie(cookie);
 			
