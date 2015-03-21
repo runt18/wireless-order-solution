@@ -87,7 +87,7 @@
         android:id="@+id/relativeLayout_port_network"
         android:layout_width="match_parent"
         android:layout_height="60dip"
-        android:layout_below="@id/relativeLayout_backup_network" >
+        android:layout_below="@+id/relativeLayout_backup_network" >
 
         <TextView
             android:id="@+id/port"
@@ -126,7 +126,7 @@
         android:id="@+id/relativeLayout_serial_network"
         android:layout_width="match_parent"
         android:layout_height="60dip"
-        android:layout_below="@id/relativeLayout_port_network" >
+        android:layout_below="@+id/relativeLayout_accent_network" >
 
         <TextView
             android:id="@+id/textView_serial_network"
@@ -162,7 +162,7 @@
         android:id="@+id/relativeLayout_accent_network"
         android:layout_width="match_parent"
         android:layout_height="60dip"
-        android:layout_below="@id/relativeLayout_serial_network" >
+        android:layout_below="@id/relativeLayout_port_network" >
 
         <TextView
             android:id="@+id/textView_accent_network"

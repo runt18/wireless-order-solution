@@ -140,8 +140,14 @@ public class AskTableDialog extends DialogFragment {
 						checkBox = (CheckBox)convertView;
 					}
 					
-					//设置餐台名称
-					checkBox.setText(tbl.getName());
+					//设置餐台状态和名称
+					if(tbl.isBusy()){
+						checkBox.setBackgroundDrawable(mDialogFgm.get().getActivity().getResources().getDrawable(R.drawable.ask_dialog_item_busy_selector));
+						checkBox.setText(tbl.getName() + "(" + tbl.getCustomNum() + "人)");
+					}else{
+						checkBox.setBackgroundDrawable(mDialogFgm.get().getActivity().getResources().getDrawable(R.drawable.ask_dialog_item_selector));
+						checkBox.setText(tbl.getName());
+					}
 					//设置点击处理回调函数
 					checkBox.setOnClickListener(new OnClickListener(){
 
