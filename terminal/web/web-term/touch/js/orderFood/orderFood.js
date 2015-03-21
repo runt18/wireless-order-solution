@@ -433,7 +433,7 @@ of.updataSelloutFoods = function(){
 					of.foodList[j].status &= ~(1 << 2);
 					for (var i = 0; i < stopFoods.length; i++) {
 						if(of.foodList[j].id == stopFoods[i].id){
-							of.foodList[j] = stopFoods[i];
+							of.foodList[j].status |= (1 << 2);
 							break;
 						}
 					}
