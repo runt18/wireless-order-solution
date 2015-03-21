@@ -723,12 +723,12 @@ function foodOperation(type){
 					for (var i = 1; i <= jr.root.length; i++) {
 						var unitNameId = 'multiPriceUnit' + i,  unitPriceId = 'multiPriceValue' + i;
 						
-						Ext.getCmp('food_multiPlans').add({
+						Ext.getCmp('food_multiPrice').add({
 							cls : 'multiClass'+i,
 					 		columnWidth : 1	 		
 					 	});								
 						
-						Ext.getCmp('food_multiPlans').add({
+						Ext.getCmp('food_multiPrice').add({
 							cls : 'multiClass'+i,
 					 		columnWidth : .15,
 					 		items : [{
@@ -737,7 +737,7 @@ function foodOperation(type){
 					 		}]		 		
 					 	});	
 	
-						Ext.getCmp('food_multiPlans').add({
+						Ext.getCmp('food_multiPrice').add({
 							cls : 'multiClass'+i,
 					 		columnWidth : .3,
 					 		items : [{
@@ -751,7 +751,18 @@ function foodOperation(type){
 					 	    	hideLabel : true
 					 		}]		 		
 					 	});	
-						Ext.getCmp('food_multiPlans').add({
+						
+						Ext.getCmp('food_multiPrice').add({
+							cls : 'multiClass'+i,
+					 		columnWidth : .03,
+					 		items : [{
+					 			xtype : 'label',
+					 			style : 'font-size:16px;',
+					 	    	text : '/'
+					 		}]		 		
+					 	});	
+						
+						Ext.getCmp('food_multiPrice').add({
 							cls : 'multiClass'+i,
 					 		columnWidth : .3,
 					 		items : [{
@@ -764,7 +775,7 @@ function foodOperation(type){
 					 		}]	 		 		
 					 	});		
 						
-						Ext.getCmp('food_multiPlans').add({
+						Ext.getCmp('food_multiPrice').add({
 							cls : 'multiClass'+i,
 					 		columnWidth : .2,
 					 		items : [{
@@ -780,7 +791,7 @@ function foodOperation(type){
 						
 					}
 					
-					Ext.getCmp('food_multiPlans').doLayout();
+					Ext.getCmp('food_multiPrice').doLayout();
 					
 					$('.multiPriceName').attr('placeholder', '单位名称');
 					$('.multiPriceValue').attr('placeholder', '价格');
@@ -1406,7 +1417,7 @@ var basicOperationPanel = new Ext.Panel({
 		 		style : 'margin-top:3px;'
 		 	}, {
 				columnWidth : 1,	
-				id : 'food_multiPlans',
+				id : 'food_multiPrice',
 				layout : 'column',
 			 	defaults : {
 			 		xtype : 'panel',
@@ -1734,16 +1745,19 @@ var basicOperationPanel = new Ext.Panel({
 	}]
 });
 
+/**
+ * 添加多单位
+ */
 function optMultiPriceHandler(){
 	++ multiFoodPriceCount; 
 	var unitNameId = 'multiPriceUnit' + multiFoodPriceCount,  unitPriceId = 'multiPriceValue' + multiFoodPriceCount;
 	
-	Ext.getCmp('food_multiPlans').add({
+	Ext.getCmp('food_multiPrice').add({
 		cls : 'multiClass'+multiFoodPriceCount,
  		columnWidth : 1	 		
  	});								
 	
-	Ext.getCmp('food_multiPlans').add({
+	Ext.getCmp('food_multiPrice').add({
 		cls : 'multiClass'+multiFoodPriceCount,
  		columnWidth : .15,
  		items : [{
@@ -1751,7 +1765,7 @@ function optMultiPriceHandler(){
  	    	html : '&nbsp;'
  		}]		 		
  	});	
-	Ext.getCmp('food_multiPlans').add({
+	Ext.getCmp('food_multiPrice').add({
 		cls : 'multiClass'+multiFoodPriceCount,
 		columnWidth : .3,
 		items : [{
@@ -1765,7 +1779,18 @@ function optMultiPriceHandler(){
 			hideLabel : true
 		}]		 		
 	});	
-	Ext.getCmp('food_multiPlans').add({
+	
+	Ext.getCmp('food_multiPrice').add({
+		cls : 'multiClass'+multiFoodPriceCount,
+ 		columnWidth : .03,
+ 		items : [{
+ 			xtype : 'label',
+ 			style : 'font-size:16px;',
+ 	    	text : '/'
+ 		}]		 		
+ 	});		
+	
+	Ext.getCmp('food_multiPrice').add({
 		cls : 'multiClass'+multiFoodPriceCount,
  		columnWidth : .3,
  		items : [{
@@ -1778,7 +1803,7 @@ function optMultiPriceHandler(){
  		}]	 		 		
  	});			
 	
-	Ext.getCmp('food_multiPlans').add({
+	Ext.getCmp('food_multiPrice').add({
 		cls : 'multiClass'+multiFoodPriceCount,
  		columnWidth : .2,
  		items : [{
@@ -1792,22 +1817,25 @@ function optMultiPriceHandler(){
  		}] 		 		
  	});		
 	
-	Ext.getCmp('food_multiPlans').doLayout();
+	Ext.getCmp('food_multiPrice').doLayout();
 	$('.multiPriceName').attr('placeholder', '单位名称');
 	$('.multiPriceValue').attr('placeholder', '价格');
 	
 	Ext.getCmp(unitPriceId).focus();
 }
 
+/**
+ * 删除单个多单位
+ * @param e
+ */
 function deleteMultiPriceHandler(e){
 	var cmps = $('.multiClass'+Ext.getCmp(e.id).multiIndex);
 	
 	for (var i = 0; i < cmps.length; i++) {
-		Ext.getCmp('food_multiPlans').remove(cmps[i].getAttribute("id"));
+		Ext.getCmp('food_multiPrice').remove(cmps[i].getAttribute("id"));
 	}
 	
-//	multiFoodPriceCount --;
-	Ext.getCmp('food_multiPlans').doLayout();
+	Ext.getCmp('food_multiPrice').doLayout();
 }
 
 
@@ -1904,7 +1932,7 @@ function resetbBasicOperation(_d){
 		}
 	}
 	
-	Ext.getCmp('food_multiPlans').removeAll();
+	Ext.getCmp('food_multiPrice').removeAll();
 	multiFoodPriceCount = 0;
 	
 	foodName.focus(true, 100);
