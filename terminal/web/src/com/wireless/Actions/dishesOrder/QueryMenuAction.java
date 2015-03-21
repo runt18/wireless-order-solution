@@ -26,6 +26,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.pojo.staffMgr.Staff;
@@ -378,6 +379,29 @@ public class QueryMenuAction extends DispatchAction {
 			jobject.initTip(e);
 		}finally{
 			jobject.setRoot(root);
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}		
+	
+	
+	public ActionForward getMultiPrices(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jobject = new JObject();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			String foodId = request.getParameter("foodId");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Food food = FoodDao.getById(staff, Integer.parseInt(foodId));
+			
+			List<FoodUnit> units = food.getFoodUnits();
+
+			jobject.setRoot(units);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
 			response.getWriter().print(jobject.toString());
 		}
 		return null;

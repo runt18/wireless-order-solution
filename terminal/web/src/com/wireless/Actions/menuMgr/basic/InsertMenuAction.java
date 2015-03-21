@@ -51,6 +51,7 @@ public class InsertMenuAction extends Action {
 			String isWeight = request.getParameter("isWeight");
 			String isCommission = request.getParameter("isCommission");
 			String commission = request.getParameter("commission");
+			String multiFoodPrices = request.getParameter("multiFoodPrices");
 //			String stockStatus = request.getParameter("stockStatus");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -79,6 +80,14 @@ public class InsertMenuAction extends Action {
 				for (String p : food_prices) {
 					String[] planPrice = p.split(",");
 					builder.addPrice(Integer.parseInt(planPrice[0]), Integer.parseInt(planPrice[1]));
+				}
+			}
+			
+			if(multiFoodPrices != null && !multiFoodPrices.isEmpty()){
+				String[] multiPrices = multiFoodPrices.split("&");
+				for (String p : multiPrices) {
+					String[] unitPrice = p.split(",");
+					builder.addUnit(Float.parseFloat(unitPrice[1]), unitPrice[0]);
 				}
 			}
 			
