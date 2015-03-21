@@ -710,6 +710,89 @@ function foodOperation(type){
 			}
 		});		
 		
+		Ext.Ajax.request({
+			url : "../../QueryMenu.do",
+			params : {
+				dataSource : 'getMultiPrices',
+				foodId : selRowData.id
+			},
+			success : function(response){
+				var jr = Ext.util.JSON.decode(response.responseText);
+				if(jr.success && jr.root.length > 0){
+					multiFoodPriceCount = jr.root.length;
+					for (var i = 1; i <= jr.root.length; i++) {
+						var unitNameId = 'multiPriceUnit' + i,  unitPriceId = 'multiPriceValue' + i;
+						
+						Ext.getCmp('food_multiPlans').add({
+							cls : 'multiClass'+i,
+					 		columnWidth : 1	 		
+					 	});								
+						
+						Ext.getCmp('food_multiPlans').add({
+							cls : 'multiClass'+i,
+					 		columnWidth : .15,
+					 		items : [{
+					 			xtype : 'label',
+					 	    	html : '&nbsp;'
+					 		}]		 		
+					 	});	
+	
+						Ext.getCmp('food_multiPlans').add({
+							cls : 'multiClass'+i,
+					 		columnWidth : .3,
+					 		items : [{
+					 			xtype : 'numberfield',
+					 			id : unitPriceId,
+					 	    	maxValue : 65535,
+					 	    	value : jr.root[i-1].price,
+					 	    	cls : 'multiPriceValue',
+					 	    	style : 'text-align:right',
+					 	    	width : 85,
+					 	    	hideLabel : true
+					 		}]		 		
+					 	});	
+						Ext.getCmp('food_multiPlans').add({
+							cls : 'multiClass'+i,
+					 		columnWidth : .3,
+					 		items : [{
+					 			xtype : 'textfield',
+					 			id : unitNameId,
+					 	    	value : jr.root[i-1].unit,
+					 	    	width : 85,
+					 	    	cls : 'multiPriceName',
+					 	    	hideLabel : true
+					 		}]	 		 		
+					 	});		
+						
+						Ext.getCmp('food_multiPlans').add({
+							cls : 'multiClass'+i,
+					 		columnWidth : .2,
+					 		items : [{
+						    	xtype : 'button',
+						    	text : '删除',
+						    	multiIndex : i,
+						    	iconCls : 'btn_delete',
+						    	handler : function(e){
+						    		deleteMultiPriceHandler(e);
+						    	}
+					 		}] 		 		
+					 	});								
+						
+					}
+					
+					Ext.getCmp('food_multiPlans').doLayout();
+					
+					$('.multiPriceName').attr('placeholder', '单位名称');
+					$('.multiPriceValue').attr('placeholder', '价格');
+				
+				}
+			},
+			failure : function(){
+			
+			}
+		});	
+		
+		
 		resetbBasicOperation(selRowData);
 		foWin.setTitle(selRowData.name);
 		foodOperationWin.otype = mmObj.operation.update;
@@ -1180,7 +1263,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	allowBlank : false,
 		 	    	maxValue : 99999.99,
 		 	    	minValue : 0.00,
-		 	    	width : 80,
+		 	    	width : 85,
 		 	    	validator : function(v){
 		 	    		if(v >= 0.00 && v <= 99999.99){
 		 	    	    	return true;
@@ -1301,15 +1384,45 @@ var basicOperationPanel = new Ext.Panel({
 			 	    	}
 			 		}]
 			 	}]
+		 	},{
+		 		columnWidth : .15,
+		 		items : [{
+		 			xtype : 'label',
+		 	    	text : '多单位:'
+		 		}]
+		 	},{
+		 		columnWidth : .3,
+		 		items : [{
+			    	xtype : 'button',
+			    	text : '添加单位',
+			    	width : 85,
+			    	iconCls : 'btn_add',
+			    	handler : function(){
+			    		optMultiPriceHandler();
+			    	}
+		 		}]
+		 	},{
+		 		columnWidth : 1,
+		 		style : 'margin-top:3px;'
+		 	}, {
+				columnWidth : 1,	
+				id : 'food_multiPlans',
+				layout : 'column',
+			 	defaults : {
+			 		xtype : 'panel',
+			 		layout : 'form',
+			 		labelWidth : 40
+			 	},
+			 	items : []
+		 	},{
+		 		columnWidth : 1,
+		 		html : '&nbsp;'
 		 	}, {
 		 		columnWidth : .5,
 		 		items : [{
 		 			xtype : 'hidden',
 		 			id : 'txtBasicForPinyin'
 		 		}]
-		 	}, {
-		 		columnWidth : 1,
-		 		html : '&nbsp;'
 		 	}, {
 		 		columnWidth : .5,
 		 	    items : [{
@@ -1384,7 +1497,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	id : 'txtBasicForDesc',
 		 	    	fieldLabel : '简介',
 		 	    	width : 253,
-		 	    	height : 150,
+		 	    	height : 100,
 		 	    	maxLength : 500,
 		 	    	maxLengthText : '简介最多输入500字,可以为空.'
 		 	    }]
@@ -1470,29 +1583,6 @@ var basicOperationPanel = new Ext.Panel({
 							
 						}
 		 	    	}
-		 	    }]
-		 	},{
-		 		columnWidth : .5,
-		 		labelWidth : 55,
-		 		items : [{
-		 	    	xtype : 'combo',
-		 	    	id : 'comboBasicForStockStatus',
-		 	    	fieldLabel : '库存管理',
-		 	    	width : 86,
-//		 	    	listWidth : Ext.isIE ? 79 : 83,
-		 	    	store : new Ext.data.SimpleStore({
-						fields : ['value', 'text'],
-						data : stockStatusData
-					}),
-					valueField : 'value',
-					displayField : 'text',
-					mode : 'local',
-					triggerAction : 'all',
-					typeAhead : true,
-					selectOnFocus : true,
-					forceSelection : true,
-					allowBlank : false,
-					readOnly : false
 		 	    }]
 		 	},{
 		 		columnWidth : .5,
@@ -1644,6 +1734,83 @@ var basicOperationPanel = new Ext.Panel({
 	}]
 });
 
+function optMultiPriceHandler(){
+	++ multiFoodPriceCount; 
+	var unitNameId = 'multiPriceUnit' + multiFoodPriceCount,  unitPriceId = 'multiPriceValue' + multiFoodPriceCount;
+	
+	Ext.getCmp('food_multiPlans').add({
+		cls : 'multiClass'+multiFoodPriceCount,
+ 		columnWidth : 1	 		
+ 	});								
+	
+	Ext.getCmp('food_multiPlans').add({
+		cls : 'multiClass'+multiFoodPriceCount,
+ 		columnWidth : .15,
+ 		items : [{
+ 			xtype : 'label',
+ 	    	html : '&nbsp;'
+ 		}]		 		
+ 	});	
+	Ext.getCmp('food_multiPlans').add({
+		cls : 'multiClass'+multiFoodPriceCount,
+		columnWidth : .3,
+		items : [{
+			xtype : 'numberfield',
+			id : unitPriceId,
+			cls : 'multiPriceValue',
+			style : 'text-align:right',
+			maxValue : 65535,
+			value : '',
+			width : 85,
+			hideLabel : true
+		}]		 		
+	});	
+	Ext.getCmp('food_multiPlans').add({
+		cls : 'multiClass'+multiFoodPriceCount,
+ 		columnWidth : .3,
+ 		items : [{
+ 			xtype : 'textfield',
+ 			id : unitNameId,
+ 			cls : 'multiPriceName',
+ 	    	value : '',
+ 	    	width : 85,
+ 	    	hideLabel : true
+ 		}]	 		 		
+ 	});			
+	
+	Ext.getCmp('food_multiPlans').add({
+		cls : 'multiClass'+multiFoodPriceCount,
+ 		columnWidth : .2,
+ 		items : [{
+	    	xtype : 'button',
+	    	text : '删除',
+	    	multiIndex : multiFoodPriceCount,
+	    	iconCls : 'btn_delete',
+	    	handler : function(e){
+	    		deleteMultiPriceHandler(e);
+	    	}
+ 		}] 		 		
+ 	});		
+	
+	Ext.getCmp('food_multiPlans').doLayout();
+	$('.multiPriceName').attr('placeholder', '单位名称');
+	$('.multiPriceValue').attr('placeholder', '价格');
+	
+	Ext.getCmp(unitPriceId).focus();
+}
+
+function deleteMultiPriceHandler(e){
+	var cmps = $('.multiClass'+Ext.getCmp(e.id).multiIndex);
+	
+	for (var i = 0; i < cmps.length; i++) {
+		Ext.getCmp('food_multiPlans').remove(cmps[i].getAttribute("id"));
+	}
+	
+//	multiFoodPriceCount --;
+	Ext.getCmp('food_multiPlans').doLayout();
+}
+
+
 /**
  * 界面赋值
  */
@@ -1665,7 +1832,6 @@ function resetbBasicOperation(_d){
 	var img = Ext.getDom('foodBasicImg');
 	var btnUploadFoodImage = Ext.getCmp('btnUploadFoodImage');
 	var btnDeleteFoodImage = Ext.getCmp('btnDeleteFoodImage');
-	var stockStatus = Ext.getCmp('comboBasicForStockStatus');
 	var commission = Ext.getCmp('numCommission');
 	var chkAlias = Ext.getCmp('chbForFoodAlias');
 	var data = {};
@@ -1727,9 +1893,6 @@ function resetbBasicOperation(_d){
 		img.src = data.img.image;
 	}
 	
-	stockStatus.setValue(typeof(data.stockStatusValue) == 'undefined' ? 1 : data.stockStatusValue);
-	
-	
 	for (var i = 0; i < food_pricePlans.length; i++) {
 		var checkBoxId = 'chbForFoodAlias' + food_pricePlans[i].id,  numberfieldId = 'numBasicForPrice' + food_pricePlans[i].id;
 		if(Ext.getDom(checkBoxId).checked){
@@ -1741,11 +1904,13 @@ function resetbBasicOperation(_d){
 		}
 	}
 	
+	Ext.getCmp('food_multiPlans').removeAll();
+	multiFoodPriceCount = 0;
+	
 	foodName.focus(true, 100);
 	foodName.clearInvalid();
 	foodPinyin.clearInvalid();
 	foodPrice.clearInvalid();
-	stockStatus.clearInvalid();
 	foodKitchenAlias.clearInvalid();
 };
 
@@ -1803,8 +1968,8 @@ function basicOperationBasicHandler(c){
 	var comboContent = '';
 	var kitchenID = '';
 	var cfg = Ext.getCmp('combinationFoodGrid');
-	var stockStatus = Ext.getCmp('comboBasicForStockStatus');
 	var foodPrices = '';
+	var multiFoodPrices = '';
 		
 	if(!foodName.isValid() || !foodPrice.isValid() || !foodKitchenAlias.isValid()){
 //		Ext.getCmp('foodOperationWinTab').setActiveTab('basicOperationTab');
@@ -1833,6 +1998,28 @@ function basicOperationBasicHandler(c){
 			foodPrices += (food_pricePlans[i].id + ',' + Ext.getCmp('numBasicForPrice'+food_pricePlans[i].id).getValue());  
 		}
 	}
+	
+	if(multiFoodPriceCount > 0){
+		for (var i = 1; i <= multiFoodPriceCount; i++) {
+			var unit = Ext.getCmp('multiPriceUnit'+i);
+			var price = Ext.getCmp('multiPriceValue'+i);
+			//过滤已经删除了的单位价格
+			if(unit && price){
+				//过滤信息没有填齐全的单位价格
+				if(unit.getValue() && price.getValue()){
+					
+					if(multiFoodPrices){
+						multiFoodPrices += '&';
+					}
+					multiFoodPrices += (unit.getValue() + "," + price.getValue());						
+				}
+			
+			}
+			
+
+		}		
+	}
+
 	
 /*	for(var i = 0; i < kitchenData.length; i++){
 		if(kitchenData[i].alias == foodKitchenAlias.getValue()){
@@ -1872,11 +2059,11 @@ function basicOperationBasicHandler(c){
 			isCommission : isCommission.getValue(),
 			commission : commission.getValue(),
 			comboContent : comboContent,
-			foodImage : foodOperationWin.foodImage
+			foodImage : foodOperationWin.foodImage,
+			multiFoodPrices : multiFoodPrices
 		},
 		success : function(res, opt){
 			var jr = Ext.util.JSON.decode(res.responseText);
-			
 			if(jr.success == true){
 				if(c.type == mmObj.operation.insert){
 					if(c.close == true){

@@ -813,7 +813,7 @@ var TableRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'customNum', 'minimum
     'categoryText', 'statusValue', 'statusText', 'region']);
 var TasteRecord = Ext.ux.cr(['id','alias','name','price','rate', 'cateValue','cateText','calcText','typeValue', 'typeText']);
 var FoodBasicRecord = Ext.ux.cr(['id','alias','name','displayFoodName','pinyin','unitPrice','status','stockStatusValue',
-    'kitchen', 'kitchen.alias','kitchen.name','kitchen.id','operator','tasteRefType','desc','img', 'rid', 'commission']);
+    'kitchen', 'kitchen.alias','kitchen.name','kitchen.id','operator','tasteRefType','desc','img', 'rid', 'commission', 'multiUnitPrice']);
 var FoodTasteRecord = Ext.ux.cr(['taste', 'taste.id', 'taste.alias', 'taste.name', 'taste.rank', 'taste.price', 'taste.rate', 
     'taste.calcValue', 'taste.calcText', 'taste.cateValue', 'taste.cateText', 'food', 'food.id', 'food.name']);
 var ComboFoodRecord = Ext.ux.cr(['parentId', 'parentName', 'amount'], FoodBasicRecord);
