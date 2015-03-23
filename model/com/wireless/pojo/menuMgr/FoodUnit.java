@@ -1,9 +1,11 @@
 package com.wireless.pojo.menuMgr;
 
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 
-public class FoodUnit implements Parcelable{
+public class FoodUnit implements Parcelable, Jsonable{
 	
 	public static class InsertBuilder{
 		public final int foodId;
@@ -131,4 +133,68 @@ public class FoodUnit implements Parcelable{
 		}
 		
 	};
+	
+	public static enum Key4Json{
+		UNIT_ID("id", "单位id"),
+		UNIT("unit", "单位"),
+		PRICE("price", "价钱"),
+		FOOD_ID("foodId", "foodId");
+		
+		Key4Json(String key, String desc){
+			this.key = key;
+			this.desc = desc;
+		}
+		
+		private final String key;
+		private final String desc;
+		
+		@Override
+		public String toString(){
+			return "key = " + key + ",desc = " + desc;
+		}
+		
+	}	
+	
+	public final static int CR_JSONABLE_4_COMMIT = 0; 
+	
+	
+	public static Jsonable.Creator<FoodUnit> JSON_CREATOR = new Jsonable.Creator<FoodUnit>() {
+		@Override
+		public FoodUnit newInstance() {
+			return new FoodUnit(0);
+		}
+	};
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putFloat("price", getPrice());
+		jm.putString("unit", getUnit());
+		jm.putInt("id", getId());
+		jm.putInt("foodId", getFoodId());
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		if(flag == CR_JSONABLE_4_COMMIT){
+			if(jsonMap.containsKey(Key4Json.UNIT_ID.key)){
+				setId(jsonMap.getInt(Key4Json.UNIT_ID.key));
+			}else{
+				throw new IllegalStateException("提交的点菜数据缺少字段(" + Key4Json.UNIT_ID.desc + ")");
+			}
+			
+			if(jsonMap.containsKey(Key4Json.UNIT.key)){
+				setUnit(jsonMap.getString(Key4Json.UNIT.key));
+			}else{
+				throw new IllegalStateException("提交的点菜数据缺少字段(" + Key4Json.UNIT.desc + ")");
+			}
+			
+			if(jsonMap.containsKey(Key4Json.PRICE.key)){
+				setPrice(jsonMap.getFloat(Key4Json.PRICE.key));
+			}else{
+				throw new IllegalStateException("提交的点菜数据缺少字段(" + Key4Json.PRICE.desc + ")");
+			}
+		}		
+	}
 }

@@ -850,6 +850,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		IS_HURRIED("isHurried", "是否催菜"),
 		IS_GIFT("isGift", "是否赠送"),
 		IS_HANG("isHangup", "是否叫起"),
+		IS_CURRPRICE("isCurrPrice", "是否时价"),
 		IS_COMMISSION("isCommission", "是否提成"),
 		IS_TRANSFER("isTransfer", "是否转菜"),
 		IS_RETURN("isReturn", "是否退菜"),
@@ -896,11 +897,12 @@ public class OrderFood implements Parcelable, Jsonable {
 		jm.putBoolean(Key4Json.IS_RETURN.key, this.getCount() < 0 ? true : false);
 		jm.putFloat(Key4Json.DISCOUNT.key, this.mDiscount);
 		jm.putFloat(Key4Json.COUNT.key, this.getCount());
-		jm.putFloat(Key4Json.UNIT_PRICE.key, this.asFood().getPrice());
+		jm.putFloat(Key4Json.UNIT_PRICE.key, this.getUnitPrice());
 		jm.putFloat(Key4Json.ACTUAL_PRICE.key, this.asFood().getPrice());
 		jm.putFloat(Key4Json.TOTAL_PRICE.key, this.calcPrice());
 		jm.putJsonable(Key4Json.TASTE_GROUP.key, this.getTasteGroup(), 0);
 		jm.putString(Key4Json.OPERATION.key, this.getOperation() != null? this.getOperation().getDesc() : "点菜");
+		jm.putInt("operationValue", this.getOperation() != null? this.getOperation().getVal() : -1);
 		jm.putFloat(Key4Json.TOTAL_PRICE_BEFORE_DISCOUNT.key, this.calcPriceBeforeDiscount());
 		
 		return jm;
@@ -945,6 +947,15 @@ public class OrderFood implements Parcelable, Jsonable {
 			
 			if(jsonMap.containsKey(Key4Json.IS_HANG.key)){
 				setHangup(jsonMap.getBoolean(Key4Json.IS_HANG.key));
+			}
+			
+			//时价
+			if(jsonMap.containsKey(Key4Json.IS_CURRPRICE.key)){
+				setFoodUnit(FoodUnit.newInstance4CurPrice(jsonMap.getFloat(Key4Json.UNIT_PRICE.key)));
+			}
+			//多单位
+			if(jsonMap.containsKey("foodUnit")){
+				setFoodUnit(jsonMap.getJsonable("foodUnit", FoodUnit.JSON_CREATOR, flag));
 			}
 			
 			
