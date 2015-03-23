@@ -1045,6 +1045,7 @@
 	    </div>
 	</div>	
 	
+	<!-- 菜品数量输入 -->
 	<div id="orderFoodCountSet" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
 	    <div data-role="header" data-theme="b" class="ui-corner-top">
 	        <h1>输入菜品数量</h1>
@@ -1085,6 +1086,48 @@
 	    </div>
 	</div>	
 	
+	<!-- 菜品时价输入 -->
+	<div id="orderFoodUnitPriceSet" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
+	    <div data-role="header" data-theme="b" class="ui-corner-top">
+	        <h1>输入菜品时价</h1>
+	    </div>
+	    <div style="min-height: 300px; overflow-y: auto;">
+			<div class="calculator">
+				<div class="top">
+					<span class="clear">+</span>
+					<span class="inputs">
+						<input id="inputOrderFoodUnitPriceSet" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodUnitPriceSet')">
+					</span>
+					<span class="clear">-</span>
+				</div>
+				<div class="keys">
+					<span>7</span>
+					<span>8</span>
+					<span>9</span>
+					<span>0</span>
+					
+					<span>4</span>
+					<span>5</span>
+					<span>6</span>
+					<span>.</span>
+					
+					<span>1</span>
+					<span>2</span>
+					<span>3</span>
+					<span class="clear">C</span>
+				</div>
+			</div>		    
+	    
+		</div>	
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.saveForFoodUnitPrice()">确定</a>
+				 <a  data-role="button" data-inline="true" data-rel="back" class="countPopbottomBtn">取消</a>		 
+			 </div>
+	    </div>
+	</div>	
+	
+	<!-- 助记码输入 -->
 	<div id="orderFoodByAliasCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
 	    <div data-role="header" data-theme="b" class="ui-corner-top">
 	        <h1>输入助记码</h1>
@@ -1238,13 +1281,30 @@
         	</div>			 
 			 
 	    </div>
-		<div id="divFloatFoodTastes" style="height: 168px;">
-			<a onclick="chooseOrderFoodCommonTaste({event: this, id: 2})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index=0 data-value=2 data-theme="c">
-				<div>
-					口味1<br>￥10
-				</div>
-			</a>
-		</div>  	
+	    
+	    <div data-role="collapsible" data-mini="true" id="collapsibleCommonTaste" >
+	    	<h3>常用口味</h3>
+			<div id="divFloatFoodTastes">
+				<a onclick="chooseOrderFoodCommonTaste({event: this, id: 2})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index=0 data-value=2 data-theme="c">
+					<div>
+						口味1<br>￥10
+					</div>
+				</a>
+			</div> 
+	    </div>
+	    <div data-role="collapsible" data-mini="true" id="collapsibleMultiPrice">
+	        <h3>多单位</h3>
+	        <div id="divFloatFoodMultiPrices">
+				<a onclick="" data-role="button" data-corners="false" data-inline="true" class="multiPriceCmp" data-index=0 data-value=2 data-theme="c">
+					<div>
+						¥45/例
+					</div>
+				</a>
+			</div> 
+	    </div>
+	    
+	    
+ 	
 	</div>	
 </div>
 <!-- end 点菜界面-->

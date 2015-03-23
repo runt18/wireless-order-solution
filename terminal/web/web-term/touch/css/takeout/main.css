@@ -166,6 +166,13 @@ html { overflow-y: hidden;}
 	width: 100px;
 	height: 60px;
 }
+/*多单位*/
+.multiPriceCmp{
+	width: 100px;
+	height: 45px;
+}
+
+
 
 /*
 餐台
@@ -387,6 +394,9 @@ html { overflow-y: hidden;}
 	font-weight: bold;
 }
 
+/*
+	常用口味动态窗口
+*/
 .commonTasteFloat{
 	z-index: 2;
 	position: absolute; 
@@ -397,6 +407,12 @@ html { overflow-y: hidden;}
 	display: none;
 	background-color: white;
 }
+
+/*
+	常用口味动态窗口下手风琴去掉外边距
+*/
+.commonTasteFloat .ui-collapsible-inset { margin: initial; }
+
 
 /*区域按钮文字放大*/
 .regionBtn{

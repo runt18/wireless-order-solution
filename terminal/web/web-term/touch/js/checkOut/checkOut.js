@@ -18,7 +18,7 @@ var uo = {
 		+ '<td ><div style="height: 45px;overflow: hidden;">{name}</div></td>'
 		+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
 		+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
-		+ '<td>{actualPrice}</td>'
+		+ '<td>{unitPrice}</td>'
 	//	+ '<td>{totalPrice}</td>'
 		+ '<td>{orderDateFormat}</td>'
 		+ '<td>' 
@@ -139,7 +139,7 @@ uo.showOrder = function(){
 			isWeight : (uo.order.orderFoods[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 			hasWeigh : (uo.order.orderFoods[i].status & 1 << 7) != 0 ?'orderFoodMoreOperateCmp':'',
 			tastePref : uo.order.orderFoods[i].tasteGroup.tastePref,
-			actualPrice : (uo.order.orderFoods[i].actualPrice + uo.order.orderFoods[i].tasteGroup.tastePrice).toFixed(2) + (uo.order.orderFoods[i].isGift?'&nbsp;[<font style="font-weight:bold;">已赠送</font>]':''),
+			unitPrice : uo.order.orderFoods[i].unitPrice.toFixed(2) + (uo.order.orderFoods[i].isGift?'&nbsp;[<font style="font-weight:bold;">已赠送</font>]':''),
 			totalPrice : uo.order.orderFoods[i].totalPrice.toFixed(2),
 			orderDateFormat : uo.order.orderFoods[i].orderDateFormat.substring(11),
 			waiter : uo.order.orderFoods[i].waiter 

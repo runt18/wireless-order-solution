@@ -521,8 +521,10 @@ window.onload=function(){
         }
     });
     
+    //易笔字样式和加载
     addStyle();
     dynamicLoadYBZ();
+    
 }
 
 //改变窗口时

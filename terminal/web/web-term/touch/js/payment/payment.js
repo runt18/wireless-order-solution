@@ -3,7 +3,7 @@ var pm = {table : {}, payByMember:false},
 	//折扣,服务费方案, 付款方式
 	discountData = [],  servicePlanData = [], payTypeData=[], restaurantData = [],
 	//加载显示账单基础信息
-	orderMsg,
+	orderMsg = null,
 	//赋值总额用于抹数计算
 	checkOut_actualPrice,
 	
@@ -74,6 +74,14 @@ var pm = {table : {}, payByMember:false},
 //当离开结账页面时
 $(document).on("pagebeforehide","#paymentMgr",function(){ 
 	$('#numberKeyboard').hide();
+	document.getElementById("totalPrice").innerHTML = 0.00;
+	document.getElementById("shouldPay").innerHTML = 0.00;
+	document.getElementById("forFree").innerHTML = 0.00;
+	document.getElementById("spanCancelFoodAmount").innerHTML = 0.00;
+	document.getElementById("discountPrice").innerHTML = 0.00;	
+	checkOut_actualPrice = 0;
+	orderMsg = null;
+	
 });
 
 function showPaymentMgr(c){
@@ -88,12 +96,16 @@ function showPaymentMgr(c){
 	
  	loadSystemSettingData();
 	
+ 	//加载账单信息
 	refreshOrderData({calc : false});
 	
+	//加载折扣
 	loadDiscountData();
 	
+	//加载服务费方案
 	loadServicePlanData();
 	
+	//加载混合结账付款方式
 	loadPayTypeData(); 
 	
 	//实时显示找零
@@ -504,6 +516,12 @@ var paySubmit = function(submitType) {
 	//发送短信, 打印二维码
 	var sendSms, printCode;
 
+	
+	if(orderMsg == null){
+		Util.msg.alert({msg:"读取账单有误, 不能结账", renderTo:'paymentMgr'});
+		return;
+	}
+	
 	if(eraseQuota && isNaN(eraseQuota)){
 		Util.msg.alert({msg:"请填写正确的抹数金额", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();firstTimeInput = true;}});
 		return;
@@ -684,15 +702,15 @@ function lookupOrderDetailByType(type){
 	if(type == 'detail_all'){
 		lookupCondtion = "true"; 
 	}else if(type == 'detail_cancel'){
-		lookupCondtion = "tempData.count < 0 && tempData.isTransfer != true";
+		lookupCondtion = "tempData.operationValue == 2";
 		//退菜时, 显示字符为退菜
 		$('#lab4CancelReasonOrComment').html('退菜原因');
 	}else if(type == 'detail_discount'){
 		lookupCondtion = "tempData.discount < 1";
 	}else if(type == 'detail_gift'){
-		lookupCondtion = "tempData.isGift == true";
+		lookupCondtion = "tempData.operationValue == 4";
 	}else if(type == 'detail_trans'){
-		lookupCondtion = "tempData.isTransfer == true";
+		lookupCondtion = "tempData.operationValue == 3";
 	}
 	
 	//账单查看
