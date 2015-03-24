@@ -857,6 +857,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		DISCOUNT("discount", "折扣"),
 		COUNT("count", "数量"),
 		UNIT_PRICE("unitPrice", "单价"),
+		FOOD_UNIT("foodUnit", ""),
 		ACTUAL_PRICE("actualPrice", "实收"),
 		TOTAL_PRICE("totalPrice", "应收"),
 		TASTE_GROUP("tasteGroup", "口味"),
@@ -898,6 +899,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		jm.putFloat(Key4Json.DISCOUNT.key, this.mDiscount);
 		jm.putFloat(Key4Json.COUNT.key, this.getCount());
 		jm.putFloat(Key4Json.UNIT_PRICE.key, this.getUnitPrice());
+		jm.putJsonable(Key4Json.FOOD_UNIT.key, this.mFoodUnit, 0);
 		jm.putFloat(Key4Json.ACTUAL_PRICE.key, this.asFood().getPrice());
 		jm.putFloat(Key4Json.TOTAL_PRICE.key, this.calcPrice());
 		jm.putJsonable(Key4Json.TASTE_GROUP.key, this.getTasteGroup(), 0);
@@ -952,8 +954,8 @@ public class OrderFood implements Parcelable, Jsonable {
 			//时价
 			if(jsonMap.containsKey(Key4Json.IS_CURRPRICE.key)){
 				setFoodUnit(FoodUnit.newInstance4CurPrice(jsonMap.getFloat(Key4Json.UNIT_PRICE.key)));
-			}else if(jsonMap.containsKey("foodUnit")){//多单位
-				setFoodUnit(jsonMap.getJsonable("foodUnit", FoodUnit.JSON_CREATOR, flag));
+			}else if(jsonMap.containsKey(Key4Json.FOOD_UNIT.key)){//多单位
+				setFoodUnit(jsonMap.getJsonable(Key4Json.FOOD_UNIT.key, FoodUnit.JSON_CREATOR, flag));
 			}
 			
 			
