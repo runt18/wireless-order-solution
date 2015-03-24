@@ -342,7 +342,7 @@ function initBillboardContent(c){
 				html.push('<li data-index={index} data-value={id} onclick="displayBillboard(this)"> <a>{status}{title}</a></li>'.format({
 					index : i,
 					id : result.root[i].id,
-					status : result.root[i].status == 1?'<font color="red" >＊</font>':'',
+					status : !getcookie("billboard"+result.root[i].id)?'<font color="red" >＊</font>':'',
 					title : result.root[i].title
 				}));
 				
@@ -383,10 +383,10 @@ function displayBillboard(thiz){
 		    	$('#billboardCmp').popup('open');
 		    	
 		    	//设置为已读状态
-		    	if(billboard.status == 1){
-		    		$.post('../OperateBillboard.do', {dataSource : 'update', id : billboard.id, status : 2}, function(){
-		    			initBillboardContent();	
-		    		}).error(function() { Util.msg.alert({topTip:true, msg:'读取出错'}) });
+		    	if(!getcookie("billboard"+billboard.id)){
+		    		//已读状态设置到cookie
+		    		setcookie("billboard"+billboard.id, true, null, billboard.expired)
+		    		initBillboardContent();	
 		    	}
 
 	    	}
