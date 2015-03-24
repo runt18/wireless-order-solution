@@ -31,7 +31,7 @@ public class VerifyLoginAction extends Action {
 					@Override
 					public JsonMap toJsonMap(int flag) {
 						JsonMap jm = new JsonMap();
-						jm.putJsonable("staff", staff, 0);
+						jm.putJsonable("staff", staff, Staff.ST_PARCELABLE_COMPLEX);
 						jm.putString("sessionId", request.getSession().getId());
 						return jm;
 					}

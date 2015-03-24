@@ -128,7 +128,7 @@ public class OperateOrderFoodAction extends DispatchAction{
 			
 			String giftFoods[] = giftFood.split(",");
 			for (OrderFood of : actualOrder.getOrderFoods()) {
-				if(of.getFoodId() == Integer.parseInt(giftFoods[0])){
+				if(of.getFoodId() == Integer.parseInt(giftFoods[0]) && !of.isGift()){
 					of.setCount(Float.parseFloat(giftFoods[1]));
 					builder = new Order.GiftBuilder(Integer.parseInt(orderId), of);
 				}
