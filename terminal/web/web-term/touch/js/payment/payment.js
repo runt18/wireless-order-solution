@@ -306,7 +306,7 @@ function loadOrderBasicMsg(){
 		html.push(payment_orderFoodListCmpTemplet.format({
 			dataIndex : i + 1,
 			id : checkOutData.root[i].id,
-			name : checkOutData.root[i].name + ((checkOutData.root[i].status & 1 << 7) != 0 ? '[称重确认]' : ''),
+			name : checkOutData.root[i].foodName + ((checkOutData.root[i].status & 1 << 7) != 0 ? '[称重确认]' : ''),
 			count : checkOutData.root[i].count.toFixed(2),
 			isWeight : (checkOutData.root[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 			tastePref : checkOutData.root[i].tasteGroup.tastePref,
@@ -721,7 +721,7 @@ function lookupOrderDetailByType(type){
 			html += payment_lookupOrderDetailTemplet.format({
 				dataIndex : index,
 				id : orderFoodDetails[i].id,
-				name : orderFoodDetails[i].name,
+				name : orderFoodDetails[i].foodName,
 				count : orderFoodDetails[i].count,
 				isWeight : (orderFoodDetails[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 				isGift : orderFoodDetails[i].isGift?'是':'否',	

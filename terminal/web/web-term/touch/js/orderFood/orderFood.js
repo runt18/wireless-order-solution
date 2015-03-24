@@ -2286,7 +2286,17 @@ of.submit = function(c){
 						
 						//从已点菜进入时, 返回已点菜界面
 						if(of.afterCommitCallback != null && typeof of.afterCommitCallback == 'function'){
-							of.afterCommitCallback();
+							
+							//先送则停留在本页面
+							if(of.orderBeforeCallback){
+								//标示为先送返回
+								uo.fromBack = true;
+								of.orderBeforeCallback();
+							}else{
+								//去除表示
+								delete uo.fromBack;
+								of.afterCommitCallback();
+							}
 						}else{//从主界面进入
 							//先送则停留在本页面
 							if(of.orderBeforeCallback){

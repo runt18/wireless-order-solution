@@ -268,6 +268,7 @@ function initStaffContent(c){
 		data : {
 			restaurantID : lg.restaurant.id
 		},
+		dataType : 'json',
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){

@@ -629,9 +629,9 @@
 	
      <!-- 单条已点菜更多操作 -->
 	<div data-role="popup" id="orderFoodMoreOperateCmp" data-theme="d">
-        <ul data-role="listview" data-inset="true" style="min-width:100px;" data-theme="b">
-            <li style="line-height: 40px;" onclick="uo.weighAction()"><a >称重</a></li>
-            <li style="line-height: 40px;" onclick="uo.giftAction()"><a >赠送</a></li>
+        <ul data-role="listview" id="orderFood_moreOpe" data-inset="true" style="min-width:100px;" data-theme="b">
+            <li style="line-height: 40px;" id="btnWeighFood" onclick="uo.weighAction()"><a >称重</a></li>
+            <li style="line-height: 40px;" id="btnGiftFood" onclick="uo.giftAction()"><a >赠送</a></li>
             <li style="line-height: 40px;" onclick="uo.hurriedFoodAction()"><a >催菜</a></li>
         </ul>
 	</div>		

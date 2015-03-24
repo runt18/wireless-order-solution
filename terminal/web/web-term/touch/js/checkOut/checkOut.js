@@ -50,6 +50,15 @@ var uo = {
 		$('#divSelectTablesForTs a').buttonMarkup( "refresh" );
 	}
 
+	
+$(document).on("pagebeforeshow","#orderFoodListMgr",function(){
+	if(!jQuery.isEmptyObject(uo.table) && uo.fromBack){
+		delete uo.fromBack;
+		initOrderData({table : uo.table});
+	}
+});	
+	
+	
 /**
  * 初始化菜单数据，存放在uoFood数组中
  * @param {object} data 餐桌对象
@@ -134,7 +143,7 @@ uo.showOrder = function(){
 		html += orderFoodListCmpTemplet.format({
 			dataIndex : i + 1,
 			id : uo.order.orderFoods[i].id,
-			name : uo.order.orderFoods[i].name,
+			name : uo.order.orderFoods[i].foodName,
 			count : uo.order.orderFoods[i].count.toFixed(2),
 			isWeight : (uo.order.orderFoods[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 			hasWeigh : (uo.order.orderFoods[i].status & 1 << 7) != 0 ?'orderFoodMoreOperateCmp':'',
@@ -178,7 +187,7 @@ uo.showNorthForUpdateOrder = function(){
  */
 uo.showDescForUpdateOrder = function(){
 	var html = "";
-	html = (uo.orderMember?"<span style = 'margin-left: 20px;'>当前会员：<font color='green'>" + uo.orderMember.name +"</font></span>" : "") +
+	html = (uo.orderMember?"<span style = 'margin-left: 20px;'>当前会员：<font color='green'>" + uo.orderMember.foodName +"</font></span>" : "") +
 		(uo.order.discount?"<span style = 'margin-left: 20px;'>当前折扣：<font color='green'>" + uo.order.discount.name +"</font></span>" : "") +
 		(uo.order.discounter ? "<span style = 'margin-left: 20px;'>折扣人：<font color='green'>" + uo.order.discounter + "</font></span><span style = 'margin-left: 20px;'>折扣时间：<font color='green'>" + uo.order.discountDate + "</font></span>" : "") ;
 	$("#divDescForUpdateOrder").html(html);
@@ -377,7 +386,7 @@ uo.cancelFoodAction = function(){
 		
 		//把相关数据加到退菜信息对象
 		uoCancelFood.id = uo.operateFood.id;
-		uoCancelFood.foodName = uo.operateFood.name;
+		uoCancelFood.foodName = uo.operateFood.foodName;
 		uoCancelFood.dishes = uo.operateFood.tasteGroup.tastePref;
 		uoCancelFood.count = -num;
 		if(uo.selectingCancelReason){
@@ -409,6 +418,26 @@ uo.cancelFoodAction = function(){
 uo.openOrderFoodOtherOperate = function(c){
 	//获取选中行
 	uo.selectedFood = uo.order.orderFoods[parseInt($(c.event).attr('data-index'))-1];
+	
+	var giftPrivileges = false;
+	for (var i = 0; i < ln.staffData.role.privileges.length; i++) {
+		if(ln.staffData.role.privileges[i].codeValue == 1003){
+			giftPrivileges = true;
+		}
+	}
+	if((uo.selectedFood.status & 1 << 3) != 0 && giftPrivileges){
+		$('#btnGiftFood').show();
+	}else{
+		$('#btnGiftFood').hide();
+	} 
+	if((uo.selectedFood.status & 1 << 7) == 0){
+		$('#btnWeighFood').hide();
+	}else{
+		$('#btnWeighFood').show();
+	}
+	
+	$('#orderFood_moreOpe').listview('refresh');		
+	
 	$('#orderFoodMoreOperateCmp').popup('open');
 	//动态使用popup时要动态设置popup控件位置
 	$('#orderFoodMoreOperateCmp-popup').css({top:$(c.event).position().top, left:$(c.event).position().left});
@@ -458,7 +487,7 @@ uo.openWeighOperate = function(){
 	setTimeout(function(){
 		$('#inputOrderFoodWeigh').focus();
 		//显示菜名
-		$('#weighFoodName').text(uo.selectedFood.name);		
+		$('#weighFoodName').text(uo.selectedFood.foodName);		
 	}, 250);
 	$('#orderFoodWeighCmp').parent().addClass('popup').addClass('in');
 	$('#orderFoodWeighCmp').popup('open');
@@ -525,7 +554,7 @@ uo.openGiftOperate = function(){
 		$('#inputOrderFoodGift').val(uo.selectedFood.count);	
 		$('#inputOrderFoodGift').select();
 		//显示菜名
-		$('#giftFoodName').text(uo.selectedFood.name);		
+		$('#giftFoodName').text(uo.selectedFood.foodName);		
 	}, 250);
 	$('#orderFoodGiftCmp').parent().addClass('popup').addClass('in');
 	$('#orderFoodGiftCmp').popup('open');
@@ -585,7 +614,7 @@ uo.transFoodForTS = function(c){
 	
 	var orderFood = uo.order.orderFoods[parseInt($(c.event).attr('data-index'))-1];
 	
-	$('#transSomethingTitle').html(orderFood.name +" -- 请输入桌号，菜品数量确定转菜");
+	$('#transSomethingTitle').html(orderFood.foodName +" -- 请输入桌号，菜品数量确定转菜");
 	
 	ts.tf.id = orderFood.id
 	ts.tf.count = orderFood.count + '';	
