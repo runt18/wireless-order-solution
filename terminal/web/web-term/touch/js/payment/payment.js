@@ -708,7 +708,7 @@ function lookupOrderDetailByType(type){
 	}else if(type == 'detail_discount'){
 		lookupCondtion = "tempData.discount < 1";
 	}else if(type == 'detail_gift'){
-		lookupCondtion = "tempData.operationValue == 4";
+		lookupCondtion = "tempData.isGift == true";
 	}else if(type == 'detail_trans'){
 		lookupCondtion = "tempData.operationValue == 3";
 	}

@@ -421,7 +421,7 @@ uo.openOrderFoodOtherOperate = function(c){
 	
 	var giftPrivileges = false;
 	for (var i = 0; i < ln.staffData.role.privileges.length; i++) {
-		if(ln.staffData.role.privileges[i].codeValue == 1003){
+		if(ln.staffData.role.privileges[i].codeValue === 1003){
 			giftPrivileges = true;
 		}
 	}
@@ -430,7 +430,7 @@ uo.openOrderFoodOtherOperate = function(c){
 	}else{
 		$('#btnGiftFood').hide();
 	} 
-	if((uo.selectedFood.status & 1 << 7) == 0){
+	if((uo.selectedFood.status & 1 << 7) === 0){
 		$('#btnWeighFood').hide();
 	}else{
 		$('#btnWeighFood').show();
@@ -449,7 +449,7 @@ uo.openOrderFoodOtherOperate = function(c){
 uo.hurriedFoodAction = function(){
 	var uoFood = uo.order.orderFoods;
 	for(var x = 0; x < uoFood.length; x++){
-		if(uoFood[x].id == uo.selectedFood.id){
+		if(uoFood[x].id === uo.selectedFood.id){
 			uoFood[x].isHurried = true;
 		}
 	}	
