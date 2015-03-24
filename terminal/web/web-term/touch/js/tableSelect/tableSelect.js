@@ -600,8 +600,6 @@ function initFoodData(c){
 			dataSource : 'foodList'
 		},
 		success : function(data, status, xhr){
-			Util.LM.hide();	
-			
 			var deptNodes = data.root;
 			
 			of.foodList = [];
@@ -631,6 +629,8 @@ function initFoodData(c){
 					of.kitchens.root.splice(i, 1);
 				}
 			}	
+			
+			Util.LM.hide();	
 			
 			if(c.firstTime){
 				//加载临时厨房
@@ -1413,7 +1413,6 @@ function initTableData(){
 			random : Math.random()
 		},
 		success : function(data, status, xhr){
-			Util.LM.hide();
 			tables = [];
 			busyTables = [];
 			freeTables = [];
@@ -1464,7 +1463,10 @@ function initTableData(){
 				tempForAllStatus = tables;
 				temp = tables;
 				showTable(temp);
+				
+				Util.LM.hide();
 			}else{
+				Util.LM.hide();
 				Util.msg.alert({
 					title : data.title,
 					msg : data.msg,
