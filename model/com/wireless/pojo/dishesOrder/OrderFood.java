@@ -885,6 +885,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		// extends food
 		jm.putJsonable(this.mFood, 0);
 		jm.putInt(Key4Json.ORDER_ID.key, this.mOrderId);
+		jm.putString("foodName", this.getName());
 		jm.putString(Key4Json.ORDER_DATE.key, DateUtil.format(this.mOrderDate));
 		jm.putString(Key4Json.WAITER.key, this.mWaiter);
 		jm.putJsonable(Key4Json.CANCEL_REASON.key, this.mCancelReason, 0);

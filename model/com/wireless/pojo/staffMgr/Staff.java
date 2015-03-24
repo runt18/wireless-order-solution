@@ -6,8 +6,8 @@ import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 public class Staff implements Parcelable, Jsonable{ 
 
-	public final static byte ST_PARCELABLE_COMPLEX = 0;
-	public final static byte ST_PARCELABLE_SIMPLE = 1;
+	public final static byte ST_PARCELABLE_COMPLEX = 1;
+	public final static byte ST_PARCELABLE_SIMPLE = 0;
 	
 	public static enum Type{
 		NORMAL(1, "普通"),
