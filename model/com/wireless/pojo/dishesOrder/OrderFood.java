@@ -952,9 +952,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			//时价
 			if(jsonMap.containsKey(Key4Json.IS_CURRPRICE.key)){
 				setFoodUnit(FoodUnit.newInstance4CurPrice(jsonMap.getFloat(Key4Json.UNIT_PRICE.key)));
-			}
-			//多单位
-			if(jsonMap.containsKey("foodUnit")){
+			}else if(jsonMap.containsKey("foodUnit")){//多单位
 				setFoodUnit(jsonMap.getJsonable("foodUnit", FoodUnit.JSON_CREATOR, flag));
 			}
 			
