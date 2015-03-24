@@ -169,7 +169,8 @@ html { overflow-y: hidden;}
 /*多单位*/
 .multiPriceCmp{
 	width: 100px;
-	height: 45px;
+	height: 60px;
+	line-height: 40px;
 }
 
 
@@ -183,14 +184,14 @@ html { overflow-y: hidden;}
 }
 
 .moreTasteCmp{
-	width: 80px;
+	width: 100px;
 	line-height: 60px;	
 }
 
 .moreTasteCmp > span{
 	font-size: 18px !important;
 	padding: initial;
-	text-align: left;
+	text-align: center;
 }
 
 .tasteCmp > span, .tableCmp > span{
@@ -412,6 +413,9 @@ html { overflow-y: hidden;}
 	常用口味动态窗口下手风琴去掉外边距
 */
 .commonTasteFloat .ui-collapsible-inset { margin: initial; }
+.commonTasteFloat .ui-collapsible-content {
+	padding: 0px 15px;
+}
 
 
 /*区域按钮文字放大*/
