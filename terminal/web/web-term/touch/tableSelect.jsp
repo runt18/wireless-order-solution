@@ -934,7 +934,7 @@
 			<div data-role="popup" id="orderFoodOtherOperateCmp" data-theme="d">
 		        <ul data-role="listview" data-inset="true" style="min-width:130px;" data-theme="b">
 		        	<li class="tempFoodKitchen none" id="giftFoodOperate"  onclick="of.giftFood()"><a>赠送</a></li>	
-		        	<li class="tempFoodKitchen" onclick="of.updateFoodUnitPrice()"><a>时价</a></li>
+		        	<li class="tempFoodKitchen" onclick="of.updateFoodUnitPrice()"><a>修改时价</a></li>
 		            <li class="tempFoodKitchen" onclick="operateOrderFoodTaste({type:1})"><a >全单口味</a></li>
 		            <li class="tempFoodKitchen" onclick="of.foodHangup({type : 1})"><a >全单叫起</a></li>
 		        </ul>
@@ -1288,21 +1288,21 @@
 	    <div data-role="collapsible" data-mini="true" id="collapsibleCommonTaste" >
 	    	<h3>常用口味</h3>
 			<div id="divFloatFoodTastes">
-				<a onclick="chooseOrderFoodCommonTaste({event: this, id: 2})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index=0 data-value=2 data-theme="c">
+<!-- 				<a onclick="chooseOrderFoodCommonTaste({event: this, id: 2})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index=0 data-value=2 data-theme="c">
 					<div>
 						口味1<br>￥10
 					</div>
-				</a>
+				</a> -->
 			</div> 
 	    </div>
 	    <div data-role="collapsible" data-mini="true" id="collapsibleMultiPrice">
-	        <h3>多单位</h3>
+	        <h3>选择单位</h3>
 	        <div id="divFloatFoodMultiPrices">
-				<a onclick="" data-role="button" data-corners="false" data-inline="true" class="multiPriceCmp" data-index=0 data-value=2 data-theme="c">
+<!-- 				<a onclick="" data-role="button" data-corners="false" data-inline="true" class="multiPriceCmp" data-index=0 data-value=2 data-theme="c">
 					<div>
 						¥45/例
 					</div>
-				</a>
+				</a> -->
 			</div> 
 	    </div>
 	    

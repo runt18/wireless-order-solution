@@ -1068,6 +1068,7 @@ function operateOrderFoodTaste(c){
 	//全单口味
 	of.selectedOrderFood = (c.type == 1 ? {} :selectedOrderFood);
 	
+	//存放选中口味
 	var foodTasteGroup = [];
 	//普通口味时
 	if(c.type == 2){
@@ -1131,6 +1132,7 @@ function operateOrderFoodTaste(c){
 		}*/
 		if(of.ot.allBillTaste){
 			foodTasteGroup = foodTasteGroup.concat(of.ot.allBillTaste);
+			of.ot.tasteGroupClick = true;
 		}
 		tastesDate = of.allTastes;			
 	}
