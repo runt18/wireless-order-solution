@@ -40,7 +40,7 @@ public class FoodUnit implements Parcelable, Jsonable{
 	}
 	
 	public static FoodUnit newInstance4CurPrice(float price){
-		FoodUnit tmpUnit = new FoodUnit((int)System.currentTimeMillis() % Integer.MAX_VALUE);
+		FoodUnit tmpUnit = new FoodUnit((int)Math.round(Math.random() * (99999999 - 50000000) + 50000000));
 		tmpUnit.setUnit("时价");
 		tmpUnit.setPrice(price);
 		return tmpUnit;
