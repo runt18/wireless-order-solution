@@ -624,6 +624,7 @@
             <li class="tempFoodKitchen" onclick="uo.tempPayForPrintAll()"><a >补打总单</a></li>
             <li class="tempFoodKitchen" onclick="uo.printDetailPatch()"><a >补打明细</a></li>
             <li class="tempFoodKitchen" onclick="uo.allTransFoodForTS()"><a >全单转菜</a></li>
+            <li class="tempFoodKitchen" onclick="uo.allFoodHurried()"><a >全单催菜</a></li>
         </ul>
 	</div>		
 	
@@ -1030,7 +1031,7 @@
     	<div id="tastesCmp" class="ui-bar ui-bar-c" style="height:300px;" align="left">
 
     	</div>
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 48px;">
 			<div class="bottomTastesBar">
 				<div style="float: left;margin-left: 20px;">已选口味 : </div>
 				<div id="divDescForChooseTaste" style="float: left;color: green;font-weight: bold;"></div>

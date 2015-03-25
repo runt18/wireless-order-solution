@@ -462,6 +462,21 @@ uo.hurriedFoodAction = function(){
 	
 }
 
+/**
+ * 全单催菜
+ */
+uo.allFoodHurried = function(){
+	var uoFood = uo.order.orderFoods;
+	for(var x = 0; x < uoFood.length; x++){
+		uoFood[x].isHurried = true;
+	}	
+	$('#updateFoodOtherOperateCmp').popup('close');
+	uo.hurriedFood = true;
+	setTimeout(function(){
+		uo.submitUpdateOrderHandler({orderFoods:uoFood});
+	}, 250);	
+}
+
 
 /**
  * 去称重

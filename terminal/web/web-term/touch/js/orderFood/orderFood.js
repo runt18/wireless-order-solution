@@ -391,6 +391,8 @@ of.show = function(c){
 	of.table = c.table;
 	of.order = typeof c.order != 'undefined' ? c.order : null;
 	of.afterCommitCallback = typeof c.callback == 'function' ? c.callback : null;
+	//清空选中的全单口味
+	of.ot.allBillTaste && delete of.ot.allBillTaste;
 	//更新沽清
 	of.updataSelloutFoods();
 	//加载菜品数据
@@ -1124,12 +1126,6 @@ function operateOrderFoodTaste(c){
 				of.tasteGroups[i].items = of.allTastes;
 			}
 		}		
-/*		if(of.ot.allBillTaste){
-			foodTasteGroup = foodTasteGroup.concat(of.ot.allBillTaste);
-			tastesDate = foodTasteGroup;
-		}else{
-			tastesDate = of.allTastes;
-		}*/
 		if(of.ot.allBillTaste){
 			foodTasteGroup = foodTasteGroup.concat(of.ot.allBillTaste);
 			of.ot.tasteGroupClick = true;
@@ -1153,7 +1149,7 @@ function operateOrderFoodTaste(c){
 		setTimeout(function(){
 			$('#orderFoodTasteCmp').popup('open');
 			$('#orderFoodTasteCmp').parent().addClass("pop").addClass("in");
-		},250);		
+		},300);		
 	}
 	
 
