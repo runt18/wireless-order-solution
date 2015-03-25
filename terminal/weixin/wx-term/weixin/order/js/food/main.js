@@ -176,6 +176,18 @@ function operateFood(c){
 										break;
 									}
 								}
+								
+								//有外卖模块时
+								if(true){
+									var tol = $('#divFoodListForTO > div');
+									for(var j = 0; j < tol.length; j++){
+										if(parseInt(tol[j].getAttribute('data-value')) == temp.id){
+											$(tol[j]).remove();
+											break;
+										}
+									}
+								}
+								
 								params.orderData.splice(i, 1);
 								displayOrderFoodMsg();
 								
@@ -186,6 +198,8 @@ function operateFood(c){
 									operateShoppingCart({event:this, otype:'hide'});
 								}
 									
+								
+								
 							}
 						}
 					});
@@ -214,13 +228,19 @@ function operateFood(c){
 		});
 	}
 }
+//刷新菜品列表信息
 function displayOrderFoodMsg(c){
 	var sumPrice = 0, temp, has = false;
 	for(var i = 0; i < params.orderData.length; i++){
 		sumPrice += params.orderData[i].unitPrice * params.orderData[i].count;
 	}
+	//点菜
 	Util.getDom('spanSumCountForSC').innerHTML = params.orderData.length;
 	Util.getDom('spanSumPriceForSC').innerHTML = sumPrice.toFixed(2);
+	
+	//外卖
+	Util.getDom('spanSumCountForTO').innerHTML = params.orderData.length;
+	Util.getDom('spanSumPriceForTO').innerHTML = sumPrice.toFixed(2);	
 	
 	var display = Util.getDom('spanDisplayFoodCount');
 				
@@ -250,10 +270,27 @@ function displayOrderFoodMsg(c){
 	}
 }
 
+
+function orderOrTakeout(otype){
+	
+	if(otype){//外卖
+		operateShoppingCart({otype:'show', takeout:true});
+	}else{//店内
+		operateShoppingCart({otype:'confirm'});
+	}
+}
+
 function operateShoppingCart(c){
 	var scBox = $('#divShoppingCart'), scMainView = $('#divFoodListForSC');
 	var sumCountView = $('#spanSumCountForSC');
 	var sumPrice = 0, sumPriceView = $('#spanSumPriceForSC');
+	
+	//如果是外卖模块时
+	if(c.takeout){
+		scBox = $('#divTakeout'), scMainView = $('#divFoodListForTO');
+		sumCountView = $('#spanSumCountForTO');
+		sumPrice = 0, sumPriceView = $('#spanSumPriceForTO');
+	}
 	var html = [], temp;
 	
 	if(c.otype == 'show'){
@@ -262,10 +299,22 @@ function operateShoppingCart(c){
 			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.', btn : 'yes'});
 			return;
 		}
-		if(scBox.hasClass('left-nav-hide')){
-			scBox.removeClass('left-nav-hide');			
+		
+		if(c.takeout){
+			$('#divTakeout').show();
+			if(scBox.hasClass('right-nav-hide')){
+				scBox.removeClass('right-nav-hide');			
+			}
+			scBox.addClass('right-nav-show');	
+			operateShoppingCart({otype : 'hide'})
+		}else{
+			$('#divShoppingCart').show();
+			if(scBox.hasClass('left-nav-hide')){
+				scBox.removeClass('left-nav-hide');			
+			}
+			scBox.addClass('left-nav-show');			
 		}
-		scBox.addClass('left-nav-show');
+
 
 		for(var i = 0; i < params.orderData.length; i++){
 			temp = params.orderData[i];
@@ -282,28 +331,37 @@ function operateShoppingCart(c){
 		sumPriceView.html(sumPrice.toFixed(2));
 		
 		
-		//当菜品列表高过屏幕高度时, 固定列表div的高度
-		if((87 + params.orderData.length * 51) > htmlHeight){
-			scBox.height(htmlHeight);
-			scMainView.height(htmlHeight - 87);
-		}else{
-			scMainView.height('auto');
-			scBox.height(87 + params.orderData.length * 51);
-			
+		if(!c.takeout){
+			//当菜品列表高过屏幕高度时, 固定列表div的高度
+			if((generalHeight + params.orderData.length * foodHeight) > htmlHeight){
+				scBox.height(htmlHeight);
+				scMainView.height(htmlHeight - generalHeight);
+			}else{
+				scMainView.height('auto');
+				scBox.height(generalHeight + params.orderData.length * foodHeight);
+			}			
 		}
 		shopCartInit = true;
 	}else if(c.otype == 'hide'){
-		if(shopCartInit){
-			displayOrderFoodMsg();
-			if(scBox.hasClass('left-nav-show')){
-				scBox.removeClass('left-nav-show');
+		//是否外卖界面
+		if(c.takeout){
+			if(scBox.hasClass('right-nav-show')){
+				scBox.removeClass('right-nav-show');
 			}
-			scBox.addClass('left-nav-hide');
-			scMainView.html(html.join(''));		
+			scBox.addClass('right-nav-hide');
+			$('#divTakeout').hide();
+			showOtherAddress({otype: 'other', showHas:true});
+		}else{
+			if(shopCartInit){
+				if(scBox.hasClass('left-nav-show')){
+					scBox.removeClass('left-nav-show');
+				}
+				scBox.addClass('left-nav-hide');
+				$('#divShoppingCart').hide();
+				scMainView.html(html.join(''));		
+			}			
 		}
 	}else if(c.otype == 'confirm'){
-//		Util.dialog.show({ msg : '请叫服务员照单下单.' });return;
-		
 		if(params.orderData.length == 0){
 			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.', btn : 'yes'});
 			return;
@@ -331,8 +389,12 @@ function operateShoppingCart(c){
 				Util.lm.hide();
 				if(data.success){
 					params.orderData = [];
+					//刷新界面
+					displayOrderFoodMsg();
 					operateShoppingCart({otype:'hide'});
+					//清空列表
 					Util.getDom('divFoodListForSC').innerHTML = '';
+					Util.getDom('divFoodListForTO').innerHTML = '';
 					
 					Util.dialog.show({title : '请呼叫服务员确认订单', msg : '<font style="font-weight:bold;font-size:25px;">订单号: ' + data.other.order.code + '</font>', btn : 'yes' });
 				}else{
@@ -384,3 +446,147 @@ function foodShowAbout(c){
 	}
 }
 
+function selectAddress(thiz){
+	for (var i = 0; i < $('.takeout_address_added').length; i++) {
+		var address = $($('.takeout_address_added')[i]);
+		if(!address.hasClass('takeout_address_unselect')){
+			address.addClass('takeout_address_unselect');
+		}
+	}
+	//样式选中
+	$(thiz).removeClass('takeout_address_unselect');
+	//设置已有地址
+	to.defaultAddress = $(thiz).attr('data-value');
+}
+
+//加载外卖地址
+function loadCustomerAddress(){
+	$('#divAddressList').show();
+	var html=[];
+	for (var i = 0; i < to.customerContects.length; i++) {
+		var temp = to.customerContects[i];
+		html.push(Templet.contectBox.format({
+			id : temp.id,
+			name : temp.name,
+			phone : temp.phone,
+			address : temp.address,
+			hidden : (temp.isDefault == true?'':'takeout_address_hidden takeout_address_unselect')
+		}));		
+		if(temp.isDefault){
+			to.defaultAddress = temp.id;
+		}
+	}
+	
+	$('#divAddressList').html(html.join('') + '<div id="takeoutOtherId" align="right" class="takeout_other_address"><span onclick="showOtherAddress({event:this, otype:\'other\'})">→使用其他地址</span> </div>'
+											+ '<div id="takeoutNewId" align="right" class="takeout_other_address takeout_address_hidden"><span onclick="showOtherAddress({event:this, otype:\'new\'})">+填写并使用新的地址</span> </div>');
+}
+
+//地址操作
+function showOtherAddress(c){
+	if(c.otype == 'other'){
+		if(to.customerContects.length == 1 && !c.showHas){
+			showOtherAddress({otype : 'new'});
+			return ;
+		}
+		
+		to.useNewAddress = false;
+		//隐藏其他地址按钮
+		$('#takeoutOtherId').removeClass('takeout_other_address');
+		$('#takeoutOtherId').hide();
+		//显示所有的地址
+		$('.takeout_address_added').css('display', 'block');	
+		//显示添加按钮
+		$('#takeoutNewId').removeClass('takeout_address_hidden');
+		$('#takeoutNewId').addClass('takeout_other_address');
+	}else if(c.otype == 'new'){
+		to.useNewAddress = true;
+		//隐藏添加新地址
+		$(c.event).parent().removeClass('takeout_other_address');
+		$(c.event).hide();		
+		//显示填写地址
+		$('#divNewAddress4TO').show();
+		//隐藏已有地址
+		$('#divAddressList').hide();
+		//显示选回原有地址按钮
+		$('#takeoutOtherId').addClass('takeout_other_address');
+		$('#takeoutOtherId').show();		
+//		$('.takeout_address_added').addClass('takeout_address_unselect');
+	}
+}
+
+//外卖提交
+to.takeoutCommit = function(){
+	var name = $('#to_name').val();
+	var address = $('#to_address').val();
+	var phone = $('#to_phone').val();	
+	//支付方式, 默认货到付款
+	var payment  = 1;
+	
+	if(to.useNewAddress){
+		var reg = /^(139|138|137|136|135|134|147|150|151|152|157|158|159|182|183|187|188|130|131|132|155|156|185|186|145|133|153|180|181|189)\d{8}$/;
+		
+		if(!address || !phone){
+			Util.dialog.show({ msg : '请填写正确的地址和电话', btn:'yes' });
+			return;
+		}
+		  
+	    if(phone.length != 11 || reg.test(phone) == false){
+			Util.dialog.show({ msg : '请填写正确手机号码', btn:'yes' });
+			return;
+	    }
+	}
+	
+	Util.lm.show();
+	
+	var foods = "";
+	for(var i = 0; i < params.orderData.length; i++){
+		temp = params.orderData[i];
+		if(i > 0) foods += '&';
+		foods += (temp.id + ',' + temp.count);
+	}
+	$.ajax({
+		url : '../../WXOperateOrder.do',
+		dataType : 'json',
+		type : 'post',
+		data : {
+			dataSource : 'takeoutCommit',
+			oid : Util.mp.oid,
+			fid : Util.mp.fid,
+			foods : foods,
+			payment : payment ,
+			oldAddress : to.defaultAddress,
+			name : name,
+			phone : phone,
+			address : address
+		},
+		success : function(data, status, xhr){
+			Util.lm.hide();
+			if(data.success){
+				params.orderData = [];
+				//刷新界面
+				displayOrderFoodMsg();
+				operateShoppingCart({otype:'hide', takeout:true});
+				
+				//清空购物车
+				Util.getDom('divFoodListForSC').innerHTML = '';
+				Util.getDom('divFoodListForTO').innerHTML = '';
+				
+				Util.dialog.show({title : '温馨提示', msg : '下单成功, 可以在我的外卖中查看', btn : 'yes' });
+				$('#foodOrderList').prepend('<img id="imgNewOrderTip" src="images/WXnew.gif" style="float : right;"></img>');
+			}else{
+				Util.dialog.show({ msg : data.msg, btn : 'yes'});
+			}
+		},
+		error : function(xhr, errorType, error){
+			Util.lm.hide();
+			Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
+		}
+	});
+	
+}
+
+//查看订单
+function linkToOrders(){
+	//传入账单类型
+	Util.skip('orderList.html', Util.mp.extra);
+}

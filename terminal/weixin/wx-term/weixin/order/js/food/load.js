@@ -25,7 +25,17 @@ var Templet = {
 		+ '</div>',
 	deptBox : '<div data-value="{id}" onclick="filtersKitchen(this)">{name}</div>',
 	kitchenBox2 : '<div data-value="{id}" onclick="filtersFood(this)">{name}</div>',
-	kitchenBox : '<li><a data-value="{id}" onclick="filtersFood2(this)" class={star}>{name}</a></li>'
+	kitchenBox : '<li><a data-value="{id}" onclick="filtersFood2(this)" class={star}>{name}</a></li>',
+	contectBox : '<div data-value={id} class="takeout_address_added {hidden}" onclick="selectAddress(this)">'+ 
+					'<div class="added_left">'+
+						'<div style="float: left;width: 50%">收货人 : {name}</div>'+
+						'<div style="float: right;width: 50%">{phone}</div>'+
+						'<div >地址: {address}</div>'+
+					'</div>'+
+						'<div class="added_right">'+
+						'<i class="foundicon-checkmark"></i>'+
+				 	'</div>'+
+				 '</div>'
 };
 
 function changeImg(e){
@@ -195,5 +205,38 @@ $(function(){
 		operateShoppingCart({event:this, otype:'hide'})	
     });	
     
+    //网页可见高度
     htmlHeight = document.body.clientHeight;
+    
+    //固定外卖页面的高度
+    $('#divTakeoutDetailBox').height(htmlHeight - 45);
+    
+    //外卖模式则加载会员信息
+    if(isTakeout){
+    	$('#food_order').text("我的外卖");
+    	$.post('../../WXOperateMember.do', {dataSource:'getInfo', oid:Util.mp.oid, fid: Util.mp.fid}, function(result){
+    		to.member = result.other.member;
+	    	$('#to_name').val(to.member.name);
+	    	$('#to_phone').val(to.member.mobile); 		
+    	})
+    	
+    	$.post('../../WXQueryAddress.do', {oid:Util.mp.oid, fid: Util.mp.fid}, function(result){
+    		if(result.success){
+    			if(result.root.length > 0){
+    				to.customerContects = result.root; 
+    				for (var i = 0; i < to.customerContects.length; i++) {
+						if(i == 0){
+							to.customerContects[i].isDefault = true;
+						}else{
+							to.customerContects[i].isDefault = false;
+						}
+					}
+    				loadCustomerAddress();
+    			}else{
+    		    	$('#divNewAddress4TO').show();
+    			}
+    		}
+    	})
+    	
+    }
 });
