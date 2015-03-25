@@ -17,21 +17,25 @@ import com.wireless.pojo.member.Member;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
+
 public abstract class QueryMemberTask extends AsyncTask<Void, Void, List<Member>>{
 
 	private final Staff mStaff;
 	
+	private final ReqQueryMember.ExtraCond mExtraCond;
+	
 	private BusinessException mBusinessException;
 	
-	public QueryMemberTask(Staff staff){
+	public QueryMemberTask(Staff staff, ReqQueryMember.ExtraCond extraCond){
 		mStaff = staff;
+		mExtraCond = extraCond;
 	}
 	
 	@Override
 	protected List<Member> doInBackground(Void... args) {
-		List<Member> members = new ArrayList<Member>();
+		final List<Member> members = new ArrayList<Member>();
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMember(mStaff));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMember(mStaff, mExtraCond));
 			if(resp.header.type == Type.ACK){
 				members.addAll(new Parcel(resp.body).readParcelList(Member.CREATOR));
 			}else{
