@@ -124,7 +124,7 @@ public class OrderDetailContent extends ConcreteContent {
 				//generate the order food detail info and replace the $(var_1) with it
 				StringBuilder var1 = new StringBuilder();
 				if(mPrintType == PType.PRINT_CANCELLED_FOOD_DETAIL){
-					var1.append(new ExtraFormatDecorator("(退)" + mParent.getName() + "(" + NumericUtil.float2String2(mParent.getCount()) + ")", mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString()).append(SEP);
+					var1.append(new ExtraFormatDecorator("(退)" + mParent.getName() + "(" + NumericUtil.float2String2(Math.abs(mParent.getDelta())) + ")", mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString()).append(SEP);
 				}else{
 					var1.append(new ExtraFormatDecorator(new FoodDetailContent(FoodDetailContent.DISPLAY_CONFIG_4_DETAIL, mParent, mPrintType, mStyle), ExtraFormatDecorator.LARGE_FONT_VH_1X).toString()).append(SEP);
 				}
@@ -153,10 +153,10 @@ public class OrderDetailContent extends ConcreteContent {
 				var1.append(mSeperatorLine);
 				
 				if(mStyle == PStyle.PRINT_STYLE_76MM){
-					var1.append(new ExtraFormatDecorator("价钱：￥" + NumericUtil.float2String2(mParent.calcPriceBeforeDiscount()), mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+					var1.append(new ExtraFormatDecorator("价钱：￥" + NumericUtil.float2String2(mParent.calcDeltaPriceBeforeDiscount()), mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 				}else{
 					var1.append(new ExtraFormatDecorator(
-									new Grid2ItemsContent("餐台：" + tblName, "价钱：￥" + NumericUtil.float2String2(mParent.calcPriceBeforeDiscount()), mStyle),
+									new Grid2ItemsContent("餐台：" + tblName, "价钱：￥" + NumericUtil.float2String2(mParent.calcDeltaPriceBeforeDiscount()), mStyle),
 									ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 				}			
 				

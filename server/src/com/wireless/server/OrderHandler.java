@@ -42,6 +42,7 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.pack.req.ReqPrintContent;
+import com.wireless.pack.req.ReqQueryMember;
 import com.wireless.pack.resp.RespACK;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
@@ -245,7 +246,7 @@ class OrderHandler implements Runnable{
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_MEMBER){
 					//handle the request to query member
-					response = new RespPackage(request.header, MemberDao.getByCond(staff, null, null), Member.MEMBER_PARCELABLE_SIMPLE);
+					response = new RespPackage(request.header, MemberDao.getByCond(staff, new MemberDao.ExtraCond(new Parcel(request.body).readParcel(ReqQueryMember.ExtraCond.CREATOR)), null), Member.MEMBER_PARCELABLE_SIMPLE);
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_INTERESTED_MEMBER){
 					//handle the request to query interested member

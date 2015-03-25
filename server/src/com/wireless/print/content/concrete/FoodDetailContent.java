@@ -123,12 +123,6 @@ public class FoodDetailContent extends ConcreteContent {
 		
 		StringBuilder detail = new StringBuilder();
 
-		if(_displayConfig.contains(DisplayItem.WEIGHT) && _of.asFood().isWeigh()){
-			if(mPrintType == PType.PRINT_EXTRA_FOOD_DETAIL || mPrintType == PType.PRINT_ALL_EXTRA_FOOD){
-				detail.append("(≥∆+)");
-			}
-		}
-		
 		if(_displayConfig.contains(DisplayItem.HURRIED) && _of.isHurried()){
 			detail.append("(¥ﬂ)");
 		}
@@ -144,10 +138,19 @@ public class FoodDetailContent extends ConcreteContent {
 		if(_displayConfig.contains(DisplayItem.GIFT) && _of.isGift()){
 			detail.append("(‘˘)");
 		}
+		
+		if(_displayConfig.contains(DisplayItem.WEIGHT) && _of.asFood().isWeigh() && _of.getDelta() < 0 && _of.getCount() - Math.abs(_of.getDelta()) > 0){
+			detail.append("(≥∆÷ÿ»∑»œ)");
+		}
+		
 		detail.append(_of.getName());
 		
 		if(_displayConfig.contains(DisplayItem.AMOUNT)){
-			detail.append("(" + NumericUtil.float2String2(_of.getCount()) + ")");
+			if(_displayConfig.contains(DisplayItem.WEIGHT) && _of.asFood().isWeigh() && _of.getDelta() < 0 && _of.getCount() - Math.abs(_of.getDelta()) > 0){
+				detail.append("(" + NumericUtil.float2String2((_of.getCount() - Math.abs(_of.getDelta()))) + "->" + NumericUtil.float2String2(_of.getCount()) + ")");
+			}else{
+				detail.append("(" + NumericUtil.float2String2(Math.abs(_of.getDelta())) + ")");
+			}
 		}
 		
 		if(_displayConfig.contains(DisplayItem.TASTE) && _of.hasTasteGroup()){
@@ -180,9 +183,9 @@ public class FoodDetailContent extends ConcreteContent {
 		
 		String foodPrice;
 		if(_displayConfig.contains(DisplayItem.DISCOUNT)){
-			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_of.calcPrice());
+			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_of.calcDeltaPrice());
 		}else{
-			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_of.calcPriceBeforeDiscount());
+			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_of.calcDeltaPriceBeforeDiscount());
 		}
 		
 		if(_displayConfig.contains(DisplayItem.PRICE)){
