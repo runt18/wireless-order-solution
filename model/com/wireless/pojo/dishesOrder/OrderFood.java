@@ -334,11 +334,27 @@ public class OrderFood implements Parcelable, Jsonable {
 	 * }
 	 * @return the total price to this food before discount
 	 */
-	private float getPriceBeforeDiscount(){
+	private float getPriceBeforeDiscount(float count){
 		if(mFood.isWeigh()){
-			return NumericUtil.roundFloat(getUnitPrice() * getCount() + (hasTasteGroup() ? mTasteGroup.getPrice() : 0));			
+			return NumericUtil.roundFloat(getUnitPrice() * count + (hasTasteGroup() ? mTasteGroup.getPrice() : 0));			
 		}else{
-			return NumericUtil.roundFloat(getUnitPrice() * getCount());	
+			return NumericUtil.roundFloat(getUnitPrice() * count);	
+		}
+	}
+	
+	public float calcDeltaPriceBeforeDiscount(){
+		if(isGift){
+			return 0;
+		}else {
+			return getPriceBeforeDiscount(Math.abs(getDelta()));
+		}
+	}
+	
+	public float calcDeltaPrice(){
+		if(isGift){
+			return 0;
+		}else{
+			return NumericUtil.roundFloat(getPriceBeforeDiscount(Math.abs(getDelta())) * getDiscount());
 		}
 	}
 	
@@ -356,7 +372,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		if(isGift){
 			return 0;
 		}else {
-			return getPriceBeforeDiscount();
+			return getPriceBeforeDiscount(getCount());
 		}
 	}
 	
@@ -374,7 +390,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		if(isGift){
 			return 0;
 		}else{
-			return NumericUtil.roundFloat(getPriceBeforeDiscount() * getDiscount());
+			return NumericUtil.roundFloat(getPriceBeforeDiscount(getCount()) * getDiscount());
 		}
 	}
 	
@@ -391,7 +407,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	 */
 	public float calcDiscountPrice(){
 		if(getDiscount() != 1 && !isGift){
-			return NumericUtil.roundFloat(getPriceBeforeDiscount() * (1 - getDiscount()));
+			return NumericUtil.roundFloat(getPriceBeforeDiscount(getCount()) * (1 - getDiscount()));
 		}else{
 			return 0;
 		}
@@ -407,7 +423,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	 */
 	public float calcGiftPrice(){
 		if(isGift){
-			return getPriceBeforeDiscount();
+			return getPriceBeforeDiscount(getCount());
 		}else{
 			return 0;
 		}
@@ -609,7 +625,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	public String getName(){
-		return mFood.getName() + (mFoodUnit != null ? "(" + mFoodUnit.getUnit() + ")" : "");
+		return mFood.getName() + (mFoodUnit != null && mFoodUnit.getUnit().length() != 0 ? "(" + mFoodUnit.getUnit() + ")" : "");
 	}
 	
 	public float getFoodPrice(){
