@@ -147,7 +147,7 @@ public class UpdateOrder {
 		}
 		
 		//Calculate the difference between the original and new order.
-		DiffResult diffResult = diff(oriOrder, newOrder);
+		DiffResult diffResult = diff(oriOrder, newOrder, staff);
 		
 		//Check to see whether the staff has privilege to cancel the food
 		if(!diffResult.cancelledFoods.isEmpty() && !staff.getRole().hasPrivilege(Privilege.Code.CANCEL_FOOD)){
@@ -233,12 +233,13 @@ public class UpdateOrder {
 	 * @param oriOrder	the original order
 	 * @param newOrder	the new order
 	 * @return the difference result
+	 * @throws BusinessException 
 	 */
-	private static DiffResult diff(Order oriOrder, Order newOrder){
-		DiffResult result = new DiffResult(oriOrder, newOrder);
+	private static DiffResult diff(Order oriOrder, Order newOrder, Staff staff) throws BusinessException{
+		final DiffResult result = new DiffResult(oriOrder, newOrder);
 
-		List<OrderFood> oriFoods = new ArrayList<OrderFood>(oriOrder.getOrderFoods());
-		List<OrderFood> newFoods = new ArrayList<OrderFood>(newOrder.getOrderFoods());
+		final List<OrderFood> oriFoods = new ArrayList<OrderFood>(oriOrder.getOrderFoods());
+		final List<OrderFood> newFoods = new ArrayList<OrderFood>(newOrder.getOrderFoods());
 		
 		/**
 		 * Compare the order foods of new order with the ones of original order,
@@ -268,11 +269,15 @@ public class UpdateOrder {
 				if(newFood.equals(oriFood)){
 					float diff = newFood.getCount() - oriFood.getCount();
 					if(diff > 0){
-						oriFood.setCount(NumericUtil.roundFloat(Math.abs(diff)));
+						oriFood.setCount(oriFood.getCount());
+						oriFood.addCount(NumericUtil.roundFloat(diff));
+						//oriFood.setCount(NumericUtil.roundFloat(Math.abs(diff)));
 						result.extraFoods.add(oriFood);
 						
 					}else if(diff < 0){
-						oriFood.setCount(NumericUtil.roundFloat(Math.abs(diff)));
+						oriFood.setCount(oriFood.getCount());
+						oriFood.removeCount(NumericUtil.roundFloat(Math.abs(diff)), staff);
+						//oriFood.setCount(NumericUtil.roundFloat(Math.abs(diff)));
 						oriFood.setCancelReason(newFood.getCancelReason());
 						result.cancelledFoods.add(oriFood);
 					}
@@ -286,10 +291,16 @@ public class UpdateOrder {
 		}
 		
 		for(OrderFood newExtraFood : newFoods){
+			float count = newExtraFood.getCount();
+			newExtraFood.setCount(0);
+			newExtraFood.addCount(count);
 			result.extraFoods.add(newExtraFood);
 		}
-		//result.extraFoods.addAll(newFoods);		
-		result.cancelledFoods.addAll(oriFoods);
+		
+		for(OrderFood cancelFood : oriFoods){
+			cancelFood.removeCount(cancelFood.getCount(), staff);
+			result.cancelledFoods.add(cancelFood);
+		}
 		
 		return result;
 	}

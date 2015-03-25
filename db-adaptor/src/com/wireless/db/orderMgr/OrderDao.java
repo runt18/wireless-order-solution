@@ -835,7 +835,7 @@ public class OrderDao {
 	 */
 	public static void discount(DBCon dbCon, Staff staff, Order.DiscountBuilder builder) throws SQLException, BusinessException{
 
-		final List<Discount> discounts;
+		final Discount discount;
 		final List<PricePlan> prices;
 		if(builder.getMemberId() != 0){
 			Member m = MemberDao.getById(dbCon, staff, builder.getMemberId());
@@ -844,18 +844,28 @@ public class OrderDao {
 			}else{
 				prices = null;
 			}
-			discounts = DiscountDao.getByCond(dbCon, staff, new DiscountDao.ExtraCond().setMemberType(m.getMemberType()).setDiscountId(builder.getDiscountId()), DiscountDao.ShowType.BY_PLAN);
+			if(builder.hasDiscountId()){
+				List<Discount> discounts = DiscountDao.getByCond(dbCon, staff, new DiscountDao.ExtraCond().setMemberType(m.getMemberType()).setDiscountId(builder.getDiscountId()), DiscountDao.ShowType.BY_PLAN);
+				if(discounts.isEmpty()){
+					throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
+				}else{
+					discount = discounts.get(0);
+				}
+			}else{
+				discount = m.getMemberType().getDefaultDiscount();
+			}
 		}else{
-			discounts = DiscountDao.getByCond(dbCon, staff, new DiscountDao.ExtraCond().setRole(staff.getRole()).setDiscountId(builder.getDiscountId()), DiscountDao.ShowType.BY_PLAN);
+			List<Discount> discounts = DiscountDao.getByCond(dbCon, staff, new DiscountDao.ExtraCond().setRole(staff.getRole()).setDiscountId(builder.getDiscountId()), DiscountDao.ShowType.BY_PLAN);
+			if(discounts.isEmpty()){
+				throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
+			}else{
+				discount = discounts.get(0);
+			}
 			prices = null;
 		}
 		
-		if(discounts.isEmpty()){
-			throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
-		}
-		
 		final Order order = OrderDao.getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
-		order.setDiscount(discounts.get(0));
+		order.setDiscount(discount);
 		
 		if(prices != null){
 			if(prices.isEmpty()){

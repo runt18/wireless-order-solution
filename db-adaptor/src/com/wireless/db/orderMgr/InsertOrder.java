@@ -137,7 +137,10 @@ public class InsertOrder {
 			
 			for(OrderFood of : orderToInsert.getOrderFoods()){
 				//Skip the food whose order count is less than zero.
-				if(of.getCount() > 0){				
+				if(of.getCount() > 0){		
+					float count = of.getCount();
+					of.setCount(0);
+					of.addCount(count);
 					//Check to see whether the staff has the privilege to present the food.
 					if(of.isGift() && !staff.getRole().hasPrivilege(Privilege.Code.GIFT)){
 						throw new BusinessException(StaffError.GIFT_NOT_ALLOW);

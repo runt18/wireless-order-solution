@@ -523,7 +523,7 @@ public class OrderFoodDao {
 			  builder.orderId + ", " +
 			  builder.extra.getOperation().getVal() + "," +
 			  builder.extra.getFoodId() + ", " +
-			  builder.extra.getCount() + ", " + 
+			  Math.abs(builder.extra.getDelta()) + ", " + 
 			  builder.extra.asFood().getPrice() + ", " + 
 			  builder.extra.asFood().getCommission() + ", " +
 			  "'" + builder.extra.asFood().getName() + "', " + 
@@ -611,7 +611,7 @@ public class OrderFoodDao {
 			  builder.orderId + ", " +
 			  builder.cancel.getOperation().getVal() + "," +
 			  builder.cancel.getFoodId() + ", " +
-			  "-" + builder.cancel.getCount() + ", " + 
+			  "-" + Math.abs(builder.cancel.getDelta()) + ", " + 
 			  builder.cancel.asFood().getPrice() + ", " + 
 			  builder.cancel.asFood().getCommission() + "," +
 			  "'" + builder.cancel.asFood().getName() + "', " + 
