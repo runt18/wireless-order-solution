@@ -187,7 +187,7 @@ uo.showNorthForUpdateOrder = function(){
  */
 uo.showDescForUpdateOrder = function(){
 	var html = "";
-	html = (uo.orderMember?"<span style = 'margin-left: 20px;'>当前会员：<font color='green'>" + uo.orderMember.foodName +"</font></span>" : "") +
+	html = (uo.orderMember?"<span style = 'margin-left: 20px;'>当前会员：<font color='green'>" + uo.orderMember.name +"</font></span>" : "") +
 		(uo.order.discount?"<span style = 'margin-left: 20px;'>当前折扣：<font color='green'>" + uo.order.discount.name +"</font></span>" : "") +
 		(uo.order.discounter ? "<span style = 'margin-left: 20px;'>折扣人：<font color='green'>" + uo.order.discounter + "</font></span><span style = 'margin-left: 20px;'>折扣时间：<font color='green'>" + uo.order.discountDate + "</font></span>" : "") ;
 	$("#divDescForUpdateOrder").html(html);
