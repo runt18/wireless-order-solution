@@ -116,29 +116,8 @@ public class WXOperateMemberAction extends DispatchAction {
 			});
 			
 		}catch(BusinessException e){
-/*				final int weixinCard = WeixinMemberDao.getCardByWeixin(dbCon, openId, formId);
-				
-				final List<MemberType> list = MemberTypeDao.getByCond(StaffDao.getAdminByRestaurant(rid), new MemberTypeDao.ExtraCond().setType(MemberType.Type.WEIXIN), " ORDER BY MT.member_type_id ");
-				jobject.setExtra(new Jsonable(){
-
-					@Override
-					public JsonMap toJsonMap(int flag) {
-						JsonMap jm = new JsonMap();
-						jm.putJsonableList("memberType", list, 0);
-						jm.putInt("status", WeixinMember.Status.INTERESTED.getVal());
-						jm.putInt("weixinCard", weixinCard);
-						return jm;
-					}
-
-					@Override
-					public void fromJsonMap(JsonMap jsonMap, int flag) {
-						
-					}
-					
-				});		*/		
-				e.printStackTrace();
-				jobject.initTip(e);
-			
+			e.printStackTrace();
+			jobject.initTip(e);
 		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);

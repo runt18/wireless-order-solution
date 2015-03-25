@@ -153,7 +153,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		
 		Data4Item item4Order = new Data4Item();
 		item4Order.setTitle("自助点餐");
-		item4Order.setUrl(createUrl(msg, WEIXIN_FOOD));
+		item4Order.setUrl(createUrl(msg, WEIXIN_FOOD)+ "&e=" + WxOrder.Type.INSIDE.getVal());
 		item4Order.setPicUrl(WEIXIN_FOOD_ICON);
 		naviItem.addItem(item4Order);
 		
@@ -171,6 +171,12 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 			dianpingItem.setPicUrl(WEIXIN_DIANPING_ICON);
 			naviItem.addItem(dianpingItem);			
 		}
+		
+		Data4Item item4TakeOut = new Data4Item();
+		item4TakeOut.setTitle("外卖点餐");
+		item4TakeOut.setUrl(createUrl(msg, WEIXIN_FOOD) + "&e=" + WxOrder.Type.TAKE_OUT.getVal());
+		item4TakeOut.setPicUrl(WEIXIN_FOOD_ICON);
+		naviItem.addItem(item4TakeOut);		
 
 
 		Data4Item intrcItem = new Data4Item();

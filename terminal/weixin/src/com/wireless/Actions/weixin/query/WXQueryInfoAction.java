@@ -10,14 +10,12 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.system.BillBoardDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.pojo.system.BillBoard;
 
 public class WXQueryInfoAction extends DispatchAction{
 	
@@ -30,22 +28,22 @@ public class WXQueryInfoAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward normal(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
-		try{
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
-			String extra = " AND BB.restaurant_id = " + rid + " AND BB.type = " + BillBoard.Type.WX_INFO.getVal() + " ORDER BY created DESC LIMIT 0,1 ";
-			jobject.setRoot(BillBoardDao.get(extra));
-		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}finally{
-			response.getWriter().print(jobject.toString());
-		}
-		return null;
-	}
+//	public ActionForward normal(ActionMapping mapping, ActionForm form,
+//			HttpServletRequest request, HttpServletResponse response)
+//			throws Exception {
+//		JObject jobject = new JObject();
+//		try{
+//			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
+//			String extra = " AND BB.restaurant_id = " + rid + " AND BB.type = " + BillBoard.Type.WX_INFO.getVal() + " ORDER BY created DESC LIMIT 0,1 ";
+//			jobject.setRoot(BillBoardDao.get(extra));
+//		}catch(Exception e){
+//			e.printStackTrace();
+//			jobject.initTip(e);
+//		}finally{
+//			response.getWriter().print(jobject.toString());
+//		}
+//		return null;
+//	}
 	
 	/**
 	 * 

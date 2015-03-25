@@ -8,6 +8,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.member.MemberDao;
+import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.order.WxOrderDao;
@@ -17,6 +19,8 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.TakeoutAddress;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.order.WxOrder;
 
@@ -84,5 +88,57 @@ public class WXOperateOrderAction extends DispatchAction {
 		}
 		return null;
 	}
-	
+
+	public ActionForward takeoutCommit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jobject = new JObject();
+		try{
+			String oid = request.getParameter("oid");
+			String fid = request.getParameter("fid");
+			String foods = request.getParameter("foods");
+//			String payment = request.getParameter("payment");
+			String name = request.getParameter("name");
+			String phone = request.getParameter("phone");
+			String address = request.getParameter("address");
+			String oldAddress = request.getParameter("oldAddress");
+			
+			int addressId;
+			
+			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(fid);
+			
+			Staff mStaff = StaffDao.getAdminByRestaurant(rid);
+			
+			final Member member = MemberDao.getByWxSerial(mStaff, oid);
+			
+			if(!phone.isEmpty() && !address.isEmpty()){
+				TakeoutAddress.InsertBuilder builder = new TakeoutAddress.InsertBuilder(member, address, phone, name);
+				addressId = TakeoutAddressDao.insert(mStaff, builder);
+			}else{
+				addressId = Integer.parseInt(oldAddress);
+			}
+			
+			WxOrder.InsertBuilder4Takeout insertBuilder = new WxOrder.InsertBuilder4Takeout(oid, TakeoutAddressDao.getById(mStaff, addressId));
+			
+			for (String of : foods.split("&")) {
+				String orderFoods[] = of.split(",");
+				OrderFood orderFood = new OrderFood(FoodDao.getById(mStaff, Integer.parseInt(orderFoods[0])));
+				orderFood.setCount(Float.parseFloat(orderFoods[1]));
+				
+				insertBuilder.add(orderFood);
+			}
+			
+			
+			WxOrderDao.insert(mStaff, insertBuilder);
+			
+			jobject.initTip(true, "下单成功, 可以在我的外卖中查看");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 }

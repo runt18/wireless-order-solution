@@ -142,8 +142,8 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			MemberOperationDao.ExtraCond extraCond4Today = new MemberOperationDao.ExtraCond(DateType.TODAY);
 			MemberOperationDao.ExtraCond extraCond4History = new MemberOperationDao.ExtraCond(DateType.HISTORY);
 			
-			extraCond4Today.setMember(mid);
-			extraCond4History.setMember(mid);
+			extraCond4Today.addMember(mid);
+			extraCond4History.addMember(mid);
 			// 查询条件(核心)
 			if(type == 1){
 				// 获取今日消费记录 
@@ -208,8 +208,8 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			MemberOperationDao.ExtraCond extraCond4Today = new MemberOperationDao.ExtraCond(DateType.TODAY);
 			MemberOperationDao.ExtraCond extraCond4History = new MemberOperationDao.ExtraCond(DateType.HISTORY);
 			
-			extraCond4Today.setMember(mid);
-			extraCond4History.setMember(mid);
+			extraCond4Today.addMember(mid);
+			extraCond4History.addMember(mid);
 			
 			extraCond4Today.addOperationType(MemberOperation.OperationType.CHARGE);
 			extraCond4History.addOperationType(MemberOperation.OperationType.CHARGE);

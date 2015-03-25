@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
@@ -25,6 +26,7 @@ public class WxQueryOrderAction extends DispatchAction {
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String oid = request.getParameter("oid");
 		String fid = request.getParameter("fid");
+		String orderType = request.getParameter("type");
 		DBCon dbCon = null;
 		JObject jobject = new JObject();
 		
@@ -35,12 +37,13 @@ public class WxQueryOrderAction extends DispatchAction {
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
-			List<WxOrder> orders = WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setWeixin(oid), " ORDER BY birth_date DESC");
+			List<WxOrder> orders = WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setWeixin(oid).setType(WxOrder.Type.valueOf(Integer.parseInt(orderType))), " ORDER BY birth_date DESC");
 			
 			for (WxOrder wxOrder : orders) {
 				if(wxOrder.getStatus() == WxOrder.Status.COMMITTED || wxOrder.getStatus() == WxOrder.Status.ORDER_ATTACHED){
 					wxOrder.addFoods(WxOrderDao.getById(dbCon, staff, wxOrder.getId()).getFoods());
 				}
+				wxOrder.setTakoutAddress(TakeoutAddressDao.getById(staff, wxOrder.getTakeoutAddress().getId()));
 			}
 			
 			jobject.setRoot(orders);
