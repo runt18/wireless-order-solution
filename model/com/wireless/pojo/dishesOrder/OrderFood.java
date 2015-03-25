@@ -964,6 +964,10 @@ public class OrderFood implements Parcelable, Jsonable {
 				setGift(jsonMap.getBoolean(Key4Json.IS_GIFT.key));
 			}
 			
+			if(jsonMap.containsKey(Key4Json.IS_HURRIED.key)){
+				setHurried(jsonMap.getBoolean(Key4Json.IS_HURRIED.key));
+			}
+			
 			if(jsonMap.containsKey(Key4Json.TASTE_GROUP.key)){
 				setTasteGroup(jsonMap.getJsonable(Key4Json.TASTE_GROUP.key, TasteGroup.JSON_CREATOR, TasteGroup.TG_JSONABLE_4_COMMIT));
 			}

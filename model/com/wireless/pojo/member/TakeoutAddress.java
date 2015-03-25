@@ -1,6 +1,9 @@
 package com.wireless.pojo.member;
 
-public class TakeoutAddress {
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
+
+public class TakeoutAddress implements Jsonable{
 
 	public static class InsertBuilder{
 		private final int memberId;
@@ -101,6 +104,22 @@ public class TakeoutAddress {
 	
 	public void setLastUsed(long lastUsed) {
 		this.lastUsed = lastUsed;
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("memberId", this.memberId);
+		jm.putString("address", this.getAddress());
+		jm.putString("tele", this.tele);
+		jm.putString("name", this.name);
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 	
 }
