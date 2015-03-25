@@ -375,7 +375,7 @@ public class MemberListActivity extends FragmentActivity {
 		}
 		
 		QueryMemberTask(){
-			super(WirelessOrder.loginStaff);
+			super(WirelessOrder.loginStaff, null);
 		}
 		
 		@Override

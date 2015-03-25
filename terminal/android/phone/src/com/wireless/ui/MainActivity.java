@@ -136,7 +136,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 
 		String[] iconDesc = { 
 							 "点菜", "快速点菜", "查看", 
-							 "结账", "快速沽清", "设置", 
+							 "帐单", "快速沽清", "设置", 
 							 "菜谱更新", "注销", "微信点菜" 
 							};
 
@@ -204,7 +204,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 					break;
 					
 				case 3:
-					//结帐
+					//帐单
 					//showDialog(DIALOG_BILL_ORDER);
 					mDialogType = DIALOG_BILL_ORDER;
 					AskTableDialog.newInstance().show(getSupportFragmentManager(), AskTableDialog.TAG);

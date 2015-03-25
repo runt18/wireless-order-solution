@@ -2,17 +2,23 @@ package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,12 +29,14 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
-import com.wireless.lib.task.DiscountOrderTask;
+import com.wireless.lib.task.QueryMemberTask;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqQueryMember;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.view.BillFoodListView;
@@ -67,7 +75,8 @@ public class BillActivity extends Activity {
 				((TextView) theActivity.findViewById(R.id.txtView_tableName_bill)).setText(theActivity.mOrderToPay.getDestTbl().getName());
 			}else{
 				((TextView) theActivity.findViewById(R.id.txtView_tableName_bill)).setText(String.valueOf(theActivity.mOrderToPay.getDestTbl().getAliasId()) + "号台");
-			}			//set the amount of customer
+			}			
+			//set the amount of customer
 			((TextView)theActivity.findViewById(R.id.txtView_peopleValue_bill)).setText(String.valueOf(theActivity.mOrderToPay.getCustomNum()));
 		}
 	};
@@ -88,7 +97,7 @@ public class BillActivity extends Activity {
 		 */
 		TextView title = (TextView) findViewById(R.id.toptitle);
 		title.setVisibility(View.VISIBLE);
-		title.setText("结账");
+		title.setText("帐单");
 
 		TextView left = (TextView) findViewById(R.id.textView_left);
 		left.setText("返回");
@@ -130,6 +139,52 @@ public class BillActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				showDiscountDialog();
+			}
+		});
+
+		/**
+		 * "会员"Button
+		 */
+		((ImageView) findViewById(R.id.btn_member_Bill)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				final EditText memberEdtTxt = new EditText(BillActivity.this);
+				memberEdtTxt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+				//FIXME memberEdtTxt.setHint(resid);
+				Dialog currentPriceDialog = new AlertDialog.Builder(BillActivity.this).setTitle("请输入会员信息")
+					.setView(memberEdtTxt)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							new QueryMemberTask(WirelessOrder.loginStaff, new ReqQueryMember.ExtraCond().setFuzzyName(memberEdtTxt.getText().toString())) {
+								
+								@Override
+								public void onSuccess(List<Member> result) {
+									// TODO Auto-generated method stub
+									if(result.isEmpty()){
+										Toast.makeText(BillActivity.this, "对不起，没有查询到相应的会员信息", Toast.LENGTH_SHORT).show();
+									}else{
+										new DiscountOrderTask(Order.DiscountBuilder.build4Member(mOrderToPay.getId(), result.get(0))).execute();
+									}
+								}
+								
+								@Override
+								public void onFail(BusinessException e) {
+									new AlertDialog.Builder(BillActivity.this).setTitle("提示").setMessage(e.getMessage()).setPositiveButton("确定", null).show();
+								}
+							}.execute();
+						}
+					})
+					.setNegativeButton("取消", null)
+					.create();
+				//弹出软键盘
+				currentPriceDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+					@Override
+					public void onShow(DialogInterface arg0) {
+                        ((InputMethodManager) BillActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(memberEdtTxt, InputMethodManager.SHOW_IMPLICIT);
+					}
+				});
+				currentPriceDialog.show();
 			}
 		});
 
@@ -209,32 +264,7 @@ public class BillActivity extends Activity {
 				.setPositiveButton("打折", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog,	int which) {
-						new DiscountOrderTask(WirelessOrder.loginStaff, Order.DiscountBuilder.build4Normal(mOrderToPay.getId(), mOrderToPay.getDiscount().getId())) {
-							
-							private ProgressDialog mProgDialog;
-
-							@Override
-							protected void onPreExecute() {
-								mProgDialog = ProgressDialog.show(BillActivity.this, "", "提交折扣信息...请稍候", true);
-							}
-							
-							@Override
-							protected void onSuccess() {
-								mProgDialog.dismiss();
-								Toast.makeText(BillActivity.this, "打折成功", Toast.LENGTH_SHORT).show();
-								new QueryOrderTask(new Table.Builder(mOrderToPay.getDestTbl().getId())).execute();
-							}
-							
-							@Override
-							protected void onFail(BusinessException e) {
-								mProgDialog.dismiss();
-								new AlertDialog.Builder(BillActivity.this)
-												.setTitle("提示")
-												.setMessage(e.getMessage())
-												.setPositiveButton("确定", null)
-												.show();
-							}
-						}.execute();
+						new DiscountOrderTask(Order.DiscountBuilder.build4Normal(mOrderToPay.getId(), mOrderToPay.getDiscount().getId())).execute();
 					}
 				})
 				.setNegativeButton("取消", null)
@@ -278,25 +308,6 @@ public class BillActivity extends Activity {
 			}
 		});
 
-//		//根据discount数量添加Radio Button
-//		RadioGroup discountsGroup = (RadioGroup) view.findViewById(R.id.radioGroup_discount_payBill);
-//		
-//		// 折扣方式方式添加事件监听器
-//		discountsGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-//			@Override
-//			public void onCheckedChanged(RadioGroup group, int checkedId) {
-//				Discount distToUse = (Discount)group.findViewById(checkedId).getTag();
-//				mOrderToPay.setDiscount(distToUse);
-//			}
-//		});
-//		
-//		for(Discount discount : WirelessOrder.loginStaff.getRole().getDiscounts()){
-//			RadioButton radioBtn = new RadioButton(BillActivity.this);
-//			radioBtn.setTag(discount);
-//			radioBtn.setText(discount.getName());
-//			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-//		}
-
 		new AlertDialog.Builder(this).setTitle("结帐")
 			.setView(view)
 			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -309,6 +320,32 @@ public class BillActivity extends Activity {
 			.setNegativeButton("取消", null)
 			.show();
 
+	}
+	
+	private class DiscountOrderTask extends com.wireless.lib.task.DiscountOrderTask{
+		DiscountOrderTask(Order.DiscountBuilder discountBuilder) {
+			super(WirelessOrder.loginStaff, discountBuilder);
+		}
+			
+		private ProgressDialog mProgDialog;
+
+		@Override
+		protected void onPreExecute() {
+			mProgDialog = ProgressDialog.show(BillActivity.this, "", "提交折扣信息...请稍候", true);
+		}
+		
+		@Override
+		protected void onSuccess() {
+			mProgDialog.dismiss();
+			Toast.makeText(BillActivity.this, "打折成功", Toast.LENGTH_SHORT).show();
+			new QueryOrderTask(new Table.Builder(mOrderToPay.getDestTbl().getId())).execute();
+		}
+		
+		@Override
+		protected void onFail(BusinessException e) {
+			mProgDialog.dismiss();
+			new AlertDialog.Builder(BillActivity.this).setTitle("提示").setMessage(e.getMessage()).setPositiveButton("确定", null).show();
+		}
 	}
 	
 	/**
