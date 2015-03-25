@@ -67,7 +67,15 @@
 		<action path="/WXQueryDianping"
 			type="com.wireless.Actions.weixin.query.WXQueryDianpingDataAction"
 			scope="request" parameter="dataSource">
-		</action>										
+		</action>			
+		<action path="/WXQueryAddress"
+			type="com.wireless.Actions.weixin.query.WXQueryTakeoutAddressAction"
+			scope="request" >
+		</action>		
+		<action path="/testMacAddr"
+			type="test.getMacAddrAction"
+			scope="request" >
+		</action>											
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 
