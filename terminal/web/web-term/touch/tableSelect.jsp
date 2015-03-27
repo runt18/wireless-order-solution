@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
 <% 
-	float v = 1.1f; 
+	float v = 1.2f; 
 	response.setHeader("Pragma","No-cache"); 
 	response.setHeader("Cache-Control","no-cache"); 
 	response.setDateHeader("Expires", 0);  
@@ -565,7 +565,7 @@
 			 <!-- <th >总价</th> -->
 			 <th style="width: 80px;">时间</th>
 			 <th style="width: 230px;">操作</th>
-			 <th >服务员</th>             
+			 <th style="width: 70px;">服务员</th>             
            </tr>
          </thead>
          <!-- 菜品列表 -->
@@ -920,9 +920,9 @@
 					 <a href="#" data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.setFood()">数量=</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.deleteFood()">删除</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="operateOrderFoodTaste({type:2})">口味</a>
-					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.updateUnitPrice()">单位</a>
+					 <!-- <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.updateUnitPrice()">单位</a> -->
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="addTempTaste()">手写口味</a>
-					 <!-- <a id="giftFoodOperate" data-role="button" data-inline="true" class="orderOperBtn" style="display: none;" data-theme="b" onclick="of.giftFood()">赠送</a> -->	
+					 <a id="giftFoodOperate" data-role="button" data-inline="true" class="orderOperBtn" style="display: none;" data-theme="b" onclick="of.giftFood()">赠送</a>	
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.foodHangup({type:2})">叫起</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" data-rel="popup"  data-transition="pop" href="#orderFoodOtherOperateCmp">更多</a>
 					 <!--<a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="operateOrderFoodTaste({type:1})">全单口味</a>
@@ -934,7 +934,7 @@
 		     <!-- 点菜更多操作 -->
 			<div data-role="popup" id="orderFoodOtherOperateCmp" data-theme="d">
 		        <ul data-role="listview" data-inset="true" style="min-width:130px;" data-theme="b">
-		        	<li class="tempFoodKitchen none" id="giftFoodOperate"  onclick="of.giftFood()"><a>赠送</a></li>	
+		        	<li class="tempFoodKitchen" onclick="of.updateUnitPrice()"><a>修改单位</a></li>	
 		        	<li class="tempFoodKitchen" onclick="of.updateFoodUnitPrice()"><a>修改时价</a></li>
 		            <li class="tempFoodKitchen" onclick="operateOrderFoodTaste({type:1})"><a >全单口味</a></li>
 		            <li class="tempFoodKitchen" onclick="of.foodHangup({type : 1})"><a >全单叫起</a></li>

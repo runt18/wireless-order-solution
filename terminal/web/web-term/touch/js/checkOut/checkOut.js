@@ -425,7 +425,7 @@ uo.openOrderFoodOtherOperate = function(c){
 			giftPrivileges = true;
 		}
 	}
-	if((uo.selectedFood.status & 1 << 3) != 0 && giftPrivileges){
+	if((uo.selectedFood.status & 1 << 3) != 0 && giftPrivileges && !uo.selectedFood.isGift){
 		$('#btnGiftFood').show();
 	}else{
 		$('#btnGiftFood').hide();
@@ -447,16 +447,11 @@ uo.openOrderFoodOtherOperate = function(c){
  * 催菜
  */
 uo.hurriedFoodAction = function(){
-	var uoFood = uo.order.orderFoods;
-	for(var x = 0; x < uoFood.length; x++){
-		if(uoFood[x].id === uo.selectedFood.id){
-			uoFood[x].isHurried = true;
-		}
-	}	
+	uo.selectedFood.isHurried = true;
 	$('#orderFoodMoreOperateCmp').popup('close');
 	uo.hurriedFood = true;
 	setTimeout(function(){
-		uo.submitUpdateOrderHandler({orderFoods:uoFood});
+		uo.submitUpdateOrderHandler({orderFoods:uo.order.orderFoods});
 	}, 250);	
 	
 	
