@@ -31,6 +31,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.print.content.Content;
 import com.wireless.print.content.ContentCombinator;
+import com.wireless.print.content.concrete.FoodDetailContent;
 import com.wireless.print.content.concrete.MemberReceiptContent;
 import com.wireless.print.content.concrete.OrderDetailContent;
 import com.wireless.print.content.concrete.ReceiptContent;
@@ -82,11 +83,11 @@ public class JobContentFactory {
 		return mInstance;
 	}
 	
-	public Content createSummaryContent(PType printType, Staff staff, List<Printer> printers, int orderId) throws SQLException, BusinessException{
-		return createSummaryContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY));
+	public Content createSummaryContent(PType printType, Staff staff, List<Printer> printers, int orderId, FoodDetailContent.DetailType detailType) throws SQLException, BusinessException{
+		return createSummaryContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY), detailType);
 	}
 	
-	public Content createSummaryContent(PType printType, Staff staff, List<Printer> printers, Order order) throws SQLException{
+	public Content createSummaryContent(PType printType, Staff staff, List<Printer> printers, Order order, FoodDetailContent.DetailType detailType) throws SQLException{
 		if(order.hasOrderFood() && !printers.isEmpty()){
 			
 			final List<JobContent> jobContents = new ArrayList<JobContent>();
@@ -100,7 +101,7 @@ public class JobContentFactory {
 										   				   new SummaryContent(order,
 										   						   			  staff.getName(),
 										   						   			  printType, 
-										   						   			  printer.getStyle())));
+										   						   			  printer.getStyle(), detailType)));
 						}else{
 							//Generate the summary to specific departments.
 							List<OrderFood> ofToDept = new ArrayList<OrderFood>();
@@ -119,7 +120,7 @@ public class JobContentFactory {
 							   						   			  orderToDept,
 							   						   			  staff.getName(),
 							   						   			  printType, 
-							   						   			  printer.getStyle())));
+							   						   			  printer.getStyle(), detailType)));
 							}
 						}
 						
@@ -134,7 +135,7 @@ public class JobContentFactory {
 		}
 	}
 	
-	public Content createDetailContent(PType printType, Staff staff, List<Printer> printers, Order order) throws BusinessException, SQLException{
+	public Content createDetailContent(PType printType, Staff staff, List<Printer> printers, Order order, FoodDetailContent.DetailType detailType) throws BusinessException, SQLException{
 		final List<JobContent> jobContents = new ArrayList<JobContent>();
 		
 		if(order.hasOrderFood() && !printers.isEmpty()){
@@ -153,7 +154,7 @@ public class JobContentFactory {
 																			   				  order, 
 																			   				  staff.getName(), 
 																			   				  printType, 
-																			   				  printer.getStyle())));
+																			   				  printer.getStyle(), detailType)));
 									}else{
 										for(Kitchen kitchen : func.getKitchens()){
 											if(kitchen.equals(childFood.asFood().getKitchen())){
@@ -164,7 +165,7 @@ public class JobContentFactory {
 																					   				  order, 
 																					   				  staff.getName(), 
 																					   				  printType, 
-																					   				  printer.getStyle())));
+																					   				  printer.getStyle(), detailType)));
 												break;
 											}
 										}
@@ -178,7 +179,7 @@ public class JobContentFactory {
 																		   				  order, 
 																		   				  staff.getName(), 
 																		   				  printType, 
-																		   				  printer.getStyle())));
+																		   				  printer.getStyle(), detailType)));
 								}else{
 									for(Kitchen kitchen : func.getKitchens()){
 										if(of.getKitchen().equals(kitchen)){
@@ -188,7 +189,7 @@ public class JobContentFactory {
 																				   				  order, 
 																				   				  staff.getName(), 
 																				   				  printType, 
-																				   				  printer.getStyle())));
+																				   				  printer.getStyle(), detailType)));
 											break;
 										}
 									}
@@ -207,8 +208,8 @@ public class JobContentFactory {
 		}
 	}
 	
-	public Content createDetailContent(PType printType, Staff staff, List<Printer> printers, int orderId) throws BusinessException, SQLException{
-		return createDetailContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY));
+	public Content createDetailContent(PType printType, Staff staff, List<Printer> printers, int orderId, FoodDetailContent.DetailType detailType) throws BusinessException, SQLException{
+		return createDetailContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY), detailType);
 	}
 
 	/**

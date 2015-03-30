@@ -11,11 +11,13 @@ public class FoodListWithSepContent extends ConcreteContent {
 	
 	private final DisplayConfig mDisplayConfig;
 	private final List<OrderFood> mOrderFoods;
+	private final FoodDetailContent.DetailType mDetailType;
 	
-	public FoodListWithSepContent(DisplayConfig config, List<OrderFood> orderFoods, PType printType, PStyle style) {
+	public FoodListWithSepContent(DisplayConfig config, List<OrderFood> orderFoods, PType printType, PStyle style, FoodDetailContent.DetailType detailType) {
 		super(printType, style);
 		mDisplayConfig = config;
 		mOrderFoods = orderFoods;
+		mDetailType = detailType;
 	}
 
 	/**
@@ -37,9 +39,9 @@ public class FoodListWithSepContent extends ConcreteContent {
 		int cnt = 0;
 		for(OrderFood of : mOrderFoods){
 			if(of.asFood().isCombo()){
-				var.append(new ComboDetail4ListContent(mDisplayConfig, of, mPrintType, mStyle).toString());
+				var.append(new ComboDetail4ListContent(mDisplayConfig, of, mPrintType, mStyle, mDetailType).toString());
 			}else{
-				var.append(new FoodDetailContent(mDisplayConfig, of, mPrintType, mStyle).toString());
+				var.append(new FoodDetailContent(mDisplayConfig, of, mPrintType, mStyle, mDetailType).toString());
 				if(mPrintType == PType.PRINT_ALL_CANCELLED_FOOD && of.hasCancelReason()){
 					var.append(SEP).append("‘≠“Ú:" + of.getCancelReason().getReason());
 				}

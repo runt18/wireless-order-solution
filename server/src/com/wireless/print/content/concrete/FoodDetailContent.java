@@ -102,13 +102,28 @@ public class FoodDetailContent extends ConcreteContent {
 		}
 	}
 	
+	public static enum DetailType{
+		DELTA,
+		TOTAL;
+		
+		public boolean isTotal(){
+			return this == TOTAL;
+		}
+		
+		public boolean isDelta(){
+			return this == DELTA;
+		}
+	}
+	
 	private final DisplayConfig _displayConfig;
 	private final OrderFood _of;
+	private final DetailType _detailType;
 	
-	public FoodDetailContent(DisplayConfig config, OrderFood of, PType printType, PStyle style){
+	public FoodDetailContent(DisplayConfig config, OrderFood of, PType printType, PStyle style, DetailType detailType){
 		super(printType, style);
 		_displayConfig = config;
 		_of = of;
+		_detailType = detailType;
 	}
 	
 	/**
@@ -139,17 +154,21 @@ public class FoodDetailContent extends ConcreteContent {
 			detail.append("(‘˘)");
 		}
 		
+		boolean isWeighConfirm;
 		if(_displayConfig.contains(DisplayItem.WEIGHT) && _of.asFood().isWeigh() && _of.getDelta() < 0 && _of.getCount() - Math.abs(_of.getDelta()) > 0){
+			isWeighConfirm = true;
 			detail.append("(≥∆÷ÿ»∑»œ)");
+		}else{
+			isWeighConfirm = false;
 		}
 		
 		detail.append(_of.getName());
 		
 		if(_displayConfig.contains(DisplayItem.AMOUNT)){
-			if(_displayConfig.contains(DisplayItem.WEIGHT) && _of.asFood().isWeigh() && _of.getDelta() < 0 && _of.getCount() - Math.abs(_of.getDelta()) > 0){
+			if(isWeighConfirm && _detailType.isDelta()){
 				detail.append("(" + NumericUtil.float2String2((_of.getCount() - Math.abs(_of.getDelta()))) + "->" + NumericUtil.float2String2(_of.getCount()) + ")");
 			}else{
-				detail.append("(" + NumericUtil.float2String2(Math.abs(_of.getDelta())) + ")");
+				detail.append("(" + NumericUtil.float2String2(_detailType.isTotal() ? _of.getCount() : Math.abs(_of.getDelta())) + ")");
 			}
 		}
 		
@@ -183,9 +202,9 @@ public class FoodDetailContent extends ConcreteContent {
 		
 		String foodPrice;
 		if(_displayConfig.contains(DisplayItem.DISCOUNT)){
-			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_of.calcDeltaPrice());
+			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_detailType.isTotal() ? _of.calcPrice() : _of.calcDeltaPrice());
 		}else{
-			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_of.calcDeltaPriceBeforeDiscount());
+			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_detailType.isTotal() ? _of.calcPriceBeforeDiscount() : _of.calcDeltaPriceBeforeDiscount());
 		}
 		
 		if(_displayConfig.contains(DisplayItem.PRICE)){

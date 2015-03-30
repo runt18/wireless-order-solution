@@ -11,11 +11,13 @@ public class FoodListContent extends ConcreteContent {
 
 	private final DisplayConfig mDisplayConfig;
 	private final List<OrderFood> mOrderFoods;
+	private final FoodDetailContent.DetailType mDetailType;
 	
-	public FoodListContent(DisplayConfig format, List<OrderFood> orderFoods, PType printType, PStyle style) {
+	public FoodListContent(DisplayConfig format, List<OrderFood> orderFoods, PType printType, PStyle style, FoodDetailContent.DetailType detailType) {
 		super(printType, style);
 		mDisplayConfig = format;
 		mOrderFoods = orderFoods;
+		mDetailType = detailType;
 	}
 
 	/**
@@ -35,9 +37,9 @@ public class FoodListContent extends ConcreteContent {
 		int cnt = 0;
 		for(OrderFood of : mOrderFoods){
 			if(of.asFood().isCombo()){
-				var.append(new ComboDetail4ListContent(mDisplayConfig, of, mPrintType, mStyle));
+				var.append(new ComboDetail4ListContent(mDisplayConfig, of, mPrintType, mStyle, mDetailType));
 			}else{
-				var.append(new FoodDetailContent(mDisplayConfig, of, mPrintType, mStyle).toString());
+				var.append(new FoodDetailContent(mDisplayConfig, of, mPrintType, mStyle, mDetailType).toString());
 			}
 			var.append(cnt++ < mOrderFoods.size() - 1 ? SEP : "");
 		}

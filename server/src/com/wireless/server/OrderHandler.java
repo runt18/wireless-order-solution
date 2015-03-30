@@ -67,6 +67,7 @@ import com.wireless.pojo.staffMgr.Device;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.print.content.ContentParcel;
+import com.wireless.print.content.concrete.FoodDetailContent;
 import com.wireless.print.scheme.JobContentFactory;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.sms.SMS;
@@ -357,13 +358,15 @@ class OrderHandler implements Runnable{
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
 			PrintHandler printHandler = new PrintHandler(staff);
 			printHandler.process(JobContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
-				 															  staff, 
-				 															  printers,
-									 										  orderToInsert));
+				 															  	   staff, 
+				 															  	   printers,
+				 															  	   orderToInsert,
+				 															  	   FoodDetailContent.DetailType.DELTA));
 			printHandler.process(JobContentFactory.instance().createDetailContent(PType.PRINT_ORDER_DETAIL, 
-																		     staff, 
-																		     printers,
-																		     orderToInsert));
+																		     	  staff, 
+																		     	  printers,
+																		     	  orderToInsert,
+																		     	  FoodDetailContent.DetailType.DELTA));
 		}
 		if(orderToInsert.getCategory().isJoin()){
 			return new RespPackage(request.header, orderToInsert.getDestTbl(), Table.TABLE_PARCELABLE_4_QUERY);
@@ -418,12 +421,14 @@ class OrderHandler implements Runnable{
 				printHandler.process(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_HURRIED_FOOD, 
 																							  staff, 
 																							  printers,
-																							  hurriedOrder));
+																							  hurriedOrder,
+																							  FoodDetailContent.DetailType.TOTAL));
 				//print the detail to hurried foods
 				printHandler.process(JobContentFactory.instance().createDetailContent(PType.PRINT_HURRIED_FOOD, 
-																							 staff,
-																							 printers,
-																							 hurriedOrder));
+																					  staff,
+																					  printers,
+																					  hurriedOrder,
+																					  FoodDetailContent.DetailType.TOTAL));
 			}
 			
 			if(!diffResult.extraFoods.isEmpty()){
@@ -434,12 +439,14 @@ class OrderHandler implements Runnable{
 				printHandler.process(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_EXTRA_FOOD, 
 																							  staff,
 																							  printers,
-																							  extraOrder));
+																							  extraOrder,
+																							  FoodDetailContent.DetailType.DELTA));
 				//print the detail to extra foods
 				printHandler.process(JobContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD_DETAIL, 
 																							 staff,
 																							 printers,
-																							 extraOrder));
+																							 extraOrder,
+																							 FoodDetailContent.DetailType.DELTA));
 			}
 
 			if(!diffResult.cancelledFoods.isEmpty()){
@@ -450,12 +457,14 @@ class OrderHandler implements Runnable{
 				printHandler.process(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_CANCELLED_FOOD,
 																							  staff,
 																							  printers,
-																							  cancelledOrder));
+																							  cancelledOrder,
+																							  FoodDetailContent.DetailType.DELTA));
 				//print the detail to canceled foods
 				printHandler.process(JobContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD_DETAIL,
 																							 staff,
 																							 printers,
-																							 cancelledOrder));
+																							 cancelledOrder,
+																							 FoodDetailContent.DetailType.DELTA));
 
 			}
 
@@ -587,11 +596,11 @@ class OrderHandler implements Runnable{
 		
 		if(printType.isSummary()){
 			int orderId = new Parcel(request.body).readInt();
-			new PrintHandler(staff).process(JobContentFactory.instance().createSummaryContent(printType, staff, printers, orderId));
+			new PrintHandler(staff).process(JobContentFactory.instance().createSummaryContent(printType, staff, printers, orderId, FoodDetailContent.DetailType.TOTAL));
 			
 		}else if(printType.isDetail()){
 			int orderId = new Parcel(request.body).readInt();
-			new PrintHandler(staff).process(JobContentFactory.instance().createDetailContent(printType, staff, printers, orderId));
+			new PrintHandler(staff).process(JobContentFactory.instance().createDetailContent(printType, staff, printers, orderId, FoodDetailContent.DetailType.TOTAL));
 			
 		}else if(printType.isReceipt()){
 			int orderId = new Parcel(request.body).readInt();

@@ -13,12 +13,14 @@ public class ComboDetailContent extends ConcreteContent {
 	private final DisplayConfig mDisplayConfig;
 	private final OrderFood mParent;
 	private final ComboFood mChild;
+	private final FoodDetailContent.DetailType mDetailType;
 	
-	public ComboDetailContent(DisplayConfig config, OrderFood parent, ComboFood child, PType printType, PStyle style){
+	public ComboDetailContent(DisplayConfig config, OrderFood parent, ComboFood child, PType printType, PStyle style, FoodDetailContent.DetailType detailType){
 		super(printType, style);
 		mDisplayConfig = config;
 		mParent = parent;
 		mChild = child;
+		mDetailType = detailType;
 	}
 
 	/**
@@ -32,7 +34,7 @@ public class ComboDetailContent extends ConcreteContent {
 	@Override
 	public String toString(){
 		StringBuilder var = new StringBuilder();
-		var.append(new FoodDetailContent(mDisplayConfig, mParent, mPrintType, mStyle).toString());
+		var.append(new FoodDetailContent(mDisplayConfig, mParent, mPrintType, mStyle, mDetailType).toString());
 		String foodName = mChild.getName();
 		for(ComboOrderFood cof : mParent.getCombo()){
 			if(cof.asComboFood().equals(mChild)){

@@ -20,20 +20,23 @@ public class SummaryContent extends ConcreteContent {
 	private String mTemplate;
 	private final String mWaiter;
 	private final Order mOrder;
+	private final FoodDetailContent.DetailType mDetailType;
 	
-	public SummaryContent(Order order, String waiter, PType printType, PStyle style) {
+	public SummaryContent(Order order, String waiter, PType printType, PStyle style, FoodDetailContent.DetailType detailType) {
 		super(printType, style);
 		mTemplate = WirelessSocketServer.printTemplates.get(PType.PRINT_ORDER).get(style);
 		mWaiter = waiter;
 		mOrder = order;
+		mDetailType = detailType;
 	}
 	
-	public SummaryContent(List<Department> depts, Order order, String waiter, PType printType, PStyle style) {
+	public SummaryContent(List<Department> depts, Order order, String waiter, PType printType, PStyle style, FoodDetailContent.DetailType detailType) {
 		super(printType, style);
 		mDepts.addAll(depts);
 		mTemplate = WirelessSocketServer.printTemplates.get(PType.PRINT_ORDER).get(style);
 		mWaiter = waiter;
 		mOrder = order;
+		mDetailType = detailType;
 	}
 
 	@Override
@@ -96,7 +99,7 @@ public class SummaryContent extends ConcreteContent {
 		//generate the order food list and replace the $(var_1) with the ordered foods
 		mTemplate = mTemplate.replace(PVar.VAR_1, 
 						new ExtraFormatDecorator(
-							new FoodListWithSepContent(FoodDetailContent.DISPLAY_CONFIG_4_SUMMARY, mOrder.getOrderFoods(), mPrintType, mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+							new FoodListWithSepContent(FoodDetailContent.DISPLAY_CONFIG_4_SUMMARY, mOrder.getOrderFoods(), mPrintType, mStyle, mDetailType), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 		
 		return mTemplate;
 	}
