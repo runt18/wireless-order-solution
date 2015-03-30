@@ -385,7 +385,7 @@ uo.cancelFoodAction = function(){
 		totalPrice = actualPrice * (-num);
 		
 		//把相关数据加到退菜信息对象
-		uoCancelFood.id = uo.operateFood.id;
+		uoCancelFood.orderFoodId = uo.operateFood.orderFoodId;
 		uoCancelFood.foodName = uo.operateFood.foodName;
 		uoCancelFood.dishes = uo.operateFood.tasteGroup.tastePref;
 		uoCancelFood.count = -num;
@@ -1106,7 +1106,7 @@ uo.saveForUO = function(){
 		var uoFood = uo.order.orderFoods;
 		for(var x = 0; x < uoFood.length; x++){
 			for(var y = 0; y < uoCancelFoods.length; y++){
-				if(uoFood[x].id == uoCancelFoods[y].id && uoFood[x].tasteGroup.tastePref == uoCancelFoods[y].dishes){
+				if(uoFood[x].orderFoodId == uoCancelFoods[y].orderFoodId && uoFood[x].tasteGroup.tastePref == uoCancelFoods[y].dishes){
 					uoFood[x].count = parseFloat(uoFood[x].count + uoCancelFoods[y].count).toFixed(2);
 					uoFood[x].cancelReason = uoCancelFoods[y].reason;
 				}
