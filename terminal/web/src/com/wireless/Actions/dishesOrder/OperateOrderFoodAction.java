@@ -62,7 +62,7 @@ public class OperateOrderFoodAction extends DispatchAction{
 			}else{
 				String transFood[] = transFoods.split(",");
 				for (OrderFood of : actualOrder.getOrderFoods()) {
-					if(of.getFoodId() == Integer.parseInt(transFood[0])){
+					if(of.getId() == Integer.parseInt(transFood[0])){
 						of.setCount(Float.parseFloat(transFood[1]));
 						builder.add(of);
 					}
