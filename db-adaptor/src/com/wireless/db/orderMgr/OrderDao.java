@@ -676,27 +676,27 @@ public class OrderDao {
 		if(source.getDestTbl().getAliasId() == builder.getDestTbl().getAliasId()){
 			throw new BusinessException("菜品不能转到相同餐台");
 		}
-		
+
+		Table destTbl = TableDao.getByAlias(dbCon, staff, builder.getDestTbl().getAliasId());
+
 		//Assert the food to transfer out does exist and the amount is less than the original.
 		for(OrderFood foodOut : builder.getTransferFoods()){
 			int index = source.getOrderFoods().indexOf(foodOut);
 			if(index < 0){
 				throw new BusinessException("菜品【" + FoodDao.getPureById(dbCon, staff, foodOut.getFoodId()).getName() + "】不在账单中");
 			}else{
-				if(source.getOrderFoods().get(index).getCount() < foodOut.getCount()){
+				final OrderFood foodToOut = source.getOrderFoods().get(index);
+				if(foodToOut.getCount() < foodOut.getCount()){
 					throw new BusinessException("菜品【" + source.getOrderFoods().get(index).getName() + "】的转菜数量大过已有数量");
+				}else{
+					foodToOut.setCancelReason(CancelReason.newTemporary("【" + staff.getName() + "】从【" + source.getDestTbl().getName() + "】转至【" + destTbl.getName() + "】"));
+					foodToOut.setOperation(OrderFood.Operation.TRANSFER);
+					foodToOut.removeCount(foodOut.getCount(), staff);
 				}
 			}
 		}
-		
-		Table destTbl = TableDao.getByAlias(dbCon, staff, builder.getDestTbl().getAliasId());
-		
 		//Transfer out the foods from source order.
-		for(OrderFood foodOut : builder.getTransferFoods()){
-			OrderFoodDao.fill(dbCon, staff, foodOut);
-			foodOut.setCancelReason(CancelReason.newTemporary("【" + staff.getName() + "】从【" + source.getDestTbl().getName() + "】转至【" + destTbl.getName() + "】"));
-			OrderFoodDao.insertCancelled(dbCon, staff, new OrderFoodDao.TransferBuilder(source.getId(), foodOut).asCancel());
-		}
+		UpdateOrder.exec(dbCon, staff, new Order.UpdateBuilder(source).addOri(source.getOrderFoods()));
 
 		//Transfer the foods out to destination table.
 		if(destTbl.isIdle()){
@@ -769,19 +769,21 @@ public class OrderDao {
 		
 		Order order = getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
 		
-		
 		int index = order.getOrderFoods().indexOf(giftedFood);
 		if(index < 0){
 			throw new BusinessException("菜品【" + giftedFood.getName() + "】不在账单中");
 		}else{
-			if(order.getOrderFoods().get(index).getCount() < builder.getGiftedFood().getCount()){
-				throw new BusinessException("菜品【" + order.getOrderFoods().get(index).getName() + "】的赠送数量大过已有数量");
+			OrderFood foodToGifted = order.getOrderFoods().get(index);
+			if(foodToGifted.getCount() < giftedFood.getCount()){
+				throw new BusinessException("菜品【" + foodToGifted.getName() + "】的赠送数量大过已有数量");
+			}else{
+				//Cancel the order food as gift operation.
+				foodToGifted.setCancelReason(CancelReason.newTemporary("【" + staff.getName() + "】赠送【" + giftedFood.asFood().getName() + "】"));
+				foodToGifted.removeCount(builder.getGiftedFood().getCount(), staff);
+				foodToGifted.setOperation(OrderFood.Operation.GIFT);
+				UpdateOrder.exec(dbCon, staff, new Order.UpdateBuilder(order).addOri(order.getOrderFoods()));
 			}
 		}
-		
-		//Cancel the order food as gift operation.
-		giftedFood.setCancelReason(CancelReason.newTemporary("【" + staff.getName() + "】赠送【" + giftedFood.asFood().getName() + "】"));
-		OrderFoodDao.insertCancelled(dbCon, staff, new OrderFoodDao.GiftBuilder(order.getId(), giftedFood).asCancel());
 		
 		//Gift the order food.
 		order = getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);

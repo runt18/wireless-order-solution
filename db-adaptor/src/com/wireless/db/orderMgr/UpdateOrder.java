@@ -271,14 +271,17 @@ public class UpdateOrder {
 					if(diff > 0){
 						oriFood.setCount(oriFood.getCount());
 						oriFood.addCount(NumericUtil.roundFloat(diff));
-						//oriFood.setCount(NumericUtil.roundFloat(Math.abs(diff)));
 						result.extraFoods.add(oriFood);
 						
 					}else if(diff < 0){
 						oriFood.setCount(oriFood.getCount());
 						oriFood.removeCount(NumericUtil.roundFloat(Math.abs(diff)), staff);
-						//oriFood.setCount(NumericUtil.roundFloat(Math.abs(diff)));
 						oriFood.setCancelReason(newFood.getCancelReason());
+						if(newFood.getOperation() == OrderFood.Operation.GIFT || newFood.getOperation() == OrderFood.Operation.TRANSFER){
+							oriFood.setOperation(newFood.getOperation());
+						}else{
+							oriFood.setOperation(OrderFood.Operation.CANCEL);
+						}
 						result.cancelledFoods.add(oriFood);
 					}
 					

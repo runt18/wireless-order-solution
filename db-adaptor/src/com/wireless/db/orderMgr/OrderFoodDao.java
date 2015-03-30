@@ -553,19 +553,6 @@ public class OrderFoodDao {
 //		}
 	}
 	
-	static class GiftBuilder{
-		private final CancelBuilder giftBuilder;;
-		
-		public GiftBuilder(int orderId, OrderFood giftFood){
-			giftBuilder = new CancelBuilder(orderId, giftFood);
-			giftBuilder.cancel.setOperation(Operation.GIFT);
-		}
-		
-		public CancelBuilder asCancel(){
-			return this.giftBuilder;
-		}
-	}
-	
 	static class TransferBuilder{
 		
 		private final CancelBuilder cancelBuilder;;
@@ -588,7 +575,6 @@ public class OrderFoodDao {
 		public CancelBuilder(int orderId, OrderFood cancel){
 			this.orderId = orderId;
 			this.cancel = cancel;
-			this.cancel.setOperation(Operation.CANCEL);
 		}
 		
 		public CancelBuilder setPaid(boolean isPaid){
