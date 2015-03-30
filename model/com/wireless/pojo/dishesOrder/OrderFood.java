@@ -78,7 +78,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	private String mWaiter;
 	
 	//the operation to this order food
-	private Operation operation;
+	private Operation mOperation;
 	
 	//the taste group to this order food
 	private TasteGroup mTasteGroup;							
@@ -118,7 +118,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	//the last order amount to this order food
 	private float mLastCnt;	
 
-	private List<ComboOrderFood> combo;
+	private List<ComboOrderFood> mCombo;
 	
 	private final Food mFood = new Food(0);
 	
@@ -127,30 +127,30 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	public Operation getOperation(){
-		return this.operation;
+		return this.mOperation;
 	}
 	
 	public void setOperation(Operation operation){
-		this.operation = operation;
+		this.mOperation = operation;
 	}
 	
 	public void addCombo(ComboOrderFood comboFood){
-		if(combo == null){
-			combo = new ArrayList<ComboOrderFood>();
+		if(mCombo == null){
+			mCombo = new ArrayList<ComboOrderFood>();
 		}
-		combo.add(comboFood);
+		mCombo.add(comboFood);
 	}
 	
 	public List<ComboOrderFood> getCombo(){
-		if(combo != null){
-			return Collections.unmodifiableList(combo);
+		if(mCombo != null){
+			return Collections.unmodifiableList(mCombo);
 		}else{
 			return Collections.emptyList();
 		}
 	}
 	
 	public boolean hasCombo(){
-		return combo != null ? !combo.isEmpty() : false;
+		return mCombo != null ? !mCombo.isEmpty() : false;
 	}
 	
 	public void setHangup(boolean isHangup){
@@ -625,7 +625,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	public String getName(){
-		return mFood.getName() + (mFoodUnit != null && mFoodUnit.getUnit().length() != 0 ? "(" + mFoodUnit.getUnit() + ")" : "");
+		return mFood.getName() + (mFoodUnit != null && mFoodUnit.getUnit().length() != 0 ? "/" + mFoodUnit.getUnit() : "");
 	}
 	
 	public float getFoodPrice(){
@@ -762,7 +762,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			dest.writeBoolean(this.isGift());
 			dest.writeLong(this.getOrderDate());
 			dest.writeString(this.getWaiter());
-			dest.writeParcelList(this.combo, 0);
+			dest.writeParcelList(this.mCombo, 0);
 
 		}else if(flag == OF_PARCELABLE_4_COMMIT){
 			if(this.isTemporary){
@@ -784,7 +784,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			dest.writeString(this.mWaiter);
 			dest.writeBoolean(this.isHurried);
 			dest.writeParcel(this.mCancelReason, CancelReason.CR_PARCELABLE_SIMPLE);
-			dest.writeParcelList(this.combo, 0);
+			dest.writeParcelList(this.mCombo, 0);
 		}
 	}
 	
@@ -816,7 +816,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			this.setGift(source.readBoolean());
 			this.setOrderDate(source.readLong());
 			this.setWaiter(source.readString());
-			this.combo = source.readParcelList(ComboOrderFood.CREATOR);
+			this.mCombo = source.readParcelList(ComboOrderFood.CREATOR);
 			
 		}else if(flag == OF_PARCELABLE_4_COMMIT){
 			if(isTemporary){
@@ -838,7 +838,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			this.mWaiter = source.readString();
 			this.isHurried = source.readBoolean();
 			this.mCancelReason = source.readParcel(CancelReason.CREATOR);
-			this.combo = source.readParcelList(ComboOrderFood.CREATOR);
+			this.mCombo = source.readParcelList(ComboOrderFood.CREATOR);
 		}
 		
 	}
@@ -911,7 +911,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		jm.putBoolean(Key4Json.IS_HURRIED.key, this.isHurried);
 		jm.putBoolean(Key4Json.IS_HANG.key, this.isHangup);
 		jm.putBoolean(Key4Json.IS_GIFT.key, this.isGift);
-		jm.putBoolean(Key4Json.IS_TRANSFER.key, this.operation == Operation.TRANSFER);
+		jm.putBoolean(Key4Json.IS_TRANSFER.key, this.mOperation == Operation.TRANSFER);
 		jm.putBoolean(Key4Json.IS_COMMISSION.key, this.mFood.isCommission());
 		jm.putBoolean(Key4Json.IS_RETURN.key, this.getCount() < 0 ? true : false);
 		jm.putFloat(Key4Json.DISCOUNT.key, this.mDiscount);
