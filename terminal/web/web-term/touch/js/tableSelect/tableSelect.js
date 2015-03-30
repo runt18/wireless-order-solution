@@ -8,6 +8,8 @@ var tables = [],
 	busyTables = [],
 	//设置空闲餐桌数组
 	freeTables = [],
+	//暂结台数组
+	tempPayTables = [],
 	//当前状态下的被选中区域的餐桌数组
 	tempForRegion = [],
 	//被选中区域的所有状态餐桌数组
@@ -1423,15 +1425,22 @@ function initTableData(){
 				for(x in data.root){	
 					if(data.root[x].statusValue == 0){
 						freeTables.push(data.root[x]);
-						
 					}else if(data.root[x].statusValue == 1){
 						busyTables.push(data.root[x]);
+						if(data.root[x].isTempPaid){
+							tempPayTables.push(data.root[x]);
+						}
 					}
 					tables.push(data.root[x]);
 				}
 				//设置各状态数量
 				$('#ts_freeTablesCount').text(freeTables.length);
 				$('#ts_busyTablesCount').text(busyTables.length);
+				$('#selectBarFreeTablesCount').text(freeTables.length);
+				$('#selectBarBusyTablesCount').text(busyTables.length);
+				$('#selectBarTempPayTablesCount').text(tempPayTables.length);
+				
+				
 				
 				//从tables数组中，遍历得到含有餐桌的区域数组region
 				region.push(tables[0].region);

@@ -967,9 +967,6 @@ of.foodHangup = function(c){
  * 赠送菜品
  */
 of.giftFood = function(c){
-	//关闭更多控件
-	$('#orderFoodOtherOperateCmp').popup('close');
-	
 	var foodContent = $('#orderFoodsCmp > li[data-theme=e]');
 	if(foodContent.length != 1){
 		Util.msg.tip('请选中一道菜品');
@@ -996,6 +993,9 @@ of.giftFood = function(c){
  * 修改多单位
  */
 of.updateUnitPrice = function(c){
+	//关闭更多控件
+	$('#orderFoodOtherOperateCmp').popup('close');	
+	
 	//获取菜品多单位
 	$.post('../QueryMenu.do', {dataSource:'getMultiPrices',foodId:of.selectedOrderFood.id}, function(result){
 		if(result.success && result.root.length > 0){
@@ -1858,13 +1858,26 @@ function foodCommonTasteLoad(){
 				id : of.multiPrices[i].id,
 				click : "of.chooseOrderFoodUnit({event: this, id: "+ of.multiPrices[i].id +", unit: '"+ of.multiPrices[i].unit +"', price: "+ of.multiPrices[i].price +"})",
 				multiPrice : '¥' + of.multiPrices[i].price + " / " + of.multiPrices[i].unit,
-				theme : "c"
+				theme : i == 0 ? "e" : "c"
 			}));		
 		}
 		
 		$("#divFloatFoodMultiPrices").html(html.join("")).trigger('create');	
 		$('#collapsibleMultiPrice').show();
 		$('#collapsibleMultiPrice').trigger("expand");
+		
+		//默认选中一个单位
+		for(var i = 0; i < of.newFood.length; i++){
+			//用唯一标示替代id
+			if(of.newFood[i].unique == of.selectedOrderFood.unique){
+				of.newFood[i].foodUnit = of.multiPrices[0];
+				of.newFood[i].unitPrice = of.multiPrices[0].price;
+				break; 
+			}
+		}	
+		of.initNewFoodContent({
+			data : of.selectedOrderFood
+		});			
 	}else{
 		$('#collapsibleMultiPrice').hide();
 	}

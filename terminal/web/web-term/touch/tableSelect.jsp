@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
 <% 
-	float v = 1.2f; 
+	float v = 1.3f; 
 	response.setHeader("Pragma","No-cache"); 
 	response.setHeader("Cache-Control","no-cache"); 
 	response.setDateHeader("Expires", 0);  
@@ -110,6 +110,9 @@
 	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
 		<div class="bottomGeneralBar">
 			<div id="spanStaffNameForDisplayToTS" style="float: left;margin-left: 10px;">操作人: ---</div>
+			<div id="spanTableStatus4Free" style="float: left;margin-left: 15px;">空闲台: <font id="selectBarFreeTablesCount" color="green">--</font></div>
+			<div id="spanTableStatus4Busy" style="float: left;margin-left: 15px;">就餐台: <font id="selectBarBusyTablesCount" color="green">--</font></div>
+			<div id="spanTableStatus4TempPay" style="float: left;margin-left: 15px;">暂结台: <font id="selectBarTempPayTablesCount" color="green">--</font></div>
 			<div id="divDescForTableSelect-padding-msg" style="float: right;margin-right: 20px;">共--项</div>
 		</div>	
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loginOut()">注销</a>

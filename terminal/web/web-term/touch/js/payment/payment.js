@@ -306,7 +306,7 @@ function loadOrderBasicMsg(){
 		html.push(payment_orderFoodListCmpTemplet.format({
 			dataIndex : i + 1,
 			id : checkOutData.root[i].id,
-			name : checkOutData.root[i].foodName + ((checkOutData.root[i].status & 1 << 7) != 0 ? '[称重确认]' : ''),
+			name : checkOutData.root[i].foodName + ((checkOutData.root[i].status & 1 << 7) != 0 ? '<font color="red">[称重确认]</font>' : ''),
 			count : checkOutData.root[i].count.toFixed(2),
 			isWeight : (checkOutData.root[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 			tastePref : checkOutData.root[i].tasteGroup.tastePref,
