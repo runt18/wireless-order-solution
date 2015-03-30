@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +47,8 @@ public class BillActivity extends Activity {
 	public static final String KEY_TABLE_ID = BillActivity.class.getName() + ".TableKey";
 
 	private Order mOrderToPay;
+	
+	private Member mMember;
 
 	private Handler mHandler;
 	
@@ -66,8 +69,23 @@ public class BillActivity extends Activity {
 			BillActivity theActivity = mActivity.get();
 			
 			((BillFoodListView)theActivity.findViewById(R.id.listView_food_bill)).notifyDataChanged(new ArrayList<OrderFood>(theActivity.mOrderToPay.getOrderFoods()));
+			//set the member
+			if(theActivity.mMember != null){
+				theActivity.findViewById(R.id.txtView_member_bill).setVisibility(View.VISIBLE);
+				theActivity.findViewById(R.id.txtView_memberValue_bill).setVisibility(View.VISIBLE);
+				((TextView)theActivity.findViewById(R.id.txtView_memberValue_bill)).setText(theActivity.mMember.getName());
+			}else{
+				theActivity.findViewById(R.id.txtView_member_bill).setVisibility(View.GONE);
+				theActivity.findViewById(R.id.txtView_memberValue_bill).setVisibility(View.GONE);
+			}
 			//set the discount price
-			((TextView)theActivity.findViewById(R.id.txtView_discountValue_bill)).setText(NumericUtil.CURRENCY_SIGN	+ Float.toString(theActivity.mOrderToPay.calcDiscountPrice()));
+			((TextView)theActivity.findViewById(R.id.txtView_discountValue_bill)).setText("无折扣");
+			for(Discount discount : WirelessOrder.foodMenu.discounts){
+				if(discount.equals(theActivity.mOrderToPay.getDiscount())){
+					((TextView)theActivity.findViewById(R.id.txtView_discountValue_bill)).setText(discount.getName());
+					break;
+				}
+			}
 			//set the actual price
 			((TextView)theActivity.findViewById(R.id.txtView_actualValue_bill)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(Math.round(theActivity.mOrderToPay.calcTotalPrice())));
 			//set the activity_table ID
@@ -150,7 +168,7 @@ public class BillActivity extends Activity {
 			public void onClick(View arg0) {
 				final EditText memberEdtTxt = new EditText(BillActivity.this);
 				memberEdtTxt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
-				//FIXME memberEdtTxt.setHint(resid);
+				memberEdtTxt.setHint(TextUtils.stringOrSpannedString("会员卡号/手机号/微信会员号"));
 				Dialog currentPriceDialog = new AlertDialog.Builder(BillActivity.this).setTitle("请输入会员信息")
 					.setView(memberEdtTxt)
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -160,11 +178,11 @@ public class BillActivity extends Activity {
 								
 								@Override
 								public void onSuccess(List<Member> result) {
-									// TODO Auto-generated method stub
 									if(result.isEmpty()){
 										Toast.makeText(BillActivity.this, "对不起，没有查询到相应的会员信息", Toast.LENGTH_SHORT).show();
 									}else{
 										new DiscountOrderTask(Order.DiscountBuilder.build4Member(mOrderToPay.getId(), result.get(0))).execute();
+										mMember = result.get(0);
 									}
 								}
 								
@@ -265,6 +283,7 @@ public class BillActivity extends Activity {
 					@Override
 					public void onClick(DialogInterface dialog,	int which) {
 						new DiscountOrderTask(Order.DiscountBuilder.build4Normal(mOrderToPay.getId(), mOrderToPay.getDiscount().getId())).execute();
+						mMember = null;
 					}
 				})
 				.setNegativeButton("取消", null)

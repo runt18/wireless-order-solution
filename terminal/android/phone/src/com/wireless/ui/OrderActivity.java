@@ -30,7 +30,6 @@ import com.wireless.fragment.OrderFoodFragment;
 import com.wireless.fragment.OrderFoodFragment.OnCommitListener;
 import com.wireless.fragment.OrderFoodFragment.OnOrderChangedListener;
 import com.wireless.lib.task.TransTblTask;
-import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PrintOption;
@@ -44,6 +43,8 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 															   OnTableSelectedListener{
 	
 	public static final String KEY_TABLE_ID = OrderActivity.class.getName() + ".tableKey";
+	
+	private Table mSelectedTable;
 	
 	private ProgressDialog mProgressDialog;
 	
@@ -72,12 +73,11 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		
 		//set the table No
 		final TextView txtViewTblName = ((TextView)findViewById(R.id.txtView_orderActivity_tableName));
-		final Table selectedTable = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
-		txtViewTblName.setText(selectedTable.getName());
+		mSelectedTable = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
+		txtViewTblName.setText(mSelectedTable.getName());
 		txtViewTblName.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				AskTableDialog.newInstance().show(getSupportFragmentManager(), AskTableDialog.TAG);
 			}
 		});
@@ -88,7 +88,6 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		customerTextView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				final EditText amountEditText = new EditText(OrderActivity.this);
 				amountEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
 				amountEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
@@ -144,7 +143,7 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		//Add OrderFoodFragment
 		FragmentTransaction fgTrans = getSupportFragmentManager().beginTransaction();
 		fgTrans.add(R.id.frameLayout_container_orderFood, 
-				    OrderFoodFragment.newInstance(selectedTable),
+				    OrderFoodFragment.newInstance(mSelectedTable),
 				    OrderFoodFragment.TAG).commit();
 		
 	}
@@ -152,7 +151,6 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 	private void commit(boolean forceInsert){
 		OrderFoodFragment ofFgm = (OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG);
 		//下单逻辑
-		TableParcel table = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
 		
 		int customNum;
 		String custNumString = ((TextView)findViewById(R.id.editText_orderActivity_customerNum)).getText().toString();
@@ -166,9 +164,9 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		try{
 			if(forceInsert){
 				//强制下单
-				ofFgm.commitForce(new Table.Builder(table.getId()), customNum, PrintOption.DO_PRINT);
+				ofFgm.commitForce(new Table.Builder(mSelectedTable.getId()), customNum, PrintOption.DO_PRINT);
 			}else{
-				ofFgm.commit(new Table.Builder(table.getId()), customNum, PrintOption.DO_PRINT);
+				ofFgm.commit(new Table.Builder(mSelectedTable.getId()), customNum, PrintOption.DO_PRINT);
 			}
 		}catch(BusinessException e){			
 			Toast.makeText(OrderActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -218,8 +216,7 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 	@Override
 	public void postSuccess(Order order) {
 		mProgressDialog.dismiss();			
-		final Table table = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
-		Toast.makeText(OrderActivity.this, table.getName() + "下单成功", Toast.LENGTH_SHORT).show();
+		Toast.makeText(OrderActivity.this, mSelectedTable.getName() + "下单成功", Toast.LENGTH_SHORT).show();
 		finish();		
 	}
 
@@ -266,35 +263,51 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 
 	@Override
 	public void onTableSelected(final Table selectedTable) {
-		final Table dest = getIntent().getExtras().getParcelable(KEY_TABLE_ID);
-		new TransTblTask(WirelessOrder.loginStaff, new Table.Builder(dest.getId()), new Table.Builder(selectedTable.getId())){
+		final Table src;
+		int index = WirelessOrder.tables.indexOf(mSelectedTable);
+		if(index >= 0){
+			src = WirelessOrder.tables.get(index);
+		}else{
+			src = null;
+		}
+		if(src.isBusy()){
+			new TransTblTask(WirelessOrder.loginStaff, new Table.Builder(src.getId()), new Table.Builder(selectedTable.getId())){
+				
+				private ProgressDialog mProgDialog;
+				
+				@Override
+				protected void onPreExecute(){			
+					mProgDialog = ProgressDialog.show(OrderActivity.this, "", "正在交换数据...请稍后", true);
+				}		
 			
-			private ProgressDialog mProgDialog;
-			
-			@Override
-			protected void onPreExecute(){			
-				mProgDialog = ProgressDialog.show(OrderActivity.this, "", "正在交换数据...请稍后", true);
-			}		
-		
-			protected void onSuccess(){
-				mProgDialog.dismiss();
-				Toast.makeText(getApplicationContext(), "换台成功", Toast.LENGTH_SHORT).show();
+				protected void onSuccess(){
+					mProgDialog.dismiss();
+					Toast.makeText(getApplicationContext(), "换台成功", Toast.LENGTH_SHORT).show();
+					((TextView)findViewById(R.id.txtView_orderActivity_tableName)).setText(selectedTable.getName());
+					mSelectedTable = src;
+				};
+				
+				protected void onFail(BusinessException e){
+					mProgDialog.dismiss();
+					new AlertDialog.Builder(OrderActivity.this)
+						.setTitle("提示")
+						.setMessage(e.getDesc())
+						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.dismiss();
+							}
+						}).show();
+				}
+				
+			}.execute();
+		}else{
+			if(selectedTable.isIdle()){
 				((TextView)findViewById(R.id.txtView_orderActivity_tableName)).setText(selectedTable.getName());
-			};
-			
-			protected void onFail(BusinessException e){
-				mProgDialog.dismiss();
-				new AlertDialog.Builder(OrderActivity.this)
-					.setTitle("提示")
-					.setMessage(e.getDesc())
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.dismiss();
-						}
-					}).show();
+				mSelectedTable = selectedTable;
+			}else{
+				Toast.makeText(this, "对不起，只能选择空闲状态的餐台修改", Toast.LENGTH_SHORT).show();
 			}
-			
-		}.execute();
+		}
 	}
 
 	@Override

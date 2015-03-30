@@ -328,7 +328,6 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 
 	@Override
 	public void onJoinedSelected(Table parent, Suffix suffix) {
-		// TODO Auto-generated method stub
 		
 	}
 	

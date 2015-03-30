@@ -558,8 +558,8 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 					public void onSuccess(Table table){
 						if(table.getStatus() == Table.Status.BUSY){
 							//Jump to TableDetailActivity in case of busy.
-							Intent intent = new Intent(TableActivity.this, TableDetailActivity.class);
-							intent.putExtra(TableDetailActivity.KEY_TABLE_ID, new TableParcel(selectedTable));
+							Intent intent = new Intent(TableActivity.this, BillActivity.class);
+							intent.putExtra(BillActivity.KEY_TABLE_ID, new TableParcel(selectedTable));
 							startActivity(intent);
 						}else{
 							//Jump to this order activity in case of idle.

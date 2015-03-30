@@ -25,7 +25,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,7 +40,9 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.lib.task.GiftOrderFoodTask;
+import com.wireless.lib.task.PrintContentTask;
 import com.wireless.lib.task.TransOrderFoodTask;
+import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.parcel.TableParcel;
@@ -557,9 +558,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 							if(!of.isGift() && WirelessOrder.loginStaff.getRole().hasPrivilege(Privilege.Code.GIFT) && of.asFood().isGift()){
 								items.add("赠送");
 							}
-							new AlertDialog
-							   .Builder(getActivity())
-							   .setTitle(of.getName())
+							new AlertDialog.Builder(getActivity()).setTitle(of.getName())
 							   .setItems(items.toArray(new String[items.size()]), new DialogInterface.OnClickListener(){
 
 								@Override
@@ -619,8 +618,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 									}
 								}
 								   
-							   }).setNegativeButton("返回", null).show();
-							
+							}).setNegativeButton("返回", null).show();
 						}
 						
 					});
@@ -637,12 +635,32 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			
 			if(map.containsKey(ITEM_IS_ORI_FOOD)){
 				
-				/**
-				 * 已点菜的Group不需要显示Button
-				 */
-				layout.findViewById(R.id.button_orderActivity_opera).setVisibility(View.GONE);
-				((ImageView)layout.findViewById(R.id.imgView_right_orderDropGroup)).setVisibility(View.INVISIBLE);
-				((ImageView) layout.findViewById(R.id.imgView_left_orderDropGroup)).setVisibility(View.INVISIBLE);
+				//已点菜显示全单Button
+				layout.findViewById(R.id.imgView_left_orderDropGroup).setVisibility(View.INVISIBLE);
+				ImageView allView = ((ImageView)layout.findViewById(R.id.imgView_right_orderDropGroup));
+				allView.setVisibility(View.VISIBLE);
+				allView.setBackgroundResource(R.drawable.all_order_selector);
+				allView.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						new AlertDialog.Builder(getActivity()).setTitle("已点菜全单操作").setItems(new String[]{"全单转菜", "全单催菜", "补打总单"}, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								if(which == 0){
+									//全单转菜
+									transfer();
+								}else if(which == 1){
+									//全单催菜
+									hurry();
+								}else if(which == 2){
+									//补打总单
+									printSummaryPatch();
+								}
+								
+							}
+						}).setNegativeButton("取消", null).show();
+					}
+				});
 				
 			}else{
 	
@@ -668,200 +686,367 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				});
 				
 				//创建'备注', '叫起', '分席'的Button
-				createPopup(parent);
+				//createPopup(parent);
 				
-				//全单Button
-				View orderOperateBtn = layout.findViewById(R.id.button_orderActivity_opera);
-				orderOperateBtn.setVisibility(View.VISIBLE);
-				orderOperateBtn.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						mPopup.showAsDropDown(v, -10, 0);
-					}
-				});
-	
+				//新点菜全单Button
+				ImageView allImg = (ImageView)layout.findViewById(R.id.imgView_left_orderDropGroup);
+				if(mNewFoodList.isEmpty()){
+					allImg.setVisibility(View.INVISIBLE);
+				}else{
+					allImg.setVisibility(View.VISIBLE);
+					allImg.setBackgroundResource(R.drawable.all_order_selector);
+					allImg.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							new AlertDialog.Builder(getActivity()).setTitle("新点菜全单操作").setItems(new String[]{"全单备注", isHangUp ? "取消叫起" : "全单叫起", isMulti ? "取消分席" : "分席"}, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									if(which == 0){
+										//全单备注
+										comment();
+									}else if(which == 1){
+										//全单叫起
+										hang();
+									}else if(which == 2){
+										//分席
+										divide();
+									}
+									
+								}
+							}).setNegativeButton("取消", null).show();
+							//mPopup.showAsDropDown(v, -10, 0);
+						}
+					});				
+				}
 			}
 			return layout;
 		}
 	
-		private void createPopup(ViewGroup parent){
-			View popupLayout = getActivity().getLayoutInflater().inflate(R.layout.order_activity_operate_popup, parent, false);
-			//全单叫起Button
-			Button hangUpBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_callUp);
-			if(isHangUp){
-				hangUpBtn.setText("取消叫起");
-			} else{
-				hangUpBtn.setText("叫起");
+		//全单催菜
+		private void hurry(){
+			for(OrderFood of : mOriOrder.getOrderFoods()){
+				of.setHurried(true);
 			}
-			
-			//分席Button
-			final Button multiBtn = ((Button)popupLayout.findViewById(R.id.button_orderActivity_operate_popup_multi));
-			if(isMulti){
-				multiBtn.setText("取消分席");
-			}else{
-				multiBtn.setText("分席");
-			}
-			
-			if(mPopup == null){
-				
-				mPopup = new PopupWindow(popupLayout, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-				mPopup.setOutsideTouchable(true);
-				mPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
-				mPopup.update();
-				
-				//全单叫起Button
-				hangUpBtn.setOnClickListener(new View.OnClickListener() {				
-					@Override
-					public void onClick(View v) {
-						if(isHangUp){
-							for(int i = 0; i < mNewFoodList.size(); i++){
-								mNewFoodList.get(i).setHangup(false);
-							}
-							isHangUp = false; 
-							mPopup.dismiss();
-							mFoodListHandler.sendEmptyMessage(0);
-						}
-						else if(mNewFoodList.size() > 0){
-							new AlertDialog.Builder(getActivity())
-								.setTitle("提示")
-								.setMessage("确定全单叫起吗?")
-								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(DialogInterface dialog,	int which){
-											for(int i = 0; i < mNewFoodList.size(); i++){
-												mNewFoodList.get(i).setHangup(true);
-											}
-											isHangUp = true;
-											mFoodListHandler.sendEmptyMessage(0);
-											mPopup.dismiss();
-										}
-									})
-									.setNegativeButton("取消", null)
-									.show();	
-						}	
-						else {
-							Toast.makeText(getActivity(), "没有新点菜，无法叫起", Toast.LENGTH_SHORT).show();
-						}
-					}
-				});
-				
-				//全单备注Button
-				Button allRemarkBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_remark);
-				allRemarkBtn.setText("备注");
-				allRemarkBtn.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						if(!mNewFoodList.isEmpty()){
-							Intent intent = new Intent(getActivity(), PickTasteActivity.class);
-							Bundle bundle = new Bundle(); 
-							OrderFood dummyFood = new OrderFood();
-							dummyFood.asFood().setName("全单备注");
-							for(Taste t : mAllFoodTastes){
-								dummyFood.addTaste(t);
-							}
-							bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(dummyFood));
-							bundle.putInt(PickTasteActivity.PICK_TASTE_INIT_FGM, PickTasteActivity.POP_TASTE_FRAGMENT);
-							bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
-							intent.putExtras(bundle);
-							startActivityForResult(intent, PICK_ALL_FOOD_TASTE);
-							mPopup.dismiss();
-						} else {
-							Toast.makeText(getActivity(), "此餐台还未点菜，无法添加备注", Toast.LENGTH_SHORT).show();
-						}
-					}
-				});
-				
-				//分席Button
-				multiBtn.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						if(mNewFoodList.isEmpty()){
-							Toast.makeText(getActivity(), "您还没有点菜", Toast.LENGTH_SHORT).show();
-						}else{
-							if(isMulti == false){
-								
-								final EditText edtTextMulti = new EditText(getActivity());
-								edtTextMulti.setKeyListener(new DigitsKeyListener(false, false));
-								
-								Dialog dialog = new AlertDialog.Builder(getActivity()).setTitle("请输入分席数量")
-									.setIcon(android.R.drawable.ic_dialog_info)
-									.setView(edtTextMulti)
-									.setPositiveButton("确定", new DialogInterface.OnClickListener(){
-										@Override
-										public void onClick(DialogInterface dialog, int which) {
-											int amount = 0;
-											try{
-												amount = Integer.parseInt(edtTextMulti.getText().toString());
-												if(amount > 1){
-													for(OrderFood of : mNewFoodList){
-														of.addCount(of.getCount() * (amount - 1));
-														if(of.hasTmpTaste()){
-															Taste tmpTaste = of.getTasteGroup().getTmpTaste();
-															tmpTaste.setPreference((tmpTaste.getPreference().length() != 0 ? tmpTaste.getPreference() + "," : "") + ("分" + amount + "席上"));
-														}else{
-															of.setTmpTaste(Taste.newTmpTaste("分" + amount + "席上", 0));
-														}
-													}
-													//设置状态为'已分席'
-													isMulti = true;
-													mFoodListHandler.sendEmptyMessage(0);
-												}
-
-											}catch(NumberFormatException e){
-												Toast.makeText(getActivity(), "您输入的分席数量不正确", Toast.LENGTH_SHORT).show();
-											} 
-										}
+			mFoodListHandler.sendEmptyMessage(0);
+		}
 		
-									})
-									.setNegativeButton("取消", null).show();		
-								
-								mPopup.dismiss();
-								
-								//只用下面这一行弹出对话框时需要点击输入框才能弹出软键盘
-								dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-								//加上下面这一行弹出对话框时软键盘随之弹出
-								dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-								
-							}else{
-								for(OrderFood of : mNewFoodList){
-									of.setCount(of.getCount() - Math.abs(of.getDelta()));
-									if(of.hasTmpTaste()){
-										Taste tmpTaste = of.getTasteGroup().getTmpTaste();
-										tmpTaste.setPreference(tmpTaste.getPreference().replaceAll("分.席上", ""));
-										if(tmpTaste.getPreference().length() == 0){
-											of.setTmpTaste(null);
-										}
-									}
-								}
-								//设置状态为'未分席'
-								isMulti = false;
-								mFoodListHandler.sendEmptyMessage(0);
-								mPopup.dismiss();
-							}
-						}
-
-					}
-				});
+		//补打总单
+		private void printSummaryPatch(){
+			new PrintContentTask(ReqPrintContent.buildReqPrintSummaryPatch(WirelessOrder.loginStaff, mOriOrder.getId())) {
 				
-				if(mOriOrder != null){
-					//全单转菜Button
-					popupLayout.findViewById(R.id.button_orderActivity_operate_popup_transfer).setOnClickListener(new View.OnClickListener() {
-	
-						@Override
-						public void onClick(View arg0) {
-							mTransFoods.clear();
-							mTransFoods.addAll(mOriOrder.getOrderFoods());
-							AskTableDialog.newInstance(getId()).show(getFragmentManager(), AskTableDialog.TAG);
-							mPopup.dismiss();
-						}
-						
-					});
-				}else{
-					popupLayout.findViewById(R.id.button_orderActivity_operate_popup_transfer).setVisibility(View.GONE);
+				@Override
+				protected void onSuccess() {
+					Toast.makeText(getActivity(), "补打总单成功", Toast.LENGTH_SHORT).show();
 				}
 				
+				@Override
+				protected void onFail(BusinessException e) {
+					Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
+			}.execute();
+		}
+		
+		//全单转菜
+		private void transfer(){
+			mTransFoods.clear();
+			mTransFoods.addAll(mOriOrder.getOrderFoods());
+			AskTableDialog.newInstance(getId()).show(getFragmentManager(), AskTableDialog.TAG);
+		}
+		
+		//全单备注
+		private void comment(){
+			if(!mNewFoodList.isEmpty()){
+				Intent intent = new Intent(getActivity(), PickTasteActivity.class);
+				Bundle bundle = new Bundle(); 
+				OrderFood dummyFood = new OrderFood();
+				dummyFood.asFood().setName("全单备注");
+				for(Taste t : mAllFoodTastes){
+					dummyFood.addTaste(t);
+				}
+				bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(dummyFood));
+				bundle.putInt(PickTasteActivity.PICK_TASTE_INIT_FGM, PickTasteActivity.POP_TASTE_FRAGMENT);
+				bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
+				intent.putExtras(bundle);
+				startActivityForResult(intent, PICK_ALL_FOOD_TASTE);
+			} else {
+				Toast.makeText(getActivity(), "此餐台还未点菜，无法添加备注", Toast.LENGTH_SHORT).show();
 			}
 		}
+		
+		//全单叫起
+		private void hang(){
+			if(isHangUp){
+				for(int i = 0; i < mNewFoodList.size(); i++){
+					mNewFoodList.get(i).setHangup(false);
+				}
+				isHangUp = false; 
+				mFoodListHandler.sendEmptyMessage(0);
+				
+			}else if(mNewFoodList.size() > 0){
+				new AlertDialog.Builder(getActivity()).setTitle("提示").setMessage("确定全单叫起吗?")
+					.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,	int which){
+							for(int i = 0; i < mNewFoodList.size(); i++){
+								mNewFoodList.get(i).setHangup(true);
+							}
+							isHangUp = true;
+							mFoodListHandler.sendEmptyMessage(0);
+							mPopup.dismiss();
+						}
+					})
+					.setNegativeButton("取消", null)
+					.show();	
+			}else {
+				Toast.makeText(getActivity(), "没有新点菜，无法叫起", Toast.LENGTH_SHORT).show();
+			}
+		}
+		
+		//分席
+		private void divide(){
+			if(mNewFoodList.isEmpty()){
+				Toast.makeText(getActivity(), "您还没有点菜", Toast.LENGTH_SHORT).show();
+			}else{
+				if(isMulti == false){
+					
+					final EditText edtTextMulti = new EditText(getActivity());
+					edtTextMulti.setKeyListener(new DigitsKeyListener(false, false));
+					
+					Dialog dialog = new AlertDialog.Builder(getActivity()).setTitle("请输入分席数量")
+						.setIcon(android.R.drawable.ic_dialog_info)
+						.setView(edtTextMulti)
+						.setPositiveButton("确定", new DialogInterface.OnClickListener(){
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								int amount = 0;
+								try{
+									amount = Integer.parseInt(edtTextMulti.getText().toString());
+									if(amount > 1){
+										for(OrderFood of : mNewFoodList){
+											of.addCount(of.getCount() * (amount - 1));
+											if(of.hasTmpTaste()){
+												Taste tmpTaste = of.getTasteGroup().getTmpTaste();
+												tmpTaste.setPreference((tmpTaste.getPreference().length() != 0 ? tmpTaste.getPreference() + "," : "") + ("分" + amount + "席上"));
+											}else{
+												of.setTmpTaste(Taste.newTmpTaste("分" + amount + "席上", 0));
+											}
+										}
+										//设置状态为'已分席'
+										isMulti = true;
+										mFoodListHandler.sendEmptyMessage(0);
+									}
+
+								}catch(NumberFormatException e){
+									Toast.makeText(getActivity(), "您输入的分席数量不正确", Toast.LENGTH_SHORT).show();
+								} 
+							}
+
+						})
+						.setNegativeButton("取消", null).show();		
+					
+					
+					//只用下面这一行弹出对话框时需要点击输入框才能弹出软键盘
+					dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+					//加上下面这一行弹出对话框时软键盘随之弹出
+					dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+					
+				}else{
+					for(OrderFood of : mNewFoodList){
+						of.setCount(of.getCount() - Math.abs(of.getDelta()));
+						if(of.hasTmpTaste()){
+							Taste tmpTaste = of.getTasteGroup().getTmpTaste();
+							tmpTaste.setPreference(tmpTaste.getPreference().replaceAll("分.席上", ""));
+							if(tmpTaste.getPreference().length() == 0){
+								of.setTmpTaste(null);
+							}
+						}
+					}
+					//设置状态为'未分席'
+					isMulti = false;
+					mFoodListHandler.sendEmptyMessage(0);
+					mPopup.dismiss();
+				}
+			}
+		}
+		
+//		private void createPopup(ViewGroup parent){
+//			View popupLayout = getActivity().getLayoutInflater().inflate(R.layout.order_activity_operate_popup, parent, false);
+//			//全单叫起Button
+//			Button hangUpBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_callUp);
+//			if(isHangUp){
+//				hangUpBtn.setText("取消叫起");
+//			} else{
+//				hangUpBtn.setText("叫起");
+//			}
+//			
+//			//分席Button
+//			final Button multiBtn = ((Button)popupLayout.findViewById(R.id.button_orderActivity_operate_popup_multi));
+//			if(isMulti){
+//				multiBtn.setText("取消分席");
+//			}else{
+//				multiBtn.setText("分席");
+//			}
+//			
+//			if(mPopup == null){
+//				
+//				mPopup = new PopupWindow(popupLayout, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+//				mPopup.setOutsideTouchable(true);
+//				mPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
+//				mPopup.update();
+//				
+//				//全单叫起Button
+//				hangUpBtn.setOnClickListener(new View.OnClickListener() {				
+//					@Override
+//					public void onClick(View v) {
+//						if(isHangUp){
+//							for(int i = 0; i < mNewFoodList.size(); i++){
+//								mNewFoodList.get(i).setHangup(false);
+//							}
+//							isHangUp = false; 
+//							mPopup.dismiss();
+//							mFoodListHandler.sendEmptyMessage(0);
+//						}
+//						else if(mNewFoodList.size() > 0){
+//							new AlertDialog.Builder(getActivity())
+//								.setTitle("提示")
+//								.setMessage("确定全单叫起吗?")
+//								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+//										@Override
+//										public void onClick(DialogInterface dialog,	int which){
+//											for(int i = 0; i < mNewFoodList.size(); i++){
+//												mNewFoodList.get(i).setHangup(true);
+//											}
+//											isHangUp = true;
+//											mFoodListHandler.sendEmptyMessage(0);
+//											mPopup.dismiss();
+//										}
+//									})
+//									.setNegativeButton("取消", null)
+//									.show();	
+//						}	
+//						else {
+//							Toast.makeText(getActivity(), "没有新点菜，无法叫起", Toast.LENGTH_SHORT).show();
+//						}
+//					}
+//				});
+//				
+//				//全单备注Button
+//				Button allRemarkBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_remark);
+//				allRemarkBtn.setText("备注");
+//				allRemarkBtn.setOnClickListener(new View.OnClickListener() {
+//					@Override
+//					public void onClick(View v) {
+//						if(!mNewFoodList.isEmpty()){
+//							Intent intent = new Intent(getActivity(), PickTasteActivity.class);
+//							Bundle bundle = new Bundle(); 
+//							OrderFood dummyFood = new OrderFood();
+//							dummyFood.asFood().setName("全单备注");
+//							for(Taste t : mAllFoodTastes){
+//								dummyFood.addTaste(t);
+//							}
+//							bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(dummyFood));
+//							bundle.putInt(PickTasteActivity.PICK_TASTE_INIT_FGM, PickTasteActivity.POP_TASTE_FRAGMENT);
+//							bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
+//							intent.putExtras(bundle);
+//							startActivityForResult(intent, PICK_ALL_FOOD_TASTE);
+//							mPopup.dismiss();
+//						} else {
+//							Toast.makeText(getActivity(), "此餐台还未点菜，无法添加备注", Toast.LENGTH_SHORT).show();
+//						}
+//					}
+//				});
+//				
+//				//分席Button
+//				multiBtn.setOnClickListener(new OnClickListener() {
+//					@Override
+//					public void onClick(View v) {
+//						if(mNewFoodList.isEmpty()){
+//							Toast.makeText(getActivity(), "您还没有点菜", Toast.LENGTH_SHORT).show();
+//						}else{
+//							if(isMulti == false){
+//								
+//								final EditText edtTextMulti = new EditText(getActivity());
+//								edtTextMulti.setKeyListener(new DigitsKeyListener(false, false));
+//								
+//								Dialog dialog = new AlertDialog.Builder(getActivity()).setTitle("请输入分席数量")
+//									.setIcon(android.R.drawable.ic_dialog_info)
+//									.setView(edtTextMulti)
+//									.setPositiveButton("确定", new DialogInterface.OnClickListener(){
+//										@Override
+//										public void onClick(DialogInterface dialog, int which) {
+//											int amount = 0;
+//											try{
+//												amount = Integer.parseInt(edtTextMulti.getText().toString());
+//												if(amount > 1){
+//													for(OrderFood of : mNewFoodList){
+//														of.addCount(of.getCount() * (amount - 1));
+//														if(of.hasTmpTaste()){
+//															Taste tmpTaste = of.getTasteGroup().getTmpTaste();
+//															tmpTaste.setPreference((tmpTaste.getPreference().length() != 0 ? tmpTaste.getPreference() + "," : "") + ("分" + amount + "席上"));
+//														}else{
+//															of.setTmpTaste(Taste.newTmpTaste("分" + amount + "席上", 0));
+//														}
+//													}
+//													//设置状态为'已分席'
+//													isMulti = true;
+//													mFoodListHandler.sendEmptyMessage(0);
+//												}
+//
+//											}catch(NumberFormatException e){
+//												Toast.makeText(getActivity(), "您输入的分席数量不正确", Toast.LENGTH_SHORT).show();
+//											} 
+//										}
+//		
+//									})
+//									.setNegativeButton("取消", null).show();		
+//								
+//								mPopup.dismiss();
+//								
+//								//只用下面这一行弹出对话框时需要点击输入框才能弹出软键盘
+//								dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+//								//加上下面这一行弹出对话框时软键盘随之弹出
+//								dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+//								
+//							}else{
+//								for(OrderFood of : mNewFoodList){
+//									of.setCount(of.getCount() - Math.abs(of.getDelta()));
+//									if(of.hasTmpTaste()){
+//										Taste tmpTaste = of.getTasteGroup().getTmpTaste();
+//										tmpTaste.setPreference(tmpTaste.getPreference().replaceAll("分.席上", ""));
+//										if(tmpTaste.getPreference().length() == 0){
+//											of.setTmpTaste(null);
+//										}
+//									}
+//								}
+//								//设置状态为'未分席'
+//								isMulti = false;
+//								mFoodListHandler.sendEmptyMessage(0);
+//								mPopup.dismiss();
+//							}
+//						}
+//
+//					}
+//				});
+//				
+//				if(mOriOrder != null){
+//					//全单转菜Button
+//					popupLayout.findViewById(R.id.button_orderActivity_operate_popup_transfer).setOnClickListener(new View.OnClickListener() {
+//	
+//						@Override
+//						public void onClick(View arg0) {
+//							mTransFoods.clear();
+//							mTransFoods.addAll(mOriOrder.getOrderFoods());
+//							AskTableDialog.newInstance(getId()).show(getFragmentManager(), AskTableDialog.TAG);
+//							mPopup.dismiss();
+//						}
+//						
+//					});
+//				}else{
+//					popupLayout.findViewById(R.id.button_orderActivity_operate_popup_transfer).setVisibility(View.GONE);
+//				}
+//				
+//			}
+//		}
 	}
 	
 	public static OrderFoodFragment newInstance(Table table){

@@ -283,6 +283,11 @@ public class AskOrderAmountDialog extends DialogFragment {
 			countEditText.setText(NumericUtil.float2String2(mSelectedFood.getCount()));
 		}
 		
+		//设置菜品单位
+		if(mSelectedFood.asFood().hasFoodUnit()){
+			mSelectedFood.setFoodUnit(mSelectedFood.asFood().getFoodUnits().get(0));
+		}
+		
 		countEditText.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -531,9 +536,7 @@ public class AskOrderAmountDialog extends DialogFragment {
 									}
 								}else if(buttonView.getTag() instanceof FoodUnit){
 									final FoodUnit unit = (FoodUnit)buttonView.getTag();
-									if(unit.equals(mSelectedFood.getFoodUnit())){
-										mSelectedFood.setFoodUnit(null);
-									}else{
+									if(!unit.equals(mSelectedFood.getFoodUnit())){
 										mSelectedFood.setFoodUnit(unit);
 									}
 								}
@@ -560,7 +563,7 @@ public class AskOrderAmountDialog extends DialogFragment {
 						if (thisUnit.equals(mSelectedFood.getFoodUnit())){
 							checkBox.setBackgroundColor(getResources().getColor(R.color.orange));
 						} else {
-							checkBox.setBackgroundColor(getResources().getColor(R.color.yellow));
+							checkBox.setBackgroundColor(getResources().getColor(R.color.brown));
 						}
 					}
 
