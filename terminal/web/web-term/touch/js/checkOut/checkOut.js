@@ -626,7 +626,7 @@ uo.transFoodForTS = function(c){
 	
 	$('#transSomethingTitle').html(orderFood.foodName +" -- 请输入桌号，菜品数量确定转菜");
 	
-	ts.tf.id = orderFood.id
+	ts.tf.id = orderFood.orderFoodId
 	ts.tf.count = orderFood.count + '';	
 	$('#txtFoodNumForTran').val(checkDot(ts.tf.count)?ts.tf.count : parseInt(ts.tf.count));	
 	
