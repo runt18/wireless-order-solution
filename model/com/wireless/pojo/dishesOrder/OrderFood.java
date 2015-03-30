@@ -900,6 +900,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		JsonMap jm = new JsonMap();
 		// extends food
 		jm.putJsonable(this.mFood, 0);
+		jm.putLong("orderFoodId", this.id);
 		jm.putInt(Key4Json.ORDER_ID.key, this.mOrderId);
 		jm.putString("foodName", this.getName());
 		jm.putString(Key4Json.ORDER_DATE.key, DateUtil.format(this.mOrderDate));
@@ -1001,3 +1002,5 @@ public class OrderFood implements Parcelable, Jsonable {
 		}
 	};
 }
+
+
