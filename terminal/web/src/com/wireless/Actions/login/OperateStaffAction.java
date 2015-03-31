@@ -25,10 +25,10 @@ public class OperateStaffAction extends Action{
 		String pin = request.getParameter("pin");
 		String pwd = request.getParameter("pwd");
 		//String account = request.getParameter("account");
-		String token = request.getParameter("token");
+//		String token = request.getParameter("token");
 		JObject jobject = new JObject();
 		final Staff theStaff;
-		final String tokenContent;
+//		final String tokenContent;
 		try{
 			Staff staff = null;
 			if(pin != null && !pin.trim().isEmpty()){
@@ -36,21 +36,22 @@ public class OperateStaffAction extends Action{
 			}
 			 
 			if(staff != null && staff.getPwd().equals(pwd)){
+				//再次验证token
+				//int tokenId = TokenDao.verify(new Token.VerifyBuilder(account, token));
+				//tokenContent = TokenDao.getById(tokenId).encrypt();
+//				tokenContent = token;
+				
 				pin = staff.getId() + "";
 				HttpSession session = request.getSession();
 				session.setAttribute("pin", pin);
 				session.setAttribute("restaurantID", staff.getRestaurantId()+"");
 				session.setAttribute("dynamicKey", System.currentTimeMillis() % 100000);
 				theStaff = staff;
-				jobject.initTip(true, "登陆成功");
+				jobject.initTip(true, "登陆成功");				
 				
-				//再次验证token
-				//int tokenId = TokenDao.verify(new Token.VerifyBuilder(account, token));
-				//tokenContent = TokenDao.getById(tokenId).encrypt();
-				tokenContent = token;
 			}else{
 				theStaff = null;
-				tokenContent = null;
+//				tokenContent = null;
 				jobject.initTip(false, "密码输入错误");
 			}
 			
@@ -61,7 +62,7 @@ public class OperateStaffAction extends Action{
 					if(theStaff != null){
 						jm.putJsonable("staff", theStaff, 1);
 					}
-					jm.putString("token", tokenContent);
+//					jm.putString("token", tokenContent);
 					return jm;
 				}
 

@@ -24,37 +24,19 @@ public class VerifyRestaurantAction extends Action {
 		
 		final JObject jobject = new JObject();
 		final String account = request.getParameter("account");
-		final String restaurantId = request.getParameter("restaurantID");
 		final String encryptedToken = request.getParameter("token");
 		final String nextEncryptedToken;
 		try {
-			final Restaurant r;
-			if(account == null || account.trim().isEmpty()){
-				r = RestaurantDao.getById(Integer.parseInt(restaurantId));
-			}else{
-				r = RestaurantDao.getByAccount(account);
-			}
+			final Restaurant r = RestaurantDao.getByAccount(account);
 			
 			jobject.setRoot(r);
 			
-			//FIXME 过渡阶段
-			if(encryptedToken == null || encryptedToken.trim().isEmpty()){
-				int tokenId = TokenDao.insert(new Token.InsertBuilder(r));
-				nextEncryptedToken = TokenDao.generate(new Token.GenerateBuilder(r.getAccount(), TokenDao.getById(tokenId).getCode()));
-			}else{
-				nextEncryptedToken = TokenDao.verify(new Token.VerifyBuilder(account, encryptedToken));
-			}
+			nextEncryptedToken = TokenDao.verify(new Token.VerifyBuilder(account, encryptedToken));
 			
 			Cookie cookie = new Cookie(request.getServerName() + "_digie_token", nextEncryptedToken);
 			cookie.setMaxAge(365 * 24 * 3600);
 			cookie.setPath("/web-term/touch/");
 			response.addCookie(cookie);
-			
-			//FIXME
-			Cookie cookieToken = new Cookie(request.getServerName() + "_digie_token", null);
-			cookieToken.setMaxAge(0);
-			cookieToken.setPath("/web-term/touch");
-			response.addCookie(cookieToken);
 			
 		}catch (BusinessException e) {
 			jobject.initTip(e);
