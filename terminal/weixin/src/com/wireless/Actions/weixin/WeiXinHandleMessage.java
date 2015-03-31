@@ -176,7 +176,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		item4TakeOut.setTitle("外卖点餐");
 		item4TakeOut.setUrl(createUrl(msg, WEIXIN_FOOD) + "&e=" + WxOrder.Type.TAKE_OUT.getVal());
 		item4TakeOut.setPicUrl(WEIXIN_FOOD_ICON);
-		naviItem.addItem(item4TakeOut);		
+//		naviItem.addItem(item4TakeOut);		
 
 
 		Data4Item intrcItem = new Data4Item();
