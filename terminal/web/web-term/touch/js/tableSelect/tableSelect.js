@@ -1909,7 +1909,7 @@ ts.member.openMemberOperationWin = function(){
 			if(jr.success){
 //				memberTypeData = jr.root;
 				Util.LM.hide();
-				var html = [];
+				var html = ['<option></option>'];
 				for (var i = 0; i < jr.root.length; i++) {
 					html.push('<option value={id} data-attrVal={attrVal} data-chargeRate={chargeRate}>{name}</option>'.format({
 						id : jr.root[i].id,
