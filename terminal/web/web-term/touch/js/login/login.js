@@ -18,9 +18,9 @@ var lg = {
 var allStaff = '<a data-role="button" data-inline="true" class="loginName" onclick="selectedName(this)" data-value="{staffId}" data-theme="c"><div>{staffName}</div></a>';
 
 $(function(){
-	//FIXME
-//	delcookie("digie_token");
-//	delcookie("digie_restaurant");
+	//FIXME 过渡
+	delcookie("digie_restaurant");
+	delcookie(document.domain+'_restaurant');
 	
 	$(".numkeyboard").ioskeyboard({
 	    keyboardRadix:80,//键盘大小基数，实际大小比为9.4，即设置为100时实际大小为940X330
@@ -42,30 +42,16 @@ $(function(){
 	}
 	
 	Util.LM.show();
-	//FIXME 过渡代码, 只有同时存在account和token才能调用Verify
-	if (getcookie("digie_restaurant") != "" || getcookie(document.domain+"_digie_restaurant") != "" || getcookie(document.domain+'_restaurant') != ""){
-		var account = getcookie("digie_restaurant");
+	
+	if (getcookie(document.domain+"_digie_restaurant") != "" && getcookie(document.domain+"_digie_token") != ""){
+		var account = getcookie(document.domain+"_digie_restaurant");
 		var token = getcookie(document.domain+"_digie_token");
 		var rid = getcookie(document.domain+'_restaurant');
-		var restaurantEntity;
-		
-		if(!account){
-			account = getcookie(document.domain+"_digie_restaurant");
-		}
-		
-		//FIXME 过渡
-		if(account.length > 10){
-			restaurantEntity = JSON.parse(account);
-		}else{
-			restaurantEntity = {account : account};
-			
-		}
 		
 		$.ajax({
 			url : '../VerifyRestaurant.do',
 			data : {
-				restaurantID : rid,
-				account : restaurantEntity.account,
+				account : account,
 				token : token && token != 'undefined'?token:''
 			},	
 			type : 'post',
@@ -85,7 +71,7 @@ $(function(){
 						fn : function(){
 							$('#txtRestaurantAccount').removeAttr('autofocus');
 							$('#loginRestaurantCmp').show();
-							$('#txtRestaurantAccount').val(restaurantEntity.account);
+							$('#txtRestaurantAccount').val(account);
 							$('#txtRestaurantDynamicCode').focus();
 						}
 					});
@@ -155,7 +141,6 @@ function staffLoginHandler(c){
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
-//				setcookie(document.domain+"_digie_token", data.other.token);
 				if(c && c.part == 'basic'){
 					location.href = '../pages/Mgr/DigieBasic.html';
 				}else{
@@ -274,7 +259,6 @@ function initStaffContent(c){
 			if(data.success){
 				lg.staffs = data.root;
 				
-//				data.root = data.root.splice(17);
 	            $.mobile.changePage("#staffLoginPage",
 	                    { transition: "fade" });
 	            

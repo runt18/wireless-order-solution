@@ -1058,6 +1058,7 @@ function operateOrderFoodTaste(c){
 	}	
 	
 	of.ot.allBill = c.type;
+	
 	var selectedOrderFood = typeof of.newFood[foodContent.attr('data-index')] != 'undefined' ? of.newFood[foodContent.attr('data-index')] : of.newFood[0];
 	
 	if(c.type == 2 && typeof selectedOrderFood.isTemporary == 'boolean' && selectedOrderFood.isTemporary){

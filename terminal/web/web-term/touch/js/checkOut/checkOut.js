@@ -1069,6 +1069,9 @@ uo.openMoreOperate = function(){
 								renderTo : 'orderFoodListMgr'
 							});		
 						});							
+					},
+					returnCallback : function(){
+						delete uo.printDetailPatchAction;
 					}
 				});
 				
