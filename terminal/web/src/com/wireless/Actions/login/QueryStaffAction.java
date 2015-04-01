@@ -141,7 +141,7 @@ public class QueryStaffAction extends Action {
 				}
 				
 			});
-			out.write(jobject.toString());
+			out.write(jobject.toString(1));
 		}
 
 		return null;
