@@ -141,7 +141,7 @@ public class QueryStaffAction extends Action {
 				}
 				
 			});
-			out.write(jobject.toString(1));
+			out.write(jobject.toString(Staff.ST_PARCELABLE_COMPLEX));
 		}
 
 		return null;
