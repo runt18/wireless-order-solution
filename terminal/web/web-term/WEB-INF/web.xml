@@ -16,7 +16,13 @@
 					/QueryStaff.do,
 					/QueryOTA.do,
 					/OperateStaff.do,
-
+					/AutoLogin.do,
+					/RestaurantLogin.do,
+					/VerifyRestaurant.do,
+					/AdminLogin.do,
+					/OperateBillboard.do,
+					/QueryBillboard.do,
+		
 					/Login.html,
 					/LoginAdmin.html,
 					/PersonLoginTimeout.html,
