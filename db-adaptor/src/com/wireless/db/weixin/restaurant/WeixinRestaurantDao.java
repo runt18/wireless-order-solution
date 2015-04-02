@@ -99,6 +99,10 @@ public class WeixinRestaurantDao {
 			  (builder.isWeixinInfoChanged() ? " ,weixin_info = '" + new StringHtml(wr.getWeixinInfo(), StringHtml.ConvertTo.TO_NORMAL) + "'" : "") +
 			  (builder.isWeixinAppIdChanged() ? " ,app_id = '" + wr.getWeixinAppId() + "'" : "") +
 			  (builder.isWeixinSecretChanged() ? " ,app_secret = '" + wr.getWeixinAppSecret() + "'" : "") +
+			  (builder.isQrCodeUrlChanged() ? " ,qrcode_url = '" + wr.getQrCodeUrl() + "'" : "") +
+			  (builder.isNickNameChanged() ? " ,nick_name = '" + wr.getNickName() + "'" : "") +
+			  (builder.isHeadImgUrlChanged() ? " ,head_img_url = '" + wr.getHeadImgUrl() + "'" : "") +
+			  (builder.isRefreshTokenChanged() ? " ,refresh_token = '" + wr.getRefreshToken() + "'" : "") +
 			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
