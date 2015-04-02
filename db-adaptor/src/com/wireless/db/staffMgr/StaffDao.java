@@ -603,6 +603,13 @@ public class StaffDao {
 		
 		Staff s = builder.build();
 		
+		//管理员只能修改密码
+		if(RoleDao.getById(dbCon, staff, s.getRole().getId()).getCategory() == Role.Category.ADMIN){
+			if(builder.isRoleChanged() || builder.isNameChanged() || builder.isMobileChanged()){
+				throw new BusinessException(StaffError.ADMIN_STAFF_NOT_ALLOW_MODIFIED);
+			}
+		}
+		
 		sql = " UPDATE " + Params.dbName + ".staff SET " + 
 			  " staff_id = " + s.getId() +
 			  (builder.isNameChanged() ? " ,name = '" + s.getName() + "'" : "") +

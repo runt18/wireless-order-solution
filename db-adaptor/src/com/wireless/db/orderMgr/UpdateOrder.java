@@ -302,6 +302,7 @@ public class UpdateOrder {
 		
 		for(OrderFood cancelFood : oriFoods){
 			cancelFood.removeCount(cancelFood.getCount(), staff);
+			cancelFood.setOperation(OrderFood.Operation.CANCEL);
 			result.cancelledFoods.add(cancelFood);
 		}
 		
