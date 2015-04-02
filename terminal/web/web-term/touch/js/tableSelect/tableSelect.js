@@ -193,7 +193,6 @@ $(function(){
 	$.ajax({
 		url : '../VerifyLogin.do',
 		success : function(data, status, xhr){
-			
 			if(data.success){
 				//刷新时去除#
 				if(location.href.indexOf('#') > 0){
