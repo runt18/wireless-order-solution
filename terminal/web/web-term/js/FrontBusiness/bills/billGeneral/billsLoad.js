@@ -53,7 +53,6 @@ function loadAllStaff() {
 	Ext.Ajax.request({
 		url : "../../QueryStaff.do",
 		params : {
-			isCookie : true,
 			"restaurantID" : restaurantID,
 			"type" : 0,
 			"isPaging" : false,

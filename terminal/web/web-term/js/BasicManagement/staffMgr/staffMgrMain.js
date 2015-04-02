@@ -156,8 +156,7 @@ if(!changePwdWin){
 				Ext.getCmp('txtNewPwd').clearInvalid();
 				Ext.getCmp('txtConfirmNewPwd').setValue('');
 				Ext.getCmp('txtConfirmNewPwd').clearInvalid();
-				var f = Ext.get('txtOldpwd');
-				f.focus.defer(true, 100); 
+				Ext.getCmp('txtOldpwd').focus(true, 100); 
 			}
 		}
 	});
@@ -319,11 +318,11 @@ var staffStore = new Ext.data.Store({
 		name : 'roleName'
 	} ]),
 	baseParams:{
-		isCookie : true,
 		"restaurantID" : restaurantID,
 		"type" : 0,
 		"isPaging" : false,
-		"isCombo" : false
+		"isCombo" : false,
+		"hasDetail" : true
 	}
 });
 staffStore.load({
