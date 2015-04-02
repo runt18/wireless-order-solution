@@ -11,15 +11,24 @@
 		<action path="/WXEntry" type="com.wireless.Actions.weixin.EntryAction"
 			scope="request">
 		</action>
+		<action path="/WxAuth"
+			type="com.wireless.Actions.weixin.auth.WxAuthAction" scope="request">
+		</action>
+		<action path="/RecWxTicket"
+			type="com.wireless.Actions.weixin.auth.WxRecTicketAction" scope="request">
+		</action>
+		<action path="/TestWxAuth"
+			type="com.wireless.Actions.weixin.auth.TestWxAuthAction" scope="request">
+		</action>
 		<action path="/WXOperateMember"
 			type="com.wireless.Actions.weixin.query.WXOperateMemberAction" scope="request"
 			parameter="dataSource">
 		</action>
-		<action path="/FinanceWeixin" type="com.wireless.Actions.weixin.finance.FinanceWeixinAction"
-			scope="request">
+		<action path="/FinanceWeixin"
+			type="com.wireless.Actions.weixin.finance.FinanceWeixinAction" scope="request">
 		</action>
-		<action path="/FinanceQRCode" type="com.wireless.Actions.weixin.finance.FinanceQRCodeAction"
-			scope="request">
+		<action path="/FinanceQRCode"
+			type="com.wireless.Actions.weixin.finance.FinanceQRCodeAction" scope="request">
 		</action>
 		<action path="/WXEntry" type="com.wireless.Actions.weixin.EntryAction"
 			scope="request">
@@ -55,27 +64,25 @@
 		<action path="/OperatePromotion"
 			type="com.wireless.Actions.weixin.query.WXQueryPromotionAction"
 			scope="request" parameter="dataSource">
-		</action>		
+		</action>
 		<action path="/WXQueryOrder"
-			type="com.wireless.Actions.weixin.query.WxQueryOrderAction"
-			scope="request" parameter="dataSource">
-		</action>		
+			type="com.wireless.Actions.weixin.query.WxQueryOrderAction" scope="request"
+			parameter="dataSource">
+		</action>
 		<action path="/WXQueryCoupon"
-			type="com.wireless.Actions.weixin.query.WXQueryCouponAction"
-			scope="request" parameter="dataSource">
-		</action>		
+			type="com.wireless.Actions.weixin.query.WXQueryCouponAction" scope="request"
+			parameter="dataSource">
+		</action>
 		<action path="/WXQueryDianping"
 			type="com.wireless.Actions.weixin.query.WXQueryDianpingDataAction"
 			scope="request" parameter="dataSource">
-		</action>			
+		</action>
 		<action path="/WXQueryAddress"
 			type="com.wireless.Actions.weixin.query.WXQueryTakeoutAddressAction"
-			scope="request" >
-		</action>		
-		<action path="/testMacAddr"
-			type="test.getMacAddrAction"
-			scope="request" >
-		</action>											
+			scope="request">
+		</action>
+		<action path="/testMacAddr" type="test.getMacAddrAction" scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 
