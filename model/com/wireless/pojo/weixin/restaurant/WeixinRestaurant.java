@@ -10,6 +10,10 @@ public class WeixinRestaurant {
 		private String weixinInfo;
 		private String weixinAppId;
 		private String weixinAppSecret;
+		private String qrCodeUrl;
+		private String nickName;
+		private String headImgUrl;
+		private String refreshToken;
 		
 		public UpdateBuilder setWeixinLogo(int ossImageId){
 			this.weixinLogo = new OssImage(ossImageId);
@@ -50,6 +54,42 @@ public class WeixinRestaurant {
 		
 		public boolean isWeixinSecretChanged(){
 			return this.weixinAppSecret != null;
+		}
+
+		public UpdateBuilder setQrCodeUrl(String qrCodeUrl){
+			this.qrCodeUrl = qrCodeUrl;
+			return this;
+		}
+		
+		public boolean isQrCodeUrlChanged(){
+			return this.weixinAppSecret != null;
+		}
+		
+		public UpdateBuilder setNickName(String nickName){
+			this.nickName = nickName;
+			return this;
+		}
+		
+		public boolean isNickNameChanged(){
+			return this.nickName != null;
+		}
+		
+		public UpdateBuilder setHeadImgUrl(String headImgUrl){
+			this.headImgUrl = headImgUrl;
+			return this;
+		}
+		
+		public boolean isHeadImgUrlChanged(){
+			return this.headImgUrl != null;
+		}
+		
+		public UpdateBuilder setRefreshToken(String refreshToken){
+			this.refreshToken = refreshToken;
+			return this;
+		}
+		
+		public boolean isRefreshTokenChanged(){
+			return this.refreshToken != null;
 		}
 		
 		public WeixinRestaurant build(){
@@ -100,12 +140,20 @@ public class WeixinRestaurant {
 	private String weixinInfo;
 	private String weixinAppId;
 	private String weixinAppSecret;
+	private String qrCodeUrl;
+	private String nickName;
+	private String headImgUrl;
+	private String refreshToken;
 	
 	private WeixinRestaurant(UpdateBuilder builder){
 		this.weixinLogo = builder.weixinLogo;
 		this.weixinInfo = builder.weixinInfo;
 		this.weixinAppId = builder.weixinAppId;
 		this.weixinAppSecret = builder.weixinAppSecret;
+		this.qrCodeUrl = builder.qrCodeUrl;
+		this.nickName = builder.nickName;
+		this.headImgUrl = builder.headImgUrl;
+		this.refreshToken = builder.refreshToken;
 	}
 	
 	public WeixinRestaurant(int restaurantId){
@@ -187,6 +235,50 @@ public class WeixinRestaurant {
 
 	public void setWeixinAppSecret(String weixinAppSecret) {
 		this.weixinAppSecret = weixinAppSecret;
+	}
+
+	public String getQrCodeUrl() {
+		if(qrCodeUrl == null){
+			return "";
+		}
+		return qrCodeUrl;
+	}
+
+	public void setQrCodeUrl(String qrCodeUrl) {
+		this.qrCodeUrl = qrCodeUrl;
+	}
+
+	public String getNickName() {
+		if(nickName == null){
+			return "";
+		}
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	public String getHeadImgUrl() {
+		if(headImgUrl == null){
+			return "";
+		}
+		return headImgUrl;
+	}
+
+	public void setHeadImgUrl(String headImgUrl) {
+		this.headImgUrl = headImgUrl;
+	}
+
+	public String getRefreshToken() {
+		if(refreshToken == null){
+			return "";
+		}
+		return refreshToken;
+	}
+
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
 	}
 
 	@Override
