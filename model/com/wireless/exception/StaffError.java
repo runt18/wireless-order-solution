@@ -5,6 +5,7 @@ public class StaffError extends ErrorEnum{
 	 *  code range : 7600 - 7649 
 	 */
 	public static final ErrorCode STAFF_NOT_EXIST = build(7600, "操作失败, 你查找的员工信息不存在.");
+	public static final ErrorCode ADMIN_STAFF_NOT_ALLOW_MODIFIED = build(7600, "操作失败, 管理员账号不允许修改信息.");
 	public static final ErrorCode ROLE_NOT_EXIST = build(7601, "操作失败, 查找的角色信息不存在.");
 	public static final ErrorCode PERMISSION_NOT_ALLOW = build(7602, "操作失败, 请求的操作没有相应的权限.");
 	public static final ErrorCode DISCOUNT_NOT_ALLOW = build(7603, "你没有使用此折扣方案的权限");

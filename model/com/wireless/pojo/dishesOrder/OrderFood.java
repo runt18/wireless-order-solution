@@ -732,7 +732,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	 */
 	@Override
 	public String toString(){
-		return mFood.getName() + (hasTasteGroup() ? ("-" + mTasteGroup.getPreference()) : "");
+		return getName() + (hasTasteGroup() ? ("-" + mTasteGroup.getPreference()) : "");
 	}
 	
 	@Override
