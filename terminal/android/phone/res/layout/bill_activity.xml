@@ -174,7 +174,8 @@
         android:id="@+id/relativeLayout_bottom2_bill"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/relativeLayout_bottom_bill" >
+        android:layout_above="@id/relativeLayout_bottom_bill"
+        android:background="@drawable/bg02" >
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -257,8 +258,9 @@
         android:id="@+id/imgView_line_bill"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/relativeLayout_bottom2_bill"
-        android:src="@drawable/line" />
+        android:layout_above="@+id/relativeLayout_bottom2_bill"
+        android:src="@drawable/line"
+        android:scaleType="centerCrop" />
 
     <com.wireless.ui.view.BillFoodListView
         android:id="@+id/listView_food_bill"

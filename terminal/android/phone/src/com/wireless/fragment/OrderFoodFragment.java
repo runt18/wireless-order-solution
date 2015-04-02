@@ -554,6 +554,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						public void onClick(View v) {
 							final List<String> items = new ArrayList<String>();
 							items.add("加菜");
+							items.add("转菜");
 							items.add(of.isHurried() ? "取消催菜" : "催菜");
 							if(!of.isGift() && WirelessOrder.loginStaff.getRole().hasPrivilege(Privilege.Code.GIFT) && of.asFood().isGift()){
 								items.add("赠送");
@@ -568,6 +569,12 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 										//加菜
 										AddOrderAmountDialog.newInstance(of, getId()).show(getFragmentManager(), AddOrderAmountDialog.TAG);
 									}else if(which == 1){
+										//转菜
+										mTransFoods.clear();
+										mTransFoods.add(mSelectedFood);
+										AskTableDialog.newInstance(getId()).show(getFragmentManager(), AskTableDialog.TAG);
+
+									}else if(which == 2){
 										//催菜
 										if(mSelectedFood.isHurried()){
 											mSelectedFood.setHurried(false);
@@ -576,7 +583,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 											Toast.makeText(getActivity(), "催菜成功", Toast.LENGTH_SHORT).show();	
 										}
 										mFoodListHandler.sendEmptyMessage(0);
-									}else if(which == 2){
+									}else if(which == 3){
 										//赠送
 										new AlertDialog.Builder(getActivity())
 											.setTitle("提示")
@@ -792,7 +799,6 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 							}
 							isHangUp = true;
 							mFoodListHandler.sendEmptyMessage(0);
-							mPopup.dismiss();
 						}
 					})
 					.setNegativeButton("取消", null)
