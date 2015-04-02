@@ -37,6 +37,7 @@ public class QueryStaffAction extends Action {
 		String cate = request.getParameter("cate");
 		String privileges = request.getParameter("privileges");
 		String checkPrivilege = request.getParameter("checkPrivilege");
+		String hasDetail = request.getParameter("hasDetail");
 		
 		JObject jobject = new JObject();
 		List<Staff> staffList = new ArrayList<Staff>();
@@ -67,14 +68,14 @@ public class QueryStaffAction extends Action {
 				staff = StaffDao.verify(Integer.parseInt(pin));
 			}
 			if(isName != null){
-				extra.putJsonable("staff", staff, 1);
+				extra.putJsonable("staff", staff, Staff.ST_PARCELABLE_SIMPLE);
 				Restaurant restaurant;
 				if(request.getSession().getAttribute("restaurantID") == null){
 					restaurant = new Restaurant();
 				}else{
 					restaurant = RestaurantDao.getById(Integer.parseInt((String) request.getSession().getAttribute("restaurantID")));
 				}
-				extra.putJsonable("restaurant", restaurant, 1);
+				extra.putJsonable("restaurant", restaurant, Restaurant.RESTAURANT_PARCELABLE_SIMPLE);
 			}else {
 				if(name != null && !name.trim().isEmpty()){
 					staffList = StaffDao.getByName(staff, name);
@@ -107,7 +108,7 @@ public class QueryStaffAction extends Action {
 				}
 				if(restaurantID != null){
 					Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));
-					extra.putJsonable("restaurant", restaurant, 0);					
+					extra.putJsonable("restaurant", restaurant, Restaurant.RESTAURANT_PARCELABLE_COMPLEX);					
 				}
 				jobject.setTotalProperty(staffList.size());
 				staffList = DataPaging.getPagingData(staffList, isPaging, index, pageSize);
@@ -141,7 +142,7 @@ public class QueryStaffAction extends Action {
 				}
 				
 			});
-			out.write(jobject.toString(Staff.ST_PARCELABLE_COMPLEX));
+			out.write(jobject.toString(hasDetail != null ? Staff.ST_PARCELABLE_COMPLEX : Staff.ST_PARCELABLE_SIMPLE));
 		}
 
 		return null;
