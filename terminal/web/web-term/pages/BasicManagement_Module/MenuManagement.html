@@ -3,59 +3,10 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>无线点餐网页终端</title>
-<script type="text/javascript">
 
-	var currPageIndex = 0;
-	var currRowIndex = -1;
-	var conditionType = '';
-	
-	//多价格数量
-	var multiFoodPriceCount = 0;
-
-	var dishesPageRecordCount = 50;
-	var dishesStaticRecordCount = 11;
-
-	var kitchenData = [];
-	var materialCateComboData = [];
-	
-	var materialData = [];
-	var materialComboData = [];
-	var materialComboDisplayData = [];
-	
-	var stockStatusData = [[1, '无库存'], [2, '商品出库'], [3, '原料出库']];
-		
-	var mmObj = {};
-	mmObj.operation = {
-		insert : 'INSERT',
-		update : 'UPDATE',
-		select : 'SELECT',
-		set : 'set',
-		get : 'get',
-		img : {
-			upload : 'UPLOAD',
-			del : 'DELETE'
-		}
-	};
-	
-	var imgTypeTmp = ['jpg', 'jpeg', 'gif', 'png', 'bmp'];
-	var tabItemsHeight = 440;
-	
-	var foodImageUpdateLoaddingMask;
-	
-	var kitchenTreeForSreach;
-	var menuGrid;
-	var foodOperationWin = null;
-	var foodPricePlanWin = null;
-	var updateDeptWin, updateKitchenWin, foodRelationOperationWin, pricePlanWin, pricePlanGrid, pricePlanOperatePanel;
-</script>
-
-<script type="text/javascript"
-	src="../../js/BasicManagement/menuMgr/menuMgrMain.js"></script>
-
-
+<script type="text/javascript" src="../../js/BasicManagement/menuMgr/menuMgrMain.js"></script>
 </head>
 <body>
-
 	<div id='divMenu'></div>
 </body>
 </html>
