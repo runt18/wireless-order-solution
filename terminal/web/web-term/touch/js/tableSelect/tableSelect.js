@@ -1992,10 +1992,17 @@ ts.member.operateMemberHandler = function(){
 	
 	
 	if(!memberMobile.val() && !memberCard.val()){
-		Util.msg.alert({
-			topTip : true,
-			msg : '至少要输入手机或会员卡号'
-		});
+		Util.msg.tip('至少要输入手机或会员卡号');
+		return;
+	}	
+	
+	if(!memberName.val()){
+		Util.msg.tip('请输入会员名称');
+		return;
+	}	
+	
+	if(!membetType.val()){
+		Util.msg.tip('请选择会员类型');
 		return;
 	}	
 	
