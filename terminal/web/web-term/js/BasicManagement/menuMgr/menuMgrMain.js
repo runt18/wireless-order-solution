@@ -1,6 +1,50 @@
-﻿
+﻿var currPageIndex = 0, currRowIndex = -1, conditionType = '',
+	//多价格数量
+	multiFoodPriceCount = 0,
+	
+	dishesPageRecordCount = 50,
+	dishesStaticRecordCount = 11,
+	
+	kitchenData = [],
+	materialCateComboData = [],
+	
+	materialData = [],
+	materialComboData = [],
+	materialComboDisplayData = [],
+	
+	stockStatusData = [[1, '无库存'], [2, '商品出库'], [3, '原料出库']],
+		
+	mmObj = {
+		operation : {
+				insert : 'INSERT',
+				update : 'UPDATE',
+				select : 'SELECT',
+				set : 'set',
+				get : 'get',
+				img : {
+					upload : 'UPLOAD',
+					del : 'DELETE'
+				}
+		}	
+	},
+	
+	imgTypeTmp = ['jpg', 'jpeg', 'gif', 'png', 'bmp'],
+	
+	tabItemsHeight = 440,
+	
+	foodImageUpdateLoaddingMask,
+	
+	kitchenTreeForSreach,
+	menuGrid,
+	foodOperationWin = null,
+	foodPricePlanWin = null,
+	updateDeptWin, updateKitchenWin, foodRelationOperationWin, pricePlanWin, pricePlanGrid, pricePlanOperatePanel,
+	
+	bar = {treeId : 'kitchenTreeForSreach', option :[{name : '修改', fn : "floatBarUpdateHandler()"}, {name : '删除', fn : "floatBarDeleteHandler()"}, {name : '置顶', fn : "floatBarSetTopHandler()"}]},
+	
+	food_pricePlans, tartDeptNode;
+	
 //-------------lib.js---------
-
 function floatBarDeleteHandler(){
 	var tn = Ext.ux.getSelNode(kitchenTreeForSreach);
 	if(!tn){
@@ -2591,7 +2635,7 @@ function fppOperation(){
 };
 //------------------
 //-----------load----------------
-var startDeptNode;
+
 function initKitchenTreeForSreach(){
 	
 	kitchenTreeForSreach = new Ext.tree.TreePanel({
@@ -3684,12 +3728,6 @@ function getPricePlan(){
 		}
 	});
 }
-
-
-
-var bar = {treeId : 'kitchenTreeForSreach', option :[{name : '修改', fn : "floatBarUpdateHandler()"}, {name : '删除', fn : "floatBarDeleteHandler()"}, {name : '置顶', fn : "floatBarSetTopHandler()"}]};
-
-var food_pricePlans;
 
 Ext.onReady(function() {
 
