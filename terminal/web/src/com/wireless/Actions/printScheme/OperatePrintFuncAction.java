@@ -220,6 +220,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 			String kitchenIds = request.getParameter("kitchens");
 			String deptId = request.getParameter("dept");
 			String regionIds = request.getParameter("regions");
+			String isNeedToCancel = request.getParameter("isNeedToCancel");
 			int printerId = -1;
 			if(request.getParameter("printerId") == null){
 				String printerName = request.getParameter("printerName");
@@ -355,6 +356,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 			int printerId = Integer.parseInt(request.getParameter("printerId"));
 			int funcId = Integer.parseInt(request.getParameter("funcId"));
 			int pType = Integer.parseInt(request.getParameter("pType"));
+			String isNeedToCancel = request.getParameter("isNeedToCancel");
 			
 			String[] kitchen = null, region = null, dept = null;
 			if(!kitchens.trim().isEmpty()){
@@ -385,6 +387,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, printerId, summaryBuilder.build(), funcId);
+				
 			}else if(PType.valueOf(pType) == PType.PRINT_ALL_CANCELLED_FOOD){
 				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newAllCancelledFood();
 				for (String r : region) {

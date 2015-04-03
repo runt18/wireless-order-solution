@@ -1,6 +1,5 @@
 package com.wireless.Actions.printScheme;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +23,7 @@ public class QueryPrintFuncAction extends Action{
 		
 		
 		JObject jobject = new JObject();
-		List<PrintFunc> root = new ArrayList<PrintFunc>();
+		List<PrintFunc> root ;
 		try{
 			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
