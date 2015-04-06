@@ -664,6 +664,12 @@ function init(){
 			bodyStyle : 'background:url(../../images/bill_select.png) no-repeat center center;'
 		}],
 	});
+	
+	
+	function opePrintName(btn){
+		Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+		Ext.getCmp('txtPrinterAlias').focus();		
+	}
 
 	//打印机操作
 	printerWin = new Ext.Window({
@@ -754,7 +760,7 @@ function init(){
 		items : [{
 			xtype : 'form',
 			labelAlign : 'left',
-			labelWidth : 40,
+			labelWidth : 50,
 			frame : true,
 			defaultType : 'textfield',
 			items : [{
@@ -771,89 +777,82 @@ function init(){
 				}
 			},{
 				xtype : 'fieldset',
-				title : '别名',
+				title : '选择名称',
 				autoHeight : true,
-				defaultType : 'radio',
+				labelWidth : 40,
 				items : [{
-					name : 'pName',
-					inputValue : '收银',
-					hideLabel : true,
-					boxLabel : '收银',
-					listeners : {
-						check : function(){
-							Ext.getCmp('txtPrinterAlias').setValue('');
-						}
-					}
-					
-				},{
-					name : 'pName',
-					inputValue : '中厨',
-					hideLabel : true,
-					boxLabel : '中厨',
-					listeners : {
-						check : function(){
-							Ext.getCmp('txtPrinterAlias').setValue('');
-						}
-					}
-				}, {
-					xtype : 'radio',
-					name : 'pName',
-					inputValue : '地哩',
-					hideLabel : true,
-					boxLabel : '地哩',
-					listeners : {
-						check : function(){
-							Ext.getCmp('txtPrinterAlias').setValue('');
-						}
-					}
-				}, {
-					xtype : 'radio',
-					name : 'pName',
-					inputValue : '点心',
-					hideLabel : true,
-					boxLabel : '点心',
-					listeners : {
-						check : function(){
-							Ext.getCmp('txtPrinterAlias').setValue('');
-						}
-					}
-				}, {
-					xtype : 'radio',
-					name : 'pName',
-					inputValue : '水吧',
-					hideLabel : true,
-					boxLabel : '水吧',
-					listeners : {
-						check : function(){
-							Ext.getCmp('txtPrinterAlias').setValue('');
-						}
-					}
-				}, {
-					xtype : 'radio',
-					name : 'pName',
-					inputValue : '海鲜',
-					hideLabel : true,
-					boxLabel : '海鲜',
-					listeners : {
-						check : function(){
-							Ext.getCmp('txtPrinterAlias').setValue('');
-						}
-					}
+					layout : 'column',
+					frame : false,
+					defaults : {
+						columnWidth : .25,
+						layout : 'form'
+					},
+					items : [{
+						items : [{
+							xtype : 'button',
+							text : '收银',
+							handler : function(btn){
+								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+								Ext.getCmp('txtPrinterAlias').focus();
+							}
+						}]
+					}, {
+						items : [{
+							xtype : 'button',
+							text : '中厨',
+							handler : function(btn){
+								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+								Ext.getCmp('txtPrinterAlias').focus();
+							}
+						}]
+					}, {
+						items : [{
+							xtype : 'button',
+							text : '点心',
+							handler : function(btn){
+								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+								Ext.getCmp('txtPrinterAlias').focus();
+							}
+						}]
+					}, {
+						items : [{
+							xtype : 'button',
+							text : '水吧',
+							handler : function(btn){
+								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+								Ext.getCmp('txtPrinterAlias').focus();
+							}
+						}]
+					},{
+						columnWidth : 1,
+						style : 'margin-bottom:5px;'
+					}, {
+						items : [{
+							xtype : 'button',
+							text : '海鲜',
+							handler : function(btn){
+								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+								Ext.getCmp('txtPrinterAlias').focus();
+							}
+						}]
+					}, {
+						items : [{
+							xtype : 'button',
+							text : '地哩',
+							handler : function(btn){
+								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+								Ext.getCmp('txtPrinterAlias').focus();
+							}
+						}]
+					},{
+						columnWidth : 1,
+						style : 'margin-bottom:5px;'
+					}]
 				}, {
 					xtype : 'textfield',
 					id : 'txtPrinterAlias',
-					fieldLabel : '其它',
-					width : 130,
-					listeners : {
-						focus : function(){
-							var names = document.getElementsByName('pName');
-							for (var i = 0; i < names.length; i++) {
-								if(names[i].checked){
-									names[i].checked = false;
-								}
-							}
-						}
-					}
+					fieldLabel : '别名',
+					width : 130
 				}]
 				
 			},{
@@ -1029,8 +1028,6 @@ function printFuncOperactionHandler(c){
 		
 		Ext.getDom('chkAllDept').checked = true;
 		Ext.getDom('chkAllRegion').checked = true;
-		
-		
 		
 	}else{
 		if(ss == null){
@@ -1344,7 +1341,6 @@ Ext.onReady(function(){
 		layout : 'border',
 		frame : true,
 		items : [printerTree, printFuncGrid]
-		
 	});
 	showFloatOption(obj);
 	
