@@ -62,7 +62,7 @@ public class WeixinRestaurant {
 		}
 		
 		public boolean isQrCodeUrlChanged(){
-			return this.weixinAppSecret != null;
+			return this.qrCodeUrl != null;
 		}
 		
 		public UpdateBuilder setNickName(String nickName){

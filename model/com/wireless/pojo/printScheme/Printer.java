@@ -27,14 +27,12 @@ public class Printer implements Jsonable{
 	public static class InsertBuilder{
 		private final String mName;
 		private final PStyle mStyle;
-		private final int mRestaurantId;
 		private String mAlias;
 		private boolean isEnabled = true;
 		
-		public InsertBuilder(String name, PStyle style, int restaurantId){
+		public InsertBuilder(String name, PStyle style){
 			mName = name;
 			mStyle = style;
-			mRestaurantId = restaurantId;
 		}
 		
 		public InsertBuilder setAlias(String alias){
@@ -53,16 +51,36 @@ public class Printer implements Jsonable{
 	}
 	
 	public static class UpdateBuilder{
-		private final String mName;
-		private final PStyle mStyle;
+		private String mName;
+		private PStyle mStyle;
 		private final int mPrinterId;
 		private String mAlias;
-		private boolean isEnabled = true;
+		private int isEnabled = -1;
 		
-		public UpdateBuilder(int printerId, String name, PStyle style){
-			mName = name;
-			mStyle = style;
+		public UpdateBuilder(int printerId){
 			mPrinterId = printerId;
+		}
+		
+		public boolean isNameChanged(){
+			return this.mName != null;
+		}
+		
+		public UpdateBuilder setName(String name){
+			this.mName = name;
+			return this;
+		}
+		
+		public boolean isStyleChanged(){
+			return this.mStyle != null;
+		}
+		
+		public UpdateBuilder setStyle(PStyle style){
+			this.mStyle = style;
+			return this;
+		}
+		
+		public boolean isAliasChanged(){
+			return this.mAlias != null;
 		}
 		
 		public UpdateBuilder setAlias(String alias){
@@ -70,8 +88,12 @@ public class Printer implements Jsonable{
 			return this;
 		}
 		
+		public boolean isEnabledChanged(){
+			return this.isEnabled == -1;
+		}
+		
 		public UpdateBuilder setEnabled(boolean isEnabled){
-			this.isEnabled = isEnabled;
+			this.isEnabled = isEnabled ? 1 : 0;
 			return this;
 		}
 		
@@ -81,21 +103,22 @@ public class Printer implements Jsonable{
 	}
 	
 	private Printer(InsertBuilder builder){
-		this(builder.mName, builder.mStyle, builder.mRestaurantId, builder.isEnabled);
+		this.mName = builder.mName;
+		this.mStyle = builder.mStyle;
+		this.isEnabled = builder.isEnabled;
 		this.mAlias = builder.mAlias;
 	}
 	
 	private Printer(UpdateBuilder builder){
-		this(builder.mName, builder.mStyle, 0, builder.isEnabled);
 		this.mId = builder.mPrinterId;
+		this.mName = builder.mName;
+		this.mStyle = builder.mStyle;
+		this.isEnabled = builder.isEnabled == 1;
 		this.mAlias = builder.mAlias;
 	}
 	
-	public Printer(String name, PStyle style, int restaurantId, boolean isEnabled){
-		this.mName = name;
-		this.mStyle = style;
-		this.mRestaurantId = restaurantId;
-		this.isEnabled = isEnabled;
+	public Printer(int id){
+		this.mId = id;
 	}
 	
 	public void setAlias(String alias){
@@ -110,6 +133,9 @@ public class Printer implements Jsonable{
 	}
 	
 	public String getName(){
+		if(mName == null){
+			return "";
+		}
 		return mName;
 	}
 	
@@ -123,6 +149,10 @@ public class Printer implements Jsonable{
 
 	public void setStyle(PStyle style){
 		mStyle = style;
+	}
+	
+	public void setRestaurantId(int restaurantId){
+		this.mRestaurantId = restaurantId;
 	}
 	
 	public int getRestaurantId(){
@@ -162,7 +192,7 @@ public class Printer implements Jsonable{
 	 */
 	public void addFunc(PrintFunc func) throws BusinessException{
 		if(contains(func)){
-			throw new BusinessException("Printfunc " + func + " has exist before.");
+			throw new BusinessException("【" + func + "】 has exist before.");
 		}else{
 			mFuncs.add(func);
 		}

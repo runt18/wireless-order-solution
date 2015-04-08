@@ -1,5 +1,6 @@
 package com.wireless.pojo.printScheme;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,42 +15,178 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	private int mId;
 	
-	private final PType mType;
+	private int printerId;
+	
+	private PType mType;
 	
 	private final List<Region> mRegions = SortedList.newInstance();
 	
-	private List<Department> mDept = SortedList.newInstance();
+	private final List<Department> mDepts = SortedList.newInstance();
 	
 	private final List<Kitchen> mKitchens = SortedList.newInstance();
 	
-	private final int mRepeat;
+	private int mRepeat;
+	
+	public static class UpdateBuilder{
+		private final int mId;
+		private int mRepeat;
+		private PType mPType;
+		private List<Region> mRegions;
+		private List<Department> mDept;
+		private List<Kitchen> mKitchens;
+		private int isIncludeCancel = -1;
+		
+		public UpdateBuilder(int id){
+			this.mId = id;
+		}
+		
+		public boolean isTypeChanged(){
+			return this.mPType != null;
+		}
+		
+		public UpdateBuilder setType(PType type){
+			this.mPType = type;
+			return this;
+		}
+		
+		public UpdateBuilder setType(PType type, boolean onOff){
+			if(type != PType.PRINT_ORDER_DETAIL && type != PType.PRINT_ORDER){
+				throw new IllegalArgumentException("只有【" + PType.PRINT_ORDER_DETAIL.getDesc() + "】或【" + PType.PRINT_ORDER.getDesc() + "】的打印功能才可设置打印退菜");
+			}else{
+				this.mPType = type;
+				isIncludeCancel = onOff ? 1 : 0;
+			}
+			return this;
+		}
+		
+		public UpdateBuilder setIncludeCancel(boolean onOff){
+			this.isIncludeCancel = onOff ? 1 : 0;
+			return this;
+		}
+		
+		public boolean isIncludeCancelChanged(){
+			return this.isIncludeCancel != -1;
+		}
+		
+		public boolean isIncludeCancel(){
+			return this.isIncludeCancel == 1;
+		}
+		
+		public boolean isRepeatChanged(){
+			return this.mRepeat != 0;
+		}
+		
+		public UpdateBuilder setRepeat(int repeat){
+			mRepeat = repeat;
+			return this;
+		}
+		
+		public boolean isRegionChanged(){
+			return this.mRegions != null;
+		}
+		
+		public UpdateBuilder setRegionAll(){
+			mRegions = new ArrayList<Region>(0);
+			return this;
+		}
+		
+		public UpdateBuilder addRegion(Region regionToAdd){
+			if(mRegions == null){
+				mRegions = SortedList.newInstance();
+			}
+			if(!mRegions.contains(regionToAdd)){
+				mRegions.add(regionToAdd);
+			}
+			return this;
+		}
+		
+		public boolean isDeptChanged(){
+			return this.mDept != null;
+		}
+		
+		public UpdateBuilder setDepartmentAll(){
+			mDept = new ArrayList<Department>(0);
+			return this;
+		}
+		
+		public UpdateBuilder addDepartment(Department dept){
+			if(mDept == null){
+				mDept = SortedList.newInstance();
+			}
+			if(!mDept.contains(dept)){
+				mDept.add(dept);
+			}
+			return this;
+		}
+		
+		public boolean isKitchenChanged(){
+			return this.mKitchens != null;
+		}
+		
+		public UpdateBuilder setKitchenAll(){
+			this.mKitchens = new ArrayList<Kitchen>(0);
+			return this;
+		}
+		
+		public UpdateBuilder addKitchen(Kitchen kitchen){
+			if(mKitchens == null){
+				mKitchens = SortedList.newInstance();
+			}
+			if(!mKitchens.contains(kitchen)){
+				mKitchens.add(kitchen);
+			}
+			return this;
+		}
+		
+		public PrintFunc build(){
+			return new PrintFunc(this);
+		}
+	}
 	
 	/**
 	 * The helper class to create the print function of summary.
 	 */
 	public static class SummaryBuilder{
+		private final int printerId;
 		private int mRepeat = 1;
-		private PType mType;
-		private List<Region> mRegions = SortedList.newInstance();
-		private List<Department> mDept = SortedList.newInstance();
+		private final PType mType;
+		private final List<Region> mRegions = SortedList.newInstance();
+		private final List<Department> mDepts = SortedList.newInstance();
+		private final boolean isIncludeCancel;
 		
-		private SummaryBuilder(){
+		private SummaryBuilder(int printerId, PType type, boolean isIncludeCancel){
+			this.printerId = printerId;
+			this.isIncludeCancel = isIncludeCancel;
+			this.mType = type;
 		}
 		
-		public static SummaryBuilder newPrintOrder(){
-			SummaryBuilder builder = new SummaryBuilder();
-			builder.setType( PType.PRINT_ORDER);
+		public static SummaryBuilder newExtra(int printerId, boolean isIncludeCancel){
+			SummaryBuilder builder = new SummaryBuilder(printerId, PType.PRINT_ORDER, isIncludeCancel);
 			return builder;
 		}
 		
-		public static SummaryBuilder newAllCancelledFood(){
-			SummaryBuilder builder = new SummaryBuilder();
-			builder.setType(PType.PRINT_ALL_CANCELLED_FOOD);
+		public static SummaryBuilder newCancel(PrintFunc func){
+			SummaryBuilder builder = new SummaryBuilder(func.getPrinterId(), PType.PRINT_ALL_CANCELLED_FOOD, false);
+			builder.setRepeat(func.getRepeat());
+			builder.setDepartments(func.getDepartment());
+			builder.setRegions(func.getRegions());
 			return builder;
+		}
+		
+		public boolean isIncludeCancel(){
+			return this.isIncludeCancel;
 		}
 		
 		public SummaryBuilder setRepeat(int repeat){
 			mRepeat = repeat;
+			return this;
+		}
+		
+		public SummaryBuilder setRegions(List<Region> regions){
+			if(regions != null){
+				mRegions.clear();
+				mRegions.addAll(regions);
+			}
 			return this;
 		}
 		
@@ -60,8 +197,16 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}
 		
+		public SummaryBuilder setDepartments(List<Department> depts){
+			if(depts != null){
+				mDepts.clear();
+				mDepts.addAll(depts);
+			}
+			return this;
+		}
+		
 		public SummaryBuilder addDepartment(Department dept){
-			mDept.add(dept);
+			mDepts.add(dept);
 			return this;
 		}		
 		
@@ -69,47 +214,56 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return mType;
 		}
 
-		private SummaryBuilder setType(PType type) {
-			this.mType = type;
-			return this;
-		}
-
 		public PrintFunc build(){
 			return new PrintFunc(this);
 		}
 	}
 	
-	
-	
-	
 	public static class DetailBuilder{
+		private final int mPrinterId;
 		private int mRepeat = 1;
 		private List<Kitchen> mKitchens = SortedList.newInstance();
-		private PType mType;
+		private final PType mType;
+		private final boolean isIncludeCancel;
 		
-		private DetailBuilder(){
+		private DetailBuilder(int printerId, PType type, boolean isIncludeCancel){
+			this.mPrinterId = printerId;
+			this.isIncludeCancel = isIncludeCancel;
+			this.mType = type;
 		}
 		
-		public static DetailBuilder newPrintFoodDetail(){
-			DetailBuilder builder = new DetailBuilder();
-			builder.setType(PType.PRINT_ORDER_DETAIL);
-			return builder;
-			
-		}
-		
-		public static DetailBuilder newCancelledFood(){
-			DetailBuilder builder = new DetailBuilder();
-			builder.setType(PType.PRINT_CANCELLED_FOOD_DETAIL);
+		public static DetailBuilder newExtra(int printerId, boolean isIncludeCancel){
+			DetailBuilder builder = new DetailBuilder(printerId, PType.PRINT_ORDER_DETAIL, isIncludeCancel);
 			return builder;
 		}
+		
+		public static DetailBuilder newCancel(PrintFunc func){
+			DetailBuilder builder = new DetailBuilder(func.getPrinterId(), PType.PRINT_CANCELLED_FOOD_DETAIL, false);
+			builder.setRepeat(func.getRepeat());
+			builder.setKitchens(func.getKitchens());
+			return builder;
+		}
+		
+		public boolean isIncludeCancel(){
+			return this.isIncludeCancel;
+		}
+		
 		public DetailBuilder setRepeat(int repeat){
 			mRepeat = repeat;
 			return this;
 		}
 		
-		public DetailBuilder addKitchen(Kitchen kitcheToAdd){
-			if(!mKitchens.contains(kitcheToAdd)){
-				mKitchens.add(kitcheToAdd);
+		public DetailBuilder setKitchens(List<Kitchen> kitchens){
+			if(kitchens != null){
+				mKitchens.clear();
+				mKitchens.addAll(kitchens);
+			}
+			return this;
+		}
+		
+		public DetailBuilder addKitchen(Kitchen kitchenToAdd){
+			if(!mKitchens.contains(kitchenToAdd)){
+				mKitchens.add(kitchenToAdd);
 			}
 			return this;
 		}
@@ -118,46 +272,42 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return mType;
 		}
 
-		private DetailBuilder setType(PType type) {
-			this.mType = type;
-			return this;
-		}
-
 		public PrintFunc build(){
 			return new PrintFunc(this);
 		}
 	}
 	
 	public static class Builder{
+		private final int mPrinterId;
 		private int mRepeat = 1;
 		private PType mType ;
 		private List<Region> mRegions = SortedList.newInstance();
 		
-		private Builder(){
-			
+		private Builder(int printerId){
+			this.mPrinterId = printerId;
 		}
 		
-		public static Builder newReceipt(){
-			Builder builder = new Builder();
-			builder.setmType(PType.PRINT_RECEIPT);
+		public static Builder newReceipt(int printerId){
+			Builder builder = new Builder(printerId);
+			builder.setType(PType.PRINT_RECEIPT);
 			return builder;
 		}
 		
-		public static Builder newTempReceipt(){
-			Builder builder = new Builder();
-			builder.setmType(PType.PRINT_TEMP_RECEIPT);
+		public static Builder newTempReceipt(int printerId){
+			Builder builder = new Builder(printerId);
+			builder.setType(PType.PRINT_TEMP_RECEIPT);
 			return builder;
 		}
 
-		public static Builder newTransferTable(){
-			Builder builder = new Builder();
-			builder.setmType(PType.PRINT_TRANSFER_TABLE);
+		public static Builder newTransferTable(int printerId){
+			Builder builder = new Builder(printerId);
+			builder.setType(PType.PRINT_TRANSFER_TABLE);
 			return builder;
 		}		
 		
-		public static Builder newAllHurriedFood(){
-			Builder builder = new Builder();
-			builder.setmType(PType.PRINT_ALL_HURRIED_FOOD);
+		public static Builder newAllHurriedFood(int printerId){
+			Builder builder = new Builder(printerId);
+			builder.setType(PType.PRINT_ALL_HURRIED_FOOD);
 			return builder;
 		}
 		
@@ -174,11 +324,11 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 		
 		
-		public PType getmType() {
+		public PType getType() {
 			return mType;
 		}
 
-		private Builder setmType(PType mType) {
+		private Builder setType(PType mType) {
 			this.mType = mType;
 			return this;
 		}
@@ -189,21 +339,41 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		
 	}
 	
-	
+	private PrintFunc(UpdateBuilder builder){
+		setId(builder.mId);
+		if(builder.isTypeChanged()){
+			setType(builder.mPType);
+		}
+		if(builder.isRepeatChanged()){
+			setRepeat(builder.mRepeat);
+		}
+		if(builder.isRegionChanged()){
+			mRegions.addAll(builder.mRegions);
+		}
+		if(builder.isDeptChanged()){
+			mDepts.addAll(builder.mDept);
+		}
+		if(builder.isKitchenChanged()){
+			mKitchens.addAll(builder.mKitchens);
+		}
+	}
 	
 	private PrintFunc(SummaryBuilder builder){
 		this(builder.getType(), builder.mRepeat);
+		this.printerId = builder.printerId;
 		mRegions.addAll(builder.mRegions);
-		mDept.addAll(builder.mDept);
+		mDepts.addAll(builder.mDepts);
 	}
 	
 	private PrintFunc(DetailBuilder builder){
 		this(builder.getType(), builder.mRepeat);
+		this.printerId = builder.mPrinterId;
 		mKitchens.addAll(builder.mKitchens);
 	}
 	
 	private PrintFunc(Builder builder){
-		this(builder.getmType(), builder.mRepeat);
+		this(builder.getType(), builder.mRepeat);
+		this.printerId = builder.mPrinterId;
 		mRegions.addAll(builder.mRegions);
 	}
 	
@@ -220,8 +390,24 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		mId = id;
 	}
 	
+	public void setType(PType type){
+		this.mType = type;
+	}
+	
 	public PType getType(){
 		return mType;
+	}
+	
+	public void setPrinterId(int printerId){
+		this.printerId = printerId;
+	}
+	
+	public int getPrinterId(){
+		return this.printerId;
+	}
+	
+	public void setRepeat(int repeat){
+		this.mRepeat = repeat;
 	}
 	
 	public int getRepeat(){
@@ -229,25 +415,32 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	}
 	
 	public List<Department> getDepartment(){
-		return Collections.unmodifiableList(mDept);
+		return Collections.unmodifiableList(mDepts);
+	}
+	
+	public void setDepartments(List<Department> depts){
+		if(depts != null){
+			mDepts.clear();
+			mDepts.addAll(depts);
+		}
 	}
 	
 	public void addDepartment(Department dept){
-		if(!mDept.contains(dept)){
-			mDept.add(dept);
+		if(!mDepts.contains(dept)){
+			mDepts.add(dept);
 		}
 	}
 
 	public boolean removeDepartment(Department dept){
-		return mDept.remove(dept);
+		return mDepts.remove(dept);
 	}
 	
 	public void setDepartmentAll(){
-		mDept = null;
+		mDepts.clear();
 	}
 	
 	public boolean isDeptAll(){
-		return mDept.isEmpty();
+		return mDepts.isEmpty();
 	}
 	
 	public List<Region> getRegions(){
@@ -256,6 +449,13 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	public List<Kitchen> getKitchens(){
 		return Collections.unmodifiableList(mKitchens);
+	}
+	
+	public void setKitchens(List<Kitchen> kitchens){
+		if(kitchens != null){
+			mKitchens.clear();
+			mKitchens.addAll(kitchens);
+		}
 	}
 	
 	public void addKitchen(Kitchen kitchenToAdd){
@@ -274,6 +474,13 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	public boolean isKitchenAll(){
 		return mKitchens.isEmpty();
+	}
+	
+	public void setRegions(List<Region> regions){
+		if(regions != null){
+			mRegions.clear();
+			mRegions.addAll(regions);
+		}
 	}
 	
 	public void addRegion(Region regionToAdd){
@@ -309,8 +516,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		if(obj == null || !(obj instanceof PrintFunc)){
 			return false;
 		}else{
-			PrintFunc right = (PrintFunc)obj;
-			return getType().getVal() == right.mType.getVal();
+			return getType().getVal() == ((PrintFunc)obj).mType.getVal();
 		}
 	}
 
@@ -414,8 +620,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			}
 		}
 		
-		if(this.mDept.size() > 0){
-			for (Department department : this.mDept) {
+		if(this.mDepts.size() > 0){
+			for (Department department : this.mDepts) {
 				if(depts == ""){
 					deptValues += department.getId();
 					depts += department.getName();
