@@ -16,6 +16,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.member.MemberDao.MemberRank;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.VerifySMSDao;
@@ -26,6 +27,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.WxMember;
 import com.wireless.pojo.promotion.Coupon;
@@ -246,6 +248,50 @@ public class WXOperateMemberAction extends DispatchAction {
 		}
 		return null;
 	}
+	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward inpour(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		JObject jobject = new JObject();
+		DBCon dbCon = new DBCon();
+		try{
+			String openId = request.getParameter("oid");
+			String fromId = request.getParameter("fid");
+			String orderId = request.getParameter("orderId");
+			
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			
+			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
+			Staff staff = StaffDao.getAdminByRestaurant(rid);
+			
+			WxMember wxMember = WxMemberDao.getByCond(dbCon, staff, new WxMemberDao.ExtraCond().setSerial(openId)).get(0);
+			
+			Order.DiscountBuilder builder = Order.DiscountBuilder.build4Member(Integer.parseInt(orderId), MemberDao.getById(staff, wxMember.getMemberId()), 0, 0, 0);
+			
+			OrderDao.discount(staff, builder);
+			
+			dbCon.conn.commit();
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			dbCon.disconnect();
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
 	
 	/**
 	 * 重新绑定手机号码

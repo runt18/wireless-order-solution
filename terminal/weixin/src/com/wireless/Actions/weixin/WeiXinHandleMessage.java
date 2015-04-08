@@ -55,6 +55,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	private final String WEIXIN_COUPON;
 	private final String WEIXIN_ORDER;
 	private final String WEIXIN_DIANPING;
+	private final String WEIXIN_SCANNING;
 	
 	private final String WEIXIN_FOOD_ICON;
 	private final String WEIXIN_RFOOD_ICON;
@@ -67,6 +68,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	public final static String MEMBER_EVENT_KEY = "member_event_key";
 	public final static String ORDER_EVENT_KEY = "order_event_key";
 	public final static String ZHUAN_EVENT_KEY = "zhuan_event_key";
+	public final static String SCAN_EVENT_KEY = "scan_event_key";
 	
 	private final DefaultSession session;
 	
@@ -80,6 +82,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		this.WEIXIN_COUPON = root + "/weixin/order/sales.html";
 		this.WEIXIN_ORDER = root + "/weixin/order/orderList.html";
 		this.WEIXIN_DIANPING = root + "/weixin/order/dianping.html";
+		this.WEIXIN_SCANNING = root + "/weixin/order/scan.html";
 		
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
 		this.WEIXIN_RFOOD_ICON = root + "/weixin/order/images/icon_rfood.png";
@@ -387,6 +390,9 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 						description = "点击去自助点餐";
 						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("暂无订单", description, "", createUrl(msg, WEIXIN_FOOD))));
 					}
+					
+				}else if(msg.getEventKey().equals(SCAN_EVENT_KEY)){
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("点击此处开始扫描", "点我扫描支付二维码", "", createUrl(msg, WEIXIN_SCANNING))));
 					
 				}else if(msg.getEventKey().equals(ZHUAN_EVENT_KEY)){
 					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("您有一次抽奖机会", "点击开始玩大转盘", "", "http://www.weixinrs.com/wx/xydzp0-5840.html?&wid=5165")));					
