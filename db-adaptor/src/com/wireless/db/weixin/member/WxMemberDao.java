@@ -354,6 +354,7 @@ public class WxMemberDao {
 			}
 			weixinMember.setStatus(WxMember.Status.valueOf(dbCon.rs.getInt("status")));
 			weixinMember.setWeixinMemberSerial(dbCon.rs.getString("weixin_serial"));
+			weixinMember.setMemberId(dbCon.rs.getInt("member_id"));
 			result.add(weixinMember);
 		}
 		dbCon.rs.close();
