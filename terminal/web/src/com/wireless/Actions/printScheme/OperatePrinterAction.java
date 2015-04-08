@@ -83,7 +83,7 @@ public class OperatePrinterAction extends DispatchAction{
 			String printerAlias = request.getParameter("printerAlias");
 			int style = Integer.parseInt(request.getParameter("style"));
 			
-			Printer.InsertBuilder builder = new Printer.InsertBuilder(printerName, PStyle.valueOf(style), staff.getRestaurantId());
+			Printer.InsertBuilder builder = new Printer.InsertBuilder(printerName, PStyle.valueOf(style));
 			builder.setAlias(printerAlias);
 			PrinterDao.insert(dbCon, staff, builder);
 			response.getWriter().print("Port printer '" + printerName + "' successfully...");
@@ -116,7 +116,7 @@ public class OperatePrinterAction extends DispatchAction{
 			String printerAlias = request.getParameter("printerAlias");
 			int style =Integer.parseInt(request.getParameter("style"));
 			
-			Printer.InsertBuilder builder = new Printer.InsertBuilder(printerName, PStyle.valueOf(style), staff.getRestaurantId());
+			Printer.InsertBuilder builder = new Printer.InsertBuilder(printerName, PStyle.valueOf(style));
 			builder.setAlias(printerAlias);
 			PrinterDao.insert(dbCon, staff, builder);
 			jobject.initTip(true, "操作成功, 已添加打印机");
@@ -153,7 +153,9 @@ public class OperatePrinterAction extends DispatchAction{
 			String printerId = request.getParameter("printerId");
 			String isEnabled = request.getParameter("isEnabled");
 			
-			Printer.UpdateBuilder builder = new Printer.UpdateBuilder(Integer.parseInt(printerId), printerName, PStyle.valueOf(style));
+			Printer.UpdateBuilder builder = new Printer.UpdateBuilder(Integer.parseInt(printerId));
+			builder.setName(printerName);
+			builder.setStyle(PStyle.valueOf(style));
 			builder.setAlias(printerAlias);
 			builder.setEnabled(Boolean.parseBoolean(isEnabled));
 			

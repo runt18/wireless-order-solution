@@ -215,7 +215,6 @@ public class QueryKitchenAction extends DispatchAction {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		StringBuilder jsonSB = new StringBuilder();
-		 ;
 		try{
 			String pin = (String)request.getAttribute("pin");
 			
@@ -224,7 +223,7 @@ public class QueryKitchenAction extends DispatchAction {
 			
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			List<PrintFunc> pfs = PrintFuncDao.getFuncByPrinterId(Integer.parseInt(printerId));
+			List<PrintFunc> pfs = PrintFuncDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), new PrintFuncDao.ExtraCond().setPrinter(Integer.parseInt(printerId)));
 			PrintFunc scheme = null;
 			for (PrintFunc printFunc : pfs) {
 				if((printFunc.getId()+"").equals(schemeId)){

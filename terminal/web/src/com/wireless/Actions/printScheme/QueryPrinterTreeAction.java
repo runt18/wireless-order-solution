@@ -26,7 +26,7 @@ public class QueryPrinterTreeAction extends Action{
 		
 		try{
 			Staff staff = StaffDao.getById(Integer.parseInt(pin));
-			List<Printer> result = PrinterDao.getAllPrinters(staff);
+			List<Printer> result = PrinterDao.getByCond(staff, null);
 			if(!result.isEmpty()){
 				int index = 0;
 				for (Printer printer : result) {

@@ -26,10 +26,8 @@ public class QueryPrintFuncAction extends Action{
 		List<PrintFunc> root ;
 		try{
 			String pin = (String)request.getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin));
-			
 			String printerId = request.getParameter("printerId");
-			root = PrintFuncDao.getFuncByPrinterId(Integer.parseInt(printerId));
+			root = PrintFuncDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), new PrintFuncDao.ExtraCond().setPrinter(Integer.parseInt(printerId)));
 			jobject.setTotalProperty(root.size());
 			jobject.setRoot(root);
 			
