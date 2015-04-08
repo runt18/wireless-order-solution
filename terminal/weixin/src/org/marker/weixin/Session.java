@@ -91,7 +91,6 @@ public abstract class Session {
 		msg.write(document);
 		try {
 			Transformer transformer = tffactory.newTransformer();
-
 			transformer.transform(new DOMSource(document), new StreamResult(new OutputStreamWriter(this.os, "utf-8")));
 		} catch (Exception e) {
 			e.printStackTrace();

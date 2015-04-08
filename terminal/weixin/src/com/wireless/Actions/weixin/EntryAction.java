@@ -91,8 +91,7 @@ public class EntryAction extends Action{
 		OutputStream os = response.getOutputStream();
 		DefaultSession session = DefaultSession.newInstance();
 		try{
-			String account = request.getParameter("account");
-			session.addOnHandleMessageListener(new WeiXinHandleMessage(session, account, "http://" + request.getLocalAddr() + "/wx-term"));
+			session.addOnHandleMessageListener(new WeiXinHandleMessage(session, "http://" + request.getLocalAddr() + "/wx-term"));
 			session.process(is, os);
 		}finally{
 			session.close();

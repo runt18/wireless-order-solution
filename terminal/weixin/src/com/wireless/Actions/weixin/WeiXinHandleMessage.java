@@ -69,11 +69,9 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	public final static String ZHUAN_EVENT_KEY = "zhuan_event_key";
 	
 	private final DefaultSession session;
-	private final String account;
 	
-	public WeiXinHandleMessage(DefaultSession session, String account, String root){
+	public WeiXinHandleMessage(DefaultSession session, String root){
 		this.session = session;
-		this.account = account;
 		this.WEIXIN_INDEX = root + "/weixin/order/index.html";
 		this.WEIXIN_FOOD = root + "/weixin/order/food.html";
 		this.WEIXIN_RFOOD = root + "/weixin/order/rfood.html";
@@ -138,7 +136,8 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		Data4Item mainItem;
 		Restaurant restaurant = null;
 		try {
-			restaurant = RestaurantDao.getByAccount(account);
+			//restaurant = RestaurantDao.getByAccount(account);
+			restaurant = RestaurantDao.getById(WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
 			WeixinRestaurant wr = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurant.getId()));
 			if(wr.getWeixinLogo() != null){
 				mainItem = new Data4Item(restaurant.getName(), "", wr.getWeixinLogo().getObjectUrl(), createUrl(msg, WEIXIN_INDEX)); 
@@ -196,7 +195,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	public void onTextMsg(Msg4Text msg) {
 		try{
 			// 绑定餐厅和公众平台信息
-			WeixinRestaurantDao.bind(msg.getToUserName(), account);
+			WeixinRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
 			if(msg.getContent().equalsIgnoreCase("M")){
 				session.callback(createNavi(msg));
 			}else{
@@ -214,7 +213,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	public void onEventMsg(Msg4Event msg) {
 		try{
 			// 绑定餐厅和公众平台信息
-			WeixinRestaurantDao.bind(msg.getToUserName(), account);
+			WeixinRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
 			
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注

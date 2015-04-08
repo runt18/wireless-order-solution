@@ -14,11 +14,11 @@ import com.wireless.json.Jsonable;
 public abstract class Msg implements Jsonable{
 	
 	
-	Msg(Msg4Head head){
+	protected Msg(Msg4Head head){
 		this.head = head;
 	}
 	
-	Msg(Msg received, Msg4Head.MsgType msgType){
+	protected Msg(Msg received, Msg4Head.MsgType msgType){
 		this.head = new Msg4Head();
 		this.head.setFromUserName(received.getToUserName());
 		this.head.setToUserName(received.getFromUserName());

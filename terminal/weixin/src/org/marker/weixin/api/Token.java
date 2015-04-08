@@ -3,6 +3,7 @@ package org.marker.weixin.api;
 import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
+import org.maker.weixin.auth.AuthorizerToken;
 
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
@@ -14,6 +15,13 @@ public class Token implements Jsonable{
 	private int expiresIn;
 
 	private Token(){}
+	
+	public static Token newInstance(AuthorizerToken authorizerToken){
+		Token token = new Token();
+		token.setAccessToken(authorizerToken.getAccessToken());
+		token.setExpiresIn(authorizerToken.getExpired());
+		return token;
+	}
 	
 	public static Token newInstance(String appId, String appSecret) throws ClientProtocolException, IOException{
 		return JObject.parse(JSON_CREATOR, 0, BaseAPI.doGet(BaseAPI.BASE_URI + "/cgi-bin/token?grant_type=client_credential&appid=" + appId + "&secret=" + appSecret));
