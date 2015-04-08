@@ -351,7 +351,7 @@ class OrderHandler implements Runnable{
 	
 	private RespPackage doInsertOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		//handle insert order request 
-		final List<Printer> printers = PrinterDao.getPrinters(staff);
+		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true));
 		
 		Order orderToInsert = InsertOrder.exec(staff, new Parcel(request.body).readParcel(Order.InsertBuilder.CREATOR));
 		
@@ -407,7 +407,7 @@ class OrderHandler implements Runnable{
 	private RespPackage doUpdateOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
 		//handle update order request
 		DiffResult diffResult = UpdateOrder.exec(staff, new Parcel(request.body).readParcel(Order.UpdateBuilder.CREATOR));
-		List<Printer> printers = PrinterDao.getPrinters(staff);
+		List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true));
 		
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
 			
@@ -419,10 +419,10 @@ class OrderHandler implements Runnable{
 				hurriedOrder.setOrderFoods(diffResult.hurriedFoods);
 				//print the summary to hurried foods
 				printHandler.process(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_HURRIED_FOOD, 
-																							  staff, 
-																							  printers,
-																							  hurriedOrder,
-																							  FoodDetailContent.DetailType.TOTAL));
+																					   staff, 
+																					   printers,
+																					   hurriedOrder,
+																					   FoodDetailContent.DetailType.TOTAL));
 				//print the detail to hurried foods
 				printHandler.process(JobContentFactory.instance().createDetailContent(PType.PRINT_HURRIED_FOOD, 
 																					  staff,
@@ -437,16 +437,16 @@ class OrderHandler implements Runnable{
 				extraOrder.setOrderFoods(diffResult.extraFoods);
 				//print the summary to extra foods
 				printHandler.process(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_EXTRA_FOOD, 
-																							  staff,
-																							  printers,
-																							  extraOrder,
-																							  FoodDetailContent.DetailType.DELTA));
+																					   staff,
+																					   printers,
+																					   extraOrder,
+																					   FoodDetailContent.DetailType.DELTA));
 				//print the detail to extra foods
 				printHandler.process(JobContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD_DETAIL, 
-																							 staff,
-																							 printers,
-																							 extraOrder,
-																							 FoodDetailContent.DetailType.DELTA));
+																					  staff,
+																					  printers,
+																					  extraOrder,
+																					  FoodDetailContent.DetailType.DELTA));
 			}
 
 			if(!diffResult.cancelledFoods.isEmpty()){
@@ -509,7 +509,7 @@ class OrderHandler implements Runnable{
 	private RespPackage doPayOrder(final Staff staff, ProtocolPackage request)  throws SQLException, BusinessException{
 		final Order.PayBuilder payBuilder = new Parcel(request.body).readParcel(Order.PayBuilder.CREATOR);
 		
-		List<Printer> printers = PrinterDao.getPrinters(staff);
+		List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true));
 		
 		PrintHandler printHandler = new PrintHandler(staff);
 
@@ -592,7 +592,7 @@ class OrderHandler implements Runnable{
 	
 	private RespPackage doPrintContent(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
 		PType printType = PType.valueOf(request.header.reserved);
-		List<Printer> printers = PrinterDao.getPrinters(staff);
+		List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true));
 		
 		if(printType.isSummary()){
 			int orderId = new Parcel(request.body).readInt();
