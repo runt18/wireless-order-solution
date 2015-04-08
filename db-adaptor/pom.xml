@@ -37,6 +37,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
+
 		<dependency>
 			<groupId>gui.ava</groupId>
 			<artifactId>html2image</artifactId>

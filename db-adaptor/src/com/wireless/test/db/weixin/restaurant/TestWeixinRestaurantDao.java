@@ -84,7 +84,11 @@ public class TestWeixinRestaurantDao {
 																	.setWeixinLogo(ossImageId)
 																	.setWeixinInfo(info)
 																	.setWeixinAppId("asdfsdfsaf")
-																	.setWeixinAppSecret("dadsftwe");
+																	.setWeixinAppSecret("dadsftwe")
+																	.setQrCodeUrl("http://www.qrcode")
+																	.setHeadImgUrl("http://www.headimg")
+																	.setNickName("测试昵称")
+																	.setRefreshToken("adfeiilmasd;iottt");
 		WeixinRestaurantDao.update(mStaff, builder);
 		
 		WeixinRestaurant expected = builder.build();
@@ -109,7 +113,10 @@ public class TestWeixinRestaurantDao {
 		
 		Assert.assertEquals("weixin app id", expected.getWeixinAppId(), actual.getWeixinAppId());
 		Assert.assertEquals("weixin secret", expected.getWeixinAppSecret(), actual.getWeixinAppSecret());
-
+		Assert.assertEquals("weixin qr code url", expected.getQrCodeUrl(), actual.getQrCodeUrl());
+		Assert.assertEquals("weixin head image url", expected.getHeadImgUrl(), actual.getHeadImgUrl());
+		Assert.assertEquals("weixin nick name", expected.getNickName(), actual.getNickName());
+		Assert.assertEquals("weixin refresh token", expected.getRefreshToken(), actual.getRefreshToken());
 
 	}
 }

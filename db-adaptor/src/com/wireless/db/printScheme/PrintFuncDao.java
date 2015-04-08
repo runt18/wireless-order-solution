@@ -2,7 +2,6 @@ package com.wireless.db.printScheme;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -14,10 +13,52 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.printScheme.PrintFunc;
+import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class PrintFuncDao {
+	
+	public static class ExtraCond{
+		private int id;
+		private int printerId;
+		private PType type;
+		
+		public ExtraCond setId(int id){
+			this.id = id;
+			return this;
+		}
+		
+		public ExtraCond setPrinter(Printer printer){
+			this.printerId = printer.getId();
+			return this;
+		}
+		
+		public ExtraCond setPrinter(int printerId){
+			this.printerId = printerId;
+			return this;
+		}
+		
+		public ExtraCond setType(PType type){
+			this.type = type;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(id != 0){
+				extraCond.append(" AND func_id = " + id);
+			}
+			if(printerId != 0){
+				extraCond.append(" AND printer_id = " + printerId);
+			}
+			if(type != null){
+				extraCond.append(" AND type = " + type.getVal());
+			}
+			return extraCond.toString();
+		}
+	}
 	
 	/**
 	 * Add a new print function to specific printer
@@ -25,8 +66,6 @@ public class PrintFuncDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param printerId
-	 * 			the printer to add function
 	 * @param func
 	 * 			the function to add
 	 * @return the id to print function just generated
@@ -36,12 +75,12 @@ public class PrintFuncDao {
 	 * 			throws if the printer does NOT exist
 	 * 			throws if the function type has exist before
 	 */
-	private static int addFunc(DBCon dbCon, Staff staff, int printerId, PrintFunc func) throws SQLException, BusinessException{
+	private static int addFunc(DBCon dbCon, Staff staff, PrintFunc func) throws SQLException, BusinessException{
 		
 		String sql;
 		
 		//Check to see whether the printer is exist
-		sql = " SELECT * FROM " + Params.dbName + ".printer WHERE printer_id = " + printerId;
+		sql = " SELECT * FROM " + Params.dbName + ".printer WHERE printer_id = " + func.getPrinterId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(!dbCon.rs.next()){
 			throw new BusinessException(PrintSchemeError.PRINTER_NOT_EXIST);
@@ -50,7 +89,7 @@ public class PrintFuncDao {
 		
 		//Check to see whether the function has exist before
 		sql = " SELECT * FROM " + Params.dbName + ".print_func WHERE " +
-			  " printer_id = " + printerId + " AND " + " type = " + func.getType().getVal();
+			  " printer_id = " + func.getPrinterId() + " AND " + " type = " + func.getType().getVal();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			throw new BusinessException(PrintSchemeError.DUPLICATE_FUNC_TYPE);
@@ -60,7 +99,7 @@ public class PrintFuncDao {
 		sql = " INSERT INTO " + Params.dbName + ".print_func" +
 		      "( `printer_id`, `repeat`, `type` )" +
 			  " VALUES( " +
-		      printerId + "," +
+			  func.getPrinterId() + "," +
 			  func.getRepeat() + "," +
 		      func.getType().getVal() +
 		      ")";
@@ -117,10 +156,8 @@ public class PrintFuncDao {
 	 * Add a new summary print function to specific printer
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
-	 * @param printerId
-	 * 			the printer to add function
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param func
 	 * 			the function to add
 	 * @return the id to print function just generated
@@ -130,18 +167,21 @@ public class PrintFuncDao {
 	 * 			throws if the printer does NOT exist
 	 * 			throws if the function type has exist before
 	 */
-	public static int addFunc(DBCon dbCon, Staff term, int printerId, PrintFunc.SummaryBuilder builder) throws SQLException, BusinessException{
-		return addFunc(dbCon, term, printerId, builder.build());
+	public static int addFunc(DBCon dbCon, Staff staff, PrintFunc.SummaryBuilder builder) throws SQLException, BusinessException{
+		int funcId = addFunc(dbCon, staff, builder.build());
+		//Add the associated cancel printer function.
+		if(builder.isIncludeCancel()){
+			addFunc(dbCon, staff, PrintFunc.SummaryBuilder.newCancel(getById(dbCon, staff, funcId)).build());
+		}
+		return funcId;
 	}
 	
 	/**
 	 * Add a new detail print function to specific printer
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
-	 * @param printerId
-	 * 			the printer to add function
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param func
 	 * 			the function to add
 	 * @return the id to print function just generated
@@ -151,17 +191,20 @@ public class PrintFuncDao {
 	 * 			throws if the printer does NOT exist
 	 * 			throws if the function type has exist before
 	 */
-	public static int addFunc(DBCon dbCon, Staff term, int printerId, PrintFunc.DetailBuilder builder) throws SQLException, BusinessException{
-		return addFunc(dbCon, term, printerId, builder.build());
+	public static int addFunc(DBCon dbCon, Staff staff, PrintFunc.DetailBuilder builder) throws SQLException, BusinessException{
+		int funcId = addFunc(dbCon, staff, builder.build());
+		//Add the associated cancel detail printer function.
+		if(builder.isIncludeCancel()){
+			addFunc(dbCon, staff, PrintFunc.DetailBuilder.newCancel(getById(dbCon, staff, funcId)).build());
+		}
+		return funcId;
 	}
 	/**
 	 * Add a new  print function to specific printer
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
-	 * @param printerId
-	 * 			the printer to add function
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param func
 	 * 			the function to add
 	 * @return the id to print function just generated
@@ -171,8 +214,8 @@ public class PrintFuncDao {
 	 * 			throws if the printer does NOT exist
 	 * 			throws if the function type has exist before
 	 */
-	public static int addFunc(DBCon dbCon, Staff term, int printerId, PrintFunc.Builder builder) throws SQLException, BusinessException{
-		return addFunc(dbCon, term, printerId, builder.build());
+	public static int addFunc(DBCon dbCon, Staff staff, PrintFunc.Builder builder) throws SQLException, BusinessException{
+		return addFunc(dbCon, staff, builder.build());
 	}
 	
 	/**
@@ -186,13 +229,13 @@ public class PrintFuncDao {
 	 * @throws BusinessException
 	 * 			throws if the function to delete does NOT exist
 	 */
-	public static void removeFunc(Staff staff, int funcId) throws SQLException, BusinessException{
+	public static void deleteById(Staff staff, int funcId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			removeFunc(dbCon, staff, funcId);
+			deleteById(dbCon, staff, funcId);
 			
 			dbCon.conn.commit();
 		}finally{
@@ -214,129 +257,189 @@ public class PrintFuncDao {
 	 * @throws BusinessException
 	 * 			throws if the function to delete does NOT exist
 	 */
-	public static void removeFunc(DBCon dbCon, Staff staff, int funcId) throws SQLException, BusinessException{
-		String sql;
-		
-		sql = " DELETE FROM " + Params.dbName + ".func_dept WHERE func_id = " + funcId;
-		dbCon.stmt.executeUpdate(sql);
-		
-		sql = " DELETE FROM " + Params.dbName + ".func_kitchen WHERE func_id = " + funcId;
-		dbCon.stmt.executeUpdate(sql);
-		
-		sql = " DELETE FROM " + Params.dbName + ".func_region WHERE func_id = " + funcId;
-		dbCon.stmt.executeUpdate(sql);
-		
-		sql = " DELETE FROM " + Params.dbName + ".print_func WHERE func_id = " + funcId;
-		if(dbCon.stmt.executeUpdate(sql) == 0){
+	public static void deleteById(DBCon dbCon, Staff staff, int funcId) throws SQLException, BusinessException{
+		if(deleteByCond(dbCon, staff, new ExtraCond().setId(funcId)) == 0){
 			throw new BusinessException(PrintSchemeError.FUNC_TYPE_NOT_EXIST);
 		}
 	}
 	
-	public static void updateFunc(DBCon dbCon, Staff staff, int printerId, PrintFunc func, int funcId) throws SQLException, BusinessException{
-		String sql;
-		
-		//Check to see whether the printer is exist
-		sql = " SELECT * FROM " + Params.dbName + ".printer WHERE printer_id = " + printerId;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(!dbCon.rs.next()){
-			throw new BusinessException(PrintSchemeError.PRINTER_NOT_EXIST);
-		}
-		dbCon.rs.close();
-		
-		sql = " UPDATE " + Params.dbName + ".print_func SET " +
-			  " `repeat` = " + func.getRepeat() +
-			  " ,type = " + func.getType().getVal() +
-			  " WHERE func_id = " +  funcId;
-		
-		dbCon.stmt.executeUpdate(sql);
-		
-		sql = " DELETE FROM " + Params.dbName + ".func_dept WHERE func_id = " + funcId;
-		dbCon.stmt.executeUpdate(sql);
-		
-		sql = " DELETE FROM " + Params.dbName + ".func_kitchen WHERE func_id = " + funcId;
-		dbCon.stmt.executeUpdate(sql);
-		
-		sql = " DELETE FROM " + Params.dbName + ".func_region WHERE func_id = " + funcId;
-		dbCon.stmt.executeUpdate(sql);
-		
-		//Insert the department to this print function
-		for(Department dept : func.getDepartment()){
-			sql = " INSERT INTO " + Params.dbName + ".func_dept" +
-				  "( func_id, dept_id, restaurant_id )" +
-				  " VALUES(" +
-				  funcId + "," +
-				  dept.getId() + "," +
-				  staff.getRestaurantId() + 
-				  ")";
+	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+		int amount = 0;
+		for(PrintFunc printFunc : getByCond(dbCon, staff, extraCond)){
+			String sql;
+			
+			sql = " DELETE FROM " + Params.dbName + ".func_dept WHERE func_id = " + printFunc.getId();
 			dbCon.stmt.executeUpdate(sql);
-		}
-		
-		//Insert the kitchens to this print function
-		for(Kitchen kitchen : func.getKitchens()){
-			sql = " INSERT INTO " + Params.dbName + ".func_kitchen" +
-				  "( func_id, kitchen_id, restaurant_id )" +
-				  " VALUES( " +
-				  funcId + "," +
-				  kitchen.getId() + "," +
-				  staff.getRestaurantId() + 
-				  ")";
+			
+			sql = " DELETE FROM " + Params.dbName + ".func_kitchen WHERE func_id = " + printFunc.getId();
 			dbCon.stmt.executeUpdate(sql);
-		}
-		
-		//Insert the regions to this print function
-		for(Region region : func.getRegions()){
-			sql = " INSERT INTO " + Params.dbName + ".func_region" +
-				  "( func_id, region_id, restaurant_id )" +
-				  " VALUES( " +
-				  funcId + "," +
-				  region.getId() + "," +
-				  staff.getRestaurantId() +
-				  ")";
+			
+			sql = " DELETE FROM " + Params.dbName + ".func_region WHERE func_id = " + printFunc.getId();
 			dbCon.stmt.executeUpdate(sql);
+			
+			sql = " DELETE FROM " + Params.dbName + ".print_func WHERE func_id = " + printFunc.getId();
+			if(dbCon.stmt.executeUpdate(sql) != 0){
+				amount++;
+			}
+			//Delete the associated order & detail print function.
+			if(printFunc.getType() == PType.PRINT_ORDER){
+				amount += deleteByCond(dbCon, staff, new ExtraCond().setPrinter(printFunc.getPrinterId()).setType(PType.PRINT_ALL_CANCELLED_FOOD));
+			}else if(printFunc.getType() == PType.PRINT_ORDER_DETAIL){
+				amount += deleteByCond(dbCon, staff, new ExtraCond().setPrinter(printFunc.getPrinterId()).setType(PType.PRINT_CANCELLED_FOOD_DETAIL)); 
+			}
 		}
-		
-		
+		return amount;
 	}
 	
+	public static void updateFunc(DBCon dbCon, Staff staff, PrintFunc.UpdateBuilder builder) throws SQLException, BusinessException{
+		String sql;
+		
+		PrintFunc func = builder.build();
+		
+		sql = " UPDATE " + Params.dbName + ".print_func SET " +
+			  " func_id = " + func.getId() +
+			  (builder.isRepeatChanged() ? " ,`repeat` = " + func.getRepeat() : "") +
+			  (builder.isTypeChanged() ? " ,type = " + func.getType().getVal() : "") +
+			  " WHERE func_id = " +  func.getId();
+		
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(PrintSchemeError.PRINTER_NOT_EXIST);
+		}
+		
+		//Update the department.
+		if(builder.isDeptChanged()){
+			sql = " DELETE FROM " + Params.dbName + ".func_dept WHERE func_id = " + func.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			for(Department dept : func.getDepartment()){
+				sql = " INSERT INTO " + Params.dbName + ".func_dept ( func_id, dept_id, restaurant_id ) VALUES ( " +
+					  func.getId() + "," +
+					  dept.getId() + "," +
+					  staff.getRestaurantId() + 
+					  ")";
+				dbCon.stmt.executeUpdate(sql);
+			}
+		}
+		
+		//Update the kitchen.
+		if(builder.isKitchenChanged()){
+			sql = " DELETE FROM " + Params.dbName + ".func_kitchen WHERE func_id = " + func.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			for(Kitchen kitchen : func.getKitchens()){
+				sql = " INSERT INTO " + Params.dbName + ".func_kitchen ( func_id, kitchen_id, restaurant_id ) VALUES( " +
+					  func.getId() + "," +
+					  kitchen.getId() + "," +
+					  staff.getRestaurantId() + 
+					  ")";
+				dbCon.stmt.executeUpdate(sql);
+			}
+		}
+		
+		//Update the regions.
+		if(builder.isRegionChanged()){
+			sql = " DELETE FROM " + Params.dbName + ".func_region WHERE func_id = " + func.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			for(Region region : func.getRegions()){
+				sql = " INSERT INTO " + Params.dbName + ".func_region ( func_id, region_id, restaurant_id ) VALUES( " +
+					  func.getId() + "," +
+					  region.getId() + "," +
+					  staff.getRestaurantId() +
+					  ")";
+				dbCon.stmt.executeUpdate(sql);
+			}
+		}
+		
+		//TODO Insert the associated all cancel & detail
+		if(builder.isIncludeCancelChanged()){
+			func = getById(dbCon, staff, func.getId());
+			if(func.getType() == PType.PRINT_ORDER){
+				deleteByCond(dbCon, staff, new ExtraCond().setPrinter(func.getPrinterId()).setType(PType.PRINT_ALL_CANCELLED_FOOD));
+				if(builder.isIncludeCancel()){
+					addFunc(dbCon, staff, PrintFunc.SummaryBuilder.newCancel(func));
+				}
+				
+			}else if(func.getType() == PType.PRINT_ORDER_DETAIL){
+				deleteByCond(dbCon, staff, new ExtraCond().setPrinter(func.getPrinterId()).setType(PType.PRINT_CANCELLED_FOOD_DETAIL));
+				if(builder.isIncludeCancel()){
+					addFunc(dbCon, staff, PrintFunc.DetailBuilder.newCancel(func));
+				}
+			}
+		}
+	}
+	
+
 	/**
-	 * Get the print functions to the specific printer 
-	 * @param printerId
-	 * 			the id to printer
-	 * @return the print functions to this printer
+	 * Get the printer function to specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param funcId
+	 * 			the id to printer function
+	 * @return the printer function to this specific id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the printer function to this specific id does NOT exist
+	 */
+	public static PrintFunc getById(DBCon dbCon, Staff staff, int funcId) throws SQLException, BusinessException{
+		List<PrintFunc> result = getByCond(dbCon, staff, new ExtraCond().setId(funcId));
+		if(result.isEmpty()){
+			throw new BusinessException(PrintSchemeError.PRINTER_NOT_EXIST);
+		}else{
+			return result.get(0);
+		}
+	}
+
+	/**
+	 * Get the printer function to specific extra condition {@link ExtraCond}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @return the printer functions to this extra condition
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<PrintFunc> getFuncByPrinterId(int printerId) throws SQLException{
+	public static List<PrintFunc> getByCond(Staff staff, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getFuncByPrinterId(dbCon, printerId);
+			return getByCond(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * Get the print functions to the specific printer 
+	 * Get the printer function to specific extra condition {@link ExtraCond}.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param printerId
-	 * 			the id to printer
-	 * @return the print functions to this printer
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @return the printer functions to this extra condition
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<PrintFunc> getFuncByPrinterId(DBCon dbCon, int printerId) throws SQLException{
+	public static List<PrintFunc> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
 		
-		sql = " SELECT func_id, `repeat`, `type` FROM " + Params.dbName + ".print_func WHERE printer_id = " + printerId + " ORDER BY type ";
+		sql = " SELECT * FROM " + 
+			  Params.dbName + ".print_func WHERE 1 = 1 " + 
+			  (extraCond != null ? extraCond.toString() : "") +
+			  " ORDER BY type ";
 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
-		List<PrintFunc> result = new ArrayList<PrintFunc>();
+		final List<PrintFunc> result = new ArrayList<PrintFunc>();
 		while(dbCon.rs.next()){
 			PrintFunc func = new PrintFunc(PType.valueOf(dbCon.rs.getInt("type")), dbCon.rs.getInt("repeat"));
 			func.setId(dbCon.rs.getInt("func_id"));
+			func.setPrinterId(dbCon.rs.getInt("printer_id"));
 			result.add(func);
 		}
 		dbCon.rs.close();
@@ -386,6 +489,22 @@ public class PrintFuncDao {
 			dbCon.rs.close();
 		}
 	
-		return Collections.unmodifiableList(result);
+		return result;
+	}
+	
+	/**
+	 * Get the print functions to the specific printer 
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param printerId
+	 * 			the id to printer
+	 * @return the print functions to this printer
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<PrintFunc> getByPrinter(DBCon dbCon, Staff staff, Printer printer) throws SQLException{
+		return getByCond(dbCon, staff, new ExtraCond().setPrinter(printer));
 	}
 }

@@ -21,6 +21,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.printScheme.PrintFunc;
 import com.wireless.pojo.printScheme.PrintFunc.Builder;
 import com.wireless.pojo.printScheme.PrintFunc.DetailBuilder;
@@ -38,7 +39,7 @@ public class TestPrinterScheme {
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getAdminByRestaurant(37);
+			mStaff = StaffDao.getAdminByRestaurant(40);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -86,13 +87,13 @@ public class TestPrinterScheme {
 			List<Kitchen> kitchens = KitchenDao.getByType(dbCon, mStaff, Kitchen.Type.NORMAL);
 			List<Region> regions = RegionDao.getByStatus(dbCon, mStaff, Region.Status.BUSY);
 			
-			Printer.InsertBuilder builder = new Printer.InsertBuilder("GP-80250-200", PStyle.PRINT_STYLE_58MM, mStaff.getRestaurantId())
+			Printer.InsertBuilder builder = new Printer.InsertBuilder("GP-80250-200-test", PStyle.PRINT_STYLE_58MM)
 													   .setAlias("海鲜打印机");
 			//Add a new printer
 			printerId = PrinterDao.insert(dbCon, mStaff, builder);
 			
-			//下单
-			PrintFunc.SummaryBuilder summaryFuncBuilder = SummaryBuilder.newPrintOrder()
+			//点菜总单
+			PrintFunc.SummaryBuilder summaryFuncBuilder = SummaryBuilder.newExtra(printerId, true)
 																	   .setRepeat(2)
 																	   .addRegion(regions.get(0))
 																	   .addRegion(regions.get(1))
@@ -100,79 +101,72 @@ public class TestPrinterScheme {
 																	   .addDepartment(depts.get(1));
 			
 			//Add a summary function to this printer
-			int summaryFuncId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, summaryFuncBuilder);
+			int summaryFuncId = PrintFuncDao.addFunc(dbCon, mStaff, summaryFuncBuilder);
 			
-			//Add a detail function to this printer(下单详细)
-			PrintFunc.DetailBuilder detailFuncBuilder = DetailBuilder.newPrintFoodDetail()
+			//退菜总单
+			int cancelSummaryFuncId = PrintFuncDao.getByCond(dbCon, mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_ALL_CANCELLED_FOOD)).get(0).getId();
+			
+			//点菜分单
+			PrintFunc.DetailBuilder detailFuncBuilder = DetailBuilder.newExtra(printerId, true)
 																	 .setRepeat(2)
 																	 .addKitchen(kitchens.get(0))
 																	 .addKitchen(kitchens.get(1));
-			int detailFuncId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, detailFuncBuilder);
+			int detailFuncId = PrintFuncDao.addFunc(dbCon, mStaff, detailFuncBuilder);
 			
-			//退菜
-			PrintFunc.SummaryBuilder allCancelledFoodBuilder = SummaryBuilder.newAllCancelledFood()
-																			.setRepeat(3)
-																			.addRegion(regions.get(1))
-																			.addRegion(regions.get(2))
-																			.addDepartment(depts.get(1))
-																			.addDepartment(depts.get(2));
-			
-			int allCancelledFoodId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, allCancelledFoodBuilder);
-			
-			//退菜详细
-			PrintFunc.DetailBuilder cancelledFoodBuilder = DetailBuilder.newCancelledFood()
-																		.setRepeat(3)
-																		.addKitchen(kitchens.get(3))
-																		.addKitchen(kitchens.get(4));
-			int CancelledFoodId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, cancelledFoodBuilder);
+			//退菜分单
+			int cancelledDetailFuncId = PrintFuncDao.getByCond(dbCon, mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_CANCELLED_FOOD_DETAIL)).get(0).getId();
 			
 			//结账
-			PrintFunc.Builder  receiptBuilder = Builder.newReceipt()
+			PrintFunc.Builder  receiptBuilder = Builder.newReceipt(printerId)
 														.setRepeat(3)
 														.addRegion(regions.get(0))
 														.addRegion(regions.get(4));
-			int receiptId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, receiptBuilder);
+			int receiptId = PrintFuncDao.addFunc(dbCon, mStaff, receiptBuilder);
 			
 			//暂结
-			PrintFunc.Builder tempReceiptBuilder = Builder.newTempReceipt()
+			PrintFunc.Builder tempReceiptBuilder = Builder.newTempReceipt(printerId)
 															.setRepeat(2)
 															.addRegion(regions.get(0))
 															.addRegion(regions.get(2));
-			int tempReceiptId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, tempReceiptBuilder);
+			int tempReceiptId = PrintFuncDao.addFunc(dbCon, mStaff, tempReceiptBuilder);
 			
 			//转台
-			PrintFunc.Builder transferTableBuilder = Builder.newTransferTable()
+			PrintFunc.Builder transferTableBuilder = Builder.newTransferTable(printerId)
 															.setRepeat(3)
 															.addRegion(regions.get(2))
 															.addRegion(regions.get(3));
 			
-			int transferTableId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, transferTableBuilder);
+			int transferTableId = PrintFuncDao.addFunc(dbCon, mStaff, transferTableBuilder);
 			
 			//催菜
-			PrintFunc.Builder allHurriedFoodBuilder = Builder.newAllHurriedFood()
+			PrintFunc.Builder allHurriedFoodBuilder = Builder.newAllHurriedFood(printerId)
 															.setRepeat(1)
 															.addRegion(regions.get(2))
 															.addRegion(regions.get(3));
-			int allHurriedFoodId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, allHurriedFoodBuilder);
+			int allHurriedFoodId = PrintFuncDao.addFunc(dbCon, mStaff, allHurriedFoodBuilder);
 			
 			
 			Printer expected = builder.build();
 			expected.setId(printerId);
 			
-			PrintFunc summaryFunc = summaryFuncBuilder.build();
-			summaryFunc.setId(summaryFuncId);
-			expected.addFunc(summaryFunc);
+			PrintFunc summaryExtraFunc = summaryFuncBuilder.build();
+			summaryExtraFunc.setType(PType.PRINT_ORDER);
+			summaryExtraFunc.setId(summaryFuncId);
+			expected.addFunc(summaryExtraFunc);
+			
+			PrintFunc summaryCancelFunc = summaryFuncBuilder.build();
+			summaryCancelFunc.setType(PType.PRINT_ALL_CANCELLED_FOOD);
+			summaryCancelFunc.setId(cancelSummaryFuncId);
+			expected.addFunc(summaryCancelFunc);
 			
 			PrintFunc detailFunc = detailFuncBuilder.build();
+			detailFunc.setType(PType.PRINT_ORDER_DETAIL);
 			detailFunc.setId(detailFuncId);
 			expected.addFunc(detailFunc);
 			
-			PrintFunc allCancelledFood = allCancelledFoodBuilder.build();
-			allCancelledFood.setId(allCancelledFoodId);
-			expected.addFunc(allCancelledFood);
-			
-			PrintFunc cancelledFood = cancelledFoodBuilder.build();
-			cancelledFood.setId(CancelledFoodId);
+			PrintFunc cancelledFood = detailFuncBuilder.build();
+			cancelledFood.setType(PType.PRINT_CANCELLED_FOOD_DETAIL);
+			cancelledFood.setId(cancelledDetailFuncId);
 			expected.addFunc(cancelledFood);
 			
 			PrintFunc receipt = receiptBuilder.build();
@@ -192,35 +186,65 @@ public class TestPrinterScheme {
 			expected.addFunc(allHurriedFood);
 			
 			//Compare after insertion
-			compare(expected, PrinterDao.getPrinterById(dbCon, mStaff, printerId));
+			compare(expected, PrinterDao.getById(dbCon, mStaff, printerId));
 			
-			//Remove the summary function
-			PrintFuncDao.removeFunc(dbCon, mStaff, summaryFuncId);
+			//------------Update the summary function-----------------
+			PrintFunc.UpdateBuilder summaryUpdateBuilder = new PrintFunc.UpdateBuilder(summaryFuncId)
+																		.setRepeat(3)
+																		.addDepartment(depts.get(1))
+																		.setRegionAll();
+			PrintFuncDao.updateFunc(dbCon, mStaff, summaryUpdateBuilder);
+			expected.removeFunc(summaryExtraFunc);
+			if(summaryUpdateBuilder.isDeptChanged()){
+				summaryExtraFunc.setDepartments(summaryUpdateBuilder.build().getDepartment());
+			}
+			if(summaryUpdateBuilder.isKitchenChanged()){
+				summaryExtraFunc.setKitchens(summaryUpdateBuilder.build().getKitchens());
+			}
+			if(summaryUpdateBuilder.isRegionChanged()){
+				summaryExtraFunc.setRegions(summaryUpdateBuilder.build().getRegions());
+			}
+			if(summaryUpdateBuilder.isRepeatChanged()){
+				summaryExtraFunc.setRepeat(summaryUpdateBuilder.build().getRepeat());
+			}
+			//Compare after update summary function
+			expected.addFunc(summaryExtraFunc);
+			compare(expected, PrinterDao.getById(dbCon, mStaff, printerId));
 			
-			expected.removeFunc(summaryFunc);
+			//------------Remove the summary function---------------------------------
+			PrintFuncDao.deleteById(dbCon, mStaff, summaryFuncId);
 			
-			PrintFuncDao.removeFunc(dbCon, mStaff, allCancelledFoodId);
+			expected.removeFunc(summaryExtraFunc);
+			expected.removeFunc(summaryCancelFunc);
 			
-			expected.removeFunc(allCancelledFood);
-			
-			PrintFuncDao.removeFunc(dbCon, mStaff, receiptId);
+			PrintFuncDao.deleteById(dbCon, mStaff, receiptId);
 			
 			expected.removeFunc(receipt);
 			
 			//Compare after deletion
-			compare(expected, PrinterDao.getPrinterById(dbCon, mStaff, printerId));
+			compare(expected, PrinterDao.getById(dbCon, mStaff, printerId));
 
 			//Update the printer
-			Printer.UpdateBuilder updateBuilder = new Printer.UpdateBuilder(printerId, "GP-80250-201", PStyle.PRINT_STYLE_80MM)
+			Printer.UpdateBuilder updateBuilder = new Printer.UpdateBuilder(printerId)
+															 .setName("GP-80250-201-test")
+															 .setStyle(PStyle.PRINT_STYLE_80MM)
 															 .setAlias("中厨打印机").setEnabled(false);
 			PrinterDao.update(dbCon, mStaff, updateBuilder);
 			
-			expected.setName("GP-80250-201");
-			expected.setStyle(PStyle.PRINT_STYLE_80MM);
-			expected.setAlias("中厨打印机");
-			expected.setEnabled(false);
+			if(updateBuilder.isNameChanged()){
+				expected.setName(updateBuilder.build().getName());
+			}
+			if(updateBuilder.isStyleChanged()){
+				expected.setStyle(updateBuilder.build().getStyle());
+			}
+			if(updateBuilder.isAliasChanged()){
+				expected.setAlias(updateBuilder.build().getAlias());
+			}
+			if(updateBuilder.isEnabledChanged()){
+				expected.setEnabled(updateBuilder.build().isEnabled());
+			}
 			//Compare after update printer
-			compare(expected, PrinterDao.getPrinterById(dbCon, mStaff, printerId));
+			compare(expected, PrinterDao.getById(dbCon, mStaff, printerId));
 			
 		}finally{
 			
@@ -229,11 +253,11 @@ public class TestPrinterScheme {
 				PrinterDao.deleteById(dbCon, mStaff, printerId);
 				
 				try{
-					PrinterDao.getPrinterById(dbCon, mStaff, printerId);
+					PrinterDao.getById(dbCon, mStaff, printerId);
 					assertTrue("fail to delete printer", false);
 				}catch(BusinessException ignored){}
 				
-				assertTrue("fail to delete print functions", PrintFuncDao.getFuncByPrinterId(dbCon, printerId).isEmpty());
+				assertTrue("fail to delete print functions", PrintFuncDao.getByCond(dbCon, mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId)).isEmpty());
 			}
 			
 			dbCon.disconnect();

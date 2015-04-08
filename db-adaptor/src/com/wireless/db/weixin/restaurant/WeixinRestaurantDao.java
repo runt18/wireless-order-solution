@@ -90,6 +90,11 @@ public class WeixinRestaurantDao {
 	 * 			throws if the weixin restaurant does NOT exist
 	 */
 	public static void update(DBCon dbCon, Staff staff, WeixinRestaurant.UpdateBuilder builder) throws SQLException, BusinessException{
+		
+		if(getByCond(dbCon, staff, null, null).isEmpty()){
+			insert(dbCon, staff);
+		}
+		
 		String sql;
 		
 		WeixinRestaurant wr = builder.build();
@@ -187,6 +192,10 @@ public class WeixinRestaurantDao {
 			wr.setStatus(WeixinRestaurant.Status.valueOf(dbCon.rs.getInt("status")));
 			wr.setWeixinAppId(dbCon.rs.getString("app_id"));
 			wr.setWeixinAppSecret(dbCon.rs.getString("app_secret"));
+			wr.setQrCodeUrl(dbCon.rs.getString("qrcode_url"));
+			wr.setHeadImgUrl(dbCon.rs.getString("head_img_url"));
+			wr.setRefreshToken(dbCon.rs.getString("refresh_token"));
+			wr.setNickName(dbCon.rs.getString("nick_name"));
 			String info = dbCon.rs.getString("weixin_info");
 			if(info != null && !info.isEmpty()){
 				wr.setWeixinInfo(new StringHtml(info, StringHtml.ConvertTo.TO_HTML).toString());
@@ -243,7 +252,14 @@ public class WeixinRestaurantDao {
 		// 以餐厅的account作为TOKEN
 		Restaurant restaurant = RestaurantDao.getByAccount(dbCon, account);
 		
-		if(signature.equals(CalcWeixinSignature.calc(restaurant.getAccount(), timestamp, nonce))) {
+		final String token;
+		if(restaurant.getAccount().length() < 3){
+			token = "xxx";
+		}else{
+			token = restaurant.getAccount();
+		}
+		
+		if(signature.equals(CalcWeixinSignature.calc(token, timestamp, nonce))) {
 			// 请求验证成功，更新openId和餐厅的验证记录
 			String sql;
 			
@@ -461,204 +477,5 @@ public class WeixinRestaurantDao {
 		}
 		return restaurantId;
 	}
-	
-//	/**
-//	 * 
-//	 * @param dbCon
-//	 * @param rid
-//	 * @return
-//	 * @throws SQLException
-//	 * @throws BusinessException
-//	 */
-//	public static String getInfo(DBCon dbCon, int rid) throws SQLException, BusinessException{
-//		String info = "";
-//		String querySQL = "SELECT weixin_info FROM weixin_misc WHERE restaurant_id = " + rid;
-//		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-//		if(dbCon.rs != null && dbCon.rs.next()){
-//			info = dbCon.rs.getString(1);
-//			info = info == null ? "" : info;
-//			info = info.replaceAll("&amp;", "&")
-//					.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", "\"")
-//					.replaceAll("\r&#10;", "　\n").replaceAll("&#10;", "　\n").replaceAll("&#032;", " ")
-//					.replaceAll("&#039;", "'").replaceAll("&#033;", "!");
-//		}
-//		return info;
-//	}
-//	public static String getInfo(int rid) throws SQLException, BusinessException{
-//		DBCon dbCon = null;
-//		try{
-//			dbCon = new DBCon();
-//			dbCon.connect();
-//			return getInfo(dbCon, rid);
-//		}finally{
-//			if(dbCon != null) dbCon.disconnect();
-//		}
-//	}
-//	
-//	/**
-//	 * 
-//	 * @param dbCon
-//	 * @param serial
-//	 * @return
-//	 * @throws SQLException
-//	 * @throws BusinessException
-//	 */
-//	public static String getInfoByRestaurantSerial(DBCon dbCon, String serial) throws SQLException, BusinessException{
-//		int rid = getRestaurantIdByWeixin(dbCon, serial);
-//		return getInfo(dbCon, rid);
-//	}
-//	public static String getInfoByRestaurantSerial(String serial) throws SQLException, BusinessException{
-//		DBCon dbCon = null;
-//		try{
-//			dbCon = new DBCon();
-//			dbCon.connect();
-//			return getInfoByRestaurantSerial(dbCon, serial);
-//		}finally{
-//			if(dbCon != null) dbCon.disconnect();
-//		}
-//	}
-//	
-//	/**
-//	 * 
-//	 * @param dbCon
-//	 * @param rid
-//	 * @param info
-//	 * @throws SQLException
-//	 * @throws BusinessException
-//	 */
-//	public static void updateInfo(DBCon dbCon, int rid, String info) throws SQLException, BusinessException{
-//		info = info.replaceAll("&", "&amp;")
-//			.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;")
-//			.replaceAll("\n\r", "&#10;").replaceAll("\r\n", "&#10;").replaceAll("\n", "&#10;")
-//			.replaceAll(" ", "&#032;").replaceAll("'", "&#039;").replaceAll("!", "&#033;");
-//		String updateSQL = "UPDATE weixin_misc SET weixin_info = '" + info + "' WHERE restaurant_id = " + rid;
-//		if(dbCon.stmt.executeUpdate(updateSQL) == 0){
-//			throw new BusinessException(WeixinRestaurantError.WEIXIN_UPDATE_INFO_FAIL);
-//		}
-//	}
-//	public static void updateInfo(int rid, String info) throws SQLException, BusinessException{
-//		DBCon dbCon = null;
-//		try{
-//			dbCon = new DBCon();
-//			dbCon.connect();
-//			updateInfo(dbCon, rid, info);
-//		}finally{
-//			if(dbCon != null) dbCon.disconnect();
-//		}
-//	}
-//	
-//	/**
-//	 * 
-//	 * @param dbCon
-//	 * @param serial
-//	 * @param info
-//	 * @throws SQLException
-//	 * @throws BusinessException
-//	 */
-//	public static void updateInfoByRestaurantSerial(DBCon dbCon, String serial, String info) throws SQLException, BusinessException{
-//		int rid = getRestaurantIdByWeixin(dbCon, serial);
-//		updateInfo(dbCon, rid, info);
-//	}
-//	public static void updateInfoByRestaurantSerial(String serial, String info) throws SQLException, BusinessException{
-//		DBCon dbCon = null;
-//		try{
-//			dbCon = new DBCon();
-//			dbCon.connect();
-//			updateInfoByRestaurantSerial(dbCon, serial, info);
-//		}finally{
-//			if(dbCon != null) dbCon.disconnect();
-//		}
-//	}
-//	
-//	/**
-//	 * 
-//	 * @param dbCon
-//	 * @param rid
-//	 * @param imgKey
-//	 * @throws SQLException
-//	 */
-//	public static void addImageMaterial(DBCon dbCon, int rid, String imgKey) throws SQLException{
-//		String insertSQL = "INSERT INTO weixin_image (restaurant_id,image,last_modified)"
-//				+ " VALUES(" + rid + ",'" + imgKey + "', NOW())";
-//		dbCon.stmt.executeUpdate(insertSQL);
-//	}
-//	public static void addImageMaterial(int rid, String imgKey) throws SQLException{
-//		DBCon dbCon = null;
-//		try{
-//			dbCon = new DBCon();
-//			dbCon.connect();
-//			addImageMaterial(dbCon, rid, imgKey);
-//		}finally{
-//			if(dbCon != null) dbCon.disconnect();
-//		}
-//	}
-//	
-//	/**
-//	 * 
-//	 * @param dbCon
-//	 * @param restaurantId
-//	 * @return
-//	 * @throws SQLException
-//	 * @throws BusinessException 
-//	 */
-//	public static String getLogo(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
-//		String sql = " SELECT weixin_logo FROM weixin_misc WHERE restaurant_id = " + restaurantId;
-//		String logo = null;
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
-//		if(dbCon.rs.next()){
-//			logo = dbCon.rs.getString(1);
-//		}else{
-//			throw new BusinessException("");
-//		}
-//		dbCon.rs.close();
-//		return logo;
-//	}
-//	
-//	public static String getLogo(int rid) throws SQLException, BusinessException{
-//		DBCon dbCon = new DBCon();
-//		try{
-//			dbCon.connect();
-//			return getLogo(dbCon, rid);
-//		}finally{
-//			dbCon.disconnect();
-//		}
-//	}
-//	
-//	public static String getLogoByRestaurantSerial(DBCon dbCon, String serial) throws SQLException, BusinessException{
-//		return getLogo(dbCon, getRestaurantIdByWeixin(dbCon, serial));
-//	}
-//	public static String getLogoByRestaurantSerial(String serial) throws SQLException, BusinessException{
-//		DBCon dbCon = null;
-//		try{
-//			dbCon = new DBCon();
-//			dbCon.connect();
-//			return getLogoByRestaurantSerial(dbCon, serial);
-//		}finally{
-//			if(dbCon != null) dbCon.disconnect();
-//		}
-//	}
-//	
-//	/**
-//	 * 
-//	 * @param dbCon
-//	 * @param rid
-//	 * @param imgKey
-//	 * @throws SQLException
-//	 */
-//	public static void updateLogo(DBCon dbCon, int rid, String imgKey) throws SQLException{
-//		String updateSQL = "UPDATE weixin_misc SET weixin_logo = '" + imgKey + "' WHERE restaurant_id = " + rid;
-//		dbCon.stmt.executeUpdate(updateSQL);
-//	}
-//	public static void updateLogo(int rid, String imgKey) throws SQLException{
-//		DBCon dbCon = null;
-//		try{
-//			dbCon = new DBCon();
-//			dbCon.connect();
-//			updateLogo(dbCon, rid, imgKey);
-//		}finally{
-//			if(dbCon != null) dbCon.disconnect();
-//		}
-//	}
-//	
 	
 }

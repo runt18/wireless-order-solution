@@ -472,16 +472,16 @@ public class RestaurantDao {
 	}
 	
 	private static void initPrinter(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
-		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-201", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()));
-		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-202", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()));
-		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-203", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()));
-		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-204", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()));
-		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-205", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()));
-		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-206", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()).setEnabled(false));
-		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-207", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()).setEnabled(false));
-		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-208", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()).setEnabled(false));
-		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-209", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()).setEnabled(false));
-		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-210", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()).setEnabled(false));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-201", PStyle.PRINT_STYLE_80MM));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-202", PStyle.PRINT_STYLE_80MM));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-203", PStyle.PRINT_STYLE_80MM));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-204", PStyle.PRINT_STYLE_80MM));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-205", PStyle.PRINT_STYLE_80MM));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-206", PStyle.PRINT_STYLE_80MM).setEnabled(false));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-207", PStyle.PRINT_STYLE_80MM).setEnabled(false));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-208", PStyle.PRINT_STYLE_80MM).setEnabled(false));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-209", PStyle.PRINT_STYLE_80MM).setEnabled(false));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-210", PStyle.PRINT_STYLE_80MM).setEnabled(false));
 	}
 	
 	private static void initMemberType(DBCon dbCon, Staff staff) throws SQLException{

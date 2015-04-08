@@ -221,7 +221,7 @@ public class TestRestaurantDao {
 	}
 	
 	private void comparePrinters(Staff staff) throws SQLException{
-		Assert.assertEquals("failed to insert 10 printers", 10, PrinterDao.getAllPrinters(staff).size());
+		Assert.assertEquals("failed to insert 10 printers", 10, PrinterDao.getByCond(staff, null).size());
 	}
 	
 	private void compareMemberType(Staff staff) throws SQLException{
