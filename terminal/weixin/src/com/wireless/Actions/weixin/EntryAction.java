@@ -16,16 +16,16 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.marker.weixin.DefaultSession;
 import org.marker.weixin.api.Button;
 import org.marker.weixin.api.Menu;
 import org.marker.weixin.api.Token;
+import org.marker.weixin.session.WxSession;
 
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class EntryAction extends Action{
 	
@@ -66,8 +66,8 @@ public class EntryAction extends Action{
 											.build());
 							if(menu.create(token).isOk()){
 								//Record the app id & secret.
-								WeixinRestaurantDao.update(StaffDao.getAdminByRestaurant(RestaurantDao.getByAccount(account).getId()), 
-														   new WeixinRestaurant.UpdateBuilder().setWeixinAppId(appId).setWeixinAppSecret(appSecret));
+								WxRestaurantDao.update(StaffDao.getAdminByRestaurant(RestaurantDao.getByAccount(account).getId()), 
+														   new WxRestaurant.UpdateBuilder().setWeixinAppId(appId).setWeixinAppSecret(appSecret));
 							}
 						} catch (IOException | SQLException | BusinessException e) {
 							e.printStackTrace();
@@ -91,7 +91,7 @@ public class EntryAction extends Action{
 	private void reply(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		InputStream is = request.getInputStream();
 		OutputStream os = response.getOutputStream();
-		DefaultSession session = DefaultSession.newInstance();
+		WxSession session = WxSession.newInstance();
 		try{
 			session.addOnHandleMessageListener(new WeiXinHandleMessage(session, "http://" + request.getLocalAddr() + "/wx-term"));
 			session.process(is, os);
@@ -116,7 +116,7 @@ public class EntryAction extends Action{
 				String timestamp = request.getParameter("timestamp");	// 时间戳
 				String nonce = request.getParameter("nonce");			// 随机数
 				String echostr = request.getParameter("echostr");		// 随机字符串
-				WeixinRestaurantDao.verify(account, signature, timestamp, nonce);
+				WxRestaurantDao.verify(account, signature, timestamp, nonce);
 				result = echostr;
 			}
 		}catch(Exception e){

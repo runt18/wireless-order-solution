@@ -21,7 +21,7 @@ import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
@@ -133,7 +133,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			Map<Object, Object> params = new HashMap<Object, Object>();
 			
 			// 获取餐厅编号
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
 			//
 			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
 			// 获取会员编号
@@ -197,7 +197,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			List<MemberOperation> couponDetail = new ArrayList<MemberOperation>();
 			
 			// 获取餐厅编号
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
 			//
 			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
 			// 获取会员编号
@@ -321,7 +321,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			
 			String restaurantSerial = request.getParameter("fid"), memberSerial = request.getParameter("oid");
 			// 获取餐厅编号
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
 			//
 			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
 			// 获取会员编号

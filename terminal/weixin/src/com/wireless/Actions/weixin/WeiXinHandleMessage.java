@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.marker.weixin.DefaultSession;
 import org.marker.weixin.HandleMessageAdapter;
 import org.marker.weixin.msg.Data4Item;
 import org.marker.weixin.msg.Msg;
@@ -24,6 +23,7 @@ import org.marker.weixin.msg.Msg4Event;
 import org.marker.weixin.msg.Msg4Event.Event;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
+import org.marker.weixin.session.WxSession;
 
 import com.alibaba.fastjson.JSON;
 import com.wireless.db.member.MemberDao;
@@ -33,7 +33,7 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.order.WxOrderDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.member.Member;
@@ -43,7 +43,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.weixin.order.WxOrder;
-import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class WeiXinHandleMessage extends HandleMessageAdapter {
 	
@@ -70,10 +70,9 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	public final static String ZHUAN_EVENT_KEY = "zhuan_event_key";
 	public final static String SCAN_EVENT_KEY = "scan_event_key";
 	
-	private final DefaultSession session;
 	
-	public WeiXinHandleMessage(DefaultSession session, String root){
-		this.session = session;
+	public WeiXinHandleMessage(WxSession session, String root){
+		super(session);
 		this.WEIXIN_INDEX = root + "/weixin/order/index.html";
 		this.WEIXIN_FOOD = root + "/weixin/order/food.html";
 		this.WEIXIN_RFOOD = root + "/weixin/order/rfood.html";
@@ -100,7 +99,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	}
 	
 	private Msg createWelcome(Msg msg) throws SQLException, BusinessException{
-		int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+		int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 		List<Promotion> welcome = PromotionDao.getByCond(StaffDao.getAdminByRestaurant(restaurantId), 
 											   new PromotionDao.ExtraCond().setType(Promotion.Type.WELCOME).addStatus(Promotion.Status.PROGRESS));
 		
@@ -140,8 +139,8 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		Restaurant restaurant = null;
 		try {
 			//restaurant = RestaurantDao.getByAccount(account);
-			restaurant = RestaurantDao.getById(WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
-			WeixinRestaurant wr = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurant.getId()));
+			restaurant = RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
+			WxRestaurant wr = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurant.getId()));
 			if(wr.getWeixinLogo() != null){
 				mainItem = new Data4Item(restaurant.getName(), "", wr.getWeixinLogo().getObjectUrl(), createUrl(msg, WEIXIN_INDEX)); 
 			}else{
@@ -198,7 +197,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	public void onTextMsg(Msg4Text msg) {
 		try{
 			// 绑定餐厅和公众平台信息
-			WeixinRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
+			WxRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
 			if(msg.getContent().equalsIgnoreCase("M")){
 				session.callback(createNavi(msg));
 			}else{
@@ -216,11 +215,11 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	public void onEventMsg(Msg4Event msg) {
 		try{
 			// 绑定餐厅和公众平台信息
-			WeixinRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
+			WxRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
 			
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注
-				Staff staff = StaffDao.getAdminByRestaurant(WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
+				Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
 				WxMemberDao.interest(staff, msg.getFromUserName());
 				try{
 					session.callback(createWelcome(msg));
@@ -244,7 +243,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					
 				}else if(msg.getEventKey().equals(PROMOTION_EVENT_KEY)){
 					//最新优惠
-					int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+					int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 					
 					Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 					
@@ -356,7 +355,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 				}else if(msg.getEventKey().equals(MEMBER_EVENT_KEY)){
 					//会员信息
 					try{
-						Member member = MemberDao.getByWxSerial(StaffDao.getAdminByRestaurant(WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())), msg.getFromUserName());
+						Member member = MemberDao.getByWxSerial(StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())), msg.getFromUserName());
 						StringBuilder title = new StringBuilder();
 						title.append("亲爱的" + member.getName());
 						if(member.getTotalBalance() > 0){
@@ -374,7 +373,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					}
 						
 				}else if(msg.getEventKey().equals(ORDER_EVENT_KEY)){
-					int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+					int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 					
 					Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 					

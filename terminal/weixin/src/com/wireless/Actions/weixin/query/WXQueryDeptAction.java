@@ -18,7 +18,7 @@ import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Department;
@@ -36,7 +36,7 @@ public class WXQueryDeptAction extends DispatchAction{
 			dbCon.connect();
 			
 			String fid = request.getParameter("fid");
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			
 			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
 			List<Department> depts = DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL);
@@ -86,7 +86,7 @@ public class WXQueryDeptAction extends DispatchAction{
 			dbCon.connect();
 			
 			String fid = request.getParameter("fid");
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			
 			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
 			

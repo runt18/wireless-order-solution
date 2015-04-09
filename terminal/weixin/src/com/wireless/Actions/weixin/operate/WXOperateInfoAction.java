@@ -9,7 +9,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -28,8 +28,8 @@ public class WXOperateInfoAction extends DispatchAction {
 	public ActionForward getInfo(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		try{
-			int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
-			final String info = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId)).getWeixinInfo();
+			int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
+			final String info = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId)).getWeixinInfo();
 			jobject.setExtra(new Jsonable(){
 
 				@Override

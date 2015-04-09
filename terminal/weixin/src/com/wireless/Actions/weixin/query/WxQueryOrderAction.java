@@ -14,7 +14,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.order.WxOrderDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
@@ -34,7 +34,7 @@ public class WxQueryOrderAction extends DispatchAction {
 			dbCon = new DBCon();
 			dbCon.connect();
 			
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			List<WxOrder> orders = WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setWeixin(oid).setType(WxOrder.Type.valueOf(Integer.parseInt(orderType))), " ORDER BY birth_date DESC");

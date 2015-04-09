@@ -13,7 +13,7 @@ import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.order.WxOrderDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
@@ -44,7 +44,7 @@ public class WXOperateOrderAction extends DispatchAction {
 			String fid = request.getParameter("fid");
 			String foods = request.getParameter("foods");
 			
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(fid);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			
 			Staff mStaff = StaffDao.getAdminByRestaurant(rid);
 			
@@ -103,7 +103,7 @@ public class WXOperateOrderAction extends DispatchAction {
 			
 			int addressId;
 			
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(fid);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			
 			Staff mStaff = StaffDao.getAdminByRestaurant(rid);
 			

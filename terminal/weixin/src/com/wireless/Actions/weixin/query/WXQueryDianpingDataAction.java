@@ -22,7 +22,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 
 public class WXQueryDianpingDataAction extends DispatchAction{
@@ -36,7 +36,7 @@ public class WXQueryDianpingDataAction extends DispatchAction{
 		try {
 			dbCon = new DBCon();
 			dbCon.connect();
-			Restaurant restaurant = RestaurantDao.getById(dbCon, WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid));
+			Restaurant restaurant = RestaurantDao.getById(dbCon, WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid));
 
 	    	String appkey = "6373481645";  
 	    	String secret = "21dcd218a828460bbea7d1977d7140a8";  

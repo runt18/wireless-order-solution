@@ -42,7 +42,6 @@ import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.TextAnchor;
-import org.marker.weixin.DefaultSession;
 import org.marker.weixin.HandleMessageAdapter;
 import org.marker.weixin.MySecurity;
 import org.marker.weixin.api.Button;
@@ -55,6 +54,7 @@ import org.marker.weixin.msg.Msg4Event;
 import org.marker.weixin.msg.Msg4Event.Event;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
+import org.marker.weixin.session.WxSession;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -145,10 +145,10 @@ public class FinanceWeixinAction extends Action {
 		InputStream is = request.getInputStream();
 		OutputStream os = response.getOutputStream();
 		
-		final DefaultSession session = DefaultSession.newInstance(); 
+		WxSession session = WxSession.newInstance(); 
 		
 		try{
-			session.addOnHandleMessageListener(new HandleMessageAdapter(){
+			session.addOnHandleMessageListener(new HandleMessageAdapter(session){
 				
 				@Override
 				public void onEventMsg(final Msg4Event msg){

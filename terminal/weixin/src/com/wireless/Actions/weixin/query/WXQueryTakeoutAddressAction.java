@@ -13,7 +13,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.TakeoutAddress;
@@ -26,7 +26,7 @@ public class WXQueryTakeoutAddressAction extends Action{
 			throws Exception {
 		JObject jobject = new JObject();
 		try{
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
 			Staff mStaff = StaffDao.getAdminByRestaurant(rid);
 			final Member member = MemberDao.getByWxSerial(mStaff, request.getParameter("oid"));			
 			

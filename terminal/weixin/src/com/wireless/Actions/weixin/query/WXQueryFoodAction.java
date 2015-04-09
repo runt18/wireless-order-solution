@@ -12,7 +12,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
@@ -35,7 +35,7 @@ public class WXQueryFoodAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			String fid = request.getParameter("fid");
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(fid);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			
 			String extraCond = " AND FOOD.restaurant_id = " + rid, orderClause = " ORDER BY FOOD.food_alias";
 			extraCond += " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
@@ -85,7 +85,7 @@ public class WXQueryFoodAction extends DispatchAction{
 			
 			String fid = request.getParameter("fid");
 			String kitchenId = request.getParameter("kitchenId");
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			
 			String extraCond = " AND FOOD.restaurant_id = " + rid, orderClause = " ORDER BY FOOD.food_alias";
 			extraCond += " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";

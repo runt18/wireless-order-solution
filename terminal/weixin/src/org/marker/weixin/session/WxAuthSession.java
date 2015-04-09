@@ -1,4 +1,4 @@
-package org.marker.weixin;
+package org.marker.weixin.session;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
 import com.qq.weixin.mp.aes.AesException;
 import com.qq.weixin.mp.aes.WXBizMsgCrypt;
 
-public class WxAuthSession extends DefaultSession{
+public class WxAuthSession extends WxSession{
 
 	private class EncryptedMsg extends Msg{
 		

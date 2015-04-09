@@ -14,7 +14,7 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.staffMgr.Staff;
@@ -34,7 +34,7 @@ public class WXQueryPromotionAction extends DispatchAction{
 		}else{
 			DBCon dbCon = new DBCon();
 			dbCon.connect();
-			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+			rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
 			staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
 			dbCon.disconnect();
 		}

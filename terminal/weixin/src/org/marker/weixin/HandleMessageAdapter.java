@@ -7,8 +7,15 @@ import org.marker.weixin.msg.Msg4Location;
 import org.marker.weixin.msg.Msg4Text;
 import org.marker.weixin.msg.Msg4Video;
 import org.marker.weixin.msg.Msg4Voice;
+import org.marker.weixin.session.WxSession;
 
 public class HandleMessageAdapter implements HandleMessageListener {
+	protected final WxSession session;
+	
+	public HandleMessageAdapter(final WxSession session){
+		this.session = session;
+	}
+	
 	@Override
 	public void onTextMsg(Msg4Text msg) {
 	}

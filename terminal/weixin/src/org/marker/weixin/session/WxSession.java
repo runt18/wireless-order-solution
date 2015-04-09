@@ -1,9 +1,11 @@
-package org.marker.weixin;
+package org.marker.weixin.session;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -14,6 +16,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.marker.weixin.HandleMessageListener;
 import org.marker.weixin.api.Token;
 import org.marker.weixin.msg.Msg;
 import org.marker.weixin.msg.Msg4Event;
@@ -27,7 +30,8 @@ import org.marker.weixin.msg.Msg4Voice;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-public abstract class Session {
+public class WxSession {
+	private final List<HandleMessageListener> listeners = new ArrayList<>(3);
 	private InputStream is;
 	private OutputStream os;
 	private static DocumentBuilder builder;
@@ -43,6 +47,10 @@ public abstract class Session {
 
 	private static TransformerFactory tffactory = TransformerFactory.newInstance();
 
+	public static WxSession newInstance(){ 
+		return new WxSession();
+	}
+	
 	public void process(InputStream is, OutputStream os) {
 		this.os = os;
 		this.is = is;
@@ -121,19 +129,59 @@ public abstract class Session {
 		}
 	}
 
-	public abstract void onTextMsg(Msg4Text paramMsg4Text);
+	public void addOnHandleMessageListener(HandleMessageListener handleMassge) {
+		this.listeners.add(handleMassge);
+	}
 
-	public abstract void onImageMsg(Msg4Image paramMsg4Image);
+	public void removeOnHandleMessageListener(HandleMessageListener handleMassge) {
+		this.listeners.remove(handleMassge);
+	}
 
-	public abstract void onEventMsg(Msg4Event paramMsg4Event);
+	public void onTextMsg(Msg4Text msg) {
+		for (HandleMessageListener currentListener : this.listeners) {
+			currentListener.onTextMsg(msg);
+		}
+	}
 
-	public abstract void onLinkMsg(Msg4Link paramMsg4Link);
+	public void onImageMsg(Msg4Image msg) {
+		for (HandleMessageListener currentListener : this.listeners) {
+			currentListener.onImageMsg(msg);
+		}
+	}
 
-	public abstract void onLocationMsg(Msg4Location paramMsg4Location);
+	public void onEventMsg(Msg4Event msg) {
+		for (HandleMessageListener currentListener : this.listeners) {
+			currentListener.onEventMsg(msg);
+		}
+	}
 
-	public abstract void onVoiceMsg(Msg4Voice paramMsg4Voice);
+	public void onLinkMsg(Msg4Link msg) {
+		for (HandleMessageListener currentListener : this.listeners) {
+			currentListener.onLinkMsg(msg);
+		}
+	}
 
-	public abstract void onVideoMsg(Msg4Video paramMsg4Video);
+	public void onLocationMsg(Msg4Location msg) {
+		for (HandleMessageListener currentListener : this.listeners) {
+			currentListener.onLocationMsg(msg);
+		}
+	}
 
-	public abstract void onErrorMsg(int paramInt);
+	public void onErrorMsg(int errorCode) {
+		for (HandleMessageListener currentListener : this.listeners) {
+			currentListener.onErrorMsg(errorCode);
+		}
+	}
+
+	public void onVoiceMsg(Msg4Voice msg) {
+		for (HandleMessageListener currentListener : this.listeners) {
+			currentListener.onVoiceMsg(msg);
+		}
+	}
+
+	public void onVideoMsg(Msg4Video msg) {
+		for (HandleMessageListener currentListener : this.listeners) {
+			currentListener.onVideoMsg(msg);
+		}
+	}
 }

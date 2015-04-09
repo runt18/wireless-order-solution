@@ -17,7 +17,7 @@ import com.wireless.db.member.MemberDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.promotion.Coupon;
@@ -35,7 +35,7 @@ public class WXQueryCouponAction extends DispatchAction{
 		if(pin != null){
 			staff = StaffDao.verify(Integer.parseInt(pin));
 		}else{
-			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
+			rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
 			staff = StaffDao.getAdminByRestaurant(rid);
 		}
 		
@@ -67,7 +67,7 @@ public class WXQueryCouponAction extends DispatchAction{
 		String openId = request.getParameter("oid");
 				
 		int rid = 0;
-		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
+		rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
 		Staff staff = StaffDao.getAdminByRestaurant(rid);
 		
 		
@@ -103,7 +103,7 @@ public class WXQueryCouponAction extends DispatchAction{
 		String pId = request.getParameter("pId");
 		
 		int rid = 0;
-		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
+		rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
 		Staff staff = StaffDao.getAdminByRestaurant(rid);
 		
 		
@@ -140,7 +140,7 @@ public class WXQueryCouponAction extends DispatchAction{
 		int rid = 0;
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
-		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+		rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
 		
 		JObject jobject = new JObject();
 		try{

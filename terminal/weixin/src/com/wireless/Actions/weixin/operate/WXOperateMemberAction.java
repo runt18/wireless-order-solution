@@ -22,7 +22,7 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.VerifySMSDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
@@ -62,7 +62,7 @@ public class WXOperateMemberAction extends DispatchAction {
 		try{
 
 			dbCon.connect();
-			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+			rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			final Restaurant restaurant = RestaurantDao.getById(dbCon, rid);
 			
@@ -155,7 +155,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			String fromId = request.getParameter("fid");
 
 			final VerifySMS sms = VerifySMSDao.getById(dbCon, VerifySMSDao.insert(dbCon, new InsertBuilder(ExpiredPeriod.MINUTE_10)));
-			int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
+			int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
 			SMS.send(dbCon, StaffDao.getAdminByRestaurant(restaurantId), mobile, new Msg4Verify(sms.getCode()));
 			dbCon.conn.commit();
 			
@@ -226,7 +226,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
 			Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			// 验证验证码
@@ -269,7 +269,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
 			Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			WxMember wxMember = WxMemberDao.getByCond(dbCon, staff, new WxMemberDao.ExtraCond().setSerial(openId)).get(0);

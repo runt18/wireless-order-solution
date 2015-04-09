@@ -29,10 +29,10 @@ import com.google.zxing.common.HybridBinarizer;
 import com.wireless.Actions.weixin.WeiXinHandleMessage;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class WxAuthAction extends Action {
 	
@@ -52,16 +52,14 @@ public class WxAuthAction extends Action {
             BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));  
   
             @SuppressWarnings("serial")
-			Result result = new MultiFormatReader().decode(bitmap, new HashMap<DecodeHintType, Object>(){{  
-            															put(DecodeHintType.CHARACTER_SET, "GBK");
-            											   }});  
-            System.out.println(result.getText());
+			Result qrCode = new MultiFormatReader().decode(bitmap, new HashMap<DecodeHintType, Object>(){{ put(DecodeHintType.CHARACTER_SET, "GBK"); }});
             
-			WeixinRestaurantDao.update(StaffDao.getAdminByRestaurant(restaurant.getId()), 
-									   new WeixinRestaurant.UpdateBuilder().setWeixinAppId(authorizerInfo.getAppId())
+			WxRestaurantDao.update(StaffDao.getAdminByRestaurant(restaurant.getId()), 
+									   new WxRestaurant.UpdateBuilder().setWeixinAppId(authorizerInfo.getAppId())
 									   									   .setNickName(authorizerInfo.getNickName())
 									   									   .setHeadImgUrl(authorizerInfo.getHeadImg())
 									   									   .setQrCodeUrl(authorizerInfo.getQrCodeUrl())
+									   									   .setQrCode(qrCode.getText())
 									   									   .setRefreshToken(authorizationInfo.getAuthorizerRefreshToken()));
 			
 			AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, authorizationInfo.getAuthorizerAppId(), authorizationInfo.getAuthorizerRefreshToken());
@@ -71,7 +69,7 @@ public class WxAuthAction extends Action {
 			Menu menu = new Menu();
 			Menu.delete(Token.newInstance(authorizerToken));
 			menu.set1stButton(new Button.ClickBuilder("餐厅导航", WeiXinHandleMessage.NAVI_EVENT_KEY).build());
-			menu.set2ndButton(new Button.ClickBuilder("最新优惠", WeiXinHandleMessage.PROMOTION_EVENT_KEY).build());
+			menu.set2ndButton(new Button.ClickBuilder("扫一扫", WeiXinHandleMessage.SCAN_EVENT_KEY).build());
 			
 			menu.set3rdButton(new Button.ClickBuilder("我的", "AAA")
 							.addChild(new Button.ClickBuilder("我的订单", WeiXinHandleMessage.ORDER_EVENT_KEY))

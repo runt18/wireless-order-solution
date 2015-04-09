@@ -10,7 +10,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -57,8 +57,8 @@ public class WXQueryInfoAction extends DispatchAction{
 	public ActionForward initData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		JObject jobject = new JObject();
 		try{
-			int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
-			OssImage oss = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId)).getWeixinLogo();
+			int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
+			OssImage oss = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId)).getWeixinLogo();
 			String logo;
 			if(oss == null){
 				logo = getServlet().getInitParameter("imageBrowseDefaultFile");
