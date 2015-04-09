@@ -93,7 +93,7 @@ public class WxAuthSession extends WxSession{
 			final WXBizMsgCrypt pc = new WXBizMsgCrypt(token, encodingAesKey, appId);
 			final String decryptedMsg = pc.decryptMsg(msgSignature, timestamp, nonce, fromXML);
 			
-			System.out.println("decrypted : " + decryptedMsg);
+			//System.out.println("decrypted : " + decryptedMsg);
 			
 			super.process(new ByteArrayInputStream(decryptedMsg.getBytes()), os);
 			
