@@ -3,7 +3,7 @@ package com.wireless.pojo.weixin.restaurant;
 import com.wireless.pojo.oss.OssImage;
 
 
-public class WeixinRestaurant {
+public class WxRestaurant {
 
 	public static class UpdateBuilder{
 		private OssImage weixinLogo;
@@ -14,6 +14,16 @@ public class WeixinRestaurant {
 		private String nickName;
 		private String headImgUrl;
 		private String refreshToken;
+		private String qrCode;
+		
+		public boolean isQrCodeChanged(){
+			return this.qrCode != null;
+		}
+		
+		public UpdateBuilder setQrCode(String qrCode){
+			this.qrCode = qrCode;
+			return this;
+		}
 		
 		public UpdateBuilder setWeixinLogo(int ossImageId){
 			this.weixinLogo = new OssImage(ossImageId);
@@ -92,8 +102,8 @@ public class WeixinRestaurant {
 			return this.refreshToken != null;
 		}
 		
-		public WeixinRestaurant build(){
-			return new WeixinRestaurant(this);
+		public WxRestaurant build(){
+			return new WxRestaurant(this);
 		}
 	}
 	
@@ -141,11 +151,12 @@ public class WeixinRestaurant {
 	private String weixinAppId;
 	private String weixinAppSecret;
 	private String qrCodeUrl;
+	private String qrCode;
 	private String nickName;
 	private String headImgUrl;
 	private String refreshToken;
 	
-	private WeixinRestaurant(UpdateBuilder builder){
+	private WxRestaurant(UpdateBuilder builder){
 		this.weixinLogo = builder.weixinLogo;
 		this.weixinInfo = builder.weixinInfo;
 		this.weixinAppId = builder.weixinAppId;
@@ -154,9 +165,10 @@ public class WeixinRestaurant {
 		this.nickName = builder.nickName;
 		this.headImgUrl = builder.headImgUrl;
 		this.refreshToken = builder.refreshToken;
+		this.qrCode = builder.qrCode;
 	}
 	
-	public WeixinRestaurant(int restaurantId){
+	public WxRestaurant(int restaurantId){
 		this.restaurantId = restaurantId;
 	}
 	
@@ -248,6 +260,17 @@ public class WeixinRestaurant {
 		this.qrCodeUrl = qrCodeUrl;
 	}
 
+	public void setQrCode(String qrCode){
+		this.qrCode = qrCode;
+	}
+	
+	public String getQrCode(){
+		if(this.qrCode == null){
+			return "";
+		}
+		return this.qrCode;
+	}
+	
 	public String getNickName() {
 		if(nickName == null){
 			return "";
@@ -288,10 +311,10 @@ public class WeixinRestaurant {
 	
 	@Override 
 	public boolean equals(Object obj){
-		if(obj == null || !(obj instanceof WeixinRestaurant)){
+		if(obj == null || !(obj instanceof WxRestaurant)){
 			return false;
 		}else{
-			return getWeixinSerial().equals(((WeixinRestaurant)obj).getWeixinSerial());
+			return getWeixinSerial().equals(((WxRestaurant)obj).getWeixinSerial());
 		}
 	}
 	
