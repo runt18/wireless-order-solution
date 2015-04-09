@@ -7,8 +7,9 @@
 <script type="text/javascript">
 $(function(){
 	$.ajax({
-		url : '../../TestWxAuth.do',
+		url : '../../WxAuthLogin.do',
 		type : 'post',
+		data : { rid : 40 },
 		success : function(result){
 			console.log(result);
 		},
