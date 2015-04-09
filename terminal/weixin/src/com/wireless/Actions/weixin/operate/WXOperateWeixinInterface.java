@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.Formatter;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -21,11 +22,19 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.maker.weixin.auth.AuthorizerToken;
 import org.marker.weixin.api.Token;
 
+import com.wireless.Actions.weixin.auth.AuthParam;
+import com.wireless.db.DBCon;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class WXOperateWeixinInterface extends DispatchAction{
 	public static class Ticket implements Jsonable{
@@ -117,47 +126,73 @@ public class WXOperateWeixinInterface extends DispatchAction{
 	 */
 	public ActionForward getConfig(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String url = request.getParameter("url");
+		String fromId = request.getParameter("fid");
 //		String token = request.getParameter("token");
+		DBCon dbCon = new DBCon();
 		
-		String appId = "wx49b3278a8728ff76";
-		
-		Token token = Token.newInstance(appId, "0ba130d87e14a1a37e20c78a2b0ee3ba");
-		
-		String ticketJson = HttpRequest("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token="+ token.getAccessToken() +"&type=jsapi");
-		
-		Ticket ticket = JObject.parse(Ticket.JSON_CREATOR, 0, ticketJson);
-		
-        
+		JObject jobject = new JObject();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			
+//			String appId = "wx49b3278a8728ff76";
+//			
+//			Token token = Token.newInstance(appId, "0ba130d87e14a1a37e20c78a2b0ee3ba");
+			
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
+			Staff staff = StaffDao.getAdminByRestaurant(rid);
+			
+			WxRestaurant wxRes = WxRestaurantDao.get(staff);
+			
+			System.out.println("wxAppId="+wxRes.getWeixinAppId() + ", token=" + wxRes.getRefreshToken());
+			
+			AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRes.getWeixinAppId(), wxRes.getRefreshToken());
+			
+			System.out.println("acToken="+authorizerToken.getAccessToken());
+			
+			String ticketJson = HttpRequest("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token="+ authorizerToken.getAccessToken() +"&type=jsapi");
 
-        // 注意 URL 一定要动态获取，不能 hardcode
-//        String url = "http://example.com";
-//		String jsapi_ticket = request.getParameter("jsapi_ticket");
-		
-        JsonMap ret = sign(ticket.getTicket(), url);
-        ret.putString("appId", appId);
-        
-        final JsonMap config = ret;
-        
-        for (Entry<String, Object> entry : ret.entrySet()) {
-            System.out.println(entry.getKey() + ", " + entry.getValue());
-        }
-        
-        JObject jobject = new JObject();
-        jobject.setExtra(new Jsonable() {
+			System.out.println("ticket=" + ticketJson);
 			
-			@Override
-			public JsonMap toJsonMap(int flag) {
-				return config;
-			}
+			Ticket ticket = JObject.parse(Ticket.JSON_CREATOR, 0, ticketJson);			
+
+	        // 注意 URL 一定要动态获取，不能 hardcode
+//	        String url = "http://example.com";
+//			String jsapi_ticket = request.getParameter("jsapi_ticket");
 			
-			@Override
-			public void fromJsonMap(JsonMap jsonMap, int flag) {
+	        JsonMap ret = sign(ticket.getTicket(), url);
+	        ret.putString("appId", wxRes.getWeixinAppId());
+	        
+	        final JsonMap config = ret;
+	        
+//	        for (Entry<String, Object> entry : ret.entrySet()) {
+//	            System.out.println(entry.getKey() + ", " + entry.getValue());
+//	        }
+	        
+	        jobject.setExtra(new Jsonable() {
 				
-			}
-		});
-        
-        response.getWriter().print(jobject.toString());
-        
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					return config;
+				}
+				
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+			});
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			dbCon.disconnect();
+			response.getWriter().print(jobject.toString());
+		}
 		return null;
 	}
 	
