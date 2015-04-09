@@ -1,6 +1,6 @@
 package org.marker.weixin;
 
-public final class WxXmlElementName{
+public final class WxXmlElementName__{
   public static final String ROOT = "xml";
   public static final String TO_USER_NAME = "ToUserName";
   public static final String FROM_USER_NAME = "FromUserName";
