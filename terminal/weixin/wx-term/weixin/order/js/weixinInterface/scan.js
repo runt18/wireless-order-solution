@@ -1,5 +1,5 @@
 
-/*$(function(){
+$(function(){
 	Util.lm.show();
 
 	$.ajax({
@@ -26,18 +26,6 @@
 		}
 	});	
 	
-});*/
-
-$.post('../../WXOperateMember.do', {
-	dataSource:'inpour',
-	oid : Util.mp.oid,
-	fid : Util.mp.fid,
-	orderId : 3064505
-}, function(result){
-	if(result.success){
-//		document.getElementById('div4ScanMsg').innerHTML('会员支付成功!');
-		$('#div4ScanMsg').html('会员支付成功!');
-	}   	    	
 });
 
 
