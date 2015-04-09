@@ -24,7 +24,7 @@ import com.wireless.db.system.BillBoardDao;
 import com.wireless.db.system.BusinessHourDao;
 import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ModuleError;
 import com.wireless.exception.RestaurantError;
@@ -468,7 +468,7 @@ public class RestaurantDao {
 	}
 	
 	private static void initWeixinRestaurant(DBCon dbCon, Staff staff) throws SQLException{
-		WeixinRestaurantDao.insert(dbCon, staff);
+		WxRestaurantDao.insert(dbCon, staff);
 	}
 	
 	private static void initPrinter(DBCon dbCon, Staff staff) throws SQLException, BusinessException{

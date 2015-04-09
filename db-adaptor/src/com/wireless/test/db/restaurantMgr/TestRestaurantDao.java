@@ -28,7 +28,7 @@ import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.BusinessHourDao;
 import com.wireless.db.system.SystemDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
@@ -45,7 +45,7 @@ import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.BusinessHour;
-import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.test.db.TestInit;
 
 public class TestRestaurantDao {
@@ -213,11 +213,11 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareWeixinRestaurant(Staff staff) throws SQLException, BusinessException{
-		WeixinRestaurant actual = WeixinRestaurantDao.get(staff);
+		WxRestaurant actual = WxRestaurantDao.get(staff);
 		Assert.assertEquals("weixin restaurant : restaurant id", actual.getRestaurantId(), staff.getRestaurantId());
 		Assert.assertEquals("weixin restaurant : info", actual.getWeixinInfo(), "");
 		Assert.assertEquals("weixin restaurant : logo", actual.getWeixinLogo(), null);
-		Assert.assertEquals("weixin restaurant : status", actual.getStatus(), WeixinRestaurant.Status.CREATED);
+		Assert.assertEquals("weixin restaurant : status", actual.getStatus(), WxRestaurant.Status.CREATED);
 	}
 	
 	private void comparePrinters(Staff staff) throws SQLException{

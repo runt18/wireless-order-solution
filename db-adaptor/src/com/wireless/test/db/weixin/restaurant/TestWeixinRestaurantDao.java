@@ -17,11 +17,11 @@ import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.CalcWeixinSignature;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.test.db.TestInit;
 import com.wireless.test.db.oss.TestOssImage;
 
@@ -51,17 +51,17 @@ public class TestWeixinRestaurantDao {
 		final String account = "demo";
 		final String timestamp = "2013-9-11 7:48:00";
 		final String nonce = "jingyang";
-		WeixinRestaurantDao.verify(account, CalcWeixinSignature.calc(RestaurantDao.getByAccount(account).getAccount(), timestamp, nonce), timestamp, nonce);
-		WeixinRestaurant actual = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(RestaurantDao.getByAccount(account).getId()));
-		Assert.assertEquals("verify status", WeixinRestaurant.Status.VERIFIED, actual.getStatus());
-		Assert.assertTrue("verify restaurant", WeixinRestaurantDao.isVerified(account));
+		WxRestaurantDao.verify(account, CalcWeixinSignature.calc(RestaurantDao.getByAccount(account).getAccount(), timestamp, nonce), timestamp, nonce);
+		WxRestaurant actual = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(RestaurantDao.getByAccount(account).getId()));
+		Assert.assertEquals("verify status", WxRestaurant.Status.VERIFIED, actual.getStatus());
+		Assert.assertTrue("verify restaurant", WxRestaurantDao.isVerified(account));
 		
-		WeixinRestaurantDao.bind(WEIXIN_RESTAURANT_SERIAL, account);
-		actual = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(RestaurantDao.getByAccount(account).getId()));
-		Assert.assertEquals("bind status", WeixinRestaurant.Status.BOUND, actual.getStatus());
+		WxRestaurantDao.bind(WEIXIN_RESTAURANT_SERIAL, account);
+		actual = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(RestaurantDao.getByAccount(account).getId()));
+		Assert.assertEquals("bind status", WxRestaurant.Status.BOUND, actual.getStatus());
 		
-		Assert.assertTrue("weixin serial is bound to restaurant account", WeixinRestaurantDao.isBound(WEIXIN_RESTAURANT_SERIAL, account));
-		Assert.assertEquals("restaurant bound to weixin serial", RestaurantDao.getByAccount(account).getId(), WeixinRestaurantDao.getRestaurantIdByWeixin(WEIXIN_RESTAURANT_SERIAL));
+		Assert.assertTrue("weixin serial is bound to restaurant account", WxRestaurantDao.isBound(WEIXIN_RESTAURANT_SERIAL, account));
+		Assert.assertEquals("restaurant bound to weixin serial", RestaurantDao.getByAccount(account).getId(), WxRestaurantDao.getRestaurantIdByWeixin(WEIXIN_RESTAURANT_SERIAL));
 	}
 	
 	@Test 
@@ -80,20 +80,21 @@ public class TestWeixinRestaurantDao {
 		String htmlTxt = "<br>数量份金沙路<div align=\"center\" style=\"width:100%;\"><img src='$(pic_1)' style=\"max-width:95%;\"></div>谁加路费金沙路费<br><br><div align=\"center\" style=\"width:100%;\"><img src='$(pic_2)' style=\"max-width:95%;\"></div><br>";
 		String info = htmlTxt.replace("$(pic_1)", infoImg1.getObjectUrl()).replace("$(pic_2)", infoImg2.getObjectUrl());
 		
-		WeixinRestaurant.UpdateBuilder builder = new WeixinRestaurant.UpdateBuilder()
+		WxRestaurant.UpdateBuilder builder = new WxRestaurant.UpdateBuilder()
 																	.setWeixinLogo(ossImageId)
 																	.setWeixinInfo(info)
 																	.setWeixinAppId("asdfsdfsaf")
 																	.setWeixinAppSecret("dadsftwe")
 																	.setQrCodeUrl("http://www.qrcode")
+																	.setQrCode("http://qrcode")
 																	.setHeadImgUrl("http://www.headimg")
 																	.setNickName("测试昵称")
 																	.setRefreshToken("adfeiilmasd;iottt");
-		WeixinRestaurantDao.update(mStaff, builder);
+		WxRestaurantDao.update(mStaff, builder);
 		
-		WeixinRestaurant expected = builder.build();
+		WxRestaurant expected = builder.build();
 		expected.setRestaurantId(mStaff.getRestaurantId());
-		WeixinRestaurant actual = WeixinRestaurantDao.get(mStaff);
+		WxRestaurant actual = WxRestaurantDao.get(mStaff);
 		
 		Assert.assertEquals("weixin logo type", OssImage.Type.WX_LOGO, actual.getWeixinLogo().getType());
 		Assert.assertEquals("weixin logo associated id", mStaff.getRestaurantId(), actual.getWeixinLogo().getAssociatedId());
@@ -114,6 +115,7 @@ public class TestWeixinRestaurantDao {
 		Assert.assertEquals("weixin app id", expected.getWeixinAppId(), actual.getWeixinAppId());
 		Assert.assertEquals("weixin secret", expected.getWeixinAppSecret(), actual.getWeixinAppSecret());
 		Assert.assertEquals("weixin qr code url", expected.getQrCodeUrl(), actual.getQrCodeUrl());
+		Assert.assertEquals("weixin qr code", expected.getQrCode(), actual.getQrCode());
 		Assert.assertEquals("weixin head image url", expected.getHeadImgUrl(), actual.getHeadImgUrl());
 		Assert.assertEquals("weixin nick name", expected.getNickName(), actual.getNickName());
 		Assert.assertEquals("weixin refresh token", expected.getRefreshToken(), actual.getRefreshToken());

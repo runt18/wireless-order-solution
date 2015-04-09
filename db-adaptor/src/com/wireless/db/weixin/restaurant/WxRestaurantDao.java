@@ -16,10 +16,10 @@ import com.wireless.exception.WxRestaurantError;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.util.StringHtml;
 
-public class WeixinRestaurantDao {
+public class WxRestaurantDao {
 	
 	/**
 	 * Insert a new record.
@@ -34,7 +34,7 @@ public class WeixinRestaurantDao {
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".weixin_restaurant" +
 		      " (restaurant_id, status) " +
-			  " VALUES (" + staff.getRestaurantId() + "," + WeixinRestaurant.Status.CREATED.getVal() + ")";
+			  " VALUES (" + staff.getRestaurantId() + "," + WxRestaurant.Status.CREATED.getVal() + ")";
 		dbCon.stmt.executeUpdate(sql);
 	}
 	
@@ -56,17 +56,17 @@ public class WeixinRestaurantDao {
 	}
 	
 	/**
-	 * Update the weixin restaurant according to builder {@link WeixinRestaurant#UpdateBuilder}
+	 * Update the weixin restaurant according to builder {@link WxRestaurant#UpdateBuilder}
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the update builder {@link WeixinRestaurant#UpdateBuilder}
+	 * 			the update builder {@link WxRestaurant#UpdateBuilder}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if the weixin restaurant does NOT exist
 	 */
-	public static void update(Staff staff, WeixinRestaurant.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(Staff staff, WxRestaurant.UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -77,19 +77,19 @@ public class WeixinRestaurantDao {
 	}
 	
 	/**
-	 * Update the weixin restaurant according to builder {@link WeixinRestaurant#UpdateBuilder}
+	 * Update the weixin restaurant according to builder {@link WxRestaurant#UpdateBuilder}
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the update builder {@link WeixinRestaurant#UpdateBuilder}
+	 * 			the update builder {@link WxRestaurant#UpdateBuilder}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if the weixin restaurant does NOT exist
 	 */
-	public static void update(DBCon dbCon, Staff staff, WeixinRestaurant.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff staff, WxRestaurant.UpdateBuilder builder) throws SQLException, BusinessException{
 		
 		if(getByCond(dbCon, staff, null, null).isEmpty()){
 			insert(dbCon, staff);
@@ -97,7 +97,7 @@ public class WeixinRestaurantDao {
 		
 		String sql;
 		
-		WeixinRestaurant wr = builder.build();
+		WxRestaurant wr = builder.build();
 		sql = " UPDATE " + Params.dbName + ".weixin_restaurant SET " +
 			  " restaurant_id = " + staff.getRestaurantId() + 
 			  (builder.isWeixinLogoChanged() ? " ,weixin_logo = '" + wr.getWeixinLogo().getId() + "'" : "") +
@@ -105,6 +105,7 @@ public class WeixinRestaurantDao {
 			  (builder.isWeixinAppIdChanged() ? " ,app_id = '" + wr.getWeixinAppId() + "'" : "") +
 			  (builder.isWeixinSecretChanged() ? " ,app_secret = '" + wr.getWeixinAppSecret() + "'" : "") +
 			  (builder.isQrCodeUrlChanged() ? " ,qrcode_url = '" + wr.getQrCodeUrl() + "'" : "") +
+			  (builder.isQrCodeChanged() ? " ,qrcode = '" + wr.getQrCode() + "'" : "") +
 			  (builder.isNickNameChanged() ? " ,nick_name = '" + wr.getNickName() + "'" : "") +
 			  (builder.isHeadImgUrlChanged() ? " ,head_img_url = '" + wr.getHeadImgUrl() + "'" : "") +
 			  (builder.isRefreshTokenChanged() ? " ,refresh_token = '" + wr.getRefreshToken() + "'" : "") +
@@ -138,7 +139,7 @@ public class WeixinRestaurantDao {
 	 * @throws BusinessException
 	 * 			throws if the weixin restaurant does NOT exist
 	 */
-	public static WeixinRestaurant get(Staff staff) throws SQLException, BusinessException{
+	public static WxRestaurant get(Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -160,12 +161,12 @@ public class WeixinRestaurantDao {
 	 * @throws BusinessException
 	 * 			throws if the weixin restaurant does NOT exist
 	 */
-	public static WeixinRestaurant get(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
-		List<WeixinRestaurant> result = getByCond(dbCon, staff, null, null);
+	public static WxRestaurant get(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		List<WxRestaurant> result = getByCond(dbCon, staff, null, null);
 		if(result.isEmpty()){
 			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
 		}else{
-			WeixinRestaurant wr = result.get(0);
+			WxRestaurant wr = result.get(0);
 			if(wr.hasWeixinLogo()){
 				wr.setWeixinLogo(OssImageDao.getById(dbCon, staff, wr.getWeixinLogo().getId()));
 			}
@@ -173,7 +174,7 @@ public class WeixinRestaurantDao {
 		}
 	}
 	
-	private static List<WeixinRestaurant> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	private static List<WxRestaurant> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".weixin_restaurant" +
 			  " WHERE 1 = 1 " +
@@ -181,18 +182,19 @@ public class WeixinRestaurantDao {
 			  (extraCond != null ? extraCond : " ") +
 			  (orderClause != null ? orderClause : "");
 		
-		List<WeixinRestaurant> result = new ArrayList<WeixinRestaurant>();
+		List<WxRestaurant> result = new ArrayList<WxRestaurant>();
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			WeixinRestaurant wr = new WeixinRestaurant(dbCon.rs.getInt("restaurant_id"));
+			WxRestaurant wr = new WxRestaurant(dbCon.rs.getInt("restaurant_id"));
 			if(dbCon.rs.getTimestamp("bind_date") != null){
 				wr.setBindDate(dbCon.rs.getTimestamp("bind_date").getTime());
 			}
-			wr.setStatus(WeixinRestaurant.Status.valueOf(dbCon.rs.getInt("status")));
+			wr.setStatus(WxRestaurant.Status.valueOf(dbCon.rs.getInt("status")));
 			wr.setWeixinAppId(dbCon.rs.getString("app_id"));
 			wr.setWeixinAppSecret(dbCon.rs.getString("app_secret"));
 			wr.setQrCodeUrl(dbCon.rs.getString("qrcode_url"));
+			wr.setQrCode(dbCon.rs.getString("qrcode"));
 			wr.setHeadImgUrl(dbCon.rs.getString("head_img_url"));
 			wr.setRefreshToken(dbCon.rs.getString("refresh_token"));
 			wr.setNickName(dbCon.rs.getString("nick_name"));
@@ -265,7 +267,7 @@ public class WeixinRestaurantDao {
 			
 			sql = " UPDATE " + Params.dbName + ".weixin_restaurant SET" +
 				  " restaurant_id = " + restaurant.getId() +
-				  " ,status = " + WeixinRestaurant.Status.VERIFIED.getVal() +
+				  " ,status = " + WxRestaurant.Status.VERIFIED.getVal() +
 				  " WHERE restaurant_id = " + restaurant.getId();
 			
 			if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -363,7 +365,7 @@ public class WeixinRestaurantDao {
 		sql = " SELECT restaurant_id FROM " + Params.dbName + ".weixin_restaurant " +
 			  " WHERE weixin_serial_crc = CRC32('" + weixinRestaurantSerial + "')" +
 			  " AND weixin_serial = '" + weixinRestaurantSerial + "'" +
-			  " AND status = " + WeixinRestaurant.Status.BOUND.getVal() +
+			  " AND status = " + WxRestaurant.Status.BOUND.getVal() +
 			  " AND restaurant_id = ( SELECT id FROM " + Params.dbName + ".restaurant WHERE account = '" + account + "' )";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -422,7 +424,7 @@ public class WeixinRestaurantDao {
 				   " ,weixin_serial_crc = CRC32('" + weixinRestaurantSerial + "')" +
 				   " ,weixin_serial = '" + weixinRestaurantSerial + "'" +
 				   " ,bind_date = NOW() " +
-				   " ,status = " + WeixinRestaurant.Status.BOUND.getVal() +
+				   " ,status = " + WxRestaurant.Status.BOUND.getVal() +
 				   " WHERE restaurant_id = " + restaurant.getId();
 			
 			if(dbCon.stmt.executeUpdate(sql) == 0){
