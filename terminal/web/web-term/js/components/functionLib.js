@@ -140,6 +140,19 @@ Ext.override(Ext.grid.CellSelectionModel, {
        }
      }
 });
+
+/**
+ * 添加设置checkbox文本的方法
+ */
+Ext.override(Ext.form.Checkbox, {  
+    setBoxLabel: function(boxLabel){  
+        this.boxLabel = boxLabel;  
+        if(this.rendered){  
+            this.wrap.child('.x-form-cb-label').update(boxLabel);  
+        }  
+    }  
+});
+
 // GridPanel默认分页条数
 var GRID_PADDING_LIMIT_10 = 10;
 var GRID_PADDING_LIMIT_20 = 20;

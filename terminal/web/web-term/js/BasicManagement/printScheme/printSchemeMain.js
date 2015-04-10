@@ -230,24 +230,26 @@ function init(){
 					}
 				}
 				
-				
+				//选厨房
+				var allKitchen = Ext.getDom('chkAllKitchen');
 				var kitchens = '';
-				var checkedNodes = kitchenTree.getChecked();
-				//添加厨房
-				for(var i=0;i < checkedNodes.length; i++){
-					if(checkedNodes[i].attributes.isKitchen){
-						if(kitchens != ''){
-							kitchens += ',';
+				if(!allKitchen.checked){
+					var checkedNodes = kitchenTree.getChecked();
+					for(var i=0;i < checkedNodes.length; i++){
+						if(checkedNodes[i].attributes.isKitchen){
+							if(kitchens != ''){
+								kitchens += ',';
+							}
+							kitchens += checkedNodes[i].attributes.kid;
 						}
-						kitchens += checkedNodes[i].attributes.kid;
-					}
-				}				
+					}	
+				}
 				
+				//选部门
 				var allDept = Ext.getDom('chkAllDept');
 				var depts = '';
 				if(!allDept.checked){
 					var dept = document.getElementsByName('dept');
-					//添加部门
 					for ( var i = 0; i < dept.length; i++) {
 						if(dept[i].checked && depts == ''){
 							depts += dept[i].value;
@@ -258,6 +260,7 @@ function init(){
 				}
 	
 	
+				//选区域
 				var allRegion = Ext.getDom('chkAllRegion');
 				var regions = '';
 				if(!allRegion.checked){
@@ -320,23 +323,26 @@ function init(){
 					}
 				}
 				
+				//选厨房
+				var allKitchen = Ext.getDom('chkAllKitchen');
 				var kitchens = '';
-				var checkedNodes = kitchenTree.getChecked();
-				//添加厨房
-				for(var i=0;i < checkedNodes.length; i++){
-					if(checkedNodes[i].attributes.isKitchen){
-						if(kitchens != ''){
-							kitchens += ',';
+				if(!allKitchen.checked){
+					var checkedNodes = kitchenTree.getChecked();
+					for(var i=0;i < checkedNodes.length; i++){
+						if(checkedNodes[i].attributes.isKitchen){
+							if(kitchens != ''){
+								kitchens += ',';
+							}
+							kitchens += checkedNodes[i].attributes.kid;
 						}
-						kitchens += checkedNodes[i].attributes.kid;
-					}
-				}	
+					}	
+				}
 				
+				//选部门
 				var allDept = Ext.getDom('chkAllDept');
 				var depts = '';
 				if(!allDept.checked){
 					var dept = document.getElementsByName('dept');
-					//添加部门
 					for ( var i = 0; i < dept.length; i++) {
 						if(dept[i].checked && depts == ''){
 							depts += dept[i].value;
@@ -347,6 +353,7 @@ function init(){
 				}
 	
 	
+				//选区域
 				var allRegion = Ext.getDom('chkAllRegion');
 				var regions = '';
 				if(!allRegion.checked){
@@ -446,6 +453,7 @@ function init(){
 						id : 'txtRepeat',
 						fieldLabel : '打印数',
 						width : 70,
+						value : 1,
 						allowBlank : false,
 						listeners : {
 							focus : function(thiz){
@@ -476,7 +484,7 @@ function init(){
 						inputValue : 1,
 						hideLabel : true,
 						checked : true,
-						boxLabel : '客人总单',
+						boxLabel : '点菜总单',
 						listeners : {
 							check  : function(thiz, checked){
 								if(checked){
@@ -491,7 +499,7 @@ function init(){
 						name : 'pType',
 						inputValue : 2,
 						hideLabel : true,
-						boxLabel : '厨房总单',
+						boxLabel : '点菜分单',
 						listeners : {
 							check  : function(thiz, checked){
 								if(checked){
@@ -654,6 +662,41 @@ function init(){
 						labelWidth : 70
 					}
 				}]
+			},{
+				layout : 'column',
+				id : 'kitchensTree',
+				frame : true,
+				defaults : {
+					columnWidth : .25,
+					layout : 'form',
+					labelWidth : 70
+				},
+				items : [{
+					columnWidth : 1,
+					xtype : 'label',
+					text : '请选择厨房:'
+				},{
+					items : [{
+						xtype : 'checkbox',
+		//				name : 'pType',
+						id : 'chkAllKitchen',
+						hideLabel : true,
+						boxLabel : '所有厨房',
+						listeners : {
+							focus : function(){
+								Ext.getCmp('kitchens').enable();
+							},
+							check : function(checkbox, checked){
+								if(checked){
+									Ext.getCmp('kitchens').disable();
+								}else{
+									Ext.getCmp('kitchens').enable();
+								}
+								
+							}
+						}
+					}]
+				}]
 			}, kitchenTree]			
 		},{
 			id : 'showPrintPaper',
@@ -785,12 +828,14 @@ function init(){
 					frame : false,
 					defaults : {
 						columnWidth : .25,
-						layout : 'form'
+						layout : 'form',
 					},
 					items : [{
 						items : [{
 							xtype : 'button',
 							text : '收银',
+							width : 50,
+							height : 30,
 							handler : function(btn){
 								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
 								Ext.getCmp('txtPrinterAlias').focus();
@@ -800,6 +845,8 @@ function init(){
 						items : [{
 							xtype : 'button',
 							text : '中厨',
+							width : 50,
+							height : 30,
 							handler : function(btn){
 								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
 								Ext.getCmp('txtPrinterAlias').focus();
@@ -809,6 +856,8 @@ function init(){
 						items : [{
 							xtype : 'button',
 							text : '点心',
+							width : 50,
+							height : 30,
 							handler : function(btn){
 								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
 								Ext.getCmp('txtPrinterAlias').focus();
@@ -818,6 +867,8 @@ function init(){
 						items : [{
 							xtype : 'button',
 							text : '水吧',
+							width : 50,
+							height : 30,
 							handler : function(btn){
 								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
 								Ext.getCmp('txtPrinterAlias').focus();
@@ -830,6 +881,8 @@ function init(){
 						items : [{
 							xtype : 'button',
 							text : '海鲜',
+							width : 50,
+							height : 30,
 							handler : function(btn){
 								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
 								Ext.getCmp('txtPrinterAlias').focus();
@@ -839,6 +892,8 @@ function init(){
 						items : [{
 							xtype : 'button',
 							text : '地哩',
+							width : 50,
+							height : 30,
 							handler : function(btn){
 								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
 								Ext.getCmp('txtPrinterAlias').focus();
@@ -922,21 +977,33 @@ function init(){
 
 
 function showPanel(v){
+	//获取退菜btn
+	var cancelFoodBtn = Ext.getCmp('chkIsNeedToCancel');
+	
 	if(v == 1 || v ==8){
 		Ext.getCmp('kitchens').hide();
+		Ext.getCmp('kitchensTree').hide();
 		Ext.getCmp('depts').show();
 		Ext.getCmp('regions').show();
 		Ext.query("#showPrintPaper .x-panel-body")[0].style.backgroundImage = 'url(../../images/bill_select.png)';
+		
+		cancelFoodBtn.show();
+		cancelFoodBtn.setBoxLabel('打印退菜总单');
 	}else if(v == 2 || v == 5){
 		Ext.getCmp('kitchens').show();
+		Ext.getCmp('kitchensTree').show();
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').hide();
 		Ext.query("#showPrintPaper .x-panel-body")[0].style.backgroundImage = 'url(../../images/basicManagement_select.png)';
+		cancelFoodBtn.show();
+		cancelFoodBtn.setBoxLabel('打印退菜分单');
 	}else{
 		Ext.getCmp('kitchens').hide();
+		Ext.getCmp('kitchensTree').hide();
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').show();
 		Ext.query("#showPrintPaper .x-panel-body")[0].style.backgroundImage = 'url(../../images/billboard_select.png)';
+		cancelFoodBtn.hide();
 	}
 	//防止切换时格式错乱
 	Ext.getCmp('addPrintFuncWin').center();
@@ -1025,9 +1092,11 @@ function printFuncOperactionHandler(c){
 		Ext.getCmp('radioOrder').fireEvent('check', Ext.getCmp('radioOrder'), true);
 		Ext.getCmp('allDept').disable();
 		Ext.getCmp('chkAllRegion').fireEvent('check', Ext.getCmp('chkAllRegion'), true);
+		Ext.getCmp('chkAllKitchen').fireEvent('check', Ext.getCmp('chkAllKitchen'), true);
 		
 		Ext.getDom('chkAllDept').checked = true;
 		Ext.getDom('chkAllRegion').checked = true;
+		Ext.getDom('chkAllKitchen').checked = true;
 		
 	}else{
 		if(ss == null){
@@ -1232,7 +1301,17 @@ Ext.onReady(function(){
 		}),
 		
 		loader : new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryPrinterTree.do'
+			dataUrl : '../../QueryPrinterTree.do',
+			listeners : {
+				load : function(thiz, node, res){
+					var rn = printerTree.getRootNode().childNodes;
+					var node = rn[0];
+	        		if(node != null){
+	        			node.select();
+	        			node.fireEvent('click', node);
+					}					
+				}
+			}
 		}),
 		root : new Ext.tree.AsyncTreeNode({
 			expanded : true,
