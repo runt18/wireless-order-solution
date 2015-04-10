@@ -7,7 +7,10 @@
 <meta http-equiv="cache-control" content="no-cache"> 
 <meta http-equiv="expires" content="0">	
 
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
+<link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/member.css">
+
 <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" ></script>
 <script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="js/Util.js"></script>
@@ -19,8 +22,27 @@
 </style>
 </head>
 <body>
-	<div id="div4ScanMsg">
+	<div id="div4ScanMsg" align="center">
 		正在打开扫描仪......
 	</div>
+	
+<div id="divOrderInfo" class="main-box none">
+	<ul class="m-b-list">
+		<li class="box-horizontal" >
+			<div style="width:50%">账单号: <span id="spanOrderId" style="color:#26a9d0;">55548</span></div>
+			<div style="width:50%;text-align: right;">会员名: <span id="spanMemberName" style="color:#26a9d0;">edsion</span></div>
+		</li>
+		<li class="box-horizontal" >
+			<div style="width:50%">账单原价: <span id="spanBillShouldPay" style="color:#26a9d0;">80</span></div>
+			<div style="width:50%;text-align: right;">会员价: <span id="spanBillAfterDiscount" style="color:#FF4500;">70</span></div>
+		</li>	
+		<li class="none-line">
+			<div style="height: 55px;width: 100%;text-align: center;" >
+				<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="getVerifyCode({event:this})">进入会员中心</a>	
+			</div>	
+		</li>			
+	</ul>
+</div>	
+
 </body>
 </html>

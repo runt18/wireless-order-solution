@@ -29,6 +29,8 @@ $(function(){
 });
 
 
+
+
 /*var ajax = xhr({
     url:'../../WXInterface.do',
     data:{
@@ -68,19 +70,25 @@ wx.ready(function(){
 	    	    }
 	    	});*/
 	    	$('#div4ScanMsg').html('正在处理信息...');
+	    	
 	    	$.post('../../WXOperateMember.do', {
 	    		dataSource:'inpour',
 	    		oid : Util.mp.oid,
 	    		fid : Util.mp.fid,
-	    		orderId : 4393330
+	    		orderId : res.resultStr.split('?')[1]
+//	    		orderId : 3064505
 	    	}, function(result){
 	    		if(result.success){
-//	    			document.getElementById('div4ScanMsg').innerHTML('会员支付成功!');
 	    			$('#div4ScanMsg').html('会员支付成功!');
+	    			$('#divOrderInfo').show();
+	    		}else{
+	    			alert(result.msg);
 	    		}   	    	
+	    	}, "json").error(function(result){
+	    		alert("注入会员出错, 请稍后再试");
 	    	});
 	    	
-	    	var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+	    	// 当needResult 为 1 时，扫码返回的结果  var result = res.resultStr;
 		}
 	});
 });

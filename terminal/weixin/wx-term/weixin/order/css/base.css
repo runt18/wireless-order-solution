@@ -1,4 +1,12 @@
 *{margin:0; padding:0;}
+.block {
+	display : block;
+}
+.none {
+	display : none;
+}
+
+
 .div-full{
 	box-flex: 1; 
 	-webkit-box-flex: 1;
@@ -67,6 +75,7 @@ z-index: 99999;
 .m-b-list > li{
 	line-height: 50px;
 	border-bottom: 1px solid #eee;
+	list-style: none;
 }
 .m-b-list > li[class*=title]{
 	text-align:center; font-size:16px; color: #000; font-weight: bold;
