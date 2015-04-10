@@ -16,7 +16,7 @@ import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberLevelDao;
 import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
@@ -293,7 +293,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 			final JsonMap extra = new JsonMap();
 			String openId = request.getParameter("oid");
 			String formId = request.getParameter("fid");
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
 			Staff staff = StaffDao.getAdminByRestaurant(rid); 
 			List<MemberLevel> list = MemberLevelDao.get(staff);
 			

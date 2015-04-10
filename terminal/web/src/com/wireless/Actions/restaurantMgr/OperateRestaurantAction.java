@@ -17,7 +17,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.token.TokenDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
@@ -30,7 +30,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.restaurantMgr.Restaurant.UpdateBuilder;
 import com.wireless.pojo.token.Token;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class OperateRestaurantAction extends DispatchAction {
 	public ActionForward insert(ActionMapping mapping, ActionForm form,
@@ -197,7 +197,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			int rid = Integer.parseInt(request.getAttribute("restaurantID").toString());
 			
 			if(!info.isEmpty()){
-				WeixinRestaurantDao.update(StaffDao.getAdminByRestaurant(rid), new WeixinRestaurant.UpdateBuilder().setWeixinInfo(info));
+				WxRestaurantDao.update(StaffDao.getAdminByRestaurant(rid), new WxRestaurant.UpdateBuilder().setWeixinInfo(info));
 			}
 
 			jobject.initTip(true, "操作成功, 已修改微信餐厅简介信息.");
@@ -222,7 +222,7 @@ public class OperateRestaurantAction extends DispatchAction {
 	public ActionForward getInfo(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		try{
-			final String info = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(Integer.valueOf(request.getAttribute("restaurantID").toString()))).getWeixinInfo();
+			final String info = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(Integer.valueOf(request.getAttribute("restaurantID").toString()))).getWeixinInfo();
 			jobject.setExtra(new Jsonable(){
 
 				@Override
@@ -261,7 +261,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			throws Exception {
 		JObject jobject = new JObject();
 		try{
-			OssImage image = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(Integer.valueOf(request.getAttribute("restaurantID").toString()))).getWeixinLogo();
+			OssImage image = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(Integer.valueOf(request.getAttribute("restaurantID").toString()))).getWeixinLogo();
 			final String logo;
 			if(image != null){
 				logo = image.getObjectUrl();
@@ -311,10 +311,10 @@ public class OperateRestaurantAction extends DispatchAction {
 		String pin = (String) request.getAttribute("pin");
 		JObject jobject = new JObject();
 		try{
-			WeixinRestaurant.UpdateBuilder builder = new WeixinRestaurant.UpdateBuilder();
+			WxRestaurant.UpdateBuilder builder = new WxRestaurant.UpdateBuilder();
 			builder.setWeixinLogo(Integer.parseInt(logo));
 			
-			WeixinRestaurantDao.update(StaffDao.verify(Integer.parseInt(pin)), builder);
+			WxRestaurantDao.update(StaffDao.verify(Integer.parseInt(pin)), builder);
 			
 			jobject.initTip(true, "上传ＬＯＧＯ成功");
 		}catch(Exception e){

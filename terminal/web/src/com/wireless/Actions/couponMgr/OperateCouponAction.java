@@ -14,7 +14,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.member.Member;
@@ -68,7 +68,7 @@ public class OperateCouponAction extends DispatchAction{
 		int rid = 0;
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
-		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+		rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
 		
 		JObject jobject = new JObject();
 		try{

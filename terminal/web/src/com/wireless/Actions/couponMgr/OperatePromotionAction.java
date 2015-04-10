@@ -16,7 +16,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
@@ -216,7 +216,7 @@ public class OperatePromotionAction extends DispatchAction{
 		}else{
 			DBCon dbCon = new DBCon();
 			dbCon.connect();
-			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+			rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
 			staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
 			dbCon.disconnect();
 		}
@@ -520,7 +520,7 @@ public class OperatePromotionAction extends DispatchAction{
 		}else{
 			DBCon dbCon = new DBCon();
 			dbCon.connect();
-			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+			rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
 			staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
 			dbCon.disconnect();
 		}
