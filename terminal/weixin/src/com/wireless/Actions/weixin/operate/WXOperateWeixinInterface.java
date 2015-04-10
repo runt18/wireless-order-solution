@@ -12,7 +12,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Formatter;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -147,6 +146,8 @@ public class WXOperateWeixinInterface extends DispatchAction{
 			System.out.println("wxAppId="+wxRes.getWeixinAppId() + ", token=" + wxRes.getRefreshToken());
 			
 			AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRes.getWeixinAppId(), wxRes.getRefreshToken());
+			
+			WxRestaurantDao.update(staff, new WxRestaurant.UpdateBuilder().setRefreshToken(authorizerToken.getRefreshToken()));
 			
 			System.out.println("acToken="+authorizerToken.getAccessToken());
 			

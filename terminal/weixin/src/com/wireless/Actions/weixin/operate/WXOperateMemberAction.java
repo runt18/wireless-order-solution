@@ -271,8 +271,12 @@ public class WXOperateMemberAction extends DispatchAction {
 			
 			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
 			Staff staff = StaffDao.getAdminByRestaurant(rid);
-			
-			WxMember wxMember = WxMemberDao.getByCond(dbCon, staff, new WxMemberDao.ExtraCond().setSerial(openId)).get(0);
+			WxMember wxMember;
+			if(WxMemberDao.getByCond(dbCon, staff, new WxMemberDao.ExtraCond().setSerial(openId)).isEmpty()){
+				wxMember = WxMemberDao.getByCond(dbCon, staff, new WxMemberDao.ExtraCond().setSerial(openId)).get(0);
+			}else{
+				throw new BusinessException("请重新关注本餐厅");
+			}
 			
 			Order.DiscountBuilder builder = Order.DiscountBuilder.build4Member(Integer.parseInt(orderId), MemberDao.getById(staff, wxMember.getMemberId()), 0, 0, 0);
 			
