@@ -96,7 +96,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 			}
 			
 			if(PType.valueOf(pType) == PType.PRINT_ORDER){
-				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newExtra(printerId);
+				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newExtra(printerId, Boolean.parseBoolean(isNeedToCancel));
 				for (String region : regions) {
 					summaryBuilder.addRegion(new Region(Short.parseShort(region)));
 				}
@@ -105,30 +105,10 @@ public class OperatePrintFuncAction extends DispatchAction{
 				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
 				
-				PrintFuncDao.addFunc(dbCon, staff, summaryBuilder);
-				
-			}else if(PType.valueOf(pType) == PType.PRINT_ALL_CANCELLED_FOOD){
-				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newAllCancelledFood();
-				for (String region : regions) {
-					summaryBuilder.addRegion(new Region(Short.parseShort(region)));
-				}
-				for (String department : depts) {
-					summaryBuilder.addDepartment(new Department(Short.parseShort(department)));
-				}
-				summaryBuilder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, summaryBuilder);
 				
 			}else if(PType.valueOf(pType) == PType.PRINT_ORDER_DETAIL){
-				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newExtra(printerId);
-				for (String kitchenAlias : kitchens) {
-					Kitchen ki = new Kitchen(Integer.parseInt(kitchenAlias));
-					detailBuilder.addKitchen(ki);
-				}
-				detailBuilder.setRepeat(Integer.parseInt(repeat));
-				PrintFuncDao.addFunc(dbCon, staff, detailBuilder);
-				
-			}else if(PType.valueOf(pType) == PType.PRINT_CANCELLED_FOOD_DETAIL){
-				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newCancelledFood(printerId);
+				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newExtra(printerId, Boolean.parseBoolean(isNeedToCancel));
 				for (String kitchenAlias : kitchens) {
 					Kitchen ki = new Kitchen(Integer.parseInt(kitchenAlias));
 					detailBuilder.addKitchen(ki);
@@ -197,7 +177,6 @@ public class OperatePrintFuncAction extends DispatchAction{
 			String kitchens = request.getParameter("kitchens");
 			String depts = request.getParameter("dept");
 			String regions = request.getParameter("regions");
-			int printerId = Integer.parseInt(request.getParameter("printerId"));
 			int funcId = Integer.parseInt(request.getParameter("funcId"));
 			int pType = Integer.parseInt(request.getParameter("pType"));
 			String isNeedToCancel = request.getParameter("isNeedToCancel");
@@ -222,70 +201,54 @@ public class OperatePrintFuncAction extends DispatchAction{
 			}
 			
 			if(PType.valueOf(pType) == PType.PRINT_ORDER){
-				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newExtra(printerId);
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(funcId);
 				for (String r : region) {
-					summaryBuilder.addRegion(new Region(Short.parseShort(r)));
+					builder.addRegion(new Region(Short.parseShort(r)));
 				}
 				for (String department : dept) {
-					summaryBuilder.addDepartment(new Department(Short.parseShort(department)));
+					builder.addDepartment(new Department(Short.parseShort(department)));
 				}
-				summaryBuilder.setRepeat(Integer.parseInt(repeat));
-				PrintFuncDao.updateFunc(dbCon, staff, summaryBuilder.build(), funcId);
+				builder.setRepeat(Integer.parseInt(repeat));
+				builder.setIncludeCancel(Boolean.parseBoolean(isNeedToCancel));
+				PrintFuncDao.updateFunc(dbCon, staff, builder);
 				
-			}else if(PType.valueOf(pType) == PType.PRINT_ALL_CANCELLED_FOOD){
-				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newAllCancelledFood(printerId);
-				for (String r : region) {
-					summaryBuilder.addRegion(new Region(Short.parseShort(r)));
-				}
-				for (String department : dept) {
-					summaryBuilder.addDepartment(new Department(Short.parseShort(department)));
-				}
-				summaryBuilder.setRepeat(Integer.parseInt(repeat));
-				PrintFuncDao.updateFunc(dbCon, staff, printerId, summaryBuilder.build(), funcId);
 			}else if(PType.valueOf(pType) == PType.PRINT_ORDER_DETAIL){
-				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newExtra(printerId);
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(funcId);
 				for (String k : kitchen) {
 					Kitchen ki = new Kitchen(Integer.parseInt(k));
-					detailBuilder.addKitchen(ki);
+					builder.addKitchen(ki);
 				}
-				detailBuilder.setRepeat(Integer.parseInt(repeat));
-				PrintFuncDao.updateFunc(dbCon, staff, detailBuilder.build(), funcId);
-			}else if(PType.valueOf(pType) == PType.PRINT_CANCELLED_FOOD_DETAIL){
-				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newCancelledFood(printerId);
-				for (String k : kitchen) {
-					Kitchen ki = new Kitchen(Integer.parseInt(k));
-					detailBuilder.addKitchen(ki);
-				}
-				detailBuilder.setRepeat(Integer.parseInt(repeat));
-				PrintFuncDao.updateFunc(dbCon, staff, detailBuilder.build(), funcId);
+				builder.setRepeat(Integer.parseInt(repeat));
+				builder.setIncludeCancel(Boolean.parseBoolean(isNeedToCancel));
+				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) == PType.PRINT_RECEIPT){
-				PrintFunc.Builder builder = Builder.newReceipt(printerId);
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(funcId);
 				for (String r : region) {
 					builder.addRegion(new Region(Short.parseShort(r)));
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
-				PrintFuncDao.updateFunc(dbCon, staff, builder.build(), funcId);
+				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) ==PType.PRINT_TEMP_RECEIPT){
-				PrintFunc.Builder builder = Builder.newTempReceipt(printerId);
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(funcId);
 				for (String r : region) {
 					builder.addRegion(new Region(Short.parseShort(r)));
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
-				PrintFuncDao.updateFunc(dbCon, staff, builder.build(), funcId);
+				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) ==PType.PRINT_TRANSFER_TABLE){
-				PrintFunc.Builder builder = Builder.newTransferTable(printerId);
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(funcId);
 				for (String r : region) {
 					builder.addRegion(new Region(Short.parseShort(r)));
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
-				PrintFuncDao.updateFunc(dbCon, staff, builder.build(), funcId);
+				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) ==PType.PRINT_ALL_HURRIED_FOOD){
-				PrintFunc.Builder builder = Builder.newAllHurriedFood(printerId);
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(funcId);
 				for (String r : region) {
 					builder.addRegion(new Region(Short.parseShort(r)));
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
-				PrintFuncDao.updateFunc(dbCon, staff, builder.build(), funcId);
+				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}
 		
 			jobject.initTip(true, "操作成功, 已修改方案");
