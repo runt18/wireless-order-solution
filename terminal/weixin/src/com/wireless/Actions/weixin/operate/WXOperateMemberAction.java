@@ -14,9 +14,10 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.member.MemberDao;
-import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.member.MemberDao.MemberRank;
+import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.orderMgr.PayOrder;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.VerifySMSDao;
@@ -272,15 +273,35 @@ public class WXOperateMemberAction extends DispatchAction {
 			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
 			Staff staff = StaffDao.getAdminByRestaurant(rid);
 			WxMember wxMember;
-			if(WxMemberDao.getByCond(dbCon, staff, new WxMemberDao.ExtraCond().setSerial(openId)).isEmpty()){
+			if(!WxMemberDao.getByCond(dbCon, staff, new WxMemberDao.ExtraCond().setSerial(openId)).isEmpty()){
 				wxMember = WxMemberDao.getByCond(dbCon, staff, new WxMemberDao.ExtraCond().setSerial(openId)).get(0);
 			}else{
-				throw new BusinessException("请重新关注本餐厅");
+				throw new BusinessException("查找会员失败, 请重新关注本餐厅");
 			}
 			
-			Order.DiscountBuilder builder = Order.DiscountBuilder.build4Member(Integer.parseInt(orderId), MemberDao.getById(staff, wxMember.getMemberId()), 0, 0, 0);
+			final Member member = MemberDao.getById(staff, wxMember.getMemberId());
+			
+			Order.DiscountBuilder builder = Order.DiscountBuilder.build4Member(Integer.parseInt(orderId), member, 0, 0, 0);
 			
 			OrderDao.discount(staff, builder);
+			
+			final Order order = PayOrder.calc(staff, Order.PayBuilder.build4Normal(Integer.valueOf(orderId)));
+			
+			jobject.setExtra(new Jsonable() {
+				
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putJsonable("order", order, flag);
+					jm.putString("wxMemberName", member.getName());
+					return jm;
+				}
+				
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+			});
 			
 			dbCon.conn.commit();
 		}catch(BusinessException e){
