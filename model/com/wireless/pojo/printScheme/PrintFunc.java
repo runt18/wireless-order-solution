@@ -27,6 +27,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	private int mRepeat;
 	
+	private boolean isIncludeCancel = true;
+	
 	public static class UpdateBuilder{
 		private final int mId;
 		private int mRepeat;
@@ -501,6 +503,14 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		return mRegions.isEmpty();
 	}
 	
+	public boolean isIncludeCancel() {
+		return isIncludeCancel;
+	}
+
+	public void setIncludeCancel(boolean isIncludeCancel) {
+		this.isIncludeCancel = isIncludeCancel;
+	}
+
 	@Override
 	public String toString(){
 		return "type : " + mType.getDesc() + ", repeat : " + getRepeat();
@@ -592,6 +602,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		jm.putInt("pTypeValue", this.mType.getVal());
 		jm.putString("pTypeText", this.mType.getDesc());
 		jm.putInt("repeat", this.mRepeat);
+		
+		jm.putBoolean("isIncludeCancel", this.isIncludeCancel);
 		
 		if(this.mRegions.size() > 0){
 			regions = "";
