@@ -198,20 +198,7 @@ function init(){
 			xtype : 'checkbox',
 			id : 'chkIsNeedToCancel',
 			checked : true,
-			boxLabel : '打印退菜',
-			listeners : {
-				focus : function(){
-					Ext.getCmp('allDept').enable();
-				},
-				check : function(checkbox, checked){
-					if(checked){
-						Ext.getCmp('allDept').disable();
-					}else{
-						Ext.getCmp('allDept').enable();
-					}
-					
-				}
-			}			
+			boxLabel : '打印退菜总单'			
 		},'-',{
 			text : '应用',
 			id : 'btnSaveNext',
@@ -1073,11 +1060,10 @@ function printFuncOperactionHandler(c){
 	var ss = Ext.getCmp('printFunc_grid').getSelectionModel().getSelected();
 	if(c.type == 'update'){
 		kitchenTree.loader.dataUrl = "../../QueryKitchen.do";
-		kitchenTree.loader.baseParams = {dataSource : 'printKitchenTree4Update', schemeId : ss.data.printFuncId, printerId:sn.id};		
+		kitchenTree.loader.baseParams = {dataSource : 'printKitchenTree4Update', schemeId : ss.data.printFuncId, printerId:sn.id};
 	}
 	
 	addPrintFunc.show();
-	
 	
 	Ext.getDom('lblPrinterName').innerHTML = sn.attributes.name + " " + sn.attributes.alias;
 	if(c.type == 'insert'){
@@ -1107,6 +1093,13 @@ function printFuncOperactionHandler(c){
 			addPrintFunc.setTitle('修改方案');
 		}else{
 			addPrintFunc.setTitle('查看方案');
+		}
+		
+		//是否有退菜
+		if(ss.data.isIncludeCancel){
+			Ext.getDom('chkIsNeedToCancel').checked = true;
+		}else{
+			Ext.getDom('chkIsNeedToCancel').checked = false;
 		}
 		
 		addPrintFunc.operationType = c.type;
@@ -1157,6 +1150,10 @@ function printFuncOperactionHandler(c){
 
 		}
 
+		if(ss.data.kitchenValues == ''){
+			Ext.getDom('chkAllKitchen').checked = true;
+			Ext.getCmp('chkAllKitchen').fireEvent('check', Ext.getCmp('chkAllKitchen'), true);
+		}
 		
 		repeat.setValue(ss.data.repeat);
 	
@@ -1368,7 +1365,8 @@ Ext.onReady(function(){
 		    {name : 'deptValue'},
 		    {name : 'regions'},
 		    {name : 'regionValues'},
-		    {name : 'repeat'}
+		    {name : 'repeat'},
+		    {name : 'isIncludeCancel'}
 		])
 		
 	});
