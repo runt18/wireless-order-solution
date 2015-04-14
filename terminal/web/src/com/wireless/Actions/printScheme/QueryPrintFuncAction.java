@@ -14,7 +14,9 @@ import com.wireless.db.printScheme.PrintFuncDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.printScheme.PrintFunc;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.WebParams;
 
 public class QueryPrintFuncAction extends Action{
@@ -27,7 +29,20 @@ public class QueryPrintFuncAction extends Action{
 		try{
 			String pin = (String)request.getAttribute("pin");
 			String printerId = request.getParameter("printerId");
-			root = PrintFuncDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), new PrintFuncDao.ExtraCond().setPrinter(Integer.parseInt(printerId)));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			root = PrintFuncDao.getByCond(staff, new PrintFuncDao.ExtraCond().setPrinter(Integer.parseInt(printerId)));
+			
+			for (PrintFunc printFunc : root) {
+				if(printFunc.getType() == PType.PRINT_ORDER){
+					if(PrintFuncDao.getByCond(staff, new PrintFuncDao.ExtraCond().setPrinter(printFunc.getPrinterId()).setType(PType.PRINT_ALL_CANCELLED_FOOD)).isEmpty()){
+						printFunc.setIncludeCancel(false);
+					}
+				}else if(printFunc.getType() == PType.PRINT_ORDER_DETAIL){
+					if(PrintFuncDao.getByCond(staff, new PrintFuncDao.ExtraCond().setPrinter(printFunc.getPrinterId()).setType(PType.PRINT_CANCELLED_FOOD_DETAIL)).isEmpty()){
+						printFunc.setIncludeCancel(false);
+					}					
+				}
+			}
 			jobject.setTotalProperty(root.size());
 			jobject.setRoot(root);
 			

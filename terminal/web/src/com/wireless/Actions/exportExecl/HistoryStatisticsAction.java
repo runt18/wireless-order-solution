@@ -1637,8 +1637,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String offDuty = request.getParameter("offDuty");
 		String detailOperate = request.getParameter("detailOperate");
 		//String total = request.getParameter("total");
-		
 		final MemberOperationDao.ExtraCond extraCond;
+		
 		if(dataSource.equalsIgnoreCase("today")){
 			extraCond = new MemberOperationDao.ExtraCond(DateType.TODAY);
 		}else{
@@ -1681,7 +1681,14 @@ public class HistoryStatisticsAction extends DispatchAction{
 			sum.setOperateSeq(list.get(0).getOperateSeq());
 			sum.setStaffName(list.get(0).getStaffName());
 			for(MemberOperation temp : list){
-				temp.setMember(MemberDao.getById(staff, temp.getMemberId()));
+				try{
+					temp.setMember(MemberDao.getById(staff, temp.getMemberId()));
+				}catch(Exception e){
+					Member m = new Member(-1);
+					m.setName("已删除会员");
+					m.setIdCard("----");
+					m.setTele("----");
+				}
 				
 				sum.setDeltaBaseMoney(temp.getDeltaBaseMoney() + sum.getDeltaBaseMoney());
 				sum.setDeltaExtraMoney(temp.getDeltaExtraMoney() + sum.getDeltaExtraMoney());

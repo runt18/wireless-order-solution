@@ -91,6 +91,8 @@ public class UpdateMenuAction extends Action {
 					String[] unitPrice = p.split(",");
 					builder.addUnit(Float.parseFloat(unitPrice[1]), unitPrice[0]);
 				}
+			}else{
+				builder.emptyUnit();
 			}
 			
 			FoodDao.update(staff, builder);
