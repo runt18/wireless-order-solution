@@ -10,6 +10,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.CalcWeixinSignature;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.WxRestaurantError;
@@ -94,12 +95,35 @@ public class WxRestaurantDao {
 		if(getByCond(dbCon, staff, null, null).isEmpty()){
 			insert(dbCon, staff);
 		}
-		
+
 		String sql;
-		
 		WxRestaurant wr = builder.build();
+		
+		//Delete the weixin restaurant with the same weixin serial.
+		if(builder.isWxSerialChanged()){
+			List<Integer> restaurants = new ArrayList<>();
+			sql = " SELECT restaurant_id FROM " + Params.dbName + ".weixin_restaurant " +
+				  " WHERE weixin_serial_crc = CRC32('" + wr.getWeixinSerial() + "')" +
+				  " AND weixin_serial = '" + wr.getWeixinSerial() + "'" +
+				  " AND restaurant_id <> " + staff.getRestaurantId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				restaurants.add(dbCon.rs.getInt("restaurant_id"));
+			}
+			dbCon.rs.close();
+			
+			for(int restaurantId : restaurants){
+				sql = " DELETE FROM " + Params.dbName + ".weixin_restaurant WHERE restaurant_id = " + restaurantId;
+				dbCon.stmt.executeUpdate(sql);
+				
+				insert(dbCon, StaffDao.getAdminByRestaurant(restaurantId));
+			}
+		}
+		
+		
 		sql = " UPDATE " + Params.dbName + ".weixin_restaurant SET " +
 			  " restaurant_id = " + staff.getRestaurantId() + 
+			  (builder.isWxSerialChanged() ? " ,weixin_serial_crc = CRC32('" + wr.getWeixinSerial() + "') ,weixin_serial = '" + wr.getWeixinSerial() + "'" : "") +
 			  (builder.isWeixinLogoChanged() ? " ,weixin_logo = '" + wr.getWeixinLogo().getId() + "'" : "") +
 			  (builder.isWeixinInfoChanged() ? " ,weixin_info = '" + new StringHtml(wr.getWeixinInfo(), StringHtml.ConvertTo.TO_NORMAL) + "'" : "") +
 			  (builder.isWeixinAppIdChanged() ? " ,app_id = '" + wr.getWeixinAppId() + "'" : "") +

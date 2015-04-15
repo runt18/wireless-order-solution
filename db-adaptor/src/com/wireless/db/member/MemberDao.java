@@ -997,7 +997,7 @@ public class MemberDao {
 			 "'" + member.getIdCard() + "'," + 
 			 "'" + member.getCompany()+ "'," +
 			 "'" + member.getContactAddress() + "'," +
-			 "'" + DateUtil.format(member.getCreateDate()) + "'," +
+			 " NOW(), " +
 			 " (SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getId() + ")" + 
 			 ")";
 		
@@ -1782,12 +1782,9 @@ public class MemberDao {
 			dbCon.conn.commit();
 			return mo;
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
 			throw e;	
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}

@@ -62,7 +62,7 @@ public class TestMember {
 		assertEquals("member total charge", expected.getTotalCharge(), actual.getTotalCharge(), 0.01);
 		assertEquals("member tele", expected.getTele(), actual.getTele());
 		assertEquals("member sex", expected.getSex(), actual.getSex());
-		//assertEquals("member create date", expected.getCreateDate(), actual.getCreateDate());
+		assertTrue("member create date", System.currentTimeMillis() - actual.getCreateDate() < 5000);
 		assertEquals("member id card", expected.getIdCard(), actual.getIdCard());
 		assertEquals("member birthday", expected.getBirthday(), actual.getBirthday());
 		assertEquals("member company", expected.getCompany(), actual.getCompany());
