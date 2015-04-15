@@ -5,13 +5,13 @@
 	version="3.0">
 	<display-name>WirelessOrderWeixin</display-name>
 	<filter>
-		  <filter-name>filter</filter-name> 
-		  <filter-class>com.wireless.filter.RequestFilter</filter-class> 
+		<filter-name>filter</filter-name>
+		<filter-class>com.wireless.filter.RequestFilter</filter-class>
 	</filter>
 	<filter-mapping>
-		  <filter-name>filter</filter-name> 
-		  <url-pattern>*.do</url-pattern> 
-	</filter-mapping>	
+		<filter-name>filter</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
 	<servlet>
 		<servlet-name>action</servlet-name>
 		<servlet-class>com.wireless.Actions.init.InitServlet</servlet-class>
@@ -96,6 +96,14 @@
 		<init-param>
 			<param-name>oss_bucket_finance</param-name>
 			<param-value>weixin-finance-test</param-value>
+		</init-param>
+		<init-param>
+			<param-name>component_app_id</param-name>
+			<param-value>wxaacb91075f189dff</param-value>
+		</init-param>
+		<init-param>
+			<param-name>component_app_secret</param-name>
+			<param-value>0c79e1fa963cd80cc0be99b20a18faeb</param-value>
 		</init-param>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
