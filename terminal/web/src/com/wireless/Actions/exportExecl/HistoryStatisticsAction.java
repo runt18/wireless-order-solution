@@ -1681,13 +1681,14 @@ public class HistoryStatisticsAction extends DispatchAction{
 			sum.setOperateSeq(list.get(0).getOperateSeq());
 			sum.setStaffName(list.get(0).getStaffName());
 			for(MemberOperation temp : list){
-				try{
-					temp.setMember(MemberDao.getById(staff, temp.getMemberId()));
-				}catch(Exception e){
-					Member m = new Member(-1);
-					m.setName("已删除会员");
-					m.setIdCard("----");
-					m.setTele("----");
+				List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setId(temp.getMemberId()), null);
+				
+				if(members.isEmpty()){
+					MemberType delteMT = new MemberType(0);
+					delteMT.setName("已删除会员");
+					temp.getMember().setMemberType(delteMT);
+				}else{
+					temp.setMember(members.get(0));
 				}
 				
 				sum.setDeltaBaseMoney(temp.getDeltaBaseMoney() + sum.getDeltaBaseMoney());

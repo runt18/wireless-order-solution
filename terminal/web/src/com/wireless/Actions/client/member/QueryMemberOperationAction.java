@@ -118,7 +118,7 @@ public class QueryMemberOperationAction extends Action{
 					
 					if(members.isEmpty()){
 						MemberType delteMT = new MemberType(0);
-						delteMT.setName("已删除类型");
+						delteMT.setName("已删除会员");
 						temp.getMember().setMemberType(delteMT);
 					}else{
 						temp.setMember(members.get(0));
