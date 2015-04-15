@@ -1,5 +1,7 @@
 package com.wireless.Actions.weixin.auth;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.StringReader;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,8 +44,16 @@ public class WxRecTicketAction extends Action {
 //	    System.out.println("------------------------------------------------------------");
 	    
 	    ComponentVerifyTicket ticket = ComponentVerifyTicket.newInstance(request.getInputStream(), timestamp, nonce, msgSignature);
-	    AuthParam.TICKET = ticket.getTicket();
+	    AuthParam.COMPONENT_VERIFY_TICKET = ticket;
 
+		File logFile = new File("/home/yzhang/www/wx-term/ticket.txt");
+		if(!logFile.exists()){
+			logFile.createNewFile();
+		}
+		FileWriter logWriter = new FileWriter(logFile, false);
+		logWriter.write(ticket.toString());
+		logWriter.close();
+		
 	    ComponentAccessToken accessToken = ComponentAccessToken.newInstance(ticket);
 	    AuthParam.COMPONENT_ACCESS_TOKEN = accessToken;
 	    System.out.println(accessToken);

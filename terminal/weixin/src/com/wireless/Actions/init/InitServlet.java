@@ -1,12 +1,19 @@
 package com.wireless.Actions.init;
 
 import java.beans.PropertyVetoException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 import javax.servlet.ServletException;
 
 import org.apache.struts.action.ActionServlet;
+import org.maker.weixin.auth.ComponentAccessToken;
+import org.maker.weixin.auth.ComponentVerifyTicket;
 
+import com.wireless.Actions.weixin.auth.AuthParam;
 import com.wireless.db.DBCon;
+import com.wireless.json.JObject;
 import com.wireless.pojo.oss.OSSParams;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.sccon.ServerConnector;
@@ -40,6 +47,27 @@ public class InitServlet extends ActionServlet {
 		
 		ServerConnector.instance().setMaster(new ServerConnector.Connector(getServletConfig().getInitParameter("socket_host"), Integer.parseInt(getServletConfig().getInitParameter("socket_port"))));
 		
+		AuthParam.APP_ID = getServletConfig().getInitParameter("component_app_id");
+		AuthParam.APP_SECRET = getServletConfig().getInitParameter("component_app_secret");
+		
+		try {
+			BufferedReader br = new BufferedReader(new FileReader("/home/yzhang/www/wx-term/ticket.txt"));
+	        StringBuilder sb = new StringBuilder();
+	        String temp = br.readLine();
+	        while(temp != null){
+	        	sb.append(temp);
+	            temp = br.readLine();
+	        }
+	        br.close();
+	        
+	        AuthParam.COMPONENT_VERIFY_TICKET = JObject.parse(ComponentVerifyTicket.JSON_CREATOR, 0, sb.toString());
+	        AuthParam.COMPONENT_ACCESS_TOKEN = ComponentAccessToken.newInstance(AuthParam.COMPONENT_VERIFY_TICKET);
+	        
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	         
 		super.init();
 	}
 }

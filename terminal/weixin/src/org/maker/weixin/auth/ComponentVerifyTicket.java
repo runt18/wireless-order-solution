@@ -14,8 +14,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.qq.weixin.mp.aes.AesException;
 import com.qq.weixin.mp.aes.WXBizMsgCrypt;
 import com.wireless.Actions.weixin.auth.AuthParam;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 
-public class ComponentVerifyTicket {
+public class ComponentVerifyTicket implements Jsonable{
 
 	private String ticket;
 	private String infoType;
@@ -57,7 +59,30 @@ public class ComponentVerifyTicket {
 	
 	@Override
 	public String toString(){
-		return JSONObject.toJSONString(this);
+		return JSONObject.toJSONString(this.toJsonMap(0));
 	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putString("ticket", ticket);
+		jm.putString("appId", appId);
+		jm.putString("infoType", infoType);
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		this.ticket = jsonMap.getString("ticket");
+		this.appId = jsonMap.getString("appId");
+		this.infoType = jsonMap.getString("infoType");
+	}
+	
+	public static Jsonable.Creator<ComponentVerifyTicket> JSON_CREATOR = new Jsonable.Creator<ComponentVerifyTicket>() {
+		@Override
+		public ComponentVerifyTicket newInstance() {
+			return new ComponentVerifyTicket();
+		}
+	};
 	
 }

@@ -56,11 +56,12 @@ public class WxAuthAction extends Action {
             
 			WxRestaurantDao.update(StaffDao.getAdminByRestaurant(restaurant.getId()), 
 									   new WxRestaurant.UpdateBuilder().setWeixinAppId(authorizerInfo.getAppId())
-									   									   .setNickName(authorizerInfo.getNickName())
-									   									   .setHeadImgUrl(authorizerInfo.getHeadImg())
-									   									   .setQrCodeUrl(authorizerInfo.getQrCodeUrl())
-									   									   .setQrCode(qrCode.getText())
-									   									   .setRefreshToken(authorizationInfo.getAuthorizerRefreshToken()));
+									   								   .setWxSerial(authorizerInfo.getUserName())
+								   									   .setNickName(authorizerInfo.getNickName())
+								   									   .setHeadImgUrl(authorizerInfo.getHeadImg())
+								   									   .setQrCodeUrl(authorizerInfo.getQrCodeUrl())
+								   									   .setQrCode(qrCode.getText())
+								   									   .setRefreshToken(authorizationInfo.getAuthorizerRefreshToken()));
 			
 			AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, authorizationInfo.getAuthorizerAppId(), authorizationInfo.getAuthorizerRefreshToken());
 			//System.out.println(authorizerToken);
@@ -78,9 +79,9 @@ public class WxAuthAction extends Action {
 							//.addChild(new Button.ClickBuilder("我的大转盘", WeiXinHandleMessage.ZHUAN_EVENT_KEY))
 							.build());
 			if(menu.create(Token.newInstance(authorizerToken)).isOk()){
-				response.getWriter().print("create menu ok");
+				response.getWriter().print(restaurant.getName() + "授权成功");
 			}else{
-				response.getWriter().print("create menu failed");
+				response.getWriter().print(restaurant.getName() + "授权失败");
 			}
 			
 		}catch(BusinessException | SQLException e){
