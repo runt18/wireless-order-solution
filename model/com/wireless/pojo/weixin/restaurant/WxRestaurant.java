@@ -15,6 +15,16 @@ public class WxRestaurant {
 		private String headImgUrl;
 		private String refreshToken;
 		private String qrCode;
+		private String wxSerial;
+		
+		public boolean isWxSerialChanged(){
+			return this.wxSerial != null;
+		}
+		
+		public UpdateBuilder setWxSerial(String wxSerial){
+			this.wxSerial = wxSerial;
+			return this;
+		}
 		
 		public boolean isQrCodeChanged(){
 			return this.qrCode != null;
@@ -166,6 +176,7 @@ public class WxRestaurant {
 		this.headImgUrl = builder.headImgUrl;
 		this.refreshToken = builder.refreshToken;
 		this.qrCode = builder.qrCode;
+		this.weixinSerial = builder.wxSerial;
 	}
 	
 	public WxRestaurant(int restaurantId){
@@ -173,6 +184,9 @@ public class WxRestaurant {
 	}
 	
 	public String getWeixinSerial() {
+		if(weixinSerial == null){
+			return "";
+		}
 		return weixinSerial;
 	}
 
@@ -262,6 +276,10 @@ public class WxRestaurant {
 
 	public void setQrCode(String qrCode){
 		this.qrCode = qrCode;
+	}
+	
+	public boolean hasQrCode(){
+		return getQrCode().length() > 0;
 	}
 	
 	public String getQrCode(){
