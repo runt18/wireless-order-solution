@@ -11,14 +11,17 @@
 		<action path="/WXEntry" type="com.wireless.Actions.weixin.EntryAction"
 			scope="request">
 		</action>
-		<action path="/WxAuth"
-			type="com.wireless.Actions.weixin.auth.WxAuthAction" scope="request">
+		<action path="/*/RecWxEvent" type="com.wireless.Actions.weixin.auth.WxRecEventAction"
+			scope="request">
+		</action>
+		<action path="/WxAuth" type="com.wireless.Actions.weixin.auth.WxAuthAction"
+			scope="request">
 		</action>
 		<action path="/RecWxTicket"
 			type="com.wireless.Actions.weixin.auth.WxRecTicketAction" scope="request">
 		</action>
-		<action path="/TestWxAuth"
-			type="com.wireless.Actions.weixin.auth.TestWxAuthAction" scope="request">
+		<action path="/WxAuthLogin"
+			type="com.wireless.Actions.weixin.auth.WxAuthLoginAction" scope="request">
 		</action>
 		<action path="/WXOperateMember"
 			type="com.wireless.Actions.weixin.query.WXOperateMemberAction" scope="request"
