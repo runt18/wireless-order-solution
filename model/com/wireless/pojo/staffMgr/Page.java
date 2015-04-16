@@ -171,6 +171,7 @@ public class Page{
 	}
 	
 	public static enum Weixin{
+		WX_BIND("WXBind", "微信餐厅绑定", "", "../../images/discountStatistics.png"),
 		WX_LOGO("WXLogo", "微信餐厅形象", "", "../../images/weixin.png"),
 		WX_INFO("WXInfo", "微信餐厅简介", "", "../../images/resturantMgr.png");
 //		WX_SALES("WXSales", "微信促销信息", "System_Module/WXSalesManagement.html", "../../images/staffMgr.png");

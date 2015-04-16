@@ -640,6 +640,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		jm.putInt("pTypeValue", this.mType.getVal());
 		jm.putString("pTypeText", this.mType.getDesc());
 		jm.putInt("repeat", this.mRepeat);
+		jm.putString("comment", this.mComment);
 		
 		jm.putBoolean("isIncludeCancel", this.isIncludeCancel);
 		

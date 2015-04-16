@@ -1,9 +1,11 @@
 package com.wireless.pojo.weixin.restaurant;
 
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.oss.OssImage;
 
 
-public class WxRestaurant {
+public class WxRestaurant implements Jsonable{
 
 	public static class UpdateBuilder{
 		private OssImage weixinLogo;
@@ -339,5 +341,25 @@ public class WxRestaurant {
 	@Override
 	public String toString(){
 		return "weixin_restaurant(" + getWeixinSerial() + "," + restaurantId + ")";
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putString("weixinAppId", getWeixinAppId());
+		jm.putString("weixinAppSecret", getWeixinAppSecret());
+		jm.putString("weixinInfo", getWeixinInfo());
+		jm.putString("weixinSerial", getWeixinSerial());
+		jm.putString("headImgUrl", getHeadImgUrl());
+		jm.putString("nickName", getNickName());
+		jm.putString("refreshToken", getRefreshToken());
+		jm.putString("qrCodeUrl", getQrCodeUrl());
+		
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 }
