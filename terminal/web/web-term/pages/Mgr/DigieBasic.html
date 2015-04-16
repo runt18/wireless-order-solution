@@ -281,6 +281,8 @@ Ext.onReady(function(){
 							businessStatWin.center();
 						}else if(e.attributes.mId == "verifyCode"){
 							showWeixinVerifyCode();
+						}else if(e.attributes.mId == "WXBind"){
+							window.open("../../../wx-term/weixin/order/wxAuth.html?rid="+restaurantID);
 						}else if(e.attributes.mId == "WXInfo"){
 							operateWXInfo();
 						}else if(e.attributes.mId == "WXLogo"){
