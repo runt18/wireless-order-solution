@@ -97,11 +97,12 @@ public class PrintFuncDao {
 		dbCon.rs.close();
 		
 		sql = " INSERT INTO " + Params.dbName + ".print_func" +
-		      "( `printer_id`, `repeat`, `type` )" +
+		      "( `printer_id`, `repeat`, `type`, `comment` )" +
 			  " VALUES( " +
 			  func.getPrinterId() + "," +
 			  func.getRepeat() + "," +
-		      func.getType().getVal() +
+		      func.getType().getVal() + "," +
+		      (func.hasComment() ? "'" + func.getComment() + "'" : " NULL ") + 
 		      ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -300,6 +301,7 @@ public class PrintFuncDao {
 			  " func_id = " + func.getId() +
 			  (builder.isRepeatChanged() ? " ,`repeat` = " + func.getRepeat() : "") +
 			  (builder.isTypeChanged() ? " ,type = " + func.getType().getVal() : "") +
+			  (builder.isCommentChanged() ? " ,comment = '" + func.getComment() + "'" : "") +
 			  " WHERE func_id = " +  func.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -351,7 +353,7 @@ public class PrintFuncDao {
 			}
 		}
 		
-		//TODO Insert the associated all cancel & detail
+		//Insert the associated all cancel & detail
 		if(builder.isIncludeCancelChanged()){
 			func = getById(dbCon, staff, func.getId());
 			if(func.getType() == PType.PRINT_ORDER){
@@ -440,6 +442,7 @@ public class PrintFuncDao {
 			PrintFunc func = new PrintFunc(PType.valueOf(dbCon.rs.getInt("type")), dbCon.rs.getInt("repeat"));
 			func.setId(dbCon.rs.getInt("func_id"));
 			func.setPrinterId(dbCon.rs.getInt("printer_id"));
+			func.setComment(dbCon.rs.getString("comment"));
 			result.add(func);
 		}
 		dbCon.rs.close();

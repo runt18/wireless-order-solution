@@ -8,6 +8,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.ComboOrderFood;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
@@ -49,7 +50,7 @@ public class ComboDao {
 			int tgId = TasteGroup.EMPTY_TASTE_GROUP_ID;
 			if(cof.hasTasteGroup()){
 				//Insert the taste group to this combo order food
-				tgId = TasteGroupDao.insert(dbCon, staff, new TasteGroup.InsertBuilder(cof.asComboFood().asFood())
+				tgId = TasteGroupDao.insert(dbCon, staff, new TasteGroup.InsertBuilder(new OrderFood(cof.asComboFood().asFood()))
 																	    .addTastes(cof.getTasteGroup().getNormalTastes())
 																	    .setTmpTaste(cof.getTasteGroup().getTmpTaste()));
 			}

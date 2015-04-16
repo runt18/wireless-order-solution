@@ -10,7 +10,6 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PrintSchemeError;
 import com.wireless.pojo.printScheme.PStyle;
-import com.wireless.pojo.printScheme.PrintFunc;
 import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -237,11 +236,7 @@ public class PrinterDao {
 		dbCon.rs.close();
 		
 		for(Printer printer : result){
-			for(PrintFunc func : PrintFuncDao.getByPrinter(dbCon, staff, printer)){
-				try{
-					printer.addFunc(func);
-				}catch(BusinessException ignored){}
-			}
+			printer.setFuncs(PrintFuncDao.getByPrinter(dbCon, staff, printer));
 		}
 		
 		return result;

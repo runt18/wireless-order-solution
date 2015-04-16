@@ -60,6 +60,7 @@ public class TestPrinterScheme {
 		for(int i = 0; i < expectedFuncs.size(); i++){
 			assertEquals("print function type", expectedFuncs.get(i).getType().getVal(), actualFuncs.get(i).getType().getVal());
 			assertEquals("print function repeat", expectedFuncs.get(i).getRepeat(), actualFuncs.get(i).getRepeat());
+			assertEquals("print function comment", expectedFuncs.get(i).getComment(), actualFuncs.get(i).getComment());
 			
 			if(expectedFuncs.get(i).getType().isSummary()){
 				//Compare the department if the print type is summary
@@ -83,9 +84,9 @@ public class TestPrinterScheme {
 		try{
 			dbCon.connect();
 			
-			List<Department> depts = DepartmentDao.getByType(dbCon, mStaff, Department.Type.NORMAL);
-			List<Kitchen> kitchens = KitchenDao.getByType(dbCon, mStaff, Kitchen.Type.NORMAL);
-			List<Region> regions = RegionDao.getByStatus(dbCon, mStaff, Region.Status.BUSY);
+			final List<Department> depts = DepartmentDao.getByType(dbCon, mStaff, Department.Type.NORMAL);
+			final List<Kitchen> kitchens = KitchenDao.getByType(dbCon, mStaff, Kitchen.Type.NORMAL);
+			final List<Region> regions = RegionDao.getByStatus(dbCon, mStaff, Region.Status.BUSY);
 			
 			Printer.InsertBuilder builder = new Printer.InsertBuilder("GP-80250-200-test", PStyle.PRINT_STYLE_58MM)
 													   .setAlias("海鲜打印机");
@@ -98,7 +99,8 @@ public class TestPrinterScheme {
 																	   .addRegion(regions.get(0))
 																	   .addRegion(regions.get(1))
 																	   .addDepartment(depts.get(0))
-																	   .addDepartment(depts.get(1));
+																	   .addDepartment(depts.get(1))
+																	   .setComment("测试备注");
 			
 			//Add a summary function to this printer
 			int summaryFuncId = PrintFuncDao.addFunc(dbCon, mStaff, summaryFuncBuilder);

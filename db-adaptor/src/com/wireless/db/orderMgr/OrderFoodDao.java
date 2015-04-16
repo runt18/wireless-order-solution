@@ -494,7 +494,7 @@ public class OrderFoodDao {
 			TasteGroup tg = builder.extra.getTasteGroup();		
 			
 			if(tg.getGroupId() == TasteGroup.EMPTY_TASTE_GROUP_ID){
-				int tgId = TasteGroupDao.insert(dbCon, staff, new TasteGroup.InsertBuilder(builder.extra.asFood())
+				int tgId = TasteGroupDao.insert(dbCon, staff, new TasteGroup.InsertBuilder(builder.extra)
 			     															.addTastes(tg.getNormalTastes())
 			     															.setTmpTaste(tg.getTmpTaste()));
 				tg.setGroupId(tgId);
