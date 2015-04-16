@@ -103,6 +103,13 @@ public class OperatePrintFuncAction extends DispatchAction{
 				for (String department : depts) {
 					summaryBuilder.addDepartment(new Department(Short.parseShort(department)));
 				}
+				
+				//单尾结束语
+				String comment = request.getParameter("comment");
+				if(comment != null && !comment.isEmpty()){
+					summaryBuilder.setComment(comment);
+				}
+				
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
 				
 				PrintFuncDao.addFunc(dbCon, staff, summaryBuilder);
@@ -210,7 +217,6 @@ public class OperatePrintFuncAction extends DispatchAction{
 					}
 				}
 				
-				
 				if(dept.length == 0){
 					builder.setDepartmentAll();
 				}else{
@@ -218,6 +224,13 @@ public class OperatePrintFuncAction extends DispatchAction{
 						builder.addDepartment(new Department(Short.parseShort(department)));
 					}
 				}
+				
+				//单尾结束语
+				String comment = request.getParameter("comment");
+				if(comment != null && !comment.isEmpty()){
+					builder.setComment(comment);
+				}
+				
 				builder.setRepeat(Integer.parseInt(repeat));
 				builder.setIncludeCancel(Boolean.parseBoolean(isNeedToCancel));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);

@@ -1,5 +1,6 @@
 package com.wireless.Actions.printScheme;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ public class QueryPrintFuncAction extends Action{
 			String printerId = request.getParameter("printerId");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			root = PrintFuncDao.getByCond(staff, new PrintFuncDao.ExtraCond().setPrinter(Integer.parseInt(printerId)));
+			List<PrintFunc> roots = new ArrayList<PrintFunc>();
 			
 			for (PrintFunc printFunc : root) {
 				if(printFunc.getType() == PType.PRINT_ORDER){
@@ -42,9 +44,15 @@ public class QueryPrintFuncAction extends Action{
 						printFunc.setIncludeCancel(false);
 					}					
 				}
+				
+				if(printFunc.getType() != PType.PRINT_CANCELLED_FOOD_DETAIL && printFunc.getType() != PType.PRINT_ALL_CANCELLED_FOOD){
+					roots.add(printFunc);
+				}
 			}
-			jobject.setTotalProperty(root.size());
-			jobject.setRoot(root);
+			
+			
+			jobject.setTotalProperty(roots.size());
+			jobject.setRoot(roots);
 			
 		}catch(BusinessException e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
