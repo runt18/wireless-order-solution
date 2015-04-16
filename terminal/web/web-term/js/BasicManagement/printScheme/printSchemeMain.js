@@ -708,11 +708,14 @@ function init(){
 				layout : 'form',
 				labelWidth : 80,
 				items : [{
-					xtype : 'textarea',
+					xtype : 'label',
+					text : '单尾结束语:'
+				}, {
+					xtype : 'textfield',
+					style : 'margin-top:5px;',
 					id : 'printComment',
-					width : 200,
-					boxMaxHeight : 50,
-					fieldLabel : '单尾结束语'
+					width : 280,
+					hideLabel : true
 				}]
 			}]
 		}],
