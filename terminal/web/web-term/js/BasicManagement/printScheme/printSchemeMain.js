@@ -369,6 +369,8 @@ function init(){
 				
 				var sn = Ext.getCmp('printerTree').getSelectionModel().getSelectedNode();
 				var repeat = Ext.getCmp('txtRepeat').getValue();
+				var printComment = Ext.getCmp('printComment').getValue();
+				
 				Ext.Ajax.request({
 					url : '../../OperatePrintFunc.do',
 					params : {
@@ -380,6 +382,7 @@ function init(){
 						printerId : sn.attributes.printerId,
 						funcId : funcId,
 						isNeedToCancel : Ext.getDom('chkIsNeedToCancel').checked, 
+						comment : printComment,
 						dataSource : dataSource
 					},
 					success : function(res, opt){
@@ -686,12 +689,32 @@ function init(){
 				}]
 			}, kitchenTree]			
 		},{
-			id : 'showPrintPaper',
+			
 			title : '打单示例',
 			region : 'east',
+			layout : 'border',
 			height : 550,
 			width : 300,
-			bodyStyle : 'background:url(../../images/bill_select.png) no-repeat center center;'
+			items : [{
+				id : 'showPrintPaper',
+				border : false,
+				region : 'center',
+				bodyStyle : 'background:url(../../images/bill_select.png) no-repeat center center;'
+			}, {
+				region : 'south',
+				id : 'printCommentPanel',
+				height : 55,
+				frame : true,
+				layout : 'form',
+				labelWidth : 80,
+				items : [{
+					xtype : 'textarea',
+					id : 'printComment',
+					width : 200,
+					boxMaxHeight : 50,
+					fieldLabel : '单尾结束语'
+				}]
+			}]
 		}],
 	});
 	
@@ -702,262 +725,264 @@ function init(){
 	}
 
 	//打印机操作
-	printerWin = new Ext.Window({
-		id : 'print_addPrinter',
-		title : '添加打印机',
-		closable : false,
-		resizable : true, 
-		modal : true,
-		width : 260,
-		bbar : ['->',{
-			text : '保存',
-			id : 'btnSavePrinter',
-			iconCls : 'btn_save',
-			handler : function(e){
-				var printerName = Ext.getCmp('txtPrinterName');
-				var printerAlias;
-				var isEnabled = Ext.getCmp('enabled');
-				var styles = document.getElementsByName('pStyle');
-				var printerId = Ext.getCmp('printerId');
-				
-				var dataSource = '';
-				
-				//机型
-				var style = '';
-				for ( var i = 0; i < styles.length; i++) {
-					if(styles[i].checked){
-						style = styles[i].value;
-					}
-				}
-				//停用
-				if(isEnabled.checked){
-					isEnabled = 'true';
-				}else{
-					isEnabled = 'false';
-				}
-				if(!Ext.getCmp('txtPrinterName').isValid()){
-					return;
-				}
-				
-				if(printerWin.operationType == 'insert'){
-					dataSource = 'insert';
-				}else if(printerWin.operationType == 'update'){
-					dataSource = 'update';
-				}else return;
-				
-				//别名input为空时,从radio中选择别名
-				if(Ext.getCmp('txtPrinterAlias').getValue()){
-					printerAlias = Ext.getCmp('txtPrinterAlias').getValue();
-				}else{
-					var names = document.getElementsByName('pName');
-					for (var i = 0; i < names.length; i++) {
-						if(names[i].checked){
-							printerAlias = names[i].value;
-							break;
+	if(!printerWin){
+		printerWin = new Ext.Window({
+			id : 'print_addPrinter',
+			title : '添加打印机',
+			closable : false,
+			resizable : true, 
+			modal : true,
+			width : 260,
+			bbar : ['->',{
+				text : '保存',
+				id : 'btnSavePrinter',
+				iconCls : 'btn_save',
+				handler : function(e){
+					var printerName = Ext.getCmp('txtPrinterName');
+					var printerAlias;
+					var isEnabled = Ext.getCmp('enabled');
+					var styles = document.getElementsByName('pStyle');
+					var printerId = Ext.getCmp('printerId');
+					
+					var dataSource = '';
+					
+					//机型
+					var style = '';
+					for ( var i = 0; i < styles.length; i++) {
+						if(styles[i].checked){
+							style = styles[i].value;
 						}
-					}					
-				}
-				
-				Ext.Ajax.request({
-					url : '../../OperatePrinter.do',
-					params : {
-						printerName : printerName.getValue(),
-						printerAlias : printerAlias,
-						style : style,
-						printerId : printerId.getValue(),
-						isEnabled : isEnabled,
-						dataSource : dataSource
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						printerWin.hide();
-						Ext.ux.showMsg(jr);
-						printerTree.getRootNode().reload();
-					},
-					failure : function(res, opt){
-						Ext.ux.showMsg(Ext.decode(res.responseText));
 					}
-				});
-			}
-		},{
-			text : '取消',
-			id : 'btnCloseFunc',
-			iconCls : 'btn_close',
-			handler : function(){
-				printerWin.hide();
-			}
-		}],
-		items : [{
-			xtype : 'form',
-			labelAlign : 'left',
-			labelWidth : 50,
-			frame : true,
-			defaultType : 'textfield',
-			items : [{
-				id : 'txtPrinterName',
-				fieldLabel : '打印机',
-				width : 130,
-				allowBlank : false,
-				validator : function(v){
-					if(Ext.util.Format.trim(v).length > 0){
-						return true;
+					//停用
+					if(isEnabled.checked){
+						isEnabled = 'true';
 					}else{
-						return '名称不能为空.';
+						isEnabled = 'false';
 					}
+					if(!Ext.getCmp('txtPrinterName').isValid()){
+						return;
+					}
+					
+					if(printerWin.operationType == 'insert'){
+						dataSource = 'insert';
+					}else if(printerWin.operationType == 'update'){
+						dataSource = 'update';
+					}else return;
+					
+					//别名input为空时,从radio中选择别名
+					if(Ext.getCmp('txtPrinterAlias').getValue()){
+						printerAlias = Ext.getCmp('txtPrinterAlias').getValue();
+					}else{
+						var names = document.getElementsByName('pName');
+						for (var i = 0; i < names.length; i++) {
+							if(names[i].checked){
+								printerAlias = names[i].value;
+								break;
+							}
+						}					
+					}
+					
+					Ext.Ajax.request({
+						url : '../../OperatePrinter.do',
+						params : {
+							printerName : printerName.getValue(),
+							printerAlias : printerAlias,
+							style : style,
+							printerId : printerId.getValue(),
+							isEnabled : isEnabled,
+							dataSource : dataSource
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							printerWin.hide();
+							Ext.ux.showMsg(jr);
+							printerTree.getRootNode().reload();
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
 				}
 			},{
-				xtype : 'fieldset',
-				title : '选择名称',
-				autoHeight : true,
-				labelWidth : 40,
+				text : '取消',
+				id : 'btnCloseFunc',
+				iconCls : 'btn_close',
+				handler : function(){
+					printerWin.hide();
+				}
+			}],
+			items : [{
+				xtype : 'form',
+				labelAlign : 'left',
+				labelWidth : 50,
+				frame : true,
+				defaultType : 'textfield',
 				items : [{
-					layout : 'column',
-					frame : false,
-					defaults : {
-						columnWidth : .25,
-						layout : 'form',
-					},
+					id : 'txtPrinterName',
+					fieldLabel : '打印机',
+					width : 130,
+					allowBlank : false,
+					validator : function(v){
+						if(Ext.util.Format.trim(v).length > 0){
+							return true;
+						}else{
+							return '名称不能为空.';
+						}
+					}
+				},{
+					xtype : 'fieldset',
+					title : '选择名称',
+					autoHeight : true,
+					labelWidth : 40,
 					items : [{
+						layout : 'column',
+						frame : false,
+						defaults : {
+							columnWidth : .25,
+							layout : 'form',
+						},
 						items : [{
-							xtype : 'button',
-							text : '收银',
-							width : 50,
-							height : 30,
-							handler : function(btn){
-								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
-								Ext.getCmp('txtPrinterAlias').focus();
-							}
+							items : [{
+								xtype : 'button',
+								text : '收银',
+								width : 50,
+								height : 30,
+								handler : function(btn){
+									Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+									Ext.getCmp('txtPrinterAlias').focus();
+								}
+							}]
+						}, {
+							items : [{
+								xtype : 'button',
+								text : '中厨',
+								width : 50,
+								height : 30,
+								handler : function(btn){
+									Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+									Ext.getCmp('txtPrinterAlias').focus();
+								}
+							}]
+						}, {
+							items : [{
+								xtype : 'button',
+								text : '点心',
+								width : 50,
+								height : 30,
+								handler : function(btn){
+									Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+									Ext.getCmp('txtPrinterAlias').focus();
+								}
+							}]
+						}, {
+							items : [{
+								xtype : 'button',
+								text : '水吧',
+								width : 50,
+								height : 30,
+								handler : function(btn){
+									Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+									Ext.getCmp('txtPrinterAlias').focus();
+								}
+							}]
+						},{
+							columnWidth : 1,
+							style : 'margin-bottom:5px;'
+						}, {
+							items : [{
+								xtype : 'button',
+								text : '海鲜',
+								width : 50,
+								height : 30,
+								handler : function(btn){
+									Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+									Ext.getCmp('txtPrinterAlias').focus();
+								}
+							}]
+						}, {
+							items : [{
+								xtype : 'button',
+								text : '地哩',
+								width : 50,
+								height : 30,
+								handler : function(btn){
+									Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
+									Ext.getCmp('txtPrinterAlias').focus();
+								}
+							}]
+						},{
+							columnWidth : 1,
+							style : 'margin-bottom:5px;'
 						}]
 					}, {
-						items : [{
-							xtype : 'button',
-							text : '中厨',
-							width : 50,
-							height : 30,
-							handler : function(btn){
-								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
-								Ext.getCmp('txtPrinterAlias').focus();
-							}
-						}]
-					}, {
-						items : [{
-							xtype : 'button',
-							text : '点心',
-							width : 50,
-							height : 30,
-							handler : function(btn){
-								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
-								Ext.getCmp('txtPrinterAlias').focus();
-							}
-						}]
-					}, {
-						items : [{
-							xtype : 'button',
-							text : '水吧',
-							width : 50,
-							height : 30,
-							handler : function(btn){
-								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
-								Ext.getCmp('txtPrinterAlias').focus();
-							}
-						}]
-					},{
-						columnWidth : 1,
-						style : 'margin-bottom:5px;'
-					}, {
-						items : [{
-							xtype : 'button',
-							text : '海鲜',
-							width : 50,
-							height : 30,
-							handler : function(btn){
-								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
-								Ext.getCmp('txtPrinterAlias').focus();
-							}
-						}]
-					}, {
-						items : [{
-							xtype : 'button',
-							text : '地哩',
-							width : 50,
-							height : 30,
-							handler : function(btn){
-								Ext.getCmp('txtPrinterAlias').setValue(btn.getText());
-								Ext.getCmp('txtPrinterAlias').focus();
-							}
-						}]
-					},{
-						columnWidth : 1,
-						style : 'margin-bottom:5px;'
+						xtype : 'textfield',
+						id : 'txtPrinterAlias',
+						fieldLabel : '别名',
+						width : 130
 					}]
-				}, {
-					xtype : 'textfield',
-					id : 'txtPrinterAlias',
-					fieldLabel : '别名',
-					width : 130
-				}]
-				
-			},{
-				xtype : 'fieldset',
-				title : '机型',
-				autoHeight : true,
-				defaultType : 'radio',
-				hideLabels : true,
-				items : [{
-					name : 'pStyle',
-					inputValue : 2,
-					id : 'rdo80mm',
-					checked : true,
-					hideLabel : true,
-					boxLabel : '80mm'
 					
 				},{
-					xtype : 'radio',
-					name : 'pStyle',
-					inputValue : 1,
-					hideLabel : true,
-					boxLabel : '58mm'
-				}, {
-					xtype : 'radio',
-					name : 'pStyle',
-					inputValue : 3,
-					hideLabel : true,
-					boxLabel : '76mm'
-				}, {
-					xtype : 'radio',
-					name : 'pStyle',
-					inputValue : 4,
-					hideLabel : true,
-					boxLabel : '标签(50mm * 40mm)'
-				}]
-				
-			},{
-				xtype : 'fieldset',
-				title : '状态',
-				autoHeight : true,
-				defaultType : 'radio',
-				hideLabels : true,
-				items : [{
-					id : 'enabled',
-					name : 'isEnabled',
-					inputValue : 'true',
-					hideLabel : true,
-					checked : true,
-					boxLabel : '可用'
+					xtype : 'fieldset',
+					title : '机型',
+					autoHeight : true,
+					defaultType : 'radio',
+					hideLabels : true,
+					items : [{
+						name : 'pStyle',
+						inputValue : 2,
+						id : 'rdo80mm',
+						checked : true,
+						hideLabel : true,
+						boxLabel : '80mm'
+						
+					},{
+						xtype : 'radio',
+						name : 'pStyle',
+						inputValue : 1,
+						hideLabel : true,
+						boxLabel : '58mm'
+					}, {
+						xtype : 'radio',
+						name : 'pStyle',
+						inputValue : 3,
+						hideLabel : true,
+						boxLabel : '76mm'
+					}, {
+						xtype : 'radio',
+						name : 'pStyle',
+						inputValue : 4,
+						hideLabel : true,
+						boxLabel : '标签(50mm * 40mm)'
+					}]
+					
 				},{
-					id : 'unEnabled',
-					name : 'isEnabled',
-					inputValue : 'false',
-					hideLabel : true,
-					boxLabel : '停用'
+					xtype : 'fieldset',
+					title : '状态',
+					autoHeight : true,
+					defaultType : 'radio',
+					hideLabels : true,
+					items : [{
+						id : 'enabled',
+						name : 'isEnabled',
+						inputValue : 'true',
+						hideLabel : true,
+						checked : true,
+						boxLabel : '可用'
+					},{
+						id : 'unEnabled',
+						name : 'isEnabled',
+						inputValue : 'false',
+						hideLabel : true,
+						boxLabel : '停用'
+					}]
+				},{
+					xtype : 'hidden',
+					id : 'printerId'
 				}]
-			},{
-				xtype : 'hidden',
-				id : 'printerId'
 			}]
-		}]
-		
-	});	
+			
+		});			
+	}
 	
 	
 }
@@ -972,6 +997,7 @@ function showPanel(v){
 		Ext.getCmp('kitchensTree').hide();
 		Ext.getCmp('depts').show();
 		Ext.getCmp('regions').show();
+		Ext.getCmp('printCommentPanel').show();
 		Ext.query("#showPrintPaper .x-panel-body")[0].style.backgroundImage = 'url(../../images/bill_select.png)';
 		
 		cancelFoodBtn.show();
@@ -981,6 +1007,7 @@ function showPanel(v){
 		Ext.getCmp('kitchensTree').show();
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').hide();
+		Ext.getCmp('printCommentPanel').hide();
 		Ext.query("#showPrintPaper .x-panel-body")[0].style.backgroundImage = 'url(../../images/basicManagement_select.png)';
 		cancelFoodBtn.show();
 		cancelFoodBtn.setBoxLabel('打印退菜分单');
@@ -989,6 +1016,7 @@ function showPanel(v){
 		Ext.getCmp('kitchensTree').hide();
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').show();
+		Ext.getCmp('printCommentPanel').hide();
 		Ext.query("#showPrintPaper .x-panel-body")[0].style.backgroundImage = 'url(../../images/billboard_select.png)';
 		cancelFoodBtn.hide();
 	}
@@ -1049,6 +1077,7 @@ function printFuncOperactionHandler(c){
 	var dept = document.getElementsByName('dept');
 	var region = document.getElementsByName('region');
 	var repeat = Ext.getCmp('txtRepeat');
+	var comment = Ext.getCmp('printComment');
 	//区域重置
 	for ( var i = 0; i < region.length; i++) {
 		if(region[i].checked){
@@ -1104,8 +1133,12 @@ function printFuncOperactionHandler(c){
 		
 		addPrintFunc.operationType = c.type;
 		Ext.getCmp('kitchens').setHeight(435);
+		Ext.getCmp('kitchensTree').hide();
+		
 		Ext.getCmp('printerType').hide();
 		Ext.getCmp('btnSaveNext').hide();
+		
+		
 		//功能选中
 		var pTypeValue = ss.data.pTypeValue;
 		for ( var i = 0; i < pType.length; i++) {
@@ -1150,12 +1183,15 @@ function printFuncOperactionHandler(c){
 
 		}
 
+		//厨房是否全选
 		if(ss.data.kitchenValues == ''){
 			Ext.getDom('chkAllKitchen').checked = true;
 			Ext.getCmp('chkAllKitchen').fireEvent('check', Ext.getCmp('chkAllKitchen'), true);
 		}
 		
 		repeat.setValue(ss.data.repeat);
+		
+		comment.setValue(ss.data.comment);
 	
 	}
 	addPrintFunc.center();
@@ -1366,6 +1402,7 @@ Ext.onReady(function(){
 		    {name : 'regions'},
 		    {name : 'regionValues'},
 		    {name : 'repeat'},
+		    {name : 'comment'},
 		    {name : 'isIncludeCancel'}
 		])
 		

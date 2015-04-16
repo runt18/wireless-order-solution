@@ -24,7 +24,11 @@ function checkUserSessionStatus(conn,response,options){
 			closable : false,
 			fn : function(btn){
 				if(btn == 'ok'){
-					location.href = response.getResponseHeader("root_path") + '/pages/Login.html';
+					if(Ext.pageModule && Ext.pageModule == "admin"){
+						location.href = response.getResponseHeader("root_path") + '/admin/index.html';
+					}else{
+						location.href = response.getResponseHeader("root_path") + '/pages/Login.html';
+					}
 				}
 			}
 		});
@@ -32,7 +36,11 @@ function checkUserSessionStatus(conn,response,options){
 		new Ext.util.TaskRunner().start({
 			run: function(){
 				if(interval < 1){
-					location.href = response.getResponseHeader("root_path") + '/pages/Login.html';								
+					if(Ext.pageModule && Ext.pageModule == "admin"){
+						location.href = response.getResponseHeader("root_path") + '/admin/index.html';
+					}else{
+						location.href = response.getResponseHeader("root_path") + '/pages/Login.html';
+					}						
 				}
 				Ext.getDom('returnInterval').innerHTML = interval;
 				interval--;
