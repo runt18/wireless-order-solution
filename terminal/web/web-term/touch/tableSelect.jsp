@@ -58,6 +58,7 @@
 			</div>
 		</div>	
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop"  data-position-to="window" onclick="ts.displayFeastPayWin()">酒席入账</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageMemberOperation">会员</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="toOrderMgrPage()">账单</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:2, businessStatic:2})">交款</a>
@@ -542,12 +543,43 @@
 	    </div>
 	</div>			
 	
-	
+	<!-- 酒席入账 -->
+	<div id="feastPayWin" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 200px; left: 50%;width:400px; margin: -100px 0px 0px -200px;display: none;background-color: white;" align="center">
+	    <div data-role="header" class="ui-corner-top" data-theme="b">
+	        <h1>酒席入账</h1>
+	    </div>
+	    <div style="padding: 5px 10px;" >
+		    <a data-rel="popup" data-role="button" data-transition="pop" data-theme="b" data-icon="plus" href="#popupDepartmentsCmp">添加入账部门</a>
+		    <table id="feastPayWinTable">
+<!-- 		    	<tr id="tr4Feast">
+		    		<td><a data-role="button" data-theme="e" >现金</a></td>
+		    		<td style="padding-right: 10px;"><input id="" class="mixPayInputFont numberInputStyle" onkeypress="intOnly()"></td>
+		    		<td> <a data-role="button" data-for="" data-icon="delete" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-inline="true" >D</a></td>
+		    	</tr> -->
+		    </table>
+		    <div style="text-align: right;padding-right: 20px;font-size: 30px;color: green;">
+    			总金额 : <label id="feastPayTotalPrice">0</label>
+    		</div>
+	    </div>
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.closeFeastPayWin()">取消</a>		 
+			 </div>
+	    </div>	    
+	    
+	 </div>	
+	 
+	<div data-role="popup" id="popupDepartmentsCmp" data-theme="d" >
+        <ul id="departmentsListCmp" data-role="listview" data-inset="true" style="min-width:100px;" data-theme="b">
+            <li class="popupButtonList " data-icon="false"><a onclick="">部门一</a></li>
+        </ul>
+	</div>		 
 </div>
 <!-- end 餐台选择  -->
 
 
-<!-- 弹出框时, 挡住其他操作的div -->
+<!-- 弹出框时, 挡住其他操作的div阴影 -->
 <div id="shadowForPopup" style="z-index: 1101;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%; background: #DDD;display: none;" ></div>
 
 
@@ -1429,8 +1461,8 @@
 		         		<td ><label id="lab_replaceCancelBtn">----</label><a id="spanSeeCancelFoodAmount" href="#" style="display: none;" onclick="loadOrderDetail();lookupOrderDetailByType('detail_cancel')">明细</a></td>
 		         	</tr>	
 		         	<tr id="tr4EraseQuota">
-		         		<td colspan="2" style="width: 200px;line-height: 60px;font-size: 22px;text-align: right;" >抹数金额(上限:￥<font id="font_showEraseQuota" color="red">--</font>)：</td>
-		         		<td width="80" style="padding-right: 5px;">
+		         		<td colspan="2" style="width: 200px;line-height: 60px;font-size: 20px;text-align: right;" >抹数金额(上限:￥<font id="font_showEraseQuota" color="red">--</font>)：</td>
+		         		<td width="70" style="padding-right: 5px;">
 		         			<input id="txtEraseQuota" class="countInputStyle" onkeypress="intOnly()" onblur="pm.closeKeyboard()" >
 		         		</td>
 		         	</tr>
@@ -1534,6 +1566,7 @@
         <ul id="payment_serviceCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>
 	</div>	
 	
+<!-- 收款操作 -->	
 	<div id="inputReciptWin" data-role="popup"  data-overlay-theme="e" data-theme="d" data-dismissible="false" class="ui-corner-all" align="center">
 	    <div data-role="header" class="ui-corner-top" data-theme="b">
 	        <h1>输入收款显示找零</h1>
@@ -1546,7 +1579,7 @@
 	    	</tr>
 	    	<tr>
 	    		<td>输入收款:</td>
-	    		<td><input class="numberInputStyle" id="txtInputRecipt"></td>
+	    		<td><input class="numberInputStyle" id="txtInputRecipt" onkeypress="intOnly()"></td>
 	    	</tr>
 	    	<tr>
 	    		<td>找零:</td>
@@ -1562,6 +1595,7 @@
 	    </div>
 	 </div>	
 	 
+<!-- 混合结账操作 -->	 
 	<div id="mixedPayWin" data-role="popup"  data-overlay-theme="e" data-theme="d" data-dismissible="false" class="ui-corner-all" align="center">
 	    <div data-role="header" class="ui-corner-top" data-theme="b">
 	        <h1>混合结账</h1>

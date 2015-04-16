@@ -1835,7 +1835,8 @@ function foodCommonTasteLoad(){
 				id : of.commonTastes[i].taste.id,
 				name : of.commonTastes[i].taste.name,
 				click : "chooseOrderFoodCommonTaste({event: this, id: "+ of.commonTastes[i].taste.id +"})",
-				price : of.commonTastes[i].taste.price,
+//				price : of.commonTastes[i].taste.price,
+				price : of.commonTastes[i].taste.calcValue == 1?(of.commonTastes[i].taste.rate * 100) + '%' : ('￥'+ of.commonTastes[i].taste.price),
 				theme : "c"
 			}));		
 		}
@@ -1991,12 +1992,9 @@ function chooseOrderFoodCommonTaste(c){
 of.chooseOrderFoodUnit = function(c){
 	var currentUnit = $(c.event);
 	
-	var foodUnit = null;
-	
-	if(currentUnit.attr('data-theme') == 'e'){
-		currentUnit.attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
-		foodUnit = null;
-	}else{
+	if(currentUnit.attr('data-theme') != 'e'){
+		var foodUnit = null;
+		
 		$("#divFloatFoodMultiPrices a").attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
 		currentUnit.attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
 		foodUnit = {
@@ -2004,32 +2002,32 @@ of.chooseOrderFoodUnit = function(c){
 			unit : c.unit,
 			price : c.price
 		};
-	}
-
-	$("#divFloatFoodMultiPrices a").buttonMarkup( "refresh" );
-	
-	
-	for(var i = 0; i < of.newFood.length; i++){
-		//用唯一标示替代id
-		if(of.newFood[i].unique == of.selectedOrderFood.unique){
-			of.newFood[i].foodUnit = foodUnit;
-			if(foodUnit){
-				of.newFood[i].unitPrice = foodUnit.price;
-			}else{
-				//菜品设回原价
-				for (var j = 0; j < of.foodList.length; j++) {
-					if(of.newFood[i].id == of.foodList[j].id){
-						of.newFood[i].unitPrice = of.foodList[j].unitPrice;
+		$("#divFloatFoodMultiPrices a").buttonMarkup( "refresh" );
+		
+		
+		for(var i = 0; i < of.newFood.length; i++){
+			//用唯一标示替代id
+			if(of.newFood[i].unique == of.selectedOrderFood.unique){
+				of.newFood[i].foodUnit = foodUnit;
+				if(foodUnit){
+					of.newFood[i].unitPrice = foodUnit.price;
+				}else{
+					//FIXME 菜品设回原价
+					for (var j = 0; j < of.foodList.length; j++) {
+						if(of.newFood[i].id == of.foodList[j].id){
+							of.newFood[i].unitPrice = of.foodList[j].unitPrice;
+						}
 					}
 				}
+				break; 
 			}
-			break; 
-		}
-	}	
-	
-	of.initNewFoodContent({
-		data : of.selectedOrderFood
-	});		
+		}	
+		
+		of.initNewFoodContent({
+			data : of.selectedOrderFood
+		});		
+		
+	}
 }
 
 

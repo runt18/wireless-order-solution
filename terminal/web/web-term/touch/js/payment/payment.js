@@ -128,7 +128,7 @@ function showPaymentMgr(c){
 			return;
 		}			
 		
-		$('#shouldPay').html(checkOut_actualPrice - eraseQuota);
+		$('#shouldPay').html((checkOut_actualPrice * 10000 - eraseQuota * 10000)/10000);
 		
 	});
 	
@@ -815,17 +815,17 @@ function loadMix(){
 	}
 	
 	isMixedPay = true;
-	var html='';
+	var html=[];
 	for (var i = 0; i < payTypeData.length; i++) {
 		var checkBoxId = "chbForPayType" + payTypeData[i].id,  numberfieldId = "numForPayType" + payTypeData[i].id;
-		html += maxTr.format({
+		html.push(maxTr.format({
 			name : payTypeData[i].name,
 			checkboxId : checkBoxId,
 			numberfieldId : numberfieldId
-		});
+		}));
 	}
 	
-	$('#mixedPayWinTable').html(html).trigger('create');
+	$('#mixedPayWinTable').html(html.join('')).trigger('create');
 	
 	$('#mixedPayWin').popup('open');
 	

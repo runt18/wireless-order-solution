@@ -129,7 +129,13 @@ var tables = [],
 			+ '<td class="text_right">{deltaPoint}</td>'
 			+ '<td>{staffName}</td>'
 			+ '<td>{comment}</td>'
-			+ '</tr>';
+			+ '</tr>',
+	//酒席入账部门
+	feastPayDeptTemplet = '<tr id={tr4Feast}>' +
+			'<td><a data-role="button" data-theme="e" >{deptName}</a></td>' +
+			'<td style="padding-right: 10px;"><input id={numberfieldId} class="mixPayInputFont numberInputStyle" onkeypress="intOnly()"></td>'+
+			'<td> <a data-role="button" data-for="{deptId}" data-text={deptName} data-icon="delete" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-inline="true" onclick="ts.feastPayRemoveAction({event:this})">D</a></td>'+
+		'</tr>';
 
 
 $(function(){
@@ -2520,6 +2526,148 @@ ts.member.closeMemberConsumeDetailWin = function(){
 	
 	$('#consumeDetail_memberName').val('');
 	$('#front_memberConsumeDetailBody').html('');
+}
+
+/**
+ * 酒席分部门入账
+ */
+ts.displayFeastPayWin = function(){
+	$.post('../QueryDept.do', {dataSource:'normal'}, function(result){
+		ts.depts4Feast = result.root;
+		
+		var html=[];
+		for (var i = 0; i < ts.depts4Feast.length; i++) {
+			html.push('<li class="popupButtonList" data-icon="false"><a onclick="ts.addFeastDepartment({index})">{name}</a></li>'.format({
+				index : i,
+				name : ts.depts4Feast[i].name
+			}));
+		}
+		
+		$('#departmentsListCmp').html(html.join('')).listview('refresh');		
+	});
+	
+	$('#feastPayWin').show();
+	$('#shadowForPopup').show();
+	
+	//设置数字键盘输入
+	$('.numberInputStyle').focus(function(){
+		focusInput = this.id;
+	});		
+}
+
+/**
+ * 关闭酒席入账
+ */
+ts.closeFeastPayWin = function(){
+	$('#feastPayWin').hide();
+	$('#shadowForPopup').hide();	
+	
+	//清空操作
+	$('#numberKeyboard').hide();
+	$('#feastPayWinTable').html('');
+	$('#feastPayTotalPrice').text(0);	
+	ts.addFeastDepartment.depts.length = 0;
+}
+
+/**
+ * 计算酒席入账总金额
+ */
+ts.calcFeastPay = function(){
+	var totalMoney = 0;
+	
+	for (var i = 0; i < ts.addFeastDepartment.depts.length; i++) {
+		if($('#numForFeast'+ts.addFeastDepartment.depts[i]).val()){
+			totalMoney += parseFloat($('#numForFeast'+ts.addFeastDepartment.depts[i]).val());
+		}
+	}
+	
+	$('#feastPayTotalPrice').text(totalMoney);	
+}
+
+/**
+ * 添加入账部门
+ */
+ts.addFeastDepartment = function(index){
+	
+	var dept = ts.depts4Feast[index], fieldId = "numForFeast" + dept.id; 
+	
+	for (var i = 0; i < ts.addFeastDepartment.depts.length; i++) {
+		if(ts.addFeastDepartment.depts[i] == dept.id){
+			Util.msg.tip("此部门已添加");
+			return;
+		}
+	}
+	
+	ts.addFeastDepartment.depts.push(dept.id);
+	
+	var html = feastPayDeptTemplet.format({
+		numberfieldId : fieldId,
+		deptName : dept.name,
+		deptId : dept.id,
+		tr4Feast : 'tr4Feast'+dept.id
+	});
+	
+	$('#feastPayWinTable').append(html).trigger('create');
+	
+	//找零快捷键
+    $('#'+fieldId).on('keyup', function(btn){
+    	ts.calcFeastPay();
+	});	
+	
+	$('#popupDepartmentsCmp').popup('close');
+	
+	//设置数字键盘输入
+	$('.numberInputStyle').focus(function(){
+		focusInput = this.id;
+	});		
+	
+	setTimeout(function(){
+		var numForAlias = $("#"+fieldId);
+		
+		$('#numberKeyboard').show();
+		
+		firstTimeInput = true;
+		//设置数字键盘触发
+		numKeyBoardFireEvent = function (){
+			$("#"+fieldId).keyup();
+		}
+		
+		numForAlias.focus();
+		numForAlias.select();		
+	}, 250);
+
+}
+//记录添加的部门
+ts.addFeastDepartment.depts = [];
+
+/**
+ * 移除部门收益
+ */
+ts.feastPayRemoveAction = function(c){
+	var curField = $(c.event);
+	var numForAlias = parseInt(curField.attr('data-for'));
+	var name = curField.attr('data-text');
+	
+	Util.msg.alert({
+		msg : '是否去除 <font color="green">' + name +'</font> 收益?',
+		renderTo : 'tableSelectMgr',
+		buttons : 'yesback',
+		certainCallback : function(){
+			$('#numberKeyboard').hide();
+			for (var i = 0; i < ts.addFeastDepartment.depts.length; i++) {
+				if(numForAlias == ts.addFeastDepartment.depts[i]){
+					ts.addFeastDepartment.depts.splice(i, 1);
+					break;
+				}
+			}
+
+			$('#tr4Feast'+numForAlias).remove();		
+			
+			ts.calcFeastPay();
+		}
+	});
+	
+	
 }
 
 
