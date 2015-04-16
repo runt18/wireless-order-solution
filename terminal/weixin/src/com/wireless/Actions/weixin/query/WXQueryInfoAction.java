@@ -11,11 +11,14 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class WXQueryInfoAction extends DispatchAction{
 	
@@ -28,22 +31,26 @@ public class WXQueryInfoAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-//	public ActionForward normal(ActionMapping mapping, ActionForm form,
-//			HttpServletRequest request, HttpServletResponse response)
-//			throws Exception {
-//		JObject jobject = new JObject();
-//		try{
-//			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
-//			String extra = " AND BB.restaurant_id = " + rid + " AND BB.type = " + BillBoard.Type.WX_INFO.getVal() + " ORDER BY created DESC LIMIT 0,1 ";
-//			jobject.setRoot(BillBoardDao.get(extra));
-//		}catch(Exception e){
-//			e.printStackTrace();
-//			jobject.initTip(e);
-//		}finally{
-//			response.getWriter().print(jobject.toString());
-//		}
-//		return null;
-//	}
+	public ActionForward restInfo(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		String rid = request.getParameter("rid");
+		try{
+			Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			WxRestaurant rest = WxRestaurantDao.get(staff);
+			jobject.setRoot(rest);
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 	
 	/**
 	 * 
