@@ -184,6 +184,19 @@ public class Printer implements Jsonable{
 		return mFuncs.contains(func);
 	}
 
+	public void setFuncs(List<PrintFunc> funcs){
+		if(funcs != null){
+			mFuncs.clear();
+			for(PrintFunc func : funcs){
+				try{
+					addFunc(func);
+				}catch(BusinessException ignored){
+					ignored.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Add the print function to printer
 	 * @param func the function to add

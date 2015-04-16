@@ -54,7 +54,7 @@ public class ComboOrderFood implements Parcelable {
 	public void setTasteGroup(TasteGroup tg){
 		if(tg != null){
 			tasteGroup = tg;
-			tasteGroup.setAttachedFood(comboFood.asFood());
+			tasteGroup.setAttachedFood(new OrderFood(comboFood.asFood()));
 		}
 	}
 	
@@ -81,7 +81,7 @@ public class ComboOrderFood implements Parcelable {
 	
 	public boolean addTaste(Taste tasteToAdd){
 		if(tasteGroup == null){
-			tasteGroup = new TasteGroup(comboFood.asFood());
+			tasteGroup = new TasteGroup(new OrderFood(comboFood.asFood()));
 		}
 		if(tasteGroup.addTaste(tasteToAdd)){
 			tasteGroup.refresh();
@@ -93,7 +93,7 @@ public class ComboOrderFood implements Parcelable {
 	
 	public void setTmpTaste(Taste tmpTaste){
 		if(tasteGroup == null){
-			tasteGroup = new TasteGroup(comboFood.asFood());
+			tasteGroup = new TasteGroup(new OrderFood(comboFood.asFood()));
 		}
 		tasteGroup.setTmpTaste(tmpTaste);
 	}

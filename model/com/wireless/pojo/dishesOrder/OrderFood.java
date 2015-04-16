@@ -476,13 +476,13 @@ public class OrderFood implements Parcelable, Jsonable {
 	public void setTasteGroup(TasteGroup tg){
 		if(tg != null){
 			mTasteGroup = tg;
-			mTasteGroup.setAttachedFood(mFood);
+			mTasteGroup.setAttachedFood(this);
 		}
 	}
 
 	public boolean addTaste(Taste tasteToAdd){
 		if(mTasteGroup == null){
-			mTasteGroup = new TasteGroup(mFood);
+			mTasteGroup = new TasteGroup(this);
 		}
 		if(mTasteGroup.addTaste(tasteToAdd)){
 			mTasteGroup.refresh();
@@ -494,7 +494,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	public void setTmpTaste(Taste tmpTaste){
 		if(mTasteGroup == null){
-			mTasteGroup = new TasteGroup(mFood);
+			mTasteGroup = new TasteGroup(this);
 		}
 		mTasteGroup.setTmpTaste(tmpTaste);
 	}

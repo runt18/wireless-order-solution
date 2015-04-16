@@ -8,7 +8,6 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
-import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.util.SortedList;
@@ -18,10 +17,10 @@ public class TasteGroup implements Parcelable, Jsonable{
 	public static class InsertBuilder{
 		private List<Taste> normalTastes = new ArrayList<Taste>();
 		private Taste tmpTaste;
-		private final Food attachedFood;
+		private final OrderFood attachedFood;
 		
-		public InsertBuilder(Food f){
-			this.attachedFood = f;
+		public InsertBuilder(OrderFood of){
+			this.attachedFood = of;
 		}
 		
 		public InsertBuilder addTaste(Taste taste){ 
@@ -73,7 +72,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 	
 	private int mGroupId = EMPTY_TASTE_GROUP_ID;
 	
-	private Food mAttachedFood;
+	private OrderFood mAttachedFood;
 	
 	private SortedList<Taste> mTastes = SortedList.newInstance();
 	private Taste mSpec;
@@ -107,14 +106,14 @@ public class TasteGroup implements Parcelable, Jsonable{
 		}
 	}
 	
-	TasteGroup(Food attachedFood){
+	TasteGroup(OrderFood attachedFood){
 		this.mAttachedFood = attachedFood;
 	}
 	
 	private float makeNormalTastePrice(){ 
 		float tastePrice = 0;
 		for(Taste t : getNormalTastes()){
-			tastePrice += t.isCalcByPrice() ? t.getPrice() : (mAttachedFood.getPrice() * t.getRate());
+			tastePrice += t.isCalcByPrice() ? t.getPrice() : (mAttachedFood.getFoodPrice() * t.getRate());
 		}
 		return NumericUtil.roundFloat(tastePrice);
 	}
@@ -396,7 +395,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 		}
 	}
 	
-	void setAttachedFood(Food attachedFood){
+	void setAttachedFood(OrderFood attachedFood){
 		this.mAttachedFood = attachedFood;
 	}
 

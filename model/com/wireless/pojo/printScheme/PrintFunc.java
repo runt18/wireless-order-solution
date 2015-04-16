@@ -27,12 +27,15 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	private int mRepeat;
 	
+	private String mComment;
+	
 	private boolean isIncludeCancel = true;
 	
 	public static class UpdateBuilder{
 		private final int mId;
 		private int mRepeat;
 		private PType mPType;
+		private String mComment;
 		private List<Region> mRegions;
 		private List<Department> mDept;
 		private List<Kitchen> mKitchens;
@@ -58,6 +61,15 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 				this.mPType = type;
 				isIncludeCancel = onOff ? 1 : 0;
 			}
+			return this;
+		}
+		
+		public boolean isCommentChanged(){
+			return this.mComment != null;
+		}
+		
+		public UpdateBuilder setComment(String comment){
+			this.mComment = comment;
 			return this;
 		}
 		
@@ -155,6 +167,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private final List<Region> mRegions = SortedList.newInstance();
 		private final List<Department> mDepts = SortedList.newInstance();
 		private final boolean isIncludeCancel;
+		private String comment;
 		
 		private SummaryBuilder(int printerId, PType type, boolean isIncludeCancel){
 			this.printerId = printerId;
@@ -172,11 +185,17 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			builder.setRepeat(func.getRepeat());
 			builder.setDepartments(func.getDepartment());
 			builder.setRegions(func.getRegions());
+			builder.setComment(func.getComment());
 			return builder;
 		}
 		
 		public boolean isIncludeCancel(){
 			return this.isIncludeCancel;
+		}
+		
+		public SummaryBuilder setComment(String comment){
+			this.comment = comment;
+			return this;
 		}
 		
 		public SummaryBuilder setRepeat(int repeat){
@@ -358,6 +377,9 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		if(builder.isKitchenChanged()){
 			mKitchens.addAll(builder.mKitchens);
 		}
+		if(builder.isCommentChanged()){
+			mComment = builder.mComment;
+		}
 	}
 	
 	private PrintFunc(SummaryBuilder builder){
@@ -365,6 +387,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		this.printerId = builder.printerId;
 		mRegions.addAll(builder.mRegions);
 		mDepts.addAll(builder.mDepts);
+		mComment = builder.comment;
 	}
 	
 	private PrintFunc(DetailBuilder builder){
@@ -501,6 +524,21 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	public boolean isRegionAll(){
 		return mRegions.isEmpty();
+	}
+	
+	public boolean hasComment(){
+		return getComment().trim().length() != 0;
+	}
+	
+	public String getComment(){
+		if(this.mComment == null){
+			return "";
+		}
+		return this.mComment;
+	}
+	
+	public void setComment(String comment){
+		this.mComment = comment;
 	}
 	
 	public boolean isIncludeCancel() {
