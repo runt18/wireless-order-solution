@@ -542,7 +542,7 @@ public class Promotion implements Jsonable{
 		jm.putString("title", this.title);
 		jm.putString("body", this.body);
 		jm.putString("entire", this.entire);
-		jm.putString("image", this.getImage().getObjectUrl());
+		jm.putString("image", this.getImage() != null ? this.getImage().getObjectUrl() : "http://digie-image-real.oss.aliyuncs.com/nophoto.jpg");
 		jm.putInt("point", this.point);
 		jm.putInt("status", this.status.getVal());
 		jm.putInt("pType", this.rule.getVal());

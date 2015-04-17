@@ -334,6 +334,7 @@ public class Coupon implements Jsonable{
 
 	public final static byte COUPON_JSONABLE_COMPLEX = 0;
 	public final static byte COUPON_JSONABLE_SIMPLE = 1;	
+	public final static byte COUPON_JSONABLE_WITH_PROMOTION = 2;		
 	
 	@Override
 	public JsonMap toJsonMap(int flag) {
@@ -351,8 +352,10 @@ public class Coupon implements Jsonable{
 			jm.putJsonable("promotion", this.promotion, 0);
 			jm.putJsonable("drawProgress", getDrawProgress(), 0);			
 			jm.putJsonable("couponType", this.couponType, CouponType.COUPON_TYPE_JSONABLE_COMPLEX);
-		}else{
+		}else if(flag == COUPON_JSONABLE_SIMPLE){
 			jm.putJsonable("couponType", this.couponType, CouponType.COUPON_TYPE_JSONABLE_SIMPLE);
+		}else if(flag == COUPON_JSONABLE_WITH_PROMOTION){
+			jm.putJsonable("promotion", this.promotion, 0);
 		}
 
 		return jm;
