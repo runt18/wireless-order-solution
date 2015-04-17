@@ -1022,7 +1022,7 @@ function showPanel(v){
 		Ext.query("#showPrintPaper .x-panel-body")[0].style.backgroundImage = 'url(../../images/billboard_select.png)';
 		cancelFoodBtn.hide();
 		
-		if(v == 127){
+		if(v == 127 || v == 3){
 			Ext.getCmp('printCommentPanel').show();
 		}else{
 			Ext.getCmp('printCommentPanel').hide();
