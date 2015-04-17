@@ -303,6 +303,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private int mRepeat = 1;
 		private PType mType ;
 		private List<Region> mRegions = SortedList.newInstance();
+		private String mComment;
 		
 		private Builder(int printerId){
 			this.mPrinterId = printerId;
@@ -344,6 +345,16 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}
 		
+		public String getComment(){
+			if(this.mComment == null){
+				return "";
+			}
+			return this.mComment;
+		}
+		
+		public void setComment(String comment){
+			this.mComment = comment;
+		}
 		
 		public PType getType() {
 			return mType;
@@ -400,6 +411,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		this(builder.getType(), builder.mRepeat);
 		this.printerId = builder.mPrinterId;
 		mRegions.addAll(builder.mRegions);
+		mComment = builder.mComment;
 	}
 	
 	public PrintFunc(PType type, int repeat){
