@@ -19,30 +19,97 @@
 .div-mask{display: none; z-index:1000; position: absolute; height: 100%; width: 100%; left:0; top:0;}
 .div-mask-ld{background: rgba(0,0,0, 0);}
 .div-mask-ld > div[class=img]{position: fixed; height:50px; width:50px; left:50%; top:50%; margin: -25px; background: rgba(255,255,255,1); border: 1px solid #eee; border-radius: 2px;}
+#payFoodList li{
+	line-height : 30px;
+}
+
+.welcomeFont{
+	font-size: 20px;
+	font-weight : bold;
+	font-family: 'Comic Sans MS', cursive;
+}
+
 </style>
 </head>
 <body>
-	<div id="div4ScanMsg" align="center">
-		正在打开扫描仪......
-	</div>
 	
-<div id="divOrderInfo" class="main-box none">
+<div id="div4ScanMsg" align="center">
+	正在打开扫描仪......
+</div>	
+
+<div id="div4OrderInfo" class="main-box none">
 	<ul class="m-b-list">
 		<li class="box-horizontal" >
-			<div style="width:50%">账单号: <span id="spanOrderId" style="color:#26a9d0;">55548</span></div>
-			<div style="width:50%;text-align: right;">会员名: <span id="spanMemberName" style="color:#26a9d0;">edsion</span></div>
+			<div style="width:50%">账单号: <span id="spanOrderId" style="color:#26a9d0;">----</span></div>
+			<div style="width:50%;text-align: right;">会员名: <span id="spanMemberName" style="color:#26a9d0;">----</span></div>
 		</li>
-		<li class="box-horizontal" >
-			<div style="width:50%">账单原价: <span id="spanBillShouldPay" style="color:#26a9d0;">80</span></div>
-			<div style="width:50%;text-align: right;">会员价: <span id="spanBillAfterDiscount" style="color:#FF4500;">70</span></div>
+		<li id="orderPrice" class="box-horizontal" >
+			<div style="width:50%">账单原价: <span id="spanBillShouldPay" style="color:#26a9d0;">--.--</span></div>
+			<div style="width:50%;text-align: right;">会员价: <span id="spanBillAfterDiscount" style="color:#FF4500;">--.--</span></div>
 		</li>	
+		<li class="box-horizontal" >
+			<div style="width:50%">会员积分: <span id="memberPoint" style="color:#26a9d0;">--.--</span></div>
+			<div style="width:50%;text-align: right;"></div>
+		</li>		
 		<li class="none-line">
 			<div style="height: 55px;width: 100%;text-align: center;" >
-				<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="getVerifyCode({event:this})">进入会员中心</a>	
+				<a class="button rounded green" style="font-size: 20px;font-weight: bold;" onclick="Util.skip('member.html')">我知道了</a>	
 			</div>	
 		</li>			
 	</ul>
+</div>
+<br>	
+<!-- <div id="div4Food" class="main-box">
+		<ul class="m-b-list">
+			<li class="box-horizontal" >
+				<div style="width:100%;text-align: center;font-size: 20px;font-weight: bold;">餐厅明星菜</div>
+			</li>
+			<li>
+				<div style="width:100%;text-align: center;margin-top: 5px;">
+					<div style="height:150px;overflow-x:auto;overflow-y:hidden;background-color: white;">
+					    <div style="width:9999px;">
+					        <div class="sale-food-list" style="background-image: url(http://digie-image-test.oss.aliyuncs.com/FoodImage/40/20141009094809909.jpg) ;">
+								<div class="specialFood">
+									波斯卡特葡萄酒<span style="margin-right: 5px;float: right;color: #ff6600">￥238</span>
+								</div>
+					        </div>
+					        <div class="sale-food-list" style="background-image: url(http://digie-image-test.oss.aliyuncs.com/FoodImage/40/20141009094840176.jpg) ;">
+								<div class="specialFood">波斯卡特葡萄酒<span style="margin-right: 5px;float: right;color: #ff6600">￥238</span></div>
+					        </div>
+					        <div class="sale-food-list" style="background-image: url(http://digie-image-test.oss.aliyuncs.com/FoodImage/40/20141009094840176.jpg) ;">
+								<div class="specialFood">波斯卡特葡萄酒<span style="margin-right: 5px;float: right;color: #ff6600">￥238</span></div>
+					        </div>
+					        <div class="sale-food-list" style="background-image: url(http://digie-image-test.oss.aliyuncs.com/FoodImage/40/20141009094840176.jpg) ;">
+								<div class="specialFood">波斯卡特葡萄酒<span style="margin-right: 5px;float: right;color: #ff6600">￥238</span></div>
+					        </div>					        
+					    </div>	
+					</div>
+				</div>
+			</li>
+		</ul>
+</div>	 -->
+
+<div id="div4Active" class="main-box none">
+		<ul class="m-b-list">
+			<li class="box-horizontal" >
+				<div id="promotionTitle" style="width:100%;text-align: center;font-size: 20px;font-weight: bold;">----</div>
+			</li>
+			<li>
+				<div style="width:100%;text-align: center;margin-top: 5px;"><img id="promotionImage" alt="" src="images/member_card.jpg" width="95%"></div>
+			</li>
+			<li class="none-line">
+				<div style="height: 55px;width: 100%;text-align: right;" >
+					<a href="javascript:void(0)" style="font-size: 15px;font-weight: bold;" class="button rounded green"> 立即查看→ </a>
+				</div>	
+			</li>				
+		</ul>
 </div>	
+
+<div id="div4Welcome" class="main-box none" align="center">
+	<p id="restName" class="welcomeFont">利雅园酒家</p>
+	<p class="welcomeFont">谢谢惠顾, 欢迎再次光临</p>
+</div>
+
 
 </body>
 </html>

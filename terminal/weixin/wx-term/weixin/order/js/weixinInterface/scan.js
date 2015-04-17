@@ -1,6 +1,6 @@
 
 $(function(){
-	Util.lm.show();
+//	Util.lm.show();
 
 	$.ajax({
 		url : '../../WXInterface.do',
@@ -28,9 +28,6 @@ $(function(){
 	
 });
 
-
-
-
 /*var ajax = xhr({
     url:'../../WXInterface.do',
     data:{
@@ -53,6 +50,8 @@ wx.ready(function(){
 	    needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
 	    scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
 	    success: function (res) {
+	    	// 当needResult 为 1 时，扫码返回的结果  var result = res.resultStr;
+	    	
 /*	    	xhr({
 	    	    url:'../../WXOperateMember.do',
 	    	    data:{
@@ -71,6 +70,8 @@ wx.ready(function(){
 	    	});*/
 	    	$('#div4ScanMsg').html('正在处理信息...');
 	    	
+	    	var restName;
+	    	
 	    	$.post('../../WXOperateMember.do', {
 	    		dataSource:'inpour',
 	    		oid : Util.mp.oid,
@@ -81,6 +82,29 @@ wx.ready(function(){
 	    		if(result.success){
 	    			$('#div4ScanMsg').html('会员支付成功!');
 	    			$('#divOrderInfo').show();
+
+	    			$('#spanOrderId').text(result.other.order.id);
+	    			$('#spanMemberName').text(result.other.member.name);
+	    			$('#spanBillShouldPay').text(result.other.order.actualPriceBeforeDiscount);
+	    			$('#spanBillAfterDiscount').text(result.other.order.actualPrice);
+	    			$('#memberPoint').text(result.other.member.point);
+	    			
+	    			restName = result.other.restName;
+	    			
+//	    			var foodTemplet = '	<li class="box-horizontal" >' +
+//    				'<div style="width:80%">{foodName}</div>' +
+//    				'<div style="width:20%;text-align: right;">¥ {price}</div>'+
+//    				'</li>';	    			
+//	    			var html = [];
+//	    			var orderFoods = result.other.order.orderFoods;
+//	    			for (var i = 0; i < orderFoods.length; i++) {
+//	    				html.push(foodTemplet.format({
+//	    					foodName : orderFoods[i].foodName,
+//	    					price : orderFoods[i].totalPrice
+//	    				}));
+//					}
+//	    			$('#orderPrice').after(html.join(''));
+	    			
 	    		}else{
 	    			alert(result.msg);
 	    		}   	    	
@@ -88,7 +112,20 @@ wx.ready(function(){
 	    		alert("注入会员出错, 请稍后再试");
 	    	});
 	    	
-	    	// 当needResult 为 1 时，扫码返回的结果  var result = res.resultStr;
+	    	$.post('../../WXQueryPromotion.do', {dataSource : 'promotions', fid : Util.mp.fid, oid : Util.mp.oid}, function(data){
+	    		if(data.success){
+	    			var promotion = data.root[0];
+	    			
+	    			$('#div4Active').show();
+	    			$('#promotionTitle').html(promotion.title);
+	    			$('#promotionImage').attr("src", promotion.image);
+	    		}else{
+	    			$('#restName').text(restName);
+	    			$('#div4Welcome').show();
+	    		}
+	    		
+	    	});
+	    	
 		}
 	});
 });
