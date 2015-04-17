@@ -16,6 +16,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.maker.weixin.auth.AuthorizerToken;
 import org.marker.weixin.HandleMessageListener;
 import org.marker.weixin.api.Token;
 import org.marker.weixin.msg.Msg;
@@ -105,6 +106,16 @@ public class WxSession {
 		}
 	}
 
+	public void callback(AuthorizerToken token, Callable<Msg> callable){
+		try {
+			this.os.write(0);
+			this.os.flush();
+			callable.call().send(token);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void callback(Token token, Callable<Msg> callable){
 		try {
 			this.os.write(0);

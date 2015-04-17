@@ -10,6 +10,7 @@ import org.apache.struts.action.ActionMapping;
 import org.marker.weixin.session.WxAuthSession;
 
 import com.wireless.Actions.weixin.WeiXinHandleMessage;
+import com.wireless.Actions.weixin.WxAccessHandleMessage;
 
 public class WxRecEventAction extends Action {
 	@Override
@@ -21,7 +22,7 @@ public class WxRecEventAction extends Action {
 		
 		WxAuthSession session = new WxAuthSession(timestamp, nonce, msgSignature, AuthParam.TOKEN, AuthParam.ENCRYPT_AES_KEY, AuthParam.APP_ID);
 		try{
-			//String account = request.getParameter("account");
+			session.addOnHandleMessageListener(new WxAccessHandleMessage(session));
 			session.addOnHandleMessageListener(new WeiXinHandleMessage(session, "http://" + request.getLocalAddr() + "/wx-term"));
 			session.process(request.getInputStream(), response.getOutputStream());
 		}finally{

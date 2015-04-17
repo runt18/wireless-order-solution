@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import org.apache.struts.action.ActionServlet;
 import org.maker.weixin.auth.ComponentAccessToken;
 import org.maker.weixin.auth.ComponentVerifyTicket;
+import org.maker.weixin.auth.PreAuthCode;
 
 import com.wireless.Actions.weixin.auth.AuthParam;
 import com.wireless.db.DBCon;
@@ -62,7 +63,8 @@ public class InitServlet extends ActionServlet {
 	        
 	        AuthParam.COMPONENT_VERIFY_TICKET = JObject.parse(ComponentVerifyTicket.JSON_CREATOR, 0, sb.toString());
 	        AuthParam.COMPONENT_ACCESS_TOKEN = ComponentAccessToken.newInstance(AuthParam.COMPONENT_VERIFY_TICKET);
-	        
+	        AuthParam.PRE_AUTH_CODE = PreAuthCode.newInstance( AuthParam.COMPONENT_ACCESS_TOKEN);
+		    
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

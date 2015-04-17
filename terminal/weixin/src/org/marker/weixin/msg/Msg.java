@@ -3,6 +3,7 @@ package org.marker.weixin.msg;
 import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
+import org.maker.weixin.auth.AuthorizerToken;
 import org.marker.weixin.api.BaseAPI;
 import org.marker.weixin.api.Status;
 import org.marker.weixin.api.Token;
@@ -38,6 +39,10 @@ public abstract class Msg implements Jsonable{
 		return null;
 	}
 
+	public Status send(AuthorizerToken token) throws ClientProtocolException, IOException{
+		return BaseAPI.doPost(BaseAPI.BASE_URI + "/cgi-bin/message/custom/send?access_token=" + token.getAccessToken(), this);
+	}
+	
 	public Status send(Token token) throws ClientProtocolException, IOException{
 		return BaseAPI.doPost(BaseAPI.BASE_URI + "/cgi-bin/message/custom/send?access_token=" + token.getAccessToken(), this);
 	}
