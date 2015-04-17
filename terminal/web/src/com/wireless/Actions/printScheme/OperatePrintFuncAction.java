@@ -137,6 +137,13 @@ public class OperatePrintFuncAction extends DispatchAction{
 					builder.addRegion(new Region(Short.parseShort(regionId)));
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
+				
+				//单尾结束语
+				String comment = request.getParameter("comment");
+				if(comment != null && !comment.isEmpty()){
+					builder.setComment(comment);
+				}
+				
 				PrintFuncDao.addFunc(dbCon, staff, builder);
 				
 			}else if(PType.valueOf(pType) ==PType.PRINT_TRANSFER_TABLE){
@@ -267,6 +274,11 @@ public class OperatePrintFuncAction extends DispatchAction{
 					for (String r : region) {
 						builder.addRegion(new Region(Short.parseShort(r)));
 					}
+				}
+				//单尾结束语
+				String comment = request.getParameter("comment");
+				if(comment != null && !comment.isEmpty()){
+					builder.setComment(comment);
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
