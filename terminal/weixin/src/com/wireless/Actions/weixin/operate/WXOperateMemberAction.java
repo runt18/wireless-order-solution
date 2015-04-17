@@ -271,6 +271,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			dbCon.conn.setAutoCommit(false);
 			
 			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
+			final Restaurant rest = RestaurantDao.getById(rid);
 			Staff staff = StaffDao.getAdminByRestaurant(rid);
 			WxMember wxMember;
 			if(!WxMemberDao.getByCond(dbCon, staff, new WxMemberDao.ExtraCond().setSerial(openId)).isEmpty()){
@@ -293,7 +294,8 @@ public class WXOperateMemberAction extends DispatchAction {
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putJsonable("order", order, flag);
-					jm.putString("wxMemberName", member.getName());
+					jm.putJsonable("member", member, flag);
+					jm.putString("restName", rest.getName());
 					return jm;
 				}
 				

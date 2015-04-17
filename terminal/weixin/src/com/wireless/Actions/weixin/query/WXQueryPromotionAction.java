@@ -12,10 +12,13 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.member.MemberDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -62,4 +65,50 @@ public class WXQueryPromotionAction extends DispatchAction{
 		return null;		
 		
 	}	
+	
+	
+	public ActionForward promotions(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		String formId = request.getParameter("fid");
+		String oid = request.getParameter("oid");
+		
+		int rid = 0;
+		Staff staff;
+		if(pin != null){
+			staff = StaffDao.verify(Integer.parseInt(pin));
+		}else{
+			DBCon dbCon = new DBCon();
+			dbCon.connect();
+			rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+			staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
+			dbCon.disconnect();
+		}
+		
+		JObject jobject = new JObject();
+		try{
+			
+			List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(MemberDao.getByWxSerial(staff, oid)).setPromotionType(Promotion.Type.NORMAL), null);
+			
+			if(!coupons.isEmpty()){
+				jobject.setRoot(coupons.get(0));
+			}else{
+				jobject.initTip(false, "无相关活动");
+			}
+			
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;		
+		
+	}		
 }
