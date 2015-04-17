@@ -1019,9 +1019,14 @@ function showPanel(v){
 		Ext.getCmp('kitchensTree').hide();
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').show();
-		Ext.getCmp('printCommentPanel').hide();
 		Ext.query("#showPrintPaper .x-panel-body")[0].style.backgroundImage = 'url(../../images/billboard_select.png)';
 		cancelFoodBtn.hide();
+		
+		if(v == 127){
+			Ext.getCmp('printCommentPanel').show();
+		}else{
+			Ext.getCmp('printCommentPanel').hide();
+		}
 	}
 	//防止切换时格式错乱
 	Ext.getCmp('addPrintFuncWin').center();
