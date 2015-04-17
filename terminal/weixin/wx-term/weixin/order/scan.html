@@ -22,10 +22,19 @@
 #payFoodList li{
 	line-height : 30px;
 }
+body{
+	background-color: #DFE8F6;
+}
+
+#div4ScanMsg{
+	font-size: 20px;
+	font-weight: bold;
+}
 
 .welcomeFont{
 	font-size: 20px;
 	font-weight : bold;
+	color: maroon;
 	font-family: 'Comic Sans MS', cursive;
 }
 
@@ -33,9 +42,7 @@
 </head>
 <body>
 	
-<div id="div4ScanMsg" align="center">
-	正在打开扫描仪......
-</div>	
+
 
 <div id="div4OrderInfo" class="main-box none">
 	<ul class="m-b-list">
@@ -89,6 +96,15 @@
 		</ul>
 </div>	 -->
 
+<div id="div4ScanMsg" align="center">
+	<img src="images/ajax-loader.gif" style="vertical-align:middle;"> <span>正在打开扫描仪...</span>
+</div>	
+
+<div id="div4Welcome" class="main-box none" align="center" style="padding: 15px 0">
+	<p id="restName" class="welcomeFont">----</p>
+	<p class="welcomeFont">谢谢惠顾, 欢迎再次光临</p>
+</div>
+
 <div id="div4Active" class="main-box none">
 		<ul class="m-b-list">
 			<li class="box-horizontal" >
@@ -105,10 +121,7 @@
 		</ul>
 </div>	
 
-<div id="div4Welcome" class="main-box none" align="center">
-	<p id="restName" class="welcomeFont">利雅园酒家</p>
-	<p class="welcomeFont">谢谢惠顾, 欢迎再次光临</p>
-</div>
+
 
 
 </body>

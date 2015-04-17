@@ -1,8 +1,6 @@
 var couponId;
 
 $(function(){
-//	Util.lm.show();
-
 	$.ajax({
 		url : '../../WXInterface.do',
 		dataType : 'json',
@@ -20,7 +18,6 @@ $(function(){
 			    signature: data.other.signature,// 必填，签名，见附录1
 			    jsApiList: ["scanQRCode"] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
 			});		
-			Util.lm.hide();
 		},
 		error : function(xhr, errorType, error){
 			alert('操作失误, 请重新进入');
@@ -57,9 +54,7 @@ wx.ready(function(){
 	    success: function (res) {
 	    	// 当needResult 为 1 时，扫码返回的结果  var result = res.resultStr;
 	    	
-	    	$('#div4ScanMsg').html('正在处理信息...');
-
-	    	var restName;
+	    	$('#div4ScanMsg').html('<span>正在处理信息...</span>');
 
 	    	$.post('../../WXOperateMember.do', {
 	    		dataSource:'inpour',
@@ -69,7 +64,9 @@ wx.ready(function(){
 //	    		orderId : 3064505
 	    	}, function(result){
 	    		if(result.success){
-	    			$('#div4ScanMsg').html('会员操作成功!');
+	    			$('#div4ScanMsg').html('<span>会员操作成功!</span>');
+	    			$('#div4ScanMsg').fadeOut(2000);
+	    			
 	    			$('#div4OrderInfo').show();
 
 	    			$('#spanOrderId').text(result.other.order.id);
@@ -78,30 +75,28 @@ wx.ready(function(){
 	    			$('#spanBillAfterDiscount').text(result.other.order.actualPrice);
 	    			$('#memberPoint').text(result.other.member.point);
 	    			
-	    			restName = result.other.restName;
+	    			$('#restName').text(result.other.restName);
+	    			
+	    	    	$.post('../../OperatePromotion.do', {dataSource : 'promotions', fid : Util.mp.fid, oid : Util.mp.oid}, function(data){
+	    	    		if(data.success){
+	    	    			var promotion = data.root[0].promotion;
+	    	    			
+	    	    			$('#div4Active').show();
+	    	    			$('#promotionTitle').html(promotion.title);
+	    	    			$('#promotionImage').attr("src", promotion.image);
+	    	    			
+	    	    			couponId = data.root[0].couponId;
+	    	    		}else{
+	    	    			$('#div4Welcome').show();
+	    	    		}
+	    	    		
+	    	    	});
 	    		}else{
 	    			alert(result.msg);
 	    		}   	    	
 	    	}, "json").error(function(result){
 	    		alert("注入会员出错, 请稍后再试");
 	    	});
-
-	    	$.post('../../OperatePromotion.do', {dataSource : 'promotions', fid : Util.mp.fid, oid : Util.mp.oid}, function(data){
-	    		if(data.success){
-	    			var promotion = data.root[0].promotion;
-	    			
-	    			$('#div4Active').show();
-	    			$('#promotionTitle').html(promotion.title);
-	    			$('#promotionImage').attr("src", promotion.image);
-	    			
-	    			couponId = data.root[0].couponId;
-	    		}else{
-	    			$('#restName').text(restName);
-	    			$('#div4Welcome').show();
-	    		}
-	    		
-	    	});
-	    	
 		}
 	});
 });
