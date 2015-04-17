@@ -57,26 +57,10 @@ wx.ready(function(){
 	    success: function (res) {
 	    	// 当needResult 为 1 时，扫码返回的结果  var result = res.resultStr;
 	    	
-/*	    	xhr({
-	    	    url:'../../WXOperateMember.do',
-	    	    data:{
-		    		dataSource:'inpour',
-		    		oid : Util.mp.oid,
-		    		fid : Util.mp.fid,
-		    		orderId : 4393328
-	    	    },
-	    	    method:'POST',
-	    	    success: function  (data) {
-	    	        var obj = JSON.parse(data);
-		    		if(obj.success){
-		    			document.getElementById('div4ScanMsg').innerHTML('会员支付成功!');
-		    		}
-	    	    }
-	    	});*/
 	    	$('#div4ScanMsg').html('正在处理信息...');
-	    	
+
 	    	var restName;
-	    	
+
 	    	$.post('../../WXOperateMember.do', {
 	    		dataSource:'inpour',
 	    		oid : Util.mp.oid,
@@ -85,8 +69,8 @@ wx.ready(function(){
 //	    		orderId : 3064505
 	    	}, function(result){
 	    		if(result.success){
-	    			$('#div4ScanMsg').html('会员支付成功!');
-	    			$('#divOrderInfo').show();
+	    			$('#div4ScanMsg').html('会员操作成功!');
+	    			$('#div4OrderInfo').show();
 
 	    			$('#spanOrderId').text(result.other.order.id);
 	    			$('#spanMemberName').text(result.other.member.name);
@@ -95,29 +79,14 @@ wx.ready(function(){
 	    			$('#memberPoint').text(result.other.member.point);
 	    			
 	    			restName = result.other.restName;
-	    			
-//	    			var foodTemplet = '	<li class="box-horizontal" >' +
-//    				'<div style="width:80%">{foodName}</div>' +
-//    				'<div style="width:20%;text-align: right;">¥ {price}</div>'+
-//    				'</li>';	    			
-//	    			var html = [];
-//	    			var orderFoods = result.other.order.orderFoods;
-//	    			for (var i = 0; i < orderFoods.length; i++) {
-//	    				html.push(foodTemplet.format({
-//	    					foodName : orderFoods[i].foodName,
-//	    					price : orderFoods[i].totalPrice
-//	    				}));
-//					}
-//	    			$('#orderPrice').after(html.join(''));
-	    			
 	    		}else{
 	    			alert(result.msg);
 	    		}   	    	
 	    	}, "json").error(function(result){
 	    		alert("注入会员出错, 请稍后再试");
 	    	});
-	    	
-	    	$.post('../../WXQueryPromotion.do', {dataSource : 'promotions', fid : Util.mp.fid, oid : Util.mp.oid}, function(data){
+
+	    	$.post('../../OperatePromotion.do', {dataSource : 'promotions', fid : Util.mp.fid, oid : Util.mp.oid}, function(data){
 	    		if(data.success){
 	    			var promotion = data.root[0].promotion;
 	    			
@@ -136,3 +105,34 @@ wx.ready(function(){
 		}
 	});
 });
+
+//xhr({
+//url:'../../WXOperateMember.do',
+//data:{
+//	dataSource:'inpour',
+//	oid : Util.mp.oid,
+//	fid : Util.mp.fid,
+//	orderId : 4393328
+//},
+//method:'POST',
+//success: function  (data) {
+//    var obj = JSON.parse(data);
+//	if(obj.success){
+//		document.getElementById('div4ScanMsg').innerHTML('会员支付成功!');
+//	}
+//}
+//});
+
+//var foodTemplet = '	<li class="box-horizontal" >' +
+//'<div style="width:80%">{foodName}</div>' +
+//'<div style="width:20%;text-align: right;">¥ {price}</div>'+
+//'</li>';	    			
+//var html = [];
+//var orderFoods = result.other.order.orderFoods;
+//for (var i = 0; i < orderFoods.length; i++) {
+//	html.push(foodTemplet.format({
+//		foodName : orderFoods[i].foodName,
+//		price : orderFoods[i].totalPrice
+//	}));
+//}
+//$('#orderPrice').after(html.join(''));
