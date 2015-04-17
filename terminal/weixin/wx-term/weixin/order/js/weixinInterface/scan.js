@@ -1,3 +1,4 @@
+var couponId;
 
 $(function(){
 //	Util.lm.show();
@@ -27,6 +28,10 @@ $(function(){
 	});	
 	
 });
+
+function entryPromotion(){
+	Util.skip('sales.html', couponId);
+}
 
 /*var ajax = xhr({
     url:'../../WXInterface.do',
@@ -114,11 +119,13 @@ wx.ready(function(){
 	    	
 	    	$.post('../../WXQueryPromotion.do', {dataSource : 'promotions', fid : Util.mp.fid, oid : Util.mp.oid}, function(data){
 	    		if(data.success){
-	    			var promotion = data.root[0];
+	    			var promotion = data.root[0].promotion;
 	    			
 	    			$('#div4Active').show();
 	    			$('#promotionTitle').html(promotion.title);
 	    			$('#promotionImage').attr("src", promotion.image);
+	    			
+	    			couponId = data.root[0].couponId;
 	    		}else{
 	    			$('#restName').text(restName);
 	    			$('#div4Welcome').show();
