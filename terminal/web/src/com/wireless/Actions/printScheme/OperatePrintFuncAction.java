@@ -129,6 +129,12 @@ public class OperatePrintFuncAction extends DispatchAction{
 					builder.addRegion(new Region(Short.parseShort(regionId)));
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
+				
+				//单尾结束语
+				String comment = request.getParameter("comment");
+				if(comment != null && !comment.isEmpty()){
+					builder.setComment(comment);
+				}				
 				PrintFuncDao.addFunc(dbCon, staff, builder);
 				
 			}else if(PType.valueOf(pType) ==PType.PRINT_TEMP_RECEIPT){
@@ -265,6 +271,11 @@ public class OperatePrintFuncAction extends DispatchAction{
 					}
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
+				//单尾结束语
+				String comment = request.getParameter("comment");
+				if(comment != null && !comment.isEmpty()){
+					builder.setComment(comment);
+				}
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) ==PType.PRINT_TEMP_RECEIPT){
 				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(funcId);
