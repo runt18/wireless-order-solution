@@ -92,6 +92,7 @@ public class WXQueryPromotionAction extends DispatchAction{
 			List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(MemberDao.getByWxSerial(staff, oid)).setPromotionType(Promotion.Type.NORMAL), null);
 			
 			if(!coupons.isEmpty()){
+				coupons.get(0).setPromotion(PromotionDao.getById(staff, coupons.get(0).getPromotion().getId()));
 				jobject.setRoot(coupons.get(0));
 			}else{
 				jobject.initTip(false, "无相关活动");
@@ -105,7 +106,7 @@ public class WXQueryPromotionAction extends DispatchAction{
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jobject.toString(Coupon.COUPON_JSONABLE_WITH_PROMOTION));
 		}
 		
 		return null;		
