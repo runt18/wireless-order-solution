@@ -689,7 +689,7 @@ function init(){
 				}]
 			}, kitchenTree]			
 		},{
-			
+			id : 'paperDemoCmp',
 			title : '打单示例',
 			region : 'east',
 			layout : 'border',
@@ -995,23 +995,25 @@ function showPanel(v){
 	//获取退菜btn
 	var cancelFoodBtn = Ext.getCmp('chkIsNeedToCancel');
 	
-	if(v == 1 || v ==8){
+	var paperDemoCmp = Ext.query("#showPrintPaper .x-panel-body")[0];
+	if(v == 1 || v ==8){//总单
 		Ext.getCmp('kitchens').hide();
 		Ext.getCmp('kitchensTree').hide();
 		Ext.getCmp('depts').show();
 		Ext.getCmp('regions').show();
 		Ext.getCmp('printCommentPanel').show();
-		Ext.query("#showPrintPaper .x-panel-body")[0].style.backgroundImage = 'url(../../images/bill_select.png)';
+		
+		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E7%82%B9%E8%8F%9C%E6%80%BB%E5%8D%95.jpg)';
 		
 		cancelFoodBtn.show();
 		cancelFoodBtn.setBoxLabel('打印退菜总单');
-	}else if(v == 2 || v == 5){
+	}else if(v == 2 || v == 5){//分单
 		Ext.getCmp('kitchens').show();
 		Ext.getCmp('kitchensTree').show();
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').hide();
 		Ext.getCmp('printCommentPanel').hide();
-		Ext.query("#showPrintPaper .x-panel-body")[0].style.backgroundImage = 'url(../../images/basicManagement_select.png)';
+		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/fendan.jpg)';
 		cancelFoodBtn.show();
 		cancelFoodBtn.setBoxLabel('打印退菜分单');
 	}else{
@@ -1019,15 +1021,26 @@ function showPanel(v){
 		Ext.getCmp('kitchensTree').hide();
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').show();
-		Ext.query("#showPrintPaper .x-panel-body")[0].style.backgroundImage = 'url(../../images/billboard_select.png)';
 		cancelFoodBtn.hide();
 		
-		if(v == 127 || v == 3){
+		if(v == 127){//暂结
 			Ext.getCmp('printCommentPanel').show();
-		}else{
+			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E6%9A%82%E7%BB%93%E5%8D%95.jpg)';
+		}else if(v == 3){//结账
+			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/jiezhang.jpg)';
+			Ext.getCmp('printCommentPanel').show();
+		}else if(v == 6){//转台
+			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E8%BD%AC%E5%8F%B0.jpg)';
 			Ext.getCmp('printCommentPanel').hide();
+		}else if(v == 9){//催菜
+			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E5%82%AC%E8%8F%9C.jpg)';
+			Ext.getCmp('printCommentPanel').hide();			
 		}
 	}
+	Ext.getCmp('paperDemoCmp').doLayout();
+	
+	paperDemoCmp.style.backgroundSize = 'cover';
+	
 	//防止切换时格式错乱
 	Ext.getCmp('addPrintFuncWin').center();
 
