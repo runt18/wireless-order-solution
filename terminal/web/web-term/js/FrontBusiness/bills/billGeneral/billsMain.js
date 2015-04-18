@@ -719,7 +719,7 @@ Ext.onReady(function(){
 			[true, false, false, true], 
 			['帐单号', 'id'],
 			['流水号', 'seqId'],
-			['台号', 'table.alias',120,,'function(v,m,r){if(r.get("table.name")!=""){return v+\"(\"+r.get("table.name")+\")\";}else{return v;}}'],
+			['台号', 'table.alias',120,,'function(v,m,r){if(v != 0){return v+\"(\"+r.get("table.name")+\")\";}else{return r.get("table.name");}}'],
 			['区域', 'table.region.name'],
 			['日期', 'orderDateFormat', 150],
 			['账单类型', 'categoryText',,'center'],
