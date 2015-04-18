@@ -89,7 +89,7 @@ public class Printer implements Jsonable{
 		}
 		
 		public boolean isEnabledChanged(){
-			return this.isEnabled == -1;
+			return this.isEnabled != -1;
 		}
 		
 		public UpdateBuilder setEnabled(boolean isEnabled){
