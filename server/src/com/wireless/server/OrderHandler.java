@@ -196,6 +196,10 @@ class OrderHandler implements Runnable{
 					Table tblToQuery = TableDao.getById(staff, new Parcel(request.body).readParcel(Table.CREATOR).getId());
 					response = new RespACK(request.header, (byte)tblToQuery.getStatus().getVal());
 					
+				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_FEAST_ORDER){
+					//handle feast order request
+					response = doFeastOrder(staff, request);
+					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 					//handle insert order request
 					response = doInsertOrder(staff, request);
@@ -332,6 +336,11 @@ class OrderHandler implements Runnable{
 				System.err.println(e.toString());
 			}
 		}		
+	}
+	
+	private RespPackage doFeastOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+		OrderDao.feast(staff, new Parcel(request.body).readParcel(Order.FeastBuilder.CREATOR));
+		return new RespACK(request.header);
 	}
 	
 	private RespPackage doQueryWxOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
@@ -519,10 +528,8 @@ class OrderHandler implements Runnable{
 		 */
 		if(request.header.type == Type.PAY_TEMP_ORDER){
 			if(payBuilder.getPrintOption() == PrintOption.DO_PRINT){
-				printHandler.process(JobContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, 
-																				  staff,
-																				  printers,
-																				  PayOrder.payTemp(staff, payBuilder)));
+				printHandler.process(JobContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, staff,  printers,
+																				  	   PayOrder.payTemp(staff, payBuilder)));
 			}else{
 				PayOrder.payTemp(staff, payBuilder);
 			}
@@ -531,9 +538,16 @@ class OrderHandler implements Runnable{
 			
 			final Order order = PayOrder.pay(staff, payBuilder);
 			
-			//Perform SMS notification to member coupon dispatch & member upgrade in another thread
-			//so that not affect the order payment.
-			if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
+			//Perform to print receipt to this order.
+			printHandler.process(JobContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, staff, printers, order));
+
+			if(order.isSettledByMember()){
+				
+				//Perform to print the member receipt if settled by member.
+				printHandler.process(JobContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, staff, printers,
+																							 MemberOperationDao.getByOrder(staff, order.getId())));
+				
+				//Perform SMS notification to member coupon dispatch & member upgrade in another thread so that not affect the order payment.
 				WirelessSocketServer.threadPool.execute(new Runnable(){
 					@Override
 					public void run() {
@@ -573,16 +587,7 @@ class OrderHandler implements Runnable{
 						}
 					}
 				});
-			}
-			
-			printHandler.process(JobContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, staff, printers, order));
-			
-			//Perform to print the member receipt if settled by member.
-			if(order.isSettledByMember()){
-				printHandler.process(JobContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, 
-																								staff, 
-																								printers,
-																								MemberOperationDao.getByOrder(staff, order.getId())));
+
 			}
 			
 		}

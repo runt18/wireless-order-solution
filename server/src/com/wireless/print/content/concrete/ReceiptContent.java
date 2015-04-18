@@ -11,6 +11,7 @@ import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.print.PVar;
 import com.wireless.print.content.concrete.FoodDetailContent.DisplayConfig;
 import com.wireless.print.content.concrete.FoodDetailContent.DisplayItem;
@@ -26,16 +27,28 @@ public class ReceiptContent extends ConcreteContent {
 	private String mTemplate;
 	private final String mWaiter;
 	private final Order mOrder;
-
-	public ReceiptContent(int receiptStyle, Restaurant restaurant, Order order, String waiter, PType printType, PStyle style) {
+	private final WxRestaurant mWxRestaurant;
+	private String ending;
+	
+	public ReceiptContent(int receiptStyle, Restaurant restaurant, WxRestaurant wxRestaurant, Order order, String waiter, PType printType, PStyle style) {
 		super(printType, style);
 		mTemplate = WirelessSocketServer.printTemplates.get(PType.PRINT_RECEIPT).get(style);
 		mRestaurant = restaurant;
+		mWxRestaurant = wxRestaurant;
 		mReceiptStyle = receiptStyle;
 		mWaiter = waiter;
 		mOrder = order;
 	}
 
+	public ReceiptContent setEnding(String ending){
+		this.ending = ending;
+		return this;
+	}
+	
+	private boolean hasEnding(){
+		return ending != null && ending.trim().length() != 0;
+	}
+	
 	@Override 
 	public String toString(){
 		if(mPrintType == PType.PRINT_RECEIPT){
@@ -121,27 +134,40 @@ public class ReceiptContent extends ConcreteContent {
 			mTemplate = mTemplate.replace(PVar.RECEIPT_COMMENT, "备注：" + mOrder.getComment());
 		}
 		
-		StringBuilder ending = new StringBuilder();
-		if(!mRestaurant.getAddress().isEmpty()){
-			ending.append(new CenterAlignedDecorator(mRestaurant.getAddress(), mStyle).toString());
-		}
-		if(!mRestaurant.getTele1().isEmpty()){
-			if(ending.length() != 0){
-				ending.append(SEP);
-			}
-			ending.append(new CenterAlignedDecorator(mRestaurant.getTele1(), mStyle).toString());
-		}
-		
-		if(ending.length() != 0){
-			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, ending.toString());
+		if(getPrintType() == PType.PRINT_TEMP_RECEIPT && mWxRestaurant.hasQrCode() && getStyle() == PStyle.PRINT_STYLE_80MM){
+			final String qrCodeContent = mWxRestaurant.getQrCode() + "?" + mOrder.getId();
+			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new String(new char[]{0x1B, 0x61, 0x01}) + new QRCodeContent(getPrintType(), getStyle(), qrCodeContent) + new String(new char[]{0x1B, 0x61, 0x00}) +
+																		  SEP +
+																		  new CenterAlignedDecorator(hasEnding() ? ending : "微信扫一扫", mStyle).toString());
+
 		}else{
-//			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new String(new char[]{0x1B, 0x61, 0x01}) + new QRCodeContent(getPrintType(), getStyle(), String.valueOf(mOrder.getId())) + 
-//																		  SEP + 
-//																		  new String(new char[]{0x1B, 0x61, 0x00}) + new CenterAlignedDecorator("欢迎您再次光临", mStyle).toString());
-			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new CenterAlignedDecorator("欢迎您再次光临", mStyle).toString());
-		}
+			if(hasEnding()){
+				mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, ending);
+			}else{
+				final StringBuilder receiptEnding = new StringBuilder();
+				if(!mRestaurant.getAddress().isEmpty()){
+					receiptEnding.append(new CenterAlignedDecorator(mRestaurant.getAddress(), mStyle).toString());
+				}
+				if(!mRestaurant.getTele1().isEmpty()){
+					if(receiptEnding.length() != 0){
+						receiptEnding.append(SEP);
+					}
+					receiptEnding.append(new CenterAlignedDecorator(mRestaurant.getTele1(), mStyle).toString());
+				}
+				
+				if(receiptEnding.length() != 0){
+					mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, receiptEnding.toString());
+				}else{
+					mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new CenterAlignedDecorator("欢迎您再次光临", mStyle).toString());
+				}
+			}
+		}		
 		
-		return mPrintType == PType.PRINT_RECEIPT ? mTemplate + EJECT : mTemplate;
+		if(mPrintType == PType.PRINT_RECEIPT){
+			return mTemplate + EJECT;
+		}else{
+			return mTemplate;
+		}
 	}
 	
 	/**

@@ -12,6 +12,7 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.PaymentDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.system.SystemDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.ShiftDetail;
@@ -29,6 +30,7 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.print.content.Content;
 import com.wireless.print.content.ContentCombinator;
 import com.wireless.print.content.concrete.FoodDetailContent;
@@ -101,10 +103,10 @@ public class JobContentFactory {
 										   				   new SummaryContent(order,
 										   						   			  staff.getName(),
 										   						   			  printType, 
-										   						   			  printer.getStyle(), detailType)));
+										   						   			  printer.getStyle(), detailType).setEnding(func.getComment())));
 						}else{
 							//Generate the summary to specific departments.
-							List<OrderFood> ofToDept = new ArrayList<OrderFood>();
+							final List<OrderFood> ofToDept = new ArrayList<OrderFood>();
 							for(OrderFood of : order.getOrderFoods()){
 								if(func.getDepartment().contains(of.asFood().getKitchen().getDept())){
 									ofToDept.add(of);
@@ -120,7 +122,7 @@ public class JobContentFactory {
 							   						   			  orderToDept,
 							   						   			  staff.getName(),
 							   						   			  printType, 
-							   						   			  printer.getStyle(), detailType)));
+							   						   			  printer.getStyle(), detailType).setEnding(func.getComment())));
 							}
 						}
 						
@@ -227,9 +229,10 @@ public class JobContentFactory {
 		try{
 			dbCon.connect();
 			Restaurant restaurant = RestaurantDao.getById(dbCon, staff.getRestaurantId());
-			int receiptStyle = SystemDao.getSetting(dbCon, staff.getRestaurantId()).getReceiptStyle();
+			WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+			final int receiptStyle = SystemDao.getSetting(dbCon, staff.getRestaurantId()).getReceiptStyle();
 			
-			List<JobContent> jobContents = new ArrayList<JobContent>();
+			final List<JobContent> jobContents = new ArrayList<JobContent>();
 			
 			for(Printer printer : printers){
 				for(PrintFunc func : printer.getPrintFuncs()){
@@ -237,10 +240,11 @@ public class JobContentFactory {
 						jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 														new ReceiptContent(receiptStyle,
 															  			   restaurant, 
+															  			   wxRestaurant,
 															  			   order,
 															  			   staff.getName(),
 															  			   printType, 
-															  			   printer.getStyle())));
+															  			   printer.getStyle()).setEnding(func.getComment())));
 					}
 				}
 			}

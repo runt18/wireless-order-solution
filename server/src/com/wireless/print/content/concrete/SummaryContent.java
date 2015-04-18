@@ -21,6 +21,7 @@ public class SummaryContent extends ConcreteContent {
 	private final String mWaiter;
 	private final Order mOrder;
 	private final FoodDetailContent.DetailType mDetailType;
+	private String ending;
 	
 	public SummaryContent(Order order, String waiter, PType printType, PStyle style, FoodDetailContent.DetailType detailType) {
 		super(printType, style);
@@ -39,6 +40,11 @@ public class SummaryContent extends ConcreteContent {
 		mDetailType = detailType;
 	}
 
+	public SummaryContent setEnding(String ending){
+		this.ending = ending;
+		return this;
+	}
+	
 	@Override
 	public String toString(){
 		
@@ -101,7 +107,16 @@ public class SummaryContent extends ConcreteContent {
 						new ExtraFormatDecorator(
 							new FoodListWithSepContent(FoodDetailContent.DISPLAY_CONFIG_4_SUMMARY, mOrder.getOrderFoods(), mPrintType, mStyle, mDetailType), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 		
+		if(hasEnding() && mPrintType == PType.PRINT_ORDER){
+			mTemplate = mTemplate.replace(PVar.VAR_4, "*" + ending + "*");
+		}else{
+			mTemplate = mTemplate.replace(PVar.VAR_4, "");
+		}
+		
 		return mTemplate;
 	}
 
+	private boolean hasEnding(){
+		return ending != null && ending.trim().length() != 0;
+	}
 }
