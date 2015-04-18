@@ -115,9 +115,11 @@ public class OperatePrinterAction extends DispatchAction{
 			String printerName = request.getParameter("printerName");
 			String printerAlias = request.getParameter("printerAlias");
 			int style =Integer.parseInt(request.getParameter("style"));
+			String isEnabled = request.getParameter("isEnabled");
 			
 			Printer.InsertBuilder builder = new Printer.InsertBuilder(printerName, PStyle.valueOf(style));
 			builder.setAlias(printerAlias);
+			builder.setEnabled(Boolean.parseBoolean(isEnabled));
 			PrinterDao.insert(dbCon, staff, builder);
 			jobject.initTip(true, "操作成功, 已添加打印机");
 			
