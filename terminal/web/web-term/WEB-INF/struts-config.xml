@@ -621,6 +621,10 @@
 			type="com.wireless.Actions.login.VerifyRestaurantAction"
 			scope="request" >
 		</action>				
+		<action path="/FeastOrder"
+			type="com.wireless.Actions.dishesOrder.FeastOrderAction"
+			scope="request" >
+		</action>				
 		
 	</action-mappings>
 
