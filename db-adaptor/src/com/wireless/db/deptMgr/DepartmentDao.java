@@ -9,10 +9,51 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.DeptError;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class DepartmentDao {
 
+	public static class ExtraCond{
+		private Department.DeptId deptId;
+		private final List<Department.Type> types = new ArrayList<>();
+		
+		public ExtraCond setId(Department.DeptId deptId){
+			this.deptId = deptId;
+			return this;
+		}
+		
+		public ExtraCond setId(int id){
+			this.deptId = Department.DeptId.valueOf(id);
+			return this;
+		}
+		
+		public ExtraCond addType(Department.Type type){
+			types.add(type);
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(deptId != null){
+				extraCond.append(" AND DEPT.dept_id = " + deptId.getVal());
+			}
+			StringBuilder typeCond = new StringBuilder();
+			for(Department.Type type : types){
+				if(typeCond.length() == 0){
+					typeCond.append(type.getVal());
+				}else{
+					typeCond.append(",").append(type.getVal());
+				}
+			}
+			if(typeCond.length() != 0){
+				extraCond.append(" AND type IN (" + typeCond.toString() + ")");
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	/**
 	 * Move the department up to another.  
 	 * @param staff
@@ -94,6 +135,28 @@ public class DepartmentDao {
 	
 	/**
 	 * Get the department to a specified restaurant defined in {@link Staff} and other extra condition.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the list holding the department result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Department> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the department to a specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -106,14 +169,14 @@ public class DepartmentDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static List<Department> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	public static List<Department> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		
-		List<Department> result = new ArrayList<Department>();
+		final List<Department> result = new ArrayList<Department>();
 		
 		String sql = " SELECT dept_id, name, restaurant_id, type, display_id FROM " + Params.dbName + ".department DEPT " +
 					 " WHERE 1 = 1 " +
 					 " AND DEPT.restaurant_id = " + staff.getRestaurantId() +
-					 (extraCond != null ? extraCond : "") + " " +
+					 (extraCond != null ? extraCond.toString() : "") + " " +
 					 (orderClause != null ? orderClause : " ORDER BY display_id ");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
@@ -162,7 +225,7 @@ public class DepartmentDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Department> getByType(DBCon dbCon, Staff staff, Department.Type type) throws SQLException{
-		return getByCond(dbCon, staff, " AND DEPT.type = " + type.getVal() , null);
+		return getByCond(dbCon, staff, new ExtraCond().addType(type) , null);
 	}
 	
 	/**
@@ -179,7 +242,7 @@ public class DepartmentDao {
 	 */
 	public static List<Department> getDepartments4Inventory(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		List<Department> result = new ArrayList<Department>(getByType(dbCon, staff, Department.Type.NORMAL));
-		result.addAll(getByCond(dbCon, staff, " AND DEPT.type = " + Department.Type.WARE_HOUSE.getVal(), null));
+		result.addAll(getByCond(dbCon, staff, new ExtraCond().addType(Department.Type.WARE_HOUSE), null));
 		return result;
 	}
 	
@@ -242,7 +305,7 @@ public class DepartmentDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static Department getById(DBCon dbCon, Staff staff, int deptId) throws BusinessException, SQLException{
-		List<Department> result = getByCond(dbCon, staff, " AND DEPT.dept_id = " + deptId, null);
+		List<Department> result = getByCond(dbCon, staff, new ExtraCond().setId(deptId), null);
 		if(result.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -293,6 +356,7 @@ public class DepartmentDao {
 		sql = " SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE " +
 			  " restaurant_id = " + staff.getRestaurantId() + 
 			  " AND dept_id = " + deptId +
+			  " AND type = " + Kitchen.Type.NORMAL.getVal() +
 			  " LIMIT 1 ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
@@ -385,6 +449,10 @@ public class DepartmentDao {
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}
 		
+		//Update the name associated feast kitchen. 
+		List<Kitchen> result = KitchenDao.getByCond(dbCon, staff, new KitchenDao.ExtraCond().setDeptId(deptId).setType(Kitchen.Type.FEAST), null);
+		KitchenDao.update(dbCon, staff, new Kitchen.UpdateBuilder(result.get(0).getId()).setName(d.getName() + "酒席费"));
+
 		return deptId;
 	}
 	
@@ -424,6 +492,11 @@ public class DepartmentDao {
 	 */
 	public static void update(DBCon dbCon, Staff staff, Department.UpdateBuilder builder) throws SQLException, BusinessException{
 		Department d = builder.build();
+		
+		//Update the name associated feast kitchen. 
+		List<Kitchen> result = KitchenDao.getByCond(dbCon, staff, new KitchenDao.ExtraCond().setDeptId(d.getId()).setType(Kitchen.Type.FEAST), null);
+		KitchenDao.update(dbCon, staff, new Kitchen.UpdateBuilder(result.get(0).getId()).setName(d.getName() + "酒席费"));
+		
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".department SET " +
 			  " name = '" + d.getName() + "'" +
@@ -478,40 +551,10 @@ public class DepartmentDao {
 		
 		dbCon.stmt.executeUpdate(sql);
 		
+		//Insert the associated kitchen to feast.
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(deptToInsert.getName() + "酒席费", Department.DeptId.valueOf(deptToInsert.getId()), Kitchen.Type.FEAST));
+		
 		return deptToInsert.getId();
 	}
 	
-	public static List<Department> getDeptByNomal(Staff staff, String extraCond, String otherClause) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getDeptByNomal(dbCon, staff, extraCond, otherClause);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	public static List<Department> getDeptByNomal(DBCon dbCon, Staff staff, String extraCond, String otherClause) throws SQLException{
-		String sql = " SELECT dept_id, name, type, restaurant_id " 
-				+ " FROM " 
-				+ Params.dbName + ".department " 
-				+ " WHERE restaurant_id = " + staff.getRestaurantId() 
-				+ " AND dept_id <> " + Department.DeptId.DEPT_TMP.getVal() + " AND dept_id <> " + Department.DeptId.DEPT_NULL.getVal() 
-				+ (extraCond == null ? "" : extraCond) 
-				+ " ORDER BY dept_id ";
-		
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		List<Department> list = new ArrayList<Department>();
-		
-		while(dbCon.rs.next()){
-			Department dept = new Department(dbCon.rs.getInt("dept_id"));
-			dept.setName(dbCon.rs.getString("name"));
-			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			dept.setType(dbCon.rs.getInt("type"));
-			
-			list.add(dept);
-		}
-		
-		return list;
-	}
 }

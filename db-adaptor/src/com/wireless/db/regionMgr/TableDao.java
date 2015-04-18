@@ -321,6 +321,22 @@ public class TableDao {
 	}
 	
 	/**
+	 * Insert a feast table to specific builder{@link Table#InsertBuilder4Feast}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to insert a joined table
+	 * @return the table id to just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int insert(DBCon dbCon, Staff staff, Table.InsertBuilder4Feast builder) throws SQLException{
+		return insert(dbCon, staff, builder.build());
+	}
+	
+	/**
 	 * Insert a fast table to specific builder{@link Table#InsertBuilder4Fast}.
 	 * @param dbCon
 	 * 			the database connection
@@ -450,7 +466,7 @@ public class TableDao {
 			  (tblToInsert.getCategory().isNormal() ? tblToInsert.getAliasId() : "NULL") + ", " + 
 			  staff.getRestaurantId() + ", " +
 			  "'" + tblToInsert.getName() + "', " +
-			  (tblToInsert.getCategory().isTakeout() || tblToInsert.getCategory().isFast() ? "NULL" : tblToInsert.getRegion().getId()) + ", " +
+			  (tblToInsert.getCategory().isNormal() || tblToInsert.getCategory().isJoin() ? tblToInsert.getRegion().getId() : "NULL") + ", " +
 			  tblToInsert.getCategory().getVal() + "," +
 			  tblToInsert.getMinimumCost() + 
 			  " ) ";

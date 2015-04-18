@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.InsertOrder;
@@ -23,6 +24,7 @@ import com.wireless.exception.TableError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
@@ -41,6 +43,45 @@ public class TestCommitOrderDao {
 			mStaff = StaffDao.getAdminByRestaurant(37);
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testCommit4Feast() throws BusinessException, SQLException{
+		int orderId = 0;
+		try{
+			final List<Department> depts = DepartmentDao.getByType(mStaff, Department.Type.NORMAL);
+			orderId = OrderDao.feast(mStaff, new Order.FeastBuilder().add(depts.get(0).getId(), 1000).add(depts.get(1), 2000));
+			
+			Order actual = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+			
+			Assert.assertEquals("feast : total price", 3000, actual.getActualPrice(), 0.01);
+			Assert.assertEquals("feast : order category", Order.Category.FEAST, actual.getCategory());
+			
+			for(OrderFood of : actual.getOrderFoods()){
+				if(of.asFood().getKitchen().getDept().equals(depts.get(0))){
+					Assert.assertEquals(of.getName() + "#name", depts.get(0).getName() + "酒席费", of.getName());
+					Assert.assertEquals(of.getName() + "#price", 1000, of.getPrice(), 0.01);
+					Assert.assertEquals(of.getName() + "#count", 1, of.getCount(), 0.01);
+					
+				}else if(of.asFood().getKitchen().getDept().equals(depts.get(1))){
+					Assert.assertEquals(of.getName() + "#name", depts.get(1).getName() + "酒席费", of.getName());
+					Assert.assertEquals(of.getName() + "#price", 2000, of.getPrice(), 0.01);
+					Assert.assertEquals(of.getName() + "#count", 1, of.getCount(), 0.01);
+				}
+			}
+			
+		}finally{
+			if(orderId != 0){
+				OrderDao.deleteByCond(mStaff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(orderId));
+				try{
+					//Check to see whether the order is deleted.
+					OrderDao.getById(mStaff, orderId, DateType.TODAY);
+					Assert.assertTrue("failed to delete order", false);
+				}catch(BusinessException e){
+					Assert.assertEquals("failed to delete the order", FrontBusinessError.ORDER_NOT_EXIST, e.getErrCode());
+				}
+			}
 		}
 	}
 	

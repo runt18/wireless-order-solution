@@ -3,9 +3,11 @@ package com.wireless.db.orderMgr;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.menuMgr.FoodDao;
@@ -28,6 +30,8 @@ import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.member.Member;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.regionMgr.Region;
@@ -907,6 +911,63 @@ public class OrderDao {
 				  " AND food_id = " + of.getFoodId();
 			dbCon.stmt.executeUpdate(sql);				
 		}		
+	}
+	
+	/**
+	 * Perform this feast order according to specific builder {@link Order#FeastBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to feast
+	 * @return the id to feast order
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement 
+	 * @throws BusinessException
+	 */
+	public static int feast(Staff staff, Order.FeastBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			int orderId = feast(dbCon, staff, builder);
+			dbCon.conn.commit();
+			return orderId;
+		}catch(SQLException | BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform this feast order according to specific builder {@link Order#FeastBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to feast
+	 * @return the id to feast order
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement 
+	 * @throws BusinessException
+	 */
+	public static int feast(DBCon dbCon, Staff staff, Order.FeastBuilder builder) throws SQLException, BusinessException{
+		Order.InsertBuilder insertBuilder = Order.InsertBuilder.newInstance4Feast();
+		for(Map.Entry<Department, Float> entry : builder.getIncomeByDept()){
+			Kitchen feastKitchen = KitchenDao.getByCond(dbCon, staff, new KitchenDao.ExtraCond().setDeptId(entry.getKey().getId()).setType(Kitchen.Type.FEAST), null).get(0);
+			OrderFood of = new OrderFood(0);
+			of.setTemp(true);
+			of.setCount(1);
+			of.asFood().setName(feastKitchen.getName());
+			of.asFood().setKitchen(feastKitchen);
+			of.asFood().setPrice(entry.getValue());
+			insertBuilder.add(of, staff);
+		}
+		int orderId = InsertOrder.exec(dbCon, staff, insertBuilder).getId();
+		
+		return PayOrder.pay(dbCon, staff, Order.PayBuilder.build4Normal(orderId)).getId();
 	}
 	
 	/**

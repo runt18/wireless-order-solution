@@ -275,7 +275,7 @@ public class PayOrder {
 
 		//Delete the temporary table if the category belongs to joined, take out or fast.
 		final Table table = orderCalculated.getDestTbl();
-		if(table.getCategory().isJoin() || table.getCategory().isTakeout() || table.getCategory().isFast()){
+		if(!table.getCategory().isNormal()){
 			TableDao.deleteById(dbCon, staff, table.getId());
 		}
 		

@@ -10,9 +10,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.SortedList;
 import com.wireless.test.db.TestInit;
@@ -24,7 +26,7 @@ public class TestDepartmentDao {
 	public static void beforeClass() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getAdminByRestaurant(37);
+			mStaff = StaffDao.getAdminByRestaurant(40);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -45,7 +47,12 @@ public class TestDepartmentDao {
 			Assert.assertEquals("name : insert department", expected.getName(), actual.getName());
 			Assert.assertEquals("type : insert department", Department.Type.NORMAL, actual.getType());
 
-			Department.UpdateBuilder updateBuilder = new Department.UpdateBuilder(Department.DeptId.valueOf(deptId), "测试部门2");
+			Kitchen feastKitchen = KitchenDao.getByCond(mStaff, new KitchenDao.ExtraCond().setDeptId(deptId).setType(Kitchen.Type.FEAST), null).get(0);
+			Assert.assertEquals("restaurant : associated feast kitchen", mStaff.getRestaurantId(), feastKitchen.getRestaurantId());
+			Assert.assertEquals("name : associated feast kitchen", actual.getName() + "酒席费", feastKitchen.getName());
+			Assert.assertEquals("display : associated feast kitchen", 0, feastKitchen.getDisplayId());
+			
+			Department.UpdateBuilder updateBuilder = new Department.UpdateBuilder(Department.DeptId.valueOf(deptId), "测试修改部门");
 			DepartmentDao.update(mStaff, updateBuilder);
 			actual = DepartmentDao.getById(mStaff, deptId);
 			expected = updateBuilder.build();
@@ -55,6 +62,12 @@ public class TestDepartmentDao {
 			Assert.assertEquals("name : insert department", expected.getName(), actual.getName());
 			Assert.assertEquals("type : insert department", Department.Type.NORMAL, actual.getType());
 			
+			feastKitchen = KitchenDao.getByCond(mStaff, new KitchenDao.ExtraCond().setDeptId(deptId).setType(Kitchen.Type.FEAST), null).get(0);
+			Assert.assertEquals("restaurant : associated feast kitchen", mStaff.getRestaurantId(), feastKitchen.getRestaurantId());
+			Assert.assertEquals("name : associated feast kitchen", actual.getName() + "酒席费", feastKitchen.getName());
+			Assert.assertEquals("display : associated feast kitchen", 0, feastKitchen.getDisplayId());
+
+
 		}finally{
 			if(deptId != 0){
 				DepartmentDao.remove(mStaff, deptId);

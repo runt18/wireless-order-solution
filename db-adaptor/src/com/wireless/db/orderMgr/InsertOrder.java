@@ -128,7 +128,13 @@ public class InsertOrder {
 			int takeoutTblId = TableDao.insert(dbCon, staff, new Table.InsertBuilder4Takeout());
 			orderToInsert.setDestTbl(TableDao.getById(dbCon, staff, takeoutTblId));
 			
+		}else if(orderToInsert.getCategory().isFeast()){
+			//Create the temporary table for feast
+			int feastTblId = TableDao.insert(dbCon, staff, new Table.InsertBuilder4Feast());
+			orderToInsert.setDestTbl(TableDao.getById(dbCon, staff, feastTblId));
+			
 		}else if(orderToInsert.getCategory().isFast()){
+			//Create the temporary table for fast
 			int fastTblId = TableDao.insert(dbCon, staff, new Table.InsertBuilder4Fast(fastNo));
 			orderToInsert.setDestTbl(TableDao.getById(dbCon, staff, fastTblId));
 		}

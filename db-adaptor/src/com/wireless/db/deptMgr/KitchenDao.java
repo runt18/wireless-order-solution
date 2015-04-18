@@ -28,6 +28,11 @@ public class KitchenDao {
 			return this;
 		}
 		
+		public ExtraCond setDeptId(int deptId){
+			this.deptId = Department.DeptId.valueOf(deptId);
+			return this;
+		}
+		
 		public ExtraCond setDeptId(Department.DeptId deptId){
 			this.deptId = deptId;
 			return this;
@@ -186,7 +191,7 @@ public class KitchenDao {
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".kitchen SET " +
 			  " kitchen_id = " + k.getId() +
-			  (builder.isNameChanged() ? ",name = '" + k.getName() + "'": "") +
+			  (builder.isNameChanged() ? ",name = '" + k.getName() + "'" : "") +
 			  (builder.isDeptChanged() ? ",dept_id = " + k.getDept().getId() : "") +
 			  (builder.isAllowTmpChanged() ? ",is_allow_temp = " + (k.isAllowTemp() ? 1 : 0) : "") +
 			  " WHERE kitchen_id = " + k.getId();
@@ -571,7 +576,7 @@ public class KitchenDao {
 
 		int displayId = 0;
 
-		if(kitchenToAdd.isNull() || kitchenToAdd.isTemp()){
+		if(kitchenToAdd.isNull() || kitchenToAdd.isTemp() || kitchenToAdd.isFeast()){
 			displayId = 0;
 		}else{
 			//Calculate the display id if case of normal kitchen.

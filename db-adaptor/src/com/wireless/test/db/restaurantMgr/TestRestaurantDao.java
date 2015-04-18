@@ -285,6 +285,13 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareDept(Staff staff, int restaurantId) throws SQLException, BusinessException{
+		for(Department dept : DepartmentDao.getByCond(staff, new DepartmentDao.ExtraCond().addType(Department.Type.NORMAL).addType(Department.Type.IDLE), null)){
+			Kitchen feastKitchen = KitchenDao.getByCond(staff, new KitchenDao.ExtraCond().setDeptId(dept.getId()).setType(Kitchen.Type.FEAST), null).get(0);
+			Assert.assertEquals("restaurant : associated feast kitchen", staff.getRestaurantId(), feastKitchen.getRestaurantId());
+			Assert.assertEquals("name : associated feast kitchen", dept.getName() + "酒席费", feastKitchen.getName());
+			Assert.assertEquals("display : associated feast kitchen", 0, feastKitchen.getDisplayId());
+		}
+		
 		Department deptToTemp = DepartmentDao.getByType(staff, Department.Type.TEMP).get(0);
 		Assert.assertEquals("department id", deptToTemp.getId(), Department.DeptId.DEPT_TMP.getVal());
 		Assert.assertEquals("department name", deptToTemp.getName(), Department.DeptId.DEPT_TMP.getDesc());
