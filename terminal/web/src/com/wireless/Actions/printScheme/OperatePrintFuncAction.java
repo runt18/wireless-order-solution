@@ -240,7 +240,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				
 				//单尾结束语
 				String comment = request.getParameter("comment");
-				if(comment != null && !comment.isEmpty()){
+				if(comment != null){
 					builder.setComment(comment);
 				}
 				
@@ -273,7 +273,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				builder.setRepeat(Integer.parseInt(repeat));
 				//单尾结束语
 				String comment = request.getParameter("comment");
-				if(comment != null && !comment.isEmpty()){
+				if(comment != null){
 					builder.setComment(comment);
 				}
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
@@ -288,7 +288,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				}
 				//单尾结束语
 				String comment = request.getParameter("comment");
-				if(comment != null && !comment.isEmpty()){
+				if(comment != null){
 					builder.setComment(comment);
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
