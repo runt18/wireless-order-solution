@@ -2574,10 +2574,14 @@ ts.closeFeastPayWin = function(){
  */
 ts.calcFeastPay = function(){
 	var totalMoney = 0;
+	//清空酒席记录再重新赋值
+	ts.addFeastDepartment.deptFeast.length = 0;
 	
 	for (var i = 0; i < ts.addFeastDepartment.depts.length; i++) {
 		if($('#numForFeast'+ts.addFeastDepartment.depts[i]).val()){
 			totalMoney += parseFloat($('#numForFeast'+ts.addFeastDepartment.depts[i]).val());
+			console.log(typeof $('#numForFeast'+ts.addFeastDepartment.depts[i]).val())
+			ts.addFeastDepartment.deptFeast.push(ts.addFeastDepartment.depts[i] + "," + $('#numForFeast'+ts.addFeastDepartment.depts[i]).val());
 		}
 	}
 	
@@ -2639,6 +2643,8 @@ ts.addFeastDepartment = function(index){
 }
 //记录添加的部门
 ts.addFeastDepartment.depts = [];
+//记录添加的部门和金额
+ts.addFeastDepartment.deptFeast = [];
 
 /**
  * 移除部门收益
@@ -2666,8 +2672,25 @@ ts.feastPayRemoveAction = function(c){
 			ts.calcFeastPay();
 		}
 	});
-	
-	
+}
+
+/**
+ * 确定酒席入账
+ */
+ts.doFeastOrder = function(){
+	Util.LM.show();
+	$.post('../FeastOrder.do', {deptFeasts : ts.addFeastDepartment.deptFeast.join('&')}, function(result){
+		Util.LM.hide();
+		if(result.success){
+			ts.closeFeastPayWin();
+			Util.msg.tip(result.msg);
+		}else{
+			Util.msg.alert({
+				msg : result.msg,
+				renderTo : 'tableSelectMgr'
+			});
+		}
+	}, "json");
 }
 
 

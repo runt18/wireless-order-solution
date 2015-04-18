@@ -563,7 +563,7 @@
 	    </div>
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.doFeastOrder()">确定</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.closeFeastPayWin()">取消</a>		 
 			 </div>
 	    </div>	    
@@ -572,7 +572,7 @@
 	 
 	<div data-role="popup" id="popupDepartmentsCmp" data-theme="d" >
         <ul id="departmentsListCmp" data-role="listview" data-inset="true" style="min-width:100px;" data-theme="b">
-            <li class="popupButtonList " data-icon="false"><a onclick="">部门一</a></li>
+            <!-- <li class="popupButtonList " data-icon="false"><a onclick="">部门一</a></li> -->
         </ul>
 	</div>		 
 </div>
