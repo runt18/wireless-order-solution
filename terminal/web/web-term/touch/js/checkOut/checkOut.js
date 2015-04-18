@@ -114,11 +114,18 @@ function initOrderData(c){
 				}) : null;
 									
 			}else{
+				//清空账单信息
+				$("#divNorthForUpdateOrder").html('');
+				$('#orderFoodListBody').html('');
+				$("#spanToTempPayStatus").html('');
 				Util.msg.alert({
 					title : data.title,
 					msg : data.msg,
 					renderTo : 'orderFoodListMgr',
-					time : 3
+					time : 3,
+					fn : function(){
+						window.history.back(-1);
+					}
 				});
 			}
 		},
