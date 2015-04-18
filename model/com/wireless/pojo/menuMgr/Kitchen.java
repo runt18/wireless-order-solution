@@ -188,7 +188,8 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		NORMAL(0, "普通厨房"),
 		IDLE(1, "空闲厨房"),
 		TEMP(2, "临时厨房"),
-		NULL(3, "空厨房");
+		NULL(3, "空厨房"),
+		FEAST(4, "酒席费");
 		
 		private final int val;
 		private final String desc;
@@ -256,9 +257,15 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	
 	private Kitchen(UpdateBuilder builder){
 		setId(builder.id);
-		setName(builder.kitchenName);
-		setAllowTemp(builder.isAllowTemp);
-		setDept(builder.deptId.getVal(), builder.deptId.getDesc());
+		if(builder.isNameChanged()){
+			setName(builder.kitchenName);
+		}
+		if(builder.isAllowTempChanged){
+			setAllowTemp(builder.isAllowTemp);
+		}
+		if(builder.isDeptChanged()){
+			setDept(builder.deptId.getVal(), builder.deptId.getDesc());
+		}
 	}
 	
 	public void copyFrom(Kitchen src){
@@ -354,6 +361,10 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	
 	public boolean isTemp(){
 		return this.type == Type.TEMP;
+	}
+	
+	public boolean isFeast(){
+		return this.type == Type.FEAST;
 	}
 	
 	public boolean isNull(){

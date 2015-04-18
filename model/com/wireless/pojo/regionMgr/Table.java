@@ -134,6 +134,20 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		}
 	}
 	
+	public static class InsertBuilder4Feast{
+		private final InsertBuilder builder;
+		
+		public InsertBuilder4Feast(){
+			builder = new InsertBuilder(0, null);
+			builder.category = Category.FEAST;
+			builder.tableName = "酒席入账";
+		}
+		
+		public Table build(){
+			return new Table(this);
+		}
+	}
+	
 	public static class InsertBuilder4Fast{
 		private final InsertBuilder builder;
 		
@@ -308,7 +322,8 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		NORMAL(1, "一般"),
 		TAKE_OUT(2,	"外卖"),
 		JOIN(3, "拆台"),
-		FAST(4, "快餐");
+		FAST(4, "快餐"),
+		FEAST(5, "酒席费");
 		
 		private final int val;
 		private final String desc;
@@ -354,6 +369,10 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		
 		public boolean isFast(){
 			return this == FAST;
+		}
+		
+		public boolean isFeast(){
+			return this == FEAST;
 		}
 		
 		public boolean isTemporary(){
@@ -448,6 +467,12 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	private Table(InsertBuilder4Fast builder){
 		setTableAlias(builder.builder.tableAlias);
 		setMinimumCost(builder.builder.miniCost);
+		setTableName(builder.builder.tableName);
+		setCategory(builder.builder.category);
+	}
+	
+	private Table(InsertBuilder4Feast builder){
+		setTableAlias(builder.builder.tableAlias);
 		setTableName(builder.builder.tableName);
 		setCategory(builder.builder.category);
 	}
