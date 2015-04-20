@@ -51,19 +51,7 @@ $(function(){
 					}
 					foods += temp.foods[j].name;
 				}
-				if(Util.mp.extra == 1){//店内
-					html.push(Templet.inside.format({
-						code : temp.code,
-						status : temp.statusDesc,
-						orderDate : temp.date,
-						totalPrice : totalPrice,
-						count : count,
-						foods : foods,
-						display : temp.statusVal == 1 ? 'hidden="hidden"' : '',
-						orderClass : temp.statusVal == 2?'box-order-commit' : '',
-						orderBorder : temp.statusVal == 2?'orderBorder_commit' : 'orderBorder_invalid'
-					}));					
-				}else if(Util.mp.extra == 3){//外卖
+				if(Util.mp.extra == 3){//外卖
 					html.push(Templet.takeout.format({
 						code : temp.code,
 						status : temp.statusDesc,
@@ -77,6 +65,18 @@ $(function(){
 						phone : temp.contect.phone,
 						address : temp.contect.address
 					}));					
+				}else{//默认店内
+					html.push(Templet.inside.format({
+						code : temp.code,
+						status : temp.statusDesc,
+						orderDate : temp.date,
+						totalPrice : totalPrice,
+						count : count,
+						foods : foods,
+						display : temp.statusVal == 1 ? 'hidden="hidden"' : '',
+						orderClass : temp.statusVal == 2?'box-order-commit' : '',
+						orderBorder : temp.statusVal == 2?'orderBorder_commit' : 'orderBorder_invalid'
+					}));						
 				}
 
 			}
