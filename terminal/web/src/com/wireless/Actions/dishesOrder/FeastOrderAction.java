@@ -38,7 +38,7 @@ public class FeastOrderAction extends Action{
 			final ProtocolPackage resp = ServerConnector.instance().ask(new ReqFeastOrder(staff, builder));
 			
 			if(resp.header.type == Type.ACK){
-				jobject.initTip(true, ("录入成功."));
+				jobject.initTip(true, ("酒席分账录入成功."));
 				
 			}else if(resp.header.type == Type.NAK){
 				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
