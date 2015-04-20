@@ -275,8 +275,8 @@ Ext.onReady(function(){
 			Ext.Ajax.request({
 				url : '../../BusinessStatistics.do',
 				params : {
-					onDuty : dateBegin.getValue().format('Y-m-d 00:00:00'),
-					offDuty : dateEnd.getValue().format('Y-m-d 23:59:59'),	
+					onDuty : Ext.util.Format.date(dateBegin.getValue(), 'Y-m-d 00:00:00'),
+					offDuty : Ext.util.Format.date(dateEnd.getValue(), 'Y-m-d 23:59:59'),	
 					opening : data.opening,
 					ending : data.ending,
 					chart : true,
@@ -416,8 +416,8 @@ Ext.onReady(function(){
 					url, 
 					'ExportHistoryStatisticsToExecl.do', 
 					'business',
-					businessSub_beginDate.getValue().format('Y-m-d 00:00:00'),
-					businessSub_endDate.getValue().format('Y-m-d 23:59:59'),
+					Ext.util.Format.date(businessSub_beginDate.getValue(), 'Y-m-d 00:00:00'),
+					Ext.util.Format.date(businessSub_endDate.getValue(), 'Y-m-d 23:59:59'),
 					'history',
 					data.opening,
 					data.ending,

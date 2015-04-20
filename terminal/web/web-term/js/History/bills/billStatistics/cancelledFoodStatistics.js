@@ -263,8 +263,8 @@ function cancelFoodDetailsStatPanelInit(){
 				}					
 				var gs = cfdsGrid.getStore();
 				gs.baseParams['deptID'] = cancel_deptCombo.getValue();
-				gs.baseParams['dateBeg'] = beginDate.getValue().format('Y-m-d 00:00:00');
-				gs.baseParams['dateEnd'] = endDate.getValue().format('Y-m-d 23:59:59');
+				gs.baseParams['dateBeg'] = Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00');
+				gs.baseParams['dateEnd'] = Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59');
 				gs.baseParams['reasonID'] = reasonCombo.getValue();
 				gs.baseParams['staffID'] = cancel_combo_staffs.getValue();
 				gs.baseParams['opening'] = opening;
@@ -290,8 +290,8 @@ function cancelFoodDetailsStatPanelInit(){
 				
 				cancel_requestParams = {
 					dataSource : 'getDetailChart',
-					dateBeg : beginDate.getValue().format('Y-m-d 00:00:00'),
-					dateEnd : endDate.getValue().format('Y-m-d 23:59:59'),
+					dateBeg : Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00'),
+					dateEnd : Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59'),
 					deptID : cancel_deptCombo.getValue(),
 					reasonID : reasonCombo.getValue(),
 					staffID : cancel_combo_staffs.getValue(),
@@ -361,8 +361,8 @@ function cancelFoodDetailsStatPanelInit(){
 					url,
 					'ExportHistoryStatisticsToExecl.do',
 					cancel_deptCombo.getValue(),
-					beginDate.getValue().format('Y-m-d 00:00:00'),
-					endDate.getValue().format('Y-m-d 23:59:59'),
+					Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00'),
+					Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59'),
 					reasonCombo.getValue(),
 					'cancelledFood',
 					cancel_combo_staffs.getValue()
@@ -597,8 +597,8 @@ var cancel_loadDeptPieChart = function(type){
 };
 
 function showCancelDetailChart(jdata){
-	var dateBegin = Ext.getCmp('cancel_dateSearchDateBegin').getValue().format('Y-m-d');
-	var dateEnd = Ext.getCmp('cancel_dateSearchDateEnd').getValue().format('Y-m-d');
+	var dateBegin = Ext.util.Format.date(Ext.getCmp('cancel_dateSearchDateBegin').getValue(), 'Y-m-d');
+	var dateEnd = Ext.util.Format.date(Ext.getCmp('cancel_dateSearchDateEnd').getValue(), 'Y-m-d');
 	
 	var hourBegin = Ext.getCmp('cancel_txtBusinessHourBegin').getEl().dom.textContent;
 	var hourEnd = Ext.getCmp('cancel_txtBusinessHourEnd').getEl().dom.textContent;

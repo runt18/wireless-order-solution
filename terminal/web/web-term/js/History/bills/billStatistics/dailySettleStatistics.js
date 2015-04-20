@@ -146,8 +146,8 @@ function dailySettleStatGridInit(){
 					return;
 				}
 				var gs = dailySettleStatGrid.getStore();
-				gs.baseParams['onDuty'] = onDuty.getValue().format('Y-m-d 00:00:00');
-				gs.baseParams['offDuty'] = offDuty.getValue().format('Y-m-d 23:59:59');
+				Ext.util.Format.date(gs.baseParams['onDuty'] = onDuty.getValue(), 'Y-m-d 00:00:00');
+				Ext.util.Format.date(gs.baseParams['offDuty'] = offDuty.getValue(), 'Y-m-d 23:59:59');
 				gs.load({
 					params : {
 						start : 0,

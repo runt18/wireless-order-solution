@@ -216,8 +216,8 @@ function initGiftStatisticsGrid(){
 				}					
 				
 				var gs = grid_giftStatistics.getStore();
-				gs.baseParams['onDuty'] = beginDate.getValue().format('Y-m-d 00:00:00');
-				gs.baseParams['offDuty'] = endDate.getValue().format('Y-m-d 23:59:59');
+				gs.baseParams['onDuty'] = Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00');
+				gs.baseParams['offDuty'] = Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59');
 				gs.baseParams['region'] = Ext.getCmp('giftStatistic_comboRegion').getValue();
 				gs.baseParams['foodName'] = Ext.getCmp('gift_foodName').getValue();
 				gs.baseParams['giftStaffId'] = gift_combo_staffs.getValue();
@@ -238,8 +238,8 @@ function initGiftStatisticsGrid(){
 			
 				requestParams = {
 					dataSource : 'getDetailChart',
-					dateBeg : beginDate.getValue().format('Y-m-d 00:00:00'),
-					dateEnd : endDate.getValue().format('Y-m-d 23:59:59'),
+					dateBeg : Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00'),
+					dateEnd : Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59'),
 					region : Ext.getCmp('giftStatistic_comboRegion').getValue(),
 					giftStaffId : gift_combo_staffs.getValue(),
 					foodName : Ext.getCmp('gift_foodName').getValue(),
@@ -351,8 +351,8 @@ function gift_changeChartWidth(w,h){
 }
 
 function showGiftDetailChart(jdata){
-	var dateBegin = Ext.getCmp('gift_dateSearchDateBegin').getValue().format('Y-m-d');
-	var dateEnd = Ext.getCmp('gift_dateSearchDateEnd').getValue().format('Y-m-d');
+	var dateBegin = Ext.util.Format.date(Ext.getCmp('gift_dateSearchDateBegin').getValue(), 'Y-m-d');
+	var dateEnd = Ext.util.Format.date(Ext.getCmp('gift_dateSearchDateEnd').getValue(), 'Y-m-d');
 	
 	var hourBegin = Ext.getCmp('giftStatistic_txtBusinessHourBegin').getEl().dom.textContent;
 	var hourEnd = Ext.getCmp('giftStatistic_txtBusinessHourEnd').getEl().dom.textContent;

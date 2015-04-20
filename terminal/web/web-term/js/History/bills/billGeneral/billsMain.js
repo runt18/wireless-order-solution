@@ -7,8 +7,8 @@ function billQueryHandler() {
 			limit : GRID_PADDING_LIMIT_20
 	};
 	if(searchType){
-		gs.baseParams['dateBeg'] = Ext.getCmp('dateSearchDateBegin').getValue().format('Y-m-d 00:00:00');
-		gs.baseParams['dateEnd'] = Ext.getCmp('dateSearchDateEnd').getValue().format('Y-m-d 23:59:59');
+		gs.baseParams['dateBeg'] = Ext.util.Format.date(Ext.getCmp('dateSearchDateBegin').getValue(), 'Y-m-d 00:00:00');
+		gs.baseParams['dateEnd'] = Ext.util.Format.date(Ext.getCmp('dateSearchDateEnd').getValue(), 'Y-m-d 23:59:59');
 		gs.baseParams['comboPayType'] = Ext.getCmp('comboPayType').getValue();
 		gs.baseParams['common'] = Ext.getCmp('textSearchValue').getValue();
 		if(isNaN(Ext.getCmp('textTableAliasOrName').getValue())){
@@ -61,8 +61,8 @@ function billQueryExportHandler() {
 		url = String.format(
 			url, 
 			'ExportHistoryStatisticsToExecl.do', 
-			Ext.getCmp('dateSearchDateBegin').getValue().format('Y-m-d 00:00:00'), 
-			Ext.getCmp('dateSearchDateEnd').getValue().format('Y-m-d 23:59:59'),
+			Ext.util.Format.date(Ext.getCmp('dateSearchDateBegin').getValue(), 'Y-m-d 00:00:00'), 
+			Ext.util.Format.date(Ext.getCmp('dateSearchDateEnd').getValue(), 'Y-m-d 23:59:59'),
 			Ext.getCmp('comboPayType').getValue(),
 			Ext.getCmp('textSearchValue').getValue(),
 			Ext.getCmp('numberSearchValue').getValue(),

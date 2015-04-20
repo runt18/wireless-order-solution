@@ -220,8 +220,8 @@ function commissionDetailInit(){
 				
 				var store = commissionStatisticsGrid.getStore();
 				store.baseParams['dataSource'] = 'normal';
-				store.baseParams['beginDate'] = commission_beginDate.getValue().format('Y-m-d 00:00:00');
-				store.baseParams['endDate'] = commission_endDate.getValue().format('Y-m-d 23:59:59');
+				store.baseParams['beginDate'] = Ext.util.Format.date(commission_beginDate.getValue(), 'Y-m-d 00:00:00');
+				store.baseParams['endDate'] = Ext.util.Format.date(commission_endDate.getValue(), 'Y-m-d 23:59:59');
 				store.baseParams['staffId'] = commission_combo_staffs.getValue();
 				store.baseParams['deptId'] = commission_deptCombo.getValue();
 				store.baseParams['opening'] = businessHour.opening;
@@ -248,8 +248,8 @@ function commissionDetailInit(){
 				
 				requestParams = {
 					dataSource : 'getDetailChart',
-					dateBeg : commission_beginDate.getValue().format('Y-m-d 00:00:00'),
-					dateEnd : commission_endDate.getValue().format('Y-m-d 23:59:59'),
+					dateBeg : Ext.util.Format.date(commission_beginDate.getValue(), 'Y-m-d 00:00:00'),
+					dateEnd : Ext.util.Format.date(commission_endDate.getValue(), 'Y-m-d 23:59:59'),
 					deptID : commission_deptCombo.getValue(),
 					staffID : commission_combo_staffs.getValue(),
 					opening : businessHour.opening,
@@ -291,8 +291,8 @@ function commissionDetailInit(){
 			url = String.format(
 					url, 
 					'ExportHistoryStatisticsToExecl.do', 
-					commission_beginDate.getValue().format('Y-m-d 00:00:00'), 
-					commission_endDate.getValue().format('Y-m-d 23:59:59'),
+					Ext.util.Format.date(commission_beginDate.getValue(), 'Y-m-d 00:00:00'), 
+					Ext.util.Format.date(commission_endDate.getValue(), 'Y-m-d 23:59:59'),
 					commission_combo_staffs.getValue(),
 					commission_deptCombo.getValue(),
 					'commissionStatisticsList'
@@ -402,8 +402,8 @@ function commission_changeChartWidth(w,h){
 }
 
 function showCommissionDetailChart(jdata){
-	var dateBegin = Ext.getCmp('commission_dateSearchDateBegin').getValue().format('Y-m-d');
-	var dateEnd = Ext.getCmp('commission_dateSearchDateEnd').getValue().format('Y-m-d');
+	var dateBegin = Ext.util.Format.date(Ext.getCmp('commission_dateSearchDateBegin').getValue(), 'Y-m-d');
+	var dateEnd = Ext.util.Format.date(Ext.getCmp('commission_dateSearchDateEnd').getValue(), 'Y-m-d');
 	
 	var hourBegin = Ext.getCmp('commission_txtBusinessHourBegin').getEl().dom.textContent;
 	var hourEnd = Ext.getCmp('commission_txtBusinessHourEnd').getEl().dom.textContent;

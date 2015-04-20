@@ -86,7 +86,6 @@ Ext.onReady(function(){
 		xtype : 'datefield',
 		width : 100,
 		format : 'Y-m-d',
-//		maxValue : new Date(new Date().getTime() - 24 * 3600 * 1000),
 		maxValue : new Date(),
 		hideParent : true,
 		hidden : mrd_modal ? false : true,
@@ -207,8 +206,8 @@ Ext.onReady(function(){
 							Ext.example.msg('提示', '操作失败, 请选择搜索时间段.');
 							return;
 						}
-						onDuty = mrd_search_onDuty.getValue().format('Y-m-d 00:00:00');
-						offDuty = mrd_search_offDuty.getValue().format('Y-m-d 23:59:59');
+						onDuty = Ext.util.Format.date(mrd_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+						offDuty = Ext.util.Format.date(mrd_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 					}
 					var memberType = mrd_search_memberType.getRawValue() != '' ? mrd_search_memberType.getValue() : '';
 					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&operateType=2';
@@ -237,6 +236,7 @@ Ext.onReady(function(){
 			[true, false, false, true], 
 			['会员名称', 'member.name', 60],
 			['会员类型', 'member.memberType.name'],
+			['手机号码', 'member.mobile', 60],
 			['实收/实退', 'chargeMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['充值/退款', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['收款方式', 'chargeTypeText'],
@@ -317,8 +317,8 @@ function mrd_searchMemberOperation(){
 			Ext.example.msg('提示', '操作失败, 请选择搜索时间段.');
 			return;
 		}
-		onDuty = mrd_search_onDuty.getValue().format('Y-m-d 00:00:00');
-		offDuty = mrd_search_offDuty.getValue().format('Y-m-d 23:59:59');
+		onDuty = Ext.util.Format.date(mrd_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+		offDuty = Ext.util.Format.date(mrd_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 	}
 	var memberType = mrd_search_memberType.getRawValue() != '' ? mrd_search_memberType.getValue() : '';
 	

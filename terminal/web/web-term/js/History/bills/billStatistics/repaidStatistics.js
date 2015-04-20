@@ -84,8 +84,8 @@ function linkOrderId(v){
 }
 
 function showRepaidDetailChart(jdata){
-	var dateBegin = repaid_beginDate.getValue().format('Y-m-d');
-	var dateEnd = repaid_endDate.getValue().format('Y-m-d');
+	var dateBegin = Ext.util.Format.date(repaid_beginDate.getValue(), 'Y-m-d');
+	var dateEnd = Ext.util.Format.date(repaid_endDate.getValue(), 'Y-m-d');
 	
 	var hourBegin = Ext.getCmp('repaid_txtBusinessHourBegin').getEl().dom.textContent;
 	var hourEnd = Ext.getCmp('repaid_txtBusinessHourEnd').getEl().dom.textContent;	
@@ -273,8 +273,8 @@ function initGrid(){
 				
 				var store = repaidStatisticsGrid.getStore();
 				store.baseParams['dataSource'] = 'normal',
-				store.baseParams['beginDate'] = repaid_beginDate.getValue().format('Y-m-d 00:00:00');
-				store.baseParams['endDate'] = repaid_endDate.getValue().format('Y-m-d 23:59:59');
+				store.baseParams['beginDate'] = Ext.util.Format.date(repaid_beginDate.getValue(), 'Y-m-d 00:00:00');
+				store.baseParams['endDate'] = Ext.util.Format.date(repaid_endDate.getValue(), 'Y-m-d 23:59:59');
 				store.baseParams['staffId'] = repaid_combo_staffs.getValue();
 				store.baseParams['opening'] = businessHour.opening;
 				store.baseParams['ending'] = businessHour.ending;				
@@ -293,8 +293,8 @@ function initGrid(){
 				
 				requestParams = {
 					dataSource : 'getDetailChart',
-					dateBeg : repaid_beginDate.getValue().format('Y-m-d 00:00:00'),
-					dateEnd : repaid_endDate.getValue().format('Y-m-d 23:59:59'),
+					dateBeg : Ext.util.Format.date(repaid_beginDate.getValue(), 'Y-m-d 00:00:00'),
+					dateEnd : Ext.util.Format.date(repaid_endDate.getValue(), 'Y-m-d 23:59:59'),
 					staffID : repaid_combo_staffs.getValue(),
 					opening : businessHour.opening,
 					ending : businessHour.ending
@@ -335,8 +335,8 @@ function initGrid(){
 			url = String.format(
 					url, 
 					'ExportHistoryStatisticsToExecl.do', 
-					repaid_beginDate.getValue().format('Y-m-d 00:00:00'), 
-					repaid_endDate.getValue().format('Y-m-d 23:59:59'),
+					Ext.util.Format.date(repaid_beginDate.getValue(), 'Y-m-d 00:00:00'), 
+					Ext.util.Format.date(repaid_endDate.getValue(), 'Y-m-d 23:59:59'),
 					repaid_combo_staffs.getValue(),
 					'repaidStatisticsList'
 				);

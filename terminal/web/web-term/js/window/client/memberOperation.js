@@ -342,8 +342,8 @@ function cdd_searchMemberOperation(){
 			Ext.example.msg('提示', '操作失败, 请选择搜索时间段.');
 			return;
 		}
-		onDuty = cdd_search_onDuty.getValue().format('Y-m-d 00:00:00');
-		offDuty = cdd_search_offDuty.getValue().format('Y-m-d 23:59:59');
+		onDuty = Ext.util.Format.date(cdd_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+		offDuty = Ext.util.Format.date(cdd_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 	}
 	var memberType = cdd_search_memberType.getRawValue() != '' ? cdd_search_memberType.getValue() : '';
 	var operateType = cdd_search_comboOperateType.getRawValue() != '' ? cdd_search_comboOperateType.getValue() : '';

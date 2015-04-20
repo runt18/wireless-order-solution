@@ -263,8 +263,8 @@ Ext.onReady(function(){
 							Ext.example.msg('提示', '操作失败, 请选择搜索时间段.');
 							return;
 						}
-						onDuty = mcd_search_onDuty.getValue().format('Y-m-d 00:00:00');
-						offDuty = mcd_search_offDuty.getValue().format('Y-m-d 23:59:59');
+						onDuty = Ext.util.Format.date(mcd_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+						offDuty = Ext.util.Format.date(mcd_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 					}
 					var memberType = mcd_search_memberType.getRawValue() != '' ? mcd_search_memberType.getValue() : '';
 					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&operateType=1';
@@ -372,8 +372,8 @@ function mcd_searchMemberOperation(){
 			Ext.example.msg('提示', '操作失败, 请选择搜索时间段.');
 			return;
 		}
-		onDuty = mcd_search_onDuty.getValue().format('Y-m-d 00:00:00');
-		offDuty = mcd_search_offDuty.getValue().format('Y-m-d 23:59:59');
+		onDuty = Ext.util.Format.date(mcd_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+		offDuty = Ext.util.Format.date(mcd_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 	}
 	var memberType = mcd_search_memberType.getRawValue() != '' ? mcd_search_memberType.getValue() : '';
 	//var operateType = mcd_search_comboOperateType.getRawValue() != '' ? mcd_search_comboOperateType.getValue() : '';

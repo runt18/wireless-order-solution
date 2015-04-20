@@ -198,8 +198,8 @@ function initDiscountGrid(){
 				
 				var store = discountStatisticsGrid.getStore();
 				store.baseParams['dataSource'] = 'normal',
-				store.baseParams['beginDate'] = discount_beginDate.getValue().format('Y-m-d 00:00:00');
-				store.baseParams['endDate'] = discount_endDate.getValue().format('Y-m-d 23:59:59');
+				store.baseParams['beginDate'] = Ext.util.Format.date(discount_beginDate.getValue(), 'Y-m-d 00:00:00');
+				store.baseParams['endDate'] = Ext.util.Format.date(discount_endDate.getValue(), 'Y-m-d 23:59:59');
 				store.baseParams['staffID'] = discount_combo_staffs.getValue();
 				store.baseParams['deptID'] = discount_deptCombo.getValue();
 				store.baseParams['opening'] = businessHour.opening;
@@ -226,8 +226,8 @@ function initDiscountGrid(){
 				
 				requestParams = {
 					dataSource : 'getDetailChart',
-					dateBeg : discount_beginDate.getValue().format('Y-m-d 00:00:00'),
-					dateEnd : discount_endDate.getValue().format('Y-m-d 23:59:59'),
+					dateBeg : Ext.util.Format.date(discount_beginDate.getValue(), 'Y-m-d 00:00:00'),
+					dateEnd : Ext.util.Format.date(discount_endDate.getValue(), 'Y-m-d 23:59:59'),
 					deptID : discount_deptCombo.getValue(),
 					staffId : discount_combo_staffs.getValue(),
 					opening : businessHour.opening,
@@ -276,8 +276,8 @@ function initDiscountGrid(){
 			url = String.format(
 					url, 
 					'ExportHistoryStatisticsToExecl.do', 
-					beginDate.getValue().format('Y-m-d 00:00:00'),
-					endDate.getValue().format('Y-m-d 23:59:59'),
+					Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00'),
+					Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59'),
 					discount_combo_staffs.getValue(),
 					discount_deptCombo.getValue(),
 					'discountStatisticsList'
@@ -364,8 +364,8 @@ function discount_changeChartWidth(w,h){
 }
 
 function showDiscountDetailChart(jdata){
-	var dateBegin = Ext.getCmp('discount_dateSearchDateBegin').getValue().format('Y-m-d');
-	var dateEnd = Ext.getCmp('discount_dateSearchDateEnd').getValue().format('Y-m-d');
+	var dateBegin = Ext.util.Format.date(Ext.getCmp('discount_dateSearchDateBegin').getValue(), 'Y-m-d');
+	var dateEnd = Ext.util.Format.date(Ext.getCmp('discount_dateSearchDateEnd').getValue(), 'Y-m-d');
 	
 	var hourBegin = Ext.getCmp('discount_txtBusinessHourBegin').getEl().dom.textContent;
 	var hourEnd = Ext.getCmp('discount_txtBusinessHourEnd').getEl().dom.textContent;

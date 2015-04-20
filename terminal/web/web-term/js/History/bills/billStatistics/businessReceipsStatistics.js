@@ -104,8 +104,8 @@ function loadBusinessStatistic(x){
 }
 
 function recipe_showChart(jdata){
-	var dateBegin = Ext.getCmp('receipts_dateSearchDateBegin').getValue().format('Y-m-d');
-	var dateEnd = Ext.getCmp('receipts_dateSearchDateEnd').getValue().format('Y-m-d');
+	var dateBegin = Ext.util.Format.date(Ext.getCmp('receipts_dateSearchDateBegin').getValue(), 'Y-m-d');
+	var dateEnd = Ext.util.Format.date(Ext.getCmp('receipts_dateSearchDateEnd').getValue(), 'Y-m-d');
 	
 	var hourBegin = Ext.getCmp('businessReceipt_txtBusinessHourBegin').getEl().dom.textContent;
 	var hourEnd = Ext.getCmp('businessReceipt_txtBusinessHourEnd').getEl().dom.textContent;
@@ -373,8 +373,8 @@ function initBusinessReceipsGrid(c){
 			}
 			
 			initBusinessReceipsData({
-				dateBegin : dateBegin.getValue().format('Y-m-d 00:00:00'), 
-				dateEnd :dateEnd.getValue().format('Y-m-d 23:59:59'),
+				dateBegin : Ext.util.Format.date(dateBegin.getValue(), 'Y-m-d 00:00:00'), 
+				dateEnd :Ext.util.Format.date(dateEnd.getValue(), 'Y-m-d 23:59:59'),
 				opening : data.opening,
 				ending : data.ending
 			});
@@ -394,8 +394,8 @@ function initBusinessReceipsGrid(c){
 					-10, 
 					restaurantID, 
 					'businessReceips',
-					onDuty.getValue().format('Y-m-d 00:00:00'),
-					offDuty.getValue().format('Y-m-d 23:59:59')
+					Ext.util.Format.date(onDuty.getValue(), 'Y-m-d 00:00:00'),
+					Ext.util.Format.date(offDuty.getValue(), 'Y-m-d 23:59:59')
 				);
 			
 			window.location = url;
