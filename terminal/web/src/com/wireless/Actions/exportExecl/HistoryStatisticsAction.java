@@ -1711,12 +1711,13 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		sheet.setColumnWidth(0, 3800);
 		sheet.setColumnWidth(1, 3000);
-		sheet.setColumnWidth(2, 3300);
-		sheet.setColumnWidth(3, 4000);
-		sheet.setColumnWidth(4, 3000);
+		sheet.setColumnWidth(2, 3800);
+		sheet.setColumnWidth(3, 3300);
+		sheet.setColumnWidth(4, 4000);
 		sheet.setColumnWidth(5, 3000);
-		sheet.setColumnWidth(6, 6000);
-		sheet.setColumnWidth(7, 4000);
+		sheet.setColumnWidth(6, 3000);
+		sheet.setColumnWidth(7, 6000);
+		sheet.setColumnWidth(8, 4000);
 		
 		//冻结行
 		sheet.createFreezePane(0, 5, 0, 5);
@@ -1730,7 +1731,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(titleStyle);
 		
 		//合并单元格
-		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 7));
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 8));
 		
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
@@ -1746,7 +1747,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("统计时间: " + date );
 //		cell.setCellStyle(strStyle);
 		
-		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
 		
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
@@ -1756,12 +1757,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("总收款金额: " + df.format(sum.getChargeMoney()) + "         总充值额 :" + df.format(sum.getDeltaTotalMoney()));
 //		cell.setCellStyle(strStyle);
 		
-		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
 		
 		//空白
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
-		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
 		
 		//列头
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -1774,6 +1775,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("会员类型");
 		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("手机号码");
+		cell.setCellStyle(headerStyle);		
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("实收/实退");
@@ -1809,6 +1814,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 			
 			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(mo.getMember().getMemberType().getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(mo.getMemberMobile().isEmpty()? "----" : mo.getMemberMobile());
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
