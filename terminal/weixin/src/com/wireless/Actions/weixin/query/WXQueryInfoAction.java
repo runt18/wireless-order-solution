@@ -68,12 +68,9 @@ public class WXQueryInfoAction extends DispatchAction{
 			OssImage oss = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId)).getWeixinLogo();
 			String logo;
 			if(oss == null){
-				logo = getServlet().getInitParameter("imageBrowseDefaultFile");
+				logo = "http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxLogo/default.jpg";					
 			}else{
 				logo = oss.getObjectUrl();
-				if(logo.isEmpty()){
-					logo = "http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxLogo/default.jpg";					
-				}
 			}
 			
 			final Restaurant rInfo = RestaurantDao.getById(restaurantId);
