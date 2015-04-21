@@ -27,8 +27,6 @@ import com.wireless.test.db.oss.TestOssImage;
 
 public class TestWeixinRestaurantDao {
 	
-	private static final String WEIXIN_RESTAURANT_SERIAL = "oACWTjsRKuGYTjEpEyG7fPTg06fc";
-	
 	private static Staff mStaff;
 	
 	private static OSSClient ossClient;
@@ -47,7 +45,7 @@ public class TestWeixinRestaurantDao {
 	}
 	
 	@Test
-	public void testVerifyAndBind() throws SQLException, BusinessException, NoSuchAlgorithmException{
+	public void testVerify() throws SQLException, BusinessException, NoSuchAlgorithmException{
 		final String account = "demo";
 		final String timestamp = "2013-9-11 7:48:00";
 		final String nonce = "jingyang";
@@ -56,12 +54,6 @@ public class TestWeixinRestaurantDao {
 		Assert.assertEquals("verify status", WxRestaurant.Status.VERIFIED, actual.getStatus());
 		Assert.assertTrue("verify restaurant", WxRestaurantDao.isVerified(account));
 		
-		WxRestaurantDao.bind(WEIXIN_RESTAURANT_SERIAL, account);
-		actual = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(RestaurantDao.getByAccount(account).getId()));
-		Assert.assertEquals("bind status", WxRestaurant.Status.BOUND, actual.getStatus());
-		
-		Assert.assertTrue("weixin serial is bound to restaurant account", WxRestaurantDao.isBound(WEIXIN_RESTAURANT_SERIAL, account));
-		Assert.assertEquals("restaurant bound to weixin serial", RestaurantDao.getByAccount(account).getId(), WxRestaurantDao.getRestaurantIdByWeixin(WEIXIN_RESTAURANT_SERIAL));
 	}
 	
 	@Test 
