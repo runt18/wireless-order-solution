@@ -821,12 +821,20 @@ public class DiscountDao {
 	public static void delete(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
 		String sql;
 		
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order WHERE discount_id = " + id;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			if(dbCon.rs.getInt(1) > 0){
+				throw new BusinessException("当前有账单正在使用此折扣方案, 不能删除", DiscountError.RESERVED_NOT_ALLOW_DELETE);
+			}
+		}
+		
 		//Check to see whether the discount belongs to reserved.
 		sql = " SELECT type FROM " + Params.dbName + ".discount WHERE discount_id = " + id;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			if(Discount.Type.valueOf(dbCon.rs.getInt("type")) == Type.RESERVED){
-				throw new BusinessException(DiscountError.RESERVED_NOT_ALLOW_DELETE);
+				throw new BusinessException("系统保留的折扣方案不能删除", DiscountError.RESERVED_NOT_ALLOW_DELETE);
 			}
 		}else{
 			throw new BusinessException(DiscountError.DISCOUNT_NOT_EXIST);
