@@ -7,7 +7,7 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqFeastOrder extends RequestPackage {
 
-	protected ReqFeastOrder(Staff staff, Order.FeastBuilder builder) {
+	public ReqFeastOrder(Staff staff, Order.FeastBuilder builder) {
 		super(staff);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.INSERT_FEAST_ORDER;
