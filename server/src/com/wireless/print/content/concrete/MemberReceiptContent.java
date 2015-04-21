@@ -43,13 +43,13 @@ public class MemberReceiptContent extends ConcreteContent {
 		s.append("时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(mMo.getOperateDate())).append(SEP);
 		
 		s.append(new Grid2ItemsContent("操作人：" + mWaiter,
-									   "操作类型：" + mMo.getOperationType().getName() + "(" + mOrder.getPaymentType().toString() + ")",
+									   "操作类型：" + mMo.getOperationType().getName() + (mOrder != null ? "(" + mOrder.getPaymentType().toString() + ")" : ""),
 									   getStyle())).append(SEP);
 		
 		if(mMo.getOperationType() == OperationType.CONSUME){
 			s.append("消费账单号：" + mOrder.getId()).append(SEP); 
 			if(mOrder != null){
-				s.append("餐台：" + mOrder.getDestTbl().getAliasId() + (mOrder.getDestTbl().getName().isEmpty() ? "" : ("(" + mOrder.getDestTbl().getName() + ")"))).append(SEP);
+				s.append("餐台：" + mOrder.getDestTbl().getName()).append(SEP);
 			}
 			
 		}else if(mMo.getOperationType() == OperationType.CHARGE){

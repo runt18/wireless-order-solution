@@ -339,7 +339,11 @@ class OrderHandler implements Runnable{
 	}
 	
 	private RespPackage doFeastOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
-		OrderDao.feast(staff, new Parcel(request.body).readParcel(Order.FeastBuilder.CREATOR));
+		int orderId = OrderDao.feast(staff, new Parcel(request.body).readParcel(Order.FeastBuilder.CREATOR));
+		//Perform to print receipt to this feast order.
+		new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, staff, 
+																						  PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true)), 
+																						  OrderDao.getById(staff, orderId, DateType.TODAY)));
 		return new RespACK(request.header);
 	}
 	
@@ -518,9 +522,9 @@ class OrderHandler implements Runnable{
 	private RespPackage doPayOrder(final Staff staff, ProtocolPackage request)  throws SQLException, BusinessException{
 		final Order.PayBuilder payBuilder = new Parcel(request.body).readParcel(Order.PayBuilder.CREATOR);
 		
-		List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true));
+		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true));
 		
-		PrintHandler printHandler = new PrintHandler(staff);
+		final PrintHandler printHandler = new PrintHandler(staff);
 
 		/**
 		 * If pay order temporary, just only print the temporary receipt.
