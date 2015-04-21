@@ -1881,11 +1881,24 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String offDuty = request.getParameter("offDuty");
 		String fuzzy = request.getParameter("fuzzy");
 		
-		final MemberOperationDao.ExtraCond extraCond;
+		MemberOperationDao.ExtraCond extraCond = null;
+		
+		DateType dy;
+		
 		if(dataSource.equalsIgnoreCase("today")){
-			extraCond = new MemberOperationDao.ExtraCond(DateType.TODAY);
+			dy = DateType.TODAY;
 		}else{
-			extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
+			dy = DateType.HISTORY;
+		}
+
+		if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
+			if(Integer.valueOf(operateType) == OperationType.CONSUME.getType()){
+				extraCond = new MemberOperationDao.ExtraCond4Consume(dy);
+			}else{
+				extraCond = new MemberOperationDao.ExtraCond(dy);
+			}
+		}else{
+			extraCond = new MemberOperationDao.ExtraCond(dy);
 		}
 		
 		if(fuzzy != null && !fuzzy.trim().isEmpty()){
@@ -1898,10 +1911,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 		if(memberType != null && !memberType.trim().isEmpty()){
 			extraCond.setMemberType(Integer.parseInt(memberType));
 		}
-		if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
-			for(OperationType type : OperationType.typeOf(Integer.parseInt(operateType))){
-				extraCond.addOperationType(type);
-			}
+		
+		if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
+			extraCond.setOperateDate(new DutyRange(onDuty, offDuty));
 		}
 		
 		String orderClause = " ORDER BY MO.operate_date ";
@@ -1916,7 +1928,15 @@ public class HistoryStatisticsAction extends DispatchAction{
 			sum.setOperateSeq(list.get(0).getOperateSeq());
 			sum.setStaffName(list.get(0).getStaffName());
 			for(MemberOperation temp : list){
-				temp.setMember(MemberDao.getById(staff, temp.getMemberId()));
+				List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setId(temp.getMemberId()), null);
+				
+				if(members.isEmpty()){
+					MemberType delteMT = new MemberType(0);
+					delteMT.setName("已删除会员");
+					temp.getMember().setMemberType(delteMT);
+				}else{
+					temp.setMember(members.get(0));
+				}
 				
 				sum.setDeltaBaseMoney(temp.getDeltaBaseMoney() + sum.getDeltaBaseMoney());
 				sum.setDeltaExtraMoney(temp.getDeltaExtraMoney() + sum.getDeltaExtraMoney());
