@@ -76,12 +76,12 @@ Ext.onReady(function(){
 						var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');
 						var rechargeType = Ext.getCmp('rd_comboFirstRechargeType');
 						if(cm_obj.otype.toLowerCase() == Ext.ux.otype['insert'].toLowerCase() && record.get('attributeValue') == 0){
-							firstCharge.show();
-							firstCharge.getEl().up('.x-form-item').setDisplayed(true);	
-							firstActualCharge.show();
-							firstActualCharge.getEl().up('.x-form-item').setDisplayed(true);
-							rechargeType.show();
-							rechargeType.getEl().up('.x-form-item').setDisplayed(true);
+							firstCharge.enable();
+//							firstCharge.getEl().up('.x-form-item').setDisplayed(true);	
+							firstActualCharge.enable();
+//							firstActualCharge.getEl().up('.x-form-item').setDisplayed(true);
+							rechargeType.enable();
+//							rechargeType.getEl().up('.x-form-item').setDisplayed(true);
 							
 							chargeRate = record.get('chargeRate');
 							
@@ -106,7 +106,7 @@ Ext.onReady(function(){
 			}]
 		}, {
 			items : [{
-				hidden : true,
+//				hidden : true,
 				xtype : 'numberfield',
 				id : 'cm_numFirstCharge',
 				fieldLabel : '首次充值',
@@ -132,7 +132,7 @@ Ext.onReady(function(){
 			}]
 		}, {
 			items : [{
-				hidden : true,
+//				hidden : true,
 				xtype : 'numberfield',
 				id : 'cm_numFirstActualCharge',
 				fieldLabel : '账户充额'
@@ -329,11 +329,12 @@ function cm_operationMemberData(c){
 	
 	
 	if(c.type.toUpperCase() == Ext.ux.otype['set'].toUpperCase()){
-		memberType.store.loadData(c.data.memberTypeData);
+		firstCharge.disable();
+		firstActualCharge.disable();
+		rechargeType.disable();
 		
-		firstCharge.getEl().up('.x-form-item').setDisplayed(false);
-		firstActualCharge.getEl().up('.x-form-item').setDisplayed(false);
-		rechargeType.getEl().up('.x-form-item').setDisplayed(false);
+		memberType.store.loadData(c.data.memberTypeData);
+		console.log(c.data.memberTypeData)
 		
 		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
 		memberID.setValue(data['id']);
@@ -386,7 +387,9 @@ function cm_operationMemberData(c){
 			}
 			
 		}
-		
+//		firstCharge.getEl().up('.x-form-item').setDisplayed(false);
+//		firstActualCharge.getEl().up('.x-form-item').setDisplayed(false);
+//		rechargeType.getEl().up('.x-form-item').setDisplayed(false);
 /*		if(data['name']){
 			publicComment.getEl().dom.readOnly = true;
 			privateComment.getEl().dom.readOnly = true;
