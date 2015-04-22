@@ -265,6 +265,8 @@ function loadOrderBasicMsg(){
 	
 	if(orderMsg.coupon){
 		$('#orderCouponInfo').html('当前优惠券:<font style="color:green;font-weight:bold;">'+ orderMsg.coupon.couponType.name + (orderMsg.coupon.couponType.price > 0? " (¥" + orderMsg.coupon.couponType.price +")" : "") + '</font>');
+	}else{
+		$('#orderCouponInfo').html('');
 	}
 	
 	if(orderMsg.memberId && orderMsg.memberId > 0){
