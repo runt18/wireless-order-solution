@@ -329,11 +329,12 @@ function cm_operationMemberData(c){
 	
 	
 	if(c.type.toUpperCase() == Ext.ux.otype['set'].toUpperCase()){
+		memberType.store.loadData(c.data.memberTypeData);
+		
 		firstCharge.getEl().up('.x-form-item').setDisplayed(false);
 		firstActualCharge.getEl().up('.x-form-item').setDisplayed(false);
 		rechargeType.getEl().up('.x-form-item').setDisplayed(false);
 		
-		memberType.store.loadData(c.data.memberTypeData);
 		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
 		memberID.setValue(data['id']);
 		name.setValue(data['name']);
