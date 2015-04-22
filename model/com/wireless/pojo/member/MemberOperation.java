@@ -11,8 +11,8 @@ import com.wireless.pojo.util.DateUtil;
 public class MemberOperation implements Jsonable {
 
 	/**
-	 * 操作类型(value) 1-充值, 2-消费, 3-积分消费, 4-积分调整, 5-金额调整, 6-取款
 	 * 报表搜索大类(type) 1-消费反结账, 2-充值取款, 3-积分 
+	 * 操作类型(value) 1-充值, 2-消费, 3-积分消费, 4-积分调整, 5-金额调整, 6-取款
 	 * @author WuZY
 	 */
 	public static enum OperationType {

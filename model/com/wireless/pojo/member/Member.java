@@ -821,7 +821,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.putJsonable("memberType", this.memberType, 0);
 		jm.putString("name", this.name);
 		jm.putString("tele", this.tele);
-		jm.putString("mobile", this.mobile);
+		jm.putString("mobile", this.getMobile());
 		jm.putLong("birthday", this.birthday);
 		jm.putString("birthdayFormat", this.birthday != 0 ? DateUtil.formatToDate(this.birthday) : "");
 		jm.putString("idCard", this.idCard);
