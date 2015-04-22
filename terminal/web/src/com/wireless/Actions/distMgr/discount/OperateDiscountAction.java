@@ -25,6 +25,7 @@ public class OperateDiscountAction extends DispatchAction{
 		final int orderId = Integer.parseInt(request.getParameter("orderId"));
 		final int discountId = Integer.parseInt(request.getParameter("discountId") != null?request.getParameter("discountId"):"0");
 		String pricePlanId = request.getParameter("pricePlan");
+		String coupon = request.getParameter("coupon");
 		final int memberId;
 		if(request.getParameter("memberId") != null && !request.getParameter("memberId").isEmpty()){
 			memberId = Integer.parseInt(request.getParameter("memberId"));
@@ -41,10 +42,15 @@ public class OperateDiscountAction extends DispatchAction{
 			if(memberId != 0){
 				int pricePlan = 0;
 				if(pricePlanId != null && !pricePlanId.trim().isEmpty()){
-					//FIXME lack of coupon
 					pricePlan = Integer.parseInt(pricePlanId);
 				}
-				builder = Order.DiscountBuilder.build4Member(orderId, MemberDao.getById(staff, memberId), discountId, pricePlan, 0);
+				
+				int couponId = 0;
+				if(coupon != null && !coupon.trim().isEmpty()){
+					couponId = Integer.parseInt(coupon);
+				}		
+				
+				builder = Order.DiscountBuilder.build4Member(orderId, MemberDao.getById(staff, memberId), discountId, pricePlan, couponId);
 			}else{
 				builder = Order.DiscountBuilder.build4Normal(orderId, discountId);
 			}
