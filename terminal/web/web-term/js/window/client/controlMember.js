@@ -2,7 +2,6 @@ Ext.onReady(function(){
 	var memeberCardAliasID = {
 		xtype : 'numberfield',
 		id : 'cm_numberMemberCard',
-		//inputType : 'password',
 		fieldLabel : '会员卡',
 		disabled : false
 	};
@@ -58,8 +57,6 @@ Ext.onReady(function(){
 				readOnly : false,
 				forceSelection : true,
 				store : new Ext.data.JsonStore({
-//					url: '../../QueryMemberType.do?dataSource=normal',
-//					root : 'root',
 					fields : ['id', 'name', 'attributeValue', 'chargeRate']
 				}),
 				valueField : 'id',
@@ -189,17 +186,6 @@ Ext.onReady(function(){
 				format : 'Y-m-d'
 			}]
 		}, 
-/*		{
-			items : [{
-				id : 'cm_txtMemberTastePref',
-				fieldLabel : '口味'
-			}]
-		}, {
-			items : [{
-				id : 'cm_txtMemberTaboo',
-				fieldLabel : '忌讳'
-			}]
-		}, */
 		{
 			columnWidth : 1,
 			items : [{
@@ -208,21 +194,6 @@ Ext.onReady(function(){
 				width : 535
 			}]
 		}
-/*		, {
-			columnWidth : 1,
-			items : [{
-				id : 'cm_txtMemberPublicComment',
-				fieldLabel : '公有评论',
-				width : 535
-			}]
-		}, {
-			columnWidth : 1,
-			items : [{
-				id : 'cm_txtMemberPrivateComment',
-				fieldLabel : '私有评论',
-				width : 535
-			}]
-		}*/
 		, {
 			columnWidth : 1,
 			xtype : 'panel',
@@ -326,8 +297,6 @@ function cm_operationMemberData(c){
 	
 	firstCharge.setValue();
 	firstActualCharge.setValue();
-//	var publicComment = Ext.getCmp('cm_txtMemberPublicComment');
-//	var privateComment = Ext.getCmp('cm_txtMemberPrivateComment');
 	
 	
 	
@@ -336,13 +305,17 @@ function cm_operationMemberData(c){
 //		firstCharge.getEl().up('.x-form-item').setDisplayed(false);
 //		firstActualCharge.getEl().up('.x-form-item').setDisplayed(false);
 //		rechargeType.getEl().up('.x-form-item').setDisplayed(false);
-		memberType.store.loadData(c.data.memberTypeData);
+		
+		var types = [{attributeValue:0, chargeRate:2, id:36, name:"微信会员"}]
+		
+		memberType.store.loadData(types);
+		console.log(c.data.memberTypeData)
 		
 		firstCharge.disable();
 		firstActualCharge.disable();
 		rechargeType.disable();
 		
-		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
+/*		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
 		memberID.setValue(data['id']);
 		name.setValue(data['name']);
 		mobile.setValue(data['mobile']);
@@ -373,7 +346,7 @@ function cm_operationMemberData(c){
 				memberType.setValue();
 			}
 			
-		}
+		}*/
 		Ext.getCmp('panelControlMemberContent').doLayout();
 		
 	}else if(c.type.toUpperCase() == Ext.ux.otype['get'].toUpperCase()){
@@ -395,7 +368,6 @@ function cm_operationMemberData(c){
 	sex.clearInvalid();
 	
 	
-	Ext.getCmp('panelControlMemberContent').doLayout();
 	return c;
 };
 
