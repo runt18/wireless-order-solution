@@ -1318,11 +1318,10 @@ function winInit(){
 									data : data
 								});
 								focusToAddMember();
-								memberBasicWin.setMemberData = cm_operationMemberBasicMsg;
 								Ext.TaskMgr.stop(this);
 							}
 						},
-						interval: 500
+						interval: 300
 					};
 					
 					

@@ -43,7 +43,7 @@ Ext.onReady(function(){
 			items : [{
 				id : 'cm_txtMemberMobile',
 				style : 'font-weight: bold; color: #FF0000;',
-				fieldLabel : '手机' + Ext.ux.txtFormat.xh,
+				fieldLabel : '手机',
 				regex : Ext.ux.RegText.phone.reg,
 				regexText : Ext.ux.RegText.phone.error
 			}]
