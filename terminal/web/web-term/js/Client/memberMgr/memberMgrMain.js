@@ -1318,10 +1318,11 @@ function winInit(){
 									data : data
 								});
 								focusToAddMember();
+								memberBasicWin.setMemberData = cm_operationMemberBasicMsg;
 								Ext.TaskMgr.stop(this);
 							}
 						},
-						interval: 1000
+						interval: 500
 					};
 					
 					
@@ -1366,6 +1367,46 @@ function winInit(){
 					boxLabel : '发送充值信息'+(Ext.ux.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Ext.ux.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Ext.ux.smsCount+'条, 请及时充值</font>)'),
 					hidden : true
 				},'->', {
+					text : '应用',
+					id : 'btnAppControlMemberBasicMsg',
+					iconCls : 'btn_app',
+					handler : function(e){
+						if(typeof operateMemberHandler != 'function'){
+							Ext.example.msg('提示', '操作失败, 请求异常, 请尝试刷新页面后重试.');
+						}else{
+							var sendSms = Ext.getCmp('chbSendFirstCharge').getValue();
+							if(sendSms){
+								Ext.ux.setCookie(document.domain+'_chargeSms', true, 3650);
+							}else{
+								Ext.ux.setCookie(document.domain+'_chargeSms', false, 3650);
+							}
+							var btnClose = Ext.getCmp('btnCloseControlMemberBasicMsg');
+							operateMemberHandler({
+								type : memberBasicWin.otype,
+								data : memberBasicWin.otype == Ext.ux.otype['update'] ? Ext.ux.getSelData(memberBasicGrid) : null,
+								isPrint : Ext.getCmp('chbPrintFirstRecharge').getValue(),
+								sendSms : Ext.getCmp('chbSendFirstCharge').getValue(),										
+								setButtonStatus : function(s){
+									e.setDisabled(s);
+									btnClose.setDisabled(s);
+								},
+								callback : function(memberData, c, res){
+									if(res.success){
+										Ext.example.msg(res.title, res.msg);
+										cm_operationMemberBasicMsg({
+											type : 'SET',
+											data : {memberTypeData: memberTypeData.root}
+										});	
+										focusToAddMember();
+									}else{
+										Ext.ux.showMsg(res);
+										
+									}
+								}
+							});							
+						}
+					}
+			}, {
 					text : '保存',
 					id : 'btnSaveControlMemberBasicMsg',
 					iconCls : 'btn_save',

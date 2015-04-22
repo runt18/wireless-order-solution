@@ -44,7 +44,6 @@ Ext.onReady(function(){
 				id : 'cm_txtMemberMobile',
 				style : 'font-weight: bold; color: #FF0000;',
 				fieldLabel : '手机' + Ext.ux.txtFormat.xh,
-				allowBlank : false,
 				regex : Ext.ux.RegText.phone.reg,
 				regexText : Ext.ux.RegText.phone.error
 			}]
@@ -418,7 +417,7 @@ function cm_operationMemberBasicMsg(c){
 	if(c == null || c.type == null || typeof c.type == 'undefined')
 		return;
 	if(c.type.toUpperCase() == Ext.ux.otype['set'].toUpperCase()){
-		if(!c.data.memberTypeData){
+		if(c.data && !c.data.memberTypeData){
 			$.ajax({
 				url : '../../QueryMemberType.do',
 				type : 'post',

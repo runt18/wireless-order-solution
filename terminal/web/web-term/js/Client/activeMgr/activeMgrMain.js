@@ -1,7 +1,7 @@
 
 
 /**
- * 修改部门信息
+ * 初始化优惠活动编辑
  */
 function initCouponTypeWin(c){
 	operatePromotTypeWin = Ext.getCmp('operatePromotTypeWin');
