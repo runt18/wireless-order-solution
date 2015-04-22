@@ -255,13 +255,17 @@ function loadOrderBasicMsg(){
 	document.getElementById('spanDisplayCurrentServiceRate').innerHTML = (orderMsg.serviceRate*100)+'%';
 	$('#orderCustomNum').html(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
 	
-	//会员和折扣
+	//会员 & 折扣 & 优惠劵
 	var discountDesc = '当前折扣:<font style="color:green;font-weight:bold;">'+ orderMsg.discount.name + '</font>'
 	if(orderMsg.discounter){
 		discountDesc += ', 折扣人:<font style="color:green;font-weight:bold;">'+ orderMsg.discounter + '</font>';
 		discountDesc += ', 折扣时间:<font style="color:green;font-weight:bold;">'+ orderMsg.discountDate + '</font>';
 	}
 	$('#orderDiscountDesc').html(discountDesc);
+	
+	if(orderMsg.coupon){
+		$('#orderCouponInfo').html('当前优惠券:<font style="color:green;font-weight:bold;">'+ orderMsg.coupon.couponType.name + (orderMsg.coupon.couponType.price > 0? " (¥" + orderMsg.coupon.couponType.price +")" : "") + '</font>');
+	}
 	
 	if(orderMsg.memberId && orderMsg.memberId > 0){
 		//设置会员结账按钮
@@ -1026,7 +1030,7 @@ function loadMemberInfo(member){
 	}
 	$('#payment_discountList4Member').html(discountHtml).trigger('create');
 	
-	if(pricePlans){
+	if(pricePlans.length > 0){
 		$('#payment4MemberPricePlan').text(member.memberType.pricePlan.name);
 		$('#payment4MemberPricePlan').attr('data-value', member.memberType.pricePlan.id);
 		for (var i = 0; i < pricePlans.length; i++) {
@@ -1035,7 +1039,7 @@ function loadMemberInfo(member){
 		$('#payment_pricePlanList4Member').html(pricePlanHtml).trigger('create');
 	}
 	
-	if(member.coupons){
+	if(member.coupons && member.coupons.length > 0){
 		var couponHtml = '';
 		$('#payment4MemberCoupon').text('不使用');
 		for (var i = 0; i < member.coupons.length; i++) {

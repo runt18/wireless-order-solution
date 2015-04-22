@@ -194,11 +194,12 @@ uo.showNorthForUpdateOrder = function(){
  */
 uo.showDescForUpdateOrder = function(){
 	var html = "";
-	html = (uo.orderMember?"<span style = 'margin-left: 20px;'>当前会员：<font color='green'>" + uo.orderMember.name +"</font></span>" : "") +
+	html = (uo.order.coupon?"<span style = 'margin-left: 20px;'>当前优惠劵：<font color='green'>" + uo.order.coupon.couponType.name + (uo.order.coupon.couponType.price > 0? " (¥" + uo.order.coupon.couponType.price +")" : "") +"</font></span>" : "") + 
+		(uo.orderMember?"<span style = 'margin-left: 20px;'>当前会员：<font color='green'>" + uo.orderMember.name +"</font></span>" : "") +
 		(uo.order.discount?"<span style = 'margin-left: 20px;'>当前折扣：<font color='green'>" + uo.order.discount.name +"</font></span>" : "") +
 		(uo.order.discounter ? "<span style = 'margin-left: 20px;'>折扣人：<font color='green'>" + uo.order.discounter + "</font></span><span style = 'margin-left: 20px;'>折扣时间：<font color='green'>" + uo.order.discountDate + "</font></span>" : "") ;
 	$("#divDescForUpdateOrder").html(html);
-	$("#spanTotalPriceUO").html('消费总额：<font color="green">¥'+ uo.order.totalPrice + "</font>");
+	$("#spanTotalPriceUO").html('消费总额：<font color="green">¥'+ uo.order.actualPrice + "</font>");
 	if(uo.order.tempPayStaff){
 		$("#spanToTempPayStatus").html('暂结人：<font color="green">' + uo.order.tempPayStaff +'</font>，暂结时间：<font color="green">'+ uo.order.tempPayDate + "</font>");
 	}else{

@@ -1541,6 +1541,7 @@
 	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
 		<div  class="bottomGeneralBar" style="background-color:#f7c942">
 			<div id="divDescForUpdateOrder" style="float: right;">
+				<span id="orderCouponInfo" style="float: left;margin-right: 20px;"></span>	
 				<span id="orderMemberDesc" style="float: left;margin-right: 20px;"></span>			
 				<span id="orderDiscountDesc" style="float: left;margin-right: 20px;">
 					当前折扣: <font color="green" >----</font>
