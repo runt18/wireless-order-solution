@@ -218,12 +218,12 @@ public class WxMemberDao {
 	public static int bind(DBCon dbCon, Staff staff, WxMember.BindBuilder builder) throws SQLException, BusinessException{
 		
 		final int memberId;
-		final WxMember wxMemberToBind = getBySerial(dbCon, staff, builder.getSerial());
+		final WxMember weixinMember = getBySerial(dbCon, staff, builder.getSerial());
 		
 		List<Member> membersToMobile = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setMobile(builder.getMobile()), null);
 		if(membersToMobile.isEmpty()){
 			//Check to see whether the member associated with this weixin serial exist.
-			List<Member> membersToSerial = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(wxMemberToBind.getSerial()), null);
+			List<Member> membersToSerial = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(weixinMember.getSerial()), null);
 			if(membersToSerial.isEmpty()){
 				throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 			}
@@ -233,7 +233,7 @@ public class WxMemberDao {
 			
 		}else{
 			//Delete the member associated with this weixin while interested.
-			MemberDao.deleteByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(wxMemberToBind.getSerial()));
+			MemberDao.deleteByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(weixinMember.getSerial()));
 			
 			memberId = membersToMobile.get(0).getId();
 			String sql;
@@ -242,7 +242,7 @@ public class WxMemberDao {
 				  " member_id = " + memberId +
 				  " ,status = " + WxMember.Status.BOUND.getVal() + 
 				  " ,bind_date = NOW() " +
-				  " WHERE weixin_card = " + wxMemberToBind.getCard();
+				  " WHERE weixin_card = " + weixinMember.getCard();
 			
 			if(dbCon.stmt.executeUpdate(sql) == 0){
 				throw new BusinessException(WxMemberError.WEIXIN_INFO_NOT_EXIST);

@@ -884,6 +884,8 @@ public class OrderDao {
 		//Set the coupon if exist.
 		if(builder.hasCoupon()){
 			order.setCoupon(CouponDao.getById(dbCon, staff, builder.getCouponId()));
+		}else{
+			order.setCoupon(null);
 		}
 		
 		String sql;
@@ -894,8 +896,9 @@ public class OrderDao {
 			  " ,discount_staff = '" + staff.getName() + "'" +
   			  " ,discount_date = NOW() " +
 			  " ,discount_id = " + order.getDiscount().getId() +
-			  (order.hasPricePlan() ? " ,price_plan_id = " + order.getPricePlan().getId() : "") +
-			  (order.hasCoupon() ? " ,coupon_id = " + order.getCoupon().getId() + " ,coupon_price = " + order.getCoupon().getPrice(): "") +
+			  " ,price_plan_id = " + (builder.hasPricePlan() ? order.getPricePlan().getId() : " NULL ") +
+			  " ,coupon_id = " + (order.hasCoupon() ? order.getCoupon().getId() : " NULL ") +
+			  " ,coupon_price = " + (order.hasCoupon() ? order.getCoupon().getPrice() : "0") +
 			  " ,member_id = " + builder.getMemberId() +
 			  " WHERE id = " + order.getId();
 		dbCon.stmt.executeUpdate(sql);
