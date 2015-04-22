@@ -1321,7 +1321,7 @@ function winInit(){
 								Ext.TaskMgr.stop(this);
 							}
 						},
-						interval: 200
+						interval: 1000
 					};
 					
 					

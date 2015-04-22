@@ -76,12 +76,15 @@ Ext.onReady(function(){
 						var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');
 						var rechargeType = Ext.getCmp('rd_comboFirstRechargeType');
 						if(cm_obj.otype.toLowerCase() == Ext.ux.otype['insert'].toLowerCase() && record.get('attributeValue') == 0){
-							firstCharge.show();
-							firstCharge.getEl().up('.x-form-item').setDisplayed(true);	
-							firstActualCharge.show();
-							firstActualCharge.getEl().up('.x-form-item').setDisplayed(true);
-							rechargeType.show();
-							rechargeType.getEl().up('.x-form-item').setDisplayed(true);
+//							firstCharge.show();
+//							firstCharge.getEl().up('.x-form-item').setDisplayed(true);	
+//							firstActualCharge.show();
+//							firstActualCharge.getEl().up('.x-form-item').setDisplayed(true);
+//							rechargeType.show();
+//							rechargeType.getEl().up('.x-form-item').setDisplayed(true);
+							firstCharge.enable();
+							firstActualCharge.enable();
+							rechargeType.enable();
 							
 							chargeRate = record.get('chargeRate');
 							
@@ -106,7 +109,7 @@ Ext.onReady(function(){
 			}]
 		}, {
 			items : [{
-				hidden : true,
+//				hidden : true,
 				xtype : 'numberfield',
 				id : 'cm_numFirstCharge',
 				fieldLabel : '首次充值',
@@ -132,7 +135,7 @@ Ext.onReady(function(){
 			}]
 		}, {
 			items : [{
-				hidden : true,
+//				hidden : true,
 				xtype : 'numberfield',
 				id : 'cm_numFirstActualCharge',
 				fieldLabel : '账户充额'
@@ -329,11 +332,15 @@ function cm_operationMemberData(c){
 	
 	
 	if(c.type.toUpperCase() == Ext.ux.otype['set'].toUpperCase()){
+		
+//		firstCharge.getEl().up('.x-form-item').setDisplayed(false);
+//		firstActualCharge.getEl().up('.x-form-item').setDisplayed(false);
+//		rechargeType.getEl().up('.x-form-item').setDisplayed(false);
 		memberType.store.loadData(c.data.memberTypeData);
 		
-		firstCharge.getEl().up('.x-form-item').setDisplayed(false);
-		firstActualCharge.getEl().up('.x-form-item').setDisplayed(false);
-		rechargeType.getEl().up('.x-form-item').setDisplayed(false);
+		firstCharge.disable();
+		firstActualCharge.disable();
+		rechargeType.disable();
 		
 		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
 		memberID.setValue(data['id']);
@@ -356,25 +363,6 @@ function cm_operationMemberData(c){
 		point.setValue(data['point']);
 		usedPoint.setValue(data['usedPoint']);
 		
-/*		if(!data['privateComment']){
-			privateComment.setValue();
-			privateComment.enable();
-		}else{
-			privateComment.setValue(data['privateComment'].comment);
-			privateComment.disable();
-		}
-		
-		if(!data['publicComment']){
-			publicComment.setValue();
-			publicComment.enable();
-		}else{
-			var comments = "";
-			for (var i = 0; i < data['publicComment'].length; i++) {
-				comments += data['publicComment'][i].comment + "  ";
-			}
-			publicComment.setValue(comments);
-			publicComment.disable();
-		}*/
 
 		if(typeof data['memberType'] != 'undefined'){
 			memberType.setValue(data['memberType']['id']);
@@ -386,14 +374,8 @@ function cm_operationMemberData(c){
 			}
 			
 		}
+		Ext.getCmp('panelControlMemberContent').doLayout();
 		
-/*		if(data['name']){
-			publicComment.getEl().dom.readOnly = true;
-			privateComment.getEl().dom.readOnly = true;
-		}else{
-			publicComment.getEl().dom.readOnly = false;
-			privateComment.getEl().dom.readOnly = false;
-		}*/
 	}else if(c.type.toUpperCase() == Ext.ux.otype['get'].toUpperCase()){
 		data = {
 			id : memberID.getValue(),
@@ -411,6 +393,9 @@ function cm_operationMemberData(c){
 	memberCard.clearInvalid();
 	memberType.clearInvalid();
 	sex.clearInvalid();
+	
+	
+	Ext.getCmp('panelControlMemberContent').doLayout();
 	return c;
 };
 
