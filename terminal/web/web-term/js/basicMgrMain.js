@@ -1022,8 +1022,7 @@ function operateWXInfo(){
 	wx.info.win.show();
 }
 
-function operateWXLogo(c){
-	c = c ? c : {};
+function operateWXLogo(){
 	if(!wx.logo.win){
 		var uploadMask = new Ext.LoadMask(document.body, {
 			msg : '正在上传图片...'
