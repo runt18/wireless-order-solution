@@ -32,7 +32,6 @@ public class UpdateStaffAction extends Action {
 			String staffPwd = request.getParameter("staffPwd");
 			
 			String roleId = request.getParameter("roleId");
-			String tele = request.getParameter("tele");
 			
 			if(oldPwd != null && !oldPwd.trim().isEmpty()){
 				Staff staff = StaffDao.verify(Integer.parseInt(staffId));
@@ -40,13 +39,19 @@ public class UpdateStaffAction extends Action {
 					throw new BusinessException(StaffError.VERIFY_PWD);
 				}
 			}
-
-			StaffDao.update(StaffDao.verify(Integer.parseInt(pin)),
-							new UpdateBuilder(Integer.parseInt(staffId))
-			 						.setStaffName(staffName)
-			 						.setStaffPwd(staffPwd)
-			 						.setMobile(tele)
-			 						.setRoleId(Integer.parseInt(roleId)));
+			Staff.UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(staffId))
+										.setStaffPwd(staffPwd);
+			
+			
+			if(roleId != null && !roleId.isEmpty()){
+				builder.setRoleId(Integer.parseInt(roleId));
+			}
+			
+			if(staffName != null && !staffName.isEmpty()){
+				builder.setStaffName(staffName);
+			}
+			
+			StaffDao.update(StaffDao.verify(Integer.parseInt(pin)),builder);
 			
 			jobject.initTip(true, "修改成功");
 			
