@@ -107,12 +107,9 @@ if(!changePwdWin){
 								Ext.Ajax.request({
 									url : '../../UpdateStaff.do',
 									params : {
-										isCookie : true,
-										'staffName' : '管理员',
 										'oldPwd' : MD5(oldPwd),
 										'staffId' : staffID,
-										'staffPwd' : newPwd,
-										'roleId' : ss.data.role.id
+										'staffPwd' : newPwd
 									},
 									success : function(response, options) {
 										var jr = Ext.util.JSON.decode(response.responseText);
