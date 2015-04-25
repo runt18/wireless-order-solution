@@ -27,6 +27,7 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberType;
@@ -334,7 +335,7 @@ public class QueryMemberAction extends DispatchAction {
 		
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			MemberOperation mo = MemberOperationDao.getByOrder(staff, Integer.parseInt(orderId));
+			MemberOperation mo = MemberOperationDao.getLastConsumptionByOrder(staff, new Order(Integer.parseInt(orderId)));
 			Member m = MemberDao.getById(staff, mo.getMemberId());
 			List<Member> list = new ArrayList<Member>();
 			list.add(m);
