@@ -686,12 +686,18 @@ public class OrderDao {
 		}
 		
 		Order source = OrderDao.getById(dbCon, staff, builder.getSourceOrderId(), DateType.TODAY);
+
+		final Table destTbl; 
 		
-		if(source.getDestTbl().getAliasId() == builder.getDestTbl().getAliasId()){
+		if(builder.getDestTbl().getId() != 0){
+			destTbl = TableDao.getById(dbCon, staff, builder.getDestTbl().getId());
+		}else{
+			destTbl = TableDao.getByAlias(dbCon, staff, builder.getDestTbl().getAliasId());
+		}
+		
+		if(source.getDestTbl().equals(destTbl)){
 			throw new BusinessException("菜品不能转到相同餐台");
 		}
-
-		Table destTbl = TableDao.getByAlias(dbCon, staff, builder.getDestTbl().getAliasId());
 
 		//Assert the food to transfer out does exist and the amount is less than the original.
 		for(OrderFood foodOut : builder.getTransferFoods()){
