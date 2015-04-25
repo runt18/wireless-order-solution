@@ -31,7 +31,7 @@ public class OrderParcel implements Parcelable{
 	private OrderParcel(Parcel in){
 		if(in.readInt() != 1){
 			mSrcOrder = new Order(in.readInt());
-			mSrcOrder.setSettleType(in.readInt());
+			mSrcOrder.setSettleType(Order.SettleType.valueOf(in.readInt()));
 			mSrcOrder.setPaymentType(new PayType(in.readInt()));
 			mSrcOrder.setCategory(Category.valueOf(in.readInt()));
 			mSrcOrder.setServiceRate(NumericUtil.int2Float(in.readInt()));
