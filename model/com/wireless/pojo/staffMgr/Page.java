@@ -171,10 +171,10 @@ public class Page{
 	}
 	
 	public static enum Weixin{
+		WX_STEPS_BIND("WXBind", "分步", "Client_Module/WeixinAuth.html", "../../images/discountStatistics.png"),
 		WX_BIND("WXBind", "微信餐厅绑定", "", "../../images/discountStatistics.png"),
 		WX_LOGO("WXLogo", "微信餐厅形象", "", "../../images/weixin.png"),
 		WX_INFO("WXInfo", "微信餐厅简介", "", "../../images/resturantMgr.png");
-//		WX_SALES("WXSales", "微信促销信息", "System_Module/WXSalesManagement.html", "../../images/staffMgr.png");
 		
 		private String mgrId;
 		private String desc;
@@ -209,6 +209,7 @@ public class Page{
 	public static enum Member{
 //		MEMBER_TYPE("memberType", "会员类型", "Client_Module/MemberTypeManagement.html", "../../images/memberTypeMgr.png"),
 		MEMBER("memberMgr", "会员管理", "Client_Module/MemberManagement.html", "../../images/memberMgr.png"),
+		WX_STEPS_BIND("WXBind", "微信公众号设置", "Client_Module/WeixinAuth.html", "../../images/discountStatistics.png"),
 		ACTIVE("activeMgr", "优惠活动管理", "Client_Module/ActiveManagement.html", "../../images/memberMgr.png");
 //		MEMBER_LEVEL("memberLevel", "会员等级", "Client_Module/MemberLevelManagement.html", "../../images/memberLevel.png");
 //		COUPON("coupon", "优惠劵管理", "Client_Module/CouponManagement.html", "../../images/book.png" );
