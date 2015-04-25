@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Insert title here</title>
+    
+
+<link rel="stylesheet" href="../../css/stepCss/main.css">
+<link rel="stylesheet" href="../../css/stepCss/jquery.steps.css">
+
+<link href="../../js/umeditor/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
+
+<!-- <script type="text/javascript" charset="utf-8" src="../../jquery/jquery-1.8.2.min.js"></script> -->
+
+
+<style type="text/css"> 
+.edui-combobox-menu .edui-combobox-item {
+  display: block !important;
+  border: 1px solid white;
+}
+
+#weixinAuthRest{ 
+	margin-left : 10px;
+	display: box; 
+	display: -webkit-box; 
+	display: -moz-box; 
+	-webkit-box-pack:center; 
+	-moz-box-pack:center; 
+	-webkit-box-align:center; 
+	-moz-box-align:center; 
+} 
+
+#weixinAuthRest button{
+	height : 50px;
+	font-size : 20px;
+	cursor: pointer;
+}
+
+a[aria-controls ~= weixin_wizard-p]{
+  background: #9dc8e2 !important;
+  color: #fff !important;
+}
+
+
+.displayBorder{
+	border: 1px solid white;
+	margin-right: 10px;
+	-moz-box-shadow: 0 0 8px rgba(0,0,0,.6);
+	-webkit-box-shadow: 0 0 8px rgba(0,0,0,.6);
+	box-shadow: 0 0 8px rgba(0,0,0,.6);	
+	display: box; 
+	display: -webkit-box; 
+	display: -moz-box; 
+	-webkit-box-pack:center; 
+	-moz-box-pack:center; 
+	-webkit-box-align:center; 
+	-moz-box-align:center; 
+}
+
+
+</style>	
+</head>
+<body>
+
+<div id="divWeixinAuth"  style="padding-top: 5px;">
+     <div id="weixin_wizard" style="width: 95%;margin-left: 2.5%;">
+            <span style="font-size: 25px;font-weight: bolder;color: red;'">绑定微信公众号</span>
+            <div>
+            	<div style="float: left;width: 35%;" >
+            		<div id="weixinAuthRest" >
+            			<div align="center">
+            				<div id="weixinAuthRestInfo" class="none">
+		            			<h1>微信餐厅已绑定, 请继续其他操作</h1>
+								<img id="wxRestLogo" alt="" src="http://food-image-test.oss.aliyuncs.com/nophoto.jpg" width="200px" height="200px">
+								<br>微信公众号 : <label id="wxNickName">pinjiao</label>
+								<br><br>
+			            		<button id="btnReAuthWeixinAuth" onclick="linkToAuth()" >重新绑定微信公众号</button>
+		            		</div>
+		            		
+							<button id="btnWeixinAuthFinish" onclick="getRestaurantInfo()" class="none">点击完成绑定</button>
+		            		<button id="btnWeixinAuth" onclick="linkToAuth()" class="none">点击去绑定微信公众号</button>
+						</div>
+            		</div>
+            	</div>
+            	<div style="float:right;width: 60%;text-align: center;">
+            		<h2>操作示例</h2>
+            		<div id="weixinAuthDisplay" class="displayBorder" >
+            			<img width="100%" height="100%" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxGuideSample/wxAuth.jpg"/>
+            		</div>
+            		
+            	</div>
+            </div>     
+			<span style="font-size: 25px;">上传餐厅形象</span>
+			<div id="setImageCmp" style="padding-top:5px;">
+            	<div style="float: left;width: 500px;margin-left: 20px;text-align: center;" >
+            		<h2>上传图片</h2>
+            		<div id="weixinLogoUploader" style="width : inherit;height: 450px;">
+            			
+            		</div>
+            	</div>
+            	<div style="float:right;width: -webkit-calc(100% - 530px);text-align: center;">
+            		<h2>微信端显示效果示例</h2>
+            		<div id="weixinLogoDisplay" class="displayBorder" >
+            			<img width="60%" height="100%" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxGuideSample/wxLogo2.jpg"/>
+            		</div>
+            		
+            	</div>				
+			</div>
+			
+     		<span style="font-size: 25px;">编写餐厅简介</span>
+			<div id="setRestaurantInfoCmp" >
+            	<div style="float: left;" >
+	 				<!--style给定宽度可以影响编辑器的最终宽度-->
+					<div id="myEditor" style="width:600px;height: 430px;margin-left: 10px; ">
+					
+					</div>
+					<div style="float: right;margin-top: 3px;">
+						<button style="height: 30px;" onclick="setRestaurantInfo()">保存内存</button>       		
+						<button style="height: 30px;" onclick="um_clear()">清空</button>
+					</div>	    
+            	</div>
+            	<div  style="float:right;width: -webkit-calc(100% - 630px);text-align: center;">
+            		<h2>微信端显示效果示例</h2>
+            		<div id="weixinEditorDisplay" class="displayBorder">
+            			<img width="100%" height="100%" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxGuideSample/wxRestaurnat.jpg"/>
+            		</div>
+            		
+            	</div>					
+			</div>
+			
+     		<span style="font-size: 25px;">查看效果</span>
+			<div id="seeRestaurantByCode" >
+            	<div  style="text-align: center;">
+            		<br>
+            		<h2 id="seeRestaurantByCodeTitle">微信扫码</h2>
+            		<br>
+            		<div>
+            			<img id="weixinCodeToRestaurant" width="400px" height="400px" src="http://food-image-test.oss.aliyuncs.com/nophoto.jpg"/>
+            		</div>
+            	</div>					
+			</div>			
+
+    </div>
+</div>	
+
+
+</body>
+<script src="../../jquery/jquery.steps.js"></script>
+
+<script type="text/javascript" charset="utf-8" src="../../js/umeditor/umeditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/umeditor/umeditor.js"></script>
+
+
+<script type="text/javascript" src="../../js/umeditor/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript" src="../../js/Client/weixinAuth.js"></script>
+</html>
