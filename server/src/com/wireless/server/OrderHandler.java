@@ -512,8 +512,9 @@ class OrderHandler implements Runnable{
 		OrderDao.repaid(staff, builder);
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
 			ServerConnector.instance().ask(ReqPrintContent.buildReqPrintReceipt(staff, builder.getUpdateBuilder().build().getId()));
-			if(builder.getPayBuilder().getSettleType() == Order.SettleType.MEMBER){
-				ServerConnector.instance().ask(ReqPrintContent.buildReqPrintMemberReceipt(staff, MemberOperationDao.getByOrder(staff, builder.getUpdateBuilder().build().getId()).getId()));
+			Order order = OrderDao.getById(staff, builder.getUpdateBuilder().build().getId(), DateType.TODAY);
+			if(order.isSettledByMember()){
+				ServerConnector.instance().ask(ReqPrintContent.buildReqPrintMemberReceipt(staff, MemberOperationDao.getLastConsumptionByOrder(staff, order).getId()));
 			}
 		}
 		return new RespACK(request.header);
@@ -549,7 +550,7 @@ class OrderHandler implements Runnable{
 				
 				//Perform to print the member receipt if settled by member.
 				printHandler.process(JobContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, staff, printers,
-																							 MemberOperationDao.getByOrder(staff, order.getId())));
+																							 MemberOperationDao.getLastConsumptionByOrder(staff, order)));
 				
 				//Perform SMS notification to member coupon dispatch & member upgrade in another thread so that not affect the order payment.
 				WirelessSocketServer.threadPool.execute(new Runnable(){
@@ -577,7 +578,7 @@ class OrderHandler implements Runnable{
 							Msg4Upgrade msg4Upgrade = MemberLevelDao.upgrade(staff, order.getMemberId());
 
 							if(payBuilder.isSendSMS()){
-								MemberOperation mo = MemberOperationDao.getByOrder(staff, order.getId());
+								MemberOperation mo = MemberOperationDao.getLastConsumptionByOrder(staff, order);
 								//Send SMS if perform member consumption
 								SMS.send(staff, mo.getMemberMobile(), new Msg4Consume(mo));
 								//Send SMS if member upgrade

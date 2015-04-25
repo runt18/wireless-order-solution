@@ -207,16 +207,19 @@ public class ReceiptContent extends ConcreteContent {
 			}
 			line3.append("ƒ® ˝£∫" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getErasePrice()));
 		}
+		if(mOrder.hasCoupon()){
+			if(line3.length() > 0){
+				line3.append("  ");
+			}
+			line3.append(mOrder.getCoupon().getName() + "£∫" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getCouponPrice()));
+		}
 		
 		StringBuilder line4 = new StringBuilder();
-		if(mOrder.getCouponPrice() > 0){
-			line3.append("”≈ª›»Ø£∫" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getCouponPrice()));
-		}
 		
 		String var = new RightAlignedDecorator(line1.toString(), mStyle).toString() +
 					 (line2.length() != 0 ? SEP + new RightAlignedDecorator(line2.toString(), mStyle) : "").toString() +
 					 (line3.length() != 0 ? SEP + new RightAlignedDecorator(line3.toString(), mStyle) : "").toString() +
-					 (line4.length() != 0 ? SEP + new RightAlignedDecorator(line3.toString(), mStyle) : "").toString();
+					 (line4.length() != 0 ? SEP + new RightAlignedDecorator(line4.toString(), mStyle) : "").toString();
 		
 		try{
 			var = new String(var.getBytes("GBK"), "GBK");
