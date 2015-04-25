@@ -186,12 +186,12 @@ public class QueryPrivilegeAction extends DispatchAction{
 					Module mModule = new Module(Module.Code.MEMBER);
 					if(modules.indexOf(mModule) < 0){
 						tree.append(",expanded:false");
-						tree.append(",text:'会员(未开通)'");
+						tree.append(",text:'微信会员(未开通)'");
 						tree.append(",cls:'unModuleFont'");
 						tree.append(",listeners : {beforeexpand : function(){warnModule('会员模块未开通, 只能录入50条信息');}}");
 					}else{
 						tree.append(",expanded:true");
-						tree.append(",text:'会员'");
+						tree.append(",text:'微信会员'");
 						tree.append(",cls:'tFont'");
 					}
 
@@ -261,7 +261,8 @@ public class QueryPrivilegeAction extends DispatchAction{
 					}
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
-				}else if(privilege.getCode() == Code.WEIXIN){
+				}
+/*				else if(privilege.getCode() == Code.WEIXIN){
 					tree.append("{");
 					tree.append("leaf:false");
 					tree.append(",expanded:true");
@@ -277,7 +278,8 @@ public class QueryPrivilegeAction extends DispatchAction{
 					}
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
-				}else if(privilege.getCode() == Code.SMS){
+				}*/
+				else if(privilege.getCode() == Code.SMS){
 					tree.append("{");
 					tree.append("leaf:false");
 					tree.append(",expanded:true");

@@ -28,6 +28,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.restaurantMgr.Restaurant.InsertBuilder;
 import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.restaurantMgr.Restaurant.UpdateBuilder;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.token.Token;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
@@ -417,4 +418,40 @@ public class OperateRestaurantAction extends DispatchAction {
 		}
 		return null;
 	}
+	
+	/**
+	 * 获取绑定后的微信餐厅信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward restInfo(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		String rid = request.getParameter("rid");
+		try{
+			Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			WxRestaurant rest = WxRestaurantDao.get(staff);
+			jobject.setRoot(rest);
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
+	
+	
+	
+	
+	
+	
 }
