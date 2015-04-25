@@ -1,5 +1,7 @@
 package com.wireless.test.db.frontBusiness;
 
+import static org.junit.Assert.assertEquals;
+
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.Comparator;
@@ -11,6 +13,9 @@ import org.junit.Test;
 
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.member.MemberDao;
+import com.wireless.db.member.MemberOperationDao;
+import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.InsertOrder;
 import com.wireless.db.orderMgr.OrderDao;
@@ -22,8 +27,13 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.TableError;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberOperation;
+import com.wireless.pojo.member.MemberOperation.ChargeType;
+import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
@@ -40,7 +50,7 @@ public class TestCommitOrderDao {
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getAdminByRestaurant(37);
+			mStaff = StaffDao.getAdminByRestaurant(40);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -191,7 +201,7 @@ public class TestCommitOrderDao {
 		
 		int orderId = 0;
 		final List<Table> idleTables = TableDao.getByCond(mStaff, new TableDao.ExtraCond().setStatus(Table.Status.IDLE), null);
-		final List<Table> busyTables = TableDao.getByCond(mStaff, new TableDao.ExtraCond().setStatus(Table.Status.BUSY), null);
+		//final List<Table> busyTables = TableDao.getByCond(mStaff, new TableDao.ExtraCond().setStatus(Table.Status.BUSY), null);
 		
 		try{
 			Table tblToInsert = idleTables.get(0);
@@ -255,49 +265,49 @@ public class TestCommitOrderDao {
 			compare4Commit(expectedOrder, actualOrder);
 
 			//-----------Test to transfer food---------------------------
-			OrderFood transferFood1 = actualOrder.getOrderFoods().get(0);
-			OrderFood transferFood2 = actualOrder.getOrderFoods().get(1);
-			
-			if(!busyTables.isEmpty()){
-				Table tblToTransfer = busyTables.get(0);
-				Order expectedTransferOrder = OrderDao.getByTableId(mStaff, tblToTransfer.getId());
-				
-				expectedTransferOrder.addFood(transferFood1, mStaff);
-				
-				OrderDao.transfer(mStaff, new Order.TransferBuilder(orderId, new Table.AliasBuilder(tblToTransfer.getAliasId())).add(transferFood1));
-
-				expectedOrder.remove(transferFood1, mStaff);
-				
-				actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
-
-				compare4Commit(expectedOrder, actualOrder);
-
-				Order actualTransferOrder = OrderDao.getByTableId(mStaff, tblToTransfer.getId());
-				compare4Commit(expectedTransferOrder, actualTransferOrder);
-				
-			}
-			
-			if(!idleTables.isEmpty()){
-				Table tblToTransfer = idleTables.get(1);
-				Order expectedTransferOrder = new Order(0);
-				expectedTransferOrder.setCustomNum(1);
-				expectedTransferOrder.setDestTbl(tblToTransfer);
-				
-				expectedTransferOrder.addFood(transferFood2, mStaff);
-				
-				OrderDao.transfer(mStaff, new Order.TransferBuilder(orderId, new Table.AliasBuilder(tblToTransfer.getAliasId())).add(transferFood2));
-
-				expectedOrder.remove(transferFood2, mStaff);
-				
-				actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
-
-				compare4Commit(expectedOrder, actualOrder);
-
-				Order actualTransferOrder = OrderDao.getByTableId(mStaff, tblToTransfer.getId());
-				compare4Commit(expectedTransferOrder, actualTransferOrder);
-				
-				OrderDao.deleteByCond(mStaff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(actualTransferOrder.getId()));
-			}
+//			OrderFood transferFood1 = actualOrder.getOrderFoods().get(0);
+//			OrderFood transferFood2 = actualOrder.getOrderFoods().get(1);
+//			
+//			if(!busyTables.isEmpty()){
+//				Table tblToTransfer = busyTables.get(0);
+//				Order expectedTransferOrder = OrderDao.getByTableId(mStaff, tblToTransfer.getId());
+//				
+//				expectedTransferOrder.addFood(transferFood1, mStaff);
+//				
+//				OrderDao.transfer(mStaff, new Order.TransferBuilder(orderId, new Table.AliasBuilder(tblToTransfer.getAliasId())).add(transferFood1));
+//
+//				expectedOrder.remove(transferFood1, mStaff);
+//				
+//				actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+//
+//				compare4Commit(expectedOrder, actualOrder);
+//
+//				Order actualTransferOrder = OrderDao.getByTableId(mStaff, tblToTransfer.getId());
+//				compare4Commit(expectedTransferOrder, actualTransferOrder);
+//				
+//			}
+//			
+//			if(!idleTables.isEmpty()){
+//				Table tblToTransfer = idleTables.get(1);
+//				Order expectedTransferOrder = new Order(0);
+//				expectedTransferOrder.setCustomNum(1);
+//				expectedTransferOrder.setDestTbl(tblToTransfer);
+//				
+//				expectedTransferOrder.addFood(transferFood2, mStaff);
+//				
+//				OrderDao.transfer(mStaff, new Order.TransferBuilder(orderId, new Table.AliasBuilder(tblToTransfer.getAliasId())).add(transferFood2));
+//
+//				expectedOrder.remove(transferFood2, mStaff);
+//				
+//				actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+//
+//				compare4Commit(expectedOrder, actualOrder);
+//
+//				Order actualTransferOrder = OrderDao.getByTableId(mStaff, tblToTransfer.getId());
+//				compare4Commit(expectedTransferOrder, actualTransferOrder);
+//				
+//				OrderDao.deleteByCond(mStaff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(actualTransferOrder.getId()));
+//			}
 			
 
 			//-----------Test to pay the order---------------------------
@@ -316,6 +326,77 @@ public class TestCommitOrderDao {
 			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
 			compare4MixedPayment(payBuilder, expectedOrder, actualOrder);
 			
+			//-----------Test to re-pay the order in case of normal -> member---------------------------
+			final MemberType chargeType = MemberTypeDao.getByCond(mStaff, new MemberTypeDao.ExtraCond().setAttribute(MemberType.Attribute.CHARGE), null).get(0);
+			Member expectedMember = MemberDao.getByCond(mStaff, new MemberDao.ExtraCond().setMemberType(chargeType), null).get(0);
+			MemberDao.charge(mStaff, expectedMember.getId(), actualOrder.getActualPrice(), actualOrder.getActualPrice(), ChargeType.CASH);
+			expectedMember = MemberDao.getById(mStaff, expectedMember.getId());
+			
+			Order.DiscountBuilder discountBuilder = Order.DiscountBuilder.build4Member(orderId, expectedMember);
+			Order.UpdateBuilder updateBuilder = new Order.UpdateBuilder(actualOrder).addOri(actualOrder.getOrderFoods());
+			payBuilder = PayBuilder.build4Member(orderId, PayType.MEMBER, false);
+			OrderDao.repaid(mStaff, new Order.RepaidBuilder(updateBuilder, payBuilder).setDiscountBuilder(discountBuilder));
+			
+			Member actualMember = MemberDao.getById(mStaff, expectedMember.getId());
+			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+			
+			expectedOrder.setSettleType(Order.SettleType.MEMBER);
+			compare4RePayment(payBuilder, expectedOrder, actualOrder);
+			
+			MemberOperation expectedMo = expectedMember.consume(actualOrder.getActualPrice(), null, PayType.MEMBER);
+			compare4RePayment(expectedMember, actualMember);
+			compare4RePayment(expectedMo, MemberOperationDao.getLastConsumptionByOrder(mStaff, actualOrder));
+			
+			//-----------Test to re-pay the order in case of the same member -> member---------------------------
+			expectedMember = MemberDao.getById(mStaff, expectedMember.getId());
+			
+			discountBuilder = Order.DiscountBuilder.build4Member(orderId, expectedMember);
+			updateBuilder = new Order.UpdateBuilder(actualOrder).addOri(actualOrder.getOrderFoods());
+			payBuilder = PayBuilder.build4Member(orderId, PayType.MEMBER, false);
+			
+			expectedMember.restore(MemberOperationDao.getLastConsumptionByOrder(mStaff, actualOrder));
+			expectedMo = expectedMember.reConsume(actualOrder.getActualPrice(), null, PayType.MEMBER);
+			
+			OrderDao.repaid(mStaff, new Order.RepaidBuilder(updateBuilder, payBuilder).setDiscountBuilder(discountBuilder));
+			
+			actualMember = MemberDao.getById(mStaff, expectedMember.getId());
+			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+			
+			expectedOrder.setSettleType(Order.SettleType.MEMBER);
+			compare4RePayment(payBuilder, expectedOrder, actualOrder);
+			
+			compare4RePayment(expectedMember, actualMember);
+			compare4RePayment(expectedMo, MemberOperationDao.getLastConsumptionByOrder(mStaff, actualOrder));
+			
+			//-----------Test to re-pay the order in case of the different member -> member---------------------------
+			Member expectedNewMember = MemberDao.getByCond(mStaff, new MemberDao.ExtraCond().setMemberType(chargeType), null).get(1);
+			MemberDao.charge(mStaff, expectedNewMember.getId(), actualOrder.getActualPrice(), actualOrder.getActualPrice(), ChargeType.CASH);
+			expectedNewMember = MemberDao.getById(mStaff, expectedNewMember.getId());
+			Member expectedOriMember = expectedMember = MemberDao.getById(mStaff, expectedMember.getId());
+			
+			discountBuilder = Order.DiscountBuilder.build4Member(orderId, expectedNewMember);
+			updateBuilder = new Order.UpdateBuilder(actualOrder).addOri(actualOrder.getOrderFoods());
+			payBuilder = PayBuilder.build4Member(orderId, PayType.MEMBER, false);
+			
+			MemberOperation expectedOriMo = expectedOriMember.restore(MemberOperationDao.getLastConsumptionByOrder(mStaff, actualOrder));
+			
+			OrderDao.repaid(mStaff, new Order.RepaidBuilder(updateBuilder, payBuilder).setDiscountBuilder(discountBuilder));
+			
+			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
+			
+			MemberOperation expectedNewMo = expectedNewMember.reConsume(actualOrder.getActualPrice(), null, PayType.MEMBER);
+			
+			Member actualNewMember = MemberDao.getById(mStaff, expectedNewMember.getId());
+			Member actualOriMember = MemberDao.getById(mStaff, expectedOriMember.getId());
+			
+			expectedOrder.setSettleType(Order.SettleType.MEMBER);
+			compare4RePayment(payBuilder, expectedOrder, actualOrder);
+			
+			compare4RePayment(expectedOriMember, actualOriMember);
+			compare4RePayment(expectedOriMo, MemberOperationDao.getByCond(mStaff, new MemberOperationDao.ExtraCond(DateType.TODAY).addMember(actualOriMember), " ORDER BY id DESC LIMIT 1 ").get(0));
+			
+			compare4RePayment(expectedNewMember, actualNewMember);
+			compare4RePayment(expectedNewMo, MemberOperationDao.getLastConsumptionByOrder(mStaff, actualOrder));
 		}finally{
 			if(orderId != 0){
 				OrderDao.deleteByCond(mStaff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(orderId));
@@ -337,13 +418,68 @@ public class TestCommitOrderDao {
 		//Check the custom number
 		Assert.assertEquals("the custom number to order", payBuilder.getCustomNum(), actual.getCustomNum());
 		//Check the settle type
-		Assert.assertEquals("the settle to order", payBuilder.getSettleType(), actual.getSettleType());
+		Assert.assertEquals("the settle to order", Order.SettleType.NORMAL, actual.getSettleType());
 		//Check the total price
 		Assert.assertEquals("the total price to order", expected.calcTotalPrice(), actual.getTotalPrice(), 0.01);
 		//Check the order status
 		Assert.assertEquals("the status to order", Order.Status.REPAID, actual.getStatus());
 		//Check the mixed payment
 		Assert.assertEquals("the mixed payment to order", payBuilder.getMixedPayment(), actual.getMixedPayment());
+	}
+	
+	private void compare4RePayment(MemberOperation expected, MemberOperation actual){
+		assertEquals("mo - associated restaurant id", mStaff.getRestaurantId(), actual.getRestaurantId());
+//		assertEquals("mo - staff id", mStaff.getId(), actual.getStaffId());
+//		assertEquals("mo - member name", expected.getMemberName(), actual.getMemberName());
+//		assertEquals("mo - member mobile", expected.getMemberMobile(), actual.getMemberMobile());
+//		assertEquals("mo - member id", expected.getMemberId(), actual.getMemberId());
+//		assertEquals("mo - member card", expected.getMemberCard(), actual.getMemberCard());
+//		assertEquals("mo - operation seq", expected.getOperateSeq(), actual.getOperateSeq());
+//		assertEquals("mo - operation date", expected.getOperateDate(), actual.getOperateDate());
+		assertEquals("mo - operation type", expected.getOperationType(), expected.getOperationType());
+		assertEquals("mo - consume money", expected.getPayMoney(), actual.getPayMoney(), 0.01);
+		assertEquals("mo - charge type", expected.getChargeType(), actual.getChargeType());
+		assertEquals("mo - charge balance", expected.getChargeMoney(), actual.getChargeMoney(), 0.01);
+		assertEquals("mo - delta base balance", expected.getDeltaBaseMoney(), actual.getDeltaBaseMoney(), 0.01);
+		assertEquals("mo - delta extra balance", expected.getDeltaExtraMoney(), actual.getDeltaExtraMoney(), 0.01);
+		assertEquals("mo - delta point", expected.getDeltaPoint(), actual.getDeltaPoint());
+		assertEquals("mo - remaining base balance", expected.getRemainingBaseMoney(), actual.getRemainingBaseMoney(), 0.01);
+		assertEquals("mo - remaining extra balance", expected.getRemainingExtraMoney(), actual.getRemainingExtraMoney(), 0.01);
+		assertEquals("mo - remaining point", expected.getRemainingPoint(), actual.getRemainingPoint());
+		assertEquals("mo - coupon id", expected.getCouponId(), actual.getCouponId());
+		assertEquals("mo - coupon money", expected.getCouponMoney(), actual.getCouponMoney(), 0.01);
+		assertEquals("mo - coupon name", expected.getCouponName(), actual.getCouponName());
+	}
+	
+	private void compare4RePayment(Member expected, Member actual){
+		assertEquals("member id", expected.getId(), actual.getId());
+		assertEquals("member card", expected.getMemberCard(), actual.getMemberCard());
+		assertEquals("member_name", expected.getName(), actual.getName());
+		assertEquals("member mobile", expected.getMobile(), actual.getMobile());
+		assertEquals("member type", expected.getMemberType(), actual.getMemberType());
+		assertEquals("associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
+		assertEquals("member consumption amount", expected.getConsumptionAmount(),  actual.getConsumptionAmount());
+		assertEquals("member used balance", expected.getUsedBalance(), actual.getUsedBalance(), 0.01);
+		assertEquals("member base balance", expected.getBaseBalance(), actual.getBaseBalance(), 0.01);
+		assertEquals("member extra balance", expected.getExtraBalance(), actual.getExtraBalance(), 0.01);
+		assertEquals("member point", expected.getPoint(), actual.getPoint());
+		assertEquals("member used point", expected.getUsedPoint(), actual.getUsedPoint());
+		assertEquals("member total consumption", expected.getTotalConsumption(), actual.getTotalConsumption(), 0.01);
+		assertEquals("member total point", expected.getTotalPoint(), actual.getTotalPoint(), 0.01);
+	}
+	
+	private void compare4RePayment(Order.PayBuilder payBuilder, Order expected, Order actual) throws SQLException{
+		//Check the associated table
+		Assert.assertEquals("the payment to order", payBuilder.getPaymentType(), actual.getPaymentType());
+		//Check the custom number
+		Assert.assertEquals("the custom number to order", payBuilder.getCustomNum(), actual.getCustomNum());
+		//Check the settle type
+		Assert.assertEquals("the settle to order", expected.getSettleType(), actual.getSettleType());
+		//Check the total price
+		expected.setDiscount(DiscountDao.getDefault(mStaff));
+		Assert.assertEquals("the total price to order", expected.calcTotalPrice(), actual.getTotalPrice(), 0.01);
+		//Check the order status
+		Assert.assertEquals("the status to order", Order.Status.REPAID, actual.getStatus());
 	}
 	
 	private void compare4Payment(Order.PayBuilder payBuilder, Order expected, Order actual) throws SQLException{
@@ -367,7 +503,7 @@ public class TestCommitOrderDao {
 		//Check the custom number
 		Assert.assertEquals("the custom number to order", payBuilder.getCustomNum(), actual.getCustomNum());
 		//Check the settle type
-		Assert.assertEquals("the settle to order", payBuilder.getSettleType(), actual.getSettleType());
+		Assert.assertEquals("the settle to order", Order.SettleType.NORMAL, actual.getSettleType());
 		//Check the total price
 		expected.setDiscount(DiscountDao.getDefault(mStaff));
 		Assert.assertEquals("the total price to order", expected.calcTotalPrice(), actual.getTotalPrice(), 0.01);

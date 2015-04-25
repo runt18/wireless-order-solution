@@ -531,7 +531,7 @@ public class OrderDao {
 			PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
 			payType.setName(dbCon.rs.getString("pay_type_name"));
 			order.setPaymentType(payType);
-			order.setSettleType(dbCon.rs.getShort("settle_type"));
+			order.setSettleType(Order.SettleType.valueOf(dbCon.rs.getShort("settle_type")));
 			order.setStatus(Order.Status.valueOf(dbCon.rs.getInt("status")));
 			order.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			order.setComment(dbCon.rs.getString("comment"));
@@ -617,6 +617,16 @@ public class OrderDao {
 	 */
 	public static void repaid(DBCon dbCon, Staff staff, Order.RepaidBuilder builder) throws BusinessException, SQLException{
 		if(staff.getRole().hasPrivilege(Privilege.Code.RE_PAYMENT)){
+			if(builder.hasDiscountBuilder()){
+				if(builder.getDiscountBuilder().hasMember()){
+					//Restore the account if perform member consumption before.
+					Order oriOrder = OrderDao.getById(staff, builder.getDiscountBuilder().getOrderId(), DateType.TODAY);
+					if(oriOrder.getMemberId() != 0){
+						MemberDao.restore(dbCon, staff, oriOrder.getMemberId(), oriOrder);
+					}
+				}
+				discount(dbCon, staff, builder.getDiscountBuilder());
+			}
 			UpdateOrder.exec(dbCon, staff, builder.getUpdateBuilder());
 			PayOrder.pay(dbCon, staff, builder.getPayBuilder());
 		}else{
@@ -843,7 +853,7 @@ public class OrderDao {
 
 		final Discount discount;
 		final List<PricePlan> prices;
-		if(builder.getMemberId() != 0){
+		if(builder.hasMember()){
 			Member m = MemberDao.getById(dbCon, staff, builder.getMemberId());
 			if(builder.hasPricePlan()){
 				prices = PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setId(builder.getPricePlanId()).setMemberType(m.getMemberType()));
@@ -906,8 +916,7 @@ public class OrderDao {
 		//Update each food's discount & unit price.
 		for(OrderFood of : order.getOrderFoods()){
 			sql = " UPDATE " + Params.dbName + ".order_food " +
-				  " SET " +
-				  " food_id = " + of.getFoodId() +
+				  " SET food_id = " + of.getFoodId() +
 				  " ,discount = " + of.getDiscount() + 
 				  " ,unit_price = " + of.getFoodPrice() +
 				  " WHERE order_id = " + order.getId() + 

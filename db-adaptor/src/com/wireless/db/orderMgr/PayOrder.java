@@ -17,10 +17,10 @@ import com.wireless.exception.StaffError;
 import com.wireless.pojo.dishesOrder.MixedPayment;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayBuilder;
+import com.wireless.pojo.dishesOrder.Order.SettleType;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.Member;
-import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
@@ -187,14 +187,12 @@ public class PayOrder {
 			orderCalculated.setReceivedCash(orderCalculated.getActualPrice());
 		}
 		
-		if(orderCalculated.isSettledByMember()){
+		if(orderCalculated.isSettledByMember() && orderCalculated.isUnpaid()){
 			Member member = MemberDao.getById(dbCon, staff, orderCalculated.getMemberId());
-			if(orderCalculated.isUnpaid()){
-				//Check to see whether be able to perform consumption.
-				member.checkConsume(orderCalculated.getActualPrice(), 
-									orderCalculated.getCoupon(), 
-									orderCalculated.getPaymentType());
-			}
+			//Check to see whether be able to perform consumption.
+			member.checkConsume(orderCalculated.getActualPrice(), 
+								orderCalculated.getCoupon(), 
+								orderCalculated.getPaymentType());
 		}
 		
 		//Calculate the sequence id to this order in case of unpaid.
@@ -264,8 +262,7 @@ public class PayOrder {
 		//Update each food's discount & unit price.
 		for(OrderFood of : orderCalculated.getOrderFoods()){
 			sql = " UPDATE " + Params.dbName + ".order_food " +
-				  " SET " +
-				  " food_id = " + of.getFoodId() +
+				  " SET food_id = " + of.getFoodId() +
 				  " ,discount = " + of.getDiscount() + 
 				  " ,unit_price = " + of.getFoodPrice() +
 				  " WHERE order_id = " + orderCalculated.getId() + 
@@ -273,29 +270,27 @@ public class PayOrder {
 			dbCon.stmt.executeUpdate(sql);				
 		}	
 
-		//Delete the temporary table if the category belongs to joined, take out or fast.
-		final Table table = orderCalculated.getDestTbl();
-		if(!table.getCategory().isNormal()){
-			TableDao.deleteById(dbCon, staff, table.getId());
-		}
-		
-		//Update the member status if settled by member.
-		if(orderCalculated.isSettledByMember()){
+		if(orderCalculated.isUnpaid()){
+			//Delete the temporary table if the category belongs to joined, take out or fast.
+			if(!orderCalculated.getDestTbl().getCategory().isNormal()){
+				TableDao.deleteById(dbCon, staff, orderCalculated.getDestTbl().getId());
+			}
 			
-			if(orderCalculated.isUnpaid()){
-				//Perform the member consumption.
+			//Perform the member consumption if settle by member.
+			if(orderCalculated.isSettledByMember()){
 				MemberDao.consume(dbCon, staff, orderCalculated.getMemberId(), orderCalculated.getActualPrice(), 
 								  orderCalculated.getCoupon(),
 								  orderCalculated.getPaymentType(),
 								  orderCalculated.getId());
-
-			}else{
-				//Perform this member re-consumption.
-				MemberDao.reConsume(dbCon, staff, orderCalculated.getMemberId(), orderCalculated.getActualPrice(), orderCalculated.getPaymentType(), orderCalculated.getId());
 			}
-			
-		}  
-			
+		}else{
+			if(orderCalculated.isSettledByMember()){
+				MemberDao.reConsume(dbCon, staff, orderCalculated.getMemberId(), orderCalculated.getActualPrice(), 
+						  			orderCalculated.getCoupon(),
+						  			orderCalculated.getPaymentType(),
+						  			orderCalculated.getId());
+			}
+		}
 		
 		return orderCalculated;
 	}
@@ -356,6 +351,19 @@ public class PayOrder {
 		//Get all the details of order.
 		Order orderToCalc = OrderDao.getById(dbCon, staff, payBuilder.getOrderId(), DateType.TODAY);
 		
+		//Set the payment type.
+		orderToCalc.setPaymentType(PayTypeDao.getById(dbCon, staff, payBuilder.getPaymentType().getId()));
+		//Set the settle type.
+		orderToCalc.setSettleType(orderToCalc.hasMember() ? SettleType.MEMBER : SettleType.NORMAL);
+		
+		if(orderToCalc.getPaymentType().isMixed() && orderToCalc.isSettledByMember()){
+			throw new BusinessException("会员不支持混合结账");
+		}
+		
+		if(orderToCalc.isSettledByNormal() && orderToCalc.getPaymentType().isMember()){
+			throw new IllegalArgumentException("普通结账不能使用【会员卡】的付款方式");
+		}
+		
 		//Set the discount.
 		try{
 			if(orderToCalc.getDiscountDate() == 0){
@@ -372,19 +380,14 @@ public class PayOrder {
 			}
 		}
 
-		
 		//Set the erase price.
 		orderToCalc.setErasePrice(payBuilder.getErasePrice());
 		//Set the custom number.
 		orderToCalc.setCustomNum(payBuilder.getCustomNum());
-		//Set the settle type.
-		orderToCalc.setSettleType(payBuilder.getSettleType());
 		//Set the received cash.
 		orderToCalc.setReceivedCash(payBuilder.getReceivedCash());
 		//Set the comment.
 		orderToCalc.setComment(payBuilder.getComment());
-		//Get the payment type.
-		orderToCalc.setPaymentType(PayTypeDao.getById(dbCon, staff, payBuilder.getPaymentType().getId()));
 		
 		//If the service plan is set, use to get the rate to region belongs to this order
 		if(payBuilder.hasServicePlan()){

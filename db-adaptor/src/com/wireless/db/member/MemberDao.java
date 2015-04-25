@@ -171,6 +171,11 @@ public class MemberDao {
 			return this;
 		}
 		
+		public ExtraCond setMemberType(MemberType memberType){
+			this.memberTypeId = memberType.getId();
+			return this;
+		}
+		
 		public ExtraCond greaterConsume(int amount){
 			this.minConsumeAmount = amount;
 			return this;
@@ -1378,8 +1383,8 @@ public class MemberDao {
 	 * 			the coupon to use, null means no coupon
 	 * @param payType
 	 * 			the payment type referred to {@link Order.PayType}
-	 * @param orderId
-	 * 			the associated order id to this consumption
+	 * @param order
+	 * 			the associated order to this consumption
 	 * @return the member operation to the consumption operation
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
@@ -1388,12 +1393,12 @@ public class MemberDao {
 	 *			1 - the consume price exceeds total balance to this member account<br>
 	 *			2 - the member account to consume is NOT found.
 	 */
-	public static MemberOperation reConsume(Staff staff, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation reConsume(Staff staff, int memberId, float consumePrice, Coupon coupon, PayType payType, int orderId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = reConsume(dbCon, staff, memberId, consumePrice, payType, orderId);
+			MemberOperation mo = reConsume(dbCon, staff, memberId, consumePrice, coupon, payType, orderId);
 			dbCon.conn.commit();
 			return mo;
 		}catch(BusinessException | SQLException e){
@@ -1428,16 +1433,66 @@ public class MemberDao {
 	 *			1 - the consume price exceeds total balance to this member account<br>
 	 *			2 - the member account to consume is NOT found.
 	 */
-	public static MemberOperation reConsume(DBCon dbCon, Staff staff, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
-		MemberOperation lastConsumption = MemberOperationDao.getByOrder(dbCon, staff, orderId);
+	public static MemberOperation reConsume(DBCon dbCon, Staff staff, int memberId, float consumePrice, Coupon coupon, PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		Member member = getById(dbCon, staff, memberId);
 		
 		//Perform the consume operation and get the related member operation.
-		MemberOperation mo = member.reConsume(consumePrice, payType, lastConsumption);
+		MemberOperation mo = member.reConsume(consumePrice, coupon, payType);
+		
+		//Perform to use coupon.
+		if(coupon != null){
+			CouponDao.use(dbCon, staff, coupon.getId(), orderId);
+		}
 		
 		//Set the associate order id
 		mo.setOrderId(orderId);
+		
+		//Insert the member operation to this consumption operation.
+		MemberOperationDao.insert(dbCon, staff, mo);
+		
+		//Update the base & extra balance and point.
+		String sql = " UPDATE " + Params.dbName + ".member SET" + 
+					 " consumption_amount = " + member.getConsumptionAmount() +
+					 " ,last_consumption = '" + DateUtil.format(System.currentTimeMillis(), DateUtil.Pattern.DATE_TIME) + "'" +
+					 " ,used_balance = " + member.getUsedBalance() +  
+					 " ,base_balance = " + member.getBaseBalance() +  
+					 " ,extra_balance = " + member.getExtraBalance() + 
+					 " ,total_consumption = " + member.getTotalConsumption() + 
+					 " ,total_point = " + member.getTotalPoint() +  
+					 " ,point = " + member.getPoint() +
+					 " WHERE member_id = " + memberId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		return mo;
+	}
+	
+	/**
+	 * Restore the member account from specific order
+	 * @param dbCon	
+	 * 			the database connection
+	 * @param staff	
+	 * 			the staff to perform this action
+	 * @param memberId 
+	 * 			the id to member account
+	 * @param order
+	 * 			the associated order to this consumption
+	 * @return the member operation to restore account
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 * @throws BusinessException
+	 *	 		throws if one of cases the member operation to last consumption NOT be found
+	 */
+	public static MemberOperation restore(DBCon dbCon, Staff staff, int memberId, Order order) throws SQLException, BusinessException{
+		MemberOperation lastConsumption = MemberOperationDao.getLastConsumptionByOrder(dbCon, staff, order);
+		
+		Member member = getById(dbCon, staff, memberId);
+		
+		//Perform the consume operation and get the related member operation.
+		MemberOperation mo = member.restore(lastConsumption);
+		
+		//Set the associate order id
+		mo.setOrderId(order.getId());
 		
 		//Insert the member operation to this consumption operation.
 		MemberOperationDao.insert(dbCon, staff, mo);
