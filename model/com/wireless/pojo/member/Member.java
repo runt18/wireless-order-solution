@@ -443,6 +443,31 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	/**
+	 * Restore the member account according to last consumption.
+	 * @param lastConsumption
+	 * 			the member last consumption
+	 * @return the member operation to account restore
+	 * @throws BusinessException
+	 *             throws if the consume price exceeds total balance to this member account
+	 */
+	public MemberOperation restore(MemberOperation lastConsumption) throws BusinessException{
+		//还原结账前的账户状态
+		baseBalance += lastConsumption.getDeltaBaseMoney();
+		extraBalance += lastConsumption.getDeltaExtraMoney();
+		usedBalance -= lastConsumption.getDeltaTotalMoney();
+		consumptionAmount--;
+		totalConsumption -= lastConsumption.getPayMoney();
+		point -= lastConsumption.getDeltaPoint();
+		totalPoint -= lastConsumption.getDeltaPoint();
+		
+		//重新执行会员结账, 生成member operation
+		MemberOperation mo = consume(0, null, PayType.MEMBER);
+		mo.setOperationType(OperationType.RE_CONSUME);
+		
+		return mo;
+	}
+	
+	/**
 	 * Perform the re-consumption operation to this member account in case of paid by member.
 	 * 
 	 * @param consumePrice
@@ -455,21 +480,10 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	 * @throws BusinessException
 	 *             throws if the consume price exceeds total balance to this member account
 	 */
-	public MemberOperation reConsume(float consumePrice, PayType payType, MemberOperation lastConsumption) throws BusinessException{
-
-		//还原结账前的账户状态
-		baseBalance += lastConsumption.getDeltaBaseMoney();
-		extraBalance += lastConsumption.getDeltaExtraMoney();
-		usedBalance -= lastConsumption.getDeltaTotalMoney();
-		consumptionAmount--;
-		totalConsumption -= lastConsumption.getPayMoney();
-		point -= lastConsumption.getDeltaPoint();
-		totalPoint -= lastConsumption.getDeltaPoint();
-		
+	public MemberOperation reConsume(float consumePrice, Coupon coupon, PayType payType) throws BusinessException{
 		//重新执行会员结账
-		MemberOperation mo = consume(consumePrice, null, payType);
+		MemberOperation mo = consume(consumePrice, coupon, payType);
 		mo.setOperationType(OperationType.RE_CONSUME);
-		
 		return mo;
 	}
 	
