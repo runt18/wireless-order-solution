@@ -20,6 +20,7 @@ import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.dishesOrder.PrintOption;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
@@ -32,6 +33,9 @@ public class RepaidOrderAction extends Action{
 		int orderId = Integer.parseInt(request.getParameter("orderId"));
 		String payType_money = request.getParameter("payType_money");
 		String sType = request.getParameter("settleType");
+		String couponId = request.getParameter("couponId");
+		String pricePlanId = request.getParameter("pricePlanId");
+		
 		try {
 			out = response.getWriter();
 			
@@ -84,10 +88,29 @@ public class RepaidOrderAction extends Action{
 				}
 			}
 			
+			Order.RepaidBuilder repaidBuilder = new Order.RepaidBuilder(JObject.parse(Order.UpdateBuilder.JSON_CREATOR, 0, request.getParameter("commitOrderData")), payBuilder);
+			
+			int discount = 0, pricePlan = 0, coupon = 0;
+			discount = Integer.parseInt(request.getParameter("discountID"));
+			
+			if(settleType == Order.SettleType.MEMBER){
+				
+				if(couponId != null && !couponId.isEmpty()){
+					coupon = Integer.parseInt(couponId);
+				}
+				if(pricePlanId != null && !pricePlanId.isEmpty()){
+					pricePlan = Integer.parseInt(pricePlanId);
+				}
+				
+				
+				repaidBuilder.setDiscountBuilder(Order.DiscountBuilder.build4Member(orderId, new Member(Integer.valueOf(request.getParameter("memberID"))), discount, pricePlan, coupon));
+			}else{
+				repaidBuilder.setDiscountBuilder(Order.DiscountBuilder.build4Normal(orderId, discount));
+			}
+			
 			ProtocolPackage resp = ServerConnector.instance().ask(
-					new ReqRepayOrder(staff, 
-							new Order.RepaidBuilder(JObject.parse(Order.UpdateBuilder.JSON_CREATOR, 0, request.getParameter("commitOrderData")), payBuilder), 
-									PrintOption.DO_PRINT));
+					new ReqRepayOrder(staff,repaidBuilder, PrintOption.DO_PRINT));
+			
 			
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");	

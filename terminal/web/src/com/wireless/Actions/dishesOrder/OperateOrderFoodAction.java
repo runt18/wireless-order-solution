@@ -43,7 +43,7 @@ public class OperateOrderFoodAction extends DispatchAction{
 			throws Exception {
 		
 		String orderId = request.getParameter("orderId");
-		String aliasId = request.getParameter("aliasId");
+		String tableId = request.getParameter("tableId");
 		String transFoods = request.getParameter("transFoods");
 		String pin = (String) request.getAttribute("pin");
 		
@@ -51,7 +51,7 @@ public class OperateOrderFoodAction extends DispatchAction{
 		try {
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			Order.TransferBuilder builder = new Order.TransferBuilder(Integer.parseInt(orderId), new Table.AliasBuilder(Integer.parseInt(aliasId)));
+			Order.TransferBuilder builder = new Order.TransferBuilder(Integer.parseInt(orderId), new Table.Builder(Integer.parseInt(tableId)));
 			
 			Order actualOrder = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY);
 			
