@@ -833,7 +833,7 @@ uo.transFood = function(c){
 	$.post('../OperateOrderFood.do', {
 		dataSource : 'transFood',
 		orderId : uo.order.id,
-		aliasId : c.alias,
+		tableId : c.id,
 		transFoods : (c.allTrans?c.allTrans:(ts.tf.id + ',' + ts.tf.count))		
 	},function(data){
 		Util.LM.hide();
@@ -841,7 +841,7 @@ uo.transFood = function(c){
 			uo.closeTransOrderFood();
 			Util.msg.tip(data.msg);			
 			//刷新已点菜
-			updateTable({alias : uo.table.alias});
+			updateTable({id : uo.table.id});
 			ts.tf={};
 		}else{
 			Util.msg.alert({

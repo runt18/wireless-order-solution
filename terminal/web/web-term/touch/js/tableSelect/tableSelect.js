@@ -853,9 +853,9 @@ ts.toOrderFoodOrTransFood = function(c){
 	if(ts.commitTableOrTran == 'table'){
 		ts.renderToCreateOrder(c.alias, 1);
 	}else if(ts.commitTableOrTran == 'trans'){
-		uo.transFood({alias:c.alias});
+		uo.transFood({id:c.id});
 	}else if(ts.commitTableOrTran == 'allTrans'){
-		uo.transFood({alias:c.alias, allTrans : -1});
+		uo.transFood({id:c.id, allTrans : -1});
 	}else if(ts.commitTableOrTran == 'transTable'){
 		ts.transTable({alias:c.alias})
 	}else if(ts.commitTableOrTran == 'lookup'){
@@ -877,9 +877,19 @@ ts.submitForSelectTableOrTransFood = function(){
 	if(ts.commitTableOrTran == 'table'){//普通选台
 		ts.submitForSelectTableNumTS();
 	}else if(ts.commitTableOrTran == 'trans'){//单条转菜
-		uo.transFood({alias:$('#txtTableNumForTS').val()});
+		var table = getTableByAlias($('#txtTableNumForTS').val());
+		if(table){
+			uo.transFood({id:table.id});
+		}else{
+			Util.msg.tip('没有此餐台, 请重新输入');
+		}
 	}else if(ts.commitTableOrTran == 'allTrans'){//全单转菜
-		uo.transFood({alias:$('#txtTableNumForTS').val(), allTrans : -1});
+		var table = getTableByAlias($('#txtTableNumForTS').val());
+		if(table){
+			uo.transFood({id:table.id, allTrans : -1});
+		}else{
+			Util.msg.tip('没有此餐台, 请重新输入');
+		}		
 	}else if(ts.commitTableOrTran == 'transTable'){//转台
 		ts.transTable({alias:$('#txtTableNumForTS').val()})
 	}else if(ts.commitTableOrTran == 'tableTransTable'){//前台转台
@@ -899,10 +909,7 @@ ts.submitForSelectTableOrTransFood = function(){
 			if(table4Search.length > 0){
 				tableId = table4Search[0].id;
 			}else{
-				Util.msg.alert({
-					msg : '没有此餐台, 请重新输入',
-					topTip : true
-				});			
+				Util.msg.tip('没有此餐台, 请重新输入');			
 				tableInfo.focus();
 				return;
 			}
