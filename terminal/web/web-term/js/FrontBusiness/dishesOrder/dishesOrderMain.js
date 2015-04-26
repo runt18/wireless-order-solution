@@ -28,6 +28,7 @@ function repaid_initNorthPanel(){
 					xtype : 'textfield',
 					id : 'txtSettleTypeFormat',
 					fieldLabel : '结账方式',
+					style : 'color:green;font-size:15px;font-weight:bold',
 					value : '一般/会员',
 					disabled : true
 				}]
@@ -50,7 +51,12 @@ function repaid_initNorthPanel(){
 					selectOnFocus : true,
 					listeners : {
 						select : function(thiz, record, index) {
-							Ext.Ajax.request({
+							//选了别的折扣后取消会员注入
+							re_member = null;
+							Ext.getCmp('txtSettleTypeFormat').setValue('一般');
+							setRepaidOrderTitle();
+							//FIXME
+/*							Ext.Ajax.request({
 								url : '../../OperateDiscount.do',
 								params : {
 									dataSource : 'setDiscount',
@@ -67,7 +73,7 @@ function repaid_initNorthPanel(){
 									}
 								},
 								failure : function(res){}
-							});
+							});*/
 						}
 					}
 				}]
@@ -115,7 +121,7 @@ function repaid_initNorthPanel(){
 					selectOnFocus : true				
 				}]
 			}]
-		}, {
+		},{
 			columnWidth : 0.15,
 			items : [{
 				xtype : 'label',
@@ -139,23 +145,22 @@ function repaid_initNorthPanel(){
 				readOnly : false,
 				listeners : {
 					render : function(thiz){
-						var cmb_repaid_payType = repaid_payType.concat();
 						//如果是会员结账就不用添加混合
-						if(orderType == 'common'){
-							cmb_repaid_payType.push({id:100, name:'混合结账'});
-						}
-						thiz.getStore().loadData(cmb_repaid_payType);
+						repaid_payType.push({id:100, name:'混合结账'});
+/*						if(orderType == 'common'){
+						}*/
+						thiz.getStore().loadData(repaid_payType);
 						thiz.setValue(primaryOrderData.other.order.payTypeValue);
-						
+						//FIXME
 						//积分会员可选付款方式, 充值会员只能用卡
-						if(re_member){
+/*						if(re_member){
 							if(re_member.memberType['attributeValue'] == 1){//积分
 								thiz.setDisabled(false);
 
 							}else if(re_member.memberType['attributeValue'] == 0){//充值
 								thiz.setDisabled(true);
 							}
-						}
+						}*/
 					},
 					select : function(thiz){
 						if(thiz.getValue() == 100){
@@ -174,7 +179,7 @@ function repaid_initNorthPanel(){
 				width : 20,
 				html : '&nbsp;'
 			}]
-		}, {
+		},  {
 			columnWidth : 0.8,
 			id : 'repaid_mixedPayTypePanel',
 			items : []
@@ -187,8 +192,67 @@ function repaid_initNorthPanel(){
 	}
 }
 
+
+function memberRepaid(){
+	var bindMemberWin;
+	if(!bindMemberWin){
+		bindMemberWin = new Ext.Window({
+			title : '会员反结账',
+			width : 800,
+			height : 200,
+			modal : true,
+			closable : false,
+			resizable : false,
+			keys: [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					bindMemberWin.hide();
+				}
+			}],
+			buttonAlign : 'center',
+			buttons : [{
+				text : '注入',
+				handler : function(e){
+					re_member = getOrderMember();
+					Ext.getCmp('txtSettleTypeFormat').setValue('会员');
+					bindMemberWin.hide();
+					
+					
+					
+					repaid_payType.push({id: 3, name: "会员卡", typeValue: 3});
+					Ext.getCmp('repaid_comboPayType').getStore().loadData(repaid_payType);
+					setRepaidOrderTitle({member:true});
+					
+				}
+			}, {
+				text : '关闭',
+				handler : function(e){
+					bindMemberWin.hide();
+				}
+			}],
+			listeners : {
+				hide : function(thiz){
+//					calcDiscountID = tempCalcDiscountID;
+					thiz.body.update('');
+				},
+				show : function(thiz){
+					thiz.load({
+						url : '../window/frontBusiness/memberRepaid.jsp',
+						scripts : true
+					});
+				}
+			}
+		});
+	}
+	bindMemberWin.show();
+}
+
 function initPaytypeCheckboxs(){
 	for (var i = 0; i < repaid_payType.length; i++) {
+		if(repaid_payType[i].id == 100){
+			continue;
+		}
 		var checkBoxId = 'repaid_chbForPayType' + repaid_payType[i].id,  numberfieldId = 'repaid_numForPayType' + repaid_payType[i].id;
 		if(i > 0){
 			Ext.getCmp('repaid_mixedPayTypePanel').add({
@@ -922,6 +986,12 @@ var orderPanel = new Ext.Panel({
 	layout : 'fit',
 	buttonAlign : 'center',
 	buttons : [{
+		text : '读取会员',
+		hidden : !isRepaid,
+		handler : function() {
+			memberRepaid();
+		}
+	},{
 		text : '提交',
 		handler : function() {
 			submitOrderHandler({
@@ -1154,22 +1224,29 @@ function initKeyBoardEvent(){
 }
 
 	
-function setRepaidOrderTitle(){
+function setRepaidOrderTitle(c){
 	var orderFoodTitle = null;
+	
 	if(isRepaid){
-		orderFoodTitle = '反结账 -- <span style="padding-left:2px; color:red;">'+orderID+'</span>&nbsp;号帐单'
+		orderFoodTitle = '反结账 -- <span style="padding-left:2px; color:red;">'+orderId4Display+'</span>&nbsp;号帐单'
 	}
-	
-	if(re_member){
-		orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
-	}
-	
-	if(primaryOrderData.other.order.discount){
-		orderFoodTitle += '&nbsp;&nbsp;&nbsp;当前折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';
-	}
-	if(primaryOrderData.other.order.discounter){
-		orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣人:<font color="green">'+ primaryOrderData.other.order.discounter +'</font>';
-		orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣时间:<font color="green">'+ primaryOrderData.other.order.discountDate +'</font>';
+	if(c && c.member){
+		if(re_member && re_member.hasMember){
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
+		}
+		orderFoodTitle += '&nbsp;&nbsp;&nbsp;当前折扣:<font color="green">'+ re_member.discount.name +'</font>';
+	}else{
+		if(re_member){
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
+		}
+		
+		if(primaryOrderData.other.order.discount){
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;账单折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';
+		}
+		if(primaryOrderData.other.order.discounter){
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣人:<font color="green">'+ primaryOrderData.other.order.discounter +'</font>';
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣时间:<font color="green">'+ primaryOrderData.other.order.discountDate +'</font>';
+		}
 	}
 	
 	Ext.getCmp('billModCenterPanel').setTitle(orderFoodTitle);	
@@ -1336,7 +1413,7 @@ Ext.onReady(function() {
 		}
 		
 		if(primaryOrderData.other.order.discount){
-			orderFoodTitle += '&nbsp;&nbsp;&nbsp;当前折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;账单折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';
 		}
 		if(primaryOrderData.other.order.discounter){
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;折扣人:<font color="green">'+ primaryOrderData.other.order.discounter +'</font>';

@@ -896,12 +896,32 @@ function submitRepaidOrderMain(_c){
 	orderDataModel.id = _c.grid.order["id"];
 	orderDataModel.orderDate =  _c.grid.order["orderDate"];
 	
+	var member, discount = discountID.getValue(), settleType = 1, pricePlanId="", couponId="";
+	if(re_member){
+		if(typeof re_member.hasMember != 'undefined'){
+			if(re_member.hasMember){
+				member = re_member.id;
+				discount = re_member.discount.id;
+				pricePlanId = re_member.pricePlan || "";
+				couponId =  re_member.couponId || "";
+				
+				settleType = 2;
+			}else{
+				member = '';
+			}
+			
+		}else{
+			member = re_member.id; 
+			settleType = 2;
+		}
+	}
+	
 	Ext.Ajax.request({
 		url : "../../RepaidOrder.do",
 		params : {
 			'orderId' : _c.grid.order["id"],
-			'memberID' : re_member?re_member.id:'',
-			'discountID' : discountID.getValue(),
+			'memberID' : member,
+			'discountID' : discount,
 			'servicePlan' : servicePlan.getValue(),
 			"payType" : _c.commit_payType,
 			'payType_money' : _c.payType_money,
@@ -909,7 +929,9 @@ function submitRepaidOrderMain(_c){
 			'erasePrice' : erasePrice.getValue(),
 			"commitOrderData" : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
 			'customNum' : _c.grid.order['customNum'],
-			'settleType' : re_member?2:1
+			'pricePlanId' : pricePlanId,
+			'couponId' : couponId,
+			'settleType' : settleType
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
@@ -969,7 +991,7 @@ function submitRepaidOrderHandler(_c){
 			}	*/
 			var payType_money = '';
 			for (var i = 0; i < repaid_payType.length; i++) {
-				if(Ext.getCmp('repaid_chbForPayType' + repaid_payType[i].id).getValue()){
+				if(Ext.getCmp('repaid_chbForPayType' + repaid_payType[i].id) && Ext.getCmp('repaid_chbForPayType' + repaid_payType[i].id).getValue()){
 					if(payType_money){
 						payType_money += '&';
 					}

@@ -99,9 +99,10 @@ function loadSingleOrderData(resultJSON){
 
 				//会员反结账, 根据会员类型获取折扣
 				var getDisParam = {dataSource : 'role'};
-				if(orderType == 'member'){
+				//FIXME
+/*				if(orderType == 'member'){
 					getDisParam = {dataSource : 'getByMemberType', memberTypeId : re_member.memberType.id}
-				}
+				}*/
 				Ext.Ajax.request({
 					url : '../../QueryDiscount.do',
 					params : getDisParam,
