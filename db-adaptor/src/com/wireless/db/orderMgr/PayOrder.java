@@ -272,7 +272,7 @@ public class PayOrder {
 
 		if(orderCalculated.isUnpaid()){
 			//Delete the temporary table if the category belongs to joined, take out or fast.
-			if(!orderCalculated.getDestTbl().getCategory().isNormal()){
+			if(orderCalculated.getDestTbl().getCategory().isTemporary()){
 				TableDao.deleteById(dbCon, staff, orderCalculated.getDestTbl().getId());
 			}
 			
