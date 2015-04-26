@@ -5,7 +5,6 @@ $("#weixin_wizard").steps({
     bodyTag: "div",
     transitionEffect: "slideLeft",
     
-    enableFinishButton : false,
     enableAllSteps : true,
     labels: {
         current: "current step:",
