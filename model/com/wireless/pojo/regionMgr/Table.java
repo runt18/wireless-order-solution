@@ -376,7 +376,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		}
 		
 		public boolean isTemporary(){
-			return isJoin() || isFast() || isTakeout();
+			return this != NORMAL;
 		}
 	}
 	
@@ -610,7 +610,8 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		if(obj == null || !(obj instanceof Table)){
 			return false;
 		}else{
-			return getAliasId() == ((Table)obj).getAliasId() && getRestaurantId() == ((Table)obj).getRestaurantId();
+			//return getAliasId() == ((Table)obj).getAliasId() && getRestaurantId() == ((Table)obj).getRestaurantId();
+			return getId() == ((Table)obj).getId();
 		}
 	}
 	
