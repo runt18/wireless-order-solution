@@ -54,6 +54,7 @@ function repaid_initNorthPanel(){
 							//选了别的折扣后取消会员注入
 							re_member = null;
 							Ext.getCmp('txtSettleTypeFormat').setValue('一般');
+							Ext.getCmp('repaid_comboPayType').setValue(repaid_payType[0].id);
 							setRepaidOrderTitle();
 							//FIXME
 /*							Ext.Ajax.request({
