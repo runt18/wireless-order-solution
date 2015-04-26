@@ -43,16 +43,17 @@ a[aria-controls ~= weixin_wizard-p]{
 
 
 .displayBorder{
+	width : 99%;
 	border: 1px solid white;
-	margin-right: 10px;
-	-moz-box-shadow: 0 0 8px rgba(0,0,0,.6);
+	/* margin-right: 10px; */
+	/* -moz-box-shadow: 0 0 8px rgba(0,0,0,.6); */
 	-webkit-box-shadow: 0 0 8px rgba(0,0,0,.6);
 	box-shadow: 0 0 8px rgba(0,0,0,.6);	
 	display: box; 
 	display: -webkit-box; 
-	display: -moz-box; 
+	/* display: -moz-box;  */
 	-webkit-box-pack:center; 
-	-moz-box-pack:center; 
+	/* -moz-box-pack:center;  */
 	-webkit-box-align:center; 
 	-moz-box-align:center; 
 }
@@ -66,8 +67,8 @@ a[aria-controls ~= weixin_wizard-p]{
      <div id="weixin_wizard" style="width: 95%;margin-left: 2.5%;">
             <span style="font-size: 25px;font-weight: bolder;color: red;'">绑定微信公众号</span>
             <div>
-            	<div style="float: left;width: 35%;" >
-            		<div id="weixinAuthRest" >
+            	<div style="float: left;width: 40%;" >
+            		<div id="weixinAuthRest" style="width: 100%">
             			<div align="center">
             				<div id="weixinAuthRestInfo" class="none">
 		            			<h1>微信餐厅已绑定, 请继续其他操作</h1>
@@ -98,7 +99,7 @@ a[aria-controls ~= weixin_wizard-p]{
             			
             		</div>
             	</div>
-            	<div style="float:right;width: -webkit-calc(100% - 530px);text-align: center;">
+            	<div style="float:right;width: -webkit-calc(100% - 540px);width: -moz-calc(100% - 540px);width: -ms-calc(100% - 540px);width: -o-calc(100% - 540px);text-align: center;">
             		<h2>微信端显示效果示例</h2>
             		<div id="weixinLogoDisplay" class="displayBorder" >
             			<img width="60%" height="100%" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxGuideSample/wxLogo2.jpg"/>
@@ -119,7 +120,7 @@ a[aria-controls ~= weixin_wizard-p]{
 						<button style="height: 30px;" onclick="um_clear()">清空</button>
 					</div>	    
             	</div>
-            	<div  style="float:right;width: -webkit-calc(100% - 630px);text-align: center;">
+            	<div  style="float:right;width: -webkit-calc(100% - 640px);width: -moz-calc(100% - 640px);width: -ms-calc(100% - 640px);width: -o-calc(100% - 640px);text-align: center;">
             		<h2>微信端显示效果示例</h2>
             		<div id="weixinEditorDisplay" class="displayBorder">
             			<img width="100%" height="100%" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxGuideSample/wxRestaurnat.jpg"/>
