@@ -434,11 +434,15 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			throw new BusinessException("【积分会员】不能使用【会员卡】结账");
 			
 		}else if(memberType.isCharge() && payType.equals(PayType.MEMBER)){
-			float couponPrice = coupon != null ? coupon.getPrice() : 0; 
-			if(getTotalBalance() < consumePrice - couponPrice){
-				//Check to see whether the balance of member account is enough or NOT in case of unpaid.
-				throw new BusinessException(MemberError.EXCEED_BALANCE);
-			}
+			checkBalance(consumePrice, coupon);
+		}
+	}
+	
+	private void checkBalance(float consumePrice, Coupon coupon) throws BusinessException{
+		float couponPrice = coupon != null ? coupon.getPrice() : 0; 
+		if(getTotalBalance() < consumePrice - couponPrice){
+			//Check to see whether the balance of member account is enough or NOT in case of unpaid.
+			throw new BusinessException(MemberError.EXCEED_BALANCE);
 		}
 	}
 	
@@ -509,9 +513,10 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		mo.setPayMoney(consumePrice);
 		
 		if(payType.equals(PayType.MEMBER)){
-			//使用会员付款时扣除账户余额
-			checkConsume(consumePrice, coupon, payType);
+			//检查余额是否充足
+			checkBalance(consumePrice, coupon);
 
+			//使用会员付款时扣除账户余额
 			mo.setPayMoney(consumePrice);
 			
 			float deltaBase, deltaExtra;
