@@ -37,8 +37,8 @@
 	var tableID = Request['tableID'];
 	var orderID = Request['orderID'];
 	var orderType = Request['orderType'];
-	var isRepaid = false, isFree = true, tableCategory = 1,  isGroup = false;
-	
+	var isRepaid = false, isFree = true, tableCategory = 1,  isGroup = false, orderId4Display = orderID;
+	console.log(orderId4Display)
 	var primaryOrderData;
 	var params;
 	
@@ -57,25 +57,25 @@
 				primaryOrderData = jr;
 				if(jr.success){
 					orderID = primaryOrderData.other.order.id;
-					isRepaid = eval(primaryOrderData.other.order.statusValue) != 0;
+					isRepaid = primaryOrderData.other.order.statusValue != 0;
 					isFree = false;
 					
 					if(isRepaid){
-						if(orderType == 'common'){
-							$.ajax({
-								url : '../../QueryPayType.do',
-								type : 'post',
-								async:false,
-								data : {
-									dataSource : 'exceptMember'
-								},
-								success : function(jr, status, xhr){
-									repaid_payType = jr.root;
-								},
-								error : function(request, status, err){
-								}
-							}); 							
-						}else{
+						$.ajax({
+							url : '../../QueryPayType.do',
+							type : 'post',
+							async:false,
+							data : {
+								dataSource : 'exceptMember'
+							},
+							success : function(jr, status, xhr){
+								repaid_payType = jr.root;
+							},
+							error : function(request, status, err){
+							}
+						}); 							
+						if(orderType != 'common'){
+							repaid_payType.push({id: 3, name: "会员卡", typeValue: 3});
 							//根据order获取member
 							$.ajax({
 								url : '../../QueryMember.do',
@@ -87,15 +87,6 @@
 								},
 								success : function(jr, status, xhr){
 									re_member = jr.root[0];
-									
-									//积分会员可选付款方式, 充值会员只能用卡
-									if(re_member.memberType['attributeValue'] == 1){//积分
-										repaid_payType = [{"id":1,"name":"现金","typeValue":2},{"id":2,"name":"刷卡","typeValue":2}];
-
-									}else if(re_member.memberType['attributeValue'] == 0){//充值
-										repaid_payType = [{"id":3,"name":"会员卡","typeValue":3}];
-									}
-									
 								},
 								error : function(request, status, err){
 								}
