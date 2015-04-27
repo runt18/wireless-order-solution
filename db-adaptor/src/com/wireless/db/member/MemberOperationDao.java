@@ -37,27 +37,15 @@ public class MemberOperationDao {
 		@Override
 		public String toString(){
 			final StringBuilder extraCond = new StringBuilder();
-			StringBuilder operateTypeCond = new StringBuilder();
-			for(MemberOperation.OperationType type : super.operationTypes){
-				if(operateTypeCond.length() == 0){
-					operateTypeCond.append(type.getValue());
-				}else{
-					operateTypeCond.append("," + type.getValue());
-				}
-			}
 			
-			if(operateTypeCond.length() != 0){
-				extraCond.append(" AND MO.operate_type IN (" + operateTypeCond.toString() + ")");
-			}
+			extraCond.append(" AND MO.id IN (" +
+							 " SELECT MAX(id) FROM wireless_order_db." + super.moTbl + " WHERE restaurant_id = " + super.restaurantId +
+							 " AND operate_type IN (" + 
+							 MemberOperation.OperationType.CONSUME.getValue() + ", " + 
+							 MemberOperation.OperationType.RE_CONSUME.getValue() + "," + 
+							 MemberOperation.OperationType.RE_CONSUME_RESTORE.getValue() + ") GROUP BY order_id )");
 			
-			if(super.operationDate != null){
-				extraCond.append(" AND MO.operate_date BETWEEN '" + super.operationDate.getOnDutyFormat() + "' AND '" + super.operationDate.getOffDutyFormat() + "'");
-			}	
-			
-			extraCond.append(" AND EXISTS( SELECT 1 FROM wireless_order_db.member_operation_history MO2 " +
-							" WHERE 1 = 1 AND MO.order_id = MO2.order_id GROUP BY MO2.order_id HAVING MAX(MO2.id) = MO.id)");
-			
-			return extraCond.toString();
+			return super.toString() + extraCond.toString();
 		}
 		
 	}
@@ -65,7 +53,6 @@ public class MemberOperationDao {
 	public static class ExtraCond{
 		private final DateType dateType;
 		private final String moTbl;
-		
 		private int id;
 		private final List<Integer> members = new ArrayList<Integer>();
 		private int memberTypeId;
@@ -76,6 +63,7 @@ public class MemberOperationDao {
 		private final List<MemberOperation.OperationType> operationTypes = new ArrayList<MemberOperation.OperationType>();
 		private DutyRange operationDate;
 		private boolean containsCoupon;
+		private int restaurantId;
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
@@ -88,6 +76,11 @@ public class MemberOperationDao {
 		
 		public ExtraCond setId(int id){
 			this.id = id;
+			return this;
+		}
+		
+		ExtraCond setRestaurant(int restaurantId){
+			this.restaurantId = restaurantId;
 			return this;
 		}
 		
@@ -355,8 +348,8 @@ public class MemberOperationDao {
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = MO.pay_type_id " +
 			  " WHERE 1 = 1 " +
 			  " AND MO.restaurant_id = " + staff.getRestaurantId() +
-			  extraCond.toString() +
-			  (orderClause != null ? orderClause : "");
+			  extraCond.setRestaurant(staff.getRestaurantId()).toString() +
+			  (orderClause != null ? orderClause : " ORDER BY MO.id DESC ");
 		
 		List<MemberOperation> result = new ArrayList<MemberOperation>();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -385,7 +378,6 @@ public class MemberOperationDao {
 			}
 			mo.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
 			mo.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
-			//mo.setDeltaTotalMoney(dbCon.rs.getFloat("delta_base_money"));
 			mo.setDeltaPoint(dbCon.rs.getInt("delta_point"));
 			mo.setRemainingBaseMoney(dbCon.rs.getFloat("remaining_base_money"));
 			mo.setRemainingExtraMoney(dbCon.rs.getFloat("remaining_extra_money"));
@@ -465,7 +457,7 @@ public class MemberOperationDao {
 	 * 			throws if the member operation to this id does NOT exist
 	 */
 	public static MemberOperation getById(DBCon dbCon, Staff staff, DateType dateType, int id) throws SQLException, BusinessException{
-		List<MemberOperation> result = getByCond(dbCon, staff, new ExtraCond(DateType.TODAY).setId(id), null);
+		List<MemberOperation> result = getByCond(dbCon, staff, new ExtraCond(dateType).setId(id), null);
 		if(result.isEmpty()){
 			throw new BusinessException(MemberError.OPERATION_NOT_EXIST);
 		}else{
