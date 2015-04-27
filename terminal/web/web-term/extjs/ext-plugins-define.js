@@ -3,9 +3,17 @@
  */
 Ext.namespace('Ext.ux', 'Ext.ux.plugins');
 Ext.ux.plugins.imgTypes = ['jpg','jpeg', 'gif', 'bmp', 'png'];
+Ext.ux.plugins.imgSize = 200;
+/**
+ * 
+ */
 Ext.ux.plugins.createImageFile = function(config){
 	config = config || {};
 	var check = false;
+	//设置图片大小限制
+	if(config.imgSize){
+		Ext.ux.plugins.imgSize = config.imgSize;
+	}
 	var img = new Ext.form.TextField({
 		id : config.id,
 		name : 'imgFile',
@@ -33,19 +41,28 @@ Ext.ux.plugins.createImageFile = function(config){
  	        	    					break;
  	        	    				}
  	        	    			}
- 	        	    			if(check){
- 	        	    				img.src = Ext.BLANK_IMAGE_URL;
- 	        	    				if(img.filters.length == 0){
- 	        	    					img.style.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)';
- 	        	    					img.style.width = typeof config.width == 'number' ? config.width+'px' : '400px';
- 	        	    					img.style.height = typeof config.height == 'number' ? config.height+'px' : '300px';
- 	        	    				}
- 	        	    				img.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = imgURL; 	        	    					
- 	        	    			}else{
+ 	        	    			if(!check){
  	        	    				file.select();
  	        	    				document.execCommand('Delete');
- 	        	    				Ext.example.msg('提示', '操作失败, 选择的图片类型不正确, 请重新选择!');
+ 	        	    				Ext.ux.showMsg({code : 7150, title:'提示', msg:'操作失败, 选择的图片类型不正确! 请重新选择'});
+ 	        	    				return;
  	        	    			}
+ 	        	    			
+ 	        	    			if(Ext.ux.plugins.getFileSize(file) > Ext.ux.plugins.imgSize){
+ 	        	    				file.value = '';
+ 	        	    				Ext.ux.showMsg({code : 7150, title:'提示', msg:'操作失败, 选择的图片大小超过 ' + Ext.ux.plugins.imgSize +'Kb ! 请重新选择'});
+ 	        	    				return;	        	    				
+ 	        	    			}
+ 	        	    			
+        	    				img.src = Ext.BLANK_IMAGE_URL;
+        	    				if(img.filters.length == 0){
+        	    					img.style.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)';
+        	    					img.style.width = typeof config.width == 'number' ? config.width+'px' : '400px';
+        	    					img.style.height = typeof config.height == 'number' ? config.height+'px' : '300px';
+        	    				}
+        	    				img.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = imgURL; 	
+ 	        	    			
+ 	        	    			
 	 						}
 	 					}else{
 	 						if(file.files && file.files[0]){
@@ -58,16 +75,28 @@ Ext.ux.plugins.createImageFile = function(config){
  	        	    					break;
  	        	    				}
  	        	    			}
- 	        	    			if(check){
- 	        	    				var reader = new FileReader();
- 	        	    				reader.onload = function(evt){img.src = evt.target.result;};
- 	        	    				reader.readAsDataURL(file.files[0]);
- 	        	    			}else{
+ 	        	    			if(!check){
  	        	    				file.value = '';
- 	        	    				Ext.example.msg('提示', '操作失败, 选择的图片类型不正确, 请重新选择!');
+ 	        	    				Ext.ux.showMsg({code : 7150, title:'提示', msg:'操作失败, 选择的图片类型不正确! 请重新选择'});
+ 	        	    				return;
  	        	    			}
+ 	        	    			if(Ext.ux.plugins.getFileSize(file) > Ext.ux.plugins.imgSize){
+ 	        	    				file.value = '';
+ 	        	    				Ext.ux.showMsg({code : 7150, title:'提示', msg:'操作失败, 选择的图片大小超过 ' + Ext.ux.plugins.imgSize +'Kb ! 请重新选择'});
+ 	        	    				return;	        	    				
+ 	        	    			}
+ 	        	    			
+ 	        	    			
+        	    				var reader = new FileReader();
+        	    				reader.onload = function(evt){img.src = evt.target.result;};
+        	    				reader.readAsDataURL(file.files[0]);
+ 	        	    			
 	 						}
 	 					}
+						
+						//图片显示后是否立即上传
+						config.uploadCallback && config.uploadCallback();
+						
 					} catch(e){
 						Ext.example.msg('提示', '操作失败, 无法获取图片信息. 请换浏览器后重试.');
 					}
@@ -112,6 +141,25 @@ Ext.ux.plugins.createImageFile = function(config){
 	};
 	return img;
 };
+
+//计算文件大小，返回文件大小值，单位K
+Ext.ux.plugins.getFileSize =  function(target){
+	var fs = 0;
+	if (Ext.isIE && !target.files) {
+		var filePath = target.value;
+		var fileSystem = new ActiveXObject("Scripting.FileSystemObject");
+		var file = fileSystem.GetFile (filePath);
+		fs = file.Size; 
+	}else if(target.files && target.files.length > 0){
+		fs = target.files[0].size;
+	}else{
+		fs = 0;
+	}
+	if(fs > 0){
+		fs = fs / 1024;
+	}
+	return fs;
+}
 
 Ext.ux.plugins.HEInsertImage = function(config){
 	config = config || {};
