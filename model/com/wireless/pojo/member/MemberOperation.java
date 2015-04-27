@@ -10,28 +10,58 @@ import com.wireless.pojo.util.DateUtil;
 
 public class MemberOperation implements Jsonable {
 
+	public static enum OperationCate{
+		CONSUME_TYPE(1, "消费类型"),
+		CHARGE_TYPE(2, "充值类型"),
+		POINT_ADJUST_TYPE(3, "积分调整"),
+		BALANCE_ADJUST_TYPE(4, "金额调整");
+		
+		OperationCate(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public static OperationCate valueOf(int val) {
+			for (OperationCate cate : values()) {
+				if (cate.val == val) {
+					return cate;
+				}
+			}
+			throw new IllegalArgumentException("The operation category value(val = " + val + ") passed is invalid.");
+		}
+		
+		private final int val;
+		private final String desc;
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	};
+	
 	/**
 	 * 报表搜索大类(type) 1-消费反结账, 2-充值取款, 3-积分 
 	 * 操作类型(value) 1-充值, 2-消费, 3-积分消费, 4-积分调整, 5-金额调整, 6-取款
 	 * @author WuZY
 	 */
 	public static enum OperationType {
-		CHARGE(2, 1, "充值", "CZ"),
-		CONSUME(1, 2, "消费", "XF"), 
-		POINT_CONSUME(3, 3, "积分消费", "JFXF"), 
-		POINT_ADJUST(3, 4, "积分调整", "JFTZ"),
-		BALANCE_ADJUST(4, 5, "金额调整", "CZTZ"), 
-		REFUND(2, 6, "取款", "QK"),
-		RE_CONSUME(1, 7, "反结账(消费)", "FJZ"),
-		RE_CONSUME_RESTORE(1, 8, "反结账(退款)", "FJZTK");
 
-		private final int type;
+		CHARGE(OperationCate.CHARGE_TYPE, 1, "充值", "CZ"),
+		CONSUME(OperationCate.CONSUME_TYPE, 2, "消费", "XF"), 
+		POINT_CONSUME(OperationCate.POINT_ADJUST_TYPE, 3, "积分消费", "JFXF"), 
+		POINT_ADJUST(OperationCate.POINT_ADJUST_TYPE, 4, "积分调整", "JFTZ"),
+		BALANCE_ADJUST(OperationCate.BALANCE_ADJUST_TYPE, 5, "金额调整", "CZTZ"), 
+		REFUND(OperationCate.CHARGE_TYPE, 6, "取款", "QK"),
+		RE_CONSUME(OperationCate.CONSUME_TYPE, 7, "反结账(消费)", "FJZ"),
+		RE_CONSUME_RESTORE(OperationCate.CONSUME_TYPE, 8, "反结账(退款)", "FJZTK");
+
+		private final OperationCate cate;
 		private final int value; //
 		private final String name; //
 		private final String prefix; // 流水号前缀
 
-		OperationType(int type, int value, String name, String prefix) {
-			this.type = type;
+		OperationType(OperationCate type, int value, String name, String prefix) {
+			this.cate = type;
 			this.value = value;
 			this.name = name;
 			this.prefix = prefix;
@@ -48,18 +78,17 @@ public class MemberOperation implements Jsonable {
 					return ot;
 				}
 			}
-
 			throw new IllegalArgumentException("The operation value(val = " + val + ") passed is invalid.");
 		}
 
-		public static List<OperationType> typeOf(int type) {
-			List<OperationType> list = new ArrayList<OperationType>();
+		public static List<OperationType> typeOf(OperationCate cate) {
+			final List<OperationType> result = new ArrayList<OperationType>();
 			for (OperationType ot : values()) {
-				if (ot.getType() == type) {
-					list.add(ot);
+				if (ot.cate == cate) {
+					result.add(ot);
 				}
 			}
-			return list;
+			return result;
 		}
 
 		public int getValue() {
@@ -74,8 +103,8 @@ public class MemberOperation implements Jsonable {
 			return prefix;
 		}
 
-		public int getType() {
-			return type;
+		public boolean isConsume(){
+			return this.cate == OperationCate.CONSUME_TYPE;
 		}
 	}
 
