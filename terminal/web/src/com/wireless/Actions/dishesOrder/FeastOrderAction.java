@@ -8,17 +8,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ErrorCode;
 import com.wireless.json.JObject;
-import com.wireless.pack.ProtocolPackage;
-import com.wireless.pack.Type;
-import com.wireless.pack.req.ReqFeastOrder;
-import com.wireless.parcel.Parcel;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.sccon.ServerConnector;
+import com.wireless.util.DateType;
 
 public class FeastOrderAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -35,18 +33,25 @@ public class FeastOrderAction extends Action{
 				String[] feast = feasts[i].split(",");
 				builder.add(Integer.parseInt(feast[0]), Float.parseFloat(feast[1]));
 			}
-			final ProtocolPackage resp = ServerConnector.instance().ask(new ReqFeastOrder(staff, builder));
+			int orderId = OrderDao.feast(staff, builder);
 			
-			if(resp.header.type == Type.ACK){
-				jobject.initTip(true, ("酒席分账录入成功."));
+			Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
+			final int tableId = order.getDestTbl().getId();
+			
+			jobject.setExtra(new Jsonable() {
 				
-			}else if(resp.header.type == Type.NAK){
-				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
-				jobject.initTip(false, errCode.getCode(), "酒席分账失败，请重新确认.");
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putInt("tableId", tableId);
+					return jm;
+				}
 				
-			}else{
-				jobject.initTip(false, ("酒席分账失败，请重新确认."));
-			}
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+			});
 			
 		}catch(BusinessException e){
 			jobject.initTip(e);
