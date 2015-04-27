@@ -3,7 +3,7 @@ var mpo_orderFoodGrid;
 var mpo_memberPayOrderSreachMemberCardWin;
 var mpo_memberPayOrderRechargeWin;
 var mpo_payMannerData = [[1, '现金'], [2, '刷卡'], [3, '会员余额']];
-var mpo_servicePlanData = [], mpo_pricePlanData = [], mpo_discountData = [];
+var mpo_servicePlanData = [], mpo_pricePlanData = [], mpo_discountData = [], mpo_couponData = [];
 
 function reloadMemberPay(){
 	Ext.Ajax.request({
@@ -273,6 +273,7 @@ function memberPayOrderToBindData(_c){
 	if(coupons){
 		coupon.getEl().up('.x-form-item').setDisplayed(true);
 		var list = [[-1,'不使用']];
+		mpo_couponData = coupons;
 		for (var i = 0; i < coupons.length; i++) {
 			list.push([coupons[i].couponId, coupons[i].couponType.name]);
 		}
@@ -470,6 +471,8 @@ function memberPayOrderRecharge(){
 
 function getOrderMember(){
 	var discountId = Ext.getCmp('mpo_txtDiscountForPayOrder').getValue();
+	var couponId = Ext.getCmp('mpo_couponForPayOrder').getValue();
+	
 	for (var i = 0; i < mpo_discountData.length; i++) {
 		if(discountId == mpo_discountData[i].id){
 			mpo_memberDetailData.discount = mpo_discountData[i];
@@ -477,8 +480,16 @@ function getOrderMember(){
 		}
 	}
 	
+	if(couponId){
+		for (var i = 0; i < mpo_couponData.length; i++) {
+			if(couponId == mpo_couponData[i].couponId){
+				mpo_memberDetailData.coupon = mpo_couponData[i];
+				break;
+			}
+		}
+	}
+	
 	mpo_memberDetailData.pricePlanId = Ext.getCmp('mpo_txtPricePlanForPayOrder').getValue();
-	mpo_memberDetailData.couponId = Ext.getCmp('mpo_couponForPayOrder').getValue();
 	
 	return mpo_memberDetailData;
 	

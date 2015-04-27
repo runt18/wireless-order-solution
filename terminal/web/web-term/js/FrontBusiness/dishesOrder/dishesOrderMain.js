@@ -29,7 +29,7 @@ function repaid_initNorthPanel(){
 					id : 'txtSettleTypeFormat',
 					fieldLabel : '结账方式',
 					style : 'color:green;font-size:15px;font-weight:bold',
-					value : '一般/会员',
+					value : '普通/会员',
 					disabled : true
 				}]
 			}, {
@@ -52,9 +52,13 @@ function repaid_initNorthPanel(){
 					listeners : {
 						select : function(thiz, record, index) {
 							//选了别的折扣后取消会员注入
-							re_member = null;
-							Ext.getCmp('txtSettleTypeFormat').setValue('一般');
-							Ext.getCmp('repaid_comboPayType').setValue(repaid_payType[0].id);
+							if(orderType != 'common'){
+								re_member = null;
+								Ext.getCmp('txtSettleTypeFormat').setValue('普通');
+								var payTypeCmo = Ext.getCmp('repaid_comboPayType');
+								payTypeCmo.setValue(repaid_payType[0].id);
+								payTypeCmo.fireEvent('select', payTypeCmo, null, null);
+							}
 							setRepaidOrderTitle();
 							//FIXME
 /*							Ext.Ajax.request({
@@ -219,8 +223,14 @@ function memberRepaid(){
 					Ext.getCmp('txtSettleTypeFormat').setValue('会员');
 					bindMemberWin.hide();
 					
-					repaid_payType.push({id: 3, name: "会员卡", typeValue: 3});
+					repaid_payType.push({id: 3, name: "会员余额", typeValue: 3});
 					Ext.getCmp('repaid_comboPayType').getStore().loadData(repaid_payType);
+					//是充值卡则选会员余额 
+					if(re_member.memberType['attributeValue'] == 0){//充值
+						var payTypeCmo = Ext.getCmp('repaid_comboPayType'); 
+						payTypeCmo.setValue(3);
+						payTypeCmo.fireEvent('select', payTypeCmo,null,null);
+					}
 					setRepaidOrderTitle({member:true});
 					
 				}
@@ -249,7 +259,7 @@ function memberRepaid(){
 
 function initPaytypeCheckboxs(){
 	for (var i = 0; i < repaid_payType.length; i++) {
-		if(repaid_payType[i].id == 100){
+		if(repaid_payType[i].id == 100 || repaid_payType[i].id == 3){
 			continue;
 		}
 		var checkBoxId = 'repaid_chbForPayType' + repaid_payType[i].id,  numberfieldId = 'repaid_numForPayType' + repaid_payType[i].id;
@@ -1232,11 +1242,18 @@ function setRepaidOrderTitle(c){
 	if(c && c.member){
 		if(re_member && re_member.hasMember){
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
+			if(re_member.coupon){
+				orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券: <span class="re_showMemberDetail">'+ re_member.coupon.name +'</span>';
+			}
 		}
 		orderFoodTitle += '&nbsp;&nbsp;&nbsp;当前折扣:<font color="green">'+ re_member.discount.name +'</font>';
 	}else{
 		if(re_member){
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
+		}
+		
+		if(primaryOrderData.other.order.coupon){
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券:<font color="green">'+ primaryOrderData.other.order.coupon.name +'</font>';
 		}
 		
 		if(primaryOrderData.other.order.discount){
@@ -1411,6 +1428,9 @@ Ext.onReady(function() {
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
 		}
 		
+		if(primaryOrderData.other.order.coupon){
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券:<font color="green">'+ primaryOrderData.other.order.coupon.name +'</font>';
+		}
 		if(primaryOrderData.other.order.discount){
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;账单折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';
 		}
