@@ -466,7 +466,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		
 		//重新执行会员结账, 生成member operation
 		MemberOperation mo = consume(0, null, PayType.MEMBER);
-		mo.setOperationType(OperationType.RE_CONSUME);
+		mo.setOperationType(OperationType.RE_CONSUME_RESTORE);
 		
 		return mo;
 	}

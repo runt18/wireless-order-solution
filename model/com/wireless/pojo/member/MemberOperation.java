@@ -22,7 +22,8 @@ public class MemberOperation implements Jsonable {
 		POINT_ADJUST(3, 4, "积分调整", "JFTZ"),
 		BALANCE_ADJUST(4, 5, "金额调整", "CZTZ"), 
 		REFUND(2, 6, "取款", "QK"),
-		RE_CONSUME(1, 7, "反结账", "FJZ");
+		RE_CONSUME(1, 7, "反结账(消费)", "FJZ"),
+		RE_CONSUME_RESTORE(1, 8, "反结账(退款)", "FJZTK");
 
 		private final int type;
 		private final int value; //
@@ -48,8 +49,7 @@ public class MemberOperation implements Jsonable {
 				}
 			}
 
-			throw new IllegalArgumentException("The operation value(val = "
-					+ val + ") passed is invalid.");
+			throw new IllegalArgumentException("The operation value(val = " + val + ") passed is invalid.");
 		}
 
 		public static List<OperationType> typeOf(int type) {
@@ -60,8 +60,6 @@ public class MemberOperation implements Jsonable {
 				}
 			}
 			return list;
-			// throw new IllegalArgumentException("The operation value(val = " +
-			// type + ") passed is invalid.");
 		}
 
 		public int getValue() {
