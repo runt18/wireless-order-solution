@@ -15,7 +15,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
@@ -65,23 +64,22 @@ public class WXQueryInfoAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
-			OssImage oss = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId)).getWeixinLogo();
-			String logo;
-			if(oss == null){
-				logo = "http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxLogo/default.jpg";					
+			WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId));
+			final String logo;
+			if(wxRestaurant.hasWeixinLogo()){
+				logo = wxRestaurant.getWeixinLogo().getObjectUrl();
 			}else{
-				logo = oss.getObjectUrl();
+				logo = "http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxLogo/default.jpg";					
 			}
 			
 			final Restaurant rInfo = RestaurantDao.getById(restaurantId);
 			
-			final String logoPath = logo;
 			jobject.setExtra(new Jsonable(){
 
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
-					jm.putString("logo", logoPath);
+					jm.putString("logo", logo);
 					jm.putJsonable("rInfo", rInfo, flag);
 					return jm;
 				}

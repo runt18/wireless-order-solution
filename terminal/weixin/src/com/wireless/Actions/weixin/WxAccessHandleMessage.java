@@ -27,9 +27,8 @@ public class WxAccessHandleMessage extends HandleMessageAdapter {
 			session.callback(new Msg4Text(msg, "TESTCOMPONENT_MSG_TYPE_TEXT_callback"));
 			
 		}else if(msg.getToUserName().equalsIgnoreCase(ACCESS_USER_NAME) && msg.getContent().contains("QUERY_AUTH_CODE")){
-			String s = msg.getContent().split(":")[1];
-			final String queryAuthCode = s.substring(1, s.length() - 1);
-			System.out.println("Query Auth Code : " + queryAuthCode);
+			final String queryAuthCode = msg.getContent().split(":")[1];
+			//System.out.println("Query Auth Code : " + queryAuthCode);
 			
 			AuthorizationInfo authorizationInfo;
 			try {

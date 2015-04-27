@@ -195,16 +195,12 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	 */
 	@Override
 	public void onTextMsg(Msg4Text msg) {
-		try{
-			// 绑定餐厅和公众平台信息
-			WxRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
-			if(msg.getContent().equalsIgnoreCase("M")){
-				session.callback(createNavi(msg));
-			}else{
-				session.callback(new Msg4Text(msg, "回复【m】获取餐厅导航"));
-			}
-		}catch(BusinessException | SQLException e){
-			e.printStackTrace();
+		// 绑定餐厅和公众平台信息
+		//WxRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
+		if(msg.getContent().equalsIgnoreCase("M")){
+			session.callback(createNavi(msg));
+		}else{
+			session.callback(new Msg4Text(msg, "回复【m】获取餐厅导航"));
 		}
 	}
 	
@@ -215,7 +211,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	public void onEventMsg(Msg4Event msg) {
 		try{
 			// 绑定餐厅和公众平台信息
-			WxRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
+			//WxRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
 			
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注
