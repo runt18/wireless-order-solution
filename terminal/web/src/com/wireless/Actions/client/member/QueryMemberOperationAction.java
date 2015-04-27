@@ -92,7 +92,7 @@ public class QueryMemberOperationAction extends Action{
 				}
 			}
 			
-			String orderClause = " ORDER BY MO.operate_date DESC " ;
+			String orderClause = " ORDER BY MO.id DESC " ;
 			
 			if(isPaging != null && isPaging.trim().equals("true")){
 				if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
