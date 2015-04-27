@@ -53,28 +53,33 @@ public class TestPrinterScheme {
 		assertEquals("printer enabled", expected.isEnabled(), actual.isEnabled());
 		
 		//Compare the associated print functions
-		List<PrintFunc> expectedFuncs = SortedList.newInstance(expected.getPrintFuncs());
-		List<PrintFunc> actualFuncs = SortedList.newInstance(actual.getPrintFuncs());
+		final List<PrintFunc> expectedFuncs = SortedList.newInstance(expected.getPrintFuncs());
+		final List<PrintFunc> actualFuncs = SortedList.newInstance(actual.getPrintFuncs());
 		assertEquals(expectedFuncs.size(), actualFuncs.size());
 		
 		for(int i = 0; i < expectedFuncs.size(); i++){
-			assertEquals("print function type", expectedFuncs.get(i).getType().getVal(), actualFuncs.get(i).getType().getVal());
-			assertEquals("print function repeat", expectedFuncs.get(i).getRepeat(), actualFuncs.get(i).getRepeat());
-			assertEquals("print function comment", expectedFuncs.get(i).getComment(), actualFuncs.get(i).getComment());
-			
-			if(expectedFuncs.get(i).getType().isSummary()){
-				//Compare the department if the print type is summary
-				assertEquals("department to summary", expectedFuncs.get(i).getDepartment(), actualFuncs.get(i).getDepartment());
-			}
-			
-			if(expectedFuncs.get(i).getType().isDetail()){
-				//Compare the kitchens if the print type is detail
-				assertEquals("kitchens to detail", expectedFuncs.get(i).getKitchens(), actualFuncs.get(i).getKitchens());
-			}
-			
-			//Compare the regions
-			assertEquals("regions to print type", expectedFuncs.get(i).getRegions(), actualFuncs.get(i).getRegions());
+			compare(expectedFuncs.get(i), actualFuncs.get(i));
 		}
+	}
+	
+	private void compare(PrintFunc expected, PrintFunc actual){
+		assertEquals("print function type", expected.getType().getVal(), actual.getType().getVal());
+		assertEquals("print function repeat", expected.getRepeat(), actual.getRepeat());
+		assertEquals("print function comment", expected.getComment(), actual.getComment());
+		assertEquals("print function enabled", expected.isEnabled(), actual.isEnabled());
+		
+		if(expected.getType().isSummary()){
+			//Compare the department if the print type is summary
+			assertEquals("department to summary", expected.getDepartment(), actual.getDepartment());
+		}
+		
+		if(expected.getType().isDetail()){
+			//Compare the kitchens if the print type is detail
+			assertEquals("kitchens to detail", expected.getKitchens(), actual.getKitchens());
+		}
+		
+		//Compare the regions
+		assertEquals("regions to print type", expected.getRegions(), actual.getRegions());
 	}
 	
 	@Test
@@ -94,7 +99,7 @@ public class TestPrinterScheme {
 			printerId = PrinterDao.insert(dbCon, mStaff, builder);
 			
 			//点菜总单
-			PrintFunc.SummaryBuilder summaryFuncBuilder = SummaryBuilder.newExtra(printerId, true)
+			PrintFunc.SummaryBuilder summaryFuncBuilder = new SummaryBuilder(printerId, true, true)
 																	   .setRepeat(2)
 																	   .addRegion(regions.get(0))
 																	   .addRegion(regions.get(1))
@@ -103,16 +108,18 @@ public class TestPrinterScheme {
 																	   .setComment("测试备注");
 			
 			//Add a summary function to this printer
-			int summaryFuncId = PrintFuncDao.addFunc(dbCon, mStaff, summaryFuncBuilder);
+			PrintFuncDao.addFunc(dbCon, mStaff, summaryFuncBuilder);
+			
+			int summaryFuncId = PrintFuncDao.getByCond(dbCon, mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_ORDER)).get(0).getId();
 			
 			//退菜总单
 			int cancelSummaryFuncId = PrintFuncDao.getByCond(dbCon, mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_ALL_CANCELLED_FOOD)).get(0).getId();
 			
 			//点菜分单
-			PrintFunc.DetailBuilder detailFuncBuilder = DetailBuilder.newExtra(printerId, true)
-																	 .setRepeat(2)
-																	 .addKitchen(kitchens.get(0))
-																	 .addKitchen(kitchens.get(1));
+			PrintFunc.DetailBuilder detailFuncBuilder = new DetailBuilder(printerId, true, true)
+																	.setRepeat(2)
+																	.addKitchen(kitchens.get(0))
+																	.addKitchen(kitchens.get(1));
 			int detailFuncId = PrintFuncDao.addFunc(dbCon, mStaff, detailFuncBuilder);
 			
 			//退菜分单
@@ -151,25 +158,21 @@ public class TestPrinterScheme {
 			Printer expected = builder.build();
 			expected.setId(printerId);
 			
-			PrintFunc summaryExtraFunc = summaryFuncBuilder.build();
-			summaryExtraFunc.setType(PType.PRINT_ORDER);
+			PrintFunc summaryExtraFunc = summaryFuncBuilder.build()[0];
 			summaryExtraFunc.setId(summaryFuncId);
 			expected.addFunc(summaryExtraFunc);
 			
-			PrintFunc summaryCancelFunc = summaryFuncBuilder.build();
-			summaryCancelFunc.setType(PType.PRINT_ALL_CANCELLED_FOOD);
+			PrintFunc summaryCancelFunc = summaryFuncBuilder.build()[1];
 			summaryCancelFunc.setId(cancelSummaryFuncId);
 			expected.addFunc(summaryCancelFunc);
 			
-			PrintFunc detailFunc = detailFuncBuilder.build();
-			detailFunc.setType(PType.PRINT_ORDER_DETAIL);
-			detailFunc.setId(detailFuncId);
-			expected.addFunc(detailFunc);
+			PrintFunc detailExtraFunc = detailFuncBuilder.build()[0];
+			detailExtraFunc.setId(detailFuncId);
+			expected.addFunc(detailExtraFunc);
 			
-			PrintFunc cancelledFood = detailFuncBuilder.build();
-			cancelledFood.setType(PType.PRINT_CANCELLED_FOOD_DETAIL);
-			cancelledFood.setId(cancelledDetailFuncId);
-			expected.addFunc(cancelledFood);
+			PrintFunc detailCancelFunc = detailFuncBuilder.build()[1];
+			detailCancelFunc.setId(cancelledDetailFuncId);
+			expected.addFunc(detailCancelFunc);
 			
 			PrintFunc receipt = receiptBuilder.build();
 			receipt.setId(receiptId);
@@ -191,27 +194,95 @@ public class TestPrinterScheme {
 			compare(expected, PrinterDao.getById(dbCon, mStaff, printerId));
 			
 			//------------Update the summary function-----------------
-			PrintFunc.UpdateBuilder summaryUpdateBuilder = new PrintFunc.UpdateBuilder(summaryFuncId)
+			PrintFunc.SummaryUpdateBuilder summaryUpdateBuilder = new PrintFunc.SummaryUpdateBuilder(printerId, true, false)
 																		.setRepeat(3)
 																		.addDepartment(depts.get(1))
 																		.setRegionAll();
 			PrintFuncDao.updateFunc(dbCon, mStaff, summaryUpdateBuilder);
 			expected.removeFunc(summaryExtraFunc);
-			if(summaryUpdateBuilder.isDeptChanged()){
-				summaryExtraFunc.setDepartments(summaryUpdateBuilder.build().getDepartment());
+			expected.removeFunc(summaryCancelFunc);
+			PrintFunc.UpdateBuilder extraSummaryUpdateBuilder = summaryUpdateBuilder.build(summaryExtraFunc.getId(), summaryCancelFunc.getId())[0];
+			PrintFunc.UpdateBuilder cancelSummaryUpdateBuilder = summaryUpdateBuilder.build(summaryExtraFunc.getId(), summaryCancelFunc.getId())[1];
+			if(extraSummaryUpdateBuilder.isDeptChanged()){
+				summaryExtraFunc.setDepartments(extraSummaryUpdateBuilder.build().getDepartment());
+				summaryCancelFunc.setDepartments(extraSummaryUpdateBuilder.build().getDepartment());
 			}
-			if(summaryUpdateBuilder.isKitchenChanged()){
-				summaryExtraFunc.setKitchens(summaryUpdateBuilder.build().getKitchens());
+			if(extraSummaryUpdateBuilder.isKitchenChanged()){
+				summaryExtraFunc.setKitchens(extraSummaryUpdateBuilder.build().getKitchens());
+				summaryCancelFunc.setKitchens(extraSummaryUpdateBuilder.build().getKitchens());
 			}
-			if(summaryUpdateBuilder.isRegionChanged()){
-				summaryExtraFunc.setRegions(summaryUpdateBuilder.build().getRegions());
+			if(extraSummaryUpdateBuilder.isRegionChanged()){
+				summaryExtraFunc.setRegions(extraSummaryUpdateBuilder.build().getRegions());
+				summaryCancelFunc.setRegions(extraSummaryUpdateBuilder.build().getRegions());
 			}
-			if(summaryUpdateBuilder.isRepeatChanged()){
-				summaryExtraFunc.setRepeat(summaryUpdateBuilder.build().getRepeat());
+			if(extraSummaryUpdateBuilder.isRepeatChanged()){
+				summaryExtraFunc.setRepeat(extraSummaryUpdateBuilder.build().getRepeat());
+				summaryCancelFunc.setRepeat(extraSummaryUpdateBuilder.build().getRepeat());
+			}
+			if(extraSummaryUpdateBuilder.isEnabledChanged()){
+				summaryExtraFunc.setEnabled(extraSummaryUpdateBuilder.build().isEnabled());
+				summaryCancelFunc.setEnabled(cancelSummaryUpdateBuilder.build().isEnabled());
+			}
+			if(summaryExtraFunc.isEnabled()){
+				expected.addFunc(summaryExtraFunc);
+			}else{
+				//Compare the detail extra print function which switch to be disable.
+				compare(summaryExtraFunc, PrintFuncDao.getByCond(mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_ORDER)).get(0));
+			}
+			if(summaryCancelFunc.isEnabled()){
+				expected.addFunc(summaryCancelFunc);
+			}else{
+				//Compare the detail cancel print function which switch to be disable.
+				compare(summaryCancelFunc, PrintFuncDao.getByCond(mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_ALL_CANCELLED_FOOD)).get(0));
 			}
 			//Compare after update summary function
-			expected.addFunc(summaryExtraFunc);
 			compare(expected, PrinterDao.getById(dbCon, mStaff, printerId));
+			//----------------------------------------------------------------
+			
+			//------------Update the detail function-----------------
+			PrintFunc.DetailUpdateBuilder detailUpdateBuilder = new PrintFunc.DetailUpdateBuilder(printerId, false, true)
+																		.setRepeat(3)
+																		.addKitchen(kitchens.get(1));
+			PrintFuncDao.updateFunc(dbCon, mStaff, detailUpdateBuilder);
+			expected.removeFunc(detailExtraFunc);
+			expected.removeFunc(detailCancelFunc);
+			PrintFunc.UpdateBuilder detailExtraUpdateBuilder = detailUpdateBuilder.build(detailExtraFunc.getId(), detailCancelFunc.getId())[0];
+			PrintFunc.UpdateBuilder detailCancelUpdateBuilder = detailUpdateBuilder.build(detailExtraFunc.getId(), detailCancelFunc.getId())[1];
+			if(detailExtraUpdateBuilder.isDeptChanged()){
+				detailExtraFunc.setDepartments(detailExtraUpdateBuilder.build().getDepartment());
+				detailCancelFunc.setDepartments(detailCancelUpdateBuilder.build().getDepartment());
+			}
+			if(detailExtraUpdateBuilder.isKitchenChanged()){
+				detailExtraFunc.setKitchens(detailExtraUpdateBuilder.build().getKitchens());
+				detailCancelFunc.setKitchens(detailCancelUpdateBuilder.build().getKitchens());
+			}
+			if(detailExtraUpdateBuilder.isRegionChanged()){
+				detailExtraFunc.setRegions(detailExtraUpdateBuilder.build().getRegions());
+				detailCancelFunc.setRegions(detailCancelUpdateBuilder.build().getRegions());
+			}
+			if(detailExtraUpdateBuilder.isRepeatChanged()){
+				detailExtraFunc.setRepeat(detailExtraUpdateBuilder.build().getRepeat());
+				detailCancelFunc.setRepeat(detailCancelUpdateBuilder.build().getRepeat());
+			}
+			if(detailExtraUpdateBuilder.isEnabledChanged()){
+				detailExtraFunc.setEnabled(detailExtraUpdateBuilder.build().isEnabled());
+				detailCancelFunc.setEnabled(detailCancelUpdateBuilder.build().isEnabled());
+			}
+			if(detailExtraFunc.isEnabled()){
+				expected.addFunc(detailExtraFunc);
+			}else{
+				//Compare the detail extra print function which switch to be disable.
+				compare(detailExtraFunc, PrintFuncDao.getByCond(mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_ORDER_DETAIL)).get(0));
+			}
+			if(detailCancelFunc.isEnabled()){
+				expected.addFunc(detailCancelFunc);
+			}else{
+				//Compare the detail cancel print function which switch to be disable.
+				compare(detailCancelFunc, PrintFuncDao.getByCond(mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_CANCELLED_FOOD_DETAIL)).get(0));
+			}
+			//Compare after update detail function
+			compare(expected, PrinterDao.getById(dbCon, mStaff, printerId));
+			//-----------------------------------------------------------------------------------------------
 			
 			//------------Remove the summary function---------------------------------
 			PrintFuncDao.deleteById(dbCon, mStaff, summaryFuncId);

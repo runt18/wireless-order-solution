@@ -23,6 +23,7 @@ public class PrintFuncDao {
 		private int id;
 		private int printerId;
 		private PType type;
+		private int enabled = -1;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -44,6 +45,11 @@ public class PrintFuncDao {
 			return this;
 		}
 		
+		public ExtraCond setEnabled(boolean onOff){
+			this.enabled = onOff ? 1 : 0;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -55,6 +61,9 @@ public class PrintFuncDao {
 			}
 			if(type != null){
 				extraCond.append(" AND type = " + type.getVal());
+			}
+			if(enabled != -1){
+				extraCond.append(" AND enabled = " + enabled);
 			}
 			return extraCond.toString();
 		}
@@ -87,14 +96,8 @@ public class PrintFuncDao {
 		}
 		dbCon.rs.close();
 		
-		//Check to see whether the function has exist before
-		sql = " SELECT * FROM " + Params.dbName + ".print_func WHERE " +
-			  " printer_id = " + func.getPrinterId() + " AND " + " type = " + func.getType().getVal();
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			throw new BusinessException(PrintSchemeError.DUPLICATE_FUNC_TYPE);
-		}
-		dbCon.rs.close();
+		//Delete the function has exist before.
+		deleteByCond(dbCon, staff, new ExtraCond().setPrinter(func.getPrinterId()).setType(func.getType()));
 		
 		sql = " INSERT INTO " + Params.dbName + ".print_func" +
 		      "( `printer_id`, `repeat`, `type`, `comment` )" +
@@ -161,7 +164,7 @@ public class PrintFuncDao {
 	 * 			the staff to perform this action
 	 * @param func
 	 * 			the function to add
-	 * @return the id to print function just generated
+	 * @return the id to extra print function just generated
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
@@ -169,10 +172,9 @@ public class PrintFuncDao {
 	 * 			throws if the function type has exist before
 	 */
 	public static int addFunc(DBCon dbCon, Staff staff, PrintFunc.SummaryBuilder builder) throws SQLException, BusinessException{
-		int funcId = addFunc(dbCon, staff, builder.build());
-		//Add the associated cancel printer function.
-		if(builder.isIncludeCancel()){
-			addFunc(dbCon, staff, PrintFunc.SummaryBuilder.newCancel(getById(dbCon, staff, funcId)).build());
+		int funcId = 0;
+		for(PrintFunc func : builder.build()){
+			funcId = addFunc(dbCon, staff, func);
 		}
 		return funcId;
 	}
@@ -193,10 +195,9 @@ public class PrintFuncDao {
 	 * 			throws if the function type has exist before
 	 */
 	public static int addFunc(DBCon dbCon, Staff staff, PrintFunc.DetailBuilder builder) throws SQLException, BusinessException{
-		int funcId = addFunc(dbCon, staff, builder.build());
-		//Add the associated cancel detail printer function.
-		if(builder.isIncludeCancel()){
-			addFunc(dbCon, staff, PrintFunc.DetailBuilder.newCancel(getById(dbCon, staff, funcId)).build());
+		int funcId = 0;
+		for(PrintFunc func : builder.build()){
+			funcId = addFunc(dbCon, staff, func);
 		}
 		return funcId;
 	}
@@ -292,6 +293,60 @@ public class PrintFuncDao {
 		return amount;
 	}
 	
+	
+	/**
+	 * Update the summary print function according to specific builder {@link PrintFunc#SummaryUpdateBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to summary print function
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 */
+	public static void updateFunc(DBCon dbCon, Staff staff, PrintFunc.SummaryUpdateBuilder builder) throws SQLException, BusinessException{
+		PrintFunc summaryExtraFunc = getByCond(dbCon, staff, new ExtraCond().setPrinter(builder.getPrinterId()).setType(PType.PRINT_ORDER)).get(0);
+		PrintFunc summaryCancelFunc = getByCond(dbCon, staff, new ExtraCond().setPrinter(builder.getPrinterId()).setType(PType.PRINT_ALL_CANCELLED_FOOD)).get(0);
+		for(PrintFunc.UpdateBuilder eachBuilder : builder.build(summaryExtraFunc.getId(), summaryCancelFunc.getId())){
+			updateFunc(dbCon, staff, eachBuilder);
+		}
+	}
+	
+	/**
+	 * Update the detail print function according to specific builder {@link PrintFunc#DetailUpdateBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to detail print function
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 */
+	public static void updateFunc(DBCon dbCon, Staff staff, PrintFunc.DetailUpdateBuilder builder) throws SQLException, BusinessException{
+		PrintFunc detailExtraFunc = getByCond(dbCon, staff, new ExtraCond().setPrinter(builder.getPrinterId()).setType(PType.PRINT_ORDER_DETAIL)).get(0);
+		PrintFunc detailCancelFunc = getByCond(dbCon, staff, new ExtraCond().setPrinter(builder.getPrinterId()).setType(PType.PRINT_CANCELLED_FOOD_DETAIL)).get(0);
+		for(PrintFunc.UpdateBuilder eachBuilder : builder.build(detailExtraFunc.getId(), detailCancelFunc.getId())){
+			updateFunc(dbCon, staff, eachBuilder);
+		}
+	}
+	
+	/**
+	 * Update the print function according to builder {@link PrintFucn#UpdateBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to print function
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the print function to update does NOT exist
+	 */
 	public static void updateFunc(DBCon dbCon, Staff staff, PrintFunc.UpdateBuilder builder) throws SQLException, BusinessException{
 		String sql;
 		
@@ -302,6 +357,7 @@ public class PrintFuncDao {
 			  (builder.isRepeatChanged() ? " ,`repeat` = " + func.getRepeat() : "") +
 			  (builder.isTypeChanged() ? " ,type = " + func.getType().getVal() : "") +
 			  (builder.isCommentChanged() ? " ,comment = '" + func.getComment() + "'" : "") +
+			  (builder.isEnabledChanged() ? " ,enabled = " + (func.isEnabled() ? "1" : "0") : "") +
 			  " WHERE func_id = " +  func.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -353,22 +409,6 @@ public class PrintFuncDao {
 			}
 		}
 		
-		//Insert the associated all cancel & detail
-		if(builder.isIncludeCancelChanged()){
-			func = getById(dbCon, staff, func.getId());
-			if(func.getType() == PType.PRINT_ORDER){
-				deleteByCond(dbCon, staff, new ExtraCond().setPrinter(func.getPrinterId()).setType(PType.PRINT_ALL_CANCELLED_FOOD));
-				if(builder.isIncludeCancel()){
-					addFunc(dbCon, staff, PrintFunc.SummaryBuilder.newCancel(func));
-				}
-				
-			}else if(func.getType() == PType.PRINT_ORDER_DETAIL){
-				deleteByCond(dbCon, staff, new ExtraCond().setPrinter(func.getPrinterId()).setType(PType.PRINT_CANCELLED_FOOD_DETAIL));
-				if(builder.isIncludeCancel()){
-					addFunc(dbCon, staff, PrintFunc.DetailBuilder.newCancel(func));
-				}
-			}
-		}
 	}
 	
 
@@ -443,6 +483,7 @@ public class PrintFuncDao {
 			func.setId(dbCon.rs.getInt("func_id"));
 			func.setPrinterId(dbCon.rs.getInt("printer_id"));
 			func.setComment(dbCon.rs.getString("comment"));
+			func.setEnabled(dbCon.rs.getBoolean("enabled"));
 			result.add(func);
 		}
 		dbCon.rs.close();
@@ -508,6 +549,6 @@ public class PrintFuncDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<PrintFunc> getByPrinter(DBCon dbCon, Staff staff, Printer printer) throws SQLException{
-		return getByCond(dbCon, staff, new ExtraCond().setPrinter(printer));
+		return getByCond(dbCon, staff, new ExtraCond().setPrinter(printer).setEnabled(true));
 	}
 }
