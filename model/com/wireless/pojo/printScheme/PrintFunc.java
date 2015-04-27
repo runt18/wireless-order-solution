@@ -29,7 +29,100 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	private String mComment;
 	
-	private boolean isIncludeCancel = true;
+	private boolean enabled = true;
+	
+	public static class SummaryUpdateBuilder{
+		private final UpdateBuilder builder = new UpdateBuilder(0);
+		private final int printerId;
+		private final boolean extraEnabled;
+		private final boolean cancelEnabled;
+		
+		public SummaryUpdateBuilder(int printerId, boolean extraEnabled, boolean cancelEnabled){
+			this.printerId = printerId;
+			this.extraEnabled = extraEnabled;
+			this.cancelEnabled = cancelEnabled;
+		}
+		
+		public SummaryUpdateBuilder setRepeat(int repeat){
+			builder.setRepeat(repeat);
+			return this;
+		}
+		
+		public SummaryUpdateBuilder setComment(String comment){
+			this.builder.setComment(comment);
+			return this;
+		}
+		
+		public SummaryUpdateBuilder setRegionAll(){
+			this.builder.setRegionAll();
+			return this;
+		}
+		
+		public SummaryUpdateBuilder addRegion(Region regionToAdd){
+			this.builder.addRegion(regionToAdd);
+			return this;
+		}
+		
+		public SummaryUpdateBuilder setDepartmentAll(){
+			this.builder.setDepartmentAll();
+			return this;
+		}
+		
+		public SummaryUpdateBuilder addDepartment(Department dept){
+			this.builder.addDepartment(dept);
+			return this;
+		}
+		
+		public int getPrinterId(){
+			return this.printerId;
+		}
+		
+		public UpdateBuilder[] build(int extraId, int cancelId){
+			final UpdateBuilder[] result = new UpdateBuilder[2];
+			result[0] = new UpdateBuilder(extraId, builder).setEnabled(extraEnabled);
+			result[1] = new UpdateBuilder(cancelId, builder).setEnabled(cancelEnabled);
+			return result;
+		}
+	}
+	
+	public static class DetailUpdateBuilder{
+		private final UpdateBuilder builder = new UpdateBuilder(0);
+		private final int printerId;
+		private final boolean extraEnabled;
+		private final boolean cancelEnabled;
+		
+		public DetailUpdateBuilder(int printerId, boolean extraEnabled, boolean cancelEnabled){
+			this.printerId = printerId;
+			this.extraEnabled = extraEnabled;
+			this.cancelEnabled = cancelEnabled;
+		}
+		
+		public DetailUpdateBuilder setRepeat(int repeat){
+			builder.setRepeat(repeat);
+			return this;
+		}
+		
+		public DetailUpdateBuilder setKitchenAll(){
+			this.builder.setKitchenAll();
+			return this;
+		}
+		
+		public DetailUpdateBuilder addKitchen(Kitchen kitchen){
+			this.builder.addKitchen(kitchen);
+			return this;
+		}
+		
+		public int getPrinterId(){
+			return this.printerId;
+		}
+		
+		public UpdateBuilder[] build(int extraId, int cancelId){
+			final UpdateBuilder[] result = new UpdateBuilder[2];
+			result[0] = new UpdateBuilder(extraId, builder).setEnabled(extraEnabled);
+			result[1] = new UpdateBuilder(cancelId, builder).setEnabled(cancelEnabled);
+			return result;
+		}
+	}
 	
 	public static class UpdateBuilder{
 		private final int mId;
@@ -39,7 +132,38 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private List<Region> mRegions;
 		private List<Department> mDept;
 		private List<Kitchen> mKitchens;
-		private int isIncludeCancel = -1;
+		private int enabled;
+		
+		private UpdateBuilder(int id, UpdateBuilder src){
+			this(id);
+			if(src.isRepeatChanged()){
+				setRepeat(src.mRepeat);
+			}
+			if(src.isTypeChanged()){
+				setType(src.mPType);
+			}
+			if(src.isCommentChanged()){
+				setComment(src.mComment);
+			}
+			if(src.isRegionChanged()){
+				for(Region region : src.mRegions){
+					addRegion(region);
+				}
+			}
+			if(src.isDeptChanged()){
+				for(Department dept : src.mDept){
+					addDepartment(dept);
+				}
+			}
+			if(src.isKitchenChanged()){
+				for(Kitchen kitchen : src.mKitchens){
+					addKitchen(kitchen);
+				}
+			}
+			if(src.isEnabledChanged()){
+				setEnabled(src.enabled == 1);
+			}
+		}
 		
 		public UpdateBuilder(int id){
 			this.mId = id;
@@ -54,16 +178,6 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}
 		
-		public UpdateBuilder setType(PType type, boolean onOff){
-			if(type != PType.PRINT_ORDER_DETAIL && type != PType.PRINT_ORDER){
-				throw new IllegalArgumentException("只有【" + PType.PRINT_ORDER_DETAIL.getDesc() + "】或【" + PType.PRINT_ORDER.getDesc() + "】的打印功能才可设置打印退菜");
-			}else{
-				this.mPType = type;
-				isIncludeCancel = onOff ? 1 : 0;
-			}
-			return this;
-		}
-		
 		public boolean isCommentChanged(){
 			return this.mComment != null;
 		}
@@ -73,17 +187,17 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}
 		
-		public UpdateBuilder setIncludeCancel(boolean onOff){
-			this.isIncludeCancel = onOff ? 1 : 0;
+		public boolean isEnabledChanged(){
+			return this.enabled != -1;
+		}
+		
+		public UpdateBuilder setEnabled(boolean onOff){
+			this.enabled = onOff ? 1 : 0;
 			return this;
 		}
 		
-		public boolean isIncludeCancelChanged(){
-			return this.isIncludeCancel != -1;
-		}
-		
-		public boolean isIncludeCancel(){
-			return this.isIncludeCancel == 1;
+		public boolean isEnabled(){
+			return this.enabled == 1;
 		}
 		
 		public boolean isRepeatChanged(){
@@ -163,34 +277,16 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	public static class SummaryBuilder{
 		private final int printerId;
 		private int mRepeat = 1;
-		private final PType mType;
 		private final List<Region> mRegions = SortedList.newInstance();
 		private final List<Department> mDepts = SortedList.newInstance();
-		private final boolean isIncludeCancel;
 		private String comment;
+		private final boolean extraEnabled;
+		private final boolean cancelEnabled;
 		
-		private SummaryBuilder(int printerId, PType type, boolean isIncludeCancel){
+		public SummaryBuilder(int printerId, boolean extraEnabled, boolean cancelEnabled){
 			this.printerId = printerId;
-			this.isIncludeCancel = isIncludeCancel;
-			this.mType = type;
-		}
-		
-		public static SummaryBuilder newExtra(int printerId, boolean isIncludeCancel){
-			SummaryBuilder builder = new SummaryBuilder(printerId, PType.PRINT_ORDER, isIncludeCancel);
-			return builder;
-		}
-		
-		public static SummaryBuilder newCancel(PrintFunc func){
-			SummaryBuilder builder = new SummaryBuilder(func.getPrinterId(), PType.PRINT_ALL_CANCELLED_FOOD, false);
-			builder.setRepeat(func.getRepeat());
-			builder.setDepartments(func.getDepartment());
-			builder.setRegions(func.getRegions());
-			builder.setComment(func.getComment());
-			return builder;
-		}
-		
-		public boolean isIncludeCancel(){
-			return this.isIncludeCancel;
+			this.extraEnabled = extraEnabled;
+			this.cancelEnabled = cancelEnabled;
 		}
 		
 		public SummaryBuilder setComment(String comment){
@@ -231,42 +327,30 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}		
 		
-		public PType getType() {
-			return mType;
+		public PrintFunc[] build(){
+			final PrintFunc[] result = new PrintFunc[2];
+			result[0] = new PrintFunc(this, PType.PRINT_ORDER, extraEnabled);
+			result[1] = new PrintFunc(this, PType.PRINT_ALL_CANCELLED_FOOD, cancelEnabled);
+			return result;
 		}
-
-		public PrintFunc build(){
-			return new PrintFunc(this);
-		}
+		
 	}
 	
 	public static class DetailBuilder{
 		private final int mPrinterId;
 		private int mRepeat = 1;
-		private List<Kitchen> mKitchens = SortedList.newInstance();
-		private final PType mType;
-		private final boolean isIncludeCancel;
+		private final List<Kitchen> mKitchens = SortedList.newInstance();
+		private final boolean extraEnabled;
+		private final boolean cancelEnabled;
 		
-		private DetailBuilder(int printerId, PType type, boolean isIncludeCancel){
+		public DetailBuilder(Printer printer, boolean extraEnabled, boolean cancelEnabled){
+			this(printer.getId(), extraEnabled, cancelEnabled);
+		}
+		
+		public DetailBuilder(int printerId, boolean extraEnabled, boolean cancelEnabled){
 			this.mPrinterId = printerId;
-			this.isIncludeCancel = isIncludeCancel;
-			this.mType = type;
-		}
-		
-		public static DetailBuilder newExtra(int printerId, boolean isIncludeCancel){
-			DetailBuilder builder = new DetailBuilder(printerId, PType.PRINT_ORDER_DETAIL, isIncludeCancel);
-			return builder;
-		}
-		
-		public static DetailBuilder newCancel(PrintFunc func){
-			DetailBuilder builder = new DetailBuilder(func.getPrinterId(), PType.PRINT_CANCELLED_FOOD_DETAIL, false);
-			builder.setRepeat(func.getRepeat());
-			builder.setKitchens(func.getKitchens());
-			return builder;
-		}
-		
-		public boolean isIncludeCancel(){
-			return this.isIncludeCancel;
+			this.extraEnabled = extraEnabled;
+			this.cancelEnabled = cancelEnabled;
 		}
 		
 		public DetailBuilder setRepeat(int repeat){
@@ -289,12 +373,11 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}
 		
-		public PType getType() {
-			return mType;
-		}
-
-		public PrintFunc build(){
-			return new PrintFunc(this);
+		public PrintFunc[] build(){
+			final PrintFunc[] result = new PrintFunc[2];
+			result[0] = new PrintFunc(this, PType.PRINT_ORDER_DETAIL, extraEnabled);
+			result[1] = new PrintFunc(this, PType.PRINT_CANCELLED_FOOD_DETAIL, cancelEnabled);
+			return result;
 		}
 	}
 	
@@ -391,20 +474,25 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		if(builder.isCommentChanged()){
 			mComment = builder.mComment;
 		}
+		if(builder.isEnabledChanged()){
+			enabled = builder.enabled == 1;
+		}
 	}
 	
-	private PrintFunc(SummaryBuilder builder){
-		this(builder.getType(), builder.mRepeat);
+	private PrintFunc(SummaryBuilder builder, PType type, boolean enabled){
+		this(type, builder.mRepeat);
 		this.printerId = builder.printerId;
-		mRegions.addAll(builder.mRegions);
-		mDepts.addAll(builder.mDepts);
-		mComment = builder.comment;
+		this.mRegions.addAll(builder.mRegions);
+		this.mDepts.addAll(builder.mDepts);
+		this.mComment = builder.comment;
+		this.enabled = enabled;
 	}
 	
-	private PrintFunc(DetailBuilder builder){
-		this(builder.getType(), builder.mRepeat);
+	private PrintFunc(DetailBuilder builder, PType type, boolean enabled){
+		this(type, builder.mRepeat);
 		this.printerId = builder.mPrinterId;
-		mKitchens.addAll(builder.mKitchens);
+		this.mKitchens.addAll(builder.mKitchens);
+		this.enabled = enabled;
 	}
 	
 	private PrintFunc(Builder builder){
@@ -553,12 +641,12 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		this.mComment = comment;
 	}
 	
-	public boolean isIncludeCancel() {
-		return isIncludeCancel;
+	public boolean isEnabled() {
+		return this.enabled;
 	}
 
-	public void setIncludeCancel(boolean isIncludeCancel) {
-		this.isIncludeCancel = isIncludeCancel;
+	public void setEnabled(boolean onOff) {
+		this.enabled = onOff;
 	}
 
 	@Override
@@ -654,7 +742,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		jm.putInt("repeat", this.mRepeat);
 		jm.putString("comment", this.mComment);
 		
-		jm.putBoolean("isIncludeCancel", this.isIncludeCancel);
+		jm.putBoolean("enabled", this.enabled);
 		
 		if(this.mRegions.size() > 0){
 			regions = "";
