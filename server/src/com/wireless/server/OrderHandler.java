@@ -196,9 +196,9 @@ class OrderHandler implements Runnable{
 					Table tblToQuery = TableDao.getById(staff, new Parcel(request.body).readParcel(Table.CREATOR).getId());
 					response = new RespACK(request.header, (byte)tblToQuery.getStatus().getVal());
 					
-				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_FEAST_ORDER){
-					//handle feast order request
-					response = doFeastOrder(staff, request);
+//				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_FEAST_ORDER){
+//					//handle feast order request
+//					response = doFeastOrder(staff, request);
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 					//handle insert order request
@@ -338,14 +338,14 @@ class OrderHandler implements Runnable{
 		}		
 	}
 	
-	private RespPackage doFeastOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
-		int orderId = OrderDao.feast(staff, new Parcel(request.body).readParcel(Order.FeastBuilder.CREATOR));
-		//Perform to print receipt to this feast order.
-		new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, staff, 
-																						  PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true)), 
-																						  OrderDao.getById(staff, orderId, DateType.TODAY)));
-		return new RespACK(request.header);
-	}
+//	private RespPackage doFeastOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+//		int orderId = OrderDao.feast(staff, new Parcel(request.body).readParcel(Order.FeastBuilder.CREATOR));
+//		//Perform to print receipt to this feast order.
+//		new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, staff, 
+//																						  PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true)), 
+//																						  OrderDao.getById(staff, orderId, DateType.TODAY)));
+//		return new RespACK(request.header);
+//	}
 	
 	private RespPackage doQueryWxOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
 		List<WxOrder> result = new ArrayList<WxOrder>();
