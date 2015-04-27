@@ -196,6 +196,11 @@ function init(){
 		},
 		bbar : ['->',{
 			xtype : 'checkbox',
+			id : 'chkIsNeedToAdd',
+			checked : true,
+			boxLabel : '打印加菜总单'			
+		},{
+			xtype : 'checkbox',
 			id : 'chkIsNeedToCancel',
 			checked : true,
 			boxLabel : '打印退菜总单'			
@@ -272,6 +277,7 @@ function init(){
 						dept : depts,
 						regions : regions,
 						printerId : sn.attributes.printerId,
+						isNeedToAdd : Ext.getDom('chkIsNeedToAdd').checked,
 						isNeedToCancel : Ext.getDom('chkIsNeedToCancel').checked, 
 						dataSource : 'insert'
 					},
@@ -381,6 +387,7 @@ function init(){
 						regions : regions,
 						printerId : sn.attributes.printerId,
 						funcId : funcId,
+						isNeedToAdd : Ext.getDom('chkIsNeedToAdd').checked,
 						isNeedToCancel : Ext.getDom('chkIsNeedToCancel').checked, 
 						comment : printComment,
 						dataSource : dataSource
@@ -390,6 +397,8 @@ function init(){
 						if(jr.success){
 							sn.fireEvent('click', sn);
 							Ext.example.msg(jr.title, jr.msg);
+							
+							Ext.getCmp('printFunc_grid').getStore().reload();
 						}else{
 							Ext.ux.showMsg(jr);
 						}
@@ -699,7 +708,7 @@ function init(){
 				id : 'showPrintPaper',
 				border : false,
 				region : 'center',
-				bodyStyle : 'background:url(../../images/bill_select.png) no-repeat center center;'
+				bodyStyle : 'background:url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E7%82%B9%E8%8F%9C%E6%80%BB%E5%8D%95.jpg) no-repeat center center;'
 			}, {
 				region : 'south',
 				id : 'printCommentPanel',
@@ -994,6 +1003,7 @@ function init(){
 function showPanel(v){
 	//获取退菜btn
 	var cancelFoodBtn = Ext.getCmp('chkIsNeedToCancel');
+	var addFoodBtn = Ext.getCmp('chkIsNeedToAdd');
 	
 	var paperDemoCmp = Ext.query("#showPrintPaper .x-panel-body")[0];
 	if(v == 1 || v ==8){//总单
@@ -1007,6 +1017,8 @@ function showPanel(v){
 		
 		cancelFoodBtn.show();
 		cancelFoodBtn.setBoxLabel('打印退菜总单');
+		addFoodBtn.show();
+		addFoodBtn.setBoxLabel('打印加菜总单');
 	}else if(v == 2 || v == 5){//分单
 		Ext.getCmp('kitchens').show();
 		Ext.getCmp('kitchensTree').show();
@@ -1016,12 +1028,15 @@ function showPanel(v){
 		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/fendan.jpg)';
 		cancelFoodBtn.show();
 		cancelFoodBtn.setBoxLabel('打印退菜分单');
+		addFoodBtn.show();
+		addFoodBtn.setBoxLabel('打印加菜分单');
 	}else{
 		Ext.getCmp('kitchens').hide();
 		Ext.getCmp('kitchensTree').hide();
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').show();
 		cancelFoodBtn.hide();
+		addFoodBtn.hide();
 		
 		if(v == 127){//暂结
 			Ext.getCmp('printCommentPanel').show();
@@ -1072,9 +1087,6 @@ function deletePrintFuncOperationHandler(){
 						failure : function(res, opt){
 							Ext.ux.showMsg(Ext.decode(res.responseText));
 						}
-						
-					
-						
 					});
 				}
 			}
@@ -1139,18 +1151,54 @@ function printFuncOperactionHandler(c){
 			Ext.MessageBox.alert('提示', '请选中一个方案再进行操作.');
 			return;
 		}
+		
+		//判断是打印加菜还是退菜
+		var pTypeText = '';
+		if(ss.data.pTypeValue == 1){//总单
+			pTypeText = 'summary';
+		}else if(ss.data.pTypeValue == 2){//分单
+			pTypeText = 'detail';
+		}
+		if(pTypeText){
+			Ext.Ajax.request({
+				url : '../../OperatePrintFunc.do',
+				params : {
+					printerId : ss.data.printerId,
+					dataSource : 'isEnable',
+					pType : pTypeText
+				},
+				success : function(res, opt){
+					var jr = Ext.decode(res.responseText);
+					if(jr.success){
+						//是否有加菜
+						if(jr.other.add){
+							Ext.getDom('chkIsNeedToAdd').checked = true;
+						}else{
+							Ext.getDom('chkIsNeedToAdd').checked = false;
+						}
+						//是否有退菜
+						if(jr.other.cancel){
+							Ext.getDom('chkIsNeedToCancel').checked = true;
+						}else{
+							Ext.getDom('chkIsNeedToCancel').checked = false;
+						}
+					}
+				},
+				failure : function(res, opt){
+					Ext.ux.showMsg(Ext.decode(res.responseText));
+				}
+			});	
+		}
+		
+		
+		
 		if(c.type == 'update'){
 			addPrintFunc.setTitle('修改方案');
 		}else{
 			addPrintFunc.setTitle('查看方案');
 		}
 		
-		//是否有退菜
-		if(ss.data.isIncludeCancel){
-			Ext.getDom('chkIsNeedToCancel').checked = true;
-		}else{
-			Ext.getDom('chkIsNeedToCancel').checked = false;
-		}
+
 		
 		addPrintFunc.operationType = c.type;
 		Ext.getCmp('kitchens').setHeight(435);
@@ -1414,6 +1462,7 @@ Ext.onReady(function(){
 		proxy : new Ext.data.HttpProxy({url:'../../QueryPrintFunc.do'}),
 		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 		    {name : 'printFuncId'},
+		    {name : 'printerId'},
 		    {name : 'pTypeValue'},
 		    {name : 'pTypeText'},
 		    {name : 'kitchens'},
@@ -1425,7 +1474,12 @@ Ext.onReady(function(){
 		    {name : 'repeat'},
 		    {name : 'comment'},
 		    {name : 'isIncludeCancel'}
-		])
+		]),
+		listeners : {
+			beforeload : function(thiz, options){
+				console.log(options)
+			}
+		}
 		
 	});
 	
