@@ -321,7 +321,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	public static enum Category{
 		NORMAL(1, "一般"),
 		TAKE_OUT(2,	"外卖"),
-		JOIN(3, "拆台"),
+		JOIN(3, "搭台"),
 		FAST(4, "快餐"),
 		FEAST(5, "酒席费");
 		
