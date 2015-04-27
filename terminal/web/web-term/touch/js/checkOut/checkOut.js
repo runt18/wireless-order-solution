@@ -34,19 +34,26 @@ var uo = {
 
 
 	function initSearchTables(c){
-		var html = '';
+		var html = [];
 		for (var i = 0; i < c.data.length; i++) {
-			html += tableCmpTemplet.format({
+			
+			var aliasOrName;
+			if(c.data[i].categoryValue == 1){
+				aliasOrName = c.data[i].alias
+			}else{
+				aliasOrName = '<font color="green">'+ c.data[i].categoryText +'</font>'
+			}
+			html.push(tableCmpTemplet.format({
 				dataIndex : i,
 				id : c.data[i].id,
 				click : 'ts.toOrderFoodOrTransFood({alias:'+ c.data[i].alias +',id:'+ c.data[i].id +'})',
-				alias : c.data[i].alias && c.data[i].alias != 0?c.data[i].alias:'<font color="green">搭台</font>',
+				alias : aliasOrName,
 				theme : c.data[i].statusValue == '1' ? "e" : "c",
 				name : c.data[i].name == "" || typeof c.data[i].name != 'string' ? c.data[i].alias + "号桌" : c.data[i].name,
 				tempPayStatus : c.data[i].isTempPaid? '暂结' : ''
-			});	
+			}));	
 		}
-		$('#divSelectTablesForTs').html(html);
+		$('#divSelectTablesForTs').html(html.join(''));
 		$('#divSelectTablesForTs a').buttonMarkup( "refresh" );
 	}
 

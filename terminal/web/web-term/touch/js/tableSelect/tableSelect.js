@@ -181,11 +181,17 @@ $(function(){
 		renderTo : 'divTableShowForSelect',
 		displayId : 'divDescForTableSelect-padding-msg',
 		templet : function(c){
+			var aliasOrName;
+			if(c.data.categoryValue == 1){
+				aliasOrName = c.data.alias
+			}else{
+				aliasOrName = '<font color="green">'+ c.data.categoryText +'</font>'
+			}
 			return tableCmpTemplet.format({
 				dataIndex : c.index,
 				id : c.data.id,
 				click : 'ts.selectTable({event : this, id : '+ c.data.id +',tableAlias :'+ c.data.alias +'})',
-				alias : c.data.alias && c.data.alias != 0?c.data.alias:'<font color="green">搭台</font>',
+				alias : aliasOrName,
 				theme : c.data.statusValue == '1' ? "e" : "c",
 				name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
 				tempPayStatus : c.data.isTempPaid? '暂结' : ''
@@ -2690,7 +2696,13 @@ ts.doFeastOrder = function(){
 		Util.LM.hide();
 		if(result.success){
 			ts.closeFeastPayWin();
-			Util.msg.tip(result.msg);
+			//先跳转到结账界面再操作
+			updateTable({
+				toPay : true,
+				id : result.other.tableId
+			});	
+			//刷新餐台数据
+			initTableData();
 		}else{
 			Util.msg.alert({
 				msg : result.msg,
