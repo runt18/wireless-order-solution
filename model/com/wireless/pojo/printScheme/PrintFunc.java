@@ -737,6 +737,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		
 		JsonMap jm = new JsonMap();
 		jm.putInt("printFuncId", this.mId);
+		jm.putInt("printerId", this.getPrinterId());
 		jm.putInt("pTypeValue", this.mType.getVal());
 		jm.putString("pTypeText", this.mType.getDesc());
 		jm.putInt("repeat", this.mRepeat);
