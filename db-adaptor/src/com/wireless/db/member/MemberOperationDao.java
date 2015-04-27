@@ -17,6 +17,7 @@ import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.MOSummary;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
+import com.wireless.pojo.member.MemberOperation.OperationCate;
 import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -38,12 +39,16 @@ public class MemberOperationDao {
 		public String toString(){
 			final StringBuilder extraCond = new StringBuilder();
 			
+			final StringBuilder operationCond = new StringBuilder();
+			for(OperationType type : OperationType.typeOf(OperationCate.CONSUME_TYPE)){
+				if(operationCond.length() != 0){
+					operationCond.append(",");
+				}
+				operationCond.append(type.getValue());
+			}
 			extraCond.append(" AND MO.id IN (" +
 							 " SELECT MAX(id) FROM wireless_order_db." + super.moTbl + " WHERE restaurant_id = " + super.restaurantId +
-							 " AND operate_type IN (" + 
-							 MemberOperation.OperationType.CONSUME.getValue() + ", " + 
-							 MemberOperation.OperationType.RE_CONSUME.getValue() + "," + 
-							 MemberOperation.OperationType.RE_CONSUME_RESTORE.getValue() + ") GROUP BY order_id )");
+							 " AND operate_type IN (" + operationCond.toString() + ") GROUP BY order_id )");
 			
 			return super.toString() + extraCond.toString();
 		}
@@ -132,6 +137,13 @@ public class MemberOperationDao {
 		public ExtraCond addOperationType(OperationType type){
 			if(type != null){
 				operationTypes.add(type);
+			}
+			return this;
+		}
+
+		public ExtraCond addOperationType(List<OperationType> types){
+			if(types != null){
+				operationTypes.addAll(types);
 			}
 			return this;
 		}
@@ -250,9 +262,9 @@ public class MemberOperationDao {
 		      "'" + mo.getOperateSeq() + "'," +
 		      "'" + DateUtil.format(mo.getOperateDate()) + "'," + 
 		      mo.getOperationType().getValue() + "," + 
-		      (mo.getOperationType() == OperationType.CONSUME || mo.getOperationType() == OperationType.RE_CONSUME ? mo.getPayType().getId() : "NULL") + "," +
-		      (mo.getOperationType() == OperationType.CONSUME || mo.getOperationType() == OperationType.RE_CONSUME ? mo.getPayMoney() : "NULL") + "," + 
-		      (mo.getOperationType() == OperationType.CONSUME || mo.getOperationType() == OperationType.RE_CONSUME ? mo.getOrderId() : "NULL") + "," +
+		      (mo.getOperationType().isConsume() ? mo.getPayType().getId() : "NULL") + "," +
+		      (mo.getOperationType().isConsume() ? mo.getPayMoney() : "NULL") + "," + 
+		      (mo.getOperationType().isConsume() ? mo.getOrderId() : "NULL") + "," +
 		      (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : (mo.getOperationType() == OperationType.REFUND ? mo.getChargeType().getValue() : "NULL")) + "," + 
 		      (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeMoney() : (mo.getOperationType() == OperationType.REFUND ? mo.getChargeMoney() : "NULL")) + "," +
 		      mo.getCouponId() + "," +
@@ -365,7 +377,7 @@ public class MemberOperationDao {
 			mo.setOperateSeq(dbCon.rs.getString("operate_seq"));
 			mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			mo.setOperationType(dbCon.rs.getShort("operate_type"));
-			if(mo.getOperationType() == OperationType.CONSUME || mo.getOperationType() == OperationType.RE_CONSUME){
+			if(mo.getOperationType().isConsume()){
 				PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
 				payType.setName(dbCon.rs.getString("pay_type_name"));
 				mo.setPayType(payType);
@@ -480,7 +492,9 @@ public class MemberOperationDao {
 	 * 			throws if the member operation to this order id does NOT exist
 	 */
 	public static MemberOperation getLastConsumptionByOrder(DBCon dbCon, Staff staff, Order order) throws SQLException, BusinessException{
-		List<MemberOperation> result = getByCond(dbCon, staff, new MemberOperationDao.ExtraCond(DateType.TODAY).setOrder(order).addOperationType(OperationType.CONSUME).addOperationType(OperationType.RE_CONSUME)," ORDER BY id DESC LIMIT 1 ");
+		List<MemberOperation> result = getByCond(dbCon, staff, new MemberOperationDao.ExtraCond(DateType.TODAY).setOrder(order)
+																				.addOperationType(OperationType.typeOf(OperationCate.CONSUME_TYPE)),
+																				" ORDER BY id DESC LIMIT 1 ");
 		if(result.isEmpty()){
 			throw new BusinessException(MemberError.OPERATION_NOT_EXIST);
 		}else{
