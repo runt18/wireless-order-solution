@@ -293,7 +293,9 @@ Ext.onReady(function(){
 			['账单号', 'orderId', 110, 'center', 'linkOrderId'],
 			['消费时间', 'operateDateFormat'],
 			['会员名称', 'member.name', 60],
+			['手机', 'member.mobile'],
 			['会员类型', 'member.memberType.name'],
+			['付款方式', 'payTypeText'],
 			['消费金额', 'payMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['所得积分', 'deltaPoint', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['操作人', 'staffName', 90, 'center'],
@@ -344,9 +346,11 @@ Ext.onReady(function(){
 			memberSumView.getCell(store.getCount()-1, 2).innerHTML = '--';
 			memberSumView.getCell(store.getCount()-1, 3).innerHTML = '--';
 			memberSumView.getCell(store.getCount()-1, 4).innerHTML = '--';
+			memberSumView.getCell(store.getCount()-1, 5).innerHTML = '--';
+			memberSumView.getCell(store.getCount()-1, 6).innerHTML = '--';
 			
-			memberSumView.getCell(store.getCount()-1, 7).innerHTML = '--';
-			memberSumView.getCell(store.getCount()-1, 8).innerHTML = '--';
+			memberSumView.getCell(store.getCount()-1, 9).innerHTML = '--';
+			memberSumView.getCell(store.getCount()-1, 10).innerHTML = '--';
 		}
 	});
 	if(otype && otype == 0){
