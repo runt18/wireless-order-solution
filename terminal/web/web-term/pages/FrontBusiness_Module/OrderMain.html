@@ -38,7 +38,6 @@
 	var orderID = Request['orderID'];
 	var orderType = Request['orderType'];
 	var isRepaid = false, isFree = true, tableCategory = 1,  isGroup = false, orderId4Display = orderID;
-	console.log(orderId4Display)
 	var primaryOrderData;
 	var params;
 	
@@ -75,7 +74,7 @@
 							}
 						}); 							
 						if(orderType != 'common'){
-							repaid_payType.push({id: 3, name: "会员卡", typeValue: 3});
+							repaid_payType.push({id: 3, name: "会员余额", typeValue: 3});
 							//根据order获取member
 							$.ajax({
 								url : '../../QueryMember.do',
