@@ -18,7 +18,6 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.printScheme.PrintFunc;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.WebParams;
 
 public class QueryPrintFuncAction extends Action{
 
@@ -33,7 +32,7 @@ public class QueryPrintFuncAction extends Action{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			root = PrintFuncDao.getByCond(staff, new PrintFuncDao.ExtraCond().setPrinter(Integer.parseInt(printerId)));
 			List<PrintFunc> roots = new ArrayList<PrintFunc>();
-			
+/*			
 			for (PrintFunc printFunc : root) {
 				if(printFunc.getType() == PType.PRINT_ORDER){
 					if(PrintFuncDao.getByCond(staff, new PrintFuncDao.ExtraCond().setPrinter(printFunc.getPrinterId()).setType(PType.PRINT_ALL_CANCELLED_FOOD)).isEmpty()){
@@ -49,17 +48,51 @@ public class QueryPrintFuncAction extends Action{
 					roots.add(printFunc);
 				}
 			}
+			*/
+			boolean summary = true, detail = true;
+			for (PrintFunc printFunc : root) {
+				if(printFunc.getType() == PType.PRINT_ORDER || printFunc.getType() == PType.PRINT_ALL_CANCELLED_FOOD){
+					if(printFunc.getType() == PType.PRINT_ORDER ){
+						if(summary){
+							roots.add(printFunc);
+							summary = false;
+						}
+					}else if(printFunc.getType() == PType.PRINT_ALL_CANCELLED_FOOD){
+						if(summary){
+							printFunc.setType(PType.PRINT_ORDER);
+							roots.add(printFunc);
+							summary = false;
+						}						
+					}
+				}else if(printFunc.getType() == PType.PRINT_ORDER_DETAIL || printFunc.getType() == PType.PRINT_CANCELLED_FOOD_DETAIL){
+					if(printFunc.getType() == PType.PRINT_ORDER_DETAIL ){
+						if(detail){
+							roots.add(printFunc);
+							detail = false;
+						}
+					}else if(printFunc.getType() == PType.PRINT_CANCELLED_FOOD_DETAIL){
+						if(detail){
+							printFunc.setType(PType.PRINT_ORDER_DETAIL);
+							roots.add(printFunc);
+							detail = false;
+						}						
+					}
+				}else{
+					roots.add(printFunc);
+				}
+				
+			}
 			
 			
 			jobject.setTotalProperty(roots.size());
 			jobject.setRoot(roots);
 			
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 			
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			e.printStackTrace();
 		}finally{
 			

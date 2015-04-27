@@ -16,7 +16,6 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.WebParams;
 
 public class OperatePrinterAction extends DispatchAction{
 
@@ -34,10 +33,10 @@ public class OperatePrinterAction extends DispatchAction{
 			jobject.initTip(true, "操作成功, 已删除打印机");
 			
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			e.printStackTrace();
 		}finally{
 			dbCon.disconnect();
@@ -124,10 +123,10 @@ public class OperatePrinterAction extends DispatchAction{
 			jobject.initTip(true, "操作成功, 已添加打印机");
 			
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			e.printStackTrace();
 		}finally{
 			dbCon.disconnect();
@@ -165,10 +164,10 @@ public class OperatePrinterAction extends DispatchAction{
 			
 			jobject.initTip(true, "操作成功,已修改打印机");
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			e.printStackTrace();
 		}finally{
 			dbCon.disconnect();
