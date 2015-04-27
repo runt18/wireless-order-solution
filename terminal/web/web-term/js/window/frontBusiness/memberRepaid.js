@@ -189,12 +189,13 @@ Ext.onReady(function(){
 					typeAhead : true,
 					mode : 'local',
 					triggerAction : 'all',
-					selectOnFocus : true,
-					listeners : {
+					selectOnFocus : true
+					//FIXME
+/*					,listeners : {
 						select : function(thiz){
 							reloadMemberPay();
 						}
-					}
+					}*/
 				}]
 			},{
 				items : [{
@@ -212,12 +213,13 @@ Ext.onReady(function(){
 					typeAhead : true,
 					mode : 'local',
 					triggerAction : 'all',
-					selectOnFocus : true,
-					listeners : {
+					selectOnFocus : true
+					//FIXME
+/*					,listeners : {
 						select : function(thiz){
 							reloadMemberPay();
 						}
-					}
+					}*/
 				}]
 			}]
 		}],
@@ -474,6 +476,9 @@ function getOrderMember(){
 			break;
 		}
 	}
+	
+	mpo_memberDetailData.pricePlanId = Ext.getCmp('mpo_txtPricePlanForPayOrder').getValue();
+	mpo_memberDetailData.couponId = Ext.getCmp('mpo_couponForPayOrder').getValue();
 	
 	return mpo_memberDetailData;
 	

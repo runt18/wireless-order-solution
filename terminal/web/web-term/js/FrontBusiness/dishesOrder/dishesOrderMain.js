@@ -219,8 +219,6 @@ function memberRepaid(){
 					Ext.getCmp('txtSettleTypeFormat').setValue('会员');
 					bindMemberWin.hide();
 					
-					
-					
 					repaid_payType.push({id: 3, name: "会员卡", typeValue: 3});
 					Ext.getCmp('repaid_comboPayType').getStore().loadData(repaid_payType);
 					setRepaidOrderTitle({member:true});

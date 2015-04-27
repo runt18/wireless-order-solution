@@ -902,7 +902,7 @@ function submitRepaidOrderMain(_c){
 			if(re_member.hasMember){
 				member = re_member.id;
 				discount = re_member.discount.id;
-				pricePlanId = re_member.pricePlan || "";
+				pricePlanId = re_member.pricePlanId || "";
 				couponId =  re_member.couponId || "";
 				
 				settleType = 2;

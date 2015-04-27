@@ -24,6 +24,9 @@ $("#weixin_wizard").steps({
     		weixinLogoUploader.render('weixinLogoUploader');
     	}else if(currentIndex == 2 && !um_getContent()){
 			wx.lm.show();
+			if($('#weixinEditorDisplay').width() >= 660){
+				$('#weixinEditorDisplay').width(660);
+			}
 			Ext.Ajax.request({
 				url : '../../OperateRestaurant.do',
 				params : {
