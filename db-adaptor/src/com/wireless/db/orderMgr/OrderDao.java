@@ -983,7 +983,8 @@ public class OrderDao {
 		}
 		int orderId = InsertOrder.exec(dbCon, staff, insertBuilder).getId();
 		
-		return PayOrder.pay(dbCon, staff, Order.PayBuilder.build4Normal(orderId)).getId();
+		//return PayOrder.pay(dbCon, staff, Order.PayBuilder.build4Normal(orderId)).getId();
+		return orderId;
 	}
 	
 	/**
