@@ -100,12 +100,13 @@ public class PrintFuncDao {
 		deleteByCond(dbCon, staff, new ExtraCond().setPrinter(func.getPrinterId()).setType(func.getType()));
 		
 		sql = " INSERT INTO " + Params.dbName + ".print_func" +
-		      "( `printer_id`, `repeat`, `type`, `comment` )" +
+		      "( `printer_id`, `repeat`, `type`, `comment`, `enabled` )" +
 			  " VALUES( " +
 			  func.getPrinterId() + "," +
 			  func.getRepeat() + "," +
 		      func.getType().getVal() + "," +
-		      (func.hasComment() ? "'" + func.getComment() + "'" : " NULL ") + 
+		      (func.hasComment() ? "'" + func.getComment() + "'" : " NULL ") + "," +
+		      (func.isEnabled() ? "1" : "0") +
 		      ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
