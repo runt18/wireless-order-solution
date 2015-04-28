@@ -18,6 +18,7 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
+import com.wireless.pojo.member.MemberOperation.OperationCate;
 import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
@@ -60,7 +61,7 @@ public class QueryMemberOperationAction extends Action{
 			}
 
 			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
-				if(Integer.valueOf(operateType) == OperationType.CONSUME.getType()){
+				if(OperationCate.valueOf(Integer.valueOf(operateType)) == OperationCate.CONSUME_TYPE){
 					extraCond = new MemberOperationDao.ExtraCond4Consume(dy);
 				}else{
 					extraCond = new MemberOperationDao.ExtraCond(dy);
@@ -86,7 +87,7 @@ public class QueryMemberOperationAction extends Action{
 				extraCond.addOperationType(OperationType.valueOf(detailOperate));
 			}else{
 				if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
-					for(OperationType type : OperationType.typeOf(Integer.parseInt(operateType))){
+					for(OperationType type : OperationType.typeOf(OperationCate.valueOf(Integer.parseInt(operateType)))){
 						extraCond.addOperationType(type);
 					}
 				}
