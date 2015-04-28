@@ -1214,6 +1214,8 @@ function printFuncOperactionHandler(c){
 			if(pType[i].value == pTypeValue){
 				pType[i].checked = true;
 				pType[i].click();
+				//切换图片
+				showPanel(pType[i].value);
 			}
 		}
 		

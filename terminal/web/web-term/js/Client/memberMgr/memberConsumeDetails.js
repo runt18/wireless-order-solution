@@ -228,6 +228,50 @@ Ext.onReady(function(){
 			text : '&nbsp;&nbsp;会员类型:'
 		}, mcd_search_memberType, {
 			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;收款方式:'			
+		},{
+			xtype : 'combo',
+			forceSelection : true,
+			width : 80,
+			id : 'consume_comboPayType',
+			store : new Ext.data.JsonStore({
+				fields : [ 'id', 'name' ]
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			readOnly : false,
+			listeners : {
+				render : function(thiz){
+					Ext.Ajax.request({
+						url : '../../QueryPayType.do?',
+						params : {
+							dataSource : 'allPayType'
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								jr.root.unshift({id:-1, name:'全部'});
+								thiz.store.loadData(jr.root);
+								thiz.setValue(-1);
+							}
+						},
+						failure : function(res, opt){
+							thiz.store.loadData({root:[{typeId:-1, name:'全部'}]});
+							thiz.setValue(-1);
+						}
+					});
+				},
+				select : function(){
+					mcd_searchMemberOperation();
+				}
+			}				
+		},{
+			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
 		}, mcd_search_memberName, '->', {
 			text : '搜索',
@@ -267,7 +311,7 @@ Ext.onReady(function(){
 						offDuty = Ext.util.Format.date(mcd_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 					}
 					var memberType = mcd_search_memberType.getRawValue() != '' ? mcd_search_memberType.getValue() : '';
-					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&operateType=1';
+					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&operateType=1&payType={7}';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
@@ -276,7 +320,8 @@ Ext.onReady(function(){
 							onDuty,
 							offDuty,
 							mcd_search_memberName.getValue(),
-							dataSource
+							dataSource,
+							Ext.getCmp('consume_comboPayType').getValue()
 						);
 					window.location = url;
 				}
@@ -295,7 +340,7 @@ Ext.onReady(function(){
 			['会员名称', 'member.name', 60],
 			['手机', 'member.mobile'],
 			['会员类型', 'member.memberType.name'],
-			['付款方式', 'payTypeText'],
+			['收款方式', 'payTypeText'],
 			['消费金额', 'payMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['所得积分', 'deltaPoint', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['操作人', 'staffName', 90, 'center'],
@@ -386,6 +431,7 @@ function mcd_searchMemberOperation(){
 	gs.baseParams['dataSource'] = dataSource;
 	gs.baseParams['memberType'] = memberType > 0 ? memberType : '';
 	gs.baseParams['fuzzy'] = mcd_search_memberName.getValue();
+	gs.baseParams['payType'] = Ext.getCmp('consume_comboPayType').getValue();
 	gs.baseParams['operateType'] = 1;
 	gs.baseParams['onDuty'] = onDuty;
 	gs.baseParams['offDuty'] = offDuty;

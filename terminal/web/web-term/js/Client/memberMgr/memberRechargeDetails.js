@@ -167,7 +167,51 @@ Ext.onReady(function(){
 		{
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;操作类型:'
-		}, mrd_search_comboOperateType, 
+		}, mrd_search_comboOperateType, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;收款方式:'			
+		},{
+			xtype : 'combo',
+			forceSelection : true,
+			width : 80,
+			id : 'recharge_comboPayType',
+			store : new Ext.data.JsonStore({
+				fields : [ 'id', 'name' ]
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			readOnly : false,
+			listeners : {
+				render : function(thiz){
+					Ext.Ajax.request({
+						url : '../../QueryPayType.do?',
+						params : {
+							dataSource : 'allPayType'
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								jr.root.unshift({id:-1, name:'全部'});
+								thiz.store.loadData(jr.root);
+								thiz.setValue(-1);
+							}
+						},
+						failure : function(res, opt){
+							thiz.store.loadData({root:[{typeId:-1, name:'全部'}]});
+							thiz.setValue(-1);
+						}
+					});
+				},
+				select : function(){
+					mrd_searchMemberOperation();
+				}
+			}				
+		}, 
 		{
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
@@ -210,7 +254,7 @@ Ext.onReady(function(){
 						offDuty = Ext.util.Format.date(mrd_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 					}
 					var memberType = mrd_search_memberType.getRawValue() != '' ? mrd_search_memberType.getValue() : '';
-					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&operateType=2';
+					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&operateType=2&payType={8}';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
@@ -220,7 +264,8 @@ Ext.onReady(function(){
 							offDuty,
 							mrd_search_memberName.getValue(),
 							dataSource,
-							mrd_search_comboOperateType.getRawValue() != '' ? mrd_search_comboOperateType.getValue() : ''
+							mrd_search_comboOperateType.getRawValue() != '' ? mrd_search_comboOperateType.getValue() : '',
+							Ext.getCmp('recharge_comboPayType').getValue()
 						);
 					window.location = url;
 				}
@@ -291,10 +336,11 @@ Ext.onReady(function(){
 			
 			memberSumView.getCell(store.getCount()-1, 1).innerHTML = '汇总';
 			memberSumView.getCell(store.getCount()-1, 2).innerHTML = '--';
-			memberSumView.getCell(store.getCount()-1, 5).innerHTML = '--';
+			memberSumView.getCell(store.getCount()-1, 3).innerHTML = '--';
 			memberSumView.getCell(store.getCount()-1, 6).innerHTML = '--';
 			memberSumView.getCell(store.getCount()-1, 7).innerHTML = '--';
 			memberSumView.getCell(store.getCount()-1, 8).innerHTML = '--';
+			memberSumView.getCell(store.getCount()-1, 9).innerHTML = '--';
 		}
 	});
 	
@@ -327,6 +373,7 @@ function mrd_searchMemberOperation(){
 	gs.baseParams['memberType'] = memberType > 0 ? memberType : '';
 	gs.baseParams['fuzzy'] = mrd_search_memberName.getValue();
 	gs.baseParams['operateType'] = 2;
+	gs.baseParams['chargeType'] = Ext.getCmp('recharge_comboPayType').getValue();
 	gs.baseParams['detailOperate'] = mrd_search_comboOperateType.getRawValue() != '' ? mrd_search_comboOperateType.getValue() : '';
 	gs.baseParams['onDuty'] = onDuty;
 	gs.baseParams['offDuty'] = offDuty;
