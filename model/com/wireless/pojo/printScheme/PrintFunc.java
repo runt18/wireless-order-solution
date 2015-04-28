@@ -146,18 +146,30 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 				setComment(src.mComment);
 			}
 			if(src.isRegionChanged()){
-				for(Region region : src.mRegions){
-					addRegion(region);
+				if(src.mRegions.isEmpty()){
+					setRegionAll();
+				}else{
+					for(Region region : src.mRegions){
+						addRegion(region);
+					}
 				}
 			}
 			if(src.isDeptChanged()){
-				for(Department dept : src.mDept){
-					addDepartment(dept);
+				if(src.mDept.isEmpty()){
+					setDepartmentAll();
+				}else{
+					for(Department dept : src.mDept){
+						addDepartment(dept);
+					}
 				}
 			}
 			if(src.isKitchenChanged()){
-				for(Kitchen kitchen : src.mKitchens){
-					addKitchen(kitchen);
+				if(src.mKitchens.isEmpty()){
+					setKitchenAll();
+				}else{
+					for(Kitchen kitchen : src.mKitchens){
+						addKitchen(kitchen);
+					}
 				}
 			}
 			if(src.isEnabledChanged()){

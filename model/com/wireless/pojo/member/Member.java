@@ -320,6 +320,32 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}
 	}
 	
+	public static class BindBuilder{
+		private final int memberId;
+		private final String mobile;
+		private final String card;
+		private String name;
+		private Sex sex;
+		private long birthday;
+		
+		public BindBuilder(int memberId, String mobile, String card){
+			this.memberId = memberId;
+			this.mobile = mobile;
+			this.card = card;
+		}
+		
+		public Member[] build(){
+			Member source = new Member(memberId);
+			Member dest = new Member(0);
+			dest.setMobile(mobile);
+			dest.setMemberCard(card);
+			dest.setName(name);
+			dest.setSex(sex);
+			dest.setBirthday(birthday);
+			return new Member[]{ source, dest };
+		}
+	}
+	
 	private int id;
 	private int restaurantId;
 	private float totalConsumption;		// 消费总额
@@ -979,6 +1005,10 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	public void setTele(String tele) {
 		this.tele = tele;
+	}
+	
+	public boolean isRaw(){
+		return getMobile().trim().length() == 0 && getMemberCard().trim().length() == 0;
 	}
 	
 	public String getMobile() {
