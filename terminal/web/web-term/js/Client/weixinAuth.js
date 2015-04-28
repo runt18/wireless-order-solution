@@ -17,15 +17,20 @@ $("#weixin_wizard").steps({
     onInit : function (event, currentIndex) {
     	console.log(111111);
     },
-    onStepChanged: function (event, currentIndex, priorIndex) { 
+    onStepChanged: function (event, currentIndex, priorIndex) {
     	//0 - 2
-    	if(currentIndex == 1){
+    	if(currentIndex == 0){
+			if($('#weixinLogoDisplay').width() >= 660){
+				$('#weixinLogoDisplayImg').attr('width', '660px');
+			}
+    	}
+    	else if(currentIndex == 1){
     		//加载微信logo uploader
     		weixinLogoUploader.render('weixinLogoUploader');
     	}else if(currentIndex == 2 && !um_getContent()){
 			wx.lm.show();
 			if($('#weixinEditorDisplay').width() >= 660){
-				$('#weixinEditorDisplay').width(660);
+				$('#weixinAuthDisplayImg').attr('width', '660px');
 			}
 			Ext.Ajax.request({
 				url : '../../OperateRestaurant.do',
@@ -94,10 +99,12 @@ function linkToAuth(change){
 }
 
 function getRestaurantInfo(){
+	wx.lm.show();
 	$.post('../../OperateRestaurant.do', {
 		dataSource : 'restInfo',
 		rid : restaurantID
 	}, function(result){
+		wx.lm.hide();
 		if(result.success && result.root[0].isAuth){
 			getRestaurantInfo.isAuth = true;
 			$('#btnWeixinAuth').hide();
