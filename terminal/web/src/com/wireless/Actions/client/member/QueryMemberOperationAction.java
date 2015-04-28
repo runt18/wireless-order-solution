@@ -44,6 +44,8 @@ public class QueryMemberOperationAction extends Action{
 			
 			String fuzzy = request.getParameter("fuzzy");
 			
+			String payType = request.getParameter("payType");
+			String chargeType = request.getParameter("chargeType");
 			String operateType = request.getParameter("operateType");
 			String detailOperate = request.getParameter("detailOperate");
 			String onDuty = request.getParameter("onDuty");
@@ -72,6 +74,14 @@ public class QueryMemberOperationAction extends Action{
 
 			if(memberType != null && !memberType.trim().isEmpty()){
 				extraCond.setMemberType(Integer.parseInt(memberType));
+			}
+			
+			if(payType != null && !payType.isEmpty() && !payType.equals("-1")){
+				extraCond.setPayType(Integer.parseInt(payType));
+			}
+			
+			if(chargeType != null && !chargeType.isEmpty() && !chargeType.equals("-1")){
+				extraCond.setChargeType(Integer.parseInt(chargeType));
 			}
 			
 			if(fuzzy != null && !fuzzy.trim().isEmpty()){
