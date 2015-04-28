@@ -17,6 +17,7 @@ import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.ModuleError;
+import com.wireless.exception.WxMemberError;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pack.req.ReqQueryMember;
@@ -1991,6 +1992,121 @@ public class MemberDao {
 		return mo;
 	}
 	
+	/**
+	 * Bind the raw member according to specific builder {@link Member#BindBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the bind builder
+	 * @return the id to bound destination member
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the source member does NOT exist
+	 * 			<li>the source member is NOT raw.
+	 * 			<li>the destination member with mobile & card is NOT the same
+	 */
+	public static int bind(Staff staff, Member.BindBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			int memberId = bind(dbCon, staff, builder);
+			dbCon.conn.commit();
+			return memberId;
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Bind the raw member according to specific builder {@link Member#BindBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the bind builder
+	 * @return the id to bound destination member
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the source member does NOT exist
+	 * 			<li>the source member is NOT raw.
+	 * 			<li>the destination member with mobile & card is NOT the same
+	 */
+	public static int bind(DBCon dbCon, Staff staff, Member.BindBuilder builder) throws SQLException, BusinessException{
+		
+		Member source = getById(dbCon, staff, builder.build()[0].getId());
+		if(!source.isRaw()){
+			throw new BusinessException("【" + source.getName() + "】已绑定手机或会员卡", MemberError.BIND_FAIL);
+		}
+		
+		Member dest = builder.build()[1];
+		final List<Member> destsMatched = new ArrayList<Member>();
+		//Get the member matched mobile.
+		if(dest.hasMobile()){
+			try{
+				destsMatched.add(getByMobile(dbCon, staff, dest.getMobile()));
+			}catch(BusinessException ignored){
+				ignored.printStackTrace();
+			}
+		}
+		//Get the member matched card.
+		if(dest.hasMemberCard()){
+			try{
+				destsMatched.add(getByCard(dbCon, staff, dest.getMemberCard()));
+			}catch(BusinessException ignored){
+				ignored.printStackTrace();
+			}
+		}
+		
+		if(destsMatched.size() == 0){
+			dest = source;
+			
+		}else if(destsMatched.size() == 1){
+			dest = destsMatched.get(0);
+			
+		}else if(destsMatched.size() == 2){
+			if(destsMatched.get(0).equals(destsMatched.get(1))){
+				dest = destsMatched.get(0);
+			}else{
+				throw new BusinessException("绑定的手机和会员卡号分别属于两个不同的会员", MemberError.BIND_FAIL);
+			}
+		}
+		
+		if(!source.equals(dest)){
+			if(source.hasWeixin()){
+				String sql;
+				//Associated the source weixin member with the destination.  
+				sql = " UPDATE " + Params.dbName + ".weixin_member SET " + 
+					  " member_id = " + dest.getId() +
+					  " ,status = " + WxMember.Status.BOUND.getVal() + 
+					  " ,bind_date = NOW() " +
+					  " WHERE weixin_card = " + source.getWeixin().getCard();
+				if(dbCon.stmt.executeUpdate(sql) == 0){
+					throw new BusinessException(WxMemberError.WEIXIN_INFO_NOT_EXIST);
+				}
+			}
+			//Delete the source member.
+			deleteById(dbCon, staff, source.getId());
+		}
+		
+		//Update the destination member like name, sex, and so on.
+		update(dbCon, staff, new Member.UpdateBuilder(dest.getId())
+											.setName(builder.build()[1].getName())
+											.setSex(builder.build()[1].getSex())
+											.setMobile(builder.build()[1].getMobile())
+											.setMemberCard(builder.build()[1].getMemberCard())
+											.setBirthday(builder.build()[1].getBirthday()));
+		
+		return dest.getId();
+	}
 	
 	/**
 	 * Calculate most favor foods to each member.
