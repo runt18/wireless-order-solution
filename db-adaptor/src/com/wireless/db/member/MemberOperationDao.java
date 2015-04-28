@@ -17,6 +17,7 @@ import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.MOSummary;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
+import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberOperation.OperationCate;
 import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.member.MemberType;
@@ -68,6 +69,7 @@ public class MemberOperationDao {
 		private final List<MemberOperation.OperationType> operationTypes = new ArrayList<MemberOperation.OperationType>();
 		private DutyRange operationDate;
 		private int payTypeId;
+		private int chargeTypeId;
 		private boolean containsCoupon;
 		private int restaurantId;
 		
@@ -174,6 +176,16 @@ public class MemberOperationDao {
 			return this;
 		}
 		
+		public ExtraCond setChargeType(ChargeType chargeType){
+			this.chargeTypeId = chargeType.getValue();
+			return this;
+		}
+		
+		public ExtraCond setChargeType(int chargeTypeId){
+			this.chargeTypeId = chargeTypeId;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			final StringBuilder extraCond = new StringBuilder();
@@ -182,6 +194,9 @@ public class MemberOperationDao {
 			}
 			if(payTypeId != 0){
 				extraCond.append(" AND PT.pay_type_id = " + payTypeId);
+			}
+			if(chargeTypeId != 0){
+				extraCond.append(" AND MO.charge_type = " + chargeTypeId);
 			}
 			StringBuilder memberCond = new StringBuilder();
 			for(Integer memberId : this.members){
