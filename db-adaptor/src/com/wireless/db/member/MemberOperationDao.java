@@ -67,6 +67,7 @@ public class MemberOperationDao {
 		private String name;
 		private final List<MemberOperation.OperationType> operationTypes = new ArrayList<MemberOperation.OperationType>();
 		private DutyRange operationDate;
+		private int payTypeId;
 		private boolean containsCoupon;
 		private int restaurantId;
 		
@@ -163,12 +164,24 @@ public class MemberOperationDao {
 			return this;
 		}
 		
+		public ExtraCond setPayType(PayType payType){
+			this.payTypeId = payType.getId();
+			return this;
+		}
+		
+		public ExtraCond setPayType(int payTypeId){
+			this.payTypeId = payTypeId;
+			return this;
+		}
 		
 		@Override
 		public String toString(){
 			final StringBuilder extraCond = new StringBuilder();
 			if(id != 0){
 				extraCond.append(" AND MO.id = " + id);
+			}
+			if(payTypeId != 0){
+				extraCond.append(" AND PT.pay_type_id = " + payTypeId);
 			}
 			StringBuilder memberCond = new StringBuilder();
 			for(Integer memberId : this.members){
