@@ -140,7 +140,7 @@
 //        ,imageFieldName:"upfile"                   //图片数据的key,若此处修改，需要在后台对应文件修改对应参数
         
         //FIXME 改为用digie的oss
-        ,imageUrl:"OperateImage.do?dataSource=upload&ossType=8"
+        ,imageUrl:"../../OperateImage.do?dataSource=upload&ossType=8"
         ,imagePath: ""
         ,imageFieldName:"imgFile"
 

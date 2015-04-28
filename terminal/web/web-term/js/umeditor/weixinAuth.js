@@ -15,22 +15,19 @@ $("#weixin_wizard").steps({
         loading: "加载中 ..."
     },
     onInit : function (event, currentIndex) {
-    	console.log(111111);
+		if($('#weixinAuthDisplay').width() >= 660){
+			$('#weixinAuthDisplayImg').attr('width', '660px');
+		}
     },
     onStepChanged: function (event, currentIndex, priorIndex) {
     	//0 - 2
-    	if(currentIndex == 0){
-			if($('#weixinLogoDisplay').width() >= 660){
-				$('#weixinLogoDisplayImg').attr('width', '660px');
-			}
-    	}
-    	else if(currentIndex == 1){
+    	if(currentIndex == 1){
     		//加载微信logo uploader
     		weixinLogoUploader.render('weixinLogoUploader');
     	}else if(currentIndex == 2 && !um_getContent()){
 			wx.lm.show();
 			if($('#weixinEditorDisplay').width() >= 660){
-				$('#weixinAuthDisplayImg').attr('width', '660px');
+				$('#weixinEditorDisplayImg').attr('width', '660px');
 			}
 			Ext.Ajax.request({
 				url : '../../OperateRestaurant.do',
@@ -222,32 +219,32 @@ function initWeixinLogoCmp(){
 	        	
 	        	Ext.Ajax.request({
 	        		url : '../../OperateImage.do?dataSource=upload&ossType=7',
- 	   			isUpload : true,
- 	   			form : form.getForm().getEl(),
- 	   			success : function(response, options){
- 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
-					Ext.Ajax.request({
-						url : '../../OperateRestaurant.do',
-						params : {
-							dataSource : 'updateLogo',
-							logo : jr.root[0].imageId
-						},
-						success : function(res, opt){
-							uploadMask.hide();
-							var jr = Ext.decode(res.responseText);
-							Ext.example.msg('提示', jr.msg);
-						},
-						fialure : function(res, opt){
-							wx.lm.hide();
-							Ext.ux.showMsg(res.responseText);
-						}
-					});	 	   				
- 	   				
- 	   			},
- 	   			failure : function(response, options){
- 	   				uploadMask.hide();
- 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
- 	   			}
+	 	   			isUpload : true,
+	 	   			form : form.getForm().getEl(),
+	 	   			success : function(response, options){
+	 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
+						Ext.Ajax.request({
+							url : '../../OperateRestaurant.do',
+							params : {
+								dataSource : 'updateLogo',
+								logo : jr.root[0].imageId
+							},
+							success : function(res, opt){
+								uploadMask.hide();
+								var jr = Ext.decode(res.responseText);
+								Ext.example.msg('提示', jr.msg);
+							},
+							fialure : function(res, opt){
+								wx.lm.hide();
+								Ext.ux.showMsg(res.responseText);
+							}
+						});	 	   				
+	 	   				
+	 	   			},
+	 	   			failure : function(response, options){
+	 	   				uploadMask.hide();
+	 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+	 	   			}
 	        	});
 	        }
 	});
