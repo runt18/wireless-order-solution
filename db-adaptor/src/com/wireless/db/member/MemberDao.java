@@ -2098,12 +2098,21 @@ public class MemberDao {
 		}
 		
 		//Update the destination member like name, sex, and so on.
-		update(dbCon, staff, new Member.UpdateBuilder(dest.getId())
-											.setName(builder.build()[1].getName())
-											.setSex(builder.build()[1].getSex())
-											.setMobile(builder.build()[1].getMobile())
-											.setMemberCard(builder.build()[1].getMemberCard())
-											.setBirthday(builder.build()[1].getBirthday()));
+		Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(dest.getId());
+		dest = builder.build()[1];
+		if(dest.getName().length() != 0){
+			updateBuilder.setName(dest.getName());
+		}
+		if(dest.hasMobile()){
+			updateBuilder.setMobile(dest.getMobile());
+		}
+		if(dest.hasMemberCard()){
+			updateBuilder.setMemberCard(dest.getMemberCard());
+		}
+		if(dest.getBirthday() != 0){
+			updateBuilder.setBirthday(dest.getBirthday());
+		}
+		update(dbCon, staff, updateBuilder);
 		
 		return dest.getId();
 	}
