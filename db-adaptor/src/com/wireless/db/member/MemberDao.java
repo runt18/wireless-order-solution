@@ -2109,6 +2109,9 @@ public class MemberDao {
 		if(dest.getBirthday() != 0){
 			updateBuilder.setBirthday(dest.getBirthday());
 		}
+		if(dest.getMemberType().getId() != 0){
+			updateBuilder.setMemberType(dest.getMemberType().getId());
+		}
 		update(dbCon, staff, updateBuilder);
 		
 		return destMemberId;

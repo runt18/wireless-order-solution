@@ -171,7 +171,7 @@ public class TestMember {
 			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId)
 														   .setName("李四")
 														   .setMobile("18520590931")
-														   .setMemberTypeId(memberType.getId())
+														   .setMemberType(memberType.getId())
 														   .setSex(Sex.MALE)
 														   .setBirthday(DateUtil.parseDate("1987-06-29"))
 														   .setCompany("DingDing Tech")
