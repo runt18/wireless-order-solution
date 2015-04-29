@@ -218,8 +218,13 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			return this.mobile != null && this.mobile.trim().length() != 0;
 		}
 		
-		public UpdateBuilder setMemberTypeId(int memberTypeId){
+		public UpdateBuilder setMemberType(int memberTypeId){
 			this.memberTypeId = memberTypeId;
+			return this;
+		}
+		
+		public UpdateBuilder setMemberType(MemberType memberType){
+			this.memberTypeId = memberType.getId();
 			return this;
 		}
 		
@@ -327,6 +332,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		private String name;
 		private Sex sex;
 		private long birthday;
+		private final MemberType memberType = new MemberType(0);
 		
 		public BindBuilder(int memberId, String mobile, String card){
 			this.memberId = memberId;
@@ -348,8 +354,15 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			return this;
 		}
 
+		public BindBuilder setMemberType(int memberTypeId){
+			this.memberType.setId(memberTypeId);
+			return this;
+		}
 
-
+		public BindBuilder setMemberType(MemberType memberType){
+			return setMemberType(memberType.getId());
+		}
+		
 		public Member[] build(){
 			Member source = new Member(memberId);
 			Member dest = new Member(0);
@@ -358,6 +371,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			dest.setName(name);
 			dest.setSex(sex);
 			dest.setBirthday(birthday);
+			dest.setMemberType(memberType);
 			return new Member[]{ source, dest };
 		}
 	}
