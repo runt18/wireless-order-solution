@@ -824,7 +824,7 @@
 	    </div>
 	</div>		
 	<!-- 系统共用会员绑定start -->
-	<div id="finishMemberInfo" class="ui-overlay-shadow ui-corner-all" style="width:700px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -350px;background-color: white;display: none;" align="center">	
+	<div id="finishMemberInfo" class="ui-overlay-shadow ui-corner-all" style="width:740px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -370px;background-color: white;display: none;" align="center">	
 	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
 	        	完善会员资料
 	    </div> 
@@ -834,7 +834,7 @@
 	    		<td><input id="fm_txtMemberName" data-type="txt"></td>
 	 	
 	    		<td class="readMemberTd">会员手机:</td>
-	    		<td><input id="fm_txtMemberMobile" onkeypress="intOnly()" data-type="num" class="countInputStyle"></td>    
+	    		<td><input id="fm_txtMemberMobile" onkeypress="intOnly()" value="13533464033" data-type="num" class="countInputStyle"></td>    
 	    		
 	    		<td class="readMemberTd">会员卡号:</td>
 	    		<td><input id="fm_numberMemberCard" onkeypress="intOnly()" data-type="num" class="countInputStyle"></td>     			

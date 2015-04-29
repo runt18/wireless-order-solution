@@ -1356,7 +1356,7 @@ uo.memberInfoBind = function(){
 					$('#finishMemberInfo').show();	
 					
 					setTimeout(function(){
-						$('#fm_txtMemberName').val('微信会员');
+						$('#fm_txtMemberName').val(uo.orderMember.name);
 						$('#fm_txtMemberName').select();
 						
 					}, 250);
@@ -1391,17 +1391,24 @@ uo.closeMemberInfoBind = function(){
 	$('#fm_numberMemberCard').val('');
 	$('#fm_dateMemberBirthday').val('');
 	
-	//默认微信会员
-	$('#fm_comboMemberType').val(uo.memberInfoBind.firstOption.id);
-	$('#fm_comboMemberType').selectmenu('refresh');
-	
 	//关闭易笔字
 	YBZ_win = YBZ_win || '';
 	if(YBZ_win){
 		YBZ_win.close();
 	}
 	//关闭数字键盘
-	$('#numberKeyboard').hide();	
+	$('#numberKeyboard').hide();
+	
+	$('#fm_txtMemberMobile').removeAttr("disabled").parent().removeClass('ui-disabled');
+	$('#fm_numberMemberCard').removeAttr('disabled').parent().removeClass('ui-disabled');
+	
+	//默认微信会员
+	$('#fm_comboMemberType').val(uo.memberInfoBind.firstOption.id);
+	$('#fm_comboMemberType').selectmenu('refresh');
+	
+
+	
+	
 }
 
 /**
@@ -1445,6 +1452,9 @@ uo.readMemberByDetail = function(){
 	}, 'json');
 }
 
+/**
+ * 设置对比数据
+ */
 uo.showOldMemberDetail = function(m){
 	$('#confirmMemberName').html(m.name);
 	$('#confirmMembeMobile').html(m.mobile?m.mobile:"----");
@@ -1452,6 +1462,26 @@ uo.showOldMemberDetail = function(m){
 	$('#confirmMembeSex').html(m.sexText);
 	$('#confirmMembeBirthday').html(m.birthdayFormat?m.birthdayFormat:"----");
 	$('#confirmMembeType').html(m.memberType.name);
+	
+	//设置数据到input
+	$('#fm_txtMemberName').val(m.name);
+	$('#fm_txtMemberMobile').val(m.mobile);
+	$('#fm_numberMemberCard').val(m.memberCard);
+	$('#fm_dateMemberBirthday').val(m.birthdayFormat);
+	
+	$('input[name="fm_comboMemberSex"]').each(function(){
+		if(this.value == m.sexValue){
+			$(this).attr("checked",true).checkboxradio("refresh");
+		}else{
+			$(this).attr("checked",false).checkboxradio("refresh");
+		}
+	});
+	
+	$('#fm_comboMemberType').val(m.memberType.id);
+	$('#fm_comboMemberType').selectmenu("refresh");
+	
+	$('#fm_txtMemberMobile').attr("disabled","disabled").parent().addClass('ui-disabled');
+	$('#fm_numberMemberCard').attr('disabled',"true").parent().addClass('ui-disabled');
 }
 
 /**
