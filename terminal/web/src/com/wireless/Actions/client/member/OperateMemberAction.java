@@ -593,6 +593,7 @@ public class OperateMemberAction extends DispatchAction{
 		String name = request.getParameter("name");
 		String sex = request.getParameter("sex");
 		String birthday = request.getParameter("birthday");
+		String memberType = request.getParameter("type");
 		
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -602,6 +603,7 @@ public class OperateMemberAction extends DispatchAction{
 			builder.setBirthday(DateUtil.parseDate(birthday));
 			builder.setName(name);
 			builder.setSex(Member.Sex.valueOf(Integer.parseInt(sex)));
+			builder.setMemberType(Integer.parseInt(memberType));
 			
 			int mId = MemberDao.bind(staff, builder);
 			
