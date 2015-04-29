@@ -636,7 +636,7 @@
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.goToCreateOrder()">点菜</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.tempPayForUO()">暂结</a>
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.memberInfoBind()">会员绑定</a>
+		 	<!-- <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.memberInfoBind()">会员绑定</a> -->
 		 	<a id="btnPayBill" data-role="button" data-inline="true" class="bottomBtnFont none" onclick="showPaymentMgr({table:uo.table})" >结账</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loadOrderDetail();lookupOrderDetailByType('detail_all');">明细</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#popupDiscountCmp">折扣</a>
@@ -834,7 +834,7 @@
 	    		<td><input id="fm_txtMemberName" data-type="txt"></td>
 	 	
 	    		<td class="readMemberTd">会员手机:</td>
-	    		<td><input id="fm_txtMemberMobile" onkeypress="intOnly()" value="13533464033" data-type="num" class="countInputStyle"></td>    
+	    		<td><input id="fm_txtMemberMobile" onkeypress="intOnly()" data-type="num" class="countInputStyle"></td>    
 	    		
 	    		<td class="readMemberTd">会员卡号:</td>
 	    		<td><input id="fm_numberMemberCard" onkeypress="intOnly()" data-type="num" class="countInputStyle"></td>     			
