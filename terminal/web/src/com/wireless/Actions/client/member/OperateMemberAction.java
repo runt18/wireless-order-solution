@@ -189,7 +189,7 @@ public class OperateMemberAction extends DispatchAction{
 			Member.UpdateBuilder ub = new Member.UpdateBuilder(Integer.valueOf(id))
 											    .setName(name)
 											    .setMobile(mobile)
-											    .setMemberTypeId(Integer.valueOf(memberTypeId))
+											    .setMemberType(Integer.valueOf(memberTypeId))
 											    .setSex(Member.Sex.valueOf(Integer.valueOf(sex)))
 											    .setBirthday(birthday)
 											    .setMemberCard(memberCard)
