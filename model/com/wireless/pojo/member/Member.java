@@ -333,7 +333,23 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			this.mobile = mobile;
 			this.card = card;
 		}
-		
+		public BindBuilder setName(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public BindBuilder setSex(Sex sex) {
+			this.sex = sex;
+			return this;
+		}
+
+		public BindBuilder setBirthday(long birthday) {
+			this.birthday = birthday;
+			return this;
+		}
+
+
+
 		public Member[] build(){
 			Member source = new Member(memberId);
 			Member dest = new Member(0);
@@ -881,6 +897,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.putString("memberCard", this.memberCard);
 		jm.putJsonableList("publicComment", this.publicComments, 0);
 		jm.putJsonable("privateComment", this.privateComment, 0);
+		jm.putBoolean("isRaw", this.isRaw());
 		return jm;
 	}
 
