@@ -128,3 +128,11 @@ li[role=option] a{
 .table_toolBarCmp{
 	width: 130px;
 }
+
+#divConfirmMember td:nth-child(even){
+	color : green;
+	font-weight: bold;
+}
+
+
+

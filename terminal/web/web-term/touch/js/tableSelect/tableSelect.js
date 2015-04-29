@@ -1,4 +1,5 @@
 var Request = new Util_urlParaQuery();
+//1:pos端	2:touch		3:试用 
 var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 
 
@@ -355,55 +356,66 @@ function addStyle() {
 
 
 window.onload=function(){
-	$('input[data-type=txt]').focus(function(){
-		//if(getcookie('isNeedWriter') == 'true'){
-		if(true){
+	if(systemStatus == 2){
+		$('input[data-type=txt]').focus(function(){
+			//if(getcookie('isNeedWriter') == 'true'){
 			//关闭数字键盘
 			$('#numberKeyboard').hide();
 			
 			YBZ_open($(this)[0]);			
-		}
-	});
-	
-	$('input[data-type=num]').focus(function(){
-		//if(getcookie('isNeedNumKeyboard') == 'true'){
-		if(true){
+		});
+		
+		$('input[data-type=num]').focus(function(){
+			//if(getcookie('isNeedNumKeyboard') == 'true'){
 			//关闭易笔字
 			YBZ_win = YBZ_win || '';
 			if(YBZ_win){
 				YBZ_win.close();
 			}		
 			$('#numberKeyboard').show();	
-		}
-	});	
-	
-	
-	$('#txtEraseQuota').focus(function(){
-		usedEraseQuota = false;
-		mouseOutNumKeyboard = true;
-		$('#numberKeyboard').show();	
-		//设置数字键盘触发
-		numKeyBoardFireEvent = function (){
-			$('#txtEraseQuota').keyup();
-		}
+		});	
 		
-		$('#calculator4NumberKeyboard').on("mouseover", function(){
+		$('input[data-type=neither]').focus(function(){
+			//关闭易笔字
+			YBZ_win = YBZ_win || '';
+			if(YBZ_win){
+				YBZ_win.close();
+			}
+			//关闭数字键盘
+			$('#numberKeyboard').hide();	
+			
+		});		
+		
+		//设置数字键盘输入
+		$('.countInputStyle').focus(function(){
+			focusInput = this.id;
+		});	
+		
+
+		//抹数
+		$('#txtEraseQuota').focus(function(){
 			usedEraseQuota = false;
-			mouseOutNumKeyboard = false;
-		});
-		
-		$('#calculator4NumberKeyboard').on("mouseout", function(){
-			usedEraseQuota = true;
 			mouseOutNumKeyboard = true;
-		});			
-	});
+			$('#numberKeyboard').show();	
+			//设置数字键盘触发
+			numKeyBoardFireEvent = function (){
+				$('#txtEraseQuota').keyup();
+			}
+			
+			$('#calculator4NumberKeyboard').on("mouseover", function(){
+				usedEraseQuota = false;
+				mouseOutNumKeyboard = false;
+			});
+			
+			$('#calculator4NumberKeyboard').on("mouseout", function(){
+				usedEraseQuota = true;
+				mouseOutNumKeyboard = true;
+			});			
+		});
+	}
+
 	
-	
-	//设置数字键盘输入
-	$('.countInputStyle').focus(function(){
-		focusInput = this.id;
-	});	
-	
+	//菜品搜索 各个端都显示手写
 	$('#searchFoodInput').focus(function(){
 		focusInput = this.id;
 		if(this.id == 'searchFoodInput'){
@@ -411,52 +423,6 @@ window.onload=function(){
 		}		
 	});
 	
-	
-	//打开手写板
-	$(".handWriteCmp").change(function(){
-		//$(this).val() 得到当前选中的值
-		if($(this).val() == 'on'){
-			//关闭数字键盘
-			$('#numberKeyboard').hide();
-			var myselect = $(".numberKeyboard");
-			for (var i = 0; i < myselect.length; i++) {
-				myselect[i].selectedIndex = 0;
-			}
-			myselect.slider('refresh'); 	
-			
-			YBZ_open(document.getElementById($(this).attr('data-for')));
-			
-			$('#'+$(this).attr('data-for')).focus();
-		}else{
-			YBZ_win.close();
-		}
-	});
-	
-	//打开数字键盘
-	$(".numberKeyboard").change(function(){
-		//$(this).val() 得到当前选中的值
-		if($(this).val() == 'on'){
-			$('#numberKeyboard').show();
-			
-			//关闭易笔字
-			var myselect = $(".handWriteCmp");
-			for (var i = 0; i < myselect.length; i++) {
-				myselect[i].selectedIndex = 0;
-			}
-			myselect.slider('refresh'); 
-			
-			if(YBZ_win){
-				YBZ_win.close();
-			}
-			$('#'+$(this).attr('data-for')).focus();
-			
-//			document.getElementById($(this).attr('data-for')).style.display="block";
-		}else{
-			$('#numberKeyboard').hide();
-			//document.getElementById($(this).attr('data-for')).style.display="none";
-		}
-	});	
-
 	//快捷键
 	$(document).keydown(function(event){
 		if($.mobile.activePage.attr( "id" ) == 'paymentMgr'){//结账界面中使用
@@ -493,6 +459,9 @@ window.onload=function(){
 	
 	//渲染会员读取窗口
 	$('#readMemberWin').trigger('create').trigger('refresh');	
+	
+	//渲染完善会员资料窗口
+//	$('#finishMemberInfo').trigger('create').trigger('refresh');		
 	
 	//会员读卡
     $('#txtMemberInfo4Read').on('keypress',function(event){
@@ -533,6 +502,7 @@ window.onload=function(){
         	ts.member.searchMemberDetail();
         }
     });
+    
     
     //易笔字样式和加载
     addStyle();
