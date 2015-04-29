@@ -2,6 +2,8 @@ package com.wireless.Actions.client.member;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,13 +13,17 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.DBCon;
 import com.wireless.db.member.MemberDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.MemberError;
 import com.wireless.json.JObject;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPrintContent;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
@@ -451,7 +457,15 @@ public class OperateMemberAction extends DispatchAction{
 		return null;
 	}
 	
-	
+	/**
+	 * 关注会员
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward interestedMember(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		
@@ -483,4 +497,132 @@ public class OperateMemberAction extends DispatchAction{
 		}
 		return null;
 	}
+	
+	/**
+	 * 微信会员绑定前确认会员
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward checkMember(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		
+		
+		JObject jobject = new JObject();
+		String mobile = request.getParameter("mobile");
+		String card = request.getParameter("card");
+		
+		DBCon dbCon = null;
+		try{
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			dbCon = new DBCon();
+			dbCon.connect();
+			
+			Member dest = new Member(0);
+			dest.setMobile(mobile);
+			dest.setMemberCard(card);
+			
+			final List<Member> destsMatched = new ArrayList<Member>();
+			//Get the member matched mobile.
+			if(dest.hasMobile()){
+				try{
+					destsMatched.add(MemberDao.getByMobile(dbCon, staff, dest.getMobile()));
+				}catch(BusinessException ignored){
+					ignored.printStackTrace();
+				}
+			}
+			//Get the member matched card.
+			if(dest.hasMemberCard()){
+				try{
+					destsMatched.add(MemberDao.getByCard(dbCon, staff, dest.getMemberCard()));
+				}catch(BusinessException ignored){
+					ignored.printStackTrace();
+				}
+			}
+			
+			if(destsMatched.size() == 0){
+				dest = null;
+			}else if(destsMatched.size() == 1){
+				dest = destsMatched.get(0);
+			}else if(destsMatched.size() == 2){
+				if(destsMatched.get(0).equals(destsMatched.get(1))){
+					dest = destsMatched.get(0);
+				}else{
+					throw new BusinessException("绑定的手机和会员卡号分别属于两个不同的会员", MemberError.BIND_FAIL);
+				}
+			}
+			
+			jobject.setRoot(dest);
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			dbCon.disconnect();
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 绑定原卡到微信会员
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward bindWxMember(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		
+		
+		JObject jobject = new JObject();
+		String memberId = request.getParameter("id");
+		String orderId = request.getParameter("orderId");
+		String mobile = request.getParameter("mobile");
+		String card = request.getParameter("card");
+		String name = request.getParameter("name");
+		String sex = request.getParameter("sex");
+		String birthday = request.getParameter("birthday");
+		
+		try{
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			Member.BindBuilder builder = new Member.BindBuilder(Integer.parseInt(memberId), mobile, card);
+			builder.setBirthday(DateUtil.parseDate(birthday));
+			builder.setName(name);
+			builder.setSex(Member.Sex.valueOf(Integer.parseInt(sex)));
+			
+			int mId = MemberDao.bind(staff, builder);
+			
+			Member member = MemberDao.getById(staff, mId);
+			
+			OrderDao.discount(staff, Order.DiscountBuilder.build4Member(Integer.parseInt(orderId), member));
+			
+			jobject.initTip(true, "微信会员绑定成功");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
+	
 }
