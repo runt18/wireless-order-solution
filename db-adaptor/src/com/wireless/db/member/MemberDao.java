@@ -1057,11 +1057,7 @@ public class MemberDao {
 			dbCon.conn.commit();
 			return memberId;
 			
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
-			
-		}catch(BusinessException e){
+		}catch(SQLException | BusinessException e){
 			dbCon.conn.rollback();
 			throw e;
 			
@@ -2098,7 +2094,8 @@ public class MemberDao {
 		}
 		
 		//Update the destination member like name, sex, and so on.
-		Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(dest.getId());
+		int destMemberId = dest.getId();
+		Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(destMemberId);
 		dest = builder.build()[1];
 		if(dest.getName().length() != 0){
 			updateBuilder.setName(dest.getName());
@@ -2114,7 +2111,7 @@ public class MemberDao {
 		}
 		update(dbCon, staff, updateBuilder);
 		
-		return dest.getId();
+		return destMemberId;
 	}
 	
 	/**

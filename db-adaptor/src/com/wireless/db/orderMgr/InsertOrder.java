@@ -188,21 +188,22 @@ public class InsertOrder {
 		 * Insert to 'order' table.
 		 */
 		sql = " INSERT INTO `" + Params.dbName + "`.`order` (" +
-			  " `restaurant_id`, `category`, `region_id`, `region_name`, " +
+			  " `restaurant_id`, `comment`, `category`, `region_id`, `region_name`, " +
 			  " `table_id`, `table_alias`, `table_name`, " +
 			  " `birth_date`, `order_date`, `custom_num`, `staff_id`, `waiter`, `discount_id`) VALUES (" +
 			  staff.getRestaurantId() + ", " + 
+			  "'" + orderToInsert.getComment() + "'," +
 			  orderToInsert.getCategory().getVal() + ", " +
-			  orderToInsert.getRegion().getId() + ", '" +
-			  orderToInsert.getRegion().getName() + "', " +
+			  orderToInsert.getRegion().getId() + ", " +
+			  "'" + orderToInsert.getRegion().getName() + "', " +
 			  orderToInsert.getDestTbl().getId() + ", " +
 			  orderToInsert.getDestTbl().getAliasId() + ", " +
-			  "'" + orderToInsert.getDestTbl().getName() + "'" + ", " +
-			  " NOW() " + ", " + 
-			  " NOW() " + ", " +
+			  "'" + orderToInsert.getDestTbl().getName() + "', " +
+			  " NOW(), " + 
+			  " NOW(), " +
 			  orderToInsert.getCustomNum() + ", " +
 			  staff.getId() + ", " +
-			  "'" + staff.getName() + "'" + ", " +
+			  "'" + staff.getName() + "', " +
 			  orderToInsert.getDiscount().getId() + 
 			  ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
