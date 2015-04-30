@@ -104,9 +104,13 @@ function getRestaurantInfo(){
 		wx.lm.hide();
 		if(result.success && result.root[0].isAuth){
 			getRestaurantInfo.isAuth = true;
+			//点击去绑定
 			$('#btnWeixinAuth').hide();
+			//点击完成
 			$('#btnWeixinAuthFinish').hide();
+			//重新绑定
 			$('#btnReAuthWeixinAuth').show();
+			
 			var rest = result.root[0];
 			$('#wxRestLogo').attr('src', rest.headImgUrl);
 			$('#wxNickName').text(rest.nickName);
@@ -117,6 +121,7 @@ function getRestaurantInfo(){
 			
 		}else{
 			getRestaurantInfo.isAuth = false;
+			//点击去绑定
 			$('#btnWeixinAuth').show();
 			
 			$('#seeRestaurantByCodeTitle').html('请先完成第一步微信公众号绑定');
