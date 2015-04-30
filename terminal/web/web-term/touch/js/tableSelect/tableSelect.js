@@ -2413,7 +2413,7 @@ ts.member.readWeixinMemberFrontBind = function(){
 		if(jr.success && jr.root.length > 0){
 			ts.member.bindWeixinMember.memberId = jr.root[0].id;
 			
-			$('#weixinMemberFrontBind').hide();
+			ts.member.closeWeixinMemberFrontBind();
 			ts.member.memberInfoBind('loadMemberBind4Tableselect', jr.root[0].name);
 			
 		}else{
@@ -2520,6 +2520,8 @@ ts.member.showOldMemberDetail = function(m){
 	$('#confirmMembeSex').html(m.sexText);
 	$('#confirmMembeBirthday').html(m.birthdayFormat?m.birthdayFormat:"----");
 	$('#confirmMembeType').html(m.memberType.name);
+	$('#confirmMembeBalance').html(m.totalBalance);
+	$('#confirmMembePoint').html(m.point);
 	
 	//设置数据到input
 	$('#fm_txtMemberName').val(m.name);

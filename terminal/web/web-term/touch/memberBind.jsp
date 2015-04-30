@@ -171,6 +171,14 @@ select{
 		    		<td class="readMemberTd">会员类型:</td>
 		    		<td id="confirmMembeType">----</td>  		   		
 		    	</tr> 
+		    	<tr>
+		    		<td class="readMemberTd">余额:</td>
+		    		<td id="confirmMembeBalance">----</td>    
+		    		
+		    		<td class="readMemberTd">积分:</td>
+		    		<td id="confirmMembePoint">----</td>   
+		    		
+		    	</tr> 
 		    </table>	    	
 	    </div>
 	    
