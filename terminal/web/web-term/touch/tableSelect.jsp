@@ -74,6 +74,7 @@
 			<li class="popupButtonList" onclick="ts.member.openMemberChargeWin()"><a >会员充值</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberConsumeDetailWin()"><a >消费明细</a></li>
+			<li class="popupButtonList" onclick="ts.member.openWeixinMemberFrontBind()"><a >微信会员绑定</a></li>
 		</ul>
 	</div>	
 	
@@ -466,6 +467,30 @@
 		</ul>
 	</div>	
 	
+	
+	<!-- 微信会员绑定 -->
+	<div id="weixinMemberFrontBind" class="ui-overlay-shadow ui-corner-all" style="width:340px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -150px;background-color: white;display: none;" align="center">	
+	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
+	        	微信会员绑定
+	    </div> 
+	    <table>
+	    	<tr>
+		    	<td>
+		    		<input placeholder="请输入微信卡号" style="font-size:20px;font-weight: bold;" id="txtMember4FrontBind">
+		    	</td>
+		    </tr>
+	    </table>
+	    
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.member.readWeixinMemberFrontBind()">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.member.closeWeixinMemberFrontBind()">取消</a>		 
+			 </div>
+	    </div>	
+	</div>		
+	<!-- 系统共用会员绑定start -->
+	<div id="loadMemberBind4Tableselect"></div>
+	
 	<!-- 会员消费明细  -->
 	<div id="memberConsumeDetailWin" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 200px; left: 50%;width:1200px; margin: -100px 0px 0px -600px;display: none;background-color: white;" align="center">
 	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
@@ -636,7 +661,6 @@
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.goToCreateOrder()">点菜</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.tempPayForUO()">暂结</a>
-		 	<!-- <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.memberInfoBind()">会员绑定</a> -->
 		 	<a id="btnPayBill" data-role="button" data-inline="true" class="bottomBtnFont none" onclick="showPaymentMgr({table:uo.table})" >结账</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loadOrderDetail();lookupOrderDetailByType('detail_all');">明细</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#popupDiscountCmp">折扣</a>
@@ -824,7 +848,8 @@
 	    </div>
 	</div>		
 	<!-- 系统共用会员绑定start -->
-	<div id="finishMemberInfo" class="ui-overlay-shadow ui-corner-all" style="width:740px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -370px;background-color: white;display: none;" align="center">	
+	<div id="loadMemberBind4Checkout"></div>
+<!-- 	<div id="finishMemberInfo" class="ui-overlay-shadow ui-corner-all" style="width:740px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -370px;background-color: white;display: none;" align="center">	
 	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
 	        	完善会员资料
 	    </div> 
@@ -841,16 +866,10 @@
 	    	</tr>
 	    	<tr>
 	    		<td class="readMemberTd">性别:</td>
-	    		<td>
-<!-- 	    			<select  id="fm_comboMemberSex" data-native-menu="false">
-						<option value="0">男</option>
-						<option value="1">女</option>
-					</select>	  -->
-					<fieldset data-role="controlgroup" data-type="horizontal" >
-				        <input type="radio" name="fm_comboMemberSex" data-theme="c" id="memberSexMan" value="0" checked="checked">
-				        <label for="memberSexMan">男</label>
-				        <input type="radio" name="fm_comboMemberSex" data-theme="c" id="memberSexWoman" value="1">
-				        <label for="memberSexWoman">女</label>
+	    		<td >
+					<fieldset id="comboRadioSex" data-role="controlgroup" data-type="horizontal" >
+				        <input type="radio" name="fm_comboMemberSex" data-theme="c" id="memberSexMan" value="0" checked="checked"><label for="memberSexMan">男</label>
+				        <input type="radio" name="fm_comboMemberSex" data-theme="c" id="memberSexWoman" value="1"><label for="memberSexWoman">女</label>
 				    </fieldset>			
 					   		
 	    		</td>    
@@ -899,7 +918,7 @@
 				 <a  data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn" onclick="uo.closeMemberInfoBind()">取消</a>		 
 			 </div>
 	    </div>	
-	</div>	
+	</div>	 -->
 	<!-- end会员绑定 -->
 </div>	
 <!-- end 已点菜界面-->
@@ -958,6 +977,7 @@
 <!-- end 系统共用餐台操作-->
 
 
+	
 <!-- 系统共用数字键盘 start -->
 <div id="numberKeyboard" class="ui-overlay-shadow ui-corner-all" style="z-index: 1200;position: absolute;background-color: white;right: 0;bottom: 0;display: none;" align="center">
     <div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="line-height: 30px;">
@@ -1744,6 +1764,9 @@
 			 </div>
 	    </div>	
 	</div>		 
+	 
+	 <!-- 系统共用会员绑定start -->
+	<div id="loadMemberBind4Payment"></div>
 	 
 </div>
 <!-- end 结账界面 -->

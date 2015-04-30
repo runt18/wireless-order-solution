@@ -200,7 +200,7 @@ function handleTableForTS(c){
 					initTableData();
 				}
 				$('#btnCloseForSelectTableNumTS').click();
-				uo.show({
+				uo.entry({
 					table : table
 				});
 				
@@ -223,7 +223,7 @@ function handleTableForTS(c){
 				if(!$(c.event).hasClass('table-busy')){
 					initTableData();
 				}
-				uo.show({
+				uo.entry({
 					table : table
 				});
 			}else{
@@ -313,7 +313,7 @@ function renderToCreateOrder(tableNo, peopleNo){
 		//同时操作餐台时,选中状态没变化的餐桌处理
 		//直接写台豪点菜时判断是否已点菜, 是则先给co.order.orderFoods赋值
 		if(getTableByAlias(tableNo).statusValue == 1){
-//			uo.show({
+//			uo.entry({
 //				table : getTableByAlias(tableNo),
 //				type : 'createOrder',
 //			});
@@ -324,7 +324,7 @@ function renderToCreateOrder(tableNo, peopleNo){
 //					initTableData();
 //				}
 //			});
-//			uo.show({
+//			uo.entry({
 //				table : getTableByAlias(tableNo),
 //				type : 'createOrder',
 //			});

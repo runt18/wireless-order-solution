@@ -2,7 +2,7 @@
  * 显示已点菜界面函数
  * @param {object} c  
  */
-uo.show = function(c){
+uo.entry = function(c){
 	if(c.type == null || typeof c.type == 'undefined'){
 		Util.toggleContentDisplay({
 			type: 'show', 
@@ -17,7 +17,7 @@ uo.show = function(c){
 
 uo.updateOrderHandler = function(){
 	initTableData();
-	uo.show({
+	uo.entry({
 		table : uo.table
 	});
 };

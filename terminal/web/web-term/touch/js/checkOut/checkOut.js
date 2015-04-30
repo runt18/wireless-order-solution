@@ -65,6 +65,36 @@ $(document).on("pagebeforeshow","#orderFoodListMgr",function(){
 	}
 });	
 	
+
+/**
+ * 显示已点菜界面函数, 入口
+ * @param {object} c  
+ */
+uo.entry = function(c){
+	
+	//加载退出原因
+	if(uo.reasons.length <= 0){
+		//加载退菜原因
+		$.post('../QueryCancelReason.do', function(result){
+			if(result.success){
+				uo.reasons = result.root;
+				uo.loadCancelReasonData(result.root);
+			}
+		});			
+	}
+	
+	if(true){
+		uo.loadDiscountCmp();
+	}
+	
+	//异步刷新账单
+	initOrderData({table : c.table});
+	uo.table = c.table;
+	
+	//设置会员动态popup控件
+	uo.setMemberReadCmp();
+	
+};
 	
 /**
  * 初始化菜单数据，存放在uoFood数组中
@@ -203,7 +233,7 @@ uo.showDescForUpdateOrder = function(){
 	var html = "", memberSpan = "";
 	if(uo.orderMember){
 		if(uo.orderMember.isRaw){
-			memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="text-decoration: underline;cursor: pointer;color:blue" onclick="uo.memberInfoBind()">' + uo.orderMember.name +"(点击绑定)</font></span>";
+			memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="text-decoration: underline;cursor: pointer;color:blue" onclick="ts.member.memberInfoBind(\'loadMemberBind4Checkout\', \''+ uo.orderMember.name +'\')">' + uo.orderMember.name +"(点击绑定)</font></span>";
 		}else{
 			memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="color:green">' + uo.orderMember.name +"</font></span>";
 		}
@@ -232,36 +262,6 @@ uo.getTotalPriceUO = function(){
 		totalPriceUO += uoFood[x].count * (uoFood[x].actualPrice + uoFood[x].tasteGroup.tastePrice) * uoFood[x].discount;
 	}
 	return totalPriceUO;
-};
-
-/**
- * 显示已点菜界面函数
- * @param {object} c  
- */
-uo.show = function(c){
-	
-	//加载退出原因
-	if(uo.reasons.length <= 0){
-		//加载退菜原因
-		$.post('../QueryCancelReason.do', function(result){
-			if(result.success){
-				uo.reasons = result.root;
-				uo.loadCancelReasonData(result.root);
-			}
-		});			
-	}
-	
-	if(true){
-		uo.loadDiscountCmp();
-	}
-	
-	//异步刷新账单
-	initOrderData({table : c.table});
-	uo.table = c.table;
-	
-	//设置会员动态popup控件
-	uo.setMemberReadCmp();
-	
 };
 
 //设置会员动态popup控件
@@ -1301,12 +1301,14 @@ uo.cancelForUO = function(){
 //	}
 };
 
+
+
 /**
- * 打开微信会员资料绑定
+ * 打开微信会员绑定
  */
-uo.memberInfoBind = function(){
+uo.memberInfoBind1 = function(){
 	//渲染完善会员资料窗口
-	$('#finishMemberInfo').trigger('create').trigger('refresh');
+	$('#finishMemberInfo').trigger('create').trigger('refresh');	
 	
 	if(uo.memberInfoBind.typeList){
 		$('#shadowForPopup').show();
@@ -1347,7 +1349,7 @@ uo.memberInfoBind = function(){
 						chargeRate : weixin.chargeRate,
 						name : weixin.name
 					}));
-					$('#fm_comboMemberType').html(html.join("")).selectmenu('refresh');
+					$('#fm_comboMemberType').html(html.join("")).trigger('create').selectmenu('refresh');
 					
 					uo.memberInfoBind.typeList = true;
 					uo.memberInfoBind.firstOption = weixin;
@@ -1378,12 +1380,24 @@ uo.memberInfoBind = function(){
 }
 
 /**
+ * 
+ */
+uo.memberInfoBind = function(id){
+	uo.memberInfoBind.id = id;
+	$('#'+id).load("memberBind.jsp",{memberName:uo.orderMember.name}, function(){
+		$('#finishMemberInfo').trigger('create').trigger('refresh');	
+	});
+}
+
+/**
  * 关闭微信绑定
  */
 uo.closeMemberInfoBind = function(){
 	$('#shadowForPopup').hide();
-	$('#finishMemberInfo').hide();
-	$('#divConfirmMember').hide();	
+//	$('#finishMemberInfo').hide();
+//	$('#divConfirmMember').hide();
+	
+	$('#finishMemberInfo').remove();
 	
 	$('#weixinMemberCertain .ui-btn-text').html('确定');
 	$('#weixinMemberCertain')[0].onclick = uo.readMemberByDetail;

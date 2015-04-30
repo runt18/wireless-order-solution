@@ -281,7 +281,15 @@ function loadOrderBasicMsg(){
 				member4Payment.hadSet = true;
 				
 				member4Display = Util.clone(member4Payment);
-				$('#orderMemberDesc').html('当前会员:<font style="color:green;font-weight:bold;">'+ result.root[0].name + '</font>');
+				
+				var memberSpan = "";
+				if(result.root[0].isRaw){
+					memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="text-decoration: underline;cursor: pointer;color:blue" onclick="ts.member.memberInfoBind(\'loadMemberBind4Payment\', \''+ result.root[0].name +'\')">' + result.root[0].name +"(点击绑定)</font></span>";
+				}else{
+					memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="color:green">' + result.root[0].name +"</font></span>";
+				}
+				
+				$('#orderMemberDesc').html(memberSpan);
 			}
 		});
 	}else{
@@ -1250,7 +1258,7 @@ function closeMemberInfoWin(){
 //改单
 function toCheckoutPage(){
 	location.href = '#orderFoodListMgr';
-	uo.show({
+	uo.entry({
 		table : pm.table
 	});	
 }
