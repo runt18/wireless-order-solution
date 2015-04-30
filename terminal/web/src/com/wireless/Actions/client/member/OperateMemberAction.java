@@ -607,9 +607,11 @@ public class OperateMemberAction extends DispatchAction{
 			
 			int mId = MemberDao.bind(staff, builder);
 			
-			Member member = MemberDao.getById(staff, mId);
-			
-			OrderDao.discount(staff, Order.DiscountBuilder.build4Member(Integer.parseInt(orderId), member));
+			if(orderId != null && !orderId.isEmpty()){
+				Member member = MemberDao.getById(staff, mId);
+				
+				OrderDao.discount(staff, Order.DiscountBuilder.build4Member(Integer.parseInt(orderId), member));
+			}
 			
 			jobject.initTip(true, "微信会员绑定成功");
 		}catch(BusinessException e){
