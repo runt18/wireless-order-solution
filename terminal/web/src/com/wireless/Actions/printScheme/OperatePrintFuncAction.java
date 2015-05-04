@@ -205,6 +205,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 			String depts = request.getParameter("dept");
 			String regions = request.getParameter("regions");
 			int printerId = Integer.parseInt(request.getParameter("printerId"));
+			String funcId = request.getParameter("funcId");
 			int pType = Integer.parseInt(request.getParameter("pType"));
 			
 			String isNeedToAdd = request.getParameter("isNeedToAdd");
@@ -269,7 +270,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) == PType.PRINT_RECEIPT){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId);
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(Integer.parseInt(funcId));
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
@@ -285,7 +286,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				}
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) ==PType.PRINT_TEMP_RECEIPT){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId);
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(Integer.parseInt(funcId));
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
@@ -301,7 +302,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) ==PType.PRINT_TRANSFER_TABLE){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId);
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(Integer.parseInt(funcId));
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
@@ -312,7 +313,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) ==PType.PRINT_ALL_HURRIED_FOOD){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId);
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(Integer.parseInt(funcId));
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
