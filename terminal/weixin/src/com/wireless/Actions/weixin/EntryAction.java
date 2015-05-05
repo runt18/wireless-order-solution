@@ -56,13 +56,11 @@ public class EntryAction extends Action{
 							Token token = Token.newInstance(appId, appSecret);
 							Menu.delete(token);
 							menu.set1stButton(new Button.ClickBuilder("餐厅导航", WeiXinHandleMessage.NAVI_EVENT_KEY).build());
-							menu.set2ndButton(new Button.ClickBuilder("扫码支付", WeiXinHandleMessage.SCAN_EVENT_KEY).build());
+							menu.set2ndButton(new Button.ClickBuilder("优惠活动", WeiXinHandleMessage.PROMOTION_EVENT_KEY).build());
 							
 							menu.set3rdButton(new Button.ClickBuilder("我的", "AAA")
 											.addChild(new Button.ClickBuilder("我的订单", WeiXinHandleMessage.ORDER_EVENT_KEY))
 											.addChild(new Button.ClickBuilder("我的会员卡", WeiXinHandleMessage.MEMBER_EVENT_KEY))
-											.addChild(new Button.ClickBuilder("优惠活动", WeiXinHandleMessage.PROMOTION_EVENT_KEY))
-											//.addChild(new Button.ClickBuilder("我的大转盘", WeiXinHandleMessage.ZHUAN_EVENT_KEY))
 											.build());
 							if(menu.create(token).isOk()){
 								//Record the app id & secret.

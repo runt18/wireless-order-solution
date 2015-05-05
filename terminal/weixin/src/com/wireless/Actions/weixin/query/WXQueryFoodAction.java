@@ -12,6 +12,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -37,11 +38,7 @@ public class WXQueryFoodAction extends DispatchAction{
 			String fid = request.getParameter("fid");
 			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			
-			String extraCond = " AND FOOD.restaurant_id = " + rid, orderClause = " ORDER BY FOOD.food_alias";
-			extraCond += " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
-			extraCond += " AND (FOOD.status & " + Food.RECOMMEND + ") <> 0";
-			extraCond += " AND (FOOD.oss_image_id <> 0) ";
-			List<Food> list = FoodDao.getPureByCond(extraCond, orderClause);
+			List<Food> list = FoodDao.getPureByCond(StaffDao.getAdminByRestaurant(rid), new FoodDao.ExtraCond().setSellout(false).setRecomment(true).setContainsImage(true), " ORDER BY FOOD.food_alias");
 			if(list != null){
 				jobject.setTotalProperty(list.size());
 				list = DataPaging.getPagingData(list, true, 0, 20);
@@ -87,13 +84,9 @@ public class WXQueryFoodAction extends DispatchAction{
 			String kitchenId = request.getParameter("kitchenId");
 			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			
-			String extraCond = " AND FOOD.restaurant_id = " + rid, orderClause = " ORDER BY FOOD.food_alias";
-			extraCond += " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
-			extraCond += " AND (FOOD.oss_image_id <> 0) ";
-			if(kitchenId != null && !kitchenId.trim().isEmpty() && !kitchenId.trim().equals("-1")){
-				extraCond += (" AND KITCHEN.kitchen_id = " + kitchenId);
-			}
-			root = FoodDao.getPureByCond(dbCon, extraCond, orderClause);
+			root = FoodDao.getPureByCond(dbCon, StaffDao.getAdminByRestaurant(dbCon, rid),
+										new FoodDao.ExtraCond().setSellout(false).setContainsImage(true).setKitchen(Integer.parseInt(kitchenId)), 
+										" ORDER BY FOOD.food_alias ");
 			
 		}catch(BusinessException e){
 			e.printStackTrace();

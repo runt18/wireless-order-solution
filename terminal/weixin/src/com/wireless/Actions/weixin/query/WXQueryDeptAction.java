@@ -38,7 +38,7 @@ public class WXQueryDeptAction extends DispatchAction{
 			String fid = request.getParameter("fid");
 			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			
-			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
+			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
 			List<Department> depts = DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL);
 			List<Kitchen> kitchens = KitchenDao.getByType(dbCon, staff, Kitchen.Type.NORMAL);
 			
@@ -88,15 +88,11 @@ public class WXQueryDeptAction extends DispatchAction{
 			String fid = request.getParameter("fid");
 			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			
-			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
+			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
 			
 			List<Kitchen> list = new ArrayList<>(); 
 			
-			String extraCond = " AND FOOD.restaurant_id = " + rid;
-			extraCond += " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
-			extraCond += " AND (FOOD.status & " + Food.RECOMMEND + ") <> 0";
-			extraCond += " AND (FOOD.oss_image_id <> 0) ";
-			List<Food> foods = FoodDao.getPureByCond(extraCond, null);
+			List<Food> foods = FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().setSellout(false).setRecomment(true).setContainsImage(true), null);
 			if(!foods.isEmpty()){
 				Kitchen star = new Kitchen(-10);
 				star.setName("明星菜");
