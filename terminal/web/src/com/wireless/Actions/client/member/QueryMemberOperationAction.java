@@ -22,6 +22,7 @@ import com.wireless.pojo.member.MemberOperation.OperationCate;
 import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 
 public class QueryMemberOperationAction extends Action{
@@ -111,10 +112,10 @@ public class QueryMemberOperationAction extends Action{
 				}
 				jobject.setTotalProperty(MemberOperationDao.getAmountByCond(staff, extraCond));
 				
-				orderClause += " LIMIT " + start + "," + limit;
+//				orderClause += " LIMIT " + start + "," + limit;
 			}
 			
-			final List<MemberOperation> list = MemberOperationDao.getByCond(staff, extraCond, orderClause);
+			List<MemberOperation> list = MemberOperationDao.getByCond(staff, extraCond, orderClause);
 			
 			if(!list.isEmpty()){
 				MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
@@ -140,6 +141,8 @@ public class QueryMemberOperationAction extends Action{
 					sum.setPayMoney(temp.getPayMoney() + sum.getPayMoney());
 					sum.setDeltaPoint(temp.getDeltaPoint() + sum.getDeltaPoint());
 				}
+				
+				list = DataPaging.getPagingData(list, Boolean.parseBoolean(isPaging), start, limit);
 				
 				if(total != null){
 					sum.setMember(list.get(0).getMember());
