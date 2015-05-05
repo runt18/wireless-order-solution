@@ -155,7 +155,7 @@ public class FoodDetailContent extends ConcreteContent {
 		}
 		
 		boolean isWeighConfirm;
-		if(_displayConfig.contains(DisplayItem.WEIGHT) && _of.asFood().isWeigh() && _of.getDelta() < 0 && _of.getCount() - Math.abs(_of.getDelta()) > 0){
+		if(_displayConfig.contains(DisplayItem.WEIGHT) && _of.asFood().isWeight() && _of.getDelta() < 0 && _of.getCount() - Math.abs(_of.getDelta()) > 0){
 			isWeighConfirm = true;
 			detail.append("(≥∆÷ÿ»∑»œ)");
 		}else{

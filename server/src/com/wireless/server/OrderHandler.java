@@ -161,7 +161,7 @@ class OrderHandler implements Runnable{
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_SELL_OUT){
 					//handle query sell out foods request
 					response = new RespPackage(request.header, 
-											   FoodDao.getPureByCond(staff, " AND FOOD.status & " + Food.SELL_OUT + " <> 0 ", null), 
+											   FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().setSellout(true), null), 
 											   Food.FOOD_PARCELABLE_SIMPLE);
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.MAKE_FOOD_SELL_OUT){
