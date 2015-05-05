@@ -166,15 +166,11 @@ public class UpdateOrder {
 	 * @param newOrder
 	 * @return the difference {@link DiffResult} between original order and the new
  	 * @throws BusinessException 
- 	 * 			throws if one of the cases below
- 	 * 			<li>the order to this id does NOT exist
-	 * 	        <li>the order to this id is expired
-	 * 			<li>the table of new order to update is BUSY
+ 	 * 			throws if the remaining to any limit food is insufficient 
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * 
 	 */
-	private static DiffResult doUpdate(DBCon dbCon, Staff staff, DiffResult diffResult, Order.UpdateBuilder builder) throws SQLException{
+	private static DiffResult doUpdate(DBCon dbCon, Staff staff, DiffResult diffResult, Order.UpdateBuilder builder) throws SQLException, BusinessException{
 		
 		String sql;
 		
@@ -269,9 +265,9 @@ public class UpdateOrder {
 				if(newFood.equals(oriFood)){
 					float diff = newFood.getCount() - oriFood.getCount();
 					if(diff > 0){
-						oriFood.setCount(oriFood.getCount());
-						oriFood.addCount(NumericUtil.roundFloat(diff));
-						result.extraFoods.add(oriFood);
+						newFood.setCount(oriFood.getCount());
+						newFood.addCount(NumericUtil.roundFloat(diff));
+						result.extraFoods.add(newFood);
 						
 					}else if(diff < 0){
 						oriFood.setCount(oriFood.getCount());

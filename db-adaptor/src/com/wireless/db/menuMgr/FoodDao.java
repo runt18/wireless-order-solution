@@ -93,12 +93,279 @@ public class FoodDao {
 			return this;
 		}
 		
+		ExtraCond extraCond(){
+			final String sql = " SELECT sub_food_id FROM " + Params.dbName + ".combo WHERE 1 = 1 " + this.toString();
+			return new ExtraCond().setExtra(" FOOD.food_id IN (" + sql + ")");
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
 			extraCond.append(" AND combo.food_id = " + parentId);
 			if(childId > 0){
 				extraCond.append(" AND combo.sub_food_id = " + childId);
+			}
+			return extraCond.toString();
+		}
+	}
+	
+	public static class ExtraCond{
+		private int id;
+		private int restaurantId;
+		private int kitchenId;
+		private int deptId;
+		private String name;
+		private String pinyin;
+		private float price = -1;
+		private int alias = -1;
+		private int special = -1;
+		private int recomment = -1;
+		private int sellout = -1;
+		private int gift = -1;
+		private int curPrice = -1;
+		private int combo = -1;
+		private int hot = -1;
+		private int weight = -1;
+		private int commission = -1;
+		private int temp = -1;
+		private final List<Short> statusList = new ArrayList<Short>();
+		public int containsImage = -1;
+		private String extra;
+		
+		ExtraCond setExtra(String extra){
+			this.extra = extra;
+			return this;
+		}
+		
+		public ExtraCond setContainsImage(boolean onOff){
+			containsImage = onOff ? 1 : 0;
+			return this;
+		}
+		
+		public ExtraCond setPrice(float price){
+			this.price = price;
+			return this;
+		}
+		
+		public ExtraCond setAlias(int alias){
+			this.alias = alias;
+			return this;
+		}
+		
+		public ExtraCond addStatus(Short status){
+			if(!this.statusList.contains(status)){
+				this.statusList.add(status);
+			}
+			return this;
+		}
+		
+		public ExtraCond setTemp(boolean onOff){
+			this.temp = onOff ? 1 : 0;
+			return this;
+		}
+		
+		public ExtraCond setCommisson(boolean onOff){
+			this.commission = onOff ? 1 : 0;
+			return this;
+		}
+		
+		public ExtraCond setWeight(boolean onOff){
+			this.weight = onOff ? 1 : 0;
+			return this;
+		}
+		
+		public ExtraCond setHot(boolean onOff){
+			this.hot = onOff ? 1 : 0;
+			return this;
+		}
+		
+		public ExtraCond setCombo(boolean onOff){
+			this.combo = onOff ? 1 : 0;
+			return this;
+		}
+		
+		public ExtraCond setCurPrice(boolean onOff){
+			this.curPrice = onOff ? 1 : 0;
+			return this;
+		}
+		
+		public ExtraCond setGift(boolean onOff){
+			this.gift = onOff ? 1 : 0;
+			return this;
+		}
+		
+		public ExtraCond setSellout(boolean onOff){
+			this.sellout = onOff ? 1 : 0;
+			return this;
+		}
+		
+		public ExtraCond setRecomment(boolean onOff){
+			this.recomment = onOff ? 1 : 0;
+			return this;
+		}
+		
+		public ExtraCond setSpecial(boolean onOff){
+			this.special = onOff ? 1 : 0;
+			return this;
+		}
+		
+		public ExtraCond setId(int id){
+			this.id = id;
+			return this;
+		}
+		
+		ExtraCond setRestaurant(int restaurantId){
+			this.restaurantId = restaurantId;
+			return this;
+		}
+		
+		public ExtraCond setKitchen(int kitchenId){
+			this.kitchenId = kitchenId;
+			return this;
+		}
+		
+		public ExtraCond setKitchen(Kitchen kitchen){
+			this.kitchenId = kitchen.getId();
+			return this;
+		}
+		
+		public ExtraCond setDepartment(Department dept){
+			this.deptId = dept.getId();
+			return this;
+		}
+		
+		public ExtraCond setDepartment(int deptId){
+			this.deptId = deptId;
+			return this;
+		}
+		
+		public ExtraCond setName(String name){
+			this.name = name;
+			return this;
+		}
+		
+		public ExtraCond setPinyin(String pinyin){
+			this.pinyin = pinyin;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(id != 0){
+				extraCond.append(" AND FOOD.food_id = " + id);
+			}
+			if(alias >= 0){
+				extraCond.append(" AND FOOD.food_alias = " + alias);
+			}
+			if(restaurantId != 0){
+				extraCond.append(" AND FOOD.restaurant_id = " + restaurantId);
+			}
+			if(kitchenId != 0){
+				extraCond.append(" AND FOOD.kitchen_id = " + kitchenId);
+			}
+			if(deptId != 0){
+				extraCond.append(" AND DEPT.dept_id = " + deptId);
+			}
+			if(name != null){
+				extraCond.append(" AND FOOD.name like '%" + name.trim() + "%'");
+			}
+			if(pinyin != null){
+				extraCond.append(" AND FOOD.pinyin like '" + pinyin.trim() + "%'");
+			}
+			if(price >= 0){
+				extraCond.append(" AND FOOD.price = " + price);
+			}
+			if(special >= 0){
+				if(special == 1){
+					extraCond.append(" AND (FOOD.status & " + Food.SPECIAL + " <> 0)");
+				}else{
+					extraCond.append(" AND (FOOD.status & " + Food.SPECIAL + " = 0)");
+				}
+			}
+			if(recomment >= 0){
+				if(recomment == 1){
+					extraCond.append(" AND (FOOD.status & " + Food.RECOMMEND + " <> 0)");
+				}else{
+					extraCond.append(" AND (FOOD.status & " + Food.RECOMMEND + " = 0)");
+				}
+			}
+			if(sellout >= 0){
+				if(sellout == 1){
+					extraCond.append(" AND (FOOD.status & " + Food.SELL_OUT + " <> 0)");
+				}else{
+					extraCond.append(" AND (FOOD.status & " + Food.SELL_OUT + " = 0)");
+				}
+			}
+			if(gift >= 0){
+				if(gift == 1){
+					extraCond.append(" AND (FOOD.status & " + Food.GIFT + " <> 0)");
+				}else{
+					extraCond.append(" AND (FOOD.status & " + Food.GIFT + " = 0)");
+				}
+			}
+			if(curPrice >= 0){
+				if(curPrice == 1){
+					extraCond.append(" AND (FOOD.status & " + Food.CUR_PRICE + " <> 0)");
+				}else{
+					extraCond.append(" AND (FOOD.status & " + Food.CUR_PRICE + " = 0)");
+				}
+			}
+			if(combo >= 0){
+				if(combo == 1){
+					extraCond.append(" AND (FOOD.status & " + Food.COMBO + " <> 0)");
+				}else{
+					extraCond.append(" AND (FOOD.status & " + Food.COMBO + " = 0)");
+				}
+			}
+			if(hot >= 0){
+				if(hot == 0){
+					extraCond.append(" AND (FOOD.status & " + Food.HOT + " <> 0)");
+				}else{
+					extraCond.append(" AND (FOOD.status & " + Food.HOT + " = 0)");
+				}
+			}
+			if(weight >= 0){
+				if(weight == 1){
+					extraCond.append(" AND (FOOD.status & " + Food.WEIGHT + " <> 0)");
+				}else{
+					extraCond.append(" AND (FOOD.status & " + Food.WEIGHT + " = 0)");
+				}
+			}
+			if(commission >= 0){
+				if(commission == 1){
+					extraCond.append(" AND (FOOD.status & " + Food.COMMISSION + " <> 0)");
+				}else{
+					extraCond.append(" AND (FOOD.status & " + Food.COMMISSION + " = 0)");
+				}
+			}
+			if(temp >= 0){
+				if(temp == 1){
+					extraCond.append(" AND (FOOD.status & " + Food.TEMP + " <> 0)");
+				}else{
+					extraCond.append(" AND (FOOD.status & " + Food.TEMP + " = 0)");
+				}
+			}
+			StringBuilder statusCond = new StringBuilder();
+			for(Short status : statusList){
+				if(statusCond.length() == 0){
+					statusCond.append(" (FOOD.status & " + status + " <> 0) ");
+				}else{
+					statusCond.append(" OR (FOOD.status & " + status + " <> 0) ");
+				}
+			}
+			if(statusCond.length() != 0){
+				extraCond.append(" AND " + statusCond.toString());
+			}
+			if(extra != null){
+				extraCond.append(" AND " + extra);
+			}
+			if(containsImage != -1){
+				if(containsImage == 0){
+					extraCond.append(" AND FOOD.oss_image_id = 0 ");
+				}else{
+					extraCond.append(" AND FOOD.oss_image_id <> 0 ");
+				}
 			}
 			return extraCond.toString();
 		}
@@ -185,7 +452,7 @@ public class FoodDao {
 		}
 		
 		sql = " INSERT INTO " + Params.dbName + ".food" +
-			  " (`name`, `food_alias`, `price`, `commission`, `restaurant_id`, `kitchen_id`, `status`, `oss_image_id`, `desc` ) VALUES ( " +
+			  " (`name`, `food_alias`, `price`, `commission`, `restaurant_id`, `kitchen_id`, `status`, `limit_amount`, `oss_image_id`, `desc` ) VALUES ( " +
 			  "'" + f.getName() + "'," +
 			  f.getAliasId() + "," +
 			  f.getPrice() + "," +
@@ -193,6 +460,7 @@ public class FoodDao {
 			  staff.getRestaurantId() + "," +
 			  f.getKitchen().getId() + "," +
 			  f.getStatus() + "," +
+			  (f.isLimit() ? f.getLimitAmount() : "NULL") + "," +
 			  (f.hasImage() ? f.getImage().getId() : "NULL") + "," +
 			  (f.hasDesc() ? "'" + f.getDesc() + "'" : "NULL") + 
 			  ")";
@@ -393,43 +661,60 @@ public class FoodDao {
 		}
 		
 		//Compare the original status against the new and set the status bit if changed.
-		sql = " SELECT status FROM " + Params.dbName + ".food WHERE food_id = " + f.getFoodId();
+		sql = " SELECT status, limit_amount FROM " + Params.dbName + ".food WHERE food_id = " + f.getFoodId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			f.setStatus(dbCon.rs.getInt("status"));
+			f.setLimitAmount(dbCon.rs.getInt("limit_amount"));
 		}else{
 			throw new BusinessException(FoodError.FOOD_NOT_EXIST);
 		}
 		dbCon.rs.close();
 		
+		Food food4Status = builder.build();
 		if(builder.isCurPriceChanged()){
-			f.setCurPrice(builder.isCurPrice());
+			f.setCurPrice(food4Status.isCurPrice());
 		}
 		if(builder.isGiftChanged()){
-			f.setGift(builder.isGift());
+			f.setGift(food4Status.isGift());
 		}
 		if(builder.isSelloutChanged()){
-			f.setSellOut(builder.isSellout());
+			f.setSellOut(food4Status.isSellOut());
 		}
 		if(builder.isRecommendChanged()){
-			f.setRecommend(builder.isRecommend());
+			f.setRecommend(food4Status.isRecommend());
 		}
 		if(builder.isSpecialChanged()){
-			f.setSpecial(builder.isSpecial());
+			f.setSpecial(food4Status.isSpecial());
 		}
 		if(builder.isHotChanged()){
-			f.setHot(builder.isHot());
+			f.setHot(food4Status.isHot());
 		}
 		if(builder.isWeightChanged()){
-			f.setWeigh(builder.isWeight());
+			f.setWeigh(food4Status.isWeight());
 		}
 		if(builder.isCommissionChanged()){
-			f.setCommission(builder.isCommission());
+			f.setCommission(food4Status.isCommission());
 		}
 		if(builder.isComboChanged()){
-			f.setCombo(builder.isCombo());
+			f.setCombo(food4Status.isCombo());
+		}
+		if(builder.isLimitChanged()){
+			f.setLimit(food4Status.isLimit());
+			if(food4Status.isLimit()){
+				f.setLimitAmount(food4Status.getLimitAmount());
+			}
 		}
 		f.setTemp(false);
+		
+		if(builder.isLimitRemaingChanged()){
+			if(!f.isLimit()){
+				throw new BusinessException("你操作的菜品不是限量估清菜品");
+			}
+			if(f.getLimitRemaing() > f.getLimitAmount()){
+				throw new BusinessException("限量估清的剩余数量不能大于限量数");
+			}
+		}
 		
 		//Update the oss image.
 		if(builder.isImageChanged()){
@@ -489,6 +774,8 @@ public class FoodDao {
 		sql = " UPDATE " + Params.dbName + ".food SET " +
 			  " food_id = " + f.getFoodId() +
 			  " ,status = " + f.getStatus() +
+			  (builder.isLimitChanged() ? ",limit_amount = " + (f.isLimit() ? f.getLimitAmount() : "NULL") : "") +
+			  (builder.isLimitRemaingChanged() ? ",limit_remaing = " + f.getLimitRemaing() : "") +
 			  (builder.isAliasChanged() ? ",food_alias = " + f.getAliasId() : "") +
 			  (builder.isNameChanged() ? ",name = '" + f.getName() + "'" : "") +
 			  (builder.isKitchenChanged() ? ",kitchen_id = " + f.getKitchen().getId() : "") +
@@ -595,7 +882,7 @@ public class FoodDao {
 	 * 			throws if the food to specified restaurant and id is NOT found
 	 */	
 	public static Food getById(DBCon dbCon, Staff staff, int foodId) throws SQLException, BusinessException{
-		List<Food> result = FoodDao.getByCond(dbCon, staff, " AND FOOD.food_id = " + foodId, null);
+		List<Food> result = FoodDao.getByCond(dbCon, staff, new ExtraCond().setId(foodId), null);
 		if(result.isEmpty()){
 			throw new BusinessException(FoodError.FOOD_NOT_EXIST);
 		}else{
@@ -654,7 +941,7 @@ public class FoodDao {
 
 		sql = " SELECT sub_food_id FROM " + Params.dbName + ".combo WHERE 1 = 1 " + extraCond;
 		
-		for(Food subFood : getPureByCond(dbCon, staff, " AND FOOD.food_id IN (" + sql + ")", null)){
+		for(Food subFood : getPureByCond(dbCon, staff, extraCond.extraCond(), null)){
 			
 			sql = " SELECT amount FROM " + Params.dbName + ".combo WHERE food_id = " + extraCond.parentId + " AND sub_food_id = " + subFood.getFoodId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -707,13 +994,13 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static List<Food> getPureByCond(DBCon dbCon, String extraCondition, String orderClause) throws SQLException{
+	public static List<Food> getPureByCond(DBCon dbCon, ExtraCond extraCondition, String orderClause) throws SQLException{
 		List<Food> foods = new ArrayList<Food>();
 	    //get all the food information to this restaurant
 		String sql = " SELECT " +
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 					 " FOOD.name, FOOD.price, FOOD.commission, FOOD.status, FOOD.desc, " +
-					 " FOOD.order_amount, " +
+					 " FOOD.order_amount, FOOD.limit_amount, FOOD.limit_remaing, " +
 					 " KITCHEN.kitchen_id, KITCHEN.display_id AS kitchen_display_id, KITCHEN.name AS kitchen_name, " +
 					 " KITCHEN.type AS kitchen_type , KITCHEN.is_allow_temp AS is_allow_temp, " +
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, DEPT.display_id AS dept_display_id, " +
@@ -725,7 +1012,7 @@ public class FoodDao {
 					 " LEFT JOIN " + Params.dbName + ".oss_image OI ON FOOD.oss_image_id = OI.oss_image_id " +
 					 " LEFT JOIN " + Params.dbName + ".oss_image TOI ON OI.oss_thumbnail_id = TOI.oss_image_id " +
 					 " WHERE 1 = 1 " +
-					 (extraCondition == null ? "" : extraCondition) + " " +
+					 (extraCondition == null ? "" : extraCondition.toString()) + " " +
 					 (orderClause == null ? "" : orderClause); 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
@@ -746,6 +1033,8 @@ public class FoodDao {
 			f.setCommission(dbCon.rs.getFloat("commission"));
 			f.setStatistics(new FoodStatistics(dbCon.rs.getInt("order_amount")));
 			f.setStatus(dbCon.rs.getShort("status"));
+			f.setLimitAmount(dbCon.rs.getInt("limit_amount"));
+			f.setLimitRemaing(dbCon.rs.getInt("limit_remaing"));
 			f.setDesc(dbCon.rs.getString("desc"));
 			int ossImageId = dbCon.rs.getInt("oss_image_id");
 			if(ossImageId != 0){
@@ -793,7 +1082,7 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static List<Food> getPureByCond(String extraCond, String orderClause) throws SQLException{
+	public static List<Food> getPureByCond(ExtraCond extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -817,8 +1106,8 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static List<Food> getPureByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
-		return getPureByCond(dbCon, " AND FOOD.restaurant_id = " + staff.getRestaurantId() + " " + (extraCond != null ? extraCond : ""), orderClause);
+	public static List<Food> getPureByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+		return getPureByCond(dbCon, extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()) : new ExtraCond().setRestaurant(staff.getRestaurantId()), orderClause);
 	}
 
 	/**
@@ -833,7 +1122,7 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static List<Food> getPureByCond(Staff staff, String extraCond, String orderClause) throws SQLException{
+	public static List<Food> getPureByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -891,7 +1180,7 @@ public class FoodDao {
 	 * 			
 	 */
 	public static Food getPureById(DBCon dbCon, Staff staff, int foodId) throws SQLException, BusinessException{
-		List<Food> result = getPureByCond(dbCon, staff, " AND FOOD.food_id = " + foodId, null);
+		List<Food> result = getPureByCond(dbCon, staff, new ExtraCond().setId(foodId), null);
 		if(!result.isEmpty()){
 			return result.get(0);
 		}else{
@@ -955,7 +1244,7 @@ public class FoodDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Food> getPureByDept(DBCon dbCon, Staff staff, DeptId deptId) throws SQLException{
-		return getPureByCond(dbCon, staff, " AND DEPT.dept_id = " + deptId.getVal() + " AND DEPT.restaurant_id = " + staff.getRestaurantId(), null);
+		return getPureByCond(dbCon, staff, new ExtraCond().setDepartment(deptId.getVal()), null);
 	}
 	
 	/**
@@ -991,7 +1280,7 @@ public class FoodDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Food> getPureByKitchen(DBCon dbCon, Staff staff, int kitchenId) throws SQLException{
-		return getPureByCond(dbCon, staff, " AND KITCHEN.kitchen_id = " + kitchenId, null);
+		return getPureByCond(dbCon, staff, new ExtraCond().setKitchen(kitchenId), null);
 	}
 	
 	/**
@@ -1027,11 +1316,11 @@ public class FoodDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Food> getPureByName(DBCon dbCon, Staff staff, String name) throws SQLException{
-		return getPureByCond(dbCon, staff, " AND FOOD.name LIKE %" + name + "%", null);
+		return getPureByCond(dbCon, staff, new ExtraCond().setName(name), null);
 	}
 	
 	/**
-	 * Get the food and its related information to the specified restaurant defined in staff {@link Staff} as below.
+	 * Get the food and its related information according to extra condition {@link ExtraCond} as below.
 	 * 1 - Popular taste to each food
 	 * 2 - Child food details to the food in case of combo
 	 * @param dbCon
@@ -1046,7 +1335,7 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */			
-	public static List<Food> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	public static List<Food> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 
 		//Using link hash map to keep original order after retrieving the foods by order clause defined in SQL statement.
 		Map<Integer, Food> foods = new LinkedHashMap<Integer, Food>();
@@ -1132,7 +1421,7 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */	
-	public static List<Food> getByCond(Staff staff, String extraCond, String orderClause) throws SQLException{
+	public static List<Food> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

@@ -1237,6 +1237,10 @@ public class MemberDao {
 			//Delete the weixin member associated with this member.
 			//WeixinMemberDao.deleteByCond(dbCon, staff, new WeixinMemberDao.ExtraCond().setMember(member));
 			
+			//Unbound the weixin member id
+			sql = " UPDATE " + Params.dbName + ".weixin_member SET member_id = 0 WHERE member_id = " + member.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
 			//Delete the member
 			sql = " DELETE FROM " + Params.dbName + ".member WHERE member_id = " + member.getId();
 			dbCon.stmt.executeUpdate(sql);
@@ -2112,6 +2116,7 @@ public class MemberDao {
 		if(dest.getMemberType().getId() != 0){
 			updateBuilder.setMemberType(dest.getMemberType().getId());
 		}
+		updateBuilder.setSex(dest.getSex());
 		update(dbCon, staff, updateBuilder);
 		
 		return destMemberId;

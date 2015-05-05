@@ -179,8 +179,10 @@ public class InsertOrder {
 	 * 			the order along with basic insert parameters
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
+	 * @throws BusinessException 
+	 * 			throws if the remaining to any limit food is insufficient 
 	 */
-	private static void doInsert(DBCon dbCon, Staff staff, Order orderToInsert) throws SQLException{
+	private static void doInsert(DBCon dbCon, Staff staff, Order orderToInsert) throws SQLException, BusinessException{
 
 		String sql; 
 

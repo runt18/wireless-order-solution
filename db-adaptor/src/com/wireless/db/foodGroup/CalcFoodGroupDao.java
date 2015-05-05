@@ -57,11 +57,7 @@ public class CalcFoodGroupDao {
 		List<Pager> pagers = new ArrayList<Pager>();
 		for(Department dept : depts){
 			//Get the foods to this department.
-			List<Food> foods = FoodDao.getPureByCond(dbCon, term, 
-														   " AND DEPT.dept_id = " + dept.getId() +
-														   " AND FOOD.img IS NOT NULL " + 
-														   " AND FOOD.status & " + Food.SELL_OUT + " = 0 ", 
-													null);
+			List<Food> foods = FoodDao.getPureByCond(dbCon, term, new FoodDao.ExtraCond().setDepartment(dept).setSellout(false).setContainsImage(true),	null);
 			pagers.addAll(divideFoodsInfoPager(foods));
 		}
 		

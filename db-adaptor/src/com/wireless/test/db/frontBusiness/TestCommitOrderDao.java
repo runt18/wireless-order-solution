@@ -37,6 +37,7 @@ import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.regionMgr.Table.Category;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.SortedList;
 import com.wireless.test.db.TestInit;
@@ -200,7 +201,7 @@ public class TestCommitOrderDao {
 	public void testCommit() throws BusinessException, SQLException{
 		
 		int orderId = 0;
-		final List<Table> idleTables = TableDao.getByCond(mStaff, new TableDao.ExtraCond().setStatus(Table.Status.IDLE), null);
+		final List<Table> idleTables = TableDao.getByCond(mStaff, new TableDao.ExtraCond().setStatus(Table.Status.IDLE).addCategory(Category.NORMAL), null);
 		//final List<Table> busyTables = TableDao.getByCond(mStaff, new TableDao.ExtraCond().setStatus(Table.Status.BUSY), null);
 		
 		try{

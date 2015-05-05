@@ -45,7 +45,7 @@ public class TestFoodDao {
 				OssImage.Params.instance().getOssParam().ACCESS_OSS_ID, 
 				OssImage.Params.instance().getOssParam().ACCESS_OSS_KEY);
 		try {
-			mStaff = StaffDao.getAdminByRestaurant(26);
+			mStaff = StaffDao.getAdminByRestaurant(40);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -116,8 +116,8 @@ public class TestFoodDao {
 			Food.InsertBuilder insertBuilder = new Food.InsertBuilder("测试菜品", 15.4f, KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(0))
 													   .setImage(ossImageId)
 													   .addPrice(planId, 4)
-													   .setAliasId(200).setDesc("测试描述")
-													   .setHot(true).setCommission(2.0f).setGift(true).setWeigh(false)
+													   .setAliasId(65500).setDesc("测试描述")
+													   .setHot(true).setCommission(2.0f).setGift(true).setWeigh(false).setLimit(true, 10)
 													   .addUnit(2.5f, "半只");
 			foodId = FoodDao.insert(mStaff, insertBuilder); 
 			
@@ -149,7 +149,7 @@ public class TestFoodDao {
 													   .setPrice(34.2f).setDesc("测试修改描述")
 													   .addPrice(planId, 5)
 													   .setHot(false).setCommission(3).setSellOut(true).setRecommend(true)
-													   .setGift(false).setWeigh(true)
+													   .setGift(false).setWeigh(true).setLimit(true, 5).setLimitRemaining(5)
 													   .addUnit(3f, "份");
 			FoodDao.update(mStaff, updateBuilder);
 			
@@ -242,9 +242,11 @@ public class TestFoodDao {
 		Assert.assertEquals("recommend : " + tag, expected.isRecommend(), actual.isRecommend());
 		Assert.assertEquals("sell out : " + tag, expected.isSellOut(), actual.isSellOut());
 		Assert.assertEquals("special : " + tag, expected.isSpecial(), actual.isSpecial());
-		Assert.assertEquals("weight : " + tag, expected.isWeigh(), actual.isWeigh());
+		Assert.assertEquals("weight : " + tag, expected.isWeight(), actual.isWeight());
 		Assert.assertEquals("hot : " + tag, expected.isHot(), actual.isHot());
 		Assert.assertEquals("gift : " + tag, expected.isGift(), actual.isGift());
+		Assert.assertEquals("limit : " + tag, expected.isLimit(), actual.isLimit());
+		Assert.assertEquals("limit amount : " + tag, expected.getLimitAmount(), actual.getLimitAmount());
 		Assert.assertEquals("commission : " + tag, expected.getCommission(), actual.getCommission(), 0.01);
 		//------- the content to associated food units --------
 		for(int i = 0; i < expected.getFoodUnits().size(); i++){

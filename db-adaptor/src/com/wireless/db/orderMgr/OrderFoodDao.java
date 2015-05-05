@@ -22,6 +22,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood.Operation;
 import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
@@ -408,7 +409,7 @@ public class OrderFoodDao {
 			  " ORDER BY id ASC ";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		List<OrderFood> result = new ArrayList<OrderFood>();
+		final List<OrderFood> result = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood of = new OrderFood(dbCon.rs.getLong("id"));
 			of.asFood().setFoodId(dbCon.rs.getInt("food_id"));
@@ -485,7 +486,20 @@ public class OrderFoodDao {
 		}
 	}
 	
-	static void insertExtra(DBCon dbCon, Staff staff, ExtraBuilder builder) throws SQLException{
+	/**
+	 * Insert the extra order food according to builder {@link ExtraBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the extra builder {@link ExtraBuilder}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the remaining to limit food is insufficient 
+	 */
+	static void insertExtra(DBCon dbCon, Staff staff, ExtraBuilder builder) throws SQLException, BusinessException{
 		/**
 		 * Insert the taste group info if containing taste.
 		 */
@@ -544,6 +558,24 @@ public class OrderFoodDao {
 			  (comboId != 0 ? comboId : "NULL") +
 			  " ) ";
 		dbCon.stmt.executeUpdate(sql);	
+		
+		//Calculate the limit remaining.
+		if(builder.extra.asFood().isLimit()){
+			int limitRemaining = Math.round(builder.extra.asFood().getLimitRemaing() - Math.abs(builder.extra.getDelta()));
+			Food.UpdateBuilder updateBuilder = new Food.UpdateBuilder(builder.extra.asFood().getFoodId());
+			if(limitRemaining < 0){
+				throw new BusinessException("【" + builder.extra.asFood().getName() + "】的点菜数量超过设定的限量数量");
+				
+			}else if(limitRemaining == 0){
+				//Having the food to be sold out if the limit remaining reaches zero.
+				updateBuilder.setSellOut(true);
+			}
+			try{
+				FoodDao.update(dbCon, staff, updateBuilder.setLimitRemaining(limitRemaining));
+			} catch (BusinessException ignored) {
+				ignored.printStackTrace();
+			}
+		}
 		
 		//FIXME Insert the temporary food to menu.
 //		if(builder.extra.isTemp()){
@@ -619,6 +651,18 @@ public class OrderFoodDao {
 			  (builder.cancel.isGift() ? 1 : 0 ) +
 			 " ) ";
 		dbCon.stmt.executeUpdate(sql);	
+		
+		//Add and update the food to be on sale.
+		if(builder.cancel.asFood().isLimit()){
+			try {
+				builder.cancel.asFood().copyFrom(FoodDao.getById(dbCon, staff, builder.cancel.getFoodId()));
+				int limitRemaining = Math.round(builder.cancel.asFood().getLimitRemaing() + Math.abs(builder.cancel.getDelta()));
+				limitRemaining = limitRemaining > builder.cancel.asFood().getLimitAmount() ? builder.cancel.asFood().getLimitAmount() : limitRemaining;
+				FoodDao.update(dbCon, staff, new Food.UpdateBuilder(builder.cancel.asFood().getFoodId()).setLimitRemaining(limitRemaining).setSellOut(false));
+			} catch (BusinessException ignored) {
+				ignored.printStackTrace();
+			}
+		}
 	}
 	
 	/**
