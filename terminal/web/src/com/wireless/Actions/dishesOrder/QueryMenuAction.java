@@ -81,7 +81,7 @@ public class QueryMenuAction extends DispatchAction {
 		String pinyin = request.getParameter("pinyin");
 		try {
 			String pin = (String)request.getAttribute("pin");
-			String cond = "";
+			FoodDao.ExtraCond cond = new FoodDao.ExtraCond();
 			String orderBy = null;
 			
 			orderBy = " ORDER BY FOOD.food_alias";
@@ -91,13 +91,13 @@ public class QueryMenuAction extends DispatchAction {
 			
 			
 			if(kitchenAlias != null && !kitchenAlias.trim().isEmpty() && !kitchenAlias.equals("-1")){
-				cond += (" AND FOOD.kitchen_id = " + kitchenAlias);
+				cond.setKitchen(Integer.parseInt(kitchenAlias));
 			}
 			if(foodName != null && !foodName.trim().isEmpty()){
-				cond += (" AND FOOD.name like '%" + foodName.trim() + "%'");
+				cond.setName(foodName);
 			}
 			if(foodAlias != null && !foodAlias.trim().isEmpty()){
-				cond += (" AND FOOD.food_alias like '" + foodAlias.trim() + "%'");
+				cond.setAlias(Integer.parseInt(foodAlias));
 			}
 			root = new FoodList(FoodDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), cond, orderBy), Food.BY_ALIAS);
 
@@ -272,8 +272,7 @@ public class QueryMenuAction extends DispatchAction {
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String extraCond = " AND (FOOD.status & " + Food.SELL_OUT + ") <> 0";
-			root = FoodDao.getPureByCond(staff, extraCond, null);
+			root = FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().setSellout(true), null);
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -305,8 +304,7 @@ public class QueryMenuAction extends DispatchAction {
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String extraCond = " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
-			root = FoodDao.getPureByCond(staff, extraCond, null);
+			root = FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().setSellout(false), null);
 			
 		}catch(Exception e){
 			e.printStackTrace();
