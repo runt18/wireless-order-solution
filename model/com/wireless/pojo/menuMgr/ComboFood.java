@@ -106,16 +106,50 @@ public class ComboFood implements Parcelable, Jsonable{
 		
 	};
 
+	public final static int COMBO_FOOD_JSONABLE_COMPLEX = 0;
+	public final static int COMBO_FOOD_JSONABLE_SIMPLE = 1;
+	
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
-		jm.putJsonable(food, Food.FOOD_JSONABLE_COMPLEX);
+		if(flag == COMBO_FOOD_JSONABLE_COMPLEX){
+			jm.putJsonable(food, Food.FOOD_JSONABLE_COMPLEX);
+		}else if(flag == COMBO_FOOD_JSONABLE_SIMPLE){
+			jm.putJsonable(food, Food.FOOD_JSONABLE_SIMPLE);
+		}
 		jm.putInt(Food.Key4Json.COMBO_AMOUNT.key, amount);
 		return jm;
 	}
 
-	@Override
-	public void fromJsonMap(JsonMap jsonMap, int flag) {
+	public static enum Key4Json{
+		COMBO_FOOD_ID("comboFoodId", "子菜编号"),
+		COMBO_FOOD_AMOUNT("comboFoodAmount", "子菜数量");
+		
+		Key4Json(String key, String desc){
+			this.key = key;
+			this.desc = desc;
+		}
+		
+		private final String key;
+		private final String desc;
+		
+		@Override
+		public String toString(){
+			return "key = " + key + ",desc = " + desc;
+		}
 		
 	}
+	
+	@Override
+	public void fromJsonMap(JsonMap jm, int flag) {
+		this.food = new Food(jm.getInt(Key4Json.COMBO_FOOD_ID.key));
+		this.amount = jm.getInt(Key4Json.COMBO_FOOD_AMOUNT.key);
+	}
+	
+	public static Jsonable.Creator<ComboFood> JSON_CREATOR = new Jsonable.Creator<ComboFood>() {
+		@Override
+		public ComboFood newInstance() {
+			return new ComboFood();
+		}
+	};
 }

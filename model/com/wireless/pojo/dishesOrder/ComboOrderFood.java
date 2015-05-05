@@ -1,11 +1,13 @@
 package com.wireless.pojo.dishesOrder;
 
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.tasteMgr.Taste;
 
-public class ComboOrderFood implements Parcelable {
+public class ComboOrderFood implements Parcelable, Jsonable {
 	
 	//private int comboId;
 	private ComboFood comboFood;
@@ -139,6 +141,47 @@ public class ComboOrderFood implements Parcelable {
 			return new ComboOrderFood[size];
 		}
 		
+		@Override
+		public ComboOrderFood newInstance() {
+			return new ComboOrderFood();
+		}
+	};
+
+	public static enum Key4Json{
+		COMBO_FOOD("comboFood", "子菜"),
+		COMBO_FOOD_TASTE_GROUP("comboFoodTaste", "子菜口味");
+		
+		Key4Json(String key, String desc){
+			this.key = key;
+			this.desc = desc;
+		}
+		
+		private final String key;
+		private final String desc;
+		
+		@Override
+		public String toString(){
+			return "key = " + key + ",desc = " + desc;
+		}
+	}
+	
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putJsonable(Key4Json.COMBO_FOOD.key, this.comboFood, ComboFood.COMBO_FOOD_JSONABLE_COMPLEX);
+		jm.putJsonable(Key4Json.COMBO_FOOD_TASTE_GROUP.key, this.tasteGroup, TasteGroup.TG_JSONABLE_4_COMMIT);
+		return null;
+	}
+	
+	@Override
+	public void fromJsonMap(JsonMap jm, int flag) {
+		this.comboFood = jm.getJsonable(Key4Json.COMBO_FOOD.key, ComboFood.JSON_CREATOR, ComboFood.COMBO_FOOD_JSONABLE_SIMPLE);
+		if(jm.containsKey(Key4Json.COMBO_FOOD_TASTE_GROUP)){
+			setTasteGroup(jm.getJsonable(Key4Json.COMBO_FOOD_TASTE_GROUP.key, TasteGroup.JSON_CREATOR, TasteGroup.TG_JSONABLE_4_COMMIT));
+		}
+	}
+	
+	public static Jsonable.Creator<ComboOrderFood> JSON_CREATOR = new Jsonable.Creator<ComboOrderFood>() {
 		@Override
 		public ComboOrderFood newInstance() {
 			return new ComboOrderFood();

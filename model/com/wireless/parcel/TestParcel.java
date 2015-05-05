@@ -110,7 +110,7 @@ public class TestParcel {
 		assertEquals("gift flag to food", foodToParcel.isGift(), parcelableFood.isGift());
 		assertEquals("recommend flag to food", foodToParcel.isRecommend(), parcelableFood.isRecommend());
 		assertEquals("sell out flag to food", foodToParcel.isSellOut(), parcelableFood.isSellOut());
-		assertEquals("weight flag to food", foodToParcel.isWeigh(), parcelableFood.isWeigh());
+		assertEquals("weight flag to food", foodToParcel.isWeight(), parcelableFood.isWeight());
 		
 		// Check the name to food
 		assertEquals("food name", foodToParcel.getName(), parcelableFood.getName());

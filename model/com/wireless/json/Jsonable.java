@@ -17,10 +17,10 @@ public interface Jsonable {
 	
 	/**
 	 * Create the object from key-value map.
-	 * @param jsonMap the key-value map to create object {@link JsonMap}
+	 * @param jm the key-value map to create object {@link JsonMap}
 	 * @param flag additional flags about how the object should be created
 	 */
-	public void fromJsonMap(JsonMap jsonMap, int flag);
+	public void fromJsonMap(JsonMap jm, int flag);
 	
     /**
      * Interface that must be implemented and provided as a public CREATOR

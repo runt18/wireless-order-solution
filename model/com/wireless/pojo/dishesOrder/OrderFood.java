@@ -134,6 +134,13 @@ public class OrderFood implements Parcelable, Jsonable {
 		this.mOperation = operation;
 	}
 	
+	public void setCombo(List<ComboOrderFood> comboFoods){
+		if(comboFoods != null){
+			mCombo.clear();
+			mCombo.addAll(comboFoods);
+		}
+	}
+	
 	public void addCombo(ComboOrderFood comboFood){
 		if(mCombo == null){
 			mCombo = new ArrayList<ComboOrderFood>();
@@ -302,7 +309,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	 * @return the unit price to this order food
 	 */
 	private float getUnitPrice(){
-		return NumericUtil.roundFloat(getFoodPrice() + (!hasTasteGroup() || mFood.isWeigh() ? 0 : mTasteGroup.getPrice()));
+		return NumericUtil.roundFloat(getFoodPrice() + (!hasTasteGroup() || mFood.isWeight() ? 0 : mTasteGroup.getPrice()));
 	}
 	
 	/**
@@ -335,7 +342,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	 * @return the total price to this food before discount
 	 */
 	private float getPriceBeforeDiscount(float count){
-		if(mFood.isWeigh()){
+		if(mFood.isWeight()){
 			return NumericUtil.roundFloat(getUnitPrice() * count + (hasTasteGroup() ? mTasteGroup.getPrice() : 0));			
 		}else{
 			return NumericUtil.roundFloat(getUnitPrice() * count);	
@@ -857,8 +864,10 @@ public class OrderFood implements Parcelable, Jsonable {
 	};
 
 	public static enum Key4Json{
+		ORDER_FOOD_ID("orderFoodId", ""),
 		ORDER_ID("orderId", "账单id"),
 		ORDER_DATE("orderDateFormat", "账单日期"),
+		FOOD_NAME("foodName", "菜品名称"),
 		WAITER("waiter", "服务员"),
 		CANCEL_REASON("cancelReason", "退菜原因"),
 		IS_TEMP("isTemporary", "是否临时菜"),
@@ -873,7 +882,8 @@ public class OrderFood implements Parcelable, Jsonable {
 		DISCOUNT("discount", "折扣"),
 		COUNT("count", "数量"),
 		UNIT_PRICE("unitPrice", "单价"),
-		FOOD_UNIT("foodUnit", ""),
+		FOOD_UNIT("foodUnit", "菜品单位"),
+		COMBO("combo", "套菜"),
 		ACTUAL_PRICE("actualPrice", "实收"),
 		TOTAL_PRICE("totalPrice", "应收"),
 		TASTE_GROUP("tasteGroup", "口味"),
@@ -900,9 +910,9 @@ public class OrderFood implements Parcelable, Jsonable {
 		JsonMap jm = new JsonMap();
 		// extends food
 		jm.putJsonable(this.mFood, 0);
-		jm.putLong("orderFoodId", this.id);
+		jm.putLong(Key4Json.ORDER_FOOD_ID.key, this.id);
 		jm.putInt(Key4Json.ORDER_ID.key, this.mOrderId);
-		jm.putString("foodName", this.getName());
+		jm.putString(Key4Json.FOOD_NAME.key, this.getName());
 		jm.putString(Key4Json.ORDER_DATE.key, DateUtil.format(this.mOrderDate));
 		jm.putString(Key4Json.WAITER.key, this.mWaiter);
 		jm.putJsonable(Key4Json.CANCEL_REASON.key, this.mCancelReason, 0);
@@ -921,6 +931,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		jm.putFloat(Key4Json.ACTUAL_PRICE.key, this.asFood().getPrice());
 		jm.putFloat(Key4Json.TOTAL_PRICE.key, this.calcPrice());
 		jm.putJsonable(Key4Json.TASTE_GROUP.key, this.getTasteGroup(), 0);
+		jm.putJsonableList(Key4Json.COMBO.key, this.mCombo, 0);
 		jm.putString(Key4Json.OPERATION.key, this.getOperation() != null? this.getOperation().getDesc() : "点菜");
 		jm.putInt("operationValue", this.getOperation() != null? this.getOperation().getVal() : -1);
 		jm.putFloat(Key4Json.TOTAL_PRICE_BEFORE_DISCOUNT.key, this.calcPriceBeforeDiscount());
@@ -931,66 +942,71 @@ public class OrderFood implements Parcelable, Jsonable {
 	public final static int OF_JSONABLE_4_COMMIT = 0; 
 	
 	@Override
-	public void fromJsonMap(JsonMap jsonMap, int flag) {
+	public void fromJsonMap(JsonMap jm, int flag) {
 		if(flag == OF_JSONABLE_4_COMMIT){
-			if(jsonMap.getBoolean(Key4Json.IS_TEMP.key)){
+			if(jm.getBoolean(Key4Json.IS_TEMP.key)){
 				setTemp(true);
 				//name to temporary...must
-				if(jsonMap.containsKey(Food.Key4Json.FOOD_NAME.key)){
-					mFood.setName(jsonMap.getString(Food.Key4Json.FOOD_NAME.key));
+				if(jm.containsKey(Food.Key4Json.FOOD_NAME.key)){
+					mFood.setName(jm.getString(Food.Key4Json.FOOD_NAME.key));
 				}else{
 					throw new IllegalStateException("提交的临时菜数据缺少(" + Food.Key4Json.FOOD_NAME.toString() + ")");
 				}
 				//price to temporary...must
-				if(jsonMap.containsKey(Food.Key4Json.FOOD_PRICE.key)){
-					mFood.setPrice(jsonMap.getFloat(Food.Key4Json.FOOD_PRICE.key));
+				if(jm.containsKey(Food.Key4Json.FOOD_PRICE.key)){
+					mFood.setPrice(jm.getFloat(Food.Key4Json.FOOD_PRICE.key));
 				}else{
 					throw new IllegalStateException("提交的临时菜数据缺少(" + Food.Key4Json.FOOD_PRICE.toString() + ")");
 				}
 				//kitchen to temporary...must
-				mFood.setKitchen(jsonMap.getJsonable(Food.Key4Json.ASSOCIATED_KITCHEN.key, Kitchen.JSON_CREATOR, Kitchen.KITCHEN_JSONABLE_SIMPLE));
+				mFood.setKitchen(jm.getJsonable(Food.Key4Json.ASSOCIATED_KITCHEN.key, Kitchen.JSON_CREATOR, Kitchen.KITCHEN_JSONABLE_SIMPLE));
 			}else{
 				setTemp(false);
 				//food id...must
-				if(jsonMap.containsKey(Food.Key4Json.FOOD_ID.key)){
-					mFood.setFoodId(jsonMap.getInt(Food.Key4Json.FOOD_ID.key));
+				if(jm.containsKey(Food.Key4Json.FOOD_ID.key)){
+					mFood.setFoodId(jm.getInt(Food.Key4Json.FOOD_ID.key));
 				}else{
 					throw new IllegalStateException("提交的数据缺少(" + Food.Key4Json.FOOD_ID.toString() + ")");
 				}
 			}
 
-			if(jsonMap.containsKey(Key4Json.COUNT.key)){
-				setCount(jsonMap.getFloat(Key4Json.COUNT.key));
+			if(jm.containsKey(Key4Json.COUNT.key)){
+				setCount(jm.getFloat(Key4Json.COUNT.key));
 			}else{
 				throw new IllegalStateException("提交的数据缺少(" + Key4Json.COUNT.toString() + ")");
 			}
-			
-			if(jsonMap.containsKey(Key4Json.IS_HANG.key)){
-				setHangup(jsonMap.getBoolean(Key4Json.IS_HANG.key));
+			//套菜
+			if(jm.containsKey(Key4Json.COMBO.key)){
+				//TODO
+				setCombo(jm.getJsonableList(Key4Json.COMBO.key, ComboOrderFood.JSON_CREATOR, 0));
 			}
-			
+			//是否叫起
+			if(jm.containsKey(Key4Json.IS_HANG.key)){
+				setHangup(jm.getBoolean(Key4Json.IS_HANG.key));
+			}
 			//时价
-			if(jsonMap.containsKey(Key4Json.IS_CURRPRICE.key)){
-				setFoodUnit(FoodUnit.newInstance4CurPrice(jsonMap.getFloat(Key4Json.UNIT_PRICE.key)));
-			}else if(jsonMap.containsKey(Key4Json.FOOD_UNIT.key)){//多单位
-				setFoodUnit(jsonMap.getJsonable(Key4Json.FOOD_UNIT.key, FoodUnit.JSON_CREATOR, flag));
+			if(jm.containsKey(Key4Json.IS_CURRPRICE.key)){
+				setFoodUnit(FoodUnit.newInstance4CurPrice(jm.getFloat(Key4Json.UNIT_PRICE.key)));
 			}
-			
-			
-			if(jsonMap.containsKey(Key4Json.IS_GIFT.key)){
-				setGift(jsonMap.getBoolean(Key4Json.IS_GIFT.key));
+			//多单位
+			if(jm.containsKey(Key4Json.FOOD_UNIT.key)){
+				setFoodUnit(jm.getJsonable(Key4Json.FOOD_UNIT.key, FoodUnit.JSON_CREATOR, flag));
 			}
-			
-			if(jsonMap.containsKey(Key4Json.IS_HURRIED.key)){
-				setHurried(jsonMap.getBoolean(Key4Json.IS_HURRIED.key));
+			//是否赠送
+			if(jm.containsKey(Key4Json.IS_GIFT.key)){
+				setGift(jm.getBoolean(Key4Json.IS_GIFT.key));
 			}
-			
-			if(jsonMap.containsKey(Key4Json.TASTE_GROUP.key)){
-				setTasteGroup(jsonMap.getJsonable(Key4Json.TASTE_GROUP.key, TasteGroup.JSON_CREATOR, TasteGroup.TG_JSONABLE_4_COMMIT));
+			//是否催菜
+			if(jm.containsKey(Key4Json.IS_HURRIED.key)){
+				setHurried(jm.getBoolean(Key4Json.IS_HURRIED.key));
 			}
-			
-			if(jsonMap.containsKey(Key4Json.CANCEL_REASON.key)){
-				setCancelReason(jsonMap.getJsonable(Key4Json.CANCEL_REASON.key, CancelReason.JSON_CREATOR, CancelReason.CR_JSONABLE_4_COMMIT));
+			//口味
+			if(jm.containsKey(Key4Json.TASTE_GROUP.key)){
+				setTasteGroup(jm.getJsonable(Key4Json.TASTE_GROUP.key, TasteGroup.JSON_CREATOR, TasteGroup.TG_JSONABLE_4_COMMIT));
+			}
+			//退菜原因
+			if(jm.containsKey(Key4Json.CANCEL_REASON.key)){
+				setCancelReason(jm.getJsonable(Key4Json.CANCEL_REASON.key, CancelReason.JSON_CREATOR, CancelReason.CR_JSONABLE_4_COMMIT));
 			}
 		}
 	}
