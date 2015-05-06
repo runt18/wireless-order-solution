@@ -467,6 +467,8 @@ public class OrderFood implements Parcelable, Jsonable {
 		this.isHurried = src.isHurried;
 		this.isRepaid = src.isRepaid;
 		this.mTasteGroup = src.mTasteGroup;
+		this.mFoodUnit = src.mFoodUnit;
+		this.mPricePlan = src.mPricePlan;
 	}
 	
 	public void clearTasetGroup(){
