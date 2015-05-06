@@ -7,6 +7,13 @@ SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
+-- Add the field 'limit_remaing' & 'limit_amount' to table 'food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food` 
+ADD COLUMN `limit_amount` INT NULL DEFAULT NULL AFTER `status`,
+ADD COLUMN `limit_remaing` INT NULL DEFAULT NULL AFTER `limit_amount`;
+
+-- -----------------------------------------------------
 -- Add the field 'enabled' to table 'print_func'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`print_func` 
