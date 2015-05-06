@@ -128,6 +128,7 @@ public class FoodDao {
 		private int weight = -1;
 		private int commission = -1;
 		private int temp = -1;
+		private int limit = -1;
 		private final List<Short> statusList = new ArrayList<Short>();
 		public int containsImage = -1;
 		private String extra;
@@ -156,6 +157,11 @@ public class FoodDao {
 			if(!this.statusList.contains(status)){
 				this.statusList.add(status);
 			}
+			return this;
+		}
+		
+		public ExtraCond setLimit(boolean onOff){
+			this.limit = onOff ? 1 : 0;
 			return this;
 		}
 		
@@ -275,6 +281,13 @@ public class FoodDao {
 			}
 			if(price >= 0){
 				extraCond.append(" AND FOOD.price = " + price);
+			}
+			if(limit >= 0){
+				if(limit == 1){
+					extraCond.append(" AND (FOOD.status & " + Food.LIMIT + " <> 0)");
+				}else{
+					extraCond.append(" AND (FOOD.status & " + Food.LIMIT + " = 0)");
+				}
 			}
 			if(special >= 0){
 				if(special == 1){
@@ -707,15 +720,6 @@ public class FoodDao {
 		}
 		f.setTemp(false);
 		
-		if(builder.isLimitRemaingChanged()){
-			if(!f.isLimit()){
-				throw new BusinessException("你操作的菜品不是限量估清菜品");
-			}
-			if(f.getLimitRemaing() > f.getLimitAmount()){
-				throw new BusinessException("限量估清的剩余数量不能大于限量数");
-			}
-		}
-		
 		//Update the oss image.
 		if(builder.isImageChanged()){
 			if(f.hasImage()){
@@ -775,7 +779,7 @@ public class FoodDao {
 			  " food_id = " + f.getFoodId() +
 			  " ,status = " + f.getStatus() +
 			  (builder.isLimitChanged() ? ",limit_amount = " + (f.isLimit() ? f.getLimitAmount() : "NULL") : "") +
-			  (builder.isLimitRemaingChanged() ? ",limit_remaing = " + f.getLimitRemaing() : "") +
+			  (builder.isLimitChanged() && !f.isLimit() ? ",limit_remaing = NULL " : "") +
 			  (builder.isAliasChanged() ? ",food_alias = " + f.getAliasId() : "") +
 			  (builder.isNameChanged() ? ",name = '" + f.getName() + "'" : "") +
 			  (builder.isKitchenChanged() ? ",kitchen_id = " + f.getKitchen().getId() : "") +
@@ -788,6 +792,74 @@ public class FoodDao {
 			throw new BusinessException(FoodError.FOOD_NOT_EXIST);
 		}
 
+	}
+	
+	/**
+	 * Update the limit remaining to specific builder {@link Food#LimitRemainingBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the limit remaining builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the food to update does NOT exist
+	 * 			<li>the food does NOT belong to be limited
+	 * 			<li>the limit remaining exceeds the amount
+	 */
+	public static void update(Staff staff, Food.LimitRemainingBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			update(dbCon, staff, builder);
+			dbCon.conn.commit();
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update the limit remaining to specific builder {@link Food#LimitRemainingBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the limit remaining builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the food to update does NOT exist
+	 * 			<li>the food does NOT belong to be limited
+	 * 			<li>the limit remaining exceeds the amount
+	 */
+	public static void update(DBCon dbCon, Staff staff, Food.LimitRemainingBuilder builder) throws SQLException, BusinessException{
+		int remaining = builder.build().getLimitRemaing();
+		Food food = getById(dbCon, staff, builder.build().getFoodId());
+		if(!food.isLimit()){
+			throw new BusinessException("【" + food.getName() + "】不是限量估清菜品");
+		}
+		if(remaining > food.getLimitAmount()){
+			throw new BusinessException("【" + food.getName() + "】的剩余数量不能大于限量数");
+		}
+		if(remaining > 0){
+			update(dbCon, staff, new Food.UpdateBuilder(food.getFoodId()).setSellOut(false));
+			
+		}else if(remaining == 0){
+			update(dbCon, staff, new Food.UpdateBuilder(food.getFoodId()).setSellOut(true));
+		}
+		
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".food SET limit_remaing = " + remaining + " WHERE food_id = " + food.getFoodId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(FoodError.FOOD_NOT_EXIST);
+		}
 	}
 	
 	/**

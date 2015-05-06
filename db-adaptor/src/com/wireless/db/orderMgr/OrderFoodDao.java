@@ -562,16 +562,11 @@ public class OrderFoodDao {
 		//Calculate the limit remaining.
 		if(builder.extra.asFood().isLimit()){
 			int limitRemaining = Math.round(builder.extra.asFood().getLimitRemaing() - Math.abs(builder.extra.getDelta()));
-			Food.UpdateBuilder updateBuilder = new Food.UpdateBuilder(builder.extra.asFood().getFoodId());
 			if(limitRemaining < 0){
 				throw new BusinessException("【" + builder.extra.asFood().getName() + "】的点菜数量超过设定的限量数量");
-				
-			}else if(limitRemaining == 0){
-				//Having the food to be sold out if the limit remaining reaches zero.
-				updateBuilder.setSellOut(true);
 			}
 			try{
-				FoodDao.update(dbCon, staff, updateBuilder.setLimitRemaining(limitRemaining));
+				FoodDao.update(dbCon, staff, new Food.LimitRemainingBuilder(builder.extra.asFood(), limitRemaining));
 			} catch (BusinessException ignored) {
 				ignored.printStackTrace();
 			}
@@ -658,7 +653,7 @@ public class OrderFoodDao {
 				builder.cancel.asFood().copyFrom(FoodDao.getById(dbCon, staff, builder.cancel.getFoodId()));
 				int limitRemaining = Math.round(builder.cancel.asFood().getLimitRemaing() + Math.abs(builder.cancel.getDelta()));
 				limitRemaining = limitRemaining > builder.cancel.asFood().getLimitAmount() ? builder.cancel.asFood().getLimitAmount() : limitRemaining;
-				FoodDao.update(dbCon, staff, new Food.UpdateBuilder(builder.cancel.asFood().getFoodId()).setLimitRemaining(limitRemaining).setSellOut(false));
+				FoodDao.update(dbCon, staff, new Food.LimitRemainingBuilder(builder.cancel.asFood(), limitRemaining));
 			} catch (BusinessException ignored) {
 				ignored.printStackTrace();
 			}

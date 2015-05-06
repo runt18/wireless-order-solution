@@ -149,7 +149,7 @@ public class TestFoodDao {
 													   .setPrice(34.2f).setDesc("测试修改描述")
 													   .addPrice(planId, 5)
 													   .setHot(false).setCommission(3).setSellOut(true).setRecommend(true)
-													   .setGift(false).setWeigh(true).setLimit(true, 5).setLimitRemaining(5)
+													   .setGift(false).setWeigh(true).setLimit(true, 5)
 													   .addUnit(3f, "份");
 			FoodDao.update(mStaff, updateBuilder);
 			
