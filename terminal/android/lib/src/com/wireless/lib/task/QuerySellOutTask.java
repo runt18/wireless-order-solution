@@ -2,7 +2,6 @@ package com.wireless.lib.task;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import android.os.AsyncTask;
@@ -34,22 +33,29 @@ public abstract class QuerySellOutTask extends AsyncTask<Void, Void, List<Food>>
 	@Override
 	protected List<Food> doInBackground(Void... args) {
 		
-		List<Food> sellOutFoods = new ArrayList<Food>();
+		final List<Food> sellOutFoods = new ArrayList<Food>();
 		
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQuerySellOut(mStaff));
 			if(resp.header.type == Type.ACK){
 				sellOutFoods.addAll(new Parcel(resp.body).readParcelList(Food.CREATOR));
-					
+				
 				for(Food f : mFoodList){
 					f.setSellOut(false);
+					f.setLimit(false);
+					f.setLimitAmount(0);
+					f.setLimitRemaing(0);
 				}
 				
 				for(Food sellOut : sellOutFoods){
 					Food f = mFoodList.find(sellOut);
 					if(f != null){
+						f.setStatus(sellOut.getStatus());
+						if(f.isLimit()){
+							f.setLimitAmount(sellOut.getLimitAmount());
+							f.setLimitRemaing(sellOut.getLimitRemaing());
+						}
 						sellOut.copyFrom(f);
-						f.setSellOut(true);
 					}
 				}
 				
@@ -62,7 +68,7 @@ public abstract class QuerySellOutTask extends AsyncTask<Void, Void, List<Food>>
 			mBusinessException = e;
 		}
 		
-		return Collections.unmodifiableList(sellOutFoods);
+		return sellOutFoods;
 	}
 
 	@Override
