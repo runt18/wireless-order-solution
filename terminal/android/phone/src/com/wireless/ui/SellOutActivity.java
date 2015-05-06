@@ -2,20 +2,27 @@ package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.DigitsKeyListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -29,8 +36,11 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.lib.task.MakeLimitRemaining;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
+import com.wireless.pojo.util.NumericUtil;
+import com.wireless.pojo.util.SortedList;
 import com.wireless.ui.dialog.SelloutCommitDialog;
 
 public class SellOutActivity extends FragmentActivity {
@@ -111,6 +121,7 @@ public class SellOutActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		this.setContentView(R.layout.sell_out_activity);
 		
 		//返回Button和标题
@@ -246,10 +257,21 @@ public class SellOutActivity extends FragmentActivity {
 	}
 	
 	private class SellOutFoodAdapter extends BaseAdapter{
-		private List<Food> mFoods;
+		private final List<Food> mFoods;
 
 		SellOutFoodAdapter(List<Food> sellOutFoods){
-			mFoods = sellOutFoods;
+			mFoods = SortedList.newInstance(sellOutFoods, new Comparator<Food>(){
+				@Override
+				public int compare(Food f1, Food f2) {
+					if(f1.isLimit() && !f2.isLimit()){
+						return -1;
+					}else if(!f1.isLimit() && f2.isLimit()){
+						return 1;
+					}else{
+						return f1.compareTo(f2);
+					}
+				}
+			});
 		}
 		
 		@Override
@@ -271,7 +293,7 @@ public class SellOutActivity extends FragmentActivity {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final View layout;
 			if(convertView == null){
-				layout = LayoutInflater.from(getApplicationContext()).inflate(R.layout.sellout_list_item, null);
+				layout = LayoutInflater.from(getApplicationContext()).inflate(R.layout.sellout_list_item, parent, false);
 			}else{
 				layout = convertView;
 			}
@@ -298,7 +320,52 @@ public class SellOutActivity extends FragmentActivity {
 			button.setOnClickListener(new OnClickListener(){
 
 				public void onClick(View v) {
-					if(mCurrentPage == ON_SALE_PAGE){
+					if(food.isLimit()){
+						final EditText edtLimitRemaining = new EditText(SellOutActivity.this);
+						edtLimitRemaining.setKeyListener(new DigitsKeyListener(false, false));
+						
+						Dialog dialog = new AlertDialog.Builder(SellOutActivity.this).setTitle("请输入【" + food.getName() + "】的剩余数量")
+							.setIcon(android.R.drawable.ic_dialog_info)
+							.setView(edtLimitRemaining)
+							.setPositiveButton("确定", new DialogInterface.OnClickListener(){
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									
+									new MakeLimitRemaining(WirelessOrder.loginStaff, new Food.LimitRemainingBuilder(food, Integer.parseInt(edtLimitRemaining.getText().toString()))) {
+										
+										private ProgressDialog mProgressDialog;
+										
+										@Override
+										public void onPreExecute(){
+											mProgressDialog = ProgressDialog.show(SellOutActivity.this, "", "正在修改...请稍后", true);
+										}
+										
+										@Override
+										public void onSuccess() {
+											mProgressDialog.dismiss();
+											//更新沽清菜品信息
+											mQuerySellOutTask = new QuerySellOutTask();
+											mQuerySellOutTask.execute();
+											Toast.makeText(SellOutActivity.this, "【" + food.getName() + "】的剩余数量修改成功", Toast.LENGTH_SHORT).show();
+										}
+										
+										@Override
+										public void onFail(BusinessException e) {
+											mProgressDialog.dismiss();
+											Toast.makeText(SellOutActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+										}
+									}.execute();
+								}
+							})
+							.setNegativeButton("取消", null).show();		
+						
+						
+						//只用下面这一行弹出对话框时需要点击输入框才能弹出软键盘
+						dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+						//加上下面这一行弹出对话框时软键盘随之弹出
+						dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+						
+					}else if(mCurrentPage == ON_SALE_PAGE){
 						if(mToSellout.indexOf(food) >= 0){
 							mToSellout.remove(food);
 							layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.GONE);
@@ -321,8 +388,17 @@ public class SellOutActivity extends FragmentActivity {
 			});
 			
 			//设置菜名和价格
-			((TextView)layout.findViewById(R.id.txtView_foodName_sellOut_listItem)).setText(mFoods.get(position).getName());
-			((TextView)layout.findViewById(R.id.txtView_price_sellOut_listItem)).setText("￥" + mFoods.get(position).getPrice());
+			((TextView)layout.findViewById(R.id.txtView_foodName_sellOut_listItem)).setText(food.getName());
+			((TextView)layout.findViewById(R.id.txtView_price_sellOut_listItem)).setText("价格:￥" + NumericUtil.float2String2(food.getPrice()));
+			if(food.isLimit()){
+				layout.findViewById(R.id.txtView_limitAmount_sellOut_listItem).setVisibility(View.VISIBLE);
+				((TextView)layout.findViewById(R.id.txtView_limitAmount_sellOut_listItem)).setText("限量:" + food.getLimitAmount());
+				layout.findViewById(R.id.txtView_limitRemaining_sellOut_listItem).setVisibility(View.VISIBLE);
+				((TextView)layout.findViewById(R.id.txtView_limitRemaining_sellOut_listItem)).setText("剩余:" + food.getLimitRemaing());
+			}else{
+				layout.findViewById(R.id.txtView_limitAmount_sellOut_listItem).setVisibility(View.GONE);
+				layout.findViewById(R.id.txtView_limitRemaining_sellOut_listItem).setVisibility(View.GONE);
+			}
 			
 			return layout;
 		}
@@ -333,15 +409,23 @@ public class SellOutActivity extends FragmentActivity {
 	 */
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		
+		private ProgressDialog mProgressDialog;
+		
+		@Override
+		public void onPreExecute(){
+			mProgressDialog = ProgressDialog.show(SellOutActivity.this, "", "正在获取估清菜品...请稍后", true);
+		}
+		
 		QuerySellOutTask(){
 			super(WirelessOrder.loginStaff, WirelessOrder.foodMenu.foods);
 		}
 		
 		@Override
 		public void onSuccess(List<Food> sellOutFoods){
+			mProgressDialog.dismiss();
 			Toast.makeText(SellOutActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
-			List<Food> sellOut = new ArrayList<Food>();
-			List<Food> onSale = new ArrayList<Food>();
+			final List<Food> sellOut = new ArrayList<Food>();
+			final List<Food> onSale = new ArrayList<Food>();
 			for(Food f : WirelessOrder.foodMenu.foods){
 				if(f.isSellOut()){
 					sellOut.add(f);
@@ -349,6 +433,7 @@ public class SellOutActivity extends FragmentActivity {
 					onSale.add(f);
 				}
 			}
+
 			mSellOutFoods = new FoodList(sellOut);
 			mOnSaleFoods = new FoodList(onSale);
 			mFoodListHandler.sendEmptyMessage(mCurrentPage);
@@ -356,6 +441,7 @@ public class SellOutActivity extends FragmentActivity {
 		
 		@Override
 		public void onFail(BusinessException e){
+			mProgressDialog.dismiss();
 			Toast.makeText(SellOutActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();		
 		}
 		

@@ -31,7 +31,6 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -267,7 +266,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						map.put(ITEM_FOOD_NAME, of.getName()); 
 						map.put(ITEM_FOOD_AMOUNT, "+" + String.valueOf(Math.abs(of.getDelta())));
 						map.put(ITEM_FOOD_PRICE, "+" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(of.calcUnitPrice() * Math.abs(of.getDelta())));
-						if(of.asFood().isWeigh()){
+						if(of.asFood().isWeight()){
 							map.put(ITEM_FOOD_TASTE, "称重确认");
 						}else{
 							map.put(ITEM_FOOD_TASTE, "加" + NumericUtil.float2String2(Math.abs(of.getDelta())) + "份");
@@ -325,7 +324,6 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		
 		private List<? extends Map<String, ?>> mGroupData;
 		private List<? extends List<? extends Map<String, ?>>> mChildData;
-		private PopupWindow mPopup;
 		
 		public FoodExpandableAdapter(Context context,
 									 List<? extends Map<String, ?>> groupData, int groupLayout,	String[] groupFrom, int[] groupTo,
@@ -437,7 +435,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	
 				//"数量"操作
 				ImageView amountImgView = (ImageView)layout.findViewById(R.id.imgView_right_orderFoodListView_childItem);
-				if(of.asFood().isWeigh()){
+				if(of.asFood().isWeight()){
 					amountImgView.setBackgroundResource(R.drawable.weight_selector);
 				}else{
 					amountImgView.setBackgroundResource(R.drawable.amount_selector);
@@ -491,7 +489,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						((TextView)layout.findViewById(R.id.txtView_taste_orderChildItem)).setTextColor(getResources().getColor(R.color.green));
 						layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.INVISIBLE);
 						//'取消加菜'按钮
-						if(of.asFood().isWeigh()){
+						if(of.asFood().isWeight()){
 							restoreBtn.setText("取消称重");
 						}else{
 							restoreBtn.setText("取消加菜");
@@ -513,7 +511,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					rightImgView.setVisibility(View.VISIBLE);
 					restoreBtn.setVisibility(View.INVISIBLE);
 					
-					if(of.asFood().isWeigh()){
+					if(of.asFood().isWeight()){
 						rightImgView.setBackgroundResource(R.drawable.weight_selector);
 						//"称重"操作
 						rightImgView.setOnClickListener(new View.OnClickListener() {				
@@ -870,7 +868,6 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					//设置状态为'未分席'
 					isMulti = false;
 					mFoodListHandler.sendEmptyMessage(0);
-					mPopup.dismiss();
 				}
 			}
 		}

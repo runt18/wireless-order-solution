@@ -266,41 +266,50 @@ public class PickFoodFragment extends Fragment{
 			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.getAliasId()));
 			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(NumericUtil.float2String2(food.getPrice()));
 			
-			//设置售罄的显示
-			if(food.isSellOut()){
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("停");
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.red));
-				
-			}else if(food.isCurPrice()){
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("时");
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.brown));
-				
-			}else if(food.isGift() && WirelessOrder.loginStaff.getRole().hasPrivilege(Privilege.Code.GIFT)){
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("赠");
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.maroon));
-				
-			}else if(food.isCombo()){
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("套");
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.green));
-				
-			}else if(food.isWeigh()){
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("称");
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.green));
-				
-			}else if(food.isSpecial()){
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("特");
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.green));
-				
-			}else{
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
+			if(food.isLimit()){
+				//设置限量估清的显示
+				view.findViewById(R.id.linearLayout_limit_pickFoodFgm_item).setVisibility(View.VISIBLE);
+				view.findViewById(R.id.textView_status_pickFoodFgm_item).setVisibility(View.GONE);
+				((TextView)view.findViewById(R.id.textView_limitAmount_pickFoodFgm_item)).setText("限" + food.getLimitAmount());
+				((TextView)view.findViewById(R.id.textView_limitRemaining_pickFoodFgm_item)).setText("剩" + food.getLimitRemaing());
+
+			}else{ 
+				view.findViewById(R.id.linearLayout_limit_pickFoodFgm_item).setVisibility(View.GONE);
+				view.findViewById(R.id.textView_status_pickFoodFgm_item).setVisibility(View.VISIBLE);
+				if(food.isSellOut()){
+					//设置售罄的显示
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setText("停");
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.red));
+					
+				}else if(food.isCurPrice()){
+					//设置时价的显示
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setText("时");
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.brown));
+					
+				}else if(food.isGift() && WirelessOrder.loginStaff.getRole().hasPrivilege(Privilege.Code.GIFT)){
+					//设置赠送的显示
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setText("赠");
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.maroon));
+					
+				}else if(food.isCombo()){
+					//设置套菜的显示
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setText("套");
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.green));
+					
+				}else if(food.isWeight()){
+					//设置称重的显示
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setText("称");
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.green));
+					
+				}else if(food.isSpecial()){
+					//设置特价的显示
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setText("特");
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.green));
+					
+				}else{
+					((TextView)view.findViewById(R.id.textView_status_pickFoodFgm_item)).setVisibility(View.GONE);
+				}
 			}
-			
 			return view;
 		}
 	}

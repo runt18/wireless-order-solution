@@ -8,8 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="false"
-        android:layout_centerVertical="true"
+        android:layout_alignParentTop="true"
         android:background="@drawable/table_add_btn_selector"
         android:padding="4dp"
         android:textColor="@color/blue"
@@ -27,7 +26,8 @@
             android:layout_height="wrap_content"
             android:text="菜名"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/black"
+            android:textColor="#483D8B"
+            android:textSize="20sp"
             android:typeface="sans" />
 
         <View
@@ -49,5 +49,27 @@
         android:text="价钱"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#FF6600" />
+
+    <TextView
+        android:id="@+id/txtView_limitAmount_sellOut_listItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/txtView_price_sellOut_listItem"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/txtView_price_sellOut_listItem"
+        android:text="限量:"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/red" />
+
+    <TextView
+        android:id="@+id/txtView_limitRemaining_sellOut_listItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/txtView_price_sellOut_listItem"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/txtView_limitAmount_sellOut_listItem"
+        android:text="剩余:"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/green" />
 
 </RelativeLayout>
