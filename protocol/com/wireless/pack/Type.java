@@ -36,6 +36,7 @@ public final class Type{
 	public final static byte QUERY_BACKUP_SERVER = 28;
 	public final static byte GIFT_ORDER_FOOD = 29;
 	public final static byte INSERT_FEAST_ORDER = 30;
+	public final static byte MAKE_LIMIT_REMAINING = 31;
 	
 	/* belong to member */
 	public final static byte QUERY_MEMBER = 1;
