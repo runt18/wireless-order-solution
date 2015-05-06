@@ -161,8 +161,8 @@ class OrderHandler implements Runnable{
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_SELL_OUT){
 					//handle query sell out foods request
 					response = new RespPackage(request.header, 
-											   FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().setSellout(true), null), 
-											   Food.FOOD_PARCELABLE_SIMPLE);
+											   FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().addStatus(Food.SELL_OUT).addStatus(Food.LIMIT), null), 
+											   Food.FOOD_PARCELABLE_SELL_OUT);
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.MAKE_FOOD_SELL_OUT){
 					//handle update the food to be sell out
@@ -176,6 +176,11 @@ class OrderHandler implements Runnable{
 					for(Food f : new Parcel(request.body).readParcelList(Food.CREATOR)){
 						FoodDao.update(staff, new Food.UpdateBuilder(f.getFoodId()).setSellOut(false));
 					}
+					response = new RespACK(request.header);
+					
+				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.MAKE_LIMIT_REMAINING){
+					//handle update the food limit remaining
+					FoodDao.update(staff, new Parcel(request.body).readParcel(Food.LimitRemainingBuilder.CREATOR));
 					response = new RespACK(request.header);
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE){
