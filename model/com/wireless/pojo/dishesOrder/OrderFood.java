@@ -118,7 +118,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	//the last order amount to this order food
 	private float mLastCnt;	
 
-	private List<ComboOrderFood> mCombo = new ArrayList<>();
+	private List<ComboOrderFood> mCombo = new ArrayList<ComboOrderFood>();
 	
 	private final Food mFood = new Food(0);
 	
@@ -764,7 +764,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			}
 			dest.writeInt(this.getFoodId());
 			dest.writeShort(this.getAliasId());
-			dest.writeParcel(this.mFoodUnit, 0);
+			dest.writeParcel(this.mFoodUnit, FoodUnit.FOOD_UNIT_PARCELABLE_COMPLEX);
 			dest.writeFloat(this.getDiscount());
 			dest.writeFloat(this.getCount());
 			dest.writeBoolean(this.isHangup());
@@ -785,7 +785,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			dest.writeLong(this.getId());
 			dest.writeInt(this.getFoodId());
 			dest.writeShort(this.getAliasId());
-			dest.writeParcel(this.mFoodUnit, 0);
+			dest.writeParcel(this.mFoodUnit, FoodUnit.FOOD_UNIT_PARCELABLE_SIMPLE);
 			dest.writeFloat(this.getCount());
 			dest.writeBoolean(this.isHangup());
 			dest.writeBoolean(this.isGift());

@@ -5,12 +5,13 @@ import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.menuMgr.ComboFood;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.tasteMgr.Taste;
 
 public class ComboOrderFood implements Parcelable, Jsonable {
 	
-	//private int comboId;
 	private ComboFood comboFood;
+	private FoodUnit foodUnit;
 	private TasteGroup tasteGroup;
 	
 	private ComboOrderFood(){
@@ -21,24 +22,28 @@ public class ComboOrderFood implements Parcelable, Jsonable {
 		this.comboFood = comboFood;
 	}
 	
-//	public void setComboId(int comboId){
-//		this.comboId = comboId;
-//	}
-//	
-//	public int getCombId(){
-//		return this.comboId;
-//	}
-	
 	public ComboFood asComboFood(){
 		return this.comboFood;
 	}
 	
 	public String getName(){
 		if(comboFood != null){
-			return comboFood.getName();
+			return comboFood.getName() + (foodUnit != null && foodUnit.getUnit().length() != 0 ? "/" + foodUnit.getUnit() : "");
 		}else{
 			return "";
 		}
+	}
+	
+	public boolean hasFoodUnit(){
+		return this.foodUnit != null;
+	}
+	
+	public void setFoodUnit(FoodUnit unit){
+		this.foodUnit = unit;
+	}
+	
+	public FoodUnit getFoodUnit(){
+		return this.foodUnit;
 	}
 	
 	public boolean hasTasteGroup(){
@@ -118,19 +123,20 @@ public class ComboOrderFood implements Parcelable, Jsonable {
 	
 	@Override
 	public String toString(){
-		return (comboFood == null ? "" : comboFood.getName()) + 
-			   (tasteGroup == null ? "" : "-" + tasteGroup.getPreference());
+		return getName() + (hasTasteGroup() ? "-" + tasteGroup.getPreference() : "");
 	}
 
 	@Override
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeParcel(this.comboFood, ComboFood.COMBO_FOOD_PARCELABLE_SIMPLE);
+		dest.writeParcel(this.foodUnit, FoodUnit.FOOD_UNIT_PARCELABLE_COMPLEX);
 		dest.writeParcel(this.tasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
 	}
 
 	@Override
 	public void createFromParcel(Parcel source) {
 		this.comboFood = source.readParcel(ComboFood.CREATOR);
+		this.foodUnit = source.readParcel(FoodUnit.CREATOR);
 		setTasteGroup(source.readParcel(TasteGroup.CREATOR));
 	}
 	
@@ -149,7 +155,8 @@ public class ComboOrderFood implements Parcelable, Jsonable {
 
 	public static enum Key4Json{
 		COMBO_FOOD("comboFood", "子菜"),
-		COMBO_FOOD_TASTE_GROUP("tasteGroup", "子菜口味");
+		COMBO_FOOD_TASTE_GROUP("tasteGroup", "子菜口味"),
+		COMBO_FOOD_UNIT("foodUnit", "子菜单位");
 		
 		Key4Json(String key, String desc){
 			this.key = key;
@@ -178,6 +185,9 @@ public class ComboOrderFood implements Parcelable, Jsonable {
 		this.comboFood = jm.getJsonable(Key4Json.COMBO_FOOD.key, ComboFood.JSON_CREATOR, ComboFood.COMBO_FOOD_JSONABLE_SIMPLE);
 		if(jm.containsKey(Key4Json.COMBO_FOOD_TASTE_GROUP.key)){
 			setTasteGroup(jm.getJsonable(Key4Json.COMBO_FOOD_TASTE_GROUP.key, TasteGroup.JSON_CREATOR, TasteGroup.TG_JSONABLE_4_COMMIT));
+		}
+		if(jm.containsKey(Key4Json.COMBO_FOOD_UNIT.key)){
+			setFoodUnit(jm.getJsonable(Key4Json.COMBO_FOOD_UNIT.key, FoodUnit.JSON_CREATOR, FoodUnit.FOOD_UNIT_JSONABLE_4_COMMIT));
 		}
 	}
 	

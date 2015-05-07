@@ -104,20 +104,35 @@ public class FoodUnit implements Parcelable, Jsonable{
 		return this.price + "/" + unit;
 	}
 
+	public final static int FOOD_UNIT_PARCELABLE_COMPLEX = 0;
+	public final static int FOOD_UNIT_PARCELABLE_SIMPLE = 1;
+	
 	@Override
 	public void writeToParcel(Parcel dest, int flag) {
-		dest.writeInt(this.id);
-		dest.writeInt(this.foodId);
-		dest.writeFloat(this.price);
-		dest.writeString(this.unit);
+		dest.writeByte(flag);
+		if(flag == FOOD_UNIT_PARCELABLE_COMPLEX){
+			dest.writeInt(this.id);
+			dest.writeInt(this.foodId);
+			dest.writeFloat(this.price);
+			dest.writeString(this.unit);
+			
+		}else if(flag == FOOD_UNIT_PARCELABLE_SIMPLE){
+			dest.writeInt(this.id);
+		}
 	}
 
 	@Override
 	public void createFromParcel(Parcel source) {
-		this.id = source.readInt();
-		this.foodId = source.readInt();
-		this.price = source.readFloat();
-		this.unit = source.readString();
+		short flag = source.readByte();
+		if(flag == FOOD_UNIT_PARCELABLE_COMPLEX){
+			this.id = source.readInt();
+			this.foodId = source.readInt();
+			this.price = source.readFloat();
+			this.unit = source.readString();
+			
+		}else if(flag == FOOD_UNIT_PARCELABLE_SIMPLE){
+			this.id = source.readInt();
+		}
 	}
 	
 	public final static Parcelable.Creator<FoodUnit> CREATOR = new Parcelable.Creator<FoodUnit>(){
@@ -155,7 +170,7 @@ public class FoodUnit implements Parcelable, Jsonable{
 		
 	}	
 	
-	public final static int CR_JSONABLE_4_COMMIT = 0; 
+	public final static int FOOD_UNIT_JSONABLE_4_COMMIT = 0; 
 	
 	
 	public static Jsonable.Creator<FoodUnit> JSON_CREATOR = new Jsonable.Creator<FoodUnit>() {
@@ -177,7 +192,7 @@ public class FoodUnit implements Parcelable, Jsonable{
 
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
-		if(flag == CR_JSONABLE_4_COMMIT){
+		if(flag == FOOD_UNIT_JSONABLE_4_COMMIT){
 			if(jsonMap.containsKey(Key4Json.UNIT_ID.key)){
 				setId(jsonMap.getInt(Key4Json.UNIT_ID.key));
 			}else{
