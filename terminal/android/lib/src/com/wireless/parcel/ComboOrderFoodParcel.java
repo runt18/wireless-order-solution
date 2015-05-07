@@ -20,6 +20,10 @@ public class ComboOrderFoodParcel implements Parcelable{
 		if(in.readInt() != 1){
 			ComboFood comboFood = ComboFoodParcel.CREATOR.createFromParcel(in).asComboFood();
 			mSrc = new ComboOrderFood(comboFood);
+			FoodUnitParcel foodUnitParcel = FoodUnitParcel.CREATOR.createFromParcel(in);
+			if(foodUnitParcel.asFoodUnit() != null){
+				mSrc.setFoodUnit(foodUnitParcel.asFoodUnit());
+			}
 			TasteGroupParcel tgParcel = TasteGroupParcel.CREATOR.createFromParcel(in);
 			if(tgParcel.asTasteGroup() != null){
 				mSrc.setTasteGroup(tgParcel.asTasteGroup());
@@ -54,6 +58,11 @@ public class ComboOrderFoodParcel implements Parcelable{
 		if(mSrc != null){
 			dest.writeInt(0);
 			new ComboFoodParcel(mSrc.asComboFood()).writeToParcel(dest, flags);
+			if(mSrc.hasFoodUnit()){
+				new FoodUnitParcel(mSrc.getFoodUnit()).writeToParcel(dest, flags);
+			}else{
+				new FoodUnitParcel(null).writeToParcel(dest, flags);
+			}
 			if(mSrc.hasTasteGroup()){
 				new TasteGroupParcel(mSrc.getTasteGroup()).writeToParcel(dest, flags);
 			}else{
