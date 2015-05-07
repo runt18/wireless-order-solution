@@ -283,11 +283,6 @@ public class AskOrderAmountDialog extends DialogFragment {
 			countEditText.setText(NumericUtil.float2String2(mSelectedFood.getCount()));
 		}
 		
-		//设置菜品单位
-		if(mSelectedFood.asFood().hasFoodUnit()){
-			mSelectedFood.setFoodUnit(mSelectedFood.asFood().getFoodUnits().get(0));
-		}
-		
 		countEditText.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -499,6 +494,11 @@ public class AskOrderAmountDialog extends DialogFragment {
 		GridView tasteGridView = (GridView) tasteView.findViewById(R.id.gridView_askOrderAmount_dialog);
 
 		tasteView.setTag(R.id.combo_of_indicator_key, Boolean.FALSE);
+		
+		//设置菜品的初始单位
+		if(mSelectedFood.asFood().hasFoodUnit()){
+			mSelectedFood.setFoodUnit(mSelectedFood.asFood().getFoodUnits().get(0));
+		}
 		
 		if (mSelectedFood.asFood().hasPopTastes() || mSelectedFood.asFood().hasFoodUnit()) {
 
@@ -766,6 +766,14 @@ public class AskOrderAmountDialog extends DialogFragment {
     	
 		//Check to see whether this combo food is contained in this order food.
 		comboTasteView.setTag(R.id.combo_of_indicator_key, Boolean.TRUE);
+		
+		//设置套菜菜品的初始单位
+		if(comboFood.asFood().hasFoodUnit()){
+			ComboOrderFood cof4Unit = new ComboOrderFood(comboFood);
+			cof4Unit.setFoodUnit(comboFood.asFood().getFoodUnits().get(0));
+			mSelectedFood.addCombo(cof4Unit);
+		}
+		
 		ComboOrderFood cof = matchComboFood(comboFood);
 		if(cof != null){
 			comboTasteView.setTag(R.id.combo_of_key, cof);
@@ -773,11 +781,13 @@ public class AskOrderAmountDialog extends DialogFragment {
 			comboTasteView.setTag(R.id.combo_of_key, new ComboOrderFood(comboFood));
 		}
 		
-		if(comboFood.asFood().hasPopTastes()){
+		if(comboFood.asFood().hasPopTastes() || comboFood.asFood().hasFoodUnit()){
 			
 			tasteGridView.setVisibility(View.VISIBLE);
 			
-			final List<Taste> popTastes = new ArrayList<Taste>(comboFood.asFood().getPopTastes());
+			final List<Object> popTastes = new ArrayList<Object>();
+			popTastes.addAll(comboFood.asFood().getFoodUnits());
+			popTastes.addAll(comboFood.asFood().getPopTastes());
 			//只显示前8个常用口味
 //			while(popTastes.size() > 8){
 //				popTastes.remove(popTastes.size() - 1);
@@ -799,6 +809,7 @@ public class AskOrderAmountDialog extends DialogFragment {
 						checkBox = (CheckBox)convertView;
 					}else{
 						checkBox = (CheckBox) LayoutInflater.from(getActivity()).inflate(R.layout.ask_order_amount_dialog_item, container, false);
+						
 						checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 							
 							@Override
@@ -811,30 +822,49 @@ public class AskOrderAmountDialog extends DialogFragment {
 									mSelectedFood.addCombo(thisCombo);
 								}
 								
-								Taste taste = (Taste) buttonView.getTag();
-								if(thisCombo.getTasteGroup().contains(taste)){
-									thisCombo.removeTaste(taste);
-								} else {
-									thisCombo.addTaste(taste);
+								if(buttonView.getTag() instanceof Taste){
+									Taste taste = (Taste) buttonView.getTag();
+									if (thisCombo.getTasteGroup().contains(taste)) {
+										thisCombo.removeTaste(taste);
+									} else {
+										thisCombo.addTaste(taste);
+									}
+								}else if(buttonView.getTag() instanceof FoodUnit){
+									final FoodUnit unit = (FoodUnit)buttonView.getTag();
+									if(!unit.equals(thisCombo.getFoodUnit())){
+										thisCombo.setFoodUnit(unit);
+									}
 								}
 								mRefreshHandler.sendEmptyMessage(0);
 							}
 						});
 					}
 					
-					Taste thisTaste = popTastes.get(position);
-					checkBox.setTag(thisTaste);
-					checkBox.setText(thisTaste.getPreference());
-					
 					//Check to see whether this combo food is contained in this order food.
 					ComboOrderFood thisCombo = matchComboFood(comboFood);
 					
-					if(thisCombo != null && thisCombo.getTasteGroup().contains(thisTaste)){
-						checkBox.setBackgroundColor(getResources().getColor(R.color.orange));
-					}else{
-						checkBox.setBackgroundColor(getResources().getColor(R.color.green));
+					if(popTastes.get(position) instanceof Taste){
+						Taste thisTaste = (Taste)popTastes.get(position);
+						checkBox.setTag(thisTaste);
+						checkBox.setText(thisTaste.getPreference());
+	
+						if (thisCombo != null && thisCombo.getTasteGroup().contains(thisTaste)) {
+							checkBox.setBackgroundColor(getResources().getColor(R.color.orange));
+						} else {
+							checkBox.setBackgroundColor(getResources().getColor(R.color.green));
+						}
+					}else if(popTastes.get(position) instanceof FoodUnit){
+						FoodUnit thisUnit = (FoodUnit)popTastes.get(position);
+						checkBox.setTag(thisUnit);
+						checkBox.setText(NumericUtil.float2String2(thisUnit.getPrice()) + "元/" + thisUnit.getUnit());
+	
+						if (thisCombo != null && thisUnit.equals(thisCombo.getFoodUnit())){
+							checkBox.setBackgroundColor(getResources().getColor(R.color.orange));
+						} else {
+							checkBox.setBackgroundColor(getResources().getColor(R.color.brown));
+						}
 					}
-
+					
 					return checkBox;
 				}
 				
