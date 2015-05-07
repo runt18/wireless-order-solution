@@ -76,6 +76,20 @@ public class FoodUnitDao {
 		return unitId;
 	}
 
+	/**
+	 * Get the food unit to specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param id
+	 * 			the id to food unit
+	 * @return the food unit to specific id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the food unit to this id does NOT exist
+	 */
 	public static FoodUnit getById(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
 		List<FoodUnit> result = getByCond(dbCon, staff, new ExtraCond().setId(id));
 		if(result.isEmpty()){
@@ -85,6 +99,16 @@ public class FoodUnitDao {
 		}
 	}
 	
+	/**
+	 * Get the food units to extra condition {@link ExtraCond}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to food units
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
 	public static List<FoodUnit> getByCond(Staff staff, ExtraCond extraCond) throws SQLException {
 		DBCon dbCon = new DBCon();
 		try{
@@ -95,6 +119,18 @@ public class FoodUnitDao {
 		}
 	}
 	
+	/**
+	 * Get the food units to extra condition {@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to food units
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
 	public static List<FoodUnit> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException {
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".food_unit WHERE 1 = 1 "	+

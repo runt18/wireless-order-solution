@@ -12,6 +12,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 
@@ -56,14 +57,13 @@ public class ComboDao {
 			}
 			//Insert the combo order food
 			sql = " INSERT INTO " + Params.dbName + ".combo_order_food" + 
-				  " ( " +
-				  " combo_id, food_id, food_name, food_amount, taste_group_id " +
-				  " ) " +
-				  " VALUES (" +
+				  " ( combo_id, food_id, food_name, food_amount, food_unit_id, food_unit, taste_group_id ) VALUES ( " +
 				  comboId + "," +
 				  cof.asComboFood().getFoodId() + "," +
 				  "'" + cof.asComboFood().getName() + "'," +
 				  cof.asComboFood().getAmount() + "," +
+				  (cof.hasFoodUnit() ? cof.getFoodUnit().getId() : "NULL") + "," +
+				  (cof.hasFoodUnit() ? "'" + cof.getFoodUnit().getUnit() + "'" : "NULL") + "," +
 				  tgId +
 				  " ) ";
 			dbCon.stmt.executeUpdate(sql);
@@ -109,6 +109,13 @@ public class ComboDao {
 			Food f = new Food(dbCon.rs.getInt("food_id"));
 			f.setName(dbCon.rs.getString("food_name"));
 			ComboOrderFood cof = new ComboOrderFood(new ComboFood(f, dbCon.rs.getInt("food_amount")));
+			//Get the food unit.
+			if(dbCon.rs.getInt("food_unit_id") != 0){
+				FoodUnit unit = new FoodUnit(dbCon.rs.getInt("food_unit_id"));
+				unit.setUnit(dbCon.rs.getString("food_unit"));
+				cof.setFoodUnit(unit);
+			}			
+			//Get the taste group.
 			int tgId = dbCon.rs.getInt("taste_group_id");
 			if(tgId != TasteGroup.EMPTY_TASTE_GROUP_ID){
 				cof.setTasteGroup(new TasteGroup(tgId, null, null, null));

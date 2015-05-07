@@ -84,6 +84,10 @@ public class FoodDao {
 		
 		private int childId;
 		
+		public ExtraCond4Combo(Food parent){
+			this.parentId = parent.getFoodId();
+		}
+		
 		public ExtraCond4Combo(int parentId){
 			this.parentId = parentId;
 		}

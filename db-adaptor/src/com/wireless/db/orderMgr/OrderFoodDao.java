@@ -11,6 +11,7 @@ import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.FoodDao.ExtraCond4Combo;
 import com.wireless.db.menuMgr.FoodDao.ExtraCond4Price;
+import com.wireless.db.menuMgr.FoodUnitDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -21,6 +22,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood.Operation;
 import com.wireless.pojo.dishesOrder.TasteGroup;
+import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodUnit;
@@ -455,7 +457,19 @@ public class OrderFoodDao {
 			if(extraCond.dateType.isToday()){
 				//Get the details to the combo.
 				if(of.asFood().isCombo()){
-					of.asFood().setChildFoods(FoodDao.getComboByCond(dbCon, staff, new ExtraCond4Combo(of.asFood().getFoodId())));
+					of.asFood().setChildFoods(FoodDao.getComboByCond(dbCon, staff, new ExtraCond4Combo(of.asFood())));
+					for(ComboFood comboFood : of.asFood().getChildFoods()){
+						ComboOrderFood cof = null;
+						for(ComboOrderFood each : of.getCombo()){
+							if(each.asComboFood().equals(comboFood)){
+								cof = each;
+								break;
+							}
+						}
+						if(cof == null){
+							of.addCombo(new ComboOrderFood(comboFood));
+						}
+					}
 				}
 				//Get the detail to associated price plan.
 				of.asFood().setPricePlan(FoodDao.getPricePlan(dbCon, staff, new ExtraCond4Price(of.asFood())));
@@ -686,10 +700,15 @@ public class OrderFoodDao {
 			src.asFood().setKitchen(KitchenDao.getById(dbCon, staff, src.getKitchen().getId()));
 			
 		}else{		
-			//Get the details to each order food.
+			//Get the detail to associated food.
 			src.asFood().copyFrom(FoodDao.getById(dbCon, staff, src.getFoodId()));
 			
-			//Get the details to normal tastes.
+			//Get the detail to food unit
+			if(src.hasFoodUnit()){
+				src.setFoodUnit(FoodUnitDao.getById(dbCon, staff, src.getFoodUnit().getId()));
+			}
+			
+			//Get the detail to normal tastes.
 			if(src.hasNormalTaste()){
 				//Get the detail to each taste.
 				for(Taste t : src.getTasteGroup().getTastes()){
@@ -707,6 +726,10 @@ public class OrderFoodDao {
 				for(ComboOrderFood cof : src.getCombo()){
 					//Get the details to combo food.
 					cof.asComboFood().copyFrom(FoodDao.getComboByCond(dbCon, staff, new ExtraCond4Combo(src.asFood().getFoodId()).setChildId(cof.asComboFood().getFoodId())).get(0));
+					//Get the details to food unit.
+					if(cof.hasFoodUnit()){
+						cof.setFoodUnit(FoodUnitDao.getById(dbCon, staff, cof.getFoodUnit().getId()));
+					}
 					//Get the details to normal tastes of combo
 					if(cof.hasTasteGroup() && cof.getTasteGroup().hasNormalTaste()){
 						//Get the details to each taste of combo.
