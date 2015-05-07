@@ -718,7 +718,7 @@ of.initNewFoodContent = function(c){
 				comboFoodLi.push(comboFoodLiTemplet.format({
 					name : temp.combo[j].comboFood.name,
 					//有单位时使用单位名
-					unit : temp.combo[j].comboFood.foodUnit ? ' /' + temp.combo[j].comboFood.foodUnit.unit : '',
+					unit : temp.combo[j].foodUnit ? ' /' + temp.combo[j].foodUnit.unit : '',
 					amount : temp.combo[j].comboFood.amount,
 					tastes : temp.combo[j].tasteGroup.tastePref ? ('—' + temp.combo[j].tasteGroup.tastePref) : ''
 				}));
@@ -1736,10 +1736,10 @@ function initComboFoodMultiPrice(){
 					for (var j = 0; j < of.newFood[i].combo.length; j++) {
 						var comboFood = of.newFood[i].combo[j].comboFood;
 						//若有单位
-						id4Choosed = comboFood.foodUnit ? comboFood.foodUnit.id : 0;
+						id4Choosed = of.newFood[i].combo[j].foodUnit ? of.newFood[i].combo[j].foodUnit.id : 0;
 						
-						if(comboFood.id == chooseOrderFoodCommonTaste.curComboFoodId && !comboFood.foodUnit){
-							comboFood.foodUnit = of.multiPrices[0];
+						if(comboFood.id == chooseOrderFoodCommonTaste.curComboFoodId && !of.newFood[i].combo[j].foodUnit){
+							of.newFood[i].combo[j].foodUnit = of.multiPrices[0];
 							
 							id4Choosed = of.multiPrices[0].id;
 							break; 
@@ -2671,7 +2671,7 @@ of.chooseOrderFoodUnit = function(c){
 					for (var j = 0; j < of.newFood[i].combo.length; j++) {
 						var comboFood = of.newFood[i].combo[j].comboFood;
 						if(comboFood.id == chooseOrderFoodCommonTaste.curComboFoodId){
-							comboFood.foodUnit = foodUnit;
+							of.newFood[i].combo[j].foodUnit = foodUnit;
 						}
 					}
 				}else{
