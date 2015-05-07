@@ -122,8 +122,8 @@ public class ComboFood implements Parcelable, Jsonable{
 	}
 
 	public static enum Key4Json{
-		COMBO_FOOD_ID("comboFoodId", "子菜编号"),
-		COMBO_FOOD_AMOUNT("comboFoodAmount", "子菜数量");
+		COMBO_FOOD_ID("id", "子菜编号"),
+		COMBO_FOOD_AMOUNT("amount", "子菜数量");
 		
 		Key4Json(String key, String desc){
 			this.key = key;

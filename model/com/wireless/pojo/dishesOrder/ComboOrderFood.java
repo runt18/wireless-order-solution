@@ -149,7 +149,7 @@ public class ComboOrderFood implements Parcelable, Jsonable {
 
 	public static enum Key4Json{
 		COMBO_FOOD("comboFood", "子菜"),
-		COMBO_FOOD_TASTE_GROUP("comboFoodTaste", "子菜口味");
+		COMBO_FOOD_TASTE_GROUP("tasteGroup", "子菜口味");
 		
 		Key4Json(String key, String desc){
 			this.key = key;
@@ -170,13 +170,13 @@ public class ComboOrderFood implements Parcelable, Jsonable {
 		JsonMap jm = new JsonMap();
 		jm.putJsonable(Key4Json.COMBO_FOOD.key, this.comboFood, ComboFood.COMBO_FOOD_JSONABLE_COMPLEX);
 		jm.putJsonable(Key4Json.COMBO_FOOD_TASTE_GROUP.key, this.tasteGroup, TasteGroup.TG_JSONABLE_4_COMMIT);
-		return null;
+		return jm;
 	}
 	
 	@Override
 	public void fromJsonMap(JsonMap jm, int flag) {
 		this.comboFood = jm.getJsonable(Key4Json.COMBO_FOOD.key, ComboFood.JSON_CREATOR, ComboFood.COMBO_FOOD_JSONABLE_SIMPLE);
-		if(jm.containsKey(Key4Json.COMBO_FOOD_TASTE_GROUP)){
+		if(jm.containsKey(Key4Json.COMBO_FOOD_TASTE_GROUP.key)){
 			setTasteGroup(jm.getJsonable(Key4Json.COMBO_FOOD_TASTE_GROUP.key, TasteGroup.JSON_CREATOR, TasteGroup.TG_JSONABLE_4_COMMIT));
 		}
 	}

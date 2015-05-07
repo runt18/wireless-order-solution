@@ -118,7 +118,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	//the last order amount to this order food
 	private float mLastCnt;	
 
-	private List<ComboOrderFood> mCombo;
+	private List<ComboOrderFood> mCombo = new ArrayList<>();
 	
 	private final Food mFood = new Food(0);
 	
