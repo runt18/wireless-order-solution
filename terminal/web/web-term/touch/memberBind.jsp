@@ -108,7 +108,7 @@ select{
 </head>
 <body>
 	<!-- 系统共用会员绑定start -->
-	<div id="finishMemberInfo" class="ui-overlay-shadow ui-corner-all" style="width:740px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -370px;background-color: white;" align="center">	
+	<div id="finishMemberInfo" class="ui-overlay-shadow ui-corner-all" style="width:750px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -375px;background-color: white;" align="center">	
 	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
 	        	完善会员资料
 	    </div> 
@@ -138,10 +138,12 @@ select{
 	    		
 	    		<td class="readMemberTd">会员类型:</td>
 	    		<td class="selectionCmp" style="line-height: 20px;padding: 0 3px;">
-					<select id="fm_comboMemberType" data-role="none" data-native-menu="false" data-theme="b" onchange="ts.member.add_changeMemberType()">
+<!-- 					<select id="fm_comboMemberType" data-role="none" data-native-menu="false" data-theme="b" onchange="ts.member.add_changeMemberType()">
 						<option value="aaa" >aaaaaa</option>
 						<option value="bbbb" >bbbbb</option>
-					</select>		 
+					</select>	 -->	 
+					<select name="select-native-1" id="fm_comboMemberType" onchange="ts.member.add_changeMemberType()">
+				    </select>					
 	    		</td>  		   		
 	    	</tr> 
 	    </table>

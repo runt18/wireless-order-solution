@@ -283,7 +283,7 @@ $(function(){
 		var target = $(e.target); 
 		//关闭点菜时弹出的动态口味
 		if(mouseOutFoodSelect){
-			if($('#divFoodTasteFloat').is(':visible')){
+			if($('#divFoodTasteFloat').is(':visible') || $('#divComboFoodFloat').is(':visible')){
 		 		if(target.closest(".commonTasteFloat").length == 0){ 
 					$(".commonTasteFloat").hide(); 
 				}
@@ -1176,7 +1176,7 @@ ts.renderToCreateOrder = function(tableNo, peopleNo){
 			});
 		}else{
 			theTable.customNum = peopleNo;
-			of.show({
+			of.entry({
 				table : theTable
 /*				,callback : function(){
 					initTableData();

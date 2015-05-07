@@ -1036,12 +1036,29 @@
 		     <div id="divOrderFoodsCmp" class="ui-block-a" style="width: -webkit-calc(100% - 99px);width: -moz-calc(100% - 99px);width: -ms-calc(100% - 99px);width: -o-calc(100% - 99px);height: inherit;overflow-y: auto;">
 		     	<!--已点菜列表  -->
 				<ul id="orderFoodsCmp" data-role="listview" data-theme="d" data-inset="true">
-<!-- 				    <li data-icon="forFree"><a href="#">
-					    	<h2>忒观音 X 1</h2>
+<!-- 				    <li data-icon="forFree">
+				    	<a href="#">
+					    	<h1>忒观音</h1>
 					    	<span style="color:gray;">打包,加水,加热</span>
 					    	<div>
 					    		<span style="float: left;color: red;">叫起</span>
-					    		<span style="float: right;">￥89</span>
+					    		<span style="float: right;">￥89 X <font color="green">1</font></span>
+					    	</div>
+					    	<br>
+							<div ><ul data-role="listview" data-inset="false" class="div4comboFoodList">
+						            <li>┕饮料<font color="blue"> —加大,中牌</font></li>
+						            <li>┕水果<font color="blue"> —加辣</font></li>
+						            <li>┕甜品<font color="blue"> —临时口味</font></li>
+						    </ul></div>
+					    
+				    </a></li>
+				    <li data-icon="">
+				    	<a href="#">
+					    	<h1>炒番茄</h1>
+					    	<span style="color:gray;">加热</span>
+					    	<div>
+					    		<span style="float: left;color: red;">叫起</span>
+					    		<span style="float: right;">￥89 X <font color="green">1</font></span>
 					    	</div>
 				    </a></li> -->
 				</ul>		    	
@@ -1097,12 +1114,12 @@
 			 	<a onclick="Util.to.scroll({content:'divOrderFoodsCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>
 			 </div>
 			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-			 	
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="comboFoodTasteUnitLoad()">test</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.submit({notPrint : false})">下单</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="btnOrderAndPay" onclick="of.orderAndPay()">下单并结账</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="searchFood('on')">搜索</a>
-			 	<a onclick="addTempFood()" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-transition="pop" data-theme="b" class="bottomBtnFont" >临时菜</a>
+			 	<a data-role="button" onclick="addTempFood()" data-rel="popup" data-position-to="window"  data-inline="true" data-transition="pop" data-theme="b" class="bottomBtnFont" >临时菜</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#orderOtherOperateCmp">更多</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.foodPaging.getPreviousPage()">上一页</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.foodPaging.getNextPage()">下一页</a>
@@ -1142,8 +1159,8 @@
 		 
 	</div>
 	
-	<div id="orderFoodTasteCmp" data-role="popup" data-theme="c" data-dismissible="false" style="width:820px;" class="ui-corner-all" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top" style="height: 50px;">
+	<div id="orderFoodTasteCmp" data-role="popup" data-theme="c" data-dismissible="false" style="width:820px;" class="ui-corner-all" align="center" onmouseout="javascript:mouseOutFoodSelect = true;" onmouseover="javascript:mouseOutFoodSelect = false;">
+	    <div data-role="header" data-theme="b" class="ui-corner-top">
 	    	<!-- 口味组 -->
 	    	<div id="tasteGroupCmp" data-role="controlgroup" data-type="horizontal" >
 	    			<!-- 文字外的div是为了不让字出现省略号... -->
@@ -1174,7 +1191,47 @@
 				 <a data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="tasteGroupPage" onclick="tasteCmpNextPage()">R</a>	 -->	 
 			 </div>
 	    </div>
-	</div>	
+	</div>	 
+	
+	<!-- 套菜点菜 -->
+	<div id="divComboFoodFloat" class="ui-overlay-shadow ui-corner-all commonTasteFloat" >
+	<!-- <div id="divFoodTasteFloat" class="commonTasteFloat" data-role="popup"  data-theme="c" data-dismissible="false" style="min-width:550px;" class="ui-corner-all"> -->
+		<div data-role="header" data-theme="b" class="ui-corner-top" style="height: 50px">
+    		<div id="comboFoodsGroupCmp" data-role="controlgroup" style="float: left;margin-left: 5px;">
+    		
+    		</div>
+        	<div style="float: right">
+  				<a onclick="closeComboFoodTasteUnit()" data-role="button" data-corners="false" class="popupWinCloseBtn4comboFood">X</a>      		
+        	</div>			 
+			 
+	    </div>
+	    
+	    <div data-role="collapsible" data-mini="true" id="collapsibleComboFoodTaste" >
+	    	<h3>常用口味</h3>
+			<div id="divComboFoodTastes">
+<!-- 				<a onclick="chooseOrderFoodCommonTaste({event: this, id: 2})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index=0 data-value=2 data-theme="c">
+					<div>
+						口味1<br>￥10
+					</div>
+				</a> -->
+			</div> 
+	    </div>
+	    <div data-role="collapsible" data-mini="true" id="collapsibleComboFoodMultiPrice">
+	        <h3>选择单位</h3>
+	        <div id="divComboFoodMultiPrices">
+<!-- 				<a onclick="" data-role="button" data-corners="false" data-inline="true" class="multiPriceCmp" data-index=0 data-value=2 data-theme="c">
+					<div>
+						¥45/例
+					</div>
+				</a> -->
+			</div> 
+	    </div>
+	    
+	    
+ 	
+	</div>		
+	
+	
 	
 	<!-- 菜品数量输入 -->
 	<div id="orderFoodCountSet" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
@@ -1299,7 +1356,7 @@
 	    </div>
 	</div>		
 	
-	<div id="addTempTasteCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: -100px 0px 0px -250px;min-width:500px;display: none;background-color: white;" align="center">
+	<div id="addTempTasteCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: -100px 0px 0px -250px;min-width:500px;display: none;background-color: white;" align="center" onmouseout="javascript:mouseOutFoodSelect = true;" onmouseover="javascript:mouseOutFoodSelect = false;">
 	<!-- <div id="addTempTasteCmp" data-role="popup"  data-theme="c" data-dismissible="false" style="min-width:550px;" class="ui-corner-all" align="center"> -->
 	    <div data-role="header" data-theme="b" class="ui-corner-top">
 	        <h1>添加临时口味</h1>

@@ -1,5 +1,5 @@
 /*
-Ìæ´úÔ­À´1114ÐÐµÄ°´Å¥top 3px
+æ›¿ä»£åŽŸæ¥1114è¡Œçš„æŒ‰é’®top 3px
 */
 .ui-header .ui-btn-left,
 .ui-header .ui-btn-right,
@@ -9,15 +9,27 @@
 .ui-header-fixed.ui-fixed-hidden .ui-btn-right { position: absolute;top:initial;}
 
 /*
-Ìæ»»Ô­2694ÐÐlistviewµÄpaddingÐÐ¸ß
+æ›¿æ¢åŽŸ2694è¡Œlistviewçš„paddingè¡Œé«˜
 */
 .ui-li .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li {
-padding: 0 15px;
-display: block;
+	padding: 0 15px;
+	display: block;
+}
+
+.div4comboFoodList .ui-li-static{
+	cursor : pointer;
+	padding: 5px 0px;
+	border: initial !important; 
+	background-color: inherit;
+}
+
+/*è®¾ç½®èµ é€å›¾æ ‡ä½ç½®*/
+#orderFoodsCmp span.ui-icon-forFree {
+	top: 40px;
 }
 
 /*
-2835ÐÐ»¬¿é¿ª¹Ø´óÐ¡
+2835è¡Œæ»‘å—å¼€å…³å¤§å°
 */
 div.ui-slider-switch {
 	display: inline-block;
@@ -28,7 +40,7 @@ div.ui-slider-switch {
 }
 
 /*
-2985ÐÐÒþ²Øtable ColumnsÑ¡Ôñ
+2985è¡Œéšè—table Columnsé€‰æ‹©
 */
 .ui-table-columntoggle-btn{
 	float: right;
@@ -37,7 +49,7 @@ div.ui-slider-switch {
 }
 
 /*
-2971ÐÐ °ßÂíÏßÉèÖÃÉîÉ«
+2971è¡Œ æ–‘é©¬çº¿è®¾ç½®æ·±è‰²
 */
 .table-stripe tbody tr:nth-child(odd) td, .table-stripe tbody tr:nth-child(odd) th {
 	background-color: rgba(0,0,0,0.04);
@@ -45,7 +57,7 @@ div.ui-slider-switch {
 }
 
 /*
-2294ÐÐ, z-indexÐÞ¸Äpopup²ã¸ßÓÚÊý×Ö¼üÅÌ¿Ø¼þ
+2294è¡Œ, z-indexä¿®æ”¹popupå±‚é«˜äºŽæ•°å­—é”®ç›˜æŽ§ä»¶
 */
 .ui-popup-screen {
 	background-image: url(data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==);
@@ -69,7 +81,7 @@ div.ui-slider-switch {
 
 
 /*
-Ò×±Ê×Öblack.css 47ÐÐÒþ²Ø¹Ø±Õ
+æ˜“ç¬”å­—black.css 47è¡Œéšè—å…³é—­
 */
 .d-close {
 	top: 4px;
@@ -85,7 +97,7 @@ div.ui-slider-switch {
 }
 
 /*
-Òþ²ØÒ×±Ê×Ö¹Ø±Õ°´Å¥  
+éšè—æ˜“ç¬”å­—å…³é—­æŒ‰é’®  
 */
 .d-state-highlight:last-child{
 	display: none;
@@ -101,20 +113,20 @@ html { overflow-y: hidden;}
 }
 
 /**
-°´¼üµ×²¿±ßÔ²½Ç
+æŒ‰é”®åº•éƒ¨è¾¹åœ†è§’
 */
 .barBottomBeCorner{
 	border-bottom-right-radius : 0.6em;
 	border-bottom-left-radius : 0.6em;
 }
 
-/*°Ñµ×²¿µÄ°´Å¥ÎÄ×Ö·Å´ó*/
+/*æŠŠåº•éƒ¨çš„æŒ‰é’®æ–‡å­—æ”¾å¤§*/
 .bottomBtnFont{
 	margin-left: 2px !important;
 	min-width: 80px;
 	line-height: 36px;
 }
-/*°Ñ¶¥²¿µÄ°´Å¥ÎÄ×Ö·Å´ó*/
+/*æŠŠé¡¶éƒ¨çš„æŒ‰é’®æ–‡å­—æ”¾å¤§*/
 .topBtnFont{
 	margin-left: 2px !important;
 	min-width: 80px;
@@ -124,7 +136,7 @@ html { overflow-y: hidden;}
 	font-size: 20px !important;
 }
 
-/*Í·²¿*/
+/*å¤´éƒ¨*/
 .tableBasicMsg, .tableStatus{
 	width: 100px;
 	height: 62px;
@@ -140,7 +152,7 @@ html { overflow-y: hidden;}
 	padding: 1em 0px;
 }
 
-/*µ¯³ö¿ò°´Å¥*/
+/*å¼¹å‡ºæ¡†æŒ‰é’®*/
 .countPopbottomBtn{
 	width: -webkit-calc(50% - 2px);
 	width: -moz-calc(50% - 2px);
@@ -151,7 +163,7 @@ html { overflow-y: hidden;}
 	font-size: 20px !important;
 }
 
-/*¿ªÌ¨&µã²Ë°´Å¥*/
+/*å¼€å°&ç‚¹èœæŒ‰é’®*/
 .tablePopbottomBtn{
 	margin-left: 1px !important;
 	width: 32.5%;
@@ -161,22 +173,24 @@ html { overflow-y: hidden;}
 }
 
 
-/*¿ÚÎ¶*/
+/*å£å‘³*/
 .tasteCmp{
 	width: 100px;
 	height: 60px;
 }
-/*¶àµ¥Î»*/
+/*å¤šå•ä½*/
 .multiPriceCmp{
 	width: 100px;
 	height: 60px;
 	line-height: 40px;
 }
-
+.multiPriceCmp .ui-btn-inner{
+	padding: .6em 0px;
+}
 
 
 /*
-²ÍÌ¨
+é¤å°
 */
 .tableCmp{
 	width: 100px;
@@ -200,7 +214,7 @@ html { overflow-y: hidden;}
 	padding-right: initial;	
 }
 
-/*¿ÚÎ¶×éÑ¡Ôñ*/
+/*å£å‘³ç»„é€‰æ‹©*/
 .tastePopTopBtn{
 	margin-left: 2px !important;
 	width : 110px;
@@ -209,7 +223,7 @@ html { overflow-y: hidden;}
 	font-size: 20px !important;
 }
 
-/*¿ÚÎ¶×é·ÖÒ³°´Å¥*/
+/*å£å‘³ç»„åˆ†é¡µæŒ‰é’®*/
 .tasteGroupPage{
 	height: 48px !important;
 }
@@ -217,7 +231,7 @@ html { overflow-y: hidden;}
 	padding: 15px 25px !important;
 }
 
-/*¿ÚÎ¶·ÖÒ³°´Å¥*/
+/*å£å‘³åˆ†é¡µæŒ‰é’®*/
 .tastePopBottomBtn{
 	margin-left: 2px !important;
 	width : 100px;
@@ -227,7 +241,7 @@ html { overflow-y: hidden;}
 }
 
 
-/*²¿ÃÅºÍ³ø·¿*/
+/*éƒ¨é—¨å’ŒåŽ¨æˆ¿*/
 .deptKitBtnFont{
 	width: 87px;
 	line-height: 60px;
@@ -237,7 +251,7 @@ html { overflow-y: hidden;}
 	padding: initial;
 }
 
-/*³ø·¿²¿ÃÅ·ÖÒ³*/
+/*åŽ¨æˆ¿éƒ¨é—¨åˆ†é¡µ*/
 .deptKitBtnFontPage{
 	height: 61px !important;
 	width: 40px;
@@ -247,7 +261,7 @@ html { overflow-y: hidden;}
 	padding: 0.6em 0px;
 }
 
-/*²ËÆ·*/
+/*èœå“*/
 .food-style{
 	width: 100px;
 	height: 70px;
@@ -261,12 +275,12 @@ html { overflow-y: hidden;}
 	white-space: initial;
 }
 
-/*²ËÆ·ÏÔÊ¾ÌØÐÔ×Ö*/
+/*èœå“æ˜¾ç¤ºç‰¹æ€§å­—*/
 .food-status-font{
 	/* position:absolute; */
 	right:0;bottom:0;font-size:20px;
 }
-/*²ÍÌ¨ÔÝ½á*/
+/*é¤å°æš‚ç»“*/
 .tempPayStatus{
 	/* position:absolute; 
 	right:0;bottom:16px;*/
@@ -276,7 +290,7 @@ html { overflow-y: hidden;}
 }
 
 
-/*²ËÆ·²Ù×÷*/
+/*èœå“æ“ä½œ*/
 .orderOperBtn {
 	width: 95px;
 	line-height: 49px;	
@@ -285,7 +299,7 @@ html { overflow-y: hidden;}
 	padding: initial;
 }
 
-/*²ËÆ··ÖÒ³*/
+/*èœå“åˆ†é¡µ*/
 .foodsPaging{
 	height: 58px !important;
 	width: 80px !important;
@@ -300,7 +314,7 @@ html { overflow-y: hidden;}
 	zoom: 1;
 }
 
-/*µ×²¿ÐÅÏ¢»ã×ÜÀ¸, ÓÃfloatÐÎÊ½Ðü¸¡ÔÚfooterÉÏ*/
+/*åº•éƒ¨ä¿¡æ¯æ±‡æ€»æ , ç”¨floatå½¢å¼æ‚¬æµ®åœ¨footerä¸Š*/
 .bottomGeneralBar{
 	width: 100%;
 	float:left;
@@ -310,7 +324,7 @@ html { overflow-y: hidden;}
 	top : -30px;
 }
 
-/*¿ÚÎ¶ÐÅÏ¢À¸, ÓÃfloatÐÎÊ½Ðü¸¡ÔÚfooterÉÏ*/
+/*å£å‘³ä¿¡æ¯æ , ç”¨floatå½¢å¼æ‚¬æµ®åœ¨footerä¸Š*/
 .bottomTastesBar{
 	width: 100%;
 	float:left;
@@ -322,13 +336,13 @@ html { overflow-y: hidden;}
 }
 
 
-/*¶©µ¥¹ÜÀítableµÄÐÐ¸ß*/
+/*è®¢å•ç®¡ç†tableçš„è¡Œé«˜*/
 .infoTableMgr{}
 .infoTableMgr td{
 	line-height: 40px;
 }
 
-/*¶©µ¥ÏêÇé*/
+/*è®¢å•è¯¦æƒ…*/
 .orderDetailGreneral{
 	border-top: 1px dashed gray;
 	border-bottom: 1px dashed gray;
@@ -344,12 +358,12 @@ html { overflow-y: hidden;}
 	min-width: 20px;
 }
 
-/*ÔùËÍÍ¼±ê*/
+/*èµ é€å›¾æ ‡*/
 .ui-icon-forFree{
 	background-image: url(../../images/forFree.png);
 }
 
-/*»ØÉ¾µ¥¸ö×Ö°´Å¥*/
+/*å›žåˆ å•ä¸ªå­—æŒ‰é’®*/
 .btnDeleteWord > span{
 	height: 25px !important;
 	width: 30px !important;
@@ -396,7 +410,7 @@ html { overflow-y: hidden;}
 }
 
 /*
-	³£ÓÃ¿ÚÎ¶¶¯Ì¬´°¿Ú
+	å¸¸ç”¨å£å‘³åŠ¨æ€çª—å£
 */
 .commonTasteFloat{
 	z-index: 2;
@@ -410,7 +424,7 @@ html { overflow-y: hidden;}
 }
 
 /*
-	³£ÓÃ¿ÚÎ¶¶¯Ì¬´°¿ÚÏÂÊÖ·çÇÙÈ¥µôÍâ±ß¾à
+	å¸¸ç”¨å£å‘³åŠ¨æ€çª—å£ä¸‹æ‰‹é£Žç´åŽ»æŽ‰å¤–è¾¹è·
 */
 .commonTasteFloat .ui-collapsible-inset { margin: initial; }
 .commonTasteFloat .ui-collapsible-content {
@@ -418,7 +432,7 @@ html { overflow-y: hidden;}
 }
 
 
-/*ÇøÓò°´Å¥ÎÄ×Ö·Å´ó*/
+/*åŒºåŸŸæŒ‰é’®æ–‡å­—æ”¾å¤§*/
 .regionBtn{
 	width: 110px;
 	margin: 3px 5px;
@@ -429,7 +443,7 @@ html { overflow-y: hidden;}
 	padding-right: initial;
 }
 
-/*ÆÕÍ¨ÌáÊ¾*/
+/*æ™®é€šæç¤º*/
 .toptip{
 	min-width:150px;z-index: 1202;position: absolute; top: 10px;background-color: white;
 	box-shadow: 0 0 12px rgba(0,0,0,.6);
@@ -474,7 +488,7 @@ html { overflow-y: hidden;}
 	color: green;
 }
 
-/*»ìºÏ½áÕË*/
+/*æ··åˆç»“è´¦*/
 .mixPayInputFont{
 	font-size:20px;font-weight: bold;width: 170px;
 }
@@ -490,7 +504,19 @@ html { overflow-y: hidden;}
 	background-image: -o-linear-gradient( top,red,maroon);	
 }
 
-/*ÏÔÊ¾»áÔ±ÐÅÏ¢table*/
+.popupWinCloseBtn4comboFood{
+	border-top-right-radius: 0.5em;
+  width: 40px;
+  height: 50px;
+  margin: -1px 0;
+  line-height: 35px;
+	background-image: -webkit-linear-gradient( top,red,maroon);
+	background-image: -moz-linear-gradient( top,red,maroon);
+	background-image: -ms-linear-gradient( top,red,maroon);
+	background-image: -o-linear-gradient( top,red,maroon);	
+}
+
+/*æ˜¾ç¤ºä¼šå‘˜ä¿¡æ¯table*/
 .readMemberTd{
 	line-height: 50px;font-weight: bold;font-size: 20px;text-align: center;min-width: 96px;
 }
@@ -498,7 +524,24 @@ html { overflow-y: hidden;}
 	line-height: 50px;font-weight: bold;font-size: 20px;text-align: left;color: green;min-width: 120px;
 }
 
-/*²Ù×÷´°¿ÚµÄÍ·¸ß*/
+/*æ“ä½œçª—å£çš„å¤´é«˜*/
 .win_head{
 	line-height: 35px;
+}
+
+
+/*å¥—èœåˆ—*/
+.comboFoodColumn{
+  height: 45px;
+  line-height: 25px;	
+}
+
+/*å¥—èœç»„é€‰æ‹©*/
+.comboFoodPopTopBtn{
+	margin-left: 2px !important;
+	width : 110px;
+}
+.comboFoodPopTopBtn > span{
+	font-size: 15px !important;
+	line-height: 30px;
 }

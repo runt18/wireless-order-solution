@@ -35,9 +35,9 @@ var pm = {table : {}, payByMember:false},
 	 * 元素模板
 	 */
 	//菜品列表
-	payment_orderFoodListCmpTemplet = '<tr>'
+	payment_orderFoodListCmpTemplet = '<tr class="{isComboFoodTd}">'
 		+ '<td>{dataIndex}</td>'
-		+ '<td ><div style="height: 45px;overflow: hidden;">{name}</div></td>'
+		+ '<td ><div class={foodNameStyle}>{name}</div></td>'
 		+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
 		+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
 		+ '<td>{tastePrice}</td>'
@@ -321,7 +321,7 @@ function loadOrderBasicMsg(){
 			dataIndex : i + 1,
 			id : checkOutData.root[i].id,
 			name : checkOutData.root[i].foodName + ((checkOutData.root[i].status & 1 << 7) != 0 ? '<font color="red">[称重确认]</font>' : ''),
-			count : checkOutData.root[i].count.toFixed(2),
+			count : checkOutData.root[i].count,
 			isWeight : (checkOutData.root[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 			tastePref : checkOutData.root[i].tasteGroup.tastePref,
 			tastePrice : checkOutData.root[i].tasteGroup.tastePrice,
@@ -329,8 +329,34 @@ function loadOrderBasicMsg(){
 			discount : checkOutData.root[i].discount,
 			totalPrice : checkOutData.root[i].totalPrice.toFixed(2),
 			orderDateFormat : checkOutData.root[i].orderDateFormat.substring(11),
-			waiter : checkOutData.root[i].waiter 
+			waiter : checkOutData.root[i].waiter,
+			isComboFoodTd : "",
+			foodNameStyle : "commonFoodName"
 		}));
+		
+		if((checkOutData.root[i].status & 1 << 5) != 0){
+			var combo = checkOutData.root[i].combo;
+			
+			for (var j = 0; j < combo.length; j++) {
+				html.push(payment_orderFoodListCmpTemplet.format({
+					dataIndex : '',
+					id : combo[j].comboFood.id,
+					name : '┕' + combo[j].comboFood.name,
+					count : combo[j].comboFood.amount,
+					isWeight : (combo[j].comboFood.status & 1 << 7) != 0 ? 'initial' : 'none',
+					tastePref : combo[j].tasteGroup.tastePref,
+					tastePrice : combo[j].tasteGroup.tastePrice,
+					unitPrice : "",
+					discount : "",
+					totalPrice : "",
+					orderDateFormat : "",
+					waiter : "",
+					isComboFoodTd : "comboFoodTd",
+					foodNameStyle : "comboFoodName"
+				}));					
+			}
+		}
+		
 	}			
 	
 	$('#payment_orderFoodListBody').html(html.join("")).trigger('create');	

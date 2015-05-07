@@ -13,16 +13,16 @@ var uo = {
 	 * 元素模板
 	 */
 	//已点菜列表
-	orderFoodListCmpTemplet = '<tr>'
+	orderFoodListCmpTemplet = '<tr class="{isComboFoodTd}">'
 		+ '<td>{dataIndex}</td>'
-		+ '<td ><div style="height: 45px;overflow: hidden;">{name}</div></td>'
+		+ '<td ><div class={foodNameStyle}>{name}</div></td>'
 		+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
 		+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
 		+ '<td>{unitPrice}</td>'
 	//	+ '<td>{totalPrice}</td>'
 		+ '<td>{orderDateFormat}</td>'
-		+ '<td>' 
-		+ 		'<div data-role="controlgroup" data-type="horizontal" >'
+		+ '<td>' + '{comboFoodOpe}'
+		+ 		'<div data-role="controlgroup" data-type="horizontal" class="{isHideOpe}">'
 	    + 			'<a onclick="uo.openCancelFoodCmp({event:this})" data-index={dataIndex} data-role="button" data-theme="b">退菜</a>'
 	    +			'<a onclick="uo.transFoodForTS({event:this})" data-index={dataIndex} data-role="button" data-theme="b">转菜</a>'
 	    +			'<a  data-index={dataIndex} data-role="button" data-theme="b"  data-rel="popup"  data-transition="pop" onclick="uo.openOrderFoodOtherOperate({event:this})">更多</a>'
@@ -140,7 +140,7 @@ function initOrderData(c){
 				
 				uo.showOrder();
 				uo.showDescForUpdateOrder();
-			    c.createrOrder == 'createrOrder' ? of.show({
+			    c.createrOrder == 'createrOrder' ? of.entry({
 					table : uo.table,
 					order : uo.order,
 					callback : function(){
@@ -188,15 +188,46 @@ uo.showOrder = function(){
 			dataIndex : i + 1,
 			id : uo.order.orderFoods[i].id,
 			name : uo.order.orderFoods[i].foodName,
-			count : uo.order.orderFoods[i].count.toFixed(2),
+			count : uo.order.orderFoods[i].count,
 			isWeight : (uo.order.orderFoods[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 			hasWeigh : (uo.order.orderFoods[i].status & 1 << 7) != 0 ?'orderFoodMoreOperateCmp':'',
 			tastePref : uo.order.orderFoods[i].tasteGroup.tastePref,
 			unitPrice : uo.order.orderFoods[i].unitPrice.toFixed(2) + (uo.order.orderFoods[i].isGift?'&nbsp;[<font style="font-weight:bold;">已赠送</font>]':''),
-			totalPrice : uo.order.orderFoods[i].totalPrice.toFixed(2),
+//			totalPrice : uo.order.orderFoods[i].totalPrice.toFixed(2),
 			orderDateFormat : uo.order.orderFoods[i].orderDateFormat.substring(11),
-			waiter : uo.order.orderFoods[i].waiter 
+			waiter : uo.order.orderFoods[i].waiter ,
+			comboFoodOpe : '',
+			isHideOpe : "",
+			isComboFoodTd : "",
+			foodNameStyle : "commonFoodName"
 		});
+		
+		if((uo.order.orderFoods[i].status & 1 << 5) != 0){
+			var combo = uo.order.orderFoods[i].combo;
+			
+			for (var j = 0; j < combo.length; j++) {
+				html += orderFoodListCmpTemplet.format({
+					dataIndex : '',
+					id : combo[j].comboFood.id,
+					name : '┕' + combo[j].comboFood.name,
+					count : combo[j].comboFood.amount,
+					isWeight : (combo[j].comboFood.status & 1 << 7) != 0 ? 'initial' : 'none',
+					hasWeigh : (combo[j].comboFood.status & 1 << 7) != 0 ?'orderFoodMoreOperateCmp':'',
+					tastePref : combo[j].tasteGroup.tastePref,
+					unitPrice : "",
+//					totalPrice : combo.comboFood.totalPrice.toFixed(2),
+					orderDateFormat : "",
+					waiter : "",
+					comboFoodOpe : '',
+					isHideOpe : "none",
+					isComboFoodTd : "comboFoodTd",
+					foodNameStyle : "comboFoodName"
+				});					
+			}
+			
+		
+		}
+		
 	}			
 	
 	$('#orderFoodListBody').html(html).trigger('create');
@@ -1253,7 +1284,7 @@ uo.goToCreateOrder = function(){
 		//FIXME 每点一次餐台都去更新菜品
 //		initFoodData();
 		
-		of.show({
+		of.entry({
 			table : uo.table,
 			order : uo.order,
 			callback : function(){
