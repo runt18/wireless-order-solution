@@ -40,6 +40,9 @@ public class UpdateMenuAction extends Action {
 			String isHot = request.getParameter("isHot");
 			String isWeight = request.getParameter("isWeight");
 			String isCommission = request.getParameter("isCommission");
+			String isLimit = request.getParameter("isLimit");
+			String limitCount = request.getParameter("limitCount");
+			
 			String commission = request.getParameter("commission");
 			String foodAliasId = request.getParameter("foodAliasID");
 			String foodImage = request.getParameter("foodImage");
@@ -58,7 +61,8 @@ public class UpdateMenuAction extends Action {
 												 .setGift(Boolean.parseBoolean(isFree))
 												 .setCurPrice(Boolean.parseBoolean(isCurrPrice))
 												 .setHot(Boolean.parseBoolean(isHot))
-												 .setWeigh(Boolean.parseBoolean(isWeight));
+												 .setWeigh(Boolean.parseBoolean(isWeight))
+												 .setLimit(Boolean.parseBoolean(isLimit), Integer.parseInt(limitCount));
 			
 			if(foodImage != null && !foodImage.isEmpty()){
 				builder.setImage(Integer.parseInt(foodImage));

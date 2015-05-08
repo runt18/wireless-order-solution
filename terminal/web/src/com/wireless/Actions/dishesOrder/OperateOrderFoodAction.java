@@ -10,6 +10,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -22,6 +23,7 @@ import com.wireless.pack.req.ReqTransFood;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.WebParams;
@@ -162,4 +164,38 @@ public class OperateOrderFoodAction extends DispatchAction{
 		}		
 		return null;
 	}	
+	
+	/**
+	 * 更新限量沽清菜品
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward updateFoodLimit(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		String foodId = request.getParameter("foodId");
+		String limitAmount = request.getParameter("amount");
+		String pin = (String) request.getAttribute("pin");
+		
+		JObject jobject = new JObject();
+		try {
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			FoodDao.update(staff, new Food.LimitRemainingBuilder(new Food(Integer.parseInt(foodId)), Integer.parseInt(limitAmount)));
+		}catch(BusinessException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}catch(Exception e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}		
+		return null;
+	}	
+	
 }

@@ -50,6 +50,9 @@ public class InsertMenuAction extends Action {
 			String isHot = request.getParameter("isHot");
 			String isWeight = request.getParameter("isWeight");
 			String isCommission = request.getParameter("isCommission");
+			String isLimit = request.getParameter("isLimit");
+			String limitCount = request.getParameter("limitCount");			
+			
 			String commission = request.getParameter("commission");
 			String multiFoodPrices = request.getParameter("multiFoodPrices");
 //			String stockStatus = request.getParameter("stockStatus");
@@ -65,7 +68,8 @@ public class InsertMenuAction extends Action {
 												 .setGift(Boolean.valueOf(isGift))
 												 .setCurPrice(Boolean.valueOf(isCurrPrice))
 												 .setHot(Boolean.valueOf(isHot))
-												 .setWeigh(Boolean.valueOf(isWeight));
+												 .setWeigh(Boolean.valueOf(isWeight))
+												 .setLimit(Boolean.parseBoolean(isLimit), Integer.parseInt(limitCount));
 			
 			if(foodAliasId != null && !foodAliasId.isEmpty()){
 				builder.setAliasId(Integer.parseInt(foodAliasId));
