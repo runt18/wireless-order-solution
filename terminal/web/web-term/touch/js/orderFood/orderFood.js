@@ -469,12 +469,14 @@ of.updataSelloutFoods = function(){
 					of.foodList[j].status &= ~(1 << 2);
 					for (var i = 0; i < stopFoods.length; i++) {
 						if(of.foodList[j].id == stopFoods[i].id){
+							if(stopFoods[i].foodLimitRemain == 0){
+								of.foodList[j].status |= (1 << 2);
+							}
+							
 							//更新限量沽清剩余
-							if((of.foodList[j].status & 1 << 10) != 0 && stopFoods[i].foodLimitRemain > 0){
+							if((of.foodList[j].status & 1 << 10) != 0){
 								of.foodList[j].foodLimitAmount = stopFoods[i].foodLimitAmount;
 								of.foodList[j].foodLimitRemain = stopFoods[i].foodLimitRemain;
-							}else{
-								of.foodList[j].status |= (1 << 2);
 							}
 							break;
 						}
