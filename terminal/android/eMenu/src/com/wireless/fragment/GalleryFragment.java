@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,6 +42,7 @@ import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.ComboFoodActivity;
@@ -93,7 +96,14 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 					
 					//菜品名称和价钱
 					((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(mFragment.get().mCurFood.getName());
-					((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(NumericUtil.float2String2(mFragment.get().mCurFood.getPrice()));
+					if(mFragment.get().mCurFood.hasFoodUnit()){
+						((TextView) fgmView.findViewById(R.id.textView_priceTag_galleryFgm)).setText("多单位");
+						((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setVisibility(View.GONE);
+					}else{
+						((TextView) fgmView.findViewById(R.id.textView_priceTag_galleryFgm)).setText("单价:");
+						((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setVisibility(View.VISIBLE);
+						((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(NumericUtil.float2String2(mFragment.get().mCurFood.getPrice()));
+					}
 					Food curFood = mFragment.get().mCurFood;
 					if(curFood.isCombo())
 						((TextView) fgmView.findViewById(R.id.button_galleryFgm_detail)).setText("套餐详情");
@@ -353,15 +363,38 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			@Override
 			public void onClick(View v) {
 				try{
-					OrderFood of = new OrderFood(mCurFood);
+					final OrderFood of = new OrderFood(mCurFood);
 					of.setCount(1f);
-					ShoppingCart.instance().addFood(of);
-
-					mHandler.sendEmptyMessage(0);
 					
-					//Perform to show the associated foods
-					if(!mComboPopup.isShowing()){
-						getView().findViewById(R.id.button_galleryFgm_ComboFood).performClick();
+					if(mCurFood.hasFoodUnit()){
+						List<String> items = new ArrayList<String>();
+						for(FoodUnit unit : mCurFood.getFoodUnits()){
+							items.add(unit.toString());
+						}
+						new AlertDialog.Builder(getActivity()).setTitle(of.getName())
+						   .setItems(items.toArray(new String[items.size()]), new DialogInterface.OnClickListener(){
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								try {
+									of.setFoodUnit(mCurFood.getFoodUnits().get(which));
+									ShoppingCart.instance().addFood(of);
+									mHandler.sendEmptyMessage(0);
+								} catch (BusinessException e) {
+									Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+								}
+							}
+						}).setNegativeButton("返回", null).show();
+						
+					}else{
+
+						ShoppingCart.instance().addFood(of);
+	
+						mHandler.sendEmptyMessage(0);
+						
+						//Perform to show the associated foods
+						if(!mComboPopup.isShowing()){
+							getView().findViewById(R.id.button_galleryFgm_ComboFood).performClick();
+						}
 					}
 					
 				}catch(BusinessException e){
@@ -529,7 +562,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
         }
         
         //设置关联菜弹出框
-		mComboPopup = new ExhibitPopupWindow(getActivity().getLayoutInflater().inflate(R.layout.gallery_fgm_combo, null),
+		mComboPopup = new ExhibitPopupWindow(getActivity().getLayoutInflater().inflate(R.layout.gallery_fgm_combo, (ViewGroup)this.getActivity().getWindow().getDecorView(), false),
 											 popupWidth,
 											 LayoutParams.WRAP_CONTENT);
 		
@@ -548,7 +581,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		
 		
 		//设置简介弹出框
-		mIntroPopup = new PopupWindow(getActivity().getLayoutInflater().inflate(R.layout.gallery_fgm_intro, null),
+		mIntroPopup = new PopupWindow(getActivity().getLayoutInflater().inflate(R.layout.gallery_fgm_intro, (ViewGroup)this.getActivity().getWindow().getDecorView(), false),
 									  LayoutParams.WRAP_CONTENT,
 									  LayoutParams.WRAP_CONTENT);
 		mIntroPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
@@ -651,7 +684,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			this.setPosByFood(food);
 		}else {
 			Toast toast = Toast.makeText(getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
-			toast.setGravity(Gravity.TOP|Gravity.RIGHT, 230, 100);
+			toast.setGravity(Gravity.TOP | Gravity.END, 230, 100);
 			toast.show();
 		}
 	}

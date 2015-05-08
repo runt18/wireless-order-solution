@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_centerHorizontal="false"
     android:layout_centerVertical="false" >
 
@@ -16,7 +16,7 @@
         android:id="@+id/top_bar_galleryFgm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:background="@drawable/main_top_bg"
         android:clickable="false"
@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/imageButton_rec_galleryFgm"
+            android:layout_toEndOf="@+id/imageButton_rec_galleryFgm"
             android:background="@null"
             android:src="@drawable/current_btn_selector"
             android:visibility="invisible" />
@@ -38,11 +38,11 @@
             android:id="@+id/editText_galleryFgm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="false"
+            android:layout_alignParentEnd="false"
             android:layout_alignParentTop="false"
             android:layout_marginRight="6dp"
             android:layout_marginTop="4dp"
-            android:layout_toLeftOf="@+id/imageButton_amplify_galleryFgm"
+            android:layout_toStartOf="@+id/imageButton_amplify_galleryFgm"
             android:background="@drawable/search_bar"
             android:ems="10"
             android:hint="请输入菜名或编号搜索"
@@ -57,7 +57,7 @@
             android:id="@+id/imageButton_amplify_galleryFgm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:layout_marginRight="70dp"
             android:background="@null"
@@ -68,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/editText_galleryFgm"
-            android:layout_toRightOf="@+id/imageView_galleryFgm_hotSignal"
+            android:layout_toEndOf="@+id/imageView_galleryFgm_hotSignal"
             android:src="@drawable/gift_signal"
             android:visibility="gone" />
         -->
@@ -79,7 +79,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/editText_galleryFgm"
+            android:layout_alignEnd="@+id/editText_galleryFgm"
             android:background="@drawable/delete_all_selector" />
 
         <Button
@@ -88,14 +88,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/editText_galleryFgm"
+            android:layout_toStartOf="@+id/editText_galleryFgm"
             android:background="@drawable/gallery_fgm_combo_selector" />
 
         <ImageView
             android:id="@+id/imageView_galleryFgm_hotSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:src="@drawable/hot_signal_small" />
 
@@ -104,7 +104,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/imageView_galleryFgm_hotSmall"
+            android:layout_toEndOf="@+id/imageView_galleryFgm_hotSmall"
             android:src="@drawable/rec_signal_small" />
     </RelativeLayout>
 
@@ -113,7 +113,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="false"
         android:background="@drawable/main_bottom_bg"
         android:descendantFocusability="afterDescendants" >
@@ -122,10 +122,10 @@
             android:id="@+id/imageButton_add_galleryFgm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentTop="false"
             android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:background="@null"
             android:scaleType="center"
             android:src="@drawable/add_dish_btn_selector" />
@@ -134,7 +134,7 @@
             android:id="@+id/textView_foodName_galleryFgm"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_centerVertical="true"
             android:gravity="center"
@@ -144,13 +144,13 @@
             android:textSize="@dimen/text_size_l" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/textView_priceTag_galleryFgm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="false"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:layout_toRightOf="@+id/textView_foodName_galleryFgm"
+            android:layout_marginStart="20dp"
+            android:layout_toEndOf="@+id/textView_foodName_galleryFgm"
             android:text="单价："
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/white"
@@ -161,7 +161,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/textView2"
+            android:layout_toEndOf="@+id/textView_priceTag_galleryFgm"
             android:text="88"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/white"
@@ -172,7 +172,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/imageButton_add_galleryFgm"
+            android:layout_toStartOf="@+id/imageButton_add_galleryFgm"
             android:background="@drawable/sub_button_main_selector"
             android:text="菜品详情"
             android:textColor="@color/white"
@@ -185,7 +185,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/relativeLayout_bottom_right"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:shadowColor="@color/black"
         android:shadowDx="1"
         android:shadowDy="1"
@@ -199,7 +199,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/textView_galleryFgm_count"
-        android:layout_toLeftOf="@+id/textView_galleryFgm_count"
+        android:layout_toStartOf="@+id/textView_galleryFgm_count"
         android:shadowColor="@color/black"
         android:shadowDx="1"
         android:shadowDy="1"
@@ -213,9 +213,9 @@
         android:id="@+id/imageView_galleryFgm_hotSignal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/top_bar_galleryFgm"
-        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:src="@drawable/hot_signal"
         android:visibility="visible" />
@@ -225,7 +225,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/top_bar_galleryFgm"
-        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/special_signal"
         android:visibility="visible" />
@@ -235,7 +235,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/top_bar_galleryFgm"
-        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:src="@drawable/recommend_signal"
         android:visibility="visible" />

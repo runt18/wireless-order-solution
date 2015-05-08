@@ -3,8 +3,10 @@ package com.wireless.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.FoodDetailActivity;
 
@@ -64,7 +67,7 @@ public class ThumbnailItemFragment extends ListFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		final View layout = inflater.inflate(R.layout.fragment_text_list_item, null);
+		final View layout = inflater.inflate(R.layout.fragment_text_list_item, container, false);
 
 		Bundle args = getArguments();
 		String parentTag = args.getString(KEY_PARENT_FGM_TAG);
@@ -179,7 +182,7 @@ public class ThumbnailItemFragment extends ListFragment {
 			final View layout;
 
 			if (convertView == null) {
-				layout = LayoutInflater.from(parent.getContext()).inflate(R.layout.thumbnail_fgm_item, null);
+				layout = LayoutInflater.from(parent.getContext()).inflate(R.layout.thumbnail_fgm_item, parent, false);
 			}else{
 				layout = convertView;
 			}
@@ -197,13 +200,35 @@ public class ThumbnailItemFragment extends ListFragment {
 				addBtn.setOnClickListener(new OnClickListener(){
 					@Override
 					public void onClick(View v) {
-						OrderFood of = new OrderFood(leftFood);
+						final OrderFood of = new OrderFood(leftFood);
 						of.setCount(1f);
-						try {
-							ShoppingCart.instance().addFood(of);
-							refreshDisplay(leftFood, layout, true);
-						} catch (BusinessException e) {
-							Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+						
+						if(leftFood.hasFoodUnit()){
+							List<String> items = new ArrayList<String>();
+							for(FoodUnit unit : leftFood.getFoodUnits()){
+								items.add(unit.toString());
+							}
+							new AlertDialog.Builder(getActivity()).setTitle(of.getName())
+							   .setItems(items.toArray(new String[items.size()]), new DialogInterface.OnClickListener(){
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									try {
+										of.setFoodUnit(leftFood.getFoodUnits().get(which));
+										ShoppingCart.instance().addFood(of);
+										refreshDisplay(leftFood, layout, true);
+									} catch (BusinessException e) {
+										Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+									}
+								}
+							}).setNegativeButton("返回", null).show();
+							
+						}else{
+							try {
+								ShoppingCart.instance().addFood(of);
+								refreshDisplay(leftFood, layout, true);
+							} catch (BusinessException e) {
+								Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+							}
 						}
 					}
 				});
@@ -304,9 +329,13 @@ public class ThumbnailItemFragment extends ListFragment {
 			}
 
 			// 菜品价钱
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price1))
-							.setText(NumericUtil.float2String2(foodToDisplay.getPrice()));
-
+			if(foodToDisplay.hasFoodUnit()){
+				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price1)).setText("多单位");
+				layout.findViewById(R.id.textView_combo_name).setVisibility(View.INVISIBLE);
+			}else{
+				layout.findViewById(R.id.textView_combo_name).setVisibility(View.VISIBLE);
+				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price1)).setText(NumericUtil.float2String2(foodToDisplay.getPrice()));
+			}
 			// 菜品名称
 			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName1)).setText(foodToDisplay.getName());
 

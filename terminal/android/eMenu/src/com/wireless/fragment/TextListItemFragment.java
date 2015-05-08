@@ -3,9 +3,11 @@ package com.wireless.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +27,7 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
@@ -181,7 +184,7 @@ class SubListAdapter extends BaseAdapter{
 		
 		View layout;
 		if(convertView == null){
-			layout = LayoutInflater.from(mContext).inflate(R.layout.food_list_fgm_item_subitem, null);
+			layout = LayoutInflater.from(mContext).inflate(R.layout.food_list_fgm_item_subitem, parent, false);
 		}else{
 			layout = convertView;
 		}
@@ -196,17 +199,42 @@ class SubListAdapter extends BaseAdapter{
 				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(leftFood.getName());
 			}
 			//价格显示
-			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price1)).setText(NumericUtil.float2String2(leftFood.getPrice()));
+			if(leftFood.hasFoodUnit()){
+				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price1)).setText("多单位");
+			}else{
+				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price1)).setText(NumericUtil.float2String2(leftFood.getPrice()));
+			}
 			//点菜按钮
 			Button addBtnLeft = (Button)layout.findViewById(R.id.button_foodListFgm_item_subItem_add1);
 			addBtnLeft.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					try {
-						OrderFood leftOrderFood = new OrderFood(leftFood);
-						leftOrderFood.setCount(1f);
-						ShoppingCart.instance().addFood(leftOrderFood);
-						Toast.makeText(mContext, leftOrderFood.getName() + "一份，已添加", Toast.LENGTH_SHORT).show();
+						final OrderFood of = new OrderFood(leftFood);
+						of.setCount(1f);
+						if(leftFood.hasFoodUnit()){
+							List<String> items = new ArrayList<String>();
+							for(FoodUnit unit : leftFood.getFoodUnits()){
+								items.add(unit.toString());
+							}
+							new AlertDialog.Builder(mContext).setTitle(of.getName())
+							   .setItems(items.toArray(new String[items.size()]), new DialogInterface.OnClickListener(){
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									try {
+										of.setFoodUnit(leftFood.getFoodUnits().get(which));
+										ShoppingCart.instance().addFood(of);
+										Toast.makeText(mContext, of.getName() + "一份，已添加", Toast.LENGTH_SHORT).show();
+									} catch (BusinessException e) {
+										Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+									}
+								}
+							}).setNegativeButton("返回", null).show();
+							
+						}else{
+							ShoppingCart.instance().addFood(of);
+							Toast.makeText(mContext, of.getName() + "一份，已添加", Toast.LENGTH_SHORT).show();
+						}
 					} catch (BusinessException e) {
 						Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
 					}
@@ -230,7 +258,11 @@ class SubListAdapter extends BaseAdapter{
 				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(foodRight.getName());
 			}
 			
-			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price2)).setText(NumericUtil.float2String2(foodRight.getPrice()));
+			if(foodRight.hasFoodUnit()){
+				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price2)).setText("多单位");
+			}else{
+				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price2)).setText(NumericUtil.float2String2(foodRight.getPrice()));
+			}
 			Button addBtnRight  = (Button) layout.findViewById(R.id.button_foodListFgm_item_subItem_add2);
 			addBtnRight.setOnClickListener(new OnClickListener() {
 				@Override
