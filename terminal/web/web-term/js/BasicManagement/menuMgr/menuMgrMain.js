@@ -1560,7 +1560,7 @@ var basicOperationPanel = new Ext.Panel({
 		 		columnWidth : .13,
 		 	    items : [{html:'状态:'}]
 		 	}, {
-		 		columnWidth : .2,
+		 		columnWidth : .17,
 		 	    items : [{
 		 	    	xtype : 'checkbox',
 		 	    	id : 'chbForBasicSpecial',
@@ -1568,7 +1568,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	boxLabel : '<img title="特价" src="../../images/icon_tip_te.png"></img>'
 		 	    }]
 		 	}, {
-		 		columnWidth : .2,
+		 		columnWidth : .17,
 		 	    items : [{
 		 	    	xtype : 'checkbox',
 		 	    	id : 'chbForBasicRecommend',
@@ -1576,7 +1576,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	boxLabel : '<img title="推荐" src="../../images/icon_tip_jian.png"></img>'
 		 	    }]
 		 	}, {
-		 		columnWidth : .2,
+		 		columnWidth : .17,
 		 	    items : [{
 		 	    	xtype : 'checkbox',
 		 	    	id : 'chbForBasicFree',
@@ -1584,7 +1584,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	boxLabel : '<img title="赠送" src="../../images/forFree.png"></img>'
 		 	    }]
 		 	}, {
-		 		columnWidth : .2,
+		 		columnWidth : .17,
 		 	    items : [{
 		 	    	xtype : 'checkbox',
 		 	    	id : 'chbForBasicStop',
@@ -1592,12 +1592,30 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	boxLabel : '<img title="停售" src="../../images/icon_tip_ting.png"></img>'
 		 	   	}]
 		 	}, {
+		 		columnWidth : .17,
+		 	    items : [{
+		 	    	xtype : 'checkbox',
+		 	    	id : 'chbForBasicLimit',
+		 	    	hideLabel : true,
+		 	    	boxLabel : '<img title="限量沽清" src="../../images/icon_tip_ting.png"></img>',
+		 	    	listeners : {
+		 	    		check : function(checkbox, checked){
+							if(checked){
+								Ext.getCmp('numLimitCount').getEl().up('.x-form-item').setDisplayed(true);
+								Ext.getCmp('numLimitCount').focus(true, 100);
+							}else{
+								Ext.getCmp('numLimitCount').getEl().up('.x-form-item').setDisplayed(false);
+							}
+						}
+		 	    	}
+		 	    }]
+		 	}, {
 		 		columnWidth : 1
 		 	}, {
 		 		columnWidth : .13,
 		 	    items : [{html:'&nbsp;&nbsp;&nbsp;&nbsp;'}]
 		 	}, {
-		 		columnWidth : .2,
+		 		columnWidth : .17,
 		 	    items : [{
 		 	    	xtype : 'checkbox',
 		 	    	id : 'chbForBasicCurrPrice',
@@ -1605,7 +1623,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	boxLabel : '<img title="时价" src="../../images/currPrice.png"></img>'
 		 	    }]
 		 	}, {
-		 		columnWidth : .2,
+		 		columnWidth : .17,
 		 	    items : [{
 		 	    	xtype : 'checkbox',
 		 	    	id : 'chbForBasicHot',
@@ -1613,7 +1631,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	boxLabel : '<img title="热销" src="../../images/hot.png"></img>'
 		 	    }]
 		 	}, {
-		 		columnWidth : .2,
+		 		columnWidth : .17,
 		 	    items : [{
 		 	    	xtype : 'checkbox',
 		 	    	id : 'chbForBasicWeight',
@@ -1621,7 +1639,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	boxLabel : '<img title="称重" src="../../images/weight.png"></img>'
 		 	    }]
 		 	}, {
-		 		columnWidth : .2,
+		 		columnWidth : .17,
 		 	    items : [{
 		 	    	xtype : 'checkbox',
 		 	    	id : 'chbForBasicCommission',
@@ -1635,7 +1653,6 @@ var basicOperationPanel = new Ext.Panel({
 							}else{
 								Ext.getCmp('numCommission').getEl().up('.x-form-item').setDisplayed(false);
 							}
-							
 						}
 		 	    	}
 		 	    }]
@@ -1657,6 +1674,27 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	    	return true;
 		 	    	    }else{
 		 	    	    	return '价格需在 0.00  至 99999.99 之间!';
+		 	    	    }
+		 	    	}
+		 	    }]
+		 	},{
+		 		columnWidth : .5,
+		 		labelWidth : 60,
+		 		items : [{
+		 	    	xtype : 'numberfield',
+		 	    	id : 'numLimitCount',
+		 	    	style : 'text-align:right;',
+		 	    	fieldLabel : '限量沽清',
+		 	    	decimalPrecision : 2,
+		 	    	allowBlank : false,
+		 	    	maxValue : 99999.99,
+		 	    	minValue : 0.00,
+		 	    	width : 70,
+		 	    	validator : function(v){
+		 	    		if(v >= 0.00 && v <= 99999.99){
+		 	    	    	return true;
+		 	    	    }else{
+		 	    	    	return '数量需在 0.00  至 99999.99 之间!';
 		 	    	    }
 		 	    	}
 		 	    }]
@@ -1901,13 +1939,18 @@ function resetbBasicOperation(_d){
 	var isHot = Ext.getCmp('chbForBasicHot');
 	var isWeight = Ext.getCmp('chbForBasicWeight');
 	var isCommission = Ext.getCmp('chbForBasicCommission');
+	var isLimit = Ext.getCmp('chbForBasicLimit');
+	
 	var img = Ext.getDom('foodBasicImg');
 	var btnUploadFoodImage = Ext.getCmp('btnUploadFoodImage');
 	var btnDeleteFoodImage = Ext.getCmp('btnDeleteFoodImage');
 	var commission = Ext.getCmp('numCommission');
+	var limitCount = Ext.getCmp('numLimitCount');
+	
 	var chkAlias = Ext.getCmp('chbForFoodAlias');
 	var data = {};
 	commission.getEl().up('.x-form-item').setDisplayed(false);
+	limitCount.getEl().up('.x-form-item').setDisplayed(false);
 	// 清空图片信息
 	refreshFoodImageMsg();
 	
@@ -1953,10 +1996,13 @@ function resetbBasicOperation(_d){
 	isHot.setValue(Ext.ux.cfs.isHot(status));
 	isWeight.setValue(Ext.ux.cfs.isWeigh(status));
 	isCommission.setValue(Ext.ux.cfs.isCommission(status));
+	isLimit.setValue(Ext.ux.cfs.isLimit(status));
+	
 	if(Ext.ux.cfs.isCommission(status)){
 		isCommission.fireEvent('check', isCommission, true);
 	}
 	commission.setValue(data.commission);
+	limitCount.setValue(data.limitCount);
 	
 	if(typeof(data.img) == 'undefined' || data.img == ''){
 		//FIXME 图片hardcore
@@ -2035,7 +2081,11 @@ function basicOperationBasicHandler(c){
 	var isHot = Ext.getCmp('chbForBasicHot');
 	var isWeight = Ext.getCmp('chbForBasicWeight');
 	var isCommission = Ext.getCmp('chbForBasicCommission');
+	var isLimit = Ext.getCmp('chbForBasicLimit');
+	
 	var commission = Ext.getCmp('numCommission');
+	var limitCount = Ext.getCmp('numLimitCount');
+	
 	var isCombination = false;
 	var comboContent = '';
 	var kitchenID = '';
@@ -2127,7 +2177,9 @@ function basicOperationBasicHandler(c){
 			isCombination : isCombination,
 			isWeight : isWeight.getValue(),
 			isCommission : isCommission.getValue(),
+			isLimit : isLimit.getValue(),
 			commission : commission.getValue(),
+			limitCount : limitCount.getValue(),
 			comboContent : comboContent,
 			foodImage : foodOperationWin.foodImage,
 			multiFoodPrices : multiFoodPrices
@@ -2931,6 +2983,12 @@ function initMenuGrid(){
 				}, {
 					xtype : 'checkbox',
 					id : 'stopCheckbox'
+				}, { 
+					xtype:'tbtext', 
+					text:'&nbsp;&nbsp;&nbsp;&nbsp;限量:'
+				}, {
+					xtype : 'checkbox',
+					id : 'limitCheckbox'
 				}, { 
 					xtype:'tbtext',
 					text:'&nbsp;&nbsp;&nbsp;&nbsp;时价:'
