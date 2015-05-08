@@ -68,8 +68,7 @@ public class InsertMenuAction extends Action {
 												 .setGift(Boolean.valueOf(isGift))
 												 .setCurPrice(Boolean.valueOf(isCurrPrice))
 												 .setHot(Boolean.valueOf(isHot))
-												 .setWeigh(Boolean.valueOf(isWeight))
-												 .setLimit(Boolean.parseBoolean(isLimit), Integer.parseInt(limitCount));
+												 .setWeigh(Boolean.valueOf(isWeight));
 			
 			if(foodAliasId != null && !foodAliasId.isEmpty()){
 				builder.setAliasId(Integer.parseInt(foodAliasId));
@@ -77,6 +76,12 @@ public class InsertMenuAction extends Action {
 			
 			if(Boolean.valueOf(isCommission)){
 				builder.setCommission(Float.parseFloat(commission));
+			}
+			
+			if(Boolean.parseBoolean(isLimit)){
+				builder.setLimit(Boolean.parseBoolean(isLimit), Integer.parseInt(limitCount));
+			}else{
+				builder.setLimit(false, 0);
 			}
 			
 			if(foodPrices != null && !foodPrices.isEmpty()){
