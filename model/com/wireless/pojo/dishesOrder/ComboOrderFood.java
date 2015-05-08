@@ -177,6 +177,8 @@ public class ComboOrderFood implements Parcelable, Jsonable {
 		JsonMap jm = new JsonMap();
 		jm.putJsonable(Key4Json.COMBO_FOOD.key, this.comboFood, ComboFood.COMBO_FOOD_JSONABLE_COMPLEX);
 		jm.putJsonable(Key4Json.COMBO_FOOD_TASTE_GROUP.key, this.tasteGroup, TasteGroup.TG_JSONABLE_4_COMMIT);
+		jm.putJsonable(Key4Json.COMBO_FOOD_UNIT.key, this.foodUnit, flag);
+		jm.putString("comboFoodDesc", this.getName());
 		return jm;
 	}
 	
