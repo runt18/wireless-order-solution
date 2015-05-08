@@ -209,7 +209,7 @@ uo.showOrder = function(){
 				html += orderFoodListCmpTemplet.format({
 					dataIndex : '',
 					id : combo[j].comboFood.id,
-					name : '┕' + combo[j].comboFood.name,
+					name : '┕' + combo[j].comboFoodDesc,
 					count : combo[j].comboFood.amount,
 					isWeight : (combo[j].comboFood.status & 1 << 7) != 0 ? 'initial' : 'none',
 					hasWeigh : (combo[j].comboFood.status & 1 << 7) != 0 ?'orderFoodMoreOperateCmp':'',

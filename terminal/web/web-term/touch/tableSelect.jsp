@@ -1114,7 +1114,6 @@
 			 	<a onclick="Util.to.scroll({content:'divOrderFoodsCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>
 			 </div>
 			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="comboFoodTasteUnitLoad()">test</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.submit({notPrint : false})">下单</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="btnOrderAndPay" onclick="of.orderAndPay()">下单并结账</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>
@@ -1545,6 +1544,51 @@
 			 </div>
 
 		</div>
+		
+	
+		<!--限量沽清修改数量 -->
+		<div id="orderFoodLimitCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
+		    <div data-role="header" data-theme="b" class="ui-corner-top">
+		        <h1>输入限量沽清菜品剩余数量</h1>
+		    </div>
+		    <div style="min-height: 300px; overflow-y: auto;">
+				<div class="calculator">
+					<div class="top">
+						<span class="clear">+</span>
+						<span class="inputs">
+							<input id="inputOrderFoodLimitCountSet" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodLimitCountSet')">
+						</span>
+						<span class="clear">-</span>
+					</div>
+					<div class="keys">
+						<span>7</span>
+						<span>8</span>
+						<span>9</span>
+						<span>0</span>
+						
+						<span>4</span>
+						<span>5</span>
+						<span>6</span>
+						<span>.</span>
+						
+						<span>1</span>
+						<span>2</span>
+						<span>3</span>
+						<span class="clear">C</span>
+					</div>
+				</div>		    
+		    
+			</div>	
+			<div data-role="footer" data-theme="b" class="ui-corner-bottom">
+				 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+					 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="">确定</a>
+					 <a  data-role="button" data-inline="true" data-rel="back" class="countPopbottomBtn">取消</a>		 
+				 </div>
+		    </div>
+		</div>			
+		
+		
+		
 		<div id="searchFoods4StopSellCmp" style="height: 60px;padding-top: 25px;display: none;">		
 			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal" style="margin-right: 460px;">
 			 <table>

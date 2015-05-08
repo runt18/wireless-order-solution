@@ -280,6 +280,14 @@ html { overflow-y: hidden;}
 	/* position:absolute; */
 	right:0;bottom:0;font-size:20px;
 }
+
+/*限量沽清*/
+.food-status-limit{
+	/* position:absolute; */
+	right:0;bottom:0;font-size:14px;
+}
+
+
 /*餐台暂结*/
 .tempPayStatus{
 	/* position:absolute; 
