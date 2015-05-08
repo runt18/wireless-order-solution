@@ -395,8 +395,8 @@ public class OrderFoodDao {
 		String sql;
 
 		sql = " SELECT OF.order_id, OF.food_id, OF.taste_group_id, OF.food_unit_id, OF.is_temporary, OF.is_gift, " +
+			  (extraCond.dateType.isToday() ? " combo_id, " : "") +
 			  " MIN(OF.id) AS id, MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_id) AS kitchen_id, " + 
-			  (extraCond.dateType.isToday() ? " MAX(OF.combo_id) AS combo_id, " : "") +
 			  " MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
 			  " MAX(OF.food_unit) AS food_unit, MAX(OF.food_unit_price) AS food_unit_price, " +
 			  " MAX(OF.unit_price) AS unit_price, MAX(OF.commission) AS commission, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
@@ -406,7 +406,7 @@ public class OrderFoodDao {
 			  " ON OF.order_id = O.id " +
 			  " WHERE 1 = 1 " +
 			  (extraCond == null ? "" : extraCond) +
-			  " GROUP BY OF.food_id, OF.taste_group_id, OF.food_unit_id, OF.is_temporary, OF.is_gift " + 
+			  " GROUP BY OF.food_id, OF.taste_group_id, OF.food_unit_id, OF.is_temporary, OF.is_gift " + (extraCond.dateType.isToday() ? ", OF.combo_id" : "") +
 			  " HAVING order_sum > 0 " +
 			  " ORDER BY id ASC ";
 		
@@ -420,11 +420,7 @@ public class OrderFoodDao {
 			of.asFood().setStatus(dbCon.rs.getShort("food_status"));
 			if(extraCond.dateType.isToday()){
 				int comboId = dbCon.rs.getInt("combo_id");
-				if(comboId > 0){
-					for(ComboOrderFood cof : ComboDao.getByComboId(staff, comboId, extraCond.dateType)){
-						of.addCombo(cof);
-					}
-				}
+				of.setComboId(comboId);
 			}
 			int tgId = dbCon.rs.getInt("taste_group_id");
 			if(tgId != TasteGroup.EMPTY_TASTE_GROUP_ID){
@@ -455,20 +451,24 @@ public class OrderFoodDao {
 		
 		for(OrderFood of : result){
 			if(extraCond.dateType.isToday()){
-				//Get the details to the combo.
+				//Get the detail to combo order food.
+				if(of.getComboId() > 0){
+					of.setCombo(ComboDao.getByComboId(dbCon, staff, of.getComboId(), extraCond.dateType));
+				}
+				//Get the details to the combo of the food.
 				if(of.asFood().isCombo()){
 					of.asFood().setChildFoods(FoodDao.getComboByCond(dbCon, staff, new ExtraCond4Combo(of.asFood())));
-					for(ComboFood comboFood : of.asFood().getChildFoods()){
-						ComboOrderFood cof = null;
-						for(ComboOrderFood each : of.getCombo()){
-							if(each.asComboFood().equals(comboFood)){
-								cof = each;
-								break;
-							}
+				}
+				for(ComboFood comboFood : of.asFood().getChildFoods()){
+					ComboOrderFood cof = null;
+					for(ComboOrderFood each : of.getCombo()){
+						if(each.asComboFood().equals(comboFood)){
+							cof = each;
+							break;
 						}
-						if(cof == null){
-							of.addCombo(new ComboOrderFood(comboFood));
-						}
+					}
+					if(cof == null){
+						of.addCombo(new ComboOrderFood(comboFood));
 					}
 				}
 				//Get the detail to associated price plan.
@@ -633,7 +633,7 @@ public class OrderFoodDao {
 			  " `food_unit_id`, `food_unit`, `food_unit_price`, " +
 			  " `discount`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`, " +
 			  " `dept_id`, `kitchen_id`, " +
-			  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, `is_gift`) VALUES (" +
+			  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, `is_gift`, `combo_id`) VALUES (" +
 			  staff.getRestaurantId() + ", " +
 			  builder.orderId + ", " +
 			  builder.cancel.getOperation().getVal() + "," +
@@ -657,8 +657,9 @@ public class OrderFoodDao {
 			  " NOW(), " + 
 			  (builder.cancel.isTemp() ? 1 : 0) + ", " +
 			  (builder.isPaid ? 1 : 0) + ", " +
-			  (builder.cancel.isGift() ? 1 : 0 ) +
-			 " ) ";
+			  (builder.cancel.isGift() ? 1 : 0 ) + ", " +
+			  (builder.cancel.getComboId() != 0 ? builder.cancel.getComboId() : "NULL") +
+			  " ) ";
 		dbCon.stmt.executeUpdate(sql);	
 		
 		//Add and update the food to be on sale.
