@@ -118,7 +118,11 @@ public class OrderFood implements Parcelable, Jsonable {
 	//the last order amount to this order food
 	private float mLastCnt;	
 
+	//the associated combo order foods
 	private List<ComboOrderFood> mCombo = new ArrayList<ComboOrderFood>();
+	
+	//the combo id
+	private int mComboId;
 	
 	private final Food mFood = new Food(0);
 	
@@ -132,6 +136,14 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	public void setOperation(Operation operation){
 		this.mOperation = operation;
+	}
+	
+	public void setComboId(int comboId){
+		this.mComboId = comboId;
+	}
+	
+	public int getComboId(){
+		return this.mComboId;
 	}
 	
 	public void setCombo(List<ComboOrderFood> comboFoods){
@@ -655,33 +667,23 @@ public class OrderFood implements Parcelable, Jsonable {
 		return mFood.getKitchen();
 	}
 	
-	/**
-	 * Comparing two foods without the tastes
-	 * @param of the order food to compare
-	 * @return true if the order food is the same ignoring taste, otherwise false
-	 */
-	public boolean equalsIgnoreTaste(OrderFood of){
-		if(isGift != of.isGift){
-			return false;
-			
-		}else if(isTemporary != of.isTemporary){
-			return false;
-			
-		}else if(isTemporary && of.isTemporary){
-			return mFood.getName().equals(of.asFood().getName()) && (mFood.getPrice() == of.asFood().getPrice());
-			
+	private boolean isComboMatch(OrderFood of2Compared){
+		if(!hasCombo() && !of2Compared.hasCombo()){
+			return true;
+		}else if(hasCombo() && of2Compared.hasCombo()){
+			return mCombo.equals(of2Compared.mCombo);
 		}else{
-			if(mFood.equals(of.asFood())){
-				if(hasFoodUnit() && of.hasFoodUnit()){
-					return mFoodUnit.equals(of.mFoodUnit);
-				}else if(!hasFoodUnit() && !of.hasFoodUnit()){
-					return true;
-				}else{
-					return false;
-				}
-			}else{
-				return false;
-			}
+			return false;
+		}
+	}
+	
+	private boolean isUnitMatch(OrderFood of2Compared){
+		if(!hasFoodUnit() && !of2Compared.hasFoodUnit()){
+			return true;
+		}else if(hasFoodUnit() && of2Compared.hasFoodUnit()){
+			return mFoodUnit.equals(of2Compared.mFoodUnit);
+		}else{
+			return false;
 		}
 	}
 	
@@ -690,11 +692,11 @@ public class OrderFood implements Parcelable, Jsonable {
 	 * @param of the order food to compared
 	 * @return true if the taste group is the same, otherwise false
 	 */
-	boolean equalsTasteGroup(OrderFood of){
-		if(hasTasteGroup() && of.hasTasteGroup()){
-			return mTasteGroup.equals(of.mTasteGroup);
-		}else if(!hasTasteGroup() && !of.hasTasteGroup()){
+	private boolean isTgMatch(OrderFood of){
+		if(!hasTasteGroup() && !of.hasTasteGroup()){
 			return true;
+		}else if(hasTasteGroup() && of.hasTasteGroup()){
+			return mTasteGroup.equals(of.mTasteGroup);
 		}else{
 			return false;
 		}
@@ -714,7 +716,18 @@ public class OrderFood implements Parcelable, Jsonable {
 			
 		}else{
 			OrderFood of = (OrderFood)obj;
-			return equalsIgnoreTaste(of) && equalsTasteGroup(of);
+			if(isGift != of.isGift){
+				return false;
+				
+			}else if(isTemporary != of.isTemporary){
+				return false;
+				
+			}else if(isTemporary && of.isTemporary){
+				return mFood.getName().equals(of.asFood().getName()) && (mFood.getPrice() == of.asFood().getPrice());
+				
+			}else{
+				return mFood.equals(of.asFood()) && isTgMatch(of) && isUnitMatch(of) && isComboMatch(of);
+			}
 		}
 	}
 	

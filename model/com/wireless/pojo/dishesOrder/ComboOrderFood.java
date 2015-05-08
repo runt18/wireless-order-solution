@@ -105,12 +105,33 @@ public class ComboOrderFood implements Parcelable, Jsonable {
 		tasteGroup.setTmpTaste(tmpTaste);
 	}
 	
+	private boolean isUnitMatched(ComboOrderFood right){
+		if(hasFoodUnit() && right.hasFoodUnit()){
+			return getFoodUnit().equals(right.getFoodUnit());
+		}else if(!hasFoodUnit() && !right.hasFoodUnit()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	private boolean isTgMatched(ComboOrderFood right){
+		if(hasTasteGroup() && right.hasTasteGroup()){
+			return this.tasteGroup.equals(right.tasteGroup);
+		}else if(!hasTasteGroup() && !right.hasTasteGroup()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
 	@Override
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof ComboOrderFood)){
 			return false;
 		}else{
-			return comboFood.equals(((ComboOrderFood)obj).comboFood);
+			ComboOrderFood cof2Compared = (ComboOrderFood)obj;
+			return this.comboFood.equals(cof2Compared.comboFood) && isTgMatched(cof2Compared) && isUnitMatched(cof2Compared);
 		}
 	}
 	
