@@ -1443,96 +1443,6 @@ function comboFoodTasteUnitLoad(){
 		of.comboFoodGroups.push(of.selectedOrderFood.combo[i].comboFood);
 	}
 	
-/*	
-	of.comboFoodGroups = [ {
-		alias: "----",
-		commission: 0,
-		desc: "",
-		foodCnt: 13,
-		id: 56549,
-		kitchen: {alias: 37, dept: {id: 0, name: "湘菜", rid: 40, typeValue: 0}, id: 1612, isAllowTmp: true, name: "湘菜1"},
-		multiUnitPrice: [],
-		name: "（湘）石门肥肠钵",
-		pinyin: "xsmfcb",
-		restaurantId: 40,
-		status: 32,
-		unitPrice: 58		
-	},{
-		alias: "33",
-		commission: 0,
-		desc: "",
-		foodCnt: 0,
-		id: 70029,
-		kitchen: {alias: 37, dept: {id: 0, name: "湘菜", rid: 40, typeValue: 0}, id: 1612, isAllowTmp: true, name: "湘菜1"},
-		multiUnitPrice: [],
-		name: "bbbb",
-		pinyin: "bbbb",
-		restaurantId: 40,
-		status: 8,
-		unitPrice: 23		
-	}, {
-		alias: "----",
-		commission: 0,
-		desc: "",
-		foodCnt: 975,
-		id: 56538,
-		kitchen: {alias: 37, dept: {id: 0, name: "湘菜", rid: 40, typeValue: 0}, id: 1612, isAllowTmp: true, name: "湘菜1"},
-		multiUnitPrice: [],
-		name: "（湘）*金品酸汤鱼（鲩鱼）（例）",
-		pinyin: "xjpstyhyl",
-		restaurantId: 40,
-		status: 136,
-		unitPrice: 38		
-	}];
-	*/
-/*	
-	of.commonTastes = [{taste :{
-		alias: 1169,
-		calcText: "按价格",
-		calcValue: 0,
-		cateStatusText: "口味",
-		cateStatusValue: 2,
-		cateText: "口味",
-		cateValue: 156,
-		id: 1169,
-		name: "加快",
-		price: 0,
-		rank: 1,
-		rate: 0,
-		rid: 40,
-		typeText: "一般",
-		typeValue: 0
-	}},{taste :{
-		alias: 5903,
-		calcText: "按价格",
-		calcValue: 0,
-		cateStatusText: "口味",
-		cateStatusValue: 2,
-		cateText: "口味",
-		cateValue: 156,
-		id: 5903,
-		name: "少辣",
-		price: 0,
-		rank: 2,
-		rate: 0,
-		rid: 40,
-		typeText: "一般",
-		typeValue: 0		
-	}}]
-	
-	of.multiPrices = [{
-		foodId: 56538,
-		id: 24,
-		price: 50,
-		unit: "可乐"		
-	}, {
-		foodId: 56538,
-		id: 25,
-		price: 34.7,
-		unit: "雪碧"		
-	}];
-	*/
-	
 	initComboFoodGroupCmp();
 	
 	$('#divComboFoodFloat').show();
@@ -1566,7 +1476,6 @@ function initComboFoodGroupCmp(){
 			if((of.comboFoodGroups[of.ot.comboFoodPagingStart + i].status & 1 << 5) != 0){
 				theme = "e";
 			}
-			
 			
 			html.push(comboFoodGroupCmpTemplet.format({
 				index : i,
@@ -1672,40 +1581,34 @@ function initComboFoodTasteCmp(c){
 			});
 		}
 		
+		for (var j = 0; j < of.selectedOrderFood.combo.length; j++) {
+			var comboFood = of.selectedOrderFood.combo[j];
+			 
+			 $.ajax({
+				 url : '../QueryMenu.do',
+				 type : 'post',
+				 dataType : 'json',
+				 data : {
+					 dataSource:"getMultiPrices", foodId:comboFood.comboFood.id
+				 },
+				 async : false,
+				 success : function(result){
+					 if(result.root.length > 0){
+						 comboFood.foodUnit = result.root[0]; 
+					 }					 
+				 },
+				 error : function(){}
+			 });
+		}
+		
+		of.initNewFoodContent({
+			data : of.selectedOrderFood
+		});	
+		
 		initComboFoodCommentTaste();
 		
 		initComboFoodMultiPrice();
 	}
-	
-	
-	
-/*	of.ot.tastePaging = Util.to.padding({
-		renderTo : "tastesCmp",
-		data : tastesDate,
-		displayId : 'tastePagingDesc',
-		templet : function(c){
-			//默认不选中
-			var theme = "c";
-			//当从口味组进入时, 恢复选中状态
-			if(of.ot.tasteGroupClick){
-				for (var k = 0; k < of.ot.choosedTastes.length; k++) {
-					if(c.data.taste.id == of.ot.choosedTastes[k].taste.id){
-						theme = "e";
-						break;
-					}
-				}
-			}			
-			return tasteCmpTemplet.format({
-				index : c.index,
-				id : c.data.taste.id,
-				name : c.data.taste.name,
-				click : "chooseTaste({event: this, id: "+ c.data.taste.id +"})",
-				price : c.data.taste.calcValue == 1?(c.data.taste.rate * 100) + '%' : ('￥'+ c.data.taste.price),
-				theme : theme//是否选中
-			});
-		}
-	});	
-	of.ot.tastePaging.getFirstPage();*/
 }
 
 /**
