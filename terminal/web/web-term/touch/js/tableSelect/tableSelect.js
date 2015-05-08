@@ -183,8 +183,12 @@ $(function(){
 		displayId : 'divDescForTableSelect-padding-msg',
 		templet : function(c){
 			var aliasOrName;
-			if(c.data.categoryValue == 1){
+			if(c.data.categoryValue == 1){//一般台
 				aliasOrName = c.data.alias
+			}else if(c.data.categoryValue == 3){//搭台
+				var begin = c.data.name.indexOf("(");
+				var end = c.data.name.indexOf(")");
+				aliasOrName = '<font color="green">' + c.data.name.substring(begin+1, end) +'</font>';
 			}else{
 				aliasOrName = '<font color="green">'+ c.data.categoryText +'</font>'
 			}
