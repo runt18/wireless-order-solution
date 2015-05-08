@@ -344,7 +344,7 @@ function loadOrderBasicMsg(){
 					name : '┕' + combo[j].comboFoodDesc,
 					count : combo[j].comboFood.amount,
 					isWeight : (combo[j].comboFood.status & 1 << 7) != 0 ? 'initial' : 'none',
-					tastePref : combo[j].tasteGroup.tastePref,
+					tastePref : combo[j].tasteGroup ? combo[j].tasteGroup.tastePref : "无口味",
 					tastePrice : combo[j].tasteGroup.tastePrice,
 					unitPrice : "",
 					discount : "",

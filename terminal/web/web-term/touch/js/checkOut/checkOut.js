@@ -213,7 +213,7 @@ uo.showOrder = function(){
 					count : combo[j].comboFood.amount,
 					isWeight : (combo[j].comboFood.status & 1 << 7) != 0 ? 'initial' : 'none',
 					hasWeigh : (combo[j].comboFood.status & 1 << 7) != 0 ?'orderFoodMoreOperateCmp':'',
-					tastePref : combo[j].tasteGroup.tastePref,
+					tastePref : combo[j].tasteGroup ? combo[j].tasteGroup.tastePref : "无口味",
 					unitPrice : "",
 //					totalPrice : combo.comboFood.totalPrice.toFixed(2),
 					orderDateFormat : "",
