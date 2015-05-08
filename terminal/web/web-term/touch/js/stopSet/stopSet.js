@@ -35,6 +35,8 @@ var ss = {
  * 沽清入口
  */
 ss.entry = function(){
+	initFoodData({firstTime:true});
+	
 	ss.init();
 	
 	ss.updateData();
@@ -142,7 +144,7 @@ ss.updateData = function(c){
 		},
 		success : function(data, status, xhr) {
 			ss.stoptp.init({
-				data : data.root
+				data : data.root.sort(of.foodOrderByStatus)
 			});
 		},
 		error : function(request, status, err) {
@@ -164,7 +166,7 @@ ss.updateData = function(c){
 		success : function(data, status, xhr) {
 			Util.LM.hide();
 			ss.normaltp.init({
-				data : data.root
+				data : data.root.sort(of.foodOrderByStatus)
 			});
 		},
 		error : function(request, status, err) {
@@ -285,7 +287,7 @@ ss.initKitchenContent = function(c){
 	temp = null;
 	
 	ss.showKitchenPaging();
-	ss.iteratorData = tempFoodData;
+	ss.iteratorData = tempFoodData.sort(of.foodOrderByStatus);
 	
 	ss.showFoodByCond();	
 	
@@ -505,6 +507,8 @@ ss.setFoodLimitRemaining = function(c){
 				ss.entry();
 				Util.msg.tip("剩余数量修改成功");
 				
+			}else{
+				Util.msg.tip(rt.msg);
 			}
 		},
 		error : function(xhr){

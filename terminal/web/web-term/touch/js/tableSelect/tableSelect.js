@@ -312,7 +312,7 @@ ts.loadData = function(){
 	of.loadFoodDateAction = window.setInterval("keepLoadTableData()", 500);	
 }
 
-//设置搜索出来的餐台升序, 按名称长短
+//设置搜索出来的餐台升序排序, 按名称长短
 ts.searchTableCompareByName = function (obj1, obj2) {
     var val1 = obj1.name.length;
     var val2 = obj2.name.length;
