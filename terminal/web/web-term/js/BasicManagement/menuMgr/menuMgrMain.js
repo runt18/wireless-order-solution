@@ -1597,7 +1597,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	xtype : 'checkbox',
 		 	    	id : 'chbForBasicLimit',
 		 	    	hideLabel : true,
-		 	    	boxLabel : '<img title="限量沽清" src="../../images/icon_tip_ting.png"></img>',
+		 	    	boxLabel : '<img title="限量沽清" src="../../images/limitCount.png"></img>',
 		 	    	listeners : {
 		 	    		check : function(checkbox, checked){
 							if(checked){
