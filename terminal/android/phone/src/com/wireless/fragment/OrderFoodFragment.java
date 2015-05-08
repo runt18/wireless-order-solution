@@ -50,6 +50,7 @@ import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PrintOption;
+import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.regionMgr.Table.InsertBuilder4Join.Suffix;
@@ -381,11 +382,18 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				LinearLayout comboLinearLayout = (LinearLayout)layout.findViewById(R.id.linearLayout_comboList_orderChildItem);
 				comboLinearLayout.removeAllViews();
 				comboLinearLayout.setVisibility(View.VISIBLE);
-				for(ComboOrderFood cof : of.getCombo()){
+				for(ComboFood comboFood : of.asFood().getChildFoods()){
+					ComboOrderFood cof = null;
+					for(ComboOrderFood each : of.getCombo()){
+						if(each.asComboFood().equals(comboFood)){
+							cof = each;
+							break;
+						}
+					}
 					TextView tv = new TextView(getActivity());
 					tv.setTextColor(getResources().getColor(R.color.blue));
 					tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-					tv.setText("©¦¨D " + cof.toString());
+					tv.setText("©¦¨D " + (cof != null ? cof.toString() : comboFood.getName()));
 					comboLinearLayout.addView(tv);
 				}
 			}else{
