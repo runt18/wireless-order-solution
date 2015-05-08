@@ -2001,6 +2001,10 @@ function resetbBasicOperation(_d){
 	if(Ext.ux.cfs.isCommission(status)){
 		isCommission.fireEvent('check', isCommission, true);
 	}
+	if(Ext.ux.cfs.isLimit(status)){
+		isLimit.fireEvent('check', isLimit, true);
+	}
+	
 	commission.setValue(data.commission);
 	limitCount.setValue(data.limitCount);
 	
