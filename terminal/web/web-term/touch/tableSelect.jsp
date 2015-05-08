@@ -1549,14 +1549,14 @@
 		<!--限量沽清修改数量 -->
 		<div id="orderFoodLimitCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
 		    <div data-role="header" data-theme="b" class="ui-corner-top">
-		        <h1>输入限量沽清菜品剩余数量</h1>
+		        <h1>输入剩余数量</h1>
 		    </div>
 		    <div style="min-height: 300px; overflow-y: auto;">
 				<div class="calculator">
 					<div class="top">
 						<span class="clear">+</span>
 						<span class="inputs">
-							<input id="inputOrderFoodLimitCountSet" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodLimitCountSet')">
+							<input id="inputOrderFoodLimitCountSet" style="font-size: 20px;font-weight: bold;" onkeypress="intOnly()" onfocus="setInput('inputOrderFoodLimitCountSet')">
 						</span>
 						<span class="clear">-</span>
 					</div>
@@ -1581,8 +1581,8 @@
 			</div>	
 			<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 				 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-					 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="">确定</a>
-					 <a  data-role="button" data-inline="true" data-rel="back" class="countPopbottomBtn">取消</a>		 
+					 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ss.setFoodLimitRemaining()">确定</a>
+					 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ss.closeFoodLimitCmp()">取消</a>		 
 				 </div>
 		    </div>
 		</div>			

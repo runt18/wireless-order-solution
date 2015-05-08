@@ -30,12 +30,17 @@ var of = {
 	//菜品列表
 	foodCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-value={id} onclick="{click}">' +
 							'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
-								'<div class="food-status-font">' +
+								'<div class="food-status-font {commonStatus}">' +
 									'<font color="orange">{weigh}</font>' +
 									'<font color="blue">{currPrice}</font>' +
 									'<font color="FireBrick">{sellout}</font>' +
 									'<font color="green">{gift}</font>' +
 								'</div>'+
+								'<div class="food-status-limit {limitStatus}">' +
+									'<font color="orange">限: {foodLimitAmount}</font><br>' +
+									'<font color="green">剩: {foodLimitRemain}</font>' +
+								'</div>'+								
+								
 							'</div>'+
 						  '</a>',
 	//已点菜列表					  
@@ -108,7 +113,11 @@ of.s = {
 						sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
 						currPrice : (c.data.status & 1 << 4) != 0 ? '时' : '',		
 						gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
-						weigh : (c.data.status & 1 << 7) != 0 ? '称' : ''				
+						weigh : (c.data.status & 1 << 7) != 0 ? '称' : '',
+						commonStatus : (c.data.status & 1 << 10) != 0 ? 'none' : '',
+						limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
+						foodLimitAmount : c.data.foodLimitAmount,
+						foodLimitRemain : c.data.foodLimitRemain
 					});
 				},
 				pagedCallBack : function(){
@@ -342,13 +351,18 @@ of.initKitchenContent = function(c){
 					sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
 					currPrice : (c.data.status & 1 << 4) != 0 ? '时' : '',		
 					gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
-					weigh : (c.data.status & 1 << 7) != 0 ? '称' : ''					
+					weigh : (c.data.status & 1 << 7) != 0 ? '称' : '',
+					commonStatus : (c.data.status & 1 << 10) != 0 ? 'none' : '',
+					limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
+					foodLimitAmount : c.data.foodLimitAmount,
+					foodLimitRemain : c.data.foodLimitRemain					
 				});
 			},
 			pagedCallBack : function(){
 				//FIXME .food-status-font中position:absolute不起作用
 				setTimeout(function(){
 					$(".food-status-font").css("position", "absolute");
+					$(".food-status-limit").css("position", "absolute");
 				}, 250);				
 			}
 		});			

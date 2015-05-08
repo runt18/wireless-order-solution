@@ -9,20 +9,74 @@ var ss = {
 	/**
 	 * 元素模板
 	 */
+	//菜品
 	stopSellFoodTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-value={id} onclick="{click}">' +
 								'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
+								'<div class="food-status-limit {limitStatus}">' +
+									'<font color="orange">限: {foodLimitAmount}</font><br>' +
+									'<font color="green">剩: {foodLimitRemain}</font>' +
+								'</div>'+	
+								
 								'</div>'+
 							'</a>',
-	
+	//部门
 	dept4StopSellCmpTemplet = '<a href="javascript: ss.initKitchenContent({deptId:{id}})" data-role="button" data-inline="true" class="deptKitBtnFont" data-type="dept4StopSellCmp" data-value="{id}" >{name}</a>',
+	//厨房
 	kitchen4StopSellCmpTemplet = '<a data-role="button" data-inline="true" class="deptKitBtnFont" data-type="kitchen4StopSellCmp" data-value={id} onclick="ss.findFoodByKitchen({event:this, kitchenId:{id}})">{name}</a>',
-	
+	//选中菜列表
 	orderFood4StopSellCmpTemplet = '<li data-icon=false data-index={dataIndex} data-theme="c" data-value={id} data-type="orderFood4StopSellCmp" onclick="ss.selectNewFood({event:this, foodId:{id}})" ><a >'+
 										'<h1 style="font-size:20px;">{name}</h1>' +
 										'<div>' +
 											'<span style="float: right;">￥{unitPrice}</span>' +
 										'</div>' +
 										'</a></li>';
+
+/**
+ * 沽清入口
+ */
+ss.entry = function(){
+	ss.init();
+	
+	ss.updateData();
+	
+	ss.initDeptContent();
+	
+	ss.initKitchenContent({deptId : -1});
+	
+	/**
+	 * 没加载到菜品时不断刷新
+	 */	
+	var index = 0;	
+	ss.loadFoodDateAction = window.setInterval(function(){
+		if($('#foods4StopSellCmp').find("a").length > 0){
+			clearInterval(ss.loadFoodDateAction);
+			if(index == 0){
+				ss.searchData({event:$('#divBtnSellFood'), isStop:false})
+			}
+			Util.LM.hide();
+		}else{
+			index ++;
+			Util.LM.show();
+			ss.searchData({event:$('#divBtnSellFood'), isStop:false})
+		}
+	}, 500);
+	
+};
+
+/**
+ * 返回餐台界面
+ */
+ss.back = function(){
+	location.href = '#tableSelectMgr';
+	
+	ss.newFood = [];
+	ss.cancelSellOutFood = [];
+	ss.callback = null;
+	ss.initNewFoodContent();
+	
+	$('.tableStatus').attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
+	ss.extra = '';
+};
 
 //初始化分页
 ss.init = function(){
@@ -37,8 +91,17 @@ ss.init = function(){
 					id : c.data.id,
 					name : c.data.name,
 					unitPrice : c.data.unitPrice,
-					click : 'ss.insertFood({foodId:'+c.data.id+', type:\'deSellOut\'})'
+					click : 'ss.insertFood({foodId:'+c.data.id+', type:\'deSellOut\'})',
+					limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
+					foodLimitAmount : c.data.foodLimitAmount,
+					foodLimitRemain : c.data.foodLimitRemain
 				});
+			},
+			pagedCallBack : function(){
+				//FIXME .food-status-font中position:absolute不起作用
+				setTimeout(function(){
+					$(".food-status-limit").css("position", "absolute");
+				}, 250);				
 			}
 		});
 		ss.normaltp = new Util.to.padding({
@@ -49,8 +112,17 @@ ss.init = function(){
 					id : c.data.id,
 					name : c.data.name,
 					unitPrice : c.data.unitPrice,
-					click : 'ss.insertFood({foodId:'+c.data.id+', type:\'sellOut\'})'
+					click : 'ss.insertFood({foodId:'+c.data.id+', type:\'sellOut\'})',
+					limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
+					foodLimitAmount : c.data.foodLimitAmount,
+					foodLimitRemain : c.data.foodLimitRemain
 				});
+			},
+			pagedCallBack : function(){
+				//FIXME .food-status-font中position:absolute不起作用
+				setTimeout(function(){
+					$(".food-status-limit").css("position", "absolute");
+				}, 250);				
 			}
 		});
 		ss.tp = ss.normaltp;
@@ -358,53 +430,6 @@ ss.findFoodByKitchen = function(c){
 };
 
 /**
- * 沽清入口
- */
-ss.entry = function(){
-	ss.init();
-	
-	ss.updateData();
-	
-	ss.initDeptContent();
-	
-	ss.initKitchenContent({deptId : -1});
-	
-	/**
-	 * 没加载到菜品时不断刷新
-	 */	
-	var index = 0;	
-	ss.loadFoodDateAction = window.setInterval(function(){
-		if($('#foods4StopSellCmp').find("a").length > 0){
-			clearInterval(ss.loadFoodDateAction);
-			if(index == 0){
-				ss.searchData({event:$('#divBtnSellFood'), isStop:false})
-			}
-			Util.LM.hide();
-		}else{
-			index ++;
-			Util.LM.show();
-			ss.searchData({event:$('#divBtnSellFood'), isStop:false})
-		}
-	}, 500);
-	
-};
-
-/**
- * 返回餐台界面
- */
-ss.back = function(){
-	location.href = '#tableSelectMgr';
-	
-	ss.newFood = [];
-	ss.cancelSellOutFood = [];
-	ss.callback = null;
-	ss.initNewFoodContent();
-	
-	$('.tableStatus').attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
-	ss.extra = '';
-};
-
-/**
  * 点击头部导航栏显示相关菜品
  */
 ss.searchData = function(c){
@@ -431,6 +456,65 @@ ss.searchData = function(c){
 	
 };
 
+/**
+ * 打开限量沽清
+ */
+ss.openFoodLimitCmp = function(){
+	setTimeout(function(){
+		$('#inputOrderFoodLimitCountSet').val(ss.insertFood.remianAmount).select();
+	}, 250);
+	
+	firstTimeInput = true;
+	$('#orderFoodLimitCmp').popup('open');
+	$('#orderFoodLimitCmp').parent().addClass("pop").addClass("in");	
+}
+
+/**
+ * 关闭限量沽清
+ */
+ss.closeFoodLimitCmp = function(){
+	$('#orderFoodLimitCmp').popup('close');
+	
+	$('#inputOrderFoodLimitCountSet').val("");
+}
+
+/**
+ * 设置剩余数量
+ */
+ss.setFoodLimitRemaining = function(c){
+	var amount = $('#inputOrderFoodLimitCountSet');
+	if(!amount.val()){
+		Util.msg.tip('请填写数量');
+		amount.focus();
+		return;
+	}	
+	
+	$.ajax({
+		url : '../OperateOrderFood.do',
+		type : 'post',
+		dataType : 'json',
+		data : {
+			dataSource : 'updateFoodLimit',
+			foodId : ss.insertFood.foodId,
+			amount : amount.val()
+		},
+		success : function(rt){
+			if(rt.success){
+				ss.closeFoodLimitCmp();
+				initFoodData({firstTime:true});
+				ss.entry();
+				Util.msg.tip("剩余数量修改成功");
+				
+			}
+		},
+		error : function(xhr){
+			
+		}
+	});
+	
+	
+}
+
 
 /**
  * 选中菜品
@@ -455,6 +539,16 @@ ss.insertFood = function(c){
 		});
 		return;
 	}
+	
+	//是否限量菜品
+	if((data.status & 1 << 10) != 0){
+		ss.insertFood.foodId = c.foodId;
+		ss.insertFood.remianAmount = data.foodLimitRemain;
+		ss.openFoodLimitCmp();
+		return;
+	}
+	
+	
 	
 	var has = false;
 	//
