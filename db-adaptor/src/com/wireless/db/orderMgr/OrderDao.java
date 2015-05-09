@@ -575,6 +575,48 @@ public class OrderDao {
 	}
 	
 	/**
+	 * Comment the order to specific builder {@link Order#CommentBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the comment builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the order to comment does NOT exist
+	 */
+	public static void comment(Staff staff, Order.CommentBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			comment(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Comment the order to specific builder {@link Order#CommentBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the comment builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the order to comment does NOT exist
+	 */
+	public static void comment(DBCon dbCon, Staff staff, Order.CommentBuilder builder) throws SQLException, BusinessException{
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".order SET comment = '" + builder.getComment() + "' WHERE id = " + builder.getOrderId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(FrontBusinessError.ORDER_NOT_EXIST);
+		}
+	}
+	
+	/**
 	 * Repaid the order according to specific builder {@link Order#RepaidBuilder}.
 	 * @param staff
 	 * 			the staff to perform this action

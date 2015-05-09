@@ -59,7 +59,7 @@ public class TestFoodDao {
 													   .setAliasId(100).setDesc("测试描述").setHot(true).setCommission(2.0f).setGift(true).setWeigh(false);
 			foodId = FoodDao.insert(mStaff, insertBuilder); 
 			
-			List<Food> foods = FoodDao.getPureFoods(mStaff);
+			List<Food> foods = FoodDao.getPureByCond(mStaff, null, null);
 			Food childFood1 = foods.get(0);
 			Food childFood2 = foods.get(2);
 			

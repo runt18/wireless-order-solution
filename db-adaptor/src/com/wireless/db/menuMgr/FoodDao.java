@@ -20,7 +20,6 @@ import com.wireless.exception.FoodError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodStatistics;
 import com.wireless.pojo.menuMgr.FoodUnit;
@@ -1207,38 +1206,6 @@ public class FoodDao {
 			dbCon.disconnect();
 		}
 	}
-
-	/**
-	 * Get the pure foods to specific restaurant defined in staff {@link Staff}.
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @return the foods to specific restaurant
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<Food> getPureFoods(Staff staff) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getPureFoods(dbCon, staff);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the pure foods to specific restaurant defined in staff {@link Staff}.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @return the foods to specific restaurant
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<Food> getPureFoods(DBCon dbCon, Staff staff) throws SQLException{
-		return getPureByCond(dbCon, staff, null, null);
-	}
 	
 	/**
 	 * Get the pure food to the specified restaurant and id.
@@ -1287,113 +1254,6 @@ public class FoodDao {
 		}
 	}
 
-	/**
-	 * Get pure foods to specific department.
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param deptId
-	 * 			the department id
-	 * @return the foods to specific department
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<Food> getPureByDept(Staff staff, DeptId deptId) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getPureByDept(dbCon, staff, deptId);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get pure foods to specific department.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param deptId
-	 * 			the department id
-	 * @return the foods to specific department
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<Food> getPureByDept(DBCon dbCon, Staff staff, DeptId deptId) throws SQLException{
-		return getPureByCond(dbCon, staff, new ExtraCond().setDepartment(deptId.getVal()), null);
-	}
-	
-	/**
-	 * Get pure foods to specific kitchen.
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param kitchenId
-	 * 			the kitchen id
-	 * @return the foods to specific kitchen
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<Food> getPureByKitchen(Staff staff, int kitchenId) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getPureByKitchen(dbCon, staff, kitchenId);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get pure foods to specific kitchen.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param kitchenId
-	 * 			the kitchen id
-	 * @return the foods to specific kitchen
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<Food> getPureByKitchen(DBCon dbCon, Staff staff, int kitchenId) throws SQLException{
-		return getPureByCond(dbCon, staff, new ExtraCond().setKitchen(kitchenId), null);
-	}
-	
-	/**
-	 * Get pure foods like the specific name.
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param name
-	 * 			the name
-	 * @return the food like the specific name
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<Food> getPureByName(Staff staff, String name) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getPureByName(dbCon, staff, name);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get pure foods like the specific name.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param name
-	 * 			the name
-	 * @return the food like the specific name
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<Food> getPureByName(DBCon dbCon, Staff staff, String name) throws SQLException{
-		return getPureByCond(dbCon, staff, new ExtraCond().setName(name), null);
-	}
 	
 	/**
 	 * Get the food and its related information according to extra condition {@link ExtraCond} as below.
@@ -1570,6 +1430,29 @@ public class FoodDao {
 		dbCon.rs.close();
 		
 		return result;
+	}
+	
+	/**
+	 * Restore the food limit amount.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the amount to food restored
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int restoreLimit(DBCon dbCon, Staff staff) throws SQLException{
+		int amount = 0;
+		for(Food f : FoodDao.getPureByCond(dbCon, staff, new FoodDao.ExtraCond().setLimit(true), null)){
+			try{
+				FoodDao.update(dbCon, staff, new Food.LimitRemainingBuilder(f, f.getLimitAmount()));
+				amount++;
+			}catch(BusinessException ignored){
+				ignored.printStackTrace();
+			}
+		}
+		return amount;
 	}
 	
 	/**

@@ -10,6 +10,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.member.MemberOperationDao;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.MixedPaymentDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderFoodDao;
@@ -342,6 +343,9 @@ public class DailySettleDao {
 					dbCon.stmt.executeUpdate(sql);
 				}
 			}
+			
+			//Perform restore food limit.
+			FoodDao.restoreLimit(dbCon, staff);
 			
 			dbCon.conn.commit();
 			
