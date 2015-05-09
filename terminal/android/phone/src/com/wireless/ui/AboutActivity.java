@@ -22,17 +22,17 @@ public class AboutActivity extends Activity {
 		
 		((TextView)findViewById(R.id.contents)).setText(R.string.content);
 		
-		TextView title=(TextView)findViewById(R.id.toptitle);
+		TextView title=(TextView)findViewById(R.id.txtView_centralTitle_topBar);
 		title.setVisibility(View.VISIBLE);
 		title.setText("关于");
 		/**
 		 * "返回"Button
 		 */
-		TextView left=(TextView)findViewById(R.id.textView_left);
+		TextView left=(TextView)findViewById(R.id.txtView_leftBtn_topBar);
 		left.setText("返回");
 		left.setVisibility(View.VISIBLE);
 		
-		ImageButton aboutback = (ImageButton)findViewById(R.id.btn_left);
+		ImageButton aboutback = (ImageButton)findViewById(R.id.imageButton_left_topBar);
 		aboutback.setVisibility(View.VISIBLE);
 		aboutback.setOnClickListener(new View.OnClickListener(){
 

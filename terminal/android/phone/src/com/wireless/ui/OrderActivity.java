@@ -54,15 +54,15 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		setContentView(R.layout.order_activity);
 
 		//Title
-		TextView title = (TextView)findViewById(R.id.toptitle);
+		TextView title = (TextView)findViewById(R.id.txtView_centralTitle_topBar);
 		title.setVisibility(View.VISIBLE);
 		title.setText("账单");
 
 		//"返回"Button
-		TextView left = (TextView)findViewById(R.id.textView_left);
+		TextView left = (TextView)findViewById(R.id.txtView_leftBtn_topBar);
 		left.setText("返回");
 		left.setVisibility(View.VISIBLE);
-		ImageButton backBtn = (ImageButton)findViewById(R.id.btn_left);
+		ImageButton backBtn = (ImageButton)findViewById(R.id.imageButton_left_topBar);
 		backBtn.setVisibility(View.VISIBLE);
 		backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -126,12 +126,12 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 			}
 		});
 		
-		TextView rightTxtView = (TextView)findViewById(R.id.textView_right);
+		TextView rightTxtView = (TextView)findViewById(R.id.txtView_rightBtn_topBar);
 		rightTxtView.setText("提交");
 		rightTxtView.setVisibility(View.VISIBLE);
 		
 		//"提交"Button
-		ImageButton commitBtn = (ImageButton)findViewById(R.id.btn_right);
+		ImageButton commitBtn = (ImageButton)findViewById(R.id.imageButton_right_topBar);
 		commitBtn.setVisibility(View.VISIBLE);
 		commitBtn.setOnClickListener(new View.OnClickListener() {
 			@Override

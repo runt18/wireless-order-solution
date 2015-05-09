@@ -163,16 +163,16 @@ public class NetworkSettingFragment extends Fragment {
 			}
 		});
 		
-		TextView title = (TextView) view.findViewById(R.id.toptitle);
+		TextView title = (TextView) view.findViewById(R.id.txtView_centralTitle_topBar);
 		title.setVisibility(View.VISIBLE);
 		title.setText("设置");
 
-		TextView left = (TextView) view.findViewById(R.id.textView_left);
+		TextView left = (TextView) view.findViewById(R.id.txtView_leftBtn_topBar);
 		left.setText("返回");
 		left.setVisibility(View.VISIBLE);
 
 		//返回Button
-		ImageButton back = (ImageButton) view.findViewById(R.id.btn_left);
+		ImageButton back = (ImageButton) view.findViewById(R.id.imageButton_left_topBar);
 		back.setVisibility(View.VISIBLE);
 		back.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -187,9 +187,9 @@ public class NetworkSettingFragment extends Fragment {
 		});
 
 		//重置Button
-		ImageButton next = (ImageButton) view.findViewById(R.id.btn_right);
+		ImageButton next = (ImageButton) view.findViewById(R.id.imageButton_right_topBar);
 
-		TextView right = (TextView) view.findViewById(R.id.textView_right);
+		TextView right = (TextView) view.findViewById(R.id.txtView_rightBtn_topBar);
 		right.setText("重置");
 		right.setVisibility(View.VISIBLE);
 

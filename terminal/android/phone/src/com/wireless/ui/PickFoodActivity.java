@@ -60,7 +60,7 @@ public class PickFoodActivity extends FragmentActivity
 		ViewHandler(PickFoodActivity activity)
 		{
 			mActivity = new WeakReference<PickFoodActivity>(activity);
-			mTitleTextView = (TextView) activity.findViewById(R.id.toptitle);
+			mTitleTextView = (TextView) activity.findViewById(R.id.txtView_centralTitle_topBar);
 			mTitleTextView.setVisibility(View.VISIBLE);
 			
 			mNumBtn = (ImageButton) activity.findViewById(R.id.imageButton_num_pickFood);
@@ -163,11 +163,11 @@ public class PickFoodActivity extends FragmentActivity
 		mViewHandler = new ViewHandler(this);
 		
 		//·µ»ØButton
-		TextView left = (TextView) findViewById(R.id.textView_left);
+		TextView left = (TextView) findViewById(R.id.txtView_leftBtn_topBar);
 		left.setText("·µ»Ø");
 		left.setVisibility(View.VISIBLE);
 		
-		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
+		ImageButton back = (ImageButton) findViewById(R.id.imageButton_left_topBar);
 		back.setVisibility(View.VISIBLE);
 		back.setOnClickListener(new View.OnClickListener() {			
 			@Override

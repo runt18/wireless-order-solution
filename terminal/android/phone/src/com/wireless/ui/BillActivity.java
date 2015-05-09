@@ -68,6 +68,14 @@ public class BillActivity extends Activity {
 			
 			BillActivity theActivity = mActivity.get();
 			
+			//set the order comment
+			if(theActivity.mOrderToPay.getComment().length() != 0){
+				theActivity.findViewById(R.id.txtView_centralTitle2_topBar).setVisibility(View.VISIBLE);
+				((TextView)theActivity.findViewById(R.id.txtView_centralTitle2_topBar)).setText("备注:" + theActivity.mOrderToPay.getComment());
+			}else{
+				theActivity.findViewById(R.id.txtView_centralTitle2_topBar).setVisibility(View.GONE);
+			}
+			
 			((BillFoodListView)theActivity.findViewById(R.id.listView_food_bill)).notifyDataChanged(new ArrayList<OrderFood>(theActivity.mOrderToPay.getOrderFoods()));
 			//set the member
 			if(theActivity.mMember != null){
@@ -113,15 +121,15 @@ public class BillActivity extends Activity {
 		/**
 		 * "返回"Button
 		 */
-		TextView title = (TextView) findViewById(R.id.toptitle);
+		TextView title = (TextView) findViewById(R.id.txtView_centralTitle_topBar);
 		title.setVisibility(View.VISIBLE);
 		title.setText("帐单");
 
-		TextView left = (TextView) findViewById(R.id.textView_left);
+		TextView left = (TextView) findViewById(R.id.txtView_leftBtn_topBar);
 		left.setText("返回");
 		left.setVisibility(View.VISIBLE);
 
-		ImageButton backBtn = (ImageButton) findViewById(R.id.btn_left);
+		ImageButton backBtn = (ImageButton) findViewById(R.id.imageButton_left_topBar);
 		backBtn.setVisibility(View.VISIBLE);
 		backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override

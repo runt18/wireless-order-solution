@@ -125,15 +125,15 @@ public class SellOutActivity extends FragmentActivity {
 		this.setContentView(R.layout.sell_out_activity);
 		
 		//返回Button和标题
-		TextView title = (TextView) findViewById(R.id.toptitle);
+		TextView title = (TextView) findViewById(R.id.txtView_centralTitle_topBar);
 		title.setVisibility(View.VISIBLE);
 		title.setText("快速沽清");
 
-		TextView left = (TextView) findViewById(R.id.textView_left);
+		TextView left = (TextView) findViewById(R.id.txtView_leftBtn_topBar);
 		left.setText("返回");
 		left.setVisibility(View.VISIBLE);
 
-		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
+		ImageButton back = (ImageButton) findViewById(R.id.imageButton_left_topBar);
 		back.setVisibility(View.VISIBLE);
 		back.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -142,11 +142,11 @@ public class SellOutActivity extends FragmentActivity {
 			}
 		});
 		
-		TextView rightText = (TextView) findViewById(R.id.textView_right);
+		TextView rightText = (TextView) findViewById(R.id.txtView_rightBtn_topBar);
 		rightText.setText("提交");
 		rightText.setVisibility(View.VISIBLE);
 		
-		View commitButton = findViewById(R.id.btn_right);
+		View commitButton = findViewById(R.id.imageButton_right_topBar);
 		commitButton.setVisibility(View.VISIBLE);
 		
 		//"提交"按钮

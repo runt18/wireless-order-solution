@@ -4,11 +4,7 @@
     android:layout_height="match_parent" >
 
     <include
-        android:id="@+id/include1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        android:id="@+id/top_orderActivity"
         layout="@layout/topbar" />
 
     <RelativeLayout
@@ -16,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/include1"
+        android:layout_below="@+id/top_orderActivity"
         android:background="@drawable/bg02"
         android:descendantFocusability="afterDescendants" >
 

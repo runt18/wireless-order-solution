@@ -244,7 +244,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		});
 
 		//取得并显示软件版本号
-		TextView topTitle = (TextView)findViewById(R.id.toptitle);
+		TextView topTitle = (TextView)findViewById(R.id.txtView_centralTitle_topBar);
 		try{
 			topTitle.setText("e点通(v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName + ")");
 		}catch(NameNotFoundException e) {

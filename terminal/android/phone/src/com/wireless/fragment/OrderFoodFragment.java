@@ -177,6 +177,13 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		public void handleMessage(Message msg) {
 			OrderFoodFragment ofFgm = mFragment.get();
 			
+			if(ofFgm.mOriOrder != null && ofFgm.mOriOrder.getComment().length() != 0){
+				ofFgm.getActivity().findViewById(R.id.txtView_centralTitle2_topBar).setVisibility(View.VISIBLE);
+				((TextView)ofFgm.getActivity().findViewById(R.id.txtView_centralTitle2_topBar)).setText("±¸×¢:" + ofFgm.mOriOrder.getComment());
+			}else{
+				ofFgm.getActivity().findViewById(R.id.txtView_centralTitle2_topBar).setVisibility(View.GONE);
+			}
+			
 			List<Map<String, ?>> groupData = new ArrayList<Map<String, ?>>();
 			List<List<Map<String, ?>>> childData =  new ArrayList<List<Map<String, ?>>>();
 			

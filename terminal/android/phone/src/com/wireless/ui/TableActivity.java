@@ -249,37 +249,37 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 			}
 			
 			if(theActivity.mRegionCond == FILTER_REGION_ALL){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(REGION_ALL_STR);
+				((TextView)theActivity.findViewById(R.id.txtView_centralTitle_topBar)).setText(REGION_ALL_STR);
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_1.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(0).getName());
+				((TextView)theActivity.findViewById(R.id.txtView_centralTitle_topBar)).setText(WirelessOrder.regions.get(0).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_2.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(1).getName());
+				((TextView)theActivity.findViewById(R.id.txtView_centralTitle_topBar)).setText(WirelessOrder.regions.get(1).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_3.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(2).getName());
+				((TextView)theActivity.findViewById(R.id.txtView_centralTitle_topBar)).setText(WirelessOrder.regions.get(2).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_4.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(3).getName());
+				((TextView)theActivity.findViewById(R.id.txtView_centralTitle_topBar)).setText(WirelessOrder.regions.get(3).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_5.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(4).getName());
+				((TextView)theActivity.findViewById(R.id.txtView_centralTitle_topBar)).setText(WirelessOrder.regions.get(4).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_6.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(5).getName());
+				((TextView)theActivity.findViewById(R.id.txtView_centralTitle_topBar)).setText(WirelessOrder.regions.get(5).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_7.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(6).getName());
+				((TextView)theActivity.findViewById(R.id.txtView_centralTitle_topBar)).setText(WirelessOrder.regions.get(6).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_8.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(7).getName());
+				((TextView)theActivity.findViewById(R.id.txtView_centralTitle_topBar)).setText(WirelessOrder.regions.get(7).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_9.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(8).getName());
+				((TextView)theActivity.findViewById(R.id.txtView_centralTitle_topBar)).setText(WirelessOrder.regions.get(8).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_10.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(9).getName());
+				((TextView)theActivity.findViewById(R.id.txtView_centralTitle_topBar)).setText(WirelessOrder.regions.get(9).getName());
 				
 			}
 			
@@ -490,18 +490,18 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		/**
 		 * Title Text View
 		 */		
-		TextView titleTextView = (TextView) findViewById(R.id.toptitle);
+		TextView titleTextView = (TextView) findViewById(R.id.txtView_centralTitle_topBar);
 		titleTextView.setVisibility(View.VISIBLE);
 		titleTextView.setBackgroundResource(R.drawable.title_selector);
 		
 		/**
 		 * "返回"Button
 		 */
-		TextView leftTxtView = (TextView) findViewById(R.id.textView_left);
+		TextView leftTxtView = (TextView) findViewById(R.id.txtView_leftBtn_topBar);
 		leftTxtView.setText("返回");
 		leftTxtView.setVisibility(View.VISIBLE);
 
-		ImageButton backBtn = (ImageButton) findViewById(R.id.btn_left);
+		ImageButton backBtn = (ImageButton) findViewById(R.id.imageButton_left_topBar);
 		backBtn.setVisibility(View.VISIBLE);
 		backBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -609,7 +609,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		/**
 		 * “全部”按钮
 		 */
-		ImageButton allBtn = (ImageButton)findViewById(R.id.btn_right);
+		ImageButton allBtn = (ImageButton)findViewById(R.id.imageButton_right_topBar);
 		allBtn.setVisibility(View.VISIBLE);
 		allBtn.setOnClickListener(new OnClickListener(){
 			@Override
@@ -622,7 +622,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 			}
 		});
 		
-		TextView allTextView = (TextView)findViewById(R.id.textView_right);
+		TextView allTextView = (TextView)findViewById(R.id.txtView_rightBtn_topBar);
 		allTextView.setText("刷新");
 		allTextView.setVisibility(View.VISIBLE);
 		

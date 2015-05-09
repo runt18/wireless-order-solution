@@ -208,16 +208,16 @@ public class MemberDetailActivity extends FragmentActivity {
 		setContentView(R.layout.member_detail_activity);
 		
 		//标题
-		TextView title = (TextView) findViewById(R.id.toptitle);
+		TextView title = (TextView) findViewById(R.id.txtView_centralTitle_topBar);
 		title.setVisibility(View.VISIBLE);
 		title.setText("会员信息");
 
 		//返回Button
-		TextView left = (TextView) findViewById(R.id.textView_left);
+		TextView left = (TextView) findViewById(R.id.txtView_leftBtn_topBar);
 		left.setText("返回");
 		left.setVisibility(View.VISIBLE);
 
-		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
+		ImageButton back = (ImageButton) findViewById(R.id.imageButton_left_topBar);
 		back.setVisibility(View.VISIBLE);
 		back.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -227,11 +227,11 @@ public class MemberDetailActivity extends FragmentActivity {
 		});
 		
 		//快点Button
-		TextView right = (TextView)findViewById(R.id.textView_right);
+		TextView right = (TextView)findViewById(R.id.txtView_rightBtn_topBar);
 		right.setVisibility(View.VISIBLE);
 		right.setText("快点");
 		
-		ImageButton quick = (ImageButton) findViewById(R.id.btn_right);
+		ImageButton quick = (ImageButton) findViewById(R.id.imageButton_right_topBar);
 		quick.setVisibility(View.VISIBLE);
 		quick.setOnClickListener(new View.OnClickListener() {
 			@Override

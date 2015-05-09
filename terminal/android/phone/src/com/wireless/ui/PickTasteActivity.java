@@ -53,7 +53,7 @@ public class PickTasteActivity extends FragmentActivity  implements OnTastePicke
 		
 		FgmHandler(PickTasteActivity activity){
 			mActivity = new WeakReference<PickTasteActivity>(activity);
-			mTitleTextView = (TextView) activity.findViewById(R.id.toptitle);
+			mTitleTextView = (TextView) activity.findViewById(R.id.txtView_centralTitle_topBar);
 		}
 		
 		@Override
@@ -139,15 +139,15 @@ public class PickTasteActivity extends FragmentActivity  implements OnTastePicke
 
 		setContentView(R.layout.pick_taste_activity);
 		
-		TextView title = (TextView) findViewById(R.id.toptitle);
+		TextView title = (TextView) findViewById(R.id.txtView_centralTitle_topBar);
 		title.setVisibility(View.VISIBLE);
 		title.setText("口味");
 		//返回按钮
-		TextView left = (TextView) findViewById(R.id.textView_left);
+		TextView left = (TextView) findViewById(R.id.txtView_leftBtn_topBar);
 		left.setText("返回");
 		left.setVisibility(View.VISIBLE);
 		
-		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
+		ImageButton back = (ImageButton) findViewById(R.id.imageButton_left_topBar);
 		back.setVisibility(View.VISIBLE);
 		back.setOnClickListener(new View.OnClickListener() {
 			

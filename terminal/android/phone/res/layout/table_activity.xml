@@ -5,7 +5,7 @@
     android:background="#fff" >
 
     <include
-        android:id="@+id/top"
+        android:id="@+id/top_search_table"
         layout="@layout/topbar" />
 
     <RelativeLayout
@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/top" >
+        android:layout_below="@+id/top_search_table" >
 
         <AutoCompleteTextView
             android:id="@+id/txtView_srch_table"

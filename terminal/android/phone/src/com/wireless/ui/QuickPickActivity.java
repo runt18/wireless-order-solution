@@ -59,7 +59,7 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 
 		ViewHandler(QuickPickActivity activity){
 			mActivity = new WeakReference<QuickPickActivity>(activity);
-			mTitleTextView = (TextView) activity.findViewById(R.id.toptitle);
+			mTitleTextView = (TextView) activity.findViewById(R.id.txtView_centralTitle_topBar);
 			mTitleTextView.setVisibility(View.VISIBLE);
 			
 			mNumBtn = (ImageButton) activity.findViewById(R.id.imageButton_num_quickPick);
@@ -166,11 +166,11 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 		
 		//返回Button
-		TextView left = (TextView) findViewById(R.id.textView_left);
+		TextView left = (TextView) findViewById(R.id.txtView_leftBtn_topBar);
 		left.setText("返回");
 		left.setVisibility(View.VISIBLE);
 		
-		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
+		ImageButton back = (ImageButton) findViewById(R.id.imageButton_left_topBar);
 		back.setVisibility(View.VISIBLE);
 		back.setOnClickListener(new View.OnClickListener() {			
 			@Override
@@ -180,7 +180,7 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 		});
 		
 		//提交按钮
-		TextView right = (TextView) findViewById(R.id.textView_right);
+		TextView right = (TextView) findViewById(R.id.txtView_rightBtn_topBar);
 		right.setText("提交");
 		right.setVisibility(View.VISIBLE);
 		
@@ -199,7 +199,7 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 			}
 		}
 		
-		ImageButton commit = (ImageButton) findViewById(R.id.btn_right);
+		ImageButton commit = (ImageButton) findViewById(R.id.imageButton_right_topBar);
 		commit.setVisibility(View.VISIBLE);
 		commit.setOnClickListener(new OnClickListener(){
 			@Override
