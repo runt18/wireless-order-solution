@@ -308,7 +308,6 @@ Util.to.padding = function(c){
 			if(this.dom){
 				this.dom.html('');
 			}
-			this.showMsg();
 		},
 		pagedCallBack : c.pagedCallBack,//执行分页后调用
 		showMsg : function(){
@@ -335,7 +334,9 @@ Util.to.padding = function(c){
 //			console.log(this.renderTo)
 			
 			this.dom = $('#'+this.renderTo);
+			
 			this.clearContent();
+			//重置右下角分页导航信息
 			this.showMsg();			
 			//
 			var ch = this.dom[0].clientHeight, cw = this.dom[0].clientWidth;

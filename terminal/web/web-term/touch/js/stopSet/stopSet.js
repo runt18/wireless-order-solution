@@ -35,11 +35,10 @@ var ss = {
  * 沽清入口
  */
 ss.entry = function(){
-	initFoodData({firstTime:true});
-	
 	ss.init();
 	
-	ss.updateData();
+	//更新沽清菜 & 限量沽清菜
+	of.updataSelloutFoods();
 	
 	ss.initDeptContent();
 	
@@ -50,16 +49,17 @@ ss.entry = function(){
 	 */	
 	var index = 0;	
 	ss.loadFoodDateAction = window.setInterval(function(){
+		//默认选中第一个, 显示在售菜品
 		if($('#foods4StopSellCmp').find("a").length > 0){
 			clearInterval(ss.loadFoodDateAction);
 			if(index == 0){
-				ss.searchData({event:$('#divBtnSellFood'), isStop:false})
+				ss.searchData({event:$('#divBtnSellFood')[0], isStop:false})
 			}
 			Util.LM.hide();
 		}else{
 			index ++;
 			Util.LM.show();
-			ss.searchData({event:$('#divBtnSellFood'), isStop:false})
+			ss.searchData({event:$('#divBtnSellFood')[0], isStop:false})
 		}
 	}, 500);
 	
@@ -100,7 +100,7 @@ ss.init = function(){
 				});
 			},
 			pagedCallBack : function(){
-				//FIXME .food-status-font中position:absolute不起作用
+				//FIXME .food-status-limit中position:absolute不起作用
 				setTimeout(function(){
 					$(".food-status-limit").css("position", "absolute");
 				}, 250);				
@@ -121,7 +121,7 @@ ss.init = function(){
 				});
 			},
 			pagedCallBack : function(){
-				//FIXME .food-status-font中position:absolute不起作用
+				//FIXME .food-status-limit中position:absolute不起作用
 				setTimeout(function(){
 					$(".food-status-limit").css("position", "absolute");
 				}, 250);				
@@ -134,52 +134,54 @@ ss.init = function(){
  * 更新沽清菜列表
  * @param {} c
  */
-ss.updateData = function(c){
-	Util.LM.show();
-	$.ajax({
-		url : '../QueryMenu.do',
-		type : 'post',
-		data : {
-			dataSource : 'stop'
-		},
-		success : function(data, status, xhr) {
-			ss.stoptp.init({
-				data : data.root.sort(of.foodOrderByStatus)
-			});
-		},
-		error : function(request, status, err) {
-			Util.LM.hide();
-			Util.msg.alert({
-				title : '错误',
-				msg : '加载菜品出错, 请刷新页面',
-				renderTo : 'stopSellMgr'
-			});
-		}
-	});
-	
-	$.ajax({
-		url : '../QueryMenu.do',
-		type : 'post',
-		data : {
-			dataSource : 'unStop'
-		},
-		success : function(data, status, xhr) {
-			Util.LM.hide();
-			ss.normaltp.init({
-				data : data.root.sort(of.foodOrderByStatus)
-			});
-		},
-		error : function(request, status, err) {
-			Util.LM.hide();
-			Util.msg.alert({
-				title : '错误',
-				msg : '加载菜品出错, 请刷新页面',
-				renderTo : 'stopSellMgr'
-			});
-		}
-	});
-	
-};
+//ss.updateData = function(c){
+//	Util.LM.show();
+//	$.ajax({
+//		url : '../QueryMenu.do',
+//		type : 'post',
+//		async : false,
+//		data : {
+//			dataSource : 'stop'
+//		},
+//		success : function(data, status, xhr) {
+//			ss.stoptp.init({
+//				data : data.root.sort(of.foodOrderByStatus)
+//			});
+//		},
+//		error : function(request, status, err) {
+//			Util.LM.hide();
+//			Util.msg.alert({
+//				title : '错误',
+//				msg : '加载菜品出错, 请刷新页面',
+//				renderTo : 'stopSellMgr'
+//			});
+//		}
+//	});
+//	
+//	$.ajax({
+//		url : '../QueryMenu.do',
+//		type : 'post',
+//		async : false,
+//		data : {
+//			dataSource : 'unStop'
+//		},
+//		success : function(data, status, xhr) {
+//			Util.LM.hide();
+//			ss.normaltp.init({
+//				data : data.root.sort(of.foodOrderByStatus)
+//			});
+//		},
+//		error : function(request, status, err) {
+//			Util.LM.hide();
+//			Util.msg.alert({
+//				title : '错误',
+//				msg : '加载菜品出错, 请刷新页面',
+//				renderTo : 'stopSellMgr'
+//			});
+//		}
+//	});
+//	
+//};
 
 /**
  * 部门初始化
@@ -503,7 +505,6 @@ ss.setFoodLimitRemaining = function(c){
 		success : function(rt){
 			if(rt.success){
 				ss.closeFoodLimitCmp();
-				initFoodData({firstTime:true});
 				ss.entry();
 				Util.msg.tip("剩余数量修改成功");
 				
@@ -694,8 +695,6 @@ ss.soldOut = function(c){
 					topTip : true,
 					msg : data.msg
 				});
-				//重新加载更改后的foodData
-				initFoodData();
 				ss.back();
 			} else {
 				Util.msg.alert({
