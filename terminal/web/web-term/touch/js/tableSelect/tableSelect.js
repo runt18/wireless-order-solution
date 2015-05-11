@@ -1109,6 +1109,7 @@ ts.closeTableWithPeople = function(){
 	$('#tableCustomerCountSet').popup('close');
 	//人数输入框设置默认
 	$('#inputTableCustomerCountSet').val(1);
+	$('#inputTableOpenCommon').val("");
 }
 
 
