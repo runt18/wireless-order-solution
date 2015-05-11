@@ -102,8 +102,8 @@ public class OperatePrintFuncAction extends DispatchAction{
 				depts = new String[0];
 			}
 			
-			if(PType.valueOf(pType) == PType.PRINT_ORDER){
-				PrintFunc.SummaryBuilder summaryBuilder = new SummaryBuilder(printerId, Boolean.parseBoolean(isNeedToAdd), Boolean.parseBoolean(isNeedToCancel));
+			if(PType.valueOf(pType) == PType.PRINT_ORDER || PType.valueOf(pType) == PType.PRINT_ALL_CANCELLED_FOOD){
+				PrintFunc.SummaryBuilder summaryBuilder = new SummaryBuilder(printerId, PType.valueOf(pType));
 				for (String region : regions) {
 					summaryBuilder.addRegion(new Region(Short.parseShort(region)));
 				}
@@ -205,7 +205,6 @@ public class OperatePrintFuncAction extends DispatchAction{
 			String depts = request.getParameter("dept");
 			String regions = request.getParameter("regions");
 			int printerId = Integer.parseInt(request.getParameter("printerId"));
-			String funcId = request.getParameter("funcId");
 			int pType = Integer.parseInt(request.getParameter("pType"));
 			
 			String isNeedToAdd = request.getParameter("isNeedToAdd");
@@ -230,8 +229,8 @@ public class OperatePrintFuncAction extends DispatchAction{
 				dept = new String[0];
 			}
 			
-			if(PType.valueOf(pType) == PType.PRINT_ORDER){
-				PrintFunc.SummaryUpdateBuilder builder = new PrintFunc.SummaryUpdateBuilder(printerId, Boolean.parseBoolean(isNeedToAdd), Boolean.parseBoolean(isNeedToCancel));
+			if(PType.valueOf(pType) == PType.PRINT_ORDER || PType.valueOf(pType) == PType.PRINT_ALL_CANCELLED_FOOD){
+				PrintFunc.SummaryUpdateBuilder builder = new PrintFunc.SummaryUpdateBuilder(printerId, PType.valueOf(pType));
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
@@ -270,7 +269,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) == PType.PRINT_RECEIPT){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(Integer.parseInt(funcId));
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, PType.valueOf(pType));
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
@@ -286,7 +285,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				}
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) ==PType.PRINT_TEMP_RECEIPT){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(Integer.parseInt(funcId));
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, PType.valueOf(pType));
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
@@ -302,7 +301,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) ==PType.PRINT_TRANSFER_TABLE){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(Integer.parseInt(funcId));
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, PType.valueOf(pType));
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
@@ -313,7 +312,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) ==PType.PRINT_ALL_HURRIED_FOOD){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(Integer.parseInt(funcId));
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, PType.valueOf(pType));
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
