@@ -940,23 +940,23 @@ function Util_urlParaQuery() {
 /**
  * cookies操作
  */
-function setcookie(name,value, url, time){  
-	var exp= new Date(), path = "";
+function setcookie(name,value, path, time){  
+	var exp= new Date(), pathData = "";
 	
 	//js要设置毫秒, java则为秒
 	if(time){
-	    exp.setTime(time); 
+	    exp.setTime(exp.getTime() + time); 
 	}else{
 	    exp.setTime(exp.getTime() + 30*365 * 24*60*60*1000); 		
 	}
  
     //不设置path默认使用当前相对路径, 会导致ajax不能上传cookie
-    if(url){
-    	path = "path=/;";
+    if(path){
+    	pathData = "path=/;";
     }else{
-    	path = "path=/web-term/touch/;";
+    	pathData = "path=/web-term/touch/;";
     }
-	document.cookie = name + "=" + escape (value) + ";" + path +"expires = " + exp.toGMTString();    
+	document.cookie = name + "=" + escape (value) + ";" + pathData +"expires = " + exp.toGMTString();    
 }
 
 function getcookie(name){  

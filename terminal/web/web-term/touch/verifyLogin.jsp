@@ -119,6 +119,10 @@
 			<div data-role="content" id="billboardDesc" class="bb_content" align="left"></div>  
 		</div>			
 		<div id="staffPaddingBar" data-role="footer" data-tap-toggle="false" data-theme="b" class="bb_bar">
+			 <div data-role="controlgroup" class="ui-btn-left" data-type="horizontal">
+				<a data-role="button" data-inline="true" class="btnBillboard" onclick="lastBillboard()">上一条</a>
+				<a data-role="button" data-inline="true" class="btnBillboard" onclick="nextBillboard()">下一条</a>
+			 </div>		
 			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 				<a data-rel="back" data-role="button" data-inline="true" class="btnBillboard">我知道了</a>
 			 </div>

@@ -322,7 +322,8 @@ function initBillboardContent(c){
 			$('#btnDisplayBillboard .ui-btn-text').html(result.root.length +' 条公告');
 			$('#btnDisplayBillboard').buttonMarkup('refresh');	
 			lg.bbs =  result.root;
-			var html = ['<li data-role="divider" data-theme="e">点击标题查看详情:</li>'], unRead = 0;
+			initBillboardContent.unRead = [];
+			var html = ['<li data-role="divider" data-theme="e">点击标题查看详情:</li>'];
 			for (var i = 0; i < result.root.length; i++) {
 				html.push('<li data-index={index} data-value={id} onclick="displayBillboard(this)"> <a>{status}{title}</a></li>'.format({
 					index : i,
@@ -331,17 +332,34 @@ function initBillboardContent(c){
 					title : result.root[i].title
 				}));
 				
-				if(result.root[i].status == 1){
-					unRead ++;
+				//cookie中不存在此条记录则还未阅读
+				if(!getcookie("billboard"+result.root[i].id)){
+					initBillboardContent.unRead.push(result.root[i]);
 				}
 			}
 			$('#billboardList').html(html.join("")).trigger('create').listview('refresh');
 			
-			if(unRead > 0 && c.display){
+			if(initBillboardContent.unRead.length > 0 && c.display && !getcookie("alertBillboard")){
 				setTimeout(function(){
-					$('#billboardsCmp').popup('open');
-					$('#billboardsCmp').parent().addClass("slideup").addClass("in")
-					$('#billboardsCmp-popup').css({top:$('#headDisplayBillboard').position().top + 25, left:$('#headDisplayBillboard').position().left - 80});
+//					$('#billboardsCmp').popup('open');
+//					$('#billboardsCmp').parent().addClass("slideup").addClass("in")
+//					$('#billboardsCmp-popup').css({top:$('#headDisplayBillboard').position().top + 25, left:$('#headDisplayBillboard').position().left - 80});
+
+					displayBillboard.curBillboardId = initBillboardContent.unRead[0].id;
+					
+					var remainTimes = getTodayRemainTime();
+					
+			    	$('#billboardTitle').text(initBillboardContent.unRead[0].title);
+			    	$('#billboardDesc').html(initBillboardContent.unRead[0].desc);
+			    	
+			    	$('#billboardCmp').popup('open');
+			    	
+			    	setcookie("alertBillboard", true, null, remainTimes);
+			    	//已读状态设置到cookie
+		    		if(initBillboardContent.unRead[0].expired > new Date().getTime()){
+		    			setcookie("billboard"+initBillboardContent.unRead[0].id, true, null, remainTimes);
+		    		}
+		    		initBillboardContent();	
 				}, 400);
 			}
 			
@@ -350,9 +368,6 @@ function initBillboardContent(c){
 		}
 	});
 }
-
-
-
 /**
  * 公告
  */
@@ -370,8 +385,10 @@ function displayBillboard(thiz){
 		    	//设置为已读状态
 		    	if(!getcookie("billboard"+billboard.id)){
 		    		//已读状态设置到cookie
-		    		setcookie("billboard"+billboard.id, true, null, billboard.expired)
-		    		initBillboardContent();	
+		    		if(billboard.expired > new Date().getTime()){
+		    			setcookie("billboard"+billboard.id, true, null, getTodayRemainTime());
+		    			initBillboardContent();	
+		    		}
 		    	}
 
 	    	}
@@ -380,10 +397,57 @@ function displayBillboard(thiz){
 	});	
 	
 	$('#billboardsCmp').popup('close');
-	
-	
 }
 
+/**
+ * 读取了公告
+ */
+function knowedBillboard(){
+	$('#billboardCmp').popup('close');
+	initBillboardContent();
+}
+
+/**
+ * 下一条公告
+ */
+function nextBillboard(){
+	for (var i = 0; i < lg.bbs.length; i++) {
+		if(lg.bbs[i].id == displayBillboard.curBillboardId && (i+1) < lg.bbs.length){
+	    	$('#billboardTitle').text(lg.bbs[i+1].title);
+	    	$('#billboardDesc').html(lg.bbs[i+1].desc);
+	    	
+	    	displayBillboard.curBillboardId = lg.bbs[i+1].id;
+	    	
+			setcookie("billboard"+lg.bbs[i+1].id, true, null, getTodayRemainTime());
+			initBillboardContent();	
+		}
+	}
+}
+
+/**
+ * 上一条公告
+ */
+function lastBillboard(){
+	for (var i = 0; i < lg.bbs.length; i++) {
+		if(lg.bbs[i].id == displayBillboard.curBillboardId && (i-1) >= 0){
+	    	$('#billboardTitle').text(lg.bbs[i-1].title);
+	    	$('#billboardDesc').html(lg.bbs[i-1].desc);
+	    	
+	    	displayBillboard.curBillboardId = lg.bbs[i-1].id;
+	    	
+			setcookie("billboard"+lg.bbs[i-1].id, true, null, getTodayRemainTime());
+			initBillboardContent();	
+		}
+	}
+}
+
+/**
+ * 获取当天剩余秒数
+ * @returns {Number}
+ */
+function getTodayRemainTime(){
+	return new Date(new Date().getFullYear() + "-" + (new Date().getMonth()+1) + "-" + new Date().getDate() + " 23:23:59").getTime() - new Date().getTime();
+}
 
 /**
  * 选择员工
