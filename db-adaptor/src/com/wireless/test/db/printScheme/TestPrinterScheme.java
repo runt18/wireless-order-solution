@@ -194,46 +194,33 @@ public class TestPrinterScheme {
 			compare(expected, PrinterDao.getById(dbCon, mStaff, printerId));
 			
 			//------------Update the summary function-----------------
-			PrintFunc.SummaryUpdateBuilder summaryUpdateBuilder = new PrintFunc.SummaryUpdateBuilder(printerId, true, false)
+			PrintFunc.SummaryUpdateBuilder summaryUpdateBuilder = new PrintFunc.SummaryUpdateBuilder(printerId, PType.PRINT_ORDER)
 																		.setRepeat(3)
 																		.addDepartment(depts.get(1))
 																		.setRegionAll();
 			PrintFuncDao.updateFunc(dbCon, mStaff, summaryUpdateBuilder);
 			expected.removeFunc(summaryExtraFunc);
-			expected.removeFunc(summaryCancelFunc);
-			PrintFunc.UpdateBuilder extraSummaryUpdateBuilder = summaryUpdateBuilder.build(summaryExtraFunc.getId(), summaryCancelFunc.getId())[0];
-			PrintFunc.UpdateBuilder cancelSummaryUpdateBuilder = summaryUpdateBuilder.build(summaryExtraFunc.getId(), summaryCancelFunc.getId())[1];
+			PrintFunc.UpdateBuilder extraSummaryUpdateBuilder = summaryUpdateBuilder.build();
 			if(extraSummaryUpdateBuilder.isDeptChanged()){
 				summaryExtraFunc.setDepartments(extraSummaryUpdateBuilder.build().getDepartment());
-				summaryCancelFunc.setDepartments(extraSummaryUpdateBuilder.build().getDepartment());
 			}
 			if(extraSummaryUpdateBuilder.isKitchenChanged()){
 				summaryExtraFunc.setKitchens(extraSummaryUpdateBuilder.build().getKitchens());
-				summaryCancelFunc.setKitchens(extraSummaryUpdateBuilder.build().getKitchens());
 			}
 			if(extraSummaryUpdateBuilder.isRegionChanged()){
 				summaryExtraFunc.setRegions(extraSummaryUpdateBuilder.build().getRegions());
-				summaryCancelFunc.setRegions(extraSummaryUpdateBuilder.build().getRegions());
 			}
 			if(extraSummaryUpdateBuilder.isRepeatChanged()){
 				summaryExtraFunc.setRepeat(extraSummaryUpdateBuilder.build().getRepeat());
-				summaryCancelFunc.setRepeat(extraSummaryUpdateBuilder.build().getRepeat());
 			}
 			if(extraSummaryUpdateBuilder.isEnabledChanged()){
 				summaryExtraFunc.setEnabled(extraSummaryUpdateBuilder.build().isEnabled());
-				summaryCancelFunc.setEnabled(cancelSummaryUpdateBuilder.build().isEnabled());
 			}
 			if(summaryExtraFunc.isEnabled()){
 				expected.addFunc(summaryExtraFunc);
 			}else{
 				//Compare the detail extra print function which switch to be disable.
 				compare(summaryExtraFunc, PrintFuncDao.getByCond(mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_ORDER)).get(0));
-			}
-			if(summaryCancelFunc.isEnabled()){
-				expected.addFunc(summaryCancelFunc);
-			}else{
-				//Compare the detail cancel print function which switch to be disable.
-				compare(summaryCancelFunc, PrintFuncDao.getByCond(mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_ALL_CANCELLED_FOOD)).get(0));
 			}
 			//Compare after update summary function
 			compare(expected, PrinterDao.getById(dbCon, mStaff, printerId));

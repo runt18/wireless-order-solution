@@ -308,11 +308,7 @@ public class PrintFuncDao {
 	 * @throws BusinessException
 	 */
 	public static void updateFunc(DBCon dbCon, Staff staff, PrintFunc.SummaryUpdateBuilder builder) throws SQLException, BusinessException{
-		PrintFunc summaryExtraFunc = getByCond(dbCon, staff, new ExtraCond().setPrinter(builder.getPrinterId()).setType(PType.PRINT_ORDER)).get(0);
-		PrintFunc summaryCancelFunc = getByCond(dbCon, staff, new ExtraCond().setPrinter(builder.getPrinterId()).setType(PType.PRINT_ALL_CANCELLED_FOOD)).get(0);
-		for(PrintFunc.UpdateBuilder eachBuilder : builder.build(summaryExtraFunc.getId(), summaryCancelFunc.getId())){
-			updateFunc(dbCon, staff, eachBuilder);
-		}
+		updateFunc(dbCon, staff, builder.build());
 	}
 	
 	/**
@@ -353,10 +349,17 @@ public class PrintFuncDao {
 		
 		PrintFunc func = builder.build();
 		
+		//Get the printer function id.
+		final List<PrintFunc> associatedFuncs = getByCond(dbCon, staff, new ExtraCond().setPrinter(func.getPrinterId()).setType(func.getType()));
+		if(associatedFuncs.isEmpty()){
+			throw new BusinessException("修改失败, 【" + func.getType().getDesc() + "】的打印功能不存在");
+		}else{
+			func.setId(associatedFuncs.get(0).getId());
+		}
+		
 		sql = " UPDATE " + Params.dbName + ".print_func SET " +
 			  " func_id = " + func.getId() +
 			  (builder.isRepeatChanged() ? " ,`repeat` = " + func.getRepeat() : "") +
-			  (builder.isTypeChanged() ? " ,type = " + func.getType().getVal() : "") +
 			  (builder.isCommentChanged() ? " ,comment = '" + func.getComment() + "'" : "") +
 			  (builder.isEnabledChanged() ? " ,enabled = " + (func.isEnabled() ? "1" : "0") : "") +
 			  " WHERE func_id = " +  func.getId();
