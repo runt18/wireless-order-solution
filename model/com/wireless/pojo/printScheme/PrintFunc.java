@@ -33,7 +33,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	public static class SummaryUpdateBuilder{
 		private final UpdateBuilder builder;
-		
+		  
 		public SummaryUpdateBuilder(int printerId, PType type){
 			if(type == PType.PRINT_ORDER || type == PType.PRINT_ALL_CANCELLED_FOOD){
 				this.builder = new UpdateBuilder(printerId, type);
