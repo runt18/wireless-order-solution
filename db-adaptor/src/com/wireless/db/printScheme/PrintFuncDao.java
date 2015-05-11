@@ -173,11 +173,7 @@ public class PrintFuncDao {
 	 * 			throws if the function type has exist before
 	 */
 	public static int addFunc(DBCon dbCon, Staff staff, PrintFunc.SummaryBuilder builder) throws SQLException, BusinessException{
-		int funcId = 0;
-		for(PrintFunc func : builder.build()){
-			funcId = addFunc(dbCon, staff, func);
-		}
-		return funcId;
+		return addFunc(dbCon, staff, builder.build());
 	}
 	
 	/**

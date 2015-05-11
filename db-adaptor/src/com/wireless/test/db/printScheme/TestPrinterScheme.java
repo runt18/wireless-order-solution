@@ -99,7 +99,7 @@ public class TestPrinterScheme {
 			printerId = PrinterDao.insert(dbCon, mStaff, builder);
 			
 			//点菜总单
-			PrintFunc.SummaryBuilder summaryFuncBuilder = new SummaryBuilder(printerId, true, true)
+			PrintFunc.SummaryBuilder summaryFuncBuilder = new SummaryBuilder(printerId, PType.PRINT_ORDER)
 																	   .setRepeat(2)
 																	   .addRegion(regions.get(0))
 																	   .addRegion(regions.get(1))
@@ -113,7 +113,7 @@ public class TestPrinterScheme {
 			int summaryFuncId = PrintFuncDao.getByCond(dbCon, mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_ORDER)).get(0).getId();
 			
 			//退菜总单
-			int cancelSummaryFuncId = PrintFuncDao.getByCond(dbCon, mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_ALL_CANCELLED_FOOD)).get(0).getId();
+			//int cancelSummaryFuncId = PrintFuncDao.getByCond(dbCon, mStaff, new PrintFuncDao.ExtraCond().setPrinter(printerId).setType(PType.PRINT_ALL_CANCELLED_FOOD)).get(0).getId();
 			
 			//点菜分单
 			PrintFunc.DetailBuilder detailFuncBuilder = new DetailBuilder(printerId, true, true)
@@ -158,13 +158,9 @@ public class TestPrinterScheme {
 			Printer expected = builder.build();
 			expected.setId(printerId);
 			
-			PrintFunc summaryExtraFunc = summaryFuncBuilder.build()[0];
+			PrintFunc summaryExtraFunc = summaryFuncBuilder.build();
 			summaryExtraFunc.setId(summaryFuncId);
 			expected.addFunc(summaryExtraFunc);
-			
-			PrintFunc summaryCancelFunc = summaryFuncBuilder.build()[1];
-			summaryCancelFunc.setId(cancelSummaryFuncId);
-			expected.addFunc(summaryCancelFunc);
 			
 			PrintFunc detailExtraFunc = detailFuncBuilder.build()[0];
 			detailExtraFunc.setId(detailFuncId);
@@ -275,7 +271,6 @@ public class TestPrinterScheme {
 			PrintFuncDao.deleteById(dbCon, mStaff, summaryFuncId);
 			
 			expected.removeFunc(summaryExtraFunc);
-			expected.removeFunc(summaryCancelFunc);
 			
 			PrintFuncDao.deleteById(dbCon, mStaff, receiptId);
 			
