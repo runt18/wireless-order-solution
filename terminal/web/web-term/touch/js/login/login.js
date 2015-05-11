@@ -328,7 +328,7 @@ function initBillboardContent(c){
 				html.push('<li data-index={index} data-value={id} onclick="displayBillboard(this)"> <a>{status}{title}</a></li>'.format({
 					index : i,
 					id : result.root[i].id,
-					status : !getcookie("billboard"+result.root[i].id)?'<font color="red" >＊</font>':'',
+					status : '<font color="red" >＊</font>',
 					title : result.root[i].title
 				}));
 				
@@ -339,27 +339,24 @@ function initBillboardContent(c){
 			}
 			$('#billboardList').html(html.join("")).trigger('create').listview('refresh');
 			
-			if(initBillboardContent.unRead.length > 0 && c.display && !getcookie("alertBillboard")){
+			if(lg.bbs.length > 0 && c.display && !getcookie("alertBillboard")){
 				setTimeout(function(){
 //					$('#billboardsCmp').popup('open');
 //					$('#billboardsCmp').parent().addClass("slideup").addClass("in")
 //					$('#billboardsCmp-popup').css({top:$('#headDisplayBillboard').position().top + 25, left:$('#headDisplayBillboard').position().left - 80});
 
-					displayBillboard.curBillboardId = initBillboardContent.unRead[0].id;
+					displayBillboard.curBillboardId = lg.bbs[0].id;
 					
-					var remainTimes = getTodayRemainTime();
-					
-			    	$('#billboardTitle').text(initBillboardContent.unRead[0].title);
-			    	$('#billboardDesc').html(initBillboardContent.unRead[0].desc);
+			    	$('#billboardTitle').text(lg.bbs[0].title);
+			    	$('#billboardDesc').html(lg.bbs[0].desc);
 			    	
 			    	$('#billboardCmp').popup('open');
 			    	
-			    	setcookie("alertBillboard", true, null, remainTimes);
 			    	//已读状态设置到cookie
 		    		if(initBillboardContent.unRead[0].expired > new Date().getTime()){
-		    			setcookie("billboard"+initBillboardContent.unRead[0].id, true, null, remainTimes);
+//		    			setcookie("billboard"+initBillboardContent.unRead[0].id, true, null, remainTimes);
 		    		}
-		    		initBillboardContent();	
+//		    		initBillboardContent();	
 				}, 400);
 			}
 			
@@ -382,12 +379,13 @@ function displayBillboard(thiz){
 		    	
 		    	$('#billboardCmp').popup('open');
 		    	
+		    	displayBillboard.curBillboardId = billboard.id;
 		    	//设置为已读状态
 		    	if(!getcookie("billboard"+billboard.id)){
 		    		//已读状态设置到cookie
 		    		if(billboard.expired > new Date().getTime()){
-		    			setcookie("billboard"+billboard.id, true, null, getTodayRemainTime());
-		    			initBillboardContent();	
+//		    			setcookie("billboard"+billboard.id, true, null, getTodayRemainTime());
+//		    			initBillboardContent();	
 		    		}
 		    	}
 
@@ -404,7 +402,8 @@ function displayBillboard(thiz){
  */
 function knowedBillboard(){
 	$('#billboardCmp').popup('close');
-	initBillboardContent();
+	setcookie("alertBillboard", true, null, getTodayRemainTime());
+//	initBillboardContent();
 }
 
 /**
@@ -418,8 +417,8 @@ function nextBillboard(){
 	    	
 	    	displayBillboard.curBillboardId = lg.bbs[i+1].id;
 	    	
-			setcookie("billboard"+lg.bbs[i+1].id, true, null, getTodayRemainTime());
-			initBillboardContent();	
+//			setcookie("billboard"+lg.bbs[i+1].id, true, null, getTodayRemainTime());
+//			initBillboardContent();	
 		}
 	}
 }
@@ -435,8 +434,8 @@ function lastBillboard(){
 	    	
 	    	displayBillboard.curBillboardId = lg.bbs[i-1].id;
 	    	
-			setcookie("billboard"+lg.bbs[i-1].id, true, null, getTodayRemainTime());
-			initBillboardContent();	
+//			setcookie("billboard"+lg.bbs[i-1].id, true, null, getTodayRemainTime());
+//			initBillboardContent();	
 		}
 	}
 }

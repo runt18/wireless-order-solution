@@ -124,7 +124,7 @@
 				<a data-role="button" data-inline="true" class="btnBillboard" onclick="nextBillboard()">下一条</a>
 			 </div>		
 			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-				<a data-rel="back" data-role="button" data-inline="true" class="btnBillboard">我知道了</a>
+				<a data-role="button" data-inline="true" class="btnBillboard" onclick="knowedBillboard()">我知道了</a>
 			 </div>
 		</div>			
      </div>     
