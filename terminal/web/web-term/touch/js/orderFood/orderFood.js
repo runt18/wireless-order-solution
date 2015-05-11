@@ -176,6 +176,7 @@ of.searchFoodCompare = function (obj1, obj2) {
 of.entry = function(c){
 	
 	of.table = c.table;
+	of.table.comment = c.comment;
 	of.order = typeof c.order != 'undefined' ? c.order : null;
 	of.afterCommitCallback = typeof c.callback == 'function' ? c.callback : null;
 	//清空选中的全单口味
@@ -478,6 +479,7 @@ of.updataSelloutFoods = function(){
 			if(result.success){
 				var stopFoods = result.root;
 				for (var j = 0; j < of.foodList.length; j++) {
+					//先把菜品全部变为不停售的, 因为可能之前是停售的, 现在不停售了
 					of.foodList[j].status &= ~(1 << 2);
 					for (var i = 0; i < stopFoods.length; i++) {
 						if(of.foodList[j].id == stopFoods[i].id){
@@ -486,7 +488,9 @@ of.updataSelloutFoods = function(){
 							}
 							
 							//更新限量沽清剩余
-							if((of.foodList[j].status & 1 << 10) != 0){
+							if((of.foodList[j].status & 1 << 10) != 0 || stopFoods[i].foodLimitAmount > 0){
+								//设置菜品为限量沽清属性
+								of.foodList[j].status |= (1 << 10);
 								of.foodList[j].foodLimitAmount = stopFoods[i].foodLimitAmount;
 								of.foodList[j].foodLimitRemain = stopFoods[i].foodLimitRemain;
 							}
@@ -2784,6 +2788,7 @@ of.submit = function(c){
 	
 	orderDataModel.tableID = of.table.id;
 	orderDataModel.customNum = of.table.customNum;
+	orderDataModel.comment = of.table.comment;
 	orderDataModel.orderFoods = (typeof c.commitType != 'undefined'? of.newFood.slice(0) : foodData);
 	orderDataModel.categoryValue =  of.table.categoryValue;
 	if(!isFree){

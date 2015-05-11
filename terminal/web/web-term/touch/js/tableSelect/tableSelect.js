@@ -975,6 +975,7 @@ ts.openTableAction = function(){
 	orderDataModel.customNum = customNum;
 	orderDataModel.orderFoods = [];
 	orderDataModel.categoryValue =  ts.table.categoryValue;
+	orderDataModel.comment = $('#inputTableOpenCommon').val()
 	
 	$.post('../InsertOrder.do', {
 		commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
@@ -1181,7 +1182,8 @@ ts.renderToCreateOrder = function(tableNo, peopleNo){
 		}else{
 			theTable.customNum = peopleNo;
 			of.entry({
-				table : theTable
+				table : theTable,
+				comment : $('#inputTableOpenCommon').val()
 /*				,callback : function(){
 					initTableData();
 				}*/

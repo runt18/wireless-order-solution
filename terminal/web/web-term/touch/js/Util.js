@@ -308,6 +308,7 @@ Util.to.padding = function(c){
 			if(this.dom){
 				this.dom.html('');
 			}
+			this.showMsg();
 		},
 		pagedCallBack : c.pagedCallBack,//执行分页后调用
 		showMsg : function(){

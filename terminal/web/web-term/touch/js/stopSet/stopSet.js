@@ -94,7 +94,7 @@ ss.init = function(){
 					name : c.data.name,
 					unitPrice : c.data.unitPrice,
 					click : 'ss.insertFood({foodId:'+c.data.id+', type:\'deSellOut\'})',
-					limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
+					limitStatus : ((c.data.status & 1 << 10) != 0 || c.data.foodLimitAmount > 0) ? '' : 'none',
 					foodLimitAmount : c.data.foodLimitAmount,
 					foodLimitRemain : c.data.foodLimitRemain
 				});

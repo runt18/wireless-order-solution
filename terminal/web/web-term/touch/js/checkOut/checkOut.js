@@ -253,6 +253,7 @@ uo.showNorthForUpdateOrder = function(){
 			"<span style = 'margin: 10px;'>餐台号：" + uo.order.table.alias + " </span>" +
 			"<span style = 'margin: 10px;'>账单号：" + uo.order.id + " </span>" +
 			"<span style = 'margin: 10px;' id='customNumForUO'>用餐人数：" + uo.customNum + "</span>" +			
+			(uo.order.comment ? ("<span style = 'margin: 10px;' >开台备注：" + uo.order.comment + "</span>") : "") +
 		"</div>";
 	$("#divNorthForUpdateOrder").html(html);
 }

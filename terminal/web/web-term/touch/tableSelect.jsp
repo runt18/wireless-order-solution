@@ -158,6 +158,9 @@
 					<span>3</span>
 					<span class="clear">C</span>
 				</div>
+				<div>
+						<input id="inputTableOpenCommon" placeholder="开台备注" data-type="txt" class="countInputStyle" >
+				</div>
 			</div>		    
 	    
 		</div>	
@@ -1693,6 +1696,9 @@
 				</span>
 				<span style="line-height: 35px;float: left;margin-left: 20px;">
 					 人数 : <font id="orderCustomNum" color="#f7c942">1</font>
+				</span>
+				<span style="line-height: 35px;float: left;margin-left: 20px;">
+					 开台备注 : <font id="orderComment" color="#f7c942">----</font>
 				</span>
 			</div>
 			<div id="payment_orderFoodListCmp" style="overflow-y: auto;">
