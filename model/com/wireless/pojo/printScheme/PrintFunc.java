@@ -32,15 +32,14 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	private boolean enabled = true;
 	
 	public static class SummaryUpdateBuilder{
-		private final UpdateBuilder builder = new UpdateBuilder(0);
-		private final int printerId;
-		private final boolean extraEnabled;
-		private final boolean cancelEnabled;
+		private final UpdateBuilder builder;
 		
-		public SummaryUpdateBuilder(int printerId, boolean extraEnabled, boolean cancelEnabled){
-			this.printerId = printerId;
-			this.extraEnabled = extraEnabled;
-			this.cancelEnabled = cancelEnabled;
+		public SummaryUpdateBuilder(int printerId, PType type){
+			if(type == PType.PRINT_ORDER || type == PType.PRINT_ALL_CANCELLED_FOOD){
+				this.builder = new UpdateBuilder(printerId, type);
+			}else{
+				throw new IllegalArgumentException("打印类型只能是【" + PType.PRINT_ORDER.getDesc() + "】或者【" + PType.PRINT_ALL_CANCELLED_FOOD.getDesc() + "】");
+			}
 		}
 		
 		public SummaryUpdateBuilder setRepeat(int repeat){
@@ -73,25 +72,19 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}
 		
-		public int getPrinterId(){
-			return this.printerId;
-		}
-		
-		public UpdateBuilder[] build(int extraId, int cancelId){
-			final UpdateBuilder[] result = new UpdateBuilder[2];
-			result[0] = new UpdateBuilder(extraId, builder).setEnabled(extraEnabled);
-			result[1] = new UpdateBuilder(cancelId, builder).setEnabled(cancelEnabled);
-			return result;
+		public UpdateBuilder build(){
+			return this.builder;
 		}
 	}
 	
 	public static class DetailUpdateBuilder{
-		private final UpdateBuilder builder = new UpdateBuilder(0);
+		private final UpdateBuilder builder;
 		private final int printerId;
 		private final boolean extraEnabled;
 		private final boolean cancelEnabled;
 		
 		public DetailUpdateBuilder(int printerId, boolean extraEnabled, boolean cancelEnabled){
+			this.builder = new UpdateBuilder(printerId, PType.PRINT_UNKNOWN);
 			this.printerId = printerId;
 			this.extraEnabled = extraEnabled;
 			this.cancelEnabled = cancelEnabled;
@@ -118,29 +111,26 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		
 		public UpdateBuilder[] build(int extraId, int cancelId){
 			final UpdateBuilder[] result = new UpdateBuilder[2];
-			result[0] = new UpdateBuilder(extraId, builder).setEnabled(extraEnabled);
-			result[1] = new UpdateBuilder(cancelId, builder).setEnabled(cancelEnabled);
+			result[0] = new UpdateBuilder(builder.mPrinterId, PType.PRINT_ORDER_DETAIL, builder).setEnabled(extraEnabled);
+			result[1] = new UpdateBuilder(builder.mPrinterId, PType.PRINT_CANCELLED_FOOD_DETAIL, builder).setEnabled(cancelEnabled);
 			return result;
 		}
 	}
 	
 	public static class UpdateBuilder{
-		private final int mId;
+		private final int mPrinterId;
 		private int mRepeat;
-		private PType mPType;
+		private final PType mPType;
 		private String mComment;
 		private List<Region> mRegions;
 		private List<Department> mDept;
 		private List<Kitchen> mKitchens;
-		private int enabled;
+		private int enabled = -1;
 		
-		private UpdateBuilder(int id, UpdateBuilder src){
-			this(id);
+		private UpdateBuilder(int printerId, PType type, UpdateBuilder src){
+			this(printerId, type);
 			if(src.isRepeatChanged()){
 				setRepeat(src.mRepeat);
-			}
-			if(src.isTypeChanged()){
-				setType(src.mPType);
 			}
 			if(src.isCommentChanged()){
 				setComment(src.mComment);
@@ -177,17 +167,13 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			}
 		}
 		
-		public UpdateBuilder(int id){
-			this.mId = id;
+		public UpdateBuilder(Printer printer, PType type){
+			this(printer.getId(), type);
 		}
 		
-		public boolean isTypeChanged(){
-			return this.mPType != null;
-		}
-		
-		public UpdateBuilder setType(PType type){
+		public UpdateBuilder(int printerId, PType type){
+			this.mPrinterId = printerId;
 			this.mPType = type;
-			return this;
 		}
 		
 		public boolean isCommentChanged(){
@@ -200,7 +186,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 		
 		public boolean isEnabledChanged(){
-			return this.enabled != -1;
+			return this.enabled >= 0;
 		}
 		
 		public UpdateBuilder setEnabled(boolean onOff){
@@ -467,10 +453,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	}
 	
 	private PrintFunc(UpdateBuilder builder){
-		setId(builder.mId);
-		if(builder.isTypeChanged()){
-			setType(builder.mPType);
-		}
+		setPrinterId(builder.mPrinterId);
+		setType(builder.mPType);
 		if(builder.isRepeatChanged()){
 			setRepeat(builder.mRepeat);
 		}
