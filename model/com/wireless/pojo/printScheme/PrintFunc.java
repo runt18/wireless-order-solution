@@ -274,17 +274,19 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	 */
 	public static class SummaryBuilder{
 		private final int printerId;
+		private final PType type;
 		private int mRepeat = 1;
 		private final List<Region> mRegions = SortedList.newInstance();
 		private final List<Department> mDepts = SortedList.newInstance();
 		private String comment;
-		private final boolean extraEnabled;
-		private final boolean cancelEnabled;
 		
-		public SummaryBuilder(int printerId, boolean extraEnabled, boolean cancelEnabled){
-			this.printerId = printerId;
-			this.extraEnabled = extraEnabled;
-			this.cancelEnabled = cancelEnabled;
+		public SummaryBuilder(int printerId, PType type){
+			if(type == PType.PRINT_ORDER || type == PType.PRINT_ALL_CANCELLED_FOOD){
+				this.printerId = printerId;
+				this.type = type;
+			}else{
+				throw new IllegalArgumentException("打印类型只能是【" + PType.PRINT_ORDER.getDesc() + "】或者【" + PType.PRINT_ALL_CANCELLED_FOOD.getDesc() + "】");
+			}
 		}
 		
 		public SummaryBuilder setComment(String comment){
@@ -325,11 +327,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}		
 		
-		public PrintFunc[] build(){
-			final PrintFunc[] result = new PrintFunc[2];
-			result[0] = new PrintFunc(this, PType.PRINT_ORDER, extraEnabled);
-			result[1] = new PrintFunc(this, PType.PRINT_ALL_CANCELLED_FOOD, cancelEnabled);
-			return result;
+		public PrintFunc build(){
+			return new PrintFunc(this);
 		}
 		
 	}
@@ -475,13 +474,12 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 	}
 	
-	private PrintFunc(SummaryBuilder builder, PType type, boolean enabled){
-		this(type, builder.mRepeat);
+	private PrintFunc(SummaryBuilder builder){
+		this(builder.type, builder.mRepeat);
 		this.printerId = builder.printerId;
 		this.mRegions.addAll(builder.mRegions);
 		this.mDepts.addAll(builder.mDepts);
 		this.mComment = builder.comment;
-		this.enabled = enabled;
 	}
 	
 	private PrintFunc(DetailBuilder builder, PType type, boolean enabled){
