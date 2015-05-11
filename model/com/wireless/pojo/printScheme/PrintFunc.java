@@ -36,7 +36,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		  
 		public SummaryUpdateBuilder(int printerId, PType type){
 			if(type == PType.PRINT_ORDER || type == PType.PRINT_ALL_CANCELLED_FOOD){
-				this.builder = new UpdateBuilder(printerId, type);
+				this.builder = new UpdateBuilder(printerId, type);  
 			}else{
 				throw new IllegalArgumentException("打印类型只能是【" + PType.PRINT_ORDER.getDesc() + "】或者【" + PType.PRINT_ALL_CANCELLED_FOOD.getDesc() + "】");
 			}
