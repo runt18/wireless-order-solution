@@ -426,6 +426,14 @@ window.onload=function(){
 			of.s.fireEvent();
 		}		
 	});
+	//沽清搜索
+	$('#searchSelloutFoodInput').focus(function(){
+		focusInput = this.id;
+		if(this.id == 'searchSelloutFoodInput'){
+			ss.s.fireEvent();
+		}		
+	});
+	
 	
 	//快捷键
 	$(document).keydown(function(event){
@@ -1110,6 +1118,8 @@ ts.closeTableWithPeople = function(){
 	//人数输入框设置默认
 	$('#inputTableOpenCommon').val("");
 	$('#inputTableCustomerCountSet').val(1);
+	
+	$('#numberKeyboard').hide();
 }
 
 
@@ -1169,28 +1179,28 @@ ts.renderToCreateOrder = function(tableNo, peopleNo){
 	if(tableNo > 0){
 		//关闭台操作popup
 		uo.closeTransOrderFood();
-		//设置餐台人数为默认
-		$('#inputTableCustomerCountSet').val(1);
-		$('#inputTableOpenCommon').val("");
+		//关闭开台
+		ts.closeTableWithPeople();
 		
-		var theTable = getTableByAlias(tableNo);
-		//同时操作餐台时,选中状态没变化的餐桌处理
-		//直接写台豪点菜时判断是否已点菜, 是则先给co.order.orderFoods赋值
-		if(theTable.statusValue == 1){
-			initOrderData({
-				table : getTableByAlias(tableNo),
-				createrOrder : 'createrOrder'
-			});
-		}else{
-			theTable.customNum = peopleNo;
-			of.entry({
-				table : theTable,
-				comment : $('#inputTableOpenCommon').val()
-/*				,callback : function(){
-					initTableData();
-				}*/
-			});
-		}		
+		setTimeout(function(){
+			var theTable = getTableByAlias(tableNo);
+			//同时操作餐台时,选中状态没变化的餐桌处理
+			//直接写台豪点菜时判断是否已点菜, 是则先给co.order.orderFoods赋值
+			if(theTable.statusValue == 1){
+				initOrderData({
+					table : getTableByAlias(tableNo),
+					createrOrder : 'createrOrder'
+				});
+			}else{
+				theTable.customNum = peopleNo;
+				of.entry({
+					table : theTable,
+					comment : $('#inputTableOpenCommon').val()
+				});
+			}				
+		}, 250);
+		
+	
 	}else{
 		Util.msg.alert({
 			msg : '没有该餐桌，请重新输入一个桌号.', 
@@ -1531,7 +1541,10 @@ function showRegion(temp, pageNow){
 	//添加区域信息
 	var html = [];
 	for (var i = 0; i < temp.length; i++) {
-		html.push('<a data-role="button" data-inline="true" data-type="region" class="regionBtn" onclick="ts.addTables({event:this, id:'+ temp[i].id +'})">'+ temp[i].name +'</a>');
+		//不显示酒席费空区域
+		if(temp[i].id != 0){
+			html.push('<a data-role="button" data-inline="true" data-type="region" class="regionBtn" onclick="ts.addTables({event:this, id:'+ temp[i].id +'})">'+ temp[i].name +'</a>');
+		}
 	}
 	
 	$('#divSelectRegionForTS').html(html.join("")).trigger('create').trigger('refresh');

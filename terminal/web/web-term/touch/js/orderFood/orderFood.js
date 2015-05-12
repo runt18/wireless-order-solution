@@ -66,7 +66,7 @@ var of = {
 	comboFoodGroupCmpTemplet = '<a data-role="button" data-inline="true" class="comboFoodPopTopBtn" data-value={id} data-index={index} data-theme="{theme}" onclick="initComboFoodTasteCmp({event:this, id:{id}, isComboFood : {isComboFood}})"><div>{name}</div></a>';
 	//多单位
 	multiPriceCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="multiPriceCmp" data-index={index} data-value={id} data-theme={theme}><div>{multiPrice}</div></a>',
-//餐台选择匹配
+//菜品选择匹配
 of.s = {
 	file : null,
 	fileValue : null,
@@ -155,7 +155,6 @@ of.s = {
 		of.s.onInput();
 	}
 };
-
 
 //设置搜索出来的菜品的排序依据, 按点击次数
 of.searchFoodCompare = function (obj1, obj2) {
@@ -292,19 +291,6 @@ of.deptGetPreviousPage = function(){
 	of.initDeptContent();
 };
 
-//设置菜品排序, 限量沽清排在最前
-of.foodOrderByStatus = function (obj1, obj2) {
-    var val1 = obj1.status;
-    var val2 = obj2.status;
-    if ((val1 & 1 << 10) < (val2 & 1 << 10)) {
-        return 1;
-    } else if ((val1 & 1 << 10) > (val2 & 1 << 10)) {
-        return -1;
-    } else {
-        return 0;
-    }            
-} 
-
 /**
  * 初始化分厨选择
  * @param c
@@ -353,7 +339,7 @@ of.initKitchenContent = function(c){
 	if(!of.foodPaging){
 		of.foodPaging = new Util.to.padding({
 			renderTo : "foodsCmp",
-			data : tempFoodData.sort(of.foodOrderByStatus),
+			data : tempFoodData,
 			displayId : 'foodPagingDesc',
 			templet : function(c){
 				return foodCmpTemplet.format({
@@ -381,7 +367,7 @@ of.initKitchenContent = function(c){
 		});			
 	}else{
 		of.foodPaging.init({
-			data : tempFoodData.sort(of.foodOrderByStatus)
+			data : tempFoodData
 		});
 	}
 	of.foodPaging.getFirstPage();

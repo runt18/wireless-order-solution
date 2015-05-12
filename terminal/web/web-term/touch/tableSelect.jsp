@@ -159,7 +159,7 @@
 					<span class="clear">C</span>
 				</div>
 				<div>
-						<input id="inputTableOpenCommon" placeholder="开台备注" data-type="txt" class="countInputStyle" >
+						<input id="inputTableOpenCommon" placeholder="开台备注" data-type="num" class="countInputStyle" >
 				</div>
 			</div>		    
 	    
@@ -684,6 +684,7 @@
 	<div data-role="popup" id="updateFoodOtherOperateCmp" data-theme="d">
         <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
             <li class="tempFoodKitchen" onclick="uo.showOperatePeople()"><a >人数</a></li>
+            <li class="tempFoodKitchen" onclick=""><a >修改备注</a></li>
             <li class="tempFoodKitchen" onclick="uo.tempPayForPrintAll()"><a >补打总单</a></li>
             <li class="tempFoodKitchen" onclick="uo.printDetailPatch()"><a >补打明细</a></li>
             <li class="tempFoodKitchen" onclick="uo.allTransFoodForTS()"><a >全单转菜</a></li>
@@ -741,6 +742,50 @@
 	</div>		
 	
 	<div id="orderFoodWeighCmp" data-role="popup" data-theme="c" data-dismissible="false" class="ui-corner-all" align="center">
+	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
+	        <!-- <h1>输入称重--<span id="weighFoodName"></span></h1> -->
+	       	 输入称重--<span id="weighFoodName"></span>
+	    </div>
+		<div class="calculator">
+			<div class="top">
+				<span class="clear">+</span>
+				<span class="inputs">
+					<input id="inputOrderFoodWeigh" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodWeigh')">
+				</span>
+				<span class="clear">-</span>
+			</div>
+			<div class="keys">
+				<span>7</span>
+				<span>8</span>
+				<span>9</span>
+				<span>0</span>
+				
+				<span>4</span>
+				<span>5</span>
+				<span>6</span>
+				<span>.</span>
+				
+				<span>1</span>
+				<span>2</span>
+				<span>3</span>
+				<span class="clear">C</span>
+			</div>
+			
+			<label>
+		        <input type="checkbox" id="chkPrintWeigh" data-theme="e" checked="checked">打印称重信息
+		    </label>	
+		</div>		    
+	    
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.openWeighaction()">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeWeighOperate()">取消</a>		 
+			 </div>
+	    </div>
+	</div>		
+	
+	<!-- 修改备注 -->
+	<div id="orderFoodCommentCmp" data-role="popup" data-theme="c" data-dismissible="false" class="ui-corner-all" align="center">
 	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
 	        <!-- <h1>输入称重--<span id="weighFoodName"></span></h1> -->
 	       	 输入称重--<span id="weighFoodName"></span>
@@ -1541,13 +1586,33 @@
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : true})">沽清</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : false})">开售</a>
 			 	<!-- <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a> -->
-			 	<!-- <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="searchFood('on')">搜索</a> -->
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="searchSelloutFood('on')">搜索</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.tp.getPreviousPage()">上一页</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.tp.getNextPage()">下一页</a>
 			 </div>
-
 		</div>
-		
+		<!-- 搜索组件 -->
+		<div id="searchSelloutFoodCmp" style="height: 60px;padding-top: 25px;display: none;">		
+			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal" style="margin-right: 460px;">
+			 <table>
+			 	<tr>
+			 		<td>
+			 			<input id="searchSelloutFoodInput"  type="text" placeholder="输入菜名"  style="font-size: 20px;font-weight: bold;width: 150px;">
+			 		</td>
+			 		<td>
+						<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:60px;" align="center">
+						    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="ss.s.valueBack()">D</a>
+						</div>			 		
+			 		</td>
+			 		<td>
+					 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : true})">沽清</a>
+					 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : false})">开售</a>
+			 			<a data-role="button" data-inline="true" class="bottomBtnFont" style="margin-top: -5px;" onclick="searchSelloutFood()">关闭</a>
+			 		</td>
+			 	</tr>
+			 </table>
+			 </div>
+		 </div>			
 	
 		<!--限量沽清修改数量 -->
 		<div id="orderFoodLimitCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
@@ -1589,30 +1654,6 @@
 				 </div>
 		    </div>
 		</div>			
-		
-		
-		
-		<div id="searchFoods4StopSellCmp" style="height: 60px;padding-top: 25px;display: none;">		
-			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal" style="margin-right: 460px;">
-			 <table>
-			 	<tr>
-			 		<td>
-			 			<input id="searchFoods4StopSellInput"  type="text" placeholder="输入菜名"  style="font-size: 20px;font-weight: bold;width: 150px;">
-			 		</td>
-			 		<td>
-						<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:60px;" align="center">
-						    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="of.s.valueBack()">D</a>
-						</div>			 		
-			 		</td>
-			 		<td>
-			 			<a data-role="button" data-inline="true" class="bottomBtnFont" style="margin-top: -5px;" onclick="addTempFood()">临时菜</a>
-			 			<a data-role="button" data-inline="true" class="bottomBtnFont" style="margin-top: -5px;" onclick="of.submit({notPrint : false})">下单</a>
-			 			<a data-role="button" data-inline="true" class="bottomBtnFont" style="margin-top: -5px;" onclick="searchFood()">关闭</a>
-			 		</td>
-			 	</tr>
-			 </table>
-			 </div>
-		 </div>		 
 		 
 	</div>	
 </div>

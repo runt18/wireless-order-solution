@@ -80,6 +80,159 @@ ss.back = function(){
 	ss.extra = '';
 };
 
+//沽清选择匹配
+ss.s = {
+	file : null,
+	fileValue : null,
+	init : function(c){
+		this.file = document.getElementById(c.file);
+		if(typeof this.file.oninput != 'function'){
+			this.file.oninput = function(e){
+				ss.s.fileValue = ss.s.file.value;
+				var data = null, temp = null;
+				if(ss.s.fileValue.trim().length > 0){
+					data = [];
+					//所有菜品
+					temp = ss.showFoodByCond.showFoodDatas.slice(0);
+					for(var i = 0; i < temp.length; i++){
+						if(temp[i].name.indexOf(ss.s.fileValue.trim()) != -1){
+							data.push(temp[i]);
+						}
+					}				
+				}
+				
+				if(data){
+					data = data.sort(of.searchFoodCompare);
+				}
+				
+				ss.s.foodPaging.init({
+					data : data.sort(ss.foodOrderByStatus),
+					callback : function(){
+						ss.s.foodPaging.getFirstPage();
+					}
+				});
+				data = null;
+				temp = null;
+			};
+		}
+		
+		if(!ss.s.foodPaging){
+			ss.s.foodPaging = Util.to.padding({
+				renderTo : "foods4StopSellCmp",
+				templet : function(c){
+					return stopSellFoodTemplet.format({
+						id : c.data.id,
+						name : c.data.name,
+						unitPrice : c.data.unitPrice,
+						click : 'ss.insertFood({foodId:'+c.data.id+', type:'+ (ss.status == 'stop' ? '\'deSellOut\'' : '\'sellOut\'')  +'})',
+						limitStatus : ((c.data.status & 1 << 10) != 0 || c.data.foodLimitAmount > 0) ? '' : 'none',
+						foodLimitAmount : c.data.foodLimitAmount,
+						foodLimitRemain : c.data.foodLimitRemain
+					});
+				},
+				pagedCallBack : function(){
+					//FIXME .food-status-font中position:absolute不起作用
+					setTimeout(function(){
+						$(".food-status-limit").css("position", "absolute");
+					}, 250);				
+				}
+			});		
+		}
+		return this.file;
+	},
+	valueBack : function(){
+		if(this.file.value){
+			this.file.value = this.file.value.substring(0, this.file.value.length - 1);
+			this.file.oninput(this.file);			
+		}
+		this.file.focus();
+	},
+	onInput : function(){
+		this.file.oninput(this.file);		
+	},
+	select : function(){
+		this.file.select();
+	},
+	clear : function(){
+		this.file.value = '';
+		this.file.oninput(this.file);
+		this.file.select();
+	},
+	callback : function(){
+		ss.s.clear();
+	},
+	fireEvent : function(){
+		ss.s.onInput();
+	}
+};	
+
+/**
+ * 搜索菜品
+ * @param ope
+ */
+function searchSelloutFood(ope){
+	if(ope=='on'){
+		if(!ss.s.init({file : 'searchSelloutFoodInput'})){
+			Util.msg.alert({
+				renderTo : 'stopSellMgr',
+				msg : '程序异常, 搜索功能无法使用, 请刷新页面后重试.',
+				time : 2
+			});
+			return;
+		}
+		
+		ss.searchFooding = true;
+		
+		YBZ_open(document.getElementById('searchSelloutFoodInput'));
+		
+		$('#normalOperateFood4StopSellCmp').hide();
+		$('#searchSelloutFoodCmp').show();	
+		
+		setTimeout(function(){
+			$('#searchSelloutFoodInput').focus();
+		}, 250);
+		
+	}else{
+		var kitchen = $('#kitchens4StopSellCmp > a[data-theme=b]');
+		if(kitchen.length > 0){
+			kitchen.click();
+		}else{
+			kitchen = $('#kitchens4StopSellCmp a[data-value=-1]')[0];
+			kitchen.onclick();
+		}
+		kitchen = null;		
+		
+		closeSearchSelloutFood();
+	}
+}
+/**
+ * 关闭搜索
+ */
+function closeSearchSelloutFood(){
+	ss.searchFooding = false;	
+	
+	$('#searchSelloutFoodInput').val('');
+	
+	$('#normalOperateFood4StopSellCmp').show();
+	$('#searchSelloutFoodCmp').hide();
+	
+	YBZ_win.close();
+}
+
+
+//设置菜品排序, 限量沽清排在最前
+ss.foodOrderByStatus = function (obj1, obj2) {
+    var val1 = obj1.status;
+    var val2 = obj2.status;
+    if ((val1 & 1 << 10) < (val2 & 1 << 10)) {
+        return 1;
+    } else if ((val1 & 1 << 10) > (val2 & 1 << 10)) {
+        return -1;
+    } else {
+        return 0;
+    }            
+} 
+
 //初始化分页
 ss.init = function(){
 	if(!this.initFlag===true){
@@ -289,7 +442,7 @@ ss.initKitchenContent = function(c){
 	temp = null;
 	
 	ss.showKitchenPaging();
-	ss.iteratorData = tempFoodData.sort(of.foodOrderByStatus);
+	ss.iteratorData = tempFoodData.sort(ss.foodOrderByStatus);
 	
 	ss.showFoodByCond();	
 	
@@ -364,15 +517,15 @@ ss.showFoodByCond = function(c){
 		return;
 	}
 	
-	var showFoodDatas = [];
+	ss.showFoodByCond.showFoodDatas = [];
 	for (var i = 0; i < ss.iteratorData.length; i++) {
 		var tempFoodData = ss.iteratorData[i];
 		if(eval(ss.extra)){
-			showFoodDatas.push(tempFoodData);
+			ss.showFoodByCond.showFoodDatas.push(tempFoodData);
 		}
 	}
 	ss.tp.init({
-		data : showFoodDatas
+		data : ss.showFoodByCond.showFoodDatas
 	});
 	ss.tp.getFirstPage();
 };
@@ -442,8 +595,10 @@ ss.searchData = function(c){
 	ss.initNewFoodContent();
 	ss.extra = '';
 	if(c.isStop === true){
+		ss.status = 'stop';
 		ss.tp = ss.stoptp;
 	}else{
+		ss.status = 'sell';
 		ss.tp = ss.normaltp;
 	}
 	
@@ -695,6 +850,8 @@ ss.soldOut = function(c){
 					topTip : true,
 					msg : data.msg
 				});
+				//关闭搜索
+				closeSearchSelloutFood();
 				ss.back();
 			} else {
 				Util.msg.alert({
