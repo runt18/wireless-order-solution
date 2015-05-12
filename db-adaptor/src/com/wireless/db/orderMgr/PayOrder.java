@@ -382,12 +382,16 @@ public class PayOrder {
 
 		//Set the erase price.
 		orderToCalc.setErasePrice(payBuilder.getErasePrice());
-		//Set the custom number.
-		orderToCalc.setCustomNum(payBuilder.getCustomNum());
 		//Set the received cash.
 		orderToCalc.setReceivedCash(payBuilder.getReceivedCash());
+		//Set the custom number.
+		if(payBuilder.hasCustomNum()){
+			orderToCalc.setCustomNum(payBuilder.getCustomNum());
+		}
 		//Set the comment.
-		orderToCalc.setComment(payBuilder.getComment());
+		if(payBuilder.hasComment()){
+			orderToCalc.setComment(payBuilder.getComment());
+		}
 		
 		//If the service plan is set, use to get the rate to region belongs to this order
 		if(payBuilder.hasServicePlan()){
