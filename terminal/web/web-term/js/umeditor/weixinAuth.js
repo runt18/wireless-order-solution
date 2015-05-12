@@ -127,7 +127,7 @@ function getRestaurantInfo(){
 			$('#seeRestaurantByCodeTitle').html('请先完成第一步微信公众号绑定');
 			$('#weixinCodeToRestaurant').attr('src', 'http://food-image-test.oss.aliyuncs.com/nophoto.jpg');
 		}
-	});
+	}, 'json');
 }
 
 $(function (){

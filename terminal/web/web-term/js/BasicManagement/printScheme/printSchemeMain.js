@@ -507,6 +507,10 @@ function init(){
 								if(checked){
 									showPanel(thiz.inputValue);
 								}
+							},
+							//第一次点击bug
+							focus : function(thiz){
+								thiz.fireEvent('check', thiz, true)
 							}
 						}
 					}]
@@ -1029,9 +1033,15 @@ function showPanel(v){
 		Ext.getCmp('kitchensTree').hide();
 		Ext.getCmp('depts').show();
 		Ext.getCmp('regions').show();
-		Ext.getCmp('printCommentPanel').show();
 		
-		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E7%82%B9%E8%8F%9C%E6%80%BB%E5%8D%95.jpg)';
+		
+		if(v == 1){
+			Ext.getCmp('printCommentPanel').show();
+			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E7%82%B9%E8%8F%9C%E6%80%BB%E5%8D%95.jpg)';
+		}else{
+			Ext.getCmp('printCommentPanel').hide();
+			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E7%82%B9%E8%8F%9C%E6%80%BB%E5%8D%95.jpg)';
+		}
 		
 		cancelFoodBtn.hide();
 		addFoodBtn.hide();
