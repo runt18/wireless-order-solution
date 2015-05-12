@@ -41,7 +41,7 @@ public class QueryMenuAction extends DispatchAction {
 		response.setContentType("text/json;charset=utf-8");
 		JObject jobject = new JObject();
 		String pin = (String) request.getAttribute("pin");
-		final DepartmentTree deptTree = new DepartmentTree.Builder(FoodDao.getPureFoods(StaffDao.verify(Integer.parseInt(pin)))).build();
+		final DepartmentTree deptTree = new DepartmentTree.Builder(FoodDao.getPureByCond(StaffDao.verify(Integer.parseInt(pin)), null, null)).build();
 		jobject.setRoot(deptTree.asDeptNodes());
 		jobject.setExtra(new Jsonable(){
 
