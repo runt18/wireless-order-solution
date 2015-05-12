@@ -1108,8 +1108,8 @@ ts.createTableWithPeople = function(){
 ts.closeTableWithPeople = function(){
 	$('#tableCustomerCountSet').popup('close');
 	//人数输入框设置默认
-	$('#inputTableCustomerCountSet').val(1);
 	$('#inputTableOpenCommon').val("");
+	$('#inputTableCustomerCountSet').val(1);
 }
 
 
@@ -1171,6 +1171,7 @@ ts.renderToCreateOrder = function(tableNo, peopleNo){
 		uo.closeTransOrderFood();
 		//设置餐台人数为默认
 		$('#inputTableCustomerCountSet').val(1);
+		$('#inputTableOpenCommon').val("");
 		
 		var theTable = getTableByAlias(tableNo);
 		//同时操作餐台时,选中状态没变化的餐桌处理
