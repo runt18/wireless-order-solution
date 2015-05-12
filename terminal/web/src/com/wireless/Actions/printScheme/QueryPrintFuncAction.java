@@ -32,39 +32,10 @@ public class QueryPrintFuncAction extends Action{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			root = PrintFuncDao.getByCond(staff, new PrintFuncDao.ExtraCond().setPrinter(Integer.parseInt(printerId)));
 			List<PrintFunc> roots = new ArrayList<PrintFunc>();
-/*			
+
+			boolean detail = true;
 			for (PrintFunc printFunc : root) {
-				if(printFunc.getType() == PType.PRINT_ORDER){
-					if(PrintFuncDao.getByCond(staff, new PrintFuncDao.ExtraCond().setPrinter(printFunc.getPrinterId()).setType(PType.PRINT_ALL_CANCELLED_FOOD)).isEmpty()){
-						printFunc.setIncludeCancel(false);
-					}
-				}else if(printFunc.getType() == PType.PRINT_ORDER_DETAIL){
-					if(PrintFuncDao.getByCond(staff, new PrintFuncDao.ExtraCond().setPrinter(printFunc.getPrinterId()).setType(PType.PRINT_CANCELLED_FOOD_DETAIL)).isEmpty()){
-						printFunc.setIncludeCancel(false);
-					}					
-				}
-				
-				if(printFunc.getType() != PType.PRINT_CANCELLED_FOOD_DETAIL && printFunc.getType() != PType.PRINT_ALL_CANCELLED_FOOD){
-					roots.add(printFunc);
-				}
-			}
-			*/
-			boolean summary = true, detail = true;
-			for (PrintFunc printFunc : root) {
-				if(printFunc.getType() == PType.PRINT_ORDER || printFunc.getType() == PType.PRINT_ALL_CANCELLED_FOOD){
-					if(printFunc.getType() == PType.PRINT_ORDER ){
-						if(summary){
-							roots.add(printFunc);
-							summary = false;
-						}
-					}else if(printFunc.getType() == PType.PRINT_ALL_CANCELLED_FOOD){
-						if(summary){
-							printFunc.setType(PType.PRINT_ORDER);
-							roots.add(printFunc);
-							summary = false;
-						}						
-					}
-				}else if(printFunc.getType() == PType.PRINT_ORDER_DETAIL || printFunc.getType() == PType.PRINT_CANCELLED_FOOD_DETAIL){
+				if(printFunc.getType() == PType.PRINT_ORDER_DETAIL || printFunc.getType() == PType.PRINT_CANCELLED_FOOD_DETAIL){
 					if(printFunc.getType() == PType.PRINT_ORDER_DETAIL ){
 						if(detail){
 							roots.add(printFunc);
