@@ -322,7 +322,6 @@ function initBillboardContent(c){
 			$('#btnDisplayBillboard .ui-btn-text').html(result.root.length +' 条公告');
 			$('#btnDisplayBillboard').buttonMarkup('refresh');	
 			lg.bbs =  result.root;
-			initBillboardContent.unRead = [];
 			var html = ['<li data-role="divider" data-theme="e">点击标题查看详情:</li>'];
 			for (var i = 0; i < result.root.length; i++) {
 				html.push('<li data-index={index} data-value={id} onclick="displayBillboard(this)"> <a>{status}{title}</a></li>'.format({
@@ -332,19 +331,11 @@ function initBillboardContent(c){
 					title : result.root[i].title
 				}));
 				
-				//cookie中不存在此条记录则还未阅读
-				if(!getcookie("billboard"+result.root[i].id)){
-					initBillboardContent.unRead.push(result.root[i]);
-				}
 			}
 			$('#billboardList').html(html.join("")).trigger('create').listview('refresh');
 			
 			if(lg.bbs.length > 0 && c.display && !getcookie("alertBillboard")){
 				setTimeout(function(){
-//					$('#billboardsCmp').popup('open');
-//					$('#billboardsCmp').parent().addClass("slideup").addClass("in")
-//					$('#billboardsCmp-popup').css({top:$('#headDisplayBillboard').position().top + 25, left:$('#headDisplayBillboard').position().left - 80});
-
 					displayBillboard.curBillboardId = lg.bbs[0].id;
 					
 			    	$('#billboardTitle').text(lg.bbs[0].title);
@@ -352,11 +343,6 @@ function initBillboardContent(c){
 			    	
 			    	$('#billboardCmp').popup('open');
 			    	
-			    	//已读状态设置到cookie
-		    		if(initBillboardContent.unRead[0].expired > new Date().getTime()){
-//		    			setcookie("billboard"+initBillboardContent.unRead[0].id, true, null, remainTimes);
-		    		}
-//		    		initBillboardContent();	
 				}, 400);
 			}
 			
@@ -380,14 +366,6 @@ function displayBillboard(thiz){
 		    	$('#billboardCmp').popup('open');
 		    	
 		    	displayBillboard.curBillboardId = billboard.id;
-		    	//设置为已读状态
-		    	if(!getcookie("billboard"+billboard.id)){
-		    		//已读状态设置到cookie
-		    		if(billboard.expired > new Date().getTime()){
-//		    			setcookie("billboard"+billboard.id, true, null, getTodayRemainTime());
-//		    			initBillboardContent();	
-		    		}
-		    	}
 
 	    	}
 	    	thiz = null;
@@ -403,7 +381,6 @@ function displayBillboard(thiz){
 function knowedBillboard(){
 	$('#billboardCmp').popup('close');
 	setcookie("alertBillboard", true, null, getTodayRemainTime());
-//	initBillboardContent();
 }
 
 /**
@@ -416,9 +393,6 @@ function nextBillboard(){
 	    	$('#billboardDesc').html(lg.bbs[i+1].desc);
 	    	
 	    	displayBillboard.curBillboardId = lg.bbs[i+1].id;
-	    	
-//			setcookie("billboard"+lg.bbs[i+1].id, true, null, getTodayRemainTime());
-//			initBillboardContent();	
 		}
 	}
 }
@@ -433,9 +407,6 @@ function lastBillboard(){
 	    	$('#billboardDesc').html(lg.bbs[i-1].desc);
 	    	
 	    	displayBillboard.curBillboardId = lg.bbs[i-1].id;
-	    	
-//			setcookie("billboard"+lg.bbs[i-1].id, true, null, getTodayRemainTime());
-//			initBillboardContent();	
 		}
 	}
 }
