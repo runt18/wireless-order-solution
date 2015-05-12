@@ -493,6 +493,24 @@ function init(){
 						}
 					}]
 				},{
+					
+					items : [{
+						xtype : 'radio',
+						name : 'pType',
+						id : 'radioCancelOrder',
+						inputValue : 8,
+						hideLabel : true,
+						checked : true,
+						boxLabel : '退菜总单',
+						listeners : {
+							check  : function(thiz, checked){
+								if(checked){
+									showPanel(thiz.inputValue);
+								}
+							}
+						}
+					}]
+				},{
 					items : [{
 						xtype : 'radio',
 						name : 'pType',
@@ -1015,10 +1033,12 @@ function showPanel(v){
 		
 		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E7%82%B9%E8%8F%9C%E6%80%BB%E5%8D%95.jpg)';
 		
-		cancelFoodBtn.show();
-		cancelFoodBtn.setBoxLabel('打印退菜总单');
-		addFoodBtn.show();
-		addFoodBtn.setBoxLabel('打印加菜总单');
+		cancelFoodBtn.hide();
+		addFoodBtn.hide();
+//		cancelFoodBtn.show();
+//		cancelFoodBtn.setBoxLabel('打印退菜总单');
+//		addFoodBtn.show();
+//		addFoodBtn.setBoxLabel('打印加菜总单');
 	}else if(v == 2 || v == 5){//分单
 		Ext.getCmp('kitchens').show();
 		Ext.getCmp('kitchensTree').show();
