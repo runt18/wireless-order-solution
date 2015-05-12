@@ -14,6 +14,17 @@
 
 
 <style type="text/css"> 
+/*修改step.css115 导航选中*/
+.wizard > .steps .current a,
+.wizard > .steps .current a:hover,
+.wizard > .steps .current a:active
+{
+    background: #2184be !important;
+    color: #fff;
+    cursor: default;
+}
+
+
 .edui-combobox-menu .edui-combobox-item {
   display: block !important;
   border: 1px solid white;
@@ -56,6 +67,13 @@ a[aria-controls ~= weixin_wizard-p]{
 	/* -moz-box-pack:center;  */
 	-webkit-box-align:center; 
 	-moz-box-align:center; 
+}
+
+/*设置所有导航为已读*/
+#weixin_wizard li[role=tab] > a{
+  background: #9dc8e2;
+  color: #fff;
+  cursor: default;
 }
 
 </style>	
