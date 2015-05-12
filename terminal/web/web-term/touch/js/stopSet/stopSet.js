@@ -903,5 +903,22 @@ ss.selectNewFood = function(c){
 	});
 };
 
+/**
+ * 限量沽清重置
+ */
+ss.resetFoodLimit = function(){
+	$.post('../OperateSellOutFood.do', {dataSource : 'resetFoodLimit'}, function(rt){
+		if(rt.success){
+			ss.entry();
+			Util.msg.tip(rt.msg)
+		}else{
+			Util.msg.alert({
+				renderTo : 'stopSellMgr',
+				msg : '重置失败'
+			});
+		}
+	});
+}
+
 
 

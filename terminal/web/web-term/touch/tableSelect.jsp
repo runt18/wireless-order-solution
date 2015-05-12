@@ -1582,7 +1582,7 @@
 			 	<a onclick="Util.to.scroll({content:'divFoods4StopSellCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>
 			 </div>
 			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-			 	
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.resetFoodLimit()">限量重置</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : true})">沽清</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : false})">开售</a>
 			 	<!-- <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a> -->
