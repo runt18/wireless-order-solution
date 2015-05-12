@@ -10,6 +10,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.DBCon;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -74,4 +75,41 @@ public class OperateSellOutFoodAction extends DispatchAction{
 
 		return null;
 	}
+	
+	/**
+	 * 限量沽清重置
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward resetFoodLimit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		
+		JObject jobject = new JObject();
+		DBCon con = null;
+		try{
+			con = new DBCon();
+			con.connect();
+			FoodDao.restoreLimit(con, StaffDao.verify(Integer.parseInt(pin)));
+			jobject.initTip(true, "重置成功");
+		}catch(BusinessException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}catch(SQLException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}catch(Exception e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}finally{
+			con.disconnect();
+			response.getWriter().print(jobject.toString());
+		}
+
+		return null;
+	}	
+	
 }
