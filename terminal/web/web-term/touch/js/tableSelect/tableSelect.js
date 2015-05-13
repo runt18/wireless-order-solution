@@ -366,6 +366,8 @@ window.onload=function(){
 			//关闭数字键盘
 			$('#numberKeyboard').hide();
 			
+			console.log($(this)[0])
+			
 			YBZ_open($(this)[0]);			
 		});
 		
@@ -1041,9 +1043,13 @@ ts.createOrderForLookup = function (){
 ts.openApartTable = function(){
 	//隐藏数量输入
 	$('#td4TxtFoodNumForTran').hide();
+	//显示备注
+	$('#tr4TxtTableComment').show();
+	
 	ts.commitTableOrTran = 'apartTable';
 	
 	$("#txtTableNumForTS").val("");
+	$("#txtTableComment").val("");
 	
 	$('#transSomethingTitle').html("请输入桌号，确认拆台");
 	
@@ -1060,7 +1066,8 @@ ts.openApartTableAction = function(s){
 	$.post('../OperateTable.do', {
 		dataSource : 'apartTable',
 		tableID : ts.table.id,
-		suffix : s
+		suffix : s,
+		comment : $("#txtTableComment").val()
 	}, function(result){
 		Util.LM.hide();
 		if(result.success){

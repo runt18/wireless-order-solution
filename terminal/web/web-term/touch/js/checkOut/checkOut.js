@@ -668,6 +668,57 @@ uo.openGiftaction = function(){
 }
 
 /**
+ * 打开备注
+ */
+uo.openCommentOperate = function(){
+	//关闭更多
+	$('#updateFoodOtherOperateCmp').popup('close');
+	setTimeout(function(){
+		$('#shadowForPopup').show();
+		$('#orderFoodCommentCmp').show();
+		$('#inputUpdateComment').val(uo.order.comment != "----" ? uo.order.comment : "");	
+		$('#inputUpdateComment').select();
+	}, 250);
+	
+}
+
+/**
+ * 关闭备注
+ */
+uo.closeComment = function(){
+	$('#shadowForPopup').hide();
+	$('#orderFoodCommentCmp').hide();
+	if(YBZ_win){
+		YBZ_win.close();	
+	}
+}
+
+/**
+ * 修改备注
+ */
+uo.saveComment = function(){
+	Util.LM.show();
+	$.post('../OperateOrderFood.do', {
+		dataSource : 'updateComment',
+		orderId : uo.order.id,
+		comment : $('#inputUpdateComment').val()
+	},function(data){
+		Util.LM.hide();
+		if(data.success){
+			Util.msg.tip( '备注成功');	
+			uo.closeComment();
+			initOrderData({table : uo.table});
+		}else{
+			Util.msg.alert({
+				title : '提示',
+				msg : data.msg, 
+				renderTo : 'orderFoodListMgr'
+			});				
+		}			
+	});
+}
+
+/**
  * 设置控件为转菜
  * @param o
  */
@@ -800,12 +851,7 @@ uo.useMemberForOrderAction = function(){
 			
 		}	
 	});
-	
-	
-
-	
 }
-
 
 /**
  * 转菜操作
@@ -842,6 +888,8 @@ uo.closeTransOrderFood = function(){
 	}else if(ts.commitTableOrTran == 'apartTable'){
 		//隐藏拆台
 		$('#divSelectTablesSuffixForTs').hide();
+		//隐藏备注
+		$('#tr4TxtTableComment').hide();
 		//显示餐台选择
 		$('#divSelectTablesForTs').show();
 	}else if(ts.commitTableOrTran == 'member'){
@@ -1187,7 +1235,7 @@ uo.submitUpdateOrderHandler = function(c){
 		orderDataModel.categoryValue = uo.order.categoryValue;
 		orderDataModel.id = uo.order.id,
 		orderDataModel.orderDate = uo.order.orderDate;
-
+		
 		Util.LM.show();
 		$.ajax({
 			url : '../InsertOrder.do',

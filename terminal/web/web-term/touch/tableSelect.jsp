@@ -684,7 +684,7 @@
 	<div data-role="popup" id="updateFoodOtherOperateCmp" data-theme="d">
         <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
             <li class="tempFoodKitchen" onclick="uo.showOperatePeople()"><a >人数</a></li>
-            <li class="tempFoodKitchen" onclick=""><a >修改备注</a></li>
+            <li class="tempFoodKitchen" onclick="uo.openCommentOperate()"><a >修改备注</a></li>
             <li class="tempFoodKitchen" onclick="uo.tempPayForPrintAll()"><a >补打总单</a></li>
             <li class="tempFoodKitchen" onclick="uo.printDetailPatch()"><a >补打明细</a></li>
             <li class="tempFoodKitchen" onclick="uo.allTransFoodForTS()"><a >全单转菜</a></li>
@@ -785,45 +785,27 @@
 	</div>		
 	
 	<!-- 修改备注 -->
-	<div id="orderFoodCommentCmp" data-role="popup" data-theme="c" data-dismissible="false" class="ui-corner-all" align="center">
+	<div id="orderFoodCommentCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: 100px 0px 0px -200px;min-width:400px;display: none;background-color: white;" align="center">
 	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
-	        <!-- <h1>输入称重--<span id="weighFoodName"></span></h1> -->
-	       	 输入称重--<span id="weighFoodName"></span>
+	       	 修改备注
 	    </div>
-		<div class="calculator">
-			<div class="top">
-				<span class="clear">+</span>
-				<span class="inputs">
-					<input id="inputOrderFoodWeigh" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodWeigh')">
-				</span>
-				<span class="clear">-</span>
-			</div>
-			<div class="keys">
-				<span>7</span>
-				<span>8</span>
-				<span>9</span>
-				<span>0</span>
-				
-				<span>4</span>
-				<span>5</span>
-				<span>6</span>
-				<span>.</span>
-				
-				<span>1</span>
-				<span>2</span>
-				<span>3</span>
-				<span class="clear">C</span>
-			</div>
-			
-			<label>
-		        <input type="checkbox" id="chkPrintWeigh" data-theme="e" checked="checked">打印称重信息
-		    </label>	
-		</div>		    
-	    
+	    <table style="width:80%;">
+	    	<tr>
+	    		<td>
+	    			<input id="inputUpdateComment" type="text" placeholder="备注" data-type="txt" class="countInputStyle">
+	    		</td>
+	    		<td>
+					<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:inherit;">
+					    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('inputUpdateComment')">D</a>
+					</div>		    		
+	    		</td>
+	    	</tr>
+	    </table>
+	    	    
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.openWeighaction()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeWeighOperate()">取消</a>		 
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.saveComment()">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeComment()">取消</a>		 
 			 </div>
 	    </div>
 	</div>		
@@ -996,6 +978,11 @@
 			    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('txtTableNumForTS')">D</a>
 			</div>		    		
    		</td>   				
+   	</tr>
+   	<tr id="tr4TxtTableComment" style="display: none;">
+   		<td >
+   			<input id="txtTableComment" type="text" placeholder="开台备注" class="numberInputStyle">
+   		</td>      	
    	</tr>
     </table>
     <hr>
@@ -1454,14 +1441,6 @@
 					    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('tempFoodName')">D</a>
 					</div>	    		
 	    		</td>
-<!-- 	    		<td>
-		            <select id="tempFoodWriterOn" data-role="slider" data-for="tempFoodName" class="handWriteCmp">
-					    <option value="off">打开手写</option>
-					    <option value="on">关闭手写</option>
-					</select>		    		
-				    <input type="checkbox" id="isWriter4Food" onclick="isNeedWriter('on')" checked="checked">
-				    <label for="isWriter4Food">需要手写板?</label>						
-	    		</td> -->
 	    	</tr>
 	    	<tr>
 	    		<td style="width:40px;"><label for="tempFoodPrice">价格:</label></td>
