@@ -1153,7 +1153,7 @@
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="btnOrderAndPay" onclick="of.orderAndPay()">下单并结账</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="searchFood('on')">搜索</a>
-			 	<a data-role="button" onclick="addTempFood()" data-rel="popup" data-position-to="window"  data-inline="true" data-transition="pop" data-theme="b" class="bottomBtnFont" >临时菜</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="addTempFood()" data-rel="popup" data-position-to="window"   data-transition="pop" data-theme="b"  >临时菜</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#orderOtherOperateCmp">更多</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.foodPaging.getPreviousPage()">上一页</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.foodPaging.getNextPage()">下一页</a>
