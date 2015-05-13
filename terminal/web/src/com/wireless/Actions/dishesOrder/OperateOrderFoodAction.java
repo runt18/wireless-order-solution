@@ -22,6 +22,7 @@ import com.wireless.pack.req.ReqGiftOrderFood;
 import com.wireless.pack.req.ReqTransFood;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.Order.CommentBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
@@ -186,6 +187,30 @@ public class OperateOrderFoodAction extends DispatchAction{
 		try {
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			FoodDao.update(staff, new Food.LimitRemainingBuilder(new Food(Integer.parseInt(foodId)), Integer.parseInt(limitAmount)));
+		}catch(BusinessException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}catch(Exception e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}		
+		return null;
+	}	
+	
+	public ActionForward updateComment(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String orderId = request.getParameter("orderId");
+		String comment = request.getParameter("comment");
+		String pin = (String) request.getAttribute("pin");
+		
+		JObject jobject = new JObject();
+		try {
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			OrderDao.comment(staff, new CommentBuilder(Integer.parseInt(orderId), comment));
+			jobject.initTip(true, "备注成功");
 		}catch(BusinessException e){
 			jobject.initTip(e);
 			e.printStackTrace();

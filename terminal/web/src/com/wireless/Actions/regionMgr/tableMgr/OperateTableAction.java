@@ -217,10 +217,11 @@ public class OperateTableAction extends DispatchAction{
 		JObject jobject = new JObject();
 		String tableID = request.getParameter("tableID");
 		String suffix = request.getParameter("suffix");
+		String comment = request.getParameter("comment");
 		try {
 			List<Table> list = new ArrayList<>();
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, Order.InsertBuilder.newInstance4Join(new Table.Builder(Integer.parseInt(tableID)), Table.InsertBuilder4Join.Suffix.valueOf(suffix, 0)), PrintOption.DO_NOT_PRINT));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, Order.InsertBuilder.newInstance4Join(new Table.Builder(Integer.parseInt(tableID)), Table.InsertBuilder4Join.Suffix.valueOf(suffix, 0)).setComment(comment), PrintOption.DO_NOT_PRINT));
 			if(resp.header.type == Type.ACK){
 				Table joinedTbl = new Parcel(resp.body).readParcel(Table.CREATOR);
 				list.add(TableDao.getById(staff, joinedTbl.getId()));
