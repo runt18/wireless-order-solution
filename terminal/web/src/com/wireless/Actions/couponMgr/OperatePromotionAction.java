@@ -14,6 +14,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.CouponTypeDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
@@ -507,6 +508,15 @@ public class OperatePromotionAction extends DispatchAction{
 
 	}	
 	
+	/**
+	 * 获取欢迎活动
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward hasWelcomePage(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -532,6 +542,10 @@ public class OperatePromotionAction extends DispatchAction{
 			extra.addStatus(Promotion.Status.PROGRESS).addStatus(Promotion.Status.CREATED).addStatus(Promotion.Status.PUBLISH);
 			
 			List<Promotion> list = PromotionDao.getByCond(staff, extra);
+			
+			if(list.size() > 0){
+				list.get(0).setCouponType(CouponTypeDao.getById(staff, list.get(0).getCouponType().getId()));
+			}
 			
 			jobject.setRoot(list);
 			
