@@ -95,7 +95,8 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					.append(url)
 					.append("?_d=" + System.currentTimeMillis())
 					.append("&m=").append(msg.getFromUserName())
-					.append("&r=").append(msg.getToUserName()).toString();
+					.append("&r=").append(msg.getToUserName())
+					.append("&time=").append(System.currentTimeMillis()).toString();
 	}
 	
 	private Msg createWelcome(Msg msg) throws SQLException, BusinessException{

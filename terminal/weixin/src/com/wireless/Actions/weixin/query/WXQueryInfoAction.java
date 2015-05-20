@@ -22,7 +22,7 @@ import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 public class WXQueryInfoAction extends DispatchAction{
 	
 	/**
-	 * 
+	 * 获取绑定后的微信餐厅信息
 	 * @param mapping
 	 * @param form
 	 * @param request
