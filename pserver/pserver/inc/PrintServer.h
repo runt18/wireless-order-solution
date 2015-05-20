@@ -28,4 +28,5 @@ private:
 	IPReport* m_Report;
 
 	void portPrinter(IPReport* pReport);
+	DWORD ping(const string& ip);
 };

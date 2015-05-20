@@ -11,4 +11,5 @@ public:
 
 	/* belong to Test */
 	static const int PING = 1;
+	static const int PRINTER = 2;
 };

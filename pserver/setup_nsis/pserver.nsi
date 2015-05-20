@@ -3,7 +3,7 @@
 ; HM NIS Edit Wizard helper defines
 !define EXECUTE_FILE "gui.exe"
 !define PRODUCT_NAME "e点通打印服务"
-!define PRODUCT_VERSION "1.0.8"
+!define PRODUCT_VERSION "1.0.9"
 !define PRODUCT_PUBLISHER "广州智易科技有限公司"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${EXECUTE_FILE}"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"

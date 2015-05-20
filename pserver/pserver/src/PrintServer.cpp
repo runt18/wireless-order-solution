@@ -15,6 +15,8 @@
 #include "../inc/ConfTags.h"
 #include "../inc/PrinterInstance.h"
 #include <winhttp.h>
+#include <iphlpapi.h>
+#include <icmpapi.h>
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -27,6 +29,12 @@
 #include <Mstcpip.h>
 #include <WinSpool.h>
 #include <time.h>
+
+#include "../rapidjson/document.h"
+#include "../rapidjson/writer.h"
+#include "../rapidjson/stringbuffer.h"
+#include <iostream>
+using namespace RAPIDJSON_NAMESPACE;
 
 typedef struct{
 	string address;
@@ -53,7 +61,7 @@ public:
 
 }VERSION;
 
-static const string _PROG_VER_ = "1.0.8";
+static const string _PROG_VER_ = "1.0.9";
 //the queue to print job
 static queue<PrintJob> g_jobQueue;
 //the critical section to the print job queue
@@ -598,6 +606,223 @@ static void checkProgram(IPReport* pReport, const wstring& hostAddr, const int& 
 }
 
 /*******************************************************************************
+* Function Name  : status4000
+* Description    : Get the printer status on port 4000
+* Input          : printer_addr - the ip address to printer
+* Output         : None
+* Return         : the status to printer on port 4000
+*******************************************************************************/
+static UINT status4000(const string& printer_addr){
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (sock == INVALID_SOCKET) {
+		return 0;
+	}
+
+	struct sockaddr_in clientService;
+	// The sockaddr_in structure specifies the address family,
+	// IP address, and port of the server to be connected to.
+	clientService.sin_family = AF_INET;
+	clientService.sin_port = htons(4000);
+	clientService.sin_addr.s_addr = inet_addr(printer_addr.c_str());
+
+	int iTimeOut = 3000;
+	setsockopt(sock, SOL_SOCKET,SO_RCVTIMEO,(char*)&iTimeOut, sizeof(iTimeOut));
+	setsockopt(sock, SOL_SOCKET,SO_SNDTIMEO,(char*)&iTimeOut, sizeof(iTimeOut)); 
+
+	UINT result = 0;
+	// Connect to server.
+	int iResult = connect(sock, (SOCKADDR*) &clientService, sizeof(clientService));
+	if(iResult != SOCKET_ERROR){
+		char send_buf[2];
+		send_buf[0] = 0x1B;
+		send_buf[1] = 0x76;
+		::send(sock, send_buf, 2, 0);
+
+		char rec_buf[4];
+		::recv(sock, rec_buf, 4, 0);
+		result =  (rec_buf[0] & 0x000000FF) |
+			   ((rec_buf[1] & 0x000000FF) << 8) |
+			   ((rec_buf[2] & 0x000000FF) << 16) |
+			   ((rec_buf[3] & 0x000000FF) << 24);
+	}
+
+	closesocket(sock);
+
+	return result;
+}
+
+/*******************************************************************************
+* Function Name  : status9100
+* Description    : Get the printer status on port 9100
+* Input          : printer_addr - the ip address to printer
+* Output         : None
+* Return         : the status to printer on port 9100
+*******************************************************************************/
+static UINT status9100(const string& printer_addr){
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (sock == INVALID_SOCKET) {
+		return 0;
+	}
+
+	struct sockaddr_in clientService;
+	// The sockaddr_in structure specifies the address family,
+	// IP address, and port of the server to be connected to.
+	clientService.sin_family = AF_INET;
+	clientService.sin_port = htons(9100);
+	clientService.sin_addr.s_addr = inet_addr(printer_addr.c_str());
+
+	int iTimeOut = 3000;
+	setsockopt(sock, SOL_SOCKET,SO_RCVTIMEO,(char*)&iTimeOut, sizeof(iTimeOut));
+	setsockopt(sock, SOL_SOCKET,SO_SNDTIMEO,(char*)&iTimeOut, sizeof(iTimeOut)); 
+
+	unsigned char result = 0x00;
+	// Connect to server.
+	int iResult = connect(sock, (SOCKADDR*) &clientService, sizeof(clientService));
+	if(iResult != SOCKET_ERROR){
+		char send_buf[3];
+		//Get the printer status
+		send_buf[0] = 0x10;
+		send_buf[1] = 0x04;
+		send_buf[2] = 0x01;
+		::send(sock, send_buf, 3, 0);
+
+		char printer_status[1];
+		::recv(sock, printer_status, 1, 0);
+
+		//Get the offline status
+		send_buf[0] = 0x10;
+		send_buf[1] = 0x04;
+		send_buf[2] = 0x02;
+		::send(sock, send_buf, 3, 0);
+
+		char offline_status[1];
+		::recv(sock, offline_status, 1, 0);
+
+		//Get the error status
+		send_buf[0] = 0x10;
+		send_buf[1] = 0x04;
+		send_buf[2] = 0x03;
+		::send(sock, send_buf, 3, 0);
+
+		char error_status[1];
+		::recv(sock, error_status, 1, 0);
+
+		//Get the paper status
+		send_buf[0] = 0x10;
+		send_buf[1] = 0x04;
+		send_buf[2] = 0x04;
+		::send(sock, send_buf, 3, 0);
+
+		char paper_status[1];
+		::recv(sock, paper_status, 1, 0);
+
+		result =  (printer_status[0] & 0x000000FF) |
+			((offline_status[1] & 0x000000FF) << 8) |
+			((error_status[2] & 0x000000FF) << 16) |
+			((paper_status[3] & 0x000000FF) << 24);
+
+	}
+
+	closesocket(sock);
+
+	return result;
+}
+
+#define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
+#define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+
+/*******************************************************************************
+* Function Name  : gateway
+* Description    : Get the gateways to local machine
+* Input          : None
+* Output         : None
+* Return         : the result string contains the gateways
+*******************************************************************************/
+static string gateway(){
+	PIP_ADAPTER_INFO pAdapterInfo;
+	PIP_ADAPTER_INFO pAdapter = NULL;
+	string result;
+
+	ULONG ulOutBufLen = sizeof (IP_ADAPTER_INFO);
+	pAdapterInfo = (IP_ADAPTER_INFO *) MALLOC(sizeof (IP_ADAPTER_INFO));
+	if (pAdapterInfo == NULL) {
+		printf("Error allocating memory needed to call GetAdaptersinfo\n");
+	}
+	// Make an initial call to GetAdaptersInfo to get
+	// the necessary size into the ulOutBufLen variable
+	if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) {
+		FREE(pAdapterInfo);
+		pAdapterInfo = (IP_ADAPTER_INFO *) MALLOC(ulOutBufLen);
+		if (pAdapterInfo == NULL) {
+			printf("Error allocating memory needed to call GetAdaptersinfo\n");
+		}
+	}
+
+	if ((GetAdaptersInfo(pAdapterInfo, &ulOutBufLen)) == NO_ERROR) {
+		pAdapter = pAdapterInfo;
+		while (pAdapter) {
+			if(string(pAdapter->GatewayList.IpAddress.String) != "0.0.0.0"){
+				if(result.size() != 0){
+					result.append(",");
+				}
+				result.append(pAdapter->GatewayList.IpAddress.String);
+			}
+			pAdapter = pAdapter->Next;
+		}
+	}
+	if (pAdapterInfo){
+		FREE(pAdapterInfo);
+	}
+	return result;
+}
+
+/*******************************************************************************
+* Function Name  : ping
+* Description    : 
+* Input          : ip - the ip address to ping
+* Output         : None
+* Return         : 1 means ok, 0 means fail
+*******************************************************************************/
+static BOOL ping(const string& ip){
+
+	char SendData[32] = "Data Buffer";
+
+	unsigned long ipaddr = INADDR_NONE;
+	ipaddr = inet_addr(ip.c_str());
+	if (ipaddr == INADDR_NONE) {
+		printf("usage: %s IP address\n", ip.c_str());
+		return FALSE;
+	}
+
+	HANDLE hIcmpFile = INVALID_HANDLE_VALUE;
+	hIcmpFile = IcmpCreateFile();
+	if (hIcmpFile == INVALID_HANDLE_VALUE) {
+		printf("\tUnable to open handle.\n");
+		printf("IcmpCreatefile returned error: %ld\n", GetLastError() );
+		return FALSE;
+	}    
+
+	DWORD ReplySize = sizeof(ICMP_ECHO_REPLY) + sizeof(SendData);
+	LPVOID ReplyBuffer = (VOID*) malloc(ReplySize);
+	if (ReplyBuffer == NULL) {
+		printf("\tUnable to allocate memory\n");
+		return FALSE;
+	} 
+
+	BOOL result = TRUE;
+	for(int i = 0; i < 4; i++){
+		if(IcmpSendEcho(hIcmpFile, ipaddr, SendData, sizeof(SendData), NULL, ReplyBuffer, ReplySize, 1000) == 0){
+			result = FALSE;
+			break;
+		}
+	}
+	if(ReplyBuffer){
+		free(ReplyBuffer);
+	}
+	return result;
+}
+
+/*******************************************************************************
 * Function Name  : PrintMgrProc
 * Description    : 
 * Input          : pvParam - the report call back functions
@@ -729,7 +954,7 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 				ProtocolPackage printReq;
 				iResult = Protocol::recv(g_ConnectSocket, 128, printReq);			
 				if(iResult > 0){
-					if(printReq.header.mode == Mode::PRINT && printReq.header.type == Type::PRINT_BILL){
+					if(printReq.header.mode == Mode::PRINT && printReq.header.type == ::Type::PRINT_BILL){
 						//extract the 2-byte length of the print content
 						unsigned int len = (unsigned char)printReq.header.length[0] | (unsigned char)printReq.header.length[1] << 8;
 
@@ -804,44 +1029,6 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 
 							jobs.push_back(PrintJob(printerName, repeat, printType, printContent, orderId, wstring(buf)));
 
-							/*
-							//notify the corresponding print thread according to the print function code
-							vector< boost::shared_ptr<PrinterInstance> >::iterator iter = g_PrintInstances.begin();
-							//enumerate each printer instances' supported function codes to check if the job is supported
-							for(iter; iter != g_PrintInstances.end(); iter++){
-								vector<PrintFunc>::iterator it = (*iter)->funcs.begin();
-								for(it; it != (*iter)->funcs.end(); it++){
-									if(it->code == Reserved::PRINT_ORDER && (printReq.header.reserved == Reserved::PRINT_ORDER || 
-										printReq.header.reserved == Reserved::PRINT_HURRIED_FOOD || printReq.header.reserved == Reserved::PRINT_ALL_EXTRA_FOOD)){
-											(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
-
-									}else if(it->code == Reserved::PRINT_ORDER_DETAIL && (printReq.header.reserved == Reserved::PRINT_ORDER_DETAIL ||
-										printReq.header.reserved == Reserved::PRINT_EXTRA_FOOD)){
-											(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
-
-									}else if(it->code == Reserved::PRINT_RECEIPT && (printReq.header.reserved == Reserved::PRINT_RECEIPT || 
-										printReq.header.reserved == Reserved::PRINT_SHIFT_RECEIPT ||
-										printReq.header.reserved == Reserved::PRINT_TEMP_SHIFT_RECEIPT || printReq.header.reserved == Reserved::PRINT_DAILY_SETTLE_RECEIPT ||
-										printReq.header.reserved == Reserved::PRINT_HISTORY_DAILY_SETTLE_RECEIPT || printReq.header.reserved == Reserved::PRINT_HISTORY_SHIFT_RECEIPT)){
-											(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
-
-									}else if(it->code == Reserved::PRINT_TEMP_RECEIPT && printReq.header.reserved == Reserved::PRINT_TEMP_RECEIPT){
-										(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
-
-									}else if(it->code == Reserved::PRINT_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_CANCELLED_FOOD)){
-										(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
-
-									}else if(it->code == Reserved::PRINT_TRANSFER_TABLE && (printReq.header.reserved == Reserved::PRINT_TRANSFER_TABLE)){
-										(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
-
-									}else if(it->code == Reserved::PRINT_ALL_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_ALL_CANCELLED_FOOD)){
-										(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
-
-									}else if(it->code == Reserved::PRINT_ALL_HURRIED_FOOD && (printReq.header.reserved == Reserved::PRINT_ALL_HURRIED_FOOD)){
-										(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
-									}
-								}
-							}*/
 						}
 
 						//responds with an ACK
@@ -859,9 +1046,77 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 						}
 						LeaveCriticalSection(&g_csJobQueue);
 
-					}else if(printReq.header.mode == Mode::TEST && printReq.header.type == Type::PING){
+					}else if(printReq.header.mode == Mode::DIAGNOSE && printReq.header.type == ::Type::PING){
 						//responds with an ACK if the server sent a PING request to check if connected
 						iResult = Protocol::send(g_ConnectSocket, RespACK(printReq.header));
+
+					}else if(printReq.header.mode == Mode::DIAGNOSE && printReq.header.type == ::Type::PRINTER){
+						//extract the 2-byte length of the print content
+						unsigned int len = (unsigned char)printReq.header.length[0] | (unsigned char)printReq.header.length[1] << 8;
+						RAPIDJSON_NAMESPACE::Document d;
+						d.Parse(string(printReq.body, len).c_str());
+
+						HANDLE hPrinter = 0;
+						Document respDoc;
+						respDoc.SetObject();
+
+						if(OpenPrinter((TCHAR*)Util::s2ws(string(d["printer_name"].GetString())).c_str(), &hPrinter, NULL)){
+							respDoc.AddMember("driver", Value("1", respDoc.GetAllocator()), respDoc.GetAllocator());
+							respDoc.AddMember("gateway", Value(gateway().c_str(), respDoc.GetAllocator()), respDoc.GetAllocator());									
+							DWORD dwSize = 0;    
+							// How many memory should be allocated for PRINTER_INFO_2
+							GetPrinter(hPrinter, 2, 0, 0, &dwSize);
+							if( dwSize ){
+								// Allocate memory
+								PRINTER_INFO_2* pPrnInfo2 = (PRINTER_INFO_2*)malloc(dwSize);
+
+								// Receive printer details
+								if(GetPrinter(hPrinter, 2, (LPBYTE)pPrnInfo2, dwSize, &dwSize)){
+
+									string printerAddr = Util::ws2s(wstring(pPrnInfo2->pPortName));
+									respDoc.AddMember("printer_port", Value(printerAddr.c_str(), respDoc.GetAllocator()), respDoc.GetAllocator());
+									if(ping(printerAddr)){
+										respDoc.AddMember("ping", Value("1", respDoc.GetAllocator()), respDoc.GetAllocator());
+										char printer_status[32];
+										//Get the printer status to port 4000
+										int statusVal = status4000(printerAddr);
+										sprintf_s(printer_status, 32, "%d", statusVal);
+										respDoc.AddMember("status_4000", Value(printer_status, respDoc.GetAllocator()), respDoc.GetAllocator());
+										if(statusVal == 0){
+											//Get the printer status to port 9100
+											sprintf_s(printer_status, 32, "%d", status9100(printerAddr));
+											respDoc.AddMember("status_9100", Value(printer_status, respDoc.GetAllocator()), respDoc.GetAllocator());
+										}
+
+									}else{
+										respDoc.AddMember("ping", Value("0", respDoc.GetAllocator()), respDoc.GetAllocator());
+									}
+
+								}
+								// Free allocated memory
+								free( pPrnInfo2 );
+
+							}
+							// Close printer
+							ClosePrinter(hPrinter);
+						}else{
+							//TODO
+							respDoc.AddMember("driver", Value("0", respDoc.GetAllocator()), respDoc.GetAllocator());
+						}
+
+						StringBuffer buffer;
+						Writer<StringBuffer> writer(buffer);
+						respDoc.Accept(writer);
+
+						char* body = new char[buffer.GetSize() + 1];
+						strcpy_s(body, buffer.GetSize() + 1, buffer.GetString());
+						body[buffer.GetSize()] = '\0';
+						Protocol::send(g_ConnectSocket, RespPackage(printReq.header, body, buffer.GetSize() + 1));
+
+						//if(pReport){
+						//	pReport->OnPrintReport(0, Util::s2ws(string(buffer.GetString())).c_str());
+						//}
+						
 					}
 
 				}else if(iResult == 0){
@@ -1093,7 +1348,7 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 								//check whether the sequence no is matched or not
 								if(loginResp.header.seq == reqLogin.header.seq){
 									//check the type to see it's an ACK or NAK
-									if(loginResp.header.type == Type::ACK){
+									if(loginResp.header.type == ::Type::ACK){
 										wstring restaurant;
 										wstring otaHost;
 										int otaPort;
