@@ -173,7 +173,7 @@ public class PromotionDao {
 			  "'" + promotion.getDateRange().getEndingFormat() + "'," +
 			  "'" + promotion.getTitle() + "'," +
 			  "'" + new StringHtml(promotion.getBody(), StringHtml.ConvertTo.TO_NORMAL) + "'," +
-			  "'" + promotion.getEntire() + "'," +
+			  "'" + new StringHtml(promotion.getEntire(), StringHtml.ConvertTo.TO_NORMAL) + "'," +
 			  couponTypeId + "," +
 			  promotion.getOriented().getVal() + "," +
 			  promotion.getRule().getVal() + "," +

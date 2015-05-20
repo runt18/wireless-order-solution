@@ -280,10 +280,8 @@ public class PrintFuncDao {
 			if(dbCon.stmt.executeUpdate(sql) != 0){
 				amount++;
 			}
-			//Delete the associated order & detail print function.
-			if(printFunc.getType() == PType.PRINT_ORDER){
-				amount += deleteByCond(dbCon, staff, new ExtraCond().setPrinter(printFunc.getPrinterId()).setType(PType.PRINT_ALL_CANCELLED_FOOD));
-			}else if(printFunc.getType() == PType.PRINT_ORDER_DETAIL){
+			//Delete the associated detail print function.
+			if(printFunc.getType() == PType.PRINT_ORDER_DETAIL){
 				amount += deleteByCond(dbCon, staff, new ExtraCond().setPrinter(printFunc.getPrinterId()).setType(PType.PRINT_CANCELLED_FOOD_DETAIL)); 
 			}
 		}

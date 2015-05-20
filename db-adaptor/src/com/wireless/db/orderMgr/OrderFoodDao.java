@@ -575,6 +575,7 @@ public class OrderFoodDao {
 		
 		//Calculate the limit remaining.
 		if(builder.extra.asFood().isLimit()){
+			builder.extra.asFood().copyFrom(FoodDao.getPureById(dbCon, staff, builder.extra.getFoodId()));
 			int limitRemaining = Math.round(builder.extra.asFood().getLimitRemaing() - Math.abs(builder.extra.getDelta()));
 			if(limitRemaining < 0){
 				throw new BusinessException("【" + builder.extra.asFood().getName() + "】的点菜数量超过设定的限量数量");
@@ -705,7 +706,7 @@ public class OrderFoodDao {
 			src.asFood().copyFrom(FoodDao.getById(dbCon, staff, src.getFoodId()));
 			
 			//Get the detail to food unit
-			if(src.hasFoodUnit()){
+			if(src.hasFoodUnit() && !src.asFood().isCurPrice()){
 				src.setFoodUnit(FoodUnitDao.getById(dbCon, staff, src.getFoodUnit().getId()));
 			}
 			
