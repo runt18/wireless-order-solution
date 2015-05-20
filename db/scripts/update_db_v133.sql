@@ -7,6 +7,13 @@ SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
+-- Add the field 'food_unit' & 'food_unit_id' to table 'combo_order_food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`combo_order_food` 
+ADD COLUMN `food_unit` VARCHAR(45) NULL DEFAULT NULL AFTER `food_amount`,
+ADD COLUMN `food_unit_id` INT NULL DEFAULT NULL AFTER `food_unit`;
+
+-- -----------------------------------------------------
 -- Add the field 'limit_remaing' & 'limit_amount' to table 'food'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`food` 
