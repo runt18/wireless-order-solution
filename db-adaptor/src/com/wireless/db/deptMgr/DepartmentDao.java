@@ -17,6 +17,7 @@ public class DepartmentDao {
 	public static class ExtraCond{
 		private Department.DeptId deptId;
 		private final List<Department.Type> types = new ArrayList<>();
+		private String name;
 		
 		public ExtraCond setId(Department.DeptId deptId){
 			this.deptId = deptId;
@@ -25,6 +26,11 @@ public class DepartmentDao {
 		
 		public ExtraCond setId(int id){
 			this.deptId = Department.DeptId.valueOf(id);
+			return this;
+		}
+		
+		public ExtraCond setName(String name){
+			this.name = name;
 			return this;
 		}
 		
@@ -50,6 +56,11 @@ public class DepartmentDao {
 			if(typeCond.length() != 0){
 				extraCond.append(" AND type IN (" + typeCond.toString() + ")");
 			}
+			
+			if(name != null){
+				extraCond.append(" AND DEPT.name = '" + name + "' ");
+			}
+			
 			return extraCond.toString();
 		}
 	}
