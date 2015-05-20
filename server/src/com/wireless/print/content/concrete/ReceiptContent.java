@@ -131,7 +131,7 @@ public class ReceiptContent extends ConcreteContent {
 		if(mOrder.getComment().isEmpty()){
 			mTemplate = mTemplate.replace(PVar.RECEIPT_COMMENT, "");
 		}else{
-			mTemplate = mTemplate.replace(PVar.RECEIPT_COMMENT, "±¸×¢£º" + mOrder.getComment());
+			mTemplate = mTemplate.replace(PVar.RECEIPT_COMMENT, new RightAlignedDecorator("±¸×¢£º" + mOrder.getComment(), getStyle()).toString());
 		}
 		
 		if(getPrintType() == PType.PRINT_TEMP_RECEIPT && mWxRestaurant.hasQrCode() && getStyle() == PStyle.PRINT_STYLE_80MM){

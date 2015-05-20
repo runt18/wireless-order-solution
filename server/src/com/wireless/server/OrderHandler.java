@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
-import com.wireless.db.foodGroup.CalcFoodGroupDao;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.member.MemberCommentDao;
 import com.wireless.db.member.MemberDao;
@@ -51,7 +50,6 @@ import com.wireless.parcel.Parcel;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PrintOption;
-import com.wireless.pojo.foodGroup.Pager;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberComment;
 import com.wireless.pojo.member.MemberComment.CommitBuilder;
@@ -104,9 +102,9 @@ class OrderHandler implements Runnable{
 			// Get the request from socket stream.
 			request.readFromStream(in, _timeout);
 			
-			final RespPackage response;
+			final ProtocolPackage response;
 			
-			if(request.header.mode == Mode.TEST && request.header.type == Type.PING){
+			if(request.header.mode == Mode.DIAGNOSIS && request.header.type == Type.PING){
 				//handle the ping test request
 				response = new RespACK(request.header);
 				
@@ -121,11 +119,11 @@ class OrderHandler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){
 				//handle the query staff request
 				Device device = DeviceDao.getWorkingDeviceById(new Parcel(request.body).readParcel(Device.CREATOR).getDeviceId());
-				response = new RespPackage(request.header, StaffDao.getByRestaurant(device.getRestaurantId()), Staff.ST_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header).fillBody(StaffDao.getByRestaurant(device.getRestaurantId()), Staff.ST_PARCELABLE_COMPLEX);
 				
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_BACKUP_SERVER){
 				//handle the query backup connectors
-				response = new RespPackage(request.header, WirelessSocketServer.backups, 0);
+				response = new RespPackage(request.header).fillBody(WirelessSocketServer.backups, 0);
 			
 			}else{
 				
@@ -143,24 +141,24 @@ class OrderHandler implements Runnable{
 				
 				if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_MENU){
 					//handle query menu request
-					response = new RespPackage(request.header, QueryMenu.exec(staff), 0);
+					response = new RespPackage(request.header).fillBody(QueryMenu.exec(staff), 0);
 
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_RESTAURANT){
 					//handle query restaurant request
-					response = new RespPackage(request.header, RestaurantDao.getById(staff.getRestaurantId()), 0);
+					response = new RespPackage(request.header).fillBody(RestaurantDao.getById(staff.getRestaurantId()), 0);
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_REGION){
 					//handle query region request
-					response = new RespPackage(request.header, RegionDao.getByStatus(staff, Region.Status.BUSY), Region.REGION_PARCELABLE_COMPLEX);
+					response = new RespPackage(request.header).fillBody(RegionDao.getByStatus(staff, Region.Status.BUSY), Region.REGION_PARCELABLE_COMPLEX);
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_ASSOCIATION){
 					//handle query the associated food
 					Food foodToAssociated = new Parcel(request.body).readParcel(Food.CREATOR);
-					response = new RespPackage(request.header, QueryFoodAssociationDao.exec(staff, foodToAssociated), Food.FOOD_PARCELABLE_SIMPLE);
+					response = new RespPackage(request.header).fillBody(QueryFoodAssociationDao.exec(staff, foodToAssociated), Food.FOOD_PARCELABLE_SIMPLE);
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_SELL_OUT){
 					//handle query sell out foods request
-					response = new RespPackage(request.header, 
+					response = new RespPackage(request.header).fillBody( 
 											   FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().addStatus(Food.SELL_OUT).addStatus(Food.LIMIT), null), 
 											   Food.FOOD_PARCELABLE_SELL_OUT);
 					
@@ -185,7 +183,7 @@ class OrderHandler implements Runnable{
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE){
 					//handle query table request
-					response = new RespPackage(request.header, TableDao.getByCond(staff, null, null), Table.TABLE_PARCELABLE_COMPLEX);
+					response = new RespPackage(request.header).fillBody(TableDao.getByCond(staff, null, null), Table.TABLE_PARCELABLE_COMPLEX);
 				
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_WX_ORDER){
 					//handle the query wx order
@@ -194,7 +192,7 @@ class OrderHandler implements Runnable{
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_BY_TBL){
 					//handle query order request
 					Table tableToQuery = new Parcel(request.body).readParcel(Table.CREATOR);
-					response = new RespPackage(request.header, OrderDao.getByTableId(staff, tableToQuery.getId()), Order.ORDER_PARCELABLE_4_QUERY);
+					response = new RespPackage(request.header).fillBody(OrderDao.getByTableId(staff, tableToQuery.getId()), Order.ORDER_PARCELABLE_4_QUERY);
 
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE_STATUS){
 					//handle query table status
@@ -249,18 +247,25 @@ class OrderHandler implements Runnable{
 					//handle the print request
 					response = doPrintContent(staff, request);
 					
-				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_GROUP){
-					//handle the query food group
-					List<Pager> pagers = CalcFoodGroupDao.calc(staff);
-					response = new RespPackage(request.header, pagers, 0);
+				}else if(request.header.mode == Mode.DIAGNOSIS && request.header.type == Type.PRINTER){
+					//handler the printer diagnosis
+					response = new PrinterDiagnoseHandler(staff).process(request);
+					
+				}else if(request.header.mode == Mode.DIAGNOSIS && request.header.type == Type.PRINTER_DISPATCH){
+					response = new PrinterDiagnoseHandler(staff).processDispatch(request);
+					
+//				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_GROUP){
+//					//handle the query food group
+//					List<Pager> pagers = CalcFoodGroupDao.calc(staff);
+//					response = new RespPackage(request.header, pagers, 0);
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_MEMBER){
 					//handle the request to query member
-					response = new RespPackage(request.header, MemberDao.getByCond(staff, new MemberDao.ExtraCond(new Parcel(request.body).readParcel(ReqQueryMember.ExtraCond.CREATOR)), null), Member.MEMBER_PARCELABLE_SIMPLE);
+					response = new RespPackage(request.header).fillBody(MemberDao.getByCond(staff, new MemberDao.ExtraCond(new Parcel(request.body).readParcel(ReqQueryMember.ExtraCond.CREATOR)), null), Member.MEMBER_PARCELABLE_SIMPLE);
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_INTERESTED_MEMBER){
 					//handle the request to query interested member
-					response = new RespPackage(request.header, MemberDao.getInterestedMember(staff, null), Member.MEMBER_PARCELABLE_SIMPLE);
+					response = new RespPackage(request.header).fillBody(MemberDao.getInterestedMember(staff, null), Member.MEMBER_PARCELABLE_SIMPLE);
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.INTERESTED_IN_MEMBER){
 					//handle the request to be interested in specific member
@@ -274,7 +279,7 @@ class OrderHandler implements Runnable{
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_MEMBER_DETAIL){
 					//handle the request to query member detail
-					response = new RespPackage(request.header, MemberDao.getById(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId()), Member.MEMBER_PARCELABLE_COMPLEX);
+					response = new RespPackage(request.header).fillBody(MemberDao.getById(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId()), Member.MEMBER_PARCELABLE_COMPLEX);
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.COMMIT_MEMBER_COMMENT){
 					//handle the request to commit member comment
@@ -352,7 +357,7 @@ class OrderHandler implements Runnable{
 //		return new RespACK(request.header);
 //	}
 	
-	private RespPackage doQueryWxOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+	private ProtocolPackage doQueryWxOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
 		List<WxOrder> result = new ArrayList<WxOrder>();
 		for(WxOrder wxOrder : new Parcel(request.body).readParcelList(WxOrder.CREATOR)){
 			wxOrder = WxOrderDao.getByCode(staff, wxOrder.getCode());
@@ -363,11 +368,11 @@ class OrderHandler implements Runnable{
 		if(result.isEmpty()){
 			throw new BusinessException(WxOrderError.WX_ORDER_NOT_EXIST);
 		}else{
-			return new RespPackage(request.header, result, WxOrder.WX_ORDER_PARCELABLE_COMPLEX);
+			return new RespPackage(request.header).fillBody(result, WxOrder.WX_ORDER_PARCELABLE_COMPLEX);
 		}
 	}
 	
-	private RespPackage doInsertOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
+	private ProtocolPackage doInsertOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		//handle insert order request 
 		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true));
 		
@@ -387,13 +392,13 @@ class OrderHandler implements Runnable{
 																		     	  FoodDetailContent.DetailType.DELTA));
 		}
 		if(orderToInsert.getCategory().isJoin()){
-			return new RespPackage(request.header, orderToInsert.getDestTbl(), Table.TABLE_PARCELABLE_4_QUERY);
+			return new RespPackage(request.header).fillBody(orderToInsert.getDestTbl(), Table.TABLE_PARCELABLE_4_QUERY);
 		}else{
 			return new RespACK(request.header);
 		}
 	}
 	
-	private RespPackage doInsertOrderForce(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
+	private ProtocolPackage doInsertOrderForce(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		//handle insert order request force
 		Order newOrder = new Parcel(request.body).readParcel(Order.InsertBuilder.CREATOR).build();
 		

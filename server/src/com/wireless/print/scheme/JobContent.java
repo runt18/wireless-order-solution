@@ -47,7 +47,7 @@ public class JobContent implements Content{
 		return mPrintContent;
 	}
 	
-	private static class StringContent implements Content{
+	static class StringContent implements Content{
 		
 		private byte[] mBytesToContent;
 		
