@@ -27,17 +27,12 @@ public class ProtocolPackage {
 		fillBody(parcelable, flag);
 	}
 	
-	public ProtocolPackage(ProtocolHeader header, Parcel parcel){
-		this.header = header;
-		fillBody(parcel);
-	}
-
 	/**
 	 * Fill body according to a list of parcelable objects.
 	 * @param parcelableArray The source that is a list of parcelable objects to marshal.
 	 * @param flag Additional flags about how each object should be written.
 	 */
-	protected void fillBody(List<? extends Parcelable> parcelableList, int flag){
+	public ProtocolPackage fillBody(List<? extends Parcelable> parcelableList, int flag){
 		if(parcelableList != null){
 			Parcel p = new Parcel();
 			p.writeParcelList(parcelableList, flag);
@@ -45,6 +40,7 @@ public class ProtocolPackage {
 		}else{
 			this.body = new byte[0];
 		}
+		return this;
 	}
 	
 	/**
@@ -52,7 +48,7 @@ public class ProtocolPackage {
 	 * @param parcelableArray The source that is an array of parcelable objects to marshal.
 	 * @param flag Additional flags about how each object should be written.
 	 */
-	protected void fillBody(Parcelable[] parcelableArray, int flag){
+	public ProtocolPackage fillBody(Parcelable[] parcelableArray, int flag){
 		if(parcelableArray != null){
 			Parcel p = new Parcel();
 			p.writeParcelArray(parcelableArray, flag);
@@ -60,6 +56,7 @@ public class ProtocolPackage {
 		}else{
 			this.body = new byte[0];
 		}
+		return this;
 	}
 	
 	/**
@@ -67,7 +64,7 @@ public class ProtocolPackage {
 	 * @param parcelable The source which is a parcelable object to marshal.
 	 * @param flag Additional flags about how the object should be written.
 	 */
-	protected void fillBody(Parcelable parcelable, int flag){
+	public ProtocolPackage fillBody(Parcelable parcelable, int flag){
 		if(parcelable != null){
 			Parcel p = new Parcel();
 			p.writeParcel(parcelable, flag);
@@ -75,18 +72,7 @@ public class ProtocolPackage {
 		}else{
 			this.body = new byte[0];
 		}
-	}
-	
-	/**
-	 * Fill body by a parcel.
-	 * @param parcel the source which is a parcel to marshal.
-	 */
-	protected void fillBody(Parcel parcel){
-		if(parcel != null){
-			this.body = parcel.marshall();
-		}else{
-			this.body = new byte[0];
-		}
+		return this;
 	}
 	
 	/**

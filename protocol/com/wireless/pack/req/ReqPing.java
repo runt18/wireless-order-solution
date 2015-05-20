@@ -17,7 +17,7 @@ import com.wireless.pack.Type;
 public class ReqPing extends RequestPackage{
 	public ReqPing(){
 		super(null);
-		header.mode = Mode.TEST;
+		header.mode = Mode.DIAGNOSIS;
 		header.type = Type.PING;
 	}
 }

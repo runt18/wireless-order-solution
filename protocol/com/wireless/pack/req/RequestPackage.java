@@ -1,32 +1,22 @@
 package com.wireless.pack.req;
 
 import com.wireless.pack.ProtocolPackage;
-import com.wireless.parcel.Parcel;
-import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class RequestPackage extends ProtocolPackage{
 	private final static Object syncObj = new Object();
 	private static byte seq = Byte.MIN_VALUE;
-	
+
 	protected RequestPackage(Staff staff){
 		this.fillHeader(staff);
 		this.body = new byte[0];
 	}
-	
-	protected RequestPackage(Staff staff, Parcel parcel){
+
+	public RequestPackage(Staff staff, byte mode, byte type){
+		this.header.mode = mode;
+		this.header.type = type;
 		this.fillHeader(staff);
-		this.fillBody(parcel);
-	}
-	
-	protected RequestPackage(Staff staff, Parcelable parcelable, int flag){
-		this.fillHeader(staff);
-		this.fillBody(parcelable, flag);
-	}
-	
-	protected RequestPackage(Staff staff, Parcelable[] parcelableArray, int flag){
-		this.fillHeader(staff);
-		this.fillBody(parcelableArray, flag);
+		this.body = new byte[0];
 	}
 	
 	private void fillHeader(Staff staff){

@@ -52,8 +52,10 @@ public final class Type{
 	public final static byte GET_HOST = 3;
 	public final static byte GET_PIC_URL = 4;
 	
-	/* belong to Test */
+	/* belong to Diagnosis */
 	public final static byte PING = 1;
+	public final static byte PRINTER = 2;
+	public final static byte PRINTER_DISPATCH = 3;
 	
 	/* belong to Print */
 //	public final static byte PRINTER_LOGIN = 1;
