@@ -1,5 +1,6 @@
 package com.wireless.pojo.printScheme;
 
+
 public class PrinterConnection {
 
 	public static class InsertBuilder{
@@ -76,6 +77,28 @@ public class PrinterConnection {
 	public void setLastConnected(long connectDate) {
 		this.lastConnection = connectDate;
 	}
+	
+//	public boolean isLocal(){
+//		try{
+//			for (Enumeration<NetworkInterface> n = NetworkInterface.getNetworkInterfaces(); n.hasMoreElements();) {
+//				NetworkInterface e = n.nextElement();
+//				//System.out.println("Interface: " + e.getName() + ",isLoopback: " + e.isLoopback() + ",isUp: " + e.isUp() + ",isP2P: " + e.isPointToPoint() + ",isVirtual: " + e.isVirtual());
+//				if(e.isUp()){
+//					for (Enumeration<InetAddress> a = e.getInetAddresses(); a.hasMoreElements();) {
+//						InetAddress addr = a.nextElement();
+//						//System.out.println("  " + addr.getHostAddress());
+//						if(addr.getAddress().length == 4 && getDest().equals(addr.getHostAddress())){
+//							return true;
+//						}
+//					}
+//				}
+//			}
+//			return false;
+//		}catch(SocketException ignored){
+//			ignored.printStackTrace();
+//			return false;
+//		}
+//	}
 	
 	@Override
 	public int hashCode(){

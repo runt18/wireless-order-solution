@@ -798,7 +798,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			dest.writeLong(this.getId());
 			dest.writeInt(this.getFoodId());
 			dest.writeShort(this.getAliasId());
-			dest.writeParcel(this.mFoodUnit, FoodUnit.FOOD_UNIT_PARCELABLE_SIMPLE);
+			dest.writeParcel(this.mFoodUnit, FoodUnit.FOOD_UNIT_PARCELABLE_COMPLEX);
 			dest.writeFloat(this.getCount());
 			dest.writeBoolean(this.isHangup());
 			dest.writeBoolean(this.isGift());
