@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+<title>Insert title here</title>
+<link rel="stylesheet" href="css/common/jquery.mobile-1.3.2.css">
+<style>
+
+.none{
+	display : none;
+}
+.jqm-header {
+  background: #fff;
+  border-top: 3px solid #6ABA2F;
+  border-bottom: 1px solid #e0e0e0;
+  color: #777;
+  text-shadow: 0 1px 0 #fff;
+  -webkit-box-shadow: 0 0 5px rgba(0,0,0,.15);
+  -moz-box-shadow: 0 0 5px rgba(0,0,0,.15);
+  box-shadow: 0 0 5px rgba(0,0,0,.15);
+}
+
+.jqm-header.ui-header-fixed:not(.ui-fixed-hidden) {
+  border-top-width: 4px;
+  padding-top: 0;
+}
+
+/*content边距缩小 1130*/
+.ui-content {
+  border-width: 0;
+  overflow: visible;
+  overflow-x: hidden;
+  padding: 5px;
+}
+
+/*下拉框文字大小与边框距离*/
+.ui-btn-inner {
+  font-size: 12px;
+  padding: .6em 5px;
+  min-width: .75em;
+  display: block;
+  position: relative;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  zoom: 1;
+}
+/*下拉框图标边距*/
+.ui-select .ui-btn-icon-right .ui-icon {
+  right: 5px;
+}
+
+/*grid边距 1106*/
+.ui-bar, .ui-body {
+  position: relative;
+  padding: initial !important;
+  overflow: hidden;
+  display: block;
+  clear: both;
+}
+/*grid字体 1107*/
+.ui-bar {
+  font-size: 14px;
+  margin: 0;
+}
+
+/*table captain样式 2955*/
+.ui-table caption {
+  text-align: center;
+  margin: initial !important;
+  opacity: .5;
+}
+</style>
+
+
+<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="js/common/jquery.mobile-1.3.2.js"></script>
+<script type="text/javascript" src="js/common/highcharts.js"></script>
+<script type="text/javascript" src="js/Util.js"></script>
+<script type="text/javascript" src="js/generalReport/generalReport.js"></script>
+</head>
+<body>
+<div data-role="page" id="businessStatisticsMgr" data-theme="d">
+	<div data-role="header" data-tap-toggle="false" data-theme="b" class="jqm-header">
+		<h2>营业统计</h2>
+	</div>
+	<div data-role="content" data-theme="c" style="height: 100%">
+		<div class="ui-grid-a">
+		    <div class="ui-block-a" style="width: 35%">
+		    	<div class="ui-bar ui-bar-c" style="height:45px">
+				<select name="select-choice-a" id="select-choice-a" data-native-menu="false" onchange="changeTime(this)">
+				    <option value="5">本周</option>
+				    <option value="7">本月</option>
+				    <option value="8">上月</option>
+				    <option value="4">近三月</option>
+				</select>
+				</div>
+			</div>
+		    <div class="ui-block-b" style="width: 65%;line-height: 45px;">
+		    	<div class="ui-bar ui-bar-c" style="height:45px;text-align: center;">
+					<span id="beginDate">2015-12-16</span> ~ <span id="endDate">2015-12-19</span>
+				</div>
+			</div>
+			<div class="ui-block-a" style="width: 33.33%;text-align: center;">
+				<div class="ui-bar ui-bar-c" style="line-height:30px">
+					总营业额:<span>360</span>
+				</div>
+			</div>
+			<div class="ui-block-b" style="width: 33.33%;text-align: center;">
+				<div class="ui-bar ui-bar-c" style="line-height:30px">
+					日均金额:<span>120</span>
+				</div>
+			</div>
+			<div class="ui-block-c" style="width: 33.33%;text-align: center;">
+				<div class="ui-bar ui-bar-c" style="line-height:30px">
+					日均账单:<span>12</span>
+				</div>
+			</div>
+		</div><!-- /grid-a -->		
+		
+		<div id="receivePieChart"></div>
+		<hr>
+		<div id="deptGeneralPieChart"></div>
+		<hr>
+		<div id="memberOpePieChart"></div>
+		<hr>
+		<div id="orderTypeColumnChart"></div>		
+		<hr>
+		<div id="dailyBusinessStatisticColumnChart"></div>			
+	</div>
+<!-- 	<div data-role="footer" data-id="foo1" data-position="fixed">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="a.html" class="ui-btn-active ui-state-persist">Info</a></li>
+				<li><a href="b.html">Friends</a></li>
+				<li><a href="c.html">Albums</a></li>
+				<li><a href="d.html">Emails</a></li>
+			</ul>
+		</div>/navbar
+	</div>/footer -->
+</div>
+<div data-role="page" id="singleReportMgr" data-theme="d">
+	<div data-role="header" data-tap-toggle="false" data-theme="b" class="jqm-header">
+		<h2 id="reportName">报表</h2>
+	</div>
+	<div data-role="content" data-theme="c" >
+		<div id="singleReportChart"></div>
+		
+		<div id="secondReportChart"></div>
+		<hr>
+		<div id="display4KitchenTop10" class="none">
+		<table  data-role="table" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive" >
+			<caption>销量前十菜品</caption>
+	         <thead>
+	           <tr class="ui-bar-d">
+	             <th ></th>
+	             <th>菜名</th>
+	             <th style="width: 35px;">销量</th>
+	             <th >营业额</th>
+	           </tr>
+	         </thead>
+	         <tbody id="table4KitchenTop10">
+	            <tr>
+					<td>1</td>
+					<td>酸菜鱼</td>
+					<td>200</td>
+					<td>5000</td>
+	           </tr>
+	           <tr>
+					<td>2</td>
+					<td>土豆丝</td>
+					<td>150</td>
+					<td>3000</td>
+	           </tr>
+	           <tr>
+					<td>3</td>
+					<td>蒸饺</td>
+					<td>100</td>
+					<td>1000</td>
+	           </tr>
+	         </tbody>
+	      </table>   		
+		</div>
+	</div>
+</div>
+<div data-role="page" id="dailyBusinessStatisticMgr" data-theme="d">
+	<div data-role="header" data-tap-toggle="false" data-theme="b" class="jqm-header" style="line-height: 35px;text-align: center;">
+		<span id="businessStatisticTitle">每日营业统计</span>
+	</div>
+	<div data-role="content">
+		<div id="daily_receivePieChart"></div>
+		<hr>
+		<div id="daily_deptGeneralPieChart"></div>
+		<hr>
+		<div id="daily_memberOpePieChart"></div>
+		<hr>
+		<div id="daily_orderTypeColumnChart"></div>
+	</div>		
+</div>
+</body>
+</html>
