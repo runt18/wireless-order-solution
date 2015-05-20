@@ -142,14 +142,16 @@ IF NOT EXIST pserver\setup_nsis\pserver.exe GOTO pserver_not_exist
 	GOTO end
 
 :socket_jar
-IF EXIST server\deliverables\wireless_order_socket.jar GOTO socket_exist
-IF NOT EXIST server\deliverables\wireless_order_socket.jar GOTO socket_not_exist
+IF EXIST server\target\wireless_order_socket.jar GOTO socket_exist
+IF NOT EXIST server\target\wireless_order_socket.jar GOTO socket_not_exist
 :socket_exist
 	@echo copying the wireless order socket jar file...
 	IF NOT EXIST dist\socket mkdir dist\socket
-	@copy server\deliverables\wireless_order_socket.jar dist\socket > nul
+	@copy server\target\wireless_order_socket.jar dist\socket > nul
 	@copy server\conf\conf.xml dist\socket > nul
 	@copy server\releasenote.txt dist\socket > nul
+	IF NOT EXIST dist\socket\lib mkdir dist\socket\lib
+	@copy server\target\lib dist\socket\lib > nul
 	GOTO socket_scripts
 
 :socket_not_exist
