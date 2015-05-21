@@ -1252,12 +1252,14 @@ function printFuncOperactionHandler(c){
 		//部门选中
 		var deptValue = ss.data.deptValue;
 		if(!deptValue == ''){
+			deptValue = ss.data.deptValue.split(",");
 			Ext.getDom('chkAllDept').checked = false;
 			Ext.getCmp('chkAllDept').fireEvent('check', Ext.getCmp('chkAllDept'), false);
 			for ( var i = 0; i < dept.length; i++) {
 				for ( var j = 0; j < deptValue.length; j++) {
 					if(deptValue[j] == dept[i].value){
 						dept[i].checked = true;
+						break;
 					}
 				}
 			}	
@@ -1278,6 +1280,7 @@ function printFuncOperactionHandler(c){
 				for ( var j = 0; j < regionValues.length; j++) {
 					if(regionValues[j] == region[i].value){
 						region[i].checked = true;
+						break;
 					}
 				}
 			}
@@ -1506,12 +1509,7 @@ Ext.onReady(function(){
 		    {name : 'repeat'},
 		    {name : 'comment'},
 		    {name : 'isIncludeCancel'}
-		]),
-		listeners : {
-			beforeload : function(thiz, options){
-				console.log(options)
-			}
-		}
+		])
 		
 	});
 	
