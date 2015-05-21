@@ -24,6 +24,7 @@ $(function(){
 		}
 	});	
 	
+	
 });
 
 function entryPromotion(){
@@ -61,7 +62,6 @@ wx.ready(function(){
 	    		oid : Util.mp.oid,
 	    		fid : Util.mp.fid,
 	    		orderId : res.resultStr.split('?')[1]
-//	    		orderId : 3064505
 	    	}, function(result){
 	    		if(result.success){
 	    			$('#div4ScanMsg').html('<span>会员操作成功!</span>');
