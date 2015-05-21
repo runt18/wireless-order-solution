@@ -270,7 +270,7 @@ function getBusinessStatisticsData(c){
 				  		if(point.category == "服务费收入"){
 				  			return;
 				  		}
-				  		
+				  		$('#display4KitchenTop10').hide();
 				        $.mobile.changePage("#singleReportMgr",
 				        	    { transition: "fade" });
 				        $('#reportName').html(point.category+ "报表");
