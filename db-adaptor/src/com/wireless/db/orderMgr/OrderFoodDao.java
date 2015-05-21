@@ -476,7 +476,11 @@ public class OrderFoodDao {
 			}
 			//Get the detail to taste group.
 			if(of.getTasteGroup() != null){
-				of.setTasteGroup(TasteGroupDao.getById(staff, of.getTasteGroup().getGroupId(), extraCond.dateType));
+				try{
+					of.setTasteGroup(TasteGroupDao.getById(staff, of.getTasteGroup().getGroupId(), extraCond.dateType));
+				}catch(BusinessException e){
+					of.clearTasetGroup();
+				}
 			}
 		}
 		
@@ -707,7 +711,9 @@ public class OrderFoodDao {
 			
 			//Get the detail to food unit
 			if(src.hasFoodUnit() && !src.asFood().isCurPrice()){
-				src.setFoodUnit(FoodUnitDao.getById(dbCon, staff, src.getFoodUnit().getId()));
+				try{
+					src.setFoodUnit(FoodUnitDao.getById(dbCon, staff, src.getFoodUnit().getId()));
+				}catch(BusinessException ignored){}
 			}
 			
 			//Get the detail to normal tastes.

@@ -236,7 +236,7 @@ public class TasteGroupDao {
 		String sql;
 		
 		final String tgItem = "`taste_group_id`, `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
-				  					  "`tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price`";
+				  			  "`tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price`";
 		
 		//Move the taste group to history
 		sql = " INSERT INTO " + Params.dbName + ".taste_group_history (" + tgItem + " ) " +
@@ -256,12 +256,11 @@ public class TasteGroupDao {
 			  " WHERE " +
 			  " normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
 			  " AND " +
-			  " normal_taste_group_id IN(" +
-			  " SELECT normal_taste_group_id " +
-			  " FROM " + Params.dbName + ".order_food OF " + " JOIN " + Params.dbName + ".taste_group TG" +
-			  " ON OF.taste_group_id = TG.taste_group_id " +
-			  " WHERE " +
-			  " OF.order_id IN (" + paidOrder + ")" +
+			  " normal_taste_group_id IN (" +
+				  " SELECT normal_taste_group_id " +
+				  " FROM " + Params.dbName + ".order_food OF " + 
+				  " JOIN " + Params.dbName + ".taste_group TG ON OF.taste_group_id = TG.taste_group_id " +
+				  " WHERE OF.order_id IN (" + paidOrder + ")" +
 			  " ) ";
 		
 		int ntgAmount = dbCon.stmt.executeUpdate(sql);
@@ -334,5 +333,53 @@ public class TasteGroupDao {
 		dbCon.stmt.executeUpdate(sql);	
 		
 		return new ArchiveResult(tgAmount, ntgAmount, maxTgId, maxNormalTgId);
+	}
+	
+	public static class CleanupResult{
+		private final long elapsedTime;
+		private final int nTasteGroup;
+		private final int nNormalTasteGroup;
+		
+		public CleanupResult(long elapsedTime, int nTasteGroup, int nNormalTasteGroup) {
+			this.elapsedTime = elapsedTime;
+			this.nTasteGroup = nTasteGroup;
+			this.nNormalTasteGroup = nNormalTasteGroup;
+		}
+		
+	
+		@Override
+		public String toString(){
+			return "The clean up to " + nTasteGroup + " taste group(s), " + nNormalTasteGroup + " normal taste group(s) takes " + elapsedTime + " sec.";
+		}
+	}
+	
+	public static CleanupResult cleanup() throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			long beginTime = System.currentTimeMillis();
+			dbCon.connect();
+			String sql;
+			sql = " DELETE TG FROM " + Params.dbName + ".taste_group TG " +
+				  " LEFT JOIN " + Params.dbName + ".order_food OF ON TG.taste_group_id = OF.taste_group_id " +
+				  " WHERE 1 = 1 " +
+				  " AND TG.taste_group_id <> 1 " +
+				  " AND TG.restaurant_id <> " + Restaurant.ADMIN + 
+				  " AND OF.id IS NULL ";
+			int nTasteGroup = dbCon.stmt.executeUpdate(sql);
+			
+			sql = " DELETE NTG FROM " + Params.dbName + ".normal_taste_group NTG " +
+				  " LEFT JOIN " + Params.dbName + ".taste_group TG ON NTG.normal_taste_group_id = TG.normal_taste_group_id " +
+				  " WHERE 1 = 1 " +
+				  " AND NTG.normal_taste_group_id <> 1 " +
+				  " AND TG.normal_taste_group_id IS NULL ";
+			int nNormalTasteGroup = dbCon.stmt.executeUpdate(sql);
+			
+			long elapsedTime = (System.currentTimeMillis() - beginTime) / 1000;
+			
+			return new CleanupResult(elapsedTime, nTasteGroup, nNormalTasteGroup);
+			
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 }

@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.wireless.db.orderMgr.TasteGroupDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
@@ -85,5 +86,10 @@ public class TestTasteDao {
 				} catch (BusinessException ignored) {}
 			}
 		}
+	}
+	
+	@Test
+	public void testTasteCleanup() throws SQLException{
+		System.out.println(TasteGroupDao.cleanup());
 	}
 }
