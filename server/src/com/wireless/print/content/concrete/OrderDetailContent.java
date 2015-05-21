@@ -11,7 +11,6 @@ import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PVar;
-import com.wireless.print.content.decorator.CenterAlignedDecorator;
 import com.wireless.print.content.decorator.ExtraFormatDecorator;
 import com.wireless.server.WirelessSocketServer;
 
@@ -44,6 +43,12 @@ public class OrderDetailContent extends ConcreteContent {
 		mDetailType = detailType;
 	}
 	
+	private String makeTitle(String title){
+		return new String(new String(new char[]{0x1B, 0x61, 0x01}) + 
+				   new ExtraFormatDecorator(title, mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X) +
+				   SEP + new String(new char[]{0x1B, 0x61, 0x00}));	
+	}
+	
 	@Override
 	public String toString(){
 		
@@ -62,40 +67,19 @@ public class OrderDetailContent extends ConcreteContent {
 			
 			//generate the title and replace the "$(title)" with it
 			if(mPrintType == PType.PRINT_ORDER_DETAIL){
-				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
-														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("点菜" + (mParent.isHangup() ? "叫起" : "") + "分单 - " + tblName, mStyle), 
-															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
+				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("点菜" + (mParent.isHangup() ? "叫起" : "") + "分单 - " + tblName));
 				
 			}else if(mPrintType == PType.PRINT_ORDER_DETAIL_PATCH){
-				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
-														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("补打分单 - " + tblName, mStyle), 
-															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
+				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("补打分单 - " + tblName));
 			
 			}else if(mPrintType == PType.PRINT_EXTRA_FOOD_DETAIL){
-				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
-														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("加菜" + (mParent.isHangup() ? "叫起" : "") + "分单 - " + tblName, mStyle),
-															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
+				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("加菜" + (mParent.isHangup() ? "叫起" : "") + "分单 - " + tblName));
 				
 			}else if(mPrintType == PType.PRINT_CANCELLED_FOOD_DETAIL){
-				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
-														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("!!!退菜分单!!! - " + tblName, mStyle), 
-															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
-				
-			}else if(mPrintType == PType.PRINT_HURRIED_FOOD){
-				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
-														new ExtraFormatDecorator(
-															new CenterAlignedDecorator("催菜分细!!! - " + tblName, mStyle), 
-															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
+				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("!!!退菜分单!!! - " + tblName));
 				
 			}else{
-				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
-														new ExtraFormatDecorator(
-																new CenterAlignedDecorator("点菜分单 - " + tblName, mStyle),
-																ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
+				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("点菜分单 - " + tblName));
 			}
 
 			if(mStyle == PStyle.PRINT_STYLE_58MM || mStyle == PStyle.PRINT_STYLE_76MM){

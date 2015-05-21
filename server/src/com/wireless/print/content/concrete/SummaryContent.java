@@ -10,7 +10,6 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.print.PVar;
-import com.wireless.print.content.decorator.CenterAlignedDecorator;
 import com.wireless.print.content.decorator.ExtraFormatDecorator;
 import com.wireless.server.WirelessSocketServer;
 
@@ -45,34 +44,35 @@ public class SummaryContent extends ConcreteContent {
 		return this;
 	}
 	
+	private String makeTitle(String title){
+		return new String(new String(new char[]{0x1B, 0x61, 0x01}) + 
+				   new ExtraFormatDecorator(title, mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X) +
+				   SEP + new String(new char[]{0x1B, 0x61, 0x00}));	
+	}
+	
 	@Override
 	public String toString(){
 		
 		//generate the title and replace the "$(title)" with it
 		if(mPrintType == PType.PRINT_ORDER){
-			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(
-															new CenterAlignedDecorator("点菜总单", mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());		
+			mTemplate = mTemplate.replace(PVar.TITLE, makeTitle("点菜总单"));		
 			
 		}else if(mPrintType == PType.PRINT_ALL_EXTRA_FOOD){
-			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(
-															new CenterAlignedDecorator("加菜总单", mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+			mTemplate = mTemplate.replace(PVar.TITLE, makeTitle("加菜总单"));
 			
 		}else if(mPrintType == PType.PRINT_ORDER_PATCH){
-			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(
-															new CenterAlignedDecorator("补打总单", mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+			mTemplate = mTemplate.replace(PVar.TITLE, makeTitle("补打总单"));	
 			
 		}else if(mPrintType == PType.PRINT_ALL_CANCELLED_FOOD){
 			//char[] format = { 0x1D, 0x21, 0x03 };
-			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("退  菜  总  单 !", mStyle), 
-																			   ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
+			mTemplate = mTemplate.replace(PVar.TITLE, makeTitle("退  菜  总  单 !"));
 			
 		}else if(mPrintType == PType.PRINT_ALL_HURRIED_FOOD){
 			//char[] format = { 0x1D, 0x21, 0x03 };
-			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("催  菜  总  单 !", mStyle), 
-																			   ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
+			mTemplate = mTemplate.replace(PVar.TITLE, makeTitle("催  菜  总  单 !"));
 			
 		}else{
-			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator(new ExtraFormatDecorator("点菜总单", mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X)).toString());
+			mTemplate = mTemplate.replace(PVar.TITLE, makeTitle("点菜总单"));		
 		}
 		
 		if(mStyle == PStyle.PRINT_STYLE_58MM || mStyle == PStyle.PRINT_STYLE_76MM){

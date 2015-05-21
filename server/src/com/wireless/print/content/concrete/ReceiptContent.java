@@ -112,8 +112,12 @@ public class ReceiptContent extends ConcreteContent {
 		
 		//replace the $(var_3) with the actual price
 		StringBuilder var3 = new StringBuilder();
-		var3.append(new ExtraFormatDecorator(new RightAlignedDecorator("实收金额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getActualPrice()), mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString())
-			.append(SEP);
+		var3.append(new ExtraFormatDecorator(
+						//new RightAlignedDecorator("实收(" + mOrder.getPaymentType().getName() + "):" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getActualPrice()), mStyle).toString(),
+						(new String(new char[]{0x1B, 0x61, 0x02}) + "实收(" + mOrder.getPaymentType().getName() + "):" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(mOrder.getActualPrice())),
+						mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
+			.append(SEP).append(new char[]{0x1B, 0x61, 0x00});
+		
 		if(mOrder.getPaymentType().isMixed()){
 			StringBuilder mixedDetail = new StringBuilder();
 			for(Entry<PayType, Float> entry : mOrder.getMixedPayment().getPayments().entrySet()){
@@ -123,7 +127,7 @@ public class ReceiptContent extends ConcreteContent {
 					mixedDetail.append(" ").append(entry.getKey().getName() + "：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(entry.getValue()));
 				}
 			}
-			var3.append(new RightAlignedDecorator(mixedDetail.toString(), mStyle));
+			var3.append(SEP + new RightAlignedDecorator(mixedDetail.toString(), mStyle));
 		}
 		mTemplate = mTemplate.replace(PVar.VAR_3, var3.toString());
 		

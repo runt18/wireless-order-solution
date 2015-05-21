@@ -12,6 +12,7 @@ import com.wireless.db.foodAssociation.CalcFoodAssociationDao;
 import com.wireless.db.foodStatistics.CalcFoodStatisticsDao;
 import com.wireless.db.frontBusiness.DailySettleDao;
 import com.wireless.db.member.MemberDao;
+import com.wireless.db.orderMgr.TasteGroupDao;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.printScheme.PrintLossDao;
 import com.wireless.db.promotion.PromotionDao;
@@ -37,6 +38,9 @@ public class DailySettlementTask extends SchedulerTask{
 		taskInfo.append("Daily settlement task starts on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new java.util.Date())).append(sep);
 		
 		try {   
+			
+			//Clean up the unused taste records
+			taskInfo.append("info : " + TasteGroupDao.cleanup()).append(sep);
 			
 			//Clean up the unprinted records
 			taskInfo.append("info : " + PrintLossDao.cleanup() + " print loss(es) are removed.").append(sep);

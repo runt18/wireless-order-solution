@@ -51,10 +51,6 @@ public class PrinterDiagnoseHandler {
 		
 	}
 	
-
-	
-
-	
 	private final Staff staff;
 	
 	public PrinterDiagnoseHandler(Staff staff){
