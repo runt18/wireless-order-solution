@@ -24,7 +24,7 @@ import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WxRestaurantDao;
+import com.wireless.db.weixin.finance.WeixinFinanceDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -61,14 +61,14 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 	 */
 	public ActionForward history(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pin = (String) request.getAttribute("pin");
-		String formId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
 		
 		int rid = 0;
 		Staff staff;
 		if(pin != null){
 			staff = StaffDao.verify(Integer.parseInt(pin));
 		}else{
-			rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
+			rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
 			staff = StaffDao.getAdminByRestaurant(rid);
 		}
 		JObject jObject = new JObject();
@@ -166,14 +166,14 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 	
 	public ActionForward deptSaleStatistic(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pin = (String) request.getAttribute("pin");
-		String formId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
 		
 		int rid = 0;
 		Staff staff;
 		if(pin != null){
 			staff = StaffDao.verify(Integer.parseInt(pin));
 		}else{
-			rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
+			rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
 			staff = StaffDao.getAdminByRestaurant(rid);
 		}
 	
@@ -269,9 +269,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		String opening = request.getParameter("opening");
 		String ending = request.getParameter("ending");
 		
-		String formId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
 		
-		int rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
+		int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
 		Staff staff = StaffDao.getAdminByRestaurant(rid);
 		
 		JObject jobject = new JObject();
@@ -314,9 +314,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		String opening = request.getParameter("opening");
 		String ending = request.getParameter("ending");
 		
-		String formId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
 		
-		int rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
+		int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
 		Staff staff = StaffDao.getAdminByRestaurant(rid);
 		
 		JObject jobject = new JObject();
@@ -361,9 +361,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		String opening = request.getParameter("opening");
 		String ending = request.getParameter("ending");
 		
-		String formId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
 		
-		int rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
+		int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
 		Staff staff = StaffDao.getAdminByRestaurant(rid);
 		
 		JObject jobject = new JObject();
@@ -414,9 +414,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		String opening = request.getParameter("opening");
 		String ending = request.getParameter("ending");
 		
-		String formId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
 		
-		int rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
+		int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
 		Staff staff = StaffDao.getAdminByRestaurant(rid);
 		
 		JObject jobject = new JObject();
@@ -466,9 +466,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		String opening = request.getParameter("opening");
 		String ending = request.getParameter("ending");
 		
-		String formId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
 		
-		int rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
+		int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
 		Staff staff = StaffDao.getAdminByRestaurant(rid);
 		
 		JObject jobject = new JObject();
@@ -517,9 +517,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		String opening = request.getParameter("opening");
 		String ending = request.getParameter("ending");
 		
-		String formId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
 		
-		int rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
+		int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
 		Staff staff = StaffDao.getAdminByRestaurant(rid);
 		
 		JObject jobject = new JObject();
@@ -566,9 +566,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		String opening = request.getParameter("opening");
 		String ending = request.getParameter("ending");
 		
-		String formId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
 		
-		int rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
+		int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
 		Staff staff = StaffDao.getAdminByRestaurant(rid);
 		
 		JObject jobject = new JObject();
@@ -600,7 +600,6 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 
 		return null;
 	}
-	
 	public ActionForward getCommissionStaffChart(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -611,9 +610,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		String opening = request.getParameter("opening");
 		String ending = request.getParameter("ending");
 		
-		String formId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
 		
-		int rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
+		int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
 		Staff staff = StaffDao.getAdminByRestaurant(rid);		
 		
 		JObject jobject = new JObject();
