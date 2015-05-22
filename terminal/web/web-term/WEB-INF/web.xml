@@ -22,6 +22,7 @@
 					/AdminLogin.do,
 					/OperateBillboard.do,
 					/QueryBillboard.do,
+					/PrinterDiagnosis.do,
 		
 					/Login.html,
 					/LoginAdmin.html,
