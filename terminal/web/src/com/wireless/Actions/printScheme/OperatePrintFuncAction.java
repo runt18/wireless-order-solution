@@ -27,7 +27,6 @@ import com.wireless.pojo.printScheme.PrintFunc.DetailBuilder;
 import com.wireless.pojo.printScheme.PrintFunc.SummaryBuilder;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.WebParams;
 
 public class OperatePrintFuncAction extends DispatchAction{
 
@@ -45,10 +44,10 @@ public class OperatePrintFuncAction extends DispatchAction{
 			jobject.initTip(true, "操作成功, 已删除方案");
 			
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -178,10 +177,10 @@ public class OperatePrintFuncAction extends DispatchAction{
 		
 			jobject.initTip(true, "操作成功, 已添加方案");
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			e.printStackTrace();
 		}finally{
 			dbCon.disconnect();
@@ -326,10 +325,10 @@ public class OperatePrintFuncAction extends DispatchAction{
 		
 			jobject.initTip(true, "操作成功, 已修改方案");
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			e.printStackTrace();
 		}finally{
 			dbCon.disconnect();
