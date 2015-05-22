@@ -67,19 +67,19 @@ public class OrderDetailContent extends ConcreteContent {
 			
 			//generate the title and replace the "$(title)" with it
 			if(mPrintType == PType.PRINT_ORDER_DETAIL){
-				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("点菜" + (mParent.isHangup() ? "叫起" : "") + "分单 - " + tblName));
+				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("点菜" + (mParent.isHangup() ? "叫起" : "") + "分单-" + tblName));
 				
 			}else if(mPrintType == PType.PRINT_ORDER_DETAIL_PATCH){
-				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("补打分单 - " + tblName));
+				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("补打分单-" + tblName));
 			
 			}else if(mPrintType == PType.PRINT_EXTRA_FOOD_DETAIL){
-				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("加菜" + (mParent.isHangup() ? "叫起" : "") + "分单 - " + tblName));
+				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("加菜" + (mParent.isHangup() ? "叫起" : "") + "分单-" + tblName));
 				
 			}else if(mPrintType == PType.PRINT_CANCELLED_FOOD_DETAIL){
-				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("!!!退菜分单!!! - " + tblName));
+				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("!!!退菜分单!!!-" + tblName));
 				
 			}else{
-				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("点菜分单 - " + tblName));
+				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("点菜分单-" + tblName));
 			}
 
 			if(mStyle == PStyle.PRINT_STYLE_58MM || mStyle == PStyle.PRINT_STYLE_76MM){
