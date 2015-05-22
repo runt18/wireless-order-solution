@@ -164,7 +164,7 @@ function getBusinessStatisticsData(c){
 		url : '../../WXQueryBusinessStatistics.do',
 		type : 'post',
 		data : {
-			fid : Util.mp.fid,
+			oid : Util.mp.oid,
 			onDuty:begin,
 			offDuty:end,
 			chart:c.chart ? true : false,
@@ -202,7 +202,7 @@ function getBusinessStatisticsData(c){
 			        //厨房
 			        $.post('../../WXQueryBusinessStatistics.do', {
 			        	dataSource : 'deptSaleStatistic',
-						fid : Util.mp.fid,
+						oid : Util.mp.oid,
 						dateBeg:begin,
 						dateEnd:end,
 						region:-1,
@@ -225,7 +225,7 @@ function getBusinessStatisticsData(c){
 			        //菜品top10
 			        $.post('../../WXQueryBusinessStatistics.do', {
 			        	dataSource : 'deptSaleStatistic',
-						fid : Util.mp.fid,
+						oid : Util.mp.oid,
 						dateBeg:begin,
 						dateEnd:end,
 						region:-1,
@@ -261,8 +261,8 @@ function getBusinessStatisticsData(c){
 				}}).setSize(pageWidth-10, pageWidth-10);				
 				
 				var orderTypeColumnChartData = initChartData();
-				orderTypeColumnChartData.priceColumnChart.xAxis = ['抹数','折扣', '赠送', '退菜', '反结账', '提成', '服务费收入'];
-				orderTypeColumnChartData.priceColumnChart.yAxis.data = [orderType.eraseIncome, orderType.discountIncome, orderType.giftIncome, orderType.cancelIncome, orderType.paidIncome, 0, orderType.serviceIncome];
+				orderTypeColumnChartData.priceColumnChart.xAxis = ['抹数','折扣', '赠送', '退菜', '反结账', '服务费收入'];
+				orderTypeColumnChartData.priceColumnChart.yAxis.data = [orderType.eraseIncome, orderType.discountIncome, orderType.giftIncome, orderType.cancelIncome, Math.abs(orderType.paidIncome), orderType.serviceIncome];
 				
 				//操作类型
 				newColumnChart2({
@@ -278,7 +278,7 @@ function getBusinessStatisticsData(c){
 				        if(point.category == "折扣"){
 				        	$.post('../../WXQueryBusinessStatistics.do', {
 				        		dataSource:"getDiscountStaffChart",
-				        		fid : Util.mp.fid,
+				        		oid : Util.mp.oid,
 				        		dateBeg:begin,
 				        		dateEnd:end,
 				        		deptID:-1,
@@ -295,7 +295,7 @@ function getBusinessStatisticsData(c){
 				        	
 				        	$.post('../../WXQueryBusinessStatistics.do', {
 				        		dataSource:"getDiscountDeptChart",
-				        		fid : Util.mp.fid,
+				        		oid : Util.mp.oid,
 				        		dateBeg:begin,
 				        		dateEnd:end,
 				        		deptID:-1,
@@ -312,7 +312,7 @@ function getBusinessStatisticsData(c){
 				        }else if(point.category == "赠送"){
 				        	$.post('../../WXQueryBusinessStatistics.do', {
 				        		dataSource:"getGiftStaffChart",
-				        		fid : Util.mp.fid,
+				        		oid : Util.mp.oid,
 				        		dateBeg:begin,
 				        		dateEnd:end,
 				        		deptID:-1,
@@ -329,7 +329,7 @@ function getBusinessStatisticsData(c){
 				        	
 				        	$.post('../../WXQueryBusinessStatistics.do', {
 				        		dataSource:"getGiftDeptChart",
-				        		fid : Util.mp.fid,
+				        		oid : Util.mp.oid,
 				        		dateBeg:begin,
 				        		dateEnd:end,
 				        		deptID:-1,
@@ -345,8 +345,8 @@ function getBusinessStatisticsData(c){
 				        	});
 				        }else if(point.category == "退菜"){
 				        	$.post('../../WXQueryBusinessStatistics.do', {
-				        		dataSource:"getStaffChart",
-				        		fid : Util.mp.fid,
+				        		dataSource:"getCancelStaffChart",
+				        		oid : Util.mp.oid,
 				        		dateBeg:begin,
 				        		dateEnd:end,
 				        		deptID:-1,
@@ -363,8 +363,8 @@ function getBusinessStatisticsData(c){
 				        	});
 				        	
 				        	$.post('../../WXQueryBusinessStatistics.do', {
-				        		dataSource:"getReasonChart",
-				        		fid : Util.mp.fid,
+				        		dataSource:"getCancelReasonChart",
+				        		oid : Util.mp.oid,
 				        		dateBeg:begin,
 				        		dateEnd:end,
 				        		deptID:-1,
@@ -382,7 +382,7 @@ function getBusinessStatisticsData(c){
 				        }else if(point.category == "反结账"){
 				        	$.post('../../WXQueryBusinessStatistics.do', {
 				        		dataSource:"getRepaidStaffChart",
-				        		fid : Util.mp.fid,
+				        		oid : Util.mp.oid,
 				        		dateBeg:begin,
 				        		dateEnd:end,
 				        		staffID:-1
@@ -393,13 +393,13 @@ function getBusinessStatisticsData(c){
 									repaidStaffPieChartData.chartPriceData.data.push([e.staffName, e.repaidPrice]);
 								}) 
 					        	
-					        	newPieChart2({rt: 'singleReportChart', title : "员工赠送金额比例图", unit: "元", series: repaidStaffPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);				        		
+					        	newPieChart2({rt: 'singleReportChart', title : "员工反结账金额比例图", unit: "元", series: repaidStaffPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);				        		
 				        	});
 				        	
 				        }else if(point.category == "提成"){
 				        	$.post('../../WXQueryBusinessStatistics.do', {
-				        		dataSource:"getStaffChart",
-				        		fid : Util.mp.fid,
+				        		dataSource:"getCommissionStaffChart",
+				        		oid : Util.mp.oid,
 				        		dateBeg:begin,
 				        		dateEnd:end,
 				        		deptID:-1,
@@ -444,7 +444,7 @@ function getBusinessStatisticsData(c){
 				            
 				            Util.lm.show();
 				            $.post('../../WXQueryBusinessStatistics.do', {
-				    			fid : Util.mp.fid,
+				    			oid : Util.mp.oid,
 				    			onDuty:point.category + " 00:00:00",
 				    			offDuty:point.category + " 23:59:59",
 				    			region:-1,
@@ -472,8 +472,8 @@ function getBusinessStatisticsData(c){
 								newPieChart2({rt: 'daily_deptGeneralPieChart', title : '部门汇总比例图', unit: '元', series: daily_deptGeneralPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);
 								
 								var daily_orderTypeColumnChartData = initChartData();
-								daily_orderTypeColumnChartData.priceColumnChart.xAxis = ['抹数','折扣', '赠送', '退菜', '反结账', '提成', '服务费收入'];
-								daily_orderTypeColumnChartData.priceColumnChart.yAxis.data = [daily_orderType.eraseIncome, daily_orderType.discountIncome, daily_orderType.giftIncome, daily_orderType.cancelIncome, daily_orderType.paidIncome, 0, daily_orderType.serviceIncome];
+								daily_orderTypeColumnChartData.priceColumnChart.xAxis = ['抹数','折扣', '赠送', '退菜', '反结账', '服务费收入'];
+								daily_orderTypeColumnChartData.priceColumnChart.yAxis.data = [daily_orderType.eraseIncome, daily_orderType.discountIncome, daily_orderType.giftIncome, daily_orderType.cancelIncome, Math.abs(daily_orderType.paidIncome), daily_orderType.serviceIncome];
 								
 						
 								var daily_memberOpeColumnChartData = initChartData();
