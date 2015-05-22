@@ -197,6 +197,8 @@ function getBusinessStatisticsData(c){
 			       $.mobile.changePage("#singleReportMgr",
 			        	    { transition: "fade" });
 			        $('#reportName').html(point.name +"报表");
+			        //部门只需一个饼图
+			        $('#secondReportChart').hide();
 			        
 			        Util.lm.show();
 			        //厨房
@@ -270,7 +272,10 @@ function getBusinessStatisticsData(c){
 				  		if(point.category == "服务费收入"){
 				  			return;
 				  		}
+				  		//操作类型需要两个饼图 & 隐藏菜品top10
+				  		$('#secondReportChart').show();
 				  		$('#display4KitchenTop10').hide();
+				  		
 				        $.mobile.changePage("#singleReportMgr",
 				        	    { transition: "fade" });
 				        $('#reportName').html(point.category+ "报表");
