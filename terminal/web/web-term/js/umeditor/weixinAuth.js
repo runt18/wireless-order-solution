@@ -1,63 +1,5 @@
 var weixinLogoUploader;
 
-$("#weixin_wizard").steps({
-    headerTag: "span",
-    bodyTag: "div",
-    transitionEffect: "slideLeft",
-    
-    enableAllSteps : true,
-    labels: {
-        current: "current step:",
-        pagination: "Pagination",
-        finish: "完成",
-        next: "下一步",
-        previous: "上一步",
-        loading: "加载中 ..."
-    },
-    onInit : function (event, currentIndex) {
-		if($('#weixinAuthDisplay').width() >= 660){
-			$('#weixinAuthDisplayImg').attr('width', '660px');
-		}
-    },
-    onStepChanged: function (event, currentIndex, priorIndex) {
-    	//0开始
-    	if(currentIndex == 1){//餐厅logo
-    		//加载微信logo uploader
-    		weixinLogoUploader.render('weixinLogoUploader');
-    	}else if(currentIndex == 2 && !um_getContent()){//餐厅简介
-			wx.lm.show();
-			if($('#weixinEditorDisplay').width() >= 660){
-				$('#weixinEditorDisplayImg').attr('width', '660px');
-			}
-			Ext.Ajax.request({
-				url : '../../OperateRestaurant.do',
-				params : {
-					dataSource : 'getInfo'
-				},
-				success : function(res, opt){
-					wx.lm.hide();
-					var jr = Ext.decode(res.responseText);
-					if(jr.success){
-						UM.getEditor('myEditor').setContent(jr.other.info);
-					}else{
-						um_clear();
-						Ext.ux.showMsg(jr);
-					}
-				},
-				fialure : function(res, opt){
-					wx.lm.hide();
-					Ext.ux.showMsg(res.responseText);
-				}
-			});    		
-    	}else if(currentIndex == 3){//欢迎活动
-    		getWxPromotion();
-			if($('#wxActiveEditorDisplay').width() >= 660){
-				$('#wxActiveEditorDisplayImg').attr('width', '660px');
-			}    		
-    	}
-    }
-});
-
 function setRestaurantInfo() {
 	wx.lm.show();
 	Ext.Ajax.request({
@@ -138,6 +80,65 @@ function getRestaurantInfo(){
 //step高度
 var stepH;
 $(function (){
+	
+	$("#weixin_wizard").steps({
+	    headerTag: "span",
+	    bodyTag: "div",
+	    transitionEffect: "slideLeft",
+	    
+	    enableAllSteps : true,
+	    labels: {
+	        current: "current step:",
+	        pagination: "Pagination",
+	        finish: "完成",
+	        next: "下一步",
+	        previous: "上一步",
+	        loading: "加载中 ..."
+	    },
+	    onInit : function (event, currentIndex) {
+			if($('#weixinAuthDisplay').width() >= 660){
+				$('#weixinAuthDisplayImg').attr('width', '660px');
+			}
+	    },
+	    onStepChanged: function (event, currentIndex, priorIndex) {
+	    	//0开始
+	    	if(currentIndex == 1){//餐厅logo
+	    		//加载微信logo uploader
+	    		weixinLogoUploader.render('weixinLogoUploader');
+	    	}else if(currentIndex == 2 && !um_getContent()){//餐厅简介
+				wx.lm.show();
+				if($('#weixinEditorDisplay').width() >= 660){
+					$('#weixinEditorDisplayImg').attr('width', '660px');
+				}
+				Ext.Ajax.request({
+					url : '../../OperateRestaurant.do',
+					params : {
+						dataSource : 'getInfo'
+					},
+					success : function(res, opt){
+						wx.lm.hide();
+						var jr = Ext.decode(res.responseText);
+						if(jr.success){
+							UM.getEditor('myEditor').setContent(jr.other.info);
+						}else{
+							um_clear();
+							Ext.ux.showMsg(jr);
+						}
+					},
+					fialure : function(res, opt){
+						wx.lm.hide();
+						Ext.ux.showMsg(res.responseText);
+					}
+				});    		
+	    	}else if(currentIndex == 3){//欢迎活动
+	    		getWxPromotion();
+				if($('#wxActiveEditorDisplay').width() >= 660){
+					$('#wxActiveEditorDisplayImg').attr('width', '660px');
+				}    		
+	    	}
+	    }
+	});	
+	
 	//获取微信餐厅,判读是否已绑定
 	getRestaurantInfo();
 //	$('#btnWeixinAuth').show();
