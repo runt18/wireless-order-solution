@@ -1,4 +1,4 @@
-var pageWidth = window.screen.width;
+var pageWidth ;
 
 initChartData = function(c){
 	c = c || {};
@@ -31,9 +31,6 @@ function newPieChart2(c){
             plotBackgroundColor: null,
             plotBorderWidth: null,
             plotShadow: false
-//            ,
-//            type : 'pie',
-//            height : 500
         },
         title: {
         	margin: c.titleMargin ? c.titleMargin : 15,
@@ -193,7 +190,7 @@ function getBusinessStatisticsData(c){
 					}
 				}) 
 				//收款
-				newPieChart2({rt: 'receivePieChart', title : '收款方式比例图', unit: '元', series: receiveChartData.chartPriceData}).setSize(pageWidth, pageWidth-10);
+				newPieChart2({rt: 'receivePieChart', title : '收款方式比例图', unit: '元', series: receiveChartData.chartPriceData});
 				
 				var deptGeneralPieChartData = initChartData();
 				deptStatistics.forEach(function(e){  
@@ -206,6 +203,7 @@ function getBusinessStatisticsData(c){
 			        $('#reportName').html(point.name +"统计("+ $('#beginDate').text() + " ~ " + $('#endDate').text() + ")");
 			        //部门只需一个饼图 & 隐藏开关
 			        $('#secondReportChart').hide();
+			        $('#hr4SecondReportChart').hide();
 			        $("#statisticToggle").hide();
 			        
 			        Util.lm.show();
@@ -268,7 +266,7 @@ function getBusinessStatisticsData(c){
 			        	$('#display4KitchenTop10').show();
 			        },'json');
 			        
-				}}).setSize(pageWidth, pageWidth-10);				
+				}});				
 				
 				var orderTypeColumnChartData = initChartData();
 				orderTypeColumnChartData.priceColumnChart.xAxis = ['抹数','折扣', '赠送', '退菜', '反结账', '服务费收入'];
@@ -283,6 +281,7 @@ function getBusinessStatisticsData(c){
 				  		//操作类型需要一个或者两个饼图 & 开关 & 隐藏菜品top10
 				  		$("#statisticToggle").show();
 				  		$('#secondReportChart').hide();
+				  		$('#hr4SecondReportChart').hide();
 				  		$('#display4KitchenTop10').hide();
 				  		//开关复位
 				  		var myswitch = $('input[name="priceOrAmount"]:checked').val();
@@ -408,6 +407,7 @@ function getBusinessStatisticsData(c){
 }
 
 $(function () {
+	pageWidth = $(window).width();
 	//默认调用本月
 	$("#selectTimes").val(7).selectmenu('refresh');
 	changeDate(7);
@@ -533,6 +533,7 @@ function orderTpyeSwitch(c){
         	
         	newPieChart2({rt: 'secondReportChart', title : "部门折扣" + c.priceOrAmount +"比例图", titleMargin : 50, unit: c.unit, series: c.switchType == 0 ? discountDeptPieChartData.chartPriceData : discountDeptPieChartData.chartAmountData}).setSize(pageWidth-10, pageWidth + 30);
 			$('#secondReportChart').show();
+			$('#hr4SecondReportChart').show();
     	});
     }else if(c.point.category == "赠送"){
     	Util.lm.show();
@@ -571,6 +572,7 @@ function orderTpyeSwitch(c){
         	
         	newPieChart2({rt: 'secondReportChart', title : "部门赠送" + c.priceOrAmount +"比例图", titleMargin : 50, unit: c.unit, series: c.switchType == 0 ? giftDeptPieChartData.chartPriceData : giftDeptPieChartData.chartAmountData }).setSize(pageWidth-10, pageWidth + 30);
 			$('#secondReportChart').show();
+			$('#hr4SecondReportChart').show();
     	});
     }else if(c.point.category == "退菜"){
     	Util.lm.show();
@@ -611,6 +613,7 @@ function orderTpyeSwitch(c){
         	
         	newPieChart2({rt: 'secondReportChart', title : "退菜原因" + c.priceOrAmount +"比例图", titleMargin : 50, unit: c.unit, series: c.switchType == 0 ?cancelReasonPieChartData.chartPriceData:cancelReasonPieChartData.chartAmountData}).setSize(pageWidth-10, pageWidth + 30);
 			$('#secondReportChart').show();
+			$('#hr4SecondReportChart').show();
     	});
     }else if(c.point.category == "反结账"){
     	Util.lm.show();
