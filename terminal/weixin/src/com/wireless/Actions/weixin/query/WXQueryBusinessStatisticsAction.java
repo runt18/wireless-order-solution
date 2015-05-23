@@ -224,9 +224,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 				
 			}else if(qt == SaleDetailsDao.QUERY_BY_FOOD){
 				Department dept = DepartmentDao.getByCond(staff, new DepartmentDao.ExtraCond().setName(deptName), null).get(0);
-				if(deptID != null && !deptID.equals("-1")){
+				if(deptName != null && dept.getId() >= 0){
 					extraConds.setDept(Department.DeptId.valueOf(dept.getId()));
-				}
+				} 
 				salesDetailList = SaleDetailsDao.getByFood(staff, dutyRange, extraConds, ot);
 			}else if(qt == SaleDetailsDao.QUERY_BY_KITCHEN){
 				
