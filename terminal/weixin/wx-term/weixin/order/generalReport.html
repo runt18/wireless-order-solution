@@ -71,8 +71,20 @@
 /*table captain样式 2955*/
 .ui-table caption {
   text-align: center;
-  margin: initial !important;
+  margin: 5px 0 !important;
   opacity: .5;
+  color: blue;
+  font-weight: bold;
+}
+
+/*总额,日均额显示样式*/
+.businessStatisticsTitle{
+	line-height:30px;
+	color : blue;
+}
+
+table >tbody{
+	color : blue;
 }
 </style>
 
@@ -85,14 +97,12 @@
 </head>
 <body>
 <div data-role="page" id="businessStatisticsMgr" data-theme="d">
-	<div data-role="header" data-tap-toggle="false" data-theme="b" class="jqm-header">
-		<h2>营业统计</h2>
-	</div>
-	<div data-role="content" data-theme="c" style="height: 100%">
+	<div data-role="header" data-tap-toggle="false" data-position="fixed" data-theme="b" class="jqm-header" style="line-height: 25px;text-align: center;">
+		<span>营业统计</span>
 		<div class="ui-grid-a">
 		    <div class="ui-block-a" style="width: 35%">
 		    	<div class="ui-bar ui-bar-c" style="height:45px">
-				<select name="select-choice-a" id="select-choice-a" data-native-menu="false" onchange="changeTime(this)">
+				<select name="select-choice-a" id="selectTimes" data-native-menu="false" onchange="changeTime(this)">
 				    <option value="5">本周</option>
 				    <option value="7">本月</option>
 				    <option value="8">上月</option>
@@ -105,30 +115,35 @@
 					<span id="beginDate">2015-12-16</span> ~ <span id="endDate">2015-12-19</span>
 				</div>
 			</div>
+		</div><!-- /grid-a -->				
+	</div>
+	<div data-role="content" data-theme="c" style="height: 100%">
+	
+		<div class="ui-grid-a">
 			<div class="ui-block-a" style="width: 33.33%;text-align: center;">
-				<div class="ui-bar ui-bar-c" style="line-height:30px">
-					总营业额:<span>360</span>
+				<div class="ui-bar ui-bar-c businessStatisticsTitle" >
+					总营业额:<span id="businessTotalMoney">0</span>
 				</div>
 			</div>
 			<div class="ui-block-b" style="width: 33.33%;text-align: center;">
-				<div class="ui-bar ui-bar-c" style="line-height:30px">
-					日均金额:<span>120</span>
+				<div class="ui-bar ui-bar-c businessStatisticsTitle">
+					日均营业:<span id="businessAvgMoney">0</span>
 				</div>
 			</div>
 			<div class="ui-block-c" style="width: 33.33%;text-align: center;">
-				<div class="ui-bar ui-bar-c" style="line-height:30px">
-					日均账单:<span>12</span>
+				<div class="ui-bar ui-bar-c businessStatisticsTitle">
+					日均账单:<span id="businessAvgCount">0</span>
 				</div>
 			</div>
 		</div><!-- /grid-a -->		
-		
+	
 		<div id="receivePieChart"></div>
 		<hr>
 		<div id="deptGeneralPieChart"></div>
 		<hr>
-		<div id="memberOpePieChart"></div>
-		<hr>
 		<div id="orderTypeColumnChart"></div>		
+		<hr>
+		<div id="memberOpePieChart"></div>
 		<hr>
 		<div id="dailyBusinessStatisticColumnChart"></div>			
 	</div>
@@ -144,8 +159,21 @@
 	</div>/footer -->
 </div>
 <div data-role="page" id="singleReportMgr" data-theme="d">
-	<div data-role="header" data-tap-toggle="false" data-theme="b" class="jqm-header">
-		<h2 id="reportName">报表</h2>
+	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="c" class="jqm-header" style="line-height: 35px;text-align: center;">
+		<span id="reportName">报表</span>
+<!-- 		<div data-role="controlgroup" class="ui-btn-right " data-type="horizontal"  style="margin-top: -10px;">
+			<select name="toggle" id="statisticToggle"data-role="slider" onchange="">
+				<option value="off">按数量</option>
+				<option value="on">按金额</option>
+			</select>
+		</div>
+		 -->
+	    <fieldset id="statisticToggle" data-role="controlgroup" class="ui-btn-right " data-type="horizontal" data-mini="true" style="margin-top: -5px;">
+	        <input type="radio" data-theme="c" name="priceOrAmount" id="radio-price" value="0" checked="checked" onclick="displayPriceOrAmount()">
+	        <label for="radio-price">按金额</label>
+	        <input type="radio" data-theme="c" name="priceOrAmount" id="radio-amount" value="1" onclick="displayPriceOrAmount()">
+	        <label for="radio-amount">按数量</label>
+	    </fieldset>					
 	</div>
 	<div data-role="content" data-theme="c" align="center">
 		<div id="singleReportChart"></div>
@@ -188,7 +216,7 @@
 	</div>
 </div>
 <div data-role="page" id="dailyBusinessStatisticMgr" data-theme="d">
-	<div data-role="header" data-tap-toggle="false" data-theme="b" class="jqm-header" style="line-height: 35px;text-align: center;">
+	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b" class="jqm-header" style="line-height: 35px;text-align: center;">
 		<span id="businessStatisticTitle">每日营业统计</span>
 	</div>
 	<div data-role="content">

@@ -31,8 +31,12 @@ function newPieChart2(c){
             plotBackgroundColor: null,
             plotBorderWidth: null,
             plotShadow: false
+//            ,
+//            type : 'pie',
+//            height : 500
         },
         title: {
+        	margin: c.titleMargin ? c.titleMargin : 15,
             text: c.title
         },
         tooltip: {
@@ -153,6 +157,7 @@ function newColumnChart2(c){
     })	
 }
 
+var orderTypeStatisticParam;
 function getBusinessStatisticsData(c){
 	c = c || {}
 	var begin = c.begin ? c.begin : $('#beginDate').html() + ' 00:00:00';
@@ -183,10 +188,12 @@ function getBusinessStatisticsData(c){
 				
 				var receiveChartData = initChartData();
 				receiveStatistics.forEach(function(e){  
-				    receiveChartData.chartPriceData.data.push([e.payType, e.total]);
+					if(e.total > 0){
+						receiveChartData.chartPriceData.data.push([e.payType, e.total]);
+					}
 				}) 
 				//收款
-				newPieChart2({rt: 'receivePieChart', title : '收款方式比例图', unit: '元', series: receiveChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);
+				newPieChart2({rt: 'receivePieChart', title : '收款方式比例图', unit: '元', series: receiveChartData.chartPriceData}).setSize(pageWidth, pageWidth-10);
 				
 				var deptGeneralPieChartData = initChartData();
 				deptStatistics.forEach(function(e){  
@@ -196,9 +203,10 @@ function getBusinessStatisticsData(c){
 				newPieChart2({rt: 'deptGeneralPieChart', title : '部门汇总比例图', unit: '元', series: deptGeneralPieChartData.chartPriceData, clickHander : function(point){
 			       $.mobile.changePage("#singleReportMgr",
 			        	    { transition: "fade" });
-			        $('#reportName').html(point.name +"报表");
-			        //部门只需一个饼图
+			        $('#reportName').html(point.name +"统计("+ $('#beginDate').text() + " ~ " + $('#endDate').text() + ")");
+			        //部门只需一个饼图 & 隐藏开关
 			        $('#secondReportChart').hide();
+			        $("#statisticToggle").hide();
 			        
 			        Util.lm.show();
 			        //厨房
@@ -248,7 +256,7 @@ function getBusinessStatisticsData(c){
 			        	for (var i = 0; i < rt.root.length; i++) {
 							html.push('<tr><td>{index}</td><td>{name}</td><td>{count}</td><td style="text-align:right;">{money}</td></tr>'.format({
 								index : i+1,
-								name : rt.root[i].food.name,
+								name : rt.root[i].food.name.substring(0, 8),
 								money : rt.root[i].income.toFixed(2),
 								count : rt.root[i].salesAmount
 							}));
@@ -260,7 +268,7 @@ function getBusinessStatisticsData(c){
 			        	$('#display4KitchenTop10').show();
 			        },'json');
 			        
-				}}).setSize(pageWidth-10, pageWidth-10);				
+				}}).setSize(pageWidth, pageWidth-10);				
 				
 				var orderTypeColumnChartData = initChartData();
 				orderTypeColumnChartData.priceColumnChart.xAxis = ['抹数','折扣', '赠送', '退菜', '反结账', '服务费收入'];
@@ -272,157 +280,33 @@ function getBusinessStatisticsData(c){
 				  		if(point.category == "服务费收入"){
 				  			return;
 				  		}
-				  		//操作类型需要两个饼图 & 隐藏菜品top10
-				  		$('#secondReportChart').show();
+				  		//操作类型需要一个或者两个饼图 & 开关 & 隐藏菜品top10
+				  		$("#statisticToggle").show();
+				  		$('#secondReportChart').hide();
 				  		$('#display4KitchenTop10').hide();
+				  		//开关复位
+				  		var myswitch = $('input[name="priceOrAmount"]:checked').val();
+				  		if(myswitch > 0){
+				  			$('input[name="priceOrAmount"]:eq(0)').attr("checked",true).checkboxradio("refresh");
+				  			$('input[name="priceOrAmount"]:eq(1)').attr("checked",false).checkboxradio("refresh");
+				  		}
 				  		
 				        $.mobile.changePage("#singleReportMgr",
 				        	    { transition: "fade" });
 				        $('#reportName').html(point.category+ "报表");
 				        
-				        if(point.category == "折扣"){
-				        	$.post('../../WXQueryBusinessStatistics.do', {
-				        		dataSource:"getDiscountStaffChart",
-				        		oid : Util.mp.oid,
-				        		dateBeg:begin,
-				        		dateEnd:end,
-				        		deptID:-1,
-				        		staffID:-1
-				        	}, function(rt){
-				        		
-								var discountStaffPieChartData = initChartData();
-								rt.root.forEach(function(e){  
-									discountStaffPieChartData.chartPriceData.data.push([e.staffName, e.discountPrice]);
-								}) 
-					        	
-					        	newPieChart2({rt: 'singleReportChart', title : "员工折扣金额比例图", unit: "元", series: discountStaffPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);				        		
-				        	});
-				        	
-				        	$.post('../../WXQueryBusinessStatistics.do', {
-				        		dataSource:"getDiscountDeptChart",
-				        		oid : Util.mp.oid,
-				        		dateBeg:begin,
-				        		dateEnd:end,
-				        		deptID:-1,
-				        		staffID:-1
-				        	}, function(rt){
-				        		
-								var discountDeptPieChartData = initChartData();
-								rt.root.forEach(function(e){  
-									discountDeptPieChartData.chartPriceData.data.push([e.discountDept.name, e.discountPrice]);
-								}) 
-					        	
-					        	newPieChart2({rt: 'secondReportChart', title : "部门折扣金额比例图", unit: "元", series: discountDeptPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);				        		
-				        	});
-				        }else if(point.category == "赠送"){
-				        	$.post('../../WXQueryBusinessStatistics.do', {
-				        		dataSource:"getGiftStaffChart",
-				        		oid : Util.mp.oid,
-				        		dateBeg:begin,
-				        		dateEnd:end,
-				        		deptID:-1,
-				        		staffID:-1
-				        	}, function(rt){
-				        		
-								var giftStaffPieChartData = initChartData();
-								rt.root.forEach(function(e){  
-									giftStaffPieChartData.chartPriceData.data.push([e.giftStaff, e.giftPrice]);
-								}) 
-					        	
-					        	newPieChart2({rt: 'singleReportChart', title : "员工赠送金额比例图", unit: "元", series: giftStaffPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);				        		
-				        	});
-				        	
-				        	$.post('../../WXQueryBusinessStatistics.do', {
-				        		dataSource:"getGiftDeptChart",
-				        		oid : Util.mp.oid,
-				        		dateBeg:begin,
-				        		dateEnd:end,
-				        		deptID:-1,
-				        		staffID:-1
-				        	}, function(rt){
-				        		
-								var giftDeptPieChartData = initChartData();
-								rt.root.forEach(function(e){  
-									giftDeptPieChartData.chartPriceData.data.push([e.giftDept.name, e.giftPrice]);
-								}) 
-					        	
-					        	newPieChart2({rt: 'secondReportChart', title : "部门折扣金额比例图", unit: "元", series: giftDeptPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);				        		
-				        	});
-				        }else if(point.category == "退菜"){
-				        	$.post('../../WXQueryBusinessStatistics.do', {
-				        		dataSource:"getCancelStaffChart",
-				        		oid : Util.mp.oid,
-				        		dateBeg:begin,
-				        		dateEnd:end,
-				        		deptID:-1,
-				        		reasonID:-1,
-				        		staffID:-1
-				        	}, function(rt){
-				        		
-								var cancelStaffPieChartData = initChartData();
-								rt.root.forEach(function(e){  
-									cancelStaffPieChartData.chartPriceData.data.push([e.cancelStaff, e.cancelPrice]);
-								}) 
-					        	
-					        	newPieChart2({rt: 'singleReportChart', title : "员工退菜金额比例图", unit: "元", series: cancelStaffPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);				        		
-				        	});
-				        	
-				        	$.post('../../WXQueryBusinessStatistics.do', {
-				        		dataSource:"getCancelReasonChart",
-				        		oid : Util.mp.oid,
-				        		dateBeg:begin,
-				        		dateEnd:end,
-				        		deptID:-1,
-				        		reasonID:-1,
-				        		staffID:-1
-				        	}, function(rt){
-				        		
-								var cancelReasonPieChartData = initChartData();
-								rt.root.forEach(function(e){  
-									cancelReasonPieChartData.chartPriceData.data.push([e.reason, e.cancelPrice]);
-								}) 
-					        	
-					        	newPieChart2({rt: 'secondReportChart', title : "退菜原因金额比例图", unit: "元", series: cancelReasonPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);				        		
-				        	});
-				        }else if(point.category == "反结账"){
-				        	$.post('../../WXQueryBusinessStatistics.do', {
-				        		dataSource:"getRepaidStaffChart",
-				        		oid : Util.mp.oid,
-				        		dateBeg:begin,
-				        		dateEnd:end,
-				        		staffID:-1
-				        	}, function(rt){
-				        		
-								var repaidStaffPieChartData = initChartData();
-								rt.root.forEach(function(e){  
-									repaidStaffPieChartData.chartPriceData.data.push([e.staffName, e.repaidPrice]);
-								}) 
-					        	
-					        	newPieChart2({rt: 'singleReportChart', title : "员工反结账金额比例图", unit: "元", series: repaidStaffPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);				        		
-				        	});
-				        	
-				        }else if(point.category == "提成"){
-				        	$.post('../../WXQueryBusinessStatistics.do', {
-				        		dataSource:"getCommissionStaffChart",
-				        		oid : Util.mp.oid,
-				        		dateBeg:begin,
-				        		dateEnd:end,
-				        		deptID:-1,
-				        		staffID:-1
-				        	}, function(rt){
-				        		
-								var CommissionStaffPieChartData = initChartData();
-								rt.root.forEach(function(e){  
-									CommissionStaffPieChartData.chartPriceData.data.push([e.staffName, e.commissionPrice]);
-								}) 
-					        	
-					        	newPieChart2({rt: 'singleReportChart', title : "员工提成金额比例图", unit: "元", series: CommissionStaffPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);				        		
-				        	});
-				        	
+				        orderTypeStatisticParam = {
+				        	priceOrAmount : "金额",
+				        	unit : "元",
+				        	switchType : 0,
+				        	point : point,
+				        	begin : begin,
+				        	end : end
 				        }
 				        
+				        orderTpyeSwitch(orderTypeStatisticParam);
 				  	}	
-				}).setSize(pageWidth-10, pageWidth-10);					
+				}).setSize(pageWidth, pageWidth * 1.5);					
 				
 				var memberOpeColumnChartData = initChartData();
 				memberOpeColumnChartData.priceColumnChart.xAxis = ['充值', '退款'];
@@ -438,8 +322,13 @@ function getBusinessStatisticsData(c){
 						
 					var dailyBusinessStatistic = JSON.parse(rt.other.businessChart);
 					var dailyBusinessStatisticColumnChartData = initChartData();
-					dailyBusinessStatisticColumnChartData.priceColumnChart.xAxis = dailyBusinessStatistic.xAxis;
-					dailyBusinessStatisticColumnChartData.priceColumnChart.yAxis.data = dailyBusinessStatistic.ser[0].data; 
+					dailyBusinessStatisticColumnChartData.priceColumnChart.xAxis = dailyBusinessStatistic.xAxis.splice(0, 15);
+					dailyBusinessStatisticColumnChartData.priceColumnChart.yAxis.data = dailyBusinessStatistic.ser[0].data.splice(0, 15); 
+					
+					//总额 & 日均
+					$("#businessTotalMoney").text(dailyBusinessStatistic.totalMoney);
+					$("#businessAvgMoney").text(dailyBusinessStatistic.avgMoney);
+					$("#businessAvgCount").text(dailyBusinessStatistic.avgCount);
 					//每日营业报表条形图
 					newColumnChart2({
 					  	rt: 'dailyBusinessStatisticColumnChart', title : "每日营业统计", series: dailyBusinessStatisticColumnChartData.priceColumnChart.yAxis, xAxis:dailyBusinessStatisticColumnChartData.priceColumnChart.xAxis, dateFormat: true, clickHander : function(point){
@@ -464,17 +353,21 @@ function getBusinessStatisticsData(c){
 								
 								var daily_receiveChartData = initChartData();
 								daily_receiveStatistics.forEach(function(e){  
-									daily_receiveChartData.chartPriceData.data.push([e.payType, e.total]);
+									if(e.total > 0){
+										daily_receiveChartData.chartPriceData.data.push([e.payType, e.total]);
+									}
 								}) 
 								//收款
-								newPieChart2({rt: 'daily_receivePieChart', title : '收款方式比例图', unit: '元', series: daily_receiveChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);
+								newPieChart2({rt: 'daily_receivePieChart', title : '收款方式比例图', unit: '元', series: daily_receiveChartData.chartPriceData}).setSize(pageWidth-10, pageWidth+30);
 								
 								var daily_deptGeneralPieChartData = initChartData();
 								daily_deptStatistics.forEach(function(e){  
-									daily_deptGeneralPieChartData.chartPriceData.data.push([e.dept.name, e.income]);
+									if(e.income > 0){
+										daily_deptGeneralPieChartData.chartPriceData.data.push([e.dept.name, e.income]);
+									}
 								}) 
 								//部门
-								newPieChart2({rt: 'daily_deptGeneralPieChart', title : '部门汇总比例图', unit: '元', series: daily_deptGeneralPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);
+								newPieChart2({rt: 'daily_deptGeneralPieChart', title : '部门汇总比例图', unit: '元', series: daily_deptGeneralPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth+30);
 								
 								var daily_orderTypeColumnChartData = initChartData();
 								daily_orderTypeColumnChartData.priceColumnChart.xAxis = ['抹数','折扣', '赠送', '退菜', '反结账', '服务费收入'];
@@ -490,7 +383,7 @@ function getBusinessStatisticsData(c){
 									//操作类型
 									newColumnChart2({
 									  	rt: 'daily_orderTypeColumnChart', title : '操作类型条形图', series: daily_orderTypeColumnChartData.priceColumnChart.yAxis, xAxis:daily_orderTypeColumnChartData.priceColumnChart.xAxis
-									}).setSize(pageWidth-10, pageWidth-10);	
+									}).setSize(pageWidth-10, pageWidth * 1.5);	
 									//会员
 									newColumnChart2({
 										rt: 'daily_memberOpePieChart', title : '会员操作条形图', series: daily_memberOpeColumnChartData.priceColumnChart.yAxis, xAxis:daily_memberOpeColumnChartData.priceColumnChart.xAxis	
@@ -502,7 +395,7 @@ function getBusinessStatisticsData(c){
 				            });
 				            
 					  	}	
-					}).setSize(pageWidth-10, pageWidth-10);							
+					}).setSize(pageWidth-10, pageWidth * 2);							
 					
 				}
 				
@@ -515,8 +408,9 @@ function getBusinessStatisticsData(c){
 }
 
 $(function () {
-	//默认调用本周
-	changeDate(8);
+	//默认调用本月
+	$("#selectTimes").val(7).selectmenu('refresh');
+	changeDate(7);
 	
 });
 
@@ -599,3 +493,178 @@ function getMonthDays(myMonth){
 	var days = (monthEndDate - monthStartDate)/(1000 * 60 * 60 * 24); 
 	return days; 
 }
+
+//操作类型饼图
+function orderTpyeSwitch(c){
+	Util.lm.show();
+    if(c.point.category == "折扣"){
+    	$.post('../../WXQueryBusinessStatistics.do', {
+    		dataSource:"getDiscountStaffChart",
+    		oid : Util.mp.oid,
+    		dateBeg:c.begin,
+    		dateEnd:c.end,
+    		deptID:-1,
+    		staffID:-1
+    	}, function(rt){
+    		Util.lm.hide();
+			var discountStaffPieChartData = initChartData();
+			rt.root.forEach(function(e){  
+				discountStaffPieChartData.chartPriceData.data.push([e.staffName, e.discountPrice]);
+				discountStaffPieChartData.chartAmountData.data.push([e.staffName, e.discountAmount]);
+			}) 
+        	
+        	newPieChart2({rt: 'singleReportChart', title : "员工折扣" + c.priceOrAmount +"比例图", unit: c.unit, series: c.switchType == 0 ? discountStaffPieChartData.chartPriceData : discountStaffPieChartData.chartAmountData}).setSize(pageWidth-10, pageWidth + 30);				        		
+    	});
+    	
+    	$.post('../../WXQueryBusinessStatistics.do', {
+    		dataSource:"getDiscountDeptChart",
+    		oid : Util.mp.oid,
+    		dateBeg:c.begin,
+    		dateEnd:c.end,
+    		deptID:-1,
+    		staffID:-1
+    	}, function(rt){
+    		
+			var discountDeptPieChartData = initChartData();
+			rt.root.forEach(function(e){  
+				discountDeptPieChartData.chartPriceData.data.push([e.discountDept.name, e.discountPrice]);
+				discountDeptPieChartData.chartAmountData.data.push([e.discountDept.name, e.discountAmount]);
+			}) 
+        	
+        	newPieChart2({rt: 'secondReportChart', title : "部门折扣" + c.priceOrAmount +"比例图", titleMargin : 50, unit: c.unit, series: c.switchType == 0 ? discountDeptPieChartData.chartPriceData : discountDeptPieChartData.chartAmountData}).setSize(pageWidth-10, pageWidth + 30);
+			$('#secondReportChart').show();
+    	});
+    }else if(c.point.category == "赠送"){
+    	Util.lm.show();
+    	$.post('../../WXQueryBusinessStatistics.do', {
+    		dataSource:"getGiftStaffChart",
+    		oid : Util.mp.oid,
+    		dateBeg:c.begin,
+    		dateEnd:c.end,
+    		deptID:-1,
+    		staffID:-1
+    	}, function(rt){
+    		Util.lm.hide();
+			var giftStaffPieChartData = initChartData();
+			rt.root.forEach(function(e){  
+				giftStaffPieChartData.chartPriceData.data.push([e.giftStaff, e.giftPrice]);
+				giftStaffPieChartData.chartAmountData.data.push([e.giftStaff, e.giftAmount]);
+			}) 
+        	
+        	newPieChart2({rt: 'singleReportChart', title : "员工赠送" + c.priceOrAmount +"比例图", unit: c.unit, series: c.switchType == 0 ?giftStaffPieChartData.chartPriceData : giftStaffPieChartData.chartAmountData}).setSize(pageWidth-10, pageWidth + 30);				        		
+    	});
+    	
+    	$.post('../../WXQueryBusinessStatistics.do', {
+    		dataSource:"getGiftDeptChart",
+    		oid : Util.mp.oid,
+    		dateBeg:c.begin,
+    		dateEnd:c.end,
+    		deptID:-1,
+    		staffID:-1
+    	}, function(rt){
+    		
+			var giftDeptPieChartData = initChartData();
+			rt.root.forEach(function(e){  
+				giftDeptPieChartData.chartPriceData.data.push([e.giftDept.name, e.giftPrice]);
+				giftDeptPieChartData.chartAmountData.data.push([e.giftDept.name, e.giftAmount]);
+			}) 
+        	
+        	newPieChart2({rt: 'secondReportChart', title : "部门赠送" + c.priceOrAmount +"比例图", titleMargin : 50, unit: c.unit, series: c.switchType == 0 ? giftDeptPieChartData.chartPriceData : giftDeptPieChartData.chartAmountData }).setSize(pageWidth-10, pageWidth + 30);
+			$('#secondReportChart').show();
+    	});
+    }else if(c.point.category == "退菜"){
+    	Util.lm.show();
+    	$.post('../../WXQueryBusinessStatistics.do', {
+    		dataSource:"getCancelStaffChart",
+    		oid : Util.mp.oid,
+    		dateBeg:c.begin,
+    		dateEnd:c.end,
+    		deptID:-1,
+    		reasonID:-1,
+    		staffID:-1
+    	}, function(rt){
+    		Util.lm.hide();
+			var cancelStaffPieChartData = initChartData();
+			rt.root.forEach(function(e){  
+				cancelStaffPieChartData.chartPriceData.data.push([e.cancelStaff, e.cancelPrice]);
+				cancelStaffPieChartData.chartAmountData.data.push([e.cancelStaff, e.cancelAmount]);
+			}) 
+        	
+        	newPieChart2({rt: 'singleReportChart', title : "员工退菜" + c.priceOrAmount +"比例图", unit: c.unit, series: c.switchType == 0 ?cancelStaffPieChartData.chartPriceData:cancelStaffPieChartData.chartAmountData}).setSize(pageWidth-10, pageWidth + 30);				        		
+    	});
+    	
+    	$.post('../../WXQueryBusinessStatistics.do', {
+    		dataSource:"getCancelReasonChart",
+    		oid : Util.mp.oid,
+    		dateBeg:c.begin,
+    		dateEnd:c.end,
+    		deptID:-1,
+    		reasonID:-1,
+    		staffID:-1
+    	}, function(rt){
+    		
+			var cancelReasonPieChartData = initChartData();
+			rt.root.forEach(function(e){  
+				cancelReasonPieChartData.chartPriceData.data.push([e.reason, e.cancelPrice]);
+				cancelReasonPieChartData.chartAmountData.data.push([e.reason, e.cancelAmount]);
+			}) 
+        	
+        	newPieChart2({rt: 'secondReportChart', title : "退菜原因" + c.priceOrAmount +"比例图", titleMargin : 50, unit: c.unit, series: c.switchType == 0 ?cancelReasonPieChartData.chartPriceData:cancelReasonPieChartData.chartAmountData}).setSize(pageWidth-10, pageWidth + 30);
+			$('#secondReportChart').show();
+    	});
+    }else if(c.point.category == "反结账"){
+    	Util.lm.show();
+    	$.post('../../WXQueryBusinessStatistics.do', {
+    		dataSource:"getRepaidStaffChart",
+    		oid : Util.mp.oid,
+    		dateBeg:c.begin,
+    		dateEnd:c.end,
+    		staffID:-1
+    	}, function(rt){
+    		Util.lm.hide();
+			var repaidStaffPieChartData = initChartData();
+			rt.root.forEach(function(e){  
+				repaidStaffPieChartData.chartPriceData.data.push([e.staffName, e.repaidPrice]);
+				repaidStaffPieChartData.chartAmountData.data.push([e.staffName, e.repaidAmount]);
+			}) 
+        	
+        	newPieChart2({rt: 'singleReportChart', title : "员工反结账" + c.priceOrAmount +"比例图", unit: c.unit, series: c.switchType == 0 ?repaidStaffPieChartData.chartPriceData :repaidStaffPieChartData.chartAmountData}).setSize(pageWidth-10, pageWidth + 30);				        		
+    	});
+    	
+    }else if(c.point.category == "提成"){
+    	Util.lm.show();
+    	$.post('../../WXQueryBusinessStatistics.do', {
+    		dataSource:"getCommissionStaffChart",
+    		oid : Util.mp.oid,
+    		dateBeg:c.begin,
+    		dateEnd:c.end,
+    		deptID:-1,
+    		staffID:-1
+    	}, function(rt){
+    		Util.lm.hide();
+			var commissionStaffPieChartData = initChartData();
+			rt.root.forEach(function(e){  
+				commissionStaffPieChartData.chartPriceData.data.push([e.staffName, e.commissionPrice]);
+				commissionStaffPieChartData.chartAmountData.data.push([e.staffName, e.commissionAmount]);
+			}) 
+        	
+        	newPieChart2({rt: 'singleReportChart', title : "员工提成" + c.priceOrAmount +"比例图", unit: c.unit, series: c.switchType == 0 ?commissionStaffPieChartData.chartPriceData:commissionStaffPieChartData.chartAmountData}).setSize(pageWidth-10, pageWidth + 30);				        		
+    	});
+    	
+    }	
+	
+}
+
+function displayPriceOrAmount(){
+	$('input[name="priceOrAmount"]').each(function(){
+		if(this.checked){
+			orderTypeStatisticParam.priceOrAmount = this.value == 0? "金额" : "数量";
+			orderTypeStatisticParam.unit = this.value == 0? "元" : "份";
+			orderTypeStatisticParam.switchType = this.value;
+			console.log(orderTypeStatisticParam)
+			orderTpyeSwitch(orderTypeStatisticParam);
+		}
+	});
+}
+
+
