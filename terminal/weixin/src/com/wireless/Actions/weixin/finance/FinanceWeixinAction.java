@@ -852,7 +852,7 @@ public class FinanceWeixinAction extends Action {
 		Button b3 = new Button.ClickBuilder("月报", "AAA")
 //							.addChild(new Button.ClickBuilder("本月报表", THIS_MONTH_EVENT_KEY))
 //							.addChild(new Button.ClickBuilder("上月报表", LAST_MONTH_EVENT_KEY))
-							.addChild(new Button.ViewBuilder("营业报表", "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx49b3278a8728ff76&redirect_uri=http://http://wx.e-tones.net/wx-term/weixin/order/linkToStatistics.html&response_type=code&scope=snsapi_base&state=1#wechat_redirect"))
+							.addChild(new Button.ViewBuilder("营业报表", "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx49b3278a8728ff76&redirect_uri=wx.e-tones.net/wx-term/weixin/order/linkToStatistics.html&response_type=code&scope=snsapi_base&state=1#wechat_redirect"))
 							.build();
 		menu.set3rdButton(b3);
 		
