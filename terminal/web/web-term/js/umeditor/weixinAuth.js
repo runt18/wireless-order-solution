@@ -162,7 +162,9 @@ $(function (){
     $('#weixinEditorDisplay').height(stepH);
     //欢迎活动示例
     $('#wxActiveEditorDisplay').height(stepH);
-    $('#wxActiveEditor').height(stepH - 275);
+//    $('#wxActiveEditor').height(stepH - 275);
+    $('#container4WxActiveEditor').height(stepH - 210);
+    $('#container4WxActiveEditor').css("overflow-x", "hidden");
     //上传菜品示例
     $('#uploadFoodImgDisplay').height(stepH);
     $('#uploadFoodImgCmp').height(stepH - 50);
@@ -744,7 +746,8 @@ function choosePromotionModel(promotionType){
 		Ext.getCmp('wxActive_secendStep2CouponDetail').hide();
 		Ext.getCmp('wxActive_secendStep2SelectCoupon').hide();
 //		Ext.getCmp('secondStep_edit').setHeight(440);
-		Ext.get('wxActiveEditor').setHeight(stepH - 160);
+//		Ext.get('wxActiveEditor').setHeight(stepH - 160);
+		$('#container4WxActiveEditor').height(stepH - 100);
 		
 		
 	}else if(promotionType == 2){
@@ -752,7 +755,8 @@ function choosePromotionModel(promotionType){
 		Ext.getCmp('wxActive_secendStep2CouponDetail').show();
 		Ext.getCmp('wxActive_secendStep2SelectCoupon').show();
 		
-		Ext.get('wxActiveEditor').setHeight(stepH - 275);
+//		Ext.get('wxActiveEditor').setHeight(stepH - 275);
+		$('#container4WxActiveEditor').height(stepH - 210);
 		
 	}
 }
