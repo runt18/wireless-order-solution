@@ -275,7 +275,7 @@ function getBusinessStatisticsData(c){
 				//操作类型
 				newColumnChart2({
 				  	rt: 'orderTypeColumnChart', title : '操作类型条形图', series: orderTypeColumnChartData.priceColumnChart.yAxis, xAxis:orderTypeColumnChartData.priceColumnChart.xAxis, clickHander : function(point){
-				  		if(point.category == "服务费收入"){
+				  		if(point.category == "服务费收入" || point.category == "抹数"){
 				  			return;
 				  		}
 				  		//操作类型需要一个或者两个饼图 & 开关 & 隐藏菜品top10

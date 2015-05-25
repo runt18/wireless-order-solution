@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
+<script type="text/javascript">
+//从url获取当前桌信息
+function Util_urlParaQuery() {
+	var name, value, i, key = 0;
+	var str = location.href;
+	
+	if(str.indexOf("#") > 0){
+		str = str.substring(0,str.indexOf("#"));
+	}
+	var num = str.indexOf("?");
+	if(num > 0){
+		str = str.substr(num + 1);
+		var arrtmp = str.split("&");
+		for (i = 0; i < arrtmp.length; i++) {
+			num = arrtmp[i].indexOf("=");
+			if (num > 0) {
+				name = arrtmp[i].substring(0, num);
+				value = arrtmp[i].substr(num + 1);
+				this[name] = value;
+			}
+		}
+	}
+}
+
+var Request = new Util_urlParaQuery();
+var code = Request["code"];
+
+$.ajax({
+	url : '../../WXInterface.do',
+	dataType : 'json',
+	data : {
+		dataSource : 'getOpenid',
+		code: code
+	},
+	success : function(data, status, xhr){
+		location.href = document.domain + "/wx-term/weixin/order/generalReport.html?m=" + data + "&time=" + new Date().getTime();
+	},
+	error : function(xhr, errorType, error){
+		alert('操作失误, 请重新进入');
+	}
+});
+
+</script>
+</head>
+<body>
+正在进入报表...
+</body>
+</html>
