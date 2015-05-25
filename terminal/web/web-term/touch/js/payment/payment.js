@@ -127,8 +127,8 @@ function showPaymentMgr(c){
 			Util.msg.alert({msg:"抹数金额大于设置上限，不能结帐!", topTip:true,fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();}});
 			return;
 		}			
-		
-		$('#shouldPay').html((checkOut_actualPrice * 10000 - eraseQuota * 10000)/10000);
+		checkOut_actualPrice = (checkOut_actualPrice * 10000 - eraseQuota * 10000)/10000;
+		$('#shouldPay').html(checkOut_actualPrice);
 		
 	});
 	

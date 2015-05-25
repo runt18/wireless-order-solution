@@ -716,10 +716,17 @@ of.initNewFoodContent = function(c){
 	var temp = null, tempUnitPrice = 0;
 	for(var i = 0; i < of.newFood.length; i++){
 		temp = of.newFood[i];
-		tempUnitPrice = typeof temp.tasteGroup.price != 'number' ? 0 : parseFloat(temp.unitPrice + temp.tasteGroup.price);
-		
 		sumCount += temp.count;
-		sumPrice += temp.count * tempUnitPrice;
+		//称重属性是整个菜加口味价钱, 不是每份菜
+		if((temp.status & 1 << 7) != 0){
+			tempUnitPrice = temp.unitPrice;
+			var tasteGroupPrice = typeof temp.tasteGroup.price != 'number' ? 0 :  temp.tasteGroup.price;
+			sumPrice += (temp.count * tempUnitPrice) + tasteGroupPrice;
+		}else{
+			tempUnitPrice = typeof temp.tasteGroup.price != 'number' ? 0 : parseFloat(temp.unitPrice + temp.tasteGroup.price);
+			
+			sumPrice += temp.count * tempUnitPrice;
+		}
 		
 		var foodStatus = '';
 		if(typeof temp.isHangup == 'boolean' && temp.isHangup){
@@ -1362,7 +1369,11 @@ function initTasteCmp(c){
 	if(c && c.event){
 		var tGroup = $(c.event);
 		var glist = $('#tasteGroupCmp a');
-		tastesDate = of.tasteGroups[parseInt(tGroup.attr('data-index'))].items;
+		of.tasteGroups.forEach(function(e){
+			if(e.id == tGroup.data("value")){
+				tastesDate = e.items;
+			}
+		});
 		
 		//刷新样式
 		glist.attr('data-theme', 'b');

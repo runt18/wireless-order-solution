@@ -2206,12 +2206,15 @@ ts.member.rechargeControlCenter = function(_c){
 	_c = _c == null || typeof _c == 'undefined' ? {} : _c;
 	
 	if(ts.member.rechargeMember == null || typeof ts.member.rechargeMember == 'undefined'){
-		Ext.example.msg('提示', '未读取会员信息, 请先刷卡.');
+		Util.msg.tip('未读取会员信息, 请先刷卡.');
 		return;
 	}
 	
 	if(ts.member.rechargeMember.memberType.attributeValue != 0){
-		Ext.example.msg('提示', '优惠属性会员不允许充值, 请重新刷卡.');
+		Util.msg.alert({
+			renderTo : 'tableSelectMgr',
+			msg : '积分属性会员不允许充值, 请重新刷卡.'
+		});
 		return;
 	}
 	
