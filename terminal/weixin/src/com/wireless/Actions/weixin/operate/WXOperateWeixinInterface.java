@@ -11,6 +11,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Formatter;
 import java.util.UUID;
 
@@ -284,7 +285,8 @@ public class WXOperateWeixinInterface extends DispatchAction{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(token.getOpenid());
+			String path = "http://" + request.getLocalAddr() + "/wx-term/weixin/order/generalReport.html?m=" + token.getOpenid() + "&time=" + new Date().getTime();
+			response.getWriter().print(path);
 		}
 		return null;
 	}	
