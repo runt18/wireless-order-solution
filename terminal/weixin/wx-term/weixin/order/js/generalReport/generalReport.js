@@ -1,3 +1,5 @@
+var Request = new Util_urlParaQuery();
+var restName = Request["restName"];
 var pageWidth ;
 
 initChartData = function(c){
@@ -35,6 +37,9 @@ function newPieChart2(c){
         title: {
         	margin: c.titleMargin ? c.titleMargin : 15,
             text: c.title
+        },
+        subtitle: {
+            text: c.subtitle ? c.subtitle : ''
         },
         tooltip: {
         	enabled : c.tooltip ? true : false,
@@ -190,14 +195,14 @@ function getBusinessStatisticsData(c){
 					}
 				}) 
 				//收款
-				newPieChart2({rt: 'receivePieChart', title : '收款方式比例图', unit: '元', series: receiveChartData.chartPriceData});
+				newPieChart2({rt: 'receivePieChart', title : '收款方式统计', unit: '元', series: receiveChartData.chartPriceData}).setSize(pageWidth-10, pageWidth+10);
 				
 				var deptGeneralPieChartData = initChartData();
 				deptStatistics.forEach(function(e){  
 				    deptGeneralPieChartData.chartPriceData.data.push([e.dept.name, e.income]);
 				}) 
 				//部门
-				newPieChart2({rt: 'deptGeneralPieChart', title : '部门汇总比例图', unit: '元', series: deptGeneralPieChartData.chartPriceData, clickHander : function(point){
+				newPieChart2({rt: 'deptGeneralPieChart', title : '各部门营业统计', subtitle : '点击饼图查看各厨房营业', unit: '元', series: deptGeneralPieChartData.chartPriceData, clickHander : function(point){
 			       $.mobile.changePage("#singleReportMgr",
 			        	    { transition: "fade" });
 			        $('#reportName').html(point.name +"统计("+ $('#beginDate').text() + " ~ " + $('#endDate').text() + ")");
@@ -225,7 +230,7 @@ function getBusinessStatisticsData(c){
 							kitchenPieChartData.chartPriceData.data.push([e.kitchen.name, e.income]);
 						}) 
 			        	
-			        	newPieChart2({rt: 'singleReportChart', title : "厨房金额比例图", unit: "元", series: kitchenPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth-10);
+			        	newPieChart2({rt: 'singleReportChart', title : "各厨房营业统计", unit: "元", series: kitchenPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth+30);
 					    
 			        },'json');
 			        
@@ -266,7 +271,7 @@ function getBusinessStatisticsData(c){
 			        	$('#display4KitchenTop10').show();
 			        },'json');
 			        
-				}});				
+				}}).setSize(pageWidth-10, pageWidth+10);				
 				
 				var orderTypeColumnChartData = initChartData();
 				orderTypeColumnChartData.priceColumnChart.xAxis = ['抹数','折扣', '赠送', '退菜', '反结账', '服务费收入'];
@@ -274,7 +279,7 @@ function getBusinessStatisticsData(c){
 				
 				//操作类型
 				newColumnChart2({
-				  	rt: 'orderTypeColumnChart', title : '操作类型条形图', series: orderTypeColumnChartData.priceColumnChart.yAxis, xAxis:orderTypeColumnChartData.priceColumnChart.xAxis, clickHander : function(point){
+				  	rt: 'orderTypeColumnChart', title : '操作类型统计', subtitle : '点击条形图查看详情', series: orderTypeColumnChartData.priceColumnChart.yAxis, xAxis:orderTypeColumnChartData.priceColumnChart.xAxis, clickHander : function(point){
 				  		if(point.category == "服务费收入" || point.category == "抹数"){
 				  			return;
 				  		}
@@ -313,7 +318,7 @@ function getBusinessStatisticsData(c){
 				
 				//会员
 				newColumnChart2({
-					rt: 'memberOpePieChart', title : '会员操作条形图', series: memberOpeColumnChartData.priceColumnChart.yAxis, xAxis:memberOpeColumnChartData.priceColumnChart.xAxis	
+					rt: 'memberOpePieChart', title : '会员充值|退款统计', series: memberOpeColumnChartData.priceColumnChart.yAxis, xAxis:memberOpeColumnChartData.priceColumnChart.xAxis	
 				}).setSize(pageWidth-10, pageWidth-10);
 				
 				
@@ -330,7 +335,7 @@ function getBusinessStatisticsData(c){
 					$("#businessAvgCount").text(dailyBusinessStatistic.avgCount);
 					//每日营业报表条形图
 					newColumnChart2({
-					  	rt: 'dailyBusinessStatisticColumnChart', title : "每日营业统计", series: dailyBusinessStatisticColumnChartData.priceColumnChart.yAxis, xAxis:dailyBusinessStatisticColumnChartData.priceColumnChart.xAxis, dateFormat: true, clickHander : function(point){
+					  	rt: 'dailyBusinessStatisticColumnChart', title : "每日营业统计", subtitle : '点击条形图查看详情', series: dailyBusinessStatisticColumnChartData.priceColumnChart.yAxis, xAxis:dailyBusinessStatisticColumnChartData.priceColumnChart.xAxis, dateFormat: true, clickHander : function(point){
 				            $.mobile.changePage("#dailyBusinessStatisticMgr",
 				            	    { transition: "fade" });
 				            $('#businessStatisticTitle').html("每日营业统计(" + point.category + ")" );
@@ -357,7 +362,7 @@ function getBusinessStatisticsData(c){
 									}
 								}) 
 								//收款
-								newPieChart2({rt: 'daily_receivePieChart', title : '收款方式比例图', unit: '元', series: daily_receiveChartData.chartPriceData}).setSize(pageWidth-10, pageWidth+30);
+								newPieChart2({rt: 'daily_receivePieChart', title : '收款方式统计', unit: '元', series: daily_receiveChartData.chartPriceData}).setSize(pageWidth-10, pageWidth+30);
 								
 								var daily_deptGeneralPieChartData = initChartData();
 								daily_deptStatistics.forEach(function(e){  
@@ -366,7 +371,7 @@ function getBusinessStatisticsData(c){
 									}
 								}) 
 								//部门
-								newPieChart2({rt: 'daily_deptGeneralPieChart', title : '部门汇总比例图', unit: '元', series: daily_deptGeneralPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth+30);
+								newPieChart2({rt: 'daily_deptGeneralPieChart', title : '各部门营业统计', unit: '元', series: daily_deptGeneralPieChartData.chartPriceData}).setSize(pageWidth-10, pageWidth+30);
 								
 								var daily_orderTypeColumnChartData = initChartData();
 								daily_orderTypeColumnChartData.priceColumnChart.xAxis = ['抹数','折扣', '赠送', '退菜', '反结账', '服务费收入'];
@@ -381,11 +386,11 @@ function getBusinessStatisticsData(c){
 								setTimeout(function(){
 									//操作类型
 									newColumnChart2({
-									  	rt: 'daily_orderTypeColumnChart', title : '操作类型条形图', series: daily_orderTypeColumnChartData.priceColumnChart.yAxis, xAxis:daily_orderTypeColumnChartData.priceColumnChart.xAxis
+									  	rt: 'daily_orderTypeColumnChart', title : '操作类型统计', series: daily_orderTypeColumnChartData.priceColumnChart.yAxis, xAxis:daily_orderTypeColumnChartData.priceColumnChart.xAxis
 									}).setSize(pageWidth-10, pageWidth * 1.5);	
 									//会员
 									newColumnChart2({
-										rt: 'daily_memberOpePieChart', title : '会员操作条形图', series: daily_memberOpeColumnChartData.priceColumnChart.yAxis, xAxis:daily_memberOpeColumnChartData.priceColumnChart.xAxis	
+										rt: 'daily_memberOpePieChart', title : '会员充值|退款统计', series: daily_memberOpeColumnChartData.priceColumnChart.yAxis, xAxis:daily_memberOpeColumnChartData.priceColumnChart.xAxis	
 									}).setSize(pageWidth-10, pageWidth-10);	
 									
 								}, 250);
@@ -407,6 +412,9 @@ function getBusinessStatisticsData(c){
 }
 
 $(function () {
+	if(restName){
+		$('#generalTitle').text('营业统计(' + restName + ')');
+	}
 	pageWidth = $(window).width();
 	//默认调用本月
 	$("#selectTimes").val(7).selectmenu('refresh');
@@ -429,7 +437,7 @@ function changeDate(value){
 		
 	}else if(value == 1){//前一天
 		now.setDate(now.getDate()-1);
-		dateEnd.setValue(now);
+		$('#endDate').html(now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate());
 	}else if(value == 2){//最近7天
 		now.setDate(now.getDate()-7);
 	}else if(value == 3){//最近一个月
@@ -453,7 +461,7 @@ function changeDate(value){
 		
 	}else if(value == 6){//上周
 		now.setDate(now.getDate() - nowDayOfWeek);
-		dateEnd.setValue(now);
+		$('#endDate').html(now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate());
 		now.setDate(now.getDate() - 6);
 	}else if(value == 7){//本月
 		//为避免当天无数据显示, 删除当天 
