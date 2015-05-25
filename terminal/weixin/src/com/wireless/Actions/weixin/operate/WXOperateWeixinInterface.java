@@ -269,8 +269,8 @@ public class WXOperateWeixinInterface extends DispatchAction{
 	public ActionForward getOpenid(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		final String APP_ID = "wx49b3278a8728ff76";
-		final String APP_SECRET = "0ba130d87e14a1a37e20c78a2b0ee3ba";
+		final String APP_ID = "wx6fde9cd2c7fc791e";
+		final String APP_SECRET = "0a360a43b80e3a334e5e52da706a3134";
 		
 		String code = request.getParameter("code");
 		
