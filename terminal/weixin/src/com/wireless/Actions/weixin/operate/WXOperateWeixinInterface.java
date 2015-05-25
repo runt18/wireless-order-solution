@@ -278,23 +278,50 @@ public class WXOperateWeixinInterface extends DispatchAction{
 		
 		String code = request.getParameter("code");
 		AccessToken token = null;
-		Restaurant rest = null;
+		int rid = 0;
 		try {
 			String json = HttpRequest("https://api.weixin.qq.com/sns/oauth2/access_token?appid="+ APP_ID +"&secret="+ APP_SECRET +"&code="+ code +"&grant_type=authorization_code");
 
 			token = JObject.parse(AccessToken.JSON_CREATOR, 0, json);
 			
-			int rid = WeixinFinanceDao.getRestaurantIdByWeixin(token.getOpenid());
-			rest = RestaurantDao.getById(rid);
-			
+			rid = WeixinFinanceDao.getRestaurantIdByWeixin(token.getOpenid());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
-			String path = "http://" + request.getLocalAddr() + "/wx-term/weixin/order/generalReport.html?m=" + token.getOpenid() + "&restName="+ rest.getName() +"&time=" + new Date().getTime();
+			String path = "http://" + request.getLocalAddr() + "/wx-term/weixin/order/generalReport.html?m=" + token.getOpenid() + "&rid=" + rid +"&time=" + new Date().getTime();
 			response.getWriter().print(path);
 		}
 		return null;
 	}	
+	
+	/**
+	 * 获取餐厅信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getRestaurant(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		String rid = request.getParameter("rid");
+		JObject jobject = new JObject();
+		try {
+			
+			Restaurant r = RestaurantDao.getById(Integer.parseInt(rid));
+			jobject.setRoot(r);
+		} catch (Exception e) {
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}		
+	
 
 	private static String HttpRequest(String requestUrl) {
         StringBuilder sb = new StringBuilder();
