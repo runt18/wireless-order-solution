@@ -27,12 +27,15 @@ import org.marker.weixin.api.Token;
 
 import com.wireless.Actions.weixin.auth.AuthParam;
 import com.wireless.db.DBCon;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.finance.WeixinFinanceDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
@@ -274,18 +277,20 @@ public class WXOperateWeixinInterface extends DispatchAction{
 		final String APP_SECRET = "0a360a43b80e3a334e5e52da706a3134";
 		
 		String code = request.getParameter("code");
-		
 		AccessToken token = null;
+		Restaurant rest = null;
 		try {
 			String json = HttpRequest("https://api.weixin.qq.com/sns/oauth2/access_token?appid="+ APP_ID +"&secret="+ APP_SECRET +"&code="+ code +"&grant_type=authorization_code");
 
-			System.out.println("openid=" + json);
+			token = JObject.parse(AccessToken.JSON_CREATOR, 0, json);
 			
-			token = JObject.parse(AccessToken.JSON_CREATOR, 0, json);				
+			int rid = WeixinFinanceDao.getRestaurantIdByWeixin(token.getOpenid());
+			rest = RestaurantDao.getById(rid);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
-			String path = "http://" + request.getLocalAddr() + "/wx-term/weixin/order/generalReport.html?m=" + token.getOpenid() + "&time=" + new Date().getTime();
+			String path = "http://" + request.getLocalAddr() + "/wx-term/weixin/order/generalReport.html?m=" + token.getOpenid() + "&restName="+ rest.getName() +"&time=" + new Date().getTime();
 			response.getWriter().print(path);
 		}
 		return null;
