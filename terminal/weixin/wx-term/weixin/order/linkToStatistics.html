@@ -42,8 +42,8 @@ $.ajax({
 		location.href = document.domain + "/wx-term/weixin/order/generalReport.html?m=" + data + "&time=" + new Date().getTime();
 	},
 	error : function(xhr, errorType, error){
-		alert(JSON.stringify(xhr));
-		alert('操作失误, 请重新进入');
+		//alert(JSON.stringify(xhr));
+		location.href = xhr.responseText;
 	}
 });
 
