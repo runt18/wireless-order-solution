@@ -1,5 +1,5 @@
 var Request = new Util_urlParaQuery();
-var restName = Request["restName"];
+var rid = Request["rid"];
 var pageWidth ;
 
 initChartData = function(c){
@@ -39,7 +39,11 @@ function newPieChart2(c){
             text: c.title
         },
         subtitle: {
-            text: c.subtitle ? c.subtitle : ''
+            text: c.subtitle ? c.subtitle : '',
+    		style : {
+    			color: 'blue',
+                fontWeight: 'bold'
+    		}
         },
         tooltip: {
         	enabled : c.tooltip ? true : false,
@@ -86,7 +90,14 @@ function newColumnChart2(c){
         },                                                                 
         title: {                                                           
             text: c.title                   
-        },                                                                 
+        },      
+        subtitle: {
+            text: c.subtitle ? c.subtitle : '',
+    		style : {
+    			color: 'blue',
+                fontWeight: 'bold'
+    		}
+        },        
         xAxis: {                                                           
             categories: c.xAxis,
             title: {                                                       
@@ -412,9 +423,14 @@ function getBusinessStatisticsData(c){
 }
 
 $(function () {
-	if(restName){
-		$('#generalTitle').text('营业统计(' + restName + ')');
-	}
+	$.post('../../WXInterface.do', {
+		dataSource : 'getRestaurant',
+		rid : rid
+	}, function(rt){
+		if(rt.success){
+			$('#generalTitle').text('营业统计(' + rt.root[0].name + ')');
+		}
+	}, "json")
 	pageWidth = $(window).width();
 	//默认调用本月
 	$("#selectTimes").val(7).selectmenu('refresh');
