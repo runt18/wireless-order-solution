@@ -79,8 +79,10 @@ import com.wireless.util.DateType;
 
 public class FinanceWeixinAction extends Action {
 	
-	final static String APP_ID = "wx6fde9cd2c7fc791e";
-	final static String APP_SECRET = "0a360a43b80e3a334e5e52da706a3134";
+	final static String APP_ID = "wx49b3278a8728ff76";
+	final static String APP_SECRET = "0ba130d87e14a1a37e20c78a2b0ee3ba";
+//	final static String APP_ID = "wx6fde9cd2c7fc791e";
+//	final static String APP_SECRET = "0a360a43b80e3a334e5e52da706a3134";
 	//FIXME just 4 test
 	//final static String APP_ID = "wxa7b4687daedda86f";
 	//final static String APP_SECRET = "4322fbf1c4bba4cccd90424e2e16306b";
@@ -848,8 +850,9 @@ public class FinanceWeixinAction extends Action {
 		menu.set2ndButton(b2);
 
 		Button b3 = new Button.ClickBuilder("月报", "AAA")
-							.addChild(new Button.ClickBuilder("本月报表", THIS_MONTH_EVENT_KEY))
-							.addChild(new Button.ClickBuilder("上月报表", LAST_MONTH_EVENT_KEY))
+//							.addChild(new Button.ClickBuilder("本月报表", THIS_MONTH_EVENT_KEY))
+//							.addChild(new Button.ClickBuilder("上月报表", LAST_MONTH_EVENT_KEY))
+							.addChild(new Button.ViewBuilder("营业报表", "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx49b3278a8728ff76&redirect_uri=http://http://wx.e-tones.net/wx-term/weixin/order/linkToStatistics.html&response_type=code&scope=snsapi_base&state=1#wechat_redirect"))
 							.build();
 		menu.set3rdButton(b3);
 		

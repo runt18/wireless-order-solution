@@ -96,6 +96,65 @@ public class WXOperateWeixinInterface extends DispatchAction{
 		
 	}	
 	
+	public static class AccessToken implements Jsonable{
+		private String access_token;
+		private String refresh_token;
+		private String openid;
+
+
+		public String getAccess_token() {
+			return access_token;
+		}
+
+		public void setAccess_token(String access_token) {
+			this.access_token = access_token;
+		}
+
+		public String getRefresh_token() {
+			return refresh_token;
+		}
+
+		public void setRefresh_token(String refresh_token) {
+			this.refresh_token = refresh_token;
+		}
+
+		public String getOpenid() {
+			return openid;
+		}
+
+		public void setOpenid(String openid) {
+			this.openid = openid;
+		}
+
+		public static Jsonable.Creator<AccessToken> getJSON_CREATOR() {
+			return JSON_CREATOR;
+		}
+
+		public static void setJSON_CREATOR(Jsonable.Creator<AccessToken> jSON_CREATOR) {
+			JSON_CREATOR = jSON_CREATOR;
+		}
+
+		public static Jsonable.Creator<AccessToken> JSON_CREATOR = new Jsonable.Creator<AccessToken>() {
+			@Override
+			public AccessToken newInstance() {
+				return new AccessToken();
+			}
+		};		
+		
+		@Override
+		public JsonMap toJsonMap(int flag) {
+			return null;
+		}
+
+		@Override
+		public void fromJsonMap(JsonMap jsonMap, int flag) {
+			setAccess_token(jsonMap.getString("access_token"));
+			setRefresh_token(jsonMap.getString("refresh_token"));
+			setOpenid(jsonMap.getString("openid"));
+		}
+		
+	}		
+	
 	/**
 	 * 
 	 * @param mapping
@@ -197,6 +256,38 @@ public class WXOperateWeixinInterface extends DispatchAction{
 		return null;
 	}
 	
+	
+	/**
+	 * 获取OpenId
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getOpenid(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		final String APP_ID = "wx49b3278a8728ff76";
+		final String APP_SECRET = "0ba130d87e14a1a37e20c78a2b0ee3ba";
+		
+		String code = request.getParameter("code");
+		
+		AccessToken token = null;
+		try {
+			String json = HttpRequest("https://api.weixin.qq.com/sns/oauth2/access_token?appid="+ APP_ID +"&secret="+ APP_SECRET +"&code="+ code +"&grant_type=authorization_code");
+
+			System.out.println("openid=" + json);
+			
+			token = JObject.parse(AccessToken.JSON_CREATOR, 0, json);				
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(token.getOpenid());
+		}
+		return null;
+	}	
 
 	private static String HttpRequest(String requestUrl) {
         StringBuilder sb = new StringBuilder();
