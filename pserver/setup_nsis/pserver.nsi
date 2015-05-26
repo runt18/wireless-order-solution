@@ -101,9 +101,12 @@ Section "MainSection" SEC01
   File "..\releasenote.txt"
   File "uninst.ico"
   File "rn.ico"
+  ;create start-menu items
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME} ${PRODUCT_VERSION}"
   CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME} ${PRODUCT_VERSION}\${PRODUCT_NAME}.lnk" "$INSTDIR\${EXECUTE_FILE}"
   CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME} ${PRODUCT_VERSION}\°æ±¾ÀúÊ·.lnk" "$INSTDIR\releasenote.txt" "" "$INSTDIR\rn.ico"
+  ;create desktop shortcut
+  CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\${EXECUTE_FILE}"
 SectionEnd
 
 Section -AdditionalIcons
@@ -172,6 +175,10 @@ Section Uninstall
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
   DeleteRegValue HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Run\" "PServer"
+  
+  ;Delete desktop shortcut
+  Delete "$DESKTOP\${PRODUCT_NAME}.lnk"
+  
   SetAutoClose true
 SectionEnd
 
