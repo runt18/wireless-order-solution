@@ -79,13 +79,8 @@ import com.wireless.util.DateType;
 
 public class FinanceWeixinAction extends Action {
 	
-	final static String APP_ID = "wx49b3278a8728ff76";
-	final static String APP_SECRET = "0ba130d87e14a1a37e20c78a2b0ee3ba";
-//	final static String APP_ID = "wx6fde9cd2c7fc791e";
-//	final static String APP_SECRET = "0a360a43b80e3a334e5e52da706a3134";
-	//FIXME just 4 test
-	//final static String APP_ID = "wxa7b4687daedda86f";
-	//final static String APP_SECRET = "4322fbf1c4bba4cccd90424e2e16306b";
+	final static String APP_ID = "wx6fde9cd2c7fc791e";
+	final static String APP_SECRET = "0a360a43b80e3a334e5e52da706a3134";
 	
 	private final static int WEIXIN_CONTENT_LENGTH = 34;
 	
@@ -837,7 +832,7 @@ public class FinanceWeixinAction extends Action {
 
 		Menu menu = new Menu();
 		
-		Button b1 = new Button.ClickBuilder("营业日报", "AAA")
+		Button b1 = new Button.ClickBuilder("日报", "AAA")
 							.addChild(new Button.ClickBuilder("即时战报", TODAY_EVENT_KEY))
 							.addChild(new Button.ClickBuilder("最近日结", YESTERDAY_EVENT_KEY))
 							.build();
