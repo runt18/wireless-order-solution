@@ -1113,9 +1113,11 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 						body[buffer.GetSize()] = '\0';
 						Protocol::send(g_ConnectSocket, RespPackage(printReq.header, body, buffer.GetSize() + 1));
 
-						//if(pReport){
-						//	pReport->OnPrintReport(0, Util::s2ws(string(buffer.GetString())).c_str());
-						//}
+#ifdef _DEBUG
+						if(pReport){
+							pReport->OnPrintReport(0, Util::s2ws(string(buffer.GetString())).c_str());
+						}
+#endif // _DEBUG
 						
 					}
 
