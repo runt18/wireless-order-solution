@@ -53,6 +53,9 @@
 .ui-select .ui-btn-icon-right .ui-icon {
   right: 5px;
 }
+.ui-select{
+	line-height: 20px !important;
+}
 
 /*grid边距 1106*/
 .ui-bar, .ui-body {
@@ -64,7 +67,7 @@
 }
 /*grid字体 1107*/
 .ui-bar {
-  font-size: 12px;
+  font-size: 14px;
   margin: 0;
 }
 
@@ -124,17 +127,32 @@ table >tbody{
 		<div class="ui-grid-a">
 			<div class="ui-block-a" style="width: 33.33%;text-align: center;">
 				<div class="ui-bar ui-bar-c businessStatisticsTitle" >
-					总营业额:<span id="businessTotalMoney">0</span>元
+					总营业额
 				</div>
 			</div>
 			<div class="ui-block-b" style="width: 33.33%;text-align: center;">
 				<div class="ui-bar ui-bar-c businessStatisticsTitle">
-					日均营业:<span id="businessAvgMoney">0</span>元
+					日均营业
 				</div>
 			</div>
 			<div class="ui-block-c" style="width: 33.33%;text-align: center;">
 				<div class="ui-bar ui-bar-c businessStatisticsTitle">
-					日均账单:<span id="businessAvgCount">0</span>张
+					日均账单
+				</div>
+			</div>
+			<div class="ui-block-a" style="width: 33.33%;text-align: center;">
+				<div class="ui-bar ui-bar-c businessStatisticsTitle" >
+					<span id="businessTotalMoney">0</span>元
+				</div>
+			</div>
+			<div class="ui-block-b" style="width: 33.33%;text-align: center;">
+				<div class="ui-bar ui-bar-c businessStatisticsTitle">
+					<span id="businessAvgMoney">0</span>元
+				</div>
+			</div>
+			<div class="ui-block-c" style="width: 33.33%;text-align: center;">
+				<div class="ui-bar ui-bar-c businessStatisticsTitle">
+					<span id="businessAvgCount">0</span>张
 				</div>
 			</div>
 		</div><!-- /grid-a -->		
