@@ -355,24 +355,6 @@ Ext.onReady(function(){
 	mcd_mo_grid.frame = false;
 	mcd_mo_grid.border = false;
 
-	mcd_mo_grid.getStore().on('load', function(){
-//		mcd_search_memerbCard.setValue();
-	});
-	mcd_panelMemberOperationContent = new Ext.Panel({
-		renderTo : 'divMemberConsumeDetails',
-		width : mw,
-		height : mh,
-		border : false,
-		layout : 'fit',
-		items : [mcd_mo_grid],
-		keys : [{
-			key : Ext.EventObject.ENTER,
-			scope : this,
-			fn : function(){
-				mcd_searchMemberOperation();
-			}
-		}]
-	});
 	
 	mcd_mo_grid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
@@ -398,6 +380,23 @@ Ext.onReady(function(){
 			memberSumView.getCell(store.getCount()-1, 10).innerHTML = '--';
 		}
 	});
+	
+	mcd_panelMemberOperationContent = new Ext.Panel({
+		renderTo : 'divMemberConsumeDetails',
+		width : mw,
+		height : mh,
+		border : false,
+		layout : 'fit',
+		items : [mcd_mo_grid],
+		keys : [{
+			key : Ext.EventObject.ENTER,
+			scope : this,
+			fn : function(){
+				mcd_searchMemberOperation();
+			}
+		}]
+	});
+
 	if(otype && otype == 0){
 		Ext.getDom('memberConsume_today').checked = true;
 		Ext.getCmp('memberConsume_today').fireEvent('check', Ext.getCmp('memberConsume_today'), true);

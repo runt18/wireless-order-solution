@@ -1137,7 +1137,7 @@ function gridInit(){
 				gs.load({
 					params : {
 						start : 0,
-						limit : 200
+						limit : 100
 					}
 				});
 				gs.on('load', function(store, records, options){
@@ -1147,6 +1147,29 @@ function gridInit(){
 								records[i].set('acctendtioned', true);
 							}
 						}
+					}
+					if(store.getCount() > 0){
+//						var memberSum = memberBasicGrid.getView().getRow(store.getCount() - 1);
+//						memberSum.style.backgroundColor = '#EEEEEE';
+						var memberSumView = memberBasicGrid.getView();
+						
+						for (var i = 0; i < memberBasicGrid.getColumnModel().getColumnCount(); i++) {
+							var sumCell = memberSumView.getCell(store.getCount()-1, i);
+							sumCell.style.fontSize = '15px';
+							sumCell.style.fontWeight = 'bold';
+							sumCell.style.color = 'green';
+						}
+						memberSumView.getCell(store.getCount()-1, 1).innerHTML = '汇总';
+						memberSumView.getCell(store.getCount()-1, 2).innerHTML = '--';
+						memberSumView.getCell(store.getCount()-1, 3).innerHTML = '--';
+						memberSumView.getCell(store.getCount()-1, 4).innerHTML = '--';
+						memberSumView.getCell(store.getCount()-1, 5).innerHTML = '--';
+						memberSumView.getCell(store.getCount()-1, 6).innerHTML = '--';
+						memberSumView.getCell(store.getCount()-1, 7).innerHTML = '--';
+						
+						memberSumView.getCell(store.getCount()-1, 9).innerHTML = '--';
+						memberSumView.getCell(store.getCount()-1, 10).innerHTML = '--';
+						memberSumView.getCell(store.getCount()-1, 11).innerHTML = '--';
 					}
 					//ＦＩＸＭＥ
 //					if(gs.getTotalCount() > 0 && tipWinShow){
@@ -1158,7 +1181,6 @@ function gridInit(){
 //					
 //					tipWinShow = true;
 				});
-				
 				
 			}
 		}, {
@@ -1257,28 +1279,25 @@ function gridInit(){
 			['消费总额', 'totalConsumption',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['累计积分', 'totalPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['当前积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['总充值额', 'baseBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['账户余额', 'totalBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['总充值额', 'baseBalance',,'right'],
+			['账户余额', 'totalBalance',,'right'],
 			['手机号码', 'mobile', 125],
 			['会员卡号', 'memberCard', 125],
 			['操作', 'operation', 270, 'center', 'memberOperationRenderer']
 		],
 		MemberBasicRecord.getKeys(),
 		[['isPaging', true], ['restaurantID', restaurantID],  ['dataSource', 'normal']],
-		200,
+		100,
 		'',
 		[memberBasicGridTbar, memberBasicGridExcavateMemberTbar]
 	);	
 	memberBasicGrid.region = 'center';
 	memberBasicGrid.loadMask = null;
 	
-	
-	memberBasicGrid.on('render', function(e){
-		Ext.getCmp('btnSearchMember').handler();
-	});
 	memberBasicGrid.on('rowdblclick', function(e){
 		updateMemberHandler();
 	});
+	
 	memberBasicGrid.keys = [{
 		key : Ext.EventObject.ENTER,
 		scope : this,
@@ -3191,5 +3210,8 @@ Ext.onReady(function(){
 	showFloatOption(memberMgr_obj);
 	
 	initAddLevelWin();
+	
+	//获取member数据, 在render事件后触发修改数据时不能更新UI
+	Ext.getCmp('btnSearchMember').handler();
 	
 });
