@@ -142,6 +142,7 @@ public class QueryMemberAction extends DispatchAction {
 			String endDate = request.getParameter("endDate");
 			String searchType = request.getParameter("sType");
 			String forDetail = request.getParameter("forDetail");
+			String needSum = request.getParameter("needSum");
 			
 //			String point = request.getParameter("point");
 //			String usedPoint = request.getParameter("usedPoint");
@@ -226,15 +227,20 @@ public class QueryMemberAction extends DispatchAction {
 			}
 			jobject.setTotalProperty(newList.size());
 			
-			float baseBalance = 0, extraBalance = 0;
-			for (Member m : newList) {
-				baseBalance += m.getBaseBalance();
-				extraBalance += m.getExtraBalance();
+			Member sumMember = null;
+			if(needSum != null && !needSum.isEmpty()){
+				sumMember = new Member(-1);
+				float baseBalance = 0, extraBalance = 0;
+				for (Member m : newList) {
+					baseBalance += m.getBaseBalance();
+					extraBalance += m.getExtraBalance();
+				}
+				
+				sumMember.setMemberType(new MemberType(-1));
+				sumMember.setBaseBalance(baseBalance);
+				sumMember.setExtraBalance(extraBalance);				
 			}
-			Member sumMember = new Member(-1);
-			sumMember.setMemberType(new MemberType(-1));
-			sumMember.setBaseBalance(baseBalance);
-			sumMember.setExtraBalance(extraBalance);
+
 			
 			newList = DataPaging.getPagingData(newList, true, start, limit);
 			
@@ -257,7 +263,9 @@ public class QueryMemberAction extends DispatchAction {
 				}
 			}
 			
-			newList.add(sumMember);
+			if(needSum != null && !needSum.isEmpty()){
+				newList.add(sumMember);
+			}
 			
 			jobject.setRoot(newList);
 			
