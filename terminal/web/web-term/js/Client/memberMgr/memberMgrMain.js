@@ -1134,6 +1134,7 @@ function gridInit(){
 				gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('textTotalMaxMemberCostCount').getValue();
 				gs.baseParams['memberBalance'] = Ext.getCmp('textMemberBalance').getValue();
 				gs.baseParams['memberBalanceEqual'] = Ext.getCmp('memberBalanceEqual').getValue();
+				gs.baseParams['needSum'] = true;
 				gs.load({
 					params : {
 						start : 0,
@@ -1286,7 +1287,7 @@ function gridInit(){
 			['操作', 'operation', 270, 'center', 'memberOperationRenderer']
 		],
 		MemberBasicRecord.getKeys(),
-		[['isPaging', true], ['restaurantID', restaurantID],  ['dataSource', 'normal']],
+		[['isPaging', true], ['restaurantID', restaurantID],  ['dataSource', 'normal'],  ['needSum', true]],
 		100,
 		'',
 		[memberBasicGridTbar, memberBasicGridExcavateMemberTbar]
