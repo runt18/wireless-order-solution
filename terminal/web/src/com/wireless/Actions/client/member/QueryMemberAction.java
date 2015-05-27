@@ -225,6 +225,17 @@ public class QueryMemberAction extends DispatchAction {
 				}
 			}
 			jobject.setTotalProperty(newList.size());
+			
+			float baseBalance = 0, extraBalance = 0;
+			for (Member m : newList) {
+				baseBalance += m.getBaseBalance();
+				extraBalance += m.getExtraBalance();
+			}
+			Member sumMember = new Member(-1);
+			sumMember.setMemberType(new MemberType(-1));
+			sumMember.setBaseBalance(baseBalance);
+			sumMember.setExtraBalance(extraBalance);
+			
 			newList = DataPaging.getPagingData(newList, true, start, limit);
 			
 			if(!newList.isEmpty() && forDetail != null && !forDetail.isEmpty()){
@@ -245,6 +256,8 @@ public class QueryMemberAction extends DispatchAction {
 					});					
 				}
 			}
+			
+			newList.add(sumMember);
 			
 			jobject.setRoot(newList);
 			
