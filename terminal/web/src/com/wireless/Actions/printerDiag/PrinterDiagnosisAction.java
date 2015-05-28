@@ -25,7 +25,7 @@ public class PrinterDiagnosisAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
-		//final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getParameter("pin")));
+//		final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getParameter("pin")));
 
 		ProtocolPackage resp = ServerConnector.instance().ask(new RequestPackage(staff, Mode.DIAGNOSIS, Type.PRINTER));
 		
