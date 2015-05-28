@@ -920,6 +920,91 @@ ts.submitForSelectTableOrTransFood = function(){
 	}
 }
 
+var printerConnectionTemplet = '<tr>' +
+		'<td>{index}</td>' +
+		'<td>{name}</td>' +
+		'<td >{driver}</td>' +
+		'<td>{port}</td>' +
+		'<td>{gateway}</td>' +
+		'<td >{ping}</td>' +
+		'<td >{coverOpen}</td>' +
+		'<td >{paperEnd}</td>' +
+		'<td >{cutterError}</td>' +
+	'</tr>';
+/**
+ * 打开远程诊断
+ */
+ts.displayPrintConnection = function(){
+	Util.LM.show();
+	$.ajax({
+		url : '../PrinterDiagnosis.do',
+		type : 'post',
+		dataType : 'json',
+//		data : { pin : 29 },
+		success : function(result){
+			Util.LM.hide();
+			if(result.success){
+				$('#printerConnectionCount').text(result.root[0].printers.length);
+/*				var root =[{
+					printerName : '192.168.1.202',
+					printerAlias : '中厨',
+					printerPort : '192.168.1.202',
+					driver : false,
+					ping : false,
+					coverOpen : true,
+					paperEnd : true,
+					cutterError : true
+				}];*/
+				
+				if(result.root[0].connectionAmount == 1){
+					$('#printerServiceState').html('已打开');
+				}else if(printerService == 2){
+					$('#printerServiceState').html('<a href="#printerServiceErrorCmp" data-rel="popup" data-transition="pop">服务重叠 (所有打印机出重单, 点击解决)</a>');
+				}else{
+					$('#printerServiceState').html('<a href="#printerServiceErrorCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>');
+				}
+				
+				var html = [];
+				for (var i = 0; i < result.root[0].printers.length; i++) {
+					html.push(printerConnectionTemplet.format({
+						index : i+1,
+						name : result.root[0].printers[i].printerName + (result.root[0].printers[i].printerAlias?'('+result.root[0].printers[i].printerAlias+')':''),
+						driver : result.root[0].printers[i].driver ? '<font color="green">正常</font>' : '<a href="#printerDriverErrorCmp" data-rel="popup" data-transition="pop">失败</a>', 
+						port : result.root[0].printers[i].printerPort?result.root[0].printers[i].printerPort:'----',
+						gateway : result.root[0].printers[i].gateway?result.root[0].printers[i].gateway:'----',
+						ping : result.root[0].printers[i].ping ? '<font color="green">正常</font>' : '<a href="#printerPingErrorCmp" data-rel="popup" data-transition="pop">失败</a>',
+						coverOpen : result.root[0].printers[i].coverOpen ? '<a href="#">未关闭</a>' : '<font color="green">正常</font>',
+						paperEnd : 	result.root[0].printers[i].paperEnd ? '<a href="#">已用完</a>' : '<font color="green">正常</font>',
+						cutterError : 	result.root[0].printers[i].paperEnd ? '<a href="#">已损坏</a>' : '<font color="green">正常</font>'
+					}));
+				}
+				$('#printerConnectionList').html(html.join('')).trigger('create').trigger('refresh');
+				
+			
+			}else{
+				$('#printerServiceState').html('<a href="#printerServiceErrorCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>');
+			}
+			
+			$('#printerConnectionCmp').show();
+			$('#shadowForPopup').show();	
+		},
+		error : function(result){
+			Util.LM.hide();
+			Util.msg.alert({
+				renderTo : 'tableSelectMgr',
+				msg : '诊断出错, 请联系客服'
+			});
+		}
+	});
+}
+
+/**
+ * 关闭远程诊断
+ */
+ts.closePrintConnection = function(){
+	$('#printerConnectionCmp').hide();
+	$('#shadowForPopup').hide();
+}
 
 /**
  * 设置控件为转台

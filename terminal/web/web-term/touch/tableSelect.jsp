@@ -120,6 +120,7 @@
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loginOut()">注销</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="location.reload()" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.displayPrintConnection()">打印机诊断</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.createOrderForLookup()">查台</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.openApartTable()">拆台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.transTableForTS()">转台</a>
@@ -129,6 +130,7 @@
 		 </div>
 	</div>
 	
+	<!-- 输入餐台人数 -->
 	<div id="tableCustomerCountSet" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
 	    <div id="tableCustomerCountSetTitle" data-role="header" data-theme="b" class="ui-corner-top" style="line-height: 35px;">
 	        	餐台 -- 输入人数
@@ -171,7 +173,108 @@
 				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.closeTableWithPeople()">取消</a>		 
 			 </div>
 	    </div>
+	</div>	
+	
+	<!-- 远程诊断打印机 -->
+	<div id="printerConnectionCmp" class="ui-overlay-shadow ui-corner-all" style="width:1020px;z-index: 1102;position: absolute; top: 150px; left: 50%; margin: -100px 0px 0px -500px;background-color: white;display: none;" align="center">
+	    <div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
+	    		<div id="printerConnectionCmpTitle" style="float: left;line-height: 35px;margin-left: 10px;">
+					远程打印机诊断, 共 <span id="printerConnectionCount" style="color: maroon;">0</span> 台打印机在使用
+	    		</div>
+	        	<div style="float: right">
+	  				<a onclick="ts.closePrintConnection()" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
+	        	</div>
+	    </div> 	    
+	    
+	    <div data-role="content">
+			<div class="ui-grid-a">
+			    <div class="ui-block-a ui-bar-c" style="width: 100%;line-height: 45px;">
+			    	<a href="javascript:void()" onclick="ts.displayPrintConnection()" style="color: blue;margin-right: 20px;">刷新</a>打印服务状态: <span id="printerServiceState"> <a href="#printerServiceErrorCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>	</span> 
+				</div>
+			</div><!-- /grid-a -->				
+			<br> 
+			<div style="max-height: 500px;overflow: auto;"> 
+			<table id="printer" data-role="table" data-mode="columntoggle"  class="ui-body-d ui-shadow table-stripe ui-responsive">	
+				<caption style="font-weight: bold;margin-bottom: 0;color: blue">打印机列表</caption>
+				<tr>
+					<th></th>
+					<th >打印机</th>
+					<th >驱动</th>
+					<th >端口</th>
+					<th >网关</th>
+					<th >连接状态</th>
+					<th >机盖</th>
+					<th >卷纸</th>
+					<th >切刀</th>
+				</tr>
+				<tbody id="printerConnectionList" >
+<!-- 					<tr>
+						<td>192.168.1.201</td>
+						<td>中厨</td>
+						<td>192.168.1.201</td>
+						<td><a href="#printerPingErrorCmp" data-rel="popup" data-transition="pop">未连接(打印机不出单, 点击解决)</a></td>
+						<td><a href="#">未安装(请联系客服)</a></td>
+						<td><a href="#">未关闭(请盖好打印机)</a></td>
+						<td><a href="#">已用完(请更换打印纸)</a></td>
+						<td><a href="#">已损坏(请更换切刀)</a></td>
+					</tr>	 -->
+				</tbody>			
+			</table>	
+			</div>    
+		</div>	
+	</div>
+	
+	<!-- 打印服务没开时提示 -->
+	<div id="printerServiceErrorCmp" data-role="popup"  data-dismissible="false" style="width:900px;" class="ui-corner-all" align="center">
+		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
+	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
+				打印服务检查
+	   		</div>
+	       	<div style="float: right">
+	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
+	       	</div>
+       	</div>	
+       	<div data-role="content">
+			<h2>1, 所有打印机不出单:</h2>
+				<p>屏幕右下角打开电脑菜单 -> 所有程序 -> e点通打印服务 -> 打开打印服务即可</p>
+			
+			<h2>2, 所有打印机出重单:</h2>
+				<p>请卸载店里其中一台收银电脑的e点通打印服务</p>
+		</div>
+	</div>				
+	
+	<!-- ping不通时提示 -->
+	<div id="printerPingErrorCmp" data-role="popup"  data-dismissible="false" style="width:900px;" class="ui-corner-all" align="center">
+		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
+	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
+				网线检查
+	   		</div>
+	       	<div style="float: right">
+	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
+	       	</div>
+       	</div>	
+       	<div data-role="content">
+			<h3>1, 检查当前打印机后面接网线的地方有没有黄色的灯亮着</h3>
+			
+			<h3>2, 检查分线盒是否连上路由器</h3>
+		</div>
+	</div>	
+	
+	<!-- 联系客服提示 -->
+	<div id="printerDriverErrorCmp" data-role="popup"  data-dismissible="false" style="width:350px;" class="ui-corner-all" align="center">
+		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
+	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
+				请联系客服
+	   		</div>
+	       	<div style="float: right">
+	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
+	       	</div>
+       	</div>	
+       	<div data-role="content">
+			<h3>QQ: 850774706</h3>
+		</div>
 	</div>		
+	
 	
 	<!-- 交款, 交班, 日结 -->
 	<div id="dailyInfoTable" class="ui-overlay-shadow ui-corner-all" style="width:900px;z-index: 1102;position: absolute; top: 150px; left: 50%; margin: -100px 0px 0px -450px;background-color: white;display: none;" align="center">	

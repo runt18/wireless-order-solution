@@ -151,4 +151,21 @@ li[role=option] a{
 	margin-left: 30px;
 }
 
+/*
+打印机诊断列表错误信息样式
+*/
+#printerConnectionCmp a{
+	color: red
+}
+
+/*
+修改样式为td文字居中, 2942
+*/
+.ui-table th, .ui-table td {
+  line-height: 1.5em;
+  text-align: left;
+  padding: .4em .5em;
+  vertical-align: middle;
+}
+
 
