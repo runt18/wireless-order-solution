@@ -79,8 +79,8 @@ function getRestaurantInfo(){
 
 //step高度
 var stepH;
+
 $(function (){
-	
 	$("#weixin_wizard").steps({
 	    headerTag: "span",
 	    bodyTag: "div",
@@ -139,42 +139,46 @@ $(function (){
 	    }
 	});	
 	
-	//获取微信餐厅,判读是否已绑定
-	getRestaurantInfo();
-//	$('#btnWeixinAuth').show();
-	
-    //设置step高度自适应
-    $("#weixin_wizard .content").css({"min-height":(document.body.clientHeight - 220)+"px", "overflow":"auto"});
-    
-    //实例化编辑器
-    var um = UM.getEditor('myEditor');
-    
-    //实例化活动编辑器
-    var wxActiveEditor = UM.getEditor('wxActiveEditor');
-    
-    //设置编辑器高度自适应
-    stepH = $("#weixin_wizard .content").height() - 40;
-    $('#myEditor').height(stepH - 70);
-    //auth
-    $('#weixinAuthDisplay').height(stepH);
-    $('#weixinAuthRest').height(stepH);
-    //餐厅简介示例
-    $('#weixinEditorDisplay').height(stepH);
-    //欢迎活动示例
-    $('#wxActiveEditorDisplay').height(stepH);
-//    $('#wxActiveEditor').height(stepH - 275);
-    $('#container4WxActiveEditor').height(stepH - 210);
-    $('#container4WxActiveEditor').css("overflow-x", "hidden");
-    //上传菜品示例
-    $('#uploadFoodImgDisplay').height(stepH);
-    $('#uploadFoodImgCmp').height(stepH - 50);
-    //logo
-    $('#weixinLogoDisplay').height(stepH);
-    
-    //初始化第二步微信Logo界面
-    initWeixinLogoCmp();
-    //初始化第四步欢迎活动界面
-    initWeixinActiveCmp();
+	//先初始化step再设置参数
+	setTimeout(function(){
+		//获取微信餐厅,判读是否已绑定
+		getRestaurantInfo();
+		
+	    //设置step高度自适应
+	    $("#weixin_wizard .content").css({"min-height":(document.body.clientHeight - 220)+"px", "overflow":"auto"});
+	    
+	    //实例化编辑器
+	    var um = UM.getEditor('myEditor');
+	    
+	    //实例化活动编辑器
+	    var wxActiveEditor = UM.getEditor('wxActiveEditor');
+	    
+	    //设置编辑器高度自适应
+	    stepH = $("#weixin_wizard .content").height() - 40;
+	    $('#myEditor').height(stepH - 70);
+	    //auth
+	    $('#weixinAuthDisplay').height(stepH);
+	    $('#weixinAuthRest').height(stepH);
+	    //餐厅简介示例
+	    $('#weixinEditorDisplay').height(stepH);
+	    //欢迎活动示例
+	    $('#wxActiveEditorDisplay').height(stepH);
+//	    $('#wxActiveEditor').height(stepH - 275);
+	    $('#container4WxActiveEditor').height(stepH - 210);
+	    $('#container4WxActiveEditor').css("overflow-x", "hidden");
+	    //上传菜品示例
+	    $('#uploadFoodImgDisplay').height(stepH);
+	    $('#uploadFoodImgCmp').height(stepH - 50);
+	    //logo
+	    $('#weixinLogoDisplay').height(stepH);
+	    
+	    //初始化第二步微信Logo界面
+	    initWeixinLogoCmp();
+	    //初始化第四步欢迎活动界面
+	    initWeixinActiveCmp();		
+	}, 100);
+
+
 });
 
 
