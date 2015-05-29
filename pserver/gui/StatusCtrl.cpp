@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "StatusCtrl.h"
 #include "Resource.h"
+#include "../protocol/inc/Util.h"
 #include <boost/shared_ptr.hpp>
 
 #ifdef _DEBUG
@@ -120,18 +121,33 @@ BOOL CStatusCtrl::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 
 static DWORD __stdcall RichEditStreamInCallback(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
-	int *pos = (int *)dwCookie;
-	char *pBuffer = ((char *)dwCookie) + 4;
+	//int *pos = (int *)dwCookie;
+	//char *pBuffer = ((char *)dwCookie);
 
-	if (cb > static_cast<LONG>(strlen(pBuffer + *pos))) 
-		cb = strlen(pBuffer + *pos);
+	//if (cb > static_cast<LONG>(strlen(pBuffer + *pos))) 
+	//	cb = strlen(pBuffer + *pos);
 
-	memcpy(pbBuff, pBuffer + *pos, cb);
+	//memcpy(pbBuff, pBuffer + *pos, cb);
 
-	*pcb = cb;
+	//*pcb = cb;
 
-	*pos += cb;
+	//*pos += cb;
 
+	std::string *pstr = (std::string *)dwCookie;  
+	int len = pstr->length();  
+	if (len < cb)  
+	{  
+		*pcb = len;  
+		memcpy(pbBuff, pstr->c_str(), len);  
+		pstr->clear();  
+	}  
+	else  
+	{  
+		*pcb = cb;  
+		memcpy(pbBuff, pstr->c_str(), cb);  
+		*pstr = pstr->substr(cb);  
+	}  
+	
 	return 0;
 }
 
@@ -143,13 +159,9 @@ void CStatusCtrl::OnOutputcontextClearall()
 
 	rtfstr += "} ";
 
-	DWORD dwNum = WideCharToMultiByte(CP_OEMCP, NULL, rtfstr.GetBuffer(), -1, NULL, 0, NULL, FALSE);
-	boost::shared_ptr<char> buffer(new char[dwNum + 5], boost::checked_array_deleter<char>());
-	WideCharToMultiByte (CP_OEMCP, NULL, rtfstr.GetBuffer(), -1, buffer.get() + 4, dwNum, NULL, FALSE);
-	*(int *)buffer.get() = 0;
-
 	EDITSTREAM es;
-	es.dwCookie = (DWORD)buffer.get(); // Pass a pointer to the CString to the callback function 
+	string s = Util::ws2s(wstring(rtfstr));
+	es.dwCookie = (DWORD)&s; // Pass a pointer to the CString to the callback function 
 	es.pfnCallback = RichEditStreamInCallback; // Specify the pointer to the callback function.
 	
 	StreamIn(SF_RTF, es); // Perform the streaming
@@ -275,13 +287,9 @@ int CStatusCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CString rtfstr = m_RTFHeader;
 	rtfstr += "} ";
 
-	DWORD dwNum = WideCharToMultiByte(CP_OEMCP, NULL, rtfstr.GetBuffer(), -1, NULL, 0, NULL, FALSE);
-	boost::shared_ptr<char> buffer(new char[dwNum + 5], boost::checked_array_deleter<char>());
-	WideCharToMultiByte (CP_OEMCP, NULL, rtfstr.GetBuffer(), -1, buffer.get() + 4, dwNum, NULL, FALSE);
-	*(int *)buffer.get() = 0;
-
 	EDITSTREAM es;
-	es.dwCookie = (DWORD)buffer.get(); // Pass a pointer to the CString to the callback function 
+	string s = Util::ws2s(wstring(rtfstr));
+	es.dwCookie = (DWORD)&s;	// Pass a pointer to the string to the callback function
 	es.pfnCallback = RichEditStreamInCallback; // Specify the pointer to the callback function.
 	
 	StreamIn(SF_RTF, es); // Perform the streaming
@@ -352,14 +360,11 @@ void CStatusCtrl::ShowStatus(CString status, int nType)
 	
 	rtfstr += "} ";
 
-	DWORD dwNum = WideCharToMultiByte(CP_OEMCP, NULL, rtfstr.GetBuffer(), -1, NULL, 0, NULL, FALSE);
-	boost::shared_ptr<char> buffer(new char[dwNum + 5], boost::checked_array_deleter<char>());
-	WideCharToMultiByte (CP_OEMCP, NULL, rtfstr.GetBuffer(), -1, buffer.get() + 4, dwNum, NULL, FALSE);
-	*(int *)buffer.get() = 0;
 
 	EDITSTREAM es;
 
-	es.dwCookie = (DWORD)buffer.get(); // Pass a pointer to the CString to the callback function 
+	string s = Util::ws2s(wstring(rtfstr));
+	es.dwCookie = (DWORD)&s;	// Pass a pointer to the string to the callback function 
 	es.pfnCallback = RichEditStreamInCallback; // Specify the pointer to the callback function.
 
 	CWnd *pFocusWnd = GetFocus();

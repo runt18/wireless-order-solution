@@ -457,7 +457,7 @@ void CMainFrame::OnAutoRun(){
 		CString progPath(CurrentPath);
 		//开机最小化运行
 		progPath.Append(_T(" -minimize"));
-		if(bResult=::RegSetValueEx(hRegKey, REG_VALUE, 0, REG_SZ, (const unsigned char*)progPath.GetBuffer(), MAX_PATH) != ERROR_SUCCESS)  
+		if(bResult = ::RegSetValueEx(hRegKey, REG_VALUE, 0, REG_SZ, (const unsigned char*)progPath.GetBuffer(), MAX_PATH) != ERROR_SUCCESS)  
 		{   //写入失败, 关闭注册表key
 			RegCloseKey(hRegKey);   
 			//释放内存资源

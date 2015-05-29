@@ -1074,6 +1074,27 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 								if(GetPrinter(hPrinter, 2, (LPBYTE)pPrnInfo2, dwSize, &dwSize)){
 
 									string printerAddr = Util::ws2s(wstring(pPrnInfo2->pPortName));
+
+									//Read the associated ip address to this printer port from the register
+									wostringstream wos;
+									wos << _T("SYSTEM\\CurrentControlSet\\Control\\Print\\Monitors\\Standard TCP/IP Port\\Ports\\") << pPrnInfo2->pPortName;
+									//´ò¿ª×¢²á±í
+									HKEY hRegKey = NULL;
+									if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, wos.str().c_str(), 0, KEY_READ, &hRegKey) == ERROR_SUCCESS){
+										WCHAR szBuffer[512];
+										DWORD dwBufferSize = sizeof(szBuffer);
+										if(RegQueryValueEx(hRegKey, _T("HostName"), 0, NULL, (LPBYTE)szBuffer, &dwBufferSize) == ERROR_SUCCESS){
+											printerAddr = Util::ws2s(wstring(szBuffer));
+										}
+									}
+									if(hRegKey){
+										RegCloseKey(hRegKey);
+									}
+
+									if(printerAddr.size() == 0){
+										printerAddr = Util::ws2s(wstring(pPrnInfo2->pPortName));
+									}
+
 									respDoc.AddMember("printer_port", Value(printerAddr.c_str(), respDoc.GetAllocator()), respDoc.GetAllocator());
 									if(ping(printerAddr)){
 										respDoc.AddMember("ping", Value("1", respDoc.GetAllocator()), respDoc.GetAllocator());
