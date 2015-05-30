@@ -91,7 +91,7 @@ public class PrinterDiagnoseHandler {
 				printerResult.setPrinter(printer);
 				result.addPrinter(printerResult);
 			}
-			System.out.println(result);
+			//System.out.println(result);
 			return result;
 		}
 		return null;
