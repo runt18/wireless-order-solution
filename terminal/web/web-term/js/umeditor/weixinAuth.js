@@ -134,7 +134,8 @@ $(function (){
 	    		getWxPromotion();
 				if($('#wxActiveEditorDisplay').width() >= 660){
 					$('#wxActiveEditorDisplayImg').attr('width', '660px');
-				}    		
+				}    	
+			    Ext.getCmp("wxActive_secendStepPanel").setHeight(stepH-10);
 	    	}
 	    }
 	});	
@@ -163,6 +164,7 @@ $(function (){
 	    $('#weixinEditorDisplay').height(stepH);
 	    //欢迎活动示例
 	    $('#wxActiveEditorDisplay').height(stepH);
+
 //	    $('#wxActiveEditor').height(stepH - 275);
 	    $('#container4WxActiveEditor').height(stepH - 210);
 	    $('#container4WxActiveEditor').css("overflow-x", "hidden");
@@ -438,6 +440,7 @@ function initWeixinActiveCmp(){
 	
 	var secendStepWest = new Ext.form.FormPanel({
 		width : 615,
+		height:600,
 		title : '编辑活动内容:',
 		items : [{
 			contentEl : 'wxActive_secendStep4'
@@ -554,12 +557,12 @@ function initWeixinActiveCmp(){
 			layout : 'border',
 			frame : false,
 			border : false,
-			height : 530,
+			height : 630,
 			items : [{
 	 			xtype : 'panel',
 	 			region : 'center',
 	 			width :630,
-	 			height : 523,
+	 			height : 623,
 				layout : 'column',
 				frame : true,
 				defaults : {
