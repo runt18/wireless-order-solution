@@ -226,7 +226,7 @@
 	</div>
 	
 	<!-- 打印服务没开时提示 -->
-	<div id="printerServiceErrorCmp" data-role="popup"  data-dismissible="false" style="width:900px;" class="ui-corner-all" align="center">
+	<div id="printerServiceUnopenCmp" data-role="popup"  data-dismissible="false" style="width:900px;" class="ui-corner-all" align="center">
 		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
 	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
 				打印服务检查
@@ -236,13 +236,26 @@
 	       	</div>
        	</div>	
        	<div data-role="content">
-			<h2>1, 所有打印机不出单:</h2>
+			<h2>所有打印机不出单:</h2>
 				<p>屏幕右下角打开电脑菜单 -> 所有程序 -> e点通打印服务 -> 打开打印服务即可</p>
-			
-			<h2>2, 所有打印机出重单:</h2>
+		</div>
+	</div>	
+	
+	<!-- 打印服务开两个时提示 -->
+	<div id="printerServiceOpenTwiceCmp" data-role="popup"  data-dismissible="false" style="width:900px;" class="ui-corner-all" align="center">
+		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
+	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
+				打印服务检查
+	   		</div>
+	       	<div style="float: right">
+	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
+	       	</div>
+       	</div>	
+       	<div data-role="content">
+			<h2>所有打印机出重单:</h2>
 				<p>请卸载店里其中一台收银电脑的e点通打印服务</p>
 		</div>
-	</div>				
+	</div>					
 	
 	<!-- ping不通时提示 -->
 	<div id="printerPingErrorCmp" data-role="popup"  data-dismissible="false" style="width:900px;" class="ui-corner-all" align="center">
@@ -265,14 +278,14 @@
 	<div id="printerDriverErrorCmp" data-role="popup"  data-dismissible="false" style="width:350px;" class="ui-corner-all" align="center">
 		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
 	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
-				请联系客服
+				驱动失败
 	   		</div>
 	       	<div style="float: right">
 	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
 	       	</div>
        	</div>	
        	<div data-role="content">
-			<h3>QQ: 850774706</h3>
+			<h3>请安装驱动, 或联系客服QQ: 850774706</h3>
 		</div>
 	</div>		
 	

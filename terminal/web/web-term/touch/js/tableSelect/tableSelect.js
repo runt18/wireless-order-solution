@@ -959,23 +959,25 @@ ts.displayPrintConnection = function(){
 				if(result.root[0].connectionAmount == 1){
 					$('#printerServiceState').html('已打开');
 				}else if(printerService == 2){
-					$('#printerServiceState').html('<a href="#printerServiceErrorCmp" data-rel="popup" data-transition="pop">服务重叠 (所有打印机出重单, 点击解决)</a>');
+					$('#printerServiceState').html('<a href="#printerServiceOpenTwiceCmp" data-rel="popup" data-transition="pop">服务重叠 (所有打印机出重单, 点击解决)</a>');
 				}else{
-					$('#printerServiceState').html('<a href="#printerServiceErrorCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>');
+					$('#printerServiceState').html('<a href="#printerServiceUnopenCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>');
 				}
 				
 				var html = [];
 				for (var i = 0; i < result.root[0].printers.length; i++) {
+					var printer = result.root[0].printers[i];
+					var details = printer.driver && printer.ping;
 					html.push(printerConnectionTemplet.format({
 						index : i+1,
-						name : result.root[0].printers[i].printerName + (result.root[0].printers[i].printerAlias?'('+result.root[0].printers[i].printerAlias+')':''),
-						driver : result.root[0].printers[i].driver ? '<font color="green">正常</font>' : '<a href="#printerDriverErrorCmp" data-rel="popup" data-transition="pop">失败</a>', 
-						port : result.root[0].printers[i].printerPort?result.root[0].printers[i].printerPort:'----',
-						gateway : result.root[0].printers[i].gateway?result.root[0].printers[i].gateway:'----',
-						ping : result.root[0].printers[i].ping ? '<font color="green">正常</font>' : '<a href="#printerPingErrorCmp" data-rel="popup" data-transition="pop">失败</a>',
-						coverOpen : result.root[0].printers[i].coverOpen ? '<a href="#">未关闭</a>' : '<font color="green">正常</font>',
-						paperEnd : 	result.root[0].printers[i].paperEnd ? '<a href="#">已用完</a>' : '<font color="green">正常</font>',
-						cutterError : 	result.root[0].printers[i].paperEnd ? '<a href="#">已损坏</a>' : '<font color="green">正常</font>'
+						name : printer.printerName + (printer.printerAlias?'('+printer.printerAlias+')':''),
+						driver : printer.driver ? '<font color="green">正常</font>' : '<a href="#printerDriverErrorCmp" data-rel="popup" data-transition="pop">失败</a>', 
+						port : printer.printerPort?printer.printerPort:'----',
+						gateway : printer.gateway?printer.gateway:'----',
+						ping : printer.ping ? '<font color="green">正常</font>' : '<a href="#printerPingErrorCmp" data-rel="popup" data-transition="pop">失败</a>',
+						coverOpen : !details? "----" : printer.coverOpen ? '<a href="#">未关闭</a>' : '<font color="green">正常</font>',
+						paperEnd : 	!details? "----" : printer.paperEnd ? '<a href="#">已用完</a>' : '<font color="green">正常</font>',
+						cutterError : 	!details? "----" : printer.paperEnd ? '<a href="#">已损坏</a>' : '<font color="green">正常</font>'
 					}));
 				}
 				$('#printerConnectionList').html(html.join('')).trigger('create').trigger('refresh');
@@ -983,6 +985,8 @@ ts.displayPrintConnection = function(){
 			
 			}else{
 				$('#printerServiceState').html('<a href="#printerServiceErrorCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>');
+				$('#printerConnectionCount').text(0);
+				$('#printerConnectionList').html('');
 			}
 			
 			$('#printerConnectionCmp').show();
