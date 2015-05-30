@@ -957,8 +957,8 @@ ts.displayPrintConnection = function(){
 				}];*/
 				
 				if(result.root[0].connectionAmount == 1){
-					$('#printerServiceState').html('已打开');
-				}else if(printerService == 2){
+					$('#printerServiceState').html('<font color="green">正常</font>');
+				}else if(result.root[0].connectionAmount == 2){
 					$('#printerServiceState').html('<a href="#printerServiceOpenTwiceCmp" data-rel="popup" data-transition="pop">服务重叠 (所有打印机出重单, 点击解决)</a>');
 				}else{
 					$('#printerServiceState').html('<a href="#printerServiceUnopenCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>');
