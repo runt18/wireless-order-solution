@@ -42,8 +42,12 @@ function newPieChart(c){
 	    },
 	    title: {
 	        text: c.title
-	    },
+	    },                                                           
+        legend: {         
+        	enabled : false
+        },
 	    tooltip: {
+	    	enabled : false,
 		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
 	    },
 	    plotOptions: {
@@ -56,7 +60,20 @@ function newPieChart(c){
 	                connectorColor: '#000000',
 	                format: '<b>{point.name}</b>: {point.y} '+c.unit
 	            }
-	        }
+	        },            
+            series: {
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function () {
+                        	console.log(c.pointClick)
+                        	if(c.pointClick()){
+                        		c.pointClick();
+                        	}
+                        }
+                    }
+                }
+            } 
 	    },
 	    series: [c.series],
         credits : {
@@ -65,6 +82,9 @@ function newPieChart(c){
 	});	
 
 }
+
+
+
 function newColumnChart(c){
 	return  new Highcharts.Chart({
         chart: {
