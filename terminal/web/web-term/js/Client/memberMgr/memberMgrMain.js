@@ -320,7 +320,7 @@ function initTakeMoneyWin(){
  */
 function rechargeHandler(){
 	initRechargeWin();
-	Ext.getCmp('rechargeWin').show();
+	Ext.getCmp('rechargeWin').show();		
 }
 
 function takeMoneyHandler(){
@@ -861,15 +861,20 @@ memberOperationRenderer = function(val, m, record){
 //	}else{
 //		attendtion = '<a href="javascript:attentionHandler()">添加关注</a>';
 //	}
+	var recharge = '';
+	if(record.data['memberType']['attributeValue'] == 0){
+		recharge ='<a href="javascript:rechargeHandler()">充值</a>'
+				+ '&nbsp;&nbsp;&nbsp;'
+				+ '<a href="javascript:takeMoneyHandler()">取款</a>'
+				+ '&nbsp;&nbsp;&nbsp;';
+	}
+	
 	return ''
 		+ '<a href="javascript:updateMemberHandler()">修改</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 		+ '<a href="javascript:deleteMemberHandler()">删除</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-		+ '<a href="javascript:rechargeHandler()">充值</a>'
-		+ '&nbsp;&nbsp;&nbsp;'
-		+ '<a href="javascript:takeMoneyHandler()">取款</a>'
-		+ '&nbsp;&nbsp;&nbsp;'
+		+ recharge
 		+ '<a href="javascript:memberOperationSend() ">操作明细</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;';
 //		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
@@ -1172,15 +1177,6 @@ function gridInit(){
 						memberSumView.getCell(store.getCount()-1, 10).innerHTML = '--';
 						memberSumView.getCell(store.getCount()-1, 11).innerHTML = '--';
 					}
-					//ＦＩＸＭＥ
-//					if(gs.getTotalCount() > 0 && tipWinShow){
-//						memberBasicGrid.getSelectionModel().selectAll();
-////						if(Ext.ux.getCookie(document.domain+'_memberTip') != 'true'){
-//							memberTipWin.show();
-////						}					
-//					}
-//					
-//					tipWinShow = true;
 				});
 				
 			}
@@ -1200,32 +1196,6 @@ function gridInit(){
 			iconCls : 'btn_add',
 			handler : function(e){
 				insertMemberHandler();
-			}
-		}, {
-			hidden : true,
-			text : '修改',
-			iconCls : 'btn_edit',
-			handler : function(e){
-				updateMemberHandler();
-			}
-		}, {
-			hidden : true,
-			text : '删除',
-			iconCls : 'btn_delete',
-			handler : function(e){
-				deleteMemberHandler();
-			}
-		}, {
-			text : '充值',
-			iconCls : 'icon_tb_recharge',
-			handler : function(e){
-				rechargeHandler();
-			}
-		}, {
-			text : '取款',
-			iconCls : 'btn_edit',
-			handler : function(){
-				takeMoneyHandler();
 			}
 		}, {
 			text : '积分调整',
@@ -1898,13 +1868,6 @@ function operateMemberHandler(c){
 	var firstCharge = Ext.getCmp('cm_numFirstCharge');
 	var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');
 	var rechargeType = Ext.getCmp('rd_comboFirstRechargeType');
-	
-	if(memberBasicWin.otype.toLowerCase() == Ext.ux.otype['insert'].toLowerCase()){
-		if(!memberMobile.getValue() && !Ext.getCmp('cm_numberMemberCard').getValue()){
-			Ext.example.msg('提示', '至少要输入手机或会员卡号');
-			return;
-		}
-	}
 	
 	if(!memberName.isValid() || !membetType.isValid() || !memberSex.isValid()){
 		return;

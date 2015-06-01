@@ -1,4 +1,4 @@
-﻿
+﻿var history_hours;
 //------------------lib
 function billQueryHandler() {
 	var gs = billsGrid.getStore();
@@ -20,7 +20,15 @@ function billQueryHandler() {
 		}
 		gs.baseParams['region'] = Ext.getCmp('history_comboRegion').getValue();
 		gs.baseParams['staffId'] = Ext.getCmp('historyBill_combo_staffs').getValue();
-		var businessHour = history_oBusinessHourData({type : 'get'}).data;
+		
+		var businessHour;
+		
+		if(history_hours){
+			businessHour = history_hours;
+		}else{
+			businessHour = history_oBusinessHourData({type : 'get'}).data;
+		}
+		
 		if(parseInt(businessHour.businessHourType) != -1){
 			gs.baseParams['opening'] = businessHour.opening;
 			gs.baseParams['ending'] = businessHour.ending;
@@ -513,6 +521,28 @@ var historyBill_combo_staffs = new Ext.form.ComboBox({
 	}
 });
 
+var history_setStatisticsDate = function(){
+	if(sendToPageOperation){
+		Ext.getCmp('btnBillHeightSearch').handler();
+		
+		Ext.getCmp('dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
+		Ext.getCmp('dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
+		
+		Ext.getCmp('history_comboRegion').setValue(sendToStatisticsRegion);
+		
+		history_hours = sendToStatisticsPageHours;
+		
+		billQueryHandler();
+		
+		Ext.getCmp('txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+history_hours.openingText+'</font>');
+		Ext.getCmp('txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+history_hours.endingText+'</font>');
+		Ext.getCmp('history_comboBusinessHour').setValue(history_hours.hourComboValue);		
+		
+		sendToPageOperation = false;		
+	}
+
+};
+
 var billsGrid;
 var foodStatus;
 var historyExtraBar;
@@ -631,6 +661,7 @@ Ext.onReady(function() {
 							params : {
 								dataSource : 'normal'
 							},
+							async : false,
 							success : function(res, opt){
 								var jr = Ext.decode(res.responseText);
 								for(var i = 0; i < jr.root.length; i++){
@@ -705,6 +736,7 @@ Ext.onReady(function() {
 						var data = [[-1,'全天']];
 						Ext.Ajax.request({
 							url : '../../QueryBusinessHour.do',
+							async : false,
 							success : function(res, opt){
 								var jr = Ext.decode(res.responseText);
 								for(var i = 0; i < jr.root.length; i++){
@@ -1092,8 +1124,10 @@ Ext.onReady(function() {
 	);
 	billsGrid.region = 'center';
 	billsGrid.on('render', function(){
-		history_dateCombo.setValue(1);
-		history_dateCombo.fireEvent('select', history_dateCombo,null,1);
+		if(!sendToPageOperation){
+			history_dateCombo.setValue(1);
+			history_dateCombo.fireEvent('select', history_dateCombo,null,1);
+		}
 	});
 	billsGrid.on('bodyresize', function(e, w, h){
 		
@@ -1132,7 +1166,9 @@ Ext.onReady(function() {
 		})
 	});
 	billHistoryOnLoad();
-	billQueryHandler();
+//	billQueryHandler();
 	
+	history_setStatisticsDate();
 	
 });
+

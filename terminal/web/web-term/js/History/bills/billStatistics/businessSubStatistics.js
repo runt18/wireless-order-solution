@@ -333,7 +333,7 @@ Ext.onReady(function(){
 						
 						trPayTypeContent += (String.format(trPayIncomeModel, 
 								temp.payType, 
-								temp.amount, 
+								'<a href="javascript:void()" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8})">' + temp.amount + '</a>', 
 								temp.total.toFixed(2), 
 								temp.actual.toFixed(2)
 							)
