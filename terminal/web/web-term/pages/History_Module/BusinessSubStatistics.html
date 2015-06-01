@@ -19,6 +19,8 @@
 		sendToStatisticsPageHours.deptId = c.deptId;
 		sendToStatisticsPageHours.deptName = c.deptName;
 		
+		sendToStatisticsRegion = Ext.getCmp('businessSub_comboRegion').getValue();
+		
 		if(!sendToStatisticsPageHours.opening){
 			sendToStatisticsPageHours.openingText = "00:00";
 			sendToStatisticsPageHours.endingText = "00:00";
@@ -46,6 +48,8 @@
 			addTab('businessReceiptsStatistics', '收款统计', 'History_Module/BusinessReceiptsStatistics.html');			
 		}else if(c.type == 7){//提成统计
 			addTab('commissionStatistics', '提成统计', 'History_Module/CommissionStatistics.html');			
+		}else if(c.type == 8){//历史账单
+			addTab('history', '历史账单', 'History_Module/HistoryStatistics.html');			
 		}else{
 			return;
 		}
