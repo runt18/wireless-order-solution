@@ -191,7 +191,8 @@
 	    <div data-role="content">
 			<div class="ui-grid-a">
 			    <div class="ui-block-a ui-bar-c" style="width: 100%;line-height: 45px;">
-			    	<a href="javascript:void()" onclick="ts.displayPrintConnection()" style="color: blue;margin-right: 20px;">刷新</a>打印服务状态: <span id="printerServiceState"> <a href="#printerServiceErrorCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>	</span> 
+			    	<a href="javascript:void()" onclick="ts.displayPrintConnection()" style="color: blue;margin-right: 20px;">刷新</a>打印服务状态: 
+			    	<span id="printerServiceState"> 未知 </span> 
 				</div>
 			</div><!-- /grid-a -->				
 			<br> 
@@ -238,7 +239,9 @@
        	</div>	
        	<div data-role="content">
 			<h2>所有打印机不出单:</h2>
-				<p>屏幕右下角打开电脑菜单 -> 所有程序 -> e点通打印服务 -> 打开打印服务即可</p>
+				<p>屏幕右下角打开电脑菜单 -> 所有程序 -> e点通打印服务 -> 点击e点通打印服务即可</p>
+				
+			<img alt="" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintError/openService.jpg">
 		</div>
 	</div>	
 	
@@ -254,7 +257,8 @@
        	</div>	
        	<div data-role="content">
 			<h2>所有打印机出重单:</h2>
-				<p>请卸载店里其中一台收银电脑的e点通打印服务</p>
+				<p>屏幕右下角打开电脑菜单 -> 所有程序 -> e点通打印服务 -> 卸载e点通打印服务即可</p>
+			<img alt="" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintError/closeService.jpg">	
 		</div>
 	</div>					
 	
@@ -268,10 +272,11 @@
 	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
 	       	</div>
        	</div>	
-       	<div data-role="content">
+       	<div data-role="content" style="max-height:650px;overflow: auto;">
 			<h3>1, 检查当前打印机后面接网线的地方有没有黄色的灯亮着</h3>
-			
-			<h3>2, 检查分线盒是否连上路由器</h3>
+			<img alt="" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintError/theYellowLight.jpg">
+			<h3>2, 检查交换机连上路由器的灯是否亮着</h3>
+			<img alt="" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintError/luyouqi.jpg">
 		</div>
 	</div>	
 	

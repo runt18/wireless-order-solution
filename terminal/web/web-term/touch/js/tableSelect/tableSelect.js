@@ -984,7 +984,7 @@ ts.displayPrintConnection = function(){
 				
 			
 			}else{
-				$('#printerServiceState').html('<a href="#printerServiceErrorCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>');
+				$('#printerServiceState').html('<a href="#printerServiceUnopenCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>');
 				$('#printerConnectionCount').text(0);
 				$('#printerConnectionList').html('');
 			}
