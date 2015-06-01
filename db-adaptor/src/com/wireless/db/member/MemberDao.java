@@ -1091,12 +1091,12 @@ public class MemberDao {
 		}
 		
 		//Check to see whether the mobile or member card is duplicated.
-		if(builder.isMobileChanged()){
+		if(builder.isMobileChanged() && member.hasMobile()){
 			if(!getByCond(dbCon, staff, new ExtraCond().setMobile(member.getMobile()) + " AND M.member_id <> " + member.getId(), null).isEmpty()){
 				throw new BusinessException(MemberError.MOBLIE_DUPLICATED);
 			}
 		}
-		if(builder.isMemberCardChanged()){
+		if(builder.isMemberCardChanged() && member.hasMemberCard()){
 			if(member.hasMemberCard() && !getByCond(dbCon, staff, new ExtraCond().setCard(member.getMemberCard()) + " AND M.member_id <> " + member.getId(), null).isEmpty()){
 				throw new BusinessException(MemberError.MEMBER_CARD_DUPLICATED);
 			}
@@ -1106,10 +1106,10 @@ public class MemberDao {
 		sql = " UPDATE " + Params.dbName + ".member SET " +
 			  " member_id = " + member.getId() +
 			  (builder.isNameChanged() ? " ,name = '" + member.getName() + "'" : "") +
-			  (" ,mobile = " + "'" + member.getMobile() + "'" ) +
+			  (builder.isMobileChanged() ? " ,mobile = " + "'" + member.getMobile() + "'" : "") +
 			  (builder.isMobileChanged() ? " ,mobile_crc = CRC32('" + member.getMobile() + "')" : "") +
 			  (builder.isMemberTypeChanged() ? " ,member_type_id = " + member.getMemberType().getId() : "")	+
-			  (" ,member_card = '" + member.getMemberCard() + "'")	+
+			  (builder.isMemberCardChanged() ? " ,member_card = '" + member.getMemberCard() + "'" : "")	+
 			  (builder.isMemberCardChanged() ? ", member_card_crc = CRC32('" + member.getMemberCard() + "')" : "") +
 			  (builder.isTeleChanged() ? " ,tele = '" + member.getTele() + "'" : "") +
 			  (builder.isSexChanged() ? " ,sex = " + member.getSex().getVal() : "")	+
