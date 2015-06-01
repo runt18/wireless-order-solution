@@ -91,7 +91,7 @@ public class QueryOrderStatisticsAction extends Action {
 			if(seqId != null && !seqId.isEmpty()){
 				extraCond.setSeqId(Integer.parseInt(seqId));
 			}
-			if(comboPayType != null && !comboPayType.equals("-1")){
+			if(comboPayType != null && !comboPayType.isEmpty() && !comboPayType.equals("-1")){
 				//按结帐方式
 				extraCond.setPayType(new PayType(Integer.parseInt(comboPayType)));
 			}

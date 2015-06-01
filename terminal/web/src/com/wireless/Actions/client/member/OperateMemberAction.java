@@ -84,6 +84,8 @@ public class OperateMemberAction extends DispatchAction{
 				if(memberCard != null && !memberCard.isEmpty()){
 					ib.setMemberCard(memberCard);
 				}				
+			}else{
+				ib = Member.InsertBuilder.build4Weixin(name, Integer.valueOf(memberTypeId));
 			}
 			
 			ib.setBirthday(DateUtil.parseDate(birthday))
