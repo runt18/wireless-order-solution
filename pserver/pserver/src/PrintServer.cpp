@@ -1073,7 +1073,7 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 								// Receive printer details
 								if(GetPrinter(hPrinter, 2, (LPBYTE)pPrnInfo2, dwSize, &dwSize)){
 
-									string printerAddr = Util::ws2s(wstring(pPrnInfo2->pPortName));
+									string printerAddr;
 
 									//Read the associated ip address to this printer port from the register
 									wostringstream wos;
@@ -1081,17 +1081,33 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 									//´ò¿ª×¢²á±í
 									HKEY hRegKey = NULL;
 									if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, wos.str().c_str(), 0, KEY_READ, &hRegKey) == ERROR_SUCCESS){
-										WCHAR szBuffer[512];
-										DWORD dwBufferSize = sizeof(szBuffer);
-										if(RegQueryValueEx(hRegKey, _T("HostName"), 0, NULL, (LPBYTE)szBuffer, &dwBufferSize) == ERROR_SUCCESS){
-											printerAddr = Util::ws2s(wstring(szBuffer));
+										DWORD dwBufferSize = 0;
+										//For win7
+										if(RegQueryValueEx(hRegKey, _T("HostName"), 0, NULL, NULL, &dwBufferSize) == ERROR_SUCCESS){
+											//allocate the memory to hold host name
+											boost::shared_ptr<WCHAR> pHostName(new WCHAR[dwBufferSize], boost::checked_array_deleter<WCHAR>());
+											if(RegQueryValueEx(hRegKey, _T("HostName"), 0, NULL, (LPBYTE)pHostName.get(), &dwBufferSize) == ERROR_SUCCESS){
+												printerAddr = Util::ws2s(wstring(pHostName.get()));
+
+											}
+										}
+										//For winXP
+										if(printerAddr.empty()){
+											if(RegQueryValueEx(hRegKey, _T("IPAddress"), 0, NULL, NULL, &dwBufferSize) == ERROR_SUCCESS){
+												//allocate the memory to hold ip address
+												boost::shared_ptr<WCHAR> pIPAddress(new WCHAR[dwBufferSize], boost::checked_array_deleter<WCHAR>());
+												if(RegQueryValueEx(hRegKey, _T("IPAddress"), 0, NULL, (LPBYTE)pIPAddress.get(), &dwBufferSize) == ERROR_SUCCESS){
+													printerAddr = Util::ws2s(wstring(pIPAddress.get()));
+
+												}
+											}
 										}
 									}
 									if(hRegKey){
 										RegCloseKey(hRegKey);
 									}
 
-									if(printerAddr.size() == 0){
+									if(printerAddr.empty()){
 										printerAddr = Util::ws2s(wstring(pPrnInfo2->pPortName));
 									}
 
