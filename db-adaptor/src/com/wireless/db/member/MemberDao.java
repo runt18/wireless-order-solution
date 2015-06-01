@@ -1106,10 +1106,10 @@ public class MemberDao {
 		sql = " UPDATE " + Params.dbName + ".member SET " +
 			  " member_id = " + member.getId() +
 			  (builder.isNameChanged() ? " ,name = '" + member.getName() + "'" : "") +
-			  (builder.isMobileChanged() ? " ,mobile = " + "'" + member.getMobile() + "'" : "") +
+			  (" ,mobile = " + "'" + member.getMobile() + "'" ) +
 			  (builder.isMobileChanged() ? " ,mobile_crc = CRC32('" + member.getMobile() + "')" : "") +
 			  (builder.isMemberTypeChanged() ? " ,member_type_id = " + member.getMemberType().getId() : "")	+
-			  (builder.isMemberCardChanged() ? " ,member_card = '" + member.getMemberCard() + "'" : "")	+
+			  (" ,member_card = '" + member.getMemberCard() + "'")	+
 			  (builder.isMemberCardChanged() ? ", member_card_crc = CRC32('" + member.getMemberCard() + "')" : "") +
 			  (builder.isTeleChanged() ? " ,tele = '" + member.getTele() + "'" : "") +
 			  (builder.isSexChanged() ? " ,sex = " + member.getSex().getVal() : "")	+
