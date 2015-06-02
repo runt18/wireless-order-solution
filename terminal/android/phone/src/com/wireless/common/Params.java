@@ -24,7 +24,7 @@ public final class Params {
 	/* the default IP address */
 	public final static String DEF_IP_ADDR = "e-tones.net";
 	/* the default backup IP address */
-	public final static String DEF_BACKUP_CONNECTOR = "bk.e-tones.net:55555";
+	public final static String DEF_BACKUP_CONNECTOR = "wx.e-tones.net:55555";
 	
 	/* the default IP port */
 	public final static int DEF_IP_PORT = 55555;

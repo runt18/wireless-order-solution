@@ -142,51 +142,40 @@ public class StartupActivity extends Activity {
 		
 		@Override
 		public void onSuccess(List<Connector> result) {
-			if(result.isEmpty()){
-				String backups = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getString(Params.BACKUP_CONNECTOR, Params.DEF_BACKUP_CONNECTOR);
-				for(String connector : backups.split(",")){
-					String addr = connector.substring(0, connector.indexOf(":"));
-					String port = connector.substring(connector.indexOf(":") + 1);
-					ServerConnector.instance().addBackup(new ServerConnector.Connector(addr, Integer.parseInt(port)));
+			StringBuilder backups = new StringBuilder();
+			for(ServerConnector.Connector backup : result){
+				if(backups.length() > 0){
+					backups.append(",");
 				}
-			}else{
-				StringBuilder backups = new StringBuilder();
-				for(ServerConnector.Connector backup : result){
-					ServerConnector.instance().addBackup(backup);
-					if(backups.length() > 0){
-						backups.append(",");
-					}
-					backups.append(backup.getAddress() + ":" + backup.getPort());
-				}
+				backups.append(backup.getAddress() + ":" + backup.getPort());
+			}
+			if(backups.length() != 0){
 				getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit().putString(Params.BACKUP_CONNECTOR, backups.toString()).commit();
 			}
 			
+			doNext();
+		}
+
+		@Override
+		public void onFail(BusinessException e) {
+			doNext();
+		}
+		
+		private void doNext(){
+			for(String connector : getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getString(Params.BACKUP_CONNECTOR, Params.DEF_BACKUP_CONNECTOR).split(",")){
+				String addr = connector.substring(0, connector.indexOf(":"));
+				String port = connector.substring(connector.indexOf(":") + 1);
+				ServerConnector.instance().addBackup(new ServerConnector.Connector(addr, Integer.parseInt(port)));
+			}
 			try {
 				if(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != 1){
 					new QueryStaffTask(JUST_4_TEST).execute();
 				}else{
 					new QueryStaffTask().execute();
 				}
-			} catch (NameNotFoundException e) {
+			} catch (NameNotFoundException ignored) {
 				new QueryStaffTask().execute();
 			}
-		}
-
-		@Override
-		public void onFail(BusinessException e) {
-			new AlertDialog.Builder(
-					StartupActivity.this)
-					.setTitle("提示")
-					.setMessage(e.getMessage())
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,	int id) {
-									Intent intent = new Intent(StartupActivity.this, MainActivity.class);
-									startActivity(intent);
-									finish();
-								}
-							})
-					.show();
 		}
 		
 	}
