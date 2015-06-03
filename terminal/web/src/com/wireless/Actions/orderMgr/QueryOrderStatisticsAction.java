@@ -10,6 +10,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.DBCon;
+import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
@@ -39,11 +41,15 @@ public class QueryOrderStatisticsAction extends Action {
 		DateType dateTypeEnmu = DateType.valueOf(Integer.parseInt(dateType));
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");
+		String isRange = request.getParameter("isRange");
 		
 		String businessHourBeg = request.getParameter("opening");
 		String businessHourEnd = request.getParameter("ending");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
+		
+		DBCon dbCon = new DBCon();
+		
 		
 		OrderDao.ExtraCond extraCond = new ExtraCond(DateType.valueOf(Integer.parseInt(dateType)));
 		try{
@@ -58,6 +64,8 @@ public class QueryOrderStatisticsAction extends Action {
 			String staffId = request.getParameter("staffId");
 			String common = request.getParameter("common");
 			String comboPayType = request.getParameter("comboPayType");
+			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(comboType != null && !comboType.trim().isEmpty()){
 				int comboVal = Integer.valueOf(comboType);
@@ -111,7 +119,18 @@ public class QueryOrderStatisticsAction extends Action {
 				extraCond.setRegionId(Region.RegionId.valueOf(Short.parseShort(region)));
 			}
 			if(dateBeg != null && !dateBeg.isEmpty()){
-				extraCond.setOrderRange(new DutyRange(dateBeg, dateEnd));
+				dbCon.connect();
+				
+				if(isRange != null && !isRange.isEmpty()){
+					
+					DutyRange range = DutyRangeDao.exec(dbCon, staff, 
+							DateUtil.format(DateUtil.parseDate(dateBeg), DateUtil.Pattern.DATE_TIME), 
+							DateUtil.format(DateUtil.parseDate(dateEnd), DateUtil.Pattern.DATE_TIME));				
+					
+					extraCond.setOrderRange(new DutyRange(range.getOnDutyFormat(), range.getOffDutyFormat()));
+				}else{
+					extraCond.setOrderRange(new DutyRange(dateBeg, dateEnd));
+				}
 			}
 			if(businessHourBeg != null && !businessHourBeg.isEmpty()){
 				extraCond.setHourRange(new HourRange(businessHourBeg, businessHourEnd, DateUtil.Pattern.HOUR));
@@ -121,7 +140,7 @@ public class QueryOrderStatisticsAction extends Action {
 			
 			String orderClause = " ORDER BY "+ extraCond.orderTblAlias +".order_date ASC " + " LIMIT " + start + "," + limit;
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
 			
 			list = OrderDao.getByCond(staff, extraCond, orderClause);
 			totalList = OrderDao.getByCond(staff, extraCond, null);
@@ -138,6 +157,7 @@ public class QueryOrderStatisticsAction extends Action {
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
+			dbCon.disconnect();
 			if(!list.isEmpty() && dateTypeEnmu == DateType.TODAY){
 				Order sum = new Order();
 				sum.setDestTbl(new Table());
