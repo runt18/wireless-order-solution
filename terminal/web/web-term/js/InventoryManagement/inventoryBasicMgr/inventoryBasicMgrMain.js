@@ -349,9 +349,11 @@ function initOperateMaterialWin(){
 				}
 			}],
 			listeners : {
+				render : function(){
+					initMaterialCate.store.loadData(materialCateData);
+				},
 				show : function(thiz){
 					thiz.center();
-					initMaterialCate.store.loadData(materialCateData);
 				},
 				hide : function(){
 					Ext.getCmp('txtMaterialName').setValue();

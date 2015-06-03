@@ -333,7 +333,7 @@ Ext.onReady(function(){
 						
 						trPayTypeContent += (String.format(trPayIncomeModel, 
 								temp.payType, 
-								'<a href="javascript:void()" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8})">' + temp.amount + '</a>', 
+								'<a href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, payType:\''+ temp.payType +'\'})">' + temp.amount + '</a>', 
 								temp.total.toFixed(2), 
 								temp.actual.toFixed(2)
 							)
@@ -535,5 +535,4 @@ Ext.onReady(function(){
 	}
 	
 //	Ext.getDom('divBusinessStatisticsSummary').parentNode.style.overflowY = 'auto';
-	
 });
