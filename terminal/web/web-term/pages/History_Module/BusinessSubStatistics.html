@@ -23,6 +23,8 @@
 		
 		sendToStatisticsPayType = c.payType;
 		
+		sendToStatisticsOperateType = c.operateType;
+		
 		if(!sendToStatisticsPageHours.opening){
 			sendToStatisticsPageHours.openingText = "00:00";
 			sendToStatisticsPageHours.endingText = "00:00";
@@ -52,6 +54,8 @@
 			addTab('commissionStatistics', '提成统计', 'History_Module/CommissionStatistics.html');			
 		}else if(c.type == 8){//历史账单
 			addTab('history', '历史账单', 'History_Module/HistoryStatistics.html');			
+		}else if(c.type == 9){//抹数统计
+			addTab('eraseStatistics', '抹数统计', 'History_Module/EraseStatistic.html');			
 		}else{
 			return;
 		}
@@ -87,31 +91,31 @@
 		</tr>
 		<tr>
 			<th>抹数</th>
-			<td class="text_right" id="businessSub_bssiEraseAmount">---</td>
+			<td class="text_right" ><a id="businessSub_bssiEraseAmount" href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, operateType:5})">---</a></td>
 			<td class="text_right" id="businessSub_bssiEraseIncome">---</td>
-			<td class="text_center">----</td>
+			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 9})">查看详情</a></td>
 		</tr>
 		<tr>
 			<th>折扣</th>
-			<td class="text_right" id="businessSub_bssiDiscountAmount">---</td>
+			<td class="text_right" ><a id="businessSub_bssiDiscountAmount" href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, operateType:2})">---</a></td>
 			<td class="text_right" id="businessSub_bssiDiscountIncome">---</td>
 			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 1})">查看详情</a></td>
 		</tr>
 		<tr>
 			<th>赠送</th>
-			<td class="text_right" id="businessSub_bssiGiftAmount">---</td>
+			<td class="text_right" ><a id="businessSub_bssiGiftAmount" href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, operateType:3})">---</a></td>
 			<td class="text_right" id="businessSub_bssiGiftIncome">---</td>
 			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 2})">查看详情</a></td>
 		</tr>
 		<tr>
 			<th>退菜</th>
-			<td class="text_right" id="businessSub_bssiCancelAmount">---</td>
+			<td class="text_right"><a id="businessSub_bssiCancelAmount" href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, operateType:4})">---</a></td>
 			<td class="text_right" id="businessSub_bssiCancelIncome">---</td>
 			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 3})">查看详情</a></td>
 		</tr>
 		<tr>
 			<th>反结帐</th>
-			<td class="text_right" id="businessSub_bssiPaidAmount">---</td>
+			<td class="text_right"><a id="businessSub_bssiPaidAmount" href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, operateType:1})">---</a></td>
 			<td class="text_right" id="businessSub_bssiPaidIncome">---</td>
 			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 4})">查看详情</a></td>
 		</tr>
@@ -129,7 +133,7 @@
 		</tr>
 		<tr>
 			<th>优惠劵</th>
-			<td class="text_right" id="businessSub_bssiCouponAmount">---</td>
+			<td class="text_right"><a id="businessSub_bssiCouponAmount" href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, operateType:6})">---</a></td>
 			<td class="text_right" id="businessSub_bssiCouponIncome">---</td>
 			<td class="text_center">----</td>
 		</tr>
