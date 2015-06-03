@@ -100,8 +100,6 @@ function orderFoodStatPanelInit(){
         			salesSubDeptId = e.attributes.deptID;
         		}*/	     
         		salesSubDeptId = e.attributes.deptID;
-        	},
-        	dblclick : function(e){
         		Ext.getCmp('foodStatistic_btnSearch').handler();
         	}
         }
