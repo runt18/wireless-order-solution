@@ -485,6 +485,16 @@ var erase_loadStaffColumnChart = function(type){
     });	
 };
 
+function erase_fnChangeStaffChart(thiz, v){
+	$(thiz).find('input').attr('checked', 'checked');
+	erase_staffPieChart = erase_loadStaffPieChart(v);
+	erase_staffColumnChart = erase_loadStaffColumnChart(v);
+	erase_staffPieChart.setSize(eraseStatChartTabPanel.getWidth()*0.4, erase_panelDrag ? eraseStatChartTabPanel.getHeight() - erase_cutAfterDrag : eraseStatChartTabPanel.getHeight()-erase_cutChartHeight);
+	erase_staffColumnChart.setSize(eraseStatChartTabPanel.getWidth()*0.6, erase_panelDrag ? eraseStatChartTabPanel.getHeight() - erase_cutAfterDrag : eraseStatChartTabPanel.getHeight()-erase_cutChartHeight);
+	
+	eraseDetailsStatPanel.otype = v;
+}
+
 var erase_setStatisticsDate = function(){
 	if(sendToPageOperation){
 		Ext.getCmp('erase_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
@@ -502,16 +512,6 @@ var erase_setStatisticsDate = function(){
 	}
 
 };
-
-function erase_fnChangeStaffChart(thiz, v){
-	$(thiz).find('input').attr('checked', 'checked');
-	erase_staffPieChart = erase_loadStaffPieChart(v);
-	erase_staffColumnChart = erase_loadStaffColumnChart(v);
-	erase_staffPieChart.setSize(eraseStatChartTabPanel.getWidth()*0.4, erase_panelDrag ? eraseStatChartTabPanel.getHeight() - erase_cutAfterDrag : eraseStatChartTabPanel.getHeight()-erase_cutChartHeight);
-	erase_staffColumnChart.setSize(eraseStatChartTabPanel.getWidth()*0.6, erase_panelDrag ? eraseStatChartTabPanel.getHeight() - erase_cutAfterDrag : eraseStatChartTabPanel.getHeight()-erase_cutChartHeight);
-	
-	eraseDetailsStatPanel.otype = v;
-}
 
 var erase_cutAfterDrag = 190, erase_cutBeforeDrag = 40, erase_hours;
 var titleEraseDeptName, titleEraseStaffName;

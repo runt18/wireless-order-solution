@@ -547,6 +547,13 @@ var history_setStatisticsDate = function(){
 			}
 		}
 		
+		$('input[name="conditionRadio"]').each(function(){
+			if(this.value == sendToStatisticsOperateType){
+				Ext.getCmp(this.id).setValue(true);
+				Ext.getCmp(this.id).fireEvent('check', Ext.getCmp(this.id), true);
+			}
+		});
+		
 		billQueryHandler({isRange:true});
 		
 		Ext.getCmp('txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+history_hours.openingText+'</font>');
