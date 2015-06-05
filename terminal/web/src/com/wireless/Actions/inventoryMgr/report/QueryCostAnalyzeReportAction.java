@@ -16,12 +16,10 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.CostAnalyzeReportDao;
-import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.CostAnalyze;
-import com.wireless.pojo.util.WebParams;
 
 public class QueryCostAnalyzeReportAction extends Action {
 
@@ -39,13 +37,17 @@ public class QueryCostAnalyzeReportAction extends Action {
 			Calendar c = Calendar.getInstance();
 			if(beginDate == null){
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				long current = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
+//				long current = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
+//				
+//				c.setTime(new Date(current));
+//				c.add(Calendar.MONTH, -1);
+//				beginDate = sdf.format(c.getTime());
+//				int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+//				endDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day + " 23:59:59";
+				//默认使用当前时间实时查询
+				beginDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-01";
 				
-				c.setTime(new Date(current));
-				c.add(Calendar.MONTH, -1);
-				beginDate = sdf.format(c.getTime());
-				int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
-				endDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day + " 23:59:59";
+				endDate = sdf.format(new Date());
 				list = CostAnalyzeReportDao.getCostAnalyzes(staff, beginDate, endDate, null);
 			}else{
 				endDate = beginDate + "-31 23:59:59";
@@ -55,10 +57,10 @@ public class QueryCostAnalyzeReportAction extends Action {
 			jobject.setRoot(list);
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), e.getCode(), e.getDesc());
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}	

@@ -15,7 +15,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.db.stockMgr.StockDeltaReportDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -46,13 +45,19 @@ public class QueryDeltaReportAction extends Action{
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			if(beginDate == null){
 				
-				long current = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
+//				long current = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
+//				Calendar c = Calendar.getInstance();
+//				c.setTime(new Date(current));
+//				c.add(Calendar.MONTH, -1);
+//				beginDate = sdf.format(c.getTime());
+//				int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+//				endDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day;
+				
+				//默认使用当前时间实时查询
 				Calendar c = Calendar.getInstance();
-				c.setTime(new Date(current));
-				c.add(Calendar.MONTH, -1);
-				beginDate = sdf.format(c.getTime());
-				int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
-				endDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day;
+				beginDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-01";
+				
+				endDate = sdf.format(new Date());
 				
 			}else{
 				endDate = beginDate + "-31";

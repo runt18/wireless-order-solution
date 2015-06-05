@@ -1,5 +1,8 @@
 package com.wireless.Actions.inventoryMgr.stockTake;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -53,6 +56,23 @@ public class OperateStockTakeAction extends DispatchAction{
 				.setDept(new Department(staff.getRestaurantId(), Short.valueOf(dept), null))
 				.setOperatorId(staff.getId()).setOperator(staff.getName())
 				.setComment(comment);
+			
+			if(StockTakeDao.beforeInsertStockTake(staff)){
+				builder.setStartTime(System.currentTimeMillis());	
+			}else{
+				Calendar c = Calendar.getInstance();
+
+				int year = c.get(Calendar.YEAR); 
+				int month = c.get(Calendar.MONTH);
+				//获取上个月的天数
+				int day = getDaysByYearMonth(year, month);
+				
+				String startTime = year + "-" + month + "-" + day + " 23:59:59";
+				SimpleDateFormat sdf =   new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				builder.setStartTime(sdf.parse(startTime).getTime());	
+				
+			}
+			
 			if(cateId != null && !cateId.trim().isEmpty()){
 				builder.setCateId(Integer.valueOf(cateId));
 			}
@@ -76,6 +96,18 @@ public class OperateStockTakeAction extends DispatchAction{
 		}
 		return null;
 	}
+	
+	 private static int getDaysByYearMonth(int year, int month) {  
+         
+	        Calendar a = Calendar.getInstance();  
+	        a.set(Calendar.YEAR, year);  
+	        a.set(Calendar.MONTH, month - 1);  
+	        a.set(Calendar.DATE, 1);  
+	        a.roll(Calendar.DATE, -1);  
+	        int maxDate = a.get(Calendar.DATE);  
+	        return maxDate;  
+	    } 	
+	
 	
 	/**
 	 * 
