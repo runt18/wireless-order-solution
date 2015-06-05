@@ -38,7 +38,6 @@ if(!addSupplier){
 					Ext.Ajax.request({
 						url : actionUrl,
 						params : {
-							
 							supplierID : sId,
 							supplierName : sName,
 							tele : sTele,
@@ -50,7 +49,11 @@ if(!addSupplier){
 							Ext.getCmp('supplier_grid').store.reload();
 							var jr = Ext.util.JSON.decode(res.responseText);
 							if(jr.success){
-								addSupplier.hide();
+								if(addSupplier.operationType == 'insert'){
+									supplierOperactionHandler({type : 'insert'});									
+								}else{
+									addSupplier.hide();
+								}
 								Ext.example.msg(jr.title, jr.msg);
 							}else{
 								Ext.ux.showMsg(jr);
@@ -93,7 +96,6 @@ if(!addSupplier){
 				id : 'txtSTele',
 				width : 130,
 				fieldLabel : '联系方式',
-				allowBlank : false,
 				regex : Ext.ux.RegText.phone.reg,
 				regexText : Ext.ux.RegText.phone.error
 				
@@ -122,32 +124,6 @@ if(!addSupplier){
 			}]
 	
 		}],
-		listeners : {
-			'show' : function(thiz){
-				var fn = Ext.getCmp('txtSName');
-				if(addSupplier.operationType == 'insert'){
-					
-					fn.setValue('');
-					fn.clearInvalid();
-					
-					Ext.getCmp('txtSTele').setValue('');
-					Ext.getCmp('txtSTele').clearInvalid();
-					
-					Ext.getCmp('txtSAddr').setValue('');
-	
-					Ext.getCmp('txtSContact').setValue('');
-					Ext.getCmp('txtSContact').clearInvalid();
-					
-					Ext.getCmp('txtSComment').setValue('');
-					
-					
-					
-				}else{
-					Ext.getCmp('txtSTele').clearInvalid();
-				}
-				fn.focus(true, 100);
-			}
-		},
 		keys : [{
 			key : Ext.EventObject.ENTER,
 			scope : this,
@@ -158,6 +134,8 @@ if(!addSupplier){
 			
 	});
 }
+
+
 
 
 var filterTypeDate = [[0,'全部'],[1,'供应商名称'],[2,'联系电话'],[3,'联系人']];
@@ -225,6 +203,15 @@ supplierOperactionHandler = function(c){
 	
 	if(c.type == 'insert'){
 		addSupplier.setTitle('添加供应商');
+		sId.setValue('');
+		sName.setValue('');
+		sTele.setValue('');
+		sAddr.setValue('');
+		sContact.setValue('');
+		sComment.setValue('');
+		
+		sContact.clearInvalid();
+		sName.clearInvalid();
 	}
 	else if(c.type == 'update'){
 		var sn = Ext.getCmp('supplier_grid').getSelectionModel().getSelected(); 
@@ -243,6 +230,8 @@ supplierOperactionHandler = function(c){
 	addSupplier.operationType = c.type;
 	//addSupplier.center();
 	addSupplier.show();
+	
+	sName.focus(true, 100);
 };
 
 deleteSupplierOperationHandler = function(){

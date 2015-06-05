@@ -196,7 +196,7 @@ Ext.onReady(function(){
 			id : 'dr_beginDate',
 			allowBlank : false,
 			format : 'Y-m',
-			value : date,
+			value : new Date(),
 			maxValue : new Date(),
 			width : 100
 		},

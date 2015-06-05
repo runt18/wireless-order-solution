@@ -95,62 +95,61 @@ function operateStockTakeDate(c){
  * 新增盘点任务
  */
 function insertStockTakeHandler(){
+//FIXME 不需要验证当前月份	
+//	Ext.Ajax.request({
+//		url : '../../OperateStockTake.do',
+//		params : {
+//			dataSource : 'checkCurrentMonth'
+//			
+//		},
+//		success : function(res, opt){
+//			var jr = Ext.decode(res.responseText);
+//			if(jr.success){
+//
+//			}else{
+//				Ext.ux.showMsg(jr);
+//			}
+//		},
+//		failure : function(res, opt){
+//			Ext.ux.showMsg(Ext.decode(res.responseText));
+//		}
+//	});
+	
 	Ext.Ajax.request({
 		url : '../../OperateStockTake.do',
 		params : {
-			dataSource : 'checkCurrentMonth'
+			dataSource : 'checkStockAction'
 			
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
-				Ext.Ajax.request({
-					url : '../../OperateStockTake.do',
-					params : {
-						dataSource : 'checkStockAction'
-						
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						if(jr.success){
-							stockTakeWin.otype = Ext.ux.otype['insert'];
-							stockTakeWin.show();
-							stockTakeWin.setTitle('新增盘点任务');
-							stockTakeWin.center();
-							
-							operateStockTakeDate({
-								otype : Ext.ux.otype['set']
-							});
-							var dept = Ext.getCmp('comboStockTakeDept');
-							var cate = Ext.getCmp('comboMaterialCate');
-							var cateId = Ext.getCmp('comboMaterialCateId');
-							dept.setDisabled(false);
-							cate.setDisabled(false);
-							cateId.setDisabled(false);
-//							cate.fireEvent('select', cate);
-							
-							Ext.getCmp('btnAuditStockTake').hide();
-							Ext.getCmp('btnSaveStockTake').show();
-							//Ext.getCmp('stockTakeWinWest').setDisabled(false);
-							//loadOperateMaterial();
-						}else{
-							jr['icon'] = Ext.Msg.WARNING; 
-							Ext.ux.showMsg(jr);
-						}
-					},
-					failure : function(res, opt){
-						Ext.ux.showMsg(Ext.decode(res.responseText));
-					}
+				stockTakeWin.otype = Ext.ux.otype['insert'];
+				stockTakeWin.show();
+				stockTakeWin.setTitle('新增盘点任务');
+				stockTakeWin.center();
+				
+				operateStockTakeDate({
+					otype : Ext.ux.otype['set']
 				});
-
+				var dept = Ext.getCmp('comboStockTakeDept');
+				var cate = Ext.getCmp('comboMaterialCate');
+				var cateId = Ext.getCmp('comboMaterialCateId');
+				dept.setDisabled(false);
+				cate.setDisabled(false);
+				cateId.setDisabled(false);
+				
+				Ext.getCmp('btnAuditStockTake').hide();
+				Ext.getCmp('btnSaveStockTake').show();
 			}else{
+				jr['icon'] = Ext.Msg.WARNING; 
 				Ext.ux.showMsg(jr);
 			}
 		},
 		failure : function(res, opt){
 			Ext.ux.showMsg(Ext.decode(res.responseText));
 		}
-	});
+	});	
 
 	
 }

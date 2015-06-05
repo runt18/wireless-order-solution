@@ -53,7 +53,6 @@ function stockTaskNavHandler(e){
 	
 					for(var i = 0; i < ss.length; i++){
 						if(ss[i] != ws[i]){
-	//						if(stockTaskNavWin.otype == Ext.ux.otype['insert']){
 								if(confirm('入库单类型已更改, 确定继续将清空原操作信息.')){
 									// 更换类型后重置相关信息
 									operateStockActionBasic({
@@ -69,16 +68,137 @@ function stockTaskNavHandler(e){
 										}
 									}
 								}
-	//						}
 						}
 					}
 				}
 			}
 		}
-		if(index == 1){
+		if(index >= 1){
 			/***** 第二步, 根据用户选择入库单类型设置相关信息 *****/
-			// stockTypeList -> [[0]出入库类型, [1]货品类型, [2]货单类型]
-//			var titleDom = Ext.getDom('displayPanelForStockActionTitle');
+			
+			/** 处理导航按钮触发事件, 设置导航页面或提交操作 **/
+			if(index >= 0 && index <= 1 ){
+				// 切换步骤
+				stockTaskNavWin.getLayout().setActiveItem(index);
+				var smfos = Ext.getCmp('comboSelectMaterialForStockAction');
+				var stockActionDate = Ext.getCmp('datetOriStockDateForStockActionBasic');
+				stockActionDate.clearInvalid();
+				
+				smfos.setValue();
+				smfos.clearInvalid();
+				smfos.store.load({
+					params : {
+						cateType : stockTaskNavWin.stockType.split(',')[1]
+					}
+				});
+				stockTaskNavWin.setTitle(stockTaskNavWin.getLayout().activeItem.mt);
+			}else{
+				if(index > 1){
+					// 完成时的操作
+					var id = Ext.getCmp('hideStockActionId');
+					var deptIn = Ext.getCmp('comboDeptInForStockActionBasic');
+					var supplier = Ext.getCmp('comboSupplierForStockActionBasic');
+					var deptOut = Ext.getCmp('comboDeptOutForStockActionBasic');
+					var oriStockId = Ext.getCmp('txtOriStockIdForStockActionBasic');
+					var oriStockDate = Ext.getCmp('datetOriStockDateForStockActionBasic');
+					var comment = Ext.getCmp('txtCommentForStockActionBasic');
+					var actualPrice = Ext.getDom('txtActualPrice');
+					var detail = '';
+					if(!oriStockDate.getValue()){
+						if(oriStockDate.isValid()){
+						
+						}
+						return;
+					}
+					var stockTypeList = stockTaskNavWin.stockType.split(',');
+					var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
+					if(stockType == 1){
+						if(stockSubType == 1){
+							if(!deptIn.isValid() || !supplier.isValid()){
+								return;
+							}
+						}else if(stockSubType == 2){
+							if(!deptIn.isValid() || !deptOut.isValid()){
+								return;
+							}
+						}else if(stockSubType == 3){
+							if(!deptIn.isValid()){
+								return;
+							}
+						}
+					}else if(stockType == 2){
+						if(stockSubType == 4){
+							if(!supplier.isValid() || !deptOut.isValid()){
+								return;
+							}
+						}else if(stockSubType == 5){
+							if(!deptIn.isValid() || !deptOut.isValid()){
+								return;
+							}
+						}else if(stockSubType == 6){
+							if(!deptOut.isValid()){
+								return;
+							}
+						}
+					}
+					
+					if(secondStepPanelCenter.getStore().getCount() == 0){
+						Ext.example.msg('提示', '操作失败, 请选中货品信息.');
+						return;
+					}
+					//防止重复点击
+					btnNext.setDisabled(true);
+					
+					for(var i = 0; i < secondStepPanelCenter.getStore().getCount(); i++){
+						var temp = secondStepPanelCenter.getStore().getAt(i);
+						if(i>0){
+							detail+='<sp>';
+						}
+						detail+=(temp.get('material.id')+'<spst>'+temp.get('price')+'<spst>'+temp.get('amount'));
+					}
+					Ext.Ajax.request({
+						url : '../../OperateStockAction.do',
+						params : {
+							'dataSource' : stockTaskNavWin.otype.toLowerCase(),
+							
+							id : id.getValue(),
+							deptIn : deptIn.getValue(),
+							supplier : supplier.getValue(),
+							deptOut : deptOut.getValue(),
+							oriStockId : oriStockId.getValue(),
+							oriStockDate : oriStockDate.getValue().getTime(),
+							comment : comment.getValue(),
+							type : stockType,
+							cate : stockCate,
+							subType : stockSubType,
+							actualPrice : actualPrice.value,
+							detail : detail
+						},
+						success : function(res, opt){
+							btnNext.setDisabled(false);
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.example.msg(jr.title, jr.msg);
+								stockTaskNavWin.hide();
+								Ext.getCmp('comboSearchForStockType').setValue(stockType);
+								Ext.getCmp('comboSearchForStockType').fireEvent('select', Ext.getCmp('comboSearchForStockType'));
+								Ext.getCmp('sam_comboSearchForSubType').setValue(stockSubType);
+								Ext.getCmp('sam_comboSearchForCateType').setValue(stockCate);
+								
+								Ext.getCmp('btnSearchForStockBasicMsg').handler();
+								
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							btnNext.setDisabled(false);
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+				}
+			}			
+			
 			var deptInDom = Ext.getCmp('displayPanelForDeptIn');
 			var supplierDom = Ext.getCmp('displayPanelForSupplier');
 			var deptOutDom = Ext.getCmp('displayPanelForDeptOut');
@@ -110,6 +230,9 @@ function stockTaskNavHandler(e){
 					if(document.getElementById('displayPanelForDeptIn')){
 						document.getElementById('displayPanelForDeptIn').style.display = 'block';
 					}
+					if(document.getElementById('displayPanelForSupplier')){
+						document.getElementById('displayPanelForSupplier').style.display = 'block';
+					}
 				}else if(stockSubType == 2){
 					// 调拨
 					if(stockCate == 1){
@@ -122,7 +245,11 @@ function stockTaskNavHandler(e){
 					// 控制选择货仓
 					deptInDom.show();
 					supplierDom.hide();
+					
 					deptOutDom.show();
+					if(document.getElementById('displayPanelForDeptOut')){
+						document.getElementById('displayPanelForDeptOut').style.display = 'block';
+					}
 					
 					moneyPanel.setDisabled(true);
 					priceDom.getEl()? priceDom.getEl().up('.x-form-item').setDisplayed(false) : '';
@@ -196,6 +323,10 @@ function stockTaskNavHandler(e){
 					supplierDom.hide();
 					deptOutDom.show();
 					
+					if(document.getElementById('displayPanelForDeptOut')){
+						document.getElementById('displayPanelForDeptOut').style.display = 'block';
+					}		
+					
 					moneyPanel.setDisabled(true);
 					priceDom.getEl()? priceDom.getEl().up('.x-form-item').setDisplayed(false) : '';
 					column.setHidden(3, true);
@@ -214,6 +345,10 @@ function stockTaskNavHandler(e){
 					supplierDom.hide();
 					deptOutDom.show();
 					
+					if(document.getElementById('displayPanelForDeptOut')){
+						document.getElementById('displayPanelForDeptOut').style.display = 'block';
+					}		
+					
 					priceDom.getEl()? priceDom.getEl().up('.x-form-item').setDisplayed(false) : '';
 					column.setRenderer(3, '');
 				}else if(stockSubType == 8){
@@ -229,7 +364,9 @@ function stockTaskNavHandler(e){
 					deptInDom.hide();
 					supplierDom.hide();
 					deptOutDom.show();
-
+					if(document.getElementById('displayPanelForDeptOut')){
+						document.getElementById('displayPanelForDeptOut').style.display = 'block';
+					}		
 				}else if(stockSubType == 9){
 					// 报损
 					if(stockCate == 1){
@@ -243,16 +380,18 @@ function stockTaskNavHandler(e){
 					deptInDom.hide();
 					supplierDom.hide();
 					deptOutDom.show();
-
+					if(document.getElementById('displayPanelForDeptOut')){
+						document.getElementById('displayPanelForDeptOut').style.display = 'block';
+					}		
 				}
 			}
+			//刷新组件
 			secondStepPanelNorth.doLayout();
+			
 			if(stockTaskNavWin.otype != Ext.ux.otype['insert']){
 				var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
 				document.getElementById('stockActionTitle').innerHTML = diaplayTitle + '<label style="margin-left:50px">库单编号: ' + sn.data.id + '</label>';
-//				titleDom.setText(diaplayTitle + '库单编号: ' + sn.data.id);
 			}else{
-//				titleDom.body.update(diaplayTitle);
 				document.getElementById('stockActionTitle').innerHTML = diaplayTitle;
 			}
 			document.getElementById('stockActionTitle').style.display = 'block';
@@ -271,128 +410,6 @@ function stockTaskNavHandler(e){
 			btnPrevious.setDisabled(true);
 		}
 		
-		/** 处理导航按钮触发事件, 设置导航页面或提交操作 **/
-		if(index >= 0 && index <= 1 ){
-			// 切换步骤
-			stockTaskNavWin.getLayout().setActiveItem(index);
-			var smfos = Ext.getCmp('comboSelectMaterialForStockAction');
-			var stockActionDate = Ext.getCmp('datetOriStockDateForStockActionBasic');
-			stockActionDate.clearInvalid();
-			
-			smfos.setValue();
-			smfos.clearInvalid();
-			smfos.store.load({
-				params : {
-					cateType : stockTaskNavWin.stockType.split(',')[1]
-				}
-			});
-			stockTaskNavWin.setTitle(stockTaskNavWin.getLayout().activeItem.mt);
-		}else{
-			if(index > 1){
-				// 完成时的操作
-				var id = Ext.getCmp('hideStockActionId');
-				var deptIn = Ext.getCmp('comboDeptInForStockActionBasic');
-				var supplier = Ext.getCmp('comboSupplierForStockActionBasic');
-				var deptOut = Ext.getCmp('comboDeptOutForStockActionBasic');
-				var oriStockId = Ext.getCmp('txtOriStockIdForStockActionBasic');
-				var oriStockDate = Ext.getCmp('datetOriStockDateForStockActionBasic');
-				var comment = Ext.getCmp('txtCommentForStockActionBasic');
-				var actualPrice = Ext.getDom('txtActualPrice');
-				var detail = '';
-				if(!oriStockDate.getValue()){
-					if(oriStockDate.isValid()){
-					
-					}
-					return;
-				}
-				var stockTypeList = stockTaskNavWin.stockType.split(',');
-				var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
-				if(stockType == 1){
-					if(stockSubType == 1){
-						if(!deptIn.isValid() || !supplier.isValid()){
-							return;
-						}
-					}else if(stockSubType == 2){
-						if(!deptIn.isValid() || !deptOut.isValid()){
-							return;
-						}
-					}else if(stockSubType == 3){
-						if(!deptIn.isValid()){
-							return;
-						}
-					}
-				}else if(stockType == 2){
-					if(stockSubType == 4){
-						if(!supplier.isValid() || !deptOut.isValid()){
-							return;
-						}
-					}else if(stockSubType == 5){
-						if(!deptIn.isValid() || !deptOut.isValid()){
-							return;
-						}
-					}else if(stockSubType == 6){
-						if(!deptOut.isValid()){
-							return;
-						}
-					}
-				}
-				
-				if(secondStepPanelCenter.getStore().getCount() == 0){
-					Ext.example.msg('提示', '操作失败, 请选中货品信息.');
-					return;
-				}
-				//防止重复点击
-				btnNext.setDisabled(true);
-				
-				for(var i = 0; i < secondStepPanelCenter.getStore().getCount(); i++){
-					var temp = secondStepPanelCenter.getStore().getAt(i);
-					if(i>0){
-						detail+='<sp>';
-					}
-					detail+=(temp.get('material.id')+'<spst>'+temp.get('price')+'<spst>'+temp.get('amount'));
-				}
-				Ext.Ajax.request({
-					url : '../../OperateStockAction.do',
-					params : {
-						'dataSource' : stockTaskNavWin.otype.toLowerCase(),
-						
-						id : id.getValue(),
-						deptIn : deptIn.getValue(),
-						supplier : supplier.getValue(),
-						deptOut : deptOut.getValue(),
-						oriStockId : oriStockId.getValue(),
-						oriStockDate : oriStockDate.getValue().getTime(),
-						comment : comment.getValue(),
-						type : stockType,
-						cate : stockCate,
-						subType : stockSubType,
-						actualPrice : actualPrice.value,
-						detail : detail
-					},
-					success : function(res, opt){
-						btnNext.setDisabled(false);
-						var jr = Ext.decode(res.responseText);
-						if(jr.success){
-							Ext.example.msg(jr.title, jr.msg);
-							stockTaskNavWin.hide();
-							Ext.getCmp('comboSearchForStockType').setValue(stockType);
-							Ext.getCmp('comboSearchForStockType').fireEvent('select', Ext.getCmp('comboSearchForStockType'));
-							Ext.getCmp('sam_comboSearchForSubType').setValue(stockSubType);
-							Ext.getCmp('sam_comboSearchForCateType').setValue(stockCate);
-							
-							Ext.getCmp('btnSearchForStockBasicMsg').handler();
-							
-						}else{
-							Ext.ux.showMsg(jr);
-						}
-					},
-					failure : function(res, opt){
-						btnNext.setDisabled(false);
-						Ext.ux.showMsg(Ext.decode(res.responseText));
-					}
-				});
-			}
-		}
 	}else{
 		Ext.Msg.show({
 			title : '错误',
@@ -445,13 +462,16 @@ function operateStockActionBasic(c){
 		}
 		
 		id.setValue(data['id']);
-		if(deptInData['id']){
-			deptIn.setValue(deptInData['id']);
-		}
 		
-		if(supplierData['supplierID']){
-			supplier.setValue(supplierData['supplierID']);
-		}
+		setTimeout(function(){
+			if(typeof deptInData['id'] != "undefined"){
+				deptIn.setValue(deptInData['id']);
+			}
+			
+			if(supplierData['supplierID']){
+				supplier.setValue(supplierData['supplierID']);
+			}
+		}, 400);
 		
 		if(data['oriStockDateFormat']){
 			oriStockDate.setValue(data['oriStockDateFormat']);
@@ -475,7 +495,8 @@ function operateStockActionBasic(c){
 			actualPrice.value = data['actualPrice'] + "$"; 
 		}
 		actualPrice.disabled = true;
-		if(data['statusValue'] == 2){
+		//审核或反审核显示审核人
+		if(data['statusValue'] == 2 || data['statusValue'] == 3){
 			approverName.setValue(data['approverName']);
 			approverDate.setValue(data['approverDateFormat']);
 		}else{
@@ -563,7 +584,8 @@ function insertStockActionHandler(){
 /**
  * 修改出入库单信息
  */
-function updateStockActionHandler(){
+function updateStockActionHandler(c){
+	c = c || {};
 	var data = Ext.ux.getSelData(stockBasicGrid);
 	if(!data){
 		Ext.example.msg('提示', '操作失败, 请选中一条记录后再操作.');
@@ -572,8 +594,11 @@ function updateStockActionHandler(){
 	stockTaskNavWin.center();
 	stockTaskNavWin.show();
 	
-	if(data['statusValue'] == 1){
+	if(data['statusValue'] == 1 || c.reAudit){
 		stockTaskNavWin.otype = Ext.ux.otype['update'];
+		if(c.reAudit){
+			stockTaskNavWin.otype = "reaudit"
+		}
 		stockTaskNavWin.setTitle('修改库存单信息');
 		operateStockActionBasic({
 			otype : Ext.ux.otype['set'],
@@ -822,6 +847,8 @@ function stockOperateRenderer(v, m, r, ri, ci, s){
 		}
 	}else{
 		return ''
+			+ '<a href="javascript:updateStockActionHandler({reAudit:true});">反审核</a>'
+			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:exportExcel();">导出</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:updateStockActionHandler();">查看</a>';
@@ -1710,41 +1737,6 @@ function initControl(){
 		    					price : newRecord.get('price')
 		    				}));
 		    			}
-						
-						
-/*	添加数量
- * 					var price = Ext.getCmp('numSelectPriceForStockAction');
-		    			var count = Ext.getCmp('numSelectCountForStockAction');
-						var stockTypeList = stockTaskNavWin.stockType.split(',');
-						var stockSubType = stockTypeList[2];
-						if(stockSubType == 3 || stockSubType == 6 || stockSubType == 2 || stockSubType == 5){
-							Ext.Ajax.request({
-								url : '../../QueryMaterial.do',
-								params : {
-									dataSource : 'normal',
-									
-									restaurantID : restaurantID,
-									materialId : thiz.getValue()
-								},
-								success : function(res, opt){
-								var jr = Ext.decode(res.responseText);
-									if(jr.success){
-										price.setValue(jr.root[0].price);
-										price.setDisabled(true);
-									}else{
-										Ext.ux.showMsg(jr);
-									}
-								},
-								failure : function(res, opt){
-									Ext.ux.showMsg(Ext.decode(res.responseText));
-								}
-							});
-						}else{
-							price.setValue(0);
-						}
-	
-		    			count.setValue(1);
-		    			count.focus(true, 100);*/
 					}
 				}
 			}]
@@ -1807,25 +1799,6 @@ function initControl(){
 		    }
 		});
 		
-/*		secondStepPanelCenter = createGridPanel(
-			'secondStepPanelCenter',
-			'货品列表',
-			'',
-			'',
-			'',
-			[
-				[true, false, false, false], 
-				['品名', 'material.name', 130],
-				['数量', 'amount',130,'right', 'stockDetailTotalCountRenderer'],
-				['单价', 'price',80,'right'],
-				['总价', 'totalPrice',80,'right', 'stockDetailTotalPriceRenderer']
-			],
-			StockDetailRecord.getKeys(),
-			[['isPaging', true],  ['restaurantId', restaurantID], ['stockStatus', 3]],
-			GRID_PADDING_LIMIT_20,
-			'',
-			stockAddMarterialGridTbar
-		);*/
 	}
 
 	secondStepPanelCenter.region = 'center';
@@ -1864,7 +1837,6 @@ function initControl(){
 	        title : '添加货品',
 	        id : 'sam_secondStepPanelWest',
 	        layout : 'form',
-//	    	region : 'west',
 	    	frame : true,
 	    	width : 220,
 	    	labelWidth : 60,
@@ -1873,7 +1845,6 @@ function initControl(){
 	    	},
 	    	items : [{
 				xtype : 'combo',
-//				id : 'comboSelectMaterialForStockAction',
 				fieldLabel : '货品',
 				forceSelection : true,
 				listWidth : 250,
@@ -1916,13 +1887,6 @@ function initControl(){
 						}
 					},
 					select : function(thiz){
-	//					var newRecord = null;
-	//	    			for(var i=0, temp=thiz.store, sv=thiz.getValue(); i<temp.getCount(); i++){
-	//	    				if(temp.getAt(i).get('id') == sv){
-	//	    					newRecord = temp.getAt(i);
-	//	    					break;
-	//	    				}
-	//	    			}
 						var price = Ext.getCmp('numSelectPriceForStockAction');
 		    			var count = Ext.getCmp('numSelectCountForStockAction');
 						var stockTypeList = stockTaskNavWin.stockType.split(',');
@@ -2083,7 +2047,6 @@ function initControl(){
 	    			stockTaskNavHandler(e);
 	    			Ext.getCmp('sam_secondStepPanelWest').setWidth(230);
 	    			Ext.getCmp('stock_secondStepPanel').doLayout();
-	    			
 		    	}
 	    	}, {
 	    		text : '审核',

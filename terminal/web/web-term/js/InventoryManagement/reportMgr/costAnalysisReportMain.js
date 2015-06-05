@@ -1,6 +1,7 @@
 
 function onLoad(){
-	Ext.getCmp('cost_analysis').getStore().load();
+//	Ext.getCmp('cost_analysis').getStore().load();
+	Ext.getCmp('btnSearch').handler();
 }
 
 var suppllierGridTbar;
@@ -37,8 +38,8 @@ Ext.onReady(function(){
 		])
 	});
 	
-	var date = new Date();
-	date.setMonth(date.getMonth()-1);
+//	var date = new Date();
+//	date.setMonth(date.getMonth()-1);
 	
 	costAnalyzeGridTbar = new Ext.Toolbar({
 		items : [
@@ -48,7 +49,7 @@ Ext.onReady(function(){
 			id : 'car_beginDate',
 			allowBlank : false,
 			format : 'Y-m',
-			value : date,
+			value : new Date(),
 			maxValue : new Date(),
 			width : 100
 		},'->', {
@@ -110,5 +111,5 @@ Ext.onReady(function(){
 		}]
 	});
 	
-//	onLoad();
+	onLoad();
 });	
