@@ -165,7 +165,7 @@ public class StockTakeDao {
 				sTake.getStatus().getVal() + ", " +
 				"'" + sTake.getOperator() + "', " +
 				sTake.getOperatorId() + ", " +
-				"'" + DateUtil.format(new Date().getTime()) + "', " +
+				"'" + DateUtil.format(sTake.getStartDate()) + "', " +
 				"'" + sTake.getComment() + "'" +
 				")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);

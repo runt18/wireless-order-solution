@@ -7,7 +7,9 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.CostAnalyze;
@@ -43,8 +45,14 @@ public class CostAnalyzeReportDao {
 			
 			materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, staff, " AND MD.dept_id = " + dept.getId(), null);
 			if(materialDepts.isEmpty()){
+				float endMoney = 0;
+				//期末金额为materialDept剩余物料总和 * 参考成本
+				for (MaterialDept md : materialDepts) {
+					Material m = MaterialDao.getById(md.getMaterialId());
+					endMoney += md.getStock() * m.getPrice();
+				}
 				costAnalyze.setPrimeMoney(0);
-				costAnalyze.setEndMoney(0);
+				costAnalyze.setEndMoney(endMoney);
 			}else{
 				float primeMoney = 0, endMoney = 0;
 				String primeAmount = "SELECT MBD.opening_balance FROM " + Params.dbName + ".monthly_balance MB" +

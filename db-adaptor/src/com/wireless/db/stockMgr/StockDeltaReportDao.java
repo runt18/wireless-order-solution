@@ -49,14 +49,12 @@ public class StockDeltaReportDao {
 	}
 	
 	public static List<StockTakeDetail> deltaReport(DBCon dbCon, Staff term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
-//		float expectFinalAmount;
 		float actualFinalAmount;
 		List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
 		List<StockReport> stockReports;
 		if(dept.equals("-1")){
 			stockReports = StockReportDao.getStockCollect(dbCon, term, begin, end, extraCond, orderClause);
 		}else{
-			
 			stockReports = getStockCollect(dbCon, term, begin, end, dept, extraCond, orderClause);
 		}
 		
@@ -69,23 +67,26 @@ public class StockDeltaReportDao {
 			actualFinalAmount = stockReport.getFinalAmount();
 			//期末数量
 			stockTakeDetail.setEndAmount(actualFinalAmount);
-			//理论期末数量(不包括盘盈，亏)
-			//expectFinalAmount = stockReport.getPrimeAmount() + stockReport.getStockIn() + stockReport.getStockInTransfer() + stockReport.getStockSpill() - stockReport.getStockOut() - stockReport.getStockOutTransfer() - stockReport.getStockDamage() - stockReport.getUseUp();
 			
-			//理论消耗
-			//stockTakeDetail.setExpectAmount(stockReport.getPrimeAmount() - expectFinalAmount);
+/*			//理论消耗
 			float expectAmount = stockReport.getPrimeAmount() + stockReport.getStockIn() + stockReport.getStockInTransfer() + stockReport.getStockSpill() - stockReport.getStockOut() - stockReport.getStockOutTransfer() - stockReport.getStockDamage() - actualFinalAmount;
 			stockTakeDetail.setExpectAmount(expectAmount);
-			
 			//差异
-			//stockTakeDetail.setDeltaAmount(actualFinalAmount - expectFinalAmount);
 			float deltaAmount = stockReport.getStockTakeMore()  - stockReport.getStockTakeLess();
 			stockTakeDetail.setDeltaAmount(deltaAmount);
-			
 			//实际消耗	
-			//stockTakeDetail.setActualAmount(stockReport.getPrimeAmount() - actualFinalAmount);
 			float actualAmount = expectAmount - deltaAmount;
+			stockTakeDetail.setActualAmount(actualAmount);*/
+			
+			//理论消耗(销售量)
+			float expectAmount = stockReport.getUseUp();
+			stockTakeDetail.setExpectAmount(expectAmount);
+			//实际消耗(期初+入库-出库-期末)	
+			float actualAmount = stockReport.getPrimeAmount() + stockReport.getStockIn() + stockReport.getStockInTransfer() - stockReport.getStockOut() - stockReport.getStockOutTransfer() - actualFinalAmount;
 			stockTakeDetail.setActualAmount(actualAmount);
+			//差异(理论-实际)
+			float deltaAmount = expectAmount - actualAmount;
+			stockTakeDetail.setDeltaAmount(deltaAmount);
 			
 			//入库总数
 			stockTakeDetail.setStockInTotal(stockReport.getStockIn() + stockReport.getStockInTransfer() + stockReport.getStockSpill());
@@ -93,7 +94,6 @@ public class StockDeltaReportDao {
 			//出库总数
 			stockTakeDetail.setStockOutTotal(stockReport.getStockOut() - stockReport.getStockOutTransfer() - stockReport.getStockDamage());
 
-			
 			stockTakeDetails.add(stockTakeDetail);
 		}
 		return stockTakeDetails;

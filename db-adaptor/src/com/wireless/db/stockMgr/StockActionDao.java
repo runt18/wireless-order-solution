@@ -394,8 +394,8 @@ public class StockActionDao {
 		dbCon.rs.close(); 
 		StockAction updateStockAction = builder.build();
 
-		String sql = "UPDATE " + Params.dbName + ".stock_action " + 
-				" SET ori_stock_id = '" + builder.getOriStockId() + "' " +
+		String sql = "UPDATE " + Params.dbName + ".stock_action SET " + 
+				" ori_stock_id = '" + builder.getOriStockId() + "' " +
 				", ori_stock_date = '" + DateUtil.format(builder.getOriStockDate()) + "' " +
 				", comment = '" + builder.getComment() + "' " +
 				", supplier_id = " + builder.getSupplier().getSupplierId() + 
@@ -587,12 +587,8 @@ public class StockActionDao {
 							
 						}
 
-						//FIXME 取消加权平均, 改用参考单价
+						//取消加权平均, 改用参考单价
 						material = MaterialDao.getById(materialDept.getMaterialId());
-/*						//计算加权平均价格(只针对入库)
-						if(updateStockAction.getSubType() == SubType.STOCK_IN){
-							material.stockInAvgPrice(sActionDetail.getPrice(), sActionDetail.getAmount());
-						}*/
 						
 						//入库单增加总库存
 						material.plusStock(sActionDetail.getAmount());		
@@ -670,12 +666,6 @@ public class StockActionDao {
 							//更新剩余数量
 							sActionDetail.setDeptOutRemaining(materialDept.getStock());
 						}
-						//FIXME
-/*						//计算加权平均价格(针对出库)
-						if(updateStockAction.getSubType() == SubType.STOCK_OUT){
-							material.stockOutAvgPrice(sActionDetail.getPrice(), sActionDetail.getAmount());
-						}*/
-						
 						//出库单减少总库存
 						material.cutStock(sActionDetail.getAmount());
 						//更新原料表
@@ -692,6 +682,345 @@ public class StockActionDao {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * 反审核库单
+	 * @param term 反审核人员
+	 * @param builder 
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static void reAuditStockAction(Staff term, int stockInId, InsertBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+//			dbCon.conn.setAutoCommit(false);
+			reAuditStockAction(dbCon, term, stockInId, builder);
+//			dbCon.conn.commit();
+		}catch(BusinessException e){
+//			dbCon.conn.rollback();
+			throw e;
+		}catch(SQLException e){
+//			dbCon.conn.rollback();
+			throw e;
+		}
+		finally{
+//			dbCon.conn.setAutoCommit(true);
+			dbCon.disconnect();
+		}
+		
+	}	
+	
+	/**
+	 * 反审核库单
+	 * @param dbCon
+	 * @param staff
+	 * @param stockInId
+	 * @throws BusinessException 
+	 * @throws SQLException 
+	 */
+	public static void reAuditStockAction(DBCon dbCon, Staff term, int stockInId, InsertBuilder builder) throws SQLException, BusinessException{
+		
+		//判断是否同个部门下进行调拨
+		if((builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER) && builder.getDeptIn().getId() == builder.getDeptOut().getId()){
+			throw new BusinessException(StockError.MATERIAL_DEPT_UPDATE_EXIST);
+		}
+		//获取当前工作月
+		Calendar c = Calendar.getInstance();
+		c.setTime(new Date());
+		//获取月份最大天数
+		int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+		
+		long lastDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day);
+		
+		
+		//比较盘点时间和月结时间,取最大值
+		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + term.getRestaurantId() + 
+				" UNION ALL " +
+				" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + term.getRestaurantId() + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
+		long maxDate = 0;
+		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
+		if(dbCon.rs.next()){
+			if(dbCon.rs.getTimestamp("date") != null){
+				maxDate = dbCon.rs.getTimestamp("date").getTime();
+			}else{
+				Calendar max = Calendar.getInstance();
+				maxDate = DateUtil.parseDate(max.get(Calendar.YEAR) + "-" + (max.get(Calendar.MONTH)+1) + "-01");
+			}
+		}
+		dbCon.rs.close();
+		
+
+		//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
+		if(builder.getOriStockDate() < maxDate){
+			throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
+
+		}else if(builder.getOriStockDate() > lastDate){
+			throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
+		}		
+		
+		
+		List<Material> reCalcMaterials = new ArrayList<>();
+		//获取库单和detail
+		StockAction updateStockAction = getStockAndDetailById(dbCon, term, stockInId);
+		int deptInId ;
+		int deptOutId ;
+		//还原material和materialDept
+		for (StockActionDetail sActionDetail : updateStockAction.getStockDetails()) {
+			MaterialDept materialDept;
+			List<MaterialDept> materialDepts;
+			Material material;
+			//判断是库单是什么类型的
+			if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL){
+				deptInId = updateStockAction.getDeptIn().getId();
+
+				materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
+				
+				//还原materialDept的stock
+				//审核时已经添加, 所以一定有一条materialDept记录
+				materialDept = materialDepts.get(0);
+				//入库单增加部门库存
+				materialDept.cutStock(sActionDetail.getAmount());
+				//更新原料_部门表
+				MaterialDeptDao.updateMaterialDept(dbCon, term, materialDept);
+				//更新剩余数量
+				sActionDetail.setDeptInRemaining(materialDept.getStock());
+					
+				material = MaterialDao.getById(materialDept.getMaterialId());
+				//还原总库存
+				material.cutStock(sActionDetail.getAmount());		
+				//更新原料表
+				material.setLastModStaff(term.getName());
+//				MaterialDao.update(dbCon, material);
+				reCalcMaterials.add(material);
+				
+				//更新库存明细表
+				sActionDetail.setRemaining(material.getStock());
+				StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
+			}else if(updateStockAction.getSubType() == SubType.STOCK_IN_TRANSFER || updateStockAction.getSubType() == SubType.STOCK_OUT_TRANSFER){
+				deptInId = updateStockAction.getDeptIn().getId();
+				deptOutId = updateStockAction.getDeptOut().getId();
+				
+				//还原入库调拨
+				materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
+					MaterialDept materialDeptPlus = materialDepts.get(0);
+					//还原部门库存
+					materialDeptPlus.cutStock(sActionDetail.getAmount());
+					MaterialDeptDao.updateMaterialDept(dbCon, term, materialDeptPlus);
+					
+					//更新剩余数量
+					sActionDetail.setDeptInRemaining(materialDeptPlus.getStock());
+				
+				//还原出库调拨
+				materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
+					MaterialDept materialDeptCut = materialDepts.get(0);
+					//还原部门库存
+					materialDeptCut.plusStock(sActionDetail.getAmount());
+					MaterialDeptDao.updateMaterialDept(dbCon, term, materialDeptCut);
+					//更新剩余数量
+					sActionDetail.setDeptOutRemaining(materialDeptCut.getStock());
+				
+				//更新库存明细表
+				StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
+			}else{
+				deptOutId = updateStockAction.getDeptOut().getId();
+				material = MaterialDao.getById(sActionDetail.getMaterialId());
+				materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
+					materialDept = materialDepts.get(0);
+					//还原部门中库存
+					materialDept.plusStock(sActionDetail.getAmount());
+					//更新原料_部门表
+					MaterialDeptDao.updateMaterialDept(dbCon, term, materialDept);
+					
+					//更新剩余数量
+					sActionDetail.setDeptOutRemaining(materialDept.getStock());
+					
+				//还原总库存
+				material.plusStock(sActionDetail.getAmount());
+				//更新原料表
+				material.setLastModStaff(term.getName());
+//				MaterialDao.update(dbCon, material);
+				reCalcMaterials.add(material);
+				
+				//更新剩余数量
+				sActionDetail.setRemaining(material.getStock());
+				
+				//更新库存明细表
+				StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
+			}
+		
+		}		
+		
+		//修改为反审核状态
+		String deptInName;
+		String deptOutName;
+		String SupplierName;
+		
+		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId() + " AND restaurant_id = " + term.getRestaurantId();		
+		dbCon.rs = dbCon.stmt.executeQuery(selectDeptIn);
+		if(dbCon.rs.next()){
+			deptInName = dbCon.rs.getString("name");
+		}else{
+			deptInName = "";
+		}
+		dbCon.rs.close(); 
+		
+		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId() + " AND restaurant_id = " + term.getRestaurantId();
+		dbCon.rs = dbCon.stmt.executeQuery(selectDeptOut);
+		if(dbCon.rs.next()){
+			deptOutName = dbCon.rs.getString("name");
+		}else{
+			deptOutName = "";
+		}
+		
+		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + builder.getSupplier().getSupplierId() + " AND restaurant_id = " + term.getRestaurantId();
+		dbCon.rs = dbCon.stmt.executeQuery(selectSupplierName);
+		if(dbCon.rs.next()){
+			SupplierName = dbCon.rs.getString("name");
+		}else{
+			SupplierName = "";
+		}		
+		dbCon.rs.close(); 
+		StockAction reAuditStockAction = builder.build();
+
+		String sql = "UPDATE " + Params.dbName + ".stock_action SET " + 
+				" ori_stock_id = '" + builder.getOriStockId() + "' " +
+				", ori_stock_date = '" + DateUtil.format(builder.getOriStockDate()) + "' " +
+				", comment = '" + builder.getComment() + "' " +
+				", supplier_id = " + builder.getSupplier().getSupplierId() + 
+				", supplier_name = '" + SupplierName + "'" +
+				", dept_in = " + builder.getDeptIn().getId() + 
+				", dept_in_name = '" + deptInName + "'" +
+				", dept_out = " + builder.getDeptOut().getId() + 
+				", dept_out_name ='" + deptOutName + "'" +
+				", amount = " + reAuditStockAction.getTotalAmount() + 
+				", price = " + reAuditStockAction.getTotalPrice() +
+				", actual_price = " + reAuditStockAction.getActualPrice() + 
+				
+				", approver_id = " + term.getId() + ", " +
+				" approver = '" + term.getName() + "'," +
+				" approve_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
+				" status = " + StockAction.Status.DELETE.getVal() +
+				
+				" WHERE id = " + stockInId;
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(StockError.STOCKACTION_UPDATE);
+		}
+		StockActionDetailDao.deleteStockDetail(dbCon, " AND stock_action_id = " + stockInId);
+/*		for (StockActionDetail sDetail : builder.getStockActionDetails()) {
+			Material material = MaterialDao.getById(sDetail.getMaterialId());
+			if(builder.getSubType() == SubType.STOCK_IN || builder.getSubType() == SubType.SPILL || builder.getSubType() == SubType.MORE){
+				material.plusStock(sDetail.getAmount());
+			}else if(builder.getSubType() == SubType.STOCK_OUT || builder.getSubType() == SubType.DAMAGE || builder.getSubType() == SubType.LESS || builder.getSubType() == SubType.USE_UP){
+				material.cutStock(sDetail.getAmount());
+			}
+			sDetail.setStockActionId(stockInId);
+			sDetail.setName(material.getName());
+			sDetail.setRemaining(material.getStock());
+			
+			StockActionDetailDao.insertStockActionDetail(dbCon, sDetail);
+		}	*/	
+		//还原material和materialDept
+		for (StockActionDetail sActionDetail : builder.getStockActionDetails()) {
+			sActionDetail.setStockActionId(stockInId);
+			MaterialDept materialDept;
+			List<MaterialDept> materialDepts;
+			Material material = null;
+			//判断是库单是什么类型的
+			if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL){
+				deptInId = updateStockAction.getDeptIn().getId();
+
+				materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
+				
+				//还原materialDept的stock
+				//审核时已经添加, 所以一定有一条materialDept记录
+				materialDept = materialDepts.get(0);
+				//入库单增加部门库存
+				materialDept.plusStock(sActionDetail.getAmount());
+				//更新原料_部门表
+				MaterialDeptDao.updateMaterialDept(dbCon, term, materialDept);
+				//更新剩余数量
+				sActionDetail.setDeptInRemaining(materialDept.getStock());
+					
+				//material = MaterialDao.getById(materialDept.getMaterialId());
+				for (Material m : reCalcMaterials) {
+					if(m.getId() == materialDept.getMaterialId()){
+						material = m;
+						break;
+					}
+				}
+				
+				//增加总库存
+				material.plusStock(sActionDetail.getAmount());		
+				//更新原料表
+				material.setLastModStaff(term.getName());
+				MaterialDao.update(dbCon, material);
+				
+				//更新库存明细表
+				sActionDetail.setRemaining(material.getStock());
+//				StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
+			}else if(updateStockAction.getSubType() == SubType.STOCK_IN_TRANSFER || updateStockAction.getSubType() == SubType.STOCK_OUT_TRANSFER){
+				deptInId = updateStockAction.getDeptIn().getId();
+				deptOutId = updateStockAction.getDeptOut().getId();
+				
+				//还原入库调拨
+				materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
+					MaterialDept materialDeptPlus = materialDepts.get(0);
+					//还原部门库存
+					materialDeptPlus.plusStock(sActionDetail.getAmount());
+					MaterialDeptDao.updateMaterialDept(dbCon, term, materialDeptPlus);
+					
+					//更新剩余数量
+					sActionDetail.setDeptInRemaining(materialDeptPlus.getStock());
+				
+				//还原出库调拨
+				materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
+					MaterialDept materialDeptCut = materialDepts.get(0);
+					//还原部门库存
+					materialDeptCut.cutStock(sActionDetail.getAmount());
+					MaterialDeptDao.updateMaterialDept(dbCon, term, materialDeptCut);
+					//更新剩余数量
+					sActionDetail.setDeptOutRemaining(materialDeptCut.getStock());
+				
+				//更新库存明细表
+//				StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
+			}else{
+				deptOutId = updateStockAction.getDeptOut().getId();
+
+				materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
+					materialDept = materialDepts.get(0);
+					//还原部门中库存
+					materialDept.cutStock(sActionDetail.getAmount());
+					//更新原料_部门表
+					MaterialDeptDao.updateMaterialDept(dbCon, term, materialDept);
+					
+					//更新剩余数量
+					sActionDetail.setDeptOutRemaining(materialDept.getStock());
+					
+				//material = MaterialDao.getById(materialDept.getMaterialId());
+				for (Material m : reCalcMaterials) {
+					if(m.getId() == materialDept.getMaterialId()){
+						material = m;
+						break;
+					}
+				}					
+				//还原总库存
+				material.cutStock(sActionDetail.getAmount());
+				//更新原料表
+				material.setLastModStaff(term.getName());
+				MaterialDao.update(dbCon, material);
+//				reCalcMaterials.add(material);
+				
+				//更新剩余数量
+				sActionDetail.setRemaining(material.getStock());
+				
+				//更新库存明细表
+//				StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
+			}
+			StockActionDetailDao.insertStockActionDetail(dbCon, sActionDetail);
+		}			
+		
 	}
 	
 	/**
