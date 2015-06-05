@@ -365,7 +365,7 @@ public class StockAction implements Jsonable{
 	public static enum Status{
 		UNAUDIT(1, "未审核"), 
 		AUDIT(2, "审核通过"),
-		DELETE(3, "冲红");
+		DELETE(3, "反审核");
 		
 		private final int val;
 		private final String desc;

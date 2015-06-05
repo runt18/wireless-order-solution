@@ -23,6 +23,7 @@ public class StockTake implements Jsonable {
 		private int operatorId;
 		private String operator;
 		private String comment;
+		private long startTime;
 		private List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
 		
 
@@ -140,6 +141,14 @@ public class StockTake implements Jsonable {
 		public InsertStockTakeBuilder addStockTakeDetail(StockTakeDetail tDetail){
 			this.stockTakeDetails.add(tDetail);
 			return this;
+		}
+
+		public long getStartTime() {
+			return startTime;
+		}
+
+		public void setStartTime(long startTime) {
+			this.startTime = startTime;
 		}
 		
 		
@@ -451,6 +460,7 @@ public class StockTake implements Jsonable {
 		setOperator(builder.getOperator());
 		setComment(builder.getComment());
 		setStockTakeDetails(builder.getStockTakeDetails());
+		setStartDate(builder.getStartTime());
 	}
 	
 	public StockTake(UpdateStockTakeBuilder builder){
