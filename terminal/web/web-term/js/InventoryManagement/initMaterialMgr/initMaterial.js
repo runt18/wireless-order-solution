@@ -245,7 +245,14 @@ function initMaterialControl(){
 	var cm = new Ext.grid.ColumnModel([
 	       new Ext.grid.RowNumberer(),
 	       {header: '物品名称 ', dataIndex: 'name'},
-	       {header: '库存', dataIndex: 'stock', align: 'right', editor: new Ext.form.NumberField({allowBlank: false }), renderer: Ext.ux.txtFormat.gridDou},
+	       {header: '库存', dataIndex: 'stock', align: 'right', editor: new Ext.form.NumberField({
+	    	   allowBlank: false,
+	    	   listeners : {
+	    		   focus : function(thiz){
+	    			   thiz.focus(true, 100);
+	    		   }
+	    	   }
+	       }), renderer: Ext.ux.txtFormat.gridDou},
 	       {header: '单位成本', dataIndex: 'price', align: 'right', renderer: Ext.ux.txtFormat.gridDou}
 	]);
 	cm.defaultSortable = true;

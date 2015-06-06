@@ -3362,7 +3362,7 @@ var menu_filterTypeComb = new Ext.form.ComboBox({
 	id : 'menu_filter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
-		data : [[0, '全部'], [1, '助记码'], [2, '名称'],/* [3, '拼音'],*/ [4, '价格'],/* [5, '厨房'],*/ [6, '库存管理']]
+		data : [[0, '全部'], [1, '助记码'], [2, '名称'],/* [3, '拼音'],*/ [4, '价格']/* ,[5, '厨房'], [6, '库存管理']*/]
 	}),
 	valueField : 'value',
 	displayField : 'text',
