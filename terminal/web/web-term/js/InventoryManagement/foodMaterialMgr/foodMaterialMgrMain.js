@@ -231,7 +231,7 @@ function initControl(){
 	});
 	foodBasicGrid.on('rowclick', function(thiz){
 		Ext.getCmp('btnSearchFoodMaterial').handler();
-		Ext.getCmp('btnSearchMaterial').handler();
+		Ext.getCmp('btnSearchFoodMaterial').handler();
 	});
 	foodBasicGrid.keys = [{
 		key : Ext.EventObject.ENTER,
@@ -361,7 +361,7 @@ function initControl(){
 			}, '->',
 			{
 				text : '搜索',
-				id : 'btnSearchMaterial',
+				id : 'btnSearchFoodMaterial',
 				iconCls : 'btn_search',
 				handler : function(){
 					materialBasicGrid.getStore().load({
@@ -400,7 +400,7 @@ function initControl(){
 	);
 	materialBasicGrid.region = 'east';
 	materialBasicGrid.on('render', function(thiz){
-		Ext.getCmp('btnSearchMaterial').handler();
+		Ext.getCmp('btnSearchFoodMaterial').handler();
 	});
 	materialBasicGrid.on('rowdblclick', function(thiz){
 		addNewFoodMaterial();
@@ -408,7 +408,7 @@ function initControl(){
 	materialBasicGrid.keys = [{
 		key : Ext.EventObject.ENTER,
 		fn : function(){
-			Ext.getCmp('btnSearchMaterial').handler();
+			Ext.getCmp('btnSearchFoodMaterial').handler();
 		},
 		scope : this
 	}];

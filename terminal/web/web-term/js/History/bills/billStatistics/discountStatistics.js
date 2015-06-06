@@ -299,7 +299,7 @@ function initDiscountGrid(){
 		 ['账单号', 'id',,,'discount_linkOrderId'],
          ['折扣额','discountPrice',,'right','Ext.ux.txtFormat.gridDou'], 
          ['实收金额','actualPrice',,'right','Ext.ux.txtFormat.gridDou'],
-         ['操作人','waiter'], 
+         ['操作人','discounter'], 
          ['备注','comment', 200]
 		],
 		['orderDateFormat', 'id', 'discountPrice', 'actualPrice', 'waiter', 'comment'],
