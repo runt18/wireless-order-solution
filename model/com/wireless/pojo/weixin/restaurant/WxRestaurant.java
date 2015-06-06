@@ -354,7 +354,7 @@ public class WxRestaurant implements Jsonable{
 		jm.putString("nickName", getNickName());
 		jm.putString("refreshToken", getRefreshToken());
 		jm.putString("qrCodeUrl", getQrCodeUrl());
-		jm.putBoolean("isAuth", hasWeixinLogo());
+		jm.putBoolean("isAuth", hasQrCode());
 		
 		return jm;
 	}
