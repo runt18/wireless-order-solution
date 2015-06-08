@@ -649,6 +649,7 @@ var paySubmit = function(submitType) {
 					Util.msg.alert({msg : dataInfo, topTip:true});
 //					setFormButtonStatus(false);
 				}else{
+					closeMixedPayWin();
 					Util.msg.alert({msg : '结账成功!', topTip:true});
 					if(inputReciptWin){
 						closeInputReciptWin();
@@ -665,7 +666,7 @@ var paySubmit = function(submitType) {
 				}
 			} else {
 				//不能同时弹出两个popup
-				if(inputReciptWin || payType == 2){
+				if(inputReciptWin || payType == 2 || submitType == 100){
 					Util.msg.alert({msg : resultJSON.data, topTip:true});
 				}else{
 					Util.msg.alert({
@@ -945,9 +946,9 @@ function mixPayAction(temp){
 			}
 		}					
 	
-	if(mixedPayMoney != 0){
-		Util.msg.alert({msg:'混合结账的金额不等于账单的实收金额', topTip:true});
-	}else{
+//	if(mixedPayMoney != 0){
+//		Util.msg.alert({msg:'混合结账的金额不等于账单的实收金额', topTip:true});
+//	}else{
 		payTypeCash ='';
 		for (var i = 0; i < payTypeData.length; i++) {
 			var checked = $('#chbForPayType' + payTypeData[i].id).attr('checked');
@@ -963,11 +964,11 @@ function mixPayAction(temp){
 			paySubmit(101);
 		}else{
 			paySubmit(100);
-			closeMixedPayWin();				
+//			closeMixedPayWin();				
 		}
 		
 				
-	}
+//	}
 }
 
 function closeMixedPayWin(){
