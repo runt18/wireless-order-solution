@@ -666,7 +666,7 @@ var paySubmit = function(submitType) {
 				}
 			} else {
 				//不能同时弹出两个popup
-				if(inputReciptWin || payType == 2 || submitType == 100){
+				if(inputReciptWin || payType == 2 || submitType == 100 || submitType == 101){
 					Util.msg.alert({msg : resultJSON.data, topTip:true});
 				}else{
 					Util.msg.alert({
