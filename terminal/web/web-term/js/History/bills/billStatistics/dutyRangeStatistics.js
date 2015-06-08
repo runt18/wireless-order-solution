@@ -145,8 +145,8 @@ function dutyRangeStatPanelInit(c){
 					return;
 				}
 				var gs = dutyRangeStatPanel.getStore();
-				Ext.util.Format.date(gs.baseParams['onDuty'] = beginDate.getValue(), 'Y-m-d 00:00:00');
-				Ext.util.Format.date(gs.baseParams['offDuty'] = endDate.getValue(), 'Y-m-d 23:59:59');
+				gs.baseParams['onDuty'] = Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00');
+				gs.baseParams['offDuty'] = Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59');
 				gs.load({
 					params : {
 						start : 0,
