@@ -74,6 +74,9 @@ public class OrderFood implements Parcelable, Jsonable {
 	//the order date to this order food
 	private long mOrderDate;
 
+	//the staff id to this order food
+	private int mStaffId;
+	
 	//the waiter to this order food
 	private String mWaiter;
 	
@@ -569,6 +572,14 @@ public class OrderFood implements Parcelable, Jsonable {
 		this.mOrderDate = orderDate;
 	}
 
+	public int getStaffId(){
+		return this.mStaffId;
+	}
+	
+	public void setStaffId(int staffId){
+		this.mStaffId = staffId;
+	}
+	
 	public String getWaiter() {
 		return mWaiter;
 	}

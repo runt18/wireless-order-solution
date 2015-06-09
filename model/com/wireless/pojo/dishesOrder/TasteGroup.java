@@ -18,7 +18,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 		private List<Taste> normalTastes = new ArrayList<Taste>();
 		private Taste tmpTaste;
 		private final OrderFood attachedFood;
-		
+
 		public InsertBuilder(OrderFood of){
 			this.attachedFood = of;
 		}

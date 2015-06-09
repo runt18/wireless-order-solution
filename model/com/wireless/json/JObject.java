@@ -8,18 +8,22 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.util.WebParams;
 
 public class JObject implements Jsonable {
 	
 	private boolean success = true;         		// 操作状态
 	private int totalProperty = 0;		    		// 数据数量
 	private List<? extends Jsonable> root;			// 数据主体
-	private int code = WebParams.ERROR_CODE;		// 错误码
-	private String msg = WebParams.ERROR_MSG;		// 错误提示信息
-	private String title = WebParams.ERROR_TITLE; 	// 错误信息标题
-	private int lv = WebParams.ERROR_LV;			// 错误等级
+	private int code = 0;							// 错误码
+	private String msg = "";						// 错误提示信息
+	private String title = TIP_TITLE_DEFAULT; 		// 错误信息标题
+	private int lv = 0;								// 错误等级
 	private Jsonable extra;							// 其他附加信息
+	
+	public static final String TIP_TITLE_DEFAULT = "提示";
+	public static final String TIP_TITLE_WARNING = "警告";
+	public static final String TIP_TITLE_EXCEPTION = "异常";
+	public static final String TIP_TITLE_ERROE = "错误";
 	
 	public JObject(){
 		
@@ -36,11 +40,11 @@ public class JObject implements Jsonable {
 	}
 	
 	public JObject(boolean success, String msg){
-		this.initTip(success, this.title, WebParams.ERROR_CODE, msg);
+		this.initTip(success, this.title, 0, msg);
 	}
 	
 	public JObject(boolean success, String title, String msg){
-		this.initTip(success, title, WebParams.ERROR_CODE, msg);
+		this.initTip(success, title, 0, msg);
 	}
 	
 	public JObject(boolean success, String title, int code, String msg){
@@ -57,10 +61,10 @@ public class JObject implements Jsonable {
 		this.msg = msg;
 	}
 	public void initTip(boolean success, String msg){
-		this.initTip(success, this.title, WebParams.ERROR_CODE, msg);
+		this.initTip(success, this.title, 0, msg);
 	}
 	public void initTip(boolean success, String title, String msg){
-		this.initTip(success, title, WebParams.ERROR_CODE, msg);
+		this.initTip(success, title, 0, msg);
 	}
 	public void initTip(boolean success, int code, String msg){
 		this.initTip(success, this.title, code, msg);
@@ -72,13 +76,13 @@ public class JObject implements Jsonable {
 		this.msg = msg;
 	}
 	public void initTip(BusinessException e){
-		this.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getErrCode().getCode(), e.getMessage());
+		this.initTip(false, JObject.TIP_TITLE_DEFAULT, e.getErrCode().getCode(), e.getMessage());
 	}
 	public void initTip(SQLException e){
-		this.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
+		this.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
 	}
-	public void initTip(Exception e){
-		this.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, e.getMessage());
+	public void initTip4Exception(Exception e){
+		this.initTip(false, JObject.TIP_TITLE_EXCEPTION, 9999, e.getMessage());
 	}
 	
 
