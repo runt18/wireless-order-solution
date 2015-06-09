@@ -18,7 +18,7 @@ public class TestDailySettlement {
 	
 	@Test
 	public void testDailySettlement() throws SQLException, BusinessException{
-		System.out.println(DailySettleDao.exec(StaffDao.getAdminByRestaurant(40)));
-		System.out.println(DailySettleDao.exec());
+		System.out.println(DailySettleDao.manual(StaffDao.getAdminByRestaurant(40)));
+		System.out.println(DailySettleDao.auto());
 	}
 }

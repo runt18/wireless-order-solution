@@ -11,10 +11,7 @@ import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.orderMgr.MixedPaymentDao;
 import com.wireless.db.orderMgr.OrderDao;
-import com.wireless.db.orderMgr.OrderFoodDao;
-import com.wireless.db.orderMgr.TasteGroupDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.PaymentDao;
 import com.wireless.db.shift.ShiftDao;
@@ -29,6 +26,7 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
+import com.wireless.pojo.util.DateType;
 
 public class DailySettleDao {
 	
@@ -48,11 +46,7 @@ public class DailySettleDao {
 		private int elapsedTime;			//日结消耗的时间
 		private int totalShift;				//当日交班的记录数
 		private DutyRange range;
-		
 		private OrderDao.ArchiveResult orderArchive;
-		private OrderFoodDao.ArchiveResult orderFoodArchive;
-		private TasteGroupDao.ArchiveResult tgArchive;
-		private MixedPaymentDao.ArchiveResult mixedArchive;
 		
 		Result(){
 			
@@ -88,15 +82,15 @@ public class DailySettleDao {
 			final String sep = System.getProperty("line.separator");
 
 			StringBuilder resultInfo = new StringBuilder();
-			resultInfo.append("info : " + orderArchive.getAmount() + " record(s) are moved from \"order\" to \"order_history\"").append(sep);
-			resultInfo.append("info : " + mixedArchive.getAmount() + " record(s) are moved from \"mixed_payment\" to \"mixed_payment_history\"").append(sep);
-			resultInfo.append("info : " + orderFoodArchive.getAmount() + " record(s) are moved from \"order_food\" to \"order_food_history\"").append(sep);
-			resultInfo.append("info : " + getTotalShift() + " record(s) are moved from \"shift\" to \"shift_history\"").append(sep);
-			resultInfo.append("info : " + 
-							  "maxium order id : " + orderArchive.getMaxId() + ", " +
-							  "maxium order food id : " + orderFoodArchive.getMaxId()).append(sep);
-			resultInfo.append("info : " +
-							  "maxium taste group id : " + tgArchive.getTgMaxId()).append(sep);
+//			resultInfo.append("info : " + orderArchive.getAmount() + " record(s) are moved from \"order\" to \"order_history\"").append(sep);
+//			resultInfo.append("info : " + mixedArchive.getAmount() + " record(s) are moved from \"mixed_payment\" to \"mixed_payment_history\"").append(sep);
+//			resultInfo.append("info : " + orderFoodArchive.getAmount() + " record(s) are moved from \"order_food\" to \"order_food_history\"").append(sep);
+//			resultInfo.append("info : " + getTotalShift() + " record(s) are moved from \"shift\" to \"shift_history\"").append(sep);
+//			resultInfo.append("info : " + 
+//							  "maxium order id : " + orderArchive.getMaxId() + ", " +
+//							  "maxium order food id : " + orderFoodArchive.getMaxId()).append(sep);
+//			resultInfo.append("info : " +
+//							  "maxium taste group id : " + tgArchive.getTgMaxId()).append(sep);
 			resultInfo.append("info : The record movement takes " + getElapsedTime() + " sec.");
 			
 			return resultInfo.toString();
@@ -111,11 +105,11 @@ public class DailySettleDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static Result exec() throws SQLException, BusinessException{
+	public static Result auto() throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon);
+			return auto(dbCon);
 			
 		}finally{
 			dbCon.disconnect();
@@ -129,7 +123,7 @@ public class DailySettleDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static Result exec(DBCon dbCon) throws SQLException, BusinessException{
+	public static Result auto(DBCon dbCon) throws SQLException, BusinessException{
 		
 		long beginTime = System.currentTimeMillis();
 		
@@ -158,27 +152,31 @@ public class DailySettleDao {
 		int totalOrder = 0, totalMixedPayment = 0, totalOrderFood = 0, totalShift = 0, maxOrderId = 0, maxOrderFoodId = 0;
 		int maxTgId = 0, maxNTgId = 0;
 		for(Staff staff : staffs){			
-			Result eachResult = exec(dbCon, staff, SettleType.AUTO_MATION);
+			Result eachResult = auto(dbCon, staff);
 			
-			totalOrder += eachResult.orderArchive != null ? eachResult.orderArchive.getAmount() : 0;
-			totalMixedPayment += eachResult.mixedArchive.getAmount();
-			maxOrderId = eachResult.orderArchive != null ? eachResult.orderArchive.getMaxId() : 0; 
-			totalOrderFood += eachResult.orderFoodArchive != null ? eachResult.orderFoodArchive.getAmount() : 0;
-			maxOrderFoodId = eachResult.orderFoodArchive != null ? eachResult.orderFoodArchive.getMaxId() : 0;
-			maxTgId = eachResult.tgArchive != null ? eachResult.tgArchive.getTgMaxId() : 0;
-			maxNTgId = eachResult.tgArchive != null ? eachResult.tgArchive.getNTgMaxId() : 0;
+//			totalOrder += eachResult.orderArchive != null ? eachResult.orderArchive.getAmount() : 0;
+//			totalMixedPayment += eachResult.mixedArchive.getAmount();
+//			maxOrderId = eachResult.orderArchive != null ? eachResult.orderArchive.getMaxId() : 0; 
+//			totalOrderFood += eachResult.orderFoodArchive != null ? eachResult.orderFoodArchive.getAmount() : 0;
+//			maxOrderFoodId = eachResult.orderFoodArchive != null ? eachResult.orderFoodArchive.getMaxId() : 0;
+//			maxTgId = eachResult.tgArchive != null ? eachResult.tgArchive.getTgMaxId() : 0;
+//			maxNTgId = eachResult.tgArchive != null ? eachResult.tgArchive.getNTgMaxId() : 0;
 			totalShift += eachResult.getTotalShift();
 		}
 		
 		Result result = new Result();
-		result.orderArchive = new OrderDao.ArchiveResult(maxOrderId, totalOrder);
-		result.orderFoodArchive = new OrderFoodDao.ArchiveResult(maxOrderFoodId, totalOrderFood);
-		result.tgArchive = new TasteGroupDao.ArchiveResult(0, 0, maxTgId, maxNTgId);
-		result.mixedArchive = new MixedPaymentDao.ArchiveResult(totalMixedPayment);
+//		result.orderArchive = new OrderDao.ArchiveResult(maxOrderId, totalOrder);
+//		result.orderFoodArchive = new OrderFoodDao.ArchiveResult(maxOrderFoodId, totalOrderFood);
+//		result.tgArchive = new TasteGroupDao.ArchiveResult(0, 0, maxTgId, maxNTgId);
+//		result.mixedArchive = new MixedPaymentDao.ArchiveResult(totalMixedPayment);
 		result.setTotalShift(totalShift);
 		result.setElapsedTime((int)(System.currentTimeMillis() - beginTime) / 1000);
 		
 		return result;
+	}
+	
+	public static Result auto(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		return exec(dbCon, staff, SettleType.AUTO_MATION);
 	}
 	
 	/**
@@ -190,34 +188,18 @@ public class DailySettleDao {
 	 *             throws if fail to execute any SQL statement
 	 * @throws BusinessException
 	 */
-	public static Result exec(Staff staff) throws SQLException, BusinessException{
+	public static Result manual(Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, staff, SettleType.MANUAL);
+			return manual(dbCon, staff);
 			
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	/**
-	 * Perform to daily settle according to a terminal.
-	 * Note that the database should be connected before invoking this method.
-	 * @param dbCon
-	 *            the database connection
-	 * @param staff
-	 * 			  the staff with both user name and restaurant id
-	 * @param type
-	 * 			  indicates whether the daily settle is manual or automation
-	 * @return the result to daily settle
-	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement
-	 * @throws BusinessException
-	 */
-	public static Result exec(DBCon dbCon, Staff staff, SettleType type) throws SQLException, BusinessException{
-		Result result = new Result();
-		
+	private static void materialConsumption(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		//Perform food material consumption
 		List<StockAction.AuditBuilder> auditBuilders = new ArrayList<StockAction.AuditBuilder>();
 		
@@ -272,7 +254,44 @@ public class DailySettleDao {
 				StockActionDao.auditStockAction(dbCon, staff, auditBuilder);
 			}
 		}
+	}
+	
+	/**
+	 * Perform to daily settle manually.
+	 * @param dbCon
+	 *            the database connection
+	 * @param staff
+	 * 			  the staff to perform this action
+	 * @param type
+	 * 			  indicates whether the daily settle is manual or automation
+	 * @return the result to daily settle
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 * @throws BusinessException
+	 */
+	private static Result manual(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		return exec(dbCon, staff, SettleType.MANUAL);
+	}
+	
+	/**
+	 * Perform to daily settle.
+	 * @param dbCon
+	 *            the database connection
+	 * @param staff
+	 * 			  the staff to perform this action
+	 * @param type
+	 * 			  indicates whether the daily settle is manual or automation
+	 * @return the result to daily settle
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 * @throws BusinessException
+	 */
+	private static Result exec(DBCon dbCon, Staff staff, SettleType type) throws SQLException, BusinessException{
 		
+		materialConsumption(dbCon, staff);
+		
+		Result result = new Result();
+				
 		String sql;
 		
 		//Get the date to last daily settlement.
@@ -297,9 +316,7 @@ public class DailySettleDao {
 		result.setRange(range);
 		
 		//get the amount to shift record
-		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".shift " +
-			  " WHERE 1=1 " +
-			  (staff.getRestaurantId() < 0 ? "AND restaurant_id <> " + Restaurant.ADMIN : "AND restaurant_id=" + staff.getRestaurantId());
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".shift WHERE restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.setTotalShift(dbCon.rs.getInt(1));
@@ -310,38 +327,32 @@ public class DailySettleDao {
 		try{
 			dbCon.conn.setAutoCommit(false);
 			
-			//Archive the order and associated order food, taste group records.
-			OrderDao.Result orderResult = OrderDao.archive(dbCon, staff);
-			result.orderArchive = orderResult.getOrderArchive();
-			result.orderFoodArchive = orderResult.getOrderFoodArchive();
-			result.tgArchive = orderResult.getTgArchive();
-			result.mixedArchive = orderResult.getMixedArchive();
+			//Archive the order and associated order food, taste group records from today to history.
+			result.orderArchive = OrderDao.archive(dbCon, staff, DateType.TODAY, DateType.HISTORY);
 			
 			//Archive the shift records.
-			ShiftDao.archive(dbCon, staff);
+			ShiftDao.archive(dbCon, staff, DateType.TODAY, DateType.HISTORY);
 			
 			//Archive the payment records.
-			PaymentDao.archive(dbCon, staff);
+			PaymentDao.archive(dbCon, staff, DateType.TODAY, DateType.HISTORY);
 			
 			//Archive the member operation records.
-			MemberOperationDao.archive(dbCon, staff);
+			MemberOperationDao.archive(dbCon, staff, DateType.TODAY, DateType.HISTORY);
 			
 			//Create the daily settle record
 			sql = " INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
 				  staff.getRestaurantId() + ", " +
 				  "'" + staff.getName() + "', " +
-				  " DATE_FORMAT('" + range.getOnDutyFormat() + "', '%Y%m%d%H%i%s')" + "," +
-				  " DATE_FORMAT('" + range.getOffDutyFormat() + "', '%Y%m%d%H%i%s')" + 
+				  "'" + range.getOnDutyFormat() + "'," +
+				  "'" + range.getOffDutyFormat() + "'" + 
 				  " ) ";
 
-			//Insert the daily settle record in case of manual.
 			if(type == SettleType.MANUAL){
+				//Insert the daily settle record in case of manual.
 				dbCon.stmt.executeUpdate(sql);				
-			}else{
+			}else if(type == SettleType.AUTO_MATION && result.orderArchive.getAmount() > 0){
 				//Insert the record if the amount of rest orders is greater than zero in case of automation.
-				if(result.orderArchive.getAmount() > 0){
-					dbCon.stmt.executeUpdate(sql);
-				}
+				dbCon.stmt.executeUpdate(sql);
 			}
 			
 			//Perform restore food limit.

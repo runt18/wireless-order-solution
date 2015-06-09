@@ -15,9 +15,9 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.weixin.order.WxOrder;
-import com.wireless.util.DateType;
 
 public class UpdateOrder {
 	

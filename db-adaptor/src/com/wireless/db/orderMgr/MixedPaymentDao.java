@@ -9,7 +9,7 @@ import com.wireless.pojo.dishesOrder.MixedPayment;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.DateType;
+import com.wireless.pojo.util.DateType;
 
 public class MixedPaymentDao {
 
@@ -56,7 +56,7 @@ public class MixedPaymentDao {
 	static void insert(DBCon dbCon, Staff staff, MixedPayment.InsertBuilder builder) throws SQLException{
 		MixedPayment mixedPayment = builder.build();
 		
-		delete(dbCon, staff, new ExtraCond(DateType.TODAY, mixedPayment.getOrderId()));
+		deleteByCond(dbCon, staff, new ExtraCond(DateType.TODAY, mixedPayment.getOrderId()));
 		
 		for(Entry<PayType, Float> entry : mixedPayment.getPayments().entrySet()){
 			String sql;
@@ -81,7 +81,7 @@ public class MixedPaymentDao {
 	 * @return 
 	 * @throws SQLException
 	 */
-	static MixedPayment get(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+	static MixedPayment getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		
 		MixedPayment result = new MixedPayment();
 		
@@ -113,7 +113,7 @@ public class MixedPaymentDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	static int delete(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+	static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
 		sql = " DELETE FROM " + Params.dbName + "." + extraCond.mixedPaymentTbl + " WHERE 1 = 1 " + (extraCond != null ? extraCond.toString() : "");
 		return dbCon.stmt.executeUpdate(sql);
@@ -132,18 +132,30 @@ public class MixedPaymentDao {
 			return amount + " mixed payment record(s) are moved to history";
 		}
 	}
-	
-	public static ArchiveResult archive(DBCon dbCon, String paidOrder) throws SQLException{
+
+	/**
+	 * Archive the mixed payment record to specific order.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param order
+	 * 			the mixed payment record to this order
+	 * @param archiveFrom
+	 * 			archive from {@link DateType}
+	 * @param archiveTo
+	 * 			archive to {@link DateType}
+	 * @return the archive result {@link ArchiveResult}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static ArchiveResult archive(DBCon dbCon, Staff staff, Order order, DateType archiveFrom, DateType archiveTo) throws SQLException{
 		final String item = "order_id, pay_type_id, price";
 		String sql;
-		sql = " INSERT INTO " + Params.dbName + ".mixed_payment_history " +
+		sql = " INSERT INTO " + Params.dbName + "." + new ExtraCond(archiveTo, order).mixedPaymentTbl +
 			  " ( " + item + " ) " +
-			  " SELECT order_id, pay_type_id, price FROM " + Params.dbName + ".mixed_payment WHERE order_id IN (" + paidOrder + ")";
-		dbCon.stmt.executeUpdate(sql);
-		
-		sql = " DELETE FROM " + Params.dbName + ".mixed_payment WHERE order_id IN (" + paidOrder + ")";
+			  " SELECT order_id, pay_type_id, price FROM " + Params.dbName + "." + new ExtraCond(archiveFrom, order).mixedPaymentTbl + " WHERE order_id = " + order.getId();
 		return new ArchiveResult(dbCon.stmt.executeUpdate(sql));
-		
 	}
 	
 }

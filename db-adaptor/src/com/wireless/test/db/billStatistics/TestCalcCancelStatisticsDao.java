@@ -19,8 +19,8 @@ import com.wireless.pojo.billStatistics.cancel.CancelIncomeByEachDay;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByStaff;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.test.db.TestInit;
-import com.wireless.util.DateType;
 
 public class TestCalcCancelStatisticsDao {
 	private static Staff mStaff;

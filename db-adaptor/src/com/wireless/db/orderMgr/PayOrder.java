@@ -25,7 +25,7 @@ import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.Setting;
-import com.wireless.util.DateType;
+import com.wireless.pojo.util.DateType;
 
 public class PayOrder {
 	
@@ -266,7 +266,8 @@ public class PayOrder {
 				  " ,discount = " + of.getDiscount() + 
 				  " ,unit_price = " + of.getFoodPrice() +
 				  " WHERE order_id = " + orderCalculated.getId() + 
-				  " AND food_id = " + of.getFoodId();
+				  " AND food_id = " + of.getFoodId() +
+				  (of.hasFoodUnit() ? " AND food_unit_id = " + of.getFoodUnit().getId() : "");
 			dbCon.stmt.executeUpdate(sql);				
 		}	
 

@@ -18,8 +18,8 @@ import com.wireless.pojo.billStatistics.gift.GiftIncomeByStaff;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.util.DateType;
 
 public class CalcGiftStatisticsDao {
 

@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
@@ -14,7 +15,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.DateType;
+import com.wireless.pojo.util.DateType;
 
 public class ShiftDao {
 	
@@ -291,19 +292,19 @@ public class ShiftDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int archive(DBCon dbCon, Staff staff) throws SQLException{
+	public static int archive(DBCon dbCon, Staff staff, DateType archiveFrom, DateType archiveTo) throws SQLException{
 		String sql;
 		
 		final String shiftItem = "`restaurant_id`, `name`, `on_duty`, `off_duty`";
 		
 		//Move the shift record from 'shift' to 'shift_history'.
-		sql = " INSERT INTO " + Params.dbName + ".shift_history (" + shiftItem + ") " +
-			  " SELECT " + shiftItem + " FROM " + Params.dbName + ".shift " +
+		sql = " INSERT INTO " + Params.dbName + "." + new DBTbl(archiveTo).shiftTbl + "(" + shiftItem + ") " +
+			  " SELECT " + shiftItem + " FROM " + Params.dbName + "." + new DBTbl(archiveFrom).shiftTbl +
 			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		int amount = dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the today shift records belong to this restaurant.
-		sql = " DELETE FROM " + Params.dbName + ".shift WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id=" + staff.getRestaurantId());
+		sql = " DELETE FROM " + Params.dbName + "." + new DBTbl(archiveFrom).shiftTbl + " WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id=" + staff.getRestaurantId());
 		dbCon.stmt.executeUpdate(sql);
 		
 		return amount;

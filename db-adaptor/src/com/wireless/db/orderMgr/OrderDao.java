@@ -40,13 +40,15 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.weixin.order.WxOrder;
-import com.wireless.util.DateType;
 
 public class OrderDao {
 
 	public static class ExtraCond{
 		public final String orderTblAlias;
+		private final String orderTbl;
 		private final String orderFoodTbl;
 		
 		private final DateType dateType;
@@ -75,9 +77,11 @@ public class OrderDao {
 			this.dateType = dateType;
 			if(dateType == DateType.TODAY){
 				orderTblAlias = "O";
+				orderTbl = "order";
 				orderFoodTbl = "order_food";
 			}else{
 				orderTblAlias = "OH";
+				orderTbl = "order_history";
 				orderFoodTbl = "order_food_history";
 			}
 		}
@@ -406,7 +410,7 @@ public class OrderDao {
 		order.setOrderFoods(OrderFoodDao.getDetail(dbCon, staff, new OrderFoodDao.ExtraCond(dateType).setOrder(order)));	
 		//Get the detail to mixed payment.
 		if(order.getPaymentType().isMixed()){
-			order.setMixedPayment(MixedPaymentDao.get(dbCon, staff, new MixedPaymentDao.ExtraCond(dateType, order)));
+			order.setMixedPayment(MixedPaymentDao.getByCond(dbCon, staff, new MixedPaymentDao.ExtraCond(dateType, order)));
 		}
 		//Get the detail to associated wx orders.
 		for(WxOrder wxOrder : WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setOrder(order), null)){
@@ -435,18 +439,18 @@ public class OrderDao {
 		String sql;
 		if(extraCond.dateType == DateType.TODAY){
 			sql = " SELECT " +
-				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, O.staff_id, " +
+				  " O.id, O.birth_date, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, O.staff_id, " +
 				  " O.temp_staff, O.temp_date, " +
 				  " T.minimum_cost, IFNULL(T.category, 1) AS tbl_category, " +
 				  " O.waiter, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.settle_type, O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
-				  " O.discount_id, O.discount_staff, O.discount_date, " +
+				  " O.discount_id, O.discount_staff_id, O.discount_staff, O.discount_date, " +
 				  " O.coupon_id, " +
 				  " O.price_plan_id, O.member_id, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.coupon_price, O.total_price, O.actual_price " +
 				  " FROM " + 
-				  Params.dbName + ".order O " +
+				  Params.dbName + "." + extraCond.orderTbl + " O " +
 				  " LEFT JOIN " + Params.dbName + ".table T ON O.table_id = T.table_id " +
 				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
 				  " WHERE 1 = 1 " + 
@@ -456,13 +460,13 @@ public class OrderDao {
 			
 		}else if(extraCond.dateType == DateType.HISTORY){
 			sql = " SELECT " +
-				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
-				  " OH.waiter, OH.discount_staff, OH.discount_date, " +
+				  " OH.id, OH.birth_date, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
+				  " OH.waiter, OH.discount_staff_id, OH.discount_staff, OH.discount_date, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
 				  " OH.coupon_price, " +
 				  " OH.settle_type, OH.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, OH.category, OH.status, OH.service_rate, OH.comment, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
-				  " FROM " + Params.dbName + ".order_history OH " + 
+				  " FROM " + Params.dbName + "." + extraCond.orderTbl + " OH " + 
 				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = OH.pay_type_id " +
 				  " WHERE 1 = 1 " + 
 				  " AND OH.restaurant_id = " + staff.getRestaurantId() + " " +
@@ -475,16 +479,20 @@ public class OrderDao {
 		//Get the details to each order.
 		dbCon.rs = dbCon.stmt.executeQuery(sql);		
 
-		List<Order> result = new ArrayList<Order>();
+		final List<Order> result = new ArrayList<Order>();
 		
 		while(dbCon.rs.next()) {
 			Order order = new Order();
 			order.setId(dbCon.rs.getInt("id"));
 			order.setSeqId(dbCon.rs.getInt("seq_id"));
+			order.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
 			order.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			order.setWaiter(dbCon.rs.getString("waiter"));
-			order.setDiscounter(dbCon.rs.getString("discount_staff"));
-			order.setDiscountDate(dbCon.rs.getTimestamp("discount_date") != null ? dbCon.rs.getTimestamp("discount_date").getTime() : 0);
+			if(dbCon.rs.getTimestamp("discount_date") != null){
+				order.setDiscounterId(dbCon.rs.getInt("discount_staff_id"));
+				order.setDiscounter(dbCon.rs.getString("discount_staff"));
+				order.setDiscountDate(dbCon.rs.getTimestamp("discount_date").getTime());
+			}
 			
 			order.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			order.setStatus(Order.Status.valueOf(dbCon.rs.getInt("status")));
@@ -1152,13 +1160,14 @@ public class OrderDao {
 		for(Order order : getByCond(dbCon, staff, extraCond, null)){
 			String sql;
 
+			TasteGroupDao.ExtraCond tgCond = new TasteGroupDao.ExtraCond(extraCond.dateType);
 			//Delete the records to normal taste group. 
-			sql = " DELETE FROM " + Params.dbName + ".normal_taste_group" +
+			sql = " DELETE FROM " + Params.dbName + "." + tgCond.ntgTbl +
 			      " WHERE " +
 				  " normal_taste_group_id IN (" +
 					  " SELECT normal_taste_group_id " +
-					  " FROM " + Params.dbName + ".order_food OF " +
-					  " JOIN " + Params.dbName + ".taste_group TG ON OF.taste_group_id = TG.taste_group_id " +
+					  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " +
+					  " JOIN " + Params.dbName + "." + tgCond.tgTbl + " TG ON OF.taste_group_id = TG.taste_group_id " +
 					  " WHERE 1 = 1 " + 
 					  " AND OF.order_id = " + order.getId() +
 					  " AND TG.normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
@@ -1166,29 +1175,28 @@ public class OrderDao {
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Delete the records to taste group.
-			sql = " DELETE FROM " + Params.dbName + ".taste_group " +
+			sql = " DELETE FROM " + Params.dbName + "." + tgCond.tgTbl +
 			      " WHERE taste_group_id IN (" +
-					  " SELECT taste_group_id FROM " + Params.dbName + ".order_food " +
-				      " WHERE " + 
-					  " order_id = " + order.getId() +
-					  " AND " +
-					  " taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
+					  " SELECT taste_group_id FROM " + Params.dbName + "." + extraCond.orderFoodTbl +
+				      " WHERE 1 = 1 " + 
+					  " AND order_id = " + order.getId() +
+					  " AND taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
 				  " ) ";
 			dbCon.stmt.executeUpdate(sql);
 			
 			//delete the records related to the order id and food id in "order_food" table
-			sql = " DELETE FROM `" + Params.dbName + "`.`order_food` WHERE order_id = " + order.getId();
+			sql = " DELETE FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " WHERE order_id = " + order.getId();
 			dbCon.stmt.executeUpdate(sql);
 			
 			//delete the corresponding order record in "order" table
-			sql = " DELETE FROM `" + Params.dbName + "`.`order` WHERE id = " + order.getId();
+			sql = " DELETE FROM " + Params.dbName + "." + extraCond.orderTbl + " WHERE id = " + order.getId();
 			dbCon.stmt.executeUpdate(sql);
 
 			//Delete the associated mixed payment.
-			MixedPaymentDao.delete(dbCon, staff, new MixedPaymentDao.ExtraCond(DateType.TODAY, order.getId()));
+			MixedPaymentDao.deleteByCond(dbCon, staff, new MixedPaymentDao.ExtraCond(extraCond.dateType, order.getId()));
 			
 			//Delete the temporary table in case of joined or take out
-			if(order.getCategory().isJoin() || order.getCategory().isTakeout()){
+			if(!order.getDestTbl().getCategory().isNormal()){
 				try {
 					TableDao.deleteById(dbCon, staff, order.getDestTbl().getId());
 				} catch (BusinessException ignored) {
@@ -1201,81 +1209,6 @@ public class OrderDao {
 		return amount;
 	}
 
-	public static class Result{
-		private final OrderDao.ArchiveResult orderArchive;
-		private final OrderFoodDao.ArchiveResult ofArchive;
-		private final TasteGroupDao.ArchiveResult tgArchive;
-		private final MixedPaymentDao.ArchiveResult mixedArchive;
-		
-		Result(OrderDao.ArchiveResult orderArchive, MixedPaymentDao.ArchiveResult mixedArchive, OrderFoodDao.ArchiveResult orderFoodArchive, TasteGroupDao.ArchiveResult tgArchive){
-			this.orderArchive = orderArchive;
-			this.mixedArchive = mixedArchive;
-			this.ofArchive = orderFoodArchive;
-			this.tgArchive = tgArchive;
-		}
-		
-		Result(){
-			orderArchive = new OrderDao.ArchiveResult(0, 0);
-			mixedArchive = new MixedPaymentDao.ArchiveResult(0);
-			ofArchive = new OrderFoodDao.ArchiveResult(0, 0);
-			tgArchive = new TasteGroupDao.ArchiveResult(0, 0, 0, 0);
-		}
-		
-		public OrderDao.ArchiveResult getOrderArchive(){
-			return this.orderArchive;
-		}
-
-		public MixedPaymentDao.ArchiveResult getMixedArchive(){
-			return this.mixedArchive;
-		}
-		
-		public OrderFoodDao.ArchiveResult getOrderFoodArchive(){
-			return this.ofArchive;
-		}
-		
-		public TasteGroupDao.ArchiveResult getTgArchive(){
-			return this.tgArchive;
-		}
-	}
-	
-	public static Result archive(DBCon dbCon, Staff staff) throws SQLException{
-		StringBuilder paidOrderCond = new StringBuilder();
-		
-		String sql;
-		//Get the amount and id to paid orders
-		sql = " SELECT id FROM " + Params.dbName + ".order " +
-			  " WHERE " +
-			  " (status = " + Order.Status.PAID.getVal() + " OR status = " + Order.Status.REPAID.getVal() + ")" +
-			 (staff.getRestaurantId() < 0 ? "" : "AND restaurant_id=" + staff.getRestaurantId());
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			paidOrderCond.append(dbCon.rs.getInt("id")).append(",");
-		}
-		dbCon.rs.close();
-		
-		if(paidOrderCond.length() > 0){
-			paidOrderCond.deleteCharAt(paidOrderCond.length() - 1);
-
-			//Archive the taste group.
-			TasteGroupDao.ArchiveResult tgArchive = TasteGroupDao.archive(dbCon, staff, paidOrderCond.toString());
-			
-			//Archive the order food.
-			OrderFoodDao.ArchiveResult ofArchive = OrderFoodDao.archive(dbCon, staff, paidOrderCond.toString());
-
-			//Archive the mixed payment.
-			MixedPaymentDao.ArchiveResult mixedArchive = MixedPaymentDao.archive(dbCon, paidOrderCond.toString());
-
-			//Archive the order.
-			OrderDao.ArchiveResult orderArchive = OrderDao.archive(dbCon, staff, paidOrderCond.toString());
-			
-			return new Result(orderArchive, mixedArchive, ofArchive, tgArchive);
-			
-		}else{
-			return new Result();
-		}
-		
-	}
-	
 	public static class ArchiveResult{
 		private final int maxId;
 		private final int orderAmount;
@@ -1298,44 +1231,202 @@ public class OrderDao {
 		}
 	}
 	
-	private static ArchiveResult archive(DBCon dbCon, Staff staff, String paidOrder) throws SQLException{
-		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
-				"`discount_staff`, `discount_staff_id`, `discount_date`," +
-				"`cancel_price`, `discount_price`, `gift_price`, `coupon_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
-				"`waiter`, `settle_type`, `pay_type_id`, `category`, `staff_id`, " +
-				"`region_id`, `region_name`, `table_id`, `table_alias`, `table_name`, `service_rate`, `comment`";
-		
+	public static ArchiveResult archive(DBCon dbCon, Staff staff, DateType archiveFrom, DateType archiveTo) throws SQLException, BusinessException{
 		String sql;
-		//Move the paid order from "order" to "order_history".
-		sql = " INSERT INTO " + Params.dbName + ".order_history (" + orderItem + ") " + 
-			  " SELECT " + orderItem + " FROM " + Params.dbName + ".order WHERE id IN " + "(" + paidOrder + ")";
-		int amount = dbCon.stmt.executeUpdate(sql);
+		ExtraCond extraCond4ArchiveFrom = new ExtraCond(archiveFrom);
+		ExtraCond extraCond4ArchiveTo = new ExtraCond(archiveTo);
 		
-		//Calculate the max order id from both today and history.
-		int maxId = 0;
-		sql = " SELECT MAX(id) + 1 FROM (" + 
-			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order " +
-			  " UNION " +
-			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_history) AS all_order";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			maxId = dbCon.rs.getInt(1);
+		if(archiveFrom == DateType.TODAY){
+			//Calculate the max order id from both today and history.
+			int maxId = 0;
+			sql = " SELECT MAX(id) + 1 FROM (" + 
+				  " SELECT MAX(id) AS id FROM " + Params.dbName + "." + extraCond4ArchiveFrom.orderTbl +
+				  " UNION " +
+				  " SELECT MAX(id) AS id FROM " + Params.dbName + "." + extraCond4ArchiveTo.orderTbl + ") AS all_order";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				maxId = dbCon.rs.getInt(1);
+			}
+			dbCon.rs.close();
+			
+			sql = " DELETE FROM " + Params.dbName + ".order WHERE restaurant_id = " + Restaurant.ADMIN;
+			dbCon.stmt.executeUpdate(sql);
+			
+			sql = " INSERT INTO " + Params.dbName + ".order " +
+				  " ( id, restaurant_id ) VALUES " +
+				 "(" + maxId + "," + Restaurant.ADMIN + ")";
+			dbCon.stmt.executeUpdate(sql);
 		}
-		dbCon.rs.close();
 		
-		sql = " DELETE FROM " + Params.dbName + ".order WHERE restaurant_id = " + Restaurant.ADMIN;
-		dbCon.stmt.executeUpdate(sql);
+		int amount = 0;
+		for(Order order : getByCond(dbCon, staff, new ExtraCond(archiveFrom).addStatus(Order.Status.PAID).addStatus(Order.Status.REPAID), null)){
+			sql = " INSERT INTO " + Params.dbName + "." + extraCond4ArchiveTo.orderTbl + "(" +
+				  "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
+				  "`discount_staff`, `discount_staff_id`, `discount_date`," +
+				  "`cancel_price`, `discount_price`, `gift_price`, `coupon_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
+				  "`waiter`, `settle_type`, `pay_type_id`, `category`, `staff_id`, " +
+				  "`region_id`, `region_name`, `table_id`, `table_alias`, `table_name`, `service_rate`, `comment`) VALUES ( " +
+				  order.getId() + "," +
+				  order.getSeqId() + "," +
+				  order.getRestaurantId() + "," +
+				  "'" + DateUtil.format(order.getBirthDate(), DateUtil.Pattern.DATE_TIME) + "'," +
+				  "'" + DateUtil.format(order.getOrderDate(), DateUtil.Pattern.DATE_TIME) + "'," +
+				  order.getStatus().getVal() + "," +
+				  (order.getDiscounterId() != 0 ? "'" + order.getDiscounter() + "'" : "NULL") + "," +
+				  (order.getDiscounterId() != 0 ? order.getDiscounterId() : "NULL") + "," +
+				  (order.getDiscountDate() != 0 ? "'" + DateUtil.format(order.getDiscountDate(), DateUtil.Pattern.DATE_TIME) + "'" : "NULL") + "," +
+				  order.getCancelPrice() + "," +
+				  order.getDiscountPrice() + "," +
+				  order.getGiftPrice() + "," +
+				  order.getCouponPrice() + "," +
+				  order.getRepaidPrice() + "," +
+				  order.getErasePrice() + "," +
+				  order.getTotalPrice() + "," +
+				  order.getActualPrice() + "," +
+				  order.getCustomNum() + "," +
+				  "'" + order.getWaiter() + "'," +
+				  order.getSettleType().getVal() + "," +
+				  order.getPaymentType().getId() + "," + 
+				  order.getCategory().getVal() + "," +
+				  order.getStaffId() + "," +
+				  order.getRegion().getId() + "," +
+				  "'" + order.getRegion().getName() + "'," +
+				  order.getDestTbl().getId() + "," +
+				  order.getDestTbl().getAliasId() + "," +
+				  "'" + order.getDestTbl().getName() + "'," +
+				  order.getServiceRate() + "," +
+				  "'" + order.getComment() + "'" +
+ 				  ")";
+			
+			if(dbCon.stmt.executeUpdate(sql) != 0){
+				amount++;
+			}
+			
+			//Archive the order food records.
+			OrderFoodDao.archive(dbCon, staff, order, archiveFrom, archiveTo);
+			
+			//Archive the mixed payment records.
+			MixedPaymentDao.archive(dbCon, staff, order, archiveFrom, archiveTo);
+			
+			//Delete the order and associated records. 
+			deleteByCond(dbCon, staff, new ExtraCond(archiveFrom).setOrderId(order.getId()));
+		}
 		
-		sql = " INSERT INTO " + Params.dbName + ".order " +
-			  " ( id, restaurant_id ) VALUES " +
-			 "(" + maxId + "," + Restaurant.ADMIN + ")";
-		dbCon.stmt.executeUpdate(sql);
-		
-		//Delete the paid order from "order" table.
-		sql = " DELETE FROM " + Params.dbName + ".order WHERE id IN ( " + paidOrder + ")";
-		dbCon.stmt.executeUpdate(sql);
-		
-		return new ArchiveResult(maxId, amount);
+		return new ArchiveResult(0, amount);
 	}
+	
+//	public static class Result{
+//		private final OrderDao.ArchiveResult orderArchive;
+//		private final OrderFoodDao.ArchiveResult ofArchive;
+//		private final TasteGroupDao.ArchiveResult tgArchive;
+//		private final MixedPaymentDao.ArchiveResult mixedArchive;
+//		
+//		Result(OrderDao.ArchiveResult orderArchive, MixedPaymentDao.ArchiveResult mixedArchive, OrderFoodDao.ArchiveResult orderFoodArchive, TasteGroupDao.ArchiveResult tgArchive){
+//			this.orderArchive = orderArchive;
+//			this.mixedArchive = mixedArchive;
+//			this.ofArchive = orderFoodArchive;
+//			this.tgArchive = tgArchive;
+//		}
+//		
+//		Result(){
+//			orderArchive = new OrderDao.ArchiveResult(0, 0);
+//			mixedArchive = new MixedPaymentDao.ArchiveResult(0);
+//			ofArchive = new OrderFoodDao.ArchiveResult(0, 0);
+//			tgArchive = new TasteGroupDao.ArchiveResult(0, 0, 0, 0);
+//		}
+//		
+//		public OrderDao.ArchiveResult getOrderArchive(){
+//			return this.orderArchive;
+//		}
+//
+//		public MixedPaymentDao.ArchiveResult getMixedArchive(){
+//			return this.mixedArchive;
+//		}
+//		
+//		public OrderFoodDao.ArchiveResult getOrderFoodArchive(){
+//			return this.ofArchive;
+//		}
+//		
+//		public TasteGroupDao.ArchiveResult getTgArchive(){
+//			return this.tgArchive;
+//		}
+//	}
+	
+//	public static Result archive(DBCon dbCon, Staff staff) throws SQLException{
+//		StringBuilder paidOrderCond = new StringBuilder();
+//		
+//		String sql;
+//		//Get the amount and id to paid orders
+//		sql = " SELECT id FROM " + Params.dbName + ".order " +
+//			  " WHERE (status = " + Order.Status.PAID.getVal() + " OR status = " + Order.Status.REPAID.getVal() + ")" +
+//			 (staff.getRestaurantId() < 0 ? "" : "AND restaurant_id=" + staff.getRestaurantId());
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		while(dbCon.rs.next()){
+//			paidOrderCond.append(dbCon.rs.getInt("id")).append(",");
+//		}
+//		dbCon.rs.close();
+//		
+//		if(paidOrderCond.length() > 0){
+//			paidOrderCond.deleteCharAt(paidOrderCond.length() - 1);
+//
+//			//Archive the taste group.
+//			TasteGroupDao.ArchiveResult tgArchive = TasteGroupDao.archive(dbCon, staff, paidOrderCond.toString());
+//			
+//			//Archive the order food.
+//			OrderFoodDao.ArchiveResult ofArchive = OrderFoodDao.archive(dbCon, staff, paidOrderCond.toString());
+//
+//			//Archive the mixed payment.
+//			MixedPaymentDao.ArchiveResult mixedArchive = MixedPaymentDao.archive(dbCon, paidOrderCond.toString());
+//
+//			//Archive the order.
+//			OrderDao.ArchiveResult orderArchive = OrderDao.archive(dbCon, staff, paidOrderCond.toString());
+//			
+//			return new Result(orderArchive, mixedArchive, ofArchive, tgArchive);
+//			
+//		}else{
+//			return new Result();
+//		}
+//		
+//	}
+	
+//	private static ArchiveResult archive(DBCon dbCon, Staff staff, String paidOrder) throws SQLException{
+//		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
+//				"`discount_staff`, `discount_staff_id`, `discount_date`," +
+//				"`cancel_price`, `discount_price`, `gift_price`, `coupon_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
+//				"`waiter`, `settle_type`, `pay_type_id`, `category`, `staff_id`, " +
+//				"`region_id`, `region_name`, `table_id`, `table_alias`, `table_name`, `service_rate`, `comment`";
+//		
+//		String sql;
+//		//Move the paid order from "order" to "order_history".
+//		sql = " INSERT INTO " + Params.dbName + ".order_history (" + orderItem + ") " + 
+//			  " SELECT " + orderItem + " FROM " + Params.dbName + ".order WHERE id IN " + "(" + paidOrder + ")";
+//		int amount = dbCon.stmt.executeUpdate(sql);
+//		
+//		//Calculate the max order id from both today and history.
+//		int maxId = 0;
+//		sql = " SELECT MAX(id) + 1 FROM (" + 
+//			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order " +
+//			  " UNION " +
+//			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_history) AS all_order";
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		if(dbCon.rs.next()){
+//			maxId = dbCon.rs.getInt(1);
+//		}
+//		dbCon.rs.close();
+//		
+//		sql = " DELETE FROM " + Params.dbName + ".order WHERE restaurant_id = " + Restaurant.ADMIN;
+//		dbCon.stmt.executeUpdate(sql);
+//		
+//		sql = " INSERT INTO " + Params.dbName + ".order " +
+//			  " ( id, restaurant_id ) VALUES " +
+//			 "(" + maxId + "," + Restaurant.ADMIN + ")";
+//		dbCon.stmt.executeUpdate(sql);
+//		
+//		//Delete the paid order from "order" table.
+//		sql = " DELETE FROM " + Params.dbName + ".order WHERE id IN ( " + paidOrder + ")";
+//		dbCon.stmt.executeUpdate(sql);
+//		
+//		return new ArchiveResult(maxId, amount);
+//	}
 	
 }

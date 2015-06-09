@@ -518,7 +518,7 @@ public class CouponDao {
 			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " +
 			  " WHERE 1 = 1 " +
 			  " AND C.restaurant_id = " + staff.getRestaurantId() +
-			  " AND p.status !=" + Promotion.Status.FINISH.getVal() +
+			  " AND P.status !=" + Promotion.Status.FINISH.getVal() +
 			  (extraCond != null ? extraCond : " ") +
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

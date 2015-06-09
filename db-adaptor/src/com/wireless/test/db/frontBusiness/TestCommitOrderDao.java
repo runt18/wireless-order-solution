@@ -39,9 +39,9 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.regionMgr.Table.Category;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.SortedList;
 import com.wireless.test.db.TestInit;
-import com.wireless.util.DateType;
 
 public class TestCommitOrderDao {
 	

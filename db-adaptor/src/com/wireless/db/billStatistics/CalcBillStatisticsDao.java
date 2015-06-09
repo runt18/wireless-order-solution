@@ -40,8 +40,8 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.util.DateType;
 
 public class CalcBillStatisticsDao {
 
@@ -719,7 +719,7 @@ public class CalcBillStatisticsDao {
 			   " WHERE 1 = 1 " +
 			   (extraCond == null ? "" : extraCond.toString()) +
 			   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			   " GROUP BY OF.order_id, OF.food_id, OF.taste_group_id, OF.is_gift " +
+			   " GROUP BY OF.order_id, OF.food_id, OF.taste_group_id, OF.food_unit_id, OF.is_gift " +
 			   " HAVING food_amount > 0 ";
 	}
 	

@@ -19,8 +19,8 @@ import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.util.DateType;
 
 public class CalcCommissionStatisticsDao {
 	public static class ExtraCond{

@@ -14,7 +14,7 @@ import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.DateType;
+import com.wireless.pojo.util.DateType;
 
 public class ComboDao {
 

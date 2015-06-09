@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond4Charge;
@@ -16,8 +17,8 @@ import com.wireless.pojo.billStatistics.PaymentGeneral;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.util.DateType;
 
 public class PaymentDao {
 
@@ -370,31 +371,6 @@ public class PaymentDao {
 		return result;
 	}
 	
-	/**
-	 * Move the payment record to history.
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @return the amount payment records to move 
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static int move(Staff staff) throws SQLException{
-		DBCon dbCon = new DBCon();
-		int amount = 0;
-		try{
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			amount = archive(dbCon, staff);
-			dbCon.conn.commit();
-			
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-		}finally{
-			dbCon.disconnect();
-		}
-		
-		return amount;
-	}
 	
 	/**
 	 * Move the payment record to history.
@@ -406,18 +382,18 @@ public class PaymentDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int archive(DBCon dbCon, Staff staff) throws SQLException{
+	public static int archive(DBCon dbCon, Staff staff, DateType archiveFrom, DateType archiveTo) throws SQLException{
 		final String paymentItem = "`restaurant_id`, `staff_id`, `staff_name`, `on_duty`, `off_duty`";
 		
 		String sql;
-		sql = " INSERT INTO " + Params.dbName + ".payment_history " + 
+		sql = " INSERT INTO " + Params.dbName + "." + new DBTbl(archiveTo).paymentTbl + 
 			  "(" + paymentItem + ")" +
-			  " SELECT " + paymentItem + " FROM " + Params.dbName + ".payment" +
+			  " SELECT " + paymentItem + " FROM " + Params.dbName + "." + new DBTbl(archiveFrom).paymentTbl +
 			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		
 		int amount = dbCon.stmt.executeUpdate(sql);
 		
-		sql = " DELETE FROM " + Params.dbName + ".payment WHERE restaurant_id = " + staff.getRestaurantId();
+		sql = " DELETE FROM " + Params.dbName + "." + new DBTbl(archiveFrom).paymentTbl + " WHERE restaurant_id = " + staff.getRestaurantId();
 		dbCon.stmt.executeUpdate(sql);
 		
 		return amount;

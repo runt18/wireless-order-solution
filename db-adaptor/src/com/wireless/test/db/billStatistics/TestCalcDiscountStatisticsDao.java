@@ -17,8 +17,8 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.discount.DiscountIncomeByEachDay;
 import com.wireless.pojo.billStatistics.discount.DiscountIncomeByStaff;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.test.db.TestInit;
-import com.wireless.util.DateType;
 
 public class TestCalcDiscountStatisticsDao {
 

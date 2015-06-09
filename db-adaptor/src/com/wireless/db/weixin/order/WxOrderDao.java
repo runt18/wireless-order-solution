@@ -22,8 +22,8 @@ import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.TakeoutAddress;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.weixin.order.WxOrder;
-import com.wireless.util.DateType;
 
 public class WxOrderDao {
 	

@@ -17,8 +17,8 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByEachDay;
 import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByStaff;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.test.db.TestInit;
-import com.wireless.util.DateType;
 
 public class TestCalcRepaidStatisticsDao {
 

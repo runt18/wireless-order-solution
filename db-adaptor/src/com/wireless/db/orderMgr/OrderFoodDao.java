@@ -2,9 +2,12 @@ package com.wireless.db.orderMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.KitchenDao;
@@ -28,10 +31,10 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.util.DateType;
+import com.wireless.pojo.util.DateType;
+import com.wireless.pojo.util.DateUtil;
 
 /**
  * The DB reflector is designed to the bridge between the OrderFood instance of
@@ -88,13 +91,9 @@ public class OrderFoodDao {
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
-			if(dateType.isToday()){
-				orderTbl = "order";
-				orderFoodTbl = "order_food";
-			}else{
-				orderTbl = "order_history";
-				orderFoodTbl = "order_food_history";
-			}
+			DBTbl dbTbl = new DBTbl(dateType);
+			orderTbl = dbTbl.orderTbl;
+			orderFoodTbl = dbTbl.orderFoodTbl;
 		}
 		
 		public ExtraCond setOrder(Order order){
@@ -227,10 +226,8 @@ public class OrderFoodDao {
 	 * @return the list of order holding each single detail
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement.
-	 * @throws BusinessException 
-	 * 			   throws if any associated taste group does NOT exist
 	 */
-	public static List<OrderFood> getSingleDetail(Staff staff, ExtraCond extraCond, String orderClause) throws Exception {
+	public static List<OrderFood> getSingleDetail(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -255,10 +252,8 @@ public class OrderFoodDao {
 	 * @return the list of order holding each single detail
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement.
-	 * @throws BusinessException 
-	 * 			   throws if any associated taste group does NOT exist
 	 */
-	public static List<OrderFood> getSingleDetail(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException {
+	public static List<OrderFood> getSingleDetail(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException {
 		return getSingleDetail(dbCon, staff, extraCond.toString(), orderClause, extraCond.dateType);
 	}
 	
@@ -276,16 +271,14 @@ public class OrderFoodDao {
 	 * @return the list of order holding each single detail
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement.
-	 * @throws BusinessException 
-	 * 			   throws if any associated taste group does NOT exist
 	 */
-	private static List<OrderFood> getSingleDetail(DBCon dbCon, Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException, BusinessException {
+	private static List<OrderFood> getSingleDetail(DBCon dbCon, Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException {
 		String sql;
 
 		if(dateType.isHistory()){
 			sql = "SELECT OF.order_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, OF.operation, " +
-					" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
-					" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
+					" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.commission, OF.is_paid, " +
+					" OF.unit_price, OF.order_count, OF.staff_id, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
 					" OF.food_unit_id, OF.food_unit, OF.food_unit_price, " +
 					" OF.cancel_reason_id, IF(OF.cancel_reason_id = 1, '无原因', OF.cancel_reason) cancel_reason, " +
 					" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
@@ -301,8 +294,8 @@ public class OrderFoodDao {
 		
 		}else if(dateType.isToday()){
 			sql = " SELECT OF.id, OF.order_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, OF.operation, " +
-					" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
-					" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
+					" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.commission, OF.is_paid, " +
+					" OF.unit_price, OF.order_count, OF.staff_id, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
 					" OF.food_unit_id, OF.food_unit, OF.food_unit_price, " +
 					" OF.cancel_reason_id, OF.cancel_reason, " +
 					" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
@@ -328,6 +321,7 @@ public class OrderFoodDao {
 			of.asFood().setName(dbCon.rs.getString("name"));
 			of.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			of.asFood().setStatus(dbCon.rs.getShort("food_status"));
+			of.asFood().setCommission(dbCon.rs.getFloat("commission"));
 			of.setRepaid(dbCon.rs.getBoolean("is_paid"));
 			of.setGift(dbCon.rs.getBoolean("is_gift"));
 			of.setOperation(OrderFood.Operation.valueOf(dbCon.rs.getInt("operation")));
@@ -343,12 +337,17 @@ public class OrderFoodDao {
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
 			//Get the detail to taste group.
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
-				of.setTasteGroup(TasteGroupDao.getById(staff, tasteGroupId, dateType));
+				try{
+					of.setTasteGroup(TasteGroupDao.getById(staff, tasteGroupId, dateType));
+				}catch(BusinessException ignored){
+					ignored.printStackTrace();
+				}
 			}
 			
 			of.setCount(dbCon.rs.getFloat("order_count"));
 			of.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
 			of.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+			of.setStaffId(dbCon.rs.getInt("staff_id"));
 			of.setWaiter(dbCon.rs.getString("waiter"));
 			
 			Kitchen kitchen = new Kitchen(dbCon.rs.getInt("kitchen_id"));
@@ -477,7 +476,7 @@ public class OrderFoodDao {
 			//Get the detail to taste group.
 			if(of.getTasteGroup() != null){
 				try{
-					of.setTasteGroup(TasteGroupDao.getById(staff, of.getTasteGroup().getGroupId(), extraCond.dateType));
+					of.setTasteGroup(TasteGroupDao.getById(dbCon, staff, of.getTasteGroup().getGroupId(), extraCond.dateType));
 				}catch(BusinessException e){
 					of.clearTasetGroup();
 				}
@@ -756,73 +755,132 @@ public class OrderFoodDao {
 	}
 	
 	public static class ArchiveResult{
-		private final int maxId;
-		private final int orderAmount;
-		public ArchiveResult(int maxId, int orderAmount){
-			this.maxId = maxId;
-			this.orderAmount = orderAmount;
+		private final int maxOrderFoodId;
+		private final int ofAmount;
+		
+		public ArchiveResult(int maxOrderFoodId, int orderFoodAmount){
+			this.maxOrderFoodId = maxOrderFoodId;
+			this.ofAmount = orderFoodAmount;
 		}
 		
 		public int getMaxId(){
-			return this.maxId;
+			return this.maxOrderFoodId;
 		}
 		
 		public int getAmount(){
-			return this.orderAmount;
+			return this.ofAmount;
 		}
 		
 		@Override
 		public String toString(){
-			return orderAmount + " record(s) are moved to history, maxium id : " + maxId;
+			return ofAmount + " order food record(s) are moved to history, maxium id : " + maxOrderFoodId;
 		}
 	}
 	
-	static ArchiveResult archive(DBCon dbCon, Staff staff, String paidOrder) throws SQLException{
-		
-		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `operation`, `food_id`, `order_date`, `order_count`," + 
-				"`unit_price`, `commission`, `name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
-				"`discount`, `dept_id`, `kitchen_id`, " +
-				"`food_unit_id`, `food_unit`, `food_unit_price`," +
-				"`staff_id`, `waiter`, `is_temporary`, `is_paid`, `is_gift`";
-
-		String sql;
-		
-		//Move the records from today to history.
-		sql = " INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ") " +
-			  " SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food " +
-			  " WHERE " +
-			  " order_id IN ( " + paidOrder + " ) ";
-		
-		int orderAmount = dbCon.stmt.executeUpdate(sql);
-		
-		int maxId = 0;
-		//Calculate the max order food id from both today and history.
-		sql = " SELECT MAX(id) + 1 FROM (" +
-			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_food " +
-			  " UNION " +
-			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_food_history) AS all_order_food";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			maxId = dbCon.rs.getInt(1);
+	static ArchiveResult archive(DBCon dbCon, Staff staff, Order order, DateType archiveFrom, DateType archiveTo) throws SQLException{
+		int amount = 0;
+		ExtraCond extraCond = new ExtraCond(archiveTo);
+		Map<Integer, Integer> tgMap = new HashMap<>();
+		for(OrderFood of : getSingleDetail(dbCon, staff, new ExtraCond(archiveFrom).setOrder(order), null)){
+			int tgId = TasteGroup.EMPTY_TASTE_GROUP_ID;
+			if(of.hasTasteGroup()){
+				if(!tgMap.containsKey(of.getTasteGroup().getGroupId())){
+					int tgId4Archive = TasteGroupDao.archive(dbCon, staff, of.getTasteGroup().getGroupId(), archiveFrom, archiveTo);
+					tgMap.put(of.getTasteGroup().getGroupId(), tgId4Archive);
+				}
+				tgId = tgMap.get(of.getTasteGroup().getGroupId()).intValue();
+			}
+			String sql;
+			sql = " INSERT INTO " + Params.dbName + "." + extraCond.orderFoodTbl +
+				  " ( " + 
+				  " `restaurant_id`, `order_id`, `operation`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
+				  " `food_unit_id`, `food_unit`, `food_unit_price`, " +
+				  " `discount`, `taste_group_id`, " +
+				  " `dept_id`, `kitchen_id`, " +
+				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, `is_gift`, " +
+				  " `cancel_reason_id`, `cancel_reason` " +
+				  " ) " +
+				  " VALUES " +
+				  "(" +
+				  staff.getRestaurantId() + ", " +
+				  of.getOrderId() + ", " +
+				  of.getOperation().getVal() + "," +
+				  of.getFoodId() + ", " +
+				  of.getCount() + ", " + 
+				  of.getFoodPrice() + ", " + 
+				  of.asFood().getCommission() + ", " +
+				  "'" + of.getName() + "', " + 
+				  of.asFood().getStatus() + ", " +
+				  (of.hasFoodUnit() ? of.getFoodUnit().getId() : " NULL ") + "," +
+				  (of.hasFoodUnit() ? "'" + of.getFoodUnit().getUnit() + "'" : " NULL ") + "," +
+				  (of.hasFoodUnit() ? of.getFoodUnit().getPrice() : " NULL ") + "," +
+				  of.getDiscount() + ", " +
+				  tgId + "," +
+				  of.getKitchen().getDept().getId() + ", " +
+				  of.getKitchen().getId() + ", " +
+				  of.getStaffId() + ", " +
+				  "'" + of.getWaiter() + "', " +
+				  "'" +  DateUtil.format(of.getOrderDate(), DateUtil.Pattern.DATE_TIME) + "'," +
+				  (of.isTemp() ? 1 : 0) + ", " +
+				  (of.isRepaid() ? 1 : 0) + "," +
+				  (of.isGift() ? 1 : 0) + "," +
+				  (of.hasCancelReason() ? of.getCancelReason().getId() : "NULL") + "," +
+				  (of.hasCancelReason() ? "'" + of.getCancelReason().getReason() + "'" : "NULL") +
+				  " ) ";
+			if(dbCon.stmt.executeUpdate(sql) != 0){
+				amount++;
+			}	
 		}
-		dbCon.rs.close();
 		
-		sql = " DELETE FROM " + Params.dbName + ".order_food WHERE restaurant_id = " + Restaurant.ADMIN;
-		dbCon.stmt.executeUpdate(sql);
-		
-		//Insert the max id.
-		sql = " INSERT INTO " + Params.dbName + ".order_food " +
-			  " (id, restaurant_id) VALUES(" +
-			  maxId + "," +
-			  Restaurant.ADMIN + 
-			  ")";
-		dbCon.stmt.executeUpdate(sql);
-		
-		//Delete the paid order food from 'order_food' table.
-		sql = " DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrder + ")";
-		dbCon.stmt.executeUpdate(sql);
-		
-		return new ArchiveResult(maxId, orderAmount);
+		return new ArchiveResult(0, amount);
 	}
+	
+//	static ArchiveResult archive(DBCon dbCon, Staff staff, String paidOrder) throws SQLException{
+//		
+//		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `operation`, `food_id`, `order_date`, `order_count`," + 
+//				"`unit_price`, `commission`, `name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
+//				"`discount`, `dept_id`, `kitchen_id`, " +
+//				"`food_unit_id`, `food_unit`, `food_unit_price`," +
+//				"`staff_id`, `waiter`, `is_temporary`, `is_paid`, `is_gift`";
+//
+//		String sql;
+//		
+//		//Move the records from today to history.
+//		sql = " INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ") " +
+//			  " SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food " +
+//			  " WHERE " +
+//			  " order_id IN ( " + paidOrder + " ) ";
+//		
+//		int orderAmount = dbCon.stmt.executeUpdate(sql);
+//		
+//		int maxId = 0;
+//		//Calculate the max order food id from both today and history.
+//		sql = " SELECT MAX(id) + 1 FROM (" +
+//			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_food " +
+//			  " UNION " +
+//			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_food_history) AS all_order_food";
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		if(dbCon.rs.next()){
+//			maxId = dbCon.rs.getInt(1);
+//		}
+//		dbCon.rs.close();
+//		
+//		sql = " DELETE FROM " + Params.dbName + ".order_food WHERE restaurant_id = " + Restaurant.ADMIN;
+//		dbCon.stmt.executeUpdate(sql);
+//		
+//		//Insert the max id.
+//		sql = " INSERT INTO " + Params.dbName + ".order_food " +
+//			  " (id, restaurant_id) VALUES(" +
+//			  maxId + "," +
+//			  Restaurant.ADMIN + 
+//			  ")";
+//		dbCon.stmt.executeUpdate(sql);
+//		
+//		//Delete the paid order food from 'order_food' table.
+//		sql = " DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrder + ")";
+//		dbCon.stmt.executeUpdate(sql);
+//		
+//		return new ArchiveResult(maxId, orderAmount);
+//	}
 	
 }

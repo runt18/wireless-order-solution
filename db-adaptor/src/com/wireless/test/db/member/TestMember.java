@@ -26,9 +26,9 @@ import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.test.db.TestInit;
-import com.wireless.util.DateType;
 
 public class TestMember {
 	

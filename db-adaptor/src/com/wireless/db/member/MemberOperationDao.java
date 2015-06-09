@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
@@ -21,11 +22,10 @@ import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberOperation.OperationCate;
 import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.member.MemberType;
-import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
-import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 
 public class MemberOperationDao {
@@ -810,10 +810,13 @@ public class MemberOperationDao {
 		}
 	}
 	
-	public static ArchiveResult archive(DBCon dbCon, Staff staff) throws SQLException{
+	public static ArchiveResult archive(DBCon dbCon, Staff staff, DateType archiveFrom, DateType archiveTo) throws SQLException{
 		String sql;
 		
-		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member_operation WHERE restaurant_id = " + staff.getRestaurantId();
+		DBTbl fromTbl = new DBTbl(archiveFrom);
+		DBTbl toTbl = new DBTbl(archiveTo);
+		
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + "." + fromTbl.moTbl + " WHERE restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		int moAmount = 0;
 		if(dbCon.rs.next()){
@@ -825,45 +828,21 @@ public class MemberOperationDao {
 			return new ArchiveResult(0, 0);
 		}
 		
-		//Calculate the max member operation id from both today and history
-		sql = " SELECT MAX(id) + 1 " +
-			  " FROM " +
-			  " (SELECT MAX(id) AS id FROM " + Params.dbName + ".member_operation" +
-			  " UNION " +
-			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".member_operation_history) AS all_mo_id ";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		
-		int maxId = 0;
-		if(dbCon.rs.next()){
-			maxId = dbCon.rs.getInt(1);
-		}
-		dbCon.rs.close();
+		final String item = "`restaurant_id`, `staff_id`, `staff_name`, `member_id`, `member_name`, `member_mobile`, `member_card`, `operate_seq`, `operate_date`," +
+							"`operate_type`, `pay_type_id`, `pay_money`, `coupon_id`, `coupon_money`, `coupon_name`, `order_id`, `charge_type`, `charge_money`, `delta_base_money`," +
+							"`delta_extra_money`, `delta_point`, `remaining_base_money`, `remaining_extra_money`, `remaining_point`, `comment`";
 		
 		//Move the member operation record from 'member_operation' to 'member_operation_history'
-		sql = " INSERT INTO " + Params.dbName + ".member_operation_history" +
-			  " SELECT * FROM " + Params.dbName + ".member_operation" + 
+		sql = " INSERT INTO " + Params.dbName + "." + toTbl.moTbl + "(" + item + ")" +
+			  " SELECT " + item + " FROM " + Params.dbName + "." + fromTbl.moTbl + 
 			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		moAmount = dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the member operation to this restaurant
-		sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE restaurant_id = " + staff.getRestaurantId();
+		sql = " DELETE FROM " + Params.dbName + "." + fromTbl.moTbl + " WHERE restaurant_id = " + staff.getRestaurantId();
 		dbCon.stmt.executeUpdate(sql);
 		
-		//Delete the member operation belongs to admin.
-		sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE restaurant_id = " + Restaurant.ADMIN;
-		dbCon.stmt.executeUpdate(sql);
 		
-		//Insert a record with max member operation id 
-		sql = " INSERT INTO " + Params.dbName + ".member_operation" +
-			  " (`id`, `restaurant_id`, `staff_id`, `member_id`, `member_name`, `member_mobile`, `operate_seq`, `operate_date`, `operate_type`) " +
-			  " VALUES " +
-			  " ( " +
-			  maxId + "," +
-			  Restaurant.ADMIN + "," +
-			  " 0, 0, '', '', '', 0, 0 " +
-			  " ) ";
-		dbCon.stmt.executeUpdate(sql);
-		
-		return new ArchiveResult(maxId, moAmount);
+		return new ArchiveResult(0, moAmount);
 	}
 }
