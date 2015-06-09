@@ -57,9 +57,11 @@ public class OperateStockTakeAction extends DispatchAction{
 				.setOperatorId(staff.getId()).setOperator(staff.getName())
 				.setComment(comment);
 			
-			if(StockTakeDao.beforeInsertStockTake(staff)){
+			try{
+				StockTakeDao.beforeInsertStockTake(staff);
 				builder.setStartTime(System.currentTimeMillis());	
-			}else{
+			}catch(BusinessException e){
+				//不是当前时间, 则生成月末盘点单
 				Calendar c = Calendar.getInstance();
 
 				int year = c.get(Calendar.YEAR); 
@@ -69,8 +71,7 @@ public class OperateStockTakeAction extends DispatchAction{
 				
 				String startTime = year + "-" + month + "-" + day + " 23:59:59";
 				SimpleDateFormat sdf =   new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				builder.setStartTime(sdf.parse(startTime).getTime());	
-				
+				builder.setStartTime(sdf.parse(startTime).getTime());				
 			}
 			
 			if(cateId != null && !cateId.trim().isEmpty()){
@@ -86,10 +87,10 @@ public class OperateStockTakeAction extends DispatchAction{
 			StockTakeDao.insertStockTake(staff, builder);
 			jobject.initTip(true, "操作成功, 已增加新盘点任务.");
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
