@@ -55,7 +55,7 @@ public class WXQueryCouponAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -89,7 +89,7 @@ public class WXQueryCouponAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -124,7 +124,7 @@ public class WXQueryCouponAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -154,7 +154,7 @@ public class WXQueryCouponAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());

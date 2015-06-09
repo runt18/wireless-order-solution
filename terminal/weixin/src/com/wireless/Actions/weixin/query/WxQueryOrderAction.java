@@ -59,7 +59,7 @@ public class WxQueryOrderAction extends DispatchAction {
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(dbCon != null) dbCon.disconnect();
 			response.getWriter().print(jobject.toString());

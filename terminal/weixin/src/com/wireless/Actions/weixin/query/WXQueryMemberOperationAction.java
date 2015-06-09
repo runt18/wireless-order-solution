@@ -31,8 +31,8 @@ import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 
 public class WXQueryMemberOperationAction extends DispatchAction{
@@ -177,7 +177,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(dbCon != null) dbCon.disconnect();
 		}
@@ -295,7 +295,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(dbCon != null) dbCon.disconnect();
 		}
@@ -338,7 +338,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(dbCon != null){
 				dbCon.disconnect();
@@ -454,7 +454,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

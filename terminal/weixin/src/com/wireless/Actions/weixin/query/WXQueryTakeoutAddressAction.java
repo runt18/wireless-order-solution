@@ -34,7 +34,7 @@ public class WXQueryTakeoutAddressAction extends Action{
 			jobject.setRoot(list);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

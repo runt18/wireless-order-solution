@@ -73,9 +73,9 @@ import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.util.DateType;
 
 public class FinanceWeixinAction extends Action {
 	

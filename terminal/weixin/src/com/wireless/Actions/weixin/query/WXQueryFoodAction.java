@@ -49,7 +49,7 @@ public class WXQueryFoodAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -93,7 +93,7 @@ public class WXQueryFoodAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(dbCon != null) dbCon.disconnect();
 			if(root != null && !root.isEmpty()){

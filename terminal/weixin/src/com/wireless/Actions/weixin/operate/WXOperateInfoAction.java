@@ -48,7 +48,7 @@ public class WXOperateInfoAction extends DispatchAction {
 			jobject.setSuccess(true);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

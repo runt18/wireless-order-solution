@@ -126,7 +126,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
@@ -190,12 +190,12 @@ public class WXOperateMemberAction extends DispatchAction {
 		}catch(IOException e){
 			dbCon.conn.rollback();
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			
 		}catch(Exception e){
 			dbCon.conn.rollback();
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			
 		}finally{
 			dbCon.disconnect();
