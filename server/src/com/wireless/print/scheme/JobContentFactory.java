@@ -30,6 +30,7 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.print.content.Content;
 import com.wireless.print.content.ContentCombinator;
@@ -40,7 +41,6 @@ import com.wireless.print.content.concrete.ReceiptContent;
 import com.wireless.print.content.concrete.ShiftContent;
 import com.wireless.print.content.concrete.SummaryContent;
 import com.wireless.print.content.concrete.TransTableContent;
-import com.wireless.util.DateType;
 
 public class JobContentFactory {
 

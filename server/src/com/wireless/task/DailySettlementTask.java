@@ -49,7 +49,7 @@ public class DailySettlementTask extends SchedulerTask{
 			taskInfo.append("info : " + VerifySMSDao.deleteAll() + " verification SMS record(s) are removed.").append(sep);
 			
 			//Perform daily settlement.
-			taskInfo.append(DailySettleDao.exec()).append(sep);
+			taskInfo.append(DailySettleDao.auto()).append(sep);
 			
 			//Perform to smart taste calculation.
 			taskInfo.append("info : " + TasteRefDao.exec()).append(sep);

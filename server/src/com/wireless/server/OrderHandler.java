@@ -63,6 +63,7 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Device;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.print.content.ContentParcel;
 import com.wireless.print.content.concrete.FoodDetailContent;
@@ -71,7 +72,6 @@ import com.wireless.sccon.ServerConnector;
 import com.wireless.sms.SMS;
 import com.wireless.sms.msg.Msg4Consume;
 import com.wireless.sms.msg.Msg4Upgrade;
-import com.wireless.util.DateType;
 /**
  * @author yzhang
  *
