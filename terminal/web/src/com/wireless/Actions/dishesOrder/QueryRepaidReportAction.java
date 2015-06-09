@@ -24,9 +24,9 @@ import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByEachDay;
 import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByStaff;
 import com.wireless.pojo.billStatistics.repaid.RepaidStatistics;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DateType;
 
 public class QueryRepaidReportAction extends DispatchAction{
 
@@ -73,7 +73,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 			jobject.initTip(e);
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -139,7 +139,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -179,7 +179,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

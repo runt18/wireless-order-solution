@@ -70,7 +70,7 @@ public class QueryDiscountPlanAction extends Action{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(list != null){
 				jobject.setTotalProperty(list.size());

@@ -34,7 +34,7 @@ public class QueryBillboardAction extends DispatchAction{
 			jobject.setRoot(BillBoardDao.getByCond(dbCon, new BillBoardDao.ExtraCond().setType(BillBoard.Type.SYSTEM)));
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(dbCon != null) dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
@@ -78,7 +78,7 @@ public class QueryBillboardAction extends DispatchAction{
 			jobject.setRoot(bbs);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(dbCon != null) dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
@@ -104,7 +104,7 @@ public class QueryBillboardAction extends DispatchAction{
 //			jobject.setRoot(BillBoardDao.get(extra));
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -129,7 +129,7 @@ public class QueryBillboardAction extends DispatchAction{
 //			jobject.setRoot(BillBoardDao.get(extra));
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

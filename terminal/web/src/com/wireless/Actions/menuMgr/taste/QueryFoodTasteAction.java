@@ -15,7 +15,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.FoodTaste;
-import com.wireless.pojo.util.WebParams;
 
 public class QueryFoodTasteAction extends Action{
 
@@ -34,11 +33,11 @@ public class QueryFoodTasteAction extends Action{
 			
 			
 			if(foodID == null){
-				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,没有指定查询口味的菜品!");
+				jobject.initTip(false, JObject.TIP_TITLE_ERROE, "操作失败,没有指定查询口味的菜品!");
 			}
 			
 			if(restaurantID == null){
-				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,没有指定查询口味的餐厅!");
+				jobject.initTip(false, JObject.TIP_TITLE_ERROE, "操作失败,没有指定查询口味的餐厅!");
 			}
 			
 			if(jobject.isSuccess()){
@@ -46,10 +45,10 @@ public class QueryFoodTasteAction extends Action{
 			}
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(true, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(true, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			
 		} catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		} finally{
 			if(list != null){

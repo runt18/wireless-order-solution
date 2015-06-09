@@ -73,7 +73,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			jobject.initTip(true, "添加成功");
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -204,7 +204,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			jobject.initTip(true, "操作成功, 已修改微信餐厅简介信息.");
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -241,7 +241,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			});
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -287,7 +287,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			jobject.setSuccess(true);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -320,7 +320,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			jobject.initTip(true, "上传ＬＯＧＯ成功");
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -378,7 +378,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			});
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -412,7 +412,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			jobject.setRoot(codes);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -442,7 +442,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

@@ -22,7 +22,6 @@ import com.wireless.pojo.stockMgr.StockTake.CateType;
 import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTake.UpdateStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail.InsertStockTakeDetail;
-import com.wireless.pojo.util.WebParams;
 
 public class OperateStockTakeAction extends DispatchAction{
 
@@ -90,7 +89,7 @@ public class OperateStockTakeAction extends DispatchAction{
 			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -154,10 +153,10 @@ public class OperateStockTakeAction extends DispatchAction{
 			StockTakeDao.updateStockTake(staff, Integer.valueOf(id), builder);
 			jobject.initTip(true, "操作成功, 已修改盘点任务内容.");
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -189,10 +188,10 @@ public class OperateStockTakeAction extends DispatchAction{
 			StockTakeDao.deleteStockTakeById(staff, Integer.valueOf(id));
 			jobject.initTip(true, "操作成功, 已取消选中盘点任务.");
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -226,10 +225,10 @@ public class OperateStockTakeAction extends DispatchAction{
 			StockTakeDao.auditStockTake(staff, uBuilder);
 			jobject.initTip(true, "操作成功, 已审核选中盘点任务.");
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -265,10 +264,10 @@ public class OperateStockTakeAction extends DispatchAction{
 			}
 			jobject.initTip(true, "操作成功, 已处理该盘点任务盘漏货品.");
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -298,13 +297,13 @@ public class OperateStockTakeAction extends DispatchAction{
 			if(StockTakeDao.beforeInsertStockTake(staff)){
 				jobject.initTip(true, "操作成功, 会计月验证通过.");				
 			}else{
-				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 未知错误.");
+				jobject.initTip(false, "操作失败, 未知错误.");
 			}
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -333,10 +332,10 @@ public class OperateStockTakeAction extends DispatchAction{
 			StockTakeDao.checkStockAction(staff);
 			jobject.initTip(true, "操作成功, 继续填写信息.");
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());

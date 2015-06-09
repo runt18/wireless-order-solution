@@ -30,7 +30,6 @@ import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.WebParams;
 import com.wireless.util.DataPaging;
 
 public class QueryMenuAction extends DispatchAction {
@@ -103,7 +102,7 @@ public class QueryMenuAction extends DispatchAction {
 
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(root != null){
 				List<Food> result;
@@ -147,7 +146,7 @@ public class QueryMenuAction extends DispatchAction {
 			root = FoodTasteDao.getFoodTaste(Integer.parseInt(restaurantId));
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_WARNING, WebParams.TIP_CODE_EXCEPTION, e.getMessage());
+			jobject.initTip4Exception(e);
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
@@ -181,7 +180,7 @@ public class QueryMenuAction extends DispatchAction {
 			root = KitchenDao.getByType(StaffDao.verify(Integer.parseInt(pin)), Type.NORMAL);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
@@ -215,7 +214,7 @@ public class QueryMenuAction extends DispatchAction {
 			root = DepartmentDao.getByType(StaffDao.getAdminByRestaurant(Integer.parseInt(restaurantId)), Department.Type.NORMAL);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_WARNING, WebParams.TIP_CODE_EXCEPTION, e.getMessage());
+			jobject.initTip4Exception(e);
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
@@ -245,7 +244,7 @@ public class QueryMenuAction extends DispatchAction {
 			root = KitchenDao.getByAllowTemp(StaffDao.verify(Integer.parseInt(pin)));
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			jobject.setTotalProperty(root.size());
 			jobject.setRoot(root);
@@ -276,7 +275,7 @@ public class QueryMenuAction extends DispatchAction {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			jobject.setTotalProperty(root.size());
 			jobject.setRoot(root);
@@ -299,7 +298,7 @@ public class QueryMenuAction extends DispatchAction {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			jobject.setTotalProperty(root.size());
 			jobject.setRoot(root);
@@ -331,7 +330,7 @@ public class QueryMenuAction extends DispatchAction {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			jobject.setTotalProperty(root.size());
 			jobject.setRoot(root);
@@ -352,7 +351,7 @@ public class QueryMenuAction extends DispatchAction {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			jobject.setRoot(root);
 			response.getWriter().print(jobject.toString());
@@ -397,7 +396,7 @@ public class QueryMenuAction extends DispatchAction {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			jobject.setRoot(root);
 			response.getWriter().print(jobject.toString());
@@ -421,7 +420,7 @@ public class QueryMenuAction extends DispatchAction {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

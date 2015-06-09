@@ -20,8 +20,8 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DateType;
 
 public class QueryDetailAction extends Action {
 	
@@ -73,7 +73,7 @@ public class QueryDetailAction extends Action {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(list != null){
 				list = DataPaging.getPagingData(list, isPaging, start, limit);

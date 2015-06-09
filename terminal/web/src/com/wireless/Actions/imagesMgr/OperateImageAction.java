@@ -83,7 +83,7 @@ public class OperateImageAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 
 			response.getWriter().print(jobject.toString());
@@ -111,7 +111,7 @@ public class OperateImageAction extends DispatchAction{
 		}catch(SQLException e){
 			jobject.initTip(e);
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

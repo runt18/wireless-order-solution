@@ -50,7 +50,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(!rolePrivilege.isEmpty()){
 				jobject.setTotalProperty(rolePrivilege.size());

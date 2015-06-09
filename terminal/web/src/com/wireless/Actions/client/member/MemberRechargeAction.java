@@ -20,7 +20,6 @@ import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.WebParams;
 import com.wireless.sccon.ServerConnector;
 
 public class MemberRechargeAction extends Action{
@@ -43,7 +42,7 @@ public class MemberRechargeAction extends Action{
 			
 			MemberOperation mo = MemberDao.charge(staff, Integer.valueOf(memberID), Float.valueOf(payMoney), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
 			if(mo == null || mo.getId() == 0){
-				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9998, "操作失败, 会员充值未成功, 未知错误, 请联系客服人员.");
+				jobject.initTip(false, JObject.TIP_TITLE_ERROE, 9998, "操作失败, 会员充值未成功, 未知错误, 请联系客服人员.");
 			}else{
 				jobject.initTip(true, "操作成功, 会员充值成功.");
 				if(isPrint != null && Boolean.valueOf(isPrint)){
@@ -68,7 +67,7 @@ public class MemberRechargeAction extends Action{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

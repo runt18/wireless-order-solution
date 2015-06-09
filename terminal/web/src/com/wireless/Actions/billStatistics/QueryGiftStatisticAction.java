@@ -26,9 +26,9 @@ import com.wireless.pojo.billStatistics.gift.GiftIncomeByEachDay;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByStaff;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Region.RegionId;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DateType;
 
 public class QueryGiftStatisticAction extends DispatchAction{
 
@@ -84,7 +84,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -162,7 +162,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -210,7 +210,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -258,7 +258,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

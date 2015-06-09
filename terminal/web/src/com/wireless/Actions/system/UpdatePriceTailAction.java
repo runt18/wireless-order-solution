@@ -58,7 +58,7 @@ public class UpdatePriceTailAction extends Action{
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		} finally {
 			response.getWriter().print(jobject.toString());
 		}

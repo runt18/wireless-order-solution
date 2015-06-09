@@ -54,7 +54,7 @@ public class QueryModuleAction extends DispatchAction{
 			modulelist = ModuleDao.getAll();
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			jobject.setRoot(modulelist);
 			response.getWriter().print(jobject.toString());

@@ -16,7 +16,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.pojo.util.WebParams;
 import com.wireless.util.DataPaging;
 
 public class QueryTasteAction extends Action {
@@ -75,11 +74,11 @@ public class QueryTasteAction extends Action {
 			root = TasteDao.getTastes(staff, extraCond, " ORDER BY TASTE.taste_id ");
 		} catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			
 		} catch(Exception e) {
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());

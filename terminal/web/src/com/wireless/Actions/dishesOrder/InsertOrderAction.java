@@ -21,7 +21,6 @@ import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.WebParams;
 import com.wireless.sccon.ServerConnector;
 
 
@@ -81,16 +80,16 @@ public class InsertOrderAction extends Action{
 			}
 			
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			e.printStackTrace();
 		}catch(IOException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9997, "服务器请求不成功，请重新检查网络是否连通.");
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, 9997, "服务器请求不成功，请重新检查网络是否连通.");
 			e.printStackTrace();
 		}catch(NumberFormatException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9998, "菜品提交的数量不正确，请检查后重新提交.");
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, 9998, "菜品提交的数量不正确，请检查后重新提交.");
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作错误.");
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作错误.");
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());

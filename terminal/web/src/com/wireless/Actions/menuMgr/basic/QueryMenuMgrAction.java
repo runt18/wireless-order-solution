@@ -116,7 +116,7 @@ public class QueryMenuMgrAction extends Action {
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());

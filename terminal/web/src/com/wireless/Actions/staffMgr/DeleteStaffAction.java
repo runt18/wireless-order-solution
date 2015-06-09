@@ -12,7 +12,6 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
-import com.wireless.pojo.util.WebParams;
 
 public class DeleteStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -29,7 +28,7 @@ public class DeleteStaffAction extends Action {
 
 		}  catch (SQLException e) {
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 
 		}finally {
 			response.getWriter().print(jobject.toString());

@@ -43,7 +43,7 @@ public class InsertDiscountAction extends Action{
 			e.printStackTrace();
 			
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());

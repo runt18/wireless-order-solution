@@ -15,7 +15,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
-import com.wireless.pojo.util.WebParams;
 import com.wireless.util.DataPaging;
 
 public class DailySettleStatisticsAction extends Action {
@@ -44,11 +43,11 @@ public class DailySettleStatisticsAction extends Action {
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(list != null){
 				jobject.setTotalProperty(list.size());

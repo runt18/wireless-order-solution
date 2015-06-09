@@ -23,7 +23,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
-import com.wireless.util.DateType;
+import com.wireless.pojo.util.DateType;
 
 public class DailySettleStatDetailAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -139,7 +139,7 @@ public class DailySettleStatDetailAction extends Action {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 
 		} finally {
 			dbCon.disconnect();

@@ -30,7 +30,7 @@ public class DeleteDiscountAction extends Action{
 		}catch(BusinessException e){
 			jobject.initTip(e);
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());

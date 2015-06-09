@@ -26,9 +26,8 @@ import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.regionMgr.Region.RegionId;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.pojo.util.WebParams;
-import com.wireless.util.DateType;
 
 public class BusinessStatisticsAction extends DispatchAction {
 	
@@ -133,7 +132,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jObject.initTip(e);
+			jObject.initTip4Exception(e);
 			
 		}finally{
 			
@@ -179,7 +178,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 					
 				});
 			}else{
-				jObject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
+				jObject.initTip(false, JObject.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
 			}
 			
 		}catch(BusinessException e){
@@ -188,7 +187,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jObject.initTip(e);
+			jObject.initTip4Exception(e);
 			
 		}finally{
 			response.getWriter().print(jObject.toString());
@@ -236,7 +235,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 					
 				});
 			}else{
-				jObject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
+				jObject.initTip(false, JObject.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
 			}
 			
 		}catch(BusinessException e){
@@ -245,7 +244,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jObject.initTip(e);
+			jObject.initTip4Exception(e);
 			
 		}finally{
 			response.getWriter().print(jObject.toString());
@@ -293,7 +292,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 					
 				});
 			}else{
-				jObject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
+				jObject.initTip(false, JObject.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
 			}
 			
 		}catch(BusinessException e){
@@ -302,7 +301,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jObject.initTip(e);
+			jObject.initTip4Exception(e);
 			
 		}finally{
 			response.getWriter().print(jObject.toString());

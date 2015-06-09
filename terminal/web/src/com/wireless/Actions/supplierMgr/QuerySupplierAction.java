@@ -16,7 +16,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.supplierMgr.Supplier;
-import com.wireless.pojo.util.WebParams;
 
 public class QuerySupplierAction extends Action {
 
@@ -66,7 +65,7 @@ public class QuerySupplierAction extends Action {
 
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

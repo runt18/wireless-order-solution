@@ -16,7 +16,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockDetailReport;
-import com.wireless.pojo.util.WebParams;
 
 public class QueryStockDetailReportAction extends Action{
 	@Override
@@ -58,7 +57,7 @@ public class QueryStockDetailReportAction extends Action{
 			jobject.initTip(false, e.getMessage(), e.getCode(), e.getDesc());
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(stockDetailReports != null){
 				jobject.setTotalProperty(roots);

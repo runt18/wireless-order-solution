@@ -25,8 +25,8 @@ import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.util.DateType;
 
 public class QueryOrderStatisticsAction extends Action {
 	
@@ -155,7 +155,7 @@ public class QueryOrderStatisticsAction extends Action {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			dbCon.disconnect();
 			if(!list.isEmpty() && dateTypeEnmu == DateType.TODAY){

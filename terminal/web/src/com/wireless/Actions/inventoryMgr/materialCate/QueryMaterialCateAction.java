@@ -19,7 +19,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.WebParams;
 import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
 
@@ -63,11 +62,11 @@ public class QueryMaterialCateAction extends DispatchAction{
 			root = MaterialCateDao.getContent(params);
 			
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			e.printStackTrace();
 			
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			if(root != null){

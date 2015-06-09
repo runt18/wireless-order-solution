@@ -28,10 +28,9 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.pojo.util.WebParams;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DateType;
 
 public class QueryCancelledFoodAction extends DispatchAction{
 	
@@ -53,11 +52,11 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			String ending = request.getParameter("ending");
 			
 			if(dateBeg == null || dateBeg.trim().isEmpty()){
-				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 请指定统计日期开始时间.");
+				jobject.initTip(false, JObject.TIP_TITLE_ERROE, "操作失败, 请指定统计日期开始时间.");
 				return null;
 			}
 			if(dateEnd == null || dateEnd.trim().isEmpty()){
-				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 请指定统计日期结束时间.");
+				jobject.initTip(false, JObject.TIP_TITLE_ERROE, "操作失败, 请指定统计日期结束时间.");
 				return null;
 			}
 			
@@ -114,7 +113,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		} finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -191,7 +190,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -238,7 +237,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -285,7 +284,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -332,7 +331,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

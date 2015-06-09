@@ -39,7 +39,7 @@ public class PaymentStatisticsAction extends DispatchAction{
 			String pin = (String)request.getAttribute("pin");
 			list = PaymentDao.getToday(StaffDao.verify(Integer.parseInt(pin)));
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			jobject.setRoot(list);
@@ -80,7 +80,7 @@ public class PaymentStatisticsAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(list != null){
 				jobject.setTotalProperty(list.size());

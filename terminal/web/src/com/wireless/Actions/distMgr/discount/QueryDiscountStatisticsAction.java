@@ -26,9 +26,9 @@ import com.wireless.pojo.billStatistics.discount.DiscountIncomeByStaff;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DateType;
 
 public class QueryDiscountStatisticsAction extends DispatchAction{
 
@@ -83,7 +83,7 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 			jobject.initTip(e);
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -152,7 +152,7 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -193,7 +193,7 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -235,7 +235,7 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

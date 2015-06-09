@@ -22,8 +22,8 @@ import com.wireless.pojo.member.MemberOperation.OperationCate;
 import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DateType;
 
 public class QueryMemberOperationAction extends Action{
 
@@ -157,7 +157,7 @@ public class QueryMemberOperationAction extends Action{
 				
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

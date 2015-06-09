@@ -60,7 +60,7 @@ public class OperateDiscountAction extends DispatchAction{
 			e.printStackTrace();
 			
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -97,7 +97,7 @@ public class OperateDiscountAction extends DispatchAction{
 			e.printStackTrace();
 			
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -130,7 +130,7 @@ public class OperateDiscountAction extends DispatchAction{
 			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -154,7 +154,7 @@ public class OperateDiscountAction extends DispatchAction{
 		}catch(BusinessException e){
 			jobject.initTip(e);
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());

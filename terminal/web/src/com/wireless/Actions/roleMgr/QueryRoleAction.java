@@ -15,7 +15,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.WebParams;
 
 public class QueryRoleAction extends Action{
 
@@ -31,7 +30,7 @@ public class QueryRoleAction extends Action{
 			root = RoleDao.getRoles(staff, null, " ORDER BY cate");
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());

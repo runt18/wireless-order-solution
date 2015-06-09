@@ -32,12 +32,9 @@ public class OperateFoodTasteCategoryAction extends DispatchAction{
 			TasteCategory.InsertBuilder builder = new TasteCategory.InsertBuilder(staff.getRestaurantId(), name);
 			TasteCategoryDao.insert(staff, builder);
 			jobject.initTip(true, "添加成功");
-		}catch(IllegalArgumentException e){
-			jobject.initTip(e);
-		}catch(SQLException e){
-			jobject.initTip(e);
 		}catch(Exception e){
-			jobject.initTip(e);
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -57,14 +54,8 @@ public class OperateFoodTasteCategoryAction extends DispatchAction{
 			TasteCategory.UpdateBuilder updateBuilder = new TasteCategory.UpdateBuilder(Integer.parseInt(categoryId), name);
 			TasteCategoryDao.update(staff, updateBuilder);
 			jobject.initTip(true, "修改成功");
-		}catch(BusinessException e){
-			jobject.initTip(e);
-		}catch(IllegalArgumentException e){
-			jobject.initTip(e);
-		}catch(SQLException e){
-			jobject.initTip(e);
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -82,12 +73,8 @@ public class OperateFoodTasteCategoryAction extends DispatchAction{
 		try{
 			TasteCategoryDao.delete(staff, Integer.parseInt(categoryId));
 			jobject.initTip(true, "删除成功");
-		}catch(BusinessException e){
-			jobject.initTip(e);
-		}catch(SQLException e){
-			jobject.initTip(e);
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -104,12 +91,8 @@ public class OperateFoodTasteCategoryAction extends DispatchAction{
 		try{
 			TasteCategory.SwapDisplayBuilder builder = new TasteCategory.SwapDisplayBuilder(Integer.parseInt(cateA), Integer.parseInt(cateB));
 			TasteCategoryDao.swap(staff, builder);
-		}catch(BusinessException e){
-			jobject.initTip(e);
-		}catch(SQLException e){
-			jobject.initTip(e);
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

@@ -47,7 +47,7 @@ public class QueryFoodTasteCategoryAction extends DispatchAction{
 		}catch(SQLException e){
 			jobject.initTip(e);
 		}catch(Exception e){
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print("[" + tree.toString() + "]");
 		}

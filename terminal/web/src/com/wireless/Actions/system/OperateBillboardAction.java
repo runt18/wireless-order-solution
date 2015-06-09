@@ -48,7 +48,7 @@ public class OperateBillboardAction extends DispatchAction{
 			jobject.initTip(true, "操作成功, 已添加新公告信息.");
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -98,7 +98,7 @@ public class OperateBillboardAction extends DispatchAction{
 			jobject.initTip(true, "操作成功, 已修改公告信息.");
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -127,7 +127,7 @@ public class OperateBillboardAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

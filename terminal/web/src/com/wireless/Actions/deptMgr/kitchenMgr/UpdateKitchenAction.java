@@ -45,7 +45,7 @@ public class UpdateKitchenAction extends Action {
 			jobject.initTip(true, "操作成功,已修改厨房信息.");
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		} finally {
 			response.getWriter().print(jobject.toString());
 		}

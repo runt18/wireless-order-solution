@@ -15,7 +15,6 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.staffMgr.Staff.InsertBuilder;
-import com.wireless.pojo.util.WebParams;
 
 public class InsertStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -42,7 +41,7 @@ public class InsertStaffAction extends Action {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 
 		}finally {
 			response.getWriter().print(jobject.toString());

@@ -19,7 +19,6 @@ import com.wireless.pojo.staffMgr.Device.InsertBuilder;
 import com.wireless.pojo.staffMgr.Device.Model;
 import com.wireless.pojo.staffMgr.Device.Status;
 import com.wireless.pojo.staffMgr.Device.UpdateBuilder;
-import com.wireless.pojo.util.WebParams;
 
 public class OperateDeviceAction extends DispatchAction{
 
@@ -41,13 +40,13 @@ public class OperateDeviceAction extends DispatchAction{
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
 		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -80,7 +79,7 @@ public class OperateDeviceAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -106,7 +105,7 @@ public class OperateDeviceAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

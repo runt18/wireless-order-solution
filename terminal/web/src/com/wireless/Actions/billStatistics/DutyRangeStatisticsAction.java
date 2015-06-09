@@ -20,11 +20,10 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.PaymentGeneral;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
 import com.wireless.pojo.billStatistics.ShiftGeneral.StaffPayment;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.pojo.util.WebParams;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DateType;
 
 public class DutyRangeStatisticsAction extends DispatchAction {
 	
@@ -48,11 +47,11 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 			String pin = (String)request.getAttribute("pin");
 			list = ShiftGeneralDao.getTodayShift(StaffDao.verify(Integer.parseInt(pin)));
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
 			e.printStackTrace();
 			
 		}catch(SQLException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
 			e.printStackTrace();
 			
 		}finally{
@@ -96,11 +95,11 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 				jsonTree.append("}");
 			}
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
 			e.printStackTrace();
 			
 		}catch(SQLException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
 			e.printStackTrace();
 			
 		}finally{
@@ -176,10 +175,10 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 			
 		}catch(BusinessException e){	
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 		}catch(SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
 		}finally{
 			if(list != null){
 				jobject.setTotalProperty(list.size());

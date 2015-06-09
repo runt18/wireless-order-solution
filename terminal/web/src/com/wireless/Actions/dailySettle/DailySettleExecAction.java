@@ -38,7 +38,7 @@ public class DailySettleExecAction extends Action {
 
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
-			final DutyRange dutyRange = DailySettleDao.exec(staff).getRange();
+			final DutyRange dutyRange = DailySettleDao.manual(staff).getRange();
 			
 			jObj.setExtra(new Jsonable(){
 

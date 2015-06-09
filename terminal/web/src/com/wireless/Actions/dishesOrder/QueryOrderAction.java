@@ -16,7 +16,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.DateType;
+import com.wireless.pojo.util.DateType;
 
 public class QueryOrderAction extends Action {
 	
@@ -80,7 +80,7 @@ public class QueryOrderAction extends Action {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			
 		} finally {
 			response.getWriter().print(jobject.toString());

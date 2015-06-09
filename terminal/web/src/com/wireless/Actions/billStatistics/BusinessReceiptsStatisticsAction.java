@@ -21,10 +21,10 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.IncomeByPay;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DateType;
 
 public class BusinessReceiptsStatisticsAction extends DispatchAction {
 	
@@ -58,7 +58,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(incomesByEachDay.size() == 1 && incomesByEachDay.get(0).getIncomeByPay() == null){
 				jobject.setRoot(new ArrayList<Jsonable>(0));
@@ -200,7 +200,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 			});
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

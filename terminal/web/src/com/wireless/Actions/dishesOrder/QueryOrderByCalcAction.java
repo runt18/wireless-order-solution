@@ -96,7 +96,7 @@ public class QueryOrderByCalcAction extends Action{
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 			
 		} finally {
 

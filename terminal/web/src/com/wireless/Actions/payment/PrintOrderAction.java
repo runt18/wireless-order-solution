@@ -25,7 +25,6 @@ import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.pojo.util.WebParams;
 import com.wireless.sccon.ServerConnector;
 
 public class PrintOrderAction extends Action{
@@ -219,26 +218,26 @@ public class PrintOrderAction extends Action{
 				}else if(resp.header.type == Type.NAK){
 					ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
 					if(errCode.equals(FrontBusinessError.ORDER_NOT_EXIST)){
-						jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "账单不存在, 请重新确认.");
+						jobject.initTip(false, JObject.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "账单不存在, 请重新确认.");
 					}else{
-						jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "号账单打印不成功, 请重新检查网络是否连通.");
+						jobject.initTip(false, JObject.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "号账单打印不成功, 请重新检查网络是否连通.");
 					}
 				}else{
-					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, 服务器请求不成功, 请重新检查网络是否连通.");
+					jobject.initTip(false, JObject.TIP_TITLE_ERROE, 9999, "操作失败, 服务器请求不成功, 请重新检查网络是否连通.");
 				}
 			}
 		}catch(NumberFormatException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 获取账单编号或餐台编号或打印类型信息失败.");
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, 9999, "操作失败, 获取账单编号或餐台编号或打印类型信息失败.");
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 		}catch(IOException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 服务器请求不成功, 请重新检查网络是否连通.");
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, 9999, "操作失败, 服务器请求不成功, 请重新检查网络是否连通.");
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 未知错误, 请联系客服人员.");
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, 9999, "操作失败, 未知错误, 请联系客服人员.");
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

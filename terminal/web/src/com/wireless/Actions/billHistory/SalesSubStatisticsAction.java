@@ -22,9 +22,9 @@ import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Region.RegionId;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DateType;
 
 public class SalesSubStatisticsAction extends Action {
 	
@@ -134,7 +134,7 @@ public class SalesSubStatisticsAction extends Action {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		} finally{
 			jobject.setTotalProperty(salesDetailList.size());
 			

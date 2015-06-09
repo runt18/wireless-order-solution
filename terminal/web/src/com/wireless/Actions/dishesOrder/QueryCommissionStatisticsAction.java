@@ -31,10 +31,10 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DateType;
 
 public class QueryCommissionStatisticsAction extends DispatchAction{
 
@@ -88,7 +88,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 			jobject.initTip(e);
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -159,7 +159,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -201,7 +201,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -242,7 +242,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			if(dbCon != null) dbCon.disconnect();
 			response.getWriter().print(jobject.toString());

@@ -83,7 +83,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			jobject.setTotalProperty(list.size());
 			jobject.setRoot(list);
@@ -278,7 +278,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -344,7 +344,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

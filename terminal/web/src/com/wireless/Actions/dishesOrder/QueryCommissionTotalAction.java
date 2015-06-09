@@ -18,8 +18,8 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DateType;
 
 public class QueryCommissionTotalAction extends Action{
 
@@ -61,7 +61,7 @@ public class QueryCommissionTotalAction extends Action{
 			jobject.initTip(e);
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

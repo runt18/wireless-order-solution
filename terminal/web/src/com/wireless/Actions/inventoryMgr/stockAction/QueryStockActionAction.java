@@ -18,7 +18,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
-import com.wireless.pojo.util.WebParams;
 import com.wireless.util.DataPaging;
 
 public class QueryStockActionAction extends Action{
@@ -98,11 +97,11 @@ public class QueryStockActionAction extends Action{
 			root = StockActionDao.getStockAndDetail(staff, extraCond, orderClause);
 
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			e.printStackTrace();
 			
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			if(!root.isEmpty()){

@@ -37,7 +37,7 @@ public class QueryCancelReasonAction extends Action{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			jobject.setRoot(list);
 			response.getWriter().print(jobject.toString());

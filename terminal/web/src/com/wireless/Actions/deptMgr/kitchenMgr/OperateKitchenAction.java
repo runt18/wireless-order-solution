@@ -45,7 +45,7 @@ public class OperateKitchenAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -77,7 +77,7 @@ public class OperateKitchenAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		} finally {
 			response.getWriter().print(jobject.toString());
 		}
@@ -111,7 +111,7 @@ public class OperateKitchenAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		} finally {
 			response.getWriter().print(jobject.toString());
 		}
@@ -138,7 +138,7 @@ public class OperateKitchenAction extends DispatchAction{
 			jobject.initTip(e);
 		}catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.initTip4Exception(e);
 		} finally {
 			response.getWriter().print(jobject.toString());
 		}
