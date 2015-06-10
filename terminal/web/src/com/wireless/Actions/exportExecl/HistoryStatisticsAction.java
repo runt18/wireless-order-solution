@@ -35,6 +35,7 @@ import com.wireless.db.billStatistics.CalcDiscountStatisticsDao;
 import com.wireless.db.billStatistics.CalcRepaidStatisticsDao;
 import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.billStatistics.SaleDetailsDao;
+import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.orderMgr.OrderDao;
@@ -42,6 +43,7 @@ import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.orderMgr.PayTypeDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.exception.BusinessException;
@@ -73,6 +75,7 @@ import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockReport;
+import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
@@ -1610,6 +1613,119 @@ public class HistoryStatisticsAction extends DispatchAction{
 		return null;
 		
 	}
+	
+	/**
+	 * 导出盘点明细
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward stockTakeDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		
+		
+		response.setContentType("application/vnd.ms-excel;");
+		
+		String pin = (String)request.getAttribute("pin");
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		String cateId = request.getParameter("cateId");
+		String deptId = request.getParameter("deptId");
+		String cateType = request.getParameter("cateType");
+		
+		String deptName = DepartmentDao.getById(staff, Integer.parseInt(deptId)).getName();
+		
+		List<StockTakeDetail> root = new ArrayList<StockTakeDetail>();
+		if(cateId != null && !cateId.trim().isEmpty() && deptId != null){
+			root = MaterialDeptDao.getStockTakeDetails(staff, Integer.parseInt(deptId), Integer.parseInt(cateType), Integer.parseInt(cateId), " ORDER BY MD.stock DESC");
+		}
+		
+		String title = "盘点单明细";
+		//标题
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("盘点单明细.xls").getBytes("GBK"),  "ISO8859_1"));
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(title);
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 6000);
+		sheet.setColumnWidth(1, 6000);
+		sheet.setColumnWidth(2, 6000);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 2));
+		
+		//冻结行
+		sheet.createFreezePane(0, 4, 0, 4);
+		
+		//报表头
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		
+		cell = row.createCell(0);
+		cell.setCellValue(title);
+		cell.setCellStyle(titleStyle);
+		
+		//摘要
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("部门: " + deptName
+				);
+
+		cell.setCellStyle(headerDetailStyle);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 2));
+		
+		//空白
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 2));
+		
+		//列头
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("货品名称");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("盘点数");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("账面数");
+		cell.setCellStyle(headerStyle);
+		
+		for (StockTakeDetail stockTakeDetail : root) {
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			
+			cell = row.createCell(0);
+			cell.setCellValue(stockTakeDetail.getMaterial().getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue("");
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(stockTakeDetail.getExpectAmount());
+			cell.setCellStyle(numStyle);			
+		}
+		
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
+		
+		return null;
+		
+	}	
+	
 	/**
 	 * 充值明细
 	 * @param mapping
