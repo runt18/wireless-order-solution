@@ -596,6 +596,38 @@ function insertStockActionHandler(){
 		}
 	});
 }
+
+/**
+ * 检查是否可以反审核
+ */
+function isableToReAudit(){
+	var data = Ext.ux.getSelData(stockBasicGrid);
+	Ext.Ajax.request({
+		url : '../../OperateStockAction.do',
+		params : {
+			'dataSource' : 'checkReAudit',
+			
+			stockActionId : data['id']
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				updateStockActionHandler({reAudit:true});
+			}else{
+				Ext.ux.showMsg({
+					code : 9999,
+					title : '提示',
+					msg : '库单审核时间小于最后盘点时间, 不能反审核'
+				});
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
+}
+
+
 /**
  * 修改出入库单信息
  */
@@ -862,7 +894,7 @@ function stockOperateRenderer(v, m, r, ri, ci, s){
 		}
 	}else{
 		return ''
-			+ '<a href="javascript:updateStockActionHandler({reAudit:true});">反审核</a>'
+			+ '<a href="javascript:isableToReAudit();">反审核</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:exportExcel();">导出</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'

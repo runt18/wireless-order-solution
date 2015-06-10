@@ -141,6 +141,7 @@ function insertStockTakeHandler(){
 				
 				Ext.getCmp('btnAuditStockTake').hide();
 				Ext.getCmp('btnSaveStockTake').show();
+				Ext.getCmp('btnExportStockTake').show();
 			}else{
 				jr['icon'] = Ext.Msg.WARNING; 
 				Ext.ux.showMsg(jr);
@@ -169,6 +170,7 @@ function updateStockTakeHandler(){
 	dept.setDisabled(true);
 	cate.setDisabled(true);
 	cateId.setDisabled(true);
+	Ext.getCmp('btnExportStockTake').show();
 	if(data['statusValue'] == 1){
 		stockTakeWin.otype = Ext.ux.otype['update'];
 		stockTakeWin.show();
@@ -184,15 +186,16 @@ function updateStockTakeHandler(){
 		stockTakeWin.center();
 		Ext.getCmp('btnAuditStockTake').hide();
 		Ext.getCmp('btnSaveStockTake').hide();
-		//Ext.getCmp('stockTakeWinWest').setDisabled(true);
+		Ext.getCmp('btnExportStockTake').hide();
 	}else{
 		data['statusValue'] = 1;
 		stockTakeWin.otype = Ext.ux.otype['select'];
 		stockTakeWin.show();
 		stockTakeWin.setTitle('查看盘点任务');
 		stockTakeWin.center();
-		Ext.getCmp('btnSaveStockTake').hide();
 		Ext.getCmp('btnAuditStockTake').show();
+		Ext.getCmp('btnSaveStockTake').hide();
+		Ext.getCmp('btnExportStockTake').hide();
 	}
 	operateStockTakeDate({
 		otype : Ext.ux.otype['set'],
