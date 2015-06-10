@@ -828,7 +828,32 @@ function initWin(){
 			closable : false,
 			layout : 'border',
 			items : [stockTakeWinNorth, stockTakeWinCenter],
-			bbar : ['->', {
+			bbar : ['->',{
+				text : '导出盘点',
+				id : 'btnExportStockTake',
+				iconCls : 'icon_tb_exoprt_excel',
+				handler : function(){
+					var dept = Ext.getCmp('comboStockTakeDept');
+					var cate = Ext.getCmp('comboMaterialCate');
+					var cateId = Ext.getCmp('comboMaterialCateId');
+					
+					if(!dept.isValid()){
+							return;
+					}
+					
+					var url = '../../{0}?dataSource={1}&cateId={2}&deptId={3}&cateType={4}';
+					url = String.format(
+							url, 
+							'ExportHistoryStatisticsToExecl.do', 
+							'stockTakeDetail',
+							cateId.getValue() > 0 && cateId.getRawValue() ? cateId.getValue() : '-1',
+							dept.getValue(),
+							cate.getValue()
+					);
+					window.location = url;
+					
+				}
+			}, {
 				text : '保存',
 				id : 'btnSaveStockTake',
 				iconCls : 'btn_save',

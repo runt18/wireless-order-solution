@@ -30,7 +30,7 @@ function stockTaskNavHandler(e){
 		var index = e.change + act.index;
 		
 		/***** 第一步, 选择入库单类型, 预处理 *****/
-		if(act.index == 0){
+		if(act.index == 0 || index == 0){
 			var select = null;
 			var type = Ext.query('input[name=\"radioStockOrderType\"]');
 			for(var i = 0; i < type.length; i++){
@@ -39,6 +39,9 @@ function stockTaskNavHandler(e){
 					break;
 				}
 			}
+			// 切换步骤
+			stockTaskNavWin.getLayout().setActiveItem(index);
+			
 			if(stockTaskNavWin.stockType == null || typeof stockTaskNavWin.stockType == 'undefined'){
 				if(select){
 					stockTaskNavWin.stockType = select;
@@ -47,27 +50,39 @@ function stockTaskNavHandler(e){
 					return;
 				}
 			}else{
+				
 				if(select){
 					var ss = select.split(',');
 					var ws = stockTaskNavWin.stockType.split(',');
 	
 					for(var i = 0; i < ss.length; i++){
 						if(ss[i] != ws[i]){
-								if(confirm('入库单类型已更改, 确定继续将清空原操作信息.')){
-									// 更换类型后重置相关信息
-									operateStockActionBasic({
-										otype : Ext.ux.otype['set']
-									});
-									stockTaskNavWin.stockType = select;
-									break;
-								}else{
-									for(var i = 0; i < type.length; i++){
-										var temp = type[i].value.split(',');
-										if(eval(temp[0] == ws[0]) && eval(temp[1] == ws[1]) && eval(temp[2] == ws[2])){
-											type[i].checked = true;
-										}
+							//FIXME 暂不用确定是否改变
+							operateStockActionBasic({
+								otype : Ext.ux.otype['set']
+							});
+							stockTaskNavWin.stockType = select;
+/*							Ext.Msg.confirm(
+								'提示',
+								'入库单类型已更改, 确定继续将清空原操作信息.',
+								function(e){
+									if(e == 'yes'){
+										// 更换类型后重置相关信息
+										operateStockActionBasic({
+											otype : Ext.ux.otype['set']
+										});
+										stockTaskNavWin.stockType = select;
+									}else{
+										for(var i = 0; i < type.length; i++){
+											var temp = type[i].value.split(',');
+											if(eval(temp[0] == ws[0]) && eval(temp[1] == ws[1]) && eval(temp[2] == ws[2])){
+												type[i].checked = true;
+											}
+										}											
 									}
-								}
+								},
+								this
+							);*/
 						}
 					}
 				}
@@ -1357,9 +1372,11 @@ function initControl(){
 		        	height : Ext.isIE ? 100 : 115,
 		        	bodyStyle : 'padding:3px 0px 0px 10px; ',
 		        	items : [{
+		        		id : 'radioStockOrderTypeGoodIn',
 		        		xtype : 'radio',
 		        		inputValue : [1,1,1],
 		        		name : 'radioStockOrderType',
+		        		checked : true,
 		        		hideLabel : true,
 		        		boxLabel : '商品采购'
 		        	}, {
@@ -2098,6 +2115,7 @@ function initControl(){
 		    		for(var i = 0; i < sot.length; i++){
 		    			sot[i].checked = false;
 		    		}
+		    		Ext.getCmp('radioStockOrderTypeGoodIn').setValue(true);
 		    		// 清空单据基础信息
 		    		operateStockActionBasic({
 		    			otype : Ext.ux.otype['set']
