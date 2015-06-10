@@ -1,5 +1,6 @@
 package com.wireless.Actions.inventoryMgr.stockAction;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.DBCon;
+import com.wireless.db.Params;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
@@ -18,6 +21,7 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
@@ -482,6 +486,68 @@ public class OperateStockActionAction extends DispatchAction{
 			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 检查是否可以反审核
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward checkReAudit(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		
+		JObject jobject = new JObject();
+		DBCon dbCon = new DBCon();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			String restaurantID = (String)request.getAttribute("restaurantID");
+			String stockActionId = request.getParameter("stockActionId");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			StockAction sa = StockActionDao.getStockAndDetailById(staff, Integer.parseInt(stockActionId));
+			
+			
+			dbCon.connect();
+			String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + restaurantID + 
+					" UNION ALL " +
+					" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + restaurantID + " AND (status = " + StockTake.Status.AUDIT.getVal() + " OR status = " + StockTake.Status.CHECKING.getVal() + ")) M";
+			dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
+			final Timestamp minDay;
+			if(dbCon.rs.next()){
+				if(dbCon.rs.getTimestamp("date") != null){
+					minDay = dbCon.rs.getTimestamp("date");
+				}else{
+					minDay = null;
+				}
+			}else{
+				minDay = null;
+			}
+			if(minDay != null){
+				if(minDay.getTime() < sa.getApproverDate()){
+					jobject.initTip(true, "");
+				}else{
+					jobject.initTip(false, "");
+				}
+			}else{
+				jobject.initTip(true, "");
+			}
+		}catch(BusinessException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}catch(Exception e){
+			jobject.initTip4Exception(e);
+			e.printStackTrace();
+		}finally{
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		return null;

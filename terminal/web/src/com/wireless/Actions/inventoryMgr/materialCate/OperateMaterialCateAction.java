@@ -106,9 +106,10 @@ public class OperateMaterialCateAction extends DispatchAction {
 		
 		
 		JObject jobject = new JObject();
+		String pin = (String)request.getAttribute("pin");
 		try{
 			String cateId = request.getParameter("cateId");
-			MaterialCateDao.delete(Integer.valueOf(cateId));
+			MaterialCateDao.delete(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(cateId));
 			jobject.initTip(true, "操作成功, 已删除原料类别信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();
