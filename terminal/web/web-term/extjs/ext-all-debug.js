@@ -14771,6 +14771,11 @@ Ext.extend(Ext.Editor, Ext.Component, {
     
     cancelOnEsc : true,
     
+    //用作处理方向键
+    OnUp : false,
+    OnDown : false,
+    OnKey : false,
+    
     updateEl : false,
 
     initComponent : function(){
@@ -14810,10 +14815,10 @@ Ext.extend(Ext.Editor, Ext.Component, {
             this.field.msgTarget = 'qtip';
         }
         this.field.inEditor = true;
-        //FIXME  
+        
         this.mon(this.field, {
             scope: this,
-            //blur: this.onBlur,
+            blur: this.onBlur,
             specialkey: this.onSpecialKey
         });
         if(this.field.grow){
@@ -14831,6 +14836,7 @@ Ext.extend(Ext.Editor, Ext.Component, {
 
     
     onSpecialKey : function(field, e){
+    	console.log("key")
         var key = e.getKey(),
             complete = this.completeOnEnter && key == e.ENTER,
             cancel = this.cancelOnEsc && key == e.ESC;
@@ -14845,6 +14851,18 @@ Ext.extend(Ext.Editor, Ext.Component, {
                 field.triggerBlur(); 
             }
         }
+        //FIXME  库存功能方向键
+        //按上下键的情况
+        this.OnKey = true;
+        if(key == e.UP){
+        	this.OnUp = true;
+        }else if(key == e.DOWN){
+        	this.OnDown = true;
+        }else{
+        	this.OnUp = false;
+        	this.OnDown = false;
+        }
+        //if(b==d.UP){this.OnUp=true;}else if(b==d.DOWN){this.OnDown=true;}else{this.OnUp=false;this.OnDown=false;}
         this.fireEvent('specialkey', field, e);
     },
 
@@ -14966,10 +14984,13 @@ Ext.extend(Ext.Editor, Ext.Component, {
     },
 
     
-    onBlur : function(){
-        if(this.allowBlur !== true && this.editing){
+    onBlur : function(e){
+    	//FIXME  库存功能方向键
+    	//当按上下键的时候不完成操作, 而是去上下的编辑单元格, 或者是鼠标点击失去焦点也完成
+        if(this.allowBlur !== true && this.editing && !this.OnUp && !this.OnDown || !this.OnKey){
             this.completeEdit();
         }
+        this.OnKey = false;
     },
 
     
@@ -39553,6 +39574,8 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
         var adjust = btn.getItemId() == 'increasefontsize' ? 1 : -1,
             doc = this.getDoc(),
             v = parseInt(doc.queryCommandValue('FontSize') || 2, 10);
+        //FIXME 在火狐或者谷歌中不能伸缩字体
+        //if((Ext.isSafari && !Ext.isSafari2) || Ext.isChrome || Ext.isAir){
         if((Ext.isSafari && !Ext.isSafari2) || Ext.isAir){
             
             
@@ -44132,7 +44155,6 @@ Ext.grid.EditorGridPanel = Ext.extend(Ext.grid.GridPanel, {
             }
         }
         this.view.focusCell(ed.row, ed.col);
-        //alert('sfj');
     },
 
     
@@ -44170,7 +44192,6 @@ Ext.grid.EditorGridPanel = Ext.extend(Ext.grid.GridPanel, {
                         },
                         specialkey: function(field, e){
                         	this.getSelectionModel().onEditorKey(field, e);
-                            //this.getSelectionModel().onEditorKey(field, e);
                         },
                         complete: this.onEditComplete,
                         canceledit: this.stopEditing.createDelegate(this, [true])
