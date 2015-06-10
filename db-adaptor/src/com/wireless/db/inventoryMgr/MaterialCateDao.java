@@ -10,6 +10,7 @@ import com.wireless.db.DBCon;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.SQLUtil;
 
 public class MaterialCateDao {
@@ -176,7 +177,7 @@ public class MaterialCateDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int delete(DBCon dbCon, int id) throws BusinessException, SQLException {
+	public static int delete(DBCon dbCon, Staff staff, int id) throws BusinessException, SQLException {
 		int count = 0;
 		String querySQL = "SELECT COUNT(*) FROM material WHERE cate_id = " + id;
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
@@ -184,7 +185,7 @@ public class MaterialCateDao {
 
 			
 			String selectFoodMaterial = "DELETE FM FROM food_material FM JOIN material M ON M.material_id = FM.material_id JOIN material_cate MC ON MC.cate_id = M.cate_id "+
-										" WHERE FM.restaurant_id = 40 AND MC.cate_id = " + id;
+										" WHERE FM.restaurant_id = " + staff.getRestaurantId() +" AND MC.cate_id = " + id;
 			
 			dbCon.stmt.executeUpdate(selectFoodMaterial);
 			
@@ -205,11 +206,11 @@ public class MaterialCateDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static void delete(int id) throws BusinessException, SQLException{
+	public static void delete(Staff staff, int id) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			int count = MaterialCateDao.delete(dbCon, id);
+			int count = MaterialCateDao.delete(dbCon, staff, id);
 			if(count == 0){
 				throw new BusinessException(MaterialError.CATE_DELETE_FAIL);
 			}
