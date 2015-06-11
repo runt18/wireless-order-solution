@@ -181,7 +181,7 @@ function stockTaskNavHandler(e){
 							supplier : supplier.getValue(),
 							deptOut : deptOut.getValue(),
 							oriStockId : oriStockId.getValue(),
-							oriStockDate : oriStockDate.getValue().getTime(),
+							oriStockDate : oriStockDate.getValue().getTime() + 86000000,
 							comment : comment.getValue(),
 							type : stockType,
 							cate : stockCate,
@@ -892,13 +892,18 @@ function stockOperateRenderer(v, m, r, ri, ci, s){
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:deleteStockActionHandler();">删除</a>';
 		}
-	}else{
+	}else if(r.get('statusValue') == 4){
 		return ''
-			+ '<a href="javascript:isableToReAudit();">反审核</a>'
-			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:exportExcel();">导出</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:updateStockActionHandler();">查看</a>';
+	}else{
+		return ''
+		+ '<a href="javascript:isableToReAudit();">反审核</a>'
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ '<a href="javascript:exportExcel();">导出</a>'
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ '<a href="javascript:updateStockActionHandler();">查看</a>';		
 	}
 }
 
@@ -1277,9 +1282,9 @@ function initControl(){
 			['数量', 'amount',60,'right','Ext.ux.txtFormat.gridDou'],
 			['应收金额', 'price',80,'right', displayPrice],
 			['实际金额', 'actualPrice', 80, 'right', displayPrice],
+			['制单人', 'operatorName', 60],
 			['审核人', 'approverName', 60],
 			['审核状态', 'statusText', 60, 'center'],
-			['制单人', 'operatorName', 60],
 			['操作', 'center', 150, 'center', 'stockOperateRenderer']
 		],
 		StockRecord.getKeys(),

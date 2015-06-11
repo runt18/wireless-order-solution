@@ -115,12 +115,12 @@ function stockDetailHandler(orderID) {
 	billDetailWin.center();
 };
 
-var materialTypeDate = [[1,'商品'],[2,'原料']];
+var materialTypeDate = [[-1,'全部'],[1,'商品'],[2,'原料']];
 var materialTypeComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 90,
 	id : 'materialType',
-	value : 1,
+	value : -1,
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
 		data : materialTypeDate
@@ -149,6 +149,8 @@ var materialTypeComb = new Ext.form.ComboBox({
         			dataSource : 'normal'
         		}
         	});
+        	
+        	Ext.getCmp('stockDetail_btnSearch').handler();		
 		}  
 	}
 	
@@ -191,6 +193,8 @@ var materialCateComb = new Ext.form.ComboBox({
 	            	dataSource : 'normal'
 	            }  
             });     
+        	
+        	Ext.getCmp('stockDetail_btnSearch').handler();		
 		}
 
 	}
@@ -269,17 +273,20 @@ Ext.onReady(function(){
 	//定义列模型
 	var cm = new Ext.grid.ColumnModel([
 	         new Ext.grid.RowNumberer(),
-	         {header:'id', dataIndex:'id', hidden: true },
+//	         {header:'id', dataIndex:'id', hidden: true },
 	         {header:'日期', dataIndex:'date'},
 	         {header:'单号', dataIndex:'oriStockId'},
 	         {header:'部门', dataIndex:'dept', width:160},
+	         {header:'货品名称', dataIndex:'materialName'},
 	         {header:'入库类型', dataIndex:'stockInSubType', width:100},
 	         {header:'入库数量', dataIndex:'stockInAmount', align : 'right', renderer : renderFormat},
 	         {header:'入库金额', dataIndex:'stockInMoney', align : 'right', renderer : renderFormat},
 	         {header:'出库类型', dataIndex:'stockOutSubType', width:100},
 	         {header:'出库数量', dataIndex:'stockOutAmount', align : 'right', renderer : renderFormat},
 	         {header:'出库金额', dataIndex:'stockOutMoney', align : 'right', renderer : renderFormat},
-	         {header:'结存数量', dataIndex:'remaining', align : 'right', renderer : renderFormat}]);
+	         {header:'结存数量', dataIndex:'remaining', align : 'right', renderer : renderFormat},
+	         {header:'操作人', dataIndex:'operater'}
+	]);
 	
 	cm.defaultSortable = true;
 	//var data = {root: [{"id":426,"stockInSubType":"","remaining":3,"stockOutAmount":10,"stockInMoney":"1231231","oriStockId":"","stockOutMoney":15,"stockOutSubType":"盘亏","dept":"甜甜蜜蜜","date":"2013-07-02 12:03:45","stockInAmount":""}]};
@@ -291,6 +298,7 @@ Ext.onReady(function(){
 	         {name : 'id'},                                                                         
 	         {name : 'date'},
 	         {name : 'oriStockId'},
+	         {name : 'materialName'},
 	         {name : 'dept'},
 	         {name : 'stockInSubType'},
 	         {name : 'stockInAmount'},
@@ -298,7 +306,8 @@ Ext.onReady(function(){
 	         {name : 'stockOutSubType'},
 	         {name : 'stockOutAmount'},
 	         {name : 'stockOutMoney'},
-	         {name : 'remaining'}
+	         {name : 'remaining'},
+	         {name : 'operater'}
 		])
 	});
 	var date = new Date();
@@ -404,10 +413,10 @@ Ext.onReady(function(){
 			id : 'stockDetail_btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
-				materialComb.allowBlank = false;
-				if(!Ext.getCmp('materialId').isValid()){
-					return;
-				}
+//				materialComb.allowBlank = false;
+//				if(!Ext.getCmp('materialId').isValid()){
+//					return;
+//				}
 				var deptID = '-1';
 				var sn = stockDetailReportTree.getSelectionModel().getSelectedNode();
 				//Ext.MessageBox.alert(sn.attributes.deptID);
@@ -416,6 +425,8 @@ Ext.onReady(function(){
 				sgs.baseParams['endDate'] = Ext.getCmp('sdr_endDate').getValue().format('Y-m-d');
 				sgs.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
 				sgs.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
+				sgs.baseParams['materialCateId'] = Ext.getCmp('materialCate').getValue();
+				sgs.baseParams['cateType'] = Ext.getCmp('materialType').getValue();
 				sgs.baseParams['stockType'] = Ext.getCmp('sdr_comboSearchForStockType').getValue();
 				sgs.baseParams['subType'] = Ext.getCmp('sdr_comboSearchForSubType').getValue();
 				//load两种加载方式,远程和本地
@@ -505,7 +516,7 @@ Ext.onReady(function(){
 						stockDetailReportTree.getRootNode().reload();
 					}
 			}
-		      	 ]
+		]
 			
 
 	});
@@ -545,7 +556,6 @@ Ext.onReady(function(){
 		}
 
 	});
-	//ds.load({params:{start:0, limit:limitCount}});
    new Ext.Panel({
 		renderTo : 'divStockDetail',
 		width : parseInt(Ext.getDom('divStockDetail').parentElement.style.width.replace(/px/g,'')),
@@ -560,6 +570,12 @@ Ext.onReady(function(){
 			fn : function(){
 				Ext.getCmp('stockDetail_btnSearch').handler();
 			}
-		}]
+		}],
+		listeners : {
+			render : function(){
+				Ext.getCmp('stockDetail_btnSearch').handler();
+			}
+		}
 	});
+   
 });
