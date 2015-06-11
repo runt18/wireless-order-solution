@@ -36,7 +36,7 @@ public class CostAnalyzeReportDao {
 		List<MaterialDept> materialDepts;
 		List<Department> departments = DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL);
 		String extra;
-		String extraCond = " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "'";
+		String extraCond = " AND S.ori_stock_date BETWEEN '" + begin + "' AND '" + end + "'";
 		
 		for (Department dept : departments) {
 			CostAnalyze costAnalyze = new CostAnalyze();
@@ -162,13 +162,21 @@ public class CostAnalyzeReportDao {
 	 * @throws SQLException
 	 */
 	public static float getMoney(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
-		String sql = "SELECT SUM(D.price * D.amount) as money " + 
+/*		String sql = "SELECT SUM(D.price * D.amount) as money " + 
 				" FROM " + Params.dbName + ".stock_action as S  INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +  
 				" WHERE S.restaurant_id = " + term.getRestaurantId() +
 				" AND S.status = " + StockAction.Status.AUDIT.getVal() +
 				(extraCond == null ? "" : extraCond) +
 				" GROUP BY S.id " +
-				(orderClause == null ? "" : orderClause);
+				(orderClause == null ? "" : orderClause);*/
+		
+		String sql = "SELECT SUM(D.price * D.amount) AS money FROM " + Params.dbName + ".stock_action_detail as D " +
+		" JOIN " + Params.dbName + ".stock_action as S ON S.id = D.stock_action_id "+
+		" WHERE S.restaurant_id = " + term.getRestaurantId() +
+		" AND S.status IN ("+ StockAction.Status.AUDIT.getVal() +", "+ StockAction.Status.DELETE.getVal() +") " +
+		(extraCond == null ? "" : extraCond) +
+		(orderClause == null ? "" : orderClause);
+		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		float money = 0;
 		while(dbCon.rs.next()){

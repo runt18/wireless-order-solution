@@ -18,9 +18,13 @@ public class StockDetailReportDao {
 
 	public static int getStockDetailReportCount(DBCon dbCon, Staff term, int materialId, String extraCond, String orderClause) throws SQLException{
 		String sql = "SELECT count(*)" + 
-						" FROM " + Params.dbName + ".stock_action as S  INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +  
+						" FROM " + Params.dbName + ".stock_action as S  " +
+						"INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +
+						"INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id " +
+						"INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +  
 						" WHERE S.restaurant_id = " + term.getRestaurantId() +
-						" AND D.material_id = " + materialId + " AND S.status = " + StockAction.Status.AUDIT.getVal() +
+						(materialId != -1 ? " AND D.material_id = " + materialId : "")+ 
+						" AND S.status = " + StockAction.Status.AUDIT.getVal() +
 						(extraCond == null ? "" : extraCond) +
 						(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -34,10 +38,14 @@ public class StockDetailReportDao {
 		
 	}
 	public static List<StockDetailReport> getStockDetailReport(DBCon dbCon, Staff term, int materialId, String extraCond, String orderClause) throws SQLException{
-		String sql = "SELECT S.id, S.ori_stock_date, S.ori_stock_id, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.sub_type, D.amount, D.price, D.remaining" + 
-						" FROM " + Params.dbName + ".stock_action as S  INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +  
+		String sql = "SELECT S.id, S.ori_stock_date, S.ori_stock_id, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.sub_type, S.approver, D.name, D.amount, D.price, D.remaining" + 
+						" FROM " + Params.dbName + ".stock_action as S  " +
+						"INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +  
+						"INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id " +
+						"INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +  
 						" WHERE S.restaurant_id = " + term.getRestaurantId() +
-						" AND D.material_id = " + materialId + " AND S.status = " + StockAction.Status.AUDIT.getVal() +
+						(materialId != -1 ? " AND D.material_id = " + materialId : "")+  
+						" AND S.status = " + StockAction.Status.AUDIT.getVal() +
 						(extraCond == null ? "" : extraCond) +
 						(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -48,12 +56,14 @@ public class StockDetailReportDao {
 			stockDetailReport.setId(dbCon.rs.getInt("id"));
 			stockDetailReport.setDate(dbCon.rs.getTimestamp("ori_stock_date").getTime());
 			stockDetailReport.setOriStockId(dbCon.rs.getString("ori_stock_id"));
+			stockDetailReport.setMaterialName(dbCon.rs.getString("name"));
 			stockDetailReport.setDeptIn(dbCon.rs.getString("dept_in_name"));
 			stockDetailReport.setDeptOut(dbCon.rs.getString("dept_out_name"));
 			stockDetailReport.setStockActionAmount(dbCon.rs.getFloat("amount"));
 			stockDetailReport.setStockDetailPrice(dbCon.rs.getFloat("price"));
 			stockDetailReport.setRemaining(dbCon.rs.getFloat("remaining"));
 			stockDetailReport.setStockActionSubType(dbCon.rs.getInt("sub_type"));
+			stockDetailReport.setOperater(dbCon.rs.getString("approver"));
 			
 			stockDetailReports.add(stockDetailReport);
 		}
@@ -63,10 +73,14 @@ public class StockDetailReportDao {
 	}
 	
 	public static List<StockDetailReport> getStockDetailReportByDept(DBCon dbCon, Staff term, int materialId, String extraCond, String orderClause, int deptId) throws SQLException{
-		String sql = "SELECT S.id, S.ori_stock_date, S.ori_stock_id, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.sub_type, D.amount, D.price, D.remaining, D.dept_in_remaining, D.dept_out_remaining" + 
-						" FROM " + Params.dbName + ".stock_action as S  INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +  
+		String sql = "SELECT S.id, S.ori_stock_date, S.ori_stock_id, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.sub_type, S.approver, D.name, D.amount, D.price, D.remaining, D.dept_in_remaining, D.dept_out_remaining" + 
+						" FROM " + Params.dbName + ".stock_action as S  " +
+						"INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +
+						"INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id " +
+						"INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +  
 						" WHERE S.restaurant_id = " + term.getRestaurantId() +
-						" AND D.material_id = " + materialId + " AND S.status = " + StockAction.Status.AUDIT.getVal() +
+						(materialId != -1 ? " AND D.material_id = " + materialId : "")+  
+						" AND S.status = " + StockAction.Status.AUDIT.getVal() +
 						(extraCond == null ? "" : extraCond) +
 						(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -77,10 +91,12 @@ public class StockDetailReportDao {
 			stockDetailReport.setId(dbCon.rs.getInt("id"));
 			stockDetailReport.setDate(dbCon.rs.getTimestamp("ori_stock_date").getTime());
 			stockDetailReport.setOriStockId(dbCon.rs.getString("ori_stock_id"));
+			stockDetailReport.setMaterialName(dbCon.rs.getString("name"));
 			stockDetailReport.setDeptIn(dbCon.rs.getString("dept_in_name"));
 			stockDetailReport.setDeptOut(dbCon.rs.getString("dept_out_name"));
 			stockDetailReport.setStockActionAmount(dbCon.rs.getFloat("amount"));
 			stockDetailReport.setStockDetailPrice(dbCon.rs.getFloat("price"));
+			stockDetailReport.setOperater(dbCon.rs.getString("approver"));
 			//stockDetailReport.setRemaining(dbCon.rs.getFloat("remaining"));
 			
 			if(dbCon.rs.getInt("dept_in") == deptId){

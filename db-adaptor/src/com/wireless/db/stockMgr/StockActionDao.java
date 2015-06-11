@@ -1294,4 +1294,44 @@ public class StockActionDao {
 	}
 	
 	
+	/**
+	 * 获取最近一次盘点审核时间或月结时间
+	 * @return
+	 * @throws SQLException 
+	 */
+	public static long getStockActionInsertTime(Staff staff) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getStockActionInsertTime(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 获取最近一次盘点审核时间或月结时间
+	 * @param dbCon
+	 * @param staff
+	 * @return
+	 * @throws SQLException
+	 */
+	public static long getStockActionInsertTime(DBCon dbCon, Staff staff) throws SQLException{
+		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + staff.getRestaurantId() + 
+				" UNION ALL " +
+				" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + staff.getRestaurantId() + " AND (status = " + StockTake.Status.AUDIT.getVal() + " OR status = " + StockTake.Status.CHECKING.getVal() + ")) M";
+		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
+		final long minDay;
+		if(dbCon.rs.next()){
+			if(dbCon.rs.getTimestamp("date") != null){
+				minDay = dbCon.rs.getTimestamp("date").getTime();
+			}else{
+				minDay = 0;
+			}
+		}else{
+			minDay = 0;
+		}
+		return minDay;		
+		
+	}
 }
