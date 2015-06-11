@@ -10,12 +10,14 @@ public class StockDetailReport implements Jsonable {
 	private int id;
 	private long date;
 	private String oriStockId;
+	private String materialName; 
 	private String deptIn;
 	private String deptOut;
 	private SubType stockActionSubType; 
 	private float stockActionAmount;
 	private float stockDetailPrice;
 	private float remaining;
+	private String operater;
 	
 	
 	public int getId() {
@@ -84,13 +86,25 @@ public class StockDetailReport implements Jsonable {
 	public float totalMoney(){
 		return this.stockActionAmount * this.stockDetailPrice;
 	}
-	
+	public String getMaterialName() {
+		return materialName;
+	}
+	public void setMaterialName(String materialName) {
+		this.materialName = materialName;
+	}
+	public String getOperater() {
+		return operater;
+	}
+	public void setOperater(String operater) {
+		this.operater = operater;
+	}
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
-		jm.putInt("id", this.getId());
+//		jm.putInt("id", this.getId());
 		jm.putString("date", DateUtil.formatToDate(this.getDate()));
 		jm.putString("oriStockId", this.getOriStockId());
+		jm.putString("materialName", this.getMaterialName());
 		if(this.getStockActionSubType() == SubType.STOCK_IN || this.getStockActionSubType() == SubType.MORE || this.getStockActionSubType() == SubType.SPILL){
 			jm.putString("dept", this.getDeptIn());
 			jm.putString("stockInSubType", this.getStockActionSubType().getText());
@@ -128,6 +142,7 @@ public class StockDetailReport implements Jsonable {
 		}
 
 		jm.putFloat("remaining", this.getRemaining());
+		jm.putString("operater", this.getOperater());
 		
 		return jm;
 	}
