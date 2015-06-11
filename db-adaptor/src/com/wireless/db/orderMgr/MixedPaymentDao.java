@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Map.Entry;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.pojo.dishesOrder.MixedPayment;
 import com.wireless.pojo.dishesOrder.Order;
@@ -14,7 +15,6 @@ import com.wireless.pojo.util.DateType;
 public class MixedPaymentDao {
 
 	public static class ExtraCond{
-		private final DateType dateType;
 		private final String mixedPaymentTbl;
 		private final int orderId;
 		
@@ -23,12 +23,8 @@ public class MixedPaymentDao {
 		}
 		
 		public ExtraCond(DateType dateType, int orderId){
-			this.dateType = dateType;
-			if(this.dateType.isToday()){
-				mixedPaymentTbl = "mixed_payment";
-			}else{
-				mixedPaymentTbl = "mixed_payment_history";
-			}
+			DBTbl dbTbl = new DBTbl(dateType);
+			this.mixedPaymentTbl = dbTbl.mixedTbl;
 			this.orderId = orderId;
 		}
 		
@@ -120,8 +116,12 @@ public class MixedPaymentDao {
 	}
 
 	public static class ArchiveResult{
-		private final int amount;
-		public ArchiveResult(int amount) {
+		private final DBTbl fromTbl;
+		private final DBTbl toTbl;
+		public final int amount;
+		public ArchiveResult(DateType archiveFrom, DateType archiveTo, int amount) {
+			this.fromTbl = new DBTbl(archiveFrom);
+			this.toTbl = new DBTbl(archiveTo);
 			this.amount = amount;
 		}
 		public int getAmount(){
@@ -129,7 +129,7 @@ public class MixedPaymentDao {
 		}
 		@Override
 		public String toString(){
-			return amount + " mixed payment record(s) are moved to history";
+			return amount + " mixed payment record(s) are moved from '" + fromTbl.mixedTbl + "' to '" + toTbl.mixedTbl + "'";
 		}
 	}
 
@@ -155,7 +155,7 @@ public class MixedPaymentDao {
 		sql = " INSERT INTO " + Params.dbName + "." + new ExtraCond(archiveTo, order).mixedPaymentTbl +
 			  " ( " + item + " ) " +
 			  " SELECT order_id, pay_type_id, price FROM " + Params.dbName + "." + new ExtraCond(archiveFrom, order).mixedPaymentTbl + " WHERE order_id = " + order.getId();
-		return new ArchiveResult(dbCon.stmt.executeUpdate(sql));
+		return new ArchiveResult(archiveFrom, archiveTo, dbCon.stmt.executeUpdate(sql));
 	}
 	
 }

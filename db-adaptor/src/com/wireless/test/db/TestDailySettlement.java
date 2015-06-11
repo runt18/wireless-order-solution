@@ -17,8 +17,12 @@ public class TestDailySettlement {
 	}
 	
 	@Test
-	public void testDailySettlement() throws SQLException, BusinessException{
+	public void testManualDailySettlement() throws SQLException, BusinessException{
 		System.out.println(DailySettleDao.manual(StaffDao.getAdminByRestaurant(40)));
+	}
+	
+	@Test
+	public void testAutoDailySettlement() throws SQLException, BusinessException{
 		System.out.println(DailySettleDao.auto());
 	}
 }

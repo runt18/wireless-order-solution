@@ -755,16 +755,16 @@ public class OrderFoodDao {
 	}
 	
 	public static class ArchiveResult{
-		private final int maxOrderFoodId;
-		private final int ofAmount;
+		public final int ofAmount;
+		public final int tgAmount;
+		private final DBTbl fromTbl;
+		private final DBTbl toTbl;
 		
-		public ArchiveResult(int maxOrderFoodId, int orderFoodAmount){
-			this.maxOrderFoodId = maxOrderFoodId;
-			this.ofAmount = orderFoodAmount;
-		}
-		
-		public int getMaxId(){
-			return this.maxOrderFoodId;
+		public ArchiveResult(DateType archiveFrom, DateType archiveTo, int ofAmount, int tgAmount){
+			this.fromTbl = new DBTbl(archiveFrom);
+			this.toTbl = new DBTbl(archiveTo);
+			this.ofAmount = ofAmount;
+			this.tgAmount = tgAmount;
 		}
 		
 		public int getAmount(){
@@ -773,25 +773,31 @@ public class OrderFoodDao {
 		
 		@Override
 		public String toString(){
-			return ofAmount + " order food record(s) are moved to history, maxium id : " + maxOrderFoodId;
+			final String sep = System.getProperty("line.separator");
+			return ofAmount + " record(s) are moved from '" + fromTbl.orderFoodTbl + "' to '" + toTbl.orderFoodTbl + "'" + sep +
+				   tgAmount + " record(s) are moved from '" + fromTbl.tgTbl + "' to '" + toTbl.tgTbl + "'";
 		}
 	}
 	
 	static ArchiveResult archive(DBCon dbCon, Staff staff, Order order, DateType archiveFrom, DateType archiveTo) throws SQLException{
-		int amount = 0;
-		ExtraCond extraCond = new ExtraCond(archiveTo);
+		int ofAmount = 0, tgAmount = 0;
+		DBTbl toTbl = new DBTbl(archiveTo);
 		Map<Integer, Integer> tgMap = new HashMap<>();
 		for(OrderFood of : getSingleDetail(dbCon, staff, new ExtraCond(archiveFrom).setOrder(order), null)){
+			//Archive the taste group.
 			int tgId = TasteGroup.EMPTY_TASTE_GROUP_ID;
 			if(of.hasTasteGroup()){
 				if(!tgMap.containsKey(of.getTasteGroup().getGroupId())){
 					int tgId4Archive = TasteGroupDao.archive(dbCon, staff, of.getTasteGroup().getGroupId(), archiveFrom, archiveTo);
 					tgMap.put(of.getTasteGroup().getGroupId(), tgId4Archive);
+					tgAmount++;
 				}
 				tgId = tgMap.get(of.getTasteGroup().getGroupId()).intValue();
 			}
+			
 			String sql;
-			sql = " INSERT INTO " + Params.dbName + "." + extraCond.orderFoodTbl +
+			//Archive the order food records.
+			sql = " INSERT INTO " + Params.dbName + "." + toTbl.orderFoodTbl +
 				  " ( " + 
 				  " `restaurant_id`, `order_id`, `operation`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 				  " `food_unit_id`, `food_unit`, `food_unit_price`, " +
@@ -828,11 +834,11 @@ public class OrderFoodDao {
 				  (of.hasCancelReason() ? "'" + of.getCancelReason().getReason() + "'" : "NULL") +
 				  " ) ";
 			if(dbCon.stmt.executeUpdate(sql) != 0){
-				amount++;
+				ofAmount++;
 			}	
 		}
 		
-		return new ArchiveResult(0, amount);
+		return new ArchiveResult(archiveFrom, archiveTo, ofAmount, tgAmount);
 	}
 	
 //	static ArchiveResult archive(DBCon dbCon, Staff staff, String paidOrder) throws SQLException{

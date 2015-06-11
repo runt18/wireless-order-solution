@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
@@ -1210,39 +1211,44 @@ public class OrderDao {
 	}
 
 	public static class ArchiveResult{
-		private final int maxId;
-		private final int orderAmount;
-		public ArchiveResult(int maxId, int orderAmount){
-			this.maxId = maxId;
+		private final DBTbl fromTbl;
+		private final DBTbl toTbl;
+		public final int orderAmount;
+		public final int ofAmount;
+		public final int tgAmount;
+		public final int mixedAmount;
+		
+		public ArchiveResult(DateType archiveFrom, DateType archiveTo, int orderAmount, int ofAmount, int tgAmount, int mixedAmount){
+			this.fromTbl = new DBTbl(archiveFrom);
+			this.toTbl = new DBTbl(archiveTo);
 			this.orderAmount = orderAmount;
-		}
-		
-		public int getMaxId(){
-			return this.maxId;
-		}
-		
-		public int getAmount(){
-			return this.orderAmount;
+			this.ofAmount = ofAmount;
+			this.tgAmount = tgAmount;
+			this.mixedAmount = mixedAmount;
 		}
 		
 		@Override
 		public String toString(){
-			return orderAmount + " record(s) are moved to history, maxium id : " + maxId;
+			final String sep = System.getProperty("line.separator");
+			return orderAmount + " record(s) are moved from '" + fromTbl.orderTbl + "'to '" + toTbl.orderTbl + "'" + sep +
+				   ofAmount + " record(s) are moved from '" + fromTbl.orderFoodTbl + "' to '" + toTbl.orderFoodTbl + "'" + sep +
+				   tgAmount + " record(s) are moved from '" + fromTbl.tgTbl + "' to '" + toTbl.tgTbl + "'" + sep +
+				   mixedAmount + " record(s) are moved from '" + fromTbl.mixedTbl + "' to '" + toTbl.mixedTbl + "'";
 		}
 	}
 	
 	public static ArchiveResult archive(DBCon dbCon, Staff staff, DateType archiveFrom, DateType archiveTo) throws SQLException, BusinessException{
 		String sql;
-		ExtraCond extraCond4ArchiveFrom = new ExtraCond(archiveFrom);
-		ExtraCond extraCond4ArchiveTo = new ExtraCond(archiveTo);
+		DBTbl fromTbl = new DBTbl(archiveFrom);
+		DBTbl toTbl = new DBTbl(archiveTo);
 		
 		if(archiveFrom == DateType.TODAY){
 			//Calculate the max order id from both today and history.
 			int maxId = 0;
 			sql = " SELECT MAX(id) + 1 FROM (" + 
-				  " SELECT MAX(id) AS id FROM " + Params.dbName + "." + extraCond4ArchiveFrom.orderTbl +
+				  " SELECT MAX(id) AS id FROM " + Params.dbName + "." + fromTbl.orderTbl +
 				  " UNION " +
-				  " SELECT MAX(id) AS id FROM " + Params.dbName + "." + extraCond4ArchiveTo.orderTbl + ") AS all_order";
+				  " SELECT MAX(id) AS id FROM " + Params.dbName + "." + toTbl.orderTbl + ") AS all_order";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				maxId = dbCon.rs.getInt(1);
@@ -1259,8 +1265,11 @@ public class OrderDao {
 		}
 		
 		int amount = 0;
+		int ofAmount = 0;
+		int tgAmount = 0;
+		int mixedAmount = 0;
 		for(Order order : getByCond(dbCon, staff, new ExtraCond(archiveFrom).addStatus(Order.Status.PAID).addStatus(Order.Status.REPAID), null)){
-			sql = " INSERT INTO " + Params.dbName + "." + extraCond4ArchiveTo.orderTbl + "(" +
+			sql = " INSERT INTO " + Params.dbName + "." + toTbl.orderTbl + "(" +
 				  "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
 				  "`discount_staff`, `discount_staff_id`, `discount_date`," +
 				  "`cancel_price`, `discount_price`, `gift_price`, `coupon_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
@@ -1303,16 +1312,18 @@ public class OrderDao {
 			}
 			
 			//Archive the order food records.
-			OrderFoodDao.archive(dbCon, staff, order, archiveFrom, archiveTo);
+			OrderFoodDao.ArchiveResult ofResult = OrderFoodDao.archive(dbCon, staff, order, archiveFrom, archiveTo);
+			ofAmount += ofResult.ofAmount;
+			tgAmount += ofResult.tgAmount;
 			
 			//Archive the mixed payment records.
-			MixedPaymentDao.archive(dbCon, staff, order, archiveFrom, archiveTo);
+			mixedAmount += MixedPaymentDao.archive(dbCon, staff, order, archiveFrom, archiveTo).amount;
 			
 			//Delete the order and associated records. 
 			deleteByCond(dbCon, staff, new ExtraCond(archiveFrom).setOrderId(order.getId()));
 		}
 		
-		return new ArchiveResult(0, amount);
+		return new ArchiveResult(archiveFrom, archiveTo, amount, ofAmount, tgAmount, mixedAmount);
 	}
 	
 //	public static class Result{
