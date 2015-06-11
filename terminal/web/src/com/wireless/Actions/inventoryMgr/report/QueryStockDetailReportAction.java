@@ -34,11 +34,24 @@ public class QueryStockDetailReportAction extends Action{
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
 			String materialId = request.getParameter("materialId");
+			String materialCateId = request.getParameter("materialCateId");
+			String cateType = request.getParameter("cateType");
 			String deptId = request.getParameter("deptId");
 			//String stockType = request.getParameter("stockType");
 			String subType = request.getParameter("subType");
-			String extra = " AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date <= '" + endDate + " 23:59:59'";
+			String extra = " AND S.ori_stock_date BETWEEN '" + beginDate + "' AND '" + endDate + " 23:59:59'";
 			
+			if(materialId == null || materialId.isEmpty()){
+				materialId = "-1";
+			}
+			
+			if(materialCateId != null && !materialCateId.isEmpty()){
+				extra += " AND MC.cate_id = " + materialCateId;
+			}
+			
+			if(cateType != null && !cateType.isEmpty() && !cateType.equals("-1")){
+				extra += " AND MC.type = " + cateType;
+			}
 			
 			if(subType != null && !subType.isEmpty()){
 				extra += " AND S.sub_type = " + subType;

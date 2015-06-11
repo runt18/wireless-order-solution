@@ -95,6 +95,17 @@ public class QueryStockActionAction extends Action{
 			}
 			orderClause += (" ORDER BY S.status, S.ori_stock_date ");
 			root = StockActionDao.getStockAndDetail(staff, extraCond, orderClause);
+			
+			//设置是否可反审核
+			//最近盘点或月结时间
+			long stockTakeOrBalanceTime = StockActionDao.getStockActionInsertTime(staff);
+			for (StockAction stockAction : root) {
+				if(stockAction.getStatus() == StockAction.Status.AUDIT || stockAction.getStatus() == StockAction.Status.DELETE){
+					if(stockTakeOrBalanceTime > stockAction.getApproverDate()){
+						stockAction.setStatus(StockAction.Status.FINAL);
+					}
+				}
+			}
 
 		}catch(BusinessException e){
 			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());

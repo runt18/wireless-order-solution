@@ -74,10 +74,15 @@ public class QueryCurrentMonthAction extends Action{
 					" UNION ALL " +
 					" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + restaurantID + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
 			dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
-			final Timestamp minDay;
+			final Date minDay;
 			if(dbCon.rs.next()){
 				if(dbCon.rs.getTimestamp("date") != null){
-					minDay = dbCon.rs.getTimestamp("date");
+					//不设置为Ext.dateField控件最小日期, 设置前一天为最小日期, 防止在盘点审核当日不能添加库单
+					Timestamp result = dbCon.rs.getTimestamp("date");
+					Calendar c = Calendar.getInstance();
+					c.setTimeInMillis(result.getTime());
+					c.add(Calendar.DATE, -1);
+					minDay = c.getTime();
 				}else{
 					minDay = null;
 				}

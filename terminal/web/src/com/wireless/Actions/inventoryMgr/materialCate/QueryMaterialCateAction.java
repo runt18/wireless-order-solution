@@ -53,7 +53,7 @@ public class QueryMaterialCateAction extends DispatchAction{
 			String extra = "";
 			extra += " AND MC.restaurant_id = " + restaurantID;
 			
-			if(type != null && !type.isEmpty()){
+			if(type != null && !type.isEmpty() && !type.equals("-1")){
 				extra += " AND MC.type = " + type;
 			}
 			

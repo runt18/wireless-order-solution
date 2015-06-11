@@ -56,7 +56,7 @@ public class QueryMaterialAction extends DispatchAction{
 			String extra = "";
 			extra += (" AND M.restaurant_id = " + restaurantID);
 			
-			if(cateType != null && !cateType.trim().isEmpty()){
+			if(cateType != null && !cateType.trim().isEmpty() && !cateType.equals("-1")){
 				extra += (" AND MC.type = " + cateType);
 			}
 			
