@@ -143,40 +143,6 @@ var sDelta_materialComb = new Ext.form.ComboBox({
 });
 var deptTree;
 Ext.onReady(function(){
-	var cm = new Ext.grid.ColumnModel([
-	       new Ext.grid.RowNumberer(),
-	       {header: '品项名称 ', dataIndex: 'material.name'},
-	       {header: '初期数量', dataIndex: 'primeAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-	       {header: '入库总数', dataIndex: 'stockInTotal', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-	       {header: '出库总数', dataIndex: 'stockOutTotal', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-	       {header: '期末数量', dataIndex: 'endAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-	       {header: '理论消耗', dataIndex: 'expectAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-	       {header: '实际消耗', dataIndex: 'actualAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-	       {header: '差异数', dataIndex: 'deltaAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou}
-	]);
-	cm.defaultSortable = true;
-	
-	var ds = new Ext.data.Store({
-		proxy : new Ext.data.HttpProxy({url: '../../QueryDeltaReport.do'}),
-		reader : new Ext.data.JsonReader({totalProperty: 'totalProperty', root:'root'},[
-				{name: 'material.name'},
-				{name: 'primeAmount'},
-				{name: 'stockInTotal'},
-				{name: 'stockOutTotal'},
-				{name: 'endAmount'},
-				{name: 'expectAmount'},
-				{name: 'actualAmount'},
-				{name: 'deltaAmount'}
-		])
-	});
-
-	var pagingBar = new Ext.PagingToolbar({
-		pageSize : PAGE_LIME,
-		store : ds,
-		displayInfo : true,
-		displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
-		emptyMsg : '没有记录'
-	});
 	
 	var date = new Date();
 	date.setMonth(date.getMonth()-1);
@@ -214,7 +180,6 @@ Ext.onReady(function(){
 			handler : function(){
 				var deptID = '-1';
 				var sn = deptTree.getSelectionModel().getSelectedNode();
-				//Ext.MessageBox.alert(sn.attributes.deptID);
 				var sgs = deltaReportGrid.getStore();
 				sgs.baseParams['beginDate'] = Ext.getCmp('dr_beginDate').getValue().format('Y-m');
 				sgs.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
@@ -234,28 +199,33 @@ Ext.onReady(function(){
 	});
 	
 	
-	var deltaReportGrid = new Ext.grid.GridPanel({
-		title : '消耗差异表',
-		//id : 'deltaReport',
-		region : 'center',
-		border : true,
-		frame : true,
-		store : ds,
-		cm : cm,
-		loadMask : {
-			msg : "数据加载中, 请稍候...."
-		},
-		viewConfig : {
-			forceFit : true		
-		},
-		tbar : deltaReportBar,
-		bbar : pagingBar
-	});
-	
-	
-	ds.load({
-		params:{start:0, limit:PAGE_LIME}
-	});
+	var deltaReportGrid = createGridPanel(
+			'stockTakeWinCenter',
+			'货品列表',
+			'',
+			'',
+			'../../QueryDeltaReport.do',
+			[
+				[true, false, false, false], 
+				['品项名称', 'material.name', 130],
+				['初期数量', 'primeAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
+				['入库总数', 'stockInTotal',80,'right', 'Ext.ux.txtFormat.gridDou'],
+				['出库总数', 'stockOutTotal',80,'right', 'Ext.ux.txtFormat.gridDou'],
+				['期末数量', 'endAmount',80,'right', 'Ext.ux.txtFormat.gridDou'],
+				['理论消耗', 'expectAmount',80,'right', 'Ext.ux.txtFormat.gridDou'],
+				['实际消耗', 'actualAmount',80,'right', 'Ext.ux.txtFormat.gridDou'],
+				['差异数', 'deltaAmount',80,'right', 'Ext.ux.txtFormat.gridDou']
+			],
+			deltaReportRecord.getKeys(),
+			[['isPaging', true]],
+			GRID_PADDING_LIMIT_20,
+			'',
+			deltaReportBar
+		);		
+	deltaReportGrid.region = 'center';
+	deltaReportGrid.on('render', function(){
+		Ext.getCmp('btnSearch').handler();
+	});	
 	
 	deptTree = new Ext.tree.TreePanel({
 		title : '部门信息',
@@ -303,25 +273,20 @@ Ext.onReady(function(){
 		}),
 		listeners : {
 			click : function(e){
-//				Ext.getCmp('btnSearch').handler();
 				Ext.getDom('dept').innerHTML = e.text;
-			},
-			dblclick : function(e){
 				Ext.getCmp('btnSearch').handler();
 			}
 		},
 		tbar :	[
 		     '->',
 		     {
-					text : '刷新',
-					iconCls : 'btn_refresh',
-					handler : function(){
-						deptTree.getRootNode().reload();
-					}
+				text : '刷新',
+				iconCls : 'btn_refresh',
+				handler : function(){
+					deptTree.getRootNode().reload();
+				}
 			}
 		 ]
-			
-
 	});
 	
 	new Ext.Panel({
@@ -337,4 +302,6 @@ Ext.onReady(function(){
 			}
 		}]
 	});
+	
+	
 });
