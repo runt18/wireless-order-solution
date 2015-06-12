@@ -1,9 +1,4 @@
 
-function onLoad(){
-//	Ext.getCmp('cost_analysis').getStore().load();
-	Ext.getCmp('btnSearch').handler();
-}
-
 var suppllierGridTbar;
 Ext.onReady(function(){
 	var cm = new Ext.grid.ColumnModel([
@@ -85,9 +80,9 @@ Ext.onReady(function(){
 	    cm : cm,
 	    autoExpandColumn : 'profitRate',
 	    autoExpandMax : 200,
-//	    viewConfig : {
-//	    	forceFit : true
-//	    },
+	    viewConfig : {
+	    	forceFit : true
+	    },
 	    tbar : costAnalyzeGridTbar,
 	    bbar : pagingBar
 	});
@@ -97,7 +92,6 @@ Ext.onReady(function(){
 	
 	new Ext.Panel({
 		renderTo : 'divCostAnalysis',
-		//width : parseInt(Ext.getDom('divCostAnalysis').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divCostAnalysis').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
 		//子集
@@ -111,5 +105,6 @@ Ext.onReady(function(){
 		}]
 	});
 	
-	onLoad();
+	//页面打开即加载数据
+	Ext.getCmp('btnSearch').handler();
 });	
