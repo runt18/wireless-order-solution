@@ -69,7 +69,6 @@ public class MonthlyBalanceDao {
 			if(dbCon.rs.next()){
 				openingBalance = dbCon.rs.getFloat("ending_balance");
 			}else{
-//				openingBalance = CostAnalyzeReportDao.getBalance(beginDate, dept.getId(), staff.getRestaurantId());
 				openingBalance = 0;
 			}
 		
@@ -156,7 +155,7 @@ public class MonthlyBalanceDao {
 	 * @return	list of MonthlyBalance
 	 * @throws SQLException
 	 */
-	private static List<MonthlyBalance> getMonthlyBalance(String extraCond, String otherClause) throws SQLException{
+	public static List<MonthlyBalance> getMonthlyBalance(String extraCond, String otherClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		try{
