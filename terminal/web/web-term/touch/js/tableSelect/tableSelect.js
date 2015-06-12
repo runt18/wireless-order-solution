@@ -1509,6 +1509,19 @@ function handleTableForTS(c){
 function initTableData(){
 	
 	Util.LM.show();
+	regionId = [];
+	region = [];	
+	//加载区域
+	$.post('../QueryRegion.do', {dataSource : 'normal'}, function(rt){
+		rt.root.forEach(function(e){
+			region.push(e);
+			regionId.push(e.id);			
+		});
+		//显示区域
+		showRegion(region);
+	}, 'json');
+	
+	
 	// 加载菜单数据
 	$.ajax({
 		url : '../QueryTable.do',
@@ -1520,8 +1533,6 @@ function initTableData(){
 			tables = [];
 			busyTables = [];
 			freeTables = [];
-			regionId = [];
-			region = [];
 			if(data.success){
 				//把所有餐桌对象都放到本地数组tables中,freeTables存放空闲餐桌，busyTables存放就餐餐桌
 				for(x in data.root){	
@@ -1545,29 +1556,26 @@ function initTableData(){
 				
 				
 				//从tables数组中，遍历得到含有餐桌的区域数组region
-				region.push(tables[0].region);
-				regionId.push(tables[0].region.id);
-				for(x in tables){
-					var flag = false;
-					for(y in regionId){
-						if(regionId[y] == tables[x].region.id){		
-							flag = true;
-							break;
-						}			
-					}
-					if(!flag){
-						region.push(tables[x].region);
-						regionId.push(tables[x].region.id);
-					}
-				}
+//				region.push(tables[0].region);
+//				regionId.push(tables[0].region.id);
+//				for(x in tables){
+//					var flag = false;
+//					for(y in regionId){
+//						if(regionId[y] == tables[x].region.id){		
+//							flag = true;
+//							break;
+//						}			
+//					}
+//					if(!flag){
+//						region.push(tables[x].region);
+//						regionId.push(tables[x].region.id);
+//					}
+//				}
 				ts.rn.selectingId = 'divAllArea';
 				ts.rn.pageNow = 1;
 				var regionH = $("#divToolRightForSelect").height() - 6 * 65;
 				ts.rn.limit = Math.floor(regionH/62);
 				ts.rn.pageCount = Math.ceil(region.length/ts.rn.limit);
-				
-				//显示区域
-				showRegion(region);
 				
 				//默认显示全部状态下的全部区域
 				statusType = "allStatus";
@@ -1638,9 +1646,7 @@ function showRegion(temp, pageNow){
 	var html = [];
 	for (var i = 0; i < temp.length; i++) {
 		//不显示酒席费空区域
-		if(temp[i].id != 0){
-			html.push('<a data-role="button" data-inline="true" data-type="region" class="regionBtn" onclick="ts.addTables({event:this, id:'+ temp[i].id +'})">'+ temp[i].name +'</a>');
-		}
+		html.push('<a data-role="button" data-inline="true" data-type="region" class="regionBtn" onclick="ts.addTables({event:this, id:'+ temp[i].id +'})">'+ temp[i].name +'</a>');
 	}
 	
 	$('#divSelectRegionForTS').html(html.join("")).trigger('create').trigger('refresh');
