@@ -5,7 +5,7 @@ var stockActionHead = {
 	height : 120,
 	frame : true,
 	items : [{
-		id : 'displayPanelForStockTitle',
+		id : 'displayPanelForHistoryStockTitle',
 		height : 30,
 		bodyStyle : 'font-size:18px;text-align:center;',
 		html : '-----'
@@ -27,7 +27,7 @@ var stockActionHead = {
 			}]
 		}, 
 		{
-			id : 'displayPanelForDeptIn',
+			id : 'displayPanelForHistoryDeptIn',
 			items : [{
 				id : 'txtDeptInForHistoryStockActionBasic',
 				xtype : 'textfield',
@@ -36,7 +36,7 @@ var stockActionHead = {
 			}]
 		}, 
 		{
-			id : 'displayPanelForSupplier',
+			id : 'displayPanelForHistorySupplier',
 			items : [{
 				id : 'txtSupplierForHistoryStockActionBasic',
 				xtype : 'textfield',
@@ -44,7 +44,7 @@ var stockActionHead = {
 				disabled : true
 			}]
 		}, {
-			id : 'displayPanelForDeptOut',
+			id : 'displayPanelForHistoryDeptOut',
 			items : [{
 				id : 'txtDeptOutForHistoryStockActionBasic',
 				xtype : 'textfield',
@@ -178,10 +178,10 @@ var stockActionWin = new Ext.Window({
 
 
 function showDetail(){
-	var txtStockIn = Ext.getCmp('displayPanelForDeptIn');
-	var txtStockOut = Ext.getCmp('displayPanelForDeptOut');
-	var txtSupplier = Ext.getCmp('displayPanelForSupplier');
-	var titleDom = Ext.getCmp('displayPanelForStockTitle');
+	var txtStockIn = Ext.getCmp('displayPanelForHistoryDeptIn');
+	var txtStockOut = Ext.getCmp('displayPanelForHistoryDeptOut');
+	var txtSupplier = Ext.getCmp('displayPanelForHistorySupplier');
+	var titleDom = Ext.getCmp('displayPanelForHistoryStockTitle');
 	var sn = Ext.getCmp('historyHistoryStockActionGrid').getSelectionModel().getSelected();
 	
 	Ext.getCmp('txtDeptInForHistoryStockActionBasic').setValue(sn.data.deptIn.name);
