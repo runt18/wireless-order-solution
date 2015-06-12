@@ -63,7 +63,9 @@ function getRestaurantInfo(){
 			$('#wxNickName').text(rest.nickName);
 			
 			$('#seeRestaurantByCodeTitle').html('扫一扫去您的微信餐厅');
+			console.log(rest.qrCodeUrl)
 			$('#weixinCodeToRestaurant').attr('src', rest.qrCodeUrl);
+			
 			$('#weixinAuthRestInfo').show();
 			
 		}else{

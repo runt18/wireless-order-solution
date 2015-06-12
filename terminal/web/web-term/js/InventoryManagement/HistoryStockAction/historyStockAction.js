@@ -23,13 +23,13 @@ var stockActionHead = {
 		items : [{
 			items : [{
 				xtype : 'hidden',
-				id : 'hideStockActionId'
+				id : 'hideHistoryStockActionId'
 			}]
 		}, 
 		{
 			id : 'displayPanelForDeptIn',
 			items : [{
-				id : 'txtDeptInForStockActionBasic',
+				id : 'txtDeptInForHistoryStockActionBasic',
 				xtype : 'textfield',
 				fieldLabel : '收货仓',
 				disabled : true
@@ -38,7 +38,7 @@ var stockActionHead = {
 		{
 			id : 'displayPanelForSupplier',
 			items : [{
-				id : 'txtSupplierForStockActionBasic',
+				id : 'txtSupplierForHistoryStockActionBasic',
 				xtype : 'textfield',
 				fieldLabel : '供应商',
 				disabled : true
@@ -46,21 +46,21 @@ var stockActionHead = {
 		}, {
 			id : 'displayPanelForDeptOut',
 			items : [{
-				id : 'txtDeptOutForStockActionBasic',
+				id : 'txtDeptOutForHistoryStockActionBasic',
 				xtype : 'textfield',
 				fieldLabel : '出货仓',
 				disabled : true
 			}]
 		}, {
 			items : [{
-				id : 'txtOriStockIdForStockActionBasic',
+				id : 'txtOriStockIdForHistoryStockActionBasic',
 				xtype : 'textfield',
 				fieldLabel : '原始单号',
 				disabled : true
 			}]
 		}, {
 			items : [{
-				id : 'txtOriStockDateForStockActionBasic',
+				id : 'txtOriStockDateForHistoryStockActionBasic',
 				xtype : 'textfield',
 				fieldLabel : '货单日期',
 				disabled : true
@@ -69,7 +69,7 @@ var stockActionHead = {
 			columnWidth : 1,
 			style : 'width:100%;',
 			items : [{
-				id : 'txtCommentForStockActionBasic',
+				id : 'txtCommentForHistoryStockActionBasic',
 				xtype : 'textfield',
 				width : 774,
 				fieldLabel : '备注',
@@ -77,28 +77,28 @@ var stockActionHead = {
 			}]
 		}, {
 			items : [{
-				id : 'txtApproverNameForStockActionBasic',
+				id : 'txtApproverNameForHistoryStockActionBasic',
 				xtype : 'textfield',
 				fieldLabel : '审核人',
 				disabled : true
 			}]
 		}, {
 			items : [{
-				id : 'dateApproverDateForStockActionBasic',
+				id : 'dateApproverDateForHistoryStockActionBasic',
 				xtype : 'textfield',
 				fieldLabel : '审核日期',
 				disabled : true
 			}]
 		}, {
 			items : [{
-				id : 'txtOperatorNameForStockActionBasic',
+				id : 'txtOperatorNameForHistoryStockActionBasic',
 				xtype : 'textfield',
 				fieldLabel : '制单人',
 				disabled : true
 			}]
 		}, {
 			items : [{
-				id : 'dateOperatorDateForStockActionBasic',
+				id : 'dateOperatorDateForHistoryStockActionBasic',
 				xtype : 'textfield',
 				fieldLabel : '制单日期',
 				disabled : true
@@ -145,7 +145,7 @@ var stockDetailGrid = new Ext.grid.GridPanel({
 });
 
 var stockActionPanel = new Ext.Panel({
-	id : 'panelStockAction',
+	id : 'panelHistoryStockAction',
 	layout : 'border',
 	width : '100%',
 	items : [stockActionHead, stockDetailGrid, stockActionPanelSouth]
@@ -154,7 +154,7 @@ var stockActionPanel = new Ext.Panel({
 
 var stockActionWin = new Ext.Window({
 	title : '货单基础信息',
-	id : 'winStockAction',
+	id : 'winHistoryStockAction',
 	width : 900,
 	height : 550,
 	modal : true,
@@ -182,22 +182,22 @@ function showDetail(){
 	var txtStockOut = Ext.getCmp('displayPanelForDeptOut');
 	var txtSupplier = Ext.getCmp('displayPanelForSupplier');
 	var titleDom = Ext.getCmp('displayPanelForStockTitle');
-	var sn = Ext.getCmp('historyStockActionGrid').getSelectionModel().getSelected();
+	var sn = Ext.getCmp('historyHistoryStockActionGrid').getSelectionModel().getSelected();
 	
-	Ext.getCmp('txtDeptInForStockActionBasic').setValue(sn.data.deptIn.name);
-	Ext.getCmp('txtSupplierForStockActionBasic').setValue(sn.data.supplier.name);
-	Ext.getCmp('txtDeptOutForStockActionBasic').setValue(sn.data.deptOut.name) ;
-	Ext.getCmp('txtOriStockIdForStockActionBasic').setValue(sn.data.oriStockId);
-	Ext.getCmp('txtOriStockDateForStockActionBasic').setValue(sn.data.oriStockDateFormat);
-	Ext.getCmp('txtCommentForStockActionBasic').setValue(sn.data.comment);
-	Ext.getCmp('txtApproverNameForStockActionBasic').setValue(sn.data.approverName);
+	Ext.getCmp('txtDeptInForHistoryStockActionBasic').setValue(sn.data.deptIn.name);
+	Ext.getCmp('txtSupplierForHistoryStockActionBasic').setValue(sn.data.supplier.name);
+	Ext.getCmp('txtDeptOutForHistoryStockActionBasic').setValue(sn.data.deptOut.name) ;
+	Ext.getCmp('txtOriStockIdForHistoryStockActionBasic').setValue(sn.data.oriStockId);
+	Ext.getCmp('txtOriStockDateForHistoryStockActionBasic').setValue(sn.data.oriStockDateFormat);
+	Ext.getCmp('txtCommentForHistoryStockActionBasic').setValue(sn.data.comment);
+	Ext.getCmp('txtApproverNameForHistoryStockActionBasic').setValue(sn.data.approverName);
 	if(sn.data.statusValue !=1){
-		Ext.getCmp('dateApproverDateForStockActionBasic').setValue(sn.data.approverDateFormat);
+		Ext.getCmp('dateApproverDateForHistoryStockActionBasic').setValue(sn.data.approverDateFormat);
 	}else{
-		Ext.getCmp('dateApproverDateForStockActionBasic').setValue();
+		Ext.getCmp('dateApproverDateForHistoryStockActionBasic').setValue();
 	}
-	Ext.getCmp('txtOperatorNameForStockActionBasic').setValue(sn.data.operatorName);
-	Ext.getCmp('dateOperatorDateForStockActionBasic').setValue(sn.data.birthDateFormat);
+	Ext.getCmp('txtOperatorNameForHistoryStockActionBasic').setValue(sn.data.operatorName);
+	Ext.getCmp('dateOperatorDateForHistoryStockActionBasic').setValue(sn.data.birthDateFormat);
 
 	if(typeof sn.data.stockDetails != 'undefined' && sn.data.stockDetails.length > 0){
 		for ( var i = 0; i < sn.data.stockDetails.length; i++) {
@@ -631,7 +631,7 @@ Ext.onReady(function(){
 		]
 	});
 	stockActionGrid = new Ext.grid.GridPanel({
-		id : 'historyStockActionGrid',
+		id : 'historyHistoryStockActionGrid',
 		height : 200,
 		border : true,
 		frame : true,
