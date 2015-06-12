@@ -141,7 +141,7 @@ var sDelta_materialComb = new Ext.form.ComboBox({
 		
 	}
 });
-var deptTree;
+var deltaReportDeptTree;
 Ext.onReady(function(){
 	
 	var date = new Date();
@@ -179,7 +179,7 @@ Ext.onReady(function(){
 			iconCls : 'btn_search',
 			handler : function(){
 				var deptID = '-1';
-				var sn = deptTree.getSelectionModel().getSelectedNode();
+				var sn = deltaReportDeptTree.getSelectionModel().getSelectedNode();
 				var sgs = deltaReportGrid.getStore();
 				sgs.baseParams['beginDate'] = Ext.getCmp('dr_beginDate').getValue().format('Y-m');
 				sgs.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
@@ -227,9 +227,9 @@ Ext.onReady(function(){
 		Ext.getCmp('btnSearch').handler();
 	});	
 	
-	deptTree = new Ext.tree.TreePanel({
+	deltaReportDeptTree = new Ext.tree.TreePanel({
 		title : '部门信息',
-		id : 'deptTree',   
+		id : 'deltaReportDeptTree',   
 		region : 'west',
 		width : 170,
 		border : false,
@@ -252,16 +252,16 @@ Ext.onReady(function(){
 	        deptID : '-1',
 	        listeners : {
 	        	load : function(){
-	        		var treeRoot = deptTree.getRootNode().childNodes;
+	        		var treeRoot = deltaReportDeptTree.getRootNode().childNodes;
 	        		if(treeRoot.length > 0){
 	        			deptData = [];
 	        			for(var i = (treeRoot.length - 1); i >= 0; i--){
 	    					if(treeRoot[i].attributes.deptID == 255 || treeRoot[i].attributes.deptID == 253){
-	    						deptTree.getRootNode().removeChild(treeRoot[i]);
+	    						deltaReportDeptTree.getRootNode().removeChild(treeRoot[i]);
 	    					}
 	    				}
 	        		}else{
-	        			deptTree.getRootNode().getUI().hide();
+	        			deltaReportDeptTree.getRootNode().getUI().hide();
 	        			Ext.Msg.show({
 	        				title : '提示',
 	        				msg : '加载部门信息失败.',
@@ -283,7 +283,7 @@ Ext.onReady(function(){
 				text : '刷新',
 				iconCls : 'btn_refresh',
 				handler : function(){
-					deptTree.getRootNode().reload();
+					deltaReportDeptTree.getRootNode().reload();
 				}
 			}
 		 ]
@@ -293,7 +293,7 @@ Ext.onReady(function(){
 		renderTo : 'divDeltaReport',
 		height : parseInt(Ext.getDom('divDeltaReport').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
-		items : [deptTree, deltaReportGrid],
+		items : [deltaReportDeptTree, deltaReportGrid],
 		keys : [{
 			key : Ext.EventObject.ENTER,
 			scope : this,

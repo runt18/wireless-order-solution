@@ -451,7 +451,6 @@ Ext.onReady(function(){
 
 	stockDetailReportTree = new Ext.tree.TreePanel({
 		title : '部门信息',
-		id : 'deptTree',
 		region : 'west',
 		width : 160,
 		border : false,

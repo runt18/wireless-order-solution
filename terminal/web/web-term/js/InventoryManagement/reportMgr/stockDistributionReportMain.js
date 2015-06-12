@@ -138,14 +138,14 @@ var materialComb = new Ext.form.ComboBox({
 	}
 	
 });
-var deptTree;
+var stockDistributionDeptTree;
 var stockDistributionGrid;
 Ext.onReady(function(){
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
-	deptTree = new Ext.tree.TreePanel({
+	stockDistributionDeptTree = new Ext.tree.TreePanel({
 		title : '部门信息',
-		id : 'deptTree',   
+		id : 'stockDistributionDeptTree',   
 		region : 'west',
 		width : 200,
 		border : false,
@@ -168,16 +168,16 @@ Ext.onReady(function(){
 	        deptID : ' ',
 	        listeners : {
 	        	load : function(){
-	        		var treeRoot = deptTree.getRootNode().childNodes;
+	        		var treeRoot = stockDistributionDeptTree.getRootNode().childNodes;
 	        		if(treeRoot.length > 0){
 	        			deptData = [];
 	        			for(var i = (treeRoot.length - 1); i >= 0; i--){
 	    					if(treeRoot[i].attributes.deptID == 255 || treeRoot[i].attributes.deptID == 253){
-	    						deptTree.getRootNode().removeChild(treeRoot[i]);
+	    						stockDistributionDeptTree.getRootNode().removeChild(treeRoot[i]);
 	    					}
 	    				}
 	        		}else{
-	        			deptTree.getRootNode().getUI().hide();
+	        			stockDistributionDeptTree.getRootNode().getUI().hide();
 	        			Ext.Msg.show({
 	        				title : '提示',
 	        				msg : '加载部门信息失败.',
@@ -190,8 +190,6 @@ Ext.onReady(function(){
 		listeners : {
 			click : function(e){
 				Ext.getDom('dept').innerHTML = e.text;
-			},
-			dblclick : function(e){
 				Ext.getCmp('btnStockDistributionSearch').handler();
 			}
 		},
@@ -201,7 +199,7 @@ Ext.onReady(function(){
 				text : '刷新',
 				iconCls : 'btn_refresh',
 				handler : function(){
-					deptTree.getRootNode().reload();
+					stockDistributionDeptTree.getRootNode().reload();
 				}
 			}
 		 ]
@@ -266,7 +264,7 @@ Ext.onReady(function(){
 			iconCls : 'btn_search',
 			handler : function(){
 				var deptID = '';
-					var sn = deptTree.getSelectionModel().getSelectedNode();
+					var sn = stockDistributionDeptTree.getSelectionModel().getSelectedNode();
 					
 					var stockds = stockDistributionGrid.getStore();
 					stockds.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
@@ -316,7 +314,7 @@ Ext.onReady(function(){
 		layout : 'border',//布局
 		//margins : '5 5 5 5',
 		//子集
-		items : [deptTree, stockDistributionGrid]
+		items : [stockDistributionDeptTree, stockDistributionGrid]
 	});
 });
 
