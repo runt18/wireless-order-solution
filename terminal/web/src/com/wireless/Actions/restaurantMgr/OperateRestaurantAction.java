@@ -32,6 +32,7 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.token.Token;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant.QrCodeStatus;
 
 public class OperateRestaurantAction extends DispatchAction {
 	public ActionForward insert(ActionMapping mapping, ActionForm form,
@@ -141,7 +142,46 @@ public class OperateRestaurantAction extends DispatchAction {
 		return null;
 		
 	}
+
+	/**
+	 * 设置是否在账单打印二维码
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward updateRestaurantPrintCode(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		DBCon dbCon = new DBCon();
+		PrintWriter out = response.getWriter();
+		JObject jobject = new JObject();
+		String pin = (String) request.getAttribute("pin");
+		String printCode = request.getParameter("printCode");
+		try{
+			WxRestaurant.UpdateBuilder builder = new WxRestaurant.UpdateBuilder().setQrCodeStatus(printCode.equals("true")?QrCodeStatus.NORMAL:QrCodeStatus.HIDDEN);
+			WxRestaurantDao.update(StaffDao.verify(Integer.parseInt(pin)), builder);
+		} catch(BusinessException e) {
+			e.printStackTrace();
+			jobject.initTip(e);
+		} finally {
+			dbCon.disconnect();
+			out.print(jobject.toString());
+		}
+		return null;
+	}	
 	
+	/**
+	 * 设置餐厅地址和电话
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward systemUpdate(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
