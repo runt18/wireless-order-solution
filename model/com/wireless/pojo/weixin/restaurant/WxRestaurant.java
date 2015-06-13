@@ -17,6 +17,7 @@ public class WxRestaurant implements Jsonable{
 		private String headImgUrl;
 		private String refreshToken;
 		private String qrCode;
+		private QrCodeStatus qrCodeStatus;
 		private String wxSerial;
 		
 		public boolean isWxSerialChanged(){
@@ -35,6 +36,15 @@ public class WxRestaurant implements Jsonable{
 		public UpdateBuilder setQrCode(String qrCode){
 			this.qrCode = qrCode;
 			return this;
+		}
+		
+		public UpdateBuilder setQrCodeStatus(QrCodeStatus status){
+			this.qrCodeStatus = status;
+			return this;
+		}
+		
+		public boolean isQrCodeStatusChanged(){
+			return this.qrCodeStatus != null;
 		}
 		
 		public UpdateBuilder setWeixinLogo(int ossImageId){
@@ -154,6 +164,41 @@ public class WxRestaurant implements Jsonable{
 		}
 	}
 	
+	public static enum QrCodeStatus{
+		NORMAL(1, "正常"),
+		HIDDEN(3, "隐藏");
+		
+		private final int val;
+		private final String desc;
+		
+		QrCodeStatus(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+		
+		public static QrCodeStatus valueOf(int val){
+			for(QrCodeStatus status : values()){
+				if(status.val == val){
+					return status;
+				}
+			}
+			throw new IllegalArgumentException("The status(val = " + val + ") is invalid.");
+		}
+		
+		@Override
+		public String toString(){
+			return "status(val=" + val + ", desc=" + desc + ")";
+		}
+	}
+	
 	private String weixinSerial;
 	private int restaurantId;
 	private long bindDate;
@@ -164,6 +209,7 @@ public class WxRestaurant implements Jsonable{
 	private String weixinAppSecret;
 	private String qrCodeUrl;
 	private String qrCode;
+	private QrCodeStatus qrCodeStatus;
 	private String nickName;
 	private String headImgUrl;
 	private String refreshToken;
@@ -178,6 +224,7 @@ public class WxRestaurant implements Jsonable{
 		this.headImgUrl = builder.headImgUrl;
 		this.refreshToken = builder.refreshToken;
 		this.qrCode = builder.qrCode;
+		this.qrCodeStatus = builder.qrCodeStatus;
 		this.weixinSerial = builder.wxSerial;
 	}
 	
@@ -192,6 +239,14 @@ public class WxRestaurant implements Jsonable{
 		return weixinSerial;
 	}
 
+	public void setQrCodeStatus(QrCodeStatus status){
+		this.qrCodeStatus = status;
+	}
+	
+	public QrCodeStatus getQrCodeStatus(){
+		return this.qrCodeStatus;
+	}
+	
 	public void setWeixinSerial(String weixinSerial) {
 		this.weixinSerial = weixinSerial;
 	}
