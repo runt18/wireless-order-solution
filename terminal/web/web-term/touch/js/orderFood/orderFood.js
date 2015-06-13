@@ -1288,12 +1288,13 @@ function operateOrderFoodTaste(c){
 	//单项口味不用延迟
 	if(c.type == 2){
 		$('#orderFoodTasteCmp').popup('open');
-		$('#orderFoodTasteCmp').parent().addClass("pop").addClass("in");		
+//		$('#orderFoodTasteCmp').parent().addClass("pop").addClass("in");		
 	}else{
+		//先关闭更多再打开全单口味
 		setTimeout(function(){
 			$('#orderFoodTasteCmp').popup('open');
-			$('#orderFoodTasteCmp').parent().addClass("pop").addClass("in");
-		},300);		
+			//$('#orderFoodTasteCmp').parent().addClass("pop").addClass("in");
+		},500);		
 	}
 	
 
