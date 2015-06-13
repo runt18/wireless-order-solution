@@ -343,7 +343,7 @@ Ext.onReady(function(){
 					//汇总
 					trPayTypeContent += (String.format(trPayIncomeModel, 
 						'总计', 
-						totalCount, 
+						'<a href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, payType:-1})">' + totalCount + '</a>',
 						totalShouldPay.toFixed(2), 
 						totalActual.toFixed(2)
 					));

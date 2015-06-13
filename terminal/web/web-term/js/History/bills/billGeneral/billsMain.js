@@ -540,10 +540,15 @@ var history_setStatisticsDate = function(){
 		
 		history_hours = sendToStatisticsPageHours;
 		
-		for (var i = 0; i < historyPayTypes.length; i++) {
-			if(historyPayTypes[i].name == sendToStatisticsPayType){
-				Ext.getCmp('comboPayType').setValue(historyPayTypes[i].id);
-				break;
+		
+		if(sendToStatisticsPayType == -1){
+			Ext.getCmp('comboPayType').setValue(-1);
+		}else{
+			for (var i = 0; i < historyPayTypes.length; i++) {
+				if(historyPayTypes[i].name == sendToStatisticsPayType){
+					Ext.getCmp('comboPayType').setValue(historyPayTypes[i].id);
+					break;
+				}
 			}
 		}
 		

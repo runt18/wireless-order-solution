@@ -63,9 +63,10 @@ function getRestaurantInfo(){
 			$('#wxNickName').text(rest.nickName);
 			
 			$('#seeRestaurantByCodeTitle').html('扫一扫去您的微信餐厅');
-			console.log(rest.qrCodeUrl)
+			//显示二维码
 			$('#weixinCodeToRestaurant').attr('src', rest.qrCodeUrl);
-			
+			//显示是否打印二维码
+			$('#isPrintQrCodeInOrderPaper').attr('checked', rest.qrCodeStatus == 1 ? true : false);
 			$('#weixinAuthRestInfo').show();
 			
 		}else{
@@ -183,6 +184,18 @@ $(function (){
 	}, 100);
 
 
+	$('#isPrintQrCodeInOrderPaper').change(function(){
+		wx.lm.show();
+		$.post('../../OperateRestaurant.do', {
+			dataSource: 'updateRestaurantPrintCode', 
+			printCode : $('#isPrintQrCodeInOrderPaper').attr('checked') ? true:false
+		}, function(rt){
+			wx.lm.hide();
+		}).error(function(){
+			wx.lm.hide();
+		});
+	});
+	
 });
 
 
