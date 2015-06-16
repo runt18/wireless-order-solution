@@ -184,6 +184,14 @@ public class WxRestaurant implements Jsonable{
 			return this.desc;
 		}
 		
+		public boolean isNormal(){
+			return this == NORMAL;
+		}
+		
+		public boolean isHidden(){
+			return this == HIDDEN;
+		}
+		
 		public static QrCodeStatus valueOf(int val){
 			for(QrCodeStatus status : values()){
 				if(status.val == val){

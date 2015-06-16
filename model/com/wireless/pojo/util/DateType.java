@@ -31,6 +31,10 @@ public enum DateType {
 		return this == DateType.HISTORY;
 	}
 	
+	public boolean isArchive(){
+		return this == DateType.ARCHIVE;
+	}
+	
 	public static DateType valueOf(int type){
 		for(DateType dateType : values()){
 			if(dateType.type == type){
