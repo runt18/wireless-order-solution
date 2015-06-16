@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -266,6 +267,15 @@ public class PickFoodActivity extends FragmentActivity
 	@Override
 	public void onFoodPicked(OrderFood of, ActionType actionType) {
 		if(actionType == ActionType.ADD){
+			if(mCurFg == NUMBER_FRAGMENT){
+				final View srchView = findViewById(R.id.editText_search_pickFoodFragment);
+				srchView.postDelayed(new Runnable(){
+					@Override
+					public void run() {
+						((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(srchView, InputMethodManager.SHOW_IMPLICIT);
+					}
+				}, 500);
+			}
 			try{
 				mTmpOrder.addFood(of, WirelessOrder.loginStaff);
 				
