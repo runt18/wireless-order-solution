@@ -3529,7 +3529,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		List<StockReport> stockReports = null ;
 		String extra = "";
-		extra += " AND S.status = " + Status.AUDIT.getVal();
+		extra += " AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") ";
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		if(beginDate == null || cateType == null){
 				
