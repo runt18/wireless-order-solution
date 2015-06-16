@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.member.MemberOperationDao;
@@ -44,7 +45,7 @@ public class DailySettleDao {
 	public static final class AutoResult{
 		
 		int elapsedTime;			//自动日结消耗的秒数
-		int shiftAmount;				//当日交班的记录数
+		int shiftAmount;			//当日交班的记录数
 		int orderAmount;			//自动日结处理的账单数
 		int ofAmount;				//自动日结处理的order food数量
 		int tgAmount;				//自动日结处理的taste group数量
@@ -60,12 +61,13 @@ public class DailySettleDao {
 		public String toString(){
 			
 			final String sep = System.getProperty("line.separator");
-
+			DBTbl dbTbl = new DBTbl(DateType.HISTORY);
 			StringBuilder resultInfo = new StringBuilder();
-			resultInfo.append("info : " + orderAmount + " record(s) are moved to\"order_history\"").append(sep);
-			resultInfo.append("info : " + mixedAmount + " record(s) are moved to \"mixed_payment_history\"").append(sep);
-			resultInfo.append("info : " + ofAmount + " record(s) are moved to \"order_food_history\"").append(sep);
-			resultInfo.append("info : " + shiftAmount + " record(s) are moved to \"shift_history\"").append(sep);
+			resultInfo.append("info : " + orderAmount + " record(s) are moved to \"").append(dbTbl.orderTbl).append("\"").append(sep);
+			resultInfo.append("info : " + mixedAmount + " record(s) are moved to \"").append(dbTbl.mixedTbl).append("\"").append(sep);
+			resultInfo.append("info : " + ofAmount + " record(s) are moved to \"").append(dbTbl.orderFoodTbl).append("\"").append(sep);
+			resultInfo.append("info : " + tgAmount + " record(s) are moved to \"").append(dbTbl.tgTbl).append("\"").append(sep);
+			resultInfo.append("info : " + shiftAmount + " record(s) are moved to \"").append(dbTbl.shiftTbl).append("\"").append(sep);
 			resultInfo.append("info : " + 
 							  "maxium order id : " + maxOrderId + ", " +
 							  "maxium order food id : " + maxOrderFoodId).append(sep);
@@ -84,7 +86,7 @@ public class DailySettleDao {
 	 */
 	public static final class ManualResult{
 		
-		int elapsedTime;			//日结消耗的时间
+		int elapsedTime;				//日结消耗的时间
 		int shiftAmount;				//当日交班的记录数
 		DutyRange range;
 		OrderDao.ArchiveResult orderArchive;
@@ -341,16 +343,16 @@ public class DailySettleDao {
 			dbCon.conn.setAutoCommit(false);
 			
 			//Archive the order and associated order food, taste group records from today to history.
-			result.orderArchive = OrderDao.archive(dbCon, staff, DateType.TODAY, DateType.HISTORY);
+			result.orderArchive = OrderDao.archive4Daily(dbCon, staff);
 			
 			//Archive the shift records.
-			ShiftDao.archive(dbCon, staff, DateType.TODAY, DateType.HISTORY);
+			ShiftDao.archive4Daily(dbCon, staff);
 			
 			//Archive the payment records.
-			PaymentDao.archive(dbCon, staff, DateType.TODAY, DateType.HISTORY);
+			PaymentDao.archive4Daily(dbCon, staff);
 			
 			//Archive the member operation records.
-			MemberOperationDao.archive(dbCon, staff, DateType.TODAY, DateType.HISTORY);
+			MemberOperationDao.archive4Daily(dbCon, staff);
 			
 			//Create the daily settle record
 			sql = " INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
@@ -386,6 +388,42 @@ public class DailySettleDao {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Archive the expired daily records from history to archive.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the amount to records archive
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int archive4Expired(DBCon dbCon, Staff staff) throws SQLException{
+		DBTbl fromTbl = new DBTbl(DateType.HISTORY);
+		DBTbl toTbl = new DBTbl(DateType.ARCHIVE);
+		
+		String sql;
+		
+		String extraCond = " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(DAILY.off_duty) > REST.record_alive ";
+		
+		final String dailyItem = "`restaurant_id`, `name`, `on_duty`, `off_duty`";
+		//Move the shift record from 'shift' to 'shift_history'.
+		sql = " INSERT INTO " + Params.dbName + "." + toTbl.dailyTbl + "(" + dailyItem + ") " +
+			  " SELECT " + dailyItem + " FROM " + Params.dbName + "." + fromTbl.dailyTbl + " DAILY " +
+			  " JOIN " + Params.dbName + ".restaurant REST ON REST.id = DAILY.restaurant_id " +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() +
+			  (extraCond != null ? extraCond.toString() : "");
+		int amount = dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the today shift records belong to this restaurant.
+		sql = " DELETE DAILY FROM " + Params.dbName + "." + fromTbl.dailyTbl + " DAILY " +
+			  " JOIN " + Params.dbName + ".restaurant REST ON REST.id = DAILY.restaurant_id " +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() + (extraCond != null ? extraCond.toString() : "");
+		dbCon.stmt.executeUpdate(sql);
+		
+		return amount;
 	}
 	
 	/**

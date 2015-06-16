@@ -48,7 +48,7 @@ public class MemberOperationDao {
 				operationCond.append(type.getValue());
 			}
 			extraCond.append(" AND MO.id IN (" +
-							 " SELECT MAX(id) FROM wireless_order_db." + super.moTbl + " WHERE restaurant_id = " + super.restaurantId +
+							 " SELECT MAX(id) FROM wireless_order_db." + super.dbTbl.moTbl + " WHERE restaurant_id = " + super.restaurantId +
 							 " AND operate_type IN (" + operationCond.toString() + ") GROUP BY order_id )");
 			
 			return super.toString() + extraCond.toString();
@@ -57,8 +57,7 @@ public class MemberOperationDao {
 	}
 	
 	public static class ExtraCond{
-		private final DateType dateType;
-		private final String moTbl;
+		protected final DBTbl dbTbl;
 		private int id;
 		private final List<Integer> members = new ArrayList<Integer>();
 		private int memberTypeId;
@@ -74,12 +73,7 @@ public class MemberOperationDao {
 		private int restaurantId;
 		
 		public ExtraCond(DateType dateType){
-			this.dateType = dateType;
-			if(this.dateType.isHistory()){
-				moTbl = "member_operation_history";
-			}else{
-				moTbl = "member_operation";
-			}
+			this.dbTbl = new DBTbl(dateType);
 		}
 		
 		public ExtraCond setId(int id){
@@ -383,7 +377,7 @@ public class MemberOperationDao {
 			  " MO.delta_base_money, MO.delta_extra_money, MO.delta_point, " +
 			  " MO.remaining_base_money, MO.remaining_extra_money, MO.remaining_point, MO.comment, " +
 			  " MO.coupon_id, MO.coupon_money, MO.coupon_name " +
-			  " FROM " + Params.dbName + "." + extraCond.moTbl + " MO " +
+			  " FROM " + Params.dbName + "." + extraCond.dbTbl.moTbl + " MO " +
 			  " LEFT JOIN " + Params.dbName + ".member M ON MO.member_id = M.member_id "	+
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = MO.pay_type_id " +
 			  " WHERE 1 = 1 " +
@@ -565,7 +559,7 @@ public class MemberOperationDao {
 	public static int getAmountByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
 		sql = " SELECT COUNT(*) " +
-			  " FROM " + Params.dbName + "." + extraCond.moTbl + " MO " +
+			  " FROM " + Params.dbName + "." + extraCond.dbTbl.moTbl + " MO " +
 			  " JOIN " + Params.dbName + ".member M ON MO.member_id = M.member_id "	+
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = MO.pay_type_id " +
 			  " WHERE 1 = 1 " +
@@ -809,8 +803,42 @@ public class MemberOperationDao {
 			return moAmount + " record(s) are moved to history, maxium id : " + maxId;
 		}
 	}
+
+	/**
+	 * Archive the daily member operation records from today to history.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the amount to records archived
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static ArchiveResult archive4Daily(DBCon dbCon, Staff staff) throws SQLException{
+		return archive(dbCon, staff, null, DateType.TODAY, DateType.HISTORY);
+	}
+
+	/**
+	 * Archive the expired member operation records from history to archive.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the amount to records archived
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static ArchiveResult archive4Expired(DBCon dbCon, final Staff staff) throws SQLException{
+		ExtraCond extraCond4Expired = new ExtraCond(DateType.HISTORY){
+			@Override
+			public String toString(){
+				return " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(MO.operate_date) > REST.record_alive ";
+			}
+		};
+		return archive(dbCon, staff, extraCond4Expired, DateType.HISTORY, DateType.ARCHIVE);
+	}
 	
-	public static ArchiveResult archive(DBCon dbCon, Staff staff, DateType archiveFrom, DateType archiveTo) throws SQLException{
+	private static ArchiveResult archive(DBCon dbCon, Staff staff, ExtraCond extraCond, DateType archiveFrom, DateType archiveTo) throws SQLException{
 		String sql;
 		
 		DBTbl fromTbl = new DBTbl(archiveFrom);
@@ -834,14 +862,17 @@ public class MemberOperationDao {
 		
 		//Move the member operation record from 'member_operation' to 'member_operation_history'
 		sql = " INSERT INTO " + Params.dbName + "." + toTbl.moTbl + "(" + item + ")" +
-			  " SELECT " + item + " FROM " + Params.dbName + "." + fromTbl.moTbl + 
-			  " WHERE restaurant_id = " + staff.getRestaurantId();
+			  " SELECT " + item + " FROM " + Params.dbName + "." + fromTbl.moTbl + " MO " +
+			  " JOIN " + Params.dbName + ".restaurant REST ON REST.id = MO.restaurant_id " +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() +
+			  (extraCond != null ? extraCond.toString() : "");
 		moAmount = dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the member operation to this restaurant
-		sql = " DELETE FROM " + Params.dbName + "." + fromTbl.moTbl + " WHERE restaurant_id = " + staff.getRestaurantId();
+		sql = " DELETE MO FROM " + Params.dbName + "." + fromTbl.moTbl + " MO " +
+			  " JOIN " + Params.dbName + ".restaurant REST ON REST.id = MO.restaurant_id " +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() + (extraCond != null ? extraCond.toString() : "");
 		dbCon.stmt.executeUpdate(sql);
-		
 		
 		return new ArchiveResult(0, moAmount);
 	}

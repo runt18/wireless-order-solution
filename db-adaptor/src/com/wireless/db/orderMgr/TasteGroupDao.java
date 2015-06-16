@@ -20,16 +20,11 @@ import com.wireless.pojo.util.DateType;
 public class TasteGroupDao {
 
 	public static class ExtraCond{
-		private final DateType dateType;
-		public final String tgTbl;
-		public final String ntgTbl;
+		private final DBTbl dbTbl;
 		private int tgId;
 		
 		public ExtraCond(DateType dateType){
-			this.dateType = dateType;
-			DBTbl dbTbl = new DBTbl(dateType);
-			tgTbl = dbTbl.tgTbl;
-			ntgTbl = dbTbl.ntgTbl;
+			this.dbTbl = new DBTbl(dateType);
 		}
 		
 		public ExtraCond setTasteGroupId(TasteGroup tg){
@@ -72,22 +67,22 @@ public class TasteGroupDao {
 	public static int archive(DBCon dbCon, Staff staff, int tgId4ArchiveFrom, DateType archiveFrom, DateType archiveTo) throws SQLException{
 		try{
 			TasteGroup tg = getById(dbCon, staff, tgId4ArchiveFrom, archiveFrom);
-			ExtraCond extraCond4ArchiveTo = new ExtraCond(archiveTo);
+			
+			DBTbl toTbl = new DBTbl(archiveTo);
 			
 			String sql;
-			sql = " INSERT INTO " + Params.dbName + "." + extraCond4ArchiveTo.tgTbl +
+			sql = " INSERT INTO " + Params.dbName + "." + toTbl.tgTbl +
 				  " ( " +
 				  " `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
 				  " `tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price` " +
-				  " ) " +
-				  " SELECT " +
-				  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
+				  " ) VALUES (" +
+				  TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID + ", " +
 				  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
 				  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
 				  (tg.hasTmpTaste() ? tg.getTmpTaste().getTasteId() : "NULL") + ", " +
 				  (tg.hasTmpTaste() ? "'" + tg.getTmpTastePref() + "'" : "NULL") + ", " +
 				  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
-				  " FROM " + Params.dbName + "." + extraCond4ArchiveTo.tgTbl + " LIMIT 1 ";
+				  ")";
 			
 			dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 			dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -98,11 +93,17 @@ public class TasteGroupDao {
 				throw new SQLException("The id of taste group is not generated successfully.");
 			}
 			
+			//Update the normal taste group id.
+			if(tg.hasNormalTaste()){
+				sql = " UPDATE " + Params.dbName + "." + toTbl.tgTbl + " SET normal_taste_group_id = " + tgId + " WHERE taste_group_id = " + tgId;
+				dbCon.stmt.executeUpdate(sql);
+			}
+			
 			for(Taste normalTaste : tg.getNormalTastes()){
-				sql = " INSERT INTO " + Params.dbName + "." + extraCond4ArchiveTo.ntgTbl +
+				sql = " INSERT INTO " + Params.dbName + "." + toTbl.ntgTbl +
 					  " ( `normal_taste_group_id`, `taste_id` ) " +
 					  " VALUES ( " +
-					  " (SELECT normal_taste_group_id FROM " + Params.dbName + "." + extraCond4ArchiveTo.tgTbl + " WHERE taste_group_id = " + tgId + "), " +
+					  " (SELECT normal_taste_group_id FROM " + Params.dbName + "." + toTbl.tgTbl + " WHERE taste_group_id = " + tgId + "), " +
 					  normalTaste.getTasteId() + 
 					  " ) ";
 				dbCon.stmt.executeUpdate(sql);
@@ -134,21 +135,20 @@ public class TasteGroupDao {
 		ExtraCond extraCond = new ExtraCond(DateType.TODAY);
 		
 		String sql;
-		sql = " INSERT INTO " + Params.dbName + "." + extraCond.tgTbl +
+		sql = " INSERT INTO " + Params.dbName + "." + extraCond.dbTbl.tgTbl +
 			  " ( " +
 			  " `restaurant_id`, " +
 			  " `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
 			  " `tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price` " +
-			  " ) " +
-			  " SELECT " +
+			  " ) VALUES ( " +
 			  staff.getRestaurantId() + ", " +
-			  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
+			  TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID + ", " +
 			  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
 			  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
 			  (tg.hasTmpTaste() ? tg.getTmpTaste().getTasteId() : "NULL") + ", " +
 			  (tg.hasTmpTaste() ? "'" + tg.getTmpTastePref() + "'" : "NULL") + ", " +
 			  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
-			  " FROM " + Params.dbName + "." + extraCond.tgTbl + " LIMIT 1 ";
+			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		//get the generated id to taste group 
@@ -160,11 +160,17 @@ public class TasteGroupDao {
 			throw new SQLException("The id of taste group is not generated successfully.");
 		}
 		
+		//Update the normal taste group id.
+		if(tg.hasNormalTaste()){
+			sql = " UPDATE " + Params.dbName + "." + extraCond.dbTbl.tgTbl + " SET normal_taste_group_id = " + tgId + " WHERE taste_group_id = " + tgId;
+			dbCon.stmt.executeUpdate(sql);
+		}
+		
 		for(Taste normalTaste : tg.getNormalTastes()){
-			sql = " INSERT INTO " + Params.dbName + "." + extraCond.ntgTbl +
+			sql = " INSERT INTO " + Params.dbName + "." + extraCond.dbTbl.ntgTbl +
 				  " ( `normal_taste_group_id`, `taste_id` ) " +
 				  " VALUES ( " +
-				  " (SELECT normal_taste_group_id FROM " + Params.dbName + "." + extraCond.tgTbl + " WHERE taste_group_id = " + tgId + "), " +
+				  " (SELECT normal_taste_group_id FROM " + Params.dbName + "." + extraCond.dbTbl.tgTbl + " WHERE taste_group_id = " + tgId + "), " +
 				  normalTaste.getTasteId() + 
 				  " ) ";
 			dbCon.stmt.executeUpdate(sql);
@@ -180,7 +186,7 @@ public class TasteGroupDao {
 			  " TG.normal_taste_group_id, TG.normal_taste_pref, TG.normal_taste_price, " +
 			  " CASE WHEN (TG.tmp_taste_id IS NULL) THEN 0 ELSE 1 END AS has_tmp_taste, " +
 			  " TG.tmp_taste_id, TG.tmp_taste_pref, TG.tmp_taste_price " +
-			  " FROM " +  Params.dbName + "." + extraCond.tgTbl + " TG " + 
+			  " FROM " +  Params.dbName + "." + extraCond.dbTbl.tgTbl + " TG " + 
 			  " WHERE 1 = 1 " + extraCond;
 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -210,11 +216,9 @@ public class TasteGroupDao {
 			
 			//Get detail of each normal taste to this group in case of today
 			List<Taste> normalTastes = null;
-			if(extraCond.dateType == DateType.TODAY){
-				if(normalTasteGroupId != TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID){
-					sql = " SELECT taste_id FROM " + Params.dbName + "." + extraCond.ntgTbl + " WHERE normal_taste_group_id = " + normalTasteGroupId;
-					normalTastes = TasteDao.getTastes(staff, " AND TASTE.taste_id IN (" + sql + ")", null);
-				}
+			if(normalTasteGroupId != TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID){
+				sql = " SELECT taste_id FROM " + Params.dbName + "." + extraCond.dbTbl.ntgTbl + " WHERE normal_taste_group_id = " + normalTasteGroupId;
+				normalTastes = TasteDao.getTastes(staff, " AND TASTE.taste_id IN (" + sql + ")", null);
 			}
 			
 			result.add(new TasteGroup(tgId, normal, normalTastes, tmp));
@@ -293,14 +297,14 @@ public class TasteGroupDao {
 			String sql;
 			//Delete the associated normal taste.
 			sql = " DELETE NTG " + 
-				  " FROM " + Params.dbName + "." + extraCond.ntgTbl + " NTG " +
-				  " JOIN " + Params.dbName + "." + extraCond.tgTbl + " TG ON NTG.normal_taste_group_id = TG.normal_taste_group_id " +
+				  " FROM " + Params.dbName + "." + extraCond.dbTbl.ntgTbl + " NTG " +
+				  " JOIN " + Params.dbName + "." + extraCond.dbTbl.tgTbl + " TG ON NTG.normal_taste_group_id = TG.normal_taste_group_id " +
 				  " WHERE TG.taste_group_id = " + tg.getGroupId() +
 				  " AND TG.normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID;
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Delete the taste group.
-			sql = " DELETE FROM " + Params.dbName + "." + extraCond.tgTbl + " WHERE taste_group_id = " + tg.getGroupId() + " AND taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID;
+			sql = " DELETE FROM " + Params.dbName + "." + extraCond.dbTbl.tgTbl + " WHERE taste_group_id = " + tg.getGroupId() + " AND taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID;
 			if(dbCon.stmt.executeUpdate(sql) != 0){
 				amount++;
 			}

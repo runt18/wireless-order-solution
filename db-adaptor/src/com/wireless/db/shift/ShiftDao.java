@@ -7,7 +7,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
-import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond4Charge;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
@@ -125,7 +124,7 @@ public class ShiftDao {
 		}
 		dbCon.rs.close();
 		
-		return getByRange(dbCon, staff, new DutyRange(onDuty, System.currentTimeMillis()), new ExtraCond(DateType.TODAY));
+		return getByRange(dbCon, staff, new DutyRange(onDuty, System.currentTimeMillis()), new CalcBillStatisticsDao.ExtraCond(DateType.TODAY));
 	}
 	
 	/**
@@ -162,7 +161,7 @@ public class ShiftDao {
 	 * 	 			throws if the restaurant does NOT exist 
 	 */
 	private static ShiftDetail getCurrentShift(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
-		return getByRange(dbCon, staff, getCurrentShiftRange(dbCon, staff), new ExtraCond(DateType.TODAY));
+		return getByRange(dbCon, staff, getCurrentShiftRange(dbCon, staff), new CalcBillStatisticsDao.ExtraCond(DateType.TODAY));
 	}
 	
 	/**
@@ -220,7 +219,7 @@ public class ShiftDao {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail getByRange(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static ShiftDetail getByRange(Staff staff, DutyRange range, CalcBillStatisticsDao.ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -244,7 +243,7 @@ public class ShiftDao {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail getByRange(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static ShiftDetail getByRange(DBCon dbCon, Staff staff, DutyRange range, CalcBillStatisticsDao.ExtraCond extraCond) throws SQLException{
 		
 		ShiftDetail result = new ShiftDetail(range);
 		
@@ -282,6 +281,47 @@ public class ShiftDao {
 		return result;
 	}
 
+	public static class ExtraCond{
+		final DBTbl dbTbl;
+		ExtraCond(DateType dateType){
+			dbTbl = new DBTbl(dateType);
+		}
+	}
+	
+	/**
+	 * Archive the daily shift records from today to history.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the amount of shift records archived
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int archive4Daily(DBCon dbCon, Staff staff) throws SQLException{
+		return archive(dbCon, staff, null, DateType.TODAY, DateType.HISTORY);
+	}
+	
+	/**
+	 * Archive the expired shift records from history to archive.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the amount of shift records archived
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int archive4Expired(DBCon dbCon, final Staff staff) throws SQLException{
+		ExtraCond extraCond4Expired = new ExtraCond(DateType.HISTORY){
+			@Override
+			public String toString(){
+				return " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(SH.off_duty) > REST.record_alive ";
+			}
+		};
+		return archive(dbCon, staff, extraCond4Expired, DateType.HISTORY, DateType.ARCHIVE);
+	}
+	
 	/**
 	 * Archive the shift records.
 	 * @param dbCon
@@ -292,19 +332,26 @@ public class ShiftDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int archive(DBCon dbCon, Staff staff, DateType archiveFrom, DateType archiveTo) throws SQLException{
+	private static int archive(DBCon dbCon, Staff staff, ExtraCond extraCond, DateType archiveFrom, DateType archiveTo) throws SQLException{
+		DBTbl fromTbl = new DBTbl(archiveFrom);
+		DBTbl toTbl = new DBTbl(archiveTo);
+		
 		String sql;
 		
 		final String shiftItem = "`restaurant_id`, `name`, `on_duty`, `off_duty`";
 		
 		//Move the shift record from 'shift' to 'shift_history'.
-		sql = " INSERT INTO " + Params.dbName + "." + new DBTbl(archiveTo).shiftTbl + "(" + shiftItem + ") " +
-			  " SELECT " + shiftItem + " FROM " + Params.dbName + "." + new DBTbl(archiveFrom).shiftTbl +
-			  " WHERE restaurant_id = " + staff.getRestaurantId();
+		sql = " INSERT INTO " + Params.dbName + "." + toTbl.shiftTbl + "(" + shiftItem + ") " +
+			  " SELECT " + shiftItem + " FROM " + Params.dbName + "." + fromTbl.shiftTbl + " SH " +
+  			  " JOIN " + Params.dbName + ".restaurant REST ON REST.id = SH.restaurant_id " +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() +
+			  (extraCond != null ? extraCond.toString() : "");
 		int amount = dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the today shift records belong to this restaurant.
-		sql = " DELETE FROM " + Params.dbName + "." + new DBTbl(archiveFrom).shiftTbl + " WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id=" + staff.getRestaurantId());
+		sql = " DELETE SH FROM " + Params.dbName + "." + fromTbl.shiftTbl + " SH " +
+			  " JOIN " + Params.dbName + ".restaurant REST ON REST.id = SH.restaurant_id " +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() + (extraCond != null ? extraCond.toString() : "");
 		dbCon.stmt.executeUpdate(sql);
 		
 		return amount;

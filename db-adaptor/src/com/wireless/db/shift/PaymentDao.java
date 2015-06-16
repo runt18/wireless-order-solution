@@ -24,17 +24,12 @@ public class PaymentDao {
 
 	public static class ExtraCond{
 		private final DateType dateType;
-		private final String paymentTbl;
-		
+		protected final DBTbl dbTbl;
 		private int staffId;
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
-			if(this.dateType == DateType.TODAY){
-				paymentTbl = "payment";
-			}else{
-				paymentTbl = "payment_history";
-			}
+			this.dbTbl = new DBTbl(dateType);
 		}
 		
 		public ExtraCond setStaffId(int staffId){
@@ -277,7 +272,7 @@ public class PaymentDao {
 		
 		String sql;
 		sql = " SELECT restaurant_id, staff_id, staff_name, on_duty, off_duty FROM " +
-			  Params.dbName + "." + extraCond.paymentTbl +
+			  Params.dbName + "." + extraCond.dbTbl.paymentTbl +
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond.toString() : "") +
@@ -371,29 +366,59 @@ public class PaymentDao {
 		return result;
 	}
 	
-	
 	/**
-	 * Move the payment record to history.
+	 * Archived the daily payment records from today to history.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @return the amount payment records to move 
+	 * @return the amount to payment records archived
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int archive(DBCon dbCon, Staff staff, DateType archiveFrom, DateType archiveTo) throws SQLException{
+	public static int archive4Daily(DBCon dbCon, Staff staff) throws SQLException{
+		return archive(dbCon, staff, null, DateType.TODAY, DateType.HISTORY);
+	}
+	
+	/**
+	 * Archive the expired payment records from history to archive.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the amount to payment records archived
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statment
+	 */
+	public static int archive4Expired(DBCon dbCon, final Staff staff) throws SQLException{
+		ExtraCond extraCond4Expired = new ExtraCond(DateType.HISTORY){
+			@Override
+			public String toString(){
+				return " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(P.off_duty) > REST.record_alive ";
+			}
+		};
+		return archive(dbCon, staff, extraCond4Expired, DateType.HISTORY, DateType.ARCHIVE);
+	}
+	
+	private static int archive(DBCon dbCon, Staff staff, ExtraCond extraCond, DateType archiveFrom, DateType archiveTo) throws SQLException{
+		DBTbl fromTbl = new DBTbl(archiveFrom);
+		DBTbl toTbl = new DBTbl(archiveTo);
+		
 		final String paymentItem = "`restaurant_id`, `staff_id`, `staff_name`, `on_duty`, `off_duty`";
 		
 		String sql;
-		sql = " INSERT INTO " + Params.dbName + "." + new DBTbl(archiveTo).paymentTbl + 
+		sql = " INSERT INTO " + Params.dbName + "." + toTbl.paymentTbl + 
 			  "(" + paymentItem + ")" +
-			  " SELECT " + paymentItem + " FROM " + Params.dbName + "." + new DBTbl(archiveFrom).paymentTbl +
-			  " WHERE restaurant_id = " + staff.getRestaurantId();
+			  " SELECT " + paymentItem + " FROM " + Params.dbName + "." + fromTbl.paymentTbl + " P " +
+			  " JOIN " + Params.dbName + ".restaurant REST ON REST.id = P.restaurant_id " +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() +
+			  (extraCond != null ? extraCond.toString() : "");
 		
 		int amount = dbCon.stmt.executeUpdate(sql);
 		
-		sql = " DELETE FROM " + Params.dbName + "." + new DBTbl(archiveFrom).paymentTbl + " WHERE restaurant_id = " + staff.getRestaurantId();
+		sql = " DELETE P FROM " + Params.dbName + "." + fromTbl.paymentTbl + " P " +
+			  " JOIN " + Params.dbName + ".restaurant REST ON REST.id = P.restaurant_id " +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() + (extraCond != null ? extraCond.toString() : "");
 		dbCon.stmt.executeUpdate(sql);
 		
 		return amount;

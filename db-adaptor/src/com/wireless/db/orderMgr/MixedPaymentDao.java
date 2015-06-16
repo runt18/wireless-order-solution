@@ -150,11 +150,13 @@ public class MixedPaymentDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static ArchiveResult archive(DBCon dbCon, Staff staff, Order order, DateType archiveFrom, DateType archiveTo) throws SQLException{
+		DBTbl fromTbl = new DBTbl(archiveFrom);
+		DBTbl toTbl = new DBTbl(archiveTo);
 		final String item = "order_id, pay_type_id, price";
 		String sql;
-		sql = " INSERT INTO " + Params.dbName + "." + new ExtraCond(archiveTo, order).mixedPaymentTbl +
+		sql = " INSERT INTO " + Params.dbName + "." + toTbl.mixedTbl +
 			  " ( " + item + " ) " +
-			  " SELECT order_id, pay_type_id, price FROM " + Params.dbName + "." + new ExtraCond(archiveFrom, order).mixedPaymentTbl + " WHERE order_id = " + order.getId();
+			  " SELECT order_id, pay_type_id, price FROM " + Params.dbName + "." + fromTbl.mixedTbl + " WHERE order_id = " + order.getId();
 		return new ArchiveResult(archiveFrom, archiveTo, dbCon.stmt.executeUpdate(sql));
 	}
 	

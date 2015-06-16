@@ -76,14 +76,13 @@ public class OrderDao {
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
+			DBTbl dbTbl = new DBTbl(dateType);
+			this.orderTbl = dbTbl.orderTbl;
+			this.orderFoodTbl = dbTbl.orderFoodTbl;
 			if(dateType == DateType.TODAY){
 				orderTblAlias = "O";
-				orderTbl = "order";
-				orderFoodTbl = "order_food";
 			}else{
 				orderTblAlias = "OH";
-				orderTbl = "order_history";
-				orderFoodTbl = "order_food_history";
 			}
 		}
 		
@@ -1161,28 +1160,22 @@ public class OrderDao {
 		for(Order order : getByCond(dbCon, staff, extraCond, null)){
 			String sql;
 
-			TasteGroupDao.ExtraCond tgCond = new TasteGroupDao.ExtraCond(extraCond.dateType);
+			DBTbl dbTbl = new DBTbl(extraCond.dateType);
 			//Delete the records to normal taste group. 
-			sql = " DELETE FROM " + Params.dbName + "." + tgCond.ntgTbl +
-			      " WHERE " +
-				  " normal_taste_group_id IN (" +
-					  " SELECT normal_taste_group_id " +
-					  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " +
-					  " JOIN " + Params.dbName + "." + tgCond.tgTbl + " TG ON OF.taste_group_id = TG.taste_group_id " +
-					  " WHERE 1 = 1 " + 
-					  " AND OF.order_id = " + order.getId() +
-					  " AND TG.normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
-				  " ) ";
+			sql = " DELETE NTG FROM " + Params.dbName + "." + dbTbl.ntgTbl + " NTG " +
+				  " JOIN " + Params.dbName + "." + dbTbl.tgTbl + " TG ON NTG.normal_taste_group_id = TG.normal_taste_group_id " +
+				  " JOIN " + Params.dbName + "." + extraCond.orderFoodTbl + " OF ON OF.taste_group_id = TG.taste_group_id " +
+				  " WHERE 1 = 1 " + 
+				  " AND OF.order_id = " + order.getId() +
+				  " AND TG.normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID;
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Delete the records to taste group.
-			sql = " DELETE FROM " + Params.dbName + "." + tgCond.tgTbl +
-			      " WHERE taste_group_id IN (" +
-					  " SELECT taste_group_id FROM " + Params.dbName + "." + extraCond.orderFoodTbl +
-				      " WHERE 1 = 1 " + 
-					  " AND order_id = " + order.getId() +
-					  " AND taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
-				  " ) ";
+			sql = " DELETE TG FROM " + Params.dbName + "." + dbTbl.tgTbl + " TG " +
+				  " JOIN " + Params.dbName + "." + extraCond.orderFoodTbl + " OF ON TG.taste_group_id = OF.taste_group_id " +
+			      " WHERE 1 = 1 " + 
+				  " AND OF.order_id = " + order.getId() +
+				  " AND TG.taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
 			dbCon.stmt.executeUpdate(sql);
 			
 			//delete the records related to the order id and food id in "order_food" table
@@ -1196,8 +1189,8 @@ public class OrderDao {
 			//Delete the associated mixed payment.
 			MixedPaymentDao.deleteByCond(dbCon, staff, new MixedPaymentDao.ExtraCond(extraCond.dateType, order.getId()));
 			
-			//Delete the temporary table in case of joined or take out
-			if(!order.getDestTbl().getCategory().isNormal()){
+			//Delete the temporary table
+			if(extraCond.dateType.isToday() && !order.getDestTbl().getCategory().isNormal()){
 				try {
 					TableDao.deleteById(dbCon, staff, order.getDestTbl().getId());
 				} catch (BusinessException ignored) {
@@ -1237,38 +1230,82 @@ public class OrderDao {
 		}
 	}
 	
-	public static ArchiveResult archive(DBCon dbCon, Staff staff, DateType archiveFrom, DateType archiveTo) throws SQLException, BusinessException{
+	/**
+	 * Archive the daily record from today to history.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the archive result
+	 * @throws SQLException
+	 * 			throws if failed to execute SQL statement
+	 */
+	public static ArchiveResult archive4Daily(DBCon dbCon, Staff staff) throws SQLException{
 		String sql;
-		DBTbl fromTbl = new DBTbl(archiveFrom);
+		DBTbl fromTbl = new DBTbl(DateType.TODAY);
+		DBTbl toTbl = new DBTbl(DateType.HISTORY);
+		
+		//Calculate the max order id from both today and history.
+		int maxId = 0;
+		sql = " SELECT MAX(id) + 1 FROM (" + 
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + "." + fromTbl.orderTbl +
+			  " UNION " +
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + "." + toTbl.orderTbl + ") AS all_order";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			maxId = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
+		
+		sql = " DELETE FROM " + Params.dbName + ".order WHERE restaurant_id = " + Restaurant.ADMIN;
+		dbCon.stmt.executeUpdate(sql);
+		
+		sql = " INSERT INTO " + Params.dbName + ".order " +
+			  " ( id, restaurant_id ) VALUES " +
+			 "(" + maxId + "," + Restaurant.ADMIN + ")";
+		dbCon.stmt.executeUpdate(sql);
+		
+		return archive(dbCon, staff, new ExtraCond(DateType.TODAY).addStatus(Order.Status.PAID).addStatus(Order.Status.REPAID), DateType.TODAY, DateType.HISTORY);
+		
+	}
+	
+	/**
+	 * Archive the expired records from history to archive.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the archive result {@link ArchiveResult}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static ArchiveResult archive4Expired(DBCon dbCon, final Staff staff) throws SQLException{
+		ExtraCond extraCond4Expired = new ExtraCond(DateType.HISTORY){
+			@Override
+			public String toString(){
+				String sql;
+				sql = " SELECT OH.id FROM " + Params.dbName + ".order_history OH " +
+					  " JOIN " + Params.dbName + ".restaurant REST ON REST.id = OH.restaurant_id " +
+					  " WHERE 1 = 1 " +
+					  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(OH.order_date) > REST.record_alive " +
+					  " AND REST.id = " + staff.getRestaurantId();
+				return " AND " + orderTblAlias + ".id IN ( " + sql + ")";
+			}
+		};
+		
+		return archive(dbCon, staff, extraCond4Expired, DateType.HISTORY, DateType.ARCHIVE);
+	}
+	
+	private static ArchiveResult archive(DBCon dbCon, Staff staff, ExtraCond extraCond, DateType archiveFrom, DateType archiveTo) throws SQLException{
 		DBTbl toTbl = new DBTbl(archiveTo);
 		
-		if(archiveFrom == DateType.TODAY){
-			//Calculate the max order id from both today and history.
-			int maxId = 0;
-			sql = " SELECT MAX(id) + 1 FROM (" + 
-				  " SELECT MAX(id) AS id FROM " + Params.dbName + "." + fromTbl.orderTbl +
-				  " UNION " +
-				  " SELECT MAX(id) AS id FROM " + Params.dbName + "." + toTbl.orderTbl + ") AS all_order";
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				maxId = dbCon.rs.getInt(1);
-			}
-			dbCon.rs.close();
-			
-			sql = " DELETE FROM " + Params.dbName + ".order WHERE restaurant_id = " + Restaurant.ADMIN;
-			dbCon.stmt.executeUpdate(sql);
-			
-			sql = " INSERT INTO " + Params.dbName + ".order " +
-				  " ( id, restaurant_id ) VALUES " +
-				 "(" + maxId + "," + Restaurant.ADMIN + ")";
-			dbCon.stmt.executeUpdate(sql);
-		}
+		String sql;
 		
 		int amount = 0;
 		int ofAmount = 0;
 		int tgAmount = 0;
 		int mixedAmount = 0;
-		for(Order order : getByCond(dbCon, staff, new ExtraCond(archiveFrom).addStatus(Order.Status.PAID).addStatus(Order.Status.REPAID), null)){
+		for(Order order : getByCond(dbCon, staff, extraCond, null)){
 			sql = " INSERT INTO " + Params.dbName + "." + toTbl.orderTbl + "(" +
 				  "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
 				  "`discount_staff`, `discount_staff_id`, `discount_date`," +
@@ -1325,119 +1362,5 @@ public class OrderDao {
 		
 		return new ArchiveResult(archiveFrom, archiveTo, amount, ofAmount, tgAmount, mixedAmount);
 	}
-	
-//	public static class Result{
-//		private final OrderDao.ArchiveResult orderArchive;
-//		private final OrderFoodDao.ArchiveResult ofArchive;
-//		private final TasteGroupDao.ArchiveResult tgArchive;
-//		private final MixedPaymentDao.ArchiveResult mixedArchive;
-//		
-//		Result(OrderDao.ArchiveResult orderArchive, MixedPaymentDao.ArchiveResult mixedArchive, OrderFoodDao.ArchiveResult orderFoodArchive, TasteGroupDao.ArchiveResult tgArchive){
-//			this.orderArchive = orderArchive;
-//			this.mixedArchive = mixedArchive;
-//			this.ofArchive = orderFoodArchive;
-//			this.tgArchive = tgArchive;
-//		}
-//		
-//		Result(){
-//			orderArchive = new OrderDao.ArchiveResult(0, 0);
-//			mixedArchive = new MixedPaymentDao.ArchiveResult(0);
-//			ofArchive = new OrderFoodDao.ArchiveResult(0, 0);
-//			tgArchive = new TasteGroupDao.ArchiveResult(0, 0, 0, 0);
-//		}
-//		
-//		public OrderDao.ArchiveResult getOrderArchive(){
-//			return this.orderArchive;
-//		}
-//
-//		public MixedPaymentDao.ArchiveResult getMixedArchive(){
-//			return this.mixedArchive;
-//		}
-//		
-//		public OrderFoodDao.ArchiveResult getOrderFoodArchive(){
-//			return this.ofArchive;
-//		}
-//		
-//		public TasteGroupDao.ArchiveResult getTgArchive(){
-//			return this.tgArchive;
-//		}
-//	}
-	
-//	public static Result archive(DBCon dbCon, Staff staff) throws SQLException{
-//		StringBuilder paidOrderCond = new StringBuilder();
-//		
-//		String sql;
-//		//Get the amount and id to paid orders
-//		sql = " SELECT id FROM " + Params.dbName + ".order " +
-//			  " WHERE (status = " + Order.Status.PAID.getVal() + " OR status = " + Order.Status.REPAID.getVal() + ")" +
-//			 (staff.getRestaurantId() < 0 ? "" : "AND restaurant_id=" + staff.getRestaurantId());
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
-//		while(dbCon.rs.next()){
-//			paidOrderCond.append(dbCon.rs.getInt("id")).append(",");
-//		}
-//		dbCon.rs.close();
-//		
-//		if(paidOrderCond.length() > 0){
-//			paidOrderCond.deleteCharAt(paidOrderCond.length() - 1);
-//
-//			//Archive the taste group.
-//			TasteGroupDao.ArchiveResult tgArchive = TasteGroupDao.archive(dbCon, staff, paidOrderCond.toString());
-//			
-//			//Archive the order food.
-//			OrderFoodDao.ArchiveResult ofArchive = OrderFoodDao.archive(dbCon, staff, paidOrderCond.toString());
-//
-//			//Archive the mixed payment.
-//			MixedPaymentDao.ArchiveResult mixedArchive = MixedPaymentDao.archive(dbCon, paidOrderCond.toString());
-//
-//			//Archive the order.
-//			OrderDao.ArchiveResult orderArchive = OrderDao.archive(dbCon, staff, paidOrderCond.toString());
-//			
-//			return new Result(orderArchive, mixedArchive, ofArchive, tgArchive);
-//			
-//		}else{
-//			return new Result();
-//		}
-//		
-//	}
-	
-//	private static ArchiveResult archive(DBCon dbCon, Staff staff, String paidOrder) throws SQLException{
-//		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
-//				"`discount_staff`, `discount_staff_id`, `discount_date`," +
-//				"`cancel_price`, `discount_price`, `gift_price`, `coupon_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
-//				"`waiter`, `settle_type`, `pay_type_id`, `category`, `staff_id`, " +
-//				"`region_id`, `region_name`, `table_id`, `table_alias`, `table_name`, `service_rate`, `comment`";
-//		
-//		String sql;
-//		//Move the paid order from "order" to "order_history".
-//		sql = " INSERT INTO " + Params.dbName + ".order_history (" + orderItem + ") " + 
-//			  " SELECT " + orderItem + " FROM " + Params.dbName + ".order WHERE id IN " + "(" + paidOrder + ")";
-//		int amount = dbCon.stmt.executeUpdate(sql);
-//		
-//		//Calculate the max order id from both today and history.
-//		int maxId = 0;
-//		sql = " SELECT MAX(id) + 1 FROM (" + 
-//			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order " +
-//			  " UNION " +
-//			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_history) AS all_order";
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
-//		if(dbCon.rs.next()){
-//			maxId = dbCon.rs.getInt(1);
-//		}
-//		dbCon.rs.close();
-//		
-//		sql = " DELETE FROM " + Params.dbName + ".order WHERE restaurant_id = " + Restaurant.ADMIN;
-//		dbCon.stmt.executeUpdate(sql);
-//		
-//		sql = " INSERT INTO " + Params.dbName + ".order " +
-//			  " ( id, restaurant_id ) VALUES " +
-//			 "(" + maxId + "," + Restaurant.ADMIN + ")";
-//		dbCon.stmt.executeUpdate(sql);
-//		
-//		//Delete the paid order from "order" table.
-//		sql = " DELETE FROM " + Params.dbName + ".order WHERE id IN ( " + paidOrder + ")";
-//		dbCon.stmt.executeUpdate(sql);
-//		
-//		return new ArchiveResult(maxId, amount);
-//	}
 	
 }
