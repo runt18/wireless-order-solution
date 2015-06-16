@@ -260,12 +260,12 @@ function initOperateMaterialWin(){
 			modal : true,
 			resizable : false,
 			closable : false,
-			width : 250,
+			width : 300,
 			items : [{
 				xtype : 'form',
 				layout : 'form',
 				labelWidth : 65,
-				width : 250,
+				width : 300,
 				frame : true,
 				defaults : {
 					width : 130
@@ -285,7 +285,84 @@ function initOperateMaterialWin(){
 					Ext.getCmp('btnAddMaterial').handler();
 				}
 			}],
-			bbar : ['->', {
+			bbar : [ {
+				text : '上一个',
+		    	id : 'btnPreviousFoodMaterial',
+		    	iconCls : 'btn_previous',
+		    	tooltip : '加载上一道菜品相关信息',
+		    	handler : function(){
+		    		inventory_materialBasicGrid.getSelectionModel().selectPrevious();
+		    		
+		    		var materialId = Ext.getCmp('hideMaterialId');
+		    		var materialName = Ext.getCmp('txtMaterialName');
+		    		var materialCate = Ext.getCmp('txtMaterialCate');
+		    		var materialPrice = Ext.getCmp('txtMaterialPrice');
+		    		
+		    		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
+
+		    		operateMaterialWin.cateType = data['cateType'];
+		    		
+		    		if(data['cateType'] == 1){
+		    			Ext.getCmp('txtMaterialCate').store.loadData(materialGoodCateData);
+		    			materialId.setValue(data['id']);
+		    			materialName.setValue(data['name']);
+		    			materialPrice.setValue(data['price']);
+		    			materialCate.setValue(data['cateId']);	
+		    			
+		    			materialPrice.focus(true, 100);
+		    		}else{
+		    			Ext.getCmp('txtMaterialCate').store.loadData(materialCateData);
+		    			materialId.setValue(data['id']);
+		    			materialName.setValue(data['name']);
+		    			materialCate.setValue(data['cateId']);	
+		    			materialPrice.setValue(data['price']);
+		    			
+		    			materialName.focus(true, 100);
+		    		}
+		    		operateMaterialWin.cateId = data['cateId'];
+		    		
+		    		Ext.getCmp('btnPreviousFoodMaterial').setDisabled(!inventory_materialBasicGrid.getSelectionModel().hasPrevious());
+		    		Ext.getCmp('btnNextFoodMaterial').setDisabled(false);
+		    	}
+		    }, {
+		    	text : '下一个',
+		    	id : 'btnNextFoodMaterial',
+		    	iconCls : 'btn_next',
+		    	tooltip : '加载下一道菜品相关信息',
+		    	handler : function(){
+		    		inventory_materialBasicGrid.getSelectionModel().selectNext();
+		    		var materialId = Ext.getCmp('hideMaterialId');
+		    		var materialName = Ext.getCmp('txtMaterialName');
+		    		var materialCate = Ext.getCmp('txtMaterialCate');
+		    		var materialPrice = Ext.getCmp('txtMaterialPrice');
+		    		
+		    		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
+
+		    		operateMaterialWin.cateType = data['cateType'];
+		    		
+		    		if(data['cateType'] == 1){
+		    			Ext.getCmp('txtMaterialCate').store.loadData(materialGoodCateData);
+		    			materialId.setValue(data['id']);
+		    			materialName.setValue(data['name']);
+		    			materialPrice.setValue(data['price']);
+		    			materialCate.setValue(data['cateId']);	
+		    			
+		    			materialPrice.focus(true, 100);
+		    		}else{
+		    			Ext.getCmp('txtMaterialCate').store.loadData(materialCateData);
+		    			materialId.setValue(data['id']);
+		    			materialName.setValue(data['name']);
+		    			materialCate.setValue(data['cateId']);	
+		    			materialPrice.setValue(data['price']);
+		    			
+		    			materialName.focus(true, 100);
+		    		}
+		    		operateMaterialWin.cateId = data['cateId'];
+		    		
+		    		Ext.getCmp('btnPreviousFoodMaterial').setDisabled(false);
+		    		Ext.getCmp('btnNextFoodMaterial').setDisabled(!inventory_materialBasicGrid.getSelectionModel().hasNext());
+		    	}
+		    },'->', {
 				text : '保存',
 				id : 'btnAddMaterial',
 				iconCls : 'btn_save',
@@ -361,6 +438,9 @@ function initOperateMaterialWin(){
 					
 					Ext.getCmp('txtMaterialName').clearInvalid();
 					Ext.getCmp('txtMaterialPrice').clearInvalid();
+					
+					Ext.getCmp('btnPreviousFoodMaterial').setDisabled(false);
+					Ext.getCmp('btnNextFoodMaterial').setDisabled(false);
 				}
 			}
 		});
@@ -383,6 +463,10 @@ function operateMaterialHandler(c){
 	var materialName = Ext.getCmp('txtMaterialName');
 	var materialCate = Ext.getCmp('txtMaterialCate');
 	var materialPrice = Ext.getCmp('txtMaterialPrice');
+	
+	var btnPreviousFoodMaterial = Ext.getCmp('btnPreviousFoodMaterial');
+	var btnNextFoodMaterial = Ext.getCmp('btnNextFoodMaterial');
+	
 	if(c.otype == Ext.ux.otype['insert']){
 		
 		materialId.setValue();
@@ -392,9 +476,16 @@ function operateMaterialHandler(c){
 		materialCate.clearInvalid();
 		materialCate.setDisabled(false);
 		
+		btnPreviousFoodMaterial.setVisible(false);
+		btnNextFoodMaterial.setVisible(false);
+		
 		operateMaterialWin.setTitle('');
 		materialName.show();
 		materialCate.show();
+		
+		setTimeout(function(){
+			materialCate.store.loadData(materialGoodCateData.concat(materialCateData));
+		}, 250);
 		
 		var node = materialCateTree.getSelectionModel().getSelectedNode();
 		if(node && typeof node.attributes.cateId != 'undefined' && node.attributes.cateId != -1 && node.attributes.type != 1) {
@@ -411,13 +502,15 @@ function operateMaterialHandler(c){
 			Ext.example.msg('提示', '请选中一条原料信息再进行操作.');
 			return;
 		}
+		btnPreviousFoodMaterial.setVisible(true);
+		btnNextFoodMaterial.setVisible(true);
 		
 		operateMaterialWin.show();
 
 		operateMaterialWin.cateType = data['cateType'];
 		
 		if(data['cateType'] == 1){
-			Ext.getCmp('txtMaterialCate').store.loadData(materialGoodCateData);
+			materialCate.store.loadData(materialGoodCateData);
 			materialId.setValue(data['id']);
 			materialName.setValue(data['name']);
 			materialPrice.setValue(data['price']);
@@ -425,7 +518,7 @@ function operateMaterialHandler(c){
 			
 			materialPrice.focus(true, 100);
 		}else{
-			Ext.getCmp('txtMaterialCate').store.loadData(materialCateData);
+			materialCate.store.loadData(materialCateData);
 			materialId.setValue(data['id']);
 			materialName.setValue(data['name']);
 			materialCate.setValue(data['cateId']);	
@@ -541,6 +634,8 @@ function initControl(){
 	        			params : {dataSource : 'normal'},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
+							materialCateData.length = 0;
+							materialGoodCateData.length = 0;
 							for (var i = 0; i < jr.root.length; i++) {
 								if(jr.root[i].typeValue == 2){
 									materialCateData.push([jr.root[i].id, jr.root[i].name]);
