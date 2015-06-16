@@ -20,6 +20,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction.Status;
+import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockReport;
 
 public class QueryReportAction extends Action {
@@ -45,7 +46,7 @@ public class QueryReportAction extends Action {
 			List<StockReport> stockReportPage = new ArrayList<StockReport>() ;
 			int roots = 0;
 			String extra = "";
-			extra += " AND S.status = " + Status.AUDIT.getVal();
+			extra += " AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") ";
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			if(beginDate == null || cateType == null){
 					
