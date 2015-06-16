@@ -185,14 +185,6 @@ public class CostAnalyzeReportDao {
 	 * @throws SQLException
 	 */
 	public static float getMoney(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
-/*		String sql = "SELECT SUM(D.price * D.amount) as money " + 
-				" FROM " + Params.dbName + ".stock_action as S  INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +  
-				" WHERE S.restaurant_id = " + term.getRestaurantId() +
-				" AND S.status = " + StockAction.Status.AUDIT.getVal() +
-				(extraCond == null ? "" : extraCond) +
-				" GROUP BY S.id " +
-				(orderClause == null ? "" : orderClause);*/
-		
 		String sql = "SELECT SUM(D.price * D.amount) AS money FROM " + Params.dbName + ".stock_action_detail as D " +
 		" JOIN " + Params.dbName + ".stock_action as S ON S.id = D.stock_action_id "+
 		" WHERE S.restaurant_id = " + term.getRestaurantId() +

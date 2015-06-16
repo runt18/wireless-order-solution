@@ -12,10 +12,10 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
-import com.wireless.pojo.stockMgr.StockAction.Status;
-import com.wireless.pojo.stockMgr.StockAction.SubType;
 
 public class StockDeltaReportDao {
 
@@ -59,6 +59,7 @@ public class StockDeltaReportDao {
 		}
 		
 		for (StockReport stockReport : stockReports) {
+			//在stockTake中加期初,期末等字段当做消耗差异表model
 			StockTakeDetail stockTakeDetail = new StockTakeDetail();
 			stockTakeDetail.setMaterialId(stockReport.getMaterial().getId());
 			stockTakeDetail.setMaterialName(stockReport.getMaterial().getName());
@@ -67,16 +68,6 @@ public class StockDeltaReportDao {
 			actualFinalAmount = stockReport.getFinalAmount();
 			//期末数量
 			stockTakeDetail.setEndAmount(actualFinalAmount);
-			
-/*			//理论消耗
-			float expectAmount = stockReport.getPrimeAmount() + stockReport.getStockIn() + stockReport.getStockInTransfer() + stockReport.getStockSpill() - stockReport.getStockOut() - stockReport.getStockOutTransfer() - stockReport.getStockDamage() - actualFinalAmount;
-			stockTakeDetail.setExpectAmount(expectAmount);
-			//差异
-			float deltaAmount = stockReport.getStockTakeMore()  - stockReport.getStockTakeLess();
-			stockTakeDetail.setDeltaAmount(deltaAmount);
-			//实际消耗	
-			float actualAmount = expectAmount - deltaAmount;
-			stockTakeDetail.setActualAmount(actualAmount);*/
 			
 			//理论消耗(销售量)
 			float expectAmount = stockReport.getUseUp();
@@ -167,7 +158,8 @@ public class StockDeltaReportDao {
 							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")" +
 							" AND S.ori_stock_date <= '" + end + " 23:59:59' AND D.material_id = " + materialId + 
-							" AND S.status = " + Status.AUDIT.getVal() +
+							" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
+							
 							" ORDER BY D.id DESC LIMIT 0,1";
 					endAmountCon.rs = endAmountCon.stmt.executeQuery(endAmount);
 					
@@ -200,7 +192,7 @@ public class StockDeltaReportDao {
 							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")" +
 							" AND S.ori_stock_date < '" + begin + "' AND D.material_id = " + materialId + 
-							" AND S.status = " + Status.AUDIT.getVal() +
+							" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
 							" ORDER BY D.id DESC LIMIT 0,1";
 		
 					primeAmountCon.rs = primeAmountCon.stmt.executeQuery(primeAmount);

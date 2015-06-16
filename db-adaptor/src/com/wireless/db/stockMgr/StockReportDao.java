@@ -12,7 +12,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.stockMgr.StockAction.Status;
+import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockReport;
 
@@ -149,7 +149,7 @@ public class StockReportDao {
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D  ON S.id = D.stock_action_id " +
 							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND S.ori_stock_date <= '" + end + " 23:59:59' AND D.material_id = " + materialId + 
-							" AND S.status = " + Status.AUDIT.getVal() +
+							" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
 							" ORDER BY D.id DESC LIMIT 0,1";
 					endAmountCon.rs = endAmountCon.stmt.executeQuery(endAmount);
 					
@@ -168,7 +168,7 @@ public class StockReportDao {
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D  ON S.id = D.stock_action_id " + 
 							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND S.ori_stock_date < '" + begin + "' AND D.material_id = " + materialId + 
-							" AND S.status = " + Status.AUDIT.getVal() +
+							" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
 							" ORDER BY D.id DESC LIMIT 0,1";
 		
 					primeAmountCon.rs = primeAmountCon.stmt.executeQuery(primeAmount);
@@ -293,7 +293,7 @@ public class StockReportDao {
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D  ON S.id = D.stock_action_id " +
 							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND S.ori_stock_date <= '" + end + " 23:59:59' AND D.material_id = " + materialId + 
-							" AND S.status = " + Status.AUDIT.getVal() +
+							" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
 							" AND (S.dept_in = " + deptId + " OR S.dept_out = " + deptId + ") " + 
 							" ORDER BY D.id DESC LIMIT 0,1";
 					endAmountCon.rs = endAmountCon.stmt.executeQuery(endAmount);
@@ -319,7 +319,7 @@ public class StockReportDao {
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D  ON S.id = D.stock_action_id " + 
 							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND S.ori_stock_date <= '" + begin + "' AND D.material_id = " + materialId + 
-							" AND S.status = " + Status.AUDIT.getVal() +
+							" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
 							" AND (S.dept_in = " + deptId + " OR S.dept_out = " + deptId + ") " + 
 							" ORDER BY D.id DESC LIMIT 0,1";
 		

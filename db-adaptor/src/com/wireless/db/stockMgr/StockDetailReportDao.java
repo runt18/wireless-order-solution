@@ -24,7 +24,8 @@ public class StockDetailReportDao {
 						"INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +  
 						" WHERE S.restaurant_id = " + term.getRestaurantId() +
 						(materialId != -1 ? " AND D.material_id = " + materialId : "")+ 
-						" AND S.status = " + StockAction.Status.AUDIT.getVal() +
+						" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
+						
 						(extraCond == null ? "" : extraCond) +
 						(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -45,7 +46,7 @@ public class StockDetailReportDao {
 						"INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +  
 						" WHERE S.restaurant_id = " + term.getRestaurantId() +
 						(materialId != -1 ? " AND D.material_id = " + materialId : "")+  
-						" AND S.status = " + StockAction.Status.AUDIT.getVal() +
+						" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
 						(extraCond == null ? "" : extraCond) +
 						(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -80,7 +81,7 @@ public class StockDetailReportDao {
 						"INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +  
 						" WHERE S.restaurant_id = " + term.getRestaurantId() +
 						(materialId != -1 ? " AND D.material_id = " + materialId : "")+  
-						" AND S.status = " + StockAction.Status.AUDIT.getVal() +
+						" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
 						(extraCond == null ? "" : extraCond) +
 						(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
