@@ -817,6 +817,79 @@ of.initNewFoodContent = function(c){
 };
 
 /**
+ * 打开分席
+ */
+of.openSplitOrderWin = function(c){
+	$('#splitOrderCount').val("");
+	$('#orderFoodOtherOperateCmp').popup('close');	
+	
+	
+	setTimeout(function(){
+		$('#splitOrderWin').popup('open');
+		$('#splitOrderWin').parent().addClass("pop").addClass("in");
+		
+		firstTimeInput = true;
+		setTimeout(function(){
+			$('#splitOrderCount').focus();
+		}, 200);
+	}, 250);
+
+};
+
+/**
+ * 账单分席上
+ */
+of.saveForSplitOrder = function(){
+	var count = $('#splitOrderCount').val();
+	var temp;
+	for(var i = 0; i < of.newFood.length; i++){
+		temp = of.newFood[i];
+		//转换为int
+		temp.count =  parseInt(count);
+		if(!temp.tasteGroup.normalTaste){
+			temp.tasteGroup.normalTaste = {
+				name : '',
+				price : 0
+			}
+		}
+		
+		if(typeof temp.tasteGroup.tmpTaste != 'undefined'){
+			//如果已经是分席上, 则截取前段拼上分席
+			var splitName;
+			var index = temp.tasteGroup.tmpTaste.name.indexOf("席上");
+			if(index > 0){
+				splitName = temp.tasteGroup.tmpTaste.name.substring(0, temp.tasteGroup.tmpTaste.name.indexOf("分 "));
+				splitName += (splitName?", 分 " + count + " 席上" : "分 " + count + " 席上");
+			}else{//如果不是则直接拼上分席
+				splitName = temp.tasteGroup.tmpTaste.name + ", 分 " + count + " 席上";
+			}
+			
+			//口味显示分席
+			var newstr=temp.tasteGroup.normalTaste.name.replace(temp.tasteGroup.tmpTaste.name,splitName);  
+			temp.tasteGroup.tmpTaste.name = splitName;
+			temp.tasteGroup.normalTaste.name = newstr;
+			temp.tasteGroup.tastePref = temp.tasteGroup.normalTaste.name;			
+		}else{
+			var tempTasteData = {
+				name : "分 " + count + " 席上",
+				id : -11,
+				cateStatusValue : 2,
+				price : 0,
+				isTemp : true
+			}
+			//口味显示分席
+			temp.tasteGroup.tmpTaste = tempTasteData;
+			temp.tasteGroup.normalTaste.name += (temp.tasteGroup.normalTaste.name ? ',' + tempTasteData.name : tempTasteData.name);
+			temp.tasteGroup.tastePref = temp.tasteGroup.normalTaste.name;
+		}		
+	}
+	
+	of.initNewFoodContent();
+	
+	$('#splitOrderWin').popup('close');
+}
+
+/**
  * 选中菜品
  */
 of.selectNewFood = function(c){

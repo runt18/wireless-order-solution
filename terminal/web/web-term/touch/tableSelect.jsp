@@ -1246,6 +1246,7 @@
 		        	<li class="tempFoodKitchen" onclick="of.updateFoodUnitPrice()"><a>修改时价</a></li>
 		            <li class="tempFoodKitchen" onclick="operateOrderFoodTaste({type:1})"><a >全单口味</a></li>
 		            <li class="tempFoodKitchen" onclick="of.foodHangup({type : 1})"><a >全单叫起</a></li>
+		            <li class="tempFoodKitchen" onclick="of.openSplitOrderWin()"><a >分席上</a></li>
 		        </ul>
 			</div>		     
 		     
@@ -1471,6 +1472,47 @@
 			 </div>
 	    </div>
 	</div>	
+	
+	<!-- 分席上 -->
+	<div id="splitOrderWin" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
+	    <div data-role="header" data-theme="b" class="ui-corner-top">
+	        <h1>输入分席数</h1>
+	    </div>
+	    <div style="min-height: 300px; overflow-y: auto;">
+			<div class="calculator">
+				<div class="top">
+					<span class="clear">+</span>
+					<span class="inputs">
+						<input id="splitOrderCount" style="font-size: 20px;font-weight: bold;" onfocus="setInput('splitOrderCount')">
+					</span>
+					<span class="clear">-</span>
+				</div>
+				<div class="keys">
+					<span>7</span>
+					<span>8</span>
+					<span>9</span>
+					<span>0</span>
+					
+					<span>4</span>
+					<span>5</span>
+					<span>6</span>
+					<span>.</span>
+					
+					<span>1</span>
+					<span>2</span>
+					<span>3</span>
+					<span class="clear">C</span>
+				</div>
+			</div>		    
+	    
+		</div>	
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.saveForSplitOrder()">确定</a>
+				 <a  data-role="button" data-inline="true" data-rel="back" class="countPopbottomBtn">取消</a>		 
+			 </div>
+	    </div>
+	</div>		
 	
 	<!-- 助记码输入 -->
 	<div id="orderFoodByAliasCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
