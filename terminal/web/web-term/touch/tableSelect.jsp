@@ -1249,7 +1249,6 @@
 		            <li class="tempFoodKitchen" onclick="of.openSplitOrderWin()"><a >分席上</a></li>
 		        </ul>
 			</div>		     
-		     
 		   </div>			     
 	     
 	     </div>
