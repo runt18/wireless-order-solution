@@ -276,8 +276,8 @@ Ext.onReady(function(){
 //	         {header:'id', dataIndex:'id', hidden: true },
 	         {header:'日期', dataIndex:'date'},
 	         {header:'单号', dataIndex:'oriStockId'},
-	         {header:'部门', dataIndex:'dept', width:160},
-	         {header:'货品名称', dataIndex:'materialName'},
+	         {header:'货品名称', dataIndex:'materialName', width:160},
+	         {header:'部门', dataIndex:'dept'},
 	         {header:'入库类型', dataIndex:'stockInSubType', width:100},
 	         {header:'入库数量', dataIndex:'stockInAmount', align : 'right', renderer : renderFormat},
 	         {header:'入库金额', dataIndex:'stockInMoney', align : 'right', renderer : renderFormat},
@@ -287,9 +287,7 @@ Ext.onReady(function(){
 	         {header:'结存数量', dataIndex:'remaining', align : 'right', renderer : renderFormat},
 	         {header:'操作人', dataIndex:'operater'}
 	]);
-	
 	cm.defaultSortable = true;
-	//var data = {root: [{"id":426,"stockInSubType":"","remaining":3,"stockOutAmount":10,"stockInMoney":"1231231","oriStockId":"","stockOutMoney":15,"stockOutSubType":"盘亏","dept":"甜甜蜜蜜","date":"2013-07-02 12:03:45","stockInAmount":""}]};
 	//数据加载器
 	var ds = new Ext.data.Store({
 		//proxy : new Ext.data.MemoryProxy(data),
@@ -312,6 +310,7 @@ Ext.onReady(function(){
 	});
 	var date = new Date();
 	date.setMonth(date.getMonth()-1);
+	
 	var detailReportBar = new Ext.Toolbar({
 		items : [
  		{
@@ -351,7 +350,59 @@ Ext.onReady(function(){
 		{xtype : 'tbtext', text : '货品:'},
 		materialComb,
 		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
- 		{
+		'->', {
+			text : '搜索',
+			id : 'stockDetail_btnSearch',
+			iconCls : 'btn_search',
+			handler : function(){
+				var sn = stockDetailReportTree.getSelectionModel().getSelectedNode();
+				var sgs = stockDetailReportGrid.getStore();
+				sgs.baseParams['beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m-d');
+				sgs.baseParams['endDate'] = Ext.getCmp('sdr_endDate').getValue().format('Y-m-d');
+				sgs.baseParams['deptId'] = !sn ? "-1" : sn.attributes.deptID;
+				sgs.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
+				sgs.baseParams['materialCateId'] = Ext.getCmp('materialCate').getValue();
+				sgs.baseParams['cateType'] = Ext.getCmp('materialType').getValue();
+				sgs.baseParams['stockType'] = Ext.getCmp('sdr_comboSearchForStockType').getValue();
+				sgs.baseParams['subType'] = Ext.getCmp('sdr_comboSearchForSubType').getValue();
+				sgs.baseParams['supplier'] = Ext.getCmp('comboSearchSupplierForDetail').getValue();
+				//load两种加载方式,远程和本地
+				sgs.load({
+					params : {
+						start : 0,
+						limit : limitCount
+					}
+				});
+			}
+		},'-', {
+			text : '导出',
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				var sn = stockDetailReportTree.getSelectionModel().getSelectedNode();
+				var url = "../../{0}?dataSource={1}&beginDate={2}&endDate={3}&deptId={4}&materialId={5}&materialCateId={6}&cateType={7}&stockType={8}&subType={9}&supplier={10}";
+				url = String.format(
+					url,
+					'ExportHistoryStatisticsToExecl.do',
+					'stockActionDetail',
+					Ext.getCmp('sdr_beginDate').getValue().format('Y-m-d'),
+					Ext.getCmp('sdr_endDate').getValue().format('Y-m-d'),
+					!sn ? "-1" : sn.attributes.deptID,
+					Ext.getCmp('materialId').getValue(),
+					Ext.getCmp('materialCate').getValue(),
+					Ext.getCmp('materialType').getValue(),
+					Ext.getCmp('sdr_comboSearchForStockType').getValue(),
+					Ext.getCmp('sdr_comboSearchForSubType').getValue(),
+					Ext.getCmp('comboSearchSupplierForDetail').getValue()
+				);
+				window.location = url;
+			}
+		},{xtype : 'tbtext', text : '&nbsp;&nbsp;'}
+		]
+	});
+	
+	var detailReportSecondBar = new Ext.Toolbar({
+		items : [{xtype : 'tbtext', text : '&nbsp;'},
+		{
 			xtype : 'tbtext',
 			text : '货单类型:'
 		}, {
@@ -408,38 +459,56 @@ Ext.onReady(function(){
 		},
 
 		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
-		'->', {
-			text : '搜索',
-			id : 'stockDetail_btnSearch',
-			iconCls : 'btn_search',
-			handler : function(){
-//				materialComb.allowBlank = false;
-//				if(!Ext.getCmp('materialId').isValid()){
-//					return;
-//				}
-				var deptID = '-1';
-				var sn = stockDetailReportTree.getSelectionModel().getSelectedNode();
-				//Ext.MessageBox.alert(sn.attributes.deptID);
-				var sgs = stockDetailReportGrid.getStore();
-				sgs.baseParams['beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m-d');
-				sgs.baseParams['endDate'] = Ext.getCmp('sdr_endDate').getValue().format('Y-m-d');
-				sgs.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
-				sgs.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
-				sgs.baseParams['materialCateId'] = Ext.getCmp('materialCate').getValue();
-				sgs.baseParams['cateType'] = Ext.getCmp('materialType').getValue();
-				sgs.baseParams['stockType'] = Ext.getCmp('sdr_comboSearchForStockType').getValue();
-				sgs.baseParams['subType'] = Ext.getCmp('sdr_comboSearchForSubType').getValue();
-				//load两种加载方式,远程和本地
-				sgs.load({
-					params : {
-						start : 0,
-						limit : limitCount
-					}
-				});
+		{
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;供应商:'
+		}, {
+			xtype : 'combo',
+			id : 'comboSearchSupplierForDetail',
+			readOnly : false,
+			forceSelection : true,
+			width : 100,
+			store : new Ext.data.SimpleStore({
+				fields : ['supplierID', 'name']
+			}),
+			valueField : 'supplierID',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [[-1,'全部']];
+					Ext.Ajax.request({
+						url : '../../QuerySupplier.do',
+						params : {
+							
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['supplierID'], jr.root[i]['name']]);
+							}
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						},
+						failure : function(res, opt){
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						}
+					});
+				},
+				select : function(){
+					//Ext.getCmp('btnSearch').handler();
+				}
 			}
-		},{xtype : 'tbtext', text : '&nbsp;&nbsp;'}
+			
+		}
 		]
-	});
+	});	
+	
+	
 	
 	var pagingBar = new Ext.PagingToolbar({
 		pageSize : limitCount,
@@ -535,6 +604,9 @@ Ext.onReady(function(){
 		tbar : detailReportBar,
 		bbar : pagingBar,
 		listeners : {
+			render : function(){
+				detailReportSecondBar.render(stockDetailReportGrid.tbar);
+			},
 			rowdblclick : function(grid, rowindex, e){ 
 				var id = -1;
 			    grid.getSelectionModel().each(function(rec){   
