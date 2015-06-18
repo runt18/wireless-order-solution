@@ -26,6 +26,24 @@ public class Button implements Jsonable{
 		}
 		
 	}
+	
+	public static class ScanPushBuilder extends ButtonBuilder {
+		public ScanPushBuilder(String name, String key) {
+			super(name);
+			super.key = key;
+			super.type = Type.SCAN_PUSH;
+		}
+		
+	}
+	
+	public static class ScanMsgBuilder extends ButtonBuilder {
+		public ScanMsgBuilder(String name, String key) {
+			super(name);
+			super.key = key;
+			super.type = Type.SCAN_MSG;
+		}
+		
+	}	
 
 	public abstract static class ButtonBuilder{
 		private final String name;
@@ -55,7 +73,10 @@ public class Button implements Jsonable{
 	}
 	
 	public static enum Type {
-		CLICK("click"), VIEW("view");
+		CLICK("click"),
+		VIEW("view"),
+		SCAN_PUSH("scancode_push"),
+		SCAN_MSG("scancode_waitmsg");
 		private final String val;
 
 		Type(String val) {
@@ -150,14 +171,17 @@ public class Button implements Jsonable{
 		JsonMap jm = new JsonMap();
 		jm.putString(Key4Json.NAME.key, this.name);
 		jm.putString(Key4Json.TYPE.key, this.type.val);
-		if(type == Type.CLICK){
+		if(type == Type.CLICK || type == Type.SCAN_PUSH || type == Type.SCAN_MSG){
 			jm.putString(Key4Json.KEY.key, this.key);
 		}else if(type == Type.VIEW){
 			jm.putString(Key4Json.URL.key, this.url);
 		}
+		
 		if(!this.children.isEmpty()){
 			jm.putJsonableList(Key4Json.SUB_BUTTON.key, this.children, 0);
 		}
+		
+		
 		return jm;
 	}
 

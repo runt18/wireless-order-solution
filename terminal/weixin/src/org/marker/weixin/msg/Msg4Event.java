@@ -11,7 +11,7 @@ public class Msg4Event extends Msg {
 		SUBSCRIBE("subscribe"),
 		UNSUBSCRIBE("unsubscribe"),
 		CLICK("CLICK"),
-		SCAN("SCAN"),
+		SCAN("scancode_waitmsg"),
 		LOCATION("LOCATION"),
 		SCAN_WAIT_MSG("scancode_waitmsg"),
 		SCAN_PUSH("scancode_push");
