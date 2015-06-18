@@ -1,5 +1,10 @@
 package com.wireless.Actions.weixin.auth;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -23,6 +28,7 @@ import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
 import com.google.zxing.LuminanceSource;
 import com.google.zxing.MultiFormatReader;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
@@ -33,6 +39,7 @@ import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant.QrCodeStatus;
 
 public class WxAuthAction extends Action {
 	
@@ -48,7 +55,7 @@ public class WxAuthAction extends Action {
 			//System.out.println(authorizerInfo);
 			
 			//Parse the qr code url from image.
-            LuminanceSource source = new BufferedImageLuminanceSource(ImageIO.read(new URL(authorizerInfo.getQrCodeUrl())));  
+            LuminanceSource source = new BufferedImageLuminanceSource(toBufferedImage(ImageIO.read(new URL(authorizerInfo.getQrCodeUrl())).getScaledInstance(420, 420, Image.SCALE_SMOOTH)));  
             BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));  
   
             @SuppressWarnings("serial")
@@ -61,6 +68,7 @@ public class WxAuthAction extends Action {
 								   									   .setHeadImgUrl(authorizerInfo.getHeadImg())
 								   									   .setQrCodeUrl(authorizerInfo.getQrCodeUrl())
 								   									   .setQrCode(qrCode.getText())
+								   									   .setQrCodeStatus(QrCodeStatus.NORMAL)
 								   									   .setRefreshToken(authorizationInfo.getAuthorizerRefreshToken()));
 			
 			AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, authorizationInfo.getAuthorizerAppId(), authorizationInfo.getAuthorizerRefreshToken());
@@ -91,4 +99,39 @@ public class WxAuthAction extends Action {
 		return null;
 	}
 
+	/**
+	 * Converts a given Image into a BufferedImage
+	 *
+	 * @param img The Image to be converted
+	 * @return The converted BufferedImage
+	 */
+	private static BufferedImage toBufferedImage(Image img){
+	    if (img instanceof BufferedImage){
+	        return (BufferedImage) img;
+	    }
+
+	    // Create a buffered image with transparency
+	    BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+	    // Draw the image on to the buffered image
+	    Graphics2D bGr = bimage.createGraphics();
+	    bGr.drawImage(img, 0, 0, null);
+	    bGr.dispose();
+
+	    // Return the buffered image
+	    return bimage;
+	}
+	
+	public static void main(String[] args) throws MalformedURLException, IOException, NotFoundException{
+		final String qrCodeUrl = "http://mmbiz.qpic.cn/mmbiz/E6E9icibhDaqDwMlicviaNx3wDHD8ehYYUyEV5icWMpn0zKU6hAMlgGibtdrHjUcxcBCvMiaiakWStuOUibthTupKaQWrAA/0";
+		LuminanceSource source = new BufferedImageLuminanceSource(toBufferedImage(ImageIO.read(new URL(qrCodeUrl)).getScaledInstance(420, 420, Image.SCALE_SMOOTH)));  
+		//LuminanceSource source = new BufferedImageLuminanceSource(ImageIO.read(new URL(qrCodeUrl)));  
+		BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));  
+		
+		@SuppressWarnings("serial")
+		Result qrCode = new MultiFormatReader().decode(bitmap, new HashMap<DecodeHintType, Object>(){{ put(DecodeHintType.CHARACTER_SET, "GBK"); }});
+		
+		System.out.println(qrCode.getText());
+	}
+	
 }

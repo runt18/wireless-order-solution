@@ -1,6 +1,8 @@
 package org.marker.weixin.msg;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class Msg4Event extends Msg {
 	
@@ -10,7 +12,9 @@ public class Msg4Event extends Msg {
 		UNSUBSCRIBE("unsubscribe"),
 		CLICK("CLICK"),
 		SCAN("SCAN"),
-		LOCATION("LOCATION");
+		LOCATION("LOCATION"),
+		SCAN_WAIT_MSG("scancode_waitmsg"),
+		SCAN_PUSH("scancode_push");
 		
 		private final String val;
 		
@@ -39,7 +43,10 @@ public class Msg4Event extends Msg {
 	private String latitude;
 	private String longitude;
 	private String precision;
-
+	private String scanType;
+	private String scanResult;
+	
+	
 	public Msg4Event(Msg4Head head) {
 		super(head);
 	}
@@ -58,6 +65,12 @@ public class Msg4Event extends Msg {
 			this.precision = getElementContent(document, "Precision");
 		} else if (event == Event.CLICK) {
 			this.eventKey = getElementContent(document, "EventKey");
+		}else if(event == Event.SCAN_PUSH || event == Event.SCAN_WAIT_MSG){
+			NodeList nl = document.getElementsByTagName("ScanCodeInfo");
+			if(nl != null){
+				this.scanType = ((Element)nl.item(0)).getElementsByTagName("ScanType").item(0).getFirstChild().getNodeValue();
+				this.scanResult = ((Element)nl.item(0)).getElementsByTagName("ScanResult").item(0).getFirstChild().getNodeValue();
+			}
 		}
 	}
 
@@ -113,5 +126,19 @@ public class Msg4Event extends Msg {
 
 	public void setPrecision(String precision) {
 		this.precision = precision;
+	}
+	
+	public String getScanType(){
+		if(this.scanType == null){
+			return "";
+		}
+		return this.scanType;
+	}
+	
+	public String getScanResult(){
+		if(this.scanResult == null){
+			return "";
+		}
+		return this.scanResult;
 	}
 }
