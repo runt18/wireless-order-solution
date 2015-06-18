@@ -11,7 +11,6 @@ public class Msg4Event extends Msg {
 		SUBSCRIBE("subscribe"),
 		UNSUBSCRIBE("unsubscribe"),
 		CLICK("CLICK"),
-		SCAN("scancode_waitmsg"),
 		LOCATION("LOCATION"),
 		SCAN_WAIT_MSG("scancode_waitmsg"),
 		SCAN_PUSH("scancode_push");
@@ -56,7 +55,7 @@ public class Msg4Event extends Msg {
 
 	public void read(Document document) {
 		this.event = Event.valueOf(getElementContent(document, "Event"), 0);
-		if(event == Event.SUBSCRIBE || event == Event.UNSUBSCRIBE || event == Event.SCAN) {
+		if(event == Event.SUBSCRIBE || event == Event.UNSUBSCRIBE) {
 			this.eventKey = getElementContent(document, "EventKey");
 			this.ticket = getElementContent(document, "Ticket");
 		} else if (event == Event.LOCATION) {
