@@ -388,10 +388,15 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					}
 					
 				}else if(msg.getEventKey().equals(SCAN_EVENT_KEY)){
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("点击此处开始扫描", "点我扫描支付二维码", "", createUrl(msg, WEIXIN_SCANNING))));
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("点击此处开始扫描", msg.getScanType() + "," + msg.getScanResult(), "", createUrl(msg, WEIXIN_SCANNING))));
 					
 				}else if(msg.getEventKey().equals(ZHUAN_EVENT_KEY)){
 					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("您有一次抽奖机会", "点击开始玩大转盘", "", "http://www.weixinrs.com/wx/xydzp0-5840.html?&wid=5165")));					
+				}
+				
+			}else if(msg.getEvent() == Event.SCAN_WAIT_MSG){
+				if(msg.getEventKey().equals(SCAN_EVENT_KEY)){
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("点击此处开始扫描", msg.getScanType() + "," + msg.getScanResult(), "", createUrl(msg, WEIXIN_SCANNING))));
 				}
 			}
 			

@@ -65,6 +65,7 @@ public class Msg4Event extends Msg {
 		} else if (event == Event.CLICK) {
 			this.eventKey = getElementContent(document, "EventKey");
 		}else if(event == Event.SCAN_PUSH || event == Event.SCAN_WAIT_MSG){
+			this.eventKey = getElementContent(document, "EventKey");
 			NodeList nl = document.getElementsByTagName("ScanCodeInfo");
 			if(nl != null){
 				this.scanType = ((Element)nl.item(0)).getElementsByTagName("ScanType").item(0).getFirstChild().getNodeValue();

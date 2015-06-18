@@ -161,9 +161,6 @@ public class FinanceWeixinAction extends Action {
 							WeixinFinanceDao.cancel(msg.getFromUserName());
 						}catch(SQLException ignored){}
 						
-					}else if(msg.getEvent() == Event.SCAN){
-						session.callback(doBinding(msg, msg.getEventKey()));
-						
 					}else if(msg.getEvent() == Event.CLICK){
 						
 						if(msg.getEventKey().equals(TODAY_EVENT_KEY)){
