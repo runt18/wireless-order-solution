@@ -20,6 +20,8 @@ import org.apache.struts.action.ActionMapping;
 import org.maker.weixin.auth.AuthorizationInfo;
 import org.maker.weixin.auth.AuthorizerInfo;
 import org.maker.weixin.auth.AuthorizerToken;
+import org.maker.weixin.auth.ComponentAccessToken;
+import org.maker.weixin.auth.ComponentVerifyTicket;
 import org.marker.weixin.api.Button;
 import org.marker.weixin.api.Menu;
 import org.marker.weixin.api.Token;
@@ -37,6 +39,7 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JObject;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant.QrCodeStatus;
@@ -123,15 +126,42 @@ public class WxAuthAction extends Action {
 	}
 	
 	public static void main(String[] args) throws MalformedURLException, IOException, NotFoundException{
-		final String qrCodeUrl = "http://mmbiz.qpic.cn/mmbiz/E6E9icibhDaqDwMlicviaNx3wDHD8ehYYUyEV5icWMpn0zKU6hAMlgGibtdrHjUcxcBCvMiaiakWStuOUibthTupKaQWrAA/0";
-		LuminanceSource source = new BufferedImageLuminanceSource(toBufferedImage(ImageIO.read(new URL(qrCodeUrl)).getScaledInstance(420, 420, Image.SCALE_SMOOTH)));  
-		//LuminanceSource source = new BufferedImageLuminanceSource(ImageIO.read(new URL(qrCodeUrl)));  
-		BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));  
+//		final String qrCodeUrl = "http://mmbiz.qpic.cn/mmbiz/E6E9icibhDaqDwMlicviaNx3wDHD8ehYYUyEV5icWMpn0zKU6hAMlgGibtdrHjUcxcBCvMiaiakWStuOUibthTupKaQWrAA/0";
+//		LuminanceSource source = new BufferedImageLuminanceSource(toBufferedImage(ImageIO.read(new URL(qrCodeUrl)).getScaledInstance(420, 420, Image.SCALE_SMOOTH)));  
+//		//LuminanceSource source = new BufferedImageLuminanceSource(ImageIO.read(new URL(qrCodeUrl)));  
+//		BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));  
+//		
+//		@SuppressWarnings("serial")
+//		Result qrCode = new MultiFormatReader().decode(bitmap, new HashMap<DecodeHintType, Object>(){{ put(DecodeHintType.CHARACTER_SET, "GBK"); }});
+//		
+//		System.out.println(qrCode.getText());
+		final String ticket = "";
+		final String appId = "";
+		final String refreshToken = "";
+        AuthParam.COMPONENT_VERIFY_TICKET = JObject.parse(ComponentVerifyTicket.JSON_CREATOR, 0, ticket);
+        AuthParam.COMPONENT_ACCESS_TOKEN = ComponentAccessToken.newInstance(AuthParam.COMPONENT_VERIFY_TICKET);
+        
+		AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, appId, refreshToken);
+		//System.out.println(authorizerToken);
 		
-		@SuppressWarnings("serial")
-		Result qrCode = new MultiFormatReader().decode(bitmap, new HashMap<DecodeHintType, Object>(){{ put(DecodeHintType.CHARACTER_SET, "GBK"); }});
+		//Make the menu.
+		Menu menu = new Menu();
+		Menu.delete(Token.newInstance(authorizerToken));
+		menu.set1stButton(new Button.ClickBuilder("餐厅导航", WeiXinHandleMessage.NAVI_EVENT_KEY).build());
+		menu.set2ndButton(new Button.ScanMsgBuilder("扫一扫", WeiXinHandleMessage.SCAN_EVENT_KEY).build());
 		
-		System.out.println(qrCode.getText());
+		menu.set3rdButton(new Button.ClickBuilder("我的", "AAA")
+						.addChild(new Button.ClickBuilder("优惠活动", WeiXinHandleMessage.PROMOTION_EVENT_KEY))
+						.addChild(new Button.ClickBuilder("我的订单", WeiXinHandleMessage.ORDER_EVENT_KEY))
+						.addChild(new Button.ClickBuilder("我的会员卡", WeiXinHandleMessage.MEMBER_EVENT_KEY))
+						//.addChild(new Button.ClickBuilder("我的大转盘", WeiXinHandleMessage.ZHUAN_EVENT_KEY))
+						.build());
+		
+		if(menu.create(Token.newInstance(authorizerToken)).isOk()){
+			System.out.println("菜单更新成功");
+		}else{
+			System.out.println("菜单更新失败");
+		}
 	}
 	
 }

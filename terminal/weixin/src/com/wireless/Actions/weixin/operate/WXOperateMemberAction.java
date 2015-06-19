@@ -282,7 +282,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			
 			final Member member = MemberDao.getById(staff, wxMember.getMemberId());
 			
-			Order.DiscountBuilder builder = Order.DiscountBuilder.build4Member(Integer.parseInt(orderId), member, 0, 0, 0);
+			Order.DiscountBuilder builder = Order.DiscountBuilder.build4Member(Integer.parseInt(orderId), member);
 			
 			OrderDao.discount(staff, builder);
 			

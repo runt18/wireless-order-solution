@@ -27,6 +27,7 @@ import org.marker.weixin.session.WxSession;
 
 import com.alibaba.fastjson.JSON;
 import com.wireless.db.member.MemberDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -36,11 +37,13 @@ import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
@@ -56,6 +59,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	private final String WEIXIN_ORDER;
 	private final String WEIXIN_DIANPING;
 	private final String WEIXIN_SCANNING;
+	private final String wEIXIN_SCANNING_RESULT;
 	
 	private final String WEIXIN_FOOD_ICON;
 	private final String WEIXIN_RFOOD_ICON;
@@ -67,7 +71,6 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	public final static String PROMOTION_EVENT_KEY = "promotion_event_key";
 	public final static String MEMBER_EVENT_KEY = "member_event_key";
 	public final static String ORDER_EVENT_KEY = "order_event_key";
-	public final static String ZHUAN_EVENT_KEY = "zhuan_event_key";
 	public final static String SCAN_EVENT_KEY = "scan_event_key";
 	
 	
@@ -82,6 +85,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		this.WEIXIN_ORDER = root + "/weixin/order/orderList.html";
 		this.WEIXIN_DIANPING = root + "/weixin/order/dianping.html";
 		this.WEIXIN_SCANNING = root + "/weixin/order/scan.html";
+		this.wEIXIN_SCANNING_RESULT = root + "/weixin/order/scanResult.html";
 		
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
 		this.WEIXIN_RFOOD_ICON = root + "/weixin/order/images/icon_rfood.png";
@@ -388,15 +392,20 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					}
 					
 				}else if(msg.getEventKey().equals(SCAN_EVENT_KEY)){
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("点击此处开始扫描", msg.getScanType() + "," + msg.getScanResult(), "", createUrl(msg, WEIXIN_SCANNING))));
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("点击此处开始扫描", "点我扫描支付二维码", "", createUrl(msg, WEIXIN_SCANNING))));
 					
-				}else if(msg.getEventKey().equals(ZHUAN_EVENT_KEY)){
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("您有一次抽奖机会", "点击开始玩大转盘", "", "http://www.weixinrs.com/wx/xydzp0-5840.html?&wid=5165")));					
 				}
 				
 			}else if(msg.getEvent() == Event.SCAN_WAIT_MSG){
 				if(msg.getEventKey().equals(SCAN_EVENT_KEY)){
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("点击此处开始扫描", msg.getScanType() + "," + msg.getScanResult(), "", createUrl(msg, WEIXIN_SCANNING))));
+					Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
+					Member member = MemberDao.getByWxSerial(staff, msg.getFromUserName());
+					int orderId = Integer.parseInt(msg.getScanResult().substring(msg.getScanResult().indexOf("?") + 1));
+					OrderDao.discount(staff, Order.DiscountBuilder.build4Member(orderId, member));
+					Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
+					StringBuilder body = new StringBuilder();
+					body.append("账单号：" + order.getId()).append("，").append("原价：" + order.calcPriceBeforeDiscount()).append("，").append("会员价：" + order.calcTotalPrice());
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item(member.getName() + "信息注入成功", body.toString(), "", createUrl(msg, wEIXIN_SCANNING_RESULT) + "&orderId=" + order.getId())));
 				}
 			}
 			
