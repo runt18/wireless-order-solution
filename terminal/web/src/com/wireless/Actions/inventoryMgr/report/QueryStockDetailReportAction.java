@@ -37,6 +37,7 @@ public class QueryStockDetailReportAction extends Action{
 			String materialCateId = request.getParameter("materialCateId");
 			String cateType = request.getParameter("cateType");
 			String deptId = request.getParameter("deptId");
+			String supplier = request.getParameter("supplier");
 			//String stockType = request.getParameter("stockType");
 			String subType = request.getParameter("subType");
 			String extra = " AND S.ori_stock_date BETWEEN '" + beginDate + "' AND '" + endDate + " 23:59:59'";
@@ -57,12 +58,34 @@ public class QueryStockDetailReportAction extends Action{
 				extra += " AND S.sub_type = " + subType;
 			}
 				
+			if(supplier != null && !supplier.isEmpty() && !supplier.equals("-1")){
+				extra += " AND S.supplier_id = " + supplier;
+			}
+			
 			if(deptId.equals("-1")){
 				stockDetailReports = StockDetailReportDao.getStockDetailReport(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
 			}else{
 				extra += " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")";
 				stockDetailReports = StockDetailReportDao.getStockDetailReportByDept(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit), Integer.parseInt(deptId));
 			}
+			
+			if(!stockDetailReports.isEmpty()){
+				StockDetailReport sum = new StockDetailReport();
+				float totalMoney = 0, stockActionCount = 0, remaining = 0;
+				for (StockDetailReport s : stockDetailReports) {
+					totalMoney += s.totalMoney();
+					stockActionCount += s.getStockActionAmount();
+					remaining += s.getRemaining();
+				}
+				sum.setStockActionAmount(stockActionCount);
+				sum.setTotalMoney(totalMoney);
+				sum.setRemaining(remaining);
+				
+				sum.setStockActionSubType(stockDetailReports.get(0).getStockActionSubType());
+				
+				stockDetailReports.add(sum);				
+			}
+
 			
 			roots = StockDetailReportDao.getStockDetailReportCount(staff, Integer.parseInt(materialId), extra, null);
 		}catch(BusinessException e){

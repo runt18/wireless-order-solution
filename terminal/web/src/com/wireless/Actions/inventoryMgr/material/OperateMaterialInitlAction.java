@@ -11,15 +11,21 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.DBCon;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
+import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockInitDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
+import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockActionDetail;
+import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 
 public class OperateMaterialInitlAction extends DispatchAction{
 
@@ -80,10 +86,21 @@ public class OperateMaterialInitlAction extends DispatchAction{
 		String pin = (String) request.getAttribute("pin");
 		String deptId = request.getParameter("deptId");
 		String editData = request.getParameter("editData");
-		
+		String cateType = request.getParameter("cateType");
+		DBCon dbCon = new DBCon();
+		dbCon.connect();
 		try{
 			if(!editData.isEmpty()){
 				Staff staff = StaffDao.verify(Integer.parseInt(pin));
+				InsertBuilder builder = StockAction.InsertBuilder.stockInit(staff.getRestaurantId(), System.currentTimeMillis(), 0)
+						.setOriStockId("")
+						.setOperatorId(staff.getId()).setOperator(staff.getName())
+						.setComment("")
+						.setCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)))
+						.setDeptIn(Short.valueOf(deptId));
+				
+				
+				
 				String[] mds = editData.split("<li>");
 				for (String md : mds) {
 					String[] m = md.split(",");
@@ -111,7 +128,13 @@ public class OperateMaterialInitlAction extends DispatchAction{
 						MaterialDeptDao.updateMaterialDept(staff, mDept);
 					}
 					
+					builder.addDetail(new StockActionDetail(material.getId(), 0, Float.valueOf(m[1])));
+
 				}
+				
+				//添加并审核
+				int stockActionId = StockActionDao.insertStockAction(dbCon, staff, builder);
+				StockActionDao.auditStockAction(dbCon, staff, StockAction.AuditBuilder.newStockActionAudit(stockActionId));
 				jobject.initTip(true, "保存成功");				
 			}
 
@@ -125,6 +148,7 @@ public class OperateMaterialInitlAction extends DispatchAction{
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 
