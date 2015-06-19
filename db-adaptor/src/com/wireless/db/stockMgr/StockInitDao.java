@@ -7,6 +7,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class StockInitDao {
@@ -73,7 +74,8 @@ public class StockInitDao {
 	public static List<Material> getMaterialStockByDeptId(DBCon dbCon, Staff staff, int deptId, ExtraCond extraCond, String orderClause) throws SQLException{
 		List<Material> materials = new ArrayList<>();
 		String sql = "SELECT M.material_id, M.name, M.price, "
-					+ "CASE "
+					+ " MC.cate_id, MC.name cate_name, MC.type cate_type, "
+					+ " CASE "
 					+ " WHEN (MD.dept_id != "+ deptId +" OR MD.dept_id is null) THEN 0 " 
 					+ " ELSE MD.stock "
 					+ "END AS deptOrTotal_stock "
@@ -90,6 +92,10 @@ public class StockInitDao {
 			m.setName(dbCon.rs.getString("name"));
 			m.setPrice(dbCon.rs.getFloat("price"));
 			m.setStock(dbCon.rs.getFloat("deptOrTotal_stock"));
+			m.setCate(dbCon.rs.getInt("cate_id"), dbCon.rs.getString("cate_name"), dbCon.rs.getInt("cate_type"));
+			if(m.getCate().getType() == MaterialCate.Type.GOOD){
+				m.setGood(true);
+			}
 			materials.add(m);
 		}
 		dbCon.rs.close();

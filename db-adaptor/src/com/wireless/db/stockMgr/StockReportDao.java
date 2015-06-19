@@ -99,6 +99,7 @@ public class StockReportDao {
 						" INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id) " +
 						" INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +
 						" WHERE S.restaurant_id = " + term.getRestaurantId() + 
+						" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
 						" AND S.ori_stock_date <= '" + end + " 23:59:59' AND S.ori_stock_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
 						" GROUP BY S.sub_type, D.material_id " +
@@ -117,7 +118,7 @@ public class StockReportDao {
 			if(result.get(materialId) == null){
 				stockReport = new StockReport();
 				
-				if(SubType.STOCK_IN.getVal() == subType){
+				if(SubType.STOCK_IN.getVal() == subType || SubType.INIT.getVal() == subType){
 					stockReport.setStockIn(amount);
 				}else if(SubType.STOCK_IN_TRANSFER.getVal() == subType){
 					stockReport.setStockInTransfer(amount);
@@ -186,7 +187,7 @@ public class StockReportDao {
 			}else{
 				//如果已经material_id存在,则只需加subType的数量
 				stockReport = result.get(dbCon.rs.getInt("material_id"));
-				if(SubType.STOCK_IN.getVal() == subType){
+				if(SubType.STOCK_IN.getVal() == subType || SubType.INIT.getVal() == subType){
 					stockReport.setStockIn(amount);
 				}else if(SubType.STOCK_IN_TRANSFER.getVal() == subType){
 					stockReport.setStockInTransfer(amount);

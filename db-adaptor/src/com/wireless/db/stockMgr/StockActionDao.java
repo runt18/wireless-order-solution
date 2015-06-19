@@ -179,6 +179,7 @@ public class StockActionDao {
 				}else if(stockAction.getSubType() == SubType.STOCK_OUT || stockAction.getSubType() == SubType.DAMAGE || stockAction.getSubType() == SubType.LESS || stockAction.getSubType() == SubType.USE_UP){
 					material.cutStock(sDetail.getAmount());
 				}
+				//初始化库存单不进行加减
 				sDetail.setStockActionId(stockId);
 				sDetail.setName(material.getName());
 				sDetail.setRemaining(material.getStock());
@@ -557,129 +558,134 @@ public class StockActionDao {
 			StockAction updateStockAction = getStockAndDetailById(dbCon, term, stockAction.getId());
 			//判断是否通过了审核
 			if(updateStockAction.getStatus() == Status.AUDIT){
-				int deptInId ;
-				int deptOutId ;
-				for (StockActionDetail sActionDetail : updateStockAction.getStockDetails()) {
-					MaterialDept materialDept;
-					List<MaterialDept> materialDepts;
-					Material material;
-					//判断是库单是什么类型的
-					if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL){
-						deptInId = updateStockAction.getDeptIn().getId();
+				//初始化库存单不进行加减
+				if(updateStockAction.getSubType() != SubType.INIT){
+					int deptInId ;
+					int deptOutId ;
+					for (StockActionDetail sActionDetail : updateStockAction.getStockDetails()) {
+						MaterialDept materialDept;
+						List<MaterialDept> materialDepts;
+						Material material;
+						//判断是库单是什么类型的
+						if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL){
+							deptInId = updateStockAction.getDeptIn().getId();
 
-						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
-						//判断此部门下是否添加了这个原料
-						if(materialDepts.isEmpty()){
-							//如果没有就新增一条记录
-							materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptInId, term.getRestaurantId(), sActionDetail.getAmount());
-							MaterialDeptDao.insertMaterialDept(term, materialDept);
-							//更新剩余数量
-							sActionDetail.setDeptInRemaining(sActionDetail.getAmount());
-							
-						}else{
-							materialDept = materialDepts.get(0);
-							//入库单增加部门库存
-							materialDept.plusStock(sActionDetail.getAmount());
-							//更新原料_部门表
-							MaterialDeptDao.updateMaterialDept(dbCon, term, materialDept);
-							//更新剩余数量
-							sActionDetail.setDeptInRemaining(materialDept.getStock());
-							
-						}
-
-						//取消加权平均, 改用参考单价
-						material = MaterialDao.getById(materialDept.getMaterialId());
-						
-						//入库单增加总库存
-						material.plusStock(sActionDetail.getAmount());		
-						//更新原料表
-						material.setLastModStaff(term.getName());
-						MaterialDao.update(dbCon, material);
-						
-						//更新库存明细表
-						sActionDetail.setRemaining(material.getStock());
-						StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
-					}else if(updateStockAction.getSubType() == SubType.STOCK_IN_TRANSFER || updateStockAction.getSubType() == SubType.STOCK_OUT_TRANSFER){
-						deptInId = updateStockAction.getDeptIn().getId();
-						deptOutId = updateStockAction.getDeptOut().getId();
-						
-						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
-						//判断此部门下是否添加了这个原料
-						if(materialDepts.isEmpty()){
-							//如果没有就新增一条记录
-							materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptInId, term.getRestaurantId(), sActionDetail.getAmount());
-							MaterialDeptDao.insertMaterialDept(dbCon, term, materialDept);
-							
-							//更新剩余数量
-							sActionDetail.setDeptInRemaining(sActionDetail.getAmount());
-						}else{
-							MaterialDept materialDeptPlus = materialDepts.get(0);
-							//入库单增加部门库存
-							materialDeptPlus.plusStock(sActionDetail.getAmount());
-							MaterialDeptDao.updateMaterialDept(dbCon, term, materialDeptPlus);
-							
-							//更新剩余数量
-							sActionDetail.setDeptInRemaining(materialDeptPlus.getStock());
-						}
-						
-						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
-						if(materialDepts.isEmpty()){
-							//如果没有就新增一条记录
-							materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.getRestaurantId(), (-sActionDetail.getAmount()));
-							MaterialDeptDao.insertMaterialDept(dbCon, term, materialDept);
-							//更新剩余数量
-							sActionDetail.setDeptOutRemaining(materialDept.getStock());
-						}else{
-							MaterialDept materialDeptCut = materialDepts.get(0);
-							//获取调出部门后对其进行减少
-							materialDeptCut.cutStock(sActionDetail.getAmount());
-							MaterialDeptDao.updateMaterialDept(dbCon, term, materialDeptCut);
-							//更新剩余数量
-							sActionDetail.setDeptOutRemaining(materialDeptCut.getStock());
-						}
-						
-						//更新库存明细表
-						StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
-					}else{
-						deptOutId = updateStockAction.getDeptOut().getId();
-						material = MaterialDao.getById(sActionDetail.getMaterialId());
-						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
-						if(materialDepts.isEmpty()){
-							if(updateStockAction.getSubType() == SubType.LESS){
-								materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.getRestaurantId(), 0);
+							materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
+							//判断此部门下是否添加了这个原料
+							if(materialDepts.isEmpty()){
+								//如果没有就新增一条记录 
+								materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptInId, term.getRestaurantId(), sActionDetail.getAmount());
+								MaterialDeptDao.insertMaterialDept(term, materialDept);
+								//更新剩余数量
+								sActionDetail.setDeptInRemaining(sActionDetail.getAmount());
+								
 							}else{
-								materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.getRestaurantId(), (-sActionDetail.getAmount()));
+								materialDept = materialDepts.get(0);
+								//入库单增加部门库存
+								materialDept.plusStock(sActionDetail.getAmount());
+								//更新原料_部门表
+								MaterialDeptDao.updateMaterialDept(dbCon, term, materialDept);
+								//更新剩余数量
+								sActionDetail.setDeptInRemaining(materialDept.getStock());
+								
+							}
+
+							//取消加权平均, 改用参考单价
+							material = MaterialDao.getById(materialDept.getMaterialId());
+							
+							//入库单增加总库存
+							material.plusStock(sActionDetail.getAmount());		
+							//更新原料表
+							material.setLastModStaff(term.getName());
+							MaterialDao.update(dbCon, material);
+							
+							//更新库存明细表
+							sActionDetail.setRemaining(material.getStock());
+							StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
+						}else if(updateStockAction.getSubType() == SubType.STOCK_IN_TRANSFER || updateStockAction.getSubType() == SubType.STOCK_OUT_TRANSFER){
+							deptInId = updateStockAction.getDeptIn().getId();
+							deptOutId = updateStockAction.getDeptOut().getId();
+							
+							materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
+							//判断此部门下是否添加了这个原料
+							if(materialDepts.isEmpty()){
+								//如果没有就新增一条记录
+								materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptInId, term.getRestaurantId(), sActionDetail.getAmount());
+								MaterialDeptDao.insertMaterialDept(dbCon, term, materialDept);
+								
+								//更新剩余数量
+								sActionDetail.setDeptInRemaining(sActionDetail.getAmount());
+							}else{
+								MaterialDept materialDeptPlus = materialDepts.get(0);
+								//入库单增加部门库存
+								materialDeptPlus.plusStock(sActionDetail.getAmount());
+								MaterialDeptDao.updateMaterialDept(dbCon, term, materialDeptPlus);
+								
+								//更新剩余数量
+								sActionDetail.setDeptInRemaining(materialDeptPlus.getStock());
 							}
 							
-							MaterialDeptDao.insertMaterialDept(dbCon, term, materialDept);
+							materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
+							if(materialDepts.isEmpty()){
+								//如果没有就新增一条记录
+								materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.getRestaurantId(), (-sActionDetail.getAmount()));
+								MaterialDeptDao.insertMaterialDept(dbCon, term, materialDept);
+								//更新剩余数量
+								sActionDetail.setDeptOutRemaining(materialDept.getStock());
+							}else{
+								MaterialDept materialDeptCut = materialDepts.get(0);
+								//获取调出部门后对其进行减少
+								materialDeptCut.cutStock(sActionDetail.getAmount());
+								MaterialDeptDao.updateMaterialDept(dbCon, term, materialDeptCut);
+								//更新剩余数量
+								sActionDetail.setDeptOutRemaining(materialDeptCut.getStock());
+							}
 							
-							//更新剩余数量
-							sActionDetail.setDeptOutRemaining(materialDept.getStock());
-							
+							//更新库存明细表
+							StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
 						}else{
-							materialDept = materialDepts.get(0);
-							//出库单减少部门中库存
-							materialDept.cutStock(sActionDetail.getAmount());
-							//更新原料_部门表
-							MaterialDeptDao.updateMaterialDept(dbCon, term, materialDept);
+							deptOutId = updateStockAction.getDeptOut().getId();
+							material = MaterialDao.getById(sActionDetail.getMaterialId());
+							materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
+							if(materialDepts.isEmpty()){
+								if(updateStockAction.getSubType() == SubType.LESS){
+									materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.getRestaurantId(), 0);
+								}else{
+									materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.getRestaurantId(), (-sActionDetail.getAmount()));
+								}
+								
+								MaterialDeptDao.insertMaterialDept(dbCon, term, materialDept);
+								
+								//更新剩余数量
+								sActionDetail.setDeptOutRemaining(materialDept.getStock());
+								
+							}else{
+								materialDept = materialDepts.get(0);
+								//出库单减少部门中库存
+								materialDept.cutStock(sActionDetail.getAmount());
+								//更新原料_部门表
+								MaterialDeptDao.updateMaterialDept(dbCon, term, materialDept);
+								
+								//更新剩余数量
+								sActionDetail.setDeptOutRemaining(materialDept.getStock());
+							}
+							//出库单减少总库存
+							material.cutStock(sActionDetail.getAmount());
+							//更新原料表
+							material.setLastModStaff(term.getName());
+							MaterialDao.update(dbCon, material);
 							
 							//更新剩余数量
-							sActionDetail.setDeptOutRemaining(materialDept.getStock());
+							sActionDetail.setRemaining(material.getStock());
+							
+							//更新库存明细表
+							StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
 						}
-						//出库单减少总库存
-						material.cutStock(sActionDetail.getAmount());
-						//更新原料表
-						material.setLastModStaff(term.getName());
-						MaterialDao.update(dbCon, material);
-						
-						//更新剩余数量
-						sActionDetail.setRemaining(material.getStock());
-						
-						//更新库存明细表
-						StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
-					}
-				
+					
+					}					
 				}
+				
+
 			}
 		}
 	}

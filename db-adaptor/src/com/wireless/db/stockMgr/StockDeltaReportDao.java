@@ -59,7 +59,7 @@ public class StockDeltaReportDao {
 		}
 		
 		for (StockReport stockReport : stockReports) {
-			//在stockTake中加期初,期末等字段当做消耗差异表model
+			//在stockTake中加期初,期末,入库总数, 出库总数4个字段当做消耗差异表model
 			StockTakeDetail stockTakeDetail = new StockTakeDetail();
 			stockTakeDetail.setMaterialId(stockReport.getMaterial().getId());
 			stockTakeDetail.setMaterialName(stockReport.getMaterial().getName());

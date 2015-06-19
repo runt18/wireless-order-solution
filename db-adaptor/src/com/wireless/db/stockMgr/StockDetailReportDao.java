@@ -39,7 +39,7 @@ public class StockDetailReportDao {
 		
 	}
 	public static List<StockDetailReport> getStockDetailReport(DBCon dbCon, Staff term, int materialId, String extraCond, String orderClause) throws SQLException{
-		String sql = "SELECT S.id, S.ori_stock_date, S.ori_stock_id, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.sub_type, S.approver, D.name, D.amount, D.price, D.remaining" + 
+		String sql = "SELECT S.id, S.ori_stock_date, S.ori_stock_id, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.sub_type, S.approver,S.supplier_name, D.name, D.amount, D.price, D.remaining" + 
 						" FROM " + Params.dbName + ".stock_action as S  " +
 						"INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +  
 						"INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id " +
@@ -58,6 +58,7 @@ public class StockDetailReportDao {
 			stockDetailReport.setDate(dbCon.rs.getTimestamp("ori_stock_date").getTime());
 			stockDetailReport.setOriStockId(dbCon.rs.getString("ori_stock_id"));
 			stockDetailReport.setMaterialName(dbCon.rs.getString("name"));
+			stockDetailReport.setSupplier(dbCon.rs.getString("supplier_name"));
 			stockDetailReport.setDeptIn(dbCon.rs.getString("dept_in_name"));
 			stockDetailReport.setDeptOut(dbCon.rs.getString("dept_out_name"));
 			stockDetailReport.setStockActionAmount(dbCon.rs.getFloat("amount"));
@@ -65,6 +66,7 @@ public class StockDetailReportDao {
 			stockDetailReport.setRemaining(dbCon.rs.getFloat("remaining"));
 			stockDetailReport.setStockActionSubType(dbCon.rs.getInt("sub_type"));
 			stockDetailReport.setOperater(dbCon.rs.getString("approver"));
+			stockDetailReport.setTotalMoney(dbCon.rs.getFloat("amount") * dbCon.rs.getFloat("price"));
 			
 			stockDetailReports.add(stockDetailReport);
 		}
@@ -74,7 +76,7 @@ public class StockDetailReportDao {
 	}
 	
 	public static List<StockDetailReport> getStockDetailReportByDept(DBCon dbCon, Staff term, int materialId, String extraCond, String orderClause, int deptId) throws SQLException{
-		String sql = "SELECT S.id, S.ori_stock_date, S.ori_stock_id, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.sub_type, S.approver, D.name, D.amount, D.price, D.remaining, D.dept_in_remaining, D.dept_out_remaining" + 
+		String sql = "SELECT S.id, S.ori_stock_date, S.ori_stock_id, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.sub_type, S.approver,S.supplier_name, D.name, D.amount, D.price, D.remaining, D.dept_in_remaining, D.dept_out_remaining" + 
 						" FROM " + Params.dbName + ".stock_action as S  " +
 						"INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +
 						"INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id " +
@@ -93,12 +95,13 @@ public class StockDetailReportDao {
 			stockDetailReport.setDate(dbCon.rs.getTimestamp("ori_stock_date").getTime());
 			stockDetailReport.setOriStockId(dbCon.rs.getString("ori_stock_id"));
 			stockDetailReport.setMaterialName(dbCon.rs.getString("name"));
+			stockDetailReport.setSupplier(dbCon.rs.getString("supplier_name"));
 			stockDetailReport.setDeptIn(dbCon.rs.getString("dept_in_name"));
 			stockDetailReport.setDeptOut(dbCon.rs.getString("dept_out_name"));
 			stockDetailReport.setStockActionAmount(dbCon.rs.getFloat("amount"));
 			stockDetailReport.setStockDetailPrice(dbCon.rs.getFloat("price"));
 			stockDetailReport.setOperater(dbCon.rs.getString("approver"));
-			//stockDetailReport.setRemaining(dbCon.rs.getFloat("remaining"));
+			stockDetailReport.setTotalMoney(dbCon.rs.getFloat("amount") * dbCon.rs.getFloat("price"));
 			
 			if(dbCon.rs.getInt("dept_in") == deptId){
 				if(dbCon.rs.getInt("sub_type") == SubType.STOCK_IN_TRANSFER.getVal() || dbCon.rs.getInt("sub_type") == SubType.STOCK_OUT_TRANSFER.getVal()){
