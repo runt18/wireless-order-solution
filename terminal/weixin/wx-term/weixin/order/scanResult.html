@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>会员扫码支付</title>
+<meta http-equiv="pragma" content="no-cache"> 
+<meta http-equiv="cache-control" content="no-cache"> 
+<meta http-equiv="expires" content="0">	
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
+<link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/member.css">
+
+<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="js/Util.js"></script>
+<script type="text/javascript" src="js/weixinInterface/scan.js"></script>
+<style type="text/css">
+.div-mask{display: none; z-index:1000; position: absolute; height: 100%; width: 100%; left:0; top:0;}
+.div-mask-ld{background: rgba(0,0,0, 0);}
+.div-mask-ld > div[class=img]{position: fixed; height:50px; width:50px; left:50%; top:50%; margin: -25px; background: rgba(255,255,255,1); border: 1px solid #eee; border-radius: 2px;}
+#payFoodList li{
+	line-height : 30px;
+}
+body{
+	background-color: #DFE8F6;
+}
+
+.welcomeFont{
+	font-size: 20px;
+	font-weight : bold;
+	color: maroon;
+	font-family: 'Comic Sans MS', cursive;
+}
+
+</style>
+</head>
+<body>
+	
+
+
+<div id="div4OrderInfo" class="main-box none">
+	<ul class="m-b-list">
+		<li class="box-horizontal" >
+			<div style="width:50%">账单号: <span id="spanOrderId" style="color:#26a9d0;">----</span></div>
+			<div style="width:50%;text-align: right;">会员名: <span id="spanMemberName" style="color:#26a9d0;">----</span></div>
+		</li>
+		<li id="orderPrice" class="box-horizontal" >
+			<div style="width:50%">账单原价: <span id="spanBillShouldPay" style="color:#26a9d0;">--.--</span></div>
+			<div style="width:50%;text-align: right;">会员价: <span id="spanBillAfterDiscount" style="color:#FF4500;">--.--</span></div>
+		</li>	
+		<li class="box-horizontal" >
+			<div style="width:50%">会员积分: <span id="memberPoint" style="color:#26a9d0;">--.--</span></div>
+			<div style="width:50%;text-align: right;"></div>
+		</li>		
+		<li class="none-line">
+			<div style="height: 55px;width: 100%;text-align: center;" >
+				<a class="button rounded green" style="font-size: 20px;font-weight: bold;" onclick="Util.skip('member.html')">我知道了</a>	
+			</div>	
+		</li>			
+	</ul>
+</div>
+<br>	
+
+
+<div id="div4Welcome" class="main-box none" align="center" style="padding: 15px 0">
+	<p id="restName" class="welcomeFont">----</p>
+	<div style="height: 55px;width: 100%;text-align: center;" >
+		<a class="button rounded green" style="font-size: 20px;font-weight: bold;" onclick="Util.skip('about.html')">大家都在看</a>	
+	</div>	
+</div>
+
+<div id="div4Active" class="main-box none">
+		<ul class="m-b-list">
+			<li class="box-horizontal" >
+				<div id="promotionTitle" style="width:100%;text-align: center;font-size: 20px;font-weight: bold;">----</div>
+			</li>
+			<li>
+				<div style="width:100%;text-align: center;margin-top: 5px;"><img id="promotionImage" alt="" src="images/member_card.jpg" width="95%"></div>
+			</li>
+			<li class="none-line">
+				<div style="height: 55px;width: 100%;text-align: right;" >
+					<a onclick="entryPromotion()" style="font-size: 15px;font-weight: bold;" class="button rounded green"> 立即查看→ </a>
+				</div>	
+			</li>				
+		</ul>
+</div>	
+</body>
+</html>
