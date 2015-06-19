@@ -1,6 +1,7 @@
 package com.wireless.Actions.inventoryMgr.material;
 
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
+import com.wireless.pojo.util.DateUtil;
 
 public class OperateMaterialInitlAction extends DispatchAction{
 
@@ -92,7 +94,12 @@ public class OperateMaterialInitlAction extends DispatchAction{
 		try{
 			if(!editData.isEmpty()){
 				Staff staff = StaffDao.verify(Integer.parseInt(pin));
-				InsertBuilder builder = StockAction.InsertBuilder.stockInit(staff.getRestaurantId(), System.currentTimeMillis(), 0)
+				Calendar c = Calendar.getInstance();
+				c.add(Calendar.MONTH, -1);
+				//初始化库存账单为上个月31
+				String initDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.getActualMaximum(Calendar.DAY_OF_MONTH);
+				
+				InsertBuilder builder = StockAction.InsertBuilder.stockInit(staff.getRestaurantId(), DateUtil.parseDate(initDate), 0)
 						.setOriStockId("")
 						.setOperatorId(staff.getId()).setOperator(staff.getName())
 						.setComment("")
@@ -134,7 +141,7 @@ public class OperateMaterialInitlAction extends DispatchAction{
 				
 				//添加并审核
 				int stockActionId = StockActionDao.insertStockAction(dbCon, staff, builder);
-				StockActionDao.auditStockAction(dbCon, staff, StockAction.AuditBuilder.newStockActionAudit(stockActionId));
+				StockActionDao.auditStockAction(dbCon, staff, StockAction.AuditBuilder.newStockActionAudit(stockActionId).setStockInitApproverDate());
 				jobject.initTip(true, "保存成功");				
 			}
 
