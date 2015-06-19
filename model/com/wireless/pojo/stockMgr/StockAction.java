@@ -2,6 +2,7 @@ package com.wireless.pojo.stockMgr;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -327,6 +328,7 @@ public class StockAction implements Jsonable{
 		private int approverId;
 		private String approver;
 		private Status status;
+		private long approverDate;
 		
 		public StockAction build(){
 			return new StockAction(this);
@@ -366,6 +368,21 @@ public class StockAction implements Jsonable{
 			this.approver = approver;
 			return this;
 		}
+
+		public long getApproverDate() {
+			return approverDate;
+		}
+
+		public AuditBuilder setStockInitApproverDate() {
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.MONTH, -1);
+			
+			String date = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.getActualMaximum(Calendar.DAY_OF_MONTH);
+			this.approverDate = DateUtil.parseDate(date);
+			return this;
+		}
+		
+		
 
 	}
 	
