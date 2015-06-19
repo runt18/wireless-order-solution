@@ -264,7 +264,7 @@ public class MonthlyBalanceDao {
 				if(list.isEmpty()){
 					return new Date().getTime();
 				}else{
-					return list.get(0).getBirthDate();
+					return list.get(0).getOriStockDate();
 				}
 			}
 		}finally{

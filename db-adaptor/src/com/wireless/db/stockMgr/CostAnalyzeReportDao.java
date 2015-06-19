@@ -43,21 +43,21 @@ public class CostAnalyzeReportDao {
 		String extraCond = " AND S.ori_stock_date BETWEEN '" + begin + "' AND '" + end + "'";
 		
 		//判断这个月是否有月结
-		List<MonthlyBalance> ms = MonthlyBalanceDao.getMonthlyBalance(" AND MB.month = " + begin, null);
+		List<MonthlyBalance> thisMb = MonthlyBalanceDao.getMonthlyBalance(" AND MB.restaurant_id = " + staff.getRestaurantId() + " AND MB.month = '" + begin + "' ", null);
 		
 		long beginL = DateUtil.parseDate(begin);
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(beginL);
 		c.add(Calendar.MONTH, -1);
 		//判断上个月是否有月结
-		List<MonthlyBalance> lastMb = MonthlyBalanceDao.getMonthlyBalance(" AND MB.month = " + DateUtil.format(c.getTimeInMillis(), DateUtil.Pattern.DATE), null);
+		List<MonthlyBalance> lastMb = MonthlyBalanceDao.getMonthlyBalance(" AND MB.restaurant_id = " + staff.getRestaurantId() + " AND MB.month = '" + DateUtil.format(c.getTimeInMillis(), DateUtil.Pattern.DATE) + "'", null);
 		for (Department dept : departments) {
 			CostAnalyze costAnalyze = new CostAnalyze();
 			costAnalyze.setDeptId(dept.getId());
 			costAnalyze.setDeptName(dept.getName());
 			
 			materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, staff, " AND MD.dept_id = " + dept.getId(), null);
-			if(ms.isEmpty()){
+			if(thisMb.isEmpty()){
 				float endMoney = 0;
 				//期末金额为materialDept剩余物料总和 * 参考成本
 				for (MaterialDept md : materialDepts) {
