@@ -40,13 +40,15 @@ Ext.onReady(function(){
 		items : [
 		{ xtype:'tbtext', text:'日期:'},
 		{
-			xtype : 'datefield',
 			id : 'car_beginDate',
+			xtype: 'datefield',  
 			allowBlank : false,
-			format : 'Y-m',
-			value : new Date(),
 			maxValue : new Date(),
-			width : 100
+			value : new Date(),
+            width:100,  
+            plugins: 'monthPickerPlugin',  
+            format: 'Y-m'
+            //editable: false
 		},'->', {
 			text : '搜索',
 			id : 'btnSearch',
@@ -106,5 +108,5 @@ Ext.onReady(function(){
 	});
 	
 	//页面打开即加载数据
-	Ext.getCmp('btnSearch').handler();
+//	Ext.getCmp('btnSearch').handler();
 });	

@@ -125,6 +125,11 @@ function stockTaskNavHandler(e){
 						}
 						return;
 					}
+					if(parseInt(Ext.getDom('txtActualPrice').value) > parseInt(Ext.getDom('txtTotalPrice').value)){
+						Ext.example.msg("错误", "实际金额不能大于总金额");
+						return;
+					}
+					
 					var stockTypeList = stockTaskNavWin.stockType.split(',');
 					var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
 					if(stockType == 1){
@@ -2148,11 +2153,11 @@ function initControl(){
 		    		btnNext.setDisabled(false);
 		    		btnNext.setText('下一步');
 		    		// 清空已入库单类型
-		    		var sot = Ext.query('input[name=radioStockOrderType]');
-		    		for(var i = 0; i < sot.length; i++){
-		    			sot[i].checked = false;
-		    		}
-		    		Ext.getCmp('radioStockOrderTypeGoodIn').setValue(true);
+//		    		var sot = Ext.query('input[name=radioStockOrderType]');
+//		    		for(var i = 0; i < sot.length; i++){
+//		    			sot[i].checked = false;
+//		    		}
+//		    		Ext.getCmp('radioStockOrderTypeGoodIn').setValue(true);
 		    		// 清空单据基础信息
 		    		operateStockActionBasic({
 		    			otype : Ext.ux.otype['set']

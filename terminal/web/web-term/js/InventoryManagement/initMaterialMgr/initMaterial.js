@@ -201,7 +201,8 @@ function initMaterialControl(){
 							params : {
 								dataSource : 'updateDeptStock',
 								deptId : deptId.getValue(),
-								editData : editData
+								editData : editData,
+								cateType : init_materialBasicGrid.cateType ? (init_materialBasicGrid.cateType == true ? 1 : 2) : 2
 							},
 							success : function(res, opt){
 								init_uploadMask.hide();
@@ -294,6 +295,7 @@ function initMaterialControl(){
 					editData += '<li>';
 				}
 				editData += (e.record.data['id'] + ',' + e.record.data['stock'] );
+				init_materialBasicGrid.cateType = e.record.data['isGood']; 
 			},
 			cellclick : function(grid, rowIndex, columnIndex, e) {
 		        var record = grid.getStore().getAt(rowIndex);  // Get the Record

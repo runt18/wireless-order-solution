@@ -161,10 +161,11 @@ Ext.onReady(function(){
 			xtype : 'datefield',
 			id : 'dr_beginDate',
 			allowBlank : false,
-			format : 'Y-m',
-			value : new Date(),
 			maxValue : new Date(),
-			width : 100
+			value : new Date(),
+            width:100,  
+            plugins: 'monthPickerPlugin',  
+            format: 'Y-m'
 		},
 		{xtype : 'tbtext', text : '&nbsp;'},
 		{xtype : 'tbtext', text : '类型:'},

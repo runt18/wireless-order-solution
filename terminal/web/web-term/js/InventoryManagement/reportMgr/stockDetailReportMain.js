@@ -277,6 +277,7 @@ Ext.onReady(function(){
 	         {header:'日期', dataIndex:'date'},
 	         {header:'单号', dataIndex:'oriStockId'},
 	         {header:'货品名称', dataIndex:'materialName', width:160},
+	         {header:'供应商', dataIndex:'supplier'},
 	         {header:'部门', dataIndex:'dept'},
 	         {header:'入库类型', dataIndex:'stockInSubType', width:100},
 	         {header:'入库数量', dataIndex:'stockInAmount', align : 'right', renderer : renderFormat},
@@ -296,6 +297,7 @@ Ext.onReady(function(){
 	         {name : 'id'},                                                                         
 	         {name : 'date'},
 	         {name : 'oriStockId'},
+	         {name : 'supplier'},
 	         {name : 'materialName'},
 	         {name : 'dept'},
 	         {name : 'stockInSubType'},
@@ -308,8 +310,9 @@ Ext.onReady(function(){
 	         {name : 'operater'}
 		])
 	});
-	var date = new Date();
-	date.setMonth(date.getMonth()-1);
+	
+	//日期默认为本月
+	var date = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 	
 	var detailReportBar = new Ext.Toolbar({
 		items : [
@@ -627,6 +630,34 @@ Ext.onReady(function(){
 		}
 
 	});
+	
+	stockDetailReportGrid.getStore().on('load', function(store, records, options){
+		var sumRow = null;
+		if(store.getCount() > 0){
+
+			sumRow = stockDetailReportGrid.getView().getRow(store.getCount() - 1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			for(var i = 0; i < stockDetailReportGrid.getColumnModel().getColumnCount(); i++){
+				var sumCell = stockDetailReportGrid.getView().getCell(store.getCount() - 1, i);
+				sumCell.style.fontSize = '15px';
+				sumCell.style.fontWeight = 'bold';
+				sumCell.style.color = 'green';
+			}
+			
+			
+			stockDetailReportGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			stockDetailReportGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+			stockDetailReportGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			stockDetailReportGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
+			stockDetailReportGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
+			stockDetailReportGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+			stockDetailReportGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+			stockDetailReportGrid.getView().getCell(store.getCount()-1, 13).innerHTML = '--';
+		}
+		
+	});	
+	
+	
    new Ext.Panel({
 		renderTo : 'divStockDetail',
 		width : parseInt(Ext.getDom('divStockDetail').parentElement.style.width.replace(/px/g,'')),
