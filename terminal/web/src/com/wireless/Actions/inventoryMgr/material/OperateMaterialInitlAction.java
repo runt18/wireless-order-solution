@@ -16,6 +16,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
+import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockInitDao;
 import com.wireless.exception.BusinessException;
@@ -24,6 +25,7 @@ import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
+import com.wireless.pojo.stockMgr.MonthlyBalance;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
@@ -142,6 +144,10 @@ public class OperateMaterialInitlAction extends DispatchAction{
 				//添加并审核
 				int stockActionId = StockActionDao.insertStockAction(dbCon, staff, builder);
 				StockActionDao.auditStockAction(dbCon, staff, StockAction.AuditBuilder.newStockActionAudit(stockActionId).setStockInitApproverDate());
+				
+				MonthlyBalance.InsertBuilder monthBuild = new MonthlyBalance.InsertBuilder(staff.getRestaurantId(), staff.getName());
+
+				MonthlyBalanceDao.insert(monthBuild, staff);
 				jobject.initTip(true, "保存成功");				
 			}
 
