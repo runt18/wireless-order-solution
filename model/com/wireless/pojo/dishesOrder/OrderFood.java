@@ -1003,7 +1003,6 @@ public class OrderFood implements Parcelable, Jsonable {
 			}
 			//套菜
 			if(jm.containsKey(Key4Json.COMBO.key)){
-				//TODO
 				setCombo(jm.getJsonableList(Key4Json.COMBO.key, ComboOrderFood.JSON_CREATOR, 0));
 			}
 			//是否叫起

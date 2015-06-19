@@ -166,7 +166,7 @@ public class WxRestaurant implements Jsonable{
 	
 	public static enum QrCodeStatus{
 		NORMAL(1, "正常"),
-		HIDDEN(3, "隐藏");
+		HIDDEN(2, "隐藏");
 		
 		private final int val;
 		private final String desc;
