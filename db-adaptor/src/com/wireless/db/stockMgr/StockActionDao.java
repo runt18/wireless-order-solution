@@ -92,8 +92,8 @@ public class StockActionDao {
 		}
 		dbCon.rs.close();
 		
-		//如果是消耗类型的单则不需要限定时间
-		if(builder.getSubType() != SubType.USE_UP && builder.getSubType() != SubType.MORE && builder.getSubType() != SubType.LESS){
+		//如果是消耗类型或初始化类型的单则不需要限定时间
+		if(builder.getSubType() != SubType.INIT && builder.getSubType() != SubType.USE_UP && builder.getSubType() != SubType.MORE && builder.getSubType() != SubType.LESS){
 			//货单原始时间必须大于最后一次已审核盘点时间或月结,小于当前月最后一天
 			if(builder.getOriStockDate() < maxDate){
 				throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
@@ -102,8 +102,8 @@ public class StockActionDao {
 				throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
 			}
 		}
-		//判断除了消耗,盘盈,盘亏单外, 是否正在盘点中
-		if(builder.getSubType() != SubType.USE_UP && builder.getSubType() != SubType.LESS && builder.getSubType() != SubType.MORE){
+		//判断除了初始化, 消耗,盘盈,盘亏单外, 是否正在盘点中
+		if(builder.getSubType() != SubType.INIT && builder.getSubType() != SubType.USE_UP && builder.getSubType() != SubType.LESS && builder.getSubType() != SubType.MORE){
 			checkStockTake(dbCon, term);
 		}		
 
@@ -548,7 +548,7 @@ public class StockActionDao {
 		sql = "UPDATE " + Params.dbName + ".stock_action SET " +
 				" approver_id = " + stockAction.getApproverId() + ", " +
 				" approver = '" + stockAction.getApprover() + "'," +
-				" approve_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
+				" approve_date = " + "'" + (stockAction.getApproverDate() > 0 ? DateUtil.format(stockAction.getApproverDate()) : DateUtil.format(new Date().getTime())) + "', " +
 				" status = " + stockAction.getStatus().getVal() +
 				" WHERE id = " + stockAction.getId() + 
 				" AND restaurant_id = " + term.getRestaurantId();
