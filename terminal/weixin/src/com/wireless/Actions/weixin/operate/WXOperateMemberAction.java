@@ -320,6 +320,64 @@ public class WXOperateMemberAction extends DispatchAction {
 		return null;
 	}	
 	
+	
+	public ActionForward afterInpour(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		JObject jobject = new JObject();
+		DBCon dbCon = new DBCon();
+		try{
+			String openId = request.getParameter("oid");
+			String fromId = request.getParameter("fid");
+			String orderId = request.getParameter("orderId");
+			
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
+			final Restaurant rest = RestaurantDao.getById(rid);
+			Staff staff = StaffDao.getAdminByRestaurant(rid);
+			WxMember wxMember;
+			if(!WxMemberDao.getByCond(dbCon, staff, new WxMemberDao.ExtraCond().setSerial(openId)).isEmpty()){
+				wxMember = WxMemberDao.getByCond(dbCon, staff, new WxMemberDao.ExtraCond().setSerial(openId)).get(0);
+			}else{
+				throw new BusinessException("查找会员失败, 请重新关注本餐厅");
+			}
+			
+			final Member member = MemberDao.getById(staff, wxMember.getMemberId());
+			
+			final Order order = PayOrder.calc(staff, Order.PayBuilder.build4Normal(Integer.valueOf(orderId)));
+			
+			jobject.setExtra(new Jsonable() {
+				
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putJsonable("order", order, flag);
+					jm.putJsonable("member", member, flag);
+					jm.putString("restName", rest.getName());
+					return jm;
+				}
+				
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+			});
+			
+			dbCon.conn.commit();
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			dbCon.disconnect();
+			response.getWriter().print(jobject.toString());
+		}		
+		return null;
+	}
+	
 	/**
 	 * 重新绑定手机号码
 	 * @param mapping
