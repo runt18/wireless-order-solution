@@ -11,6 +11,7 @@ public class StockDetailReport implements Jsonable {
 	private long date;
 	private String oriStockId;
 	private String materialName; 
+	private String supplier; 
 	private String deptIn;
 	private String deptOut;
 	private SubType stockActionSubType; 
@@ -18,6 +19,7 @@ public class StockDetailReport implements Jsonable {
 	private float stockDetailPrice;
 	private float remaining;
 	private String operater;
+	private float totalMoney = 0;
 	
 	
 	public int getId() {
@@ -33,7 +35,7 @@ public class StockDetailReport implements Jsonable {
 		this.date = date;
 	}
 	public String getOriStockId() {
-		if(oriStockId.trim().length() == 0 || oriStockId == null){
+		if(oriStockId == null || oriStockId.trim().length() == 0){
 			oriStockId = "----";
 		}
 		return oriStockId;
@@ -84,7 +86,7 @@ public class StockDetailReport implements Jsonable {
 	}
 	
 	public float totalMoney(){
-		return this.stockActionAmount * this.stockDetailPrice;
+		return this.totalMoney;
 	}
 	public String getMaterialName() {
 		return materialName;
@@ -98,6 +100,18 @@ public class StockDetailReport implements Jsonable {
 	public void setOperater(String operater) {
 		this.operater = operater;
 	}
+	public String getSupplier() {
+		return supplier;
+	}
+	public void setSupplier(String supplier) {
+		this.supplier = supplier;
+	}
+	public float getTotalMoney() {
+		return totalMoney;
+	}
+	public void setTotalMoney(float totalMoney) {
+		this.totalMoney = totalMoney;
+	}
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
@@ -105,6 +119,7 @@ public class StockDetailReport implements Jsonable {
 		jm.putString("date", DateUtil.formatToDate(this.getDate()));
 		jm.putString("oriStockId", this.getOriStockId());
 		jm.putString("materialName", this.getMaterialName());
+		jm.putString("supplier", this.getSupplier());
 		if(this.getStockActionSubType() == SubType.STOCK_IN || this.getStockActionSubType() == SubType.MORE || this.getStockActionSubType() == SubType.SPILL){
 			jm.putString("dept", this.getDeptIn());
 			jm.putString("stockInSubType", this.getStockActionSubType().getText());

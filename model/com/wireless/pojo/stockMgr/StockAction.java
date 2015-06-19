@@ -49,6 +49,17 @@ public class StockAction implements Jsonable{
 			builder.actualPrice = actualPrice;
 			return builder;
 		}
+		//初始化库存
+		public static InsertBuilder stockInit(int restaurantId, long oriStockIdDate, float actualPrice){
+			InsertBuilder builder = new InsertBuilder(restaurantId);
+			builder.setType(Type.STOCK_IN)
+					.setSubType(SubType.INIT)
+					.setOriStockDate(oriStockIdDate)
+					.setDeptOut((short) -1);
+			
+			builder.actualPrice = actualPrice;
+			return builder;
+		}
 		//入库调拨
 		public static InsertBuilder newStockInTransfer(int restaurantId){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
@@ -461,7 +472,8 @@ public class StockAction implements Jsonable{
 		DAMAGE(6, "报损"),
 		MORE(7, "盘盈"),
 		LESS(8, "盘亏"),
-		USE_UP(9, "消耗");
+		USE_UP(9, "消耗"),
+		INIT(10, "初始化");
 			
 		private final int val;
 		private final String text;
