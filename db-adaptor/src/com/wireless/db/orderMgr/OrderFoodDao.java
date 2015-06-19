@@ -470,6 +470,8 @@ public class OrderFoodDao {
 						of.addCombo(new ComboOrderFood(comboFood));
 					}
 				}
+				//Get the price plan
+				//of
 				//Get the detail to associated price plan.
 				of.asFood().setPricePlan(FoodDao.getPricePlan(dbCon, staff, new ExtraCond4Price(of.asFood())));
 			}

@@ -390,6 +390,8 @@ public class OrderDao {
 	}
 	
 	private static void fillDetail(DBCon dbCon, Staff staff, Order order, DateType dateType) throws SQLException, BusinessException{
+		//Get the order foods to each order.
+		order.setOrderFoods(OrderFoodDao.getDetail(dbCon, staff, new OrderFoodDao.ExtraCond(dateType).setOrder(order)));	
 		//Get the detail to discount.
 		if(order.hasDiscount()){
 			order.setDiscount(DiscountDao.getById(dbCon, staff, order.getDiscount().getId()));
@@ -406,8 +408,6 @@ public class OrderDao {
 		if(order.hasCoupon()){
 			order.setCoupon(CouponDao.getById(dbCon, staff, order.getCoupon().getId()));
 		}
-		//Get the order foods to each order.
-		order.setOrderFoods(OrderFoodDao.getDetail(dbCon, staff, new OrderFoodDao.ExtraCond(dateType).setOrder(order)));	
 		//Get the detail to mixed payment.
 		if(order.getPaymentType().isMixed()){
 			order.setMixedPayment(MixedPaymentDao.getByCond(dbCon, staff, new MixedPaymentDao.ExtraCond(dateType, order)));
@@ -972,9 +972,10 @@ public class OrderDao {
 			sql = " UPDATE " + Params.dbName + ".order_food " +
 				  " SET food_id = " + of.getFoodId() +
 				  " ,discount = " + of.getDiscount() + 
-				  " ,unit_price = " + of.getFoodPrice() +
+				  " ,unit_price = " + of.asFood().getPrice() +
 				  " WHERE order_id = " + order.getId() + 
-				  " AND food_id = " + of.getFoodId();
+				  " AND food_id = " + of.getFoodId() +
+				  (of.hasFoodUnit() ? " AND food_unit_id = " + of.getFoodUnit().getId() : "");
 			dbCon.stmt.executeUpdate(sql);				
 		}		
 	}
