@@ -18,6 +18,7 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.SortedList;
+import com.wireless.pojo.util.DateUtil.Pattern;
 
 public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
@@ -907,7 +908,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.putString("contactAddress", this.contactAddress);
 		//jm.put("comment", this.comment);
 		jm.putLong("createDate", this.createDate);
-		jm.putString("createDateFormat", DateUtil.format(this.createDate));
+		jm.putString("createDateFormat", DateUtil.format(this.createDate, Pattern.DATE.getPattern()));
 		jm.putString("memberCard", this.memberCard);
 		jm.putJsonableList("publicComment", this.publicComments, 0);
 		jm.putJsonable("privateComment", this.privateComment, 0);
