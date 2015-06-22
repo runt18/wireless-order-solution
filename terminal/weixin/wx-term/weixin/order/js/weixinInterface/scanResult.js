@@ -14,7 +14,7 @@ $(function(){
 
 			$('#spanOrderId').text(result.other.order.id);
 			$('#spanMemberName').text(result.other.member.name);
-			$('#spanBillShouldPay').text(result.other.order.actualPriceBeforeDiscount);
+			$('#spanBillShouldPay').text(result.other.order.pureTotalPrice);
 			$('#spanBillAfterDiscount').text(result.other.order.actualPrice);
 			$('#memberPoint').text(result.other.member.point);
 			
