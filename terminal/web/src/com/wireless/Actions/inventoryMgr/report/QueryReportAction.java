@@ -34,7 +34,7 @@ public class QueryReportAction extends Action {
 			String start = request.getParameter("start");
 			String limit = request.getParameter("limit");
 			String beginDate = request.getParameter("beginDate");
-			String endDate = request.getParameter("endDate");
+			String endDate = "";
 			String cateType = request.getParameter("cateType");
 			String cateId = request.getParameter("cateId");
 			String materialId = request.getParameter("materialId");
@@ -55,6 +55,9 @@ public class QueryReportAction extends Action {
 				stockReports = StockReportDao.getStockCollectByTime(staff, sdf.format(c.getTime()), sdf.format(new Date()), extra, null);
 				
 			}else{
+				endDate = beginDate + "-31";
+				beginDate += "-01";
+				
 				if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
 					extra += " AND M.material_id = " + materialId;
 				}

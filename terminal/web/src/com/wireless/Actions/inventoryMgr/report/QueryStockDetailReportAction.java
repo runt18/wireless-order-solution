@@ -32,7 +32,7 @@ public class QueryStockDetailReportAction extends Action{
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String beginDate = request.getParameter("beginDate");
-			String endDate = request.getParameter("endDate");
+			String endDate = "";
 			String materialId = request.getParameter("materialId");
 			String materialCateId = request.getParameter("materialCateId");
 			String cateType = request.getParameter("cateType");
@@ -40,6 +40,10 @@ public class QueryStockDetailReportAction extends Action{
 			String supplier = request.getParameter("supplier");
 			//String stockType = request.getParameter("stockType");
 			String subType = request.getParameter("subType");
+			
+			endDate = beginDate + "-31";
+			beginDate += "-01";
+			
 			String extra = " AND S.ori_stock_date BETWEEN '" + beginDate + "' AND '" + endDate + " 23:59:59'";
 			
 			if(materialId == null || materialId.isEmpty()){
