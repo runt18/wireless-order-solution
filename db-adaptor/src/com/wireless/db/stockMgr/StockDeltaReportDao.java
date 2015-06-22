@@ -105,6 +105,7 @@ public class StockDeltaReportDao {
 						" INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id) " +
 						" INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +
 						" WHERE S.restaurant_id = " + term.getRestaurantId() + 
+						" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
 						" AND (S.dept_in = " + dept  + " OR S.dept_out = " + dept + ")" + 
 						" AND S.ori_stock_date <= '" + end + " 23:59:59' AND S.ori_stock_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
