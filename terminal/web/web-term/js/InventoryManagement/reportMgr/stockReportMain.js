@@ -194,27 +194,38 @@ Ext.onReady(function(){
 
 		{xtype : 'tbtext', text : '查看日期:'},
 		{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+//		{
+//			xtype : 'datefield',
+//			id : 'sr_beginDate',
+//			allowBlank : false,
+//			format : 'Y-m-d',
+//			value : date,
+//			maxValue : new Date(),
+//			width : 100
+//		}, {
+//			xtype : 'label',
+//			id : 'to',
+//			text : ' 至 '
+//		}, {
+//			xtype : 'datefield',
+//			id : 'sr_endDate',
+//			allowBlank : false,
+//			format : 'Y-m-d',
+//			value : new Date(),
+//			maxValue : new Date(),
+//			width : 100
+//		},
 		{
 			xtype : 'datefield',
 			id : 'sr_beginDate',
 			allowBlank : false,
-			format : 'Y-m-d',
-			value : date,
 			maxValue : new Date(),
-			width : 100
-		}, {
-			xtype : 'label',
-			id : 'to',
-			text : ' 至 '
-		}, {
-			xtype : 'datefield',
-			id : 'sr_endDate',
-			allowBlank : false,
-			format : 'Y-m-d',
 			value : new Date(),
-			maxValue : new Date(),
-			width : 100
-		}, {xtype:'tbtext', text:'&nbsp;&nbsp;'},
+            width:100,  
+            plugins: 'monthPickerPlugin',  
+            format: 'Y-m'
+		},
+		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		{ xtype:'tbtext', text:'品项:'},
 		materialComb,
 		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
@@ -240,8 +251,7 @@ Ext.onReady(function(){
 				if(materialComb.getValue() != ''){
 					materialId = materialComb.getValue();
 				}
-				sgs.baseParams['beginDate'] = Ext.getCmp('sr_beginDate').getValue().format('Y-m-d');
-				sgs.baseParams['endDate'] = Ext.getCmp('sr_endDate').getValue().format('Y-m-d');
+				sgs.baseParams['beginDate'] = Ext.getCmp('sr_beginDate').getValue().format('Y-m');
 				sgs.baseParams['cateType'] = cateType;
 				sgs.baseParams['cateId'] = cateId;
 				sgs.baseParams['materialId'] = materialId;
@@ -413,5 +423,6 @@ Ext.onReady(function(){
 		items : [stockReportTree,stockReportGrid]
 	});
 	
-	ds.load({params:{start:0,limit:17}});
+    //加载页面执行查询
+    Ext.getCmp('general_btnSearch').handler();
 });

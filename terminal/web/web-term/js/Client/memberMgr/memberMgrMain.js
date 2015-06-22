@@ -1172,10 +1172,12 @@ function gridInit(){
 						memberSumView.getCell(store.getCount()-1, 5).innerHTML = '--';
 						memberSumView.getCell(store.getCount()-1, 6).innerHTML = '--';
 						memberSumView.getCell(store.getCount()-1, 7).innerHTML = '--';
+						memberSumView.getCell(store.getCount()-1, 8).innerHTML = '--';
 						
-						memberSumView.getCell(store.getCount()-1, 9).innerHTML = '--';
+//						memberSumView.getCell(store.getCount()-1, 9).innerHTML = '--';
 						memberSumView.getCell(store.getCount()-1, 10).innerHTML = '--';
 						memberSumView.getCell(store.getCount()-1, 11).innerHTML = '--';
+						memberSumView.getCell(store.getCount()-1, 12).innerHTML = '--';
 					}
 				});
 				
@@ -1246,6 +1248,7 @@ function gridInit(){
 			[true, false, false, true],
 			['名称', 'name'],
 			['类型', 'memberType.name'],
+			['创建时间','createDateFormat'],
 			['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['消费总额', 'totalConsumption',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['累计积分', 'totalPoint',,'right', 'Ext.ux.txtFormat.gridDou'],

@@ -324,26 +324,36 @@ Ext.onReady(function(){
 			)
 		},
 		{ xtype:'tbtext', text:'日期:'},
+//		{
+//			xtype : 'datefield',
+//			id : 'sdr_beginDate',
+//			allowBlank : false,
+//			format : 'Y-m-d',
+//			value : date,
+//			maxValue : new Date(),
+//			width : 100
+//		}, {
+//			xtype : 'label',
+//			id : 'to',
+//			text : ' 至 '
+//		}, {
+//			xtype : 'datefield',
+//			id : 'sdr_endDate',
+//			allowBlank : false,
+//			format : 'Y-m-d',
+//			value : new Date(),
+//			maxValue : new Date(),
+//			width : 100
+//		},
 		{
 			xtype : 'datefield',
 			id : 'sdr_beginDate',
 			allowBlank : false,
-			format : 'Y-m-d',
-			value : date,
 			maxValue : new Date(),
-			width : 100
-		}, {
-			xtype : 'label',
-			id : 'to',
-			text : ' 至 '
-		}, {
-			xtype : 'datefield',
-			id : 'sdr_endDate',
-			allowBlank : false,
-			format : 'Y-m-d',
 			value : new Date(),
-			maxValue : new Date(),
-			width : 100
+            width:100,  
+            plugins: 'monthPickerPlugin',  
+            format: 'Y-m'			
 		},
 		{xtype : 'tbtext', text : '&nbsp;'},
 		{xtype : 'tbtext', text : '类型:'},
@@ -360,8 +370,8 @@ Ext.onReady(function(){
 			handler : function(){
 				var sn = stockDetailReportTree.getSelectionModel().getSelectedNode();
 				var sgs = stockDetailReportGrid.getStore();
-				sgs.baseParams['beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m-d');
-				sgs.baseParams['endDate'] = Ext.getCmp('sdr_endDate').getValue().format('Y-m-d');
+				sgs.baseParams['beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m');
+//				sgs.baseParams['endDate'] = Ext.getCmp('sdr_endDate').getValue().format('Y-m-d');
 				sgs.baseParams['deptId'] = !sn ? "-1" : sn.attributes.deptID;
 				sgs.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
 				sgs.baseParams['materialCateId'] = Ext.getCmp('materialCate').getValue();
