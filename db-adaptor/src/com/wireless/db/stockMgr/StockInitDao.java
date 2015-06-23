@@ -9,6 +9,7 @@ import com.wireless.db.Params;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.stockMgr.StockAction;
 
 public class StockInitDao {
 	public static class ExtraCond{
@@ -261,16 +262,19 @@ public class StockInitDao {
 	
 	public static boolean isInit(DBCon dbCon, Staff staff) throws SQLException{
 		int count = 0;
-		String sql = "SELECT COUNT(*) FROM monthly_balance WHERE restaurant_id = "+ staff.getRestaurantId();
 		
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		
-		if(dbCon.rs.next()){
-			count += dbCon.rs.getInt(1);
-		}
-		dbCon.rs.close();
-		
-		sql = "SELECT COUNT(*) FROM stock_action WHERE restaurant_id = "+ staff.getRestaurantId();
+		//月结不做计算, 初始化时默认加上月的月结
+//		String sql = "SELECT COUNT(*) FROM monthly_balance WHERE restaurant_id = "+ staff.getRestaurantId();
+//		
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		
+//		if(dbCon.rs.next()){
+//			count += dbCon.rs.getInt(1);
+//		}
+//		dbCon.rs.close();
+		//初始化和消耗不算入库存数
+		String sql = "SELECT COUNT(*) FROM stock_action WHERE restaurant_id = "+ staff.getRestaurantId() 
+				+ " AND sub_type NOT IN("+ StockAction.SubType.USE_UP.getVal() +", "+ StockAction.SubType.INIT.getVal() +")";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
