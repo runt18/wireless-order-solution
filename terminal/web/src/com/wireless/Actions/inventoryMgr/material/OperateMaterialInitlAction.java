@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.Params;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
@@ -96,6 +97,17 @@ public class OperateMaterialInitlAction extends DispatchAction{
 		try{
 			if(!editData.isEmpty()){
 				Staff staff = StaffDao.verify(Integer.parseInt(pin));
+				//保存初始化数据之前先初始化一次
+				//删除月结明细记录
+				String sql = "DELETE MD FROM " + Params.dbName + ".monthly_balance_detail MD " + 
+						" JOIN " + Params.dbName + ".monthly_balance M ON M.id = MD.monthly_balance_id " +
+						" WHERE M.restaurant_id = " + staff.getRestaurantId();
+				dbCon.stmt.executeUpdate(sql);	
+				
+				//删除月结记录
+				sql = "DELETE FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + staff.getRestaurantId();
+				dbCon.stmt.executeUpdate(sql);
+				
 				Calendar c = Calendar.getInstance();
 				c.add(Calendar.MONTH, -1);
 				//初始化库存账单为上个月31
@@ -142,6 +154,7 @@ public class OperateMaterialInitlAction extends DispatchAction{
 				}
 				//设置总额
 				builder.setInitActualPrice(builder.getTotalPrice());
+				
 				//添加并审核
 				int stockActionId = StockActionDao.insertStockAction(dbCon, staff, builder);
 				StockActionDao.auditStockAction(dbCon, staff, StockAction.AuditBuilder.newStockActionAudit(stockActionId).setStockInitApproverDate());
