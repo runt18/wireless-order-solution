@@ -51,14 +51,13 @@ public class StockAction implements Jsonable{
 			return builder;
 		}
 		//初始化库存
-		public static InsertBuilder stockInit(int restaurantId, long oriStockIdDate, float actualPrice){
+		public static InsertBuilder stockInit(int restaurantId, long oriStockIdDate){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
 			builder.setType(Type.STOCK_IN)
 					.setSubType(SubType.INIT)
 					.setOriStockDate(oriStockIdDate)
 					.setDeptOut((short) -1);
 			
-			builder.actualPrice = actualPrice;
 			return builder;
 		}
 		//入库调拨
@@ -287,6 +286,21 @@ public class StockAction implements Jsonable{
 		
 		public InsertBuilder setCateType(int val){
 			this.cateType = MaterialCate.Type.valueOf(val);
+			return this;
+		}
+		
+		public float getTotalPrice(){
+			float sum = 0;
+			if(this.subType == SubType.INIT || this.subType == SubType.STOCK_IN || this.subType == SubType.STOCK_OUT || this.subType == SubType.USE_UP){
+				for (StockActionDetail sDetail : this.stockActionDetails) {
+					sum += sDetail.getAmount() * sDetail.getPrice();
+				}
+			}
+			return sum;
+		}
+		
+		public InsertBuilder setInitActualPrice(float actualPrice){
+			this.actualPrice = actualPrice;
 			return this;
 		}
 		
@@ -817,7 +831,7 @@ public class StockAction implements Jsonable{
 	
 	public float getTotalPrice(){
 		float sum = 0;
-		if(this.subType == SubType.STOCK_IN || this.subType == SubType.STOCK_OUT || this.subType == SubType.USE_UP){
+		if(this.subType == SubType.INIT || this.subType == SubType.STOCK_IN || this.subType == SubType.STOCK_OUT || this.subType == SubType.USE_UP){
 			for (StockActionDetail sDetail : this.stockDetails) {
 				sum += sDetail.getAmount() * sDetail.getPrice();
 			}
