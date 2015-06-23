@@ -27,8 +27,8 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.MonthlyBalance;
 import com.wireless.pojo.stockMgr.StockAction;
-import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
+import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.util.DateUtil;
 
 public class OperateMaterialInitlAction extends DispatchAction{
@@ -101,7 +101,7 @@ public class OperateMaterialInitlAction extends DispatchAction{
 				//初始化库存账单为上个月31
 				String initDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.getActualMaximum(Calendar.DAY_OF_MONTH);
 				
-				InsertBuilder builder = StockAction.InsertBuilder.stockInit(staff.getRestaurantId(), DateUtil.parseDate(initDate), 0)
+				InsertBuilder builder = StockAction.InsertBuilder.stockInit(staff.getRestaurantId(), DateUtil.parseDate(initDate))
 						.setOriStockId("")
 						.setOperatorId(staff.getId()).setOperator(staff.getName())
 						.setComment("")
@@ -137,10 +137,11 @@ public class OperateMaterialInitlAction extends DispatchAction{
 						MaterialDeptDao.updateMaterialDept(staff, mDept);
 					}
 					
-					builder.addDetail(new StockActionDetail(material.getId(), 0, Float.valueOf(m[1])));
+					builder.addDetail(new StockActionDetail(material.getId(), Float.parseFloat(m[2]), Float.valueOf(m[1])));
 
 				}
-				
+				//设置总额
+				builder.setInitActualPrice(builder.getTotalPrice());
 				//添加并审核
 				int stockActionId = StockActionDao.insertStockAction(dbCon, staff, builder);
 				StockActionDao.auditStockAction(dbCon, staff, StockAction.AuditBuilder.newStockActionAudit(stockActionId).setStockInitApproverDate());
