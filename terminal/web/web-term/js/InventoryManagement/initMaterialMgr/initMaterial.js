@@ -294,7 +294,7 @@ function initMaterialControl(){
 				if(editData != ''){
 					editData += '<li>';
 				}
-				editData += (e.record.data['id'] + ',' + e.record.data['stock'] );
+				editData += (e.record.data['id'] + ',' + e.record.data['stock'] + ',' +  e.record.data['price']);
 				init_materialBasicGrid.cateType = e.record.data['isGood']; 
 			},
 			cellclick : function(grid, rowIndex, columnIndex, e) {

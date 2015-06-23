@@ -201,7 +201,7 @@ Ext.onReady(function(){
 	
 	
 	var deltaReportGrid = createGridPanel(
-			'stockTakeWinCenter',
+			'',
 			'货品列表',
 			'',
 			'',

@@ -113,9 +113,9 @@ var stockActionPanelSouth = {
 		frame : true,
 		height : 37,
 		bodyStyle : 'font-size:18px;text-align:center;',
-		html : '总数量小计:<input id="txtTotalAmount" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
-			'&nbsp;&nbsp;&nbsp; 总金额:<input id="txtTotalPrice" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
-			'&nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtActualPrice" disabled="disabled" type="text" style=" height: 20px;width:90px;font-size :18px;font-weight: bolder; color:red"/>'
+		html : '总数量小计:<input id="txtHistoryTotalAmount" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
+			'&nbsp;&nbsp;&nbsp; 总金额:<input id="txtHistoryTotalPrice" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
+			'&nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtHistoryActualPrice" disabled="disabled" type="text" style=" height: 20px;width:90px;font-size :18px;font-weight: bolder; color:red"/>'
 };
 
 var cmStockDetail = new Ext.grid.ColumnModel([
@@ -234,9 +234,9 @@ function showDetail(){
 	}
 	stockActionWin.show();
 	titleDom.body.update(sn.data.typeText + ' -- ' + sn.data.cateTypeText + sn.data.subTypeText + '单' + '<label style="margin-left:50px">库单编号: ' + sn.data.id + '</label>');
-	Ext.getDom('txtTotalAmount').value = sn.data.amount;
-	Ext.getDom('txtTotalPrice').value = sn.data.price;
-	Ext.getDom('txtActualPrice').value = sn.data.actualPrice;
+	Ext.getDom('txtHistoryTotalAmount').value = sn.data.amount;
+	Ext.getDom('txtHistoryTotalPrice').value = sn.data.price;
+	Ext.getDom('txtHistoryActualPrice').value = sn.data.actualPrice;
 }
 
 
@@ -457,7 +457,7 @@ Ext.onReady(function(){
 							subType.store.loadData('');
 							subType.setValue();
 						}
-						Ext.getCmp('btnSearch').handler();
+						Ext.getCmp('btnHistoryStockSearch').handler();
 					}
 				}
 			}, {
@@ -481,7 +481,7 @@ Ext.onReady(function(){
 				selectOnFocus : true,
 				listeners : {
 					select : function(){
-						Ext.getCmp('btnSearch').handler();
+						Ext.getCmp('btnHistoryStockSearch').handler();
 					}
 				}
 			}, {
@@ -507,7 +507,7 @@ Ext.onReady(function(){
 				allowBlank : false,
 				listeners : {
 					select : function(){
-						Ext.getCmp('btnSearch').handler();
+						Ext.getCmp('btnHistoryStockSearch').handler();
 					}
 				}
 			}, {
@@ -531,7 +531,7 @@ Ext.onReady(function(){
 				selectOnFocus : true,
 				listeners : {
 					select : function(){
-						Ext.getCmp('btnSearch').handler();
+						Ext.getCmp('btnHistoryStockSearch').handler();
 					},
 					render : function(thiz){
 						var data = [[-1,'全部']];
@@ -579,7 +579,7 @@ Ext.onReady(function(){
 				allowBlank : false,
 				listeners : {
 					select : function(){
-						Ext.getCmp('btnSearch').handler();
+						Ext.getCmp('btnHistoryStockSearch').handler();
 					}
 				}
 			}, {
@@ -623,7 +623,7 @@ Ext.onReady(function(){
 						});
 					},
 					select : function(){
-						Ext.getCmp('btnSearch').handler();
+						Ext.getCmp('btnHistoryStockSearch').handler();
 					}
 				}
 				
@@ -648,7 +648,7 @@ Ext.onReady(function(){
 				     '->',
 				     {
 				    	 text : '搜索',
-				    	 id : 'btnSearch',
+				    	 id : 'btnHistoryStockSearch',
 				    	 iconCls : 'btn_search',
 				    	 handler : function(e){
 				    		 var beginDate = Ext.getCmp('beginDate');
@@ -698,11 +698,11 @@ Ext.onReady(function(){
 				     },'-',
 				     {
 				    	 text : '高级条件↓',
-				    	 id : 'btnStockHeightSearch',
+				    	 id : 'btnHistoryStockHeightSearch',
 				    	 handler : function(){
 
-					    		Ext.getCmp('btnStockHeightSearch').hide();
-					    		Ext.getCmp('btnStockCommonSearch').show();
+					    		Ext.getCmp('btnHistoryStockHeightSearch').hide();
+					    		Ext.getCmp('btnHistoryStockCommonSearch').show();
 					    		
 					    		Ext.getCmp('oriStockId').setValue();
 					    		Ext.getCmp('oriStockId').disable();
@@ -716,12 +716,12 @@ Ext.onReady(function(){
 				    	 }
 				     },{
 				    	 text : '高级条件↑',
-				    	 id : 'btnStockCommonSearch',
+				    	 id : 'btnHistoryStockCommonSearch',
 				    	 hidden : true,
 				    	 handler : function(thiz){
 				    		Ext.getCmp('oriStockId').enable();
-				    		Ext.getCmp('btnStockHeightSearch').show();
-				    		Ext.getCmp('btnStockCommonSearch').hide();
+				    		Ext.getCmp('btnHistoryStockHeightSearch').show();
+				    		Ext.getCmp('btnHistoryStockCommonSearch').hide();
 				    		
 				    		Ext.getCmp('hsa_comboSearchForStockType').setValue(-1);
 				    		Ext.getCmp('comboSearchForSubType').store.loadData('');
@@ -733,7 +733,7 @@ Ext.onReady(function(){
 				    		
 				    		
 				    		Ext.getCmp('tbarSecond').hide();
-				    		Ext.getCmp('btnSearch').handler();
+				    		Ext.getCmp('btnHistoryStockSearch').handler();
 				    		
 				    		stockActionGrid.setHeight(stockActionGrid.getHeight()+28);
 				    		stockActionGrid.syncSize();
@@ -776,7 +776,7 @@ Ext.onReady(function(){
 			key : Ext.EventObject.ENTER,
 			scope : this,
 			fn : function(){
-				Ext.getCmp('btnSearch').handler();
+				Ext.getCmp('btnHistoryStockSearch').handler();
 			}
 		}]
 		
