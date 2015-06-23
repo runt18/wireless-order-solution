@@ -395,9 +395,9 @@ function initOperateMaterialWin(){
 							if(jr.success){
 								Ext.example.msg(jr.title, jr.msg);
 								if(dataSource == 'update'){
-									operateMaterialWin.hide();
-									operateMaterialWin.cateType = '';
-									Ext.getCmp('btnSearchMaterial').handler();
+//									operateMaterialWin.hide();
+//									operateMaterialWin.cateType = '';
+//									Ext.getCmp('btnSearchMaterial').handler();
 								}else{
 									Ext.getCmp('txtMaterialName').setValue();
 									Ext.getCmp('txtMaterialPrice').setValue();
