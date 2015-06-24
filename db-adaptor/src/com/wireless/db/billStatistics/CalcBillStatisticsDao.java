@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.db.orderMgr.PayTypeDao;
 import com.wireless.exception.BusinessException;
@@ -46,18 +47,14 @@ import com.wireless.pojo.util.DateUtil;
 public class CalcBillStatisticsDao {
 
 	public static class ExtraCond4Charge{
-		private final DateType dateType;
+		private final DBTbl dbTbl;
 		private final String moTbl;
 		
 		private int staffId;
 		
 		public ExtraCond4Charge(DateType dateType){
-			this.dateType = dateType;
-			if(this.dateType.isHistory()){
-				this.moTbl = TBL_MEMBER_OPERATION_HISTORY;
-			}else{
-				this.moTbl = TBL_MEMBER_OPERATION;
-			}
+			this.dbTbl = new DBTbl(dateType);
+			this.moTbl = dbTbl.moTbl;
 		}
 		
 		public ExtraCond4Charge setStaffId(int staffId){
@@ -77,6 +74,7 @@ public class CalcBillStatisticsDao {
 	
 	public static class ExtraCond{
 		public final DateType dateType;
+		private final DBTbl dbTbl;
 		private final String orderTbl;
 		private final String orderFoodTbl;
 		private final String tasteGrpTbl;
@@ -87,20 +85,15 @@ public class CalcBillStatisticsDao {
 		private String foodName;
 		private HourRange hourRange;
 		private int staffId;
+		private int staffId4OrderFood;
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
-			if(this.dateType.isHistory()){
-				orderTbl = TBL_ORDER_HISTORY;
-				orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
-				tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
-				mixedTbl = TBL_MIXED_PAYMENT_HISTORY;
-			}else{
-				orderTbl = TBL_ORDER_TODAY;
-				orderFoodTbl = TBL_ORDER_FOOD_TODAY;
-				tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
-				mixedTbl = TBL_MIXED_PAYMENT_TODAY;
-			}
+			this.dbTbl = new DBTbl(dateType);
+			orderTbl = dbTbl.orderTbl;
+			orderFoodTbl = dbTbl.orderFoodTbl;
+			tasteGrpTbl = dbTbl.tgTbl;
+			mixedTbl = dbTbl.mixedTbl;
 		}
 		
 		public ExtraCond setRegion(Region.RegionId regionId){
@@ -128,6 +121,11 @@ public class CalcBillStatisticsDao {
 			return this;
 		}
 		
+		public ExtraCond setStaffId4OrderFood(int staffId){
+			this.staffId4OrderFood = staffId;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -146,20 +144,13 @@ public class CalcBillStatisticsDao {
 			if(staffId > 0){
 				extraCond.append(" AND O.staff_id = " + staffId);
 			}
+			if(staffId4OrderFood > 0){
+				extraCond.append(" AND OF.staff_id = " + staffId);
+			}
 			return extraCond.toString();
 		}
 	}
 	
-	private final static String TBL_ORDER_TODAY = "order";
-	private final static String TBL_ORDER_FOOD_TODAY = "order_food";
-	private final static String TBL_TASTE_GROUP_TODAY = "taste_group";
-	private final static String TBL_MEMBER_OPERATION = "member_operation";
-	private final static String TBL_ORDER_HISTORY = "order_history";
-	private final static String TBL_ORDER_FOOD_HISTORY = "order_food_history";
-	private final static String TBL_TASTE_GROUP_HISTORY = "taste_group_history";
-	private final static String TBL_MEMBER_OPERATION_HISTORY = "member_operation_history";
-	private final static String TBL_MIXED_PAYMENT_TODAY = "mixed_payment";
-	private final static String TBL_MIXED_PAYMENT_HISTORY = "mixed_payment_history";
 	
 	/**
 	 * Calculate the income by pay type.
@@ -1098,34 +1089,22 @@ public class CalcBillStatisticsDao {
 	 * @param range
 	 * @param extraCond
 	 * 			the extra condition
-	 * @param queryType
+	 * @param dateType
 	 * @return
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throw if the query type is invalid
 	 */
-	public static List<CommissionStatistics> calcCommissionTotal(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException, BusinessException{
-		String orderFoodTbl = null;
-		String orderTbl = null;
-		if(queryType.isHistory()){
-			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
-			orderTbl = TBL_ORDER_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
-			orderTbl = TBL_ORDER_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
+	public static List<CommissionStatistics> calcCommissionTotal(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType dateType) throws SQLException, BusinessException{
+		DBTbl dbTbl = new DBTbl(dateType);
 		String sql;
 		sql = " SELECT ROUND(SUM(totalPrice), 2) AS totalPrice, ROUND(SUM(commission), 2) AS commission, SF.name AS waiter,  MAX(TOTAL.staff_id) AS staff_id  FROM ( SELECT " +
 			  " ROUND(SUM(OFH.unit_price * OFH.order_count), 2) AS totalPrice, " +
 			  " ROUND(SUM(OFH.commission * OFH.order_count), 2) AS commission, MAX(OFH.waiter) AS waiter, " +
 			  " OFH.staff_id " +
-			  " FROM " + Params.dbName + "." + orderFoodTbl + " OFH " +
-			  " JOIN " + Params.dbName + "." + orderTbl + " OH ON 1 = 1 " +
+			  " FROM " + Params.dbName + "." + dbTbl.orderFoodTbl + " OFH " +
+			  " JOIN " + Params.dbName + "." + dbTbl.orderTbl + " OH ON 1 = 1 " +
 			  " AND OH.id = OFH.order_id " +
 			  " AND OH.restaurant_id = " + staff.getRestaurantId() + 
 			  " AND OH.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
