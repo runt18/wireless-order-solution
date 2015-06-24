@@ -230,7 +230,7 @@ function initControl(){
 		Ext.getCmp('btnSearchFood').handler();
 	});
 	foodBasicGrid.on('rowclick', function(thiz){
-		Ext.getCmp('btnSearchFoodMaterial').handler();
+		Ext.getCmp('btnRefreshFoodMaterial').handler();
 		Ext.getCmp('btnSearchFoodMaterial').handler();
 	});
 	foodBasicGrid.keys = [{
@@ -245,7 +245,7 @@ function initControl(){
 		height : 26,
 		items : ['->', {
 			text : '刷新',
-			id : 'btnSearchFoodMaterial',
+			id : 'btnRefreshFoodMaterial',
 			iconCls : 'btn_refresh',
 			handler : function(){
 				var data = Ext.ux.getSelData(foodBasicGrid);
@@ -482,15 +482,6 @@ function initControl(){
 	menuFoodMaterialCount.render(document.body);
 }
 //--------------------
-/*var btnGetBack = new Ext.ux.ImageButton({
-	imgPath : '../../images/UserLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '返回',
-	handler : function(btn){
-		location.href = 'InventoryProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
-	}
-});*/
 
 var btnLoginOut = new Ext.ux.ImageButton({
 	imgPath : '../../images/ResLogout.png',

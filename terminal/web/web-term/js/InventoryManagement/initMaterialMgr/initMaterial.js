@@ -1,4 +1,4 @@
-
+var init_materialBasicGrid, init_materialCateTree, editData=new Map(),  isInit = false;
 
 var init_uploadMask = new Ext.LoadMask(document.body, {
 	msg : '正在保存...'
@@ -187,7 +187,7 @@ function initMaterialControl(){
 			id : 'btnSaveInitMaterial',
 			iconCls : 'btn_save',
 			handler : function(){
-				if(!editData){
+				if(editData.size() == 0){
 					return;
 				}
 				$.post('../../OperateMaterialInit.do', {dataSource:'isInit'}, function(jr){
@@ -201,7 +201,7 @@ function initMaterialControl(){
 							params : {
 								dataSource : 'updateDeptStock',
 								deptId : deptId.getValue(),
-								editData : editData,
+								editData : editData.values().join("<li>"),
 								cateType : init_materialBasicGrid.cateType ? (init_materialBasicGrid.cateType == true ? 1 : 2) : 2
 							},
 							success : function(res, opt){
@@ -210,7 +210,7 @@ function initMaterialControl(){
 								if(jr.success){
 									Ext.example.msg(jr.title, jr.msg);
 									init_materialBasicGrid.getStore().commitChanges();
-									editData = '';
+									editData.clear() ;
 								}else{
 									Ext.ux.showMsg(jr);
 								}						
@@ -291,10 +291,10 @@ function initMaterialControl(){
 				}
 			},
 			afteredit : function(e){
-				if(editData != ''){
-					editData += '<li>';
-				}
-				editData += (e.record.data['id'] + ',' + e.record.data['stock'] + ',' +  e.record.data['price']);
+				if(editData.containsKey(e.record.data['id'])){
+					editData.remove(e.record.data['id']);
+				} 
+				editData.put(e.record.data['id'], e.record.data['id'] + ',' + e.record.data['stock'] + ',' +  e.record.data['price']);
 				init_materialBasicGrid.cateType = e.record.data['isGood']; 
 			},
 			cellclick : function(grid, rowIndex, columnIndex, e) {
@@ -302,7 +302,7 @@ function initMaterialControl(){
 				$.post('../../OperateMaterialInit.do', {dataSource:'isInit'}, function(jr){
 					isInit = jr.success;
 					if(!isInit){
-						Ext.example.msg('提示', '未初始化库存, 不能修改库存数量');
+						Ext.example.msg('提示', '开始录入库单后, 不能修改库存数量');
 						record.commit();
 					}
 				});			        

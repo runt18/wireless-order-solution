@@ -468,6 +468,7 @@ function operateMaterialHandler(c){
 	var btnNextFoodMaterial = Ext.getCmp('btnNextFoodMaterial');
 	
 	if(c.otype == Ext.ux.otype['insert']){
+		materialCate.store.loadData(materialGoodCateData.concat(materialCateData));
 		
 		materialId.setValue();
 		materialName.setValue();
@@ -483,13 +484,12 @@ function operateMaterialHandler(c){
 		materialName.show();
 		materialCate.show();
 		
-		setTimeout(function(){
-			materialCate.store.loadData(materialGoodCateData.concat(materialCateData));
-		}, 250);
-		
 		var node = materialCateTree.getSelectionModel().getSelectedNode();
 		if(node && typeof node.attributes.cateId != 'undefined' && node.attributes.cateId != -1 && node.attributes.type != 1) {
-			materialCate.setValue(node.attributes.cateId);
+			
+			setTimeout(function(){
+				materialCate.setValue(node.attributes.cateId);
+			}, 250);
 		}
 		
 		operateMaterialWin.show();
