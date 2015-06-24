@@ -316,9 +316,9 @@ public class OrderFood implements Parcelable, Jsonable {
 	 * The unit price with taste to a specific food is as below.
 	 * <pre>
 	 * if(isWeight){
-	 *     unit_price = food_price + taste_price;
+	 *     unit_price = {@link OrderFood#getFoodPrice()} + taste_price;
 	 * }else{
-	 *     unit_price = food_price;
+	 *     unit_price = {@link OrderFood#getFoodPrice()};
 	 * } 
 	 * </pre>
 	 * @return the unit price to this order food
