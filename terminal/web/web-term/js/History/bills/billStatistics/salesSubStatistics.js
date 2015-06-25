@@ -138,6 +138,54 @@ function orderFoodStatPanelInit(){
 	var foodName = new Ext.form.TextField({
 		width : 100
 	});
+	
+	var foodSale_combo_staffs = new Ext.form.ComboBox({
+		id : 'foodSale_combo_staffs',
+		readOnly : false,
+		forceSelection : true,
+		width : 80,
+		listWidth : 120,
+		store : new Ext.data.SimpleStore({
+			fields : ['staffID', 'staffName']
+		}),
+		valueField : 'staffID',
+		displayField : 'staffName',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [[-1,'全部']];
+				Ext.Ajax.request({
+					url : '../../QueryStaff.do',
+//					params : {privileges : '1001'},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						for(var i = 0; i < jr.root.length; i++){
+							data.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+						}
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+						
+						if(sendToPageOperation){
+							cancel_setStatisticsDate();
+						}else{
+							cancel_dateCombo.setValue(1);
+							cancel_dateCombo.fireEvent('select', cancel_dateCombo, null, 1);			
+						}							
+					},
+					fialure : function(res, opt){
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					}
+				});
+			},
+			select : function(){
+				Ext.getCmp('cancel_btnSearch').handler();
+			}
+		}
+	});
 
 	var orderFoodStatPanelGridTbarItem = [{
 			xtype : 'tbtext',
@@ -147,6 +195,9 @@ function orderFoodStatPanelInit(){
 		{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 		{xtype : 'tbtext', text : '区域:'},
 		initRegionCombo('foodStatistic_'),
+		{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+		{xtype : 'tbtext', text : '员工:'},
+		foodSale_combo_staffs,
 	    '->', {
 		text : '搜索',
 		iconCls : 'btn_search',
@@ -170,6 +221,7 @@ function orderFoodStatPanelInit(){
 			gs.baseParams['deptID'] = salesSubDeptId;
 			gs.baseParams['foodName'] = foodName.getValue();
 			gs.baseParams['region'] = Ext.getCmp("foodStatistic_comboRegion").getValue();
+			gs.baseParams['staffId'] = foodSale_combo_staffs.getValue();
 			gs.baseParams['opening'] = data.opening;
 			gs.baseParams['ending'] = data.ending;
 			gs.load({
