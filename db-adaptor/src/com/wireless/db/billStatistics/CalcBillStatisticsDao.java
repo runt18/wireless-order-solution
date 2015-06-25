@@ -145,7 +145,7 @@ public class CalcBillStatisticsDao {
 				extraCond.append(" AND O.staff_id = " + staffId);
 			}
 			if(staffId4OrderFood > 0){
-				extraCond.append(" AND OF.staff_id = " + staffId);
+				extraCond.append(" AND OF.staff_id = " + staffId4OrderFood);
 			}
 			return extraCond.toString();
 		}
