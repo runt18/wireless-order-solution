@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.wireless.exception.BusinessException;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
@@ -103,6 +106,96 @@ public class Book {
 			return this;
 		}
 		
+		public InsertBuilder4Weixin addOrderFood(OrderFood of, Staff staff) throws BusinessException{
+			builder.addOrderFood(of, staff);
+			return this;
+		}
+		
+		public UpdateBuilder getBuilder(){
+			return this.builder;
+		}
+		
+		public Book build(){
+			return builder.build();
+		}
+	}
+	
+	public static class InsertBuilder4Manual{
+		private final UpdateBuilder builder = new UpdateBuilder(0).setSource(Source.MANUAL).setStatus(Status.CONFIRMED);
+		
+		public InsertBuilder4Manual setId(int id){
+			builder.id = id;
+			return this;
+		}
+		
+		public InsertBuilder4Manual setBookDate(long date){
+			if(date < System.currentTimeMillis()){
+				throw new IllegalArgumentException("预订时间不能小于当前时间");
+			}
+			builder.setBookDate(date);
+			return this;
+		}
+		
+		public InsertBuilder4Manual setBookDate(String date){
+			builder.setBookDate(date);
+			return this;
+		}
+		
+		public InsertBuilder4Manual setMember(Member member){
+			builder.setMember(member);
+			return this;
+		}
+		
+		public InsertBuilder4Manual setMember(String member){
+			builder.setMember(member);
+			return this;
+		}
+		
+		public InsertBuilder4Manual setTele(String tele){
+			builder.setTele(tele);
+			return this;
+		}
+		
+		public InsertBuilder4Manual setAmount(int amount){
+			builder.setAmount(amount);
+			return this;
+		}
+		
+		public InsertBuilder4Manual setStaff(Staff staff){
+			builder.setStaff(staff);
+			return this;
+		}
+		
+		public InsertBuilder4Manual setCategory(String category){
+			builder.setCategory(category);
+			return this;
+		}
+		
+		public InsertBuilder4Manual setReserved(int reserved){
+			builder.setReserved(reserved);
+			return this;
+		}
+		
+		public InsertBuilder4Manual setComment(String comment){
+			builder.setComment(comment);
+			return this;
+		}
+		
+		public InsertBuilder4Manual setMoney(float money){
+			builder.setMoney(money);
+			return this;
+		}
+		
+		public InsertBuilder4Manual addTable(Table table){
+			builder.addTable(table);
+			return this;
+		}
+		
+		public InsertBuilder4Manual addOrderFood(OrderFood of, Staff staff) throws BusinessException{
+			builder.addOrderFood(of, staff);
+			return this;
+		}
+		
 		public UpdateBuilder getBuilder(){
 			return this.builder;
 		}
@@ -128,17 +221,18 @@ public class Book {
 		private String category;
 		private String comment;
 		private final List<Table> tables = new ArrayList<Table>();
+		private Order bookOrder;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
 		}
 		
-		public UpdateBuilder setBookDate(String date){
+		UpdateBuilder setBookDate(String date){
 			this.bookDate = DateUtil.parseDate(date);
 			return this;
 		}
 		
-		public UpdateBuilder setBookDate(long date){
+		UpdateBuilder setBookDate(long date){
 			this.bookDate = date;
 			return this;
 		}
@@ -147,7 +241,7 @@ public class Book {
 			return this.bookDate != 0;
 		}
 		
-		public UpdateBuilder setReserved(int reserved){
+		UpdateBuilder setReserved(int reserved){
 			this.reserved = reserved;
 			return this;
 		}
@@ -156,7 +250,7 @@ public class Book {
 			return this.reserved != 0;
 		}
 		
-		public UpdateBuilder setRegion(String region){
+		UpdateBuilder setRegion(String region){
 			this.region = region;
 			return this;
 		}
@@ -165,14 +259,14 @@ public class Book {
 			return this.region != null;
 		}
 		
-		public UpdateBuilder setMember(Member member){
+		UpdateBuilder setMember(Member member){
 			this.member = member.getName();
 			this.memberId = member.getId();
 			this.tele = member.getTele();
 			return this;
 		}
 		
-		public UpdateBuilder setMember(String member){
+		UpdateBuilder setMember(String member){
 			this.member = member;
 			return this;
 		}
@@ -181,7 +275,7 @@ public class Book {
 			return this.member != null;
 		}
 		
-		public UpdateBuilder setTele(String tele){
+		UpdateBuilder setTele(String tele){
 			this.tele = tele;
 			return this;
 		}
@@ -190,7 +284,7 @@ public class Book {
 			return this.tele != null;
 		}
 		
-		public UpdateBuilder setAmount(int amount){
+		UpdateBuilder setAmount(int amount){
 			this.amount = amount;
 			return this;
 		}
@@ -203,7 +297,7 @@ public class Book {
 			return this.memberId != 0;
 		}
 		
-		public UpdateBuilder setStaff(Staff staff){
+		UpdateBuilder setStaff(Staff staff){
 			this.staff = staff;
 			return this;
 		}
@@ -212,7 +306,7 @@ public class Book {
 			return this.staff != null;
 		}
 		
-		public UpdateBuilder setMoney(float money){
+		UpdateBuilder setMoney(float money){
 			this.money = money;
 			return this;
 		}
@@ -221,7 +315,7 @@ public class Book {
 			return this.money != 0;
 		}
 		
-		public UpdateBuilder setCategory(String category){
+		UpdateBuilder setCategory(String category){
 			this.category = category;
 			return this;
 		}
@@ -230,7 +324,7 @@ public class Book {
 			return this.category != null;
 		}
 		
-		public UpdateBuilder setSource(Source source){
+		UpdateBuilder setSource(Source source){
 			this.source = source;
 			return this;
 		}
@@ -239,7 +333,7 @@ public class Book {
 			return this.source != null;
 		}
 		
-		public UpdateBuilder setStatus(Status status){
+		UpdateBuilder setStatus(Status status){
 			this.status = status;
 			return this;
 		}
@@ -248,13 +342,25 @@ public class Book {
 			return this.status != null;
 		}
 		
-		public UpdateBuilder addTable(Table table){
+		UpdateBuilder addTable(Table table){
 			this.tables.add(table);
 			return this;
 		}
 		
 		public boolean isTableChanged(){
 			return !this.tables.isEmpty();
+		}
+		
+		public UpdateBuilder addOrderFood(OrderFood of, Staff staff) throws BusinessException{
+			if(this.bookOrder == null){
+				this.bookOrder = new Order();
+			}
+			this.bookOrder.addFood(of, staff);
+			return this;
+		}
+		
+		public boolean isBookOrderChanged(){
+			return this.bookOrder != null;
 		}
 		
 		public UpdateBuilder setComment(String comment){
@@ -370,6 +476,7 @@ public class Book {
 	private String category;
 	private String comment;
 	private final List<Table> tables = new ArrayList<Table>();
+	private Order order;
 	
 	private Book(UpdateBuilder builder){
 		this.id = builder.id;
@@ -387,6 +494,7 @@ public class Book {
 		this.category = builder.category;
 		this.comment = builder.comment;
 		setTables(builder.tables);
+		setOrder(builder.bookOrder);
 	}
 	
 	public Book(int id){
@@ -527,6 +635,18 @@ public class Book {
 	
 	public boolean isExpired(){
 		return (System.currentTimeMillis() / 1000) > this.bookDate + this.reserved;
+	}
+	
+	public void setOrder(Order order){
+		this.order = order;
+	}
+	
+	public Order getOrder(){
+		return this.order;
+	}
+	
+	public boolean hasOrder(){
+		return this.order != null;
 	}
 	
 	public void setTables(List<Table> tables){
