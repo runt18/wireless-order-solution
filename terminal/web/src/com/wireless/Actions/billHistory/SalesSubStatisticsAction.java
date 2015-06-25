@@ -74,7 +74,7 @@ public class SalesSubStatisticsAction extends Action {
 			String deptID = request.getParameter("deptID");
 			String foodName = request.getParameter("foodName");
 			String region = request.getParameter("region");
-			
+			String staffId = request.getParameter("staffId");
 			
 			
 			pin = pin != null && pin.length() > 0 ? pin.trim() : "";
@@ -119,6 +119,10 @@ public class SalesSubStatisticsAction extends Action {
 				if(deptID != null && !deptID.equals("-1")){
 					extraConds.setDept(Department.DeptId.valueOf(Integer.parseInt(deptID)));
 				}
+				if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+					extraConds.setStaffId4OrderFood(Integer.parseInt(staffId));
+				}
+				
 				salesDetailList = SaleDetailsDao.getByFood(StaffDao.verify(Integer.parseInt(pin)), dutyRange, extraConds, ot);
 			}else if(qt == SaleDetailsDao.QUERY_BY_KITCHEN){
 				
