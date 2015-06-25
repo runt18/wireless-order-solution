@@ -182,7 +182,7 @@ function orderFoodStatPanelInit(){
 				});
 			},
 			select : function(){
-				Ext.getCmp('cancel_btnSearch').handler();
+				Ext.getCmp('foodStatistic_btnSearch').handler();
 			}
 		}
 	});
