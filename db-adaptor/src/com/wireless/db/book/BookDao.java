@@ -7,11 +7,19 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.menuMgr.FoodUnitDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BookError;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.book.Book;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.DateUtil;
 
 public class BookDao {
@@ -157,6 +165,54 @@ public class BookDao {
 		return bookId;
 	}
 	
+	/**
+	 * Insert the book record for manual according to specific builder {@link Book#InsertBuilder4Weixin}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to insert manual book record
+	 * @return the book id 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if failed to insert the manual book record
+	 */
+	public static int insert(Staff staff, Book.InsertBuilder4Manual builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			int bookId = insert(dbCon, staff, builder);
+			dbCon.conn.commit();
+			return bookId;
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Insert the book record for manual according to specific builder {@link Book#InsertBuilder4Weixin}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to insert manual book record
+	 * @return the book id 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if failed to insert the manual book record
+	 */
+	public static int insert(DBCon dbCon, Staff staff, Book.InsertBuilder4Manual builder) throws SQLException, BusinessException{
+		int bookId = insert(dbCon, staff);
+		update(dbCon, staff, builder.setId(bookId).getBuilder());
+		return bookId;
+	}
+	
 	private static int insert(DBCon dbCon, Staff staff) throws SQLException{
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".book " + 
@@ -218,7 +274,33 @@ public class BookDao {
 			}
 		}
 		
-		//TODO Update the associated book order.
+		//Update the associated book order.
+		if(book.hasOrder()){
+			for(OrderFood of : book.getOrder().getOrderFoods()){
+				sql = " INSERT INTO " + Params.dbName+ ".book_order" +
+					  " (book_id, food_id, food_unit_id, amount, tmp_taste, tmp_taste_price) VALUES ( " +
+					  book.getId() + "," +
+					  of.asFood().getFoodId() + "," +
+					  (of.hasFoodUnit() ? of.getFoodUnit().getId() : "NULL") + "," +
+					  of.getCount() + "," +
+					  (of.hasTmpTaste() ? "'" + of.getTasteGroup().getTmpTastePref() + "'" : "NULL") + "," +
+					  (of.hasTmpTaste() ? of.getTasteGroup().getTmpTastePrice() : "NULL") +
+					  ")";
+				dbCon.stmt.executeUpdate(sql);
+
+				if(of.getTasteGroup().hasNormalTaste()){
+					for(Taste ntg : of.getTasteGroup().getNormalTastes()){
+						sql = " INSERT INTO " + Params.dbName + ".book_order_taste" +
+							  " (book_id, food_id, taste_id) VALUES( " +
+							  book.getId() + "," +
+							  of.asFood().getFoodId() + "," +
+							  ntg.getTasteId() + 
+							  ")";
+						dbCon.stmt.executeUpdate(sql);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -254,14 +336,33 @@ public class BookDao {
 	 * @return the book record to this id
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			throws if the book record to this id does NOT exist
+	 * @throws BusinessException 
+	 * 			throws if cases below
+	 * 			<li>any booked table does NOT exist
+	 * 			<li>any food to booked does NOT exist
+	 * 			<li>any food unit to booked order food does NOT exist
+	 * 			<li>any taste to booked order food does NOT exist
 	 */
 	public static Book getById(DBCon dbCon, Staff staff, int bookId) throws SQLException, BusinessException{
 		List<Book> result = getByCond(dbCon, staff, new ExtraCond().setId(bookId));
 		if(result.isEmpty()){
 			throw new BusinessException(BookError.BOOK_RECORD_NOT_EXIST);
 		}else{
+			for(OrderFood of : result.get(0).getOrder().getOrderFoods()){
+				//Get the detail to food.
+				of.asFood().copyFrom(FoodDao.getById(dbCon, staff, of.asFood().getFoodId()));
+				//Get the detail to food unit.
+				if(of.hasFoodUnit()){
+					of.setFoodUnit(FoodUnitDao.getById(dbCon, staff, of.getFoodUnit().getId()));
+				}
+				//Get the normal tastes.
+				String sql = " SELECT taste_id FROM " + Params.dbName + ".book_order_taste WHERE book_id = " + result.get(0).getId() + " AND food_id = " + of.asFood().getFoodId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				while(dbCon.rs.next()){
+					of.addTaste(TasteDao.getById(staff, dbCon.rs.getInt("taste_id")));
+				}
+				dbCon.rs.close();
+			}
 			return result.get(0);
 		}
 	}
@@ -309,8 +410,8 @@ public class BookDao {
 		}
 		dbCon.rs.close();
 		
-		//Get the associated book tables.
 		for(Book book : result){
+			//Get the associated book tables.
 			sql = " SELECT table_id, table_name FROM " + Params.dbName + ".book_table WHERE book_id = " + book.getId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			final List<Table> bookTbls = new ArrayList<Table>();
@@ -318,11 +419,49 @@ public class BookDao {
 				Table tbl = new Table(dbCon.rs.getInt("table_id"));
 				tbl.setTableName(dbCon.rs.getString("table_name"));
 				bookTbls.add(tbl);
+				book.setTables(bookTbls);
 			}
 			dbCon.rs.close();
+			
+			Staff admin = null;
+			try{
+				admin = StaffDao.getAdminByRestaurant(dbCon, staff.getRestaurantId());
+			}catch(BusinessException ignored){
+				ignored.printStackTrace();
+			}
+			//Get the associated book order.
+			Order bookOrder = null;
+			sql = " SELECT food_id, food_unit_id, amount, tmp_taste, tmp_taste_price FROM " + Params.dbName + ".book_order WHERE book_id = " + book.getId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				if(bookOrder == null){
+					bookOrder = new Order();
+				}
+				OrderFood of = new OrderFood();
+				//Get the food.
+				of.asFood().setFoodId(dbCon.rs.getInt("food_id"));
+				//Get the food unit.
+				if(dbCon.rs.getInt("food_unit_id") != 0){
+					of.setFoodUnit(new FoodUnit(dbCon.rs.getInt("food_unit_id")));
+				}
+				//Get the amount.
+				of.setCount(dbCon.rs.getFloat("amount"));
+				//Get the temporary taste.
+				if(dbCon.rs.getString("tmp_taste") != null){
+					of.setTmpTaste(Taste.newTmpTaste(dbCon.rs.getString("tmp_taste"), dbCon.rs.getFloat("tmp_taste_price")));
+				}
+				try{
+					bookOrder.addFood(of, admin);
+				}catch(BusinessException ignored){
+					ignored.printStackTrace();
+				}
+			}
+			dbCon.rs.close();
+			
+			book.setOrder(bookOrder);
+			
 		}
 		
-		//TODO Get the associated book order.
 		return result;
 	}
 
@@ -394,6 +533,9 @@ public class BookDao {
 			dbCon.stmt.executeUpdate(sql);
 			
 			sql = " DELETE FROM " + Params.dbName + ".book_order WHERE book_id = " + book.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			sql = " DELETE FROM " + Params.dbName + ".book_order_taste WHERE book_id = " + book.getId();
 			dbCon.stmt.executeUpdate(sql);
 			
 			amount++;

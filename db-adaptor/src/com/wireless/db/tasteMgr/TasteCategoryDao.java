@@ -2,7 +2,6 @@ package com.wireless.db.tasteMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -219,7 +218,7 @@ public class TasteCategoryDao {
 		String sql;
 		
 		//Check to see whether the taste to this category does exist
-		if(TasteDao.getTasteAmountByCategory(dbCon, staff, categoryId) > 0){
+		if(!TasteDao.getByCond(dbCon, staff, new TasteDao.ExtraCond().setCategory(categoryId), " LIMIT 1 ").isEmpty()){
 			throw new BusinessException(TasteError.TASTE_NOT_CLEAN_UP);
 		}
 		
@@ -227,38 +226,6 @@ public class TasteCategoryDao {
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(TasteError.TASTE_CATE_NOT_EXIST);
 		}
-	}
-	
-	/**
-	 * Get the taste category to a specific restaurant.
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @return the taste category to specific restaurant
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<TasteCategory> get(Staff staff) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getByCond(dbCon, staff, null, null);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the taste category to a specific restaurant.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @return the taste category to specific restaurant
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<TasteCategory> get(DBCon dbCon, Staff staff) throws SQLException{
-		return getByCond(dbCon, staff, null, null);
 	}
 	
 	/**
@@ -306,7 +273,43 @@ public class TasteCategoryDao {
 		}
 	}
 	
-	private static List<TasteCategory> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	/**
+	 * Get the taste category according to extra condition.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the result to taste category
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<TasteCategory> getByCond(Staff staff, String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the taste category according to extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the result to taste category
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<TasteCategory> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".taste_category " +
 			  " WHERE 1 = 1 " +
@@ -314,7 +317,7 @@ public class TasteCategoryDao {
 			  (extraCond != null ? extraCond : " ") +
 			  (orderClause != null ? orderClause : " ORDER BY display_id ");
 		
-		List<TasteCategory> result = new ArrayList<TasteCategory>();
+		final List<TasteCategory> result = new ArrayList<TasteCategory>();
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
@@ -328,6 +331,6 @@ public class TasteCategoryDao {
 		}
 		dbCon.rs.close();
 		
-		return Collections.unmodifiableList(result);
+		return result;
 	}
 }

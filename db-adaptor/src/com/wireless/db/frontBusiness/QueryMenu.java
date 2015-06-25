@@ -50,8 +50,8 @@ public class QueryMenu {
 	 */
 	public static FoodMenu exec(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		return new FoodMenu(FoodDao.getByCond(dbCon, staff, null, null),
-						    TasteCategoryDao.get(dbCon, staff),
-							TasteDao.getTastes(dbCon, staff, null, null),
+						    TasteCategoryDao.getByCond(dbCon, staff, null, null),
+							TasteDao.getByCond(dbCon, staff, null, null),
 							KitchenDao.getByType(dbCon, staff, Kitchen.Type.NORMAL),
 			    			DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL),
 			    			DiscountDao.getAll(dbCon, staff),

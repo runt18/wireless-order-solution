@@ -179,7 +179,7 @@ public class TasteGroupDao {
 		return tgId;
 	}
 	
-	public static List<TasteGroup> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<TasteGroup> getByCond(DBCon dbCon, Staff staff, final ExtraCond extraCond) throws SQLException, BusinessException{
 		String sql;
 		sql = " SELECT " +
 			  " TG.taste_group_id, " +
@@ -195,11 +195,10 @@ public class TasteGroupDao {
 		while(dbCon.rs.next()){
 			int tgId = dbCon.rs.getInt("taste_group_id");
 			
-			int normalTasteGroupId;
 			Taste normal = null;
 			Taste tmp = null;
 			//Get the normal taste in case of exist.
-			normalTasteGroupId = dbCon.rs.getInt("normal_taste_group_id");
+			final int normalTasteGroupId = dbCon.rs.getInt("normal_taste_group_id");
 			if(normalTasteGroupId != TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID){
 				normal = new Taste(0);
 				normal.setPreference(dbCon.rs.getString("normal_taste_pref"));
@@ -217,8 +216,14 @@ public class TasteGroupDao {
 			//Get detail of each normal taste to this group in case of today
 			List<Taste> normalTastes = null;
 			if(normalTasteGroupId != TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID){
-				sql = " SELECT taste_id FROM " + Params.dbName + "." + extraCond.dbTbl.ntgTbl + " WHERE normal_taste_group_id = " + normalTasteGroupId;
-				normalTastes = TasteDao.getTastes(staff, " AND TASTE.taste_id IN (" + sql + ")", null);
+				TasteDao.ExtraCond extraCond4Taste = new TasteDao.ExtraCond(){
+					@Override
+					public String toString(){
+						String sql = " SELECT taste_id FROM " + Params.dbName + "." + extraCond.dbTbl.ntgTbl + " WHERE normal_taste_group_id = " + normalTasteGroupId;
+						return " AND TASTE.taste_id IN (" + sql + ")";
+					}
+				};
+				normalTastes = TasteDao.getByCond(staff, extraCond4Taste, null);
 			}
 			
 			result.add(new TasteGroup(tgId, normal, normalTastes, tmp));

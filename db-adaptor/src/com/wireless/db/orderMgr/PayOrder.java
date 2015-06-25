@@ -259,18 +259,6 @@ public class PayOrder {
 			MixedPaymentDao.insert(dbCon, staff, new MixedPayment.InsertBuilder(orderCalculated).setPayments(orderCalculated.getMixedPayment().getPayments()));
 		}
 		
-		//Update each food's discount & unit price.
-//		for(OrderFood of : orderCalculated.getOrderFoods()){
-//			sql = " UPDATE " + Params.dbName + ".order_food " +
-//				  " SET food_id = " + of.getFoodId() +
-//				  " ,discount = " + of.getDiscount() + 
-//				  " ,unit_price = " + of.getFoodPrice() +
-//				  " WHERE order_id = " + orderCalculated.getId() + 
-//				  " AND food_id = " + of.getFoodId() +
-//				  (of.hasFoodUnit() ? " AND food_unit_id = " + of.getFoodUnit().getId() : "");
-//			dbCon.stmt.executeUpdate(sql);				
-//		}	
-
 		if(orderCalculated.isUnpaid()){
 			//Delete the temporary table if the category belongs to joined, take out or fast.
 			if(orderCalculated.getDestTbl().getCategory().isTemporary()){

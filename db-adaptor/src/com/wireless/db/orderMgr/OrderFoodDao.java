@@ -721,11 +721,11 @@ public class OrderFoodDao {
 			if(src.hasNormalTaste()){
 				//Get the detail to each taste.
 				for(Taste t : src.getTasteGroup().getTastes()){
-					t.copyFrom(TasteDao.getTasteById(dbCon, staff, t.getTasteId()));
+					t.copyFrom(TasteDao.getById(dbCon, staff, t.getTasteId()));
 				}
 				//Get the detail to each spec.
 				if(src.getTasteGroup().hasSpec()){
-					src.getTasteGroup().getSpec().copyFrom(TasteDao.getTasteById(dbCon, staff, src.getTasteGroup().getSpec().getTasteId()));
+					src.getTasteGroup().getSpec().copyFrom(TasteDao.getById(dbCon, staff, src.getTasteGroup().getSpec().getTasteId()));
 				}
 				src.getTasteGroup().refresh();
 			}
@@ -743,11 +743,11 @@ public class OrderFoodDao {
 					if(cof.hasTasteGroup() && cof.getTasteGroup().hasNormalTaste()){
 						//Get the details to each taste of combo.
 						for(Taste t : cof.getTasteGroup().getTastes()){
-							t.copyFrom(TasteDao.getTasteById(dbCon, staff, t.getTasteId()));
+							t.copyFrom(TasteDao.getById(dbCon, staff, t.getTasteId()));
 						}
 						//Get the detail to each spec of combo
 						if(cof.getTasteGroup().hasSpec()){
-							cof.getTasteGroup().getSpec().copyFrom(TasteDao.getTasteById(dbCon, staff, cof.getTasteGroup().getSpec().getTasteId()));
+							cof.getTasteGroup().getSpec().copyFrom(TasteDao.getById(dbCon, staff, cof.getTasteGroup().getSpec().getTasteId()));
 						}
 						cof.getTasteGroup().refresh();
 					}

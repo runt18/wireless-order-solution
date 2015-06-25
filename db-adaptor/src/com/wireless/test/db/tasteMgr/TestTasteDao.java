@@ -45,7 +45,7 @@ public class TestTasteDao {
 			
 			Taste expected = builder.build();
 			expected.setTasteId(tasteId);
-			Taste actual = TasteDao.getTasteById(mStaff, tasteId);
+			Taste actual = TasteDao.getById(mStaff, tasteId);
 			
 			Assert.assertEquals("the id to taste", expected.getTasteId(), actual.getTasteId());
 			Assert.assertEquals("the prefence to taste", expected.getPreference(), actual.getPreference());
@@ -66,7 +66,7 @@ public class TestTasteDao {
 			expected.setRestaurantId(mStaff.getRestaurantId());
 			expected.setCategory(category);
 			
-			actual = TasteDao.getTasteById(mStaff, tasteId);
+			actual = TasteDao.getById(mStaff, tasteId);
 			
 			Assert.assertEquals("the id to taste", expected.getTasteId(), actual.getTasteId());
 			Assert.assertEquals("the prefence to taste", expected.getPreference(), actual.getPreference());
@@ -81,7 +81,7 @@ public class TestTasteDao {
 				TasteDao.delete(mStaff, tasteId);
 				TasteCategoryDao.delete(mStaff, categoryId);
 				try {
-					TasteDao.getTasteById(mStaff, tasteId);
+					TasteDao.getById(mStaff, tasteId);
 					Assert.assertTrue("failed to delete taste", false);
 				} catch (BusinessException ignored) {}
 			}
