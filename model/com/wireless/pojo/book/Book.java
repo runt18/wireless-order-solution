@@ -469,6 +469,7 @@ public class Book {
 	private int memberId;
 	private String tele;
 	private int amount;
+	private long confirmDate;
 	private Staff staff;
 	private float money;
 	private Source source;
@@ -658,5 +659,13 @@ public class Book {
 	
 	public List<Table> getTables(){
 		return Collections.unmodifiableList(this.tables);
+	}
+	
+	public void setConfirmDate(long confirmDate){
+		this.confirmDate = confirmDate;
+	}
+	
+	public long getConfirmDate(){
+		return this.confirmDate;
 	}
 }
