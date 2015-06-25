@@ -249,6 +249,7 @@ public class BookDao {
 			  (builder.isStaffChanged() ? " ,book_staff_id = " + book.getStaff().getId() : "") +
 			  (builder.isCategoryChanged() ? " ,book_cate = '" + book.getCategory() + "'" : "") +
 			  (builder.isSourceChanged() ? " ,book_source = " + book.getSource().getVal() : "") +
+			  (builder.isStatusChanged() && book.getStatus() == Book.Status.CONFIRMED ? " ,book_confirm_date = NOW() " : "") +
 			  (builder.isStatusChanged() ? " ,book_status = " + book.getStatus().getVal() : "") +
 			  (builder.isMoneyChanged() ? " ,book_money = " + book.getMoney() : "") +
 			  (builder.isCommentChanged() ? " ,comment = '" + book.getComment() + "'" : "") +
@@ -400,6 +401,9 @@ public class BookDao {
 				Staff bookStaff = new Staff(dbCon.rs.getInt("book_staff_id"));
 				bookStaff.setName(dbCon.rs.getString("book_staff"));
 				book.setStaff(bookStaff);
+			}
+			if(dbCon.rs.getTimestamp("book_confirm_date") != null){
+				book.setConfirmDate(dbCon.rs.getTimestamp("book_confirm_date").getTime());
 			}
 			book.setCategory(dbCon.rs.getString("book_cate"));
 			book.setSource(Book.Source.valueOf(dbCon.rs.getInt("book_source")));
