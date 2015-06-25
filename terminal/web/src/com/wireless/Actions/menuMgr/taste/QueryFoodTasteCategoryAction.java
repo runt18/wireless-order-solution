@@ -29,7 +29,7 @@ public class QueryFoodTasteCategoryAction extends DispatchAction{
 		StringBuilder tree = new StringBuilder(); 
 		List<TasteCategory> list = new ArrayList<TasteCategory>();
 		try{
-			list = TasteCategoryDao.get(staff);
+			list = TasteCategoryDao.getByCond(staff, null, null);
 			for (int i = 0; i < list.size(); i++) {
 				if(i > 0){
 					tree.append(",");
