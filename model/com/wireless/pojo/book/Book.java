@@ -14,6 +14,28 @@ import com.wireless.pojo.util.DateUtil;
 
 public class Book {
 
+	public static class SeatBuilder{
+		private final int id;
+		private final List<Order.InsertBuilder> bookOrders = new ArrayList<Order.InsertBuilder>();
+		
+		public SeatBuilder(int id){
+			this.id = id;
+		}
+		
+		public SeatBuilder addOrder(Order.InsertBuilder builder){
+			bookOrders.add(builder);
+			return this;
+		}
+		
+		public int getBookId(){
+			return this.id;
+		}
+		
+		public List<Order.InsertBuilder> getBookOrders(){
+			return Collections.unmodifiableList(bookOrders);
+		}
+	}
+	
 	public static class ConfirmBuilder{
 		private final UpdateBuilder builder;
 		
@@ -412,7 +434,7 @@ public class Book {
 	public static enum Status{
 		CREATED(1, "已创建"),
 		CONFIRMED(2, "已确认"),
-		FINISH(3, "已完成");
+		SEAT(3, "已入座");
 		
 		private final int val;
 		private final String desc;
