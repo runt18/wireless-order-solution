@@ -2,6 +2,7 @@ package com.wireless.test.db.book;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -11,17 +12,20 @@ import org.junit.Test;
 
 import com.wireless.db.book.BookDao;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BookError;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.book.Book;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.SortedList;
 import com.wireless.test.db.TestInit;
 
@@ -38,9 +42,14 @@ public class TestBookDao {
 		}
 	}
 	
+	@Test 
+	public void testSeat() throws SQLException, BusinessException{
+	}
+	
 	@Test
 	public void testBook4Manual() throws SQLException, BusinessException{
 		int bookId = 0;
+		final List<Order> actualBookOrders = new ArrayList<Order>();
 		final List<Table> tables = TableDao.getByCond(mStaff, null, null);
 		final List<Food> foods = FoodDao.getByCond(mStaff, null, null);
 		final List<Taste> tastes = TasteDao.getByCond(mStaff, null, null);
@@ -50,11 +59,13 @@ public class TestBookDao {
 
 			OrderFood of1 = new OrderFood();
 			of1.asFood().copyFrom(foods.get(0));
+			of1.setCount(1);
 			of1.addTaste(tastes.get(0));
 			of1.setTmpTaste(Taste.newTmpTaste("测试口味1", 10));
 
 			OrderFood of2 = new OrderFood();
 			of2.asFood().copyFrom(foods.get(1));
+			of2.setCount(1);
 			of2.addTaste(tastes.get(1));
 			of2.setTmpTaste(Taste.newTmpTaste("测试口味2", 10));
 			
@@ -78,6 +89,26 @@ public class TestBookDao {
 			
 			compare(expected, actual);
 			
+			//Test to seat the book order
+			Order.InsertBuilder bookOrderBuilder = Order.InsertBuilder.newInstance4Book(new Table.Builder(bookTbl1.getId())).add(of1, mStaff).add(of2, mStaff);
+			Book.SeatBuilder seatBuilder = new Book.SeatBuilder(bookId).addOrder(bookOrderBuilder);
+			BookDao.seat(mStaff, seatBuilder);
+			
+			for(Order.InsertBuilder eachOrderBuilder : seatBuilder.getBookOrders()){
+				Order actualOrder = OrderDao.getByTableId(mStaff, eachOrderBuilder.build().getDestTbl().getId());
+				actualBookOrders.add(actualOrder);
+				
+				Order expectedOrder = new Order(0);
+				expectedOrder.setDestTbl(eachOrderBuilder.build().getDestTbl());
+				expectedOrder.setComment(expected.getMember() + "预订");
+				expectedOrder.setCustomNum(expected.getAmount() / seatBuilder.getBookOrders().size());
+				expectedOrder.setCategory(Order.Category.NORMAL);
+				expectedOrder.setOrderFoods(eachOrderBuilder.build().getOrderFoods());
+				
+				compareBookOrder(expectedOrder, actualOrder);
+				
+			}
+			
 		}finally{
 			if(bookId != 0){
 				BookDao.deleteById(mStaff, bookId);
@@ -86,6 +117,10 @@ public class TestBookDao {
 					Assert.assertTrue("failed to delete the book record", false);
 				}catch(BusinessException e){
 					Assert.assertEquals("failed to delete the book record", BookError.BOOK_RECORD_NOT_EXIST, e.getErrCode());
+				}
+				
+				for(Order bookOrder : actualBookOrders){
+					OrderDao.deleteByCond(mStaff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(bookOrder.getId()));
 				}
 			}
 		}
@@ -210,5 +245,41 @@ public class TestBookDao {
 				Assert.assertEquals("food taste group to book order food[" + i + "]", expectedFoods.get(i).getTasteGroup(), actualFoods.get(i).getTasteGroup());
 			}
 		}
+	}
+	
+	private void compareBookOrder(Order expected, Order actual) throws BusinessException, SQLException{
+		
+		//Check the associated table
+		Assert.assertEquals("the table to order", expected.getDestTbl(), actual.getDestTbl());
+		//Check the custom number
+		Assert.assertEquals("the custom number to order", expected.getCustomNum(), actual.getCustomNum());
+		//Check the category
+		Assert.assertEquals("the category to order", expected.getCategory(), actual.getCategory());
+		//Check the comment 
+		Assert.assertEquals("the comment to order", expected.getComment(), actual.getComment());
+		//Check the order foods
+		Comparator<OrderFood> comp = new Comparator<OrderFood>(){
+			@Override
+			public int compare(OrderFood arg0, OrderFood arg1) {
+				return arg0.asFood().compareTo(arg1.asFood());
+			}
+		};
+		List<OrderFood> expectedFoods = SortedList.newInstance(expected.getOrderFoods(), comp);
+		List<OrderFood> actualFoods = SortedList.newInstance(actual.getOrderFoods(), comp);
+		
+		Assert.assertEquals("order food size", expectedFoods.size(), actualFoods.size());
+		for(int i = 0; i < expectedFoods.size(); i++){
+			Assert.assertEquals("basic info to food[" + i + "]", expectedFoods.get(i), actualFoods.get(i));
+			Assert.assertEquals("order count to food[" + i + "]", expectedFoods.get(i).getCount(), actualFoods.get(i).getCount(), 0.01);
+		}
+		
+		//Check the associated table detail
+		Table tbl = TableDao.getById(mStaff, actual.getDestTbl().getId());
+		//Check the status to associated table
+		Assert.assertEquals("the status to associated table", tbl.getStatus().getVal(), Table.Status.BUSY.getVal());
+		//Check the custom number to associated table
+		Assert.assertEquals("the custom number to associated table", tbl.getCustomNum(), actual.getCustomNum());
+		//Check the category to associated table
+		Assert.assertEquals("the category to associated table", tbl.getCategory().getVal(), actual.getCategory().getVal());
 	}
 }

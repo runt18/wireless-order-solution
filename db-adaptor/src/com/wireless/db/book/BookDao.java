@@ -1,5 +1,6 @@
 package com.wireless.db.book;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +14,21 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BookError;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.ErrorCode;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqInsertOrder;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.sccon.ServerConnector;
 
 public class BookDao {
 
@@ -70,7 +78,72 @@ public class BookDao {
 	}
 
 	/**
-	 * Confirm the book record.
+	 * Perform seat action according to builder {@link Book.SeatBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the seat builder {@link Book.SeatBuilder}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the book status is NOT confirmed
+	 * 			<li>the book order failed to insert
+	 */
+	public static void seat(Staff staff, Book.SeatBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			seat(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform seat action according to builder {@link Book.SeatBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the seat builder {@link Book.SeatBuilder}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the book status is NOT confirmed
+	 * 			<li>the book order failed to insert
+	 * 			<li>lack of book order
+	 */
+	public static void seat(DBCon dbCon, Staff staff, Book.SeatBuilder builder) throws SQLException, BusinessException{
+		Book book = getById(dbCon, staff, builder.getBookId());
+		if(book.getStatus() != Book.Status.CONFIRMED){
+			throw new BusinessException("预订信息不是【" + Book.Status.CONFIRMED.toString() + "】，不能入座", BookError.BOOK_RECORD_SEAT_FAIL);
+		}
+		final int nBookOrder = builder.getBookOrders().size();
+		if(nBookOrder == 0){
+			throw new BusinessException("缺少账单信息，不能预订入座");
+		}
+		for(Order.InsertBuilder orderBuilder : builder.getBookOrders()){
+			try{
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, orderBuilder.setForce(true)
+																											.setCustomNum(book.getAmount() / nBookOrder)
+																											.setComment(book.getMember() + "预订"), 
+																						 PrintOption.DO_PRINT));
+				if(resp.header.type == Type.ACK){
+					
+				}else if(resp.header.type == Type.NAK){
+					throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+				}
+			}catch(IOException e){
+				throw new BusinessException(e.getMessage());
+			}
+		}
+	}
+	
+	/**
+	 * Confirm the book record according to builder {@link Book.ConfirmBuilder}.
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
@@ -96,7 +169,7 @@ public class BookDao {
 	}
 	
 	/**
-	 * Confirm the book record.
+	 * Confirm the book record according to builder {@link Book.ConfirmBuilder}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
