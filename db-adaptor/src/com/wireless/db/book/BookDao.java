@@ -87,9 +87,11 @@ public class BookDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if any cases below
+	 * 			<li>the book record has expired
 	 * 			<li>the book status is NOT confirmed
 	 * 			<li>the book order failed to insert
-	 */
+	 * 			<li>lack of book order
+	 **/
 	public static void seat(Staff staff, Book.SeatBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -112,12 +114,16 @@ public class BookDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if any cases below
+	 * 			<li>the book record has expired
 	 * 			<li>the book status is NOT confirmed
 	 * 			<li>the book order failed to insert
 	 * 			<li>lack of book order
 	 */
 	public static void seat(DBCon dbCon, Staff staff, Book.SeatBuilder builder) throws SQLException, BusinessException{
 		Book book = getById(dbCon, staff, builder.getBookId());
+		if(book.isExpired()){
+			throw new BusinessException("已超过预订时间，不能入座", BookError.BOOK_RECORD_EXPIRED);
+		}
 		if(book.getStatus() != Book.Status.CONFIRMED){
 			throw new BusinessException("预订信息不是【" + Book.Status.CONFIRMED.toString() + "】，不能入座", BookError.BOOK_RECORD_SEAT_FAIL);
 		}
@@ -182,7 +188,8 @@ public class BookDao {
 	 * 			throws if the book record to confirm does NOT exist
 	 */
 	public static void confirm(DBCon dbCon, Staff staff, Book.ConfirmBuilder builder) throws SQLException, BusinessException{
-		if(getById(dbCon, staff, builder.build().getId()).getStatus() == Book.Status.CREATED){
+		Book book = getById(dbCon, staff, builder.build().getId());
+		if(book.getStatus() == Book.Status.CREATED || book.getStatus() == Book.Status.CONFIRMED){
 			update(dbCon, staff, builder.getBuilder());
 		}else{
 			throw new BusinessException("【已创建】状态的预订信息才可确认", BookError.BOOK_RECORD_CONFIRM_FAIL);
