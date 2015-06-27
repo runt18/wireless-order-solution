@@ -21,6 +21,10 @@ public class JsonMap implements Map<String, Object>{
 		jmap.putAll(map);
 	}
 	
+	public JSONObject getJSONObject(){
+		return this.jmap;
+	}
+	
 	@Override
 	public void clear() {
 		jmap.clear();
