@@ -399,18 +399,22 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 			}else if(msg.getEvent() == Event.SCAN_WAIT_MSG){
 				if(msg.getEventKey().equals(SCAN_EVENT_KEY)){
 					Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
-					Member member = MemberDao.getByWxSerial(staff, msg.getFromUserName());
+					Member member = MemberDao.getById(staff, WxMemberDao.getBySerial(staff, msg.getFromUserName()).getMemberId());
 					int orderId = Integer.parseInt(msg.getScanResult().substring(msg.getScanResult().indexOf("?") + 1));
 					OrderDao.discount(staff, Order.DiscountBuilder.build4Member(orderId, member));
 					Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
 					StringBuilder body = new StringBuilder();
-					body.append("账单号：" + order.getId()).append("，").append("原价：" + order.calcPriceBeforeDiscount()).append("，").append("会员价：" + order.calcTotalPrice());
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item(member.getName() + "信息注入成功", body.toString(), "", createUrl(msg, wEIXIN_SCANNING_RESULT) + "&orderId=" + order.getId())));
+					body.append("账单号：" + order.getId()).append("，")
+						.append("原价：" + NumericUtil.float2String2(order.calcPureTotalPrice()) + "元").append("，")
+						.append("会员价：" + NumericUtil.float2String2(order.calcTotalPrice()) + "元").append("，")
+						.append("点击查看账单详情");
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item(member.getName() + "信息读取成功", body.toString(), "", createUrl(msg, wEIXIN_SCANNING_RESULT) + "&orderId=" + order.getId())));
 				}
 			}
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
+			session.callback(new Msg4ImageText(msg).addItem(new Data4Item("操作失败", e.getMessage(), "", "")));
 		}
 	}
 	

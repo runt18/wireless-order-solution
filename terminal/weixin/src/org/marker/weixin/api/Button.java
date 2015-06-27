@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
@@ -83,6 +84,15 @@ public class Button implements Jsonable{
 			this.val = val;
 		}
 
+		public static Type valueOf(String val, int i){
+			for(Type type : values()){
+				if(type.val.equalsIgnoreCase(val)){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The type(val = " + val + ") is invalid.");
+		}
+		
 		@Override
 		public String toString() {
 			return val;
@@ -143,6 +153,10 @@ public class Button implements Jsonable{
 		return Collections.unmodifiableList(children);
 	}
 
+	public boolean hasChildren(){
+		return !this.children.isEmpty();
+	}
+	
 	public Button addChild(Button sub){
 		if(children.size() > 5){
 			throw new IllegalStateException("一级菜单最多包含5个二级菜单");
@@ -181,12 +195,37 @@ public class Button implements Jsonable{
 			jm.putJsonableList(Key4Json.SUB_BUTTON.key, this.children, 0);
 		}
 		
-		
 		return jm;
 	}
 
 	@Override
-	public void fromJsonMap(JsonMap jsonMap, int flag) {
-		//TODO
+	public void fromJsonMap(JsonMap jm, int flag) {
+		this.name = jm.getString(Key4Json.NAME.key);
+		if(jm.containsKey(Key4Json.SUB_BUTTON.key)){
+			this.children.clear();
+			this.children.addAll(JObject.parseList(Button.JSON_CREATOR, 0, jm.getJSONObject().getJSONObject(Key4Json.SUB_BUTTON.key).getJSONArray("list").toString()));
+		}else{
+			this.type = Button.Type.valueOf(jm.getString(Key4Json.TYPE.key), 0);
+			if(type == Type.CLICK || type == Type.SCAN_PUSH || type == Type.SCAN_MSG){
+				this.key = jm.getString(Key4Json.KEY.key);
+			}else if(type == Type.VIEW){
+				this.url = jm.getString(Key4Json.URL.key);
+			}
+		}
+	}
+	
+	public static Jsonable.Creator<Button> JSON_CREATOR = new Jsonable.Creator<Button>() {
+		@Override
+		public Button newInstance() {
+			return new Button();
+		}
+	};
+	
+	@Override
+	public String toString(){
+		return this.name + 
+			   (this.type != null ? ", " + this.type : "") +
+			   (this.key != null ? ", " + this.key : "") +
+			   (this.url != null ? ", " + this.url : "");
 	}
 }

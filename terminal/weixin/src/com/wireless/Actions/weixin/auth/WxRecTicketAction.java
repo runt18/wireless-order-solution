@@ -56,10 +56,10 @@ public class WxRecTicketAction extends Action {
 		
 	    ComponentAccessToken accessToken = ComponentAccessToken.newInstance(ticket);
 	    AuthParam.COMPONENT_ACCESS_TOKEN = accessToken;
-	    System.out.println(AuthParam.COMPONENT_ACCESS_TOKEN);
+	    //System.out.println(AuthParam.COMPONENT_ACCESS_TOKEN);
 	    
 	    AuthParam.PRE_AUTH_CODE = PreAuthCode.newInstance(accessToken);
-	    System.out.println(AuthParam.PRE_AUTH_CODE);
+	    //System.out.println(AuthParam.PRE_AUTH_CODE);
 	    
 	    response.getWriter().print("success");
 	    
