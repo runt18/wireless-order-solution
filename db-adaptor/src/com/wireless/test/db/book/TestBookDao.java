@@ -94,6 +94,10 @@ public class TestBookDao {
 			Book.SeatBuilder seatBuilder = new Book.SeatBuilder(bookId).addOrder(bookOrderBuilder);
 			BookDao.seat(mStaff, seatBuilder);
 			
+			expected.setStatus(Book.Status.SEAT);
+			actual = BookDao.getById(mStaff, bookId);
+			compare(expected, actual);
+			
 			for(Order.InsertBuilder eachOrderBuilder : seatBuilder.getBookOrders()){
 				Order actualOrder = OrderDao.getByTableId(mStaff, eachOrderBuilder.build().getDestTbl().getId());
 				actualBookOrders.add(actualOrder);
@@ -169,6 +173,7 @@ public class TestBookDao {
 			BookDao.confirm(mStaff, confirmBuilder);
 			actual = BookDao.getById(mStaff, bookId);
 			
+			expected.setStatus(Book.Status.CONFIRMED);
 			expected.setCategory(confirmBuilder.build().getCategory());
 			expected.setReserved(confirmBuilder.build().getReserved());
 			expected.setComment(confirmBuilder.build().getComment());
@@ -202,6 +207,7 @@ public class TestBookDao {
 		Assert.assertEquals("book region", expected.getRegion(), actual.getRegion());
 		Assert.assertEquals("book source", expected.getSource(), actual.getSource());
 		Assert.assertEquals("book category", expected.getCategory(), actual.getCategory());
+		Assert.assertEquals("book status", expected.getStatus(), actual.getStatus());
 		Assert.assertEquals("book money", expected.getMoney(), actual.getMoney(), 0.01);
 		Assert.assertEquals("book comment", expected.getComment(), actual.getComment());
 		if(expected.getStatus() != Book.Status.CREATED){

@@ -127,6 +127,12 @@ public class BookDao {
 		if(book.getStatus() != Book.Status.CONFIRMED){
 			throw new BusinessException("预订信息不是【" + Book.Status.CONFIRMED.toString() + "】，不能入座", BookError.BOOK_RECORD_SEAT_FAIL);
 		}
+		
+		String sql;
+		//Update the status to seated.
+		sql = " UPDATE " + Params.dbName + ".book SET book_status = " + Book.Status.SEAT.getVal() + " WHERE book_id = " + book.getId();
+		dbCon.stmt.executeUpdate(sql);
+		
 		final int nBookOrder = builder.getBookOrders().size();
 		if(nBookOrder == 0){
 			throw new BusinessException("缺少账单信息，不能预订入座");
