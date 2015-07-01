@@ -30,7 +30,6 @@ import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.task.DailySettlementTask;
-import com.wireless.task.SweepDBTask;
 
 public class WirelessSocketServer {
 
@@ -77,7 +76,7 @@ public class WirelessSocketServer {
     //printer login handler
     static PrinterLoginHandler printerLoginHandler = null;
     //the sweep db scheduler task
-    static Scheduler scheDbTask = null;
+    //static Scheduler scheDbTask = null;
     //the daily settlement task
     static Scheduler scheDailySettlement = null;
     
@@ -213,21 +212,21 @@ public class WirelessSocketServer {
 				new Thread(printerLoginHandler, "Printer Login").start();
 				
 				//start to schedule the sweep db task
-				scheDbTask = new Scheduler();
-				//parse the time to run sweep db task from configuration file
-				nl = doc.getElementsByTagName("sweep_db");
-				if(nl.item(0) != null){
-					String[] sweepTime = nl.item(0).getFirstChild().getNodeValue().split(",");
-					
-					//int dayOfMonth = Integer.parseInt(sweepTime[0]);
-					int hourOfDay = Integer.parseInt(sweepTime[1]);
-					int minute = Integer.parseInt(sweepTime[2]);
-					int second = Integer.parseInt(sweepTime[3]);
-					//schedule the sweep db task
-					scheDbTask.schedule(new SweepDBTask(), 
-										//new MonthlyIterator(dayOfMonth, hourOfDay, minute, second)
-										new DailyIterator(hourOfDay, minute, second));
-				}
+//				scheDbTask = new Scheduler();
+//				//parse the time to run sweep db task from configuration file
+//				nl = doc.getElementsByTagName("sweep_db");
+//				if(nl.item(0) != null){
+//					String[] sweepTime = nl.item(0).getFirstChild().getNodeValue().split(",");
+//					
+//					//int dayOfMonth = Integer.parseInt(sweepTime[0]);
+//					int hourOfDay = Integer.parseInt(sweepTime[1]);
+//					int minute = Integer.parseInt(sweepTime[2]);
+//					int second = Integer.parseInt(sweepTime[3]);
+//					//schedule the sweep db task
+//					scheDbTask.schedule(new SweepDBTask(), 
+//										//new MonthlyIterator(dayOfMonth, hourOfDay, minute, second)
+//										new DailyIterator(hourOfDay, minute, second));
+//				}
 				
 				
 				//start to schedule the daily settlement task

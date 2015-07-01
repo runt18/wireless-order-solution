@@ -146,10 +146,10 @@ public class MonitorHandler implements Runnable{
 							response += "stop the thread pool" + sep;
 						}
 						//terminate the sweep db task
-						if(WirelessSocketServer.scheDbTask != null){
-							WirelessSocketServer.scheDbTask.cancel();
-							response += "stop the sweeping db task" + sep;
-						}
+//						if(WirelessSocketServer.scheDbTask != null){
+//							WirelessSocketServer.scheDbTask.cancel();
+//							response += "stop the sweeping db task" + sep;
+//						}
 						//terminate the daily settlement task
 						if(WirelessSocketServer.scheDailySettlement != null){
 							WirelessSocketServer.scheDailySettlement.cancel();

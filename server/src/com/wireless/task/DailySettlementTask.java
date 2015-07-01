@@ -1,17 +1,27 @@
 package com.wireless.task;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 import org.tiling.scheduling.SchedulerTask;
 
 import com.wireless.db.foodAssociation.CalcFoodAssociationDao;
 import com.wireless.db.foodStatistics.CalcFoodStatisticsDao;
 import com.wireless.db.frontBusiness.DailySettleDao;
 import com.wireless.db.member.MemberDao;
+import com.wireless.db.misc.DbArchiveDao;
 import com.wireless.db.orderMgr.TasteGroupDao;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.printScheme.PrintLossDao;
@@ -31,6 +41,50 @@ import com.wireless.exception.BusinessException;
  */
 public class DailySettlementTask extends SchedulerTask{
 	
+	private String doPost(String url, String param) throws ClientProtocolException, IOException{
+		
+	    DefaultHttpClient client = new DefaultHttpClient();
+	    
+        HttpPost request = new HttpPost(url);
+        if(param != null && !param.isEmpty()){
+		    request.setEntity(new StringEntity(param, HTTP.UTF_8));
+        }
+        
+        ByteArrayOutputStream bos = null;
+        InputStream bis = null;
+        byte[] buf = new byte[10240];
+
+        String content = null;
+        
+	    try{
+
+	        HttpResponse response = client.execute(request);
+	
+	        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+	            bis = response.getEntity().getContent();
+	
+	            bos = new ByteArrayOutputStream();
+	            int count;
+	            while ((count = bis.read(buf)) != -1) {
+	                bos.write(buf, 0, count);
+	            }
+	            bis.close();
+	            content = bos.toString();
+	            
+	        } else {
+	            throw new IOException("error code is " + response.getStatusLine().getStatusCode());
+	        }
+			
+			return content;
+	    }finally{
+            if (bis != null) {
+                try {
+                    bis.close();// 最后要关闭BufferedReader
+                } catch (Exception ignored) { }
+            }
+	    }
+	}
+	
 	@Override
 	public void run() {
 		final String sep = System.getProperty("line.separator");
@@ -38,6 +92,8 @@ public class DailySettlementTask extends SchedulerTask{
 		taskInfo.append("Daily settlement task starts on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new java.util.Date())).append(sep);
 		
 		try {   
+			//Perform to db archive.
+			taskInfo.append(DbArchiveDao.archive()).append(sep);
 			
 			//Clean up the unused taste records
 			taskInfo.append("info : " + TasteGroupDao.cleanup()).append(sep);
@@ -87,6 +143,10 @@ public class DailySettlementTask extends SchedulerTask{
 			//Perform to cleanup the expired bill boards.
 			taskInfo.append("info : " + BillBoardDao.cleanup()).append(sep);
 			
+			//Notify wx-term to send the liveness & expired. 
+			doPost("http://wx.e-tones.net/wx-term/WxRemind.do?dataSource=expired", "");
+			doPost("http://wx.e-tones.net/wx-term/WxRemind.do?dataSource=liveness", "");
+			
 		}catch(SQLException | BusinessException e){
 			taskInfo.append("error : " + e.getMessage()).append(sep);
 			e.printStackTrace();
@@ -114,6 +174,11 @@ public class DailySettlementTask extends SchedulerTask{
 			}catch(IOException e){}
 			
 		}
+	}
+	
+	public static void main(String[] args) throws Exception{
+		new DailySettlementTask().doPost("http://wx.e-tones.net/wx-term/WxRemind.do?dataSource=liveness", "");
+		new DailySettlementTask().doPost("http://wx.e-tones.net/wx-term/WxRemind.do?dataSource=expired", "");
 	}
 }
 

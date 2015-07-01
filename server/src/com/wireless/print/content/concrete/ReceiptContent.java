@@ -112,11 +112,32 @@ public class ReceiptContent extends ConcreteContent {
 		
 		//replace the $(var_3) with the actual price
 		StringBuilder var3 = new StringBuilder();
-		var3.append(new ExtraFormatDecorator(
-						//new RightAlignedDecorator("实收(" + mOrder.getPaymentType().getName() + "):" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getActualPrice()), mStyle).toString(),
-						(new String(new char[]{0x1B, 0x61, 0x02}) + "实收(" + mOrder.getPaymentType().getName() + "):" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(mOrder.getActualPrice())),
-						mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
-			.append(SEP).append(new char[]{0x1B, 0x61, 0x00});
+		float pureTotal = mOrder.calcPureTotalPrice();
+		float actualTotal = mOrder.getActualPrice();
+		if(mPrintType == PType.PRINT_TEMP_RECEIPT && mOrder.hasMember() && actualTotal < pureTotal){
+			var3.append(new ExtraFormatDecorator(
+							(new String(new char[]{0x1B, 0x61, 0x02}) + "会员价:" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(actualTotal)), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
+				.append(SEP).append(new char[]{0x1B, 0x61, 0x00})
+				.append(SEP)
+				.append(new RightAlignedDecorator("原价:" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(pureTotal) + ", 节省" + NumericUtil.float2String2(pureTotal - actualTotal) + "元", mStyle));
+			
+//			var3.append(new ExtraFormatDecorator(
+//							(new String(new char[]{0x1B, 0x61, 0x02}) + "原价:" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(pureTotal)), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
+//				.append(SEP).append(new char[]{0x1B, 0x61, 0x00});
+//			var3.append(new ExtraFormatDecorator(
+//					(new String(new char[]{0x1B, 0x61, 0x02}) + "会员价:" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(actualTotal)), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
+//				.append(SEP).append(new char[]{0x1B, 0x61, 0x00});
+//			var3.append(new ExtraFormatDecorator(
+//					(new String(new char[]{0x1B, 0x61, 0x02}) + "节省" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(pureTotal - actualTotal)), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
+//				.append(SEP).append(new char[]{0x1B, 0x61, 0x00});
+		}else{
+			var3.append(new ExtraFormatDecorator(
+					(new String(new char[]{0x1B, 0x61, 0x02}) + "实收(" + mOrder.getPaymentType().getName() + "):" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(mOrder.getActualPrice())),
+					mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
+				.append(SEP).append(new char[]{0x1B, 0x61, 0x00});
+		}
+		
+
 		
 		if(mOrder.getPaymentType().isMixed()){
 			StringBuilder mixedDetail = new StringBuilder();
@@ -138,7 +159,7 @@ public class ReceiptContent extends ConcreteContent {
 			mTemplate = mTemplate.replace(PVar.RECEIPT_COMMENT, new RightAlignedDecorator("备注：" + mOrder.getComment(), getStyle()).toString());
 		}
 		
-		if(getPrintType() == PType.PRINT_TEMP_RECEIPT && mWxRestaurant.hasQrCode() && getStyle() == PStyle.PRINT_STYLE_80MM){
+		if(getPrintType() == PType.PRINT_TEMP_RECEIPT && mWxRestaurant.hasQrCode() && mWxRestaurant.getQrCodeStatus().isNormal() && getStyle() == PStyle.PRINT_STYLE_80MM){
 			final String qrCodeContent = mWxRestaurant.getQrCode() + "?" + mOrder.getId();
 			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new String(new char[]{0x1B, 0x61, 0x01}) + new QRCodeContent(getPrintType(), getStyle(), qrCodeContent) + new String(new char[]{0x1B, 0x61, 0x00}) +
 																		  SEP +
