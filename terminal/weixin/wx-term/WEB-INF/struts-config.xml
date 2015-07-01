@@ -7,12 +7,15 @@
 	<global-forwards />
 
 	<action-mappings>
-
+		<action path="/WxRemind"
+			type="com.wireless.Actions.weixin.remind.WxRemindAction" scope="request"
+			parameter="dataSource">
+		</action>
 		<action path="/WXEntry" type="com.wireless.Actions.weixin.EntryAction"
 			scope="request">
 		</action>
-		<action path="/*/RecWxEvent" type="com.wireless.Actions.weixin.auth.WxRecEventAction"
-			scope="request">
+		<action path="/*/RecWxEvent"
+			type="com.wireless.Actions.weixin.auth.WxRecEventAction" scope="request">
 		</action>
 		<action path="/WxAuth" type="com.wireless.Actions.weixin.auth.WxAuthAction"
 			scope="request">
@@ -93,7 +96,7 @@
 		<action path="/WXQueryBusinessStatistics"
 			type="com.wireless.Actions.weixin.query.WXQueryBusinessStatisticsAction"
 			scope="request" parameter="dataSource">
-		</action>		
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 
