@@ -79,8 +79,8 @@ import com.wireless.pojo.util.NumericUtil;
 
 public class FinanceWeixinAction extends Action {
 	
-	final static String APP_ID = "wx6fde9cd2c7fc791e";
-	final static String APP_SECRET = "0a360a43b80e3a334e5e52da706a3134";
+	public final static String APP_ID = "wx6fde9cd2c7fc791e";
+	public final static String APP_SECRET = "0a360a43b80e3a334e5e52da706a3134";
 	
 	private final static int WEIXIN_CONTENT_LENGTH = 34;
 	
