@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport"
 	content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
-<title>自助点餐</title>
+<title>预订点餐</title>
 <link rel="stylesheet" href="./css/base.css">
 <link rel="stylesheet" href="./css/food.css">
 <link type="text/css" rel="stylesheet" href="./css/mbar.css">
@@ -18,7 +18,8 @@
 
 </head>
 <body>
-
+<div>
+	<!-- 厨房列表 -->
 	<div id="divNavKitchen" class="box-horizontal">
 		<div id="divNavKitchen-kitchen">
 			<div data-r="title" class="div-l-n-title" data-value="-1"
@@ -31,17 +32,6 @@
 	<!-- 购物车列表 -->
 	<div id="divShoppingCart" class="box-vertical">
 		<div id="divFoodListForSC">
-			<!-- 
-		<div class="div-fl-f-sc-box box-horizontal">
-			<div data-type="msg" class="div-full">
-				<div>上汤菜心</div>
-				<div>价格:8888.88</div>
-			</div>
-			<div data-type="cut">-</div>
-			<div data-type="add">+</div>
-			<div data-type="count">88</div>
-		</div>
-		-->
 		</div>
 		<div id="divSumForSC">
 			菜品数量:&nbsp;<span id="spanSumCountForSC">--.--</span> &nbsp;&nbsp;
@@ -71,41 +61,6 @@
 		<div class="takeoutDetail">
 			<p>送餐信息:</p>
 			<div id="divAddressList" class="takeout_address" align="center">
-<!-- 				<div class="takeout_address_added takeout_address_unselect" onclick="selectAddress(this)">
-					<div class="added_left">
-						<div style="float: left;width: 50%">收货人 : 鸣人</div>
-						<div style="float: right;width: 50%">13533464033</div>
-						<div >地址: 天河区大观南路晨晖商务大厦A301</div>
-					</div>
-					<div class="added_right">
-						<i class="foundicon-checkmark"></i>
-					</div>
-				</div>
-				
-				<div class="takeout_address_added takeout_address_unselect"  onclick="selectAddress(this)">
-					<div class="added_left">
-						<div style="float: left;width: 50%">收货人 : 鸣人</div>
-						<div style="float: right;width: 50%">13533464033</div>
-						<div >地址: 天河区大观南路晨晖商务大厦A301</div>
-					</div>
-					<div class="added_right">
-						<i class="foundicon-checkmark"></i>
-					</div>
-				</div>
-				
-				<div class="takeout_address_added takeout_address_unselect"  onclick="selectAddress(this)">
-					<div class="added_left">
-						<div style="float: left;width: 50%">收货人 : 鸣人</div>
-						<div style="float: right;width: 50%">13533464033</div>
-						<div >地址: 天河区大观南路晨晖商务大厦A301</div>
-					</div>
-					<div class="added_right">
-						<i class="foundicon-checkmark"></i>
-					</div>
-				</div>			
-				
-				<div align="right" class="takeout_other_address"><span onclick="showOtherAddress({event:this, otype:'other'})">→使用其他地址</span> </div>
-				<div align="right" class="takeout_other_address takeout_address_hidden"><span onclick="showOtherAddress({event:this, otype:'new'})">→填写新的地址</span> </div> -->
 			</div>
 			<!-- 手动地址 -->
 			<div id="divNewAddress4TO" class="takeout_address" align="center">
@@ -149,7 +104,6 @@
 
 	</div>
 
-
 	<!-- 厨房列表 -->
 	<div id="divMainView" class="box-vertical">
 		<section class="panel" id="panelNav">
@@ -159,62 +113,22 @@
 		</section>
 
 		<div id="divFoodList" class="div-full" style="margin-left: 80px;">
-			<!-- 
-			<div class="box-horizontal box-food-list">
-				<div data-r="l">
-					<div style="background-image: url(../title-image.jpg);"></div>
-				</div>
-				<div data-r="c" class="box-food-list-c">
-					<div data-r="t"><b>上汤菜心</b></div>
-					<div data-r="m">价格: <span>￥8888.88</span></div>
-					<div data-r="b">积分: <font>8888.88</font></div>
-				</div>
-				<div data-r="r" class="box-horizontal box-food-list-r">
-					<div data-r="l">8</div>
-					<div data-r="r">+</div>
-				</div>
-			</div>
-		 -->
-			<!-- <div id="divOperateFoodPaging" onclick="loadFoodPaging()">&nbsp;</div> -->
 			<div id="divOperateFoodPaging">&nbsp;</div>
 		</div>
 
 		<div id="divBottomNav" class="hewarp">
 			<ul class="swiper-wrapper">
-				<li class="index swiper-slide"><a
-					href="javascript:Util.skip('index.html');"> <i
-						class="foundicon-home fcolor6"></i>首&nbsp;页
-				</a></li>
-				<li class="user swiper-slide">
-					<a id="foodOrderList" href="javascript:linkToOrders();"> 
-						<i class="foundicon-star fcolor1"></i><font id="food_order">我的订单</font>
-					</a>
-				</li>
 				<li class="special swiper-slide"><a
 					href="javascript:operateShoppingCart({event:this, otype:'show'});"
 					title="购物车"> <i class="foundicon-cart fcolor2"><div
 								id="spanDisplayFoodCount"></div></i>购物车
 				</a></li>
 				<li class="user swiper-slide"><a
-					href="javascript:window.location.reload();" title="刷新"> <i
-						class="foundicon-refresh fcolor3"></i>刷&nbsp;新
+					href="javascript:history.back()" title="返回"> <i
+						class="foundicon-left-arrow fcolor3"></i>返&nbsp;回
 				</a></li>
-				<li class="special swiper-slide">
-					<!-- 				<a href="javascript:Util.skip('rfood.html');" title="特色菜品">
-				<i class="foundicon-heart fcolor2"></i>特色菜品
-				</a> -->
-				</li>
-				<!-- 			<li class="user swiper-slide">
-				<a href="javascript:Util.skip('member.html');" title="会员中心"> 
-				<i class="foundicon-user fcolor3"></i>会员中心
-				</a>
-			</li>
- 			<li class="order swiper-slide">
-				<a href="javascript:operateKitchenSearch({event:this, otype:'show'});" title="分厨">
-				<i class="foundicon-search fcolor5"></i>分&nbsp;类
-				</a>
-			</li> -->
-
+				<li class="user swiper-slide"></li>
+				<li class="special swiper-slide"></li>
 			</ul>
 		</div>
 	</div>
@@ -247,23 +161,10 @@
 			</div>
 		</div>
 		<div data-region=desc class="d-fsa-desc">暂无简介</div>
-		<!-- 	<div  class="d-fsa-desc">点了这个菜的客人还点了:</div>
-
-	<div style="height:100px;overflow-x:auto;overflow-y:hidden;background-color: white;">
-	    <div style="width:9999px;">
-	        <div class="sale-food-list" style="background-image: url(http://digie-image-test.oss.aliyuncs.com/FoodImage/40/20141009094809909.jpg) ;">
-				<div style="height: 20px;background-color: rgba(0, 0, 0, 0.198039);width: 100%;padding-top: 3px;color: white;">波斯卡特葡萄酒<span style="margin-right: 5px;float: right;color: #ff6600">￥238</span></div>
-				<span class="sale-food-sorder" ><input type="button" value="下单" onclick="saleOrderFood({otype:'order', id:12919, event:this})"> </span>      	
-	        </div>
-	        <div class="sale-food-list" style="background-image: url(http://digie-image-test.oss.aliyuncs.com/FoodImage/40/20141009094840176.jpg) ;">
-				<div style="height: 20px;background-color: rgba(0, 0, 0, 0.198039);width: 100%;padding-top: 3px;color: white;">波斯卡特葡萄酒<span style="margin-right: 5px;float: right;color: #ff6600">￥238</span></div>
-				<span class="sale-food-sorder" ><input type="button" value="下单√" onclick="saleOrderFood({otype:'order', id:25537, event:this})"> </span>      	
-	        </div>
-	    </div>	
-	</div> -->
 		<div data-region="mask" class="d-fsa-mask div-full"
 			onclick="foodShowAbout({event:this, otype:'hide'})"></div>
 	</div>
-
+	
+</div>
 </body>
 </html>

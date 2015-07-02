@@ -292,18 +292,18 @@ body{
 .div-fl-f-sc-box > div[data-type=cut], div[data-type=add], div[data-type=plus]{
 	width: 40px;
 	color: #aaa;
-	line-height: 50px;
+	line-height: 45px;
 	text-align: center;
-	font-size: 60px;
+	font-size: 30px;
 	font-family : "courier",Georgia,Serif;
 	border-left: 1px solid #aaa;
 }
 
 .div-fl-f-sc-box > div[data-type=count]{
 	width: 50px;
-	font-size: 26px;
+	font-size: 20px;
 	font-weight: bold;
-	line-height: 50px;
+	line-height: 40px;
 	text-align: center;
 	background: #7ed2eb;
 	color: #fff;

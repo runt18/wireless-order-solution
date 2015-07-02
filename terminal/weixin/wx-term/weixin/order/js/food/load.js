@@ -1,3 +1,33 @@
+	var params = {
+		foodData : [],
+		orderData : [],
+		dataSource : 'normal',
+		isPaging : false,//默认不分页
+		start : 0,
+		limit : 10,
+		kitchenData : {},
+		kitchenId : -1,
+		DNSC : 'divNavKitchen-item-select'
+	};
+	var shopCartInit = false;
+	//购物车菜品总信息和下导航栏总高度 && 购物车每行菜品高度
+	var generalHeight = 87, foodHeight = 51;
+	//网页可见高度
+	var htmlHeight;
+	
+	var isTakeout = false, to={};
+	
+	if(Util.mp.extra && Util.mp.extra==3){
+		isTakeout = true;
+		to={
+				useNewAddress : false,
+				defaultAddress : '',
+				member : {},
+				customerContects : []
+		};		
+	}
+
+
 var Templet = {
 	foodBox : '<div class="box-horizontal box-food-list">'
 		+ '<div data-r="l">'
@@ -147,6 +177,7 @@ function initFoodData(c){
 }
 
 function initDeptData(){
+	Util.lm.show();
 	$.ajax({
 		url : '../../WXQueryDept.do',
 		dataType : 'json',
@@ -156,6 +187,7 @@ function initDeptData(){
 			fid : Util.getParam('r')
 		},
 		success : function(data, status, xhr){
+			Util.lm.hide();
 			params.kitchenData = data.root;
 			var temp, html = [], kitchenList = $('#ulKitchenList');
 			if(params.kitchenData.length > 0){
@@ -169,7 +201,8 @@ function initDeptData(){
 					temp = params.kitchenData[i];
 					html.push(Templet.kitchenBox.format({
 						id : temp.id,
-						star : temp.id == -10 ? 'star-kitchen-name' : '',
+						//如果是明星菜则用橙色背景, 否则第一个默认选中用灰色背景
+						star : temp.id == -10 ? 'star-kitchen-name' : (i == 0 ?'divNavKitchen-item-select':''),
 						name : temp.name.substring(0, 4)
 					}));
 				}
@@ -179,6 +212,7 @@ function initDeptData(){
 			html = null;			
 		},
 		error : function(xhr, errorType, error){
+			Util.lm.hide();
 			Util.dialog.show({ msg : '加载分厨信息失败.' });
 		}
 	});

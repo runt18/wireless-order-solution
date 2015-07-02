@@ -1,0 +1,51 @@
+.bookDate{
+	float : left;
+	width: 33.3%;
+
+}
+.bookDateDetail{
+	width:100%;
+	height: 40px;
+	border: 1px solid white;	
+	background-color: Gainsboro;
+	text-align: center;
+	padding: 5px 0;
+	color : DimGray ;
+}
+
+.bookDateCheck{
+	background-color: LightCoral ;
+	color: white; 
+}
+
+.bookTime{
+	padding:5px 5px;width:250px;border-radius:3px;border:1px solid #ddd;outline:none;text-align:center;color:#666;box-shadow: 2px 2px 5px 0px rgba(50, 50, 50, 0.35);
+	font-size: 15px;
+}
+.bookTime:focus{border-color:#ccc;color:#333;}
+
+.radioInput{
+  width: 20px;
+  height: 20px;
+  margin-top: 10px;
+}
+
+.bookPerson{
+	font-size: 15px;
+	padding: 5px;
+}
+
+.payTypeButton{
+	border: 1px solid red;padding : 5px; color: red;border-radius:5px;
+}
+.commitBook{
+	border-radius:10px;height: 30px;background-color: red;color: white;font-size: 15px;margin-right: 10px;
+}
+
+.bookFoodList{
+	width : 100% !important;
+}
+
+.bookFoodList span {
+	color:#ff6600 !important;
+}

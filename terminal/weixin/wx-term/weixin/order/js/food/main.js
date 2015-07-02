@@ -220,9 +220,17 @@ function operateFood(c){
 			msg : '是否清空已选菜品?',
 			callback : function(btn){
 				if(btn == 'yes'){
-					params.orderData = [];
+					//清空数据
+					var li = $('.select-food');
+
+					if(li.length > 0){
+						li.each(function(e){
+							$(this).removeClass("select-food");
+						});
+					}
+					params.orderData.length = 0;
+					$('#spanDisplayFoodCount').html('');
 					operateShoppingCart({otype:'hide'});
-					Util.getDom('divFoodListForSC').innerHTML = '';
 				}
 			}
 		});
