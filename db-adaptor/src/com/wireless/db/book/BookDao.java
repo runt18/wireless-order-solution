@@ -10,6 +10,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.FoodUnitDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BookError;
@@ -435,7 +436,14 @@ public class BookDao {
 		if(result.isEmpty()){
 			throw new BusinessException(BookError.BOOK_RECORD_NOT_EXIST);
 		}else{
-			for(OrderFood of : result.get(0).getOrder().getOrderFoods()){
+			Book book = result.get(0);
+			final List<Table> tables = new ArrayList<Table>();
+			for(Table tbl : book.getTables()){
+				tables.add(TableDao.getById(dbCon, staff, tbl.getId()));
+			}
+			book.setTables(tables);
+			
+			for(OrderFood of : book.getOrder().getOrderFoods()){
 				//Get the detail to food.
 				of.asFood().copyFrom(FoodDao.getById(dbCon, staff, of.asFood().getFoodId()));
 				//Get the detail to food unit.
@@ -450,7 +458,7 @@ public class BookDao {
 				}
 				dbCon.rs.close();
 			}
-			return result.get(0);
+			return book;
 		}
 	}
 	
