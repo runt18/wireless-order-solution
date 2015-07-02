@@ -113,6 +113,9 @@ public class DateUtil {
 	 * @return
 	 */
 	public static long parseDate(String date){
+		if(date == null){
+			return 0;
+		}
 		try{
 			return new SimpleDateFormat(Pattern.DATE_TIME.getPattern(), Locale.getDefault()).parse(date).getTime(); 
 		}catch(ParseException e){
