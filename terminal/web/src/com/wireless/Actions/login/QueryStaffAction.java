@@ -57,8 +57,6 @@ public class QueryStaffAction extends Action {
 		final JsonMap extra = new JsonMap();
 		
 		try {
-			// 解决后台中文传到前台乱码
-			
 			
 			out = response.getWriter();
 			String restaurantID ;
