@@ -20,6 +20,7 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.parcel.Parcel;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -38,6 +39,8 @@ public class BookDao {
 		private String tele;
 		private String member;
 		private Book.Status status;
+		private DutyRange range;
+		private int tableId;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -59,6 +62,21 @@ public class BookDao {
 			return this;
 		}
 		
+		public ExtraCond setBookRange(DutyRange range){
+			this.range = range;
+			return this;
+		}
+		
+		public ExtraCond setTable(int tableId){
+			this.tableId = tableId;
+			return this;
+		}
+		
+		public ExtraCond setTable(Table table){
+			this.tableId = table.getId();
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -73,6 +91,18 @@ public class BookDao {
 			}
 			if(status != null){
 				extraCond.append(" AND book_status = " + status.getVal());
+			}
+			if(range != null){
+				if(range.getOnDuty() != 0){
+					extraCond.append(" AND book_date >= " + range.getOnDutyFormat());
+				}
+				if(range.getOffDuty() != 0){
+					extraCond.append(" AND book_date <= " + range.getOffDutyFormat());
+				}
+			}
+			if(tableId != 0){
+				String sql = " SELECT book_id FROM " + Params.dbName + ".book_table WHERE table_id = " + tableId;
+				extraCond.append(" AND book_id IN (" + sql + ")");
 			}
 			return extraCond.toString();
 		}
@@ -116,6 +146,7 @@ public class BookDao {
 	 * @throws BusinessException
 	 * 			throws if any cases below
 	 * 			<li>the book record has expired
+	 * 			<li>the
 	 * 			<li>the book status is NOT confirmed
 	 * 			<li>the book order failed to insert
 	 * 			<li>lack of book order
@@ -127,6 +158,11 @@ public class BookDao {
 		}
 		if(book.getStatus() != Book.Status.CONFIRMED){
 			throw new BusinessException("预订信息不是【" + Book.Status.CONFIRMED.toString() + "】，不能入座", BookError.BOOK_RECORD_SEAT_FAIL);
+		}
+		for(Table tbl : book.getTables()){
+			if(tbl.isBusy()){
+				throw new BusinessException("餐台【" + tbl.getName() + "】是就餐状态，不能入座", BookError.BOOK_RECORD_SEAT_FAIL);
+			}
 		}
 		
 		String sql;
@@ -437,11 +473,6 @@ public class BookDao {
 			throw new BusinessException(BookError.BOOK_RECORD_NOT_EXIST);
 		}else{
 			Book book = result.get(0);
-			final List<Table> tables = new ArrayList<Table>();
-			for(Table tbl : book.getTables()){
-				tables.add(TableDao.getById(dbCon, staff, tbl.getId()));
-			}
-			book.setTables(tables);
 			
 			for(OrderFood of : book.getOrder().getOrderFoods()){
 				//Get the detail to food.
@@ -478,7 +509,8 @@ public class BookDao {
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".book WHERE 1 = 1 " +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
-			  (extraCond != null ? extraCond.toString() : "");
+			  (extraCond != null ? extraCond.toString() : "") +
+			  " ORDER BY book_date ASC ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		final List<Book> result = new ArrayList<Book>();
 		while(dbCon.rs.next()){
@@ -514,8 +546,14 @@ public class BookDao {
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			final List<Table> bookTbls = new ArrayList<Table>();
 			while(dbCon.rs.next()){
-				Table tbl = new Table(dbCon.rs.getInt("table_id"));
-				tbl.setTableName(dbCon.rs.getString("table_name"));
+				Table tbl;
+				try {
+					tbl = TableDao.getById(staff, dbCon.rs.getInt("table_id"));
+				} catch (BusinessException e) {
+					tbl = new Table(dbCon.rs.getInt("table_id"));
+					tbl.setTableName(dbCon.rs.getString("table_name"));
+				}
+
 				bookTbls.add(tbl);
 				book.setTables(bookTbls);
 			}
