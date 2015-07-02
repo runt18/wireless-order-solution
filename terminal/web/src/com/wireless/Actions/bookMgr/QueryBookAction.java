@@ -1,5 +1,6 @@
 package com.wireless.Actions.bookMgr;
 
+import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,8 +16,10 @@ import com.wireless.db.book.BookDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.book.Book;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 
 public class QueryBookAction extends DispatchAction{
 	
@@ -46,7 +49,12 @@ public class QueryBookAction extends DispatchAction{
 				extra.setStatus(Book.Status.valueOf(Integer.parseInt(status)));
 			}
 			if(bookDate != null && !bookDate.isEmpty()){
-				extra.setBookDate(bookDate);
+				DutyRange range = new DutyRange(DateUtil.parseDate(bookDate), DateUtil.parseDate(bookDate + " 23:59:59"));
+				extra.setBookRange(range);
+			}else{
+				Calendar c = Calendar.getInstance();
+				DutyRange range = new DutyRange(DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + c.get(Calendar.DATE)), 0);
+				extra.setBookRange(range);
 			}
 			List<Book> bookList = BookDao.getByCond(dbCon, staff, extra);
 			
