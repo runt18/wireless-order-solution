@@ -627,6 +627,15 @@
 		<action path="/PrinterDiagnosis"
 			type="com.wireless.Actions.printerDiag.PrinterDiagnosisAction" scope="request">
 		</action>
+		<action path="/QueryBook"
+			type="com.wireless.Actions.bookMgr.QueryBookAction"
+			scope="request" parameter="dataSource">
+		</action>	
+		<action path="/OperateBook"
+			type="com.wireless.Actions.bookMgr.OperateBookAction"
+			scope="request" parameter="dataSource">
+		</action>			
+		
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
