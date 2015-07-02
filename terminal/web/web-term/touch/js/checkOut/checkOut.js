@@ -143,6 +143,7 @@ function initOrderData(c){
 			    c.createrOrder == 'createrOrder' ? of.entry({
 					table : uo.table,
 					order : uo.order,
+					orderFoodOperateType : 'normal',
 					callback : function(){
 						location.href = '#orderFoodListMgr';
 						//异步刷新账单
@@ -876,7 +877,9 @@ uo.openTransOrderFood = function (){
 uo.closeTransOrderFood = function(){
 	//取消数字键盘触发
 	numKeyBoardFireEvent = null;	
-	
+
+
+		
 	if(ts.commitTableOrTran == 'openTable'){
 		//隐藏人数输入
 		$('#td4OpenTablePeople').hide();
@@ -904,9 +907,13 @@ uo.closeTransOrderFood = function(){
 		//去除3个按钮并排
 		$('#searchTableCmpsFoot a').removeClass('tablePopbottomBtn');		
 	}
-	
-	//操作设置为默认
-	ts.commitTableOrTran = 'table'
+
+	//不设置预订默认操作
+	if(ts.commitTableOrTran != 'bookTableChoose' && ts.commitTableOrTran != 'addBookTableChoose'){
+		//操作设置为默认
+		ts.commitTableOrTran = 'table';
+	}
+
 	
 	$('#transFoodCmp').hide();
 	$('#shadowForPopup').hide();	
@@ -1336,6 +1343,7 @@ uo.goToCreateOrder = function(){
 		of.entry({
 			table : uo.table,
 			order : uo.order,
+			orderFoodOperateType : 'normal',
 			callback : function(){
 				location.href = '#orderFoodListMgr';
 				//异步刷新账单

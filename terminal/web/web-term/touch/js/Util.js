@@ -1021,7 +1021,7 @@ Util.clone = function(myObj){
  */
 function intOnly(){
 	  var codeNum=event.keyCode;
-	  if(codeNum==8||codeNum==37||codeNum==39|| codeNum==110 (codeNum>=48&&codeNum<=57)){
+	  if(codeNum==8||codeNum==37||codeNum==39|| codeNum==110 || (codeNum>=48&&codeNum<=57)){
 	    event.returnValue=codeNum;
 	  }else{
 	    event.returnValue=false;

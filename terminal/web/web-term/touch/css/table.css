@@ -141,7 +141,7 @@ li[role=option] a{
 }
 
 .commonFoodName{
-	height: 45px;
+	height: 25px;
 	overflow: hidden;
 }
 
@@ -169,3 +169,6 @@ li[role=option] a{
 }
 
 
+.btnAddBookTables span{
+	padding: initial;
+}

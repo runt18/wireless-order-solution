@@ -40,7 +40,8 @@ var tables = [],
 		dailyOpe : {},
 		member : {},
 		searchTable : false,
-		commitTableOrTran : 'table'
+		commitTableOrTran : 'table',
+		bookChoosedTable : []
 	},
 	//登录操作包
 	ln={
@@ -171,6 +172,8 @@ $(function(){
 	document.getElementById('divFoods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
 	//已点菜界面高度
 	$('#orderFoodListCmp').height(document.body.clientHeight - 125);
+	//预订列表
+	$('#bookOrderListCmp').height(document.body.clientHeight - 170);	
 	//结账界面高度 & 菜品列表高度
 	$('#paymentCmp').height(document.body.clientHeight - 86);	
 	$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
@@ -780,6 +783,130 @@ ts.s = {
 };
 
 /**
+ * 预订列表匹配
+ */
+ts.bookSearch = {
+	file : null,
+	fileValue : null,
+	init : function(c){
+		this.file = document.getElementById(c.file);
+		if(typeof this.file.oninput != 'function'){
+			this.file.oninput = function(e){
+				ts.bookSearch.fileValue = ts.bookSearch.file.value;
+				var data = null, temp = null;
+				if(ts.bookSearch.fileValue.trim().length > 0){
+					data = [];
+					temp = ts.bookList;
+					for(var i = 0; i < temp.length; i++){
+						if((temp[i].tele).indexOf(ts.bookSearch.fileValue.trim()) != -1){
+							data.push(temp[i]);
+						}
+					}				
+					if(data != null){
+						ts.loadBookListData(data);			
+					}
+					
+					data = null;
+					temp = null;					
+				}else{
+					ts.loadBookListData(ts.bookList);	
+				}
+				
+
+			};
+		}
+		return this.file;
+	},
+	valueBack : function(){
+		if(this.file.value){
+			this.file.value = this.file.value.substring(0, this.file.value.length - 1);
+			this.file.oninput(this.file);			
+		}
+
+		this.file.focus();
+	},
+	select : function(){
+		this.file.select();
+	},
+	clear : function(){
+		this.file.value = '';
+		this.file.oninput(this.file);
+		this.file.select();
+	},
+	callback : function(){
+		co.s.clear();
+	},
+	onInput : function(){
+		this.file.oninput(this.file);		
+	},	
+	fireEvent : function(){
+		ts.bookSearch.onInput();
+	}
+};
+
+/**
+ * 预订列表名称匹配
+ */
+ts.bookSearchByName = {
+	file : null,
+	fileValue : null,
+	init : function(c){
+		this.file = document.getElementById(c.file);
+		if(typeof this.file.oninput != 'function'){
+			this.file.oninput = function(e){
+				ts.bookSearchByName.fileValue = ts.bookSearchByName.file.value;
+				var data = null, temp = null;
+				if(ts.bookSearchByName.fileValue.trim().length > 0){
+					data = [];
+					temp = ts.bookList;
+					for(var i = 0; i < temp.length; i++){
+						if((temp[i].member).indexOf(ts.bookSearchByName.fileValue.trim()) != -1){
+							data.push(temp[i]);
+						}
+					}				
+					if(data != null){
+						ts.loadBookListData(data);			
+					}
+					
+					data = null;
+					temp = null;					
+				}else{
+					ts.loadBookListData(ts.bookList);	
+				}
+				
+
+			};
+		}
+		return this.file;
+	},
+	valueBack : function(){
+		if(this.file.value){
+			this.file.value = this.file.value.substring(0, this.file.value.length - 1);
+			this.file.oninput(this.file);			
+		}
+
+		this.file.focus();
+	},
+	select : function(){
+		this.file.select();
+	},
+	clear : function(){
+		this.file.value = '';
+		this.file.oninput(this.file);
+		this.file.select();
+	},
+	callback : function(){
+		co.s.clear();
+	},
+	onInput : function(){
+		this.file.oninput(this.file);		
+	},	
+	fireEvent : function(){
+		ts.bookSearchByName.onInput();
+	}
+};
+
+/**
  * 执行转台
  * @param c  当前台号alias, 转去的台号oldAlias
  */
@@ -857,6 +984,58 @@ ts.toOrderFoodOrTransFood = function(c){
 		$('#divSelectTablesForTs').hide();
 		$('#divSelectTablesSuffixForTs').show();
 		ts.table.id = c.id;
+	}else if(ts.commitTableOrTran == 'bookTableChoose'){//预订台
+		var table = null;
+		for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+			if(ts.bookChoosedTable[i].id == c.id){
+				table = true;
+				ts.bookChoosedTable.splice(i, 1);
+				break;
+			}
+		}
+		
+		//选择餐台
+		if(table == null){
+			table = getTableById(c.id);
+			if(table.statusValue == 1){
+				Util.msg.tip("此餐台已使用, 不能选择");
+				return;
+			}
+			
+			ts.bookChoosedTable.push(table);
+		}
+		//选台后关闭
+		uo.closeTransOrderFood();
+		//刷新已点餐台
+		ts.loadBookChoosedTable({renderTo : 'bookTableHadChoose'});
+	}else if(ts.commitTableOrTran == 'addBookTableChoose'){//预订台
+		var table = null;
+		for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+			if(ts.bookChoosedTable[i].id == c.id){
+				table = true;
+				ts.bookChoosedTable.splice(i, 1);
+				break;
+			}
+		}
+		
+		//选择餐台
+		if(table == null){
+			table = getTableById(c.id);
+			if(table.statusValue == 1){
+				Util.msg.tip("此餐台已使用, 不能选择");
+				return;
+			}
+			
+			ts.bookChoosedTable.push(table);
+		}
+		//刷新已点餐台
+		ts.loadBookChoosedTable({renderTo : 'add_bookTableList'});
+		
+		//显示预订添加界面餐台
+		$('#box4BookTableList').show();
+		
+		//选台后关闭
+		uo.closeTransOrderFood();
 	}
 }
 
@@ -917,6 +1096,30 @@ ts.submitForSelectTableOrTransFood = function(){
 		ts.table = getTableByAlias($('#txtTableNumForTS').val());
 	}else if(ts.commitTableOrTran == 'member'){//会员
 		uo.useMemberForOrderAction();
+	}else if(ts.commitTableOrTran == 'bookTableChoose'){//预订台
+		var table = null;
+		for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+			if(ts.bookChoosedTable[i].alias == $('#txtTableNumForTS').val()){
+				table = true;
+				break;
+			}
+		}
+		
+		//选择餐台
+		if(table == null){
+			table = getTableByAlias($('#txtTableNumForTS').val());
+			if(table.statusValue == 1){
+				Util.msg.tip("此餐台已使用, 不能选择");
+				return;
+			}
+			
+			ts.bookChoosedTable.push(table);
+			//刷新已点餐台
+			ts.loadBookChoosedTable({renderTo : 'bookTableHadChoose'});
+		}
+		
+		uo.closeTransOrderFood();
+
 	}
 }
 
@@ -1127,6 +1330,42 @@ ts.createOrderForLookup = function (){
 }
 
 /**
+ * 设置预订入座选台
+ */
+ts.openBookTable = function(){
+	//隐藏数量输入
+	$('#td4TxtFoodNumForTran').hide();
+	
+	ts.commitTableOrTran = 'bookTableChoose';
+	
+	$("#txtTableNumForTS").val("");
+	$("#txtTableComment").val("");
+	
+	$('#transSomethingTitle').html("请输入桌号，确认添加");
+	
+	//打开控件
+	uo.openTransOrderFood();		
+}
+
+/**
+ * 设置手动预订选台
+ */
+ts.openAddBookTable = function(){
+	//隐藏数量输入
+	$('#td4TxtFoodNumForTran').hide();
+	
+	ts.commitTableOrTran = 'addBookTableChoose';
+	
+	$("#txtTableNumForTS").val("");
+	$("#txtTableComment").val("");
+	
+	$('#transSomethingTitle').html("请输入桌号，确认添加");
+	
+	//打开控件
+	uo.openTransOrderFood();		
+}
+
+/**
  * 设置为拆台
  */
 ts.openApartTable = function(){
@@ -1291,7 +1530,8 @@ ts.renderToCreateOrder = function(tableNo, peopleNo){
 				theTable.customNum = peopleNo;
 				of.entry({
 					table : theTable,
-					comment : $('#inputTableOpenCommon').val()
+					comment : $('#inputTableOpenCommon').val(),
+					orderFoodOperateType : 'normal'
 				});
 			}				
 		}, 250);
@@ -1313,6 +1553,19 @@ ts.renderToCreateOrder = function(tableNo, peopleNo){
 function getTableByAlias(tableAlias){
 	for(x in tables){
 		if(tables[x].alias == tableAlias){
+			return tables[x];		
+		}
+	}
+}
+
+/**
+ * 根据餐桌id，返回餐桌对象
+ * @param {int} tableId
+ * @returns {object} 
+ */
+function getTableById(tableId){
+	for(x in tables){
+		if(tables[x].id == tableId){
 			return tables[x];		
 		}
 	}
@@ -3026,11 +3279,532 @@ ts.doFeastOrder = function(){
 }
 
 
+
+
+
+
+/**
+ * 加载预订数据
+ */
+ts.loadBookListData = function(data){
+	var bookListTemplate = '<tr>' +
+		'<td>{list}</td>' +
+		'<td>{bookDate}</td>' +
+		'<td>{region}</td>' +
+		'<td>{member}</td>' +
+		'<td>{tele}</td>' +
+		'<td>{amount}</td>' +
+		'<td>{status}</td>' +
+		'<td>{staff}</td>' +
+		'<td><a onclick="ts.addBookInfo({type:\'look\', index:{index}})">查看</a></td>' +
+		'<td><div data-role="controlgroup" data-type="horizontal"><a href="#" data-role="button" data-theme="b">确认</a><a data-role="button" data-theme="b" onclick="ts.bookOperateTable({bookId:{bookId}, index:{index}})">入座</a><a href=""  data-role="button" data-theme="b">取消</a></div></td>' +
+	'</tr>';
+	
+	var html = [];
+	for (var i = 0; i < data.length; i++) {
+		var region = [];
+		if(data[i].tables.length > 0){
+			for (var j = 0; j < data[i].tables.length; j++) {
+				region.push(data[i].tables[j].name);
+			}
+			region = region.join(",");
+		}else{
+			region = data[i].region;
+		}
+		
+		html.push(bookListTemplate.format({
+			list : i+1,
+			index : i,
+			bookId : data[i].id,
+			bookDate : data[i].bookDate,
+			region : region,
+			member : data[i].member,
+			tele : data[i].tele,
+			amount : data[i].amount,
+			status : data[i].statusDesc,
+			staff : data[i].staff
+		}));
+	}
+	$('#bookOrderListBody').html(html.join("")).trigger('create');
+}
+
+/**
+ * 查询列表
+ */
+ts.searchBookList = function(){
+	Util.LM.show();
+	
+	var name = $('#searchBookPerson').val();
+	var phone = $('#searchBookPhone').val();
+	var status = $('#searchBookStatus').val();
+	var bookDate = $('input[name=bookDateType]:checked').val();
+	$.post('../QueryBook.do', {
+		dataSource : 'normal',
+		name : name,
+		phone : phone,
+		status : status,
+		bookDate : bookDate
+	}, function(data){
+		Util.LM.hide();
+		
+		if(data.success){
+			ts.bookList = data.root;
+			ts.loadBookListData(data.root);
+		}
+		
+	}, 'json');	
+}
+
+/**
+ * 进入订单列表Entry
+ */
+ts.bookListEntry = function(){
+	
+	//电话筛选
+	ts.bookSearch.init({file : 'searchBookPhone'});	
+	ts.bookSearchByName.init({file : 'searchBookPerson'});	
+	
+	//去已点菜界面
+	location.href="#bookOrderListMgr";
+	ts.searchBookList();
+	
+	var now = new Date();
+	
+	var today = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+	
+	now.setDate(now.getDate() + 1);
+	var tomorrow = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+
+	now.setDate(now.getDate() + 1);
+	var afterday = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+	
+	$('#bookDate_today').attr('value', today);
+	$('#bookDate_tomorrow').attr('value', tomorrow);
+	$('#bookDate_afterday').attr('value', afterday);
+	
+	//时分插件
+	$(".bookTime").timepicki();
+	
+	//加载经手人
+	$.post('../QueryStaff.do', function(data){
+		if(data.success){
+			var html = [];
+			var option = '<option value="{id}">{name}</option>';
+			data.root.forEach(function(e){
+				html.push(option.format({
+					id : e.staffID,
+					name : e.staffName
+				}));
+			});
+			$('#add_staff').html(html.join(""));
+			
+		}
+	}, 'json');
+
+}
+/**
+ * 预订入座
+ */
+ts.bookOperateTable = function(c){
+	if(ts.bookList[c.index].status != 2){
+		Util.msg.tip("预订不是【已确认】状态, 不能入座");
+		return;
+	}
+	
+	var tables = ts.bookList[c.index].tables;
+	
+	//初始化已选餐台
+	ts.bookChoosedTable.length = 0;
+	ts.currentBookId = c.bookId;
+	
+	var html = [];
+	for (var i = 0; i < tables.length; i++) {
+		var aliasOrName;
+		if(tables[i].categoryValue == 1){//一般台
+			aliasOrName = tables[i].alias
+		}else if(tables[i].categoryValue == 3){//搭台
+			var begin = tables[i].name.indexOf("(");
+			var end = tables[i].name.indexOf(")");
+			aliasOrName = '<font color="green">' + tables[i].name.substring(begin+1, end) +'</font>';
+		}else{
+			aliasOrName = '<font color="green">'+ tables[i].categoryText +'</font>'
+		}		
+		html.push(tableCmpTemplet.format({
+			dataIndex : i,
+			id : tables[i].id,
+			click : 'ts.toOrderFoodOrTransFood({alias:'+ tables[i].alias +',id:'+ tables[i].id +'})',
+			alias : aliasOrName,
+			theme : tables[i].statusValue == '1' ? "e" : "c",
+			name : tables[i].name == "" || typeof tables[i].name != 'string' ? tables[i].alias + "号桌" : tables[i].name,
+			tempPayStatus : tables[i].isTempPaid? '暂结' : ''
+		}));				
+	}
+	$('#bookTableToChoose').html(html.join("")).trigger('create');
+	
+	ts.commitTableOrTran = 'bookTableChoose';
+	
+	$('#bookOperateChooseTable').show();
+	$('#shadowForPopup').show();
+}
+
+/**
+ * 关闭预订入座
+ */
+ts.closeBookOperateTable = function(){
+	$('#bookOperateChooseTable').hide();
+	$('#shadowForPopup').hide();
+	$('#bookTableHadChoose').html('');
+	//清空选台
+	ts.bookChoosedTable.length = 0;
+} 
+
+
+/**
+ * 加载已选餐台
+ */
+ts.loadBookChoosedTable = function(c){
+	var html = [];
+	for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+		var aliasOrName;
+		if(ts.bookChoosedTable[i].categoryValue == 1){//一般台
+			aliasOrName = ts.bookChoosedTable[i].alias
+		}else if(ts.bookChoosedTable[i].categoryValue == 3){//搭台
+			var begin = ts.bookChoosedTable[i].name.indexOf("(");
+			var end = ts.bookChoosedTable[i].name.indexOf(")");
+			aliasOrName = '<font color="green">' + ts.bookChoosedTable[i].name.substring(begin+1, end) +'</font>';
+		}else{
+			aliasOrName = '<font color="green">'+ ts.bookChoosedTable[i].categoryText +'</font>'
+		}		
+		html.push(tableCmpTemplet.format({
+			dataIndex : i,
+			id : ts.bookChoosedTable[i].id,
+			click : 'ts.toOrderFoodOrTransFood({alias:'+ ts.bookChoosedTable[i].alias +',id:'+ ts.bookChoosedTable[i].id +'})',
+			alias : aliasOrName,
+			theme : ts.bookChoosedTable[i].statusValue == '1' ? "e" : "c",
+			name : ts.bookChoosedTable[i].name == "" || typeof ts.bookChoosedTable[i].name != 'string' ? ts.bookChoosedTable[i].alias + "号桌" : ts.bookChoosedTable[i].name,
+			tempPayStatus : tables[i].isTempPaid? '暂结' : ''
+		}));				
+	}
+	$('#'+c.renderTo).html(html.join("")).trigger('create');	
+}
+
+/**
+ * 入座点菜
+ */
+ts.bookTableOrderFood = function(){
+
+	if(ts.bookChoosedTable.length == 0){
+		Util.msg.tip("请选择餐台");
+		return;
+	}
+	
+	setTimeout(function(){
+		//关闭选台
+		ts.closeBookOperateTable();				
+	}, 500);
+
+	//进入点菜界面
+	of.entry({
+		table : ts.bookChoosedTable[0],
+		comment : '',
+		orderFoodOperateType : 'bookSeat'
+	});	
+}
+
+/**
+ * 入座落单
+ */
+ts.bookTableCommitOrderFood = function(){
+	
+	if(of.newFood.length == 0){
+		Util.msg.alert({
+			msg : "请选择菜品",
+			renderTo : 'orderFoodMgr'
+		});		
+		return ;
+	}
+	
+	var bookOrderFoods = [];
+	for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+		orderDataModel.tableID = ts.bookChoosedTable[i].id;
+		orderDataModel.orderFoods = of.newFood.slice(0);
+		orderDataModel.categoryValue =  ts.bookChoosedTable[i].categoryValue;	
+		bookOrderFoods.push(JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)));
+	}
+	
+	Util.LM.show();
+	$.post('../OperateBook.do', {
+		dataSource : 'seat',
+		bookId : ts.currentBookId,
+		bookOrderFoods : bookOrderFoods.join("<li>")
+	}, function(data){
+		Util.LM.hide();
+		if(data.success){
+			Util.msg.tip(data.msg);
+			ts.bookListEntry();
+		}else{
+			Util.msg.alert({
+				renderTo : 'orderFoodMgr',
+				msg : data.msg
+			});
+		}
+	}, 'json');
+}
+
+
+/**
+ * 打开手动预订页面
+ */
+ts.addBookInfo = function(c){
+	if(c.type == "add"){
+		$('#title4AddBook').text("填写预订");
+		$('#footer4AddBook').show();
+	}else if(c.type == "look"){
+		$('#title4AddBook').text("查看预订");
+		$('#footer4AddBook').hide();
+		
+		var book = ts.bookList[c.index];
+		$.ajax({
+			url : '../QueryBook.do',
+			type : 'post',
+			dataType : 'json',
+			async : false,
+			data :{
+				dataSource : 'checkout',
+				id : book.id
+			},
+			success : function(data){
+				if(data.success){
+					book = data.root[0];
+				}
+			}
+		});
+		
+		$('#add_bookDate').val(book.bookDate.substring(0, 11));
+		$('#add_bookTime').val(book.bookDate.substring(11, 16));
+		$('#add_bookPerson').val(book.member);
+		$('#add_bookPhone').val(book.tele);
+		$('#add_bookAmount').val(book.amount);
+		$('#cm_bookCate').val(book.category).selectmenu("refresh");
+		$('#cm_bookReserved').val(book.reserved);
+		$('#add_staff').val(book.staffId != -1?book.staffId :"").selectmenu("refresh");;
+		$('#add_bookMoney').val(book.money);
+		
+		if(book.tables.length > 0){
+			ts.bookChoosedTable = book.tables;
+			$('#box4BookTableList').show();
+			ts.loadBookChoosedTable({renderTo : 'add_bookTableList'});
+		}
+		
+		if(book.order && book.order.orderFoods.length > 0){
+			var orderFoods = book.order.orderFoods;
+			var bookOrderFoodListCmpTemplet = '<tr class="{isComboFoodTd}">'
+				+ '<td>{dataIndex}</td>'
+				+ '<td ><div class={foodNameStyle}>{name}</div></td>'
+				+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
+				+ '<td><div style="height: 25px;overflow: hidden;">{tastePref}</div></td>'
+				+ '<td>{unitPrice}</td>'
+				+ '</tr>';
+			
+			var html = [];
+			for (var i = 0; i < orderFoods.length; i++) {
+				html.push(bookOrderFoodListCmpTemplet.format({
+					dataIndex : i + 1,
+					id : orderFoods[i].id,
+					name : orderFoods[i].foodName,
+					count : orderFoods[i].count,
+					isWeight : (orderFoods[i].status & 1 << 7) != 0 ? 'initial' : 'none',
+					tastePref : orderFoods[i].tasteGroup.tastePref,
+					unitPrice : orderFoods[i].unitPrice.toFixed(2) + (orderFoods[i].isGift?'&nbsp;[<font style="font-weight:bold;">已赠送</font>]':''),
+					isComboFoodTd : "",
+					foodNameStyle : "commonFoodName"
+				}));
+			}
+			
+			$('#bookOrderFoodListBody').html(html.join('')).trigger('create');
+			
+			
+			//显示预订界面菜品显示
+			$('#box4BookOrderFoodList').show();				
+		}
+		
+		
+	}
+	$('#addBookInfo').show();
+	$('#shadowForPopup').show();
+}
+/**
+ * 关闭手动预订页面
+ */
+ts.closeAddBookInfo = function(){
+	$('#addBookInfo').hide();
+	$('#shadowForPopup').hide();
+	//清空选台 & 显示
+	ts.bookChoosedTable.length = 0;	
+	$('#box4BookTableList').hide();
+	$('#add_bookTableList').html('');	
+	
+	//清空菜品
+	of.newFood.length = 0;
+	$('#box4BookOrderFoodList').hide();
+	$('#bookOrderFoodListBody').html('');
+	
+	//清空input
+	$('#add_bookDate').val("");
+	$('#add_bookTime').val("");
+	$('#add_bookPerson').val("");
+	$('#add_bookPhone').val("");
+	$('#add_bookAmount').val("");
+//	$('#cm_bookCate').val();
+	$('#cm_bookReserved').val("");
+//	$('#add_staff').val();
+	$('#add_bookMoney').val("");	
+}
+
+/**
+ * 打开点菜页面
+ */
+ts.toOrderFoodPage = function(){
+	//关闭shadow
+	$('#shadowForPopup').hide();
+	//进入点菜界面
+	of.entry({
+		table : ts.bookChoosedTable.length > 0 ? ts.bookChoosedTable[0] : {name : '预订台', alias: ''},
+		comment : '',
+		//不清空已点菜
+		orderFoodOperateType : 'addBook'
+	});	
+}
+
+/**
+ * 预定菜完毕返回添加预订
+ */
+ts.bookFoodChooseFinish = function(){
+	
+	if(of.newFood.length == 0){
+		Util.msg.alert({
+			msg : "请选择菜品",
+			renderTo : 'orderFoodMgr'
+		});		
+		return ;
+	}
+	
+	//返回预订界面
+	history.back();
+	
+	var bookOrderFoodListCmpTemplet = '<tr class="{isComboFoodTd}">'
+		+ '<td>{dataIndex}</td>'
+		+ '<td ><div class={foodNameStyle}>{name}</div></td>'
+		+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
+		+ '<td><div style="height: 25px;overflow: hidden;">{tastePref}</div></td>'
+		+ '<td>{unitPrice}</td>'
+		+ '</tr>';
+	
+	var html = [];
+	for (var i = 0; i < of.newFood.length; i++) {
+		html.push(bookOrderFoodListCmpTemplet.format({
+			dataIndex : i + 1,
+			id : of.newFood[i].id,
+			name : of.newFood[i].name,
+			count : of.newFood[i].count,
+			isWeight : (of.newFood[i].status & 1 << 7) != 0 ? 'initial' : 'none',
+			tastePref : of.newFood[i].tasteGroup.tastePref,
+			unitPrice : of.newFood[i].unitPrice.toFixed(2) + (of.newFood[i].isGift?'&nbsp;[<font style="font-weight:bold;">已赠送</font>]':''),
+			isComboFoodTd : "",
+			foodNameStyle : "commonFoodName"
+		}));
+	}
+	
+	$('#bookOrderFoodListBody').html(html.join('')).trigger('create');
+	
+	//显示预订界面菜品显示
+	$('#box4BookOrderFoodList').show();	
+}	
+
+/**
+ * 添加预订数据提交
+ */
+ts.commitAddBook = function(){
+	var bookDate = $('#add_bookDate').val();
+	var time = $('#add_bookTime').val();
+	var member = $('#add_bookPerson').val();
+	var tele = $('#add_bookPhone').val();
+	var amount = $('#add_bookAmount').val();
+	var cate = $('#cm_bookCate').val();
+	var reserved = $('#cm_bookReserved').val();
+	var staff = $('#add_staff').val();
+	var money = $('#add_bookMoney').val();
+	
+
+	if(!bookDate || !reserved || !member || !tele || !amount || !money){
+		Util.msg.tip("请填写完整信息");
+		return;
+	}
+	
+	if(ts.bookChoosedTable.length == 0){
+		Util.msg.tip("请选择餐台");
+		return;		
+	}
+	
+	if(time.indexOf('PM') > 0){
+		var hourString = time.substring(0, time.indexOf(':'));
+		var hour = parseInt(hourString)+12;
+		var minute = time.substr(time.indexOf(':')+1, 2);
+		time = hour + ":" + minute + ':' + "59"
+	}else if(time.indexOf('AM') > 0){
+		var hour = time.substring(0, time.indexOf(':'));
+		var minute = time.substr(time.indexOf(':')+1, 2);	
+		time = hour + ":" + minute + ':' + "59"
+	}
+	
+	var tables = [];
+	for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+		tables.push(ts.bookChoosedTable[i].id);
+	}
+	
+	var orderFoods = [];
+	for (var i = 0; i < of.newFood.length; i++) {
+		orderFoods.push(JSON.stringify(of.newFood[i]));
+	}
+	
+	Util.LM.show();
+	$.post('../OperateBook.do', {
+		dataSource : 'addBook',
+		bookDate : bookDate,
+		member : member,
+		tele : tele,
+		amount : amount,
+		cate : cate,
+		reserved : reserved,
+		staff : staff,
+		money : money,
+		comment : '',
+		tables : tables.join("&"),
+		orderFoods : orderFoods.join("&")
+	}, function(data){
+		Util.LM.hide();
+		if(data.success){
+			Util.msg.tip(data.msg);
+			ts.closeAddBookInfo();
+			ts.searchBookList();
+		}
+	});
+	
+	
+}
+
+
+
+
+
+
+
 /**
  * 新页面打开账单管理
  */
 function toOrderMgrPage(){
-	window.open("../pages/FrontBusiness_Module/Bills.html");                 
+	window.open("../pages/FrontBusiness_Module/Bills.html");      
+	ts.searchBookList();
 }
 
 /**

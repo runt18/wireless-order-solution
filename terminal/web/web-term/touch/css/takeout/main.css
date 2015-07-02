@@ -512,12 +512,16 @@ html { overflow-y: hidden;}
 	background-image: -o-linear-gradient( top,red,maroon);	
 }
 
+.popupWinCloseBtn > span{
+	padding: initial !important; 	
+}
+
 .popupWinCloseBtn4comboFood{
 	border-top-right-radius: 0.5em;
-  width: 40px;
-  height: 50px;
-  margin: -1px 0;
-  line-height: 35px;
+	width: 40px;
+	height: 50px;
+	margin: -1px 0;
+	line-height: 35px;
 	background-image: -webkit-linear-gradient( top,red,maroon);
 	background-image: -moz-linear-gradient( top,red,maroon);
 	background-image: -ms-linear-gradient( top,red,maroon);

@@ -13,7 +13,9 @@ var of = {
 	commonTastes : [],
 	multiPrices : [],
 	calculator : {},
-	newFood : []
+	newFood : [],
+	//从哪个功能进入点菜
+	orderFoodOperateType : 'normal'
 },
 	//不同条件下选出的口味
 	tastesDate = [],
@@ -177,6 +179,7 @@ of.entry = function(c){
 	of.table = c.table;
 	of.table.comment = c.comment;
 	of.order = typeof c.order != 'undefined' ? c.order : null;
+	of.orderFoodOperateType = c.orderFoodOperateType;
 	of.afterCommitCallback = typeof c.callback == 'function' ? c.callback : null;
 	//清空选中的全单口味
 	of.ot.allBillTaste && delete of.ot.allBillTaste;
@@ -195,7 +198,35 @@ of.toOrderFoodPage = function(table){
 	$('#divNFCOTableBasicMsg').html(table.alias + '<br>' + table.name);
 	
 	of.table = table;
-	of.newFood = [];
+	
+	//正常点菜
+	if(of.orderFoodOperateType == 'normal'){
+		of.newFood = [];
+		$('#normalOrderFood').show();
+		$('#btnOrderAndPay').show();
+		$('#addBookOrderFood').hide();
+		$('#bookSeatOrderFood').hide();
+	}else if(of.orderFoodOperateType == 'bookSeat'){
+		of.newFood = [];
+		$('#bookSeatOrderFood').show();
+		$('#addBookOrderFood').hide();
+		$('#btnOrderAndPay').hide();
+		$('#normalOrderFood').hide();		
+	}else if(of.orderFoodOperateType == 'addBook'){
+		$('#addBookOrderFood').show();
+		$('#bookSeatOrderFood').hide();
+		$('#normalOrderFood').hide();
+		$('#btnOrderAndPay').hide();		
+	}
+	
+	if(of.orderFoodOperateType == 'normal'){
+		$('#addBookOrderFood').hide();
+		$('#bookSeatOrderFood').hide();
+	}else if(of.orderFoodOperateType == 'addBook'){
+		
+	}else if(of.orderFoodOperateType == 'bookSeat'){
+		
+	}
 	
 	//渲染数据
 	of.initDeptContent();
@@ -785,6 +816,8 @@ of.initNewFoodContent = function(c){
 		
 		orderFoodHtmlData = null;
 	}
+	
+	
 	temp = null;
 	tempUnitPrice = null;
 	if(sumCount > 0){
