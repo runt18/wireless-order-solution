@@ -950,6 +950,7 @@
 	    	</tr>
 	    	
 	    </table>
+	    <br>
 	    </div>
 		<div id="footer4AddBook" data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">

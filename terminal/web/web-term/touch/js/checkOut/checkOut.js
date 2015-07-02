@@ -17,7 +17,7 @@ var uo = {
 		+ '<td>{dataIndex}</td>'
 		+ '<td ><div class={foodNameStyle}>{name}</div></td>'
 		+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
-		+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
+		+ '<td><div style="height: 25px;overflow: hidden;">{tastePref}</div></td>'
 		+ '<td>{unitPrice}</td>'
 	//	+ '<td>{totalPrice}</td>'
 		+ '<td>{orderDateFormat}</td>'

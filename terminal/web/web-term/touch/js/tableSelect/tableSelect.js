@@ -137,7 +137,15 @@ var tables = [],
 			'<td><a data-role="button" data-theme="e" >{deptName}</a></td>' +
 			'<td style="padding-right: 10px;"><input id={numberfieldId} class="mixPayInputFont numberInputStyle" onkeypress="intOnly()"></td>'+
 			'<td> <a data-role="button" data-for="{deptId}" data-text={deptName} data-icon="delete" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-inline="true" onclick="ts.feastPayRemoveAction({event:this})">D</a></td>'+
-		'</tr>';
+		'</tr>',
+	//查看预订菜品	
+	bookOrderFoodListCmpTemplet = '<tr class="{isComboFoodTd}">'
+			+ '<td>{dataIndex}</td>'
+			+ '<td ><div class={foodNameStyle}>{name}</div></td>'
+			+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
+			+ '<td><div style="height: 25px;overflow: hidden;">{tastePref}</div></td>'
+			+ '<td>{unitPrice}</td>'
+			+ '</tr>';		
 
 
 $(function(){
@@ -1021,10 +1029,6 @@ ts.toOrderFoodOrTransFood = function(c){
 		//选择餐台
 		if(table == null){
 			table = getTableById(c.id);
-			if(table.statusValue == 1){
-				Util.msg.tip("此餐台已使用, 不能选择");
-				return;
-			}
 			
 			ts.bookChoosedTable.push(table);
 		}
@@ -3296,8 +3300,8 @@ ts.loadBookListData = function(data){
 		'<td>{amount}</td>' +
 		'<td>{status}</td>' +
 		'<td>{staff}</td>' +
-		'<td><a onclick="ts.addBookInfo({type:\'look\', index:{index}})">查看</a></td>' +
-		'<td><div data-role="controlgroup" data-type="horizontal"><a href="#" data-role="button" data-theme="b">确认</a><a data-role="button" data-theme="b" onclick="ts.bookOperateTable({bookId:{bookId}, index:{index}})">入座</a><a href=""  data-role="button" data-theme="b">取消</a></div></td>' +
+		'<td><a href="javascript: ts.addBookInfo({type:\'look\', index:{index}})">{lookout}</a></td>' +
+		'<td><div data-role="controlgroup" data-type="horizontal"><a href="#" data-role="button" data-theme="b" onclick="ts.addBookInfo({type:\'confirm\', index:{index}})">确认</a><a data-role="button" data-theme="b" onclick="ts.bookOperateTable({bookId:{bookId}, index:{index}})">入座</a><a href=""  data-role="button" data-theme="b">取消</a></div></td>' +
 	'</tr>';
 	
 	var html = [];
@@ -3317,6 +3321,7 @@ ts.loadBookListData = function(data){
 			index : i,
 			bookId : data[i].id,
 			bookDate : data[i].bookDate,
+			lookout : data[i].isExpired ? '<span style="color:red">查看(超时)</span>' : '查看',
 			region : region,
 			member : data[i].member,
 			tele : data[i].tele,
@@ -3455,7 +3460,7 @@ ts.closeBookOperateTable = function(){
 	$('#shadowForPopup').hide();
 	$('#bookTableHadChoose').html('');
 	//清空选台
-	ts.bookChoosedTable.length = 0;
+//	ts.bookChoosedTable.length = 0;
 } 
 
 
@@ -3559,9 +3564,7 @@ ts.addBookInfo = function(c){
 	if(c.type == "add"){
 		$('#title4AddBook').text("填写预订");
 		$('#footer4AddBook').show();
-	}else if(c.type == "look"){
-		$('#title4AddBook').text("查看预订");
-		$('#footer4AddBook').hide();
+	}else if(c.type == "look" || c.type == "confirm"){
 		
 		var book = ts.bookList[c.index];
 		$.ajax({
@@ -3579,6 +3582,18 @@ ts.addBookInfo = function(c){
 				}
 			}
 		});
+		
+		if(c.type == "look" ){
+			$('#footer4AddBook').hide();
+			$('#title4AddBook').text("查看预订 -- "+ book.sourceDesc);
+		}else{
+			if(book.status == 3){
+				Util.msg.tip("入座状态不能做确认操作");
+				return;
+			}
+			$('#footer4AddBook').show();
+			$('#title4AddBook').text("确认预订");
+		}
 		
 		$('#add_bookDate').val(book.bookDate.substring(0, 11));
 		$('#add_bookTime').val(book.bookDate.substring(11, 16));
@@ -3598,13 +3613,6 @@ ts.addBookInfo = function(c){
 		
 		if(book.order && book.order.orderFoods.length > 0){
 			var orderFoods = book.order.orderFoods;
-			var bookOrderFoodListCmpTemplet = '<tr class="{isComboFoodTd}">'
-				+ '<td>{dataIndex}</td>'
-				+ '<td ><div class={foodNameStyle}>{name}</div></td>'
-				+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
-				+ '<td><div style="height: 25px;overflow: hidden;">{tastePref}</div></td>'
-				+ '<td>{unitPrice}</td>'
-				+ '</tr>';
 			
 			var html = [];
 			for (var i = 0; i < orderFoods.length; i++) {
@@ -3623,13 +3631,12 @@ ts.addBookInfo = function(c){
 			
 			$('#bookOrderFoodListBody').html(html.join('')).trigger('create');
 			
-			
 			//显示预订界面菜品显示
 			$('#box4BookOrderFoodList').show();				
 		}
-		
-		
 	}
+	
+	
 	$('#addBookInfo').show();
 	$('#shadowForPopup').show();
 }
@@ -3691,14 +3698,6 @@ ts.bookFoodChooseFinish = function(){
 	
 	//返回预订界面
 	history.back();
-	
-	var bookOrderFoodListCmpTemplet = '<tr class="{isComboFoodTd}">'
-		+ '<td>{dataIndex}</td>'
-		+ '<td ><div class={foodNameStyle}>{name}</div></td>'
-		+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
-		+ '<td><div style="height: 25px;overflow: hidden;">{tastePref}</div></td>'
-		+ '<td>{unitPrice}</td>'
-		+ '</tr>';
 	
 	var html = [];
 	for (var i = 0; i < of.newFood.length; i++) {
@@ -3770,7 +3769,7 @@ ts.commitAddBook = function(){
 	Util.LM.show();
 	$.post('../OperateBook.do', {
 		dataSource : 'addBook',
-		bookDate : bookDate,
+		bookDate : bookDate + " " + time,
 		member : member,
 		tele : tele,
 		amount : amount,
