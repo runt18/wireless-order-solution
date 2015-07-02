@@ -349,6 +349,15 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 获取会员等级highchart数据
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward chart(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
