@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.member.Member;
@@ -12,7 +14,7 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 
-public class Book {
+public class Book implements Jsonable{
 
 	public static class SeatBuilder{
 		private final int id;
@@ -689,5 +691,39 @@ public class Book {
 	
 	public long getConfirmDate(){
 		return this.confirmDate;
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("restaurantId", this.restaurantId);
+		jm.putString("bookDate", DateUtil.format(this.bookDate));
+		jm.putInt("reserved", this.reserved);
+		jm.putString("region", this.region);
+		jm.putString("member", this.member);
+		jm.putInt("memberId", this.memberId);
+		jm.putString("tele", this.tele);
+		jm.putInt("amount", this.amount);
+		jm.putString("staff", this.staff != null ? this.staff.getName() : "----");
+		jm.putInt("staffId", this.staff != null ? this.staff.getId() : -1);
+		jm.putFloat("money", this.money);
+		jm.putInt("sourceValue", this.source.getVal());
+		jm.putString("sourceDesc", this.source.toString());
+		jm.putString("statusDesc", this.status.toString());
+		jm.putInt("status", this.status.getVal());
+		jm.putString("category", this.category);
+		jm.putString("comment", this.comment);
+		jm.putJsonableList("tables", this.tables, flag);
+		if(this.order != null){
+			jm.putJsonable("order", this.order, flag);
+		}
+		return jm;
+	}
+
+
+	@Override
+	public void fromJsonMap(JsonMap jm, int flag) {
+		
 	}
 }
