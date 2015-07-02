@@ -94,10 +94,10 @@ public class BookDao {
 			}
 			if(range != null){
 				if(range.getOnDuty() != 0){
-					extraCond.append(" AND book_date >= " + range.getOnDutyFormat());
+					extraCond.append(" AND book_date >= '" + range.getOnDutyFormat() + "'");
 				}
 				if(range.getOffDuty() != 0){
-					extraCond.append(" AND book_date <= " + range.getOffDutyFormat());
+					extraCond.append(" AND book_date <= '" + range.getOffDutyFormat() + "'");
 				}
 			}
 			if(tableId != 0){
