@@ -6,6 +6,7 @@ Ext.onReady(function(){
        {header: '部门 ', dataIndex: 'deptName'},
        {header: '期初余额', dataIndex: 'primeMoney', align : 'right',  renderer : Ext.ux.txtFormat.gridDou},
        {header: '领料金额', dataIndex: 'useMaterialMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '拨入金额', dataIndex: 'stockInTransferMoney', align : 'right', width : 120, renderer : Ext.ux.txtFormat.gridDou},
        {header: '退料金额', dataIndex: 'stockOutMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
        {header: '拨出金额', dataIndex: 'stockOutTransferMoney', align : 'right', width : 120, renderer : Ext.ux.txtFormat.gridDou},
        {header: '期末金额', dataIndex: 'endMoney', align : 'right', width : 130, renderer : Ext.ux.txtFormat.gridDou},
@@ -24,6 +25,7 @@ Ext.onReady(function(){
 				{name: 'primeMoney'},
 				{name: 'useMaterialMoney'},
 				{name: 'stockOutMoney'},
+				{name: 'stockInTransferMoney'},
 				{name: 'stockOutTransferMoney'},
 				{name: 'endMoney'},
 				{name: 'costMoney'},
@@ -91,6 +93,25 @@ Ext.onReady(function(){
 	
 
 	costAnalyzeGrid.region = 'center';
+	
+	costAnalyzeGrid.getStore().on('load', function(store, records, options){
+		
+		if(store.getCount() > 0){
+			var sumRow = costAnalyzeGrid.getView().getRow(store.getCount() - 1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			sumRow.style.color = 'green';
+			for(var i = 0; i < costAnalyzeGrid.getColumnModel().getColumnCount(); i++){
+				var sumRow = costAnalyzeGrid.getView().getCell(store.getCount() - 1, i);
+				sumRow.style.fontSize = '15px';
+				sumRow.style.fontWeight = 'bold';					
+			}
+			costAnalyzeGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			costAnalyzeGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
+			costAnalyzeGrid.getView().getCell(store.getCount()-1, 11).innerHTML = '--';
+			
+		}
+	});	
+	
 	
 	new Ext.Panel({
 		renderTo : 'divCostAnalysis',

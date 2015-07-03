@@ -179,11 +179,10 @@ Ext.onReady(function(){
 			id : 'btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
-				var deptID = '-1';
 				var sn = deltaReportDeptTree.getSelectionModel().getSelectedNode();
 				var sgs = deltaReportGrid.getStore();
 				sgs.baseParams['beginDate'] = Ext.getCmp('dr_beginDate').getValue().format('Y-m');
-				sgs.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
+				sgs.baseParams['deptId'] = !sn ? '-1' : sn.attributes.deptID;
 				sgs.baseParams['cateType'] = Ext.getCmp('comboMaterialType').getValue();
 				sgs.baseParams['cateId'] = Ext.getCmp('drm_comboMaterialCate').getValue();
 				sgs.baseParams['materialId'] = Ext.getCmp('drm_comboMaterial').getValue();
@@ -194,6 +193,25 @@ Ext.onReady(function(){
 						limit : PAGE_LIME
 					}
 				});
+			}
+		}, {
+			text : '导出',
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				var sn = deltaReportDeptTree.getSelectionModel().getSelectedNode();
+				
+				var url = "../../{0}?dataSource={1}&beginDate={2}&deptId={3}&materialId={4}&cateId={5}&cateType={6}";
+				url = String.format(
+					url,
+					'ExportHistoryStatisticsToExecl.do',
+					'detailReport',
+					Ext.getCmp('dr_beginDate').getValue().format('Y-m'),
+					!sn ? "-1" : sn.attributes.deptID,
+					Ext.getCmp('drm_comboMaterial').getValue(),
+					Ext.getCmp('drm_comboMaterialCate').getValue(),
+					Ext.getCmp('comboMaterialType').getValue()
+				);
+				window.location = url;
 			}
 		}
 		]

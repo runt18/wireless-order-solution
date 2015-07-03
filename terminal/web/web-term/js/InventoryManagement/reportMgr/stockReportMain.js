@@ -1,3 +1,4 @@
+var materialCateData = {root:[]};
 
 var logOutBut = new Ext.ux.ImageButton({
 	imgPath : '../../images/ResLogout.png',
