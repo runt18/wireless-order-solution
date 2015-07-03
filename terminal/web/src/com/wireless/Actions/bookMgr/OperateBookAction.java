@@ -100,7 +100,7 @@ public class OperateBookAction extends DispatchAction{
 					 .setTele(tele)
 					 .setAmount(Integer.parseInt(amount))
 					 .setCategory(cate)
-					 .setReserved(Integer.parseInt(reserved) * 30)
+					 .setReserved(Integer.parseInt(reserved) * 60)
 					 .setComment(comment)
 					 .setStaff(emloyee)
 					 .setMoney(Float.parseFloat(money));
