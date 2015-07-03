@@ -37,13 +37,6 @@ public class QueryCostAnalyzeReportAction extends Action {
 			Calendar c = Calendar.getInstance();
 			if(beginDate == null){
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//				long current = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
-//				
-//				c.setTime(new Date(current));
-//				c.add(Calendar.MONTH, -1);
-//				beginDate = sdf.format(c.getTime());
-//				int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
-//				endDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day + " 23:59:59";
 				//默认使用当前时间实时查询
 				beginDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-01";
 				
@@ -54,6 +47,24 @@ public class QueryCostAnalyzeReportAction extends Action {
 				list = CostAnalyzeReportDao.getCostAnalyzes(staff, beginDate + "-01", endDate, null);
 			}
 			jobject.setTotalProperty(list.size());
+			
+			if(!list.isEmpty()){
+				CostAnalyze sum = new CostAnalyze();
+				for (CostAnalyze costAnalyze : list) {
+					sum.setPrimeMoney(sum.getPrimeMoney() + costAnalyze.getPrimeMoney());
+					sum.setPickMaterialMoney(sum.getPickMaterialMoney() + costAnalyze.getPickMaterialMoney());
+					sum.setStockInTransferMoney(sum.getStockInTransferMoney() + costAnalyze.getStockInTransferMoney());
+					sum.setStockOutMoney(sum.getStockOutMoney() + costAnalyze.getStockOutMoney());
+					sum.setStockOutTransferMoney(sum.getStockOutTransferMoney() + costAnalyze.getStockOutTransferMoney());
+					sum.setEndMoney(sum.getEndMoney() + costAnalyze.getEndMoney());
+					sum.setCostMoney(sum.getCostMoney() + costAnalyze.getCostMoney());
+					sum.setSalesMoney(sum.getSalesMoney() + costAnalyze.getSalesMoney());
+				}
+				
+				list.add(sum);
+			}
+			
+			
 			jobject.setRoot(list);
 		}catch(BusinessException e){
 			e.printStackTrace();
