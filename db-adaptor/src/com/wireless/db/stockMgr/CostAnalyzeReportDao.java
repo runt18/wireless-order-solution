@@ -108,8 +108,11 @@ public class CostAnalyzeReportDao {
 			}
 			
 			//获取领料金额
-			extra = " AND S.dept_in = " + dept.getId() + " AND (S.sub_type = " + SubType.STOCK_IN.getVal() + " OR S.sub_type = " + SubType.STOCK_OUT_TRANSFER.getVal() + " OR S.sub_type = " + SubType.STOCK_IN_TRANSFER.getVal() + ")";
+			extra = " AND S.dept_in = " + dept.getId() + " AND S.sub_type = " + SubType.STOCK_IN.getVal();
 			costAnalyze.setPickMaterialMoney(getMoney(dbCon, staff, extraCond + extra, orderClause));
+			//拨入金额
+			extra = " AND S.dept_in = " + dept.getId() + " AND (S.sub_type = " + SubType.STOCK_OUT_TRANSFER.getVal() + " OR S.sub_type = " + SubType.STOCK_IN_TRANSFER.getVal() + ") ";
+			costAnalyze.setStockInTransferMoney(getMoney(dbCon, staff, extraCond + extra, orderClause));
 			//退料金额
 			extra = " AND S.dept_out = " + dept.getId() + " AND S.sub_type = " + SubType.STOCK_OUT.getVal();
 			costAnalyze.setStockOutMoney(getMoney(dbCon, staff, extraCond + extra, orderClause));
@@ -117,7 +120,7 @@ public class CostAnalyzeReportDao {
 			extra = " AND S.dept_out = " + dept.getId() + " AND (S.sub_type = " + SubType.STOCK_OUT_TRANSFER.getVal() + " OR S.sub_type = " + SubType.STOCK_IN_TRANSFER.getVal() + ") ";
 			costAnalyze.setStockOutTransferMoney(getMoney(dbCon, staff, extraCond + extra, orderClause));
 			//成本金额
-			costAnalyze.setCostMoney(costAnalyze.getPrimeMoney() + costAnalyze.getPickMaterialMoney() - costAnalyze.getStockOutMoney() - costAnalyze.getStockOutTransferMoney() - costAnalyze.getEndMoney());
+			costAnalyze.setCostMoney(costAnalyze.getPrimeMoney() + costAnalyze.getPickMaterialMoney() + costAnalyze.getStockInTransferMoney() - costAnalyze.getStockOutMoney() - costAnalyze.getStockOutTransferMoney() - costAnalyze.getEndMoney());
 			
 			costAnalyzes.add(costAnalyze);
 		}
