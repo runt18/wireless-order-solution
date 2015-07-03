@@ -108,7 +108,6 @@ Ext.onReady(function(){
 			costAnalyzeGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
 			costAnalyzeGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
 			costAnalyzeGrid.getView().getCell(store.getCount()-1, 11).innerHTML = '--';
-			
 		}
 	});	
 	
