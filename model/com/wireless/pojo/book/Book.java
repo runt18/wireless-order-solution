@@ -434,7 +434,7 @@ public class Book implements Jsonable{
 	}
 	
 	public static enum Status{
-		CREATED(1, "已创建"),
+		CREATED(1, "待确认"),
 		CONFIRMED(2, "已确认"),
 		SEAT(3, "已入座");
 		
@@ -659,7 +659,7 @@ public class Book implements Jsonable{
 	}
 	
 	public boolean isExpired(){
-		return (System.currentTimeMillis() / 1000) > this.bookDate + this.reserved;
+		return (System.currentTimeMillis() / 1000) > this.bookDate / 1000 + this.reserved;
 	}
 	
 	public void setOrder(Order order){
