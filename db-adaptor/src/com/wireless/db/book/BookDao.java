@@ -159,7 +159,8 @@ public class BookDao {
 		if(book.getStatus() != Book.Status.CONFIRMED){
 			throw new BusinessException("预订信息不是【" + Book.Status.CONFIRMED.toString() + "】，不能入座", BookError.BOOK_RECORD_SEAT_FAIL);
 		}
-		for(Table tbl : book.getTables()){
+		for(Order.InsertBuilder orderBuilder : builder.getBookOrders()){
+			Table tbl = TableDao.getById(dbCon, staff, orderBuilder.build().getDestTbl().getId());
 			if(tbl.isBusy()){
 				throw new BusinessException("餐台【" + tbl.getName() + "】是就餐状态，不能入座", BookError.BOOK_RECORD_SEAT_FAIL);
 			}
