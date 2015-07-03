@@ -9,8 +9,13 @@ public class CostAnalyze implements Jsonable{
 	private String deptName;
 	private float primeMoney;
 	//private float useMaterialMoney;
+	//领料
 	private float pickMaterialMoney;
+	//退料
 	private float stockOutMoney;
+	//拨入
+	private float stockInTransferMoney;
+	//拨出
 	private float stockOutTransferMoney;
 	private float endMoney;
 	private float costMoney;
@@ -121,6 +126,14 @@ public class CostAnalyze implements Jsonable{
 	public void setProfitRate(float profitRate) {
 		this.profitRate = profitRate;
 	}
+	
+	public float getStockInTransferMoney() {
+		return stockInTransferMoney;
+	}
+
+	public void setStockInTransferMoney(float stockInTransferMoney) {
+		this.stockInTransferMoney = stockInTransferMoney;
+	}
 
 	@Override
 	public String toString(){
@@ -150,6 +163,7 @@ public class CostAnalyze implements Jsonable{
 		jm.putFloat("primeMoney", this.getPrimeMoney());
 		jm.putFloat("useMaterialMoney", this.getPickMaterialMoney());
 		jm.putFloat("stockOutMoney", this.getStockOutMoney());
+		jm.putFloat("stockInTransferMoney", this.getStockInTransferMoney());
 		jm.putFloat("stockOutTransferMoney", this.getStockOutTransferMoney());
 		jm.putFloat("endMoney", this.getEndMoney());
 		jm.putFloat("costMoney", this.getCostMoney());
