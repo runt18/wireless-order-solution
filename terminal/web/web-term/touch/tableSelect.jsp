@@ -748,7 +748,7 @@
     	<tr>
     		<td style="width:10%;">
 			    <div style="padding: 0 10px" align="left" >
-					<fieldset data-role="controlgroup" data-type="horizontal" data-theme="b" style="width:300px;">
+					<fieldset data-role="controlgroup" data-type="horizontal" data-theme="b" style="width:330px;">
 						<label>
 				        	<input type="radio" name="bookDateType" data-type="bookDate_all" value="" checked="checked" onclick="ts.searchBookList()">全部
 				        </label>

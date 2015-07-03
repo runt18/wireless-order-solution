@@ -207,7 +207,6 @@ of.toOrderFoodPage = function(table){
 		$('#addBookOrderFood').hide();
 		$('#bookSeatOrderFood').hide();
 	}else if(of.orderFoodOperateType == 'bookSeat'){
-		of.newFood = [];
 		$('#bookSeatOrderFood').show();
 		$('#addBookOrderFood').hide();
 		$('#btnOrderAndPay').hide();
@@ -754,7 +753,12 @@ of.initNewFoodContent = function(c){
 			var tasteGroupPrice = typeof temp.tasteGroup.price != 'number' ? 0 :  temp.tasteGroup.price;
 			sumPrice += (temp.count * tempUnitPrice) + tasteGroupPrice;
 		}else{
-			tempUnitPrice = typeof temp.tasteGroup.price != 'number' ? 0 : parseFloat(temp.unitPrice + temp.tasteGroup.price);
+			if(typeof temp.tasteGroup.price == 'number'){
+				tempUnitPrice = parseFloat(temp.unitPrice + temp.tasteGroup.price);
+			}
+			if(typeof temp.tasteGroup.tastePrice == 'number'){
+				tempUnitPrice = parseFloat(temp.unitPrice + temp.tasteGroup.tastePrice);
+			}
 			
 			sumPrice += temp.count * tempUnitPrice;
 		}

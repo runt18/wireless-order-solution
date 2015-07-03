@@ -3408,7 +3408,7 @@ ts.bookListEntry = function(){
 
 }
 /**
- * 预订入座
+ * 打开预订入座
  */
 ts.bookOperateTable = function(c){
 	if(ts.bookList[c.index].status != 2){
@@ -3416,7 +3416,25 @@ ts.bookOperateTable = function(c){
 		return;
 	}
 	
-	var tables = ts.bookList[c.index].tables;
+	var book = ts.bookList[c.index];
+	$.ajax({
+		url : '../QueryBook.do',
+		type : 'post',
+		dataType : 'json',
+		async : false,
+		data :{
+			dataSource : 'checkout',
+			id : book.id
+		},
+		success : function(data){
+			if(data.success){
+				book = data.root[0];
+				of.newFood = data.root[0].order.orderFoods;
+			}
+		}
+	});
+	
+	var tables = book.tables;
 	
 	//初始化已选餐台
 	ts.bookChoosedTable.length = 0;
@@ -3459,8 +3477,6 @@ ts.closeBookOperateTable = function(){
 	$('#bookOperateChooseTable').hide();
 	$('#shadowForPopup').hide();
 	$('#bookTableHadChoose').html('');
-	//清空选台
-//	ts.bookChoosedTable.length = 0;
 } 
 
 
