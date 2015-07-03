@@ -3401,7 +3401,7 @@ ts.bookListEntry = function(){
 					name : e.staffName
 				}));
 			});
-			$('#add_staff').html(html.join(""));
+			$('#add_staff').html(html.join("")).selectmenu("refresh");
 			
 		}
 	}, 'json');

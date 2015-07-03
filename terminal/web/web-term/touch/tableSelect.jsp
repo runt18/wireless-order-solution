@@ -869,26 +869,26 @@
 	    <table>
 	    	<tr>
 	    		<td class="readMemberTd">预订日期:</td>
-	    		<td><input type="date" data-role="datebox" id="add_bookDate" data-options='{"mode": "datebox"}' value="2015-07-02"></td></td>
+	    		<td><input type="date" data-role="datebox" id="add_bookDate" data-options='{"mode": "datebox"}' ></td></td>
 	    		
 	    		<td class="readMemberTd">预订时间:</td>
-	    		<td><input id="add_bookTime" class="bookTime" value="10:24 AM"></td>
+	    		<td><input id="add_bookTime" class="bookTime" ></td>
   	
 	    		<td class="readMemberTd">预留时长(单位/分钟):</td>
 	    		<td class="selectionCmp" style="line-height: 20px;padding: 0 3px;width: 100px;">
-					<input id="cm_bookReserved" onkeypress="intOnly()" value="30"> 
+					<input id="cm_bookReserved" onkeypress="intOnly()" > 
 	    		</td>  		  	
  			
 	    	</tr>
 	    	<tr>
 	    		<td class="readMemberTd">预订人:</td>
-	    		<td><input id="add_bookPerson" value="李生"></td>    
+	    		<td><input id="add_bookPerson" ></td>    
 	    		
 	    		<td class="readMemberTd">预订电话:</td>
-	    		<td><input id="add_bookPhone" onkeypress="intOnly()" value="13533464033"></td>   
+	    		<td><input id="add_bookPhone" onkeypress="intOnly()" ></td>   
 	    		
 	    		<td class="readMemberTd">预订人数:</td>
-	    		<td><input id="add_bookAmount" onkeypress="intOnly()" value="7"></td>     	    	
+	    		<td><input id="add_bookAmount" onkeypress="intOnly()" ></td>     	    	
 	    	</tr>
 	    	<tr>
 	    		<td class="readMemberTd">经手人:</td>
@@ -911,7 +911,7 @@
 					</select>	    		
 	    		</td>    
 	    		<td class="readMemberTd">订金:</td>
-	    		<td><input id="add_bookMoney" onkeypress="intOnly()" value="1000"></td>   
+	    		<td><input id="add_bookMoney" onkeypress="intOnly()"></td>   
 	    	</tr> 
 	    
 	    	<tr >
