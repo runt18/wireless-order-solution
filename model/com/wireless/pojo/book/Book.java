@@ -699,7 +699,7 @@ public class Book implements Jsonable{
 		jm.putInt("id", this.id);
 		jm.putInt("restaurantId", this.restaurantId);
 		jm.putString("bookDate", DateUtil.format(this.bookDate));
-		jm.putInt("reserved", this.reserved);
+		jm.putInt("reserved", this.reserved / 30);
 		jm.putString("region", this.region);
 		jm.putString("member", this.member);
 		jm.putInt("memberId", this.memberId);
