@@ -52,6 +52,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	
 	private final String WEIXIN_INDEX;
 	private final String WEIXIN_FOOD;
+	private final String WEIXIN_BOOK;
 	private final String WEIXIN_RFOOD;
 	private final String WEIXIN_ABOUT;
 	private final String WEIXIN_MEMBER;
@@ -62,6 +63,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	private final String wEIXIN_SCANNING_RESULT;
 	
 	private final String WEIXIN_FOOD_ICON;
+	private final String WEIXIN_BOOK_ICON;
 	private final String WEIXIN_RFOOD_ICON;
 	private final String WEIXIN_ABOUT_ICON;
 	private final String WEIXIN_DIANPING_ICON;
@@ -78,6 +80,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		super(session);
 		this.WEIXIN_INDEX = root + "/weixin/order/index.html";
 		this.WEIXIN_FOOD = root + "/weixin/order/food.html";
+		this.WEIXIN_BOOK = root + "/weixin/order/book.html";
 		this.WEIXIN_RFOOD = root + "/weixin/order/rfood.html";
 		this.WEIXIN_ABOUT = root + "/weixin/order/about.html";
 		this.WEIXIN_MEMBER = root + "/weixin/order/member.html";
@@ -88,6 +91,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		this.wEIXIN_SCANNING_RESULT = root + "/weixin/order/scanResult.html";
 		
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
+		this.WEIXIN_BOOK_ICON = root + "/weixin/order/images/icon_book.jpg";
 		this.WEIXIN_RFOOD_ICON = root + "/weixin/order/images/icon_rfood.png";
 		this.WEIXIN_ABOUT_ICON = root + "/weixin/order/images/icon_about.png";
 		this.WEIXIN_DIANPING_ICON = root + "/weixin/order/images/dianping1.png";
@@ -162,6 +166,12 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		item4Order.setUrl(createUrl(msg, WEIXIN_FOOD)+ "&e=" + WxOrder.Type.INSIDE.getVal());
 		item4Order.setPicUrl(WEIXIN_FOOD_ICON);
 		naviItem.addItem(item4Order);
+		
+		Data4Item item4Book = new Data4Item();
+		item4Book.setTitle("预订");
+		item4Book.setUrl(createUrl(msg, WEIXIN_BOOK));
+		item4Book.setPicUrl(WEIXIN_BOOK_ICON);
+		naviItem.addItem(item4Book);		
 		
 		Data4Item specialFoodItem = new Data4Item();
 		specialFoodItem.setTitle("特色菜品");
