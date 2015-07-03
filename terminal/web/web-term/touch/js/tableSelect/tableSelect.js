@@ -3415,7 +3415,8 @@ ts.bookOperateTable = function(c){
 		Util.msg.tip("预订不是【已确认】状态, 不能入座");
 		return;
 	}
-	
+	//清空菜品
+	of.newFood.length = 0;
 	var book = ts.bookList[c.index];
 	$.ajax({
 		url : '../QueryBook.do',
@@ -3578,6 +3579,9 @@ ts.bookTableCommitOrderFood = function(){
  */
 ts.addBookInfo = function(c){
 	if(c.type == "add"){
+		//清空菜品
+		of.newFood.length = 0;
+		
 		$('#title4AddBook').text("填写预订");
 		$('#footer4AddBook').show();
 	}else if(c.type == "look" || c.type == "confirm"){

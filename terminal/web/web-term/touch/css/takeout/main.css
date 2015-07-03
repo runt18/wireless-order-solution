@@ -501,7 +501,7 @@ html { overflow-y: hidden;}
 	font-size:20px;font-weight: bold;width: 170px;
 }
 
-.popupWinCloseBtn{
+.popupWinCloseBtn, .popupWinCloseBtn4Book{
 	border-top-right-radius: 0.5em;
 	width: 50px;
 	height: 35px;
@@ -512,7 +512,9 @@ html { overflow-y: hidden;}
 	background-image: -o-linear-gradient( top,red,maroon);	
 }
 
-.popupWinCloseBtn > span{
+
+
+.popupWinCloseBtn4Book > span{
 	padding: initial !important; 	
 }
 

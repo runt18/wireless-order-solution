@@ -833,7 +833,7 @@
 	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
 	       	 入座选台
         	<div style="float: right">
-  				<a onclick="ts.closeBookOperateTable()" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
+  				<a onclick="ts.closeBookOperateTable()" data-role="button" data-corners="false" class="popupWinCloseBtn4Book">X</a>      		
         	</div>		
 	    </div>
 	    
@@ -862,7 +862,7 @@
 	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
 	        <span id="title4AddBook">填写预订</span>	
         	<div id="btnCloseAddBook" style="float: right">
-  				<a onclick="ts.closeAddBookInfo()" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
+  				<a onclick="ts.closeAddBookInfo()" data-role="button" data-corners="false" class="popupWinCloseBtn4Book">X</a>      		
         	</div>			        	
 	    </div> 
 	    <div style="max-height: 600px;overflow-y: auto;">
