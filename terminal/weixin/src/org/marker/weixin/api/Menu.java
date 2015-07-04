@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
 
+import com.wireless.Actions.weixin.WeiXinHandleMessage;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -21,10 +22,10 @@ import com.wireless.json.Jsonable;
  */
 public class Menu implements Jsonable{
 
-	private List<Button> buttons = new ArrayList<Button>(3);
+	private final List<Button> buttons = new ArrayList<Button>(3);
 
 	public Menu(){
-		for(int i = 0; i < buttons.size(); i++){
+		for(int i = 0; i < 3; i++){
 			buttons.add(null);
 		}
 	}
@@ -96,29 +97,20 @@ public class Menu implements Jsonable{
 		String appId = "wx49b3278a8728ff76";
 		String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
 		
-//		Menu menu = new Menu();
-//
-//		Button b1 = new Button.ClickBuilder("营业日报", "AAA")
-//							.addChild(new Button.ClickBuilder("即时战报", "AAA-1"))
-//							.addChild(new Button.ClickBuilder("最近日结", "AAA-2"))
-//							.build();
-//		menu.set1stButton(b1);
+		Menu menu = new Menu();
+		//Menu.delete(Token.newInstance(appId, appSecret));
+		menu.set1stButton(new Button.ClickBuilder("餐厅导航", WeiXinHandleMessage.NAVI_EVENT_KEY).build());
+		menu.set2ndButton(new Button.ScanMsgBuilder("扫一扫", WeiXinHandleMessage.SCAN_EVENT_KEY).build());
+		
+		menu.set3rdButton(new Button.ClickBuilder("我的", "AAA")
+						.addChild(new Button.ClickBuilder("优惠活动", WeiXinHandleMessage.PROMOTION_EVENT_KEY))
+						.addChild(new Button.ClickBuilder("我的订单", WeiXinHandleMessage.ORDER_EVENT_KEY))
+						.addChild(new Button.ClickBuilder("我的会员卡", WeiXinHandleMessage.MEMBER_EVENT_KEY))
+						//.addChild(new Button.ClickBuilder("我的大转盘", WeiXinHandleMessage.ZHUAN_EVENT_KEY))
+						.build());
 //		
-//		Button b2 = new Button.ClickBuilder("周报", "BBB")
-//							.addChild(new Button.ClickBuilder("本周报表", "AAA-1"))
-//							.addChild(new Button.ClickBuilder("上周报表", "AAA-2"))
-//							.build();
-//		menu.set2ndButton(b2);
-//
-//		Button b3 = new Button.ClickBuilder("月报", "AAA")
-//							.addChild(new Button.ClickBuilder("本月报表", "AAA-1"))
-//							.addChild(new Button.ClickBuilder("上月报表", "AAA-2"))
-//							.build();
-//		menu.set3rdButton(b3);
-//		
-//		Token token = Token.newInstance(appId, appSecret);
 //		System.out.println(token.getAccessToken());
-//		System.out.println(menu.create(token));
+		System.out.println(menu.create(Token.newInstance(appId, appSecret)));
 		
 		System.out.println(Menu.newInstance(Token.newInstance(appId, appSecret)));
 	}
