@@ -152,20 +152,8 @@ function repaid_initNorthPanel(){
 					render : function(thiz){
 						//如果是会员结账就不用添加混合
 						repaid_payType.push({id:100, name:'混合结账'});
-/*						if(orderType == 'common'){
-						}*/
 						thiz.getStore().loadData(repaid_payType);
 						thiz.setValue(primaryOrderData.other.order.payTypeValue);
-						//FIXME
-						//积分会员可选付款方式, 充值会员只能用卡
-/*						if(re_member){
-							if(re_member.memberType['attributeValue'] == 1){//积分
-								thiz.setDisabled(false);
-
-							}else if(re_member.memberType['attributeValue'] == 0){//充值
-								thiz.setDisabled(true);
-							}
-						}*/
 					},
 					select : function(thiz){
 						if(thiz.getValue() == 100){
@@ -188,6 +176,63 @@ function repaid_initNorthPanel(){
 			columnWidth : 0.8,
 			id : 'repaid_mixedPayTypePanel',
 			items : []
+		}, 
+		{
+			id : 'box4RepaidPricePlan',
+			columnWidth : 0.15,
+			items : [{
+				xtype : 'label',
+				width : 65,
+				text : '价格方案:'
+			},{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 80,
+				id : 'repaid_txtPricePlanForPayOrder',
+				store : new Ext.data.JsonStore({
+					fields : [ 'id', 'name' ]
+				}),
+				valueField : 'id',
+				displayField : 'name',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false				
+			},{
+				xtype : 'label',
+				width : 10,
+				html : '&nbsp;'
+			}]			
+		}, {
+			id : 'box4RepaidCoupon',
+			columnWidth : 0.15,
+			items : [{
+				xtype : 'label',
+				width : 65,
+				html : '<font style="color:red;font-weight:bold">＊</font>优惠劵:'
+			},{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 80,
+				id : 'repaid_couponForPayOrder',
+				store : new Ext.data.SimpleStore({
+					fields : [ 'value', 'text' ]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false				
+			},{
+				xtype : 'label',
+				width : 10,
+				html : '&nbsp;'
+			}]			
 		}]
 	});
 	
@@ -1452,12 +1497,17 @@ Ext.onReady(function() {
 		items : [ centerPanel ]
 	});
 	
-	initMainView(null, billModCenterPanel, null);
+	initMainView(null, billModCenterPanel, null, function(){
+			//隐藏价格方案 & 优惠券
+			Ext.getCmp('box4RepaidPricePlan').hide();
+			Ext.getCmp('box4RepaidCoupon').hide();
+			// 初始化菜品数据
+			loadOrderData();		
+	});
 	
 	getOperatorName("../../");
 	
-	// 初始化菜品数据
-	loadOrderData();
+
 	
 	initKeyBoardEvent();
 	

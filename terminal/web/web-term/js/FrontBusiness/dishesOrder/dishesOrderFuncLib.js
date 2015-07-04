@@ -898,6 +898,7 @@ function submitRepaidOrderMain(_c){
 	
 	var member, discount = discountID.getValue(), settleType = 1, pricePlanId="", couponId="";
 	if(re_member){
+		//是否手动注入会员
 		if(typeof re_member.hasMember != 'undefined'){
 			if(re_member.hasMember){
 				member = re_member.id;
@@ -912,6 +913,8 @@ function submitRepaidOrderMain(_c){
 			
 		}else{
 			member = re_member.id; 
+			pricePlanId = Ext.getCmp('repaid_txtPricePlanForPayOrder').getValue();
+			couponId = Ext.getCmp('repaid_couponForPayOrder').getValue();
 			settleType = 2;
 		}
 	}

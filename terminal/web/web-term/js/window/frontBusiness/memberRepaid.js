@@ -190,12 +190,6 @@ Ext.onReady(function(){
 					mode : 'local',
 					triggerAction : 'all',
 					selectOnFocus : true
-					//FIXME
-/*					,listeners : {
-						select : function(thiz){
-							reloadMemberPay();
-						}
-					}*/
 				}]
 			},{
 				items : [{
@@ -214,12 +208,6 @@ Ext.onReady(function(){
 					mode : 'local',
 					triggerAction : 'all',
 					selectOnFocus : true
-					//FIXME
-/*					,listeners : {
-						select : function(thiz){
-							reloadMemberPay();
-						}
-					}*/
 				}]
 			}]
 		}],

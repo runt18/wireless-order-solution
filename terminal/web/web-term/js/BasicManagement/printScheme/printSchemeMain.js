@@ -80,7 +80,7 @@ function loadInformation(){
 	
 	kitchenTree = new Ext.tree.TreePanel({
 		id : 'kitchens',
-		height : 360,
+		height : 380,
 		hidden : true,
 		border : true,
 		rootVisible : true,
@@ -102,6 +102,8 @@ function loadInformation(){
 							});
 						}
 					}); 
+					//treePanel长度过长问题
+					$('#kitchens .x-panel-body-noheader').height(380);
 				}
 			}
 		}),

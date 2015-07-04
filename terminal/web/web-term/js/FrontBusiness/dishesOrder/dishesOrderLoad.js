@@ -149,7 +149,35 @@ function loadSingleOrderData(resultJSON){
 						});
 					}
 				});				
-				
+				//会员价格方案
+				if(orderType != 'common'){
+					
+					var memberType = re_member.memberType, pricePlanCbo = Ext.getCmp('repaid_txtPricePlanForPayOrder'), 
+					couponCbo = Ext.getCmp('repaid_couponForPayOrder');
+					if(memberType.pricePlans && memberType.pricePlans.length > 0){
+						Ext.getCmp('box4RepaidPricePlan').show();
+						var mpo_pricePlanData = memberType.pricePlans; 
+						memberType.pricePlans.unshift({id : '-1', name : '普通价'});
+						pricePlanCbo.store.loadData(mpo_pricePlanData);
+						pricePlanCbo.setValue(memberType.pricePlan.id);
+					}else{
+						Ext.getCmp('box4RepaidPricePlan').hide();
+					}		
+					
+					if(re_member.coupons){
+						Ext.getCmp('box4RepaidCoupon').show();
+						var list = [[-1,'不使用']];
+						for (var i = 0; i < re_member.coupons.length; i++) {
+							list.push([re_member.coupons[i].couponId, re_member.coupons[i].couponType.name]);
+						}
+						couponCbo.store.loadData(list);
+						if(orderSingleData.other.order.coupon){
+							couponCbo.setValue(orderSingleData.other.order.coupon.couponId);
+						}
+					}else{
+						Ext.getCmp('box4RepaidCoupon').hide();	
+					}
+				}
 				
 				
 			}else{

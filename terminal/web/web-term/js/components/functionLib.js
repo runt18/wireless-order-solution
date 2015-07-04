@@ -364,7 +364,7 @@ function verifyStaff(actionPath, code, callback){
  * @param east
  * 	viewport layout for east region
  */
-function initMainView(west, center, east){
+function initMainView(west, center, east, afterRender){
 	new Ext.Viewport({
 		layout : 'border',
 		id : 'viewport',
@@ -385,7 +385,14 @@ function initMainView(west, center, east){
 			frame : true,
 			border : false,
 			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		}]
+		}],
+		listeners : {
+			afterrender : function(){
+				if(typeof afterRender == "function"){
+					afterRender();
+				}
+			}
+		}
 	});
 }
 /**
