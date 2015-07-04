@@ -86,6 +86,9 @@
 								},
 								success : function(jr, status, xhr){
 									re_member = jr.root[0];
+									if(jr.other.coupons && jr.other.coupons.length > 0){
+										re_member.coupons = jr.other.coupons;
+									} 
 								},
 								error : function(request, status, err){
 								}
