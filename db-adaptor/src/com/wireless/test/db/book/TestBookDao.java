@@ -164,7 +164,7 @@ public class TestBookDao {
 			
 			Table bookTbl1 = tables.get(0);
 			Table bookTbl2 = tables.get(1);
-			Book.ConfirmBuilder confirmBuilder = new Book.ConfirmBuilder(bookId).setCategory(Book.Category.SINGLE.toString())
+			Book.ConfirmBuilder confirmBuilder = (Book.ConfirmBuilder)new Book.ConfirmBuilder(bookId).setCategory(Book.Category.SINGLE.toString())
 																				.setReserved(60 * 30)
 																				.setComment("测试备注")
 																				.setStaff(mStaff)

@@ -146,13 +146,16 @@ public class BookDao {
 	 * @throws BusinessException
 	 * 			throws if any cases below
 	 * 			<li>the book record has expired
-	 * 			<li>the
+	 * 			<li>the book status is NOT confirmed
 	 * 			<li>the book status is NOT confirmed
 	 * 			<li>the book order failed to insert
 	 * 			<li>lack of book order
 	 */
 	public static void seat(DBCon dbCon, Staff staff, Book.SeatBuilder builder) throws SQLException, BusinessException{
 		Book book = getById(dbCon, staff, builder.getBookId());
+		if(book.getStatus() != Book.Status.CONFIRMED){
+			throw new BusinessException("当前餐台状态是【" + book.getStatus().toString() + "】，不能入座", BookError.BOOK_RECORD_SEAT_FAIL);
+		}
 		if(book.isExpired()){
 			throw new BusinessException("已超过预订时间，不能入座", BookError.BOOK_RECORD_EXPIRED);
 		}
