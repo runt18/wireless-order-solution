@@ -111,7 +111,7 @@ function commitBook(){
 		var minute = time.substr(time.indexOf(':')+1, 2);	
 		time = hour + ":" + minute + ':' + "59"
 	}else{
-		Util.dialog.show({msg: '请选择时间'});
+		Util.dialog.show({msg: '请选择时间', btn:'yes'});
 		return;
 	}
 	
@@ -126,11 +126,11 @@ function commitBook(){
 	
 	
 	if(!name){
-		Util.dialog.show({msg: '请填写姓名'});
+		Util.dialog.show({msg: '请填写姓名', btn:'yes'});
 		return;
 	}	
 	if(!phone){
-		Util.dialog.show({msg: '请填写电话'});
+		Util.dialog.show({msg: '请填写电话', btn:'yes'});
 		return;
 	}	
 	
@@ -152,7 +152,13 @@ function commitBook(){
 		foods : foods
 	}, function(data){
 		if(data.success){
-			Util.dialog.show({msg: '预订成功'});
+			Util.dialog.show({msg: '预订成功', btn:'yes',
+				callback : function(btn){
+					if(btn == 'yes'){
+						Util.skip('orderList.html');
+					}
+				}
+			});
 		}
 	}, 'json');
 }

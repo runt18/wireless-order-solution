@@ -271,6 +271,7 @@ Util.dialog = {
 		this.box.style.display = 'block';
 		var view = this.box.firstChild;
 		view.style.marginTop = parseInt(view.offsetHeight / 2 * -1) + 'px';
+		$('#div-loadmask-m-dialog').height(document.body.clientHeight);
 	},
 	hide : function(){
 		if(this.box){ this.box.style.display = 'none'; }
