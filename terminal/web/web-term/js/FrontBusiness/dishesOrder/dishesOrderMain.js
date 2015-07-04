@@ -127,6 +127,60 @@ function repaid_initNorthPanel(){
 				}]
 			}]
 		},{
+			columnWidth : 1
+		},{
+			id : 'box4RepaidPricePlan',
+			width : 160,
+			items : [{
+				xtype : 'label',
+				width : 65,
+				text : '价格方案:'
+			},{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 80,
+				id : 'repaid_txtPricePlanForPayOrder',
+				store : new Ext.data.JsonStore({
+					fields : [ 'id', 'name' ]
+				}),
+				valueField : 'id',
+				displayField : 'name',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false				
+			}]			
+		}, {
+			id : 'box4RepaidCoupon',
+			width : 160,
+			items : [{
+				xtype : 'label',
+				width : 65,
+				html : '<font style="color:red;font-weight:bold">＊</font>优惠劵:'
+			},{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 80,
+				id : 'repaid_couponForPayOrder',
+				store : new Ext.data.SimpleStore({
+					fields : [ 'value', 'text' ]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false				
+			},{
+				xtype : 'label',
+				width : 10,
+				html : '&nbsp;'
+			}]			
+		}, {
 			columnWidth : 0.15,
 			items : [{
 				xtype : 'label',
@@ -167,72 +221,11 @@ function repaid_initNorthPanel(){
 						}
 					}
 				}				
-			},{
-				xtype : 'label',
-				width : 20,
-				html : '&nbsp;'
 			}]
 		},  {
-			columnWidth : 0.8,
+			columnWidth : 0.7,
 			id : 'repaid_mixedPayTypePanel',
 			items : []
-		}, 
-		{
-			id : 'box4RepaidPricePlan',
-			columnWidth : 0.15,
-			items : [{
-				xtype : 'label',
-				width : 65,
-				text : '价格方案:'
-			},{
-				xtype : 'combo',
-				forceSelection : true,
-				width : 80,
-				id : 'repaid_txtPricePlanForPayOrder',
-				store : new Ext.data.JsonStore({
-					fields : [ 'id', 'name' ]
-				}),
-				valueField : 'id',
-				displayField : 'name',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true,
-				allowBlank : false,
-				readOnly : false				
-			},{
-				xtype : 'label',
-				width : 10,
-				html : '&nbsp;'
-			}]			
-		}, {
-			id : 'box4RepaidCoupon',
-			columnWidth : 0.15,
-			items : [{
-				xtype : 'label',
-				width : 65,
-				html : '<font style="color:red;font-weight:bold">＊</font>优惠劵:'
-			},{
-				xtype : 'combo',
-				forceSelection : true,
-				width : 80,
-				id : 'repaid_couponForPayOrder',
-				store : new Ext.data.SimpleStore({
-					fields : [ 'value', 'text' ]
-				}),
-				valueField : 'value',
-				displayField : 'text',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true,
-				allowBlank : false,
-				readOnly : false				
-			},{
-				xtype : 'label',
-				width : 10,
-				html : '&nbsp;'
-			}]			
 		}]
 	});
 	
