@@ -47,12 +47,14 @@ public class WXOperateBookAction extends DispatchAction {
 					 .setTele(phone)
 					 .setAmount(Integer.parseInt(count))
 					 .setRegion(region);
-			for (String of : foods.split("&")) {
-				String orderFoods[] = of.split(",");
-				OrderFood orderFood = new OrderFood(FoodDao.getById(staff, Integer.parseInt(orderFoods[0])));
-				orderFood.setCount(Float.parseFloat(orderFoods[1]));
-				
-				insertBuilder.addOrderFood(orderFood, staff);
+			if(foods != null && !foods.isEmpty()){
+				for (String of : foods.split("&")) {
+					String orderFoods[] = of.split(",");
+					OrderFood orderFood = new OrderFood(FoodDao.getById(staff, Integer.parseInt(orderFoods[0])));
+					orderFood.setCount(Float.parseFloat(orderFoods[1]));
+					
+					insertBuilder.addOrderFood(orderFood, staff);
+				}
 			}
 			
 			
