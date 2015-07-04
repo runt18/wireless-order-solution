@@ -359,10 +359,26 @@ public class QueryMemberAction extends DispatchAction {
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			MemberOperation mo = MemberOperationDao.getLastConsumptionByOrder(staff, new Order(Integer.parseInt(orderId)));
 			Member m = MemberDao.getById(staff, mo.getMemberId());
-			List<Member> list = new ArrayList<Member>();
-			list.add(m);
-			jobject.setRoot(list);
 			
+			final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(m.getId()).setStatus(Coupon.Status.DRAWN), null);
+			jobject.setRoot(m);
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					if(!coupons.isEmpty()){
+						jm.putJsonableList("coupons", coupons, Coupon.COUPON_JSONABLE_SIMPLE);
+					}
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});			
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
