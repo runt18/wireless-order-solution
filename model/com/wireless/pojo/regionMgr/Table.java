@@ -692,7 +692,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		jm.putInt("id", this.tableId);
 		jm.putInt("alias", this.tableAlias);
 		jm.putInt("rid", this.restaurantId);
-		jm.putString("name", this.tableName);
+		jm.putString("name", this.getName());
 		jm.putInt("customNum", this.customNum);
 		jm.putFloat("minimumCost", this.minimumCost);
 		jm.putInt("categoryValue", this.category.getVal());
