@@ -843,12 +843,21 @@
 	    </div>
 	    
 		<div class="ui-grid-a">
-		    <div class="ui-block-a"><div id="bookTableToChoose" class="ui-bar ui-bar-e" style="height:360px;text-align: left;">
-		    	
-		    </div></div>
+		    <div class="ui-block-a">
+		    	<div class="ui-bar-e" >
+				    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
+				       	 已订餐台
+				    </div>		    	
+				    <div id="bookTableToChoose" class="ui-bar ui-bar-e" style="height:360px;text-align: left;">
+				    </div>
+			    </div>
+		    </div>
 		    <div class="ui-block-b">
 		    	<div class="ui-bar-e" style="height:360px;text-align: left;">
-		    		<div data-role="content" id="bookTableHadChoose" style="height:  -webkit-calc(100% - 65px);height: -moz-calc(100% - 65px);height: -ms-calc(100% - 65px);height: -o-calc(100% - 65px);">
+			    	<div data-role="header" data-theme="b" class="ui-corner-top win_head">
+				       	 入座餐台
+				    </div>	
+		    		<div data-role="content" id="bookTableHadChoose" style="height:  -webkit-calc(100% - 63px);height: -moz-calc(100% - 63px);height: -ms-calc(100% - 63px);height: -o-calc(100% - 63px);">
 		    		</div>
 					<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 						 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">

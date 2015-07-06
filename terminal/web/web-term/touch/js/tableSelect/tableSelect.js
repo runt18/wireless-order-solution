@@ -996,7 +996,7 @@ ts.toOrderFoodOrTransFood = function(c){
 		$('#divSelectTablesForTs').hide();
 		$('#divSelectTablesSuffixForTs').show();
 		ts.table.id = c.id;
-	}else if(ts.commitTableOrTran == 'bookTableChoose'){//预订台
+	}else if(ts.commitTableOrTran == 'bookTableChoose'){//预订入座选台
 		var table = null;
 		for (var i = 0; i < ts.bookChoosedTable.length; i++) {
 			if(ts.bookChoosedTable[i].id == c.id){
@@ -1005,6 +1005,16 @@ ts.toOrderFoodOrTransFood = function(c){
 				break;
 			}
 		}
+		
+		//去除已订餐台
+		for (var i = 0; i < ts.bookOperateTable.oldTables.length; i++) {
+			if(ts.bookOperateTable.oldTables[i].id == c.id){
+				ts.bookOperateTable.oldTables.splice(i, 1);
+				break;
+			}
+		}
+		
+		
 		
 		//选择餐台
 		if(table == null){
@@ -1020,7 +1030,7 @@ ts.toOrderFoodOrTransFood = function(c){
 		uo.closeTransOrderFood();
 		//刷新已点餐台
 		ts.loadBookChoosedTable({renderTo : 'bookTableHadChoose'});
-	}else if(ts.commitTableOrTran == 'addBookTableChoose'){//预订台
+	}else if(ts.commitTableOrTran == 'addBookTableChoose'){//添加预订选台
 		var table = null;
 		for (var i = 0; i < ts.bookChoosedTable.length; i++) {
 			if(ts.bookChoosedTable[i].id == c.id){
@@ -1865,6 +1875,10 @@ function initTableData(){
 			});
 		}
 	});	
+	
+	//刷新餐台是刷新预订
+	ts.refreshWeixinBook();
+	
 }
 
 /**
@@ -3319,7 +3333,7 @@ ts.loadBookListData = function(data){
 		'<td>{status}</td>' +
 		'<td>{staff}</td>' +
 		'<td><a href="javascript: ts.addBookInfo({type:\'look\', index:{index}})">{lookout}</a></td>' +
-		'<td><div data-role="controlgroup" data-type="horizontal"><a href="#" data-role="button" data-theme="b" onclick="ts.addBookInfo({type:\'confirm\', index:{index}})">修改</a><a data-role="button" data-theme="b" onclick="ts.bookOperateTable({bookId:{bookId}, index:{index}})">入座</a><a data-role="button" data-theme="b" onclick="ts.deleteBook({index:{index}})">删除</a></div></td>' +
+		'<td><div data-role="controlgroup" data-type="horizontal"><a href="#" data-role="button" data-theme="b" onclick="ts.addBookInfo({type:\'confirm\', index:{index}})">{confirmOrUpdate}</a><a data-role="button" data-theme="b" onclick="ts.bookOperateTable({bookId:{bookId}, index:{index}})">入座</a><a data-role="button" data-theme="b" onclick="ts.deleteBook({index:{index}})">删除</a></div></td>' +
 	'</tr>';
 	
 	var html = [];
@@ -3345,6 +3359,7 @@ ts.loadBookListData = function(data){
 			tele : data[i].tele,
 			amount : data[i].amount,
 			status : data[i].status == 1? '<span style="color:green">'+ data[i].statusDesc +' ('+ data[i].sourceDesc +')</span>' : data[i].statusDesc,
+			confirmOrUpdate : data[i].status == 1? '确认' : '修改',
 			staff : data[i].staff
 		}));
 	}
@@ -3462,6 +3477,8 @@ ts.bookOperateTable = function(c){
 	});
 	
 	var tables = book.tables;
+	//用于操作餐台点击
+	ts.bookOperateTable.oldTables = book.tables; 
 	
 	//初始化已选餐台
 	ts.bookChoosedTable.length = 0;
@@ -3636,6 +3653,8 @@ ts.addBookInfo = function(c){
 		
 		//清空菜品
 		of.newFood.length = 0;
+		//清空已选餐台
+		ts.bookChoosedTable.length = 0;
 		
 		$('#title4AddBook').text("填写预订");
 		$('#footer4AddBook').show();
@@ -3864,12 +3883,14 @@ ts.commitAddBook = function(){
 		orderFoods : orderFoods.join("&")
 	}, function(data){
 		Util.LM.hide();
-		ts.addBookInfo.otype = '';
-		delete ts.addBookInfo.id
 		if(data.success){
+			ts.addBookInfo.otype = '';
+			delete ts.addBookInfo.id
 			Util.msg.tip(data.msg);
 			ts.closeAddBookInfo();
 			ts.searchBookList();
+			
+			ts.refreshWeixinBook();
 		}
 	});
 	
