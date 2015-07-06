@@ -3452,7 +3452,11 @@ ts.bookOperateTable = function(c){
 		success : function(data){
 			if(data.success){
 				book = data.root[0];
-				of.newFood = data.root[0].order.orderFoods;
+				if(data.root[0].order && data.root[0].order.orderFoods.length > 0){
+					of.newFood = data.root[0].order.orderFoods;
+				}else{
+					of.newFood.length = 0;
+				}
 			}
 		}
 	});
