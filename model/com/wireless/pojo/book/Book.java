@@ -38,49 +38,10 @@ public class Book implements Jsonable{
 		}
 	}
 	
-	public static class ConfirmBuilder{
-		private final UpdateBuilder builder;
-		
+	public static class ConfirmBuilder extends InsertBuilder4Manual{
 		public ConfirmBuilder(int id){
-			builder = new UpdateBuilder(id).setStatus(Book.Status.CONFIRMED);
-		}
-		
-		public ConfirmBuilder setStaff(Staff staff){
-			builder.setStaff(staff);
-			return this;
-		}
-		
-		public ConfirmBuilder setCategory(String category){
-			builder.setCategory(category);
-			return this;
-		}
-		
-		public ConfirmBuilder setReserved(int reserved){
-			builder.setReserved(reserved);
-			return this;
-		}
-		
-		public ConfirmBuilder setComment(String comment){
-			builder.setComment(comment);
-			return this;
-		}
-		
-		public ConfirmBuilder setMoney(float money){
-			builder.setMoney(money);
-			return this;
-		}
-		
-		public ConfirmBuilder addTable(Table table){
-			builder.addTable(table);
-			return this;
-		}
-		
-		public UpdateBuilder getBuilder(){
-			return this.builder;
-		}
-		
-		public Book build(){
-			return builder.build();
+			super.builder.setStatus(Status.CONFIRMED).setSource(null);
+			super.setId(id);
 		}
 	}
 	
