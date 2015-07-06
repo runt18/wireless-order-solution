@@ -927,6 +927,7 @@ var MemberOperationRecord = Ext.ux.cr(['id', 'seq', 'rid', 'staffId', 'staffName
     'member', 'member.name','member.mobile', 'member.memberType.name', 'operateTypeText', 'operateTypeValue', 'payTypeText', 'payTypeValue', 'payMoney', 'chargeTypeText', 'chargeTypeValue', 'chargeMoney']);
 var MOSummaryRecord = Ext.ux.cr(['chargeMoney', 'consumeAmount', 'payMoney', 'consumePoint', 'pointConsume', 'pointAdjust', 'moneyAdjust', 'member', 'member.name', 'member.memberType.name']);
 var CouponRecord = Ext.ux.cr(['createStaff', 'birthDate', 'couponId', 'restaurantId', 'couponType','couponType.expiredFormat', 'orderId', 'orderDate', 'statusText', 'statusValue', 'member', 'member.name', 'member.mobile']);
+var saleMaterial_Record = Ext.ux.cr(['foodName', 'amount', 'rate', 'consume']);
 
 
 

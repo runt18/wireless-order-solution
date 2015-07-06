@@ -1,14 +1,14 @@
 var deptData = [];
 var PAGE_LIME = 18; 
-var materialTypeDate = [[1,'商品'],[2,'原料']];
-var materialTypeComb = new Ext.form.ComboBox({
+var saleMaterial_materialTypeDate = [[1,'商品'],[2,'原料']];
+var saleMaterial_materialTypeComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 90,
-	id : 'comboMaterialType',
-	value : 1,
+	id : 'saleMaterial_comboMaterialType',
+	value : 2,
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
-		data : materialTypeDate
+		data : saleMaterial_materialTypeDate
 	}),
 	valueField : 'value',
 	displayField : 'text',
@@ -20,17 +20,17 @@ var materialTypeComb = new Ext.form.ComboBox({
 	listeners : {
         select : function(combo, record, index){ 
         	
-        	drm_materialCateComb.reset();
-        	sDelta_materialComb.allowBlank = true;
-        	sDelta_materialComb.reset();
-        	sDelta_materialCateStore.load({  
+        	saleMaterial_materialCateComb.reset();
+        	saleMaterial_materialComb.allowBlank = true;
+        	saleMaterial_materialComb.reset();
+        	saleMaterial_materialCateStore.load({  
 	            params: {  
 	            	type : combo.value,  
 	            	dataSource : 'normal'
 	            }  
             });     
             
-        	sDelta_materialStore.load({
+        	saleMaterial_materialStore.load({
         		params: {
         			cateType : combo.value,
         			dataSource : 'normal'
@@ -42,7 +42,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 });
 
 
-var sDelta_materialCateStore = new Ext.data.Store({
+var saleMaterial_materialCateStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do?restaurantID=' + restaurantID}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
@@ -50,17 +50,17 @@ var sDelta_materialCateStore = new Ext.data.Store({
 	         {name : 'name'}
 	])
 });
-sDelta_materialCateStore.load({  
+saleMaterial_materialCateStore.load({  
     params: {  
-    	type : materialTypeComb.value,  
+    	type : saleMaterial_materialTypeComb.value,  
     	dataSource : 'normal'
     }
 }); 
-var drm_materialCateComb = new Ext.form.ComboBox({
+var saleMaterial_materialCateComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 90,
-	id : 'drm_comboMaterialCate',
-	store : sDelta_materialCateStore,
+	id : 'saleMaterial_comboMaterialCate',
+	store : saleMaterial_materialCateStore,
 	valueField : 'id',
 	displayField : 'name',
 	typeAhead : true,
@@ -71,11 +71,11 @@ var drm_materialCateComb = new Ext.form.ComboBox({
 	readOnly : false,
 	listeners : {
         select : function(combo, record, index){ 
-        	sDelta_materialComb.allowBlank = true;
-        	sDelta_materialComb.reset();
-        	sDelta_materialStore.load({  
+        	saleMaterial_materialComb.allowBlank = true;
+        	saleMaterial_materialComb.reset();
+        	saleMaterial_materialStore.load({  
 	            params: {  
-	            	cateType : materialTypeComb.value,
+	            	cateType : saleMaterial_materialTypeComb.value,
 	            	cateId : combo.value,  
 	            	dataSource : 'normal'
 	            }  
@@ -88,7 +88,7 @@ var drm_materialCateComb = new Ext.form.ComboBox({
 
 
 
-var sDelta_materialStore = new Ext.data.Store({
+var saleMaterial_materialStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
@@ -97,25 +97,27 @@ var sDelta_materialStore = new Ext.data.Store({
          {name : 'pinyin'}
 	])
 });
-sDelta_materialStore.load({  
+saleMaterial_materialStore.load({  
     params: { 
-    	cateType : materialTypeComb.value,
+    	cateType : saleMaterial_materialTypeComb.value,
     	dataSource : 'normal'
     }  
 }); 
-var sDelta_materialComb = new Ext.form.ComboBox({
+var saleMaterial_materialComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 100,
 	listWidth : 250,
 	maxheight : 300,
-	id : 'drm_comboMaterial',
-	store : sDelta_materialStore,
+	id : 'saleMaterial_comboMaterial',
+	store : saleMaterial_materialStore,
 	valueField : 'id',
 	displayField : 'name',
 	typeAhead : true,
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
+	allowBlank : false,
+	blankText: '不能为空', 
 	tpl:'<tpl for=".">' 
 		+ '<div class="x-combo-list-item" style="height:18px;">'
 		+ '{id} -- {name} -- {pinyin}'
@@ -138,18 +140,18 @@ var sDelta_materialComb = new Ext.form.ComboBox({
 			}
 		},
 		select : function(){
-			Ext.getCmp('btnSearch').handler();		
+			Ext.getCmp('saleMaterial_btnSearch').handler();		
 		}
 		
 	}
 });
-var deltaReportDeptTree;
+var saleMaterial_DeptTree;
 Ext.onReady(function(){
 	
 	var date = new Date();
 	date.setMonth(date.getMonth()-1);
 	
-	var deltaReportBar = new Ext.Toolbar({
+	var saleMaterial_Bar = new Ext.Toolbar({
 		items : [
  		{
 			xtype : 'tbtext',
@@ -171,23 +173,28 @@ Ext.onReady(function(){
 		},
 		{xtype : 'tbtext', text : '&nbsp;'},
 		{xtype : 'tbtext', text : '类型:'},
-		materialTypeComb,
+		saleMaterial_materialTypeComb,
 		{xtype : 'tbtext', text : '类别:'},
-		drm_materialCateComb,
+		saleMaterial_materialCateComb,
 		{xtype : 'tbtext', text : '货品:'},
-		sDelta_materialComb,
+		saleMaterial_materialComb,
 		'->', {
 			text : '搜索',
-			id : 'btnSearch',
+			id : 'saleMaterial_btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
-				var sn = deltaReportDeptTree.getSelectionModel().getSelectedNode();
-				var sgs = deltaReportGrid.getStore();
+				
+				if(!saleMaterial_materialComb.isValid()){
+					return;
+				}
+				
+				var sn = saleMaterial_DeptTree.getSelectionModel().getSelectedNode();
+				var sgs = saleMaterial_Grid.getStore();
 				sgs.baseParams['beginDate'] = Ext.getCmp('dr_beginDate').getValue().format('Y-m');
 				sgs.baseParams['deptId'] = !sn ? '-1' : sn.attributes.deptID;
-				sgs.baseParams['cateType'] = Ext.getCmp('comboMaterialType').getValue();
-				sgs.baseParams['cateId'] = Ext.getCmp('drm_comboMaterialCate').getValue();
-				sgs.baseParams['materialId'] = Ext.getCmp('drm_comboMaterial').getValue();
+				sgs.baseParams['cateType'] = Ext.getCmp('saleMaterial_comboMaterialType').getValue();
+				sgs.baseParams['cateId'] = Ext.getCmp('saleMaterial_comboMaterialCate').getValue();
+				sgs.baseParams['materialId'] = Ext.getCmp('saleMaterial_comboMaterial').getValue();
 				//load两种加载方式,远程和本地
 				sgs.load({
 					params : {
@@ -196,11 +203,12 @@ Ext.onReady(function(){
 					}
 				});
 			}
-		}, {
+		}
+/*		, {
 			text : '导出',
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
-				var sn = deltaReportDeptTree.getSelectionModel().getSelectedNode();
+				var sn = saleMaterial_DeptTree.getSelectionModel().getSelectedNode();
 				
 				var url = "../../{0}?dataSource={1}&beginDate={2}&deptId={3}&materialId={4}&cateId={5}&cateType={6}";
 				url = String.format(
@@ -209,48 +217,62 @@ Ext.onReady(function(){
 					'detailReport',
 					Ext.getCmp('dr_beginDate').getValue().format('Y-m'),
 					!sn ? "-1" : sn.attributes.deptID,
-					Ext.getCmp('drm_comboMaterial').getValue(),
-					Ext.getCmp('drm_comboMaterialCate').getValue(),
-					Ext.getCmp('comboMaterialType').getValue()
+					Ext.getCmp('saleMaterial_comboMaterial').getValue(),
+					Ext.getCmp('saleMaterial_comboMaterialCate').getValue(),
+					Ext.getCmp('saleMaterial_comboMaterialType').getValue()
 				);
 				window.location = url;
 			}
-		}
+		}*/
 		]
 	});
 	
 	
-	var deltaReportGrid = createGridPanel(
+	var saleMaterial_Grid = createGridPanel(
 			'',
-			'货品列表',
+			'销售对账列表',
 			'',
 			'',
-			'../../QueryDeltaReport.do',
+			'../../QuerySaleOfMaterial.do',
 			[
 				[true, false, false, false], 
-				['品项名称', 'material.name', 130],
-				['初期数量', 'primeAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
-				['入库总数', 'stockInTotal',80,'right', 'Ext.ux.txtFormat.gridDou'],
-				['出库总数', 'stockOutTotal',80,'right', 'Ext.ux.txtFormat.gridDou'],
-				['期末数量', 'endAmount',80,'right', 'Ext.ux.txtFormat.gridDou'],
-				['理论消耗', 'expectAmount',80,'right', 'Ext.ux.txtFormat.gridDou'],
-				['实际消耗', 'actualAmount',80,'right', 'Ext.ux.txtFormat.gridDou'],
-				['差异数', 'deltaAmount',80,'right', 'Ext.ux.txtFormat.gridDou']
+				['菜品名称', 'foodName', 130],
+				['销售数量', 'amount',,'right'],
+				['对应比例', 'rate',80,'right', 'Ext.ux.txtFormat.gridDou'],
+				['消耗数量', 'consume',80,'right', 'Ext.ux.txtFormat.gridDou']
 			],
-			deltaReportRecord.getKeys(),
+			saleMaterial_Record.getKeys(),
 			[['isPaging', true]],
 			GRID_PADDING_LIMIT_20,
 			'',
-			deltaReportBar
+			saleMaterial_Bar
 		);		
-	deltaReportGrid.region = 'center';
-	deltaReportGrid.on('render', function(){
-		Ext.getCmp('btnSearch').handler();
+	saleMaterial_Grid.region = 'center';
+	saleMaterial_Grid.on('render', function(){
+		//Ext.getCmp('saleMaterial_btnSearch').handler();
+	});	
+	saleMaterial_Grid.getStore().on('load', function(store, records, options){
+		
+		if(store.getCount() > 0){
+			var sumRow = saleMaterial_Grid.getView().getRow(store.getCount() - 1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			sumRow.style.color = 'green';
+			for(var i = 0; i < saleMaterial_Grid.getColumnModel().getColumnCount(); i++){
+				var sumRow = saleMaterial_Grid.getView().getCell(store.getCount() - 1, i);
+				sumRow.style.fontSize = '15px';
+				sumRow.style.fontWeight = 'bold';					
+			}
+			saleMaterial_Grid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			saleMaterial_Grid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+			saleMaterial_Grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+		}
 	});	
 	
-	deltaReportDeptTree = new Ext.tree.TreePanel({
+	
+	
+	saleMaterial_DeptTree = new Ext.tree.TreePanel({
 		title : '部门信息',
-		id : 'deltaReportDeptTree',   
+		id : 'saleMaterial_DeptTree',   
 		region : 'west',
 		width : 170,
 		border : false,
@@ -273,16 +295,16 @@ Ext.onReady(function(){
 	        deptID : '-1',
 	        listeners : {
 	        	load : function(){
-	        		var treeRoot = deltaReportDeptTree.getRootNode().childNodes;
+	        		var treeRoot = saleMaterial_DeptTree.getRootNode().childNodes;
 	        		if(treeRoot.length > 0){
 	        			deptData = [];
 	        			for(var i = (treeRoot.length - 1); i >= 0; i--){
 	    					if(treeRoot[i].attributes.deptID == 255 || treeRoot[i].attributes.deptID == 253){
-	    						deltaReportDeptTree.getRootNode().removeChild(treeRoot[i]);
+	    						saleMaterial_DeptTree.getRootNode().removeChild(treeRoot[i]);
 	    					}
 	    				}
 	        		}else{
-	        			deltaReportDeptTree.getRootNode().getUI().hide();
+	        			saleMaterial_DeptTree.getRootNode().getUI().hide();
 	        			Ext.Msg.show({
 	        				title : '提示',
 	        				msg : '加载部门信息失败.',
@@ -295,7 +317,7 @@ Ext.onReady(function(){
 		listeners : {
 			click : function(e){
 				Ext.getDom('dept').innerHTML = e.text;
-				Ext.getCmp('btnSearch').handler();
+				Ext.getCmp('saleMaterial_btnSearch').handler();
 			}
 		},
 		tbar :	[
@@ -304,24 +326,24 @@ Ext.onReady(function(){
 				text : '刷新',
 				iconCls : 'btn_refresh',
 				handler : function(){
-					deltaReportDeptTree.getRootNode().reload();
+					saleMaterial_DeptTree.getRootNode().reload();
 				}
 			}
 		 ]
 	});
 	
 	new Ext.Panel({
-		renderTo : 'divDeltaReport',
-		height : parseInt(Ext.getDom('divDeltaReport').parentElement.style.height.replace(/px/g,'')),
+		renderTo : 'divSaleOfMaterial',
+		height : parseInt(Ext.getDom('divSaleOfMaterial').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
-		items : [deltaReportDeptTree, deltaReportGrid],
-		keys : [{
+		items : [saleMaterial_DeptTree, saleMaterial_Grid]
+/*		keys : [{
 			key : Ext.EventObject.ENTER,
 			scope : this,
 			fn : function(){
-				Ext.getCmp('btnSearch').handler;
+				Ext.getCmp('saleMaterial_btnSearch').handler;
 			}
-		}]
+		}]*/
 	});
 	
 	
