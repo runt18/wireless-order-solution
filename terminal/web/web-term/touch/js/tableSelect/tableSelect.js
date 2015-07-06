@@ -309,7 +309,11 @@ $(function(){
 			numKeyBoardFireEvent = null;
 		}
 
-	}) 	
+	})
+	
+	//刷新微信预订单
+	ts.refreshWeixinBook();
+	
 	
 });	
 
@@ -3283,10 +3287,24 @@ ts.doFeastOrder = function(){
 }
 
 
+//预订=============================================
 
 
-
-
+/**
+ * 刷新微信预订单
+ */
+ts.refreshWeixinBook = function(){
+	$.post('../QueryBook.do', {dataSource: 'normal', status:1}, function(data){
+		if(data.success){
+			if(data.root && data.root.length > 0){
+				$('#amount4Book').html(data.root.length);
+				$('#amount4Book').show();
+			}else{
+				$('#amount4Book').hide();
+			}
+		}
+	}, 'json');	
+}
 /**
  * 加载预订数据
  */
@@ -3301,7 +3319,7 @@ ts.loadBookListData = function(data){
 		'<td>{status}</td>' +
 		'<td>{staff}</td>' +
 		'<td><a href="javascript: ts.addBookInfo({type:\'look\', index:{index}})">{lookout}</a></td>' +
-		'<td><div data-role="controlgroup" data-type="horizontal"><a href="#" data-role="button" data-theme="b" onclick="ts.addBookInfo({type:\'confirm\', index:{index}})">确认</a><a data-role="button" data-theme="b" onclick="ts.bookOperateTable({bookId:{bookId}, index:{index}})">入座</a><a href=""  data-role="button" data-theme="b">取消</a></div></td>' +
+		'<td><div data-role="controlgroup" data-type="horizontal"><a href="#" data-role="button" data-theme="b" onclick="ts.addBookInfo({type:\'confirm\', index:{index}})">修改</a><a data-role="button" data-theme="b" onclick="ts.bookOperateTable({bookId:{bookId}, index:{index}})">入座</a><a data-role="button" data-theme="b" onclick="ts.deleteBook({index:{index}})">删除</a></div></td>' +
 	'</tr>';
 	
 	var html = [];
@@ -3326,7 +3344,7 @@ ts.loadBookListData = function(data){
 			member : data[i].member,
 			tele : data[i].tele,
 			amount : data[i].amount,
-			status : data[i].statusDesc,
+			status : data[i].status == 1? '<span style="color:green">'+ data[i].statusDesc +' ('+ data[i].sourceDesc +')</span>' : data[i].statusDesc,
 			staff : data[i].staff
 		}));
 	}
@@ -3376,6 +3394,7 @@ ts.bookListEntry = function(){
 	var now = new Date();
 	
 	var today = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+	ts.bookListEntry.today = today;
 	
 	now.setDate(now.getDate() + 1);
 	var tomorrow = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
@@ -3386,9 +3405,6 @@ ts.bookListEntry = function(){
 	$('#bookDate_today').attr('value', today);
 	$('#bookDate_tomorrow').attr('value', tomorrow);
 	$('#bookDate_afterday').attr('value', afterday);
-	
-	//时分插件
-	$(".bookTime").timepicki();
 	
 	//加载经手人
 	$.post('../QueryStaff.do', function(data){
@@ -3415,6 +3431,12 @@ ts.bookOperateTable = function(c){
 		Util.msg.tip("预订不是【已确认】状态, 不能入座");
 		return;
 	}
+	
+	if(ts.bookList[c.index].isExpired){
+		Util.msg.tip("预订已过期, 不能入座");
+		return;
+	}
+	
 	//清空菜品
 	of.newFood.length = 0;
 	var book = ts.bookList[c.index];
@@ -3480,6 +3502,27 @@ ts.closeBookOperateTable = function(){
 	$('#bookTableHadChoose').html('');
 } 
 
+ts.deleteBook = function(c){
+	Util.msg.alert({
+		title : '提示',
+		msg : '是否删除该预订?',
+		buttons : 'YESBACK',
+		renderTo : 'bookOrderListMgr',
+		certainCallback : function(btn){
+			if(btn == 'yes'){
+				Util.LM.show();
+				$.post('../OperateBook.do', {
+					dataSource : 'delete',
+					bookId : ts.bookList[c.index].id
+				}, function(data){
+					Util.LM.hide();
+					Util.msg.tip(data.msg);
+					ts.bookListEntry();
+				}, 'json');
+			}
+		}
+	});	
+}
 
 /**
  * 加载已选餐台
@@ -3578,7 +3621,15 @@ ts.bookTableCommitOrderFood = function(){
  * 打开手动预订页面
  */
 ts.addBookInfo = function(c){
+	//时分插件
+	$('#add_bookTimeBox').html('<input id="add_bookTime" class="bookTime" >').trigger('create');
+	$(".bookTime").timepicki();	
+	
+	$('#add_bookDate').val(ts.bookListEntry.today);
+	$('#add_bookMoney').val(0);
 	if(c.type == "add"){
+		ts.addBookInfo.otype = "insert";
+		
 		//清空菜品
 		of.newFood.length = 0;
 		
@@ -3587,6 +3638,10 @@ ts.addBookInfo = function(c){
 	}else if(c.type == "look" || c.type == "confirm"){
 		
 		var book = ts.bookList[c.index];
+		
+		ts.addBookInfo.otype = "update";
+		ts.addBookInfo.id = book.id;
+		
 		$.ajax({
 			url : '../QueryBook.do',
 			type : 'post',
@@ -3678,7 +3733,7 @@ ts.closeAddBookInfo = function(){
 	
 	//清空input
 	$('#add_bookDate').val("");
-	$('#add_bookTime').val("");
+	$('#add_bookTimeBox').html("");
 	$('#add_bookPerson').val("");
 	$('#add_bookPhone').val("");
 	$('#add_bookAmount').val("");
@@ -3788,7 +3843,8 @@ ts.commitAddBook = function(){
 	
 	Util.LM.show();
 	$.post('../OperateBook.do', {
-		dataSource : 'addBook',
+		dataSource : ts.addBookInfo.otype,
+		bookId : ts.addBookInfo.id,
 		bookDate : bookDate + " " + time,
 		member : member,
 		tele : tele,
@@ -3802,6 +3858,8 @@ ts.commitAddBook = function(){
 		orderFoods : orderFoods.join("&")
 	}, function(data){
 		Util.LM.hide();
+		ts.addBookInfo.otype = '';
+		delete ts.addBookInfo.id
 		if(data.success){
 			Util.msg.tip(data.msg);
 			ts.closeAddBookInfo();

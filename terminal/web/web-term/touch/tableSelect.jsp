@@ -125,7 +125,12 @@
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loginOut()">注销</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="location.reload()" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.bookListEntry()">预订</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.bookListEntry()">
+		 	<div>
+		 		<div id="amount4Book" style="display:none;width:28px;height: 28px;border-radius: 14px;background-color: red;float: right;margin-top: -11px;line-height:28px;">0</div>
+		 		预订
+		 	</div>	
+		 	</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.createOrderForLookup()">查台</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.openApartTable()">拆台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.transTableForTS()">转台</a>
@@ -773,7 +778,7 @@
     		<td style="line-height: 20px;padding: 0 3px;width:20%;">
 				<select  id="searchBookStatus" onchange="ts.searchBookList()" style="font-size: 20px;">
 					<option value="-1">订单状态</option>
-					<option value="1">已创建</option>
+					<option value="1">待确认</option>
 					<option value="2">已确认</option>
 					<option value="3">已入座</option>
 				</select>
@@ -793,7 +798,7 @@
              <th style="width: 130px;">预订人</th>
              <th >预订电话</th>
 			 <th style="width: 80px;">预订人数</th>
-			 <th style="width: 70px;">状态</th>
+			 <th style="width: 110px;">状态</th>
 			 <th style="width: 90px;">经手人</th>
 			  <th style="width: 100px;">详情</th>
 			 <th style="width: 230px;">操作</th>             
@@ -872,7 +877,7 @@
 	    		<td><input type="date" data-role="datebox" id="add_bookDate" data-options='{"mode": "datebox"}' ></td></td>
 	    		
 	    		<td class="readMemberTd">预订时间:</td>
-	    		<td><input id="add_bookTime" class="bookTime" ></td>
+	    		<td id="add_bookTimeBox"><input id="add_bookTime" class="bookTime" ></td>
   	
 	    		<td class="readMemberTd">预留时长(单位/分钟):</td>
 	    		<td class="selectionCmp" style="line-height: 20px;padding: 0 3px;width: 100px;">
