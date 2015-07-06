@@ -3829,6 +3829,8 @@ ts.commitAddBook = function(){
 		var hour = time.substring(0, time.indexOf(':'));
 		var minute = time.substr(time.indexOf(':')+1, 2);	
 		time = hour + ":" + minute + ':' + "59"
+	}else{
+		time += ":59";
 	}
 	
 	var tables = [];
