@@ -233,7 +233,7 @@ Util.dialog = {
 	tid : 'div-loadmask-m-dialog-t',
 	mid : 'div-loadmask-m-dialog-m',
 //	btn : {yesno : '<button onclick="Util.dialog.event(\'yes\');">确定</button>&nbsp;&nbsp;<button onclick="Util.dialog.event(\'cancel\');">取消</button>', yes : '<button onclick="Util.dialog.event(\'yes\');">确定</button>'},
-	templet : '<div id="{id}" class="div-mask div-mask-dialog dialong-show"><div class="dialog">'
+	templet : '<div id="{id}" class="div-mask div-mask-dialog"><div class="dialog">'
 		+ '<div id={tid} class="dialog-title">{title}</div>'
 		+ '<div id={mid} class="dialog-msg">{msg}</div>'
 		+ '<div class="dialog-button">'
@@ -271,7 +271,7 @@ Util.dialog = {
 		this.box.style.display = 'block';
 		var view = this.box.firstChild;
 		view.style.marginTop = parseInt(view.offsetHeight / 2 * -1) + 'px';
-		$('#div-loadmask-m-dialog').height(document.body.clientHeight);
+		$('#div-loadmask-m-dialog').height(document.body.clientHeight + 15);
 	},
 	hide : function(){
 		if(this.box){ this.box.style.display = 'none'; }
