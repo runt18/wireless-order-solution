@@ -478,20 +478,22 @@ public class BookDao {
 		}else{
 			Book book = result.get(0);
 			
-			for(OrderFood of : book.getOrder().getOrderFoods()){
-				//Get the detail to food.
-				of.asFood().copyFrom(FoodDao.getById(dbCon, staff, of.asFood().getFoodId()));
-				//Get the detail to food unit.
-				if(of.hasFoodUnit()){
-					of.setFoodUnit(FoodUnitDao.getById(dbCon, staff, of.getFoodUnit().getId()));
+			if(book.getOrder() != null){
+				for(OrderFood of : book.getOrder().getOrderFoods()){
+					//Get the detail to food.
+					of.asFood().copyFrom(FoodDao.getById(dbCon, staff, of.asFood().getFoodId()));
+					//Get the detail to food unit.
+					if(of.hasFoodUnit()){
+						of.setFoodUnit(FoodUnitDao.getById(dbCon, staff, of.getFoodUnit().getId()));
+					}
+					//Get the normal tastes.
+					String sql = " SELECT taste_id FROM " + Params.dbName + ".book_order_taste WHERE book_id = " + result.get(0).getId() + " AND food_id = " + of.asFood().getFoodId();
+					dbCon.rs = dbCon.stmt.executeQuery(sql);
+					while(dbCon.rs.next()){
+						of.addTaste(TasteDao.getById(staff, dbCon.rs.getInt("taste_id")));
+					}
+					dbCon.rs.close();
 				}
-				//Get the normal tastes.
-				String sql = " SELECT taste_id FROM " + Params.dbName + ".book_order_taste WHERE book_id = " + result.get(0).getId() + " AND food_id = " + of.asFood().getFoodId();
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				while(dbCon.rs.next()){
-					of.addTaste(TasteDao.getById(staff, dbCon.rs.getInt("taste_id")));
-				}
-				dbCon.rs.close();
 			}
 			return book;
 		}
