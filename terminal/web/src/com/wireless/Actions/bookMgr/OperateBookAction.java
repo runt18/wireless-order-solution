@@ -188,7 +188,6 @@ public class OperateBookAction extends DispatchAction{
 		String orderFoods = request.getParameter("orderFoods");
 		
 		JObject jobject = new JObject();
-		
 		try{
 			String pin = (String) request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
