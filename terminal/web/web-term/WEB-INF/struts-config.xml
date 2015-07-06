@@ -635,7 +635,9 @@
 			type="com.wireless.Actions.bookMgr.OperateBookAction"
 			scope="request" parameter="dataSource">
 		</action>			
-		
+		<action path="/QuerySaleOfMaterial"
+			type="com.wireless.Actions.inventoryMgr.report.QuerySaleOfMaterialAction" scope="request">
+		</action>		
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
