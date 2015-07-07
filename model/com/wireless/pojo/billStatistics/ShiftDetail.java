@@ -27,9 +27,11 @@ public class ShiftDetail implements Jsonable{
 	
 	private IncomeByErase incomeByErase;		//抹数数据
 	
-	private IncomeByCharge incomeByCharge; 	//会员充值信息
+	private IncomeByCharge incomeByCharge; 		//会员充值信息
 	
-	private List<IncomeByDept> deptIncome;	//所有部门营业额
+	private IncomeByBook incomeByBook;			//预订订金
+	
+	private List<IncomeByDept> deptIncome;		//所有部门营业额
 
 	public ShiftDetail(DutyRange range){
 		this.onDuty = range.getOnDutyFormat();
@@ -243,6 +245,17 @@ public class ShiftDetail implements Jsonable{
 		}
 	}
 
+	public void setIncomeByBook(IncomeByBook bookIncome){
+		this.incomeByBook = bookIncome;
+	}
+	
+	public IncomeByBook getIncomeByBook(){
+		if(this.incomeByBook == null){
+			return IncomeByBook.DUMMY;
+		}
+		return this.incomeByBook;
+	}
+	
 	@Override 
 	public String toString(){
 		return "ShiftDetail : " +

@@ -432,6 +432,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	private Status status = Status.IDLE;
 	private Region region;
 	private boolean tempPaidFlag = false;
+	private boolean bookFlag = false;
 	
 	public Table(){
 		
@@ -587,6 +588,14 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	
 	public void setTempPaid(boolean onOff){
 		this.tempPaidFlag = onOff;
+	}
+	
+	public boolean isBooked(){
+		return this.bookFlag;
+	}
+	
+	public void setBook(boolean onOff){
+		this.bookFlag = onOff;
 	}
 	
 	@Override
