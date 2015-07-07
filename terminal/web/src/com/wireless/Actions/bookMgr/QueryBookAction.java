@@ -29,6 +29,7 @@ public class QueryBookAction extends DispatchAction{
 		String phone = request.getParameter("phone");
 		String status = request.getParameter("status");
 		String bookDate = request.getParameter("bookDate");
+		String tableId = request.getParameter("tableId");
 		DBCon dbCon = null;
 		try{
 			dbCon = new DBCon();
@@ -48,6 +49,10 @@ public class QueryBookAction extends DispatchAction{
 			if(status != null && !status.isEmpty() && !status.equals("-1")){
 				extra.addStatus(Book.Status.valueOf(Integer.parseInt(status)));
 			}
+			if(tableId != null && !tableId.isEmpty()){
+				extra.setTable(Integer.parseInt(tableId));
+			}
+			
 			if(bookDate != null && !bookDate.isEmpty()){
 				DutyRange range = new DutyRange(DateUtil.parseDate(bookDate), DateUtil.parseDate(bookDate + " 23:59:59"));
 				extra.setBookRange(range);

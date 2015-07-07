@@ -133,7 +133,8 @@ public class QueryMemberAction extends DispatchAction {
 			String memberType = request.getParameter("memberType");
 			String memberTypeAttr = request.getParameter("memberTypeAttr");
 			String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
-//			String totalBalance = request.getParameter("usedBalance");
+			String memberBalance = request.getParameter("memberBalance");
+			String memberBalanceEqual = request.getParameter("memberBalanceEqual");
 			String MaxTotalMemberCost = request.getParameter("MaxTotalMemberCost");
 			String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
 			String consumptionMinAmount = request.getParameter("consumptionMinAmount");
@@ -143,11 +144,7 @@ public class QueryMemberAction extends DispatchAction {
 			String searchType = request.getParameter("sType");
 			String forDetail = request.getParameter("forDetail");
 			String needSum = request.getParameter("needSum");
-			
-//			String point = request.getParameter("point");
-//			String usedPoint = request.getParameter("usedPoint");
-//			String usedBalanceEqual = request.getParameter("usedBalanceEqual");
-//			String consumptionAmountEqual = request.getParameter("consumptionAmountEqual");
+			String orderBy = request.getParameter("orderBy");
 			
 			MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
 			
@@ -185,19 +182,30 @@ public class QueryMemberAction extends DispatchAction {
 					extraCond.lessConsume(Integer.parseInt(consumptionMaxAmount));
 				}
 				
-				
 				if(beginDate != null && !beginDate.isEmpty()){
 					extraCond.setRange(new DutyRange(beginDate, endDate));
 				}
 				
-/*				if(usedPoint != null && !usedPoint.trim().isEmpty())
-					extraCond += (" AND M.total_point " + so + usedPoint);
+				if(memberBalance != null && !memberBalance.isEmpty()){
+					extraCond.setMemberBalance(Integer.parseInt(memberBalance));
+				}
 				
-				if(point != null && !point.trim().isEmpty())
-					extraCond += (" AND M.point " + so + point);*/
+				if(memberBalanceEqual != null && !memberBalanceEqual.isEmpty()){
+					extraCond.setMemberBalanceEqual(memberBalanceEqual);
+				}
 			}
 			
-			orderClause = " ORDER BY M.member_id ";
+			if(orderBy.equals("create")){
+				orderClause = " ORDER BY M.member_id ";
+			}else if(orderBy.equals("consumeMoney")){
+				orderClause = " ORDER BY M.total_consumption DESC ";
+			}else if(orderBy.equals("consumeAmount")){
+				orderClause = " ORDER BY M.consumption_amount DESC ";
+			}else if(orderBy.equals("point")){
+				orderClause = " ORDER BY M.total_point DESC ";
+			}
+			
+			
 			
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
