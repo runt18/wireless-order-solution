@@ -46,7 +46,7 @@ public class QueryBookAction extends DispatchAction{
 				extra.setTele(phone);
 			}
 			if(status != null && !status.isEmpty() && !status.equals("-1")){
-				extra.setStatus(Book.Status.valueOf(Integer.parseInt(status)));
+				extra.addStatus(Book.Status.valueOf(Integer.parseInt(status)));
 			}
 			if(bookDate != null && !bookDate.isEmpty()){
 				DutyRange range = new DutyRange(DateUtil.parseDate(bookDate), DateUtil.parseDate(bookDate + " 23:59:59"));
