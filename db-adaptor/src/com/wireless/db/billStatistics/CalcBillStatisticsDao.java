@@ -12,10 +12,12 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
+import com.wireless.db.book.BookDao;
 import com.wireless.db.orderMgr.PayTypeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
+import com.wireless.pojo.billStatistics.IncomeByBook;
 import com.wireless.pojo.billStatistics.IncomeByCancel;
 import com.wireless.pojo.billStatistics.IncomeByCharge;
 import com.wireless.pojo.billStatistics.IncomeByCoupon;
@@ -32,6 +34,7 @@ import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.pojo.billStatistics.IncomeTrendByDept;
 import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
+import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
@@ -1049,7 +1052,31 @@ public class CalcBillStatisticsDao {
 		 return incomeByCharge;
 		 
 	 }
-	 
+	
+	/**
+	 * Calculate the income by book.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the range to calculate
+	 * @return the income by book 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static IncomeByBook calcIncomeByBook(DBCon dbCon, Staff staff, DutyRange range) throws SQLException{
+		float income = 0;
+		int amount = 0;
+		for(Book book : BookDao.getByCond(dbCon, staff, new BookDao.ExtraCond().setConfirmRange(range).addStatus(Book.Status.CONFIRMED).addStatus(Book.Status.SEAT))){
+			if(book.getMoney() != 0){
+				income += book.getMoney();
+				amount++;
+			}
+		}
+		return new IncomeByBook(income, amount);
+	}
+	
 	public static List<CommissionStatistics> calcCommissionTotal(Staff staff, DutyRange range, DateType queryType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{

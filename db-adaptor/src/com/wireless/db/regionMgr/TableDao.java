@@ -213,10 +213,16 @@ public class TableDao {
 			  " TBL.restaurant_id, TBL.table_id, TBL.table_alias, TBL.name AS tbl_name, TBL.category, TBL.minimum_cost, " +
 			  " O.custom_num, O.id, " + 
 			  " IF(O.temp_date IS NULL, 0, 1) AS temp_paid, " +
-			  " IF(O.status IS NULL, " + Table.Status.IDLE.getVal() + "," + Table.Status.BUSY.getVal() + ") AS tbl_status " + 
+			  " IF(O.status IS NULL, " + Table.Status.IDLE.getVal() + "," + Table.Status.BUSY.getVal() + ") AS tbl_status, " + 
+			  " IF(BT.table_id IS NULL, 0, 1 ) AS book_flag " +
 			  " FROM " + Params.dbName + ".table TBL " +
 			  " LEFT JOIN " + Params.dbName + ".region REGION ON REGION.region_id = TBL.region_id AND REGION.restaurant_id = TBL.restaurant_id " +
-			  " LEFT JOIN ( SELECT * FROM " + Params.dbName + ".order WHERE restaurant_id = " + staff.getRestaurantId() + " AND status = " + Order.Status.UNPAID.getVal() + " GROUP BY table_id ) AS O ON O.table_id = TBL.table_id " + 
+			  " LEFT JOIN ( SELECT * FROM " + Params.dbName + ".order WHERE restaurant_id = " + staff.getRestaurantId() + " AND status = " + Order.Status.UNPAID.getVal() + " GROUP BY table_id ) AS O ON O.table_id = TBL.table_id " +
+			  " LEFT JOIN ( SELECT BT.table_id FROM " + Params.dbName + ".book_table BT " + 
+			  				" JOIN " + Params.dbName + ".book B ON BT.book_id = B.book_id " +
+			  				" WHERE B.restaurant_id = " + staff.getRestaurantId() + 
+			  				" AND TO_DAYS(NOW()) - TO_DAYS(B.book_date) = 0 " +
+			  				" GROUP BY BT.table_id ) AS BT ON BT.table_id = TBL.table_id " +
 			  " WHERE 1 = 1 " +
 			  " AND TBL.restaurant_id = " + staff.getRestaurantId() + " " +
 			  (extraCond != null ? extraCond : "") + " " + 
@@ -241,6 +247,7 @@ public class TableDao {
 			}else{
 				table.setStatus(Table.Status.IDLE);
 			}
+			table.setBook(dbCon.rs.getBoolean("book_flag"));
 			table.setTableAlias(dbCon.rs.getInt("table_alias"));
 			table.setId(dbCon.rs.getInt("table_id"));
 			table.setTableName(dbCon.rs.getString("tbl_name"));

@@ -275,6 +275,9 @@ public class ShiftDao {
 		//Get the income by charge
 		result.setIncomeByCharge(CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new ExtraCond4Charge(extraCond.dateType)));
 		
+		//Get the income by book
+		result.setIncomeByBook(CalcBillStatisticsDao.calcIncomeByBook(dbCon, staff, range));
+		
 		//Get the gift, discount & total to each department during this period.
 		result.setDeptIncome(CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond));
 		

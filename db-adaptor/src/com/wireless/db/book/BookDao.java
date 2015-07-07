@@ -38,8 +38,9 @@ public class BookDao {
 		private int id;
 		private String tele;
 		private String member;
-		private Book.Status status;
-		private DutyRange range;
+		private final List<Book.Status> statuses = new ArrayList<Book.Status>();
+		private DutyRange bookRange;
+		private DutyRange confirmRange;
 		private int tableId;
 		
 		public ExtraCond setId(int id){
@@ -57,13 +58,18 @@ public class BookDao {
 			return this;
 		}
 		
-		public ExtraCond setStatus(Book.Status status){
-			this.status = status;
+		public ExtraCond addStatus(Book.Status status){
+			this.statuses.add(status);
 			return this;
 		}
 		
 		public ExtraCond setBookRange(DutyRange range){
-			this.range = range;
+			this.bookRange = range;
+			return this;
+		}
+		
+		public ExtraCond setConfirmRange(DutyRange range){
+			this.confirmRange = range;
 			return this;
 		}
 		
@@ -89,15 +95,30 @@ public class BookDao {
 			if(member != null){
 				extraCond.append(" AND book_member LIKE %" + member + "%");
 			}
-			if(status != null){
-				extraCond.append(" AND book_status = " + status.getVal());
-			}
-			if(range != null){
-				if(range.getOnDuty() != 0){
-					extraCond.append(" AND book_date >= '" + range.getOnDutyFormat() + "'");
+			StringBuilder status = new StringBuilder();
+			for(Book.Status s : statuses){
+				if(status.length() != 0){
+					status.append(",");
 				}
-				if(range.getOffDuty() != 0){
-					extraCond.append(" AND book_date <= '" + range.getOffDutyFormat() + "'");
+				status.append(s.getVal());
+			}
+			if(status.length() != 0){
+				extraCond.append(" AND book_status IN ( " + status.toString() + ")");
+			}
+			if(bookRange != null){
+				if(bookRange.getOnDuty() != 0){
+					extraCond.append(" AND book_date >= '" + bookRange.getOnDutyFormat() + "'");
+				}
+				if(bookRange.getOffDuty() != 0){
+					extraCond.append(" AND book_date <= '" + bookRange.getOffDutyFormat() + "'");
+				}
+			}
+			if(confirmRange != null){
+				if(confirmRange.getOnDuty() != 0){
+					extraCond.append(" AND book_confirm_date >= '" + confirmRange.getOnDutyFormat() + "'");
+				}
+				if(confirmRange.getOffDuty() != 0){
+					extraCond.append(" AND book_confirm_date <= '" + confirmRange.getOffDutyFormat() + "'");
 				}
 			}
 			if(tableId != 0){
@@ -239,7 +260,7 @@ public class BookDao {
 		if(book.getStatus() == Book.Status.CREATED || book.getStatus() == Book.Status.CONFIRMED){
 			update(dbCon, staff, builder.getBuilder());
 		}else{
-			throw new BusinessException("【已创建】状态的预订信息才可确认", BookError.BOOK_RECORD_CONFIRM_FAIL);
+			throw new BusinessException("【" + book.getStatus().toString() + "】状态的预订信息不能进行确认操作", BookError.BOOK_RECORD_CONFIRM_FAIL);
 		}
 	}
 	
