@@ -959,7 +959,7 @@ function gridInit(){
 		width : 100,
 		maxValue : new Date(),
 		readOnly : false,
-		allowBlank : false
+//		allowBlank : false
 	});
 	var member_endDate = new Ext.form.DateField({
 		xtype : 'datefield',
@@ -968,7 +968,7 @@ function gridInit(){
 		width : 100,
 		maxValue : new Date(),
 		readOnly : false,
-		allowBlank : false
+//		allowBlank : false
 	});
 	var member_dateCombo = Ext.ux.createDateCombo({
 		width : 75,
@@ -1057,6 +1057,69 @@ function gridInit(){
 			}]
 		
 	});
+	
+	var memberBasicGridSortTbar = new Ext.Toolbar({
+		hidden : true,
+		height : 28,		
+		items : [
+			{xtype : 'tbtext', text : '排序:&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{
+				xtype : 'radio',
+				id : 'm_searchOrderby',
+				checked : true,
+				boxLabel : '创建时间',
+				name : 'memberSort',
+				inputValue : 'create',
+				listeners : {
+					check : function(e){
+						if(e.getValue()){
+							m_searchAdditionFilter = e.inputValue;
+						}
+					}
+				}
+			}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
+				xtype : 'radio',
+				name : 'memberSort',
+				boxLabel : '消费额',
+				inputValue : 'consumeMoney',
+				listeners : {
+					check : function(e){
+						if(e.getValue()){
+							m_searchAdditionFilter = e.inputValue;
+						}
+							
+					}
+				}
+			}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
+				xtype : 'radio',
+				name : 'memberSort',
+				boxLabel : '消费次数',
+				inputValue : 'consumeAmount',
+				listeners : {
+					check : function(e){
+						if(e.getValue())
+							m_searchAdditionFilter = e.inputValue;
+					}
+				}
+			}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
+				xtype : 'radio',
+				name : 'memberSort',
+				boxLabel : '积分',
+				inputValue : 'point',
+				listeners : {
+					check : function(e){
+						if(e.getValue()){
+							m_searchAdditionFilter = e.inputValue;
+						}
+					}
+				}
+			}]
+		
+	});	
+	
+	
+	
 	var memberBasicGridTbar = new Ext.Toolbar({
 		items : [{
 			xtype : 'tbtext',
@@ -1080,9 +1143,10 @@ function gridInit(){
 				Ext.getCmp('member_btnCommonSearch').show();
 	    		Ext.getCmp('member_btnHeightSearch').hide();
 	    		
-	    		memberBasicGrid.setHeight(memberBasicGrid.getHeight()-28);
+	    		memberBasicGrid.setHeight(memberBasicGrid.getHeight()-56);
 	    		
 	    		memberBasicGridExcavateMemberTbar.show();
+	    		memberBasicGridSortTbar.show();
 	    		
 	    		
 	    		memberBasicGrid.syncSize(); //强制计算高度
@@ -1098,20 +1162,33 @@ function gridInit(){
 	    		Ext.getCmp('member_btnCommonSearch').hide();
 	    		
 	    		memberBasicGridExcavateMemberTbar.hide();
+	    		memberBasicGridSortTbar.hide();
 	    		
-	    		memberBasicGrid.setHeight(memberBasicGrid.getHeight()+28);
+	    		memberBasicGrid.setHeight(memberBasicGrid.getHeight()+56);
 	    		memberBasicGrid.syncSize(); //强制计算高度
 	    		memberBasicGrid.doLayout();//重新布局 	
 	    		
-	    		member_dateCombo.setValue(4);
-	    		member_dateCombo.fireEvent('select', member_dateCombo,null,4);
+	    		//日期清空
+	    		Ext.getCmp('dateSearchDateBegin').setValue('');
+	    		Ext.getCmp('dateSearchDateEnd').setValue('');	    		
 	    		
-	    		Ext.getCmp('textTotalMemberCost').setValue();
-	    		Ext.getCmp('usedBalanceEqual').setValue('=');
-	    		Ext.getCmp('textTotalMemberCostCount').setValue();
-	    		Ext.getCmp('consumptionAmountEqual').setValue('=');
-	    		Ext.getCmp('numberSearchByMemberPhoneOrCard').setValue();
+	    		//消费金额清空
+	    		Ext.getCmp('textTotalMinMemberCost').setValue('');
+	    		Ext.getCmp('textTotalMaxMemberCost').setValue('');
+	    		
+	    		//消费次数清空
+	    		Ext.getCmp('textTotalMinMemberCostCount').setValue('');
+	    		Ext.getCmp('textTotalMaxMemberCostCount').setValue('');
+	    		
+	    		//清空余额
 	    		Ext.getCmp('memberBalanceEqual').setValue('=');
+	    		Ext.getCmp('textMemberBalance').setValue('');
+	    		
+	    		//设置按创建时间排序
+	    		Ext.getCmp('m_searchOrderby').setValue(true);
+	    		
+	    		member_dateCombo.setValue(4);
+	    		Ext.getCmp('btnSearchMember').handler();
 			}
 		},{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	 
 		{
@@ -1139,7 +1216,10 @@ function gridInit(){
 				gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('textTotalMaxMemberCostCount').getValue();
 				gs.baseParams['memberBalance'] = Ext.getCmp('textMemberBalance').getValue();
 				gs.baseParams['memberBalanceEqual'] = Ext.getCmp('memberBalanceEqual').getValue();
+				gs.baseParams['beginDate'] = Ext.getCmp('dateSearchDateBegin').getValue();
+				gs.baseParams['endDate'] = Ext.getCmp('dateSearchDateEnd').getValue();
 				gs.baseParams['needSum'] = true;
+				gs.baseParams['orderBy'] = m_searchAdditionFilter;
 				gs.load({
 					params : {
 						start : 0,
@@ -1218,7 +1298,7 @@ function gridInit(){
 				}
 				
 				var url = '../../{0}?memberType={1}&memberCardOrMobileOrName={2}&MinTotalMemberCost={3}' +
-						'&MaxTotalMemberCost={4}&consumptionMinAmount={5}&consumptionMaxAmount={6}&memberBalance={7}&memberBalanceEqual={8}&dataSource={9}';
+						'&MaxTotalMemberCost={4}&consumptionMinAmount={5}&consumptionMaxAmount={6}&memberBalance={7}&memberBalanceEqual={8}&orderBy={9}&dataSource={10}';
 				url = String.format(
 					url, 
 					'ExportHistoryStatisticsToExecl.do', 
@@ -1230,6 +1310,7 @@ function gridInit(){
 					Ext.getCmp('textTotalMaxMemberCostCount').getValue(),
 					Ext.getCmp('textMemberBalance').getValue(),
 					Ext.getCmp('memberBalanceEqual').getValue(),
+					m_searchAdditionFilter,
 					'memberList'
 				);
 				
@@ -1263,7 +1344,7 @@ function gridInit(){
 		[['isPaging', true], ['restaurantID', restaurantID],  ['dataSource', 'normal'],  ['needSum', true]],
 		100,
 		'',
-		[memberBasicGridTbar, memberBasicGridExcavateMemberTbar]
+		[memberBasicGridTbar, memberBasicGridExcavateMemberTbar, memberBasicGridSortTbar]
 	);	
 	memberBasicGrid.region = 'center';
 	memberBasicGrid.loadMask = null;
