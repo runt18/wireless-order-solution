@@ -854,7 +854,7 @@
 		    </div>
 		    <div class="ui-block-b">
 		    	<div class="ui-bar-e" style="height:360px;text-align: left;">
-			    	<div data-role="header" data-theme="b" class="ui-corner-top win_head">
+			    	<div data-role="header" data-theme="b" class="ui-corner-top win_head" align="center">
 				       	 入座餐台
 				    </div>	
 		    		<div data-role="content" id="bookTableHadChoose" style="height:  -webkit-calc(100% - 63px);height: -moz-calc(100% - 63px);height: -ms-calc(100% - 63px);height: -o-calc(100% - 63px);">

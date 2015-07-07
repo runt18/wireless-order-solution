@@ -998,38 +998,53 @@ ts.toOrderFoodOrTransFood = function(c){
 		ts.table.id = c.id;
 	}else if(ts.commitTableOrTran == 'bookTableChoose'){//预订入座选台
 		var table = null;
-		for (var i = 0; i < ts.bookChoosedTable.length; i++) {
-			if(ts.bookChoosedTable[i].id == c.id){
-				table = true;
-				ts.bookChoosedTable.splice(i, 1);
-				break;
-			}
-		}
-		
-		//去除已订餐台
-		for (var i = 0; i < ts.bookOperateTable.oldTables.length; i++) {
-			if(ts.bookOperateTable.oldTables[i].id == c.id){
-				ts.bookOperateTable.oldTables.splice(i, 1);
-				break;
-			}
-		}
-		
-		
-		
-		//选择餐台
-		if(table == null){
-			table = getTableById(c.id);
-			if(table.statusValue == 1){
-				Util.msg.tip("此餐台已使用, 不能选择");
-				return;
-			}
+		if(typeof c.otype == 'undefined' || c.otype == 'commit'){
 			
-			ts.bookChoosedTable.push(table);
+			for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+				if(ts.bookChoosedTable[i].id == c.id){
+					table = true;
+					break;
+				}
+			}
+			//选择餐台
+			if(table == null){
+				table = getTableById(c.id);
+				if(table.statusValue == 1){
+					Util.msg.tip("此餐台已使用, 不能选择");
+					return;
+				}
+				ts.bookChoosedTable.push(table);
+			}			
+			//去除已订餐台
+			for (var i = 0; i < ts.bookOperateTable.oldTables.length; i++) {
+				if(ts.bookOperateTable.oldTables[i].id == c.id){
+					ts.bookOperateTable.oldTables.splice(i, 1);
+					break;
+				}
+			}			
+		}else if(c.otype == 'display'){
+			for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+				if(ts.bookChoosedTable[i].id == c.id){
+					table = ts.bookChoosedTable[i];
+					ts.bookChoosedTable.splice(i, 1);
+					break;
+				}
+			}
+			//退回原餐台
+			ts.bookOperateTable.oldTables.push(table);
 		}
+
+		
+		
+
+		
 		//选台后关闭
 		uo.closeTransOrderFood();
-		//刷新已点餐台
-		ts.loadBookChoosedTable({renderTo : 'bookTableHadChoose'});
+		//刷新入座餐台
+		ts.loadBookChoosedTable({renderTo : 'bookTableHadChoose', tables:ts.bookChoosedTable, otype : 'display'});
+		//刷新预订餐台
+		ts.loadBookChoosedTable({renderTo : 'bookTableToChoose', tables:ts.bookOperateTable.oldTables, otype : 'commit'});		
+		
 	}else if(ts.commitTableOrTran == 'addBookTableChoose'){//添加预订选台
 		var table = null;
 		for (var i = 0; i < ts.bookChoosedTable.length; i++) {
@@ -1047,7 +1062,7 @@ ts.toOrderFoodOrTransFood = function(c){
 			ts.bookChoosedTable.push(table);
 		}
 		//刷新已点餐台
-		ts.loadBookChoosedTable({renderTo : 'add_bookTableList'});
+		ts.loadBookChoosedTable({renderTo : 'add_bookTableList', tables:ts.bookChoosedTable});
 		
 		//显示预订添加界面餐台
 		$('#box4BookTableList').show();
@@ -1133,7 +1148,7 @@ ts.submitForSelectTableOrTransFood = function(){
 			
 			ts.bookChoosedTable.push(table);
 			//刷新已点餐台
-			ts.loadBookChoosedTable({renderTo : 'bookTableHadChoose'});
+			ts.loadBookChoosedTable({renderTo : 'bookTableHadChoose', tables:ts.bookChoosedTable, otype : 'display'});
 		}
 		
 		uo.closeTransOrderFood();
@@ -3484,29 +3499,7 @@ ts.bookOperateTable = function(c){
 	ts.bookChoosedTable.length = 0;
 	ts.currentBookId = c.bookId;
 	
-	var html = [];
-	for (var i = 0; i < tables.length; i++) {
-		var aliasOrName;
-		if(tables[i].categoryValue == 1){//一般台
-			aliasOrName = tables[i].alias
-		}else if(tables[i].categoryValue == 3){//搭台
-			var begin = tables[i].name.indexOf("(");
-			var end = tables[i].name.indexOf(")");
-			aliasOrName = '<font color="green">' + tables[i].name.substring(begin+1, end) +'</font>';
-		}else{
-			aliasOrName = '<font color="green">'+ tables[i].categoryText +'</font>'
-		}		
-		html.push(tableCmpTemplet.format({
-			dataIndex : i,
-			id : tables[i].id,
-			click : 'ts.toOrderFoodOrTransFood({alias:'+ tables[i].alias +',id:'+ tables[i].id +'})',
-			alias : aliasOrName,
-			theme : tables[i].statusValue == '1' ? "e" : "c",
-			name : tables[i].name == "" || typeof tables[i].name != 'string' ? tables[i].alias + "号桌" : tables[i].name,
-			tempPayStatus : tables[i].isTempPaid? '暂结' : ''
-		}));				
-	}
-	$('#bookTableToChoose').html(html.join("")).trigger('create');
+	ts.loadBookChoosedTable({renderTo : 'bookTableToChoose', tables:tables, otype : 'commit'});
 	
 	ts.commitTableOrTran = 'bookTableChoose';
 	
@@ -3550,25 +3543,25 @@ ts.deleteBook = function(c){
  */
 ts.loadBookChoosedTable = function(c){
 	var html = [];
-	for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+	for (var i = 0; i < c.tables.length; i++) {
 		var aliasOrName;
-		if(ts.bookChoosedTable[i].categoryValue == 1){//一般台
-			aliasOrName = ts.bookChoosedTable[i].alias
-		}else if(ts.bookChoosedTable[i].categoryValue == 3){//搭台
-			var begin = ts.bookChoosedTable[i].name.indexOf("(");
-			var end = ts.bookChoosedTable[i].name.indexOf(")");
-			aliasOrName = '<font color="green">' + ts.bookChoosedTable[i].name.substring(begin+1, end) +'</font>';
+		if(c.tables[i].categoryValue == 1){//一般台
+			aliasOrName = c.tables[i].alias
+		}else if(c.tables[i].categoryValue == 3){//搭台
+			var begin = c.tables[i].name.indexOf("(");
+			var end = c.tables[i].name.indexOf(")");
+			aliasOrName = '<font color="green">' + c.tables[i].name.substring(begin+1, end) +'</font>';
 		}else{
-			aliasOrName = '<font color="green">'+ ts.bookChoosedTable[i].categoryText +'</font>'
+			aliasOrName = '<font color="green">'+ c.tables[i].categoryText +'</font>'
 		}		
 		html.push(tableCmpTemplet.format({
 			dataIndex : i,
-			id : ts.bookChoosedTable[i].id,
-			click : 'ts.toOrderFoodOrTransFood({alias:'+ ts.bookChoosedTable[i].alias +',id:'+ ts.bookChoosedTable[i].id +'})',
+			id : c.tables[i].id,
+			click : 'ts.toOrderFoodOrTransFood({alias:'+ c.tables[i].alias +',id:'+ c.tables[i].id +', otype:\''+ c.otype +'\'})',
 			alias : aliasOrName,
-			theme : ts.bookChoosedTable[i].statusValue == '1' ? "e" : "c",
-			name : ts.bookChoosedTable[i].name == "" || typeof ts.bookChoosedTable[i].name != 'string' ? ts.bookChoosedTable[i].alias + "号桌" : ts.bookChoosedTable[i].name,
-			tempPayStatus : tables[i].isTempPaid? '暂结' : ''
+			theme : c.tables[i].statusValue == '1' ? "e" : "c",
+			name : c.tables[i].name == "" || typeof c.tables[i].name != 'string' ? c.tables[i].alias + "号桌" : c.tables[i].name,
+			tempPayStatus : c.tables[i].isTempPaid? '暂结' : ''
 		}));				
 	}
 	$('#'+c.renderTo).html(html.join("")).trigger('create');	
@@ -3706,7 +3699,7 @@ ts.addBookInfo = function(c){
 		if(book.tables.length > 0){
 			ts.bookChoosedTable = book.tables;
 			$('#box4BookTableList').show();
-			ts.loadBookChoosedTable({renderTo : 'add_bookTableList'});
+			ts.loadBookChoosedTable({renderTo : 'add_bookTableList', tables:ts.bookChoosedTable});
 		}
 		
 		if(book.order && book.order.orderFoods.length > 0){
