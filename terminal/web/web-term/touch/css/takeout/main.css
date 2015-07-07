@@ -290,11 +290,21 @@ html { overflow-y: hidden;}
 
 /*餐台暂结*/
 .tempPayStatus{
-	/* position:absolute; 
-	right:0;bottom:16px;*/
 	font-size:15px;color: blue;
 	margin-left: 70px;
 	margin-top: -6px;
+}
+
+/*餐台预订*/
+.bookTableStatus{
+	font-size:15px;color: deeppink;
+	margin-left: 80px;
+	margin-top: -65px;
+}
+.bookTableStatus4Moz{
+	font-size:15px;color: deeppink;
+	margin-left: 80px;
+	margin-top: -73px;
 }
 
 

@@ -50,7 +50,8 @@ var uo = {
 				alias : aliasOrName,
 				theme : c.data[i].statusValue == '1' ? "e" : "c",
 				name : c.data[i].name == "" || typeof c.data[i].name != 'string' ? c.data[i].alias + "号桌" : c.data[i].name,
-				tempPayStatus : c.data[i].isTempPaid? '暂结' : ''
+				tempPayStatus : c.data[i].isTempPaid? '暂结' : '',
+				bookTableStatus : c.data[i].isBook? '订' : ''
 			}));	
 		}
 		$('#divSelectTablesForTs').html(html.join(''));

@@ -58,6 +58,7 @@ var tables = [],
 //	'<div>{name}<br>{alias}</div></a>';
 		'<div style="height: 70px;">{name}<br>{alias}' +
 			'<div class="tempPayStatus">{tempPayStatus}</div>'+
+			'<div class="bookTableStatus">{bookTableStatus}</div>'+
 		'</div>'+
 	'</a>',
 	
@@ -210,7 +211,8 @@ $(function(){
 				alias : aliasOrName,
 				theme : c.data.statusValue == '1' ? "e" : "c",
 				name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
-				tempPayStatus : c.data.isTempPaid? '暂结' : ''
+				tempPayStatus : c.data.isTempPaid? '暂结' : '&nbsp;&nbsp;',
+				bookTableStatus : c.data.isBook? '订' : ''
 			});				
 		}
 	});
@@ -314,11 +316,17 @@ $(function(){
 	//刷新微信预订单
 	ts.refreshWeixinBook();
 	
-	
+/*	var explorer =navigator.userAgent ; 
+	if (explorer.indexOf("Firefox") >= 0) {
+		console.log($(".bookTableStatus").length)
+		$(".bookTableStatus").each(function(){
+			$(this).removeClass('bookTableStatus').addClass('bookTableStatus4Moz');
+		});
+	}  */
 });	
 
 
-/**
+/** 
  * 通过其他界面返回餐台选择
  */
 ts.loadData = function(){
@@ -1062,7 +1070,7 @@ ts.toOrderFoodOrTransFood = function(c){
 			ts.bookChoosedTable.push(table);
 		}
 		//刷新已点餐台
-		ts.loadBookChoosedTable({renderTo : 'add_bookTableList', tables:ts.bookChoosedTable});
+		ts.loadBookChoosedTable({renderTo : 'add_bookTableList', tables:ts.bookChoosedTable, otype:'display'});
 		
 		//显示预订添加界面餐台
 		$('#box4BookTableList').show();
@@ -1749,7 +1757,15 @@ function handleTableForTS(c){
 				uo.closeTransOrderFood();
 				//选择开台人数
 				firstTimeInput = true;
-				$('#tableCustomerCountSetTitle').text(c.table.name + ' -- 输入人数');
+				$('#tableCustomerCountSetTitle').text(c.table.name);
+				//是否为预订台
+				if(ts.table.isBook){
+					$('#btnCheckoutBook').show();
+					$('#closeTable4PeopleCount').hide();
+				}else{
+					$('#btnCheckoutBook').hide();
+					$('#closeTable4PeopleCount').show();					
+				}
 				$('#tableCustomerCountSet').parent().addClass("pop").addClass("in");
 				$('#tableCustomerCountSet').popup('open');
 				$('#inputTableCustomerCountSet').focus();
@@ -1777,7 +1793,15 @@ function handleTableForTS(c){
 				
 				//选择开台人数
 				firstTimeInput = true;
-				$('#tableCustomerCountSetTitle').text(c.table.name + ' -- 输入人数');
+				$('#tableCustomerCountSetTitle').text(c.table.name);
+				//是否为预订台
+				if(ts.table.isBook){
+					$('#btnCheckoutBook').show();
+					$('#closeTable4PeopleCount').hide();
+				}else{
+					$('#btnCheckoutBook').hide();
+					$('#closeTable4PeopleCount').show();					
+				}
 				$('#tableCustomerCountSet').parent().addClass("pop").addClass("in");
 				$('#tableCustomerCountSet').popup('open');
 				$('#inputTableCustomerCountSet').focus();
@@ -3396,7 +3420,8 @@ ts.searchBookList = function(){
 		name : name,
 		phone : phone,
 		status : status,
-		bookDate : bookDate
+		bookDate : bookDate,
+		tableId : ts.bookTable4Search || ""
 	}, function(data){
 		Util.LM.hide();
 		
@@ -3413,7 +3438,7 @@ ts.searchBookList = function(){
  */
 ts.bookListEntry = function(){
 	
-	//电话筛选
+	//条件筛选初始化
 	ts.bookSearch.init({file : 'searchBookPhone'});	
 	ts.bookSearchByName.init({file : 'searchBookPerson'});	
 	
@@ -3453,6 +3478,15 @@ ts.bookListEntry = function(){
 	}, 'json');
 
 }
+
+ts.bookListBack = function(){
+	history.back();
+	if(!ts.bookTable4Search){
+		ts.loadData();
+	}
+	delete ts.bookTable4Search;
+}
+
 /**
  * 打开预订入座
  */
@@ -3561,7 +3595,8 @@ ts.loadBookChoosedTable = function(c){
 			alias : aliasOrName,
 			theme : c.tables[i].statusValue == '1' ? "e" : "c",
 			name : c.tables[i].name == "" || typeof c.tables[i].name != 'string' ? c.tables[i].alias + "号桌" : c.tables[i].name,
-			tempPayStatus : c.tables[i].isTempPaid? '暂结' : ''
+			tempPayStatus : c.tables[i].isTempPaid? '暂结' : '',
+			bookTableStatus : c.tables[i].isBook? '订' : ''
 		}));				
 	}
 	$('#'+c.renderTo).html(html.join("")).trigger('create');	
@@ -3886,8 +3921,19 @@ ts.commitAddBook = function(){
 			ts.refreshWeixinBook();
 		}
 	});
-	
-	
+}
+
+/**
+ * 已点菜界面查看预订
+ */
+ts.checkBookTable = function(){
+	//去已点菜界面
+	if($.mobile.activePage.attr( "id" ) == 'tableSelectMgr'){//餐台界面中使用
+		ts.bookTable4Search = ts.table.id;
+	}else if($.mobile.activePage.attr( "id" ) == 'orderFoodListMgr'){//已点菜界面使用
+		ts.bookTable4Search = uo.table.id;
+	}	
+	ts.bookListEntry();
 }
 
 

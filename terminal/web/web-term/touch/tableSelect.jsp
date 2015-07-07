@@ -143,8 +143,11 @@
 	
 	<!-- 输入餐台人数 -->
 	<div id="tableCustomerCountSet" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
-	    <div id="tableCustomerCountSetTitle" data-role="header" data-theme="b" class="ui-corner-top" style="line-height: 35px;">
-	        	餐台 -- 输入人数
+	    <div data-role="header" data-theme="b" class="ui-corner-top" style="line-height: 35px;">
+	        	<span id="tableCustomerCountSetTitle">餐台</span> -- 输入人数
+	    	<div style="float: right">
+	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn4Book">X</a>      		
+	       	</div>
 	    </div>
 	    <div style="min-height: 300px; overflow-y: auto;">
 			<div id="calculator4TableCustomerCount" class="calculator">
@@ -181,7 +184,8 @@
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
 				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.openTableAction()">开台</a>
 				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.createTableWithPeople()">点菜</a>
-				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.closeTableWithPeople()">取消</a>		 
+				 <a id="closeTable4PeopleCount" data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.closeTableWithPeople()">取消</a>		 
+				 <a id="btnCheckoutBook" data-role="button" data-inline="true" class="tablePopbottomBtn none" onclick="ts.checkBookTable()">查看预订</a>
 			 </div>
 	    </div>
 	</div>	
@@ -826,7 +830,7 @@
 	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
 
 		 <!-- <input type="button" value="返回" style="width: 70px;height: 70px;"> -->
-		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.loadData()">返回</a>
+		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.bookListBack()">返回</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.addBookInfo({type:'add'})">添加</a>
 			<a href="javascript: Util.to.scroll({content:'bookOrderListCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
@@ -1030,6 +1034,7 @@
 		 <!-- <input type="button" value="返回" style="width: 70px;height: 70px;"> -->
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.cancelForUO()">返回</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.checkBookTable()">查看预订</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.goToCreateOrder()">点菜</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.tempPayForUO()">暂结</a>
 		 	<a id="btnPayBill" data-role="button" data-inline="true" class="bottomBtnFont none" onclick="showPaymentMgr({table:uo.table})" >结账</a>
