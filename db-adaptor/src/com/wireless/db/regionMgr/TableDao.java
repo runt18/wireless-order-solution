@@ -10,6 +10,7 @@ import com.wireless.db.Params;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.TableError;
+import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
@@ -222,6 +223,7 @@ public class TableDao {
 			  				" JOIN " + Params.dbName + ".book B ON BT.book_id = B.book_id " +
 			  				" WHERE B.restaurant_id = " + staff.getRestaurantId() + 
 			  				" AND TO_DAYS(NOW()) - TO_DAYS(B.book_date) = 0 " +
+			  				" AND B.book_status <> " + Book.Status.SEAT.getVal() +
 			  				" GROUP BY BT.table_id ) AS BT ON BT.table_id = TBL.table_id " +
 			  " WHERE 1 = 1 " +
 			  " AND TBL.restaurant_id = " + staff.getRestaurantId() + " " +
