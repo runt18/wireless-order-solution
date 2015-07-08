@@ -9,21 +9,27 @@ import org.w3c.dom.Element;
 public class Msg4Head {
 	
 	public static enum MsgType{
-		MSG_TYPE_UNKNOWN("unknown"),
-		MSG_TYPE_TEXT("text"),
-		MSG_TYPE_IMAGE("image"),
-		MSG_TYPE_MUSIC("music"),
-		MSG_TYPE_LOCATION("location"),
-		MSG_TYPE_LINK("link"),
-		MSG_TYPE_IMAGE_TEXT("news"),
-		MSG_TYPE_EVENT("event"),
-		MSG_TYPE_VOICE("voice"),
-		MSG_TYPE_VIDEO("video");
+		MSG_TYPE_UNKNOWN(1, "unknown"),
+		MSG_TYPE_TEXT(2, "text"),
+		MSG_TYPE_IMAGE(3, "image"),
+		MSG_TYPE_MUSIC(4, "music"),
+		MSG_TYPE_LOCATION(5, "location"),
+		MSG_TYPE_LINK(6, "link"),
+		MSG_TYPE_IMAGE_TEXT(7, "news"),
+		MSG_TYPE_EVENT(8, "event"),
+		MSG_TYPE_VOICE(9, "voice"),
+		MSG_TYPE_VIDEO(10, "video");
 		
 		private final String val;
+		private final int type;
 		
-		MsgType(String val){
+		MsgType(int type, String val){
+			this.type = type;
 			this.val = val;
+		}
+		
+		public int getType(){
+			return this.type;
 		}
 		
 		public String getVal(){
@@ -37,6 +43,15 @@ public class Msg4Head {
 				}
 			}
 			throw new IllegalArgumentException("The val(" + val + ") is invalid.");
+		}
+		
+		public static MsgType valueOf(int typeVal){
+			for(MsgType type : values()){
+				if(type.type == typeVal){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The type(" + typeVal + ") is invalid.");
 		}
 		
 		@Override

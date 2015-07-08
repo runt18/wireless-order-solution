@@ -20,7 +20,12 @@ public class Msg4Text extends Msg {
 	}
 	
 	public Msg4Text(Msg4Head head) {
-		super(head);
+		super(head, Msg4Head.MsgType.MSG_TYPE_TEXT);
+	}
+	
+	public Msg4Text(Msg4Head head, String content) {
+		super(head, Msg4Head.MsgType.MSG_TYPE_TEXT);
+		setContent(content);
 	}
 
 	public void write(Document document) {
@@ -33,10 +38,8 @@ public class Msg4Text extends Msg {
 	}
 
 	public void read(Document document) {
-		this.content = document.getElementsByTagName("Content").item(0)
-				.getTextContent();
-		this.msgId = document.getElementsByTagName("MsgId").item(0)
-				.getTextContent();
+		this.content = document.getElementsByTagName("Content").item(0).getTextContent();
+		this.msgId = document.getElementsByTagName("MsgId").item(0).getTextContent();
 	}
 
 	public String getContent() {

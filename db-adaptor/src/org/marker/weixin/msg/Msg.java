@@ -19,6 +19,11 @@ public abstract class Msg implements Jsonable{
 		this.head = head;
 	}
 	
+	protected Msg(Msg4Head head, Msg4Head.MsgType msgType){
+		this(head);
+		this.head.setMsgType(msgType);
+	}
+	
 	protected Msg(Msg received, Msg4Head.MsgType msgType){
 		this.head = new Msg4Head();
 		this.head.setFromUserName(received.getToUserName());
