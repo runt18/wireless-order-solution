@@ -34,7 +34,8 @@ public enum ErrorType {
 	 *  WX_ORDER : 6959 - 6999
 	 *  token_error : 6900 - 6949
 	 *  bill_board : 6859 - 6899
-	 *  book : 6759 - 6799
+	 *  book : 6760 - 6799
+	 *  weixin_menu : 6700 -6759 
 	 */
 	UNKNOWN(1, "unknown"),
 	PROTOCOL(2, "protocol"),
@@ -70,7 +71,8 @@ public enum ErrorType {
 	IO_ERROR(32, "io_error"),
 	TOKEN_ERROR(33, "token_error"),
 	BILL_BOARD(34, "bill_board_error"),
-	BOOK(35, "book_error");
+	BOOK(35, "book_error"),
+	WX_MENU(36, "weixin_menu_error");
 	
 	private final String desc;
 	
