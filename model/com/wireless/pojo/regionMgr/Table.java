@@ -710,6 +710,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		jm.putString("statusText", this.status.getDesc());
 		jm.putJsonable("region", this.region, 0);
 		jm.putBoolean("isTempPaid", this.isTempPaid());
+		jm.putBoolean("isBook", this.bookFlag);
 		
 		return jm;
 	}
