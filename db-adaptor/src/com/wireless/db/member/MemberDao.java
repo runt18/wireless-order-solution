@@ -123,6 +123,8 @@ public class MemberDao {
 		private DutyRange range;
 		private String weixinCard;
 		private String weixinSerial;
+		private int memberBalance;
+		private String memberBalanceEqual;
 		
 		public ExtraCond(ReqQueryMember.ExtraCond extraCond){
 			this.setId(extraCond.getId()).setFuzzyName(extraCond.getFuzzyName());
@@ -202,6 +204,16 @@ public class MemberDao {
 			return this;
 		}
 		
+		public ExtraCond setMemberBalance(int memberBalance){
+			this.memberBalance = memberBalance;
+			return this;
+		}
+		
+		public ExtraCond setMemberBalanceEqual(String memberBalanceEqual){
+			this.memberBalanceEqual = memberBalanceEqual;
+			return this;
+		}
+		
 		private String cond4Card(String card){
 			if(card != null){
 				String cardExcludeZero = card.replaceFirst("^(0+)", "");
@@ -252,6 +264,10 @@ public class MemberDao {
 				extraCond.append(" AND MT.member_type_id = " + memberTypeId);
 			}
 			
+			if(memberBalance != 0){
+				extraCond.append(" AND (M.base_balance + M.extra_balance) " + memberBalanceEqual + memberBalance);
+			}
+			
 			if(range != null){
 				
 				StringBuilder havingCond = new StringBuilder();
@@ -291,9 +307,9 @@ public class MemberDao {
 				}
 				
 				if(minTotalConsume > 0 && maxTotalConsume == 0){
-					extraCond.append(" AND M.total_consumption >= " + minConsumeAmount);
+					extraCond.append(" AND M.total_consumption >= " + minTotalConsume);
 				}else if(maxTotalConsume > 0 && minTotalConsume == 0){
-					extraCond.append(" AND M.total_consumption <= " + maxConsumeAmount);
+					extraCond.append(" AND M.total_consumption <= " + maxTotalConsume);
 				}else if(maxTotalConsume > 0 && minTotalConsume > 0){
 					extraCond.append(" AND M.total_consumption BETWEEN " + minTotalConsume + " AND " + maxTotalConsume);
 				}
