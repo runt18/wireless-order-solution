@@ -17,12 +17,13 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.maker.weixin.auth.AuthorizationInfo;
-import org.maker.weixin.auth.AuthorizerInfo;
-import org.maker.weixin.auth.AuthorizerToken;
 import org.marker.weixin.api.Button;
 import org.marker.weixin.api.Menu;
 import org.marker.weixin.api.Token;
+import org.marker.weixin.auth.AuthParam;
+import org.marker.weixin.auth.AuthorizationInfo;
+import org.marker.weixin.auth.AuthorizerInfo;
+import org.marker.weixin.auth.AuthorizerToken;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;

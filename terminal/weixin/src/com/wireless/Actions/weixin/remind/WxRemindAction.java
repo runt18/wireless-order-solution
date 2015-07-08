@@ -65,7 +65,7 @@ public class WxRemindAction extends DispatchAction {
 		
 		final StringBuilder work = new StringBuilder();
 		for(Restaurant restaurant : RestaurantDao.getByCond(null, null)){
-			long now = System.currentTimeMillis() / 1000 - restaurant.getExpireDate();
+			long now = (System.currentTimeMillis() - restaurant.getExpireDate()) / 1000;
 			if(now < ONE_WEEK && now > 0){
 				if(work.length() != 0){
 					work.append(", ");

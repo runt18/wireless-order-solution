@@ -3,15 +3,14 @@ package com.wireless.Actions.weixin;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import org.maker.weixin.auth.AuthorizationInfo;
-import org.maker.weixin.auth.AuthorizerToken;
 import org.marker.weixin.HandleMessageAdapter;
+import org.marker.weixin.auth.AuthParam;
+import org.marker.weixin.auth.AuthorizationInfo;
+import org.marker.weixin.auth.AuthorizerToken;
 import org.marker.weixin.msg.Msg;
 import org.marker.weixin.msg.Msg4Event;
 import org.marker.weixin.msg.Msg4Text;
 import org.marker.weixin.session.WxSession;
-
-import com.wireless.Actions.weixin.auth.AuthParam;
 
 public class WxAccessHandleMessage extends HandleMessageAdapter {
 

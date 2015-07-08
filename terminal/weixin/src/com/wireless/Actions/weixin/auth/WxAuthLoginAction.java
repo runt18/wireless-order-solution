@@ -7,6 +7,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.marker.weixin.auth.AuthParam;
 
 public class WxAuthLoginAction extends Action{
 	@Override

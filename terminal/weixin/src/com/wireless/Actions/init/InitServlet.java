@@ -8,11 +8,11 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 
 import org.apache.struts.action.ActionServlet;
-import org.maker.weixin.auth.ComponentAccessToken;
-import org.maker.weixin.auth.ComponentVerifyTicket;
-import org.maker.weixin.auth.PreAuthCode;
+import org.marker.weixin.auth.AuthParam;
+import org.marker.weixin.auth.ComponentAccessToken;
+import org.marker.weixin.auth.ComponentVerifyTicket;
+import org.marker.weixin.auth.PreAuthCode;
 
-import com.wireless.Actions.weixin.auth.AuthParam;
 import com.wireless.db.DBCon;
 import com.wireless.json.JObject;
 import com.wireless.pojo.oss.OSSParams;

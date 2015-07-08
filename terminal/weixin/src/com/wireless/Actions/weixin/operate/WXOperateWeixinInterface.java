@@ -22,10 +22,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.maker.weixin.auth.AuthorizerToken;
 import org.marker.weixin.api.Token;
+import org.marker.weixin.auth.AuthParam;
+import org.marker.weixin.auth.AuthorizerToken;
 
-import com.wireless.Actions.weixin.auth.AuthParam;
 import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
