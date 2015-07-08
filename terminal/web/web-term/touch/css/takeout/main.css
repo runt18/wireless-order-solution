@@ -294,6 +294,11 @@ html { overflow-y: hidden;}
 	margin-left: 70px;
 	margin-top: -6px;
 }
+.tempPayStatus4Moz{
+	font-size:15px;color: blue;
+	margin-left: 70px;
+	margin-top: -11px;
+}
 
 /*餐台预订*/
 .bookTableStatus{
@@ -301,11 +306,11 @@ html { overflow-y: hidden;}
 	margin-left: 80px;
 	margin-top: -65px;
 }
-.bookTableStatus4Moz{
+/* .bookTableStatus4Moz{
 	font-size:15px;color: deeppink;
 	margin-left: 80px;
 	margin-top: -73px;
-}
+} */
 
 
 /*菜品操作*/

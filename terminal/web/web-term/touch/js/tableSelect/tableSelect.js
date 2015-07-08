@@ -57,7 +57,7 @@ var tables = [],
 	tableCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
 //	'<div>{name}<br>{alias}</div></a>';
 		'<div style="height: 70px;">{name}<br>{alias}' +
-			'<div class="tempPayStatus">{tempPayStatus}</div>'+
+			'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
 			'<div class="bookTableStatus">{bookTableStatus}</div>'+
 		'</div>'+
 	'</a>',
@@ -212,7 +212,8 @@ $(function(){
 				theme : c.data.statusValue == '1' ? "e" : "c",
 				name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
 				tempPayStatus : c.data.isTempPaid? '暂结' : '&nbsp;&nbsp;',
-				bookTableStatus : c.data.isBook? '订' : ''
+				bookTableStatus : c.data.isBook? '订' : '',
+				tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0?'tempPayStatus4Moz':'tempPayStatus'
 			});				
 		}
 	});
@@ -316,13 +317,6 @@ $(function(){
 	//刷新微信预订单
 	ts.refreshWeixinBook();
 	
-/*	var explorer =navigator.userAgent ; 
-	if (explorer.indexOf("Firefox") >= 0) {
-		console.log($(".bookTableStatus").length)
-		$(".bookTableStatus").each(function(){
-			$(this).removeClass('bookTableStatus').addClass('bookTableStatus4Moz');
-		});
-	}  */
 });	
 
 
@@ -1947,6 +1941,14 @@ function showTable(temp){
 		
 		//关闭可能存在的状态popup
 		$('#popupAllStatusCmp').popup('close');
+		
+/*		var explorer =navigator.userAgent ; 
+		if (explorer.indexOf("Firefox") >= 0) {
+			console.log($(".tempPayStatus").length)
+			$(".tempPayStatus").each(function(){
+				$(this).removeClass('tempPayStatus').addClass('tempPayStatus4Moz');
+			});
+		}  	*/	
 	}else{
 		$("#divTableShowForSelect").html("");
 	}	
@@ -3595,8 +3597,9 @@ ts.loadBookChoosedTable = function(c){
 			alias : aliasOrName,
 			theme : c.tables[i].statusValue == '1' ? "e" : "c",
 			name : c.tables[i].name == "" || typeof c.tables[i].name != 'string' ? c.tables[i].alias + "号桌" : c.tables[i].name,
-			tempPayStatus : c.tables[i].isTempPaid? '暂结' : '',
-			bookTableStatus : c.tables[i].isBook? '订' : ''
+			tempPayStatus : c.tables[i].isTempPaid? '暂结' : '&nbsp;&nbsp;',
+			bookTableStatus : c.tables[i].isBook? '订' : '',
+			tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0?'tempPayStatus4Moz':'tempPayStatus'		
 		}));				
 	}
 	$('#'+c.renderTo).html(html.join("")).trigger('create');	

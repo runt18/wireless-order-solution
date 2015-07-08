@@ -30,8 +30,6 @@ var uo = {
 	    +'</td>'
 		+ '<td>{waiter}</td>'
 		+ '</tr>';
-	
-
 
 	function initSearchTables(c){
 		var html = [];
@@ -50,8 +48,9 @@ var uo = {
 				alias : aliasOrName,
 				theme : c.data[i].statusValue == '1' ? "e" : "c",
 				name : c.data[i].name == "" || typeof c.data[i].name != 'string' ? c.data[i].alias + "号桌" : c.data[i].name,
-				tempPayStatus : c.data[i].isTempPaid? '暂结' : '',
-				bookTableStatus : c.data[i].isBook? '订' : ''
+				tempPayStatus : c.data[i].isTempPaid? '暂结' : '&nbsp;&nbsp;',
+				bookTableStatus : c.data[i].isBook? '订' : '',
+				tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0?'tempPayStatus4Moz':'tempPayStatus'
 			}));	
 		}
 		$('#divSelectTablesForTs').html(html.join(''));
