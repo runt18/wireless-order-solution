@@ -231,7 +231,7 @@ public class DailySettleDao {
 				sql = " SELECT " +
 				      " MAX(M.material_id) AS material_id, MAX(M.name) AS material, " +
 					  " SUM(OF.order_count * FM.consumption) AS consume_amount, " +
-					  " M.price AS consume_price " +
+					  " MAX(M.price) AS consume_price " +
 				      " FROM " + Params.dbName + ".order O " +
 					  " JOIN " + Params.dbName + ".order_food OF ON O.id = OF.order_id" +
 					  " JOIN " + Params.dbName + ".food_material FM ON OF.food_id = FM.food_id " +
@@ -242,7 +242,7 @@ public class DailySettleDao {
 					  " AND O.status <> " + Order.Status.UNPAID.getVal() +
 					  " AND OF.dept_id = " + dept.getId() +
 					  " AND MC.type = " + cateType.getValue() +
-					  " GROUP BY OF.food_id " +
+					  " GROUP BY FM.food_id, FM.material_id " +
 					  " HAVING SUM(OF.order_count) > 0 ";
 				
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
