@@ -24,10 +24,12 @@ function repaid_initNorthPanel(){
 		items : [{
 			columnWidth : 1,
 			items : [{
+				width : 130,
 				items : [{
 					xtype : 'textfield',
 					id : 'txtSettleTypeFormat',
 					fieldLabel : '结账方式',
+					width : 50,
 					style : 'color:green;font-size:15px;font-weight:bold',
 					value : '普通/会员',
 					disabled : true
@@ -99,12 +101,12 @@ function repaid_initNorthPanel(){
 				style : 'font-size:18px;',
 				html : '上限:￥<font id="fontShowEraseQuota" style="color:red;">0.00</font>'
 			}, {
-				width : 100,
-				labelWidth : 40,
+				width : 120,
+				labelWidth : 70,
 				items : [{
 					xtype : 'label',
 					width : 40,
-					fieldLabel : '服务费',
+					fieldLabel : '当前服务费',
 					id : 'serviceRate',
 					style : 'font-size:15px;text-align:right;'
 				}]
@@ -112,7 +114,8 @@ function repaid_initNorthPanel(){
 				items : [{
 					xtype : 'combo',
 					id : 'repaid_comboServicePlan',
-					fieldLabel : '服务费方案',
+					//fieldLabel : '服务费方案',
+					hideLabel : true,
 					readOnly : false,
 					forceSelection : true,
 					store : new Ext.data.JsonStore({
