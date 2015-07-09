@@ -162,9 +162,9 @@ function initControl(){
 		listeners : {
 			click : function(e){
 				Ext.getDom('showTypeForSearchKitchen').innerHTML = e.text;
+				Ext.getCmp('btnSearchFood').handler();
 			},
 			dblclick : function(node, e){
-				Ext.getCmp('btnSearchFood').handler();
 			}
 		}
 	});
@@ -194,7 +194,7 @@ function initControl(){
 				var foodName = Ext.getCmp('txtFoodNameForSearch');
 				var node = kitchenTreeForSreach.getSelectionModel().getSelectedNode();
 				var gs = foodBasicGrid.getStore();
-				gs.baseParams['kitchen'] = node && node.attributes.alias >= 0 ? node.attributes.alias : '';
+				gs.baseParams['kitchen'] = node && node.attributes.kid >= 0 ? node.attributes.kid : '';
 				gs.baseParams['name'] = foodName.getValue();
 				gs.load({
 					params : {
