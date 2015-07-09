@@ -281,7 +281,7 @@ Ext.onReady(function(){
 	         {header:'部门', dataIndex:'dept'},
 	         {header:'入库类型', dataIndex:'stockInSubType', width:100},
 	         {header:'入库数量', dataIndex:'stockInAmount', align : 'right', renderer : renderFormat},
-	         {header:'实际收入', dataIndex:'stockInMoney', align : 'right', renderer : renderFormat},
+	         {header:'金额', dataIndex:'stockInMoney', align : 'right', renderer : renderFormat},
 	         {header:'出库类型', dataIndex:'stockOutSubType', width:100},
 	         {header:'出库数量', dataIndex:'stockOutAmount', align : 'right', renderer : renderFormat},
 	         {header:'出库金额', dataIndex:'stockOutMoney', align : 'right', renderer : renderFormat},

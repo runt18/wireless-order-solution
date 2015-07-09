@@ -203,6 +203,11 @@ Ext.onReady(function(){
 											memberTitle, memberTrDate, title, trContent);
 								}			
 								
+								//是否有预订金额
+								if(business.bookIncome > 0){
+									table += '<br><table border="1" class="tb_base"><tr><th class="table_title text_center">预订总金额:</th><th class="table_title text_center">'+ business.bookIncome +'</th></tr></table>';
+								}
+								
 								Ext.getCmp('businessStatisticsSummaryInformationCenterPanel').body.update(table);
 								
 								if(dutyRange == "range"){
