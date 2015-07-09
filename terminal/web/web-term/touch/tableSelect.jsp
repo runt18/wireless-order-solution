@@ -185,7 +185,7 @@
 				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.openTableAction()">开台</a>
 				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.createTableWithPeople()">点菜</a>
 				 <a id="closeTable4PeopleCount" data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.closeTableWithPeople()">取消</a>		 
-				 <a id="btnCheckoutBook" data-role="button" data-inline="true" class="tablePopbottomBtn none" onclick="ts.checkBookTable()">查看预订</a>
+				 <a id="ts_btnCheckoutBook" data-role="button" data-inline="true" class="tablePopbottomBtn none" onclick="ts.checkBookTable()">查看预订</a>
 			 </div>
 	    </div>
 	</div>	
@@ -1034,7 +1034,6 @@
 		 <!-- <input type="button" value="返回" style="width: 70px;height: 70px;"> -->
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.cancelForUO()">返回</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.checkBookTable()">查看预订</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.goToCreateOrder()">点菜</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.tempPayForUO()">暂结</a>
 		 	<a id="btnPayBill" data-role="button" data-inline="true" class="bottomBtnFont none" onclick="showPaymentMgr({table:uo.table})" >结账</a>
@@ -1062,6 +1061,7 @@
             <li class="tempFoodKitchen" onclick="uo.printDetailPatch()"><a >补打明细</a></li>
             <li class="tempFoodKitchen" onclick="uo.allTransFoodForTS()"><a >全单转菜</a></li>
             <li class="tempFoodKitchen" onclick="uo.allFoodHurried()"><a >全单催菜</a></li>
+            <li id="uo_btnCheckoutBook" class="tempFoodKitchen" onclick="ts.checkBookTable()"><a >查看预订</a></li>
         </ul>
 	</div>		
 	

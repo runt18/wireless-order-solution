@@ -1754,10 +1754,10 @@ function handleTableForTS(c){
 				$('#tableCustomerCountSetTitle').text(c.table.name);
 				//是否为预订台
 				if(ts.table.isBook){
-					$('#btnCheckoutBook').show();
+					$('#ts_btnCheckoutBook').show();
 					$('#closeTable4PeopleCount').hide();
 				}else{
-					$('#btnCheckoutBook').hide();
+					$('#ts_btnCheckoutBook').hide();
 					$('#closeTable4PeopleCount').show();					
 				}
 				$('#tableCustomerCountSet').parent().addClass("pop").addClass("in");
@@ -1790,10 +1790,10 @@ function handleTableForTS(c){
 				$('#tableCustomerCountSetTitle').text(c.table.name);
 				//是否为预订台
 				if(ts.table.isBook){
-					$('#btnCheckoutBook').show();
+					$('#ts_btnCheckoutBook').show();
 					$('#closeTable4PeopleCount').hide();
 				}else{
-					$('#btnCheckoutBook').hide();
+					$('#ts_btnCheckoutBook').hide();
 					$('#closeTable4PeopleCount').show();					
 				}
 				$('#tableCustomerCountSet').parent().addClass("pop").addClass("in");
@@ -2083,7 +2083,12 @@ function getDailyInfo(c){
 				table = '<table border="1" class="tb_base">{0}{1}</table>'.format(memberTitle, memberTrDate);
 			}else{
 				table = '<table border="1" class="tb_base">{0}{1}</table><br><table border="1" class="tb_base">{2}{3}</table>'.format(memberTitle, memberTrDate, title, trContent);
-			}			
+			}		
+			
+			//是否有预订金额
+			if(business.bookIncome > 0){
+				table += '<br><table border="1" class="tb_base"><tr><th class="table_title text_center">预订总金额:</th><th class="table_title text_center">'+ business.bookIncome +'</th></tr></table>';
+			}
 			
 			$('#businessStatisticsSummaryInformationCenterPanel').html(table);
 			
@@ -3482,11 +3487,16 @@ ts.bookListEntry = function(){
 }
 
 ts.bookListBack = function(){
-	history.back();
-	if(!ts.bookTable4Search){
+	if(ts.bookListEntry.backToTableSelect){
 		ts.loadData();
+	}else{
+		history.back();
+		if(!ts.bookTable4Search){
+			ts.loadData();
+		}
 	}
 	delete ts.bookTable4Search;
+	delete ts.bookListEntry.backToTableSelect;
 }
 
 /**
@@ -3657,6 +3667,7 @@ ts.bookTableCommitOrderFood = function(){
 	}, function(data){
 		Util.LM.hide();
 		if(data.success){
+			ts.bookListEntry.backToTableSelect = true;
 			Util.msg.tip(data.msg);
 			ts.bookListEntry();
 		}else{
@@ -3935,6 +3946,7 @@ ts.checkBookTable = function(){
 		ts.bookTable4Search = ts.table.id;
 	}else if($.mobile.activePage.attr( "id" ) == 'orderFoodListMgr'){//已点菜界面使用
 		ts.bookTable4Search = uo.table.id;
+		$('#updateFoodOtherOperateCmp').popup('close');
 	}	
 	ts.bookListEntry();
 }
