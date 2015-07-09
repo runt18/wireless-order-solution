@@ -23,5 +23,6 @@ public final class PVar{
 	public final static String VAR_3 = "$(var_3)";
 	public final static String VAR_4 = "$(var_4)";
 	public final static String VAR_5 = "$(var_5)";
+	public final static String VAR_6 = "$(var_6)";
 }
 

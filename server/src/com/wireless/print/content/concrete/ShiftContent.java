@@ -1,5 +1,6 @@
 package com.wireless.print.content.concrete;
 
+import com.wireless.pojo.billStatistics.IncomeByBook;
 import com.wireless.pojo.billStatistics.IncomeByCharge;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByPay.PaymentIncome;
@@ -122,30 +123,42 @@ public class ShiftContent extends ConcreteContent {
 													new RightAlignedDecorator("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mShiftDetail.getTotalActual()), mStyle).toString(),
 														mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 		
-		IncomeByCharge incomeByCharge = mShiftDetail.getIncomeByCharge();
-		if(incomeByCharge.getTotalAccountCharge() != 0 || incomeByCharge.getTotalAccountRefund() != 0){
-			StringBuilder chargeStat = new StringBuilder();
+		//replace the $(var_5) with the charge income
+		IncomeByCharge chargeIncome = mShiftDetail.getIncomeByCharge();
+		if(chargeIncome.getTotalAccountCharge() != 0 || chargeIncome.getTotalAccountRefund() != 0){
+			StringBuilder chargeInfo = new StringBuilder();
 			
-			chargeStat.append(mSeperatorLine);
-			if(incomeByCharge.getChargeAmount() > 0){
-				chargeStat.append(new CenterAlignedDecorator("会员充值(" + incomeByCharge.getChargeAmount() + "次)", getStyle()).toString()).append(SEP);
+			chargeInfo.append(mSeperatorLine);
+			if(chargeIncome.getChargeAmount() > 0){
+				chargeInfo.append(new CenterAlignedDecorator("会员充值(" + chargeIncome.getChargeAmount() + "次)", getStyle()).toString()).append(SEP);
 			}else{
-				chargeStat.append(new CenterAlignedDecorator("会员充值", getStyle()).toString()).append(SEP);
+				chargeInfo.append(new CenterAlignedDecorator("会员充值", getStyle()).toString()).append(SEP);
 			}
-			chargeStat.append(new Grid2ItemsContent("实收金额：" + incomeByCharge.getTotalActualCharge(), "账户充额：" + incomeByCharge.getTotalAccountCharge(), getStyle())).append(SEP);
-			chargeStat.append("现金实收：" + incomeByCharge.getActualCashCharge()).append(SEP);
-			chargeStat.append("刷卡实收：" + incomeByCharge.getActualCreditCardCharge()).append(SEP);
-			chargeStat.append(SEP);
-			if(incomeByCharge.getRefundAmount() > 0){
-				chargeStat.append(new CenterAlignedDecorator("会员退款(" + incomeByCharge.getRefundAmount() + "次)", getStyle()).toString()).append(SEP);
+			chargeInfo.append(new Grid2ItemsContent("实收金额：" + chargeIncome.getTotalActualCharge(), "账户充额：" + chargeIncome.getTotalAccountCharge(), getStyle())).append(SEP);
+			chargeInfo.append("现金实收：" + chargeIncome.getActualCashCharge()).append(SEP);
+			chargeInfo.append("刷卡实收：" + chargeIncome.getActualCreditCardCharge()).append(SEP);
+			chargeInfo.append(SEP);
+			if(chargeIncome.getRefundAmount() > 0){
+				chargeInfo.append(new CenterAlignedDecorator("会员退款(" + chargeIncome.getRefundAmount() + "次)", getStyle()).toString()).append(SEP);
 			}else{
-				chargeStat.append(new CenterAlignedDecorator("会员退款", getStyle()).toString()).append(SEP);
+				chargeInfo.append(new CenterAlignedDecorator("会员退款", getStyle()).toString()).append(SEP);
 			}
-			chargeStat.append(new Grid2ItemsContent("实退金额：" + incomeByCharge.getTotalActualRefund(), "账户扣额：" + incomeByCharge.getTotalAccountRefund(), getStyle())).append(SEP);
+			chargeInfo.append(new Grid2ItemsContent("实退金额：" + chargeIncome.getTotalActualRefund(), "账户扣额：" + chargeIncome.getTotalAccountRefund(), getStyle())).append(SEP);
 			
-			mTemplate = mTemplate.replace(PVar.VAR_5, chargeStat.toString());
+			mTemplate = mTemplate.replace(PVar.VAR_5, chargeInfo.toString());
 		}else{
 			mTemplate = mTemplate.replace(PVar.VAR_5, "");
+		}
+		
+		//replace the $(var_5) with the book income
+		IncomeByBook bookIncome = mShiftDetail.getIncomeByBook();
+		if(bookIncome.getIncome() > 0){
+			StringBuilder bookInfo = new StringBuilder();
+			bookInfo.append(mSeperatorLine);
+			bookInfo.append("预订金额：" + bookIncome.getIncome()).append(SEP);
+			mTemplate = mTemplate.replace(PVar.VAR_6, bookInfo.toString());
+		}else{
+			mTemplate = mTemplate.replace(PVar.VAR_6, "");
 		}
 		
 		return mTemplate;
