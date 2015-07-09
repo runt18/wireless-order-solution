@@ -319,6 +319,8 @@ public class ShiftDetail implements Jsonable{
 		jm.putInt("serviceAmount", this.getServiceAmount());
 		jm.putFloat("serviceIncome", this.getServiceIncome());
 		
+		jm.putFloat("bookIncome", this.getIncomeByBook().getIncome());
+		
 		jm.putJsonableList("deptStat", this.getDeptIncome(), 0);
 		jm.putInt("paidAmount", this.getPaidAmount());
 		jm.putInt("eraseAmount", this.getEraseAmount());
