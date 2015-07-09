@@ -138,7 +138,7 @@ function repaid_initNorthPanel(){
 			}]			
 		}, {
 			id : 'box4RepaidCoupon',
-			width : 160,
+			columnWidth : 0.15,
 			items : [{
 				xtype : 'label',
 				width : 65,
@@ -165,7 +165,7 @@ function repaid_initNorthPanel(){
 				html : '&nbsp;'
 			}]			
 		}, {
-			columnWidth : 0.15,
+			width : 160,
 			items : [{
 				xtype : 'label',
 				width : 65,
