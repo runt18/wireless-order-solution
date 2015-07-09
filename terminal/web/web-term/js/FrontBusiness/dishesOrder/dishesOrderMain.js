@@ -62,25 +62,6 @@ function repaid_initNorthPanel(){
 								payTypeCmo.fireEvent('select', payTypeCmo, null, null);
 							}
 							setRepaidOrderTitle();
-							//FIXME
-/*							Ext.Ajax.request({
-								url : '../../OperateDiscount.do',
-								params : {
-									dataSource : 'setDiscount',
-									orderId : orderID, 
-									discountId : thiz.getValue() 
-								},
-								success : function(res){
-									var jr = Ext.decode(res.responseText);
-									if(jr.success){
-										queryOrderDetail();
-										setRepaidOrderTitle();
-									}else{
-										Ext.example.msg(jr.title, jr.msg);
-									}
-								},
-								failure : function(res){}
-							});*/
 						}
 					}
 				}]
