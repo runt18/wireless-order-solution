@@ -210,7 +210,11 @@ function URLParaQuery() {
 }
 
 
-//从普通url获取当前桌信息
+/**
+ * 从普通url获取当前桌信息 
+ * var Request = new common_urlParaQuery();
+	var systemStatus = Request["status"];
+ */
 function common_urlParaQuery() {
 	var name, value, i, key = 0;
 	var str = location.href;
@@ -542,7 +546,8 @@ function showFloatOption(obj_b){
 			if($('#div_floatBar').html()){
 				$('#div_floatBar').css({left:offset.left+$(this).find("a").width(), top:(Ext.isIE?(offset.top-12):(offset.top-2))});
 				$('#div_floatBar').show();	
-				Ext.getCmp(obj_b.treeId).getNodeById(floatBarNodeId).select();
+				//FIXME 应该在弹出框中记录nodeId
+//				Ext.getCmp(obj_b.treeId).getNodeById(floatBarNodeId).select();
 			}else{
 				$('#div_floatBar').hide();		
 			}

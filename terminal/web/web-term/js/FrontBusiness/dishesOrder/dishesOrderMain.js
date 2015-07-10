@@ -2,6 +2,7 @@
 function repaid_initNorthPanel(){
 
 	dishesOrderNorthPanel = new Ext.Panel({
+		id : 'dishesOrderNorthPanel',
 		hidden : !isRepaid,
 		region : 'north',
 		height : 62,
@@ -35,6 +36,7 @@ function repaid_initNorthPanel(){
 					disabled : true
 				}]
 			}, {
+				width : 200,
 				items : [{
 					xtype : 'combo',
 					id : 'comboDiscount',
@@ -92,6 +94,7 @@ function repaid_initNorthPanel(){
 					style : 'font-size:15px;text-align:right;'
 				}]
 			}, {
+				width : 130,
 				items : [{
 					xtype : 'combo',
 					id : 'repaid_comboServicePlan',
@@ -1479,7 +1482,15 @@ Ext.onReady(function() {
 			Ext.getCmp('box4RepaidPricePlan').hide();
 			Ext.getCmp('box4RepaidCoupon').hide();
 			// 初始化菜品数据
-			loadOrderData();		
+			loadOrderData();
+			//屏幕分辨率问题
+			$('#dishesOrderNorthPanel .x-column-inner').each(function(){
+				$(this).parent().css({"min-width":"1024px"});
+				$(this).css({"min-width":"1024px"});
+				if($(this).children(":first").width() > 300){
+					$(this).children(":first").css({"min-width":"1024px"})
+				}
+			});
 	});
 	
 	getOperatorName("../../");
