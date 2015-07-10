@@ -1967,6 +1967,23 @@ public class HistoryStatisticsAction extends DispatchAction{
 			}
 		}
 		
+		if(business.getIncomeByBook().getIncome() > 0){
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));		
+			
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			
+			cell = row.createCell(0);
+			cell.setCellValue("预订总金额");
+			cell.setCellStyle(headerStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(business.getIncomeByBook().getIncome());
+			cell.setCellStyle(normalNumStyle);
+		}
+		
 		OutputStream os = response.getOutputStream();
 		wb.write(os);
 		os.flush();
