@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.marker.weixin.HandleMessageAdapter;
 import org.marker.weixin.msg.Data4Item;
 import org.marker.weixin.msg.Msg;
@@ -24,6 +26,7 @@ import org.marker.weixin.msg.Msg4Event.Event;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 import org.marker.weixin.session.WxSession;
+import org.xml.sax.SAXException;
 
 import com.alibaba.fastjson.JSON;
 import com.wireless.db.member.MemberDao;
@@ -33,6 +36,8 @@ import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
+import com.wireless.db.weixin.menuAction.WxMenuAction;
+import com.wireless.db.weixin.menuAction.WxMenuActionDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
@@ -404,6 +409,11 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 				}else if(msg.getEventKey().equals(SCAN_EVENT_KEY)){
 					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("点击此处开始扫描", "点我扫描支付二维码", "", createUrl(msg, WEIXIN_SCANNING))));
 					
+				}else{
+					int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+					
+					Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
+					session.callback(new WxMenuAction.MsgProxy(msg.getHead(), WxMenuActionDao.getById(staff, Integer.parseInt(msg.getEventKey()))).toMsg());
 				}
 				
 			}else if(msg.getEvent() == Event.SCAN_WAIT_MSG){
@@ -422,7 +432,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 				}
 			}
 			
-		}catch(BusinessException | SQLException e){
+		}catch(BusinessException | SQLException | NumberFormatException | SAXException | IOException | ParserConfigurationException e){
 			e.printStackTrace();
 			session.callback(new Msg4ImageText(msg).addItem(new Data4Item("操作失败", e.getMessage(), "", "")));
 		}
