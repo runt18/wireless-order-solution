@@ -22,12 +22,15 @@ import com.wireless.exception.BusinessException;
 
 public class WxMenuAction {
 
-	public static class Msg4Action extends Msg{
+	public static class MsgProxy{
 		
 		private Msg msg;
 		
-		public Msg4Action(Msg4Head header, WxMenuAction menuAction) throws SAXException, IOException, ParserConfigurationException{
-			super(header);
+		public MsgProxy(WxMenuAction menuAction) throws SAXException, IOException, ParserConfigurationException{
+			this(new Msg4Head(), menuAction);
+		}
+		
+		public MsgProxy(Msg4Head header, WxMenuAction menuAction) throws SAXException, IOException, ParserConfigurationException{
 			Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(menuAction.getAction().getBytes("utf-8")));
 			Msg4Head head = new Msg4Head();
 			head.read(document);
@@ -39,16 +42,6 @@ public class WxMenuAction {
 			}
 		}
 
-		@Override
-		public void write(Document document) {
-			msg.write(document);
-		}
-
-		@Override
-		public void read(Document document) {
-			throw new UnsupportedOperationException();
-		}
-		
 		public Msg toMsg(){
 			return this.msg;
 		}

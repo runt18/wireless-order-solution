@@ -93,6 +93,9 @@ public class Msg4Head {
 	}
 
 	public String getToUserName() {
+		if(this.toUserName == null){
+			return "";
+		}
 		return this.toUserName;
 	}
 
@@ -101,6 +104,9 @@ public class Msg4Head {
 	}
 
 	public String getFromUserName() {
+		if(this.fromUserName == null){
+			return "";
+		}
 		return this.fromUserName;
 	}
 

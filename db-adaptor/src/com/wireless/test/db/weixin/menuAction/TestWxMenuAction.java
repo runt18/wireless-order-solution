@@ -16,7 +16,10 @@ import javax.xml.transform.stream.StreamResult;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.marker.weixin.msg.Msg;
 import org.marker.weixin.msg.Msg4Head;
+import org.marker.weixin.msg.Msg4Head.MsgType;
+import org.marker.weixin.msg.Msg4Text;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -58,7 +61,11 @@ public class TestWxMenuAction {
 			header.setToUserName("head_to_user");
 			
 			Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-			new WxMenuAction.Msg4Action(header, actual).write(document);
+			Msg msg = new WxMenuAction.MsgProxy(header, actual).toMsg();
+			if(msg.getHead().getMsgType() == MsgType.MSG_TYPE_TEXT){
+				System.out.println(((Msg4Text)msg).getContent());
+			}
+			msg.write(document);
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.transform(new DOMSource(document), new StreamResult(new OutputStreamWriter(System.out, "utf-8")));
 			
