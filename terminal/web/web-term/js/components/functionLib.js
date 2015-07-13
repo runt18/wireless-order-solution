@@ -492,8 +492,8 @@ Ext.ux.operateTree_material = function (node, mult){
 
 Ext.ux.operateTree_weixinMenu = function (node, mult){
 	for (var j = 0; j < mult.length; j++) {
-		if(node.attributes.type == mult[j].type){
-			if(!$("#div_floatBar").type || $("#div_floatBar").type != node.attributes.type){
+		if(node.attributes.m_type == mult[j].m_type){
+			if(!$("#div_floatBar").m_type || $("#div_floatBar").m_type != node.attributes.m_type){
 				$('#div_floatBar').html("");
 				for (var i = 0; i < mult[j].option.length; i++) {
 					if(i > 0){
@@ -501,7 +501,7 @@ Ext.ux.operateTree_weixinMenu = function (node, mult){
 					}
 					$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+mult[j].option[i].fn+'>'+ mult[j].option[i].name +'</a>&nbsp;');
 				}	
-				$("#div_floatBar").type = node.attributes.type; 
+				$("#div_floatBar").m_type = node.attributes.m_type; 
 				
 				break;
 			}

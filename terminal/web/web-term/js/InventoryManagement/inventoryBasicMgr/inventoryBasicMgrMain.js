@@ -346,24 +346,27 @@ function initOperateMaterialWin(){
 		    			materialName.setValue(data['name']);
 		    			materialPrice.setValue(data['price']);
 		    			materialCate.setValue(data['cateId']);	
-		    			
-		    			materialPrice.focus(true, 100);
 		    		}else{
 		    			Ext.getCmp('txtMaterialCate').store.loadData(materialCateData);
 		    			materialId.setValue(data['id']);
 		    			materialName.setValue(data['name']);
 		    			materialCate.setValue(data['cateId']);	
 		    			materialPrice.setValue(data['price']);
-		    			
-		    			materialName.focus(true, 100);
 		    		}
+		    		
+		    		if(operateMaterialWin.otype == Ext.ux.otype['insert']){
+		    			materialName.focus(true, 100);
+		    		}else{
+		    			materialPrice.focus(true, 100);
+		    		}
+		    		
 		    		operateMaterialWin.cateId = data['cateId'];
 		    		
 		    		Ext.getCmp('btnPreviousFoodMaterial').setDisabled(false);
 		    		Ext.getCmp('btnNextFoodMaterial').setDisabled(!inventory_materialBasicGrid.getSelectionModel().hasNext());
 		    	}
 		    },'->', {
-				text : '保存',
+				text : '保存并下一个',
 				id : 'btnAddMaterial',
 				iconCls : 'btn_save',
 				handler : function(){
@@ -397,7 +400,8 @@ function initOperateMaterialWin(){
 								if(dataSource == 'update'){
 //									operateMaterialWin.hide();
 //									operateMaterialWin.cateType = '';
-//									Ext.getCmp('btnSearchMaterial').handler();
+									//下一个
+									Ext.getCmp('btnNextFoodMaterial').handler();
 								}else{
 									Ext.getCmp('txtMaterialName').setValue();
 									Ext.getCmp('txtMaterialPrice').setValue();

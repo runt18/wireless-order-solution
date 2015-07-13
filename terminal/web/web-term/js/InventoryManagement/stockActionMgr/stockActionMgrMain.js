@@ -540,6 +540,8 @@ function operateStockActionBasic(c){
 			secondStepPanelCenter.getStore().removeAll();
 		}
 		
+		actualPrice.value = actualPrice.value.substring(0, (actualPrice.value.length-1));
+		
 		deptIn.clearInvalid();
 		supplier.clearInvalid();
 		deptOut.clearInvalid();
@@ -1871,9 +1873,8 @@ function initControl(){
 		}
 		Ext.getDom('txtTotalAmount').value = amount;
 		Ext.getDom('txtTotalPrice').value = totalPrice.toFixed(2);
-		if(txtActualPrice.indexOf('$') > 0){
-			Ext.getDom('txtActualPrice').value = txtActualPrice.substring(0, (txtActualPrice.length-1));
-		}else{
+		//修改库单则不改变实际金额
+		if(txtActualPrice.indexOf('$') < 0){
 			Ext.getDom('txtActualPrice').value = totalPrice.toFixed(2);
 		}
 		
@@ -2357,4 +2358,10 @@ Ext.onReady(function(){
 	Ext.getCmp('btnSearchForStockBasicMsg').handler();
 	
 	showUnitPriceMenu();
+	
+	//关闭再打开页面时, id重复
+	if($("div[id=stockActionTotalPrice]").length > 1){
+		$("div[id=stockActionTotalPrice]").eq(0).remove();
+	}
+	
 });

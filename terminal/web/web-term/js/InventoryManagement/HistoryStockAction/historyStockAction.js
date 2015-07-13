@@ -781,4 +781,12 @@ Ext.onReady(function(){
 		}]
 		
 	});
+	
+	//关闭再打开页面时, id重复
+	if($("div[id=stockActionPanelSouth]").length > 1){
+		
+		$("div[id=stockActionPanelSouth]").eq(0).remove();
+		
+	}
+	
 });
