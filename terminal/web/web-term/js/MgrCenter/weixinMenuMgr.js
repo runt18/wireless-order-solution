@@ -1,6 +1,7 @@
 var Request = new common_urlParaQuery();
 var rid = Request["rid"];
-rid = 40;
+//rid = 40;
+var basePath = "http://ts.e-tones.net";
 
 //悬浮操作框的treeNode id
 var floatBarNodeId = "";
@@ -177,7 +178,7 @@ function operateMenuContent(){
 	$.ajax({ 
 	    type : "post", 
 	    async:false, 
-	    url : "http://localhost:8080/wx-term/WXOperateMenu.do",
+	    url : basePath+"/wx-term/WXOperateMenu.do",
 	    data : {
 	    	dataSource : 'insertMenu',
 	    	rid : rid,
@@ -224,7 +225,7 @@ function getWeixinMenu(){
 	$.ajax({ 
 	    type : "get", 
 //	    async:false, 
-	    url : "http://localhost:8080/wx-term/WXOperateMenu.do?dataSource=weixinMenu",
+	    url : basePath+"/wx-term/WXOperateMenu.do?dataSource=weixinMenu&rid="+rid,
 	    dataType : "jsonp",//jsonp数据类型 
 	    jsonp: "jsonCallback",//服务端用于接收callback调用的function名的参数 
 	    success : function(data){
@@ -360,9 +361,10 @@ Ext.onReady(function(){
 				$.ajax({ 
 				    type : "post", 
 				    async:false, 
-				    url : "http://localhost:8080/wx-term/WXOperateMenu.do",
+				    url : basePath+"/wx-term/WXOperateMenu.do",
 				    data : {
 				    	dataSource : 'commitMenu',
+				    	rid :rid,
 				    	menu : JSON.stringify(menu)
 				    },
 				    dataType : "jsonp",//jsonp数据类型 
@@ -456,7 +458,7 @@ Ext.onReady(function(){
 					$.ajax({ 
 					    type : "post", 
 					    async:false, 
-					    url : "http://localhost:8080/wx-term/WXOperateMenu.do",
+					    url : basePath+"/wx-term/WXOperateMenu.do",
 					    data : {
 					    	dataSource : 'menuReply',
 					    	rid : rid,

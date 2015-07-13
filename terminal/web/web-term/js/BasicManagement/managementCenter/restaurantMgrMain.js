@@ -372,7 +372,8 @@ var restaurantAddWin = new Ext.Window({
 function optRestaurant(){
 	return ''
 	+ "<a href = \"javascript:optRestaurantHandler({otype:'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"
-	+ "&nbsp;&nbsp;<a href = \"javascript:displayCodeHandle()\">" + "<img src='../../images/Modify.png'/>生成验证码</a>";
+	+ "&nbsp;&nbsp;<a href = \"javascript:displayCodeHandle()\">" + "<img src='../../images/Modify.png'/>生成验证码</a>"
+	+ "&nbsp;&nbsp;<a href = \"javascript:setWeixinMenu()\">" + "<img src='../../images/Modify.png'/>设置菜单</a>";
 }
 
 function optSms(v){
@@ -574,6 +575,10 @@ function optSmsHandler(){
 	numAdjustSms.focus(true, 100);
 }
 
+function setWeixinMenu(){
+	var data = Ext.ux.getSelData(restaurantPanel);
+	location.href = 'weixinMenuMgr.html?rid='+data.id;	
+}
 
 
 function displayCodeHandle(){
@@ -861,8 +866,8 @@ Ext.onReady(function(){
 	
 	var cm = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
-		{header : '餐厅编号', dataIndex : 'id'},
-		{header : '账户名', dataIndex : 'account'},
+		{header : '餐厅编号', dataIndex : 'id',width : 40},
+		{header : '账户名', dataIndex : 'account',width : 70},
 		{header : '创建时间', dataIndex : 'birthDate'},
 		{header : '账号有效期', dataIndex : 'expireDate'},
 		{header : '餐厅名', dataIndex : 'name', width : 150},
@@ -872,7 +877,7 @@ Ext.onReady(function(){
 		{header : '短信', dataIndex : 'smsRemain', align : 'right', renderer : optSms},
 		{header : '已用验证码', dataIndex : 'usedCode', align : 'right'},
 		{header : '可用验证码', dataIndex : 'unUsedCode', align : 'right', renderer:unUsedCode},
-		{header : '操作', dataIndex : 'optRestaurant', id : 'optRestaurant',width : 200, align : 'center', renderer : optRestaurant}
+		{header : '操作', dataIndex : 'optRestaurant', id : 'optRestaurant',width : 300, align : 'center', renderer : optRestaurant}
 		
 	]);
 	
