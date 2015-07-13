@@ -1,5 +1,6 @@
 package com.wireless.Actions.inventoryMgr.material;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +30,7 @@ public class QueryMaterialDeptAction extends Action{
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		JObject jobject = new JObject();
-		List<MaterialDept> root = null;
+		List<MaterialDept> mds = new ArrayList<>();
 		try{
 			String pin = (String)request.getAttribute("pin");
 			String deptId = request.getParameter("deptId");
@@ -51,7 +52,17 @@ public class QueryMaterialDeptAction extends Action{
 					extraCond += " AND MC.type = " + cateType;
 				}
 			}
-			root = MaterialDeptDao.getMaterialDeptState(staff, extraCond, null);
+			List<MaterialDept> root = MaterialDeptDao.getMaterialDeptState(staff, extraCond, null);
+			
+			if(!root.isEmpty()){
+				for (MaterialDept m : root) {
+					if(m.getStock() > 0){
+						mds.add(m);
+					}
+				}
+			}
+			
+			
 		}catch(BusinessException e){
 			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			e.printStackTrace();
@@ -60,9 +71,9 @@ public class QueryMaterialDeptAction extends Action{
 			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-			if(root != null){
-				jobject.setTotalProperty(root.size());
-				jobject.setRoot(DataPaging.getPagingData(root, "true", start, limit));
+			if(mds != null){
+				jobject.setTotalProperty(mds.size());
+				jobject.setRoot(DataPaging.getPagingData(mds, "true", start, limit));
 			}
 			response.getWriter().print(jobject.toString());
 		}
