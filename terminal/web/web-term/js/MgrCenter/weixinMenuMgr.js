@@ -195,6 +195,7 @@ function operateMenuContent(){
 	        var rt = JSON.parse(xhr.responseText);
 	        if(rt.success){
 	        	Ext.example.msg('提示', '添加成功');
+	        	tn.attributes.type = "click";
 				tn.attributes.key = rt.other.key;
 			}
 	    } 
@@ -326,7 +327,7 @@ Ext.onReady(function(){
 								sonBtn = {
 									"type" : childson.attributes.type || "click",
 									"name" : childson.text,
-									"key" : childson.attributes.key || ""
+									"key" : childson.attributes.key || -1
 								}
 							}
 							
@@ -343,7 +344,7 @@ Ext.onReady(function(){
 							btn = {
 								"type" : child.attributes.type || "click",
 								"name" : child.text,
-								"key" : child.attributes.key || ""
+								"key" : child.attributes.key || -1
 							}
 						}					
 					}
