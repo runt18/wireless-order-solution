@@ -101,6 +101,11 @@
 			type="com.wireless.Actions.weixin.operate.WXOperateBookAction"
 			scope="request" parameter="dataSource">
 		</action>				
+		<action path="/WXOperateMenu"
+			type="com.wireless.Actions.weixin.operate.WXOperateMenuAction"
+			scope="request" parameter="dataSource">
+		</action>
+		
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 
