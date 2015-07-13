@@ -80,7 +80,7 @@ public final class BaseAPI {
 	                bos.write(buf, 0, count);
 	            }
 	            bis.close();
-	            content = bos.toString();
+	            content = bos.toString("UTF-8");
 	            
 	        } else {
 	            throw new IOException("error code is " + response.getStatusLine().getStatusCode());

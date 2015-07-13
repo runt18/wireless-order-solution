@@ -184,11 +184,13 @@ public class Button implements Jsonable{
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putString(Key4Json.NAME.key, this.name);
-		jm.putString(Key4Json.TYPE.key, this.type.val);
-		if(type == Type.CLICK || type == Type.SCAN_PUSH || type == Type.SCAN_MSG){
-			jm.putString(Key4Json.KEY.key, this.key);
-		}else if(type == Type.VIEW){
-			jm.putString(Key4Json.URL.key, this.url);
+		if(this.type != null){
+			jm.putString(Key4Json.TYPE.key, this.type.val);
+			if(type == Type.CLICK || type == Type.SCAN_PUSH || type == Type.SCAN_MSG){
+				jm.putString(Key4Json.KEY.key, this.key);
+			}else if(type == Type.VIEW){
+				jm.putString(Key4Json.URL.key, this.url);
+			}
 		}
 		
 		if(!this.children.isEmpty()){
