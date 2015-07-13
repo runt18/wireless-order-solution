@@ -48,6 +48,10 @@ public class WxMenuAction {
 		public void read(Document document) {
 			throw new UnsupportedOperationException();
 		}
+		
+		public Msg toMsg(){
+			return this.msg;
+		}
 	}
 	
 	public static class InsertBuilder4Text{
