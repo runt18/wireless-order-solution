@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -190,6 +191,15 @@ public class OperateTableAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 转台
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward transTable(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		try {
@@ -212,6 +222,15 @@ public class OperateTableAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 拆台
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward apartTable(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		String tableID = request.getParameter("tableID");
@@ -242,5 +261,39 @@ public class OperateTableAction extends DispatchAction{
 		}
 		return null;
 	}		
+	
+	/**
+	 * 撤台
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward cancelTable(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jobject = new JObject();
+		try {
+			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
+			
+			int tableId = Integer.parseInt(request.getParameter("tableId"));
+
+			// print the transfer table receipt
+			OrderDao.cancel(staff, new Table.Builder(tableId));
+			jobject.initTip(true, "撤台成功.");
+			
+		} catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		} finally {
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
 	
 }
