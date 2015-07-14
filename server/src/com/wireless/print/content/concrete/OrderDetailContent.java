@@ -62,8 +62,7 @@ public class OrderDetailContent extends ConcreteContent {
 			mPrintTemplate = mPrintTemplate.replace(PVar.FOOD_PRICE, NumericUtil.float2String2(mParent.getPrice()));
 			
 		}else{
-			String tblName;
-			tblName = mOrder.getDestTbl().getName().isEmpty() ? Integer.toString(mOrder.getDestTbl().getAliasId()) : mOrder.getDestTbl().getName();
+			final String tblName = mOrder.getDestTbl().getName();
 			
 			//generate the title and replace the "$(title)" with it
 			if(mPrintType == PType.PRINT_ORDER_DETAIL){

@@ -46,7 +46,7 @@ public class SummaryContent extends ConcreteContent {
 	
 	private String makeTitle(String title){
 		return new String(new String(new char[]{0x1B, 0x61, 0x01}) + 
-				   new ExtraFormatDecorator(title, mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X) +
+				   new ExtraFormatDecorator(title + "-" + mOrder.getDestTbl().getName(), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X) +
 				   SEP + new String(new char[]{0x1B, 0x61, 0x00}));	
 	}
 	
@@ -65,11 +65,11 @@ public class SummaryContent extends ConcreteContent {
 			
 		}else if(mPrintType == PType.PRINT_ALL_CANCELLED_FOOD){
 			//char[] format = { 0x1D, 0x21, 0x03 };
-			mTemplate = mTemplate.replace(PVar.TITLE, makeTitle("退  菜  总  单 !"));
+			mTemplate = mTemplate.replace(PVar.TITLE, makeTitle("!!!退菜总单!!!"));
 			
 		}else if(mPrintType == PType.PRINT_ALL_HURRIED_FOOD){
 			//char[] format = { 0x1D, 0x21, 0x03 };
-			mTemplate = mTemplate.replace(PVar.TITLE, makeTitle("催  菜  总  单 !"));
+			mTemplate = mTemplate.replace(PVar.TITLE, makeTitle("!!!催菜总单!!!"));
 			
 		}else{
 			mTemplate = mTemplate.replace(PVar.TITLE, makeTitle("点菜总单"));		

@@ -40,6 +40,7 @@ import com.wireless.print.content.concrete.OrderDetailContent;
 import com.wireless.print.content.concrete.ReceiptContent;
 import com.wireless.print.content.concrete.ShiftContent;
 import com.wireless.print.content.concrete.SummaryContent;
+import com.wireless.print.content.concrete.TransFoodContent;
 import com.wireless.print.content.concrete.TransTableContent;
 
 public class JobContentFactory {
@@ -359,6 +360,31 @@ public class JobContentFactory {
 					if(!srcTbl.equals(destTbl)){
 						jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 														new TransTableContent(orderId,
+																   srcTbl,
+																   destTbl,
+																   staff.getName(),
+																   printType,
+																   printer.getStyle())));
+					}
+				}
+			}
+		}
+
+		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
+	}
+	
+	public Content createTransFoodContent(PType printType, Staff staff, List<Printer> printers, int orderId, Table srcTbl, Table destTbl, List<OrderFood> transferFoods){
+		List<JobContent> jobContents = new ArrayList<JobContent>();
+		
+		Region regionToCompare = new Region(Region.RegionId.REGION_1.getId(), "", staff.getRestaurantId());
+		
+		for(Printer printer : printers){
+			for(PrintFunc func : printer.getPrintFuncs()){
+				if(func.isTypeMatched(printType) && func.isRegionMatched(regionToCompare)){
+					if(!srcTbl.equals(destTbl)){
+						jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+														new TransFoodContent(transferFoods,
+																   orderId,
 																   srcTbl,
 																   destTbl,
 																   staff.getName(),

@@ -44,25 +44,12 @@ public class TransTableContent extends ConcreteContent {
 		_template = _template.replace(PVar.WAITER_NAME, mWaiter);
 
 		//replace the $(var_1) with the table transfer message
-		String srcTbl;
-		srcTbl = _srcTbl.getAliasId() + "号台";
-		if(!_srcTbl.getName().isEmpty()){
-			srcTbl += "(" + _srcTbl.getName() + ")";
-		}
-		
-		String destTbl;
-		destTbl = _destTbl.getAliasId() + "号台";
-		if(!_destTbl.getName().isEmpty()){
-			destTbl += "(" + _destTbl.getName() + ")";
-		}
-		
-		final String msg = srcTbl + "转至" + destTbl;
 		_template = _template.replace(PVar.VAR_1, new ExtraFormatDecorator(new ConcreteContent(mPrintType, mStyle) {
 																				@Override
 																				public String toString(){
-																					return msg;
+																					return _srcTbl.getName() + "转至" + _destTbl.getName();
 																				}
-																			}, ExtraFormatDecorator.LARGE_FONT_V_2X).toString());
+																			}, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString());
 		
 		return _template;
 	}

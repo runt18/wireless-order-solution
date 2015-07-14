@@ -49,6 +49,7 @@ import com.wireless.pack.resp.RespPackage;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberComment;
@@ -500,15 +501,17 @@ class OrderHandler implements Runnable{
 		return new RespACK(request.header);
 	}
 	
-	private RespPackage doTransOrderFood(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
-		OrderDao.transfer(staff, new Parcel(request.body).readParcel(Order.TransferBuilder.CREATOR));
+	private RespPackage doTransOrderFood(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
+		Order.TransferBuilder builder = new Parcel(request.body).readParcel(Order.TransferBuilder.CREATOR);
+		OrderDao.transfer(staff, builder);
+		ServerConnector.instance().ask(ReqPrintContent.buildTransFood(staff, builder));
 		return new RespACK(request.header);
 	}
 	
 	private RespPackage doTransTable(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		Table.TransferBuilder builder = new Parcel(request.body).readParcel(Table.TransferBuilder.CREATOR);
 		int orderId = TableDao.transfer(staff, builder);
-		ServerConnector.instance().ask(ReqPrintContent.buildReqPrintTransTbl(staff, orderId, new Table.Builder(builder.getSrcTbl().getId()), new Table.Builder(builder.getDestTbl().getId())));
+		ServerConnector.instance().ask(ReqPrintContent.buildTransTbl(staff, orderId, new Table.Builder(builder.getSrcTbl().getId()), new Table.Builder(builder.getDestTbl().getId())));
 		return new RespACK(request.header);
 	}
 	
@@ -521,10 +524,10 @@ class OrderHandler implements Runnable{
 		Order.RepaidBuilder builder = new Parcel(request.body).readParcel(Order.RepaidBuilder.CREATOR);
 		OrderDao.repaid(staff, builder);
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
-			ServerConnector.instance().ask(ReqPrintContent.buildReqPrintReceipt(staff, builder.getUpdateBuilder().build().getId()));
+			ServerConnector.instance().ask(ReqPrintContent.buildReceipt(staff, builder.getUpdateBuilder().build().getId()));
 			Order order = OrderDao.getById(staff, builder.getUpdateBuilder().build().getId(), DateType.TODAY);
 			if(order.isSettledByMember()){
-				ServerConnector.instance().ask(ReqPrintContent.buildReqPrintMemberReceipt(staff, MemberOperationDao.getLastConsumptionByOrder(staff, order).getId()));
+				ServerConnector.instance().ask(ReqPrintContent.buildMemberReceipt(staff, MemberOperationDao.getLastConsumptionByOrder(staff, order).getId()));
 			}
 		}
 		return new RespACK(request.header);
@@ -632,6 +635,15 @@ class OrderHandler implements Runnable{
 			Table srcTbl = TableDao.getById(staff, p.readParcel(Table.CREATOR).getId());
 			Table destTbl = TableDao.getById(staff, p.readParcel(Table.CREATOR).getId());
 			new PrintHandler(staff).process(JobContentFactory.instance().createTransContent(printType, staff, printers, orderId, srcTbl, destTbl));
+			
+		}else if(printType.isTransFood()){
+			Order.TransferBuilder builder = new Parcel(request.body).readParcel(Order.TransferBuilder.CREATOR);
+			Order srcOrder = OrderDao.getById(staff, builder.getSourceOrderId(), DateType.TODAY);
+			Table destTbl = TableDao.getById(staff, builder.getDestTbl().getId());
+			for(OrderFood foodOut : builder.getTransferFoods()){
+				foodOut.asFood().copyFrom(FoodDao.getById(staff, foodOut.asFood().getFoodId()));
+			}
+			new PrintHandler(staff).process(JobContentFactory.instance().createTransFoodContent(printType, staff, printers, srcOrder.getId(), srcOrder.getDestTbl(), destTbl, builder.getTransferFoods()));
 			
 		}else if(printType.isShift()){
 			Parcel p = new Parcel(request.body);

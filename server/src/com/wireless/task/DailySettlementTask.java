@@ -144,8 +144,8 @@ public class DailySettlementTask extends SchedulerTask{
 			taskInfo.append("info : " + BillBoardDao.cleanup()).append(sep);
 			
 			//Notify wx-term to send the liveness & expired. 
-			doPost("http://wx.e-tones.net/wx-term/WxRemind.do?dataSource=expired", "");
-			doPost("http://wx.e-tones.net/wx-term/WxRemind.do?dataSource=liveness", "");
+			//doPost("http://wx.e-tones.net/wx-term/WxRemind.do?dataSource=expired", "");
+			//doPost("http://wx.e-tones.net/wx-term/WxRemind.do?dataSource=liveness", "");
 			
 		}catch(SQLException | BusinessException e){
 			taskInfo.append("error : " + e.getMessage()).append(sep);
