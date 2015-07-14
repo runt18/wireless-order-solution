@@ -47,7 +47,7 @@ public class MemberRechargeAction extends Action{
 				jobject.initTip(true, "操作成功, 会员充值成功.");
 				if(isPrint != null && Boolean.valueOf(isPrint)){
 					try{
-						ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintMemberReceipt(staff, mo.getId());
+						ReqPrintContent reqPrintContent = ReqPrintContent.buildMemberReceipt(staff, mo.getId());
 						if(reqPrintContent != null){
 							ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
 							if(resp.header.type == Type.ACK){
