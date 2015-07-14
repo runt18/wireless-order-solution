@@ -840,6 +840,7 @@ function foodOperation(type){
 					$('.multiPriceName').attr('placeholder', '单位名称');
 					$('.multiPriceValue').attr('placeholder', '价格');
 				
+					isHasMultiPrice();
 				}
 			},
 			failure : function(){
@@ -1903,7 +1904,9 @@ function optMultiPriceHandler(){
 	$('.multiPriceName').attr('placeholder', '单位名称');
 	$('.multiPriceValue').attr('placeholder', '价格');
 	
+	isHasMultiPrice();
 	Ext.getCmp(unitPriceId).focus();
+	
 }
 
 /**
@@ -1918,6 +1921,16 @@ function deleteMultiPriceHandler(e){
 	}
 	
 	Ext.getCmp('food_multiPrice').doLayout();
+	
+	isHasMultiPrice();
+}
+
+function isHasMultiPrice(){
+	if($("div[class*='multiClass']").length == 0){
+		Ext.getCmp('numBasicForPrice').enable();
+	}else{
+		Ext.getCmp('numBasicForPrice').disable();
+	}	
 }
 
 
