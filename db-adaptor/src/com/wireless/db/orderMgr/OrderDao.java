@@ -1039,6 +1039,62 @@ public class OrderDao {
 	}
 	
 	/**
+	 * Cancel the order to specific table.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param tblBuilder
+	 * 			the order to this table
+	 * @return the id to order cancelled 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the order to this table does NOT exist
+	 * 			<li>the order has performed any action before
+	 */
+	public static int cancel(Staff staff, Table.Builder tblBuilder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			int orderId = cancel(dbCon, staff, tblBuilder);
+			dbCon.conn.commit();
+			return orderId;
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Cancel the order to specific table.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param tblBuilder
+	 * 			the order to this table
+	 * @return the id to order cancelled 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the order to this table does NOT exist
+	 * 			<li>the order has performed any action before
+	 */
+	public static int cancel(DBCon dbCon, Staff staff, Table.Builder tblBuilder) throws SQLException, BusinessException{
+		Order order = OrderDao.getByTableId(dbCon, staff, tblBuilder.build().getId());
+		if(OrderFoodDao.getSingleDetail(dbCon, staff, new OrderFoodDao.ExtraCond(DateType.TODAY).setOrder(order), null).isEmpty()){
+			deleteByCond(dbCon, staff, new ExtraCond(DateType.TODAY).setOrderId(order.getId()));
+			return order.getId();
+		}else{
+			throw new BusinessException("【" + order.getDestTbl().getName() + "】的账单已有操作，不能撤台", FrontBusinessError.ORDER_CANCEL_FAIL);
+		}
+	}
+	
+	/**
 	 * Get the summary to orders to specified restaurant defined in {@link Staff} and other condition.
 	 * @param staff
 	 * 			the staff to perform this action
