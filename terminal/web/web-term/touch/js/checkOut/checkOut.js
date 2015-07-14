@@ -535,6 +535,46 @@ uo.allFoodHurried = function(){
 	}, 250);	
 }
 
+/**
+ * 撤台
+ */
+uo.cancelTable = function(){
+	$('#updateFoodOtherOperateCmp').popup('close');
+	
+	setTimeout(function(){
+		Util.msg.alert({
+			msg : '是否撤台?',
+			renderTo : 'orderFoodListMgr',
+			buttons : 'yesback',
+			certainCallback : function(){
+				Util.LM.show();
+				$.post('../OperateTable.do', {'tableId' : uo.order.table.id, 'dataSource' : 'cancelTable'}, function(result){
+					Util.LM.hide();
+					if(result.success){
+						Util.msg.tip( result.msg);
+						uo.cancelForUO();
+					}else{
+						Util.msg.alert({
+							title : '错误',
+							msg : result.msg,
+							renderTo : 'orderFoodListMgr',
+							time : 3
+						});
+					}		
+				}).error(function() {
+					Util.LM.hide();
+					Util.msg.alert({
+						msg : '操作失败, 请联系客服',
+						renderTo : 'orderFoodListMgr'
+					});		
+				});							
+			}
+		});			
+	}, 250);
+	
+
+}
+
 
 /**
  * 去称重

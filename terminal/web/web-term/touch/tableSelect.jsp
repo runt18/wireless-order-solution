@@ -1061,6 +1061,7 @@
             <li class="tempFoodKitchen" onclick="uo.printDetailPatch()"><a >补打明细</a></li>
             <li class="tempFoodKitchen" onclick="uo.allTransFoodForTS()"><a >全单转菜</a></li>
             <li class="tempFoodKitchen" onclick="uo.allFoodHurried()"><a >全单催菜</a></li>
+            <li class="tempFoodKitchen" onclick="uo.cancelTable()"><a >撤台</a></li>
             <li id="uo_btnCheckoutBook" class="tempFoodKitchen" onclick="ts.checkBookTable()"><a >查看预订</a></li>
         </ul>
 	</div>		
@@ -2114,7 +2115,6 @@
 		    	<a data-role="button" data-theme="b" onclick="openInputReciptWin()">现金找零</a>
 		    	<a data-role="button" data-theme="b" id="btnPayByMember" data-rel="popup" data-position-to="window" data-transition="pop" onclick="showMemberInfoWin()">读取会员</a>
 		    	<a data-role="button" data-theme="b" onclick="loadMix()" data-rel="popup" data-position-to="window" data-transition="pop">其他结账</a>
-		    	<a data-role="button" data-theme="b" onclick="paySubmit(6)">暂结(-)</a>
 		    </div>
 		    
 		</div>
@@ -2131,9 +2131,6 @@
 				</span>
 				<span style="line-height: 35px;float: left;margin-left: 20px;">
 					 人数 : <font id="orderCustomNum" color="#f7c942">1</font>
-				</span>
-				<span style="line-height: 35px;float: left;margin-left: 20px;">
-					 开台备注 : <font id="orderComment" color="#f7c942">----</font>
 				</span>
 			</div>
 			<div id="payment_orderFoodListCmp" style="overflow-y: auto;">
@@ -2185,6 +2182,7 @@
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" href="#tableSelectMgr" >返回</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="refreshOrderData({calc:true})" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="paySubmit(6)">暂结(-)</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="toCheckoutPage()">改单</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupDiscountCmp">折扣</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupServiceCmp">服务费</a>

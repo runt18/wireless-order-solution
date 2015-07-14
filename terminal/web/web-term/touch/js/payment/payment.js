@@ -254,7 +254,7 @@ function loadOrderBasicMsg(){
 	}
 	document.getElementById('spanDisplayCurrentServiceRate').innerHTML = (orderMsg.serviceRate*100)+'%';
 	$('#orderCustomNum').html(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
-	$('#orderComment').html(orderMsg.comment ? orderMsg.comment : '----');
+	$('#remark').val(orderMsg.comment && orderMsg.comment != '----' ? orderMsg.comment : '');
 	
 	//会员 & 折扣 & 优惠劵
 	var discountDesc = '当前折扣:<font style="color:green;font-weight:bold;">'+ orderMsg.discount.name + '</font>'
