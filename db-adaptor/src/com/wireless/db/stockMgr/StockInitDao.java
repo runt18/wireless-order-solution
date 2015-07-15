@@ -4,12 +4,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.DateUtil.Pattern;
 
 public class StockInitDao {
 	public static class ExtraCond{
@@ -174,6 +177,7 @@ public class StockInitDao {
 		}
 	}	
 	
+	
 	/**
 	 * Initialize the stock detail
 	 * @param staff
@@ -246,6 +250,15 @@ public class StockInitDao {
 				" M.stock = 0 " +
 				" WHERE M.cate_id = MC.cate_id AND MC.restaurant_id = " + staff.getRestaurantId();
 		dbCon.stmt.executeUpdate(sql);
+		
+		
+		sql = " INSERT INTO " + Params.dbName + ".stock_init " +
+				  " ( restaurant_id, init_date ) VALUES( " +
+				  staff.getRestaurantId() + "," +
+				  "'" + DateUtil.format(System.currentTimeMillis(), Pattern.DATE) + "'" +
+				  ")";
+			
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 	}
 	
 	
@@ -300,6 +313,41 @@ public class StockInitDao {
 		
 	}
 	
+	/**
+	 * 获取期初建账时间
+	 * @param staff
+	 * @return
+	 * @throws SQLException
+	 */
+	public static long getInitDate(Staff staff) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getInitDate(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}		
+		
+	}
 	
+	/**
+	 * 获取期初建账时间
+	 * @param dbCon
+	 * @param staff
+	 * @return
+	 * @throws SQLException
+	 */
+	public static long getInitDate(DBCon dbCon, Staff staff) throws SQLException{
+		String sql = "SELECT init_date FROM " + Params.dbName + ".stock_init " +
+					" WHERE restaurant_id = " + staff.getRestaurantId() +
+					" ORDER BY id DESC";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		long initDate = 0;
+		if(dbCon.rs.next()){
+			initDate = dbCon.rs.getTimestamp("init_date").getTime();
+		}
+		
+		return initDate;
+	}
 
 }
