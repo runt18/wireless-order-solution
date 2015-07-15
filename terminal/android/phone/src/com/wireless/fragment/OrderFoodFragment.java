@@ -744,7 +744,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		
 		//²¹´ò×Üµ¥
 		private void printSummaryPatch(){
-			new PrintContentTask(ReqPrintContent.buildReqPrintSummaryPatch(WirelessOrder.loginStaff, mOriOrder.getId())) {
+			new PrintContentTask(ReqPrintContent.buildSummaryPatch(WirelessOrder.loginStaff, mOriOrder.getId())) {
 				
 				@Override
 				protected void onSuccess() {
