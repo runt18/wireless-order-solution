@@ -47,4 +47,12 @@ public class Data4Item {
 	public void setUrl(String url) {
 		this.url = url;
 	}
+	
+	@Override
+	public String toString(){
+		return "title = " + getTitle() +
+			   (this.description != null ? ", desc = " + this.description : "") +
+			   (this.picUrl != null ? ", picUrl = " + this.picUrl : "") +
+			   (this.url != null ? ", url = " + this.url : "");
+	}
 }

@@ -286,7 +286,7 @@ public class OssImageDao {
 		}
 		
 		if(ossImage.getImage().trim().isEmpty()){
-			ossImage.setImage(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis()) + (int)(Math.random() * 1000) + "." + imgType);
+			ossImage.setImage(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis()) + (int)(Math.random() * 1000) + "." + imgType.getSuffix());
 		}
 		ossImage.setRestaurantId(staff.getRestaurantId());
 		

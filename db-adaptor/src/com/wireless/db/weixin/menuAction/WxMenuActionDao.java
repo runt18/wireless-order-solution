@@ -1,16 +1,25 @@
 package com.wireless.db.weixin.menuAction;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.marker.weixin.msg.Data4Item;
+import org.marker.weixin.msg.Msg;
 import org.marker.weixin.msg.Msg4Head.MsgType;
+import org.marker.weixin.msg.Msg4ImageText;
+import org.xml.sax.SAXException;
 
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.WxMenuError;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class WxMenuActionDao {
@@ -42,6 +51,46 @@ public class WxMenuActionDao {
 		}
 	}
 
+	/**
+	 * Insert the weixin menu action for image text.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder weixin menu text action 
+	 * @return the id to weixin menu action
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if failed to create the weixin menu action
+	 */
+	public static int insert(Staff staff, WxMenuAction.InsertBuilder4ImageText builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return insert(dbCon, staff, builder.build());
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Insert the weixin menu action for image text.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder weixin menu text action 
+	 * @return the id to weixin menu action
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if failed to create the weixin menu action
+	 */
+	public static int insert(DBCon dbCon, Staff staff, WxMenuAction.InsertBuilder4ImageText builder) throws SQLException, BusinessException{
+		return insert(dbCon, staff, builder.build());
+	}
+	
 	/**
 	 * Insert the weixin menu action for text.
 	 * @param staff
@@ -137,12 +186,72 @@ public class WxMenuActionDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if action to update does NOT exist
+	 * @throws ParserConfigurationException 
+	 * @throws IOException 
+	 * @throws SAXException 
+	 */
+	public static void update(DBCon dbCon, Staff staff, WxMenuAction.UpdateBuilder4ImageText builder) throws SQLException, BusinessException, SAXException, IOException, ParserConfigurationException{
+		update(dbCon, staff, builder.build());
+	}
+	
+	/**
+	 * Update the weixin menu image text action.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to weixin menu text action
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if action to update does NOT exist
+	 */
+	public static void update(Staff staff, WxMenuAction.UpdateBuilder4ImageText builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			update(dbCon, staff, builder.build());
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update the weixin menu image text action.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to weixin menu text action
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if action to update does NOT exist
 	 */
 	public static void update(DBCon dbCon, Staff staff, WxMenuAction.UpdateBuilder4Text builder) throws SQLException, BusinessException{
 		update(dbCon, staff, builder.build());
 	}
 	
 	private static void update(DBCon dbCon, Staff staff, WxMenuAction menuAction) throws SQLException, BusinessException{
+		
+		//Delete the associated oss image.
+		try {
+			WxMenuAction oriAction = getById(dbCon, staff, menuAction.getId());
+			if(oriAction.getMsgType() == MsgType.MSG_TYPE_IMAGE_TEXT){
+				Msg oriMsg = new WxMenuAction.MsgProxy(oriAction).toMsg();
+				for(Data4Item item : ((Msg4ImageText)oriMsg).getItems()){
+					for(OssImage image4Item : OssImageDao.getByCond(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_ACTION_IMAGE, 1))){
+						if(image4Item.getObjectUrl().equals(item.getPicUrl())){
+							OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(image4Item.getId()));
+							break;
+						}
+					}
+				}
+			}
+		} catch (SAXException | IOException | ParserConfigurationException e) {
+			throw new BusinessException(e.getMessage());
+		}
+
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".weixin_menu_action SET " +
 			  " id = " + menuAction.getId() + 
@@ -287,6 +396,22 @@ public class WxMenuActionDao {
 	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		int amount = 0;
 		for(WxMenuAction menuAction : getByCond(dbCon, staff, extraCond)){
+			//Delete the associated oss image if belong to image text
+			try {
+				if(menuAction.getMsgType() == MsgType.MSG_TYPE_IMAGE_TEXT){
+					for(Data4Item item : ((Msg4ImageText)new WxMenuAction.MsgProxy(menuAction).toMsg()).getItems()){
+						for(OssImage image4Item : OssImageDao.getByCond(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_ACTION_IMAGE, 1))){
+							if(image4Item.getObjectUrl().equals(item.getPicUrl())){
+								OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(image4Item.getId()));
+								break;
+							}
+						}
+					}
+				}
+			} catch (SAXException | IOException | ParserConfigurationException | BusinessException ignored) {
+				ignored.printStackTrace();
+			}
+			
 			String sql;
 			sql = " DELETE FROM " + Params.dbName + ".weixin_menu_action WHERE id = " + menuAction.getId();
 			if(dbCon.stmt.executeUpdate(sql) != 0){

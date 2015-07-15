@@ -11,9 +11,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.marker.weixin.msg.Data4Item;
 import org.marker.weixin.msg.Msg;
 import org.marker.weixin.msg.Msg4Head;
 import org.marker.weixin.msg.Msg4Head.MsgType;
+import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -39,11 +41,33 @@ public class WxMenuAction {
 			if (head.getMsgType() == Msg4Head.MsgType.MSG_TYPE_TEXT) {
 				msg = new Msg4Text(head);
 				msg.read(document);
+			}else if(head.getMsgType() == Msg4Head.MsgType.MSG_TYPE_IMAGE_TEXT){
+				msg = new Msg4ImageText(head);
+				msg.read(document);
 			}
 		}
 
 		public Msg toMsg(){
 			return this.msg;
+		}
+	}
+	
+	public static class InsertBuilder4ImageText{
+		private final InsertBuilder builder;
+		private final Msg4ImageText msg = new Msg4ImageText(InsertBuilder.head4Insert);
+		
+		public InsertBuilder4ImageText(Data4Item item){
+			msg.addItem(item);
+			builder = new InsertBuilder(MsgType.MSG_TYPE_IMAGE_TEXT, msg);
+		}
+		
+		public InsertBuilder4ImageText addItem(Data4Item item){
+			msg.addItem(item);
+			return this;
+		}
+		
+		public WxMenuAction build() throws BusinessException{
+			return builder.build();
 		}
 	}
 	
@@ -82,6 +106,24 @@ public class WxMenuAction {
 		
 		public WxMenuAction build() throws BusinessException{
 			return new WxMenuAction(this);
+		}
+	}
+	
+	public static class UpdateBuilder4ImageText{
+		private final UpdateBuilder builder;
+		private final Msg4ImageText msg = new Msg4ImageText(InsertBuilder.head4Insert);
+		public UpdateBuilder4ImageText(int id, Data4Item item){
+			msg.addItem(item);
+			builder = new UpdateBuilder(id, MsgType.MSG_TYPE_IMAGE_TEXT, msg);
+		}
+		
+		public UpdateBuilder4ImageText addItem(Data4Item item){
+			this.msg.addItem(item);
+			return this;
+		}
+		
+		public WxMenuAction build() throws BusinessException{
+			return builder.build();
 		}
 	}
 	
