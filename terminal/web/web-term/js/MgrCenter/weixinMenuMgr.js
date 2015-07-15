@@ -1,7 +1,7 @@
 var Request = new common_urlParaQuery();
 var rid = Request["rid"];
 //rid = 40;
-var basePath = "http://ts.e-tones.net";
+var basePath = "http://localhost:8080";
 
 //悬浮操作框的treeNode id
 var floatBarNodeId = "";
@@ -175,13 +175,19 @@ function operateMenuContent(){
 		return ;
 	}
 	
+	var dataSource = "insertMenu";
+	if(tn.attributes.key && !isNaN(tn.attributes.key)){
+		dataSource = "updateMenu";
+	}	
+	
 	$.ajax({ 
 	    type : "post", 
 	    async:false, 
 	    url : basePath+"/wx-term/WXOperateMenu.do",
 	    data : {
-	    	dataSource : 'insertMenu',
+	    	dataSource : dataSource,
 	    	rid : rid,
+	    	key : tn.attributes.key,
 	    	text : $('#menuTxtReply').val()
 	    },
 	    dataType : "jsonp",//jsonp数据类型 
@@ -195,9 +201,11 @@ function operateMenuContent(){
 	    error:function(xhr){ 
 	        var rt = JSON.parse(xhr.responseText);
 	        if(rt.success){
-	        	Ext.example.msg('提示', '添加成功');
-	        	tn.attributes.type = "click";
-				tn.attributes.key = rt.other.key;
+	        	Ext.example.msg('提示', rt.msg);
+	        	if(dataSource == "insertMenu"){
+	        		tn.attributes.type = "click";
+	        		tn.attributes.key = rt.other.key;
+	        	}
 			}
 	    } 
 	}); 
@@ -218,6 +226,7 @@ function operateMenuUrl(){
 	tn.attributes.type = "view";
 	tn.attributes.url = $('#url4Menu').val();
 	
+	Ext.example.msg('提示', '操作成功');
 }
 
 function getWeixinMenu(){

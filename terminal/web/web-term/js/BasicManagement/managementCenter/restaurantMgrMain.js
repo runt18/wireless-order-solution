@@ -369,11 +369,15 @@ var restaurantAddWin = new Ext.Window({
 
 
 
-function optRestaurant(){
-	return ''
-	+ "<a href = \"javascript:optRestaurantHandler({otype:'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"
-	+ "&nbsp;&nbsp;<a href = \"javascript:displayCodeHandle()\">" + "<img src='../../images/Modify.png'/>生成验证码</a>"
-	+ "&nbsp;&nbsp;<a href = \"javascript:setWeixinMenu()\">" + "<img src='../../images/Modify.png'/>设置菜单</a>";
+function optRestaurant(v, m, r, ri, ci, s){
+	var operate =  "<a href = \"javascript:optRestaurantHandler({otype:'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"
+					+ "&nbsp;&nbsp;<a href = \"javascript:displayCodeHandle()\">" + "<img src='../../images/Modify.png'/>生成验证码</a>";
+	
+	if(r.get('qrCode') == true){
+		operate += "&nbsp;&nbsp;<a href = \"javascript:setWeixinMenu()\">" + "<img src='../../images/Modify.png'/>设置菜单</a>";
+	}
+	
+	return operate;
 }
 
 function optSms(v){
@@ -577,7 +581,7 @@ function optSmsHandler(){
 
 function setWeixinMenu(){
 	var data = Ext.ux.getSelData(restaurantPanel);
-	location.href = 'weixinMenuMgr.html?rid='+data.id;	
+	window.open('weixinMenuMgr.html?rid='+data.id);	
 }
 
 
@@ -861,6 +865,8 @@ Ext.onReady(function(){
 			name : 'usedCode'
 		}, {
 			name : 'unUsedCode'
+		}, {
+			name : 'qrCode'
 		}])
 	});
 	
