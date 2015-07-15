@@ -1,5 +1,6 @@
 package com.wireless.Actions.inventoryMgr.report;
 
+import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,11 +13,13 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.inventoryMgr.SaleOfMaterialDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.stockMgr.StockInitDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.SaleOfMaterial;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 
 public class QuerySaleOfMaterialAction extends Action{
 	@Override
@@ -34,6 +37,24 @@ public class QuerySaleOfMaterialAction extends Action{
 			
 			endDate = beginDate + "-31";
 			beginDate += "-01";
+			
+			long stockInitDateTime = StockInitDao.getInitDate(staff);
+			
+			if(stockInitDateTime > 0){
+				Calendar c = Calendar.getInstance();
+				c.setTimeInMillis(stockInitDateTime);
+				String stockInitDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-01";
+				
+				if(DateUtil.parseDate(stockInitDate) == DateUtil.parseDate(beginDate)){
+					beginDate = DateUtil.format(stockInitDateTime);
+				}else{
+					beginDate += "-01";
+				}
+			}else{
+				
+			}
+			
+			
 			
 			String extra = " AND OF.order_date BETWEEN '" + beginDate + "' AND '" + endDate + " 23:59:59'";
 				

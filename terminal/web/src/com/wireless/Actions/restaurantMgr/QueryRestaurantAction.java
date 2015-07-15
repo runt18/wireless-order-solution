@@ -16,12 +16,15 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.SMStatDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.token.TokenDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.SMStat;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.token.Token;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.util.DataPaging;
 
 public class QueryRestaurantAction extends Action{
@@ -66,8 +69,13 @@ public class QueryRestaurantAction extends Action{
 				list.addAll(RestaurantDao.getByCond(extraCond, orderClause));
 				if(!list.isEmpty()){
 					for(final Restaurant rest : list) {
+						
+						
+						Staff adminStaff = StaffDao.getAdminByRestaurant(dbCon, rest.getId()); 
 						//为restaurant加上短信条数
-						final SMStat sms = SMStatDao.get(dbCon, StaffDao.getAdminByRestaurant(dbCon, rest.getId()));
+						final SMStat sms = SMStatDao.get(dbCon, adminStaff);
+						
+						final WxRestaurant wxRest = WxRestaurantDao.get(adminStaff);
 						
 						//为restaurant加上验证码个数
 						int used = 0, unUsed = 0;
@@ -89,6 +97,7 @@ public class QueryRestaurantAction extends Action{
 								jm.putInt("smsRemain", sms.getRemaining());
 								jm.putInt("usedCode", usedCode);
 								jm.putInt("unUsedCode", unUsedCode);
+								jm.putBoolean("qrCode", wxRest.hasQrCode());
 								return jm;
 							}
 							

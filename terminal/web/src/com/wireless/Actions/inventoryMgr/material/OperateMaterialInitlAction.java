@@ -189,6 +189,7 @@ public class OperateMaterialInitlAction extends DispatchAction{
 		String pin = (String) request.getAttribute("pin");
 		try{
 			StockInitDao.initStock(StaffDao.verify(Integer.parseInt(pin)));
+			
 			jobject.initTip(true, "初始化成功");			
 		}catch(SQLException e){
 			e.printStackTrace();
