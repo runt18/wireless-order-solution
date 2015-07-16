@@ -22,6 +22,14 @@
 
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
+<script type="text/javascript" src="../../extjs/ext-plugins-define.js"></script>
+
+<style type="text/css">
+#systemReplyBox label{
+	margin-right: 20px;
+}
+</style>
+
 </head>
 <body>
 	<div id="div4MenuInit" align="center">
@@ -39,8 +47,11 @@
 		<br>
 		<input type="button" value="保存" onclick="operateMenuUrl()" style="width: 90px;font-size: 20px;">		
 	</div>
-	<div id="textAndPicReplyBox" style="padding-top: 10px" align="center">
-		<div style="width:800px;height: 400px;border: 1px dashed gray"></div>
+	<div id="systemReplyBox" style="padding: 10px">
+		<div id="div4systemReplyBox" style="width:600px;height: 50px;border: 1px dashed gray;padding:20px;">
+<!-- 			<input id="r1" type="radio" name="systemSet" value="navi_event_key"><label for="r1">餐厅导航</label>-->
+		</div>
+		<input type="button" value="设置" onclick="setSystemMenu()" style="width: 90px;font-size: 20px;">
 	</div>
 	
 	<div class="floatBar" id="div_floatBar" style="height: 15px;background-color: #DFE8F6;position: absolute;display: none"></div>
