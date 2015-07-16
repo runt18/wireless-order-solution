@@ -4,8 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,10 +63,8 @@ public class OperateImageAction extends DispatchAction{
 	    			
 	    			ossImageId = OssImageDao.insert(staff, builder);    
 	    			
-	    			List<OssImage> list = new ArrayList<>();
 	    			OssImage image = OssImageDao.getById(staff, ossImageId);
-	    			list.add(image);
-	    			jobject.setRoot(list);
+	    			jobject.setRoot(image);
 	    			
 	    			jobject.initTip(true, "操作成功, 上传图片信息成功!");
 	            }
