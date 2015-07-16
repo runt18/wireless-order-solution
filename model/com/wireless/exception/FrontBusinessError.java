@@ -13,6 +13,7 @@ public class FrontBusinessError extends ErrorEnum {
 	public final static ErrorCode ORDER_EXPIRED = build(9195, "账单已过期");
 	public final static ErrorCode MIXED_PAYMENT_NOT_EQUALS_TO_ACTUAL = build(9194, "混合结账的金额不等于账单的实收金额");
 	public final static ErrorCode ORDER_CANCEL_FAIL = build(9193, "撤台失败");
+	public final static ErrorCode INSERT_MULTI_FAIL = build(9192, "多台入席失败");
 	
 	private FrontBusinessError(){
 		
