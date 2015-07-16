@@ -1,6 +1,9 @@
 package org.marker.weixin.msg;
 
-public class Data4Item {
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
+
+public class Data4Item implements Jsonable{
 	private String title;
 	private String description;
 	private String picUrl;
@@ -54,5 +57,20 @@ public class Data4Item {
 			   (this.description != null ? ", desc = " + this.description : "") +
 			   (this.picUrl != null ? ", picUrl = " + this.picUrl : "") +
 			   (this.url != null ? ", url = " + this.url : "");
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putString("title", title);
+		jm.putString("description", description);
+		jm.putString("picUrl", picUrl);
+		jm.putString("url", url);
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jm, int flag) {
+		
 	}
 }
