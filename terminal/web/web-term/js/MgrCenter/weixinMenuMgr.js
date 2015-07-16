@@ -1,7 +1,40 @@
+
+
 var Request = new common_urlParaQuery();
 var rid = Request["rid"];
 //rid = 40;
 var basePath = "http://localhost:8080";
+
+
+
+/**
+ * 拓展string方法
+ * @param args
+ * @returns {String}
+ */
+String.prototype.format = function(args){
+    var result = this;
+    if (arguments.length > 0){    
+        if (arguments.length == 1 && typeof args == "object"){
+            for(var key in args) {
+                if(args[key] != undefined){
+                    var reg = new RegExp("({" + key + "})", "g");
+                    result = result.replace(reg, args[key]);
+                }
+            }
+        }else{
+        	for(var i = 0; i < arguments.length; i++){
+        		if (arguments[i] != undefined) {
+        			var reg= new RegExp("({)" + i + "(})", "g");
+        			result = result.replace(reg, arguments[i]);
+                }
+            }
+        }
+    }
+    return result;
+};
+
+
 
 //悬浮操作框的treeNode id
 var floatBarNodeId = "";
@@ -164,6 +197,9 @@ function deleteMenu(){
 	
 }
 
+/**
+ * 保存文本回复
+ */
 function operateMenuContent(){
 	var tn = Ext.ux.getSelNode(tree);
 	if(!tn){
@@ -211,6 +247,28 @@ function operateMenuContent(){
 	}); 
 	
 } 
+
+/**
+ * 设置系统保留菜单
+ */
+function setSystemMenu(){
+	var tn = Ext.ux.getSelNode(tree);
+	if(!tn){
+		Ext.example.msg('提示', '操作失败, 请选中一个菜单再进行操作.');
+		return;
+	}	
+	
+	var key = $('input[name="systemSet"]:checked').val();
+	
+	tn.attributes.type = "click";
+	if(key == "scan_event_key"){
+		tn.attributes.type = "scancode_waitmsg";
+	}
+	tn.attributes.key = key;
+	
+	Ext.example.msg('提示', '设置成功');
+}
+
 
 function operateMenuUrl(){
 	var tn = Ext.ux.getSelNode(tree);
@@ -293,6 +351,36 @@ function getWeixinMenu(){
 }
 
 Ext.onReady(function(){
+	$.ajax({ 
+	    type : "post", 
+	    url : basePath+"/wx-term/WXOperateMenu.do",
+	    data : {
+	    	dataSource : 'systemMenu'
+	    },
+	    dataType : "jsonp",//jsonp数据类型 
+	    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+	    success : function(data){ 
+			if(data.success){
+			}
+	    }, 
+	    error:function(xhr){ 
+	        var rt = JSON.parse(xhr.responseText);
+	        var systemMenuTemplate = '<input id="{id}" type="radio" name="systemSet" value={key}><label for="{id}">{desc}</label>';
+	        
+	        if(rt.success){
+	        	var html = [];
+	        	for (var i = 0; i < rt.root.length; i++) {
+	        		html.push(systemMenuTemplate.format({
+	        			id : "r"+(i+1),
+	        			key : rt.root[i].key,
+	        			desc : rt.root[i].desc
+	        		}))
+				}
+	        	$("#div4systemReplyBox").html(html.join(""));
+			}
+	    } 
+	}); 
+	
 	
 	var programTreeTbar = new Ext.Toolbar({
 		items : ['->'
@@ -446,8 +534,25 @@ Ext.onReady(function(){
 			},
 			click : function(e){
 				$('#menuTxtReply').val("");			
-				$('#url4Menu').val("");			
+				$('#url4Menu').val("");	
+				
+				$('#itemTitle').val("");			
+				$('#itemContent').val("");	
+				$('#itemUrl').val("");			
+				delete p_box.ossId;	
+				imgFile.setImg("");
+				
+				$('input[name="systemSet"]:checked').removeAttr("checked");
+				
 				var tn = Ext.ux.getSelNode(tree);
+				
+				if(tn.hasChildNodes()){
+					tabs.disable();
+					return;
+				}else{
+					tabs.enable();
+				}
+				
 				if(tn.attributes.type == "view"){
 					var tab = tabs.getComponent("tab_view");
 					tabs.setActiveTab(tab);
@@ -457,42 +562,71 @@ Ext.onReady(function(){
 //					p.layout.north = northPanel2;
 //					p.doLayout();
 //					p.add(northPanel2).doLayout();
+					
+					//判断key是否为数字
 					if(isNaN(parseInt(tn.attributes.key))){
-						return;
+						var tab = tabs.getComponent("tab_system");
+						tabs.setActiveTab(tab);
+						
+						$('input[name="systemSet"]').each(function(){
+							if(this.value == tn.attributes.key){
+								$(this).attr("checked","checked");
+							}
+						});
+					}else{
+						$.ajax({ 
+						    type : "post", 
+						    async:false, 
+						    url : basePath+"/wx-term/WXOperateMenu.do",
+						    data : {
+						    	dataSource : 'menuReply',
+						    	rid : rid,
+						    	key : tn.attributes.key
+						    },
+						    dataType : "jsonp",//jsonp数据类型 
+						    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+						    success : function(data){ 
+								if(data.success){
+								}
+						    }, 
+						    error:function(xhr){ 
+						        var rt = JSON.parse(xhr.responseText);
+						        if(rt.success){
+						        	if(rt.other){
+						        		$('#menuTxtReply').val(rt.other.text);
+						        		
+										var tab = tabs.getComponent("tab_click");
+										tabs.setActiveTab(tab);
+						        	}else if(rt.root.length > 0){
+						        		var item = rt.root[0];
+						        		
+										$('#itemTitle').val(item.title);			
+										$('#itemContent').val(item.description);	
+										$('#itemUrl').val(item.url);	
+						        		imgFile.setImg(item.picUrl);
+						        		
+										var tab = tabs.getComponent("tab_image_text");
+										tabs.setActiveTab(tab);
+						        	}
+								}
+						    } 
+						}); 						
 					}
 					
-					var tab = tabs.getComponent("tab_click");
-					tabs.setActiveTab(tab);
-					
-					$.ajax({ 
-					    type : "post", 
-					    async:false, 
-					    url : basePath+"/wx-term/WXOperateMenu.do",
-					    data : {
-					    	dataSource : 'menuReply',
-					    	rid : rid,
-					    	key : tn.attributes.key
-					    },
-					    dataType : "jsonp",//jsonp数据类型 
-					    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
-					    success : function(data){ 
-							if(data.success){
-							}
-					    }, 
-					    error:function(xhr){ 
-					        var rt = JSON.parse(xhr.responseText);
-					        if(rt.success){
-								$('#menuTxtReply').val(rt.other.text);					
-							}
-					    } 
-					}); 
+
 				}else if(typeof tn.attributes.type == "undefined"){
 //					Ext.getCmp('contentPanel').removeAll();
 					Ext.getCmp('contentPanel').add(northPanel);
 					Ext.getCmp('contentPanel').doLayout();
 				}else{
-					var tab = tabs.getComponent("tab_click");
+					var tab = tabs.getComponent("tab_system");
 					tabs.setActiveTab(tab);
+					
+					$('input[name="systemSet"]').each(function(){
+						if(this.value == tn.attributes.key){
+							$(this).attr("checked","checked");
+						}
+					});
 				}
 				
 			},
@@ -524,6 +658,104 @@ Ext.onReady(function(){
 	tree.setRootNode(root); */
 	
 	
+	var menu_uploadMask = new Ext.LoadMask(document.body, {
+		msg : '正在上传图片...'
+	});
+	var p_box = new Ext.BoxComponent({
+		xtype : 'box',
+ 	    height : 200,
+ 	    width : 300,
+ 	    style : 'marginRight:5px;',
+ 	    autoEl : {
+ 	    	tag : 'img',
+ 	    	title : '图片预览'
+ 	    }
+	});
+
+	var btnUpload = new Ext.Button({
+		hidden : true,
+        text : '上传图片',
+        listeners : {
+        	render : function(thiz){
+        		thiz.getEl().setWidth(60, true);
+        	}
+        },
+        handler : function(e){
+        	var check = true, img = '';
+        	if(Ext.isIE){
+        		Ext.getDom(imgFile.getId()).select();
+        		img = document.selection.createRange().text;
+        	}else{
+ 	        	img = Ext.getDom(imgFile.getId()).value;
+        	}
+        	if(typeof(img) != 'undefined' && img.length > 0){
+	 	        var type = img.substring(img.lastIndexOf('.') + 1, img.length);
+	 	        check = false;
+	 	        for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
+	 	        	if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
+	 	        		check = true;
+		 	           	break;
+		 	        }
+	 	        }
+	 	        if(!check){
+		 	       	Ext.example.msg('提示', '图片类型不正确.');
+		 	        return;
+ 	        	}
+        	}else{
+        		Ext.example.msg('提示', '未选择图片.');
+ 	        	return;
+        	}
+        	menu_uploadMask.show();
+        	Ext.Ajax.request({
+        		url : '../../OperateImage.do?dataSource=upload&ossType=10',
+ 	   			isUpload : true,
+ 	   			form : form.getForm().getEl(),
+ 	   			success : function(response, options){
+ 	   				menu_uploadMask.hide();
+ 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
+ 	   				if(jr.success){
+// 	   					Ext.ux.showMsg(jr);
+	  	   				var ossImage = jr.root[0];
+	  	   				p_box.image = ossImage.image;
+	  	   				p_box.ossId = ossImage.imageId;	   				
+ 	   				}else{
+ 	   					Ext.ux.showMsg(jr);
+ 	   					Ext.getCmp('couponTypeBox').setImg();
+ 	   				}
+
+ 	   				
+ 	   			},
+ 	   			failure : function(response, options){
+ 	   				menu_uploadMask.hide();
+ 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+ 	   			}
+        	});
+        }
+	});	
+	
+	var imgFile = Ext.ux.plugins.createImageFile({
+		id : 'replyBox',
+		img : p_box,
+		width : 300,
+		height : 200,
+		callback : function(){
+			btnUpload.handler();
+		}
+	});		
+	
+	var form = new Ext.form.FormPanel({
+		labelWidth : 60,
+		fileUpload : true,
+		items : [imgFile],
+		listeners : {
+	    	render : function(e){
+	    		Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+ 	  		}
+	    }
+	});			
+	
+	
+	
  	tabs = new Ext.TabPanel({
  	    region:'center',
  	    deferredRender:false,
@@ -543,14 +775,123 @@ Ext.onReady(function(){
  	    	contentEl : 'urlReplyBox',
  	    	title:'连接'
  	    },{
- 	        contentEl:'textAndPicReplyBox',
+ 	    	id : 'tab_image_text',
  	        title: '图文', 
- 	        //iconCls : 'tab_home'
+			layout : 'form',
+			width : 270,
+			frame : true,
+			items : [{
+				xtype : 'fieldset',
+				title : '单图文',
+				autoHeight : true,
+				labelWidth : 40,
+				defaults : {
+					width : 250
+				},
+				width : 360,
+				items : [ {
+					xtype : 'textfield',
+					id : 'itemTitle',
+					fieldLabel : '标题',
+					value : '标题',
+					allowBlank : false
+				}, {
+					xtype : 'panel',
+					width : 320,
+					layout : 'column',
+					style : 'marginLeft:18px;',
+					frame : true,
+					items : [p_box, form,{
+							items : [{
+								xtype : 'label',
+								html : '&nbsp;&nbsp;'
+							}]						
+						},{
+							items : [{
+								xtype : 'label',
+								style : 'width : 130px;',
+								html : '<sapn style="font-size:13px;color:green;font-weight:bold">图片大小不能超过100K</span>'
+							}]							
+						},btnUpload],
+					listeners : {
+		 	    		render : function(e){
+		 	    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+			 	  		}
+		 	    	}	
+				},{
+					xtype : 'textfield',
+					id : 'itemContent',
+					fieldLabel : '内容',
+					value : '内容',
+					style : 'margin-top:5px'
+				}, {
+					xtype : 'textarea',
+					id : 'itemUrl',
+					value : 'www.baidu.com',
+					fieldLabel : '链接'
+				}]  				
+			}, {
+				xtype : 'button',
+				text : '保存',
+				width : 100,
+				height : 20,
+				handler : function(){
+					var tn = Ext.ux.getSelNode(tree);
+					if(!tn){
+						Ext.example.msg('提示', '操作失败, 请选中一个菜单再进行操作.');
+						return;
+					}		
+					if(!$('#itemTitle').val() || !$('#itemContent').val() || !$('#itemUrl').val() || !p_box.ossId){
+						Ext.example.msg('提示', '请输入内容');
+						return ;
+					}
+					
+					var dataSource = "insertImageText";
+					if(tn.attributes.key && !isNaN(tn.attributes.key)){
+						dataSource = "updateImageText";
+					}	
+					
+					
+					$.ajax({ 
+					    type : "post", 
+					    async:false, 
+					    url : basePath+"/wx-term/WXOperateMenu.do",
+					    data : {
+					    	dataSource : dataSource,
+					    	rid : rid,
+					    	key : tn.attributes.key,
+					    	title : $("#itemTitle").val(),
+					    	image : p_box.ossId,
+					    	content : $("#itemContent").val(),
+					    	url : $("#itemUrl").val()
+					    },
+					    dataType : "jsonp",//jsonp数据类型 
+					    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+					    success : function(data){ 
+							if(data.success){
+							}
+					    }, 
+					    error:function(xhr){ 
+					        var rt = JSON.parse(xhr.responseText);
+					        if(rt.success){
+					        	Ext.example.msg('提示', rt.msg);
+					        	if(dataSource == "insertImageText"){
+					        		tn.attributes.type = "click";
+					        		tn.attributes.key = rt.other.key;
+					        	}
+							}
+					    } 
+					}); 
+				}
+			}]	        
+ 	    },{
+ 	    	id : 'tab_system',
+ 	    	contentEl : 'systemReplyBox',
+ 	    	title:'系统保留'
  	    }],
  	    listeners : {
  	    	tabchange : function(){
  	    		nodey = 0;
-// 	    		page_tipHide();
  	    	}
  	    },
  	    plugins: new Ext.ux.TabCloseMenu()
