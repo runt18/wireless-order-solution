@@ -205,9 +205,7 @@ public class BookDao {
 																											.setCustomNum(book.getAmount() / nBookOrder)
 																											.setComment(book.getMember() + "预订"), 
 																						 PrintOption.DO_PRINT));
-				if(resp.header.type == Type.ACK){
-					
-				}else if(resp.header.type == Type.NAK){
+				if(resp.header.type == Type.NAK){
 					throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 				}
 			}catch(IOException e){

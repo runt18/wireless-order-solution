@@ -38,6 +38,11 @@ public class OssImageDao {
 			return this;
 		}
 		
+		public ExtraCond setType(OssImage.Type type){
+			this.type = type;
+			return this;
+		}
+		
 		public ExtraCond setAssociated(OssImage.Type type, int associatedId){
 			this.type = type;
 			this.associatedId = associatedId;

@@ -1,5 +1,6 @@
 package com.wireless.db.orderMgr;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,13 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.serviceRate.ServicePlanDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.ErrorCode;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.StaffError;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqInsertOrder;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.crMgr.CancelReason;
@@ -28,6 +34,7 @@ import com.wireless.pojo.dishesOrder.Order.Category;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.member.Member;
@@ -44,6 +51,7 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.weixin.order.WxOrder;
+import com.wireless.sccon.ServerConnector;
 
 public class OrderDao {
 
@@ -1091,6 +1099,68 @@ public class OrderDao {
 			return order.getId();
 		}else{
 			throw new BusinessException("【" + order.getDestTbl().getName() + "】的账单已有操作，不能撤台", FrontBusinessError.ORDER_CANCEL_FAIL);
+		}
+	}
+	
+	/**
+	 * Perform the order multi insert action to specific builder {@link Order#InsertMultiBuilder}. 
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the multi insert builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>any table is busy
+	 * 			<li>lack of order
+	 */
+	public static void insertMulti(Staff staff, Order.InsertMultiBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			insertMulti(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform the order multi insert action to specific builder {@link Order#InsertMultiBuilder}. 
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the multi insert builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>any table is busy
+	 * 			<li>lack of order
+	 */
+	public static void insertMulti(DBCon dbCon, Staff staff, Order.InsertMultiBuilder builder) throws SQLException, BusinessException{
+		for(Order.InsertBuilder orderBuilder : builder.getBuilders()){
+			Table tbl = TableDao.getById(dbCon, staff, orderBuilder.build().getDestTbl().getId());
+			if(tbl.isBusy()){
+				throw new BusinessException("餐台【" + tbl.getName() + "】是就餐状态，不能入席", FrontBusinessError.INSERT_MULTI_FAIL);
+			}
+		}
+		
+		final int nOrder = builder.getBuilders().size();
+		if(nOrder == 0){
+			throw new BusinessException("缺少账单信息，不能多台入席");
+		}
+		for(Order.InsertBuilder orderBuilder : builder.getBuilders()){
+			try{
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, orderBuilder.setForce(true), PrintOption.DO_PRINT));
+				if(resp.header.type == Type.NAK){
+					throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+				}
+			}catch(IOException e){
+				throw new BusinessException(e.getMessage());
+			}
 		}
 	}
 	

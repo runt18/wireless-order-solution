@@ -240,7 +240,7 @@ public class WxMenuActionDao {
 			if(oriAction.getMsgType() == MsgType.MSG_TYPE_IMAGE_TEXT){
 				Msg oriMsg = new WxMenuAction.MsgProxy(oriAction).toMsg();
 				for(Data4Item item : ((Msg4ImageText)oriMsg).getItems()){
-					for(OssImage image4Item : OssImageDao.getByCond(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_ACTION_IMAGE, 1))){
+					for(OssImage image4Item : OssImageDao.getByCond(dbCon, staff, new OssImageDao.ExtraCond().setType(OssImage.Type.WX_ACTION_IMAGE))){
 						if(image4Item.getObjectUrl().equals(item.getPicUrl())){
 							OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(image4Item.getId()));
 							break;
@@ -400,7 +400,7 @@ public class WxMenuActionDao {
 			try {
 				if(menuAction.getMsgType() == MsgType.MSG_TYPE_IMAGE_TEXT){
 					for(Data4Item item : ((Msg4ImageText)new WxMenuAction.MsgProxy(menuAction).toMsg()).getItems()){
-						for(OssImage image4Item : OssImageDao.getByCond(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_ACTION_IMAGE, 1))){
+						for(OssImage image4Item : OssImageDao.getByCond(dbCon, staff, new OssImageDao.ExtraCond().setType(OssImage.Type.WX_ACTION_IMAGE))){
 							if(image4Item.getObjectUrl().equals(item.getPicUrl())){
 								OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(image4Item.getId()));
 								break;
