@@ -74,12 +74,29 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	private final String WEIXIN_DIANPING_ICON;
 	private final String WEIXIN_DEFAULT_LOGO;
 	
-	public final static String NAVI_EVENT_KEY = "navi_event_key";
-	public final static String PROMOTION_EVENT_KEY = "promotion_event_key";
-	public final static String MEMBER_EVENT_KEY = "member_event_key";
-	public final static String ORDER_EVENT_KEY = "order_event_key";
-	public final static String SCAN_EVENT_KEY = "scan_event_key";
-	
+	public static enum EventKey{
+		NAVI_EVENT_KEY("navi_event_key", "餐厅导航"),
+		PROMOTION_EVENT_KEY("promotion_event_key", "优惠活动"),
+		MEMBER_EVENT_KEY("member_event_key", "我的会员卡"),
+		ORDER_EVENT_KEY("order_event_key", "我的订单"),
+		SCAN_EVENT_KEY("scan_event_key", "扫一扫");
+		
+		EventKey(String val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		private final String val;
+		private final String desc;
+		
+		public String getKey(){
+			return this.val;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
 	
 	public WeiXinHandleMessage(WxSession session, String root){
 		super(session);
@@ -172,11 +189,11 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		item4Order.setPicUrl(WEIXIN_FOOD_ICON);
 		naviItem.addItem(item4Order);
 		
-		Data4Item item4Book = new Data4Item();
-		item4Book.setTitle("预订");
-		item4Book.setUrl(createUrl(msg, WEIXIN_BOOK));
-		item4Book.setPicUrl(WEIXIN_BOOK_ICON);
-		naviItem.addItem(item4Book);		
+//		Data4Item item4Book = new Data4Item();
+//		item4Book.setTitle("预订");
+//		item4Book.setUrl(createUrl(msg, WEIXIN_BOOK));
+//		item4Book.setPicUrl(WEIXIN_BOOK_ICON);
+//		naviItem.addItem(item4Book);		
 		
 		Data4Item specialFoodItem = new Data4Item();
 		specialFoodItem.setTitle("特色菜品");
@@ -253,11 +270,11 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 				
 			}else if(msg.getEvent() == Event.CLICK){
 
-				if(msg.getEventKey().equals(NAVI_EVENT_KEY)){
+				if(msg.getEventKey().equals(EventKey.NAVI_EVENT_KEY.val)){
 					//餐厅导航
 					session.callback(createNavi(msg));
 					
-				}else if(msg.getEventKey().equals(PROMOTION_EVENT_KEY)){
+				}else if(msg.getEventKey().equals(EventKey.PROMOTION_EVENT_KEY.val)){
 					//最新优惠
 					int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 					
@@ -368,7 +385,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 						session.callback(couponItem);
 					}
 					
-				}else if(msg.getEventKey().equals(MEMBER_EVENT_KEY)){
+				}else if(msg.getEventKey().equals(EventKey.MEMBER_EVENT_KEY.val)){
 					//会员信息
 					try{
 						Member member = MemberDao.getByWxSerial(StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())), msg.getFromUserName());
@@ -388,7 +405,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 						session.callback(new Msg4ImageText(msg).addItem(new Data4Item(e.getMessage(), "", "", "")));
 					}
 						
-				}else if(msg.getEventKey().equals(ORDER_EVENT_KEY)){
+				}else if(msg.getEventKey().equals(EventKey.ORDER_EVENT_KEY.val)){
 					int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 					
 					Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
@@ -406,7 +423,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("暂无订单", description, "", createUrl(msg, WEIXIN_FOOD))));
 					}
 					
-				}else if(msg.getEventKey().equals(SCAN_EVENT_KEY)){
+				}else if(msg.getEventKey().equals(EventKey.SCAN_EVENT_KEY.val)){
 					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("点击此处开始扫描", "点我扫描支付二维码", "", createUrl(msg, WEIXIN_SCANNING))));
 					
 				}else{
@@ -417,7 +434,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 				}
 				
 			}else if(msg.getEvent() == Event.SCAN_WAIT_MSG){
-				if(msg.getEventKey().equals(SCAN_EVENT_KEY)){
+				if(msg.getEventKey().equals(EventKey.SCAN_EVENT_KEY.val)){
 					Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
 					Member member = MemberDao.getById(staff, WxMemberDao.getBySerial(staff, msg.getFromUserName()).getMemberId());
 					int orderId = Integer.parseInt(msg.getScanResult().substring(msg.getScanResult().indexOf("?") + 1));

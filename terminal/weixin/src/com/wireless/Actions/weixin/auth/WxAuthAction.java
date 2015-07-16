@@ -77,13 +77,13 @@ public class WxAuthAction extends Action {
 			//Make the menu.
 			Menu menu = new Menu();
 			Menu.delete(Token.newInstance(authorizerToken));
-			menu.set1stButton(new Button.ClickBuilder("餐厅导航", WeiXinHandleMessage.NAVI_EVENT_KEY).build());
-			menu.set2ndButton(new Button.ScanMsgBuilder("扫一扫", WeiXinHandleMessage.SCAN_EVENT_KEY).build());
+			menu.set1stButton(new Button.ClickBuilder("餐厅导航", WeiXinHandleMessage.EventKey.NAVI_EVENT_KEY.getKey()).build());
+			menu.set2ndButton(new Button.ScanMsgBuilder("扫一扫", WeiXinHandleMessage.EventKey.SCAN_EVENT_KEY.getKey()).build());
 			
 			menu.set3rdButton(new Button.ClickBuilder("我的", "AAA")
-							.addChild(new Button.ClickBuilder("优惠活动", WeiXinHandleMessage.PROMOTION_EVENT_KEY))
-							.addChild(new Button.ClickBuilder("我的订单", WeiXinHandleMessage.ORDER_EVENT_KEY))
-							.addChild(new Button.ClickBuilder("我的会员卡", WeiXinHandleMessage.MEMBER_EVENT_KEY))
+							.addChild(new Button.ClickBuilder("优惠活动", WeiXinHandleMessage.EventKey.PROMOTION_EVENT_KEY.getKey()))
+							.addChild(new Button.ClickBuilder("我的订单", WeiXinHandleMessage.EventKey.ORDER_EVENT_KEY.getKey()))
+							.addChild(new Button.ClickBuilder("我的会员卡", WeiXinHandleMessage.EventKey.MEMBER_EVENT_KEY.getKey()))
 							//.addChild(new Button.ClickBuilder("我的大转盘", WeiXinHandleMessage.ZHUAN_EVENT_KEY))
 							.build());
 			if(menu.create(Token.newInstance(authorizerToken)).isOk()){
