@@ -2,6 +2,8 @@ package com.wireless.Actions.weixin.operate;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,10 +16,15 @@ import org.marker.weixin.api.Menu;
 import org.marker.weixin.api.Token;
 import org.marker.weixin.auth.AuthParam;
 import org.marker.weixin.auth.AuthorizerToken;
+import org.marker.weixin.msg.Data4Item;
 import org.marker.weixin.msg.Msg;
 import org.marker.weixin.msg.Msg4Head.MsgType;
+import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 
+import com.wireless.Actions.weixin.WeiXinHandleMessage;
+import com.wireless.Actions.weixin.WeiXinHandleMessage.EventKey;
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.menuAction.WxMenuAction;
 import com.wireless.db.weixin.menuAction.WxMenuActionDao;
@@ -26,6 +33,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
@@ -49,7 +57,7 @@ public class WXOperateMenuAction extends DispatchAction {
 			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
 			WxMenuAction.InsertBuilder4Text insert4Text = new WxMenuAction.InsertBuilder4Text(text);
 			final int actionId = WxMenuActionDao.insert(staff, insert4Text);
-			
+			jobject.initTip(true, "添加成功");
 			jobject.setExtra(new Jsonable() {
 				
 				@Override
@@ -80,6 +88,94 @@ public class WXOperateMenuAction extends DispatchAction {
 		return null;
 	}
 	
+	/**
+	 * 修改文字
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward updateMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String text = request.getParameter("text");
+		String rid = request.getParameter("rid");
+		String key = request.getParameter("key");
+		JObject jobject = new JObject(); 
+		
+		try{
+			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			WxMenuAction.UpdateBuilder4Text update4Text = new WxMenuAction.UpdateBuilder4Text(Integer.parseInt(key), text);
+			WxMenuActionDao.update(staff, update4Text);
+			jobject.initTip(true, "修改成功");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}	
+	
+	/**
+	 * 保存单图文信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward insertImageText(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String title = request.getParameter("title");
+		String image = request.getParameter("image");
+		String content = request.getParameter("content");
+		String url = request.getParameter("url");
+		String rid = request.getParameter("rid");
+		JObject jobject = new JObject(); 
+		
+		try{
+			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			OssImage ossImage = OssImageDao.getById(staff, Integer.parseInt(image));
+			WxMenuAction.InsertBuilder4ImageText insert4ImageText = new WxMenuAction.InsertBuilder4ImageText(new Data4Item(title, content, ossImage.getObjectUrl(), url));
+			final int actionId = WxMenuActionDao.insert(staff, insert4ImageText);
+			jobject.initTip(true, "添加成功");
+			jobject.setExtra(new Jsonable() {
+				
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putInt("key", actionId);
+					return jm;
+				}
+				
+				@Override
+				public void fromJsonMap(JsonMap jm, int flag) {
+					
+				}
+			});
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}	
 
 	/**
 	 * 获取微信菜单
@@ -92,12 +188,13 @@ public class WXOperateMenuAction extends DispatchAction {
 	 */
 	public ActionForward weixinMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject(); 
-		int rid = Integer.parseInt(request.getParameter("rid"));
 		
 //		String appId = "wx49b3278a8728ff76";
 //		String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
 //		System.out.println(Menu.newInstance(Token.newInstance(appId, appSecret)));
+//		jobject.setRoot(Menu.newInstance(Token.newInstance(appId, appSecret)));
 		
+		int rid = Integer.parseInt(request.getParameter("rid"));
 		WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(rid));
 		AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
 		jobject.setRoot(Menu.newInstance(Token.newInstance(authorizerToken)));
@@ -139,6 +236,15 @@ public class WXOperateMenuAction extends DispatchAction {
 		return null;
 	}	
 	
+	/**
+	 * 根据key获取回复内容
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward menuReply(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String key = request.getParameter("key");
 		String rid = request.getParameter("rid");
@@ -166,6 +272,8 @@ public class WXOperateMenuAction extends DispatchAction {
 						
 					}
 				});
+			}else if(msg.getHead().getMsgType() == MsgType.MSG_TYPE_IMAGE_TEXT){
+				jobject.setRoot(((Msg4ImageText)msg).getItems());
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -176,6 +284,45 @@ public class WXOperateMenuAction extends DispatchAction {
 
 		return null;
 	}	
+	
+	/**
+	 * 获取系统保留的menu选项
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward systemMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jobject = new JObject(); 
+
+		List<Jsonable> list = new ArrayList<>();
+		for(final EventKey key : WeiXinHandleMessage.EventKey.values()){
+			Jsonable j = new Jsonable() {
+				
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("key", key.getKey());
+					jm.putString("desc", key.toString());
+					return jm;
+				}
+				
+				@Override
+				public void fromJsonMap(JsonMap jm, int flag) {
+					
+				}
+			};	
+			
+			list.add(j);
+		}
+		jobject.setRoot(list);
+		
+		response.getWriter().print(jobject.toString());
+		
+		return null;
+	}
 	
 
 	public static void main(String[] args) throws IOException{
