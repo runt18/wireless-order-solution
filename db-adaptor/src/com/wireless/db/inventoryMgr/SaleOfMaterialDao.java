@@ -24,7 +24,7 @@ public class SaleOfMaterialDao {
 	public static List<SaleOfMaterial> saleOfMaterialList(DBCon dbCon, Staff staff, int materialId, String extraCond, String orderClause) throws SQLException{
 		List<SaleOfMaterial> saleOfMaterials = new ArrayList<SaleOfMaterial>();
 		String sql = "SELECT TMP.food_id, TMP.food_name, TMP.total, TMP.rate, (TMP.rate * TMP.total) consume FROM (" +
-					" SELECT (SELECT ROUND(((SELECT cONsumptiON FROM food_material S_FM WHERE S_FM.food_id = FM.food_id and S_FM.material_id = " + materialId +")/sum(cONsumptiON)), 2) FROM food_material S_FM WHERE S_FM.food_id = FM.food_id) " +
+					" SELECT (SELECT cONsumptiON FROM food_material S_FM WHERE S_FM.food_id = FM.food_id and S_FM.material_id = " + materialId +") " +
 					" AS rate, FM.food_id, F.name food_name, SUM(OF.order_count) total "+
 					" FROM food_material FM " +
 					" JOIN food F ON F.food_id = FM.food_id " +

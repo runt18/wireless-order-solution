@@ -12,7 +12,6 @@ import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.pojo.util.DateUtil.Pattern;
 
 public class StockInitDao {
 	public static class ExtraCond{
@@ -255,7 +254,7 @@ public class StockInitDao {
 		sql = " INSERT INTO " + Params.dbName + ".stock_init " +
 				  " ( restaurant_id, init_date ) VALUES( " +
 				  staff.getRestaurantId() + "," +
-				  "'" + DateUtil.format(System.currentTimeMillis(), Pattern.DATE) + "'" +
+				  "'" + DateUtil.format(System.currentTimeMillis()) + "'" +
 				  ")";
 			
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
