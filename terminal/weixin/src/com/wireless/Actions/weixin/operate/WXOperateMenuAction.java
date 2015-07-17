@@ -182,6 +182,44 @@ public class WXOperateMenuAction extends DispatchAction {
 		
 		return null;
 	}	
+	
+	
+	public ActionForward updateImageText(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String title = request.getParameter("title");
+		String image = request.getParameter("image");
+		String content = request.getParameter("content");
+		String url = request.getParameter("url");
+		String key = request.getParameter("key");
+		String rid = request.getParameter("rid");
+		JObject jobject = new JObject(); 
+		
+		try{
+			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			WxMenuAction.UpdateBuilder4ImageText update4ImageText;
+			if(image != null && !image.isEmpty()){
+				OssImage ossImage = OssImageDao.getById(staff, Integer.parseInt(image));
+				update4ImageText = new WxMenuAction.UpdateBuilder4ImageText(Integer.parseInt(key), new Data4Item(title, content, ossImage.getObjectUrl(), url));				
+			}else{
+				update4ImageText = new WxMenuAction.UpdateBuilder4ImageText(Integer.parseInt(key), new Data4Item(title, content, "", url));	
+			}
+
+			WxMenuActionDao.update(staff, update4ImageText);
+			jobject.initTip(true, "修改成功");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}		
 
 	/**
 	 * 获取微信菜单
