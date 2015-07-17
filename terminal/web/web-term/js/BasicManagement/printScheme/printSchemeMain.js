@@ -594,6 +594,22 @@ function init(){
 						}
 					}]
 					
+				},{
+					items : [{
+						xtype : 'radio',
+						name : 'pType',
+						inputValue : 16,
+						hideLabel : true,
+						boxLabel : '转菜',
+						listeners : {
+							check  : function(thiz, checked){
+								if(checked){
+									showPanel(thiz.inputValue);
+								}
+							}
+						}
+					}]
+					
 				}]
 			},{
 				layout : 'column',
@@ -1081,6 +1097,9 @@ function showPanel(v){
 			Ext.getCmp('printCommentPanel').hide();
 		}else if(v == 9){//催菜
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E5%82%AC%E8%8F%9C.jpg)';
+			Ext.getCmp('printCommentPanel').hide();			
+		}else if(v == 16){//转菜
+			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/transferFood2.jpg)';
 			Ext.getCmp('printCommentPanel').hide();			
 		}
 	}
