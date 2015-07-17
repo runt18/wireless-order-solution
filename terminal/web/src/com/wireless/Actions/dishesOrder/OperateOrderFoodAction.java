@@ -222,4 +222,45 @@ public class OperateOrderFoodAction extends DispatchAction{
 		return null;
 	}	
 	
+	/**
+	 * 多台开席
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward multiOpenTable(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String multiTableOrderFoodsString = request.getParameter("multiTableOrderFoods");
+		String pin = (String) request.getAttribute("pin");
+		
+		JObject jobject = new JObject();
+		try {
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			String[] multiTableOrderFoods = multiTableOrderFoodsString.split("<li>");
+			
+			Order.InsertMultiBuilder builder = new Order.InsertMultiBuilder();
+			for (int i = 0; i < multiTableOrderFoods.length; i++) {
+				Order.InsertBuilder insertBuilder = JObject.parse(Order.InsertBuilder.JSON_CREATOR, 0, multiTableOrderFoods[i]);
+				builder.add(insertBuilder);
+			}
+			OrderDao.insertMulti(staff, builder);
+			
+			jobject.initTip(true, "多台开席成功");
+		}catch(BusinessException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}catch(Exception e){
+			jobject.initTip4Exception(e);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}		
+		return null;
+	}	
+	
+	
 }
