@@ -206,26 +206,27 @@ of.toOrderFoodPage = function(table){
 		$('#btnOrderAndPay').show();
 		$('#addBookOrderFood').hide();
 		$('#bookSeatOrderFood').hide();
+		$('#multiOpenTable').hide();
 	}else if(of.orderFoodOperateType == 'bookSeat'){
 		$('#bookSeatOrderFood').show();
 		$('#addBookOrderFood').hide();
 		$('#btnOrderAndPay').hide();
 		$('#normalOrderFood').hide();		
+		$('#multiOpenTable').hide();		
 	}else if(of.orderFoodOperateType == 'addBook'){
 		$('#addBookOrderFood').show();
 		$('#bookSeatOrderFood').hide();
 		$('#normalOrderFood').hide();
-		$('#btnOrderAndPay').hide();		
-	}
-	
-	if(of.orderFoodOperateType == 'normal'){
+		$('#btnOrderAndPay').hide();	
+		$('#multiOpenTable').hide();
+	}else if(of.orderFoodOperateType == 'multiOpenTable'){
+		$('#multiOpenTable').show();
 		$('#addBookOrderFood').hide();
 		$('#bookSeatOrderFood').hide();
-	}else if(of.orderFoodOperateType == 'addBook'){
-		
-	}else if(of.orderFoodOperateType == 'bookSeat'){
-		
+		$('#normalOrderFood').hide();
+		$('#btnOrderAndPay').hide();	
 	}
+	
 	
 	//渲染数据
 	of.initDeptContent();

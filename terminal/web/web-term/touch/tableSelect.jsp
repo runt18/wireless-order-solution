@@ -135,10 +135,39 @@
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.openApartTable()">拆台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.transTableForTS()">转台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.stopSellMgr()">沽清</a>
+			<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#tableSelectOtherOperateCmp" onclick="">更多</a>
 			<a href="javascript: ts.tp.getPreviousPage()" data-role="button" data-inline="true" class="bottomBtnFont">上一页</a>
 			<a href="javascript: ts.tp.getNextPage()" data-role="button" data-inline="true" class="bottomBtnFont">下一页</a>		 
 		 </div>
 	</div>
+
+	 <!-- 餐台更多操作 -->
+	<div data-role="popup" id="tableSelectOtherOperateCmp" data-theme="d">
+        <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+            <li class="tempFoodKitchen" onclick="ts.openMultiOpenTableCmp()"><a >多台开席</a></li>
+        </ul>
+	</div>		
+	
+	<!-- 多台开席选台 -->
+	<div id="multiOpenTableCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: 100px 0px 0px -200px;width:550px;display: none;background-color: white;" align="center">
+	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
+	       	 多台开席选台
+        	<div style="float: right">
+  				<a onclick="ts.closeMultiOpenTableCmp()" data-role="button" data-corners="false" class="popupWinCloseBtn4Book">X</a>      		
+        	</div>		
+	    </div>
+	    
+	    <div data-role="content" id="multiOpenTableHadChoose" style="height:100px" align="left">
+	    
+   		</div>	    
+	    
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.openMultiOpenTable()">添加餐台</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.multiOpenTableOrderFood()">确定</a>		 
+			 </div>
+	    </div>	    	    
+	</div>		
 	
 	
 	<!-- 输入餐台人数 -->
@@ -1524,6 +1553,7 @@
 			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="addBookOrderFood" onclick="ts.bookFoodChooseFinish()">选好了</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="bookSeatOrderFood" onclick="ts.bookTableCommitOrderFood()">入座</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="multiOpenTable" onclick="ts.multiOpenTableCommitOrderFood()">多台开席</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="normalOrderFood" onclick="of.submit({notPrint : false})">下单</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="btnOrderAndPay" onclick="of.orderAndPay()">下单并结账</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>

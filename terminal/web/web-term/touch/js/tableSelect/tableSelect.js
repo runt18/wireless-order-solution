@@ -41,7 +41,8 @@ var tables = [],
 		member : {},
 		searchTable : false,
 		commitTableOrTran : 'table',
-		bookChoosedTable : []
+		bookChoosedTable : [],
+		multiOpenTableChoosedTable : []
 	},
 	//登录操作包
 	ln={
@@ -1036,10 +1037,6 @@ ts.toOrderFoodOrTransFood = function(c){
 			ts.bookOperateTable.oldTables.push(table);
 		}
 
-		
-		
-
-		
 		//选台后关闭
 		uo.closeTransOrderFood();
 		//刷新入座餐台
@@ -1071,6 +1068,29 @@ ts.toOrderFoodOrTransFood = function(c){
 		
 		//选台后关闭
 		uo.closeTransOrderFood();
+	}else if(ts.commitTableOrTran == 'multiOpenTableChoose'){//多台开席选台
+		var table = null;
+			
+		for (var i = 0; i < ts.multiOpenTableChoosedTable.length; i++) {
+			if(ts.multiOpenTableChoosedTable[i].id == c.id){
+				table = true;
+				ts.multiOpenTableChoosedTable.splice(i, 1);
+				break;
+			}
+		}
+		
+		//选择餐台
+		if(table == null){
+			table = getTableById(c.id);
+			
+			ts.multiOpenTableChoosedTable.push(table);
+		}
+		//选台后关闭
+		uo.closeTransOrderFood();
+		//刷新已点餐台
+		ts.loadBookChoosedTable({renderTo : 'multiOpenTableHadChoose', tables:ts.multiOpenTableChoosedTable});	
+
+		
 	}
 }
 
@@ -3951,11 +3971,115 @@ ts.checkBookTable = function(){
 	}	
 	ts.bookListEntry();
 }
+//==============end 预订
 
+//=================多台开席start
 
+/**
+ * 打开多台开席
+ */
+ts.openMultiOpenTableCmp = function(){
+	//初始化选择餐台
+	ts.multiOpenTableChoosedTable.length = 0;
+	//关闭更多
+	$('#tableSelectOtherOperateCmp').popup('close');
+	setTimeout(function(){
+		$('#multiOpenTableCmp').show();
+		$('#shadowForPopup').show();
+	}, 250);
+}
 
+/**
+ * 关闭预订入座
+ */
+ts.closeMultiOpenTableCmp = function(){
+	$('#multiOpenTableCmp').hide();
+	$('#shadowForPopup').hide();
+	$('#multiOpenTableHadChoose').html('');
+}
 
+/**
+ * 设置多台开席入座选台
+ */
+ts.openMultiOpenTable = function(){
+	//隐藏数量输入
+	$('#td4TxtFoodNumForTran').hide();
+	
+	ts.commitTableOrTran = 'multiOpenTableChoose';
+	
+	$("#txtTableNumForTS").val("");
+	$("#txtTableComment").val("");
+	
+	$('#transSomethingTitle').html("请输入桌号，确认添加");
+	
+	//打开控件
+	uo.openTransOrderFood();		
+}
 
+/**
+ * 多台点菜
+ */
+ts.multiOpenTableOrderFood = function(){
+
+	if(ts.multiOpenTableChoosedTable.length == 0){
+		Util.msg.tip("请选择餐台");
+		return;
+	}
+	
+	setTimeout(function(){
+		//关闭选台
+		ts.closeMultiOpenTableCmp();				
+	}, 500);
+
+	//进入点菜界面
+	of.entry({
+		table : ts.multiOpenTableChoosedTable[0],
+		comment : '',
+		orderFoodOperateType : 'multiOpenTable'
+	});	
+}
+/**
+ * 多台开席落单
+ */
+ts.multiOpenTableCommitOrderFood = function(){
+	
+	if(of.newFood.length == 0){
+		Util.msg.alert({
+			msg : "请选择菜品",
+			renderTo : 'orderFoodMgr'
+		});		
+		return ;
+	}
+	
+	var orderFoods = [];
+	for (var i = 0; i < ts.multiOpenTableChoosedTable.length; i++) {
+		orderDataModel.tableID = ts.multiOpenTableChoosedTable[i].id;
+		orderDataModel.orderFoods = of.newFood.slice(0);
+		orderDataModel.categoryValue =  ts.multiOpenTableChoosedTable[i].categoryValue;	
+		orderFoods.push(JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)));
+	}
+	
+	Util.LM.show();
+	$.post('../OperateOrderFood.do', {
+		dataSource : 'multiOpenTable',
+		multiTableOrderFoods : orderFoods.join("<li>")
+	}, function(data){
+		Util.LM.hide();
+		if(data.success){
+			Util.msg.tip(data.msg);
+			//清空已选餐台
+			ts.multiOpenTableChoosedTable.length = 0;
+			ts.loadData();
+		}else{
+			Util.msg.alert({
+				renderTo : 'orderFoodMgr',
+				msg : data.msg
+			});
+		}
+	}, 'json');
+}
+
+//===============end 多台开席
 
 
 /**

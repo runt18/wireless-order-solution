@@ -956,7 +956,7 @@ uo.closeTransOrderFood = function(){
 	}
 
 	//不设置预订默认操作
-	if(ts.commitTableOrTran != 'bookTableChoose' && ts.commitTableOrTran != 'addBookTableChoose'){
+	if(ts.commitTableOrTran != 'bookTableChoose' && ts.commitTableOrTran != 'addBookTableChoose' && ts.commitTableOrTran != 'multiOpenTableChoose'){
 		//操作设置为默认
 		ts.commitTableOrTran = 'table';
 	}
