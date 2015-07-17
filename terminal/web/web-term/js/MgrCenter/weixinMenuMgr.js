@@ -2,7 +2,7 @@
 
 var Request = new common_urlParaQuery();
 var rid = Request["rid"];
-//rid = 40;
+rid = 40;
 var basePath = "http://localhost:8080";
 
 
@@ -183,13 +183,46 @@ function operateDeptHandler(node){
 function deleteMenu(){
 //	var s = tree.getSelectionModel().getSelectedNode();
 //	tree.root.removeChild(s);
-	var node = Ext.ux.getSelNode(tree);
+	var tn = Ext.ux.getSelNode(tree);
 	Ext.Msg.confirm(
 		'提示',
-		'是否删除: ' + node.text,
+		'是否删除: ' + tn.text,
 		function(e){
 			if(e == 'yes'){
-				node.remove();
+				if(tn.attributes.key && !isNaN(tn.attributes.key)){
+					$.ajax({ 
+					    type : "post", 
+					    async:false, 
+					    url : basePath+"/wx-term/WXOperateMenu.do",
+					    data : {
+					    	dataSource : "deleteMenu",
+					    	rid : rid,
+					    	key : tn.attributes.key
+					    },
+					    dataType : "jsonp",//jsonp数据类型 
+					    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+					    success : function(data){ 
+							if(data.success){
+							}
+					    }, 
+					    error:function(xhr){ 
+					        var rt = JSON.parse(xhr.responseText);
+					        Ext.example.msg('提示', rt.msg);
+					    } 
+					}); 	
+				}
+				
+				tn.remove();
+				
+				$('#menuTxtReply').val("");			
+				$('#url4Menu').val("");	
+				
+				$('#itemTitle').val("");			
+				$('#itemContent').val("");	
+				$('#itemUrl').val("");			
+				delete p_box.ossId;	
+				imgFile.setImg("");
+				
 			}
 		}
 	);	
@@ -237,12 +270,12 @@ function operateMenuContent(){
 	    error:function(xhr){ 
 	        var rt = JSON.parse(xhr.responseText);
 	        if(rt.success){
-	        	Ext.example.msg('提示', rt.msg);
 	        	if(dataSource == "insertMenu"){
 	        		tn.attributes.type = "click";
 	        		tn.attributes.key = rt.other.key;
 	        	}
 			}
+	        Ext.example.msg('提示', rt.msg);
 	    } 
 	}); 
 	
@@ -473,9 +506,7 @@ Ext.onReady(function(){
 				    }, 
 				    error:function(xhr){ 
 				        var rt = JSON.parse(xhr.responseText);
-				        if(rt.success){
-				        	Ext.example.msg('提示', '发布成功');
-						}
+				        Ext.example.msg('提示', '发布成功');
 				    } 
 				}); 
 				
@@ -749,7 +780,7 @@ Ext.onReady(function(){
 		items : [imgFile],
 		listeners : {
 	    	render : function(e){
-	    		Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+	    		//Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
  	  		}
 	    }
 	});			
@@ -766,15 +797,6 @@ Ext.onReady(function(){
  	    minTabWidth: 115,
  	    //autoDestroy : false,
  	    items:[{
- 	    	id : "tab_click",
- 	        contentEl:'textReplyBox',
- 	        title: '文字', 
- 	        //iconCls : 'tab_home'
- 	    },{
- 	    	id : 'tab_view',
- 	    	contentEl : 'urlReplyBox',
- 	    	title:'连接'
- 	    },{
  	    	id : 'tab_image_text',
  	        title: '图文', 
 			layout : 'form',
@@ -841,7 +863,7 @@ Ext.onReady(function(){
 						Ext.example.msg('提示', '操作失败, 请选中一个菜单再进行操作.');
 						return;
 					}		
-					if(!$('#itemTitle').val() || !$('#itemContent').val() || !$('#itemUrl').val() || !p_box.ossId){
+					if(!$('#itemTitle').val() || !$('#itemContent').val() || !$('#itemUrl').val()){
 						Ext.example.msg('提示', '请输入内容');
 						return ;
 					}
@@ -861,7 +883,7 @@ Ext.onReady(function(){
 					    	rid : rid,
 					    	key : tn.attributes.key,
 					    	title : $("#itemTitle").val(),
-					    	image : p_box.ossId,
+					    	image : p_box.ossId ? p_box.ossId : "",
 					    	content : $("#itemContent").val(),
 					    	url : $("#itemUrl").val()
 					    },
@@ -874,16 +896,25 @@ Ext.onReady(function(){
 					    error:function(xhr){ 
 					        var rt = JSON.parse(xhr.responseText);
 					        if(rt.success){
-					        	Ext.example.msg('提示', rt.msg);
 					        	if(dataSource == "insertImageText"){
 					        		tn.attributes.type = "click";
 					        		tn.attributes.key = rt.other.key;
 					        	}
 							}
+					        Ext.example.msg('提示', rt.msg);
 					    } 
 					}); 
 				}
 			}]	        
+ 	    },{
+ 	    	id : "tab_click",
+ 	        contentEl:'textReplyBox',
+ 	        title: '文字', 
+ 	        //iconCls : 'tab_home'
+ 	    },{
+ 	    	id : 'tab_view',
+ 	    	contentEl : 'urlReplyBox',
+ 	    	title:'连接'
  	    },{
  	    	id : 'tab_system',
  	    	contentEl : 'systemReplyBox',
@@ -897,6 +928,8 @@ Ext.onReady(function(){
  	    plugins: new Ext.ux.TabCloseMenu()
  	    
  	});
+ 	
+ 	
  	
  	var centerPanel = new Ext.Panel({
  		id : 'contentPanel',
