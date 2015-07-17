@@ -173,6 +173,13 @@ public class OperatePrintFuncAction extends DispatchAction{
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, builder);
+			}else if(PType.valueOf(pType) ==PType.PRINT_TRANSFER_FOOD){
+				PrintFunc.Builder builder = Builder.newTransferFood(printerId);
+				for (String regionId : regions) {
+					builder.addRegion(new Region(Short.parseShort(regionId)));
+				}
+				builder.setRepeat(Integer.parseInt(repeat));
+				PrintFuncDao.addFunc(dbCon, staff, builder);
 			}
 		
 			jobject.initTip(true, "操作成功, 已添加方案");
@@ -311,6 +318,17 @@ public class OperatePrintFuncAction extends DispatchAction{
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}else if(PType.valueOf(pType) ==PType.PRINT_ALL_HURRIED_FOOD){
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, PType.valueOf(pType));
+				if(region.length == 0){
+					builder.setRegionAll();
+				}else{
+					for (String r : region) {
+						builder.addRegion(new Region(Short.parseShort(r)));
+					}
+				}
+				builder.setRepeat(Integer.parseInt(repeat));
+				PrintFuncDao.updateFunc(dbCon, staff, builder);
+			}else if(PType.valueOf(pType) ==PType.PRINT_TRANSFER_FOOD){
 				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, PType.valueOf(pType));
 				if(region.length == 0){
 					builder.setRegionAll();
