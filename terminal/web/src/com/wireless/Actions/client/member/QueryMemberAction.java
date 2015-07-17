@@ -195,17 +195,17 @@ public class QueryMemberAction extends DispatchAction {
 				}
 			}
 			
-			if(orderBy.equals("create")){
-				orderClause = " ORDER BY M.member_id ";
-			}else if(orderBy.equals("consumeMoney")){
-				orderClause = " ORDER BY M.total_consumption DESC ";
-			}else if(orderBy.equals("consumeAmount")){
-				orderClause = " ORDER BY M.consumption_amount DESC ";
-			}else if(orderBy.equals("point")){
-				orderClause = " ORDER BY M.total_point DESC ";
-			}
-			
-			
+			if(orderBy != null){
+				if(orderBy.equals("create")){
+					orderClause = " ORDER BY M.member_id ";
+				}else if(orderBy.equals("consumeMoney")){
+					orderClause = " ORDER BY M.total_consumption DESC ";
+				}else if(orderBy.equals("consumeAmount")){
+					orderClause = " ORDER BY M.consumption_amount DESC ";
+				}else if(orderBy.equals("point")){
+					orderClause = " ORDER BY M.total_point DESC ";
+				}
+			}			
 			
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
