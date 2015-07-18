@@ -1550,9 +1550,9 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 * @throws BusinessException
-	 *	 		throws if one of cases below occurred<br>
-	 *			1 - the consume price exceeds total balance to this member account<br>
-	 *			2 - the member account to consume is NOT found.
+	 *	 		throws if one of cases below occurred
+	 *			<li>the consume price exceeds total balance to this member account
+	 *			<li>the member account to consume is NOT found
 	 */
 	public static MemberOperation consume(DBCon dbCon, Staff staff, int memberId, float consumePrice, Coupon coupon, PayType payType, int orderId) throws SQLException, BusinessException{
 		
@@ -1620,12 +1620,9 @@ public class MemberDao {
 			dbCon.conn.commit();
 			return mo;
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
 			throw e;	
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1781,12 +1778,9 @@ public class MemberDao {
 			dbCon.conn.commit();
 			return mo;
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
 			throw e;	
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1886,12 +1880,9 @@ public class MemberDao {
 			dbCon.conn.commit();
 			return mo;
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
 			throw e;	
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1961,12 +1952,9 @@ public class MemberDao {
 			dbCon.conn.commit();
 			return mo;
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
 			throw e;	
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}

@@ -194,7 +194,7 @@ public class RoleDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int insert(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException{
+	public static int insert(DBCon dbCon, Staff staff, Role.InsertBuilder builder) throws SQLException{
 		String sql;
 		int roleId;
 		sql = "INSERT INTO " + Params.dbName + ".role(restaurant_id, name, type, cate) " +

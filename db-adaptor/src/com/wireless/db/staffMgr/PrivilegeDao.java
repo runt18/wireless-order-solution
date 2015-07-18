@@ -54,13 +54,13 @@ public class PrivilegeDao {
 	 */
 	public static List<Privilege> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
-		sql = " SELECT pri_id, pri_code, cate FROM " + Params.dbName + ".privilege" +
+		sql = " SELECT pri_id, pri_code FROM " + Params.dbName + ".privilege" +
 			  " WHERE 1 = 1 " +
 			  (extraCond != null ? extraCond : " ");
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
-		List<Privilege> result = new ArrayList<Privilege>();
+		final List<Privilege> result = new ArrayList<Privilege>();
 		while(dbCon.rs.next()){
 			final Privilege privilege;
 			if(dbCon.rs.getInt("pri_code") == Code.PRICE_PLAN.getVal()){

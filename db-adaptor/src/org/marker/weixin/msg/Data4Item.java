@@ -44,11 +44,18 @@ public class Data4Item implements Jsonable{
 	}
 
 	public String getUrl() {
+		if(this.url == null){
+			return "";
+		}
 		return this.url;
 	}
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public boolean hasUrl(){
+		return getUrl().length() != 0;
 	}
 	
 	@Override
