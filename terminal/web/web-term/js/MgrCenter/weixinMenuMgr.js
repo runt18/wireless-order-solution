@@ -202,8 +202,7 @@ function deleteMenu(){
 					    },
 					    dataType : "json",//jsonp数据类型 
 					    success : function(data){ 
-							if(data.success){
-							}
+					    	Ext.example.msg('提示', data.msg);
 					    }, 
 					    error:function(xhr){ 
 					        var rt = JSON.parse(xhr.responseText);
@@ -260,11 +259,14 @@ function operateMenuContent(){
 	    	text : $('#menuTxtReply').val()
 	    },
 	    dataType : "json",//jsonp数据类型 
-	    success : function(data){ 
-			if(data.success){
-				tn.attributes.type = "click";
-				tn.attributes.key = data.other.key;
+	    success : function(rt){ 
+	        if(rt.success){
+	        	if(dataSource == "insertMenu"){
+	        		tn.attributes.type = "click";
+	        		tn.attributes.key = rt.other.key;
+	        	}
 			}
+	        Ext.example.msg('提示', rt.msg);
 	    }, 
 	    error:function(xhr){ 
 	        var rt = JSON.parse(xhr.responseText);
@@ -324,27 +326,16 @@ function getWeixinMenu(){
 	$.ajax({ 
 	    type : "get", 
 //	    async:false, 
-	    url : basePath+"/wx-term/WXOperateMenu.do?dataSource=weixinMenu&rid="+rid,
-	    dataType : "jsonp",//jsonp数据类型
-	    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
-	    success : function(data){
+	    url : "../../OperateMenu.do?dataSource=weixinMenu&rid="+rid,
+	    dataType : "json",//jsonp数据类型
+	    success : function(rt){
 	    	weixinMenuLM.hide();
-			if(data.success){
-				console.log(data.root);
-			}
-	    }, 
-	    error:function(xhr){
-	    	weixinMenuLM.hide();
-	    	var rt = JSON.parse(xhr.responseText);
 	    	var root ={
 	 			text : 'root',
 	 			children : []
 	    	}
 	    	
 	    	var menu = rt.root[0];
-	    	
-	    	console.log("result:")
-	    	console.log(menu)
 	    	
 	    	for (var i = 0; i < menu.button.length; i++) {
 				var btn = {
@@ -375,9 +366,12 @@ function getWeixinMenu(){
 				root.children.push(btn);
 			}
 	    	
-	    	console.log(root)
 	    	tree.setRootNode(new Ext.tree.AsyncTreeNode(root));
-	    	
+	    }, 
+	    error:function(xhr){
+	    	weixinMenuLM.hide();
+	    	var rt = JSON.parse(xhr.responseText);
+	    	Ext.example.msg('提示',rt.msg);
 	    } 
 	}); 	
 }
@@ -614,12 +608,7 @@ Ext.onReady(function(){
 						    	key : tn.attributes.key
 						    },
 						    dataType : "json",//jsonp数据类型 
-						    success : function(data){ 
-								if(data.success){
-								}
-						    }, 
-						    error:function(xhr){ 
-						        var rt = JSON.parse(xhr.responseText);
+						    success : function(rt){ 
 						        if(rt.success){
 						        	if(rt.other){
 						        		$('#menuTxtReply').val(rt.other.text);
@@ -638,6 +627,10 @@ Ext.onReady(function(){
 										tabs.setActiveTab(tab);
 						        	}
 								}
+						    }, 
+						    error:function(xhr){ 
+						        var rt = JSON.parse(xhr.responseText);
+						        Ext.example.msg('提示', rt.msg);
 						    } 
 						}); 						
 					}
@@ -886,18 +879,17 @@ Ext.onReady(function(){
 					    	url : $("#itemUrl").val()
 					    },
 					    dataType : "json",//jsonp数据类型 
-					    success : function(data){ 
-							if(data.success){
-							}
-					    }, 
-					    error:function(xhr){ 
-					        var rt = JSON.parse(xhr.responseText);
+					    success : function(rt){ 
 					        if(rt.success){
 					        	if(dataSource == "insertImageText"){
 					        		tn.attributes.type = "click";
 					        		tn.attributes.key = rt.other.key;
 					        	}
 							}
+					        Ext.example.msg('提示', rt.msg);
+					    }, 
+					    error:function(xhr){ 
+					        var rt = JSON.parse(xhr.responseText);
 					        Ext.example.msg('提示', rt.msg);
 					    } 
 					}); 
