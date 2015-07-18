@@ -326,7 +326,8 @@ function getWeixinMenu(){
 	$.ajax({ 
 	    type : "get", 
 //	    async:false, 
-	    url : "../../OperateMenu.do?dataSource=weixinMenu&rid="+rid,
+	    url :  basePath+"/wx-term/WXOperateMenu.do?dataSource=weixinMenu&rid="+rid,
+	    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
 	    dataType : "json",//jsonp数据类型
 	    success : function(rt){
 	    	weixinMenuLM.hide();
@@ -371,7 +372,43 @@ function getWeixinMenu(){
 	    error:function(xhr){
 	    	weixinMenuLM.hide();
 	    	var rt = JSON.parse(xhr.responseText);
-	    	Ext.example.msg('提示',rt.msg);
+	    	var root ={
+	 			text : 'root',
+	 			children : []
+	    	}
+	    	
+	    	var menu = rt.root[0];
+	    	
+	    	for (var i = 0; i < menu.button.length; i++) {
+				var btn = {
+	 				text : menu.button[i].name,
+	 				type : menu.button[i].type,
+	 				m_type : 1,
+	 				key : menu.button[i].key,
+	 				cls:'floatBarStyle',
+	 				expanded:true,
+	 				expandable: true,
+	 				children : []
+	 			}
+				if(menu.button[i].sub_button && menu.button[i].sub_button.length > 0){
+					var childs = menu.button[i].sub_button;
+					for (var j = 0; j < childs.length; j++) {
+						var son = {
+							text : childs[j].name,
+							key : childs[j].key,
+							type : childs[j].type,
+							m_type : 2,
+							url : childs[j].url,
+							leaf : true
+						}
+						btn.children.push(son);
+					}
+				}
+				
+				root.children.push(btn);
+			}
+	    	
+	    	tree.setRootNode(new Ext.tree.AsyncTreeNode(root));
 	    } 
 	}); 	
 }
