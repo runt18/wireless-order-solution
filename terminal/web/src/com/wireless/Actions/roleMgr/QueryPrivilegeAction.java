@@ -179,7 +179,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
-				}else if(privilege.getCode() == Code.MEMBER){
+				}else if(privilege.getCode() == Code.MEMBER_CHECK){
 					tree.append("{");
 					tree.append("leaf:false");
 					tree.append(",id:'memberMgr'");
