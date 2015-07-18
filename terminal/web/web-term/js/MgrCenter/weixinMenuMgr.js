@@ -3,8 +3,8 @@
 var Request = new common_urlParaQuery();
 var rid = Request["rid"];
 //rid = 40;
-var basePath = "http://localhost:8080";
-//var basePath = "http://wx.e-tones.net";
+//var basePath = "http://localhost:8080";
+var basePath = "http://wx.e-tones.net";
 
 
 
