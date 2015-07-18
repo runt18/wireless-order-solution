@@ -136,7 +136,7 @@ public class Role implements Jsonable, Parcelable{
 			addPrivilege(Privilege.Code.GIFT);
 			addPrivilege(Privilege.Code.HISTORY);
 			addPrivilege(Privilege.Code.INVENTORY);
-			addPrivilege(Privilege.Code.MEMBER);
+			addPrivilege(Privilege.Cate.MEMBER);
 			addPrivilege(Privilege.Code.SMS);
 			addPrivilege(Privilege.Code.WEIXIN);
 			addPrivilege(Privilege.Code.RE_PAYMENT);
@@ -230,6 +230,15 @@ public class Role implements Jsonable, Parcelable{
 		
 		public List<Privilege> getPrivileges() {
 			return privileges;
+		}
+		
+		public InsertBuilder addPrivilege(Privilege.Cate cate){
+			for(Privilege.Code code : Privilege.Code.values()){
+				if(code.getCate() == cate){
+					addPrivilege(code);
+				}
+			}
+			return this;
 		}
 		
 		public InsertBuilder addPrivilege(Privilege.Code code) {

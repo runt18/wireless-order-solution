@@ -76,7 +76,12 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 		BASIC(2000, Cate.BASIC, 1, "后台"),
 		INVENTORY(5000, Cate.INVENTORY, 1, "库存"),
 		HISTORY(4000, Cate.HISTORY, 1, "历史"),
-		MEMBER(3000, Cate.MEMBER, 1, "会员"),
+		MEMBER_CHECK(3000, Cate.MEMBER, 1, "会员查询"),
+		MEMBER_ADD(3001, Cate.MEMBER, 1, "会员增加"),
+		MEMBER_MODIFY(3002, Cate.MEMBER, 2, "会员修改"),
+		MEMBER_REMOVE(3003, Cate.MEMBER, 3, "会员删除"),
+		MEMBER_CHARGE(3004, Cate.MEMBER, 4, "会员充值"),
+		MEMBER_REFUND(3005, Cate.MEMBER, 5, "会员取款"),
 		SYSTEM(6000, Cate.SYSTEM, 1, "系统"),
 		WEIXIN(7000, Cate.WEIXIN, 1, "微信"),
 		SMS(8000, Cate.SMS, 1, "短信");
@@ -147,7 +152,7 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 	private int id;
 	private Code code;
 	private int restaurantId;
-	private List<Discount> discounts = new ArrayList<Discount>();
+	private final List<Discount> discounts = new ArrayList<Discount>();
 	
 	Privilege(){
 		
