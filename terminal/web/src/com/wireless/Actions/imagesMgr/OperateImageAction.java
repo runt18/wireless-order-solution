@@ -31,7 +31,13 @@ public class OperateImageAction extends DispatchAction{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		String pin = (String)request.getAttribute("pin");
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		String rid = request.getParameter("rid");
+		Staff staff;		
+		if(rid != null && !rid.isEmpty()){
+			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+		}else{
+			staff = StaffDao.verify(Integer.parseInt(pin));
+		}		
 		
 		String ossType = request.getParameter("ossType");
 		
