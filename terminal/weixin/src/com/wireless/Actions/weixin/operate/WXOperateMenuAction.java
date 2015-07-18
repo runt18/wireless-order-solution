@@ -26,7 +26,32 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class WXOperateMenuAction extends DispatchAction {
-	
+	/**
+	 * 获取微信菜单
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward weixinMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jobject = new JObject(); 
+		
+		String appId = "wx49b3278a8728ff76";
+		String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
+		System.out.println(Menu.newInstance(Token.newInstance(appId, appSecret)));
+		jobject.setRoot(Menu.newInstance(Token.newInstance(appId, appSecret)));
+		
+//		int rid = Integer.parseInt(request.getParameter("rid"));
+//		WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(rid));
+//		AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+//		jobject.setRoot(Menu.newInstance(Token.newInstance(authorizerToken)));
+		
+		response.getWriter().print(jobject.toString());
+		
+		return null;
+	}			
 	/**
 	 * 获取系统保留的menu选项
 	 * @param mapping
