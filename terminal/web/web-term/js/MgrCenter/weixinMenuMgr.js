@@ -729,7 +729,7 @@ Ext.onReady(function(){
         	}
         	menu_uploadMask.show();
         	Ext.Ajax.request({
-        		url : '../../OperateImage.do?dataSource=upload&ossType=10',
+        		url : '../../OperateImage.do?dataSource=upload&ossType=10&rid='+rid,
  	   			isUpload : true,
  	   			form : form.getForm().getEl(),
  	   			success : function(response, options){
