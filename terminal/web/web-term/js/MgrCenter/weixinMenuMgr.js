@@ -4,6 +4,7 @@ var Request = new common_urlParaQuery();
 var rid = Request["rid"];
 rid = 40;
 var basePath = "http://localhost:8080";
+//var basePath = "http://wx.e-tones.net";
 
 
 
@@ -193,14 +194,13 @@ function deleteMenu(){
 					$.ajax({ 
 					    type : "post", 
 					    async:false, 
-					    url : basePath+"/wx-term/WXOperateMenu.do",
+					    url : "../../OperateMenu.do",
 					    data : {
 					    	dataSource : "deleteMenu",
 					    	rid : rid,
 					    	key : tn.attributes.key
 					    },
-					    dataType : "jsonp",//jsonp数据类型 
-					    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+					    dataType : "json",//jsonp数据类型 
 					    success : function(data){ 
 							if(data.success){
 							}
@@ -252,15 +252,14 @@ function operateMenuContent(){
 	$.ajax({ 
 	    type : "post", 
 	    async:false, 
-	    url : basePath+"/wx-term/WXOperateMenu.do",
+	    url : "../../OperateMenu.do",
 	    data : {
 	    	dataSource : dataSource,
 	    	rid : rid,
 	    	key : tn.attributes.key,
 	    	text : $('#menuTxtReply').val()
 	    },
-	    dataType : "jsonp",//jsonp数据类型 
-	    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+	    dataType : "json",//jsonp数据类型 
 	    success : function(data){ 
 			if(data.success){
 				tn.attributes.type = "click";
@@ -326,8 +325,8 @@ function getWeixinMenu(){
 	    type : "get", 
 //	    async:false, 
 	    url : basePath+"/wx-term/WXOperateMenu.do?dataSource=weixinMenu&rid="+rid,
-	    dataType : "jsonp",//jsonp数据类型 
-	    jsonp: "jsonCallback",//服务端用于接收callback调用的function名的参数 
+	    dataType : "jsonp",//jsonp数据类型
+	    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
 	    success : function(data){
 	    	weixinMenuLM.hide();
 			if(data.success){
@@ -608,14 +607,13 @@ Ext.onReady(function(){
 						$.ajax({ 
 						    type : "post", 
 						    async:false, 
-						    url : basePath+"/wx-term/WXOperateMenu.do",
+						    url : "../../OperateMenu.do",
 						    data : {
 						    	dataSource : 'menuReply',
 						    	rid : rid,
 						    	key : tn.attributes.key
 						    },
-						    dataType : "jsonp",//jsonp数据类型 
-						    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+						    dataType : "json",//jsonp数据类型 
 						    success : function(data){ 
 								if(data.success){
 								}
@@ -877,7 +875,7 @@ Ext.onReady(function(){
 					$.ajax({ 
 					    type : "post", 
 					    async:false, 
-					    url : basePath+"/wx-term/WXOperateMenu.do",
+					    url : "../../OperateMenu.do",
 					    data : {
 					    	dataSource : dataSource,
 					    	rid : rid,
@@ -887,8 +885,7 @@ Ext.onReady(function(){
 					    	content : $("#itemContent").val(),
 					    	url : $("#itemUrl").val()
 					    },
-					    dataType : "jsonp",//jsonp数据类型 
-					    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+					    dataType : "json",//jsonp数据类型 
 					    success : function(data){ 
 							if(data.success){
 							}
