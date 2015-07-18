@@ -637,7 +637,11 @@
 		</action>			
 		<action path="/QuerySaleOfMaterial"
 			type="com.wireless.Actions.inventoryMgr.report.QuerySaleOfMaterialAction" scope="request">
-		</action>		
+		</action>	
+		<action path="/OperateMenu"
+			type="com.wireless.Actions.client.member.OperateMenuAction"
+			scope="request" parameter="dataSource">
+		</action>				
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
