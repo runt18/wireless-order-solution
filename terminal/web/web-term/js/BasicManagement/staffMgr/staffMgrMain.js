@@ -1085,7 +1085,7 @@ Ext.onReady(function() {
 								pricePlan += ',';
 							}
 							pricePlan += checkedNodes[i].attributes.planId;						
-						}else{
+						}else if(checkedNodes[i].attributes.pId){
 							if(privilege != ''){
 								privilege += ',';
 							}
@@ -1146,6 +1146,12 @@ Ext.onReady(function() {
 							childSon.ui.toggleCheck(checked);  
 							childSon.attributes.checked = checked;*/
 							setParentNodeCheckState(childSon);
+							if(childSon.hasChildNodes()){
+								childSon.expand();
+								childSon.eachChild(function(grandSon){
+									setParentNodeCheckState(grandSon);
+								})
+							}
 						});
 					}
 				}); 
