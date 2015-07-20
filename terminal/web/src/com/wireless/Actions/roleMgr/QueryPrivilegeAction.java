@@ -25,6 +25,7 @@ import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Page;
 import com.wireless.pojo.staffMgr.Privilege;
+import com.wireless.pojo.staffMgr.Privilege.CateNode;
 import com.wireless.pojo.staffMgr.Privilege.Code;
 import com.wireless.pojo.staffMgr.Privilege4Price;
 import com.wireless.pojo.staffMgr.Role;
@@ -32,6 +33,15 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryPrivilegeAction extends DispatchAction{
 
+	/**
+	 * 根据角色获取权限
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward normal(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		JObject jobject = new JObject();
@@ -64,6 +74,15 @@ public class QueryPrivilegeAction extends DispatchAction{
 		
 	}
 	
+	/**
+	 * 未选中角色时的所有权限列表
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward tree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		String pin = (String) request.getAttribute("pin");
@@ -74,7 +93,139 @@ public class QueryPrivilegeAction extends DispatchAction{
 			
 			root = PrivilegeDao.getByCond(staff, null);
 			if(root.size() > 0){
+				List<CateNode> cates = new ArrayList<>();
+				//前台cate
+				List<Privilege> front_ps = new ArrayList<>();
+				CateNode front = new CateNode(Privilege.Cate.FRONT_BUSINESS, front_ps);
+				cates.add(front);
+				//后台cate
+				List<Privilege> basic_ps = new ArrayList<>();
+				CateNode basic = new CateNode(Privilege.Cate.BASIC, basic_ps);
+				cates.add(basic);
+				//库存cate
+				List<Privilege> inventory_ps = new ArrayList<>();
+				CateNode inventory = new CateNode(Privilege.Cate.INVENTORY, inventory_ps);
+				cates.add(inventory);
+				//历史cate
+				List<Privilege> history_ps = new ArrayList<>();
+				CateNode history = new CateNode(Privilege.Cate.HISTORY, history_ps);
+				cates.add(history);
+				//会员cate
+				List<Privilege> member_ps = new ArrayList<>();
+				CateNode member = new CateNode(Privilege.Cate.MEMBER, member_ps);
+				cates.add(member);
+				//系统cate
+				List<Privilege> system_ps = new ArrayList<>();
+				CateNode system = new CateNode(Privilege.Cate.SYSTEM, system_ps);
+				cates.add(system);
+				//微信cate
+				List<Privilege> weixin_ps = new ArrayList<>();
+				CateNode weixin = new CateNode(Privilege.Cate.WEIXIN, weixin_ps);
+				cates.add(weixin);
+				//短信cate
+				List<Privilege> sms_ps = new ArrayList<>();
+				CateNode sms = new CateNode(Privilege.Cate.SMS, sms_ps);
+				cates.add(sms);
+				
+				for (Privilege p : root) {
+					if(p.getCate() == Privilege.Cate.FRONT_BUSINESS){
+						front_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.BASIC){
+						basic_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.INVENTORY){
+						inventory_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.HISTORY){
+						history_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.MEMBER){
+						member_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.SYSTEM){
+						system_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.WEIXIN){
+						weixin_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.SMS){
+						sms_ps.add(p);
+					}
+				}
+				
+				
 				tree.append("[");
+				for (int i = 0; i < cates.size(); i++) {
+					if(i > 0){
+						tree.append(",");
+					}
+					tree.append("{");
+					tree.append("leaf:false");
+					StringBuilder children = new StringBuilder();
+					//foreach权限种类
+					for (int j = 0; j < cates.get(i).getValue().size(); j++) {
+						Privilege p = cates.get(i).getValue().get(j);
+						if(j>0){
+							children.append(",");
+						}
+						children.append("{");
+						
+						//前台权限里包含折扣和价格方案
+						if(p.getCode() == Code.DISCOUNT){
+							children.append("leaf:false");
+							StringBuilder grandson = new StringBuilder();
+							
+							for (int k = 0; k < p.getDiscounts().size(); k++) {
+								if(k>0){
+									grandson.append(",");
+								}
+								grandson.append("{");
+								grandson.append("checked:false");
+								grandson.append(",leaf:true");
+								grandson.append(",text:'" + p.getDiscounts().get(k).getName() + "'");
+								grandson.append(",discountId:'" + p.getDiscounts().get(k).getId() + "'");
+								grandson.append(",isDiscount:true");
+								grandson.append("}");
+							}
+							
+							children.append(",children : [" + grandson.toString() + "]");
+						}else if(p.getCode() == Code.PRICE_PLAN){
+							List<PricePlan> list = PricePlanDao.getByCond(staff, null);
+							if(!list.isEmpty()){
+								children.append("leaf:false");
+								StringBuilder grandson = new StringBuilder();
+								
+								for (int k = 0; k < list.size(); k++) {
+									if(k>0){
+										grandson.append(",");
+									}
+									grandson.append("{");
+									grandson.append("checked:false");
+									grandson.append(",leaf:true");
+									grandson.append(",text:'" + list.get(k).getName() + "'");
+									grandson.append("}");
+								}
+								children.append(",children : [" + grandson.toString() + "]");
+							}else{
+								children.append("leaf:true");
+								children.append(",hidden:true");
+							}
+							
+						}else{
+							children.append("leaf:true");
+						}
+						
+						children.append(",checked:false");
+						children.append(",text:'" + p.getCode().getDesc() + "'");
+						children.append(",pId:'" + p.getId() + "'");
+						children.append("}");
+					}
+					tree.append(",children : [" + children.toString() + "]");
+					tree.append(",checked:false");
+					
+					tree.append(",text:'" + cates.get(i).getKey().getDesc() + "'");
+					tree.append("}");
+				}
+				tree.append("]");
+				
+				
+				
+				
+/*				tree.append("[");
 				for (int i = 0; i < root.size(); i++) {
 					if(i > 0){
 						tree.append(",");
@@ -128,7 +279,9 @@ public class QueryPrivilegeAction extends DispatchAction{
 					tree.append(",pId:'" + root.get(i).getId() + "'");
 					tree.append("}");
 				}
-				tree.append("]");
+				tree.append("]");*/
+				
+				
 			}
 			
 			
@@ -139,9 +292,19 @@ public class QueryPrivilegeAction extends DispatchAction{
 		}
 		return null;
 		
-	}
+	}	
 	
-	
+	/**
+	 * 系统功能列表树
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
 	public ActionForward pageTree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception, SQLException, BusinessException{
 		
 		String pin = (String) request.getAttribute("pin");
@@ -308,6 +471,15 @@ public class QueryPrivilegeAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 根据角色获取显示对应权限
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward roleTree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		String pin = (String) request.getAttribute("pin");
@@ -325,6 +497,219 @@ public class QueryPrivilegeAction extends DispatchAction{
 			//获取所有权限和不是会员类型的所有折扣
 			root = PrivilegeDao.getByCond(staff, null);
 			if(root.size() > 0){
+				
+				List<CateNode> cates = new ArrayList<>();
+				//前台cate
+				List<Privilege> front_ps = new ArrayList<>();
+				CateNode front = new CateNode(Privilege.Cate.FRONT_BUSINESS, front_ps);
+				cates.add(front);
+				//后台cate
+				List<Privilege> basic_ps = new ArrayList<>();
+				CateNode basic = new CateNode(Privilege.Cate.BASIC, basic_ps);
+				cates.add(basic);
+				//库存cate
+				List<Privilege> inventory_ps = new ArrayList<>();
+				CateNode inventory = new CateNode(Privilege.Cate.INVENTORY, inventory_ps);
+				cates.add(inventory);
+				//历史cate
+				List<Privilege> history_ps = new ArrayList<>();
+				CateNode history = new CateNode(Privilege.Cate.HISTORY, history_ps);
+				cates.add(history);
+				//会员cate
+				List<Privilege> member_ps = new ArrayList<>();
+				CateNode member = new CateNode(Privilege.Cate.MEMBER, member_ps);
+				cates.add(member);
+				//系统cate
+				List<Privilege> system_ps = new ArrayList<>();
+				CateNode system = new CateNode(Privilege.Cate.SYSTEM, system_ps);
+				cates.add(system);
+				//微信cate
+				List<Privilege> weixin_ps = new ArrayList<>();
+				CateNode weixin = new CateNode(Privilege.Cate.WEIXIN, weixin_ps);
+				cates.add(weixin);
+				//短信cate
+				List<Privilege> sms_ps = new ArrayList<>();
+				CateNode sms = new CateNode(Privilege.Cate.SMS, sms_ps);
+				cates.add(sms);
+				
+				for (Privilege p : root) {
+					if(p.getCate() == Privilege.Cate.FRONT_BUSINESS){
+						front_ps.add(p);
+					}
+					else if(p.getCate() == Privilege.Cate.BASIC){
+						basic_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.INVENTORY){
+						inventory_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.HISTORY){
+						history_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.MEMBER){
+						member_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.SYSTEM){
+						system_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.WEIXIN){
+						weixin_ps.add(p);
+					}else if(p.getCate() == Privilege.Cate.SMS){
+						sms_ps.add(p);
+					}
+				}
+				
+				
+				tree.append("[");
+				for (int i = 0; i < cates.size(); i++) {
+					if(i > 0){
+						tree.append(",");
+					}
+					tree.append("{");
+					tree.append("leaf:false");
+					StringBuilder children = new StringBuilder();
+					//foreach权限种类
+					for (int j = 0; j < cates.get(i).getValue().size(); j++) {
+						Privilege p = cates.get(i).getValue().get(j);
+						if(j>0){
+							children.append(",");
+						}
+						children.append("{");
+						
+						
+						int index = rolePrivilege.indexOf(p);
+						//如果选中role包含此权限, 则勾选上
+						if(index >= 0){
+							//前台权限里包含折扣和价格方案
+							if(p.getCode() == Code.DISCOUNT){
+								children.append("leaf:false");
+								StringBuilder grandson = new StringBuilder();
+								
+								for (int k = 0; k < p.getDiscounts().size(); k++) {
+									if(k>0){
+										grandson.append(",");
+									}
+									grandson.append("{");
+									grandson.append("leaf:true");
+									grandson.append(",text:'" + p.getDiscounts().get(k).getName() + "'");
+									//对应折扣选中
+									if(rolePrivilege.get(index).getDiscounts().isEmpty()){
+										if(p.getDiscounts().get(k).isReserved()){
+											grandson.append(",disabled:true");
+										}
+										grandson.append(",checked:true");
+									}else{
+										int disIndex = rolePrivilege.get(index).getDiscounts().indexOf(p.getDiscounts().get(k));
+										if(disIndex >= 0){
+											if(p.getDiscounts().get(k).isReserved()){
+												grandson.append(",disabled:true");
+											}
+											grandson.append(",checked:true");
+										}else{
+											grandson.append(",checked:false");
+										}
+									}
+									
+									
+									grandson.append(",discountId:'" + p.getDiscounts().get(k).getId() + "'");
+									grandson.append(",isDiscount:true");
+									grandson.append("}");
+									
+								}
+								
+								children.append(",children : [" + grandson.toString() + "]");
+							}else if(p.getCode() == Code.PRICE_PLAN){
+								
+								List<PricePlan> plans = ((Privilege4Price)p).getPricePlans();
+								if(plans.isEmpty()){
+									children.append("leaf:true");
+									children.append(",hidden:true");
+								}else{
+									children.append("leaf:false");
+									
+									StringBuilder grandson = new StringBuilder();
+									for (int k = 0; k < plans.size(); k++) {
+										if(k>0){
+											grandson.append(",");
+										}
+										grandson.append("{");
+										grandson.append("leaf:true");
+										grandson.append(",text:'" + plans.get(k).getName() + "'");			
+																
+										int planIndex = ((Privilege4Price)(rolePrivilege.get(index))).getPricePlans().indexOf(plans.get(k));
+										if(planIndex >= 0){
+											grandson.append(",checked:true");
+										}else{
+											grandson.append(",checked:false");
+										}
+										grandson.append(",isPricePlan:true");
+										grandson.append(",planId:'" + plans.get(k).getId() + "'");
+										grandson.append("}");									
+									}
+									children.append(",children : [" + grandson.toString() + "]");
+								}
+								
+							}else{
+								children.append("leaf:true");
+							}
+							children.append(",checked:true");
+						}else{//如果选中的角色没有此权限,则前面的checkbox不勾选
+							//前台权限里包含折扣和价格方案
+							if(p.getCode() == Code.DISCOUNT){
+								children.append("leaf:false");
+								StringBuilder grandson = new StringBuilder();
+								
+								for (int k = 0; k < p.getDiscounts().size(); k++) {
+									if(k>0){
+										grandson.append(",");
+									}
+									grandson.append("{");
+									grandson.append("checked:false");
+									grandson.append(",leaf:true");
+									grandson.append(",text:'" + p.getDiscounts().get(k).getName() + "'");
+									grandson.append(",discountId:'" + p.getDiscounts().get(k).getId() + "'");
+									grandson.append(",isDiscount:true");
+									grandson.append("}");
+								}
+								
+								children.append(",children : [" + grandson.toString() + "]");
+							}else if(p.getCode() == Code.PRICE_PLAN){
+//								List<PricePlan> list = PricePlanDao.getByCond(staff, null);
+								List<PricePlan> list = ((Privilege4Price)root.get(i)).getPricePlans();
+								if(!list.isEmpty()){
+									children.append("leaf:false");
+									StringBuilder grandson = new StringBuilder();
+									
+									for (int k = 0; k < list.size(); k++) {
+										if(k>0){
+											grandson.append(",");
+										}
+										grandson.append("{");
+										grandson.append("checked:false");
+										grandson.append(",leaf:true");
+										grandson.append(",text:'" + list.get(k).getName() + "'");
+										grandson.append("}");
+									}
+									children.append(",children : [" + grandson.toString() + "]");
+								}else{
+									children.append("leaf:true");
+									children.append(",hidden:true");
+								}
+								
+							}else{
+								children.append("leaf:true");
+							}
+							children.append(",checked:false");
+						}
+
+						children.append(",text:'" + p.getCode().getDesc() + "'");
+						children.append(",pId:'" + p.getId() + "'");
+						children.append(",code:" + p.getCode().getVal());
+						children.append("}");
+					}
+					tree.append(",children : [" + children.toString() + "]");
+					tree.append(",checked:true");
+					
+					tree.append(",text:'" + cates.get(i).getKey().getDesc() + "'");
+					tree.append("}");
+				}
+				tree.append("]");
+				
+/*				
 				tree.append("[");
 				for (int i = 0; i < root.size(); i++) {
 					if(i > 0){
@@ -333,9 +718,9 @@ public class QueryPrivilegeAction extends DispatchAction{
 					tree.append("{");
 
 					int index = rolePrivilege.indexOf(root.get(i));
+					//如果选中role包含此权限, 则勾选上
 					if(index >= 0){
 						if(root.get(i).getCode() == Code.DISCOUNT){
-
 							
 							tree.append("leaf:false");
 							StringBuilder children = new StringBuilder();
@@ -462,6 +847,9 @@ public class QueryPrivilegeAction extends DispatchAction{
 					tree.append("}");
 				}
 				tree.append("]");
+				*/
+				
+				
 			}
 		}catch(Exception e){
 			e.printStackTrace();
