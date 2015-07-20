@@ -1082,7 +1082,10 @@ ts.toOrderFoodOrTransFood = function(c){
 		//选择餐台
 		if(table == null){
 			table = getTableById(c.id);
-			
+			if(table.statusValue == 1){
+				Util.msg.tip("此餐台已使用, 不能选择");
+				return;
+			}
 			ts.multiOpenTableChoosedTable.push(table);
 		}
 		//选台后关闭

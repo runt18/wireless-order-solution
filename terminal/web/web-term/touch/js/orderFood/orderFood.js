@@ -220,6 +220,7 @@ of.toOrderFoodPage = function(table){
 		$('#btnOrderAndPay').hide();	
 		$('#multiOpenTable').hide();
 	}else if(of.orderFoodOperateType == 'multiOpenTable'){
+		of.newFood = [];
 		$('#multiOpenTable').show();
 		$('#addBookOrderFood').hide();
 		$('#bookSeatOrderFood').hide();
