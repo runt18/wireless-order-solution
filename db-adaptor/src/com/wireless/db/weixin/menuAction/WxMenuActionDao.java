@@ -27,6 +27,7 @@ public class WxMenuActionDao {
 	public static class ExtraCond{
 		private int id;
 		private String key;
+		private WxMenuAction.Cate cate;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -38,6 +39,11 @@ public class WxMenuActionDao {
 			return this;
 		}
 		
+		public ExtraCond setCate(WxMenuAction.Cate cate){
+			this.cate = cate;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -46,6 +52,9 @@ public class WxMenuActionDao {
 			}
 			if(key != null){
 				extraCond.append(" AND key = '" + key + "'");
+			}
+			if(this.cate != null){
+				extraCond.append(" AND cate = " + cate.getVal());
 			}
 			return extraCond.toString();
 		}
