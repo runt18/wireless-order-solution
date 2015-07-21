@@ -42,6 +42,7 @@ public class QueryMaterialAction extends DispatchAction{
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		String pin = (String)request.getAttribute("pin");
+		String contentAll = request.getParameter("contentAll");
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		List<Jsonable> list = new ArrayList<>();
@@ -77,7 +78,6 @@ public class QueryMaterialAction extends DispatchAction{
 		}catch(SQLException e){
 			jobject.initTip(e);
 			e.printStackTrace();
-			
 		}catch(Exception e){
 			jobject.initTip4Exception(e);
 			e.printStackTrace();
@@ -85,6 +85,14 @@ public class QueryMaterialAction extends DispatchAction{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
 				root = DataPaging.getPagingData(root, isPaging, start, limit);
+				//添加全部
+				if(contentAll != null){
+					Material all = new Material();
+					all.setName("全部");
+					all.setId(-1);
+					all.setPinyin("QB");
+					list.add(all);
+				}
 				
 				for (final Material m : root) {
 					if(m.isGood()){
