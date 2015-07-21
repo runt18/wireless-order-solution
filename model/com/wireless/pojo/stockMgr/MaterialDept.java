@@ -1,5 +1,8 @@
 package com.wireless.pojo.stockMgr;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.inventoryMgr.Material;
@@ -14,7 +17,7 @@ public class MaterialDept implements Jsonable{
 	private Department dept = new Department(0);
 	private float cost;
 	
-	
+	private Map<Department, Float> deptStock = new HashMap<>(); 
 	
 	
 	public float getCost() {
@@ -70,7 +73,12 @@ public class MaterialDept implements Jsonable{
 	public void cutStock(float count){
 		this.stock = stock - count;
 	}
-	
+	public Map<Department, Float> getDeptStock() {
+		return deptStock;
+	}
+	public void setDeptStock(Map<Department, Float> deptStock) {
+		this.deptStock = deptStock;
+	}
 	public MaterialDept(){}
 	
 	public MaterialDept(int materialId, int deptId, int restaurantId, float stock){
