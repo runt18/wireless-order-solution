@@ -635,6 +635,8 @@ function foodOperation(type){
 	var btnRefreshForOW = Ext.getCmp('btnRefreshForOW');
 	var btnPreviousFood = Ext.getCmp('btnPreviousFood');
 	var btnNextFood = Ext.getCmp('btnNextFood');
+	//恢复价格可用
+	Ext.getCmp('numBasicForPrice').enable();
 	
 	Ext.getCmp('food_pricePlans').removeAll();
 	
@@ -2181,7 +2183,7 @@ function basicOperationBasicHandler(c){
 			foodName : foodName.getValue().trim(),
 			foodAliasID : document.getElementById('chbForFoodAlias').checked?foodAliasID.getValue():'',
 			foodPinyin : foodPinyin.getValue(),
-			foodPrice : foodPrice.getValue(),
+			foodPrice : foodPrice.getValue()?foodPrice.getValue():0,
 			foodPrices : foodPrices,
 			kitchenID : foodKitchenAlias.getValue(),
 			foodDesc : foodDesc.getValue().trim(),
