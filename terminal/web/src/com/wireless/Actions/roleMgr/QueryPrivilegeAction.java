@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +26,7 @@ import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Page;
 import com.wireless.pojo.staffMgr.Privilege;
-import com.wireless.pojo.staffMgr.Privilege.CateNode;
+import com.wireless.pojo.staffMgr.Privilege.Cate;
 import com.wireless.pojo.staffMgr.Privilege.Code;
 import com.wireless.pojo.staffMgr.Privilege4Price;
 import com.wireless.pojo.staffMgr.Role;
@@ -71,6 +72,45 @@ public class QueryPrivilegeAction extends DispatchAction{
 		}
 		
 		return null;
+		
+	}
+	
+	private static class CateNode implements Entry<Cate, List<Privilege>>, Comparable<CateNode>{
+
+		private final Cate key;
+		private final List<Privilege> value;
+		
+		public CateNode(Cate key, List<Privilege> value){
+			this.key = key;
+			
+			this.value = value;
+		}
+		
+		@Override
+		public Cate getKey() {
+			return key;
+		}
+
+		@Override
+		public List<Privilege> getValue() {
+			return value;
+		}
+
+		@Override
+		public List<Privilege> setValue(List<Privilege> value) {
+			throw new UnsupportedOperationException("The dept node is immutable");
+		}
+
+		@Override
+		public int compareTo(CateNode o) {
+			if(this.key.getDisplayId() < o.key.getDisplayId()){
+				return -1;
+			}else if(this.key.getDisplayId() > o.key.getDisplayId()){
+				return 1;
+			}else{
+				return 0;
+			}
+		}
 		
 	}
 	
@@ -126,6 +166,8 @@ public class QueryPrivilegeAction extends DispatchAction{
 				List<Privilege> sms_ps = new ArrayList<>();
 				CateNode sms = new CateNode(Privilege.Cate.SMS, sms_ps);
 				cates.add(sms);
+				
+				Collections.sort(cates);
 				
 				for (Privilege p : root) {
 					if(p.getCate() == Privilege.Cate.FRONT_BUSINESS){
