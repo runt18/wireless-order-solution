@@ -17,6 +17,7 @@ import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.ModuleError;
+import com.wireless.exception.StaffError;
 import com.wireless.exception.WxMemberError;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -38,6 +39,7 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Module;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.SQLUtil;
@@ -121,6 +123,7 @@ public class MemberDao {
 		private int minTotalConsume;
 		private int maxTotalConsume;
 		private DutyRange range;
+		private DutyRange createRange;
 		private String weixinCard;
 		private String weixinSerial;
 		private int memberBalance;
@@ -196,6 +199,11 @@ public class MemberDao {
 		
 		public ExtraCond lessTotalConsume(int totalConsume){
 			this.maxTotalConsume = totalConsume;
+			return this;
+		}
+		
+		public ExtraCond setCreateRange(DutyRange range){
+			this.createRange = range;
 			return this;
 		}
 		
@@ -316,6 +324,9 @@ public class MemberDao {
 				
 			}
 			
+			if(this.createRange != null){
+				extraCond.append(" AND M.create_date BETWEEN '" + createRange.getOnDutyFormat() + "' AND '" + createRange.getOffDutyFormat() + "'");
+			}
 			return extraCond.toString();
 		}
 
@@ -617,7 +628,10 @@ public class MemberDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	private static List<Member> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
-		List<Member> result = new ArrayList<Member>();
+//		if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_CHECK)){
+//			throw new BusinessException(StaffError.MEMBER_CHECK_NOT_ALLOW);
+//		}
+		final List<Member> result = new ArrayList<Member>();
 		String sql;
 		sql = " SELECT "	+
 			  " M.member_id, M.restaurant_id, M.point, M.used_point, " +
@@ -697,8 +711,10 @@ public class MemberDao {
 	 * @return the list holding the result
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the staff does NOT contains the member check privilege
 	 */
-	public static List<Member> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+	public static List<Member> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		if(extraCond != null){
 			return MemberDao.getByCond(dbCon, staff, extraCond.toString(), orderClause);
 		}else{
@@ -715,6 +731,8 @@ public class MemberDao {
 	 * @return the list holding the result
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the staff does NOT contains the member check privilege
 	 */
 	public static List<Member> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
@@ -954,10 +972,6 @@ public class MemberDao {
 		}
 	}
 
-	public static void cancel(DBCon dbCon, Staff staff, String weixinSerial) throws SQLException{
-		
-	}
-	
 	/**
 	 * Insert a new member.
 	 * @param dbCon
@@ -970,11 +984,16 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the mobile to new member has been exist before
-	 * 			throws if the card to new member has been exist before
-	 * 			throws if the member type does NOT exist
+	 * 			throws if cases below
+	 * 			<li>the mobile to new member has been exist before
+	 * 			<li>the card to new member has been exist before
+	 * 			<li>the member type does NOT exist
+	 * 			<li>the staff does NOT have the member add privilege 
 	 */
 	public static int insert(DBCon dbCon, Staff staff, Member.InsertBuilder builder) throws SQLException, BusinessException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_ADD)){
+			throw new BusinessException(StaffError.MEMBER_ADD_NOT_ALLOW);
+		}
 		//判断是否有会员模块
 		if(!RestaurantDao.getById(staff.getRestaurantId()).hasModule(Module.Code.MEMBER)){
 			//限制添加条数
@@ -1060,10 +1079,13 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if cases below<br>
-	 * 			the mobile to new member has been exist before<br>
-	 * 			the card to new member has been exist before
-	 */
+	 * 			throws if cases below
+	 * 			<li>the mobile to new member has been exist before
+	 * 			<li>the card to new member has been exist before
+	 * 			<li>the member type does NOT exist
+	 * 			<li>the staff does NOT have the member add privilege 
+	 * 			<li>throws if the staff does NOT contains the member update privilege
+	 **/
 	public static int insert(Staff staff, Member.InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -1094,8 +1116,12 @@ public class MemberDao {
 	 * 			<li>throws if the mobile to new member has been exist before
 	 * 			<li>throws if the card to new member has been exist before
 	 * 			<li>throws if the member to update does NOT exist
+	 * 			<li>throws if the staff does NOT contains the member update privilege
 	 */
 	public static void update(DBCon dbCon, Staff staff, Member.UpdateBuilder builder) throws SQLException, BusinessException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_MODIFY)){
+			throw new BusinessException(StaffError.MEMBER_UPDATE_NOT_ALLOW);
+		}
 		Member member = builder.build();
 		// 旧会员类型是充值属性, 修改为优惠属性时, 检查是否还有余额, 有则不允许修改
 		if(builder.isMemberTypeChanged()){
@@ -1195,7 +1221,9 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the member type associated with member does NOT exist
+	 * 			throws if cases below
+	 * 			<li>the member type associated with member does NOT exist
+	 * 			<li>the staff does NOT contain the member remove privilege
 	 */
 	public static int deleteByCond(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
@@ -1225,9 +1253,14 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the member type associated with member does NOT exist
+	 * 			throws if cases below
+	 * 			<li>the member type associated with member does NOT exist
+	 * 			<li>the staff does NOT contain the member remove privilege
 	 */
 	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_REMOVE)){
+			throw new BusinessException(StaffError.MEMBER_REMOVE_NOT_ALLOW);
+		}
 		int amount = 0;
 		for(Member member : getByCond(dbCon, staff, extraCond, null)){
 			String sql;
@@ -1644,11 +1677,16 @@ public class MemberDao {
 	 * 			the charge type referred to {@link Member.ChargeType}
 	 * @return the member operation to this charge.
 	 * @throws BusinessException
-	 * 			throw if the member id to search is NOT found 
+	 * 			throws if cases below
+	 * 			<li>the member id to perform charge does NOT exit
+	 * 			<li>the staff does NOT contains the charge privilege 
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
 	public static MemberOperation charge(DBCon dbCon, Staff staff, int memberId, float chargeMoney, float accountMoney, ChargeType chargeType) throws BusinessException, SQLException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_CHARGE)){
+			throw new BusinessException(StaffError.MEMBER_CHARGE_NOT_ALLOW);
+		}
 		
 		if(chargeMoney < 0){
 			throw new IllegalArgumentException("The amount of charge money(amount = " + chargeMoney + ") must be more than zero");
@@ -1687,7 +1725,9 @@ public class MemberDao {
 	 * 			the charge type referred to {@link Member.ChargeType}
 	 * @return the member operation to this charge.
 	 * @throws BusinessException
-	 * 			throw if the member id to search is NOT found 
+	 * 			throws if cases below
+	 * 			<li>the member id to perform charge does NOT exit
+	 * 			<li>the staff does NOT contains the charge privilege  
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
@@ -1722,11 +1762,17 @@ public class MemberDao {
 	 * 			the account money
 	 * @return the member operation to refund
 	 * @throws BusinessException
-	 * 			throws if insufficient to refund
+	 * 			throws if cases below
+	 * 			<li>insufficient to refund
+	 * 			<li>the staff does NOT contains member refund privilege
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static MemberOperation refund(DBCon dbCon, Staff staff, int memberId, float refundMoney, float accountMoney) throws BusinessException, SQLException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_REFUND)){
+			throw new BusinessException(StaffError.MEMBER_REFUND_NOT_ALLOW);
+		}
+		
 		if(refundMoney < 0){
 			throw new IllegalArgumentException("The amount of take money(amount = " + refundMoney + ") must be more than zero");
 		}
@@ -1765,7 +1811,9 @@ public class MemberDao {
 	 * 			the account money
 	 * @return the member operation to refund
 	 * @throws BusinessException
-	 * 			throws if insufficient to refund
+	 * 			throws if cases below
+	 * 			<li>insufficient to refund
+	 * 			<li>the staff does NOT contains member refund privilege
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */

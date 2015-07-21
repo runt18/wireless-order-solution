@@ -19,7 +19,6 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByBook;
 import com.wireless.pojo.billStatistics.IncomeByCancel;
-import com.wireless.pojo.billStatistics.IncomeByCharge;
 import com.wireless.pojo.billStatistics.IncomeByCoupon;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByDiscount;
@@ -37,8 +36,6 @@ import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
 import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
-import com.wireless.pojo.member.MemberOperation.ChargeType;
-import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -49,32 +46,6 @@ import com.wireless.pojo.util.DateUtil;
 
 public class CalcBillStatisticsDao {
 
-	public static class ExtraCond4Charge{
-		private final DBTbl dbTbl;
-		private final String moTbl;
-		
-		private int staffId;
-		
-		public ExtraCond4Charge(DateType dateType){
-			this.dbTbl = new DBTbl(dateType);
-			this.moTbl = dbTbl.moTbl;
-		}
-		
-		public ExtraCond4Charge setStaffId(int staffId){
-			this.staffId = staffId;
-			return this;
-		}
-		
-		@Override
-		public String toString(){
-			StringBuilder extraCond = new StringBuilder();
-			if(staffId > 0){
-				extraCond.append(" AND staff_id = " + staffId);
-			}
-			return extraCond.toString();
-		}
-	}
-	
 	public static class ExtraCond{
 		public final DateType dateType;
 		private final DBTbl dbTbl;
@@ -962,97 +933,7 @@ public class CalcBillStatisticsDao {
 		return foodIncomes;
 	}
 
-	 /**
-	  * Calculate the member charge income according to duty range and extra condition.
-	  * @param staff
-	  * 		the staff to perform this action
-	  * @param range
-	  * 		the duty range
-	  * @param extraCond
-	  * 		the extra condition
-	  * @return the income by charge refer to {@link IncomeByCharge}
-	  * @throws SQLException
-	  * 			if failed to execute any SQL statement
-	  */
-	 public static IncomeByCharge calcIncomeByCharge(Staff staff, DutyRange range, ExtraCond4Charge extraCond) throws SQLException{
-		 DBCon dbCon = new DBCon();
-		 try{
-			 dbCon.connect();
-			 return calcIncomeByCharge(dbCon, staff, range, extraCond);
-		 }finally{
-			 dbCon.disconnect();
-		 }
-	 }
 	 
-	 /**
-	  * Calculate the member charge income according to duty range and extra condition.
-	  * @param dbCon
-	  * 		the data base connection
-	  * @param staff
-	  * 		the staff to perform this action
-	  * @param range
-	  * 		the duty range
-	  * @param extraCond
-	  * 		the extra condition
-	  * @return the income by charge refer to {@link IncomeByCharge}
-	  * @throws SQLException
-	  * 			if failed to execute any SQL statement
-	  */
-	 public static IncomeByCharge calcIncomeByCharge(DBCon dbCon, Staff staff, DutyRange range, ExtraCond4Charge extraCond) throws SQLException{
-		 String sql;
-		 
-		 // Calculate the charge money. 
-		 sql = " SELECT " +
-			   " COUNT(*) AS charge_amount, " +
-			   " SUM(delta_base_money + delta_extra_money) AS total_account_charge, " +
-		 	   " SUM(IF(charge_type = " + ChargeType.CASH.getValue() + ", charge_money, 0)) AS total_actual_charge_by_cash, " +
-		 	   " SUM(IF(charge_type = " + ChargeType.CREDIT_CARD.getValue() + ", charge_money, 0)) AS total_actual_charge_by_card " +
-			   " FROM " + Params.dbName + "." + extraCond.moTbl +
-			   " WHERE 1 = 1 " +
-			   (extraCond != null ? extraCond.toString() : "") +
-			   " AND restaurant_id = " + staff.getRestaurantId() +
-			   " AND operate_type = " + OperationType.CHARGE.getValue() +
-			   " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
-		 
-		 dbCon.rs = dbCon.stmt.executeQuery(sql);
-		 
-		 IncomeByCharge incomeByCharge = new IncomeByCharge();
-		 
-		 if(dbCon.rs.next()){
-			 incomeByCharge.setChargeAmount(dbCon.rs.getInt("charge_amount"));
-			 incomeByCharge.setActualCashCharge(dbCon.rs.getFloat("total_actual_charge_by_cash"));
-			 incomeByCharge.setActualCreditCardCharge(dbCon.rs.getFloat("total_actual_charge_by_card"));
-			 incomeByCharge.setTotalAccountCharge(dbCon.rs.getFloat("total_account_charge"));
-		 }
-		 
-		 dbCon.rs.close();
-		 
-		 // Calculate the refund. 
-		 sql = " SELECT " +
-			   " COUNT(*) AS refund_amount, " +
-			   " SUM(delta_base_money + delta_extra_money) AS total_account_refund, " +
-		 	   " SUM(charge_money) AS total_actual_refund " +
-			   " FROM " + Params.dbName + "." + extraCond.moTbl +
-			   " WHERE 1 = 1 " +
-			   (extraCond != null ? extraCond.toString() : "") +
-			   " AND restaurant_id = " + staff.getRestaurantId() +
-			   " AND operate_type = " + OperationType.REFUND.getValue() +
-			   " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
-		 
-		 dbCon.rs = dbCon.stmt.executeQuery(sql);
-		 
-		 if(dbCon.rs.next()){
-			 incomeByCharge.setRefundAmount(dbCon.rs.getInt("refund_amount"));
-			 incomeByCharge.setTotalActualRefund(Math.abs(dbCon.rs.getFloat("total_actual_refund")));
-			 incomeByCharge.setTotalAccountRefund(Math.abs(dbCon.rs.getFloat("total_account_refund")));
-		 }
-		 
-		 dbCon.rs.close();
-		 
-		 return incomeByCharge;
-		 
-	 }
-	
 	/**
 	 * Calculate the income by book.
 	 * @param dbCon
@@ -1287,7 +1168,7 @@ public class CalcBillStatisticsDao {
 				income.setIncomeByService(calcServicePrice(dbCon, staff, range, extraCond));
 				
 				//Get the charge income by both cash and credit card
-				income.setIncomeByCharge(calcIncomeByCharge(dbCon, staff, range, new ExtraCond4Charge(DateType.HISTORY).setStaffId(extraCond.staffId)));
+				income.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY).setStaffId(extraCond.staffId)));
 				
 			}
 			result.add(income);

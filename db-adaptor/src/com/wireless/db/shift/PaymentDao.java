@@ -9,7 +9,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
-import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond4Charge;
+import com.wireless.db.billStatistics.CalcMemberStatisticsDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -361,7 +361,7 @@ public class PaymentDao {
 		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, range, extraCond4CalcBill));
 		
 		//Get the income by charge
-		result.setIncomeByCharge(CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new ExtraCond4Charge(extraCond.dateType).setStaffId(extraCond.staffId)));
+		result.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(extraCond.dateType).setStaffId(extraCond.staffId)));
 		
 		return result;
 	}

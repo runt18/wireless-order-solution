@@ -68,7 +68,7 @@ public class TestWxMenuAction {
 			ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_ACTION_IMAGE, 1)
 																.setImgResource(ImageType.JPG, new FileInputStream(new File(fileName))));
 			OssImage image = OssImageDao.getById(mStaff, ossImageId);
-			WxMenuAction.InsertBuilder4ImageText insert4ImageText = new WxMenuAction.InsertBuilder4ImageText(new Data4Item("测试Title", "测试Description", image.getObjectUrl(), "http://www.baidu.com"));
+			WxMenuAction.InsertBuilder4ImageText insert4ImageText = new WxMenuAction.InsertBuilder4ImageText(new Data4Item("测试Title", "测试Description", image.getObjectUrl(), "http://www.baidu.com"), WxMenuAction.Cate.NORMAL);
 			actionId = WxMenuActionDao.insert(mStaff, insert4ImageText);
 			
 			WxMenuAction expected = insert4ImageText.build();
@@ -112,8 +112,9 @@ public class TestWxMenuAction {
 				}
 			}
 			
-			expected = update4Text.build();
+			expected = update4Text.builder().build();
 			actual = WxMenuActionDao.getById(mStaff, actionId);
+			expected.setCate(actual.getCate());
 			compare(expected, actual);
 			//-------------------------------------------------------------------------------------------------
 			
@@ -125,8 +126,9 @@ public class TestWxMenuAction {
 			WxMenuAction.UpdateBuilder4ImageText update4ImageText = new WxMenuAction.UpdateBuilder4ImageText(actionId, new Data4Item("测试Title", "测试Description", image.getObjectUrl(), "http://www.baidu.com"));
 			WxMenuActionDao.update(mStaff, update4ImageText);
 			
-			expected = update4ImageText.build();
+			expected = update4ImageText.builder().build();
 			actual = WxMenuActionDao.getById(mStaff, actionId);
+			expected.setCate(actual.getCate());
 			compare(expected, actual);
 			//-------------------------------------------------------------------------------------------------
 			
@@ -168,7 +170,7 @@ public class TestWxMenuAction {
 		int actionId = 0;
 		try{
 			//Test to insert a new weixin text msg action.
-			WxMenuAction.InsertBuilder4Text insert4Text = new WxMenuAction.InsertBuilder4Text("测试内容");
+			WxMenuAction.InsertBuilder4Text insert4Text = new WxMenuAction.InsertBuilder4Text("测试内容", WxMenuAction.Cate.NORMAL);
 			actionId = WxMenuActionDao.insert(mStaff, insert4Text);
 			
 			WxMenuAction expected = insert4Text.build();
@@ -195,8 +197,9 @@ public class TestWxMenuAction {
 			WxMenuAction.UpdateBuilder4Text update4Text = new WxMenuAction.UpdateBuilder4Text(actionId, "测试修改");
 			WxMenuActionDao.update(mStaff, update4Text);
 			
-			expected = update4Text.build();
+			expected = update4Text.builder().build();
 			actual = WxMenuActionDao.getById(mStaff, actionId);
+			expected.setCate(actual.getCate());
 			compare(expected, actual);
 			
 		}finally{
@@ -216,5 +219,6 @@ public class TestWxMenuAction {
 		Assert.assertEquals("wx menu action id", expected.getId(), actual.getId());
 		Assert.assertEquals("wx menu action msg type", expected.getMsgType().toString(), actual.getMsgType().toString());
 		Assert.assertEquals("wx menu action", expected.getAction(), actual.getAction());
+		Assert.assertEquals("wx menu cate", expected.getCate(), actual.getCate());
 	}
 }

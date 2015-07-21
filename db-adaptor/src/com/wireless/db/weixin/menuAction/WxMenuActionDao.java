@@ -134,10 +134,11 @@ public class WxMenuActionDao {
 	private static int insert(DBCon dbCon, Staff staff, WxMenuAction menuAction) throws SQLException{
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".weixin_menu_action " +
-			  " ( restaurant_id, type, action ) VALUES( " +
+			  " ( restaurant_id, type, action, cate ) VALUES( " +
 			  staff.getRestaurantId() + "," +
 			  menuAction.getMsgType().getType() + "," +
-			  "'" + menuAction.getAction() + "'" +
+			  "'" + menuAction.getAction() + "'," +
+			  menuAction.getCate().getVal() + 
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -191,7 +192,7 @@ public class WxMenuActionDao {
 	 * @throws SAXException 
 	 */
 	public static void update(DBCon dbCon, Staff staff, WxMenuAction.UpdateBuilder4ImageText builder) throws SQLException, BusinessException, SAXException, IOException, ParserConfigurationException{
-		update(dbCon, staff, builder.build());
+		update(dbCon, staff, builder.builder());
 	}
 	
 	/**
@@ -209,7 +210,7 @@ public class WxMenuActionDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			update(dbCon, staff, builder.build());
+			update(dbCon, staff, builder.builder());
 		}finally{
 			dbCon.disconnect();
 		}
@@ -229,11 +230,12 @@ public class WxMenuActionDao {
 	 * 			throws if action to update does NOT exist
 	 */
 	public static void update(DBCon dbCon, Staff staff, WxMenuAction.UpdateBuilder4Text builder) throws SQLException, BusinessException{
-		update(dbCon, staff, builder.build());
+		update(dbCon, staff, builder.builder());
 	}
 	
-	private static void update(DBCon dbCon, Staff staff, WxMenuAction menuAction) throws SQLException, BusinessException{
+	private static void update(DBCon dbCon, Staff staff, WxMenuAction.UpdateBuilder builder) throws SQLException, BusinessException{
 		
+		WxMenuAction menuAction = builder.build(); 
 		//Delete the associated oss image.
 		try {
 			WxMenuAction oriAction = getById(dbCon, staff, menuAction.getId());
@@ -253,10 +255,19 @@ public class WxMenuActionDao {
 		}
 
 		String sql;
+		
+		if(builder.isCateChanged() && menuAction.getCate() == WxMenuAction.Cate.SUBSCRIBE_REPLY){
+			sql = " UPDATE " + Params.dbName + ".weixin_menu_action SET " +
+				  " cate = " + WxMenuAction.Cate.NORMAL.getVal() + 
+				  " WHERE restaurant_id = " + staff.getRestaurantId();
+			dbCon.stmt.executeUpdate(sql);
+		}
+		
 		sql = " UPDATE " + Params.dbName + ".weixin_menu_action SET " +
 			  " id = " + menuAction.getId() + 
 			  " ,type = " + menuAction.getMsgType().getType() +
 			  " ,action = '" + menuAction.getAction() + "'" +
+			  (builder.isCateChanged() ? " ,cate = " + menuAction.getCate().getVal() : "") +
 			  " WHERE id = " + menuAction.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WxMenuError.WEIXIN_MENU_ACTION_NOT_EXIST);
@@ -334,6 +345,7 @@ public class WxMenuActionDao {
 			menuAction.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			menuAction.setMsgType(MsgType.valueOf(dbCon.rs.getInt("type")));
 			menuAction.setAction(dbCon.rs.getString("action"));
+			menuAction.setCate(WxMenuAction.Cate.valueOf(dbCon.rs.getInt("cate")));
 			result.add(menuAction);
 		}
 		dbCon.rs.close();
