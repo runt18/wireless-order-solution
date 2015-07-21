@@ -1,11 +1,11 @@
 
-var materialTypeDate = [[1,'商品'],[2,'原料']];
+var materialTypeDate = [[-1,'全部'],[1,'商品'],[2,'原料']];
 var materialTypeComb = new Ext.form.ComboBox({
 	fidldLabel : '类型:',
 	forceSelection : true,
 	width : 110,
 	id : 'sdir_materialType',
-	value : 1,
+	value : -1,
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
 		data : materialTypeDate
@@ -16,7 +16,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	readOnly : false	,
+	readOnly : false,
 	listeners : {
         select : function(combo, record, index){  
         	materialCateComb.reset();
@@ -40,7 +40,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 });
 var materialCateStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
-	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do?restaurantID=' + restaurantID}),
+	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do'}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
          {name : 'id'},
          {name : 'name'}
@@ -84,7 +84,7 @@ var materialCateComb = new Ext.form.ComboBox({
 });
 var materialStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
-	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
+	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?contentAll=true'}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 		{name : 'id'},
 		{name : 'name'},
@@ -207,29 +207,51 @@ Ext.onReady(function(){
 
 	});
 	
+	var deptProperty = [];
+	$.ajax({
+		url : '../../QueryDept.do',
+		type : 'post',
+		dataType : 'json',
+		async : false,
+		data : {dataSource : 'normal'},
+		success : function(data){
+			deptProperty = data.root;
+		},
+		error : function(xhr){
+			Ext.ux.showMsg(JSON.parse(xhr.responseText));
+		}
+	});
 	
-	var stockDetail = new Ext.grid.ColumnModel([
+	var deptColumnModel = [{header:'品项名称', dataIndex:'materialName', width:200}];
+	var dataStore = [{name : 'materialName'}];
+	for (var i = 0; i < deptProperty.length; i++) {
+		deptColumnModel.push({header:deptProperty[i].name, dataIndex: 'dept'+deptProperty[i].id, align: 'right'});
+		dataStore.push({name : 'dept'+deptProperty[i].id });
+	}
+	deptColumnModel.push({header:'成本单价', dataIndex:'price', align: 'right', renderer : Ext.ux.txtFormat.gridDou});
+	deptColumnModel.push({header:'数量合计', dataIndex:'stock', align: 'right'});
+	deptColumnModel.push({header:'成本金额', dataIndex:'cost', align: 'right', renderer : Ext.ux.txtFormat.gridDou});
+	
+	dataStore.push({name : 'price'});
+	dataStore.push({name : 'stock'});
+	dataStore.push({name : 'cost'});
+	
+/*	var stockDetail = new Ext.grid.ColumnModel([
 		{header:'部门', dataIndex:'dept.name', width:220},
 		{header:'品项名称', dataIndex:'materialName', width:220, hidden:true},
 		{header:'数量', dataIndex:'stock', width:220, align: 'right', renderer : Ext.ux.txtFormat.gridDou},
 		{header:'成本单价', dataIndex:'price', width:220, align: 'right', renderer : Ext.ux.txtFormat.gridDou},
 		{header:'成本金额', dataIndex:'cost', width:220, align: 'right', renderer : Ext.ux.txtFormat.gridDou}
 	                                            
-	    ]);
-	    stockDetail.defaultSortable = true;
-	var ds = new Ext.data.GroupingStore({
-		//proxy : new Ext.data.MemoryProxy(data),
+	    ]);*/
+	var stockDetail = new Ext.grid.ColumnModel(deptColumnModel);
+	stockDetail.defaultSortable = true;
+	
+	var ds = new Ext.data.Store({
 		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialDept.do'}),
-		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-			 {name : 'dept.name'},
-	         {name : 'materialName'},
-	         {name : 'stock'},
-	         {name : 'price'},
-	         {name : 'cost'}
-
-		]),
-		sortInfo:{field: 'materialName', direction: "ASC"},
-		groupField:'materialName'
+		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, dataStore)
+/*		sortInfo:{field: 'materialName', direction: "ASC"},
+		groupField:'materialName'*/
 	});
 	var date = new Date();
 	date.setMonth(date.getMonth()-1);
@@ -252,13 +274,15 @@ Ext.onReady(function(){
 		{xtype : 'tbtext', text : '货品:'},
 		materialComb,
 
-		'->', {
+		'->', 
+/*			{
 				text : '展开/收缩',
 				iconCls : 'icon_tb_toggleAllGroups',
 				handler : function(){
 					stockDistributionGrid.getView().toggleAllGroups();
 				} 
-			}, {
+			},*/
+			{
 			text : '搜索',
 			id : 'btnStockDistributionSearch',
 			iconCls : 'btn_search',
@@ -298,13 +322,37 @@ Ext.onReady(function(){
         animCollapse: false,
 		store : ds,
 		cm : stockDetail,
-		view : new Ext.grid.GroupingView({
+/*		view : new Ext.grid.GroupingView({
             forceFit: true,
             groupTextTpl: '{text} ({[values.rs.length]}条记录)'
-        }),
+        }),*/
 		tbar : distributionReportBar,
 		bbar : pagingBar
 	});
+	
+	stockDistributionGrid.getStore().on('load', function(store, records, options){
+		if(store.getCount() > 0){
+
+			var sumRow = stockDistributionGrid.getView().getRow(store.getCount() - 1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			for(var i = 0; i < stockDistributionGrid.getColumnModel().getColumnCount(); i++){
+				var sumCell = stockDistributionGrid.getView().getCell(store.getCount() - 1, i);
+				sumCell.style.fontSize = '15px';
+				sumCell.style.fontWeight = 'bold';
+				sumCell.style.color = 'green';
+			}
+			
+			var index;
+			for (var i = 0; i < deptProperty.length; i++) {
+				stockDistributionGrid.getView().getCell(store.getCount()-1, i+1).innerHTML = '--';
+				index = i;
+			}
+			stockDistributionGrid.getView().getCell(store.getCount()-1, index+2).innerHTML = '--';
+		}
+		
+	});
+	
+	
 	ds.load({params:{start:0,limit:13}});
 	
 	new Ext.Panel({
