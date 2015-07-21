@@ -1,9 +1,9 @@
 package com.wireless.print.content.concrete;
 
 import com.wireless.pojo.billStatistics.IncomeByBook;
-import com.wireless.pojo.billStatistics.IncomeByCharge;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByPay.PaymentIncome;
+import com.wireless.pojo.billStatistics.member.IncomeByCharge;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
