@@ -16,17 +16,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.marker.weixin.HandleMessageAdapter;
 import org.marker.weixin.msg.Data4Item;
 import org.marker.weixin.msg.Msg;
 import org.marker.weixin.msg.Msg4Event;
 import org.marker.weixin.msg.Msg4Event.Event;
+import org.marker.weixin.msg.Msg4Head.MsgType;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 import org.marker.weixin.session.WxSession;
-import org.xml.sax.SAXException;
 
 import com.alibaba.fastjson.JSON;
 import com.wireless.db.member.MemberDao;
@@ -121,12 +119,17 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	}
 	
 	private String createUrl(Msg msg, String url){
-		return new StringBuilder()
-					.append(url)
-					.append("?_d=" + System.currentTimeMillis())
-					.append("&m=").append(msg.getFromUserName())
-					.append("&r=").append(msg.getToUserName())
-					.append("&time=").append(System.currentTimeMillis()).toString();
+		StringBuilder s = new StringBuilder();
+		s.append(url);
+		if(!url.contains("?")){
+			s.append("?1=1");
+		}
+		return s.append("&_d=" + System.currentTimeMillis())
+				.append("&m=" + msg.getFromUserName())
+				.append("&r=" + msg.getToUserName())
+				.append("&time=" + System.currentTimeMillis())
+				.toString();
+		
 	}
 	
 	private Msg createWelcome(Msg msg) throws SQLException, BusinessException{
@@ -430,7 +433,18 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 					
 					Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
-					session.callback(new WxMenuAction.MsgProxy(msg.getHead(), WxMenuActionDao.getById(staff, Integer.parseInt(msg.getEventKey()))).toMsg());
+					Msg msg4Action = new WxMenuAction.MsgProxy(msg.getHead(), WxMenuActionDao.getById(staff, Integer.parseInt(msg.getEventKey()))).toMsg();
+					if(msg4Action.getHead().getMsgType() == MsgType.MSG_TYPE_IMAGE_TEXT){
+						for(Data4Item item : ((Msg4ImageText)msg4Action).getItems()){
+							if(item.hasUrl()){
+								System.out.println(createUrl(msg, item.getUrl()) + "&wecha_id=" + msg.getFromUserName());
+								item.setUrl(createUrl(msg, item.getUrl()) + "&wecha_id=" + msg.getFromUserName());
+							}
+						}
+					}
+					session.callback(msg4Action);
+					
+					//wecha_id={wechat_id}
 				}
 				
 			}else if(msg.getEvent() == Event.SCAN_WAIT_MSG){
@@ -449,7 +463,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 				}
 			}
 			
-		}catch(BusinessException | SQLException | NumberFormatException | SAXException | IOException | ParserConfigurationException e){
+		}catch(Exception e){
 			e.printStackTrace();
 			session.callback(new Msg4ImageText(msg).addItem(new Data4Item("操作失败", e.getMessage(), "", "")));
 		}
