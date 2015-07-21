@@ -34,6 +34,7 @@ var materialTypeComb = new Ext.form.ComboBox({
         			dataSource : 'normal'
         		}
         	});
+        	Ext.getCmp('btnStockDistributionSearch').handler();
 		}  
 	}
 	
@@ -76,7 +77,8 @@ var materialCateComb = new Ext.form.ComboBox({
 	            	cateId : combo.value,  
 	            	dataSource : 'normal'
 	            }  
-            });     
+            });   
+        	Ext.getCmp('btnStockDistributionSearch').handler();
 		}
 
 	}
