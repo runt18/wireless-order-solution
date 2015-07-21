@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -129,35 +128,6 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 		public String getDesc(){
 			return desc;
 		}
-	}
-	
-	public static class CateNode implements Entry<Cate, List<Privilege>>{
-
-		private final Cate key;
-		private final List<Privilege> value;
-		
-		public CateNode(Cate key, List<Privilege> value){
-			this.key = key;
-			
-			this.value = value;
-		}
-		
-		@Override
-		public Cate getKey() {
-			return key;
-		}
-
-		@Override
-		public List<Privilege> getValue() {
-			return value;
-		}
-
-		@Override
-		public List<Privilege> setValue(List<Privilege> value) {
-			throw new UnsupportedOperationException("The dept node is immutable");
-		}
-
-		
 	}
 	
 	public final static Comparator<Privilege> BY_CATE = new Comparator<Privilege>(){

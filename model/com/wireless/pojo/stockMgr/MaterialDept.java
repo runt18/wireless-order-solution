@@ -17,7 +17,7 @@ public class MaterialDept implements Jsonable{
 	private Department dept = new Department(0);
 	private float cost;
 	
-	private Map<Department, Float> deptStock = new HashMap<>(); 
+	private Map<Department, Float> deptStock = new HashMap<Department, Float>(); 
 	
 	
 	public float getCost() {

@@ -2,6 +2,7 @@ package com.wireless.pojo.billStatistics;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.billStatistics.member.IncomeByCharge;
 import com.wireless.pojo.util.DateUtil;
 
 public class IncomeByEachDay implements Jsonable{

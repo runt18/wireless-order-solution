@@ -18,8 +18,14 @@ public class StaffError extends ErrorEnum{
 	public static final ErrorCode VERIFY_PWD = build(7609, "原密码输入错误");
 	public static final ErrorCode TEMP_PAYMENT_NOT_ALLOW = build(7610, "你没有暂结的权限");
 	public static final ErrorCode RESERVED_ROLE_NOT_ALLOW_MODIFY = build(7611, "系统保留的角色不能修改");
-	public static final ErrorCode RESERVED_STAFF_NOT_ALLOW_MODIFY = build(7611, "系统保留的员工不能修改");
-	public static final ErrorCode TRANSFER_FOOD_NOT_ALLOW = build(7606, "你没有转菜的权限");
+	public static final ErrorCode RESERVED_STAFF_NOT_ALLOW_MODIFY = build(7612, "系统保留的员工不能修改");
+	public static final ErrorCode TRANSFER_FOOD_NOT_ALLOW = build(7613, "你没有转菜的权限");
+	public static final ErrorCode MEMBER_CHECK_NOT_ALLOW = build(7614, "你没有查询会员的权限");
+	public static final ErrorCode MEMBER_ADD_NOT_ALLOW = build(7615, "你没有增加会员的权限");
+	public static final ErrorCode MEMBER_REMOVE_NOT_ALLOW = build(7616, "你没有删除会员的权限");
+	public static final ErrorCode MEMBER_UPDATE_NOT_ALLOW = build(7617, "你没有修改会员的权限");
+	public static final ErrorCode MEMBER_CHARGE_NOT_ALLOW = build(7618, "你没有会员充值的权限");
+	public static final ErrorCode MEMBER_REFUND_NOT_ALLOW = build(7619, "你没有会员取款的权限");
 	
 	private StaffError(){
 		
