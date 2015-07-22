@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.wireless.pojo.billStatistics.IncomeByPay;
-import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.Member;
 
 public class StatisticsByEachDay {
@@ -18,7 +16,7 @@ public class StatisticsByEachDay {
 	
 	private final IncomeByCharge charge;
 	
-	private final IncomeByPay.PaymentIncome consumption;
+	private final IncomeByConsume consumption;
 	
 	private StatisticsByEachDay(){
 		this.date = null;
@@ -26,7 +24,7 @@ public class StatisticsByEachDay {
 		this.consumption = null;
 	}
 	
-	public StatisticsByEachDay(String date, List<Member> creates, IncomeByCharge charge, IncomeByPay.PaymentIncome consumption){
+	public StatisticsByEachDay(String date, List<Member> creates, IncomeByCharge charge, IncomeByConsume consumption){
 		this.date = date;
 		if(creates != null){
 			this.creates.addAll(creates);
@@ -50,9 +48,9 @@ public class StatisticsByEachDay {
 		return this.charge;
 	}
 	
-	public IncomeByPay.PaymentIncome getConsumption(){
+	public IncomeByConsume getConsumption(){
 		if(this.consumption == null){
-			return new IncomeByPay.PaymentIncome(PayType.MEMBER, 0, 0, 0);
+			return IncomeByConsume.DUMMY;
 		}
 		return this.consumption;
 	}
@@ -61,8 +59,8 @@ public class StatisticsByEachDay {
 	public String toString(){
 		return "date = " + this.date +
 			   ", create member = " + this.creates.size() +
-			   ", consumption amount = " + getConsumption().getAmount() +
-			   ", consumption total = " + getConsumption().getTotal() +
+			   ", consumption amount = " + getConsumption().getTotalAmount() +
+			   ", consumption total = " + getConsumption().getTotalConsume() +
 			   ", charge amount = " + getCharge().getChargeAmount() +
 			   ", charge total = " + getCharge().getTotalActualCharge() +
 			   ", refund amount = " + getCharge().getRefundAmount() +

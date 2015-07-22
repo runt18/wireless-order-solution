@@ -36,6 +36,12 @@ public class DutyRange implements Jsonable{
 	}
 
 	@Override
+	public String toString(){
+		return "on_duty = " + getOnDutyFormat() + 
+				", off_duty = " + getOffDutyFormat(); 
+	}
+	
+	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putLong("onDuty", getOnDuty());
