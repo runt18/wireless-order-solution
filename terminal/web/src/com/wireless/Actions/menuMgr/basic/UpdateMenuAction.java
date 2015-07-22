@@ -83,7 +83,7 @@ public class UpdateMenuAction extends Action {
 				String[] food_prices = foodPrices.split("&");
 				for (String p : food_prices) {
 					String[] planPrice = p.split(",");
-					builder.addPrice(Integer.parseInt(planPrice[0]), Integer.parseInt(planPrice[1]));
+					builder.addPrice(Integer.parseInt(planPrice[0]), Float.parseFloat(planPrice[1]));
 				}
 			}
 			
