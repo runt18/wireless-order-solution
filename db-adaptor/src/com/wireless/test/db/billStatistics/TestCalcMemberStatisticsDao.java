@@ -23,7 +23,7 @@ public class TestCalcMemberStatisticsDao {
 	public static void initDbParam() throws PropertyVetoException, SQLException, BusinessException, ParseException{
 		TestInit.init();
 		 mStaff = StaffDao.getAdminByRestaurant(40);
-		 mDutyRange = new DutyRange("2015-7-20", "2015-7-26"); 
+		 mDutyRange = new DutyRange("2015-7-3", "2015-7-4"); 
 	}
 	
 	@Test 

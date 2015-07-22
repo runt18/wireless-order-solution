@@ -15,11 +15,11 @@ import com.wireless.db.Params;
 import com.wireless.db.member.MemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
-import com.wireless.pojo.billStatistics.IncomeByPay;
-import com.wireless.pojo.billStatistics.IncomeByPay.PaymentIncome;
 import com.wireless.pojo.billStatistics.member.IncomeByCharge;
+import com.wireless.pojo.billStatistics.member.IncomeByConsume;
 import com.wireless.pojo.billStatistics.member.StatisticsByEachDay;
 import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.staffMgr.Staff;
@@ -72,33 +72,57 @@ public class CalcMemberStatisticsDao {
 		while (dateBegin.compareTo(dateEnd) <= 0) {
 			c.add(Calendar.DATE, 1);
 			
-			final DutyRange range = new DutyRange(dateBegin.getTime(), c.getTime().getTime());
+			final DutyRange range = DutyRangeDao.exec(dbCon, staff, 
+													  DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), 
+													  DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
 			
-			final String date = DateUtil.format(dateBegin, DateUtil.Pattern.DATE);
-				//Calculate the general income
-				IncomeByPay.PaymentIncome consumption = null;
-				for(PaymentIncome payIncome : CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, range, new CalcBillStatisticsDao.ExtraCond(extraCond.dbTbl.dateType)).getPaymentIncomes()){
-					if(payIncome.getPayType().isMember()){
-						consumption = payIncome;
-						break;
-					}
-				}
+			IncomeByConsume consumption = null;
+			IncomeByCharge charge = null;
+			if(range != null){
+				//Calculate the consumption income
+				consumption = calcIncomeByConsume(dbCon, staff, range, extraCond);
 				
 				//Get the charge income by both cash and credit card
-				IncomeByCharge charge = calcIncomeByCharge(dbCon, staff, range, extraCond);
+				charge = calcIncomeByCharge(dbCon, staff, range, extraCond);
 				
-				List<Member> creates;
-				try {
-					creates = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setCreateRange(range), null);
-				} catch (BusinessException e) {
-					creates = Collections.emptyList();
-					e.printStackTrace();
-				}
-				
-				result.add(new StatisticsByEachDay(date, creates, charge, consumption));
+			}
+			
+			List<Member> creates = null;
+			try {
+				creates = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setCreateRange(new DutyRange(dateBegin.getTime(), c.getTime().getTime())), null);
+			} catch (BusinessException e) {
+				creates = Collections.emptyList();
+				e.printStackTrace();
+			}
+			
+			result.add(new StatisticsByEachDay(DateUtil.format(dateBegin, DateUtil.Pattern.DATE), creates, charge, consumption));
 			
 			dateBegin = c.getTime();
 		}
+		
+		return result;
+	}
+	
+	public static IncomeByConsume calcIncomeByConsume(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+		String sql;
+		sql = " SELECT IFNULL(PT.name, '其他') AS pay_type, SUM(TMP.actual_price) AS total_consume, COUNT(*) AS consume_amount FROM ( " +
+				" SELECT OH.actual_price, OH.pay_type_id FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " OH " +
+				" JOIN " + Params.dbName + "." + extraCond.dbTbl.moTbl + " MOH ON MOH.order_id = OH.id " +
+				" WHERE OH.restaurant_id = " + staff.getRestaurantId() +
+			    " AND MOH.operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+				" AND MOH.operate_type = " + MemberOperation.OperationType.CONSUME.getValue() +
+				" GROUP BY OH.id " +
+			  " ) AS TMP " +
+			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = TMP.pay_type_id " +
+			  " GROUP BY TMP.pay_type_id ";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
+		IncomeByConsume result = new IncomeByConsume();
+		
+		while(dbCon.rs.next()){
+			result.add(dbCon.rs.getString(1), dbCon.rs.getFloat(2), dbCon.rs.getInt(3));
+		}
+		dbCon.rs.close();
 		
 		return result;
 	}
