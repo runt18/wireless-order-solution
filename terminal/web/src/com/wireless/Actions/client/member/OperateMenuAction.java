@@ -127,6 +127,7 @@ public class OperateMenuAction extends DispatchAction{
 		String content = request.getParameter("content");
 		String url = request.getParameter("url");
 		String rid = request.getParameter("rid");
+		String subItems = request.getParameter("subItems");
 		JObject jobject = new JObject(); 
 		
 		try{
@@ -134,9 +135,22 @@ public class OperateMenuAction extends DispatchAction{
 			WxMenuAction.InsertBuilder4ImageText insert4ImageText;
 			if(image != null && !image.isEmpty()){
 				OssImage ossImage = OssImageDao.getById(staff, Integer.parseInt(image));
-				insert4ImageText = new WxMenuAction.InsertBuilder4ImageText(new Data4Item(title, content, ossImage.getObjectUrl(), url));				
+				image = ossImage.getObjectUrl();
 			}else{
-				insert4ImageText = new WxMenuAction.InsertBuilder4ImageText(new Data4Item(title, content, "", url));	
+				image = "";
+			}
+			insert4ImageText = new WxMenuAction.InsertBuilder4ImageText(new Data4Item(title, content, image, url));
+			if(subItems != null && !subItems.isEmpty()){
+				String[] subItemArry = subItems.split("&");
+				for (String s : subItemArry) {
+					String[] subItem = s.split(",");
+					OssImage sub_ossImage = null;
+					if(!subItem[2].equals("-1")){
+						sub_ossImage = OssImageDao.getById(staff, Integer.parseInt(subItem[2]));
+					}
+					insert4ImageText.addItem(new Data4Item(subItem[0], "", sub_ossImage != null?sub_ossImage.getObjectUrl():"", subItem[1]));
+				}
+				
 			}
 
 			final int actionId = WxMenuActionDao.insert(staff, insert4ImageText);
@@ -179,16 +193,32 @@ public class OperateMenuAction extends DispatchAction{
 		String url = request.getParameter("url");
 		String key = request.getParameter("key");
 		String rid = request.getParameter("rid");
+		String subItems = request.getParameter("subItems");
 		JObject jobject = new JObject(); 
 		
 		try{
 			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
 			WxMenuAction.UpdateBuilder4ImageText update4ImageText;
+			
 			if(image != null && !image.isEmpty()){
 				OssImage ossImage = OssImageDao.getById(staff, Integer.parseInt(image));
-				update4ImageText = new WxMenuAction.UpdateBuilder4ImageText(Integer.parseInt(key), new Data4Item(title, content, ossImage.getObjectUrl(), url));				
+				image = ossImage.getObjectUrl();
 			}else{
-				update4ImageText = new WxMenuAction.UpdateBuilder4ImageText(Integer.parseInt(key), new Data4Item(title, content, "", url));	
+				image = "";
+			}
+			
+			update4ImageText = new WxMenuAction.UpdateBuilder4ImageText(Integer.parseInt(key), new Data4Item(title, content, image, url));
+			if(subItems != null && !subItems.isEmpty()){
+				String[] subItemArry = subItems.split("&");
+				for (String s : subItemArry) {
+					String[] subItem = s.split(",");
+					OssImage sub_ossImage = null;
+					if(!subItem[2].equals("-1")){
+						sub_ossImage = OssImageDao.getById(staff, Integer.parseInt(subItem[2]));
+					}
+					update4ImageText.addItem(new Data4Item(subItem[0], "", sub_ossImage != null?sub_ossImage.getObjectUrl():"", subItem[1]));
+				}
+				
 			}
 
 			WxMenuActionDao.update(staff, update4ImageText);
