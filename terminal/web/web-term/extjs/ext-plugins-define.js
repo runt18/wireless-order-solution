@@ -95,7 +95,7 @@ Ext.ux.plugins.createImageFile = function(config){
 	 					}
 						
 						//图片显示后是否立即上传
-						config.uploadCallback && config.uploadCallback();
+						config.uploadCallback && config.uploadCallback(config);
 						
 					} catch(e){
 						Ext.example.msg('提示', '操作失败, 无法获取图片信息. 请换浏览器后重试.');
