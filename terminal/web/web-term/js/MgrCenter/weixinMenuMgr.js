@@ -5,7 +5,9 @@ var rid = Request["rid"];
 rid = 40;
 var basePath = "http://localhost:8080";
 //var basePath = "http://wx.e-tones.net";
-var multiFoodPriceCount = 0;
+
+var p_box, imgFile,
+	multiFoodPriceCount = 0, subscribe = false, subscribeKey = -1;
 
 
 /**
@@ -109,7 +111,7 @@ function deptWinInit(){
 						tree.getNodeById(deptID.getValue()).setText(deptName.getValue());
 						Ext.example.msg('提示', '修改成功');
 					}
-					
+					subscribe = false;
 					
 					updateDeptWin.hide();
 				}
@@ -219,7 +221,7 @@ function deleteMenu(){
 				$('#itemTitle').val("");			
 				$('#itemContent').val("");	
 				$('#itemUrl').val("");			
-				delete p_box.ossId;	
+				delete p_box.image;	
 				imgFile.setImg("");
 				
 			}
@@ -234,7 +236,7 @@ function deleteMenu(){
  */
 function operateMenuContent(){
 	var tn = Ext.ux.getSelNode(tree);
-	if(!tn){
+	if(!tn && !subscribe){
 		Ext.example.msg('提示', '操作失败, 请选中一个菜单再进行操作.');
 		return;
 	}		
@@ -243,27 +245,40 @@ function operateMenuContent(){
 		return ;
 	}
 	
+	var key;
 	var dataSource = "insertMenu";
-	if(tn.attributes.key && !isNaN(tn.attributes.key)){
+	if(subscribeKey != -1){
 		dataSource = "updateMenu";
+		key = subscribeKey
+	}else if(tn && tn.attributes.key && !isNaN(tn.attributes.key)){
+		dataSource = "updateMenu";
+		key = tn.attributes.key;
 	}	
 	
 	$.ajax({ 
 	    type : "post", 
 	    async:false, 
 	    url : "../../OperateMenu.do",
+	    dataType : "json",//jsonp数据类型
+//	    url : basePath+"/wx-term/WXOperateMenu.do",
+//	    dataType : "jsonp",//jsonp数据类型 
+//	    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 	    
 	    data : {
 	    	dataSource : dataSource,
 	    	rid : rid,
-	    	key : tn.attributes.key,
-	    	text : $('#menuTxtReply').val()
+	    	key : key,
+	    	text : $('#menuTxtReply').val(),
+	    	subscribe : subscribe?subscribe:""
 	    },
-	    dataType : "json",//jsonp数据类型 
 	    success : function(rt){ 
 	        if(rt.success){
 	        	if(dataSource == "insertMenu"){
-	        		tn.attributes.type = "click";
-	        		tn.attributes.key = rt.other.key;
+	        		if(tn){
+	        			tn.attributes.type = "click";
+	        			tn.attributes.key = rt.other.key;
+	        		}else{
+	        			subscribeKey = rt.other.key;
+	        		}
 	        	}
 			}
 	        Ext.example.msg('提示', rt.msg);
@@ -272,8 +287,12 @@ function operateMenuContent(){
 	        var rt = JSON.parse(xhr.responseText);
 	        if(rt.success){
 	        	if(dataSource == "insertMenu"){
-	        		tn.attributes.type = "click";
-	        		tn.attributes.key = rt.other.key;
+	        		if(tn){
+	        			tn.attributes.type = "click";
+	        			tn.attributes.key = rt.other.key;
+	        		}else{
+	        			subscribeKey = rt.other.key;
+	        		}
 	        	}
 			}
 	        Ext.example.msg('提示', rt.msg);
@@ -411,6 +430,32 @@ function getWeixinMenu(){
 	    	tree.setRootNode(new Ext.tree.AsyncTreeNode(root));
 	    } 
 	}); 	
+}
+
+function clearTabContent(){
+	$('#menuTxtReply').val("");			
+	$('#url4Menu').val("");	
+	
+	$('#itemTitle').val("");			
+	$('#itemContent').val("");	
+	$('#itemUrl').val("");			
+	delete p_box.image;	
+	imgFile.setImg("");
+	
+	if(multiFoodPriceCount > 0){
+		for (var j = 1; j <= multiFoodPriceCount; j++) {
+			var cmps = $('.multiClass'+j);
+			for (var i = 0; i < cmps.length; i++) {
+				Ext.getCmp('food_multiPrice').remove(cmps[i].getAttribute("id"));
+			}
+		}
+	}
+	Ext.getCmp('food_multiPrice').doLayout();
+	multiFoodPriceCount = 0;
+	
+	$('input[name="systemSet"]:checked').removeAttr("checked");
+	
+	subscribe = false;
 }
 
 Ext.onReady(function(){
@@ -594,27 +639,7 @@ Ext.onReady(function(){
 				getWeixinMenu();
 			},
 			click : function(e){
-				$('#menuTxtReply').val("");			
-				$('#url4Menu').val("");	
-				
-				$('#itemTitle').val("");			
-				$('#itemContent').val("");	
-				$('#itemUrl').val("");			
-				delete p_box.ossId;	
-				imgFile.setImg("");
-				
-				if(multiFoodPriceCount > 0){
-					for (var j = 1; j <= multiFoodPriceCount; j++) {
-						var cmps = $('.multiClass'+j);
-						for (var i = 0; i < cmps.length; i++) {
-							Ext.getCmp('food_multiPrice').remove(cmps[i].getAttribute("id"));
-						}
-					}
-				}
-				Ext.getCmp('food_multiPrice').doLayout();
-				multiFoodPriceCount = 0;
-				
-				$('input[name="systemSet"]:checked').removeAttr("checked");
+				clearTabContent();
 				
 				var tn = Ext.ux.getSelNode(tree);
 				
@@ -649,13 +674,16 @@ Ext.onReady(function(){
 						$.ajax({ 
 						    type : "post", 
 						    async:false, 
-						    url : "../../OperateMenu.do",
+//						    url : "../../OperateMenu.do",
+//						    dataType : "json",//jsonp数据类型 
+						    url : basePath+"/wx-term/WXOperateMenu.do",
+						    dataType : "jsonp",//jsonp数据类型 
+						    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
 						    data : {
 						    	dataSource : 'menuReply',
 						    	rid : rid,
 						    	key : tn.attributes.key
 						    },
-						    dataType : "json",//jsonp数据类型 
 						    success : function(rt){ 
 						        if(rt.success){
 						        	if(rt.other){
@@ -671,8 +699,11 @@ Ext.onReady(function(){
 										$('#itemUrl').val(item.url);	
 						        		imgFile.setImg(item.picUrl);
 						        		
+										var tab = tabs.getComponent("tab_image_text");
+										tabs.setActiveTab(tab);
+										
 						        		//如果有子显示项
-						        		if(rt.root > 1){
+						        		if(rt.root.length > 1){
 						        			multiFoodPriceCount = rt.root.length - 1;
 						        			for (var i = 1; i < rt.root.length; i++) {
 						        				var subTitleId = 'subTitle' + i,  
@@ -745,7 +776,124 @@ Ext.onReady(function(){
 							        				items : [sub_box, sub_form]	 		
 							        		 	});			
 							        			
+							        			Ext.getCmp('food_multiPrice').add({
+							        				cls : 'multiClass'+i,
+							        		 		columnWidth : .12,
+							        		 		items : [{
+							        			    	xtype : 'button',
+							        			    	text : '删除',
+							        			    	style:'margin-top:40px;margin-left:10px;',
+							        			    	multiIndex : i,
+							        			    	iconCls : 'btn_delete',
+							        			    	handler : function(e){
+							        			    		deleteMultiPriceHandler(e);
+							        			    	}
+							        		 		}] 		 		
+							        		 	});	
+							        			
+							        			Ext.getCmp('food_multiPrice').doLayout();
+							        			
 							        			sub_imgFile.setImg(rt.root[i].picUrl);
+											}
+						        		}
+
+						        	}
+								}
+						    }, 
+						    error:function(xhr){ 
+						        var rt = JSON.parse(xhr.responseText);
+						        if(rt.success){
+						        	if(rt.other){
+						        		$('#menuTxtReply').val(rt.other.text);
+						        		
+										var tab = tabs.getComponent("tab_click");
+										tabs.setActiveTab(tab);
+						        	}else if(rt.root.length > 0){
+						        		var item = rt.root[0];
+						        		
+										$('#itemTitle').val(item.title);			
+										$('#itemContent').val(item.description);	
+										$('#itemUrl').val(item.url);	
+						        		imgFile.setImg(item.picUrl);
+						        		
+						        		p_box.image = item.picUrl;
+						        		
+										var tab = tabs.getComponent("tab_image_text");
+										tabs.setActiveTab(tab);
+										
+						        		//如果有子显示项
+						        		if(rt.root.length > 1){
+						        			multiFoodPriceCount = rt.root.length - 1;
+						        			for (var i = 1; i < rt.root.length; i++) {
+						        				var subTitleId = 'subTitle' + i,  
+						        				subUrlId = 'subUrl' + i, 
+						        				subImgFileId = 'subImgFile' + i;
+						        				subFormId = 'subForm' + i;
+						        			
+							        			Ext.getCmp('food_multiPrice').add({
+							        				cls : 'multiClass'+i,
+							        		 		columnWidth : 1	 		
+							        		 	});								
+							        			
+							        			Ext.getCmp('food_multiPrice').add({
+							        				cls : 'multiClass'+i,
+							        				columnWidth: 0.48,
+							        				labelWidth : 40,
+							        				defaults : {
+							        					width : 190
+							        				},
+							        				items :[{
+							        					xtype : 'textfield',
+							        					id : subTitleId,
+							        					fieldLabel : '标题',
+							        					value : rt.root[i].title,
+							        					allowBlank : false
+							        				},{
+							        					xtype : 'textarea',
+							        					id : subUrlId,
+							        					fieldLabel : '链接',
+							        					value : rt.root[i].url
+							        				}]
+							        			});	
+	
+							        			var sub_box = new Ext.BoxComponent({
+							        				xtype : 'box',
+							        		 	    height : 55,
+							        		 	    autoEl : {
+							        		 	    	tag : 'img',
+							        		 	    	title : '图片预览'
+							        		 	    }
+							        			});
+							        			var sub_imgFile = Ext.ux.plugins.createImageFile({
+							        				id : subImgFileId,
+							        				formId : subFormId,
+							        				img : sub_box,
+							        				imgSize : 100,
+							        				//打开图片后的操作
+							        				uploadCallback : function(c){
+							        					subImageOperate(c);
+							        				}
+							        			});
+							        			
+							        			var sub_form = new Ext.form.FormPanel({
+							        				id : subFormId,
+							        				labelWidth : 60,
+							        				fileUpload : true,
+							        				items : [sub_imgFile],
+							        				listeners : {
+							        		    		render : function(e){
+							        		    			//Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+							        		 	  		}
+							        		    	}
+							        			});	
+							        			
+							        			Ext.getCmp('food_multiPrice').add({
+							        				cls : 'multiClass'+i,
+							        				columnWidth: 0.4, 
+							        				layout : 'column',
+							        				frame : true,
+							        				items : [sub_box, sub_form]	 		
+							        		 	});			
 							        			
 							        			Ext.getCmp('food_multiPrice').add({
 							        				cls : 'multiClass'+i,
@@ -760,21 +908,18 @@ Ext.onReady(function(){
 							        			    		deleteMultiPriceHandler(e);
 							        			    	}
 							        		 		}] 		 		
-							        		 	});														
+							        		 	});	
+							        			
+							        			Ext.getCmp('food_multiPrice').doLayout();
+							        			
+							        			sub_imgFile.setImg(rt.root[i].picUrl);
+							        			
+							        			sub_imgFile.image = rt.root[i].picUrl;
 											}
-						        			
-						        			Ext.getCmp('food_multiPrice').doLayout();
-						        			
 						        		}
 						        		
-										var tab = tabs.getComponent("tab_image_text");
-										tabs.setActiveTab(tab);
 						        	}
 								}
-						    }, 
-						    error:function(xhr){ 
-						        var rt = JSON.parse(xhr.responseText);
-						        Ext.example.msg('提示', rt.msg);
 						    } 
 						}); 						
 					}
@@ -840,7 +985,7 @@ Ext.onReady(function(){
 	var menu_uploadMask = new Ext.LoadMask(document.body, {
 		msg : '正在上传图片...'
 	});
-	var p_box = new Ext.BoxComponent({
+	p_box = new Ext.BoxComponent({
 		xtype : 'box',
  	    columnWidth : 1,
  	    height : 200,
@@ -849,7 +994,7 @@ Ext.onReady(function(){
  	    	title : '图片预览'
  	    }
 	});
-	var imgFile = Ext.ux.plugins.createImageFile({
+	imgFile = Ext.ux.plugins.createImageFile({
 		img : p_box,
 		width : 300,
 		height : 200,
@@ -1142,7 +1287,7 @@ Ext.onReady(function(){
 				height : 20,
 				handler : function(){
 					var tn = Ext.ux.getSelNode(tree);
-					if(!tn){
+					if(!tn && !subscribe){
 						Ext.example.msg('提示', '操作失败, 请选中一个菜单再进行操作.');
 						return;
 					}		
@@ -1160,19 +1305,24 @@ Ext.onReady(function(){
 							var image = Ext.getCmp('subImgFile'+i);
 							//过滤已经删除了的子选项
 							if(title && url){
-									if(subItems){
-										subItems += '&';
-									}
-									subItems += (title.getValue() + "," + url.getValue() + "," + (image.ossId?image.ossId:-1));						
+								if(subItems){
+									subItems += '&';
+								}
+								subItems += (title.getValue() + "," + url.getValue() + "," + (image.image?image.image:-1));						
 							
 							}
 						}		
 					}
 					
-					
+					var key;
 					var dataSource = "insertImageText";
-					if(tn.attributes.key && !isNaN(tn.attributes.key)){
+					
+					if(subscribeKey != -1){
 						dataSource = "updateImageText";
+						key = subscribeKey
+					}else if(tn && tn.attributes.key && !isNaN(tn.attributes.key)){
+						dataSource = "updateImageText";
+						key = tn.attributes.key;
 					}	
 					
 					
@@ -1180,28 +1330,46 @@ Ext.onReady(function(){
 					    type : "post", 
 					    async:false, 
 					    url : "../../OperateMenu.do",
+					    dataType : "json",//jsonp数据类型 
+//					    url : basePath+"/wx-term/WXOperateMenu.do",
+//					    dataType : "jsonp",//jsonp数据类型 
+//					    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
 					    data : {
 					    	dataSource : dataSource,
 					    	rid : rid,
-					    	key : tn.attributes.key,
+					    	key : key,
 					    	title : $("#itemTitle").val(),
-					    	image : p_box.ossId ? p_box.ossId : "",
+					    	image : p_box.image ? p_box.image : "",
 					    	content : $("#itemContent").val(),
 					    	url : $("#itemUrl").val(),
-					    	subItems : subItems
+					    	subItems : subItems,
+					    	subscribe : subscribe?subscribe:""
 					    },
-					    dataType : "json",//jsonp数据类型 
 					    success : function(rt){ 
 					        if(rt.success){
 					        	if(dataSource == "insertImageText"){
-					        		tn.attributes.type = "click";
-					        		tn.attributes.key = rt.other.key;
+					        		if(tn){
+					        			tn.attributes.type = "click";
+					        			tn.attributes.key = rt.other.key;
+					        		}else{
+					        			subscribeKey = rt.other.key;
+					        		}
 					        	}
 							}
 					        Ext.example.msg('提示', rt.msg);
 					    }, 
 					    error:function(xhr){ 
 					        var rt = JSON.parse(xhr.responseText);
+					        if(rt.success){
+					        	if(dataSource == "insertImageText"){
+					        		if(tn){
+					        			tn.attributes.type = "click";
+					        			tn.attributes.key = rt.other.key;
+					        		}else{
+					        			subscribeKey = rt.other.key;
+					        		}
+					        	}
+							}
 					        Ext.example.msg('提示', rt.msg);
 					    } 
 					}); 
@@ -1420,7 +1588,7 @@ function subImageOperate(c){
 				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
 				if(jr.success){
 	   				var ossImage = jr.root[0];
-	   				imgFile.ossId = ossImage.imageId;	   				
+	   				imgFile.image = ossImage.image;	   				
 				}else{
 					Ext.ux.showMsg(jr);
 					imgFile.setImg("");
@@ -1431,5 +1599,272 @@ function subImageOperate(c){
 				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
 			}
 	});	
+}
+
+function getSubscribeReply(){
+	clearTabContent();
+	subscribe = true;
+	$.ajax({ 
+	    type : "post", 
+	    async:false, 
+//	    url : "../../OperateMenu.do",
+//	    dataType : "json",//jsonp数据类型 
+	    url : basePath+"/wx-term/WXOperateMenu.do",
+	    dataType : "jsonp",//jsonp数据类型 
+	    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+	    data : {
+	    	dataSource : 'subscribeReply',
+	    	rid : rid
+	    },
+	    success : function(rt){ 
+	        if(rt.success){
+	        	subscribeKey = rt.other.key;
+	        	if(rt.root && rt.root.length > 0){
+	    			var tab = tabs.getComponent("tab_image_text");
+	    			tabs.setActiveTab(tab);
+	        		
+	        		var item = rt.root[0];
+	        		
+					$('#itemTitle').val(item.title);			
+					$('#itemContent').val(item.description);	
+					$('#itemUrl').val(item.url);	
+	        		imgFile.setImg(item.picUrl);
+	        		
+	        		p_box.image = item.picUrl;
+	        		
+	        		//如果有子显示项
+	        		if(rt.root.length > 1){
+	        			multiFoodPriceCount = rt.root.length - 1;
+	        			for (var i = 1; i < rt.root.length; i++) {
+	        				var subTitleId = 'subTitle' + i,  
+	        				subUrlId = 'subUrl' + i, 
+	        				subImgFileId = 'subImgFile' + i;
+	        				subFormId = 'subForm' + i;
+	        			
+		        			Ext.getCmp('food_multiPrice').add({
+		        				cls : 'multiClass'+i,
+		        		 		columnWidth : 1	 		
+		        		 	});								
+		        			
+		        			Ext.getCmp('food_multiPrice').add({
+		        				cls : 'multiClass'+i,
+		        				columnWidth: 0.48,
+		        				labelWidth : 40,
+		        				defaults : {
+		        					width : 190
+		        				},
+		        				items :[{
+		        					xtype : 'textfield',
+		        					id : subTitleId,
+		        					fieldLabel : '标题',
+		        					value : rt.root[i].title,
+		        					allowBlank : false
+		        				},{
+		        					xtype : 'textarea',
+		        					id : subUrlId,
+		        					fieldLabel : '链接',
+		        					value : rt.root[i].url
+		        				}]
+		        			});	
+
+		        			var sub_box = new Ext.BoxComponent({
+		        				xtype : 'box',
+		        		 	    height : 55,
+		        		 	    autoEl : {
+		        		 	    	tag : 'img',
+		        		 	    	title : '图片预览'
+		        		 	    }
+		        			});
+		        			var sub_imgFile = Ext.ux.plugins.createImageFile({
+		        				id : subImgFileId,
+		        				formId : subFormId,
+		        				img : sub_box,
+		        				imgSize : 100,
+		        				//打开图片后的操作
+		        				uploadCallback : function(c){
+		        					subImageOperate(c);
+		        				}
+		        			});
+		        			
+		        			var sub_form = new Ext.form.FormPanel({
+		        				id : subFormId,
+		        				labelWidth : 60,
+		        				fileUpload : true,
+		        				items : [sub_imgFile],
+		        				listeners : {
+		        		    		render : function(e){
+		        		    			//Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+		        		 	  		}
+		        		    	}
+		        			});	
+		        			
+		        			Ext.getCmp('food_multiPrice').add({
+		        				cls : 'multiClass'+i,
+		        				columnWidth: 0.4, 
+		        				layout : 'column',
+		        				frame : true,
+		        				items : [sub_box, sub_form]	 		
+		        		 	});			
+		        			
+		        			Ext.getCmp('food_multiPrice').add({
+		        				cls : 'multiClass'+i,
+		        		 		columnWidth : .12,
+		        		 		items : [{
+		        			    	xtype : 'button',
+		        			    	text : '删除',
+		        			    	style:'margin-top:40px;margin-left:10px;',
+		        			    	multiIndex : i,
+		        			    	iconCls : 'btn_delete',
+		        			    	handler : function(e){
+		        			    		deleteMultiPriceHandler(e);
+		        			    	}
+		        		 		}] 		 		
+		        		 	});	
+		        			
+		        			Ext.getCmp('food_multiPrice').doLayout();
+		        			
+		        			sub_imgFile.setImg(rt.root[i].picUrl);
+		        			
+		        			sub_imgFile.image = rt.root[i].picUrl;
+						}
+	        		}
+	        		
+	        	}else if(rt.other){
+	    			var tab = tabs.getComponent("tab_click");
+	    			tabs.setActiveTab(tab);
+	    			
+	        		$('#menuTxtReply').val(rt.other.text);
+	        	}
+			}else{
+				Ext.example.msg("提示", "还未设置自动回复");
+				Ext.getCmp('itemTitle').focus(true, 100);	
+			}
+	    }, 
+	    error:function(xhr){ 
+	        var rt = JSON.parse(xhr.responseText);
+	        if(rt.success){
+	        	subscribeKey = rt.other.key;
+	        	if(rt.root && rt.root.length > 0){
+	    			var tab = tabs.getComponent("tab_image_text");
+	    			tabs.setActiveTab(tab);
+	        		
+	        		var item = rt.root[0];
+	        		
+					$('#itemTitle').val(item.title);			
+					$('#itemContent').val(item.description);	
+					$('#itemUrl').val(item.url);	
+	        		imgFile.setImg(item.picUrl);
+	        		
+	        		p_box.image = item.picUrl;
+	        		
+	        		//如果有子显示项
+	        		if(rt.root.length > 1){
+	        			multiFoodPriceCount = rt.root.length - 1;
+	        			for (var i = 1; i < rt.root.length; i++) {
+	        				var subTitleId = 'subTitle' + i,  
+	        				subUrlId = 'subUrl' + i, 
+	        				subImgFileId = 'subImgFile' + i;
+	        				subFormId = 'subForm' + i;
+	        			
+		        			Ext.getCmp('food_multiPrice').add({
+		        				cls : 'multiClass'+i,
+		        		 		columnWidth : 1	 		
+		        		 	});								
+		        			
+		        			Ext.getCmp('food_multiPrice').add({
+		        				cls : 'multiClass'+i,
+		        				columnWidth: 0.48,
+		        				labelWidth : 40,
+		        				defaults : {
+		        					width : 190
+		        				},
+		        				items :[{
+		        					xtype : 'textfield',
+		        					id : subTitleId,
+		        					fieldLabel : '标题',
+		        					value : rt.root[i].title,
+		        					allowBlank : false
+		        				},{
+		        					xtype : 'textarea',
+		        					id : subUrlId,
+		        					fieldLabel : '链接',
+		        					value : rt.root[i].url
+		        				}]
+		        			});	
+
+		        			var sub_box = new Ext.BoxComponent({
+		        				xtype : 'box',
+		        		 	    height : 55,
+		        		 	    autoEl : {
+		        		 	    	tag : 'img',
+		        		 	    	title : '图片预览'
+		        		 	    }
+		        			});
+		        			var sub_imgFile = Ext.ux.plugins.createImageFile({
+		        				id : subImgFileId,
+		        				formId : subFormId,
+		        				img : sub_box,
+		        				imgSize : 100,
+		        				//打开图片后的操作
+		        				uploadCallback : function(c){
+		        					subImageOperate(c);
+		        				}
+		        			});
+		        			
+		        			var sub_form = new Ext.form.FormPanel({
+		        				id : subFormId,
+		        				labelWidth : 60,
+		        				fileUpload : true,
+		        				items : [sub_imgFile],
+		        				listeners : {
+		        		    		render : function(e){
+		        		    			//Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+		        		 	  		}
+		        		    	}
+		        			});	
+		        			
+		        			Ext.getCmp('food_multiPrice').add({
+		        				cls : 'multiClass'+i,
+		        				columnWidth: 0.4, 
+		        				layout : 'column',
+		        				frame : true,
+		        				items : [sub_box, sub_form]	 		
+		        		 	});			
+		        			
+		        			Ext.getCmp('food_multiPrice').add({
+		        				cls : 'multiClass'+i,
+		        		 		columnWidth : .12,
+		        		 		items : [{
+		        			    	xtype : 'button',
+		        			    	text : '删除',
+		        			    	style:'margin-top:40px;margin-left:10px;',
+		        			    	multiIndex : i,
+		        			    	iconCls : 'btn_delete',
+		        			    	handler : function(e){
+		        			    		deleteMultiPriceHandler(e);
+		        			    	}
+		        		 		}] 		 		
+		        		 	});	
+		        			
+		        			Ext.getCmp('food_multiPrice').doLayout();
+		        			
+		        			sub_imgFile.setImg(rt.root[i].picUrl);
+		        			
+		        			sub_imgFile.image = rt.root[i].picUrl;
+						}
+	        		}
+	        		
+	        	}else if(rt.other){
+	    			var tab = tabs.getComponent("tab_click");
+	    			tabs.setActiveTab(tab);
+	    			
+	        		$('#menuTxtReply').val(rt.other.text);
+	        	}
+			}else{
+				Ext.example.msg("提示", "还未设置自动回复");
+				Ext.getCmp('itemTitle').focus(true, 100);	
+			}
+	    } 
+	}); 	
 }
 
