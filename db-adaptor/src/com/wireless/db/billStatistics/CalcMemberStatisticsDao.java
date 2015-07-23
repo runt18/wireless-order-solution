@@ -3,7 +3,6 @@ package com.wireless.db.billStatistics;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -17,6 +16,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.member.IncomeByCharge;
 import com.wireless.pojo.billStatistics.member.IncomeByConsume;
+import com.wireless.pojo.billStatistics.member.MemberStatistics;
 import com.wireless.pojo.billStatistics.member.StatisticsByEachDay;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
@@ -51,7 +51,7 @@ public class CalcMemberStatisticsDao {
 		}
 	}
 
-	public static List<StatisticsByEachDay> calcStatisticsByEachDay(Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException{
+	public static MemberStatistics calcStatisticsByEachDay(Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -61,9 +61,9 @@ public class CalcMemberStatisticsDao {
 		}
 	}
 	
-	public static List<StatisticsByEachDay> calcStatisticsByEachDay(DBCon dbCon, Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException{
+	public static MemberStatistics calcStatisticsByEachDay(DBCon dbCon, Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException{
 		
-		final List<StatisticsByEachDay> result = new ArrayList<StatisticsByEachDay>();
+		final MemberStatistics result = new MemberStatistics();
 		
 		Calendar c = Calendar.getInstance();
 		Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOnDutyFormat());

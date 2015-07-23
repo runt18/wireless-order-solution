@@ -14,6 +14,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByEachDay;
+import com.wireless.pojo.billStatistics.cancel.CancelIncomeByFood;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByStaff;
 import com.wireless.pojo.crMgr.CancelReason;
@@ -368,10 +369,72 @@ public class CalcCancelStatisticsDao {
 		return result;
 	}
 	
+	/**
+	 * Calculate the cancel income by food according to extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to cancel income by each food
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<CancelIncomeByFood> calcCancelIncomeByFood(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calcCancelIncomeByFood(dbCon, staff, range, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Calculate the cancel income by food according to extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to cancel income by each food
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<CancelIncomeByFood> calcCancelIncomeByFood(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+		String sql;
+		sql = " SELECT " +
+			  " MAX(TMP.name) AS food_name, " +
+			  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
+			  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
+			  " FROM (" +
+			  makeSql4CancelFood(staff, range, extraCond) +
+			  " ) AS TMP " +
+			  " GROUP BY TMP.food_id " +
+			  " ORDER BY cancel_amount DESC ";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
+		List<CancelIncomeByFood> result = new ArrayList<CancelIncomeByFood>();
+		while(dbCon.rs.next()){
+			result.add(new CancelIncomeByFood(dbCon.rs.getString("food_name"),
+											  dbCon.rs.getFloat("cancel_amount"), 
+											  dbCon.rs.getFloat("cancel_price")));
+		}
+		dbCon.rs.close();
+		
+		return result;
+	}
+	
 	private static String makeSql4CancelFood(Staff staff, DutyRange range, ExtraCond extraCond){
 		String sql;
 		sql = " SELECT " +
-			  " OF.dept_id, OF.staff_id, OF.waiter, OF.cancel_reason_id, IFNULL(OF.cancel_reason, '无原因') AS cancel_reason, " +
+			  " OF.food_id, OF.name, OF.dept_id, OF.staff_id, OF.waiter, OF.cancel_reason_id, IFNULL(OF.cancel_reason, '无原因') AS cancel_reason, " +
 			  " ABS(OF.order_count) AS cancel_amount, " +
 			  " ABS((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount) AS cancel_price " +
 			  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
