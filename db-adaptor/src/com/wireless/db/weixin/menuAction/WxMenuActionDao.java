@@ -339,6 +339,28 @@ public class WxMenuActionDao {
 	 * @return the result to weixin menu action
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 */	
+	public static List<WxMenuAction> getByCond(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the weixin menu action to specific extra condition {@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to weixin menu action
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<WxMenuAction> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;

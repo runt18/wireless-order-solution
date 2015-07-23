@@ -225,6 +225,7 @@ public class WxMenuAction {
 	private WxMenuAction(UpdateBuilder builder) throws BusinessException{
 		setId(builder.id);
 		setMsgType(builder.msgType);
+		setCate(builder.cate);
 		try {
 			Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 			builder.action.write(document);
