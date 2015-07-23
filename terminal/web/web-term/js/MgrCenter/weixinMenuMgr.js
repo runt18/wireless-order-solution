@@ -1185,7 +1185,7 @@ Ext.onReady(function(){
 			frame : true,
 			items : [{
 				xtype : 'fieldset',
-				title : '单图文',
+				title : '多图文',
 				autoHeight : true,
 				width : 900,
 				layout:'column',
