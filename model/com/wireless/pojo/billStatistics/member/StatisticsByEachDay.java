@@ -57,13 +57,14 @@ public class StatisticsByEachDay {
 	
 	@Override
 	public String toString(){
-		return "date = " + this.date +
+		return "[date = " + this.date +
 			   ", create member = " + this.creates.size() +
 			   ", consumption amount = " + getConsumption().getTotalAmount() +
 			   ", consumption total = " + getConsumption().getTotalConsume() +
 			   ", charge amount = " + getCharge().getChargeAmount() +
 			   ", charge total = " + getCharge().getTotalActualCharge() +
 			   ", refund amount = " + getCharge().getRefundAmount() +
-			   ", refund total = " + getCharge().getTotalActualRefund();
+			   ", refund total = " + getCharge().getTotalActualRefund() +
+			   "]";
 	}
 }
