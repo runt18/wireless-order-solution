@@ -718,10 +718,10 @@ Ext.onReady(function(){
 							        			
 							        			Ext.getCmp('food_multiPrice').add({
 							        				cls : 'multiClass'+i,
-							        				columnWidth: 0.48,
+							        				columnWidth: 0.55,
 							        				labelWidth : 40,
 							        				defaults : {
-							        					width : 190
+							        					width : 300
 							        				},
 							        				items :[{
 							        					xtype : 'textfield',
@@ -770,7 +770,7 @@ Ext.onReady(function(){
 							        			
 							        			Ext.getCmp('food_multiPrice').add({
 							        				cls : 'multiClass'+i,
-							        				columnWidth: 0.4, 
+							        				columnWidth: 0.35, 
 							        				layout : 'column',
 							        				frame : true,
 							        				items : [sub_box, sub_form]	 		
@@ -778,7 +778,7 @@ Ext.onReady(function(){
 							        			
 							        			Ext.getCmp('food_multiPrice').add({
 							        				cls : 'multiClass'+i,
-							        		 		columnWidth : .12,
+							        		 		columnWidth : .1,
 							        		 		items : [{
 							        			    	xtype : 'button',
 							        			    	text : '删除',
@@ -837,10 +837,10 @@ Ext.onReady(function(){
 							        			
 							        			Ext.getCmp('food_multiPrice').add({
 							        				cls : 'multiClass'+i,
-							        				columnWidth: 0.48,
+							        				columnWidth: 0.55,
 							        				labelWidth : 40,
 							        				defaults : {
-							        					width : 190
+							        					width : 300
 							        				},
 							        				items :[{
 							        					xtype : 'textfield',
@@ -889,7 +889,7 @@ Ext.onReady(function(){
 							        			
 							        			Ext.getCmp('food_multiPrice').add({
 							        				cls : 'multiClass'+i,
-							        				columnWidth: 0.4, 
+							        				columnWidth: 0.35, 
 							        				layout : 'column',
 							        				frame : true,
 							        				items : [sub_box, sub_form]	 		
@@ -897,7 +897,7 @@ Ext.onReady(function(){
 							        			
 							        			Ext.getCmp('food_multiPrice').add({
 							        				cls : 'multiClass'+i,
-							        		 		columnWidth : .12,
+							        		 		columnWidth : .1,
 							        		 		items : [{
 							        			    	xtype : 'button',
 							        			    	text : '删除',
@@ -1187,10 +1187,10 @@ Ext.onReady(function(){
 				xtype : 'fieldset',
 				title : '多图文',
 				autoHeight : true,
-				width : 900,
+				width : 1050,
 				layout:'column',
 				items : [{
-					columnWidth: 0.4, 
+					columnWidth: 0.33, 
 					layout : 'form',
 					width : 350,
 					frame : true,
@@ -1223,7 +1223,7 @@ Ext.onReady(function(){
 						fieldLabel : '链接'
 					}]
 				}, {
-					columnWidth: 0.6,
+					columnWidth: 0.67,
 					id : 'food_multiPrice',
 					layout : 'column',
 					width : 400,
@@ -1306,9 +1306,9 @@ Ext.onReady(function(){
 							//过滤已经删除了的子选项
 							if(title && url){
 								if(subItems){
-									subItems += '&';
+									subItems += '<ul>';
 								}
-								subItems += (title.getValue() + "," + url.getValue() + "," + (image.image?image.image:-1));						
+								subItems += (title.getValue() + "<li>" + url.getValue() + "<li>" + (image.image?image.image:-1));						
 							
 							}
 						}		
@@ -1460,10 +1460,10 @@ function optMultiPriceHandler(){
 	
 	Ext.getCmp('food_multiPrice').add({
 		cls : 'multiClass'+multiFoodPriceCount,
-		columnWidth: 0.48,
+		columnWidth: 0.55,
 		labelWidth : 40,
 		defaults : {
-			width : 190
+			width : 300
 		},
 		items :[{
 			xtype : 'textfield',
@@ -1512,7 +1512,7 @@ function optMultiPriceHandler(){
 	
 	Ext.getCmp('food_multiPrice').add({
 		cls : 'multiClass'+multiFoodPriceCount,
-		columnWidth: 0.4, 
+		columnWidth: 0.35, 
 		layout : 'column',
 		frame : true,
 		items : [sub_box, sub_form]	 		
@@ -1520,7 +1520,7 @@ function optMultiPriceHandler(){
 	
 	Ext.getCmp('food_multiPrice').add({
 		cls : 'multiClass'+multiFoodPriceCount,
- 		columnWidth : .12,
+ 		columnWidth : .1,
  		items : [{
 	    	xtype : 'button',
 	    	text : '删除',
@@ -1648,10 +1648,10 @@ function getSubscribeReply(){
 		        			
 		        			Ext.getCmp('food_multiPrice').add({
 		        				cls : 'multiClass'+i,
-		        				columnWidth: 0.48,
+		        				columnWidth: 0.55,
 		        				labelWidth : 40,
 		        				defaults : {
-		        					width : 190
+		        					width : 300
 		        				},
 		        				items :[{
 		        					xtype : 'textfield',
@@ -1700,7 +1700,7 @@ function getSubscribeReply(){
 		        			
 		        			Ext.getCmp('food_multiPrice').add({
 		        				cls : 'multiClass'+i,
-		        				columnWidth: 0.4, 
+		        				columnWidth: 0.35, 
 		        				layout : 'column',
 		        				frame : true,
 		        				items : [sub_box, sub_form]	 		
@@ -1708,7 +1708,7 @@ function getSubscribeReply(){
 		        			
 		        			Ext.getCmp('food_multiPrice').add({
 		        				cls : 'multiClass'+i,
-		        		 		columnWidth : .12,
+		        		 		columnWidth : .1,
 		        		 		items : [{
 		        			    	xtype : 'button',
 		        			    	text : '删除',
@@ -1773,10 +1773,10 @@ function getSubscribeReply(){
 		        			
 		        			Ext.getCmp('food_multiPrice').add({
 		        				cls : 'multiClass'+i,
-		        				columnWidth: 0.48,
+		        				columnWidth: 0.55,
 		        				labelWidth : 40,
 		        				defaults : {
-		        					width : 190
+		        					width : 300
 		        				},
 		        				items :[{
 		        					xtype : 'textfield',
@@ -1825,7 +1825,7 @@ function getSubscribeReply(){
 		        			
 		        			Ext.getCmp('food_multiPrice').add({
 		        				cls : 'multiClass'+i,
-		        				columnWidth: 0.4, 
+		        				columnWidth: 0.35, 
 		        				layout : 'column',
 		        				frame : true,
 		        				items : [sub_box, sub_form]	 		
@@ -1833,7 +1833,7 @@ function getSubscribeReply(){
 		        			
 		        			Ext.getCmp('food_multiPrice').add({
 		        				cls : 'multiClass'+i,
-		        		 		columnWidth : .12,
+		        		 		columnWidth : .1,
 		        		 		items : [{
 		        			    	xtype : 'button',
 		        			    	text : '删除',
