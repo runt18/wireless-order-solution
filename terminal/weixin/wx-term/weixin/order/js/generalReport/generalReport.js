@@ -116,7 +116,7 @@ function newColumnChart2(c){
         yAxis: {                                                           
             min: 0,                                                        
             title: {                                                       
-                text: '金额 (元)',                             
+                text: c.unit?c.unit:'金额 (元)',                             
                 align: 'high'                                              
             },                                                             
             labels: {                                                      
@@ -198,6 +198,7 @@ function getBusinessStatisticsData(c){
 				var orderType = rt.other.business;
 				var deptStatistics = rt.other.business.deptStat;
 				var receiveStatistics = rt.other.business.paymentIncomes;
+				var memberStatistics = rt.other.memberStatistics;
 				
 				var receiveChartData = initChartData();
 				receiveStatistics.forEach(function(e){  
@@ -324,14 +325,114 @@ function getBusinessStatisticsData(c){
 				}).setSize(pageWidth, pageWidth * 1.5);					
 				
 				var memberOpeColumnChartData = initChartData();
-				memberOpeColumnChartData.priceColumnChart.xAxis = ['充值', '退款'];
-				memberOpeColumnChartData.priceColumnChart.yAxis.data = [orderType.memberChargeByCash, orderType.memberRefund];
+				memberOpeColumnChartData.priceColumnChart.xAxis = ['消费', '充值', '退款'];
+				memberOpeColumnChartData.priceColumnChart.yAxis.data = [memberStatistics.totalConsume, memberStatistics.totalCharge, memberStatistics.totalRefund];
 				
 				//会员
 				newColumnChart2({
-					rt: 'memberOpePieChart', title : '会员充值|退款统计', series: memberOpeColumnChartData.priceColumnChart.yAxis, xAxis:memberOpeColumnChartData.priceColumnChart.xAxis	
+					rt: 'memberOpePieChart', title : '会员消费|会员充值|退款统计', series: memberOpeColumnChartData.priceColumnChart.yAxis, xAxis:memberOpeColumnChartData.priceColumnChart.xAxis	, 
+					clickHander : function(point){
+				        $.mobile.changePage("#dailyMemberStatisticMgr",
+				        	    { transition: "fade" });
+			  			$('#memberStatisticsTotalTitle').html("总金额");
+			  			$('#memberStatisticsAvgTitle').html("日均额");
+				        
+						var memberEachDays = rt.other.memberStatistics.memberEachDays;
+						var member_xAxis = [], member_yAxis = [];
+				  		if(point.category == "消费"){
+				  			$('#memberStatisticTitle').html("会员每日消费统计");
+				  			$('#memberStatisticsTotalMoney').html(memberStatistics.totalConsume + "元");
+				  			$('#memberStatisticsAvgMoney').html(memberStatistics.avgConsume + "元");
+				  			
+				  			for (var i = 0; i < memberEachDays.length; i++) {
+				  				member_xAxis.push(memberEachDays[i].date.substring(5));
+				  				member_yAxis.push(memberEachDays[i].memberConsumption);
+							}
+				  		}else if(point.category == "充值"){
+				  			$('#memberStatisticTitle').html("会员每日充值统计");
+				  			$('#memberStatisticsTotalMoney').html(memberStatistics.totalCharge + "元");
+				  			$('#memberStatisticsAvgMoney').html(memberStatistics.avgCharge + "元");
+				  			
+				  			for (var i = 0; i < memberEachDays.length; i++) {
+				  				member_xAxis.push(memberEachDays[i].date.substring(5));
+				  				member_yAxis.push(memberEachDays[i].memberCharge);
+							}
+				  		}else if(point.category == "退款"){
+				  			$('#memberStatisticTitle').html("会员每日退款统计");
+				  			$('#memberStatisticsTotalMoney').html(memberStatistics.totalRefund + "元");
+				  			$('#memberStatisticsAvgMoney').html(memberStatistics.avgRefund + "元");
+				  			
+				  			for (var i = 0; i < memberEachDays.length; i++) {
+				  				member_xAxis.push(memberEachDays[i].date.substring(5));
+				  				member_yAxis.push(memberEachDays[i].memberRefund);
+							}
+				  		}
+				  		
+						var memberEachDayColumnChartData = initChartData();
+						memberEachDayColumnChartData.priceColumnChart.xAxis = member_xAxis;
+						memberEachDayColumnChartData.priceColumnChart.yAxis.data = member_yAxis;
+						
+						var reportHeight = pageWidth;
+						if(member_xAxis.length > 14){
+							reportHeight = member_xAxis.length *30;
+						}
+						
+						setTimeout(function(){
+							//会员每日统计
+							newColumnChart2({
+								rt: 'daily_memberStatisticsColumnChart', title : '会员每日统计', series: memberEachDayColumnChartData.priceColumnChart.yAxis, 
+								xAxis:memberEachDayColumnChartData.priceColumnChart.xAxis	
+							}).setSize(pageWidth, reportHeight);
+						}, 250);
+						
+				  	}
 				}).setSize(pageWidth-10, pageWidth-10);
 				
+				
+				var memberCreateColumnChartData = initChartData();
+				memberCreateColumnChartData.priceColumnChart.xAxis = ['开卡数'];
+				memberCreateColumnChartData.priceColumnChart.yAxis.data = [memberStatistics.totalCreated];
+				
+				//会员开卡
+				newColumnChart2({
+					rt: 'memberCreateChart', title : '会员开卡', series: memberCreateColumnChartData.priceColumnChart.yAxis, 
+					xAxis:memberCreateColumnChartData.priceColumnChart.xAxis, unit:'数量(张)',
+					clickHander : function(point){
+				        $.mobile.changePage("#dailyMemberStatisticMgr",
+				        	    { transition: "fade" });
+						
+						var memberEachDays = rt.other.memberStatistics.memberEachDays;
+						var member_xAxis = [], member_yAxis = [];
+			  			$('#memberStatisticTitle').html("会员每日开卡统计");
+			  			$('#memberStatisticsTotalTitle').html("总开卡数");
+			  			$('#memberStatisticsAvgTitle').html("日均开卡数");
+			  			$('#memberStatisticsTotalMoney').html(memberStatistics.totalCreated + "张");
+			  			$('#memberStatisticsAvgMoney').html(memberStatistics.avgCreated + "张");
+				  			
+			  			for (var i = 0; i < memberEachDays.length; i++) {
+			  				member_xAxis.push(memberEachDays[i].date.substring(5));
+			  				member_yAxis.push(memberEachDays[i].memberCreate);
+						}
+				  		
+						var memberEachDayColumnChartData = initChartData();
+						memberEachDayColumnChartData.priceColumnChart.xAxis = member_xAxis;
+						memberEachDayColumnChartData.priceColumnChart.yAxis.data = member_yAxis;
+						
+						var reportHeight = pageWidth;
+						if(member_xAxis.length > 14){
+							reportHeight = member_xAxis.length *30;
+						}
+						
+						setTimeout(function(){
+							//会员每日统计
+							newColumnChart2({
+								rt: 'daily_memberStatisticsColumnChart', title : '会员每日统计', series: memberEachDayColumnChartData.priceColumnChart.yAxis, 
+								xAxis:memberEachDayColumnChartData.priceColumnChart.xAxis, unit:'数量(张)'	
+							}).setSize(pageWidth, reportHeight);
+						}, 250);
+						
+				  	}
+				}).setSize(pageWidth-10, pageWidth-10);
 				
 				if(rt.other.businessChart){
 						
