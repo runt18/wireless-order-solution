@@ -168,9 +168,9 @@ public class WXOperateMenuAction extends DispatchAction {
 			
 			insert4ImageText = new WxMenuAction.InsertBuilder4ImageText(new Data4Item(title, content, image, url), cate);
 			if(subItems != null && !subItems.isEmpty()){
-				String[] subItemArry = subItems.split("&");
+				String[] subItemArry = subItems.split("<ul>");
 				for (String s : subItemArry) {
-					String[] subItem = s.split(",");
+					String[] subItem = s.split("<li>");
 					String sub_ossImage = subItem[2];
 					if(subItem[2].equals("-1")){
 						sub_ossImage = "";
@@ -239,9 +239,9 @@ public class WXOperateMenuAction extends DispatchAction {
 			update4ImageText = new WxMenuAction.UpdateBuilder4ImageText(Integer.parseInt(key), new Data4Item(title, content, image, url));
 			update4ImageText.setCate(cate);
 			if(subItems != null && !subItems.isEmpty()){
-				String[] subItemArry = subItems.split("&");
+				String[] subItemArry = subItems.split("<ul>");
 				for (String s : subItemArry) {
-					String[] subItem = s.split(",");
+					String[] subItem = s.split("<li>");
 					String sub_ossImage = subItem[2];
 					if(subItem[2].equals("-1")){
 						sub_ossImage = "";
