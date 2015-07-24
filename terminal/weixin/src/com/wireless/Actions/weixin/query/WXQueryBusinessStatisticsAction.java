@@ -18,6 +18,7 @@ import com.wireless.db.billStatistics.CalcCancelStatisticsDao;
 import com.wireless.db.billStatistics.CalcCommissionStatisticsDao;
 import com.wireless.db.billStatistics.CalcDiscountStatisticsDao;
 import com.wireless.db.billStatistics.CalcGiftStatisticsDao;
+import com.wireless.db.billStatistics.CalcMemberStatisticsDao;
 import com.wireless.db.billStatistics.CalcRepaidStatisticsDao;
 import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.billStatistics.SaleDetailsDao;
@@ -40,6 +41,7 @@ import com.wireless.pojo.billStatistics.discount.DiscountIncomeByDept;
 import com.wireless.pojo.billStatistics.discount.DiscountIncomeByStaff;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByDept;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByStaff;
+import com.wireless.pojo.billStatistics.member.MemberStatistics;
 import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByStaff;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Department.DeptId;
@@ -119,16 +121,22 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			}
 			final String chartDatas = chartData;
 			final ShiftDetail shiftDetail;
+			final MemberStatistics memberStatistics;
 			if(!dutyRange.equals("null") && !dutyRange.trim().isEmpty()){
 				DutyRange range = DutyRangeDao.exec(staff, onDuty, offDuty);
 				
 				if(range != null){
 					shiftDetail = ShiftDao.getByRange(staff, range, extraCond);
+					
+					memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, range, new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY));
 				}else{
 					shiftDetail = new ShiftDetail(new DutyRange(onDuty, offDuty));
+					memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(onDuty, offDuty), new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY));
 				}
 			}else{
 				shiftDetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), extraCond);
+				
+				memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(onDuty, offDuty), new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY));
 			}
 			
 			jObject.setExtra(new Jsonable(){
@@ -139,6 +147,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 					if(chart != null && !chart.isEmpty()){
 						jm.putString("businessChart", chartDatas);
 					}
+					jm.putJsonable("memberStatistics", memberStatistics, 0);
 					return jm;
 				}
 
