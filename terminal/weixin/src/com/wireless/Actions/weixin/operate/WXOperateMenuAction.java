@@ -49,15 +49,15 @@ public class WXOperateMenuAction extends DispatchAction {
 	public ActionForward weixinMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject(); 
 		
-//		String appId = "wx49b3278a8728ff76";
-//		String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
-//		System.out.println(Menu.newInstance(Token.newInstance(appId, appSecret)));
-//		jobject.setRoot(Menu.newInstance(Token.newInstance(appId, appSecret)));
+		String appId = "wx49b3278a8728ff76";
+		String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
+		System.out.println(Menu.newInstance(Token.newInstance(appId, appSecret)));
+		jobject.setRoot(Menu.newInstance(Token.newInstance(appId, appSecret)));
 		
-		int rid = Integer.parseInt(request.getParameter("rid"));
-		WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(rid));
-		AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
-		jobject.setRoot(Menu.newInstance(Token.newInstance(authorizerToken)));
+//		int rid = Integer.parseInt(request.getParameter("rid"));
+//		WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(rid));
+//		AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+//		jobject.setRoot(Menu.newInstance(Token.newInstance(authorizerToken)));
 		
 		response.getWriter().print(jobject.toString());
 		
@@ -484,6 +484,44 @@ public class WXOperateMenuAction extends DispatchAction {
 
 		return null;
 	}	
+	
+	/**
+	 * 删除自动回复
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward deleteSubscribe(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String rid = request.getParameter("rid");
+		JObject jobject = new JObject(); 
+		try{
+			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			List<WxMenuAction> wxMenus = WxMenuActionDao.getByCond(staff, new WxMenuActionDao.ExtraCond().setCate(Cate.SUBSCRIBE_REPLY));
+			if(!wxMenus.isEmpty()){
+				WxMenuActionDao.deleteById(staff, wxMenus.get(0).getId());
+				jobject.initTip(true, "删除成功");
+			}else{
+				jobject.initTip(false, "还没设置自动回复");
+			}
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}		
 	
 	public static void main(String[] args) throws IOException{
 		String appId = "wx49b3278a8728ff76";
