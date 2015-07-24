@@ -336,9 +336,13 @@ function getBusinessStatisticsData(c){
 				        	    { transition: "fade" });
 			  			$('#memberStatisticsTotalTitle').html("总金额");
 			  			$('#memberStatisticsAvgTitle').html("日均额");
+			  			//清空chart
+			  			$('#daily_memberStatisticsColumnChart').html('');
 				        
 						var memberEachDays = rt.other.memberStatistics.memberEachDays;
 						var member_xAxis = [], member_yAxis = [];
+						
+						Util.lm.show();
 				  		if(point.category == "消费"){
 				  			$('#memberStatisticTitle').html("会员每日消费统计");
 				  			$('#memberStatisticsTotalMoney').html(memberStatistics.totalConsume + "元");
@@ -383,7 +387,8 @@ function getBusinessStatisticsData(c){
 								rt: 'daily_memberStatisticsColumnChart', title : '会员每日统计', series: memberEachDayColumnChartData.priceColumnChart.yAxis, 
 								xAxis:memberEachDayColumnChartData.priceColumnChart.xAxis	
 							}).setSize(pageWidth, reportHeight);
-						}, 250);
+							Util.lm.hide();
+						}, 2500);
 						
 				  	}
 				}).setSize(pageWidth-10, pageWidth-10);
@@ -400,15 +405,18 @@ function getBusinessStatisticsData(c){
 					clickHander : function(point){
 				        $.mobile.changePage("#dailyMemberStatisticMgr",
 				        	    { transition: "fade" });
-						
 						var memberEachDays = rt.other.memberStatistics.memberEachDays;
 						var member_xAxis = [], member_yAxis = [];
 			  			$('#memberStatisticTitle').html("会员每日开卡统计");
 			  			$('#memberStatisticsTotalTitle').html("总开卡数");
 			  			$('#memberStatisticsAvgTitle').html("日均开卡数");
+			  			//清空chart
+			  			$('#daily_memberStatisticsColumnChart').html('');
+			  			
 			  			$('#memberStatisticsTotalMoney').html(memberStatistics.totalCreated + "张");
 			  			$('#memberStatisticsAvgMoney').html(memberStatistics.avgCreated + "张");
 				  			
+			  			Util.lm.show();
 			  			for (var i = 0; i < memberEachDays.length; i++) {
 			  				member_xAxis.push(memberEachDays[i].date.substring(5));
 			  				member_yAxis.push(memberEachDays[i].memberCreate);
@@ -429,8 +437,8 @@ function getBusinessStatisticsData(c){
 								rt: 'daily_memberStatisticsColumnChart', title : '会员每日统计', series: memberEachDayColumnChartData.priceColumnChart.yAxis, 
 								xAxis:memberEachDayColumnChartData.priceColumnChart.xAxis, unit:'数量(张)'	
 							}).setSize(pageWidth, reportHeight);
-						}, 250);
-						
+							Util.lm.hide();
+						}, 2500);
 				  	}
 				}).setSize(pageWidth-10, pageWidth-10);
 				
