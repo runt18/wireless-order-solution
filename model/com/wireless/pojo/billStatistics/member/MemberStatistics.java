@@ -3,7 +3,10 @@ package com.wireless.pojo.billStatistics.member;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MemberStatistics {
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
+
+public class MemberStatistics implements Jsonable{
 
 	public final static MemberStatistics DUMMY = new MemberStatistics();
 	
@@ -148,5 +151,25 @@ public class MemberStatistics {
 			   ", total_refund = " + getTotalRefund() +
 			   ", total_created = " + getTotalCreated() + sep +
 			   this.statistics;
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putFloat("totalConsume", this.getTotalConsume());
+		jm.putFloat("avgConsume", this.getAverageConsume());
+		jm.putFloat("totalCharge", this.getTotalCharge());
+		jm.putFloat("avgCharge", this.getAverageCharge());
+		jm.putFloat("totalRefund", this.getTotalRefund());
+		jm.putFloat("avgRefund", this.getAverageRefund());
+		jm.putFloat("totalCreated", this.getTotalCreated());
+		jm.putFloat("avgCreated", this.getAverageCreated());
+		jm.putJsonableList("memberEachDays", statistics, flag);
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jm, int flag) {
+		
 	}
 }

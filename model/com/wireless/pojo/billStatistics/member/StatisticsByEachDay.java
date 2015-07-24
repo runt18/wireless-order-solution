@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.member.Member;
 
-public class StatisticsByEachDay {
+public class StatisticsByEachDay implements Jsonable{
 
 	public final static StatisticsByEachDay DUMMY = new StatisticsByEachDay();
 	
@@ -66,5 +68,21 @@ public class StatisticsByEachDay {
 			   ", refund amount = " + getCharge().getRefundAmount() +
 			   ", refund total = " + getCharge().getTotalActualRefund() +
 			   "]";
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putString("date", this.getDate());
+		jm.putFloat("memberConsumption", getConsumption().getTotalConsume());
+		jm.putFloat("memberCharge", getCharge().getTotalActualCharge());
+		jm.putFloat("memberRefund", getCharge().getTotalActualRefund());
+		jm.putInt("memberCreate", this.creates.size());
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jm, int flag) {
+		
 	}
 }
