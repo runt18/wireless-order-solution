@@ -81,13 +81,13 @@ Ext.ux.plugins.createImageFile = function(config){
  	        	    				Ext.ux.showMsg({code : 7150, title:'提示', msg:'操作失败, 选择的图片类型不正确! 请重新选择'});
  	        	    				return;
  	        	    			}
- 	        	    			if(Ext.ux.plugins.getFileSize(file) > Ext.ux.plugins.imgSize){
+ 	        	    			
+ 	        	    			//由后台验证
+/* 	        	    			if(Ext.ux.plugins.getFileSize(file) > Ext.ux.plugins.imgSize){
  	        	    				file.value = '';
  	        	    				Ext.ux.showMsg({code : 7150, title:'提示', msg:'操作失败, 选择的图片大小超过 ' + Ext.ux.plugins.imgSize +'Kb ! 请重新选择'});
  	        	    				return;	        	    				
- 	        	    			}
- 	        	    			
- 	        	    			
+ 	        	    			}*/
         	    				var reader = new FileReader();
         	    				reader.onload = function(evt){img.src = evt.target.result;};
         	    				reader.readAsDataURL(file.files[0]);
