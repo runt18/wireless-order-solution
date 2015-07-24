@@ -2,9 +2,9 @@
 
 var Request = new common_urlParaQuery();
 var rid = Request["rid"];
-//rid = 40;
-//var basePath = "http://localhost:8080";
-var basePath = "http://wx.e-tones.net";
+rid = 40;
+var basePath = "http://localhost:8080";
+//var basePath = "http://wx.e-tones.net";
 
 /**
  * 拓展string方法
@@ -45,7 +45,7 @@ var menuTree_obj = {treeId : 'weixinMenuTree',operateTree:Ext.ux.operateTree_wei
                                           											{m_type : 2, option :[{name:'修改', fn:"floatBarUpdateHandler()"},{name:'删除', fn:"deleteMenu()"}]},
                                           											]};
 
-var tree,tabs, updateDeptWin, p_box, imgFile,
+var tree,tabs, updateDeptWin, p_box, imgFile,centerPanel,
 	multiFoodPriceCount = 0, subscribe = false, subscribeKey = -1;
 
 var weixinMenuLM = new Ext.LoadMask(document.body, {
@@ -200,18 +200,25 @@ function deleteMenu(){
 					    	key : tn.attributes.key
 					    },
 					    dataType : "json",//jsonp数据类型 
-					    success : function(data){ 
-					    	Ext.example.msg('提示', data.msg);
+					    success : function(rt){ 
+					        if(rt.success){
+					        	tn.remove();
+					        	Ext.example.msg(rt);
+					        }else{
+					        	Ext.ux.showMsg(rt);
+					        }
 					    }, 
 					    error:function(xhr){ 
 					        var rt = JSON.parse(xhr.responseText);
-					        Ext.example.msg('提示', rt.msg);
+					        if(rt.success){
+					        	tn.remove();
+					        	Ext.example.msg(rt);
+					        }else{
+					        	Ext.ux.showMsg(rt);
+					        }
 					    } 
 					}); 	
 				}
-				
-				tn.remove();
-				
 				clearTabContent();
 			}
 		}
@@ -444,7 +451,7 @@ function clearTabContent(){
 	
 	$('input[name="systemSet"]:checked').removeAttr("checked");
 	
-	subscribe = false;
+	subscribe = false, subscribeKey = -1;
 }
 
 Ext.onReady(function(){
@@ -631,6 +638,7 @@ Ext.onReady(function(){
 				clearTabContent();
 				
 				var tn = Ext.ux.getSelNode(tree);
+				centerPanel.setTitle('设置 -- ' +tn.text);
 				
 				if(tn.hasChildNodes()){
 					tabs.disable();
@@ -1198,8 +1206,7 @@ Ext.onReady(function(){
 						frame : true,
 						items : [p_box, {
 							columnWidth: 1, 
-							height: 20,
-							html : '<sapn style="font-size:13px;color:green;">提示: 单张图片大小不能超过100KB.</span>'
+							height: 5
 						}, form]
 					},{
 						xtype : 'textfield',
@@ -1393,7 +1400,7 @@ Ext.onReady(function(){
  	
  	
  	
- 	var centerPanel = new Ext.Panel({
+ 	centerPanel = new Ext.Panel({
  		id : 'contentPanel',
  		title : '设置',
  	    region:'center',
@@ -1513,8 +1520,6 @@ function optMultiPriceHandler(){
 		imgSize : 100,
 		//打开图片后的操作
 		uploadCallback : function(c){
-			console.log(c.id)
-			console.log(c.formId)
 			subImageOperate(c);
 		}
 	});
@@ -1624,6 +1629,7 @@ function subImageOperate(c){
 
 function getSubscribeReply(){
 	clearTabContent();
+	centerPanel.setTitle('设置 -- 自动回复');
 	//清除tree选中
 	tree.getSelectionModel().clearSelections();
 	subscribe = true;
@@ -1759,6 +1765,8 @@ function getSubscribeReply(){
 	        		$('#menuTxtReply').val(rt.other.text);
 	        	}
 			}else{
+    			var tab = tabs.getComponent("tab_image_text");
+    			tabs.setActiveTab(tab);
 				Ext.getCmp('itemTitle').focus(true, 100);	
 			}
 	    }, 
@@ -1883,6 +1891,8 @@ function getSubscribeReply(){
 	        		$('#menuTxtReply').val(rt.other.text);
 	        	}
 			}else{
+    			var tab = tabs.getComponent("tab_image_text");
+    			tabs.setActiveTab(tab);
 				Ext.getCmp('itemTitle').focus(true, 100);	
 			}
 	    } 
@@ -1891,6 +1901,7 @@ function getSubscribeReply(){
 
 
 function deleteSubscribeReply(){
+	centerPanel.setTitle('设置 --');
 	Ext.Msg.confirm(
 		'提示',
 		'是否删除自动回复',
