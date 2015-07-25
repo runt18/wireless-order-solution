@@ -66,15 +66,22 @@ public class CalcMemberStatisticsDao {
 		final MemberStatistics result = new MemberStatistics();
 		
 		Calendar c = Calendar.getInstance();
-		Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOnDutyFormat());
-		Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOffDutyFormat());
+		Date dateBegin = new SimpleDateFormat(DateUtil.Pattern.DATE_TIME.getPattern()).parse(dutyRange.getOnDutyFormat());
+		Date dateEnd = new SimpleDateFormat(DateUtil.Pattern.DATE_TIME.getPattern()).parse(dutyRange.getOffDutyFormat());
 		c.setTime(dateBegin);
 		while (dateBegin.compareTo(dateEnd) <= 0) {
 			c.add(Calendar.DATE, 1);
 			
-			final DutyRange range = DutyRangeDao.exec(dbCon, staff, 
-													  DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), 
-													  DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
+//			final DutyRange range = DutyRangeDao.exec(dbCon, staff, 
+//													  DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), 
+//													  DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
+			
+			final DutyRange range;
+			if(c.getTime().getTime() < dateEnd.getTime()){
+				range = new DutyRange(DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
+			}else{
+				range = new DutyRange(DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), DateUtil.format(dateEnd.getTime(), DateUtil.Pattern.DATE_TIME));
+			}
 			
 			IncomeByConsume consumption = null;
 			IncomeByCharge charge = null;

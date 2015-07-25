@@ -244,25 +244,10 @@ public class WxMenuActionDao {
 	
 	private static void update(DBCon dbCon, Staff staff, WxMenuAction.UpdateBuilder builder) throws SQLException, BusinessException{
 		
-		WxMenuAction menuAction = builder.build(); 
-		//Delete the associated oss image.
-		try {
-			WxMenuAction oriAction = getById(dbCon, staff, menuAction.getId());
-			if(oriAction.getMsgType() == MsgType.MSG_TYPE_IMAGE_TEXT){
-				Msg oriMsg = new WxMenuAction.MsgProxy(oriAction).toMsg();
-				for(Data4Item item : ((Msg4ImageText)oriMsg).getItems()){
-					for(OssImage image4Item : OssImageDao.getByCond(dbCon, staff, new OssImageDao.ExtraCond().setType(OssImage.Type.WX_ACTION_IMAGE))){
-						if(image4Item.getObjectUrl().equals(item.getPicUrl())){
-							OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(image4Item.getId()));
-							break;
-						}
-					}
-				}
-			}
-		} catch (SAXException | IOException | ParserConfigurationException e) {
-			throw new BusinessException(e.getMessage());
-		}
-
+		WxMenuAction menuAction = builder.build();
+		
+		WxMenuAction oriAction = getById(dbCon, staff, menuAction.getId());
+		
 		String sql;
 		
 		if(builder.isCateChanged() && menuAction.getCate() == WxMenuAction.Cate.SUBSCRIBE_REPLY){
@@ -280,6 +265,48 @@ public class WxMenuActionDao {
 			  " WHERE id = " + menuAction.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WxMenuError.WEIXIN_MENU_ACTION_NOT_EXIST);
+		}
+		
+		WxMenuAction newAction = getById(dbCon, staff, menuAction.getId());
+		
+		//Delete the associated oss image.
+		try {
+			//if ImageText -> ImageText, remove the original images not used.
+			if(oriAction.getMsgType() == MsgType.MSG_TYPE_IMAGE_TEXT && newAction.getMsgType() == MsgType.MSG_TYPE_IMAGE_TEXT){
+				Msg oriMsg = new WxMenuAction.MsgProxy(oriAction).toMsg();
+				Msg newMsg = new WxMenuAction.MsgProxy(newAction).toMsg();
+				for(Data4Item oriItem : ((Msg4ImageText)oriMsg).getItems()){
+					boolean isExist = false;
+					for(Data4Item newItem : ((Msg4ImageText)newMsg).getItems()){
+						if(oriItem.getPicUrl().equals(newItem.getPicUrl())){
+							isExist = true;
+							break;
+						}
+					}
+					if(!isExist){
+						for(OssImage image4Item : OssImageDao.getByCond(dbCon, staff, new OssImageDao.ExtraCond().setType(OssImage.Type.WX_ACTION_IMAGE))){
+							if(image4Item.getObjectUrl().equals(oriItem.getPicUrl())){
+								OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(image4Item.getId()));
+								break;
+							}
+						}
+					}
+				}
+			}else if(oriAction.getMsgType() == MsgType.MSG_TYPE_IMAGE_TEXT && newAction.getMsgType() == MsgType.MSG_TYPE_TEXT){
+				//if ImageText -> Text, remove all the original associated images.
+				Msg oriMsg = new WxMenuAction.MsgProxy(oriAction).toMsg();
+				for(Data4Item item : ((Msg4ImageText)oriMsg).getItems()){
+					for(OssImage image4Item : OssImageDao.getByCond(dbCon, staff, new OssImageDao.ExtraCond().setType(OssImage.Type.WX_ACTION_IMAGE))){
+						if(image4Item.getObjectUrl().equals(item.getPicUrl())){
+							OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(image4Item.getId()));
+							break;
+						}
+					}
+				}
+
+			}
+		} catch (SAXException | IOException | ParserConfigurationException e) {
+			throw new BusinessException(e.getMessage());
 		}
 	}
 	

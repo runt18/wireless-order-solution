@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
@@ -28,31 +29,22 @@ import com.wireless.pojo.util.DateUtil;
 public class CalcCancelStatisticsDao {
 	
 	public static class ExtraCond{
-		private final DateType dateType;
-		
-		private final String orderTbl;
-		//private final String orderTblAlias = "O";
-		private final String orderFoodTbl;
-		//private final String orderFoodTblAlias = "OF";
-		private final String tasteGroupTbl;
+		private final DBTbl dbTbl;
 		
 		private Department.DeptId deptId;
 		private int staffId;
 		private int reasonId;
 		private Region.RegionId regionId;
 		private HourRange hourRange;
+		private String foodName;
 		
 		public ExtraCond(DateType dateType){
-			this.dateType = dateType;
-			if(this.dateType.isToday()){
-				orderTbl = "order";
-				orderFoodTbl = "order_food";
-				tasteGroupTbl = "taste_group";
-			}else{
-				orderTbl = "order_history";
-				orderFoodTbl = "order_food_history";
-				tasteGroupTbl = "taste_group_history";
-			}
+			this.dbTbl = new DBTbl(dateType);
+		}
+		
+		public ExtraCond setFoodName(String foodName){
+			this.foodName = foodName;
+			return this;
 		}
 		
 		public ExtraCond setDeptId(Department.DeptId deptId){
@@ -97,6 +89,9 @@ public class CalcCancelStatisticsDao {
 			}
 			if(hourRange != null){
 				extraCond.append(" AND TIME(O.order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
+			}
+			if(foodName != null){
+				extraCond.append(" AND OF.name LIKE '%" + foodName + "%'");
 			}
 			return extraCond.toString();
 		}
@@ -437,14 +432,14 @@ public class CalcCancelStatisticsDao {
 			  " OF.food_id, OF.name, OF.dept_id, OF.staff_id, OF.waiter, OF.cancel_reason_id, IFNULL(OF.cancel_reason, '无原因') AS cancel_reason, " +
 			  " ABS(OF.order_count) AS cancel_amount, " +
 			  " ABS((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount) AS cancel_price " +
-			  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
-			  " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O " +
+			  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderFoodTbl + " OF " + 
+			  " JOIN " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 			  " ON 1 = 1 " +
 			  " AND OF.order_id = O.id " +
 			  " AND O.restaurant_id = " + staff.getRestaurantId() +
 			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND O.cancel_price <> 0 " +
-			  " JOIN " + Params.dbName + "." + extraCond.tasteGroupTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+			  " JOIN " + Params.dbName + "." + extraCond.dbTbl.tgTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 			  " WHERE 1 = 1 " +
 			  " AND OF.order_count < 0 " +
 			  " AND OF.operation = " + OrderFood.Operation.CANCEL.getVal() +
