@@ -2,9 +2,9 @@
 
 var Request = new common_urlParaQuery();
 var rid = Request["rid"];
-rid = 40;
-var basePath = "http://localhost:8080";
-//var basePath = "http://wx.e-tones.net";
+//rid = 40;
+//var basePath = "http://localhost:8080";
+var basePath = "http://wx.e-tones.net";
 
 /**
  * 拓展string方法
@@ -201,25 +201,17 @@ function deleteMenu(){
 					    },
 					    dataType : "json",//jsonp数据类型 
 					    success : function(rt){ 
-					        if(rt.success){
-					        	tn.remove();
-					        	Ext.example.msg(rt);
-					        }else{
-					        	Ext.ux.showMsg(rt);
-					        }
+					        Ext.example.msg(rt);
 					    }, 
 					    error:function(xhr){ 
 					        var rt = JSON.parse(xhr.responseText);
-					        if(rt.success){
-					        	tn.remove();
-					        	Ext.example.msg(rt);
-					        }else{
-					        	Ext.ux.showMsg(rt);
-					        }
+					        Ext.example.msg(rt);
 					    } 
 					}); 	
 				}
+				tn.remove();
 				clearTabContent();
+				
 			}
 		}
 	);	
