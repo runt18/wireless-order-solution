@@ -34,6 +34,7 @@ import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.billStatistics.cancel.CancelIncomeByFood;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByStaff;
 import com.wireless.pojo.billStatistics.commission.CommissionIncomeByStaff;
@@ -550,6 +551,53 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			}
 			
 			List<CancelIncomeByStaff> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByStaff(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			
+			jobject.setRoot(cancelList);
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+
+		return null;
+	}
+	
+	/**
+	 * 获取退菜菜品
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryCancelFoods(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String dateBeg = request.getParameter("dateBeg");
+		String dateEnd = request.getParameter("dateEnd");
+		String deptID = request.getParameter("deptID");
+		
+		String openId = request.getParameter("oid");
+		
+		int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
+		Staff staff = StaffDao.getAdminByRestaurant(rid);
+		
+		JObject jobject = new JObject();
+		
+		try{
+			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			}
+			
+			List<CancelIncomeByFood> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByFood(staff, new DutyRange(dateBeg, dateEnd), extraCond);
 			
 			jobject.setRoot(cancelList);
 			

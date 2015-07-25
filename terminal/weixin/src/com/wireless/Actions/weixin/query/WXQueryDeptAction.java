@@ -18,6 +18,7 @@ import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.finance.WeixinFinanceDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -61,6 +62,43 @@ public class WXQueryDeptAction extends DispatchAction{
 			kitchens = null;
 			tempKitchenList = null;
 //			jobject.getExtra().put("dept", deptList);
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * 只获取普通部门列表
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryDepts(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jobject = new JObject();
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			
+			String openId = request.getParameter("oid");
+			
+			int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
+			Staff staff = StaffDao.getAdminByRestaurant(rid);
+			
+			List<Department> depts = DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL);
+			jobject.setRoot(depts);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
