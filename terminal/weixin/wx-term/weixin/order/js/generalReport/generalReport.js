@@ -2,6 +2,8 @@ var Request = new Util_urlParaQuery();
 var rid = Request["rid"];
 var pageWidth ;
 
+var kitchenSearchFoods = [], cancelSearchFoods = [];
+
 initChartData = function(c){
 	c = c || {};
 	return {chartPriceData : {type : 'pie', name : '比例', data : []}, 
@@ -222,7 +224,8 @@ function getBusinessStatisticsData(c){
 			        $('#secondReportChart').hide();
 			        $('#hr4SecondReportChart').hide();
 			        $("#statisticToggle").hide();
-			        
+			        //隐藏退菜
+			        $('#display4CancelTop20').hide();
 			        Util.lm.show();
 			        //厨房
 			        $.post('../../WXQueryBusinessStatistics.do', {
@@ -247,6 +250,7 @@ function getBusinessStatisticsData(c){
 			        },'json');
 			        
 			        Util.lm.show();
+			        kitchenSearchFoods.length = 0;
 			        //菜品top10
 			        $.post('../../WXQueryBusinessStatistics.do', {
 			        	dataSource : 'deptSaleStatistic',
@@ -260,18 +264,19 @@ function getBusinessStatisticsData(c){
 			        }, function(rt){
 			        	Util.lm.hide();
 			        	
+			        	kitchenSearchFoods = rt.root.slice(0);
 			        	//设置搜索出来的菜品的排序依据, 按销量
 			        	var searchFoodCompare = function (obj1, obj2) {
 			        		return -(obj1.salesAmount - obj2.salesAmount);
 			        	} 
-			        	rt.root = rt.root.slice(0, 10);
+			        	rt.root = rt.root.slice(0, 20);
 			        	rt.root.sort(searchFoodCompare);
 			        	
 			        	var html = [];
 			        	for (var i = 0; i < rt.root.length; i++) {
 							html.push('<tr><td>{index}</td><td>{name}</td><td>{count}</td><td style="text-align:right;">{money}</td></tr>'.format({
 								index : i+1,
-								name : rt.root[i].food.name.substring(0, 8),
+								name : rt.root[i].food.name.substring(0, 8) + (rt.root[i].food.name.length > 8?"..." : ""),
 								money : rt.root[i].income.toFixed(2),
 								count : rt.root[i].salesAmount
 							}));
@@ -300,6 +305,8 @@ function getBusinessStatisticsData(c){
 				  		$('#secondReportChart').hide();
 				  		$('#hr4SecondReportChart').hide();
 				  		$('#display4KitchenTop10').hide();
+				  		$('#display4CancelTop20').hide();
+				  		
 				  		//开关复位
 				  		var myswitch = $('input[name="priceOrAmount"]:checked').val();
 				  		if(myswitch > 0){
@@ -321,6 +328,67 @@ function getBusinessStatisticsData(c){
 				        }
 				        
 				        orderTpyeSwitch(orderTypeStatisticParam);
+				        
+				        //获取退菜
+				  		if(point.category == "退菜"){
+				  			//用于切换部门调用
+				  			searchCancelFoodByDept.beginDate = begin;
+				  			searchCancelFoodByDept.endDate = end;
+				  			
+					        Util.lm.show();
+					        cancelSearchFoods.length = 0;
+					        //菜品top10
+					        $.post('../../WXQueryBusinessStatistics.do', {
+					        	dataSource : 'queryCancelFoods',
+								oid : Util.mp.oid,
+								dateBeg:begin,
+								dateEnd:end,
+								deptID : -1
+					        }, function(rt){
+					        	Util.lm.hide();
+					        	
+					        	cancelSearchFoods = rt.root.slice(0);
+					        	//设置搜索出来的菜品的排序依据, 按销量
+					        	var searchFoodCompare = function (obj1, obj2) {
+					        		return -(obj1.cancelAmount - obj2.cancelAmount);
+					        	} 
+					        	rt.root = rt.root.slice(0, 20);
+					        	rt.root.sort(searchFoodCompare);
+					        	
+					        	var html = [];
+					        	for (var i = 0; i < rt.root.length; i++) {
+									html.push('<tr><td>{index}</td><td>{name}</td><td>{count}</td><td style="text-align:right;">{money}</td></tr>'.format({
+										index : i+1,
+										name : rt.root[i].foodName.substring(0, 8) + (rt.root[i].foodName.length > 8?"..." : ""),
+										money : rt.root[i].cancelPrice.toFixed(2),
+										count : rt.root[i].cancelAmount
+									}));
+								}
+					        	$('#table4CancelTop20').html(html.join(''));
+								
+					        	//不显示选择隐藏列按钮
+					        	$('.ui-table-columntoggle-btn').hide();
+					        	$('#display4CancelTop20').show();
+					        },'json');
+					        
+					        //获取部门列表
+					        $.post('../../WXQueryDept.do', {
+					        	dataSource : "queryDepts",
+					        	oid : Util.mp.oid
+					        }, function(rt){
+					        	if(rt.success){
+					        		var html = ['<option value=-1>全部部门</option>'];
+					        		for (var i = 0; i < rt.root.length; i++) {
+										html.push('<option value={deptId}>{deptName}</option>'.format({
+											deptId : rt.root[i].id,
+											deptName : rt.root[i].name
+										}));
+									}
+					        		$('#selectDepts').html(html.join("")).selectmenu("refresh");
+					        	}
+					        });
+					        
+				  		}
 				  	}	
 				}).setSize(pageWidth, pageWidth * 1.5);					
 				
@@ -334,6 +402,7 @@ function getBusinessStatisticsData(c){
 					clickHander : function(point){
 				        $.mobile.changePage("#dailyMemberStatisticMgr",
 				        	    { transition: "fade" });
+				        //设置title
 			  			$('#memberStatisticsTotalTitle').html("总金额");
 			  			$('#memberStatisticsAvgTitle').html("日均额");
 			  			//清空chart
@@ -381,6 +450,7 @@ function getBusinessStatisticsData(c){
 							reportHeight = member_xAxis.length *30;
 						}
 						
+						//等待jquery mobile进入页面后再加载chart
 						setTimeout(function(){
 							//会员每日统计
 							newColumnChart2({
@@ -398,7 +468,7 @@ function getBusinessStatisticsData(c){
 				memberCreateColumnChartData.priceColumnChart.xAxis = ['开卡数'];
 				memberCreateColumnChartData.priceColumnChart.yAxis.data = [memberStatistics.totalCreated];
 				
-				//会员开卡
+				//会员开卡单独作为一个表
 				newColumnChart2({
 					rt: 'memberCreateChart', title : '会员开卡', series: memberCreateColumnChartData.priceColumnChart.yAxis, 
 					xAxis:memberCreateColumnChartData.priceColumnChart.xAxis, unit:'数量(张)',
@@ -407,6 +477,7 @@ function getBusinessStatisticsData(c){
 				        	    { transition: "fade" });
 						var memberEachDays = rt.other.memberStatistics.memberEachDays;
 						var member_xAxis = [], member_yAxis = [];
+						//设置title
 			  			$('#memberStatisticTitle').html("会员每日开卡统计");
 			  			$('#memberStatisticsTotalTitle').html("总开卡数");
 			  			$('#memberStatisticsAvgTitle').html("日均开卡数");
@@ -426,11 +497,13 @@ function getBusinessStatisticsData(c){
 						memberEachDayColumnChartData.priceColumnChart.xAxis = member_xAxis;
 						memberEachDayColumnChartData.priceColumnChart.yAxis.data = member_yAxis;
 						
+						//当日期超过14天时, chart表长度加倍
 						var reportHeight = pageWidth;
 						if(member_xAxis.length > 14){
 							reportHeight = member_xAxis.length *30;
 						}
 						
+						//等待jquery mobile进入页面后再加载chart
 						setTimeout(function(){
 							//会员每日统计
 							newColumnChart2({
@@ -454,6 +527,7 @@ function getBusinessStatisticsData(c){
 					$("#businessAvgMoney").text(dailyBusinessStatistic.avgMoney);
 					$("#businessAvgCount").text(dailyBusinessStatistic.avgCount);
 					
+					//当日期超过14天时, chart表长度加倍
 					var reportHeight = pageWidth;
 					if(dailyBusinessStatisticColumnChartData.priceColumnChart.xAxis.length > 7){
 						reportHeight = dailyBusinessStatisticColumnChartData.priceColumnChart.xAxis.length *30;
@@ -508,7 +582,7 @@ function getBusinessStatisticsData(c){
 								daily_memberOpeColumnChartData.priceColumnChart.xAxis = ['充值', '退款'];
 								daily_memberOpeColumnChartData.priceColumnChart.yAxis.data = [daily_orderType.memberChargeByCash, daily_orderType.memberRefund];
 								
-
+								//等待jquery mobile进入页面后再加载chart
 								setTimeout(function(){
 									//操作类型
 									newColumnChart2({
@@ -547,9 +621,90 @@ $(function () {
 		}
 	}, "json")
 	pageWidth = $(window).width();
+	
+	//实时查找销售菜品
+	$('#txtSaleSearchFood').on('input', function(){
+		
+		var foodName = $('#txtSaleSearchFood').val();
+		if(foodName){
+			var html = [];
+			var index = 0;
+			for (var i = 0; i < kitchenSearchFoods.length; i++) {
+				if(kitchenSearchFoods[i].food.name.indexOf(foodName) >= 0){
+					index++;
+					html.push('<tr><td>{index}</td><td>{name}</td><td>{count}</td><td style="text-align:right;">{money}</td></tr>'.format({
+						index : index,
+						name : kitchenSearchFoods[i].food.name.substring(0, 8) + (kitchenSearchFoods[i].food.name.length > 8?"..." : ""),
+						money : kitchenSearchFoods[i].income.toFixed(2),
+						count : kitchenSearchFoods[i].salesAmount
+					}));
+				}
+			}
+			
+        	$('#table4KitchenTop10').html(html.join(''));		
+		}
+
+	});	
+	
+	//实时查找退菜菜品
+	$('#txtCancelSearchFood').on('input', function(){
+		var foodName = $('#txtCancelSearchFood').val();
+		if(foodName){
+			var html = [];
+			var index = 0;
+			for (var i = 0; i < cancelSearchFoods.length; i++) {
+				console.log(cancelSearchFoods[i].foodName.indexOf(foodName))
+				if(cancelSearchFoods[i].foodName.indexOf(foodName) >= 0){
+					index++;
+					html.push('<tr><td>{index}</td><td>{name}</td><td>{count}</td><td style="text-align:right;">{money}</td></tr>'.format({
+						index : index,
+						name : cancelSearchFoods[i].foodName.substring(0, 8) + (cancelSearchFoods[i].foodName.length > 8?"..." : ""),
+						money : cancelSearchFoods[i].cancelPrice.toFixed(2),
+						count : cancelSearchFoods[i].cancelAmount
+					}));
+				}
+			}
+			
+        	$('#table4CancelTop20').html(html.join(''));		
+		}
+
+	});	
+	
+	$('#generalDate').on('input', function(){
+		var foodName = $('#generalDate').val();
+		alert(foodName)
+
+	});	
+	
 	//默认调用前一日
 	$("#selectTimes").val(1).selectmenu('refresh');
 	changeDate(1);
+	
+/*    $('#txtSaleSearchFood2').bind('input', function(){  
+    	
+		var foodName = $('#txtSaleSearchFood').val();
+		alert(foodName)
+		if(foodName){
+			var html = [];
+			var index = 0;
+			for (var i = 0; i < kitchenSearchFoods.length; i++) {
+				
+				if(kitchenSearchFoods[i].food.name.indexOf(foodName) > 0){
+					index++;
+					html.push('<tr><td>{index}</td><td>{name}</td><td>{count}</td><td style="text-align:right;">{money}</td></tr>'.format({
+						index : index,
+						name : kitchenSearchFoods[i].food.name.substring(0, 8) + (rt.root[i].food.name.length > 8?"..." : ""),
+						money : kitchenSearchFoods[i].income.toFixed(2),
+						count : kitchenSearchFoods[i].salesAmount
+					}));
+				}
+			}
+			alert(html.join(''))
+        	$('#table4KitchenTop10').html(html.join(''));		
+		}
+    }) */
+	
+
 	
 });
 
@@ -564,11 +719,13 @@ function changeDate(value){
 	var nowMonth = now.getMonth(); //当前月 0开始
 	var nowYear = now.getFullYear(); //当前年 
 	
+	var txtBeginDate, txtEndDate;
+	
 	if(value == 0){//今天
 		
 	}else if(value == 1){//前一天
 		now.setDate(now.getDate()-1);
-		$('#endDate').html(now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate());
+		txtEndDate = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate();
 	}else if(value == 2){//最近7天
 		now.setDate(now.getDate()-7);
 	}else if(value == 3){//最近一个月
@@ -580,7 +737,7 @@ function changeDate(value){
 		if(nowDayOfWeek != 1){
 			nowWeek.setDate(nowWeek.getDate()-1);
 		}
-		$('#endDate').html(nowWeek.getFullYear() + "-" + (nowWeek.getMonth()+1) + "-" + nowWeek.getDate());
+		txtEndDate = nowWeek.getFullYear() + "-" + (nowWeek.getMonth()+1) + "-" + nowWeek.getDate();
 	}else if(value == 5){//本周
 		now.setDate(now.getDate() - (nowDayOfWeek - 1));
 		//为避免当天无数据显示, 删除当天 
@@ -588,11 +745,11 @@ function changeDate(value){
 		if(nowDayOfWeek != 1){
 			nowWeek.setDate(nowWeek.getDate()-1);
 		}
-		$('#endDate').html(nowWeek.getFullYear() + "-" + (nowWeek.getMonth()+1) + "-" + nowWeek.getDate());
+		txtEndDate = nowWeek.getFullYear() + "-" + (nowWeek.getMonth()+1) + "-" + nowWeek.getDate();
 		
 	}else if(value == 6){//上周
 		now.setDate(now.getDate() - nowDayOfWeek);
-		$('#endDate').html(now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate());
+		txtEndDate = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate();
 		now.setDate(now.getDate() - 6);
 	}else if(value == 7){//本月
 		//为避免当天无数据显示, 删除当天 
@@ -600,26 +757,69 @@ function changeDate(value){
 			var nowWeek = new Date();
 			nowWeek.setDate(nowWeek.getDate()-1);
 			//dateEnd.setValue(nowWeek);
-			$('#endDate').html(nowWeek.getFullYear() + "-" + (nowWeek.getMonth()+1) + "-" + nowWeek.getDate());
+			txtEndDate = nowWeek.getFullYear() + "-" + (nowWeek.getMonth()+1) + "-" + nowWeek.getDate();
 		}					
 		now.setDate(now.getDate() - (now.getDate() -1));
 		
 	}else if(value == 8){//上个月
 		//FIXME 月份加减遇12时
 		var nowWeek = new Date(nowYear, nowMonth-1, getMonthDays(nowMonth-1));
-		$('#endDate').html(nowWeek.getFullYear() + "-" + (nowWeek.getMonth()+1) + "-" + nowWeek.getDate());
+		txtEndDate = nowWeek.getFullYear() + "-" + (nowWeek.getMonth()+1) + "-" + nowWeek.getDate();
 		now = new Date(nowYear, nowMonth-1, 1);
 	}else if(value == 9){//最近半年
 		now.setMonth(now.getMonth()-6);
 	}else if(value == 10){//无限期
 		now = "";
 	}
-	$('#beginDate').html(now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate());
+	txtBeginDate = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate();
+	
+	$('#generalDate').val(txtBeginDate + " ~ " + txtEndDate);
+	
 	//dateBegin.setValue(now);
 	//dateBegin.clearInvalid();
 	getBusinessStatisticsData({chart : true});
 	
 }
+
+function searchCancelFoodByDept(thiz){
+    Util.lm.show();
+    cancelSearchFoods.length = 0;
+    //菜品top10
+    $.post('../../WXQueryBusinessStatistics.do', {
+    	dataSource : 'queryCancelFoods',
+		oid : Util.mp.oid,
+		dateBeg:searchCancelFoodByDept.beginDate,
+		dateEnd:searchCancelFoodByDept.endDate,
+		deptID : $(thiz).val()
+    }, function(rt){
+    	Util.lm.hide();
+    	
+    	cancelSearchFoods = rt.root.slice(0);
+    	//设置搜索出来的菜品的排序依据, 按销量
+    	var searchFoodCompare = function (obj1, obj2) {
+    		return -(obj1.cancelAmount - obj2.cancelAmount);
+    	} 
+    	rt.root = rt.root.slice(0, 20);
+    	rt.root.sort(searchFoodCompare);
+    	
+    	var html = [];
+    	for (var i = 0; i < rt.root.length; i++) {
+			html.push('<tr><td>{index}</td><td>{name}</td><td>{count}</td><td style="text-align:right;">{money}</td></tr>'.format({
+				index : i+1,
+				name : rt.root[i].foodName.substring(0, 8) + (rt.root[i].foodName.length > 8?"..." : ""),
+				money : rt.root[i].cancelPrice.toFixed(2),
+				count : rt.root[i].cancelAmount
+			}));
+		}
+    	$('#table4CancelTop20').html(html.join(''));
+		
+    	//不显示选择隐藏列按钮
+    	$('.ui-table-columntoggle-btn').hide();
+    	$('#display4CancelTop20').show();
+    },'json');
+}
+
+
 //获得某月的天数 
 function getMonthDays(myMonth){ 
 	var now = new Date(); //当前日期 
