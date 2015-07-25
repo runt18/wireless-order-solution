@@ -640,7 +640,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	 * 			the charge type referred to {@link ChargeType}
 	 * @return the member operation to this charge
 	 */
-	public MemberOperation charge(float chargeMoney, float deltaMoney, ChargeType chargeType){
+	public MemberOperation charge(float chargeMoney, float accountMoney, ChargeType chargeType){
 		
 		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 		
@@ -651,36 +651,36 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		//float deltaBase = chargeMoney;
 		//float deltaExtra = chargeMoney * Math.abs(getMemberType().getChargeRate() - 1);
 
-		totalCharge += chargeMoney;
-		baseBalance += chargeMoney;
-		extraBalance += (deltaMoney - chargeMoney);
+		this.totalCharge += chargeMoney;
+		this.baseBalance += chargeMoney;
+		this.extraBalance += (accountMoney - chargeMoney);
 		
 		mo.setDeltaBaseMoney(chargeMoney);
-		mo.setDeltaExtraMoney(deltaMoney - chargeMoney);
+		mo.setDeltaExtraMoney(accountMoney - chargeMoney);
 		
-		mo.setRemainingBaseMoney(baseBalance);
-		mo.setRemainingExtraMoney(extraBalance);
-		mo.setRemainingPoint(point);
+		mo.setRemainingBaseMoney(this.baseBalance);
+		mo.setRemainingExtraMoney(this.extraBalance);
+		mo.setRemainingPoint(this.point);
 		
 		return mo;
 	}
 	
 	
-	public MemberOperation refund(float takeMoney, float deltaMoney){
+	public MemberOperation refund(float refundMoney, float accountMoney){
 		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 		
 		mo.setOperationType(OperationType.REFUND);
 		mo.setChargeType(ChargeType.CASH);
-		mo.setChargeMoney(-takeMoney);
+		mo.setChargeMoney(-refundMoney);
 		
 		//float deltaBase = takeMoney;
 		//float deltaExtra = takeMoney * Math.abs(getMemberType().getChargeRate() - 1);
 
-		baseBalance -= takeMoney;
-		extraBalance -= (deltaMoney - takeMoney);
+		baseBalance -= refundMoney;
+		extraBalance -= (accountMoney - refundMoney);
 		
-		mo.setDeltaBaseMoney(-takeMoney);
-		mo.setDeltaExtraMoney(-(deltaMoney-takeMoney));
+		mo.setDeltaBaseMoney(-refundMoney);
+		mo.setDeltaExtraMoney(-(accountMoney-refundMoney));
 		
 		mo.setRemainingBaseMoney(baseBalance);
 		mo.setRemainingExtraMoney(extraBalance);
