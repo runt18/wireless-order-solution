@@ -415,27 +415,6 @@ window.onload=function(){
 			focusInput = this.id;
 		});	
 		
-
-		//抹数
-		$('#txtEraseQuota').focus(function(){
-			usedEraseQuota = false;
-			mouseOutNumKeyboard = true;
-			$('#numberKeyboard').show();	
-			//设置数字键盘触发
-			numKeyBoardFireEvent = function (){
-				$('#txtEraseQuota').keyup();
-			}
-			
-			$('#calculator4NumberKeyboard').on("mouseover", function(){
-				usedEraseQuota = false;
-				mouseOutNumKeyboard = false;
-			});
-			
-			$('#calculator4NumberKeyboard').on("mouseout", function(){
-				usedEraseQuota = true;
-				mouseOutNumKeyboard = true;
-			});			
-		});
 	}
 
 	

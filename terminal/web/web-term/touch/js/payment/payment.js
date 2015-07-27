@@ -110,12 +110,42 @@ function showPaymentMgr(c){
 	
 	//实时显示找零
 	$('#txtInputRecipt').on('keyup', function(){
-		if($('#txtInputRecipt').val() - checkOut_actualPrice > 0){
-			$('#txtReciptReturn').text($('#txtInputRecipt').val() - checkOut_actualPrice);
+		//计算抹零
+		var eraseQuota = $('#txtEraseQuota').val();
+		var actualPrice = checkOut_actualPrice;
+		if(!isNaN(eraseQuota)){
+			actualPrice = checkOut_actualPrice - eraseQuota;
+		}
+		
+		if($('#txtInputRecipt').val() - actualPrice > 0){
+			$('#txtReciptReturn').text($('#txtInputRecipt').val() - actualPrice);
 		}else{
 			$('#txtReciptReturn').text(0);
 		}
 	});
+	
+	//抹数框输入时
+	$('#txtEraseQuota').focus(function(){
+		focusInput = this.id;
+		usedEraseQuota = false;
+		mouseOutNumKeyboard = true;
+		$('#numberKeyboard').show();	
+		//设置数字键盘触发
+		numKeyBoardFireEvent = function (){
+			$('#txtEraseQuota').keyup();
+		}
+		
+		$('#calculator4NumberKeyboard').on("mouseover", function(){
+			usedEraseQuota = false;
+			mouseOutNumKeyboard = false;
+		});
+		
+		$('#calculator4NumberKeyboard').on("mouseout", function(){
+			usedEraseQuota = true;
+			mouseOutNumKeyboard = true;
+		});			
+	});	
+	
 	
 	//抹数联动
 	$('#txtEraseQuota').on('keyup', function(){
@@ -810,6 +840,7 @@ function closeLookupOrderDetailWin(){
 
 
 function openInputReciptWin(){
+	usedEraseQuota = false;
 	//设置数字键盘触发
 	numKeyBoardFireEvent = function (){
 		$('#txtInputRecipt').keyup();
@@ -819,7 +850,13 @@ function openInputReciptWin(){
 	
 	$('#inputReciptWin').popup('open');
 	inputReciptWin = true;
-	$('#txtShouldPay4Return').text(checkOut_actualPrice);
+	//计算抹零
+	var eraseQuota = $('#txtEraseQuota').val();
+	var actualPrice = checkOut_actualPrice;
+	if(!isNaN(eraseQuota)){
+		actualPrice = checkOut_actualPrice - eraseQuota;
+	}
+	$('#txtShouldPay4Return').text(actualPrice);
 	setTimeout(function(){
 		$('#txtInputRecipt').focus();
 	}, 200);
