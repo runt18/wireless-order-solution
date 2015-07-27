@@ -774,6 +774,8 @@ function changeDate(value){
 	txtBeginDate = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate();
 	
 	$('#generalDate').val(txtBeginDate + " ~ " + txtEndDate);
+	$('#beginDate').html(txtBeginDate);
+	$('#endDate').html(txtEndDate);
 	
 	//dateBegin.setValue(now);
 	//dateBegin.clearInvalid();
