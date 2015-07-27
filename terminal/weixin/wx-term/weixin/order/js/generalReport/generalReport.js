@@ -226,6 +226,10 @@ function getBusinessStatisticsData(c){
 			        $("#statisticToggle").hide();
 			        //隐藏退菜
 			        $('#display4CancelTop20').hide();
+			  		//清空输入框
+			  		$('#txtSaleSearchFood').val("");
+			  		$('#txtCancelSearchFood').val("");
+			  		
 			        Util.lm.show();
 			        //厨房
 			        $.post('../../WXQueryBusinessStatistics.do', {
@@ -306,6 +310,9 @@ function getBusinessStatisticsData(c){
 				  		$('#hr4SecondReportChart').hide();
 				  		$('#display4KitchenTop10').hide();
 				  		$('#display4CancelTop20').hide();
+				  		//清空输入框
+				  		$('#txtSaleSearchFood').val("");
+				  		$('#txtCancelSearchFood').val("");
 				  		
 				  		//开关复位
 				  		var myswitch = $('input[name="priceOrAmount"]:checked').val();
@@ -642,6 +649,24 @@ $(function () {
 			}
 			
         	$('#table4KitchenTop10').html(html.join(''));		
+		}else{
+        	//设置搜索出来的菜品的排序依据, 按销量
+        	var searchFoodCompare = function (obj1, obj2) {
+        		return -(obj1.salesAmount - obj2.salesAmount);
+        	} 
+        	var foods = kitchenSearchFoods.slice(0, 20);
+        	foods.sort(searchFoodCompare);
+        	
+        	var html = [];
+        	for (var i = 0; i < foods.length; i++) {
+				html.push('<tr><td>{index}</td><td>{name}</td><td>{count}</td><td style="text-align:right;">{money}</td></tr>'.format({
+					index : i+1,
+					name : foods[i].food.name.substring(0, 8) + (foods[i].food.name.length > 8?"..." : ""),
+					money : foods[i].income.toFixed(2),
+					count : foods[i].salesAmount
+				}));
+			}
+        	$('#table4KitchenTop10').html(html.join(''));			
 		}
 
 	});	
@@ -653,7 +678,6 @@ $(function () {
 			var html = [];
 			var index = 0;
 			for (var i = 0; i < cancelSearchFoods.length; i++) {
-				console.log(cancelSearchFoods[i].foodName.indexOf(foodName))
 				if(cancelSearchFoods[i].foodName.indexOf(foodName) >= 0){
 					index++;
 					html.push('<tr><td>{index}</td><td>{name}</td><td>{count}</td><td style="text-align:right;">{money}</td></tr>'.format({
@@ -666,45 +690,39 @@ $(function () {
 			}
 			
         	$('#table4CancelTop20').html(html.join(''));		
+		}else{
+        	//设置搜索出来的菜品的排序依据, 按销量
+        	var searchFoodCompare = function (obj1, obj2) {
+        		return -(obj1.salesAmount - obj2.salesAmount);
+        	} 
+        	var foods = cancelSearchFoods.slice(0, 20);
+        	foods.sort(searchFoodCompare);
+        	
+        	var html = [];
+        	for (var i = 0; i < foods.length; i++) {
+				html.push('<tr><td>{index}</td><td>{name}</td><td>{count}</td><td style="text-align:right;">{money}</td></tr>'.format({
+					index : i+1,
+					name : foods[i].foodName.substring(0, 8) + (foods[i].foodName.length > 8?"..." : ""),
+					money : foods[i].cancelPrice.toFixed(2),
+					count : foods[i].cancelAmount
+				}));
+			}
+        	$('#table4CancelTop20').html(html.join(''));					
 		}
 
 	});	
 	
-	$('#generalDate').on('input', function(){
-		var foodName = $('#generalDate').val();
-		alert(foodName)
-
-	});	
+	//用户自定义日期
+	$('#generalDate').bind('change', function(){
+		$('#beginDate').html($('#generalDate').val());
+		$('#endDate').html($('#generalDate').val());
+		getBusinessStatisticsData({chart : true});
+	});
 	
+
 	//默认调用前一日
 	$("#selectTimes").val(1).selectmenu('refresh');
 	changeDate(1);
-	
-/*    $('#txtSaleSearchFood2').bind('input', function(){  
-    	
-		var foodName = $('#txtSaleSearchFood').val();
-		alert(foodName)
-		if(foodName){
-			var html = [];
-			var index = 0;
-			for (var i = 0; i < kitchenSearchFoods.length; i++) {
-				
-				if(kitchenSearchFoods[i].food.name.indexOf(foodName) > 0){
-					index++;
-					html.push('<tr><td>{index}</td><td>{name}</td><td>{count}</td><td style="text-align:right;">{money}</td></tr>'.format({
-						index : index,
-						name : kitchenSearchFoods[i].food.name.substring(0, 8) + (rt.root[i].food.name.length > 8?"..." : ""),
-						money : kitchenSearchFoods[i].income.toFixed(2),
-						count : kitchenSearchFoods[i].salesAmount
-					}));
-				}
-			}
-			alert(html.join(''))
-        	$('#table4KitchenTop10').html(html.join(''));		
-		}
-    }) */
-	
-
 	
 });
 
@@ -782,6 +800,7 @@ function changeDate(value){
 	getBusinessStatisticsData({chart : true});
 	
 }
+
 
 function searchCancelFoodByDept(thiz){
     Util.lm.show();
