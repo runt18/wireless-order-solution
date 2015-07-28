@@ -2597,9 +2597,9 @@ ts.member.loadMemberInfo4Charge = function(member){
 	$('#rd_numPayMannerMoney').val('');
 	$('#rd_numRechargeMoney').val('');
 	
-	$('#rd_numBaseBalance').text(member.totalCharge?member.totalCharge:'----');
-	$('#rd_numTotalBalance').text(member.totalBalance?member.totalBalance:'----');
-	$('#rd_numTotalPoint').text(member.point?member.point:'----');
+	$('#rd_numBaseBalance').text(member.baseBalance);
+	$('#rd_numExtraBalance').text(member.extraBalance);
+	$('#rd_numTotalBalance').text(member.totalBalance);
 	$('#rd_txtMemberName').text(member.name?member.name:'----');
 	$('#rd_txtMmeberType').text(memberType.name?memberType.name:'----');
 	$('#rd_txtMemberSex').text(member.sexText?member.sexText:'----');	

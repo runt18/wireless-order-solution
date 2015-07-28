@@ -515,12 +515,12 @@
 		    	<td></td>
 		    </tr>
 	    	<tr>
-	    		<td class="readMemberTd">充值总额:</td>
-	    		<td class="readMemberTdValue"><label id="rd_numBaseBalance">----</label></td>
 	    		<td class="readMemberTd">账户余额:</td>
 	    		<td class="readMemberTdValue"><label id="rd_numTotalBalance">----</label></td>    	
-	    		<td class="readMemberTd">当前积分:</td>
-	    		<td class="readMemberTdValue"><label id="rd_numTotalPoint">----</label></td>       			
+	    		<td class="readMemberTd">基础余额:</td>
+	    		<td class="readMemberTdValue"><label id="rd_numBaseBalance">----</label></td>
+	    		<td class="readMemberTd">赠送余额:</td>
+	    		<td class="readMemberTdValue"><label id="rd_numExtraBalance">----</label></td>       			
 	    	</tr>
 	    	<tr>
 	    		<td class="readMemberTd">实收金额:</td>
