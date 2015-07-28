@@ -1376,7 +1376,7 @@ function winInit(){
 			border : false,
 			layout : 'column',
 			width : 670,
-			height : 185,
+			height : 200,
 			defaults : {
 				xtype : 'form',
 				layout : 'form',
@@ -1586,7 +1586,6 @@ function winInit(){
 					value : 0.00
 				}]
 			}, {
-				hidden : true,
 				items : [{
 					xtype : 'numberfield',
 					id : 'cm_numberExtraBalance',

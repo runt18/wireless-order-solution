@@ -97,6 +97,15 @@ Ext.onReady(function(){
 				}]
 			}, {
 				items : [{
+					xtype : 'numberfield',
+					id : 'tm_numberExtraBalance',
+					cls : 'disableInput',
+					fieldLabel : '赠送余额',
+					disabled : true,
+					value : 0.00
+				}]
+			}, {
+				items : [{
 					id : 'tm_numTotalPoint',
 					cls : 'disableInput',
 					fieldLabel : '当前积分',
@@ -294,7 +303,7 @@ function rechargeBindMemberData(data){
 	var weixinCard = Ext.getCmp('tm_numWeixinMemberCard');
 	var totalBalance = Ext.getCmp('tm_numTotalBalance');
 	var baseBalance = Ext.getCmp('tm_numBaseBalance');
-	//var extraBalance = Ext.getCmp('tm_numExtraBalance');
+	var extraBalance = Ext.getCmp('tm_numberExtraBalance');
 	var totalPoint = Ext.getCmp('tm_numTotalPoint');
 	var name = Ext.getCmp('tm_txtMemberName');
 	var memberType = Ext.getCmp('tm_txtMmeberType');
@@ -324,6 +333,7 @@ function rechargeBindMemberData(data){
 	memberCard.setValue(data['memberCard']);
 	totalBalance.setValue(data['totalBalance']);
 	baseBalance.setValue(data['baseBalance']);
+	extraBalance.setValue(data['extraBalance']);
 	weixinCard.setValue(data['weixinCard']);
 	totalPoint.setValue(data['point']);
 	name.setValue(data['name']);
