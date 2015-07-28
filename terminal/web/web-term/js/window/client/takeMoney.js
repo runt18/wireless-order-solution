@@ -80,19 +80,19 @@ Ext.onReady(function(){
 				].join('')
 			},{
 				columnWidth : 1
-			},
-			{
-				items : [{
-					id : 'tm_numBaseBalance',
-					cls : 'disableInput',
-					fieldLabel : '收款总额',
-					disabled : true
-				}]
 			}, {
 				items : [{
 					id : 'tm_numTotalBalance',
 					cls : 'disableInput',
 					fieldLabel : '账户余额',
+					disabled : true
+				}]
+			},
+			{
+				items : [{
+					id : 'tm_numBaseBalance',
+					cls : 'disableInput',
+					fieldLabel : '基础余额',
 					disabled : true
 				}]
 			}, {
