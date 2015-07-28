@@ -21,6 +21,7 @@ public class MemberError extends ErrorEnum{
 	public static final ErrorCode ADJUST_POINT_FAIL = build(9788, "操作失败, 会员积分调整失败, 请检查数据格式.");
 	public static final ErrorCode CONSUME_POINT_FAIL = build(9787, "操作失败, 会员积分消费失败, 请检查数据格式.");
 	public static final ErrorCode BIND_FAIL = build(9786, "操作失败, 会员绑定失败.");
+	public static final ErrorCode REFUND_FAIL = build(975, "操作失败, 取款不成功.");
 	
 	/* memberOperation 9650 - 9699 */
 	public static final ErrorCode OPERATION_INSERT = build(9699, "操作失败, 添加充值操作日志失败, 请联系客服人员!");

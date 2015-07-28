@@ -665,8 +665,21 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		return mo;
 	}
 	
-	
-	public MemberOperation refund(float refundMoney, float accountMoney){
+	/**
+	 * Refund from the member balance.
+	 * @param refundMoney
+	 * 			the money refund to member
+	 * @param accountMoney
+	 * 			the money refund from account
+	 * @return the associated member operation
+	 * @throws BusinessException
+	 * 			throws if the refund money exceeds the base balance
+	 */
+	public MemberOperation refund(float refundMoney, float accountMoney) throws BusinessException{
+		if(refundMoney > this.baseBalance){
+			throw new BusinessException("取款金额不能多于基础账户的余额", MemberError.REFUND_FAIL);
+		}
+		
 		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 		
 		mo.setOperationType(OperationType.REFUND);
@@ -676,15 +689,15 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		//float deltaBase = takeMoney;
 		//float deltaExtra = takeMoney * Math.abs(getMemberType().getChargeRate() - 1);
 
-		baseBalance -= refundMoney;
-		extraBalance -= (accountMoney - refundMoney);
+		this.baseBalance -= refundMoney;
+		this.extraBalance -= (accountMoney - refundMoney);
 		
 		mo.setDeltaBaseMoney(-refundMoney);
 		mo.setDeltaExtraMoney(-(accountMoney-refundMoney));
 		
-		mo.setRemainingBaseMoney(baseBalance);
-		mo.setRemainingExtraMoney(extraBalance);
-		mo.setRemainingPoint(point);
+		mo.setRemainingBaseMoney(this.baseBalance);
+		mo.setRemainingExtraMoney(this.extraBalance);
+		mo.setRemainingPoint(this.point);
 		
 		return mo;
 	}
@@ -708,7 +721,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		point = point - pointToConsume;
 		usedPoint += pointToConsume;
 		
-		mo.setDeltaPoint(pointToConsume * -1);
+		mo.setDeltaPoint(-pointToConsume);
 		mo.setRemainingPoint(point);
 		
 		return mo;
