@@ -2022,9 +2022,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 		initParams(wb);
 		
 		sheet.setColumnWidth(0, 6000);
-		sheet.setColumnWidth(1, 6000);
-		sheet.setColumnWidth(2, 6000);
-		sheet.setColumnWidth(3, 6000);
+		sheet.setColumnWidth(1, 5000);
+		sheet.setColumnWidth(2, 5000);
+		sheet.setColumnWidth(3, 5000);
 		
 		//合并单元格
 		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 3));
