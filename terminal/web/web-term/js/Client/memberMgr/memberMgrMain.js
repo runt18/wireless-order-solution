@@ -213,6 +213,7 @@ function initRechargeWin(){
 						sendSms : sendSms,
 						callback : function(_c){
 							rechargeWin.hide();
+							Ext.getCmp('btnSearchMember').handler();
 						}
 					});
 					
@@ -297,6 +298,7 @@ function initTakeMoneyWin(){
 						isPrint : Ext.getCmp('chbPrintTakeMoney').getValue(),
 						callback : function(_c){
 							takeMoneyWin.hide();
+							Ext.getCmp('btnSearchMember').handler();
 						}
 					});
 				}

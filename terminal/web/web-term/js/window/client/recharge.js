@@ -77,13 +77,6 @@ Ext.onReady(function(){
 				].join('')
 			},{
 				columnWidth : 1
-			},{
-				items : [{
-					id : 'rd_numBaseBalance',
-					cls : 'disableInput',
-					fieldLabel : '收款总额',
-					disabled : true
-				}]
 			}, {	
 				items : [{
 					id : 'rd_numTotalBalance',
@@ -91,7 +84,22 @@ Ext.onReady(function(){
 					fieldLabel : '账户余额',
 					disabled : true
 				}]
+			},{
+				items : [{
+					id : 'rd_numBaseBalance',
+					cls : 'disableInput',
+					fieldLabel : '基础余额',
+					disabled : true
+				}]
+			},{
+				items : [{
+					id : 'rd_numberExtraBalance',
+					cls : 'disableInput',
+					fieldLabel : '赠送余额',
+					disabled : true
+				}]
 			}, {
+				hidden : true,
 				items : [{
 					id : 'rd_numTotalPoint',
 					cls : 'disableInput',
@@ -305,6 +313,7 @@ function rechargeBindMemberData(data){
 	var weixinCard = Ext.getCmp('rd_numWeixinMemberCard');
 	var totalBalance = Ext.getCmp('rd_numTotalBalance');
 	var baseBalance = Ext.getCmp('rd_numBaseBalance');
+	var extraBalance = Ext.getCmp('rd_numberExtraBalance');
 	var totalPoint = Ext.getCmp('rd_numTotalPoint');
 	var name = Ext.getCmp('rd_txtMemberName');
 	var memberType = Ext.getCmp('rd_txtMmeberType');
@@ -330,6 +339,7 @@ function rechargeBindMemberData(data){
 	weixinCard.setValue(data['weixinCard']);
 	totalBalance.setValue(data['totalBalance']);
 	baseBalance.setValue(data['baseBalance']);
+	extraBalance.setValue(data['extraBalance']);
 	totalPoint.setValue(data['point']);
 	name.setValue(data['name']);
 	memberType.setValue(memberTypeData['name']);
