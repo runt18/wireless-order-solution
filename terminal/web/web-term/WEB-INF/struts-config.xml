@@ -642,6 +642,11 @@
 			type="com.wireless.Actions.client.member.OperateMenuAction"
 			scope="request" parameter="dataSource">
 		</action>				
+		<action path="/QueryMemberStatistics"
+			type="com.wireless.Actions.client.member.QueryMemberStatisticsAction"
+			scope="request" parameter="dataSource">
+		</action>		
+		
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
