@@ -1,83 +1,15 @@
-﻿var receivablesStatResultGrid, mrd_panelMemberOperationContent;
-var mrd_search_comboOperateType, mrd_search_memberType, mrd_search_comboOperateType, mrd_search_memerbCard
-	,mrd_search_onDuty, mrd_search_offDuty, mrd_search_memberName, mrd_search_dateCombo;
-var mrd_modal = true;
+﻿//ms:memberStatisticsCharge
+var msc_grid, msc_search_memberType
+	,msc_search_onDuty, msc_search_offDuty, msc_search_memberName, msc_search_dateCombo;
+var msc_modal = true;
 
+var msc_highChart, msc_PanelHeight = 0, msc_panelDrag = false;
 
-receivablesStaticRecordCount = 93;
-var highChart;
+var msc_southPanel;
 
-var businessPanelHeight = 0, panelDrag = false;
-
-var southPanel;
-
-var tempLoadMask = new Ext.LoadMask(document.body, {
-	msg : '正在获取信息, 请稍候......',
-	remove : true
-});
-
-
-function newDate(str) { 
-	str = str.split('-'); 
-	var date = new Date(); 
-	date.setUTCFullYear(str[0], str[1] - 1, str[2]); 
-	date.setUTCHours(0, 0, 0, 0); 
-	return date; 
-} 
-
-function loadBusinessStatistic(x){
-	var date = newDate(x).getTime();
-	businessStatWin = new Ext.Window({
-		title : '营业统计 -- <font style="color:green;">历史</font>',
-		width : 885,
-		height : 580,
-		closable : false,
-		modal : true,
-		resizable : false,	
-		layout: 'fit',
-		bbar : ['->', {
-			text : '关闭',
-			iconCls : 'btn_close',
-			handler : function(){
-				businessStatWin.destroy();
-			}
-		}],
-		keys : [{
-			key : Ext.EventObject.ESC,
-			scope : this,
-			fn : function(){
-				businessStatWin.destroy();
-			}
-		}],
-		listeners : {
-			hide : function(thiz){
-				thiz.body.update('');
-			},
-			show : function(thiz){
-				thiz.load({
-					autoLoad : false,
-					url : '../window/history/businessStatistics.jsp',
-					scripts : true,
-					nocache : true,
-					text : '功能加载中, 请稍后......',
-					params : {
-						dataSource : 'history',
-						dutyRange : "range",
-						offDuty : date,
-						onDuty : date,
-						queryPattern : 3
-					}
-				});
-			}
-		}
-	});
-	businessStatWin.show();
-	businessStatWin.center();
-}
-
-function recipe_showChart(){
-	var dateBegin = Ext.util.Format.date(mrd_search_onDuty.getValue(), 'Y-m-d');
-	var dateEnd = Ext.util.Format.date(mrd_search_offDuty.getValue(), 'Y-m-d');
+function msc_showChart(){
+	var dateBegin = Ext.util.Format.date(msc_search_onDuty.getValue(), 'Y-m-d');
+	var dateEnd = Ext.util.Format.date(msc_search_offDuty.getValue(), 'Y-m-d');
 	
 	var chartData;
 	$.ajax({
@@ -87,7 +19,7 @@ function recipe_showChart(){
 		data : {
 			dataSource :'chargeStatistics',
 			dateBegin : dateBegin,
-			dateEnd : dateEnd
+			dateEnd : dateEnd + "23:59:59"
 		},
 		async : false,
 		success : function(data){
@@ -98,7 +30,7 @@ function recipe_showChart(){
 	});
 	
 	
-	highChart = new Highcharts.Chart({
+	msc_highChart = new Highcharts.Chart({
 		plotOptions : {
 			line : {
 				cursor : 'pointer',
@@ -165,11 +97,11 @@ function recipe_showChart(){
 	});
 }
 
-var receivablesStatResultGrid, receipts_dateCombo;
-function initBusinessReceipsGrid(c){
+
+function msc_initBusinessReceipsGrid(c){
 	
-	mrd_search_memberType = new Ext.form.ComboBox({
-		id : 'mrd_search_memberType',
+	msc_search_memberType = new Ext.form.ComboBox({
+		id : 'msc_search_memberType',
 		width : 90,
 		forceSelection : true,
 		readOnly : false,
@@ -215,58 +147,54 @@ function initBusinessReceipsGrid(c){
 			}
 		}
 	});
-	mrd_search_memerbCard = new Ext.form.NumberField({
-		width : 100,
-		style : 'text-align:left;'
-	});
-	mrd_search_onDuty = new Ext.form.DateField({
+	msc_search_onDuty = new Ext.form.DateField({
 		xtype : 'datefield',
 		width : 100,
 		format : 'Y-m-d',
 		maxValue : new Date(),
 		hideParent : true,
-		hidden : mrd_modal ? false : true,
+		hidden : msc_modal ? false : true,
 		readOnly : false,
 		allowBlank : false
 	});
-	mrd_search_offDuty = new Ext.form.DateField({
+	msc_search_offDuty = new Ext.form.DateField({
 		xtype : 'datefield',
 		width : 100,
 		format : 'Y-m-d',
 		maxValue : new Date(),
 		hideParent : true,
-		hidden : mrd_modal ? false : true,
+		hidden : msc_modal ? false : true,
 		readOnly : false,
 		allowBlank : false
 	});
-	mrd_search_dateCombo = Ext.ux.createDateCombo({
-		beginDate : mrd_search_onDuty,
-		endDate : mrd_search_offDuty,
+	msc_search_dateCombo = Ext.ux.createDateCombo({
+		beginDate : msc_search_onDuty,
+		endDate : msc_search_offDuty,
 		callback : function(){
 			mrd_searchMemberOperation();
 		}
 	});
-	mrd_search_memberName = new Ext.form.TextField({
+	msc_search_memberName = new Ext.form.TextField({
 		xtype : 'textfield',
 		width : 100
 		
 	});
-	var mrd_mo_tbar = new Ext.Toolbar({
+	var msc_mo_tbar = new Ext.Toolbar({
 		height : 26,
 		items : [{ 
 			xtype : 'tbtext', 
-			text : (mrd_modal ? '&nbsp;&nbsp;日期:&nbsp;' : ' ')
-		}, mrd_search_dateCombo, {
+			text : (msc_modal ? '&nbsp;&nbsp;日期:&nbsp;' : ' ')
+		}, msc_search_dateCombo, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;'
-		}, mrd_search_onDuty, { 
+		}, msc_search_onDuty, { 
 			xtype : 'tbtext',
-			text : (mrd_modal ? '&nbsp;至&nbsp;' : ' ')
-		}, mrd_search_offDuty, 
+			text : (msc_modal ? '&nbsp;至&nbsp;' : ' ')
+		}, msc_search_offDuty, 
 		{
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;会员类型:'
-		}, mrd_search_memberType, {
+		}, msc_search_memberType, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;收款方式:'			
 		},{
@@ -314,7 +242,7 @@ function initBusinessReceipsGrid(c){
 		{
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
-		}, mrd_search_memberName, '->', {
+		}, msc_search_memberName, '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
 			handler : function(e){
@@ -324,8 +252,8 @@ function initBusinessReceipsGrid(c){
 			text : '重置',
 			iconCls : 'btn_refresh',
 			handler : function(e){
-				mrd_search_memberType.setValue(-1);
-				mrd_search_memberName.setValue();
+				msc_search_memberType.setValue(-1);
+				msc_search_memberName.setValue();
 				mrd_searchMemberOperation();
 			}
 			
@@ -344,14 +272,14 @@ function initBusinessReceipsGrid(c){
 					}
 					var onDuty = '', offDuty = '';
 					if(dataSource == 'history'){
-						if(!mrd_search_onDuty.isValid() || !mrd_search_offDuty.isValid()){
+						if(!msc_search_onDuty.isValid() || !msc_search_offDuty.isValid()){
 							Ext.example.msg('提示', '操作失败, 请选择搜索时间段.');
 							return;
 						}
-						onDuty = Ext.util.Format.date(mrd_search_onDuty.getValue(), 'Y-m-d 00:00:00');
-						offDuty = Ext.util.Format.date(mrd_search_offDuty.getValue(), 'Y-m-d 23:59:59');
+						onDuty = Ext.util.Format.date(msc_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+						offDuty = Ext.util.Format.date(msc_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 					}
-					var memberType = mrd_search_memberType.getRawValue() != '' ? mrd_search_memberType.getValue() : '';
+					var memberType = msc_search_memberType.getRawValue() != '' ? msc_search_memberType.getValue() : '';
 					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&operateType=2&payType={8}';
 					url = String.format(
 							url, 
@@ -360,7 +288,7 @@ function initBusinessReceipsGrid(c){
 							'rechargeDetail',
 							onDuty,
 							offDuty,
-							mrd_search_memberName.getValue(),
+							msc_search_memberName.getValue(),
 							dataSource,
 							Ext.getCmp('recharge_comboPayType').getValue()
 						);
@@ -368,8 +296,8 @@ function initBusinessReceipsGrid(c){
 				}
 			}]
 	});
-	receivablesStatResultGrid = createGridPanel(
-		'receivablesStatResultGrid',
+	msc_grid = createGridPanel(
+		'msc_grid',
 		'',
 		'',
 		'',
@@ -382,56 +310,58 @@ function initBusinessReceipsGrid(c){
 			['实收金额', 'deltaBaseMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['账户充额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['剩余金额', 'remainingTotalMoney'],
-			['充值方式', 'payTypeText'],
+			['充值方式', 'chargeTypeText'],
 			['操作人', 'staffName', 90, 'center'],
 		],
 		MemberOperationRecord.getKeys(),
 		[ ['isPaging', true]],
 		GRID_PADDING_LIMIT_20,
 		'',
-		mrd_mo_tbar
+		msc_mo_tbar
 	);
-	receivablesStatResultGrid.region = "center";
-	receivablesStatResultGrid.frame = false;
-	receivablesStatResultGrid.border = false;
-	receivablesStatResultGrid.on('render', function(thiz){
-		mrd_search_dateCombo.setValue(1);
-		mrd_search_dateCombo.fireEvent('select', mrd_search_dateCombo, null, 1);
+	msc_grid.region = "center";
+	msc_grid.frame = false;
+	msc_grid.border = false;
+	msc_grid.on('render', function(thiz){
+		msc_search_dateCombo.setValue(1);
+		msc_search_dateCombo.fireEvent('select', msc_search_dateCombo, null, 1);
 	});
 	
 
-	receivablesStatResultGrid.getStore().on('load', function(store, records, options){
+	msc_grid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
-			var sumRow = receivablesStatResultGrid.getView().getRow(store.getCount() - 1);	
+			var sumRow = msc_grid.getView().getRow(store.getCount() - 1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
-			for(var i = 0; i < receivablesStatResultGrid.getColumnModel().getColumnCount(); i++){
-				var sumCell = receivablesStatResultGrid.getView().getCell(store.getCount() - 1, i);
+			for(var i = 0; i < msc_grid.getColumnModel().getColumnCount(); i++){
+				var sumCell = msc_grid.getView().getCell(store.getCount() - 1, i);
 				sumCell.style.fontSize = '15px';
 				sumCell.style.fontWeight = 'bold';
 				sumCell.style.color = 'green';
 			}
-			receivablesStatResultGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
-			receivablesStatResultGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
-			receivablesStatResultGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
-			receivablesStatResultGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
-			receivablesStatResultGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
-			receivablesStatResultGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+			msc_grid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			msc_grid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+			msc_grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			msc_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+			msc_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+			msc_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 		}
 	});
 }
 
 function mrd_searchMemberOperation(){
 	var onDuty = '', offDuty = '';
-	onDuty = Ext.util.Format.date(mrd_search_onDuty.getValue(), 'Y-m-d 00:00:00');
-	offDuty = Ext.util.Format.date(mrd_search_offDuty.getValue(), 'Y-m-d 23:59:59');
+	onDuty = Ext.util.Format.date(msc_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+	offDuty = Ext.util.Format.date(msc_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 	
-	var memberType = mrd_search_memberType.getRawValue() != '' ? mrd_search_memberType.getValue() : '';
+	var memberType = msc_search_memberType.getRawValue() != '' ? msc_search_memberType.getValue() : '';
 	
-	var gs = receivablesStatResultGrid.getStore();
+	var gs = msc_grid.getStore();
 	gs.baseParams['dataSource'] = 'history';
 	gs.baseParams['memberType'] = memberType > 0 ? memberType : '';
-	gs.baseParams['fuzzy'] = mrd_search_memberName.getValue();
-	gs.baseParams['operateType'] = 2;
+	gs.baseParams['fuzzy'] = msc_search_memberName.getValue();
+	//操作小类为充值
+	gs.baseParams['detailOperate'] = 1;
+	//收款方式
 	gs.baseParams['chargeType'] = Ext.getCmp('recharge_comboPayType').getValue();
 	gs.baseParams['onDuty'] = onDuty;
 	gs.baseParams['offDuty'] = offDuty;
@@ -443,42 +373,24 @@ function mrd_searchMemberOperation(){
 		}
 	});
 	//每日充值统计
-	recipe_showChart();
+	msc_showChart();
 }
 
-function changeChartWidth(w,h){
-	if(highChart != undefined){
-		highChart.setSize(w, h);
+function msc_changeChartWidth(w,h){
+	if(msc_highChart != undefined){
+		msc_highChart.setSize(w, h);
 	}
 	
 }
-
-var receipts_setStatisticsDate = function(){
-	if(sendToPageOperation){
-		Ext.getCmp('receipts_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-		Ext.getCmp('receipts_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
-		receipt_hours = sendToStatisticsPageHours;
-		
-		Ext.getCmp('businessReceipt_btnSearch').handler();
-		Ext.getCmp('businessReceipt_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+receipt_hours.openingText+'</font>');
-		Ext.getCmp('businessReceipt_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+receipt_hours.endingText+'</font>');
-		Ext.getCmp('businessReceipt_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
-		
-		sendToPageOperation = false;		
-	}
-
-};
-
-var receipt_hours;
 
 Ext.onReady(function(){
 	
-	southPanel = new Ext.Panel({
+	msc_southPanel = new Ext.Panel({
 		contentEl : 'businessReceiptsChart',
 		region : 'south'
 	});
 	
-	initBusinessReceipsGrid({data : null});
+	msc_initBusinessReceipsGrid({data : null});
 	
 	new Ext.Panel({
 		renderTo : 'divBusinessReceiptStatistics',//渲染到
@@ -488,45 +400,44 @@ Ext.onReady(function(){
 		height : parseInt(Ext.getDom('divBusinessReceiptStatistics').parentElement.style.height.replace(/px/g,'')),
 		layout:'border',
 		frame : true, //边框
-		items : [receivablesStatResultGrid,southPanel]
+		items : [msc_grid,msc_southPanel]
 	});
 	
-	businessPanelHeight = receivablesStatResultGrid.getHeight();
+	msc_PanelHeight = msc_grid.getHeight();
 	
-	var rz = new Ext.Resizable(receivablesStatResultGrid.getEl(), {
+	var msc_rz = new Ext.Resizable(msc_grid.getEl(), {
         wrap: true, //在构造Resizable时自动在制定的id的外边包裹一层div
         minHeight:100, //限制改变的最小的高度
         pinned:false, //控制可拖动区域的显示状态，false是鼠标悬停在拖拉区域上才出现
         handles: 's',//设置拖拉的方向（n,s,e,w,all...）
         listeners : {
         	resize : function(thiz, w, h, e){
-        		panelDrag = true;
+        		msc_panelDrag = true;
         	}
         }
     });
-    rz.on('resize', receivablesStatResultGrid.syncSize, receivablesStatResultGrid);//注册事件(作用:将调好的大小传个scope执行)
+    msc_rz.on('resize', msc_grid.syncSize, msc_grid);//注册事件(作用:将调好的大小传个scope执行)
 	
-	receivablesStatResultGrid.on('bodyresize', function(e, w, h){
+	msc_grid.on('bodyresize', function(e, w, h){
 		var chartHeight;
-		if(h < businessPanelHeight){
-			chartHeight = 250 + (businessPanelHeight - h);
+		if(h < msc_PanelHeight){
+			chartHeight = 250 + (msc_PanelHeight - h);
 		}else{
-			chartHeight = 250 + (h - businessPanelHeight);
+			chartHeight = 250 + (h - msc_PanelHeight);
 		}
-		changeChartWidth(w,chartHeight);
+		msc_changeChartWidth(w,chartHeight);
 		
-		if(southPanel.getEl()){
-			southPanel.getEl().setTop((h+55)) ;
-		}
-		
-		if(panelDrag){
-			southPanel.setHeight(chartHeight);
+		if(msc_southPanel.getEl()){
+			msc_southPanel.getEl().setTop((h+55)) ;
 		}
 		
-		receivablesStatResultGrid.getEl().parent().setWidth(w);
-		receivablesStatResultGrid.doLayout();
+		if(msc_panelDrag){
+			msc_southPanel.setHeight(chartHeight);
+		}
+		
+		msc_grid.getEl().parent().setWidth(w);
+		msc_grid.doLayout();
 		
 	});
-//	Ext.getCmp('businessReceiptsStatistics').updateStatisticsDate = receipts_setStatisticsDate;
 	
 });
