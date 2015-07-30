@@ -17,6 +17,10 @@ public class MemberStatistics implements Jsonable{
 		return this;
 	}
 	
+	public List<StatisticsByEachDay> getStatistics(){
+		return statistics;
+	}
+	
 	//消费金额
 	public float getTotalConsume(){
 		float total = 0;
