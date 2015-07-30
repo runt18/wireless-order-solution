@@ -46,8 +46,11 @@ public class QueryMemberOperationAction extends Action{
 			String fuzzy = request.getParameter("fuzzy");
 			
 			String payType = request.getParameter("payType");
+			//现金,刷卡,签单
 			String chargeType = request.getParameter("chargeType");
+			//消费类型,充值类型,积分,金额调整
 			String operateType = request.getParameter("operateType");
+			//充值,取款,积分消费,反结账...
 			String detailOperate = request.getParameter("detailOperate");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
@@ -93,9 +96,9 @@ public class QueryMemberOperationAction extends Action{
 				}
 			}
 			
-
+			//如果没选择小分类,则选择所有的小分类
 			if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
-				extraCond.addOperationType(OperationType.valueOf(detailOperate));
+				extraCond.addOperationType(OperationType.valueOf(Integer.valueOf(detailOperate)));
 			}else{
 				if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
 					for(OperationType type : OperationType.typeOf(OperationCate.valueOf(Integer.parseInt(operateType)))){
