@@ -19,7 +19,7 @@ function msc_showChart(){
 		data : {
 			dataSource :'chargeStatistics',
 			dateBegin : dateBegin,
-			dateEnd : dateEnd + "23:59:59"
+			dateEnd : dateEnd + " 23:59:59"
 		},
 		async : false,
 		success : function(data){
