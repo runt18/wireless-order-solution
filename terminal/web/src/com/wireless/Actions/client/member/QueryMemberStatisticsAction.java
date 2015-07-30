@@ -26,7 +26,7 @@ import com.wireless.pojo.util.DateType;
 public class QueryMemberStatisticsAction  extends DispatchAction {
 	
 	/**
-	 * history
+	 * 会员充值报表
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -60,7 +60,8 @@ public class QueryMemberStatisticsAction  extends DispatchAction {
 					data.add(e.getCharge().getTotalAccountCharge());
 			}
 			
-			chartData = "{\"xAxis\":" + xAxis + ",\"ser\":[{\"name\":\"充值额\", \"data\" : " + data + "}]}";	
+			chartData = "{\"xAxis\":" + xAxis + ",\"avgMoney\" : " + memberStatistics.getAverageCharge() + ", \"avgCount\" : " + memberStatistics.getAverageChargeAmount() +  
+					",\"ser\":[{\"name\":\"充值额\", \"data\" : " + data + "}]}";	
 			
 			final String chartDatas = chartData;
 			
@@ -92,5 +93,141 @@ public class QueryMemberStatisticsAction  extends DispatchAction {
 		}
 		return null;
 	}
+	/**
+	 * 退款
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward refundStatistics(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		JObject jObject = new JObject();
+		try{
+			
+			String dateBegin = request.getParameter("dateBegin");
+			String dateEnd = request.getParameter("dateEnd");
+			
+			CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			String chartData = null ;
+			
+			final MemberStatistics memberStatistics;
+			
+			memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
+			
+			List<String> xAxis = new ArrayList<String>();
+			List<Float> data = new ArrayList<Float>();
+			for (StatisticsByEachDay e : memberStatistics.getStatistics()) {
 
+					xAxis.add("\""+e.getDate()+"\"");
+					data.add(e.getCharge().getTotalAccountRefund());
+			}
+			
+			chartData = "{\"xAxis\":" + xAxis + ",\"avgMoney\" : " + memberStatistics.getAverageRefund() + ", \"avgCount\" : " + memberStatistics.getAverageRefundAmount() +  
+					",\"ser\":[{\"name\":\"退款额\", \"data\" : " + data + "}]}";	
+			
+			final String chartDatas = chartData;
+			
+			jObject.setExtra(new Jsonable(){
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("businessChart", chartDatas);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
+		}catch(SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip4Exception(e);
+			
+		}finally{
+			
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 充值
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward consumeStatistics(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		JObject jObject = new JObject();
+		try{
+			
+			String dateBegin = request.getParameter("dateBegin");
+			String dateEnd = request.getParameter("dateEnd");
+			
+			CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			String chartData = null ;
+			
+			final MemberStatistics memberStatistics;
+			
+			memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
+			
+			List<String> xAxis = new ArrayList<String>();
+			List<Float> data = new ArrayList<Float>();
+			for (StatisticsByEachDay e : memberStatistics.getStatistics()) {
+
+					xAxis.add("\""+e.getDate()+"\"");
+					data.add(e.getConsumption().getTotalConsume());
+			}
+			
+			chartData = "{\"xAxis\":" + xAxis + ",\"avgMoney\" : " + memberStatistics.getAverageConsume() + ", \"avgCount\" : " + memberStatistics.getAverageConsumeAmount() +  
+					",\"ser\":[{\"name\":\"消费额\", \"data\" : " + data + "}]}";	
+			
+			final String chartDatas = chartData;
+			
+			jObject.setExtra(new Jsonable(){
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("businessChart", chartDatas);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
+		}catch(SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip4Exception(e);
+			
+		}finally{
+			
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}	
 }
