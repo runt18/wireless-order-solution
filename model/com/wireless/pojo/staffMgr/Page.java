@@ -211,7 +211,7 @@ public class Page{
 	public static enum Member{
 //		MEMBER_TYPE("memberType", "会员类型", "Client_Module/MemberTypeManagement.html", "../../images/memberTypeMgr.png"),
 		MEMBER("memberMgr", "会员管理", "Client_Module/MemberManagement.html", "../../images/memberMgr.png"),
-		MEMBER_CHARGE_STATISTICS("memberChargeStatistics", "充值统计", "Client_Module/memberChargeStatistics.html", "../../images/salesStat.png"),
+		MEMBER_CHARGE_STATISTICS("memberChargeStatistics", "充值统计", "Client_Module/memberChargeStatistics.html", "../../images/btnRechargeDetails.png"),
 		WX_STEPS_BIND("WXBind", "微信公众号设置", "Client_Module/WeixinAuth.html", "../../images/discountStatistics.png"),
 		ACTIVE("activeMgr", "优惠活动管理", "Client_Module/ActiveManagement.html", "../../images/memberMgr.png");
 //		MEMBER_LEVEL("memberLevel", "会员等级", "Client_Module/MemberLevelManagement.html", "../../images/memberLevel.png");
