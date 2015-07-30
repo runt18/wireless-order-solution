@@ -925,6 +925,7 @@ var MemberBasicRecord = Ext.ux.cr(['id', 'rid', 'totalConsumption', 'totalCharge
     'consumptionAmount', 'name', 'tele', 'mobile', 'birthday', 'birthdayFormat', 'idCard', 'company', 'tastePref', 'taboo', 'contactAddress', 'comment', 'createDate', 'createDateFormat', 'memberCard', 'publicComment', 'privateComment', 'acctendtioned', 'weixinCard']);
 var MemberOperationRecord = Ext.ux.cr(['id', 'seq', 'rid', 'staffId', 'staffName', 'orderId', 'deltaBaseMoney', 'deltaExtraMoney', 'deltaPoint', 'remainingBaseMoney', 'remainingExtraMoney', 'remainingPoint', 'comment', 'deltaTotalMoney', 'remainingTotalMoney', 'operateDateFormat',
     'member', 'member.name','member.mobile', 'member.memberType.name', 'operateTypeText', 'operateTypeValue', 'payTypeText', 'payTypeValue', 'payMoney', 'chargeTypeText', 'chargeTypeValue', 'chargeMoney']);
+
 var MOSummaryRecord = Ext.ux.cr(['chargeMoney', 'consumeAmount', 'payMoney', 'consumePoint', 'pointConsume', 'pointAdjust', 'moneyAdjust', 'member', 'member.name', 'member.memberType.name']);
 var CouponRecord = Ext.ux.cr(['createStaff', 'birthDate', 'couponId', 'restaurantId', 'couponType','couponType.expiredFormat', 'orderId', 'orderDate', 'statusText', 'statusValue', 'member', 'member.name', 'member.mobile']);
 var saleMaterial_Record = Ext.ux.cr(['foodName', 'amount', 'rate', 'consume']);

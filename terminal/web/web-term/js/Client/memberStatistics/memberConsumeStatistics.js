@@ -1,15 +1,15 @@
-﻿//mcs:memberChargeStatistics
-var mcs_grid, mcs_search_memberType
-	,mcs_search_onDuty, mcs_search_offDuty, mcs_search_memberName, mcs_search_dateCombo;
-var mcs_modal = true;
+﻿//mcus:memberConsumeStatistics
+var mcus_grid, mcus_search_memberType
+	,mcus_search_onDuty, mcus_search_offDuty, mcus_search_memberName, mcus_search_dateCombo;
+var mcus_modal = true;
 
-var mcs_highChart, mcs_PanelHeight = 0, mcs_panelDrag = false;
+var mcus_highChart, mcus_PanelHeight = 0, mcus_panelDrag = false;
 
-var mcs_southPanel;
+var mcus_southPanel;
 
-function mcs_showChart(){
-	var dateBegin = Ext.util.Format.date(mcs_search_onDuty.getValue(), 'Y-m-d');
-	var dateEnd = Ext.util.Format.date(mcs_search_offDuty.getValue(), 'Y-m-d');
+function mcus_showChart(){
+	var dateBegin = Ext.util.Format.date(mcus_search_onDuty.getValue(), 'Y-m-d');
+	var dateEnd = Ext.util.Format.date(mcus_search_offDuty.getValue(), 'Y-m-d');
 	
 	var chartData;
 	$.ajax({
@@ -17,7 +17,7 @@ function mcs_showChart(){
 		type : 'post',
 		dataType : 'json',
 		data : {
-			dataSource :'chargeStatistics',
+			dataSource :'consumeStatistics',
 			dateBegin : dateBegin,
 			dateEnd : dateEnd + " 23:59:59"
 		},
@@ -30,7 +30,7 @@ function mcs_showChart(){
 	});
 	
 	
-	mcs_highChart = new Highcharts.Chart({
+	mcus_highChart = new Highcharts.Chart({
 		plotOptions : {
 			line : {
 				cursor : 'pointer',
@@ -44,15 +44,15 @@ function mcs_showChart(){
 			}
 		},
         chart: {  
-        	renderTo: 'memberChargeChart'
+        	renderTo: 'memberConsumeChart'
     	}, 
         title: {
-            text: '<b>会员充值走势图（'+ dateBegin +'至'+ dateEnd +'）</b>'
+            text: '<b>会员消费走势图（'+ dateBegin +'至'+ dateEnd +'）</b>'
         },
         labels: {
         	items : [{
-        		html : '<b>日均充值额:' + chartData.avgMoney + ' 元</b><br><b>日均充值次数:' + chartData.avgCount + ' 次</b>',
-	        	style : {left :/*($('#memberChargeChart').width()*0.80)*/'0px', top: '0px'}
+        		html : '<b>日均消费额:' + chartData.avgMoney + ' 元</b><br><b>日均消费次数:' + chartData.avgCount + ' 次</b>',
+	        	style : {left :/*($('#memberConsumeChart').width()*0.80)*/'0px', top: '0px'}
         	}]
         },
         xAxis: {
@@ -96,10 +96,10 @@ function mcs_showChart(){
 }
 
 
-function mcs_initBusinessReceipsGrid(c){
+function mcus_initBusinessReceipsGrid(c){
 	
-	mcs_search_memberType = new Ext.form.ComboBox({
-		id : 'mcs_search_memberType',
+	mcus_search_memberType = new Ext.form.ComboBox({
+		id : 'mcus_search_memberType',
 		width : 90,
 		forceSelection : true,
 		readOnly : false,
@@ -145,61 +145,61 @@ function mcs_initBusinessReceipsGrid(c){
 			}
 		}
 	});
-	mcs_search_onDuty = new Ext.form.DateField({
+	mcus_search_onDuty = new Ext.form.DateField({
 		xtype : 'datefield',
 		width : 100,
 		format : 'Y-m-d',
 		maxValue : new Date(),
 		hideParent : true,
-		hidden : mcs_modal ? false : true,
+		hidden : mcus_modal ? false : true,
 		readOnly : false,
 		allowBlank : false
 	});
-	mcs_search_offDuty = new Ext.form.DateField({
+	mcus_search_offDuty = new Ext.form.DateField({
 		xtype : 'datefield',
 		width : 100,
 		format : 'Y-m-d',
 		maxValue : new Date(),
 		hideParent : true,
-		hidden : mcs_modal ? false : true,
+		hidden : mcus_modal ? false : true,
 		readOnly : false,
 		allowBlank : false
 	});
-	mcs_search_dateCombo = Ext.ux.createDateCombo({
-		beginDate : mcs_search_onDuty,
-		endDate : mcs_search_offDuty,
+	mcus_search_dateCombo = Ext.ux.createDateCombo({
+		beginDate : mcus_search_onDuty,
+		endDate : mcus_search_offDuty,
 		callback : function(){
 			mrd_searchMemberOperation();
 		}
 	});
-	mcs_search_memberName = new Ext.form.TextField({
+	mcus_search_memberName = new Ext.form.TextField({
 		xtype : 'textfield',
 		width : 100
 		
 	});
-	var mcs_mo_tbar = new Ext.Toolbar({
+	var mcus_mo_tbar = new Ext.Toolbar({
 		height : 26,
 		items : [{ 
 			xtype : 'tbtext', 
-			text : (mcs_modal ? '&nbsp;&nbsp;日期:&nbsp;' : ' ')
-		}, mcs_search_dateCombo, {
+			text : (mcus_modal ? '&nbsp;&nbsp;日期:&nbsp;' : ' ')
+		}, mcus_search_dateCombo, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;'
-		}, mcs_search_onDuty, { 
+		}, mcus_search_onDuty, { 
 			xtype : 'tbtext',
-			text : (mcs_modal ? '&nbsp;至&nbsp;' : ' ')
-		}, mcs_search_offDuty, 
+			text : (mcus_modal ? '&nbsp;至&nbsp;' : ' ')
+		}, mcus_search_offDuty, 
 		{
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;会员类型:'
-		}, mcs_search_memberType, {
+		}, mcus_search_memberType, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;收款方式:'			
 		},{
 			xtype : 'combo',
 			forceSelection : true,
 			width : 80,
-			id : 'memberRecharge_comboPayType',
+			id : 'memberConsume_comboPayType',
 			store : new Ext.data.JsonStore({
 				fields : [ 'id', 'name' ]
 			}),
@@ -240,7 +240,7 @@ function mcs_initBusinessReceipsGrid(c){
 		{
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
-		}, mcs_search_memberName, '->', {
+		}, mcus_search_memberName, '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
 			handler : function(e){
@@ -250,8 +250,8 @@ function mcs_initBusinessReceipsGrid(c){
 			text : '重置',
 			iconCls : 'btn_refresh',
 			handler : function(e){
-				mcs_search_memberType.setValue(-1);
-				mcs_search_memberName.setValue();
+				mcus_search_memberType.setValue(-1);
+				mcus_search_memberName.setValue();
 				mrd_searchMemberOperation();
 			}
 			
@@ -259,11 +259,11 @@ function mcs_initBusinessReceipsGrid(c){
 				text : '导出',
 				iconCls : 'icon_tb_exoprt_excel',
 				handler : function(){
-					var onDuty = '', offDuty = '';
-					onDuty = Ext.util.Format.date(mcs_search_onDuty.getValue(), 'Y-m-d 00:00:00');
-					offDuty = Ext.util.Format.date(mcs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
+/*					var onDuty = '', offDuty = '';
+					onDuty = Ext.util.Format.date(mcus_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+					offDuty = Ext.util.Format.date(mcus_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 					
-					var memberType = mcs_search_memberType.getRawValue() != '' ? mcs_search_memberType.getValue() : '';
+					var memberType = mcus_search_memberType.getRawValue() != '' ? mcus_search_memberType.getValue() : '';
 					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&payType={8}';
 					url = String.format(
 							url, 
@@ -272,17 +272,37 @@ function mcs_initBusinessReceipsGrid(c){
 							'rechargeDetail',
 							onDuty,
 							offDuty,
-							mcs_search_memberName.getValue(),
+							mcus_search_memberName.getValue(),
 							'history',
 							1,
-							Ext.getCmp('memberRecharge_comboPayType').getValue()
+							Ext.getCmp('memberConsume_comboPayType').getValue()
+						);
+					window.location = url;*/
+					
+					
+					var onDuty = '', offDuty = '';
+					onDuty = Ext.util.Format.date(mcus_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+					offDuty = Ext.util.Format.date(mcus_search_offDuty.getValue(), 'Y-m-d 23:59:59');
+					
+					var memberType = mcus_search_memberType.getRawValue() != '' ? mcus_search_memberType.getValue() : '';
+					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&operateType=1&payType={7}';
+					url = String.format(
+							url, 
+							'ExportHistoryStatisticsToExecl.do', 
+							memberType > 0 ? memberType : '', 
+							'consumeDetail',
+							onDuty,
+							offDuty,
+							mcus_search_memberName.getValue(),
+							'history',
+							Ext.getCmp('memberConsume_comboPayType').getValue()
 						);
 					window.location = url;
 				}
 			}]
 	});
-	mcs_grid = createGridPanel(
-		'mcs_grid',
+	mcus_grid = createGridPanel(
+		'mcus_grid',
 		'',
 		'',
 		'',
@@ -292,62 +312,65 @@ function mcs_initBusinessReceipsGrid(c){
 			['日期', 'operateDateFormat'],
 			['操作类型', 'operateTypeText', 90, 'center'],
 			['会员名称', 'member.name', 60],
-			['实收金额', 'deltaBaseMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-			['账户充额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-			['剩余金额', 'remainingTotalMoney'],
-			['充值方式', 'chargeTypeText'],
+			['消费金额', 'payMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+			['剩余金额', 'remainingTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+			['付款方式', 'payTypeText'],
+			['变动积分', 'deltaPoint', 60, 'right'],
+			['剩余积分', 'remainingPoint', 60, 'right'],
 			['操作人', 'staffName', 90, 'center'],
 		],
 		MemberOperationRecord.getKeys(),
 		[ ['isPaging', true]],
 		GRID_PADDING_LIMIT_20,
 		'',
-		mcs_mo_tbar
+		mcus_mo_tbar
 	);
-	mcs_grid.region = "center";
-	mcs_grid.frame = false;
-	mcs_grid.border = false;
-	mcs_grid.on('render', function(thiz){
-		mcs_search_dateCombo.setValue(1);
-		mcs_search_dateCombo.fireEvent('select', mcs_search_dateCombo, null, 1);
+	mcus_grid.region = "center";
+	mcus_grid.frame = false;
+	mcus_grid.border = false;
+	mcus_grid.on('render', function(thiz){
+		mcus_search_dateCombo.setValue(1);
+		mcus_search_dateCombo.fireEvent('select', mcus_search_dateCombo, null, 1);
 	});
 	
 
-	mcs_grid.getStore().on('load', function(store, records, options){
+	mcus_grid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
-			var sumRow = mcs_grid.getView().getRow(store.getCount() - 1);	
+			var sumRow = mcus_grid.getView().getRow(store.getCount() - 1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
-			for(var i = 0; i < mcs_grid.getColumnModel().getColumnCount(); i++){
-				var sumCell = mcs_grid.getView().getCell(store.getCount() - 1, i);
+			for(var i = 0; i < mcus_grid.getColumnModel().getColumnCount(); i++){
+				var sumCell = mcus_grid.getView().getCell(store.getCount() - 1, i);
 				sumCell.style.fontSize = '15px';
 				sumCell.style.fontWeight = 'bold';
 				sumCell.style.color = 'green';
 			}
-			mcs_grid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
-			mcs_grid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
-			mcs_grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
-			mcs_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
-			mcs_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
-			mcs_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+			mcus_grid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			mcus_grid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+			mcus_grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			mcus_grid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
+			mcus_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+			mcus_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+			mcus_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+			mcus_grid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 		}
 	});
 }
 
 function mrd_searchMemberOperation(){
 	var onDuty = '', offDuty = '';
-	onDuty = Ext.util.Format.date(mcs_search_onDuty.getValue(), 'Y-m-d 00:00:00');
-	offDuty = Ext.util.Format.date(mcs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
+	onDuty = Ext.util.Format.date(mcus_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+	offDuty = Ext.util.Format.date(mcus_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 	
-	var memberType = mcs_search_memberType.getRawValue() != '' ? mcs_search_memberType.getValue() : '';
+	var memberType = mcus_search_memberType.getRawValue() != '' ? mcus_search_memberType.getValue() : '';
 	
-	var gs = mcs_grid.getStore();
+	var gs = mcus_grid.getStore();
 	gs.baseParams['dataSource'] = 'history';
 	gs.baseParams['memberType'] = memberType > 0 ? memberType : '';
-	gs.baseParams['fuzzy'] = mcs_search_memberName.getValue();
-	//操作小类为充值
-	gs.baseParams['detailOperate'] = 1;
+	gs.baseParams['fuzzy'] = mcus_search_memberName.getValue();
+	//操作大类为消费
+	gs.baseParams['operateType'] = 1;
 	//收款方式
-	gs.baseParams['chargeType'] = Ext.getCmp('memberRecharge_comboPayType').getValue();
+	gs.baseParams['payType'] = Ext.getCmp('memberConsume_comboPayType').getValue();
 	gs.baseParams['onDuty'] = onDuty;
 	gs.baseParams['offDuty'] = offDuty;
 	gs.baseParams['total'] = true;
@@ -358,70 +381,70 @@ function mrd_searchMemberOperation(){
 		}
 	});
 	//每日充值统计
-	mcs_showChart();
+	mcus_showChart();
 }
 
-function mcs_changeChartWidth(w,h){
-	if(mcs_highChart != undefined){
-		mcs_highChart.setSize(w, h);
+function mcus_changeChartWidth(w,h){
+	if(mcus_highChart != undefined){
+		mcus_highChart.setSize(w, h);
 	}
 	
 }
 
 Ext.onReady(function(){
 	
-	mcs_southPanel = new Ext.Panel({
-		contentEl : 'memberChargeChart',
+	mcus_southPanel = new Ext.Panel({
+		contentEl : 'memberConsumeChart',
 		region : 'south'
 	});
 	
-	mcs_initBusinessReceipsGrid({data : null});
+	mcus_initBusinessReceipsGrid({data : null});
 	
 	new Ext.Panel({
-		renderTo : 'divMemberChargeStatistics',//渲染到
+		renderTo : 'divMemberConsumeStatistics',//渲染到
 		id : 'businessReceiptStatisticsPanel',
 		//solve不跟随窗口的变化而变化
-		width : parseInt(Ext.getDom('divMemberChargeStatistics').parentElement.style.width.replace(/px/g,'')),
-		height : parseInt(Ext.getDom('divMemberChargeStatistics').parentElement.style.height.replace(/px/g,'')),
+		width : parseInt(Ext.getDom('divMemberConsumeStatistics').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divMemberConsumeStatistics').parentElement.style.height.replace(/px/g,'')),
 		layout:'border',
 		frame : true, //边框
-		items : [mcs_grid,mcs_southPanel]
+		items : [mcus_grid,mcus_southPanel]
 	});
 	
-	mcs_PanelHeight = mcs_grid.getHeight();
+	mcus_PanelHeight = mcus_grid.getHeight();
 	
-	var mcs_rz = new Ext.Resizable(mcs_grid.getEl(), {
+	var mcus_rz = new Ext.Resizable(mcus_grid.getEl(), {
         wrap: true, //在构造Resizable时自动在制定的id的外边包裹一层div
         minHeight:100, //限制改变的最小的高度
         pinned:false, //控制可拖动区域的显示状态，false是鼠标悬停在拖拉区域上才出现
         handles: 's',//设置拖拉的方向（n,s,e,w,all...）
         listeners : {
         	resize : function(thiz, w, h, e){
-        		mcs_panelDrag = true;
+        		mcus_panelDrag = true;
         	}
         }
     });
-    mcs_rz.on('resize', mcs_grid.syncSize, mcs_grid);//注册事件(作用:将调好的大小传个scope执行)
+    mcus_rz.on('resize', mcus_grid.syncSize, mcus_grid);//注册事件(作用:将调好的大小传个scope执行)
 	
-	mcs_grid.on('bodyresize', function(e, w, h){
+	mcus_grid.on('bodyresize', function(e, w, h){
 		var chartHeight;
-		if(h < mcs_PanelHeight){
-			chartHeight = 250 + (mcs_PanelHeight - h);
+		if(h < mcus_PanelHeight){
+			chartHeight = 250 + (mcus_PanelHeight - h);
 		}else{
-			chartHeight = 250 + (h - mcs_PanelHeight);
+			chartHeight = 250 + (h - mcus_PanelHeight);
 		}
-		mcs_changeChartWidth(w,chartHeight);
+		mcus_changeChartWidth(w,chartHeight);
 		
-		if(mcs_southPanel.getEl()){
-			mcs_southPanel.getEl().setTop((h+55)) ;
-		}
-		
-		if(mcs_panelDrag){
-			mcs_southPanel.setHeight(chartHeight);
+		if(mcus_southPanel.getEl()){
+			mcus_southPanel.getEl().setTop((h+55)) ;
 		}
 		
-		mcs_grid.getEl().parent().setWidth(w);
-		mcs_grid.doLayout();
+		if(mcus_panelDrag){
+			mcus_southPanel.setHeight(chartHeight);
+		}
+		
+		mcus_grid.getEl().parent().setWidth(w);
+		mcus_grid.doLayout();
 		
 	});
 	
