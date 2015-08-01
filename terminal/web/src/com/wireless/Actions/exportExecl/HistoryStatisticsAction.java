@@ -2291,7 +2291,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String offDuty = request.getParameter("offDuty");
 		String detailOperate = request.getParameter("detailOperate");
 		String payType = request.getParameter("payType");
-		//String total = request.getParameter("total");
+		String isRefund = request.getParameter("isRefund");
 		final MemberOperationDao.ExtraCond extraCond;
 		
 		if(dataSource.equalsIgnoreCase("today")){
@@ -2358,10 +2358,16 @@ public class HistoryStatisticsAction extends DispatchAction{
 			}
 		}
 		
-		DecimalFormat df = new DecimalFormat("#.00");
+		DecimalFormat df = new DecimalFormat("0.00");
 		String title = "会员充值明细表";
+		
+		if(isRefund != null){
+			title = "会员取款明细表";
+			response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("会员取款明细表.xls").getBytes("GBK"),  "ISO8859_1"));
+		}else{
+			response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("会员充值明细表.xls").getBytes("GBK"),  "ISO8859_1"));
+		}
 		//标题
-		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("会员充值明细表.xls").getBytes("GBK"),  "ISO8859_1"));
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet(title);
 		HSSFRow row = null;
@@ -2413,8 +2419,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(0);
 		
-		cell.setCellValue("共 "+ list.size() +" 条充值记录" + "         总收款金额: " + df.format(sum.getChargeMoney()) + "         总充值额 :" + df.format(sum.getDeltaTotalMoney()));
-//		cell.setCellStyle(strStyle);
+		
+		if(isRefund != null){
+			cell.setCellValue("共 "+ list.size() +" 条充值记录" + "         总取款金额: " + df.format(sum.getChargeMoney()) + "         账户取款额 :" + df.format(sum.getDeltaTotalMoney()));
+		}else{
+			cell.setCellValue("共 "+ list.size() +" 条充值记录" + "         总收款金额: " + df.format(sum.getChargeMoney()) + "         账户充值额 :" + df.format(sum.getDeltaTotalMoney()));
+		}
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
 		
@@ -2610,7 +2620,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			}
 		}
 		
-		DecimalFormat df = new DecimalFormat("#.00");
+		DecimalFormat df = new DecimalFormat("0.00");
 		String title = "会员消费明细表";
 		//标题
 		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("会员消费表明细.xls").getBytes("GBK"),  "ISO8859_1"));
