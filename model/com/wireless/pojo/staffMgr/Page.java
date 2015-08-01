@@ -214,7 +214,7 @@ public class Page{
 		MEMBER_CHARGE_STATISTICS("memberChargeStatistics", "充值统计", "Client_Module/memberChargeStatistics.html", "../../images/btnRechargeDetails.png"),
 		MEMBER_REFUND_STATISTICS("memberRefundStatistics", "取款统计", "Client_Module/memberRefundStatistics.html", "../../images/btnTakeMoney.png"),
 		MEMBER_CONSUME_STATISTICS("memberConsumeStatistics", "消费统计", "Client_Module/memberConsumeStatistics.html", "../../images/btnConsumeDetail.png"),
-		
+		MEMBER_CREATED_STATISTICS("memberCreatedStatistics", "开卡统计", "Client_Module/memberCreatedStatistics.html", "../../images/cancelReasonMgr1.png"),
 		WX_STEPS_BIND("WXBind", "微信公众号设置", "Client_Module/WeixinAuth.html", "../../images/discountStatistics.png"),
 		ACTIVE("activeMgr", "优惠活动管理", "Client_Module/ActiveManagement.html", "../../images/memberMgr.png");
 //		MEMBER_LEVEL("memberLevel", "会员等级", "Client_Module/MemberLevelManagement.html", "../../images/memberLevel.png");
