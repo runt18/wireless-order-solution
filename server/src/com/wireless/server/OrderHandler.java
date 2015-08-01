@@ -25,7 +25,6 @@ import com.wireless.db.orderMgr.PayOrder;
 import com.wireless.db.orderMgr.UpdateOrder;
 import com.wireless.db.orderMgr.UpdateOrder.DiffResult;
 import com.wireless.db.printScheme.PrinterDao;
-import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -58,8 +57,6 @@ import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.printScheme.Printer;
-import com.wireless.pojo.promotion.Coupon;
-import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Device;
@@ -569,22 +566,22 @@ class OrderHandler implements Runnable{
 				WirelessSocketServer.threadPool.execute(new Runnable(){
 					@Override
 					public void run() {
-						try{
-							//Perform this coupon draw.
-							List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(order.getMemberId()).setStatus(Coupon.Status.PUBLISHED)
-																									   .addPromotionStatus(Promotion.Status.PROGRESS), null);
-							//Check to see whether or not any coupons associated with this member is qualified to take.
-							for(Coupon coupon : coupons){
-								coupon = CouponDao.getById(staff, coupon.getId());
-								if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE || coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
-									if(coupon.getDrawProgress().isOk()){
-										CouponDao.draw(staff, coupon.getId());
-									}
-								}
-							}
-						}catch(SQLException | BusinessException e){
-							e.printStackTrace();
-						} 
+//						try{
+//							//Perform this coupon draw.
+//							List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(order.getMemberId()).setStatus(Coupon.Status.PUBLISHED)
+//																									   .addPromotionStatus(Promotion.Status.PROGRESS), null);
+//							//Check to see whether or not any coupons associated with this member is qualified to take.
+//							for(Coupon coupon : coupons){
+//								coupon = CouponDao.getById(staff, coupon.getId());
+//								if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE || coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
+//									if(coupon.getDrawProgress().isOk()){
+//										CouponDao.draw(staff, coupon.getId());
+//									}
+//								}
+//							}
+//						}catch(SQLException | BusinessException e){
+//							e.printStackTrace();
+//						} 
 						
 						try{
 							//Perform the member upgrade

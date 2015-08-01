@@ -25,7 +25,6 @@ import com.wireless.db.misc.DbArchiveDao;
 import com.wireless.db.orderMgr.TasteGroupDao;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.printScheme.PrintLossDao;
-import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.VerifySMSDao;
 import com.wireless.db.system.BillBoardDao;
@@ -129,7 +128,7 @@ public class DailySettlementTask extends SchedulerTask{
 			taskInfo.append("info : " + MemberDao.calcRecommendFoods()).append(sep);
 			
 			//Perform to calculate the promotion and coupon status.
-			taskInfo.append("info : " + PromotionDao.calcStatus()).append(sep);
+			//taskInfo.append("info : " + PromotionDao.calcStatus()).append(sep);
 			
 			//Perform to cleanup the single oss images.
 			taskInfo.append("info : " + OssImageDao.cleanup()).append(sep);
