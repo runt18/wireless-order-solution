@@ -2975,6 +2975,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
 		String consumptionMinAmount = request.getParameter("consumptionMinAmount");
 		String consumptionMaxAmount = request.getParameter("consumptionMaxAmount");
+		String dateBegin = request.getParameter("dateBegin");
+		String dateEnd = request.getParameter("dateEnd");
 		String orderBy = request.getParameter("orderBy");
 		
 		MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
@@ -3010,9 +3012,13 @@ public class HistoryStatisticsAction extends DispatchAction{
 				extraCond.setMemberBalanceEqual(memberBalanceEqual);
 			}
 			
+			if(dateBegin != null && !dateBegin.isEmpty()){
+				extraCond.setCreateRange(new DutyRange(dateBegin, dateEnd));
+			}
+			
 		}
 		
-		if(orderBy.equals("create")){
+		if(orderBy == null || orderBy.equals("create")){
 			orderClause = " ORDER BY M.member_id ";
 		}else if(orderBy.equals("consumeMoney")){
 			orderClause = " ORDER BY M.total_consumption DESC ";
