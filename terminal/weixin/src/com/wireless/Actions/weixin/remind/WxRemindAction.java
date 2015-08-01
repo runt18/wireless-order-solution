@@ -57,7 +57,7 @@ public class WxRemindAction extends DispatchAction {
 		return null;
 	}
 	
-	private final static int ONE_WEEK = 3600 * 24 * 14;
+	private final static long TWO_WEEKS = 3600 * 24 * 14 * 1000;
 	
 	public ActionForward expired(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -65,12 +65,13 @@ public class WxRemindAction extends DispatchAction {
 		
 		final StringBuilder work = new StringBuilder();
 		for(Restaurant restaurant : RestaurantDao.getByCond(null, null)){
-			long now = (System.currentTimeMillis() - restaurant.getExpireDate()) / 1000;
-			if(now < ONE_WEEK && now > 0){
+			long remaining = restaurant.getExpireDate() - System.currentTimeMillis();
+					
+			if(Math.abs(remaining) < TWO_WEEKS && remaining > 0){
 				if(work.length() != 0){
 					work.append(", ");
 				}
-				work.append(restaurant.getName());
+				work.append(restaurant.getName() + "(" + restaurant.getLiveness() + ")");
 			}
 		}
 		
@@ -86,7 +87,7 @@ public class WxRemindAction extends DispatchAction {
 
 			status = Template.send(token, new Template.Builder().setToUser(OPEN_ID_4_VINCENT)
 					  						.setTemplateId("UdyaL-jQJjC5aUh8A3VdeOrzkm2DQDZpUvny8kZ1kZ0")
-					  						.addKeyword(new Keyword("first", "1周内餐厅到期提醒")).addKeyword(new Keyword("work", work.toString())));
+					  						.addKeyword(new Keyword("first", "2周内餐厅到期提醒")).addKeyword(new Keyword("work", work.toString())));
 			
 			response.getWriter().write(status.toString());
 		}

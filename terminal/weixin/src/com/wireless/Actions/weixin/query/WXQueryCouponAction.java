@@ -15,6 +15,7 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.CouponDao.DrawType;
 import com.wireless.db.promotion.CouponDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
@@ -77,7 +78,7 @@ public class WXQueryCouponAction extends DispatchAction{
 			CouponDao.ExtraCond extra = new ExtraCond();
 			extra.setMember(MemberDao.getByWxSerial(staff, openId));
 			extra.addPromotionStatus(Promotion.Status.PROGRESS);
-			extra.addPromotionStatus(Promotion.Status.PUBLISH);
+			extra.addPromotionStatus(Promotion.Status.CREATED);
 			
 			List<Coupon> coupons = CouponDao.getByCond(staff, extra, null);
 			if(!coupons.isEmpty()){
@@ -112,7 +113,7 @@ public class WXQueryCouponAction extends DispatchAction{
 			CouponDao.ExtraCond extra = new CouponDao.ExtraCond();
 			extra.setMember(MemberDao.getByWxSerial(staff, openId));
 			extra.setPromotion(Integer.parseInt(pId));
-			extra.setStatus(Coupon.Status.PUBLISHED);
+			extra.setStatus(Coupon.Status.CREATED);
 			
 			List<Coupon> list = CouponDao.getByCond(staff, extra, null);
 			for(int i = 0; i < list.size(); i++){
@@ -144,7 +145,7 @@ public class WXQueryCouponAction extends DispatchAction{
 		
 		JObject jobject = new JObject();
 		try{
-			CouponDao.draw(StaffDao.getByRestaurant(dbCon, rid).get(0), Integer.parseInt(couponId));
+			CouponDao.draw(StaffDao.getByRestaurant(dbCon, rid).get(0), Integer.parseInt(couponId), DrawType.MANUAL);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();

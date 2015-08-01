@@ -24,47 +24,47 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class WXQueryPromotionAction extends DispatchAction{
 	
-	public ActionForward hasWelcomePage(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String pin = (String) request.getAttribute("pin");
-		String formId = request.getParameter("fid");
-		
-		int rid = 0;
-		Staff staff;
-		if(pin != null){
-			staff = StaffDao.verify(Integer.parseInt(pin));
-		}else{
-			DBCon dbCon = new DBCon();
-			dbCon.connect();
-			rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
-			staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
-			dbCon.disconnect();
-		}
-		
-		JObject jobject = new JObject();
-		try{
-			PromotionDao.ExtraCond extra = new PromotionDao.ExtraCond();
-			extra.setType(Promotion.Type.WELCOME);
-			extra.addStatus(Promotion.Status.PROGRESS).addStatus(Promotion.Status.CREATED).addStatus(Promotion.Status.PUBLISH);
-			
-			List<Promotion> list = PromotionDao.getByCond(staff, extra);
-			
-			jobject.setRoot(list);
-			
-		}catch(SQLException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip4Exception(e);
-		}finally{
-			response.getWriter().print(jobject.toString());
-		}
-		
-		return null;		
-		
-	}	
+//	public ActionForward hasWelcomePage(ActionMapping mapping, ActionForm form,
+//			HttpServletRequest request, HttpServletResponse response)
+//			throws Exception {
+//		String pin = (String) request.getAttribute("pin");
+//		String formId = request.getParameter("fid");
+//		
+//		int rid = 0;
+//		Staff staff;
+//		if(pin != null){
+//			staff = StaffDao.verify(Integer.parseInt(pin));
+//		}else{
+//			DBCon dbCon = new DBCon();
+//			dbCon.connect();
+//			rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+//			staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
+//			dbCon.disconnect();
+//		}
+//		
+//		JObject jobject = new JObject();
+//		try{
+//			PromotionDao.ExtraCond extra = new PromotionDao.ExtraCond();
+//			extra.setType(Promotion.Type.WELCOME);
+//			extra.addStatus(Promotion.Status.PROGRESS).addStatus(Promotion.Status.CREATED).addStatus(Promotion.Status.PUBLISH);
+//			
+//			List<Promotion> list = PromotionDao.getByCond(staff, extra);
+//			
+//			jobject.setRoot(list);
+//			
+//		}catch(SQLException e){
+//			e.printStackTrace();
+//			jobject.initTip(e);
+//		}catch(Exception e){
+//			e.printStackTrace();
+//			jobject.initTip4Exception(e);
+//		}finally{
+//			response.getWriter().print(jobject.toString());
+//		}
+//		
+//		return null;		
+//		
+//	}	
 	
 	
 	public ActionForward promotions(ActionMapping mapping, ActionForm form,

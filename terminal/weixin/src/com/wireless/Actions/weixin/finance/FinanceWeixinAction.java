@@ -388,6 +388,35 @@ public class FinanceWeixinAction extends Action {
 			content.append(grid2Item(incomeByDept.getDept().getName(), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(incomeByDept.getIncome()), 16)).append("\n");
 		}
 
+		StringBuilder operationContent = new StringBuilder();
+		if(detail.getEraseAmount() != 0 || detail.getEraseIncome() != 0){
+			operationContent.append(grid3Item(new String[]{"抹数", Integer.toString(detail.getEraseAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getEraseIncome())}, new int[]{10, 16}) + "\n");
+		}
+		if(detail.getDiscountAmount() != 0 || detail.getDiscountIncome() != 0){
+			operationContent.append(grid3Item(new String[]{"折扣", Integer.toString(detail.getDiscountAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getDiscountIncome())}, new int[]{10, 16}) + "\n");
+		}
+		if(detail.getGiftAmount() != 0 || detail.getGiftIncome() != 0){
+			operationContent.append(grid3Item(new String[]{"赠送", Integer.toString(detail.getGiftAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getGiftIncome())}, new int[]{10, 16}) + "\n");
+		}
+		if(detail.getCancelAmount() != 0 || detail.getCancelIncome() != 0){
+			operationContent.append(grid3Item(new String[]{"退菜", Integer.toString(detail.getCancelAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getCancelIncome())}, new int[]{10, 16}) + "\n");
+		}
+		if(detail.getPaidAmount() != 0 || detail.getPaidIncome() != 0){
+			operationContent.append(grid3Item(new String[]{"反结账", Integer.toString(detail.getPaidAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getPaidIncome())}, new int[]{10, 16}) + "\n");
+		}
+		if(detail.getServiceAmount() != 0 || detail.getServiceIncome() != 0){
+			operationContent.append(grid3Item(new String[]{"服务费", Integer.toString(detail.getServiceAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getServiceIncome())}, new int[]{10, 16}) + "\n");
+		}
+		if(detail.getCouponAmount() != 0 || detail.getCouponIncome() != 0){
+			operationContent.append(grid3Item(new String[]{"优惠券", Integer.toString(detail.getCouponAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getCouponIncome())}, new int[]{10, 16}) + "\n");
+		}
+		
+		if(operationContent.length() != 0){
+			content.append("-------------------\n")
+				   .append(grid3Item(new String[]{"操作", "账单数", "金额"}, new int[]{10, 20}) + "\n")
+				   .append(operationContent);
+		}
+		
 		content.append("-------------------\n")
 			   .append("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getTotalActual())).append("\n");
 		
