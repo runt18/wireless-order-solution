@@ -1,15 +1,15 @@
-﻿//mcs:memberChargeStatistics
-var mcs_grid, mcs_search_memberType
-	,mcs_search_onDuty, mcs_search_offDuty, mcs_search_memberName, mcs_search_dateCombo;
-var mcs_modal = true;
+﻿//mcrs:memberCreatedStatistics
+var mcrs_grid, mcrs_search_memberType
+	,mcrs_search_onDuty, mcrs_search_offDuty, mcrs_search_memberName, mcrs_search_dateCombo;
+var mcrs_modal = true;
 
-var mcs_highChart, mcs_PanelHeight = 0, mcs_panelDrag = false;
+var mcrs_highChart, mcrs_PanelHeight = 0, mcrs_panelDrag = false;
 
-var mcs_southPanel;
+var mcrs_southPanel;
 
-function mcs_showChart(){
-	var dateBegin = Ext.util.Format.date(mcs_search_onDuty.getValue(), 'Y-m-d');
-	var dateEnd = Ext.util.Format.date(mcs_search_offDuty.getValue(), 'Y-m-d');
+function mcrs_showChart(){
+	var dateBegin = Ext.util.Format.date(mcrs_search_onDuty.getValue(), 'Y-m-d');
+	var dateEnd = Ext.util.Format.date(mcrs_search_offDuty.getValue(), 'Y-m-d');
 	
 	var chartData;
 	$.ajax({
@@ -30,7 +30,7 @@ function mcs_showChart(){
 	});
 	
 	
-	mcs_highChart = new Highcharts.Chart({
+	mcrs_highChart = new Highcharts.Chart({
 		plotOptions : {
 			line : {
 				cursor : 'pointer',
@@ -44,7 +44,7 @@ function mcs_showChart(){
 			}
 		},
         chart: {  
-        	renderTo: 'memberChargeChart'
+        	renderTo: 'memberCreatedChart'
     	}, 
         title: {
             text: '<b>会员开卡走势图（'+ dateBegin +'至'+ dateEnd +'）</b>'
@@ -52,7 +52,7 @@ function mcs_showChart(){
         labels: {
         	items : [{
         		html : '<b>日均开卡数:' + chartData.avgCount + ' 个</b>',
-	        	style : {left :/*($('#memberChargeChart').width()*0.80)*/'0px', top: '0px'}
+	        	style : {left :/*($('#memberCreatedChart').width()*0.80)*/'0px', top: '0px'}
         	}]
         },
         xAxis: {
@@ -96,10 +96,10 @@ function mcs_showChart(){
 }
 
 
-function mcs_initBusinessReceipsGrid(c){
+function mcrs_initBusinessReceipsGrid(c){
 	
-	mcs_search_memberType = new Ext.form.ComboBox({
-		id : 'mcs_search_memberType',
+	mcrs_search_memberType = new Ext.form.ComboBox({
+		id : 'mcrs_search_memberType',
 		width : 90,
 		forceSelection : true,
 		readOnly : false,
@@ -141,74 +141,74 @@ function mcs_initBusinessReceipsGrid(c){
 				});
 			},
 			select : function(){
-				mcs_searchMemberOperation();
+				mcrs_searchMemberOperation();
 			}
 		}
 	});
-	mcs_search_onDuty = new Ext.form.DateField({
+	mcrs_search_onDuty = new Ext.form.DateField({
 		xtype : 'datefield',
 		width : 100,
 		format : 'Y-m-d',
 		maxValue : new Date(),
 		hideParent : true,
-		hidden : mcs_modal ? false : true,
+		hidden : mcrs_modal ? false : true,
 		readOnly : false,
 		allowBlank : false
 	});
-	mcs_search_offDuty = new Ext.form.DateField({
+	mcrs_search_offDuty = new Ext.form.DateField({
 		xtype : 'datefield',
 		width : 100,
 		format : 'Y-m-d',
 		maxValue : new Date(),
 		hideParent : true,
-		hidden : mcs_modal ? false : true,
+		hidden : mcrs_modal ? false : true,
 		readOnly : false,
 		allowBlank : false
 	});
-	mcs_search_dateCombo = Ext.ux.createDateCombo({
-		beginDate : mcs_search_onDuty,
-		endDate : mcs_search_offDuty,
+	mcrs_search_dateCombo = Ext.ux.createDateCombo({
+		beginDate : mcrs_search_onDuty,
+		endDate : mcrs_search_offDuty,
 		callback : function(){
-			mcs_searchMemberOperation();
+			mcrs_searchMemberOperation();
 		}
 	});
-	mcs_search_memberName = new Ext.form.TextField({
+	mcrs_search_memberName = new Ext.form.TextField({
 		xtype : 'textfield',
 		width : 100
 		
 	});
-	var mcs_mo_tbar = new Ext.Toolbar({
+	var mcrs_mo_tbar = new Ext.Toolbar({
 		height : 26,
 		items : [{ 
 			xtype : 'tbtext', 
-			text : (mcs_modal ? '&nbsp;&nbsp;日期:&nbsp;' : ' ')
-		}, mcs_search_dateCombo, {
+			text : (mcrs_modal ? '&nbsp;&nbsp;日期:&nbsp;' : ' ')
+		}, mcrs_search_dateCombo, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;'
-		}, mcs_search_onDuty, { 
+		}, mcrs_search_onDuty, { 
 			xtype : 'tbtext',
-			text : (mcs_modal ? '&nbsp;至&nbsp;' : ' ')
-		}, mcs_search_offDuty, 
+			text : (mcrs_modal ? '&nbsp;至&nbsp;' : ' ')
+		}, mcrs_search_offDuty, 
 		{
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;会员类型:'
-		}, mcs_search_memberType, 
+		}, mcrs_search_memberType, 
 		{
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
-		}, mcs_search_memberName, '->', {
+		}, mcrs_search_memberName, '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
 			handler : function(e){
-				mcs_searchMemberOperation();
+				mcrs_searchMemberOperation();
 			}
 		}, {
 			text : '重置',
 			iconCls : 'btn_refresh',
 			handler : function(e){
-				mcs_search_memberType.setValue(-1);
-				mcs_search_memberName.setValue();
-				mcs_searchMemberOperation();
+				mcrs_search_memberType.setValue(-1);
+				mcrs_search_memberName.setValue();
+				mcrs_searchMemberOperation();
 			}
 			
 		}, '-', {
@@ -216,10 +216,10 @@ function mcs_initBusinessReceipsGrid(c){
 				iconCls : 'icon_tb_exoprt_excel',
 				handler : function(){
 					var onDuty = '', offDuty = '';
-					onDuty = Ext.util.Format.date(mcs_search_onDuty.getValue(), 'Y-m-d 00:00:00');
-					offDuty = Ext.util.Format.date(mcs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
+					onDuty = Ext.util.Format.date(mcrs_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+					offDuty = Ext.util.Format.date(mcrs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 					
-					var memberType = mcs_search_memberType.getRawValue() != '' ? mcs_search_memberType.getValue() : '';
+					var memberType = mcrs_search_memberType.getRawValue() != '' ? mcrs_search_memberType.getValue() : '';
 					var url = '../../{0}?memberType={1}&dataSource={2}&dateBegin={3}&dateEnd={4}&memberCardOrMobileOrName={5}';
 					url = String.format(
 							url, 
@@ -228,14 +228,14 @@ function mcs_initBusinessReceipsGrid(c){
 							'memberList',
 							onDuty,
 							offDuty,
-							mcs_search_memberName.getValue()
+							mcrs_search_memberName.getValue()
 						);
 					window.location = url;
 				}
 			}]
 	});
-/*	mcs_grid = createGridPanel(
-		'mcs_grid',
+/*	mcrs_grid = createGridPanel(
+		'mcrs_grid',
 		'',
 		'',
 		'',
@@ -255,11 +255,11 @@ function mcs_initBusinessReceipsGrid(c){
 		[ ['isPaging', true]],
 		GRID_PADDING_LIMIT_20,
 		'',
-		mcs_mo_tbar
+		mcrs_mo_tbar
 	);*/
 	
-	mcs_grid = createGridPanel(
-			'mcs_grid',
+	mcrs_grid = createGridPanel(
+			'mcrs_grid',
 			'',
 			'',
 			'',
@@ -282,47 +282,47 @@ function mcs_initBusinessReceipsGrid(c){
 			[['isPaging', true],  ['dataSource', 'createdMember']],
 			GRID_PADDING_LIMIT_20,
 			'',
-			[mcs_mo_tbar]
+			[mcrs_mo_tbar]
 		);	
-	mcs_grid.region = "center";
-	mcs_grid.frame = false;
-	mcs_grid.border = false;
-	mcs_grid.on('render', function(thiz){
-		mcs_search_dateCombo.setValue(1);
-		mcs_search_dateCombo.fireEvent('select', mcs_search_dateCombo, null, 1);
+	mcrs_grid.region = "center";
+	mcrs_grid.frame = false;
+	mcrs_grid.border = false;
+	mcrs_grid.on('render', function(thiz){
+		mcrs_search_dateCombo.setValue(1);
+		mcrs_search_dateCombo.fireEvent('select', mcrs_search_dateCombo, null, 1);
 	});
 	
 
-/*	mcs_grid.getStore().on('load', function(store, records, options){
+/*	mcrs_grid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
-			var sumRow = mcs_grid.getView().getRow(store.getCount() - 1);	
+			var sumRow = mcrs_grid.getView().getRow(store.getCount() - 1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
-			for(var i = 0; i < mcs_grid.getColumnModel().getColumnCount(); i++){
-				var sumCell = mcs_grid.getView().getCell(store.getCount() - 1, i);
+			for(var i = 0; i < mcrs_grid.getColumnModel().getColumnCount(); i++){
+				var sumCell = mcrs_grid.getView().getCell(store.getCount() - 1, i);
 				sumCell.style.fontSize = '15px';
 				sumCell.style.fontWeight = 'bold';
 				sumCell.style.color = 'green';
 			}
-			mcs_grid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
-			mcs_grid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
-			mcs_grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
-			mcs_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
-			mcs_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
-			mcs_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+			mcrs_grid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			mcrs_grid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+			mcrs_grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			mcrs_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+			mcrs_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+			mcrs_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 		}
 	});*/
 }
 
-function mcs_searchMemberOperation(){
+function mcrs_searchMemberOperation(){
 	var onDuty = '', offDuty = '';
-	onDuty = Ext.util.Format.date(mcs_search_onDuty.getValue(), 'Y-m-d 00:00:00');
-	offDuty = Ext.util.Format.date(mcs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
+	onDuty = Ext.util.Format.date(mcrs_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+	offDuty = Ext.util.Format.date(mcrs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 	
-	var memberType = mcs_search_memberType.getRawValue() != '' ? mcs_search_memberType.getValue() : '';
+	var memberType = mcrs_search_memberType.getRawValue() != '' ? mcrs_search_memberType.getValue() : '';
 	
-	var gs = mcs_grid.getStore();
+	var gs = mcrs_grid.getStore();
 	gs.baseParams['memberType'] = memberType > 0 ? memberType : '';
-	gs.baseParams['memberCardOrMobileOrName'] = mcs_search_memberName.getValue();
+	gs.baseParams['memberCardOrMobileOrName'] = mcrs_search_memberName.getValue();
 	gs.baseParams['dateBegin'] = onDuty;
 	gs.baseParams['dateEnd'] = offDuty;
 	gs.load({
@@ -332,70 +332,70 @@ function mcs_searchMemberOperation(){
 		}
 	});
 	//每日充值统计
-	mcs_showChart();
+	mcrs_showChart();
 }
 
-function mcs_changeChartWidth(w,h){
-	if(mcs_highChart != undefined){
-		mcs_highChart.setSize(w, h);
+function mcrs_changeChartWidth(w,h){
+	if(mcrs_highChart != undefined){
+		mcrs_highChart.setSize(w, h);
 	}
 	
 }
 
 Ext.onReady(function(){
 	
-	mcs_southPanel = new Ext.Panel({
-		contentEl : 'memberChargeChart',
+	mcrs_southPanel = new Ext.Panel({
+		contentEl : 'memberCreatedChart',
 		region : 'south'
 	});
 	
-	mcs_initBusinessReceipsGrid({data : null});
+	mcrs_initBusinessReceipsGrid({data : null});
 	
 	new Ext.Panel({
-		renderTo : 'divMemberChargeStatistics',//渲染到
+		renderTo : 'divMemberCreatedStatistics',//渲染到
 		id : 'businessReceiptStatisticsPanel',
 		//solve不跟随窗口的变化而变化
-		width : parseInt(Ext.getDom('divMemberChargeStatistics').parentElement.style.width.replace(/px/g,'')),
-		height : parseInt(Ext.getDom('divMemberChargeStatistics').parentElement.style.height.replace(/px/g,'')),
+		width : parseInt(Ext.getDom('divMemberCreatedStatistics').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divMemberCreatedStatistics').parentElement.style.height.replace(/px/g,'')),
 		layout:'border',
 		frame : true, //边框
-		items : [mcs_grid,mcs_southPanel]
+		items : [mcrs_grid,mcrs_southPanel]
 	});
 	
-	mcs_PanelHeight = mcs_grid.getHeight();
+	mcrs_PanelHeight = mcrs_grid.getHeight();
 	
-	var mcs_rz = new Ext.Resizable(mcs_grid.getEl(), {
+	var mcrs_rz = new Ext.Resizable(mcrs_grid.getEl(), {
         wrap: true, //在构造Resizable时自动在制定的id的外边包裹一层div
         minHeight:100, //限制改变的最小的高度
         pinned:false, //控制可拖动区域的显示状态，false是鼠标悬停在拖拉区域上才出现
         handles: 's',//设置拖拉的方向（n,s,e,w,all...）
         listeners : {
         	resize : function(thiz, w, h, e){
-        		mcs_panelDrag = true;
+        		mcrs_panelDrag = true;
         	}
         }
     });
-    mcs_rz.on('resize', mcs_grid.syncSize, mcs_grid);//注册事件(作用:将调好的大小传个scope执行)
+    mcrs_rz.on('resize', mcrs_grid.syncSize, mcrs_grid);//注册事件(作用:将调好的大小传个scope执行)
 	
-	mcs_grid.on('bodyresize', function(e, w, h){
+	mcrs_grid.on('bodyresize', function(e, w, h){
 		var chartHeight;
-		if(h < mcs_PanelHeight){
-			chartHeight = 250 + (mcs_PanelHeight - h);
+		if(h < mcrs_PanelHeight){
+			chartHeight = 250 + (mcrs_PanelHeight - h);
 		}else{
-			chartHeight = 250 + (h - mcs_PanelHeight);
+			chartHeight = 250 + (h - mcrs_PanelHeight);
 		}
-		mcs_changeChartWidth(w,chartHeight);
+		mcrs_changeChartWidth(w,chartHeight);
 		
-		if(mcs_southPanel.getEl()){
-			mcs_southPanel.getEl().setTop((h+55)) ;
-		}
-		
-		if(mcs_panelDrag){
-			mcs_southPanel.setHeight(chartHeight);
+		if(mcrs_southPanel.getEl()){
+			mcrs_southPanel.getEl().setTop((h+55)) ;
 		}
 		
-		mcs_grid.getEl().parent().setWidth(w);
-		mcs_grid.doLayout();
+		if(mcrs_panelDrag){
+			mcrs_southPanel.setHeight(chartHeight);
+		}
+		
+		mcrs_grid.getEl().parent().setWidth(w);
+		mcrs_grid.doLayout();
 		
 	});
 	

@@ -264,7 +264,7 @@ function mrs_initBusinessReceipsGrid(c){
 					offDuty = Ext.util.Format.date(mrs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 					
 					var memberType = mrs_search_memberType.getRawValue() != '' ? mrs_search_memberType.getValue() : '';
-					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&payType={8}';
+					var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&payType={8}&isRefund=true';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
@@ -292,6 +292,7 @@ function mrs_initBusinessReceipsGrid(c){
 			['日期', 'operateDateFormat'],
 			['操作类型', 'operateTypeText', 90, 'center'],
 			['会员名称', 'member.name', 60],
+			['手机号码', 'member.mobile', 125],
 			['实退金额', 'deltaBaseMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['账户退额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['剩余金额', 'remainingTotalMoney', ,'right', 'Ext.ux.txtFormat.gridDou'],
@@ -329,6 +330,7 @@ function mrs_initBusinessReceipsGrid(c){
 			mrs_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 			mrs_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
 			mrs_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+			mrs_grid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 		}
 	});
 }

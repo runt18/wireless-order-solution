@@ -292,6 +292,7 @@ function mcs_initBusinessReceipsGrid(c){
 			['日期', 'operateDateFormat'],
 			['操作类型', 'operateTypeText', 90, 'center'],
 			['会员名称', 'member.name', 60],
+			['手机号码', 'member.mobile', 125],
 			['实收金额', 'deltaBaseMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['账户充额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['剩余金额', 'remainingTotalMoney'],
@@ -329,6 +330,7 @@ function mcs_initBusinessReceipsGrid(c){
 			mcs_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 			mcs_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
 			mcs_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+			mcs_grid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 		}
 	});
 }

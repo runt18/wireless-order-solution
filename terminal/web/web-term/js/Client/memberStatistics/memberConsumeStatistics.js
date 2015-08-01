@@ -312,6 +312,7 @@ function mcus_initBusinessReceipsGrid(c){
 			['日期', 'operateDateFormat'],
 			['操作类型', 'operateTypeText', 90, 'center'],
 			['会员名称', 'member.name', 60],
+			['手机号码', 'member.mobile', 125],
 			['消费金额', 'payMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['剩余金额', 'remainingTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['付款方式', 'payTypeText'],
@@ -352,6 +353,7 @@ function mcus_initBusinessReceipsGrid(c){
 			mcus_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
 			mcus_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 			mcus_grid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+			mcus_grid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
 		}
 	});
 }
