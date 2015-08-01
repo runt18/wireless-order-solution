@@ -396,7 +396,7 @@ public class Book implements Jsonable{
 	
 	public static enum Status{
 		CREATED(1, "待确认"),
-		CONFIRMED(2, "已确认"),
+		CONFIRMED(2, "待入座"),
 		SEAT(3, "已入座");
 		
 		private final int val;
@@ -428,6 +428,7 @@ public class Book implements Jsonable{
 	
 	public static enum Category{
 		SINGLE("散台"),
+		ROOM("包间"),
 		WEDDING("婚宴"),
 		BIRTH("寿宴"),
 		BABY("满月"),
@@ -620,7 +621,7 @@ public class Book implements Jsonable{
 	}
 	
 	public boolean isExpired(){
-		return (System.currentTimeMillis() / 1000) > this.bookDate / 1000 + this.reserved;
+		return this.status != Book.Status.SEAT && (System.currentTimeMillis() / 1000) > this.bookDate / 1000 + this.reserved;
 	}
 	
 	public void setOrder(Order order){

@@ -44,6 +44,9 @@ public class MemberError extends ErrorEnum{
 	public static final ErrorCode MEMBER_LEVEL_MORE_POINT = build(9616, "操作失败, 积分必须小于高等级的");
 	public static final ErrorCode MEMBER_LEVEL_HIGHEST = build(9617, "操作失败, 积分必须最高等级的");
 
+	/* member condition 9580 - 9599 */
+	public static final ErrorCode MEMBER_CONDITION_NOT_EXIST = build(9589, "操作失败, 该会员查询条件不存在");
+	
 	public static final ErrorCode TAKE_OUT_ADDRESS_NOT_EXIST = build(9617, "外卖地址不存在");
 	
 	private MemberError(){

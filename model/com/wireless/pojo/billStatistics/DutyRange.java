@@ -36,6 +36,15 @@ public class DutyRange implements Jsonable{
 	}
 
 	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof DutyRange)){
+			return false;
+		}else{
+			return this.onDuty / 1000 == ((DutyRange)obj).onDuty / 1000 && this.offDuty / 1000 == ((DutyRange)obj).offDuty / 1000;
+		}
+	}
+	
+	@Override
 	public String toString(){
 		return "on_duty = " + getOnDutyFormat() + 
 				", off_duty = " + getOffDutyFormat(); 

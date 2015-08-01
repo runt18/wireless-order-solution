@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.util.NumericUtil;
 
 public class MemberStatistics implements Jsonable{
 
@@ -27,7 +28,7 @@ public class MemberStatistics implements Jsonable{
 		for(StatisticsByEachDay each : statistics){
 			total += each.getConsumption().getTotalConsume();
 		}
-		return total;
+		return NumericUtil.roundFloat(total);
 	}
 	
 	//日均消费金额
@@ -35,7 +36,7 @@ public class MemberStatistics implements Jsonable{
 		if(statistics.isEmpty()){
 			return 0;
 		}else{
-			return getTotalConsume() / statistics.size();
+			return NumericUtil.roundFloat(getTotalConsume() / statistics.size());
 		}
 	}
 	
@@ -63,7 +64,7 @@ public class MemberStatistics implements Jsonable{
 		for(StatisticsByEachDay each : statistics){
 			total += each.getCharge().getTotalAccountCharge();
 		}
-		return total;
+		return NumericUtil.roundFloat(total);
 	}
 	
 	//日均充值额
@@ -71,7 +72,7 @@ public class MemberStatistics implements Jsonable{
 		if(statistics.isEmpty()){
 			return 0;
 		}else{
-			return getTotalCharge() / statistics.size();
+			return NumericUtil.roundFloat(getTotalCharge() / statistics.size());
 		}
 	}
 	
@@ -99,7 +100,7 @@ public class MemberStatistics implements Jsonable{
 		for(StatisticsByEachDay each : statistics){
 			total += each.getCharge().getTotalAccountRefund();
 		}
-		return total;
+		return NumericUtil.roundFloat(total);
 	}
 	
 	//日均退款
@@ -107,7 +108,7 @@ public class MemberStatistics implements Jsonable{
 		if(statistics.isEmpty()){
 			return 0;
 		}else{
-			return getTotalRefund() / statistics.size();
+			return NumericUtil.roundFloat(getTotalRefund() / statistics.size());
 		}
 	}
 	

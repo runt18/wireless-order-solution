@@ -69,11 +69,12 @@ public class Coupon implements Jsonable{
 	public static enum Status{
 		UNKNOWN(0, "未知"),
 		CREATED(1, "已创建"),
-		PUBLISHED(2, "已发布"),
+		//PUBLISHED(2, "已发布"),
 		DRAWN(3, "已领取"),
 		USED(4, "已使用"),
-		EXPIRED(5, "已过期"),
-		FINISH(6, "已结束");
+		//EXPIRED(5, "已过期"),
+		//FINISH(6, "已结束");
+		;
 		
 		private final int val;
 		private final String desc;
@@ -120,17 +121,18 @@ public class Coupon implements Jsonable{
 		}
 		
 		public boolean isOk(){
-			if(coupon.getStatus() == Coupon.Status.PUBLISHED && coupon.getPromotion().getStatus() == Promotion.Status.PROGRESS){
-				if(coupon.getPromotion().getRule() == Promotion.Rule.FREE){
-					return true;
-				}else if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE || coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
-					return point >= coupon.getPromotion().getPoint();
-				}else{
-					return false;
-				}
-			}else{
-				return false;
-			}
+//			if(coupon.getStatus() == Coupon.Status.PUBLISHED && coupon.getPromotion().getStatus() == Promotion.Status.PROGRESS){
+//				if(coupon.getPromotion().getRule() == Promotion.Rule.FREE){
+//					return true;
+//				}else if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE || coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
+//					return point >= coupon.getPromotion().getPoint();
+//				}else{
+//					return false;
+//				}
+//			}else{
+//				return false;
+//			}
+			return true;
 		}
 		
 		@Override
@@ -170,8 +172,8 @@ public class Coupon implements Jsonable{
 		setPromotion(builder.promotion);
 		if(builder.promotion.getStatus() == Promotion.Status.CREATED){
 			setStatus(Status.CREATED);
-		}else if(builder.promotion.getStatus() == Promotion.Status.PUBLISH || builder.promotion.getStatus() == Promotion.Status.PROGRESS){
-			setStatus(Status.PUBLISHED);
+//		}else if(builder.promotion.getStatus() == Promotion.Status.PUBLISH || builder.promotion.getStatus() == Promotion.Status.PROGRESS){
+//			setStatus(Status.PUBLISHED);
 		}else{
 			throw new IllegalArgumentException("the status to promotion is invalid");
 		}
@@ -267,6 +269,10 @@ public class Coupon implements Jsonable{
 		this.status = status;
 	}
 
+	public boolean isDrawn(){
+		return this.status == Status.DRAWN;
+	}
+	
 	public boolean isCreated(){
 		return this.status == Status.CREATED;
 	}
@@ -276,7 +282,7 @@ public class Coupon implements Jsonable{
 	}
 	
 	public boolean isExpired(){
-		return this.status == Status.EXPIRED;
+		return this.couponType.isExpired();
 	}
 	
 	public float getPrice(){

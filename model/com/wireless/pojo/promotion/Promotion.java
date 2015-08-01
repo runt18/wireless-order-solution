@@ -1,5 +1,6 @@
 package com.wireless.pojo.promotion;
 
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,12 +9,13 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.oss.OssImage;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.SortedList;
 
 public class Promotion implements Jsonable{
 
 	public static class CreateBuilder{
-		private final DateRange range;
+		private DateRange range;
 		private final String title;
 		private final String body;
 		private final String entire;
@@ -23,41 +25,53 @@ public class Promotion implements Jsonable{
 		private final CouponType.InsertBuilder typeBuilder;
 		private final SortedList<Member> members = SortedList.newInstance();
 		
-		private CreateBuilder(String title, DateRange range, String body, Rule type, CouponType.InsertBuilder typeBuilder, String entire){
+		private CreateBuilder(String title, String body, Rule type, CouponType.InsertBuilder typeBuilder, String entire){
 			this.title = title;
-			this.range = range;
 			this.body = body;
 			this.entire = entire;
 			this.rule = type;
 			this.typeBuilder = typeBuilder;
-			if(typeBuilder.build().getExpired() < range.getEndingTime()){
-				throw new IllegalArgumentException("优惠券的有效时间应该大于活动的结束时间");
-			}
 		}
 		
-		public static CreateBuilder newInstance(String title, DateRange range, String body, Rule rule, CouponType.InsertBuilder typeBuilder, String entire){
+		public static CreateBuilder newInstance(String title, String body, Rule rule, CouponType.InsertBuilder typeBuilder, String entire){
 			if(rule == Rule.DISPLAY_ONLY){
 				throw new IllegalArgumentException("【" + Rule.DISPLAY_ONLY.desc + "】类型不能创建优惠券");
 			}
-			CreateBuilder instance = new CreateBuilder(title, range, body, rule, typeBuilder, entire);
+			CreateBuilder instance = new CreateBuilder(title, body, rule, typeBuilder, entire);
 			return instance;
 		}
 		
-		public static CreateBuilder newInstance4Display(String title, DateRange range, String body, String entire){
-			CreateBuilder instance = new CreateBuilder(title, range, body, Rule.DISPLAY_ONLY, new CouponType.InsertBuilder(title, 0, range.getEndingTime()), entire);
+		public static CreateBuilder newInstance4Display(String title, String body, String entire){
+			CreateBuilder instance = new CreateBuilder(title, body, Rule.DISPLAY_ONLY, new CouponType.InsertBuilder(title, 0, 0), entire);
 			return instance;
 		}
 
-		public static CreateBuilder newInstance4Welcome(String title, DateRange range, String body, Rule rule, CouponType.InsertBuilder typeBuilder, String entire){
-			CreateBuilder instance = new CreateBuilder(title, range, body, rule, typeBuilder, entire);
-			instance.type = Type.WELCOME;
-			return instance;
+//		public static CreateBuilder newInstance4Welcome(String title, DateRange range, String body, Rule rule, CouponType.InsertBuilder typeBuilder, String entire){
+//			CreateBuilder instance = new CreateBuilder(title, range, body, rule, typeBuilder, entire);
+//			instance.type = Type.WELCOME;
+//			return instance;
+//		}
+//		
+//		public static CreateBuilder newInstance4Welcome(String title, DateRange range, String body, String entire){
+//			CreateBuilder instance = newInstance4Display(title, range, body, entire);
+//			instance.type = Type.WELCOME;
+//			return instance;
+//		}
+		
+		public CreateBuilder setRange(String begin, String end) throws ParseException{
+			setRange(DateUtil.parseDate(begin, DateUtil.Pattern.DATE), DateUtil.parseDate(end, DateUtil.Pattern.DATE));
+			return this;
 		}
 		
-		public static CreateBuilder newInstance4Welcome(String title, DateRange range, String body, String entire){
-			CreateBuilder instance = newInstance4Display(title, range, body, entire);
-			instance.type = Type.WELCOME;
-			return instance;
+		public CreateBuilder setRange(long begin, long end){
+			if(begin < 0 || end < 0){
+				throw new IllegalArgumentException("活动时间不能小于0");
+			}
+			if(end < begin){
+				throw new IllegalArgumentException("活动结束时间不能小于开始时间");
+			}
+			this.range = new DateRange(begin, end);
+			return this;
 		}
 		
 		public CreateBuilder setPoint(int point){
@@ -90,8 +104,9 @@ public class Promotion implements Jsonable{
 	}
 	
 	public static class UpdateBuilder{
+		private final static DateRange UPDATE_FLAG = new DateRange(0, 0);
 		private final int id;
-		private DateRange range;
+		private DateRange range = UPDATE_FLAG;
 		private String title;
 		private String body;
 		private String entire;
@@ -122,13 +137,29 @@ public class Promotion implements Jsonable{
 			return this.body != null;
 		}
 		
-		public UpdateBuilder setRange(DateRange range){
-			this.range = range;
+		public UpdateBuilder setRange(String begin, String end) throws ParseException{
+			setRange(DateUtil.parseDate(begin, DateUtil.Pattern.DATE), DateUtil.parseDate(end, DateUtil.Pattern.DATE));
+			return this;
+		}
+		
+		public UpdateBuilder setInfinitRange(){
+			this.range = null;
+			return this;
+		}
+		
+		public UpdateBuilder setRange(long begin, long end){
+			if(begin < 0 || end < 0){
+				throw new IllegalArgumentException("活动时间不能小于0");
+			}
+			if(end < begin){
+				throw new IllegalArgumentException("活动结束时间不能小于开始时间");
+			}
+			this.range = new DateRange(begin, end);
 			return this;
 		}
 		
 		public boolean isRangeChanged(){
-			return this.range != null;
+			return this.range != UPDATE_FLAG;
 		}
 		
 		public UpdateBuilder setPoint(int point){
@@ -192,9 +223,7 @@ public class Promotion implements Jsonable{
 	
 	public static enum Rule{
 		DISPLAY_ONLY(1, "只展示"),
-		FREE(2, "免费领取"),
-		ONCE(3, "单次积分符合条件领取"),
-		TOTAL(4, "累计积分符合条件领取");
+		FREE(2, "免费领取");
 		
 		private final int val;
 		private final String desc;
@@ -225,7 +254,8 @@ public class Promotion implements Jsonable{
 	public static enum Type{
 		
 		NORMAL(1, "normal"),	// 普通活动
-		WELCOME(2, "welcome");  // 欢迎活动
+		//WELCOME(2, "welcome");  // 欢迎活动
+		;
 		
 		private final int val;
 		private final String desc;
@@ -257,7 +287,6 @@ public class Promotion implements Jsonable{
 	
 	public static enum Status{
 		CREATED(1, "已创建"),
-		PUBLISH(2, "已发布"),
 		PROGRESS(3, "进行中"),
 		FINISH(4, "已结束");
 		
@@ -330,7 +359,6 @@ public class Promotion implements Jsonable{
 	private String body;
 	private String entire;
 	private CouponType couponType;
-	private Status status = Status.CREATED;
 	private Rule rule = Rule.FREE;
 	private Type type = Type.NORMAL;
 	private Oriented oriented;
@@ -348,13 +376,12 @@ public class Promotion implements Jsonable{
 		if(builder.rule != Rule.DISPLAY_ONLY){
 			this.couponType = builder.typeBuilder.build();
 		}
-		if(builder.members.isEmpty() || builder.type == Type.WELCOME){
+		if(builder.members.isEmpty()){
 			this.oriented = Oriented.ALL;
 		}else{
 			this.oriented = Oriented.SPECIFIC;
 		}
 		this.type = builder.type;
-		this.status = Status.CREATED;
 	}
 	
 	private Promotion(UpdateBuilder builder){
@@ -402,6 +429,10 @@ public class Promotion implements Jsonable{
 	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
+	}
+	
+	public boolean hasDateRange(){
+		return this.dateRange != null;
 	}
 	
 	public DateRange getDateRange(){
@@ -454,11 +485,20 @@ public class Promotion implements Jsonable{
 	}
 	
 	public Status getStatus() {
-		return status;
-	}
-	
-	public void setStatus(Status status) {
-		this.status = status;
+		if(this.dateRange != null){
+			long now = System.currentTimeMillis();
+			if(now < this.dateRange.getOpeningTime()){
+				return Status.CREATED;
+			}else if(now > this.dateRange.getOpeningTime() && now < this.dateRange.getEndingTime()){
+				return Status.PROGRESS;
+			}else if(now > this.dateRange.getEndingTime()){
+				return Status.FINISH;
+			}else{
+				return Status.CREATED;
+			}
+		}else{
+			return Status.CREATED;
+		}
 	}
 	
 	public Rule getRule() {
@@ -544,7 +584,7 @@ public class Promotion implements Jsonable{
 		jm.putString("entire", this.entire);
 		jm.putString("image", this.getImage() != null ? this.getImage().getObjectUrl() : "http://digie-image-real.oss.aliyuncs.com/nophoto.jpg");
 		jm.putInt("point", this.point);
-		jm.putInt("status", this.status.getVal());
+		jm.putInt("status", this.getStatus().getVal());
 		jm.putInt("pType", this.rule.getVal());
 		jm.putInt("oriented", this.oriented.getVal());
 		jm.putJsonable("coupon", this.couponType, 0);
