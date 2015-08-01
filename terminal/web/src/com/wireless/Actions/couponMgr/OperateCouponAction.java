@@ -72,7 +72,7 @@ public class OperateCouponAction extends DispatchAction{
 		
 		JObject jobject = new JObject();
 		try{
-			CouponDao.draw(StaffDao.getByRestaurant(dbCon, rid).get(0), Integer.parseInt(couponId));
+			CouponDao.draw(StaffDao.getByRestaurant(dbCon, rid).get(0), Integer.parseInt(couponId), CouponDao.DrawType.MANUAL);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();

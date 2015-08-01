@@ -4070,7 +4070,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(o.getComment().length() > 8 ? o.getComment().substring(0, 11) + "..." : o.getComment());
+			cell.setCellValue(o.getComment().length() > 8 ? o.getComment().substring(0, 8) + "..." : o.getComment());
 			cell.setCellStyle(strStyle);
 		}
 		OutputStream os = response.getOutputStream();

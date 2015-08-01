@@ -77,7 +77,7 @@ public class QueryCouponAction extends DispatchAction{
 			CouponDao.ExtraCond extra = new ExtraCond();
 			extra.setMember(MemberDao.getByWxSerial(staff, openId));
 			extra.addPromotionStatus(Promotion.Status.PROGRESS);
-			extra.addPromotionStatus(Promotion.Status.PUBLISH);
+			extra.addPromotionStatus(Promotion.Status.CREATED);
 			
 			List<Coupon> coupons = CouponDao.getByCond(staff, extra, null);
 			if(!coupons.isEmpty()){

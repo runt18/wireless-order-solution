@@ -83,10 +83,8 @@ public class OperatePromotionAction extends DispatchAction{
 				
 			}else{
 				if(Promotion.Rule.valueOf(Integer.parseInt(pType)) == Promotion.Rule.DISPLAY_ONLY){
-					promotionCreateBuilder = Promotion.CreateBuilder.newInstance4Display(title, 
-																				 new DateRange(beginDate, endDate), 
-																				 body,
-																				 entire);
+					promotionCreateBuilder = Promotion.CreateBuilder.newInstance4Display(title, body, entire)
+																	.setRange(beginDate, endDate);
 				}else{
 					CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price), DateUtil.parseDate(expiredDate)).setComment("活动优惠劵");
 					if(image != null && !image.isEmpty()){
@@ -94,11 +92,10 @@ public class OperatePromotionAction extends DispatchAction{
 					}
 					
 					promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, 
-							 new DateRange(beginDate, endDate),
 							 body,
 							 Promotion.Rule.valueOf(Integer.parseInt(pType)),
 							 typeInsertBuilder,
-							 entire);
+							 entire).setRange(beginDate, endDate);
 					if(point != null && !point.isEmpty() && Promotion.Rule.valueOf(Integer.parseInt(pType)) != Promotion.Rule.FREE){
 						promotionCreateBuilder.setPoint(Integer.parseInt(point));
 					}
@@ -158,7 +155,7 @@ public class OperatePromotionAction extends DispatchAction{
 			
 			Promotion.UpdateBuilder promotionUpdateBuilder;
 			if(Promotion.Rule.valueOf(Integer.parseInt(pRule)) == Promotion.Rule.DISPLAY_ONLY){
-				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(new DateRange(beginDate, endDate))
+				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(beginDate, endDate)
 										 .setTitle(title)
 										 .setBody(body, entire);
 			}else{
@@ -166,7 +163,7 @@ public class OperatePromotionAction extends DispatchAction{
 				if(image != null && !image.isEmpty()){
 					typeUpdateBuilder.setImage(new OssImage(Integer.parseInt(image)));
 				}
-				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(new DateRange(beginDate, endDate))
+				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(beginDate, endDate)
 										 .setTitle(title)
 										 .setBody(body, entire)
 										 .setCouponTypeBuilder(typeUpdateBuilder);
