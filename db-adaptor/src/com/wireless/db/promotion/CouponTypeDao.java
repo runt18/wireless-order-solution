@@ -13,7 +13,6 @@ import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.oss.OssImage;
-import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
@@ -139,25 +138,25 @@ public class CouponTypeDao {
 		CouponType type = builder.build();
 		String sql;
 		
-		if(builder.isExpiredChanged()){
-			if(type.isExpired()){
-				//Update the associated coupon from 'CREATED' to 'EXPIRED' 
-				sql = " UPDATE " + Params.dbName + ".coupon SET " +
-					  " status = " + Coupon.Status.EXPIRED.getVal() +
-					  " WHERE 1 = 1 " + 
-					  " AND coupon_type_id = " + type.getId() +
-					  " AND status = " + Coupon.Status.CREATED.getVal();
-				dbCon.stmt.executeUpdate(sql);
-			}else{
-				//Update the associated coupon from 'EXPIRED' to 'CREATED' 
-				sql = " UPDATE " + Params.dbName + ".coupon SET " +
-					  " status = " + Coupon.Status.CREATED.getVal() +
-					  " WHERE 1 = 1 " + 
-					  " AND coupon_type_id = " + type.getId() +
-					  " AND status = " + Coupon.Status.EXPIRED.getVal();
-				dbCon.stmt.executeUpdate(sql);
-			}
-		}
+//		if(builder.isExpiredChanged()){
+//			if(type.isExpired()){
+//				//Update the associated coupon from 'CREATED' to 'EXPIRED' 
+//				sql = " UPDATE " + Params.dbName + ".coupon SET " +
+//					  " status = " + Coupon.Status.EXPIRED.getVal() +
+//					  " WHERE 1 = 1 " + 
+//					  " AND coupon_type_id = " + type.getId() +
+//					  " AND status = " + Coupon.Status.CREATED.getVal();
+//				dbCon.stmt.executeUpdate(sql);
+//			}else{
+//				//Update the associated coupon from 'EXPIRED' to 'CREATED' 
+//				sql = " UPDATE " + Params.dbName + ".coupon SET " +
+//					  " status = " + Coupon.Status.CREATED.getVal() +
+//					  " WHERE 1 = 1 " + 
+//					  " AND coupon_type_id = " + type.getId() +
+//					  " AND status = " + Coupon.Status.EXPIRED.getVal();
+//				dbCon.stmt.executeUpdate(sql);
+//			}
+//		}
 		
 		if(builder.isImageChanged()){
 			if(type.hasImage()){

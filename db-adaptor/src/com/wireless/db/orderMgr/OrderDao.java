@@ -1165,6 +1165,69 @@ public class OrderDao {
 	}
 	
 	/**
+	 * Merge multi orders to the single.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the merge builder {@link Order.MergeBuilder}
+	 * @return the id to destination table
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the order to destination table does NOT exist
+	 * 			<li>any order to merged table does NOT exist
+	 */
+	public static int merge(Staff staff, Order.MergeBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			int tableId = merge(dbCon, staff, builder);
+			dbCon.conn.commit();
+			return tableId;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Merge multi orders to the single.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the merge builder {@link Order.MergeBuilder}
+	 * @return the id to destination table
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the order to destination table does NOT exist
+	 * 			<li>any order to merged table does NOT exist
+	 */
+	public static int merge(DBCon dbCon, Staff staff, Order.MergeBuilder builder) throws SQLException, BusinessException{
+		Order dest = getByTableId(dbCon, staff, builder.getDest().getId());
+		List<Order> mergeOrders = new ArrayList<Order>();
+		for(Table tlbToMerge : builder.getBuilders()){
+			mergeOrders.add(getByTableId(dbCon, staff, tlbToMerge.getId()));
+		}
+		
+		for(Order eachMergeOrder : mergeOrders){
+			String sql;
+			sql = " UPDATE " + Params.dbName + ".order_food SET " +
+				  " order_id = " + dest.getId() +
+				  " WHERE order_id = " + eachMergeOrder.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			deleteByCond(dbCon, staff, new ExtraCond(DateType.TODAY).setOrderId(eachMergeOrder.getId()));
+		}
+		
+		return dest.getDestTbl().getId();
+	}
+	
+	/**
 	 * Get the summary to orders to specified restaurant defined in {@link Staff} and other condition.
 	 * @param staff
 	 * 			the staff to perform this action

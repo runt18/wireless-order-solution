@@ -11,12 +11,12 @@ import com.wireless.db.member.MemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.member.Member;
-import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
+import com.wireless.pojo.promotion.Promotion.Status;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.StringHtml;
@@ -97,10 +97,21 @@ public class CouponDao {
 			}
 			StringBuilder psCond = new StringBuilder();
 			for(Promotion.Status status : promotionStatus){
-				if(psCond.length() == 0){
-					psCond.append(" P.status = " + status.getVal());
-				}else{
-					psCond.append(" OR P.status = " + status.getVal());
+				String cond = null;
+				long now = System.currentTimeMillis();
+				if(status == Status.CREATED){
+					cond = " (P.start_date > '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "')";
+				}else if(status == Status.PROGRESS){
+					cond = " (P.start_date <= '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "' AND P.finish_date >= '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "')";
+				}else if(status == Status.FINISH){
+					cond = " (P.finish_date < '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "')";
+				}
+				if(cond != null){
+					if(psCond.length() == 0){
+						psCond.append(cond);
+					}else{
+						psCond.append(" OR " + cond);
+					}
 				}
 			}
 			if(psCond.length() != 0){
@@ -136,13 +147,12 @@ public class CouponDao {
 
 		//Insert a new coupon.
 		sql = " INSERT INTO " + Params.dbName + ".coupon " +
-			  "(`restaurant_id`, `coupon_type_id`, `promotion_id`, `birth_date`, `member_id`, `status`) VALUES(" +
+			  "(`restaurant_id`, `coupon_type_id`, `promotion_id`, `birth_date`, `member_id`) VALUES(" +
 			  staff.getRestaurantId() + "," +
 			  coupon.getCouponType().getId() + "," +
 			  coupon.getPromotion().getId() + "," +
 			  " NOW(), " +
-			  coupon.getMember().getId() + "," +
-			  coupon.getStatus().getVal() +
+			  coupon.getMember().getId() + 
 			  ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -230,6 +240,8 @@ public class CouponDao {
 	 * 			the staff to perform this action
 	 * @param couponId
 	 * 			the coupon to draw
+	 * @param drawType
+	 * 			the draw type {@link DrawType}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
@@ -238,18 +250,33 @@ public class CouponDao {
 	 * 			<li>throws if the promotion associated with this coupon is NOT in 'PROGRESS' status
 	 * 			<li>throws if the coupon is NOT qualified to draw
 	 */
-	public static void draw(Staff staff, int couponId) throws SQLException, BusinessException{
+	public static void draw(Staff staff, int couponId, DrawType drawType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			draw(dbCon, staff, couponId);
+			draw(dbCon, staff, couponId, drawType);
 			dbCon.conn.commit();
 		}catch(SQLException | BusinessException e){
 			dbCon.conn.rollback();
 			throw e;
 		}finally{
 			dbCon.disconnect();
+		}
+	}
+	
+	public static enum DrawType{
+		AUTO("自动"),
+		MANUAL("手动");
+		
+		private final String desc;
+		DrawType(String desc){
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
 		}
 	}
 	
@@ -261,6 +288,8 @@ public class CouponDao {
 	 * 			the staff to perform this action
 	 * @param couponId
 	 * 			the coupon to draw
+	 * @param drawType
+	 * 			the draw type {@link DrawType}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
@@ -269,20 +298,20 @@ public class CouponDao {
 	 * 			<li>throws if the promotion associated with this coupon is NOT in 'PROGRESS' status
 	 * 			<li>throws if the coupon is NOT qualified to draw
 	 */
-	public static void draw(DBCon dbCon, Staff staff, int couponId) throws SQLException, BusinessException{
+	public static void draw(DBCon dbCon, Staff staff, int couponId, DrawType drawType) throws SQLException, BusinessException{
 		
 		Coupon coupon = getById(dbCon, staff, couponId);
 		
-		if(coupon.getStatus() != Coupon.Status.PUBLISHED){
-			throw new BusinessException("只有【已发布】的优惠券才可领取", PromotionError.COUPON_DRAW_NOT_ALLOW);
-		}
+//		if(coupon.getStatus() != Coupon.Status.PUBLISHED){
+//			throw new BusinessException("只有【已发布】的优惠券才可领取", PromotionError.COUPON_DRAW_NOT_ALLOW);
+//		}
 		
 		if(coupon.getPromotion().getRule() == Promotion.Rule.DISPLAY_ONLY){
 			throw new BusinessException("【纯展示】的优惠活动没有优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
 		}
 		
-		if(coupon.getPromotion().getStatus() != Promotion.Status.PROGRESS){
-			throw new BusinessException("只有【进行中】的优惠活动才可领取优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
+		if(drawType == DrawType.MANUAL && coupon.getPromotion().getStatus() != Promotion.Status.PROGRESS){
+			throw new BusinessException("只有【进行中】的优惠活动才可自助领取优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
 		}
 		
 		if(coupon.getDrawProgress().isOk()){
@@ -295,9 +324,9 @@ public class CouponDao {
 				throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
 			}
 			
-			if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
-				insert(dbCon, staff, new Coupon.InsertBuilder(coupon.getCouponType(), coupon.getMember(), coupon.getPromotion()));
-			}
+//			if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
+//				insert(dbCon, staff, new Coupon.InsertBuilder(coupon.getCouponType(), coupon.getMember(), coupon.getPromotion()));
+//			}
 			
 		}else{
 			throw new BusinessException("优惠券还没符合领取条件", PromotionError.COUPON_DRAW_NOT_ALLOW);
@@ -318,13 +347,18 @@ public class CouponDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			<li>throws if the coupon to use does NOT exist
+	 * 			<li>throws if the coupon has been expired
 	 * 			<li>throws if the coupon has NOT been drawn before
 	 */
 	public static void use(DBCon dbCon, Staff staff, int couponId, int orderId) throws SQLException, BusinessException{
 		
 		Coupon coupon = getById(dbCon, staff, couponId);
 		
-		if(coupon.getStatus() != Coupon.Status.DRAWN){
+		if(coupon.isExpired()){
+			throw new BusinessException("【已过期】的优惠券不可使用", PromotionError.COUPON_DRAW_NOT_ALLOW);
+		}
+		
+		if(!coupon.isDrawn()){
 			throw new BusinessException("只有【已领取】的优惠券才可使用", PromotionError.COUPON_DRAW_NOT_ALLOW);
 		}
 		
@@ -420,49 +454,49 @@ public class CouponDao {
 			coupon.setMember(MemberDao.getById(dbCon, staff, coupon.getMember().getId()));
 			coupon.setPromotion(PromotionDao.getById(dbCon, staff, coupon.getPromotion().getId()));
 
-			if(coupon.getStatus() == Coupon.Status.PUBLISHED && coupon.getPromotion().getStatus() == Promotion.Status.PROGRESS){
-				if(coupon.getPromotion().getRule() == Promotion.Rule.TOTAL || coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
-					String sql;
-					sql = " SELECT delta_point, operate_date FROM " + Params.dbName + ".member_operation " +
-						  " WHERE 1 = 1 " +
-						  " AND member_id = " + coupon.getMember().getId() +
-						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
-						  " AND operate_date BETWEEN 'begin_operate_date' AND '" + coupon.getPromotion().getDateRange().getEndingFormat() + "'" +
-						  " UNION " +
-						  " SELECT delta_point, operate_date FROM " + Params.dbName + ".member_operation_history " +
-						  " WHERE 1 = 1 " +
-						  " AND member_id = " + coupon.getMember().getId() +
-						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
-						  " AND operate_date BETWEEN 'begin_operate_date' AND '" + coupon.getPromotion().getDateRange().getEndingFormat() + "'";
-					
-					if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
-						String sql4LastDraw;
-						sql4LastDraw = " SELECT draw_date FROM " + Params.dbName + ".coupon WHERE 1 = 1 " + 
-								  	   " AND promotion_id = " + coupon.getPromotion().getId() +
-								  	   " AND member_id = " + coupon.getMember().getId() +
-								  	   " AND status = " + Coupon.Status.DRAWN.getVal() +
-								  	   " ORDER BY draw_date DESC LIMIT 1 ";
-						dbCon.rs = dbCon.stmt.executeQuery(sql4LastDraw);
-						if(dbCon.rs.next()){
-							sql = sql.replaceAll("begin_operate_date", DateUtil.format(dbCon.rs.getTimestamp("draw_date").getTime(), DateUtil.Pattern.DATE_TIME));
-						}else{
-							sql = sql.replaceAll("begin_operate_date", coupon.getPromotion().getDateRange().getOpeningFormat());
-						}
-						dbCon.rs.close();
-						sql = " SELECT MAX(delta_point) AS max_point FROM ( " + sql + " ) AS TMP ";
-						
-					}else if(coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
-						sql = " SELECT SUM(delta_point) AS total_point FROM ( " + sql.replaceAll("begin_operate_date", coupon.getPromotion().getDateRange().getOpeningFormat()) + " ) AS TMP ";
-					}
-					
-					dbCon.rs = dbCon.stmt.executeQuery(sql);
-					if(dbCon.rs.next()){
-						coupon.setDrawProgress(dbCon.rs.getInt(1));
-					}
-					dbCon.rs.close();				
-				}
-
-			}
+//			if(coupon.getStatus() == Coupon.Status.PUBLISHED && coupon.getPromotion().getStatus() == Promotion.Status.PROGRESS){
+//				if(coupon.getPromotion().getRule() == Promotion.Rule.TOTAL || coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
+//					String sql;
+//					sql = " SELECT delta_point, operate_date FROM " + Params.dbName + ".member_operation " +
+//						  " WHERE 1 = 1 " +
+//						  " AND member_id = " + coupon.getMember().getId() +
+//						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
+//						  " AND operate_date BETWEEN 'begin_operate_date' AND '" + coupon.getPromotion().getDateRange().getEndingFormat() + "'" +
+//						  " UNION " +
+//						  " SELECT delta_point, operate_date FROM " + Params.dbName + ".member_operation_history " +
+//						  " WHERE 1 = 1 " +
+//						  " AND member_id = " + coupon.getMember().getId() +
+//						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
+//						  " AND operate_date BETWEEN 'begin_operate_date' AND '" + coupon.getPromotion().getDateRange().getEndingFormat() + "'";
+//					
+//					if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
+//						String sql4LastDraw;
+//						sql4LastDraw = " SELECT draw_date FROM " + Params.dbName + ".coupon WHERE 1 = 1 " + 
+//								  	   " AND promotion_id = " + coupon.getPromotion().getId() +
+//								  	   " AND member_id = " + coupon.getMember().getId() +
+//								  	   " AND status = " + Coupon.Status.DRAWN.getVal() +
+//								  	   " ORDER BY draw_date DESC LIMIT 1 ";
+//						dbCon.rs = dbCon.stmt.executeQuery(sql4LastDraw);
+//						if(dbCon.rs.next()){
+//							sql = sql.replaceAll("begin_operate_date", DateUtil.format(dbCon.rs.getTimestamp("draw_date").getTime(), DateUtil.Pattern.DATE_TIME));
+//						}else{
+//							sql = sql.replaceAll("begin_operate_date", coupon.getPromotion().getDateRange().getOpeningFormat());
+//						}
+//						dbCon.rs.close();
+//						sql = " SELECT MAX(delta_point) AS max_point FROM ( " + sql + " ) AS TMP ";
+//						
+//					}else if(coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
+//						sql = " SELECT SUM(delta_point) AS total_point FROM ( " + sql.replaceAll("begin_operate_date", coupon.getPromotion().getDateRange().getOpeningFormat()) + " ) AS TMP ";
+//					}
+//					
+//					dbCon.rs = dbCon.stmt.executeQuery(sql);
+//					if(dbCon.rs.next()){
+//						coupon.setDrawProgress(dbCon.rs.getInt(1));
+//					}
+//					dbCon.rs.close();				
+//				}
+//
+//			}
 			return coupon;
 		}
 	}
@@ -504,7 +538,7 @@ public class CouponDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Coupon> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
-		List<Coupon> result = new ArrayList<Coupon>();
+		final List<Coupon> result = new ArrayList<Coupon>();
 		String sql;
 		sql = " SELECT " +
 			  " C.coupon_id, P.entire, C.restaurant_id, C.birth_date, C.draw_date, C.order_id, C.order_date, C.status, " +

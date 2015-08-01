@@ -31,6 +31,7 @@ import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.Discount.Type;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberComment.CommitBuilder;
+import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberType;
@@ -120,14 +121,24 @@ public class MemberDao {
 		private int memberTypeId;
 		private int minConsumeAmount;
 		private int maxConsumeAmount;
-		private int minTotalConsume;
-		private int maxTotalConsume;
+		private float minTotalConsume;
+		private float maxTotalConsume;
+		private float minBalance;
+		private float maxBalance;
 		private DutyRange range;
 		private DutyRange createRange;
 		private String weixinCard;
 		private String weixinSerial;
 		private int memberBalance;
 		private String memberBalanceEqual;
+		
+		public ExtraCond(MemberCond memberCond){
+			setRange(memberCond.getRange());
+			setMemberType(memberCond.getMemberType());
+			betweenBalance(memberCond.getMinBalance(), memberCond.getMaxBalance());
+			betweenConsume(memberCond.getMinConsumeAmount(), memberCond.getMaxConsumeAmount());
+			betweenTotalConsume(memberCond.getMinConsumeMoney(), memberCond.getMaxConsumeMoney());
+		}
 		
 		public ExtraCond(ReqQueryMember.ExtraCond extraCond){
 			this.setId(extraCond.getId()).setFuzzyName(extraCond.getFuzzyName());
@@ -183,22 +194,92 @@ public class MemberDao {
 		}
 		
 		public ExtraCond greaterConsume(int amount){
+			if(amount < 0){
+				throw new IllegalArgumentException("消费次数小于0");
+			}
 			this.minConsumeAmount = amount;
+			this.maxConsumeAmount = 0;
 			return this;
 		}
 		
 		public ExtraCond lessConsume(int amount){
+			if(amount < 0){
+				throw new IllegalArgumentException("消费次数小于0");
+			}
 			this.maxConsumeAmount = amount;
+			this.minConsumeAmount = 0;
 			return this;
 		}
 		
-		public ExtraCond greaterTotalConsume(int totalConsume){
-			this.minTotalConsume = totalConsume;
+		public ExtraCond betweenConsume(int min, int max){
+			if(min < 0 || max < 0){
+				throw new IllegalArgumentException("消费次数小于0");
+			}
+			if(min > max){
+				throw new IllegalArgumentException("最大消费次数不能小于最小消费次数");
+			}
+			this.minConsumeAmount = min;
+			this.maxConsumeAmount = max;
 			return this;
 		}
 		
-		public ExtraCond lessTotalConsume(int totalConsume){
-			this.maxTotalConsume = totalConsume;
+		public ExtraCond greaterTotalConsume(float min){
+			if(min < 0){
+				throw new IllegalArgumentException("消费总额小于0");
+			}
+			this.minTotalConsume = min;
+			this.maxTotalConsume = 0;
+			return this;
+		}
+		
+		public ExtraCond lessTotalConsume(float max){
+			if(max < 0){
+				throw new IllegalArgumentException("消费总额小于0");
+			}
+			this.minTotalConsume = 0;
+			this.maxTotalConsume = max;
+			return this;
+		}
+		
+		public ExtraCond betweenTotalConsume(float min, float max){
+			if(min < 0 || max < 0){
+				throw new IllegalArgumentException("消费总额小于0");
+			}
+			if(min > max){
+				throw new IllegalArgumentException("最大消费总额不能小于最小消费总额");
+			}
+			this.minTotalConsume = min;
+			this.maxTotalConsume = max;
+			return this;
+		}
+		
+		public ExtraCond greaterBalance(float min){
+			if(min < 0){
+				throw new IllegalArgumentException("余额不能小于0");
+			}
+			this.minBalance = min;
+			this.maxBalance = 0;
+			return this;
+		}
+		
+		public ExtraCond lessBalance(float max){
+			if(max < 0){
+				throw new IllegalArgumentException("余额不能小于0");
+			}
+			this.minBalance = 0;
+			this.maxBalance = max;
+			return this;
+		}
+		
+		public ExtraCond betweenBalance(float min, float max){
+			if(min < 0 || max < 0){
+				throw new IllegalArgumentException("余额不能小于0");
+			}
+			if(min > max){
+				throw new IllegalArgumentException("最大余额不能小于最小余额");
+			}
+			this.minBalance = min;
+			this.maxBalance = max;
 			return this;
 		}
 		
@@ -212,11 +293,13 @@ public class MemberDao {
 			return this;
 		}
 		
+		@Deprecated
 		public ExtraCond setMemberBalance(int memberBalance){
 			this.memberBalance = memberBalance;
 			return this;
 		}
 		
+		@Deprecated
 		public ExtraCond setMemberBalanceEqual(String memberBalanceEqual){
 			this.memberBalanceEqual = memberBalanceEqual;
 			return this;
@@ -274,6 +357,14 @@ public class MemberDao {
 			
 			if(memberBalance != 0){
 				extraCond.append(" AND (M.base_balance + M.extra_balance) " + memberBalanceEqual + memberBalance);
+			}
+			
+			if(minBalance > 0 && maxBalance == 0){
+				extraCond.append(" AND (M.base_balance + M.extra_balance) >= " + minBalance);
+			}else if(maxBalance > 0 && minBalance == 0){
+				extraCond.append(" AND (M.base_balance + M.extra_balance)  <= " + maxBalance);
+			}else if(maxBalance > 0 && minBalance > 0){
+				extraCond.append(" AND (M.base_balance + M.extra_balance) BETWEEN " + minBalance + " AND " + maxBalance);
 			}
 			
 			if(range != null){
@@ -1052,8 +1143,11 @@ public class MemberDao {
 		}	
 		
 		//Create the coupon to this member if the associated published or progressed promotion is oriented all.
-		for(Promotion promotion : PromotionDao.getByCond(dbCon, staff, new PromotionDao.ExtraCond().addStatus(Promotion.Status.PUBLISH).addStatus(Promotion.Status.PROGRESS).setOriented(Promotion.Oriented.ALL))){
-			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(promotion.getCouponType().getId(), promotion.getId()).addMember(memberId));
+		for(Promotion promotion : PromotionDao.getByCond(dbCon, staff, new PromotionDao.ExtraCond().setOriented(Promotion.Oriented.ALL))){
+			if(promotion.getRule() != Promotion.Rule.DISPLAY_ONLY){
+				int couponId = CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(promotion.getCouponType().getId(), promotion.getId()).addMember(memberId));
+				CouponDao.draw(dbCon, staff, couponId, CouponDao.DrawType.AUTO);
+			}
 		}
 		
 		//Commit the private comment

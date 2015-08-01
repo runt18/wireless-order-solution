@@ -1024,11 +1024,13 @@ public class RestaurantDao {
 	}
 	
 	public static ExpiredResult calcExpired() throws SQLException{
+		final int TWO_WEEKS = 3600 * 24 * 1000 * 7;
 		long beginTime = System.currentTimeMillis();
 		int amount = 0;
 		for(Restaurant r : getByCond(null, null)){
 			long remaining = r.getExpireDate() - System.currentTimeMillis();
-			if(remaining > 0 && remaining <= 3600 * 24 * 1000 * 7){
+			
+			if(Math.abs(remaining) < TWO_WEEKS && remaining > 0){
 				try{
 					String body = "亲爱的【$(account)】用户，您的账户将于$(expired_date)到期，为免影响您的正常使用，请及时联络客服人员进行续费，非常感谢您对智易软件的支持:-)";
 					body = body.replace("$(account)", r.getName());
