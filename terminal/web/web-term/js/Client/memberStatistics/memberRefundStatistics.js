@@ -141,7 +141,7 @@ function mrs_initBusinessReceipsGrid(c){
 				});
 			},
 			select : function(){
-				mrd_searchMemberOperation();
+				mrs_searchMemberOperation();
 			}
 		}
 	});
@@ -169,7 +169,7 @@ function mrs_initBusinessReceipsGrid(c){
 		beginDate : mrs_search_onDuty,
 		endDate : mrs_search_offDuty,
 		callback : function(){
-			mrd_searchMemberOperation();
+			mrs_searchMemberOperation();
 		}
 	});
 	mrs_search_memberName = new Ext.form.TextField({
@@ -233,7 +233,7 @@ function mrs_initBusinessReceipsGrid(c){
 					});
 				},
 				select : function(){
-					mrd_searchMemberOperation();
+					mrs_searchMemberOperation();
 				}
 			}				
 		}, 
@@ -244,7 +244,7 @@ function mrs_initBusinessReceipsGrid(c){
 			text : '搜索',
 			iconCls : 'btn_search',
 			handler : function(e){
-				mrd_searchMemberOperation();
+				mrs_searchMemberOperation();
 			}
 		}, {
 			text : '重置',
@@ -252,7 +252,7 @@ function mrs_initBusinessReceipsGrid(c){
 			handler : function(e){
 				mrs_search_memberType.setValue(-1);
 				mrs_search_memberName.setValue();
-				mrd_searchMemberOperation();
+				mrs_searchMemberOperation();
 			}
 			
 		}, '-', {
@@ -333,7 +333,7 @@ function mrs_initBusinessReceipsGrid(c){
 	});
 }
 
-function mrd_searchMemberOperation(){
+function mrs_searchMemberOperation(){
 	var onDuty = '', offDuty = '';
 	onDuty = Ext.util.Format.date(mrs_search_onDuty.getValue(), 'Y-m-d 00:00:00');
 	offDuty = Ext.util.Format.date(mrs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
