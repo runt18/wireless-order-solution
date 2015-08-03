@@ -327,6 +327,7 @@ function mcs_initBusinessReceipsGrid(c){
 			mcs_grid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
 			mcs_grid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
 			mcs_grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			mcs_grid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
 			mcs_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 			mcs_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
 			mcs_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
