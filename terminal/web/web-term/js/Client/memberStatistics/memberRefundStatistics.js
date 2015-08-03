@@ -328,7 +328,6 @@ function mrs_initBusinessReceipsGrid(c){
 			mrs_grid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
 			mrs_grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
 			mrs_grid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
-			mrs_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 			mrs_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
 			mrs_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 			mrs_grid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
