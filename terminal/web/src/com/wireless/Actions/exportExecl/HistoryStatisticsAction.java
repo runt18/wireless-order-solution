@@ -2328,7 +2328,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setOperateDate(new DutyRange(onDuty, offDuty));
 		}
 		
-		String orderClause = " ORDER BY MO.operate_date ";
+		String orderClause = " ORDER BY MO.id DESC ";
 
 		final List<MemberOperation> list = MemberOperationDao.getByCond(staff, extraCond, orderClause);
 		MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
@@ -2590,7 +2590,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setOperateDate(new DutyRange(onDuty, offDuty));
 		}
 		
-		String orderClause = " ORDER BY MO.operate_date ";
+		String orderClause = " ORDER BY MO.id DESC ";
 		final List<MemberOperation> list = MemberOperationDao.getByCond(staff, extraCond, orderClause);
 		
 		MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
