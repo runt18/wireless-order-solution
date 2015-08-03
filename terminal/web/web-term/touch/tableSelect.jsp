@@ -974,6 +974,7 @@
 	    		<td>
 	    			<select  id="cm_bookCate" style="font-size: 20px;">
 						<option value="散台">散台</option>
+						<option value="包间">包间</option>												
 						<option value="婚宴">婚宴</option>
 						<option value="寿宴">寿宴</option>
 						<option value="满月">满月</option>
@@ -981,7 +982,6 @@
 						<option value="周岁">周岁</option>			
 						<option value="入学">入学</option>
 						<option value="生日">生日</option>
-						<option value="包间">包间</option>												
 					</select>	    		
 	    		</td>    
 	    		<td class="readMemberTd">订金:</td>
