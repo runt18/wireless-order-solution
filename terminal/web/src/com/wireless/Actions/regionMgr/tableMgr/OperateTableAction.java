@@ -17,6 +17,8 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
@@ -295,5 +297,61 @@ public class OperateTableAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 并台
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward mergeTable(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jobject = new JObject();
+		try {
+			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
+			String tables = request.getParameter("tables");
+			
+			String[] tablesArray = tables.split(",");
+			
+			Order.MergeBuilder builder = new Order.MergeBuilder(Integer.parseInt(tablesArray[0]));
+			
+			if(tablesArray.length > 1){
+				for (int i = 1; i < tablesArray.length; i++) {
+					builder.add(Integer.parseInt(tablesArray[i]));
+				}
+			}
+			
+			final int mergeTable = OrderDao.merge(staff, builder);
+			
+			jobject.setExtra(new Jsonable() {
+				
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putInt("mergeTable", mergeTable);
+					return jm;
+				}
+				
+				@Override
+				public void fromJsonMap(JsonMap jm, int flag) {
+					
+				}
+			});
+			
+			jobject.initTip(true, "并台成功.");
+			
+		} catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		} finally {
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
 	
 }
