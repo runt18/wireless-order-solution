@@ -42,7 +42,8 @@ var tables = [],
 		searchTable : false,
 		commitTableOrTran : 'table',
 		bookChoosedTable : [],
-		multiOpenTableChoosedTable : []
+		multiOpenTableChoosedTable : [],
+		multiPayTableChoosedTable : []
 	},
 	//登录操作包
 	ln={
@@ -1071,6 +1072,32 @@ ts.toOrderFoodOrTransFood = function(c){
 		uo.closeTransOrderFood();
 		//刷新已点餐台
 		ts.loadBookChoosedTable({renderTo : 'multiOpenTableHadChoose', tables:ts.multiOpenTableChoosedTable});	
+
+		
+	}else if(ts.commitTableOrTran == 'multiPayTableChoose'){//多台并台选台
+		var table = null;
+			
+		for (var i = 0; i < ts.multiPayTableChoosedTable.length; i++) {
+			if(ts.multiPayTableChoosedTable[i].id == c.id){
+				table = true;
+				ts.multiPayTableChoosedTable.splice(i, 1);
+				break;
+			}
+		}
+		
+		//选择餐台
+		if(table == null){
+			table = getTableById(c.id);
+			if(table.statusValue == 0){
+				Util.msg.tip("此餐台未点餐, 不能选择");
+				return;
+			}
+			ts.multiPayTableChoosedTable.push(table);
+		}
+		//选台后关闭
+		uo.closeTransOrderFood();
+		//刷新已点餐台
+		ts.loadBookChoosedTable({renderTo : 'multiPayTableHadChoose', tables:ts.multiPayTableChoosedTable});	
 
 		
 	}
@@ -3451,8 +3478,9 @@ ts.bookListEntry = function(){
 	ts.bookSearch.init({file : 'searchBookPhone'});	
 	ts.bookSearchByName.init({file : 'searchBookPerson'});	
 	
-	//去已点菜界面
+	//去已预订界面
 	location.href="#bookOrderListMgr";
+	
 	ts.searchBookList();
 	
 	var now = new Date();
@@ -3488,6 +3516,22 @@ ts.bookListEntry = function(){
 
 }
 
+/**
+ * 刷新预订
+ */
+ts.refreshBookList = function(){
+	$('#searchBookPerson').val("");
+	$('#searchBookPhone').val("");
+	$('#searchBookStatus').val(-1).selectmenu("refresh");
+	$('input[name="bookDateType"]:checked').removeAttr("checked").checkboxradio("refresh");
+	$("input[name=bookDateType]:eq(0)").attr("checked",'checked').checkboxradio("refresh");
+	
+	ts.bookListEntry();
+}
+
+/**
+ * 预订返回
+ */
 ts.bookListBack = function(){
 	if(ts.bookListEntry.backToTableSelect){
 		ts.loadData();
@@ -3499,6 +3543,12 @@ ts.bookListBack = function(){
 	}
 	delete ts.bookTable4Search;
 	delete ts.bookListEntry.backToTableSelect;
+	
+	$('#searchBookPerson').val("");
+	$('#searchBookPhone').val("");
+	$('#searchBookStatus').val(-1).selectmenu("refresh");
+	$('input[name="bookDateType"]:checked').removeAttr("checked").checkboxradio("refresh");
+	$("input[name=bookDateType]:eq(0)").attr("checked",'checked').checkboxradio("refresh");	
 }
 
 /**
@@ -3564,6 +3614,9 @@ ts.closeBookOperateTable = function(){
 	$('#bookTableHadChoose').html('');
 } 
 
+/**
+ * 删除预订
+ */
 ts.deleteBook = function(c){
 	Util.msg.alert({
 		title : '提示',
@@ -3954,6 +4007,89 @@ ts.checkBookTable = function(){
 	ts.bookListEntry();
 }
 //==============end 预订
+
+//===============并台start
+/**
+ * 打开多台开席
+ */
+ts.openMultiPayTableCmp = function(){
+	//初始化选择餐台
+	ts.multiPayTableChoosedTable.length = 0;
+	//关闭更多
+	$('#tableSelectOtherOperateCmp').popup('close');
+	setTimeout(function(){
+		$('#multiPayTableCmp').show();
+		$('#shadowForPopup').show();
+	}, 250);
+}
+
+/**
+ * 关闭预订入座
+ */
+ts.closeMultiPayTableCmp = function(){
+	$('#multiPayTableCmp').hide();
+	$('#shadowForPopup').hide();
+	$('#multiPayTableHadChoose').html('');
+}
+
+/**
+ * 设置多台开席入座选台
+ */
+ts.openMultiPayTable = function(){
+	//隐藏数量输入
+	$('#td4TxtFoodNumForTran').hide();
+	
+	ts.commitTableOrTran = 'multiPayTableChoose';
+	
+	$("#txtTableNumForTS").val("");
+	$("#txtTableComment").val("");
+	
+	$('#transSomethingTitle').html("请输入桌号，确认添加");
+	
+	//打开控件
+	uo.openTransOrderFood();		
+}
+/**
+ * 多台并台
+ */
+ts.multiPayTableOrderFood = function(){
+
+	if(ts.multiPayTableChoosedTable.length == 0){
+		Util.msg.tip("请选择餐台");
+		return;
+	}
+	var tables = [];
+	for (var i = 0; i < ts.multiPayTableChoosedTable.length; i++) {
+		tables.push(ts.multiPayTableChoosedTable[i].id);
+	}
+
+	$.post('../OperateTable.do', {
+		dataSource : 'mergeTable',
+		tables : tables.join(",")
+	}, function(rt){
+		if(rt.success){
+			Util.msg.tip("并台成功, 已合并到 "+ ts.multiPayTableChoosedTable[0].name);
+			//关闭选台
+			ts.closeMultiPayTableCmp();		
+			//进入已点菜界面
+			location.href = '#orderFoodListMgr';
+			uo.entry({
+				table : ts.multiPayTableChoosedTable[0]
+			});
+		}else{
+			Util.msg.alert({
+				renderTo : 'tableSelectMgr',
+				msg : rt.msg
+			});
+		}
+	}, 'json');
+	
+	
+
+}
+
+
+//===============end并台
 
 //=================多台开席start
 

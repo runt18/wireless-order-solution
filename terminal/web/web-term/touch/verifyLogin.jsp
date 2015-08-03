@@ -33,11 +33,12 @@
 
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
 </head>
-<body>
 
+<body>
+<script language="JavaScript" src="http://code.54kefu.net/kefu/js/b150/852550.js" type="text/javascript" charset="utf-8"></script>	
 <div data-role="page" id="restaurantLoginPage" align="center" data-theme="e">
 	<!-- 智易广告 start-->
-	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b" class="advertisementCmp">
+	<div data-role="header" data-tap-toggle="false" data-theme="b" class="advertisementCmp">
 		<div data-role="controlgroup" class="ui-btn-left " data-type="horizontal">
 			<div class="adv_logo">
 				<img src="images/logo.png">
@@ -53,7 +54,7 @@
 		</div>		
 	</div>	
 	<!-- end 智易广告 -->
-	
+
 	<!-- 餐厅登陆面板 -->
 	<div data-role="content" id="loginRestaurantCmp" class="ui-corner-all lgRestCmp" data-theme="a">
         <div class="div4Input" align="center" >
@@ -69,7 +70,7 @@
 
 <div id="staffLoginPage" data-role="page" align="center" data-theme="e">
 	<!-- 智易广告 start-->
-	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b" class="advertisementCmp">
+	<div data-role="header" data-tap-toggle="false" data-theme="b" class="advertisementCmp">
 		<div data-role="controlgroup" class="ui-btn-left " data-type="horizontal">
 			<div class="adv_logo">
 				<img src="images/logo.png">
@@ -150,6 +151,5 @@
         </div>
 	</div>
 </div>
-
 </body>
 </html>

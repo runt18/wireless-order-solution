@@ -10,7 +10,7 @@
             ele_hei += 15;
             $(ele).wrap("<div class='time_pick'>");
             var ele_par = $(this).parents(".time_pick");
-            ele_par.append("<div class='timepicker_wrap'><div class='arrow_top'></div><div class='time'><div class='prev'></div><div class='ti_tx'></div><div class='next'></div></div><div class='mins'><div class='prev'></div><div class='mi_tx'></div><div class='next'></div></div><div class='meridian'><div class='prev'></div><div class='mer_tx'></div><div class='next'></div></div></div>");
+            ele_par.append("<div class='timepicker_wrap'><div class='arrow_top'></div><div class='time'><div class='prev'></div><div class='ti_tx'></div><div class='next'></div></div><div class='mins'><div class='prev'></div><div class='mi_tx'></div><div class='next'></div></div><div class='meridian'><div class='prev'></div><div class='mer_tx'></div><div class='next'></div></div><div style=\"text-align:right\"><button style=\"margin-top: 10px;width: 100%;height: 30px;\">确定</button></div></div>");
             var ele_next = $(this).next(".timepicker_wrap");
             var ele_next_all_child = ele_next.find("div");
             ele_next.css({
@@ -33,7 +33,12 @@
                             ele_next.fadeOut()
                         }
                     } else {
-                        set_date();
+                    	var value = $('.bookTime').val();
+                    	if(value){
+                    		display_date();
+                    	}else{
+                    		set_date();
+                    	}
                         ele_next.fadeIn()
                     }
                 }
@@ -82,6 +87,27 @@
                     ele_next.find(".mer_tx").text(mer)
                 }
             }
+            
+            function display_date(){
+            	var value = $('.bookTime').val();
+            	var ti = value.substring(0, 2);
+            	var mi = value.substring(3, 5);
+                var mer = "AM";
+                if (12 < ti) {
+                    ti -= 12;
+                    ti = ti < 10?"0"+ti:ti;
+                    mer = "PM"
+                }
+                
+                if(value.indexOf("P") > 0){
+                	mer = "PM";
+                }
+                
+                ele_next.find(".ti_tx").text(ti)
+                ele_next.find(".mi_tx").text(mi)
+                ele_next.find(".mer_tx").text(mer)
+            }
+            
             var cur_next = ele_next.find(".next");
             var cur_prev = ele_next.find(".prev");
             $(cur_prev).add(cur_next).on("click",

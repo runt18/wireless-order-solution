@@ -45,6 +45,8 @@
 <script type="text/javascript" src="js/payment/payment.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/tableSelect/tableSelect.js?v=<%=v %>"></script>
 
+<script language="JavaScript" src="http://code.54kefu.net/kefu/js/b150/852550.js" type="text/javascript" charset="utf-8"></script>
+
 <!--引入易笔字核心脚本(utf-8编码)-->
 <!-- <script src="http://www.yibizi.com/ybz_core/core/ybz.min.js"></script> -->
 </head>
@@ -127,6 +129,7 @@
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.bookListEntry()">
 		 	<div>
+		 		<!-- 预订单数 -->
 		 		<div id="amount4Book" style="display:none;width:28px;height: 28px;border-radius: 14px;background-color: red;float: right;margin-top: -11px;line-height:28px;">0</div>
 		 		预订
 		 	</div>	
@@ -145,6 +148,7 @@
 	<div data-role="popup" id="tableSelectOtherOperateCmp" data-theme="d">
         <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
             <li class="tempFoodKitchen" onclick="ts.openMultiOpenTableCmp()"><a >多台开席</a></li>
+            <li class="tempFoodKitchen" onclick="ts.openMultiPayTableCmp()"><a >拼台</a></li>
         </ul>
 	</div>		
 	
@@ -169,6 +173,26 @@
 	    </div>	    	    
 	</div>		
 	
+	<!-- 并台埋单 -->
+	<div id="multiPayTableCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: 100px 0px 0px -200px;width:550px;display: none;background-color: white;" align="center">
+	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
+	       	拼台(菜品将合并到第一张餐台)
+        	<div style="float: right">
+  				<a onclick="ts.closeMultiPayTableCmp()" data-role="button" data-corners="false" class="popupWinCloseBtn4Book">X</a>      		
+        	</div>		
+	    </div>
+	    
+	    <div data-role="content" id="multiPayTableHadChoose" style="height:100px" align="left">
+	    
+   		</div>	    
+	    
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.openMultiPayTable()">添加餐台</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.multiPayTableOrderFood()">确定</a>		 
+			 </div>
+	    </div>	    	    
+	</div>		
 	
 	<!-- 输入餐台人数 -->
 	<div id="tableCustomerCountSet" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
@@ -812,7 +836,7 @@
 				<select  id="searchBookStatus" onchange="ts.searchBookList()" style="font-size: 20px;">
 					<option value="-1">订单状态</option>
 					<option value="1">待确认</option>
-					<option value="2">已确认</option>
+					<option value="2">待入座</option>
 					<option value="3">已入座</option>
 				</select>
     		</td>    		
@@ -860,6 +884,8 @@
 
 		 <!-- <input type="button" value="返回" style="width: 70px;height: 70px;"> -->
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.bookListBack()">返回</a>
+		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.refreshBookList()">刷新</a>
+		 
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.addBookInfo({type:'add'})">添加</a>
 			<a href="javascript: Util.to.scroll({content:'bookOrderListCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
@@ -912,7 +938,7 @@
   				<a onclick="ts.closeAddBookInfo()" data-role="button" data-corners="false" class="popupWinCloseBtn4Book">X</a>      		
         	</div>			        	
 	    </div> 
-	    <div style="max-height: 600px;overflow-y: auto;">
+	    <div style="max-height: 600px;min-height: 225px;overflow-y: auto;">
 	    <table>
 	    	<tr>
 	    		<td class="readMemberTd">预订日期:</td>
@@ -954,7 +980,8 @@
 						<option value="年会">年会</option>
 						<option value="周岁">周岁</option>			
 						<option value="入学">入学</option>
-						<option value="生日">生日</option>										
+						<option value="生日">生日</option>
+						<option value="包间">包间</option>												
 					</select>	    		
 	    		</td>    
 	    		<td class="readMemberTd">订金:</td>
