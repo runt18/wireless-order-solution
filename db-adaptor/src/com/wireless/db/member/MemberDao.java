@@ -129,8 +129,6 @@ public class MemberDao {
 		private DutyRange createRange;
 		private String weixinCard;
 		private String weixinSerial;
-		private int memberBalance;
-		private String memberBalanceEqual;
 		
 		public ExtraCond(MemberCond memberCond){
 			setRange(memberCond.getRange());
@@ -293,18 +291,6 @@ public class MemberDao {
 			return this;
 		}
 		
-		@Deprecated
-		public ExtraCond setMemberBalance(int memberBalance){
-			this.memberBalance = memberBalance;
-			return this;
-		}
-		
-		@Deprecated
-		public ExtraCond setMemberBalanceEqual(String memberBalanceEqual){
-			this.memberBalanceEqual = memberBalanceEqual;
-			return this;
-		}
-		
 		private String cond4Card(String card){
 			if(card != null){
 				String cardExcludeZero = card.replaceFirst("^(0+)", "");
@@ -353,10 +339,6 @@ public class MemberDao {
 			}
 			if(memberTypeId > 0){
 				extraCond.append(" AND MT.member_type_id = " + memberTypeId);
-			}
-			
-			if(memberBalance != 0){
-				extraCond.append(" AND (M.base_balance + M.extra_balance) " + memberBalanceEqual + memberBalance);
 			}
 			
 			if(minBalance > 0 && maxBalance == 0){

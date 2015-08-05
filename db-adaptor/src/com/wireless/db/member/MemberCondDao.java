@@ -11,6 +11,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.member.MemberCond;
+import com.wireless.pojo.member.MemberCond.RangeType;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -70,10 +71,11 @@ public class MemberCondDao {
 		MemberCond cond = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".member_cond" +
-			  " ( restaurant_id, name, member_type_id, begin_date, end_date, min_consume_money, max_consume_money, min_consume_amount, max_consume_amount, min_balance, max_balance ) VALUES ( " +
+			  " ( restaurant_id, name, member_type_id, range_type, begin_date, end_date, min_consume_money, max_consume_money, min_consume_amount, max_consume_amount, min_balance, max_balance ) VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + cond.getName() + "'" + "," +
 			  (cond.hasMemberType() ? cond.getMemberType().getId() : " NULL ") + "," +
+			  cond.getRangeType().getVal() + "," +
 			  (cond.hasRange() ? "'" + cond.getRange().getOnDutyFormat() + "'" : " NULL ") + "," +
 			  (cond.hasRange() ? "'" + cond.getRange().getOffDutyFormat() + "'" : " NULL ") + "," +
 			  cond.getMinConsumeMoney() + "," +
@@ -141,6 +143,8 @@ public class MemberCondDao {
 			  (builder.isBalanceChanged() ? " ,min_balance = " + cond.getMinBalance() + " ,max_balance = " + cond.getMaxBalance() : "") +
 			  (builder.isConsumeAmountChanged() ? " ,min_consume_amount = " + cond.getMinConsumeAmount() + " ,max_consume_amount = " + cond.getMaxConsumeAmount() : "") +
 			  (builder.isConsumeMoneyChanged() ? " ,min_consume_money = " + cond.getMinConsumeMoney() + " ,max_consume_money = " + cond.getMaxConsumeMoney() : "") +
+			  (builder.isRangeTypeChanged() ? " ,range_type = " + cond.getRangeType().getVal() : "") +
+			  (builder.isRangeChanged() ? " ,begin_date = '" + cond.getRange().getOnDutyFormat() + "' ,end_date = '" + cond.getRange().getOffDutyFormat() + "'" : "") +
 			  " WHERE id = " + cond.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -221,15 +225,31 @@ public class MemberCondDao {
 			if(dbCon.rs.getInt("member_type_id") != 0){
 				memberCond.setMemberType(new MemberType(dbCon.rs.getInt("member_type_id")));
 			}
-			long onDuty = 0;
-			if(dbCon.rs.getTimestamp("begin_date") != null){
-				onDuty = dbCon.rs.getTimestamp("begin_date").getTime();
+			
+			memberCond.setRangeType(RangeType.valueOf(dbCon.rs.getInt("range_type")));
+			
+			if(memberCond.getRangeType() == MemberCond.RangeType.LAST_1_MONTH){
+				memberCond.setRange(new DutyRange(System.currentTimeMillis() - 3600 * 24 * 30 * 1000, System.currentTimeMillis()));
+				
+				
+			}if(memberCond.getRangeType() == MemberCond.RangeType.LAST_2_MONTHS){
+				memberCond.setRange(new DutyRange(System.currentTimeMillis() - 3600 * 24 * 60 * 1000, System.currentTimeMillis()));
+				
+			}if(memberCond.getRangeType() == MemberCond.RangeType.LAST_3_MONTHS){
+				memberCond.setRange(new DutyRange(System.currentTimeMillis() - 3600 * 24 * 90 * 1000, System.currentTimeMillis()));
+				
+			}else if(memberCond.getRangeType() == MemberCond.RangeType.USER_DEFINE){
+				long onDuty = 0;
+				if(dbCon.rs.getTimestamp("begin_date") != null){
+					onDuty = dbCon.rs.getTimestamp("begin_date").getTime();
+				}
+				long offDuty = 0;
+				if(dbCon.rs.getTimestamp("end_date") != null){
+					offDuty = dbCon.rs.getTimestamp("end_date").getTime();
+				}
+				memberCond.setRange(new DutyRange(onDuty, offDuty));
 			}
-			long offDuty = 0;
-			if(dbCon.rs.getTimestamp("end_date") != null){
-				offDuty = dbCon.rs.getTimestamp("end_date").getTime();
-			}
-			memberCond.setRange(new DutyRange(onDuty, offDuty));
+			
 			memberCond.setMinBalance(dbCon.rs.getFloat("min_balance"));
 			memberCond.setMaxBalance(dbCon.rs.getFloat("max_balance"));
 			memberCond.setMinConsumeAmount(dbCon.rs.getInt("min_consume_amount"));

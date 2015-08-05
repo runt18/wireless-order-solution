@@ -69,6 +69,12 @@ public class TestMemberCond {
 				expected.setMinConsumeMoney(updateBuilder.build().getMinConsumeMoney());
 				expected.setMaxConsumeMoney(updateBuilder.build().getMaxConsumeMoney());
 			}
+			if(updateBuilder.isRangeTypeChanged()){
+				expected.setRangeType(updateBuilder.build().getRangeType());
+			}
+			if(updateBuilder.isRangeChanged()){
+				expected.setRange(updateBuilder.build().getRange());
+			}
 			actual = MemberCondDao.getById(mStaff, id);
 			compare(expected, actual);
 		}finally{
@@ -85,6 +91,7 @@ public class TestMemberCond {
 	
 	private void compare(MemberCond expected, MemberCond actual){
 		Assert.assertEquals("member condtion id", expected.getId(), actual.getId());
+		Assert.assertEquals("member condition range type", expected.getRangeType(), actual.getRangeType());
 		Assert.assertEquals("member condition range", expected.getRange(), actual.getRange());
 		Assert.assertEquals("member condtion restaurant id", mStaff.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("member condtion name", expected.getName(), actual.getName());
