@@ -8,6 +8,7 @@ public class MemberCond {
 	public static class InsertBuilder{
 		private final String name;
 		private MemberType memberType;
+		private RangeType rangeType;
 		private DutyRange range;
 		private float minConsumeMoney;
 		private float maxConsumeMoney;
@@ -20,6 +21,14 @@ public class MemberCond {
 			this.name = name;
 		}
 		
+		public InsertBuilder setRangeType(RangeType rangeType){
+			if(rangeType == RangeType.USER_DEFINE){
+				throw new IllegalArgumentException("不能设置自定义查询时间段");
+			}
+			this.rangeType = rangeType;
+			return this;
+		}
+		
 		public InsertBuilder setRange(String onDuty, String offDuty){
 			return setRange(DateUtil.parseDate(onDuty), DateUtil.parseDate(offDuty));
 		}
@@ -29,6 +38,7 @@ public class MemberCond {
 				throw new IllegalArgumentException("会员查询的结束时间不能小于开始时间");
 			}
 			this.range = new DutyRange(onDuty, offDuty);
+			this.rangeType = RangeType.USER_DEFINE;
 			return this;
 		}
 		
@@ -73,6 +83,7 @@ public class MemberCond {
 		private final int id;
 		private String name;
 		private MemberType memberType;
+		private RangeType rangeType;
 		private DutyRange range;
 		private float minConsumeMoney;
 		private float maxConsumeMoney;
@@ -103,6 +114,18 @@ public class MemberCond {
 			return this.memberType != null;
 		}
 		
+		public boolean isRangeTypeChanged(){
+			return this.rangeType != null;
+		}
+		
+		public UpdateBuilder setRangeType(RangeType rangeType){
+			if(rangeType == RangeType.USER_DEFINE){
+				throw new IllegalArgumentException("不能设置自定义查询时间段");
+			}
+			this.rangeType = rangeType;
+			return this;
+		}
+		
 		public UpdateBuilder setRange(String onDuty, String offDuty){
 			return setRange(DateUtil.parseDate(onDuty), DateUtil.parseDate(offDuty));
 		}
@@ -112,6 +135,7 @@ public class MemberCond {
 				throw new IllegalArgumentException("会员查询的结束时间不能小于开始时间");
 			}
 			this.range = new DutyRange(onDuty, offDuty);
+			this.rangeType = RangeType.USER_DEFINE;
 			return this;
 		}
 		
@@ -163,10 +187,44 @@ public class MemberCond {
 		}
 	}
 	
+	public static enum RangeType{
+		LAST_1_MONTH(1, "近1月"),
+		LAST_2_MONTHS(2, "近2月"),
+		LAST_3_MONTHS(3, "近3月"),
+		USER_DEFINE(4, "自定义");
+		
+		private final int val;
+		private String desc;
+		
+		RangeType(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		public static RangeType valueOf(int val){
+			for(RangeType type : values()){
+				if(type.val == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The range type(val = " + val + ") is invalid.");
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
+	
 	private int id;
 	private int restaurantId;
 	private String name;
 	private MemberType memberType;
+	private RangeType rangeType;
 	private DutyRange range;
 	private float minConsumeMoney;
 	private float maxConsumeMoney;
@@ -180,6 +238,7 @@ public class MemberCond {
 		setId(builder.id);
 		setName(builder.name);
 		setMemberType(builder.memberType);
+		setRangeType(builder.rangeType);
 		setRange(builder.range);
 		setMinConsumeMoney(builder.minConsumeMoney);
 		setMaxConsumeMoney(builder.maxConsumeMoney);
@@ -192,6 +251,7 @@ public class MemberCond {
 	private MemberCond(InsertBuilder builder){
 		setName(builder.name);
 		setMemberType(builder.memberType);
+		setRangeType(builder.rangeType);
 		setRange(builder.range);
 		setMinConsumeMoney(builder.minConsumeMoney);
 		setMaxConsumeMoney(builder.maxConsumeMoney);
@@ -254,6 +314,14 @@ public class MemberCond {
 	
 	public void setRange(DutyRange range) {
 		this.range = range;
+	}
+	
+	public RangeType getRangeType(){
+		return this.rangeType;
+	}
+	
+	public void setRangeType(RangeType type){
+		this.rangeType = type;
 	}
 	
 	public float getMinConsumeMoney() {
