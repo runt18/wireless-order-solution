@@ -133,7 +133,9 @@ public class MemberDao {
 		
 		public ExtraCond(MemberCond memberCond){
 			setRange(memberCond.getRange());
-			setMemberType(memberCond.getMemberType());
+			if(memberCond.getMemberType() != null){
+				setMemberType(memberCond.getMemberType());
+			}
 			betweenBalance(memberCond.getMinBalance(), memberCond.getMaxBalance());
 			betweenConsume(memberCond.getMinConsumeAmount(), memberCond.getMaxConsumeAmount());
 			betweenTotalConsume(memberCond.getMinConsumeMoney(), memberCond.getMaxConsumeMoney());

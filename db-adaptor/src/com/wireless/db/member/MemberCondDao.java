@@ -199,6 +199,23 @@ public class MemberCondDao {
 	
 	/**
 	 * Get the member condition to specific extra condition {@link ExtraCond}.
+	 * @param staff
+	 * @param extraCond
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<MemberCond> getByCond(Staff staff, ExtraCond extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the member condition to specific extra condition {@link ExtraCond}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -229,14 +246,14 @@ public class MemberCondDao {
 			memberCond.setRangeType(RangeType.valueOf(dbCon.rs.getInt("range_type")));
 			
 			if(memberCond.getRangeType() == MemberCond.RangeType.LAST_1_MONTH){
-				memberCond.setRange(new DutyRange(System.currentTimeMillis() - 3600 * 24 * 30 * 1000, System.currentTimeMillis()));
+				memberCond.setRange(new DutyRange(System.currentTimeMillis() - (long)3600 * 24 * 30 * 1000, System.currentTimeMillis()));
 				
 				
 			}if(memberCond.getRangeType() == MemberCond.RangeType.LAST_2_MONTHS){
-				memberCond.setRange(new DutyRange(System.currentTimeMillis() - 3600 * 24 * 60 * 1000, System.currentTimeMillis()));
+				memberCond.setRange(new DutyRange(System.currentTimeMillis() - (long)3600 * 24 * 60 * 1000, System.currentTimeMillis()));
 				
 			}if(memberCond.getRangeType() == MemberCond.RangeType.LAST_3_MONTHS){
-				memberCond.setRange(new DutyRange(System.currentTimeMillis() - 3600 * 24 * 90 * 1000, System.currentTimeMillis()));
+				memberCond.setRange(new DutyRange(System.currentTimeMillis() - (long)3600 * 24 * 90 * 1000, System.currentTimeMillis()));
 				
 			}else if(memberCond.getRangeType() == MemberCond.RangeType.USER_DEFINE){
 				long onDuty = 0;
