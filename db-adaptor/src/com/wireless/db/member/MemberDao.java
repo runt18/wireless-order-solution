@@ -129,6 +129,7 @@ public class MemberDao {
 		private DutyRange createRange;
 		private String weixinCard;
 		private String weixinSerial;
+		private int restaurantId;
 		
 		public ExtraCond(MemberCond memberCond){
 			setRange(memberCond.getRange());
@@ -144,6 +145,11 @@ public class MemberDao {
 		
 		public ExtraCond(){
 			
+		}
+		
+		private ExtraCond setRestaurantId(int restaurantId){
+			this.restaurantId = restaurantId;
+			return this;
 		}
 		
 		public ExtraCond setId(int id){
@@ -370,6 +376,7 @@ public class MemberDao {
 				String sql;
 				sql = " SELECT member_id FROM " + Params.dbName + ".member_operation_history " +
 					  " WHERE 1 = 1 " +
+					  " AND restaurant_id = " + restaurantId +
 					  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
 					  " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 					  " GROUP BY member_id " +
@@ -789,7 +796,7 @@ public class MemberDao {
 	 */
 	public static List<Member> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		if(extraCond != null){
-			return MemberDao.getByCond(dbCon, staff, extraCond.toString(), orderClause);
+			return MemberDao.getByCond(dbCon, staff, extraCond.setRestaurantId(staff.getRestaurantId()).toString(), orderClause);
 		}else{
 			return MemberDao.getByCond(dbCon, staff, "", orderClause);
 		}

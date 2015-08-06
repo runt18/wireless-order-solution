@@ -274,7 +274,6 @@ public class PromotionDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			<li>throws if the promotion status does NOT belong to 'CREATED'
 	 * 			<li>throws if the promotion to update does NOT exist
 	 * 			<li>throws if the promotion's start exceed now if date range changed
 	 * @throws IOException 
@@ -285,19 +284,19 @@ public class PromotionDao {
 		Promotion promotion = builder.build();
 		
 		Promotion original = getById(dbCon, staff, promotion.getId());
-		if(original.getStatus() != Promotion.Status.CREATED){
-			throw new BusinessException("只有【已创建】状态的活动才能修改", PromotionError.PROMOTION_UPDATE_NOT_ALLOW);
-		}
+//		if(original.getStatus() != Promotion.Status.CREATED){
+//			throw new BusinessException("只有【已创建】状态的活动才能修改", PromotionError.PROMOTION_UPDATE_NOT_ALLOW);
+//		}
 
 		//Update the date range to promotion.
-		if(builder.isRangeChanged()){
-			//Check to see whether the start date exceed now.
-			Calendar c = Calendar.getInstance();
-			c.add(Calendar.DAY_OF_YEAR, -1);
-			if(promotion.getDateRange().getOpeningTime() < c.getTimeInMillis()){
-				throw new BusinessException(PromotionError.PROMOTION_START_DATE_EXCEED_NOW);
-			}
-		}
+//		if(builder.isRangeChanged()){
+//			//Check to see whether the start date exceed now.
+//			Calendar c = Calendar.getInstance();
+//			c.add(Calendar.DAY_OF_YEAR, -1);
+//			if(promotion.getDateRange().getOpeningTime() < c.getTimeInMillis()){
+//				throw new BusinessException(PromotionError.PROMOTION_START_DATE_EXCEED_NOW);
+//			}
+//		}
 		
 		//Update the coupon type.
 		if(builder.isCouponTypeChanged() && original.getRule() != Promotion.Rule.DISPLAY_ONLY){
