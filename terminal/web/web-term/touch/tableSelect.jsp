@@ -806,11 +806,11 @@
 			预订列表
 		</span>
 	</div>
-    <table style="width: 900px;">
+    <table style="width: 1024px;">
     	<tr>
     		<td style="width:10%;">
 			    <div style="padding: 0 10px" align="left" >
-					<fieldset data-role="controlgroup" data-type="horizontal" data-theme="b" style="width:330px;">
+					<fieldset data-role="controlgroup" data-type="horizontal" data-theme="b" style="width:400px;">
 						<label>
 				        	<input type="radio" name="bookDateType" data-type="bookDate_all" value="" checked="checked" onclick="ts.searchBookList()">全部
 				        </label>
@@ -823,16 +823,25 @@
 				        <label>
 				        	<input type="radio" name="bookDateType" id="bookDate_afterday" value="" onclick="ts.searchBookList()">后天
 				        </label>
+				        <label>
+				        	<input type="radio" name="bookDateType" id="bookDate_conditionday" value="" onclick="ts.openConditionDay()">自定义
+				        </label>				        
 				    </fieldset>
 			    </div>	    		
     		</td>
+    		<td id="conditionDayBegin" style="width:15%;display: none">
+    			<input type="date" data-role="datebox" id="conditionDayBeginDay" data-type="neither" data-options='{"mode": "datebox"}' style="font-size: 12px;line-height: 30px;">
+    		</td>
+    		<td id="conditionDayEnd" style="width:15%;display: none;">
+    			<input type="date" data-role="datebox" id="conditionDayEndDay" data-type="neither" data-options='{"mode": "datebox"}' style="font-size: 12px;line-height: 30px;">
+    		</td>    		
     		<td style="width:15%;">
     			<input type="text" id="searchBookPerson" placeholder="姓名">
     		</td>
     		<td style="width:15%;">
     			<input type="text" id="searchBookPhone" placeholder="电话" onkeypress="intOnly()">
     		</td>
-    		<td style="line-height: 20px;padding: 0 3px;width:20%;">
+    		<td style="line-height: 20px;padding: 0 3px;width:9%;">
 				<select  id="searchBookStatus" onchange="ts.searchBookList()" style="font-size: 20px;">
 					<option value="-1">订单状态</option>
 					<option value="1">待确认</option>

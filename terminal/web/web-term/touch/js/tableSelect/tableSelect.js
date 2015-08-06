@@ -319,6 +319,20 @@ $(function(){
 	//刷新微信预订单
 	ts.refreshWeixinBook();
 	
+	//用户自定义日期
+	$('#conditionDayBeginDay').bind('change', function(){
+		console.log(1111)
+		if($('#conditionDayBeginDay').val() && $('#conditionDayEndDay').val() ){
+			ts.searchBookList({begin:$('#conditionDayBeginDay').val(), end:$('#conditionDayEndDay').val()})
+		}
+	});	
+	$('#conditionDayEndDay').bind('change', function(){
+		if($('#conditionDayBeginDay').val() && $('#conditionDayEndDay').val() ){
+			console.log($('#conditionDayEndDay').val())
+			ts.searchBookList({begin:$('#conditionDayBeginDay').val(), end:$('#conditionDayEndDay').val()})
+		}
+	});		
+	
 });	
 
 
@@ -3444,19 +3458,31 @@ ts.loadBookListData = function(data){
 /**
  * 查询列表
  */
-ts.searchBookList = function(){
+ts.searchBookList = function(c){
 	Util.LM.show();
 	
 	var name = $('#searchBookPerson').val();
 	var phone = $('#searchBookPhone').val();
 	var status = $('#searchBookStatus').val();
 	var bookDate = $('input[name=bookDateType]:checked').val();
+	var begin, end;
+	
+	if(c && c.begin){
+		begin = c.begin;
+		end = c.end;
+	}else{
+		$('#conditionDayBegin').hide();
+		$('#conditionDayEnd').hide();
+	}
+	
 	$.post('../QueryBook.do', {
 		dataSource : 'normal',
 		name : name,
 		phone : phone,
 		status : status,
 		bookDate : bookDate,
+		beginDate : begin,
+		endDate : end, 
 		tableId : ts.bookTable4Search || ""
 	}, function(data){
 		Util.LM.hide();
@@ -3468,6 +3494,17 @@ ts.searchBookList = function(){
 		
 	}, 'json');	
 }
+
+/**
+ * 打开日期条件筛选
+ */
+ts.openConditionDay = function(){
+	$('#conditionDayBeginDay').val('');
+	$('#conditionDayEndDay').val('');
+	$('#conditionDayBegin').show();
+	$('#conditionDayEnd').show();
+}
+
 
 /**
  * 进入订单列表Entry
