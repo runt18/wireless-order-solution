@@ -1,4 +1,193 @@
 
+//var active_memberList = ''; 
+//var memberBasicGrid;
+var couponTypeId = 0, promotionType = 4; 
+var promotionTree, operatePromotTypeWin, winUnhide = true; //执行关闭操作时不验证数据
+var promotionDateTemplet = '<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue; font-szie:12px;font-weight:bold">活动日期 : <font color="red">{beginDate}</font>&nbsp;至&nbsp;<font color="red">{endDate}</font></div>';
+function buildPreviewHead(){
+	var head = '';
+	if(Ext.getCmp('active_title').getValue()){
+		head +=  '<div style="text-align:center; font-size: 30px; font-weight: bold; word-wrap:break-word; color: #D2691E;">' + Ext.getCmp('active_title').getValue() + '</div>';
+	}else{
+		head +=  '<div style="text-align:center; font-size: 30px; font-weight: bold; word-wrap:break-word; color: #D2691E;">活动标题</div>';
+	}
+	
+	if(Ext.getCmp('active_beginDate').getValue() && Ext.getCmp('active_endDate').getValue()){
+		head += '<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue; font-szie:12px;font-weight:bold">活动日期 : <font color="red">'+ Ext.getCmp('active_beginDate').getValue().format('Y-m-d') +'</font>&nbsp;至&nbsp;<font color="red">'+ Ext.getCmp('active_endDate').getValue().format('Y-m-d') +'</font></div>';
+	}
+	
+//	if(Ext.getCmp('active_point').isValid()){
+		head += promotionRule(promotionType, Ext.getCmp('active_point').getValue());
+//	}
+	return head;
+}
+var promotion_uploadMask = new Ext.LoadMask(document.body, {
+	msg : '正在保存活动...'
+});
+var finishPromotion = function(){
+	
+	
+//	if(operatePromotTypeWin.oriented == 2 && !active_memberList){
+//		Ext.example.msg('提示', '请选择参与活动的会员');
+//		return false;
+//	}else if(operatePromotTypeWin.oriented == 1){
+//		active_memberList = '';
+//	}
+	
+	var params = {};
+	var title = Ext.getCmp('active_title');
+	var beginDate = Ext.getCmp('active_beginDate');
+	var endDate = Ext.getCmp('active_endDate');
+	var point = Ext.getCmp('active_point');
+	var couponName = Ext.getCmp('active_couponName');
+	var price = Ext.getCmp('active_price');
+	var expiredDate= Ext.getCmp('active_couponExpiredDate');
+	var editBody = Ext.getCmp('secondStep_edit');
+	var entire = Ext.getCmp('secondStepEastBody');
+	
+	if(operatePromotTypeWin.otype == 'insert'){
+		params.dataSource = 'insert';
+		//面向全员
+		params.oriented = 1;
+	}else{
+		params.dataSource = 'update';
+		params.id = operatePromotTypeWin.pId;
+		params.cId = couponTypeId;
+	}
+	
+	params.pRule = promotionType;
+	params.couponName = couponName.getValue();
+	params.price = price.getValue();
+	params.expiredDate = expiredDate.getValue().format('Y-m-d');
+	params.image = operatePromotTypeWin.ossId;
+	params.title = title.getValue();
+	params.beginDate = beginDate.getValue().format('Y-m-d');
+	params.endDate = endDate.getValue().format('Y-m-d');
+	params.point = point.getValue();
+	//params.members = active_memberList;
+	
+	params.body = editBody.getValue();	
+	params.entire = entire.body.dom.innerHTML;
+
+	promotion_uploadMask.show();
+	Ext.Ajax.request({
+		url : '../../OperatePromotion.do',
+		params : params,
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			promotion_uploadMask.hide();
+			if(jr.success){
+				operatePromotTypeWin.hide();
+				promotionTree.getRootNode().reload();
+				Ext.example.msg(jr.title, jr.msg);
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+		},
+		fialure : function(res, opt){
+			wx.lm.hide();
+			Ext.ux.showMsg(res.responseText);
+		}
+	});	
+	
+};
+
+function fnValidSecondSteps(){
+	var title = '提示';
+	if(!Ext.getCmp('active_title').isValid()){
+		Ext.example.msg(title, '请填写活动标题');
+		return false;
+	}
+	
+	if(!Ext.getCmp('active_endDate').isValid()){
+		Ext.example.msg(title, '请填写活动时间');
+		return false;
+	}		
+	
+	if((Ext.getCmp('active_beginDate').getValue().getTime() + 86000000) < (new Date()).getTime()){
+		Ext.example.msg(title, '活动开始时间要大于当前时间');
+		return false;
+	}
+	
+	if((Ext.getCmp('active_endDate').getValue().getTime() + 86000000) < (new Date()).getTime()){
+		Ext.example.msg(title, '活动结束时间要大于当前时间');
+		return false;
+	}
+	
+	if((promotionType == 3 || promotionType == 4) && !Ext.getCmp('active_point').isValid()){
+		Ext.example.msg(title, '请填写积分条件');
+		return false;
+	}
+	
+	if(promotionType != 1 && !Ext.getCmp('active_couponName').isValid()){
+		Ext.example.msg(title, '请填写优惠劵名称');
+		return false;
+	}
+	
+	if(promotionType != 1 && !Ext.getCmp('active_couponExpiredDate').isValid()){
+		Ext.example.msg(title, '请填写优惠劵到期时间');
+		return false;
+	}
+	
+	if(promotionType != 1 && (Ext.getCmp('active_couponExpiredDate').getValue().getTime() + 86000000) < (new Date()).getTime()){
+		Ext.example.msg(title, '优惠劵有效期要大于当前时间');
+		return false;
+	}	
+	
+	return true;
+	
+}
+
+$(function (){
+    $("#wizard").steps({
+        headerTag: "span",
+        bodyTag: "div",
+        transitionEffect: "slideLeft",
+        labels: {
+            current: "current step:",
+            pagination: "Pagination",
+            finish: "完成",
+            next: "下一步",
+            previous: "上一步",
+            loading: "加载中 ..."
+        },
+        onStepChanged: function (event, currentIndex, priorIndex) { 
+        	if(currentIndex == 1){
+        		Ext.getCmp('active_title').focus(true, 100);
+        		Ext.getCmp('btnSecondStepEastBody').handler();
+        	}
+//        	else if(currentIndex == 2){
+//        		if(operatePromotTypeWin.oriented == 2){
+//        			
+//        			
+//        			Ext.getCmp('active_member_btnHeightSearch').handler();	
+//        			if(memberBasicGrid){
+//        	    		memberBasicGrid.syncSize(); //强制计算高度
+//        	    		memberBasicGrid.doLayout();//重新布局            				
+//        			}
+// 
+//    	    		
+//    	    		Ext.getCmp('threeStepEastBody').body.update(buildPreviewHead()+'<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">'+Ext.getCmp('secondStep_edit').getValue()+'</div>');
+//        		}
+//        		Ext.getCmp('threeStepEastBody').body.update(buildPreviewHead()+'<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">'+Ext.getCmp('secondStep_edit').getValue()+'</div>');
+//        		
+//        	}
+        },
+        onStepChanging : function(event, currentIndex, newIndex){
+        	if(currentIndex == 1 && newIndex == 2 && winUnhide){
+        		return fnValidSecondSteps();
+        	}else if(currentIndex == 1 && newIndex == 0 && operatePromotTypeWin.otype == 'update'){
+        		Ext.example.msg('提示', '不能修改活动类型');
+        		return false;
+        	}else{
+        		return true;
+        	}
+        },
+        onFinished: function(event, currentIndex, newIndex){
+        	return finishPromotion();
+        }
+    });
+});
 
 /**
  * 初始化优惠活动编辑
@@ -17,7 +206,7 @@ function initCouponTypeWin(c){
 			bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 			contentEl : 'divActiveInsert',
 			listeners : {
-				beforehide : function(thiz){
+/*				beforehide : function(thiz){
 					winUnhide = false;
 					//先让操作跳到第三部再关闭, 否则样式有误
 					var result = false;
@@ -41,7 +230,7 @@ function initCouponTypeWin(c){
 					}
 					
 					return result;
-				},
+				},*/
 				hide : function(){
 					$('#span_firstModel').click();
 					Ext.getCmp('active_title').setValue();
@@ -65,19 +254,19 @@ function initCouponTypeWin(c){
 					Ext.getCmp('secondStepEastBody').body.update('');
 					operatePromotTypeWin.image = '';
 					
-					Ext.getCmp('active_memberBasicGrid').getStore().removeAll();
-					Ext.getCmp('active_memberTypeCombo').setValue(-1);
-					
-					Ext.getCmp('active_textTotalMemberCost').setValue();
-					Ext.getCmp('active_textTotalMemberCostCount').setValue();
-					
-					active_memberList = '';
+//					Ext.getCmp('active_memberBasicGrid').getStore().removeAll();
+//					Ext.getCmp('active_memberTypeCombo').setValue(-1);
+//					
+//					Ext.getCmp('active_textTotalMemberCost').setValue();
+//					Ext.getCmp('active_textTotalMemberCostCount').setValue();
+//					
+//					active_memberList = '';
+//					Ext.getCmp('active_member_btnCommonSearch').handler({noSearch:true});
+//					$("#chkSetWelcome").removeAttr("checked");
 					
 					operatePromotTypeWin.otype = '';
 					operatePromotTypeWin.pId = '';
 					operatePromotTypeWin.oriented = 1;
-					Ext.getCmp('active_member_btnCommonSearch').handler({noSearch:true});
-					$("#chkSetWelcome").removeAttr("checked");
 					
 					winUnhide = true;
 					
@@ -127,6 +316,7 @@ function changeCouponModel(type){
 //1表示无优惠劵纯展示; 2表示无条件领取优惠劵
 function choosePromotionModel(){
 	if(promotionType == 1){
+		//纯展示
 		Ext.getCmp('active_secendStep2CouponImg').hide();
 		Ext.getCmp('active_secendStep2CouponDetail').hide();
 		Ext.getCmp('active_secendStep2SelectCoupon').hide();
@@ -135,7 +325,9 @@ function choosePromotionModel(){
 		Ext.getCmp('active_point').getEl().up('.x-form-item').setDisplayed(false);
 		Ext.getCmp('active_pointLastText').hide();
 		Ext.getCmp('hide_activeOccupy').show();
+		
 	}else if(promotionType == 2){
+		//优惠券
 		Ext.getCmp('active_secendStep2CouponImg').show();
 		Ext.getCmp('active_secendStep2CouponDetail').show();
 		Ext.getCmp('active_secendStep2SelectCoupon').show();
@@ -145,24 +337,25 @@ function choosePromotionModel(){
 		Ext.getCmp('active_pointLastText').hide();
 		Ext.getCmp('hide_activeOccupy').show();
 		Ext.getCmp('secondStep_edit').setHeight(325);
-	}else{
-		Ext.getCmp('active_secendStep2CouponImg').show();
-		Ext.getCmp('active_secendStep2CouponDetail').show();
-		Ext.getCmp('active_secendStep2SelectCoupon').show();
-		Ext.getCmp('active_point').show();
-		Ext.getCmp('active_pointLastText').show();
-		Ext.getCmp('active_point').getEl().up('.x-form-item').setDisplayed(true);	
-		Ext.getCmp('hide_activeOccupy').hide();
-		Ext.getCmp('secondStep_edit').setHeight(325);
-		
-		if(promotionType == 3){
-			Ext.getCmp('active_point').label.dom.innerHTML = '活动规则: 单次消费积分满'
-		}else if(promotionType == 4){
-			Ext.getCmp('active_point').label.dom.innerHTML = '活动规则: 累计积分满'
-		}
-		
-		
 	}
+//	else{
+//		Ext.getCmp('active_secendStep2CouponImg').show();
+//		Ext.getCmp('active_secendStep2CouponDetail').show();
+//		Ext.getCmp('active_secendStep2SelectCoupon').show();
+//		Ext.getCmp('active_point').show();
+//		Ext.getCmp('active_pointLastText').show();
+//		Ext.getCmp('active_point').getEl().up('.x-form-item').setDisplayed(true);	
+//		Ext.getCmp('hide_activeOccupy').hide();
+//		Ext.getCmp('secondStep_edit').setHeight(325);
+//		
+//		if(promotionType == 3){
+//			Ext.getCmp('active_point').label.dom.innerHTML = '活动规则: 单次消费积分满';
+//		}else if(promotionType == 4){
+//			Ext.getCmp('active_point').label.dom.innerHTML = '活动规则: 累计积分满';
+//		}
+//		
+//		
+//	}
 	Ext.getCmp('active_secendStepPanel').doLayout();
 }
 
@@ -177,11 +370,11 @@ function selectPromotionModel(thiz, type){
 function promotionRule(pType, point){
 	if(point){
 		var rule = '';
-		if(pType == 3){
-			rule = '活动规则 : 单次消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
-		}else if(pType == 4){
-			rule = '活动规则 : 累计消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
-		}
+//		if(pType == 3){
+//			rule = '活动规则 : 单次消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
+//		}else if(pType == 4){
+//			rule = '活动规则 : 累计消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
+//		}
 		return '<div style="margin: 10px 10px 10px 10px;color:LightSkyBlue; font-szie:14px;font-weight:bold;">'+ rule +'</div>';	
 	}else{
 		return '';
@@ -213,45 +406,45 @@ function getPromotionBodyById(id){
 	});
 }
 
-function fnPublishPromotion(){
-	var sn = Ext.ux.getSelNode(promotionTree);
-	Ext.Ajax.request({
-		url : '../../OperatePromotion.do',
-		params : {promotionId : sn.attributes.id, dataSource : 'publish'},
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
-			if(jr.success){
-				Ext.example.msg(jr.title, jr.msg);
-				promotionTree.getRootNode().reload();
-			}else{
-				Ext.ux.showMsg(jr);
-			}
-		},
-		failure : function(res, opt){
-			Ext.ux.showMsg(Ext.decode(res.responseText));
-		}
-	});
-}
+//function fnPublishPromotion(){
+//	var sn = Ext.ux.getSelNode(promotionTree);
+//	Ext.Ajax.request({
+//		url : '../../OperatePromotion.do',
+//		params : {promotionId : sn.attributes.id, dataSource : 'publish'},
+//		success : function(res, opt){
+//			var jr = Ext.decode(res.responseText);
+//			if(jr.success){
+//				Ext.example.msg(jr.title, jr.msg);
+//				promotionTree.getRootNode().reload();
+//			}else{
+//				Ext.ux.showMsg(jr);
+//			}
+//		},
+//		failure : function(res, opt){
+//			Ext.ux.showMsg(Ext.decode(res.responseText));
+//		}
+//	});
+//}
 
-function fnCancelPublishPromotion(){
-	var sn = Ext.ux.getSelNode(promotionTree);
-	Ext.Ajax.request({
-		url : '../../OperatePromotion.do',
-		params : {promotionId : sn.attributes.id, dataSource : 'cancelPublish'},
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
-			if(jr.success){
-				Ext.example.msg(jr.title, jr.msg);
-				promotionTree.getRootNode().reload();
-			}else{
-				Ext.ux.showMsg(jr);
-			}
-		},
-		failure : function(res, opt){
-			Ext.ux.showMsg(Ext.decode(res.responseText));
-		}
-	});
-}
+//function fnCancelPublishPromotion(){
+//	var sn = Ext.ux.getSelNode(promotionTree);
+//	Ext.Ajax.request({
+//		url : '../../OperatePromotion.do',
+//		params : {promotionId : sn.attributes.id, dataSource : 'cancelPublish'},
+//		success : function(res, opt){
+//			var jr = Ext.decode(res.responseText);
+//			if(jr.success){
+//				Ext.example.msg(jr.title, jr.msg);
+//				promotionTree.getRootNode().reload();
+//			}else{
+//				Ext.ux.showMsg(jr);
+//			}
+//		},
+//		failure : function(res, opt){
+//			Ext.ux.showMsg(Ext.decode(res.responseText));
+//		}
+//	});
+//}
 
 function fnDeletePromotionPromotion(){
 	var node = Ext.ux.getSelNode(promotionTree);
@@ -286,38 +479,38 @@ function fnDeletePromotionPromotion(){
 	);
 }
 
-function fnFinishPromotion(){
-	var node = Ext.ux.getSelNode(promotionTree);
-	if (!node || node.attributes.id == -1) {
-		Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
-		return;
-	}	
-	Ext.Msg.confirm(
-		'提示',
-		'是否结束活动:&nbsp;<font color="red">' + node.text + '</font>',
-		function(e){
-			if(e == 'yes'){
-				Ext.Ajax.request({
-					url : '../../OperatePromotion.do',
-					params : {promotionId : node.attributes.id, dataSource : 'finish'},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						if(jr.success){
-							Ext.example.msg(jr.title, jr.msg);
-							promotionTree.getRootNode().reload();
-						}else{
-							Ext.ux.showMsg(jr);
-						}
-					},
-					failure : function(res, opt){
-						Ext.ux.showMsg(Ext.decode(res.responseText));
-					}
-				});
-			}
-		},
-		this
-	);
-}
+//function fnFinishPromotion(){
+//	var node = Ext.ux.getSelNode(promotionTree);
+//	if (!node || node.attributes.id == -1) {
+//		Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
+//		return;
+//	}	
+//	Ext.Msg.confirm(
+//		'提示',
+//		'是否结束活动:&nbsp;<font color="red">' + node.text + '</font>',
+//		function(e){
+//			if(e == 'yes'){
+//				Ext.Ajax.request({
+//					url : '../../OperatePromotion.do',
+//					params : {promotionId : node.attributes.id, dataSource : 'finish'},
+//					success : function(res, opt){
+//						var jr = Ext.decode(res.responseText);
+//						if(jr.success){
+//							Ext.example.msg(jr.title, jr.msg);
+//							promotionTree.getRootNode().reload();
+//						}else{
+//							Ext.ux.showMsg(jr);
+//						}
+//					},
+//					failure : function(res, opt){
+//						Ext.ux.showMsg(Ext.decode(res.responseText));
+//					}
+//				});
+//			}
+//		},
+//		this
+//	);
+//}
 
 function operatePromotionData(data){
 	var title = Ext.getCmp('active_title');
@@ -327,7 +520,7 @@ function operatePromotionData(data){
 	var couponName = Ext.getCmp('active_couponName');
 	var price = Ext.getCmp('active_price');
 	var expiredDate= Ext.getCmp('active_couponExpiredDate');
-	var imgBox = Ext.getCmp('p_couponImg');
+	//var imgBox = Ext.getCmp('p_couponImg');
 	var editBody = Ext.getCmp('secondStep_edit');
 	
 	title.setValue(data.title);
@@ -346,32 +539,32 @@ function operatePromotionData(data){
 		Ext.getCmp('couponTypeBox').setImg(data.coupon.ossImage?data.coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg');
 	}
 	
-	if(data.oriented == 1){
-		Ext.getCmp('rdoSendAllMember').setValue(true);
-	}else{
-		Ext.getCmp('rdoSendSpecificMember').setValue(true);
-	}
+//	if(data.oriented == 1){
+//		Ext.getCmp('rdoSendAllMember').setValue(true);
+//	}else{
+//		Ext.getCmp('rdoSendSpecificMember').setValue(true);
+//	}
 	operatePromotTypeWin.oriented = data.oriented;
 	
-	if(data.members.length > 0){
-		var gs = Ext.getCmp('active_memberBasicGrid').getStore();
-		gs.on('load', function(store, records, options){
-			active_memberList = '';
-			//选中全部会员时, 不用传
-			if(operatePromotTypeWin.oriented != 1){
-				for (var i = 0; i < records.length; i++) {
-					if(i > 0){
-						active_memberList += ",";
-					}
-					active_memberList += records[i].get('id');
-				}				
-			}
-		});		
-		gs.loadData({
-			totalProperty : data.members.length,
-			root : data.members.slice(0, 200)								
-		});	
-	}
+//	if(data.members.length > 0){
+//		var gs = Ext.getCmp('active_memberBasicGrid').getStore();
+//		gs.on('load', function(store, records, options){
+//			active_memberList = '';
+//			//选中全部会员时, 不用传
+//			if(operatePromotTypeWin.oriented != 1){
+//				for (var i = 0; i < records.length; i++) {
+//					if(i > 0){
+//						active_memberList += ",";
+//					}
+//					active_memberList += records[i].get('id');
+//				}				
+//			}
+//		});		
+//		gs.loadData({
+//			totalProperty : data.members.length,
+//			root : data.members.slice(0, 200)								
+//		});	
+//	}
 	
 
 }
@@ -389,13 +582,13 @@ function fnUpdatePromotion(){
 	wx.lm.show();
 	Ext.Ajax.request({
 		url : '../../OperatePromotion.do',
-		params : {promotionId : node.attributes.id, dataSource : 'getById'},
+		params : { promotionId : node.attributes.id, dataSource : 'getPromotion' },
 		success : function(res, opt){
 			wx.lm.hide();
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
 				Ext.get('divActiveInsert').show();
-				operatePromotionData(jr.other);
+				operatePromotionData(jr.root[0]);
 				operatePromotTypeWin.show();	
 				$("#wizard").steps("next");
 			}
@@ -408,32 +601,30 @@ function fnUpdatePromotion(){
 	
 }
 
-function fnCheckHaveWelcome(){
-	$.ajax({
-		url : '../../OperatePromotion.do',
-		type : 'post',
-		async:false,
-		data : {dataSource : 'hasWelcomePage'},
-		success : function(jr, status, xhr){
-			if(jr.root.length > 0){
-				$('#divSetWelcome').hide();
-			}else{
-				$('#divSetWelcome').show();
-			}
-		},
-		error : function(request, status, err){
-			Ext.ux.showMsg({success : false, msg : '请求失败, 请刷新页面'});
-		}
-	}); 
-}
+//function fnCheckHaveWelcome(){
+//	$.ajax({
+//		url : '../../OperatePromotion.do',
+//		type : 'post',
+//		async: false,
+//		data : {dataSource : 'hasWelcomePage'},
+//		success : function(jr, status, xhr){
+//			if(jr.root.length > 0){
+//				$('#divSetWelcome').hide();
+//			}else{
+//				$('#divSetWelcome').show();
+//			}
+//		},
+//		error : function(request, status, err){
+//			Ext.ux.showMsg({success : false, msg : '请求失败, 请刷新页面'});
+//		}
+//	}); 
+//}
 
 var promotionPreviewPanel, memberCountGrid;
 var sendCouponWin, couponViewBillWin;
 var member_searchType = false;
-var bar = {treeId : 'promotionTree',operateTree:Ext.ux.operateTree_promotion, mult : [{status : 1, option :[{name : '发布', fn : "fnPublishPromotion()"}, {name : '修改', fn : "fnUpdatePromotion()"}, {name : '删除', fn : "fnDeletePromotionPromotion()"}]}, 
-											{status : 2, option :[{name : '撤销', fn : "fnCancelPublishPromotion()"}]},
-											{status : 3, option :[{name : '结束', fn : "fnFinishPromotion()"}]},
-											{status : 4, option :[{name : '删除', fn : "fnDeletePromotionPromotion()"}]} ]};
+var bar = {treeId : 'promotionTree', option : [{name : '修改', fn : "fnUpdatePromotion()"}, {name : '删除', fn : "fnDeletePromotionPromotion()"}]};
+
 Ext.onReady(function() {
 	initCouponTypeWin({type:'insert'});
 	promotionTree = new Ext.tree.TreePanel({
@@ -510,7 +701,7 @@ Ext.onReady(function() {
 					}*/
 					promotionTree.getRootNode().getUI().show();
 				}
-				fnCheckHaveWelcome();
+				//fnCheckHaveWelcome();
 			},
 			click : function(e){
 				getPromotionBodyById(e.attributes.id);
@@ -518,29 +709,29 @@ Ext.onReady(function() {
 		}
 	});
 	
-	var coupon_dateCombo = new Ext.form.ComboBox({
-		xtype : 'combo',
-		id : 'coupon_statusCombo',
-		forceSelection : true,
-		width : 100,
-		store : new Ext.data.SimpleStore({
-			fields : ['value', 'text']
-		}),
-		valueField : 'value',
-		displayField : 'text',
-		typeAhead : true,
-		mode : 'local',
-		triggerAction : 'all',
-		selectOnFocus : true,
-		listeners : {
-			render : function(thiz){
-				thiz.store.loadData([[1,'已发放'], [2,'已使用'], [3,'已过期']]);					
-			},
-			select : function(thiz, record, index){
-				Ext.getCmp('btnSearchCoupon').handler();
-			}
-		}
-	});
+//	var coupon_dateCombo = new Ext.form.ComboBox({
+//		xtype : 'combo',
+//		id : 'coupon_statusCombo',
+//		forceSelection : true,
+//		width : 100,
+//		store : new Ext.data.SimpleStore({
+//			fields : ['value', 'text']
+//		}),
+//		valueField : 'value',
+//		displayField : 'text',
+//		typeAhead : true,
+//		mode : 'local',
+//		triggerAction : 'all',
+//		selectOnFocus : true,
+//		listeners : {
+//			render : function(thiz){
+//				thiz.store.loadData([[1,'已发放'], [2,'已使用'], [3,'已过期']]);					
+//			},
+//			select : function(thiz, record, index){
+//				Ext.getCmp('btnSearchCoupon').handler();
+//			}
+//		}
+//	});
 	
 	promotionPreviewPanel = new Ext.Panel({
 		layout : 'border',
@@ -913,7 +1104,7 @@ Ext.onReady(function() {
 								inputValue : 1,
 								hideLabel : true,
 								checked : true,
-								boxLabel : '十元券&nbsp;&nbsp;',
+								boxLabel : '10元券&nbsp;&nbsp;',
 								listeners : {
 									render : function(e){
 										e.getEl().dom.parentNode.style.paddingLeft = '10px';
@@ -932,7 +1123,7 @@ Ext.onReady(function() {
 								name : 'radioActiveType',
 								inputValue : 2,
 								hideLabel : true,
-								boxLabel : '二十元券&nbsp;&nbsp;',
+								boxLabel : '20元券&nbsp;&nbsp;',
 								listeners : {
 									render : function(e){
 										e.getEl().dom.parentNode.style.paddingLeft = '10px';
@@ -984,7 +1175,7 @@ Ext.onReady(function() {
 							id : 'active_couponName',
 							xtype : 'textfield',
 							fieldLabel : '优惠劵名称',
-							value : '十元优惠劵',
+							value : '10元优惠劵',
 							allowBlank : false
 						}]
 					},{
@@ -1048,416 +1239,416 @@ Ext.onReady(function() {
 		}]
 	});	
 	
-	var active_member_beginDate = new Ext.form.DateField({
-		xtype : 'datefield',	
-		id : 'active_dateSearchDateBegin',
-		format : 'Y-m-d',
-		width : 100,
-		maxValue : new Date(),
-		readOnly : false
-	});
-	var active_member_endDate = new Ext.form.DateField({
-		xtype : 'datefield',
-		id : 'active_dateSearchDateEnd',
-		format : 'Y-m-d',
-		width : 100,
-		maxValue : new Date(),
-		readOnly : false
-	});
-	var active_member_dateCombo = Ext.ux.createDateCombo({
-		id : 'active_dateSearchDateCombo',
-		width : 75,
-		data : [[3, '近一个月'], [4, '近三个月'], [9, '近半年'], [10, '无限期']],
-		beginDate : active_member_beginDate,
-		endDate : active_member_endDate,
-		callback : function(){
-/*			if(member_searchType){
-				Ext.getCmp('active_btnSearchMember').handler();
-			}*/
-		}
-	});	
-	var active_memberBasicGridExcavateMemberTbar = new Ext.Toolbar({
-		hidden : true,
-		height : 28,
-		items : [
-			{
-				text : '活跃会员',
-				iconCls : 'btn_add',
-				handler : function(e){
+//	var active_member_beginDate = new Ext.form.DateField({
+//		xtype : 'datefield',	
+//		id : 'active_dateSearchDateBegin',
+//		format : 'Y-m-d',
+//		width : 100,
+//		maxValue : new Date(),
+//		readOnly : false
+//	});
+//	var active_member_endDate = new Ext.form.DateField({
+//		xtype : 'datefield',
+//		id : 'active_dateSearchDateEnd',
+//		format : 'Y-m-d',
+//		width : 100,
+//		maxValue : new Date(),
+//		readOnly : false
+//	});
+//	var active_member_dateCombo = Ext.ux.createDateCombo({
+//		id : 'active_dateSearchDateCombo',
+//		width : 75,
+//		data : [[3, '近一个月'], [4, '近三个月'], [9, '近半年'], [10, '无限期']],
+//		beginDate : active_member_beginDate,
+//		endDate : active_member_endDate,
+//		callback : function(){
+///*			if(member_searchType){
+//				Ext.getCmp('active_btnSearchMember').handler();
+//			}*/
+//		}
+//	});	
+//	var active_memberBasicGridExcavateMemberTbar = new Ext.Toolbar({
+//		hidden : true,
+//		height : 28,
+//		items : [
+//			{
+//				text : '活跃会员',
+//				iconCls : 'btn_add',
+//				handler : function(e){
+////					Ext.getCmp('active_member_btnHeightSearch').handler();
+//					var gs = memberBasicGrid.getStore();
+//					Ext.Ajax.request({
+//						url : '../../QueryMember.do',
+//						params : {dataSource : 'active'},
+//						success : function(res, opt){
+//							var jr = Ext.decode(res.responseText);
+//							gs.loadData({
+//								totalProperty : jr.root.length,
+//								root : jr.root.slice(0, 200)								
+//							});
+//							
+//							Ext.getCmp('active_dateSearchDateBegin').setValue(jr.other.beginDate.substring(0,10));
+//							Ext.getCmp('active_dateSearchDateEnd').setValue(jr.other.endDate.substring(0,10));
+//							Ext.getCmp('active_dateSearchDateCombo').setValue(jr.other.range);
+//							Ext.getCmp('active_textTotalMemberCostCount').setValue(jr.other.minConsumeAmount);
+//							Ext.getCmp('active_memberAmountEqual').setValue(1);
+//							
+//							gs.baseParams['consumptionMinAmount'] = jr.other.minConsumeAmount;
+//							gs.baseParams['consumptionMaxAmount'] = '';
+//							gs.baseParams['beginDate'] = jr.other.beginDate;
+//							gs.baseParams['endDate'] = jr.other.endDate;
+//						},
+//						failure : function(res, opt){
+//						}
+//					});
+//				}
+//			}, {
+//				text : '沉睡会员',
+//				iconCls : 'btn_edit',
+//				handler : function(e){
+////					Ext.getCmp('active_member_btnHeightSearch').handler();
+//					var gs = memberBasicGrid.getStore();
+//					Ext.Ajax.request({
+//						url : '../../QueryMember.do',
+//						params : {dataSource : 'idle'},
+//						success : function(res, opt){
+//							var jr = Ext.decode(res.responseText);
+//							gs.loadData({
+//								totalProperty : jr.root.length,
+//								root : jr.root.slice(0, 200)								
+//							});
+//							
+//							Ext.getCmp('active_dateSearchDateBegin').setValue(jr.other.beginDate.substring(0,10));
+//							Ext.getCmp('active_dateSearchDateEnd').setValue(jr.other.endDate.substring(0,10));
+//							Ext.getCmp('active_dateSearchDateCombo').setValue(jr.other.range);
+//							Ext.getCmp('active_textTotalMemberCostCount').setValue(jr.other.maxConsumeAmount);
+//							Ext.getCmp('active_memberAmountEqual').setValue(2);
+//							
+//							gs.baseParams['consumptionMaxAmount'] = jr.other.maxConsumeAmount;
+//							gs.baseParams['consumptionMinAmount'] = '';
+//							gs.baseParams['beginDate'] = jr.other.beginDate;
+//							gs.baseParams['endDate'] = jr.other.endDate;
+//						},
+//						failure : function(res, opt){
+//						}
+//					});
+//				}
+//			},
+//			{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;'},
+//			
+//			{xtype : 'tbtext', text : '日期:&nbsp;&nbsp;'},
+//			active_member_dateCombo,
+//			active_member_beginDate,
+//			{
+//				xtype : 'label',
+//				hidden : false,
+//				html : ' 至&nbsp;&nbsp;'
+//			}, 
+//			active_member_endDate,'->',	 
+//			{
+//				text : '搜索',
+//				id : 'active_btnSearchMember',
+//				iconCls : 'btn_search',
+//				handler : function(){
+//					
+//					var memberType = Ext.getCmp('active_memberTypeCombo');
+//					
+//					var gs = memberBasicGrid.getStore();
+//					
+//					gs.baseParams['memberType'] = memberType.getValue();
+//					
+//					if(Ext.getCmp('active_memberCostEqual').getValue() == 1){
+//						gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();
+//						gs.baseParams['MaxTotalMemberCost'] = '';
+//						
+//					}else if(Ext.getCmp('active_memberCostEqual').getValue() == 2){
+//						gs.baseParams['MinTotalMemberCost'] = '';
+//						gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();				
+//					}else{
+//						gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();
+//						gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();				
+//					}
+//					
+//					if(Ext.getCmp('active_memberAmountEqual').getValue() == 1){
+//						gs.baseParams['consumptionMinAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();
+//						gs.baseParams['consumptionMaxAmount'] = '';				
+//					}else if(Ext.getCmp('active_memberAmountEqual').getValue() == 2){
+//						gs.baseParams['consumptionMinAmount'] = '';
+//						gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();					
+//					}else{
+//						gs.baseParams['consumptionMinAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();
+//						gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();					
+//					}
+//					
+//					if(member_searchType){
+//						gs.baseParams['beginDate'] = Ext.getCmp('active_dateSearchDateBegin').getValue().format('Y-m-d 00:00:00');
+//						gs.baseParams['endDate'] = Ext.getCmp('active_dateSearchDateEnd').getValue().format('Y-m-d 23:59:59');					
+//					}else{
+//						gs.baseParams['beginDate'] = '';
+//						gs.baseParams['endDate'] = '';					
+//					}
+//
+//					gs.load({
+//						params : {
+//							start : 0,
+//							limit : 200
+//						}
+//					});
+//				}
+//			}]
+//		
+//	});
+//	var active_memberBasicGridExcavateMemberTbar2 = new Ext.Toolbar({
+//		hidden : true,
+//		height : 28,
+//		items : [{xtype : 'tbtext', text : '消费金额:'},
+//		{
+//			id : 'active_memberCostEqual',
+//			xtype : 'combo',
+//			readOnly : false,
+//			forceSelection : true,
+//			value : 3,
+//			width : 80,
+//			store : new Ext.data.SimpleStore({
+//				fields : ['value', 'text'],
+//				data : [[3, '等于'], [1, '大于等于'], [2, '小于等于']]
+//			}),
+//			valueField : 'value',
+//			displayField : 'text',
+//			typeAhead : true,
+//			mode : 'local',
+//			triggerAction : 'all',
+//			selectOnFocus : true
+//		},	
+//		{
+//			xtype : 'numberfield',
+//			id : 'active_textTotalMemberCost',
+//			width : 60
+//		},
+//		{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},	
+//		{xtype : 'tbtext', text : '消费次数:'},
+//		{
+//			id : 'active_memberAmountEqual',
+//			xtype : 'combo',
+//			readOnly : false,
+//			forceSelection : true,
+//			value : 3,
+//			width : 80,
+//			store : new Ext.data.SimpleStore({
+//				fields : ['value', 'text'],
+//				data : [[3, '等于'], [1, '大于等于'], [2, '小于等于']]
+//			}),
+//			valueField : 'value',
+//			displayField : 'text',
+//			typeAhead : true,
+//			mode : 'local',
+//			triggerAction : 'all',
+//			selectOnFocus : true
+//		},			
+//		{
+//			xtype : 'numberfield',
+//			id : 'active_textTotalMemberCostCount',
+//			width : 50
+//		},
+//		{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},
+//		{xtype : 'tbtext', text : '会员类型:'},
+//		{
+//			id : 'active_memberTypeCombo',
+//			xtype : 'combo',
+//			readOnly : false,
+//			forceSelection : true,
+//			value : -1,
+//			width : 100,
+//			store : new Ext.data.SimpleStore({
+//				fields : ['id', 'name']
+//			}),
+//			valueField : 'id',
+//			displayField : 'name',
+//			listeners : {
+//				render : function(thiz){
+//					var data = [[-1,'全部']];
+//					Ext.Ajax.request({
+//						url : '../../QueryMemberType.do',
+//						params : {dataSource : 'normal'},
+//						success : function(res, opt){
+//							var jr = Ext.decode(res.responseText);
+//							for(var i = 0; i < jr.root.length; i++){
+//								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+//							}
+//							thiz.store.loadData(data);
+//							thiz.setValue(-1);
+//						},
+//						failure : function(res, opt){
+//							thiz.store.loadData(data);
+//							thiz.setValue(-1);
+//						}
+//					});
+//				},
+//				select : function(){
 //					Ext.getCmp('active_member_btnHeightSearch').handler();
-					var gs = memberBasicGrid.getStore();
-					Ext.Ajax.request({
-						url : '../../QueryMember.do',
-						params : {dataSource : 'active'},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							gs.loadData({
-								totalProperty : jr.root.length,
-								root : jr.root.slice(0, 200)								
-							});
-							
-							Ext.getCmp('active_dateSearchDateBegin').setValue(jr.other.beginDate.substring(0,10));
-							Ext.getCmp('active_dateSearchDateEnd').setValue(jr.other.endDate.substring(0,10));
-							Ext.getCmp('active_dateSearchDateCombo').setValue(jr.other.range);
-							Ext.getCmp('active_textTotalMemberCostCount').setValue(jr.other.minConsumeAmount);
-							Ext.getCmp('active_memberAmountEqual').setValue(1);
-							
-							gs.baseParams['consumptionMinAmount'] = jr.other.minConsumeAmount;
-							gs.baseParams['consumptionMaxAmount'] = '';
-							gs.baseParams['beginDate'] = jr.other.beginDate;
-							gs.baseParams['endDate'] = jr.other.endDate;
-						},
-						failure : function(res, opt){
-						}
-					});
-				}
-			}, {
-				text : '沉睡会员',
-				iconCls : 'btn_edit',
-				handler : function(e){
-//					Ext.getCmp('active_member_btnHeightSearch').handler();
-					var gs = memberBasicGrid.getStore();
-					Ext.Ajax.request({
-						url : '../../QueryMember.do',
-						params : {dataSource : 'idle'},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							gs.loadData({
-								totalProperty : jr.root.length,
-								root : jr.root.slice(0, 200)								
-							});
-							
-							Ext.getCmp('active_dateSearchDateBegin').setValue(jr.other.beginDate.substring(0,10));
-							Ext.getCmp('active_dateSearchDateEnd').setValue(jr.other.endDate.substring(0,10));
-							Ext.getCmp('active_dateSearchDateCombo').setValue(jr.other.range);
-							Ext.getCmp('active_textTotalMemberCostCount').setValue(jr.other.maxConsumeAmount);
-							Ext.getCmp('active_memberAmountEqual').setValue(2);
-							
-							gs.baseParams['consumptionMaxAmount'] = jr.other.maxConsumeAmount;
-							gs.baseParams['consumptionMinAmount'] = '';
-							gs.baseParams['beginDate'] = jr.other.beginDate;
-							gs.baseParams['endDate'] = jr.other.endDate;
-						},
-						failure : function(res, opt){
-						}
-					});
-				}
-			},
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;'},
-			
-			{xtype : 'tbtext', text : '日期:&nbsp;&nbsp;'},
-			active_member_dateCombo,
-			active_member_beginDate,
-			{
-				xtype : 'label',
-				hidden : false,
-				html : ' 至&nbsp;&nbsp;'
-			}, 
-			active_member_endDate,'->',	 
-			{
-				text : '搜索',
-				id : 'active_btnSearchMember',
-				iconCls : 'btn_search',
-				handler : function(){
-					
-					var memberType = Ext.getCmp('active_memberTypeCombo');
-					
-					var gs = memberBasicGrid.getStore();
-					
-					gs.baseParams['memberType'] = memberType.getValue();
-					
-					if(Ext.getCmp('active_memberCostEqual').getValue() == 1){
-						gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();
-						gs.baseParams['MaxTotalMemberCost'] = '';
-						
-					}else if(Ext.getCmp('active_memberCostEqual').getValue() == 2){
-						gs.baseParams['MinTotalMemberCost'] = '';
-						gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();				
-					}else{
-						gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();
-						gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();				
-					}
-					
-					if(Ext.getCmp('active_memberAmountEqual').getValue() == 1){
-						gs.baseParams['consumptionMinAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();
-						gs.baseParams['consumptionMaxAmount'] = '';				
-					}else if(Ext.getCmp('active_memberAmountEqual').getValue() == 2){
-						gs.baseParams['consumptionMinAmount'] = '';
-						gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();					
-					}else{
-						gs.baseParams['consumptionMinAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();
-						gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();					
-					}
-					
-					if(member_searchType){
-						gs.baseParams['beginDate'] = Ext.getCmp('active_dateSearchDateBegin').getValue().format('Y-m-d 00:00:00');
-						gs.baseParams['endDate'] = Ext.getCmp('active_dateSearchDateEnd').getValue().format('Y-m-d 23:59:59');					
-					}else{
-						gs.baseParams['beginDate'] = '';
-						gs.baseParams['endDate'] = '';					
-					}
+//					Ext.getCmp('active_btnSearchMember').handler();
+//				}
+//			},
+//			typeAhead : true,
+//			mode : 'local',
+//			triggerAction : 'all',
+//			selectOnFocus : true
+//		}]
+//	});
+	
+//	var active_memberBasicGridTbar = new Ext.Toolbar({
+//		items : [{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;'},
+//			{
+//				xtype : 'radio',
+//				id : 'rdoSendAllMember',
+//				name : 'rdoFormatType',
+//				inputValue : 1,
+//				boxLabel : '全部会员',
+//				checked : true,
+//				listeners : {
+//					render : function(e){
+//						Ext.getDom('rdoSendAllMember').onclick = function(){
+//							e.setValue(true);
+//							operatePromotTypeWin.oriented = e.inputValue;
+//							Ext.getCmp('active_member_btnCommonSearch').handler();
+//						};
+//					}
+//				}
+//			},
+//			{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},
+//			{
+//				xtype : 'radio',
+//				id : 'rdoSendSpecificMember',
+//				name : 'rdoFormatType',
+//				inputValue : 2,
+//				boxLabel : '部分会员',
+//				listeners : {
+//					render : function(e){
+//						Ext.getDom('rdoSendSpecificMember').onclick = function(){
+//							e.setValue(true);
+//							Ext.getCmp('active_member_btnHeightSearch').handler();
+//							operatePromotTypeWin.oriented = e.inputValue;
+//						};
+//					}
+//				}
+//			},
+//			{xtype : 'tbtext', text : '&nbsp;&nbsp;'}, '->', {
+//			text : '高级条件↓',
+//	    	id : 'active_member_btnHeightSearch',
+//	    	handler : function(){
+//	    		
+//				Ext.getCmp('active_member_btnCommonSearch').show();
+//				
+//	    		Ext.getCmp('active_member_btnHeightSearch').hide();
+//	    		
+//	    		Ext.getCmp('rdoSendSpecificMember').setValue(true);
+//	    		operatePromotTypeWin.oriented = 2;
+//	    		
+//	    		if(!member_searchType){
+//	    			memberBasicGrid.setHeight(memberBasicGrid.getHeight()-56);
+//	    		}
+//	    		member_searchType = true;
+//	    		
+//	    		active_memberBasicGridExcavateMemberTbar.show();
+//	    		active_memberBasicGridExcavateMemberTbar2.show();
+//	    		
+//	    		memberBasicGrid.syncSize(); //强制计算高度
+//	    		memberBasicGrid.doLayout();//重新布局 	
+//	    		
+////	    		Ext.getCmp('active_memberBasicGrid').getStore().removeAll();
+//			}
+//		}, {
+//			text : '高级条件↑',
+//	    	id : 'active_member_btnCommonSearch',
+//			hidden : true,
+//	    	handler : function(e){
+//	    		member_searchType = false;
+//				Ext.getCmp('active_member_btnHeightSearch').show();
+//	    		Ext.getCmp('active_member_btnCommonSearch').hide();
+//	    		
+//	    		Ext.getCmp('rdoSendAllMember').setValue(true);
+//	    		operatePromotTypeWin.oriented = 1;
+//	    		
+//	    		active_memberBasicGridExcavateMemberTbar.hide();
+//	    		active_memberBasicGridExcavateMemberTbar2.hide();
+//	    		
+//	    		memberBasicGrid.setHeight(memberBasicGrid.getHeight()+56);
+//	    		memberBasicGrid.syncSize(); //强制计算高度
+//	    		memberBasicGrid.doLayout();//重新布局 	
+//	    		
+//	    		active_member_dateCombo.setValue(4);
+//	    		active_member_dateCombo.fireEvent('select', active_member_dateCombo,{data : {value : 4}},4);
+//	    		
+//	    		Ext.getCmp('active_memberTypeCombo').setValue(-1);
+//	    		Ext.getCmp('active_textTotalMemberCost').setValue();
+//	    		Ext.getCmp('active_textTotalMemberCostCount').setValue();
+//	    		Ext.getCmp('active_memberAmountEqual').setValue(3);
+//	    		Ext.getCmp('active_memberCostEqual').setValue(3);
+//	    		
+//	    		if(!e || typeof e.noSearch == 'undefined'){
+//	    			Ext.getCmp('active_btnSearchMember').handler();
+//	    		}
+//	    		
+//			}
+//		},{xtype : 'tbtext', text : '&nbsp;&nbsp;'}]
+//	});	
+//	memberBasicGrid = createGridPanel(
+//		'active_memberBasicGrid',
+//		'选择参与活动的会员',
+//		480,
+//		640,
+//		'../../QueryMember.do',
+//		[
+//			[true, false, false, true],
+//			['名称', 'name'],
+//			['类型', 'memberType.name'],
+//			['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
+//			['当前积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
+//			['账户余额', 'totalBalance',180,'right', 'Ext.ux.txtFormat.gridDou']
+//		],
+//		MemberBasicRecord.getKeys(),
+//		[['isPaging', true], ['restaurantID', 40],  ['dataSource', 'normal']],
+//		200,
+//		'',
+//		[active_memberBasicGridTbar, active_memberBasicGridExcavateMemberTbar,active_memberBasicGridExcavateMemberTbar2]
+//	);	
+//	memberBasicGrid.region = 'center';
+//	
+//	memberBasicGrid.store.on('load', function(store, records, options){
+//		active_memberList = '';
+//		
+//		for (var i = 0; i < records.length; i++) {
+//			if(i > 0){
+//				active_memberList += ",";
+//			}
+//			active_memberList += records[i].get('id');
+//		}
+//	});		
 
-					gs.load({
-						params : {
-							start : 0,
-							limit : 200
-						}
-					});
-				}
-			}]
-		
-	});
-	var active_memberBasicGridExcavateMemberTbar2 = new Ext.Toolbar({
-		hidden : true,
-		height : 28,
-		items : [{xtype : 'tbtext', text : '消费金额:'},
-		{
-			id : 'active_memberCostEqual',
-			xtype : 'combo',
-			readOnly : false,
-			forceSelection : true,
-			value : 3,
-			width : 80,
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : [[3, '等于'], [1, '大于等于'], [2, '小于等于']]
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true
-		},	
-		{
-			xtype : 'numberfield',
-			id : 'active_textTotalMemberCost',
-			width : 60
-		},
-		{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},	
-		{xtype : 'tbtext', text : '消费次数:'},
-		{
-			id : 'active_memberAmountEqual',
-			xtype : 'combo',
-			readOnly : false,
-			forceSelection : true,
-			value : 3,
-			width : 80,
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : [[3, '等于'], [1, '大于等于'], [2, '小于等于']]
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true
-		},			
-		{
-			xtype : 'numberfield',
-			id : 'active_textTotalMemberCostCount',
-			width : 50
-		},
-		{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},
-		{xtype : 'tbtext', text : '会员类型:'},
-		{
-			id : 'active_memberTypeCombo',
-			xtype : 'combo',
-			readOnly : false,
-			forceSelection : true,
-			value : -1,
-			width : 100,
-			store : new Ext.data.SimpleStore({
-				fields : ['id', 'name']
-			}),
-			valueField : 'id',
-			displayField : 'name',
-			listeners : {
-				render : function(thiz){
-					var data = [[-1,'全部']];
-					Ext.Ajax.request({
-						url : '../../QueryMemberType.do',
-						params : {dataSource : 'normal'},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							for(var i = 0; i < jr.root.length; i++){
-								data.push([jr.root[i]['id'], jr.root[i]['name']]);
-							}
-							thiz.store.loadData(data);
-							thiz.setValue(-1);
-						},
-						failure : function(res, opt){
-							thiz.store.loadData(data);
-							thiz.setValue(-1);
-						}
-					});
-				},
-				select : function(){
-					Ext.getCmp('active_member_btnHeightSearch').handler();
-					Ext.getCmp('active_btnSearchMember').handler();
-				}
-			},
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true
-		}]
-	});
+//	var threeStepEast = new Ext.Panel({
+//		id : 'threeStepEastBody',
+//		region : 'east',
+//		width : 350,
+//		height : 565,
+//		style : 'marginLeft:650px;background-color: #fff; border: 1px solid #ccc; padding: 5px 5px 5px 5px;overflow-y: visible;',
+//		bodyStyle : 'word-wrap:break-word;',
+//		html : ''
+//	});		
 	
-	var active_memberBasicGridTbar = new Ext.Toolbar({
-		items : [{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;'},
-			{
-				xtype : 'radio',
-				id : 'rdoSendAllMember',
-				name : 'rdoFormatType',
-				inputValue : 1,
-				boxLabel : '全部会员',
-				checked : true,
-				listeners : {
-					render : function(e){
-						Ext.getDom('rdoSendAllMember').onclick = function(){
-							e.setValue(true);
-							operatePromotTypeWin.oriented = e.inputValue;
-							Ext.getCmp('active_member_btnCommonSearch').handler();
-						};
-					}
-				}
-			},
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},
-			{
-				xtype : 'radio',
-				id : 'rdoSendSpecificMember',
-				name : 'rdoFormatType',
-				inputValue : 2,
-				boxLabel : '部分会员',
-				listeners : {
-					render : function(e){
-						Ext.getDom('rdoSendSpecificMember').onclick = function(){
-							e.setValue(true);
-							Ext.getCmp('active_member_btnHeightSearch').handler();
-							operatePromotTypeWin.oriented = e.inputValue;
-						};
-					}
-				}
-			},
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'}, '->', {
-			text : '高级条件↓',
-	    	id : 'active_member_btnHeightSearch',
-	    	handler : function(){
-	    		
-				Ext.getCmp('active_member_btnCommonSearch').show();
-				
-	    		Ext.getCmp('active_member_btnHeightSearch').hide();
-	    		
-	    		Ext.getCmp('rdoSendSpecificMember').setValue(true);
-	    		operatePromotTypeWin.oriented = 2;
-	    		
-	    		if(!member_searchType){
-	    			memberBasicGrid.setHeight(memberBasicGrid.getHeight()-56);
-	    		}
-	    		member_searchType = true;
-	    		
-	    		active_memberBasicGridExcavateMemberTbar.show();
-	    		active_memberBasicGridExcavateMemberTbar2.show();
-	    		
-	    		memberBasicGrid.syncSize(); //强制计算高度
-	    		memberBasicGrid.doLayout();//重新布局 	
-	    		
-//	    		Ext.getCmp('active_memberBasicGrid').getStore().removeAll();
-			}
-		}, {
-			text : '高级条件↑',
-	    	id : 'active_member_btnCommonSearch',
-			hidden : true,
-	    	handler : function(e){
-	    		member_searchType = false;
-				Ext.getCmp('active_member_btnHeightSearch').show();
-	    		Ext.getCmp('active_member_btnCommonSearch').hide();
-	    		
-	    		Ext.getCmp('rdoSendAllMember').setValue(true);
-	    		operatePromotTypeWin.oriented = 1;
-	    		
-	    		active_memberBasicGridExcavateMemberTbar.hide();
-	    		active_memberBasicGridExcavateMemberTbar2.hide();
-	    		
-	    		memberBasicGrid.setHeight(memberBasicGrid.getHeight()+56);
-	    		memberBasicGrid.syncSize(); //强制计算高度
-	    		memberBasicGrid.doLayout();//重新布局 	
-	    		
-	    		active_member_dateCombo.setValue(4);
-	    		active_member_dateCombo.fireEvent('select', active_member_dateCombo,{data : {value : 4}},4);
-	    		
-	    		Ext.getCmp('active_memberTypeCombo').setValue(-1);
-	    		Ext.getCmp('active_textTotalMemberCost').setValue();
-	    		Ext.getCmp('active_textTotalMemberCostCount').setValue();
-	    		Ext.getCmp('active_memberAmountEqual').setValue(3);
-	    		Ext.getCmp('active_memberCostEqual').setValue(3);
-	    		
-	    		if(!e || typeof e.noSearch == 'undefined'){
-	    			Ext.getCmp('active_btnSearchMember').handler();
-	    		}
-	    		
-			}
-		},{xtype : 'tbtext', text : '&nbsp;&nbsp;'}]
-	});	
-	memberBasicGrid = createGridPanel(
-		'active_memberBasicGrid',
-		'选择参与活动的会员',
-		480,
-		640,
-		'../../QueryMember.do',
-		[
-			[true, false, false, true],
-			['名称', 'name'],
-			['类型', 'memberType.name'],
-			['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['当前积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['账户余额', 'totalBalance',180,'right', 'Ext.ux.txtFormat.gridDou']
-		],
-		MemberBasicRecord.getKeys(),
-		[['isPaging', true], ['restaurantID', 40],  ['dataSource', 'normal']],
-		200,
-		'',
-		[active_memberBasicGridTbar, active_memberBasicGridExcavateMemberTbar,active_memberBasicGridExcavateMemberTbar2]
-	);	
-	memberBasicGrid.region = 'center';
+//	new Ext.Panel({
+//		renderTo :'active_threeStep',
+//		width :1015,
+//		border : false,
+//		items : [{
+//			layout : 'border',
+//			frame : true,
+//			border : false,
+//			height : 570,
+//			items : [memberBasicGrid, threeStepEast]
+//		}]
+//	});	
 	
-	memberBasicGrid.store.on('load', function(store, records, options){
-		active_memberList = '';
-		
-		for (var i = 0; i < records.length; i++) {
-			if(i > 0){
-				active_memberList += ",";
-			}
-			active_memberList += records[i].get('id');
-		}
-	});		
-
-	var threeStepEast = new Ext.Panel({
-		id : 'threeStepEastBody',
-		region : 'east',
-		width : 350,
-		height : 565,
-		style : 'marginLeft:650px;background-color: #fff; border: 1px solid #ccc; padding: 5px 5px 5px 5px;overflow-y: visible;',
-		bodyStyle : 'word-wrap:break-word;',
-		html : ''
-	});		
-	
-	new Ext.Panel({
-		renderTo :'active_threeStep',
-		width :1015,
-		border : false,
-		items : [{
-			layout : 'border',
-			frame : true,
-			border : false,
-			height : 570,
-			items : [memberBasicGrid, threeStepEast]
-		}]
-	});	
-	
-	fnCheckHaveWelcome();
+	//fnCheckHaveWelcome();
 	
 	//steps.js与Ext混用时的样式修正	
 	$('#active_beginDate').parent().width($('#active_beginDate').width() + $('#active_beginDate').next().width()+20);
