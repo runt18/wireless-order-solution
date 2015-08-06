@@ -2979,8 +2979,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String memberType = request.getParameter("memberType");
 		String memberTypeAttr = request.getParameter("memberTypeAttr");
 		String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
-		String memberBalance = request.getParameter("memberBalance");
-		String memberBalanceEqual = request.getParameter("memberBalanceEqual");
+		String memberMinBalance = request.getParameter("memberMinBalance");
+		String memberMaxBalance = request.getParameter("memberMaxBalance");
 		String MaxTotalMemberCost = request.getParameter("MaxTotalMemberCost");
 		String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
 		String consumptionMinAmount = request.getParameter("consumptionMinAmount");
@@ -2988,6 +2988,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String dateBegin = request.getParameter("dateBegin");
 		String dateEnd = request.getParameter("dateEnd");
 		String orderBy = request.getParameter("orderBy");
+		//是否开卡统计
+		String create = request.getParameter("create");
 		
 		MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
 		
@@ -3014,16 +3016,20 @@ public class HistoryStatisticsAction extends DispatchAction{
 			if(consumptionMaxAmount != null && !consumptionMaxAmount.isEmpty()){
 				extraCond.lessConsume(Integer.parseInt(consumptionMaxAmount));
 			}
-			if(memberBalance != null && !memberBalance.isEmpty()){
-				extraCond.setMemberBalance(Integer.parseInt(memberBalance));
+			if(memberMinBalance != null && !memberMinBalance.isEmpty()){
+				extraCond.greaterBalance(Float.parseFloat(memberMinBalance));
 			}
 			
-			if(memberBalanceEqual != null && !memberBalanceEqual.isEmpty()){
-				extraCond.setMemberBalanceEqual(memberBalanceEqual);
+			if(memberMaxBalance != null && !memberMaxBalance.isEmpty()){
+				extraCond.lessBalance(Float.parseFloat(memberMaxBalance));
 			}
 			
 			if(dateBegin != null && !dateBegin.isEmpty()){
-				extraCond.setCreateRange(new DutyRange(dateBegin, dateEnd));
+				if(create != null && !create.isEmpty()){
+					extraCond.setCreateRange(new DutyRange(dateBegin, dateEnd));
+				}else{
+					extraCond.setRange(new DutyRange(dateBegin, dateEnd));
+				}
 			}
 			
 		}

@@ -29,6 +29,8 @@ public class QueryBookAction extends DispatchAction{
 		String phone = request.getParameter("phone");
 		String status = request.getParameter("status");
 		String bookDate = request.getParameter("bookDate");
+		String beginDate = request.getParameter("beginDate");
+		String endDate = request.getParameter("endDate");
 		String tableId = request.getParameter("tableId");
 		DBCon dbCon = null;
 		try{
@@ -56,6 +58,9 @@ public class QueryBookAction extends DispatchAction{
 			if(bookDate != null && !bookDate.isEmpty()){
 				DutyRange range = new DutyRange(DateUtil.parseDate(bookDate), DateUtil.parseDate(bookDate + " 23:59:59"));
 				extra.setBookRange(range);
+			}else if(beginDate != null && !beginDate.isEmpty()){
+				DutyRange range = new DutyRange(DateUtil.parseDate(beginDate), DateUtil.parseDate(endDate + " 23:59:59"));
+				extra.setBookRange(range);				
 			}else{
 				Calendar c = Calendar.getInstance();
 				DutyRange range = new DutyRange(DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + c.get(Calendar.DATE)), 0);

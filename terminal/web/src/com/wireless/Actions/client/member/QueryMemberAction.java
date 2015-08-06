@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.member.MemberCondDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberDao.ActiveExtraCond;
 import com.wireless.db.member.MemberDao.IdleExtraCond;
@@ -30,6 +31,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.promotion.Coupon;
@@ -133,8 +135,8 @@ public class QueryMemberAction extends DispatchAction {
 			String memberType = request.getParameter("memberType");
 			String memberTypeAttr = request.getParameter("memberTypeAttr");
 			String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
-			String memberBalance = request.getParameter("memberBalance");
-			String memberBalanceEqual = request.getParameter("memberBalanceEqual");
+			String memberMinBalance = request.getParameter("memberMinBalance");
+			String memberMaxBalance = request.getParameter("memberMaxBalance");
 			String MaxTotalMemberCost = request.getParameter("MaxTotalMemberCost");
 			String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
 			String consumptionMinAmount = request.getParameter("consumptionMinAmount");
@@ -185,14 +187,14 @@ public class QueryMemberAction extends DispatchAction {
 				if(beginDate != null && !beginDate.isEmpty()){
 					extraCond.setRange(new DutyRange(beginDate, endDate));
 				}
-				
-				if(memberBalance != null && !memberBalance.isEmpty()){
-					extraCond.setMemberBalance(Integer.parseInt(memberBalance));
+				if(memberMinBalance != null && !memberMinBalance.isEmpty()){
+					extraCond.greaterBalance(Float.parseFloat(memberMinBalance));
 				}
 				
-				if(memberBalanceEqual != null && !memberBalanceEqual.isEmpty()){
-					extraCond.setMemberBalanceEqual(memberBalanceEqual);
+				if(memberMaxBalance != null && !memberMaxBalance.isEmpty()){
+					extraCond.lessBalance(Float.parseFloat(memberMaxBalance));
 				}
+				
 			}
 			
 			if(orderBy != null){
@@ -493,5 +495,91 @@ public class QueryMemberAction extends DispatchAction {
 		}
 		return null;
 	}
+	
+	/**
+	 * 会员分析
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward byMemberCond(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		String pin = (String) request.getAttribute("pin");
+		String memberCondId = request.getParameter("memberCondId");
+		String memberType = request.getParameter("memberType");
+		String memberCondMinConsume = request.getParameter("memberCondMinConsume");
+		String memberCondMaxConsume = request.getParameter("memberCondMaxConsume");
+		String memberCondMinAmount = request.getParameter("memberCondMinAmount");
+		String memberCondMaxAmount = request.getParameter("memberCondMaxAmount");
+		String memberCondMinBalance = request.getParameter("memberCondMinBalance");
+		String memberCondMaxBalance = request.getParameter("memberCondMaxBalance");
+		String memberCondBeginDate = request.getParameter("memberCondBeginDate");
+		String memberCondEndDate = request.getParameter("memberCondEndDate");
+		
+		try{
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			MemberCond memberCond;
+			if(memberCondId != null && !memberCondId.isEmpty()){
+				memberCond = MemberCondDao.getById(staff, Integer.parseInt(memberCondId));
+			}else{
+				memberCond = new MemberCond(-1);
+				int minAmount = 0, maxAmount = 0;
+				float minConsume = 0, maxConsume = 0, minBalance = 0, maxBalance = 0;
+				
+				//设置时间段
+				memberCond.setRange(new DutyRange(memberCondBeginDate, memberCondEndDate));
+				
+				if(memberType != null && !memberType.isEmpty() && !memberType.equals("-1")){
+					memberCond.setMemberType(new MemberType(Integer.parseInt(memberType)));
+				}
+				if(memberCondMinConsume != null && !memberCondMinConsume.isEmpty()){
+					minConsume = Float.parseFloat(memberCondMinConsume);
+				}
+				if(memberCondMaxConsume != null && !memberCondMaxConsume.isEmpty()){
+					maxConsume = Float.parseFloat(memberCondMaxConsume);
+				}
+				if(memberCondMinAmount != null && !memberCondMinAmount.isEmpty()){
+					minAmount = Integer.parseInt(memberCondMinAmount);
+				}
+				if(memberCondMaxAmount != null && !memberCondMaxAmount.isEmpty()){
+					maxAmount = Integer.parseInt(memberCondMaxAmount);
+				}
+				if(memberCondMinBalance != null && !memberCondMinBalance.isEmpty()){
+					minBalance = Float.parseFloat(memberCondMinBalance);
+				}
+				if(memberCondMaxBalance != null && !memberCondMaxBalance.isEmpty()){
+					maxBalance = Float.parseFloat(memberCondMaxBalance);
+				}
+				
+				memberCond.setMaxBalance(maxBalance);
+				memberCond.setMaxConsumeAmount(maxAmount);
+				memberCond.setMaxConsumeMoney(maxConsume);
+				memberCond.setMinBalance(minBalance);
+				memberCond.setMinConsumeAmount(minAmount);
+				memberCond.setMinConsumeMoney(minConsume);
+			}
+			
+			List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond(memberCond), null);
+			
+			jobject.setRoot(members);
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+			
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
 	
 }
