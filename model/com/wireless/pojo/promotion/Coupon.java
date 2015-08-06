@@ -170,13 +170,7 @@ public class Coupon implements Jsonable{
 		setCouponType(builder.couponType);
 		setMember(builder.member);
 		setPromotion(builder.promotion);
-		if(builder.promotion.getStatus() == Promotion.Status.CREATED){
-			setStatus(Status.CREATED);
-//		}else if(builder.promotion.getStatus() == Promotion.Status.PUBLISH || builder.promotion.getStatus() == Promotion.Status.PROGRESS){
-//			setStatus(Status.PUBLISHED);
-		}else{
-			throw new IllegalArgumentException("the status to promotion is invalid");
-		}
+		setStatus(Status.CREATED);
 		setBirthDate(System.currentTimeMillis());
 	}
 	
