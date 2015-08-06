@@ -561,6 +561,8 @@ Ext.ux.createDateCombo = function(_c){
 					now.setDate(now.getDate()-7);
 				}else if(record.data.value == 3){//最近一个月
 					now.setMonth(now.getMonth()-1);
+				}else if(record.data.value == 12){//最近二个月
+					now.setMonth(now.getMonth()-2);
 				}else if(record.data.value == 4){//最近三个月
 					now.setMonth(now.getMonth()-3);
 				}else if(record.data.value == 5){//本周

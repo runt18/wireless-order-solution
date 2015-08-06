@@ -1035,26 +1035,17 @@ function gridInit(){
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
 			{xtype : 'tbtext', text : '余额:'},
 			{
-				id : 'memberBalanceEqual',
-				xtype : 'combo',
-				readOnly : false,
-				forceSelection : true,
-				value : '=',
-				width : 70,
-				store : new Ext.data.SimpleStore({
-					fields : ['value', 'text'],
-					data : [['=', '等于'], ['>=', '大于等于'], ['<=', '小于等于']]
-				}),
-				valueField : 'value',
-				displayField : 'text',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true
+				xtype : 'numberfield',
+				id : 'textMemberMinBalance',
+				width : 50
+			},
+			{
+				xtype : 'tbtext',
+				text : '&nbsp;-&nbsp;'
 			},				
 			{
 				xtype : 'numberfield',
-				id : 'textMemberBalance',
+				id : 'textMemberMaxBalance',
 				width : 60
 			}]
 		
@@ -1183,8 +1174,8 @@ function gridInit(){
 	    		Ext.getCmp('textTotalMaxMemberCostCount').setValue('');
 	    		
 	    		//清空余额
-	    		Ext.getCmp('memberBalanceEqual').setValue('=');
-	    		Ext.getCmp('textMemberBalance').setValue('');
+	    		Ext.getCmp('textMemberMinBalance').setValue('=');
+	    		Ext.getCmp('textMemberMaxBalance').setValue('');
 	    		
 	    		//设置按创建时间排序
 	    		Ext.getCmp('m_searchOrderby').setValue(true);
@@ -1216,8 +1207,8 @@ function gridInit(){
 				gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('textTotalMaxMemberCost').getValue();
 				gs.baseParams['consumptionMinAmount'] = Ext.getCmp('textTotalMinMemberCostCount').getValue();
 				gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('textTotalMaxMemberCostCount').getValue();
-				gs.baseParams['memberBalance'] = Ext.getCmp('textMemberBalance').getValue();
-				gs.baseParams['memberBalanceEqual'] = Ext.getCmp('memberBalanceEqual').getValue();
+				gs.baseParams['memberMinBalance'] = Ext.getCmp('textMemberMinBalance').getValue();
+				gs.baseParams['memberMaxBalance'] = Ext.getCmp('textMemberMaxBalance').getValue();
 				gs.baseParams['beginDate'] = Ext.getCmp('dateSearchDateBegin').getValue();
 				gs.baseParams['endDate'] = Ext.getCmp('dateSearchDateEnd').getValue();
 				gs.baseParams['needSum'] = true;
@@ -1310,8 +1301,8 @@ function gridInit(){
 					Ext.getCmp('textTotalMaxMemberCost').getValue(),
 					Ext.getCmp('textTotalMinMemberCostCount').getValue(),
 					Ext.getCmp('textTotalMaxMemberCostCount').getValue(),
-					Ext.getCmp('textMemberBalance').getValue(),
-					Ext.getCmp('memberBalanceEqual').getValue(),
+					Ext.getCmp('textMemberMinBalance').getValue(),
+					Ext.getCmp('textMemberMaxBalance').getValue(),
 					m_searchAdditionFilter,
 					'memberList'
 				);

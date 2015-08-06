@@ -220,7 +220,7 @@ function mcrs_initBusinessReceipsGrid(c){
 					offDuty = Ext.util.Format.date(mcrs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 					
 					var memberType = mcrs_search_memberType.getRawValue() != '' ? mcrs_search_memberType.getValue() : '';
-					var url = '../../{0}?memberType={1}&dataSource={2}&dateBegin={3}&dateEnd={4}&memberCardOrMobileOrName={5}';
+					var url = '../../{0}?memberType={1}&dataSource={2}&dateBegin={3}&dateEnd={4}&memberCardOrMobileOrName={5}&create=true';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
