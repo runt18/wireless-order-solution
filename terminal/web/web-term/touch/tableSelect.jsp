@@ -45,7 +45,6 @@
 <script type="text/javascript" src="js/payment/payment.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/tableSelect/tableSelect.js?v=<%=v %>"></script>
 
-<script language="JavaScript" src="http://code.54kefu.net/kefu/js/b150/852550.js" type="text/javascript" charset="utf-8"></script>
 
 <!--引入易笔字核心脚本(utf-8编码)-->
 <!-- <script src="http://www.yibizi.com/ybz_core/core/ybz.min.js"></script> -->
@@ -2524,4 +2523,6 @@
 
 <!-- 数字键盘 -->
 <script src="js/calculate/datouwang.js" type="text/javascript"></script>
+
+<script language="JavaScript" src="http://code.54kefu.net/kefu/js/b150/852550.js" type="text/javascript" charset="utf-8"></script>
 </html>

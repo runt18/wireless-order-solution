@@ -18,9 +18,6 @@ var lg = {
 var allStaff = '<a data-role="button" data-inline="true" class="loginName" onclick="selectedName(this)" data-value="{staffId}" data-theme="c"><div>{staffName}</div></a>';
 
 $(function(){
-	//FIXME 过渡
-	delcookie("digie_restaurant");
-	delcookie(document.domain+'_restaurant');
 	
 	$(".numkeyboard").ioskeyboard({
 	    keyboardRadix:80,//键盘大小基数，实际大小比为9.4，即设置为100时实际大小为940X330
@@ -96,7 +93,9 @@ $(function(){
         	restaurantLoginHandler();
         }
     });		
-	
+    
+    //调试QQ客服
+    $("#kfoutbox").css("margin-top","50px");
 });
 
 

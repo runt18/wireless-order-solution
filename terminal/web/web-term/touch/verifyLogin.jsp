@@ -35,7 +35,7 @@
 </head>
 
 <body>
-<script language="JavaScript" src="http://code.54kefu.net/kefu/js/b150/852550.js" type="text/javascript" charset="utf-8"></script>	
+
 <div data-role="page" id="restaurantLoginPage" align="center" data-theme="e">
 	<!-- 智易广告 start-->
 	<div data-role="header" data-tap-toggle="false" data-theme="b" class="advertisementCmp">
@@ -152,4 +152,5 @@
 	</div>
 </div>
 </body>
+<script language="JavaScript" src="http://code.54kefu.net/kefu/js/b150/852550.js" type="text/javascript" charset="utf-8"></script>	
 </html>

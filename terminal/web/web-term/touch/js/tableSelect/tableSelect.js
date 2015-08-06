@@ -331,7 +331,11 @@ $(function(){
 			console.log($('#conditionDayEndDay').val())
 			ts.searchBookList({begin:$('#conditionDayBeginDay').val(), end:$('#conditionDayEndDay').val()})
 		}
-	});		
+	});	
+	
+	//设置
+	$('#kfoutbox').css("margin-top", "50px");
+	
 	
 });	
 
