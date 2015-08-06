@@ -29,202 +29,6 @@
 </style>
 <script type="text/javascript"
 	src="../../js/Client/activeMgr/activeMgrMain.js"></script>
-<script>
-var active_memberList = '', couponTypeId = 0, promotionType = 4, memberBasicGrid ;
-var promotionTree, operatePromotTypeWin, winUnhide = true; //执行关闭操作时不验证数据
-var promotionDateTemplet = '<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue; font-szie:12px;font-weight:bold">活动日期 : <font color="red">{beginDate}</font>&nbsp;至&nbsp;<font color="red">{endDate}</font></div>';
-function buildPreviewHead(){
-	var head = '';
-	if(Ext.getCmp('active_title').getValue()){
-		head +=  '<div style="text-align:center; font-size: 30px; font-weight: bold; word-wrap:break-word; color: #D2691E;">' + Ext.getCmp('active_title').getValue() + '</div>';
-	}else{
-		head +=  '<div style="text-align:center; font-size: 30px; font-weight: bold; word-wrap:break-word; color: #D2691E;">活动标题</div>';
-	}
-	
-	if(Ext.getCmp('active_beginDate').getValue() && Ext.getCmp('active_endDate').getValue()){
-		head += '<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue; font-szie:12px;font-weight:bold">活动日期 : <font color="red">'+ Ext.getCmp('active_beginDate').getValue().format('Y-m-d') +'</font>&nbsp;至&nbsp;<font color="red">'+ Ext.getCmp('active_endDate').getValue().format('Y-m-d') +'</font></div>';
-	}
-	
-//	if(Ext.getCmp('active_point').isValid()){
-		head += promotionRule(promotionType, Ext.getCmp('active_point').getValue());
-//	}
-	return head;
-}
-var promotion_uploadMask = new Ext.LoadMask(document.body, {
-	msg : '正在保存活动...'
-});
-var operatePromotion = function(){
-	
-	
-	if(operatePromotTypeWin.oriented == 2 && !active_memberList){
-		Ext.example.msg('提示', '请选择参与活动的会员');
-		return false;
-	}else if(operatePromotTypeWin.oriented == 1){
-		active_memberList = '';
-	}
-	
-	var params = {};
-	var title = Ext.getCmp('active_title');
-	var beginDate = Ext.getCmp('active_beginDate');
-	var endDate = Ext.getCmp('active_endDate');
-	var point = Ext.getCmp('active_point');
-	var couponName = Ext.getCmp('active_couponName');
-	var price = Ext.getCmp('active_price');
-	var expiredDate= Ext.getCmp('active_couponExpiredDate');
-	var editBody = Ext.getCmp('secondStep_edit');
-	var entire = Ext.getCmp('threeStepEastBody');
-	
-	if(operatePromotTypeWin.otype == 'insert'){
-		params.dataSource = 'insert';
-	}else{
-		params.dataSource = 'update';
-		params.id = operatePromotTypeWin.pId;
-		params.cId = couponTypeId;
-	}
-	
-	params.pRule = promotionType;
-	params.oriented = operatePromotTypeWin.oriented?operatePromotTypeWin.oriented:1;
-	params.couponName = couponName.getValue();
-	params.price = price.getValue();
-	params.expiredDate = expiredDate.getValue().format('Y-m-d');
-	params.image = operatePromotTypeWin.ossId;
-	params.title = title.getValue();
-	params.beginDate = beginDate.getValue().format('Y-m-d');
-	params.endDate = endDate.getValue().format('Y-m-d');
-	params.point = point.getValue();
-	params.members = active_memberList;
-	
-	params.body = editBody.getValue();	
-	params.entire = entire.body.dom.innerHTML;
-	params.type = $('#chkSetWelcome').is(':checked');
-
-	promotion_uploadMask.show();
-	Ext.Ajax.request({
-		url : '../../OperatePromotion.do',
-		params : params,
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
-			promotion_uploadMask.hide();
-			if(jr.success){
-				promotionTree.getRootNode().reload();
-				operatePromotTypeWin.hide();
-				Ext.example.msg(jr.title, jr.msg);
-			}else{
-				Ext.ux.showMsg(jr);
-			}
-		},
-		fialure : function(res, opt){
-			wx.lm.hide();
-			Ext.ux.showMsg(res.responseText);
-		}
-	});	
-	
-}
-
-function fnValidSecondSteps(){
-	var title = '提示';
-	if(!Ext.getCmp('active_title').isValid()){
-		Ext.example.msg(title, '请填写活动标题');
-		return false;
-	}
-	
-	if(!Ext.getCmp('active_endDate').isValid()){
-		Ext.example.msg(title, '请填写活动时间');
-		return false;
-	}		
-	
-	if((Ext.getCmp('active_beginDate').getValue().getTime() + 86000000) < (new Date()).getTime()){
-		Ext.example.msg(title, '活动开始时间要大于当前时间');
-		return false;
-	}
-	
-	if((Ext.getCmp('active_endDate').getValue().getTime() + 86000000) < (new Date()).getTime()){
-		Ext.example.msg(title, '活动结束时间要大于当前时间');
-		return false;
-	}
-	
-	if((promotionType == 3 || promotionType == 4) && !Ext.getCmp('active_point').isValid()){
-		Ext.example.msg(title, '请填写积分条件');
-		return false;
-	}
-	
-	if(promotionType != 1 && !Ext.getCmp('active_couponName').isValid()){
-		Ext.example.msg(title, '请填写优惠劵名称');
-		return false;
-	}
-	
-	if(promotionType != 1 && !Ext.getCmp('active_couponExpiredDate').isValid()){
-		Ext.example.msg(title, '请填写优惠劵到期时间');
-		return false;
-	}
-	
-	if(promotionType != 1 && (Ext.getCmp('active_couponExpiredDate').getValue().getTime() + 86000000) < (new Date()).getTime()){
-		Ext.example.msg(title, '优惠劵有效期要大于当前时间');
-		return false;
-	}	
-	
-	return true;
-	
-}
-
-function fnSetWelcomePage(){
-	if($('#chkSetWelcome').is(':checked')){
-		 $("#chkSetWelcome").removeAttr("checked");
-	}else{
-		$("#chkSetWelcome").attr("checked",'true');
-	}
-}
-
-$(function (){
-    $("#wizard").steps({
-        headerTag: "span",
-        bodyTag: "div",
-        transitionEffect: "slideLeft",
-        labels: {
-            current: "current step:",
-            pagination: "Pagination",
-            finish: "完成",
-            next: "下一步",
-            previous: "上一步",
-            loading: "加载中 ..."
-        },
-        onStepChanged: function (event, currentIndex, priorIndex) { 
-        	if(currentIndex == 1){
-        		Ext.getCmp('active_title').focus(true, 100);
-        		Ext.getCmp('btnSecondStepEastBody').handler();
-        	}else if(currentIndex == 2){
-        		if(operatePromotTypeWin.oriented == 2){
-        			
-        			
-        			Ext.getCmp('active_member_btnHeightSearch').handler();	
-        			if(memberBasicGrid){
-        	    		memberBasicGrid.syncSize(); //强制计算高度
-        	    		memberBasicGrid.doLayout();//重新布局            				
-        			}
- 
-    	    		
-    	    		Ext.getCmp('threeStepEastBody').body.update(buildPreviewHead()+'<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">'+Ext.getCmp('secondStep_edit').getValue()+'</div>');
-        		}
-        		Ext.getCmp('threeStepEastBody').body.update(buildPreviewHead()+'<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">'+Ext.getCmp('secondStep_edit').getValue()+'</div>');
-        		
-        	}
-        },
-        onStepChanging : function(event, currentIndex, newIndex){
-        	if(currentIndex == 1 && newIndex == 2 && winUnhide){
-        		return fnValidSecondSteps();
-        	}else if(currentIndex == 1 && newIndex == 0 && operatePromotTypeWin.otype == 'update'){
-        		Ext.example.msg('提示', '不能修改活动类型');
-        		return false;
-        	}else{
-        		return true;
-        	}
-        },
-        onFinished: function(event, currentIndex, newIndex){
-        	return operatePromotion();
-        }
-    });
-});
-</script>  	
 </head>
 <body>
 
@@ -234,36 +38,32 @@ $(function (){
      <div id="wizard" style="width: 95%;margin-left: 2.5%">
             <span style="font-size: 25px;font-weight: bolder;color: red;'">选择活动模板</span>
             <div align="center">
-					<div class="active_mould active_mould_default active_mould_click" onclick="selectPromotionModel(this, 4)">
+<!-- 					<div class="active_mould active_mould_default active_mould_click" onclick="selectPromotionModel(this, 4)">
 	            		<img alt="" src="../../images/promotionTotalPointModel.png" width="230px" height="350px"><br><span id="span_firstModel"><input type="radio" name="rdo_activeMould" checked="checked" />模板一(累计积分满获优惠劵)</span>
 	            	</div>
 	            	<div class="active_mould active_mould_default" onclick="selectPromotionModel(this, 3)">
 	            		<img alt="" src="../../images/promotionOncePointModel.png" width="230px" height="350px"><br><span><input type="radio" name="rdo_activeMould" />模板二(单次积分满获优惠劵)</span>
-	            	</div>   
+	            	</div>  -->  
 	            	<div class="active_mould active_mould_default" onclick="selectPromotionModel(this, 2)">
-	            		<img alt="" src="../../images/promotionFreePointModel.png" width="230px" height="350px"><br><span ><input type="radio" name="rdo_activeMould" />模板三(免费领取优惠劵)</span>
+	            		<img alt="" src="../../images/promotionFreePointModel.png" width="230px" height="350px"><br><span ><input type="radio" name="rdo_activeMould" />模板一(免费领取优惠劵)</span>
 	            	</div>
 	            	<div class="active_mould active_mould_default" onclick="selectPromotionModel(this, 1)">
-	            		<img alt="" src="../../images/promotionDisplayModel.png" width="230px" height="350px"><br><span ><input type="radio" name="rdo_activeMould" />模板四(无优惠劵,纯展示活动)</span>
+	            		<img alt="" src="../../images/promotionDisplayModel.png" width="230px" height="350px"><br><span ><input type="radio" name="rdo_activeMould" />模板二(纯展示活动)</span>
 	            	</div>
 	            	
-	            	<div id="divSetWelcome" style="margin-top: 550px;" align="left">
-	            		&nbsp;&nbsp;&nbsp;<input type="checkbox" id="chkSetWelcome" /><span id="spanSetWelcome" onClick="fnSetWelcomePage()">设置为微信会员欢迎页</span>
-	            	</div>
             </div>
 				
 			<span style="font-size: 25px;">填写活动信息</span>
 			<div >
 				<div id="active_secendStep" ></div>
 				<div id="active_secendStep2" ></div>
-				<div id="active_secendStep3" ></div>
 			</div>
 								
-			<span style="font-size: 25px;">发布活动信息</span>
+<!-- 			<span style="font-size: 25px;">发布活动信息</span>
 			<div>
 				<div id="active_threeStep" ></div>
 			</div>
-
+ -->
     </div>
 </div>	
 </body>
