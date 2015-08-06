@@ -1,9 +1,11 @@
 package com.wireless.pojo.member;
 
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.util.DateUtil;
 
-public class MemberCond {
+public class MemberCond implements Jsonable{
 
 	public static class InsertBuilder{
 		private final String name;
@@ -22,9 +24,9 @@ public class MemberCond {
 		}
 		
 		public InsertBuilder setRangeType(RangeType rangeType){
-			if(rangeType == RangeType.USER_DEFINE){
-				throw new IllegalArgumentException("不能设置自定义查询时间段");
-			}
+//			if(rangeType == RangeType.USER_DEFINE){
+//				throw new IllegalArgumentException("不能设置自定义查询时间段");
+//			}
 			this.rangeType = rangeType;
 			return this;
 		}
@@ -119,9 +121,9 @@ public class MemberCond {
 		}
 		
 		public UpdateBuilder setRangeType(RangeType rangeType){
-			if(rangeType == RangeType.USER_DEFINE){
-				throw new IllegalArgumentException("不能设置自定义查询时间段");
-			}
+//			if(rangeType == RangeType.USER_DEFINE){
+//				throw new IllegalArgumentException("不能设置自定义查询时间段");
+//			}
 			this.rangeType = rangeType;
 			return this;
 		}
@@ -370,5 +372,30 @@ public class MemberCond {
 	
 	public void setMaxBalance(float maxBalance) {
 		this.maxBalance = maxBalance;
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putString("name", this.name);
+		if( this.memberType != null){
+			jm.putInt("memberType", this.memberType.getId() );
+		}
+		jm.putInt("rangeType", this.getRangeType().getVal());
+		jm.putString("beginDate", this.getRange().getOnDutyFormat(DateUtil.Pattern.DATE));
+		jm.putString("endDate", this.getRange().getOffDutyFormat(DateUtil.Pattern.DATE));
+		jm.putFloat("minConsumeMoney", this.minConsumeMoney);
+		jm.putFloat("maxConsumeMoney", this.maxConsumeMoney);
+		jm.putInt("minConsumeAmount", this.minConsumeAmount);
+		jm.putInt("maxConsumeAmount", this.maxConsumeAmount);
+		jm.putFloat("minBalance", this.minBalance);
+		jm.putFloat("maxBalance", this.maxBalance);
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jm, int flag) {
+		
 	}
 }

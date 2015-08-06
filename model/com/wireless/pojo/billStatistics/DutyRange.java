@@ -18,6 +18,15 @@ public class DutyRange implements Jsonable{
 		this.onDuty = DateUtil.parseDate(onDuty);
 		this.offDuty = DateUtil.parseDate(offDuty);
 	}
+
+	public String getOnDutyFormat(DateUtil.Pattern pattern) {
+		return DateUtil.format(onDuty, pattern);
+	}
+	
+	public String getOffDutyFormat(DateUtil.Pattern pattern) {
+		return DateUtil.format(offDuty, pattern);
+	}
+
 	
 	public String getOnDutyFormat() {
 		return DateUtil.format(onDuty, DateUtil.Pattern.DATE_TIME);

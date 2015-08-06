@@ -211,6 +211,7 @@ public class Page{
 	public static enum Member{
 //		MEMBER_TYPE("memberType", "会员类型", "Client_Module/MemberTypeManagement.html", "../../images/memberTypeMgr.png"),
 		MEMBER("memberMgr", "会员管理", "Client_Module/MemberManagement.html", "../../images/memberMgr.png"),
+		MEMBER_COND("memberCond", "会员分析", "Client_Module/memberCond.html", "../../images/history.png"),
 		MEMBER_CHARGE_STATISTICS("memberChargeStatistics", "充值统计", "Client_Module/memberChargeStatistics.html", "../../images/btnRechargeDetails.png"),
 		MEMBER_REFUND_STATISTICS("memberRefundStatistics", "取款统计", "Client_Module/memberRefundStatistics.html", "../../images/btnTakeMoney.png"),
 		MEMBER_CONSUME_STATISTICS("memberConsumeStatistics", "消费统计", "Client_Module/memberConsumeStatistics.html", "../../images/btnConsumeDetail.png"),
