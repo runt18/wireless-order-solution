@@ -17,6 +17,7 @@ import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.member.MemberCondDao;
 import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
@@ -33,6 +34,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.DiscountPlan;
+import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
@@ -127,6 +129,9 @@ public class TestRestaurantDao {
 			//Compare the business hour
 			compareBusinessHour(staff);
 			
+			//Compare the member condition
+			compareMemberCond(staff);
+			
 			//Update a restaurant
 			Restaurant.UpdateBuilder updateBuilder = new Restaurant.UpdateBuilder(restaurantId)
 																   .setAccount("test2")
@@ -187,6 +192,14 @@ public class TestRestaurantDao {
 			
 		}finally{
 			RestaurantDao.deleteById(restaurantId);
+		}
+	}
+	
+	private void compareMemberCond(Staff staff) throws SQLException{
+		for(MemberCond memberCond : MemberCondDao.getByCond(staff, null)){
+			if(!memberCond.getName().equals("活跃会员") && !memberCond.getName().equals("沉睡会员")){
+				Assert.assertTrue("business hour", false);
+			}
 		}
 	}
 	

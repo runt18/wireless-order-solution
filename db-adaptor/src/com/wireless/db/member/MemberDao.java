@@ -136,9 +136,12 @@ public class MemberDao {
 			if(memberCond.getMemberType() != null){
 				setMemberType(memberCond.getMemberType());
 			}
-			betweenBalance(memberCond.getMinBalance(), memberCond.getMaxBalance());
-			betweenConsume(memberCond.getMinConsumeAmount(), memberCond.getMaxConsumeAmount());
-			betweenTotalConsume(memberCond.getMinConsumeMoney(), memberCond.getMaxConsumeMoney());
+			this.minBalance = memberCond.getMinBalance();
+			this.maxBalance = memberCond.getMaxBalance();
+			this.minConsumeAmount = memberCond.getMinConsumeAmount();
+			this.maxConsumeAmount = memberCond.getMaxConsumeAmount();
+			this.minTotalConsume = memberCond.getMinConsumeMoney();
+			this.maxTotalConsume = memberCond.getMaxConsumeMoney();
 		}
 		
 		public ExtraCond(ReqQueryMember.ExtraCond extraCond){
@@ -1136,8 +1139,7 @@ public class MemberDao {
 		//Create the coupon to this member if the associated published or progressed promotion is oriented all.
 		for(Promotion promotion : PromotionDao.getByCond(dbCon, staff, new PromotionDao.ExtraCond().setOriented(Promotion.Oriented.ALL))){
 			if(promotion.getRule() != Promotion.Rule.DISPLAY_ONLY){
-				int couponId = CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(promotion.getCouponType().getId(), promotion.getId()).addMember(memberId));
-				CouponDao.draw(dbCon, staff, couponId, CouponDao.DrawType.AUTO);
+				CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(promotion.getCouponType().getId(), promotion.getId()).addMember(memberId));
 			}
 		}
 		
@@ -1350,7 +1352,7 @@ public class MemberDao {
 		for(Member member : getByCond(dbCon, staff, extraCond, null)){
 			String sql;
 			//Delete the coupon associated with this member
-			CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setMember(member.getId()));
+			CouponDao.deleteByCond(dbCon, staff, new CouponDao.ExtraCond().setMember(member.getId()));
 			
 			//Delete the interested member.
 			sql = " DELETE FROM " + Params.dbName + ".interested_member WHERE member_id = " + member.getId();

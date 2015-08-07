@@ -234,12 +234,11 @@ public class PromotionDao {
 			//Create the coupon to specific members.
 			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(builder.getMembers()));
 		}
-		
 		return promotionId;
 	}
 	
 	/**
-	 * Update the promotion according to specific builder.
+	 * Update the promotion according to specific builder {@link Promotion#UpdateBuilder}.
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
@@ -264,7 +263,7 @@ public class PromotionDao {
 	}
 	
 	/**
-	 * Update the promotion according to specific builder.
+	 * Update the promotion according to specific builder {@link Promotion#UpdateBuilder}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -352,7 +351,7 @@ public class PromotionDao {
 //			if(original.getType() == Promotion.Type.WELCOME && promotion.getOriented() != Promotion.Oriented.ALL){
 //				throw new BusinessException("【" + Promotion.Type.WELCOME.toString() + "】属性的优惠活动只能面向所有会员", PromotionError.PROMOTION_UPDATE_NOT_ALLOW);
 //			}
-			CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion.getId()));
+			CouponDao.deleteByCond(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion.getId()));
 			if(promotion.getOriented() == Promotion.Oriented.ALL){
 				//Create the coupon to all members.
 				CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(MemberDao.getByCond(dbCon, staff, null, null)));
@@ -770,9 +769,9 @@ public class PromotionDao {
 		Promotion promotion = getById(dbCon, staff, promotionId);
 		if(promotion.getStatus() == Promotion.Status.CREATED || promotion.getStatus() == Promotion.Status.FINISH){
 			
-			if(!CouponDao.getByCond(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion).setStatus(Coupon.Status.DRAWN), null).isEmpty()){
-				throw new BusinessException("还有【" + promotion.getTitle() + "】活动的优惠券在使用，请在此活动发放的优惠券全部使用或过期后，再删除活动", PromotionError.PROMOTION_DELETE_NOT_ALLOW);
-			}
+//			if(!CouponDao.getByCond(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion).setStatus(Coupon.Status.DRAWN), null).isEmpty()){
+//				throw new BusinessException("还有【" + promotion.getTitle() + "】活动的优惠券在使用，请在此活动发放的优惠券全部使用或过期后，再删除活动", PromotionError.PROMOTION_DELETE_NOT_ALLOW);
+//			}
 			
 			//Delete the associated oss image to this promotion
 			OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_PROMOTION, promotion.getId()));

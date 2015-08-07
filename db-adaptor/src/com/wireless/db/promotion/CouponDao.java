@@ -14,6 +14,7 @@ import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Coupon;
+import com.wireless.pojo.promotion.Coupon.DrawType;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.Promotion.Status;
@@ -169,7 +170,7 @@ public class CouponDao {
 	 * 			the staff to perform this action
 	 * @param builder
 	 * 			the insert all builder
-	 * @return the amount to coupon assigned to member
+	 * @return the array containing the id to coupon just inserted
 	 * @throws SQLException 
 	 * 			throws if database can NOT be connected
 	 * @throws SQLException
@@ -180,7 +181,7 @@ public class CouponDao {
 	 * 			<li>the coupon type has expired
 	 * 			<li>the member does NOT exist 
 	 */
-	public static int create(Staff staff, Coupon.CreateBuilder builder) throws SQLException, BusinessException{
+	public static int[] create(Staff staff, Coupon.CreateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -198,7 +199,7 @@ public class CouponDao {
 	 * 			the staff to perform this action
 	 * @param builder
 	 * 			the insert all builder
-	 * @return the amount to coupon assigned to member
+	 * @return the array containing the id to coupon just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
@@ -207,7 +208,7 @@ public class CouponDao {
 	 * 			<li>the coupon type has expired
 	 * 			<li>the member does NOT exist
 	 */
-	public static int create(DBCon dbCon, Staff staff, Coupon.CreateBuilder builder) throws SQLException, BusinessException{
+	public static int[] create(DBCon dbCon, Staff staff, Coupon.CreateBuilder builder) throws SQLException, BusinessException{
 		final Promotion promotion = PromotionDao.getById(dbCon, staff, builder.getPromotionId());
 		if(promotion.getStatus() == Promotion.Status.FINISH){
 			throw new BusinessException("【" + promotion.getTitle() + "】已经结束, 不能创建优惠券", PromotionError.COUPON_CREATE_NOT_ALLOW);
@@ -218,20 +219,30 @@ public class CouponDao {
 		if(couponType.isExpired()){
 			throw new BusinessException(PromotionError.COUPON_EXPIRED);
 		}
-		int amount = 0;
+		final List<Integer> coupons = new ArrayList<Integer>();
 		for(Member member : builder.getMembers()){
 			try{
 				//Check to see whether the member exist.
 				if(MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setId(member.getId()), null).isEmpty()){
 					continue;
 				}
-				insert(dbCon, staff, new Coupon.InsertBuilder(couponType, member, promotion));
-				amount++;
+				//Insert the coupon.
+				int couponId = insert(dbCon, staff, new Coupon.InsertBuilder(couponType, member, promotion));
+				//Draw the coupon if draw type belongs to auto.
+				if(builder.getDrawType() == DrawType.AUTO){
+					draw(dbCon, staff, couponId, DrawType.AUTO);
+				}
+				coupons.add(couponId);
 			}catch(BusinessException | SQLException e){
 				e.printStackTrace();
 			}
 		}
-		return amount;
+
+		int[] result = new int[coupons.size()];
+		for(int i = 0; i < result.length; i++){
+			result[i] = coupons.get(i).intValue();
+		}
+		return result;
 	}
 	
 	/**
@@ -265,21 +276,6 @@ public class CouponDao {
 		}
 	}
 	
-	public static enum DrawType{
-		AUTO("自动"),
-		MANUAL("手动");
-		
-		private final String desc;
-		DrawType(String desc){
-			this.desc = desc;
-		}
-		
-		@Override
-		public String toString(){
-			return this.desc;
-		}
-	}
-	
 	/**
 	 * Draw a coupon to specific id.
 	 * @param dbCon
@@ -306,9 +302,9 @@ public class CouponDao {
 //			throw new BusinessException("只有【已发布】的优惠券才可领取", PromotionError.COUPON_DRAW_NOT_ALLOW);
 //		}
 		
-		if(coupon.getPromotion().getRule() == Promotion.Rule.DISPLAY_ONLY){
-			throw new BusinessException("【纯展示】的优惠活动没有优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
-		}
+//		if(coupon.getPromotion().getRule() == Promotion.Rule.DISPLAY_ONLY){
+//			throw new BusinessException("【纯展示】的优惠活动没有优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
+//		}
 		
 		if(drawType == DrawType.MANUAL && coupon.getPromotion().getStatus() != Promotion.Status.PROGRESS){
 			throw new BusinessException("只有【进行中】的优惠活动才可自助领取优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
@@ -606,14 +602,28 @@ public class CouponDao {
 	}
 	
 	
-	public static int delete(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
-		String sql;
-		sql = " DELETE C FROM " + Params.dbName + ".coupon AS C " + 
-			  " WHERE 1 = 1 " +
-			  " AND C.restaurant_id = " + staff.getRestaurantId() +
-			  (extraCond != null ? extraCond : "");
-		
-		return dbCon.stmt.executeUpdate(sql);
+	/**
+	 * Delete the coupon to extra condition {@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the amount to coupon deleted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+		int amount = 0;
+		for(Coupon coupon : getByCond(dbCon, staff, extraCond, null)){
+			String sql;
+			sql = " DELETE FROM " + Params.dbName + ".coupon WHERE coupon_id = " + coupon.getId(); 
+			if(dbCon.stmt.executeUpdate(sql) != 0){
+				amount++;
+			}
+		}
+		return amount;
 	}
 	
 }

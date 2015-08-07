@@ -12,6 +12,7 @@ import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.member.MemberCondDao;
 import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
@@ -31,6 +32,7 @@ import com.wireless.exception.RestaurantError;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -421,6 +423,9 @@ public class RestaurantDao {
 			//Insert the business hour
 			initBusinessHour(dbCon, staff);
 			
+			//Insert the member condition
+			initMemberCond(dbCon, staff);
+			
 			return restaurant.getId();
 			
 		}catch(Exception e){
@@ -431,6 +436,11 @@ public class RestaurantDao {
 		}
 
 	}
+	
+	private static void initMemberCond(DBCon dbCon, Staff staff) throws SQLException{
+		MemberCondDao.insert(dbCon, staff, new MemberCond.InsertBuilder("活跃会员").setRangeType(MemberCond.RangeType.LAST_3_MONTHS).setConsumeAmount(0, 5));
+		MemberCondDao.insert(dbCon, staff, new MemberCond.InsertBuilder("活跃会员").setRangeType(MemberCond.RangeType.LAST_3_MONTHS).setConsumeAmount(3, 0));
+	};
 	
 	private static void initBusinessHour(DBCon dbCon, Staff staff) throws SQLException, ParseException{
 		BusinessHourDao.insert(dbCon, staff, new BusinessHour.InsertBuilder("早市", new HourRange("6:00", "11:00", DateUtil.Pattern.HOUR)));

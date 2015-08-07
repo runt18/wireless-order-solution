@@ -14,9 +14,9 @@ import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.member.MemberLevel;
-import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.member.MemberLevel.InsertBuilder;
 import com.wireless.pojo.member.MemberLevel.UpdateBuilder;
+import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 

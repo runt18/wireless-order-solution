@@ -98,7 +98,7 @@ public class TestPromotionDao {
 			Assert.assertTrue("failed to upload promotion image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), ossPromotionImg1.getObjectKey()) != null);
 			//Compare the coupon related to this promotion.
 			for(Member m : members){
-				compare(promotionId, Coupon.Status.CREATED, couponTypeId, m, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m).setPromotion(promotionId), null).get(0));
+				compare(promotionId, Coupon.Status.DRAWN, couponTypeId, m, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m).setPromotion(promotionId), null).get(0));
 				//compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
 			}
 			
@@ -141,9 +141,9 @@ public class TestPromotionDao {
 			Assert.assertEquals("status to promotion image", OssImage.Status.MARRIED, ossPromotionImg2.getStatus());
 			Assert.assertTrue("failed to upload promotion image 2 to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), ossPromotionImg2.getObjectKey()) != null);
 			//Compare the coupon related to this promotion.
-			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m1, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0));
-			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
-			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m3, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m3).setPromotion(promotionId), null).get(0));
+			compare(promotionId, Coupon.Status.DRAWN, couponTypeId, m1, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0));
+			compare(promotionId, Coupon.Status.DRAWN, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
+			compare(promotionId, Coupon.Status.DRAWN, couponTypeId, m3, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m3).setPromotion(promotionId), null).get(0));
 			
 			//---------- Test the original oss image after promotion update --------------
 			OssImage oriImage = OssImageDao.getById(mStaff, oriImageToCouponType);

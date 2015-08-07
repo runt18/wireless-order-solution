@@ -2,6 +2,7 @@ package com.wireless.db.member;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -246,14 +247,22 @@ public class MemberCondDao {
 			memberCond.setRangeType(RangeType.valueOf(dbCon.rs.getInt("range_type")));
 			
 			if(memberCond.getRangeType() == MemberCond.RangeType.LAST_1_MONTH){
-				memberCond.setRange(new DutyRange(System.currentTimeMillis() - (long)3600 * 24 * 30 * 1000, System.currentTimeMillis()));
-				
+				//近1月
+				Calendar c = Calendar.getInstance();
+				c.add(Calendar.MONTH, -1);
+				memberCond.setRange(new DutyRange(c.getTime().getTime(), System.currentTimeMillis()));
 				
 			}if(memberCond.getRangeType() == MemberCond.RangeType.LAST_2_MONTHS){
-				memberCond.setRange(new DutyRange(System.currentTimeMillis() - (long)3600 * 24 * 60 * 1000, System.currentTimeMillis()));
+				//近2月
+				Calendar c = Calendar.getInstance();
+				c.add(Calendar.MONTH, -2);
+				memberCond.setRange(new DutyRange(c.getTime().getTime(), System.currentTimeMillis()));
 				
 			}if(memberCond.getRangeType() == MemberCond.RangeType.LAST_3_MONTHS){
-				memberCond.setRange(new DutyRange(System.currentTimeMillis() - (long)3600 * 24 * 90 * 1000, System.currentTimeMillis()));
+				//近3月
+				Calendar c = Calendar.getInstance();
+				c.add(Calendar.MONTH, -3);
+				memberCond.setRange(new DutyRange(c.getTime().getTime(), System.currentTimeMillis()));
 				
 			}else if(memberCond.getRangeType() == MemberCond.RangeType.USER_DEFINE){
 				long onDuty = 0;
