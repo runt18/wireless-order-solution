@@ -13,6 +13,7 @@ import com.wireless.pojo.util.SortedList;
 public class Coupon implements Jsonable{
 
 	public static class CreateBuilder{
+		private DrawType drawType = DrawType.AUTO;
 		private final int couponTypeId;
 		private final int promotionId;
 		private final SortedList<Member> members = SortedList.newInstance();
@@ -28,6 +29,15 @@ public class Coupon implements Jsonable{
 		
 		public int getPromotionId(){
 			return this.promotionId;
+		}
+		
+		public CreateBuilder setDrawType(DrawType drawType){
+			this.drawType = drawType;
+			return this;
+		}
+		
+		public DrawType getDrawType(){
+			return this.drawType;
 		}
 		
 		public CreateBuilder addMember(int memberId){
@@ -63,6 +73,21 @@ public class Coupon implements Jsonable{
 		
 		public Coupon build(){
 			return new Coupon(this);
+		}
+	}
+	
+	public static enum DrawType{
+		AUTO("自动"),
+		MANUAL("手动");
+		
+		private final String desc;
+		DrawType(String desc){
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
 		}
 	}
 	

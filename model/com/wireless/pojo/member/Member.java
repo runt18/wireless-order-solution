@@ -17,8 +17,8 @@ import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.pojo.util.SortedList;
 import com.wireless.pojo.util.DateUtil.Pattern;
+import com.wireless.pojo.util.SortedList;
 
 public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
