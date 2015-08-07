@@ -116,7 +116,7 @@ function memberCondTreeInit(){
 			id : 'btnRefreshMemberType',
 			iconCls : 'btn_refresh',
 			handler : function(){
-				Ext.getDom('memberTypeShowType').innerHTML = '----';
+				Ext.getDom('memberCondName').innerHTML = '----';
 				memberCondTree.getRootNode().reload();
 			}
 		}]
