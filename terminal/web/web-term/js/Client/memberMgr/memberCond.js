@@ -1,5 +1,7 @@
-﻿var memberCondWin;
-var memberCond_obj = {treeId : 'tree_memberCond', option : [{name:'修改', fn:"updateMemberCond()"},{name:'删除', fn:"deleteMemberCond()"}]};
+﻿
+var memberCondBasicGrid, memberBasicWin, adjustPointWin, memberCouponWin,m_memberTypeWin, m_searchAdditionFilter = 'create',
+	memberCondWin,
+	memberCond_obj = {treeId : 'tree_memberCond', option : [{name:'修改', fn:"updateMemberCond()"},{name:'删除', fn:"deleteMemberCond()"}]};
 
 /**
  * 修改memberCond
@@ -71,7 +73,7 @@ function deleteMemberCond(){
  * 根据条件分析会员
  */
 function queryMembersByCond(c){
-	var gs = memberBasicGrid.getStore();
+	var gs = memberCondBasicGrid.getStore();
 	gs.baseParams['memberType'] = Ext.getCmp('memberSearchByType').getValue();
 	gs.baseParams['memberCondMinConsume'] = Ext.getCmp('textTotalMinMemberCost').getValue();
 	gs.baseParams['memberCondMaxConsume'] = Ext.getCmp('textTotalMaxMemberCost').getValue();
@@ -99,7 +101,7 @@ function queryMembersByCond(c){
 /**
  * 初始化筛选
  */
-function treeInit(){
+function memberCondTreeInit(){
 	var memberTypeTreeTbar = new Ext.Toolbar({
 		items : ['->',{
 			text : '添加',
@@ -199,7 +201,7 @@ function treeInit(){
 	});
 };
 
-function gridInit(){
+function memberCondGridInit(){
 	var member_beginDate = new Ext.form.DateField({
 		xtype : 'datefield',	
 		id : 'dateSearchDateBegin',
@@ -226,7 +228,7 @@ function gridInit(){
 		}
 	});
 	
-	var memberBasicGridExcavateMemberTbar = new Ext.Toolbar({
+	var memberCondBasicGridExcavateMemberTbar = new Ext.Toolbar({
 		height : 28,		
 		items : [{
 				xtype : 'tbtext',
@@ -271,13 +273,6 @@ function gridInit(){
 				text : '导出',
 				iconCls : 'icon_tb_exoprt_excel',
 				handler : function(e){
-
-					var memberTypeNode = memberCondTree.getSelectionModel().getSelectedNode();
-//					var tipWinShow = false;
-					var memberType = '';
-					if(memberTypeNode){
-						memberType = memberTypeNode.attributes.memberTypeId;
-					}
 					var url = '../../{0}?memberType={1}&MinTotalMemberCost={2}&MaxTotalMemberCost={3}&consumptionMinAmount={4}&consumptionMaxAmount={5}'+
 							'&memberMinBalance={6}&memberMaxBalance={7}&dateBegin={8}&dateEnd={9}&dataSource={10}';
 					url = String.format(
@@ -301,7 +296,7 @@ function gridInit(){
 		
 	});
 	
-	var memberBasicGridSortTbar = new Ext.Toolbar({
+	var memberCondBasicGridSortTbar = new Ext.Toolbar({
 		height : 28,		
 		items : [{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
 			{xtype : 'tbtext', text : '消费次数:'},
@@ -384,8 +379,8 @@ function gridInit(){
 		
 	});	
 	
-	memberBasicGrid = createGridPanel(
-		'memberBasicGrid',
+	memberCondBasicGrid = createGridPanel(
+		'memberCondBasicGrid',
 		'会员信息',
 		'',
 		'',
@@ -408,16 +403,16 @@ function gridInit(){
 		[['isPaging', true],['dataSource', 'byMemberCond']],
 		100,
 		'',
-		[memberBasicGridExcavateMemberTbar, memberBasicGridSortTbar]
+		[memberCondBasicGridExcavateMemberTbar, memberCondBasicGridSortTbar]
 	);	
-	memberBasicGrid.region = 'center';
-	memberBasicGrid.loadMask = { msg : '数据加载中，请稍等...' };
+	memberCondBasicGrid.region = 'center';
+	memberCondBasicGrid.loadMask = { msg : '数据加载中，请稍等...' };
 	
-	memberBasicGrid.on('rowdblclick', function(e){
+	memberCondBasicGrid.on('rowdblclick', function(e){
 		updateMemberHandler();
 	});
 	
-	memberBasicGrid.keys = [{
+	memberCondBasicGrid.keys = [{
 		key : Ext.EventObject.ENTER,
 		scope : this,
 		fn : function(){ 
@@ -728,8 +723,8 @@ if(!memberCondWin){
 
 Ext.onReady(function(){
 	
-	treeInit();
-	gridInit();
+	memberCondTreeInit();
+	memberCondGridInit();
 	
 	var memberTypePanel = new Ext.Panel({
 		layout : 'border',
@@ -752,7 +747,7 @@ Ext.onReady(function(){
 //		width : parseInt(Ext.getDom('divMember').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divMember').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
-		items : [memberTypePanel, memberBasicGrid],
+		items : [memberTypePanel, memberCondBasicGrid],
 		autoScroll : true
 	});
 	 
