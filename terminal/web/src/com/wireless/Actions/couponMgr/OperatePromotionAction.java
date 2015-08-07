@@ -377,10 +377,17 @@ public class OperatePromotionAction extends DispatchAction{
 			throws Exception {
 		String pin = (String) request.getAttribute("pin");
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		String rule = request.getParameter("rule");
+		
+		PromotionDao.ExtraCond extra = new PromotionDao.ExtraCond();
+		if(rule != null && !rule.isEmpty() && !rule.equals("-1")){
+			extra.setRule(Promotion.Rule.valueOf(Integer.parseInt(rule)));
+		}
+		
 		StringBuilder pTree = new StringBuilder();
 		try{
 			
-				String p_create = children(staff, new PromotionDao.ExtraCond().addStatus(Status.CREATED));
+				String p_create = children(staff, extra.addStatus(Status.CREATED));
 				if(!p_create.isEmpty()){
 					pTree.append("{")
 					.append("text:'已创建'")
@@ -390,8 +397,8 @@ public class OperatePromotionAction extends DispatchAction{
 					.append("}");						
 				}
 
-				
-				String progress = children(staff, new PromotionDao.ExtraCond().addStatus(Status.PROGRESS));
+				extra.clearStatus();
+				String progress = children(staff, extra.addStatus(Status.PROGRESS));
 				if(!progress.isEmpty()){
 					if(!pTree.toString().isEmpty()){
 						pTree.append(",");
@@ -404,6 +411,7 @@ public class OperatePromotionAction extends DispatchAction{
 					.append("}");	
 				}
 	
+				extra.clearStatus();
 				String finish = children(staff, new PromotionDao.ExtraCond().addStatus(Status.FINISH));
 				if(!finish.isEmpty()){
 					if(!pTree.toString().isEmpty()){

@@ -20,9 +20,12 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.util.DataPaging;
 
 public class QueryCouponAction extends DispatchAction{
 
@@ -102,27 +105,38 @@ public class QueryCouponAction extends DispatchAction{
 	
 	
 	public ActionForward byCondtion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String formId = request.getParameter("fid");
-		String openId = request.getParameter("oid");
 		String pId = request.getParameter("pId");
-		
-		int rid = 0;
-		rid = WxRestaurantDao.getRestaurantIdByWeixin(formId);
-		Staff staff = StaffDao.getAdminByRestaurant(rid);
-		
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		String status = request.getParameter("status");
+		Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 		
 		JObject jobject = new JObject();
 		try{
 			CouponDao.ExtraCond extra = new CouponDao.ExtraCond();
-			extra.setMember(MemberDao.getByWxSerial(staff, openId));
 			extra.setPromotion(Integer.parseInt(pId));
-			extra.setStatus(Coupon.Status.PUBLISHED);
+			
+			if(status != null && !status.isEmpty()){
+				extra.setStatus(Coupon.Status.valueOf(Integer.parseInt(status)));
+			}
 			
 			List<Coupon> list = CouponDao.getByCond(staff, extra, null);
-			for(int i = 0; i < list.size(); i++){
-				list.set(i, CouponDao.getById(staff, list.get(0).getId()));
-			}
-			jobject.setRoot(list);
+			jobject.setTotalProperty(list.size());
+			jobject.setRoot(DataPaging.getPagingData(list, true, start, limit));
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putInt("couponPublished", 10);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jm, int flag) {
+				}
+				
+			});
 		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -135,4 +149,35 @@ public class QueryCouponAction extends DispatchAction{
 		return null;
 	}	
 	
+	public ActionForward byCondtion1(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String pId = request.getParameter("pId");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		String status = request.getParameter("status");
+		Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
+		
+		JObject jobject = new JObject();
+		try{
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putInt("couponPublished", 10);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jm, int flag) {
+				}
+				
+			});
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
 }
