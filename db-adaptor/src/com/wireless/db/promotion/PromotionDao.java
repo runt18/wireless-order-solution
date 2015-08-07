@@ -64,6 +64,11 @@ public class PromotionDao {
 			return this;
 		}
 		
+		public ExtraCond clearStatus(){
+			this.statusList.clear();
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -767,7 +772,7 @@ public class PromotionDao {
 	 */
 	public static void delete(DBCon dbCon, Staff staff, int promotionId) throws SQLException, BusinessException{
 		Promotion promotion = getById(dbCon, staff, promotionId);
-		if(promotion.getStatus() == Promotion.Status.CREATED || promotion.getStatus() == Promotion.Status.FINISH){
+		//if(promotion.getStatus() == Promotion.Status.CREATED || promotion.getStatus() == Promotion.Status.FINISH){
 			
 //			if(!CouponDao.getByCond(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion).setStatus(Coupon.Status.DRAWN), null).isEmpty()){
 //				throw new BusinessException("还有【" + promotion.getTitle() + "】活动的优惠券在使用，请在此活动发放的优惠券全部使用或过期后，再删除活动", PromotionError.PROMOTION_DELETE_NOT_ALLOW);
@@ -794,9 +799,9 @@ public class PromotionDao {
 			if(dbCon.stmt.executeUpdate(sql) == 0){
 				throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
 			}
-		}else{
-			throw new BusinessException("只有【已创建】或【已结束】状态的活动才能删除", PromotionError.PROMOTION_DELETE_NOT_ALLOW);
-		}
+		//}else{
+		//	throw new BusinessException("只有【已创建】或【已结束】状态的活动才能删除", PromotionError.PROMOTION_DELETE_NOT_ALLOW);
+		//}
 	}
 	
 	public static class Result{
