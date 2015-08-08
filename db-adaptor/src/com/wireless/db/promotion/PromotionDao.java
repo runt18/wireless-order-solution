@@ -44,6 +44,12 @@ public class PromotionDao {
 			return this;
 		}
 		
+		public ExtraCond setStatus(Promotion.Status status){
+			this.statusList.clear();
+			this.statusList.add(status);
+			return this;
+		}
+		
 		public ExtraCond addStatus(Promotion.Status status){
 			this.statusList.add(status);
 			return this;
@@ -61,11 +67,6 @@ public class PromotionDao {
 		
 		public ExtraCond setOriented(Promotion.Oriented oriented){
 			this.oriented = oriented;
-			return this;
-		}
-		
-		public ExtraCond clearStatus(){
-			this.statusList.clear();
 			return this;
 		}
 		
