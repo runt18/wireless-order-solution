@@ -198,13 +198,13 @@ $(function(){
 		templet : function(c){
 			var aliasOrName;
 			if(c.data.categoryValue == 1){//一般台
-				aliasOrName = c.data.alias
+				aliasOrName = c.data.alias;
 			}else if(c.data.categoryValue == 3){//搭台
 				var begin = c.data.name.indexOf("(");
 				var end = c.data.name.indexOf(")");
 				aliasOrName = '<font color="green">' + c.data.name.substring(begin+1, end) +'</font>';
 			}else{
-				aliasOrName = '<font color="green">'+ c.data.categoryText +'</font>'
+				aliasOrName = '<font color="green">'+ c.data.categoryText +'</font>';
 			}
 			return tableCmpTemplet.format({
 				dataIndex : c.index,
@@ -314,28 +314,26 @@ $(function(){
 			numKeyBoardFireEvent = null;
 		}
 
-	})
+	});
 	
 	//刷新微信预订单
 	ts.refreshWeixinBook();
 	
 	//用户自定义日期
 	$('#conditionDayBeginDay').bind('change', function(){
-		console.log(1111)
 		if($('#conditionDayBeginDay').val() && $('#conditionDayEndDay').val() ){
-			ts.searchBookList({begin:$('#conditionDayBeginDay').val(), end:$('#conditionDayEndDay').val()})
+			ts.searchBookList({begin:$('#conditionDayBeginDay').val(), end:$('#conditionDayEndDay').val()});
 		}
 	});	
 	$('#conditionDayEndDay').bind('change', function(){
 		if($('#conditionDayBeginDay').val() && $('#conditionDayEndDay').val() ){
-			console.log($('#conditionDayEndDay').val())
-			ts.searchBookList({begin:$('#conditionDayBeginDay').val(), end:$('#conditionDayEndDay').val()})
+			console.log($('#conditionDayEndDay').val());
+			ts.searchBookList({begin:$('#conditionDayBeginDay').val(), end:$('#conditionDayEndDay').val()});
 		}
 	});	
 	
-	//设置
-	$('#kfoutbox').css("margin-top", "50px");
-	
+	//设置客服QQ位置
+	//$('#kfoutbox').css("margin-top", "50px");
 	
 });	
 
@@ -347,7 +345,7 @@ ts.loadData = function(){
 	location.href = '#tableSelectMgr';
 	initTableData();
 	of.loadFoodDateAction = window.setInterval("keepLoadTableData()", 500);	
-}
+};
 
 //设置搜索出来的餐台升序排序, 按名称长短
 ts.searchTableCompareByName = function (obj1, obj2) {
@@ -360,14 +358,13 @@ ts.searchTableCompareByName = function (obj1, obj2) {
     } else {
         return 0;
     }            
-} 
+}; 
 
 //动态加载易笔字
-function dynamicLoadYBZ()  
-{  
+function dynamicLoadYBZ(){  
 	YBZ_win = '';
 	YBZ_open = function(){};
-   var script=document.createElement('script');  
+    var script = document.createElement('script');  
 	script.setAttribute('type','text/javascript');  
 	script.setAttribute('src','http://www.yibizi.com/ybz_core/core/ybz.min.js');  
 	document.getElementsByTagName('head')[0].appendChild(script);  
@@ -382,8 +379,9 @@ function dynamicLoadYBZ()
 			YBZ_fixed = true;//是否固定手写窗口			   
 	   }  
 	   script.onload = script.onreadystatechange = null;  
-	}  
+	};  
 }  
+
 function addStyle() {
     var container = document.getElementsByTagName("head")[0];
     var addStyle = document.createElement("link");
@@ -396,14 +394,14 @@ function addStyle() {
 
 
 
-window.onload=function(){
+window.onload = function(){
 	if(systemStatus == 2){
 		$('input[data-type=txt]').focus(function(){
 			//if(getcookie('isNeedWriter') == 'true'){
 			//关闭数字键盘
 			$('#numberKeyboard').hide();
 			
-			console.log($(this)[0])
+			//console.log($(this)[0]);
 			
 			YBZ_open($(this)[0]);			
 		});
@@ -538,7 +536,7 @@ window.onload=function(){
     addStyle();
     dynamicLoadYBZ();
     
-}
+};
 
 //改变窗口时
 window.onresize = function(){
@@ -560,7 +558,7 @@ window.onresize = function(){
 	//结账界面高度 & 菜品列表高度
 	$('#paymentCmp').height(document.body.clientHeight - 86);	
 	$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
-}
+};
 
 
 /**
@@ -568,7 +566,7 @@ window.onresize = function(){
  */
 ts.toPaymentMgr = function(){
 	var tableInfo = $('#txtTableNumForTS').val();
-	var tableId;
+	var tableId = 0;
 	if(isNaN(tableInfo)){
 		var temp = tables.slice(0);
 		var table4Search = [];
@@ -593,9 +591,9 @@ ts.toPaymentMgr = function(){
 	updateTable({
 		toPay : true,
 		id : tableId,
-		alias : !tableId?tableInfo:''
+		alias : !tableId ? tableInfo : ''
 	});	
-}
+};
 
 /**
  * 更新菜品列表
@@ -974,7 +972,7 @@ ts.transTable = function(c){
 			renderTo : 'orderFoodListMgr'
 		});		
 	});	
-}
+};
 
 /**
  * 搜索出来的结果点击直接提交
@@ -987,7 +985,7 @@ ts.toOrderFoodOrTransFood = function(c){
 	}else if(ts.commitTableOrTran == 'allTrans'){
 		uo.transFood({id:c.id, allTrans : -1});
 	}else if(ts.commitTableOrTran == 'transTable'){
-		ts.transTable({alias:c.alias})
+		ts.transTable({alias:c.alias});
 	}else if(ts.commitTableOrTran == 'lookup'){
 		updateTable({
 			id : c.id,
@@ -1119,7 +1117,7 @@ ts.toOrderFoodOrTransFood = function(c){
 
 		
 	}
-}
+};
 
 /**
  * 确定精确的搜索条件
@@ -1141,13 +1139,16 @@ ts.submitForSelectTableOrTransFood = function(){
 		}else{
 			Util.msg.tip('没有此餐台, 请重新输入');
 		}		
-	}else if(ts.commitTableOrTran == 'transTable'){//转台
-		ts.transTable({alias:$('#txtTableNumForTS').val()})
-	}else if(ts.commitTableOrTran == 'tableTransTable'){//前台转台
-		ts.transTable({alias:$('#numToOtherTable').val(), oldAlias:$('#txtTableNumForTS').val()})
-	}else if(ts.commitTableOrTran == 'lookup'){//查台
+	}else if(ts.commitTableOrTran == 'transTable'){
+		//转台
+		ts.transTable({alias:$('#txtTableNumForTS').val()});
+	}else if(ts.commitTableOrTran == 'tableTransTable'){
+		//前台转台
+		ts.transTable({alias:$('#numToOtherTable').val(), oldAlias:$('#txtTableNumForTS').val()});
+	}else if(ts.commitTableOrTran == 'lookup'){
+		//查台
 		var tableInfo = $('#txtTableNumForTS').val();
-		var tableId;
+		var tableId = 0;
 		if(isNaN(tableInfo)){
 			var temp = tables.slice(0);
 			var table4Search = [];
@@ -1203,7 +1204,7 @@ ts.submitForSelectTableOrTransFood = function(){
 		uo.closeTransOrderFood();
 
 	}
-}
+};
 
 var printerConnectionTemplet = '<tr>' +
 		'<td>{index}</td>' +
@@ -1216,6 +1217,7 @@ var printerConnectionTemplet = '<tr>' +
 		'<td >{paperEnd}</td>' +
 		'<td >{cutterError}</td>' +
 	'</tr>';
+
 /**
  * 打开远程诊断
  */
@@ -1285,7 +1287,7 @@ ts.displayPrintConnection = function(){
 			});
 		}
 	});
-}
+};
 
 /**
  * 关闭远程诊断
@@ -1293,7 +1295,7 @@ ts.displayPrintConnection = function(){
 ts.closePrintConnection = function(){
 	$('#printerConnectionCmp').hide();
 	$('#shadowForPopup').hide();
-}
+};
 
 /**
  * 设置控件为转台
@@ -1311,7 +1313,7 @@ ts.transTableForTS = function(){
 	
 	//打开控件
 	uo.openTransOrderFood();
-}
+};
 
 /**
  * 设置控件为直接开台
@@ -1359,7 +1361,7 @@ ts.openTableAction = function(){
 	orderDataModel.customNum = customNum;
 	orderDataModel.orderFoods = [];
 	orderDataModel.categoryValue =  ts.table.categoryValue;
-	orderDataModel.comment = $('#inputTableOpenCommon').val()
+	orderDataModel.comment = $('#inputTableOpenCommon').val();
 	
 	$.post('../InsertOrder.do', {
 		commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
@@ -1382,7 +1384,8 @@ ts.openTableAction = function(){
 		}
 	});
 	
-}
+};
+
 /**
  * 设置为查台
  */
@@ -1409,7 +1412,7 @@ ts.createOrderForLookup = function (){
 	
 	//打开控件
 	uo.openTransOrderFood();	
-}
+};
 
 /**
  * 设置预订入座选台
@@ -1427,7 +1430,7 @@ ts.openBookTable = function(){
 	
 	//打开控件
 	uo.openTransOrderFood();		
-}
+};
 
 /**
  * 设置手动预订选台
@@ -1445,7 +1448,7 @@ ts.openAddBookTable = function(){
 	
 	//打开控件
 	uo.openTransOrderFood();		
-}
+};
 
 /**
  * 设置为拆台
@@ -1465,7 +1468,7 @@ ts.openApartTable = function(){
 	
 	//打开控件
 	uo.openTransOrderFood();		
-}
+};
 
 
 /**
@@ -1500,7 +1503,7 @@ ts.openApartTableAction = function(s){
 			renderTo : 'orderFoodListMgr'
 		});		
 	});		
-}
+};
 
 /**
  * 查台后开台操作
@@ -1525,7 +1528,7 @@ ts.createTableWithPeople = function(){
 	}
 	
 	ts.renderToCreateOrder(ts.table.alias, customNum);
-}
+};
 
 /**
  * 关闭开台
@@ -1537,7 +1540,7 @@ ts.closeTableWithPeople = function(){
 	$('#inputTableCustomerCountSet').val(1);
 	
 	$('#numberKeyboard').hide();
-}
+};
 
 
 /**
@@ -1589,7 +1592,7 @@ ts.createOrderForShowMessageTS = function(){
 ts.stopSellMgr = function(){
 	location.href = '#stopSellMgr';
 	ss.entry();
-}
+};
 
 //进入点菜界面
 ts.renderToCreateOrder = function(tableNo, peopleNo){
@@ -1625,7 +1628,7 @@ ts.renderToCreateOrder = function(tableNo, peopleNo){
 			topTip : true
 		});
 	}
-}
+};
 
 /**
  * 根据餐桌alias，返回餐桌对象
@@ -1738,7 +1741,7 @@ function updateTable(c){
 				if(c.toPay){
 					//关闭选台
 					uo.closeTransOrderFood();
-					showPaymentMgr(c)
+					showPaymentMgr(c);
 				}else{
 					handleTableForTS(c);
 				}
@@ -2057,7 +2060,7 @@ ts.addTables = function(o){
 	$(o.event).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
     
     showTable(temp);
-}
+};
 
 /**
  * 获取交班, 日结信息
@@ -2107,7 +2110,7 @@ function getDailyInfo(c){
 			ts.dailyOpe.date = {
 				onDutyFormat : business.paramsOnDuty,
 				offDutyFormat : business.paramsOffDuty
-			}
+			};
 			
 			var trContent = '';
 			if(c.businessStatic != 2){
@@ -2173,7 +2176,7 @@ function getDailyInfo(c){
 			  + '<th class="table_title text_center">实收总额</th>'
 			  + '</tr>'];								
 			//输出付款方式集合
-			var totalCount = 0, totalShouldPay = 0, totalActual = 0, trPayIncomeData;
+			var totalCount = 0, totalShouldPay = 0, totalActual = 0;
 			for(var i = 0; i < business.paymentIncomes.length; i++){
 				var temp = business.paymentIncomes[i];
 				totalCount += temp.amount;
@@ -2348,7 +2351,7 @@ function dailyOperationDaYin(printType){
 function yuda(){
 	ts.dailyOpe.dutyRange = ts.dailyOpe.date;
 	if(ts.dailyOpe.otype == 'jiaokuan'){
-		dailyOperationDaYin(12)
+		dailyOperationDaYin(12);
 	}else{
 		dailyOperationDaYin(5);
 	}
@@ -2418,7 +2421,7 @@ ts.member.openMemberOperationWin = function(){
 			});
 		}
 	}); 		
-}
+};
 
 /**
  * 关闭添加会员
@@ -2435,7 +2438,7 @@ ts.member.closeAddMemberWin = function(){
 	$('#cm_numFirstActualCharge').val('');
 	
 	$('#numberKeyboard').hide();
-}
+};
 
 /**
  * 改变会员类型时
@@ -2453,7 +2456,7 @@ ts.member.add_changeMemberType = function(){
 		$('#tr_memberFirstTimeCharge').hide();
 		$('#tr_memberFirstTimeChargePrint').hide();
 	}
-}
+};
 
 /**
  * 操作会员信息, 添加
@@ -2529,7 +2532,7 @@ ts.member.operateMemberHandler = function(){
 		}		
 	});
 	
-}
+};
 
 
 /**
@@ -2561,7 +2564,7 @@ ts.member.openMemberChargeWin = function(){
 	setTimeout(function(){
 		$('#txtMemberCharge4Read').focus();
 	}, 250);
-}
+};
 
 /**
  * 关闭会员充值
@@ -2574,7 +2577,7 @@ ts.member.closeMemberChargeWin = function(){
 	$('#txtMemberCharge4Read').val('');
 	
 	delete ts.member.rechargeMember;
-}
+};
 
 /**
  * 充值读取会员
@@ -2630,7 +2633,7 @@ ts.member.readMemberByCondtion4Charge = function(stype){
 		error : function(request, status, err){
 		}
 	}); 		
-}
+};
 
 /**
  * 充值时加载会员信息
@@ -2659,7 +2662,7 @@ ts.member.loadMemberInfo4Charge = function(member){
 		$('#rd_numPayMannerMoney').focus();		
 	}
 
-}
+};
 
 /**
  * 充值操作
@@ -2736,7 +2739,7 @@ ts.member.rechargeControlCenter = function(_c){
 			});
 		}		
 	});
-}
+};
 
 
 /**
@@ -2751,9 +2754,8 @@ ts.member.openMemberPointConsumeWin = function(){
 		
 		$('#txtMember4PointConsume').focus();		
 	}, 250);
-	
+};
 
-}
 ts.member.closeMemberPointConsumeWin = function(){
 	
 	$('#memberPointConsume').hide();
@@ -2762,7 +2764,7 @@ ts.member.closeMemberPointConsumeWin = function(){
 	ts.member.loadMemberInfo4PointConsume();
 	
 	$('#txtMember4PointConsume').val('');
-}
+};
 
 
 /**
@@ -2819,7 +2821,7 @@ ts.member.readMemberByCondtion4PointConsume = function(stype){
 		error : function(request, status, err){
 		}
 	}); 		
-}
+};
 
 
 /**
@@ -2838,7 +2840,7 @@ ts.member.loadMemberInfo4PointConsume = function(member){
 	if(!jQuery.isEmptyObject(member)){
 		$('#numConsumePointForConsumePoint').focus();		
 	}
-}
+};
 
 /**
  * 积分消费操作
@@ -2888,7 +2890,7 @@ ts.member.memberPointConsumeAction = function(){
 			});
 		}		
 	});
-}
+};
 
 /**
  * 根据微信号读取会员
@@ -2917,22 +2919,22 @@ ts.member.readWeixinMemberFrontBind = function(){
 			});
 		}		
 	});	
-}
+};
 
 ts.member.openWeixinMemberFrontBind = function(){
 	//前台绑定不需要刷新账单
-	delete ts.member.bindWeixinMember.orderId
+	delete ts.member.bindWeixinMember.orderId;
 	$('#frontPageMemberOperation').popup('close');
 	$('#weixinMemberFrontBind').show();
 	setTimeout(function(){
 		$('#txtMember4FrontBind').focus();
 	}, 250);
-}
+};
 
 ts.member.closeWeixinMemberFrontBind = function(){
 	$('#weixinMemberFrontBind').hide();
 	$('#txtMember4FrontBind').val('');
-}
+};
 
 
 /**
@@ -2944,7 +2946,7 @@ ts.member.memberInfoBind = function(id, memberName){
 	$('#'+id).load("memberBind.jsp",{memberName:memberName}, function(){
 		$('#finishMemberInfo').trigger('create').trigger('refresh');	
 	});
-}
+};
 
 /**
  * 关闭微信绑定
@@ -2961,7 +2963,7 @@ ts.member.closeMemberInfoBind = function(){
 	}
 	//关闭数字键盘
 	$('#numberKeyboard').hide();
-}
+};
 
 /**
  * 绑定前查找
@@ -3002,7 +3004,7 @@ ts.member.readMemberByDetail = function(){
 			});
 		}
 	}, 'json');
-}
+};
 
 /**
  * 设置对比数据
@@ -3036,7 +3038,7 @@ ts.member.showOldMemberDetail = function(m){
 	
 	$('#fm_txtMemberMobile').attr("disabled","disabled").parent().addClass('ui-disabled');
 	$('#fm_numberMemberCard').attr('disabled',"true").parent().addClass('ui-disabled');
-}
+};
 
 /**
  * 绑定微信会员
@@ -3050,7 +3052,7 @@ ts.member.bindWeixinMember = function(){
 		ts.member.bindWeixinMember.orderId = uo.order.id;
 		ts.member.bindWeixinMember.memberId = uo.order.memberId;
 	}else{
-		delete ts.member.bindWeixinMember.orderId
+		delete ts.member.bindWeixinMember.orderId;
 	}	
 	
 	var mobile = $('#fm_txtMemberMobile').val();
@@ -3094,18 +3096,7 @@ ts.member.bindWeixinMember = function(){
 			});
 		}
 	}, 'json');	
-}
-
-
-
-
-
-
-
-
-
-
-
+};
 
 /**
  * 查询会员消费明细
@@ -3165,7 +3156,7 @@ ts.member.searchMemberDetail = function(){
 			});
 		}
 	});		
-} 
+}; 
 
 /**
  * 打开会员消费明细
@@ -3209,7 +3200,7 @@ ts.member.openMemberConsumeDetailWin = function(){
 	
 	$('#memberConsumeDetailWin').show();
 	$('#shadowForPopup').show();
-}
+};
 
 /**
  * 关闭会员消费明细
@@ -3220,7 +3211,7 @@ ts.member.closeMemberConsumeDetailWin = function(){
 	
 	$('#consumeDetail_memberName').val('');
 	$('#front_memberConsumeDetailBody').html('');
-}
+};
 
 /**
  * 酒席分部门入账
@@ -3247,7 +3238,7 @@ ts.displayFeastPayWin = function(){
 	$('.numberInputStyle').focus(function(){
 		focusInput = this.id;
 	});		
-}
+};
 
 /**
  * 关闭酒席入账
@@ -3261,7 +3252,7 @@ ts.closeFeastPayWin = function(){
 	$('#feastPayWinTable').html('');
 	$('#feastPayTotalPrice').text(0);	
 	ts.addFeastDepartment.depts.length = 0;
-}
+};
 
 /**
  * 计算酒席入账总金额
@@ -3274,13 +3265,13 @@ ts.calcFeastPay = function(){
 	for (var i = 0; i < ts.addFeastDepartment.depts.length; i++) {
 		if($('#numForFeast'+ts.addFeastDepartment.depts[i]).val()){
 			totalMoney += parseFloat($('#numForFeast'+ts.addFeastDepartment.depts[i]).val());
-			console.log(typeof $('#numForFeast'+ts.addFeastDepartment.depts[i]).val())
+			//console.log(typeof $('#numForFeast'+ts.addFeastDepartment.depts[i]).val())
 			ts.addFeastDepartment.deptFeast.push(ts.addFeastDepartment.depts[i] + "," + $('#numForFeast'+ts.addFeastDepartment.depts[i]).val());
 		}
 	}
 	
 	$('#feastPayTotalPrice').text(totalMoney);	
-}
+};
 
 /**
  * 添加入账部门
@@ -3328,13 +3319,14 @@ ts.addFeastDepartment = function(index){
 		//设置数字键盘触发
 		numKeyBoardFireEvent = function (){
 			$("#"+fieldId).keyup();
-		}
+		};
 		
 		numForAlias.focus();
 		numForAlias.select();		
 	}, 250);
 
-}
+};
+
 //记录添加的部门
 ts.addFeastDepartment.depts = [];
 //记录添加的部门和金额
@@ -3366,7 +3358,7 @@ ts.feastPayRemoveAction = function(c){
 			ts.calcFeastPay();
 		}
 	});
-}
+};
 
 /**
  * 确定酒席入账
@@ -3391,12 +3383,10 @@ ts.doFeastOrder = function(){
 			});
 		}
 	}, "json");
-}
+};
 
 
 //预订=============================================
-
-
 /**
  * 刷新微信预订单
  */
@@ -3411,7 +3401,8 @@ ts.refreshWeixinBook = function(){
 			}
 		}
 	}, 'json');	
-}
+};
+
 /**
  * 加载预订数据
  */
@@ -3457,7 +3448,7 @@ ts.loadBookListData = function(data){
 		}));
 	}
 	$('#bookOrderListBody').html(html.join("")).trigger('create');
-}
+};
 
 /**
  * 查询列表
@@ -3497,7 +3488,7 @@ ts.searchBookList = function(c){
 		}
 		
 	}, 'json');	
-}
+};
 
 /**
  * 打开日期条件筛选
@@ -3507,7 +3498,7 @@ ts.openConditionDay = function(){
 	$('#conditionDayEndDay').val('');
 	$('#conditionDayBegin').show();
 	$('#conditionDayEnd').show();
-}
+};
 
 
 /**
@@ -3555,7 +3546,7 @@ ts.bookListEntry = function(){
 		}
 	}, 'json');
 
-}
+};
 
 /**
  * 刷新预订
@@ -3568,7 +3559,7 @@ ts.refreshBookList = function(){
 	$("input[name=bookDateType]:eq(0)").attr("checked",'checked').checkboxradio("refresh");
 	
 	ts.bookListEntry();
-}
+};
 
 /**
  * 预订返回
@@ -3590,7 +3581,7 @@ ts.bookListBack = function(){
 	$('#searchBookStatus').val(-1).selectmenu("refresh");
 	$('input[name="bookDateType"]:checked').removeAttr("checked").checkboxradio("refresh");
 	$("input[name=bookDateType]:eq(0)").attr("checked",'checked').checkboxradio("refresh");	
-}
+};
 
 /**
  * 打开预订入座
@@ -3644,7 +3635,7 @@ ts.bookOperateTable = function(c){
 	
 	$('#bookOperateChooseTable').show();
 	$('#shadowForPopup').show();
-}
+};
 
 /**
  * 关闭预订入座
@@ -3653,7 +3644,7 @@ ts.closeBookOperateTable = function(){
 	$('#bookOperateChooseTable').hide();
 	$('#shadowForPopup').hide();
 	$('#bookTableHadChoose').html('');
-} 
+}; 
 
 /**
  * 删除预订
@@ -3678,7 +3669,7 @@ ts.deleteBook = function(c){
 			}
 		}
 	});	
-}
+};
 
 /**
  * 加载已选餐台
@@ -3688,13 +3679,13 @@ ts.loadBookChoosedTable = function(c){
 	for (var i = 0; i < c.tables.length; i++) {
 		var aliasOrName;
 		if(c.tables[i].categoryValue == 1){//一般台
-			aliasOrName = c.tables[i].alias
+			aliasOrName = c.tables[i].alias;
 		}else if(c.tables[i].categoryValue == 3){//搭台
 			var begin = c.tables[i].name.indexOf("(");
 			var end = c.tables[i].name.indexOf(")");
 			aliasOrName = '<font color="green">' + c.tables[i].name.substring(begin+1, end) +'</font>';
 		}else{
-			aliasOrName = '<font color="green">'+ c.tables[i].categoryText +'</font>'
+			aliasOrName = '<font color="green">'+ c.tables[i].categoryText +'</font>';
 		}		
 		html.push(tableCmpTemplet.format({
 			dataIndex : i,
@@ -3709,7 +3700,7 @@ ts.loadBookChoosedTable = function(c){
 		}));				
 	}
 	$('#'+c.renderTo).html(html.join("")).trigger('create');	
-}
+};
 
 /**
  * 入座点菜
@@ -3732,7 +3723,7 @@ ts.bookTableOrderFood = function(){
 		comment : '',
 		orderFoodOperateType : 'bookSeat'
 	});	
-}
+};
 
 /**
  * 入座落单
@@ -3773,7 +3764,7 @@ ts.bookTableCommitOrderFood = function(){
 			});
 		}
 	}, 'json');
-}
+};
 
 
 /**
@@ -3875,7 +3866,8 @@ ts.addBookInfo = function(c){
 	
 	$('#addBookInfo').show();
 	$('#shadowForPopup').show();
-}
+};
+
 /**
  * 关闭手动预订页面
  */
@@ -3902,7 +3894,7 @@ ts.closeAddBookInfo = function(){
 	$('#cm_bookReserved').val("");
 //	$('#add_staff').val();
 	$('#add_bookMoney').val("");	
-}
+};
 
 /**
  * 打开点菜页面
@@ -3917,7 +3909,7 @@ ts.toOrderFoodPage = function(){
 		//不清空已点菜
 		orderFoodOperateType : 'addBook'
 	});	
-}
+};
 
 /**
  * 预定菜完毕返回添加预订
@@ -3954,7 +3946,7 @@ ts.bookFoodChooseFinish = function(){
 	
 	//显示预订界面菜品显示
 	$('#box4BookOrderFoodList').show();	
-}	
+};	
 
 /**
  * 添加预订数据提交
@@ -3985,11 +3977,11 @@ ts.commitAddBook = function(){
 		var hourString = time.substring(0, time.indexOf(':'));
 		var hour = parseInt(hourString)+12;
 		var minute = time.substr(time.indexOf(':')+1, 2);
-		time = hour + ":" + minute + ':' + "59"
+		time = hour + ":" + minute + ':' + "59";
 	}else if(time.indexOf('AM') > 0){
 		var hour = time.substring(0, time.indexOf(':'));
 		var minute = time.substr(time.indexOf(':')+1, 2);	
-		time = hour + ":" + minute + ':' + "59"
+		time = hour + ":" + minute + ':' + "59";
 	}else{
 		time += ":59";
 	}
@@ -4023,7 +4015,7 @@ ts.commitAddBook = function(){
 		Util.LM.hide();
 		if(data.success){
 			ts.addBookInfo.otype = '';
-			delete ts.addBookInfo.id
+			delete ts.addBookInfo.id;
 			Util.msg.tip(data.msg);
 			ts.closeAddBookInfo();
 			ts.searchBookList();
@@ -4031,7 +4023,7 @@ ts.commitAddBook = function(){
 			ts.refreshWeixinBook();
 		}
 	});
-}
+};
 
 
 /**
@@ -4046,7 +4038,8 @@ ts.checkBookTable = function(){
 		$('#updateFoodOtherOperateCmp').popup('close');
 	}	
 	ts.bookListEntry();
-}
+};
+
 //==============end 预订
 
 //===============并台start
@@ -4062,7 +4055,7 @@ ts.openMultiPayTableCmp = function(){
 		$('#multiPayTableCmp').show();
 		$('#shadowForPopup').show();
 	}, 250);
-}
+};
 
 /**
  * 关闭预订入座
@@ -4071,7 +4064,7 @@ ts.closeMultiPayTableCmp = function(){
 	$('#multiPayTableCmp').hide();
 	$('#shadowForPopup').hide();
 	$('#multiPayTableHadChoose').html('');
-}
+};
 
 /**
  * 设置多台开席入座选台
@@ -4089,7 +4082,8 @@ ts.openMultiPayTable = function(){
 	
 	//打开控件
 	uo.openTransOrderFood();		
-}
+};
+
 /**
  * 多台并台
  */
@@ -4124,10 +4118,7 @@ ts.multiPayTableOrderFood = function(){
 			});
 		}
 	}, 'json');
-	
-	
-
-}
+};
 
 
 //===============end并台
@@ -4146,7 +4137,7 @@ ts.openMultiOpenTableCmp = function(){
 		$('#multiOpenTableCmp').show();
 		$('#shadowForPopup').show();
 	}, 250);
-}
+};
 
 /**
  * 关闭预订入座
@@ -4155,7 +4146,7 @@ ts.closeMultiOpenTableCmp = function(){
 	$('#multiOpenTableCmp').hide();
 	$('#shadowForPopup').hide();
 	$('#multiOpenTableHadChoose').html('');
-}
+};
 
 /**
  * 设置多台开席入座选台
@@ -4173,7 +4164,7 @@ ts.openMultiOpenTable = function(){
 	
 	//打开控件
 	uo.openTransOrderFood();		
-}
+};
 
 /**
  * 多台点菜
@@ -4196,7 +4187,8 @@ ts.multiOpenTableOrderFood = function(){
 		comment : '',
 		orderFoodOperateType : 'multiOpenTable'
 	});	
-}
+};
+
 /**
  * 多台开席落单
  */
@@ -4236,7 +4228,7 @@ ts.multiOpenTableCommitOrderFood = function(){
 			});
 		}
 	}, 'json');
-}
+};
 
 //===============end 多台开席
 

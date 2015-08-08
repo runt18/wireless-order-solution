@@ -2524,5 +2524,5 @@
 <!-- 数字键盘 -->
 <script src="js/calculate/datouwang.js" type="text/javascript"></script>
 
-<script language="JavaScript" src="http://code.54kefu.net/kefu/js/b150/852550.js" type="text/javascript" charset="utf-8"></script>
+<!-- <script language="JavaScript" src="http://code.54kefu.net/kefu/js/b150/852550.js" type="text/javascript" charset="utf-8"></script> -->
 </html>

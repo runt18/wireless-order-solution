@@ -29,21 +29,14 @@ function buildFoot(id){
 var promotion_uploadMask = new Ext.LoadMask(document.body, {
 	msg : '正在保存活动...'
 });
+
 var finishPromotion = function(){
-	
-	
-//	if(operatePromotTypeWin.oriented == 2 && !active_memberList){
-//		Ext.example.msg('提示', '请选择参与活动的会员');
-//		return false;
-//	}else if(operatePromotTypeWin.oriented == 1){
-//		active_memberList = '';
-//	}
 	
 	var params = {};
 	var title = Ext.getCmp('active_title');
 	var beginDate = Ext.getCmp('active_beginDate');
 	var endDate = Ext.getCmp('active_endDate');
-	var point = Ext.getCmp('active_point');
+	//var point = Ext.getCmp('active_point');
 	var couponName = Ext.getCmp('active_couponName');
 	var price = Ext.getCmp('active_price');
 	var expiredDate= Ext.getCmp('active_couponExpiredDate');
@@ -68,7 +61,7 @@ var finishPromotion = function(){
 	params.title = title.getValue();
 	params.beginDate = beginDate.getValue().format('Y-m-d');
 	params.endDate = endDate.getValue().format('Y-m-d');
-	params.point = point.getValue();
+	//params.point = point.getValue();
 	//params.members = active_memberList;
 	
 	params.body = editBody.getValue();	
@@ -395,6 +388,7 @@ function getPromotionBodyById(id){
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
+				
 				Ext.getCmp('promotionPreviewBody').body.update(jr.root[0].entire);
 				buildFoot(id);
 				if(jr.root[0].coupon){
@@ -413,12 +407,13 @@ function getPromotionBodyById(id){
 	
 	Ext.Ajax.request({
 		url : '../../QueryCoupon.do',
-		params : {dataSource : 'byCondtion1'},
+		params : {promotionId : id, dataSource : 'status'},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.other){
-				Ext.getCmp().setText(jr.other.couponPublished);
-											
+				Ext.getCmp('couponPublished').setText(jr.other.couponPublished + "人参与");
+				Ext.getCmp('couponDrawn').setText(jr.other.couponDrawn + "已领取");
+				Ext.getCmp('couponUsed').setText(jr.other.couponUsed + "已使用");
 			}
 		},
 		failure : function(res, opt){
@@ -739,7 +734,6 @@ Ext.onReady(function() {
 				listeners : {
 					select : function(combo, record, index){
 						var tl = promotionTree.getLoader();
-						console.log(tl.baseParams)
 						tl.baseParams['rule'] = record.data.value;
 						promotionTree.getRootNode().reload();
 					}
@@ -869,9 +863,11 @@ Ext.onReady(function() {
 						xtype : 'label',
 						text : '5人参与'						
 					},{
+						id : 'couponDrawn',
 						xtype : 'label',
 						text : '2人领取优惠券'						
 					},{
+						id : 'couponUsed',
 						xtype : 'label',
 						text : '2张优惠劵已使用'						
 					},{

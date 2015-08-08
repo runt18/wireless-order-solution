@@ -43,7 +43,7 @@ $(function(){
 	if (getcookie(document.domain+"_digie_restaurant") != "" && getcookie(document.domain+"_digie_token") != ""){
 		var account = getcookie(document.domain+"_digie_restaurant");
 		var token = getcookie(document.domain+"_digie_token");
-		var rid = getcookie(document.domain+'_restaurant');
+		//var rid = getcookie(document.domain+'_restaurant');
 		
 		$.ajax({
 			url : '../VerifyRestaurant.do',
@@ -94,14 +94,23 @@ $(function(){
         }
     });		
     
-    //调试QQ客服
-    $("#kfoutbox").css("margin-top","50px");
+    //设置QQ客服
+    dynaLoadQQ();
 });
-
 
 $(document).on("pageinit",function(event){
 	initBillboardContent({display:true});
 });
+
+//动态加载QQ客服
+function dynaLoadQQ(){  
+    var script = document.createElement('script');  
+	script.setAttribute('type', 'text/javascript');  
+	script.setAttribute('src', 'http://code.54kefu.net/kefu/js/b150/852550.js');  
+	document.getElementsByTagName('head')[0].appendChild(script);  
+    //调试QQ客服的位置
+    $("#kfoutbox").css("margin-top","100px");
+}  
 
 /**
  * 登陆
