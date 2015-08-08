@@ -303,7 +303,7 @@ public class PromotionDao {
 //		}
 		
 		//Update the coupon type.
-		if(builder.isCouponTypeChanged() && original.getRule() != Promotion.Rule.DISPLAY_ONLY){
+		if(builder.isCouponTypeChanged()){
 			CouponTypeDao.update(dbCon, staff, builder.getCouponTypeBuilder());
 		}
 		
