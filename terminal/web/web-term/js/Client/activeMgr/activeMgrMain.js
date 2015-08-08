@@ -4,6 +4,7 @@
 var couponTypeId = 0, promotionType = 4; 
 var promotionTree, operatePromotTypeWin, winUnhide = true; //执行关闭操作时不验证数据
 var promotionDateTemplet = '<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue; font-szie:12px;font-weight:bold">活动日期 : <font color="red">{beginDate}</font>&nbsp;至&nbsp;<font color="red">{endDate}</font></div>';
+var p_box;
 function buildPreviewHead(){
 	var head = '';
 	if(Ext.getCmp('active_title').getValue()){
@@ -182,6 +183,8 @@ $(function (){
         	}
         },
         onFinished: function(event, currentIndex, newIndex){
+        	//更新活动entire
+        	Ext.getCmp('btnSecondStepEastBody').handler();
         	return finishPromotion();
         }
     });
@@ -315,7 +318,8 @@ function changeCouponModel(type){
 function choosePromotionModel(){
 	if(promotionType == 1){
 		//纯展示
-		Ext.getCmp('active_secendStep2CouponImg').hide();
+//		Ext.getCmp('active_secendStep2CouponImg').hide();
+		$("#promotionPic").attr("title", "上传活动封面图片");
 		Ext.getCmp('active_secendStep2CouponDetail').hide();
 		Ext.getCmp('active_secendStep2SelectCoupon').hide();
 		Ext.getCmp('secondStep_edit').setHeight(440);
@@ -326,7 +330,8 @@ function choosePromotionModel(){
 		
 	}else if(promotionType == 2){
 		//优惠券
-		Ext.getCmp('active_secendStep2CouponImg').show();
+//		Ext.getCmp('active_secendStep2CouponImg').show();
+		$("#promotionPic").attr("title", "优惠券图片");
 		Ext.getCmp('active_secendStep2CouponDetail').show();
 		Ext.getCmp('active_secendStep2SelectCoupon').show();
 //		Ext.getCmp('active_point').hide();
@@ -405,7 +410,7 @@ function getPromotionBodyById(id){
 		}
 	});
 	
-	Ext.Ajax.request({
+/*	Ext.Ajax.request({
 		url : '../../QueryCoupon.do',
 		params : {promotionId : id, dataSource : 'status'},
 		success : function(res, opt){
@@ -419,7 +424,7 @@ function getPromotionBodyById(id){
 		failure : function(res, opt){
 			Ext.ux.showMsg(Ext.decode(res.responseText));
 		}
-	});	
+	});	*/
 }
 
 //function fnPublishPromotion(){
@@ -546,14 +551,14 @@ function operatePromotionData(data){
 	editBody.setValue(data.body);
 	
 	
-	if(promotionType > 1){
+//	if(promotionType >= 1){
 		Ext.getDom('radioSelfCoupon').checked = true; 
 		couponTypeId = data.coupon.id;
 		couponName.setValue(data.coupon.name);
 		price.setValue(data.coupon.price);
 		expiredDate.setValue(data.coupon.expiredFormat);
 		Ext.getCmp('couponTypeBox').setImg(data.coupon.ossImage?data.coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg');
-	}
+//	}
 	
 //	if(data.oriented == 1){
 //		Ext.getCmp('rdoSendAllMember').setValue(true);
@@ -939,7 +944,8 @@ Ext.onReady(function() {
 	var coupon_uploadMask = new Ext.LoadMask(document.body, {
 		msg : '正在上传图片...'
 	});
-	var p_box = new Ext.BoxComponent({
+	p_box = new Ext.BoxComponent({
+		id : 'promotionPic',
 		xtype : 'box',
  	    columnWidth : 0.4,
  	    height : 100,
