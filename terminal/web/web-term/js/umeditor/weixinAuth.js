@@ -133,13 +133,14 @@ $(function (){
 						Ext.ux.showMsg(res.responseText);
 					}
 				});    		
-	    	}else if(currentIndex == 3){//欢迎活动
+	    	}
+/*	    	else if(currentIndex == 3){//欢迎活动
 	    		getWxPromotion();
 				if($('#wxActiveEditorDisplay').width() >= 660){
 					$('#wxActiveEditorDisplayImg').attr('width', '660px');
 				}    	
 			    Ext.getCmp("wxActive_secendStepPanel").setHeight(stepH-10);
-	    	}
+	    	}*/
 	    }
 	});	
 	
@@ -155,7 +156,7 @@ $(function (){
 	    var um = UM.getEditor('myEditor');
 	    
 	    //实例化活动编辑器
-	    var wxActiveEditor = UM.getEditor('wxActiveEditor');
+//	    var wxActiveEditor = UM.getEditor('wxActiveEditor');
 	    
 	    //设置编辑器高度自适应
 	    stepH = $("#weixin_wizard .content").height() - 40;
@@ -166,11 +167,11 @@ $(function (){
 	    //餐厅简介示例
 	    $('#weixinEditorDisplay').height(stepH);
 	    //欢迎活动示例
-	    $('#wxActiveEditorDisplay').height(stepH);
+//	    $('#wxActiveEditorDisplay').height(stepH);
 
 //	    $('#wxActiveEditor').height(stepH - 275);
-	    $('#container4WxActiveEditor').height(stepH - 210);
-	    $('#container4WxActiveEditor').css("overflow-x", "hidden");
+//	    $('#container4WxActiveEditor').height(stepH - 210);
+//	    $('#container4WxActiveEditor').css("overflow-x", "hidden");
 	    //上传菜品示例
 	    $('#uploadFoodImgDisplay').height(stepH);
 	    $('#uploadFoodImgCmp').height(stepH - 50);
@@ -455,16 +456,16 @@ function initWeixinActiveCmp(){
 	    }
 	});		
 	
-	var secendStepWest = new Ext.form.FormPanel({
+/*	var secendStepWest = new Ext.form.FormPanel({
 		width : 615,
 		height:600,
 		title : '编辑活动内容:',
 		items : [{
 			contentEl : 'wxActive_secendStep4'
 		}]
-	});
+	});*/
 	
-	new Ext.Panel({
+/*	new Ext.Panel({
 		id : 'wxActive_secendStepPanel2',
 		renderTo :'wxActive_secendStep',
 		width :630,
@@ -562,10 +563,10 @@ function initWeixinActiveCmp(){
 				}]
 			}]
 		}]
-	});	
+	});	*/
 	
 	
-	new Ext.Panel({
+/*	new Ext.Panel({
 		renderTo :'wxActive_secendStep3',
 		width :630,
 		border : false,
@@ -749,7 +750,7 @@ function initWeixinActiveCmp(){
 			},secendStepWest]
 			}]
 		}]
-	});		
+	});		*/
 	
 	//默认为优惠劵模式
 	initWeixinActiveCmp.promotionType = 2;
@@ -763,7 +764,7 @@ function initWeixinActiveCmp(){
 }
 
 //1表示无优惠劵纯展示; 2表示无条件领取优惠劵
-function choosePromotionModel(promotionType){
+/*function choosePromotionModel(promotionType){
 	initWeixinActiveCmp.promotionType = promotionType
 	if(promotionType == 1){
 		Ext.getCmp('wxActive_secendStep2CouponImg').hide();
@@ -783,7 +784,7 @@ function choosePromotionModel(promotionType){
 		$('#container4WxActiveEditor').height(stepH - 210);
 		
 	}
-}
+}*/
 
 function changeCouponModel(type){
 	var couponName = Ext.getCmp('wxActive_couponName');
@@ -839,9 +840,9 @@ var saveWxActiveCmp = function(){
 	params.endDate = endDate.getValue().format('Y-m-d');
 	params.members = '';
 	
-	params.body = UM.getEditor('wxActiveEditor').getContent();
+//	params.body = UM.getEditor('wxActiveEditor').getContent();
 //	params.entire = entire.body.dom.innerHTML;
-	params.entire = UM.getEditor('wxActiveEditor').getContent();
+//	params.entire = UM.getEditor('wxActiveEditor').getContent();
 	params.type = true;//是欢迎活动
 
 	wxPromotion_uploadMask.show();
@@ -864,9 +865,9 @@ var saveWxActiveCmp = function(){
 	});	
 }
 
-function wxActive_clear() {
+/*function wxActive_clear() {
     return UM.getEditor('wxActiveEditor').setContent('');
-}
+}*/
 
 function validWxActive(){
 	var title = '提示';
@@ -941,7 +942,7 @@ function operateWxPromotionData(data){
 	title.setValue(data.title);
 	beginDate.setValue(data.promotionBeginDate);
 	endDate.setValue(data.promotionEndDate);
-	UM.getEditor('wxActiveEditor').setContent(data.body);
+//	UM.getEditor('wxActiveEditor').setContent(data.body);
 	
 	
 	if(data.pType == 1){

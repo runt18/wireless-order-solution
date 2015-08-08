@@ -186,6 +186,19 @@ function memberCondTreeInit(){
 	    		    		Ext.getCmp('dateSearchDateBegin').setValue(jr.root[0].beginDate);
 	    		    		Ext.getCmp('dateSearchDateEnd').setValue(jr.root[0].endDate);
 	    					
+    		    			if(jr.root[0].minConsumeMoney > 0 && jr.root[0].maxConsumeMoney == 0){
+    		    				//大于
+    		    				Ext.getCmp('cboConsumeMoneyBar').setValue(1);
+    		    				Ext.getCmp('cboConsumeMoneyBar').fireEvent('select', null, null, 0);
+    		    			}else if(jr.root[0].minConsumeMoney == 0 && jr.root[0].maxConsumeMoney > 0){
+    		    				//小于
+    		    				Ext.getCmp('cboConsumeMoneyBar').setValue(2);
+    		    				Ext.getCmp('cboConsumeMoneyBar').fireEvent('select', null, null, 1);
+    		    			}else if(jr.root[0].minConsumeMoney > 0 && jr.root[0].maxConsumeMoney > 0){
+    		    				//介于
+    		    				Ext.getCmp('cboConsumeMoneyBar').setValue(3);
+    		    				Ext.getCmp('cboConsumeMoneyBar').fireEvent('select', null, null, 2);
+    		    			}
 	    				}else{
 	    					Ext.ux.showMsg(jr);
 	    				}
@@ -246,22 +259,52 @@ function memberCondGridInit(){
 				text : ' 至 '
 			}, 
 			member_endDate,
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},			
-			{xtype : 'tbtext', text : '消费金额:'},
-			{
-				xtype : 'numberfield',
-				id : 'textTotalMinMemberCost',
-				width : 60
-			},
-			{
-				xtype : 'tbtext',
-				text : '&nbsp;-&nbsp;'
-			},			
-			{
-				xtype : 'numberfield',
-				id : 'textTotalMaxMemberCost',
-				width : 60
-			}, '->',{
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
+			{xtype : 'tbtext', text : '会员类型:'},
+			new Ext.form.ComboBox({
+				id : 'memberSearchByType',
+				width : 100,
+				readOnly : false,
+				forceSelection : true,
+				value : '=',
+				store : new Ext.data.JsonStore({
+					root : 'root',
+					fields : ['id', 'name']
+				}),
+				valueField : 'id',
+				displayField : 'name',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				listeners : {
+					render : function(thiz){
+						Ext.Ajax.request({
+							url : '../../QueryMemberType.do?',
+							params : {
+								dataSource : 'normal',
+								restaurantID : restaurantID
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								if(jr.success){
+									jr.root.unshift({id:-1, name:'全部'});
+								}else{
+									Ext.example.msg('异常', '会员类型数据加载失败, 请联系客服人员.');
+								}
+								thiz.store.loadData(jr);
+								thiz.setValue(-1);
+								
+							},
+							failure : function(res, opt){
+								thiz.store.loadData({root:[{typeId:-1, name:'全部'}]});
+								thiz.setValue(-1);
+							}
+						});
+					}
+				}
+			
+			}), '->',{
 				text : '搜索',
 				id : 'btnSearchMember',
 				iconCls : 'btn_search',
@@ -330,52 +373,64 @@ function memberCondGridInit(){
 				id : 'textMaxMemberBalance',
 				width : 50
 			},
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
-			{xtype : 'tbtext', text : '会员类型:'},
-			new Ext.form.ComboBox({
-				id : 'memberSearchByType',
-				width : 100,
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},			
+			{xtype : 'tbtext', text : '消费金额:'}, {
+				id : 'cboConsumeMoneyBar',
+				xtype : 'combo',
 				readOnly : false,
 				forceSelection : true,
-				value : '=',
-				store : new Ext.data.JsonStore({
-					root : 'root',
-					fields : ['id', 'name']
+				value : 1,
+				width : 80,
+				store : new Ext.data.SimpleStore({
+					fields : ['value', 'text'],
+					data : [[1, '大于'], [2, '小于'], [3, '介于']]
 				}),
-				valueField : 'id',
-				displayField : 'name',
+				valueField : 'value',
+				displayField : 'text',
 				typeAhead : true,
 				mode : 'local',
 				triggerAction : 'all',
 				selectOnFocus : true,
 				listeners : {
-					render : function(thiz){
-						Ext.Ajax.request({
-							url : '../../QueryMemberType.do?',
-							params : {
-								dataSource : 'normal',
-								restaurantID : restaurantID
-							},
-							success : function(res, opt){
-								var jr = Ext.decode(res.responseText);
-								if(jr.success){
-									jr.root.unshift({id:-1, name:'全部'});
-								}else{
-									Ext.example.msg('异常', '会员类型数据加载失败, 请联系客服人员.');
-								}
-								thiz.store.loadData(jr);
-								thiz.setValue(-1);
-								
-							},
-							failure : function(res, opt){
-								thiz.store.loadData({root:[{typeId:-1, name:'全部'}]});
-								thiz.setValue(-1);
-							}
-						});
+					select : function(combo, record, index){
+//						Ext.getCmp('textTotalMinMemberCost').setValue();
+//						Ext.getCmp('textTotalMaxMemberCost').setValue();
+						if(index == 0){
+							Ext.getCmp('betweenConsume').hide();
+							Ext.getCmp('textTotalMinMemberCost').show();
+							Ext.getCmp('textTotalMaxMemberCost').hide();
+						}else if(index == 1){
+							Ext.getCmp('betweenConsume').hide();
+							Ext.getCmp('textTotalMaxMemberCost').show();
+							Ext.getCmp('textTotalMinMemberCost').hide();
+						}else if(index == 2){
+							Ext.getCmp('betweenConsume').show();
+							Ext.getCmp('textTotalMinMemberCost').show();
+							Ext.getCmp('textTotalMaxMemberCost').show();
+							$('#betweenConsume').show();
+							$('#textTotalMinMemberCost').show();
+							$('#textTotalMaxMemberCost').show();
+						}
 					}
 				}
-			
-			})]
+			},
+			{
+				xtype : 'numberfield',
+				id : 'textTotalMinMemberCost',
+				width : 60
+			},
+			{
+				xtype : 'tbtext',
+				id : 'betweenConsume',
+				text : '&nbsp;-&nbsp;',
+				hidden : true
+			},			
+			{
+				xtype : 'numberfield',
+				id : 'textTotalMaxMemberCost',
+				width : 60,
+				hidden : true
+			}]
 		
 	});	
 	
@@ -437,6 +492,26 @@ function operateMemberCondData(data){
 	Ext.getCmp('memberCondMinBalance').setValue(data.minBalance && data.minBalance>0?data.minBalance:"");
 	Ext.getCmp('memberCondMaxBalance').setValue(data.maxBalance && data.maxBalance>0?data.maxBalance:"");
 	Ext.getCmp('memberCondDateRegion').setValue(data.rangeType);
+	
+	if(data.name){
+		if(data.minConsumeMoney > 0 && data.maxConsumeMoney == 0){
+			//大于
+			Ext.getCmp('cboConsumeMoney').setValue(1);
+			Ext.getCmp('cboConsumeMoney').fireEvent('select', null, null, 0);
+		}else if(data.minConsumeMoney == 0 && data.maxConsumeMoney > 0){
+			//小于
+			Ext.getCmp('cboConsumeMoney').setValue(2);
+			Ext.getCmp('cboConsumeMoney').fireEvent('select', null, null, 1);
+		}else if(data.minConsumeMoney > 0 && data.maxConsumeMoney > 0){
+			//介于
+			Ext.getCmp('cboConsumeMoney').setValue(3);
+			Ext.getCmp('cboConsumeMoney').fireEvent('select', null, null, 2);
+		}
+	}else{
+		Ext.getCmp('cboConsumeMoney').setValue(1);
+		Ext.getCmp('cboConsumeMoney').fireEvent('select', null, null, 0);
+	}
+	
 	if(data.rangeType && data.rangeType == 4){
 		Ext.getCmp('memberCondBeginDate').setValue(data.beginDate);
 		Ext.getCmp('memberCondEndDate').setValue(data.endDate);	
@@ -542,16 +617,59 @@ if(!memberCondWin){
 			xtype : 'label',
 			text : '消费金额:',
 		}, {
+			columnWidth : 0.2,
+			id : 'cboConsumeMoney',
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			value : 1,
+			width : 80,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text'],
+				data : [[1, '大于'], [2, '小于'], [3, '介于']]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				select : function(combo, record, index){
+					Ext.getCmp('memberCondMinConsume').setValue();
+					Ext.getCmp('memberCondMaxConsume').setValue();
+					if(index == 0){
+						Ext.getCmp('betweenMemberCondConsume').hide();
+						Ext.getCmp('memberCondMinConsume').show();
+						Ext.getCmp('memberCondMaxConsume').hide();
+					}else if(index == 1){
+						Ext.getCmp('betweenMemberCondConsume').hide();
+						Ext.getCmp('memberCondMaxConsume').show();
+						Ext.getCmp('memberCondMinConsume').hide();
+					}else if(index == 2){
+						Ext.getCmp('betweenMemberCondConsume').show();
+						Ext.getCmp('memberCondMinConsume').show();
+						Ext.getCmp('memberCondMaxConsume').show();
+						$('#betweenMemberCondConsume').show();
+						$('#memberCondMinConsume').show();
+						$('#memberCondMaxConsume').show();
+					}
+				}
+			}
+		}, {
 			columnWidth : 0.3,
 			xtype : 'numberfield',
 			id : 'memberCondMinConsume',
 		},{
 			xtype : 'label',
+			id : 'betweenMemberCondConsume',
 			text : ' ~ ',
+			hidden : true
 		}, {
 			columnWidth : 0.3,
 			xtype : 'numberfield',
 			id : 'memberCondMaxConsume',
+			hidden : true
 		},{
 			columnWidth : 1,
 			style :'margin-bottom:5px;',
