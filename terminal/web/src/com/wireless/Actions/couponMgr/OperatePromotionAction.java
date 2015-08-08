@@ -124,9 +124,13 @@ public class OperatePromotionAction extends DispatchAction{
 			
 			Promotion.UpdateBuilder promotionUpdateBuilder;
 			if(Promotion.Rule.valueOf(Integer.parseInt(pRule)) == Promotion.Rule.DISPLAY_ONLY){
+				CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(Integer.parseInt(couponTypeId), couponName).setComment("").setPrice(Integer.parseInt(price)).setExpired(expiredDate);
+				if(image != null && !image.isEmpty()){
+					typeUpdateBuilder.setImage(new OssImage(Integer.parseInt(image)));
+				}
 				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(beginDate, endDate)
 										 .setTitle(title)
-										 .setBody(body, entire);
+										 .setBody(body, entire).setCouponTypeBuilder(typeUpdateBuilder);
 			}else{
 				CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(Integer.parseInt(couponTypeId), couponName).setComment("").setPrice(Integer.parseInt(price)).setExpired(expiredDate);
 				if(image != null && !image.isEmpty()){
@@ -189,9 +193,7 @@ public class OperatePromotionAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			Promotion promo = PromotionDao.getById(staff, Integer.parseInt(promotionId));
-			List<Promotion> promotions = new ArrayList<>();
-			promotions.add(promo);
-			jobject.setRoot(promotions);
+			jobject.setRoot(promo);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
