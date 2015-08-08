@@ -146,7 +146,7 @@ function memberCondTreeInit(){
 			leaf : false,
 			border : true,
 			expanded : true,
-			memberTypeId : -1,
+			id : -1,
 			listeners : {
 				load : function(thiz){
 /*					memberTypeData.root = [];
@@ -164,6 +164,10 @@ function memberCondTreeInit(){
 		tbar : memberTypeTreeTbar,
 		listeners : {
 	    	click : function(e){
+	    		if(e.id == -1){
+	    			return;
+	    		}
+	    		
 	    		queryMembersByCond({searchByCond:e.id});
 	    		Ext.getDom('memberCondName').innerHTML = e.text;
 	    		
