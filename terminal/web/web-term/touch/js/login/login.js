@@ -140,7 +140,6 @@ function staffLoginHandler(c){
 		url : '../OperateStaff.do',
 		data : {
 			pin : lg.staff.staffID,
-			comeFrom : 3,
 			pwd : MD5(pwd.val().trim()),
 			account : lg.restaurant.account,
 			token : getcookie(document.domain+"_digie_token")
