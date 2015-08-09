@@ -242,6 +242,7 @@ function mcs_initBusinessReceipsGrid(c){
 			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
 		}, mcs_search_memberName, '->', {
 			text : '搜索',
+			id : 'memberChargeSearch',
 			iconCls : 'btn_search',
 			handler : function(e){
 				mcs_searchMemberOperation();
@@ -370,6 +371,18 @@ function mcs_changeChartWidth(w,h){
 	
 }
 
+var charge_setStatisticsDate = function(){
+	if(sendToPageOperation){
+		mcs_search_onDuty.setValue(sendToStatisticsPageBeginDate);
+		mcs_search_offDuty.setValue(sendToStatisticsPageEndDate);	
+		
+		Ext.getCmp('memberChargeSearch').handler();
+		
+		sendToPageOperation = false;		
+	}
+
+};
+
 Ext.onReady(function(){
 	
 	mcs_southPanel = new Ext.Panel({
@@ -426,5 +439,7 @@ Ext.onReady(function(){
 		mcs_grid.doLayout();
 		
 	});
+	
+	Ext.getCmp('memberChargeStatistics').updateStatisticsDate = charge_setStatisticsDate;
 	
 });

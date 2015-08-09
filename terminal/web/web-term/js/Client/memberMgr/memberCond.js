@@ -455,7 +455,7 @@ function memberCondTreeInit(){
 		    				refreshBalance();
     		    			
 		    				//会员类型
-		    				Ext.getCmp('comboMemberType4CondBar').setValue(data.memberType ? data.memberType : -1);
+		    				Ext.getCmp('comboMemberType4CondBar').setValue(jr.root[0].memberType ? jr.root[0].memberType : -1);
 	    				}else{
 	    					Ext.ux.showMsg(jr);
 	    				}
@@ -870,7 +870,6 @@ function showMemberCondWin(data){
 	
 }
 
-if(!memberCondWin){
 	
 	var comboMemberType4CondWin = new Ext.form.ComboBox({
 		columnWidth : 0.3,
@@ -888,35 +887,30 @@ if(!memberCondWin){
 		typeAhead : true,
 		mode : 'local',
 		triggerAction : 'all',
-		selectOnFocus : true,
-		listeners : {
-			render : function(thiz){
-				Ext.Ajax.request({
-					url : '../../QueryMemberType.do?',
-					params : {
-						dataSource : 'normal',
-						restaurantID : restaurantID
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						if(jr.success){
-							jr.root.unshift({id:-1, name:'全部'});
-						}else{
-							Ext.example.msg('异常', '会员类型数据加载失败');
-						}
-						thiz.store.loadData(jr);
-						thiz.setValue(-1);
-						
-					},
-					failure : function(res, opt){
-						thiz.store.loadData({root:[{typeId:-1, name:'全部'}]});
-						thiz.setValue(-1);
-					}
-				});
-			}
-		}
-	
+		selectOnFocus : true
 	});	
+	
+	Ext.Ajax.request({
+		url : '../../QueryMemberType.do?',
+		params : {
+			dataSource : 'normal',
+			restaurantID : restaurantID
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				jr.root.unshift({id:-1, name:'全部'});
+			}else{
+				Ext.example.msg('异常', '会员类型数据加载失败');
+			}
+			comboMemberType4CondWin.store.loadData(jr);
+			comboMemberType4CondWin.setValue(-1);
+		},
+		failure : function(res, opt){
+			comboMemberType4CondWin.store.loadData({root:[{typeId:-1, name:'全部'}]});
+			comboMemberType4CondWin.setValue(-1);
+		}
+	});
 	
 	memberCondWin = new Ext.Window({
 		title : '添加分析条件',
@@ -1183,11 +1177,14 @@ if(!memberCondWin){
 						if(jr.success){
 							Ext.example.msg(jr.title, jr.msg);
 							memberCondWin.hide();
-							//var sn = Ext.ux.getSelNode(memberCondTree);
-							//console.log(sn);
-							//sn.select();
-							//memberCondTree.fireEvent('click', sn);
-							memberCondTree.getRootNode().reload();
+							for(var i = 0; i < memberCondTree.getRootNode().childNodes.length; i++){
+								var node = memberCondTree.getRootNode().childNodes[i];
+								if(node.id == id){
+									node.select();
+									node.fireEvent('click', node);
+								}
+							}
+							//memberCondTree.getRootNode().reload();
 						}else{
 							Ext.ux.showMsg(jr);
 						}
@@ -1218,7 +1215,6 @@ if(!memberCondWin){
 		}]
 	});
 	
-}
 
 Ext.onReady(function(){
 	
