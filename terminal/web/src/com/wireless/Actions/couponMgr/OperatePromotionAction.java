@@ -389,7 +389,7 @@ public class OperatePromotionAction extends DispatchAction{
 		StringBuilder pTree = new StringBuilder();
 		try{
 			
-				String p_create = children(staff, extra.addStatus(Status.CREATED));
+				String p_create = children(staff, extra.setStatus(Status.CREATED));
 				if(!p_create.isEmpty()){
 					pTree.append("{")
 					.append("text:'已创建'")
@@ -399,8 +399,7 @@ public class OperatePromotionAction extends DispatchAction{
 					.append("}");						
 				}
 
-				extra.clearStatus();
-				String progress = children(staff, extra.addStatus(Status.PROGRESS));
+				String progress = children(staff, extra.setStatus(Status.PROGRESS));
 				if(!progress.isEmpty()){
 					if(!pTree.toString().isEmpty()){
 						pTree.append(",");
@@ -413,8 +412,7 @@ public class OperatePromotionAction extends DispatchAction{
 					.append("}");	
 				}
 	
-				extra.clearStatus();
-				String finish = children(staff, new PromotionDao.ExtraCond().addStatus(Status.FINISH));
+				String finish = children(staff, new PromotionDao.ExtraCond().setStatus(Status.FINISH));
 				if(!finish.isEmpty()){
 					if(!pTree.toString().isEmpty()){
 						pTree.append(",");
@@ -450,9 +448,9 @@ public class OperatePromotionAction extends DispatchAction{
 //				text += "<font color=\"red\"> -- 欢迎活动</font>";
 //			}
 			
-			if(promotions.get(i).getStatus() == Promotion.Status.FINISH){
-				text += "<font color=\"red\"> -- 已过期</font>";
-			}
+//			if(promotions.get(i).getStatus() == Promotion.Status.FINISH){
+//				text += "<font color=\"red\"> -- 已过期</font>";
+//			}
 			
 			sb.append("{")
 			.append("text:'" + text + "'")

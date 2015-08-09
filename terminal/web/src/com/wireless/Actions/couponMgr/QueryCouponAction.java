@@ -123,20 +123,6 @@ public class QueryCouponAction extends DispatchAction{
 			List<Coupon> list = CouponDao.getByCond(staff, extra, null);
 			jobject.setTotalProperty(list.size());
 			jobject.setRoot(DataPaging.getPagingData(list, true, start, limit));
-			jobject.setExtra(new Jsonable(){
-
-				@Override
-				public JsonMap toJsonMap(int flag) {
-					JsonMap jm = new JsonMap();
-					jm.putInt("couponPublished", 10);
-					return jm;
-				}
-
-				@Override
-				public void fromJsonMap(JsonMap jm, int flag) {
-				}
-				
-			});
 		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -144,26 +130,29 @@ public class QueryCouponAction extends DispatchAction{
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jobject.toString(Coupon.COUPON_JSONABLE_SIMPLE));
 		}
 		return null;
 	}	
 	
-	public ActionForward byCondtion1(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String pId = request.getParameter("pId");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		String status = request.getParameter("status");
+	public ActionForward status(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
+		String pId = request.getParameter("promotionId");
 		
 		JObject jobject = new JObject();
 		try{
+			//final int couponPublished = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)), null).size();
+			//final int couponDrawn = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.DRAWN), null).size();
+			//final int couponUsed = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.USED), null).size();
+			
 			jobject.setExtra(new Jsonable(){
 
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putInt("couponPublished", 10);
+					jm.putInt("couponDrawn", 10);
+					jm.putInt("couponUsed", 10);
 					return jm;
 				}
 
