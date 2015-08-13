@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -171,11 +170,11 @@ public class PromotionDao {
 //		}
 		
 		//Check to see whether the start date exceed now.
-		Calendar c = Calendar.getInstance();
-		c.add(Calendar.DAY_OF_YEAR, -1);
-		if(promotion.getDateRange().getOpeningTime() < c.getTimeInMillis()){
-			throw new BusinessException(PromotionError.PROMOTION_START_DATE_EXCEED_NOW);
-		}
+//		Calendar c = Calendar.getInstance();
+//		c.add(Calendar.DAY_OF_YEAR, -1);
+//		if(promotion.getDateRange().getOpeningTime() < c.getTimeInMillis()){
+//			throw new BusinessException(PromotionError.PROMOTION_START_DATE_EXCEED_NOW);
+//		}
 		
 		//Insert the associated coupon type.
 		int couponTypeId = CouponTypeDao.insert(dbCon, staff, builder.getTypeBuilder());

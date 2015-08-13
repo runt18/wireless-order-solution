@@ -2,6 +2,7 @@ package com.wireless.db.promotion;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -25,6 +26,7 @@ import com.wireless.util.StringHtml;
 public class CouponDao {
 
 	public static class ExtraCond{
+		private boolean isOnlyAmount = false;
 		private int id;
 		private Coupon.Status status;
 		private int memberId;
@@ -32,6 +34,11 @@ public class CouponDao {
 		private int promotionId;
 		private Promotion.Type promotionType;
 		private final List<Promotion.Status> promotionStatus = new ArrayList<Promotion.Status>();
+		
+		public ExtraCond setOnlyAmount(boolean onOff){
+			this.isOnlyAmount = onOff;
+			return this;
+		}
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -210,9 +217,9 @@ public class CouponDao {
 	 */
 	public static int[] create(DBCon dbCon, Staff staff, Coupon.CreateBuilder builder) throws SQLException, BusinessException{
 		final Promotion promotion = PromotionDao.getById(dbCon, staff, builder.getPromotionId());
-		if(promotion.getStatus() == Promotion.Status.FINISH){
-			throw new BusinessException("【" + promotion.getTitle() + "】已经结束, 不能创建优惠券", PromotionError.COUPON_CREATE_NOT_ALLOW);
-		}
+//		if(promotion.getStatus() == Promotion.Status.FINISH){
+//			throw new BusinessException("【" + promotion.getTitle() + "】已经结束, 不能创建优惠券", PromotionError.COUPON_CREATE_NOT_ALLOW);
+//		}
 		
 		//Check to see whether the coupon type is expired.
 		final CouponType couponType = CouponTypeDao.getById(dbCon, staff, builder.getCouponTypeId());
@@ -230,7 +237,15 @@ public class CouponDao {
 				int couponId = insert(dbCon, staff, new Coupon.InsertBuilder(couponType, member, promotion));
 				//Draw the coupon if draw type belongs to auto.
 				if(builder.getDrawType() == DrawType.AUTO){
-					draw(dbCon, staff, couponId, DrawType.AUTO);
+					String sql;
+					sql = " UPDATE " + Params.dbName + ".coupon SET " +
+						  " status = " + Coupon.Status.DRAWN.getVal() +
+						  " ,draw_date = NOW() " +
+						  " WHERE coupon_id = " + couponId;
+					if(dbCon.stmt.executeUpdate(sql) == 0){
+						throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
+					}
+					//draw(dbCon, staff, couponId, DrawType.AUTO);
 				}
 				coupons.add(couponId);
 			}catch(BusinessException | SQLException e){
@@ -534,13 +549,14 @@ public class CouponDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Coupon> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
-		final List<Coupon> result = new ArrayList<Coupon>();
 		String sql;
 		sql = " SELECT " +
+			  (extraCond.isOnlyAmount ? 
+			  " COUNT(*) " : 
 			  " C.coupon_id, P.entire, C.restaurant_id, C.birth_date, C.draw_date, C.order_id, C.order_date, C.status, " +
 			  " C.coupon_type_id, CT.name, CT.price, CT.expired, CT.oss_image_id, " +
 			  " C.member_id, M.name AS member_name, M.mobile, M.member_card, M.`consumption_amount`, M.point, M.`base_balance`, M.`extra_balance`, MT.name AS memberTypeName, " +
-			  " C.promotion_id, P.title, P.oriented " +
+			  " C.promotion_id, P.title, P.oriented ") +
 			  " FROM " + Params.dbName + ".coupon C " +
 			  " JOIN " + Params.dbName + ".coupon_type CT ON C.coupon_type_id = CT.coupon_type_id " +
 			  " JOIN " + Params.dbName + ".promotion P ON C.promotion_id = P.promotion_id " +
@@ -548,54 +564,66 @@ public class CouponDao {
 			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " +
 			  " WHERE 1 = 1 " +
 			  " AND C.restaurant_id = " + staff.getRestaurantId() +
-			  " AND P.status !=" + Promotion.Status.FINISH.getVal() +
 			  (extraCond != null ? extraCond : " ") +
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			Coupon coupon = new Coupon(dbCon.rs.getInt("coupon_id"));
-			coupon.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			coupon.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
-			if(dbCon.rs.getTimestamp("draw_date") != null){
-				coupon.setDrawDate(dbCon.rs.getTimestamp("draw_date").getTime());
+		
+		final List<Coupon> result;
+		if(extraCond.isOnlyAmount){
+			if(dbCon.rs.next()){
+				result = new ArrayList<Coupon>(dbCon.rs.getInt(1));
+				Collections.fill(result, null);
+			}else{
+				result = Collections.emptyList();
 			}
-			coupon.setOrderId(dbCon.rs.getInt("order_id"));
-			if(dbCon.rs.getTimestamp("order_date") != null){
-				coupon.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+		}else{
+			result = new ArrayList<Coupon>();
+			while(dbCon.rs.next()){
+				Coupon coupon = new Coupon(dbCon.rs.getInt("coupon_id"));
+				coupon.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				coupon.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
+				if(dbCon.rs.getTimestamp("draw_date") != null){
+					coupon.setDrawDate(dbCon.rs.getTimestamp("draw_date").getTime());
+				}
+				coupon.setOrderId(dbCon.rs.getInt("order_id"));
+				if(dbCon.rs.getTimestamp("order_date") != null){
+					coupon.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+				}
+				coupon.setStatus(Coupon.Status.valueOf(dbCon.rs.getInt("status")));
+				
+				CouponType ct = new CouponType(dbCon.rs.getInt("coupon_type_id")); 
+				ct.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				ct.setPrice(dbCon.rs.getFloat("price"));
+				ct.setName(dbCon.rs.getString("name"));
+				ct.setExpired(dbCon.rs.getTimestamp("expired").getTime());
+				if(dbCon.rs.getInt("oss_image_id") != 0){
+					ct.setImage(new OssImage(dbCon.rs.getInt("oss_image_id")));
+				}
+				coupon.setCouponType(ct);
+				
+				Member m = new Member(dbCon.rs.getInt("member_id"));
+				m.setName(dbCon.rs.getString("member_name"));
+				m.setMobile(dbCon.rs.getString("mobile"));
+				m.setMemberCard(dbCon.rs.getString("member_card"));
+				m.setPoint(dbCon.rs.getInt("point"));
+				m.setBaseBalance(dbCon.rs.getFloat("base_balance"));
+				m.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
+				m.setConsumptionAmount(dbCon.rs.getInt("consumption_amount"));
+				MemberType mt = new MemberType(0);
+				mt.setName(dbCon.rs.getString("memberTypeName"));
+				m.setMemberType(mt);
+				coupon.setMember(m);
+				
+				Promotion promotion = new Promotion(dbCon.rs.getInt("promotion_id"));
+				promotion.setTitle(dbCon.rs.getString("title"));
+				promotion.setOriented(Promotion.Oriented.valueOf(dbCon.rs.getInt("oriented")));
+				promotion.setEntire(new StringHtml(dbCon.rs.getString("entire"), StringHtml.ConvertTo.TO_HTML).toString());
+				coupon.setPromotion(promotion);
+				
+				result.add(coupon);
 			}
-			coupon.setStatus(Coupon.Status.valueOf(dbCon.rs.getInt("status")));
-			
-			CouponType ct = new CouponType(dbCon.rs.getInt("coupon_type_id")); 
-			ct.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			ct.setPrice(dbCon.rs.getFloat("price"));
-			ct.setName(dbCon.rs.getString("name"));
-			ct.setExpired(dbCon.rs.getTimestamp("expired").getTime());
-			if(dbCon.rs.getInt("oss_image_id") != 0){
-				ct.setImage(new OssImage(dbCon.rs.getInt("oss_image_id")));
-			}
-			coupon.setCouponType(ct);
-			
-			Member m = new Member(dbCon.rs.getInt("member_id"));
-			m.setName(dbCon.rs.getString("member_name"));
-			m.setMobile(dbCon.rs.getString("mobile"));
-			m.setMemberCard(dbCon.rs.getString("member_card"));
-			m.setPoint(dbCon.rs.getInt("point"));
-			m.setBaseBalance(dbCon.rs.getFloat("base_balance"));
-			m.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
-			m.setConsumptionAmount(dbCon.rs.getInt("consumption_amount"));
-			MemberType mt = new MemberType(0);
-			mt.setName(dbCon.rs.getString("memberTypeName"));
-			m.setMemberType(mt);
-			coupon.setMember(m);
-			
-			Promotion promotion = new Promotion(dbCon.rs.getInt("promotion_id"));
-			promotion.setTitle(dbCon.rs.getString("title"));
-			promotion.setOriented(Promotion.Oriented.valueOf(dbCon.rs.getInt("oriented")));
-			promotion.setEntire(new StringHtml(dbCon.rs.getString("entire"), StringHtml.ConvertTo.TO_HTML).toString());
-			coupon.setPromotion(promotion);
-			
-			result.add(coupon);
 		}
+
 		dbCon.rs.close();
 		
 		return result;
