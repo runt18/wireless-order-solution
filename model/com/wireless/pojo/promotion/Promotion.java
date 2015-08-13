@@ -233,12 +233,12 @@ public class Promotion implements Jsonable{
 		}
 		
 		public static Rule valueOf(int val){
-			for(Rule type : values()){
-				if(type.val == val){
-					return type;
+			for(Rule rule : values()){
+				if(rule.val == val){
+					return rule;
 				}
 			}
-			throw new IllegalArgumentException("The type(val = " + val + ") is invalid.");
+			throw new IllegalArgumentException("The rule(val = " + val + ") is invalid.");
 		}
 		
 		public int getVal(){
@@ -586,6 +586,7 @@ public class Promotion implements Jsonable{
 		jm.putInt("point", this.point);
 		jm.putInt("status", this.getStatus().getVal());
 		jm.putInt("pType", this.rule.getVal());
+		jm.putInt("rule", this.rule.getVal());
 		jm.putInt("oriented", this.oriented.getVal());
 		jm.putJsonable("coupon", this.couponType, 0);
 		return jm;
