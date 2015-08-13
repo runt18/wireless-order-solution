@@ -47,9 +47,6 @@
 		});
 	});
 	
-	function BaiduNavigation(){
-		location.href = "http://api.map.baidu.com/direction?origin=黄村&destination=latlng:23.130885,113.415141|name:晨晖商务大厦&mode=driving&region=广州&output=html&src=志易科技公司";
-	}
 	</script>
 </head>
 <body>
@@ -79,7 +76,7 @@
 				</div>
 			</li>
 			<li class="s2 bg2">
-				<div class="subtype" onclick="Util.skip('sales.html')">
+				<div class="subtype" onclick="Util.skip('sales.html', 'default')">
 					<em class="foundicon-offsale fontsize1"> </em> <del>优惠信息</del>
 				</div>	
 			</li>
@@ -113,11 +110,7 @@
 	<!-- 栏目 END -->
 	<div id="divRestaurantInfo" class="bgstyle">
 		<div class="clearfix merchant moreindex moreshow">
-<!-- 			<div class="merchantlogo fl">
-				<img src="./images/logo.jpg" alt="商家logo">
-			</div> -->
 			<div class="userinfo p_re embox">
-<!-- 				<div class="shopopen">营业中</div>  -->
 				<strong id="spanRestaurantName">利雅园酒家</strong> 
 				<div class="em_mobile">
 					<font>电话:</font>
@@ -125,7 +118,6 @@
 				</div>
 				<div class="em_mobile">
 					<font>地址：</font><span id="spanRestaurantAdress"></span>
-<!-- 					| <a href="javascript: BaiduNavigation()"><i class="foundicon-location fcolor1"></i></a> -->
 				</div>				
 			</div>
 		</div>

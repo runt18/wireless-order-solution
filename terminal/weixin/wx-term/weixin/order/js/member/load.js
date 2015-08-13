@@ -19,10 +19,10 @@ $(function(){
 				$('#divWXMemberCard').html('微信卡号:'+data.other.weixinCard);
 				
 				if(data.other.status == 2){
-					$('#divWeixinMemberPhone').show()
+					$('#divWeixinMemberPhone').show();
 					$('#divBindWeixinMember').hide();
 				}else if(data.other.status == 1){
-					$('#divBindWeixinMember').show()
+					$('#divBindWeixinMember').show();
 					$('#divWeixinMemberPhone').hide();					
 				}
 				
@@ -112,11 +112,11 @@ $(function(){
 		 calcFloatDivs();
 	};
 	window.onresize = autoWidth;*/
-	$.post('../../OperatePromotion.do', {dataSource : 'hasWelcomePage', 'fid':Util.mp.fid}, function(jr){
-			if(jr.success && jr.root.length > 0){
-				haveWelcomePageId = jr.root[0].id;
-			}		
-	});
+//	$.post('../../WxOperatePromotion.do', {dataSource : 'hasWelcomePage', 'fid':Util.mp.fid}, function(jr){
+//			if(jr.success && jr.root.length > 0){
+//				haveWelcomePageId = jr.root[0].id;
+//			}		
+//	});
 	
 	//点击输入验证码
 	$('#txtVerifyCode').focus(function(){
