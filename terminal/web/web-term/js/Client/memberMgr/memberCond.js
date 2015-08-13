@@ -1182,6 +1182,7 @@ function showMemberCondWin(data){
 								if(node.id == id){
 									node.select();
 									node.fireEvent('click', node);
+									break;
 								}
 							}
 							//memberCondTree.getRootNode().reload();

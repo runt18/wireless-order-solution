@@ -242,6 +242,7 @@ function mrs_initBusinessReceipsGrid(c){
 			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
 		}, mrs_search_memberName, '->', {
 			text : '搜索',
+			id : 'memberRefundSearchBtn',
 			iconCls : 'btn_search',
 			handler : function(e){
 				mrs_searchMemberOperation();
@@ -309,8 +310,13 @@ function mrs_initBusinessReceipsGrid(c){
 	mrs_grid.frame = false;
 	mrs_grid.border = false;
 	mrs_grid.on('render', function(thiz){
-		mrs_search_dateCombo.setValue(1);
-		mrs_search_dateCombo.fireEvent('select', mrs_search_dateCombo, null, 1);
+		if(sendToPageOperation){
+			memberRefund_setStatisticsDate();
+		}else{
+			mrs_search_dateCombo.setValue(1);
+			mrs_search_dateCombo.fireEvent('select', mrs_search_dateCombo, null, 1);		
+		}	
+
 	});
 	
 
@@ -370,6 +376,19 @@ function mrs_changeChartWidth(w,h){
 	
 }
 
+var memberRefund_setStatisticsDate = function(){
+	if(sendToPageOperation){
+		mrs_search_onDuty.setValue(sendToStatisticsPageBeginDate);
+		mrs_search_offDuty.setValue(sendToStatisticsPageEndDate);	
+		
+		Ext.getCmp('memberRefundSearchBtn').handler();
+		
+		
+		sendToPageOperation = false;		
+	}
+
+};
+
 Ext.onReady(function(){
 	
 	mrs_southPanel = new Ext.Panel({
@@ -426,5 +445,8 @@ Ext.onReady(function(){
 		mrs_grid.doLayout();
 		
 	});
+	
+	
+	Ext.getCmp('memberRefundStatistics').updateStatisticsDate = memberRefund_setStatisticsDate;
 	
 });

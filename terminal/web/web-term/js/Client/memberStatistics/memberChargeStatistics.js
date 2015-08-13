@@ -242,7 +242,7 @@ function mcs_initBusinessReceipsGrid(c){
 			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
 		}, mcs_search_memberName, '->', {
 			text : '搜索',
-			id : 'memberChargeSearch',
+			id : 'memberChargeSearchBtn',
 			iconCls : 'btn_search',
 			handler : function(e){
 				mcs_searchMemberOperation();
@@ -310,8 +310,13 @@ function mcs_initBusinessReceipsGrid(c){
 	mcs_grid.frame = false;
 	mcs_grid.border = false;
 	mcs_grid.on('render', function(thiz){
-		mcs_search_dateCombo.setValue(1);
-		mcs_search_dateCombo.fireEvent('select', mcs_search_dateCombo, null, 1);
+		if(sendToPageOperation){
+			memberCharge_setStatisticsDate();
+		}else{
+			mcs_search_dateCombo.setValue(1);
+			mcs_search_dateCombo.fireEvent('select', mcs_search_dateCombo, null, 1);		
+		}	
+
 	});
 	
 
@@ -371,12 +376,13 @@ function mcs_changeChartWidth(w,h){
 	
 }
 
-var charge_setStatisticsDate = function(){
+var memberCharge_setStatisticsDate = function(){
 	if(sendToPageOperation){
 		mcs_search_onDuty.setValue(sendToStatisticsPageBeginDate);
 		mcs_search_offDuty.setValue(sendToStatisticsPageEndDate);	
 		
-		Ext.getCmp('memberChargeSearch').handler();
+		Ext.getCmp('memberChargeSearchBtn').handler();
+		
 		
 		sendToPageOperation = false;		
 	}
@@ -440,6 +446,7 @@ Ext.onReady(function(){
 		
 	});
 	
-	Ext.getCmp('memberChargeStatistics').updateStatisticsDate = charge_setStatisticsDate;
+	
+	Ext.getCmp('memberChargeStatistics').updateStatisticsDate = memberCharge_setStatisticsDate;
 	
 });

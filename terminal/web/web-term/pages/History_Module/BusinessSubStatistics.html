@@ -56,8 +56,10 @@
 			addTab('history', '历史账单', 'History_Module/HistoryStatistics.html');			
 		}else if(c.type == 9){//抹数统计
 			addTab('eraseStatistics', '抹数统计', 'History_Module/EraseStatistic.html');			
-		}else if(c.type == 10){//会员充值
-			addTab('memberChargeStatistics', '充值统计', 'Client_Module/memberChargeStatistics.html');
+		}else if(c.type == 10){//充值统计
+			addTab('memberChargeStatistics', '充值统计', 'Client_Module/memberChargeStatistics.html');			
+		}else if(c.type == 11){//取款统计
+			addTab('memberRefundStatistics', '取款统计', 'Client_Module/memberRefundStatistics.html');			
 		}else{
 			return;
 		}
@@ -159,7 +161,7 @@
 			<th>会员退款</th>
 			<td class="text_right" id="bussiMemberRefund">---</td>
 			<td class="text_right" id="bussiMemberRefundByCard">---</td>
-			<td class="text_right" id="bussiMemberAccountRefund">---</td>
+			<td class="text_right" ><a id="bussiMemberAccountRefund" href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 11})">---</a></td>
 		</tr>
 		<tr style="height:15px;">
 			<td colspan="4"></td>
