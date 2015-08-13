@@ -25,7 +25,6 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.DataPaging;
 
 public class QueryCouponAction extends DispatchAction{
 
@@ -120,9 +119,9 @@ public class QueryCouponAction extends DispatchAction{
 				extra.setStatus(Coupon.Status.valueOf(Integer.parseInt(status)));
 			}
 			
-			List<Coupon> list = CouponDao.getByCond(staff, extra, null);
-			jobject.setTotalProperty(list.size());
-			jobject.setRoot(DataPaging.getPagingData(list, true, start, limit));
+			//List<Coupon> list = CouponDao.getByCond(staff, extra, null);
+			jobject.setTotalProperty(CouponDao.getByCond(staff, extra.setOnlyAmount(true), null).size());
+			jobject.setRoot(CouponDao.getByCond(staff, extra.setOnlyAmount(false), " LIMIT " + start + ", " + limit));
 		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -141,18 +140,18 @@ public class QueryCouponAction extends DispatchAction{
 		
 		JObject jobject = new JObject();
 		try{
-			//final int couponPublished = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)), null).size();
-			//final int couponDrawn = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.DRAWN), null).size();
-			//final int couponUsed = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.USED), null).size();
+			final int couponPublished = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setOnlyAmount(true), null).size();
+			final int couponDrawn = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.DRAWN).setOnlyAmount(true), null).size();
+			final int couponUsed = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.USED).setOnlyAmount(true), null).size();
 			
 			jobject.setExtra(new Jsonable(){
 
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
-					jm.putInt("couponPublished", 10);
-					jm.putInt("couponDrawn", 10);
-					jm.putInt("couponUsed", 10);
+					jm.putInt("couponPublished", couponPublished);
+					jm.putInt("couponDrawn", couponDrawn);
+					jm.putInt("couponUsed", couponUsed);
 					return jm;
 				}
 

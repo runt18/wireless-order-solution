@@ -1,7 +1,6 @@
 package com.wireless.Actions.couponMgr;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,17 +11,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.json.JsonMap;
-import com.wireless.json.Jsonable;
-import com.wireless.pojo.member.Member;
 import com.wireless.pojo.oss.OssImage;
-import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.Promotion.Status;
@@ -211,68 +205,38 @@ public class OperatePromotionAction extends DispatchAction{
 		
 	}	
 	
-	public ActionForward getById(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String pin = (String) request.getAttribute("pin");
-		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		String promotionId = request.getParameter("promotionId");
-		
-		JObject jobject = new JObject();
-		try{
-			final Promotion p = PromotionDao.getById(staff, Integer.parseInt(promotionId));
-			
-			final Promotion promo = p;
-			List<Coupon> p_List = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(p.getId()), null);
-			List<Member> members = new ArrayList<>();
-			for (Coupon coupon : p_List) {
-				members.add(coupon.getMember());
-			}
-			final List<Member> memberList = members;
-			jobject.setExtra(new Jsonable() {
-				
-				@Override
-				public JsonMap toJsonMap(int flag) {
-					JsonMap jm = new JsonMap();
-					jm.putJsonable(promo, 0);
-					jm.putJsonableList("members", memberList, 0);
-					return jm;
-				}
-				
-				@Override
-				public void fromJsonMap(JsonMap jsonMap, int flag) {
-					
-				}
-			});
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip4Exception(e);
-		}finally{
-			response.getWriter().print(jobject.toString());
-		}
-		
-		return null;		
-		
-	}		
-	
-//	public ActionForward publish(ActionMapping mapping, ActionForm form,
-//			HttpServletRequest request, HttpServletResponse response)
-//			throws Exception {
+//	public ActionForward getById(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 //		String pin = (String) request.getAttribute("pin");
+//		
+//		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 //		String promotionId = request.getParameter("promotionId");
 //		
 //		JObject jobject = new JObject();
 //		try{
-//			PromotionDao.publish(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(promotionId));
+//			final Promotion p = PromotionDao.getById(staff, Integer.parseInt(promotionId));
 //			
-//			jobject.initTip(true, "活动发布成功");
+//			final Promotion promo = p;
+//			List<Coupon> p_List = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(p.getId()), null);
+//			List<Member> members = new ArrayList<>();
+//			for (Coupon coupon : p_List) {
+//				members.add(coupon.getMember());
+//			}
+//			final List<Member> memberList = members;
+//			jobject.setExtra(new Jsonable() {
+//				
+//				@Override
+//				public JsonMap toJsonMap(int flag) {
+//					JsonMap jm = new JsonMap();
+//					jm.putJsonable(promo, 0);
+//					jm.putJsonableList("members", memberList, 0);
+//					return jm;
+//				}
+//				
+//				@Override
+//				public void fromJsonMap(JsonMap jsonMap, int flag) {
+//					
+//				}
+//			});
 //		}catch(BusinessException e){
 //			e.printStackTrace();
 //			jobject.initTip(e);
@@ -290,33 +254,6 @@ public class OperatePromotionAction extends DispatchAction{
 //		
 //	}		
 	
-//	public ActionForward cancelPublish(ActionMapping mapping, ActionForm form,
-//			HttpServletRequest request, HttpServletResponse response)
-//			throws Exception {
-//		String pin = (String) request.getAttribute("pin");
-//		String promotionId = request.getParameter("promotionId");
-//		
-//		JObject jobject = new JObject();
-//		try{
-//			PromotionDao.cancelPublish(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(promotionId));
-//			
-//			jobject.initTip(true, "活动撤销成功");
-//		}catch(BusinessException e){
-//			e.printStackTrace();
-//			jobject.initTip(e);
-//		}catch(SQLException e){
-//			e.printStackTrace();
-//			jobject.initTip(e);
-//		}catch(Exception e){
-//			e.printStackTrace();
-//			jobject.initTip4Exception(e);
-//		}finally{
-//			response.getWriter().print(jobject.toString());
-//		}
-//		
-//		return null;		
-//		
-//	}	
 	
 	public ActionForward delete(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -346,37 +283,7 @@ public class OperatePromotionAction extends DispatchAction{
 		
 	}		
 	
-//	public ActionForward finish(ActionMapping mapping, ActionForm form,
-//			HttpServletRequest request, HttpServletResponse response)
-//			throws Exception {
-//		String pin = (String) request.getAttribute("pin");
-//		String promotionId = request.getParameter("promotionId");
-//		
-//		JObject jobject = new JObject();
-//		try{
-//			PromotionDao.finish(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(promotionId));
-//			
-//			jobject.initTip(true, "活动结束成功");
-//		}catch(BusinessException e){
-//			e.printStackTrace();
-//			jobject.initTip(e);
-//		}catch(SQLException e){
-//			e.printStackTrace();
-//			jobject.initTip(e);
-//		}catch(Exception e){
-//			e.printStackTrace();
-//			jobject.initTip4Exception(e);
-//		}finally{
-//			response.getWriter().print(jobject.toString());
-//		}
-//		
-//		return null;		
-//		
-//	}		
-	
-	public ActionForward getPromotionTree(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward getPromotionTree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		String pin = (String) request.getAttribute("pin");
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		String rule = request.getParameter("rule");
@@ -386,42 +293,45 @@ public class OperatePromotionAction extends DispatchAction{
 			extra.setRule(Promotion.Rule.valueOf(Integer.parseInt(rule)));
 		}
 		
-		StringBuilder pTree = new StringBuilder();
+		StringBuilder promotionTree = new StringBuilder();
 		try{
 			
-				String p_create = children(staff, extra.setStatus(Status.CREATED));
-				if(!p_create.isEmpty()){
-					pTree.append("{")
+				String created = children(staff, extra.setStatus(Status.CREATED));
+				if(!created.isEmpty()){
+					promotionTree.append("{")
 					.append("text:'已创建'")
+					.append(", id : -2")
 					.append(", status : " + Promotion.Status.CREATED.getVal())
-					.append(",expanded:true")
-					.append(",children:[" + p_create + "]") 
+					.append(", expanded : true")
+					.append(", children : [" + created + "]") 
 					.append("}");						
 				}
 
 				String progress = children(staff, extra.setStatus(Status.PROGRESS));
 				if(!progress.isEmpty()){
-					if(!pTree.toString().isEmpty()){
-						pTree.append(",");
+					if(!promotionTree.toString().isEmpty()){
+						promotionTree.append(",");
 					}
-					pTree.append("{")
+					promotionTree.append("{")
 					.append("text:'进行中'")
+					.append(", id : -3")
 					.append(", status : " + Promotion.Status.PROGRESS.getVal())
-					.append(",expanded:true")
-					.append(",children:[" + progress + "]") 
+					.append(", expanded : true")
+					.append(", children : [" + progress + "]") 
 					.append("}");	
 				}
 	
-				String finish = children(staff, new PromotionDao.ExtraCond().setStatus(Status.FINISH));
+				String finish = children(staff, extra.setStatus(Status.FINISH));
 				if(!finish.isEmpty()){
-					if(!pTree.toString().isEmpty()){
-						pTree.append(",");
+					if(!promotionTree.toString().isEmpty()){
+						promotionTree.append(",");
 					}
-					pTree.append("{")
+					promotionTree.append("{")
 					.append("text:'已结束'")
+					.append(", id : -4")
 					.append(", status : " + Promotion.Status.FINISH.getVal())
-					.append(",expanded:true")
-					.append(",children:[" + finish + "]") 
+					.append(", expanded : true")
+					.append(", children : [" + finish + "]") 
 					.append("}");	
 				}
 		}catch(SQLException e){
@@ -429,7 +339,7 @@ public class OperatePromotionAction extends DispatchAction{
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print("[" + pTree.toString() + "]");
+			response.getWriter().print("[" + promotionTree.toString() + "]");
 		}
 		
 		return null;		
