@@ -55,12 +55,12 @@ public class EntryAction extends Action{
 							Menu menu = new Menu();
 							Token token = Token.newInstance(appId, appSecret);
 							Menu.delete(token);
-							menu.set1stButton(new Button.ClickBuilder("餐厅导航", WeiXinHandleMessage.EventKey.NAVI_EVENT_KEY.getKey()).build());
-							menu.set2ndButton(new Button.ClickBuilder("优惠活动", WeiXinHandleMessage.EventKey.PROMOTION_EVENT_KEY.getKey()).build());
+							menu.set1stButton(new Button.ClickBuilder("餐厅导航", WxHandleMessage.EventKey.NAVI_EVENT_KEY.getKey()).build());
+							menu.set2ndButton(new Button.ClickBuilder("优惠活动", WxHandleMessage.EventKey.PROMOTION_EVENT_KEY.getKey()).build());
 							
 							menu.set3rdButton(new Button.ClickBuilder("我的", "AAA")
-											.addChild(new Button.ClickBuilder("我的订单", WeiXinHandleMessage.EventKey.ORDER_EVENT_KEY.getKey()))
-											.addChild(new Button.ClickBuilder("我的会员卡", WeiXinHandleMessage.EventKey.MEMBER_EVENT_KEY.getKey()))
+											.addChild(new Button.ClickBuilder("我的订单", WxHandleMessage.EventKey.ORDER_EVENT_KEY.getKey()))
+											.addChild(new Button.ClickBuilder("我的会员卡", WxHandleMessage.EventKey.MEMBER_EVENT_KEY.getKey()))
 											.build());
 							if(menu.create(token).isOk()){
 								//Record the app id & secret.
@@ -91,7 +91,7 @@ public class EntryAction extends Action{
 		OutputStream os = response.getOutputStream();
 		WxSession session = WxSession.newInstance();
 		try{
-			session.addOnHandleMessageListener(new WeiXinHandleMessage(session, "http://" + request.getLocalAddr() + "/wx-term"));
+			session.addOnHandleMessageListener(new WxHandleMessage(session, "http://" + request.getLocalAddr() + "/wx-term"));
 			session.process(is, os);
 		}finally{
 			session.close();
@@ -131,13 +131,13 @@ public class EntryAction extends Action{
 		Menu menu = new Menu();
 		Token token = Token.newInstance("wx99cd7d58d4e03702", "30f318b5655f47aca0afd12b6b5922a5");
 		Menu.delete(token);
-		menu.set1stButton(new Button.ClickBuilder("餐厅导航", WeiXinHandleMessage.EventKey.NAVI_EVENT_KEY.getKey()).build());
-		menu.set2ndButton(new Button.ClickBuilder("扫码支付", WeiXinHandleMessage.EventKey.SCAN_EVENT_KEY.getKey()).build());
+		menu.set1stButton(new Button.ClickBuilder("餐厅导航", WxHandleMessage.EventKey.NAVI_EVENT_KEY.getKey()).build());
+		menu.set2ndButton(new Button.ClickBuilder("扫码支付", WxHandleMessage.EventKey.SCAN_EVENT_KEY.getKey()).build());
 		
 		menu.set3rdButton(new Button.ClickBuilder("我的", "AAA")
-						.addChild(new Button.ClickBuilder("我的订单", WeiXinHandleMessage.EventKey.ORDER_EVENT_KEY.getKey()))
-						.addChild(new Button.ClickBuilder("我的会员卡", WeiXinHandleMessage.EventKey.MEMBER_EVENT_KEY.getKey()))
-						.addChild(new Button.ClickBuilder("优惠活动", WeiXinHandleMessage.EventKey.PROMOTION_EVENT_KEY.getKey()))
+						.addChild(new Button.ClickBuilder("我的订单", WxHandleMessage.EventKey.ORDER_EVENT_KEY.getKey()))
+						.addChild(new Button.ClickBuilder("我的会员卡", WxHandleMessage.EventKey.MEMBER_EVENT_KEY.getKey()))
+						.addChild(new Button.ClickBuilder("优惠活动", WxHandleMessage.EventKey.PROMOTION_EVENT_KEY.getKey()))
 						//.addChild(new Button.ClickBuilder("我的大转盘", WeiXinHandleMessage.ZHUAN_EVENT_KEY))
 						.build());
 		

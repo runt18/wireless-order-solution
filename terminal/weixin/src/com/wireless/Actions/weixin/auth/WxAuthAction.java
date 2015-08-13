@@ -33,7 +33,7 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
-import com.wireless.Actions.weixin.WeiXinHandleMessage;
+import com.wireless.Actions.weixin.WxHandleMessage;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
@@ -77,13 +77,13 @@ public class WxAuthAction extends Action {
 			//Make the menu.
 			Menu menu = new Menu();
 			Menu.delete(Token.newInstance(authorizerToken));
-			menu.set1stButton(new Button.ClickBuilder("餐厅导航", WeiXinHandleMessage.EventKey.NAVI_EVENT_KEY.getKey()).build());
-			menu.set2ndButton(new Button.ScanMsgBuilder("扫一扫", WeiXinHandleMessage.EventKey.SCAN_EVENT_KEY.getKey()).build());
+			menu.set1stButton(new Button.ClickBuilder("餐厅导航", WxHandleMessage.EventKey.NAVI_EVENT_KEY.getKey()).build());
+			menu.set2ndButton(new Button.ScanMsgBuilder("扫一扫", WxHandleMessage.EventKey.SCAN_EVENT_KEY.getKey()).build());
 			
 			menu.set3rdButton(new Button.ClickBuilder("我的", "AAA")
-							.addChild(new Button.ClickBuilder("优惠活动", WeiXinHandleMessage.EventKey.PROMOTION_EVENT_KEY.getKey()))
-							.addChild(new Button.ClickBuilder("我的订单", WeiXinHandleMessage.EventKey.ORDER_EVENT_KEY.getKey()))
-							.addChild(new Button.ClickBuilder("我的会员卡", WeiXinHandleMessage.EventKey.MEMBER_EVENT_KEY.getKey()))
+							.addChild(new Button.ClickBuilder("优惠活动", WxHandleMessage.EventKey.PROMOTION_EVENT_KEY.getKey()))
+							.addChild(new Button.ClickBuilder("我的订单", WxHandleMessage.EventKey.ORDER_EVENT_KEY.getKey()))
+							.addChild(new Button.ClickBuilder("我的会员卡", WxHandleMessage.EventKey.MEMBER_EVENT_KEY.getKey()))
 							//.addChild(new Button.ClickBuilder("我的大转盘", WeiXinHandleMessage.ZHUAN_EVENT_KEY))
 							.build());
 			if(menu.create(Token.newInstance(authorizerToken)).isOk()){

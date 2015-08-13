@@ -49,7 +49,7 @@ import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
-public class WeiXinHandleMessage extends HandleMessageAdapter {
+public class WxHandleMessage extends HandleMessageAdapter {
 	
 	private final String WEIXIN_INDEX;
 	private final String WEIXIN_FOOD;
@@ -94,7 +94,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		}
 	}
 	
-	public WeiXinHandleMessage(WxSession session, String root){
+	public WxHandleMessage(WxSession session, String root){
 		super(session);
 		this.WEIXIN_INDEX = root + "/weixin/order/index.html";
 		this.WEIXIN_FOOD = root + "/weixin/order/food.html";
@@ -170,7 +170,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 //			List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(MemberDao.getByWxSerial(staff, msg.getFromUserName())).setPromotionType(Promotion.Type.WELCOME), null);			
 //			return new Msg4ImageText(msg).addItem(new Data4Item(promotion.getTitle() + "(火热进行中...)", desc.toString(), 
 //					 					   								  promotion.hasImage() ? promotion.getImage().getObjectUrl() : "", 
-//					 					   								  createUrl(msg, WEIXIN_COUPON) + "&e=" + coupons.get(0).getId()));
+//					 					   								  createUrl(msg, WEIXIN_COUPON) + "&cid=" + coupons.get(0).getId()));
 //		}
 //	}
 	
@@ -355,7 +355,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 							couponItem.addItem(new Data4Item(coupon.getPromotion().getTitle(), 
 															 desc.toString(), 
 															 coupon.getCouponType().hasImage() ? coupon.getCouponType().getImage().getObjectUrl() : "", 
-															 createUrl(msg, WEIXIN_COUPON) + "&e=" + coupon.getId()));
+															 createUrl(msg, WEIXIN_COUPON) + "&cid=" + coupon.getId()));
 							
 						}else{
 							
@@ -385,7 +385,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 									picUrl = "";
 								}
 								couponItem.addItem(new Data4Item(coupon.getPromotion().getTitle(), "", 
-												   picUrl, createUrl(msg, WEIXIN_COUPON) + "&e=" + coupon.getId()));
+												   picUrl, createUrl(msg, WEIXIN_COUPON) + "&cid=" + coupon.getId()));
 							}
 						}
 						session.callback(couponItem);

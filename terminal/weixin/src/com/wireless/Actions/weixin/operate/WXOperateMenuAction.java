@@ -22,8 +22,8 @@ import org.marker.weixin.msg.Msg4Head.MsgType;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 
-import com.wireless.Actions.weixin.WeiXinHandleMessage;
-import com.wireless.Actions.weixin.WeiXinHandleMessage.EventKey;
+import com.wireless.Actions.weixin.WxHandleMessage;
+import com.wireless.Actions.weixin.WxHandleMessage.EventKey;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.menuAction.WxMenuAction;
 import com.wireless.db.weixin.menuAction.WxMenuAction.Cate;
@@ -76,7 +76,7 @@ public class WXOperateMenuAction extends DispatchAction {
 		JObject jobject = new JObject(); 
 
 		List<Jsonable> list = new ArrayList<>();
-		for(final EventKey key : WeiXinHandleMessage.EventKey.values()){
+		for(final EventKey key : WxHandleMessage.EventKey.values()){
 			Jsonable j = new Jsonable() {
 				
 				@Override
