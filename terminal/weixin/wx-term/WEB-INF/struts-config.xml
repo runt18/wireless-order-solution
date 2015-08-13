@@ -67,16 +67,16 @@
 			type="com.wireless.Actions.weixin.query.WXQueryMemberOperationAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/OperatePromotion"
-			type="com.wireless.Actions.weixin.query.WXQueryPromotionAction"
+		<action path="/WxOperatePromotion"
+			type="com.wireless.Actions.weixin.query.WxOperatePromotionAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/WXQueryOrder"
 			type="com.wireless.Actions.weixin.query.WxQueryOrderAction" scope="request"
 			parameter="dataSource">
 		</action>
-		<action path="/WXQueryCoupon"
-			type="com.wireless.Actions.weixin.query.WXQueryCouponAction" scope="request"
+		<action path="/WxOperateCoupon"
+			type="com.wireless.Actions.weixin.query.WxOperateCouponAction" scope="request"
 			parameter="dataSource">
 		</action>
 		<action path="/WXQueryDianping"
@@ -86,8 +86,6 @@
 		<action path="/WXQueryAddress"
 			type="com.wireless.Actions.weixin.query.WXQueryTakeoutAddressAction"
 			scope="request">
-		</action>
-		<action path="/testMacAddr" type="test.getMacAddrAction" scope="request">
 		</action>
 		<action path="/WXInterface"
 			type="com.wireless.Actions.weixin.operate.WXOperateWeixinInterface"
