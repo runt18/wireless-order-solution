@@ -16,6 +16,8 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
@@ -74,9 +76,20 @@ public class OperatePromotionAction extends DispatchAction{
 				}				
 			}
 
-			PromotionDao.create(StaffDao.verify(Integer.parseInt(pin)), promotionCreateBuilder);
+			final int promotionId = PromotionDao.create(StaffDao.verify(Integer.parseInt(pin)), promotionCreateBuilder);
 			
 			jobject.initTip(true, "活动创建成功");
+			jobject.setRoot(new Jsonable(){
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putInt("pid", promotionId);
+					return jm;
+				}
+				@Override
+				public void fromJsonMap(JsonMap jm, int flag) {
+				}
+			});
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
