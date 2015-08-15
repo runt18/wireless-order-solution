@@ -184,6 +184,8 @@ function createPagingBar(pageSize, store){
  *            tbar 上方的工具条[{tbar1},{tbar2}]
  * @param {}
  *            bbar 下方的工具条（true显示，false不显示）
+ *            
+ *            rid 设置可以重复数据
  * @return {}
  */
 function createGridPanel(id, title, height, width, url, cmData, readerData,

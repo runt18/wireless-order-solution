@@ -796,6 +796,26 @@ Ext.onReady(function() {
 //		}
 //	});
 	
+	var memberanalysisBar = new Ext.Toolbar({
+		items : ['->',{
+			text : '导出',
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				
+				var promotion = Ext.ux.getSelNode(promotionTree);
+				var url = '../../{0}?dataSource={1}&pId={2}&status={3}';
+				url = String.format(
+						url, 
+						'ExportHistoryStatisticsToExecl.do', 
+						'promotionMember', 
+						promotion.id,
+						Ext.getCmp('cmb_promotionMemberStatus').getValue()
+					);
+				window.location = url;
+			}
+		}]
+	});
+	
 	memberAnalysisBasicGrid = createGridPanel(
 		'memberAnalysisBasicGrid',
 		'',
@@ -812,7 +832,7 @@ Ext.onReady(function() {
 		[['isPaging', true],['dataSource', 'byCondtion']],
 		15,
 		'',
-		[]
+		memberanalysisBar
 	);	
 	memberAnalysisBasicGrid.region = 'center';
 	memberAnalysisBasicGrid.loadMask = { msg : '数据加载中，请稍等...' };	
@@ -884,7 +904,7 @@ Ext.onReady(function() {
 						labelWidth : 40,
 						items : [{
 							xtype : 'combo',
-							id : '',
+							id : 'cmb_promotionMemberStatus',
 							fieldLabel : '状态',
 							readOnly : false,
 							forceSelection : true,
@@ -899,7 +919,6 @@ Ext.onReady(function() {
 							mode : 'local',
 							triggerAction : 'all',
 							selectOnFocus : true,
-							allowBlank : false,					
 							listeners : {
 								select : function(combo, record, index){
 									var gs = memberAnalysisBasicGrid.getStore();
