@@ -78,16 +78,18 @@ var finishPromotion = function(){
 			if(jr.success){
 				operatePromotTypeWin.hide();
 				
-				if(operatePromotTypeWin.otype == 'insert'){
+				var promotionId;
+				if(params.dataSource == 'insert'){
+					promotionId = jr.root[0].pid;
 					promotionTree.getRootNode().reload();
 				}else{
-					promotionTree.getRootNode().reload();
+					promotionId = params.id;
 					//重新加载显示刚刚修改的活动
-					for(var i = 0; i < promotionTree.getRootNode().childNodes.length; i++){
+					for(var i in promotionTree.getRootNode().childNodes){
 						var statusNode = promotionTree.getRootNode().childNodes[i];
-						for(var j = 0; j < statusNode.childNodes.length; j++){
+						for(var j in statusNode.childNodes){
 							var promotionNode = statusNode.childNodes[j];
-							if(promotionNode.id == params.id){
+							if(promotionNode.id == promotionId){
 								promotionNode.select();
 								promotionNode.fireEvent('click', promotionNode);
 								break;
@@ -95,7 +97,7 @@ var finishPromotion = function(){
 						}
 					}
 				}
-				
+
 				Ext.example.msg(jr.title, jr.msg);
 			}else{
 				Ext.ux.showMsg(jr);
@@ -640,26 +642,6 @@ function fnUpdatePromotion(){
 	
 }
 
-//function fnCheckHaveWelcome(){
-//	$.ajax({
-//		url : '../../OperatePromotion.do',
-//		type : 'post',
-//		async: false,
-//		data : {dataSource : 'hasWelcomePage'},
-//		success : function(jr, status, xhr){
-//			if(jr.root.length > 0){
-//				$('#divSetWelcome').hide();
-//			}else{
-//				$('#divSetWelcome').show();
-//			}
-//		},
-//		error : function(request, status, err){
-//			Ext.ux.showMsg({success : false, msg : '请求失败, 请刷新页面'});
-//		}
-//	}); 
-//}
-
-
 var promotionPreviewPanel, memberCountGrid, memberAnalysisBasicGrid;
 var sendCouponWin, couponViewBillWin;
 var member_searchType = false;
@@ -779,7 +761,6 @@ Ext.onReady(function() {
 					}*/
 					promotionTree.getRootNode().getUI().show();
 				}
-				//fnCheckHaveWelcome();
 			},
 			click : function(e){
 	    		if(e.id < 0){
@@ -1806,8 +1787,6 @@ Ext.onReady(function() {
 //			items : [memberAnalysisBasicGrid, threeStepEast]
 //		}]
 //	});	
-	
-	//fnCheckHaveWelcome();
 	
 	//steps.js与Ext混用时的样式修正	
 	$('#active_beginDate').parent().width($('#active_beginDate').width() + $('#active_beginDate').next().width()+20);
