@@ -38,6 +38,20 @@ public class WxOperateCouponAction extends DispatchAction{
 				extraCond.setId(Integer.parseInt(request.getParameter("cid")));
 			}
 			
+			if(request.getParameter("status") != null && !request.getParameter("status").isEmpty()){
+				if(request.getParameter("status").equalsIgnoreCase("drawn")){
+					extraCond.setStatus(Coupon.Status.DRAWN);
+				}
+			}
+			
+			if(request.getParameter("pid") != null && !request.getParameter("pid").isEmpty()){
+				extraCond.setPromotion(Integer.parseInt(request.getParameter("pid")));
+			}
+			
+			if(request.getParameter("oid") != null && !request.getParameter("oid").isEmpty()){
+				extraCond.setMember(MemberDao.getByWxSerial(staff, request.getParameter("oid")));
+			}
+			
 			final List<Coupon> result = CouponDao.getByCond(staff, extraCond, null);
 			for(Coupon coupon : result){
 				coupon.getCouponType().setImage(OssImageDao.getById(staff, coupon.getCouponType().getImage().getId()));

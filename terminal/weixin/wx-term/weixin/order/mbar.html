@@ -55,28 +55,4 @@ for(var i = 0;i < li.length; i++){
 	li[i].style.width = tw + 'px';
 }
 
-/* $.ajax({
-	url : '../../WXQueryMemberOperation.do',
-	type : 'post',
-	data : {
-		dataSource : 'hasCouponDetails',
-		oid : Util.mp.oid,
-		fid : Util.mp.fid
-	},
-	dataType : 'json',
-	success : function(data, status, xhr){
-		if(data.success){
-			if(data.root.length > 0){
-				$('#mbarMemberCenter').prepend('<img id="imgNewCouponTip" src="../../images/WXnew.gif" style="float : right;"></img>');
-			}else{
-				$('#mbarMemberCenter img').html('');
-			}			
-		}
-
-	},
-	error : function(data, errotType, eeor){
-		Util.dialog.show({msg: ''});
-	}
-}); */
-
 </script>

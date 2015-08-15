@@ -12,7 +12,7 @@ function initMemberMsg(c){
 	var totalBalance = $('#spanMemberTotalBalance');
 	var typeName = $('#spanMemberTypeName');
 	var typeNameInCard = $('#divMemberTypeName');
-	var weixinMemberCard = $('#divWXMemberCard');
+//	var weixinMemberCard = $('#divWXMemberCard');
 	var defaultMemberDiscount = $('#fontMemberDiscount');
 	var memberTotalPoint = $('#fontMemberPoint');
 	
@@ -432,10 +432,11 @@ function toggleCouponContent(){
 				toggleCouponContent.load = function(){
 					Util.lm.show();
 					$.ajax({
-						url : '../../WXQueryMemberOperation.do',
+						url : '../../WxOperateCoupon.do',
 						type : 'post',
 						data : {
-							dataSource : 'hasCouponDetails',
+							dataSource : 'getByCond',
+							status : 'drawn',
 							oid : Util.mp.oid,
 							fid : Util.mp.fid
 						},
@@ -443,28 +444,34 @@ function toggleCouponContent(){
 						success : function(data, status, xhr){
 							Util.lm.hide();
 							if(data.success){
-								var html = [], temp = null;
-								member.couponCount = data.root.length;
-								if(data.root.length > 0){
-									for(var i = 0; i < data.root.length; i++){
-										temp = data.root[i];
+								var html = [];
+								var couponAmount = 0;
+								
+								for(var i = 0; i < data.root.length; i++){
+									var coupon = data.root[i];
+									//不显示纯显示的优惠券
+									if(coupon.promotion.rule != 1){
 										html.push(templet.format({
-											couponImg : temp.couponType.ossImage?temp.couponType.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg',
-											name : temp.couponType.name,
-											cPrice : temp.couponType.price,
-											expiredTime : temp.couponType.expiredFormat,
-											promotionName : temp.promotion.title,
-											couponId : temp.couponId
+											couponImg : coupon.couponType.ossImage ? coupon.couponType.ossImage.image : 'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg',
+											name : coupon.couponType.name,
+											cPrice : coupon.couponType.price,
+											expiredTime : coupon.couponType.expiredFormat,
+											promotionName : coupon.promotion.title,
+											couponId : coupon.couponId
 										}));
+										couponAmount++;
 									}
-									mainView.html(html);
-									
-									//计算图片居中
-//									calcFloatDivs();
-									
-								}else{
+								}
+								mainView.html(html);
+								
+								//计算图片居中
+//								calcFloatDivs();
+								
+								if(couponAmount == 0){
 									mainView.html('暂无优惠券');
 								}
+								member.couponCount = couponAmount;
+								
 							}else{
 								Util.dialog.show({title: data.title, msg: data.msg});						
 							}
