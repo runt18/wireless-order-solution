@@ -695,7 +695,6 @@ public class PromotionDao {
 			String body = dbCon.rs.getString("body");
 			if(!body.isEmpty()){
 				promotion.setBody(new StringHtml(body, StringHtml.ConvertTo.TO_HTML).toString());
-				
 			}	
 			String entire = dbCon.rs.getString("entire");
 			if(!entire.isEmpty()){

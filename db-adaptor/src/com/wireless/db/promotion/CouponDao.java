@@ -11,6 +11,7 @@ import com.wireless.db.Params;
 import com.wireless.db.member.MemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
+import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.oss.OssImage;
@@ -556,7 +557,7 @@ public class CouponDao {
 			  " C.coupon_id, P.entire, C.restaurant_id, C.birth_date, C.draw_date, C.order_id, C.order_date, C.status, " +
 			  " C.coupon_type_id, CT.name, CT.price, CT.expired, CT.oss_image_id, " +
 			  " C.member_id, M.name AS member_name, M.mobile, M.member_card, M.`consumption_amount`, M.point, M.`base_balance`, M.`extra_balance`, MT.name AS memberTypeName, " +
-			  " C.promotion_id, P.title, P.oriented ") +
+			  " C.promotion_id, P.title, P.oriented, P.rule, P.start_date, P.finish_date ") +
 			  " FROM " + Params.dbName + ".coupon C " +
 			  " JOIN " + Params.dbName + ".coupon_type CT ON C.coupon_type_id = CT.coupon_type_id " +
 			  " JOIN " + Params.dbName + ".promotion P ON C.promotion_id = P.promotion_id " +
@@ -571,8 +572,7 @@ public class CouponDao {
 		final List<Coupon> result;
 		if(extraCond.isOnlyAmount){
 			if(dbCon.rs.next()){
-				result = new ArrayList<Coupon>(dbCon.rs.getInt(1));
-				Collections.fill(result, null);
+				result = Collections.nCopies(dbCon.rs.getInt(1), null);
 			}else{
 				result = Collections.emptyList();
 			}
@@ -617,6 +617,10 @@ public class CouponDao {
 				Promotion promotion = new Promotion(dbCon.rs.getInt("promotion_id"));
 				promotion.setTitle(dbCon.rs.getString("title"));
 				promotion.setOriented(Promotion.Oriented.valueOf(dbCon.rs.getInt("oriented")));
+				promotion.setRule(Promotion.Rule.valueOf(dbCon.rs.getInt("rule")));
+				if(dbCon.rs.getTimestamp("start_date") != null && dbCon.rs.getTimestamp("finish_date") != null){
+					promotion.setDateRange(new DateRange(dbCon.rs.getTimestamp("start_date").getTime(), dbCon.rs.getTimestamp("finish_date").getTime()));
+				}
 				promotion.setEntire(new StringHtml(dbCon.rs.getString("entire"), StringHtml.ConvertTo.TO_HTML).toString());
 				coupon.setPromotion(promotion);
 				
