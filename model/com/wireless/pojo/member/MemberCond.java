@@ -84,7 +84,8 @@ public class MemberCond implements Jsonable{
 	public static class UpdateBuilder{
 		private final int id;
 		private String name;
-		private MemberType memberType;
+		private final static MemberType DUMMY = new MemberType(0);
+		private MemberType memberType = DUMMY;
 		private RangeType rangeType;
 		private DutyRange range;
 		private float minConsumeMoney;
@@ -113,7 +114,7 @@ public class MemberCond implements Jsonable{
 		}
 		
 		public boolean isMemberTypeChanged(){
-			return this.memberType != null;
+			return this.memberType != DUMMY;
 		}
 		
 		public boolean isRangeTypeChanged(){

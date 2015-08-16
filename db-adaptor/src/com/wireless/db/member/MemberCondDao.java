@@ -140,7 +140,7 @@ public class MemberCondDao {
 		sql = " UPDATE " + Params.dbName + ".member_cond SET " +
 			  " id = " + cond.getId() +
 			  (builder.isNameChanged() ? " ,name = '" + cond.getName() + "'" : "") +
-			  (builder.isMemberTypeChanged() ? " ,member_type_id = " + cond.getMemberType().getId() : "") +
+			  (builder.isMemberTypeChanged() ? " ,member_type_id = " + (cond.hasMemberType() ? cond.getMemberType().getId() : "NULL") : "") +
 			  (builder.isBalanceChanged() ? " ,min_balance = " + cond.getMinBalance() + " ,max_balance = " + cond.getMaxBalance() : "") +
 			  (builder.isConsumeAmountChanged() ? " ,min_consume_amount = " + cond.getMinConsumeAmount() + " ,max_consume_amount = " + cond.getMaxConsumeAmount() : "") +
 			  (builder.isConsumeMoneyChanged() ? " ,min_consume_money = " + cond.getMinConsumeMoney() + " ,max_consume_money = " + cond.getMaxConsumeMoney() : "") +

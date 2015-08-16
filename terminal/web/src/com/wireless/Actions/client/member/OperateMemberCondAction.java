@@ -139,8 +139,12 @@ public class OperateMemberCondAction extends DispatchAction{
 				updateBuilder.setRange(memberCondBeginDate, memberCondEndDate);
 			}
 			
-			if(memberType != null && !memberType.isEmpty() && !memberType.equals("-1")){
-				updateBuilder.setMemberType(new MemberType(Integer.parseInt(memberType)));
+			if(memberType != null && !memberType.isEmpty()){
+				if(memberType.equals("-1")){
+					updateBuilder.setMemberType(null);
+				}else{
+					updateBuilder.setMemberType(new MemberType(Integer.parseInt(memberType)));
+				}
 			}
 			if(memberCondMinConsume != null && !memberCondMinConsume.isEmpty()){
 				minConsume = Float.parseFloat(memberCondMinConsume);
