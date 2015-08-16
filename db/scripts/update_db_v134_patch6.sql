@@ -7,7 +7,7 @@ SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`member_cond`
+adfasdfasdfa-- Table `wireless_order_db`.`member_cond`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`member_cond` ;
 
