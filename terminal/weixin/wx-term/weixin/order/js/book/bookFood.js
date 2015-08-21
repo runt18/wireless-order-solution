@@ -31,9 +31,9 @@ function loadBookDate(){
 	bookDates.push(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
 
 	
-	$('#bookDate4AfterDay').html('<div class="bookDateDetail" data-value=0>后天<br>'+ afterday +'</div>');
-	$('#bookDate4Today').html('<div class="bookDateDetail bookDateCheck" data-value=1>今天<br>'+ today +'</div>');
-	$('#bookDate4Tomorrow').html('<div class="bookDateDetail" data-value=2>明天<br>'+ tomorrow +'</div>');	
+	$('#bookDate4AfterDay').html('<div class="bookDateDetail" data-value=2>后天<br>'+ afterday +'</div>');
+	$('#bookDate4Today').html('<div class="bookDateDetail bookDateCheck" data-value=0>今天<br>'+ today +'</div>');
+	$('#bookDate4Tomorrow').html('<div class="bookDateDetail" data-value=1>明天<br>'+ tomorrow +'</div>');	
 }
 
 /**
@@ -68,7 +68,7 @@ function loadRegions(){
 			//预订区域 & 类型
 			$('.bookRadioSelect').on('click', function(){
 				$('#' + $(this).data("for")).click();
-			})
+			});
 		}
 	}, 'json');	
 }
@@ -94,22 +94,22 @@ function loadBookMember(){
  * 提交预订信息
  */
 function commitBook(){
-	var date, time, region, sex, name, phone, bookType, count;
+	var date, time, region, name, phone, bookType, count;
 	$('.bookDateDetail').each(function(){
 		if($(this).hasClass("bookDateCheck")){
 			date = bookDates[$(this).data('value')];
 		}
-	})
+	});
 	time = $('#bookTime').val();
 	if(time.indexOf('PM') > 0){
 		var hourString = time.substring(0, time.indexOf(':'));
-		var hour = parseInt(hourString)+12;
-		var minute = time.substr(time.indexOf(':')+1, 2);
-		time = hour + ":" + minute + ':' + "59"
+		var hour = parseInt(hourString) + 12;
+		var minute = time.substr(time.indexOf(':') + 1, 2);
+		time = hour + ":" + minute + ':' + "59";
 	}else if(time.indexOf('AM') > 0){
 		var hour = time.substring(0, time.indexOf(':'));
 		var minute = time.substr(time.indexOf(':')+1, 2);	
-		time = hour + ":" + minute + ':' + "59"
+		time = hour + ":" + minute + ':' + "59";
 	}else{
 		Util.dialog.show({msg: '请选择时间', btn:'yes'});
 		return;
@@ -137,7 +137,9 @@ function commitBook(){
 	var foods = "";
 	for(var i = 0; i < params.orderData.length; i++){
 		temp = params.orderData[i];
-		if(i > 0) foods += '&';
+		if(i > 0){
+			foods += '&';
+		}
 		foods += (temp.id + ',' + temp.count);
 	}
 	
@@ -168,7 +170,7 @@ function commitBook(){
  */
 function operateSeat(){
 	$('#div4bookFoodList').html('');	
-	$('#bookFoodTotalMoney').html('');
+//	$('#bookFoodTotalMoney').html('');
 }
 
 /**
@@ -224,10 +226,10 @@ function toBookDetail(hasFoods){
 			}));
 		}
 		$('#div4bookFoodList').html(html.join(''));	
-		$('#bookFoodTotalMoney').html('¥'+sumPrice);
+//		$('#bookFoodTotalMoney').html('¥'+sumPrice);
 	}else{
 		$('#div4bookFoodList').html('');	
-		$('#bookFoodTotalMoney').html('');
+//		$('#bookFoodTotalMoney').html('');
 	}
 	
 	$('html, body').animate({scrollTop: 1000}, 'fast');  
@@ -348,6 +350,6 @@ $(function(){
 	$('.bookDateDetail').on('click', function(){
 		$('.bookDateDetail').removeClass('bookDateCheck');
 		$(this).addClass('bookDateCheck');
-	})
+	});
 	
 });

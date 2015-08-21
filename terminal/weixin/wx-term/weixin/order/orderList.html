@@ -11,26 +11,64 @@
 <script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="./js/Util.js"></script>
 <script type="text/javascript" src="./js/order/order.js"></script>
+<style type="text/css">
+
+
+</style>
 </head>
 <body style="background-color: #f6f6f6;">
 
-<div id="divWeixinOrderList" ></div>
-<br><br><br><br>
+<div  class="main-box" style="height: 52px;">
 
-<!-- <div class="box-order">
-	<div>
-		<div style="height: 20px;">
-			<div style="float: left;font-weight: bold">订单号:1289</div>
-			<div style="float: right;color:#26a9d0;">已下单</div>
+	<div id="tab4OrderList" class="tabPanel" onclick="changWeixinOrderList('order')">
+		<div class="tabPanelList tabPanelListCheck">
+			订单列表
 		</div>
 	</div>
-	<div>点单日期: <span style="font-weight: bold">2012-09-09 09:23:67</span></div>
-	<div>
-		<div style="float: left">金额: <span style="font-weight: bold;color: red;">78</span> 元</div>
-		<div style="float: right">菜品种类: <span style="font-weight: bold;color: red;">4</span> 项</div>
+	<div id="tab4BookList" class="tabPanel" onclick="changWeixinOrderList('book')">
+		<div class="tabPanelList">
+			预定列表
+		</div>
 	</div>
-	<div>菜名: <span style="font-weight: bold;">手撕包菜, 辣子鸡, 酸菜鱼, 三文鱼刺身</span></div>
-</div> -->
+</div>
+
+<div id="divWeixinOrderList" ></div>
+<div id="divWeixinBookList"  class="none">
+
+	<div class="box-order orderBorder_commit">
+		<div class="box-order-commit">
+			<div style="height: 20px;">
+				<div style="float: left;">订单号:100</div>
+				<div style="float: right;color:#26a9d0;">已提交</div>
+			</div>
+		</div>
+		<div>点单日期: <span style="font-weight: bold">2015-08-16 23:04:36</span></div>
+		<div>
+			<div style="float: left">金额: <span style="font-weight: bold;color: red;">722</span> 元</div>
+			<div style="float: right">菜品种类: <span style="font-weight: bold;color: red;">3</span> 项</div>
+		</div>
+		<div>菜名: <span style="font-weight: bold;">原汁南非干鲍6头，*杨枝甘露（位）特，*金屋藏娇（半打）</span>
+		</div>
+	</div>
+
+</div>
+
+
+<!-- 	<div class="box-order orderBorder_commit">
+		<div class="box-order-commit">
+			<div style="height: 20px;">
+				<div style="float: left;">订单号:100</div>
+				<div style="float: right;color:#26a9d0;">已提交</div>
+			</div>
+		</div>
+		<div>点单日期: <span style="font-weight: bold">2015-08-16 23:04:36</span></div>
+		<div>
+			<div style="float: left">金额: <span style="font-weight: bold;color: red;">722</span> 元</div>
+			<div style="float: right">菜品种类: <span style="font-weight: bold;color: red;">3</span> 项</div>
+		</div>
+		<div>菜名: <span style="font-weight: bold;">原汁南非干鲍6头，*杨枝甘露（位）特，*金屋藏娇（半打）</span>
+		</div>
+	</div> -->
 
 </body>
 </html>
