@@ -127,15 +127,14 @@ public class OperateMaterialAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward delete(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward delete(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		String pin = (String)request.getAttribute("pin");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		JObject jobject = new JObject();
 		try{
-			String id = request.getParameter("id");
-			MaterialDao.delete(Integer.valueOf(id));
+			MaterialDao.deleteById(staff, Integer.valueOf(request.getParameter("id")));
 			jobject.initTip(true, "操作成功, 已删除物品信息.");
 		}catch(BusinessException e){	
 			e.printStackTrace();

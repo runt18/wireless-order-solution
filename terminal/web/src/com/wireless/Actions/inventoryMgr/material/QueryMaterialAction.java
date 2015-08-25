@@ -2,9 +2,7 @@ package com.wireless.Actions.inventoryMgr.material;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,11 +21,11 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.util.DataPaging;
-import com.wireless.util.SQLUtil;
 
 public class QueryMaterialAction extends DispatchAction{
 	
@@ -47,33 +45,35 @@ public class QueryMaterialAction extends DispatchAction{
 		
 		List<Jsonable> list = new ArrayList<>();
 		try{
-
 			
-			String restaurantID = (String) request.getAttribute("restaurantID");
+			//String restaurantID = (String) request.getAttribute("restaurantID");
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
 			String cateType = request.getParameter("cateType");
 			String materialId = request.getParameter("materialId");
-			String extra = "";
-			extra += (" AND M.restaurant_id = " + restaurantID);
+			MaterialDao.ExtraCond extra = new MaterialDao.ExtraCond();
 			
 			if(cateType != null && !cateType.trim().isEmpty() && !cateType.equals("-1")){
-				extra += (" AND MC.type = " + cateType);
+				//extra += (" AND MC.type = " + cateType);
+				extra.setCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)));
 			}
 			
 			if(name != null && !name.trim().isEmpty()){
-				extra += (" AND M.name like '%" + name + "%' ");
+				//extra += (" AND M.name like '%" + name + "%' ");
+				extra.setName(name);
 			}
 			if(cateId != null && !cateId.trim().isEmpty() && !cateId.equals("-1")){
-				extra += (" AND MC.cate_id = " + cateId);
+				//extra += (" AND MC.cate_id = " + cateId);
+				extra.setCate(Integer.parseInt(cateId));
 			}
 			if(materialId != null && !materialId.trim().isEmpty()){
-				extra += (" AND M.material_id = " + materialId);
+				//extra += (" AND M.material_id = " + materialId);
+				extra.setId(Integer.parseInt(materialId));
 			}
-			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+//			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+//			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			
-			root = MaterialDao.getContent(params);
+			root = MaterialDao.getByCond(staff, extra);
 			
 		}catch(SQLException e){
 			jobject.initTip(e);
