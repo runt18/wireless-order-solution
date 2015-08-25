@@ -193,7 +193,7 @@ public class SaleDetailsDao {
 	 * Get the sales detail to each food according to specific range and extra condition.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the staff to perform this action
 	 * @param range
 	 * 			the duty range
@@ -204,11 +204,11 @@ public class SaleDetailsDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<SalesDetail> getByFood(Staff term, DutyRange range, ExtraCond extraCond, int orderType) throws SQLException{
+	public static List<SalesDetail> getByFood(Staff staff, DutyRange range, ExtraCond extraCond, int orderType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByFood(dbCon, term, range, extraCond, orderType);
+			return getByFood(dbCon, staff, range, extraCond, orderType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -231,7 +231,7 @@ public class SaleDetailsDao {
 	 */
 	public static List<SalesDetail> getByFood(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond, int orderType) throws SQLException{
 		
-		List<IncomeByFood> foodIncomes;
+		final List<IncomeByFood> foodIncomes;
 		
 		if(extraCond.dateType.isHistory()){
 			
@@ -247,25 +247,30 @@ public class SaleDetailsDao {
 			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, staff, range, extraCond);
 		}
 		
-		List<SalesDetail> result = new ArrayList<SalesDetail>();
+		final List<SalesDetail> result = new ArrayList<SalesDetail>();
 		
 		for(IncomeByFood foodIncome : foodIncomes){
 			SalesDetail detail = new SalesDetail(foodIncome.getFood());
 			detail.setDiscount(foodIncome.getDiscount());
 			detail.setGifted(foodIncome.getGift());
 			detail.setIncome(foodIncome.getIncome());
+			detail.setTasteIncome(foodIncome.getTasteIncome());
 			detail.setSalesAmount(foodIncome.getSaleAmount());
-			
+
+			//成本
+			detail.setCost(foodIncome.getCost());
+			//单位成本
+			detail.setAvgCost(foodIncome.getUnitCost());
+
 			detail.setProfit(detail.getIncome() - detail.getCost());
 			if(detail.getIncome() != 0.00){
 				detail.setProfitRate(detail.getProfit() / detail.getIncome());
 				detail.setCostRate(detail.getCost() / detail.getIncome());
 			}
 			
-			if(detail.getSalesAmount() != 0.00){
-				detail.setAvgPrice((float)Math.round(detail.getIncome() / detail.getSalesAmount() * 100) / 100);
-				detail.setAvgCost((float)Math.round(detail.getCost() / detail.getSalesAmount() * 100) /100);
-			}
+//			if(detail.getSalesAmount() != 0.00){
+//				detail.setAvgPrice((float)Math.round(detail.getIncome() / detail.getSalesAmount() * 100) / 100);
+//			}
 			
 			result.add(detail);
 		}

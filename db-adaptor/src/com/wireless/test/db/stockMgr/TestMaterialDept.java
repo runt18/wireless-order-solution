@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,7 +21,6 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.test.db.TestInit;
-import com.wireless.util.SQLUtil;
 
 public class TestMaterialDept {
 
@@ -57,9 +54,9 @@ public class TestMaterialDept {
 			dept = depts.get(1);
 		}
 		
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}

@@ -92,8 +92,8 @@ public class StockTakeDao {
 	 * Insert a new stockTake.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param builder
 	 * 			the stockTake builder to insert
 	 * @return	the id of stockTake just created
@@ -102,11 +102,11 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if there has stockAction is not audit  
 	 */
-	public static int insertStockTake(DBCon dbCon, Staff term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
+	public static int insertStockTake(DBCon dbCon, Staff staff, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
 		//判断是否有未审核的库单
-		checkStockAction(term);
+		checkStockAction(staff);
 		//判断此部门的某个货品类型是否重复盘点
-		List<StockTake> stockTakeList = getStockTakes(dbCon, term, " AND dept_id = " + builder.getDept().getId() + " AND material_cate_id = " + builder.getCateId() + " AND status = " + Status.CHECKING.getVal(), null); 
+		List<StockTake> stockTakeList = getStockTakes(dbCon, staff, " AND dept_id = " + builder.getDept().getId() + " AND material_cate_id = " + builder.getCateId() + " AND status = " + Status.CHECKING.getVal(), null); 
 		if(!stockTakeList.isEmpty()){
 			throw new BusinessException(StockError.STOCKTAKE_HAVE_EXIST);
 		}
@@ -117,7 +117,7 @@ public class StockTakeDao {
 			//通过小类再一次获取大类,保证准确性
 			cateType = materialCate.getType().getValue();
 			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
-				Material material = MaterialDao.getById(stockTakeDetail.getMaterial().getId()) ;
+				Material material = MaterialDao.getById(staff, stockTakeDetail.getMaterial().getId()) ;
 				if(material.getCate().getId() != builder.getCateId()){
 					throw new BusinessException(StockError.STOCKTAKE_NOT_MATERIAL);
 				}
@@ -125,9 +125,9 @@ public class StockTakeDao {
 		}else{
 			cateType = builder.getCateType().getValue();
 			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
-				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + builder.getCateType().getValue() + " AND M.material_id = " + stockTakeDetail.getMaterial().getId() );
-				List<Material> materials = MaterialDao.getContent(params);
+//				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+//				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + builder.getCateType().getValue() + " AND M.material_id = " + stockTakeDetail.getMaterial().getId() );
+				List<Material> materials = MaterialDao.getByCond(staff, new MaterialDao.ExtraCond().setCateType(builder.getCateType()).setId(stockTakeDetail.getMaterial().getId()));
 				if(materials.isEmpty()){
 					throw new BusinessException(StockError.STOCKTAKE_NOT_MATERIAL_TYPE);
 				}
@@ -137,14 +137,14 @@ public class StockTakeDao {
 		StockTake sTake = builder.build();
 		String deptName;
 		String MaterialCateName;
-		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " + term.getRestaurantId();		
+		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " + staff.getRestaurantId();		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
 		if(dbCon.rs.next()){
 			deptName = dbCon.rs.getString(1);
 		}else{
 			deptName = "";
 		}
-		String selectCateName = "SELECT name FROM " + Params.dbName + ".material_cate WHERE cate_id = " + sTake.getMaterialCate().getId() + " AND restaurant_id = " + term.getRestaurantId();		
+		String selectCateName = "SELECT name FROM " + Params.dbName + ".material_cate WHERE cate_id = " + sTake.getMaterialCate().getId() + " AND restaurant_id = " + staff.getRestaurantId();		
 		dbCon.rs = dbCon.stmt.executeQuery(selectCateName);
 		if(dbCon.rs.next()){
 			MaterialCateName = dbCon.rs.getString(1);
@@ -174,7 +174,7 @@ public class StockTakeDao {
 			stockTakeId = dbCon.rs.getInt(1);
 			for (StockTakeDetail tDetail : sTake.getStockTakeDetails()) {
 				tDetail.setStockTakeId(stockTakeId);
-				StockTakeDetailDao.insertstockTakeDetail(dbCon, term, tDetail);
+				StockTakeDetailDao.insertstockTakeDetail(dbCon, staff, tDetail);
 			}
 		}else{
 			throw new SQLException("The id is not generated successfully.");
@@ -208,8 +208,8 @@ public class StockTakeDao {
 	 * Update the StockTake according to stockTakeId and InsertStockTakeBuilder.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the Terminal 
+	 * @param staff
+	 * 			the staff to perform this action 
 	 * @param stockTakeId
 	 * 			the id of this StockTake
 	 * @param builder
@@ -219,9 +219,9 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the StockTake is not exist
 	 */
-	public static void updateStockTake(DBCon dbCon, Staff term, StockTake builder) throws SQLException, BusinessException{
+	public static void updateStockTake(DBCon dbCon, Staff staff, StockTake builder) throws SQLException, BusinessException{
 		//判断盘点单是否已审核
-		StockTake stockTake = StockTakeDao.getStockTakeById(term, builder.getId());
+		StockTake stockTake = StockTakeDao.getStockTakeById(staff, builder.getId());
 		if(stockTake.getStatus() == Status.AUDIT){
 			throw new BusinessException(StockError.STOCKTAKE_UPDATE_AUDIT);
 		}
@@ -229,7 +229,7 @@ public class StockTakeDao {
 		
 		if(stockTake.getMaterialCate().getId() != 0){
 			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
-				Material material = MaterialDao.getById(stockTakeDetail.getMaterial().getId()) ;
+				Material material = MaterialDao.getById(staff, stockTakeDetail.getMaterial().getId()) ;
 				if(material.getCate().getId() != stockTake.getMaterialCate().getId()){
 					throw new BusinessException(StockError.STOCKTAKE_NOT_MATERIAL);
 				}
@@ -238,8 +238,8 @@ public class StockTakeDao {
 			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
 				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
 				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + builder.getCateType().getValue() + " AND M.material_id = " + stockTakeDetail.getMaterial().getId() );
-				List<Material> materials = MaterialDao.getContent(params);
-				if(materials == null){
+				List<Material> materials = MaterialDao.getByCond(staff, new MaterialDao.ExtraCond().setCateType(builder.getCateType()).setId(stockTakeDetail.getMaterial().getId()));
+				if(materials.isEmpty()){
 					throw new BusinessException(StockError.STOCKTAKE_NOT_MATERIAL_TYPE);
 				}
 			}
@@ -248,7 +248,7 @@ public class StockTakeDao {
 		
 		String deptName;
 
-		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " + term.getRestaurantId();		
+		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " + staff.getRestaurantId();		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
 		if(dbCon.rs.next()){
 			deptName = dbCon.rs.getString("name");
@@ -266,7 +266,7 @@ public class StockTakeDao {
 		StockTakeDetailDao.deleteStockTakeDetail(dbCon, " AND stock_take_id = " + builder.getId());
 		for (StockTakeDetail tDetail : builder.getStockTakeDetails()) {
 			tDetail.setStockTakeId(builder.getId());
-			StockTakeDetailDao.insertstockTakeDetail(dbCon, term, tDetail);
+			StockTakeDetailDao.insertstockTakeDetail(dbCon, staff, tDetail);
 		}
 	}
 	/**
@@ -363,7 +363,7 @@ public class StockTakeDao {
 		Map<StockTake, StockTake> result = new LinkedHashMap<StockTake, StockTake>();
 		
 		while(dbCon.rs.next()){
-			StockTake sTake = new StockTake();
+			StockTake stockTake = new StockTake();
 			StockTakeDetail sTakeDetail = new StockTakeDetail();
 			
 			sTakeDetail.setId(dbCon.rs.getInt("TD.id"));
@@ -374,35 +374,35 @@ public class StockTakeDao {
 			sTakeDetail.setExpectAmount(dbCon.rs.getFloat("TD.expect_amount"));
 			sTakeDetail.setDeltaAmount(dbCon.rs.getFloat("TD.delta_amount"));
 			
-			sTake.setId(dbCon.rs.getInt("ST.id"));
-			sTake.setRestaurantId(dbCon.rs.getInt("ST.restaurant_id"));
-			sTake.setDeptId(dbCon.rs.getInt("ST.dept_id"));
-			sTake.setDeptName(dbCon.rs.getString("ST.dept_name"));
-			sTake.setCateType(dbCon.rs.getInt("ST.material_cate_type"));
-			sTake.setStatus(dbCon.rs.getInt("ST.status"));
+			stockTake.setId(dbCon.rs.getInt("ST.id"));
+			stockTake.setRestaurantId(dbCon.rs.getInt("ST.restaurant_id"));
+			stockTake.setDeptId(dbCon.rs.getInt("ST.dept_id"));
+			stockTake.setDeptName(dbCon.rs.getString("ST.dept_name"));
+			stockTake.setCateType(MaterialCate.Type.valueOf(dbCon.rs.getInt("ST.material_cate_type")));
+			stockTake.setStatus(dbCon.rs.getInt("ST.status"));
 			if(dbCon.rs.getInt("ST.material_cate_id") != 0){
-				sTake.getMaterialCate().setId(dbCon.rs.getInt("ST.material_cate_id"));
-				sTake.getMaterialCate().setName(dbCon.rs.getString("ST.material_cate_name"));				
+				stockTake.getMaterialCate().setId(dbCon.rs.getInt("ST.material_cate_id"));
+				stockTake.getMaterialCate().setName(dbCon.rs.getString("ST.material_cate_name"));				
 			}else{
-				sTake.getMaterialCate().setId(-1);
-				sTake.getMaterialCate().setName(sTake.getCateType() == StockTake.CateType.GOOD?"全部商品":"全部原料");					
+				stockTake.getMaterialCate().setId(-1);
+				stockTake.getMaterialCate().setName(stockTake.getCateType() == MaterialCate.Type.GOOD ? "全部商品" : "全部原料");					
 			}
 
-			sTake.setOperatorId(dbCon.rs.getInt("ST.operator_id"));
-			sTake.setOperator(dbCon.rs.getString("ST.operator"));
-			sTake.setApprover(dbCon.rs.getString("ST.approver"));
-			sTake.setApproverId(dbCon.rs.getInt("ST.approver_id"));
-			sTake.setStartDate(dbCon.rs.getTimestamp("ST.start_date").getTime());
+			stockTake.setOperatorId(dbCon.rs.getInt("ST.operator_id"));
+			stockTake.setOperator(dbCon.rs.getString("ST.operator"));
+			stockTake.setApprover(dbCon.rs.getString("ST.approver"));
+			stockTake.setApproverId(dbCon.rs.getInt("ST.approver_id"));
+			stockTake.setStartDate(dbCon.rs.getTimestamp("ST.start_date").getTime());
 			if(dbCon.rs.getTimestamp("ST.finish_date") != null){
-				sTake.setFinishDate(dbCon.rs.getTimestamp("ST.finish_date").getTime());
+				stockTake.setFinishDate(dbCon.rs.getTimestamp("ST.finish_date").getTime());
 			}			
-			sTake.setComment(dbCon.rs.getString("ST.comment"));
+			stockTake.setComment(dbCon.rs.getString("ST.comment"));
 			
-			if(result.get(sTake) == null){
-				sTake.addStockTakeDetail(sTakeDetail);
-				result.put(sTake, sTake);
+			if(result.get(stockTake) == null){
+				stockTake.addStockTakeDetail(sTakeDetail);
+				result.put(stockTake, stockTake);
 			}else{
-				result.get(sTake).addStockTakeDetail(sTakeDetail);
+				result.get(stockTake).addStockTakeDetail(sTakeDetail);
 			}
 		}
 		dbCon.rs.close();
@@ -504,7 +504,7 @@ public class StockTakeDao {
 			sTake.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			sTake.setDeptId(dbCon.rs.getInt("dept_id"));
 			sTake.setDeptName(dbCon.rs.getString("dept_name"));
-			sTake.setCateType(dbCon.rs.getInt("material_cate_type"));
+			sTake.setCateType(MaterialCate.Type.valueOf(dbCon.rs.getInt("material_cate_type")));
 			sTake.setStatus(dbCon.rs.getInt("status"));
 			sTake.getMaterialCate().setId(dbCon.rs.getInt("material_cate_id"));
 			sTake.getMaterialCate().setName(dbCon.rs.getString("material_cate_name"));
@@ -605,24 +605,24 @@ public class StockTakeDao {
 	}
 	/**
 	 * Get the list of StockTakeDetail have not stockTake 
-	 * @param term
+	 * @param staff
 	 * @param stockTakeId
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static List<Material> getNotStockTakeDetail(Staff term, int stockTakeId) throws SQLException, BusinessException{
-		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
+	public static List<Material> getNotStockTakeDetail(Staff staff, int stockTakeId) throws SQLException, BusinessException{
+		StockTake stockTake = getStockTakeAndDetailById(staff, stockTakeId);
 		List<Material> list;
 		if(stockTake.getMaterialCate().getId() == 0){
-			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
-			list = MaterialDao.getContent(params);
+//			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+//			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
+			list = MaterialDao.getByCond(staff, new MaterialDao.ExtraCond().setCateType(stockTake.getCateType()));
 			
 		}else{
-			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
-			list = MaterialDao.getContent(params);
+//			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+//			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
+			list = MaterialDao.getByCond(staff, new MaterialDao.ExtraCond().setCate(stockTake.getMaterialCate().getId()));
 		}
 		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 			for(Iterator<Material> iter = list.iterator(); iter.hasNext();){
@@ -635,7 +635,7 @@ public class StockTakeDao {
 	}
 	/**
 	 * Check if there have other material haven't stockTake  
-	 * @param term
+	 * @param staff
 	 * @param stockTakeId
 	 * @param deptId
 	 * @return the result of stockTake : 1(exist not stockTake) 0(finish stockTake)
@@ -643,23 +643,23 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the some material is not exist in this department
 	 */
-	public static void beforeAudit(Staff term, int stockTakeId) throws SQLException, BusinessException{
+	public static void beforeAudit(Staff staff, int stockTakeId) throws SQLException, BusinessException{
 		
-		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
+		StockTake stockTake = getStockTakeAndDetailById(staff, stockTakeId);
 		
 		if(stockTake.getMaterialCate().getId() == 0){
-			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
-			List<Material> list = MaterialDao.getContent(params);
+//			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+//			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
+			List<Material> list = MaterialDao.getByCond(staff, new MaterialDao.ExtraCond().setCateType(stockTake.getCateType()));
 			
 			if(stockTake.getStockTakeDetails().size() < list.size()){
 				throw new BusinessException(StockError.STOCKTAKE_DETAIL_NOT_STOCKTAKE);
 			}
 			
 		}else{
-			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
-			List<Material> list = MaterialDao.getContent(params);
+//			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+//			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
+			List<Material> list = MaterialDao.getByCond(staff, new MaterialDao.ExtraCond().setCate(stockTake.getMaterialCate().getId()));
 			if(stockTake.getStockTakeDetails().size() < list.size()){
 				throw new BusinessException(StockError.STOCKTAKE_DETAIL_NOT_STOCKTAKE);
 			}
@@ -673,21 +673,21 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static void keep(Staff term, int stockTakeId) throws SQLException, BusinessException{
-		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
+	public static void keep(Staff staff, int stockTakeId) throws SQLException, BusinessException{
+		StockTake stockTake = getStockTakeAndDetailById(staff, stockTakeId);
 		List<Material> list;
 		//判断是选了是否选了小类
 		if(stockTake.getMaterialCate().getId() == 0){
-			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
-			list = MaterialDao.getContent(params);
+//			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+//			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
+			list = MaterialDao.getByCond(staff, new MaterialDao.ExtraCond().setCateType(stockTake.getCateType()));
 			
 		}else{
-			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
-			list = MaterialDao.getContent(params);
+//			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+//			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
+			list = MaterialDao.getByCond(staff, new MaterialDao.ExtraCond().setCate(stockTake.getMaterialCate()));
 		}
-		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.dept_id = " + stockTake.getDept().getId(), null);
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.dept_id = " + stockTake.getDept().getId(), null);
 		//把盘漏的货品挑选出来
 		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 			for(Iterator<Material> iter = list.iterator(); iter.hasNext();){
@@ -725,7 +725,7 @@ public class StockTakeDao {
 			stockTake.addStockTakeDetail(tDetail);
 		}
 		try{
-			updateStockTake(term, stockTake);
+			updateStockTake(staff, stockTake);
 		}catch(Exception e){
 			throw new BusinessException(StockError.STOCKTAKE_UPDATE);
 		}
@@ -733,26 +733,26 @@ public class StockTakeDao {
 	
 	/**
 	 * User choose to reset the data
-	 * @param term
+	 * @param staff
 	 * @param stockTakeId
 	 * @throws SQLException
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static void reset(Staff term, int stockTakeId) throws SQLException, BusinessException{
-		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
+	public static void reset(Staff staff, int stockTakeId) throws SQLException, BusinessException{
+		StockTake stockTake = getStockTakeAndDetailById(staff, stockTakeId);
 		List<Material> list;
 		if(stockTake.getMaterialCate().getId() == 0){
-			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
-			list = MaterialDao.getContent(params);
+//			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+//			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
+			list = MaterialDao.getByCond(staff, new MaterialDao.ExtraCond().setCateType(stockTake.getCateType()));
 			
 		}else{
-			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
-			list = MaterialDao.getContent(params);
+//			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+//			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
+			list = MaterialDao.getByCond(staff, new MaterialDao.ExtraCond().setCate(stockTake.getMaterialCate()));
 		}
-		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.dept_id = " + stockTake.getDept().getId(), null);
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.dept_id = " + stockTake.getDept().getId(), null);
 		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 			for(Iterator<Material> iter = list.iterator(); iter.hasNext();){
 				if(iter.next().getId() == stockTakeDetail.getMaterial().getId()){
@@ -790,7 +790,7 @@ public class StockTakeDao {
 			stockTake.addStockTakeDetail(tDetail);
 		}
 		try{
-			updateStockTake(term, stockTake);
+			updateStockTake(staff, stockTake);
 		}catch(Exception e){
 			throw new BusinessException(StockError.STOCKTAKE_UPDATE);
 		}
@@ -800,7 +800,7 @@ public class StockTakeDao {
 	 * Update stockTake according to UpdateBuilder.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param builder
 	 * 			the stockTake to update
@@ -810,8 +810,8 @@ public class StockTakeDao {
 	 * 			if the stockTake is not exist
 	 */
 	
-	public static List<Integer> auditStockTake(DBCon dbCon, Staff term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
-		beforeAudit(term, builder.getId());
+	public static List<Integer> auditStockTake(DBCon dbCon, Staff staff, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
+		beforeAudit(staff, builder.getId());
 		String sql;
 		List<Integer> result;
 
@@ -821,13 +821,13 @@ public class StockTakeDao {
 				" finish_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
 				" status = " + builder.getStatus().getVal() +
 				" WHERE id = " + builder.getId() + 
-				" AND restaurant_id = " + term.getRestaurantId();
+				" AND restaurant_id = " + staff.getRestaurantId();
 	
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(StockError.STOCKTAKE_DETAIL_UPDATE);
 		}
 		
-		StockTake stockTake = getStockTakeAndDetailById(dbCon, term, builder.getId());
+		StockTake stockTake = getStockTakeAndDetailById(dbCon, staff, builder.getId());
 		
 		InsertBuilder stockActionInsertBuild = null;
 		//定义库单Builder的集合
@@ -838,14 +838,14 @@ public class StockTakeDao {
 			//大于0则是盘盈
 			if(stockTakeDetail.getDeltaAmount() > 0){
 				
-				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.getRestaurantId())
-								   .setOperatorId(term.getId()).setOperator(term.getName())
+				stockActionInsertBuild = StockAction.InsertBuilder.newMore(staff.getRestaurantId())
+								   .setOperatorId(staff.getId()).setOperator(staff.getName())
 								   .setOriStockDate(new Date().getTime())
 								   .setComment(stockTake.getComment())
 								   .setDeptIn(stockTake.getDept().getId())
 								   .setCateType(stockTake.getCateType().getValue());
 				
-				Material material = MaterialDao.getById(dbCon, stockTakeDetail.getMaterial().getId());
+				Material material = MaterialDao.getById(dbCon, staff, stockTakeDetail.getMaterial().getId());
 				
 				//用Map方法判断builder是否存在
 				if(insertBuilders.get(stockActionInsertBuild) == null){
@@ -855,14 +855,14 @@ public class StockTakeDao {
 					insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(), material.getPrice(), stockTakeDetail.getTotalDelta()));
 				}
 			}else if(stockTakeDetail.getDeltaAmount() < 0){
-				stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.getRestaurantId())
-														   .setOperatorId(term.getId()).setOperator(term.getName())
+				stockActionInsertBuild = StockAction.InsertBuilder.newLess(staff.getRestaurantId())
+														   .setOperatorId(staff.getId()).setOperator(staff.getName())
 														   .setOriStockDate(new Date().getTime())
 														   .setComment(stockTake.getComment())
 														   .setDeptOut(stockTake.getDept().getId())
 														   .setCateType(stockTake.getCateType().getValue());
 				//获取原料信息
-				Material material = MaterialDao.getById(dbCon, stockTakeDetail.getMaterial().getId());
+				Material material = MaterialDao.getById(dbCon, staff, stockTakeDetail.getMaterial().getId());
 				
 				if(insertBuilders.get(stockActionInsertBuild) == null){
 					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(), material.getPrice(), Math.abs(stockTakeDetail.getTotalDelta())));
@@ -878,10 +878,10 @@ public class StockTakeDao {
 		if(!insertBuilders.isEmpty()){
 			result = new ArrayList<Integer>();
 			for (InsertBuilder InsertBuild : insertBuilders.values()) {
-				stockActionId = StockActionDao.insertStockAction(dbCon, term, InsertBuild);
+				stockActionId = StockActionDao.insertStockAction(dbCon, staff, InsertBuild);
 				AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(stockActionId)
-											.setApproverId(term.getId()).setApprover(term.getName());
-				StockActionDao.auditStockAction(dbCon, term, updateBuilder);
+											.setApproverId(staff.getId()).setApprover(staff.getName());
+				StockActionDao.auditStockAction(dbCon, staff, updateBuilder);
 				result.add(stockActionId);
 			}
 			
@@ -889,14 +889,14 @@ public class StockTakeDao {
 			result = Collections.emptyList();
 		}
 		//当所有盘点任务结束后, 对消耗单进行处理
-		if(!StockActionDao.isStockTakeChecking(dbCon, term)){
+		if(!StockActionDao.isStockTakeChecking(dbCon, staff)){
 			//判断是否有消耗类型的库单未审核,有则变成审核通过
-			List<StockAction> list = StockActionDao.getStockActions(dbCon, term, " AND sub_type = " + SubType.USE_UP.getVal() + " AND status = " + StockAction.Status.UNAUDIT.getVal(), null);
+			List<StockAction> list = StockActionDao.getStockActions(dbCon, staff, " AND sub_type = " + SubType.USE_UP.getVal() + " AND status = " + StockAction.Status.UNAUDIT.getVal(), null);
 			if(!list.isEmpty()){
 				for (StockAction useUpStockAction : list) {
 					AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(useUpStockAction.getId())
 												.setApprover(useUpStockAction.getOperator()).setApproverId(useUpStockAction.getOperatorId());
-					StockActionDao.auditStockAction(dbCon, term, updateBuilder);
+					StockActionDao.auditStockAction(dbCon, staff, updateBuilder);
 				}
 			}
 		}

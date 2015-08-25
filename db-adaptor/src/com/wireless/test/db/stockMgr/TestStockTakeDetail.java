@@ -5,9 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,7 +19,6 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.stockMgr.StockTakeDetail.InsertStockTakeDetail;
 import com.wireless.test.db.TestInit;
-import com.wireless.util.SQLUtil;
 
 public class TestStockTakeDetail {
 
@@ -49,9 +46,9 @@ public class TestStockTakeDetail {
 	}
 	@Test
 	public void testInsert() throws SQLException, BusinessException {
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}
@@ -72,9 +69,9 @@ public class TestStockTakeDetail {
 	
 	@Test
 	public void testStockTakeDetail() throws SQLException, BusinessException{
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}

@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,7 +20,6 @@ import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockDetailReport;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.test.db.TestInit;
-import com.wireless.util.SQLUtil;
 
 public class TestStockDetailReport {
 	private static Staff mStaff;
@@ -49,9 +46,9 @@ public class TestStockDetailReport {
 		String begin = "2013-04-01";
 		String end = "2013-07-01";
 		
-		Map<Object, Object> param = new HashMap<Object, Object>();
-		param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(param);
+//		Map<Object, Object> param = new HashMap<Object, Object>();
+//		param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		int materialId = materials.get(2).getId();
 		
 		
