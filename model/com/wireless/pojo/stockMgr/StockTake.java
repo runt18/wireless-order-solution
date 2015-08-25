@@ -16,7 +16,7 @@ public class StockTake implements Jsonable {
 	 */
 	public static class InsertStockTakeBuilder{
 		private final int restaurantId ;
-		private CateType cateType ;	
+		private MaterialCate.Type cateType ;	
 		private Department dept = new Department(0);
 		private Status status = Status.CHECKING;
 		private int cateId;
@@ -64,17 +64,17 @@ public class StockTake implements Jsonable {
 			return this;
 		}
 
-		public CateType getCateType() {
+		public MaterialCate.Type getCateType() {
 			return cateType;
 		}
 
-		public InsertStockTakeBuilder setCateType(CateType cateType) {
+		public InsertStockTakeBuilder setCateType(MaterialCate.Type cateType) {
 			this.cateType = cateType;
 			return this;
 		}
 		
 		public InsertStockTakeBuilder setCateType(int val){
-			this.cateType = CateType.valueOf(val);
+			this.cateType = MaterialCate.Type.valueOf(val);
 			return this;
 		}
 
@@ -255,56 +255,13 @@ public class StockTake implements Jsonable {
 		}
 		
 	}
-/*	public static enum Choose{
-		KEEP(1, "保留"),
-		RESET(2, "原料");
-		
-		private
-	}*/
-	/**
-	 * 货品类型
-	 * 1-商品, 2-原料
-	 */
-	public static enum CateType{
-		GOOD(1, "商品"),
-		MATERIAL(2, "原料");
-		
-		private int value;
-		private String text;
-		
-		CateType(int value, String text){
-			this.value = value;
-			this.text = text;
-		}
-		public int getValue() {
-			return value;
-		}
-		public String getText() {
-			return text;
-		}
-		@Override
-		public String toString(){
-			return "CateType(" +
-					"val = " + value +
-					"text = " + text + ")";
-		}
-		
-		public static CateType valueOf(int value){
-			for(CateType temp : values()){
-				if(temp.value == value){
-					return temp;
-				}
-			}
-			throw new IllegalArgumentException("The type value(val = " + value + ") passed is invalid.");
-		}
-	} 
 	
 	private int id;
 	private int restaurantId;
 	private Department dept = new Department(0);
-	private CateType cateType ;
+	private MaterialCate.Type cateType ;
 	private Status status = Status.CHECKING;
-	private MaterialCate materialCate = new MaterialCate();
+	private MaterialCate materialCate = new MaterialCate(0);
 	private int operatorId;
 	private String operator;
 	private int approverId;
@@ -313,8 +270,6 @@ public class StockTake implements Jsonable {
 	private long finishDate;
 	private String comment;
 	private List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
-	
-	
 	
 	
 	public int getId() {
@@ -379,19 +334,14 @@ public class StockTake implements Jsonable {
 		this.approver = approver;
 	}
 
-	public CateType getCateType() {
+	public MaterialCate.Type getCateType() {
 		return cateType;
 	}
 
-	public void setCateType(CateType cateType) {
+	public void setCateType(MaterialCate.Type cateType) {
 		this.cateType = cateType;
 	}
 	
-	public void setCateType(int val){
-		this.cateType = CateType.valueOf(val);
-		
-	}
-
 	public Status getStatus() {
 		return status;
 	}
@@ -473,7 +423,7 @@ public class StockTake implements Jsonable {
 		return "stockTake : id = " + id +
 				"restaurantId = " + restaurantId +
 				"deptId = " + dept.getId() +
-				"cateType = " + cateType.value +
+				"cateType = " + cateType.getValue() +
 				"status = " + status.getText() +
 				"operator = " + getOperator() +
 				"startDate = " + DateUtil.format(startDate) +

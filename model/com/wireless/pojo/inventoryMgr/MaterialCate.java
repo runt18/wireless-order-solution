@@ -6,15 +6,7 @@ import com.wireless.json.Jsonable;
 public class MaterialCate implements Jsonable {
 	
 	public static enum Type{
-		/**
-		 * value : 1
-		 * text : 商品
-		 */
 		GOOD(1, "商品"),
-		/**
-		 * value : 2
-		 * text : 原料
-		 */
 		MATERIAL(2, "原料");
 		
 		private int value;
@@ -32,9 +24,9 @@ public class MaterialCate implements Jsonable {
 		}
 		
 		public static Type valueOf(int value){
-			for(Type temp : values()){
-				if(temp.getValue() == value){
-					return temp;
+			for(Type type : values()){
+				if(type.getValue() == value){
+					return type;
 				}
 			}
 			throw new IllegalArgumentException("The type value(val = " + value + ") passed is invalid.");
@@ -46,7 +38,9 @@ public class MaterialCate implements Jsonable {
 	private String name;
 	private Type type;
 	
-	public MaterialCate(){}
+	public MaterialCate(int id){
+		this.id = id;
+	}
 	
 	public MaterialCate(int restaurantId, String name){
 		this(0, restaurantId, name);
@@ -86,9 +80,6 @@ public class MaterialCate implements Jsonable {
 	}
 	public void setType(Type type) {
 		this.type = type;
-	}
-	public void setType(int type) {
-		this.type = Type.valueOf(type);
 	}
 	
 	@Override

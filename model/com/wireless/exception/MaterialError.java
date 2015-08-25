@@ -14,7 +14,7 @@ public class MaterialError extends ErrorEnum{
 	public static final ErrorCode BINDING_INSERT_FAIL = build(8956, "操作失败, 未添加库存商品资料与菜品资料绑定关系.");
 	public static final ErrorCode BINDING_DELETE_FAIL = build(8955, "操作失败, 未删除库存商品资料与菜品资料绑定关系, 该关系不存在或已被删除.");
 	public static final ErrorCode GOOD_INSERT_FAIL = build(8954, "操作失败, 未添加新商品信息, 因为该商品信息已存在.");
-	public static final ErrorCode SELECT_FAIL = build(8953, "操作失败, 查找失败, 该原料不存在.");
+	public static final ErrorCode MATERIAL_NOT_EXIST = build(8953, "操作失败, 查找失败, 该原料不存在.");
 	public static final ErrorCode SELECT_NOT_ADD = build(8953, "操作失败, 查找失败, 还未添加任何原料.");
 	private MaterialError(){
 		
