@@ -38,6 +38,10 @@ function changWeixinOrderList(otype){
 	}
 }
 
+function buildInvitation(){
+	location.href = "invitation.html";
+}
+
 
 $(function(){
 	Util.lbar('', function(html){ $(document.body).append(html);  });
