@@ -152,26 +152,38 @@ var tables = [],
 
 
 $(function(){
-	//pos端 && 体验端
-	if(systemStatus == 1 || systemStatus == 3){
+	
+	//pos端 && 体验端 && touch端
+	if(systemStatus == 1){//pos端
 		//日结,交班等
 		$('#divPosOperation').show();
+		$('#btnOrderAndPay').show();
 		//已点菜结账按钮
 		$('#btnPayBill').show();
 		//收银端餐台列表高度
-		tableListHeight = 130;
+		tableListHeight = 130;	
 		
-		//体验端不开放后台
-		if(systemStatus == 3){
-			$('#btnToBasicPage').hide();
-		}
-	}else{
-		//触摸屏餐台列表高度
-		tableListHeight = 86;
-		//触摸屏端无下单结账
+	}else if(systemStatus == 3){//try端
+		//日结,交班等
+		$('#divPosOperation').show();
+		$('#btnOrderAndPay').show();
+		//已点菜结账按钮
+		$('#btnPayBill').show();
+		//收银端餐台列表高度
+		tableListHeight = 130;	
+		//try端不可进入后台
+		$('#btnToBasicPage').hide();
+		
+	}else if(systemStatus == 2){//touch端
+		//日结,交班等
+		$('#divPosOperation').show();
 		$('#btnOrderAndPay').hide();
+		//已点菜结账按钮
+		$('#btnPayBill').show();
+		//收银端餐台列表高度
+		tableListHeight = 86;
 	}
-
+	
 	//餐厅选择界面高度
 	$('#tableAndRegionsCmp').height(document.body.clientHeight - tableListHeight);	
 	//点菜界面高度
@@ -247,6 +259,7 @@ $(function(){
 				initFoodData({firstTime:true});
 				
 				//验证员工权限	
+						
 				$.ajax({
 					url : "../QueryStaff.do",
 					type : 'post',
