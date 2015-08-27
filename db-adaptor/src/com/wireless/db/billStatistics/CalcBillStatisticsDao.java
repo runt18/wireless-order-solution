@@ -36,6 +36,7 @@ import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
 import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -674,7 +675,11 @@ public class CalcBillStatisticsDao {
 			   " CASE WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
 					" WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
 				  	" ELSE 0 " +
-				  	" END AS food_income " +
+				  	" END AS food_income, " +
+			   " CASE WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
+					" WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount " +
+				  	" ELSE 0 " +
+				  	" END AS taste_income " +
 			   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
 			   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
 			   " AND OF.order_id = O.id " + 
@@ -890,17 +895,28 @@ public class CalcBillStatisticsDao {
 		//Get the gift, discount & total to each food during this period.
 		sql = " SELECT " +
 			  " TMP.food_id, " + 
+			  " MAX(IFNULL(TMP2.unit_cost, 0)) AS unit_cost, " + 
+			  " ROUND(SUM(TMP.food_amount * IFNULL(TMP2.unit_cost, 0)), 2) AS food_cost, " +
 			  " MAX(TMP.food_name) AS food_name, MAX(TMP.food_status) AS food_status, " + 
 			  " MAX(TMP.dept_id) AS dept_id, MAX(TMP.kitchen_id) AS kitchen_id, " +
 			  " SUM(TMP.food_amount) AS food_amount, " +
 			  " ROUND(SUM(TMP.food_gift), 2) AS food_gift, " +
 			  " ROUND(SUM(TMP.food_discount), 2) AS food_discount, " +
-			  " ROUND(SUM(TMP.food_income), 2) AS food_income " +
+			  " ROUND(SUM(TMP.food_income), 2) AS food_income, " +
+			  " ROUND(SUM(TMP.taste_income), 2) AS taste_income, " +
+			  " ROUND(SUM(TMP.taste_income), 2) AS taste_income " +
 			  " FROM (" +
 			  makeSql4CalcFood(staff, range, extraCond) +
 			  " ) AS TMP " +
-			  " GROUP BY food_id " +
-			  " ORDER BY food_id ";
+			  " LEFT JOIN " +
+			  	  " ( SELECT FM.food_id, M.price AS unit_cost" + 
+			  	   	 " FROM " + Params.dbName + ".food_material FM " +
+			  	     " JOIN " + Params.dbName + ".material M ON FM.material_id = M.material_id " +
+			  	     " JOIN " + Params.dbName + ".material_cate MC ON M.cate_id = MC.cate_id AND MC.type = " + MaterialCate.Type.GOOD.getValue() +
+			  	     " WHERE FM.restaurant_id = " + staff.getRestaurantId() +
+			  	  " ) AS TMP2 ON TMP.food_id = TMP2.food_id " +
+			  " GROUP BY TMP.food_id " +
+			  " ORDER BY TMP.food_id ";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -925,7 +941,11 @@ public class CalcBillStatisticsDao {
 											 dbCon.rs.getFloat("food_gift"),
 											 dbCon.rs.getFloat("food_discount"),
 											 dbCon.rs.getFloat("food_income"),
-											 dbCon.rs.getFloat("food_amount")));
+											 dbCon.rs.getFloat("taste_income"),
+											 dbCon.rs.getFloat("food_amount"),
+											 dbCon.rs.getFloat("unit_cost"),
+											 dbCon.rs.getFloat("food_cost")
+											 ));
 		}
 		
 		dbCon.rs.close();

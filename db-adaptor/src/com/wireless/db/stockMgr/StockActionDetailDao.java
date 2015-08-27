@@ -25,9 +25,11 @@ public class StockActionDetailDao {
 	 * @return the id of stockDetail just create
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the material does NOT exist 
 	 */
-	public static int insertStockActionDetail(DBCon dbCon, StockActionDetail stockDetail) throws SQLException{
-		Material material = MaterialDao.getById(stockDetail.getMaterialId());
+	public static int insertStockActionDetail(DBCon dbCon, Staff staff, StockActionDetail stockDetail) throws SQLException, BusinessException{
+		Material material = MaterialDao.getById(staff, stockDetail.getMaterialId());
 		String sql;
 		sql = "INSERT INTO " + Params.dbName + ".stock_action_detail (material_id,name,stock_action_id, price, amount, dept_in_remaining, dept_out_remaining, remaining) " +
 				" VALUES( " +
@@ -57,12 +59,13 @@ public class StockActionDetailDao {
 	 * @return the id of stockDetail just create
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static int insertStockActionDetail(StockActionDetail stockDetail) throws SQLException{
+	public static int insertStockActionDetail(Staff staff, StockActionDetail stockDetail) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return insertStockActionDetail(dbCon, stockDetail);
+			return insertStockActionDetail(dbCon, staff, stockDetail);
 		}finally{
 			dbCon.disconnect();
 		}

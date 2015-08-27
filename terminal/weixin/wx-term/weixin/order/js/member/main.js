@@ -449,8 +449,8 @@ function toggleCouponContent(){
 								
 								for(var i = 0; i < data.root.length; i++){
 									var coupon = data.root[i];
-									//不显示纯显示的优惠券
-									if(coupon.promotion.rule != 1){
+									//不显示纯显示和已过期的优惠券
+									if(coupon.promotion.rule != 1 && parseInt(coupon.couponType.expired) > new Date()){
 										html.push(templet.format({
 											couponImg : coupon.couponType.ossImage ? coupon.couponType.ossImage.image : 'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg',
 											name : coupon.couponType.name,

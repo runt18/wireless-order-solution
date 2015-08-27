@@ -314,7 +314,7 @@ function operateShoppingCart(c){
 				scBox.removeClass('right-nav-hide');			
 			}
 			scBox.addClass('right-nav-show');	
-			operateShoppingCart({otype : 'hide'})
+			operateShoppingCart({otype : 'hide'});
 		}else{
 			$('#divShoppingCart').show();
 			if(scBox.hasClass('left-nav-hide')){
@@ -423,7 +423,7 @@ function foodShowAbout(c){
 	if(c.otype == 'show'){
 		box.find('div:first-child > div[data-type=img] > div[class=recommend-food-order]').html('下单');
 		box.find('div:first-child > div[data-type=img] > div[class=recommend-food-order]').click(function(){
-			saleOrderFood({otype:"order", id:c.id, event:this})
+			saleOrderFood({otype:"order", id:c.id, event:this});
 		});
 		for(var i = 0; i < params.orderData.length; i++){
 			if(params.orderData[i].id == c.id){

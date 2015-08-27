@@ -236,7 +236,7 @@ $(function(){
             }
             elem = elem.parentNode;
         }
-		operateShoppingCart({event:this, otype:'hide'})	
+		operateShoppingCart({event:this, otype:'hide'});
     });	
     
     //网页可见高度

@@ -7,6 +7,7 @@
 <title>预订</title>
 
 <link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/member.css">
 <link type="text/css" rel="stylesheet" href="./css/mbar.css">
 <link type="text/css" rel="stylesheet" href="./css/general_foundicons.css">
 <!-- 时分选择css -->
@@ -54,7 +55,7 @@
 
 <div class="main-box" style="">
 	<ul class="m-b-list" id="ul4BookRegion">
-		<li style="line-height: 40px;">选择座位</li>
+		<li style="line-height: 40px;">选择座位区域</li>
 		<li class="box-horizontal">
 			<div data-for="region1">大厅 </div>
 			<div class="event"><input id="region1" type="radio" name="bookRegion" class="radioInput"> </div>
@@ -64,10 +65,10 @@
 </div>
 <div class="main-box" style="">
 	<ul class="m-b-list">
-		<li style="line-height: 40px;">
-			<label for="bookPerson3">2-4人</label><input id="bookPerson3" type="radio" name="bookPerson" value="4" checked="checked" />
-			&nbsp;<label for="bookPerson6">5-9人</label><input id="bookPerson6" type="radio" value="9" name="bookPerson"/>
-			&nbsp;<label for="bookPerson10">10-15人</label><input id="bookPerson10" type="radio" value="15" name="bookPerson"/>
+		<li style="line-height: 40px;font-size:18px;">
+			<label for="bookPerson3">2-4人</label><input id="bookPerson3" type="radio" name="bookPerson" value="4" checked="checked" class="radioInput"/>
+			&nbsp;&nbsp;&nbsp;<label for="bookPerson6">5-9人</label><input id="bookPerson6" type="radio" value="9" name="bookPerson" class="radioInput"/>
+			&nbsp;&nbsp;&nbsp;<label for="bookPerson10">10-15人</label><input id="bookPerson10" type="radio" value="15" name="bookPerson" class="radioInput"/>
 		</li>
 <!-- 		<li>
 			人数: <input id="txtBookPeopleCount" type="number" class="bookPerson"/>
@@ -107,8 +108,11 @@
 			<div id="div4bookFoodList" class="bookFoodList"></div>
 		</li>	
 		<li class="box-horizontal" >
-			<div id="bookFoodTotalMoney" style="color: green;"></div>
-			<div class="event"><input type="button" class="commitBook" value="确认提交" onclick="commitBook()"> </div>
+<!-- 			<div id="bookFoodTotalMoney" style="color: green;"></div> -->
+<!-- 			<div class="event"><input type="button" class="commitBook" value="确认提交" onclick="commitBook()"> </div> -->
+			<div style="margin-top: 3px;height: 55px;width: 100%;text-align: center;" >
+				<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="commitBook()">确认提交</a>	
+			</div>	
 		</li>					
 	</ul>	
 </div>
@@ -219,6 +223,10 @@
 					title="购物车"> <i class="foundicon-cart fcolor2"><div
 								id="spanDisplayFoodCount"></div></i>购物车
 				</a></li>
+				<li class="special swiper-slide"><a
+					href="javascript:toBookDetail(true)"
+					title="购物车"> <i class="foundicon-checkmark fcolor2"></i>选好了
+				</a></li>
 				<li class="user swiper-slide"><a
 					href="javascript:toBookDetail()" title="返回"> <i
 						class="foundicon-left-arrow fcolor3"></i>返&nbsp;回
@@ -237,6 +245,7 @@
 						id="recommendFoodPrice" data-type="p"
 						style="margin-right: 5px; float: right; color: #ff6600">￥88</span>
 				</div>
+				
 				<div class="recommend-food-order"
 					onclick="saleOrderFood({otype:'order', id:46712, event:this})">下单</div>
 				<!-- <span class="sale-food-border" ><input type="button" value="下单" style="font-size: 17px;"> </span> -->

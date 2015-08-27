@@ -42,7 +42,7 @@ public class StockTakeDetailDao {
 	 * Insert a new stockTakeDetail.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param builder
 	 * 			the stockTakeDetail builder to insert
@@ -51,10 +51,10 @@ public class StockTakeDetailDao {
 	 * 			if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static int insertstockTakeDetail(DBCon dbCon, Staff term, StockTakeDetail sTakeDetail) throws SQLException, BusinessException{
-		Material material = MaterialDao.getById(dbCon, sTakeDetail.getMaterial().getId());
-		StockTake stockTake = StockTakeDao.getStockTakeById(dbCon, term, sTakeDetail.getStockTakeId());
-		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, term, " AND MD.material_id = " + sTakeDetail.getMaterial().getId() + " AND MD.dept_id = " + stockTake.getDept().getId(), null);
+	public static int insertstockTakeDetail(DBCon dbCon, Staff staff, StockTakeDetail sTakeDetail) throws SQLException, BusinessException{
+		Material material = MaterialDao.getById(dbCon, staff, sTakeDetail.getMaterial().getId());
+		StockTake stockTake = StockTakeDao.getStockTakeById(dbCon, staff, sTakeDetail.getStockTakeId());
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, staff, " AND MD.material_id = " + sTakeDetail.getMaterial().getId() + " AND MD.dept_id = " + stockTake.getDept().getId(), null);
 		if(!materialDepts.isEmpty()){
 			sTakeDetail.setExpectAmount(materialDepts.get(0).getStock());
 		}

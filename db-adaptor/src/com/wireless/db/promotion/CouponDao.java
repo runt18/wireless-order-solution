@@ -212,9 +212,8 @@ public class CouponDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 * 			throws if any cases below
-	 * 			<li>the coupon type does NOT exist or has been expired
-	 * 			<li>the coupon type has expired
-	 * 			<li>the member does NOT exist
+	 * 			<li>the associated promotion does NOT exist
+	 * 			<li>the associated coupon does NOT exist
 	 */
 	public static int[] create(DBCon dbCon, Staff staff, Coupon.CreateBuilder builder) throws SQLException, BusinessException{
 		final Promotion promotion = PromotionDao.getById(dbCon, staff, builder.getPromotionId());
@@ -224,9 +223,9 @@ public class CouponDao {
 		
 		//Check to see whether the coupon type is expired.
 		final CouponType couponType = CouponTypeDao.getById(dbCon, staff, builder.getCouponTypeId());
-		if(couponType.isExpired()){
-			throw new BusinessException(PromotionError.COUPON_EXPIRED);
-		}
+//		if(couponType.isExpired()){
+//			throw new BusinessException(PromotionError.COUPON_EXPIRED);
+//		}
 		final List<Integer> coupons = new ArrayList<Integer>();
 		for(Member member : builder.getMembers()){
 			try{

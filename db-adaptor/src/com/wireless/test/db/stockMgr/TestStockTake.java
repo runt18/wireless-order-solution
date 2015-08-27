@@ -22,6 +22,7 @@ import com.wireless.exception.DeptError;
 import com.wireless.exception.MaterialError;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
@@ -29,7 +30,6 @@ import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
-import com.wireless.pojo.stockMgr.StockTake.CateType;
 import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTake.Status;
 import com.wireless.pojo.stockMgr.StockTake.UpdateStockTakeBuilder;
@@ -138,9 +138,9 @@ public class TestStockTake {
 			dept = depts.get(3);
 		}
 		System.out.println(dept.getName());
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
@@ -166,7 +166,7 @@ public class TestStockTake {
 		}
 		//添加一张盘点单	
 		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mStaff.getRestaurantId())
-											.setCateType(CateType.GOOD)
+											.setCateType(MaterialCate.Type.GOOD)
 											.setDept(dept)
 											.setCateId(2)
 											.setOperatorId((int) mStaff.getId()).setOperator(mStaff.getName())
@@ -232,7 +232,7 @@ public class TestStockTake {
 							
 							Map<Object, Object> afterParam = new HashMap<Object, Object>();
 							afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId() + " AND M.material_id = " + stockActionDetail.getMaterialId());
-							Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
+							Material afterMaterial = MaterialDao.getByCond(mStaff, new MaterialDao.ExtraCond().setId(stockActionDetail.getMaterialId())).get(0);
 							
 							int index = materials.indexOf(afterMaterial);
 							if(index >= 0){
@@ -240,7 +240,7 @@ public class TestStockTake {
 								//对比原料表的变化
 								Assert.assertEquals("deltaMaterialStock", Math.abs(stockTakeDetail.getTotalDelta()), deltaMaterialStock, 0.001);
 							}else{
-								throw new BusinessException(MaterialError.SELECT_FAIL);
+								throw new BusinessException(MaterialError.MATERIAL_NOT_EXIST);
 							}
 							//盘点的实际数量与审核后部门_原料表的储存量对比
 							Assert.assertEquals("deltaMaterialDeptStock", stockTakeDetail.getActualAmount(), afterMaterialDept.getStock(), 0.001);
@@ -259,9 +259,9 @@ public class TestStockTake {
 			//获取库单的期望值
 			for (StockTakeDetail stockTakeDetail : expected.getStockTakeDetails()) {
 				//获取对应的material
-				Map<Object, Object> param = new HashMap<Object, Object>();
-				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId() + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
-				Material material = MaterialDao.getContent(param).get(0);
+//				Map<Object, Object> param = new HashMap<Object, Object>();
+//				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId() + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
+				Material material = MaterialDao.getByCond(mStaff, new MaterialDao.ExtraCond().setId(stockTakeDetail.getMaterial().getId())).get(0);
 				//获取库存明细单
 				StockActionDetail stockActionDetail = new StockActionDetail();
 				stockActionDetail.setMaterialId(stockTakeDetail.getMaterial().getId());

@@ -28,6 +28,21 @@ var Templet = {
 		'</div>'			
 };
 
+function changWeixinOrderList(otype){
+	if(otype == 'order'){
+		$('#divWeixinOrderList').show();
+		$('#divWeixinBookList').hide();
+	}else{
+		$('#divWeixinBookList').show();
+		$('#divWeixinOrderList').hide();
+	}
+}
+
+function buildInvitation(){
+	location.href = "invitation.html";
+}
+
+
 $(function(){
 	Util.lbar('', function(html){ $(document.body).append(html);  });
 	$.ajax({
@@ -80,8 +95,14 @@ $(function(){
 				}
 
 			}
-			$('#divWeixinOrderList').before(html.join(''));
+			$('#divWeixinOrderList').html(html.join(''));
 		},
 		error : function(xhr, errorType, error){}
+	});
+	
+	//切换tab
+	$('.tabPanelList').on('click', function(){
+		$('.tabPanelList').removeClass('tabPanelListCheck');
+		$(this).addClass('tabPanelListCheck');
 	});
 });
