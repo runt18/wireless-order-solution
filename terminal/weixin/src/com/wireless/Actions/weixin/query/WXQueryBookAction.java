@@ -1,5 +1,11 @@
 package com.wireless.Actions.weixin.query;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,6 +22,8 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.book.Book;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
@@ -59,6 +67,56 @@ public class WXQueryBookAction extends DispatchAction{
 					
 				}
 			});
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * 获取微信预定列表
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward bookList(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jobject = new JObject();
+		String fid = request.getParameter("fid");
+		try{
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			Staff staff = StaffDao.getAdminByRestaurant(rid);
+			BookDao.ExtraCond extra = new BookDao.ExtraCond();
+			
+			SimpleDateFormat yyyymmdd = new SimpleDateFormat("yyyy-MM-dd");
+			String begin = yyyymmdd.format(new Date());
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.MONTH, 1);
+			String end = yyyymmdd.format(c.getTime());
+			DutyRange duty = new DutyRange(begin, end);
+			
+			extra.setBookRange(duty);
+			extra.addStatus(Book.Status.CREATED);
+			
+			List<Book> list = BookDao.getByCond(staff, extra);
+			
+			//获取详细的order & orderFoods信息
+			List<Book> books = new ArrayList<>();
+			for (Book book : list) {
+				books.add(BookDao.getById(staff, book.getId()));
+			}
+			
+			jobject.setRoot(books);
+			
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
