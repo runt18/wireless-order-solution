@@ -115,69 +115,91 @@ public class Material implements Jsonable {
 	public MaterialCate getCate() {
 		return cate;
 	}
+	
 	public void setCate(MaterialCate cate) {
 		this.cate = cate;
 	}
+	
 	public void setCate(int id, String name) {
 		this.cate = new MaterialCate(id, this.restaurantId, name);
 	}
+	
 	public void setCate(int id, String name, int type) {
 		this.cate = new MaterialCate(id, this.restaurantId, name, MaterialCate.Type.valueOf(type));
 	}
+	
 	public float getPrice() {
 		return price;
 	}
+	
 	public void setPrice(float price) {
 		this.price = price;
 	}
+	
 	public float getDelta() {
 		return delta;
 	}
+	
 	public void setDelta(float delta) {
 		this.delta = delta;
 	}
+	
 	public float getStock() {
 		return stock;
 	}
+	
 	public void setStock(float stock) {
 		this.stock = stock;
 	}
+	
 	public String getName() {
 		return name;
 	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
+	
 	public String getLastModStaff() {
 		return lastModStaff;
 	}
+	
 	public void setLastModStaff(String lastModStaff) {
 		this.lastModStaff = lastModStaff;
 	}
+	
 	public long getLastModDate() {
 		return lastModDate;
 	}
+	
 	public void setLastModDate(long lastModDate) {
 		this.lastModDate = lastModDate;
 	}
+	
 	public Status getStatus() {
 		return status;
 	}
+	
 	public void setStatus(Status status) {
 		this.status = status;
 	}
+	
 	public void setStatus(int status) {
 		this.status = Status.valueOf(status);
 	}
+	
 	public String getPinyin() {
 		return pinyin;
 	}
+	
 	public void setPinyin(String pinyin) {
 		this.pinyin = pinyin;
 	}
+	
 	public void plusStock(float count){
 		this.stock = stock + count;
 	}
+	
 	public void cutStock(float count){
 		this.stock = stock - count;
 	}

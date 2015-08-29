@@ -28,9 +28,7 @@ import com.wireless.util.DataPaging;
 
 public class SalesSubStatisticsAction extends Action {
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		List<SalesDetail> salesDetailList = null;
 		String isPaging = request.getParameter("isPaging");
 		String limit = request.getParameter("limit");
@@ -87,7 +85,7 @@ public class SalesSubStatisticsAction extends Action {
 			Integer qt = Integer.valueOf(queryType), ot = (orderType != null && !orderType.isEmpty()) ? Integer.parseInt(orderType) : SaleDetailsDao.ORDER_BY_SALES;
 			DateType dt = DateType.valueOf(Integer.valueOf(dataType));
 			
-			CalcBillStatisticsDao.ExtraCond extraConds = new ExtraCond(dt);
+			CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(dt);
 				
 			if(dt.isHistory()){
 				dateBeg = dateBeg != null && dateBeg.length() > 0 ? dateBeg.trim() + " 00:00:00" : "";
@@ -97,39 +95,32 @@ public class SalesSubStatisticsAction extends Action {
 			DutyRange dutyRange = new DutyRange(dateBeg, dateEnd);
 			
 			if(region != null && !region.equals("-1")){
-				extraConds.setRegion(RegionId.valueOf(Integer.parseInt(region)));
+				extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
 				
 			}
 			
 			if(businessHourBeg != null && !businessHourBeg.isEmpty()){
 				HourRange hr = new HourRange(businessHourBeg, businessHourEnd, DateUtil.Pattern.HOUR);
-				extraConds.setHourRange(hr);
+				extraCond.setHourRange(hr);
 			}
 			if(qt == SaleDetailsDao.QUERY_BY_DEPT){
 				
-				salesDetailList = SaleDetailsDao.execByDept(
-						StaffDao.verify(Integer.parseInt(pin)), 
-						dutyRange,
-						extraConds);
+				salesDetailList = SaleDetailsDao.execByDept(StaffDao.verify(Integer.parseInt(pin)),	dutyRange, extraCond);
 				
 			}else if(qt == SaleDetailsDao.QUERY_BY_FOOD){
 				if(foodName != null && !foodName.isEmpty()){
-					extraConds.setFoodName(foodName);
+					extraCond.setFoodName(foodName);
 				}
 				if(deptID != null && !deptID.equals("-1")){
-					extraConds.setDept(Department.DeptId.valueOf(Integer.parseInt(deptID)));
+					extraCond.setDept(Department.DeptId.valueOf(Integer.parseInt(deptID)));
 				}
 				if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
-					extraConds.setStaffId4OrderFood(Integer.parseInt(staffId));
+					extraCond.setStaffId4OrderFood(Integer.parseInt(staffId));
 				}
+				salesDetailList = SaleDetailsDao.getByFood(StaffDao.verify(Integer.parseInt(pin)), dutyRange, extraCond, ot);
 				
-				salesDetailList = SaleDetailsDao.getByFood(StaffDao.verify(Integer.parseInt(pin)), dutyRange, extraConds, ot);
 			}else if(qt == SaleDetailsDao.QUERY_BY_KITCHEN){
-				
-				salesDetailList = SaleDetailsDao.getByKitchen(
-						StaffDao.verify(Integer.parseInt(pin)), 
-						dutyRange,
-						extraConds);
+				salesDetailList = SaleDetailsDao.getByKitchen(StaffDao.verify(Integer.parseInt(pin)), dutyRange, extraCond);
 			}
 				
 		} catch(BusinessException e){
@@ -142,32 +133,33 @@ public class SalesSubStatisticsAction extends Action {
 		} finally{
 			jobject.setTotalProperty(salesDetailList.size());
 			
-			SalesDetail sum = null;
+			SalesDetail summary = null;
 			if(queryType != null && !(Integer.valueOf(queryType) == SaleDetailsDao.QUERY_BY_KITCHEN) && !salesDetailList.isEmpty()){
-				sum = new SalesDetail();
+				summary = new SalesDetail();
 				Food fb = new Food(0);
 				fb.setName("汇总");
-				sum.setFood(fb);
+				summary.setFood(fb);
 				Department dept = new Department(0);
 				dept.setName("汇总");
-				sum.setDept(dept);
+				summary.setDept(dept);
 				for(SalesDetail tp : salesDetailList){
-					sum.setIncome(sum.getIncome() + tp.getIncome());
-					sum.setDiscount(sum.getDiscount() + tp.getDiscount());
-					sum.setGifted(sum.getGifted() + tp.getGifted());
-					sum.setCost(sum.getCost() + tp.getCost());
-					sum.setProfit(sum.getProfit() + tp.getProfit());
-					sum.setSalesAmount(sum.getSalesAmount() + tp.getSalesAmount());				
+					summary.setIncome(summary.getIncome() + tp.getIncome());
+					summary.setTasteIncome(summary.getTasteIncome() + tp.getTasteIncome());
+					summary.setDiscount(summary.getDiscount() + tp.getDiscount());
+					summary.setGifted(summary.getGifted() + tp.getGifted());
+					summary.setCost(summary.getCost() + tp.getCost());
+					summary.setProfit(summary.getProfit() + tp.getProfit());
+					summary.setSalesAmount(summary.getSalesAmount() + tp.getSalesAmount());				
 				}
-				if(sum.getIncome() != 0.00){
-					sum.setProfitRate(sum.getProfit() / sum.getIncome());
-					sum.setCostRate(sum.getCost() / sum.getIncome());
+				if(summary.getIncome() != 0.00){
+					summary.setProfitRate(summary.getProfit() / summary.getIncome());
+					summary.setCostRate(summary.getCost() / summary.getIncome());
 				}
 				
 			}
 			salesDetailList = DataPaging.getPagingData(salesDetailList, isPaging, start, limit);
-			if(sum != null){
-				salesDetailList.add(sum);
+			if(summary != null){
+				salesDetailList.add(summary);
 			}
 			jobject.setRoot(salesDetailList);
 			response.getWriter().print(jobject.toString());

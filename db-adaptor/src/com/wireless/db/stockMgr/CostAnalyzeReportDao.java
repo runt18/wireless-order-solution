@@ -61,7 +61,7 @@ public class CostAnalyzeReportDao {
 				float endMoney = 0;
 				//期末金额为materialDept剩余物料总和 * 参考成本
 				for (MaterialDept md : materialDepts) {
-					Material m = MaterialDao.getById(md.getMaterialId());
+					Material m = MaterialDao.getById(staff, md.getMaterialId());
 					endMoney += md.getStock() * m.getPrice();
 				}
 				costAnalyze.setEndMoney(endMoney);

@@ -2,9 +2,7 @@ package com.wireless.test.db.stockMgr;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -35,7 +33,6 @@ import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.test.db.TestInit;
-import com.wireless.util.SQLUtil;
 
 public class TestStockAction {
 
@@ -152,9 +149,9 @@ public class TestStockAction {
 		
 		
 		//在审核时先获取之前的数据以作对比
-		Map<Object, Object> param = new HashMap<Object, Object>();
-		param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> beforeMaterials = MaterialDao.getContent(param);
+//		Map<Object, Object> param = new HashMap<Object, Object>();
+//		param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> beforeMaterials = MaterialDao.getByCond(mStaff, null);
 		
 		List<MaterialDept> beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mStaff, " AND restaurant_id = " + mStaff.getRestaurantId(), null);
 		//审核库存
@@ -194,13 +191,13 @@ public class TestStockAction {
 					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
 				}
 				//对比原料表的变化
-				Material afterMaterial = MaterialDao.getById(actualStockActionDetail.getMaterialId());
+				Material afterMaterial = MaterialDao.getById(mStaff, actualStockActionDetail.getMaterialId());
 				index = beforeMaterials.indexOf(afterMaterial);
 				if(index >= 0){
 					float deltaMaterialStock = afterMaterial.getStock() - beforeMaterials.get(index).getStock();
 					Assert.assertEquals("deltaMaterialStock", deltaStock, deltaMaterialStock, 0.0001);
 				}else{
-					throw new BusinessException(MaterialError.SELECT_FAIL);
+					throw new BusinessException(MaterialError.MATERIAL_NOT_EXIST);
 				}
 			}else if(actual.getSubType() == SubType.SPILL || actual.getSubType() == SubType.DAMAGE || actual.getSubType() == SubType.USE_UP){
 				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mStaff, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
@@ -212,13 +209,13 @@ public class TestStockAction {
 					throw new BusinessException(StockError.MATERIAL_DEPT_ADD);
 				}
 				//对比材料表变化
-				Material afterMaterial = MaterialDao.getById(actualStockActionDetail.getMaterialId());
+				Material afterMaterial = MaterialDao.getById(mStaff, actualStockActionDetail.getMaterialId());
 				index = beforeMaterials.indexOf(afterMaterial);
 				if(index >= 0){
 					float deltaMaterialStock = Math.abs(afterMaterial.getStock() - beforeMaterials.get(index).getStock());
 					Assert.assertEquals("deltaMaterialStock", deltaStock, deltaMaterialStock, 0.0001);
 				}else{
-					throw new BusinessException(MaterialError.SELECT_FAIL);
+					throw new BusinessException(MaterialError.MATERIAL_NOT_EXIST);
 				}
 				
 			}else if(actual.getSubType() == SubType.STOCK_OUT){
@@ -231,15 +228,15 @@ public class TestStockAction {
 					throw new BusinessException(StockError.MATERIAL_DEPT_ADD);
 				}
 				//对比原料表的变化
-				Map<Object, Object> afterParam = new HashMap<Object, Object>();
-				afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId() + " AND M.material_id = " + actualStockActionDetail.getMaterialId());
-				Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
+//				Map<Object, Object> afterParam = new HashMap<Object, Object>();
+//				afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId() + " AND M.material_id = " + actualStockActionDetail.getMaterialId());
+				Material afterMaterial = MaterialDao.getByCond(mStaff, new MaterialDao.ExtraCond().setId(actualStockActionDetail.getMaterialId())).get(0);
 				index = beforeMaterials.indexOf(afterMaterial);
 				if(index >= 0){
 					float deltaMaterialStock = Math.abs(afterMaterial.getStock() - beforeMaterials.get(index).getStock());
 					Assert.assertEquals("deltaMaterialStock", deltaStock, deltaMaterialStock, 0.0001);
 				}else{
-					throw new BusinessException(MaterialError.SELECT_FAIL);
+					throw new BusinessException(MaterialError.MATERIAL_NOT_EXIST);
 				}
 			}else if(actual.getSubType() == SubType.STOCK_IN_TRANSFER || actual.getSubType() == SubType.STOCK_OUT_TRANSFER){
 				MaterialDept afterMaterialDeptIn = MaterialDeptDao.getMaterialDepts(mStaff, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
@@ -291,9 +288,9 @@ public class TestStockAction {
 			deptIn = depts.get(0);
 		}
 		
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
@@ -324,9 +321,9 @@ public class TestStockAction {
 			deptIn = depts.get(3);
 			deptOut = depts.get(2);
 		}
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
@@ -354,9 +351,9 @@ public class TestStockAction {
 			deptIn = depts.get(2);
 		}
 		
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
@@ -391,9 +388,9 @@ public class TestStockAction {
 			deptOut = depts.get(2);
 		}
 		
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
@@ -425,9 +422,9 @@ public class TestStockAction {
 			deptOut = depts.get(3);
 		}
 		
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
@@ -456,9 +453,9 @@ public class TestStockAction {
 			deptIn = depts.get(2);
 		}
 		
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
@@ -488,9 +485,9 @@ public class TestStockAction {
 			deptIn = depts.get(2);
 		}
 		
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}

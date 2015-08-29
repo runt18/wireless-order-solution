@@ -15,10 +15,10 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockTakeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTake;
-import com.wireless.pojo.stockMgr.StockTake.CateType;
 import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTake.UpdateStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail.InsertStockTakeDetail;
@@ -51,7 +51,7 @@ public class OperateStockTakeAction extends DispatchAction{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			InsertStockTakeBuilder builder = new InsertStockTakeBuilder(staff.getRestaurantId())
-				.setCateType(CateType.valueOf(Integer.valueOf(cateType)))
+				.setCateType(MaterialCate.Type.valueOf(Integer.valueOf(cateType)))
 				.setDept(new Department(staff.getRestaurantId(), Short.valueOf(dept), null))
 				.setOperatorId(staff.getId()).setOperator(staff.getName())
 				.setComment(comment);
@@ -136,7 +136,7 @@ public class OperateStockTakeAction extends DispatchAction{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			InsertStockTakeBuilder builder = new InsertStockTakeBuilder(staff.getRestaurantId())
-				.setCateType(CateType.valueOf(Integer.valueOf(cateType)))
+				.setCateType(MaterialCate.Type.valueOf(Integer.valueOf(cateType)))
 				.setDept(new Department(staff.getRestaurantId(), Short.valueOf(dept), null))
 				.setOperatorId(staff.getId()).setOperator(staff.getName())
 				.setComment(comment);

@@ -2,9 +2,7 @@ package com.wireless.test.db.stockMgr;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -18,7 +16,6 @@ import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.test.db.TestInit;
-import com.wireless.util.SQLUtil;
 
 public class TestStockDetailAction {
 
@@ -45,9 +42,9 @@ public class TestStockDetailAction {
 	
 	@Test
 	public void testStockDetailDao() throws SQLException, BusinessException{
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}
@@ -55,7 +52,7 @@ public class TestStockDetailAction {
 		StockActionDetail expected = new StockActionDetail(materials.get(0).getId(), 1.5f, 100f);
 		expected.setStockActionId(8);
 		
-		final int id = StockActionDetailDao.insertStockActionDetail(expected);
+		final int id = StockActionDetailDao.insertStockActionDetail(mStaff, expected);
 		expected.setId(id);
 		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mStaff, id);
 		
@@ -85,9 +82,9 @@ public class TestStockDetailAction {
 	
 	@Test
 	public void insertStockDetail() throws SQLException, BusinessException{
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
-		List<Material> materials = MaterialDao.getContent(params);
+//		Map<Object, Object> params = new HashMap<Object, Object>();
+//		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
+		List<Material> materials = MaterialDao.getByCond(mStaff, null);
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}
@@ -95,7 +92,7 @@ public class TestStockDetailAction {
 		StockActionDetail expected = new StockActionDetail(materials.get(0).getId(), 1.5f, 100f);
 		expected.setStockActionId(8);
 		
-		int id = StockActionDetailDao.insertStockActionDetail(expected);
+		int id = StockActionDetailDao.insertStockActionDetail(mStaff, expected);
 		expected.setId(id);
 		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mStaff, id);
 		

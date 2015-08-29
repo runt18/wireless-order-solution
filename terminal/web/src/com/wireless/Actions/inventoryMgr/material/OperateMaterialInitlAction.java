@@ -92,11 +92,12 @@ public class OperateMaterialInitlAction extends DispatchAction{
 		String deptId = request.getParameter("deptId");
 		String editData = request.getParameter("editData");
 		String cateType = request.getParameter("cateType");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		try{
 			if(!editData.isEmpty()){
-				Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
 				//保存初始化数据之前先初始化一次
 				//删除月结明细记录
 				String sql = "DELETE MD FROM " + Params.dbName + ".monthly_balance_detail MD " + 
@@ -127,7 +128,7 @@ public class OperateMaterialInitlAction extends DispatchAction{
 					String[] m = md.split(",");
 					
 					List<MaterialDept> list = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + m[0] + " AND MD.dept_id = " + deptId, null);
-					Material material = MaterialDao.getById(Integer.parseInt(m[0]));
+					Material material = MaterialDao.getById(staff, Integer.parseInt(m[0]));
 					if(list.isEmpty()){
 						material.setStock(material.getStock() + Float.parseFloat(m[1]));
 						

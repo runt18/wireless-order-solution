@@ -170,10 +170,11 @@ function orderFoodStatPanelInit(){
 						
 						if(sendToPageOperation){
 							cancel_setStatisticsDate();
-						}else{
-							cancel_dateCombo.setValue(1);
-							cancel_dateCombo.fireEvent('select', cancel_dateCombo, null, 1);			
-						}							
+						}
+//						else{
+//							cancel_dateCombo.setValue(1);
+//							cancel_dateCombo.fireEvent('select', cancel_dateCombo, null, 1);			
+//						}							
 					},
 					fialure : function(res, opt){
 						thiz.store.loadData(data);
@@ -288,14 +289,15 @@ function orderFoodStatPanelInit(){
          ['菜品','food.name', 150], 
          ['销量','salesAmount','','right','Ext.ux.txtFormat.gridDou'], 
          ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
+         ['口味总额','tasteIncome','','right','Ext.ux.txtFormat.gridDou'], 
          ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
          ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou'],
+         ['单位成本','avgCost','','right','Ext.ux.txtFormat.gridDou'],
          ['成本','cost','','right','Ext.ux.txtFormat.gridDou'], 
          ['成本率','costRate','','right','Ext.ux.txtFormat.gridDou'], 
          ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], 
-         ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou'],
-         ['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], 
-         ['单位成本','avgCost','','right','Ext.ux.txtFormat.gridDou']
+         ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou']
+         //['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], 
 		],
 		SalesSubStatRecord.getKeys().concat(['food', 'food.name']),
 		[ ['isPaging', true], ['dataType', 1], ['queryType', 1]],
@@ -328,12 +330,16 @@ function orderFoodStatPanelInit(){
 				sumRow.style.fontWeight = 'bold';
 				sumRow.style.color = 'green';
 			}
-			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
-			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
-			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
-			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
-			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
-			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 11).innerHTML = '--';
+			//单位成本
+			orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 7).innerHTML = '--';
+			//成本
+			//orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 8).innerHTML = '--';
+			//成本率
+			orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 9).innerHTML = '--';
+			//毛利
+			//orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 10).innerHTML = '--';
+			//毛利率
+			orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 11).innerHTML = '--';
 		}
 	});
 	orderFoodStatPanel = new Ext.Panel({

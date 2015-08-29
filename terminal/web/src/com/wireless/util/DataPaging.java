@@ -15,18 +15,13 @@ public class DataPaging {
 	 * @throws Exception
 	 */
 	public static <T> List<T> getPagingData(List<T> list, boolean isPaging, int start, int limit) throws Exception{
-		List<T> root = null;
 		if(list != null && isPaging){
-			int dataIndex = start, dataSize = limit;
-			root = new ArrayList<T>();
-			dataSize = (dataIndex + dataSize) > list.size() ? dataSize - ((dataIndex + dataSize) - list.size()) : dataSize;
-			for(int i = 0; i < dataSize; i++){
-				root.add(list.get(dataIndex + i));
-			}
+			int end = start + limit;
+			end = end > list.size() ? list.size() : end;
+			return new ArrayList<T>(list.subList(start, end));
 		}else{
-			root = list;
+			return list;
 		}
-		return root;
 	}
 	
 	/**
@@ -63,8 +58,9 @@ public class DataPaging {
 				start = "0";
 			}
 			return DataPaging.getPagingData(list, Boolean.valueOf(isPaging), Integer.valueOf(start), Integer.valueOf(limit));
-		}else
+		}else{
 			return list;
+		}
 	}
 	
 	/**
@@ -77,11 +73,11 @@ public class DataPaging {
 	 * @throws Exception
 	 */
 	public static <T> List<T> getPagingData(List<T> list, boolean isPaging, String start, String limit) throws Exception{
-		if(start != null && limit != null)
+		if(start != null && limit != null){
 			return DataPaging.getPagingData(list, isPaging, Integer.valueOf(start), Integer.valueOf(limit));
-		else
+		}else{
 			return list;
-		
+		}
 	}
 	
 }

@@ -32,11 +32,10 @@ public class MaterialCateDao {
 		
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
-			item = new MaterialCate();
-			item.setId(dbCon.rs.getInt("cate_id"));
+			item = new MaterialCate(dbCon.rs.getInt("cate_id"));
 			item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			item.setName(dbCon.rs.getString("name"));
-			item.setType(dbCon.rs.getInt("type"));
+			item.setType(MaterialCate.Type.valueOf(dbCon.rs.getInt("type")));
 			
 			list.add(item);
 			item = null;
