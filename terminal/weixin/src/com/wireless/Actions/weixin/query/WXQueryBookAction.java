@@ -8,34 +8,67 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.DBCon;
-import com.wireless.db.regionMgr.RegionDao;
+import com.wireless.db.book.BookDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.regionMgr.Region;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class WXQueryBookAction extends DispatchAction{
 	
-	public ActionForward region(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+	/**
+	 * 通过id获取邀请函内容
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward invitation(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
-		DBCon dbCon = null;
+		String id = request.getParameter("bookId");
+		String fid = request.getParameter("fid");
+		final WxRestaurant wxRest;
+		final Restaurant rest;
 		try{
-			dbCon = new DBCon();
-			dbCon.connect();
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			Staff staff = StaffDao.getAdminByRestaurant(rid);
+			rest = RestaurantDao.getById(rid);
+			wxRest = WxRestaurantDao.get(staff);
+			jobject.setRoot(BookDao.getById(staff, Integer.parseInt(id)));
 			
-			String fid = request.getParameter("fid");
-			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
-			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
-			jobject.setRoot(RegionDao.getByStatus(staff, Region.Status.BUSY));
-			
+			jobject.setExtra(new Jsonable() {
+				
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putJsonable("rest", rest, 0);
+					jm.putJsonable("wxRest", wxRest, 0);
+					return jm;
+				}
+				
+				@Override
+				public void fromJsonMap(JsonMap jm, int flag) {
+					
+				}
+			});
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
+			jobject.initTip4Exception(e);
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
-		}		
+		}
+		
 		return null;
-	}		
+	}
 }
