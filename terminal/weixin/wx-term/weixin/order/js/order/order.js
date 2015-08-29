@@ -38,8 +38,8 @@ function changWeixinOrderList(otype){
 	}
 }
 
-function buildInvitation(){
-	location.href = "invitation.html";
+function buildInvitation(bookId){
+	Util.skip("invitation.html", bookId);
 }
 
 
