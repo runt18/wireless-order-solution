@@ -11,6 +11,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.member.MemberCondDao;
+import com.wireless.db.member.MemberDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
@@ -18,6 +20,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
@@ -29,14 +32,14 @@ public class OperatePromotionAction extends DispatchAction{
 
 	public ActionForward insert(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String title = request.getParameter("title");
-		String beginDate = request.getParameter("beginDate");
-		String endDate = request.getParameter("endDate");
+//		String beginDate = request.getParameter("beginDate");
+//		String endDate = request.getParameter("endDate");
 		String body = request.getParameter("body");
 		String entire = request.getParameter("entire");
 		String pType = request.getParameter("pRule");
 		String point = request.getParameter("point");
-		String members = request.getParameter("members");
-		String oriented = request.getParameter("oriented");
+//		String members = request.getParameter("members");
+//		String oriented = request.getParameter("oriented");
 		
 		String couponName = request.getParameter("couponName");
 		String price = request.getParameter("price");
@@ -52,29 +55,28 @@ public class OperatePromotionAction extends DispatchAction{
 			
 			if(Promotion.Rule.valueOf(Integer.parseInt(pType)) == Promotion.Rule.DISPLAY_ONLY){
 				promotionCreateBuilder = Promotion.CreateBuilder.newInstance4Display(title, body, entire)
-																.setRange(beginDate, endDate);
+																//.setRange(beginDate, endDate)
+																;
 			}else{
 				CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price), DateUtil.parseDate(expiredDate)).setComment("活动优惠劵");
 				if(image != null && !image.isEmpty()){
 					typeInsertBuilder.setImage(Integer.parseInt(image));
 				}
 				
-				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, 
-						 body,
-						 Promotion.Rule.valueOf(Integer.parseInt(pType)),
-						 typeInsertBuilder,
-						 entire).setRange(beginDate, endDate);
+				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, body, Promotion.Rule.valueOf(Integer.parseInt(pType)), typeInsertBuilder, entire)
+															    //.setRange(beginDate, endDate)
+															    ;
 				if(point != null && !point.isEmpty() && Promotion.Rule.valueOf(Integer.parseInt(pType)) != Promotion.Rule.FREE){
 					promotionCreateBuilder.setPoint(Integer.parseInt(point));
 				}
 			}				
 			
-			if(Integer.parseInt(oriented) == Promotion.Oriented.SPECIFIC.getVal() && members != null){
-				String[] memberList = members.split(",");
-				for (String member : memberList) {
-					promotionCreateBuilder.addMember(Integer.parseInt(member));
-				}				
-			}
+//			if(Integer.parseInt(oriented) == Promotion.Oriented.SPECIFIC.getVal() && members != null){
+//				String[] memberList = members.split(",");
+//				for (String member : memberList) {
+//					promotionCreateBuilder.addMember(Integer.parseInt(member));
+//				}				
+//			}
 
 			final int promotionId = PromotionDao.create(StaffDao.verify(Integer.parseInt(pin)), promotionCreateBuilder);
 			
@@ -113,8 +115,8 @@ public class OperatePromotionAction extends DispatchAction{
 		String endDate = request.getParameter("endDate");
 		String body = request.getParameter("body");
 		String entire = request.getParameter("entire");
-		String pRule = request.getParameter("pRule");
-		String point = request.getParameter("point");
+		//String rule = request.getParameter("pRule");
+		//String point = request.getParameter("point");
 		//String members = request.getParameter("members");
 		//String oriented = request.getParameter("oriented");
 		
@@ -124,46 +126,68 @@ public class OperatePromotionAction extends DispatchAction{
 		String expiredDate = request.getParameter("expiredDate");
 		String image = request.getParameter("image");		
 		
+		String orientedId = request.getParameter("oriented");
+		String condId = request.getParameter("condId");
+		
 		String pin = (String) request.getAttribute("pin");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		JObject jobject = new JObject();
 		try{
 			
+			final Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId));
 			
-			Promotion.UpdateBuilder promotionUpdateBuilder;
-			if(Promotion.Rule.valueOf(Integer.parseInt(pRule)) == Promotion.Rule.DISPLAY_ONLY){
-				CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(Integer.parseInt(couponTypeId), couponName).setComment("").setPrice(Integer.parseInt(price)).setExpired(expiredDate);
+			//优惠券类型
+			if(couponTypeId != null && !couponTypeId.isEmpty()){
+				CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(Integer.parseInt(couponTypeId), couponName);
+				if(price != null && !price.isEmpty()){
+					typeUpdateBuilder.setPrice(Integer.parseInt(price));
+				}
+				if(expiredDate != null && !expiredDate.isEmpty()){
+					typeUpdateBuilder.setExpired(expiredDate);
+				}
 				if(image != null && !image.isEmpty()){
 					typeUpdateBuilder.setImage(new OssImage(Integer.parseInt(image)));
 				}
-				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(beginDate, endDate)
-										 .setTitle(title)
-										 .setBody(body, entire).setCouponTypeBuilder(typeUpdateBuilder);
-			}else{
-				CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(Integer.parseInt(couponTypeId), couponName).setComment("").setPrice(Integer.parseInt(price)).setExpired(expiredDate);
-				if(image != null && !image.isEmpty()){
-					typeUpdateBuilder.setImage(new OssImage(Integer.parseInt(image)));
-				}
-				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(beginDate, endDate)
-										 .setTitle(title)
-										 .setBody(body, entire)
-										 .setCouponTypeBuilder(typeUpdateBuilder);
-				if(point != null && !point.isEmpty()){
-					promotionUpdateBuilder.setPoint(Integer.parseInt(point));
+				promotionUpdateBuilder.setCouponTypeBuilder(typeUpdateBuilder);
+			}
+			
+			//优惠活动Title
+			if(title != null && !title.isEmpty()){
+				promotionUpdateBuilder.setTitle(title);
+			}
+			
+			//优惠活动正本
+			if(entire != null && !entire.isEmpty()){
+				promotionUpdateBuilder.setBody(body, entire);
+			}
+			
+			//优惠活动日期
+			if(beginDate != null && !beginDate.isEmpty() && endDate != null && !endDate.isEmpty()){
+				promotionUpdateBuilder.setRange(beginDate, endDate);
+			}else if(beginDate != null && !beginDate.isEmpty() && (endDate == null || endDate.isEmpty())){
+				promotionUpdateBuilder.setRange(DateUtil.parseDate(beginDate), 0);
+			}else if((beginDate == null || beginDate.isEmpty()) && endDate != null && !endDate.isEmpty()){
+				promotionUpdateBuilder.setRange(0, DateUtil.parseDate(endDate));
+			}
+			
+			//优惠活动发布对象
+			if(orientedId != null && !orientedId.isEmpty()){
+				Promotion.Oriented oriented = Promotion.Oriented.valueOf(Integer.parseInt(orientedId));
+				if(oriented == Promotion.Oriented.ALL){
+					promotionUpdateBuilder.setAllMember();
+					
+				}else if(oriented == Promotion.Oriented.EMPTY){
+					promotionUpdateBuilder.setMemberEmpty();
+					
+				}else if(oriented == Promotion.Oriented.SPECIFIC){
+					for(Member member :	MemberDao.getByCond(staff, new MemberDao.ExtraCond(MemberCondDao.getById(staff, Integer.parseInt(condId))), null)){
+						promotionUpdateBuilder.addMember(member);
+					}
 				}
 			}
 			
+			PromotionDao.update(staff, promotionUpdateBuilder);
 			
-//			String[] memberList = members.split(",");
-//			
-//			if(Integer.parseInt(oriented) == Promotion.Oriented.SPECIFIC.getVal()){
-//				for (String member : memberList) {
-//					promotionUpdateBuilder.addMember(Integer.parseInt(member));
-//				}
-//			}else{
-//				promotionUpdateBuilder.setAllMember();
-//			}
-			
-			PromotionDao.update(StaffDao.verify(Integer.parseInt(pin)), promotionUpdateBuilder);
 			jobject.initTip(true, "活动修改成功");
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -181,9 +205,7 @@ public class OperatePromotionAction extends DispatchAction{
 		return null;
 	}	
 	
-	public ActionForward getPromotion(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward getPromotion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		String pin = (String) request.getAttribute("pin");
 		String openId = request.getParameter("fid");
 		
@@ -268,9 +290,7 @@ public class OperatePromotionAction extends DispatchAction{
 //	}		
 	
 	
-	public ActionForward delete(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward delete(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pin = (String) request.getAttribute("pin");
 		String promotionId = request.getParameter("promotionId");
 		
@@ -298,7 +318,7 @@ public class OperatePromotionAction extends DispatchAction{
 	
 	public ActionForward getPromotionTree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		String pin = (String) request.getAttribute("pin");
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		String rule = request.getParameter("rule");
 		
 		PromotionDao.ExtraCond extra = new PromotionDao.ExtraCond();
@@ -309,44 +329,44 @@ public class OperatePromotionAction extends DispatchAction{
 		StringBuilder promotionTree = new StringBuilder();
 		try{
 			
-				String created = children(staff, extra.setStatus(Status.CREATED));
-				if(!created.isEmpty()){
-					promotionTree.append("{")
-					.append("text:'已创建'")
-					.append(", id : -2")
-					.append(", status : " + Promotion.Status.CREATED.getVal())
-					.append(", expanded : true")
-					.append(", children : [" + created + "]") 
-					.append("}");						
-				}
+			String created = children(staff, extra.setStatus(Status.CREATED));
+			if(!created.isEmpty()){
+				promotionTree.append("{")
+				.append("text:'已创建'")
+				.append(", id : -2")
+				.append(", status : " + Promotion.Status.CREATED.getVal())
+				.append(", expanded : true")
+				.append(", children : [" + created + "]") 
+				.append("}");						
+			}
 
-				String progress = children(staff, extra.setStatus(Status.PROGRESS));
-				if(!progress.isEmpty()){
-					if(!promotionTree.toString().isEmpty()){
-						promotionTree.append(",");
-					}
-					promotionTree.append("{")
-					.append("text:'进行中'")
-					.append(", id : -3")
-					.append(", status : " + Promotion.Status.PROGRESS.getVal())
-					.append(", expanded : true")
-					.append(", children : [" + progress + "]") 
-					.append("}");	
+			String progress = children(staff, extra.setStatus(Status.PROGRESS));
+			if(!progress.isEmpty()){
+				if(!promotionTree.toString().isEmpty()){
+					promotionTree.append(",");
 				}
-	
-				String finish = children(staff, extra.setStatus(Status.FINISH));
-				if(!finish.isEmpty()){
-					if(!promotionTree.toString().isEmpty()){
-						promotionTree.append(",");
-					}
-					promotionTree.append("{")
-					.append("text:'已结束'")
-					.append(", id : -4")
-					.append(", status : " + Promotion.Status.FINISH.getVal())
-					.append(", expanded : true")
-					.append(", children : [" + finish + "]") 
-					.append("}");	
+				promotionTree.append("{")
+				.append("text:'进行中'")
+				.append(", id : -3")
+				.append(", status : " + Promotion.Status.PROGRESS.getVal())
+				.append(", expanded : true")
+				.append(", children : [" + progress + "]") 
+				.append("}");	
+			}
+
+			String finish = children(staff, extra.setStatus(Status.FINISH));
+			if(!finish.isEmpty()){
+				if(!promotionTree.toString().isEmpty()){
+					promotionTree.append(",");
 				}
+				promotionTree.append("{")
+				.append("text:'已结束'")
+				.append(", id : -4")
+				.append(", status : " + Promotion.Status.FINISH.getVal())
+				.append(", expanded : true")
+				.append(", children : [" + finish + "]") 
+				.append("}");	
+			}
 		}catch(SQLException e){
 			e.printStackTrace();
 		}catch(Exception e){
@@ -388,60 +408,5 @@ public class OperatePromotionAction extends DispatchAction{
 		return sb.toString();	
 
 	}	
-	
-	/**
-	 * 获取欢迎活动
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-//	public ActionForward hasWelcomePage(ActionMapping mapping, ActionForm form,
-//			HttpServletRequest request, HttpServletResponse response)
-//			throws Exception {
-//		String pin = (String) request.getAttribute("pin");
-//		String formId = request.getParameter("fid");
-//		
-//		int rid = 0;
-//		Staff staff;
-//		if(pin != null){
-//			staff = StaffDao.verify(Integer.parseInt(pin));
-//		}else{
-//			DBCon dbCon = new DBCon();
-//			dbCon.connect();
-//			rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
-//			staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
-//			dbCon.disconnect();
-//		}
-//		
-//		JObject jobject = new JObject();
-//		try{
-//			PromotionDao.ExtraCond extra = new PromotionDao.ExtraCond();
-//			extra.setType(Promotion.Type.WELCOME);
-//			extra.addStatus(Promotion.Status.PROGRESS).addStatus(Promotion.Status.CREATED).addStatus(Promotion.Status.PUBLISH);
-//			
-//			List<Promotion> list = PromotionDao.getByCond(staff, extra);
-//			
-//			if(list.size() > 0){
-//				list.get(0).setCouponType(CouponTypeDao.getById(staff, list.get(0).getCouponType().getId()));
-//			}
-//			
-//			jobject.setRoot(list);
-//			
-//		}catch(SQLException e){
-//			e.printStackTrace();
-//			jobject.initTip(e);
-//		}catch(Exception e){
-//			e.printStackTrace();
-//			jobject.initTip4Exception(e);
-//		}finally{
-//			response.getWriter().print(jobject.toString());
-//		}
-//		
-//		return null;		
-//		
-//	}	
 	
 }

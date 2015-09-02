@@ -210,10 +210,10 @@ public class OperateMemberCondAction extends DispatchAction{
 					typeNode.append(",");
 				}
 				typeNode.append("{")
-				.append("text:'" + item.getName() + "'")
-				.append(",leaf:true")
-				.append(",id:" + item.getId())
-				.append("}");				
+						.append("text:'" + item.getName() + "'")
+						.append(",leaf:true")
+						.append(",id:" + item.getId())
+						.append("}");				
 			}
 			
 		}catch(BusinessException e){
@@ -241,7 +241,45 @@ public class OperateMemberCondAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward queryById(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		JObject jobject = new JObject(); 
+		try{
+			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
+			MemberCondDao.ExtraCond extraCond = new MemberCondDao.ExtraCond();
+			
+			if(request.getParameter("id") != null && !request.getParameter("id").isEmpty()){
+				extraCond.setId(Integer.parseInt(request.getParameter("id")));
+			}
+			
+			jobject.setRoot(MemberCondDao.getByCond(staff, extraCond));
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * 通过id获取
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getById(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		JObject jobject = new JObject(); 
 		try{

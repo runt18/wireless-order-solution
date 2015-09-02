@@ -49,13 +49,16 @@ public class OperateMenuAction extends DispatchAction{
 		try{
 			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
 			WxMenuAction.InsertBuilder4ImageText insert4ImageText;
-			Cate cate = Cate.NORMAL;
 			
 			if(image == null || image.isEmpty()){
 				image = "";
 			}
+			
+			final Cate cate;
 			if(subscribe != null && !subscribe.isEmpty()){
 				cate = Cate.SUBSCRIBE_REPLY;
+			}else{
+				cate = Cate.NORMAL;
 			}
 			
 			insert4ImageText = new WxMenuAction.InsertBuilder4ImageText(new Data4Item(title, content, image, url), cate);
@@ -229,16 +232,16 @@ public class OperateMenuAction extends DispatchAction{
 		String rid = request.getParameter("rid");
 		String key = request.getParameter("key");
 		String subscribe = request.getParameter("subscribe");
-		JObject jobject = new JObject(); 
-		Cate cate = Cate.NORMAL;
+		JObject jobject = new JObject();
 		
-		if(subscribe != null && !subscribe.isEmpty()){
-			cate = Cate.SUBSCRIBE_REPLY;
-		}
 		try{
 			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
 			WxMenuAction.UpdateBuilder4Text update4Text = new WxMenuAction.UpdateBuilder4Text(Integer.parseInt(key), text);
-			update4Text.setCate(cate);
+			if(subscribe != null && !subscribe.isEmpty()){
+				update4Text.setCate(WxMenuAction.Cate.SUBSCRIBE_REPLY);
+			}else{
+				update4Text.setCate(WxMenuAction.Cate.NORMAL);
+			}
 			WxMenuActionDao.update(staff, update4Text);
 			jobject.initTip(true, "修改成功");
 		}catch(BusinessException e){
