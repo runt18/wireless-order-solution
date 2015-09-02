@@ -14,12 +14,14 @@ import javax.imageio.ImageIO;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.member.MemberCondDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.oss.CompressImage;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.billStatistics.DateRange;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
@@ -81,11 +83,11 @@ public class PromotionDao {
 				String cond = null;
 				long now = System.currentTimeMillis();
 				if(status == Status.CREATED){
-					cond = " (P.start_date > '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "')";
+					cond = " IFNULL(P.finish_date, 0) = 0 ";
 				}else if(status == Status.PROGRESS){
-					cond = " (P.start_date <= '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "' AND P.finish_date >= '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "')";
+					cond = " (IFNULL(P.finish_date, 0) <> 0 AND P.finish_date >= '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "')";
 				}else if(status == Status.FINISH){
-					cond = " (P.finish_date < '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "')";
+					cond = " (IFNULL(P.finish_date, 0) <> 0 AND P.finish_date < '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "')";
 				}
 				if(cond != null){
 					if(psCond.length() == 0){
@@ -186,8 +188,10 @@ public class PromotionDao {
 			  " VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + DateUtil.format(promotion.getCreateDate(), DateUtil.Pattern.DATE) + "'," +
-			  (promotion.hasDateRange() ? "'" + promotion.getDateRange().getOpeningFormat() + "'," : " NULL ") +
-			  (promotion.hasDateRange() ? "'" + promotion.getDateRange().getEndingFormat() + "'," : " NULL " ) +
+//			  (promotion.hasDateRange() ? "'" + promotion.getDateRange().getOpeningFormat() + "'," : " NULL ") +
+//			  (promotion.hasDateRange() ? "'" + promotion.getDateRange().getEndingFormat() + "'," : " NULL " ) +
+			  " NULL, " +
+			  " NULL, " +
 			  "'" + promotion.getTitle() + "'," +
 			  "'" + new StringHtml(promotion.getBody(), StringHtml.ConvertTo.TO_NORMAL) + "'," +
 			  "'" + new StringHtml(promotion.getEntire(), StringHtml.ConvertTo.TO_NORMAL) + "'," +
@@ -235,7 +239,7 @@ public class PromotionDao {
 		if(promotion.getOriented() == Promotion.Oriented.ALL){
 			//Create the coupon to all members.
 			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(MemberDao.getByCond(dbCon, staff, null, null)));
-		}else{
+		}else if(promotion.getOriented() == Promotion.Oriented.SPECIFIC){
 			//Create the coupon to specific members.
 			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(builder.getMembers()));
 		}
@@ -360,7 +364,7 @@ public class PromotionDao {
 			if(promotion.getOriented() == Promotion.Oriented.ALL){
 				//Create the coupon to all members.
 				CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(MemberDao.getByCond(dbCon, staff, null, null)));
-			}else{
+			}else if(promotion.getOriented() == Promotion.Oriented.SPECIFIC){
 				//Create the coupon to specific members.
 				CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
 			}
@@ -369,37 +373,7 @@ public class PromotionDao {
 	} 
 	
 	/**
-	 * Publish the promotion.
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param promotionId
-	 * 			the id of promotion to publish
-	 * @return the amount of associated coupon to publish
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			<li>throws if the promotion does NOT exist
-	 * 			<li>throws if the promotion does NOT belong to created status
-	 * 			<li>throws if the promotion opening time exceed now
-	 */
-//	public static int publish(Staff staff, int promotionId) throws SQLException, BusinessException{
-//		DBCon dbCon = new DBCon();
-//		try{
-//			dbCon.connect();
-//			dbCon.conn.setAutoCommit(false);
-//			int amount = publish(dbCon, staff, promotionId);
-//			dbCon.conn.commit();
-//			return amount;
-//		}catch(BusinessException | SQLException e){
-//			dbCon.conn.rollback();
-//			throw e;
-//		}finally{
-//			dbCon.disconnect();
-//		}
-//	}
-	
-	/**
-	 * Publish the promotion.
+	 * Publish the promotion according to publish builder {@link Promotion#PublishBuilder}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -410,44 +384,60 @@ public class PromotionDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			<li>throws if the promotion does NOT exist
-	 * 			<li>throws if the promotion does NOT belong to created status
-	 * 			<li>throws if the promotion opening time exceed now
+	 * 			throws if the promotion to publish does NOT exist
 	 */
-//	public static int publish(DBCon dbCon, Staff staff, int promotionId) throws SQLException, BusinessException{
-//		
-//		Promotion promotion = getById(dbCon, staff, promotionId);
-//		
-//		//Assure the status to this promotion should be created.
-//		if(promotion.getStatus() != Promotion.Status.CREATED){
-//			throw new BusinessException("只有【已创建】状态的活动才能发布", PromotionError.PROMOTION_PUBLISH_NOT_ALLOW);
-//		}
-//		
-//		//Assure the opening time to this promotion before now
-//		//Check to see whether the start date exceed now.
-//		Calendar c = Calendar.getInstance();
-//		c.add(Calendar.DAY_OF_YEAR, -1);
-//		if(promotion.getDateRange().getOpeningTime() < c.getTimeInMillis()){
-//			throw new BusinessException("活动的开始日期应该在当前日期之后", PromotionError.PROMOTION_START_DATE_EXCEED_NOW);
-//		}
-//		
-//		String sql;
-//		//Update the promotion status to be published. 
-//		sql = " UPDATE " + Params.dbName + ".promotion SET " +
-//			  " status = " + Promotion.Status.PUBLISH.getVal() +
-//			  " WHERE promotion_id = " + promotionId;
-//		if(dbCon.stmt.executeUpdate(sql) == 0){
-//			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
-//		}
-//		
-//		//Update the coupon status to be published.
-//		sql = " UPDATE " + Params.dbName + ".coupon SET " +
-//			  " status = " + Coupon.Status.PUBLISHED.getVal() +
-//			  " WHERE promotion_id = " + promotionId;
-//		
-//		return dbCon.stmt.executeUpdate(sql);
-//		
-//	}
+	public static void publish(Staff staff, Promotion.PublishBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			publish(dbCon, staff, builder);
+			dbCon.conn.commit();
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Publish the promotion according to publish builder {@link Promotion#PublishBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param promotionId
+	 * 			the id of promotion to publish
+	 * @return the amount of associated coupon to publish
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the promotion to publish does NOT exist
+	 */
+	public static void publish(DBCon dbCon, Staff staff, Promotion.PublishBuilder builder) throws SQLException, BusinessException{
+		
+		Promotion promotion = getById(dbCon, staff, builder.build().getId());
+		
+		Promotion.UpdateBuilder updateBuilder = new Promotion.UpdateBuilder(promotion.getId());
+		
+		updateBuilder.setRange(promotion.getDateRange());
+		
+		if(builder.isOrientedChanged()){
+			if(promotion.getOriented() == Promotion.Oriented.EMPTY){
+				updateBuilder.setMemberEmpty();
+				
+			}else if(promotion.getOriented() == Promotion.Oriented.ALL){
+				updateBuilder.setAllMember();
+				
+			}else if(promotion.getOriented() == Promotion.Oriented.SPECIFIC){
+				for(Member member : MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond(MemberCondDao.getById(dbCon, staff, builder.getCondId())), null)){
+					updateBuilder.addMember(member);
+				}
+			}
+		}		
+		
+	}
 	
 	/**
 	 * cancel the promotion published.
@@ -690,7 +680,14 @@ public class PromotionDao {
 			
 			if(dbCon.rs.getTimestamp("start_date") != null && dbCon.rs.getTimestamp("finish_date") != null){
 				promotion.setDateRange(new DateRange(dbCon.rs.getTimestamp("start_date").getTime(), dbCon.rs.getTimestamp("finish_date").getTime()));
+				
+			}else if(dbCon.rs.getTimestamp("start_date") != null && dbCon.rs.getTimestamp("finish_date") == null){
+				promotion.setDateRange(new DateRange(dbCon.rs.getTimestamp("start_date").getTime(), 0));
+				
+			}else if(dbCon.rs.getTimestamp("start_date") == null && dbCon.rs.getTimestamp("finish_date") != null){
+				promotion.setDateRange(new DateRange(0, dbCon.rs.getTimestamp("finish_date").getTime()));
 			}
+			
 			promotion.setTitle(dbCon.rs.getString("title"));
 			String body = dbCon.rs.getString("body");
 			if(!body.isEmpty()){
@@ -771,36 +768,28 @@ public class PromotionDao {
 	 */
 	public static void delete(DBCon dbCon, Staff staff, int promotionId) throws SQLException, BusinessException{
 		Promotion promotion = getById(dbCon, staff, promotionId);
-		//if(promotion.getStatus() == Promotion.Status.CREATED || promotion.getStatus() == Promotion.Status.FINISH){
 			
-//			if(!CouponDao.getByCond(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion).setStatus(Coupon.Status.DRAWN), null).isEmpty()){
-//				throw new BusinessException("还有【" + promotion.getTitle() + "】活动的优惠券在使用，请在此活动发放的优惠券全部使用或过期后，再删除活动", PromotionError.PROMOTION_DELETE_NOT_ALLOW);
-//			}
-			
-			//Delete the associated oss image to this promotion
-			OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_PROMOTION, promotion.getId()));
-			
-			//Delete the associated full oss image to this promotion.
-			if(promotion.hasImage()){
-				OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(promotion.getImage().getId()));
-			}
-			
-			//Delete the associated coupon type.
-			CouponTypeDao.delete(dbCon, staff, promotion.getCouponType().getId());
-			
-			//Delete the associated coupons.
-			String sql;
-			sql = " DELETE FROM " + Params.dbName + ".coupon WHERE promotion_id = " + promotionId;
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Delete the promotion.
-			sql = " DELETE FROM " + Params.dbName + ".promotion WHERE promotion_id = " + promotionId;
-			if(dbCon.stmt.executeUpdate(sql) == 0){
-				throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
-			}
-		//}else{
-		//	throw new BusinessException("只有【已创建】或【已结束】状态的活动才能删除", PromotionError.PROMOTION_DELETE_NOT_ALLOW);
-		//}
+		//Delete the associated oss image to this promotion
+		OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_PROMOTION, promotion.getId()));
+		
+		//Delete the associated full oss image to this promotion.
+		if(promotion.hasImage()){
+			OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(promotion.getImage().getId()));
+		}
+		
+		//Delete the associated coupon type.
+		CouponTypeDao.delete(dbCon, staff, promotion.getCouponType().getId());
+		
+		//Delete the associated coupons.
+		String sql;
+		sql = " DELETE FROM " + Params.dbName + ".coupon WHERE promotion_id = " + promotionId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the promotion.
+		sql = " DELETE FROM " + Params.dbName + ".promotion WHERE promotion_id = " + promotionId;
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
+		}
 	}
 	
 	public static class Result{
