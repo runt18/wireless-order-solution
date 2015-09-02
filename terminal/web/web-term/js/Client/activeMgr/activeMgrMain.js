@@ -1,92 +1,78 @@
 
-//var active_memberList = ''; 
-//var memberAnalysisBasicGrid;
-var couponTypeId = 0, promotionType = 4; 
-var promotionTree, operatePromotTypeWin, winUnhide = true; //执行关闭操作时不验证数据
-var promotionDateTemplet = '<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue; font-szie:12px;font-weight:bold">活动日期 : <font color="red">{beginDate}</font>&nbsp;至&nbsp;<font color="red">{endDate}</font></div>';
-var p_box;
-function buildPreviewHead(){
-	var head = '';
-	if(Ext.getCmp('active_title').getValue()){
-		head +=  '<div style="text-align:center; font-size: 30px; font-weight: bold; word-wrap:break-word; color: #D2691E;">' + Ext.getCmp('active_title').getValue() + '</div>';
+var promotionTree, promotionGuideWin;
+var couponPicBox;
+
+function buildPromotionHeader(title, endDate){
+	var head = [];
+	if(title){
+		head.push('<div style="text-align:center; font-size: 30px; font-weight: bold; word-wrap:break-word; color: #D2691E;">' + title + '</div>');
 	}else{
-		head +=  '<div style="text-align:center; font-size: 30px; font-weight: bold; word-wrap:break-word; color: #D2691E;">活动标题</div>';
+		head.push('<div style="text-align:center; font-size: 30px; font-weight: bold; word-wrap:break-word; color: #D2691E;">活动标题</div>');
 	}
 	
-	if(Ext.getCmp('active_beginDate').getValue() && Ext.getCmp('active_endDate').getValue()){
-		head += '<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue; font-szie:12px;font-weight:bold">活动日期 : <font color="red">'+ Ext.getCmp('active_beginDate').getValue().format('Y-m-d') +'</font>&nbsp;至&nbsp;<font color="red">'+ Ext.getCmp('active_endDate').getValue().format('Y-m-d') +'</font></div>';
+	if(endDate){
+		head.push('<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue; font-szie:12px;font-weight:bold">活动至<font color="red">&nbsp;' + endDate.format('Y-m-d') +'</font>&nbsp;结束</div>');
 	}
 	
-//	if(Ext.getCmp('active_point').isValid()){
-//		head += promotionRule(promotionType, Ext.getCmp('active_point').getValue());
-//	}
 	return head;
 }
 
-function buildFoot(id){
-	Ext.getCmp('promotionUrl').setText('http://wx.e-tones.net/wx-term/weixin/order/sales.html?pid=' + id);
-}
-
-var promotion_uploadMask = new Ext.LoadMask(document.body, {
-	msg : '正在保存活动...'
-});
-
-var finishPromotion = function(){
+function fnFinishPromotion(){
 	
+	var title = Ext.getCmp('guide_2nd_title');
+	if(title.getValue().length == 0){
+		Ext.example.msg('提示', '请设置活动标题');
+		Ext.getCmp('guide_2nd_title').focus();
+		return;
+	}
+	var couponName = Ext.getCmp('guide_2nd_couponName');
+	var price = Ext.getCmp('guide_2nd_couponPrice');
+	var expiredDate= Ext.getCmp('guide_2nd_couponExpired');
+
 	var params = {};
-	var title = Ext.getCmp('active_title');
-	var beginDate = Ext.getCmp('active_beginDate');
-	var endDate = Ext.getCmp('active_endDate');
-	//var point = Ext.getCmp('active_point');
-	var couponName = Ext.getCmp('active_couponName');
-	var price = Ext.getCmp('active_price');
-	var expiredDate= Ext.getCmp('active_couponExpiredDate');
-	var editBody = Ext.getCmp('secondStep_edit');
-	var entire = Ext.getCmp('secondStepEastBody');
-	
-	if(operatePromotTypeWin.otype == 'insert'){
+	if(promotionGuideWin.otype == 'insert'){
 		params.dataSource = 'insert';
 		//面向全员
 		params.oriented = 1;
 	}else{
 		params.dataSource = 'update';
-		params.id = operatePromotTypeWin.pId;
-		params.cId = couponTypeId;
+		params.id = promotionGuideWin.promotion.id;
+		params.cId = promotionGuideWin.promotion.coupon.id;
 	}
 	
-	params.pRule = promotionType;
+	params.pRule = promotionGuideWin.promotionType;
 	params.couponName = couponName.getValue();
 	params.price = price.getValue();
 	params.expiredDate = expiredDate.getValue().format('Y-m-d');
-	params.image = operatePromotTypeWin.ossId;
+	params.image = promotionGuideWin.ossId;
 	params.title = title.getValue();
-	params.beginDate = beginDate.getValue().format('Y-m-d');
-	params.endDate = endDate.getValue().format('Y-m-d');
-	//params.point = point.getValue();
-	//params.members = active_memberList;
+	//params.beginDate = beginDate.getValue().format('Y-m-d');
+	//params.endDate = endDate.getValue().format('Y-m-d');
 	
-	params.body = editBody.getValue();	
-	params.entire = entire.body.dom.innerHTML;
-
-	promotion_uploadMask.show();
+	params.body = Ext.getCmp('guide_2nd_promotionEditor').getValue();	
+	params.entire = buildPromotionHeader(title.getValue()) + params.body;
+	
+	var promotionUploadMask = new Ext.LoadMask(document.body, {	msg : '正在保存活动...' });
+	promotionUploadMask.show();
 	Ext.Ajax.request({
 		url : '../../OperatePromotion.do',
 		params : params,
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
-			promotion_uploadMask.hide();
+			promotionUploadMask.hide();
 			if(jr.success){
-				operatePromotTypeWin.hide();
+				promotionGuideWin.hide();
 				
 				var promotionId;
 				if(params.dataSource == 'insert'){
 					promotionId = jr.root[0].pid;
-					promotionTree.getRootNode().reload();
 				}else{
 					promotionId = params.id;
-					//重新加载显示刚刚修改的活动
-					for(var i in promotionTree.getRootNode().childNodes){
-						var statusNode = promotionTree.getRootNode().childNodes[i];
+				}
+				//重新加载显示刚刚修改的活动
+				promotionTree.getRootNode().reload(function(){
+					for(var i in this.childNodes){
+						var statusNode = this.childNodes[i];
 						for(var j in statusNode.childNodes){
 							var promotionNode = statusNode.childNodes[j];
 							if(promotionNode.id == promotionId){
@@ -96,14 +82,15 @@ var finishPromotion = function(){
 							}
 						}
 					}
-				}
-
+				});
+				
 				Ext.example.msg(jr.title, jr.msg);
 			}else{
 				Ext.ux.showMsg(jr);
 			}
 		},
 		fialure : function(res, opt){
+			promotionUploadMask.hide();
 			wx.lm.hide();
 			Ext.ux.showMsg(res.responseText);
 		}
@@ -111,51 +98,6 @@ var finishPromotion = function(){
 	
 };
 
-function fnValidSecondSteps(){
-	var title = '提示';
-	if(!Ext.getCmp('active_title').isValid()){
-		Ext.example.msg(title, '请填写活动标题');
-		return false;
-	}
-	
-	if(!Ext.getCmp('active_endDate').isValid()){
-		Ext.example.msg(title, '请填写活动时间');
-		return false;
-	}		
-	
-	if((Ext.getCmp('active_beginDate').getValue().getTime() + 86000000) < (new Date()).getTime()){
-		Ext.example.msg(title, '活动开始时间要大于当前时间');
-		return false;
-	}
-	
-	if((Ext.getCmp('active_endDate').getValue().getTime() + 86000000) < (new Date()).getTime()){
-		Ext.example.msg(title, '活动结束时间要大于当前时间');
-		return false;
-	}
-	
-//	if((promotionType == 3 || promotionType == 4) && !Ext.getCmp('active_point').isValid()){
-//		Ext.example.msg(title, '请填写积分条件');
-//		return false;
-//	}
-	
-	if(promotionType != 1 && !Ext.getCmp('active_couponName').isValid()){
-		Ext.example.msg(title, '请填写优惠劵名称');
-		return false;
-	}
-	
-	if(promotionType != 1 && !Ext.getCmp('active_couponExpiredDate').isValid()){
-		Ext.example.msg(title, '请填写优惠劵到期时间');
-		return false;
-	}
-	
-	if(promotionType != 1 && (Ext.getCmp('active_couponExpiredDate').getValue().getTime() + 86000000) < (new Date()).getTime()){
-		Ext.example.msg(title, '优惠劵有效期要大于当前时间');
-		return false;
-	}	
-	
-	return true;
-	
-}
 
 $(function (){
     $("#wizard").steps({
@@ -172,40 +114,22 @@ $(function (){
         },
         onStepChanged: function (event, currentIndex, priorIndex) { 
         	if(currentIndex == 1){
-        		Ext.getCmp('active_title').focus(true, 100);
-        		Ext.getCmp('btnSecondStepEastBody').handler();
+        		Ext.getCmp('guide_2nd_title').focus(true, 100);
+        		Ext.getCmp('guide_2nd_previewBtn').handler();
         	}
-//        	else if(currentIndex == 2){
-//        		if(operatePromotTypeWin.oriented == 2){
-//        			
-//        			
-//        			Ext.getCmp('active_member_btnHeightSearch').handler();	
-//        			if(memberAnalysisBasicGrid){
-//        	    		memberAnalysisBasicGrid.syncSize(); //强制计算高度
-//        	    		memberAnalysisBasicGrid.doLayout();//重新布局            				
-//        			}
-// 
-//    	    		
-//    	    		Ext.getCmp('threeStepEastBody').body.update(buildPreviewHead()+'<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">'+Ext.getCmp('secondStep_edit').getValue()+'</div>');
-//        		}
-//        		Ext.getCmp('threeStepEastBody').body.update(buildPreviewHead()+'<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">'+Ext.getCmp('secondStep_edit').getValue()+'</div>');
-//        		
-//        	}
         },
         onStepChanging : function(event, currentIndex, newIndex){
-        	if(currentIndex == 1 && newIndex == 2 && winUnhide){
-        		return fnValidSecondSteps();
-        	}else if(currentIndex == 1 && newIndex == 0 && operatePromotTypeWin.otype == 'update'){
+        	if(currentIndex == 1 && newIndex == 0 && promotionGuideWin.otype == 'update'){
         		Ext.example.msg('提示', '不能修改活动类型');
         		return false;
         	}else{
         		return true;
         	}
         },
-        onFinished: function(event, currentIndex, newIndex){
-        	//更新活动entire
-        	Ext.getCmp('btnSecondStepEastBody').handler();
-        	return finishPromotion();
+        onFinished : function(event, currentIndex, newIndex){
+        	//触发‘预览’Button的事件，更新promotion preview的内容
+        	Ext.getCmp('guide_2nd_previewBtn').handler();
+        	fnFinishPromotion();
         }
     });
 });
@@ -213,11 +137,10 @@ $(function (){
 /**
  * 初始化优惠活动编辑
  */
-function initCouponTypeWin(c){
-	operatePromotTypeWin = Ext.getCmp('operatePromotTypeWin');
-	if(!operatePromotTypeWin){
-		operatePromotTypeWin = new Ext.Window({
-			id : 'operatePromotTypeWin',
+function showPromotionGuide(c){
+	if(promotionGuideWin == null){
+
+		promotionGuideWin = new Ext.Window({
 			closable : true,
 			closeAction:'hide',
 			resizable : false,
@@ -227,7 +150,7 @@ function initCouponTypeWin(c){
 			bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 			contentEl : 'divActiveInsert',
 			listeners : {
-/*				beforehide : function(thiz){
+	/*				beforehide : function(thiz){
 					winUnhide = false;
 					//先让操作跳到第三部再关闭, 否则样式有误
 					var result = false;
@@ -252,77 +175,89 @@ function initCouponTypeWin(c){
 					
 					return result;
 				},*/
-				hide : function(){
-					$('#span_firstModel').click();
-					Ext.getCmp('active_title').setValue();
-					Ext.getCmp('active_beginDate').setValue();
-					Ext.getCmp('active_endDate').setValue();
-//					Ext.getCmp('active_point').setValue();
-					Ext.getCmp('active_couponName').setValue();
-					Ext.getCmp('active_price').setValue();
-					Ext.getCmp('active_couponExpiredDate').setValue();
-					Ext.getCmp('secondStep_edit').setValue();
+				show : function(thiz){
 					
-					Ext.getCmp('active_beginDate').clearInvalid();
-					Ext.getCmp('active_endDate').clearInvalid();
-					Ext.getCmp('active_couponExpiredDate').clearInvalid();
-//					Ext.getCmp('active_point').clearInvalid();
-					
-					Ext.getDom('radioDefaultCoupon').checked = true; 
-					Ext.getCmp('radioDefaultCoupon').fireEvent('check', Ext.getCmp('radioDefaultCoupon'), true);
-					Ext.getCmp('couponTypeBox').setImg();
-					
-					Ext.getCmp('secondStepEastBody').body.update('');
-					operatePromotTypeWin.image = '';
-					
-//					Ext.getCmp('active_memberBasicGrid').getStore().removeAll();
-//					Ext.getCmp('active_memberTypeCombo').setValue(-1);
-//					
-//					Ext.getCmp('active_textTotalMemberCost').setValue();
-//					Ext.getCmp('active_textTotalMemberCostCount').setValue();
-//					
-//					active_memberList = '';
-//					Ext.getCmp('active_member_btnCommonSearch').handler({noSearch:true});
-//					$("#chkSetWelcome").removeAttr("checked");
-					
-					operatePromotTypeWin.otype = '';
-					operatePromotTypeWin.pId = '';
-					operatePromotTypeWin.oriented = 1;
-					
-					winUnhide = true;
-					
-					$("#wizard").steps("previous");
-					$("#wizard").steps("previous");
+					if(thiz.otype == 'insert'){
+						this.setTitle('添加优惠活动');
+						
+						//跳到第一步
+						$("#wizard").steps("previous");
+						
+						Ext.getCmp('guide_2nd_title').setValue();
+						Ext.getCmp('guide_2nd_couponName').setValue();
+						Ext.getCmp('guide_2nd_couponPrice').setValue();
+						Ext.getCmp('guide_2nd_couponExpired').setValue(new Date());
+						Ext.getCmp('guide_2nd_promotionEditor').setValue();
+						Ext.getCmp('guide_2nd_couponExpired').clearInvalid();
+						
+						Ext.getDom('radioDefaultCoupon').checked = true; 
+						Ext.getCmp('radioDefaultCoupon').fireEvent('check', Ext.getCmp('radioDefaultCoupon'), true);
+						Ext.getCmp('couponTypeBox').setImg();
+						
+						Ext.getCmp('secondStepEastBody').body.update('');
+						
+						promotionGuideWin.image = '';
+						
+					}else if(thiz.otype == 'update'){
+						this.setTitle('修改优惠活动');
+						
+						//直接跳到第二步
+						$("#wizard").steps("next");
+						
+						Ext.getCmp('guide_2nd_title').setValue(thiz.promotion.title);
+						Ext.getCmp('guide_2nd_couponName').setValue(thiz.promotion.coupon.name);
+						Ext.getCmp('guide_2nd_couponPrice').setValue(thiz.promotion.coupon.price);
+						Ext.getCmp('guide_2nd_couponExpired').setValue(thiz.promotion.coupon.expiredFormat);
+						Ext.getCmp('guide_2nd_promotionEditor').setValue(thiz.promotion.body);
+						
+						Ext.getDom('radioSelfCoupon').checked = true; 
+						Ext.getCmp('couponTypeBox').setImg(thiz.promotion.coupon.ossImage ? thiz.promotion.coupon.ossImage.image : 'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg');
+						
+						updatePromotionCouponPanel(thiz.promotion.pType);
+					}
 				}
+//				,
+//				hide : function(thiz){
+//					$("#wizard").steps("previous");
+//					$("#wizard").steps("previous");
+//				}
 			},
 			keys : [{
 				 key : Ext.EventObject.ESC,
 				 fn : function(){ 
-					 operatePromotTypeWin.hide();
+					 promotionGuideWin.hide();
 				 },
 				 scope : this 
 			 }]
 		});
 	}
-	operatePromotTypeWin.otype = c.type;
-	operatePromotTypeWin.setTitle(c.type == 'insert'?'添加优惠活动':'修改优惠活动');
+	
+	promotionGuideWin.otype = c.type;
+	if(c.promotion){
+		promotionGuideWin.promotion = c.promotion;
+		promotionGuideWin.promotionType = c.promotion.pType;
+	}
+	
+	promotionGuideWin.show();
+
 };
 
 function chooseCouponModel(e, h){
-	if(Ext.isIE)
+	if(Ext.isIE){
 		e.getEl().dom.parentNode.style.paddingTop = '43px';
-	else
+	}else{
 		e.getEl().dom.parentNode.style.paddingTop = h?h:'45px';
+	}
 }
 
 function changeCouponModel(type){
-	var couponName = Ext.getCmp('active_couponName');
-	var price = Ext.getCmp('active_price');
+	var couponName = Ext.getCmp('guide_2nd_couponName');
+	var price = Ext.getCmp('guide_2nd_couponPrice');
 	if(type == 1){
-		couponName.setValue('十元优惠劵');
+		couponName.setValue('10元优惠劵');
 		price.setValue(10);
 	}else if(type == 2){
-		couponName.setValue('二十元优惠劵');
+		couponName.setValue('20元优惠劵');
 		price.setValue(20);	
 	}else if(type == 3){
 		couponName.setValue();
@@ -335,87 +270,50 @@ function changeCouponModel(type){
 }
 
 //1表示无优惠劵纯展示; 2表示无条件领取优惠劵
-function choosePromotionModel(){
+function updatePromotionCouponPanel(promotionType){
 	if(promotionType == 1){
 		//纯展示
-//		Ext.getCmp('active_secendStep2CouponImg').hide();
 		$("#promotionPic").attr("title", "上传活动封面图片");
-		Ext.getCmp('active_secendStep2CouponDetail').hide();
-		Ext.getCmp('active_secendStep2SelectCoupon').hide();
-		Ext.getCmp('secondStep_edit').setHeight(440);
-//		Ext.getCmp('active_point').hide();
-//		Ext.getCmp('active_point').getEl().up('.x-form-item').setDisplayed(false);
-//		Ext.getCmp('active_pointLastText').hide();
-		Ext.getCmp('hide_activeOccupy').show();
+		Ext.getCmp('guide_2nd_couponDetail').hide();
+		Ext.getCmp('guide_2nd_CouponOption').hide();
+		Ext.getCmp('guide_2nd_promotionEditor').setHeight(440);
+		Ext.getCmp('guide_2nd_occupy').show();
 		
 	}else if(promotionType == 2){
 		//优惠券
-//		Ext.getCmp('active_secendStep2CouponImg').show();
 		$("#promotionPic").attr("title", "优惠券图片");
-		Ext.getCmp('active_secendStep2CouponDetail').show();
-		Ext.getCmp('active_secendStep2SelectCoupon').show();
-//		Ext.getCmp('active_point').hide();
-//		Ext.getCmp('active_point').setValue(0);
-//		Ext.getCmp('active_point').getEl().up('.x-form-item').setDisplayed(false);
-//		Ext.getCmp('active_pointLastText').hide();
-		Ext.getCmp('hide_activeOccupy').show();
-		Ext.getCmp('secondStep_edit').setHeight(325);
+		Ext.getCmp('guide_2nd_couponDetail').show();
+		Ext.getCmp('guide_2nd_CouponOption').show();
+		Ext.getCmp('guide_2nd_occupy').show();
+		Ext.getCmp('guide_2nd_promotionEditor').setHeight(325);
 	}
-//	else{
-//		Ext.getCmp('active_secendStep2CouponImg').show();
-//		Ext.getCmp('active_secendStep2CouponDetail').show();
-//		Ext.getCmp('active_secendStep2SelectCoupon').show();
-//		Ext.getCmp('active_point').show();
-//		Ext.getCmp('active_pointLastText').show();
-//		Ext.getCmp('active_point').getEl().up('.x-form-item').setDisplayed(true);	
-//		Ext.getCmp('hide_activeOccupy').hide();
-//		Ext.getCmp('secondStep_edit').setHeight(325);
-//		
-//		if(promotionType == 3){
-//			Ext.getCmp('active_point').label.dom.innerHTML = '活动规则: 单次消费积分满';
-//		}else if(promotionType == 4){
-//			Ext.getCmp('active_point').label.dom.innerHTML = '活动规则: 累计积分满';
-//		}
-//		
-//		
-//	}
-	Ext.getCmp('active_secendStepPanel').doLayout();
+	Ext.getCmp('guide_2nd_panel').doLayout();
 }
 
 function selectPromotionModel(thiz, type){
 	$(".active_mould").removeClass('active_mould_click');
 	$(thiz).find('input').attr('checked', 'checked');
 	$(thiz).addClass('active_mould_click');
-	promotionType = type;
-	choosePromotionModel();
+	promotionGuideWin.promotionType = type;
+	updatePromotionCouponPanel(type);
 }
 
-function promotionRule(pType, point){
-	if(point){
-		var rule = '';
-//		if(pType == 3){
-//			rule = '活动规则 : 单次消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
-//		}else if(pType == 4){
-//			rule = '活动规则 : 累计消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
-//		}
-		return '<div style="margin: 10px 10px 10px 10px;color:LightSkyBlue; font-szie:14px;font-weight:bold;">'+ rule +'</div>';	
-	}else{
-		return '';
-	}
-	
-
-}
-
-function getPromotionBodyById(id){
+//显示优惠活动的Body和相应的Coupon内容
+function loadPromotion(promotionId){
 	Ext.Ajax.request({
 		url : '../../OperatePromotion.do',
-		params : {promotionId : id, dataSource : 'getPromotion'},
+		params : {
+			dataSource : 'getPromotion',
+			promotionId : promotionId
+		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
-				
+				//显示优惠活动正文
 				Ext.getCmp('promotionPreviewBody').body.update(jr.root[0].entire);
-				buildFoot(id);
+				//显示优惠活动URL
+				Ext.getCmp('promotionUrl').setText('http://wx.e-tones.net/wx-term/weixin/order/sales.html?pid=' + promotionId);
+				//显示优惠券内容
 				if(jr.root[0].coupon){
 					Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:left; margin: 10px 10px 10px 20px;float:left;"><img height="100"  src="' + (jr.root[0].coupon.ossImage?jr.root[0].coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg') + '" /></div>'
 																+ '<div style="float:left;vertical-align: middle;line-height: 25px;"><br><span style="margin-top: 15px;">' + jr.root[0].coupon.name + '</span><br><span >面额 : ' + jr.root[0].coupon.price + ' 元</span><br><span >到期 : ' + jr.root[0].coupon.expiredFormat + '</span></div>');							
@@ -432,7 +330,10 @@ function getPromotionBodyById(id){
 	
 	Ext.Ajax.request({
 		url : '../../QueryCoupon.do',
-		params : {promotionId : id, dataSource : 'status'},
+		params : {
+			dataSource : 'status',
+			promotionId : promotionId 
+		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.other){
@@ -447,47 +348,228 @@ function getPromotionBodyById(id){
 	});	
 }
 
-//function fnPublishPromotion(){
-//	var sn = Ext.ux.getSelNode(promotionTree);
-//	Ext.Ajax.request({
-//		url : '../../OperatePromotion.do',
-//		params : {promotionId : sn.attributes.id, dataSource : 'publish'},
-//		success : function(res, opt){
-//			var jr = Ext.decode(res.responseText);
-//			if(jr.success){
-//				Ext.example.msg(jr.title, jr.msg);
-//				promotionTree.getRootNode().reload();
-//			}else{
-//				Ext.ux.showMsg(jr);
-//			}
-//		},
-//		failure : function(res, opt){
-//			Ext.ux.showMsg(Ext.decode(res.responseText));
-//		}
-//	});
-//}
+//发布活动
+function fnPublishPromotion(){
+	var node = Ext.ux.getSelNode(promotionTree);
+	if (!node || node.attributes.id == -1) {
+		Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
+		
+	}else{
 
-//function fnCancelPublishPromotion(){
-//	var sn = Ext.ux.getSelNode(promotionTree);
-//	Ext.Ajax.request({
-//		url : '../../OperatePromotion.do',
-//		params : {promotionId : sn.attributes.id, dataSource : 'cancelPublish'},
-//		success : function(res, opt){
-//			var jr = Ext.decode(res.responseText);
-//			if(jr.success){
-//				Ext.example.msg(jr.title, jr.msg);
-//				promotionTree.getRootNode().reload();
-//			}else{
-//				Ext.ux.showMsg(jr);
-//			}
-//		},
-//		failure : function(res, opt){
-//			Ext.ux.showMsg(Ext.decode(res.responseText));
-//		}
-//	});
-//}
+		var promotionId = node.attributes.id;
+		var promotionToPublish = null;
+		var publishPromotionWnd = null;
+		//活动发布Window
+		publishPromotionWnd = new Ext.Window({
+			title : '发布优惠活动',
+			width : 400,
+			closeAction : 'hide',
+			xtype : 'panel',
+			layout : 'column',
+			frame : true,
+			modal : true,
+			items : [
+//			         {
+//				columnWidth : 1,
+//				style :'margin-top:5px;',
+//				border : false
+//			},
+			{
+				columnWidth : 0.2,
+				xtype : 'label',
+				text : '发布对象:'
+			},{
+				columnWidth : 0.3,
+				id : 'comboFilter4PromotionPublish',
+				xtype : 'combo',
+				readOnly : false,
+				forceSelection : true,
+				width : 80,
+				store : new Ext.data.JsonStore({
+					root : 'root',
+					fields : ['id', 'name']
+				}),
+				valueField : 'id',
+				displayField : 'name',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+			},
+//			{
+//				columnWidth : 0.2,
+//				xtype : 'label',
+//				text : '&nbsp;&nbsp;&nbsp;&nbsp;结束时间:'
+//			},
+			{
+				columnWidth : 0.2,
+				xtype : 'label',
+				html : '&nbsp;&nbsp;&nbsp;&nbsp;结束时间:'
+			},{
+				columWidth : 0.3,
+				id : 'dateField4PromotionPublish',
+				xtype : 'datefield',
+				fieldLabel : '&nbsp;&nbsp;&nbsp;结束日期',
+				format : 'Y-m-d',
+				readOnly : false,
+				allowBlank : false,
+				//minValue : new Date(),
+				blankText : '日期不能为空.',
+				listeners : {
+					invalid : function(thiz){
+						thiz.clearInvalid();
+					}
+				}					
+			},{
+				columnWidth : 1,
+				style :'margin-bottom:5px;',
+				border : false
+			}],
+			bbar : ['->',{
+				text : '发布',
+				id : 'btnPublish',
+				iconCls : 'btn_save',
+				handler : function(){
+					var params = {
+						dataSource : 'update',
+						id : node.attributes.id 
+					};
 
-function fnDeletePromotionPromotion(){
+					var endDate = Ext.getCmp('dateField4PromotionPublish').getValue();
+					if(endDate.length == 0){
+						Ext.example.msg('提示', '请设置活动结束日期');
+						return;
+					}else{
+						params.endDate = Ext.util.Format.date(endDate, 'Y-m-d 00:00:00');
+						params.body = promotionToPublish.body;
+						params.entire = buildPromotionHeader(promotionToPublish.title, endDate) + promotionToPublish.body;
+					}
+					
+					var oriented = Ext.getCmp('comboFilter4PromotionPublish').getValue();
+					if(oriented == -1){
+						//不发布给任何人
+						params.oriented = 3;
+						
+					}else if(oriented == 0){
+						//发布面向所有人
+						params.oriented = 1;
+						
+					}else if(oriented > 0){
+						//发布面向特定条件的会员
+						params.oriented = 2;
+						params.condId = oriented;
+					}
+					
+					var publishMask = new Ext.LoadMask(document.body, {
+						msg : '正在发布活动...'
+					});
+					publishMask.show();
+					Ext.Ajax.request({
+						url : '../../OperatePromotion.do?',
+						params : params,
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								//关闭窗体
+								publishPromotionWnd.destroy();
+								
+								//刷新活动树
+								promotionTree.getRootNode().reload(function(){
+									//reload后刷新发布活动的内容
+									for(var i in promotionTree.getRootNode().childNodes){
+										var statusNode = promotionTree.getRootNode().childNodes[i];
+										for(var j in statusNode.childNodes){
+											var promotionNode = statusNode.childNodes[j];
+											if(promotionNode.id == node.attributes.id){
+												promotionNode.select();
+												promotionNode.fireEvent('click', promotionNode);
+												break;
+											}
+										}
+									}
+								});
+								publishMask.hide();
+								Ext.example.msg('提示', '活动发布成功');
+							}else{
+								Ext.example.msg('异常', '活动发布失败');
+							}
+						},
+						failure : function(res, opt){
+							publishMask.hide();
+							Ext.example.msg('异常', '活动发布失败');
+						}
+					});
+
+				}
+			
+			}, {
+				text : '取消',
+				id : 'btnCancelPublish',
+				iconCls : 'btn_close',
+				handler : function(){
+					publishPromotionWnd.destroy();
+				}
+			}],
+			listeners : {
+				'show' : function(thiz){
+					//获取会员分析条件
+					Ext.Ajax.request({
+						url : '../../OperateMemberCond.do?',
+						params : {
+							dataSource : 'getByCond',
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								jr.root.unshift({id : 0, name : '全部'});
+								jr.root.unshift({id : -1, name : '不发布任何人'});
+								jr.root.unshift({id : -2, name : '不更改'});
+								Ext.getCmp('comboFilter4PromotionPublish').store.loadData(jr);
+								Ext.getCmp('comboFilter4PromotionPublish').setValue(-2);
+							}else{
+								Ext.example.msg('异常', '会员筛选条件数据加载失败');
+							}
+						},
+						failure : function(res, opt){
+							Ext.getCmp('comboFilter4PromotionPublish').store.loadData({root : [{id : -2, name : '不更改'}]});
+							Ext.getCmp('comboFilter4PromotionPublish').setValue(-1);
+						}
+					});
+					
+					//获取要发布的活动详情
+					Ext.Ajax.request({
+						url : '../../OperatePromotion.do?',
+						params : {
+							dataSource : 'getPromotion',
+							promotionId : promotionId,
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								promotionToPublish = jr.root[0];
+								Ext.getCmp('dateField4PromotionPublish').setValue(promotionToPublish.promotionEndDate);
+								thiz.setTitle(thiz.title + '---' + promotionToPublish.title);
+							}else{
+								Ext.example.msg('异常', jr.msg);
+							}
+						},
+						failure : function(res, opt){
+						}
+					});
+				}
+			},
+			keys : [{
+				key : Ext.EventObject.ENTER,
+				scope : this,
+				fn : function(){
+					Ext.getCmp("btnPublish").handler();
+				}
+			}]
+		}).show();
+	}	
+}
+
+function fnDeletePromotion(){
 	var node = Ext.ux.getSelNode(promotionTree);
 	if (!node || node.attributes.id == -1) {
 		Ext.example.msg('提示', '操作失败, 请选择一个活动再进行删除.');
@@ -520,118 +602,26 @@ function fnDeletePromotionPromotion(){
 	);
 }
 
-//function fnFinishPromotion(){
-//	var node = Ext.ux.getSelNode(promotionTree);
-//	if (!node || node.attributes.id == -1) {
-//		Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
-//		return;
-//	}	
-//	Ext.Msg.confirm(
-//		'提示',
-//		'是否结束活动:&nbsp;<font color="red">' + node.text + '</font>',
-//		function(e){
-//			if(e == 'yes'){
-//				Ext.Ajax.request({
-//					url : '../../OperatePromotion.do',
-//					params : {promotionId : node.attributes.id, dataSource : 'finish'},
-//					success : function(res, opt){
-//						var jr = Ext.decode(res.responseText);
-//						if(jr.success){
-//							Ext.example.msg(jr.title, jr.msg);
-//							promotionTree.getRootNode().reload();
-//						}else{
-//							Ext.ux.showMsg(jr);
-//						}
-//					},
-//					failure : function(res, opt){
-//						Ext.ux.showMsg(Ext.decode(res.responseText));
-//					}
-//				});
-//			}
-//		},
-//		this
-//	);
-//}
-
-function operatePromotionData(data){
-	var title = Ext.getCmp('active_title');
-	var beginDate = Ext.getCmp('active_beginDate');
-	var endDate = Ext.getCmp('active_endDate');
-//	var point = Ext.getCmp('active_point');
-	var couponName = Ext.getCmp('active_couponName');
-	var price = Ext.getCmp('active_price');
-	var expiredDate= Ext.getCmp('active_couponExpiredDate');
-	//var imgBox = Ext.getCmp('p_couponImg');
-	var editBody = Ext.getCmp('secondStep_edit');
-	
-	title.setValue(data.title);
-	beginDate.setValue(data.promotionBeginDate);
-	endDate.setValue(data.promotionEndDate);
-//	point.setValue(data.point);
-	editBody.setValue(data.body);
-	
-	
-//	if(promotionType >= 1){
-		Ext.getDom('radioSelfCoupon').checked = true; 
-		couponTypeId = data.coupon.id;
-		couponName.setValue(data.coupon.name);
-		price.setValue(data.coupon.price);
-		expiredDate.setValue(data.coupon.expiredFormat);
-		Ext.getCmp('couponTypeBox').setImg(data.coupon.ossImage?data.coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg');
-//	}
-	
-//	if(data.oriented == 1){
-//		Ext.getCmp('rdoSendAllMember').setValue(true);
-//	}else{
-//		Ext.getCmp('rdoSendSpecificMember').setValue(true);
-//	}
-	operatePromotTypeWin.oriented = data.oriented;
-	
-//	if(data.members.length > 0){
-//		var gs = Ext.getCmp('active_memberBasicGrid').getStore();
-//		gs.on('load', function(store, records, options){
-//			active_memberList = '';
-//			//选中全部会员时, 不用传
-//			if(operatePromotTypeWin.oriented != 1){
-//				for (var i = 0; i < records.length; i++) {
-//					if(i > 0){
-//						active_memberList += ",";
-//					}
-//					active_memberList += records[i].get('id');
-//				}				
-//			}
-//		});		
-//		gs.loadData({
-//			totalProperty : data.members.length,
-//			root : data.members.slice(0, 200)								
-//		});	
-//	}
-	
-
-}
-
 function fnUpdatePromotion(){
 	var node = Ext.ux.getSelNode(promotionTree);
 	if (!node || node.attributes.id == -1) {
 		Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
 		return;
 	}	
-	promotionType = node.attributes.pRule;
-	choosePromotionModel();
-	initCouponTypeWin({type : 'update'});
-	operatePromotTypeWin.pId = node.attributes.id;
+	
 	wx.lm.show();
 	Ext.Ajax.request({
 		url : '../../OperatePromotion.do',
-		params : { promotionId : node.attributes.id, dataSource : 'getPromotion' },
+		params : { 
+			promotionId : node.attributes.id, 
+			dataSource : 'getPromotion' 
+		},
 		success : function(res, opt){
 			wx.lm.hide();
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
 				Ext.get('divActiveInsert').show();
-				operatePromotionData(jr.root[0]);
-				operatePromotTypeWin.show();	
-				$("#wizard").steps("next");
+				showPromotionGuide({ type : 'update', promotion : jr.root[0] });
 			}
 		},
 		failure : function(res, opt){
@@ -642,10 +632,9 @@ function fnUpdatePromotion(){
 	
 }
 
-var promotionPreviewPanel, memberCountGrid, memberAnalysisBasicGrid;
+var memberCountGrid, memberAnalysisBasicGrid;
 var sendCouponWin, couponViewBillWin;
 var member_searchType = false;
-var bar = {treeId : 'promotionTree', option : [{name : '修改', fn : "fnUpdatePromotion()"}, {name : '删除', fn : "fnDeletePromotionPromotion()"}]};
 
 /**
  * 加载参与会员信息
@@ -663,7 +652,7 @@ function loadMemberAnalysis(pid){
 }
 
 Ext.onReady(function() {
-	initCouponTypeWin({type:'insert'});
+	
 	promotionTree = new Ext.tree.TreePanel({
 		title : '活动信息',
 		id : 'promotionTree',
@@ -680,28 +669,11 @@ Ext.onReady(function() {
 			}
 		}),
 		root : new Ext.tree.AsyncTreeNode({
-			expanded : true,
+			expanded : false,
 			text : '全部类型',
 	        leaf : false,
 	        border : true,
-	        promotionId : -1,
-			listeners : {
-				expand : function(thiz){
-					var rn = promotionTree.getRootNode().childNodes;
-					var node = null;
-					if(rn.length == 0){
-						promotionTree.getRootNode().getUI().hide();
-					}else{
-						node = rn[0].childNodes[0];
-					}
-	        		if(node != null){
-	        			node.select();
-	        			node.fireEvent('click', node);
-	        			node.fireEvent('dblclick', node);
-	        			
-					}	
-				}
-			}
+	        promotionId : -1
 		}),
 		tbar : [ 
 		    {
@@ -709,9 +681,7 @@ Ext.onReady(function() {
 				iconCls : 'btn_add',
 				handler : function(e){
 					Ext.get('divActiveInsert').show();
-					choosePromotionModel();
-					initCouponTypeWin({type : 'insert'});
-					operatePromotTypeWin.show();			
+					showPromotionGuide({ type : 'insert' });
 				}
 			},{
 				text : '刷新',
@@ -766,54 +736,24 @@ Ext.onReady(function() {
 	    		if(e.id < 0){
 	    			return;
 	    		}
-				getPromotionBodyById(e.attributes.id);
+				loadPromotion(e.attributes.id);
 				loadMemberAnalysis(e.attributes.id);
 			}
 		}
 	});
 	
-//	var coupon_dateCombo = new Ext.form.ComboBox({
-//		xtype : 'combo',
-//		id : 'coupon_statusCombo',
-//		forceSelection : true,
-//		width : 100,
-//		store : new Ext.data.SimpleStore({
-//			fields : ['value', 'text']
-//		}),
-//		valueField : 'value',
-//		displayField : 'text',
-//		typeAhead : true,
-//		mode : 'local',
-//		triggerAction : 'all',
-//		selectOnFocus : true,
-//		listeners : {
-//			render : function(thiz){
-//				thiz.store.loadData([[1,'已发放'], [2,'已使用'], [3,'已过期']]);					
-//			},
-//			select : function(thiz, record, index){
-//				Ext.getCmp('btnSearchCoupon').handler();
-//			}
-//		}
-//	});
-	
-	var memberanalysisBar = new Ext.Toolbar({
-		items : ['->',{
-			text : '导出',
-			iconCls : 'icon_tb_exoprt_excel',
-			handler : function(){
-				
-				var promotion = Ext.ux.getSelNode(promotionTree);
-				var url = '../../{0}?dataSource={1}&pId={2}&status={3}';
-				url = String.format(
-						url, 
-						'ExportHistoryStatisticsToExecl.do', 
-						'promotionMember', 
-						promotion.id,
-						Ext.getCmp('cmb_promotionMemberStatus').getValue()
-					);
-				window.location = url;
-			}
-		}]
+	//进入界面时，打开部门树，并展示第一条优惠活动的内容
+	promotionTree.getRootNode().expand(true, true, function(){
+		var node = null;
+		if(this.childNodes == 0){
+			promotionTree.getRootNode().getUI().hide();
+		}else{
+			node = this.childNodes[0].childNodes[0];
+		}
+		if(node != null){
+			node.select();
+			node.fireEvent('click', node);
+		}
 	});
 	
 	memberAnalysisBasicGrid = createGridPanel(
@@ -832,13 +772,31 @@ Ext.onReady(function() {
 		[['isPaging', true],['dataSource', 'byCondtion']],
 		15,
 		'',
-		memberanalysisBar
+		new Ext.Toolbar({
+			items : ['->',{
+				text : '导出',
+				iconCls : 'icon_tb_exoprt_excel',
+				handler : function(){
+					
+					var promotion = Ext.ux.getSelNode(promotionTree);
+					var url = '../../{0}?dataSource={1}&pId={2}&status={3}';
+					url = String.format(
+							url, 
+							'ExportHistoryStatisticsToExecl.do', 
+							'promotionMember', 
+							promotion.id,
+							Ext.getCmp('cmb_promotionMemberStatus').getValue()
+						);
+					window.location = url;
+				}
+			}]
+		})
 	);	
 	memberAnalysisBasicGrid.region = 'center';
 	memberAnalysisBasicGrid.loadMask = { msg : '数据加载中，请稍等...' };	
 	
 	
-	promotionPreviewPanel = new Ext.Panel({
+	var promotionPreviewPanel = new Ext.Panel({
 		layout : 'border',
 		region : 'center',
 		items : [new Ext.Panel({
@@ -952,7 +910,9 @@ Ext.onReady(function() {
 		height : parseInt(Ext.getDom('divActive').parentElement.style.height.replace(/px/g,'')),
 		items : [promotionTree, promotionPreviewPanel]
 	});
-	showFloatOption(bar);
+	showFloatOption({treeId : 'promotionTree', option : [{name : '发布', fn : "fnPublishPromotion()"},
+	                                                     {name : '修改', fn : "fnUpdatePromotion()"}, 
+	                                                     {name : '删除', fn : "fnDeletePromotion()"}]});
 	
 
 	
@@ -965,7 +925,7 @@ Ext.onReady(function() {
 	var coupon_uploadMask = new Ext.LoadMask(document.body, {
 		msg : '正在上传图片...'
 	});
-	p_box = new Ext.BoxComponent({
+	couponPicBox = new Ext.BoxComponent({
 		id : 'promotionPic',
 		xtype : 'box',
  	    columnWidth : 0.4,
@@ -1023,8 +983,8 @@ Ext.onReady(function() {
  	   				if(jr.success){
 // 	   					Ext.ux.showMsg(jr);
 	  	   				var ossImage = jr.root[0];
-	 	   				operatePromotTypeWin.image = ossImage.image;
-	 	   				operatePromotTypeWin.ossId = ossImage.imageId;	   				
+	 	   				promotionGuideWin.image = ossImage.image;
+	 	   				promotionGuideWin.ossId = ossImage.imageId;	   				
  	   				}else{
  	   					Ext.ux.showMsg(jr);
  	   					Ext.getCmp('couponTypeBox').setImg();
@@ -1042,7 +1002,7 @@ Ext.onReady(function() {
 	
 	var imgFile = Ext.ux.plugins.createImageFile({
 		id : 'couponTypeBox',
-		img : p_box,
+		img : couponPicBox,
 		width : 100,
 		height : 100,
 		callback : function(){
@@ -1064,8 +1024,8 @@ Ext.onReady(function() {
 	
 	    
 	
-	var p_edit = new Ext.form.HtmlEditor({
-		id : 'secondStep_edit',
+	var promotionEditor = new Ext.form.HtmlEditor({
+		id : 'guide_2nd_promotionEditor',
 		hideLabel : true,
 		width : 510,
 		//value : '<div style="margin: 10px; padding: 0px; font-family: Simsun; line-height: 22px; color: rgb(135, 206, 250); font-weight: bold;"><font size="5"><span class="15" style="line-height: 18.75pt; text-indent: 0pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;">一、会员充值赠</span><span class="15" style="line-height: 18.75pt; text-indent: 0pt; font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt;">送</span><span class="15" style="line-height: 18.75pt; text-indent: 0pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;">消费金额</span></font></div><div style="margin: 10px; padding: 0px; color: rgb(34, 34, 34); font-family: Simsun; line-height: 22px; word-wrap: break-word;"><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">1.充值2000元</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">100元消费额</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">2.</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">再送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">进口红酒一支</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;"><font size="5">（每人每月限送一次）</font></span><span style="font-size: 18pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></p><p class="MsoNormal" style="font-size: 16px; margin: 0px; padding: 0px;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdURya5Y1NpicnZv2iaJ9tTCgKPrvcJMc3yGTiaRN6ibiaFfUvWgibb3fRPKeD8xVllYgGeUib8ogoEb2WTFw/0?wxfmt=jpeg" data-ratio="0.6067193675889329" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdURya5Y1NpicnZv2iaJ9tTCgKPrvcJMc3yGTiaRN6ibiaFfUvWgibb3fRPKeD8xVllYgGeUib8ogoEb2WTFw/640?wxfmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">二、会员充值</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">积分</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">1.会员充值消费送积分（1元积1分）</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;"><font size="5">2.积分可以换菜式或礼品</font></span><span style="font-size: 18pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></p><br><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtSe3Tib7ytcBElwpRUxibArbcSjGG1TdeRQODz5BjHrCVQiaD9rpZeibUIQ/0?wx_fmt=jpeg" data-ratio="1.075098814229249" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtSe3Tib7ytcBElwpRUxibArbcSjGG1TdeRQODz5BjHrCVQiaD9rpZeibUIQ/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br style="margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtW2Wdn44F4f4SsjEsQuYdbibTGibSVYGbGInGydu8F5HuKGX7wIXtwsXw/0?wx_fmt=jpeg" data-ratio="0.6561264822134387" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtW2Wdn44F4f4SsjEsQuYdbibTGibSVYGbGInGydu8F5HuKGX7wIXtwsXw/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br style="margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtMvRJlA5g2PeQnleg4zXcQYzdSFAVbR9BlveqjavvBVVkiaicUeGKKYjQ/0?wx_fmt=jpeg" data-ratio="0.616600790513834" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtMvRJlA5g2PeQnleg4zXcQYzdSFAVbR9BlveqjavvBVVkiaicUeGKKYjQ/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br style="margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtDo2cKt17B2Ty9a7dTTGmnet6mzfZ4jaxJwSP4rD2bRv9ETiarSd1MzA/0?wx_fmt=jpeg" data-ratio="1.391304347826087" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtDo2cKt17B2Ty9a7dTTGmnet6mzfZ4jaxJwSP4rD2bRv9ETiarSd1MzA/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br><br><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">三、会员专享出品优惠</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="MsoNormal" style="margin: 0px; padding: 0px;"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold; background-color: rgb(255, 255, 255);">1.会员专享：点心出品</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold; background-color: rgb(255, 255, 255);">9.5折</span></font></p><span style="height: auto !important; width: auto !important;"><font size="5"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavt129Wib5Xo4Aj1AQbaQzpOUOlIdxyknFF4EYiaX73NKicB8St0nRvv6ZPg/0?wx_fmt=jpeg" data-ratio="0.6225296442687747" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavt129Wib5Xo4Aj1AQbaQzpOUOlIdxyknFF4EYiaX73NKicB8St0nRvv6ZPg/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></font></span><br style="margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtNkxvsdby99gU3DG2sq4qeQ5fQrlTH935JRyzwMyATSic0QFZCuN2shQ/0?wx_fmt=png" data-ratio="0.541501976284585" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtNkxvsdby99gU3DG2sq4qeQ5fQrlTH935JRyzwMyATSic0QFZCuN2shQ/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br><br><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">2.会员专享：菜式出品</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">9.5折</span></font><span style="font-size: 18pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></p><br><p style="font-size: 16px; margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtPTafOpPpbOKNcDLEq9CdbYfaGjWupHltkQP3hOZY6eceRmicAGhnInA/0?wx_fmt=png" data-ratio="0.6737967914438503" data-w="374" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtPTafOpPpbOKNcDLEq9CdbYfaGjWupHltkQP3hOZY6eceRmicAGhnInA/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></p><p style="font-size: 16px; margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavt01oxpuyAHAJBLNia8Z6joH35TIdZHAWHBrFxgDthp6FuE5ia0tXYKa0w/0?wx_fmt=png" data-ratio="0.614314115308151" data-w="503" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavt01oxpuyAHAJBLNia8Z6joH35TIdZHAWHBrFxgDthp6FuE5ia0tXYKa0w/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></p><br><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">四、会员生日到店消费</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">礼包</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">1.到店消费满500元</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">:红酒一瓶价值128元;</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><font size="5">&nbsp;</font></span></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">2.消费满1000元</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">：红酒一瓶价值188元</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">生日蛋糕一个。</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><font size="5">&nbsp;</font></span></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">3.要求:提前一天订餐</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><br><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtL2Z119LtzdHN5JSSnQR5q4VAxDvF0DzPLBtGIo932KfzTOI4OIIrHg/0?wx_fmt=jpeg" data-ratio="0.8043478260869565" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtL2Z119LtzdHN5JSSnQR5q4VAxDvF0DzPLBtGIo932KfzTOI4OIIrHg/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br><br><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">五、会员专享茶位优惠</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">1.会员大厅茗茶免费，非会员2元/位</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">2.功夫茶会员4元/位，非会员6元/位</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><br><p style="margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtEfJicPAtHiay0eU1mNUJf9bNLDdheiauSIZnzPzALjx6cmhTKasVibPIZA/0?wx_fmt=png" data-ratio="0.7312252964426877" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtEfJicPAtHiay0eU1mNUJf9bNLDdheiauSIZnzPzALjx6cmhTKasVibPIZA/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><font size="5"><br>六、会员专享细则说明</font></span></span></p><p style="margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><font size="5">1.要求充值消费，充值以100元为单位</font></span></span></p><p style="margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><font size="5"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;">2.卡内的消费金额，可用于易德福（明苑）</span></span></font><span style="font-size: x-large;"> 酒家的消费结算。(即充即用) </span></p><p style="margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><font size="5">3.如有增加或更改以易德福(明苑) 酒家最新   公布为准。</font></span></span></p><br><b><font size="5">订餐（咨询）电话：0760-88777888<br></font></b><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>',
@@ -1077,13 +1037,12 @@ Ext.onReady(function() {
         enableLinks: false,
         enableLists: false,
         enableSourceEdit: true,
-//        fontFamilies: ["宋体", "隶书", "黑体"],
         plugins : [new Ext.ux.plugins.HEInsertImage({
         	url : '../../OperateImage.do?dataSource=upload&ossType=1'
         })]
 	});
 	var btnPreview = new Ext.Button({
-		id : 'btnSecondStepEastBody',
+		id : 'guide_2nd_previewBtn',
 		text : '预览',
 		listeners : {
 			render : function(thiz){
@@ -1091,7 +1050,7 @@ Ext.onReady(function() {
 			}
 		},
 		handler : function(){
-			secendStepCenter.body.update(buildPreviewHead() + p_edit.getValue());
+			secendStepCenter.body.update(buildPromotionHeader(Ext.getCmp('guide_2nd_title').getValue()) + promotionEditor.getValue());
 		}
 	});
 	var btnClear = new Ext.Button({
@@ -1102,15 +1061,15 @@ Ext.onReady(function() {
 			}
 		},
 		handler : function(){
-			p_edit.setValue();
-			secendStepCenter.body.update(p_edit.getValue());
+			promotionEditor.setValue();
+			secendStepCenter.body.update(promotionEditor.getValue());
 		}
 	});
 	var secendStepWest = new Ext.form.FormPanel({
 		width : 510,
 		height : 350,
 		title : '编辑活动内容:',
-		items : [p_edit],
+		items : [promotionEditor],
 		style : 'marginLeft:40px;',
 		buttonAlign : 'center',
 		buttons : [btnPreview, btnClear]
@@ -1125,10 +1084,8 @@ Ext.onReady(function() {
 		html : '&nbsp;'
 	});	
 	
-	
-	
 	new Ext.Panel({
-		id : 'active_secendStepPanel',
+		id : 'guide_2nd_panel',
 		renderTo :'active_secendStep',
 		width :1015,
 		border : false,
@@ -1146,7 +1103,7 @@ Ext.onReady(function() {
 			items : [{
 				labelWidth : 180,
 				items : [{
-					id : 'hide_activeOccupy',
+					id : 'guide_2nd_occupy',
 					xtype : 'label',
 					style : 'color:#DFE8F6',
 					html : '单次消费积分满/累计积分满-有优惠劵'
@@ -1154,7 +1111,7 @@ Ext.onReady(function() {
 			},{
 				columnWidth : .3,
 				items : [{
-					id : 'active_title',
+					id : 'guide_2nd_title',
 					xtype : 'textfield',
 					width : 200,
 					fieldLabel : '&nbsp;&nbsp;&nbsp;活动标题',
@@ -1162,55 +1119,57 @@ Ext.onReady(function() {
 					allowBlank : false,
 					listeners : {
 						blur : function(){
-							Ext.getCmp('btnSecondStepEastBody').handler();
+							Ext.getCmp('guide_2nd_previewBtn').handler();
 						}
 					}
 				}]
-			}, {
-				items : [{
-					id : 'active_beginDate',
-					xtype : 'datefield',
-					width : 90,
-					fieldLabel : '&nbsp;&nbsp;&nbsp;活动日期',
-					format : 'Y-m-d',
-					readOnly : false,
-					allowBlank : false,
-					//minValue : new Date(),
-					blankText : '日期不能为空.',
-					listeners : {
-						invalid : function(thiz){
-							thiz.clearInvalid();
-						},
-						blur : function(){
-							Ext.getCmp('btnSecondStepEastBody').handler();
-						}						
-					}					
-				}]				
-			}, {
-				items : [{
-					xtype : 'label',
-					style : 'margin-top:4px;',
-					html : '至&nbsp;&nbsp;'
-				}]
-			}, {
-				layout : 'fit',
-				items : [{
-					id : 'active_endDate',
-					xtype : 'datefield',
-					width : 90,
-					fieldLabel : '',
-					format : 'Y-m-d',
-					readOnly : false,
-					allowBlank : false,
-					//minValue : new Date(),
-					blankText : '日期不能为空.',
-					listeners : {
-						blur : function(){
-							Ext.getCmp('btnSecondStepEastBody').handler();
-						}
-					}				
-				}]				
-			}]
+			} 
+//			,{
+//				items : [{
+//					id : 'active_beginDate',
+//					xtype : 'datefield',
+//					width : 90,
+//					fieldLabel : '&nbsp;&nbsp;&nbsp;活动日期',
+//					format : 'Y-m-d',
+//					readOnly : false,
+//					allowBlank : false,
+//					//minValue : new Date(),
+//					blankText : '日期不能为空.',
+//					listeners : {
+//						invalid : function(thiz){
+//							thiz.clearInvalid();
+//						},
+//						blur : function(){
+//							Ext.getCmp('guide_2nd_previewBtn').handler();
+//						}						
+//					}					
+//				}]				
+//			}, {
+//				items : [{
+//					xtype : 'label',
+//					style : 'margin-top:4px;',
+//					html : '至&nbsp;&nbsp;'
+//				}]
+//			}, {
+//				layout : 'fit',
+//				items : [{
+//					id : 'active_endDate',
+//					xtype : 'datefield',
+//					width : 90,
+//					fieldLabel : '',
+//					format : 'Y-m-d',
+//					readOnly : false,
+//					allowBlank : false,
+//					//minValue : new Date(),
+//					blankText : '日期不能为空.',
+//					listeners : {
+//						blur : function(){
+//							Ext.getCmp('guide_2nd_previewBtn').handler();
+//						}
+//					}				
+//				}]				
+//			}
+			]
 		}]
 	});
 	new Ext.Panel({
@@ -1236,7 +1195,7 @@ Ext.onReady(function() {
 //					columnWidth : .33
 				},
 				items : [{
-					id : 'active_secendStep2SelectCoupon',
+					id : 'guide_2nd_CouponOption',
 					items : [{
 						id : 'westPanel',
 						xtype : 'panel',
@@ -1317,7 +1276,7 @@ Ext.onReady(function() {
 					}]					
 				
 			},{
-				id : 'active_secendStep2CouponDetail',
+				id : 'guide_2nd_couponDetail',
 				items : [{
 					id : 'centerPanel',
 					xtype : 'panel',
@@ -1331,7 +1290,7 @@ Ext.onReady(function() {
 					},
 					items : [{
 						items : [{
-							id : 'active_couponName',
+							id : 'guide_2nd_couponName',
 							xtype : 'textfield',
 							fieldLabel : '优惠劵名称',
 							value : '10元优惠劵',
@@ -1339,7 +1298,7 @@ Ext.onReady(function() {
 						}]
 					},{
 						items : [{
-							id : 'active_price',
+							id : 'guide_2nd_couponPrice',
 							xtype : 'textfield',
 							value : 10,
 							fieldLabel : '&nbsp;&nbsp;&nbsp;面额',
@@ -1347,7 +1306,7 @@ Ext.onReady(function() {
 						}]
 					}, {
 						items : [{
-							id : 'active_couponExpiredDate',
+							id : 'guide_2nd_couponExpired',
 							xtype : 'datefield',
 							width : 130,
 							fieldLabel : '&nbsp;&nbsp;&nbsp;有效期至',
@@ -1355,6 +1314,7 @@ Ext.onReady(function() {
 							readOnly : false,
 							allowBlank : false,
 							minValue : new Date(),
+							value : new Date(),
 							blankText : '日期不能为空.',
 							listeners : {
 								invalid : function(thiz){
@@ -1373,7 +1333,7 @@ Ext.onReady(function() {
 					layout : 'column',
 					style : 'marginLeft:18px;',
 					frame : true,
-					items : [p_box, form,{
+					items : [couponPicBox, form,{
 							columnWidth : 0.6,
 							items : [{
 								xtype : 'label',
@@ -1398,419 +1358,10 @@ Ext.onReady(function() {
 		}]
 	});	
 	
-//	var active_member_beginDate = new Ext.form.DateField({
-//		xtype : 'datefield',	
-//		id : 'active_dateSearchDateBegin',
-//		format : 'Y-m-d',
-//		width : 100,
-//		maxValue : new Date(),
-//		readOnly : false
-//	});
-//	var active_member_endDate = new Ext.form.DateField({
-//		xtype : 'datefield',
-//		id : 'active_dateSearchDateEnd',
-//		format : 'Y-m-d',
-//		width : 100,
-//		maxValue : new Date(),
-//		readOnly : false
-//	});
-//	var active_member_dateCombo = Ext.ux.createDateCombo({
-//		id : 'active_dateSearchDateCombo',
-//		width : 75,
-//		data : [[3, '近一个月'], [4, '近三个月'], [9, '近半年'], [10, '无限期']],
-//		beginDate : active_member_beginDate,
-//		endDate : active_member_endDate,
-//		callback : function(){
-///*			if(member_searchType){
-//				Ext.getCmp('active_btnSearchMember').handler();
-//			}*/
-//		}
-//	});	
-//	var active_memberBasicGridExcavateMemberTbar = new Ext.Toolbar({
-//		hidden : true,
-//		height : 28,
-//		items : [
-//			{
-//				text : '活跃会员',
-//				iconCls : 'btn_add',
-//				handler : function(e){
-////					Ext.getCmp('active_member_btnHeightSearch').handler();
-//					var gs = memberAnalysisBasicGrid.getStore();
-//					Ext.Ajax.request({
-//						url : '../../QueryMember.do',
-//						params : {dataSource : 'active'},
-//						success : function(res, opt){
-//							var jr = Ext.decode(res.responseText);
-//							gs.loadData({
-//								totalProperty : jr.root.length,
-//								root : jr.root.slice(0, 200)								
-//							});
-//							
-//							Ext.getCmp('active_dateSearchDateBegin').setValue(jr.other.beginDate.substring(0,10));
-//							Ext.getCmp('active_dateSearchDateEnd').setValue(jr.other.endDate.substring(0,10));
-//							Ext.getCmp('active_dateSearchDateCombo').setValue(jr.other.range);
-//							Ext.getCmp('active_textTotalMemberCostCount').setValue(jr.other.minConsumeAmount);
-//							Ext.getCmp('active_memberAmountEqual').setValue(1);
-//							
-//							gs.baseParams['consumptionMinAmount'] = jr.other.minConsumeAmount;
-//							gs.baseParams['consumptionMaxAmount'] = '';
-//							gs.baseParams['beginDate'] = jr.other.beginDate;
-//							gs.baseParams['endDate'] = jr.other.endDate;
-//						},
-//						failure : function(res, opt){
-//						}
-//					});
-//				}
-//			}, {
-//				text : '沉睡会员',
-//				iconCls : 'btn_edit',
-//				handler : function(e){
-////					Ext.getCmp('active_member_btnHeightSearch').handler();
-//					var gs = memberAnalysisBasicGrid.getStore();
-//					Ext.Ajax.request({
-//						url : '../../QueryMember.do',
-//						params : {dataSource : 'idle'},
-//						success : function(res, opt){
-//							var jr = Ext.decode(res.responseText);
-//							gs.loadData({
-//								totalProperty : jr.root.length,
-//								root : jr.root.slice(0, 200)								
-//							});
-//							
-//							Ext.getCmp('active_dateSearchDateBegin').setValue(jr.other.beginDate.substring(0,10));
-//							Ext.getCmp('active_dateSearchDateEnd').setValue(jr.other.endDate.substring(0,10));
-//							Ext.getCmp('active_dateSearchDateCombo').setValue(jr.other.range);
-//							Ext.getCmp('active_textTotalMemberCostCount').setValue(jr.other.maxConsumeAmount);
-//							Ext.getCmp('active_memberAmountEqual').setValue(2);
-//							
-//							gs.baseParams['consumptionMaxAmount'] = jr.other.maxConsumeAmount;
-//							gs.baseParams['consumptionMinAmount'] = '';
-//							gs.baseParams['beginDate'] = jr.other.beginDate;
-//							gs.baseParams['endDate'] = jr.other.endDate;
-//						},
-//						failure : function(res, opt){
-//						}
-//					});
-//				}
-//			},
-//			{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;'},
-//			
-//			{xtype : 'tbtext', text : '日期:&nbsp;&nbsp;'},
-//			active_member_dateCombo,
-//			active_member_beginDate,
-//			{
-//				xtype : 'label',
-//				hidden : false,
-//				html : ' 至&nbsp;&nbsp;'
-//			}, 
-//			active_member_endDate,'->',	 
-//			{
-//				text : '搜索',
-//				id : 'active_btnSearchMember',
-//				iconCls : 'btn_search',
-//				handler : function(){
-//					
-//					var memberType = Ext.getCmp('active_memberTypeCombo');
-//					
-//					var gs = memberAnalysisBasicGrid.getStore();
-//					
-//					gs.baseParams['memberType'] = memberType.getValue();
-//					
-//					if(Ext.getCmp('active_memberCostEqual').getValue() == 1){
-//						gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();
-//						gs.baseParams['MaxTotalMemberCost'] = '';
-//						
-//					}else if(Ext.getCmp('active_memberCostEqual').getValue() == 2){
-//						gs.baseParams['MinTotalMemberCost'] = '';
-//						gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();				
-//					}else{
-//						gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();
-//						gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();				
-//					}
-//					
-//					if(Ext.getCmp('active_memberAmountEqual').getValue() == 1){
-//						gs.baseParams['consumptionMinAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();
-//						gs.baseParams['consumptionMaxAmount'] = '';				
-//					}else if(Ext.getCmp('active_memberAmountEqual').getValue() == 2){
-//						gs.baseParams['consumptionMinAmount'] = '';
-//						gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();					
-//					}else{
-//						gs.baseParams['consumptionMinAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();
-//						gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();					
-//					}
-//					
-//					if(member_searchType){
-//						gs.baseParams['beginDate'] = Ext.getCmp('active_dateSearchDateBegin').getValue().format('Y-m-d 00:00:00');
-//						gs.baseParams['endDate'] = Ext.getCmp('active_dateSearchDateEnd').getValue().format('Y-m-d 23:59:59');					
-//					}else{
-//						gs.baseParams['beginDate'] = '';
-//						gs.baseParams['endDate'] = '';					
-//					}
-//
-//					gs.load({
-//						params : {
-//							start : 0,
-//							limit : 200
-//						}
-//					});
-//				}
-//			}]
-//		
-//	});
-//	var active_memberBasicGridExcavateMemberTbar2 = new Ext.Toolbar({
-//		hidden : true,
-//		height : 28,
-//		items : [{xtype : 'tbtext', text : '消费金额:'},
-//		{
-//			id : 'active_memberCostEqual',
-//			xtype : 'combo',
-//			readOnly : false,
-//			forceSelection : true,
-//			value : 3,
-//			width : 80,
-//			store : new Ext.data.SimpleStore({
-//				fields : ['value', 'text'],
-//				data : [[3, '等于'], [1, '大于等于'], [2, '小于等于']]
-//			}),
-//			valueField : 'value',
-//			displayField : 'text',
-//			typeAhead : true,
-//			mode : 'local',
-//			triggerAction : 'all',
-//			selectOnFocus : true
-//		},	
-//		{
-//			xtype : 'numberfield',
-//			id : 'active_textTotalMemberCost',
-//			width : 60
-//		},
-//		{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},	
-//		{xtype : 'tbtext', text : '消费次数:'},
-//		{
-//			id : 'active_memberAmountEqual',
-//			xtype : 'combo',
-//			readOnly : false,
-//			forceSelection : true,
-//			value : 3,
-//			width : 80,
-//			store : new Ext.data.SimpleStore({
-//				fields : ['value', 'text'],
-//				data : [[3, '等于'], [1, '大于等于'], [2, '小于等于']]
-//			}),
-//			valueField : 'value',
-//			displayField : 'text',
-//			typeAhead : true,
-//			mode : 'local',
-//			triggerAction : 'all',
-//			selectOnFocus : true
-//		},			
-//		{
-//			xtype : 'numberfield',
-//			id : 'active_textTotalMemberCostCount',
-//			width : 50
-//		},
-//		{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},
-//		{xtype : 'tbtext', text : '会员类型:'},
-//		{
-//			id : 'active_memberTypeCombo',
-//			xtype : 'combo',
-//			readOnly : false,
-//			forceSelection : true,
-//			value : -1,
-//			width : 100,
-//			store : new Ext.data.SimpleStore({
-//				fields : ['id', 'name']
-//			}),
-//			valueField : 'id',
-//			displayField : 'name',
-//			listeners : {
-//				render : function(thiz){
-//					var data = [[-1,'全部']];
-//					Ext.Ajax.request({
-//						url : '../../QueryMemberType.do',
-//						params : {dataSource : 'normal'},
-//						success : function(res, opt){
-//							var jr = Ext.decode(res.responseText);
-//							for(var i = 0; i < jr.root.length; i++){
-//								data.push([jr.root[i]['id'], jr.root[i]['name']]);
-//							}
-//							thiz.store.loadData(data);
-//							thiz.setValue(-1);
-//						},
-//						failure : function(res, opt){
-//							thiz.store.loadData(data);
-//							thiz.setValue(-1);
-//						}
-//					});
-//				},
-//				select : function(){
-//					Ext.getCmp('active_member_btnHeightSearch').handler();
-//					Ext.getCmp('active_btnSearchMember').handler();
-//				}
-//			},
-//			typeAhead : true,
-//			mode : 'local',
-//			triggerAction : 'all',
-//			selectOnFocus : true
-//		}]
-//	});
-	
-//	var active_memberBasicGridTbar = new Ext.Toolbar({
-//		items : [{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;'},
-//			{
-//				xtype : 'radio',
-//				id : 'rdoSendAllMember',
-//				name : 'rdoFormatType',
-//				inputValue : 1,
-//				boxLabel : '全部会员',
-//				checked : true,
-//				listeners : {
-//					render : function(e){
-//						Ext.getDom('rdoSendAllMember').onclick = function(){
-//							e.setValue(true);
-//							operatePromotTypeWin.oriented = e.inputValue;
-//							Ext.getCmp('active_member_btnCommonSearch').handler();
-//						};
-//					}
-//				}
-//			},
-//			{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},
-//			{
-//				xtype : 'radio',
-//				id : 'rdoSendSpecificMember',
-//				name : 'rdoFormatType',
-//				inputValue : 2,
-//				boxLabel : '部分会员',
-//				listeners : {
-//					render : function(e){
-//						Ext.getDom('rdoSendSpecificMember').onclick = function(){
-//							e.setValue(true);
-//							Ext.getCmp('active_member_btnHeightSearch').handler();
-//							operatePromotTypeWin.oriented = e.inputValue;
-//						};
-//					}
-//				}
-//			},
-//			{xtype : 'tbtext', text : '&nbsp;&nbsp;'}, '->', {
-//			text : '高级条件↓',
-//	    	id : 'active_member_btnHeightSearch',
-//	    	handler : function(){
-//	    		
-//				Ext.getCmp('active_member_btnCommonSearch').show();
-//				
-//	    		Ext.getCmp('active_member_btnHeightSearch').hide();
-//	    		
-//	    		Ext.getCmp('rdoSendSpecificMember').setValue(true);
-//	    		operatePromotTypeWin.oriented = 2;
-//	    		
-//	    		if(!member_searchType){
-//	    			memberAnalysisBasicGrid.setHeight(memberAnalysisBasicGrid.getHeight()-56);
-//	    		}
-//	    		member_searchType = true;
-//	    		
-//	    		active_memberBasicGridExcavateMemberTbar.show();
-//	    		active_memberBasicGridExcavateMemberTbar2.show();
-//	    		
-//	    		memberAnalysisBasicGrid.syncSize(); //强制计算高度
-//	    		memberAnalysisBasicGrid.doLayout();//重新布局 	
-//	    		
-////	    		Ext.getCmp('active_memberBasicGrid').getStore().removeAll();
-//			}
-//		}, {
-//			text : '高级条件↑',
-//	    	id : 'active_member_btnCommonSearch',
-//			hidden : true,
-//	    	handler : function(e){
-//	    		member_searchType = false;
-//				Ext.getCmp('active_member_btnHeightSearch').show();
-//	    		Ext.getCmp('active_member_btnCommonSearch').hide();
-//	    		
-//	    		Ext.getCmp('rdoSendAllMember').setValue(true);
-//	    		operatePromotTypeWin.oriented = 1;
-//	    		
-//	    		active_memberBasicGridExcavateMemberTbar.hide();
-//	    		active_memberBasicGridExcavateMemberTbar2.hide();
-//	    		
-//	    		memberAnalysisBasicGrid.setHeight(memberAnalysisBasicGrid.getHeight()+56);
-//	    		memberAnalysisBasicGrid.syncSize(); //强制计算高度
-//	    		memberAnalysisBasicGrid.doLayout();//重新布局 	
-//	    		
-//	    		active_member_dateCombo.setValue(4);
-//	    		active_member_dateCombo.fireEvent('select', active_member_dateCombo,{data : {value : 4}},4);
-//	    		
-//	    		Ext.getCmp('active_memberTypeCombo').setValue(-1);
-//	    		Ext.getCmp('active_textTotalMemberCost').setValue();
-//	    		Ext.getCmp('active_textTotalMemberCostCount').setValue();
-//	    		Ext.getCmp('active_memberAmountEqual').setValue(3);
-//	    		Ext.getCmp('active_memberCostEqual').setValue(3);
-//	    		
-//	    		if(!e || typeof e.noSearch == 'undefined'){
-//	    			Ext.getCmp('active_btnSearchMember').handler();
-//	    		}
-//	    		
-//			}
-//		},{xtype : 'tbtext', text : '&nbsp;&nbsp;'}]
-//	});	
-//	memberAnalysisBasicGrid = createGridPanel(
-//		'active_memberBasicGrid',
-//		'选择参与活动的会员',
-//		480,
-//		640,
-//		'../../QueryMember.do',
-//		[
-//			[true, false, false, true],
-//			['名称', 'name'],
-//			['类型', 'memberType.name'],
-//			['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
-//			['当前积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
-//			['账户余额', 'totalBalance',180,'right', 'Ext.ux.txtFormat.gridDou']
-//		],
-//		MemberBasicRecord.getKeys(),
-//		[['isPaging', true], ['restaurantID', 40],  ['dataSource', 'normal']],
-//		200,
-//		'',
-//		[active_memberBasicGridTbar, active_memberBasicGridExcavateMemberTbar,active_memberBasicGridExcavateMemberTbar2]
-//	);	
-//	memberAnalysisBasicGrid.region = 'center';
-//	
-//	memberAnalysisBasicGrid.store.on('load', function(store, records, options){
-//		active_memberList = '';
-//		
-//		for (var i = 0; i < records.length; i++) {
-//			if(i > 0){
-//				active_memberList += ",";
-//			}
-//			active_memberList += records[i].get('id');
-//		}
-//	});		
-
-//	var threeStepEast = new Ext.Panel({
-//		id : 'threeStepEastBody',
-//		region : 'east',
-//		width : 350,
-//		height : 565,
-//		style : 'marginLeft:650px;background-color: #fff; border: 1px solid #ccc; padding: 5px 5px 5px 5px;overflow-y: visible;',
-//		bodyStyle : 'word-wrap:break-word;',
-//		html : ''
-//	});		
-	
-//	new Ext.Panel({
-//		renderTo :'active_threeStep',
-//		width :1015,
-//		border : false,
-//		items : [{
-//			layout : 'border',
-//			frame : true,
-//			border : false,
-//			height : 570,
-//			items : [memberAnalysisBasicGrid, threeStepEast]
-//		}]
-//	});	
-	
 	//steps.js与Ext混用时的样式修正	
-	$('#active_beginDate').parent().width($('#active_beginDate').width() + $('#active_beginDate').next().width()+20);
-	$('#active_endDate').parent().width($('#active_endDate').width() + $('#active_endDate').next().width()+20);
-	$('#active_couponExpiredDate').parent().width($('#active_couponExpiredDate').width() + $('#active_couponExpiredDate').next().width()+20);
+	//$('#active_beginDate').parent().width($('#active_beginDate').width() + $('#active_beginDate').next().width()+20);
+	//$('#active_endDate').parent().width($('#active_endDate').width() + $('#active_endDate').next().width()+20);
+	$('#guide_2nd_couponExpired').parent().width($('#guide_2nd_couponExpired').width() + $('#guide_2nd_couponExpired').next().width()+20);
 	
 	$('#active_dateSearchDateBegin').parent().width($('#active_dateSearchDateBegin').width() + $('#active_dateSearchDateBegin').next().width()+20);
 	$('#active_dateSearchDateEnd').parent().width($('#active_dateSearchDateEnd').width() + $('#active_dateSearchDateEnd').next().width()+20);

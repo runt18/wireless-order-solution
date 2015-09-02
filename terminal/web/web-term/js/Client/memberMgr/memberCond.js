@@ -18,7 +18,7 @@ function updateMemberCond(){
 	Ext.Ajax.request({
 		url : '../../OperateMemberCond.do',
 		params : {
-			dataSource : "queryById",
+			dataSource : "getById",
 			id : sn.id
 		},
 		success : function(response, options) {
@@ -390,17 +390,17 @@ function memberCondTreeInit(){
 	    		Ext.Ajax.request({
 	    			url : '../../OperateMemberCond.do',
 	    			params : {
-	    				dataSource : "queryById",
+	    				dataSource : "getById",
 	    				id : e.id
 	    			},
 	    			success : function(response, options) {
 	    				var jr = Ext.util.JSON.decode(response.responseText);
 	    				if(jr.success){
 	    		    		Ext.getCmp('comboMemberType4CondBar').setValue(jr.root[0].memberType);
-	    		    		Ext.getCmp('minCost4CondBar').setValue(jr.root[0].minConsumeMoney > 0?jr.root[0].minConsumeMoney:'');
-	    		    		Ext.getCmp('maxCost4CondBar').setValue(jr.root[0].maxConsumeMoney > 0?jr.root[0].maxConsumeMoney:'');
-	    		    		Ext.getCmp('minAmount4CondBar').setValue(jr.root[0].minConsumeAmount > 0?jr.root[0].minConsumeAmount:'');
-	    		    		Ext.getCmp('maxAmount4CondBar').setValue(jr.root[0].maxConsumeAmount > 0?jr.root[0].maxConsumeAmount:'');
+	    		    		Ext.getCmp('minCost4CondBar').setValue(jr.root[0].minConsumeMoney > 0 ? jr.root[0].minConsumeMoney:'');
+	    		    		Ext.getCmp('maxCost4CondBar').setValue(jr.root[0].maxConsumeMoney > 0 ? jr.root[0].maxConsumeMoney:'');
+	    		    		Ext.getCmp('minAmount4CondBar').setValue(jr.root[0].minConsumeAmount > 0 ? jr.root[0].minConsumeAmount:'');
+	    		    		Ext.getCmp('maxAmount4CondBar').setValue(jr.root[0].maxConsumeAmount > 0 ? jr.root[0].maxConsumeAmount:'');
 	    		    		Ext.getCmp('minBalance4CondBar').setValue(jr.root[0].minBalance > 0 ? jr.root[0].minBalance : '');
 	    		    		Ext.getCmp('maxBalance4CondBar').setValue(jr.root[0].maxBalance > 0 ? jr.root[0].maxBalance : '');
 	    		    		Ext.getCmp('dateSearchDateBegin').setValue(jr.root[0].beginDate);
