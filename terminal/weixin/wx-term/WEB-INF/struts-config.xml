@@ -98,7 +98,11 @@
 		<action path="/WXOperateBook"
 			type="com.wireless.Actions.weixin.operate.WXOperateBookAction"
 			scope="request" parameter="dataSource">
-		</action>				
+		</action>		
+		<action path="/WXQueryBook"
+			type="com.wireless.Actions.weixin.query.WXQueryBookAction"
+			scope="request" parameter="dataSource">
+		</action>			
 		<action path="/WXOperateMenu"
 			type="com.wireless.Actions.weixin.operate.WXOperateMenuAction"
 			scope="request" parameter="dataSource">
