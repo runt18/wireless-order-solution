@@ -368,13 +368,11 @@ function fnPublishPromotion(){
 			layout : 'column',
 			frame : true,
 			modal : true,
-			items : [
-//			         {
-//				columnWidth : 1,
-//				style :'margin-top:5px;',
-//				border : false
-//			},
-			{
+			items : [{
+				columnWidth : 1,
+				style :'margin-top:5px;',
+				border : false
+			},{
 				columnWidth : 0.2,
 				xtype : 'label',
 				text : '发布对象:'
@@ -384,7 +382,7 @@ function fnPublishPromotion(){
 				xtype : 'combo',
 				readOnly : false,
 				forceSelection : true,
-				width : 80,
+//				width : 80,
 				store : new Ext.data.JsonStore({
 					root : 'root',
 					fields : ['id', 'name']
@@ -396,17 +394,12 @@ function fnPublishPromotion(){
 				triggerAction : 'all',
 				selectOnFocus : true,
 			},
-//			{
-//				columnWidth : 0.2,
-//				xtype : 'label',
-//				text : '&nbsp;&nbsp;&nbsp;&nbsp;结束时间:'
-//			},
 			{
 				columnWidth : 0.2,
 				xtype : 'label',
 				html : '&nbsp;&nbsp;&nbsp;&nbsp;结束时间:'
 			},{
-				columWidth : 0.3,
+				columnWidth : 0.3,
 				id : 'dateField4PromotionPublish',
 				xtype : 'datefield',
 				fieldLabel : '&nbsp;&nbsp;&nbsp;结束日期',
@@ -424,7 +417,8 @@ function fnPublishPromotion(){
 				columnWidth : 1,
 				style :'margin-bottom:5px;',
 				border : false
-			}],
+			}
+			],
 			bbar : ['->',{
 				text : '发布',
 				id : 'btnPublish',
