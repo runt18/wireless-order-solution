@@ -44,5 +44,5 @@ $(function(){
 });
 
 function entryPromotion(){
-	Util.skip('sales.html', couponId);
+	Util.jump('sales.html', couponId);
 }

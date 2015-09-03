@@ -420,7 +420,7 @@ function calcFloatDivs(){
 function toggleCouponContent(){
 	var mainView = $('#divMemberCouponContentView');
 	
-	var templet = '<div class="box" onclick="Util.skip(\'sales.html\', {couponId})">' +
+	var templet = '<div class="box" onclick="Util.jump(\'sales.html\', {couponId})">' +
 					'<div class="box_in"><img src="{couponImg}"></div>' +
 					'<span>{name}</span><br><span>面额 : {cPrice} 元</span><br><span>到期 : {expiredTime}</span><br><span>来自 : {promotionName}</span>' +
 				  '</div>';	

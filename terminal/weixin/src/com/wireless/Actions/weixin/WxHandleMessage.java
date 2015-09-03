@@ -201,11 +201,11 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		item4Order.setPicUrl(WEIXIN_FOOD_ICON);
 		naviItem.addItem(item4Order);
 		
-//		Data4Item item4Book = new Data4Item();
-//		item4Book.setTitle("预订");
-//		item4Book.setUrl(createUrl(msg, WEIXIN_BOOK));
-//		item4Book.setPicUrl(WEIXIN_BOOK_ICON);
-//		naviItem.addItem(item4Book);		
+		Data4Item item4Book = new Data4Item();
+		item4Book.setTitle("预订");
+		item4Book.setUrl(createUrl(msg, WEIXIN_BOOK));
+		item4Book.setPicUrl(WEIXIN_BOOK_ICON);
+		naviItem.addItem(item4Book);		
 		
 		Data4Item specialFoodItem = new Data4Item();
 		specialFoodItem.setTitle("特色菜品");

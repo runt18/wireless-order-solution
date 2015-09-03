@@ -2,38 +2,6 @@
  * 
  */
 
-//分析url
-function parseURL(url) {
-    var a = document.createElement('a');
-    a.href = url;
-    return {
-        source: url,
-        protocol: a.protocol.replace(':', ''),
-        host: a.hostname,
-        port: a.port,
-        query: a.search,
-        params: (function () {
-            var ret = {},
-            seg = a.search.replace(/^\?/, '').split('&'),
-            len = seg.length, i = 0, s;
-            for (; i < len; i++) {
-                if (!seg[i]) { 
-                	continue; 
-                }
-                s = seg[i].split('=');
-                ret[s[0]] = s[1];
-            }
-            return ret;
- 
-        })(),
-        file: (a.pathname.match(/\/([^\/?#]+)$/i) || [, ''])[1],
-        hash: a.hash.replace('#', ''),
-        path: a.pathname.replace(/^([^\/])/, '/$1'),
-        relative: (a.href.match(/tps?:\/\/[^\/]+(.+)/) || [, ''])[1],
-        segments: a.pathname.replace(/^\\/, '').split('/')
-    };
-}
-
 //渲染优惠活动的HTML
 function render(coupon){
 	//优惠活动规则类型
@@ -62,7 +30,7 @@ function render(coupon){
 								cPrice : couponType.price,
 								expiredTime : couponType.expiredFormat
 								});
-		promotionBody += '<div id="div_toMyCoupon" style="text-align: right;font-size:15px;display: block;" ><br><a href="javascript:void(0)" onclick="Util.skip(\'member.html\', \'coupon\')" style="color:blue;text-decoration: underline;">→查看我的优惠劵</a></div>';
+		promotionBody += '<div id="div_toMyCoupon" style="text-align: right;font-size:15px;display: block;" ><br><a href="javascript:void(0)" onclick="Util.jump(\'member.html\', \'coupon\')" style="color:blue;text-decoration: underline;">→查看我的优惠劵</a></div>';
 		
 		promotionBody += '</div>';
 		
@@ -74,30 +42,29 @@ function render(coupon){
 $(function(){
 	Util.lbar('', function(html){ $(document.body).append(html);  });
 	
-	var requestUrl = parseURL(location.href);
 	var params = null;
-	if(requestUrl.params.pid){
+	if(Util.mp.params.pid){
 		params = {
 					dataSource : 'getByCond',
-					pid : requestUrl.params.pid, 
-					fid : requestUrl.params.r,
-					oid : requestUrl.params.m
+					pid : Util.mp.params.pid, 
+					fid : Util.mp.params.r,
+					oid : Util.mp.params.m
 				 };
 		//如果url parameter中包含‘pid’
 		
-	}else if(requestUrl.params.cid || requestUrl.params.e == 'default'){
+	}else if(Util.mp.params.cid || Util.mp.params.e == 'default'){
 		
-		if(requestUrl.params.e == 'default'){
+		if(Util.mp.params.e == 'default'){
 			params = {
 					dataSource : 'defaultCoupon',
-					cid : requestUrl.params.cid, 
-					fid : requestUrl.params.r
+					cid : Util.mp.params.cid, 
+					fid : Util.mp.params.r
 				};
 		}else{
 			params = {
 				dataSource : 'getById',
-				cid : requestUrl.params.cid, 
-				fid : requestUrl.params.r
+				cid : Util.mp.params.cid, 
+				fid : Util.mp.params.r
 			};
 		}
 		

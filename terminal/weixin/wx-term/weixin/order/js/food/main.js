@@ -10,7 +10,9 @@ function filtersFood(e){
 		$(kitchenBodyList[i]).removeClass(params.DNSC);
 	}
 	var kitchenId = parseInt(e.getAttribute('data-value'));
-	if(kitchenId > 0){ $(e).addClass(params.DNSC); }
+	if(kitchenId > 0){ 
+		$(e).addClass(params.DNSC); 
+	}
 	
 	params.kitchenId = kitchenId;
 	params.start = 0;
@@ -596,5 +598,5 @@ to.takeoutCommit = function(){
 //查看订单
 function linkToOrders(){
 	//传入账单类型
-	Util.skip('orderList.html', Util.mp.extra);
+	Util.jump('orderList.html', Util.mp.extra);
 }

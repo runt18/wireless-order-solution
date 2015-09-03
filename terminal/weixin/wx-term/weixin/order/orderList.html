@@ -2,7 +2,8 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
+<meta name="viewport"
+	content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
 <title>订单列表</title>
 <link rel="stylesheet" href="./css/base.css">
 <link rel="stylesheet" href="css/member.css">
@@ -15,24 +16,23 @@
 </head>
 <body style="background-color: #f6f6f6;">
 
-<div  class="main-box" style="height: 52px;">
-
-	<div id="tab4OrderList" class="tabPanel" onclick="changWeixinOrderList('order')">
-		<div class="tabPanelList tabPanelListCheck">
-			订单列表
+	<div class="main-box" style="height: 52px;">
+		<div id="tab4OrderList" class="tabPanel" onclick="changWeixinOrderList('order')">
+			<div id = "divOrderList" class="tabPanelList tabPanelListCheck">
+				订单列表
+			</div>
+		</div>
+		<div id="tab4BookList" class="tabPanel"	onclick="changWeixinOrderList('book')">
+			<div id = "divBookList" class="tabPanelList">
+				预定列表
+			</div>
 		</div>
 	</div>
-	<div id="tab4BookList" class="tabPanel" onclick="changWeixinOrderList('book')">
-		<div class="tabPanelList">
-			预定列表
-		</div>
-	</div>
-</div>
 
-<div id="divWeixinOrderList" ></div>
-<div id="divWeixinBookList"  class="none" style="margin-bottom: 50px;">
+	<div id="divWeixinOrderList"></div>
+	<div id="divWeixinBookList" class="none" style="margin-bottom: 50px;">
 
-<!-- 	<div class="box-order orderBorder_commit">
+		<!-- 	<div class="box-order orderBorder_commit">
 		<div class="box-order-commit">
 			<div style="height: 20px;">
 				<div style="float: left;">订单号:100</div>
@@ -52,10 +52,10 @@
 		</div>	
 	</div> -->
 
-</div>
+	</div>
 
 
-<!-- 	<div class="box-order orderBorder_commit">
+	<!-- 	<div class="box-order orderBorder_commit">
 		<div class="box-order-commit">
 			<div style="height: 20px;">
 				<div style="float: left;">订单号:100</div>

@@ -21,7 +21,7 @@ $(function(){
 		dataType : 'json',
 		data : {
 			dataSource : 'isRecommend',
-			fid : Util.getParam('r')
+			fid : Util.mp.params.r
 		},
 		success : function(data, status, xhr){
 			var html = [];
