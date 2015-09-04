@@ -46,7 +46,7 @@ function loadRegions(){
 	'</li>';	
 	var regions;
 	
-	$.post('../../WXOperateBook.do', {
+	$.post('../../WxOperateBook.do', {
 		fid : Util.mp.fid,
 		dataSource : 'region'
 	}, function(data){
@@ -94,7 +94,7 @@ function loadBookMember(){
  * 提交预订信息
  */
 function commitBook(){
-	var date, time, region, name, phone, bookType, count;
+	var date, time, region, name, phone, count;
 	$('.bookDateDetail').each(function(){
 		if($(this).hasClass("bookDateCheck")){
 			date = bookDates[$(this).data('value')];
@@ -122,9 +122,6 @@ function commitBook(){
 	name = $('#txtBookName').val();
 	phone = $('#txtBookPhone').val();
 	
-	bookType = $('input[name="bookType"]:checked').val();
-	
-	
 	if(!name){
 		Util.dialog.show({msg: '请填写姓名', btn:'yes'});
 		return;
@@ -143,7 +140,7 @@ function commitBook(){
 		foods += (temp.id + ',' + temp.count);
 	}
 	
-	$.post('../../WXOperateBook.do', {
+	$.post('../../WxOperateBook.do', {
 		fid : Util.mp.fid,
 		dataSource : 'insert',
 		bookDate : date + " " + time,
@@ -157,7 +154,7 @@ function commitBook(){
 			Util.dialog.show({msg: '预订成功', btn:'yes',
 				callback : function(btn){
 					if(btn == 'yes'){
-						Util.skip('orderList.html');
+						Util.jump('orderList.html?book=1');
 					}
 				}
 			});

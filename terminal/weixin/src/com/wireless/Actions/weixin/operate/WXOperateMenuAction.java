@@ -49,15 +49,15 @@ public class WXOperateMenuAction extends DispatchAction {
 	public ActionForward weixinMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject(); 
 		
-		String appId = "wx49b3278a8728ff76";
-		String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
-		System.out.println(Menu.newInstance(Token.newInstance(appId, appSecret)));
-		jobject.setRoot(Menu.newInstance(Token.newInstance(appId, appSecret)));
+//		String appId = "wx49b3278a8728ff76";
+//		String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
+//		System.out.println(Menu.newInstance(Token.newInstance(appId, appSecret)));
+//		jobject.setRoot(Menu.newInstance(Token.newInstance(appId, appSecret)));
 		
-//		int rid = Integer.parseInt(request.getParameter("rid"));
-//		WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(rid));
-//		AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
-//		jobject.setRoot(Menu.newInstance(Token.newInstance(authorizerToken)));
+		int rid = Integer.parseInt(request.getParameter("rid"));
+		WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(rid));
+		AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+		jobject.setRoot(Menu.newInstance(Token.newInstance(authorizerToken)));
 		
 		response.getWriter().print(jobject.toString());
 		
@@ -157,13 +157,17 @@ public class WXOperateMenuAction extends DispatchAction {
 		try{
 			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
 			WxMenuAction.InsertBuilder4ImageText insert4ImageText;
-			Cate cate = Cate.NORMAL;
+			
 			
 			if(image == null || image.isEmpty()){
 				image = "";
 			}
+			
+			final Cate cate;
 			if(subscribe != null && !subscribe.isEmpty()){
-				cate = Cate.SUBSCRIBE_REPLY;
+				cate = WxMenuAction.Cate.SUBSCRIBE_REPLY;
+			}else{
+				cate = WxMenuAction.Cate.NORMAL;
 			}
 			
 			insert4ImageText = new WxMenuAction.InsertBuilder4ImageText(new Data4Item(title, content, image, url), cate);
@@ -278,15 +282,17 @@ public class WXOperateMenuAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward insertMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ActionForward insertText(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String text = request.getParameter("text");
 		String rid = request.getParameter("rid");
 		String subscribe = request.getParameter("subscribe");
-		JObject jobject = new JObject(); 
-		Cate cate = Cate.NORMAL;
+		JObject jobject = new JObject();
 		
+		final WxMenuAction.Cate cate;
 		if(subscribe != null && !subscribe.isEmpty()){
-			cate = Cate.SUBSCRIBE_REPLY;
+			cate = WxMenuAction.Cate.SUBSCRIBE_REPLY;
+		}else{
+			cate = WxMenuAction.Cate.NORMAL;
 		}
 		
 		try{
@@ -332,17 +338,20 @@ public class WXOperateMenuAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward updateMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ActionForward updateText(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String text = request.getParameter("text");
 		String rid = request.getParameter("rid");
 		String key = request.getParameter("key");
 		String subscribe = request.getParameter("subscribe");
 		JObject jobject = new JObject(); 
-		Cate cate = Cate.NORMAL;
 		
+		final WxMenuAction.Cate cate;
 		if(subscribe != null && !subscribe.isEmpty()){
-			cate = Cate.SUBSCRIBE_REPLY;
+			cate = WxMenuAction.Cate.SUBSCRIBE_REPLY;
+		}else{
+			cate = WxMenuAction.Cate.NORMAL;
 		}
+		
 		try{
 			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
 			WxMenuAction.UpdateBuilder4Text update4Text = new WxMenuAction.UpdateBuilder4Text(Integer.parseInt(key), text);
@@ -522,6 +531,35 @@ public class WXOperateMenuAction extends DispatchAction {
 		
 		return null;
 	}		
+	
+	/**
+	 * 删除menu
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward deleteMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String key = request.getParameter("key");
+		String rid = request.getParameter("rid");
+		JObject jobject = new JObject(); 
+		
+		try{
+			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			
+			WxMenuActionDao.deleteById(staff, Integer.parseInt(key));
+			jobject.initTip(true, "删除成功");
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+
+		return null;
+	}
 	
 	public static void main(String[] args) throws IOException{
 		String appId = "wx49b3278a8728ff76";

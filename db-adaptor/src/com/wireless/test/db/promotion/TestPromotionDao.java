@@ -76,7 +76,7 @@ public class TestPromotionDao {
 
 			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder
 																	  .newInstance("测试优惠活动", body, Promotion.Rule.FREE, typeInsertBuilder, "hello jingjing<br>")
-																	  .setRange("2016-1-1", "2016-2-1")
+																	  //.setRange("2016-1-1", "2016-2-1")
 																	  //.addMember(m1.getId()).addMember(m2.getId())
 																	  ;
 			promotionId = PromotionDao.create(mStaff, promotionCreateBuilder);

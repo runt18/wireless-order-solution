@@ -184,7 +184,7 @@ function initDeptData(){
 		type : 'post',
 		data : {
 			dataSource : 'kitchen',
-			fid : Util.getParam('r')
+			fid : Util.mp.params.r
 		},
 		success : function(data, status, xhr){
 			Util.lm.hide();
@@ -252,7 +252,7 @@ $(function(){
     		to.member = result.other.member;
 	    	$('#to_name').val(to.member.name);
 	    	$('#to_phone').val(to.member.mobile); 		
-    	})
+    	});
     	
     	$.post('../../WXQueryAddress.do', {oid:Util.mp.oid, fid: Util.mp.fid}, function(result){
     		if(result.success){
@@ -270,7 +270,7 @@ $(function(){
     		    	$('#divNewAddress4TO').show();
     			}
     		}
-    	})
+    	});
     	
     }
 });

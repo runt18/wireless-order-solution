@@ -15,7 +15,7 @@ import com.wireless.pojo.util.SortedList;
 public class Promotion implements Jsonable{
 
 	public static class CreateBuilder{
-		private DateRange range;
+		//private DateRange range;
 		private final String title;
 		private final String body;
 		private final String entire;
@@ -24,6 +24,7 @@ public class Promotion implements Jsonable{
 		private Type type = Type.NORMAL;
 		private final CouponType.InsertBuilder typeBuilder;
 		private final SortedList<Member> members = SortedList.newInstance();
+		private Oriented oriented = Oriented.EMPTY;
 		
 		private CreateBuilder(String title, String body, Rule type, CouponType.InsertBuilder typeBuilder, String entire){
 			this.title = title;
@@ -58,21 +59,21 @@ public class Promotion implements Jsonable{
 //			return instance;
 //		}
 		
-		public CreateBuilder setRange(String begin, String end) throws ParseException{
-			setRange(DateUtil.parseDate(begin, DateUtil.Pattern.DATE), DateUtil.parseDate(end, DateUtil.Pattern.DATE));
-			return this;
-		}
-		
-		public CreateBuilder setRange(long begin, long end){
-			if(begin < 0 || end < 0){
-				throw new IllegalArgumentException("活动时间不能小于0");
-			}
-			if(end < begin){
-				throw new IllegalArgumentException("活动结束时间不能小于开始时间");
-			}
-			this.range = new DateRange(begin, end);
-			return this;
-		}
+//		public CreateBuilder setRange(String begin, String end) throws ParseException{
+//			setRange(DateUtil.parseDate(begin, DateUtil.Pattern.DATE), DateUtil.parseDate(end, DateUtil.Pattern.DATE));
+//			return this;
+//		}
+//		
+//		public CreateBuilder setRange(long begin, long end){
+//			if(begin < 0 || end < 0){
+//				throw new IllegalArgumentException("活动时间不能小于0");
+//			}
+//			if(end < begin){
+//				throw new IllegalArgumentException("活动结束时间不能小于开始时间");
+//			}
+//			this.range = new DateRange(begin, end);
+//			return this;
+//		}
 		
 		public CreateBuilder setPoint(int point){
 			if(point <= 0){
@@ -87,6 +88,17 @@ public class Promotion implements Jsonable{
 			if(!members.contains(member)){
 				members.add(member);
 			}
+			this.oriented = Oriented.SPECIFIC;
+			return this;
+		}
+		
+		public CreateBuilder setMemberAll(){
+			this.oriented = Oriented.ALL;
+			return this;
+		}
+		
+		public CreateBuilder setMemberEmpty(){
+			this.oriented = Oriented.EMPTY;
 			return this;
 		}
 		
@@ -112,7 +124,8 @@ public class Promotion implements Jsonable{
 		private String entire;
 		private int point = -1;
 		private CouponType.UpdateBuilder typeBuilder;
-		private List<Member> members;
+		private Oriented oriented;
+		private List<Member> members = SortedList.newInstance();;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
@@ -139,6 +152,11 @@ public class Promotion implements Jsonable{
 		
 		public UpdateBuilder setRange(String begin, String end) throws ParseException{
 			setRange(DateUtil.parseDate(begin, DateUtil.Pattern.DATE), DateUtil.parseDate(end, DateUtil.Pattern.DATE));
+			return this;
+		}
+		
+		public UpdateBuilder setRange(DateRange range){
+			setRange(range.getOpeningTime(), range.getEndingTime());
 			return this;
 		}
 		
@@ -172,27 +190,36 @@ public class Promotion implements Jsonable{
 		}
 		
 		public UpdateBuilder addMember(int memberId){
-			if(members == null){
-				 members = SortedList.newInstance();
-			}
 			Member member = new Member(memberId);
 			if(!members.contains(member)){
 				members.add(member);
 			}
+			this.oriented = Oriented.SPECIFIC;
+			return this;
+		}
+		
+		public UpdateBuilder addMember(Member member){
+			if(!members.contains(member)){
+				members.add(member);
+			}
+			this.oriented = Oriented.SPECIFIC;
+			return this;
+		}
+		
+		public UpdateBuilder setMemberEmpty(){
+			members.clear();
+			this.oriented = Oriented.SPECIFIC;
 			return this;
 		}
 		
 		public UpdateBuilder setAllMember(){
-			if(members == null){
-				members = SortedList.newInstance();
-			}else{
-				members.clear();
-			}
+			members.clear();
+			this.oriented = Oriented.ALL;
 			return this;
 		}
 		
 		public boolean isMemberChanged(){
-			return members != null;
+			return this.oriented != null;
 		}
 		
 		public List<Member> getMembers(){
@@ -219,6 +246,57 @@ public class Promotion implements Jsonable{
 		public Promotion build(){
 			return new Promotion(this);
 		}
+	}
+	
+	public static class PublishBuilder{
+		
+		private final int promotionId;
+		private Oriented oriented;
+		private int condId;
+		private long finishDate;
+		
+		public PublishBuilder(int promotionId){
+			this.promotionId = promotionId;
+		}
+		
+		public boolean isOrientedChanged(){
+			return this.oriented != null;
+		}
+		
+		public PublishBuilder setOrientedAll(){
+			this.oriented = Oriented.ALL;
+			return this;
+		}
+
+		public PublishBuilder setOrientedEmpty(){
+			this.oriented = Oriented.EMPTY;
+			return this;
+		}
+		
+		public PublishBuilder setOriented(int condId){
+			this.oriented = Oriented.SPECIFIC;
+			this.condId = condId;
+			return this;
+		}
+		
+		public PublishBuilder setFinishDate(long finishDate){
+			this.finishDate = finishDate;
+			return this;
+		}
+		
+		public PublishBuilder setFinishDate(String finishDate){
+			this.finishDate = DateUtil.parseDate(finishDate);
+			return this;
+		}
+		
+		public int getCondId(){
+			return this.condId;
+		}
+		
+		public Promotion build(){
+			return new Promotion(this);
+		}
+		
 	}
 	
 	public static enum Rule{
@@ -318,7 +396,8 @@ public class Promotion implements Jsonable{
 	
 	public static enum Oriented{
 		ALL(1, "全部会员"),
-		SPECIFIC(2, "特定会员");
+		SPECIFIC(2, "特定会员"),
+		EMPTY(3, "不面向会员");
 		
 		private final int val;
 		private final String desc;
@@ -367,7 +446,7 @@ public class Promotion implements Jsonable{
 	
 	private Promotion(CreateBuilder builder){
 		this.createDate = System.currentTimeMillis();
-		this.dateRange = builder.range;
+		//this.dateRange = builder.range;
 		this.title = builder.title;
 		this.body = builder.body;
 		this.entire = builder.entire;
@@ -376,11 +455,7 @@ public class Promotion implements Jsonable{
 		if(builder.rule != Rule.DISPLAY_ONLY){
 			this.couponType = builder.typeBuilder.build();
 		}
-		if(builder.members.isEmpty()){
-			this.oriented = Oriented.ALL;
-		}else{
-			this.oriented = Oriented.SPECIFIC;
-		}
+		this.oriented = builder.oriented;
 		this.type = builder.type;
 	}
 	
@@ -403,12 +478,14 @@ public class Promotion implements Jsonable{
 			this.couponType = builder.typeBuilder.build();
 		}
 		if(builder.isMemberChanged()){
-			if(builder.members.isEmpty()){
-				this.oriented = Oriented.ALL;
-			}else{
-				this.oriented = Oriented.SPECIFIC;
-			}
+			this.oriented = builder.oriented;
 		}
+	}
+	
+	private Promotion(PublishBuilder builder){
+		this.id = builder.promotionId;
+		this.oriented = builder.oriented;
+		this.dateRange = new DateRange(0, builder.finishDate);
 	}
 	
 	public Promotion(int id){
@@ -487,14 +564,12 @@ public class Promotion implements Jsonable{
 	public Status getStatus() {
 		if(this.dateRange != null){
 			long now = System.currentTimeMillis();
-			if(now < this.dateRange.getOpeningTime()){
+			if(this.dateRange.getEndingTime() == 0){
 				return Status.CREATED;
-			}else if(now > this.dateRange.getOpeningTime() && now < this.dateRange.getEndingTime()){
+			}else if(this.dateRange.getEndingTime() > now){
 				return Status.PROGRESS;
-			}else if(now > this.dateRange.getEndingTime()){
-				return Status.FINISH;
 			}else{
-				return Status.CREATED;
+				return Status.FINISH;
 			}
 		}else{
 			return Status.CREATED;

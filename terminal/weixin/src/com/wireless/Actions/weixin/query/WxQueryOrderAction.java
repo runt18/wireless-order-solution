@@ -10,7 +10,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.order.WxOrderDao;
@@ -22,19 +21,16 @@ import com.wireless.pojo.weixin.order.WxOrder;
 
 public class WxQueryOrderAction extends DispatchAction {
 	
-	public ActionForward getByMember(ActionMapping mapping, ActionForm form, 
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ActionForward getByMember(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String oid = request.getParameter("oid");
 		String fid = request.getParameter("fid");
 		String orderType = request.getParameter("type");
-		DBCon dbCon = null;
+		
 		JObject jobject = new JObject();
 		
 		try {
-			dbCon = new DBCon();
-			dbCon.connect();
 			
-			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			WxOrder.Type ordersType = WxOrder.Type.INSIDE;
@@ -42,11 +38,11 @@ public class WxQueryOrderAction extends DispatchAction {
 				ordersType = WxOrder.Type.valueOf(Integer.parseInt(orderType));
 			}
 			
-			List<WxOrder> orders = WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setWeixin(oid).setType(ordersType), " ORDER BY birth_date DESC");
+			List<WxOrder> orders = WxOrderDao.getByCond(staff, new WxOrderDao.ExtraCond().setWeixin(oid).setType(ordersType), " ORDER BY birth_date DESC");
 			
 			for (WxOrder wxOrder : orders) {
 				if(wxOrder.getStatus() == WxOrder.Status.COMMITTED || wxOrder.getStatus() == WxOrder.Status.ORDER_ATTACHED){
-					wxOrder.addFoods(WxOrderDao.getById(dbCon, staff, wxOrder.getId()).getFoods());
+					wxOrder.addFoods(WxOrderDao.getById(staff, wxOrder.getId()).getFoods());
 				}
 				if(ordersType == WxOrder.Type.TAKE_OUT){
 					wxOrder.setTakoutAddress(TakeoutAddressDao.getById(staff, wxOrder.getTakeoutAddress().getId()));
@@ -61,7 +57,6 @@ public class WxQueryOrderAction extends DispatchAction {
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		return null;

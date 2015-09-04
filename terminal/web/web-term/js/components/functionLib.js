@@ -488,7 +488,7 @@ Ext.ux.operateTree_material = function (node, mult){
 
 		}
 	}
-}
+};
 
 Ext.ux.operateTree_weixinMenu = function (node, mult){
 	for (var j = 0; j < mult.length; j++) {
@@ -508,7 +508,7 @@ Ext.ux.operateTree_weixinMenu = function (node, mult){
 
 		}
 	}
-}
+};
 
 function showFloatOption(obj_b){
 	//记录节点的位置和鼠标位置

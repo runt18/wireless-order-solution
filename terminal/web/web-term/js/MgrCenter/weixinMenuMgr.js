@@ -154,7 +154,7 @@ function addChildMenu(){
 		return;
 	}	
 	updateDeptWin.otype = 'addChild';
-	operateDeptHandler(tn)
+	operateDeptHandler(tn);
 }
 
 function operateDeptHandler(node){
@@ -192,21 +192,22 @@ function deleteMenu(){
 				if(tn.attributes.key && !isNaN(tn.attributes.key)){
 					$.ajax({ 
 					    type : "post", 
-					    async:false, 
-					    url : "../../OperateMenu.do",
+					    async : false,
+					    url : basePath + "/wx-term/WXOperateMenu.do",
 					    data : {
-					    	dataSource : "deleteMenu",
-					    	rid : rid,
-					    	key : tn.attributes.key
+					    	dataSource : 'deleteMenu',
+						    rid : rid,
+						    key : tn.attributes.key
 					    },
-					    dataType : "json",//jsonp数据类型 
-					    success : function(rt){ 
-					        Ext.example.msg(rt);
+					    dataType : "jsonp",		//jsonp数据类型 
+					    jsonp: "jsonpCallback",	//服务端用于接收callback调用的function名的参数 
+					    success : function(data){ 
+							 Ext.example.msg('提示', data.msg);
 					    }, 
-					    error:function(xhr){ 
+					    error : function(xhr){ 
 					        var rt = JSON.parse(xhr.responseText);
-					        Ext.example.msg(rt);
-					    } 
+					        Ext.example.msg('提示', rt.msg);
+					    }
 					}); 	
 				}
 				tn.remove();
@@ -233,34 +234,32 @@ function operateMenuContent(){
 		return ;
 	}
 	
-	var key;
-	var dataSource = "insertMenu";
+	var key = null;
+	var dataSource = "insertText";
 	if(subscribeKey != -1){
-		dataSource = "updateMenu";
-		key = subscribeKey
+		dataSource = "updateText";
+		key = subscribeKey;
 	}else if(tn && tn.attributes.key && !isNaN(tn.attributes.key)){
-		dataSource = "updateMenu";
+		dataSource = "updateText";
 		key = tn.attributes.key;
 	}	
 	
 	$.ajax({ 
 	    type : "post", 
 	    async:false, 
-	    url : "../../OperateMenu.do",
-	    dataType : "json",//jsonp数据类型
-//	    url : basePath+"/wx-term/WXOperateMenu.do",
-//	    dataType : "jsonp",//jsonp数据类型 
-//	    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 	    
+	    url : basePath + "/wx-term/WXOperateMenu.do",
+	    dataType : "jsonp",		//jsonp数据类型 
+	    jsonp : "jsonpCallback",	//服务端用于接收callback调用的function名的参数 	    
 	    data : {
 	    	dataSource : dataSource,
 	    	rid : rid,
-	    	key : key,
+	    	key : key != null ? key : "",
 	    	text : $('#menuTxtReply').val(),
-	    	subscribe : subscribe?subscribe:""
+	    	subscribe : subscribe ? subscribe : ""
 	    },
 	    success : function(rt){ 
 	        if(rt.success){
-	        	if(dataSource == "insertMenu"){
+	        	if(dataSource == "insertText"){
 	        		if(tn){
 	        			tn.attributes.type = "click";
 	        			tn.attributes.key = rt.other.key;
@@ -274,7 +273,7 @@ function operateMenuContent(){
 	    error:function(xhr){ 
 	        var rt = JSON.parse(xhr.responseText);
 	        if(rt.success){
-	        	if(dataSource == "insertMenu"){
+	        	if(dataSource == "insertText"){
 	        		if(tn){
 	        			tn.attributes.type = "click";
 	        			tn.attributes.key = rt.other.key;
@@ -333,15 +332,15 @@ function getWeixinMenu(){
 	$.ajax({ 
 	    type : "get", 
 //	    async:false, 
-	    url :  basePath+"/wx-term/WXOperateMenu.do?dataSource=weixinMenu&rid="+rid,
-	    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
-	    dataType : "json",//jsonp数据类型
+	    url :  basePath + "/wx-term/WXOperateMenu.do?dataSource=weixinMenu&rid="+rid,
+	    jsonp: "jsonpCallback",	//服务端用于接收callback调用的function名的参数 
+	    dataType : "json",		//jsonp数据类型
 	    success : function(rt){
 	    	weixinMenuLM.hide();
-	    	var root ={
+	    	var root = {
 	 			text : 'root',
 	 			children : []
-	    	}
+	    	};
 	    	
 	    	var menu = rt.root[0];
 	    	
@@ -355,7 +354,7 @@ function getWeixinMenu(){
 	 				expanded:true,
 	 				expandable: true,
 	 				children : []
-	 			}
+	 			};
 				if(menu.button[i].sub_button && menu.button[i].sub_button.length > 0){
 					var childs = menu.button[i].sub_button;
 					for (var j = 0; j < childs.length; j++) {
@@ -366,7 +365,7 @@ function getWeixinMenu(){
 							m_type : 2,
 							url : childs[j].url,
 							leaf : true
-						}
+						};
 						btn.children.push(son);
 					}
 				}
@@ -376,13 +375,13 @@ function getWeixinMenu(){
 	    	
 	    	tree.setRootNode(new Ext.tree.AsyncTreeNode(root));
 	    }, 
-	    error:function(xhr){
+	    error : function(xhr){
 	    	weixinMenuLM.hide();
 	    	var rt = JSON.parse(xhr.responseText);
 	    	var root ={
 	 			text : 'root',
 	 			children : []
-	    	}
+	    	};
 	    	
 	    	var menu = rt.root[0];
 	    	
@@ -396,7 +395,7 @@ function getWeixinMenu(){
 	 				expanded:true,
 	 				expandable: true,
 	 				children : []
-	 			}
+	 			};
 				if(menu.button[i].sub_button && menu.button[i].sub_button.length > 0){
 					var childs = menu.button[i].sub_button;
 					for (var j = 0; j < childs.length; j++) {
@@ -407,7 +406,7 @@ function getWeixinMenu(){
 							m_type : 2,
 							url : childs[j].url,
 							leaf : true
-						}
+						};
 						btn.children.push(son);
 					}
 				}
@@ -449,7 +448,7 @@ function clearTabContent(){
 Ext.onReady(function(){
 	$.ajax({ 
 	    type : "post", 
-	    url : basePath+"/wx-term/WXOperateMenu.do",
+	    url : basePath + "/wx-term/WXOperateMenu.do",
 	    data : {
 	    	dataSource : 'systemMenu'
 	    },
@@ -459,7 +458,7 @@ Ext.onReady(function(){
 			if(data.success){
 			}
 	    }, 
-	    error:function(xhr){ 
+	    error : function(xhr){ 
 	        var rt = JSON.parse(xhr.responseText);
 	        var systemMenuTemplate = '<input id="{id}" type="radio" name="systemSet" value={key}><label for="{id}">{desc}</label>';
 	        
@@ -470,7 +469,7 @@ Ext.onReady(function(){
 	        			id : "r"+(i+1),
 	        			key : rt.root[i].key,
 	        			desc : rt.root[i].desc
-	        		}))
+	        		}));
 				}
 	        	$("#div4systemReplyBox").html(html.join(""));
 			}
@@ -516,30 +515,30 @@ Ext.onReady(function(){
 									"type" : childson.attributes.type,
 									"name" : childson.text,
 									"url" : childson.attributes.url
-								}						
+								};					
 							}else{
 								sonBtn = {
 									"type" : childson.attributes.type || "click",
 									"name" : childson.text,
 									"key" : childson.attributes.key || -1
-								}
+								};
 							}
 							
 							btn.sub_button.list.push(sonBtn);
-						})
+						});
 					}else{
 						if(child.attributes.type == "view"){
 							btn = {
 								"type" : child.attributes.type,
 								"name" : child.text,
 								"url" : child.attributes.url
-							}						
+							};						
 						}else{
 							btn = {
 								"type" : child.attributes.type || "click",
 								"name" : child.text,
 								"key" : child.attributes.key || -1
-							}
+							};
 						}					
 					}
 					
@@ -548,27 +547,24 @@ Ext.onReady(function(){
 				
 				menu.selfmenu_info.button = btns;
 				
-				console.log("commit======")
-				
-				console.log(menu)
 				$.ajax({ 
 				    type : "post", 
-				    async:false, 
+				    async : false, 
 				    url : basePath+"/wx-term/WXOperateMenu.do",
 				    data : {
 				    	dataSource : 'commitMenu',
 				    	rid :rid,
 				    	menu : JSON.stringify(menu)
 				    },
-				    dataType : "jsonp",//jsonp数据类型 
-				    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+				    dataType : "jsonp",		//jsonp数据类型 
+				    jsonp: "jsonpCallback",	//服务端用于接收callback调用的function名的参数 
 				    success : function(data){ 
 						if(data.success){
 							Ext.example.msg('提示', '发布成功');
 						}
 				    }, 
 				    error:function(xhr){ 
-				        var rt = JSON.parse(xhr.responseText);
+				        JSON.parse(xhr.responseText);
 				        Ext.example.msg('提示', '发布成功');
 				    } 
 				}); 
@@ -644,7 +640,7 @@ Ext.onReady(function(){
 					tabs.setActiveTab(tab);
 					$('#url4Menu').val(tn.attributes.url);
 				}else if(tn.attributes.type == "click"){
-					var p = Ext.getCmp('contentPanel');
+					Ext.getCmp('contentPanel');
 //					p.layout.north = northPanel2;
 //					p.doLayout();
 //					p.add(northPanel2).doLayout();
@@ -662,12 +658,10 @@ Ext.onReady(function(){
 					}else{
 						$.ajax({ 
 						    type : "post", 
-						    async:false, 
-//						    url : "../../OperateMenu.do",
-//						    dataType : "json",//jsonp数据类型 
-						    url : basePath+"/wx-term/WXOperateMenu.do",
-						    dataType : "jsonp",//jsonp数据类型 
-						    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+						    async : false, 
+						    url : basePath + "/wx-term/WXOperateMenu.do",
+						    dataType : "jsonp",			//jsonp数据类型 
+						    jsonp: "jsonpCallback",		//服务端用于接收callback调用的function名的参数 
 						    data : {
 						    	dataSource : 'menuReply',
 						    	rid : rid,
@@ -1232,41 +1226,7 @@ Ext.onReady(function(){
 							}
 						}]
 
-					}
-/*					,{
-						columnWidth: 0.48,
-						labelWidth : 40,
-						defaults : {
-							width : 190
-						},
-						items :[{
-							xtype : 'textfield',
-							id : 'subItemTitle',
-							fieldLabel : '标题',
-							allowBlank : false
-						},{
-							xtype : 'textarea',
-							id : 'subItemUrl',
-							fieldLabel : '链接'
-						}]
-					}, {
-						columnWidth: 0.4, 
-						layout : 'column',
-						frame : true,
-						items : [sub_box, sub_form]
-					}, {
-						columnWidth: 0.12,
-						items :[{
-					    	xtype : 'button',
-					    	style:'margin-top:40px;margin-left:10px;',
-					    	text : '删除',
-					    	iconCls : 'btn_delete',
-					    	handler : function(e){
-					    		
-					    	}
-						}]
-					}*/
-					]
+					}]
 				}]  				
 			}, {
 				xtype : 'button',
@@ -1279,7 +1239,7 @@ Ext.onReady(function(){
 						Ext.example.msg('提示', '操作失败, 请选中一个菜单再进行操作.');
 						return;
 					}		
-					if(!$('#itemTitle').val() || !$('#itemContent').val() || !$('#itemUrl').val()){
+					if(!$('#itemTitle').val() || !$('#itemContent').val()){
 						Ext.example.msg('提示', '请输入内容');
 						return ;
 					}
@@ -1302,36 +1262,33 @@ Ext.onReady(function(){
 						}		
 					}
 					
-					var key;
 					var dataSource = "insertImageText";
 					
+					var key = null;
 					if(subscribeKey != -1){
 						dataSource = "updateImageText";
-						key = subscribeKey
+						key = subscribeKey;
 					}else if(tn && tn.attributes.key && !isNaN(tn.attributes.key)){
 						dataSource = "updateImageText";
 						key = tn.attributes.key;
-					}	
-					
+					}
 					
 					$.ajax({ 
 					    type : "post", 
-					    async:false, 
-//					    url : "../../OperateMenu.do",
-//					    dataType : "json",//jsonp数据类型 
-					    url : basePath+"/wx-term/WXOperateMenu.do",
+					    async : false, 
+					    url : basePath + "/wx-term/WXOperateMenu.do",
 					    dataType : "jsonp",//jsonp数据类型 
 					    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
 					    data : {
 					    	dataSource : dataSource,
 					    	rid : rid,
-					    	key : key,
+					    	key : key != null ? key : "",
 					    	title : $("#itemTitle").val(),
 					    	image : p_box.image ? p_box.image : "",
 					    	content : $("#itemContent").val(),
 					    	url : $("#itemUrl").val(),
 					    	subItems : subItems,
-					    	subscribe : subscribe?subscribe:""
+					    	subscribe : subscribe ? subscribe : ""
 					    },
 					    success : function(rt){ 
 					        if(rt.success){
@@ -1437,11 +1394,9 @@ Ext.onReady(function(){
 	//判断是否已设置自动关注
 	$.ajax({ 
 	    type : "post", 
-//	    url : "../../OperateMenu.do",
-//	    dataType : "json",//jsonp数据类型 
-	    url : basePath+"/wx-term/WXOperateMenu.do",
-	    dataType : "jsonp",//jsonp数据类型 
-	    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+	    url : basePath + "/wx-term/WXOperateMenu.do",
+	    dataType : "jsonp",		//jsonp数据类型 
+	    jsonp: "jsonpCallback",	//服务端用于接收callback调用的function名的参数 
 	    data : {
 	    	dataSource : 'subscribeReply',
 	    	rid : rid
@@ -1627,12 +1582,10 @@ function getSubscribeReply(){
 	subscribe = true;
 	$.ajax({ 
 	    type : "post", 
-	    async:false, 
-//	    url : "../../OperateMenu.do",
-//	    dataType : "json",//jsonp数据类型 
-	    url : basePath+"/wx-term/WXOperateMenu.do",
-	    dataType : "jsonp",//jsonp数据类型 
-	    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+	    async : false, 
+	    url : basePath + "/wx-term/WXOperateMenu.do",
+	    dataType : "jsonp",		//jsonp数据类型 
+	    jsonp: "jsonpCallback",	//服务端用于接收callback调用的function名的参数 
 	    data : {
 	    	dataSource : 'subscribeReply',
 	    	rid : rid
@@ -1902,11 +1855,9 @@ function deleteSubscribeReply(){
 				$.ajax({ 
 				    type : "post", 
 				    async:false, 
-//				    url : "../../OperateMenu.do",
-//				    dataType : "json",//jsonp数据类型 
 				    url : basePath+"/wx-term/WXOperateMenu.do",
-				    dataType : "jsonp",//jsonp数据类型 
-				    jsonp: "jsonpCallback",//服务端用于接收callback调用的function名的参数 
+				    dataType : "jsonp",		//jsonp数据类型 
+				    jsonp: "jsonpCallback",	//服务端用于接收callback调用的function名的参数 
 				    data : {
 				    	dataSource : "deleteSubscribe",
 				    	rid : rid

@@ -54,26 +54,51 @@ Object.clone = function(obj){
 	 return clone;
 };
 var Util = {
-	mp : { oid : 0, fid : 0 },
-	getDom : function(id){ return document.getElementById(id); },
-	hparam : [],
-	initParams : function(){
-		var str = location.href;
-		var temp = str.indexOf('?');
-		str = str.substr(temp + 1);
-		this.hparam = str.split('&');
-		this.mp.oid = Util.getParam('m');
-		this.mp.fid = Util.getParam('r');
-		this.mp.extra = Util.getParam('e');
+	mp : { 
+		oid : 0, 
+		fid : 0,
+		e : 0,
+		params : null
 	},
-	getParam : function(key){
-		var temp;
-		for (var i = 0; i < this.hparam.length; i++) {
-			temp = this.hparam[i].split('=');
-			if (temp.length > 0 && temp[0].trim() == key) {
-				return temp[1].trim();
-			}
-		}
+	getDom : function(id){ 
+		return document.getElementById(id); 
+	},
+	parseUrl : function(url){
+	    var a = document.createElement('a');
+	    a.href = url;
+	    return {
+	        source: url,
+	        protocol: a.protocol.replace(':', ''),
+	        host: a.hostname,
+	        port: a.port,
+	        query: a.search,
+	        params: (function () {
+	            var ret = {},
+	            seg = a.search.replace(/^\?/, '').split('&'),
+	            len = seg.length, i = 0, s;
+	            for (; i < len; i++) {
+	                if (!seg[i]) { 
+	                	continue; 
+	                }
+	                s = seg[i].split('=');
+	                ret[s[0]] = s[1];
+	            }
+	            return ret;
+	 
+	        })(),
+	        file: (a.pathname.match(/\/([^\/?#]+)$/i) || [, ''])[1],
+	        hash: a.hash.replace('#', ''),
+	        path: a.pathname.replace(/^([^\/])/, '/$1'),
+	        relative: (a.href.match(/tps?:\/\/[^\/]+(.+)/) || [, ''])[1],
+	        segments: a.pathname.replace(/^\\/, '').split('/')
+	    };
+	},
+	initParams : function(){
+		var requestUrl = this.parseUrl(location.href);
+		this.mp.oid = requestUrl.params.m;
+		this.mp.fid = requestUrl.params.r;
+		this.mp.extra = requestUrl.params.e;
+		this.mp.params = requestUrl.params;
 	},
 	lineTD : function(line, t){
 		var sc='m-b-line-show', hc='m-b-line-hide';
@@ -85,13 +110,13 @@ var Util = {
 			line.addClass(sc);
 		}
 	},
-	URLTemplet : './{0}?m={1}&r={2}&time={3}',
-	defineURL : function(page){
-		//this.mp.oid = 'o_da4uFcIRO1-WkbnEfebmstqFQw'; this.mp.fid = 'gh_cbad03f831ab';
-		return this.URLTemplet.format(page, this.mp.oid, this.mp.fid, new Date().getTime());
-	},
-	skip : function(page, extra){
-		window.location.href = this.defineURL(page) + (extra?'&e='+extra:'');
+	jump : function(page, extra){
+		var paramFormat = 'm={0}&r={1}&time={2}' + (extra ? '&e=' + extra : '');
+		if(page.indexOf('?') > 0){
+			window.location.href = page + '&' + paramFormat.format(this.mp.oid, this.mp.fid, new Date().getTime());
+		}else{
+			window.location.href = page + '?' + paramFormat.format(this.mp.oid, this.mp.fid, new Date().getTime());
+		}
 	},
 	lbar : function(addr, cb){
 		$.ajax({

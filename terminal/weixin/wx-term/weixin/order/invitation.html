@@ -2,6 +2,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
 <title>Insert title here</title>
 <link type="text/css" rel="stylesheet" href="./css/general_foundicons.css">
 <style type="text/css">
@@ -40,7 +42,6 @@ body,html{
 }
 
 .invitationContent{
-	height: 300px;
 	color: white;padding: 5px;
 	font-size: 18px;
     font-family: 'Microsoft Yahei', '微软雅黑';
@@ -51,23 +52,43 @@ body,html{
 	text-align: center;
 }
 </style>
+<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="js/Util.js"></script>
+<script type="text/javascript">
+	$.post('../../WxOperateBook.do', { dataSource : "invitation", bookId : Util.mp.extra, fid:Util.mp.fid}, function(data){
+		if(data.success){
+			var bookData = data.root[0];
+			$("#invitationDate").html(bookData.bookDate);
+			$("#invitationRest").html(data.other.rest.name);
+			$("#invitationPeople").html(bookData.member);
+			$("#invitationRestPhone").html(data.other.rest.tele1);
+			$("#invitationRestAddress").html(data.other.rest.address);
+			$("#invitationRestQrcode").attr("src", data.other.wxRest.qrCodeUrl);
+		}
+	});
+	
+</script>
 </head>
 <body>
 
-<div style="background-color: #ef4437;height: 100%;position: absolute;">
+<div style="background-color: #ef4437;position: absolute;">
 	<img alt="" src="images/invitation-top.png" style="width: 100%">
 	<div class="invitationContent">
-		<p>尊敬的 兰戈 先生</p>
-		<p>&emsp;兹定于 2015-08-23 11:30 在  西柠 邀请您举杯共聚。</p>
+		<p>尊敬的朋友们:</p>
+		<p>&emsp;兹定于 <font id="invitationDate">2015-08-23 11:30</font> 在  <font id="invitationRest">西柠</font> 邀请您举杯共聚。</p>
 		<p>&emsp;恭请光临！</p>
-		<p style="float: right;">邀请人: 张生 先生</p>
-	</div>
+		<p style="float: right;">邀请人: <font id="invitationPeople">X生</font></p>
+		<br><br><br>
+		<p>餐厅电话: <font id="invitationRestPhone">00000000</font></p>
+		<p>餐厅地址: <font id="invitationRestAddress">广州市天河区东圃镇黄村福元路晨晖商务大厦A301</font></p>
+		<p>如需一键导航请通过下面二维码关注本餐厅</p>
+	</div>	
 	<div class="invitationCode">
-		<img alt="" src="images/shopcode.jpg" height="200">
+		<img id="invitationRestQrcode" alt="" src="images/shopcode.png" height="150">
 	</div>
 </div>
 
-<div class="ddb-nav-footer ng-scope">
+<!-- <div class="ddb-nav-footer ng-scope">
     <a class="nav-item" >
         <i class="foundicon-page fcolor6"></i>
         门店介绍
@@ -76,6 +97,6 @@ body,html{
         <i class="foundicon-home fcolor6"></i>
         如何到店
     </a>
-</div>
+</div> -->
 </body>
 </html>
