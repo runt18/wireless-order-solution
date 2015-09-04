@@ -379,12 +379,12 @@ function fnPublishPromotion(){
 				xtype : 'label',
 				text : '发布对象:'
 			},{
-				columnWidth : 0.3,
+				columnWidth : 0.35,
 				id : 'comboFilter4PromotionPublish',
 				xtype : 'combo',
 				readOnly : false,
 				forceSelection : true,
-				width : 80,
+				width : 100,
 				store : new Ext.data.JsonStore({
 					root : 'root',
 					fields : ['id', 'name']
@@ -402,7 +402,7 @@ function fnPublishPromotion(){
 //				text : '&nbsp;&nbsp;&nbsp;&nbsp;结束时间:'
 //			},
 			{
-				columnWidth : 0.2,
+				columnWidth : 0.15,
 				xtype : 'label',
 				html : '&nbsp;&nbsp;&nbsp;&nbsp;结束时间:'
 			},{
@@ -521,8 +521,8 @@ function fnPublishPromotion(){
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
-								jr.root.unshift({id : 0, name : '全部'});
-								jr.root.unshift({id : -1, name : '不发布任何人'});
+								jr.root.unshift({id : 0, name : '全部会员'});
+								jr.root.unshift({id : -1, name : '不发布任何会员'});
 								jr.root.unshift({id : -2, name : '不更改'});
 								Ext.getCmp('comboFilter4PromotionPublish').store.loadData(jr);
 								Ext.getCmp('comboFilter4PromotionPublish').setValue(-2);
@@ -913,10 +913,6 @@ Ext.onReady(function() {
 	showFloatOption({treeId : 'promotionTree', option : [{name : '发布', fn : "fnPublishPromotion()"},
 	                                                     {name : '修改', fn : "fnUpdatePromotion()"}, 
 	                                                     {name : '删除', fn : "fnDeletePromotion()"}]});
-	
-
-	
-	
 	
 	
 //-----------------------------优惠活动
