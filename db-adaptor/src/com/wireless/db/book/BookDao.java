@@ -517,6 +517,26 @@ public class BookDao {
 			return book;
 		}
 	}
+
+	/**
+	 * Get the book according to extra condition {@link ExtraCond}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the book records
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Book> getByCond(Staff staff, ExtraCond extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
 	/**
 	 * Get the book according to extra condition {@link ExtraCond}.
