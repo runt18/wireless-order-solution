@@ -216,11 +216,6 @@ function showPromotionGuide(c){
 						updatePromotionCouponPanel(thiz.promotion.pType);
 					}
 				}
-//				,
-//				hide : function(thiz){
-//					$("#wizard").steps("previous");
-//					$("#wizard").steps("previous");
-//				}
 			},
 			keys : [{
 				 key : Ext.EventObject.ESC,
@@ -382,7 +377,6 @@ function fnPublishPromotion(){
 				xtype : 'combo',
 				readOnly : false,
 				forceSelection : true,
-//				width : 80,
 				store : new Ext.data.JsonStore({
 					root : 'root',
 					fields : ['id', 'name']
@@ -515,9 +509,8 @@ function fnPublishPromotion(){
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
-								jr.root.unshift({id : 0, name : '全部'});
-								jr.root.unshift({id : -1, name : '不发布任何人'});
-								jr.root.unshift({id : -2, name : '不更改'});
+								jr.root.unshift({id : 0, name : '全部会员'});
+								jr.root.push({id : -1, name : '不发布任何人'}, {id : -2, name : '不更改'});
 								Ext.getCmp('comboFilter4PromotionPublish').store.loadData(jr);
 								Ext.getCmp('comboFilter4PromotionPublish').setValue(-2);
 							}else{
