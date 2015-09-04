@@ -884,7 +884,7 @@ of.saveForSplitOrder = function(){
 	for(var i = 0; i < of.newFood.length; i++){
 		temp = of.newFood[i];
 		//转换为int
-		temp.count =  parseInt(count);
+		temp.count =  parseInt(count) * temp.count;
 		if(!temp.tasteGroup.normalTaste){
 			temp.tasteGroup.normalTaste = {
 				name : '',
