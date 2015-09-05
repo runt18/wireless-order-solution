@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="D:\tools\boost_1_47_0"
 				PreprocessorDefinitions="PROTOCOL_DYN_EXPORT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -117,6 +118,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="D:\tools\boost_1_47_0"
 				PreprocessorDefinitions="PROTOCOL_DYN_EXPORT"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
