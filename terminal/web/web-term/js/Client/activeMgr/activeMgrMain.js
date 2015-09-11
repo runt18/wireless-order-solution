@@ -386,7 +386,7 @@ function fnPublishPromotion(){
 				typeAhead : true,
 				mode : 'local',
 				triggerAction : 'all',
-				selectOnFocus : true,
+				selectOnFocus : true
 			},
 			{
 				columnWidth : 0.2,
@@ -504,7 +504,7 @@ function fnPublishPromotion(){
 					Ext.Ajax.request({
 						url : '../../OperateMemberCond.do?',
 						params : {
-							dataSource : 'getByCond',
+							dataSource : 'getByCond'
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
@@ -528,7 +528,7 @@ function fnPublishPromotion(){
 						url : '../../OperatePromotion.do?',
 						params : {
 							dataSource : 'getPromotion',
-							promotionId : promotionId,
+							promotionId : promotionId
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
