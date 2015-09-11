@@ -179,7 +179,7 @@ $(function(){
 		$('#divPosOperation').hide();
 		$('#btnOrderAndPay').hide();
 		//已点菜结账按钮
-		$('#btnPayBill').show();
+		$('#btnPayBill').hide();
 		//收银端餐台列表高度
 		tableListHeight = 86;
 	}
