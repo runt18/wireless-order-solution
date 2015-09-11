@@ -176,7 +176,7 @@ $(function(){
 		
 	}else if(systemStatus == 2){//touch端
 		//日结,交班等
-		$('#divPosOperation').show();
+		$('#divPosOperation').hide();
 		$('#btnOrderAndPay').hide();
 		//已点菜结账按钮
 		$('#btnPayBill').show();
