@@ -790,9 +790,8 @@ co.submit = function(c){
 							url : '../QueryOrderByCalc.do',
 							type : 'post',
 							data : {
-								calc:false,
-								serviceRate:0,
-								tableID:co.table.alias
+								calc : false,
+								tableID : co.table.alias
 							},
 							dataType : 'text',
 							success : function(results, status, xhr){

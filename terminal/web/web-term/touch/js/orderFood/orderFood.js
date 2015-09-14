@@ -2922,9 +2922,8 @@ of.submit = function(c){
 							url : '../QueryOrderByCalc.do',
 							type : 'post',
 							data : {
-								calc:false,
-								serviceRate:0,
-								tableID:of.table.id
+								calc : false,
+								tableID : of.table.id
 							},
 							dataType : 'text',
 							success : function(results, status, xhr){

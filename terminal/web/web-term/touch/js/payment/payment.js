@@ -16,8 +16,8 @@ var pm = {table : {}, payByMember:false},
 	//筛选账单明细的条件
 	lookupCondtion = "true",
 	
-	//当前折扣 && 服务费方案
-	calcDiscountID, calcServicePlan,
+	//当前折扣 
+	calcDiscountID,
 	
 	//计算混合结账:提交混合结账, 记录混合结账, 设置快捷键
 	payTypeCash ='', payMoneyCalc = {}, isMixedPay = false, curMixInput,
@@ -84,6 +84,20 @@ $(document).on("pagebeforehide","#paymentMgr",function(){
 	
 });
 
+var SettleTypeEnum = {
+	NORMAL : { val : 1, desc : '普通结账' },
+	MEMBER : { val : 2, desc : '会员结账' }
+};
+
+var PayTypeEnum = {
+	CASH : { val : 1, desc : '现金' },
+	CREDIT_CARD : { val : 2, desc : '刷卡' },
+	MEMBER : { val : 3, desc : '会员' },
+	SIGN : { val : 4, desc : '签单'},
+	HANG : { val : 5, desc : '挂账'},
+	MIXED : { val : 100, desc : '混合'}
+};
+
 function showPaymentMgr(c){
 	if(!c || !c.table){
 		Util.msg.alert({msg : '账单不存在', topTip: true});
@@ -133,7 +147,7 @@ function showPaymentMgr(c){
 		//设置数字键盘触发
 		numKeyBoardFireEvent = function (){
 			$('#txtEraseQuota').keyup();
-		}
+		};
 		
 		$('#calculator4NumberKeyboard').on("mouseover", function(){
 			usedEraseQuota = false;
@@ -210,8 +224,7 @@ function refreshOrderData(_c){
 			orderID : orderMsg?orderMsg.id:'',
 			calc : typeof _c.calc == 'boolean' ? _c.calc : true,
 			discountID : calcDiscountID,
-			customNum : pm.table.customNum,
-			servicePlan : calcServicePlan
+			customNum : pm.table.customNum
 		},
 		success : function(jr, status, xhr){
 			Util.LM.hide();
@@ -287,7 +300,7 @@ function loadOrderBasicMsg(){
 	$('#remark').val(orderMsg.comment && orderMsg.comment != '----' ? orderMsg.comment : '');
 	
 	//会员 & 折扣 & 优惠劵
-	var discountDesc = '当前折扣:<font style="color:green;font-weight:bold;">'+ orderMsg.discount.name + '</font>'
+	var discountDesc = '当前折扣:<font style="color:green;font-weight:bold;">'+ orderMsg.discount.name + '</font>';
 	if(orderMsg.discounter){
 		discountDesc += ', 折扣人:<font style="color:green;font-weight:bold;">'+ orderMsg.discounter + '</font>';
 		discountDesc += ', 折扣时间:<font style="color:green;font-weight:bold;">'+ orderMsg.discountDate + '</font>';
@@ -546,47 +559,49 @@ function setDiscountPlan(c){
  */
 function setServicePlan(c){
 	//关闭折扣选择
-	$('#payment_popupServiceCmp').popup('close');	
-	calcServicePlan = c.id;
-	refreshOrderData({calc:true});
+	$('#payment_popupServiceCmp').popup('close');
+	//设置服务费方案
+	$.ajax({
+		url : "../OperateOrderFood.do",
+		type : 'post',
+		data : {
+			dataSource: 'service',
+			orderId : orderMsg ? orderMsg.id : '',
+			planId : c.id
+		},
+		success : function(jr, status, xhr){
+			Util.LM.hide();
+			if(jr.success){
+				//刷新页面
+				refreshOrderData({calc : true});
+			}else{
+				Util.msg.alert({
+					msg : jr.msg,
+					renderTo : 'paymentMgr'
+				});
+			}
+		},
+		error : function(request, status, err){
+		}
+	}); 	
+
 }
 
 
 /**
  * 结账
  */
-var paySubmit = function(submitType) {
-	if(isPaying == true){ return; }
-	// 强制计算抹数后再结账,抹数计算
-//	if(!checkOutListRefresh()){
-//		return;
-//	}
-//	setFormButtonStatus(true);
-	var forFree = document.getElementById("forFree").innerHTML;
-	//不需要显示5秒倒数
-//	var change;
-//	if(inputReciptWin){
-//		change = $('#txtReciptReturn').text();
-//	}else{
-//		change = 0;
-//	}
-	var cancelledFoodAmount = document.getElementById("spanCancelFoodAmount").innerHTML;
+var paySubmit = function(submitType, temp) {
+	
+	if(isPaying == true){ 
+		return; 
+	}
 	var actualPrice = checkOut_actualPrice;
-	var countPrice = document.getElementById("totalPrice").innerHTML;
-	var shouldPay = document.getElementById("shouldPay").innerHTML;
 	var eraseQuota = $("#txtEraseQuota").val();
 	var submitPrice = -1;
-	/*var customNum = Ext.getCmp("numCustomNum").getValue();*/
-	
-	var payManner = 1;
-	var tempPay;
-	
-	//普通或会员结账
-	var payType;
-	
-	//发送短信, 打印二维码
-	var sendSms, printCode;
 
+	//是否发送短信
+	var sendSms = false;
 	
 	if(orderMsg == null){
 		Util.msg.alert({msg:"读取账单有误, 不能结账", renderTo:'paymentMgr'});
@@ -602,52 +617,36 @@ var paySubmit = function(submitType) {
 		return;
 	}	
 
-	//是否已注入会员
+	//普通或会员结账, 会员已注入则为会员结账, 否则为普通该结账
+	var settleType;
 	if(member4Display && member4Display.hadSet){
-		payType = 2;
-		actualMemberID = member4Display.id
+		settleType = SettleTypeEnum.MEMBER.val;
+		actualMemberID = member4Display.id;
 	}else{
-		payType = 1;
+		settleType = SettleTypeEnum.NORMAL.val;
 	}
 	// 现金
-	if (submitType == 1) {
+	if (submitType == PayTypeEnum.CASH.val) {
 		submitPrice = actualPrice;
-	}else if(submitType == 3){//会员结账
+		
+	}else if(submitType == PayTypeEnum.MEMBER.val){//会员结账
 		//FIXME 要加上抹数?
 		if(member4Display.totalBalance < checkOut_actualPrice){
 			Util.msg.alert({msg : '会员卡余额小于合计金额，不能结帐!', topTip:true});
 			return;			
 		}			
 		
-		//保存发送短信 & 打印二维码操作
+		//保存发送短信 
 		if($('#memberPaymentSendSMS').attr('checked')){
 			sendSms = true;
-			setcookie(document.domain+'_consumeSms', true);
+			setcookie(document.domain + '_consumeSms', true);
 		}else{
 			sendSms = false;
-			setcookie(document.domain+'_consumeSms', false);
+			setcookie(document.domain + '_consumeSms', false);
 		}
-/*		if($('#memberPaymentPrintCore').attr('checked')){
-			printCode = true;
-			setcookie(document.domain+'_printCore', true);
-		}else{
-			printCode = false;
-			setcookie(document.domain+'_printCore', false);
-		}*/
 		
-		//用会员卡结账
-		payManner = 3;
-	}else if (submitType == 6) {//普通暂结，调整参数
-		tempPay = "true";
-	}else if(submitType == 101){//混合暂结，调整参数
-		tempPay = "true";
-		payManner = 100;		
-	}else {
-		tempPay = "";
-		payManner = submitType;
 	}
 
-	
 	Util.LM.show();
 	
 	isPaying = true;
@@ -657,17 +656,15 @@ var paySubmit = function(submitType) {
 		data : {
 			"orderID" : orderMsg.id,
 			"cashIncome" : submitPrice,
-			"payType" : payType,
-			"payManner" : payManner,
-			"tempPay" : tempPay,
+			"payType" : settleType,
+			"payManner" : submitType,
+			"tempPay" : temp == undefined ? 'false' : 'true',
 			"memberID" : actualMemberID,
 			"comment" : $("#remark").val(),
-			"servicePlan" : calcServicePlan,
-			'eraseQuota' : eraseQuota == ''?0:eraseQuota,
+			'eraseQuota' : eraseQuota == '' ? 0 : eraseQuota,
 			'customNum' : orderMsg.customNum,
 			'payTypeCash' : payTypeCash,
-			'sendSms' : sendSms,
-			'printCode' : printCode
+			'sendSms' : sendSms
 		},
 		dataType : 'json',
 		success : function(resultJSON, status, xhr){
@@ -675,7 +672,7 @@ var paySubmit = function(submitType) {
 			isPaying = false;
 			var dataInfo = resultJSON.data;
 			if (resultJSON.success == true) {
-				if (submitType == 6 || submitType == 101) {
+				if (temp != undefined) {
 					Util.msg.alert({msg : dataInfo, topTip:true});
 //					setFormButtonStatus(false);
 				}else{
@@ -696,7 +693,7 @@ var paySubmit = function(submitType) {
 				}
 			} else {
 				//不能同时弹出两个popup
-				if(inputReciptWin || payType == 2 || submitType == 100 || submitType == 101){
+				if(inputReciptWin || settleType == 2 || submitType == 100 || submitType == 101){
 					Util.msg.alert({msg : resultJSON.data, topTip:true});
 				}else{
 					Util.msg.alert({
@@ -724,10 +721,11 @@ pm.closeKeyboard = function(){
 	if(mouseOutNumKeyboard){
 		usedEraseQuota = true;
 	}
-}
+};
 	
 function loadOrderDetail(){
-	var tableId, orderId;
+	var tableId = 0;
+	var orderId = 0;
 	if($.mobile.activePage.attr( "id" ) == 'paymentMgr'){//结账界面中使用
 		tableId = pm.table.id;
 		orderId = orderMsg.id;
@@ -788,7 +786,6 @@ function lookupOrderDetailByType(type){
 	//账单查看
 	var html = '';
 	for(var i = 0, index = 1; i < orderFoodDetails.length; i++){
-		var tempData = orderFoodDetails[i]; 
 		if(eval(lookupCondtion)){
 			html += payment_lookupOrderDetailTemplet.format({
 				dataIndex : index,
@@ -844,7 +841,7 @@ function openInputReciptWin(){
 	//设置数字键盘触发
 	numKeyBoardFireEvent = function (){
 		$('#txtInputRecipt').keyup();
-	}
+	};
 		
 	$('#numberKeyboard').show();
 	
@@ -884,7 +881,7 @@ function payInputRecipt(){
 		input.focus();
 		return;		
 	}
-	paySubmit(1);
+	paySubmit(PayTypeEnum.CASH.val);
 }
 
 function loadMix(){
@@ -979,7 +976,7 @@ function mixPayAction(temp){
 		for(var pay in payMoneyCalc){
 			if(typeof payMoneyCalc[pay] != 'boolean'){
 				//可能存在的小数问题
-				mixedPayMoney = (mixedPayMoney * 10000 - payMoneyCalc[pay] * 10000)/10000
+				mixedPayMoney = (mixedPayMoney * 10000 - payMoneyCalc[pay] * 10000) / 10000;
 			}
 		}					
 	
@@ -998,9 +995,9 @@ function mixPayAction(temp){
 		}	
 		
 		if(temp){
-			paySubmit(101);
+			paySubmit(PayTypeEnum.MIXED.val, 'temp');
 		}else{
-			paySubmit(100);
+			paySubmit(PayTypeEnum.MIXED.val);
 //			closeMixedPayWin();				
 		}
 		
@@ -1165,7 +1162,7 @@ function setMemberToOrder(){
 	var discount = $('#payment4MemberDiscount');
 	var pricePlan = $('#payment4MemberPricePlan');
 	var coupon = $('#payment4MemberCoupon');
-	var orderId;
+	var orderId = 0;
 	
 	if($.mobile.activePage.attr( "id" ) == 'paymentMgr'){//结账界面的orderId
 		orderId = orderMsg.id;
@@ -1293,15 +1290,9 @@ function showMemberInfoWin(){
 	if(getcookie(document.domain+'_consumeSms') == "true"){
 		$('#memberPaymentSendSMS').attr('checked', true);
 	}else{
-		$('#memberPaymentSendSMS').attr('checked', false)
+		$('#memberPaymentSendSMS').attr('checked', false);
 	}
 	
-/*	if(getcookie(document.domain+'_printCore') == "true"){
-		$('#memberPaymentPrintCore').attr('checked', true);
-	}else{
-		$('#memberPaymentPrintCore').attr('checked', false);
-	}	
-	$('#memberPaymentPrintCore').checkboxradio('refresh');*/
 	$('#memberPaymentSendSMS').checkboxradio('refresh');
 
 	

@@ -1020,7 +1020,6 @@ uo.tempPayForUO = function(c){
 				payType : uo.order.settleTypeValue,
 				memberID : uo.order.member,
 				payManner : uo.order.payTypeValue,
-				serviceRate : uo.order.serviceRate,
 				cashIncome : '-1',
 //				comment : uo.order.comment,
 				customNum : uo.order.customNum,

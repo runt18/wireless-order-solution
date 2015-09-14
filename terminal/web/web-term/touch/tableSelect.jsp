@@ -2247,7 +2247,7 @@
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" href="#tableSelectMgr" >返回</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="refreshOrderData({calc:true})" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="paySubmit(6)">暂结(-)</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="paySubmit(1, 'temp')">暂结(-)</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="toCheckoutPage()">改单</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupDiscountCmp">折扣</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupServiceCmp">服务费</a>
