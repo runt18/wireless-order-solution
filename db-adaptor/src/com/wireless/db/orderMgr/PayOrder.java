@@ -254,6 +254,18 @@ public class PayOrder {
 			
 		dbCon.stmt.executeUpdate(sql);			
 
+		//Update each food's discount & unit price.
+		for(OrderFood of : orderCalculated.getOrderFoods()){
+			sql = " UPDATE " + Params.dbName + ".order_food " +
+				  " SET food_id = " + of.getFoodId() +
+				  " ,discount = " + of.getDiscount() + 
+				  " ,unit_price = " + of.asFood().getPrice() +
+				  " WHERE order_id = " + orderCalculated.getId() + 
+				  " AND food_id = " + of.getFoodId() +
+				  (of.hasFoodUnit() ? " AND food_unit_id = " + of.getFoodUnit().getId() : "");
+			dbCon.stmt.executeUpdate(sql);				
+		}	
+		
 		//Insert the mixed payment detail.
 		if(orderCalculated.getPaymentType().isMixed()){
 			MixedPaymentDao.insert(dbCon, staff, new MixedPayment.InsertBuilder(orderCalculated).setPayments(orderCalculated.getMixedPayment().getPayments()));
@@ -369,6 +381,20 @@ public class PayOrder {
 			}
 		}
 
+		//Set the price plan.
+		final ServicePlan servicePlan;
+		if(orderToCalc.hasServicePlan()){
+			servicePlan = ServicePlanDao.getByRegion(dbCon, staff, orderToCalc.getServicePlan().getPlanId(), orderToCalc.getRegion());
+		}else{
+			servicePlan = ServicePlanDao.getDefaultByRegion(dbCon, staff, orderToCalc.getRegion());
+		}
+		orderToCalc.setServicePlan(servicePlan);
+		if(servicePlan.hasRates()){
+			orderToCalc.setServiceRate(servicePlan.getRates().get(0).getRate());
+		}else{
+			orderToCalc.setServiceRate(0);
+		}
+		
 		//Set the erase price.
 		orderToCalc.setErasePrice(payBuilder.getErasePrice());
 		//Set the received cash.
@@ -380,25 +406,6 @@ public class PayOrder {
 		//Set the comment.
 		if(payBuilder.hasComment()){
 			orderToCalc.setComment(payBuilder.getComment());
-		}
-		
-		//If the service plan is set, use to get the rate to region belongs to this order
-		if(payBuilder.hasServicePlan()){
-			ServicePlan sp = ServicePlanDao.getByRegion(dbCon, staff, payBuilder.getServicePlanId(), orderToCalc.getRegion());
-			orderToCalc.setServicePlan(sp);
-			if(sp.hasRates()){
-				orderToCalc.setServiceRate(sp.getRates().get(0).getRate());
-			}else{
-				orderToCalc.setServiceRate(0);
-			}
-		}else{
-			ServicePlan sp = ServicePlanDao.getDefaultByRegion(dbCon, staff, orderToCalc.getRegion());
-			orderToCalc.setServicePlan(sp);
-			if(sp.hasRates()){
-				orderToCalc.setServiceRate(sp.getRates().get(0).getRate());
-			}else{		
-				orderToCalc.setServiceRate(0);
-			}
 		}
 		
 		float cancelPrice = 0;

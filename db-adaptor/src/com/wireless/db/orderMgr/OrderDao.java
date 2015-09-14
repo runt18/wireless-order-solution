@@ -591,6 +591,54 @@ public class OrderDao {
 	}
 	
 	/**
+	 * Perform the service rate specific order.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the service builder {@link Order#ServiceBuilder}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the order does NOT exist
+	 */
+	public static void service(Staff staff, Order.ServiceBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			service(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform the service rate specific order.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the service builder {@link Order#ServiceBuilder}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the order does NOT exist
+	 */
+	public static void service(DBCon dbCon, Staff staff, Order.ServiceBuilder builder) throws SQLException, BusinessException{
+		Order order = getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
+		ServicePlan sp = ServicePlanDao.getByRegion(dbCon, staff, builder.getServicePlanId(), order.getRegion());
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".order SET " +
+			  " service_plan_id = " + sp.getPlanId() +
+			  " ,service_rate = " + (sp.hasRates() ? sp.getRates().get(0).getRate() : 0) +
+			  " WHERE id = " + order.getId();
+		
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(FrontBusinessError.ORDER_NOT_EXIST);
+		}
+	}
+	
+	/**
 	 * Comment the order to specific builder {@link Order#CommentBuilder}.
 	 * @param staff
 	 * 			the staff to perform this action
@@ -682,6 +730,9 @@ public class OrderDao {
 			}
 			if(builder.hasDiscountBuilder()){
 				discount(dbCon, staff, builder.getDiscountBuilder());
+			}
+			if(builder.hasServiceBuilder()){
+				service(dbCon, staff, builder.getServiceBuilder());
 			}
 			UpdateOrder.exec(dbCon, staff, builder.getUpdateBuilder());
 			PayOrder.pay(dbCon, staff, builder.getPayBuilder());
