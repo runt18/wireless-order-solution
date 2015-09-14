@@ -3,7 +3,7 @@
 	<!-- the name of db -->
 	<db>wireless_order_db</db>
 	<!-- the ip address of the db host -->
-	<host>192.168.180.100</host> 
+	<host>192.168.33.100</host> 
 	<!-- the port that the db is listened on -->
 	<port>3306</port>
 	<!-- the db account -->
