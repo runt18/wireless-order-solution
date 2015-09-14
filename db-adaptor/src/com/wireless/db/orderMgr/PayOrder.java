@@ -254,12 +254,10 @@ public class PayOrder {
 			
 		dbCon.stmt.executeUpdate(sql);			
 
-		//Update each food's discount & unit price.
+		//Update each food's discount.
 		for(OrderFood of : orderCalculated.getOrderFoods()){
 			sql = " UPDATE " + Params.dbName + ".order_food " +
-				  " SET food_id = " + of.getFoodId() +
-				  " ,discount = " + of.getDiscount() + 
-				  " ,unit_price = " + of.asFood().getPrice() +
+				  " SET discount = " + of.getDiscount() + 
 				  " WHERE order_id = " + orderCalculated.getId() + 
 				  " AND food_id = " + of.getFoodId() +
 				  (of.hasFoodUnit() ? " AND food_unit_id = " + of.getFoodUnit().getId() : "");
