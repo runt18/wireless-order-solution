@@ -385,8 +385,8 @@ public class JobContentFactory {
 						jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 														new TransFoodContent(transferFoods,
 																   orderId,
-																   srcTbl,
 																   destTbl,
+																   srcTbl,
 																   staff.getName(),
 																   printType,
 																   printer.getStyle())));
