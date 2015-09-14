@@ -34,9 +34,7 @@ import com.wireless.util.DataPaging;
 
 public class QueryCancelledFoodAction extends DispatchAction{
 	
-	public ActionForward getDetail(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward getDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String limit = request.getParameter("limit");
 		String start = request.getParameter("start");
 		

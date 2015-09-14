@@ -36,8 +36,6 @@ public class PayOrderAction extends Action{
 
 			/**
 			 * The parameters looks like below.
-			 * e.g. pin=0x1 & tempPay=false & tableID=201 & payType=1 & discountType=1 & 
-			 * 		payManner=1 & cashIncome=120 giftPrice=0 & serviceRate=5 & memberID=13693834750
 			 * 
 			 * pin : the pin the this terminal
 			 * 
@@ -62,9 +60,6 @@ public class PayOrderAction extends Action{
 			 * 				this parameter is optional, only takes effect while the pay manner is "现金"
 			 * 
 			 * 
-			 * serviceRate : the service percent rate to this order,
-			 * 				 this parameter is optional.
-			 * 
 			 * memberID : the id to member, 
 			 * 			  this parameter is optional, only takes effect while the pay type is "会员" 
 			 * 
@@ -79,14 +74,14 @@ public class PayOrderAction extends Action{
 			
 			int orderId = Integer.parseInt(request.getParameter("orderID"));
 			
-			Order.SettleType settleType;
+			final Order.SettleType settleType;
 			if(request.getParameter("payType") != null){
 				settleType = Order.SettleType.valueOf(Integer.parseInt(request.getParameter("payType")));
 			}else{
 				settleType = Order.SettleType.NORMAL;
 			}
 			
-			PayType payType;
+			final PayType payType;
 			if(request.getParameter("payManner") != null){
 				payType = new PayType(Integer.parseInt(request.getParameter("payManner")));
 			}else{
@@ -94,19 +89,7 @@ public class PayOrderAction extends Action{
 			}
 			
 			if(settleType == Order.SettleType.MEMBER){
-				//FIXME 不能读取cookie
-/*				boolean sendSMS = false;
-				//Send SMS if paid by charge member.
-				for(Cookie cookie : request.getCookies()){
-				    if(cookie.getName().equals((request.getServerName() + "_consumeSms"))){
-				    	if(cookie.getValue().equals("true")){
-				    		sendSMS = true;
-				    		break;
-				    	}
-				    }
-				}*/
 				payBuilder = Order.PayBuilder.build4Member(orderId, payType, Boolean.parseBoolean(request.getParameter("sendSms")));
-				
 			}else{
 				payBuilder = Order.PayBuilder.build4Normal(orderId, payType);
 			}
@@ -126,10 +109,6 @@ public class PayOrderAction extends Action{
 			
 			if(request.getParameter("pricePlanID") != null && !request.getParameter("pricePlanID").isEmpty() && !request.getParameter("pricePlanID").equals("-1")){
 				payBuilder.setPricePlanId(Integer.parseInt(request.getParameter("pricePlanID")));
-			}
-			
-			if(request.getParameter("servicePlan") != null && !request.getParameter("servicePlan").isEmpty()){
-				payBuilder.setServicePlan(Integer.parseInt(request.getParameter("servicePlan")));
 			}
 			
 			if(request.getParameter("eraseQuota") != null){
@@ -205,8 +184,6 @@ public class PayOrderAction extends Action{
 			jsonResp = jsonResp.replace("$(value)", e.getMessage());
 			
 		}finally{
-			//just for debug
-			//System.out.println(jsonResp);
 			out.print(jsonResp);
 			out.flush();
 			out.close();

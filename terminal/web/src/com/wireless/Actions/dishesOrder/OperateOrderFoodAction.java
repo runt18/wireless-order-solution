@@ -262,5 +262,30 @@ public class OperateOrderFoodAction extends DispatchAction{
 		return null;
 	}	
 	
-	
+	public ActionForward service(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jobject = new JObject();
+		
+		try{
+			
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			int servicePlanId = Integer.parseInt(request.getParameter("planId"));
+			int orderId = Integer.parseInt(request.getParameter("orderId"));
+			
+			OrderDao.service(staff, new Order.ServiceBuilder(orderId, servicePlanId));
+			
+			jobject.initTip(true, "设置服务费方案成功");
+		
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 }

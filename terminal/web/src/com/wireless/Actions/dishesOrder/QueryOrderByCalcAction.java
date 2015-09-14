@@ -57,16 +57,12 @@ public class QueryOrderByCalcAction extends Action{
 			if(calc != null && Boolean.valueOf(calc)){
 				
 				String eraseQuota = request.getParameter("eraseQuota");
-				String servicePlan = request.getParameter("servicePlan");
 				String customNum = request.getParameter("customNum");
 				if(eraseQuota != null){
 					payBuilder.setErasePrice(Integer.valueOf(eraseQuota));
 				}
 				if(customNum != null){
 					payBuilder.setCustomNum(Short.valueOf(customNum));
-				}
-				if(servicePlan != null){
-					payBuilder.setServicePlan(Integer.parseInt(servicePlan));
 				}
 				
 				order = PayOrder.calc(staff, payBuilder);

@@ -26,6 +26,7 @@ import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.util.DateType;
 
 public class DailySettleStatDetailAction extends Action {
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		JObject jobject = new JObject();

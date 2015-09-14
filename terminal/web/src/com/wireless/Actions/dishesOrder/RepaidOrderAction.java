@@ -68,9 +68,6 @@ public class RepaidOrderAction extends Action{
 			//get the custom number to this order
 			payBuilder.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
 			
-			//get the service rate to this order
-			payBuilder.setServicePlan(Integer.parseInt(request.getParameter("servicePlan")));
-
 			//get the erasePrice rate to this order
 			payBuilder.setErasePrice(Integer.valueOf(request.getParameter("erasePrice")));
 			
@@ -89,27 +86,35 @@ public class RepaidOrderAction extends Action{
 			}
 			
 			Order.RepaidBuilder repaidBuilder = new Order.RepaidBuilder(JObject.parse(Order.UpdateBuilder.JSON_CREATOR, 0, request.getParameter("commitOrderData")), payBuilder);
-			
-			int discount = 0, pricePlan = 0, coupon = 0;
-			discount = Integer.parseInt(request.getParameter("discountID"));
-			
+
+			//Set the discount.
+			String discount = request.getParameter("discountID");			
 			if(settleType == Order.SettleType.MEMBER){
-				
+				int coupon = 0;
 				if(couponId != null && !couponId.isEmpty()){
 					coupon = Integer.parseInt(couponId);
 				}
+				int pricePlan = 0;
 				if(pricePlanId != null && !pricePlanId.isEmpty()){
 					pricePlan = Integer.parseInt(pricePlanId);
 				}
 				
-				
-				repaidBuilder.setDiscountBuilder(Order.DiscountBuilder.build4Member(orderId, new Member(Integer.valueOf(request.getParameter("memberID"))), discount, pricePlan, coupon));
+				if(discount != null && !discount.isEmpty()){
+					repaidBuilder.setDiscountBuilder(Order.DiscountBuilder.build4Member(orderId, new Member(Integer.valueOf(request.getParameter("memberID"))), 
+																						Integer.parseInt(discount), pricePlan, coupon));
+				}
 			}else{
-				repaidBuilder.setDiscountBuilder(Order.DiscountBuilder.build4Normal(orderId, discount));
+				if(discount != null && !discount.isEmpty()){
+					repaidBuilder.setDiscountBuilder(Order.DiscountBuilder.build4Normal(orderId, Integer.parseInt(discount)));
+				}
 			}
 			
-			ProtocolPackage resp = ServerConnector.instance().ask(
-					new ReqRepayOrder(staff,repaidBuilder, PrintOption.DO_PRINT));
+			//Set the service plan.
+			if(request.getParameter("servicePlan") != null && !request.getParameter("servicePlan").isEmpty()){
+				repaidBuilder.setServiceBuilder(new Order.ServiceBuilder(orderId, Integer.parseInt(request.getParameter("servicePlan"))));
+			}
+			
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqRepayOrder(staff, repaidBuilder, PrintOption.DO_PRINT));
 			
 			
 			if(resp.header.type == Type.ACK){

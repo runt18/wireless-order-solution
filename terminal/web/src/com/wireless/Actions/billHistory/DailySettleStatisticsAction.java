@@ -18,12 +18,8 @@ import com.wireless.pojo.billStatistics.ShiftGeneral;
 import com.wireless.util.DataPaging;
 
 public class DailySettleStatisticsAction extends Action {
-	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		
-		
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		JObject jobject = new JObject();
 		String isPaging = request.getParameter("isPaging");

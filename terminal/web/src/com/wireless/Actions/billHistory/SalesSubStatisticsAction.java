@@ -28,6 +28,7 @@ import com.wireless.util.DataPaging;
 
 public class SalesSubStatisticsAction extends Action {
 	
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		List<SalesDetail> salesDetailList = null;
 		String isPaging = request.getParameter("isPaging");

@@ -38,9 +38,6 @@ public class QueryOrderFromMemberPayAction extends Action{
 			String pin = (String)request.getAttribute("pin");
 			String orderID = request.getParameter("orderID");
 			String pricePlanId = request.getParameter("pricePlanId");
-//			String couponId = request.getParameter("couponId");
-//			String discountID = request.getParameter("discountID");
-			String servicePlanId = request.getParameter("servicePlanId");
 			String sv = request.getParameter("sv");
 			//0: 模糊搜索, 1 : 根据手机号, 2: 微信卡号, 3:实体卡号
 			String s_type = request.getParameter("st");
@@ -99,18 +96,8 @@ public class QueryOrderFromMemberPayAction extends Action{
 				}				
 			}
 			
-			if(servicePlanId != null && !servicePlanId.isEmpty()){
-				payBuilder.setServicePlan(Integer.parseInt(servicePlanId));
-			}
-			
-//			if(couponId != null && !couponId.trim().isEmpty() && !couponId.equals("-1")){
-//				payBuilder.setCouponId(Integer.parseInt(couponId));
-//			}
 			final Order order = PayOrder.calc(staff, payBuilder);
 			
-			
-//			final List<Coupon> coupons = new ArrayList<>();
-//			final Member m;			
 			final List<Member> members = membersByType;
 			
 			final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(members.get(0).getId()).setStatus(Coupon.Status.DRAWN), null);
