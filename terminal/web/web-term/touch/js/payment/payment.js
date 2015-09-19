@@ -95,6 +95,7 @@ var PayTypeEnum = {
 	MEMBER : { val : 3, desc : '会员' },
 	SIGN : { val : 4, desc : '签单'},
 	HANG : { val : 5, desc : '挂账'},
+	WX : { val : 6, desc : '微信支付'},
 	MIXED : { val : 100, desc : '混合'}
 };
 
@@ -604,16 +605,27 @@ var paySubmit = function(submitType, temp) {
 	var sendSms = false;
 	
 	if(orderMsg == null){
-		Util.msg.alert({msg:"读取账单有误, 不能结账", renderTo:'paymentMgr'});
+		Util.msg.alert({msg : "读取账单有误, 不能结账", renderTo : 'paymentMgr'});
 		return;
 	}
 	
 	if(eraseQuota && isNaN(eraseQuota)){
-		Util.msg.alert({msg:"请填写正确的抹数金额", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();firstTimeInput = true;}});
+		Util.msg.alert({msg : "请填写正确的抹数金额", 
+						renderTo : 'paymentMgr', 
+						fn : function(){
+							$("#txtEraseQuota").focus();
+							$("#txtEraseQuota").select();
+							firstTimeInput = true;
+						}});
 		return;
 	}else if(!isNaN(eraseQuota) && eraseQuota > restaurantData.setting.eraseQuota){// 抹数金额
-//		setFormButtonStatus(false);
-		Util.msg.alert({msg:"抹数金额大于设置上限，不能结帐!", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();firstTimeInput = true;}});
+		Util.msg.alert({msg : "抹数金额大于设置上限，不能结帐!", 
+					 	renderTo : 'paymentMgr',
+					 	fn:function(){
+					 		$("#txtEraseQuota").focus();
+					 		$("#txtEraseQuota").select();
+					 		firstTimeInput = true;
+					 	}});
 		return;
 	}	
 
@@ -693,8 +705,8 @@ var paySubmit = function(submitType, temp) {
 				}
 			} else {
 				//不能同时弹出两个popup
-				if(inputReciptWin || settleType == 2 || submitType == 100 || submitType == 101){
-					Util.msg.alert({msg : resultJSON.data, topTip:true});
+				if(inputReciptWin || settleType == SettleTypeEnum.MEMBER.val || submitType == PayTypeEnum.MIXED.val){
+					Util.msg.alert({msg : resultJSON.data, topTip : true});
 				}else{
 					Util.msg.alert({
 						msg : resultJSON.data,
