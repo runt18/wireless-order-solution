@@ -5,10 +5,14 @@ $(function(){
 	var handWriting = new HandWritingPanel(
 		{ renderTo : document.getElementById('handWritingPanel'),
 		  result : function(data){
-//		  	for(var i = 0; i < data.length; i++){
-//		  		data[i]
-//		  	}
-			console.log(data);	
+			var temp = data.slice(0, 9).reverse();
+			var zifu = "";
+			for(var i = 0; i < temp.length; i++){			
+				var all = '<input type="button" value="' + temp[i] + '" onclick="">';
+				zifu = all + zifu;
+			}
+			document.getElementById("sdf").innerHTML = zifu;
+			console.log(zifu);	
 		}}
 		);
 	$('#buttonRewrite').click(function(){
@@ -194,7 +198,8 @@ function HandWritingPanel(param){
 	//public methods
 	this.rewrite = function(){
 		//TODO
-		ctx.clearRect(0,0,300,200);
+		drawing = false;
+		ctx.clearRect(0, 0, param.renderTo.clientHeight, param.renderTo.clientWidth);
         bihua = [];
   	}
 }

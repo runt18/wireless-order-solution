@@ -455,6 +455,17 @@ window.onload = function(){
 			of.s.fireEvent();
 		}		
 	});
+	
+	//菜品搜索 各个端都显示拼音
+	$('#pinyinInput').focus(function(){
+		focusInput = this.id;
+		if(this.id == 'pinyinInput'){
+			of.s.fireEvent();
+		}		
+	});
+	
+	
+	
 	//沽清搜索
 	$('#searchSelloutFoodInput').focus(function(){
 		focusInput = this.id;
@@ -1107,6 +1118,7 @@ ts.toOrderFoodOrTransFood = function(c){
 		var table = null;
 			
 		for (var i = 0; i < ts.multiPayTableChoosedTable.length; i++) {
+			
 			if(ts.multiPayTableChoosedTable[i].id == c.id){
 				table = true;
 				ts.multiPayTableChoosedTable.splice(i, 1);

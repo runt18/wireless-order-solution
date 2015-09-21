@@ -81,11 +81,20 @@ of.s = {
 				if(of.s.fileValue.trim().length > 0){
 					data = [];
 					temp = of.foodList.slice(0);
-					for(var i = 0; i < temp.length; i++){
-						if(temp[i].name.indexOf(of.s.fileValue.trim()) != -1){
-							data.push(temp[i]);
-						}
-					}				
+					if(c.qw == 'pinyin'){
+						for(var i = 0; i < temp.length; i++){
+							if(temp[i].pinyin.indexOf(of.s.fileValue.trim()) == 0){
+								data.push(temp[i]);
+							}
+						}	
+						
+					}else{
+						for(var i = 0; i < temp.length; i++){
+							if(temp[i].name.indexOf(of.s.fileValue.trim()) != -1){
+								data.push(temp[i]);
+							}
+						}						
+					}
 				}
 				
 				if(data){
@@ -169,7 +178,7 @@ of.searchFoodCompare = function (obj1, obj2) {
     } else {
         return 0;
     }            
-} 
+};
 
 /**
  * 入口, 加载点菜页面数据
@@ -247,9 +256,9 @@ of.toOrderFoodPage = function(table){
 			of.initKitchenContent({deptId:-1});
 		}
 	}, 400);
-	
+	 
 	of.initNewFoodContent();
-}
+};
 
 /**
  * 设置当前输入框
@@ -405,9 +414,12 @@ of.initKitchenContent = function(c){
 	of.foodPaging.getFirstPage();
 	
 	if(of.searchFooding){
-		//关闭搜索
+	//关闭搜索
 		closeSearchFood();
 	}	
+	if(of.searchFoodings){
+		closePinyin();
+	}
 };
 
 /**
@@ -586,6 +598,9 @@ of.findFoodByKitchen = function(c){
 		//关闭搜索
 		closeSearchFood();
 	}	
+	if(of.searchFoodings){
+		closePinyin();
+	}
 };
 
 /**
@@ -1226,7 +1241,14 @@ of.updateUnitPrice = function(c){
 				$('#divFoodTasteFloat').css({top : 'initial', bottom : '90px'});
 			}
 			
-			$('#divFoodTasteFloat').show();							
+			if(of.searchFoodings){
+				$('#divFoodTasteFloat').css({top : '130px', bottom : 'initial'});
+			}else{
+				$('#divFoodTasteFloat').css({top : 'initial', bottom : '90px'});
+			}
+
+
+									
 		}else{
 			Util.msg.tip('此菜品无其他单位');
 		}		
@@ -2253,7 +2275,7 @@ function saveTempTaste(){
  * @param ope
  */
 function searchFood(ope){
-	if(ope=='on'){
+	if(ope == 'on'){
 		if(!of.s.init({file : 'searchFoodInput'})){
 			Util.msg.alert({
 				renderTo : 'orderFoodMgr',
@@ -2265,10 +2287,11 @@ function searchFood(ope){
 		
 		of.searchFooding = true;
 		
-		YBZ_open(document.getElementById('searchFoodInput'));
+		$('#orderPinyinCmp').show();
+		$('#')
 		
-		$('#normalOperateFoodCmp').hide();
-		$('#searchFoodCmp').show();	
+		$('#normalOperateFoodCmp').show();
+		$('#searchFoodCmp').hide();	
 		
 		setTimeout(function(){
 			$('#searchFoodInput').focus();
@@ -2298,7 +2321,6 @@ function closeSearchFood(){
 	$('#normalOperateFoodCmp').show();
 	$('#searchFoodCmp').hide();
 	
-	YBZ_win.close();
 }
 
 /**
@@ -2346,6 +2368,10 @@ function addTempFood(){
 	$('#shadowForPopup').show();
 	
 	$('#tempFoodName').focus();
+	
+	if(of.searchFoodings){
+		closePinyin();
+	}
 	
 }
 
@@ -2519,7 +2545,13 @@ function foodCommonTasteLoad(){
 	
 	//在搜索时, 口味显示在上方
 	if(of.searchFooding){
-		$('#divFoodTasteFloat').css({top : '130px', bottom : 'initial'});
+		$('#divFoodTasteFloat').css({top : 'initial', bottom : '410px'});
+	}else{
+		$('#divFoodTasteFloat').css({top : 'initial', bottom : '90px'});
+	}
+	
+	if(of.searchFoodings){
+		$('#divFoodTasteFloat').css({top : 'initial', bottom : '46%'});
 	}else{
 		$('#divFoodTasteFloat').css({top : 'initial', bottom : '90px'});
 	}
@@ -2772,10 +2804,78 @@ of.openAliasOrderFood = function(){
 	}, 300);
 	
 	$('#orderFoodByAliasCmp').popup('open');
-	$('#orderFoodByAliasCmp').parent().addClass("pop").addClass("in");	
-	
+	if(of.searchFoodings){
+		closePinyin();
+	}
 
 }
+
+
+
+	//打开拼音搜索
+	function openPinyin (py){
+		if(py == 'on'){
+			if(!of.s.init({file : 'pinyinInput', qw : 'pinyin'})){
+				Util.msg.alert({
+					renderTo : 'orderFoodMgr',
+					msg : '程序异常, 搜索功能无法使用, 请刷新页面后重试.',
+					time : 2
+				});
+				return;
+			}	
+				
+			of.searchFoodings = true;
+	
+			$('#orderPinyinCmp').show();
+	
+			setTimeout(function(){
+						$('#pinyinInput').focus();
+					}, 250);
+		}else{
+			var kitchen = $('#kitchensCmp > a[data-theme=b]');
+			if(kitchen.length > 0){
+				kitchen.click();
+			}else{
+				kitchen = $('#kitchensCmp > a[data-value=-1]')[0];
+				kitchen.onclick();
+			}
+			kitchen = null;		
+			
+			closePinyin();
+		}		
+			
+	}
+/*
+ * 清空输入框
+ * */
+function deletePinyinInput(py){
+	$('#pinyinInput').val('');	
+	$('#pinyinInput').focus();
+}
+
+/*
+ * 拼音键盘点击事件
+ * */	
+function clickPinyin(m){
+	if(m){ //直接一个m 等于 typeof m == undefined &&  m == ""			
+	//	document.getElementById("pinyinInput").value = m;			
+		
+		$('#pinyinInput').val($('#pinyinInput').val() + m);
+		$('#pinyinInput').focus();
+	}		
+}
+	
+	/**
+ * 关闭搜索
+ */
+function closePinyin(){	
+	of.searchFoodings = false;
+	$('#pinyinInput').val('');
+	
+	$('#orderPinyinCmp').hide();
+	
+}
+
 
 /**
  * 关闭助记码
@@ -3004,6 +3104,9 @@ of.submit = function(c){
 							//关闭搜索
 							closeSearchFood();
 						}	
+						if(of.searchFoodings){
+							closePinyin();
+						}
 						
 						Util.msg.alert({
 							msg : data.msg,
