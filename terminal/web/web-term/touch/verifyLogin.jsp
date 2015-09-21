@@ -14,7 +14,7 @@
 <meta http-equiv="pragma" content="no-cache"> 
 <meta http-equiv="cache-control" content="no-cache"> 
 <meta http-equiv="expires" content="0">	
-
+<!-- 样式 -->
 <link rel="stylesheet" href="css/common/jquery.mobile-1.3.2.css">
 <!-- keyboard -->
 <link rel="stylesheet" href="css/keyboard/keyboard.css">
