@@ -15,6 +15,7 @@
 <meta http-equiv="cache-control" content="no-cache"> 
 <meta http-equiv="expires" content="0">	
 
+
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
 <!-- jquery mobile -->
 <link rel="stylesheet" href="css/common/jquery.mobile-1.3.2.css">
