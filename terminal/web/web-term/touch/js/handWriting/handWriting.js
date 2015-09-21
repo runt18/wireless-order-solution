@@ -47,9 +47,9 @@ function HandWritingPanel(param){
 	var bihua = [];
 	//画圆
 	function drawRound(x, y){
-	    ctx.fillStyle="#000000";
+	    ctx.fillStyle = "#000000";
 	    ctx.beginPath();
-	    ctx.arc(x,y,3,0,Math.PI*2,true);
+	    ctx.arc(x, y, 3, 0, Math.PI * 2, true);
 	    ctx.closePath();
 	    ctx.fill();
 		bihua.push(x + "a" + y + "a");
@@ -84,7 +84,7 @@ function HandWritingPanel(param){
 	    var left = getX(canvas);    
 		lastX = lastX - left + document.body.scrollLeft;
 		lastY = lastY - top + document.body.scrollTop;
-	    drawRound(lastX,lastY);
+	    drawRound(lastX, lastY);
 	
 	}
 	
@@ -180,11 +180,13 @@ function HandWritingPanel(param){
 	function senddata() {
 		var lg = "zh-cn";//选择语言
 		$.post("http://www.yibizi.com/json/hd_json.php", {
-					bh : lg + bihua
+					bh : lg + bihua.join("")
 				}, function(data) {
 					if(param.result){
-						//TODO
-						param.result(data)
+						//Remove the duplicated result.
+						param.result(data.split(" ").filter(function(item, pos, self){
+							return self.indexOf(item) == pos;
+						}))
 					}
 				});
 	}
