@@ -1615,7 +1615,7 @@
 		<!--下单>>操作  -->	
 		<div data-role="popup" id="moreOrderFood" data-theme="d">
 	        <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-	       	    <li class="tempFoodKitchen" onclick="of.orderAndPay()"><a>下单并结账</a></li>
+	       	    <li id="orderPay_li_orderFood" class="tempFoodKitchen" onclick="of.orderAndPay()"><a>下单并结账</a></li>
 	            <li class="tempFoodKitchen" onclick="of.orderWithNoPrint()"><a >下单不打印</a></li>
 	            <li class="tempFoodKitchen" onclick="of.orderBefore()"><a >先送</a></li>       	     
 	        </ul>

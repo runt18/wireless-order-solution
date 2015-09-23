@@ -158,6 +158,8 @@ $(function(){
 		//日结,交班等
 		$('#divPosOperation').show();
 		$('#btnOrderAndPay').show();
+		//下单并结账
+		$('#orderPay_li_orderFood').show();
 		//已点菜结账按钮
 		$('#btnPayBill').show();
 		//收银端餐台列表高度
@@ -167,8 +169,10 @@ $(function(){
 		//日结,交班等
 		$('#divPosOperation').show();
 		$('#btnOrderAndPay').show();
+		//下单并结账
+		$('#orderPay_li_orderFood').hide();
 		//已点菜结账按钮
-		$('#btnPayBill').show();
+		$('#btnPayBill').show();		
 		//收银端餐台列表高度
 		tableListHeight = 130;	
 		//try端不可进入后台
@@ -178,6 +182,8 @@ $(function(){
 		//日结,交班等
 		$('#divPosOperation').hide();
 		$('#btnOrderAndPay').hide();
+		//下单并结账
+		$('#orderPay_li_orderFood').hide();
 		//已点菜结账按钮
 		$('#btnPayBill').hide();
 		//收银端餐台列表高度
