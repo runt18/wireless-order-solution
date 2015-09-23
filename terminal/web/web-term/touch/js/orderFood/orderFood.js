@@ -167,14 +167,14 @@ of.s = {
 	}
 };
 
-//设置搜索出来的菜品的排序依据, 按点击次数
+//设置搜索出来的菜品的排序依据, 按点菜次数
 of.searchFoodCompare = function (obj1, obj2) {
     var val1 = obj1.foodCnt;
     var val2 = obj2.foodCnt;
     if (val1 < val2) {
-        return -1;
-    } else if (val1 > val2) {
         return 1;
+    } else if (val1 > val2) {
+        return -1;
     } else {
         return 0;
     }            
@@ -412,14 +412,10 @@ of.initKitchenContent = function(c){
 		});
 	}
 	of.foodPaging.getFirstPage();
-	
-	if(of.searchFooding){
-	//关闭搜索
-		closeSearchFood();
-	}	
-	if(of.searchFoodings){
-		closePinyin();
-	}
+	//关闭手写板
+	closeHandWriting();
+	//关闭拼音搜索
+	closePinyin();
 };
 
 /**
@@ -593,14 +589,10 @@ of.findFoodByKitchen = function(c){
 		data : tempFoodData
 	});
 	of.foodPaging.getFirstPage();
-	
-	if(of.searchFooding){
-		//关闭搜索
-		closeSearchFood();
-	}	
-	if(of.searchFoodings){
-		closePinyin();
-	}
+	//关闭手写板
+	closeHandWriting();	
+	//关闭拼音搜索
+	closePinyin();
 };
 
 /**
@@ -745,6 +737,7 @@ of.insertFood = function(c){
 	if(typeof c.callback == 'function'){
 		c.callback();
 	}
+	$('#rewrite_a_orderFood').click();
 };
 
 /**
@@ -1236,12 +1229,13 @@ of.updateUnitPrice = function(c){
 			
 			//在搜索时, 口味显示在上方
 			if(of.searchFooding){
-				$('#divFoodTasteFloat').css({top : '130px', bottom : 'initial'});
+				$('#divFoodTasteFloat').css({top : '-70px', bottom : '600px'});
 			}else{
 				$('#divFoodTasteFloat').css({top : 'initial', bottom : '90px'});
 			}
 			
-			if(of.searchFoodings){
+			
+			if(of.searchPinyin){
 				$('#divFoodTasteFloat').css({top : '130px', bottom : 'initial'});
 			}else{
 				$('#divFoodTasteFloat').css({top : 'initial', bottom : '90px'});
@@ -1445,8 +1439,8 @@ of.ot.back = function(){
 	$('#divDescForChooseTaste').html('');
 	
 	if(of.searchFooding){
-		YBZ_open(document.getElementById('searchFoodInput'));
-		$('#searchFoodInput').focus();		
+		YBZ_open(document.getElementById('handWritingInput_input_orderFood'));
+		$('#handWritingInput_input_orderFood').focus();		
 	}
 };
 
@@ -2119,11 +2113,11 @@ function addTempTaste(){
 	//关闭弹出常用口味
 	closeFoodCommonTaste();
 	
-//	if(of.searchFooding){
-//		YBZ_open(document.getElementById('tempTasteName'));
-//		$('#tempTasteWriterOn')[0].selectedIndex = 1;
-//		$('#tempTasteWriterOn').slider('refresh');
-//	}
+	if(of.searchFooding){
+		YBZ_open(document.getElementById('tempTasteName'));
+		$('#tempTasteWriterOn')[0].selectedIndex = 1;
+		$('#tempTasteWriterOn').slider('refresh');
+	}
 	
 	focusInput = "tempTastePrice";
 	var tasteGroup;
@@ -2155,6 +2149,7 @@ function addTempTaste(){
 	}	
 	
 	$('#tempTasteName').focus();
+	closePinyin();
 }
 
 /**
@@ -2183,8 +2178,8 @@ function closeTempTaste(){
 	$('#numberKeyboard').hide();	
 	//搜索点菜中则重新打开手写
 	if(of.searchFooding){
-		YBZ_open(document.getElementById('searchFoodInput'));
-		$('#searchFoodInput').focus();		
+		YBZ_open(document.getElementById('handWritingInput_input_orderFood'));
+		$('#handWritingInput_input_orderFood').focus();		
 	}else{
 		//关闭手写板
 		if(YBZ_win){
@@ -2270,58 +2265,11 @@ function saveTempTaste(){
 	closeTempTaste();
 }
 
-/**
- * 搜索菜品
- * @param ope
- */
-function searchFood(ope){
-	if(ope == 'on'){
-		if(!of.s.init({file : 'searchFoodInput'})){
-			Util.msg.alert({
-				renderTo : 'orderFoodMgr',
-				msg : '程序异常, 搜索功能无法使用, 请刷新页面后重试.',
-				time : 2
-			});
-			return;
-		}
-		
-		of.searchFooding = true;
-		
-		$('#orderPinyinCmp').show();
-		$('#')
-		
-		$('#normalOperateFoodCmp').show();
-		$('#searchFoodCmp').hide();	
-		
-		setTimeout(function(){
-			$('#searchFoodInput').focus();
-		}, 250);
-		
-	}else{
-		var kitchen = $('#kitchensCmp > a[data-theme=b]');
-		if(kitchen.length > 0){
-			kitchen.click();
-		}else{
-			kitchen = $('#kitchensCmp > a[data-value=-1]')[0];
-			kitchen.onclick();
-		}
-		kitchen = null;		
-		
-		closeSearchFood();
-	}
-}
-/**
- * 关闭搜索
- */
-function closeSearchFood(){
-	of.searchFooding = false;	
 	
-	$('#searchFoodInput').val('');
-	
-	$('#normalOperateFoodCmp').show();
-	$('#searchFoodCmp').hide();
-	
-}
+
+
+
+
 
 /**
  * 临时菜操作
@@ -2368,11 +2316,8 @@ function addTempFood(){
 	$('#shadowForPopup').show();
 	
 	$('#tempFoodName').focus();
-	
-	if(of.searchFoodings){
-		closePinyin();
-	}
-	
+	closeHandWriting();
+	closePinyin();
 }
 
 /**
@@ -2389,8 +2334,8 @@ of.tf.closeTempFood = function(){
 	$('#numberKeyboard').hide();	
 	//搜索点菜中则重新打开手写
 	if(of.searchFooding){
-		YBZ_open(document.getElementById('searchFoodInput'));
-		$('#searchFoodInput').focus();		
+		YBZ_open(document.getElementById('handWritingInput_input_orderFood'));
+		$('#handWritingInput_input_orderFood').focus();		
 	}else{
 		//关闭手写板
 		if(YBZ_win){
@@ -2550,7 +2495,7 @@ function foodCommonTasteLoad(){
 		$('#divFoodTasteFloat').css({top : 'initial', bottom : '90px'});
 	}
 	
-	if(of.searchFoodings){
+	if(of.searchPinyin){
 		$('#divFoodTasteFloat').css({top : 'initial', bottom : '46%'});
 	}else{
 		$('#divFoodTasteFloat').css({top : 'initial', bottom : '90px'});
@@ -2803,79 +2748,14 @@ of.openAliasOrderFood = function(){
 		$('#txtFoodAlias').focus();
 	}, 300);
 	
-	$('#orderFoodByAliasCmp').popup('open');
-	if(of.searchFoodings){
-		closePinyin();
-	}
-
-}
+	$('#orderFoodByAliasCmp').popup('open');	
+	closeHandWriting();
+	closePinyin();
+};
 
 
 
-	//打开拼音搜索
-	function openPinyin (py){
-		if(py == 'on'){
-			if(!of.s.init({file : 'pinyinInput', qw : 'pinyin'})){
-				Util.msg.alert({
-					renderTo : 'orderFoodMgr',
-					msg : '程序异常, 搜索功能无法使用, 请刷新页面后重试.',
-					time : 2
-				});
-				return;
-			}	
-				
-			of.searchFoodings = true;
 	
-			$('#orderPinyinCmp').show();
-	
-			setTimeout(function(){
-						$('#pinyinInput').focus();
-					}, 250);
-		}else{
-			var kitchen = $('#kitchensCmp > a[data-theme=b]');
-			if(kitchen.length > 0){
-				kitchen.click();
-			}else{
-				kitchen = $('#kitchensCmp > a[data-value=-1]')[0];
-				kitchen.onclick();
-			}
-			kitchen = null;		
-			
-			closePinyin();
-		}		
-			
-	}
-/*
- * 清空输入框
- * */
-function deletePinyinInput(py){
-	$('#pinyinInput').val('');	
-	$('#pinyinInput').focus();
-}
-
-/*
- * 拼音键盘点击事件
- * */	
-function clickPinyin(m){
-	if(m){ //直接一个m 等于 typeof m == undefined &&  m == ""			
-	//	document.getElementById("pinyinInput").value = m;			
-		
-		$('#pinyinInput').val($('#pinyinInput').val() + m);
-		$('#pinyinInput').focus();
-	}		
-}
-	
-	/**
- * 关闭搜索
- */
-function closePinyin(){	
-	of.searchFoodings = false;
-	$('#pinyinInput').val('');
-	
-	$('#orderPinyinCmp').hide();
-	
-}
-
 
 /**
  * 关闭助记码
@@ -3099,18 +2979,14 @@ of.submit = function(c){
 
 					}else{
 						of.newFood = [];
-						Util.LM.hide();
-						if(of.searchFooding){
-							//关闭搜索
-							closeSearchFood();
-						}	
-						if(of.searchFoodings){
-							closePinyin();
-						}
-						
+						Util.LM.hide();	
+						//关闭手写板
+						closeHandWriting();					
+						//关闭拼音搜索
+						closePinyin();	
 						Util.msg.alert({
 							msg : data.msg,
-							topTip : true,
+							topTip : true
 						});
 						
 						//从已点菜进入时, 返回已点菜界面
@@ -3173,7 +3049,7 @@ function isNeedWriter(c){
 	if($(c.event).attr("checked") == true){
 		setcookie('isNeedWriter', 'true');
 	}else{
-		delcookie('isNeedWriter')
+		delcookie('isNeedWriter');
 	}
 	
 	$(c.event).checkboxradio('refresh');
@@ -3181,4 +3057,214 @@ function isNeedWriter(c){
 function isNeedNumKeyboard(c){
 	$('#isKeyboard4Taste').checkboxradio('refresh');
 }
+
+
+//手写关闭
+function closeHandWriting(){
+	of.searchFooding = false;
+	//清空手写搜索框的内容		
+	$('#orderHandCmp').hide();
+}
+
+//关闭拼音
+function closePinyin(){	
+	of.pinyinSearchFooding = false;
+	$('#orderPinyinCmp').hide();	
+}
+
+$(function(){
+	
+	//重写按钮的click事件
+	$('#rewrite_a_orderFood').on('click', function(){
+		if(handWriting){
+			handWriting.rewrite();  
+		}
+		document.getElementById('searchWord_div_orderFood').innerHTML = "";	
+		$('#handWritingInput_input_orderFood').val('');
+	});
+	
+	//手写搜索的清空按钮事件
+	$('#handDel_a_orderFood').click(function(){
+		$('#handWritingInput_input_orderFood').val('');
+		$('#handWritingInput_input_orderFood').trigger('input');
+	});
+	
+	//监听手写搜索输入框值变化的input事件
+	$("#handWritingInput_input_orderFood").on("input", function(){
+		search(this.value, 'handWriting');
+	});
+	
+	//监听拼音搜索输入框值变化的input时间
+	$('#pinyinInput_input_orderFood').on("input", function(){
+		search(this.value, 'pinyin');
+	});
+	
+	//手写搜索的关闭按钮事件
+	$('#handWritingClose_a_orderFood').click(function(){
+		//模拟点击事件
+		var kitchen = $('#kitchensCmp > a[data-theme=b]');
+		if(kitchen.length > 0){
+			kitchen.click();
+		}else{
+			kitchen = $('#kitchensCmp > a[data-value=-1]')[0];
+			kitchen.onclick();
+		}
+		kitchen = null;		
+		closeHandWriting();
+	});
+	
+	//已点菜界面手写板按钮的click事件
+	$('#handWriteBoard_a_orderFood').click(function(){	
+		of.searchFooding = true;
+		$('#orderHandCmp').show();
+		createHandWriting();
+		handWriting.rewrite();
+		closePinyin();
+		$('#handWritingInput_input_orderFood').val('');
+		$('#searchWord_div_orderFood').html('');
+	});
+	
+	//拼音清空按钮事件
+	$('#pinyinDel_a_orderFood').click(function(){
+		$('#pinyinInput_input_orderFood').val('');
+		$('#pinyinInput_input_orderFood').trigger('input');
+	});
+	
+	//拼音关闭按钮
+	$('#closePinyin_a_orderFood').click(function(){
+		//模拟点击事件
+		var kitchen = $('#kitchensCmp > a[data-theme=b]');
+		if(kitchen.length > 0){
+			kitchen.click();
+		}else{
+			kitchen = $('#kitchensCmp > a[data-value=-1]')[0];
+			kitchen.onclick();
+		}
+		kitchen = null;	
+		closePinyin();
+	});
+	
+	//监听点菜界面拼音搜索按钮的事件
+	$('#pinyinBoard_a_orderFood').click(function(){
+		of.pinyinSearchFooding = true;	
+		$('#orderPinyinCmp').show();
+		$('#pinyin_div_orderFood').show();	
+		$('#pinyinInput_input_orderFood').val('');
+		closeHandWriting();
+		createPinyinKeyboard();
+	});
+			
+	//菜品分页
+	var foodPaging = Util.to.padding({
+		renderTo : "foodsCmp",
+		templet : function(c){
+			return foodCmpTemplet.format({
+				id : c.data.id,
+				name : c.data.name.substring(0, 10),
+				unitPrice : c.data.unitPrice,
+				click : 'of.insertFood({foodId:' + c.data.id + '})',
+				sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
+				currPrice : (c.data.status & 1 << 4) != 0 ? '时' : '',		
+				gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
+				weigh : (c.data.status & 1 << 7) != 0 ? '称' : '',
+				commonStatus : (c.data.status & 1 << 10) != 0 ? 'none' : '',
+				limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
+				foodLimitAmount : c.data.foodLimitAmount,
+				foodLimitRemain : c.data.foodLimitRemain
+			});
+		},
+		pagedCallBack : function(){
+			//FIXME .food-status-font中position:absolute不起作用
+			setTimeout(function(){
+				$(".food-status-font").css("position", "absolute");
+			}, 250);				
+		}
+	});		
+
+	
+	//拼音 && 手写 搜索
+	function search(value, qw){	
+		var data = null;
+		if(value.trim().length > 0){
+			data = [];
+			if(qw == 'pinyin'){
+				for(var i = 0; i < of.foodList.length; i++){
+					if(of.foodList[i].pinyin.indexOf(value.trim().toLowerCase()) != -1){
+						data.push(of.foodList[i]);
+					}
+				}	
+				
+			}else{
+				for(var i = 0; i < of.foodList.length; i++){
+					if(of.foodList[i].name.indexOf(value.trim()) != -1){
+						data.push(of.foodList[i]);
+					}
+				}						
+			}
+		}
+		foodPaging.init({
+			data : data ? data.sort(of.searchFoodCompare) : of.foodList,
+			callback : function(){
+				foodPaging.getFirstPage();
+			} 
+		});
+	}
+
+
+	
+	var handWriting = null;
+	//手写板的创建
+	function createHandWriting(){
+		if(handWriting == null){
+			 handWriting = new HandWritingPanel(
+				{ renderTo : document.getElementById('handWritingPanel_th_orderFood'),
+				  result : function(data){
+				  	var temp = data.slice(0, 8);			
+					var zifu = "";
+					for(var i = 0; i < temp.length; i++){								
+						var eachCharactar = '<input type="button" style="width:25%;height:50%;font-size:20px;" value="' + temp[i] + '">';							
+						if(i % 4 == 0 ){
+							zifu += '<br>'; 
+						}
+						zifu += eachCharactar;										
+					}
+					document.getElementById('searchWord_div_orderFood').innerHTML = zifu;
+					$('#searchWord_div_orderFood input').each(function(index, element){
+						element.onclick = function(){
+							$('#handWritingInput_input_orderFood').val($('#handWritingInput_input_orderFood').val() + element.value);
+							$('#handWritingInput_input_orderFood').trigger('input');
+						};
+					});
+				   }
+				});	
+		}
+	}
+	
+	
+	//拼音键盘动态生成
+	function createPinyinKeyboard(){
+		var allKeys = new Array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W"
+							, "X", "Y", "Z", "删除");
+		var keys = "";
+		for(var i = 0; i < allKeys.length; i++){
+			var eachKeys = '<input type="button" style="width:11%;height:21%;font-size:20px;" value="' + allKeys[i] + '">';
+			if(i % 9 == 0){
+				keys += '<br>';
+			}
+			keys += eachKeys;
+		}	
+		document.getElementById('pinyin_div_orderFood').innerHTML = keys;
+		$('#pinyin_div_orderFood input').each(function(index, element){
+			element.onclick = function(){
+//				if(element.value == "删除"){
+//					$('#pinyinInput_input_orderFood').val().slice(1, 2);					
+//				}else{
+					$('#pinyinInput_input_orderFood').val($('#pinyinInput_input_orderFood').val() + element.value);
+//				}
+				$('#pinyinInput_input_orderFood').trigger('input');
+			};
+		});	
+	}
+
+});
 

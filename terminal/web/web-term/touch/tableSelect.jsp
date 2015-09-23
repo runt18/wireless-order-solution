@@ -15,7 +15,6 @@
 <meta http-equiv="cache-control" content="no-cache"> 
 <meta http-equiv="expires" content="0">	
 
-
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
 <!-- jquery mobile -->
 <link rel="stylesheet" href="css/common/jquery.mobile-1.3.2.css">
@@ -25,6 +24,8 @@
 <link rel="stylesheet" type="text/css" href="css/timepicki.css" />
 <!-- 数字键盘样式 -->
 <link rel="stylesheet" href="css/calculate/datouwang.css">
+<!-- 拼音键盘样式 -->
+<link rel="stylesheet" href="css/calculate/pinyinKeyboard.css">
 <!-- 自定义样式 -->
 <link rel="stylesheet" href="css/takeout/main.css?v=<%=v %>">
 <link rel="stylesheet" href="css/table.css?v=<%=v %>">
@@ -37,9 +38,10 @@
 <!-- 时分插件.js -->
 <script type="text/javascript" src="js/book/timepicki.js"></script>
 <!-- 工具类 -->
+<link rel="stylesheet" href="css/calculate/pinyinKeyboard.css">
+<script type="text/javascript" src="js/handWriting/handWriting.js"></script>
 <script type="text/javascript" src="js/Util.js?v=<%=v %>"></script>
 <script type="text/javascript" src="../extjs/wireless.ux.js"></script>
-
 <script type="text/javascript" src="js/orderFood/orderFood.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/checkOut/checkOut.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/stopSet/stopSet.js?v=<%=v %>"></script>
@@ -1591,11 +1593,11 @@
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="bookSeatOrderFood" onclick="ts.bookTableCommitOrderFood()">入座</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="multiOpenTable" onclick="ts.multiOpenTableCommitOrderFood()">多台开席</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="normalOrderFood" onclick="of.submit({notPrint : false})">下单</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="btnOrderAndPay" onclick="of.orderAndPay()">下单并结账</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#moreOrderFood">下单>></a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="searchFood('on')">搜索</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="handWriteBoard_a_orderFood">手写板</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="pinyinBoard_a_orderFood">拼音</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="addTempFood()" data-rel="popup" data-position-to="window"   data-transition="pop" data-theme="b"  >临时菜</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#orderOtherOperateCmp">更多</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.foodPaging.getPreviousPage()">上一页</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.foodPaging.getNextPage()">下一页</a>
 <!-- 			 	<a onclick="of.foodPaging.getPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="foodsPaging">L</a>
@@ -1603,34 +1605,23 @@
 			 </div>
 
 		</div>
-		<!-- 下单更多操作 -->
+		<!-- 更多操作 -->
 		<div data-role="popup" id="orderOtherOperateCmp" data-theme="d">
 	        <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
 	            <li class="tempFoodKitchen" onclick="of.orderWithNoPrint()"><a >下单不打印</a></li>
 	            <li class="tempFoodKitchen" onclick="of.orderBefore()"><a >先送</a></li>
 	        </ul>
-		</div>		
-		<div id="searchFoodCmp" style="height: 60px;padding-top: 25px;display: none;">		
-			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal" style="margin-right: 460px;">
-			 <table>
-			 	<tr>
-			 		<td>
-			 			<input id="searchFoodInput"  type="text" placeholder="输入菜名"  style="font-size: 20px;font-weight: bold;width: 150px;">
-			 		</td>
-			 		<td>
-						<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:60px;" align="center">
-						    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="of.s.valueBack()">D</a>
-						</div>			 		
-			 		</td>
-			 		<td>
-			 			<a data-role="button" data-inline="true" class="bottomBtnFont" style="margin-top: -5px;" onclick="addTempFood()">临时菜</a>
-			 			<a data-role="button" data-inline="true" class="bottomBtnFont" style="margin-top: -5px;" onclick="of.submit({notPrint : false})">下单</a>
-			 			<a data-role="button" data-inline="true" class="bottomBtnFont" style="margin-top: -5px;" onclick="searchFood()">关闭</a>
-			 		</td>
-			 	</tr>
-			 </table>
-			 </div>
-		 </div>		 
+		</div>	
+		<!--下单>>操作  -->	
+		<div data-role="popup" id="moreOrderFood" data-theme="d">
+	        <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+	       	    <li class="tempFoodKitchen" onclick="of.orderAndPay()"><a>下单并结账</a></li>
+	            <li class="tempFoodKitchen" onclick="of.orderWithNoPrint()"><a >下单不打印</a></li>
+	            <li class="tempFoodKitchen" onclick="of.orderBefore()"><a >先送</a></li>       	     
+	        </ul>
+		</div>
+		
+		 
 		 
 	</div>
 	
@@ -1870,7 +1861,37 @@
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.closeAliasOrderFood()">取消</a>		 
 			 </div>
 	    </div>
+	</div>	
+	
+	<!-- 拼音搜索 -->
+	<div id="orderPinyinCmp" class="ui-overlay-shadow ui-corner-all pinyinWindow" > 		
+	   	<div class="handWritingtext"><input type="text" value="" id="pinyinInput_input_orderFood" style="font-size: 15px;font-weight: bold;"></div>
+	   	<div class="handWritingbutton"><a id="pinyinDel_a_orderFood"  data-role="button" data-theme="d" class="ui-corner-bottom">清空</a></div>	
+	    <div class="handWritingbutton"><a data-role="button" data-theme="e" class="ui-corner-bottom" id="closePinyin_a_orderFood">关闭</a></div>	
+	   		
+	   		
+	<!-- 拼音键盘 -->
+	   		<div id="pinyin_div_orderFood" style="width:100%;height:100%;display:none;margin-top:8%;" > 
+	  
+	    	</div>	
+	</div>	
+	
+	
+	
+	
+		<!-- 手写搜索 -->
+	<div id="orderHandCmp" class="ui-overlay-shadow ui-corner-all handWritingWindow" >
+	   	<div class="handWritingtext"><input type="text" value="" id="handWritingInput_input_orderFood" style="font-size: 15px;font-weight: bold;"></div>
+	   	<div class="handWritingbutton"><a id="handDel_a_orderFood"  data-role="button" data-theme="d" class="ui-corner-bottom">清空</a></div>	
+		<div class="handWritingbutton"><a data-role="button" data-theme="d" class="ui-corner-bottom" id="rewrite_a_orderFood">重写</a></div>
+	    <div class="handWritingbutton"><a data-role="button" data-theme="e" class="ui-corner-bottom" id="handWritingClose_a_orderFood">关闭</a></div>	
+		<div class="handWritingWord" style="clear:both;" id="searchWord_div_orderFood"></div>
+		<div id="handWritingPanel_th_orderFood" class="handWritingPanel"></div>
 	</div>		
+	
+	
+	
+		
 	
 	<div id="addTempTasteCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: -100px 0px 0px -250px;min-width:500px;display: none;background-color: white;" align="center" onmouseout="javascript:mouseOutFoodSelect = true;" onmouseover="javascript:mouseOutFoodSelect = false;">
 	<!-- <div id="addTempTasteCmp" data-role="popup"  data-theme="c" data-dismissible="false" style="min-width:550px;" class="ui-corner-all" align="center"> -->
@@ -2181,7 +2202,6 @@
 		    	<a data-role="button" data-theme="b" onclick="openInputReciptWin()">现金找零</a>
 		    	<a data-role="button" data-theme="b" id="btnPayByMember" data-rel="popup" data-position-to="window" data-transition="pop" onclick="showMemberInfoWin()">读取会员</a>
 		    	<a data-role="button" data-theme="b" onclick="loadMix()" data-rel="popup" data-position-to="window" data-transition="pop">其他结账</a>
-		    	<a data-role="button" data-theme="b" data-inline="true" style="width: 45%;" onclick="paySubmit(6)">微信支付</a>
 		    </div>
 		    
 		</div>
@@ -2249,7 +2269,7 @@
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" href="#tableSelectMgr" >返回</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="refreshOrderData({calc:true})" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="paySubmit(1, 'temp')">暂结(-)</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="paySubmit(6)">暂结(-)</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="toCheckoutPage()">改单</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupDiscountCmp">折扣</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupServiceCmp">服务费</a>

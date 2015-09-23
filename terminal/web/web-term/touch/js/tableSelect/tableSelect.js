@@ -448,23 +448,21 @@ window.onload = function(){
 	}
 
 	
-	//菜品搜索 各个端都显示手写
-	$('#searchFoodInput').focus(function(){
-		focusInput = this.id;
-		if(this.id == 'searchFoodInput'){
-			of.s.fireEvent();
-		}		
-	});
-	
-	//菜品搜索 各个端都显示拼音
-	$('#pinyinInput').focus(function(){
-		focusInput = this.id;
-		if(this.id == 'pinyinInput'){
-			of.s.fireEvent();
-		}		
-	});
-	
-	
+//	//菜品搜索 各个端都显示手写
+//	$('#searchFoodInput').focus(function(){
+//		if(this.id == 'searchFoodInput'){
+//			of.s.fireEvent();
+//		}		
+//	});
+//	
+//	//菜品搜索 各个端都显示拼音
+//	$('#pinyinInput').focus(function(){
+//		if(this.id == 'pinyinInput'){
+//			of.s.fireEvent();
+//		}		
+//	});
+//	
+//	
 	
 	//沽清搜索
 	$('#searchSelloutFoodInput').focus(function(){
