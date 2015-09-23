@@ -95,6 +95,7 @@ var PayTypeEnum = {
 	MEMBER : { val : 3, desc : '会员' },
 	SIGN : { val : 4, desc : '签单'},
 	HANG : { val : 5, desc : '挂账'},
+	WX : { val : 6, desc : '微信支付'},
 	MIXED : { val : 100, desc : '混合'}
 };
 
@@ -674,12 +675,15 @@ var paySubmit = function(submitType, temp) {
 			isPaying = false;
 			var dataInfo = resultJSON.data;
 			if (resultJSON.success == true) {
-				if (temp != undefined) {
-					Util.msg.alert({msg : dataInfo, topTip:true});
+				if(submitType == PayTypeEnum.WX.val){
+					Util.msg.alert({msg : '微信支付二维码打印成功', topTip : true});
+					
+				}else if (temp != undefined) {
+					Util.msg.alert({msg : dataInfo, topTip : true});
 //					setFormButtonStatus(false);
 				}else{
 					closeMixedPayWin();
-					Util.msg.alert({msg : '结账成功!', topTip:true});
+					Util.msg.alert({msg : '结账成功!', topTip : true});
 					if(inputReciptWin){
 						closeInputReciptWin();
 						//等完全关闭后再返回
@@ -694,9 +698,14 @@ var paySubmit = function(submitType, temp) {
 
 				}
 			} else {
-				//不能同时弹出两个popup
-				if(inputReciptWin || settleType == 2 || submitType == 100 || submitType == 101){
-					Util.msg.alert({msg : resultJSON.data, topTip:true});
+				if(submitType == PayTypeEnum.WX.val){
+					Util.msg.alert({
+						msg : '对不起，您还没开通微信支付' + '</br>错误信息：' + resultJSON.data,
+						renderTo : 'paymentMgr'
+					});
+				}else if(inputReciptWin || settleType == SettleTypeEnum.MEMBER.val || submitType == PayTypeEnum.MIXED.val){
+					//不能同时弹出两个popup
+					Util.msg.alert({msg : resultJSON.data, topTip : true});
 				}else{
 					Util.msg.alert({
 						msg : resultJSON.data,
@@ -1321,7 +1330,12 @@ function toCheckoutPage(){
 	});	
 }
 
-
+$(function(){
+	//微信支付Button
+	$('#wx_a_payment').click(function(){
+		paySubmit(PayTypeEnum.WX.val);
+	});
+});
 
 
 

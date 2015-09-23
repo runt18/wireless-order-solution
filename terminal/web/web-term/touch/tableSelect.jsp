@@ -2181,7 +2181,7 @@
 		    	<a data-role="button" data-theme="b" onclick="openInputReciptWin()">现金找零</a>
 		    	<a data-role="button" data-theme="b" id="btnPayByMember" data-rel="popup" data-position-to="window" data-transition="pop" onclick="showMemberInfoWin()">读取会员</a>
 		    	<a data-role="button" data-theme="b" onclick="loadMix()" data-rel="popup" data-position-to="window" data-transition="pop">其他结账</a>
-		    	<a data-role="button" data-theme="b" data-inline="true" style="width: 45%;" onclick="paySubmit(6)">微信支付</a>
+		    	<a id="wx_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">微信支付</a>
 		    </div>
 		    
 		</div>
