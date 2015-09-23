@@ -2203,6 +2203,7 @@
 		    	<a data-role="button" data-theme="b" onclick="openInputReciptWin()">现金找零</a>
 		    	<a data-role="button" data-theme="b" id="btnPayByMember" data-rel="popup" data-position-to="window" data-transition="pop" onclick="showMemberInfoWin()">读取会员</a>
 		    	<a data-role="button" data-theme="b" onclick="loadMix()" data-rel="popup" data-position-to="window" data-transition="pop">其他结账</a>
+		    	<a id="wx_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">微信支付</a>
 		    </div>
 		    
 		</div>
@@ -2270,7 +2271,7 @@
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" href="#tableSelectMgr" >返回</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="refreshOrderData({calc:true})" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="paySubmit(6)">暂结(-)</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="paySubmit(1, 'temp')">暂结(-)</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="toCheckoutPage()">改单</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupDiscountCmp">折扣</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupServiceCmp">服务费</a>

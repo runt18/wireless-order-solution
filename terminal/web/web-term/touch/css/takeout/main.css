@@ -37,7 +37,6 @@ div.ui-slider-switch {
 	width: 7em;
 	margin: .5em 0;
 	top: 0;
-	
 }
 
 /*
@@ -446,67 +445,6 @@ html { overflow-y: hidden;}
 	display: none;
 	background-color: white;
 }
-
-/*
- 拼音窗口
- */
-.handWritingWindow{
-	z-index: 2;
-	position: absolute; 
-	bottom : 90px;
-	left: 35%; 
-	width: 65%;
-	height: 35%;
-	display: none;
-	background-color:#F0F0F0;
-}
-
-.pinyinWindow{
-	z-index: 2;
-	position: absolute; 
-	bottom : 90px;
-	left: 35%; 
-	width: 65%;
-	height: 35%;
-	display: none;
-	background-color:#F0F0F0;
-}
-
-
-/*
- 手写css
- * */
-.handWritingtext{
-	float:left;
-	margin : 0px, 0px, 0px, 0px;
-	width: 16%;
-	height: 4%;
-}
-
-.handWritingbutton{
-	float:left;
-	margin : -3px 0px 0px 0px;
-	width: 12%;
-	height: 3.5%;
-}
-
-.handWritingPanel{
-	float:right;
-	margin-right:10px;
-	margin-top:-9px;
-	width: 45%;
-	height:97%;
-}
-
-.handWritingWord{
-	float:left;
-	width:40%;
-	height:40%;	
-	margin-top: 10%;
-	margin-left: 6%;	
-}
-
-
 
 /*
 	常用口味动态窗口下手风琴去掉外边距
