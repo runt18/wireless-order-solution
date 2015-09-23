@@ -1,24 +1,24 @@
 /**
  * 
  */
-$(function(){
-	var handWriting = new HandWritingPanel(
-		{ renderTo : document.getElementById('handWritingPanel'),
-		  result : function(data){
-			var temp = data.slice(0, 9).reverse();
-			var zifu = "";
-			for(var i = 0; i < temp.length; i++){			
-				var all = '<input type="button" value="' + temp[i] + '" onclick="">';
-				zifu = all + zifu;
-			}
-			document.getElementById("sdf").innerHTML = zifu;
-			console.log(zifu);	
-		}}
-		);
-	$('#buttonRewrite').click(function(){
-		handWriting.rewrite();
-	});
-});
+//$(function(){
+//	var handWriting = new HandWritingPanel(
+//		{ renderTo : document.getElementById('handWritingPanel'),
+//		  result : function(data){
+////			var temp = data.slice(0, 9).reverse();
+////			var zifu = "";
+////			for(var i = 0; i < temp.length; i++){			
+////				var all = '<input type="button" value="' + temp[i] + '" onclick="">';
+////				zifu = all + zifu;
+////			}
+////			document.getElementById("sdf").innerHTML = zifu;
+////			console.log(zifu);	
+//		}}
+//		);
+//	$('#buttonRewrite').click(function(){
+//		handWriting.rewrite();
+//	});
+//});
  
 function HandWritingPanel(param){
 	
@@ -39,15 +39,17 @@ function HandWritingPanel(param){
 	    canvas.addEventListener('touchstart', onTouchStart, false);
 	    canvas.addEventListener('touchmove', onTouchMove, false);
 		canvas.addEventListener('touchend', onTouchEnd, false);
+		canvas.addEventListener('touchout', onTouchOut, false);
 	}else{
 	    canvas.addEventListener('mousedown', onMouseDown, false);
 	    canvas.addEventListener('mousemove', onMouseMove, false);
 		canvas.addEventListener('mouseup', onMouseUp, false);
+		canvas.addEventListener('mouseout', onMouseOut, false);
 	}
 
 	//上一次触摸坐标
-	var lastX;
-	var lastY;
+	var lastX = 0;
+	var lastY = 0;
 	var bihua = [];
 	//画圆
 	function drawRound(x, y){
@@ -70,6 +72,11 @@ function HandWritingPanel(param){
 	}
 	
 	var drawing = false;
+	
+	function onMouseOut(event){
+		drawing = false;
+	}
+	
 	function onMouseUp(event) {
 	    //ev = event || window.event; 
 		//var mousePos = mousePosition(event);
@@ -116,6 +123,10 @@ function HandWritingPanel(param){
 	}
 	
 	//触摸开始事件
+	function onTouchOut(event){		
+		drawing = false;
+	}
+	
 	function onTouchStart(event) {
 	    event.preventDefault();
 	    lastX=event.touches[0].clientX;
@@ -189,18 +200,17 @@ function HandWritingPanel(param){
 					if(param.result){
 						//Remove the duplicated result.
 						param.result(data.split(" ").filter(function(item, pos, self){
-							return self.indexOf(item) == pos;
-						}))
+							return self.indexOf(item) == pos && item.trim().length != 0 && item != "\"" ;
+						}));
 					}
 				});
 	}
 	
 	//public methods
 	this.rewrite = function(){
-		//TODO
 		drawing = false;
-		ctx.clearRect(0, 0, param.renderTo.clientHeight, param.renderTo.clientWidth);
-        bihua = [];
-  	}
+		ctx.clearRect(0, 0, param.renderTo.clientWidth, param.renderTo.clientHeight);
+        bihua = [];       
+  	};
 }
 
