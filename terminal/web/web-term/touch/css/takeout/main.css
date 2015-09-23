@@ -440,7 +440,7 @@ html { overflow-y: hidden;}
 	z-index: 2;
 	position: absolute; 
 	/* top: 130px;  */
-	bottom : 90px;
+	bottom : 48.5%;
 	left: 35%; 
 	width: 65%;
 	display: none;

@@ -1866,7 +1866,8 @@
 	<!-- 拼音搜索 -->
 	<div id="orderPinyinCmp" class="ui-overlay-shadow ui-corner-all pinyinWindow" > 		
 	   	<div class="handWritingtext"><input type="text" value="" id="pinyinInput_input_orderFood" style="font-size: 15px;font-weight: bold;"></div>
-	   	<div class="handWritingbutton"><a id="pinyinDel_a_orderFood"  data-role="button" data-theme="d" class="ui-corner-bottom">清空</a></div>	
+	   	<div class="handWritingbutton"><a id="pinyinDel_a_orderFood"  data-role="button" data-theme="d" class="ui-corner-bottom">删除</a></div>
+	   	<div class="handWritingbutton"><a id="pinyinVal_a_orderFood"  data-role="button" data-theme="d" class="ui-corner-bottom">清空</a></div>	
 	    <div class="handWritingbutton"><a data-role="button" data-theme="e" class="ui-corner-bottom" id="closePinyin_a_orderFood">关闭</a></div>	
 	   		
 	   		
@@ -1991,7 +1992,7 @@
 	<!-- 动态口味组件 -->
 	<div id="divFoodTasteFloat" class="ui-overlay-shadow ui-corner-all commonTasteFloat" >
 	<!-- <div id="divFoodTasteFloat" class="commonTasteFloat" data-role="popup"  data-theme="c" data-dismissible="false" style="min-width:550px;" class="ui-corner-all"> -->
-		<div data-role="header" data-theme="b" class="ui-corner-top" style="height: 35px">
+		<div  data-role="header" data-theme="b" class="ui-corner-top" style="height: 35px">
     		<div id="txtChooosedFoodName" style="float: left;line-height: 35px;margin-left: 10px;"></div>
         	<div style="float: right">
   				<a onclick="closeFoodCommonTaste()" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
