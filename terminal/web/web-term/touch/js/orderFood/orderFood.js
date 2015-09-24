@@ -69,103 +69,103 @@ var of = {
 	//多单位
 	multiPriceCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="multiPriceCmp" data-index={index} data-value={id} data-theme={theme}><div>{multiPrice}</div></a>',
 //菜品选择匹配
-of.s = {
-	file : null,
-	fileValue : null,
-	init : function(c){
-		this.file = document.getElementById(c.file);
-		if(typeof this.file.oninput != 'function'){
-			this.file.oninput = function(e){
-				of.s.fileValue = of.s.file.value;
-				var data = null, temp = null;
-				if(of.s.fileValue.trim().length > 0){
-					data = [];
-					temp = of.foodList.slice(0);
-					if(c.qw == 'pinyin'){
-						for(var i = 0; i < temp.length; i++){
-							if(temp[i].pinyin.indexOf(of.s.fileValue.trim()) == 0){
-								data.push(temp[i]);
-							}
-						}	
-						
-					}else{
-						for(var i = 0; i < temp.length; i++){
-							if(temp[i].name.indexOf(of.s.fileValue.trim()) != -1){
-								data.push(temp[i]);
-							}
-						}						
-					}
-				}
-				
-				if(data){
-					data = data.sort(of.searchFoodCompare);
-				}
-				
-				of.s.foodPaging.init({
-					data : data,
-					callback : function(){
-						of.s.foodPaging.getFirstPage();
-					}
-				});
-				data = null;
-				temp = null;
-			};
-		}
-		
-		if(!of.s.foodPaging){
-			of.s.foodPaging = Util.to.padding({
-				renderTo : "foodsCmp",
-				templet : function(c){
-					return foodCmpTemplet.format({
-						id : c.data.id,
-						name : c.data.name.substring(0, 10),
-						unitPrice : c.data.unitPrice,
-						click : 'of.insertFood({foodId:' + c.data.id + ', callback:of.s.callback})',
-						sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
-						currPrice : (c.data.status & 1 << 4) != 0 ? '时' : '',		
-						gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
-						weigh : (c.data.status & 1 << 7) != 0 ? '称' : '',
-						commonStatus : (c.data.status & 1 << 10) != 0 ? 'none' : '',
-						limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
-						foodLimitAmount : c.data.foodLimitAmount,
-						foodLimitRemain : c.data.foodLimitRemain
-					});
-				},
-				pagedCallBack : function(){
-					//FIXME .food-status-font中position:absolute不起作用
-					setTimeout(function(){
-						$(".food-status-font").css("position", "absolute");
-					}, 250);				
-				}
-			});		
-		}
-		return this.file;
-	},
-	valueBack : function(){
-		if(this.file.value){
-			this.file.value = this.file.value.substring(0, this.file.value.length - 1);
-			this.file.oninput(this.file);			
-		}
-		this.file.focus();
-	},
-	onInput : function(){
-		this.file.oninput(this.file);		
-	},
-	select : function(){
-		this.file.select();
-	},
-	clear : function(){
-		this.file.value = '';
-		this.file.oninput(this.file);
-		this.file.select();
-	},
-	callback : function(){
-		of.s.clear();
-	},
-	fireEvent : function(){
-		of.s.onInput();
-	}
-};
+//of.s = {
+//	file : null,
+//	fileValue : null,
+//	init : function(c){
+//		this.file = document.getElementById(c.file);
+//		if(typeof this.file.oninput != 'function'){
+//			this.file.oninput = function(e){
+//				of.s.fileValue = of.s.file.value;
+//				var data = null, temp = null;
+//				if(of.s.fileValue.trim().length > 0){
+//					data = [];
+//					temp = of.foodList.slice(0);
+//					if(c.qw == 'pinyin'){
+//						for(var i = 0; i < temp.length; i++){
+//							if(temp[i].pinyin.indexOf(of.s.fileValue.trim()) == 0){
+//								data.push(temp[i]);
+//							}
+//						}	
+//						
+//					}else{
+//						for(var i = 0; i < temp.length; i++){
+//							if(temp[i].name.indexOf(of.s.fileValue.trim()) != -1){
+//								data.push(temp[i]);
+//							}
+//						}						
+//					}
+//				}
+//				
+//				if(data){
+//					data = data.sort(of.searchFoodCompare);
+//				}
+//				
+//				of.s.foodPaging.init({
+//					data : data,
+//					callback : function(){
+//						of.s.foodPaging.getFirstPage();
+//					}
+//				});
+//				data = null;
+//				temp = null;
+//			};
+//		}
+//		
+//		if(!of.s.foodPaging){
+//			of.s.foodPaging = Util.to.padding({
+//				renderTo : "foodsCmp",
+//				templet : function(c){
+//					return foodCmpTemplet.format({
+//						id : c.data.id,
+//						name : c.data.name.substring(0, 10),
+//						unitPrice : c.data.unitPrice,
+//						click : 'of.insertFood({foodId:' + c.data.id + ', callback:of.s.callback})',
+//						sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
+//						currPrice : (c.data.status & 1 << 4) != 0 ? '时' : '',		
+//						gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
+//						weigh : (c.data.status & 1 << 7) != 0 ? '称' : '',
+//						commonStatus : (c.data.status & 1 << 10) != 0 ? 'none' : '',
+//						limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
+//						foodLimitAmount : c.data.foodLimitAmount,
+//						foodLimitRemain : c.data.foodLimitRemain
+//					});
+//				},
+//				pagedCallBack : function(){
+//					//FIXME .food-status-font中position:absolute不起作用
+//					setTimeout(function(){
+//						$(".food-status-font").css("position", "absolute");
+//					}, 250);				
+//				}
+//			});		
+//		}
+//		return this.file;
+//	},
+//	valueBack : function(){
+//		if(this.file.value){
+//			this.file.value = this.file.value.substring(0, this.file.value.length - 1);
+//			this.file.oninput(this.file);			
+//		}
+//		this.file.focus();
+//	},
+//	onInput : function(){
+//		this.file.oninput(this.file);		
+//	},
+//	select : function(){
+//		this.file.select();
+//	},
+//	clear : function(){
+//		this.file.value = '';
+//		this.file.oninput(this.file);
+//		this.file.select();
+//	},
+//	callback : function(){
+//		of.s.clear();
+//	},
+//	fireEvent : function(){
+//		of.s.onInput();
+//	}
+//};
 
 //设置搜索出来的菜品的排序依据, 按点击次数
 of.searchFoodCompare = function (obj1, obj2) {
@@ -2893,7 +2893,7 @@ of.submit = function(c){
 											if(result.success){
 												Util.msg.alert({
 													topTip : true,
-													msg : result.data,
+													msg : result.data
 												});
 												//暂结应该是没有回调方法的
 //												if(of.afterCommitCallback != null && typeof of.afterCommitCallback == 'function'){
@@ -2947,7 +2947,7 @@ of.submit = function(c){
 						closeHandWriting();
 						Util.msg.alert({
 							msg : data.msg,
-							topTip : true,
+							topTip : true
 						});
 						
 						//从已点菜进入时, 返回已点菜界面
@@ -3073,10 +3073,14 @@ $(function(){
 		closeHandWriting();
 	});
 	
+	var handWriting = null;
 	//已点菜界面手写板按钮的click事件
 	$('#handWriteBoard_a_orderFood').click(function(){	
 		of.searchFooding = true;
 		$('#orderHandCmp').show();
+		if(handWriting == null){
+			handWriting = createHandWriting();
+		}
 		createHandWriting();
 		handWriting.rewrite();
 		closePinyin();
@@ -3121,35 +3125,9 @@ $(function(){
 		closeHandWriting();
 		createPinyinKeyboard();
 	});
-			
-	//菜品分页
-	var foodPaging = Util.to.padding({
-		renderTo : "foodsCmp",
-		templet : function(c){
-			return foodCmpTemplet.format({
-				id : c.data.id,
-				name : c.data.name.substring(0, 10),
-				unitPrice : c.data.unitPrice,
-				click : 'of.insertFood({foodId:' + c.data.id + '})',
-				sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
-				currPrice : (c.data.status & 1 << 4) != 0 ? '时' : '',		
-				gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
-				weigh : (c.data.status & 1 << 7) != 0 ? '称' : '',
-				commonStatus : (c.data.status & 1 << 10) != 0 ? 'none' : '',
-				limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
-				foodLimitAmount : c.data.foodLimitAmount,
-				foodLimitRemain : c.data.foodLimitRemain
-			});
-		},
-		pagedCallBack : function(){
-			//FIXME .food-status-font中position:absolute不起作用
-			setTimeout(function(){
-				$(".food-status-font").css("position", "absolute");
-			}, 250);				
-		}
-	});		
-
 	
+	//菜品分页
+	var foodPaging = null;		
 	//拼音 && 手写 搜索
 	function search(value, qw){	
 		var data = null;
@@ -3170,21 +3148,57 @@ $(function(){
 				}						
 			}
 		}
+		//创建菜品分页的控件
+		if(foodPaging == null){
+			foodPaging = Util.to.padding({
+				renderTo : "foodsCmp",
+				templet : function(c){
+					return foodCmpTemplet.format({
+						id : c.data.id,
+						name : c.data.name.substring(0, 10),
+						unitPrice : c.data.unitPrice,
+						click : 'of.insertFood({foodId:' + c.data.id + '})',
+						sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
+						currPrice : (c.data.status & 1 << 4) != 0 ? '时' : '',		
+						gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
+						weigh : (c.data.status & 1 << 7) != 0 ? '称' : '',
+						commonStatus : (c.data.status & 1 << 10) != 0 ? 'none' : '',
+						limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
+						foodLimitAmount : c.data.foodLimitAmount,
+						foodLimitRemain : c.data.foodLimitRemain
+					});
+				},
+				pagedCallBack : function(){
+					//FIXME .food-status-font中position:absolute不起作用
+					setTimeout(function(){
+						$(".food-status-font").css("position", "absolute");
+					}, 250);				
+				}
+			});		
+		}
+		
 		foodPaging.init({
-			data : data ? data.sort(of.searchFoodCompare) : of.foodList,
+			data : data ? data.sort(function (obj1, obj2) {
+										//菜品搜索结果按点菜数量排序
+									    var val1 = obj1.foodCnt;
+									    var val2 = obj2.foodCnt;
+									    if (val1 < val2) {
+									        return 1;
+									    } else if (val1 > val2) {
+									        return -1;
+									    } else {
+									        return 0;
+									    }            
+						 			}) : of.foodList,
 			callback : function(){
 				foodPaging.getFirstPage();
 			} 
 		});
 	}
 
-
-	
-	var handWriting = null;
 	//手写板的创建
 	function createHandWriting(){
-		if(handWriting == null){
-			 handWriting = new HandWritingPanel(
+		return new HandWritingPanel(
 				{ renderTo : document.getElementById('handWritingPanel_th_orderFood'),
 				  result : function(data){
 				  	var temp = data.slice(0, 6);			
@@ -3206,7 +3220,6 @@ $(function(){
 					});
 				   }
 				});	
-		}
 	}
 	
 	
