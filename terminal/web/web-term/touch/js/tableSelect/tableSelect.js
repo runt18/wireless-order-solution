@@ -452,7 +452,6 @@ window.onload = function(){
 		});	
 		
 	}
-
 	//沽清搜索
 	$('#searchSelloutFoodInput').focus(function(){
 		focusInput = this.id;

@@ -2767,7 +2767,7 @@ of.submit = function(c){
 											if(result.success){
 												Util.msg.alert({
 													topTip : true,
-													msg : result.data,
+													msg : result.data
 												});
 												//暂结应该是没有回调方法的
 //												if(of.afterCommitCallback != null && typeof of.afterCommitCallback == 'function'){
@@ -2821,7 +2821,7 @@ of.submit = function(c){
 						closeHandWriting();
 						Util.msg.alert({
 							msg : data.msg,
-							topTip : true,
+							topTip : true
 						});
 						
 						//从已点菜进入时, 返回已点菜界面
@@ -2945,9 +2945,13 @@ $(function(){
 		closeHandWriting();
 	});
 	
+	var handWriting = null;
 	//已点菜界面手写板按钮的click事件
 	$('#handWriteBoard_a_orderFood').click(function(){	
 		$('#orderHandCmp').show();
+		if(handWriting == null){
+			handWriting = createHandWriting();
+		}
 		createHandWriting();
 		handWriting.rewrite();
 		closePinyin();
@@ -2991,35 +2995,9 @@ $(function(){
 		closeHandWriting();
 		createPinyinKeyboard();
 	});
-			
-	//菜品分页
-	var foodPaging = Util.to.padding({
-		renderTo : "foodsCmp",
-		templet : function(c){
-			return foodCmpTemplet.format({
-				id : c.data.id,
-				name : c.data.name.substring(0, 10),
-				unitPrice : c.data.unitPrice,
-				click : 'of.insertFood({foodId:' + c.data.id + '})',
-				sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
-				currPrice : (c.data.status & 1 << 4) != 0 ? '时' : '',		
-				gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
-				weigh : (c.data.status & 1 << 7) != 0 ? '称' : '',
-				commonStatus : (c.data.status & 1 << 10) != 0 ? 'none' : '',
-				limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
-				foodLimitAmount : c.data.foodLimitAmount,
-				foodLimitRemain : c.data.foodLimitRemain
-			});
-		},
-		pagedCallBack : function(){
-			//FIXME .food-status-font中position:absolute不起作用
-			setTimeout(function(){
-				$(".food-status-font").css("position", "absolute");
-			}, 250);				
-		}
-	});		
-
 	
+	//菜品分页
+	var foodPaging = null;		
 	//拼音 && 手写 搜索
 	function search(value, qw){	
 		var data = null;
@@ -3040,21 +3018,57 @@ $(function(){
 				}						
 			}
 		}
+		//创建菜品分页的控件
+		if(foodPaging == null){
+			foodPaging = Util.to.padding({
+				renderTo : "foodsCmp",
+				templet : function(c){
+					return foodCmpTemplet.format({
+						id : c.data.id,
+						name : c.data.name.substring(0, 10),
+						unitPrice : c.data.unitPrice,
+						click : 'of.insertFood({foodId:' + c.data.id + '})',
+						sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
+						currPrice : (c.data.status & 1 << 4) != 0 ? '时' : '',		
+						gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
+						weigh : (c.data.status & 1 << 7) != 0 ? '称' : '',
+						commonStatus : (c.data.status & 1 << 10) != 0 ? 'none' : '',
+						limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
+						foodLimitAmount : c.data.foodLimitAmount,
+						foodLimitRemain : c.data.foodLimitRemain
+					});
+				},
+				pagedCallBack : function(){
+					//FIXME .food-status-font中position:absolute不起作用
+					setTimeout(function(){
+						$(".food-status-font").css("position", "absolute");
+					}, 250);				
+				}
+			});		
+		}
+		
 		foodPaging.init({
-			data : data ? data.sort(of.searchFoodCompare) : of.foodList,
+			data : data ? data.sort(function (obj1, obj2) {
+										//菜品搜索结果按点菜数量排序
+									    var val1 = obj1.foodCnt;
+									    var val2 = obj2.foodCnt;
+									    if (val1 < val2) {
+									        return 1;
+									    } else if (val1 > val2) {
+									        return -1;
+									    } else {
+									        return 0;
+									    }            
+						 			}) : of.foodList,
 			callback : function(){
 				foodPaging.getFirstPage();
 			} 
 		});
 	}
 
-
-	
-	var handWriting = null;
 	//手写板的创建
 	function createHandWriting(){
-		if(handWriting == null){
-			 handWriting = new HandWritingPanel(
+		return new HandWritingPanel(
 				{ renderTo : document.getElementById('handWritingPanel_th_orderFood'),
 				  result : function(data){
 				  	var temp = data.slice(0, 6);			
@@ -3076,7 +3090,6 @@ $(function(){
 					});
 				   }
 				});	
-		}
 	}
 	
 	
