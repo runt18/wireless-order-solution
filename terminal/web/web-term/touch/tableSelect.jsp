@@ -51,6 +51,14 @@
 
 <!--引入易笔字核心脚本(utf-8编码)-->
 <!-- <script src="http://www.yibizi.com/ybz_core/core/ybz.min.js"></script> -->
+
+<!--禁止触摸时选中文字  -->
+<script type="text/javascript">
+	document.onselectstart = function(){
+		return false;
+	} 
+</script>
+
 </head>
 <body>
 
