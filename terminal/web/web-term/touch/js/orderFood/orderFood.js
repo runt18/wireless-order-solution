@@ -2335,14 +2335,14 @@ function foodCommonTasteLoad(){
 
 	$('#txtChooosedFoodName').text(of.selectedOrderFood.name);
 	
-	// if(document.getElementById("orderPinyinCmp").style.display == "none" &&
-			// document.getElementById("orderHandCmp").style.display == "none"){
-		// $('#divFoodTasteFloat').css({top : 'initial', bottom : '90px'});
-	// }
-	// else{
-		// $('#divFoodTasteFloat').css({top : 'initial', bottom : '48.5%'});
-	// }
-// 	
+	 if(document.getElementById("orderPinyinCmp").style.display == "none" &&
+			 document.getElementById("orderHandCmp").style.display == "none"){
+		 $('#divFoodTasteFloat').css({top : 'initial', bottom : '90px'});
+	 }
+	 else{
+		 $('#divFoodTasteFloat').css({top : 'initial', bottom : '48.5%'});
+	 }
+ 	
 	$('#divFoodTasteFloat').show();
 	//关闭可能的套菜弹出
 	closeComboFoodTasteUnit();
