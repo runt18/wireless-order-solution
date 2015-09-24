@@ -623,8 +623,10 @@ of.insertFood = function(c){
 	if(typeof c.callback == 'function'){
 		c.callback();
 	}
+	
 	$('#rewrite_a_orderFood').click();
 	$('#pinyinVal_a_orderFood').click();	
+	$('#handDel_a_orderFood').click();
 };
 
 /**
@@ -2907,11 +2909,11 @@ function closePinyin(){
 $(function(){
 	
 	//手写重写按钮的click事件
-	$('#rewrite_a_orderFood').on('click', function(){
+	$('#rewrite_a_orderFood').click(function(){
 		if(handWriting){
 			handWriting.rewrite();  
 		}
-		document.getElementById('searchWord_div_orderFood').innerHTML = "";	
+		$('#searchWord_div_orderFood').html('');
 		$('#handWritingInput_input_orderFood').focus();
 	});
 	
@@ -2957,6 +2959,7 @@ $(function(){
 		closePinyin();
 		$('#handWritingInput_input_orderFood').val('');
 		$('#searchWord_div_orderFood').html('');
+		$('#handWritingInput_input_orderFood').focus();
 	});
 	
 	//拼音清空按钮事件
@@ -2994,6 +2997,7 @@ $(function(){
 		$('#pinyinInput_input_orderFood').val('');
 		closeHandWriting();
 		createPinyinKeyboard();
+		$('#pinyinInput_input_orderFood').focus();
 	});
 	
 	//菜品分页

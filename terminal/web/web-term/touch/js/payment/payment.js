@@ -1330,12 +1330,12 @@ function toCheckoutPage(){
 	});	
 }
 
-$(function(){
-	//微信支付Button
-	$('#wx_a_payment').click(function(){
-		paySubmit(PayTypeEnum.WX.val);
-	});
-});
+//$(function(){
+//	//微信支付Button
+//	$('#wx_a_payment').click(function(){
+//		paySubmit(PayTypeEnum.WX.val);
+//	});
+//});
 
 
 
