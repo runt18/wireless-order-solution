@@ -1,24 +1,6 @@
 /**
  * 
  */
-//$(function(){
-//	var handWriting = new HandWritingPanel(
-//		{ renderTo : document.getElementById('handWritingPanel'),
-//		  result : function(data){
-////			var temp = data.slice(0, 9).reverse();
-////			var zifu = "";
-////			for(var i = 0; i < temp.length; i++){			
-////				var all = '<input type="button" value="' + temp[i] + '" onclick="">';
-////				zifu = all + zifu;
-////			}
-////			document.getElementById("sdf").innerHTML = zifu;
-////			console.log(zifu);	
-//		}}
-//		);
-//	$('#buttonRewrite').click(function(){
-//		handWriting.rewrite();
-//	});
-//});
  
 function HandWritingPanel(param){
 	
@@ -65,8 +47,8 @@ function HandWritingPanel(param){
 	function drawLine(startX, startY, endX, endY){
 	    ctx.beginPath();
 	    ctx.lineCap = "round";
-	    ctx.moveTo(startX,startY);
-	    ctx.lineTo(endX,endY);
+	    ctx.moveTo(startX, startY);
+	    ctx.lineTo(endX, endY);
 	    ctx.stroke();
 		bihua.push(endX + "a" + endY + "a");
 	}
@@ -74,10 +56,12 @@ function HandWritingPanel(param){
 	var drawing = false;
 	
 	function onMouseOut(event){
+		//console.log('mouse out');
 		drawing = false;
 	}
 	
 	function onMouseUp(event) {
+		//console.log('mouse up');
 	    //ev = event || window.event; 
 		//var mousePos = mousePosition(event);
 		drawing = false; 
@@ -86,9 +70,11 @@ function HandWritingPanel(param){
 	}
 	
 	function onMouseDown(event) {
+		//console.log('mouse down');
 	    //ev = event || window.event; 
 		//var mousePos = mousePosition(event);
 		drawing = true; 
+		event.preventDefault();
 	    lastX = event.clientX;
 	    lastY = event.clientY;
 	    var top = getY(canvas);    
@@ -100,6 +86,7 @@ function HandWritingPanel(param){
 	}
 	
 	function onMouseMove(event) {
+		//console.log('mouse move');
 	    //ev = event || window.event; 
 		//var mousePos = mousePosition(event); 
 		if(drawing){
@@ -110,7 +97,7 @@ function HandWritingPanel(param){
 	     	 	//event.preventDefault();
 				var top = getY(canvas);    
 				var left = getX(canvas);    
-	     	 	drawLine(lastX,lastY,event.clientX - left + document.body.scrollLeft, event.clientY - top + document.body.scrollTop );
+	     	 	drawLine(lastX, lastY, event.clientX - left + document.body.scrollLeft, event.clientY - top + document.body.scrollTop );
 	     	 	lastX = event.clientX;
 	    	  	lastY = event.clientY;
 				lastX = lastX - left + document.body.scrollLeft;
