@@ -1963,17 +1963,7 @@ function addTempTaste(){
 	}
 	
 	//是否选中键盘
-	if(getcookie('isNeedNumKeyboard') == 'true'){
-		$('#isKeyboard4Taste').attr('checked', true);
-	}else{
-		$('#isKeyboard4Taste').attr('checked', false);
-	}
 	
-	if(getcookie('isNeedWriter') == 'true'){
-		$('#isWriter4Taste').attr('checked', true);
-	}else{
-		$('#isWriter4Taste').attr('checked', false);
-	}		
 	
 	of.selectedOrderFood = of.newFood[foodContent.attr('data-index')];
 	
@@ -1983,11 +1973,18 @@ function addTempTaste(){
 	
 	//关闭弹出常用口味
 	closeFoodCommonTaste();
-	//易笔字打开	
-	YBZ_open(document.getElementById('tempTasteName'));
-	$('#tempTasteWriterOn')[0].selectedIndex = 1;
-	$('#tempTasteWriterOn').slider('refresh');
-		
+	
+	
+	//易笔字打开
+	if(systemStatus == 1){
+		if(YBZ_win){
+			YBZ_win.close();
+		}		
+	}else{	
+		YBZ_open(document.getElementById('tempTasteName'));
+		$('#tempTasteWriterOn')[0].selectedIndex = 1;
+		$('#tempTasteWriterOn').slider('refresh');
+	}
 	focusInput = "tempTastePrice";
 	var tasteGroup;
 	
