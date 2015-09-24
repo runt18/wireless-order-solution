@@ -3034,13 +3034,13 @@ function closePinyin(){
 
 $(function(){
 	
-	//重写按钮的click事件
+	//拼音重写按钮的click事件
 	$('#rewrite_a_orderFood').on('click', function(){
 		if(handWriting){
 			handWriting.rewrite();  
 		}
 		document.getElementById('searchWord_div_orderFood').innerHTML = "";	
-		$('#handWritingInput_input_orderFood').val('');
+		$('#handWritingInput_input_orderFood').focus();
 	});
 	
 	//手写搜索的清空按钮事件
@@ -3187,11 +3187,11 @@ $(function(){
 			 handWriting = new HandWritingPanel(
 				{ renderTo : document.getElementById('handWritingPanel_th_orderFood'),
 				  result : function(data){
-				  	var temp = data.slice(0, 8);			
+				  	var temp = data.slice(0, 6);			
 					var zifu = "";
 					for(var i = 0; i < temp.length; i++){								
-						var eachCharactar = '<input type="button" style="width:25%;height:50%;font-size:20px;" value="' + temp[i] + '">';							
-						if(i % 4 == 0 ){
+						var eachCharactar = '<input type="button" style="width:33%;height:65%;font-size:30px;" value="' + temp[i] + '">';							
+						if(i % 3 == 0 ){
 							zifu += '<br>'; 
 						}
 						zifu += eachCharactar;										
@@ -3201,6 +3201,7 @@ $(function(){
 						element.onclick = function(){
 							$('#handWritingInput_input_orderFood').val($('#handWritingInput_input_orderFood').val() + element.value);
 							$('#handWritingInput_input_orderFood').trigger('input');
+							$('#rewrite_a_orderFood').click();
 						};
 					});
 				   }
@@ -3225,7 +3226,7 @@ $(function(){
 		$('#pinyin_div_orderFood input').each(function(index, element){
 			element.onclick = function(){
 				$('#pinyinInput_input_orderFood').val($('#pinyinInput_input_orderFood').val() + element.value);
-				$('#pinyinInput_input_orderFood').trigger('input');
+				$('#pinyinInput_input_orderFood').trigger('input');		
 			};
 		});	
 	}

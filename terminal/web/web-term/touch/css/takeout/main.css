@@ -315,9 +315,9 @@ html { overflow-y: hidden;}
 .handWritingWord{
 	float:left;
 	width:40%;
-	height:40%;	
-	margin-top: 10%;
-	margin-left: 6%;	
+	height:50%;	
+	margin-top: 5%;
+	margin-left: 7.5%;	
 }
 
 .food-style{
