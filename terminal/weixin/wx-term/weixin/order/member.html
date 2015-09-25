@@ -62,7 +62,7 @@ var totalMath = 0;
 		<div id="bindMember_div_member" style="display: none;width: 100%;">
 			<ul class="m-b-list">
 				<li class="none-line" style="line-height: 50px;padding-top: 10px;">
-					手机号: <input id="mobile_input_member" class="txtVerifyMobile" type="number" maxlength="11"/>
+					手机号码: <input id="mobile_input_member" class="txtVerifyMobile"  onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" maxlength="11"/>
 				</li>
 				<li class="none-line" style="line-height: 50px;">
 					会员姓名: <input id="name_input_member" class="txtVerifyMobile"/>
