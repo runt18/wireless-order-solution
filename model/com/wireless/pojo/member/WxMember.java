@@ -6,10 +6,20 @@ public class WxMember {
 	public static class BindBuilder{
 		private final String serial;
 		private final String mobile;
+		private String name;
 		
 		public BindBuilder(String serial, String mobile){
 			this.serial = serial;
 			this.mobile = mobile;
+		}
+		
+		public BindBuilder setName(String name){
+			this.name = name;
+			return this;
+		}
+		
+		public boolean isNameChanged(){
+			return this.name != null;
 		}
 		
 		public String getSerial(){
@@ -18,6 +28,10 @@ public class WxMember {
 		
 		public String getMobile(){
 			return this.mobile;
+		}
+		
+		public String getName(){
+			return this.name;
 		}
 	}
 	
