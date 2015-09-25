@@ -10,7 +10,7 @@ body{
 
 #divMemberCard {
 	height: 192px;
-	background-image: url(../images/member_card.jpg);
+	background-image: url(../images/member_vip.jpg);
 	background-size: 100% 100%; 
 	text-align: right;
 }
@@ -19,11 +19,24 @@ body{
 	position: relative;
 	min-width: 30px;
 	color: #000;
-	right: 25px;
-	top: 135px;
-	font-size: 16px;
+	float :left;
+	top: 155px;
+	font-size: 30px;
+	color : #156785;
 	font-weight: bold;
 }
+
+#divMemberCard > div[data-type=R]{
+	z-index: 0;
+	position: relative;
+	min-width: 30px;
+	color: #000;
+	right: 260px;
+	top: 10px;
+	font-size: 18px;
+	font-weight: bold;
+}
+
 #divMemberCard > div[data-type=r] > div{
 	line-height: 25px; 
 }
@@ -36,7 +49,7 @@ input[type=text], input[type=number]{
 
 
 /**************************************************/
-#txtVerifyMobile, #txtVerifyCode, #txtVerifyName, #txtVerifyMobileByReset, #txtVerifyCodeByReset
+.txtVerifyMobile
 {
 	font-size: 25px;
 	padding: 3px 5px 3px 5px;
@@ -46,7 +59,7 @@ input[type=text], input[type=number]{
 	//border-bottom: 1px solid #ddd;
 }
 
-#btnVerifyCode, #btnVerifyCodeByReset{
+.btnVerifyCode,.btnVerifyCodeByReset{
 	display: inline;
 	font-size: 16px;
 	padding: 0 10px 0 10px;
@@ -54,7 +67,7 @@ input[type=text], input[type=number]{
 	border: 0;
 	background: #fff;
 }
-#btnBindMemberByReset{
+.btnBindMemberByReset{
 	/* width: 200px; */
 	letter-spacing: 4px;
 	padding: 3px 5px 3px 5px;
@@ -361,10 +374,11 @@ input[type=text], input[type=number]{
 /*end ‘≤Ω«Œﬁ“ı”∞∞¥≈•*/
 
 
-#ulMemberPrivilegeDetail{
+.ulMemberPrivilegeDetail{
 	margin-left: 25px;
 }
-#ulMemberPrivilegeDetail li{
+
+.ulMemberPrivilegeDetail li{
 	list-style:disc !important;
 	font-family:  'Microsoft YaHei';
 	color : maroon ;

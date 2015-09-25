@@ -42,8 +42,12 @@ var totalMath = 0;
 <div data-type="r">
 	<!-- <div id="divRestaurantName" data-type="top">--</div> -->
 	<div id="divWXMemberCard" data-type="bottom">微信卡号:1000000</div>
-	<div id="divMemberTypeName" data-type="bottom">未激活</div>
 </div>
+
+<div data-type="R">
+<div id="divMemberTypeName" data-type="bottom">未激活</div>
+</div>
+
 </div>
 
 <div id="divMemberContent" class="main-box">
@@ -58,11 +62,10 @@ var totalMath = 0;
 		<div id="bindMember_div_member" style="display: none;width: 100%;">
 			<ul class="m-b-list">
 				<li class="none-line" style="line-height: 50px;padding-top: 10px;">
-					手机号: <input id="mobile_input_member" type="number" maxlength="11"/>
+					手机号: <input id="mobile_input_member" class="txtVerifyMobile" type="number" maxlength="11"/>
 				</li>
 				<li class="none-line" style="line-height: 50px;">
-					会员姓名: <input id="name_input_member"/>
-					<span id="btnVerifyCode" style="color: blue;font-size: 13px;" ></span>
+					会员姓名: <input id="name_input_member" class="txtVerifyMobile"/>
 				<li class="none-line">
 					<div style="height: 55px;width: 100%;text-align: center;" >
 						<a id="bind_a_member" class="a_demo_two" style="font-size: 20px;font-weight: bold;">确认绑定</a>	
@@ -72,7 +75,7 @@ var totalMath = 0;
 					<span style="font-size: 18px;">注: 可到前台激活或绑定原会员卡</span>
 					<div id="privilege_div_member" style="width: 100%;border: 1px dashed darkgray;margin-bottom: 2px;">
 						<span style="margin-left: 5px;font-size: 19px;">激活成为微信会员，可享受:</span>
-						<ul id="privilege_ul_member" ></ul>
+						<ul id="privilege_ul_member" class="ulMemberPrivilegeDetail"></ul>
 					</div>
 				</li>					
 			</ul>

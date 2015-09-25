@@ -16,7 +16,7 @@ $(function(){
 			Util.lm.hide();
 			if(data.success){
 				//会员卡号
-				$('#divWXMemberCard').html('微信卡号:' + data.other.weixinCard);
+				$('#divWXMemberCard').html('卡号:' + data.other.weixinCard);
 				
 				if(data.other.status == 2){
 					//手机号已绑定状态
