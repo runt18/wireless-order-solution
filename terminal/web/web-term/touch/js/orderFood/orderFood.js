@@ -624,9 +624,19 @@ of.insertFood = function(c){
 		c.callback();
 	}
 	
-	$('#rewrite_a_orderFood').click();
-	$('#pinyinVal_a_orderFood').click();	
-	$('#handDel_a_orderFood').click();
+	//判断拼音键盘是否显示来清空
+	if($("#orderPinyinCmp").is(":visible")){
+		$('#pinyinVal_a_orderFood').click();	
+		$('#handDel_a_orderFood').click();	
+	}
+	
+	//判断手写键盘是否显示来重写
+	if($("#orderHandCmp").is(":visible")){
+		$('#rewrite_a_orderFood').click();
+		$('#handDel_a_orderFood').click();
+	}
+	
+
 };
 
 /**
@@ -2334,11 +2344,9 @@ function foodCommonTasteLoad(){
 
 	$('#txtChooosedFoodName').text(of.selectedOrderFood.name);
 	
-	 if(document.getElementById("orderPinyinCmp").style.display == "none" &&
-			 document.getElementById("orderHandCmp").style.display == "none"){
+	 if($("#orderPinyinCmp").is(":hidden") && $("#orderHandCmp").is(":hidden")){
 		 $('#divFoodTasteFloat').css({top : 'initial', bottom : '90px'});
-	 }
-	 else{
+	 }else{
 		 $('#divFoodTasteFloat').css({top : 'initial', bottom : '48.5%'});
 	 }
  	
