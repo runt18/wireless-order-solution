@@ -50,34 +50,29 @@ var totalMath = 0;
 
 <ul class="m-b-list">
 	<li class="box-horizontal">
-		<div style="width: 45%">会员名: <span id="spanMemberName">--</span></div>
-		<div id="divWeixinMemberPhone" style="text-align: right;width: 55%">手机号: <span id="spanMemberMobile">--</span></div>
-		<div id="divBindWeixinMember" style="text-align: right;width: 55%">绑定手机号&nbsp;&gt;</div>
+		<div style="width: 45%">会员名: <span id="name_span_member">--</span></div>
+		<div id="phone_div_member" style="text-align: right;width: 55%">手机号: <span id="mobile_span_member">--</span></div>
+		<div id="bind_div_member" style="text-align: right;width: 55%">绑定手机号&nbsp;&gt;</div>
 	</li>
 	<li>
-		<div id="divToBindWeixinMember" style="display: none;width: 100%;">
+		<div id="bindMember_div_member" style="display: none;width: 100%;">
 			<ul class="m-b-list">
 				<li class="none-line" style="line-height: 50px;padding-top: 10px;">
-					手机号: <input id="txtVerifyMobile" type="number" maxlength="11"/>
+					手机号: <input id="mobile_input_member" type="number" maxlength="11"/>
 				</li>
 				<li class="none-line" style="line-height: 50px;">
-					<div style="width:100%;">
-						验证码: <input id="txtVerifyCode" type="number" maxlength="4" style="width:70px;"/>
-						<span id="btnVerifyCode" style="color: blue;font-size: 13px;" ></span>
-					</div>
+					会员姓名: <input id="name_input_member"/>
+					<span id="btnVerifyCode" style="color: blue;font-size: 13px;" ></span>
 				<li class="none-line">
-					<div id="btnGetVerifyCode" style="height: 55px;width: 100%;text-align: center;" >
-						<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="getVerifyCode({event:this})">获取验证码</a>	
+					<div style="height: 55px;width: 100%;text-align: center;" >
+						<a id="bind_a_member" class="a_demo_two" style="font-size: 20px;font-weight: bold;">确认绑定</a>	
 					</div>	
-					<div id="btnBindMember" style="margin-top: 3px;height: 55px;width: 100%;text-align: center;display: none;" >
-						<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="bindMember({event:this})">确认绑定</a>	
-					</div>							
 				</li>
-				<li >
+				<li>
 					<span style="font-size: 18px;">注: 可到前台激活或绑定原会员卡</span>
-					<div id="divMemberPrivilegeDetail" style="width: 100%;border: 1px dashed darkgray;margin-bottom: 2px;">
+					<div id="privilege_div_member" style="width: 100%;border: 1px dashed darkgray;margin-bottom: 2px;">
 						<span style="margin-left: 5px;font-size: 19px;">激活成为微信会员，可享受:</span>
-						<ul id="ulMemberPrivilegeDetail" ></ul>
+						<ul id="privilege_ul_member" ></ul>
 					</div>
 				</li>					
 			</ul>

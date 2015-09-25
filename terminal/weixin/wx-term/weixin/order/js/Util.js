@@ -309,9 +309,9 @@ function checkDot(c)
 	return r.test(c);
 }
 
-document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
-//	WeixinJSBridge.call('hideToolbar');
-});
+//document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+////	WeixinJSBridge.call('hideToolbar');
+//});
 
 function Util_urlParaQuery() {
 	var name, value, i, key = 0;

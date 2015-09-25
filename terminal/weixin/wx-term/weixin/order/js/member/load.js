@@ -16,15 +16,22 @@ $(function(){
 			Util.lm.hide();
 			if(data.success){
 				//会员卡号
-				$('#divWXMemberCard').html('微信卡号:'+data.other.weixinCard);
+				$('#divWXMemberCard').html('微信卡号:' + data.other.weixinCard);
 				
 				if(data.other.status == 2){
-					$('#divWeixinMemberPhone').show();
-					$('#divBindWeixinMember').hide();
+					//手机号已绑定状态
+					$('#phone_div_member').show();
+					$('#bind_div_member').hide();
 				}else if(data.other.status == 1){
-					$('#divBindWeixinMember').show();
-					$('#divWeixinMemberPhone').hide();					
+					//手机号码未绑定状态
+					$('#bind_div_member').show();
+					$('#phone_div_member').hide();					
 				}
+				
+				//FIXME to delete
+				$('#bind_div_member').show();
+				$('#phone_div_member').hide();
+				//------------------------------------
 				
 				$.ajax({
 					url : '../../WXQueryMemberOperation.do',
@@ -84,55 +91,103 @@ $(function(){
 				}
 				
 				var memberType = data.other.member.memberType;
-				$('#ulMemberPrivilegeDetail').append(memberType.discount.type != 2 ? '<li>'+ memberType.discount.name +'优惠</li>' : '');	
-				$('#ulMemberPrivilegeDetail').append(memberType.chargeRate >1 ? '<li>'+ memberType.chargeRate +'倍充值优惠, 充 100 元送 '+parseInt((memberType.chargeRate-1)*100)+' 元</li>':'');
-				$('#ulMemberPrivilegeDetail').append(memberType.exchangeRate >1 ? '<li>'+ memberType.exchangeRate +'倍积分特权, 消费 1 元积 '+memberType.exchangeRate+' 分</li>':'');
-				$('#ulMemberPrivilegeDetail').append(typeof memberType.desc != 'undefined' && memberType.desc != '' ? '<li>'+ memberType.desc +'</li>':'');
+				$('#privilege_ul_member').append(memberType.discount.type != 2 ? '<li>'+ memberType.discount.name +'优惠</li>' : '');	
+				$('#privilege_ul_member').append(memberType.chargeRate >1 ? '<li>'+ memberType.chargeRate +'倍充值优惠, 充 100 元送 '+parseInt((memberType.chargeRate-1)*100)+' 元</li>':'');
+				$('#privilege_ul_member').append(memberType.exchangeRate >1 ? '<li>'+ memberType.exchangeRate +'倍积分特权, 消费 1 元积 '+memberType.exchangeRate+' 分</li>':'');
+				$('#privilege_ul_member').append(typeof memberType.desc != 'undefined' && memberType.desc != '' ? '<li>'+ memberType.desc +'</li>':'');
 				
 				
-				if($('#ulMemberPrivilegeDetail').html()){
-					$('#divMemberPrivilegeDetail').css('display', 'block');
+				if($('#privilege_ul_member').html()){
+					$('#privilege_div_member').css('display', 'block');
 				}else{
-					$('#divMemberPrivilegeDetail').css('display', 'none');
+					$('#privilege_div_member').css('display', 'none');
 				}					
 					
 			}else{
 				Util.dialog.show({title:'提示', msg: data.msg});
 			}
 		},
-		error : function(data, errotType, eeor){
+		error : function(data, errotType, err){
 			Util.lm.hide();
 			Util.dialog.show({title:'错误', msg: '服务器请求失败, 请稍候再试.'});
 		}
 	});
 	
-	//优惠劵宽度自适应
-/*	var autoWidth = function()
-	{
-		 calcFloatDivs();
-	};
-	window.onresize = autoWidth;*/
-//	$.post('../../WxOperatePromotion.do', {dataSource : 'hasWelcomePage', 'fid':Util.mp.fid}, function(jr){
-//			if(jr.success && jr.root.length > 0){
-//				haveWelcomePageId = jr.root[0].id;
-//			}		
-//	});
+	function initMemberMsg(c){
+		c = c == null ? {} : c;
+		var data = typeof c.data == 'undefined' ? {} : c.data;
+		
+	//	var restaurantName = $('#divRestaurantName');
+		var name = $('#name_span_member');
+		var mobile = $('#mobile_span_member');
+		var point = $('#spanMemberPoint');
+		var totalBalance = $('#spanMemberTotalBalance');
+		var typeName = $('#spanMemberTypeName');
+		var typeNameInCard = $('#divMemberTypeName');
+	//	var weixinMemberCard = $('#divWXMemberCard');
+		var defaultMemberDiscount = $('#fontMemberDiscount');
+		var memberTotalPoint = $('#fontMemberPoint');
+		
+	//	restaurantName.html(typeof data.restaurant == 'undefined' ? '--' : data.restaurant.name);
+		name.html(typeof data.name == 'undefined' ? '--' : data.name);
+		mobile.html(typeof data.mobile == 'undefined' ? '--' : data.mobile);
+		point.html(typeof data.point == 'undefined' ? '--' : data.point);
+		totalBalance.html(typeof data.totalBalance == 'undefined' ? '--' : checkDot(data.totalBalance)?parseFloat(data.totalBalance).toFixed(2) : data.totalBalance);
+		typeName.html(typeof data.memberType.name == 'undefined' ? '--' : data.memberType.name);
+		typeNameInCard.html(typeof data.memberType.name == 'undefined' ? '未激活' : data.memberType.name);
+	//	weixinMemberCard.html(typeof data.memberType.name == 'undefined' ? '未激活' : data.memberType.name);
+		defaultMemberDiscount.html(typeof data.memberType.discount != 'undefined' && data.memberType.discount.type != 2 ? data.memberType.discount.name : '');
+		memberTotalPoint.html(typeof data.totalPoint == 'undefined' ? '--' : data.totalPoint);
+	}
 	
-	//点击输入验证码
-	$('#txtVerifyCode').focus(function(){
-		$('html, body').animate({scrollTop: 190}, 'fast'); 
-	});
-
 	//绑定会员	
-	$('#divBindWeixinMember').toggle(
+	$('#bind_div_member').toggle(
 		function(){
-			
-			$('#divToBindWeixinMember').show();
+			$('#bindMember_div_member').show();
 			$('html, body').animate({scrollTop: 200}, 'fast'); 
-			weixinPhoneFocus();			
 		},
 		function(){
-			$('#divToBindWeixinMember').hide();
+			$('#bindMember_div_member').hide();
 		}
 	);
+	
+	//'确认绑定'Click
+	$('#bind_a_member').click(function(){
+		var mobile = $('#mobile_input_member').val().trim();
+		if(!/^1[3,5,8][0-9]{9}$/.test(mobile)){
+			Util.dialog.show({msg: '请输入 11 位纯数字的有效手机号码'});
+			return;
+		}
+		var name = $('#name_input_member').val().trim();
+		
+		$.ajax({
+			url : '../../WXOperateMember.do',
+			type : 'post',
+			data : {
+				dataSource : 'bind',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid,
+				mobile : mobile,
+				name : name
+			},
+			dataType : 'json',
+			success : function(data, status, xhr){
+				if(data.success){
+					Util.dialog.show({msg: '绑定成功', callback : function(){
+						$('#bind_div_member').hide();
+						$('#bindMember_div_member').hide();
+						$('#phone_div_member').show();
+						if(name.length != 0){
+							$('#name_span_member').html(name);
+						}
+						$('#mobile_span_member').html(mobile);
+					}});
+				}else{
+					Util.dialog.show({msg: data.msg});
+				}					
+			}
+		});
+		
+	});
+	
 });
