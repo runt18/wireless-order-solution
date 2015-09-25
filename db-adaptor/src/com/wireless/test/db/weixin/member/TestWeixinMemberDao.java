@@ -54,7 +54,7 @@ public class TestWeixinMemberDao {
 			Assert.assertEquals("member id to getByWxCard", memberId, MemberDao.getByWxCard(mStaff, weixinCard).getId());
 			
 			//----------Test to bind a weixin member----------------
-			WxMemberDao.bind(mStaff, new WxMember.BindBuilder(WEIXIN_MEMBER_SERIAL, "18520590931"));
+			WxMemberDao.bind(mStaff, new WxMember.BindBuilder(WEIXIN_MEMBER_SERIAL, "18520590931", "张小姐"));
 			Member expected = MemberDao.getByMobile(mStaff, "18520590931");
 			actual = MemberDao.getByWxSerial(mStaff, WEIXIN_MEMBER_SERIAL);
 			Assert.assertEquals("member id after bound", expected.getId(), actual.getId());

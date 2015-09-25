@@ -10,7 +10,6 @@ import com.wireless.db.Params;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberTypeDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.MemberError;
 import com.wireless.exception.WxMemberError;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.WxMember;
@@ -216,40 +215,9 @@ public class WxMemberDao {
 	 * 			<li>the member to this weixin does NOT exist
 	 */
 	public static int bind(DBCon dbCon, Staff staff, WxMember.BindBuilder builder) throws SQLException, BusinessException{
-		
-		final int memberId;
 		final WxMember weixinMember = getBySerial(dbCon, staff, builder.getSerial());
-		
-		List<Member> membersToMobile = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setMobile(builder.getMobile()), null);
-		if(membersToMobile.isEmpty()){
-			//Check to see whether the member associated with this weixin serial exist.
-			List<Member> membersToSerial = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(weixinMember.getSerial()), null);
-			if(membersToSerial.isEmpty()){
-				throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
-			}
-			//Update the mobile to the member associated with the weixin serial.
-			memberId = membersToSerial.get(0).getId();
-			MemberDao.update(dbCon, staff, new Member.UpdateBuilder(memberId).setMobile(builder.getMobile()));
-			
-		}else{
-			//Delete the member associated with this weixin while interested.
-			MemberDao.deleteByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(weixinMember.getSerial()));
-			
-			memberId = membersToMobile.get(0).getId();
-			String sql;
-			//Associated the original member owns this mobile with this weixin serial.  
-			sql = " UPDATE " + Params.dbName + ".weixin_member SET " + 
-				  " member_id = " + memberId +
-				  " ,status = " + WxMember.Status.BOUND.getVal() + 
-				  " ,bind_date = NOW() " +
-				  " WHERE weixin_card = " + weixinMember.getCard();
-			
-			if(dbCon.stmt.executeUpdate(sql) == 0){
-				throw new BusinessException(WxMemberError.WEIXIN_INFO_NOT_EXIST);
-			}
-		}
-
-		return memberId;
+		MemberDao.update(dbCon, staff, new Member.UpdateBuilder(weixinMember.getMemberId()).setMobile(builder.getMobile()).setName(builder.isNameChanged() ? builder.getName() : null));
+		return weixinMember.getMemberId();
 	}
 	
 	
