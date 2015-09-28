@@ -201,3 +201,87 @@ function HandWritingPanel(param){
   	};
 }
 
+var HandWritingAttacher = (function () {
+
+    //参数：传递给单例的一个参数集合
+    function Singleton() {
+
+        var attachInputs = [];
+        var activeInput = null;
+        var container = null;
+        
+        this.attach = function(attachTo, param){
+        	//检查是否有重复控件
+			var isExist = attachInputs.some(function(item, index, array){
+				return item.attachObj.id == attachTo.id;
+			});
+			
+			if(!isExist){
+				var attachInput = {
+					attachObj : attachTo,
+	        		focusFn : function(){
+	        			if(container == null){
+	        				//TODO
+		        			container = document.createElement("div");
+							container.style.height = "500px";
+							container.style.width = "500px";
+							document.body.appendChild(container);
+							new HandWritingPanel({ renderTo : container,
+											   	   result : function(data){
+											   	   		//TODO
+											   			$(activeInput).val(data[0]);
+											   	}});
+	        			}
+	        			activeInput = attachTo;
+	        		},
+	        		blurFn : function(){
+	        			if(container){
+							document.body.removeChild(container);
+							container = null;
+						}
+						activeInput = null;
+	        		}
+				}
+				
+	        	attachInputs.push(attachInput);
+	        	
+	        	$(attachTo).on('focus', attachInput.focusFn);
+	        	
+	        	$(attachTo).on('blur', attachInput.blurFn);
+			}
+			
+        	return this;
+        }
+        
+        this.detach = function(detachFrom){
+			//删除focus事件的处理函数
+			for(var i = 0; i < attachInputs.length; i++){
+				if(attachInputs[i].attachObj.id == detachFrom.id){
+					$(attachInputs[i].attachObj).off('focus', attachInputs[i].focusFn);
+				}
+			}
+			
+			attachInputs = attachInputs.filter(function(item, index, array){
+				return detachFrom.id != item.attachObj.id;
+			})
+        }
+        
+    }
+
+    //实例容器
+    var instance = null;
+
+    var _static = {
+
+        //获取实例的方法
+        //返回Singleton的实例
+        instance : function () {
+            if (instance == null) {
+                instance = new Singleton();
+            }
+            return instance;
+        }
+    };
+    return _static;
+})();
+
