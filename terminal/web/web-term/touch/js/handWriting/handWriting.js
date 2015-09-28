@@ -267,6 +267,8 @@ var HandWritingAttacher = (function () {
 			attachInputs = attachInputs.filter(function(item, index, array){
 				return detachFrom.id != item.attachObj.id;
 			});
+			
+			return this;
         };
         
     }
