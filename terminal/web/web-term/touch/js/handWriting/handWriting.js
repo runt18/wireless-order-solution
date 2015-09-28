@@ -221,27 +221,30 @@ var HandWritingAttacher = (function () {
 					attachObj : attachTo,
 	        		focusFn : function(){
 	        			if(container == null){
+	        				container = $('<div/>');
 	        				//TODO
-		        			container = document.createElement("div");
-							container.style.height = "500px";
-							container.style.width = "500px";
-							document.body.appendChild(container);
-							new HandWritingPanel({ renderTo : container,
-											   	   result : function(data){
-											   	   		//TODO
-											   			$(activeInput).val(data[0]);
-											   	}});
+	        				container.css(param || {
+	        					'width' : '500px',
+	        					'height' : '500px'
+	        				});
+	        				$('body').append(container);
+							new HandWritingPanel({ 
+								renderTo : container[0],
+						   	   	result : function(data){
+						   	   		//TODO
+						   			$(activeInput).val(data[0]);
+						   	}});
 	        			}
 	        			activeInput = attachTo;
 	        		},
 	        		blurFn : function(){
 	        			if(container){
-							document.body.removeChild(container);
+							container.remove();
 							container = null;
 						}
 						activeInput = null;
 	        		}
-				}
+				};
 				
 	        	attachInputs.push(attachInput);
 	        	
@@ -251,7 +254,7 @@ var HandWritingAttacher = (function () {
 			}
 			
         	return this;
-        }
+        };
         
         this.detach = function(detachFrom){
 			//删除focus事件的处理函数
@@ -260,11 +263,11 @@ var HandWritingAttacher = (function () {
 					$(attachInputs[i].attachObj).off('focus', attachInputs[i].focusFn);
 				}
 			}
-			
+			//删除数组中的Input组件
 			attachInputs = attachInputs.filter(function(item, index, array){
 				return detachFrom.id != item.attachObj.id;
-			})
-        }
+			});
+        };
         
     }
 
