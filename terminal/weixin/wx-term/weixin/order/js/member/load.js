@@ -28,11 +28,6 @@ $(function(){
 					$('#phone_div_member').hide();					
 				}
 				
-				//FIXME to delete
-				$('#bind_div_member').show();
-				$('#phone_div_member').hide();
-				//------------------------------------
-				
 				$.ajax({
 					url : '../../WXQueryMemberOperation.do',
 					type : 'post',
@@ -155,10 +150,25 @@ $(function(){
 	$('#bind_a_member').click(function(){
 		var mobile = $('#mobile_input_member').val().trim();
 		if(!/^1[3,5,8][0-9]{9}$/.test(mobile)){
-			Util.dialog.show({msg: '请输入 11 位纯数字的有效手机号码'});
+			Util.dialog.show({
+				msg: '请输入 11 位纯数字的有效手机号码',
+				callback : function(){
+					$('#mobile_input_member').select();
+				}
+			});
 			return;
 		}
+		
 		var name = $('#name_input_member').val().trim();
+		if(!/^([^x00-xff]{2,16})|([a-zA-z][a-zA-z0-9]{3,17})$/.test(name)){
+			Util.dialog.show({
+				msg: '请输入至少两个中文字或字母开头4至18位的会员名称',
+				callback : function(){
+					$('#name_input_member').select();
+				}
+			});
+			return;
+		}
 		
 		$.ajax({
 			url : '../../WXOperateMember.do',

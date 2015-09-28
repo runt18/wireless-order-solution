@@ -88,7 +88,10 @@ $(function(){
 
 	}
 	//微信支付
-	$('#iknowButton').on('click', callpay);
+	//$('#iknowButton').click(callpay);
+	$('#iknowButton').click(function(){
+		Util.jump('member.html');
+	});
 	
 	var couponId = 0;
 	//查看优惠活动
