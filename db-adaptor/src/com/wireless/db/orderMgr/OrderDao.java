@@ -268,6 +268,28 @@ public class OrderDao {
 	
 	/**
 	 * Get the status to a specific order.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param orderId
+	 * 			the order id 
+	 * @return the status to this order
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the order to check does NOT exist
+	 */
+	public static Order.Status getStatusById(Staff staff, int orderId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getStatusById(dbCon, staff, orderId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the status to a specific order.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -456,7 +478,7 @@ public class OrderDao {
 				  " O.discount_id, O.discount_staff_id, O.discount_staff, O.discount_date, " +
 				  " O.coupon_id, " +
 				  " O.price_plan_id, O.member_id, " +
-				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.coupon_price, O.total_price, O.actual_price " +
+				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.coupon_price, O.pure_price, O.total_price, O.actual_price " +
 				  " FROM " + 
 				  Params.dbName + "." + extraCond.orderTbl + " O " +
 				  " LEFT JOIN " + Params.dbName + ".table T ON O.table_id = T.table_id " +
@@ -473,7 +495,7 @@ public class OrderDao {
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
 				  " OH.coupon_price, " +
 				  " OH.settle_type, OH.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, OH.category, OH.status, OH.service_rate, OH.comment, " +
-				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
+				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.pure_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + "." + extraCond.orderTbl + " OH " + 
 				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = OH.pay_type_id " +
 				  " WHERE 1 = 1 " + 
@@ -557,6 +579,7 @@ public class OrderDao {
 			order.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
 			order.setErasePrice(dbCon.rs.getInt("erase_price"));
 			order.setCouponPrice(dbCon.rs.getFloat("coupon_price"));
+			order.setPurePrice(dbCon.rs.getFloat("pure_price"));
 			order.setTotalPrice(dbCon.rs.getFloat("total_price"));
 			order.setActualPrice(dbCon.rs.getFloat("actual_price"));
 			
@@ -1550,7 +1573,7 @@ public class OrderDao {
 			sql = " INSERT INTO " + Params.dbName + "." + toTbl.orderTbl + "(" +
 				  "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
 				  "`discount_staff`, `discount_staff_id`, `discount_date`," +
-				  "`cancel_price`, `discount_price`, `gift_price`, `coupon_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
+				  "`cancel_price`, `discount_price`, `gift_price`, `coupon_price`, `repaid_price`, `erase_price`, `pure_price`, `total_price`, `actual_price`, `custom_num`," + 
 				  "`waiter`, `settle_type`, `pay_type_id`, `category`, `staff_id`, " +
 				  "`region_id`, `region_name`, `table_id`, `table_alias`, `table_name`, `service_rate`, `comment`) VALUES ( " +
 				  order.getId() + "," +
@@ -1568,6 +1591,7 @@ public class OrderDao {
 				  order.getCouponPrice() + "," +
 				  order.getRepaidPrice() + "," +
 				  order.getErasePrice() + "," +
+				  order.getPurePrice() + "," +
 				  order.getTotalPrice() + "," +
 				  order.getActualPrice() + "," +
 				  order.getCustomNum() + "," +

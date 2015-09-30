@@ -236,6 +236,7 @@ public class PayOrder {
 			  " ,repaid_price =  " + orderCalculated.getRepaidPrice() + 
 			  " ,erase_price = " + orderCalculated.getErasePrice() + 
 			  " ,coupon_price = " + orderCalculated.getCouponPrice() + 
+			  " ,pure_price = " + orderCalculated.getPurePrice() +
 			  " ,total_price = " + orderCalculated.getTotalPrice() +  
 			  " ,actual_price = " + orderCalculated.getActualPrice() + 
 			  " ,custom_num = " + orderCalculated.getCustomNum() + 
@@ -436,7 +437,7 @@ public class PayOrder {
 		}
 		
 		//Calculate the total price.
-		float totalPrice = orderToCalc.calcTotalPrice();			
+		final float totalPrice = orderToCalc.calcTotalPrice();			
 		
 		//Calculate the actual price.
 		float actualPrice;
@@ -472,6 +473,8 @@ public class PayOrder {
 		orderToCalc.setGiftPrice(orderToCalc.calcGiftPrice());			
 		//Set the discount price.
 		orderToCalc.setDiscountPrice(orderToCalc.calcDiscountPrice());
+		//Set the pure price.
+		orderToCalc.setPurePrice(orderToCalc.calcPureTotalPrice());
 		//Set the total price.
 		orderToCalc.setTotalPrice(totalPrice);
 		//Set the actual price

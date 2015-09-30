@@ -27,6 +27,7 @@ import com.wireless.pojo.billStatistics.IncomeByErase;
 import com.wireless.pojo.billStatistics.IncomeByFood;
 import com.wireless.pojo.billStatistics.IncomeByGift;
 import com.wireless.pojo.billStatistics.IncomeByKitchen;
+import com.wireless.pojo.billStatistics.IncomeByMemberPrice;
 import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.billStatistics.IncomeByPay.PaymentIncome;
 import com.wireless.pojo.billStatistics.IncomeByRepaid;
@@ -50,10 +51,6 @@ public class CalcBillStatisticsDao {
 	public static class ExtraCond{
 		public final DateType dateType;
 		private final DBTbl dbTbl;
-		private final String orderTbl;
-		private final String orderFoodTbl;
-		private final String tasteGrpTbl;
-		private final String mixedTbl;
 
 		private Region.RegionId regionId;
 		private Department.DeptId deptId;
@@ -65,10 +62,6 @@ public class CalcBillStatisticsDao {
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
 			this.dbTbl = new DBTbl(dateType);
-			orderTbl = dbTbl.orderTbl;
-			orderFoodTbl = dbTbl.orderFoodTbl;
-			tasteGrpTbl = dbTbl.tgTbl;
-			mixedTbl = dbTbl.mixedTbl;
 		}
 		
 		public ExtraCond setRegion(Region.RegionId regionId){
@@ -169,7 +162,7 @@ public class CalcBillStatisticsDao {
 		
 		String sql;
 		//Calculate the order amount.
-		sql = " SELECT COUNT(*) FROM " + Params.dbName + "." + extraCond.orderTbl + " O " + 
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " + 
 			  " WHERE 1 = 1 " +
 			  (extraCond != null ? extraCond.toString() : "") +
 			  " AND O.restaurant_id = " + staff.getRestaurantId() +
@@ -187,7 +180,7 @@ public class CalcBillStatisticsDao {
 		sql = " SELECT " +
 			  " O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, " +
 			  " COUNT(*) AS amount, ROUND(SUM(O.total_price), 2) AS total_income, ROUND(SUM(O.actual_price), 2) AS actual_income " +
-			  " FROM " + Params.dbName + "." + extraCond.orderTbl + " O " +
+			  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
 			  " WHERE 1 = 1 " +
 			  (extraCond != null ? extraCond.toString() : "") +
@@ -211,8 +204,8 @@ public class CalcBillStatisticsDao {
 		sql = " SELECT " +
 			  " MP.pay_type_id, IFNULL(MAX(PT.name), '其他') AS pay_type_name, " +
 			  " COUNT(*) AS amount, ROUND(SUM(MP.price), 2) AS total_income, ROUND(SUM(MP.price), 2) AS actual_income " +
-			  " FROM " + Params.dbName + "." + extraCond.orderTbl + " O " +
-			  " JOIN " + Params.dbName + "." + extraCond.mixedTbl + " MP ON O.id = MP.order_id " +
+			  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
+			  " JOIN " + Params.dbName + "." + extraCond.dbTbl.mixedTbl + " MP ON O.id = MP.order_id " +
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON MP.pay_type_id = PT.pay_type_id " +
 			  " WHERE 1 = 1 " +
 			  (extraCond != null ? extraCond.toString() : "") +
@@ -285,7 +278,7 @@ public class CalcBillStatisticsDao {
 		sql = " SELECT " +
 			  " COUNT(*) AS amount, ROUND(SUM(erase_price), 2) AS total_erase " +
 			  " FROM " +
-			  Params.dbName + "." + extraCond.orderTbl + " O " +
+			  Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 			  " WHERE 1 = 1 " +
 			  (extraCond != null ? extraCond.toString() : "") +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
@@ -344,7 +337,7 @@ public class CalcBillStatisticsDao {
 		sql = " SELECT " +
 			  " COUNT(*) AS amount, ROUND(SUM(discount_price), 2) AS total_discount " +
 			  " FROM " +
-			  Params.dbName + "." + extraCond.orderTbl + " O " +
+			  Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 			  " WHERE 1 = 1 " +
 			  (extraCond != null ? extraCond.toString() : "") +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
@@ -404,7 +397,7 @@ public class CalcBillStatisticsDao {
 		sql = " SELECT " +
 		      " COUNT(*) AS amount, ROUND(SUM(gift_price), 2) AS total_gift " +
 		      " FROM " +
-		      Params.dbName + "." + extraCond.orderTbl + " O " +
+		      Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 		      " WHERE 1 = 1 " +
 		      (extraCond != null ? extraCond.toString() : "") +
 		      " AND restaurant_id = " + staff.getRestaurantId() +
@@ -465,7 +458,7 @@ public class CalcBillStatisticsDao {
 		sql = " SELECT " +
 		      " COUNT(*) AS amount, ROUND(SUM(cancel_price), 2) AS total_cancel " +
 		      " FROM " +
-		      Params.dbName + "." + extraCond.orderTbl + " O " +
+		      Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 		      " WHERE 1 = 1 " +
 		      (extraCond != null ? extraCond.toString() : "") +
 		      " AND restaurant_id = " + staff.getRestaurantId() +
@@ -526,7 +519,7 @@ public class CalcBillStatisticsDao {
 		sql = " SELECT " +
 		      " COUNT(*) AS amount, ROUND(SUM(coupon_price), 2) AS total_coupon " +
 		      " FROM " +
-		      Params.dbName + "." + extraCond.orderTbl + " O " +
+		      Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 		      " WHERE 1 = 1 " +
 		      (extraCond != null ? extraCond.toString() : "") +
 		      " AND restaurant_id = " + staff.getRestaurantId() +
@@ -586,7 +579,7 @@ public class CalcBillStatisticsDao {
 		sql = " SELECT " +
 		      " COUNT(*) AS amount, ROUND(SUM(repaid_price), 2) AS total_repaid " +
 		      " FROM " +
-		      Params.dbName + "." + extraCond.orderTbl + " O " +
+		      Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 		      " WHERE 1 = 1 " +
 		      " AND restaurant_id = " + staff.getRestaurantId() +
 		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
@@ -601,6 +594,42 @@ public class CalcBillStatisticsDao {
 		dbCon.rs.close();
 		
 		return repaidIncome;
+	}
+	
+	/**
+	 * Calculate the repaid price according to specific range and extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to income by repaid {@link IncomeByRepaid}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static IncomeByMemberPrice calcMemberPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+		
+		String sql;
+		sql = " SELECT " +
+		      " COUNT(*) AS amount, ROUND(SUM(pure_price) - SUM(actual_price), 2) AS price " +
+		      " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
+		      " JOIN " + Params.dbName + "." + extraCond.dbTbl.moTbl + " MO ON O.id = MO.order_id" +
+		      " WHERE 1 = 1 " +
+		      " AND O.restaurant_id = " + staff.getRestaurantId() +
+		      " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
+			
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		IncomeByMemberPrice memberPriceIncome = new IncomeByMemberPrice();
+		if(dbCon.rs.next()){
+			memberPriceIncome.setMemberPriceAmount(dbCon.rs.getInt("amount"));
+			memberPriceIncome.setMemberPrice(dbCon.rs.getFloat("price"));
+		}
+		dbCon.rs.close();
+		
+		return memberPriceIncome;
 	}
 	
 	/**
@@ -646,7 +675,7 @@ public class CalcBillStatisticsDao {
 		sql = " SELECT " +
 			  " COUNT(*) AS amount, ROUND(SUM(total_price * service_rate), 2) AS total_service " +
 			  " FROM " +
-			  Params.dbName + "." + extraCond.orderTbl + " O " +
+			  Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 			  " WHERE 1 = 1 " +
 			  (extraCond != null ? extraCond.toString() : "") +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
@@ -680,12 +709,12 @@ public class CalcBillStatisticsDao {
 					" WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount " +
 				  	" ELSE 0 " +
 				  	" END AS taste_income " +
-			   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
-			   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
+			   " FROM " + Params.dbName + "." + extraCond.dbTbl.orderFoodTbl + " OF " + 
+			   " JOIN " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O ON 1 = 1 " + 
 			   " AND OF.order_id = O.id " + 
 			   " AND O.restaurant_id = " + staff.getRestaurantId() + 
 			   " AND O.status <> " + Order.Status.UNPAID.getVal() +
-			   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+			   " JOIN " + Params.dbName + "." + extraCond.dbTbl.tgTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 			   " WHERE 1 = 1 " +
 			   (extraCond == null ? "" : extraCond.toString()) +
 			   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +

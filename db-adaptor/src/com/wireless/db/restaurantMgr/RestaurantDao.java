@@ -204,6 +204,8 @@ public class RestaurantDao {
 			restaurant.setPublicKey(dbCon.rs.getString("public_key"));
 			restaurant.setPrivateKey(dbCon.rs.getString("private_key"));
 			
+			restaurant.setBeeCloudAppId(dbCon.rs.getString("bee_cloud_app_id"));
+			restaurant.setBeeCloudAppSecret(dbCon.rs.getString("bee_cloud_app_secret"));
 			result.add(restaurant);
 		}
 		dbCon.rs.close();
@@ -282,6 +284,7 @@ public class RestaurantDao {
 			  (builder.isRecordAliveChanged() ? " ,record_alive = " + restaurant.getRecordAlive() + "" : "") +
 			  (builder.isExpireDateChanged() ? " ,expire_date = '" + DateUtil.format(restaurant.getExpireDate()) + "'" : "") +
 			  (builder.isRSAChanged() ? " ,public_key = '" + restaurant.getPublicKey() + "', private_key = '" + restaurant.getPrivateKey() + "'" : "") +
+			  (builder.isBeeCloudChanged() ? " ,bee_cloud_app_id = '" + restaurant.getBeeCloudAppId() + "', bee_cloud_app_secret = '" + restaurant.getBeeCloudAppSecret() + "'" : "") +
 			  " WHERE id = " + builder.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){

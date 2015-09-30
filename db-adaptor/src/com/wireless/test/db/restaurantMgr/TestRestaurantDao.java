@@ -187,6 +187,11 @@ public class TestRestaurantDao {
 				expected.setPrivateKey(updateBuilder.build().getPrivateKey());
 			}
 			
+			if(updateBuilder.isBeeCloudChanged()){
+				expected.setBeeCloudAppId(updateBuilder.build().getBeeCloudAppId());
+				expected.setBeeCloudAppSecret(updateBuilder.build().getBeeCloudAppSecret());
+			}
+			
 			actual = RestaurantDao.getById(restaurantId);
 			compareRestaurant(expected, actual);
 			
@@ -456,6 +461,8 @@ public class TestRestaurantDao {
 		Assert.assertEquals("resturant dianping id", expected.getDianpingId(), actual.getDianpingId());
 		Assert.assertEquals("restaurant rsa public key", expected.getPublicKey(), actual.getPublicKey());
 		Assert.assertEquals("restaurant rsa private key", expected.getPrivateKey(), actual.getPrivateKey());
+		Assert.assertEquals("restaurant bee cloud app id", expected.getBeeCloudAppId(), actual.getBeeCloudAppId());
+		Assert.assertEquals("restaurant bee cloud app secret", expected.getBeeCloudAppSecret(), actual.getBeeCloudAppSecret());
 		Assert.assertEquals("init modules", expected.getModules(), actual.getModules());
 	}
 }

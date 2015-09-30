@@ -272,6 +272,9 @@ public class ShiftDao {
 		//Get the total & amount to order with service
 		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, range, extraCond));
 		
+		//Get the total & amount to member price
+		result.setMemberPriceIncome(CalcBillStatisticsDao.calcMemberPrice(dbCon, staff, range, extraCond));
+		
 		//Get the income by charge
 		result.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(extraCond.dateType)));
 		
