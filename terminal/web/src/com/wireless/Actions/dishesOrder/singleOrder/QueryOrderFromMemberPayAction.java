@@ -37,7 +37,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 		try{
 			String pin = (String)request.getAttribute("pin");
 			String orderID = request.getParameter("orderID");
-			String pricePlanId = request.getParameter("pricePlanId");
+			//String pricePlanId = request.getParameter("pricePlanId");
 			String sv = request.getParameter("sv");
 			//0: 模糊搜索, 1 : 根据手机号, 2: 微信卡号, 3:实体卡号
 			String s_type = request.getParameter("st");
@@ -88,13 +88,13 @@ public class QueryOrderFromMemberPayAction extends Action{
 			payBuilder = Order.PayBuilder.build4Member(Integer.valueOf(orderID), payType, false);
 			
 			
-			if(pricePlanId != null && !pricePlanId.trim().isEmpty() && !pricePlanId.equals("-1")){
-				payBuilder.setPricePlanId(Integer.parseInt(pricePlanId));
-			}else{
-				if(membersByType.get(0).getMemberType().getDefaultPrice() != null){
-					payBuilder.setPricePlanId(membersByType.get(0).getMemberType().getDefaultPrice().getId());
-				}				
-			}
+//			if(pricePlanId != null && !pricePlanId.trim().isEmpty() && !pricePlanId.equals("-1")){
+//				payBuilder.setPricePlanId(Integer.parseInt(pricePlanId));
+//			}else{
+//				if(membersByType.get(0).getMemberType().getDefaultPrice() != null){
+//					payBuilder.setPricePlanId(membersByType.get(0).getMemberType().getDefaultPrice().getId());
+//				}				
+//			}
 			
 			final Order order = PayOrder.calc(staff, payBuilder);
 			
