@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -29,6 +30,7 @@ public class ReceiptContent extends ConcreteContent {
 	private final Order mOrder;
 	private final WxRestaurant mWxRestaurant;
 	private String ending;
+	private Member member;
 	
 	public ReceiptContent(int receiptStyle, Restaurant restaurant, WxRestaurant wxRestaurant, Order order, String waiter, PType printType, PStyle style) {
 		super(printType, style);
@@ -42,6 +44,11 @@ public class ReceiptContent extends ConcreteContent {
 
 	public ReceiptContent setEnding(String ending){
 		this.ending = ending;
+		return this;
+	}
+	
+	public ReceiptContent setMember(Member member){
+		this.member = member;
 		return this;
 	}
 	
@@ -90,6 +97,13 @@ public class ReceiptContent extends ConcreteContent {
 		//replace the "$(waiter)"
 		mTemplate = mTemplate.replace(PVar.WAITER_NAME, mWaiter);
 		
+		//replace the "$(member_name)"
+		if(member != null){
+			mTemplate = mTemplate.replace(PVar.MEMBER_NAME, SEP + "会员：" + member.getName());
+		}else{
+			mTemplate = mTemplate.replace(PVar.MEMBER_NAME, "");
+		}
+		
 		final String tblName;
 		if(mOrder.getDestTbl().getAliasId() == 0){
 			tblName = mOrder.getDestTbl().getName();
@@ -112,8 +126,8 @@ public class ReceiptContent extends ConcreteContent {
 		
 		//replace the $(var_3) with the actual price
 		StringBuilder var3 = new StringBuilder();
-		float pureTotal = mOrder.calcPureTotalPrice();
-		float actualTotal = mOrder.getActualPrice();
+		final float pureTotal = mOrder.calcPureTotalPrice();
+		final float actualTotal = mOrder.getActualPrice();
 		if(mPrintType == PType.PRINT_TEMP_RECEIPT && mOrder.hasMember() && actualTotal < pureTotal){
 			var3.append(new ExtraFormatDecorator(
 							(new String(new char[]{0x1B, 0x61, 0x02}) + "会员价:" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(actualTotal)), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
@@ -121,18 +135,17 @@ public class ReceiptContent extends ConcreteContent {
 				.append(SEP)
 				.append(new RightAlignedDecorator("原价:" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(pureTotal) + ", 节省" + NumericUtil.float2String2(pureTotal - actualTotal) + "元", mStyle));
 			
-//			var3.append(new ExtraFormatDecorator(
-//							(new String(new char[]{0x1B, 0x61, 0x02}) + "原价:" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(pureTotal)), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
-//				.append(SEP).append(new char[]{0x1B, 0x61, 0x00});
-//			var3.append(new ExtraFormatDecorator(
-//					(new String(new char[]{0x1B, 0x61, 0x02}) + "会员价:" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(actualTotal)), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
-//				.append(SEP).append(new char[]{0x1B, 0x61, 0x00});
-//			var3.append(new ExtraFormatDecorator(
-//					(new String(new char[]{0x1B, 0x61, 0x02}) + "节省" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(pureTotal - actualTotal)), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
-//				.append(SEP).append(new char[]{0x1B, 0x61, 0x00});
+		}else if(mPrintType == PType.PRINT_RECEIPT && mOrder.hasMember() && actualTotal < pureTotal){
+			var3.append(new ExtraFormatDecorator(
+					(new String(new char[]{0x1B, 0x61, 0x02}) + "实收(" + mOrder.getPaymentType().getName() + "):" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(actualTotal)),
+					mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
+				.append(SEP).append(new char[]{0x1B, 0x61, 0x00})
+				.append(SEP)
+				.append(new RightAlignedDecorator("原价:" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(pureTotal) + ", 节省" + NumericUtil.float2String2(pureTotal - actualTotal) + "元", mStyle));
+			
 		}else{
 			var3.append(new ExtraFormatDecorator(
-					(new String(new char[]{0x1B, 0x61, 0x02}) + "实收(" + mOrder.getPaymentType().getName() + "):" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(mOrder.getActualPrice())),
+					(new String(new char[]{0x1B, 0x61, 0x02}) + "实收(" + mOrder.getPaymentType().getName() + "):" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(actualTotal)),
 					mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
 				.append(SEP).append(new char[]{0x1B, 0x61, 0x00});
 		}

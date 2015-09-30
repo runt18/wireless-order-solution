@@ -5,7 +5,7 @@ $(title)
 流水号：$(seq_id)
 账单：$(order_id)$(pay_manner)$(order_cate)$(service_rate)
 服务员：$(waiter)
-时间：$(print_date)
+时间：$(print_date)$(member_name)
 -----------------------------------------------
 $(var_5)
 -----------------------------------------------

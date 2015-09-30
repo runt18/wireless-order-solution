@@ -42,6 +42,7 @@ import com.wireless.print.content.concrete.ShiftContent;
 import com.wireless.print.content.concrete.SummaryContent;
 import com.wireless.print.content.concrete.TransFoodContent;
 import com.wireless.print.content.concrete.TransTableContent;
+import com.wireless.print.content.concrete.WxReceiptContent;
 
 public class JobContentFactory {
 
@@ -230,7 +231,7 @@ public class JobContentFactory {
 		try{
 			dbCon.connect();
 			Restaurant restaurant = RestaurantDao.getById(dbCon, staff.getRestaurantId());
-			WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+			WxRestaurant wxRestaurant = WxRestaurantDao.get(dbCon, staff);
 			final int receiptStyle = SystemDao.getSetting(dbCon, staff.getRestaurantId()).getReceiptStyle();
 			
 			final List<JobContent> jobContents = new ArrayList<JobContent>();
@@ -238,6 +239,12 @@ public class JobContentFactory {
 			for(Printer printer : printers){
 				for(PrintFunc func : printer.getPrintFuncs()){
 					if(func.isTypeMatched(printType) && func.isRegionMatched(order.getRegion())){
+						final Member member;
+						if(order.hasMember()){
+							member = MemberDao.getById(dbCon, staff, order.getMemberId());
+						}else{
+							member = null;
+						}
 						jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 														new ReceiptContent(receiptStyle,
 															  			   restaurant, 
@@ -245,7 +252,8 @@ public class JobContentFactory {
 															  			   order,
 															  			   staff.getName(),
 															  			   printType, 
-															  			   printer.getStyle()).setEnding(func.getComment())));
+															  			   printer.getStyle()).setEnding(func.getComment())
+																							  .setMember(member)));
 					}
 				}
 			}
@@ -259,6 +267,22 @@ public class JobContentFactory {
 	
 	public Content createReceiptContent(PType printType, Staff staff, List<Printer> printers, int orderId) throws BusinessException, SQLException{
 		return createReceiptContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY));
+	}
+	
+	public Content createWxReceiptContent(Staff staff, List<Printer> printers, String codeUrl) throws SQLException{
+		
+		final List<JobContent> jobContents = new ArrayList<JobContent>();
+		
+		for(Printer printer : printers){
+			for(PrintFunc func : printer.getPrintFuncs()){
+				if(func.isTypeMatched(PType.PRINT_WX_RECEIT)){
+					jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_WX_RECEIT, new WxReceiptContent(codeUrl, printer.getStyle())));
+				}
+			}
+		}
+		
+		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
+			
 	}
 	
 	/**

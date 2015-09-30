@@ -626,6 +626,11 @@ class OrderHandler implements Runnable{
 			int orderId = new Parcel(request.body).readInt();
 			new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(printType, staff, printers, orderId));
 			
+		}else if(printType.isWxReceipt()){
+			Parcel p = new Parcel(request.body);
+			String codeUrl = p.readString();
+			new PrintHandler(staff).process(JobContentFactory.instance().createWxReceiptContent(staff, printers, codeUrl));
+			
 		}else if(printType.isTransTbl()){
 			Parcel p = new Parcel(request.body);
 			int orderId = p.readInt();

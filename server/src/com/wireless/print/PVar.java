@@ -8,6 +8,7 @@ public final class PVar{
 	public final static String FOOD_TASTE = "$(food_taste)";
 	public final static String FOOD_PRICE = "$(food_price)";
 	public final static String WAITER_NAME = "$(waiter)";
+	public final static String MEMBER_NAME = "$(member_name)";
 	public final static String PRINT_DATE = "$(print_date)";
 	public final static String PRINT_TIME = "$(print_time)";
 	public final static String SERVICE_RATE = "$(service_rate)";
