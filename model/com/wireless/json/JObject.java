@@ -17,7 +17,6 @@ public class JObject implements Jsonable {
 	private int code = 0;							// 错误码
 	private String msg = "";						// 错误提示信息
 	private String title = TIP_TITLE_DEFAULT; 		// 错误信息标题
-	private int lv = 0;								// 错误等级
 	private Jsonable extra;							// 其他附加信息
 	
 	public static final String TIP_TITLE_DEFAULT = "提示";
@@ -91,13 +90,13 @@ public class JObject implements Jsonable {
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
-		jm.putBoolean("success", this.isSuccess());
-		jm.putInt("totalProperty", this.getTotalProperty());
-		jm.putJsonableList("root", this.getRoot(), flag);
-		jm.putInt("code", this.getCode());
-		jm.putString("msg", this.getMsg());
-		jm.putString("title", this.getTitle());
-		jm.putJsonable("other", this.getExtra(), 0);
+		jm.putBoolean("success", this.success);
+		jm.putInt("totalProperty", this.totalProperty);
+		jm.putJsonableList("root", this.root, flag);
+		jm.putInt("code", this.code);
+		jm.putString("msg", this.msg);
+		jm.putString("title", this.title);
+		jm.putJsonable("other", this.extra, 0);
 		
 		return jm;
 	}
@@ -124,16 +123,8 @@ public class JObject implements Jsonable {
 		this.success = success;
 	}
 	
-	public int getTotalProperty() {
-		return totalProperty;
-	}
-	
 	public void setTotalProperty(int totalProperty) {
 		this.totalProperty = totalProperty;
-	}
-	
-	public List<? extends Jsonable> getRoot() {
-		return root;
 	}
 	
 	public void setRoot(List<? extends Jsonable> root) {
@@ -146,40 +137,20 @@ public class JObject implements Jsonable {
 		this.root = roots;
 	}
 	
-	public int getCode() {
-		return code;
-	}
-	
 	public void setCode(int code) {
 		this.code = code;
-	}
-	
-	public String getMsg() {
-		return msg;
 	}
 	
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}
 	
-	public String getTitle() {
-		return title;
+	public String getMsg(){
+		return this.msg;
 	}
 	
 	public void setTitle(String title) {
 		this.title = title;
-	}
-	
-	public int getLv() {
-		return lv;
-	}
-	
-	public void setLv(int lv) {
-		this.lv = lv;
-	}
-	
-	public Jsonable getExtra() {
-		return extra;
 	}
 	
 	public void setExtra(Jsonable other) {

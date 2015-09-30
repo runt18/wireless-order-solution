@@ -28,6 +28,8 @@ public class ShiftDetail implements Jsonable{
 	
 	private IncomeByErase incomeByErase;		//抹数数据
 	
+	private IncomeByMemberPrice incomeByMemberPrice;	//会员价数据
+	
 	private IncomeByCharge incomeByCharge; 		//会员充值信息
 	
 	private IncomeByBook incomeByBook;			//预订订金
@@ -191,6 +193,26 @@ public class ShiftDetail implements Jsonable{
 	public float getPaidIncome() {
 		if(incomeByRepaid != null){
 			return incomeByRepaid.getTotalRepaid();
+		}else{
+			return 0;
+		}
+	}
+	
+	public void setMemberPriceIncome(IncomeByMemberPrice memberPriceIncome){
+		this.incomeByMemberPrice = memberPriceIncome;
+	}
+	
+	public int getMemberPriceAmount(){
+		if(this.incomeByMemberPrice != null){
+			return this.incomeByMemberPrice.getMemberPriceAmount();
+		}else{
+			return 0;
+		}
+	}
+	
+	public float getMemberPriceIncome(){
+		if(this.incomeByMemberPrice != null){
+			return this.incomeByMemberPrice.getMemberPrice();
 		}else{
 			return 0;
 		}

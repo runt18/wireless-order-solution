@@ -105,6 +105,8 @@ public class Restaurant implements Parcelable, Jsonable{
 		private int dianpingId;
 		private final List<Module> modules = SortedList.newInstance(); 
 		private RSACoder coder;
+		private String beeCloudAppId;
+		private String beeCloudAppSecret;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
@@ -206,6 +208,16 @@ public class Restaurant implements Parcelable, Jsonable{
 		
 		public int getId(){
 			return id;
+		}
+		
+		public UpdateBuilder setBeeCloud(String appId, String appSecret){
+			this.beeCloudAppId = appId;
+			this.beeCloudAppSecret = appSecret;
+			return this;
+		}
+		
+		public boolean isBeeCloudChanged(){
+			return this.beeCloudAppId != null && this.beeCloudAppSecret != null;
 		}
 		
 		public UpdateBuilder addModule(Module.Code code){
@@ -316,6 +328,8 @@ public class Restaurant implements Parcelable, Jsonable{
 	private int dianpingId;
 	private String publicKey;
 	private String privateKey;
+	private String beeCloudAppId;
+	private String beeCloudAppSecret;
 	private final List<Module> modules = new ArrayList<Module>();
 	
 	public Restaurant(){
@@ -384,6 +398,10 @@ public class Restaurant implements Parcelable, Jsonable{
 		if(builder.isRSAChanged()){
 			setPublicKey(builder.coder.getPublicKey());
 			setPrivateKey(builder.coder.getPrivateKey());
+		}
+		if(builder.isBeeCloudChanged()){
+			setBeeCloudAppId(builder.beeCloudAppId);
+			setBeeCloudAppSecret(builder.beeCloudAppSecret);
 		}
 	}
 	
@@ -539,6 +557,22 @@ public class Restaurant implements Parcelable, Jsonable{
 	
 	public void setPrivateKey(String privateKey){
 		this.privateKey = privateKey;
+	}
+	
+	public String getBeeCloudAppId(){
+		return this.beeCloudAppId;
+	}
+	
+	public void setBeeCloudAppId(String appId){
+		this.beeCloudAppId = appId;
+	}
+	
+	public String getBeeCloudAppSecret(){
+		return this.beeCloudAppSecret;
+	}
+	
+	public void setBeeCloudAppSecret(String appSecret){
+		this.beeCloudAppSecret = appSecret;
 	}
 	
 	public void addModule(Module module){

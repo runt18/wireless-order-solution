@@ -693,6 +693,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}else if(mType == PType.PRINT_RECEIPT){
 			return typeToCompare == PType.PRINT_RECEIPT ||
 				   typeToCompare == PType.PRINT_MEMBER_RECEIPT ||
+				   typeToCompare == PType.PRINT_WX_RECEIT ||
 				   typeToCompare.isShift();
 			
 		}else if(mType == PType.PRINT_TEMP_RECEIPT){

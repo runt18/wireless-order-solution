@@ -33,6 +33,7 @@ public class PayType implements Parcelable, Comparable<PayType>, Jsonable{
 	public final static PayType MEMBER = new ReservedType(3, "会员卡", Type.MEMBER);
 	public final static PayType SIGN = new ReservedType(4, "签单", Type.DESIGNED);
 	public final static PayType HANG = new ReservedType(5, "挂账", Type.DESIGNED);
+	public final static PayType WX = new ReservedType(6, "微信支付", Type.DESIGNED);
 	public final static PayType MIXED = new ReservedType(100, "混合结账", Type.MIXED);
 	
 	public static class InsertBuilder{
