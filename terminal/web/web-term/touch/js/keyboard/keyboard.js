@@ -9,7 +9,7 @@ var defaults = {
     colorchange:true,//是否开启按键记忆功能，如果开启，将随着按键次数的增加加深相应按键的背景颜色
     colorchangeStep:1,//按键背景颜色改变步伐，采用RBG值，默认为RGB(255,255,255),没按一次三个数字都减去步伐值
     colorchangeMin:154//按键背影颜色的最小值，默认为RGB(154,154,154)
-} 
+};
 var options = $.extend(defaults, options); 
 var numkeyboardcount = 0;
 var activeinputele;
@@ -156,7 +156,7 @@ this.each(function(){
              $(this).css("background","rgba("+newbabkground+","+newbabkground+","+newbabkground+",.9)");
         }
     }    
-    })
+    });
     keyboard.children("li:eq("+21+")").mousedown(function(event){
         $(this).css({top:"4.6em", "box-shadow": "inset 0 0.04em 0 rgba(0,0,0,.5)"});
         keyboard.children("li:eq("+31+")").css({top:"0.1em","box-shadow": "inset 0 0em 0 rgba(0,0,0,.5)"});
@@ -309,7 +309,7 @@ this.each(function(){
             stx = etx = curX = 0;
             bToch = false;
             
-        })
+        });
 
     }
 
@@ -386,7 +386,7 @@ this.each(function(){
             stx = etx = curX = sty = ety = curY = 0;
             MTouch = false;
             
-        })
+        });
         
     }
     
