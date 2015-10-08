@@ -53,13 +53,13 @@ ss.entry = function(){
 		if($('#foods4StopSellCmp').find("a").length > 0){
 			clearInterval(ss.loadFoodDateAction);
 			if(index == 0){
-				ss.searchData({event:$('#divBtnSellFood')[0], isStop:false})
+				ss.searchData({event:$('#divBtnSellFood')[0], isStop:false});
 			}
 			Util.LM.hide();
 		}else{
 			index ++;
 			Util.LM.show();
-			ss.searchData({event:$('#divBtnSellFood')[0], isStop:false})
+			ss.searchData({event:$('#divBtnSellFood')[0], isStop:false});
 		}
 	}, 500);
 	
@@ -100,13 +100,19 @@ ss.s = {
 						}
 					}				
 				}
-				
-				if(data){
-					data = data.sort(of.searchFoodCompare);
-				}
-				
+					
 				ss.s.foodPaging.init({
-					data : data.sort(ss.foodOrderByStatus),
+					data : data ? data.sort(function (obj1, obj2) {
+											    var val1 = obj1.status;
+											    var val2 = obj2.status;
+											    if ((val1 & 1 << 10) < (val2 & 1 << 10)) {
+											        return 1;
+											    } else if ((val1 & 1 << 10) > (val2 & 1 << 10)) {
+											        return -1;
+											    } else {
+											        return 0;
+											    }            
+											}) : ss.showFoodByCond.showFoodDatas.slice(0),
 					callback : function(){
 						ss.s.foodPaging.getFirstPage();
 					}
@@ -180,17 +186,16 @@ function searchSelloutFood(ope){
 			});
 			return;
 		}
-		
 		ss.searchFooding = true;
-		
-		YBZ_open(document.getElementById('searchSelloutFoodInput'));
 		
 		$('#normalOperateFood4StopSellCmp').hide();
 		$('#searchSelloutFoodCmp').show();	
 		
-		setTimeout(function(){
-			$('#searchSelloutFoodInput').focus();
-		}, 250);
+		//临时菜输入框弹出手写板控件
+		HandWritingAttacher.instance().attach($('#searchSelloutFoodInput')[0], function(attachTo, value){
+			$(attachTo).focus();
+		});
+		$('#searchSelloutFoodInput').focus();
 		
 	}else{
 		var kitchen = $('#kitchens4StopSellCmp > a[data-theme=b]');
@@ -215,23 +220,9 @@ function closeSearchSelloutFood(){
 	
 	$('#normalOperateFood4StopSellCmp').show();
 	$('#searchSelloutFoodCmp').hide();
-	
-	YBZ_win.close();
 }
 
 
-//设置菜品排序, 限量沽清排在最前
-ss.foodOrderByStatus = function (obj1, obj2) {
-    var val1 = obj1.status;
-    var val2 = obj2.status;
-    if ((val1 & 1 << 10) < (val2 & 1 << 10)) {
-        return 1;
-    } else if ((val1 & 1 << 10) > (val2 & 1 << 10)) {
-        return -1;
-    } else {
-        return 0;
-    }            
-} 
 
 //初始化分页
 ss.init = function(){
@@ -449,8 +440,8 @@ ss.initKitchenContent = function(c){
 	
 	if(ss.searchFooding){
 		//关闭搜索
-		closeSearchFood();
-	}	
+	closeSearchSelloutFood();	
+}	
 	
 };
 
@@ -581,7 +572,7 @@ ss.findFoodByKitchen = function(c){
 	
 	if(ss.searchFooding){
 		//关闭搜索
-		closeSearchFood();
+		closeSearchSelloutFood();	
 	}		
 	
 };
@@ -626,7 +617,7 @@ ss.openFoodLimitCmp = function(){
 	firstTimeInput = true;
 	$('#orderFoodLimitCmp').popup('open');
 	$('#orderFoodLimitCmp').parent().addClass("pop").addClass("in");	
-}
+};
 
 /**
  * 关闭限量沽清
@@ -635,7 +626,7 @@ ss.closeFoodLimitCmp = function(){
 	$('#orderFoodLimitCmp').popup('close');
 	
 	$('#inputOrderFoodLimitCountSet').val("");
-}
+};
 
 /**
  * 设置剩余数量
@@ -673,7 +664,7 @@ ss.setFoodLimitRemaining = function(c){
 	});
 	
 	
-}
+};
 
 
 /**
@@ -917,7 +908,7 @@ ss.resetFoodLimit = function(){
 			$.post('../OperateSellOutFood.do', {dataSource : 'resetFoodLimit'}, function(rt){
 				if(rt.success){
 					ss.entry();
-					Util.msg.tip(rt.msg)
+					Util.msg.tip(rt.msg);
 				}else{
 					Util.msg.alert({
 						renderTo : 'stopSellMgr',
@@ -939,7 +930,7 @@ ss.resetFoodLimit = function(){
 	});
 	
 
-}
+};
 
 
 

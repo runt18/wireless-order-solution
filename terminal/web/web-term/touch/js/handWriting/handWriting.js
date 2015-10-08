@@ -7,6 +7,7 @@ function HandWritingPanel(param){
 	//在div上增加canvas
 	var canvas = document.createElement("canvas");
 	canvas.style.border = "3px green solid";
+	canvas.style.background = "white";
 	canvas.height = param.renderTo.clientHeight;
 	canvas.width = param.renderTo.clientWidth;
 	param.renderTo.appendChild(canvas);
@@ -168,20 +169,9 @@ function HandWritingPanel(param){
 	 	return top;  
 	}  
 
-	function YBZ_DeleteTheSameChar(str) {
-		var newStr = "";
-		for (var i = 0; i < 28; i++) {
-			if (newStr.indexOf(str.charAt(i)) == -1) {
-				newStr += "<input type='button' value='" + str.charAt(i)
-						+ "' onclick='javascript:showmsg(this.value);'/>";
-			}
-		}
-		return newStr;
-	}
-	
 	function senddata() {
 		var lg = "zh-cn";//选择语言
-		$.post("http://www.yibizi.com/json/hd_json.php", {
+		$.post("http://www.yibizi.com/json/hd_json.php?key=c4ca4238a0b923820dcc509a6f75849b", {
 					bh : lg + bihua.join("")
 				}, function(data) {
 					if(param.result){
@@ -209,8 +199,10 @@ var HandWritingAttacher = (function () {
         var attachInputs = [];
         var activeInput = null;
         var container = null;
-        
-        this.attach = function(attachTo, param){
+        var word = null;
+        var panel = null;
+        var isMouseOver = false;
+        this.attach = function(attachTo, onWordSelected, param){
         	//检查是否有重复控件
 			var isExist = attachInputs.some(function(item, index, array){
 				return item.attachObj.id == attachTo.id;
@@ -219,30 +211,102 @@ var HandWritingAttacher = (function () {
 			if(!isExist){
 				var attachInput = {
 					attachObj : attachTo,
+					onWordSelected : onWordSelected,
 	        		focusFn : function(){
-	        			if(container == null){
+	        			if(panel == null){
 	        				container = $('<div/>');
 	        				//TODO
 	        				container.css(param || {
-	        					'width' : '500px',
-	        					'height' : '500px'
+	        					'width' : '300px',
+	        					'height' : '300px',
+	        					'float' : 'right',
+	        					'margin-right' : '0px'
+	        				});   
+	        				
+	        				word = $('<div/>'); 	
+	        				word.css({
+	        					'width' : '40px',
+	        					'height' : '300px',
+	        					'float' : 'left',
+	        					'margin-left' : '50px',
+	        					'margin-top' : '-15px'
 	        				});
-	        				$('body').append(container);
-							new HandWritingPanel({ 
-								renderTo : container[0],
+	        				
+	        				panel = $('<div/>');
+	        				panel.css({
+	        					'width' : '410px',
+	        					'height' : '300px',
+	        					'float' : 'right',
+	        					'margin-top' : '25%',
+	        					'right' :  '9px',
+	        					'top' : 'initial',
+	        					'bottom' : '0',  
+	        					'position' : 'absolute',	 
+	        					'z-index' : '24400'
+	        					       				
+	        				});
+	        				
+	        				panel.on('mouseover', function(){	
+        						isMouseOver = true;	   
+				        	});
+				        	
+				        	panel.on('mouseout', function(){
+				        		isMouseOver = false;	
+				        	});
+	        				
+	        				panel.append(word).append(container);	        			
+	        				$('body').append(panel);
+	        				
+					  		var handWritingPanel = new HandWritingPanel({ 
+								renderTo : container[0] ,
 						   	   	result : function(data){
-						   	   		//TODO
-						   			$(activeInput).val(data[0]);
-						   	}});
+						   	    	var temp = data.slice(0, 4);
+						   	   		var zifu = "";
+						   	   		for (var i=0; i < temp.length; i++) {
+										var eachCharactar = '<input type="button" style="width:60px;height:60px;font-size:26px;" value="' + temp[i] + '">';		
+										if(i % 1 == 0){
+											zifu += '<br>';
+										}
+										zifu += eachCharactar;
+									};   	
+									zifu +=	'<input type="button" style="width:60px;height:60px;font-size:20px;" value="重写">';
+						   			word.html(zifu);		
+						   			word.find('input').each(function(index, element){						   				
+							   				element.onclick = function(){
+							   					if(element.value == '重写'){
+						   							handWritingPanel.rewrite();	
+						   						}else{
+													$(activeInput.attachObj).val($(activeInput.attachObj).val() + element.value);	
+													handWritingPanel.rewrite();	
+													if(activeInput.onWordSelected){
+														activeInput.onWordSelected(activeInput.attachObj, element.value);
+													}
+												 }
+											};	
+									});			   			
+						   		}
+						   	});
 	        			}
-	        			activeInput = attachTo;
+	        			for(var i = 0; i < attachInputs.length; i++){
+	        				if(attachInputs[i].attachObj.id == attachTo.id){
+	        					activeInput = attachInputs[i];
+	        					break;
+	        				}
+	        			}
+	        			
 	        		},
-	        		blurFn : function(){
-	        			if(container){
-							container.remove();
-							container = null;
-						}
-						activeInput = null;
+	        		blurFn : function(e){
+	        			 if(isMouseOver){
+	        				 $(activeInput.attachObj).focus();
+	        			 }else{
+	        				 if(panel){
+								 panel.remove();
+								 panel = null;
+								 container = null;
+								 word = null;
+							 }
+						 	 activeInput = null;
+	        			 }
 	        		}
 				};
 				
@@ -251,16 +315,19 @@ var HandWritingAttacher = (function () {
 	        	$(attachTo).on('focus', attachInput.focusFn);
 	        	
 	        	$(attachTo).on('blur', attachInput.blurFn);
+	        	
+	        	
 			}
 			
         	return this;
         };
         
         this.detach = function(detachFrom){
-			//删除focus事件的处理函数
+			//删除focus和 blur事件的处理函数
 			for(var i = 0; i < attachInputs.length; i++){
 				if(attachInputs[i].attachObj.id == detachFrom.id){
 					$(attachInputs[i].attachObj).off('focus', attachInputs[i].focusFn);
+					$(attachInputs[i].attachObj).off('blur', attachInputs[i].blurFn);	
 				}
 			}
 			//删除数组中的Input组件

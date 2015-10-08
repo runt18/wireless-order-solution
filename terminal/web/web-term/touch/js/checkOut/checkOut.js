@@ -37,9 +37,9 @@ var uo = {
 			
 			var aliasOrName;
 			if(c.data[i].categoryValue == 1){
-				aliasOrName = c.data[i].alias
+				aliasOrName = c.data[i].alias;
 			}else{
-				aliasOrName = '<font color="green">'+ c.data[i].categoryText +'</font>'
+				aliasOrName = '<font color="green">'+ c.data[i].categoryText +'</font>';
 			}
 			html.push(tableCmpTemplet.format({
 				dataIndex : i,
@@ -241,7 +241,7 @@ uo.showOrder = function(){
 	$('#orderFoodListBody').html(html).trigger('create');
 	
 	uo.showNorthForUpdateOrder();	
-}
+};
 
 /**
  * 初始化页头信息（账单号，餐台号，餐台名，用餐人数）
@@ -264,7 +264,7 @@ uo.showNorthForUpdateOrder = function(){
 			(uo.order.comment ? ("<span style = 'margin: 10px;' >开台备注：" + uo.order.comment + "</span>") : "") +
 		"</div>";
 	$("#divNorthForUpdateOrder").html(html);
-}
+};
 
 /**
  * 初始化页尾信息（菜品数量，消费总额）
@@ -290,7 +290,7 @@ uo.showDescForUpdateOrder = function(){
 	}else{
 		$("#spanToTempPayStatus").html('');
 	}
-}
+};
 /**
  * 取得初始的消费总额
  * @returns {number} totalPriceUO
@@ -337,14 +337,14 @@ uo.setMemberReadCmp = function(){
 	if($('#orderFoodListMgr .payment_popupCouponCmp4Member').length == 0){
 		$('#orderFoodListMgr').append(payment_popupCouponCmp4MemberTemplet);
 	}		
-}
+};
 
 /**
  * 返回
  */
 uo.back = function(){
 	ts.loadData();
-}
+};
 
 /**
  * 加载退菜原因
@@ -358,7 +358,7 @@ uo.loadCancelReasonData = function(data){
 	$('#cancelFoodReasonCmp').html(html).trigger('create').trigger('refresh');
 	
 	html = null;
-}
+};
 
 /**
  * 选择退菜原因
@@ -372,7 +372,7 @@ uo.selectCancelReason = function(c){
 	$(c.event).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
 	
 	$('#cancelFoodReasonCmp').trigger('refresh');
-}
+};
 
 /**
  * 打开退菜操作
@@ -395,7 +395,7 @@ uo.openCancelFoodCmp = function(c){
 	firstTimeInput = true;
 	$('#inputCancelFoodSet').focus();
 	$('#inputCancelFoodSet').select();
-}
+};
 
 /**
  * 关闭退菜操作
@@ -407,7 +407,7 @@ uo.closeCancelFoodCmp = function(){
 	$('#cancelFoodSet').hide();
 	
 	$('#numberKeyboard').hide();
-}
+};
 
 /**
  * 退菜操作
@@ -473,7 +473,7 @@ uo.cancelFoodAction = function(){
 		uo.canceling = true;
 		uo.saveForUO();
 	}
-}
+};
 
 /**
  * 打开已点菜中单条菜更多操作
@@ -504,7 +504,7 @@ uo.openOrderFoodOtherOperate = function(c){
 	$('#orderFoodMoreOperateCmp').popup('open');
 	//动态使用popup时要动态设置popup控件位置
 	$('#orderFoodMoreOperateCmp-popup').css({top:$(c.event).position().top, left:$(c.event).position().left});
-}
+};
 
 /**
  * 催菜
@@ -518,7 +518,7 @@ uo.hurriedFoodAction = function(){
 	}, 250);	
 	
 	
-}
+};
 
 /**
  * 全单催菜
@@ -533,7 +533,7 @@ uo.allFoodHurried = function(){
 	setTimeout(function(){
 		uo.submitUpdateOrderHandler({orderFoods:uoFood});
 	}, 250);	
-}
+};
 
 /**
  * 撤台
@@ -573,7 +573,7 @@ uo.cancelTable = function(){
 	}, 250);
 	
 
-}
+};
 
 
 /**
@@ -604,7 +604,7 @@ uo.openWeighOperate = function(){
 	}, 250);
 	$('#orderFoodWeighCmp').parent().addClass('popup').addClass('in');
 	$('#orderFoodWeighCmp').popup('open');
-}
+};
 
 /**
  * 关闭称重
@@ -614,7 +614,7 @@ uo.closeWeighOperate = function(){
 	$('#orderFoodWeighCmp').popup('close');
 	//删除动作
 	delete uo.weighOperate;
-}
+};
 
 /**
  * 称重操作
@@ -638,7 +638,7 @@ uo.openWeighaction = function(){
 	uo.selectedFood.count = count.val();
 	//对更新的菜品和人数进行提交
 	uo.submitUpdateOrderHandler({orderFoods:uo.order.orderFoods, notPrint:!$('#chkPrintWeigh').attr("checked")});	
-}
+};
 
 
 
@@ -671,7 +671,7 @@ uo.openGiftOperate = function(){
 	}, 250);
 	$('#orderFoodGiftCmp').parent().addClass('popup').addClass('in');
 	$('#orderFoodGiftCmp').popup('open');
-}
+};
 
 /**
  * 关闭赠送
@@ -679,7 +679,7 @@ uo.openGiftOperate = function(){
 uo.closeGiftOperate = function(){
 	$('#inputOrderFoodGift').val('');
 	$('#orderFoodGiftCmp').popup('close');
-}
+};
 
 /**
  * 赠送操作
@@ -713,7 +713,7 @@ uo.openGiftaction = function(){
 			Util.msg.tip('赠送失败');
 		}
 	});
-}
+};
 
 /**
  * 打开备注
@@ -728,7 +728,7 @@ uo.openCommentOperate = function(){
 		$('#inputUpdateComment').select();
 	}, 250);
 	
-}
+};
 
 /**
  * 关闭备注
@@ -736,10 +736,7 @@ uo.openCommentOperate = function(){
 uo.closeComment = function(){
 	$('#shadowForPopup').hide();
 	$('#orderFoodCommentCmp').hide();
-	if(YBZ_win){
-		YBZ_win.close();	
-	}
-}
+};
 
 /**
  * 修改备注
@@ -764,7 +761,7 @@ uo.saveComment = function(){
 			});				
 		}			
 	});
-}
+};
 
 /**
  * 设置控件为转菜
@@ -780,13 +777,13 @@ uo.transFoodForTS = function(c){
 	
 	$('#transSomethingTitle').html(orderFood.foodName +" -- 请输入桌号，菜品数量确定转菜");
 	
-	ts.tf.id = orderFood.orderFoodId
+	ts.tf.id = orderFood.orderFoodId;
 	ts.tf.count = orderFood.count + '';	
 	$('#txtFoodNumForTran').val(checkDot(ts.tf.count)?ts.tf.count : parseInt(ts.tf.count));	
 	
 	//打开控件
 	uo.openTransOrderFood();
-}
+};
 
 /**
  * 设置控件为全单转菜
@@ -804,7 +801,7 @@ uo.allTransFoodForTS = function (){
 	
 	//打开控件
 	uo.openTransOrderFood();	
-}
+};
 
 /**
  * 设置控件为转台
@@ -820,7 +817,7 @@ uo.transTableForTS = function(){
 	
 	//打开控件
 	uo.openTransOrderFood();
-}
+};
 
 
 /**
@@ -841,7 +838,7 @@ uo.useMemberForOrder = function(){
 	
 	//打开控件
 	uo.openTransOrderFood();
-}
+};
 
 /**
  * 登陆会员
@@ -858,7 +855,7 @@ uo.useMemberForOrderAction = function(){
 		member.focus();
 		member.select();	
 		return;
-	}
+	};
 	Util.LM.show();
 	$.post('../QueryMember.do', {
 		dataSource : 'normal',
@@ -899,7 +896,7 @@ uo.useMemberForOrderAction = function(){
 			
 		}	
 	});
-}
+};
 
 /**
  * 转菜操作
@@ -916,7 +913,7 @@ uo.openTransOrderFood = function (){
 	
 	$('#txtTableNumForTS').focus();
 	
-}
+};
 
 /**
  * 关闭转菜
@@ -970,8 +967,8 @@ uo.closeTransOrderFood = function(){
 	$('#txtTableNumForTS').val('');
 	$('#txtFoodNumForTran').val('');
 	
-	$('#divSelectTablesForTs').html('')
-}
+	$('#divSelectTablesForTs').html('');
+};
 
 /**
  * 执行转菜
@@ -1001,7 +998,7 @@ uo.transFood = function(c){
 			});				
 		}			
 	});
-}
+};
 
 /**
  * 暂结
@@ -1080,7 +1077,7 @@ uo.loadDiscountCmp = function(){
 		$('#discountCmp').html(html).trigger('create');
 		$('#discountCmp').listview('refresh');
 	});
-}
+};
 
 /**
  * 折扣选择
@@ -1117,7 +1114,7 @@ uo.chooseDiscount = function(c){
 			});					
 		}
 	});	
-}
+};
 
 /**
  * 补打总单
@@ -1126,7 +1123,7 @@ uo.tempPayForPrintAll = function(){
 	uo.tempPayForPrintAllAction = true;
 	//关闭后回调
 	$('#updateFoodOtherOperateCmp').popup('close');
-}
+};
 
 /**
  * 补打明细
@@ -1135,7 +1132,7 @@ uo.printDetailPatch = function(){
 	uo.printDetailPatchAction = true;
 	//关闭后回调
 	$('#updateFoodOtherOperateCmp').popup('close');	
-}
+};
 
 /**
  * 打开操作人数
@@ -1145,7 +1142,7 @@ uo.showOperatePeople = function(){
 	
 	$('#inputOrderCustomerCountSet').val(uo.order.customNum);
 	$('#updateFoodOtherOperateCmp').popup('close');
-}
+};
 
 /**
  * 关闭操作人数
@@ -1160,7 +1157,7 @@ uo.closeOperatePeople = function(c){
 		}
 	});	
 	$('#orderCustomerCountSet').popup('close');
-}
+};
 
 /**
  * 打开更多操作
@@ -1235,7 +1232,7 @@ uo.openMoreOperate = function(){
 			}
 		}
 	});	
-}
+};
 
 
 /**
@@ -1393,7 +1390,7 @@ uo.goToCreateOrder = function(){
 			callback : function(){
 				location.href = '#orderFoodListMgr';
 				//异步刷新账单
-				initOrderData({table : uo.table});
+				initOrderData({table : uo.table});				
 			}
 		});
 	}else{
@@ -1511,7 +1508,7 @@ uo.memberInfoBind1 = function(){
 			}
 		}); 
 	}
-}
+};
 
 /**
  * 
@@ -1521,7 +1518,7 @@ uo.memberInfoBind = function(id){
 	$('#'+id).load("memberBind.jsp",{memberName:uo.orderMember.name}, function(){
 		$('#finishMemberInfo').trigger('create').trigger('refresh');	
 	});
-}
+};
 
 /**
  * 关闭微信绑定
@@ -1539,11 +1536,6 @@ uo.closeMemberInfoBind = function(){
 	$('#fm_numberMemberCard').val('');
 	$('#fm_dateMemberBirthday').val('');
 	
-	//关闭易笔字
-	YBZ_win = YBZ_win || '';
-	if(YBZ_win){
-		YBZ_win.close();
-	}
 	//关闭数字键盘
 	$('#numberKeyboard').hide();
 	
@@ -1554,10 +1546,7 @@ uo.closeMemberInfoBind = function(){
 	$('#fm_comboMemberType').val(uo.memberInfoBind.firstOption.id);
 	$('#fm_comboMemberType').selectmenu('refresh');
 	
-
-	
-	
-}
+};
 
 /**
  * 绑定前查找
@@ -1598,7 +1587,7 @@ uo.readMemberByDetail = function(){
 			});
 		}
 	}, 'json');
-}
+};
 
 /**
  * 设置对比数据
@@ -1630,7 +1619,7 @@ uo.showOldMemberDetail = function(m){
 	
 	$('#fm_txtMemberMobile').attr("disabled","disabled").parent().addClass('ui-disabled');
 	$('#fm_numberMemberCard').attr('disabled',"true").parent().addClass('ui-disabled');
-}
+};
 
 /**
  * 绑定微信会员
@@ -1669,7 +1658,7 @@ uo.bindWeixinMember = function(){
 			});
 		}
 	}, 'json');	
-}
+};
 
 
 

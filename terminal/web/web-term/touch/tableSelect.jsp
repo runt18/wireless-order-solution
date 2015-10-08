@@ -1109,7 +1109,7 @@
 		 <!-- <input type="button" value="返回" style="width: 70px;height: 70px;"> -->
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.cancelForUO()">返回</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.goToCreateOrder()">点菜</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="ss" onclick="uo.goToCreateOrder()">点菜</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.tempPayForUO()">暂结</a>
 		 	<a id="btnPayBill" data-role="button" data-inline="true" class="bottomBtnFont none" onclick="showPaymentMgr({table:uo.table})" >结账</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loadOrderDetail();lookupOrderDetailByType('detail_all');">明细</a>
@@ -1516,9 +1516,9 @@
 	<div id="orderFoodCenterCmp" class="ui-grid-a" style="height: 470px;overflow: hidden;">
 	     <div class="ui-block-a" style="width: 35%;height: inherit;background-color: skyblue;">
 		   <div class="ui-grid-a" style="height: inherit;">
-		     <div id="divOrderFoodsCmp" class="ui-block-a" style="width: -webkit-calc(100% - 99px);width: -moz-calc(100% - 99px);width: -ms-calc(100% - 99px);width: -o-calc(100% - 99px);height: inherit;overflow-y: auto;">
+		     <div id="divOrderFoodsCmp"  class="ui-block-a" style="width: -webkit-calc(100% - 99px);width: -moz-calc(100% - 99px);width: -ms-calc(100% - 99px);width: -o-calc(100% - 99px);height: inherit;overflow-y: auto;">
 		     	<!--已点菜列表  -->
-				<ul id="orderFoodsCmp" data-role="listview" data-theme="d" data-inset="true">
+				<ul id="orderFoodsCmp" data-type="sdf" data-role="listview" data-theme="d" data-inset="true">
 <!-- 				    <li data-icon="forFree">
 				    	<a href="#">
 					    	<h1>忒观音</h1>
@@ -1554,7 +1554,7 @@
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.deleteFood()">删除</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="operateOrderFoodTaste({type:2})">口味</a>
 					 <!-- <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.updateUnitPrice()">单位</a> -->
-					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="addTempTaste()">手写口味</a>
+					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" id="addTaste_a_orderFood">手写口味</a>
 					 <a id="giftFoodOperate" data-role="button" data-inline="true" class="orderOperBtn" style="display: none;" data-theme="b" onclick="of.giftFood()">赠送</a>	
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.foodHangup({type:2})">叫起</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" data-rel="popup"  data-transition="pop" href="#orderFoodOtherOperateCmp">更多</a>
@@ -1596,7 +1596,7 @@
 			 	<a onclick="Util.to.scroll({content:'divOrderFoodsCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
 			 	<a onclick="Util.to.scroll({content:'divOrderFoodsCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>
 			 </div>
-			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+			 <div data-role="controlgroup" class="ui-btn-right" data-type="horizontal">
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="addBookOrderFood" onclick="ts.bookFoodChooseFinish()">选好了</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="bookSeatOrderFood" onclick="ts.bookTableCommitOrderFood()">入座</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="multiOpenTable" onclick="ts.multiOpenTableCommitOrderFood()">多台开席</a>
@@ -1605,9 +1605,9 @@
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="handWriteBoard_a_orderFood">手写板</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="pinyinBoard_a_orderFood">拼音</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="addTempFood()" data-rel="popup" data-position-to="window"   data-transition="pop" data-theme="b"  >临时菜</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.foodPaging.getPreviousPage()">上一页</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.foodPaging.getNextPage()">下一页</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup" data-position-to="window" id="addTemp_a_orderFood" data-transition="pop" data-theme="b"  >临时菜</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="getPrevious_a_orderFood">上一页</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="getNextPage_a_orderFood">下一页</a>
 <!-- 			 	<a onclick="of.foodPaging.getPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="foodsPaging">L</a>
 				<a onclick="of.foodPaging.getNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="foodsPaging">R</a> -->	
 			 </div>
@@ -1909,7 +1909,7 @@
 	    </div>
 	    <table style="width:80%;">
 	    	<tr>
-	    		<td style="width:40px;"><label for="tempTasteName">名称:</label></td>
+	    		<td style="width:40px;"><label for="tempTasteName">名称:</label></td> 
 	    		<td>
 	    			<input id="tempTasteName" type="text" placeholder="填写临时口味名称" data-type="txt" class="countInputStyle">
 	    		</td>
@@ -1933,8 +1933,8 @@
 	    </table>
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="saveTempTaste()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="closeTempTaste()">取消</a>		 
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="saveTempTaste_a_orderFood">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="closeTempTaste_a_orderFood">取消</a>		 
 			 </div>
 	    </div>			
 	</div>	
@@ -1986,13 +1986,13 @@
 		
 		<div data-role="popup" id="popupTempFoodKitchensCmp" data-theme="d" >
 	        <ul id="tempFoodKitchensCmp" data-role="listview" data-inset="true" style="min-width:200px;" data-theme="d">
-	            <li class="tempFoodKitchen" onclick="of.tf.tempFoodSelectKitchen({event:this, id:1})"><a >临时分厨1</a></li>
+	        
 	        </ul>
 		</div>		
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom" >
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.tf.saveTempFood()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.tf.closeTempFood()">取消</a>		 
+				 <a  data-role="button" id="saveTemp_a_orderFood" data-inline="true" class="countPopbottomBtn">确定</a>
+				 <a  data-role="button" id="closeTemp_a_orderFood" data-inline="true" class="countPopbottomBtn">取消</a>		 
 			 </div>
 	    </div>			
 	</div>
@@ -2084,7 +2084,7 @@
 		</div>
 		<!-- 搜索组件 -->
 		<div id="searchSelloutFoodCmp" style="height: 60px;padding-top: 25px;display: none;">		
-			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal" style="margin-right: 460px;">
+			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal" style="margin-right: 410px;">
 			 <table>
 			 	<tr>
 			 		<td>

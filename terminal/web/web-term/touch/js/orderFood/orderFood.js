@@ -2,8 +2,6 @@
 var of = {
 	table : {},
 	order : {},
-	deptPaging : {},	
-	deptPagingStart : 0,
 	ot : {
 		tasteGroupPagingStart : 0,
 		choosedTastes : [],
@@ -25,10 +23,8 @@ var of = {
 	/**
 	 * 元素模板
 	 */
-	//部门列表
-	deptCmpTemplet = '<a href="javascript: of.initKitchenContent({deptId:{id}})" data-role="button" data-inline="true" class="deptKitBtnFont" data-type="deptCmp" data-value="{id}" >{name}</a>',
-	//厨房列表
-	kitchenCmpTemplet = '<a data-role="button" data-inline="true" class="deptKitBtnFont" data-type="kitchenCmp" data-value={id} onclick="of.findFoodByKitchen({event:this, kitchenId:{id}})">{name}</a>',
+	
+	
 	//菜品列表
 	foodCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-value={id} onclick="{click}">' +
 							'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
@@ -74,81 +70,26 @@ var of = {
  * 入口, 加载点菜页面数据
  */
 of.entry = function(c){
-	
 	of.table = c.table;
 	of.table.comment = c.comment;
 	of.order = typeof c.order != 'undefined' ? c.order : null;
 	of.orderFoodOperateType = c.orderFoodOperateType;
 	of.afterCommitCallback = typeof c.callback == 'function' ? c.callback : null;
+
 	//清空选中的全单口味
 	of.ot.allBillTaste && delete of.ot.allBillTaste;
 	//更新沽清
 	of.updataSelloutFoods();
-	//加载菜品数据
-	of.toOrderFoodPage(of.table);	
-};
-/**
- * 展示菜品数据
- */
-of.toOrderFoodPage = function(table){
-	//去点餐界面
+	// //加载菜品数据
+	// toOrderFoodPage(of.table);	
+		//去点餐界面
 	location.href = '#orderFoodMgr';
+		
+	
+	$('#orderFoodMgr').trigger('entry', of.table);
 
-	$('#divNFCOTableBasicMsg').html(table.alias + '<br>' + table.name);
-	
-	of.table = table;
-	
-	//正常点菜
-	if(of.orderFoodOperateType == 'normal'){
-		of.newFood = [];
-		$('#normalOrderFood').show();
-		$('#btnOrderAndPay').show();
-		$('#addBookOrderFood').hide();
-		$('#bookSeatOrderFood').hide();
-		$('#multiOpenTable').hide();
-	}else if(of.orderFoodOperateType == 'bookSeat'){
-		$('#bookSeatOrderFood').show();
-		$('#addBookOrderFood').hide();
-		$('#btnOrderAndPay').hide();
-		$('#normalOrderFood').hide();		
-		$('#multiOpenTable').hide();		
-	}else if(of.orderFoodOperateType == 'addBook'){
-		$('#addBookOrderFood').show();
-		$('#bookSeatOrderFood').hide();
-		$('#normalOrderFood').hide();
-		$('#btnOrderAndPay').hide();	
-		$('#multiOpenTable').hide();
-	}else if(of.orderFoodOperateType == 'multiOpenTable'){
-		of.newFood = [];
-		$('#multiOpenTable').show();
-		$('#addBookOrderFood').hide();
-		$('#bookSeatOrderFood').hide();
-		$('#normalOrderFood').hide();
-		$('#btnOrderAndPay').hide();	
-	}
-	
-	
-	//渲染数据
-	of.initDeptContent();
-	
-	//第一次加载不成功, 继续加载直到显示
-	var index = 0;
-	of.loadFoodDateAction = window.setInterval(function(){
-		if($('#foodsCmp').find("a").length > 0){
-			clearInterval(of.loadFoodDateAction);
-			if(index == 0){
-				of.initKitchenContent({deptId:-1});
-			}
-			Util.LM.hide();
-		}else{
-			index ++;
-			Util.LM.show();
-			of.initKitchenContent({deptId:-1});
-		}
-	}, 400);
-	 
-	of.initNewFoodContent();
 };
+	
 
 /**
  * 设置当前输入框
@@ -161,220 +102,7 @@ function setInput(id, callback){
 	}
 }	
 
-/**
- * 初始化部门选择
- * @param c
- */
-of.initDeptContent = function(){
-	var dc = $("#deptsCmp");
-	var html = ['<a href="javascript: of.initKitchenContent({deptId:-1})" data-role="button" data-inline="true" class="deptKitBtnFont" data-value="-1" data-type="deptCmp">全部部门</a>'];
-	
-	//真实宽度
-	var usefullWidth = document.body.clientWidth - 220;
-	//每行显示部门的个数
-	var displayDeptCount =  parseInt(usefullWidth / 88);	
-	
-	of.deptPagingLimit = of.depts.root.length > displayDeptCount ? displayDeptCount-1 : displayDeptCount;
-	
-	var limit = of.depts.root.length >= of.deptPagingStart + of.deptPagingLimit ? of.deptPagingLimit : of.deptPagingLimit - (of.deptPagingStart + of.deptPagingLimit - of.depts.root.length);
-	
-	
-	if(of.depts.root.length > 0){
-		for (var i = 0; i < limit; i++) {
-			var dName = of.depts.root[of.deptPagingStart + i].name;
-			html.push(deptCmpTemplet.format({
-				id : of.depts.root[of.deptPagingStart + i].id,
-				name : dName.length > 4? dName.substring(0, 4) : dName
-			}));
-		}
-	}	
-	//显示部门分页按钮
-	if(of.depts.root.length > displayDeptCount){
-		html.push('<a href="javascript:of.deptGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
-				'<a href="javascript:of.deptGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>');
-	}	
-	$("#deptsCmp").html(html.join("")).trigger('create').trigger('refresh');	
-};
 
-/**
- * 部门分页
- * @param c
- */
-of.deptGetNextPage = function(){
-	of.deptPagingStart += of.deptPagingLimit;
-	if(of.deptPagingStart > of.depts.root.length){
-		of.deptPagingStart -= of.deptPagingLimit;
-		return;
-	}
-	of.initDeptContent();
-};
-
-/**
- * 部门分页
- * @param c
- */
-of.deptGetPreviousPage = function(){
-	of.deptPagingStart -= of.deptPagingLimit;
-	if(of.deptPagingStart < 0){
-		of.deptPagingStart += of.deptPagingLimit;
-		return;
-	}
-	of.initDeptContent();
-};
-
-/**
- * 初始化分厨选择
- * @param c
- */
-of.initKitchenContent = function(c){
-	c = c == null || typeof c == 'undefined' ? {} : c;
-	//
-	var sl = $('#deptsCmp a[data-type=deptCmp]');
-	sl.attr('data-theme', 'c');
-	for(var i = 0; i < sl.length; i++){
-		if($(sl[i]).attr('data-value') == c.deptId){
-			$(sl[i]).attr('data-theme', 'b');
-		}
-	}
-	sl.buttonMarkup( "refresh" );
-	
-	of.kitchenPagingStart = 0;
-	of.kitchenPagingData = [];
-	var tempFoodData = []; // 菜品数据
-	var temp = null;
-	for(var i = 0; i < of.kitchens.root.length; i++){
-		temp = of.kitchens.root[i];
-		if(typeof c.deptId == 'number' && c.deptId != -1){
-			if(temp.dept.id == c.deptId){
-				of.kitchenPagingData.push({
-					id : temp.id,
-					name : temp.name
-				});
-				tempFoodData = tempFoodData.concat(temp.foods);
-			}
-		}else{
-			if(temp.dept.id != -1){
-				of.kitchenPagingData.push({
-					id : temp.id,
-					name : temp.name
-				});
-			}
-			tempFoodData = of.foodList;
-		}
-	}
-	temp = null;
-	
-	//显示厨房分页
-	of.showKitchenPaging();
-	
-	if(!of.foodPaging){
-		of.foodPaging = new Util.to.padding({
-			renderTo : "foodsCmp",
-			data : tempFoodData,
-			displayId : 'foodPagingDesc',
-			templet : function(c){
-				return foodCmpTemplet.format({
-					id : c.data.id,
-					name : c.data.name.substring(0, 10),
-					unitPrice : c.data.unitPrice,
-					click : 'of.insertFood({foodId:' + c.data.id + '})',
-					sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
-					currPrice : (c.data.status & 1 << 4) != 0 ? '时' : '',		
-					gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
-					weigh : (c.data.status & 1 << 7) != 0 ? '称' : '',
-					commonStatus : (c.data.status & 1 << 10) != 0 ? 'none' : '',
-					limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
-					foodLimitAmount : c.data.foodLimitAmount,
-					foodLimitRemain : c.data.foodLimitRemain					
-				});
-			},
-			pagedCallBack : function(){
-				//FIXME .food-status-font中position:absolute不起作用
-				setTimeout(function(){
-					$(".food-status-font").css("position", "absolute");
-					$(".food-status-limit").css("position", "absolute");
-				}, 250);				
-			}
-		});			
-	}else{
-		of.foodPaging.init({
-			data : tempFoodData
-		});
-	}
-	of.foodPaging.getFirstPage();
-	closePinyin();
-	closeHandWriting();
-};
-
-/**
- * 厨房分页
- */
-of.kitchenGetNextPage = function(){
-	of.kitchenPagingStart += of.kitchenPagingLimit;
-	if(of.kitchenPagingStart > of.kitchenPagingData.length){
-		of.kitchenPagingStart -= of.kitchenPagingLimit;
-		return;
-	}
-	of.showKitchenPaging();
-};
-of.kitchenGetPreviousPage = function(){
-	of.kitchenPagingStart -= of.kitchenPagingLimit;
-	if(of.kitchenPagingStart < 0){
-		of.kitchenPagingStart += of.kitchenPagingLimit;
-		return;
-	}
-	of.showKitchenPaging();
-};
-
-/**
- * 显示厨房分页
- */
-of.showKitchenPaging = function(){
-	var kc = $("#kitchensCmp");
-	var html = ['<a onclick="of.findFoodByKitchen({event:this, kitchenId:-1})" data-role="button" data-inline="true" data-type="kitchenCmp" data-value=-1 class="deptKitBtnFont">全部厨房</a>'];
-	
-	//真实宽度
-	var usefullWidth = document.body.clientWidth - 220;
-	//每行显示厨房的个数
-	var displayKitchenCount =  parseInt(usefullWidth / 88);
-	
-	of.kitchenPagingLimit = of.kitchenPagingData.length > displayKitchenCount ? displayKitchenCount-1 : displayKitchenCount;
-	
-	var limit = of.kitchenPagingData.length >= of.kitchenPagingStart + of.kitchenPagingLimit ? of.kitchenPagingLimit : of.kitchenPagingLimit - (of.kitchenPagingStart + of.kitchenPagingLimit -of.kitchenPagingData.length);
-	
-	if(of.kitchenPagingData.length > 0){
-		for (var i = 0; i < limit ; i++) {
-			var kName = of.kitchenPagingData[of.kitchenPagingStart + i].name;
-			html.push(kitchenCmpTemplet.format({
-				id : of.kitchenPagingData[of.kitchenPagingStart + i].id,
-				name : kName.length > 4? kName.substring(0, 4) : kName
-			}));
-		}
-	}
-	
-	//显示分页按钮
-	if(of.kitchenPagingData.length > displayKitchenCount){
-		html.push('<a href="javascript:of.kitchenGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
-				'<a href="javascript:of.kitchenGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>');
-	}	
-	kc.html(html.join("")).trigger('create').trigger('refresh');
-
-};
-
-
-/**
- * 但div还没设置完成高度时不断刷新
- */
-function keepLoadFoodData(){
-	if(!$('#foodsCmp').html()){
-		Util.LM.show();
-		$('#foodsCmp').html('加载菜品中...')
-	}else{
-		of.initKitchenContent({deptId:-1});
-		clearInterval(of.loadFoodDateAction);
-		Util.LM.hide();
-	}
-}
 
 /**
  * 每次入点菜界面时更新沽清菜品
@@ -425,61 +153,9 @@ of.updataSelloutFoods = function(){
 			});
 		}
 	}); 
-}
-
-
-/**
- * 分厨选菜
- */
-of.findFoodByKitchen = function(c){
-	c = c == null || typeof c == 'undefined' ? {} : c;
-	//
-	var sl = $('#kitchensCmp > a[data-type=kitchenCmp]');
-	sl.attr('data-theme', 'c');
-	if(c.event){
-		$(c.event).attr('data-theme', 'b');
-	}
-	
-	sl.buttonMarkup( "refresh" );
-	
-	var tempFoodData = [];
-	var temp = null;
-	if(c.kitchenId == -1){
-		var dl = $('#deptsCmp a[data-theme=b]');
-		if(dl.length == 0 || parseInt(dl[0].getAttribute('data-value')) == -1){
-			for(var i = 0; i < of.kitchens.root.length; i++){
-				tempFoodData = tempFoodData.concat(of.kitchens.root[i].foods);
-			}
-		}else{
-			for(var i = 0; i < of.kitchens.root.length; i++){
-				temp = of.kitchens.root[i];
-				if(temp.dept.id == parseInt(dl[0].getAttribute('data-value'))){
-					tempFoodData = tempFoodData.concat(temp.foods);		
-				}
-			}
-		}
-	}else{
-		for(var i = 0; i < of.kitchens.root.length; i++){
-			temp = of.kitchens.root[i];
-			if(typeof c.kitchenId == 'number' && c.kitchenId != -1){
-				if(temp.id == c.kitchenId){
-					tempFoodData = tempFoodData.concat(temp.foods);
-				}
-			}else{
-				tempFoodData.concat();
-			}
-		}
-	}
-	temp = null;
-	
-	// 
-	of.foodPaging.init({
-		data : tempFoodData
-	});
-	of.foodPaging.getFirstPage();
-	closePinyin();
-	closeHandWriting();
 };
+
+
 
 /**
  * 点菜
@@ -743,9 +419,12 @@ of.initNewFoodContent = function(c){
 		$('#divDescForCreateOrde div:first').html('');
 	}
 	
+	
+	
+	 
 	$('#orderFoodsCmp').html(html.join(''));
 	
-	$('#orderFoodsCmp').listview("refresh"); 
+
 	
 	//刷新界面后重新选中点的菜
 	if(c.data != null && typeof c.data != 'undefined'){
@@ -758,9 +437,13 @@ of.initNewFoodContent = function(c){
 		}else{
 			$('#divOrderFoodsCmp').animate({scrollTop: 0}, 'fast');
 		}
+		$('#orderFoodsCmp').listview("refresh");
 	}else{
+		
 		$('#divOrderFoodsCmp').animate({scrollTop: 0}, 'fast');
 	}
+		
+	
 };
 
 /**
@@ -797,7 +480,7 @@ of.saveForSplitOrder = function(){
 			temp.tasteGroup.normalTaste = {
 				name : '',
 				price : 0
-			}
+			};
 		}
 		
 		if(typeof temp.tasteGroup.tmpTaste != 'undefined'){
@@ -823,7 +506,7 @@ of.saveForSplitOrder = function(){
 				cateStatusValue : 2,
 				price : 0,
 				isTemp : true
-			}
+			};
 			//口味显示分席
 			temp.tasteGroup.tmpTaste = tempTasteData;
 			temp.tasteGroup.normalTaste.name += (temp.tasteGroup.normalTaste.name ? ',' + tempTasteData.name : tempTasteData.name);
@@ -834,7 +517,7 @@ of.saveForSplitOrder = function(){
 	of.initNewFoodContent();
 	
 	$('#splitOrderWin').popup('close');
-}
+};
 
 /**
  * 选中菜品
@@ -986,7 +669,7 @@ of.updateFoodUnitPrice = function(){
 	}else{
 		Util.msg.tip('此菜品不能设置时价');
 	}
-}
+};
 
 /**
  * 打开时价
@@ -1214,10 +897,7 @@ function operateOrderFoodTaste(c){
 		}
 		//关闭弹出常用口味 && 手写板
 		closeFoodCommonTaste();
-		//易笔字关闭
-		if(YBZ_win){
-			YBZ_win.close();
-		}
+	
 		for (var i = 0; i < of.tasteGroups.length; i++) {
 			if(of.tasteGroups[i].id == -10){//表示常用
 				of.tasteGroups[i].name = '常用口味';
@@ -1622,6 +1302,7 @@ function initComboFoodTasteCmp(c){
 	}
 }
 
+
 /**
  * 加载套菜口味
  */
@@ -1647,20 +1328,30 @@ function initComboFoodCommentTaste(){
 			}));		
 		}
 		
-		
+		var comboTasteId = new Date().getTime() + '_combo';
 		html.push('<a onclick="operateOrderFoodTaste({type:2, comboFoodMoreTaste:true})" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">更多口味</a>' +
-				'<a onclick="addTempTaste()" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">手写口味</a>');
+				'<a id="'+ comboTasteId +'" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">手写口味</a>');
 		
 		$("#divComboFoodTastes").html(html.join("")).trigger('create');		
+
+		//打开套菜子菜手写口味
+		 $('#' + comboTasteId).click(function(){
+		 	$('#addTaste_a_orderFood').click();
+		 });
 		
 		$('#collapsibleComboFoodTaste').show();
 		$('#collapsibleComboFoodTaste').trigger("expand");
 	}else{
 		var html = [];
 		html.push('<a onclick="operateOrderFoodTaste({type:2, comboFoodMoreTaste:true})" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">更多口味</a>' +
-		'<a onclick="addTempTaste()" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">手写口味</a>');
+				'<a id="'+ comboTasteId +'" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">手写口味</a>');
 
 		$("#divComboFoodTastes").html(html.join("")).trigger('create');		
+		
+		//打开套菜手写口味
+		 $('#' + comboTasteId).click(function(){
+		 	$('#addTaste_a_orderFood').click();
+		 });
 		
 		$('#collapsibleComboFoodTaste').show();
 		$('#collapsibleComboFoodTaste').trigger("expand");		
@@ -1809,7 +1500,7 @@ of.ot.saveOrderFoodTaste = function(){
 		}
 	}else{
 		//获取主菜的tasteGroup
-		tasteGroup = of.selectedOrderFood.tasteGroup
+		tasteGroup = of.selectedOrderFood.tasteGroup;
 	}
 	
 	
@@ -1958,326 +1649,13 @@ function deleteSingleWord(id){
 	string.focus();
 }
 
-/**
- * 添加临时口味
- */
-function addTempTaste(){
-	
-	var foodContent = $('#orderFoodsCmp > li[data-theme=e]');
-	if(foodContent.length != 1){
-		Util.msg.alert({
-			msg : '请选中一道菜品',
-			topTip : true
-		});
-		return;
-	}
-	
-	//是否选中键盘
-	
-	
-	of.selectedOrderFood = of.newFood[foodContent.attr('data-index')];
-	
-	$('#addTempTasteCmp').show();
-	$('#addTempTasteCmp').css('top', '150px');
-	$('#shadowForPopup').show();
-	
-	//关闭弹出常用口味
-	closeFoodCommonTaste();
-	
-	
-	//易笔字打开
-	if(systemStatus == 1){
-		if(YBZ_win){
-			YBZ_win.close();
-		}		
-	}else{	
-		YBZ_open(document.getElementById('tempTasteName'));
-		$('#tempTasteWriterOn')[0].selectedIndex = 1;
-		$('#tempTasteWriterOn').slider('refresh');
-	}
-	focusInput = "tempTastePrice";
-	var tasteGroup;
-	
-	//是否为套菜子菜
-	if((of.selectedOrderFood.status & 1 << 5) != 0 && chooseOrderFoodCommonTaste.curComboFoodId){
-		//切换子菜时更新已选口味
-		for (var j = 0; j < of.selectedOrderFood.combo.length; j++) {
-			var comboFood = of.selectedOrderFood.combo[j];
-			if(chooseOrderFoodCommonTaste.curComboFoodId == comboFood.comboFood.id){
-				tasteGroup = comboFood.tasteGroup;
-				break;
-			}
-		}
-	}else{
-		tasteGroup = of.selectedOrderFood.tasteGroup;
-	}
-	
-	if(tasteGroup.tmpTaste){
-		$('#tempTasteName').val(tasteGroup.tmpTaste.name);
-		$('#tempTastePrice').val(tasteGroup.tmpTaste.price);
-		
-		of.ot.updateTempTaste = true;
-	}else{
-		$('#tempTasteName').val('');
-		$('#tempTastePrice').val('');
-		
-		of.ot.updateTempTaste = false;
-	}	
-	
-	$('#tempTasteName').focus();
-}
 
-/**
- * 关闭临时口味
- */
-function closeTempTaste(){
-	$('#addTempTasteCmp').hide();
-	$('#shadowForPopup').hide();
-	
-	$('#tempTasteName').val('');
-	$('#tempTastePrice').val('');	
-	
-//	var numSelect = $(".numberKeyboard");
-//	for (var i = 0; i < numSelect.length; i++) {
-//		numSelect[i].selectedIndex = 0;
-//	}
-//	numSelect.slider('refresh'); 
-//	
-//	var ybzSelect = $(".handWriteCmp");
-//	for (var i = 0; i < ybzSelect.length; i++) {
-//		ybzSelect[i].selectedIndex = 0;
-//	}	
-//	ybzSelect.slider('refresh'); 	
-	
-	//关闭键盘
-	$('#numberKeyboard').hide();	
-	//关闭手写板
-	if(YBZ_win){
-		YBZ_win.close();	
-	}				
-}
 
-/**
- * 保存临时口味
- */
-function saveTempTaste(){
-	of.ot.allBill = 2;
-	var name = $('#tempTasteName').val();
-	var price = $('#tempTastePrice').val();
-	
-	if(price == ''){
-		price = 0;
-	}
-	
-	of.ot.choosedTastes.length = 0;
-	var tasteGroup;
-	//是否为套菜子菜
-	if((of.selectedOrderFood.status & 1 << 5) != 0 && chooseOrderFoodCommonTaste.curComboFoodId){
-		//切换子菜时更新已选口味
-		for (var j = 0; j < of.selectedOrderFood.combo.length; j++) {
-			var comboFood = of.selectedOrderFood.combo[j];
-			if(chooseOrderFoodCommonTaste.curComboFoodId == comboFood.comboFood.id){
-				tasteGroup = comboFood.tasteGroup;
-				for (var k = 0; k < comboFood.tasteGroup.normalTasteContent.length; k++) {
-					of.ot.choosedTastes.push({
-						taste : comboFood.tasteGroup.normalTasteContent[k]
-					});
-				}
-				break;
-			}
-		}
-	}else{
-		tasteGroup = of.selectedOrderFood.tasteGroup;
-		for (var i = 0; i < of.selectedOrderFood.tasteGroup.normalTasteContent.length; i++) {
-			of.ot.choosedTastes.push({
-				taste : of.selectedOrderFood.tasteGroup.normalTasteContent[i]
-			});
-		}		
-	}
-	
-	//当临时口味是修改状态时
-	if(of.ot.updateTempTaste){
-		if(tasteGroup.tmpTaste){
-			//如果名称为空则是删除
-			if(name){
-				tasteGroup.tmpTaste.name = name;
-				tasteGroup.tmpTaste.price = price;
-				
-				of.ot.choosedTastes.push({taste : tasteGroup.tmpTaste});
-			}else{
-				delete tasteGroup.tmpTaste;
-			}
-			of.ot.saveOrderFoodTaste();
-		}
-	}else{
-		if(of.ot.tasteId){
-			of.ot.updateTempTaste = true;
-			saveTempTaste();
-		}else{
-			var tasteId = -11;
-			var tempTasteData = {
-				id : tasteId,
-				cateStatusValue : 2,
-				name : name,
-				price : price,
-				isTemp : true
-			};	
-			
-			of.ot.choosedTastes.push({taste : tempTasteData});
-			
-			of.ot.saveOrderFoodTaste();
-		}
-	}
-	of.ot.updateTempTaste = false;	
-	of.ot.tasteId = null;
-	
-	closeTempTaste();
-}
 
-/**
- * 临时菜操作
- */
-of.tf = {
-	selectedKitchen : null,
-	initTempKitchen : function(){
-		var html = [];
-		for (var i = 0; i < of.tempKitchens.length; i++) {
-			html.push('<li class="tempFoodKitchen" onclick="of.tf.tempFoodSelectKitchen({event:this, id:' + of.tempKitchens[i].id +'})"><a>' + of.tempKitchens[i].name +'</a></li>');
-		}
-		$('#tempFoodKitchensCmp').html(html.join("")).trigger('create');
-		$('#tempFoodKitchensCmp').listview('refresh');
-	}
-}
 
-/**
- * 弹出添加临时菜
- */
-function addTempFood(){
-	of.tf.initTempKitchen();
-	//默认选中第一个厨房
-	of.tf.selectedKitchen = of.tempKitchens[0].id;
-    	
-	focusInput = "tempFoodPrice";
-	
-	//是否选中键盘
-	if(getcookie('isNeedNumKeyboard') == 'true'){
-		$('#isKeyboard4Food').attr('checked', true);
-	}else{
-		$('#isKeyboard4Food').attr('checked', false);
-	}
-	
-	if(getcookie('isNeedWriter') == 'true'){
-		$('#isWriter4Food').attr('checked', true);
-	}else{
-		$('#isWriter4Food').attr('checked', false);
-	}	
-	
-	//默认厨房
-	$('#lab4TempKitchen').text(of.tempKitchens[0].name);
-	
-	$('#addTempFoodCmp').show();
-	$('#shadowForPopup').show();
-	
-	$('#tempFoodName').focus();
-	
-	closePinyin();
-	closeHandWriting();
-}
 
-/**
- * 关闭临时菜
- */
-of.tf.closeTempFood = function(){
-	$('#addTempFoodCmp').hide();
-	$('#shadowForPopup').hide();	
-	$('#tempFoodName').val('');
-	$('#tempFoodPrice').val('');
-	$('#tempFoodCount').val(1);
-	
-	//关闭键盘
-	$('#numberKeyboard').hide();	
-	//关闭手写板
-	if(YBZ_win){
-		YBZ_win.close();	
-	}			
-};
 
-/**
- * 临时菜选择分厨
- * @param c event:this, id
- */
-of.tf.tempFoodSelectKitchen = function(c){
-	this.selectedKitchen = c.id;
-	$('#lab4TempKitchen').text($(c.event).text());
-	$('#popupTempFoodKitchensCmp').popup('close');
-};
 
-/**
- * 保存临时菜
- */
-of.tf.saveTempFood = function(){
-	var name = $('#tempFoodName');
-	var price = $('#tempFoodPrice');
-	var count = $('#tempFoodCount');
-	
-	if(!name.val()){
-		Util.msg.alert({
-			topTip : true,
-			msg : '请临时菜名称'
-		});		
-		name.focus();
-		return;
-	}
-	
-	if(!price.val()){
-		Util.msg.alert({
-			topTip : true,
-			msg : '请填写价格'
-		});
-		price.focus();
-		return;	
-	}else if(isNaN(price.val()) || parseFloat(price.val()) < 0){
-		Util.msg.alert({
-			topTip : true,
-			msg : '请填写正确的价格'
-		});
-		price.focus();
-		return;		
-	}
-
-	if(!count.val()){
-		count.val(1);
-	}else if(isNaN(count.val()) || parseFloat(count.val()) < 1){
-		Util.msg.alert({
-			topTip : true,
-			msg : '请填写正确的数量'
-		});
-		return;		
-	}	
-	
-	
-	of.initNewFoodContent({
-		record : {
-			isTemporary : true,
-			id : (new Date().getTime()+'').substring(5, 9),
-			alias : (new Date().getTime()+'').substring(5, 9),
-			name : name.val(),
-			count : parseFloat(count.val()),
-			unitPrice : parseFloat(price.val()),
-			isHangup : false,
-			kitchen : {
-				id : this.selectedKitchen
-			},
-			tasteGroup : {
-				tastePref : '无口味',
-				price : 0,
-				normalTasteContent : []
-			}
-		}
-	});	
-	
-	of.tf.closeTempFood();
-};
 
 /**
  * 弹出动态常用口味
@@ -2299,10 +1677,16 @@ function foodCommonTasteLoad(){
 			}));		
 		}
 		
+		var CommonTasteId = new Date().getTime();
 		html.push('<a onclick="operateOrderFoodTaste({type:2})" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">更多口味</a>' +
-				'<a onclick="addTempTaste()" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">手写口味</a>');
+				'<a id="' + CommonTasteId + '" data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-theme="b">手写口味</a>');
 		
 		$("#divFloatFoodTastes").html(html.join("")).trigger('create');		
+		
+		//动态口味打开手写口味
+		 $('#' + CommonTasteId).click(function(){
+		 	$('#addTaste_a_orderFood').click();
+		 });
 		
 		$('#collapsibleCommonTaste').show();
 		$('#collapsibleCommonTaste').trigger("expand");
@@ -2556,14 +1940,6 @@ of.chooseOrderFoodUnit = function(c){
 					of.newFood[i].unitPrice = foodUnit.price;
 				}
 				break; 
-				
-				//FIXME 菜品设回原价
-/*				for (var j = 0; j < of.foodList.length; j++) {
-					if(of.newFood[i].id == of.foodList[j].id){
-						of.newFood[i].unitPrice = of.foodList[j].unitPrice;
-					}
-				}*/
-				
 			}
 		}	
 		
@@ -2911,8 +2287,10 @@ function closePinyin(){
 	$('#orderPinyinCmp').hide();	
 }
 
+
+
 $(function(){
-	
+
 	//手写重写按钮的click事件
 	$('#rewrite_a_orderFood').click(function(){
 		if(handWriting){
@@ -2945,8 +2323,8 @@ $(function(){
 		if(kitchen.length > 0){
 			kitchen.click();
 		}else{
-			kitchen = $('#kitchensCmp > a[data-value=-1]')[0];
-			kitchen.onclick();
+			kitchen = $('#kitchensCmp a[data-type=kitchenCmp]:first')[0];
+			kitchen.click();
 		}
 		kitchen = null;		
 		closeHandWriting();
@@ -2988,8 +2366,8 @@ $(function(){
 		if(kitchen.length > 0){
 			kitchen.click();
 		}else{
-			kitchen = $('#kitchensCmp > a[data-value=-1]')[0];
-			kitchen.onclick();
+			kitchen = $('#kitchensCmp a[data-type=kitchenCmp]:first')[0];
+			kitchen.click();
 		}
 		kitchen = null;	
 		closePinyin();
@@ -3005,32 +2383,108 @@ $(function(){
 		$('#pinyinInput_input_orderFood').focus();
 	});
 	
+	//点菜页面的下一页
+	$('#getNextPage_a_orderFood').click(function(){foodPaging.getNextPage();});
+	
+	//点菜页面的上一页
+	$('#getPrevious_a_orderFood').click(function(){foodPaging.getPreviousPage();});
+	
 	//菜品分页
 	var foodPaging = null;		
 	//拼音 && 手写 搜索
 	function search(value, qw){	
+		var sortMethod = null;
 		var data = null;
-		if(value.trim().length > 0){
-			data = [];
-			if(qw == 'pinyin'){
-				for(var i = 0; i < of.foodList.length; i++){
-					if(of.foodList[i].pinyin.indexOf(value.trim().toLowerCase()) != -1){
-						data.push(of.foodList[i]);
-					}
-				}	
-				
+		
+		function byConsumption(obj1, obj2){
+			//菜品搜索结果按点菜数量排序
+		    var val1 = obj1.foodCnt;
+		    var val2 = obj2.foodCnt;
+		    if (val1 < val2) {
+		        return 1;
+		    } else if (val1 > val2) {
+		        return -1;
+		    } else {
+		        return 0;
+		    } 
+		}
+		
+		function byAlias(obj1, obj2){
+			if(!isNaN(obj1.alias) && !isNaN(obj2.alias)){
+				var alias1 = parseInt(obj1.alias);
+				var alias2 = parseInt(obj2.alias);
+				if(alias1 < alias2){
+					return -1;
+				}else if(alias1 > alias2){
+					return 1;					
+				}else{
+					return 0;
+				}
+			}else if(isNaN(obj1.alias) && isNaN(obj2.alias)){
+				var id1 = parseInt(obj1.id);
+				var id2 = parseInt(obj2.id);
+				if(id1 < id2){
+					return -1;
+				}else if(id1 > id2){
+					return 1;					
+				}else{
+					return 0;
+				}
+			}else if(isNaN(obj1.alias) && !isNaN(obj2.alias)){
+				return 1;
+			}else if(!isNaN(obj1.alias) && isNaN(obj2.alias)){
+				return -1;
 			}else{
-				for(var i = 0; i < of.foodList.length; i++){
-					if(of.foodList[i].name.indexOf(value.trim()) != -1){
-						data.push(of.foodList[i]);
-					}
-				}						
+				return 0;
 			}
 		}
+		
+		if(qw == 'pinyin' && value.trim().length > 0){
+			data = [];
+			for(var i = 0; i < of.foodList.length; i++){
+				if(of.foodList[i].pinyin.indexOf(value.trim().toLowerCase()) != -1){
+					data.push(of.foodList[i]);
+				}
+			}	
+			sortMethod = byConsumption;
+			
+		}else if(qw == 'handWriting' && value.trim().length > 0){
+			data = [];
+			for(var i = 0; i < of.foodList.length; i++){
+				if(of.foodList[i].name.indexOf(value.trim()) != -1){
+					data.push(of.foodList[i]);
+				}
+			}		
+			sortMethod = byConsumption;
+							
+		}else if(qw == 'byDept'){
+			if(value.kitchenId != undefined && value.kitchenId != -1){
+				data = of.foodList.filter(function(item, pos, self){
+					return item.kitchen.id == value.kitchenId;
+				});
+			}
+			if(value.deptId != undefined && value.deptId != -1){
+				if(data){
+					data = data.filter(function(item, pos, self){
+						return item.kitchen.dept.id == value.deptId;
+					});
+				}else{
+					data = of.foodList.filter(function(item, pos, self){
+						return item.kitchen.dept.id == value.deptId;
+					});
+				}
+			}
+			if(data == null){
+				data = of.foodList.slice(0);				
+			}
+			sortMethod = byAlias;
+		}
+			
 		//创建菜品分页的控件
 		if(foodPaging == null){
 			foodPaging = Util.to.padding({
 				renderTo : "foodsCmp",
+				displayId : 'foodPagingDesc',
 				templet : function(c){
 					return foodCmpTemplet.format({
 						id : c.data.id,
@@ -3057,18 +2511,7 @@ $(function(){
 		}
 		
 		foodPaging.init({
-			data : data ? data.sort(function (obj1, obj2) {
-										//菜品搜索结果按点菜数量排序
-									    var val1 = obj1.foodCnt;
-									    var val2 = obj2.foodCnt;
-									    if (val1 < val2) {
-									        return 1;
-									    } else if (val1 > val2) {
-									        return -1;
-									    } else {
-									        return 0;
-									    }            
-						 			}) : of.foodList,
+			data : data ? data.sort(sortMethod) : of.foodList,
 			callback : function(){
 				foodPaging.getFirstPage();
 			} 
@@ -3090,7 +2533,7 @@ $(function(){
 						zifu += eachCharactar;										
 					}
 					document.getElementById('searchWord_div_orderFood').innerHTML = zifu;
-					$('#searchWord_div_orderFood input').each(function(index, element){
+					$('#searchWord_div_orderFood').find('input').each(function(index, element){
 						element.onclick = function(){
 							$('#handWritingInput_input_orderFood').val($('#handWritingInput_input_orderFood').val() + element.value);
 							$('#handWritingInput_input_orderFood').trigger('input');
@@ -3122,6 +2565,599 @@ $(function(){
 			};
 		});	
 	}
+	
+	//保存选择分厨的id
+	var selectedKitchen = null;	
+	//保存临时菜
+	$('#saveTemp_a_orderFood').click(function(){
+		var name = $('#tempFoodName');
+		var price = $('#tempFoodPrice');
+		var count = $('#tempFoodCount');
+		
+		if(!name.val()){
+			Util.msg.alert({
+				topTip : true,
+				msg : '请临时菜名称'
+			});		
+			name.focus();
+			return;
+		}
+		
+		if(!price.val()){
+			Util.msg.alert({
+				topTip : true,
+				msg : '请填写价格'
+			});
+			price.focus();
+			return;	
+		}else if(isNaN(price.val()) || parseFloat(price.val()) < 0){
+			Util.msg.alert({
+				topTip : true,
+				msg : '请填写正确的价格'
+			});
+			price.focus();
+			return;		
+		}
+	
+		if(!count.val()){
+			count.val(1);
+		}else if(isNaN(count.val()) || parseFloat(count.val()) < 1){
+			Util.msg.alert({
+				topTip : true,
+				msg : '请填写正确的数量'
+			});
+			return;		
+		}	
+		
+		
+		of.initNewFoodContent({
+			record : {
+				isTemporary : true,
+				id : (new Date().getTime()+'').substring(5, 9),
+				alias : (new Date().getTime()+'').substring(5, 9),
+				name : name.val(),
+				count : parseFloat(count.val()),
+				unitPrice : parseFloat(price.val()),
+				isHangup : false,
+				kitchen : {
+					id : selectedKitchen
+				},
+				tasteGroup : {
+					tastePref : '无口味',
+					price : 0,
+					normalTasteContent : []
+				}
+			}
+		});	
+		
+		$('#closeTemp_a_orderFood').click();
+	});
 
+	
+	 
+	 // 关闭临时菜
+	 
+	$('#closeTemp_a_orderFood').click(function(){
+		$('#addTempFoodCmp').hide();
+		$('#shadowForPopup').hide();	
+		$('#tempFoodName').val('');
+		$('#tempFoodPrice').val('');
+		$('#tempFoodCount').val(1);
+		//关闭键盘
+		$('#numberKeyboard').hide();	
+		//临时菜文本框detach
+		HandWritingAttacher.instance().detach($('#tempFoodName')[0]);
+	});
+
+	//弹出临时菜
+	$('#addTemp_a_orderFood').click(function(){
+		//初始化临时菜分厨
+		var html = [];
+		for (var i = 0; i < of.tempKitchens.length; i++) {
+			html.push('<li class="tempFoodKitchen" id="' + of.tempKitchens[i].id + '"><a>' + of.tempKitchens[i].name +'</a></li>');
+		}
+			
+		$('#tempFoodKitchensCmp').html(html.join("")).trigger('create');
+		
+		$('#tempFoodKitchensCmp').find('li').each(function(index, element){
+			element.onclick = function(){
+				selectedKitchen = element.id;
+				$('#lab4TempKitchen').text($(element).find('a').text());
+				$('#popupTempFoodKitchensCmp').popup('close');			
+			};						
+		});
+		
+		$('#tempFoodKitchensCmp').listview('refresh');
+		
+		//默认选中第一个厨房
+		selectedKitchen = of.tempKitchens[0].id;
+	    	
+		focusInput = "tempFoodPrice";
+		
+		//是否选中键盘
+		if(getcookie('isNeedNumKeyboard') == 'true'){
+			$('#isKeyboard4Food').attr('checked', true);
+		}else{
+			$('#isKeyboard4Food').attr('checked', false);
+		}
+		
+		if(getcookie('isNeedWriter') == 'true'){
+			$('#isWriter4Food').attr('checked', true);
+		}else{
+			$('#isWriter4Food').attr('checked', false);
+		}	
+		
+		//默认厨房
+		$('#lab4TempKitchen').text(of.tempKitchens[0].name);
+		
+		$('#addTempFoodCmp').show();
+		$('#shadowForPopup').show();
+		
+		//临时菜输入框弹出手写板控件
+		HandWritingAttacher.instance().attach($('#tempFoodName')[0]);
+		
+		$('#tempFoodName').focus();
+		
+		//关闭拼音和手写搜索
+		closePinyin();
+		closeHandWriting();
+		
+	});
+	
+	
+	//打开手写口味
+	$('#addTaste_a_orderFood').click(function(){
+		var foodContent = $('#orderFoodsCmp > li[data-theme=e]');
+		if(foodContent.length != 1){
+			Util.msg.alert({
+				msg : '请选中一道菜品',
+				topTip : true
+			});
+			return;
+		}
+		
+		//是否选中键盘
+		of.selectedOrderFood = of.newFood[foodContent.attr('data-index')];
+		
+		$('#addTempTasteCmp').show();
+		$('#addTempTasteCmp').css('top', '150px');
+		$('#shadowForPopup').show();
+		
+		//关闭弹出常用口味
+		closeFoodCommonTaste();
+		
+		focusInput = "tempTastePrice";
+		var tasteGroup;
+		
+		//是否为套菜子菜
+		if((of.selectedOrderFood.status & 1 << 5) != 0 && chooseOrderFoodCommonTaste.curComboFoodId){
+			//切换子菜时更新已选口味
+			for (var j = 0; j < of.selectedOrderFood.combo.length; j++) {
+				var comboFood = of.selectedOrderFood.combo[j];
+				if(chooseOrderFoodCommonTaste.curComboFoodId == comboFood.comboFood.id){
+					tasteGroup = comboFood.tasteGroup;
+					break;
+				}
+			}
+		}else{
+			tasteGroup = of.selectedOrderFood.tasteGroup;
+		}
+		
+		if(tasteGroup.tmpTaste){
+			$('#tempTasteName').val(tasteGroup.tmpTaste.name);
+			$('#tempTastePrice').val(tasteGroup.tmpTaste.price);
+			
+			updateTempTaste = true;
+		}else{
+			$('#tempTasteName').val('');
+			$('#tempTastePrice').val('');
+			
+			updateTempTaste= false;
+		}	
+		//临时口味输入框弹出手写板控件
+		HandWritingAttacher.instance().attach($('#tempTasteName')[0]);
+		$('#tempTasteName').focus();
+	});
+
+
+	var updateTempTaste = false;
+	
+	//添加临时口味的确定按钮
+	$('#saveTempTaste_a_orderFood').click(function(){
+		of.ot.allBill = 2;
+		var name = $('#tempTasteName').val();
+		var price = $('#tempTastePrice').val();
+		
+		if(price == ''){
+			price = 0;
+		}
+		
+		of.ot.choosedTastes.length = 0;
+		var tasteGroup;
+		//是否为套菜子菜
+		if((of.selectedOrderFood.status & 1 << 5) != 0 && chooseOrderFoodCommonTaste.curComboFoodId){
+			//切换子菜时更新已选口味
+			for (var j = 0; j < of.selectedOrderFood.combo.length; j++) {
+				var comboFood = of.selectedOrderFood.combo[j];
+				if(chooseOrderFoodCommonTaste.curComboFoodId == comboFood.comboFood.id){
+					tasteGroup = comboFood.tasteGroup;
+					for (var k = 0; k < comboFood.tasteGroup.normalTasteContent.length; k++) {
+						of.ot.choosedTastes.push({
+							taste : comboFood.tasteGroup.normalTasteContent[k]
+						});
+					}
+					break;
+				}
+			}
+		}else{
+			tasteGroup = of.selectedOrderFood.tasteGroup;
+			for (var i = 0; i < of.selectedOrderFood.tasteGroup.normalTasteContent.length; i++) {
+				of.ot.choosedTastes.push({
+					taste : of.selectedOrderFood.tasteGroup.normalTasteContent[i]
+				});
+			}		
+		}
+		
+		//当临时口味是修改状态时
+		if(of.ot.updateTempTaste){
+			if(tasteGroup.tmpTaste){
+				//如果名称为空则是删除
+				if(name){
+					tasteGroup.tmpTaste.name = name;
+					tasteGroup.tmpTaste.price = price;
+					
+					of.ot.choosedTastes.push({taste : tasteGroup.tmpTaste});
+				}else{
+					delete tasteGroup.tmpTaste;
+				}
+				of.ot.saveOrderFoodTaste();
+			}
+		}else{
+			if(of.ot.tasteId){
+				of.ot.updateTempTaste = true;
+				saveTempTaste();
+			}else{
+				var tasteId = -11;
+				var tempTasteData = {
+					id : tasteId,
+					cateStatusValue : 2,
+					name : name,
+					price : price,
+					isTemp : true
+				};	
+				
+				of.ot.choosedTastes.push({taste : tempTasteData});
+				
+				of.ot.saveOrderFoodTaste();
+			}
+		}
+		of.ot.updateTempTaste = false;	
+		of.ot.tasteId = null;
+		
+		$('#closeTempTaste_a_orderFood').click();
+	});
+	
+	//临时口味取消按钮
+	$('#closeTempTaste_a_orderFood').click(function(){
+		$('#addTempTasteCmp').hide();
+		$('#shadowForPopup').hide();
+	
+		$('#tempTasteName').val('');
+		$('#tempTastePrice').val('');	
+		$('#numberKeyboard').hide();	
+		
+	});	
+	
+	//进入点菜界面的时候渲染数据
+	$('#orderFoodMgr').on("entry", function(event, table){
+
+		$('#divNFCOTableBasicMsg').html(table.alias + '<br>' + table.name);
+			
+		of.table = table;
+			
+		//正常点菜
+		if(of.orderFoodOperateType == 'normal'){
+			of.newFood = [];
+			$('#normalOrderFood').show();
+			$('#btnOrderAndPay').show();
+			$('#addBookOrderFood').hide();
+			$('#bookSeatOrderFood').hide();
+			$('#multiOpenTable').hide();
+		}else if(of.orderFoodOperateType == 'bookSeat'){
+			$('#bookSeatOrderFood').show();
+			$('#addBookOrderFood').hide();
+			$('#btnOrderAndPay').hide();
+			$('#normalOrderFood').hide();		
+			$('#multiOpenTable').hide();		
+		}else if(of.orderFoodOperateType == 'addBook'){
+			$('#addBookOrderFood').show();
+			$('#bookSeatOrderFood').hide();
+			$('#normalOrderFood').hide();
+			$('#btnOrderAndPay').hide();	
+			$('#multiOpenTable').hide();
+		}else if(of.orderFoodOperateType == 'multiOpenTable'){
+			of.newFood = [];
+			$('#multiOpenTable').show();
+			$('#addBookOrderFood').hide();
+			$('#bookSeatOrderFood').hide();
+			$('#normalOrderFood').hide();
+			$('#btnOrderAndPay').hide();	
+		}
+			
+			
+		//渲染数据
+		initDeptContent();
+		initKitchenContent();
+		 // //第一次加载不成功, 延迟加载直到显示
+		setTimeout(function(){
+			 console.log($('#foodsCmp')[0].clientHeight);
+			 search({}, 'byDept');
+			 if($('#foodsCmp')[0].clientHeight == 0){
+				 setTimeout(function(){
+					 console.log($('#foodsCmp')[0].clientHeight);
+					 search({}, 'byDept');
+				 }, 500);
+			 }
+		}, 500);
+		
+		of.initNewFoodContent();
+	
+	});
+	
+	//部门分页
+	var deptPaging = [];	
+	var deptPagingStart = 0;
+	
+	 // 初始化部门选择
+	function initDeptContent(){
+		var dc = $("#deptsCmp");
+		var alldeptCmpId = new Date().getTime() + '_dept';
+		var html = ['<a id="' + alldeptCmpId + '" data-role="button" data-inline="true" class="deptKitBtnFont" data-value="-1" data-type="deptCmp">全部部门</a>'];
+		
+		//部门列表
+		var eachDeptClass = new Date().getTime() + '_deptClass';
+		var deptCmpTemplet = '<a data-role="button" data-inline="true" class="deptKitBtnFont ' + eachDeptClass + '" data-type="deptCmp" data-value="{id}" >{name}</a>';
+		//真实宽度
+		var usefullWidth = document.body.clientWidth - 220;
+		//每行显示部门的个数
+		var displayDeptCount =  parseInt(usefullWidth / 88);	
+		
+		var deptPagingLimit = of.depts.root.length > displayDeptCount ? displayDeptCount-1 : displayDeptCount;
+		
+		var limit = of.depts.root.length >= deptPagingStart + deptPagingLimit ? deptPagingLimit : deptPagingLimit - (deptPagingStart + deptPagingLimit - of.depts.root.length);
+		
+		
+		if(of.depts.root.length > 0){
+			for (var i = 0; i < limit; i++) {
+				var dName = of.depts.root[deptPagingStart + i].name;
+				html.push(deptCmpTemplet.format({
+					id : of.depts.root[deptPagingStart + i].id,
+					name : dName.length > 4? dName.substring(0, 4) : dName
+				}));
+			}
+		}	
+		//显示部门分页按钮
+		var deptPrevId = new Date().getTime() + '_prevPage';
+		var deptNextId = new Date().getTime() + '_nextPage';
+		if(of.depts.root.length > displayDeptCount){
+			html.push('<a id="' + deptPrevId + '" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
+					'<a id="' + deptNextId + '" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>');
+		}	
+		$("#deptsCmp").html(html.join("")).trigger('create').trigger('refresh');
+		
+		//全部部门的点击事件
+		$('#' + alldeptCmpId ).click(function(){
+			initKitchenContent();
+			search({}, 'byDept'); 
+		});
+		
+		//部门点击事件
+		$('.' + eachDeptClass).each(function(index, element){
+			element.onclick = function(){
+				initKitchenContent(parseInt(element.getAttribute('data-value')));
+				search({deptId : parseInt(element.getAttribute('data-value'))}, 'byDept');
+			};
+		});
+		
+		//部门分页下一页	
+		$('#' + deptNextId).click(function(){
+			deptPagingStart += deptPagingLimit;
+			if(deptPagingStart > of.depts.root.length){
+				deptPagingStart -= deptPagingLimit;
+				return;
+			}
+			initDeptContent();
+		});
+	
+		//部门分页上一页
+		$('#' + deptPrevId).click(function(){
+			deptPagingStart -= deptPagingLimit;
+			if(deptPagingStart < 0){
+				deptPagingStart += deptPagingLimit;
+				return;
+			}
+			initDeptContent();
+		});	
+		
+	};
+
+
+	/**
+	 * 初始化分厨选择
+	 * @param c
+	 */
+    function initKitchenContent(deptId){
+		var sl = $('#deptsCmp a[data-type=deptCmp]');
+		sl.attr('data-theme', 'c');
+		//存放对应部门的厨房
+		var kitchenPagingData = null;
+		if(deptId != undefined){
+			for(var i = 0; i < sl.length; i++){
+				if($(sl[i]).attr('data-value') == deptId){
+					$(sl[i]).attr('data-theme', 'b');
+				}else{
+					$(sl[i]).attr('data-theme', 'c');
+				}
+			}
+			kitchenPagingData = [];
+			for(var i = 0; i < of.kitchens.root.length; i++){
+				var temp = of.kitchens.root[i];
+				if(typeof deptId == 'number' && deptId != undefined){
+					if(temp.dept.id == deptId){
+						kitchenPagingData.push({
+							id : temp.id,
+							name : temp.name
+						});
+					}
+				}else{
+					if(temp.dept.id != -1){
+						kitchenPagingData.push({
+							id : temp.id,
+							name : temp.name
+						});
+					}
+				}
+			}
+		}else{
+			for(var i = 0; i < sl.length; i++){
+				if($(sl[i]).attr('data-value') == -1){
+					$(sl[i]).attr('data-theme', 'b');
+				}else{
+					$(sl[i]).attr('data-theme', 'c');
+				}
+			}
+			kitchenPagingData = of.kitchens.root.slice(0);
+		}
+		
+		sl.buttonMarkup( "refresh" );
+		
+		//显示厨房分页
+		showKitchenPaging(0, kitchenPagingData);
+		
+		closePinyin();
+		closeHandWriting();
+	};
+	
+	
+
+	/**
+	 * 显示厨房分页
+	 */
+    function showKitchenPaging(kitchenPagingStart, kitchenPagingData){
+		var kc = $("#kitchensCmp");
+		var findAllKiechen = new Date().getTime() + '_allKitchen';
+		var html = ['<a id="' + findAllKiechen + '" data-role="button" data-inline="true" data-type="kitchenCmp" data-value=-1 class="deptKitBtnFont">全部厨房</a>'];
+		
+		//真实宽度
+		var usefullWidth = document.body.clientWidth - 220;
+		//每行显示厨房的个数
+		var displayKitchenCount =  parseInt(usefullWidth / 88);
+		
+		var kitchenPagingLimit = kitchenPagingData.length > displayKitchenCount ? displayKitchenCount-1 : displayKitchenCount;
+		
+		var limit = kitchenPagingData.length >= kitchenPagingStart + kitchenPagingLimit ? kitchenPagingLimit : kitchenPagingLimit - (kitchenPagingStart + kitchenPagingLimit - kitchenPagingData.length);
+		
+		var  eachFindKitchenClass = new Date().getTime() + '_eachKitchen';
+		//厨房列表
+		var kitchenCmpTemplate = '<a data-role="button" data-inline="true" class="deptKitBtnFont ' + eachFindKitchenClass + '" data-type="kitchenCmp" data-value={id} ">{name}</a>';
+		
+		if(kitchenPagingData.length > 0){
+			for (var i = 0; i < limit ; i++) {
+				var kName = kitchenPagingData[kitchenPagingStart + i].name;
+				html.push(kitchenCmpTemplate.format({
+					id : kitchenPagingData[kitchenPagingStart + i].id,
+					name : kName.length > 4? kName.substring(0, 4) : kName
+				}));
+			}
+		}
+		
+		var kitchenPrevId = new Date().getTime() + 'kitchenPrev';
+		var kitchenNextId = new Date().getTime() + 'kitchenNext';
+		//显示分页按钮
+		if(kitchenPagingData.length > displayKitchenCount){
+			html.push('<a id="' + kitchenPrevId + '" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
+					'<a id="' + kitchenNextId + '" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>');
+		}	
+		kc.html(html.join("")).trigger('create').trigger('refresh');
+		
+		//FIXME
+		$('#kitchensCmp a').each(function(index, element){
+			if($(element).attr('data-theme') != 'b'){
+				$(element).attr('data-theme', 'c');
+			}
+		});
+		
+		$('#kitchensCmp a').attr('data-theme', 'c');
+		$('#kitchensCmp a').buttonMarkup( 'refresh' );
+		
+		//全部厨房点击事件
+		$('#' + findAllKiechen).click(function(){
+			var dl = $('#deptsCmp a[data-theme=b]');
+			search({deptId : parseInt(dl[0].getAttribute('data-value'))}, 'byDept');
+			//将所有厨房的样式都变为未选中状态
+			$('#kitchensCmp a[data-type=kitchenCmp]').each(function(index, element){
+				$(element).attr('data-theme', 'c');
+				$(element).buttonMarkup( 'refresh' );
+			});
+			var sl = $('#kitchensCmp a[data-type=kitchenCmp]:first');		
+			sl.attr('data-theme', 'b');
+			sl.buttonMarkup( "refresh" );
+		});
+		
+		
+
+		
+		//厨房点击事件
+		$('.' + eachFindKitchenClass).each(function(index, element){
+			element.onclick = function(){
+				var dl = $('#deptsCmp a[data-theme=b]');
+				var kitchenId = parseInt(element.getAttribute('data-value'));
+				var deptId = parseInt(dl[0].getAttribute('data-value'));
+				if(kitchenId == -1){
+					search({deptId : deptId}, 'byDept');
+				}else{
+					search({deptId : deptId, kitchenId : kitchenId}, 'byDept');
+				}
+			
+				var sl = $('#kitchensCmp a[data-type=kitchenCmp]');
+				sl.attr('data-theme', 'c');
+				if(element){
+					$(element).attr('data-theme', 'b');
+				}
+
+				sl.buttonMarkup( "refresh" );
+			
+				closePinyin();
+				closeHandWriting();
+			};
+		});
+		
+		
+		//厨房分页上一页
+		$('#' + kitchenPrevId).click(function(){
+			kitchenPagingStart -= kitchenPagingLimit;
+			if(kitchenPagingStart < 0){
+				kitchenPagingStart += kitchenPagingLimit;
+				return;
+			}
+			showKitchenPaging(kitchenPagingStart, kitchenPagingData);
+		});
+		
+		// 厨房分页下一页
+		$('#' + kitchenNextId).click(function(){
+			kitchenPagingStart += kitchenPagingLimit;
+			if(kitchenPagingStart > kitchenPagingData.length){
+				kitchenPagingStart -= of.kitchenPagingLimit;
+				return;
+			}
+			showKitchenPaging(kitchenPagingStart, kitchenPagingData);
+		});
+	};
+
+	
+
+	
+
+	
 });
 

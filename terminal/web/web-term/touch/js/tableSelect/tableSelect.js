@@ -379,68 +379,23 @@ ts.searchTableCompareByName = function (obj1, obj2) {
     }            
 }; 
 
-//动态加载易笔字
-function dynamicLoadYBZ(){  
-	YBZ_win = '';
-	YBZ_open = function(){};
-    var script = document.createElement('script');  
-	script.setAttribute('type','text/javascript');  
-	script.setAttribute('src','http://www.yibizi.com/ybz_core/core/ybz.min.js');  
-	document.getElementsByTagName('head')[0].appendChild(script);  
-	script.onload = script.onreadystatechange = function(){  
-	   if(!this.readyState || this.readyState=='loaded' || this.readyState=='complete'){
-		   //加载完成,执行js内方法
-			YBZ_win_title = "手写板";//手写板名称
-			YBZ_follow = false;//手写板吸附在输入框附近 false 右下角打开
-			YBZ_skin = "black";
-			//default||aero||chrome||opera||simple||idialog||twitter||blue||black||green
-			YBZ_tipsopen = false;//是否在网页输入框中加入手写提示
-			YBZ_fixed = true;//是否固定手写窗口			   
-	   }  
-	   script.onload = script.onreadystatechange = null;  
-	};  
-}  
-
-function addStyle() {
-    var container = document.getElementsByTagName("head")[0];
-    var addStyle = document.createElement("link");
-    addStyle.rel = "stylesheet";
-    addStyle.type = "text/css";
-    addStyle.media = "screen";
-    addStyle.href = 'http://www.yibizi.com/ybz_core/core/skins/black.css';
-    container.appendChild(addStyle);
-}
-
-
 
 window.onload = function(){
 	if(systemStatus == 2){
 		$('input[data-type=txt]').focus(function(){
-			//if(getcookie('isNeedWriter') == 'true'){
 			//关闭数字键盘
 			$('#numberKeyboard').hide();
 			
-			//console.log($(this)[0]);
-			
-			YBZ_open($(this)[0]);			
 		});
 		
 		$('input[data-type=num]').focus(function(){
 			//if(getcookie('isNeedNumKeyboard') == 'true'){
-			//关闭易笔字
-			YBZ_win = YBZ_win || '';
-			if(YBZ_win){
-				YBZ_win.close();
-			}		
+		
 			$('#numberKeyboard').show();	
 		});	
 		
 		$('input[data-type=neither]').focus(function(){
-			//关闭易笔字
-			YBZ_win = YBZ_win || '';
-			if(YBZ_win){
-				YBZ_win.close();
-			}
+		
 			//关闭数字键盘
 			$('#numberKeyboard').hide();	
 			
@@ -540,11 +495,6 @@ window.onload = function(){
         	ts.member.searchMemberDetail();
         }
     });
-    
-    
-    //易笔字样式和加载
-    addStyle();
-    dynamicLoadYBZ();
     
 };
 
@@ -2104,7 +2054,7 @@ function getDailyInfo(c){
 		$('#btnSubmitDailyOperation .ui-btn-text').html('交款');
 		ts.dailyOpe.otype = 'jiaokuan';
 	}else if(c.queryType == 0){//交班
-		$('#title4DailyInfoTable').html('<font color="#f7c942">交班表</font> -- 交班人 : '+ ln.staffData.staffName);
+		$('#title4DailyInfoTable').htmltitle4DailyInfoTable('<font color="#f7c942">交班表</font> -- 交班人 : '+ ln.staffData.staffName);
 		$('#btnSubmitDailyOperation .ui-btn-text').html('交班');
 		ts.dailyOpe.otype = 'jiaoban';
 	}else if(c.queryType == 1){//日结
@@ -2966,12 +2916,7 @@ ts.member.closeMemberInfoBind = function(){
 	$('#shadowForPopup').hide();
 	
 	$('#finishMemberInfo').remove();
-	
-	//关闭易笔字
-	YBZ_win = YBZ_win || '';
-	if(YBZ_win){
-		YBZ_win.close();
-	}
+
 	//关闭数字键盘
 	$('#numberKeyboard').hide();
 };
