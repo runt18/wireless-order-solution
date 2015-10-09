@@ -2727,7 +2727,7 @@ $(function(){
 		closeFoodCommonTaste();
 		
 		focusInput = "tempTastePrice";
-		var tasteGroup;
+		var tasteGroup = null;
 		
 		//是否为套菜子菜
 		if((of.selectedOrderFood.status & 1 << 5) != 0 && chooseOrderFoodCommonTaste.curComboFoodId){
@@ -2773,7 +2773,7 @@ $(function(){
 		}
 		
 		of.ot.choosedTastes.length = 0;
-		var tasteGroup;
+		var tasteGroup = {};
 		//是否为套菜子菜
 		if((of.selectedOrderFood.status & 1 << 5) != 0 && chooseOrderFoodCommonTaste.curComboFoodId){
 			//切换子菜时更新已选口味
@@ -2888,31 +2888,29 @@ $(function(){
 		//渲染数据
 		initDeptContent();
 		initKitchenContent();
-		 // //第一次加载不成功, 延迟加载直到显示
-		setTimeout(function(){
-			 console.log($('#foodsCmp')[0].clientHeight);
-			 search({}, 'byDept');
-			 if($('#foodsCmp')[0].clientHeight == 0){
-				 setTimeout(function(){
-					 console.log($('#foodsCmp')[0].clientHeight);
-					 search({}, 'byDept');
-				 }, 500);
-			 }
-		}, 500);
+		
+
+		 //第一次加载不成功, 延迟加载直到显示
+		(function initFoodContent(){
+			//console.log($('#foodsCmp')[0].clientHeight);
+			if($('#foodsCmp')[0].clientHeight != 0){
+				search({}, 'byDept');
+			}else{
+				setTimeout(arguments.callee, 500);
+			}
+		})();
 		
 		of.initNewFoodContent();
 	
 	});
 	
 	//部门分页
-	var deptPaging = [];	
 	var deptPagingStart = 0;
 	
 	 // 初始化部门选择
 	function initDeptContent(){
-		var dc = $("#deptsCmp");
-		var alldeptCmpId = new Date().getTime() + '_dept';
-		var html = ['<a id="' + alldeptCmpId + '" data-role="button" data-inline="true" class="deptKitBtnFont" data-value="-1" data-type="deptCmp">全部部门</a>'];
+		var allDeptCmpId = new Date().getTime() + '_dept';
+		var html = ['<a id="' + allDeptCmpId + '" data-role="button" data-inline="true" class="deptKitBtnFont" data-value="-1" data-type="deptCmp">全部部门</a>'];
 		
 		//部门列表
 		var eachDeptClass = new Date().getTime() + '_deptClass';
@@ -2946,7 +2944,7 @@ $(function(){
 		$("#deptsCmp").html(html.join("")).trigger('create').trigger('refresh');
 		
 		//全部部门的点击事件
-		$('#' + alldeptCmpId ).click(function(){
+		$('#' + allDeptCmpId ).click(function(){
 			initKitchenContent();
 			search({}, 'byDept'); 
 		});
