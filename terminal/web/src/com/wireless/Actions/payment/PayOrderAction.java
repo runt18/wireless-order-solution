@@ -2,6 +2,8 @@ package com.wireless.Actions.payment;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,18 +13,29 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.alibaba.fastjson.JSON;
+import com.wireless.db.orderMgr.PayOrder;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
+import com.wireless.json.JObject;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPayOrder;
+import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.dishesOrder.PrintOption;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
+
+import cn.beecloud.BCEumeration.PAY_CHANNEL;
+import cn.beecloud.BCPay;
+import cn.beecloud.BCPayResult;
+import cn.beecloud.BeeCloud;
 
 public class PayOrderAction extends Action{
 	
@@ -70,7 +83,6 @@ public class PayOrderAction extends Action{
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			
-			Order.PayBuilder payBuilder;
 			
 			int orderId = Integer.parseInt(request.getParameter("orderID"));
 			
@@ -88,6 +100,7 @@ public class PayOrderAction extends Action{
 				payType = PayType.CASH;
 			}
 			
+			final Order.PayBuilder payBuilder;
 			if(settleType == Order.SettleType.MEMBER){
 				payBuilder = Order.PayBuilder.build4Member(orderId, payType, Boolean.parseBoolean(request.getParameter("sendSms")));
 			}else{
@@ -107,9 +120,9 @@ public class PayOrderAction extends Action{
 				}
 			}
 			
-			if(request.getParameter("pricePlanID") != null && !request.getParameter("pricePlanID").isEmpty() && !request.getParameter("pricePlanID").equals("-1")){
-				payBuilder.setPricePlanId(Integer.parseInt(request.getParameter("pricePlanID")));
-			}
+//			if(request.getParameter("pricePlanID") != null && !request.getParameter("pricePlanID").isEmpty() && !request.getParameter("pricePlanID").equals("-1")){
+//				payBuilder.setPricePlanId(Integer.parseInt(request.getParameter("pricePlanID")));
+//			}
 			
 			if(request.getParameter("eraseQuota") != null){
 				payBuilder.setErasePrice(Integer.parseInt(request.getParameter("eraseQuota")));
@@ -137,32 +150,65 @@ public class PayOrderAction extends Action{
 			}
 			
 			/**
-			 * 
+			 * 是否打印
 			 */
 			String isPrint = request.getParameter("isPrint");
 			if(isPrint != null && !isPrint.trim().isEmpty() && !Boolean.valueOf(isPrint.trim())){
 				payBuilder.setPrintOption(PrintOption.DO_NOT_PRINT);
 			}
-				
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
 			
-			if(resp.header.type == Type.ACK){
-				jsonResp = jsonResp.replace("$(result)", "true");
-				if(payBuilder.isTemp()){
-					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单暂结成功");
+			if(payType.equals(PayType.WX)){
+				//打印微信支付单
+				Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
+				BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
+				final JObject jObj = new JObject();
+				jObj.setRoot(payBuilder);
+				Map<String, String> optional = new HashMap<String, String>(){
+					private static final long serialVersionUID = 1L;
+					{ 
+						put("payBuilder", JSON.toJSONString(payBuilder.toJsonMap(0)));
+						put("staffId", Integer.toString(staff.getId()));	
+					}
+				};
+				BCPayResult bcPayResult = BCPay.startBCPay(PAY_CHANNEL.WX_NATIVE,
+														   new Float(PayOrder.calc(staff, payBuilder).getActualPrice() * 100).intValue(),
+														   //1,//FIXME 
+														   System.currentTimeMillis() + Integer.toString(orderId),
+														   restaurant.getName() + "账单支付(" + orderId + ")", 
+														   optional, 
+														   null, null, null, null);
+				if(bcPayResult.getType().ordinal() == 0){
+					jsonResp = jsonResp.replace("$(result)", "true");
+					ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildWxReceipt(staff, bcPayResult.getCodeUrl()));
+					if(resp.header.type == Type.ACK){
+						jsonResp = jsonResp.replace("$(value)", bcPayResult.getCodeUrl());
+					}else{
+						throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+					}
 				}else{
-					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功");
-		    	}
-				
-			}else if(resp.header.type == Type.NAK){
-				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
-				
+					throw new BusinessException(bcPayResult.getErrMsg() + "," + bcPayResult.getErrDetail());
+				}
 			}else{
-				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐不成功，请重新确认");
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
+				
+				if(resp.header.type == Type.ACK){
+					jsonResp = jsonResp.replace("$(result)", "true");
+					if(payBuilder.isTemp()){
+						jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单暂结成功");
+					}else{
+						jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功");
+			    	}
+					
+				}else if(resp.header.type == Type.NAK){
+					jsonResp = jsonResp.replace("$(result)", "false");
+					jsonResp = jsonResp.replace("$(value)", new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
+					
+				}else{
+					jsonResp = jsonResp.replace("$(result)", "false");
+					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐不成功，请重新确认");
+				}
 			}
-			
+
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
