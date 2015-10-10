@@ -990,7 +990,7 @@ function operateOrderFoodTaste(c){
 	}
 	
 
-};
+}
 /**
  * 口味操作返回
  */
@@ -1163,7 +1163,7 @@ function initComboFoodGroupCmp(){
 	var html = [];
 	if(of.comboFoodGroups.length > 0){
 		for (var i = 0; i < limit; i++) {
-			var theme = "b"
+			var theme = "b";
 			if((of.comboFoodGroups[of.ot.comboFoodPagingStart + i].status & 1 << 5) != 0){
 				theme = "e";
 			}
@@ -1204,7 +1204,7 @@ function initComboFoodGroupCmp(){
 		 }, 'json');	
 	 }, 'json');
 	 */
-};
+}
 /**
  * 套菜口味选中
  * @param c
@@ -1455,7 +1455,7 @@ function initTasteGroupCmp(c){
 	}	
 	
 	$("#tasteGroupCmp").html(html.join("")).trigger('create');	
-};
+}
 
 /**
  * 口味组分页
@@ -1977,14 +1977,8 @@ of.openAliasOrderFood = function(){
 	closeHandWriting();
 };
 
-/**
- * 关闭助记码
- */
-of.closeAliasOrderFood = function(){
-	$('#orderFoodByAliasCmp').popup('close');
-	
-	$('#txtFoodAlias').val("");
-};
+
+
 
 /**
  * 助记码点菜
@@ -2028,7 +2022,12 @@ of.findByAliasAction = function(c){
 of.orderWithNoPrint = function(){
 	$('#orderOtherOperateCmp').popup('close');
 	setTimeout(function(){
-		of.submit({notPrint : true});	
+		of.submit({
+			notPrint : true,
+			postSubmit : function(){
+				uo.entry({table : of.table});
+			}
+		});	
 	}, 250);
 };
 
@@ -2036,39 +2035,40 @@ of.orderWithNoPrint = function(){
  * 下单并且结账
  */
 of.orderAndPay = function(){
-	//设置无论从哪个界面进入点菜, 下单后都会去结账界面
-	of.afterCommitCallback = function(){
-		showPaymentMgr({table:of.table});
-	};
-	of.submit({notPrint : false});	
+	of.submit({
+		notPrint : false,
+		//设置无论从哪个界面进入点菜, 下单后都会去结账界面
+		postSubmit : function(){
+			pm.entry({table:of.table});
+		}
+	});	
 };
 
 /**
  * 先送
  */
 of.orderBefore = function(){
-	of.orderBeforeCallback = function(){
-		//清空已点菜
-		$('#orderFoodsCmp').html('');
-		//清空状态栏
-		$('#divDescForCreateOrde div:first').html('');
-		$('#orderFoodsCmp').listview('refresh');
-		//更新餐台
-		if(of.order == null){
-			initTableData();
-		}
-		//更新账单
-		$.post('../QueryOrderByCalc.do', {tableID : of.table.id}, function(result){
-			of.table.statusValue == 1;
-			of.order = result.other.order;
-			delete of.orderBeforeCallback;
-		});
-		
-	};
-	
 	$('#orderOtherOperateCmp').popup('close');
 	setTimeout(function(){
-		of.submit({notPrint : false});	
+		of.submit({
+			notPrint : false,
+			postSubmit : function(){
+					//清空已点菜
+				$('#orderFoodsCmp').html('');
+				//清空状态栏
+				$('#divDescForCreateOrde div:first').html('');
+				$('#orderFoodsCmp').listview('refresh');
+				//更新餐台
+				if(of.order == null){
+					initTableData();
+				}
+				//更新账单
+				$.post('../QueryOrderByCalc.do', {tableID : of.table.id}, function(result){
+					of.table.statusValue == 1;
+					of.order = result.other.order;
+				});
+			} 
+		});	
 	}, 250);	
 };
 
@@ -2085,12 +2085,18 @@ of.submit = function(c){
 		return;
 	}
 	
-	var foodData = [], isFree = true;
-	if(of.table.statusValue == 1){
-		isFree = false;
+	var foodData = [], type = true;
+	if(c.force != undefined && c.force){
+		//force insert
+		type = 23;
+		foodData = of.newFood.slice(0);
+	}else if(of.table.statusValue == 1){
+		//update order
+		type = 7;
 		foodData = of.newFood.slice(0).concat(of.order.orderFoods.slice(0));
 	}else{
-		isFree = true;
+		//insert order
+		type = 1;
 		foodData = of.newFood.slice(0);
 	}
 	
@@ -2099,9 +2105,9 @@ of.submit = function(c){
 	orderDataModel.tableID = of.table.id;
 	orderDataModel.customNum = of.table.customNum;
 	orderDataModel.comment = of.table.comment;
-	orderDataModel.orderFoods = (typeof c.commitType != 'undefined'? of.newFood.slice(0) : foodData);
+	orderDataModel.orderFoods = foodData;
 	orderDataModel.categoryValue =  of.table.categoryValue;
-	if(!isFree){
+	if(of.table.statusValue == 1){
 		orderDataModel.id = of.order.id;
 		orderDataModel.orderDate = of.order.orderDate;
 	}
@@ -2111,125 +2117,49 @@ of.submit = function(c){
 		type : 'post',
 		data : {
 			commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
-			type : (typeof c.commitType != 'undefined'? c.commitType : isFree ? 1 : 7),
+			type : type,
 			notPrint : c.notPrint
 		},
 		success : function(data, status, xhr) {
 			//下单成功时才出现倒数, 否则提示是否强制提交
-			if (data.success) {
-					if(typeof c.tempPrint != 'undefined'){
-						$.ajax({
-							url : '../QueryOrderByCalc.do',
-							type : 'post',
-							data : {
-								calc : false,
-								tableID : of.table.id
-							},
-							dataType : 'text',
-							success : function(results, status, xhr){
-								if(typeof results == "string"){
-									results = eval("(" + results + ")");
-								}
-								
-								if(results.success){
-									$.ajax({
-										url : '../PayOrder.do',
-										type : 'post',
-										data : {
-											orderID : results.other.order.id,
-											cashIncome : '-1',
-											tempPay : true,
-											isPrint : typeof c.isPrint == 'boolean' ? c.isPrint : true
-										},
-										dataType : 'text',
-										success : function(result, status, xhr){
-											Util.LM.hide();
-											if(typeof result == "string"){
-												result = eval("(" + result + ")");
-											}
-											if(result.success){
-												Util.msg.alert({
-													topTip : true,
-													msg : result.data
-												});
-												//暂结应该是没有回调方法的
-//												if(of.afterCommitCallback != null && typeof of.afterCommitCallback == 'function'){
-//													of.afterCommitCallback();
-//												}
-				//								initOrderData({table : uo.table});
-											}else{
-												Util.msg.alert({
-													title : '错误',
-													renderTo : 'orderFoodMgr',
-													msg : result.data,
-													time : 3
-												});
-											}
-										},
-										error : function(xhr, status, err){
-											Util.LM.hide();
-											Util.msg.alert({
-												title : '错误',
-												renderTo : 'orderFoodMgr',
-												msg : err,
-												time : 3
-											});
-										}
-									});
-								}else{
-									Util.LM.hide();
-									Util.msg.alert({
-										title : '错误',
-										renderTo : 'orderFoodMgr',
-										msg : results.data,
-										time : 3
-									});
-								}
-							},
-							error : function(xhr, status, err){
-								Util.LM.hide();
-								Util.msg.alert({
-									title : '错误',
-									renderTo : 'orderFoodMgr',
-									msg : err,
-									time : 3
-								});
-							}
-						});
+			if (data.success){
 
-					}else{
-						of.newFood = [];
-						Util.LM.hide();								
-						closePinyin();
-						closeHandWriting();
-						Util.msg.alert({
-							msg : data.msg,
-							topTip : true
-						});
-						
-						//从已点菜进入时, 返回已点菜界面
-						if(of.afterCommitCallback != null && typeof of.afterCommitCallback == 'function'){
-							
-							//先送则停留在本页面
-							if(of.orderBeforeCallback){
-								//标示为先送返回
-								uo.fromBack = true;
-								of.orderBeforeCallback();
-							}else{
-								//去除表示
-								delete uo.fromBack;
-								of.afterCommitCallback();
-							}
-						}else{//从主界面进入
-							//先送则停留在本页面
-							if(of.orderBeforeCallback){
-								of.orderBeforeCallback();
-							}else{
-								uo.back();
-							}
-						}						
-					}
-			} else {
+				of.newFood = [];
+				Util.LM.hide();								
+				closePinyin();
+				closeHandWriting();
+				Util.msg.alert({
+					msg : data.msg,
+					topTip : true
+				});
+				
+				//TODO
+				if(c.postSubmit){
+					c.postSubmit();
+				}
+				
+				// //从已点菜进入时, 返回已点菜界面
+				// if(of.afterCommitCallback != null && typeof of.afterCommitCallback == 'function'){
+// 					
+					// //先送则停留在本页面
+					// if(of.orderBeforeCallback){
+						// //标示为先送返回
+						// uo.fromBack = true;
+						// of.orderBeforeCallback();
+					// }else{
+						// //去除表示
+						// delete uo.fromBack;
+						// of.afterCommitCallback();
+					// }
+				// }else{//从主界面进入
+					// //先送则停留在本页面
+					// if(of.orderBeforeCallback){
+						// of.orderBeforeCallback();
+					// }else{
+						// uo.back();
+					// }
+				// }						
+			}else {
 				Util.LM.hide();
 				Util.msg.alert({
 					title : data.title,
@@ -2239,8 +2169,12 @@ of.submit = function(c){
 					btnEnter : '继续提交',
 					fn : function(btn){
 						if(btn == 'yes'){
-							c.commitType = 23;
-							of.submit(c);
+							of.submit({
+								force : true,
+								postSubmit : function(){
+									uo.entry({table : of.table});
+								}
+							});
 						}
 					}
 				});
@@ -2704,7 +2638,7 @@ $(function(){
 		
 	});
 	
-	
+	var updateTempTaste = false;
 	//打开手写口味
 	$('#addTaste_a_orderFood').click(function(){
 		var foodContent = $('#orderFoodsCmp > li[data-theme=e]');
@@ -2759,8 +2693,6 @@ $(function(){
 		$('#tempTasteName').focus();
 	});
 
-
-	var updateTempTaste = false;
 	
 	//添加临时口味的确定按钮
 	$('#saveTempTaste_a_orderFood').click(function(){
@@ -2799,7 +2731,7 @@ $(function(){
 		}
 		
 		//当临时口味是修改状态时
-		if(of.ot.updateTempTaste){
+		if(updateTempTaste){
 			if(tasteGroup.tmpTaste){
 				//如果名称为空则是删除
 				if(name){
@@ -2814,7 +2746,7 @@ $(function(){
 			}
 		}else{
 			if(of.ot.tasteId){
-				of.ot.updateTempTaste = true;
+				updateTempTaste = true;
 				saveTempTaste();
 			}else{
 				var tasteId = -11;
@@ -2831,7 +2763,7 @@ $(function(){
 				of.ot.saveOrderFoodTaste();
 			}
 		}
-		of.ot.updateTempTaste = false;	
+		updateTempTaste = false;	
 		of.ot.tasteId = null;
 		
 		$('#closeTempTaste_a_orderFood').click();
@@ -2858,7 +2790,7 @@ $(function(){
 		//正常点菜
 		if(of.orderFoodOperateType == 'normal'){
 			of.newFood = [];
-			$('#normalOrderFood').show();
+			$('#normalOrderFood_a_orderFood').show();
 			$('#btnOrderAndPay').show();
 			$('#addBookOrderFood').hide();
 			$('#bookSeatOrderFood').hide();
@@ -2867,12 +2799,12 @@ $(function(){
 			$('#bookSeatOrderFood').show();
 			$('#addBookOrderFood').hide();
 			$('#btnOrderAndPay').hide();
-			$('#normalOrderFood').hide();		
+			$('#normalOrderFood_a_orderFood').hide();		
 			$('#multiOpenTable').hide();		
 		}else if(of.orderFoodOperateType == 'addBook'){
 			$('#addBookOrderFood').show();
 			$('#bookSeatOrderFood').hide();
-			$('#normalOrderFood').hide();
+			$('#normalOrderFood_a_orderFood').hide();
 			$('#btnOrderAndPay').hide();	
 			$('#multiOpenTable').hide();
 		}else if(of.orderFoodOperateType == 'multiOpenTable'){
@@ -2880,7 +2812,7 @@ $(function(){
 			$('#multiOpenTable').show();
 			$('#addBookOrderFood').hide();
 			$('#bookSeatOrderFood').hide();
-			$('#normalOrderFood').hide();
+			$('#normalOrderFood_a_orderFood').hide();
 			$('#btnOrderAndPay').hide();	
 		}
 			
@@ -2890,7 +2822,7 @@ $(function(){
 		initKitchenContent();
 		
 
-		 //第一次加载不成功, 延迟加载直到显示
+		 //第一次加载不成功,延迟来一直加载达到菜品显示出来为止
 		(function initFoodContent(){
 			//console.log($('#foodsCmp')[0].clientHeight);
 			if($('#foodsCmp')[0].clientHeight != 0){
@@ -2899,7 +2831,6 @@ $(function(){
 				setTimeout(arguments.callee, 500);
 			}
 		})();
-		
 		of.initNewFoodContent();
 	
 	});
@@ -2977,7 +2908,7 @@ $(function(){
 			initDeptContent();
 		});	
 		
-	};
+	}
 
 
 	/**
@@ -3034,7 +2965,7 @@ $(function(){
 		
 		closePinyin();
 		closeHandWriting();
-	};
+	}
 	
 	
 
@@ -3152,9 +3083,89 @@ $(function(){
 		});
 	};
 
+	//快餐模式下牌子号的点击事件
+	$('#brand_a_orderFood').click(function(){
+		$('#orderFoodByBrandCmp').popup('open');
+	});
 	
+	$('#orderFoodByBrandCmp').on('popupafteropen', function(){
+		setTimeout(function(){
+			$("#brandText_input_orderFood").val('1');
+			$('#brandText_input_orderFood').focus();
+		}, 100);	
+	});
+	
+	function getTableByBand(band){
+		for(x in tables){
+			if(tables[x].alias == band){
+				return tables[x];		
+			}
+		}
+	}
 
 	
+	
+	//输入牌子号的确定的点击事件
+	$('#brandSubmit_a_orderFood').click(function(){
+		var brandNo;
+		if($("#brandText_input_orderFood").val()){
+			brandNo = parseInt($("#brandText_input_orderFood").val());
+			var bandTemp = tables.slice(0);
+			
+			//遍历来判断输入的牌子号是否存在
+			for(var i = 0; i < bandTemp.length; i++){
+				if(brandNo == bandTemp[i].alias){
+					of.table = bandTemp[i];
+					break;
+				}
+			}
+			
+			if(of.table){
+				of.submit({
+					notPrint : false,
+					force : true,
+					postSubmit : function(){
+						pm.entry({table:of.table});
+					}
+				});
+			}else{
+				Util.msg.alert({
+					msg : '没有此餐桌号.', 
+					topTip : true
+				});
+			}
+			
+		}else{
+			Util.msg.alert({
+				msg : '请输入餐桌号.', 
+				topTip : true
+			});
+		}
+		
+	});
+	
+	//牌子号的取消按钮
+	$('#brandClose_a_orderFood').click(function(){
+		$('#orderFoodByBrandCmp').popup('close');
+	
+		$('#brandText_input_orderFood').val("");
+	});
+
+
+
+	//普通结账按钮事件
+	$('#normalOrderFood_a_orderFood').click(function(){
+		of.submit({
+			notPrint : false,
+			postSubmit : function(){
+				uo.entry({table : of.table});
+			}
+		});
+		
+	});
+	
+	
+
 
 	
 });

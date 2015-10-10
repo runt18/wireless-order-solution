@@ -71,7 +71,7 @@ $(document).on("pagebeforeshow","#orderFoodListMgr",function(){
  * @param {object} c  
  */
 uo.entry = function(c){
-	
+	location.href = '#orderFoodListMgr';
 	//加载退出原因
 	if(uo.reasons.length <= 0){
 		//加载退菜原因
@@ -1660,6 +1660,13 @@ uo.bindWeixinMember = function(){
 	}, 'json');	
 };
 
-
+$(function(){
+	//已点菜界面的结账按钮事件
+	$('#payOrder_a_checkOut').click(function(){
+		pm.entry({table:uo.table});
+	});
+	
+	
+});
 
 

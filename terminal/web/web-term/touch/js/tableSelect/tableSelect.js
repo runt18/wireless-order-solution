@@ -161,18 +161,18 @@ $(function(){
 		//下单并结账
 		$('#orderPay_li_orderFood').show();
 		//已点菜结账按钮
-		$('#btnPayBill').show();
+		$('#payOrder_a_checkOut').show();
 		//收银端餐台列表高度
 		tableListHeight = 130;	
 		
-	}else if(systemStatus == 3){//try端
+	}else if(systemStatus == 4){//try端
 		//日结,交班等
 		$('#divPosOperation').show();
 		$('#btnOrderAndPay').show();
 		//下单并结账
 		$('#orderPay_li_orderFood').hide();
 		//已点菜结账按钮
-		$('#btnPayBill').show();		
+		$('#payOrder_a_checkOut').show();		
 		//收银端餐台列表高度
 		tableListHeight = 130;	
 		//try端不可进入后台
@@ -185,7 +185,7 @@ $(function(){
 		//下单并结账
 		$('#orderPay_li_orderFood').hide();
 		//已点菜结账按钮
-		$('#btnPayBill').hide();
+		$('#payOrder_a_checkOut').hide();
 		//收银端餐台列表高度
 		tableListHeight = 86;
 	}
@@ -1446,7 +1446,6 @@ ts.openApartTableAction = function(s){
 		Util.LM.hide();
 		if(result.success){
 			uo.closeTransOrderFood();
-			location.href = '#orderFoodListMgr';
 			uo.entry({
 				table : result.root[0]
 			});
@@ -1702,7 +1701,7 @@ function updateTable(c){
 				if(c.toPay){
 					//关闭选台
 					uo.closeTransOrderFood();
-					showPaymentMgr(c);
+					pm.entry(c);
 				}else{
 					handleTableForTS(c);
 				}
@@ -1741,7 +1740,6 @@ function handleTableForTS(c){
 				//关闭选台
 				uo.closeTransOrderFood();
 				//去已点菜界面
-				location.href="#orderFoodListMgr";
 				uo.entry({
 					table : table
 				});
@@ -1785,7 +1783,6 @@ function handleTableForTS(c){
 					initTableData();
 				}
 				//去已点菜界面
-				location.href="#orderFoodListMgr";
 				uo.entry({
 					table : table
 				});
@@ -4063,7 +4060,6 @@ ts.multiPayTableOrderFood = function(){
 			//关闭选台
 			ts.closeMultiPayTableCmp();		
 			//进入已点菜界面
-			location.href = '#orderFoodListMgr';
 			uo.entry({
 				table : ts.multiPayTableChoosedTable[0]
 			});

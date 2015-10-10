@@ -79,7 +79,7 @@
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageMemberOperation">会员</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="toOrderMgrPage()">账单</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:2, businessStatic:2})">交款</a>
-			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:0})">交班</a>
+			<a data-role="button" data-inline"true" class="topBtnFont" onclick="getDailyInfo({queryType:0})">交班</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:1})">日结</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" id="btnToBasicPage" data-rel="popup" data-transtion="pop" href="#toBasicMgr">后台</a>
 		 </div>
@@ -157,6 +157,7 @@
 	 <!-- 餐台更多操作 -->
 	<div data-role="popup" id="tableSelectOtherOperateCmp" data-theme="d">
         <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+         	<li class="tempFoodKitchen"  onclick="uo.goToCreateOrder()"><a >快餐模式</a></li>
             <li class="tempFoodKitchen" onclick="ts.openMultiOpenTableCmp()"><a >多台开席</a></li>
             <li class="tempFoodKitchen" onclick="ts.openMultiPayTableCmp()"><a >拼台</a></li>
         </ul>
@@ -1111,7 +1112,7 @@
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="ss" onclick="uo.goToCreateOrder()">点菜</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.tempPayForUO()">暂结</a>
-		 	<a id="btnPayBill" data-role="button" data-inline="true" class="bottomBtnFont none" onclick="showPaymentMgr({table:uo.table})" >结账</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont none" id="payOrder_a_checkOut">结账</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loadOrderDetail();lookupOrderDetailByType('detail_all');">明细</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#popupDiscountCmp">折扣</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.transTableForTS()">转台</a>
@@ -1600,7 +1601,8 @@
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="addBookOrderFood" onclick="ts.bookFoodChooseFinish()">选好了</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="bookSeatOrderFood" onclick="ts.bookTableCommitOrderFood()">入座</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="multiOpenTable" onclick="ts.multiOpenTableCommitOrderFood()">多台开席</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="normalOrderFood" onclick="of.submit({notPrint : false})">下单</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="brand_a_orderFood">牌子号</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="normalOrderFood_a_orderFood">下单</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#moreOrderFood">下单>></a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="handWriteBoard_a_orderFood">手写板</a>
@@ -1828,7 +1830,54 @@
 				 <a  data-role="button" data-inline="true" data-rel="back" class="countPopbottomBtn">取消</a>		 
 			 </div>
 	    </div>
-	</div>		
+	</div>	
+	
+	<!-- 牌子号 -->
+	<div id="orderFoodByBrandCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
+	    <div data-role="header" data-theme="b" class="ui-corner-top">
+	        <h1>输入牌子号</h1>
+	    </div>
+	    <div style="max-height: 300px; overflow-y: auto;">
+			<div id="calculator4OrderFoodByBrand" class="calculator">
+				<div class="top">
+					<span class="clear">+</span>
+					<span class="inputs">
+						<input id=brandText_input_orderFood style="font-size: 20px;font-weight: bold;" onfocus="setInput('brandText_input_orderFood')">
+					</span>
+					<span class="clear">-</span>
+				</div>
+				<div class="keys">
+					<span>7</span>
+					<span>8</span>
+					<span>9</span>
+					<span>0</span>
+					
+					<span>4</span>
+					<span>5</span>
+					<span>6</span>
+					<span>.</span>
+					
+					<span>1</span>
+					<span>2</span>
+					<span>3</span>
+					<span class="clear">C</span>
+				</div>
+			</div>		    
+	    
+		</div>	
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn"  id="brandSubmit_a_orderFood">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="brandClose_a_orderFood">取消</a>		 
+			 </div>
+	    </div>
+	</div>	
+	
+	
+	
+	
+	
+		
 	
 	<!-- 助记码输入 -->
 	<div id="orderFoodByAliasCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">

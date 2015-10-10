@@ -99,7 +99,7 @@ var PayTypeEnum = {
 	MIXED : { val : 100, desc : '混合'}
 };
 
-function showPaymentMgr(c){
+pm.entry = function(c){
 	if(!c || !c.table){
 		Util.msg.alert({msg : '账单不存在', topTip: true});
 		return;
@@ -211,7 +211,7 @@ function showPaymentMgr(c){
 		$('#paymentMgr').append(payment_popupCouponCmp4MemberTemplet);
 	}		
 	
-}
+};
 
 //加载账单数据
 function refreshOrderData(_c){
@@ -1324,18 +1324,18 @@ function closeMemberInfoWin(){
 
 //改单
 function toCheckoutPage(){
-	location.href = '#orderFoodListMgr';
 	uo.entry({
 		table : pm.table
 	});	
 }
 
-//$(function(){
-//	//微信支付Button
-//	$('#wx_a_payment').click(function(){
-//		paySubmit(PayTypeEnum.WX.val);
-//	});
-//});
+// $(function(){
+	// // //微信支付Button
+	// // $('#wx_a_payment').click(function(){
+		// // paySubmit(PayTypeEnum.WX.val);
+	// // });
+// 	
+// });
 
 
 
