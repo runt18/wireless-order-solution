@@ -12,6 +12,14 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqPrintContent extends RequestPackage{
 	
+	public static ReqPrintContent buildWxReceipt(Staff staff, String codeUrl){
+		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_WX_RECEIT);
+		Parcel p = new Parcel();
+		p.writeString(codeUrl);
+		req.body = p.marshall();
+		return req;
+	}
+	
 	public static ReqPrintContent buildMemberReceipt(Staff staff, int memberOperationId){
 		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_MEMBER_RECEIPT);
 		Parcel p = new Parcel();
