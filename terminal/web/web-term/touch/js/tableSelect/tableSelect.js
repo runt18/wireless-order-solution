@@ -2050,7 +2050,7 @@ function getDailyInfo(c){
 		$('#btnSubmitDailyOperation .ui-btn-text').html('交款');
 		ts.dailyOpe.otype = 'jiaokuan';
 	}else if(c.queryType == 0){//交班
-		$('#title4DailyInfoTable').htmltitle4DailyInfoTable('<font color="#f7c942">交班表</font> -- 交班人 : '+ ln.staffData.staffName);
+		$('#title4DailyInfoTable').html('<font color="#f7c942">交班表</font> -- 交班人 : '+ ln.staffData.staffName);
 		$('#btnSubmitDailyOperation .ui-btn-text').html('交班');
 		ts.dailyOpe.otype = 'jiaoban';
 	}else if(c.queryType == 1){//日结

@@ -79,7 +79,7 @@
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageMemberOperation">会员</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="toOrderMgrPage()">账单</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:2, businessStatic:2})">交款</a>
-			<a data-role="button" data-inline"true" class="topBtnFont" onclick="getDailyInfo({queryType:0})">交班</a>
+			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:0})">交班</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:1})">日结</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" id="btnToBasicPage" data-rel="popup" data-transtion="pop" href="#toBasicMgr">后台</a>
 		 </div>
@@ -962,7 +962,7 @@
 	    <table>
 	    	<tr>
 	    		<td class="readMemberTd">预订日期:</td>
-	    		<td><input type="date" data-role="datebox" id="add_bookDate" data-options='{"mode": "datebox"}' ></td></td>
+	    		<td><input type="date" data-role="datebox" id="add_bookDate" data-options='{"mode": "datebox"}' ></td>
 	    		
 	    		<td class="readMemberTd">预订时间:</td>
 	    		<td id="add_bookTimeBox"><input id="add_bookTime" class="bookTime" ></td>
