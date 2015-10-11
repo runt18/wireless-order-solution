@@ -72,7 +72,7 @@ $(document).on("pagebeforeshow","#orderFoodListMgr",function(){
  */
 uo.entry = function(c){
 	location.href = '#orderFoodListMgr';
-	//加载退出原因
+	//加载退菜原因
 	if(uo.reasons.length <= 0){
 		//加载退菜原因
 		$.post('../QueryCancelReason.do', function(result){
@@ -82,10 +82,9 @@ uo.entry = function(c){
 			}
 		});			
 	}
-	
-	if(true){
-		uo.loadDiscountCmp();
-	}
+
+	//加载折扣方案
+	uo.loadDiscountCmp();
 	
 	//异步刷新账单
 	initOrderData({table : c.table});
@@ -147,16 +146,6 @@ function initOrderData(c){
 				
 				uo.showOrder();
 				uo.showDescForUpdateOrder();
-			    c.createrOrder == 'createrOrder' ? of.entry({
-					table : uo.table,
-					order : uo.order,
-					orderFoodOperateType : 'normal',
-					callback : function(){
-						location.href = '#orderFoodListMgr';
-						//异步刷新账单
-						initOrderData({table : uo.table});
-					}
-				}) : null;
 									
 			}else{
 				//清空账单信息
@@ -1378,28 +1367,10 @@ uo.submitUpdateOrderHandler = function(c){
  * 去点菜界面
  */
 uo.goToCreateOrder = function(){
-	//判断页面信息是否有改动
-	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
-		//FIXME 每点一次餐台都去更新菜品
-//		initFoodData();
-		
-		of.entry({
-			table : uo.table,
-			order : uo.order,
-			orderFoodOperateType : 'normal',
-			callback : function(){
-				location.href = '#orderFoodListMgr';
-				//异步刷新账单
-				initOrderData({table : uo.table});				
-			}
-		});
-	}else{
-		Util.msg.alert({
-			title : '重要提示',
-			msg : '账单已经修改，请先做“确认修改”操作。',
-			time : 3
-		});
-	}
+	of.entry({
+		table : uo.table,
+		orderFoodOperateType : 'normal'
+	});
 };
 
 /**

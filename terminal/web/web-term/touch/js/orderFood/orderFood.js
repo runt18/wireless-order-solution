@@ -70,23 +70,86 @@ var of = {
  * 入口, 加载点菜页面数据
  */
 of.entry = function(c){
-	of.table = c.table;
-	of.table.comment = c.comment;
-	of.order = typeof c.order != 'undefined' ? c.order : null;
-	of.orderFoodOperateType = c.orderFoodOperateType;
-	of.afterCommitCallback = typeof c.callback == 'function' ? c.callback : null;
-
-	//清空选中的全单口味
-	of.ot.allBillTaste && delete of.ot.allBillTaste;
-	//更新沽清
-	of.updataSelloutFoods();
-	// //加载菜品数据
-	// toOrderFoodPage(of.table);	
-		//去点餐界面
+	//去点餐界面
 	location.href = '#orderFoodMgr';
-		
 	
-	$('#orderFoodMgr').trigger('entry', of.table);
+	Util.LM.show();
+	$.ajax({
+		url : '../QueryTable.do',
+		type : 'post',
+		data : {
+			tableID : !c.table.alias || c.table.alias == 0 ? c.table.id : '', 
+			alias : c.table.alias
+		},
+		success : function(data, status, xhr){
+			if(data.success && data.root.length > 0){
+				of.table = data.root[0];
+				of.table.comment = c.comment;
+
+				of.orderFoodOperateType = c.orderFoodOperateType;
+
+				//清空选中的全单口味
+				of.ot.allBillTaste && delete of.ot.allBillTaste;
+				//获取沽清菜品的数据
+				$.post('../QueryMenu.do', {dataSource : 'stopAndLimit'}, function(result){
+					if(result.success){
+						updateSellout(result.root);
+						//触发entry事件创建部门厨房按钮
+						$('#orderFoodMgr').trigger('entry', of.table);
+					}
+				});
+				
+				if(of.table.statusValue == 1){
+					//餐台是就餐状态下需要获取原有的账单信息
+					$.post('../QueryOrderByCalc.do', {tableID : c.table.id}, function(result){
+						if(result.success){
+							of.order = result.other.order;
+						}else{
+							of.order = null;
+						}
+					});
+				}else{
+					of.order = null;
+				}
+			}else{
+				Util.msg.alert({
+					renderTo : 'orderFoodMgr',
+					msg : '没有找到此餐台信息'
+				});
+			}
+			Util.LM.hide();
+		},
+		error : function(request, status, err){
+			Util.LM.hide();
+			Util.msg.alert({
+				renderTo : 'orderFoodMgr',
+				msg : err
+			});
+		}
+	});
+
+	function updateSellout(selloutFoods){
+		for (var j = 0; j < of.foodList.length; j++) {
+			//先把菜品全部变为不停售的, 因为可能之前是停售的, 现在不停售了
+			of.foodList[j].status &= ~(1 << 2);
+			for (var i = 0; i < selloutFoods.length; i++) {
+				if(of.foodList[j].id == selloutFoods[i].id){
+					if(selloutFoods[i].foodLimitRemain == 0){
+						of.foodList[j].status |= (1 << 2);
+					}
+					
+					//更新限量沽清剩余
+					if((of.foodList[j].status & 1 << 10) != 0 || selloutFoods[i].foodLimitAmount > 0){
+						//设置菜品为限量沽清属性
+						of.foodList[j].status |= (1 << 10);
+						of.foodList[j].foodLimitAmount = selloutFoods[i].foodLimitAmount;
+						of.foodList[j].foodLimitRemain = selloutFoods[i].foodLimitRemain;
+					}
+					break;
+				}
+			}
+		}
+	}
 
 };
 	
@@ -2017,63 +2080,6 @@ of.findByAliasAction = function(c){
 
 
 /**
- * 下单不打印
- */
-of.orderWithNoPrint = function(){
-	$('#orderOtherOperateCmp').popup('close');
-	setTimeout(function(){
-		of.submit({
-			notPrint : true,
-			postSubmit : function(){
-				uo.entry({table : of.table});
-			}
-		});	
-	}, 250);
-};
-
-/**
- * 下单并且结账
- */
-of.orderAndPay = function(){
-	of.submit({
-		notPrint : false,
-		//设置无论从哪个界面进入点菜, 下单后都会去结账界面
-		postSubmit : function(){
-			pm.entry({table:of.table});
-		}
-	});	
-};
-
-/**
- * 先送
- */
-of.orderBefore = function(){
-	$('#orderOtherOperateCmp').popup('close');
-	setTimeout(function(){
-		of.submit({
-			notPrint : false,
-			postSubmit : function(){
-					//清空已点菜
-				$('#orderFoodsCmp').html('');
-				//清空状态栏
-				$('#divDescForCreateOrde div:first').html('');
-				$('#orderFoodsCmp').listview('refresh');
-				//更新餐台
-				if(of.order == null){
-					initTableData();
-				}
-				//更新账单
-				$.post('../QueryOrderByCalc.do', {tableID : of.table.id}, function(result){
-					of.table.statusValue == 1;
-					of.order = result.other.order;
-				});
-			} 
-		});	
-	}, 250);	
-};
-
-
-/**
  * 账单提交
  */
 of.submit = function(c){
@@ -2107,7 +2113,7 @@ of.submit = function(c){
 	orderDataModel.comment = of.table.comment;
 	orderDataModel.orderFoods = foodData;
 	orderDataModel.categoryValue =  of.table.categoryValue;
-	if(of.table.statusValue == 1){
+	if(of.order){
 		orderDataModel.id = of.order.id;
 		orderDataModel.orderDate = of.order.orderDate;
 	}
@@ -2118,10 +2124,9 @@ of.submit = function(c){
 		data : {
 			commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
 			type : type,
-			notPrint : c.notPrint
+			notPrint : c.notPrint ? c.notPrint : false
 		},
 		success : function(data, status, xhr) {
-			//下单成功时才出现倒数, 否则提示是否强制提交
 			if (data.success){
 
 				of.newFood = [];
@@ -2133,51 +2138,33 @@ of.submit = function(c){
 					topTip : true
 				});
 				
-				//TODO
 				if(c.postSubmit){
 					c.postSubmit();
 				}
 				
-				// //从已点菜进入时, 返回已点菜界面
-				// if(of.afterCommitCallback != null && typeof of.afterCommitCallback == 'function'){
-// 					
-					// //先送则停留在本页面
-					// if(of.orderBeforeCallback){
-						// //标示为先送返回
-						// uo.fromBack = true;
-						// of.orderBeforeCallback();
-					// }else{
-						// //去除表示
-						// delete uo.fromBack;
-						// of.afterCommitCallback();
-					// }
-				// }else{//从主界面进入
-					// //先送则停留在本页面
-					// if(of.orderBeforeCallback){
-						// of.orderBeforeCallback();
-					// }else{
-						// uo.back();
-					// }
-				// }						
 			}else {
-				Util.LM.hide();
-				Util.msg.alert({
-					title : data.title,
-					renderTo : 'orderFoodMgr',
-					msg : data.msg, 
-					buttons : 'YESBACK',
-					btnEnter : '继续提交',
-					fn : function(btn){
-						if(btn == 'yes'){
-							of.submit({
-								force : true,
-								postSubmit : function(){
-									uo.entry({table : of.table});
-								}
-							});
+				//为了防止有其他popup时，无法弹出‘强制提交’的popup，因此延迟执行
+				setTimeout(function(){
+					Util.LM.hide();
+					Util.msg.alert({
+						title : data.title,
+						renderTo : 'orderFoodMgr',
+						msg : data.msg, 
+						buttons : 'YESBACK',
+						btnEnter : '继续提交',
+						fn : function(btn){
+							if(btn == 'yes'){
+								of.submit({
+									force : true,
+									postSubmit : function(){
+										uo.entry({table : of.table});
+									}
+								});
+							}
 						}
-					}
-				});
+					});
+				}, 250);
+
 
 			}
 		},
@@ -3092,18 +3079,8 @@ $(function(){
 		setTimeout(function(){
 			$("#brandText_input_orderFood").val('1');
 			$('#brandText_input_orderFood').focus();
-		}, 100);	
+		}, 100);
 	});
-	
-	function getTableByBand(band){
-		for(x in tables){
-			if(tables[x].alias == band){
-				return tables[x];		
-			}
-		}
-	}
-
-	
 	
 	//输入牌子号的确定的点击事件
 	$('#brandSubmit_a_orderFood').click(function(){
@@ -3122,7 +3099,6 @@ $(function(){
 			
 			if(of.table){
 				of.submit({
-					notPrint : false,
 					force : true,
 					postSubmit : function(){
 						pm.entry({table:of.table});
@@ -3147,11 +3123,7 @@ $(function(){
 	//牌子号的取消按钮
 	$('#brandClose_a_orderFood').click(function(){
 		$('#orderFoodByBrandCmp').popup('close');
-	
-		$('#brandText_input_orderFood').val("");
 	});
-
-
 
 	//普通结账按钮事件
 	$('#normalOrderFood_a_orderFood').click(function(){
@@ -3164,9 +3136,56 @@ $(function(){
 		
 	});
 	
+	//下单并结账按钮事件
+	$('#orderPay_li_orderFood').click(function(){
+		$('#orderMore_div_orderFood').popup('close');
+		of.submit({
+			//设置无论从哪个界面进入点菜, 下单后都会去结账界面
+			postSubmit : function(){
+				pm.entry({table:of.table});
+			}
+		});
+	});
 	
-
-
+	//下单不打印按钮事件
+	$('#orderNotPrint_li_orderFood').click(function(){
+		$('#orderMore_div_orderFood').popup('close');
+		of.submit({
+			notPrint : true,
+			postSubmit : function(){
+				uo.entry({table : of.table});
+			}
+		});	
+	});
+	
+	
+	//先送按钮事件
+	$('#orderPre_li_orderFood').click(function(){
+		$('#orderMore_div_orderFood').popup('close');
+		of.submit({
+			notPrint : false,
+			postSubmit : function(){
+				//清空已点菜
+				$('#orderFoodsCmp').html('');
+				//清空状态栏
+				$('#divDescForCreateOrde div:first').html('');
+				$('#orderFoodsCmp').listview('refresh');
+				//更新餐台
+				if(of.order == null){
+					initTableData();
+				}
+				
+				//更新餐台
+				$.post('../QueryTable.do', {tableID : of.table.id}, function(result){
+					of.table = result.root[0];
+				});
+				//更新账单
+				$.post('../QueryOrderByCalc.do', {tableID : of.table.id}, function(result){
+					of.order = result.other.order;
+				});
+			} 
+		});	
+	});		
 	
 });
 

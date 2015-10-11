@@ -1603,7 +1603,7 @@
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="multiOpenTable" onclick="ts.multiOpenTableCommitOrderFood()">多台开席</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="brand_a_orderFood">牌子号</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="normalOrderFood_a_orderFood">下单</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#moreOrderFood">下单>></a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#orderMore_div_orderFood">下单>></a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="handWriteBoard_a_orderFood">手写板</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="pinyinBoard_a_orderFood">拼音</a>
@@ -1615,19 +1615,12 @@
 			 </div>
 
 		</div>
-		<!-- 更多操作 -->
-		<div data-role="popup" id="orderOtherOperateCmp" data-theme="d">
-	        <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-	            <li class="tempFoodKitchen" onclick="of.orderWithNoPrint()"><a >下单不打印</a></li>
-	            <li class="tempFoodKitchen" onclick="of.orderBefore()"><a >先送</a></li>
-	        </ul>
-		</div>	
 		<!--下单>>操作  -->	
-		<div data-role="popup" id="moreOrderFood" data-theme="d">
+		<div data-role="popup" id="orderMore_div_orderFood" data-theme="d">
 	        <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-	       	    <li id="orderPay_li_orderFood" class="tempFoodKitchen" onclick="of.orderAndPay()"><a>下单并结账</a></li>
-	            <li class="tempFoodKitchen" onclick="of.orderWithNoPrint()"><a >下单不打印</a></li>
-	            <li class="tempFoodKitchen" onclick="of.orderBefore()"><a >先送</a></li>       	     
+	       	    <li id="orderPay_li_orderFood" class="tempFoodKitchen"><a>下单并结账</a></li>
+	            <li id="orderNotPrint_li_orderFood" class="tempFoodKitchen"><a >下单不打印</a></li>
+	            <li id="orderPre_li_orderFood" class="tempFoodKitchen"><a >先送</a></li>       	     
 	        </ul>
 		</div>
 		

@@ -1563,18 +1563,18 @@ ts.renderToCreateOrder = function(tableNo, peopleNo){
 		ts.closeTableWithPeople();
 		
 		setTimeout(function(){
-			var theTable = getTableByAlias(tableNo);
+			var tableToAlias = getTableByAlias(tableNo);
 			//同时操作餐台时,选中状态没变化的餐桌处理
 			//直接写台豪点菜时判断是否已点菜, 是则先给co.order.orderFoods赋值
-			if(theTable.statusValue == 1){
-				initOrderData({
-					table : getTableByAlias(tableNo),
-					createrOrder : 'createrOrder'
+			if(tableToAlias.statusValue == 1){
+				of.entry({
+					table : tableToAlias,
+					orderFoodOperateType : 'normal'
 				});
 			}else{
-				theTable.customNum = peopleNo;
+				tableToAlias.customNum = peopleNo;
 				of.entry({
-					table : theTable,
+					table : tableToAlias,
 					comment : $('#inputTableOpenCommon').val(),
 					orderFoodOperateType : 'normal'
 				});
@@ -1689,9 +1689,8 @@ function updateTable(c){
 		url : '../QueryTable.do',
 		type : 'post',
 		data : {
-			tableID : !c.alias || c.alias == 0?c.id : '', 
-			alias : c.alias,
-			random : Math.random()
+			tableID : !c.alias || c.alias == 0 ? c.id : '', 
+			alias : c.alias
 		},
 //		async : false,
 		success : function(data, status, xhr){
