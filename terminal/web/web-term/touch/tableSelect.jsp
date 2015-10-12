@@ -157,7 +157,7 @@
 	 <!-- 餐台更多操作 -->
 	<div data-role="popup" id="tableSelectOtherOperateCmp" data-theme="d">
         <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-         	<li class="tempFoodKitchen"  onclick="uo.goToCreateOrder()"><a >快餐模式</a></li>
+         	<li id="fastFood_li_tableSelect" class="tempFoodKitchen" style="display:none;"><a >快餐模式</a></li>
             <li class="tempFoodKitchen" onclick="ts.openMultiOpenTableCmp()"><a >多台开席</a></li>
             <li class="tempFoodKitchen" onclick="ts.openMultiPayTableCmp()"><a >拼台</a></li>
         </ul>
@@ -1495,7 +1495,7 @@
 <div data-role="page" id="orderFoodMgr" >
 	<div class="ui-grid-a" style="width: 100%;background-color: skyblue;border-bottom:1px solid white;">
 		<div class="ui-block-a" data-role="controlgroup" data-corners="false" style="width:102px;">
-			 <a id="divNFCOTableBasicMsg" data-role="button" data-inline="true" class="tableBasicMsg">112<br>虞美人</a>
+			 <a id="divNFCOTableBasicMsg" data-role="button" data-inline="true" style="font-size:20px;" class="tableBasicMsg">112<br>虞美人</a>
 			 <a data-role="button" data-inline="true" class="tableStatus">已点菜</a>		 
 		</div>
 		<div class="ui-block-b" style="width: -webkit-calc(100% - 102px);width: -moz-calc(100% - 102px);width: -ms-calc(100% - 102px);width: -o-calc(100% - 102px);">
@@ -1593,7 +1593,7 @@
 		
 		<div id="normalOperateFoodCmp" style="height: 60px;padding-top: 25px;">		
 			<div data-role="controlgroup" class="ui-btn-left " data-type="horizontal">
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="back">返回</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="back" id="orderFoodBack_a_orderFood">返回</a>
 			 	<a onclick="Util.to.scroll({content:'divOrderFoodsCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
 			 	<a onclick="Util.to.scroll({content:'divOrderFoodsCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>
 			 </div>
@@ -1601,9 +1601,9 @@
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="addBookOrderFood" onclick="ts.bookFoodChooseFinish()">选好了</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="bookSeatOrderFood" onclick="ts.bookTableCommitOrderFood()">入座</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="multiOpenTable" onclick="ts.multiOpenTableCommitOrderFood()">多台开席</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="brand_a_orderFood">牌子号</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="brand_a_orderFood" style="display:none">下单</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="normalOrderFood_a_orderFood">下单</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#orderMore_div_orderFood">下单>></a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#orderMore_div_orderFood" id="orderFoodMore_a_orderFood">下单>></a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="handWriteBoard_a_orderFood">手写板</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="pinyinBoard_a_orderFood">拼音</a>
@@ -1836,6 +1836,7 @@
 					<span class="clear">+</span>
 					<span class="inputs">
 						<input id=brandText_input_orderFood style="font-size: 20px;font-weight: bold;" onfocus="setInput('brandText_input_orderFood')">
+						
 					</span>
 					<span class="clear">-</span>
 				</div>
@@ -1908,7 +1909,7 @@
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.findByAliasAction()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.closeAliasOrderFood()">取消</a>		 
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="closeAlias_a_orderFood">取消</a>		 
 			 </div>
 	    </div>
 	</div>	

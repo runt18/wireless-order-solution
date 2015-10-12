@@ -612,11 +612,11 @@ var paySubmit = function(submitType, temp) {
 	}
 	
 	if(eraseQuota && isNaN(eraseQuota)){
-		Util.msg.alert({msg:"请填写正确的抹数金额", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();firstTimeInput = true;}});
+		Util.msg.alert({msg:"请填写正确的抹数金额", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();}});
 		return;
 	}else if(!isNaN(eraseQuota) && eraseQuota > restaurantData.setting.eraseQuota){// 抹数金额
 //		setFormButtonStatus(false);
-		Util.msg.alert({msg:"抹数金额大于设置上限，不能结帐!", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();firstTimeInput = true;}});
+		Util.msg.alert({msg:"抹数金额大于设置上限，不能结帐!", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();}});
 		return;
 	}	
 
@@ -688,12 +688,12 @@ var paySubmit = function(submitType, temp) {
 						closeInputReciptWin();
 						//等完全关闭后再返回
 						setTimeout(function(){
-							//返回餐台界面
-							ts.loadData();
+								//返回餐台界面
+								ts.loadData();	
 						}, 250);
 					}else{
-						//返回餐台界面
-						ts.loadData();						
+								//返回餐台界面
+								ts.loadData();	
 					}
 
 				}
@@ -946,7 +946,6 @@ function mixPayCheckboxAction(c){
 		numForAlias.removeAttr("disabled"); 
 		numForAlias.parent().removeClass('ui-disabled');
 
-		firstTimeInput = true;
 		numForAlias.focus();
 		numForAlias.select();
 		
