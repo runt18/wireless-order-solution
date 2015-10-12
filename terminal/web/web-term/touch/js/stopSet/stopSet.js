@@ -614,7 +614,6 @@ ss.openFoodLimitCmp = function(){
 		$('#inputOrderFoodLimitCountSet').val(ss.insertFood.remianAmount).select();
 	}, 250);
 	
-	firstTimeInput = true;
 	$('#orderFoodLimitCmp').popup('open');
 	$('#orderFoodLimitCmp').parent().addClass("pop").addClass("in");	
 };

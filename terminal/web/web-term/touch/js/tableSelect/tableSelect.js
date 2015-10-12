@@ -149,10 +149,9 @@ var tables = [],
 			+ '<td><div style="height: 25px;overflow: hidden;">{tastePref}</div></td>'
 			+ '<td>{unitPrice}</td>'
 			+ '</tr>';		
-
-
-$(function(){
-	
+			
+//进入餐桌选择界面的时候
+$(document).on('pageinit', "#tableSelectMgr", function(){
 	//pos端 && 体验端 && touch端
 	if(systemStatus == 1){//pos端
 		//日结,交班等
@@ -164,8 +163,8 @@ $(function(){
 		$('#payOrder_a_checkOut').show();
 		//收银端餐台列表高度
 		tableListHeight = 130;	
-		
-	}else if(systemStatus == 4){//try端
+
+	}else if(systemStatus == 3){//try端
 		//日结,交班等
 		$('#divPosOperation').show();
 		$('#btnOrderAndPay').show();
@@ -188,7 +187,30 @@ $(function(){
 		$('#payOrder_a_checkOut').hide();
 		//收银端餐台列表高度
 		tableListHeight = 86;
+	}else if(systemStatus == 4){//快餐模式
+		//日结,交班等
+		$('#divPosOperation').show();
+		$('#btnOrderAndPay').show();
+		//下单并结账
+		$('#orderPay_li_orderFood').show();
+		//已点菜结账按钮
+		$('#payOrder_a_checkOut').show();
+		//快餐模式按钮
+		$('#fastFood_li_tableSelect').show();
+		//收银端餐台列表高度
+		tableListHeight = 130;	
+		
 	}
+});
+
+
+
+$(function(){
+	//快餐模式按钮
+	$('#fastFood_li_tableSelect').click(function(){
+		of.entry({orderFoodOperateType : 'fast'});
+	});
+	
 	
 	//餐厅选择界面高度
 	$('#tableAndRegionsCmp').height(document.body.clientHeight - tableListHeight);	
@@ -1758,7 +1780,6 @@ function handleTableForTS(c){
 				});	*/
 				uo.closeTransOrderFood();
 				//选择开台人数
-				firstTimeInput = true;
 				$('#tableCustomerCountSetTitle').text(c.table.name);
 				//是否为预订台
 				if(ts.table.isBook){
@@ -1793,7 +1814,6 @@ function handleTableForTS(c){
 				}
 				
 				//选择开台人数
-				firstTimeInput = true;
 				$('#tableCustomerCountSetTitle').text(c.table.name);
 				//是否为预订台
 				if(ts.table.isBook){
@@ -3267,7 +3287,6 @@ ts.addFeastDepartment = function(index){
 		
 		$('#numberKeyboard').show();
 		
-		firstTimeInput = true;
 		//设置数字键盘触发
 		numKeyBoardFireEvent = function (){
 			$("#"+fieldId).keyup();

@@ -1,7 +1,6 @@
 // Get all the keys from document
 var keys = document.querySelectorAll('.calculator span');
 var operators = ['+', '-', 'x', '÷'];
-var firstTimeInput = true;
 
 
 // Add onclick event to all the keys and perform operations
@@ -42,14 +41,13 @@ for(var i = 0; i < keys.length; i++) {
 		
 		// if any other key is pressed, just append it
 		else {
-			if(firstTimeInput){
+			if(inputVal == ''){
 				input.val(btnVal);
 			}else{
 				input.val(inputVal + btnVal);
 			}
 			
 		}
-		firstTimeInput = false;
 		
 		//触发key input事件, eg:数字键盘触发搜索餐台
 		if(numKeyBoardFireEvent){
@@ -58,5 +56,5 @@ for(var i = 0; i < keys.length; i++) {
 		
 		// prevent page jumps
 		e.preventDefault();
-	} 
+	} ;
 }

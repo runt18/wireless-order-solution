@@ -381,7 +381,6 @@ uo.openCancelFoodCmp = function(c){
 	
 	$('#numberKeyboard').show();
 	
-	firstTimeInput = true;
 	$('#inputCancelFoodSet').focus();
 	$('#inputCancelFoodSet').select();
 };
@@ -409,17 +408,14 @@ uo.cancelFoodAction = function(){
 		Util.msg.tip('退菜数目不正确');
 		$("#inputCancelFoodSet").val(uo.operateFood.count);
 		$("#inputCancelFoodSet").select();
-		firstTimeInput = true;
 	}else if(isNaN(num)){
 		Util.msg.tip('数字不合规范.');
 		$("#inputCancelFoodSet").val(uo.operateFood.count);
 		$("#inputCancelFoodSet").select();
-		firstTimeInput = true;
 	}else if(num > uo.operateFood.count){
 		Util.msg.tip('退菜数量不能大于原有数量');
 		$("#inputCancelFoodSet").val(uo.operateFood.count);
 		$("#inputCancelFoodSet").select();
-		firstTimeInput = true;
 	}else{
 		num = parseFloat(num).toFixed(2);
 		//退菜信息
@@ -652,7 +648,6 @@ uo.giftAction = function(){
  */
 uo.openGiftOperate = function(){
 	setTimeout(function(){
-		firstTimeInput = true;
 		$('#inputOrderFoodGift').val(uo.selectedFood.count);	
 		$('#inputOrderFoodGift').select();
 		//显示菜名
@@ -840,7 +835,6 @@ uo.useMemberForOrderAction = function(){
 		return;
 	}else if(member.val() <= 0 || isNaN(member.val())){
 		Util.msg.tip('请输入正确的会员信息');			
-		firstTimeInput = true;
 		member.focus();
 		member.select();	
 		return;
@@ -1156,7 +1150,6 @@ uo.openMoreOperate = function(){
 		afterclose: function (event, ui) { 
 			if(uo.updateCustom){//修改人数
 				$('#orderCustomerCountSet').popup('open');
-				firstTimeInput = true;
 				focusInput = 'inputOrderCustomerCountSet';
 				$('#inputOrderCustomerCountSet').focus();
 				$('#inputOrderCustomerCountSet').select();

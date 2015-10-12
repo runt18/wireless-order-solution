@@ -1,3 +1,7 @@
+var Request = new Util_urlParaQuery();
+//1:pos端	2:touch		3:试用 
+var systemStatus = Request["status"]?parseInt(Request["status"]):2;
+
 //点菜界面数据对象
 var of = {
 	table : {},
@@ -65,7 +69,8 @@ var of = {
 	//多单位
 	multiPriceCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="multiPriceCmp" data-index={index} data-value={id} data-theme={theme}><div>{multiPrice}</div></a>',
 
-
+	
+	
 /**
  * 入口, 加载点菜页面数据
  */
@@ -73,60 +78,71 @@ of.entry = function(c){
 	//去点餐界面
 	location.href = '#orderFoodMgr';
 	
-	Util.LM.show();
-	$.ajax({
-		url : '../QueryTable.do',
-		type : 'post',
-		data : {
-			tableID : !c.table.alias || c.table.alias == 0 ? c.table.id : '', 
-			alias : c.table.alias
-		},
-		success : function(data, status, xhr){
-			if(data.success && data.root.length > 0){
-				of.table = data.root[0];
-				of.table.comment = c.comment;
+	//设置点菜界面操作类型
+	of.orderFoodOperateType = c.orderFoodOperateType;
+	//清空选中的全单口味
+	of.ot.allBillTaste && delete of.ot.allBillTaste;
+	
+	of.order = null;
+	of.table = null;
+	if(c.table){
+		Util.LM.show();
+		$.ajax({
+			url : '../QueryTable.do',
+			type : 'post',
+			data : {
+				tableID : !c.table.alias || c.table.alias == 0 ? c.table.id : '', 
+				alias : c.table.alias
+			},
+			success : function(data, status, xhr){
+				if(data.success && data.root.length > 0){
+					of.table = data.root[0];
+					of.table.comment = c.comment;
 
-				of.orderFoodOperateType = c.orderFoodOperateType;
-
-				//清空选中的全单口味
-				of.ot.allBillTaste && delete of.ot.allBillTaste;
-				//获取沽清菜品的数据
-				$.post('../QueryMenu.do', {dataSource : 'stopAndLimit'}, function(result){
-					if(result.success){
-						updateSellout(result.root);
-						//触发entry事件创建部门厨房按钮
-						$('#orderFoodMgr').trigger('entry', of.table);
-					}
-				});
-				
-				if(of.table.statusValue == 1){
-					//餐台是就餐状态下需要获取原有的账单信息
-					$.post('../QueryOrderByCalc.do', {tableID : c.table.id}, function(result){
+					//获取沽清菜品的数据
+					$.post('../QueryMenu.do', {dataSource : 'stopAndLimit'}, function(result){
 						if(result.success){
-							of.order = result.other.order;
-						}else{
-							of.order = null;
+							updateSellout(result.root);
+							//触发entry事件创建部门厨房按钮
+							$('#orderFoodMgr').trigger('entry', of.table);
 						}
 					});
+					
+					if(of.table.statusValue == 1){
+						//餐台是就餐状态下需要获取原有的账单信息
+						$.post('../QueryOrderByCalc.do', {tableID : c.table.id}, function(result){
+							if(result.success){
+								of.order = result.other.order;
+							}
+						});
+					}
 				}else{
-					of.order = null;
+					Util.msg.alert({
+						renderTo : 'orderFoodMgr',
+						msg : '没有找到此餐台信息'
+					});
 				}
-			}else{
+				Util.LM.hide();
+			},
+			error : function(request, status, err){
+				Util.LM.hide();
 				Util.msg.alert({
 					renderTo : 'orderFoodMgr',
-					msg : '没有找到此餐台信息'
+					msg : err
 				});
 			}
-			Util.LM.hide();
-		},
-		error : function(request, status, err){
-			Util.LM.hide();
-			Util.msg.alert({
-				renderTo : 'orderFoodMgr',
-				msg : err
-			});
-		}
-	});
+		});
+	}else{
+		//获取沽清菜品的数据
+		$.post('../QueryMenu.do', {dataSource : 'stopAndLimit'}, function(result){
+			if(result.success){
+				updateSellout(result.root);
+				//触发entry事件创建部门厨房按钮
+				$('#orderFoodMgr').trigger('entry', of.table);
+			}
+		});
+	}
+	
 
 	function updateSellout(selloutFoods){
 		for (var j = 0; j < of.foodList.length; j++) {
@@ -521,7 +537,6 @@ of.openSplitOrderWin = function(c){
 		$('#splitOrderWin').popup('open');
 		$('#splitOrderWin').parent().addClass("pop").addClass("in");
 		
-		firstTimeInput = true;
 		setTimeout(function(){
 			$('#splitOrderCount').focus();
 		}, 200);
@@ -634,7 +649,6 @@ of.operateFoodCount = function(c){
 			$('#orderFoodCountSet').popup('open');
 			$('#orderFoodCountSet').parent().addClass("pop").addClass("in");
 			
-			firstTimeInput = true;
 			$('#inputOrderFoodCountSet').val(data.count);
 			$('#inputOrderFoodCountSet').focus();
 			$('#inputOrderFoodCountSet').select();
@@ -741,7 +755,6 @@ of.openFoodUnitPriceWin = function(c){
 	$('#orderFoodUnitPriceSet').popup('open');
 	$('#orderFoodUnitPriceSet').parent().addClass("pop").addClass("in");
 	
-	firstTimeInput = true;
 	
 	of.openFoodUnitPriceWin.param = c;
 	setTimeout(function(){
@@ -2031,11 +2044,11 @@ function scrolldown(c){
  * 打开助记码
  */
 of.openAliasOrderFood = function(){
-	setTimeout(function(){
-		$('#txtFoodAlias').focus();
-	}, 300);
+	$('#txtFoodAlias').focus();
+	$('#txtFoodAlias').val("");
 	
 	$('#orderFoodByAliasCmp').popup('open');
+	
 	closePinyin();
 	closeHandWriting();
 };
@@ -2077,6 +2090,8 @@ of.findByAliasAction = function(c){
 	data = null;
 	temp = null;
 };
+
+
 
 
 /**
@@ -2768,11 +2783,13 @@ $(function(){
 	});	
 	
 	//进入点菜界面的时候渲染数据
-	$('#orderFoodMgr').on("entry", function(event, table){
-
-		$('#divNFCOTableBasicMsg').html(table.alias + '<br>' + table.name);
-			
-		of.table = table;
+	$('#orderFoodMgr').on("entry", function(event){
+		if(of.table){
+			$('#divNFCOTableBasicMsg').html(of.table.alias + '<br>' + of.table.name);
+		}else{
+			$('#divNFCOTableBasicMsg').html("1号" + '<br>' + "餐桌");
+			document.getElementById("divNFCOTableBasicMsg").style.textAlign="center";
+		}
 			
 		//正常点菜
 		if(of.orderFoodOperateType == 'normal'){
@@ -2801,6 +2818,19 @@ $(function(){
 			$('#bookSeatOrderFood').hide();
 			$('#normalOrderFood_a_orderFood').hide();
 			$('#btnOrderAndPay').hide();	
+		}else if(of.orderFoodOperateType == 'fast'){
+			of.newFood = [];
+			$('#normalOrderFood_a_orderFood').hide();
+			$('#btnOrderAndPay').hide();
+			$('#addBookOrderFood').hide();
+			$('#bookSeatOrderFood').hide();
+			$('#multiOpenTable').hide();
+			//快餐模式的牌子号
+			$('#brand_a_orderFood').show();
+			//下单更多
+			$('#orderFoodMore_a_orderFood').hide();
+			//点菜界面的返回
+			$('#orderFoodBack_a_orderFood').hide();
 		}
 			
 			
@@ -3073,50 +3103,41 @@ $(function(){
 	//快餐模式下牌子号的点击事件
 	$('#brand_a_orderFood').click(function(){
 		$('#orderFoodByBrandCmp').popup('open');
+		$('#brandText_input_orderFood').focus();
+		$('#brandText_input_orderFood').val("");
 	});
-	
-	$('#orderFoodByBrandCmp').on('popupafteropen', function(){
-		setTimeout(function(){
-			$("#brandText_input_orderFood").val('1');
-			$('#brandText_input_orderFood').focus();
-		}, 100);
-	});
-	
 	//输入牌子号的确定的点击事件
 	$('#brandSubmit_a_orderFood').click(function(){
 		var brandNo;
 		if($("#brandText_input_orderFood").val()){
 			brandNo = parseInt($("#brandText_input_orderFood").val());
-			var bandTemp = tables.slice(0);
-			
-			//遍历来判断输入的牌子号是否存在
-			for(var i = 0; i < bandTemp.length; i++){
-				if(brandNo == bandTemp[i].alias){
-					of.table = bandTemp[i];
-					break;
+		}else{
+			brandNo = 1;
+		}
+		var bandTemp = tables.slice(0);
+		
+		//遍历来判断输入的牌子号是否存在
+		for(var i = 0; i < bandTemp.length; i++){
+			if(brandNo == bandTemp[i].alias){
+				of.table = bandTemp[i];
+				break;
+			}
+		}
+		
+		if(of.table){
+			of.submit({
+				force : true,
+				postSubmit : function(){
+					pm.entry({table : of.table});
 				}
-			}
-			
-			if(of.table){
-				of.submit({
-					force : true,
-					postSubmit : function(){
-						pm.entry({table:of.table});
-					}
-				});
-			}else{
-				Util.msg.alert({
-					msg : '没有此餐桌号.', 
-					topTip : true
-				});
-			}
-			
+			});
 		}else{
 			Util.msg.alert({
-				msg : '请输入餐桌号.', 
+				msg : '没有此餐桌号.', 
 				topTip : true
 			});
 		}
+			
 		
 	});
 	
@@ -3185,7 +3206,13 @@ $(function(){
 				});
 			} 
 		});	
-	});		
+	});	
+	
+	//助记码取消按钮
+	$('#closeAlias_a_orderFood').click(function(){
+		$('#orderFoodByAliasCmp').popup('close');
+	});
+	
 	
 });
 
