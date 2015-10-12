@@ -70,20 +70,6 @@ var pm = {table : {}, payByMember:false},
 			'<td style="padding-right: 10px;"><input data-theme="c" id={numberfieldId} class="mixPayInputFont numberInputStyle" disabled="disabled" ></td>'+
 			'</tr>';
 
-//window.history.forward(1); 
-//当离开结账页面时
-$(document).on("pagebeforehide","#paymentMgr",function(){ 
-	$('#numberKeyboard').hide();
-	document.getElementById("totalPrice").innerHTML = 0.00;
-	document.getElementById("shouldPay").innerHTML = 0.00;
-	document.getElementById("forFree").innerHTML = 0.00;
-	document.getElementById("spanCancelFoodAmount").innerHTML = 0.00;
-	document.getElementById("discountPrice").innerHTML = 0.00;	
-	checkOut_actualPrice = 0;
-	orderMsg = null;
-	
-});
-
 var SettleTypeEnum = {
 	NORMAL : { val : 1, desc : '普通结账' },
 	MEMBER : { val : 2, desc : '会员结账' }
@@ -599,9 +585,7 @@ var paySubmit = function(submitType, temp) {
 	if(isPaying == true){ 
 		return; 
 	}
-	var actualPrice = checkOut_actualPrice;
 	var eraseQuota = $("#txtEraseQuota").val();
-	var submitPrice = -1;
 
 	//是否发送短信
 	var sendSms = false;
@@ -628,11 +612,9 @@ var paySubmit = function(submitType, temp) {
 	}else{
 		settleType = SettleTypeEnum.NORMAL.val;
 	}
-	// 现金
-	if (submitType == PayTypeEnum.CASH.val) {
-		submitPrice = actualPrice;
-		
-	}else if(submitType == PayTypeEnum.MEMBER.val){//会员结账
+	
+	if(submitType == PayTypeEnum.MEMBER.val){
+		//会员结账
 		//FIXME 要加上抹数?
 		if(member4Display.totalBalance < checkOut_actualPrice){
 			Util.msg.alert({msg : '会员卡余额小于合计金额，不能结帐!', topTip:true});
@@ -658,7 +640,7 @@ var paySubmit = function(submitType, temp) {
 		type : 'post',
 		data : {
 			"orderID" : orderMsg.id,
-			"cashIncome" : submitPrice,
+			"cashIncome" : $('#txtInputRecipt').val(),
 			"payType" : settleType,
 			"payManner" : submitType,
 			"tempPay" : temp == undefined ? 'false' : 'true',
@@ -674,7 +656,7 @@ var paySubmit = function(submitType, temp) {
 			Util.LM.hide();
 			isPaying = false;
 			var dataInfo = resultJSON.data;
-			if (resultJSON.success == true) {
+			if (resultJSON.success) {
 				if(submitType == PayTypeEnum.WX.val){
 					Util.msg.alert({msg : '微信支付二维码打印成功', topTip : true});
 					
@@ -881,20 +863,6 @@ function closeInputReciptWin(){
 	$('#txtInputRecipt').val('');
 }
 
-function payInputRecipt(){
-	var input = $('#txtInputRecipt');
-	if(!input.val()){
-		Util.msg.alert({msg:'请输入结账金额', topTip:true});
-		input.focus();
-		return;
-	}else if(isNaN(input.val())){
-		Util.msg.alert({msg:'请输入正确的金额', topTip:true});
-		input.focus();
-		return;		
-	}
-	paySubmit(PayTypeEnum.CASH.val);
-}
-
 function loadMix(){
 	if(member4Display && member4Display.hadSet){
 		Util.msg.alert({msg:'会员不支持混合结账', topTip:true});
@@ -970,51 +938,6 @@ function setMixPayPrice(c){
 	}	
 }
 
-
-function mixPayAction(temp){
-	payMoneyCalc = {};
-	var checkboxs = $('input[name=mixPayCheckbox]');
-	for (var i = 0; i < checkboxs.length; i++) {
-		var checkbox = $(checkboxs[i]);
-		var numForAlias = $("#"+checkbox.attr('data-for'));		
-		if(checkbox.attr('checked')){
-			payMoneyCalc[checkbox.attr('data-for')] = numForAlias.val();
-		}		
-	}	
-	
-	
-	var mixedPayMoney = checkOut_actualPrice;
-		for(var pay in payMoneyCalc){
-			if(typeof payMoneyCalc[pay] != 'boolean'){
-				//可能存在的小数问题
-				mixedPayMoney = (mixedPayMoney * 10000 - payMoneyCalc[pay] * 10000) / 10000;
-			}
-		}					
-	
-//	if(mixedPayMoney != 0){
-//		Util.msg.alert({msg:'混合结账的金额不等于账单的实收金额', topTip:true});
-//	}else{
-		payTypeCash ='';
-		for (var i = 0; i < payTypeData.length; i++) {
-			var checked = $('#chbForPayType' + payTypeData[i].id).attr('checked');
-			if(checked && $('#numForPayType'+payTypeData[i].id).val()){
-				if(payTypeCash){
-					payTypeCash += '&';
-				}
-				payTypeCash += (payTypeData[i].id + ',' + $('#numForPayType'+payTypeData[i].id).val());  
-			}
-		}	
-		
-		if(temp){
-			paySubmit(PayTypeEnum.MIXED.val, 'temp');
-		}else{
-			paySubmit(PayTypeEnum.MIXED.val);
-//			closeMixedPayWin();				
-		}
-		
-				
-//	}
-}
 
 function closeMixedPayWin(){
 	curMixInput = null;
@@ -1329,13 +1252,119 @@ function toCheckoutPage(){
 	});	
 }
 
-// $(function(){
-	// // //微信支付Button
-	// // $('#wx_a_payment').click(function(){
-		// // paySubmit(PayTypeEnum.WX.val);
-	// // });
-// 	
-// });
+//当离开结账页面时
+$(document).on("pagebeforehide","#paymentMgr",function(){ 
+	//console.log('paymentMgr --- pagebeforehide');
+	$('#numberKeyboard').hide();
+	document.getElementById("totalPrice").innerHTML = 0.00;
+	document.getElementById("shouldPay").innerHTML = 0.00;
+	document.getElementById("forFree").innerHTML = 0.00;
+	document.getElementById("spanCancelFoodAmount").innerHTML = 0.00;
+	document.getElementById("discountPrice").innerHTML = 0.00;	
+	checkOut_actualPrice = 0;
+	orderMsg = null;
+	
+});
+
+//页面初始化
+$(document).on("pageinit", '#paymentMgr', function(){ 
+	//console.log('paymentMgr --- pageinit');
+	//微信支付Button
+	// $('#wx_a_payment').click(function(){
+		 // paySubmit(PayTypeEnum.WX.val);
+	// });
+	
+	//现金结账
+	$('#cash_a_payment').click(function(){
+		paySubmit(PayTypeEnum.CASH.val);
+	});	
+	
+	//刷卡结账
+	$('#credit_a_payment').click(function(){
+		paySubmit(PayTypeEnum.CREDIT_CARD.val);
+	});
+	
+	//签单结账
+	$('#sign_a_payment').click(function(){
+		paySubmit(PayTypeEnum.SIGN.val);
+	});
+	
+	//挂账结账
+	$('#hang_a_payment').click(function(){
+		paySubmit(PayTypeEnum.HANG.val);
+	});
+	
+	//会员余额结账
+	$('#memberPay_a_payment').click(function(){
+		paySubmit(PayTypeEnum.MEMBER.val);
+	});
+	
+	//暂结
+	$('#tempPay_a_payment').click(function(){
+		paySubmit(PayTypeEnum.CASH.val, 'temp')
+	});
+	
+	//现金收款-结账
+	$('#receviedCash_a_payment').click(function(){
+		var input = $('#txtInputRecipt');
+		if(input.val() && !isNaN(input.val())){
+			paySubmit(PayTypeEnum.CASH.val);
+		}else{
+			Util.msg.alert({msg:'请输入正确的结账金额', topTip : true});
+			input.focus();
+		}
+	});
+
+	//混合结账-暂结
+	$('#mixedTempPay_a_payment').click(function(){
+		mixPay(true);
+	});
+	
+	//混合结账-结账
+	$('#mixedPay_a_payment').click(function(){
+		mixPay(false);
+	});
+	
+	function mixPay(temp){
+		payMoneyCalc = {};
+		var checkboxs = $('input[name=mixPayCheckbox]');
+		for (var i = 0; i < checkboxs.length; i++) {
+			var checkbox = $(checkboxs[i]);
+			var numForAlias = $("#"+checkbox.attr('data-for'));		
+			if(checkbox.attr('checked')){
+				payMoneyCalc[checkbox.attr('data-for')] = numForAlias.val();
+			}		
+		}	
+		
+		
+		var mixedPayMoney = checkOut_actualPrice;
+		for(var pay in payMoneyCalc){
+			if(typeof payMoneyCalc[pay] != 'boolean'){
+				//可能存在的小数问题
+				mixedPayMoney = (mixedPayMoney * 10000 - payMoneyCalc[pay] * 10000) / 10000;
+			}
+		}					
+	
+		payTypeCash ='';
+		for (var i = 0; i < payTypeData.length; i++) {
+			var checked = $('#chbForPayType' + payTypeData[i].id).attr('checked');
+			if(checked && $('#numForPayType' + payTypeData[i].id).val()){
+				if(payTypeCash){
+					payTypeCash += '&';
+				}
+				payTypeCash += (payTypeData[i].id + ',' + $('#numForPayType'+payTypeData[i].id).val());  
+			}
+		}	
+		
+		if(temp){
+			paySubmit(PayTypeEnum.MIXED.val, 'temp');
+		}else{
+			paySubmit(PayTypeEnum.MIXED.val);
+		}
+		
+	}
+});
+
 
 
 
