@@ -1,5 +1,5 @@
 //结账界面数据对象
-var pm = {table : {}, payByMember:false},
+var pm = {table : {}},
 	//折扣,服务费方案, 付款方式
 	discountData = [],  servicePlanData = [], payTypeData=[], restaurantData = [],
 	//加载显示账单基础信息
@@ -11,16 +11,13 @@ var pm = {table : {}, payByMember:false},
 	payType = 1, actualMemberID = -1,
 	
 	//付款状态
-	isPaying = false, inputReciptWin,
+	isPaying = false,
 	
 	//筛选账单明细的条件
 	lookupCondtion = "true",
 	
 	//当前折扣 
 	calcDiscountID,
-	
-	//计算混合结账:提交混合结账, 记录混合结账, 设置快捷键
-	payTypeCash ='', payMoneyCalc = {}, isMixedPay = false, curMixInput,
 	
 	//查询出来的菜品列表
 	orderFoodDetails = [],
@@ -62,13 +59,9 @@ var pm = {table : {}, payByMember:false},
 		+ '<td>{orderDateFormat}</td>'
 		+ '<td>{waiter}</td>'
 		+ '<td>{cancelReason}</td>'
-		+ '</tr>',
+		+ '</tr>'
 	
-	//混合结账选项
-	maxTr = '<tr>' +
-			'<td><label><input data-theme="e" id={checkboxId} data-for={numberfieldId} type="checkbox" name="mixPayCheckbox" onclick="mixPayCheckboxAction({event:this})">{name}</label></td>'+
-			'<td style="padding-right: 10px;"><input data-theme="c" id={numberfieldId} class="mixPayInputFont numberInputStyle" disabled="disabled" ></td>'+
-			'</tr>';
+
 
 var SettleTypeEnum = {
 	NORMAL : { val : 1, desc : '普通结账' },
@@ -108,61 +101,6 @@ pm.entry = function(c){
 	
 	//加载混合结账付款方式
 	loadPayTypeData(); 
-	
-	//实时显示找零
-	$('#txtInputRecipt').on('keyup', function(){
-		//计算抹零
-		var eraseQuota = $('#txtEraseQuota').val();
-		var actualPrice = checkOut_actualPrice;
-		if(!isNaN(eraseQuota)){
-			actualPrice = checkOut_actualPrice - eraseQuota;
-		}
-		
-		if($('#txtInputRecipt').val() - actualPrice > 0){
-			$('#txtReciptReturn').text($('#txtInputRecipt').val() - actualPrice);
-		}else{
-			$('#txtReciptReturn').text(0);
-		}
-	});
-	
-	//抹数框输入时
-	$('#txtEraseQuota').focus(function(){
-		focusInput = this.id;
-		usedEraseQuota = false;
-		mouseOutNumKeyboard = true;
-		$('#numberKeyboard').show();	
-		//设置数字键盘触发
-		numKeyBoardFireEvent = function (){
-			$('#txtEraseQuota').keyup();
-		};
-		
-		$('#calculator4NumberKeyboard').on("mouseover", function(){
-			usedEraseQuota = false;
-			mouseOutNumKeyboard = false;
-		});
-		
-		$('#calculator4NumberKeyboard').on("mouseout", function(){
-			usedEraseQuota = true;
-			mouseOutNumKeyboard = true;
-		});			
-	});	
-	
-	
-	//抹数联动
-	$('#txtEraseQuota').on('keyup', function(){
-		var eraseQuota = $('#txtEraseQuota').val();
-		if(eraseQuota && isNaN(eraseQuota)){
-			Util.msg.alert({msg:"请填写正确的抹数金额", topTip:true ,fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();}});
-			return;
-		}else if(!isNaN(eraseQuota) && eraseQuota > restaurantData.setting.eraseQuota){// 抹数金额
-			Util.msg.alert({msg:"抹数金额大于设置上限，不能结帐!", topTip:true,fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();}});
-			return;
-		}			
-//		checkOut_actualPrice = ;
-		$('#shouldPay').html((checkOut_actualPrice * 10000 - eraseQuota * 10000)/10000);
-		
-	});
-	
 	
 	//设置会员动态popup控件
 	//会员信息来源
@@ -245,7 +183,7 @@ function refreshOrderData(_c){
 function loadOrderBasicMsg(){
 	//显示左边价钱
 	document.getElementById("totalPrice").innerHTML = checkDot(orderMsg.totalPrice)?parseFloat(orderMsg.totalPrice).toFixed(2) : orderMsg.totalPrice;
-	document.getElementById("shouldPay").innerHTML = checkDot(orderMsg.actualPrice)?parseFloat(orderMsg.actualPrice).toFixed(2) : orderMsg.actualPrice;
+	document.getElementById("actualPrice_td_payment").innerHTML = checkDot(orderMsg.actualPrice)?parseFloat(orderMsg.actualPrice).toFixed(2) : orderMsg.actualPrice;
 	document.getElementById("forFree").innerHTML = checkDot(orderMsg.giftPrice)?parseFloat(orderMsg.giftPrice).toFixed(2) : orderMsg.giftPrice;
 	document.getElementById("spanCancelFoodAmount").innerHTML = checkDot(orderMsg.cancelPrice)?parseFloat(orderMsg.cancelPrice).toFixed(2) : orderMsg.cancelPrice;
 	document.getElementById("discountPrice").innerHTML = checkDot(orderMsg.discountPrice)?parseFloat(orderMsg.discountPrice).toFixed(2) : orderMsg.discountPrice;
@@ -274,7 +212,7 @@ function loadOrderBasicMsg(){
 	}		
 	
 	//清空抹数和备注
-	$('#txtEraseQuota').val('');
+	$('#erasePrice_input_payment').val('');
 	$('#remark').val('');
 	
 	//账单基础信息
@@ -580,12 +518,17 @@ function setServicePlan(c){
 /**
  * 结账
  */
-var paySubmit = function(submitType, temp) {
-	
+var paySubmit = function(c) {
+
 	if(isPaying == true){ 
 		return; 
 	}
-	var eraseQuota = $("#txtEraseQuota").val();
+	
+	if(c.temp == undefined){
+		c.temp = false;
+	}
+	
+	var eraseQuota = $("#erasePrice_input_payment").val();
 
 	//是否发送短信
 	var sendSms = false;
@@ -596,11 +539,11 @@ var paySubmit = function(submitType, temp) {
 	}
 	
 	if(eraseQuota && isNaN(eraseQuota)){
-		Util.msg.alert({msg:"请填写正确的抹数金额", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();}});
+		Util.msg.alert({msg:"请填写正确的抹数金额", renderTo:'paymentMgr',fn:function(){$("#erasePrice_input_payment").focus();$("#erasePrice_input_payment").select();}});
 		return;
 	}else if(!isNaN(eraseQuota) && eraseQuota > restaurantData.setting.eraseQuota){// 抹数金额
 //		setFormButtonStatus(false);
-		Util.msg.alert({msg:"抹数金额大于设置上限，不能结帐!", renderTo:'paymentMgr',fn:function(){$("#txtEraseQuota").focus();$("#txtEraseQuota").select();}});
+		Util.msg.alert({msg:"抹数金额大于设置上限，不能结帐!", renderTo:'paymentMgr',fn:function(){$("#erasePrice_input_payment").focus();$("#erasePrice_input_payment").select();}});
 		return;
 	}	
 
@@ -613,7 +556,7 @@ var paySubmit = function(submitType, temp) {
 		settleType = SettleTypeEnum.NORMAL.val;
 	}
 	
-	if(submitType == PayTypeEnum.MEMBER.val){
+	if(c.submitType == PayTypeEnum.MEMBER){
 		//会员结账
 		//FIXME 要加上抹数?
 		if(member4Display.totalBalance < checkOut_actualPrice){
@@ -640,68 +583,29 @@ var paySubmit = function(submitType, temp) {
 		type : 'post',
 		data : {
 			"orderID" : orderMsg.id,
-			"cashIncome" : $('#txtInputRecipt').val(),
+			"cashIncome" : c.cashIncome ? c.cashIncome : 0,
 			"payType" : settleType,
-			"payManner" : submitType,
-			"tempPay" : temp == undefined ? 'false' : 'true',
+			"payManner" : c.submitType.val,
+			"tempPay" : c.temp,
 			"memberID" : actualMemberID,
 			"comment" : $("#remark").val(),
 			'eraseQuota' : eraseQuota == '' ? 0 : eraseQuota,
 			'customNum' : orderMsg.customNum,
-			'payTypeCash' : payTypeCash,
+			'payTypeCash' : c.mixedIncome ? c.mixedIncome : '',
 			'sendSms' : sendSms
 		},
 		dataType : 'json',
 		success : function(resultJSON, status, xhr){
 			Util.LM.hide();
 			isPaying = false;
-			var dataInfo = resultJSON.data;
-			if (resultJSON.success) {
-				if(submitType == PayTypeEnum.WX.val){
-					Util.msg.alert({msg : '微信支付二维码打印成功', topTip : true});
-					
-				}else if (temp != undefined) {
-					Util.msg.alert({msg : dataInfo, topTip : true});
-//					setFormButtonStatus(false);
-				}else{
-					closeMixedPayWin();
-					Util.msg.alert({msg : '结账成功!', topTip : true});
-					if(inputReciptWin){
-						closeInputReciptWin();
-						//等完全关闭后再返回
-						setTimeout(function(){
-								//返回餐台界面
-								ts.loadData();	
-						}, 250);
-					}else{
-								//返回餐台界面
-								ts.loadData();	
-					}
-
-				}
-			} else {
-				if(submitType == PayTypeEnum.WX.val){
-					Util.msg.alert({
-						msg : '对不起，您还没开通微信支付' + '</br>错误信息：' + resultJSON.data,
-						renderTo : 'paymentMgr'
-					});
-				}else if(inputReciptWin || settleType == SettleTypeEnum.MEMBER.val || submitType == PayTypeEnum.MIXED.val){
-					//不能同时弹出两个popup
-					Util.msg.alert({msg : resultJSON.data, topTip : true});
-				}else{
-					Util.msg.alert({
-						msg : resultJSON.data,
-						renderTo : 'paymentMgr'
-					});
-				}
-				
+			
+			if(c.postPayment){
+				c.postPayment(resultJSON);
 			}
-//			setFormButtonStatus(false);
 		},
 		error : function(request, status, err){
 			Util.LM.hide();
 			isPaying = false;
-//			setFormButtonStatus(false);
 			Util.msg.alert({
 				msg : "结账出错, 请刷新页面后重试",
 				renderTo : 'paymentMgr'
@@ -827,125 +731,6 @@ function closeLookupOrderDetailWin(){
 	$('#lookupOrderDetail').hide();	
 }
 
-
-
-function openInputReciptWin(){
-	usedEraseQuota = false;
-	//设置数字键盘触发
-	numKeyBoardFireEvent = function (){
-		$('#txtInputRecipt').keyup();
-	};
-		
-	$('#numberKeyboard').show();
-	
-	$('#inputReciptWin').popup('open');
-	inputReciptWin = true;
-	//计算抹零
-	var eraseQuota = $('#txtEraseQuota').val();
-	var actualPrice = checkOut_actualPrice;
-	if(!isNaN(eraseQuota)){
-		actualPrice = checkOut_actualPrice - eraseQuota;
-	}
-	$('#txtShouldPay4Return').text(actualPrice);
-	setTimeout(function(){
-		$('#txtInputRecipt').focus();
-	}, 200);
-	
-}
-
-function closeInputReciptWin(){
-	numKeyBoardFireEvent = null;
-	$('#numberKeyboard').hide();
-	
-	inputReciptWin = false;
-	$('#inputReciptWin').popup('close');
-	$('#txtReciptReturn').text(0);
-	$('#txtInputRecipt').val('');
-}
-
-function loadMix(){
-	if(member4Display && member4Display.hadSet){
-		Util.msg.alert({msg:'会员不支持混合结账', topTip:true});
-		return;
-	}
-	
-	isMixedPay = true;
-	var html=[];
-	for (var i = 0; i < payTypeData.length; i++) {
-		var checkBoxId = "chbForPayType" + payTypeData[i].id,  numberfieldId = "numForPayType" + payTypeData[i].id;
-		html.push(maxTr.format({
-			name : payTypeData[i].name,
-			checkboxId : checkBoxId,
-			numberfieldId : numberfieldId
-		}));
-	}
-	
-	$('#mixedPayWinTable').html(html.join('')).trigger('create');
-	
-	$('#mixedPayWin').popup('open');
-	
-	//设置数字键盘输入
-	$('.numberInputStyle').focus(function(){
-		focusInput = this.id;
-	});		
-}
-
-function mixPayCheckboxAction(c){
-	if(curMixInput){
-		payMoneyCalc[curMixInput.attr("id")] = curMixInput.val();
-	}
-	
-	var curCheckbox = $(c.event);
-	var checked = curCheckbox.attr('checked');
-	var numForAlias = $("#"+curCheckbox.attr('data-for'));
-	
-	if(checked){
-		$('#numberKeyboard').show();
-		payMoneyCalc[curCheckbox.attr('data-for')] = true;
-		
-		var mixedPayMoney = checkOut_actualPrice;
-		for(var pay in payMoneyCalc){
-			if(typeof payMoneyCalc[pay] != 'boolean'){
-				mixedPayMoney = (mixedPayMoney * 10000 - payMoneyCalc[pay] * 10000)/10000; 
-			}
-		}
-		numForAlias.val(mixedPayMoney < 0? 0 : mixedPayMoney);							
-		
-		numForAlias.removeAttr("disabled"); 
-		numForAlias.parent().removeClass('ui-disabled');
-
-		numForAlias.focus();
-		numForAlias.select();
-		
-		curMixInput = numForAlias;
-	}else{
-		$('#numberKeyboard').hide();
-		payMoneyCalc[curCheckbox.attr('data-for')] = false;
-		
-		numForAlias.attr("disabled",true); 
-		numForAlias.parent().addClass('ui-disabled');
-
-		numForAlias.val('');		
-	}	
-	
-}
-
-function setMixPayPrice(c){
-	//FIXME 验证
-	if(c.event.value){
-		payMoneyCalc[c.id] = c.event.value;
-	}	
-}
-
-
-function closeMixedPayWin(){
-	curMixInput = null;
-	$('#numberKeyboard').hide();
-	isMixedPay = false;
-	$('#mixedPayWin').popup('close');
-	payMoneyCalc = {};
-	payTypeCash = '';
-}
 
 /**
  * 
@@ -1239,24 +1024,13 @@ function showMemberInfoWin(){
 	$('#showMemberInfoWin').popup('open');
 }
 
-function closeMemberInfoWin(){
-	$('#showMemberInfoWin').popup('close');
-	pm.payByMember = false;
-}
-
-//改单
-function toCheckoutPage(){
-	uo.entry({
-		table : pm.table
-	});	
-}
 
 //当离开结账页面时
 $(document).on("pagebeforehide","#paymentMgr",function(){ 
 	//console.log('paymentMgr --- pagebeforehide');
 	$('#numberKeyboard').hide();
 	document.getElementById("totalPrice").innerHTML = 0.00;
-	document.getElementById("shouldPay").innerHTML = 0.00;
+	document.getElementById("actualPrice_td_payment").innerHTML = 0.00;
 	document.getElementById("forFree").innerHTML = 0.00;
 	document.getElementById("spanCancelFoodAmount").innerHTML = 0.00;
 	document.getElementById("discountPrice").innerHTML = 0.00;	
@@ -1273,47 +1047,269 @@ $(document).on("pageinit", '#paymentMgr', function(){
 		 // paySubmit(PayTypeEnum.WX.val);
 	// });
 	
+	function postPayment(resultJSON){
+		if(resultJSON.success){
+			Util.msg.alert({msg : '结账成功!', topTip : true});
+			if(systemStatus == 4){
+				//快餐模式下返回到点菜界面
+				of.entry({orderFoodOperateType : 'fast'});
+			}else{
+				//返回餐台界面
+				ts.loadData();
+			}
+		}else{
+			Util.msg.alert({
+				msg : resultJSON.data,
+				renderTo : 'paymentMgr'
+			});
+		}
+	}
+	
 	//现金结账
 	$('#cash_a_payment').click(function(){
-		paySubmit(PayTypeEnum.CASH.val);
+		paySubmit({
+			submitType : PayTypeEnum.CASH,
+			postPayment : postPayment
+		});
 	});	
 	
 	//刷卡结账
 	$('#credit_a_payment').click(function(){
-		paySubmit(PayTypeEnum.CREDIT_CARD.val);
+		paySubmit({
+			submitType : PayTypeEnum.CREDIT_CARD,
+			postPayment : postPayment
+		});
 	});
 	
 	//签单结账
 	$('#sign_a_payment').click(function(){
-		paySubmit(PayTypeEnum.SIGN.val);
+		paySubmit({
+			submitType : PayTypeEnum.SIGN,
+			postPayment : postPayment
+		});
 	});
 	
 	//挂账结账
 	$('#hang_a_payment').click(function(){
-		paySubmit(PayTypeEnum.HANG.val);
+		paySubmit({
+			submitType : PayTypeEnum.HANG,
+			postPayment : postPayment
+		});
 	});
 	
 	//会员余额结账
 	$('#memberPay_a_payment').click(function(){
-		paySubmit(PayTypeEnum.MEMBER.val);
+		paySubmit({
+			submitType : PayTypeEnum.MEMBER,
+			postPayment : function(resultJSON){
+				if(resultJSON.success){
+					Util.msg.alert({msg : '结账成功!', topTip : true});
+					$('#memberPayCancel_a_payment').click();
+					setTimeout(function(){
+						if(systemStatus == 4){
+							//快餐模式下返回到点菜界面
+							of.entry({orderFoodOperateType : 'fast'});
+						}else{
+							//返回餐台界面
+							ts.loadData();
+						}
+					}, 250);
+				}else{
+					Util.msg.alert({
+						msg : resultJSON.data,
+						renderTo : 'paymentMgr'
+					});
+				}
+			}
+		});
+	});
+	
+	//会员结账-取消
+	$('#memberPayCancel_a_payment').click(function(){
+		$('#showMemberInfoWin').popup('close');
 	});
 	
 	//暂结
 	$('#tempPay_a_payment').click(function(){
-		paySubmit(PayTypeEnum.CASH.val, 'temp')
+		paySubmit({
+			submitType : PayTypeEnum.CASH,
+			temp : true,
+			postPayment : function(resultJSON){
+				if(resultJSON.success){
+					Util.msg.alert({msg : resultJSON.data, topTip : true});
+				}else{
+					Util.msg.alert({
+						msg : resultJSON.data,
+					renderTo : 'paymentMgr'
+					});
+				}
+			}
+		});
 	});
 	
-	//现金收款-结账
-	$('#receviedCash_a_payment').click(function(){
-		var input = $('#txtInputRecipt');
+	//现金找零
+	$('#cashReceive_a_payment').click(function(){
+		$('#cashReceive_div_payment').popup('open');
+	});
+	
+	//现金输入框在输入数字后实时显示找零
+	$('#cashReceive_input_payment').on('keyup', function(){
+		//计算抹零
+		var eraseQuota = $('#erasePrice_input_payment').val();
+		var actualPrice = checkOut_actualPrice;
+		if(!isNaN(eraseQuota)){
+			actualPrice = checkOut_actualPrice - eraseQuota;
+		}
+		
+		if($('#cashReceive_input_payment').val() - actualPrice > 0){
+			$('#cashBack_label_payment').text($('#cashReceive_input_payment').val() - actualPrice);
+		}else{
+			$('#cashBack_label_payment').text(0);
+		}
+	});
+		
+	//进入现金找零Popup的函数
+	$('#cashReceive_div_payment').on('popupafteropen', function(event, ui){
+		usedEraseQuota = false;
+		//设置数字键盘触发
+		numKeyBoardFireEvent = function (){
+			$('#cashReceive_input_payment').keyup();
+		};
+			
+		$('#numberKeyboard').show();
+		
+		//计算抹零
+		var eraseQuota = $('#erasePrice_input_payment').val();
+		var actualPrice = checkOut_actualPrice;
+		if(!isNaN(eraseQuota)){
+			actualPrice = checkOut_actualPrice - eraseQuota;
+		}
+		$('#cashReceive_input_payment').val('');
+		$('#cashBack_label_payment').text(0);
+		$('#consume4CashReceive_a_payment').text(actualPrice);
+		setTimeout(function(){
+			$('#cashReceive_input_payment').focus();
+		}, 200);
+	});
+	
+	//现金找零-取消
+	$('#receivedCashCancel_a_payment').click(function(){
+		numKeyBoardFireEvent = null;
+		$('#numberKeyboard').hide();
+		
+		$('#cashReceive_div_payment').popup('close');
+	});
+	
+	//现金找零-确定
+	$('#receivedCashConfirm_a_payment').click(function(){
+		var input = $('#cashReceive_input_payment');
 		if(input.val() && !isNaN(input.val())){
-			paySubmit(PayTypeEnum.CASH.val);
+			paySubmit({
+				submitType : PayTypeEnum.CASH,
+				cashIncome : parseInt(input.val()),
+				postPayment : function(resultJSON){
+					if(resultJSON.success){
+						Util.msg.alert({msg : '结账成功!', topTip : true});
+						//关闭现金找零界面
+						$('#receivedCashCancel_a_payment').click();
+						//等完全关闭后再返回
+						setTimeout(function(){
+							if(systemStatus == 4){
+								//快餐模式下返回到点菜界面
+								of.entry({orderFoodOperateType : 'fast'});
+							}else{
+								//返回餐台界面
+								ts.loadData();
+							}
+						}, 250);
+
+					}else{
+						Util.msg.alert({
+							msg : resultJSON.data,
+							renderTo : 'paymentMgr'
+						});
+					}
+				}
+			});
 		}else{
 			Util.msg.alert({msg:'请输入正确的结账金额', topTip : true});
 			input.focus();
 		}
 	});
 
+	//混合结账
+	$('#mixed_a_payment').click(function(){
+		if(member4Display && member4Display.hadSet){
+			Util.msg.alert({msg:'会员不支持混合结账', topTip:true});
+			return;
+		}
+		
+		//混合结账选项
+		var maxTr = '<tr>' +
+				'<td><label><input data-theme="e" id={checkboxId} data-for={numberfieldId} type="checkbox" name="mixPayCheckbox">{name}</label></td>'+
+				'<td style="padding-right: 10px;"><input data-theme="c" id={numberfieldId} class="mixPayInputFont numberInputStyle" disabled="disabled" ></td>'+
+				'</tr>';
+		var html = [];
+		var checkBoxes = [];
+		for (var i = 0; i < payTypeData.length; i++) {
+			var checkBoxId = "chbForPayType" + payTypeData[i].id;
+			var numberfieldId = "numForPayType" + payTypeData[i].id;
+			checkBoxes.push(checkBoxId);
+			html.push(maxTr.format({
+				name : payTypeData[i].name,
+				checkboxId : checkBoxId,
+				numberfieldId : numberfieldId
+			}));
+		}
+		
+		$('#mixedPay_tbl_payment').html(html.join('')).trigger('create');
+		
+		//混合结账中每个CheckBox按钮的事件
+		for(var i = 0; i < checkBoxes.length; i++){
+			$('#' + checkBoxes[i]).click(function(){
+				
+				var curCheckbox = $(this);
+				var numForAlias = $("#" + curCheckbox.attr('data-for'));
+				
+				if(curCheckbox.attr('checked')){
+					$('#numberKeyboard').show();
+					
+					var mixedPayMoney = checkOut_actualPrice;
+					for (var i = 0; i < payTypeData.length; i++) {
+						var checked = $('#chbForPayType' + payTypeData[i].id).attr('checked');
+						var money = $('#numForPayType' + payTypeData[i].id).val();
+						if(checked && money){
+							mixedPayMoney = (mixedPayMoney * 10000 - parseInt(money) * 10000) / 10000; 
+						}
+					}
+					
+					numForAlias.val(mixedPayMoney < 0 ? 0 : mixedPayMoney);							
+					
+					numForAlias.removeAttr("disabled"); 
+					numForAlias.parent().removeClass('ui-disabled');
+			
+					numForAlias.focus();
+					numForAlias.select();
+					
+				}else{
+					$('#numberKeyboard').hide();
+					
+					numForAlias.attr("disabled", true); 
+					numForAlias.parent().addClass('ui-disabled');
+			
+					numForAlias.val('');		
+				}	
+			});
+		}
+		
+		$('#mixedPayWin').popup('open');
+		
+		//设置数字键盘输入
+		$('.numberInputStyle').focus(function(){
+			focusInput = this.id;
+		});		
+	});
+	
 	//混合结账-暂结
 	$('#mixedTempPay_a_payment').click(function(){
 		mixPay(true);
@@ -1325,43 +1321,102 @@ $(document).on("pageinit", '#paymentMgr', function(){
 	});
 	
 	function mixPay(temp){
-		payMoneyCalc = {};
-		var checkboxs = $('input[name=mixPayCheckbox]');
-		for (var i = 0; i < checkboxs.length; i++) {
-			var checkbox = $(checkboxs[i]);
-			var numForAlias = $("#"+checkbox.attr('data-for'));		
-			if(checkbox.attr('checked')){
-				payMoneyCalc[checkbox.attr('data-for')] = numForAlias.val();
-			}		
-		}	
 		
-		
-		var mixedPayMoney = checkOut_actualPrice;
-		for(var pay in payMoneyCalc){
-			if(typeof payMoneyCalc[pay] != 'boolean'){
-				//可能存在的小数问题
-				mixedPayMoney = (mixedPayMoney * 10000 - payMoneyCalc[pay] * 10000) / 10000;
-			}
-		}					
-	
-		payTypeCash ='';
+		var mixedIncome = '';
 		for (var i = 0; i < payTypeData.length; i++) {
 			var checked = $('#chbForPayType' + payTypeData[i].id).attr('checked');
 			if(checked && $('#numForPayType' + payTypeData[i].id).val()){
-				if(payTypeCash){
-					payTypeCash += '&';
+				if(mixedIncome.length != 0){
+					mixedIncome += '&';
 				}
-				payTypeCash += (payTypeData[i].id + ',' + $('#numForPayType'+payTypeData[i].id).val());  
+				mixedIncome += (payTypeData[i].id + ',' + $('#numForPayType' + payTypeData[i].id).val());  
 			}
 		}	
 		
-		if(temp){
-			paySubmit(PayTypeEnum.MIXED.val, 'temp');
-		}else{
-			paySubmit(PayTypeEnum.MIXED.val);
-		}
+		paySubmit({
+			submitType : PayTypeEnum.MIXED,
+			temp : temp,
+			mixedIncome : mixedIncome,
+			postPayment : function(resultJSON){
+				
+				if(resultJSON.success){
+					if(temp){
+						Util.msg.alert({msg : resultJSON.data, topTip : true});
+					}else{
+						//关闭混合结账界面
+						$('#mixedPayCancel_a_payment').click();
+						Util.msg.alert({msg : '结账成功!', topTip : true});
+						//等完全关闭后再返回
+						setTimeout(function(){
+							if(systemStatus == 4){
+								//快餐模式下返回到点菜界面
+								of.entry({orderFoodOperateType : 'fast'});
+							}else{
+								//返回餐台界面
+								ts.loadData();
+							}
+						}, 250);
+					}
+				}else{
+					Util.msg.alert({
+						msg : resultJSON.data,
+						renderTo : 'paymentMgr'
+					});
+				}
+			}
+		});
 		
 	}
+	
+	//混合结账-取消
+	$('#mixedPayCancel_a_payment').click(function(){
+		$('#numberKeyboard').hide();
+		$('#mixedPayWin').popup('close');
+	});
+	
+	//抹数框输入时
+	$('#erasePrice_input_payment').focus(function(){
+		focusInput = this.id;
+		usedEraseQuota = false;
+		mouseOutNumKeyboard = true;
+		$('#numberKeyboard').show();	
+		//设置数字键盘触发
+		numKeyBoardFireEvent = function (){
+			$('#erasePrice_input_payment').keyup();
+		};
+		
+		$('#calculator4NumberKeyboard').on("mouseover", function(){
+			usedEraseQuota = false;
+			mouseOutNumKeyboard = false;
+		});
+		
+		$('#calculator4NumberKeyboard').on("mouseout", function(){
+			usedEraseQuota = true;
+			mouseOutNumKeyboard = true;
+		});			
+	});	
+	
+	
+	//抹数联动
+	$('#erasePrice_input_payment').on('keyup', function(){
+		var eraseQuota = $('#erasePrice_input_payment').val();
+		if(eraseQuota && isNaN(eraseQuota)){
+			Util.msg.alert({msg:"请填写正确的抹数金额", topTip:true ,fn:function(){$("#erasePrice_input_payment").focus();$("#erasePrice_input_payment").select();}});
+			return;
+		}else if(!isNaN(eraseQuota) && eraseQuota > restaurantData.setting.eraseQuota){// 抹数金额
+			Util.msg.alert({msg:"抹数金额大于设置上限，不能结帐!", topTip:true,fn:function(){$("#erasePrice_input_payment").focus();$("#erasePrice_input_payment").select();}});
+			return;
+		}			
+		$('#actualPrice_td_payment').html((checkOut_actualPrice * 10000 - eraseQuota * 10000)/10000);
+		
+	});
+
+	//改单
+	$('#updateOrder_a_payment').click(function(){
+		uo.entry({
+			table : pm.table
+		});	
+	});
 });
 
 

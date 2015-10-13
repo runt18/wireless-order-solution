@@ -902,7 +902,6 @@
 	</div>
 	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
 
-		 <!-- <input type="button" value="返回" style="width: 70px;height: 70px;"> -->
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.bookListBack()">返回</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.refreshBookList()">刷新</a>
 		 
@@ -1107,7 +1106,6 @@
 			<div id="spanToTempPayStatus" style="float: left;margin-left: 20px;"></div>
 			<div id="divDescForUpdateOrder" style="float: right;margin-right: 20px;"></div>
 		</div>	
-		 <!-- <input type="button" value="返回" style="width: 70px;height: 70px;"> -->
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.cancelForUO()">返回</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="ss" onclick="uo.goToCreateOrder()">点菜</a>
@@ -1593,7 +1591,7 @@
 		
 		<div id="normalOperateFoodCmp" style="height: 60px;padding-top: 25px;">		
 			<div data-role="controlgroup" class="ui-btn-left " data-type="horizontal">
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="back" id="orderFoodBack_a_orderFood">返回</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="orderFoodBack_a_orderFood">返回</a>
 			 	<a onclick="Util.to.scroll({content:'divOrderFoodsCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
 			 	<a onclick="Util.to.scroll({content:'divOrderFoodsCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>
 			 </div>
@@ -2208,7 +2206,7 @@
 		         <tbody>	
 		         	<tr>
 		         		<td >实收:</td>
-		         		<td id="shouldPay" style="color: blue;">0.00</td>
+		         		<td id="actualPrice_td_payment" style="color: blue;">0.00</td>
 		         		<td>----</td>
 		         	</tr>
 		         	<tr>
@@ -2234,7 +2232,7 @@
 		         	<tr id="tr4EraseQuota">
 		         		<td colspan="2" style="width: 200px;line-height: 60px;font-size: 20px;text-align: right;" >抹数金额(上限:￥<font id="font_showEraseQuota" color="red">--</font>)：</td>
 		         		<td width="70" style="padding-right: 5px;">
-		         			<input id="txtEraseQuota" class="countInputStyle" onkeypress="intOnly()" onblur="pm.closeKeyboard()" >
+		         			<input id="erasePrice_input_payment" class="countInputStyle" onkeypress="intOnly()" onblur="pm.closeKeyboard()" >
 		         		</td>
 		         	</tr>
 		         	<tr>
@@ -2251,9 +2249,9 @@
 		    	<a id="credit_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">刷卡</a>
 		    	<a id="sign_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">签单</a>
 		    	<a id="hang_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">挂账</a>		    	
-		    	<a data-role="button" data-theme="b" onclick="openInputReciptWin()">现金找零</a>
+		    	<a id="cashReceive_a_payment" data-role="button" data-theme="b">现金找零</a>
 		    	<a data-role="button" data-theme="b" id="btnPayByMember" data-rel="popup" data-position-to="window" data-transition="pop" onclick="showMemberInfoWin()">读取会员</a>
-		    	<a data-role="button" data-theme="b" onclick="loadMix()" data-rel="popup" data-position-to="window" data-transition="pop">其他结账</a>
+		    	<a id="mixed_a_payment" data-role="button" data-theme="b" data-rel="popup" data-position-to="window" data-transition="pop">其他结账</a>
 		    	<!-- <a id="wx_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">微信支付</a> -->
 		    </div>
 		    
@@ -2323,7 +2321,7 @@
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="refreshOrderData({calc:true})" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a id="tempPay_a_payment" data-role="button" data-inline="true" class="bottomBtnFont">暂结(-)</a>
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="toCheckoutPage()">改单</a>
+		 	<a id="updateOrder_a_payment" data-role="button" data-inline="true" class="bottomBtnFont">改单</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupDiscountCmp">折扣</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupServiceCmp">服务费</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="openReadMemberByCondtionWin()">会员</a>
@@ -2340,7 +2338,7 @@
 	</div>	
 	
 <!-- 收款操作 -->	
-	<div id="inputReciptWin" data-role="popup"  data-overlay-theme="e" data-theme="d" data-dismissible="false" class="ui-corner-all" align="center">
+	<div id="cashReceive_div_payment" data-role="popup"  data-overlay-theme="e" data-theme="d" data-dismissible="false" class="ui-corner-all" align="center">
 	    <div data-role="header" class="ui-corner-top" data-theme="b">
 	        <h1>输入收款显示找零</h1>
 	    </div>
@@ -2348,22 +2346,22 @@
 	    <table id="inputReciptWinTable">
 	    	<tr>
 	    		<td>消费金额:</td>
-	    		<td><label id="txtShouldPay4Return"></label></td>
+	    		<td><label id="consume4CashReceive_a_payment"></label></td>
 	    	</tr>
 	    	<tr>
 	    		<td>输入收款:</td>
-	    		<td><input class="numberInputStyle" id="txtInputRecipt" onkeypress="intOnly()"></td>
+	    		<td><input class="numberInputStyle" id="cashReceive_input_payment" onkeypress="intOnly()"></td>
 	    	</tr>
 	    	<tr>
 	    		<td>找零:</td>
-	    		<td><label id="txtReciptReturn">0</label></td>
+	    		<td><label id="cashBack_label_payment">0</label></td>
 	    	</tr>	    		    	
 	    </table>
 	    </div>
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a id="receviedCash_a_payment" data-role="button" data-inline="true" class="countPopbottomBtn">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="closeInputReciptWin()">取消</a>		 
+				 <a id="receivedCashConfirm_a_payment" data-role="button" data-inline="true" class="countPopbottomBtn">确定</a>
+				 <a id="receivedCashCancel_a_payment" data-role="button" data-inline="true" class="countPopbottomBtn">取消</a>		 
 			 </div>
 	    </div>
 	 </div>	
@@ -2374,8 +2372,8 @@
 	        <h1>混合结账</h1>
 	    </div>
 	    <div style="width: 100%;padding: 5px 10px;" >
-	    <table id="mixedPayWinTable">
-	    	<tr>
+	    <table id="mixedPay_tbl_payment">
+<!-- 	    	<tr>
 	    		<td><label><input type="checkbox" name="checkbox-0 " data-for="cashinput" onclick="mixPayCheckboxAction({event:this})">现金</label></td>
 	    		<td style="padding-right: 10px;"><input id="cashinput" style="font-size:20px;font-weight: bold;width: 170px;" disabled="disabled" onblur="setMixPayPrice({event:this, id:'cashinput'})"></td>
 	    	</tr>
@@ -2390,14 +2388,14 @@
 					<label><input type="checkbox" name="checkbox-0 " onclick="mixPayCheckboxAction({event:this})">签单</label>
 				</td>
 	    		<td style="padding-right: 10px;"><input style="font-size:20px;font-weight: bold;;width: 170px;"></td>
-	    	</tr>	    		    	
+	    	</tr>	  -->   		    	
 	    </table>
 	    </div>
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-			 	 <a id="mixedTempPay_a_payment" data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="mixPayAction(true)">暂结</a>
-				 <a id="mixedPay_a_payment" data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="mixPayAction()">结账</a>
-				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="closeMixedPayWin()">取消</a>		 
+			 	 <a id="mixedTempPay_a_payment" data-role="button" data-inline="true" class="tablePopbottomBtn">暂结</a>
+				 <a id="mixedPay_a_payment" data-role="button" data-inline="true" class="tablePopbottomBtn">结账</a>
+				 <a id="mixedPayCancel_a_payment" data-role="button" data-inline="true" class="tablePopbottomBtn">取消</a>		 
 			 </div>
 	    </div>
 	 </div>	
@@ -2440,7 +2438,7 @@
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
 			 <div data-role="controlgroup" data-corners="false" data-type="horizontal" class="bottomBarFullWidth ui-bar-b barBottomBeCorner">
 				 <a id="memberPay_a_payment" data-role="button" data-inline="true" class="countPopbottomBtn">结账</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="closeMemberInfoWin()">取消</a>		 
+				 <a id="memberPayCancel_a_payment" data-role="button" data-inline="true" class="countPopbottomBtn">取消</a>		 
 			 </div>
 	    </div>	
 	</div>		 

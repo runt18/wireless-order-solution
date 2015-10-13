@@ -1884,24 +1884,6 @@ function initTableData(){
 				$('#selectBarBusyTablesCount').text(busyTables.length);
 				$('#selectBarTempPayTablesCount').text(tempPayTables.length);
 				
-				
-				
-				//从tables数组中，遍历得到含有餐桌的区域数组region
-//				region.push(tables[0].region);
-//				regionId.push(tables[0].region.id);
-//				for(x in tables){
-//					var flag = false;
-//					for(y in regionId){
-//						if(regionId[y] == tables[x].region.id){		
-//							flag = true;
-//							break;
-//						}			
-//					}
-//					if(!flag){
-//						region.push(tables[x].region);
-//						regionId.push(tables[x].region.id);
-//					}
-//				}
 				ts.rn.selectingId = 'divAllArea';
 				ts.rn.pageNow = 1;
 				var regionH = $("#divToolRightForSelect").height() - 6 * 65;

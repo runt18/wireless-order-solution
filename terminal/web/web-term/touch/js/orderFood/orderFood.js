@@ -1,7 +1,3 @@
-var Request = new Util_urlParaQuery();
-//1:pos端	2:touch		3:试用 
-var systemStatus = Request["status"]?parseInt(Request["status"]):2;
-
 //点菜界面数据对象
 var of = {
 	table : {},
@@ -2569,10 +2565,7 @@ $(function(){
 		$('#closeTemp_a_orderFood').click();
 	});
 
-	
-	 
-	 // 关闭临时菜
-	 
+	// 关闭临时菜
 	$('#closeTemp_a_orderFood').click(function(){
 		$('#addTempFoodCmp').hide();
 		$('#shadowForPopup').hide();	
@@ -2820,6 +2813,7 @@ $(function(){
 			$('#btnOrderAndPay').hide();	
 		}else if(of.orderFoodOperateType == 'fast'){
 			of.newFood = [];
+			//下单
 			$('#normalOrderFood_a_orderFood').hide();
 			$('#btnOrderAndPay').hide();
 			$('#addBookOrderFood').hide();
@@ -2829,8 +2823,6 @@ $(function(){
 			$('#brand_a_orderFood').show();
 			//下单更多
 			$('#orderFoodMore_a_orderFood').hide();
-			//点菜界面的返回
-			$('#orderFoodBack_a_orderFood').hide();
 		}
 			
 			
@@ -2983,8 +2975,6 @@ $(function(){
 		closePinyin();
 		closeHandWriting();
 	}
-	
-	
 
 	/**
 	 * 显示厨房分页
@@ -3049,9 +3039,6 @@ $(function(){
 			sl.attr('data-theme', 'b');
 			sl.buttonMarkup( "refresh" );
 		});
-		
-		
-
 		
 		//厨房点击事件
 		$('.' + eachFindKitchenClass).each(function(index, element){
@@ -3213,6 +3200,10 @@ $(function(){
 		$('#orderFoodByAliasCmp').popup('close');
 	});
 	
+	//返回
+	$('#orderFoodBack_a_orderFood').click(function(){
+		ts.loadData();
+	});
 	
 });
 
