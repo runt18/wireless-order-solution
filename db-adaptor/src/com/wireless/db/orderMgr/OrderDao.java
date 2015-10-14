@@ -57,9 +57,7 @@ public class OrderDao {
 
 	public static class ExtraCond{
 		public final String orderTblAlias;
-		private final String orderTbl;
-		private final String orderFoodTbl;
-		
+		private final DBTbl dbTbl;
 		private final DateType dateType;
 		private int orderId = -1;		//按账单号
 		private int seqId = -1;			//按流水号
@@ -84,9 +82,7 @@ public class OrderDao {
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
-			DBTbl dbTbl = new DBTbl(dateType);
-			this.orderTbl = dbTbl.orderTbl;
-			this.orderFoodTbl = dbTbl.orderFoodTbl;
+			this.dbTbl = new DBTbl(dateType); 
 			if(dateType == DateType.TODAY){
 				orderTblAlias = "O";
 			}else{
@@ -259,7 +255,7 @@ public class OrderDao {
 				filterCond.append(" AND " + orderTblAlias + ".coupon_price > 0");
 			}
 			if(isTransfer){
-				final String sql = " SELECT order_id FROM " + Params.dbName + "." + orderFoodTbl + " WHERE operation = " + OrderFood.Operation.TRANSFER.getVal();;
+				final String sql = " SELECT order_id FROM " + Params.dbName + "." + dbTbl.orderFoodTbl + " WHERE operation = " + OrderFood.Operation.TRANSFER.getVal();;
 				filterCond.append(" AND " + orderTblAlias + ".id IN( " + sql + ")");
 			}
 			return filterCond.toString();
@@ -480,7 +476,7 @@ public class OrderDao {
 				  " O.price_plan_id, O.member_id, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.coupon_price, O.pure_price, O.total_price, O.actual_price " +
 				  " FROM " + 
-				  Params.dbName + "." + extraCond.orderTbl + " O " +
+				  Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 				  " LEFT JOIN " + Params.dbName + ".table T ON O.table_id = T.table_id " +
 				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
 				  " WHERE 1 = 1 " + 
@@ -496,7 +492,7 @@ public class OrderDao {
 				  " OH.coupon_price, " +
 				  " OH.settle_type, OH.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, OH.category, OH.status, OH.service_rate, OH.comment, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.pure_price, OH.total_price, OH.actual_price " +
-				  " FROM " + Params.dbName + "." + extraCond.orderTbl + " OH " + 
+				  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " OH " + 
 				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = OH.pay_type_id " +
 				  " WHERE 1 = 1 " + 
 				  " AND OH.restaurant_id = " + staff.getRestaurantId() + " " +
@@ -1428,7 +1424,7 @@ public class OrderDao {
 			//Delete the records to normal taste group. 
 			sql = " DELETE NTG FROM " + Params.dbName + "." + dbTbl.ntgTbl + " NTG " +
 				  " JOIN " + Params.dbName + "." + dbTbl.tgTbl + " TG ON NTG.normal_taste_group_id = TG.normal_taste_group_id " +
-				  " JOIN " + Params.dbName + "." + extraCond.orderFoodTbl + " OF ON OF.taste_group_id = TG.taste_group_id " +
+				  " JOIN " + Params.dbName + "." + extraCond.dbTbl.orderFoodTbl + " OF ON OF.taste_group_id = TG.taste_group_id " +
 				  " WHERE 1 = 1 " + 
 				  " AND OF.order_id = " + order.getId() +
 				  " AND TG.normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID;
@@ -1436,18 +1432,18 @@ public class OrderDao {
 			
 			//Delete the records to taste group.
 			sql = " DELETE TG FROM " + Params.dbName + "." + dbTbl.tgTbl + " TG " +
-				  " JOIN " + Params.dbName + "." + extraCond.orderFoodTbl + " OF ON TG.taste_group_id = OF.taste_group_id " +
+				  " JOIN " + Params.dbName + "." + extraCond.dbTbl.orderFoodTbl + " OF ON TG.taste_group_id = OF.taste_group_id " +
 			      " WHERE 1 = 1 " + 
 				  " AND OF.order_id = " + order.getId() +
 				  " AND TG.taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
 			dbCon.stmt.executeUpdate(sql);
 			
 			//delete the records related to the order id and food id in "order_food" table
-			sql = " DELETE FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " WHERE order_id = " + order.getId();
+			sql = " DELETE FROM " + Params.dbName + "." + extraCond.dbTbl.orderFoodTbl + " WHERE order_id = " + order.getId();
 			dbCon.stmt.executeUpdate(sql);
 			
 			//delete the corresponding order record in "order" table
-			sql = " DELETE FROM " + Params.dbName + "." + extraCond.orderTbl + " WHERE id = " + order.getId();
+			sql = " DELETE FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " WHERE id = " + order.getId();
 			dbCon.stmt.executeUpdate(sql);
 
 			//Delete the associated mixed payment.
