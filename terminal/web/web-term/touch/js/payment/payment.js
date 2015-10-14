@@ -59,7 +59,7 @@ var pm = {table : {}},
 		+ '<td>{orderDateFormat}</td>'
 		+ '<td>{waiter}</td>'
 		+ '<td>{cancelReason}</td>'
-		+ '</tr>'
+		+ '</tr>';
 	
 
 

@@ -197,6 +197,8 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 		$('#payOrder_a_checkOut').show();
 		//快餐模式按钮
 		$('#fastFood_li_tableSelect').show();
+		//快餐模式的结账按钮
+		$('#fastPay_a_orderFood').show();
 		//收银端餐台列表高度
 		tableListHeight = 130;	
 		
@@ -3521,7 +3523,6 @@ ts.bookListBack = function(){
 	if(ts.bookListEntry.backToTableSelect){
 		ts.loadData();
 	}else{
-		history.back();
 		if(!ts.bookTable4Search){
 			ts.loadData();
 		}

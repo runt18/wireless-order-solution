@@ -3128,6 +3128,35 @@ $(function(){
 		
 	});
 	
+	//快餐模式下的结账按钮
+	$('#fastPay_a_orderFood').click(function(){
+		var brandNo = 1;
+		
+		var bandTemp = tables.slice(0);
+		//遍历来判断输入的牌子号是否存在
+		for(var i = 0; i < bandTemp.length; i++){
+			if(brandNo == bandTemp[i].alias){
+				of.table = bandTemp[i];
+				break;
+			}
+		}
+		
+		if(of.table){
+			of.submit({
+				force : true,
+				postSubmit : function(){
+					pm.entry({table : of.table});
+				}
+			});
+		}else{
+			Util.msg.alert({
+				msg : '没有此餐桌号.', 
+				topTip : true
+			});
+		}
+	});
+	
+	
 	//牌子号的取消按钮
 	$('#brandClose_a_orderFood').click(function(){
 		$('#orderFoodByBrandCmp').popup('close');

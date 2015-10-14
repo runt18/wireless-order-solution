@@ -1601,6 +1601,7 @@
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="multiOpenTable" onclick="ts.multiOpenTableCommitOrderFood()">多台开席</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="brand_a_orderFood" style="display:none">下单</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="normalOrderFood_a_orderFood">下单</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="fastPay_a_orderFood" style="display:none">结账</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#orderMore_div_orderFood" id="orderFoodMore_a_orderFood">下单>></a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="handWriteBoard_a_orderFood">手写板</a>
