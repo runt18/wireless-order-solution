@@ -2792,25 +2792,41 @@ $(function(){
 			$('#addBookOrderFood').hide();
 			$('#bookSeatOrderFood').hide();
 			$('#multiOpenTable').hide();
+			//快餐模式的牌子号
+			$('#brand_a_orderFood').hide();
+			//快餐模式的结账
+			$('#fastPay_a_orderFood').hide();
 		}else if(of.orderFoodOperateType == 'bookSeat'){
 			$('#bookSeatOrderFood').show();
 			$('#addBookOrderFood').hide();
 			$('#btnOrderAndPay').hide();
 			$('#normalOrderFood_a_orderFood').hide();		
-			$('#multiOpenTable').hide();		
+			$('#multiOpenTable').hide();
+			//快餐模式的牌子号
+			$('#brand_a_orderFood').hide();
+			//快餐模式的结账
+			$('#fastPay_a_orderFood').hide();
 		}else if(of.orderFoodOperateType == 'addBook'){
 			$('#addBookOrderFood').show();
 			$('#bookSeatOrderFood').hide();
 			$('#normalOrderFood_a_orderFood').hide();
 			$('#btnOrderAndPay').hide();	
 			$('#multiOpenTable').hide();
+			//快餐模式的牌子号
+			$('#brand_a_orderFood').hide();
+			//快餐模式的结账
+			$('#fastPay_a_orderFood').hide();
 		}else if(of.orderFoodOperateType == 'multiOpenTable'){
 			of.newFood = [];
 			$('#multiOpenTable').show();
 			$('#addBookOrderFood').hide();
 			$('#bookSeatOrderFood').hide();
 			$('#normalOrderFood_a_orderFood').hide();
-			$('#btnOrderAndPay').hide();	
+			$('#btnOrderAndPay').hide();
+			//快餐模式的牌子号
+			$('#brand_a_orderFood').hide();
+			//快餐模式的结账
+			$('#fastPay_a_orderFood').hide();
 		}else if(of.orderFoodOperateType == 'fast'){
 			of.newFood = [];
 			//下单
@@ -2821,6 +2837,8 @@ $(function(){
 			$('#multiOpenTable').hide();
 			//快餐模式的牌子号
 			$('#brand_a_orderFood').show();
+			//快餐模式的结账
+			$('#fastPay_a_orderFood').show();
 			//下单更多
 			$('#orderFoodMore_a_orderFood').hide();
 		}
