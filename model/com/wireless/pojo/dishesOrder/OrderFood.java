@@ -661,8 +661,8 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	public float getFoodPrice(){
-		if(mPricePlan != null){
-			return mFood.getPrice(mPricePlan);
+		if(mPricePlan != null && mFood.getPricePlan().containsKey(mPricePlan)){
+			return NumericUtil.roundFloat(mFood.getPricePlan().get(mPricePlan).floatValue());
 		}else if(mFoodUnit != null){
 			return mFoodUnit.getPrice();
 		}else{
