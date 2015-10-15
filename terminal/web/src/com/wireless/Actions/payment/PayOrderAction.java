@@ -113,8 +113,7 @@ public class PayOrderAction extends Action{
 			}else if(payType.equals(PayType.MIXED)){
 				String payTypeCashs = request.getParameter("payTypeCash");
 				
-				String payTypeCashList[] = payTypeCashs.split("&");
-				for (String pt : payTypeCashList) {
+				for (String pt : payTypeCashs.split("&")) {
 					String payTypeCash[] = pt.split(",");
 					payBuilder.addPayment(new PayType(Integer.parseInt(payTypeCash[0])), Float.parseFloat(payTypeCash[1]));
 				}

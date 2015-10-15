@@ -1,8 +1,5 @@
 package com.wireless.Actions.regionMgr.tableMgr;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -239,13 +236,11 @@ public class OperateTableAction extends DispatchAction{
 		String suffix = request.getParameter("suffix");
 		String comment = request.getParameter("comment");
 		try {
-			List<Table> list = new ArrayList<>();
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, Order.InsertBuilder.newInstance4Join(new Table.Builder(Integer.parseInt(tableID)), Table.InsertBuilder4Join.Suffix.valueOf(suffix, 0)).setComment(comment), PrintOption.DO_NOT_PRINT));
 			if(resp.header.type == Type.ACK){
 				Table joinedTbl = new Parcel(resp.body).readParcel(Table.CREATOR);
-				list.add(TableDao.getById(staff, joinedTbl.getId()));
-				jobject.setRoot(list);
+				jobject.setRoot(TableDao.getById(staff, joinedTbl.getId()));
 				jobject.initTip(true, ("下单成功."));
 			}else if(resp.header.type == Type.NAK){
 				throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
