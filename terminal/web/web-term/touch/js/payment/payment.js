@@ -936,7 +936,6 @@ function openReadMemberByCondtionWin(){
 	$('#shadowForPopup').show();
 	$('#readMemberWin').show();
 	
-	$('#numberKeyboard').show();
 	
 	//设置button样式
 	$('#btnReadMember').attr("data-theme", "b");
@@ -948,7 +947,7 @@ function openReadMemberByCondtionWin(){
 	$('#link_payment_popupCouponCmp4Member').attr("data-theme", "e");
 	$('#link_payment_popupCouponCmp4Member').buttonMarkup("refresh");	
 	
-	focusInput = "txtMemberInfo4Read";
+	NumKeyBoardAttacher.instance().attach($('#txtMemberInfo4Read')[0])
 	$('#txtMemberInfo4Read').focus();
 }
 

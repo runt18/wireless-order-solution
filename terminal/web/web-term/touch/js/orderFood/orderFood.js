@@ -2576,6 +2576,9 @@ $(function(){
 		$('#numberKeyboard').hide();	
 		//临时菜文本框detach
 		HandWritingAttacher.instance().detach($('#tempFoodName')[0]);
+		
+		NumKeyBoardAttacher.instance().detach($('#tempFoodPrice')[0]);
+		NumKeyBoardAttacher.instance().detach($('#tempFoodCount')[0]);
 	});
 
 	//弹出临时菜
@@ -2627,6 +2630,8 @@ $(function(){
 		
 		$('#tempFoodName').focus();
 		
+		NumKeyBoardAttacher.instance().attach($('#tempFoodPrice')[0]);
+		NumKeyBoardAttacher.instance().attach($('#tempFoodCount')[0]);
 		//关闭拼音和手写搜索
 		closePinyin();
 		closeHandWriting();
@@ -2651,6 +2656,7 @@ $(function(){
 		$('#addTempTasteCmp').show();
 		$('#addTempTasteCmp').css('top', '150px');
 		$('#shadowForPopup').show();
+		
 		
 		//关闭弹出常用口味
 		closeFoodCommonTaste();
@@ -2686,6 +2692,7 @@ $(function(){
 		//临时口味输入框弹出手写板控件
 		HandWritingAttacher.instance().attach($('#tempTasteName')[0]);
 		$('#tempTasteName').focus();
+		NumKeyBoardAttacher.instance().attach($('#tempTastePrice')[0]);
 	});
 
 	
@@ -2772,6 +2779,8 @@ $(function(){
 		$('#tempTasteName').val('');
 		$('#tempTastePrice').val('');	
 		$('#numberKeyboard').hide();	
+		
+		NumKeyBoardAttacher.instance().detach($('#tempTastePrice')[0]);
 		
 	});	
 	

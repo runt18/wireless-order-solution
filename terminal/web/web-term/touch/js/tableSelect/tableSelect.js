@@ -333,10 +333,6 @@ $(function(){
 	//餐台选择, 转菜, 查台输入框
 	ts.s.init({file : 'txtTableNumForTS'});	
 	
-	//设置数字键盘输入
-	$('.numberInputStyle').focus(function(){
-		focusInput = this.id;
-	});		
 	
 	//获取系统相关属性
 	Util.sys.checkSmStat();

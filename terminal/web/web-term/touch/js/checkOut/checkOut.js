@@ -885,16 +885,14 @@ uo.useMemberForOrderAction = function(){
  * 转菜操作
  */
 uo.openTransOrderFood = function (){
-	//设置数字键盘触发
-	numKeyBoardFireEvent = ts.s.fireEvent;
 	
 	$('#transFoodCmp').trigger('create').trigger('refresh');
 	$('#transFoodCmp').show();
-	$('#shadowForPopup').show();	
-	
-	$('#numberKeyboard').show();
-	
+	$('#shadowForPopup').show();
 	$('#txtTableNumForTS').focus();
+	NumKeyBoardAttacher.instance().attach($('#txtTableNumForTS')[0]);
+	$('#txtTableNumForTS').focus();
+	NumKeyBoardAttacher.instance().attach($('#numToOtherTable')[0]);
 	
 };
 
@@ -902,11 +900,7 @@ uo.openTransOrderFood = function (){
  * 关闭转菜
  */
 uo.closeTransOrderFood = function(){
-	//取消数字键盘触发
-	numKeyBoardFireEvent = null;	
 
-
-		
 	if(ts.commitTableOrTran == 'openTable'){
 		//隐藏人数输入
 		$('#td4OpenTablePeople').hide();
@@ -951,6 +945,10 @@ uo.closeTransOrderFood = function(){
 	$('#txtFoodNumForTran').val('');
 	
 	$('#divSelectTablesForTs').html('');
+	
+	NumKeyBoardAttacher.instance().detach($('#txtTableNumForTS')[0]);
+	
+	NumKeyBoardAttacher.instance().attach($('#numToOtherTable')[0]);
 };
 
 /**

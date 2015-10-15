@@ -47,6 +47,8 @@
 <script type="text/javascript" src="js/stopSet/stopSet.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/payment/payment.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/tableSelect/tableSelect.js?v=<%=v %>"></script>
+<!-- 数字键盘控件 -->
+<script type="text/javascript" src="js/numKeyBoard/numKeyBoard.js"></script>
 
 
 <!--引入易笔字核心脚本(utf-8编码)-->
@@ -1410,16 +1412,16 @@
     <table id="divTransFoodTableAlias" style="width:90%">
    	<tr>
    		<td>
-   			<input id="txtTableNumForTS" onkeyup="value=value.replace(/[+]/g,'')" type="text" placeholder="填写台号" class="numberInputStyle">
+   			<input id="txtTableNumForTS" onkeyup="value=value.replace(/[+]/g,'')" type="text" placeholder="填写台号">
    		</td>
    		<td id="td4TxtFoodNumForTran">
-   			<input id="txtFoodNumForTran" type="text" placeholder="填写菜品数量" class="numberInputStyle">
+   			<input id="txtFoodNumForTran" type="text" placeholder="填写菜品数量">
    		</td>    	
    		<td id="td4ToOtherTable" style="display: none;">
-   			<input id="numToOtherTable" type="text" placeholder="填写要转去的台号" class="numberInputStyle">
+   			<input id="numToOtherTable" type="text" placeholder="填写要转去的台号">
    		</td>     		
 		<td id="td4OpenTablePeople" style="display: none;">
-   			<input id="openTablePeople" type="text" placeholder="填写就餐人数" class="numberInputStyle">
+   			<input id="openTablePeople" type="text" placeholder="填写就餐人数">
    		</td>  	
    		<td id="td4CmpDeleteWord" style="display: none;">
 			<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:inherit;">
@@ -1459,35 +1461,6 @@
 <!-- end 系统共用餐台操作-->
 
 
-	
-<!-- 系统共用数字键盘 start -->
-<div id="numberKeyboard" class="ui-overlay-shadow ui-corner-all" style="z-index: 1200;position: absolute;background-color: white;right: 0;bottom: 0;display: none;" align="center">
-    <div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="line-height: 30px;">
-        	数字键盘
-    </div>
-    <div style="max-height: 300px; overflow-y: auto;">
-		<div id="calculator4NumberKeyboard" class="calculator">
-			<div class="keys">
-				<span>7</span>
-				<span>8</span>
-				<span>9</span>
-				<span>0</span>
-				
-				<span>4</span>
-				<span>5</span>
-				<span>6</span>
-				<span>.</span>
-				
-				<span>1</span>
-				<span>2</span>
-				<span>3</span>
-				<span class="clear">C</span>
-			</div>
-		</div>		    
-    
-	</div>	
-</div>	
-<!-- end 系统共用数字键盘-->
 
 <!-- 点菜界面 start-->
 <div data-role="page" id="orderFoodMgr" >
