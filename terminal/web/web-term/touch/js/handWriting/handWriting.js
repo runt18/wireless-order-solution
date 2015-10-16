@@ -257,7 +257,7 @@ var HandWritingAttacher = (function () {
 	        				panel.append(word).append(container);	        			
 	        				$('body').append(panel);
 	        				
-					  		var handWritingPanel = new HandWritingPanel({ 
+					  		new HandWritingPanel({ 
 								renderTo : container[0] ,
 						   	   	result : function(data){
 						   	    	var temp = data.slice(0, 4);
