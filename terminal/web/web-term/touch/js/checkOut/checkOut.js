@@ -582,49 +582,56 @@ uo.weighAction = function(){
  * 打开称重
  */
 uo.openWeighOperate = function(){
-	setTimeout(function(){
-		$('#inputOrderFoodWeigh').focus();
-		//显示菜名
-		$('#weighFoodName').text(uo.selectedFood.foodName);		
-	}, 250);
-	$('#orderFoodWeighCmp').parent().addClass('popup').addClass('in');
-	$('#orderFoodWeighCmp').popup('open');
-};
-
-/**
- * 关闭称重
- */
-uo.closeWeighOperate = function(){
-	$('#inputOrderFoodWeigh').val('');
-	$('#orderFoodWeighCmp').popup('close');
-	//删除动作
-	delete uo.weighOperate;
-};
-
-/**
- * 称重操作
- */
-uo.openWeighaction = function(){
-	var count = $('#inputOrderFoodWeigh');
-	if(!count.val()){
-		Util.msg.tip('请输入称重数量');
-		count.focus();
-		return;
-	}else if(isNaN(count.val())){
-		Util.msg.tip('请输入正确的称重数量');
-		count.focus();
-		return;
-	}else if(count.val() < uo.selectedFood.count){
-		Util.msg.tip('称重数量不能少于原有数量');
-		count.focus();
-		return;
-	}
+//	setTimeout(function(){
+//		$('#inputOrderFoodWeigh').focus();
+//		//显示菜名
+//		$('#weighFoodName').text(uo.selectedFood.foodName);		
+//	}, 250);
+//	$('#orderFoodWeighCmp').parent().addClass('popup').addClass('in');
+//	$('#orderFoodWeighCmp').popup('open');
+	var weighPopup = null;
+	weighPopup = new NumKeyBoardPopup({
+		header : '输入称重',
+		left : function(){
+			var count = $('#input_input_numKbPopup');
+			if(!count.val()){
+				Util.msg.tip('请输入称重数量');
+				count.focus();
+				return;
+			}else if(isNaN(count.val())){
+				Util.msg.tip('请输入正确的称重数量');
+				count.focus();
+				return;
+			}else if(count.val() < uo.selectedFood.count){
+				Util.msg.tip('称重数量不能少于原有数量');
+				count.focus();
+				return;
+			}
+			
+			uo.selectedFood.count = count.val();
+			//对更新的菜品和人数进行提交
+			uo.submitUpdateOrderHandler({orderFoods:uo.order.orderFoods, notPrint:!$('#chkPrintWeigh').attr("checked")});	
+			weighPopup.close();
+		},
+		right : function(){
+			weighPopup.close();
+		}
+	});
 	
-	uo.selectedFood.count = count.val();
-	//对更新的菜品和人数进行提交
-	uo.submitUpdateOrderHandler({orderFoods:uo.order.orderFoods, notPrint:!$('#chkPrintWeigh').attr("checked")});	
+	weighPopup.open(function(self){
+		var print = '<label>'+
+  		'<input type="checkbox" id="chkPrintWeigh" data-theme="e" checked="checked">打印称重信息'+
+	   	'</label>';	
+		$('#content_div_numKbPopup').append(print);
+		$('#content_div_numKbPopup').trigger('create');
+		setTimeout(function(){
+			self.find('[id=input_input_numKbPopup]').focus();
+		}, 200);
+		
+	});
+	
+	
 };
-
 
 
 /**
@@ -647,55 +654,53 @@ uo.giftAction = function(){
  * 打开赠送
  */
 uo.openGiftOperate = function(){
-	setTimeout(function(){
-		$('#inputOrderFoodGift').val(uo.selectedFood.count);	
-		$('#inputOrderFoodGift').select();
-		//显示菜名
-		$('#giftFoodName').text(uo.selectedFood.foodName);		
-	}, 250);
-	$('#orderFoodGiftCmp').parent().addClass('popup').addClass('in');
-	$('#orderFoodGiftCmp').popup('open');
-};
-
-/**
- * 关闭赠送
- */
-uo.closeGiftOperate = function(){
-	$('#inputOrderFoodGift').val('');
-	$('#orderFoodGiftCmp').popup('close');
-};
-
-/**
- * 赠送操作
- */
-uo.openGiftaction = function(){
-	var count = $('#inputOrderFoodGift');
-	if(!count.val() || isNaN(count.val()) || count.val() < 0){
-		Util.msg.tip('请输入正确的赠送数量');
-		count.focus();
-		return;
-	}else if(count.val() > uo.selectedFood.count){
-		Util.msg.tip('称重数量不能大于原有数量');
-		count.focus();
-		return;
-	}
-	
-	uo.selectedFood.count = count.val();
-	Util.LM.show();
-	//提交赠送
-	$.post('../OperateOrderFood.do', {
-		dataSource : 'giftOrderFood',
-		orderId : uo.order.id,
-		giftFood : uo.selectedFood.id +','+ uo.selectedFood.count
-	}, function(result){
-		Util.LM.hide();
-		if(result.success){
-			Util.msg.tip(result.msg);
-			initOrderData({table : uo.table});
-			uo.closeGiftOperate();
-		}else{
-			Util.msg.tip('赠送失败');
+	var giftPopup = null;
+	giftPopup = new NumKeyBoardPopup({
+		header : '输入赠送--' + uo.selectedFood.foodName,
+		left : function(){
+			var count = $('#input_input_numKbPopup');
+			if(!count.val() || isNaN(count.val()) || count.val() < 0){
+				Util.msg.tip('请输入正确的赠送数量');
+				count.focus();
+				return;
+			}else if(count.val() > uo.selectedFood.count){
+				Util.msg.tip('赠送数量不能大于原有数量');
+				count.focus();
+				return;
+			}
+			
+			uo.selectedFood.count = count.val();
+			Util.LM.show();
+			//提交赠送
+			$.post('../OperateOrderFood.do', {
+				dataSource : 'giftOrderFood',
+				orderId : uo.order.id,
+				giftFood : uo.selectedFood.id +','+ uo.selectedFood.count
+			}, function(result){
+				Util.LM.hide();
+				if(result.success){
+					Util.msg.tip(result.msg);
+					initOrderData({table : uo.table});
+					uo.closeGiftOperate();
+				}else{
+					Util.msg.tip('赠送失败');
+				}
+			});
+			giftPopup.close();
+		},
+		right : function(){
+			giftPopup.close();
 		}
+	});
+	
+	giftPopup.open(function(self){
+		self.find('[id=input_input_numKbPopup]').val(uo.selectedFood.count);
+		setTimeout(function(){
+		//	self.find('[id=input_input_numKbPopup]').select();
+			self.find('[id=input_input_numKbPopup]').focus();
+			self.find('[id=input_input_numKbPopup]').select();
+		}, 200);
+		
 	});
 };
 
@@ -767,6 +772,7 @@ uo.transFoodForTS = function(c){
 	
 	//打开控件
 	uo.openTransOrderFood();
+	
 };
 
 /**
@@ -893,6 +899,7 @@ uo.openTransOrderFood = function (){
 	NumKeyBoardAttacher.instance().attach($('#txtTableNumForTS')[0]);
 	$('#txtTableNumForTS').focus();
 	NumKeyBoardAttacher.instance().attach($('#numToOtherTable')[0]);
+	NumKeyBoardAttacher.instance().attach($('#txtFoodNumForTran')[0]);
 	
 };
 
@@ -948,7 +955,8 @@ uo.closeTransOrderFood = function(){
 	
 	NumKeyBoardAttacher.instance().detach($('#txtTableNumForTS')[0]);
 	
-	NumKeyBoardAttacher.instance().attach($('#numToOtherTable')[0]);
+	NumKeyBoardAttacher.instance().detach($('#numToOtherTable')[0]);
+	NumKeyBoardAttacher.instance().detach($('#txtFoodNumForTran')[0]);
 };
 
 /**
@@ -1121,7 +1129,6 @@ uo.printDetailPatch = function(){
 uo.showOperatePeople = function(){
 	uo.updateCustom = true;
 	
-	$('#inputOrderCustomerCountSet').val(uo.order.customNum);
 	$('#updateFoodOtherOperateCmp').popup('close');
 };
 
@@ -1130,14 +1137,9 @@ uo.showOperatePeople = function(){
  */
 uo.closeOperatePeople = function(c){
 	uo.updateCustom = false;
-	$('#orderCustomerCountSet').popup({
-		afterclose: function (event, ui) { 
-			if(c && c.callback){
-				c.callback();
-			}
-		}
-	});	
-	$('#orderCustomerCountSet').popup('close');
+	if(c && c.callback){
+		c.callback();
+	}
 };
 
 /**
@@ -1147,10 +1149,38 @@ uo.openMoreOperate = function(){
 	$('#updateFoodOtherOperateCmp').popup({
 		afterclose: function (event, ui) { 
 			if(uo.updateCustom){//修改人数
-				$('#orderCustomerCountSet').popup('open');
-				focusInput = 'inputOrderCustomerCountSet';
-				$('#inputOrderCustomerCountSet').focus();
-				$('#inputOrderCustomerCountSet').select();
+//				$('#orderCustomerCountSet').popup('open');
+//				focusInput = 'inputOrderCustomerCountSet';
+//				$('#inputOrderCustomerCountSet').focus();
+//				$('#inputOrderCustomerCountSet').select();
+				var updateCustomPopup = null;
+				updateCustomPopup = new NumKeyBoardPopup({
+					header : '修改人数',
+					left : function(){
+							var num = $("#input_input_numKbPopup").val();
+							//更改页面端的的人数
+							$("#customNumForUO").html("用餐人数：" + num);	
+							uo.customNum = num;
+							uo.updateCustom = true;
+							uo.saveForUO();
+							updateCustomPopup.close();
+					},
+					right : function(){
+						uo.closeOperatePeople();
+						updateCustomPopup.close();
+					}
+						
+				});
+
+				updateCustomPopup.open(function(self){
+					self.find('[id=input_input_numKbPopup]').val(uo.order.customNum);
+					setTimeout(function(){
+					//	self.find('[id=input_input_numKbPopup]').select();
+						self.find('[id=input_input_numKbPopup]').focus();
+						self.find('[id=input_input_numKbPopup]').select();
+					}, 200);
+				});
+				
 			}else if(uo.tempPayForPrintAllAction){//补打总单
 				Util.LM.show();
 				$.post('../PrintOrder.do', {'tableID' : uo.order.table.id, 'printType' : 14}, function(result){
@@ -1214,22 +1244,6 @@ uo.openMoreOperate = function(){
 	});	
 };
 
-
-/**
- * 确定修改餐桌人数
- */
-uo.saveForChangePeople = function(){
-	
-	var num = $("#inputOrderCustomerCountSet").val();
-	
-	//更改页面端的的人数
-	$("#customNumForUO").html("用餐人数：" + num);	
-	
-	uo.customNum = num;
-	
-	uo.updateCustom = true;
-	uo.saveForUO();
-};
 
 /**
  * 工具栏的确定按钮,对整个页面信息提交

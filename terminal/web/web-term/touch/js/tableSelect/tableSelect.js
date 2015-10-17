@@ -2135,7 +2135,7 @@ function handleTableForTS(c){
 			}else{
 				ts.table = table;
 				//判断餐桌是否已经改变状态
-				if(c.event && $(c.event).attr('data-theme') == 'e'){
+				if(c.event && $(c.event).attr('data-theme') == 'e'){ 
 					initTableData();
 				}
 				

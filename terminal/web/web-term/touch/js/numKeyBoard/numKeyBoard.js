@@ -13,7 +13,7 @@ function NumKeyBoard(param){
 	
 	var keys = "";
 	for(var i = 0; i < numKeys.length; i++){
-		var eachKeys = '<span	>' + numKeys[i] + '</span>';
+		var eachKeys = '<span>' + numKeys[i] + '</span>';
 		if(i % 4 == 0){
 			keys += '<br>';
 		}
@@ -190,5 +190,85 @@ var NumKeyBoardAttacher = (function(){
 	return _static;
 })();
 
+function NumKeyBoardPopup(param){
+	//创建数字键盘
+	//TODO
+	function createNumberKeyBoard(input){
+		//createNumKeyBoard一声明就执行
+		 new NumKeyBoard({
+			renderTo : document.getElementById('content_div_numKbPopup'),
+			result : function(value){
+				console.log(value);
+				input.focus();
+				//获取当前选中的文字
+				function getSelected(){
+					var t = '';
+					if(window.getSelection) {
+					    t = window.getSelection();
+					} else if(document.getSelection) {
+					    t = document.getSelection();
+					} else if(document.selection) {
+					    t = document.selection.createRange().text;
+					}
+					return t;
+				}
+				if(value == '+'){
+					if(input.val() == ""){
+						input.val(input.val() + 1);
+					}else{
+						input.val(parseFloat(input.val()) + 1);
+					}					
+				}else if(value == '-'){
+					if(input.val() == ""){
+						input.val("");
+					}else{
+						input.val(parseFloat(input.val()) - 1);
+					}	
+				}else if(value == 'C'){
+					input.val('');
+					input.focus();
+				}else{
+					var s = input.val();			
+					if(getSelected().toString() != ""){
+						input.val(s.replace(getSelected().toString(), value));
+					}else{
+						input.val(s + value);
+					}
+				}		
+			}
+		});
+	}
 
+	
+	var numberPopup = null;
+	numberPopup = new JqmPopup({
+		loadUrl : './popup/keyboard/number.html',
+		pageInit : function(self){
+			//创建数字键盘
+			//createNumKeyBoard一声明就执行
+			createNumberKeyBoard(self.find('[id = input_input_numKbPopup]'));
+			
+			self.find('[id=header_div_numKbPopup]').html('<h3>' + param.header + '</h3>');
+			
+			//绑定取消按钮
+			$('#right_a_numKbPopup').click(function(){
+				 param.right(); 
+			 });
+			 
+			 //绑定确定按钮
+			 self.find('[id=left_a_numKbPopup]').click(function(){
+				 param.left();
+
+			 });
+		}
+	});	
+	
+	this.open = function(afterOpen){
+		numberPopup.open(afterOpen);
+	};
+	
+	this.close = function(afterOpen){
+		numberPopup.close(afterOpen);
+	};
+}
 
