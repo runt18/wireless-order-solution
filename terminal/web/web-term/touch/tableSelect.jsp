@@ -49,7 +49,7 @@
 <script type="text/javascript" src="js/tableSelect/tableSelect.js?v=<%=v %>"></script>
 <!-- 数字键盘控件 -->
 <script type="text/javascript" src="js/numKeyBoard/numKeyBoard.js"></script>
-
+<script type="text/javascript" src="./js/popup/jqmPopup.js"></script>
 
 <!--引入易笔字核心脚本(utf-8编码)-->
 <!-- <script src="http://www.yibizi.com/ybz_core/core/ybz.min.js"></script> -->
@@ -1151,88 +1151,7 @@
         </ul>
 	</div>		
 
-	<div id="orderCustomerCountSet" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top">
-	        <h1>输入人数</h1>
-	    </div>
-	    <div style="max-height: 300px; overflow-y: auto;">
-			<div id="calculator4OrderCustomerCount" class="calculator">
-				<div class="top">
-					<span class="clear">+</span>
-					<span class="inputs">
-						<input id="inputOrderCustomerCountSet" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderCustomerCountSet')">
-					</span>
-					<span class="clear">-</span>
-				</div>
-				<div class="keys">
-					<span>7</span>
-					<span>8</span>
-					<span>9</span>
-					<span>0</span>
-					
-					<span>4</span>
-					<span>5</span>
-					<span>6</span>
-					<span>.</span>
-					
-					<span>1</span>
-					<span>2</span>
-					<span>3</span>
-					<span class="clear">C</span>
-				</div>
-			</div>		    
-	    
-		</div>	
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.saveForChangePeople()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeOperatePeople()">取消</a>		 
-			 </div>
-	    </div>
-	</div>		
 	
-	<div id="orderFoodWeighCmp" data-role="popup" data-theme="c" data-dismissible="false" class="ui-corner-all" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
-	        <!-- <h1>输入称重--<span id="weighFoodName"></span></h1> -->
-	       	 输入称重--<span id="weighFoodName"></span>
-	    </div>
-		<div class="calculator">
-			<div class="top">
-				<span class="clear">+</span>
-				<span class="inputs">
-					<input id="inputOrderFoodWeigh" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodWeigh')">
-				</span>
-				<span class="clear">-</span>
-			</div>
-			<div class="keys">
-				<span>7</span>
-				<span>8</span>
-				<span>9</span>
-				<span>0</span>
-				
-				<span>4</span>
-				<span>5</span>
-				<span>6</span>
-				<span>.</span>
-				
-				<span>1</span>
-				<span>2</span>
-				<span>3</span>
-				<span class="clear">C</span>
-			</div>
-			
-			<label>
-		        <input type="checkbox" id="chkPrintWeigh" data-theme="e" checked="checked">打印称重信息
-		    </label>	
-		</div>		    
-	    
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.openWeighaction()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeWeighOperate()">取消</a>		 
-			 </div>
-	    </div>
-	</div>		
 	
 	<!-- 修改备注 -->
 	<div id="orderFoodCommentCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: 100px 0px 0px -200px;min-width:400px;display: none;background-color: white;" align="center">
@@ -1256,45 +1175,6 @@
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.saveComment()">确定</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeComment()">取消</a>		 
-			 </div>
-	    </div>
-	</div>		
-	
-	<!-- 已点菜赠送 -->
-	<div id="orderFoodGiftCmp" data-role="popup" data-theme="c" data-dismissible="false" class="ui-corner-all" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
-	       	 输入赠送--<span id="giftFoodName"></span>
-	    </div>
-		<div class="calculator">
-			<div class="top">
-				<span class="clear">+</span>
-				<span class="inputs">
-					<input id="inputOrderFoodGift" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodGift')">
-				</span>
-				<span class="clear">-</span>
-			</div>
-			<div class="keys">
-				<span>7</span>
-				<span>8</span>
-				<span>9</span>
-				<span>0</span>
-				
-				<span>4</span>
-				<span>5</span>
-				<span>6</span>
-				<span>.</span>
-				
-				<span>1</span>
-				<span>2</span>
-				<span>3</span>
-				<span class="clear">C</span>
-			</div>
-		</div>		    
-	    
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.openGiftaction()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="uo.closeGiftOperate()">取消</a>		 
 			 </div>
 	    </div>
 	</div>		
@@ -1576,7 +1456,7 @@
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="fastPay_a_orderFood">结账</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="brand_a_orderFood">牌号</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#orderMore_div_orderFood" id="orderFoodMore_a_orderFood">下单>></a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="aliasOrderFood_a_orderFood">助记码</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="handWriteBoard_a_orderFood">手写板</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="pinyinBoard_a_orderFood">拼音</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup" data-position-to="window" id="addTemp_a_orderFood" data-transition="pop" data-theme="b"  >临时菜</a>
@@ -1668,223 +1548,8 @@
 			</div> 
 	    </div>
 	    
-	    
- 	
 	</div>		
 	
-	
-	
-	<!-- 菜品数量输入 -->
-	<div id="orderFoodCountSet" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top">
-	        <h1>输入菜品数量</h1>
-	    </div>
-	    <div style="min-height: 300px; overflow-y: auto;">
-			<div id="calculator4orderFoodCount" class="calculator">
-				<div class="top">
-					<span class="clear">+</span>
-					<span class="inputs">
-						<input id="inputOrderFoodCountSet" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodCountSet')">
-					</span>
-					<span class="clear">-</span>
-				</div>
-				<div class="keys">
-					<span>7</span>
-					<span>8</span>
-					<span>9</span>
-					<span>0</span>
-					
-					<span>4</span>
-					<span>5</span>
-					<span>6</span>
-					<span>.</span>
-					
-					<span>1</span>
-					<span>2</span>
-					<span>3</span>
-					<span class="clear">C</span>
-				</div>
-			</div>		    
-	    
-		</div>	
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.saveForSetFood()">确定</a>
-				 <a  data-role="button" data-inline="true" data-rel="back" class="countPopbottomBtn">取消</a>		 
-			 </div>
-	    </div>
-	</div>	
-	
-	<!-- 菜品时价输入 -->
-	<div id="orderFoodUnitPriceSet" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top">
-	        <h1>输入菜品时价</h1>
-	    </div>
-	    <div style="min-height: 300px; overflow-y: auto;">
-			<div class="calculator">
-				<div class="top">
-					<span class="clear">+</span>
-					<span class="inputs">
-						<input id="inputOrderFoodUnitPriceSet" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputOrderFoodUnitPriceSet')">
-					</span>
-					<span class="clear">-</span>
-				</div>
-				<div class="keys">
-					<span>7</span>
-					<span>8</span>
-					<span>9</span>
-					<span>0</span>
-					
-					<span>4</span>
-					<span>5</span>
-					<span>6</span>
-					<span>.</span>
-					
-					<span>1</span>
-					<span>2</span>
-					<span>3</span>
-					<span class="clear">C</span>
-				</div>
-			</div>		    
-	    
-		</div>	
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.saveForFoodUnitPrice()">确定</a>
-				 <a  data-role="button" data-inline="true" data-rel="back" class="countPopbottomBtn">取消</a>		 
-			 </div>
-	    </div>
-	</div>	
-	
-	<!-- 分席上 -->
-	<div id="splitOrderWin" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top">
-	        <h1>输入分席数</h1>
-	    </div>
-	    <div style="min-height: 300px; overflow-y: auto;">
-			<div class="calculator">
-				<div class="top">
-					<span class="clear">+</span>
-					<span class="inputs">
-						<input id="splitOrderCount" style="font-size: 20px;font-weight: bold;" onfocus="setInput('splitOrderCount')">
-					</span>
-					<span class="clear">-</span>
-				</div>
-				<div class="keys">
-					<span>7</span>
-					<span>8</span>
-					<span>9</span>
-					<span>0</span>
-					
-					<span>4</span>
-					<span>5</span>
-					<span>6</span>
-					<span>.</span>
-					
-					<span>1</span>
-					<span>2</span>
-					<span>3</span>
-					<span class="clear">C</span>
-				</div>
-			</div>		    
-	    
-		</div>	
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.saveForSplitOrder()">确定</a>
-				 <a  data-role="button" data-inline="true" data-rel="back" class="countPopbottomBtn">取消</a>		 
-			 </div>
-	    </div>
-	</div>	
-	
-	<!-- 牌子号 -->
-	<div id="orderFoodByBrandCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top">
-	        <h1>输入牌子号</h1>
-	    </div>
-	    <div style="max-height: 300px; overflow-y: auto;">
-			<div id="calculator4OrderFoodByBrand" class="calculator">
-				<div class="top">
-					<span class="clear">+</span>
-					<span class="inputs">
-						<input id=brandText_input_orderFood style="font-size: 20px;font-weight: bold;" onfocus="setInput('brandText_input_orderFood')">
-						
-					</span>
-					<span class="clear">-</span>
-				</div>
-				<div class="keys">
-					<span>7</span>
-					<span>8</span>
-					<span>9</span>
-					<span>0</span>
-					
-					<span>4</span>
-					<span>5</span>
-					<span>6</span>
-					<span>.</span>
-					
-					<span>1</span>
-					<span>2</span>
-					<span>3</span>
-					<span class="clear">C</span>
-				</div>
-			</div>		    
-	    
-		</div>	
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn"  id="brandSubmit_a_orderFood">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="brandClose_a_orderFood">取消</a>		 
-			 </div>
-	    </div>
-	</div>	
-	
-	
-	
-	
-	
-		
-	
-	<!-- 助记码输入 -->
-	<div id="orderFoodByAliasCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top">
-	        <h1>输入助记码</h1>
-	    </div>
-	    <div style="max-height: 300px; overflow-y: auto;">
-			<div id="calculator4OrderFoodByAlias" class="calculator">
-				<div class="top">
-					<span class="clear">+</span>
-					<span class="inputs">
-						<input id="txtFoodAlias" style="font-size: 20px;font-weight: bold;" onfocus="setInput('txtFoodAlias')">
-					</span>
-					<span class="clear">-</span>
-				</div>
-				<div class="keys">
-					<span>7</span>
-					<span>8</span>
-					<span>9</span>
-					<span>0</span>
-					
-					<span>4</span>
-					<span>5</span>
-					<span>6</span>
-					<span>.</span>
-					
-					<span>1</span>
-					<span>2</span>
-					<span>3</span>
-					<span class="clear">C</span>
-				</div>
-			</div>		    
-	    
-		</div>	
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="of.findByAliasAction()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="closeAlias_a_orderFood">取消</a>		 
-			 </div>
-	    </div>
-	</div>	
 	
 	<!-- 拼音搜索 -->
 	<div id="orderPinyinCmp" class="ui-overlay-shadow ui-corner-all pinyinWindow" > 		
