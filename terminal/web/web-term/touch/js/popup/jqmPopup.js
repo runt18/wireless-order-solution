@@ -80,11 +80,17 @@
 
 		};
 		
-		this.close = function(pageClose){
+		this.close = function(pageClose, timeout){
 			//添加close callback
 			if(pageClose){
 				$('#' + _popupId).on('popupafterclose', function(){
-					pageClose($('#' + _popupId));
+					if(timeout){
+						setTimeout(function(){
+							pageClose($('#' + _popupId));
+						}, timeout);
+					}else{
+						pageClose($('#' + _popupId));
+					}
 				});
 			}
 			//弹出组件
@@ -94,7 +100,7 @@
 			$('#' + _popupId).remove();
 			_popupId = null;
 		};
-	}	
+	};	
 })();
 
 

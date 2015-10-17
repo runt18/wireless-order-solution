@@ -24,8 +24,6 @@
 <link rel="stylesheet" type="text/css" href="css/timepicki.css" />
 <!-- 数字键盘样式 -->
 <link rel="stylesheet" href="css/calculate/datouwang.css">
-<!-- 拼音键盘样式 -->
-<link rel="stylesheet" href="css/calculate/pinyinKeyboard.css">
 <!-- 自定义样式 -->
 <link rel="stylesheet" href="css/takeout/main.css?v=<%=v %>">
 <link rel="stylesheet" href="css/table.css?v=<%=v %>">
@@ -37,9 +35,10 @@
 <script type="text/javascript" src="js/common/jqm.datebox.language-CN.js"></script>
 <!-- 时分插件.js -->
 <script type="text/javascript" src="js/book/timepicki.js"></script>
-<!-- 工具类 -->
-<link rel="stylesheet" href="css/calculate/pinyinKeyboard.css">
+<!-- 手写板控件 -->
 <script type="text/javascript" src="js/handWriting/handWriting.js"></script>
+<!-- jqm弹出框控件 -->
+<script type="text/javascript" src="js/popup/jqmPopup.js"></script>
 <script type="text/javascript" src="js/Util.js?v=<%=v %>"></script>
 <script type="text/javascript" src="../extjs/wireless.ux.js"></script>
 <script type="text/javascript" src="js/orderFood/orderFood.js?v=<%=v %>"></script>
@@ -80,9 +79,9 @@
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop"  data-position-to="window" onclick="ts.displayFeastPayWin()">酒席入账</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageMemberOperation">会员</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="toOrderMgrPage()">账单</a>
-		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:2, businessStatic:2})">交款</a>
-			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:0})">交班</a>
-			<a data-role="button" data-inline="true" class="topBtnFont" onclick="getDailyInfo({queryType:1})">日结</a>
+		 	<a id="personSettle_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">交款</a>
+			<a id="phraseSettle_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">交班</a>
+			<a id="dailySettle_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">日结</a>
 			<a data-role="button" data-inline="true" class="topBtnFont" id="btnToBasicPage" data-rel="popup" data-transtion="pop" href="#toBasicMgr">后台</a>
 		 </div>
 	</div>
@@ -372,95 +371,6 @@
        	<div data-role="content">
 			<h3>请安装驱动, 或联系客服QQ: 850774706</h3>
 		</div>
-	</div>		
-	
-	
-	<!-- 交款, 交班, 日结 -->
-	<div id="dailyInfoTable" class="ui-overlay-shadow ui-corner-all" style="width:900px;z-index: 1102;position: absolute; top: 150px; left: 50%; margin: -100px 0px 0px -450px;background-color: white;display: none;" align="center">	
-	    <div id="title4DailyInfoTable" data-role="header" data-theme="b" class="ui-corner-top" style="line-height: 35px;text-align: left;padding-left: 5px;">
-	        	操作表
-	    </div>
-		<div class="ui-grid-a" style="background-color: #DFE8F6">
-		<!-- #fffadf -->
-		    <div class="ui-block-a" style="border-right: 1px solid black;padding: 5px;">
-				<table id="businessStatisticsSummaryInformation" border="1" class="tb_base">
-					<tr>
-						<th>开始时间:</th>
-						<td width="210px" colspan="2" id="bssiOnDuty">---</td>
-					</tr>
-					<tr>
-						<th>结束时间:</th>
-						<td colspan="2" id="bssiOffDuty">---</td>
-					</tr>
-					<tr>
-						<th>账单总数:</th>
-						<td colspan="2" id="bssiOrderAmount">---</td>
-					</tr>
-				</table>
-				<br>
-				<table id="businessStatisticsSummaryPayIncome" border="1" class="tb_base"></table>
-				<br>
-				<table style="width : 100%;" border="1" class="tb_base" >	
-					<tr>
-						<th class="table_title text_center">操作类型</th>
-						<th class="table_title text_center">账单数</th>
-						<th class="table_title text_center">金额</th>
-					</tr>
-					<tr>
-						<th>抹数</th>
-						<td class="text_right" id="bssiEraseAmount">---</td>
-						<td class="text_right" id="bssiEraseIncome">---</td>
-					</tr>
-					<tr>
-						<th>折扣</th>
-						<td class="text_right" id="bssiDiscountAmount">---</td>
-						<td class="text_right" id="bssiDiscountIncome">---</td>
-					</tr>
-					<tr>
-						<th>赠送</th>
-						<td class="text_right" id="bssiGiftAmount">---</td>
-						<td class="text_right" id="bssiGiftIncome">---</td>
-					</tr>
-					<tr>
-						<th>退菜</th>
-						<td class="text_right" id="bssiCancelAmount">---</td>
-						<td class="text_right" id="bssiCancelIncome">---</td>
-					</tr>
-					<tr>
-						<th>反结帐</th>
-						<td class="text_right" id="bssiPaidAmount">---</td>
-						<td class="text_right" id="bssiPaidIncome">---</td>
-					</tr>
-					<tr>
-						<th>服务费收入</th>
-						<td class="text_right" id="bssiServiceAmount">---</td>
-						<td class="text_right" id="bssiServiceIncome">---</td>
-					</tr>
-					<tr>
-						<th>优惠劵</th>
-						<td class="text_right" id="bssiCouponAmount">---</td>
-						<td class="text_right" id="bssiCouponIncome">---</td>
-					</tr>
-				</table>		    	
-		    
-		    </div>
-		    <div class="ui-block-b" id="businessStatisticsSummaryInformationCenterPanel" style="padding: 5px;"></div>
-		</div>	    
-	    
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 44px;">
-		
-			 <div data-role="controlgroup" data-type="horizontal" style="float: right;margin-left: 5px;">
-			 	<a id="btnSubmitDailyOperation"  data-role="button" data-inline="true" class="topBtnFont" onclick="submitDailyOperation()">确定</a>
-				<a data-role="button" data-inline="true" class="topBtnFont" onclick="yuda()">预打</a>
-				<a data-role="button" data-inline="true" class="topBtnFont" onclick="closeDailyInfoWin()">关闭</a>
-			 </div>
-			 <div id="div4SelectionItem" class="div4SelectionItem" style="float: right;height: 40px;display: none;">
-				<select  id="dailyPrintPosition" data-native-menu="false"></select>		 
-			 </div>
-			 <div style="float: right;height: 30px;">
-		 		<label class="print_position"><input id="check4PrintPosition" type="checkbox" onchange="printPositionOperation()">打印位置</label>
-		 	</div>
-	    </div>
 	</div>		
 	
 	<!-- 添加会员 -->
