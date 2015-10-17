@@ -1036,6 +1036,22 @@ $(document).on("pagebeforehide","#paymentMgr",function(){
 	checkOut_actualPrice = 0;
 	orderMsg = null;
 	
+	//清除快捷键
+	$(document).off('keydown');
+});
+
+//进入界面界面
+$(document).on('pageshow', '#paymentMgr', function(){
+	//设置快捷键
+	$(document).on('keydown', function(event){
+		if(event.which == 109){
+			//'-'表示暂结
+			$('#tempPay_a_payment').click();
+		}else if(event.which == 107){
+			//'+'表示现金结账
+			$('#cash_a_payment').click();
+		}
+	});
 });
 
 //页面初始化

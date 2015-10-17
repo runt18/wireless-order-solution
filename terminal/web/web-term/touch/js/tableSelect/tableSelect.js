@@ -113,8 +113,32 @@ var tables = [],
 			+ '<td><div style="height: 25px;overflow: hidden;">{tastePref}</div></td>'
 			+ '<td>{unitPrice}</td>'
 			+ '</tr>';		
+
+//退出餐台选择界面
+$(document).on('pagehide', "#tableSelectMgr", function(){
+	//清除快捷键
+	$(document).off('keydown');
+});
+
+//进入餐台选择界面
+$(document).on('pageshow', "#tableSelectMgr", function(){
+	//快捷键
+	$(document).on('keydown', function(event){
+    	if(event.which == "107"){//加号
+			if(ts.commitTableOrTran != 'lookup'){
+				ts.createOrderForLookup();
+			}else{
+				ts.submitForSelectTableOrTransFood();
+			}
+    	}else if(event.which == "13"){//回车 >> pos端 && 体验端使用 
+    		if(ts.commitTableOrTran == 'lookup' && (systemStatus == 1 || systemStatus == 3)){
+    			ts.toPaymentMgr();
+    		}
+    	}  			
+	});	
+});
 			
-//进入餐桌选择界面的时候
+//进入餐桌初始化
 $(document).on('pageinit', "#tableSelectMgr", function(){
 	//pos端 && 体验端 && touch端
 	if(systemStatus == 1){//pos端
@@ -771,38 +795,6 @@ window.onload = function(){
 		}		
 	});
 	
-	
-	//快捷键
-	$(document).keydown(function(event){
-		if($.mobile.activePage.attr( "id" ) == 'paymentMgr'){//结账界面中使用
-	    	if(event.which == "109") {//减号 
-				if(isMixedPay){
-					mixPayAction(true);
-				}else{
-					paySubmit(6);
-				}
-	    	}else if(event.which == "107"){//加号
-				if(isMixedPay){
-					mixPayAction();
-				}else{
-					paySubmit(1);
-				}
-	    	}      		
-		}else if($.mobile.activePage.attr( "id" ) == 'tableSelectMgr'){//餐厅选择界面使用
-	    	if(event.which == "107"){//加号
-				if(ts.commitTableOrTran != 'lookup'){
-					ts.createOrderForLookup();
-				}else{
-					ts.submitForSelectTableOrTransFood();
-				}
-	    	}else if(event.which == "13"){//回车 >> pos端 && 体验端使用 
-	    		if(ts.commitTableOrTran == 'lookup' && (systemStatus == 1 || systemStatus == 3)){
-	    			ts.toPaymentMgr();
-	    		}
-	    		
-	    	}  			
-		}
-	});	
 	//渲染会员读取窗口
 	$('#lookupOrderDetail').trigger('create').trigger('refresh');
 	
