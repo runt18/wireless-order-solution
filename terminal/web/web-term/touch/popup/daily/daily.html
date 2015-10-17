@@ -3,29 +3,29 @@
 </head>
 <body>
 	<!-- 交款, 交班, 日结 -->
-	<div data-role="popup" data-dismissible="false" class="ui-overlay-shadow ui-corner-all" style="min-width:900px;max-width:900px;">	
+	<div id="dailySettle_div_daily" data-role="popup" data-dismissible="false" class="ui-overlay-shadow ui-corner-all" style="margin-top:-20%;min-width:900px;max-width:900px;">	
 	    <div id="title4DailyInfoTable" data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;text-align: left;padding-left: 5px;">
 	        	操作表
 	    </div>
 		<div class="ui-grid-a" style="background-color: #DFE8F6">
 		<!-- #fffadf -->
 		    <div class="ui-block-a" style="border-right: 1px solid black;padding: 5px;">
-				<table id="businessStatisticsSummaryInformation" border="1" class="tb_base">
+				<table border="1" class="tb_base">
 					<tr>
 						<th>开始时间:</th>
-						<td width="210px" colspan="2" id="bssiOnDuty">---</td>
+						<td width="210px" colspan="2" id="startDate_td_daily">---</td>
 					</tr>
 					<tr>
 						<th>结束时间:</th>
-						<td colspan="2" id="bssiOffDuty">---</td>
+						<td colspan="2" id="endDate_td_daily">---</td>
 					</tr>
 					<tr>
 						<th>账单总数:</th>
-						<td colspan="2" id="bssiOrderAmount">---</td>
+						<td colspan="2" id="orderAmount_td_daily">---</td>
 					</tr>
 				</table>
 				<br>
-				<table id="businessStatisticsSummaryPayIncome" border="1" class="tb_base"></table>
+				<table id="payIncome_table_daily" border="1" class="tb_base"></table>
 				<br>
 				<table style="width : 100%;" border="1" class="tb_base" >	
 					<tr>
@@ -35,57 +35,57 @@
 					</tr>
 					<tr>
 						<th>抹数</th>
-						<td class="text_right" id="bssiEraseAmount">---</td>
-						<td class="text_right" id="bssiEraseIncome">---</td>
+						<td class="text_right" id="eraseAmount_td_daily">---</td>
+						<td class="text_right" id="eraseIncome_td_daily">---</td>
 					</tr>
 					<tr>
 						<th>折扣</th>
-						<td class="text_right" id="bssiDiscountAmount">---</td>
-						<td class="text_right" id="bssiDiscountIncome">---</td>
+						<td class="text_right" id="discountAmount_td_daily">---</td>
+						<td class="text_right" id="discountIncome_td_daily">---</td>
 					</tr>
 					<tr>
 						<th>赠送</th>
-						<td class="text_right" id="bssiGiftAmount">---</td>
-						<td class="text_right" id="bssiGiftIncome">---</td>
+						<td class="text_right" id="giftAmount_td_daily">---</td>
+						<td class="text_right" id="giftIncome_td_daily">---</td>
 					</tr>
 					<tr>
 						<th>退菜</th>
-						<td class="text_right" id="bssiCancelAmount">---</td>
-						<td class="text_right" id="bssiCancelIncome">---</td>
+						<td class="text_right" id="cancelAmount_td_daily">---</td>
+						<td class="text_right" id="cancelIncome_td_daily">---</td>
 					</tr>
 					<tr>
 						<th>反结帐</th>
-						<td class="text_right" id="bssiPaidAmount">---</td>
-						<td class="text_right" id="bssiPaidIncome">---</td>
+						<td class="text_right" id="repaidAmount_td_daily">---</td>
+						<td class="text_right" id="repaidIncome_td_daily">---</td>
 					</tr>
 					<tr>
 						<th>服务费收入</th>
-						<td class="text_right" id="bssiServiceAmount">---</td>
-						<td class="text_right" id="bssiServiceIncome">---</td>
+						<td class="text_right" id="serviceAmount_td_daily">---</td>
+						<td class="text_right" id="serviceIncome_td_daily">---</td>
 					</tr>
 					<tr>
 						<th>优惠劵</th>
-						<td class="text_right" id="bssiCouponAmount">---</td>
-						<td class="text_right" id="bssiCouponIncome">---</td>
+						<td class="text_right" id="couponAmount_td_daily">---</td>
+						<td class="text_right" id="couponIncome_td_daily">---</td>
 					</tr>
 				</table>		    	
 		    
 		    </div>
-		    <div class="ui-block-b" id="businessStatisticsSummaryInformationCenterPanel" style="padding: 5px;"></div>
+		    <div class="ui-block-b" id="memberIncome_div_daily" style="padding: 5px;"></div>
 		</div>	    
 	    
 		<div data-role="footer" data-theme="b" class="ui-footer ui-bar-b ui-corner-bottom" style="height: 44px;">
 		
 			 <div data-role="controlgroup" data-type="horizontal" style="float: right;margin-left: 5px;">
-			 	<a id="btnSubmitDailyOperation"  data-role="button" data-inline="true" class="topBtnFont" onclick="submitDailyOperation()">确定</a>
-				<a data-role="button" data-inline="true" class="topBtnFont" onclick="yuda()">预打</a>
+			 	<a id="confirm_a_daily"  data-role="button" data-inline="true" class="topBtnFont">确定</a>
+				<a id="prePrint_a_daily" data-role="button" data-inline="true" class="topBtnFont">预打</a>
 				<a id="close_a_daily" data-role="button" data-inline="true" class="topBtnFont">关闭</a>
 			 </div>
-			 <div id="div4SelectionItem" class="div4SelectionItem" style="float: right;height: 40px;display: none;">
-				<select  id="dailyPrintPosition" data-native-menu="false"></select>		 
+			 <div id="printPos_div_daily" class="div4SelectionItem" style="float: right;height: 40px;display: none;">
+				<select  id="printPos_select_daily" data-native-menu="false"></select>		 
 			 </div>
 			 <div style="float: right;height: 30px;">
-		 		<label class="print_position"><input id="check4PrintPosition" type="checkbox" onchange="printPositionOperation()">打印位置</label>
+		 		<label class="print_position"><input id="printPos_input_daily" type="checkbox" onchange="printPositionOperation()">打印位置</label>
 		 	</div>
 	    </div>
 	</div>
