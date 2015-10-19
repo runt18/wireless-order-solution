@@ -1154,10 +1154,10 @@
     <table id="divTransFoodTableAlias" style="width:90%">
    	<tr>
    		<td>
-   			<input id="txtTableNumForTS" class="numberInputStyle " onkeyup="value=value.replace(/[+]/g,'')" type="text" placeholder="填写台号">
+   			<input id="txtTableNumForTS" class="numberInputStyle" onkeyup="value=value.replace(/[+]/g,'')" type="text" placeholder="填写台号">
    		</td>
    		<td id="td4TxtFoodNumForTran">
-   			<input id="txtFoodNumForTran" type="text" placeholder="填写菜品数量">
+   			<input id="txtFoodNumForTran" class="numberInputStyle" type="text" placeholder="填写菜品数量">
    		</td>    	
    		<td id="td4ToOtherTable" style="display: none;">
    			<input id="numToOtherTable" type="text" placeholder="填写要转去的台号">
