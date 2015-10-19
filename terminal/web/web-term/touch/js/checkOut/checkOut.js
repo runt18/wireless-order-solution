@@ -676,7 +676,6 @@ uo.openGiftOperate = function(){
 				if(result.success){
 					Util.msg.tip(result.msg);
 					initOrderData({table : uo.table});
-					uo.closeGiftOperate();
 				}else{
 					Util.msg.tip('赠送失败');
 				}
