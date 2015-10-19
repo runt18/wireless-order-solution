@@ -23,7 +23,7 @@ function NumKeyBoard(param){
 	$(param.renderTo).append(keyBoard);
 	
 	$(param.renderTo).find('span').each(function(index, element){
-		element.onclick = function(){
+		element.onclick = function(e){
 			if(param.result){ 
 				var value = $(element).text();
 				if(isNaN(value)){
@@ -34,6 +34,9 @@ function NumKeyBoard(param){
 			}
 		};
 	});
+	
+	
+	
 }
 
 	
@@ -46,7 +49,7 @@ var NumKeyBoardAttacher = (function(){
 		var container = null;
 		var numKeyBoard = null;
 		var isMouseOver = false;
-		this.attach = function(attachTo){
+		this.attach = function(attachTo, postInput){
 			//检查是否有重复控件
 			var isExist = attachInputs.some(function(item, index, array){
 				return item.attachObj.id == attachTo.id;
@@ -54,7 +57,8 @@ var NumKeyBoardAttacher = (function(){
 			
 			if(!isExist){
 				var attachInput = {
-					attachObj : attachTo,	
+					attachObj : attachTo,
+					postInput : postInput,
 					focusFn : function(){
 						if(container == null){
 							container = $('<div/>');
@@ -122,6 +126,9 @@ var NumKeyBoardAttacher = (function(){
 											$(activeInput.attachObj).val($(activeInput.attachObj).val() + value);
 											$(activeInput.attachObj).focus();
 										}
+									}
+									if(activeInput.postInput){
+										activeInput.postInput($(activeInput.attachObj).val());
 									}
 								}
 							});
@@ -248,7 +255,11 @@ function NumKeyBoardPopup(param){
 			//createNumKeyBoard一声明就执行
 			createNumberKeyBoard(self.find('[id = input_input_numKbPopup]'));
 			
-			self.find('[id=header_div_numKbPopup]').html('<h3>' + param.header + '</h3>');
+			self.find('[id=header_div_numKbPopup] h3').html(param.header);
+			
+			if(param.rightTitle){
+				self.find('[id=right_a_numKbPopup] span span').text(param.rightTitle);
+			}
 			
 			//绑定取消按钮
 			$('#right_a_numKbPopup').click(function(){
@@ -258,8 +269,22 @@ function NumKeyBoardPopup(param){
 			 //绑定确定按钮
 			 self.find('[id=left_a_numKbPopup]').click(function(){
 				 param.left();
-
 			 });
+			 
+			 if(param.middle){
+				 //绑定点菜按钮
+				 self.find('[id=middle_a_numKbPopup]').click(function(){
+					 param.middle();
+				 });
+			 }
+			 
+			 if(param.last){
+				//绑定查看预订按钮
+				 self.find('[id=last_a_numKbPopup]').click(function(){
+					 param.last();
+				 });  
+			 }
+			
 		}
 	});	
 	
@@ -267,8 +292,8 @@ function NumKeyBoardPopup(param){
 		numberPopup.open(afterOpen);
 	};
 	
-	this.close = function(afterOpen){
-		numberPopup.close(afterOpen);
+	this.close = function(afterOpen, timeout){
+		numberPopup.close(afterOpen, timeout);
 	};
 }
 

@@ -206,54 +206,6 @@
 	    </div>	    	    
 	</div>		
 	
-	<!-- 输入餐台人数 -->
-	<div id="tableCustomerCountSet" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top" style="line-height: 35px;">
-	        	<span id="tableCustomerCountSetTitle">餐台</span> -- 输入人数
-	    	<div style="float: right">
-	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn4Book">X</a>      		
-	       	</div>
-	    </div>
-	    <div style="min-height: 300px; overflow-y: auto;">
-			<div id="calculator4TableCustomerCount" class="calculator">
-				<div class="top">
-					<span class="clear">+</span>
-					<span class="inputs">
-						<input id="inputTableCustomerCountSet" value="1" style="font-size: 20px;font-weight: bold;" onfocus="setInput('inputTableCustomerCountSet')">
-					</span>
-					<span class="clear">-</span>
-				</div>
-				<div class="keys">
-					<span>7</span>
-					<span>8</span>
-					<span>9</span>
-					<span>0</span>
-					
-					<span>4</span>
-					<span>5</span>
-					<span>6</span>
-					<span>.</span>
-					
-					<span>1</span>
-					<span>2</span>
-					<span>3</span>
-					<span class="clear">C</span>
-				</div>
-				<div>
-						<input id="inputTableOpenCommon" placeholder="开台备注" data-type="num" class="countInputStyle" >
-				</div>
-			</div>		    
-	    
-		</div>	
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.openTableAction()">开台</a>
-				 <a  data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.createTableWithPeople()">点菜</a>
-				 <a id="closeTable4PeopleCount" data-role="button" data-inline="true" class="tablePopbottomBtn" onclick="ts.closeTableWithPeople()">取消</a>		 
-				 <a id="ts_btnCheckoutBook" data-role="button" data-inline="true" class="tablePopbottomBtn none" onclick="ts.checkBookTable()">查看预订</a>
-			 </div>
-	    </div>
-	</div>	
 	
 	<!-- 远程诊断打印机 -->
 	<div id="printerConnectionCmp" class="ui-overlay-shadow ui-corner-all" style="width:1020px;z-index: 1102;position: absolute; top: 150px; left: 50%; margin: -100px 0px 0px -500px;background-color: white;display: none;" align="center">
@@ -1333,7 +1285,6 @@
 		        	<li class="tempFoodKitchen" onclick="of.updateFoodUnitPrice()"><a>修改时价</a></li>
 		            <li class="tempFoodKitchen" onclick="operateOrderFoodTaste({type:1})"><a >全单口味</a></li>
 		            <li class="tempFoodKitchen" onclick="of.foodHangup({type : 1})"><a >全单叫起</a></li>
-		            <li class="tempFoodKitchen" onclick="of.openSplitOrderWin()"><a >分席上</a></li>
 		        </ul>
 			</div>		     
 		   </div>			     
@@ -2142,9 +2093,6 @@
 <!-- end 会员读取窗口--> 
 
 </body>
-
-<!-- 数字键盘 -->
-<script src="js/calculate/datouwang.js" type="text/javascript"></script>
 
 <!-- <script language="JavaScript" src="http://code.54kefu.net/kefu/js/b150/852550.js" type="text/javascript" charset="utf-8"></script> -->
 </html>

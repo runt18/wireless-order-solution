@@ -569,42 +569,36 @@ of.operateFoodCount = function(c){
 			return;
 		}else if(c.otype.toLowerCase() == 'set'){
 			of.calculator = $('#calculator4orderFoodCount');
-			
-			//TODO
-//			
-//			$('#orderFoodCountSet').popup('open');
-//			$('#orderFoodCountSet').parent().addClass("pop").addClass("in");
-//			
-//			$('#inputOrderFoodCountSet').val(data.count);
-//			$('#inputOrderFoodCountSet').focus();
-//			$('#inputOrderFoodCountSet').select();
-			
 			//数量=初始化
-			var Foodcount = null;
-			Foodcount = new NumKeyBoardPopup({
+			var foodCount = null;
+			foodCount = new NumKeyBoardPopup({
 				header : '请输入菜品数量',
 				left : function(){
 					var count = parseFloat($('#input_input_numKbPopup').val());
 			    	if(count <= 0){
-						of.operateFoodCount({
-							otype : 'delete'
-						});
+			    		foodCount.close(function(){
+							of.operateFoodCount({
+								otype : 'delete'
+							});
+			    		}, 200);
+
 					}else{
 						//重新设置数量
 						of.selectedOrderFood.count = count;
 						of.initNewFoodContent({
 							data : of.selectedOrderFood
 						});
+						foodCount.close();
 					}  
-			    	Foodcount.close();
 				},
 				right : function(){
-					Foodcount.close();
+					foodCount.close();
 				}
 			});
 			
-			Foodcount.open(function(self){
+			foodCount.open(function(self){
 				self.find('[id=input_input_numKbPopup]').val(data.count);
+				self.find('[id=middle_a_numKbPopup]').hide();
 				setTimeout(function(){
 					self.find('[id=input_input_numKbPopup]').focus();
 					self.find('[id=input_input_numKbPopup]').select();
@@ -690,7 +684,7 @@ of.updateFoodUnitPrice = function(){
 of.openFoodUnitPriceWin = function(c){
 	var curPricePopup = null;
 	curPricePopup = new NumKeyBoardPopup({
-		header : '输入时价',
+		header : '输入时价--' + c.foodData.name,
 		left : function(){
 			of.openFoodUnitPriceWin.param = c;
 			var unitPrice = parseFloat($('#input_input_numKbPopup').val());
@@ -722,6 +716,7 @@ of.openFoodUnitPriceWin = function(c){
 		
 	curPricePopup.open(function(self){
 		self.find('[id=input_input_numKbPopup]').val(c.foodData.unitPrice);
+		self.find('[id=middle_a_numKbPopup]').hide();
 		setTimeout(function(){
 		//	self.find('[id=input_input_numKbPopup]').select();
 			self.find('[id=input_input_numKbPopup]').focus();
@@ -3070,6 +3065,7 @@ $(function(){
 		});
 	
 		brandPopup.open(function(self){
+			self.find('[id=middle_a_numKbPopup]').hide();
 			setTimeout(function(){
 			//	self.find('[id=input_input_numKbPopup]').select();
 				self.find('[id=input_input_numKbPopup]').focus();
@@ -3222,7 +3218,8 @@ $(document).on('pageinit', "#orderFoodMgr", function(){
 	
 	//打开助记码
 	$('#aliasOrderFood_a_orderFood').click(function(){
-		aliasPopup.open(function(){
+		aliasPopup.open(function(self){
+			self.find('[id=middle_a_numKbPopup]').hide();
 			closePinyin();
 			closeHandWriting();
 		});

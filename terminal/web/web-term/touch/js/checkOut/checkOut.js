@@ -582,16 +582,9 @@ uo.weighAction = function(){
  * 打开称重
  */
 uo.openWeighOperate = function(){
-//	setTimeout(function(){
-//		$('#inputOrderFoodWeigh').focus();
-//		//显示菜名
-//		$('#weighFoodName').text(uo.selectedFood.foodName);		
-//	}, 250);
-//	$('#orderFoodWeighCmp').parent().addClass('popup').addClass('in');
-//	$('#orderFoodWeighCmp').popup('open');
 	var weighPopup = null;
 	weighPopup = new NumKeyBoardPopup({
-		header : '输入称重',
+		header : '输入称重--' + uo.selectedFood.foodName,
 		left : function(){
 			var count = $('#input_input_numKbPopup');
 			if(!count.val()){
@@ -624,6 +617,7 @@ uo.openWeighOperate = function(){
 	   	'</label>';	
 		$('#content_div_numKbPopup').append(print);
 		$('#content_div_numKbPopup').trigger('create');
+		self.find('[id=middle_a_numKbPopup]').hide();
 		setTimeout(function(){
 			self.find('[id=input_input_numKbPopup]').focus();
 		}, 200);
@@ -695,6 +689,7 @@ uo.openGiftOperate = function(){
 	
 	giftPopup.open(function(self){
 		self.find('[id=input_input_numKbPopup]').val(uo.selectedFood.count);
+		self.find('[id=middle_a_numKbPopup]').hide();
 		setTimeout(function(){
 		//	self.find('[id=input_input_numKbPopup]').select();
 			self.find('[id=input_input_numKbPopup]').focus();
@@ -891,21 +886,19 @@ uo.useMemberForOrderAction = function(){
  * 转菜操作
  */
 uo.openTransOrderFood = function (){
-	
 	$('#transFoodCmp').trigger('create').trigger('refresh');
 	$('#transFoodCmp').show();
 	$('#shadowForPopup').show();
-	$('#txtTableNumForTS').focus();
-	NumKeyBoardAttacher.instance().attach($('#txtTableNumForTS')[0]);
+	NumKeyBoardAttacher.instance().attach($('#txtTableNumForTS')[0], function(inputVal){
+		ts.s.fireEvent();
+	});
 	$('#txtTableNumForTS').focus();
 	NumKeyBoardAttacher.instance().attach($('#numToOtherTable')[0]);
 	NumKeyBoardAttacher.instance().attach($('#txtFoodNumForTran')[0]);
-	
 };
 
-/**
- * 关闭转菜
- */
+
+ // 关闭转菜
 uo.closeTransOrderFood = function(){
 
 	if(ts.commitTableOrTran == 'openTable'){
@@ -954,7 +947,6 @@ uo.closeTransOrderFood = function(){
 	$('#divSelectTablesForTs').html('');
 	
 	NumKeyBoardAttacher.instance().detach($('#txtTableNumForTS')[0]);
-	
 	NumKeyBoardAttacher.instance().detach($('#numToOtherTable')[0]);
 	NumKeyBoardAttacher.instance().detach($('#txtFoodNumForTran')[0]);
 };
@@ -1149,21 +1141,17 @@ uo.openMoreOperate = function(){
 	$('#updateFoodOtherOperateCmp').popup({
 		afterclose: function (event, ui) { 
 			if(uo.updateCustom){//修改人数
-//				$('#orderCustomerCountSet').popup('open');
-//				focusInput = 'inputOrderCustomerCountSet';
-//				$('#inputOrderCustomerCountSet').focus();
-//				$('#inputOrderCustomerCountSet').select();
 				var updateCustomPopup = null;
 				updateCustomPopup = new NumKeyBoardPopup({
 					header : '修改人数',
 					left : function(){
-							var num = $("#input_input_numKbPopup").val();
-							//更改页面端的的人数
-							$("#customNumForUO").html("用餐人数：" + num);	
-							uo.customNum = num;
-							uo.updateCustom = true;
-							uo.saveForUO();
-							updateCustomPopup.close();
+						var num = $("#input_input_numKbPopup").val();
+						//更改页面端的的人数
+						$("#customNumForUO").html("用餐人数：" + num);	
+						uo.customNum = num;
+						uo.updateCustom = true;
+						uo.saveForUO();
+						updateCustomPopup.close();
 					},
 					right : function(){
 						uo.closeOperatePeople();
@@ -1174,6 +1162,7 @@ uo.openMoreOperate = function(){
 
 				updateCustomPopup.open(function(self){
 					self.find('[id=input_input_numKbPopup]').val(uo.order.customNum);
+					self.find('[id=middle_a_numKbPopup]').hide();
 					setTimeout(function(){
 					//	self.find('[id=input_input_numKbPopup]').select();
 						self.find('[id=input_input_numKbPopup]').focus();
@@ -1312,7 +1301,6 @@ uo.submitUpdateOrderHandler = function(c){
 							}else if(uo.weighOperate){
 								Util.msg.tip( '账单修改成功');	
 								initOrderData({table : uo.table});
-								uo.closeWeighOperate();
 							}else if(uo.hurriedFood){
 								Util.msg.tip( '催菜成功');	
 								initOrderData({table : uo.table});
@@ -1641,7 +1629,6 @@ $(function(){
 	$('#payOrder_a_checkOut').click(function(){
 		pm.entry({table:uo.table});
 	});
-	
 	
 });
 
