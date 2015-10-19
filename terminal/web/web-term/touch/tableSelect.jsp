@@ -1049,11 +1049,11 @@
 	    </div>
 		<div id="calculator4CancelFood" class="calculator" style="width: inherit;" align="center">
 			<div class="top">
-				<span class="clear">+</span>
+				<span class="clear" id="cancelAdd_span_checkOut">+</span>
 				<span class="inputs">
 					<input id="inputCancelFoodSet" class="numberInputStyle" >
 				</span>
-				<span class="clear">-</span>
+				<span class="clear" id="cancelReduce_span_checkout">-</span>
 			</div>
 		</div>	
 		<!-- 退菜原因列表 -->

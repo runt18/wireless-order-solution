@@ -2135,7 +2135,6 @@ function handleTableForTS(c){
 					self.find('[id=content_div_numKbPopup]').trigger('create');
 					
 					setTimeout(function(){
-						self.find('[id=input_input_numKbPopup]').focus();
 						self.find('[id=input_input_numKbPopup]').select();
 					}, 200);
 					
@@ -2243,7 +2242,6 @@ function handleTableForTS(c){
 					self.find('[id=content_div_numKbPopup]').trigger('create');
 					
 					setTimeout(function(){
-						self.find('[id=input_input_numKbPopup]').focus();
 						self.find('[id=input_input_numKbPopup]').select();
 					}, 200);
 					

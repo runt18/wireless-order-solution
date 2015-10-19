@@ -375,7 +375,8 @@ uo.openCancelFoodCmp = function(c){
 	uo.operateFood = orderFood;
 	
 	$('#inputCancelFoodSet').val(checkDot(orderFood.count+'')?orderFood.count : parseInt(orderFood.count));
-	
+	NumKeyBoardAttacher.instance().attach($('#inputCancelFoodSet')[0]);
+	$('#inputCancelFoodSet').focus();	
 	$('#shadowForPopup').show();
 	$('#cancelFoodSet').show();
 	
@@ -1628,6 +1629,27 @@ $(function(){
 	//已点菜界面的结账按钮事件
 	$('#payOrder_a_checkOut').click(function(){
 		pm.entry({table:uo.table});
+	});
+	
+	
+	//退菜原因的add
+	$('#cancelAdd_span_checkOut').click(function(){
+		var cancelInput = $('#inputCancelFoodSet').val();
+		if(cancelInput == ""){
+			$('#inputCancelFoodSet').val(cancelInput + 1);
+		}else{
+			$('#inputCancelFoodSet').val(parseInt(cancelInput)  + 1);
+		}
+	});
+	
+	//退菜原因的reduce
+	$('#cancelReduce_span_checkout').click(function(){
+		var cancelInput = $('#inputCancelFoodSet').val();
+		if(cancelInput == ""){
+			$('#inputCancelFoodSet').val(cancelInput - 1);
+		}else{
+				$('#inputCancelFoodSet').val(parseInt(cancelInput) - 1);
+		}
 	});
 	
 });
