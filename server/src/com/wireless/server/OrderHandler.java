@@ -10,8 +10,11 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.member.MemberCommentDao;
@@ -59,6 +62,7 @@ import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Device;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
@@ -70,6 +74,11 @@ import com.wireless.sccon.ServerConnector;
 import com.wireless.sms.SMS;
 import com.wireless.sms.msg.Msg4Consume;
 import com.wireless.sms.msg.Msg4Upgrade;
+
+import cn.beecloud.BCEumeration.PAY_CHANNEL;
+import cn.beecloud.BCPay;
+import cn.beecloud.BCPayResult;
+import cn.beecloud.BeeCloud;
 /**
  * @author yzhang
  *
@@ -610,7 +619,7 @@ class OrderHandler implements Runnable{
 		return new RespACK(request.header);
 	}
 	
-	private RespPackage doPrintContent(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+	private RespPackage doPrintContent(final Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
 		PType printType = PType.valueOf(request.header.reserved);
 		List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true));
 		
@@ -628,8 +637,30 @@ class OrderHandler implements Runnable{
 			
 		}else if(printType.isWxReceipt()){
 			Parcel p = new Parcel(request.body);
-			String codeUrl = p.readString();
-			new PrintHandler(staff).process(JobContentFactory.instance().createWxReceiptContent(staff, printers, codeUrl));
+			final Order.PayBuilder payBuilder = p.readParcel(Order.PayBuilder.CREATOR);
+			//打印微信支付单
+			Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
+			BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
+			Map<String, String> optional = new HashMap<String, String>(){
+				private static final long serialVersionUID = 1L;
+				{ 
+					put("payBuilder", JSON.toJSONString(payBuilder.toJsonMap(0)));
+					put("staffId", Integer.toString(staff.getId()));	
+				}
+			};
+			final Order order = PayOrder.calc(staff, payBuilder);
+			BCPayResult bcPayResult = BCPay.startBCPay(PAY_CHANNEL.WX_NATIVE,
+													   Float.valueOf(order.getActualPrice() * 100).intValue(),
+													   //1,//FIXME 
+													   System.currentTimeMillis() + Integer.toString(payBuilder.getOrderId()),
+													   restaurant.getName() + "(账单号：" + payBuilder.getOrderId() + ")", 
+													   optional, 
+													   null, null, null, null);
+			if(bcPayResult.getType().ordinal() == 0){
+				new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(printType, staff, printers, order, bcPayResult.getCodeUrl()));
+			}else{
+				throw new BusinessException(bcPayResult.getErrMsg() + "," + bcPayResult.getErrDetail());
+			}
 			
 		}else if(printType.isTransTbl()){
 			Parcel p = new Parcel(request.body);
