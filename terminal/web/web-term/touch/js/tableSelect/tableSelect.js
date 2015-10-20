@@ -699,24 +699,6 @@ $(function(){
 	//获取系统相关属性
 	Util.sys.checkSmStat();
 	
-	//鼠标离开菜品列表点击时,动态口味关闭
-	$(document).bind("click",function(e){ 
-		var target = $(e.target); 
-		//关闭点菜时弹出的动态口味
-		if(mouseOutFoodSelect){
-			if($('#divFoodTasteFloat').is(':visible') || $('#divComboFoodFloat').is(':visible')){
-		 		if(target.closest(".commonTasteFloat").length == 0){ 
-					$(".commonTasteFloat").hide(); 
-				}
-			}		
-		//关闭结账界面抹数时弹出的数字键盘	
-		}else if($.mobile.activePage.attr( "id" ) == 'paymentMgr' && usedEraseQuota && mouseOutNumKeyboard){
-			$('#numberKeyboard').hide();
-			numKeyBoardFireEvent = null;
-		}
-
-	});
-	
 	//刷新微信预订单
 	ts.refreshWeixinBook();
 	
@@ -731,9 +713,6 @@ $(function(){
 			ts.searchBookList({begin:$('#conditionDayBeginDay').val(), end:$('#conditionDayEndDay').val()});
 		}
 	});	
-	
-	//设置客服QQ位置
-	//$('#kfoutbox').css("margin-top", "50px");
 	
 });	
 
@@ -2110,7 +2089,7 @@ function handleTableForTS(c){
 							
 							ts.renderToCreateOrder(ts.table.alias, customNum);
 							customerPopup.close();
-						},
+						}
 				});
 				
 				customerPopup.open(function(self){
@@ -2217,7 +2196,7 @@ function handleTableForTS(c){
 							
 							ts.renderToCreateOrder(ts.table.alias, customNum);
 							customerPopup.close();
-						},
+						}
 				});
 				
 				customerPopup.open(function(self){

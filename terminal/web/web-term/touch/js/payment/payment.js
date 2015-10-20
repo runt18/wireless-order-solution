@@ -25,9 +25,6 @@ var pm = {table : {}},
 	//查找的会员
 	member4Payment, member4Display,
 	
-	//是否在使用抹数
-	usedEraseQuota = false, mouseOutNumKeyboard = true,		
-	
 	/**
 	 * 元素模板
 	 */
@@ -499,15 +496,6 @@ function setServicePlan(c){
 
 }
 
-
-
-
-pm.closeKeyboard = function(){
-	if(mouseOutNumKeyboard){
-		usedEraseQuota = true;
-	}
-};
-	
 function loadOrderDetail(){
 	var tableId = 0;
 	var orderId = 0;
@@ -632,8 +620,6 @@ function readMemberByCondtion(stype){
 		memberInfo.focus();
 		return;
 	}
-	
-	$('#numberKeyboard').hide();
 	
 	if(stype){
 		$('#payment_searchMemberType').popup('close');
@@ -835,12 +821,11 @@ function openReadMemberByCondtionWin(){
 	$('#link_payment_popupCouponCmp4Member').attr("data-theme", "e");
 	$('#link_payment_popupCouponCmp4Member').buttonMarkup("refresh");	
 	
-	NumKeyBoardAttacher.instance().attach($('#txtMemberInfo4Read')[0])
+	NumKeyBoardAttacher.instance().attach($('#txtMemberInfo4Read')[0]);
 	$('#txtMemberInfo4Read').focus();
 }
 
 function closeReadMemberByCondtionWin(){
-	$('#numberKeyboard').hide();
 	
 	$('#shadowForPopup').hide();
 	$('#readMemberWin').hide();
@@ -916,9 +901,7 @@ function showMemberInfoWin(){
 $(function(){
 	
 	//当离开结账页面时
-	$('#paymentMgr').on("pagebeforehide", function(){ 
-		//console.log('paymentMgr --- pagebeforehide');
-		$('#numberKeyboard').hide();
+	$('#paymentMgr').on("pagehide", function(){ 
 		document.getElementById("totalPrice").innerHTML = 0.00;
 		document.getElementById("actualPrice_td_payment").innerHTML = 0.00;
 		document.getElementById("forFree").innerHTML = 0.00;
@@ -927,6 +910,8 @@ $(function(){
 		checkOut_actualPrice = 0;
 		orderMsg = null;
 		
+		//取消绑定抹数的弹出键盘
+		NumKeyBoardAttacher.instance().detach($('#erasePrice_input_payment')[0]);
 	});
 	
 	//进入界面界面
@@ -942,6 +927,10 @@ $(function(){
 				//'+'表示现金结账
 				$('#cash_a_payment').click();
 			}
+		});
+		//绑定抹数的弹出键盘
+		NumKeyBoardAttacher.instance().attach($('#erasePrice_input_payment')[0], function(inputVal){
+			$('#erasePrice_input_payment').keyup();
 		});
 	});
 	
@@ -1088,14 +1077,6 @@ $(function(){
 			
 		//进入现金找零Popup的函数
 		$('#cashReceive_div_payment').on('popupafteropen', function(event, ui){
-			usedEraseQuota = false;
-			//设置数字键盘触发
-			numKeyBoardFireEvent = function (){
-				$('#cashReceive_input_payment').keyup();
-			};
-				
-			$('#numberKeyboard').show();
-			
 			//计算抹零
 			var eraseQuota = $('#erasePrice_input_payment').val();
 			var actualPrice = checkOut_actualPrice;
@@ -1108,13 +1089,19 @@ $(function(){
 			setTimeout(function(){
 				$('#cashReceive_input_payment').focus();
 			}, 200);
+			//绑定现金收入的输入框
+			NumKeyBoardAttacher.instance().attach($('#cashReceive_input_payment')[0], function(inputVal){
+				$('#cashReceive_input_payment').keyup();
+			});
+		});
+		
+		//退出现金找零Popup的函数
+		$('#cashReceive_div_payment').on('popupafterclose', function(event, ui){
+			NumKeyBoardAttacher.instance().detach($('#cashReceive_input_payment')[0]);
 		});
 		
 		//现金找零-取消
 		$('#receivedCashCancel_a_payment').click(function(){
-			numKeyBoardFireEvent = null;
-			$('#numberKeyboard').hide();
-			
 			$('#cashReceive_div_payment').popup('close');
 		});
 		
@@ -1190,7 +1177,6 @@ $(function(){
 					var numForAlias = $("#" + curCheckbox.attr('data-for'));
 					
 					if(curCheckbox.attr('checked')){
-						$('#numberKeyboard').show();
 						
 						var mixedPayMoney = checkOut_actualPrice;
 						for (var i = 0; i < payTypeData.length; i++) {
@@ -1210,7 +1196,6 @@ $(function(){
 						numForAlias.select();
 						
 					}else{
-						$('#numberKeyboard').hide();
 						
 						numForAlias.attr("disabled", true); 
 						numForAlias.parent().addClass('ui-disabled');
@@ -1222,10 +1207,6 @@ $(function(){
 			
 			$('#mixedPayWin').popup('open');
 			
-			//设置数字键盘输入
-			$('.numberInputStyle').focus(function(){
-				focusInput = this.id;
-			});		
 		});
 		
 		//混合结账-暂结
@@ -1288,32 +1269,30 @@ $(function(){
 		
 		//混合结账-取消
 		$('#mixedPayCancel_a_payment').click(function(){
-			$('#numberKeyboard').hide();
 			$('#mixedPayWin').popup('close');
 		});
 		
-		//抹数框输入时
-		$('#erasePrice_input_payment').focus(function(){
-			focusInput = this.id;
-			usedEraseQuota = false;
-			mouseOutNumKeyboard = true;
-			$('#numberKeyboard').show();	
-			//设置数字键盘触发
-			numKeyBoardFireEvent = function (){
-				$('#erasePrice_input_payment').keyup();
-			};
-			
-			$('#calculator4NumberKeyboard').on("mouseover", function(){
-				usedEraseQuota = false;
-				mouseOutNumKeyboard = false;
-			});
-			
-			$('#calculator4NumberKeyboard').on("mouseout", function(){
-				usedEraseQuota = true;
-				mouseOutNumKeyboard = true;
-			});			
-		});	
-		
+		//FIXME 抹数框输入时
+//		$('#erasePrice_input_payment').focus(function(){
+//			focusInput = this.id;
+//			usedEraseQuota = false;
+//			mouseOutNumKeyboard = true;
+//			$('#numberKeyboard').show();	
+//			//设置数字键盘触发
+//			numKeyBoardFireEvent = function (){
+//				$('#erasePrice_input_payment').keyup();
+//			};
+//			
+//			$('#calculator4NumberKeyboard').on("mouseover", function(){
+//				usedEraseQuota = false;
+//				mouseOutNumKeyboard = false;
+//			});
+//			
+//			$('#calculator4NumberKeyboard').on("mouseout", function(){
+//				usedEraseQuota = true;
+//				mouseOutNumKeyboard = true;
+//			});			
+//		});	
 		
 		//抹数联动
 		$('#erasePrice_input_payment').on('keyup', function(){
@@ -1370,8 +1349,6 @@ $(function(){
 			c.temp = false;
 		}
 		
-		var eraseQuota = $("#erasePrice_input_payment").val();
-	
 		//是否发送短信
 		var sendSms = false;
 		
@@ -1380,6 +1357,7 @@ $(function(){
 			return;
 		}
 		
+		var eraseQuota = $("#erasePrice_input_payment").val();
 		if(eraseQuota && isNaN(eraseQuota)){
 			Util.msg.alert({msg:"请填写正确的抹数金额", renderTo:'paymentMgr',fn:function(){$("#erasePrice_input_payment").focus();$("#erasePrice_input_payment").select();}});
 			return;

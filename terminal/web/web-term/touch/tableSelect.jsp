@@ -1377,7 +1377,6 @@
 	
 	<!-- 套菜点菜 -->
 	<div id="divComboFoodFloat" class="ui-overlay-shadow ui-corner-all commonTasteFloat" >
-	<!-- <div id="divFoodTasteFloat" class="commonTasteFloat" data-role="popup"  data-theme="c" data-dismissible="false" style="min-width:550px;" class="ui-corner-all"> -->
 		<div data-role="header" data-theme="b" class="ui-corner-top" style="height: 50px">
     		<div id="comboFoodsGroupCmp" data-role="controlgroup" style="float: left;margin-left: 5px;">
     		
@@ -1487,29 +1486,29 @@
 	    
 	    <table style="width:85%;">
 	    	<tr>
-	    		<td style="width:40px;"><label for="tempFoodPrice1">名称:</label></td>
-	    		<td><input id="tempFoodName" type="text" placeholder="填写临时菜名称" data-type="txt" class="countInputStyle" ></td>
+	    		<td style="width:40px;"><label>名称:</label></td>
+	    		<td><input id="tempFoodName_input_addTemp" type="text" placeholder="填写临时菜名称" data-type="txt" class="countInputStyle" ></td>
 	    		<td>
 					<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:inherit;">
-					    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('tempFoodName')">D</a>
+					    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('tempFoodName_input_addTemp')">D</a>
 					</div>	    		
 	    		</td>
 	    	</tr>
 	    	<tr>
-	    		<td style="width:40px;"><label for="tempFoodPrice">价格:</label></td>
-	    		<td><input id="tempFoodPrice" type="text" placeholder="填写临时菜价格" data-type="num"  class="countInputStyle" ></td>
+	    		<td style="width:40px;"><label>价格:</label></td>
+	    		<td><input id="tempFoodPrice_input_addTemp" type="text" placeholder="填写临时菜价格" data-type="num"  class="countInputStyle" ></td>
 	    		<td>
 					<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:inherit;">
-					    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('tempFoodPrice')">D</a>
+					    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('tempFoodPrice_input_addTemp')">D</a>
 					</div>	    		
 	    		</td>
 	    	</tr>	    	
 	    	<tr>
-	    		<td style="width:40px;"><label for="tempFoodPrice">数量:</label></td>
-	    		<td><input id="tempFoodCount" type="text" placeholder="填写临时菜数量" value="1" data-type="num"  class="countInputStyle" ></td>
+	    		<td style="width:40px;"><label>数量:</label></td>
+	    		<td><input id="tempFoodCount_input_addTemp" type="text" placeholder="填写临时菜数量" value="1" data-type="num"  class="countInputStyle" ></td>
 	    		<td>
 					<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:inherit;">
-					    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('tempFoodCount')">D</a>
+					    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('tempFoodCount_input_addTemp')">D</a>
 					</div>		    		
 	    		</td>
 	    	</tr>	    	
@@ -1540,7 +1539,6 @@
 	
 	<!-- 动态口味组件 -->
 	<div id="divFoodTasteFloat" class="ui-overlay-shadow ui-corner-all commonTasteFloat" >
-	<!-- <div id="divFoodTasteFloat" class="commonTasteFloat" data-role="popup"  data-theme="c" data-dismissible="false" style="min-width:550px;" class="ui-corner-all"> -->
 		<div  data-role="header" data-theme="b" class="ui-corner-top" style="height: 35px">
     		<div id="txtChooosedFoodName" style="float: left;line-height: 35px;margin-left: 10px;"></div>
         	<div style="float: right">
@@ -1732,7 +1730,7 @@
 		         	<tr id="tr4EraseQuota">
 		         		<td colspan="2" style="width: 200px;line-height: 60px;font-size: 20px;text-align: right;" >抹数金额(上限:￥<font id="font_showEraseQuota" color="red">--</font>)：</td>
 		         		<td width="70" style="padding-right: 5px;">
-		         			<input id="erasePrice_input_payment" class="countInputStyle" onkeypress="intOnly()" onblur="pm.closeKeyboard()" >
+		         			<input id="erasePrice_input_payment" class="countInputStyle">
 		         		</td>
 		         	</tr>
 		         	<tr>
