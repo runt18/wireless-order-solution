@@ -1813,7 +1813,7 @@ ts.stopSellMgr = function(){
 };
 
 //进入点菜界面
-ts.renderToCreateOrder = function(tableNo, peopleNo){
+ts.renderToCreateOrder = function(tableNo, peopleNo, comment){
 	if(tableNo > 0){
 		//关闭台操作popup
 		uo.closeTransOrderFood();
@@ -1833,7 +1833,7 @@ ts.renderToCreateOrder = function(tableNo, peopleNo){
 				tableToAlias.customNum = peopleNo;
 				of.entry({
 					table : tableToAlias,
-					comment : $('#inputTableOpenCommon').val(),
+					comment : comment,
 					orderFoodOperateType : 'normal'
 				});
 			}				
@@ -2070,7 +2070,7 @@ function handleTableForTS(c){
 					},
 					middle : function(){
 							var customNum = $('#input_input_numKbPopup').val();
-							
+							var comment = $('#inputTableOpenCommon').val();
 							if(isNaN(customNum)){
 								Util.msg.alert({
 									msg : '请填写正确的人数',
@@ -2087,7 +2087,7 @@ function handleTableForTS(c){
 								return;
 							}
 							
-							ts.renderToCreateOrder(ts.table.alias, customNum);
+							ts.renderToCreateOrder(ts.table.alias, customNum, comment);
 							customerPopup.close();
 						}
 				});
@@ -2177,7 +2177,7 @@ function handleTableForTS(c){
 					},
 					middle : function(){
 							var customNum = $('#input_input_numKbPopup').val();
-							
+							var comment = $('#inputTableOpenCommon').val();
 							if(isNaN(customNum)){
 								Util.msg.alert({
 									msg : '请填写正确的人数',
@@ -2194,7 +2194,7 @@ function handleTableForTS(c){
 								return;
 							}
 							
-							ts.renderToCreateOrder(ts.table.alias, customNum);
+							ts.renderToCreateOrder(ts.table.alias, customNum, comment);
 							customerPopup.close();
 						}
 				});
