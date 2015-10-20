@@ -31,6 +31,7 @@ public class ReceiptContent extends ConcreteContent {
 	private final WxRestaurant mWxRestaurant;
 	private String ending;
 	private Member member;
+	private String wxPayUrl;
 	
 	public ReceiptContent(int receiptStyle, Restaurant restaurant, WxRestaurant wxRestaurant, Order order, String waiter, PType printType, PStyle style) {
 		super(printType, style);
@@ -52,6 +53,11 @@ public class ReceiptContent extends ConcreteContent {
 		return this;
 	}
 	
+	public ReceiptContent setWxPayUrl(String wxPayUrl){
+		this.wxPayUrl = wxPayUrl;
+		return this;
+	}
+	
 	private boolean hasEnding(){
 		return ending != null && ending.trim().length() != 0;
 	}
@@ -61,19 +67,25 @@ public class ReceiptContent extends ConcreteContent {
 		if(mPrintType == PType.PRINT_RECEIPT){
 			//generate the title and replace the "$(title)" with it
 			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator(mOrder.isRepaid() ? "反结帐单" : "结帐单", mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
-			//replace the $(restaurant)
-			mTemplate = mTemplate.replace(PVar.RESTAURANT, new ExtraFormatDecorator(new CenterAlignedDecorator(mRestaurant.getName(), mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 			//generate the total price string and replace the $(var_2) with this string
 			mTemplate = mTemplate.replace(PVar.VAR_2, buildTotalPrice(false));
 			
 		}else if(mPrintType == PType.PRINT_TEMP_RECEIPT){
 			//generate the title and replace the "$(title)" with it
 			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("暂结单", mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
-			//replace the $(restaurant)
-			mTemplate = mTemplate.replace(PVar.RESTAURANT, new ExtraFormatDecorator(new CenterAlignedDecorator(mRestaurant.getName(), mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 			//generate the total price string and replace the $(var_2) with this string
-			mTemplate = mTemplate.replace(PVar.VAR_2, buildTotalPrice(true));						
+			mTemplate = mTemplate.replace(PVar.VAR_2, buildTotalPrice(true));
+			
+		}else if(mPrintType == PType.PRINT_WX_RECEIT){
+			//generate the title and replace the "$(title)" with it
+			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("微信支付", mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+			//generate the total price string and replace the $(var_2) with this string
+			mTemplate = mTemplate.replace(PVar.VAR_2, buildTotalPrice(true));
+			
 		}
+		
+		//replace the $(restaurant)
+		mTemplate = mTemplate.replace(PVar.RESTAURANT, new ExtraFormatDecorator(new CenterAlignedDecorator(mRestaurant.getName(), mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 		
 		//replace the "$(order_id)"
 		mTemplate = mTemplate.replace(PVar.ORDER_ID, Integer.toString(mOrder.getId()));
@@ -172,13 +184,14 @@ public class ReceiptContent extends ConcreteContent {
 			mTemplate = mTemplate.replace(PVar.RECEIPT_COMMENT, new RightAlignedDecorator("备注：" + mOrder.getComment(), getStyle()).toString());
 		}
 		
-		if(getPrintType() == PType.PRINT_TEMP_RECEIPT && mWxRestaurant.hasQrCode() && mWxRestaurant.getQrCodeStatus().isNormal() && getStyle() == PStyle.PRINT_STYLE_80MM){
+		//replace the $(ending)
+		if(mPrintType == PType.PRINT_TEMP_RECEIPT && mWxRestaurant.hasQrCode() && mWxRestaurant.getQrCodeStatus().isNormal() && mStyle == PStyle.PRINT_STYLE_80MM){
 			final String qrCodeContent = mWxRestaurant.getQrCode() + "?" + mOrder.getId();
-			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new String(new char[]{0x1B, 0x61, 0x01}) + new QRCodeContent(getPrintType(), getStyle(), qrCodeContent) + new String(new char[]{0x1B, 0x61, 0x00}) +
+			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new String(new char[]{0x1B, 0x61, 0x01}) + new QRCodeContent(mPrintType, mStyle, qrCodeContent) + new String(new char[]{0x1B, 0x61, 0x00}) +
 																		  SEP +
 																		  new CenterAlignedDecorator(hasEnding() ? ending : "微信扫一扫", mStyle).toString());
 
-		}else{
+		}else if(mPrintType == PType.PRINT_RECEIPT){
 			if(hasEnding()){
 				mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, ending);
 			}else{
@@ -199,7 +212,15 @@ public class ReceiptContent extends ConcreteContent {
 					mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new CenterAlignedDecorator("欢迎您再次光临", mStyle).toString());
 				}
 			}
-		}		
+			
+		}else if(mPrintType == PType.PRINT_WX_RECEIT){
+			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new String(new char[]{0x1B, 0x61, 0x01}) + new QRCodeContent(mPrintType, mStyle, wxPayUrl) + new String(new char[]{0x1B, 0x61, 0x00}) +
+										  SEP +
+										  new CenterAlignedDecorator("微信扫一扫, 完成支付", mStyle).toString());
+			
+		}else{
+			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, "");
+		}
 		
 		if(mPrintType == PType.PRINT_RECEIPT){
 			return mTemplate + EJECT;

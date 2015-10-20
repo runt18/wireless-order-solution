@@ -117,13 +117,14 @@ var tables = [],
 
 //退出餐台选择界面
 $(document).on('pagehide', "#tableSelectMgr", function(){
-	//清除快捷键
-	$(document).off('keydown');
+
 });
 
 //进入餐台选择界面
 $(document).on('pageshow', "#tableSelectMgr", function(){
-	//快捷键
+	//清除快捷键
+	$(document).off('keydown');
+	//设置快捷键
 	$(document).on('keydown', function(event){
     	if(event.which == "107"){//加号
 			if(ts.commitTableOrTran != 'lookup'){

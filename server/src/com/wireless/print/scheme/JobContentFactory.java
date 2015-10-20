@@ -42,7 +42,6 @@ import com.wireless.print.content.concrete.ShiftContent;
 import com.wireless.print.content.concrete.SummaryContent;
 import com.wireless.print.content.concrete.TransFoodContent;
 import com.wireless.print.content.concrete.TransTableContent;
-import com.wireless.print.content.concrete.WxReceiptContent;
 
 public class JobContentFactory {
 
@@ -226,7 +225,7 @@ public class JobContentFactory {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public Content createReceiptContent(PType printType, Staff staff, List<Printer> printers, Order order) throws BusinessException, SQLException{
+	public Content createReceiptContent(PType printType, Staff staff, List<Printer> printers, Order order, String wxPayUrl) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -245,15 +244,16 @@ public class JobContentFactory {
 						}else{
 							member = null;
 						}
-						jobContents.add(new JobContent(printer, func.getRepeat(), printType,
-														new ReceiptContent(receiptStyle,
-															  			   restaurant, 
-															  			   wxRestaurant,
-															  			   order,
-															  			   staff.getName(),
-															  			   printType, 
-															  			   printer.getStyle()).setEnding(func.getComment())
-																							  .setMember(member)));
+						ReceiptContent content = new ReceiptContent(receiptStyle,
+													  			   restaurant, 
+													  			   wxRestaurant,
+													  			   order,
+													  			   staff.getName(),
+													  			   printType, 
+													  			   printer.getStyle()).setEnding(func.getComment())
+																					  .setMember(member)
+																					  .setWxPayUrl(wxPayUrl);
+						jobContents.add(new JobContent(printer, func.getRepeat(), printType, content));
 					}
 				}
 			}
@@ -265,24 +265,12 @@ public class JobContentFactory {
 		}
 	}
 	
-	public Content createReceiptContent(PType printType, Staff staff, List<Printer> printers, int orderId) throws BusinessException, SQLException{
-		return createReceiptContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY));
+	public Content createReceiptContent(PType printType, Staff staff, List<Printer> printers, Order order) throws BusinessException, SQLException{
+		return createReceiptContent(printType, staff, printers, order, null);
 	}
 	
-	public Content createWxReceiptContent(Staff staff, List<Printer> printers, String codeUrl) throws SQLException{
-		
-		final List<JobContent> jobContents = new ArrayList<JobContent>();
-		
-		for(Printer printer : printers){
-			for(PrintFunc func : printer.getPrintFuncs()){
-				if(func.isTypeMatched(PType.PRINT_WX_RECEIT)){
-					jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_WX_RECEIT, new WxReceiptContent(codeUrl, printer.getStyle())));
-				}
-			}
-		}
-		
-		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
-			
+	public Content createReceiptContent(PType printType, Staff staff, List<Printer> printers, int orderId) throws BusinessException, SQLException{
+		return createReceiptContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY), null);
 	}
 	
 	/**
