@@ -2184,7 +2184,7 @@ $(function(){
 		of.table = null;
 		
 		var param = parseUrl(parseUrl(location.href).hash).params;
-		console.log(param);
+		//console.log(param);
 		
 		if(param.table_id || param.table_alias){
 			Util.LM.show();

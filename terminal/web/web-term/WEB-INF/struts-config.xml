@@ -7,6 +7,9 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/BeeCloudHook" type="com.wireless.Actions.payment.BeeCloudHookAction"
+			scope="request">
+		</action>
 		<action path="/QueryOTA" type="com.wireless.Actions.ota.QueryOTAction"
 			scope="request">
 		</action>
@@ -568,7 +571,7 @@
 		<action path="/QueryEraseStatistics"
 			type="com.wireless.Actions.billStatistics.QueryEraseStatisticAction"
 			scope="request" parameter="dataSource">
-		</action>		
+		</action>
 		<action path="/QueryDiscountStatistics"
 			type="com.wireless.Actions.distMgr.discount.QueryDiscountStatisticsAction"
 			scope="request" parameter="dataSource">
@@ -627,29 +630,28 @@
 		<action path="/PrinterDiagnosis"
 			type="com.wireless.Actions.printerDiag.PrinterDiagnosisAction" scope="request">
 		</action>
-		<action path="/QueryBook"
-			type="com.wireless.Actions.bookMgr.QueryBookAction"
+		<action path="/QueryBook" type="com.wireless.Actions.bookMgr.QueryBookAction"
 			scope="request" parameter="dataSource">
-		</action>	
-		<action path="/OperateBook"
-			type="com.wireless.Actions.bookMgr.OperateBookAction"
+		</action>
+		<action path="/OperateBook" type="com.wireless.Actions.bookMgr.OperateBookAction"
 			scope="request" parameter="dataSource">
-		</action>			
+		</action>
 		<action path="/QuerySaleOfMaterial"
-			type="com.wireless.Actions.inventoryMgr.report.QuerySaleOfMaterialAction" scope="request">
-		</action>	
+			type="com.wireless.Actions.inventoryMgr.report.QuerySaleOfMaterialAction"
+			scope="request">
+		</action>
 		<action path="/OperateMenu"
-			type="com.wireless.Actions.client.member.OperateMenuAction"
-			scope="request" parameter="dataSource">
-		</action>				
+			type="com.wireless.Actions.client.member.OperateMenuAction" scope="request"
+			parameter="dataSource">
+		</action>
 		<action path="/QueryMemberStatistics"
 			type="com.wireless.Actions.client.member.QueryMemberStatisticsAction"
 			scope="request" parameter="dataSource">
-		</action>		
+		</action>
 		<action path="/OperateMemberCond"
 			type="com.wireless.Actions.client.member.OperateMemberCondAction"
 			scope="request" parameter="dataSource">
-		</action>			
+		</action>
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
