@@ -147,7 +147,7 @@ public class ReceiptContent extends ConcreteContent {
 				.append(SEP)
 				.append(new RightAlignedDecorator("原价:" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(pureTotal) + ", 节省" + NumericUtil.float2String2(pureTotal - actualTotal) + "元", mStyle));
 			
-		}else if(mPrintType == PType.PRINT_RECEIPT || mPrintType == PType.PRINT_WX_RECEIT && mOrder.hasMember() && actualTotal < pureTotal){
+		}else if((mPrintType == PType.PRINT_RECEIPT || mPrintType == PType.PRINT_WX_RECEIT) && mOrder.hasMember() && actualTotal < pureTotal){
 			var3.append(new ExtraFormatDecorator(
 					(new String(new char[]{0x1B, 0x61, 0x02}) + "实收(" + mOrder.getPaymentType().getName() + "):" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(actualTotal)),
 					mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString())
