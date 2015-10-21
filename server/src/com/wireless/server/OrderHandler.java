@@ -37,6 +37,7 @@ import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
 import com.wireless.exception.IOError;
+import com.wireless.exception.RestaurantError;
 import com.wireless.exception.WxOrderError;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
@@ -640,26 +641,30 @@ class OrderHandler implements Runnable{
 			final Order.PayBuilder payBuilder = p.readParcel(Order.PayBuilder.CREATOR);
 			//打印微信支付单
 			Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
-			BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
-			Map<String, String> optional = new HashMap<String, String>(){
-				private static final long serialVersionUID = 1L;
-				{ 
-					put("payBuilder", JSON.toJSONString(payBuilder.toJsonMap(0)));
-					put("staffId", Integer.toString(staff.getId()));	
+			if(restaurant.hasBeeCloud()){
+				BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
+				Map<String, String> optional = new HashMap<String, String>(){
+					private static final long serialVersionUID = 1L;
+					{ 
+						put("payBuilder", JSON.toJSONString(payBuilder.toJsonMap(0)));
+						put("staffId", Integer.toString(staff.getId()));	
+					}
+				};
+				final Order order = PayOrder.calc(staff, payBuilder);
+				BCPayResult bcPayResult = BCPay.startBCPay(PAY_CHANNEL.WX_NATIVE,
+														   Float.valueOf(order.getActualPrice() * 100).intValue(),
+														   //1,//FIXME 
+														   System.currentTimeMillis() + Integer.toString(payBuilder.getOrderId()),
+														   restaurant.getName() + "(账单号：" + payBuilder.getOrderId() + ")", 
+														   optional, 
+														   null, null, null, null);
+				if(bcPayResult.getType().ordinal() == 0){
+					new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(printType, staff, printers, order, bcPayResult.getCodeUrl()));
+				}else{
+					throw new BusinessException(bcPayResult.getErrMsg() + "," + bcPayResult.getErrDetail());
 				}
-			};
-			final Order order = PayOrder.calc(staff, payBuilder);
-			BCPayResult bcPayResult = BCPay.startBCPay(PAY_CHANNEL.WX_NATIVE,
-													   Float.valueOf(order.getActualPrice() * 100).intValue(),
-													   //1,//FIXME 
-													   System.currentTimeMillis() + Integer.toString(payBuilder.getOrderId()),
-													   restaurant.getName() + "(账单号：" + payBuilder.getOrderId() + ")", 
-													   optional, 
-													   null, null, null, null);
-			if(bcPayResult.getType().ordinal() == 0){
-				new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(printType, staff, printers, order, bcPayResult.getCodeUrl()));
 			}else{
-				throw new BusinessException(bcPayResult.getErrMsg() + "," + bcPayResult.getErrDetail());
+				throw new BusinessException(RestaurantError.BEE_CLOUD_NOT_BOUND);
 			}
 			
 		}else if(printType.isTransTbl()){
