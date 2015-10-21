@@ -42,20 +42,20 @@ public class QueryMenuAction extends DispatchAction {
 		String pin = (String) request.getAttribute("pin");
 		final DepartmentTree deptTree = new DepartmentTree.Builder(FoodDao.getPureByCond(StaffDao.verify(Integer.parseInt(pin)), null, null)).build();
 		jobject.setRoot(deptTree.asDeptNodes());
-		jobject.setExtra(new Jsonable(){
-
-			@Override
-			public JsonMap toJsonMap(int flag) {
-				JsonMap jm = new JsonMap();
-				jm.putJsonableList("foodList", deptTree.asFoodList(), Food.FOOD_JSONABLE_SIMPLE);
-				return jm;
-			}
-	
-			@Override
-			public void fromJsonMap(JsonMap jsonMap, int flag) {
-				
-			}
-		});
+//		jobject.setExtra(new Jsonable(){
+//
+//			@Override
+//			public JsonMap toJsonMap(int flag) {
+//				JsonMap jm = new JsonMap();
+//				jm.putJsonableList("foodList", deptTree.asFoodList(), Food.FOOD_JSONABLE_SIMPLE);
+//				return jm;
+//			}
+//	
+//			@Override
+//			public void fromJsonMap(JsonMap jsonMap, int flag) {
+//				
+//			}
+//		});
 		
 		response.getWriter().print(jobject.toString());
 		return null;

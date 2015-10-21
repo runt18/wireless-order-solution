@@ -922,6 +922,76 @@ function initFoodData(c){
 			
 			of.kitchens.totalProperty = of.kitchens.root.length;
 			
+			//排序foodList
+			of.foodList.sort(function(obj1, obj2){
+				if(obj1.id > obj2.id){
+					return 1;
+				}else if(obj1.id < obj2.id){
+					return -1;
+				}else{
+					return 0;
+				}
+			});
+			
+			//增加foodList的二分查找
+			of.foodList.binaryIndex = function(searchElement){
+				'use strict';
+
+				var minIndex = 0;
+				var maxIndex = this.length - 1;
+				var currentIndex;
+				var currentElement;
+				var resultIndex;
+			
+				while (minIndex <= maxIndex) {
+					resultIndex = currentIndex = (minIndex + maxIndex) / 2 | 0;
+					currentElement = this[currentIndex];
+			
+					if (currentElement.id < searchElement.id) {
+						minIndex = currentIndex + 1;
+					}
+					else if (currentElement.id > searchElement.id) {
+						maxIndex = currentIndex - 1;
+					}
+					else {
+						return currentIndex;
+					}
+				}
+			
+				return ~maxIndex;
+			}
+			
+			//判断菜品是否估清
+			of.foodList.isSellout = function(index){
+				return (this[index].status & 1 << 2) != 0;
+			}
+			//设置菜品是否估清
+			of.foodList.setSellout = function(index, onOff){
+				if(onOff){
+					this[index].status |= (1 << 2);
+				}else{
+					this[index].status &= ~(1 << 2);
+				}
+			}
+			
+			//判断菜品是否限量估清
+			of.foodList.isLimit = function(index){
+				return (this[index].status & 1 << 10) != 0;
+			}
+			
+			//设置菜品是否限量估清
+			of.foodList.setLimit = function(index, onOff, limitAmount, limitRemain){
+				if(onOff){
+					this[index].status |= (1 << 10);
+					this[index].foodLimitAmount = limitAmount;
+					this[index].foodLimitRemain = limitRemain;
+				}else{
+					this[index].status &= ~(1 << 10);
+					this[index].foodLimitAmount = 0;
+					this[index].foodLimitRemain = 0;
+				}
+			}
+			
 			//清除没有菜品的厨房
 			for(var i = of.kitchens.root.length - 1; i >= 0; i--){
 				if(of.kitchens.root[i].foods.length <= 0){
@@ -2012,7 +2082,8 @@ function handleTableForTS(c){
 				var customerPopup = null;
 				customerPopup = new NumKeyBoardPopup({
 					header : '请输入人数--' + c.table.name,
-					rightTitle : '查看预订',
+					leftText : '开台',
+					rightText : '查看预订',
 					left : function(){
 							var customNum = $('#input_input_numKbPopup').val();
 							
@@ -2123,54 +2194,55 @@ function handleTableForTS(c){
 				var customerPopup = null;
 				customerPopup = new NumKeyBoardPopup({
 					header : '请输入人数--' + c.table.name,
+					leftText : '开台',
 					left : function(){
-							var customNum = $('#input_input_numKbPopup').val();
-							
-							if(isNaN(customNum)){
+						var customNum = $('#input_input_numKbPopup').val();
+						
+						if(isNaN(customNum)){
+							Util.msg.alert({
+								msg : '请填写正确的人数',
+								topTip : true
+							});			
+							$('#input_input_numKbPopup').focus();
+							return;
+						}else if(customNum <= 0){
+							Util.msg.alert({
+								msg : '就餐人数不能少于0',
+								topTip : true
+							});
+							$('#input_input_numKbPopup').focus();
+							return;
+						}
+						
+						Util.LM.show();
+						
+						orderDataModel.tableID = ts.table.id;
+						orderDataModel.customNum = customNum;
+						orderDataModel.orderFoods = [];
+						orderDataModel.categoryValue =  ts.table.categoryValue;
+						orderDataModel.comment = $('#inputTableOpenCommon').val();
+						
+						$.post('../InsertOrder.do', {
+							commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
+							type : 1,
+							notPrint : false
+						}, function(result){
+							Util.LM.hide();
+							if (result.success) {
+								ts.closeTableWithPeople();
+								initTableData();
 								Util.msg.alert({
-									msg : '请填写正确的人数',
-									topTip : true
-								});			
-								$('#input_input_numKbPopup').focus();
-								return;
-							}else if(customNum <= 0){
-								Util.msg.alert({
-									msg : '就餐人数不能少于0',
+									msg : '开台成功!',
 									topTip : true
 								});
-								$('#input_input_numKbPopup').focus();
-								return;
+							}else{
+								Util.msg.alert({
+									msg : result.msg,
+									topTip : true
+								});			
 							}
-							
-							Util.LM.show();
-							
-							orderDataModel.tableID = ts.table.id;
-							orderDataModel.customNum = customNum;
-							orderDataModel.orderFoods = [];
-							orderDataModel.categoryValue =  ts.table.categoryValue;
-							orderDataModel.comment = $('#inputTableOpenCommon').val();
-							
-							$.post('../InsertOrder.do', {
-								commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
-								type : 1,
-								notPrint : false
-							}, function(result){
-								Util.LM.hide();
-								if (result.success) {
-									ts.closeTableWithPeople();
-									initTableData();
-									Util.msg.alert({
-										msg : '开台成功!',
-										topTip : true
-									});
-								}else{
-									Util.msg.alert({
-										msg : result.msg,
-										topTip : true
-									});			
-								}
-							});
-							customerPopup.close();	
+						});
+						customerPopup.close();	
 					},
 					right : function(){
 						customerPopup.close();

@@ -257,8 +257,12 @@ function NumKeyBoardPopup(param){
 			
 			self.find('[id=header_div_numKbPopup] h3').html(param.header);
 			
-			if(param.rightTitle){
-				self.find('[id=right_a_numKbPopup] span span').text(param.rightTitle);
+			if(param.rightText){
+				self.find('[id=right_a_numKbPopup] span span').text(param.rightText);
+			}
+			
+			if(param.leftText){
+				self.find('[id=left_a_numKbPopup] span span').text(param.leftText);
 			}
 			
 			//绑定取消按钮

@@ -52,8 +52,6 @@ var of = {
 										'<span style="float: right;">￥{unitPrice}  X <font color="lime">{count}</font></span>' +
 									'</div>' +
 								'</a></li>',
-	//套菜列表							
-	comboFoodLiTemplet = '<li class="ui-li ui-li-static">┕{name}<font color="blue">{unit}</font> X <font color="lime">{amount}</font><font color="green"> {tastes}</font></li>',
 	//口味列表
 	tasteCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>',
 	//选中口味
@@ -332,9 +330,9 @@ of.initNewFoodContent = function(c){
 		c.data = c.record;
 	}
 	var html = [], sumCount = 0, sumPrice = 0;
-	var temp = null, tempUnitPrice = 0;
 	for(var i = 0; i < of.newFood.length; i++){
-		temp = of.newFood[i];
+		var tempUnitPrice = 0;
+		var temp = of.newFood[i];
 		sumCount += temp.count;
 		//称重属性是整个菜加口味价钱, 不是每份菜
 		if((temp.status & 1 << 7) != 0){
@@ -366,11 +364,14 @@ of.initNewFoodContent = function(c){
 		}
 		
 		var comboFoodLi = [];
+		
 		//是否为套菜
 		if((temp.status & 1 << 5) != 0){
+			//套菜列表							
+			var comboFoodLiTemplate = '<li class="ui-li ui-li-static">┕{name}<font color="blue">{unit}</font> X <font color="lime">{amount}</font><font color="green"> {tastes}</font></li>';
 			for (var j = 0; j < temp.combo.length; j++) {
 				//列出套菜对应的子菜品
-				comboFoodLi.push(comboFoodLiTemplet.format({
+				comboFoodLi.push(comboFoodLiTemplate.format({
 					name : temp.combo[j].comboFood.name,
 					//有单位时使用单位名
 					unit : temp.combo[j].foodUnit ? ' /' + temp.combo[j].foodUnit.unit : '',
@@ -411,9 +412,6 @@ of.initNewFoodContent = function(c){
 		
 	}
 	
-	
-	temp = null;
-	tempUnitPrice = null;
 	if(sumCount > 0){
 		$('#divDescForCreateOrde div:first').html('总数量:<font color="green">{count}</font>, 合计:<font color="green">￥{price}</font>'.format({
 			count : sumCount.toFixed(2),
@@ -422,13 +420,8 @@ of.initNewFoodContent = function(c){
 	}else{
 		$('#divDescForCreateOrde div:first').html('');
 	}
-	
-	
-	
 	 
 	$('#orderFoodsCmp').html(html.join(''));
-	
-
 	
 	//刷新界面后重新选中点的菜
 	if(c.data != null && typeof c.data != 'undefined'){
@@ -2172,13 +2165,13 @@ $(function(){
 	}
 
 	//退出点菜界面
-	$('#orderFoodMgr').on('pagehide', function(){
-		//关闭常用口味Popup
-		$(".commonTasteFloat").hide();
-	});
+//	$('#orderFoodMgr').on('pagehide', function(){
+//		//关闭常用口味Popup
+//		$(".commonTasteFloat").hide();
+//	});
 	
 	//进入点菜界面
-	$('#orderFoodMgr').on('pageshow', function(e){
+	$('#orderFoodMgr').on('pagebeforeshow', function(e){
 		
 		of.order = null;
 		of.table = null;
@@ -2201,14 +2194,14 @@ $(function(){
 						if(param.comment)
 						of.table.comment = param.comment;
 	
-						//创建部门厨房按钮
-						initDeptAndKitchen();
-						
 						//获取沽清菜品的数据
 						$.post('../QueryMenu.do', {dataSource : 'stopAndLimit'}, function(result){
 							if(result.success){
 								updateSellout(result.root);
+								//创建部门厨房按钮
+								initDeptAndKitchen();
 							}
+							Util.LM.hide();
 						});
 						
 						if(of.table.statusValue == 1){
@@ -2225,7 +2218,6 @@ $(function(){
 							msg : '没有找到此餐台信息'
 						});
 					}
-					Util.LM.hide();
 				},
 				error : function(request, status, err){
 					Util.LM.hide();
@@ -2250,21 +2242,17 @@ $(function(){
 		function updateSellout(selloutFoods){
 			for (var j = 0; j < of.foodList.length; j++) {
 				//先把菜品全部变为不停售的, 因为可能之前是停售的, 现在不停售了
-				of.foodList[j].status &= ~(1 << 2);
-				for (var i = 0; i < selloutFoods.length; i++) {
-					if(of.foodList[j].id == selloutFoods[i].id){
-						if(selloutFoods[i].foodLimitRemain == 0){
-							of.foodList[j].status |= (1 << 2);
-						}
-						
-						//更新限量沽清剩余
-						if((of.foodList[j].status & 1 << 10) != 0 || selloutFoods[i].foodLimitAmount > 0){
-							//设置菜品为限量沽清属性
-							of.foodList[j].status |= (1 << 10);
-							of.foodList[j].foodLimitAmount = selloutFoods[i].foodLimitAmount;
-							of.foodList[j].foodLimitRemain = selloutFoods[i].foodLimitRemain;
-						}
-						break;
+				of.foodList.setSellout(j, false);
+				of.foodList.setLimit(j, false);
+			}
+			
+			for(var i = 0; i < selloutFoods.length; i++){
+				var index = of.foodList.binaryIndex(selloutFoods[i]);
+				if(index >= 0){
+					//更新估清菜品的状态和限量估清的数量
+					of.foodList[index].status = selloutFoods[i].status;
+					if(of.foodList.isLimit(index)){
+						of.foodList.setLimit(index, true, selloutFoods[i].foodLimitAmount, selloutFoods[i].foodLimitRemain);
 					}
 				}
 			}
@@ -2485,7 +2473,11 @@ $(function(){
 			//显示厨房分页
 			showKitchenPaging(0, kitchenPagingData);
 			
+			//关闭常用口味Popup
+			$(".commonTasteFloat").hide();
+			//关闭拼音
 			closePinyin();
+			//关闭手写
 			closeHandWriting();
 		}
 
@@ -2551,6 +2543,13 @@ $(function(){
 				var sl = $('#kitchensCmp a[data-type=kitchenCmp]:first');		
 				sl.attr('data-theme', 'b');
 				sl.buttonMarkup( "refresh" );
+				
+				//关闭常用口味Popup
+				$(".commonTasteFloat").hide();
+				//关闭拼音
+				closePinyin();
+				//关闭手写
+				closeHandWriting();
 			});
 			
 			//厨房点击事件
@@ -2572,8 +2571,12 @@ $(function(){
 					}
 	
 					sl.buttonMarkup( "refresh" );
-				
+					
+					//关闭常用口味Popup
+					$(".commonTasteFloat").hide();
+					//关闭拼音
 					closePinyin();
+					//关闭手写
 					closeHandWriting();
 				};
 			});
@@ -2966,6 +2969,9 @@ $(function(){
 				handWriting = createHandWriting();
 			}
 			handWriting.rewrite();
+			//关闭常用口味Popup
+			$(".commonTasteFloat").hide();
+			//关闭拼音
 			closePinyin();
 			$('#handWritingInput_input_orderFood').val('');
 			$('#searchWord_div_orderFood').html('');
@@ -3030,6 +3036,10 @@ $(function(){
 			$('#orderPinyinCmp').show();
 			$('#pinyin_div_orderFood').show();	
 			$('#pinyinInput_input_orderFood').val('');
+			
+			//关闭常用口味Popup
+			$(".commonTasteFloat").hide();
+			//关闭手写
 			closeHandWriting();
 			createPinyinKeyboard();
 			$('#pinyinInput_input_orderFood').focus();

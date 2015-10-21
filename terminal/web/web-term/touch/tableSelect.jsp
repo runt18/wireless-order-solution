@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
 <% 
-	float v = 1.4f; 
+	float v = 1.5f; 
 	response.setHeader("Pragma","No-cache"); 
 	response.setHeader("Cache-Control","no-cache"); 
 	response.setDateHeader("Expires", 0);  
@@ -36,9 +36,9 @@
 <!-- 时分插件.js -->
 <script type="text/javascript" src="js/book/timepicki.js"></script>
 <!-- 手写板控件 -->
-<script type="text/javascript" src="js/handWriting/handWriting.js"></script>
+<script type="text/javascript" src="js/handWriting/handWriting.js?v=<%=v %>"></script>
 <!-- jqm弹出框控件 -->
-<script type="text/javascript" src="js/popup/jqmPopup.js"></script>
+<script type="text/javascript" src="js/popup/jqmPopup.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/Util.js?v=<%=v %>"></script>
 <script type="text/javascript" src="../extjs/wireless.ux.js"></script>
 <script type="text/javascript" src="js/orderFood/orderFood.js?v=<%=v %>"></script>
@@ -47,8 +47,8 @@
 <script type="text/javascript" src="js/payment/payment.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/tableSelect/tableSelect.js?v=<%=v %>"></script>
 <!-- 数字键盘控件 -->
-<script type="text/javascript" src="js/numKeyBoard/numKeyBoard.js"></script>
-<script type="text/javascript" src="./js/popup/jqmPopup.js"></script>
+<script type="text/javascript" src="js/numKeyBoard/numKeyBoard.js?v=<%=v %>"></script>
+<script type="text/javascript" src="./js/popup/jqmPopup.js?v=<%=v %>"></script>
 
 <!--引入易笔字核心脚本(utf-8编码)-->
 <!-- <script src="http://www.yibizi.com/ybz_core/core/ybz.min.js"></script> -->

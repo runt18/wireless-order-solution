@@ -201,6 +201,7 @@ var HandWritingAttacher = (function () {
         var container = null;
         var word = null;
         var panel = null;
+        var _handWritingPanel = null;
         var isMouseOver = false;
         this.attach = function(attachTo, onWordSelected, param){
         	//检查是否有重复控件
@@ -257,7 +258,7 @@ var HandWritingAttacher = (function () {
 	        				panel.append(word).append(container);	        			
 	        				$('body').append(panel);
 	        				
-					  		new HandWritingPanel({ 
+					  		_handWritingPanel = new HandWritingPanel({ 
 								renderTo : container[0] ,
 						   	   	result : function(data){
 						   	    	var temp = data.slice(0, 4);
@@ -274,10 +275,10 @@ var HandWritingAttacher = (function () {
 						   			word.find('input').each(function(index, element){						   				
 							   				element.onclick = function(){
 							   					if(element.value == '重写'){
-						   							handWritingPanel.rewrite();	
+						   							_handWritingPanel.rewrite();	
 						   						}else{
 													$(activeInput.attachObj).val($(activeInput.attachObj).val() + element.value);	
-													handWritingPanel.rewrite();	
+													_handWritingPanel.rewrite();	
 													if(activeInput.onWordSelected){
 														activeInput.onWordSelected(activeInput.attachObj, element.value);
 													}
@@ -304,6 +305,7 @@ var HandWritingAttacher = (function () {
 								 panel = null;
 								 container = null;
 								 word = null;
+								 _handWritingPanel = null;
 							 }
 						 	 activeInput = null;
 	        			 }
