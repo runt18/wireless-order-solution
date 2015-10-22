@@ -1476,6 +1476,7 @@ ts.toOrderFoodOrTransFood = function(c){
 
 		
 	}
+	$('#divSelectTablesForTs').html("");
 };
 
 /**

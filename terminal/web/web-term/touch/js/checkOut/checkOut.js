@@ -605,11 +605,13 @@ uo.openWeighOperate = function(){
 			uo.selectedFood.count = count.val();
 			//对更新的菜品和人数进行提交
 			uo.submitUpdateOrderHandler({orderFoods:uo.order.orderFoods, notPrint:!$('#chkPrintWeigh').attr("checked")});	
+			
 			if($('#chkPrintWeigh_input_checkOut').attr('checked')){
 				setcookie(document.domain + '_printWeightCheck', true);
 			}else{
 				setcookie(document.domain + '_printWeightCheck', false);
 			}
+			
 			weighPopup.close();
 		},
 		right : function(){
