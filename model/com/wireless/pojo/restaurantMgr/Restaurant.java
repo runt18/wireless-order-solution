@@ -575,6 +575,10 @@ public class Restaurant implements Parcelable, Jsonable{
 		this.beeCloudAppSecret = appSecret;
 	}
 	
+	public boolean hasBeeCloud(){
+		return this.beeCloudAppId != null;
+	}
+	
 	public void addModule(Module module){
 		if(!modules.contains(module)){
 			modules.add(module);

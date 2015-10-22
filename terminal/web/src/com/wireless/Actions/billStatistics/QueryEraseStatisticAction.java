@@ -29,7 +29,7 @@ import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 
-public class QueryEraseStatisticAction  extends DispatchAction{
+public class QueryEraseStatisticAction extends DispatchAction{
 
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)

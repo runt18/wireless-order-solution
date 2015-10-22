@@ -7,6 +7,9 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/QueryMemberPriceStatistics" type="com.wireless.Actions.billStatistics.QueryMemberPriceStatisticsAction"
+			scope="request" parameter="dataSource">
+		</action>
 		<action path="/BeeCloudHook" type="com.wireless.Actions.payment.BeeCloudHookAction"
 			scope="request">
 		</action>

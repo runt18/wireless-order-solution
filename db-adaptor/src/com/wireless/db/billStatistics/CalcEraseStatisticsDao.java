@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -24,26 +25,15 @@ import com.wireless.pojo.util.DateUtil;
 
 public class CalcEraseStatisticsDao {
 	public static class ExtraCond{
-		private final DateType dateType;
 		
-		private final String orderTbl;
-		//private final String orderTblAlias = "O";
-		private final String orderFoodTbl;
-		//private final String orderFoodTblAlias = "OF";
+		private final DBTbl dbTbl;
 		
 		private int staffId;
 		private HourRange hourRange;
 		private Department.DeptId deptId;
 		
 		public ExtraCond(DateType dateType){
-			this.dateType = dateType;
-			if(this.dateType.isToday()){
-				orderTbl = "order";
-				orderFoodTbl = "order_food";
-			}else{
-				orderTbl = "order_history";
-				orderFoodTbl = "order_food_history";
-			}
+			this.dbTbl = new DBTbl(dateType);
 		}
 		
 		
@@ -267,8 +257,8 @@ public class CalcEraseStatisticsDao {
 		String sql;
 		sql = " SELECT " +
 			  " O.id, O.order_date, O.waiter, O.staff_id, O.erase_price, O.actual_price, O.comment, O.table_alias, O.table_name, O.table_id, D.name, D.dept_id, D.type " +
-			  " FROM " + Params.dbName + "." + extraCond.orderTbl + " O " +
-			  " JOIN " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " +
+			  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
+			  " JOIN " + Params.dbName + "." + extraCond.dbTbl.orderFoodTbl + " OF " +
 			  " ON OF.order_id = O.id " +
 			  " JOIN " + Params.dbName + ".department D ON D.dept_id = OF.dept_id AND D.restaurant_id = OF.restaurant_id " +
 			  " WHERE 1 = 1 " +
