@@ -605,6 +605,11 @@ uo.openWeighOperate = function(){
 			uo.selectedFood.count = count.val();
 			//对更新的菜品和人数进行提交
 			uo.submitUpdateOrderHandler({orderFoods:uo.order.orderFoods, notPrint:!$('#chkPrintWeigh').attr("checked")});	
+			if($('#chkPrintWeigh_input_checkOut').attr('checked')){
+				setcookie(document.domain + '_printWeightCheck', true);
+			}else{
+				setcookie(document.domain + '_printWeightCheck', false);
+			}
 			weighPopup.close();
 		},
 		right : function(){
@@ -614,12 +619,19 @@ uo.openWeighOperate = function(){
 	
 	weighPopup.open(function(self){
 		var print = '<label>'+
-  		'<input type="checkbox" id="chkPrintWeigh" data-theme="e" checked="checked">打印称重信息'+
+  		'<input type="checkbox" id="chkPrintWeigh_input_checkOut" data-theme="e" checked="checked">打印称重信息'+
 	   	'</label>';	
 		$('#content_div_numKbPopup').append(print);
 		$('#content_div_numKbPopup').trigger('create');
 		self.find('[id=middle_a_numKbPopup]').hide();
-		setTimeout(function(){
+
+		if(getcookie(document.domain + '_printWeightCheck') == 'true'){
+			$('#chkPrintWeigh_input_checkOut').attr("checked", true).checkboxradio("refresh");
+		}else{
+			$('#chkPrintWeigh_input_checkOut').attr("checked", false).checkboxradio("refresh");
+		}
+		
+			setTimeout(function(){
 			self.find('[id=input_input_numKbPopup]').focus();
 		}, 200);
 		
