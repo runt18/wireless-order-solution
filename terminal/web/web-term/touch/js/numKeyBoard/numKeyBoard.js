@@ -165,6 +165,15 @@ var NumKeyBoardAttacher = (function(){
 		};
 		
 		this.detach = function(detachFrom){
+			//如果detach的输入框是当前激活的，则删除数字键盘
+			if(activeInput && activeInput.attachObj.id == detachFrom.id){
+				if(container){
+					container.remove();
+					container = null;
+					numKeyBoard = null;
+				}
+				activeInput = null;
+			}
 			//删除focus和blur事件的处理函数
 			for(var i = 0; i < attachInputs.length; i++){
 				if(attachInputs[i].attachObj.id == detachFrom.id){

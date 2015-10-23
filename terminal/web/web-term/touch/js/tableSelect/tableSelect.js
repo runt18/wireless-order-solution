@@ -128,6 +128,10 @@ $(document).on('pageshow', "#tableSelectMgr", function(){
 	$(document).on('keydown', function(event){
     	if(event.which == "107"){//加号
 			if(ts.commitTableOrTran != 'lookup'){
+				//TODO
+//				new AskTablePopup({
+//					tables : tables
+//				}).open();
 				ts.createOrderForLookup();
 			}else{
 				ts.submitForSelectTableOrTransFood();
@@ -722,6 +726,7 @@ $(function(){
  */
 ts.loadData = function(){
 	location.href = '#tableSelectMgr';
+	ts.commitTableOrTran = null;
 	initTableData();
 	of.loadFoodDateAction = window.setInterval("keepLoadTableData()", 500);	
 };

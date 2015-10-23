@@ -48,6 +48,9 @@
 <script type="text/javascript" src="js/tableSelect/tableSelect.js?v=<%=v %>"></script>
 <!-- 数字键盘控件 -->
 <script type="text/javascript" src="js/numKeyBoard/numKeyBoard.js?v=<%=v %>"></script>
+<!-- 餐台选择控件 -->
+<!-- <script type="text/javascript" src="./js/popup/table/askTable.js"></script> -->
+<!-- JqmPopup弹出控件 -->
 <script type="text/javascript" src="./js/popup/jqmPopup.js?v=<%=v %>"></script>
 
 <!--引入易笔字核心脚本(utf-8编码)-->
