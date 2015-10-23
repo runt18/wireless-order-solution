@@ -32,7 +32,7 @@ public class QueryMemberPriceStatisticsAction extends DispatchAction{
 		String endDate = request.getParameter("endDate");
 		String opening = request.getParameter("opening");
 		String ending = request.getParameter("ending");
-		String staffId = request.getParameter("staffID");
+		String staffId = request.getParameter("staffId");
 		
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
