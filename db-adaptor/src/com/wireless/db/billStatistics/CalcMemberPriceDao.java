@@ -43,7 +43,7 @@ public class CalcMemberPriceDao {
 				extraCond.append(" AND TIME(O.order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
 			}
 			if(staffId != 0){
-				extraCond.append(" AND staff_id = " + staffId);
+				extraCond.append(" AND O.staff_id = " + staffId);
 			}
 			return extraCond.toString();
 		}
