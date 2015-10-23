@@ -465,10 +465,10 @@ public class OrderDao {
 		String sql;
 		if(extraCond.dateType == DateType.TODAY){
 			sql = " SELECT " +
-				  " O.id, O.birth_date, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, O.staff_id, " +
+				  " O.id, O.birth_date, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
 				  " O.temp_staff, O.temp_date, " +
 				  " T.minimum_cost, IFNULL(T.category, 1) AS tbl_category, " +
-				  " O.waiter, " +
+				  " O.waiter, O.staff_id, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.settle_type, O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
 				  " O.discount_id, O.discount_staff_id, O.discount_staff, O.discount_date, " +
@@ -487,7 +487,7 @@ public class OrderDao {
 		}else if(extraCond.dateType == DateType.HISTORY){
 			sql = " SELECT " +
 				  " OH.id, OH.birth_date, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
-				  " OH.waiter, OH.discount_staff_id, OH.discount_staff, OH.discount_date, " +
+				  " OH.waiter, OH.staff_id, OH.discount_staff_id, OH.discount_staff, OH.discount_date, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
 				  " OH.coupon_price, " +
 				  " OH.settle_type, OH.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, OH.category, OH.status, OH.service_rate, OH.comment, " +
@@ -514,6 +514,7 @@ public class OrderDao {
 			order.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
 			order.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			order.setWaiter(dbCon.rs.getString("waiter"));
+			order.setStaffId(dbCon.rs.getInt("staff_id"));
 			if(dbCon.rs.getTimestamp("discount_date") != null){
 				order.setDiscounterId(dbCon.rs.getInt("discount_staff_id"));
 				order.setDiscounter(dbCon.rs.getString("discount_staff"));
