@@ -32,12 +32,17 @@ public class QueryMemberPriceStatisticsAction extends DispatchAction{
 		String endDate = request.getParameter("endDate");
 		String opening = request.getParameter("opening");
 		String ending = request.getParameter("ending");
+		String staffId = request.getParameter("staffID");
 		
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<Order> list;
 			
 			CalcMemberPriceDao.ExtraCond extraCond = new CalcMemberPriceDao.ExtraCond(DateType.HISTORY);
+			
+			if(staffId != null && !staffId.isEmpty()){
+				extraCond.setStaff(Integer.parseInt(staffId));
+			}
 			
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
