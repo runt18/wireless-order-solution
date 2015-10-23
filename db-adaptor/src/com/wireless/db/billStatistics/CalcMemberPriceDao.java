@@ -20,6 +20,7 @@ public class CalcMemberPriceDao {
 	public static class ExtraCond{
 		private final DBTbl dbTbl;
 		private HourRange hourRange;
+		private int staffId;
 		
 		public ExtraCond setHourRange(HourRange hourRange){
 			this.hourRange = hourRange;
@@ -30,11 +31,19 @@ public class CalcMemberPriceDao {
 			dbTbl = new DBTbl(dateType);
 		}
 		
+		public ExtraCond setStaff(int staffId){
+			this.staffId = staffId;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
 			if(hourRange != null){
 				extraCond.append(" AND TIME(O.order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
+			}
+			if(staffId != 0){
+				extraCond.append(" AND staff_id = " + staffId);
 			}
 			return extraCond.toString();
 		}
