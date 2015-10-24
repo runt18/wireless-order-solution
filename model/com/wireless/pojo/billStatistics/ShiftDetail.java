@@ -312,53 +312,58 @@ public class ShiftDetail implements Jsonable{
 		jm.putFloat("totalIncome", this.getTotalIncome());
 		jm.putInt("orderAmount", this.getOrderAmount());
 		
-		//FIXME
-//		jm.putFloat("cashIncome2", this.getCashActualIncome());
-//		jm.putInt("cashAmount", this.getCashAmount());
-//		
-//		jm.putFloat("creditCardIncome2", this.getCreditActualIncome());
-//		jm.putInt("creditCardAmount", this.getCreditCardAmount());
-//		
-//		jm.putFloat("hangIncome2", this.getHangActualIncome());
-//		jm.putInt("hangAmount", this.getHangAmount());
-//		
-//		jm.putFloat("signIncome2", this.getSignActualIncome());
-//		jm.putInt("signAmount", this.getSignAmount());
-//		
-//		jm.putInt("memberAmount", this.getMemberCardAmount());
-//		jm.putFloat("memberActual", this.getMemberActualIncome());
+		//各付款方式营收
+		jm.putJsonable(this.getIncomeByPay(), flag);
 		
+		//折扣
 		jm.putFloat("discountIncome", this.getDiscountIncome());
+		jm.putInt("discountAmount", this.getDiscountAmount());
 		
+		//赠送
 		jm.putFloat("giftIncome", this.getGiftIncome());
+		jm.putInt("giftAmount", this.getGiftAmount());
 		
+		//优惠券
 		jm.putFloat("couponIncome", this.getCouponIncome());
+		jm.putInt("couponAmount", this.getCouponAmount());
 		
+		//退菜
 		jm.putFloat("cancelIncome", this.getCancelIncome());
+		jm.putInt("cancelAmount", this.getCancelAmount());
 		
+		//抹数
 		jm.putFloat("eraseIncome", this.getEraseIncome());
+		jm.putInt("eraseAmount", this.getEraseAmount());
 		
+		//反结账
 		jm.putFloat("paidIncome", this.getPaidIncome());
+		jm.putInt("paidAmount", this.getPaidAmount());
+		
+		//服务费
 		jm.putInt("serviceAmount", this.getServiceAmount());
 		jm.putFloat("serviceIncome", this.getServiceIncome());
 		
+		//会员价
+		jm.putInt("memberPriceAmount", this.getMemberPriceAmount());
+		jm.putFloat("memberPriceIncome", this.getMemberPriceIncome());
+		
+		//预订金额
 		jm.putFloat("bookIncome", this.getIncomeByBook().getIncome());
 		
+		//部门营收
 		jm.putJsonableList("deptStat", this.getDeptIncome(), 0);
-		jm.putInt("paidAmount", this.getPaidAmount());
-		jm.putInt("eraseAmount", this.getEraseAmount());
-		jm.putInt("couponAmount", this.getCouponAmount());
-		jm.putInt("cancelAmount", this.getCancelAmount());
-		jm.putInt("giftAmount", this.getGiftAmount());
-		jm.putInt("discountAmount", this.getDiscountAmount());
 		
-		jm.putJsonable(this.getIncomeByPay(), flag);
-		
+		//会员现金实冲
 		jm.putFloat("memberChargeByCash", this.getIncomeByCharge().getActualCashCharge());
+		//会员刷卡实冲
 		jm.putFloat("memberChargeByCard", this.getIncomeByCharge().getActualCreditCardCharge());
+		//会员冲额
 		jm.putFloat("memberAccountCharge", this.getIncomeByCharge().getTotalAccountCharge());
+		//会员实退金额
 		jm.putFloat("memberRefund", this.getIncomeByCharge().getTotalActualRefund());
+		//会员账户扣额
 		jm.putFloat("memberAccountRefund", this.getIncomeByCharge().getTotalAccountRefund());
+		
 		return jm;
 	}
 
