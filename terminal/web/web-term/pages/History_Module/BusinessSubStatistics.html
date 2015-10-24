@@ -60,6 +60,8 @@
 			addTab('memberChargeStatistics', '充值统计', 'Client_Module/memberChargeStatistics.html');			
 		}else if(c.type == 11){//取款统计
 			addTab('memberRefundStatistics', '取款统计', 'Client_Module/memberRefundStatistics.html');			
+		}else if(c.type == 12){//会员价统计
+			addTab('memberPriceStatistics', '会员价统计 ', 'History_Module/memberPriceStatictics.html');
 		}else{
 			return;
 		}
@@ -134,6 +136,12 @@
 			<td class="text_right" id="businessSub_bssiServiceAmount">---</td>
 			<td class="text_right" id="businessSub_bssiServiceIncome">---</td>
 			<td class="text_center">----</td>
+		</tr>
+		<tr>
+			<th>会员价</th>
+			<td class="text_right"><a id="businessSub_bssiMemberPriceAmount" href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, operateType:8})">---</a></td>
+			<td class="text_right" id="businessSub_bssiMemberPriceIncome">---</td>
+			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 12})">查看详情</a></td>
 		</tr>
 		<tr>
 			<th>优惠劵</th>

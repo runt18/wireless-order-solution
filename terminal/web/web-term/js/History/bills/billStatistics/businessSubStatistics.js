@@ -380,6 +380,9 @@ Ext.onReady(function(){
 					Ext.getDom('bussiMemberRefund').innerHTML = businessSub_business.memberRefund.toFixed();
 					Ext.getDom('bussiMemberAccountRefund').innerHTML = businessSub_business.memberAccountRefund.toFixed(2);
 					
+					Ext.getDom('businessSub_bssiMemberPriceAmount').innerHTML = businessSub_business.memberPriceAmount;
+					Ext.getDom('businessSub_bssiMemberPriceIncome').innerHTML = businessSub_business.memberPriceIncome.toFixed(2);
+					
 					Ext.getDom('businessStatisticsSummary').innerHTML = trPayTypeContent;
 					
 					Ext.getDom('businessStatisticsDeptGeneral').innerHTML = trContent;

@@ -1063,6 +1063,17 @@ Ext.onReady(function() {
 						searchAdditionFilter = e.getId();
 				}
 			}
+		},{ xtype:'tbtext', text:'&nbsp;&nbsp;'},{
+			xtype : 'radio',
+			name : 'conditionRadio',
+			boxLabel : '会员价',
+			inputValue : 8,
+			listeners : {
+				check : function(e){
+					if(e.getValue())
+						searchAdditionFilter = e.getId();
+				}
+			}
 		},
 		'->',
 		{

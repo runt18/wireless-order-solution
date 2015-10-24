@@ -209,6 +209,7 @@ var repaid_getStaffChartData = function(){
 	});
 	
 };
+
 function repaid_changeChartWidth(w,h){
 	if(eval($('div:visible[data-type=repaidChart]').attr('data-value'))){
 		if($('div:visible[data-type=repaidChart]').length == 1){
@@ -219,6 +220,8 @@ function repaid_changeChartWidth(w,h){
 		}
 	}	
 }
+
+//反结账明细的表格
 function initGrid(){
 	var cm = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
