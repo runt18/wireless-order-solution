@@ -1,46 +1,35 @@
 
-
-
-
-
-
-
-
-
-//1表示无优惠劵纯展示; 2表示无条件领取优惠劵
-function updatePromotionCouponPanel(promotionType){
-	if(promotionType == 1){
-		//纯展示
-		$("#promotionPic").attr("title", "上传活动封面图片");
-		Ext.getCmp('guide_2nd_couponDetail').hide();
-		Ext.getCmp('guide_2nd_CouponOption').hide();
-		Ext.getCmp('guide_2nd_promotionEditor').setHeight(440);
-		Ext.getCmp('guide_2nd_occupy').show();
-		
-	}else if(promotionType == 2){
-		//优惠券
-		$("#promotionPic").attr("title", "优惠券图片");
-		Ext.getCmp('guide_2nd_couponDetail').show();
-		Ext.getCmp('guide_2nd_CouponOption').show();
-		Ext.getCmp('guide_2nd_occupy').show();
-		Ext.getCmp('guide_2nd_promotionEditor').setHeight(325);
-	}
-	Ext.getCmp('guide_2nd_panel').doLayout();
-}
-
-function selectPromotionModel(thiz, type){
-	$(".active_mould").removeClass('active_mould_click');
-	$(thiz).find('input').attr('checked', 'checked');
-	$(thiz).addClass('active_mould_click');
-	promotionGuideWin.promotionType = type;
-	updatePromotionCouponPanel(type);
-}
-
-
-
-
-
 Ext.onReady(function() {
+	
+	//1表示无优惠劵纯展示; 2表示无条件领取优惠劵
+	function updatePromotionCouponPanel(promotionType){
+		if(promotionType == 1){
+			//纯展示
+			$("#promotionPic").attr("title", "上传活动封面图片");
+			Ext.getCmp('guide_2nd_couponDetail').hide();
+			Ext.getCmp('guide_2nd_CouponOption').hide();
+			Ext.getCmp('guide_2nd_promotionEditor').setHeight(440);
+			Ext.getCmp('guide_2nd_occupy').show();
+			
+		}else if(promotionType == 2){
+			//优惠券
+			$("#promotionPic").attr("title", "优惠券图片");
+			Ext.getCmp('guide_2nd_couponDetail').show();
+			Ext.getCmp('guide_2nd_CouponOption').show();
+			Ext.getCmp('guide_2nd_occupy').show();
+			Ext.getCmp('guide_2nd_promotionEditor').setHeight(325);
+		}
+		Ext.getCmp('guide_2nd_panel').doLayout();
+	}
+	
+	//优惠活动类型选择
+	function selectPromotionModel(thiz, type){
+		$(".active_mould").removeClass('active_mould_click');
+		$(thiz).find('input').attr('checked', 'checked');
+		$(thiz).addClass('active_mould_click');
+		promotionGuideWin.promotionType = type;
+		updatePromotionCouponPanel(type);
+	}
 	
 	//创建活动向导
     $("#wizard").steps({
@@ -76,6 +65,15 @@ Ext.onReady(function() {
         }
     });
     
+    //免费领取优惠券类型
+	$('#freeCoupon_div_promotion').click(function(){
+		selectPromotionModel($('#freeCoupon_div_promotion')[0], 2);
+	});
+	//纯展示优惠券类型
+	$('#display_div_promotion').click(function(){
+		selectPromotionModel($('#display_div_promotion')[0], 2);
+	});
+	
     //生成优惠活动头部内容
     function buildPromotionHeader(title, endDate){
 		var head = [];

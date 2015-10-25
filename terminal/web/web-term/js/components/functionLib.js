@@ -527,7 +527,7 @@ function showFloatOption(obj_b){
 					if(typeof obj_b.option[i].fn == 'string'){
 						$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+obj_b.option[i].fn+'>'+ obj_b.option[i].name +'</a>&nbsp;');
 					}else if(typeof obj_b.option[i].fn == 'function'){
-						$("#div_floatBar").append($('<a>' + obj_b.option[i].name + '</a>&nbsp').click(obj_b.option[i].fn));
+						$("#div_floatBar").append($('<a href="javascript:void(0)">' + obj_b.option[i].name + '</a>&nbsp').click(obj_b.option[i].fn));
 					}
 				}
 			}		
