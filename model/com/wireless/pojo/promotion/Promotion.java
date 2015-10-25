@@ -125,7 +125,6 @@ public class Promotion implements Jsonable{
 		private int point = -1;
 		private CouponType.UpdateBuilder typeBuilder;
 		private Oriented oriented;
-		private List<Member> members = SortedList.newInstance();;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
@@ -189,45 +188,13 @@ public class Promotion implements Jsonable{
 			return this.point != -1;
 		}
 		
-		public UpdateBuilder addMember(int memberId){
-			Member member = new Member(memberId);
-			if(!members.contains(member)){
-				members.add(member);
-			}
-			this.oriented = Oriented.SPECIFIC;
-			return this;
-		}
-		
-		public UpdateBuilder addMember(Member member){
-			if(!members.contains(member)){
-				members.add(member);
-			}
-			this.oriented = Oriented.SPECIFIC;
-			return this;
-		}
-		
-		public UpdateBuilder setMemberEmpty(){
-			members.clear();
-			this.oriented = Oriented.SPECIFIC;
-			return this;
-		}
-		
-		public UpdateBuilder setAllMember(){
-			members.clear();
-			this.oriented = Oriented.ALL;
+		public UpdateBuilder setOriented(Oriented oriented){
+			this.oriented = oriented;
 			return this;
 		}
 		
 		public boolean isMemberChanged(){
 			return this.oriented != null;
-		}
-		
-		public List<Member> getMembers(){
-			if(members != null){
-				return Collections.unmodifiableList(members);
-			}else{
-				return Collections.emptyList();
-			}
 		}
 		
 		public UpdateBuilder setCouponTypeBuilder(CouponType.UpdateBuilder builder){

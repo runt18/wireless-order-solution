@@ -15,7 +15,6 @@ import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
 import com.wireless.pojo.util.SortedList;
@@ -477,8 +476,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	 * Check to see whether the balance of member account is enough for consumption in case of paid by member.
 	 * @param consumePrice
 	 * 			the amount to consume price
-	 * @param coupon
-	 * 			the coupon to use, null means NOT use coupon
 	 * @param payType
 	 * 			the payment type referred to {@link PayType}
 	 * @throws BusinessException
@@ -486,18 +483,17 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	 *          <li>the consume price exceeds total balance to this member account
 	 *          <li>the point member is NOT allowed to pay by balance   
 	 */
-	public void checkConsume(float consumePrice, Coupon coupon, PayType payType) throws BusinessException{
+	public void checkConsume(float consumePrice, PayType payType) throws BusinessException{
 		if(memberType.isPoint() && payType.equals(PayType.MEMBER)){
 			throw new BusinessException("【积分会员】不能使用【会员卡】结账");
 			
 		}else if(memberType.isCharge() && payType.equals(PayType.MEMBER)){
-			checkBalance(consumePrice, coupon);
+			checkBalance(consumePrice);
 		}
 	}
 	
-	private void checkBalance(float consumePrice, Coupon coupon) throws BusinessException{
-		float couponPrice = coupon != null ? coupon.getPrice() : 0; 
-		if(getTotalBalance() < consumePrice - couponPrice){
+	private void checkBalance(float consumePrice) throws BusinessException{
+		if(getTotalBalance() < consumePrice){
 			//Check to see whether the balance of member account is enough or NOT in case of unpaid.
 			throw new BusinessException(MemberError.EXCEED_BALANCE);
 		}
@@ -522,7 +518,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		totalPoint -= lastConsumption.getDeltaPoint();
 		
 		//重新执行会员结账, 生成member operation
-		MemberOperation mo = consume(0, null, PayType.MEMBER);
+		MemberOperation mo = consume(0, PayType.MEMBER);
 		mo.setOperationType(OperationType.RE_CONSUME_RESTORE);
 		
 		return mo;
@@ -541,9 +537,9 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	 * @throws BusinessException
 	 *             throws if the consume price exceeds total balance to this member account
 	 */
-	public MemberOperation reConsume(float consumePrice, Coupon coupon, PayType payType) throws BusinessException{
+	public MemberOperation reConsume(float consumePrice, PayType payType) throws BusinessException{
 		//重新执行会员结账
-		MemberOperation mo = consume(consumePrice, coupon, payType);
+		MemberOperation mo = consume(consumePrice, payType);
 		mo.setOperationType(OperationType.RE_CONSUME);
 		return mo;
 	}
@@ -561,7 +557,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	 * @throws BusinessException
 	 *             throws if the consume price exceeds total balance to this member account
 	 */
-	public MemberOperation consume(float consumePrice, Coupon coupon, PayType payType) throws BusinessException{
+	public MemberOperation consume(float consumePrice, PayType payType) throws BusinessException{
 
 		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 		
@@ -571,21 +567,12 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		
 		if(payType.equals(PayType.MEMBER)){
 			//检查余额是否充足
-			checkBalance(consumePrice, coupon);
+			checkBalance(consumePrice);
 
 			//使用会员付款时扣除账户余额
 			mo.setPayMoney(consumePrice);
 			
 			float deltaBase, deltaExtra;
-			
-			//先扣除优惠券的面额
-			if(coupon != null){
-				consumePrice = consumePrice - coupon.getPrice();
-				consumePrice = consumePrice > 0 ? consumePrice : 0;
-				mo.setCouponId(coupon.getId());
-				mo.setCouponMoney(coupon.getPrice());
-				mo.setCoupnName(coupon.getName());
-			}
 			
 			/*
 			 * 计算账户余额。

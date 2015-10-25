@@ -18,6 +18,7 @@ public class PromotionError extends ErrorEnum{
 	public static final ErrorCode COUPON_EXPIRED = build(7233, "操作失败, 该优惠券已过期");
 	public static final ErrorCode COUPON_DRAW_NOT_ALLOW = build(7202, "优惠券不能领取");
 	public static final ErrorCode COUPON_CREATE_NOT_ALLOW = build(7202, "优惠券不能创建");
+	public static final ErrorCode COUPON_USE_NOT_ALLOW = build(7201, "优惠券不能使用");
 	
 	private PromotionError(){
 		
