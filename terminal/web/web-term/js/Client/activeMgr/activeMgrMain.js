@@ -269,7 +269,7 @@ Ext.onReady(function() {
 		Ext.Ajax.request({
 			url : '../../OperatePromotion.do',
 			params : {
-				dataSource : 'getPromotion',
+				dataSource : 'getByCond',
 				promotionId : promotionId
 			},
 			success : function(res, opt){
@@ -550,7 +550,7 @@ Ext.onReady(function() {
 			url : '../../OperatePromotion.do',
 			params : { 
 				promotionId : node.attributes.id, 
-				dataSource : 'getPromotion' 
+				dataSource : 'getByCond' 
 			},
 			success : function(res, opt){
 				wx.lm.hide();
@@ -748,7 +748,7 @@ Ext.onReady(function() {
 						Ext.Ajax.request({
 							url : '../../OperatePromotion.do?',
 							params : {
-								dataSource : 'getPromotion',
+								dataSource : 'getByCond',
 								promotionId : promotionId
 							},
 							success : function(res, opt){
