@@ -40,7 +40,7 @@ public class WxOperateCouponAction extends DispatchAction{
 			
 			if(request.getParameter("status") != null && !request.getParameter("status").isEmpty()){
 				if(request.getParameter("status").equalsIgnoreCase("drawn")){
-					extraCond.setStatus(Coupon.Status.DRAWN);
+					extraCond.setStatus(Coupon.Status.ISSUED);
 				}
 			}
 			

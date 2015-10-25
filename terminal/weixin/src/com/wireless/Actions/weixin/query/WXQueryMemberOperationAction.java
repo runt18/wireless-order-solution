@@ -327,7 +327,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			// 获取会员编号
 			int mid = MemberDao.getByWxSerial(dbCon, staff, memberSerial).getId();
 			
-			List<Coupon> couponList = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(mid).setStatus(Coupon.Status.DRAWN), null);
+			List<Coupon> couponList = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(mid).setStatus(Coupon.Status.ISSUED), null);
 			for(int i = 0; i < couponList.size(); i++){
 				couponList.set(i, CouponDao.getById(dbCon, staff, couponList.get(i).getId()));
 			}

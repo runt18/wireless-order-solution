@@ -92,7 +92,7 @@ public class WXOperateMemberAction extends DispatchAction {
 				}
 			};				
 			
-			final List<Coupon> couponList = CouponDao.getByCond(StaffDao.getAdminByRestaurant(rid), new CouponDao.ExtraCond().setMember(member.getId()).setStatus(Coupon.Status.DRAWN), null);
+			final List<Coupon> couponList = CouponDao.getByCond(StaffDao.getAdminByRestaurant(rid), new CouponDao.ExtraCond().setMember(member.getId()).setStatus(Coupon.Status.ISSUED), null);
 			
 			final int weixinCard = member.getWeixin().getCard();
 			
