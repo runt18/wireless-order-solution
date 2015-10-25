@@ -1314,6 +1314,69 @@ $(function(){
 				table : pm.table
 			});	
 		});
+		
+		//初始化发券界面
+		var cuoponIssuePopup = null;
+		cuoponIssuePopup = new JqmPopup({
+			loadUrl : './popup/cuopon/issue.html',
+			pageInit : function(self){
+				self.find('[id=cuoponIssueCancel_a_issue]').click(function(){
+					cuoponIssuePopup.close();
+				});
+				
+				$.post('../OperatePromotion.do',  {dataSource : 'getByCond', status : 'progress'}, function(response, status, xhr){
+					if(response.success){
+						var progressCuopon = "";
+						for(var i = 0; i < response.root.length; i++){
+							var eachProgressCuopon = '<tr>'
+												 + '<td style="width:250px">'
+												 + '<label style="height:50px"><input type="checkbox" data-theme="e" id="' + response.root[i].id + '">' + response.root[i].title + '</label>'
+												 + '</td>'
+												 + '<td style="width:35px"><input style="font-size:20px;font-weight: bold;width:35px;" maxlength="3"></td>'
+												 + '</tr>';
+								
+							progressCuopon += eachProgressCuopon;
+						}
+						self.find('[id = issueTal_table_issue]').append(progressCuopon);
+						self.find('[id = issueTal_table_issue]').trigger('create').trigger('refresh');
+					}
+				});
+				
+				
+//				
+//				$.post('../QueryMember.do', {dataSource : 'normal', id : orderMsg.memberId, forDetail : true}, function(result){
+//					if(result.success){
+//						member4Payment = result.root[0];
+//						//设置为已注入状态 
+//						member4Payment.hadSet = true;
+//						
+//						member4Display = Util.clone(member4Payment);
+//						
+//						var memberSpan = "";
+//						if(result.root[0].isRaw){
+//							memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="text-decoration: underline;cursor: pointer;color:blue" onclick="ts.member.memberInfoBind(\'loadMemberBind4Payment\', \''+ result.root[0].name +'\')">' + result.root[0].name +"(点击绑定)</font></span>";
+//						}else{
+//							memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="color:green">' + result.root[0].name +"</font></span>";
+//						}
+//						
+//						$('#orderMemberDesc').html(memberSpan);
+//					}
+//				});
+				
+				
+				
+			}
+		});
+		
+		//打开发送优惠券
+		$('#issueCuopon_a_orderFood').click(function(){
+			console.log('opening');
+			cuoponIssuePopup.open(function(self){
+		
+			});
+		});
+		
+		
 	});
 	
 	var SettleTypeEnum = {
@@ -1434,16 +1497,4 @@ $(function(){
 		}); 		
 	};
 });
-
-
-
-
-
-
-
-
-
-
-
-
 
