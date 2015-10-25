@@ -214,8 +214,8 @@ function loadOrderBasicMsg(){
 	}
 	$('#orderDiscountDesc').html(discountDesc);
 	
-	if(orderMsg.coupon){
-		$('#orderCouponInfo').html('当前优惠券:<font style="color:green;font-weight:bold;">'+ orderMsg.coupon.couponType.name + (orderMsg.coupon.couponType.price > 0? " (¥" + orderMsg.coupon.couponType.price +")" : "") + '</font>');
+	if(orderMsg.couponPrice > 0){
+		$('#orderCouponInfo').html('当前优惠券:<font style="color:green;font-weight:bold;">'+ orderMsg.coupon.length + '张, 共¥' + orderMsg.couponPrice + '</font>');
 	}else{
 		$('#orderCouponInfo').html('');
 	}
