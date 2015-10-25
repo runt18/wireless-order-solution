@@ -100,7 +100,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 			
 			final List<Member> members = membersByType;
 			
-			final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(members.get(0).getId()).setStatus(Coupon.Status.DRAWN), null);
+			final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(members.get(0).getId()).setStatus(Coupon.Status.ISSUED), null);
 			jobject.setExtra(new Jsonable(){
 
 				@Override

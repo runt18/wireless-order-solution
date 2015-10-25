@@ -141,7 +141,7 @@ public class QueryCouponAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			final int couponPublished = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setOnlyAmount(true), null).size();
-			final int couponDrawn = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.DRAWN).setOnlyAmount(true), null).size();
+			final int couponDrawn = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.ISSUED).setOnlyAmount(true), null).size();
 			final int couponUsed = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.USED).setOnlyAmount(true), null).size();
 			
 			jobject.setExtra(new Jsonable(){

@@ -289,12 +289,12 @@ public class QueryMenuAction extends DispatchAction {
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		response.setContentType("text/json;charset=utf-8");
 		JObject jobject = new JObject();
-		List<? extends Jsonable> root = new ArrayList<Jsonable>();
+		List<Food> root = new ArrayList<Food>();
 		try{
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			
-			root = FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().addStatus(Food.SELL_OUT).addStatus(Food.LIMIT), null);
+			root.addAll(FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().setSellout(true), null));
+			root.addAll(FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().setLimit(true), null));
 			
 		}catch(Exception e){
 			e.printStackTrace();

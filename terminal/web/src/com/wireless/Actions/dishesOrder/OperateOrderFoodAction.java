@@ -1,6 +1,7 @@
 package com.wireless.Actions.dishesOrder;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +32,40 @@ import com.wireless.pojo.util.DateType;
 import com.wireless.sccon.ServerConnector;
 
 public class OperateOrderFoodAction extends DispatchAction{
+	
+	/**
+	 * 账单使用优惠券
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward coupon(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String) request.getAttribute("pin");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String orderId = request.getParameter("orderId");
+		final String coupons = request.getParameter("coupons");
+		
+		JObject jobject = new JObject();
+		try{
+			Order.CouponBuilder builder = new Order.CouponBuilder(Integer.parseInt(orderId));
+			for(String couponId : coupons.split(",")){
+				builder.addCoupon(Integer.parseInt(couponId));
+			}
+			
+			OrderDao.coupon(staff, builder);
+			
+		}catch(BusinessException | SQLException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
 	/**
 	 * 转菜
 	 * @param mapping
@@ -40,9 +75,7 @@ public class OperateOrderFoodAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward transFood(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward transFood(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String orderId = request.getParameter("orderId");
 		String tableId = request.getParameter("tableId");
@@ -112,9 +145,7 @@ public class OperateOrderFoodAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward giftOrderFood(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward giftOrderFood(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String orderId = request.getParameter("orderId");
 		String giftFood = request.getParameter("giftFood");
@@ -198,9 +229,16 @@ public class OperateOrderFoodAction extends DispatchAction{
 		return null;
 	}	
 	
-	public ActionForward updateComment(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	/**
+	 * 修改备注
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward updateComment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String orderId = request.getParameter("orderId");
 		String comment = request.getParameter("comment");
 		String pin = (String) request.getAttribute("pin");
@@ -231,9 +269,7 @@ public class OperateOrderFoodAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward multiOpenTable(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward multiOpenTable(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String multiTableOrderFoodsString = request.getParameter("multiTableOrderFoods");
 		String pin = (String) request.getAttribute("pin");
 		
@@ -262,13 +298,22 @@ public class OperateOrderFoodAction extends DispatchAction{
 		return null;
 	}	
 	
+	/**
+	 * 设置服务费方案
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward service(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		
 		try{
 			
-			String pin = (String)request.getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final String pin = (String)request.getAttribute("pin");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			int servicePlanId = Integer.parseInt(request.getParameter("planId"));
 			int orderId = Integer.parseInt(request.getParameter("orderId"));

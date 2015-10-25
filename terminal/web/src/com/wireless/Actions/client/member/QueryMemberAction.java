@@ -256,7 +256,7 @@ public class QueryMemberAction extends DispatchAction {
 			
 			if(!newList.isEmpty() && forDetail != null && !forDetail.isEmpty()){
 				newList.set(0, MemberDao.getById(staff, newList.get(0).getId()));
-				final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(newList.get(0).getId()).setStatus(Coupon.Status.DRAWN), null);
+				final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(newList.get(0).getId()).setStatus(Coupon.Status.ISSUED), null);
 				if(!coupons.isEmpty()){
 					jobject.setExtra(new Jsonable(){
 						@Override
@@ -370,7 +370,7 @@ public class QueryMemberAction extends DispatchAction {
 			MemberOperation mo = MemberOperationDao.getLastConsumptionByOrder(staff, new Order(Integer.parseInt(orderId)));
 			Member m = MemberDao.getById(staff, mo.getMemberId());
 			
-			final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(m.getId()).setStatus(Coupon.Status.DRAWN), null);
+			final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(m.getId()).setStatus(Coupon.Status.ISSUED), null);
 			jobject.setRoot(m);
 			jobject.setExtra(new Jsonable(){
 
@@ -456,7 +456,7 @@ public class QueryMemberAction extends DispatchAction {
 			
 			final List<Member> members = membersByType;
 			
-			final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(members.get(0).getId()).setStatus(Coupon.Status.DRAWN), null);
+			final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(members.get(0).getId()).setStatus(Coupon.Status.ISSUED), null);
 			jobject.setExtra(new Jsonable(){
 
 				@Override

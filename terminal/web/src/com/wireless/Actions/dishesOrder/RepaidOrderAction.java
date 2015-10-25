@@ -33,7 +33,6 @@ public class RepaidOrderAction extends Action{
 		int orderId = Integer.parseInt(request.getParameter("orderId"));
 		String payType_money = request.getParameter("payType_money");
 		String sType = request.getParameter("settleType");
-		String couponId = request.getParameter("couponId");
 		String pricePlanId = request.getParameter("pricePlanId");
 		
 		try {
@@ -90,10 +89,6 @@ public class RepaidOrderAction extends Action{
 			//Set the discount.
 			String discount = request.getParameter("discountID");			
 			if(settleType == Order.SettleType.MEMBER){
-				int coupon = 0;
-				if(couponId != null && !couponId.isEmpty()){
-					coupon = Integer.parseInt(couponId);
-				}
 				int pricePlan = 0;
 				if(pricePlanId != null && !pricePlanId.isEmpty()){
 					pricePlan = Integer.parseInt(pricePlanId);
@@ -101,7 +96,7 @@ public class RepaidOrderAction extends Action{
 				
 				if(discount != null && !discount.isEmpty()){
 					repaidBuilder.setDiscountBuilder(Order.DiscountBuilder.build4Member(orderId, new Member(Integer.valueOf(request.getParameter("memberID"))), 
-																						Integer.parseInt(discount), pricePlan, coupon));
+																						Integer.parseInt(discount), pricePlan));
 				}
 			}else{
 				if(discount != null && !discount.isEmpty()){

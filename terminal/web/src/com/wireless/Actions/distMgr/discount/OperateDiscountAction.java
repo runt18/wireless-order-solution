@@ -20,18 +20,11 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateDiscountAction extends DispatchAction{
 
-	public ActionForward setDiscount(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws BusinessException, Exception{
+	public ActionForward setDiscount(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		final int orderId = Integer.parseInt(request.getParameter("orderId"));
 		final int discountId = Integer.parseInt(request.getParameter("discountId") != null?request.getParameter("discountId"):"0");
 		String pricePlanId = request.getParameter("pricePlan");
-		String coupon = request.getParameter("coupon");
-		final int memberId;
-		if(request.getParameter("memberId") != null && !request.getParameter("memberId").isEmpty()){
-			memberId = Integer.parseInt(request.getParameter("memberId"));
-		}else{
-			memberId = 0;
-		}
+		String memberId = request.getParameter("memberId");
 		String pin = (String) request.getAttribute("pin");
 		
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -39,22 +32,17 @@ public class OperateDiscountAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try {
 			final Order.DiscountBuilder builder;
-			if(memberId != 0){
+			if(memberId != null && !memberId.isEmpty()){
 				int pricePlan = 0;
 				if(pricePlanId != null && !pricePlanId.trim().isEmpty()){
 					pricePlan = Integer.parseInt(pricePlanId);
 				}
 				
-				int couponId = 0;
-				if(coupon != null && !coupon.trim().isEmpty()){
-					couponId = Integer.parseInt(coupon);
-				}		
-				
-				builder = Order.DiscountBuilder.build4Member(orderId, MemberDao.getById(staff, memberId), discountId, pricePlan, couponId);
+				builder = Order.DiscountBuilder.build4Member(orderId, MemberDao.getById(staff, Integer.parseInt(memberId)), discountId, pricePlan);
 			}else{
 				builder = Order.DiscountBuilder.build4Normal(orderId, discountId);
 			}
-			OrderDao.discount(StaffDao.verify(Integer.parseInt(pin)), builder);
+			OrderDao.discount(staff, builder);
 		}catch(BusinessException e){
 			jobject.initTip(e);
 			e.printStackTrace();
@@ -65,7 +53,6 @@ public class OperateDiscountAction extends DispatchAction{
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
-		
 		
 		return null;
 	}

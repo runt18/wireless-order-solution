@@ -11,8 +11,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.member.MemberCondDao;
-import com.wireless.db.member.MemberDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
@@ -20,7 +18,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.member.Member;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
@@ -115,10 +112,6 @@ public class OperatePromotionAction extends DispatchAction{
 		String endDate = request.getParameter("endDate");
 		String body = request.getParameter("body");
 		String entire = request.getParameter("entire");
-		//String rule = request.getParameter("pRule");
-		//String point = request.getParameter("point");
-		//String members = request.getParameter("members");
-		//String oriented = request.getParameter("oriented");
 		
 		String couponTypeId = request.getParameter("cId");
 		String couponName = request.getParameter("couponName");
@@ -127,7 +120,6 @@ public class OperatePromotionAction extends DispatchAction{
 		String image = request.getParameter("image");		
 		
 		String orientedId = request.getParameter("oriented");
-		String condId = request.getParameter("condId");
 		
 		String pin = (String) request.getAttribute("pin");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -172,18 +164,7 @@ public class OperatePromotionAction extends DispatchAction{
 			
 			//优惠活动发布对象
 			if(orientedId != null && !orientedId.isEmpty()){
-				Promotion.Oriented oriented = Promotion.Oriented.valueOf(Integer.parseInt(orientedId));
-				if(oriented == Promotion.Oriented.ALL){
-					promotionUpdateBuilder.setAllMember();
-					
-				}else if(oriented == Promotion.Oriented.EMPTY){
-					promotionUpdateBuilder.setMemberEmpty();
-					
-				}else if(oriented == Promotion.Oriented.SPECIFIC){
-					for(Member member :	MemberDao.getByCond(staff, new MemberDao.ExtraCond(MemberCondDao.getById(staff, Integer.parseInt(condId))), null)){
-						promotionUpdateBuilder.addMember(member);
-					}
-				}
+				promotionUpdateBuilder.setOriented(Promotion.Oriented.valueOf(Integer.parseInt(orientedId)));
 			}
 			
 			PromotionDao.update(staff, promotionUpdateBuilder);
