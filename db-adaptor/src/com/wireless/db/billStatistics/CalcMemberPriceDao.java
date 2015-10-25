@@ -16,6 +16,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.member.MemberPriceByEachDay;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
@@ -199,7 +200,7 @@ public class CalcMemberPriceDao {
 		sql = " SELECT " +
 			  " O.id, O.order_date, O.waiter, O.staff_id, O.pure_price, O.actual_price, O.comment, O.table_alias, O.table_name, O.table_id " +
 			  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
-		      " JOIN " + Params.dbName + "." + extraCond.dbTbl.moTbl + " MO ON O.id = MO.order_id" +
+		      " JOIN " + Params.dbName + "." + extraCond.dbTbl.moTbl + " MO ON O.id = MO.order_id AND MO.operate_type = " + MemberOperation.OperationType.CONSUME.getValue() +
 		      " WHERE 1 = 1 " +
 		      " AND O.restaurant_id = " + staff.getRestaurantId() +
 		      " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
