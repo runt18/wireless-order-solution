@@ -512,7 +512,7 @@ Ext.ux.operateTree_weixinMenu = function (node, mult){
 
 function showFloatOption(obj_b){
 	//记录节点的位置和鼠标位置
-	var nodex=0;
+	var nodex = 0;
 	var offset, liOffset;
 	//把bar加到tree上
 	$("#"+obj_b.treeId).mouseover(function(){
@@ -524,7 +524,11 @@ function showFloatOption(obj_b){
 					if(i > 0){
 						$("#div_floatBar").append('|&nbsp;');
 					}
-					$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+obj_b.option[i].fn+'>'+ obj_b.option[i].name +'</a>&nbsp;');
+					if(typeof obj_b.option[i].fn == 'string'){
+						$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+obj_b.option[i].fn+'>'+ obj_b.option[i].name +'</a>&nbsp;');
+					}else if(typeof obj_b.option[i].fn == 'function'){
+						$("#div_floatBar").append($('<a>' + obj_b.option[i].name + '</a>&nbsp').click(obj_b.option[i].fn));
+					}
 				}
 			}		
 		}
