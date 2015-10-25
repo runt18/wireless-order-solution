@@ -191,7 +191,6 @@ public class PayOrder {
 			Member member = MemberDao.getById(dbCon, staff, orderCalculated.getMemberId());
 			//Check to see whether be able to perform consumption.
 			member.checkConsume(orderCalculated.getActualPrice(), 
-								orderCalculated.getCoupon(), 
 								orderCalculated.getPaymentType());
 		}
 		
@@ -279,14 +278,12 @@ public class PayOrder {
 			//Perform the member consumption if settle by member.
 			if(orderCalculated.isSettledByMember()){
 				MemberDao.consume(dbCon, staff, orderCalculated.getMemberId(), orderCalculated.getActualPrice(), 
-								  orderCalculated.getCoupon(),
 								  orderCalculated.getPaymentType(),
 								  orderCalculated.getId());
 			}
 		}else{
 			if(orderCalculated.isSettledByMember()){
 				MemberDao.reConsume(dbCon, staff, orderCalculated.getMemberId(), orderCalculated.getActualPrice(), 
-						  			orderCalculated.getCoupon(),
 						  			orderCalculated.getPaymentType(),
 						  			orderCalculated.getId());
 			}

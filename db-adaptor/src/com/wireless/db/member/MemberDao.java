@@ -1136,10 +1136,10 @@ public class MemberDao {
 			throw new SQLException("The id of member is not generated successfully.");
 		}	
 		
-		//Create the coupon to this member if the associated published or progressed promotion is oriented all.
+		//Issue the coupon to this member if the associated published or progressed promotion is oriented all.
 		for(Promotion promotion : PromotionDao.getByCond(dbCon, staff, new PromotionDao.ExtraCond().setOriented(Promotion.Oriented.ALL))){
 			if(promotion.getRule() != Promotion.Rule.DISPLAY_ONLY){
-				CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(promotion.getCouponType().getId(), promotion.getId()).addMember(memberId));
+				CouponDao.issue(dbCon, staff, Coupon.IssueBuilder.newInstance4WxSubscribe().addPromotion(promotion).addMember(memberId));
 			}
 		}
 		
@@ -1516,8 +1516,6 @@ public class MemberDao {
 	 * 			the id to member account
 	 * @param consumePrice	
 	 * 			the price to consume
-	 * @param coupon
-	 * 			the coupon to use, null means no coupon
 	 * @param payType
 	 * 			the payment type referred to {@link Order.PayType}
 	 * @param order
@@ -1530,12 +1528,12 @@ public class MemberDao {
 	 *			1 - the consume price exceeds total balance to this member account<br>
 	 *			2 - the member account to consume is NOT found.
 	 */
-	public static MemberOperation reConsume(Staff staff, int memberId, float consumePrice, Coupon coupon, PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation reConsume(Staff staff, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = reConsume(dbCon, staff, memberId, consumePrice, coupon, payType, orderId);
+			MemberOperation mo = reConsume(dbCon, staff, memberId, consumePrice, payType, orderId);
 			dbCon.conn.commit();
 			return mo;
 		}catch(BusinessException | SQLException e){
@@ -1556,8 +1554,6 @@ public class MemberDao {
 	 * 			the id to member account
 	 * @param consumePrice	
 	 * 			the price to consume
-	 * @param coupon
-	 * 			the coupon to use, null means no coupon
 	 * @param payType
 	 * 			the payment type referred to {@link Order.PayType}
 	 * @param orderId
@@ -1570,17 +1566,12 @@ public class MemberDao {
 	 *			1 - the consume price exceeds total balance to this member account<br>
 	 *			2 - the member account to consume is NOT found.
 	 */
-	public static MemberOperation reConsume(DBCon dbCon, Staff staff, int memberId, float consumePrice, Coupon coupon, PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation reConsume(DBCon dbCon, Staff staff, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		Member member = getById(dbCon, staff, memberId);
 		
 		//Perform the consume operation and get the related member operation.
-		MemberOperation mo = member.reConsume(consumePrice, coupon, payType);
-		
-		//Perform to use coupon.
-		if(coupon != null){
-			CouponDao.use(dbCon, staff, coupon.getId(), orderId);
-		}
+		MemberOperation mo = member.reConsume(consumePrice, payType);
 		
 		//Set the associate order id
 		mo.setOrderId(orderId);
@@ -1674,17 +1665,12 @@ public class MemberDao {
 	 *			<li>the consume price exceeds total balance to this member account
 	 *			<li>the member account to consume is NOT found
 	 */
-	public static MemberOperation consume(DBCon dbCon, Staff staff, int memberId, float consumePrice, Coupon coupon, PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(DBCon dbCon, Staff staff, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		Member member = getById(dbCon, staff, memberId);
 		
 		//Perform the consume operation and get the related member operation.
-		MemberOperation mo = member.consume(consumePrice, coupon, payType);
-		
-		//Perform to use coupon.
-		if(coupon != null){
-			CouponDao.use(dbCon, staff, coupon.getId(), orderId);
-		}
+		MemberOperation mo = member.consume(consumePrice, payType);
 		
 		//Set the associate order id
 		mo.setOrderId(orderId);
@@ -1716,8 +1702,6 @@ public class MemberDao {
 	 * 			the id to member account
 	 * @param consumePrice	
 	 * 			the price to consume
-	 * @param coupon
-	 * 			the coupon to use, null means no coupon 
 	 * @param payType
 	 * 			the payment type referred to {@link PayType}
 	 * @param orderId
@@ -1730,13 +1714,13 @@ public class MemberDao {
 	 *			<li>the consume price exceeds total balance to this member account<br>
 	 *			<li>the member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(Staff staff, int memberId, float consumePrice, Coupon coupon, PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(Staff staff, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = MemberDao.consume(dbCon, staff, memberId, consumePrice, coupon, payType, orderId);
+			MemberOperation mo = MemberDao.consume(dbCon, staff, memberId, consumePrice, payType, orderId);
 			dbCon.conn.commit();
 			return mo;
 			

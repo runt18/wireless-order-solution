@@ -21,6 +21,7 @@ import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
 import com.wireless.exception.FrontBusinessError;
+import com.wireless.exception.PromotionError;
 import com.wireless.exception.StaffError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
@@ -432,7 +433,7 @@ public class OrderDao {
 		}
 		//Get the detail to coupon.
 		if(order.hasCoupon()){
-			order.setCoupon(CouponDao.getById(dbCon, staff, order.getCoupon().getId()));
+			order.setCoupons(CouponDao.getByCond(dbCon, staff, new CouponDao.ExtraCond().setUseMode(Coupon.UseMode.ORDER, order.getId()), null));
 		}
 		//Get the detail to mixed payment.
 		if(order.getPaymentType().isMixed()){
@@ -472,9 +473,9 @@ public class OrderDao {
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.settle_type, O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
 				  " O.discount_id, O.discount_staff_id, O.discount_staff, O.discount_date, " +
-				  " O.coupon_id, " +
 				  " O.price_plan_id, O.member_id, " +
-				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.coupon_price, O.pure_price, O.total_price, O.actual_price " +
+				  " IFNULL(O.coupon_price, -1) AS coupon_price, " +
+				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.pure_price, O.total_price, O.actual_price " +
 				  " FROM " + 
 				  Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 				  " LEFT JOIN " + Params.dbName + ".table T ON O.table_id = T.table_id " +
@@ -489,7 +490,7 @@ public class OrderDao {
 				  " OH.id, OH.birth_date, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
 				  " OH.waiter, OH.staff_id, OH.discount_staff_id, OH.discount_staff, OH.discount_date, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
-				  " OH.coupon_price, " +
+				  " IFNULL(OH.coupon_price, -1) AS coupon_price, " +
 				  " OH.settle_type, OH.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, OH.category, OH.status, OH.service_rate, OH.comment, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.pure_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " OH " + 
@@ -556,9 +557,6 @@ public class OrderDao {
 				}
 				if(dbCon.rs.getInt("price_plan_id") != 0){
 					order.setPricePlan(new PricePlan(dbCon.rs.getInt("price_plan_id")));
-				}
-				if(dbCon.rs.getInt("coupon_id") != 0){
-					order.setCoupon(new Coupon(dbCon.rs.getInt("coupon_id")));
 				}
 				order.setMemberId(dbCon.rs.getInt("member_id"));
 			}
@@ -1024,13 +1022,6 @@ public class OrderDao {
 			}
 		}
 		
-		//Set the coupon if exist.
-		if(builder.hasCoupon()){
-			order.setCoupon(CouponDao.getById(dbCon, staff, builder.getCouponId()));
-		}else{
-			order.setCoupon(null);
-		}
-		
 		String sql;
 		
 		//Update the order discount.
@@ -1040,8 +1031,6 @@ public class OrderDao {
   			  " ,discount_date = NOW() " +
 			  " ,discount_id = " + order.getDiscount().getId() +
 			  " ,price_plan_id = " + (builder.hasPricePlan() ? order.getPricePlan().getId() : " NULL ") +
-			  " ,coupon_id = " + (order.hasCoupon() ? order.getCoupon().getId() : " NULL ") +
-			  " ,coupon_price = " + (order.hasCoupon() ? order.getCoupon().getPrice() : "0") +
 			  " ,member_id = " + builder.getMemberId() +
 			  " WHERE id = " + order.getId();
 		dbCon.stmt.executeUpdate(sql);
@@ -1057,6 +1046,88 @@ public class OrderDao {
 				  (of.hasFoodUnit() ? " AND food_unit_id = " + of.getFoodUnit().getId() : "");
 			dbCon.stmt.executeUpdate(sql);				
 		}		
+	}
+	
+	/**
+	 * Perform the coupon action to specific builder {@link Order.CouponBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the coupon builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the order to coupon does NOT exist
+	 * 			<li>the order has NOT set member
+	 */
+	public static void coupon(Staff staff, Order.CouponBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			coupon(dbCon, staff, builder);
+			dbCon.conn.commit();
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform the coupon action to specific builder {@link Order.CouponBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the coupon builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the order to coupon does NOT exist
+	 * 			<li>the order has NOT set member
+	 */
+	public static void coupon(DBCon dbCon, Staff staff, Order.CouponBuilder builder) throws SQLException, BusinessException{
+		
+		Order order = getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
+		
+		if(!order.hasMember()){
+			throw new BusinessException("此账单无会员信息，不能使用优惠券", PromotionError.COUPON_USE_NOT_ALLOW);
+		}
+		
+		String sql;
+		//Restore the coupons used in this order before.
+		for(Coupon coupon : order.getCoupons()){
+			sql = " UPDATE " + Params.dbName + ".coupon " +
+				  " SET coupon_id = " + coupon.getId() +
+				  " ,use_mode = null " +
+				  " ,use_staff = null " +
+				  " ,use_staff_id = null " +
+				  " ,use_associate_id = null " +
+				  " ,use_comment = null " +
+				  " WHERE coupon_id = " + coupon.getId();
+			dbCon.stmt.executeUpdate(sql);
+		}
+		
+		if(builder.getCoupons().isEmpty()){
+			sql = " UPDATE " + Params.dbName + ".order SET coupon_price = null WHERE id = " + builder.getOrderId();
+			dbCon.stmt.executeUpdate(sql);
+			
+		}else{
+			//Use the coupons.
+			CouponDao.use(dbCon, staff, Coupon.UseBuilder.newInstance4Order(order.getMemberId(), builder.getOrderId()).setCoupons(builder.getCoupons()));
+			
+			//Calculate the coupon price.
+			float couponPrice = 0;
+			for(Coupon coupon : CouponDao.getByCond(dbCon, staff, new CouponDao.ExtraCond().setUseMode(Coupon.UseMode.ORDER, builder.getOrderId()), null)){
+				couponPrice += coupon.getPrice();
+			}
+			
+			sql = " UPDATE " + Params.dbName + ".order SET coupon_price = " + couponPrice + " WHERE id = " + builder.getOrderId();
+			dbCon.stmt.executeUpdate(sql);
+		}
+
 	}
 	
 	/**

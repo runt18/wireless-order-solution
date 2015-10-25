@@ -81,26 +81,21 @@ public class TestPromotionDao {
 																	  ;
 			promotionId = PromotionDao.create(mStaff, promotionCreateBuilder);
 			
-			Promotion expected = promotionCreateBuilder.build();
-			expected.setId(promotionId);
-			expected.setCouponType(typeInsertBuilder.build());
+			Promotion expectedPromotion = promotionCreateBuilder.build();
+			expectedPromotion.setId(promotionId);
+			expectedPromotion.setCouponType(typeInsertBuilder.build());
 			
-			Promotion actual = PromotionDao.getById(mStaff, promotionId);
-			couponTypeId = actual.getCouponType().getId();
+			Promotion actualPromotion = PromotionDao.getById(mStaff, promotionId);
+			couponTypeId = actualPromotion.getCouponType().getId();
 			
 			//Compare the promotion.
-			compare(expected, actual);
+			compare(expectedPromotion, actualPromotion);
 			//Compare the oss image to promotion body
 			OssImage ossPromotionImg1 = OssImageDao.getById(mStaff, promotionImg1);
 			Assert.assertEquals("type to promotion image", OssImage.Type.WX_PROMOTION, ossPromotionImg1.getType());
-			Assert.assertEquals("associated id to promotion image", actual.getId(), ossPromotionImg1.getAssociatedId());
+			Assert.assertEquals("associated id to promotion image", actualPromotion.getId(), ossPromotionImg1.getAssociatedId());
 			Assert.assertEquals("status to promotion image", OssImage.Status.MARRIED, ossPromotionImg1.getStatus());
 			Assert.assertTrue("failed to upload promotion image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), ossPromotionImg1.getObjectKey()) != null);
-			//Compare the coupon related to this promotion.
-			for(Member m : members){
-				compare(promotionId, Coupon.Status.DRAWN, couponTypeId, m, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m).setPromotion(promotionId), null).get(0));
-				//compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
-			}
 			
 			//--------Test to update a promotion-----------
 			int oriImageToCouponType = ossImageId;
@@ -117,17 +112,17 @@ public class TestPromotionDao {
 			Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(promotionId).setRange("2016-2-1", "2016-3-1")
 																									 .setTitle("修改优惠活动")
 																									 .setBody(body, "hello jingjing<br>")
-																									 .addMember(m1.getId()).addMember(m2.getId()).addMember(m3.getId())
-																									 .setCouponTypeBuilder(typeUpdateBuilder);
-			expected = promotionUpdateBuilder.build();
-			expected.setCouponType(typeUpdateBuilder.build());
-			expected.setCreateDate(actual.getCreateDate());
+																									 .setCouponTypeBuilder(typeUpdateBuilder)
+																									 .setOriented(Promotion.Oriented.ALL);
+			expectedPromotion = promotionUpdateBuilder.build();
+			expectedPromotion.setCouponType(typeUpdateBuilder.build());
+			expectedPromotion.setCreateDate(actualPromotion.getCreateDate());
 			
 			PromotionDao.update(mStaff, promotionUpdateBuilder);
-			actual = PromotionDao.getById(mStaff, promotionId);
+			actualPromotion = PromotionDao.getById(mStaff, promotionId);
 
 			//Compare the promotion.
-			compare(expected, actual);
+			compare(expectedPromotion, actualPromotion);
 			//Compare the oss image to promotion body
 			//Check to see the promotion image 1
 			ossPromotionImg1 = OssImageDao.getById(mStaff, promotionImg1);
@@ -137,13 +132,26 @@ public class TestPromotionDao {
 			//Check to see the promotion image 2
 			OssImage ossPromotionImg2 = OssImageDao.getById(mStaff, promotionImg2);
 			Assert.assertEquals("type to promotion image", OssImage.Type.WX_PROMOTION, ossPromotionImg2.getType());
-			Assert.assertEquals("associated id to promotion image", actual.getId(), ossPromotionImg2.getAssociatedId());
+			Assert.assertEquals("associated id to promotion image", actualPromotion.getId(), ossPromotionImg2.getAssociatedId());
 			Assert.assertEquals("status to promotion image", OssImage.Status.MARRIED, ossPromotionImg2.getStatus());
 			Assert.assertTrue("failed to upload promotion image 2 to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), ossPromotionImg2.getObjectKey()) != null);
+			
+			//Issue the coupon to m1, m2, m3
+			Coupon.IssueBuilder issueBuilder = Coupon.IssueBuilder.newInstance4Fast().addPromotion(actualPromotion).addMember(m1).addMember(m2).addMember(m3);
+			CouponDao.issue(mStaff, issueBuilder);
 			//Compare the coupon related to this promotion.
-			compare(promotionId, Coupon.Status.DRAWN, couponTypeId, m1, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0));
-			compare(promotionId, Coupon.Status.DRAWN, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
-			compare(promotionId, Coupon.Status.DRAWN, couponTypeId, m3, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m3).setPromotion(promotionId), null).get(0));
+			Coupon coupon1 = CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0);
+			Coupon coupon2 = CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0);
+			Coupon coupon3 = CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m3).setPromotion(promotionId), null).get(0);
+			compare(issueBuilder, actualPromotion, m1, coupon1);
+			compare(issueBuilder, actualPromotion, m2, coupon2);
+			compare(issueBuilder, actualPromotion, m3, coupon3);
+			
+			//Use the coupon to m1
+			Coupon.UseBuilder useBuilder = Coupon.UseBuilder.newInstance4Fast(m1).addCoupon(coupon1);
+			CouponDao.use(mStaff, useBuilder);
+			coupon1 = CouponDao.getById(mStaff, coupon1.getId());
+			compare(useBuilder, m1, coupon1);
 			
 			//---------- Test the original oss image after promotion update --------------
 			OssImage oriImage = OssImageDao.getById(mStaff, oriImageToCouponType);
@@ -161,36 +169,6 @@ public class TestPromotionDao {
 				Assert.assertTrue("failed to delete the original image from aliyun oss storage after update", false);
 			}catch(OSSException ignored){
 			}
-
-//			//--------Test to cancel publish a promotion whose status is NOT 'CREATE'-----------
-//			try{
-//				PromotionDao.cancelPublish(mStaff, promotionId);
-//			}catch(BusinessException e){
-//				Assert.assertEquals("failed to cancel publish the promotion", PromotionError.PROMOTION_PUBLISH_NOT_ALLOW, e.getErrCode());
-//			}
-//			
-//			//Test to draw a coupon which has NOT been published.
-//			try{
-//				Coupon coupon = CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0);
-//				CouponDao.draw(mStaff, coupon.getId());
-//			}catch(BusinessException e){			
-//				Assert.assertEquals("failed to draw coupon", PromotionError.COUPON_DRAW_NOT_ALLOW, e.getErrCode());
-//			}
-//			//--------Test to publish a promotion-----------
-//			PromotionDao.publish(mStaff, promotionId);
-//			//Compare the promotion.
-//			compare(expected, PromotionDao.getById(mStaff, promotionId));
-//			//Compare the coupon related to this promotion.
-//			compare(promotionId, Coupon.Status.PUBLISHED, couponTypeId, m1, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0));
-//			compare(promotionId, Coupon.Status.PUBLISHED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
-//
-//			//--------Test to cancel publish the promotion-----------
-//			PromotionDao.cancelPublish(mStaff, promotionId);
-//			//Compare the promotion.
-//			compare(expected, actual);
-//			//Compare the coupon related to this promotion.
-//			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m1, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0));
-//			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
 
 		}finally{
 			if(promotionId != 0){
@@ -290,14 +268,30 @@ public class TestPromotionDao {
 		Assert.assertTrue("failed to put image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getCouponType().getImage().getObjectKey()) != null);
 	}
 	
-	private void compare(int expectedPromotion, Coupon.Status expectedStatus, int expectedType, Member expectedMember, Coupon actual){
-		Assert.assertEquals("coupon promotion id", expectedPromotion, actual.getPromotion().getId());
-		Assert.assertEquals("coupon type", expectedType, actual.getCouponType().getId());
+	private void compare(Coupon.IssueBuilder issueBuilder, Promotion expectedPromotion, Member expectedMember, Coupon actual){
+		Assert.assertEquals("coupon promotion id", expectedPromotion.getId(), actual.getPromotion().getId());
 		Assert.assertEquals("coupon restaurant id", mStaff.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("coupon member id", expectedMember.getId(), actual.getMember().getId());
-		Assert.assertEquals("coupon status", expectedStatus, actual.getStatus());
+		Assert.assertEquals("coupon status", Coupon.Status.ISSUED, actual.getStatus());
 		Assert.assertTrue("coupon birth date", System.currentTimeMillis() - actual.getBirthDate() < 100000);
+		Assert.assertTrue("coupon issue date", System.currentTimeMillis() - actual.getIssueDate() < 100000);
+		Assert.assertEquals("coupon issue staff", mStaff.getName(), actual.getIssueStaff());
+		Assert.assertEquals("coupon issue mode", issueBuilder.getMode(), actual.getIssueMode());
+		Assert.assertEquals("coupon issue associate id", issueBuilder.getAssociateId(), actual.getIssueAssociateId());
+		Assert.assertEquals("coupon issue comment", issueBuilder.getComment(), actual.getIssueComment());
+
 	}
 	
+	private void compare(Coupon.UseBuilder useBuilder, Member expectedMember, Coupon actual){
+		Assert.assertEquals("coupon restaurant id", mStaff.getRestaurantId(), actual.getRestaurantId());
+		Assert.assertEquals("coupon member id", expectedMember.getId(), actual.getMember().getId());
+		Assert.assertEquals("coupon status", Coupon.Status.USED, actual.getStatus());
+		Assert.assertTrue("coupon use date", System.currentTimeMillis() - actual.getUseDate() < 100000);
+		Assert.assertEquals("coupon use staff", mStaff.getName(), actual.getUseStaff());
+		Assert.assertEquals("coupon use mode", useBuilder.getMode(), actual.getUseMode());
+		Assert.assertEquals("coupon use associate id", useBuilder.getAssociateId(), actual.getUseAssociateId());
+		Assert.assertEquals("coupon use comment", useBuilder.getComment(), actual.getUseComment());
+
+	}
 	
 }

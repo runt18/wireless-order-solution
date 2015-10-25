@@ -12,6 +12,7 @@ import com.wireless.db.member.MemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.billStatistics.DateRange;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.oss.OssImage;
@@ -35,6 +36,12 @@ public class CouponDao {
 		private int promotionId;
 		private Promotion.Type promotionType;
 		private final List<Promotion.Status> promotionStatus = new ArrayList<Promotion.Status>();
+		private Coupon.IssueMode issueMode;
+		private int issueAssociateId;
+		private DutyRange issueRange;
+		private Coupon.UseMode useMode;
+		private int useAssociateId;
+		private DutyRange useRange;
 		
 		public ExtraCond setOnlyAmount(boolean onOff){
 			this.isOnlyAmount = onOff;
@@ -86,6 +93,28 @@ public class CouponDao {
 			return this;
 		}
 		
+		public ExtraCond setIssueMode(Coupon.IssueMode mode, int associateId){
+			this.issueMode = mode;
+			this.issueAssociateId = associateId;
+			return this;
+		}
+		
+		public ExtraCond setIssueRange(String begin, String end){
+			this.issueRange = new DutyRange(begin, end);
+			return this;
+		}
+		
+		public ExtraCond setUseMode(Coupon.UseMode mode, int associateId){
+			this.useMode = mode;
+			this.issueAssociateId = associateId;
+			return this;
+		}
+		
+		public ExtraCond setUseRange(String begin, String end){
+			this.useRange = new DutyRange(begin, end);
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -129,6 +158,24 @@ public class CouponDao {
 			if(promotionType != null){
 				extraCond.append(" AND P.type = " + promotionType.getVal());
 			}
+			if(this.issueMode != null){
+				extraCond.append(" AND C.issue_mode = " + issueMode.getVal());
+			}
+			if(this.issueAssociateId != 0){
+				extraCond.append(" AND C.issue_associate_id = " + issueAssociateId);
+			}
+			if(this.issueRange != null){
+				extraCond.append(" AND C.issue_date BETWEEN '" + issueRange.getOnDutyFormat() + "' AND '" + issueRange.getOffDutyFormat() + "'");
+			}
+			if(this.useMode != null){
+				extraCond.append(" AND C.use_mode = " + useMode.getVal());
+			}
+			if(this.useAssociateId != 0){
+				extraCond.append(" AND C.use_associate_id = " + useAssociateId);
+			}
+			if(this.useRange != null){
+				extraCond.append(" AND C.use_date BETWEEN '" + useRange.getOnDutyFormat() + "' AND '" + useRange.getOffDutyFormat() + "'");
+			}
 			return extraCond.toString();
 		}
 	}
@@ -149,53 +196,189 @@ public class CouponDao {
 	 * 			<li>the coupon type has expired
 	 * 			<li>the member does NOT exist
 	 */
-	private static int insert(DBCon dbCon, Staff staff, Coupon.InsertBuilder builder) throws SQLException, BusinessException{
-		String sql;
-
-		Coupon coupon = builder.build();
-
-		//Insert a new coupon.
-		sql = " INSERT INTO " + Params.dbName + ".coupon " +
-			  "(`restaurant_id`, `coupon_type_id`, `promotion_id`, `birth_date`, `member_id`) VALUES(" +
-			  staff.getRestaurantId() + "," +
-			  coupon.getCouponType().getId() + "," +
-			  coupon.getPromotion().getId() + "," +
-			  " NOW(), " +
-			  coupon.getMember().getId() + 
-			  ")";
-		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-		dbCon.rs = dbCon.stmt.getGeneratedKeys();
-		if(dbCon.rs.next()){
-			return dbCon.rs.getInt(1);
-		}else{
-			throw new SQLException("The id of coupon is not generated successfully.");
+//	private static int insert(DBCon dbCon, Staff staff, Coupon.InsertBuilder builder) throws SQLException, BusinessException{
+//		String sql;
+//
+//		Coupon coupon = builder.build();
+//
+//		//Insert a new coupon.
+//		sql = " INSERT INTO " + Params.dbName + ".coupon " +
+//			  "(`restaurant_id`, `coupon_type_id`, `promotion_id`, `birth_date`, `member_id`) VALUES(" +
+//			  staff.getRestaurantId() + "," +
+//			  coupon.getCouponType().getId() + "," +
+//			  coupon.getPromotion().getId() + "," +
+//			  " NOW(), " +
+//			  coupon.getMember().getId() + 
+//			  ")";
+//		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+//		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+//		if(dbCon.rs.next()){
+//			return dbCon.rs.getInt(1);
+//		}else{
+//			throw new SQLException("The id of coupon is not generated successfully.");
+//		}
+//	}
+	
+	/**
+	 * Issue the coupon according to specific builder {@link Coupon.IssueBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to issue coupons
+	 * @return the array containing the id to coupon just issued
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the promotion does NOT exist
+	 */
+	public static int[] issue(Staff staff, Coupon.IssueBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return issue(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * create a new coupon and assign to specific members.
+	 * Issue the coupon according to specific builder {@link Coupon.IssueBuilder}.
+	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the insert all builder
-	 * @return the array containing the id to coupon just inserted
-	 * @throws SQLException 
-	 * 			throws if database can NOT be connected
+	 * 			the builder to issue coupons
+	 * @return the array containing the id to coupon just issued
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException 
+	 * @throws BusinessException
 	 * 			throws if any cases below
-	 * 			<li>the coupon type does NOT exist or has been expired
-	 * 			<li>the coupon type has expired
-	 * 			<li>the member does NOT exist 
+	 * 			<li>the promotion does NOT exist
 	 */
-	public static int[] create(Staff staff, Coupon.CreateBuilder builder) throws SQLException, BusinessException{
+	public static int[] issue(DBCon dbCon, Staff staff, Coupon.IssueBuilder builder) throws SQLException, BusinessException{
+		
+		final List<Integer> issueCoupons = new ArrayList<Integer>();
+		for(int promotionId : builder.getPromotions()){
+			final Promotion promotion = PromotionDao.getById(dbCon, staff, promotionId);
+			
+			for(int memberId : builder.getMembers()){
+				try{
+					//Check to see whether the member exist.
+					if(MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setId(memberId), null).isEmpty()){
+						continue;
+					}
+					String sql;
+					//Issue a new coupon.
+					sql = " INSERT INTO " + Params.dbName + ".coupon " +
+						  "(`restaurant_id`, `coupon_type_id`, `promotion_id`, `birth_date`, `member_id`, " +
+						    "`issue_date`, `issue_staff_id`, `issue_staff`, `issue_mode`, `issue_associate_id`, `issue_comment`, `status`) VALUES (" +
+						  staff.getRestaurantId() + "," +
+						  promotion.getCouponType().getId() + "," +
+						  promotion.getId() + "," +
+						  " NOW(), " +
+						  memberId + "," +
+						  " NOW(), " +
+						  staff.getId() + "," +
+						  "'" + staff.getName() + "'," +
+						  builder.getMode().getVal() + "," +
+						  builder.getAssociateId() + "," +
+						  "'" + builder.getComment() + "'," +
+						  Coupon.Status.ISSUED.getVal() + 
+						  ")";
+					dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+					dbCon.rs = dbCon.stmt.getGeneratedKeys();
+					if(dbCon.rs.next()){
+						issueCoupons.add(dbCon.rs.getInt(1));
+					}else{
+						throw new SQLException("The id of coupon is not generated successfully.");
+					}
+				}catch(BusinessException | SQLException e){
+					e.printStackTrace();
+				}
+			}
+		}
+
+
+		int[] result = new int[issueCoupons.size()];
+		for(int i = 0; i < result.length; i++){
+			result[i] = issueCoupons.get(i).intValue();
+		}
+		
+		return result;
+	}
+
+	/**
+	 * Use the coupon to specific builder {@link Coupon.UseBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the coupon use builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>any coupon to use does NOT exist
+	 * 			<li>any coupon to use has been expired
+	 * 			<li>the coupons to use does NOT belongs to the same member
+	 */
+	public static void use(Staff staff, Coupon.UseBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return create(dbCon, staff, builder);
+			dbCon.conn.setAutoCommit(false);
+			use(dbCon, staff, builder);
+			dbCon.conn.commit();
 		}finally{
 			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Use the coupon to specific builder {@link Coupon.UseBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the coupon use builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>any coupon to use does NOT exist
+	 * 			<li>any coupon to use has been expired
+	 * 			<li>the coupons to use does NOT belongs to the same member
+	 */
+	public static void use(DBCon dbCon, Staff staff, Coupon.UseBuilder builder) throws SQLException, BusinessException{
+		for(int couponId : builder.getCoupons()){
+			
+			Coupon coupon = getById(dbCon, staff, couponId);
+			
+			if(coupon.getMember().getId() != builder.getMemberId()){
+				throw new BusinessException("使用的优惠券不属于此会员", PromotionError.COUPON_USE_NOT_ALLOW);
+			}
+			
+			if(coupon.isExpired()){
+				throw new BusinessException("【已过期】的优惠券不可使用", PromotionError.COUPON_USE_NOT_ALLOW);
+			}
+			
+			String sql;
+			sql = " UPDATE " + Params.dbName + ".coupon " +
+				  " SET coupon_id = " + couponId +
+				  " ,status = " + Coupon.Status.USED.getVal() +
+				  " ,use_date = NOW() " +
+				  " ,use_staff_id = " + staff.getId() +
+				  " ,use_staff = '" + staff.getName() + "'" +
+				  " ,use_mode = " + builder.getMode().getVal() +
+				  " ,use_associate_id = " + builder.getAssociateId() +
+				  " ,use_comment = '" + builder.getComment() + "'" +
+				  " WHERE coupon_id = " + couponId;
+			
+			if(dbCon.stmt.executeUpdate(sql) == 0){
+				throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
+			}
 		}
 	}
 	
@@ -215,50 +398,50 @@ public class CouponDao {
 	 * 			<li>the associated promotion does NOT exist
 	 * 			<li>the associated coupon does NOT exist
 	 */
-	public static int[] create(DBCon dbCon, Staff staff, Coupon.CreateBuilder builder) throws SQLException, BusinessException{
-		final Promotion promotion = PromotionDao.getById(dbCon, staff, builder.getPromotionId());
-//		if(promotion.getStatus() == Promotion.Status.FINISH){
-//			throw new BusinessException("【" + promotion.getTitle() + "】已经结束, 不能创建优惠券", PromotionError.COUPON_CREATE_NOT_ALLOW);
+//	private static int[] create(DBCon dbCon, Staff staff, Coupon.CreateBuilder builder) throws SQLException, BusinessException{
+//		final Promotion promotion = PromotionDao.getById(dbCon, staff, builder.getPromotionId());
+////		if(promotion.getStatus() == Promotion.Status.FINISH){
+////			throw new BusinessException("【" + promotion.getTitle() + "】已经结束, 不能创建优惠券", PromotionError.COUPON_CREATE_NOT_ALLOW);
+////		}
+//		
+//		//Check to see whether the coupon type is expired.
+//		final CouponType couponType = CouponTypeDao.getById(dbCon, staff, builder.getCouponTypeId());
+////		if(couponType.isExpired()){
+////			throw new BusinessException(PromotionError.COUPON_EXPIRED);
+////		}
+//		final List<Integer> coupons = new ArrayList<Integer>();
+//		for(Member member : builder.getMembers()){
+//			try{
+//				//Check to see whether the member exist.
+//				if(MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setId(member.getId()), null).isEmpty()){
+//					continue;
+//				}
+//				//Insert the coupon.
+//				int couponId = insert(dbCon, staff, new Coupon.InsertBuilder(couponType, member, promotion));
+//				//Draw the coupon if draw type belongs to auto.
+//				if(builder.getDrawType() == DrawType.AUTO){
+//					String sql;
+//					sql = " UPDATE " + Params.dbName + ".coupon SET " +
+//						  " status = " + Coupon.Status.DRAWN.getVal() +
+//						  " ,draw_date = NOW() " +
+//						  " WHERE coupon_id = " + couponId;
+//					if(dbCon.stmt.executeUpdate(sql) == 0){
+//						throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
+//					}
+//					//draw(dbCon, staff, couponId, DrawType.AUTO);
+//				}
+//				coupons.add(couponId);
+//			}catch(BusinessException | SQLException e){
+//				e.printStackTrace();
+//			}
 //		}
-		
-		//Check to see whether the coupon type is expired.
-		final CouponType couponType = CouponTypeDao.getById(dbCon, staff, builder.getCouponTypeId());
-//		if(couponType.isExpired()){
-//			throw new BusinessException(PromotionError.COUPON_EXPIRED);
+//
+//		int[] result = new int[coupons.size()];
+//		for(int i = 0; i < result.length; i++){
+//			result[i] = coupons.get(i).intValue();
 //		}
-		final List<Integer> coupons = new ArrayList<Integer>();
-		for(Member member : builder.getMembers()){
-			try{
-				//Check to see whether the member exist.
-				if(MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setId(member.getId()), null).isEmpty()){
-					continue;
-				}
-				//Insert the coupon.
-				int couponId = insert(dbCon, staff, new Coupon.InsertBuilder(couponType, member, promotion));
-				//Draw the coupon if draw type belongs to auto.
-				if(builder.getDrawType() == DrawType.AUTO){
-					String sql;
-					sql = " UPDATE " + Params.dbName + ".coupon SET " +
-						  " status = " + Coupon.Status.DRAWN.getVal() +
-						  " ,draw_date = NOW() " +
-						  " WHERE coupon_id = " + couponId;
-					if(dbCon.stmt.executeUpdate(sql) == 0){
-						throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
-					}
-					//draw(dbCon, staff, couponId, DrawType.AUTO);
-				}
-				coupons.add(couponId);
-			}catch(BusinessException | SQLException e){
-				e.printStackTrace();
-			}
-		}
-
-		int[] result = new int[coupons.size()];
-		for(int i = 0; i < result.length; i++){
-			result[i] = coupons.get(i).intValue();
-		}
-		return result;
-	}
+//		return result;
+//	}
 	
 	/**
 	 * Draw a coupon to specific id.
@@ -328,7 +511,7 @@ public class CouponDao {
 		if(coupon.getDrawProgress().isOk()){
 			String sql;
 			sql = " UPDATE " + Params.dbName + ".coupon SET " +
-				  " status = " + Coupon.Status.DRAWN.getVal() +
+				  " status = " + Coupon.Status.ISSUED.getVal() +
 				  " ,draw_date = NOW() " +
 				  " WHERE coupon_id = " + couponId;
 			if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -361,30 +544,30 @@ public class CouponDao {
 	 * 			<li>throws if the coupon has been expired
 	 * 			<li>throws if the coupon has NOT been drawn before
 	 */
-	public static void use(DBCon dbCon, Staff staff, int couponId, int orderId) throws SQLException, BusinessException{
-		
-		Coupon coupon = getById(dbCon, staff, couponId);
-		
-		if(coupon.isExpired()){
-			throw new BusinessException("【已过期】的优惠券不可使用", PromotionError.COUPON_DRAW_NOT_ALLOW);
-		}
-		
-		if(!coupon.isDrawn()){
-			throw new BusinessException("只有【已领取】的优惠券才可使用", PromotionError.COUPON_DRAW_NOT_ALLOW);
-		}
-		
-		String sql;
-		sql = " UPDATE " + Params.dbName + ".coupon SET " +
-			  " coupon_id = " + couponId +
-			  " ,order_id = " + orderId +
-			  " ,order_date = NOW() " +
-			  " ,status = " + Coupon.Status.USED.getVal() +
-			  " WHERE coupon_id = " + couponId +
-			  " AND restaurant_id = " + staff.getRestaurantId();
-		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
-		}
-	}
+//	private static void use(DBCon dbCon, Staff staff, int couponId, int orderId) throws SQLException, BusinessException{
+//		
+//		Coupon coupon = getById(dbCon, staff, couponId);
+//		
+//		if(coupon.isExpired()){
+//			throw new BusinessException("【已过期】的优惠券不可使用", PromotionError.COUPON_DRAW_NOT_ALLOW);
+//		}
+//		
+//		if(!coupon.isDrawn()){
+//			throw new BusinessException("只有【已领取】的优惠券才可使用", PromotionError.COUPON_DRAW_NOT_ALLOW);
+//		}
+//		
+//		String sql;
+//		sql = " UPDATE " + Params.dbName + ".coupon SET " +
+//			  " coupon_id = " + couponId +
+//			  " ,order_id = " + orderId +
+//			  " ,order_date = NOW() " +
+//			  " ,status = " + Coupon.Status.USED.getVal() +
+//			  " WHERE coupon_id = " + couponId +
+//			  " AND restaurant_id = " + staff.getRestaurantId();
+//		if(dbCon.stmt.executeUpdate(sql) == 0){
+//			throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
+//		}
+//	}
 	
 	/**
 	 * Get the coupons to specific restaurant associated with the staff
@@ -553,7 +736,9 @@ public class CouponDao {
 		sql = " SELECT " +
 			  (extraCond.isOnlyAmount ? 
 			  " COUNT(*) " : 
-			  " C.coupon_id, P.entire, C.restaurant_id, C.birth_date, C.draw_date, C.order_id, C.order_date, C.status, " +
+			  " C.coupon_id, P.entire, C.restaurant_id, C.birth_date, C.status, " +
+			  " C.issue_date, C.issue_staff, C.issue_mode, C.issue_associate_id, C.issue_comment, " +
+			  " C.use_date, C.use_staff, C.use_mode, C.use_associate_id, " +
 			  " C.coupon_type_id, CT.name, CT.price, CT.expired, CT.oss_image_id, " +
 			  " C.member_id, M.name AS member_name, M.mobile, M.member_card, M.`consumption_amount`, M.point, M.`base_balance`, M.`extra_balance`, MT.name AS memberTypeName, " +
 			  " C.promotion_id, P.title, P.oriented, P.rule, P.start_date, P.finish_date ") +
@@ -581,14 +766,22 @@ public class CouponDao {
 				Coupon coupon = new Coupon(dbCon.rs.getInt("coupon_id"));
 				coupon.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				coupon.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
-				if(dbCon.rs.getTimestamp("draw_date") != null){
-					coupon.setDrawDate(dbCon.rs.getTimestamp("draw_date").getTime());
-				}
-				coupon.setOrderId(dbCon.rs.getInt("order_id"));
-				if(dbCon.rs.getTimestamp("order_date") != null){
-					coupon.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
-				}
 				coupon.setStatus(Coupon.Status.valueOf(dbCon.rs.getInt("status")));
+				
+				if(dbCon.rs.getTimestamp("issue_date") != null){
+					coupon.setIssueDate(dbCon.rs.getTimestamp("issue_date").getTime());
+					coupon.setIssueStaff(dbCon.rs.getString("issue_staff"));
+					coupon.setIssueMode(Coupon.IssueMode.valueOf(dbCon.rs.getInt("issue_mode")));
+					coupon.setIssueAssociateId(dbCon.rs.getInt("issue_associate_id"));
+					coupon.setIssueComment(dbCon.rs.getString("issue_comment"));
+				}
+				
+				if(dbCon.rs.getTimestamp("use_date") != null){
+					coupon.setUseDate(dbCon.rs.getTimestamp("use_date").getTime());
+					coupon.setUseStaff(dbCon.rs.getString("use_staff"));
+					coupon.setUseMode(Coupon.UseMode.valueOf(dbCon.rs.getInt("use_mode")));
+					coupon.setUseAssociateId(dbCon.rs.getInt("use_associate_id"));
+				}
 				
 				CouponType ct = new CouponType(dbCon.rs.getInt("coupon_type_id")); 
 				ct.setRestaurantId(dbCon.rs.getInt("restaurant_id"));

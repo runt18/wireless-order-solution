@@ -371,7 +371,7 @@ public class FoodDao {
 				}
 			}
 			if(statusCond.length() != 0){
-				extraCond.append(" AND " + statusCond.toString());
+				extraCond.append(" AND (" + statusCond.toString() + ")");
 			}
 			if(extra != null){
 				extraCond.append(" AND " + extra);

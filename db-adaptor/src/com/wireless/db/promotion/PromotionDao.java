@@ -1,7 +1,5 @@
 package com.wireless.db.promotion;
 
-import gui.ava.html.image.generator.HtmlImageGenerator;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,22 +12,20 @@ import javax.imageio.ImageIO;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.member.MemberCondDao;
-import com.wireless.db.member.MemberDao;
 import com.wireless.db.oss.CompressImage;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.billStatistics.DateRange;
-import com.wireless.pojo.member.Member;
 import com.wireless.pojo.oss.OssImage;
-import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.Promotion.Status;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.StringHtml;
+
+import gui.ava.html.image.generator.HtmlImageGenerator;
 
 public class PromotionDao {
 
@@ -164,20 +160,6 @@ public class PromotionDao {
 		
 		Promotion promotion = builder.build();
 		
-		//Assure the duplication welcome promotion.
-//		if(promotion.getType() == Promotion.Type.WELCOME){
-//			if(!getByCond(dbCon, staff, new ExtraCond().setType(Promotion.Type.WELCOME).addStatus(Promotion.Status.CREATED).addStatus(Promotion.Status.PROGRESS)).isEmpty()){
-//				throw new BusinessException("【" + Promotion.Type.WELCOME.toString() + "】属性的活动只能创建一个", PromotionError.PROMOTION_CREATE_NOT_ALLOW);
-//			}
-//		}
-		
-		//Check to see whether the start date exceed now.
-//		Calendar c = Calendar.getInstance();
-//		c.add(Calendar.DAY_OF_YEAR, -1);
-//		if(promotion.getDateRange().getOpeningTime() < c.getTimeInMillis()){
-//			throw new BusinessException(PromotionError.PROMOTION_START_DATE_EXCEED_NOW);
-//		}
-		
 		//Insert the associated coupon type.
 		int couponTypeId = CouponTypeDao.insert(dbCon, staff, builder.getTypeBuilder());
 		
@@ -188,8 +170,6 @@ public class PromotionDao {
 			  " VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + DateUtil.format(promotion.getCreateDate(), DateUtil.Pattern.DATE) + "'," +
-//			  (promotion.hasDateRange() ? "'" + promotion.getDateRange().getOpeningFormat() + "'," : " NULL ") +
-//			  (promotion.hasDateRange() ? "'" + promotion.getDateRange().getEndingFormat() + "'," : " NULL " ) +
 			  " NULL, " +
 			  " NULL, " +
 			  "'" + promotion.getTitle() + "'," +
@@ -236,13 +216,6 @@ public class PromotionDao {
 			}
 		}
 		
-		if(promotion.getOriented() == Promotion.Oriented.ALL){
-			//Create the coupon to all members.
-			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(MemberDao.getByCond(dbCon, staff, null, null)));
-		}else if(promotion.getOriented() == Promotion.Oriented.SPECIFIC){
-			//Create the coupon to specific members.
-			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(builder.getMembers()));
-		}
 		return promotionId;
 	}
 	
@@ -292,19 +265,6 @@ public class PromotionDao {
 		Promotion promotion = builder.build();
 		
 		Promotion original = getById(dbCon, staff, promotion.getId());
-//		if(original.getStatus() != Promotion.Status.CREATED){
-//			throw new BusinessException("只有【已创建】状态的活动才能修改", PromotionError.PROMOTION_UPDATE_NOT_ALLOW);
-//		}
-
-		//Update the date range to promotion.
-//		if(builder.isRangeChanged()){
-//			//Check to see whether the start date exceed now.
-//			Calendar c = Calendar.getInstance();
-//			c.add(Calendar.DAY_OF_YEAR, -1);
-//			if(promotion.getDateRange().getOpeningTime() < c.getTimeInMillis()){
-//				throw new BusinessException(PromotionError.PROMOTION_START_DATE_EXCEED_NOW);
-//			}
-//		}
 		
 		//Update the coupon type.
 		if(builder.isCouponTypeChanged()){
@@ -355,89 +315,7 @@ public class PromotionDao {
 			}
 		}
 		
-		//Create the associated coupons if the member changed.
-		if(builder.isMemberChanged()){
-//			if(original.getType() == Promotion.Type.WELCOME && promotion.getOriented() != Promotion.Oriented.ALL){
-//				throw new BusinessException("【" + Promotion.Type.WELCOME.toString() + "】属性的优惠活动只能面向所有会员", PromotionError.PROMOTION_UPDATE_NOT_ALLOW);
-//			}
-			CouponDao.deleteByCond(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion.getId()));
-			if(promotion.getOriented() == Promotion.Oriented.ALL){
-				//Create the coupon to all members.
-				CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(MemberDao.getByCond(dbCon, staff, null, null)));
-			}else if(promotion.getOriented() == Promotion.Oriented.SPECIFIC){
-				//Create the coupon to specific members.
-				CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
-			}
-		}
-		
 	} 
-	
-	/**
-	 * Publish the promotion according to publish builder {@link Promotion#PublishBuilder}.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param promotionId
-	 * 			the id of promotion to publish
-	 * @return the amount of associated coupon to publish
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			throws if the promotion to publish does NOT exist
-	 */
-	public static void publish(Staff staff, Promotion.PublishBuilder builder) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			publish(dbCon, staff, builder);
-			dbCon.conn.commit();
-		}catch(BusinessException | SQLException e){
-			dbCon.conn.rollback();
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Publish the promotion according to publish builder {@link Promotion#PublishBuilder}.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param promotionId
-	 * 			the id of promotion to publish
-	 * @return the amount of associated coupon to publish
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			throws if the promotion to publish does NOT exist
-	 */
-	public static void publish(DBCon dbCon, Staff staff, Promotion.PublishBuilder builder) throws SQLException, BusinessException{
-		
-		Promotion promotion = getById(dbCon, staff, builder.build().getId());
-		
-		Promotion.UpdateBuilder updateBuilder = new Promotion.UpdateBuilder(promotion.getId());
-		
-		updateBuilder.setRange(promotion.getDateRange());
-		
-		if(builder.isOrientedChanged()){
-			if(promotion.getOriented() == Promotion.Oriented.EMPTY){
-				updateBuilder.setMemberEmpty();
-				
-			}else if(promotion.getOriented() == Promotion.Oriented.ALL){
-				updateBuilder.setAllMember();
-				
-			}else if(promotion.getOriented() == Promotion.Oriented.SPECIFIC){
-				for(Member member : MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond(MemberCondDao.getById(dbCon, staff, builder.getCondId())), null)){
-					updateBuilder.addMember(member);
-				}
-			}
-		}		
-		
-	}
 	
 	/**
 	 * Get the promotion to specific id

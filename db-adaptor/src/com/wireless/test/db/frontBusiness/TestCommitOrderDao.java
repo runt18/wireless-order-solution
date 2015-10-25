@@ -344,7 +344,7 @@ public class TestCommitOrderDao {
 			expectedOrder.setSettleType(Order.SettleType.MEMBER);
 			compare4RePayment(payBuilder, expectedOrder, actualOrder);
 			
-			MemberOperation expectedMo = expectedMember.consume(actualOrder.getActualPrice(), null, PayType.MEMBER);
+			MemberOperation expectedMo = expectedMember.consume(actualOrder.getActualPrice(), PayType.MEMBER);
 			compare4RePayment(expectedMember, actualMember);
 			compare4RePayment(expectedMo, MemberOperationDao.getLastConsumptionByOrder(mStaff, actualOrder));
 			
@@ -356,7 +356,7 @@ public class TestCommitOrderDao {
 			payBuilder = PayBuilder.build4Member(orderId, PayType.MEMBER, false);
 			
 			expectedMember.restore(MemberOperationDao.getLastConsumptionByOrder(mStaff, actualOrder));
-			expectedMo = expectedMember.reConsume(actualOrder.getActualPrice(), null, PayType.MEMBER);
+			expectedMo = expectedMember.reConsume(actualOrder.getActualPrice(), PayType.MEMBER);
 			
 			OrderDao.repaid(mStaff, new Order.RepaidBuilder(updateBuilder, payBuilder).setDiscountBuilder(discountBuilder));
 			
@@ -385,7 +385,7 @@ public class TestCommitOrderDao {
 			
 			actualOrder = OrderDao.getById(mStaff, orderId, DateType.TODAY);
 			
-			MemberOperation expectedNewMo = expectedNewMember.reConsume(actualOrder.getActualPrice(), null, PayType.MEMBER);
+			MemberOperation expectedNewMo = expectedNewMember.reConsume(actualOrder.getActualPrice(), PayType.MEMBER);
 			
 			Member actualNewMember = MemberDao.getById(mStaff, expectedNewMember.getId());
 			Member actualOriMember = MemberDao.getById(mStaff, expectedOriMember.getId());
