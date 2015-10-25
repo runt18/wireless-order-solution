@@ -270,7 +270,8 @@ public class ReceiptContent extends ConcreteContent {
 			if(line3.length() > 0){
 				line3.append("  ");
 			}
-			line3.append(mOrder.getCoupon().getName() + "£º" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getCouponPrice()));
+			//TODO list the coupons
+			//line3.append(mOrder.getCoupon().getName() + "£º" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getCouponPrice()));
 		}
 		
 		StringBuilder line4 = new StringBuilder();
