@@ -13,7 +13,6 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
@@ -186,33 +185,32 @@ public class OperatePromotionAction extends DispatchAction{
 		return null;
 	}	
 	
-	public ActionForward getPromotion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
-		String pin = (String) request.getAttribute("pin");
-		String openId = request.getParameter("fid");
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		int rid = 0;
-		Staff staff;
-		if(pin != null){
-			staff = StaffDao.verify(Integer.parseInt(pin));
-		}else{
-			rid = WxRestaurantDao.getRestaurantIdByWeixin(openId);
-			staff = StaffDao.getAdminByRestaurant(rid);
-		}
+		String pin = (String) request.getAttribute("pin");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
 		String promotionId = request.getParameter("promotionId");
+		String status = request.getParameter("status");
+		
+		PromotionDao.ExtraCond extraCond = new PromotionDao.ExtraCond();
+		
+		if(promotionId != null && !promotionId.isEmpty()){
+			extraCond.setPromotionId(Integer.parseInt(promotionId));
+		}
+		
+		if(status != null && !status.isEmpty()){
+			if(status.equalsIgnoreCase("progress")){
+				extraCond.setStatus(Promotion.Status.PROGRESS);
+			}
+		}
 		
 		JObject jobject = new JObject();
 		try{
-			Promotion promo = PromotionDao.getById(staff, Integer.parseInt(promotionId));
-			jobject.setRoot(promo);
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
+			jobject.setRoot(PromotionDao.getByCond(staff, extraCond));
 		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
-		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
