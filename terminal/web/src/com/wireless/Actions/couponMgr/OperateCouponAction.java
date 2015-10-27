@@ -31,6 +31,7 @@ public class OperateCouponAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		response.setContentType("text/json; charset=utf-8");
 		final String pin = (String) request.getAttribute("pin");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		final String issueMode = request.getParameter("issueMode");
