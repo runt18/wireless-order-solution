@@ -90,6 +90,9 @@ public class QueryOrderStatisticsAction extends Action {
 				}else if(comboVal == 7){
 					//是否有转菜
 					extraCond.isTransfer(true);
+				}else if(comboVal == 8){
+					//是否有会员价
+					extraCond.isMemberPrice(true);
 				}
 			}
 			
