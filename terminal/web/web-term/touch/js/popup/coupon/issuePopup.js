@@ -72,6 +72,8 @@ function IssueCouponPopup(param){
 					Util.msg.tip('没有优惠券可以发放!'); 
 				}
 				
+			}else{
+				Util.msg.tip(response.msg); 
 			}
 		});
 		
@@ -84,5 +86,5 @@ function IssueCouponPopup(param){
 
 IssueCouponPopup.IssueMode = {
 	FAST : { mode : 1, desc : '快速' },
-	ORDER : { mode : 2, desc : '账单' },
+	ORDER : { mode : 2, desc : '账单' }
 };

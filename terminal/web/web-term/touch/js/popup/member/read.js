@@ -3,11 +3,12 @@
 function MemberReadPopup(param){
 	
 	param = param || {
-		confirm : function(member){}	//会员读取后的确定事件
+		confirm : function(member, discount, pricePlan){}	//会员读取后的确定事件
 	};
 	
 	var _self = this;
 	var _member = null;
+	var _selectedDiscount = null;
 	
 	var _popupInstance = null;
 	_popupInstance = new JqmPopup({
@@ -16,8 +17,8 @@ function MemberReadPopup(param){
 			//设置button样式
 			self.find('[id=read_a_memberRead]').attr("data-theme", "b");
 			self.find('[id=read_a_memberRead]').buttonMarkup("refresh");
-			$('#link_payment_popupDiscountCmp4Member').attr("data-theme", "e");
-			$('#link_payment_popupDiscountCmp4Member').buttonMarkup("refresh");
+			$('#selectDiscount_a_memberRead').attr("data-theme", "e");
+			$('#selectDiscount_a_memberRead').buttonMarkup("refresh");
 			$('#link_payment_popupPricePlanCmp4Member').attr("data-theme", "e");
 			$('#link_payment_popupPricePlanCmp4Member').buttonMarkup("refresh");
 			$('#link_payment_popupCouponCmp4Member').attr("data-theme", "e");
@@ -31,7 +32,7 @@ function MemberReadPopup(param){
 			//确定按钮
 			self.find('[id=confirm_a_memberRead]').click(function(){
 				if(param.confirm && typeof param.confirm == 'function'){
-					param.confirm(_member);
+					param.confirm(_member, _selectedDiscount);
 				}
 			});
 			
@@ -96,7 +97,7 @@ function MemberReadPopup(param){
 				if(jr.success){
 					if(jr.root.length == 1){
 						Util.msg.alert({msg : '会员信息读取成功.', topTip : true});
-						loadMemberInfo(jr.root[0]);
+						loadMemberInfo(jr.root[0], self);
 						
 					}else if(jr.root.length > 1){
 						//FIXME
@@ -123,48 +124,55 @@ function MemberReadPopup(param){
 		}); 	
 	}
 	
-	function loadMemberInfo(member){
-		$('#name_lable_memberRead').text(member.name);
-		$('#memberType_label_memberRead').text(member.memberType.name);
-		$('#balance_label_memberRead').text(member.totalBalance);
-		$('#point_label_memberRead').text(member.point);
-		$('#phone_label_memberRead').text(member.mobile?member.mobile:'----');
-		$('#payment4MemberCard').text(member.memberCard?member.memberCard:'----');	
+	function loadMemberInfo(member, self){
+		self.find('[id=name_lable_memberRead]').text(member.name);
+		self.find('[id=memberType_label_memberRead]').text(member.memberType.name);
+		self.find('[id=balance_label_memberRead]').text(member.totalBalance);
+		self.find('[id=point_label_memberRead]').text(member.point);
+		self.find('[id=phone_label_memberRead]').text(member.mobile ? member.mobile : '----');
+		self.find('[id=payment4MemberCard]').text(member.memberCard ? member.memberCard : '----');	
 		
-		$('#defaultDiscount_label_memberRead').text(member.memberType.discount.name);
-		$('#defaultDiscount_label_memberRead').attr('data-value', member.memberType.discount.id);
+		self.find('[id=defaultDiscount_label_memberRead]').text(member.memberType.discount.name);
+		self.find('[id=defaultDiscount_label_memberRead]').attr('data-value', member.memberType.discount.id);
+		_selectedDiscount = member.memberType.discount;
 		
 		var discounts = member.memberType.discounts;
 		
 		var discountHtml = '', pricePlanHtml = '';
 		for (var i = 0; i < discounts.length; i++) {
-			discountHtml += '<li data-icon="false" class="popupButtonList" onclick="chooseMemberDiscount({id:'+ discounts[i].id +',name:\''+ discounts[i].name +'\'})"><a >'+ discounts[i].name +'</a></li>';
+			discountHtml += '<li data-icon="false" class="popupButtonList" data-index="' + i + '"><a>' + discounts[i].name +'</a></li>';
 		}
-		$('#payment_discountList4Member').html(discountHtml).trigger('create');
+		self.find('[id=eachDiscount_ul_memberRead]').html(discountHtml).trigger('create');
+		self.find('[id=eachDiscount_ul_memberRead] .popupButtonList').each(function(index, element){
+			element.onclick = function(){
+				_selectedDiscount = discounts[($(element).attr('data-index'))];
+			}
+		});
 		
-		$('#link_payment_popupDiscountCmp4Member').click(function(){
-			readMemberWinToSelectDiscount();
+		//选择折扣方案
+		self.find('[id=selectDiscount_a_memberRead]').click(function(){
+			readMemberWinToSelectDiscount(self);
 		});
 
 		//价格方案
 		var pricePlans = member.memberType.pricePlans;
 		if(pricePlans.length > 0){
-			$('#defaultPricePlan_label_memberRead').text(member.memberType.pricePlan.name);
-			$('#defaultPricePlan_label_memberRead').attr('data-value', member.memberType.pricePlan.id);
+			self.find('[id=defaultPricePlan_label_memberRead]').text(member.memberType.pricePlan.name);
+			self.find('[id=defaultPricePlan_label_memberRead]').attr('data-value', member.memberType.pricePlan.id);
 			for (var i = 0; i < pricePlans.length; i++) {
 				pricePlanHtml += '<li data-icon="false" class="popupButtonList" onclick="chooseMemberPricePlan({id:'+ pricePlans[i].id +',name:\''+ pricePlans[i].name +'\'})"><a >'+ pricePlans[i].name +'</a></li>';
 			}
-			$('#payment_pricePlanList4Member').html(pricePlanHtml).trigger('create');
+			self.find('[id=payment_pricePlanList4Member]').html(pricePlanHtml).trigger('create');
 		}
 		
 		_member = member;
 	}
 	
-	function readMemberWinToSelectDiscount(){
-		//$('#payment_popupDiscountCmp4Member').popup().popup('open');
-		$('#payment_popupDiscountCmp4Member').show();
-		$('#payment_popupDiscountCmp4Member').css({top:$('#link_payment_popupDiscountCmp4Member').position().top - 270, left:$('#link_payment_popupDiscountCmp4Member').position().left-300});
-		$('#payment_discountList4Member').listview().listview('refresh');	
+	function readMemberWinToSelectDiscount(self){
+		//$('#discounts_div_memberRead').popup().popup('open');
+		self.find('[id=discounts_div_memberRead]').show();
+		self.find('[id=discounts_div_memberRead]').css({top:$('#selectDiscount_a_memberRead').position().top - 270, left:$('#selectDiscount_a_memberRead').position().left-300});
+		self.find('[id=eachDiscount_ul_memberRead]').listview().listview('refresh');	
 	}
 
 	function readMemberWinToSelectPricePlan(){
