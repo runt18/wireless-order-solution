@@ -34,6 +34,7 @@ public class OperateCouponAction extends DispatchAction{
 		response.setContentType("text/json; charset=utf-8");
 		final String pin = (String) request.getAttribute("pin");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String status = request.getParameter("status");
 		final String issueMode = request.getParameter("issueMode");
 		final String issueAssociateId = request.getParameter("issueAssociateId");
 		final String memberId = request.getParameter("memberId");
@@ -43,6 +44,12 @@ public class OperateCouponAction extends DispatchAction{
 		JObject jObject = new JObject();
 		try{
 			final CouponDao.ExtraCond extraCond = new CouponDao.ExtraCond();
+			if(status != null && !status.isEmpty()){
+				if(status.equalsIgnoreCase("issued")){
+					extraCond.setStatus(Coupon.Status.ISSUED);
+				}
+			}
+			
 			if(issueMode != null && !issueMode.isEmpty()){
 				if(issueAssociateId != null && !issueAssociateId.isEmpty()){
 					extraCond.setIssueMode(Coupon.IssueMode.valueOf(Integer.parseInt(issueMode)), Integer.parseInt(issueAssociateId));

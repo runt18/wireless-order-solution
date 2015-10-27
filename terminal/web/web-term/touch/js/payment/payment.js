@@ -1319,13 +1319,31 @@ $(function(){
 		//打开发送优惠券
 		$('#issueCoupon_a_orderFood').click(function(){
 			//初始化发送优惠券
-			var issueCoupon = new IssueCouponPopup();
+			var issueCoupon = new IssueCouponPopup({
+				issueMode : IssueCouponPopup.IssueMode.ORDER,
+				orderId : orderMsg.id,
+				issueTo : orderMsg.memberId
+			});
 			issueCoupon.open();
 		});
 		
 		//打开用券
 		$('#useCoupon_a_orderFood').click(function(){
-			var useCoupon = new UseCoupon();
+			var useCouponPopup = new UseCouponPopup({
+				useTo : orderMsg.memberId,
+				orderId :  orderMsg.id,
+				useCuoponMethod : function(coupons){
+					$.post('../OperateOrderFood.do', {dataSource : 'coupon', orderId : orderMsg.id, coupons : coupons.join(',')}, function(response, status, xhr){
+						if(response.success){
+							Util.msg.tip('使用成功!');
+							useCouponPopup.close();
+						}else{
+							Util.msg.tip(response.msg);
+						}
+					});
+					
+				}
+			});
 			useCoupon.open();
 		});
 		
