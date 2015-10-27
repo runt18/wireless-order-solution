@@ -52,7 +52,10 @@
 <!-- <script type="text/javascript" src="./js/popup/table/askTable.js"></script> -->
 <!-- JqmPopup弹出控件 -->
 <script type="text/javascript" src="./js/popup/jqmPopup.js?v=<%=v %>"></script>
-
+<!-- issuePopup弹出控件 -->
+<script type="text/javascript" src="./js/popup/coupon/issuePopup.js?v=<%=v %>"></script>
+<!-- usepopup弹出控件 -->
+<script type="text/javascript" src="./js/popup/coupon/usePopup.js?v=<%=v %>"></script>
 <!--引入易笔字核心脚本(utf-8编码)-->
 <!-- <script src="http://www.yibizi.com/ybz_core/core/ybz.min.js"></script> -->
 
@@ -1074,7 +1077,7 @@
 	</div>		
 	<!-- 系统共用会员绑定start -->
 	<div id="loadMemberBind4Checkout"></div>
-<!-- 	<div id="finishMemberInfo" class="ui-overlay-shadow ui-corner-all" style="width:740px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -370px;background-color: white;display: none;" align="center">	
+ 	<div id="finishMemberInfo" class="ui-overlay-shadow ui-corner-all" style="width:740px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -370px;background-color: white;display: none;" align="center">	
 	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
 	        	完善会员资料
 	    </div> 
@@ -1143,10 +1146,10 @@
 				 <a  data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn" onclick="uo.closeMemberInfoBind()">取消</a>		 
 			 </div>
 	    </div>	
-	</div>	 -->
+	</div>	 
 	<!-- end会员绑定 -->
 </div>	
-<!-- end 已点菜界面-->
+<!-- end 已点菜界面 -->
 
 <!-- 系统共用餐台操作:转台,查台, 拆台等 start -->
 <div id="transFoodCmp" class="ui-overlay-shadow ui-corner-all" style="width: 460px;z-index: 1102;position: absolute; top: 160px; left: 50%; margin: -100px 0px 0px -250px;min-width:500px;background-color: white;display: none;" align="center">	
@@ -1821,6 +1824,8 @@
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" href="#tableSelectMgr" >返回</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="refreshOrderData({calc:true})" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="issueCoupon_a_orderFood">发券</a>
+			<a data-role="button" data-inline="true" class="bottomBtnFont" id="useCoupon_a_orderFood">用券</a>
 		 	<a id="tempPay_a_payment" data-role="button" data-inline="true" class="bottomBtnFont">暂结(-)</a>
 		 	<a id="updateOrder_a_payment" data-role="button" data-inline="true" class="bottomBtnFont">改单</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupDiscountCmp">折扣</a>

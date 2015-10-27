@@ -2033,7 +2033,6 @@ function closePinyin(){
 
 
 $(function(){
-	
 	//菜品分页
 	var foodPaging = null;
 	
@@ -2172,7 +2171,6 @@ $(function(){
 	
 	//进入点菜界面
 	$('#orderFoodMgr').on('pagebeforeshow', function(e){
-		
 		of.order = null;
 		of.table = null;
 		
@@ -3265,6 +3263,8 @@ $(function(){
 		
 		
 	});
+
+	
 });
 
 
