@@ -39,6 +39,7 @@ import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.PricePlan;
@@ -59,7 +60,6 @@ public class OrderDao {
 	public static class ExtraCond{
 		public final String orderTblAlias;
 		private final DBTbl dbTbl;
-		private final DateType dateType;
 		private int orderId = -1;		//按账单号
 		private int seqId = -1;			//按流水号
 		private int tableAlias = -1;	//按餐台号
@@ -72,6 +72,7 @@ public class OrderDao {
 		private String comment;			//按备注
 		private int staffId;			//按员工
 		private final List<Order.Status> statusList = new ArrayList<Order.Status>();	//按状态状态
+		private int restaurantId;
 		
 		private boolean isRepaid;		//是否有反结帐
 		private boolean isDiscount;		//是否有折扣
@@ -80,15 +81,20 @@ public class OrderDao {
 		private boolean isErased;		//是否有抹数
 		private boolean isCoupon;		//是否有使用优惠券
 		private boolean isTransfer;		//是否有转菜
+		private boolean isMemberPrice;	//是否有会员价
 		
 		public ExtraCond(DateType dateType){
-			this.dateType = dateType;
 			this.dbTbl = new DBTbl(dateType); 
 			if(dateType == DateType.TODAY){
 				orderTblAlias = "O";
 			}else{
 				orderTblAlias = "OH";
 			}
+		}
+		
+		public ExtraCond setRestaurant(int restaurantId){
+			this.restaurantId = restaurantId;
+			return this;
 		}
 		
 		public ExtraCond setOrderId(int orderId){
@@ -191,6 +197,11 @@ public class OrderDao {
 			return this;
 		}
 		
+		public ExtraCond isMemberPrice(boolean onOff){
+			this.isMemberPrice = onOff;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 
@@ -258,6 +269,12 @@ public class OrderDao {
 			if(isTransfer){
 				final String sql = " SELECT order_id FROM " + Params.dbName + "." + dbTbl.orderFoodTbl + " WHERE operation = " + OrderFood.Operation.TRANSFER.getVal();;
 				filterCond.append(" AND " + orderTblAlias + ".id IN( " + sql + ")");
+			}
+			if(isMemberPrice){
+				final String sql = " SELECT OH.id FROM " + Params.dbName + "." + dbTbl.orderTbl + " OH " +
+								   " JOIN " + Params.dbName + "." + dbTbl.moTbl + " MOH ON OH.id = MOH.order_id AND MOH.operate_type = " + MemberOperation.OperationType.CONSUME.getValue() +
+								   " WHERE MOH.restaurant_id = " + restaurantId;
+				filterCond.append(" AND " + orderTblAlias + ".id IN (" + sql + ")");
 			}
 			return filterCond.toString();
 		}
@@ -464,7 +481,7 @@ public class OrderDao {
 	 */
 	public static List<Order> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
-		if(extraCond.dateType == DateType.TODAY){
+		if(extraCond.dbTbl.dateType == DateType.TODAY){
 			sql = " SELECT " +
 				  " O.id, O.birth_date, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
 				  " O.temp_staff, O.temp_date, " +
@@ -482,10 +499,10 @@ public class OrderDao {
 				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
 				  " WHERE 1 = 1 " + 
 				  " AND O.restaurant_id = " + staff.getRestaurantId() + " " +
-				  (extraCond != null ? extraCond.toString() : "") + " " +
+				  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()).toString() : "") + " " +
 				  (orderClause != null ? orderClause : "");
 			
-		}else if(extraCond.dateType == DateType.HISTORY){
+		}else if(extraCond.dbTbl.dateType == DateType.HISTORY){
 			sql = " SELECT " +
 				  " OH.id, OH.birth_date, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
 				  " OH.waiter, OH.staff_id, OH.discount_staff_id, OH.discount_staff, OH.discount_date, " +
@@ -497,7 +514,7 @@ public class OrderDao {
 				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = OH.pay_type_id " +
 				  " WHERE 1 = 1 " + 
 				  " AND OH.restaurant_id = " + staff.getRestaurantId() + " " +
-				  (extraCond != null ? extraCond.toString() : "") + " " +
+				  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()).toString() : "") + " " +
 				  (orderClause != null ? orderClause : "");
 		}else{
 			throw new IllegalArgumentException("The query type passed to query order is NOT valid.");
@@ -533,7 +550,7 @@ public class OrderDao {
 			}
 			table.setTableAlias(dbCon.rs.getInt("table_alias"));
 			table.setTableName(dbCon.rs.getString("table_name"));
-			if(extraCond.dateType == DateType.TODAY){
+			if(extraCond.dbTbl.dateType == DateType.TODAY){
 				table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 				table.setCategory(Table.Category.valueOf(dbCon.rs.getShort("tbl_category")));
 			}
@@ -544,7 +561,7 @@ public class OrderDao {
 			order.setCustomNum(dbCon.rs.getShort("custom_num"));
 			order.setCategory(Category.valueOf(dbCon.rs.getShort("category")));
 			
-			if(extraCond.dateType == DateType.TODAY){
+			if(extraCond.dbTbl.dateType == DateType.TODAY){
 				if(dbCon.rs.getTimestamp("temp_date") != null){
 					order.setTempDate(dbCon.rs.getTimestamp("temp_date").getTime());
 					order.setTempStaff(dbCon.rs.getString("temp_staff"));
@@ -1101,6 +1118,7 @@ public class OrderDao {
 		for(Coupon coupon : order.getCoupons()){
 			sql = " UPDATE " + Params.dbName + ".coupon " +
 				  " SET coupon_id = " + coupon.getId() +
+				  " ,status = " + Coupon.Status.ISSUED.getVal() +
 				  " ,use_mode = null " +
 				  " ,use_staff = null " +
 				  " ,use_staff_id = null " +
@@ -1492,10 +1510,9 @@ public class OrderDao {
 		for(Order order : getByCond(dbCon, staff, extraCond, null)){
 			String sql;
 
-			DBTbl dbTbl = new DBTbl(extraCond.dateType);
 			//Delete the records to normal taste group. 
-			sql = " DELETE NTG FROM " + Params.dbName + "." + dbTbl.ntgTbl + " NTG " +
-				  " JOIN " + Params.dbName + "." + dbTbl.tgTbl + " TG ON NTG.normal_taste_group_id = TG.normal_taste_group_id " +
+			sql = " DELETE NTG FROM " + Params.dbName + "." + extraCond.dbTbl.ntgTbl + " NTG " +
+				  " JOIN " + Params.dbName + "." + extraCond.dbTbl.tgTbl + " TG ON NTG.normal_taste_group_id = TG.normal_taste_group_id " +
 				  " JOIN " + Params.dbName + "." + extraCond.dbTbl.orderFoodTbl + " OF ON OF.taste_group_id = TG.taste_group_id " +
 				  " WHERE 1 = 1 " + 
 				  " AND OF.order_id = " + order.getId() +
@@ -1503,7 +1520,7 @@ public class OrderDao {
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Delete the records to taste group.
-			sql = " DELETE TG FROM " + Params.dbName + "." + dbTbl.tgTbl + " TG " +
+			sql = " DELETE TG FROM " + Params.dbName + "." + extraCond.dbTbl.tgTbl + " TG " +
 				  " JOIN " + Params.dbName + "." + extraCond.dbTbl.orderFoodTbl + " OF ON TG.taste_group_id = OF.taste_group_id " +
 			      " WHERE 1 = 1 " + 
 				  " AND OF.order_id = " + order.getId() +
@@ -1519,10 +1536,10 @@ public class OrderDao {
 			dbCon.stmt.executeUpdate(sql);
 
 			//Delete the associated mixed payment.
-			MixedPaymentDao.deleteByCond(dbCon, staff, new MixedPaymentDao.ExtraCond(extraCond.dateType, order.getId()));
+			MixedPaymentDao.deleteByCond(dbCon, staff, new MixedPaymentDao.ExtraCond(extraCond.dbTbl.dateType, order.getId()));
 			
 			//Delete the temporary table
-			if(extraCond.dateType.isToday() && !order.getDestTbl().getCategory().isNormal()){
+			if(extraCond.dbTbl.dateType.isToday() && !order.getDestTbl().getCategory().isNormal()){
 				try {
 					TableDao.deleteById(dbCon, staff, order.getDestTbl().getId());
 				} catch (BusinessException ignored) {
