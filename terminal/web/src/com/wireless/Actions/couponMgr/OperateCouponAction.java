@@ -37,6 +37,8 @@ public class OperateCouponAction extends DispatchAction{
 		final String issueMode = request.getParameter("issueMode");
 		final String issueAssociateId = request.getParameter("issueAssociateId");
 		final String memberId = request.getParameter("memberId");
+		final String useMode = request.getParameter("useMode");
+		final String useAssociateId = request.getParameter("useAssociateId");
 		
 		JObject jObject = new JObject();
 		try{
@@ -44,6 +46,14 @@ public class OperateCouponAction extends DispatchAction{
 			if(issueMode != null && !issueMode.isEmpty()){
 				if(issueAssociateId != null && !issueAssociateId.isEmpty()){
 					extraCond.setIssueMode(Coupon.IssueMode.valueOf(Integer.parseInt(issueMode)), Integer.parseInt(issueAssociateId));
+				}else{
+					extraCond.setIssueMode(Coupon.IssueMode.valueOf(Integer.parseInt(issueMode)), 0);
+				}
+			}
+			
+			if(useMode != null && !useMode.isEmpty()){
+				if(useAssociateId != null && !useAssociateId.isEmpty()){
+					extraCond.setUseMode(Coupon.UseMode.valueOf(Integer.parseInt(useMode)), Integer.parseInt(useAssociateId));
 				}else{
 					extraCond.setIssueMode(Coupon.IssueMode.valueOf(Integer.parseInt(issueMode)), 0);
 				}
