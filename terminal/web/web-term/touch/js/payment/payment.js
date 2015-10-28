@@ -66,39 +66,6 @@ pm.entry = function(c){
 	//加载混合结账付款方式
 	loadPayTypeData(); 
 	
-	//设置会员动态popup控件
-	//会员信息来源
-	if($('#orderFoodListMgr .payment_searchMemberType').length > 0){
-		$('#orderFoodListMgr .payment_searchMemberType').remove();
-	}    
-	if($('#paymentMgr .payment_searchMemberType').length == 0){
-		$('#paymentMgr').append(payment_searchMemberTypeTemplet);
-	}	
-
-	//会员折扣
-	if($('#orderFoodListMgr .payment_popupDiscountCmp4Member').length > 0){
-		$('#orderFoodListMgr .payment_popupDiscountCmp4Member').remove();
-	} 
-	if($('#paymentMgr .payment_popupDiscountCmp4Member').length == 0){
-		$('#paymentMgr').append(payment_popupDiscountCmp4MemberTemplet);
-	}
-	
-	//会员价格方案
-	if($('#orderFoodListMgr .payment_popupPricePlanCmp4Member').length > 0){
-		$('#orderFoodListMgr .payment_popupPricePlanCmp4Member').remove();
-	}	 
-	if($('#paymentMgr .payment_popupPricePlanCmp4Member').length == 0){
-		$('#paymentMgr').append(payment_popupPricePlanCmp4MemberTemplet);
-	}		
-	
-	//优惠劵
-	if($('#orderFoodListMgr .payment_popupCouponCmp4Member').length > 0){
-		$('#orderFoodListMgr .payment_popupCouponCmp4Member').remove();
-	}	 
-	if($('#paymentMgr .payment_popupCouponCmp4Member').length == 0){
-		$('#paymentMgr').append(payment_popupCouponCmp4MemberTemplet);
-	}		
-	
 };
 
 //加载账单数据
@@ -110,7 +77,7 @@ function refreshOrderData(_c){
 		type : 'post',
 		data : {
 			tableID : pm.table.id,
-			orderID : orderMsg?orderMsg.id:'',
+			orderID : orderMsg ? orderMsg.id : '',
 			calc : typeof _c.calc == 'boolean' ? _c.calc : true,
 			discountID : calcDiscountID,
 			customNum : pm.table.customNum
@@ -1315,14 +1282,13 @@ $(function(){
 		
 		//读取会员&会员余额
 		$('#memberBalance_a_payment').click(function(){
-			
 			if(orderMsg.memberId == 0){
 				//会员未注入时打开读取会员
 				$('#memberRead_a_payment').click();
 				
 			}else{
 				//会员已注入时使用会员余额结账
-				if(getcookie(document.domain+'_consumeSms') == "true"){
+				if(getcookie(document.domain + '_consumeSms') == "true"){
 					$('#memberPaymentSendSMS').attr('checked', true);
 				}else{
 					$('#memberPaymentSendSMS').attr('checked', false);
