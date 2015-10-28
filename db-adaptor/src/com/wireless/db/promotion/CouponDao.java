@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
@@ -260,8 +261,9 @@ public class CouponDao {
 	public static int[] issue(DBCon dbCon, Staff staff, Coupon.IssueBuilder builder) throws SQLException, BusinessException{
 		
 		final List<Integer> issueCoupons = new ArrayList<Integer>();
-		for(int promotionId : builder.getPromotions()){
-			final Promotion promotion = PromotionDao.getById(dbCon, staff, promotionId);
+		for(Entry<Integer, Integer> entry : builder.getPromotions()){
+			final Promotion promotion = PromotionDao.getById(dbCon, staff, entry.getKey());
+			final int amount = entry.getValue();
 			
 			for(int memberId : builder.getMembers()){
 				try{
@@ -270,29 +272,31 @@ public class CouponDao {
 						continue;
 					}
 					String sql;
-					//Issue a new coupon.
-					sql = " INSERT INTO " + Params.dbName + ".coupon " +
-						  "(`restaurant_id`, `coupon_type_id`, `promotion_id`, `birth_date`, `member_id`, " +
-						    "`issue_date`, `issue_staff_id`, `issue_staff`, `issue_mode`, `issue_associate_id`, `issue_comment`, `status`) VALUES (" +
-						  staff.getRestaurantId() + "," +
-						  promotion.getCouponType().getId() + "," +
-						  promotion.getId() + "," +
-						  " NOW(), " +
-						  memberId + "," +
-						  " NOW(), " +
-						  staff.getId() + "," +
-						  "'" + staff.getName() + "'," +
-						  builder.getMode().getVal() + "," +
-						  builder.getAssociateId() + "," +
-						  "'" + builder.getComment() + "'," +
-						  Coupon.Status.ISSUED.getVal() + 
-						  ")";
-					dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-					dbCon.rs = dbCon.stmt.getGeneratedKeys();
-					if(dbCon.rs.next()){
-						issueCoupons.add(dbCon.rs.getInt(1));
-					}else{
-						throw new SQLException("The id of coupon is not generated successfully.");
+					for(int i = 0; i < amount; i++){
+						//Issue a new coupon.
+						sql = " INSERT INTO " + Params.dbName + ".coupon " +
+							  "(`restaurant_id`, `coupon_type_id`, `promotion_id`, `birth_date`, `member_id`, " +
+							    "`issue_date`, `issue_staff_id`, `issue_staff`, `issue_mode`, `issue_associate_id`, `issue_comment`, `status`) VALUES (" +
+							  staff.getRestaurantId() + "," +
+							  promotion.getCouponType().getId() + "," +
+							  promotion.getId() + "," +
+							  " NOW(), " +
+							  memberId + "," +
+							  " NOW(), " +
+							  staff.getId() + "," +
+							  "'" + staff.getName() + "'," +
+							  builder.getMode().getVal() + "," +
+							  builder.getAssociateId() + "," +
+							  "'" + builder.getComment() + "'," +
+							  Coupon.Status.ISSUED.getVal() + 
+							  ")";
+						dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+						dbCon.rs = dbCon.stmt.getGeneratedKeys();
+						if(dbCon.rs.next()){
+							issueCoupons.add(dbCon.rs.getInt(1));
+						}else{
+							throw new SQLException("The id of coupon is not generated successfully.");
+						}
 					}
 				}catch(BusinessException | SQLException e){
 					e.printStackTrace();

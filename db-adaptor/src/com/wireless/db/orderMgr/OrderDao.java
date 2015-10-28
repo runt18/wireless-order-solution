@@ -1119,6 +1119,7 @@ public class OrderDao {
 			sql = " UPDATE " + Params.dbName + ".coupon " +
 				  " SET coupon_id = " + coupon.getId() +
 				  " ,status = " + Coupon.Status.ISSUED.getVal() +
+				  " ,use_date = null " +
 				  " ,use_mode = null " +
 				  " ,use_staff = null " +
 				  " ,use_staff_id = null " +

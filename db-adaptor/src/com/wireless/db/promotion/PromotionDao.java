@@ -18,7 +18,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.oss.OssImage;
-import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.Promotion.Status;
 import com.wireless.pojo.staffMgr.Staff;
@@ -360,9 +359,6 @@ public class PromotionDao {
 			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
 		}else{
 			Promotion promotion = result.get(0);
-//			if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
-				promotion.setCouponType(CouponTypeDao.getById(dbCon, staff, promotion.getCouponType().getId()));
-//			}
 			if(promotion.hasImage()){
 				promotion.setImage(OssImageDao.getById(dbCon, staff, promotion.getImage().getId()));
 			}
@@ -379,8 +375,9 @@ public class PromotionDao {
 	 * @return the promotions to this extra condition
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static List<Promotion> getByCond(Staff staff, ExtraCond extraCond) throws SQLException{
+	public static List<Promotion> getByCond(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -401,16 +398,16 @@ public class PromotionDao {
 	 * @return the promotions to this extra condition
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static List<Promotion> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+	public static List<Promotion> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		List<Promotion> result = new ArrayList<Promotion>();
 		
 		String sql;
 		sql = " SELECT P.promotion_id, P.restaurant_id, P.create_date, P.start_date, P.finish_date, P.title, P.body, P.entire, P.oriented, P.type, P.rule, P.point, " +
-			  " P.coupon_type_id, CT.name, " +
+			  " P.coupon_type_id, " +
 			  " OI.oss_image_id, OI.image, OI.type AS oss_type " +	
 			  " FROM " + Params.dbName + ".promotion P " +
-			  " LEFT JOIN " + Params.dbName + ".coupon_type CT ON P.coupon_type_id = CT.coupon_type_id " +
 			  " LEFT JOIN " + Params.dbName + ".oss_image OI ON P.oss_image_id = OI.oss_image_id " +
 			  " WHERE 1 = 1 " +
 			  " AND P.restaurant_id = " + staff.getRestaurantId() +
@@ -448,11 +445,7 @@ public class PromotionDao {
 			promotion.setRule(Promotion.Rule.valueOf(dbCon.rs.getInt("rule")));
 			promotion.setPoint(dbCon.rs.getInt("point"));
 			
-//			if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
-				CouponType type = new CouponType(dbCon.rs.getInt("coupon_type_id"));
-				type.setName(dbCon.rs.getString("name"));
-				promotion.setCouponType(type);
-//			}
+			promotion.setCouponType(CouponTypeDao.getById(staff, dbCon.rs.getInt("coupon_type_id")));
 			
 			if(dbCon.rs.getInt("oss_image_id") != 0){
 				OssImage image = new OssImage(dbCon.rs.getInt("oss_image_id"));
