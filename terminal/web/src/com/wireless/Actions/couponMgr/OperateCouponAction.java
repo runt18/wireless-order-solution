@@ -168,11 +168,19 @@ public class OperateCouponAction extends DispatchAction{
 		final String useMode = request.getParameter("useMode");
 		//final String useAssociateId = request.getParameter("useAssociateId");
 		final String memberId = request.getParameter("memberId");
+		final String coupons = request.getParameter("coupons");
 		
 		JObject jobject = new JObject();
 		try{
 			if(Coupon.UseMode.valueOf(Integer.parseInt(useMode)) == Coupon.UseMode.FAST){
-				CouponDao.use(staff, Coupon.UseBuilder.newInstance4Fast(Integer.parseInt(memberId)));
+				Coupon.UseBuilder builder = Coupon.UseBuilder.newInstance4Fast(Integer.parseInt(memberId));
+				if(coupons != null && !coupons.isEmpty()){
+					for(String couponId : coupons.split(",")){
+						builder.addCoupon(Integer.parseInt(couponId));
+					}
+				}
+				CouponDao.use(staff, builder);
+
 			}else{
 				throw new BusinessException("优惠券使用方法必须是快速使用");
 			}
