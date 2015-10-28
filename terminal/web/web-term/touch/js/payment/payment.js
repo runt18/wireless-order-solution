@@ -1344,7 +1344,7 @@ $(function(){
 					
 				}
 			});
-			useCoupon.open();
+			useCouponPopup.open();
 		});
 		
 		
