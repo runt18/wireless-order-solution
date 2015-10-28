@@ -30,7 +30,7 @@ function MemberReadPopup(param){
 			//确定按钮
 			self.find('[id=confirm_a_memberRead]').click(function(){
 				if(param.confirm && typeof param.confirm == 'function'){
-					param.confirm(_member, _selectedDiscount);
+					param.confirm(_member, _selectedDiscount, _selectedPricePlan);
 				}
 			});
 			

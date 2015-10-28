@@ -1759,7 +1759,7 @@
 		    	<a id="hang_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">挂账</a>		    	
 		    	<a id="cashReceive_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">现金找零</a>
 		    	<a id="mixed_a_payment" data-role="button" data-theme="b" data-rel="popup" data-position-to="window" data-transition="pop" data-inline="true" style="width: 45%;">其他结账</a>
-		    	<a data-role="button" data-theme="b" id="btnPayByMember" data-rel="popup" data-position-to="window" data-transition="pop" onclick="showMemberInfoWin()">读取会员</a>
+		    	<a data-role="button" data-theme="b" id="memberBalance_a_payment" data-rel="popup" data-position-to="window" data-transition="pop" onclick="showMemberInfoWin()">读取会员</a>
 		    	<a id="wx_a_payment" data-role="button" data-theme="b">微信支付</a>
 		    </div>
 		    
@@ -1819,7 +1819,7 @@
 		<div  class="bottomGeneralBar" style="background-color:#f7c942">
 			<div id="divDescForUpdateOrder" style="float: right;">
 				<span id="orderCouponInfo" style="float: left;margin-right: 20px;"></span>	
-				<span id="orderMemberDesc" style="float: left;margin-right: 20px;"></span>			
+				<span id="memberInfo_span_payment" style="float: left;margin-right: 20px;"></span>			
 				<span id="orderDiscountDesc" style="float: left;margin-right: 20px;">
 					当前折扣: <font color="green" >----</font>
 				</span>						
@@ -1834,7 +1834,7 @@
 		 	<a id="updateOrder_a_payment" data-role="button" data-inline="true" class="bottomBtnFont">改单</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupDiscountCmp">折扣</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupServiceCmp">服务费</a>
-			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="openReadMemberByCondtionWin()">会员</a>
+			<a id="memberRead_a_payment" data-role="button" data-inline="true" class="bottomBtnFont">会员</a>
 			<a href="javascript: Util.to.scroll({content:'payment_orderFoodListCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
 			<a href="javascript: Util.to.scroll({content:'payment_orderFoodListCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>			
 		 </div>

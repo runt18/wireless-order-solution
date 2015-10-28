@@ -22,25 +22,7 @@ var pm = {table : {}},
 	//查询出来的菜品列表
 	orderFoodDetails = [],
 	
-	//查找的会员
-	member4Payment, member4Display,
-	
-	/**
-	 * 元素模板
-	 */
-	//菜品列表
-	payment_orderFoodListCmpTemplet = '<tr class="{isComboFoodTd}">'
-		+ '<td>{dataIndex}</td>'
-		+ '<td ><div class={foodNameStyle}>{name}</div></td>'
-		+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
-		+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
-		+ '<td>{tastePrice}</td>'
-		+ '<td>{unitPrice}</td>'
-		+ '<td>{discount}</td>'
-		+ '<td>{totalPrice}</td>'
-		+ '<td>{orderDateFormat}</td>'
-		+ '<td>{waiter}</td>'
-		+ '</tr>',	
+
 	//账单详细
 	payment_lookupOrderDetailTemplet = '<tr>'
 		+ '<td>{dataIndex}</td>'
@@ -220,18 +202,16 @@ function loadOrderBasicMsg(){
 		$('#orderCouponInfo').html('');
 	}
 	
+	orderMsg.member = null;
 	if(orderMsg.memberId && orderMsg.memberId > 0){
 		//设置会员结账按钮
-		$('#btnPayByMember .ui-btn-text').html('会员余额');
-		$('#btnPayByMember').buttonMarkup('refresh');
+		$('#memberBalance_a_payment .ui-btn-text').html('会员余额');
+		$('#memberBalance_a_payment').buttonMarkup('refresh');
 		
 		$.post('../QueryMember.do', {dataSource : 'normal', id : orderMsg.memberId, forDetail : true}, function(result){
 			if(result.success){
-				member4Payment = result.root[0];
-				//设置为已注入状态 
-				member4Payment.hadSet = true;
 				
-				member4Display = Util.clone(member4Payment);
+				orderMsg.member = result.root[0];
 				
 				var memberSpan = "";
 				if(result.root[0].isRaw){
@@ -240,16 +220,14 @@ function loadOrderBasicMsg(){
 					memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="color:green">' + result.root[0].name +"</font></span>";
 				}
 				
-				$('#orderMemberDesc').html(memberSpan);
+				$('#memberInfo_span_payment').html(memberSpan);
 			}
 		}, 'json');
 	}else{
-		member4Payment = null;
-		member4Display = null;
-		$('#orderMemberDesc').html('');
+		$('#memberInfo_span_payment').html('');
 		//设置会员结账按钮
-		$('#btnPayByMember .ui-btn-text').html('读取会员');
-		$('#btnPayByMember').buttonMarkup('refresh');		
+		$('#memberBalance_a_payment .ui-btn-text').html('读取会员');
+		$('#memberBalance_a_payment').buttonMarkup('refresh');		
 	}
 	
 	//微信账单
@@ -268,7 +246,20 @@ function loadOrderBasicMsg(){
 	//菜品列表
 	var html = [];
 	for(var i = 0; i < checkOutData.root.length; i++){
-		html.push(payment_orderFoodListCmpTemplet.format({
+		//菜品列表
+		var orderFoodTemplate = '<tr class="{isComboFoodTd}">'
+			+ '<td>{dataIndex}</td>'
+			+ '<td ><div class={foodNameStyle}>{name}</div></td>'
+			+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
+			+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
+			+ '<td>{tastePrice}</td>'
+			+ '<td>{unitPrice}</td>'
+			+ '<td>{discount}</td>'
+			+ '<td>{totalPrice}</td>'
+			+ '<td>{orderDateFormat}</td>'
+			+ '<td>{waiter}</td>'
+			+ '</tr>';
+		html.push(orderFoodTemplate.format({
 			dataIndex : i + 1,
 			id : checkOutData.root[i].id,
 			name : checkOutData.root[i].foodName + ((checkOutData.root[i].status & 1 << 7) != 0 ? '<font color="red">[称重确认]</font>' : ''),
@@ -289,7 +280,7 @@ function loadOrderBasicMsg(){
 			var combo = checkOutData.root[i].combo;
 			
 			for (var j = 0; j < combo.length; j++) {
-				html.push(payment_orderFoodListCmpTemplet.format({
+				html.push(orderFoodTemplate.format({
 					dataIndex : '',
 					id : combo[j].comboFood.id,
 					name : '┕' + combo[j].comboFoodDesc,
@@ -642,17 +633,9 @@ function readMemberByCondtion(stype){
 			Util.LM.hide();
 			if(jr.success){
 				if(jr.root.length == 1){
-					if(member4Payment){
-						member4Display = Util.clone(member4Payment);
-					}
-					member4Payment = jr.root[0];
-					if(jr.other){
-						member4Payment.coupons = jr.other.coupons;
-					}
 					//设置为最新读取的会员
-					member4Payment.isFresh = true;
 					Util.msg.alert({msg:'会员信息读取成功.', topTip:true});
-					loadMemberInfo(member4Payment);
+					loadMemberInfo(jr.root[0]);
 				}else if(jr.root.length > 1){
 					$('#payment_searchMemberType').popup().popup('open');
 					$('#payment_searchMemberType').css({top:$('#btnReadMember').position().top - 270, left:$('#btnReadMember').position().left-300});
@@ -742,7 +725,7 @@ function chooseMemberCoupon(c){
  * 为账单注入会员
  */
 function setMemberToOrder(){
-	if(!member4Payment || !member4Payment.isFresh){
+	if(!orderMsg.member){
 		Util.msg.alert({
 			topTip : true,
 			msg : '请先读取会员'
@@ -765,7 +748,7 @@ function setMemberToOrder(){
 	$.post('../OperateDiscount.do', {
 		dataSource : 'setDiscount',
 		orderId : orderId,
-		memberId : member4Payment.id,
+		memberId : orderMsg.member.id,
 		discountId : discount.attr('data-value')?discount.attr('data-value'):'',
 		pricePlan : pricePlan.attr('data-value')?pricePlan.attr('data-value'):'',
 		coupon : coupon.attr('data-value')?coupon.attr('data-value'):''
@@ -782,9 +765,6 @@ function setMemberToOrder(){
 			}			
 			closeReadMemberByCondtionWin();
 			
-			//设置当前查出会员为注入成功状态
-			member4Payment.hadSet = true;
-			member4Display = Util.clone(member4Payment);
 			Util.msg.alert({
 				topTip : true,
 				msg : '会员注入成功'
@@ -845,10 +825,6 @@ function closeReadMemberByCondtionWin(){
 	$('#payment_pricePlanList4Member').html('');
 	$('#payment_couponList4Member').html('');
 	
-	//如果不是已注入会员则去除最新会员标记
-	if(member4Payment && !member4Payment.hadSet){
-		member4Payment.isFresh = false;
-	}
 }
 
 
@@ -869,34 +845,6 @@ function readMemberWinToSelectCoupon(){
 	$('#payment_popupCouponCmp4Member').css({top:$('#link_payment_popupCouponCmp4Member').position().top - 270, left:$('#link_payment_popupCouponCmp4Member').position().left-300});
 	$('#payment_couponList4Member').listview().listview('refresh');	
 }
-
-function showMemberInfoWin(){
-	if(!member4Display || !member4Display.hadSet){
-		/*Util.msg.alert({msg : '账单还未注入会员, 不能使用会员结账', topTip:true});*/
-		openReadMemberByCondtionWin();
-		return;
-	}
-	
-	if(getcookie(document.domain+'_consumeSms') == "true"){
-		$('#memberPaymentSendSMS').attr('checked', true);
-	}else{
-		$('#memberPaymentSendSMS').attr('checked', false);
-	}
-	
-	$('#memberPaymentSendSMS').checkboxradio('refresh');
-
-	
-	$('#payment4MemberCertainName').text(member4Display.name);
-	$('#payment4MemberCertainType').text(member4Display.memberType.name);
-	$('#payment4MemberCertainBalance').text(member4Display.totalBalance);
-	$('#payment4MemberCertainPoint').text(member4Display.point);	
-	$('#payment4MemberCertainPhone').text(member4Display.mobile?member4Display.mobile:'----');
-	$('#payment4MemberCertainCard').text(member4Display.memberCard?member4Display.memberCard:'----');	
-	
-	$('#showMemberInfoWin').popup('open');
-}
-
-
 
 $(function(){
 	
@@ -1144,7 +1092,7 @@ $(function(){
 	
 		//混合结账
 		$('#mixed_a_payment').click(function(){
-			if(member4Display && member4Display.hadSet){
+			if(orderMsg.memberId > 0){
 				Util.msg.alert({msg:'会员不支持混合结账', topTip:true});
 				return;
 			}
@@ -1344,11 +1292,6 @@ $(function(){
 						Util.LM.hide();
 						if(data.success){
 							
-							//FIXME 设置当前查出会员为注入成功状态
-							member4Payment = member;
-							member4Payment.hadSet = true;
-							member4Display = Util.clone(member4Payment);
-							
 							//刷新账单
 							refreshOrderData();
 							
@@ -1368,6 +1311,35 @@ $(function(){
 			});
 			//打开会员读取Popup
 			memberReadPopup.open();
+		});
+		
+		//读取会员&会员余额
+		$('#memberBalance_a_payment').click(function(){
+			
+			if(orderMsg.memberId == 0){
+				//会员未注入时打开读取会员
+				$('#memberRead_a_payment').click();
+				
+			}else{
+				//会员已注入时使用会员余额结账
+				if(getcookie(document.domain+'_consumeSms') == "true"){
+					$('#memberPaymentSendSMS').attr('checked', true);
+				}else{
+					$('#memberPaymentSendSMS').attr('checked', false);
+				}
+				
+				$('#memberPaymentSendSMS').checkboxradio('refresh');
+			
+				
+				$('#payment4MemberCertainName').text(orderMsg.member.name);
+				$('#payment4MemberCertainType').text(orderMsg.member.memberType.name);
+				$('#payment4MemberCertainBalance').text(orderMsg.member.totalBalance);
+				$('#payment4MemberCertainPoint').text(orderMsg.member.point);	
+				$('#payment4MemberCertainPhone').text(orderMsg.member.mobile ? orderMsg.member.mobile : '----');
+				$('#payment4MemberCertainCard').text(orderMsg.member.memberCard ? orderMsg.member.memberCard : '----');	
+				
+				$('#showMemberInfoWin').popup('open');
+			}
 		});
 		
 	});
@@ -1425,9 +1397,9 @@ $(function(){
 	
 		//普通或会员结账, 会员已注入则为会员结账, 否则为普通该结账
 		var settleType;
-		if(member4Display && member4Display.hadSet){
+		if(orderMsg.memberId > 0){
 			settleType = SettleTypeEnum.MEMBER.val;
-			actualMemberID = member4Display.id;
+			actualMemberID = orderMsg.memberId;
 		}else{
 			settleType = SettleTypeEnum.NORMAL.val;
 		}
@@ -1435,7 +1407,7 @@ $(function(){
 		if(c.submitType == PayTypeEnum.MEMBER){
 			//会员结账
 			//FIXME 要加上抹数?
-			if(member4Display.totalBalance < checkOut_actualPrice){
+			if(orderMsg.member.totalBalance < checkOut_actualPrice){
 				Util.msg.alert({msg : '会员卡余额小于合计金额，不能结帐!', topTip:true});
 				return;			
 			}			
