@@ -574,14 +574,68 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 	//快速发券
 	$('#fastIssue_a_tableSelect').click(function(){
 		$('#frontPageMemberOperation').popup('close');
-		console.log('click success');
 		setTimeout(function(){
-			var fastIssuePopup = new MemberReadPopup();
-			fastIssuePopup.open(function(){
-				console.log('open success');
+			var fastIssuePopup = new MemberReadPopup({
+				confirm : function(member){
+					if(member){
+						fastIssuePopup.close(function(){
+							var issueCouponPopup = new IssueCouponPopup({
+								title : '快速发放优惠券',
+								issueMode : IssueCouponPopup.IssueMode.FAST,
+								issueTo : member.id
+							});
+							issueCouponPopup.open();
+						}, 200);
+					}else{
+						Util.msg.tip('请注入会员!');
+					}
+				}
 			});
-		}, 200);
+			fastIssuePopup.open();
+		}, 100);
 	});
+	
+	//快速用券
+	$('#fastUse_a_tableSelect').click(function(){
+		$('#frontPageMemberOperation').popup('close');
+		setTimeout(function(){
+			var fastUsePopup = new MemberReadPopup({
+				confirm : function(member){
+					if(member){
+						fastUsePopup.close(function(){
+							var useCouponPopup = new UseCouponPopup({
+								title : '快速使用优惠券',
+								issueMode : UseCouponPopup.UseMode.FAST,
+								useTo  : member.id,
+								useCuoponMethod : function(coupons){
+									$.post('../OperateCoupon.do', {
+											dataSource : 'coupon', 
+											coupons : coupons.join(','), 
+											useTo : member.id, 
+											useMode : UseCouponPopup.UseMode.FAST.mode 
+										}, function(response, status,xhr){
+											if(response.success){
+												Util.msg.tip('使用成功!');
+												useCouponPopup.close();
+											}else{
+												Util.msg.tip(response.msg);
+											}
+									}, 'json');
+								}
+							});
+							useCouponPopup.open();
+						}, 200);
+					}else{
+						Util.msg.tip('请注入会员!');
+					}
+				}
+			});
+			fastUsePopup.open();
+		}, 100);
+	});
+	
+	
+	
 });
 
 

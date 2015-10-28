@@ -102,7 +102,7 @@
 			<li class="popupButtonList" onclick="ts.member.openMemberConsumeDetailWin()"><a >消费明细</a></li>
 			<li class="popupButtonList" onclick="ts.member.openWeixinMemberFrontBind()"><a >微信会员绑定</a></li>
 			<li class="popupButtonList" id="fastIssue_a_tableSelect"><a >快速发券</a></li>
-			<li class="popupButtonList" onclick="ts.member.openWeixinMemberFrontBind()"><a >快速用券</a></li>
+			<li class="popupButtonList" id="fastUse_a_tableSelect"><a >快速用券</a></li>
 		</ul>
 	</div>	
 	

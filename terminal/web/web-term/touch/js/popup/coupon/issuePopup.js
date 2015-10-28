@@ -3,8 +3,7 @@ function IssueCouponPopup(param){
 	param = param || {
 		header : '',       		//头部信息
 		issueMode : null,    	//发送类型
-		issueTo : '',			//发送对象				
-		issueCoupon : '',		//发送的优惠券
+		issueTo : '',			//发送对象--memberId				
 		issueComment : '',   	//备注
 		orderId : '', 			//账单ID，在issueMode是Order时需要
 		postIssue : function(resultJSON){}//优惠券发放后的回调函数
