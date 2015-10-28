@@ -15,7 +15,7 @@ function UseCouponPopup(param){
 		var availableCoupons = [];
 		if(param.orderId){
 			//搜索账单已用的
-			$.post('../OperateCoupon.do',  {dataSource : 'getByCond', useMode : UseCoupon.UseMode.ORDER.mode, useAssociateId : param.orderId}, function(response, status, xhr){
+			$.post('../OperateCoupon.do',  {dataSource : 'getByCond', useMode : UseCouponPopup.UseMode.ORDER.mode, useAssociateId : param.orderId}, function(response, status, xhr){
 				if(response.success && response.root.length > 0){
 					availableCoupons = availableCoupons.concat(response.root);
 				}
