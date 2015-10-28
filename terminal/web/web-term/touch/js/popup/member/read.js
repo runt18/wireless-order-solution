@@ -38,7 +38,17 @@ function MemberReadPopup(param){
 			self.find('[id=read_a_memberRead]').click(function(){
 				readMemberByCondtion(MemberReadPopup.SearchType.FUZZY, self);
 			});
+			
+			self.find('[id=fuzzy_input_memberRead]').on('keypress', function(event){
+				if(event.keyCode == "13"){
+					readMemberByCondtion(MemberReadPopup.SearchType.FUZZY, self);
+					$('#selectSearch_div_memberRead').hide();
+					$('#eachSearch_ul_memberRead').hide();
+				}
+			});
 		}
+	
+			
 	});	
 	
 	this.open = function(afterOpen){
@@ -84,7 +94,7 @@ function MemberReadPopup(param){
 			type : 'post',
 			data : {
 				dataSource:'normal',
-				sType: searchType.val > 0 ? searchType.valueOf() : '',
+				sType: searchType.val > 0 ? searchType.val : '',
 				forDetail : true,
 				memberCardOrMobileOrName : memberInfo.val()
 			},
@@ -96,13 +106,31 @@ function MemberReadPopup(param){
 					if(jr.root.length == 1){
 						Util.msg.alert({msg : '会员信息读取成功.', topTip : true});
 						loadMemberInfo(jr.root[0], self);
-						
+						$('#selectSearch_div_memberRead').hide();
+						$('#eachSearch_ul_memberRead').hide();
 					}else if(jr.root.length > 1){
-						//FIXME
-						$('#payment_searchMemberType').popup().popup('open');
-						$('#payment_searchMemberType').css({top:$('#btnReadMember').position().top - 270, left:$('#btnReadMember').position().left-300});
-						$('#payment_searchMemberTypeCmp').listview().listview('refresh');
-						
+//						//FIXME
+//						$('#payment_searchMemberType').popup().popup('open');
+//						$('#payment_searchMemberType').css({top:$('#btnReadMember').position().top - 270, left:$('#btnReadMember').position().left-300});
+//						$('#payment_searchMemberTypeCmp').listview().listview('refresh');
+						$('#selectSearch_div_memberRead').show();
+						$('#eachSearch_ul_memberRead').show();
+						$('#eachSearch_ul_memberRead').find('.popupButtonList').each(function(index, element){
+							element.onclick = function(){
+								if($(element).attr('data') == 'selectSearchByTel'){
+									readMemberByCondtion(MemberReadPopup.SearchType.MOBILE, self);
+									console.log($(element).attr('data'));
+								}else if($(element).attr('data') == 'selectSearchByNum'){
+									readMemberByCondtion(MemberReadPopup.SearchType.CARD, self);
+									console.log($(element).attr('data'));
+								}else if($(element).attr('data') == 'selectSearchByWeixin'){
+									readMemberByCondtion(MemberReadPopup.SearchType.WX_CARD, self);
+									console.log($(element).attr('data'));
+								}
+								$('#selectSearch_div_memberRead').hide();
+								$('#eachSearch_ul_memberRead').hide();
+							};
+						});
 					}else{
 //						Util.msg.alert({msg:'该会员信息不存在, 请重新输入条件后重试.', renderTo : 'paymentMgr', fn : function(){
 //							memberInfo.focus();
