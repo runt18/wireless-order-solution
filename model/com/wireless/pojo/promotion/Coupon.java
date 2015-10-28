@@ -1,7 +1,11 @@
 package com.wireless.pojo.promotion;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -91,7 +95,7 @@ public class Coupon implements Jsonable{
 	}
 	
 	public static class IssueBuilder{
-		private final SortedList<Integer> promotions = SortedList.newInstance();
+		private final Map<Integer, Integer> promotions = new HashMap<>();
 		private final SortedList<Integer> members = SortedList.newInstance();
 		private final IssueMode issueMode;
 		private final int issueAssociateId;
@@ -118,29 +122,25 @@ public class Coupon implements Jsonable{
 			this.issueAssociateId = associateId;
 		}
 		
-		public List<Integer> getPromotions(){
-			return Collections.unmodifiableList(this.promotions);
+		public Set<Entry<Integer, Integer>> getPromotions(){
+			return this.promotions.entrySet();
 		}
 		
 		public IssueBuilder addPromotion(int promotionId){
-			if(!promotions.containsElement(promotionId)){
-				promotions.add(promotionId);
-			}
+			return addPromotion(promotionId, 1);
+		}
+		
+		public IssueBuilder addPromotion(int promotionId, int amount){
+			promotions.put(promotionId, amount);
 			return this;
 		}
 		
 		public IssueBuilder addPromotion(Promotion promotion){
-			if(!promotions.containsElement(promotion.getId())){
-				promotions.add(promotion.getId());
-			}
-			return this;
+			return addPromotion(promotion.getId(), 1);
 		}
 		
-		public IssueBuilder setPromotions(List<Promotion> promotions){
-			this.promotions.clear();
-			for(Promotion each : promotions){
-				this.promotions.add(each.getId());
-			}
+		public IssueBuilder addPromotion(Promotion promotion, int amount){
+			promotions.put(promotion.getId(), amount);
 			return this;
 		}
 		
@@ -688,9 +688,9 @@ public class Coupon implements Jsonable{
 		
 		if(flag == COUPON_JSONABLE_COMPLEX){
 			jm.putJsonable("promotion", this.promotion, 0);
-			jm.putJsonable("drawProgress", getDrawProgress(), 0);			
 			jm.putJsonable("couponType", this.couponType, CouponType.COUPON_TYPE_JSONABLE_COMPLEX);
 		}else if(flag == COUPON_JSONABLE_SIMPLE){
+			jm.putJsonable("promotion", this.promotion, 0);
 			jm.putJsonable("couponType", this.couponType, CouponType.COUPON_TYPE_JSONABLE_SIMPLE);
 		}else if(flag == COUPON_JSONABLE_WITH_PROMOTION){
 			jm.putJsonable("promotion", this.promotion, 0);

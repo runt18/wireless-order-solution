@@ -545,7 +545,7 @@ public class OssImage implements Jsonable, Parcelable{
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putString("image", this.getObjectUrl());
-		jm.putString("thumbnail", this.hasThumbnail()? this.thumbnail.getObjectUrl():"");
+		jm.putString("thumbnail", this.hasThumbnail() ? this.thumbnail.getObjectUrl() : "");
 		jm.putInt("imageId", this.getId());
 		return jm;
 	}
