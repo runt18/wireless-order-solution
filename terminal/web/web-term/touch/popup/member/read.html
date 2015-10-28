@@ -39,7 +39,7 @@
 	    		</td>
 	    		<td><label id="defaultDiscount_label_memberRead" data-value="" class="readMemberTdValue">----</label></td>
 	    		<td>
-	    			<a data-role="button" id="link_payment_popupPricePlanCmp4Member" data-iconpos="right" data-icon="arrow-r" onclick="readMemberWinToSelectPricePlan()"><div>选择价格方案</div></a>
+	    			<a data-role="button" id="selectPlanPrice_a_memberRead" data-iconpos="right" data-icon="arrow-r"><div>选择价格方案</div></a>
 	    		</td>
 	    		<td><label id="defaultPricePlan_label_memberRead" data-value="" class="readMemberTdValue">----</label></td> 
 	    	</tr>   
@@ -49,9 +49,18 @@
 				 <a id="confirm_a_memberRead" data-role="button" data-inline="true" class="countPopbottomBtn">确定</a>
 				 <a id="cancel_a_memberRead" data-role="button" data-inline="true" class="countPopbottomBtn">取消</a>		 
 			 </div>
+			 
+			 <div id="discounts_div_memberRead" data-theme="d" class="payment_popupDiscountCmp4Member" style="margin-top:-60px;margin-left:5px;display:none;">
+			 	<div style="width:80%;background:white;opacity:0" ></div>
+	    		<ul id="eachDiscount_ul_memberRead" data-role="listview" data-inset="true" style="display:none;width:20% ;opacity:1;position: relative;" data-theme="b" ></ul>
+	    	</div>
+	    	
+	    	 <div id="pricePlan_div_memberRead" data-theme="d" class="payment_popupDiscountCmp4Member" style="margin-top:-60px;margin-left:290px;display:none;">
+			 	<div style="width:70%;background:white;opacity:0" ></div>
+	    		<ul id="eachPricePlan_ul_memberRead" data-role="listview" data-inset="true" style="display:none;width:30% ;opacity:1;position: relative;" data-theme="b" ></ul>
+	    	</div>
 	    </div>
-		<div id="discounts_div_memberRead" data-theme="d" class="payment_popupDiscountCmp4Member">
-	    	<ul id="eachDiscount_ul_memberRead" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>
-	    </div>
+	    
 	</div>		
+		
 </body>

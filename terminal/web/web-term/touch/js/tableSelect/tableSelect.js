@@ -570,6 +570,18 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 	$('#personSettle_a_tableSelect').click(function(){
 		dailyHandler(CommitTypeEnum.Person);
 	});
+	
+	//快速发券
+	$('#fastIssue_a_tableSelect').click(function(){
+		$('#frontPageMemberOperation').popup('close');
+		console.log('click success');
+		setTimeout(function(){
+			var fastIssuePopup = new MemberReadPopup();
+			fastIssuePopup.open(function(){
+				console.log('open success');
+			});
+		}, 200);
+	});
 });
 
 

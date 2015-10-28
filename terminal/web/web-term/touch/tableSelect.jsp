@@ -56,6 +56,8 @@
 <script type="text/javascript" src="./js/popup/coupon/issuePopup.js?v=<%=v %>"></script>
 <!-- usepopup弹出控件 -->
 <script type="text/javascript" src="./js/popup/coupon/usePopup.js?v=<%=v %>"></script>
+<!-- 会员读取弹出控件 -->
+<script type="text/javascript" src="./js/popup/member/read.js"></script>
 <!--引入易笔字核心脚本(utf-8编码)-->
 <!-- <script src="http://www.yibizi.com/ybz_core/core/ybz.min.js"></script> -->
 
@@ -99,6 +101,8 @@
 			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberConsumeDetailWin()"><a >消费明细</a></li>
 			<li class="popupButtonList" onclick="ts.member.openWeixinMemberFrontBind()"><a >微信会员绑定</a></li>
+			<li class="popupButtonList" id="fastIssue_a_tableSelect"><a >快速发券</a></li>
+			<li class="popupButtonList" onclick="ts.member.openWeixinMemberFrontBind()"><a >快速用券</a></li>
 		</ul>
 	</div>	
 	

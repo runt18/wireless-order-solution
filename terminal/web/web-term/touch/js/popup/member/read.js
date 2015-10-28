@@ -9,6 +9,7 @@ function MemberReadPopup(param){
 	var _self = this;
 	var _member = null;
 	var _selectedDiscount = null;
+	var _selectedPricePlan = null;
 	
 	var _popupInstance = null;
 	_popupInstance = new JqmPopup({
@@ -19,11 +20,8 @@ function MemberReadPopup(param){
 			self.find('[id=read_a_memberRead]').buttonMarkup("refresh");
 			$('#selectDiscount_a_memberRead').attr("data-theme", "e");
 			$('#selectDiscount_a_memberRead').buttonMarkup("refresh");
-			$('#link_payment_popupPricePlanCmp4Member').attr("data-theme", "e");
-			$('#link_payment_popupPricePlanCmp4Member').buttonMarkup("refresh");
-			$('#link_payment_popupCouponCmp4Member').attr("data-theme", "e");
-			$('#link_payment_popupCouponCmp4Member').buttonMarkup("refresh");	
-			
+			$('#selectPlanPrice_a_memberRead').attr("data-theme", "e");
+			$('#selectPlanPrice_a_memberRead').buttonMarkup("refresh");
 			//取消按钮
 			self.find('[id=cancel_a_memberRead]').click(function(){
 				_self.close();
@@ -135,7 +133,7 @@ function MemberReadPopup(param){
 		self.find('[id=defaultDiscount_label_memberRead]').text(member.memberType.discount.name);
 		self.find('[id=defaultDiscount_label_memberRead]').attr('data-value', member.memberType.discount.id);
 		_selectedDiscount = member.memberType.discount;
-		
+	
 		var discounts = member.memberType.discounts;
 		
 		var discountHtml = '', pricePlanHtml = '';
@@ -146,7 +144,10 @@ function MemberReadPopup(param){
 		self.find('[id=eachDiscount_ul_memberRead] .popupButtonList').each(function(index, element){
 			element.onclick = function(){
 				_selectedDiscount = discounts[($(element).attr('data-index'))];
-			}
+				self.find('[id=defaultDiscount_label_memberRead]').text($(element).text());
+				self.find('[id=eachDiscount_ul_memberRead]').hide();
+				
+			};
 		});
 		
 		//选择折扣方案
@@ -158,12 +159,26 @@ function MemberReadPopup(param){
 		var pricePlans = member.memberType.pricePlans;
 		if(pricePlans.length > 0){
 			self.find('[id=defaultPricePlan_label_memberRead]').text(member.memberType.pricePlan.name);
+			_selectedPricePlan = member.memberType.pricePlan;
 			self.find('[id=defaultPricePlan_label_memberRead]').attr('data-value', member.memberType.pricePlan.id);
 			for (var i = 0; i < pricePlans.length; i++) {
-				pricePlanHtml += '<li data-icon="false" class="popupButtonList" onclick="chooseMemberPricePlan({id:'+ pricePlans[i].id +',name:\''+ pricePlans[i].name +'\'})"><a >'+ pricePlans[i].name +'</a></li>';
+				pricePlanHtml += '<li data-icon="false" class="popupButtonList" data-index="' + i + '" ><a>'+ pricePlans[i].name +'</a></li>';
 			}
-			self.find('[id=payment_pricePlanList4Member]').html(pricePlanHtml).trigger('create');
+			self.find('[id=eachPricePlan_ul_memberRead]').html(pricePlanHtml).trigger('create');
+			
+			self.find('[id=eachPricePlan_ul_memberRead] .popupButtonList').each(function(index, element){
+				element.onclick = function(){
+					_selectedPricePlan = pricePlans[($(element).attr('data-index'))];
+					self.find('[id=defaultPricePlan_label_memberRead]').text($(element).text());
+					self.find('[id=eachPricePlan_ul_memberRead]').hide();
+				}
+			});
 		}
+		
+		//选择价格方案
+		self.find('[id=selectPlanPrice_a_memberRead]').click(function(){
+			readMemberWinToSelectPricePlan(self);
+		});
 		
 		_member = member;
 	}
@@ -171,14 +186,18 @@ function MemberReadPopup(param){
 	function readMemberWinToSelectDiscount(self){
 		//$('#discounts_div_memberRead').popup().popup('open');
 		self.find('[id=discounts_div_memberRead]').show();
-		self.find('[id=discounts_div_memberRead]').css({top:$('#selectDiscount_a_memberRead').position().top - 270, left:$('#selectDiscount_a_memberRead').position().left-300});
+		self.find('[id=eachDiscount_ul_memberRead]').show();
+		self.find('[id=pricePlan_div_memberRead]').hide();
+		self.find('[id=eachPricePlan_ul_memberRead]').hide();
 		self.find('[id=eachDiscount_ul_memberRead]').listview().listview('refresh');	
 	}
 
-	function readMemberWinToSelectPricePlan(){
-		$('#payment_popupPricePlanCmp4Member').popup().popup('open');
-		$('#payment_popupPricePlanCmp4Member').css({top:$('#link_payment_popupPricePlanCmp4Member').position().top - 270, left:$('#link_payment_popupPricePlanCmp4Member').position().left-300});
-		$('#payment_pricePlanList4Member').listview().listview('refresh');	
+	function readMemberWinToSelectPricePlan(self){
+		self.find('[id=pricePlan_div_memberRead]').show();
+		self.find('[id=eachPricePlan_ul_memberRead]').show();
+		self.find('[id=discounts_div_memberRead]').hide();
+		self.find('[id=eachDiscount_ul_memberRead]').hide();
+		self.find('[id=eachPricePlan_ul_memberRead]').listview().listview('refresh');
 	}
 }
 
