@@ -4,7 +4,6 @@ function UseCouponPopup(param){
 		header : '',		//头部信息
 		useMode : null,		//使用类型
 		useTo : '',			//对象的使用
-		useCoupon : '',		//使用的优惠券
 		useComment : '',	//备注
 		orderId : '',  		//账单id,在useMode是Order时使用
 		useCuoponMethod : function(){}	//优惠券使用的回调函数
@@ -38,10 +37,14 @@ function UseCouponPopup(param){
 
 			});
 		}else{
-			$.post('../OperateCoupon.do',  {dataSource : 'getByCond', memberId : param.useTo}, function(response, status, xhr){
-				if(response.success && response.root.length > 0){
-					availableCoupons = availableCoupons.concat(response.root);
+			$.post('../OperateCoupon.do',  {dataSource : 'getByCond',status : 'issued', memberId : param.useTo}, function(response, status, xhr){
+				if(response.success){
+					if(response.root.length > 0){
+						availableCoupons = availableCoupons.concat(response.root);
+					}
 					createPopup(availableCoupons, afterOpen);
+				}else{
+					alert(response.msg);
 				}
 			});
 		}

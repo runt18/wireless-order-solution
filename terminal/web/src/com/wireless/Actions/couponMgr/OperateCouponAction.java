@@ -167,13 +167,13 @@ public class OperateCouponAction extends DispatchAction{
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		final String useMode = request.getParameter("useMode");
 		//final String useAssociateId = request.getParameter("useAssociateId");
-		final String memberId = request.getParameter("memberId");
+		final String useTo = request.getParameter("useTo");
 		final String coupons = request.getParameter("coupons");
 		
 		JObject jobject = new JObject();
 		try{
 			if(Coupon.UseMode.valueOf(Integer.parseInt(useMode)) == Coupon.UseMode.FAST){
-				Coupon.UseBuilder builder = Coupon.UseBuilder.newInstance4Fast(Integer.parseInt(memberId));
+				Coupon.UseBuilder builder = Coupon.UseBuilder.newInstance4Fast(Integer.parseInt(useTo));
 				if(coupons != null && !coupons.isEmpty()){
 					for(String couponId : coupons.split(",")){
 						builder.addCoupon(Integer.parseInt(couponId));
