@@ -65,28 +65,6 @@ var tables = [],
 		'</div>'+
 	'</a>',
 	
-	payment_searchMemberTypeTemplet = '<div data-role="popup" id="payment_searchMemberType" data-theme="d" class="payment_searchMemberType">'+
-	'<ul id="payment_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
-	'<li data-role="divider" data-theme="e" style="line-height: 30px;">选择号码来源:</li>'+
-	'<li  class="popupButtonList" onclick="readMemberByCondtion(1)"><a >手机卡</a></li>'+
-	'<li  class="popupButtonList" onclick="readMemberByCondtion(3)"><a >会员实体卡</a></li>'+
-	'<li  class="popupButtonList" onclick="readMemberByCondtion(2)"><a >微信卡</a></li>'+
-	'</ul></div>', 
-	
-	payment_popupDiscountCmp4MemberTemplet = '<div data-role="popup" id="payment_popupDiscountCmp4Member" data-theme="d" class="payment_popupDiscountCmp4Member">'+
-	    		'<ul id="payment_discountList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>'+
-	    	'</div>',
-	
-	payment_popupPricePlanCmp4MemberTemplet = '<div data-role="popup" id="payment_popupPricePlanCmp4Member" data-theme="d" class="payment_popupPricePlanCmp4Member">'+
-			    '<ul id="payment_pricePlanList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
-			'</ul></div>',
-	
-	payment_popupCouponCmp4MemberTemplet = '<div data-role="popup" id="payment_popupCouponCmp4Member" data-theme="d" class="payment_popupCouponCmp4Member">'+
-				'<ul id="payment_couponList4Member" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">'+
-			'</ul></div>',
-	
-
-	
 	//会员消费明细
 	memberConsumeTrTemplet = '<tr>'
 			+ '<td>{dataIndex}</td>'

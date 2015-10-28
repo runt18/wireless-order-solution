@@ -109,10 +109,6 @@ function MemberReadPopup(param){
 						$('#selectSearch_div_memberRead').hide();
 						$('#eachSearch_ul_memberRead').hide();
 					}else if(jr.root.length > 1){
-//						//FIXME
-//						$('#payment_searchMemberType').popup().popup('open');
-//						$('#payment_searchMemberType').css({top:$('#btnReadMember').position().top - 270, left:$('#btnReadMember').position().left-300});
-//						$('#payment_searchMemberTypeCmp').listview().listview('refresh');
 						$('#selectSearch_div_memberRead').show();
 						$('#eachSearch_ul_memberRead').show();
 						$('#eachSearch_ul_memberRead').find('.popupButtonList').each(function(index, element){
@@ -137,7 +133,7 @@ function MemberReadPopup(param){
 //						}});
 						Util.msg.alert({msg : '该会员信息不存在, 请重新输入条件后重试', topTip : true});
 						setTimeout(function(){
-							memberInfo.focus();
+							memberInfo.select();
 						}, 200);
 					}
 				}else{

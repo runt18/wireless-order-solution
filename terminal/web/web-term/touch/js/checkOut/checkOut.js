@@ -97,9 +97,6 @@ uo.entry = function(c){
 		$('#uo_btnCheckoutBook').hide();
 	}	
 	
-	//设置会员动态popup控件
-	uo.setMemberReadCmp();
-	
 };
 	
 /**
@@ -268,7 +265,7 @@ uo.showDescForUpdateOrder = function(){
 		}
 	}
 	
-	html = (uo.order.couponPrice > 0 ?'<span style = "margin-left: 20px;">当前优惠劵：<font color="green">' + uo.order.coupon.length + '张, 共¥' + uo.order.couponPrice + '</font></span>' : '') + 
+	html = (uo.order.couponPrice > 0 ?'<span style = "margin-left: 20px;">使用优惠劵：<font color="green">' + uo.order.coupon.length + '张, 共¥' + uo.order.couponPrice + '</font></span>' : '') + 
 		memberSpan +
 		(uo.order.discount?"<span style = 'margin-left: 20px;'>当前折扣：<font color='green'>" + uo.order.discount.name +"</font></span>" : "") +
 		(uo.order.discounter ? "<span style = 'margin-left: 20px;'>折扣人：<font color='green'>" + uo.order.discounter + "</font></span><span style = 'margin-left: 20px;'>折扣时间：<font color='green'>" + uo.order.discountDate + "</font></span>" : "") ;
@@ -293,40 +290,6 @@ uo.getTotalPriceUO = function(){
 	return totalPriceUO;
 };
 
-//设置会员动态popup控件
-uo.setMemberReadCmp = function(){
-	//会员信息来源
-	if($('#paymentMgr .payment_searchMemberType').length > 0){
-		$('#paymentMgr .payment_searchMemberType').remove();
-	}	
-	if($('#orderFoodListMgr .payment_searchMemberType').length == 0){
-		$('#orderFoodListMgr').append(payment_searchMemberTypeTemplet);
-	}	
-	
-	//折扣
-	if($('#paymentMgr .payment_popupDiscountCmp4Member').length > 0){
-		$('#paymentMgr .payment_popupDiscountCmp4Member').remove();
-	}	
-	if($('#orderFoodListMgr .payment_popupDiscountCmp4Member').length == 0){
-		$('#orderFoodListMgr').append(payment_popupDiscountCmp4MemberTemplet);
-	}
-	
-	//价格方案
-	if($('#paymentMgr .payment_popupPricePlanCmp4Member').length > 0){
-		$('#paymentMgr .payment_popupPricePlanCmp4Member').remove();
-	}	
-	if($('#orderFoodListMgr .payment_popupPricePlanCmp4Member').length == 0){
-		$('#orderFoodListMgr').append(payment_popupPricePlanCmp4MemberTemplet);
-	}	
-	
-	//优惠劵
-	if($('#paymentMgr .payment_popupCouponCmp4Member').length > 0){
-		$('#paymentMgr .payment_popupCouponCmp4Member').remove();
-	}	
-	if($('#orderFoodListMgr .payment_popupCouponCmp4Member').length == 0){
-		$('#orderFoodListMgr').append(payment_popupCouponCmp4MemberTemplet);
-	}		
-};
 
 /**
  * 返回
