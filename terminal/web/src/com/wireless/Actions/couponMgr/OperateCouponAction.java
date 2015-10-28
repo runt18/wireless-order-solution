@@ -153,6 +153,39 @@ public class OperateCouponAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 快速用券
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward coupon(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String useMode = request.getParameter("useMode");
+		//final String useAssociateId = request.getParameter("useAssociateId");
+		final String memberId = request.getParameter("memberId");
+		
+		JObject jobject = new JObject();
+		try{
+			if(Coupon.UseMode.valueOf(Integer.parseInt(useMode)) == Coupon.UseMode.FAST){
+				CouponDao.use(staff, Coupon.UseBuilder.newInstance4Fast(Integer.parseInt(memberId)));
+			}else{
+				throw new BusinessException("优惠券使用方法必须是快速使用");
+			}
+			
+		}catch(BusinessException | SQLException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
 	public ActionForward draw(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		String couponId = request.getParameter("couponId");
 		
