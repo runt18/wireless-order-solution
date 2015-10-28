@@ -242,7 +242,7 @@ function loadOrderBasicMsg(){
 				
 				$('#orderMemberDesc').html(memberSpan);
 			}
-		});
+		}, 'json');
 	}else{
 		member4Payment = null;
 		member4Display = null;
@@ -1272,28 +1272,6 @@ $(function(){
 			$('#mixedPayWin').popup('close');
 		});
 		
-		//FIXME 抹数框输入时
-//		$('#erasePrice_input_payment').focus(function(){
-//			focusInput = this.id;
-//			usedEraseQuota = false;
-//			mouseOutNumKeyboard = true;
-//			$('#numberKeyboard').show();	
-//			//设置数字键盘触发
-//			numKeyBoardFireEvent = function (){
-//				$('#erasePrice_input_payment').keyup();
-//			};
-//			
-//			$('#calculator4NumberKeyboard').on("mouseover", function(){
-//				usedEraseQuota = false;
-//				mouseOutNumKeyboard = false;
-//			});
-//			
-//			$('#calculator4NumberKeyboard').on("mouseout", function(){
-//				usedEraseQuota = true;
-//				mouseOutNumKeyboard = true;
-//			});			
-//		});	
-		
 		//抹数联动
 		$('#erasePrice_input_payment').on('keyup', function(){
 			var eraseQuota = $('#erasePrice_input_payment').val();
@@ -1341,14 +1319,56 @@ $(function(){
 						}else{
 							Util.msg.tip(response.msg);
 						}
-					});
+					}, 'json');
 					
 				}
 			});
 			useCouponPopup.open();
 		});
 		
-		
+		//会员
+		$('#memberRead_a_payment').click(function(){
+			var memberReadPopup = null;
+			memberReadPopup = new MemberReadPopup({
+				confirm : function(member, discount, pricePlan){
+					Util.LM.show();
+					
+					$.post('../OperateDiscount.do', {
+						dataSource : 'setDiscount',
+						orderId : orderMsg.id,
+						memberId : member.id,
+						discountId : discount.id,
+						pricePlan : pricePlan.id
+						
+					}, function(data){
+						Util.LM.hide();
+						if(data.success){
+							
+							//FIXME 设置当前查出会员为注入成功状态
+							member4Payment = member;
+							member4Payment.hadSet = true;
+							member4Display = Util.clone(member4Payment);
+							
+							//刷新账单
+							refreshOrderData();
+							
+							Util.msg.alert({topTip : true, msg : '会员注入成功'});	
+							
+							//关闭会员读取Popup
+							memberReadPopup.close();
+							
+						}else{
+							Util.msg.alert({
+								msg : '使用会员失败</br>' + data.msg, 
+								topTip : true
+							});					
+						}
+					}, 'json');		
+				}
+			});
+			//打开会员读取Popup
+			memberReadPopup.open();
+		});
 		
 	});
 	
