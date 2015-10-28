@@ -30,9 +30,8 @@ import com.wireless.pojo.util.DateUtil;
 
 public class QueryOrderStatisticsAction extends Action {
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		List<Order> list = null;
 		List<Order> totalList = null;

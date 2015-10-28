@@ -186,6 +186,8 @@ public class OperatePromotionAction extends DispatchAction{
 	}	
 	
 	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		response.setContentType("text/json; charset=utf-8");
+		//System.out.println(response.getContentType());
 		
 		String pin = (String) request.getAttribute("pin");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -358,7 +360,7 @@ public class OperatePromotionAction extends DispatchAction{
 		
 	}	
 	
-	private String children(Staff staff, PromotionDao.ExtraCond extra) throws SQLException{
+	private String children(Staff staff, PromotionDao.ExtraCond extra) throws SQLException, BusinessException{
 		List<Promotion> promotions = PromotionDao.getByCond(staff, extra);
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < promotions.size(); i++) {
