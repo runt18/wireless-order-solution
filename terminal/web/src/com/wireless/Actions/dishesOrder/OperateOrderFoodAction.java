@@ -51,10 +51,11 @@ public class OperateOrderFoodAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			Order.CouponBuilder builder = new Order.CouponBuilder(Integer.parseInt(orderId));
-			for(String couponId : coupons.split(",")){
-				builder.addCoupon(Integer.parseInt(couponId));
-			}
-			
+			if(coupons != null && !coupons.isEmpty()){
+				for(String couponId : coupons.split(",")){
+					builder.addCoupon(Integer.parseInt(couponId));
+				}
+			}			
 			OrderDao.coupon(staff, builder);
 			
 		}catch(BusinessException | SQLException e){

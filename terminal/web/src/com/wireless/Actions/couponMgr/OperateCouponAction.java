@@ -76,7 +76,7 @@ public class OperateCouponAction extends DispatchAction{
 			jObject.initTip(e);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jObject.toString());
+			response.getWriter().print(jObject.toString(Coupon.COUPON_JSONABLE_SIMPLE));
 		}
 		return null;
 	}
@@ -101,36 +101,38 @@ public class OperateCouponAction extends DispatchAction{
 		String orderId = request.getParameter("orderId");
 		String comment = request.getParameter("comment");
 		
-		Coupon.IssueBuilder builder = null;
-		
-		if(issueMode == Coupon.IssueMode.FAST){
-			builder = Coupon.IssueBuilder.newInstance4Fast();
-			
-		}else if(issueMode == Coupon.IssueMode.ORDER){
-			builder = Coupon.IssueBuilder.newInstance4Order(Integer.parseInt(orderId));
-			
-		}else if(issueMode == Coupon.IssueMode.WX_SUBSCRIBE){
-			builder = Coupon.IssueBuilder.newInstance4WxSubscribe();
-			
-		}
-		
-		//设置发放备注
-		if(comment != null && !comment.isEmpty()){
-			builder.setComment(comment);
-		}
-		
-		//设置发放的优惠券类型
-		for(String promotionId : promotions.split(",")){
-			builder.addPromotion(Integer.parseInt(promotionId));
-		}
-		
-		//设置优惠券的发放对象
-		for(String memberId : members.split(",")){
-			builder.addMember(Integer.parseInt(memberId));
-		}
-		
 		JObject jobject = new JObject();
 		try{
+			Coupon.IssueBuilder builder = null;
+			
+			if(issueMode == Coupon.IssueMode.FAST){
+				builder = Coupon.IssueBuilder.newInstance4Fast();
+				
+			}else if(issueMode == Coupon.IssueMode.ORDER){
+				builder = Coupon.IssueBuilder.newInstance4Order(Integer.parseInt(orderId));
+				
+			}else if(issueMode == Coupon.IssueMode.WX_SUBSCRIBE){
+				builder = Coupon.IssueBuilder.newInstance4WxSubscribe();
+				
+			}
+			
+			//设置发放备注
+			if(comment != null && !comment.isEmpty()){
+				builder.setComment(comment);
+			}
+			
+			//设置发放的优惠券类型
+			for(String eachPromotion : promotions.split(";")){
+				int promotionId = Integer.parseInt(eachPromotion.split(",")[0]);
+				int amount = Integer.parseInt(eachPromotion.split(",")[1]);
+				builder.addPromotion(promotionId, amount);
+			}
+			
+			//设置优惠券的发放对象
+			for(String memberId : members.split(",")){
+				builder.addMember(Integer.parseInt(memberId));
+			}
+		
 			CouponDao.issue(staff, builder);
 			
 			jobject.initTip(true, "优惠券发放成功");

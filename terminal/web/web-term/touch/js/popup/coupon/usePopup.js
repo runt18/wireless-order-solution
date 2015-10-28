@@ -1,12 +1,13 @@
 function UseCouponPopup(param){
 	
 	param = param || {
-		header : '',	//头部信息
-		useMode : null,	//使用类型
-		useTo : '',		//对象的使用
-		useCoupon : '',	//使用的优惠券
+		header : '',		//头部信息
+		useMode : null,		//使用类型
+		useTo : '',			//对象的使用
+		useCoupon : '',		//使用的优惠券
 		useComment : '',	//备注
-		orderId : ''  //账单id
+		orderId : '',  		//账单id,在useMode是Order时使用
+		useCuoponMethod : function(){}	//优惠券使用的回调函数
 	};
 	
 	var _useCouponPopup = null;
@@ -16,16 +17,25 @@ function UseCouponPopup(param){
 		if(param.orderId){
 			//搜索账单已用的
 			$.post('../OperateCoupon.do',  {dataSource : 'getByCond', useMode : UseCouponPopup.UseMode.ORDER.mode, useAssociateId : param.orderId}, function(response, status, xhr){
-				if(response.success && response.root.length > 0){
-					availableCoupons = availableCoupons.concat(response.root);
-				}
-				//搜索会员可用的
-				$.post('../OperateCoupon.do',  {dataSource : 'getByCond', status : 'issued', memberId : param.useTo}, function(result){
-					if(result.success && result.root.length > 0){
-						availableCoupons = availableCoupons.concat(result.root);
-						createPopup(availableCoupons, afterOpen);
+				if(response.success){
+					if(response.root.length > 0){
+						availableCoupons = availableCoupons.concat(response.root);
 					}
-				});
+					//搜索会员可用的
+					$.post('../OperateCoupon.do',  {dataSource : 'getByCond', status : 'issued', memberId : param.useTo}, function(result){
+						if(result.success){
+							if(result.root.length > 0){
+								availableCoupons = availableCoupons.concat(result.root);
+							}
+							createPopup(availableCoupons, afterOpen);
+						}else{
+							alert(result.msg);
+						}
+					});
+				}else{
+					alert(response.msg);
+				}
+
 			});
 		}else{
 			$.post('../OperateCoupon.do',  {dataSource : 'getByCond', memberId : param.useTo}, function(response, status, xhr){
@@ -94,5 +104,5 @@ function UseCouponPopup(param){
 
 UseCouponPopup.UseMode = {
 	FAST : { mode : 1, desc : '快速' },
-	ORDER : { mode : 2, desc : '账单' },
+	ORDER : { mode : 2, desc : '账单' }
 };

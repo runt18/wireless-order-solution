@@ -1337,6 +1337,7 @@ $(function(){
 						if(response.success){
 							Util.msg.tip('使用成功!');
 							useCouponPopup.close();
+							refreshOrderData();
 						}else{
 							Util.msg.tip(response.msg);
 						}

@@ -209,16 +209,6 @@ public class QueryMemberAction extends DispatchAction {
 				}
 			}			
 			
-			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
-			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-/*			if(isPaging != null && isPaging.trim().equals("true")){
-				countSet = new HashMap<Object, Object>();
-				countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-				jobject.setTotalProperty(MemberDao.getMemberCount(countSet));
-				// 分页
-				orderClause += " LIMIT " + start + "," + limit;
-			}*/
 			list = MemberDao.getByCond(staff, extraCond, orderClause);
 			List<Member> newList = new ArrayList<Member>(list);  
 			if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty()){
