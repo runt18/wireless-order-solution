@@ -1665,6 +1665,50 @@ $(function(){
 		}
 	});
 	
+	$('#orderFoodListMgr').on('pageinit', function(){
+		//会员
+		$('#memberRead_a_orderFood').click(function(){
+			var memberReadPopup = null;
+			memberReadPopup = new MemberReadPopup({
+				confirm : function(member, discount, pricePlan){
+					Util.LM.show();
+					
+					$.post('../OperateDiscount.do', {
+						dataSource : 'setDiscount',
+						orderId : uo.order.id,
+						memberId : member.id,
+						discountId : discount.id,
+						pricePlan : pricePlan.id
+						
+					}, function(data){
+						Util.LM.hide();
+						if(data.success){
+							
+							//异步刷新账单
+							initOrderData({table : uo.table});
+							
+							Util.msg.alert({topTip : true, msg : '会员注入成功'});	
+							
+							//关闭会员读取Popup
+							memberReadPopup.close();
+							
+						}else{
+							Util.msg.alert({
+								msg : '使用会员失败</br>' + data.msg, 
+								topTip : true
+							});					
+						}
+					}, 'json');		
+				}
+			});
+			//打开会员读取Popup
+			memberReadPopup.open();
+		})
+	});
+	
 });
+
+
+
 
 

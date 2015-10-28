@@ -855,14 +855,6 @@ window.onload = function(){
 	//渲染完善会员资料窗口
 //	$('#finishMemberInfo').trigger('create').trigger('refresh');		
 	
-	//会员读卡
-    $('#txtMemberInfo4Read').on('keypress',function(event){
-        if(event.keyCode == "13")    
-        {
-        	readMemberByCondtion();
-        }
-    });		
-	
 	//找零快捷键
     $('#txtInputRecipt').on('keypress',function(event){
         if(event.keyCode == "13")    

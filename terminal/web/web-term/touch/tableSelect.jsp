@@ -58,9 +58,6 @@
 <script type="text/javascript" src="./js/popup/coupon/usePopup.js?v=<%=v %>"></script>
 <!-- 会员读取弹出控件 -->
 <script type="text/javascript" src="./js/popup/member/read.js"></script>
-<!--引入易笔字核心脚本(utf-8编码)-->
-<!-- <script src="http://www.yibizi.com/ybz_core/core/ybz.min.js"></script> -->
-
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -988,7 +985,7 @@
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loadOrderDetail();lookupOrderDetailByType('detail_all');">明细</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#popupDiscountCmp">折扣</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.transTableForTS()">转台</a>
-			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="openReadMemberByCondtionWin()">会员</a>
+			<a data-role="button" data-inline="true" class="bottomBtnFont" id="memberRead_a_orderFood">会员</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#updateFoodOtherOperateCmp" onclick="uo.openMoreOperate()">更多</a>
 			<a href="javascript: Util.to.scroll({content:'orderFoodListCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
 			<a href="javascript: Util.to.scroll({content:'orderFoodListCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>		 
@@ -2045,64 +2042,5 @@
     </div>
 </div>	
 <!-- end 结账明细控件 -->
-
-<!-- 系统共用会员读取控件 start -->
-<div id="readMemberWin" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 180px; left: 50%;min-width:800px; margin: -100px 0px 0px -400px;display: none;background-color: white;" align="center">	
-    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
-        	输入条件查找会员
-    </div>  
-    <table>
-	    <tr>
-	    	<td></td>
-	    	<td colspan="3">
-	    		<input placeholder="手机号/卡号/微信卡号" data-type="num" style="font-size:20px;font-weight: bold;" id="txtMemberInfo4Read">
-	    	</td>
-	    	<td>
-	    		<a data-role="button" id="btnReadMember" class="numberInputStyle" onclick="readMemberByCondtion()">读取会员</a>
-	    	</td>
-	    	<td></td>
-	    </tr>
-    	<tr>
-    		<td class="readMemberTd">会员名称:</td>
-    		<td class="readMemberTdValue"><label id="payment4MemberName">----</label></td>
-    		<td class="readMemberTd">会员余额:</td>
-    		<td class="readMemberTdValue"><label id="payment4MemberBalance">----</label></td>    	
-    		<td class="readMemberTd">会员手机:</td>
-    		<td class="readMemberTdValue"><label id="payment4MemberPhone">----</label></td>       			
-    	</tr>
-    	<tr>
-    		<td class="readMemberTd">会员类型:</td>
-    		<td class="readMemberTdValue"><label id="payment4MemberType">----</label></td>
-    		<td class="readMemberTd">会员积分:</td>
-    		<td class="readMemberTdValue"><label id="payment4MemberPoint">----</label></td>   
-    		<td class="readMemberTd">会员卡号:</td>
-    		<td class="readMemberTdValue"><label id="payment4MemberCard">----</label></td>     		   		
-    	</tr> 
-    	<tr>
-    		<td>
-    			<a data-role="button" id="link_payment_popupDiscountCmp4Member" data-iconpos="right" data-icon="arrow-r" onclick="readMemberWinToSelectDiscount()"><div>选择折扣方案</div></a>
-    		</td>
-    		<td><label id="payment4MemberDiscount" data-value="" class="readMemberTdValue">----</label></td>
-    		<td>
-    			<a data-role="button" id="link_payment_popupPricePlanCmp4Member" data-iconpos="right" data-icon="arrow-r" onclick="readMemberWinToSelectPricePlan()"><div>选择价格方案</div></a>
-    		</td>
-    		<td><label id="payment4MemberPricePlan" data-value="" class="readMemberTdValue">----</label></td> 
-    		<td>
-    			<a data-role="button" id="link_payment_popupCouponCmp4Member" data-iconpos="right" data-icon="arrow-r" onclick="readMemberWinToSelectCoupon()"><div>选择优惠劵</div></a>
-    		</td>
-    		<td><label id="payment4MemberCoupon" data-value="" class="readMemberTdValue">----</label></td>     		   		
-    	</tr>   
-    </table>
-	<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
-		 <div data-role="controlgroup" data-corners="false" data-type="horizontal" class="bottomBarFullWidth ui-bar-b barBottomBeCorner">
-			 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="setMemberToOrder()">确定</a>
-			 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="closeReadMemberByCondtionWin()">取消</a>		 
-		 </div>
-    </div>	
- </div>	
-<!-- end 会员读取窗口--> 
-
 </body>
-
-<!-- <script language="JavaScript" src="http://code.54kefu.net/kefu/js/b150/852550.js" type="text/javascript" charset="utf-8"></script> -->
 </html>
