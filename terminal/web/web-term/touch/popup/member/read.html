@@ -3,13 +3,13 @@
 </head>
 <body>
 	<div id="container_div_memberRead" data-role="popup" data-dismissible="false" class="ui-overlay-shadow ui-corner-all" style="margin-top:-20%;max-width:900px;min-width:800px; background-color: white;">	
-	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
+	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 50px;">
 	        	输入条件查找会员
 	    </div>  
 	    <table>
 		    <tr>
 		    	<td></td>
-		    	<td colspan="3">
+		    	<td colspan="2">
 		    		<input id="fuzzy_input_memberRead" placeholder="手机号/卡号/微信卡号" data-type="num" style="font-size:20px;font-weight: bold;">
 		    	</td>
 		    	<td>
@@ -44,6 +44,9 @@
 	    		<td><label id="defaultPricePlan_label_memberRead" data-value="" class="readMemberTdValue">----</label></td> 
 	    	</tr>   
 	    </table>
+	    
+	  
+	    	
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
 			 <div data-role="controlgroup" data-corners="false" data-type="horizontal" class="bottomBarFullWidth ui-bar-b barBottomBeCorner">
 				 <a id="confirm_a_memberRead" data-role="button" data-inline="true" class="countPopbottomBtn">确定</a>
@@ -59,6 +62,17 @@
 			 	<div style="width:70%;background:white;opacity:0" ></div>
 	    		<ul id="eachPricePlan_ul_memberRead" data-role="listview" data-inset="true" style="display:none;width:30% ;opacity:1;position: relative;" data-theme="b" ></ul>
 	    	</div>
+	    	
+	    	  <!-- 选择搜索方式 -->
+	    	 <div id="selectSearch_div_memberRead" data-theme="d" class="payment_popupDiscountCmp4Member" style="display:none;margin-top:-235px;margin-left:450px;">
+			 	<div style="width:70%;background:white;opacity:0" ></div>
+	    		<ul id="eachSearch_ul_memberRead" data-role="listview" data-inset="true" style="width:35% ;opacity:1;position: relative;display:none;" data-theme="b" >
+	    		<li data-icon="false" class="popupButtonList" data="selectSearchByTel" ><a>按电话号码</a></li>
+	    		<li data-icon="false" class="popupButtonList" data="selectSearchByWeixin"><a>按微信卡号</a></li>
+	    		<li data-icon="false" class="popupButtonList" data="selectSearchByNum"><a>按实体卡号</a></li>
+	    		</ul>
+    		</div>
+	    	
 	    </div>
 	    
 	</div>		
