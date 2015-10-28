@@ -107,7 +107,7 @@ public class CouponDao {
 		
 		public ExtraCond setUseMode(Coupon.UseMode mode, int associateId){
 			this.useMode = mode;
-			this.issueAssociateId = associateId;
+			this.useAssociateId = associateId;
 			return this;
 		}
 		
