@@ -998,7 +998,7 @@ public class OrderDao {
 	 * 			<li>the coupon does NOT exist
 	 */
 	public static void discount(DBCon dbCon, Staff staff, Order.DiscountBuilder builder) throws SQLException, BusinessException{
-
+		
 		final Discount discount;
 		final List<PricePlan> prices;
 		if(builder.hasMember()){
@@ -1029,6 +1029,12 @@ public class OrderDao {
 		}
 		
 		final Order order = OrderDao.getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
+
+		//Clear the coupons used before. 
+		if(order.hasCoupon()){
+			coupon(dbCon, staff, new Order.CouponBuilder(order.getId()));
+		}
+		
 		order.setDiscount(discount);
 		
 		if(prices != null){
@@ -1062,7 +1068,8 @@ public class OrderDao {
 				  " AND food_id = " + of.getFoodId() +
 				  (of.hasFoodUnit() ? " AND food_unit_id = " + of.getFoodUnit().getId() : "");
 			dbCon.stmt.executeUpdate(sql);				
-		}		
+		}	
+		
 	}
 	
 	/**
