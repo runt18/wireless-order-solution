@@ -1,15 +1,8 @@
 //结账界面数据对象
 var pm = {table : {}},
-	//折扣,服务费方案, 付款方式
-	discountData = [],  servicePlanData = [], payTypeData=[], restaurantData = [],
-	//加载显示账单基础信息
-	orderMsg = null,
-	
+ 
 	//筛选账单明细的条件
 	lookupCondtion = "true",
-	
-	//当前折扣 
-	calcDiscountID,
 	
 	//查询出来的菜品列表
 	orderFoodDetails = [],
@@ -44,410 +37,9 @@ pm.entry = function(c){
 	
 	location.href = "#paymentMgr";
 	
- 	loadSystemSettingData();
-	
- 	//加载账单信息
-	refreshOrderData({calc : false});
-	
-	//加载折扣
-	loadDiscountData();
-	
-	//加载服务费方案
-	loadServicePlanData();
-	
-	//加载混合结账付款方式
-	loadPayTypeData(); 
-	
 };
 
-//加载账单数据
-function refreshOrderData(_c){
-	Util.LM.show();
-	_c = _c || {};
-	$.ajax({
-		url : "../QueryOrderByCalc.do",
-		type : 'post',
-		data : {
-			tableID : pm.table.id,
-			orderID : orderMsg ? orderMsg.id : '',
-			calc : typeof _c.calc == 'boolean' ? _c.calc : true,
-			discountID : calcDiscountID,
-			customNum : pm.table.customNum
-		},
-		success : function(jr, status, xhr){
-			Util.LM.hide();
-			if(jr.success){
-				// 加载显示账单基础信息
-				orderMsg = jr.other.order;
-				
-				loadOrderBasicMsg();
-			}else{
-				Util.msg.alert({
-					msg : jr.msg,
-					renderTo : 'paymentMgr'
-				});
-				$('#lab_replaceBtn').show();
-			}
-		},
-		error : function(request, status, err){
-		}
-	}); 	
-	
-}
 
-/**
- * 显示账单信息
- */
-function loadOrderBasicMsg(){
-	//显示左边价钱
-	document.getElementById("totalPrice").innerHTML = checkDot(orderMsg.totalPrice)?parseFloat(orderMsg.totalPrice).toFixed(2) : orderMsg.totalPrice;
-	document.getElementById("actualPrice_td_payment").innerHTML = checkDot(orderMsg.actualPrice)?parseFloat(orderMsg.actualPrice).toFixed(2) : orderMsg.actualPrice;
-	document.getElementById("forFree").innerHTML = checkDot(orderMsg.giftPrice)?parseFloat(orderMsg.giftPrice).toFixed(2) : orderMsg.giftPrice;
-	document.getElementById("spanCancelFoodAmount").innerHTML = checkDot(orderMsg.cancelPrice)?parseFloat(orderMsg.cancelPrice).toFixed(2) : orderMsg.cancelPrice;
-	document.getElementById("discountPrice").innerHTML = checkDot(orderMsg.discountPrice)?parseFloat(orderMsg.discountPrice).toFixed(2) : orderMsg.discountPrice;
-	if(orderMsg.categoryValue != 4 && orderMsg.cancelPrice > 0){
-		$('#spanSeeCancelFoodAmount').show();	
-		$('#lab_replaceCancelBtn').hide();
-	}else{
-		$('#lab_replaceCancelBtn').show();
-		$('#spanSeeCancelFoodAmount').hide();
-	}	
-	
-	if(orderMsg.giftPrice > 0){
-		$('#spanSeeGiftFoodAmount').show();	
-		$('#lab_replaceGiftBtn').hide();
-	}else{
-		$('#lab_replaceGiftBtn').show();
-		$('#spanSeeGiftFoodAmount').hide();
-	}	
-	
-	if(orderMsg.discountPrice > 0){
-		$('#spanSeeDiscountFoodAmount').show();	
-		$('#lab_replaceDiscountBtn').hide();
-	}else{
-		$('#lab_replaceDiscountBtn').show();
-		$('#spanSeeDiscountFoodAmount').hide();
-	}		
-	
-	//清空抹数和备注
-	$('#erasePrice_input_payment').val('');
-	$('#remark').val('');
-	
-	//账单基础信息
-	$('#orderIdInfo').html('结账 -- 账单号:<font color="#f7c942">' + orderMsg.id + '</font> ' + (orderMsg.isWeixinOrder?'(<span id="showWeixinOrder" style="font-size:15px;font-weight:bold;color:green;text-decoration:underline">微信账单</span>)' : ''));
-	if(orderMsg.category != 4){
-		$('#orderTableInfo').html('餐桌号:<font color="#f7c942">' + orderMsg.table.alias + '</font>&nbsp;' + (pm.table.name?'<font color="#f7c942" >(' + pm.table.name +')</font>' :''));
-	}
-	document.getElementById('spanDisplayCurrentServiceRate').innerHTML = (orderMsg.serviceRate*100)+'%';
-	$('#orderCustomNum').html(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
-	$('#remark').val(orderMsg.comment && orderMsg.comment != '----' ? orderMsg.comment : '');
-	
-	//会员 & 折扣 & 优惠劵
-	var discountDesc = '当前折扣:<font style="color:green;font-weight:bold;">'+ orderMsg.discount.name + '</font>';
-	if(orderMsg.discounter){
-		discountDesc += ', 折扣人:<font style="color:green;font-weight:bold;">'+ orderMsg.discounter + '</font>';
-		discountDesc += ', 折扣时间:<font style="color:green;font-weight:bold;">'+ orderMsg.discountDate + '</font>';
-	}
-	$('#orderDiscountDesc').html(discountDesc);
-	
-	if(orderMsg.coupon.length > 0){
-		$('#orderCouponInfo').html('使用优惠券:<font style="color:green;font-weight:bold;">'+ orderMsg.coupon.length + '张, 共¥' + orderMsg.couponPrice + '</font>');
-	}else{
-		$('#orderCouponInfo').html('');
-	}
-	
-	orderMsg.member = null;
-	if(orderMsg.memberId && orderMsg.memberId > 0){
-		//设置会员结账按钮
-		$('#memberBalance_a_payment .ui-btn-text').html('会员余额');
-		$('#memberBalance_a_payment').buttonMarkup('refresh');
-		
-		//显示结账发券和用券按钮
-		$('#issueCoupon_a_orderFood').show();
-		$('#useCoupon_a_orderFood').show();
-		
-		$.post('../QueryMember.do', {dataSource : 'normal', id : orderMsg.memberId, forDetail : true}, function(result){
-			if(result.success){
-				
-				orderMsg.member = result.root[0];
-				
-				var memberSpan = "";
-				if(result.root[0].isRaw){
-					memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="text-decoration: underline;cursor: pointer;color:blue" onclick="ts.member.memberInfoBind(\'loadMemberBind4Payment\', \''+ result.root[0].name +'\')">' + result.root[0].name +"(点击绑定)</font></span>";
-				}else{
-					memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="color:green">' + result.root[0].name +"</font></span>";
-				}
-				
-				$('#memberInfo_span_payment').html(memberSpan);
-			}
-		}, 'json');
-	}else{
-		$('#memberInfo_span_payment').html('');
-		//设置会员结账按钮
-		$('#memberBalance_a_payment .ui-btn-text').html('读取会员');
-		$('#memberBalance_a_payment').buttonMarkup('refresh');	
-		
-		//隐藏结账发券和用券按钮
-		$('#issueCoupon_a_orderFood').hide();
-		$('#useCoupon_a_orderFood').hide();
-	}
-	
-	//微信账单
-	$('#showWeixinOrder').hover(function(){
-		if(!weixinOrderDetailWin.loadOrder){
-			loadWeixinOrderDetail();
-			weixinOrderDetailWin.loadOrder = true;
-		}
-		weixinOrderDetailWin.setPosition($('#showWeixinOrder').position().left + 475, $('#showWeixinOrder').position().top + 60);
-		weixinOrderDetailWin.show();		
-		
-	}, function(){
-		weixinOrderDetailWin.hide();
-	});		
-	
-	//菜品列表
-	var html = [];
-	for(var i = 0; i < orderMsg.orderFoods.length; i++){
-		//菜品列表
-		var orderFoodTemplate = '<tr class="{isComboFoodTd}">'
-			+ '<td>{dataIndex}</td>'
-			+ '<td ><div class={foodNameStyle}>{name}</div></td>'
-			+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
-			+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
-			+ '<td>{tastePrice}</td>'
-			+ '<td>{unitPrice}</td>'
-			+ '<td>{discount}</td>'
-			+ '<td>{totalPrice}</td>'
-			+ '<td>{orderDateFormat}</td>'
-			+ '<td>{waiter}</td>'
-			+ '</tr>';
-		html.push(orderFoodTemplate.format({
-			dataIndex : i + 1,
-			id : orderMsg.orderFoods[i].id,
-			name : orderMsg.orderFoods[i].foodName + ((orderMsg.orderFoods[i].status & 1 << 7) != 0 ? '<font color="red">[称重确认]</font>' : ''),
-			count : orderMsg.orderFoods[i].count,
-			isWeight : (orderMsg.orderFoods[i].status & 1 << 7) != 0 ? 'initial' : 'none',
-			tastePref : orderMsg.orderFoods[i].tasteGroup.tastePref,
-			tastePrice : orderMsg.orderFoods[i].tasteGroup.tastePrice,
-			unitPrice : (orderMsg.orderFoods[i].unitPrice + orderMsg.orderFoods[i].tasteGroup.tastePrice).toFixed(2),
-			discount : orderMsg.orderFoods[i].discount,
-			totalPrice : orderMsg.orderFoods[i].totalPrice.toFixed(2),
-			orderDateFormat : orderMsg.orderFoods[i].orderDateFormat.substring(11),
-			waiter : orderMsg.orderFoods[i].waiter,
-			isComboFoodTd : "",
-			foodNameStyle : "commonFoodName"
-		}));
-		
-		if((orderMsg.orderFoods[i].status & 1 << 5) != 0){
-			var combo = orderMsg.orderFoods[i].combo;
-			
-			for (var j = 0; j < combo.length; j++) {
-				html.push(orderFoodTemplate.format({
-					dataIndex : '',
-					id : combo[j].comboFood.id,
-					name : '┕' + combo[j].comboFoodDesc,
-					count : combo[j].comboFood.amount,
-					isWeight : (combo[j].comboFood.status & 1 << 7) != 0 ? 'initial' : 'none',
-					tastePref : combo[j].tasteGroup ? combo[j].tasteGroup.tastePref : "无口味",
-					tastePrice : combo[j].tasteGroup ? combo[j].tasteGroup.tastePrice : 0,
-					unitPrice : "",
-					discount : "",
-					totalPrice : "",
-					orderDateFormat : "",
-					waiter : "",
-					isComboFoodTd : "comboFoodTd",
-					foodNameStyle : "comboFoodName"
-				}));					
-			}
-		}
-		
-	}			
-	
-	$('#payment_orderFoodListBody').html(html.join("")).trigger('create');	
-}
-
-/**
- * 加载折扣方案信息
- */
-function loadDiscountData(_c){
-	if(_c == null || typeof _c == 'undefined'){
-		_c = {};
-	}
-	$.ajax({
-		url : "../QueryDiscount.do",
-		type : 'post',
-		data : {
-			dataSource : 'role'
-		},
-		success : function(jr, status, xhr){
-			if(jr.success){
-				discountData = jr.root;
-				// 设置默认显示折扣方案
-				for(var i = 0; i < discountData.length; i++){
-					if(discountData[i].isDefault == 1){
-						defaultsID = discountData[i].id;
-						break;
-					}else if(discountData[i].status == 2){
-						defaultsID = discountData[i].id;
-					}
-				}	
-				
-				var html = '';
-				for (var i = 0; i < jr.root.length; i++) {
-					html += '<li data-icon="false" class="tempFoodKitchen" onclick="setDiscountPlan({id:'+ jr.root[i].id +'})"><a >'+ jr.root[i].name +'</a></li>';
-				}
-				$('#payment_discountCmp').html(html).trigger('create');
-				$('#payment_discountCmp').listview('refresh');				
-			}
-		},
-		error : function(request, status, err){
-		}
-	});	
-}
-
-/**
- * 加载服务费方案
- */
-
-//记载服务费的function
-function loadServicePlanData(){
-	$.ajax({
-		url : "../QueryServicePlan.do",
-		type : 'post',
-		data : {
-			dataSource : 'planTree'
-		},
-		dataType : 'json',
-		success : function(jr, status, xhr){
-		},
-		error : function(request, status, err){//FIXME 不是在success中获取
-			var jr = eval("("+ request.responseText +")");
-			var html = '';
-			for (var i = 0; i < jr.length; i++) {
-				html += '<li data-icon="false" class="tempFoodKitchen" onclick="setServicePlan({id:'+ jr[i].planId +'})"><a >'+ jr[i].planName +'</a></li>';
-			}
-			$('#payment_serviceCmp').html(html).trigger('create');
-			$('#payment_serviceCmp').listview('refresh');				
-		}
-	}); 	
-}
-
-
-/**
- * 加载付款方式
- */
-function loadPayTypeData(){
-	$.ajax({
-		url : "../QueryPayType.do",
-		type : 'post',
-		data : {
-			dataSource : 'exceptMember'
-		},
-		success : function(jr, status, xhr){
-			if(jr.success){
-				payTypeData = jr.root;
-			}
-		},
-		error : function(request, status, err){
-		}
-	}); 	
-}
-
-/**
- * 加载抹数
- */
-function loadSystemSettingData(){
-	$.ajax({
-		url : "../QuerySystemSetting.do",
-		type : 'post',
-		success : function(jr, status, xhr){
-			if(jr.success){
-				restaurantData = jr.other.systemSetting;
-				if(restaurantData.setting.eraseQuota > 0){
-					
-					$('#tr4EraseQuota').show();
-					$('#font_showEraseQuota').html(restaurantData.setting.eraseQuota);
-				}else{
-					$('#tr4EraseQuota').hide();
-					$('#font_showEraseQuota').html('');
-					
-				}
-			} else {
-			}
-		},
-		error : function(request, status, err){
-		}
-	}); 
-	
-}
-
-/**
- * 设置折扣
- * @param c
- */
-function setDiscountPlan(c){
-	//关闭折扣选择
-	$('#payment_popupDiscountCmp').popup('close');
-	calcDiscountID = c.id;
-	Util.LM.show();
-	$.ajax({
-		url : "../OperateDiscount.do",
-		type : 'post',
-		data : {
-			dataSource : 'setDiscount',
-			orderId : orderMsg.id, 
-			discountId : calcDiscountID 
-		},
-		dataType : 'json',
-		success : function(jr, status, xhr){
-			Util.LM.hide();
-			if(jr.success){
-				refreshOrderData({calc:true});
-			}else{
-				Util.msg.alert({
-					msg : jr.msg,
-					renderTo : 'paymentMgr'
-				});
-			}
-		},
-		error : function(request, status, err){
-		}
-	}); 	
-}
-
-/**
- * 设置服务费方案
- * @param c
- */
-function setServicePlan(c){
-	//关闭折扣选择
-	$('#payment_popupServiceCmp').popup('close');
-	//设置服务费方案
-	$.ajax({
-		url : "../OperateOrderFood.do",
-		type : 'post',
-		data : {
-			dataSource: 'service',
-			orderId : orderMsg ? orderMsg.id : '',
-			planId : c.id
-		},
-		success : function(jr, status, xhr){
-			Util.LM.hide();
-			if(jr.success){
-				//刷新页面
-				refreshOrderData({calc : true});
-			}else{
-				Util.msg.alert({
-					msg : jr.msg,
-					renderTo : 'paymentMgr'
-				});
-			}
-		},
-		error : function(request, status, err){
-		}
-	}); 	
-
-}
 
 function loadOrderDetail(){
 	var tableId = 0;
@@ -578,7 +170,7 @@ $(function(){
 	});
 	
 	//进入界面界面
-	$('#paymentMgr').on('pageshow', function(){
+	$('#paymentMgr').on('pagebeforeshow', function(){
 		//清除快捷键
 		$(document).off('keydown');
 		//设置快捷键
@@ -595,7 +187,383 @@ $(function(){
 		NumKeyBoardAttacher.instance().attach($('#erasePrice_input_payment')[0], function(inputVal){
 			$('#erasePrice_input_payment').keyup();
 		});
+		
+		//加载餐厅设置数据
+		loadSystemSettingData();
+	
+	 	//加载账单信息
+		refreshOrderData({calc : false});
+		
+		//加载折扣
+		loadDiscountData();
+		
+		//加载服务费方案
+		loadServicePlanData();
+		
+		//加载混合结账付款方式
+		loadPayTypeData(); 
 	});
+
+	//加载显示账单基础信息
+	var orderMsg;
+	//加载账单数据
+	function refreshOrderData(_c){
+		Util.LM.show();
+		_c = _c || {};
+		$.ajax({
+			url : "../QueryOrderByCalc.do",
+			type : 'post',
+			data : {
+				tableID : pm.table.id,
+				orderID : orderMsg ? orderMsg.id : '',
+				calc : typeof _c.calc == 'boolean' ? _c.calc : true,
+				customNum : pm.table.customNum
+			},
+			success : function(jr, status, xhr){
+				Util.LM.hide();
+				if(jr.success){
+					// 加载显示账单基础信息
+					orderMsg = jr.other.order;
+					
+					loadOrderBasicMsg();
+				}else{
+					Util.msg.alert({
+						msg : jr.msg,
+						renderTo : 'paymentMgr'
+					});
+				}
+			},
+			error : function(request, status, err){
+			}
+		}); 	
+		
+	}
+
+	//显示账单信息
+	function loadOrderBasicMsg(){
+		//显示左边价钱
+		document.getElementById("totalPrice").innerHTML = checkDot(orderMsg.totalPrice)?parseFloat(orderMsg.totalPrice).toFixed(2) : orderMsg.totalPrice;
+		document.getElementById("actualPrice_td_payment").innerHTML = checkDot(orderMsg.actualPrice)?parseFloat(orderMsg.actualPrice).toFixed(2) : orderMsg.actualPrice;
+		document.getElementById("forFree").innerHTML = checkDot(orderMsg.giftPrice)?parseFloat(orderMsg.giftPrice).toFixed(2) : orderMsg.giftPrice;
+		document.getElementById("spanCancelFoodAmount").innerHTML = checkDot(orderMsg.cancelPrice)?parseFloat(orderMsg.cancelPrice).toFixed(2) : orderMsg.cancelPrice;
+		document.getElementById("discountPrice").innerHTML = checkDot(orderMsg.discountPrice)?parseFloat(orderMsg.discountPrice).toFixed(2) : orderMsg.discountPrice;
+		if(orderMsg.categoryValue != 4 && orderMsg.cancelPrice > 0){
+			$('#spanSeeCancelFoodAmount').show();	
+			$('#lab_replaceCancelBtn').hide();
+		}else{
+			$('#lab_replaceCancelBtn').show();
+			$('#spanSeeCancelFoodAmount').hide();
+		}	
+		
+		if(orderMsg.giftPrice > 0){
+			$('#spanSeeGiftFoodAmount').show();	
+			$('#lab_replaceGiftBtn').hide();
+		}else{
+			$('#lab_replaceGiftBtn').show();
+			$('#spanSeeGiftFoodAmount').hide();
+		}	
+		
+		if(orderMsg.discountPrice > 0){
+			$('#spanSeeDiscountFoodAmount').show();	
+			$('#lab_replaceDiscountBtn').hide();
+		}else{
+			$('#lab_replaceDiscountBtn').show();
+			$('#spanSeeDiscountFoodAmount').hide();
+		}		
+		
+		//清空抹数和备注
+		$('#erasePrice_input_payment').val('');
+		$('#remark').val('');
+		
+		//账单基础信息
+		$('#orderIdInfo').html('结账 -- 账单号:<font color="#f7c942">' + orderMsg.id + '</font> ' + (orderMsg.isWeixinOrder?'(<span id="showWeixinOrder" style="font-size:15px;font-weight:bold;color:green;text-decoration:underline">微信账单</span>)' : ''));
+		if(orderMsg.category != 4){
+			$('#orderTableInfo').html('餐桌号:<font color="#f7c942">' + orderMsg.table.alias + '</font>&nbsp;' + (pm.table.name?'<font color="#f7c942" >(' + pm.table.name +')</font>' :''));
+		}
+		document.getElementById('spanDisplayCurrentServiceRate').innerHTML = (orderMsg.serviceRate*100)+'%';
+		$('#orderCustomNum').html(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
+		$('#remark').val(orderMsg.comment && orderMsg.comment != '----' ? orderMsg.comment : '');
+		
+		//会员 & 折扣 & 优惠劵
+		var discountDesc = '当前折扣:<font style="color:green;font-weight:bold;">'+ orderMsg.discount.name + '</font>';
+		if(orderMsg.discounter){
+			discountDesc += ', 折扣人:<font style="color:green;font-weight:bold;">'+ orderMsg.discounter + '</font>';
+			discountDesc += ', 折扣时间:<font style="color:green;font-weight:bold;">'+ orderMsg.discountDate + '</font>';
+		}
+		$('#orderDiscountDesc').html(discountDesc);
+		
+		if(orderMsg.coupon.length > 0){
+			$('#orderCouponInfo').html('使用优惠券:<font style="color:green;font-weight:bold;">'+ orderMsg.coupon.length + '张, 共¥' + orderMsg.couponPrice + '</font>');
+		}else{
+			$('#orderCouponInfo').html('');
+		}
+		
+		orderMsg.member = null;
+		if(orderMsg.memberId && orderMsg.memberId > 0){
+			//设置会员结账按钮
+			$('#memberBalance_a_payment .ui-btn-text').html('会员余额');
+			$('#memberBalance_a_payment').buttonMarkup('refresh');
+			
+			//显示结账发券和用券按钮
+			$('#issueCoupon_a_orderFood').show();
+			$('#useCoupon_a_orderFood').show();
+			
+			$.post('../QueryMember.do', {dataSource : 'normal', id : orderMsg.memberId, forDetail : true}, function(result){
+				if(result.success){
+					
+					orderMsg.member = result.root[0];
+					
+					var memberSpan = "";
+					if(result.root[0].isRaw){
+						memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="text-decoration: underline;cursor: pointer;color:blue" onclick="ts.member.memberInfoBind(\'loadMemberBind4Payment\', \''+ result.root[0].name +'\')">' + result.root[0].name +"(点击绑定)</font></span>";
+					}else{
+						memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="color:green">' + result.root[0].name +"</font></span>";
+					}
+					
+					$('#memberInfo_span_payment').html(memberSpan);
+				}
+			}, 'json');
+		}else{
+			$('#memberInfo_span_payment').html('');
+			//设置会员结账按钮
+			$('#memberBalance_a_payment .ui-btn-text').html('读取会员');
+			$('#memberBalance_a_payment').buttonMarkup('refresh');	
+			
+			//隐藏结账发券和用券按钮
+			$('#issueCoupon_a_orderFood').hide();
+			$('#useCoupon_a_orderFood').hide();
+		}
+		
+		//微信账单
+		$('#showWeixinOrder').hover(function(){
+			if(!weixinOrderDetailWin.loadOrder){
+				loadWeixinOrderDetail();
+				weixinOrderDetailWin.loadOrder = true;
+			}
+			weixinOrderDetailWin.setPosition($('#showWeixinOrder').position().left + 475, $('#showWeixinOrder').position().top + 60);
+			weixinOrderDetailWin.show();		
+			
+		}, function(){
+			weixinOrderDetailWin.hide();
+		});		
+		
+		//菜品列表
+		var html = [];
+		for(var i = 0; i < orderMsg.orderFoods.length; i++){
+			//菜品列表
+			var orderFoodTemplate = '<tr class="{isComboFoodTd}">'
+				+ '<td>{dataIndex}</td>'
+				+ '<td ><div class={foodNameStyle}>{name}</div></td>'
+				+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
+				+ '<td><div style="height: 45px;overflow: hidden;">{tastePref}</div></td>'
+				+ '<td>{tastePrice}</td>'
+				+ '<td>{unitPrice}</td>'
+				+ '<td>{discount}</td>'
+				+ '<td>{totalPrice}</td>'
+				+ '<td>{orderDateFormat}</td>'
+				+ '<td>{waiter}</td>'
+				+ '</tr>';
+			html.push(orderFoodTemplate.format({
+				dataIndex : i + 1,
+				id : orderMsg.orderFoods[i].id,
+				name : orderMsg.orderFoods[i].foodName + ((orderMsg.orderFoods[i].status & 1 << 7) != 0 ? '<font color="red">[称重确认]</font>' : ''),
+				count : orderMsg.orderFoods[i].count,
+				isWeight : (orderMsg.orderFoods[i].status & 1 << 7) != 0 ? 'initial' : 'none',
+				tastePref : orderMsg.orderFoods[i].tasteGroup.tastePref,
+				tastePrice : orderMsg.orderFoods[i].tasteGroup.tastePrice,
+				unitPrice : (orderMsg.orderFoods[i].unitPrice + orderMsg.orderFoods[i].tasteGroup.tastePrice).toFixed(2),
+				discount : orderMsg.orderFoods[i].discount,
+				totalPrice : orderMsg.orderFoods[i].totalPrice.toFixed(2),
+				orderDateFormat : orderMsg.orderFoods[i].orderDateFormat.substring(11),
+				waiter : orderMsg.orderFoods[i].waiter,
+				isComboFoodTd : "",
+				foodNameStyle : "commonFoodName"
+			}));
+			
+			if((orderMsg.orderFoods[i].status & 1 << 5) != 0){
+				var combo = orderMsg.orderFoods[i].combo;
+				
+				for (var j = 0; j < combo.length; j++) {
+					html.push(orderFoodTemplate.format({
+						dataIndex : '',
+						id : combo[j].comboFood.id,
+						name : '┕' + combo[j].comboFoodDesc,
+						count : combo[j].comboFood.amount,
+						isWeight : (combo[j].comboFood.status & 1 << 7) != 0 ? 'initial' : 'none',
+						tastePref : combo[j].tasteGroup ? combo[j].tasteGroup.tastePref : "无口味",
+						tastePrice : combo[j].tasteGroup ? combo[j].tasteGroup.tastePrice : 0,
+						unitPrice : "",
+						discount : "",
+						totalPrice : "",
+						orderDateFormat : "",
+						waiter : "",
+						isComboFoodTd : "comboFoodTd",
+						foodNameStyle : "comboFoodName"
+					}));					
+				}
+			}
+			
+		}			
+		
+		$('#payment_orderFoodListBody').html(html.join("")).trigger('create');	
+	}
+	
+	//加载折扣方案信息
+	function loadDiscountData(){
+		$.ajax({
+			url : "../QueryDiscount.do",
+			type : 'post',
+			data : {
+				dataSource : 'role'
+			},
+			success : function(jr, status, xhr){
+				if(jr.success){
+					var discountData = jr.root;
+					var html = '';
+					for (var i = 0; i < jr.root.length; i++) {
+						html += '<li data-icon="false" class="tempFoodKitchen" discount-id="' + jr.root[i].id + '"><a>'+ jr.root[i].name +'</a></li>';
+					}
+					$('#discount_ul_payment').html(html).trigger('create').listview('refresh');
+					//每个折扣的处理事件
+					$('#discount_ul_payment').find('.tempFoodKitchen').each(function(index, element){
+						element.onclick = function(){
+							//关闭折扣选择
+							$('#discount_div_payment').popup('close');
+							Util.LM.show();
+							//设置折扣
+							$.ajax({
+								url : "../OperateDiscount.do",
+								type : 'post',
+								data : {
+									dataSource : 'setDiscount',
+									orderId : orderMsg.id, 
+									discountId : $(element).attr('discount-id') 
+								},
+								dataType : 'json',
+								success : function(jr, status, xhr){
+									Util.LM.hide();
+									if(jr.success){
+										refreshOrderData({calc : true});
+										Util.msg.tip('设置折扣成功');
+									}else{
+										Util.msg.alert({
+											msg : jr.msg,
+											renderTo : 'paymentMgr'
+										});
+									}
+								},
+								error : function(request, status, err){
+								}
+							});
+						}
+					});
+				}
+			},
+			error : function(request, status, err){
+			}
+		});	
+	}
+	
+	//付款方式
+	var payTypeData;
+	
+	//加载付款方式
+	function loadPayTypeData(){
+		$.ajax({
+			url : "../QueryPayType.do",
+			type : 'post',
+			data : {
+				dataSource : 'exceptMember'
+			},
+			success : function(jr, status, xhr){
+				if(jr.success){
+					payTypeData = jr.root;
+				}
+			},
+			error : function(request, status, err){
+			}
+		}); 	
+	}
+	
+	//加载服务费方案
+	function loadServicePlanData(){
+		$.ajax({
+			url : "../QueryServicePlan.do",
+			type : 'post',
+			data : {
+				dataSource : 'getByCond'
+			},
+			dataType : 'json',
+			success : function(jr, status, xhr){
+				var html = '';
+				for (var i = 0; i < jr.root.length; i++) {
+					html += '<li data-icon="false" class="tempFoodKitchen" plan-id="' + jr.root[i].id + '"><a>'+ jr.root[i].name +'</a></li>';
+				}
+				$('#servicePlan_ul_payment').html(html).trigger('create').listview('refresh');
+				$('#servicePlan_ul_payment').find('.tempFoodKitchen').each(function(index, element){
+					element.onclick = function(){
+						//关闭服务费方案
+						$('#servicePlan_div_payment').popup('close');
+						//设置服务费方案
+						$.ajax({
+							url : "../OperateOrderFood.do",
+							type : 'post',
+							data : {
+								dataSource: 'service',
+								orderId : orderMsg ? orderMsg.id : '',
+								planId : $(element).attr('plan-id')
+							},
+							success : function(jr, status, xhr){
+								Util.LM.hide();
+								if(jr.success){
+									//刷新页面
+									refreshOrderData({calc : true});
+									Util.msg.tip('服务费设置成功');
+								}else{
+									Util.msg.alert({
+										msg : jr.msg,
+										renderTo : 'paymentMgr'
+									});
+								}
+							},
+							error : function(request, status, err){
+							}
+						}); 
+						console.log($(element).attr('plan-id'));
+					}
+				});
+			},
+			error : function(request, status, err){
+				alert(err);
+			}
+		}); 	
+	}
+	
+	//餐厅设置参数
+	var restaurantData;
+
+ 	//加载餐厅设置参数
+	function loadSystemSettingData(){
+		$.ajax({
+			url : "../QuerySystemSetting.do",
+			type : 'post',
+			success : function(jr, status, xhr){
+				if(jr.success){
+					restaurantData = jr.other.systemSetting;
+					if(restaurantData.setting.eraseQuota > 0){
+						$('#eraseQuota_tr_payment').show();
+						$('#eraseQuota_font_payment').html(restaurantData.setting.eraseQuota);
+					}else{
+						$('#eraseQuota_tr_payment').hide();
+						$('#eraseQuota_font_payment').html('');
+					}
+				}
+			},
+			error : function(request, status, err){
+			}
+		}); 
+		
+	}
 	
 	//页面初始化
 	$('#paymentMgr').on("pageinit", function(){ 

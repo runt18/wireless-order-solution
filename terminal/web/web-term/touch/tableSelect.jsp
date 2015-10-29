@@ -1734,8 +1734,8 @@
 		         		<td id="spanCancelFoodAmount">0.00</td>
 		         		<td ><label id="lab_replaceCancelBtn">----</label><a id="spanSeeCancelFoodAmount" href="#" style="display: none;" onclick="loadOrderDetail();lookupOrderDetailByType('detail_cancel')">明细</a></td>
 		         	</tr>	
-		         	<tr id="tr4EraseQuota">
-		         		<td colspan="2" style="width: 200px;line-height: 60px;font-size: 20px;text-align: right;" >抹数金额(上限:￥<font id="font_showEraseQuota" color="red">--</font>)：</td>
+		         	<tr id="eraseQuota_tr_payment">
+		         		<td colspan="2" style="width: 200px;line-height: 60px;font-size: 20px;text-align: right;" >抹数金额(上限:￥<font id="eraseQuota_font_payment" color="red">--</font>)：</td>
 		         		<td width="70" style="padding-right: 5px;">
 		         			<input id="erasePrice_input_payment" class="countInputStyle">
 		         		</td>
@@ -1829,19 +1829,19 @@
 			<a data-role="button" data-inline="true" class="bottomBtnFont" id="useCoupon_a_orderFood">用券</a>
 		 	<a id="tempPay_a_payment" data-role="button" data-inline="true" class="bottomBtnFont">暂结(-)</a>
 		 	<a id="updateOrder_a_payment" data-role="button" data-inline="true" class="bottomBtnFont">改单</a>
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupDiscountCmp">折扣</a>
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#payment_popupServiceCmp">服务费</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#discount_div_payment">折扣</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#servicePlan_div_payment">服务费</a>
 			<a id="memberRead_a_payment" data-role="button" data-inline="true" class="bottomBtnFont">会员</a>
 			<a href="javascript: Util.to.scroll({content:'payment_orderFoodListCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
 			<a href="javascript: Util.to.scroll({content:'payment_orderFoodListCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>			
 		 </div>
 	</div>	
 	
-	<div data-role="popup" id="payment_popupDiscountCmp" data-theme="d" >
-        <ul id="payment_discountCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>
+	<div data-role="popup" id="discount_div_payment" data-theme="d" >
+        <ul id="discount_ul_payment" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>
 	</div>	
-	<div data-role="popup" id="payment_popupServiceCmp" data-theme="d" >
-        <ul id="payment_serviceCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>
+	<div data-role="popup" id="servicePlan_div_payment" data-theme="d" >
+        <ul id="servicePlan_ul_payment" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>
 	</div>	
 	
 <!-- 收款操作 -->	
