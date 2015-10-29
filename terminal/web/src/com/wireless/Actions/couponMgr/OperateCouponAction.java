@@ -1,6 +1,8 @@
 package com.wireless.Actions.couponMgr;
 
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +23,50 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateCouponAction extends DispatchAction{
 
+	/**
+	 * 根据账单和会员获取可用的优惠券
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getAvailableByOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String) request.getAttribute("pin");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String memberId = request.getParameter("memberId");
+		final String orderId = request.getParameter("orderId");
+		final JObject jObject = new JObject();
+		
+		try{
+			//获取账单已用的优惠券
+			final List<Coupon> result = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setUseMode(Coupon.UseMode.ORDER, Integer.parseInt(orderId)), null);
+			
+			//获取会员可用的优惠券
+			result.addAll(CouponDao.getByCond(staff, new CouponDao.ExtraCond().setStatus(Coupon.Status.ISSUED).setMember(Integer.parseInt(memberId)), null));
+			
+			//过滤已过期的优惠券
+			Iterator<Coupon> iter = result.iterator();
+			while(iter.hasNext()){
+				Coupon item = iter.next();
+				if(item.isExpired()){
+					iter.remove();
+				}
+			}
+			
+			jObject.setRoot(result);
+			
+			
+		}catch(SQLException e){
+			jObject.initTip(e);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jObject.toString(Coupon.COUPON_JSONABLE_SIMPLE));
+		}
+		return null;
+	}
+	
 	/**
 	 * 获取优惠券
 	 * @param mapping
