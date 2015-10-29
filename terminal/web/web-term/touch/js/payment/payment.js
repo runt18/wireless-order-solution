@@ -150,7 +150,7 @@ function loadOrderBasicMsg(){
 	}
 	$('#orderDiscountDesc').html(discountDesc);
 	
-	if(orderMsg.couponPrice > 0){
+	if(orderMsg.coupon.length > 0){
 		$('#orderCouponInfo').html('使用优惠券:<font style="color:green;font-weight:bold;">'+ orderMsg.coupon.length + '张, 共¥' + orderMsg.couponPrice + '</font>');
 	}else{
 		$('#orderCouponInfo').html('');
