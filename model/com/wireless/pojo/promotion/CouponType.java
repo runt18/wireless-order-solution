@@ -267,7 +267,7 @@ public class CouponType implements Jsonable{
 		jm.putInt("restaurantId", this.restaurantId);
 		jm.putString("name", this.name);
 		jm.putFloat("price", this.price);
-		jm.putFloat("expired", this.expired);
+		jm.putBoolean("isExpired", this.isExpired());
 		jm.putString("expiredFormat", DateUtil.formatToDate(this.expired));
 		if(flag == COUPON_TYPE_JSONABLE_COMPLEX){
 			if(this.image != null){
