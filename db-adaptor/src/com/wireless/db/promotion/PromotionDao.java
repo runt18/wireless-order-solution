@@ -33,7 +33,7 @@ public class PromotionDao {
 		private List<Promotion.Status> statusList = new ArrayList<Promotion.Status>();
 		private Promotion.Rule rule;
 		private Promotion.Type type;
-		private Promotion.Oriented oriented;
+		private final List<Promotion.Trigger> triggers = new ArrayList<Promotion.Trigger>();
 		
 		public ExtraCond setPromotionId(int id){
 			this.promotionId = id;
@@ -51,6 +51,13 @@ public class PromotionDao {
 			return this;
 		}
 		
+		public ExtraCond addTrigger(Promotion.Trigger trigger){
+			if(!this.triggers.contains(trigger)){
+				this.triggers.add(trigger);
+			}
+			return this;
+		}
+		
 		public ExtraCond setRule(Promotion.Rule rule){
 			this.rule = rule;
 			return this;
@@ -58,11 +65,6 @@ public class PromotionDao {
 		
 		public ExtraCond setType(Promotion.Type type){
 			this.type = type;
-			return this;
-		}
-		
-		public ExtraCond setOriented(Promotion.Oriented oriented){
-			this.oriented = oriented;
 			return this;
 		}
 		
@@ -96,14 +98,23 @@ public class PromotionDao {
 				extraCond.append(" AND (" + psCond.toString() + ")");
 			}
 			
+			StringBuilder triggerCond = new StringBuilder();
+			for(Promotion.Trigger trigger : triggers){
+				if(triggerCond.length() != 0){
+					triggerCond.append(",");
+				}
+				triggerCond.append(trigger.getVal());
+			}
+			if(triggerCond.length() != 0){
+				String sql = " SELECT promotion_id FROM " + Params.dbName + ".promotion_trigger WHERE trigger_type IN ( " + triggerCond.toString() + ")";
+				extraCond.append(" AND P.promotion_id IN (" + sql + ")");
+			}
+			
 			if(rule != null){
 				extraCond.append(" AND P.rule = " + rule.getVal());
 			}
 			if(type != null){
 				extraCond.append(" AND P.type = " + type.getVal());
-			}
-			if(oriented != null){
-				extraCond.append(" AND P.oriented = " + oriented.getVal());
 			}
 			return extraCond.toString();
 		}
@@ -165,7 +176,7 @@ public class PromotionDao {
 		//Insert the promotion.
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".promotion " +
-			  " (restaurant_id, create_date, start_date, finish_date, title, body, entire, coupon_type_id, oriented, rule, type, point, status) " +
+			  " (restaurant_id, create_date, start_date, finish_date, title, body, entire, coupon_type_id, rule, type, status) " +
 			  " VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + DateUtil.format(promotion.getCreateDate(), DateUtil.Pattern.DATE) + "'," +
@@ -175,10 +186,8 @@ public class PromotionDao {
 			  "'" + new StringHtml(promotion.getBody(), StringHtml.ConvertTo.TO_NORMAL) + "'," +
 			  "'" + new StringHtml(promotion.getEntire(), StringHtml.ConvertTo.TO_NORMAL) + "'," +
 			  couponTypeId + "," +
-			  promotion.getOriented().getVal() + "," +
 			  promotion.getRule().getVal() + "," +
 			  promotion.getType().getVal() + "," +
-			  promotion.getPoint() + "," +
 			  promotion.getStatus().getVal() +
 			  ")";
 		
@@ -189,6 +198,16 @@ public class PromotionDao {
 			promotionId = dbCon.rs.getInt(1);
 		}else{
 			throw new SQLException("Failed to generated the promotion id.");
+		}
+		
+		//Insert the promotion triggers.
+		for(Promotion.Trigger trigger : promotion.getTriggers()){
+			sql = " INSERT INTO " + Params.dbName + ".promotion_trigger " +
+				  " (promotion_id, trigger_type) VALUES ( " +
+				  promotionId + "," +
+				  trigger.getVal() +
+				  ")";
+			dbCon.stmt.executeUpdate(sql);
 		}
 		
 		if(!promotion.getBody().isEmpty()){
@@ -275,14 +294,26 @@ public class PromotionDao {
 		sql = " UPDATE " + Params.dbName + ".promotion SET " +
 			  " promotion_id = " + promotion.getId() +
 			  (builder.isBodyChanged() ? " ,body = '" + new StringHtml(promotion.getBody(), StringHtml.ConvertTo.TO_NORMAL) + "', entire = '" + new StringHtml(promotion.getEntire(), StringHtml.ConvertTo.TO_NORMAL) + "'" : "") +
-			  (builder.isPointChanged() ? ",point = " + promotion.getPoint() : "") +
 			  (builder.isRangeChanged() && promotion.hasDateRange() ? ",start_date = '" + promotion.getDateRange().getOpeningFormat() + "',finish_date = '" + promotion.getDateRange().getEndingFormat() + "'" : "") +
 			  (builder.isRangeChanged() && !promotion.hasDateRange() ? ",start_date = NULL, finish_date = NULL " : "") +
 			  (builder.isTitleChanged() ? ",title = '" + promotion.getTitle() + "'" : "") +
-			  (builder.isMemberChanged() ? ",oriented = " + promotion.getOriented().getVal() : "") +
 			  " WHERE promotion_id = " + promotion.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
+		}
+		
+		//Update the associated promotion triggers.
+		if(builder.isTriggersChanged()){
+			sql = " DELETE FROM " + Params.dbName + ".promotion_trigger WHERE promotion_id = " + promotion.getId();
+			dbCon.stmt.executeUpdate(sql);
+			for(Promotion.Trigger trigger : promotion.getTriggers()){
+				sql = " INSERT INTO " + Params.dbName + ".promotion_trigger " +
+					  " (promotion_id, trigger_type) VALUES ( " +
+					  promotion.getId() + "," +
+					  trigger.getVal() +
+					  ")";
+				dbCon.stmt.executeUpdate(sql);
+			}
 		}
 		
 		if(builder.isBodyChanged() && !promotion.getBody().isEmpty()){
@@ -404,7 +435,7 @@ public class PromotionDao {
 		List<Promotion> result = new ArrayList<Promotion>();
 		
 		String sql;
-		sql = " SELECT P.promotion_id, P.restaurant_id, P.create_date, P.start_date, P.finish_date, P.title, P.body, P.entire, P.oriented, P.type, P.rule, P.point, " +
+		sql = " SELECT P.promotion_id, P.restaurant_id, P.create_date, P.start_date, P.finish_date, P.title, P.body, P.entire, P.type, P.rule, " +
 			  " P.coupon_type_id, " +
 			  " OI.oss_image_id, OI.image, OI.type AS oss_type " +	
 			  " FROM " + Params.dbName + ".promotion P " +
@@ -440,10 +471,8 @@ public class PromotionDao {
 				promotion.setEntire(new StringHtml(entire, StringHtml.ConvertTo.TO_HTML).toString());
 			}
 			
-			promotion.setOriented(Promotion.Oriented.valueOf(dbCon.rs.getInt("oriented")));
 			promotion.setType(Promotion.Type.valueOf(dbCon.rs.getInt("type")));
 			promotion.setRule(Promotion.Rule.valueOf(dbCon.rs.getInt("rule")));
-			promotion.setPoint(dbCon.rs.getInt("point"));
 			
 			promotion.setCouponType(CouponTypeDao.getById(staff, dbCon.rs.getInt("coupon_type_id")));
 			
@@ -458,6 +487,16 @@ public class PromotionDao {
 			result.add(promotion);
 		}
 		dbCon.rs.close();
+		
+		//Get the associated triggers
+		for(Promotion promotion : result){
+			sql = " SELECT trigger_type FROM " + Params.dbName + ".promotion_trigger WHERE promotion_id = " + promotion.getId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				promotion.addTrigger(Promotion.Trigger.valueOf(dbCon.rs.getInt("trigger_type")));
+			}
+			dbCon.rs.close();
+		}
 		
 		return result;
 	}
@@ -506,7 +545,7 @@ public class PromotionDao {
 	 */
 	public static void delete(DBCon dbCon, Staff staff, int promotionId) throws SQLException, BusinessException{
 		Promotion promotion = getById(dbCon, staff, promotionId);
-			
+		
 		//Delete the associated oss image to this promotion
 		OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_PROMOTION, promotion.getId()));
 		
@@ -522,7 +561,11 @@ public class PromotionDao {
 		String sql;
 		sql = " DELETE FROM " + Params.dbName + ".coupon WHERE promotion_id = " + promotionId;
 		dbCon.stmt.executeUpdate(sql);
-		
+
+		//Delete the associated triggers.
+		sql = " DELETE FROM " + Params.dbName + ".promotion_trigger WHERE promotion_id = " + promotionId;
+		dbCon.stmt.executeUpdate(sql);
+
 		//Delete the promotion.
 		sql = " DELETE FROM " + Params.dbName + ".promotion WHERE promotion_id = " + promotionId;
 		if(dbCon.stmt.executeUpdate(sql) == 0){

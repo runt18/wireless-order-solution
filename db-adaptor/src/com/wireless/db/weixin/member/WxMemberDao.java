@@ -9,10 +9,14 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberTypeDao;
+import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.PromotionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.WxMemberError;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.WxMember;
+import com.wireless.pojo.promotion.Coupon;
+import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class WxMemberDao {
@@ -146,6 +150,10 @@ public class WxMemberDao {
 		final int memberId;
 		if(associatedMembers.isEmpty()){
 			memberId = MemberDao.insert(dbCon, staff, Member.InsertBuilder.build4Weixin("微信会员", MemberTypeDao.getWxMemberType(dbCon, staff)));
+			//Issue the coupon to this weixin member after subscribing.
+			for(Promotion promotion : PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().addTrigger(Promotion.Trigger.WX_SUBSCRIBE))){
+				CouponDao.issue(dbCon, staff, Coupon.IssueBuilder.newInstance4WxSubscribe().addPromotion(promotion));
+			}
 		}else{
 			memberId = associatedMembers.get(0).getId();
 		}

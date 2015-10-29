@@ -75,9 +75,8 @@ public class TestPromotionDao {
 			String body = htmlTxt.replace("$(pic_1)", OssImageDao.getById(mStaff, promotionImg1).getObjectUrl());
 
 			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder
-																	  .newInstance("测试优惠活动", body, Promotion.Rule.FREE, typeInsertBuilder, "hello jingjing<br>")
-																	  //.setRange("2016-1-1", "2016-2-1")
-																	  //.addMember(m1.getId()).addMember(m2.getId())
+																	  .newInstance("测试优惠活动", body, typeInsertBuilder, "hello jingjing<br>")
+																	  .addTrigger(Promotion.Trigger.WX_SUBSCRIBE)
 																	  ;
 			promotionId = PromotionDao.create(mStaff, promotionCreateBuilder);
 			
@@ -113,7 +112,8 @@ public class TestPromotionDao {
 																									 .setTitle("修改优惠活动")
 																									 .setBody(body, "hello jingjing<br>")
 																									 .setCouponTypeBuilder(typeUpdateBuilder)
-																									 .setOriented(Promotion.Oriented.ALL);
+																									 .emptyTriggers()
+																									 ;
 			expectedPromotion = promotionUpdateBuilder.build();
 			expectedPromotion.setCouponType(typeUpdateBuilder.build());
 			expectedPromotion.setCreateDate(actualPromotion.getCreateDate());
@@ -244,9 +244,7 @@ public class TestPromotionDao {
 		Assert.assertEquals("promotion body", expected.getEntire(), actual.getEntire());
 		Assert.assertEquals("promotion date range", expected.getDateRange(), actual.getDateRange());
 		Assert.assertEquals("promotion status", expected.getStatus(), actual.getStatus());
-		Assert.assertEquals("promotion rule", expected.getRule(), actual.getRule());
 		Assert.assertEquals("promotion type", expected.getType(), actual.getType());
-		Assert.assertEquals("promotion oriented", expected.getOriented(), actual.getOriented());
 		
 		//The content to associated promotion image
 		Assert.assertEquals("oss image type to promotion", OssImage.Type.PROMOTION, actual.getImage().getType());
@@ -266,6 +264,12 @@ public class TestPromotionDao {
 		Assert.assertEquals("oss image associated id to coupon type", actual.getCouponType().getId(), actual.getCouponType().getImage().getAssociatedId());
 		Assert.assertEquals("oss image id to coupon type", expected.getCouponType().getImage().getId(), actual.getCouponType().getImage().getId());
 		Assert.assertTrue("failed to put image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getCouponType().getImage().getObjectKey()) != null);
+		
+		//The associated triggers
+		Assert.assertEquals("size to promotion triggers", expected.getTriggers().size(), actual.getTriggers().size());
+		for(int i = 0; i < expected.getTriggers().size(); i++){
+			Assert.assertEquals("promotion trigger", expected.getTriggers().get(i), actual.getTriggers().get(i));
+		}
 	}
 	
 	private void compare(Coupon.IssueBuilder issueBuilder, Promotion expectedPromotion, Member expectedMember, Coupon actual){

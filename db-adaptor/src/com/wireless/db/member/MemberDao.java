@@ -11,7 +11,6 @@ import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.promotion.CouponDao;
-import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.exception.BusinessException;
@@ -37,8 +36,6 @@ import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.member.WxMember;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.promotion.Coupon;
-import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
@@ -1135,13 +1132,6 @@ public class MemberDao {
 		}else{
 			throw new SQLException("The id of member is not generated successfully.");
 		}	
-		
-		//Issue the coupon to this member if the associated published or progressed promotion is oriented all.
-		for(Promotion promotion : PromotionDao.getByCond(dbCon, staff, new PromotionDao.ExtraCond().setOriented(Promotion.Oriented.ALL))){
-			if(promotion.getRule() != Promotion.Rule.DISPLAY_ONLY){
-				CouponDao.issue(dbCon, staff, Coupon.IssueBuilder.newInstance4WxSubscribe().addPromotion(promotion).addMember(memberId));
-			}
-		}
 		
 		//Commit the private comment
 		if(member.hasPrivateComment()){

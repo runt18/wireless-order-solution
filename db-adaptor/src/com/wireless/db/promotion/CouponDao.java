@@ -512,23 +512,15 @@ public class CouponDao {
 			throw new BusinessException("只有【进行中】的优惠活动才可自助领取优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
 		}
 		
-		if(coupon.getDrawProgress().isOk()){
-			String sql;
-			sql = " UPDATE " + Params.dbName + ".coupon SET " +
-				  " status = " + Coupon.Status.ISSUED.getVal() +
-				  " ,draw_date = NOW() " +
-				  " WHERE coupon_id = " + couponId;
-			if(dbCon.stmt.executeUpdate(sql) == 0){
-				throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
-			}
-			
-//			if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
-//				insert(dbCon, staff, new Coupon.InsertBuilder(coupon.getCouponType(), coupon.getMember(), coupon.getPromotion()));
-//			}
-			
-		}else{
-			throw new BusinessException("优惠券还没符合领取条件", PromotionError.COUPON_DRAW_NOT_ALLOW);
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".coupon SET " +
+			  " status = " + Coupon.Status.ISSUED.getVal() +
+			  " ,draw_date = NOW() " +
+			  " WHERE coupon_id = " + couponId;
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
 		}
+			
 	}
 	
 	/**
@@ -745,7 +737,7 @@ public class CouponDao {
 			  " C.use_date, C.use_staff, C.use_mode, C.use_associate_id, " +
 			  " C.coupon_type_id, CT.name, CT.price, CT.expired, CT.oss_image_id, " +
 			  " C.member_id, M.name AS member_name, M.mobile, M.member_card, M.`consumption_amount`, M.point, M.`base_balance`, M.`extra_balance`, MT.name AS memberTypeName, " +
-			  " C.promotion_id, P.title, P.oriented, P.rule, P.start_date, P.finish_date ") +
+			  " C.promotion_id, P.title, P.rule, P.start_date, P.finish_date ") +
 			  " FROM " + Params.dbName + ".coupon C " +
 			  " JOIN " + Params.dbName + ".coupon_type CT ON C.coupon_type_id = CT.coupon_type_id " +
 			  " JOIN " + Params.dbName + ".promotion P ON C.promotion_id = P.promotion_id " +
@@ -812,7 +804,6 @@ public class CouponDao {
 				
 				Promotion promotion = new Promotion(dbCon.rs.getInt("promotion_id"));
 				promotion.setTitle(dbCon.rs.getString("title"));
-				promotion.setOriented(Promotion.Oriented.valueOf(dbCon.rs.getInt("oriented")));
 				promotion.setRule(Promotion.Rule.valueOf(dbCon.rs.getInt("rule")));
 				if(dbCon.rs.getTimestamp("start_date") != null && dbCon.rs.getTimestamp("finish_date") != null){
 					promotion.setDateRange(new DateRange(dbCon.rs.getTimestamp("start_date").getTime(), dbCon.rs.getTimestamp("finish_date").getTime()));

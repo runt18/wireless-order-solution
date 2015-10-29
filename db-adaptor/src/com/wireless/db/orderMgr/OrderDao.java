@@ -758,16 +758,23 @@ public class OrderDao {
 	 */
 	public static void repaid(DBCon dbCon, Staff staff, Order.RepaidBuilder builder) throws BusinessException, SQLException{
 		if(staff.getRole().hasPrivilege(Privilege.Code.RE_PAYMENT)){
-			//Restore the account if perform member consumption before.
 			Order oriOrder = OrderDao.getById(staff, builder.getPayBuilder().getOrderId(), DateType.TODAY);
+			//Restore the account if perform member consumption before.
 			if(oriOrder.getMemberId() != 0){
 				MemberDao.restore(dbCon, staff, oriOrder.getMemberId(), oriOrder);
+			}
+			//Restore the coupon if using coupon before & new coupons are used.
+			if(oriOrder.hasCoupon() && builder.hasCouponBuilder()){
+				coupon(dbCon, staff, new Order.CouponBuilder(oriOrder.getId()));
 			}
 			if(builder.hasDiscountBuilder()){
 				discount(dbCon, staff, builder.getDiscountBuilder());
 			}
 			if(builder.hasServiceBuilder()){
 				service(dbCon, staff, builder.getServiceBuilder());
+			}
+			if(builder.hasCouponBuilder()){
+				coupon(dbCon, staff, builder.getCouponBuilder());
 			}
 			UpdateOrder.exec(dbCon, staff, builder.getUpdateBuilder());
 			PayOrder.pay(dbCon, staff, builder.getPayBuilder());
