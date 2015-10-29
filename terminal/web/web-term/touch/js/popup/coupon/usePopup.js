@@ -1,7 +1,7 @@
 function UseCouponPopup(param){
 	
 	param = param || {
-		header : '',		//头部信息
+		title : '',		//头部信息
 		useMode : null,		//使用类型
 		useTo : '',			//对象的使用
 		useComment : '',	//备注
@@ -63,17 +63,35 @@ function UseCouponPopup(param){
 				pageInit : function(self){
 					var progressCoupon = "";
 					for(var i = 0; i < availCoupons.length; i++){
+						//判断优惠券是否过期,如果过期就不加入
+						if(availCoupons[i].couponType.isExpired){
+							continue;
+						}
 						var eachProgressCoupon = '<tr>'
 											 + '<td style="width:250px">'
-											 + '<label style="height:50px"><input type="checkbox" class="useCouponClass" data-theme="e" coupon_id="' + availCoupons[i].couponId + '">' + availCoupons[i].promotion.title + '</label>'
+											 + '<label style="height:50px"><input type="checkbox" class="useCouponClass" data-theme="e" coupon_id="' + availCoupons[i].couponId + '">' + availCoupons[i].promotion.title + '<font style="float:right" color="red">word</font>' +'</label>'
 											 + '</td>'
 											 + '</tr>';
 							
+						if(availCoupons[i].useDate){
+							eachProgressCoupon = eachProgressCoupon.replace('word', '已使用');
+						}else{
+							eachProgressCoupon = eachProgressCoupon.replace('word', ' ');
+						}
 						progressCoupon += eachProgressCoupon;
 					}
+					
+					
 					self.find('[id = useTal_table_use]').append(progressCoupon);
 					self.find('[id = useTal_table_use]').trigger('create').trigger('refresh');
 			
+					
+					//更改标题
+					if(param.title){
+						self.find('[id=couponUseHeader_div_use]').html('<h3>' + param.title + '</h3>');
+					}
+					
+					
 					
 					//绑定确定按钮
 					self.find('[id = couponUseConfirm_a_use]').click(function(){

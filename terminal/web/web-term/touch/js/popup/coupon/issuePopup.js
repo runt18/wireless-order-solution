@@ -1,7 +1,7 @@
 function IssueCouponPopup(param){
 	
 	param = param || {
-		header : '',       		//头部信息
+		title : '',       		//头部信息
 		issueMode : null,    	//发送类型
 		issueTo : '',			//发送对象--memberId				
 		issueComment : '',   	//备注
@@ -19,7 +19,6 @@ function IssueCouponPopup(param){
 					_issueCouponPopup = new JqmPopup({
 						loadUrl : './popup/coupon/issue.html',
 						pageInit : function(self){
-							
 							var progressCoupon = "";
 							for(var i = 0; i < response.root.length; i++){
 								var eachProgressCoupon = '<tr class="promotionClass_tr_issue">'
@@ -49,12 +48,17 @@ function IssueCouponPopup(param){
 								}
 							});
 							
+							//更换标题
+							if(param.title){
+								self.find('[id=couponIssueHeader_div_issue]').html('<h3>' + param.title + '</h3>');
+							}
+							
+							
 							//绑定确定按钮
 							self.find('[id = couponIssueConfirm_a_issue]').click(function(){
 								var requestParam = {};
 								if(param.orderId){
 									requestParam['orderId'] = param.orderId;
-
 								}
 								var promotions = [];
 								self.find('[id=issueTal_table_issue] .promotionClass_tr_issue').each(function(index, element){

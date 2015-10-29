@@ -162,6 +162,10 @@ function loadOrderBasicMsg(){
 		$('#memberBalance_a_payment .ui-btn-text').html('会员余额');
 		$('#memberBalance_a_payment').buttonMarkup('refresh');
 		
+		//显示结账发券和用券按钮
+		$('#issueCoupon_a_orderFood').show();
+		$('#useCoupon_a_orderFood').show();
+		
 		$.post('../QueryMember.do', {dataSource : 'normal', id : orderMsg.memberId, forDetail : true}, function(result){
 			if(result.success){
 				
@@ -181,7 +185,11 @@ function loadOrderBasicMsg(){
 		$('#memberInfo_span_payment').html('');
 		//设置会员结账按钮
 		$('#memberBalance_a_payment .ui-btn-text').html('读取会员');
-		$('#memberBalance_a_payment').buttonMarkup('refresh');		
+		$('#memberBalance_a_payment').buttonMarkup('refresh');	
+		
+		//隐藏结账发券和用券按钮
+		$('#issueCoupon_a_orderFood').hide();
+		$('#useCoupon_a_orderFood').hide();
 	}
 	
 	//微信账单
@@ -1048,6 +1056,8 @@ $(function(){
 				$('#showMemberInfoWin').popup('open');
 			}
 		});
+		
+		
 		
 	});
 	
