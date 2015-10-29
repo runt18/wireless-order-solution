@@ -685,7 +685,20 @@ public class Coupon implements Jsonable{
 		jm.putString("statusText", this.status.desc);
 		jm.putInt("statusValue", this.status.val);
 		jm.putString("birthDate", DateUtil.formatToDate(this.getBirthDate()));
-		
+		if(this.issueDate != 0){
+			jm.putString("issueStaff", this.issueStaff);
+			jm.putInt("issueMode", this.issueMode.val);
+			jm.putString("issueModeText", this.issueMode.desc);
+			jm.putString("issueDate", DateUtil.format(this.issueDate, DateUtil.Pattern.DATE_TIME));
+			jm.putString("issueComment", this.issueComment);
+		}		
+		if(this.useDate != 0){
+			jm.putString("useStaff", this.useStaff);
+			jm.putInt("useMode", this.useMode.val);
+			jm.putString("useModeText", this.useMode.desc);
+			jm.putString("useDate", DateUtil.format(this.useDate, DateUtil.Pattern.DATE_TIME));
+			jm.putString("useComment", this.useComment);
+		}
 		if(flag == COUPON_JSONABLE_COMPLEX){
 			jm.putJsonable("promotion", this.promotion, 0);
 			jm.putJsonable("couponType", this.couponType, CouponType.COUPON_TYPE_JSONABLE_COMPLEX);
