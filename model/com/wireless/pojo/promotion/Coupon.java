@@ -95,7 +95,7 @@ public class Coupon implements Jsonable{
 	}
 	
 	public static class IssueBuilder{
-		private final Map<Integer, Integer> promotions = new HashMap<>();
+		private final Map<Integer, Integer> promotions = new HashMap<Integer, Integer>();
 		private final SortedList<Integer> members = SortedList.newInstance();
 		private final IssueMode issueMode;
 		private final int issueAssociateId;
@@ -309,52 +309,6 @@ public class Coupon implements Jsonable{
 		}
 	}
 	
-	public static class DrawProgress implements Jsonable{
-		
-		private int point;
-		private final Coupon coupon;
-		private DrawProgress(int point, Coupon coupon){
-			this.point = point;
-			this.coupon = coupon;
-		}
-		
-		public int getPoint(){
-			return this.point;
-		}
-		
-		public boolean isOk(){
-//			if(coupon.getStatus() == Coupon.Status.PUBLISHED && coupon.getPromotion().getStatus() == Promotion.Status.PROGRESS){
-//				if(coupon.getPromotion().getRule() == Promotion.Rule.FREE){
-//					return true;
-//				}else if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE || coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
-//					return point >= coupon.getPromotion().getPoint();
-//				}else{
-//					return false;
-//				}
-//			}else{
-//				return false;
-//			}
-			return true;
-		}
-		
-		@Override
-		public String toString(){
-			return coupon.getPromotion().getTitle() + ", " + coupon.getPromotion().getRule().toString() + coupon.getPromotion().getPoint() + ", 当前积分" + point;
-		}
-
-		@Override
-		public JsonMap toJsonMap(int flag) {
-			JsonMap jm = new JsonMap();
-			jm.putInt("point", this.point);
-			jm.putBoolean("isOk", this.isOk());
-			return jm;
-		}
-
-		@Override
-		public void fromJsonMap(JsonMap jsonMap, int flag) {
-			
-		}
-	}
 	
 	public static enum IssueMode{
 		FAST(1, "快速"),
@@ -436,7 +390,6 @@ public class Coupon implements Jsonable{
 	private int useAssociateId;
 	private String useComment;
 	private Status status = Status.UNKNOWN;
-	private final DrawProgress drawProgress = new DrawProgress(0, this);
 	
 //	private Coupon(InsertBuilder builder){
 //		setCouponType(builder.couponType);
@@ -641,14 +594,6 @@ public class Coupon implements Jsonable{
 			return "";
 		}
 		return this.useComment;
-	}
-	
-	public void setDrawProgress(int point){
-		drawProgress.point = point;
-	}
-	
-	public DrawProgress getDrawProgress(){
-		return this.drawProgress;
 	}
 	
 	@Override

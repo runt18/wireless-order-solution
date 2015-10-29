@@ -1,16 +1,15 @@
 package com.wireless.pojo.promotion;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DateRange;
-import com.wireless.pojo.member.Member;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.pojo.util.SortedList;
 
 public class Promotion implements Jsonable{
 
@@ -19,91 +18,27 @@ public class Promotion implements Jsonable{
 		private final String title;
 		private final String body;
 		private final String entire;
-		private final Rule rule;
-		private int point;
 		private Type type = Type.NORMAL;
 		private final CouponType.InsertBuilder typeBuilder;
-		private final SortedList<Member> members = SortedList.newInstance();
-		private Oriented oriented = Oriented.EMPTY;
+		private final List<Trigger> triggers = new ArrayList<Trigger>();
 		
-		private CreateBuilder(String title, String body, Rule type, CouponType.InsertBuilder typeBuilder, String entire){
+		private CreateBuilder(String title, String body, CouponType.InsertBuilder typeBuilder, String entire){
 			this.title = title;
 			this.body = body;
 			this.entire = entire;
-			this.rule = type;
 			this.typeBuilder = typeBuilder;
 		}
 		
-		public static CreateBuilder newInstance(String title, String body, Rule rule, CouponType.InsertBuilder typeBuilder, String entire){
-			if(rule == Rule.DISPLAY_ONLY){
-				throw new IllegalArgumentException("【" + Rule.DISPLAY_ONLY.desc + "】类型不能创建优惠券");
-			}
-			CreateBuilder instance = new CreateBuilder(title, body, rule, typeBuilder, entire);
+		public static CreateBuilder newInstance(String title, String body, CouponType.InsertBuilder typeBuilder, String entire){
+			CreateBuilder instance = new CreateBuilder(title, body, typeBuilder, entire);
 			return instance;
 		}
 		
-		public static CreateBuilder newInstance4Display(String title, String body, String entire){
-			CreateBuilder instance = new CreateBuilder(title, body, Rule.DISPLAY_ONLY, new CouponType.InsertBuilder(title, 0, 0), entire);
-			return instance;
-		}
-
-//		public static CreateBuilder newInstance4Welcome(String title, DateRange range, String body, Rule rule, CouponType.InsertBuilder typeBuilder, String entire){
-//			CreateBuilder instance = new CreateBuilder(title, range, body, rule, typeBuilder, entire);
-//			instance.type = Type.WELCOME;
-//			return instance;
-//		}
-//		
-//		public static CreateBuilder newInstance4Welcome(String title, DateRange range, String body, String entire){
-//			CreateBuilder instance = newInstance4Display(title, range, body, entire);
-//			instance.type = Type.WELCOME;
-//			return instance;
-//		}
-		
-//		public CreateBuilder setRange(String begin, String end) throws ParseException{
-//			setRange(DateUtil.parseDate(begin, DateUtil.Pattern.DATE), DateUtil.parseDate(end, DateUtil.Pattern.DATE));
-//			return this;
-//		}
-//		
-//		public CreateBuilder setRange(long begin, long end){
-//			if(begin < 0 || end < 0){
-//				throw new IllegalArgumentException("活动时间不能小于0");
-//			}
-//			if(end < begin){
-//				throw new IllegalArgumentException("活动结束时间不能小于开始时间");
-//			}
-//			this.range = new DateRange(begin, end);
-//			return this;
-//		}
-		
-		public CreateBuilder setPoint(int point){
-			if(point <= 0){
-				throw new IllegalArgumentException("积分条件不能小于0");
+		public CreateBuilder addTrigger(Trigger trigger){
+			if(!this.triggers.contains(trigger)){
+				this.triggers.add(trigger);
 			}
-			this.point = point;
 			return this;
-		}
-		
-		public CreateBuilder addMember(int memberId){
-			Member member = new Member(memberId);
-			if(!members.contains(member)){
-				members.add(member);
-			}
-			this.oriented = Oriented.SPECIFIC;
-			return this;
-		}
-		
-		public CreateBuilder setMemberAll(){
-			this.oriented = Oriented.ALL;
-			return this;
-		}
-		
-		public CreateBuilder setMemberEmpty(){
-			this.oriented = Oriented.EMPTY;
-			return this;
-		}
-		
-		public List<Member> getMembers(){
-			return Collections.unmodifiableList(members);
 		}
 		
 		public CouponType.InsertBuilder getTypeBuilder(){
@@ -122,12 +57,34 @@ public class Promotion implements Jsonable{
 		private String title;
 		private String body;
 		private String entire;
-		private int point = -1;
 		private CouponType.UpdateBuilder typeBuilder;
-		private Oriented oriented;
+		private List<Trigger> triggers = null;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
+		}
+		
+		public UpdateBuilder addTrigger(Trigger trigger){
+			if(triggers == null){
+				triggers = new ArrayList<Trigger>();
+			}
+			if(!triggers.contains(trigger)){
+				this.triggers.add(trigger);
+			}
+			return this;
+		}
+
+		public UpdateBuilder emptyTriggers(){
+			if(triggers == null){
+				triggers = new ArrayList<Trigger>();
+			}else{
+				triggers.clear();
+			}
+			return this;
+		}
+		
+		public boolean isTriggersChanged(){
+			return this.triggers != null;
 		}
 		
 		public UpdateBuilder setTitle(String title){
@@ -179,24 +136,6 @@ public class Promotion implements Jsonable{
 			return this.range != UPDATE_FLAG;
 		}
 		
-		public UpdateBuilder setPoint(int point){
-			this.point = point;
-			return this;
-		}
-		
-		public boolean isPointChanged(){
-			return this.point != -1;
-		}
-		
-		public UpdateBuilder setOriented(Oriented oriented){
-			this.oriented = oriented;
-			return this;
-		}
-		
-		public boolean isMemberChanged(){
-			return this.oriented != null;
-		}
-		
 		public UpdateBuilder setCouponTypeBuilder(CouponType.UpdateBuilder builder){
 			this.typeBuilder = builder;
 			return this;
@@ -218,32 +157,11 @@ public class Promotion implements Jsonable{
 	public static class PublishBuilder{
 		
 		private final int promotionId;
-		private Oriented oriented;
 		private int condId;
 		private long finishDate;
 		
 		public PublishBuilder(int promotionId){
 			this.promotionId = promotionId;
-		}
-		
-		public boolean isOrientedChanged(){
-			return this.oriented != null;
-		}
-		
-		public PublishBuilder setOrientedAll(){
-			this.oriented = Oriented.ALL;
-			return this;
-		}
-
-		public PublishBuilder setOrientedEmpty(){
-			this.oriented = Oriented.EMPTY;
-			return this;
-		}
-		
-		public PublishBuilder setOriented(int condId){
-			this.oriented = Oriented.SPECIFIC;
-			this.condId = condId;
-			return this;
 		}
 		
 		public PublishBuilder setFinishDate(long finishDate){
@@ -361,39 +279,46 @@ public class Promotion implements Jsonable{
 		}
 	}
 	
-	public static enum Oriented{
-		ALL(1, "全部会员"),
-		SPECIFIC(2, "特定会员"),
-		EMPTY(3, "不面向会员");
+	public static enum Trigger implements Jsonable{
+		WX_SUBSCRIBE(1, "微信关注");
 		
-		private final int val;
-		private final String desc;
-		
-		Oriented(int val, String desc){
+		Trigger(int val, String desc){
 			this.val = val;
 			this.desc = desc;
 		}
 		
-		public static Oriented valueOf(int val){
-			for(Oriented oriented : values()){
-				if(oriented.val == val){
-					return oriented;
+		private final int val;
+		private final String desc;
+		
+		public static Trigger valueOf(int val){
+			for(Trigger type : values()){
+				if(type.val == val){
+					return type;
 				}
 			}
-			throw new IllegalArgumentException("The oriented (val = " + val + ") passed is invalid.");
+			throw new IllegalArgumentException("The trigger type(val = " + val + ") passed is invalid.");
 		}
 		
 		public int getVal(){
-			return val;
-		}
-		
-		public String getDesc(){
-			return desc;
+			return this.val;
 		}
 		
 		@Override
 		public String toString(){
 			return this.desc;
+		}
+
+		@Override
+		public JsonMap toJsonMap(int flag) {
+			JsonMap jm = new JsonMap();
+			jm.putInt("triggerType", this.val);
+			jm.putString("triggerText", this.desc);
+			return jm;
+		}
+
+		@Override
+		public void fromJsonMap(JsonMap jm, int flag) {
+			
 		}
 	}
 	
@@ -407,9 +332,10 @@ public class Promotion implements Jsonable{
 	private CouponType couponType;
 	private Rule rule = Rule.FREE;
 	private Type type = Type.NORMAL;
-	private Oriented oriented;
-	private int point;
+	private final List<Trigger> triggers = new ArrayList<Trigger>();
+	
 	private OssImage image;
+	
 	
 	private Promotion(CreateBuilder builder){
 		this.createDate = System.currentTimeMillis();
@@ -417,13 +343,9 @@ public class Promotion implements Jsonable{
 		this.title = builder.title;
 		this.body = builder.body;
 		this.entire = builder.entire;
-		this.rule = builder.rule;
-		this.point = builder.point;
-		if(builder.rule != Rule.DISPLAY_ONLY){
-			this.couponType = builder.typeBuilder.build();
-		}
-		this.oriented = builder.oriented;
+		this.couponType = builder.typeBuilder.build();
 		this.type = builder.type;
+		this.triggers.addAll(builder.triggers);
 	}
 	
 	private Promotion(UpdateBuilder builder){
@@ -438,20 +360,16 @@ public class Promotion implements Jsonable{
 			this.body = builder.body;
 			this.entire = builder.entire;
 		}
-		if(builder.isPointChanged()){
-			this.point = builder.point;
-		}
 		if(builder.isCouponTypeChanged()){
 			this.couponType = builder.typeBuilder.build();
 		}
-		if(builder.isMemberChanged()){
-			this.oriented = builder.oriented;
+		if(builder.isTriggersChanged()){
+			this.triggers.addAll(builder.triggers);
 		}
 	}
 	
 	private Promotion(PublishBuilder builder){
 		this.id = builder.promotionId;
-		this.oriented = builder.oriented;
 		this.dateRange = new DateRange(0, builder.finishDate);
 	}
 	
@@ -559,28 +477,12 @@ public class Promotion implements Jsonable{
 		return this.type;
 	}
 	
-	public Oriented getOriented(){
-		return this.oriented;
-	}
-	
-	public void setOriented(Oriented oriented){
-		this.oriented = oriented;
-	}
-	
 	public CouponType getCouponType(){
 		return this.couponType;
 	}
 	
 	public void setCouponType(CouponType couponType){
 		this.couponType = couponType;
-	}
-	
-	public int getPoint(){
-		return this.point;
-	}
-	
-	public void setPoint(int point){
-		this.point = point;
 	}
 	
 	public void setImage(OssImage image){
@@ -593,6 +495,14 @@ public class Promotion implements Jsonable{
 	
 	public boolean hasImage(){
 		return this.image != null;
+	}
+	
+	public void addTrigger(Trigger trigger){
+		this.triggers.add(trigger);
+	}
+	
+	public List<Trigger> getTriggers(){
+		return Collections.unmodifiableList(this.triggers);
 	}
 	
 	@Override
@@ -625,12 +535,11 @@ public class Promotion implements Jsonable{
 		jm.putString("body", this.body);
 		jm.putString("entire", this.entire);
 		jm.putString("image", this.getImage() != null ? this.getImage().getObjectUrl() : "http://digie-image-real.oss.aliyuncs.com/nophoto.jpg");
-		jm.putInt("point", this.point);
 		jm.putInt("status", this.getStatus().getVal());
 		jm.putInt("pType", this.rule.getVal());
 		jm.putInt("rule", this.rule.getVal());
-		jm.putInt("oriented", this.oriented.getVal());
 		jm.putJsonable("coupon", this.couponType, 0);
+		jm.putJsonableList("triggers", this.triggers, 0);
 		return jm;
 	}
 
