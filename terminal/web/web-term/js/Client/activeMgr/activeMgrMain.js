@@ -27,7 +27,6 @@ Ext.onReady(function() {
 		$(".active_mould").removeClass('active_mould_click');
 		$(thiz).find('input').attr('checked', 'checked');
 		$(thiz).addClass('active_mould_click');
-		promotionGuideWin.promotionType = type;
 		updatePromotionCouponPanel(type);
 	}
 	
@@ -69,10 +68,6 @@ Ext.onReady(function() {
 	$('#freeCoupon_div_promotion').click(function(){
 		selectPromotionModel($('#freeCoupon_div_promotion')[0], 2);
 	});
-	//纯展示优惠券类型
-	$('#display_div_promotion').click(function(){
-		selectPromotionModel($('#display_div_promotion')[0], 2);
-	});
 	
     //生成优惠活动头部内容
     function buildPromotionHeader(title, endDate){
@@ -106,15 +101,13 @@ Ext.onReady(function() {
 		var params = {};
 		if(promotionGuideWin.otype == 'insert'){
 			params.dataSource = 'insert';
-			//面向全员
-			params.oriented = 1;
+
 		}else{
 			params.dataSource = 'update';
 			params.id = promotionGuideWin.promotion.id;
 			params.cId = promotionGuideWin.promotion.coupon.id;
 		}
 		
-		params.pRule = promotionGuideWin.promotionType;
 		params.couponName = couponName.getValue();
 		params.price = price.getValue();
 		params.expiredDate = expiredDate.getValue().format('Y-m-d');
@@ -653,19 +646,21 @@ Ext.onReady(function() {
 							params.endDate = Ext.util.Format.date(endDate, 'Y-m-d 00:00:00');
 						}
 						
-						var oriented = Ext.getCmp('comboFilter4PromotionPublish').getValue();
-						if(oriented == -1){
-							//不发布给任何人
-							params.oriented = 3;
-							
-						}else if(oriented == 0){
-							//发布面向所有人
-							params.oriented = 1;
-							
-						}else if(oriented > 0){
-							//发布面向特定条件的会员
-							params.oriented = 2;
-						}
+						//TODO 设置优惠活动触发条件
+						params.triggers = '1';
+//						var oriented = Ext.getCmp('comboFilter4PromotionPublish').getValue();
+//						if(oriented == -1){
+//							//不发布给任何人
+//							params.oriented = 3;
+//							
+//						}else if(oriented == 0){
+//							//发布面向所有人
+//							params.oriented = 1;
+//							
+//						}else if(oriented > 0){
+//							//发布面向特定条件的会员
+//							params.oriented = 2;
+//						}
 						
 						var publishMask = new Ext.LoadMask(document.body, {
 							msg : '正在发布活动...'
@@ -870,7 +865,6 @@ Ext.onReady(function() {
 		promotionGuideWin.otype = c.type;
 		if(c.promotion){
 			promotionGuideWin.promotion = c.promotion;
-			promotionGuideWin.promotionType = c.promotion.pType;
 		}
 		
 		promotionGuideWin.show();
