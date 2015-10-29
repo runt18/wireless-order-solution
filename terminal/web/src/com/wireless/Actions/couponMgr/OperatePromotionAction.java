@@ -27,53 +27,36 @@ import com.wireless.pojo.util.DateUtil;
 public class OperatePromotionAction extends DispatchAction{
 
 	public ActionForward insert(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String title = request.getParameter("title");
-//		String beginDate = request.getParameter("beginDate");
-//		String endDate = request.getParameter("endDate");
-		String body = request.getParameter("body");
-		String entire = request.getParameter("entire");
-		String pType = request.getParameter("pRule");
-		String point = request.getParameter("point");
-//		String members = request.getParameter("members");
-//		String oriented = request.getParameter("oriented");
+		final String title = request.getParameter("title");
+		final String body = request.getParameter("body");
+		final String entire = request.getParameter("entire");
+		//String pType = request.getParameter("pRule");
+		//String point = request.getParameter("point");
 		
-		String couponName = request.getParameter("couponName");
-		String price = request.getParameter("price");
-		String expiredDate = request.getParameter("expiredDate");
-		String image = request.getParameter("image");		
+		final String couponName = request.getParameter("couponName");
+		final String price = request.getParameter("price");
+		final String expiredDate = request.getParameter("expiredDate");
+		final String image = request.getParameter("image");		
+		final String triggers = request.getParameter("triggers");
 		
-		
-		String pin = (String) request.getAttribute("pin");
-		JObject jobject = new JObject();
+		final String pin = (String) request.getAttribute("pin");
+		final JObject jobject = new JObject();
 		try{
 			
-			Promotion.CreateBuilder promotionCreateBuilder;
+			final CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price), DateUtil.parseDate(expiredDate)).setComment("活动优惠劵");
+			if(image != null && !image.isEmpty()){
+				typeInsertBuilder.setImage(Integer.parseInt(image));
+			}
 			
-			if(Promotion.Rule.valueOf(Integer.parseInt(pType)) == Promotion.Rule.DISPLAY_ONLY){
-				promotionCreateBuilder = Promotion.CreateBuilder.newInstance4Display(title, body, entire)
-																//.setRange(beginDate, endDate)
-																;
-			}else{
-				CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price), DateUtil.parseDate(expiredDate)).setComment("活动优惠劵");
-				if(image != null && !image.isEmpty()){
-					typeInsertBuilder.setImage(Integer.parseInt(image));
-				}
-				
-				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, body, Promotion.Rule.valueOf(Integer.parseInt(pType)), typeInsertBuilder, entire)
-															    //.setRange(beginDate, endDate)
-															    ;
-				if(point != null && !point.isEmpty() && Promotion.Rule.valueOf(Integer.parseInt(pType)) != Promotion.Rule.FREE){
-					promotionCreateBuilder.setPoint(Integer.parseInt(point));
-				}
-			}				
+			final Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, body, typeInsertBuilder, entire);
 			
-//			if(Integer.parseInt(oriented) == Promotion.Oriented.SPECIFIC.getVal() && members != null){
-//				String[] memberList = members.split(",");
-//				for (String member : memberList) {
-//					promotionCreateBuilder.addMember(Integer.parseInt(member));
-//				}				
-//			}
-
+			//触发条件
+			if(triggers != null && !triggers.isEmpty()){
+				for(String eachTrigger : triggers.split(",")){
+					promotionCreateBuilder.addTrigger(Promotion.Trigger.valueOf(Integer.parseInt(eachTrigger)));
+				}
+			}
+			
 			final int promotionId = PromotionDao.create(StaffDao.verify(Integer.parseInt(pin)), promotionCreateBuilder);
 			
 			jobject.initTip(true, "活动创建成功");
@@ -105,27 +88,28 @@ public class OperatePromotionAction extends DispatchAction{
 	}
 
 	public ActionForward update(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String pId = request.getParameter("id");
-		String title = request.getParameter("title");
-		String beginDate = request.getParameter("beginDate");
-		String endDate = request.getParameter("endDate");
-		String body = request.getParameter("body");
-		String entire = request.getParameter("entire");
+		final String promotionId = request.getParameter("id");
+		final String title = request.getParameter("title");
+		final String beginDate = request.getParameter("beginDate");
+		final String endDate = request.getParameter("endDate");
+		final String body = request.getParameter("body");
+		final String entire = request.getParameter("entire");
 		
-		String couponTypeId = request.getParameter("cId");
-		String couponName = request.getParameter("couponName");
-		String price = request.getParameter("price");
-		String expiredDate = request.getParameter("expiredDate");
-		String image = request.getParameter("image");		
+		final String couponTypeId = request.getParameter("cId");
+		final String couponName = request.getParameter("couponName");
+		final String price = request.getParameter("price");
+		final String expiredDate = request.getParameter("expiredDate");
+		final String image = request.getParameter("image");		
+		final String triggers = request.getParameter("triggers");
 		
-		String orientedId = request.getParameter("oriented");
+		//String orientedId = request.getParameter("oriented");
 		
-		String pin = (String) request.getAttribute("pin");
+		final String pin = (String) request.getAttribute("pin");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		JObject jobject = new JObject();
+		final JObject jobject = new JObject();
 		try{
 			
-			final Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId));
+			final Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(promotionId));
 			
 			//优惠券类型
 			if(couponTypeId != null && !couponTypeId.isEmpty()){
@@ -161,9 +145,15 @@ public class OperatePromotionAction extends DispatchAction{
 				promotionUpdateBuilder.setRange(0, DateUtil.parseDate(endDate));
 			}
 			
-			//优惠活动发布对象
-			if(orientedId != null && !orientedId.isEmpty()){
-				promotionUpdateBuilder.setOriented(Promotion.Oriented.valueOf(Integer.parseInt(orientedId)));
+			//触发条件
+			if(triggers != null){
+				if(triggers.isEmpty()){
+					promotionUpdateBuilder.emptyTriggers();
+				}else{
+					for(String eachTrigger : triggers.split(",")){
+						promotionUpdateBuilder.addTrigger(Promotion.Trigger.valueOf(Integer.parseInt(eachTrigger)));
+					}
+				}
 			}
 			
 			PromotionDao.update(staff, promotionUpdateBuilder);
