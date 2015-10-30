@@ -163,7 +163,7 @@ function loadSingleOrderData(resultJSON){
 						Ext.getCmp('box4RepaidPricePlan').hide();
 					}		
 					
-					if(re_member.coupons.length > 0){
+					if(primaryOrderData.other.order.memberId > 0){
 						Ext.getCmp('box4RepaidCoupon').show();
 					}else{
 						Ext.getCmp('box4RepaidCoupon').hide();	

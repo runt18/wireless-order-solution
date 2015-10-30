@@ -27,7 +27,7 @@ function UseCouponPopup(param){
 					alert(response.msg);
 				}
 
-			});
+			}, 'json');
 		}else{
 			$.post('../OperateCoupon.do',  {dataSource : 'getByCond',status : 'issued', memberId : param.useTo}, function(response, status, xhr){
 				if(response.success){
@@ -38,7 +38,7 @@ function UseCouponPopup(param){
 				}else{
 					alert(response.msg);
 				}
-			});
+			}, 'json');
 		}
 		
 	};
