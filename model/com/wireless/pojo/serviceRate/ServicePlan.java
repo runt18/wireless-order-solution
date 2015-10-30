@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.regionMgr.Region;
 
 
-public class ServicePlan {
+public class ServicePlan implements Jsonable{
 
 	public static class UpdateBuilder{
 		private final int planId;
@@ -284,5 +286,22 @@ public class ServicePlan {
 	@Override
 	public String toString(){
 		return this.name != null ? this.name : "";
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.planId);
+		jm.putString("name", this.name);
+		jm.putInt("type", this.type.val);
+		jm.putString("typeText", this.type.desc);
+		jm.putInt("status", this.status.val);
+		jm.putString("statusText", this.status.desc);
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jm, int flag) {
+		
 	}
 }
