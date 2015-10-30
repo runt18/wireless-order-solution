@@ -10,7 +10,7 @@
 		<init-param>
 			<param-name>skipVerify</param-name>
 			<param-value>
-
+					
 					/QueryRestaurants.do,
 					/VerifyLogin.do,
 					/QueryStaff.do,
@@ -77,7 +77,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>192.168.180.100</param-value>
+			<param-value>192.168.33.100</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
