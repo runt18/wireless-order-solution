@@ -929,9 +929,12 @@ $(function(){
 		$('#issueCoupon_a_orderFood').click(function(){
 			//初始化发送优惠券
 			var issueCoupon = new IssueCouponPopup({
+				title : '发送优惠券',
+				memberName : orderMsg.member.name, 
 				issueMode : IssueCouponPopup.IssueMode.ORDER,
 				orderId : orderMsg.id,
-				issueTo : orderMsg.memberId
+				issueTo : orderMsg.memberId,
+				
 			});
 			issueCoupon.open();
 		});
@@ -939,8 +942,10 @@ $(function(){
 		//打开用券
 		$('#useCoupon_a_orderFood').click(function(){
 			var useCouponPopup = new UseCouponPopup({
+				title : '使用优惠券',
 				useTo : orderMsg.memberId,
 				orderId :  orderMsg.id,
+				memberName : orderMsg.member.name,
 				useCuoponMethod : function(coupons){
 					$.post('../OperateOrderFood.do', {dataSource : 'coupon', orderId : orderMsg.id, coupons : coupons.join(',')}, function(response, status, xhr){
 						if(response.success){
