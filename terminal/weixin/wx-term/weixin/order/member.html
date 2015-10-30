@@ -148,42 +148,41 @@ var member = {}, currentMemberLevelData={}, memberLevelData=[];
 	</div> 
 </div>
 
-<div id="divMemberCouponContent" class="main-box">
-<ul class="m-b-list">
-	<li id="li_myCoupon" class="box-horizontal none-line" onclick="toggleCouponContent()">
-		<div>我的优惠券</div>
-		<div id="divMyCoupon" class="event">&nbsp;<font>&gt;</font></div>
-	</li>
-	<li style="overflow: hidden;padding-bottom: 3px;">
-		<div id="divMemberCouponContentView" style="display:none; width:100%;" >
-			<div id="divMemberCouponContentViews"></div>	
-		</div>
-	</li>
-</ul>
+<div class="main-box">
+	<ul class="m-b-list">
+		<li id="myCoupon_li_member" class="box-horizontal none-line">
+			<div>我的优惠券</div>
+			<div id="divMyCoupon" class="event">&nbsp;<font>&gt;</font></div>
+		</li>
+		<li style="overflow: hidden;padding-bottom: 3px;">
+			<div id="coupons_div_member" style="display:none; width:100%;" >
+			</div>
+		</li>
+	</ul>
 </div>
 
-<div id="divMemberCouponConsume" class="main-box">
-<ul class="m-b-list">
-	<li class="box-horizontal none-line" onclick="toggleCouponConsumeDetails()">
-		<div>优惠券消费记录</div>
-		<div class="event">&nbsp;&gt;</div>
-	</li>
-	<li>
-		<div id="divMemberCouponConsumeDetails" style="display:none;width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;">
-			<table class="d-list">
-				<thead>
-				<tr class="d-list-title">
-					<td style="width:50%;text-align: center;">日期</td>
-					<td style="width:25%;">消费金额</td>
-					<td style="width:25%;">优惠金额</td>
-				</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
-		</div>	
-	</li>
-</ul>
+<div id="couponDetails_div_member" class="main-box">
+	<ul class="m-b-list">
+		<li id="couponDetails_li_member" class="box-horizontal none-line">
+			<div>优惠券消费记录</div>
+			<div class="event">&nbsp;&gt;</div>
+		</li>
+		<li>
+			<div id="couponDetailItems_div_member" style="display:none;width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;">
+				<table class="d-list">
+					<thead>
+					<tr class="d-list-title">
+						<td style="width:50%;text-align: center;">日期</td>
+						<td style="width:25%;">使用方式</td>
+						<td style="width:25%;">优惠金额</td>
+					</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>	
+		</li>
+	</ul>
 </div>
 
 <div>

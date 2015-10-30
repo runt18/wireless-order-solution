@@ -32,7 +32,7 @@ $(function(){
 					url : '../../WXQueryMemberOperation.do',
 					type : 'post',
 					data : {
-						dataSource : 'chargeAndPointTitle',
+						dataSource : 'recent',
 						oid : Util.mp.oid,
 						fid : Util.mp.fid
 					},
@@ -47,7 +47,7 @@ $(function(){
 							$('#divMemberPointContent').css('display', 'block');
 						}
 						if(data.other.couponConsume >= 0){
-							$('#divMemberCouponConsume').css('display', 'block');
+							$('#couponDetails_div_member').css('display', 'block');
 						}							
 					},
 					error : function(data, errotType, eeor){
@@ -68,7 +68,7 @@ $(function(){
 				if(data.other.hasCoupon){
 					$('#divMemberCouponContent').css('display', 'block');
 					if(Util.mp.extra && Util.mp.extra == 'coupon'){
-						$('#li_myCoupon').click();
+						$('#myCoupon_li_member').click();
 					}
 				}					
 								
@@ -198,6 +198,143 @@ $(function(){
 			}
 		});
 		
+	});
+	
+	//我的优惠券
+	$('#myCoupon_li_member').click(function(){
+		var mainView = $('#coupons_div_member');
+		
+		function showCoupons(){
+
+			Util.lm.show();
+			$.ajax({
+				url : '../../WxOperateCoupon.do',
+				type : 'post',
+				data : {
+					dataSource : 'getByCond',
+					status : 'issued',
+					oid : Util.mp.oid,
+					fid : Util.mp.fid
+				},
+				dataType : 'json',
+				success : function(data, status, xhr){
+					Util.lm.hide();
+					if(data.success){
+						var couponAmount = 0;
+						if(data.root.length > 0){
+							var templet = '<div class="box" promotion-id="{promotionId}">' +
+											'<div class="box_in"><img src="{couponImg}"></div>' +
+											'<span>{name}</span><br><span>面额 : {cPrice} 元</span><br><span>到期 : {expiredTime}</span><br><span>来自 : {promotionName}</span>' +
+			  							  '</div>';
+							var html = [];
+						
+							for(var i = 0; i < data.root.length; i++){
+								var coupon = data.root[i];
+								html.push(templet.format({
+									couponImg : coupon.couponType.ossImage ? coupon.couponType.ossImage.image : 'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg',
+									name : coupon.couponType.name,
+									cPrice : coupon.couponType.price,
+									expiredTime : coupon.couponType.expiredFormat,
+									promotionName : coupon.promotion.title,
+									promotionId : coupon.promotion.id
+								}));
+								couponAmount++;
+							}
+							mainView.html(html);
+							
+							//点击优惠券的处理事件
+							mainView.find('.box').each(function(index, element){
+								element.onclick = function(){
+									Util.jump('sales.html?pid=' + $(element).attr('promotion-id'));
+								}
+							});
+							
+						}else{
+							mainView.html('暂无优惠券');
+						}
+						member.couponCount = couponAmount;
+						
+					}else{
+						Util.dialog.show({title: data.title, msg: data.msg});						
+					}
+				},
+				error : function(data, errotType, eeor){
+					Util.lm.hide();
+					Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+				}
+			});
+		};
+		mainView.fadeToggle(function(){
+			if(mainView.css('display') == 'block'){
+				$('html, body').animate({scrollTop: 0});
+				$('html, body').animate({scrollTop: 310 + $('#divMemberPointContent').height() + $('#divMemberBalanceContent').height() + $('#divMemberTypeContent').height()}, 'fast');			
+				showCoupons();
+			}else{
+				mainView.html('');
+			}
+		});
+	});
+	
+	//优惠券消费记录
+	$('#couponDetails_li_member').click(function(){
+		var mainView = $('#couponDetailItems_div_member');
+		var tbody = mainView.find('table > tbody');
+	
+		// 加载近5条消费记录
+		function showCouponDetails(){
+			Util.lm.show();
+			$.ajax({
+				url : '../../WxOperateCoupon.do',
+				type : 'post',
+				data : {
+					dataSource : 'getByCond',
+					status : 'used',
+					orderBy : ' ORDER BY C.use_date DESC LIMIT 5 ',
+					oid : Util.mp.oid,
+					fid : Util.mp.fid
+				},
+				dataType : 'json',
+				success : function(data, status, xhr){
+					Util.lm.hide();
+					if(data.success){
+						if(data.root.length > 0){
+							var template = '<tr class="d-list-item-coupon">' +
+											'<td>{time}</td>' +
+											'<td>{useMode}</td>' +
+											'<td>{couponMoney}</td>' +
+										  '</tr>';
+							var html = [];
+							for(var i = 0; i < data.root.length; i++){
+								var temp = data.root[i];
+								html.push(template.format({
+									time : fnDateInChinese(temp.useDate) + '</br><font style="font-size:13px;">' + temp.couponType.name +'</font>',
+									useMode : temp.useModeText + '</br><font style="font-size:13px;">(' + temp.useAssociateId + ')</font>',
+									couponMoney : (checkDot(temp.couponType.price) ? parseFloat(temp.couponType.price).toFixed(2) : temp.couponType.price) + '元'
+								}));
+							}
+							tbody.html(html);
+						}else{
+							tbody.html('暂无优惠券使用记录.');
+						}
+					}else{
+						Util.dialog.show({title: data.title, msg: data.msg});						
+					}
+				},
+				error : function(data, errotType, eeor){
+					Util.lm.hide();
+					Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+				}
+			});
+		};
+		
+		mainView.fadeToggle(function(){
+			if(mainView.css('display') == 'block'){
+				$('html, body').animate({scrollTop : $('#couponDetailItems_div_member').offset().top}, 'fast');
+				showCouponDetails();
+			}else{
+				tbody.html('');
+			}
+		});
 	});
 	
 });
