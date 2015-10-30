@@ -1038,7 +1038,7 @@ public class OrderDao {
 		final Order order = OrderDao.getById(dbCon, staff, builder.getOrderId(), DateType.TODAY);
 
 		//Clear the coupons used before. 
-		if(order.hasCoupon()){
+		if(order.hasCoupon() && order.getMemberId() != builder.getMemberId()){
 			coupon(dbCon, staff, new Order.CouponBuilder(order.getId()));
 		}
 		
