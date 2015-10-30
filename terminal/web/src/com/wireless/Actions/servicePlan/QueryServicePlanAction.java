@@ -1,5 +1,6 @@
 package com.wireless.Actions.servicePlan;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,8 +18,27 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.serviceRate.ServiceRate;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryServicePlanAction extends DispatchAction{
+	
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		
+		final String pin = (String) request.getAttribute("pin");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final JObject jobject = new JObject();
+		
+		try{
+			jobject.setRoot(ServicePlanDao.getAll(staff));
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}
 	
 	public ActionForward planTree(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
