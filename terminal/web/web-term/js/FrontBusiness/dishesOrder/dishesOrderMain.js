@@ -1,4 +1,5 @@
 ﻿//反结账单头
+var coupons = null;
 function repaid_initNorthPanel(){
 
 	dishesOrderNorthPanel = new Ext.Panel({
@@ -37,7 +38,7 @@ function repaid_initNorthPanel(){
 				}]
 			}, {
 				width : 200,
-				items : [{
+				items : [{ 
 					xtype : 'combo',
 					id : 'comboDiscount',
 					fieldLabel : '折扣方案',
@@ -141,32 +142,79 @@ function repaid_initNorthPanel(){
 			}]			
 		}, {
 			id : 'box4RepaidCoupon',
-			columnWidth : 0.15,
+			columnWidth : 0.2,
 			items : [{
-				xtype : 'label',
-				width : 65,
-				html : '<font style="color:red;font-weight:bold">＊</font>优惠劵:'
+				xtype : 'button',
+				width : 100,
+				text : '优惠券选择',
+				handler : function(thiz, e){
+					var cm = new Ext.grid.ColumnModel([
+                       	new Ext.grid.CheckboxSelectionModel(),
+					    {header : '编号', dataIndex : 'couponType.id',hidden :true},
+					    {header : '名称', dataIndex : 'couponType.name'},
+					    {header  : '状态', dataIndex : 'statusText' }
+                    ]);
+					
+					var ds = new Ext.data.Store({
+						proxy : new Ext.data.HttpProxy({url : '../../OperateCoupon.do'}),
+						reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'},[
+						     {name : 'couponType.id'},
+						     {name : 'couponType.name'},
+						     {name : 'statusText'}
+						])
+					});
+					ds.baseParams = {
+						dataSource : 'getAvailableByOrder',
+						memberId : primaryOrderData.other.order.memberId,
+						orderId : primaryOrderData.other.order.id
+					};
+					ds.load();
+					
+					var selectCouponGrid = new Ext.grid.GridPanel({
+						id : "selectCoupon",
+						border : true,
+						height : 300,
+						frame : true,
+						store : ds,
+						cm : cm,
+						sm : new Ext.grid.CheckboxSelectionModel(),
+						viewConfig : {
+							forceFit : true
+						},
+					});
+					
+					var win = new Ext.Window({
+						title : '优惠券选择',
+						width : 500,
+						modal : true,
+						height : 300,
+						items : [selectCouponGrid],
+						buttons : [{
+							text : '确定',
+							handler : function(){
+								coupons = coupons || [];
+								var selected = Ext.getCmp('selectCoupon').getSelectionModel().getSelections();
+								for(var i = 0; i < selected.length; i++){
+									coupons.push(selected[i].json.couponId);
+								}
+								Ext.getCmp('selectCount').setText('你共选择了' + coupons.length + '张优惠券');
+								win.close();
+							}
+						},{
+							text : '取消',
+							handler : function(){
+								win.close();
+							}
+						}]
+					});
+					
+					win.show();
+				}
 			},{
-				xtype : 'combo',
-				forceSelection : true,
-				width : 80,
-				id : 'repaid_couponForPayOrder',
-				store : new Ext.data.SimpleStore({
-					fields : [ 'value', 'text' ]
-				}),
-				valueField : 'value',
-				displayField : 'text',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true,
-				allowBlank : false,
-				readOnly : false				
-			},{
-				xtype : 'label',
-				width : 10,
-				html : '&nbsp;'
-			}]			
+			   xtype : 'label',
+			   width : 130,
+			   id : 'selectCount',
+			 }]		
 		}, {
 			width : 160,
 			items : [{
@@ -257,6 +305,8 @@ function memberRepaid(){
 						payTypeCmo.fireEvent('select', payTypeCmo,null,null);
 					}
 					setRepaidOrderTitle({member:true});
+					//显示使用优惠券
+					Ext.getCmp('box4RepaidCoupon').show();
 					
 				}
 			}, {
@@ -1268,7 +1318,7 @@ function setRepaidOrderTitle(c){
 		if(re_member && re_member.hasMember){
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
 			if(re_member.coupon){
-				orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券: <span class="re_showMemberDetail">'+ re_member.coupon.name +'</span>';
+				orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券: <span class="re_showMemberDetail">'+ primaryOrderData.other.order.coupon.length + '张, 共¥' + primaryOrderData.other.order.couponPrice + '元' +'</span>';
 			}
 		}
 		orderFoodTitle += '&nbsp;&nbsp;&nbsp;当前折扣:<font color="green">'+ re_member.discount.name +'</font>';
@@ -1278,7 +1328,7 @@ function setRepaidOrderTitle(c){
 		}
 		
 		if(primaryOrderData.other.order.coupon){
-			orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券:<font color="green">'+ primaryOrderData.other.order.coupon.name +'</font>';
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券:<font color="green">'+ primaryOrderData.other.order.coupon.length + '张, 共¥' + primaryOrderData.other.order.couponPrice + '元' +'</font>';
 		}
 		
 		if(primaryOrderData.other.order.discount){
@@ -1393,7 +1443,13 @@ function showDetail(){
 	re_memberDetailWin.setPosition($('#re_showMemberDetail').position().left, $('#re_showMemberDetail').position().top + 70);
 	re_memberDetailWin.show();		
 }
-	
+
+function couponStatus(v){
+	if(coupons){
+		return  v+ '<font color="red">已使用</font>';
+	}
+}
+
 Ext.onReady(function() {
 	var menuTabPanel = new Ext.TabPanel({
 		id : 'menuTabPanel',
@@ -1454,7 +1510,7 @@ Ext.onReady(function() {
 		}
 		
 		if(primaryOrderData.other.order.coupon){
-			orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券:<font color="green">'+ primaryOrderData.other.order.coupon.name +'</font>';
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券:<font color="green">'+ primaryOrderData.other.order.coupon.length + '张, 共¥' + primaryOrderData.other.order.couponPrice + '元' +'</font>';
 		}
 		if(primaryOrderData.other.order.discount){
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;账单折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';

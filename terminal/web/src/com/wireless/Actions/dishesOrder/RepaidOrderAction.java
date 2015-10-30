@@ -100,10 +100,12 @@ public class RepaidOrderAction extends Action{
 			
 			//Set the coupons
 			final String coupons = request.getParameter("coupons");
-			if(coupons != null){
+			if(coupons != null && !coupons.equals("-1")){
 				final Order.CouponBuilder builder = new Order.CouponBuilder(orderId);
-				for(String couponId : coupons.split(",")){
-					builder.addCoupon(Integer.parseInt(couponId));
+				if(!coupons.isEmpty()){
+					for(String couponId : coupons.split(",")){
+						builder.addCoupon(Integer.parseInt(couponId));
+					}
 				}
 				repaidBuilder.setCouponBuilder(builder);
 			}

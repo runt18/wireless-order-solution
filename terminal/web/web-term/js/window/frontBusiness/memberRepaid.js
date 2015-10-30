@@ -262,8 +262,8 @@ function memberPayOrderToBindData(_c){
 		coupon.getEl().up('.x-form-item').setDisplayed(true);
 		var list = [[-1,'不使用']];
 		mpo_couponData = coupons;
-		for (var i = 0; i < coupons.length; i++) {
-			list.push([coupons[i].couponId, coupons[i].couponType.name]);
+		for (var i = 0; i < primaryOrderData.other.order.coupon.length; i++) {
+			list.push([primaryOrderData.other.order.coupon[i].couponId, primaryOrderData.other.order.coupon[i].couponType.name]);
 		}
 		if(coupon.store.getCount() == 0){
 			coupon.store.loadData(list);

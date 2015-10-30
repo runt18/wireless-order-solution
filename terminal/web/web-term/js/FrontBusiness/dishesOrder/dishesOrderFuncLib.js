@@ -904,8 +904,6 @@ function submitRepaidOrderMain(_c){
 				member = re_member.id;
 				discount = re_member.discount.id;
 				pricePlanId = re_member.pricePlanId || "";
-				couponId =  re_member.coupon? re_member.coupon.couponId : "";
-				
 				settleType = 2;
 			}else{
 				member = '';
@@ -914,7 +912,6 @@ function submitRepaidOrderMain(_c){
 		}else{
 			member = re_member.id; 
 			pricePlanId = Ext.getCmp('repaid_txtPricePlanForPayOrder').getValue();
-			couponId = Ext.getCmp('repaid_couponForPayOrder').getValue();
 			settleType = 2;
 		}
 	}
@@ -933,7 +930,7 @@ function submitRepaidOrderMain(_c){
 			"commitOrderData" : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
 			'customNum' : _c.grid.order['customNum'],
 			'pricePlanId' : pricePlanId,
-			'couponId' : couponId,
+			'coupons' : coupons ? coupons.join('') : '-1',
 			'settleType' : settleType
 		},
 		success : function(response, options) {

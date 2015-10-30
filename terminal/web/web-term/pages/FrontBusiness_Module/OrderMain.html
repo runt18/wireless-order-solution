@@ -84,6 +84,7 @@
 									dataSource : 'byOrder',
 									orderId : orderID
 								},
+								dataType : 'json',
 								success : function(jr, status, xhr){
 									re_member = jr.root[0];
 									if(jr.other.coupons && jr.other.coupons.length > 0){
