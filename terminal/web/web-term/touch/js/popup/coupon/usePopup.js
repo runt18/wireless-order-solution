@@ -4,6 +4,7 @@ function UseCouponPopup(param){
 		title : '',		//头部信息
 		useMode : null,		//使用类型
 		useTo : '',			//对象的使用
+		memberName : '', 
 		useComment : '',	//备注
 		orderId : '',  		//账单id,在useMode是Order时使用
 		useCuoponMethod : function(){}	//优惠券使用的回调函数
@@ -15,22 +16,13 @@ function UseCouponPopup(param){
 		var availableCoupons = [];
 		if(param.orderId){
 			//搜索账单已用的
-			$.post('../OperateCoupon.do',  {dataSource : 'getByCond', useMode : UseCouponPopup.UseMode.ORDER.mode, useAssociateId : param.orderId}, function(response, status, xhr){
+			$.post('../OperateCoupon.do',  {dataSource : 'getAvailableByOrder', orderId : param.orderId, memberId : param.useTo}, function(response, status, xhr){
 				if(response.success){
 					if(response.root.length > 0){
 						availableCoupons = availableCoupons.concat(response.root);
 					}
-					//搜索会员可用的
-					$.post('../OperateCoupon.do',  {dataSource : 'getByCond', status : 'issued', memberId : param.useTo}, function(result){
-						if(result.success){
-							if(result.root.length > 0){
-								availableCoupons = availableCoupons.concat(result.root);
-							}
-							createPopup(availableCoupons, afterOpen);
-						}else{
-							alert(result.msg);
-						}
-					});
+					
+					createPopup(availableCoupons, afterOpen);
 				}else{
 					alert(response.msg);
 				}
@@ -63,10 +55,6 @@ function UseCouponPopup(param){
 				pageInit : function(self){
 					var progressCoupon = "";
 					for(var i = 0; i < availCoupons.length; i++){
-						//判断优惠券是否过期,如果过期就不加入
-						if(availCoupons[i].couponType.isExpired){
-							continue;
-						}
 						var eachProgressCoupon = '<tr>'
 											 + '<td style="width:250px">'
 											 + '<label style="height:50px"><input type="checkbox" class="useCouponClass" data-theme="e" coupon_id="' + availCoupons[i].couponId + '">' + availCoupons[i].promotion.title + '<font style="float:right" color="red">word</font>' +'</label>'
@@ -84,11 +72,16 @@ function UseCouponPopup(param){
 					
 					self.find('[id = useTal_table_use]').append(progressCoupon);
 					self.find('[id = useTal_table_use]').trigger('create').trigger('refresh');
-			
 					
 					//更改标题
+					
 					if(param.title){
-						self.find('[id=couponUseHeader_div_use]').html('<h3>' + param.title + '</h3>');
+						if(param.memberName){
+							self.find('[id=couponUseHeader_div_use]').html('<h3>' + param.title + '--' + param.memberName + '</h3>');
+						}else{
+							self.find('[id=couponUseHeader_div_use]').html('<h3>' + param.title + '</h3>');
+						}
+						
 					}
 					
 					

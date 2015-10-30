@@ -5,6 +5,7 @@ function IssueCouponPopup(param){
 		issueMode : null,    	//发送类型
 		issueTo : '',			//发送对象--memberId				
 		issueComment : '',   	//备注
+		memberName : '',
 		orderId : '', 			//账单ID，在issueMode是Order时需要
 		postIssue : function(resultJSON){}//优惠券发放后的回调函数
 	};
@@ -50,9 +51,12 @@ function IssueCouponPopup(param){
 							
 							//更换标题
 							if(param.title){
-								self.find('[id=couponIssueHeader_div_issue]').html('<h3>' + param.title + '</h3>');
+								if(param.memberName){
+									self.find('[id=couponIssueHeader_div_issue]').html('<h3>' + param.title + '--' + param.memberName + '</h3>');
+								}else{
+									self.find('[id=couponIssueHeader_div_issue]').html('<h3>' + param.title + '</h3>');
+								}
 							}
-							
 							
 							//绑定确定按钮
 							self.find('[id = couponIssueConfirm_a_issue]').click(function(){
