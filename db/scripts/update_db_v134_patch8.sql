@@ -35,6 +35,13 @@ ADD INDEX `ix_issue_associate_id` (`issue_associate_id` ASC)  COMMENT '',
 ADD INDEX `ix_use_assocaite_id` (`use_associate_id` ASC)  COMMENT '';
 
 -- -----------------------------------------------------
+-- Modify the field 'birth_date' & 'order_date' to default null
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` 
+CHANGE COLUMN `birth_date` `birth_date` DATETIME NULL DEFAULT NULL COMMENT 'the birth date to this order' ,
+CHANGE COLUMN `order_date` `order_date` DATETIME NULL DEFAULT NULL COMMENT 'the end date to this order' ;
+
+-- -----------------------------------------------------
 -- Modify the field 'coupon_price' to default null
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order` 
@@ -59,6 +66,22 @@ CREATE TABLE IF NOT EXISTS `wireless_order_db`.`promotion_trigger` (
   INDEX `ix_promotion_id` (`promotion_id` ASC)  COMMENT '')
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`order_coupon_detail`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`order_coupon_detail` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`order_coupon_detail` (
+  `order_id` INT NOT NULL COMMENT '',
+  `coupon_detail` VARCHAR(100) NULL DEFAULT NULL COMMENT '',
+  `coupon_staff` VARCHAR(45) NULL DEFAULT NULL COMMENT '',
+  `coupon_staff_id` INT NULL DEFAULT NULL COMMENT '',
+  `coupon_date` DATETIME NULL DEFAULT NULL COMMENT '',
+  PRIMARY KEY (`order_id`)  COMMENT '',
+  INDEX `ix_coupon_staff_id` (`coupon_staff_id` ASC)  COMMENT '')
+ENGINE = InnoDB;
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
