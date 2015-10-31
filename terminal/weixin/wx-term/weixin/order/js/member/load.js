@@ -117,6 +117,8 @@ $(function(){
 		var mobile = $('#mobile_span_member');
 		var point = $('#spanMemberPoint');
 		var totalBalance = $('#spanMemberTotalBalance');
+		var baseBalance = $('#spanMemberBaseBalance');
+		var extraBalance = $('#spanMemberExtraBalance');
 		var typeName = $('#spanMemberTypeName');
 		var typeNameInCard = $('#divMemberTypeName');
 	//	var weixinMemberCard = $('#divWXMemberCard');
@@ -128,6 +130,8 @@ $(function(){
 		mobile.html(typeof data.mobile == 'undefined' ? '--' : data.mobile);
 		point.html(typeof data.point == 'undefined' ? '--' : data.point);
 		totalBalance.html(typeof data.totalBalance == 'undefined' ? '--' : checkDot(data.totalBalance)?parseFloat(data.totalBalance).toFixed(2) : data.totalBalance);
+		extraBalance.html(typeof data.extraBalance == 'undefined' ? '--' : checkDot(data.extraBalance)?parseFloat(data.extraBalance).toFixed(2) : data.extraBalance);
+		baseBalance.html(typeof data.baseBalance == 'undefined' ? '--' : checkDot(data.baseBalance)?parseFloat(data.baseBalance).toFixed(2) : data.baseBalance);
 		typeName.html(typeof data.memberType.name == 'undefined' ? '--' : data.memberType.name);
 		typeNameInCard.html(typeof data.memberType.name == 'undefined' ? '未激活' : data.memberType.name);
 	//	weixinMemberCard.html(typeof data.memberType.name == 'undefined' ? '未激活' : data.memberType.name);

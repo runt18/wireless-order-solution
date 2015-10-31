@@ -69,8 +69,18 @@ var member = {}, currentMemberLevelData={}, memberLevelData=[];
 
 <div id="divMemberBalanceAndPiont" class="main-box">
 <ul class="m-b-list">
-	<li class="box-horizontal none-line" >
-		<div style="width:50%">余&nbsp;&nbsp;额: <span id="spanMemberTotalBalance" style="color:#26a9d0;">--.--</span>&nbsp;元</div>
+	<li class="box-horizontal none-line" style="height:70px;">
+		<div style="width:50%">
+			<div>
+			余&nbsp;&nbsp;额: <span id="spanMemberTotalBalance" style="color:#26a9d0;">--.--</span>&nbsp;元
+			</div>
+			<div style="margin-top:-29px;">
+				<font style="font-size: 11px;font-weight: bold;">
+				基本余额 <span id="spanMemberBaseBalance" style="color:#26a9d0;">--.--</span>元,
+				赠送余额 <span id="spanMemberExtraBalance" style="color:#26a9d0;">--.--</span>元
+				</font>
+			</div>
+		</div>
 		<div style="width:50%;text-align: right;">积&nbsp;&nbsp;分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
 	</li>
 </ul>
