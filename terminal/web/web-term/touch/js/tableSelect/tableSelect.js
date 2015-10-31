@@ -559,6 +559,7 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 						fastIssuePopup.close(function(){
 							var issueCouponPopup = new IssueCouponPopup({
 								title : '快速发放优惠券',
+								memberName : member.name,
 								issueMode : IssueCouponPopup.IssueMode.FAST,
 								issueTo : member.id
 							});
@@ -583,6 +584,7 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 						fastUsePopup.close(function(){
 							var useCouponPopup = new UseCouponPopup({
 								title : '快速使用优惠券',
+								memberName : member.name,
 								issueMode : UseCouponPopup.UseMode.FAST,
 								useTo  : member.id,
 								useCuoponMethod : function(coupons){
