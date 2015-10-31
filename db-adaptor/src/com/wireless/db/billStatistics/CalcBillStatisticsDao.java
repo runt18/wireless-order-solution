@@ -518,13 +518,12 @@ public class CalcBillStatisticsDao {
 		
 		sql = " SELECT " +
 		      " COUNT(*) AS amount, ROUND(SUM(coupon_price), 2) AS total_coupon " +
-		      " FROM " +
-		      Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
+		      " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
+		      " JOIN " + Params.dbName + ".order_coupon_detail CD ON O.id = CD.order_id " + 
 		      " WHERE 1 = 1 " +
 		      (extraCond != null ? extraCond.toString() : "") +
-		      " AND restaurant_id = " + staff.getRestaurantId() +
-		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			  " AND coupon_price > 0 ";
+		      " AND O.restaurant_id = " + staff.getRestaurantId() +
+		      " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		IncomeByCoupon couponIncome = new IncomeByCoupon();

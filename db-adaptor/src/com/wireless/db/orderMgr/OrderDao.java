@@ -264,7 +264,11 @@ public class OrderDao {
 				filterCond.append(" AND " + orderTblAlias + ".erase_price > 0");
 			}
 			if(isCoupon){
-				filterCond.append(" AND " + orderTblAlias + ".coupon_price > 0");
+				String sql;
+				sql = " SELECT O.id " + 
+					  " FROM " + Params.dbName + "." + dbTbl.orderTbl + " O " +
+					  " JOIN " + Params.dbName + ".order_coupon_detail CD ON CD.order_id = O.id AND O.restaurant_id = " + restaurantId;
+				filterCond.append(" AND " + orderTblAlias + ".id IN(" + sql + ")");
 			}
 			if(isTransfer){
 				final String sql = " SELECT order_id FROM " + Params.dbName + "." + dbTbl.orderFoodTbl + " WHERE operation = " + OrderFood.Operation.TRANSFER.getVal();;
@@ -491,12 +495,13 @@ public class OrderDao {
 				  " O.settle_type, O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
 				  " O.discount_id, O.discount_staff_id, O.discount_staff, O.discount_date, " +
 				  " O.price_plan_id, O.member_id, " +
-				  " IFNULL(O.coupon_price, -1) AS coupon_price, " +
+				  " IFNULL(CD.order_id, 0) AS has_coupon, O.coupon_price, CD.coupon_detail, CD.coupon_staff, CD.coupon_date, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.pure_price, O.total_price, O.actual_price " +
 				  " FROM " + 
 				  Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 				  " LEFT JOIN " + Params.dbName + ".table T ON O.table_id = T.table_id " +
 				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
+				  " LEFT JOIN " + Params.dbName + ".order_coupon_detail CD ON CD.order_id = O.id " +
 				  " WHERE 1 = 1 " + 
 				  " AND O.restaurant_id = " + staff.getRestaurantId() + " " +
 				  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()).toString() : "") + " " +
@@ -507,11 +512,12 @@ public class OrderDao {
 				  " OH.id, OH.birth_date, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
 				  " OH.waiter, OH.staff_id, OH.discount_staff_id, OH.discount_staff, OH.discount_date, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
-				  " IFNULL(OH.coupon_price, -1) AS coupon_price, " +
+				  " IFNULL(CD.order_id, 0) AS has_coupon, OH.coupon_price, CD.coupon_detail, CD.coupon_staff, CD.coupon_date, " +
 				  " OH.settle_type, OH.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, OH.category, OH.status, OH.service_rate, OH.comment, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.pure_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " OH " + 
 				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = OH.pay_type_id " +
+				  " LEFT JOIN " + Params.dbName + ".order_coupon_detail CD ON CD.order_id = OH.id " +
 				  " WHERE 1 = 1 " + 
 				  " AND OH.restaurant_id = " + staff.getRestaurantId() + " " +
 				  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()).toString() : "") + " " +
@@ -590,7 +596,12 @@ public class OrderDao {
 			order.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
 			order.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
 			order.setErasePrice(dbCon.rs.getInt("erase_price"));
-			order.setCouponPrice(dbCon.rs.getFloat("coupon_price"));
+			if(dbCon.rs.getBoolean("has_coupon")){
+				order.setCouponPrice(dbCon.rs.getFloat("coupon_price"));
+				order.setCouponDetail(dbCon.rs.getString("coupon_detail"));
+				order.setCouponer(dbCon.rs.getString("coupon_staff"));
+				order.setCouponDate(dbCon.rs.getTimestamp("coupon_date").getTime());
+			}
 			order.setPurePrice(dbCon.rs.getFloat("pure_price"));
 			order.setTotalPrice(dbCon.rs.getFloat("total_price"));
 			order.setActualPrice(dbCon.rs.getFloat("actual_price"));
@@ -1142,6 +1153,9 @@ public class OrderDao {
 				  " WHERE coupon_id = " + coupon.getId();
 			dbCon.stmt.executeUpdate(sql);
 		}
+
+		sql = " DELETE FROM " + Params.dbName + ".order_coupon_detail WHERE order_id = " + builder.getOrderId();
+		dbCon.stmt.executeUpdate(sql);
 		
 		if(builder.getCoupons().isEmpty()){
 			sql = " UPDATE " + Params.dbName + ".order SET coupon_price = null WHERE id = " + builder.getOrderId();
@@ -1152,12 +1166,27 @@ public class OrderDao {
 			CouponDao.use(dbCon, staff, Coupon.UseBuilder.newInstance4Order(order.getMemberId(), builder.getOrderId()).setCoupons(builder.getCoupons()));
 			
 			//Calculate the coupon price.
+			final StringBuilder couponDetail = new StringBuilder();
 			float couponPrice = 0;
 			for(Coupon coupon : CouponDao.getByCond(dbCon, staff, new CouponDao.ExtraCond().setUseMode(Coupon.UseMode.ORDER, builder.getOrderId()), null)){
+				if(couponDetail.length() > 0){
+					couponDetail.append(",");
+				}
+				couponDetail.append(coupon.getName());
 				couponPrice += coupon.getPrice();
 			}
 			
 			sql = " UPDATE " + Params.dbName + ".order SET coupon_price = " + couponPrice + " WHERE id = " + builder.getOrderId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			sql = " INSERT INTO " + Params.dbName + ".order_coupon_detail " +
+				  " (order_id, coupon_detail, coupon_date, coupon_staff_id, coupon_staff) VALUES ( " +
+				  builder.getOrderId() + "," +
+				  "'" + couponDetail + "'," +
+				  "NOW()," + 
+				  staff.getId() + "," +
+				  "'" + staff.getName() + "'" +
+				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
 
