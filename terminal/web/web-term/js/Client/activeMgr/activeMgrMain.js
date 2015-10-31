@@ -556,8 +556,12 @@ Ext.onReady(function() {
 				Ext.ux.showMsg(Ext.decode(res.responseText));
 			}
 		});
-		
 	}
+	
+	//trigger描述
+	var Trigger = {
+		WX_SUBSCRIBE : { type : 1, desc : '微信关注'}	
+	};
 	//发布活动
 	function fnPublishPromotion(){
 		var node = Ext.ux.getSelNode(promotionTree);
@@ -573,7 +577,6 @@ Ext.onReady(function() {
 			publishPromotionWnd = new Ext.Window({
 				title : '发布优惠活动',
 				width : 400,
-				closeAction : 'hide',
 				xtype : 'panel',
 				layout : 'column',
 				frame : true,
@@ -583,25 +586,13 @@ Ext.onReady(function() {
 					style :'margin-top:5px;',
 					border : false
 				},{
-					columnWidth : 0.2,
-					xtype : 'label',
-					text : '发布对象:'
+					columnWidth : 0.1,
+					id : 'weixinissue_Checkbox_activeMgrMain',
+					xtype : 'checkbox'
 				},{
-					columnWidth : 0.3,
-					id : 'comboFilter4PromotionPublish',
-					xtype : 'combo',
-					readOnly : false,
-					forceSelection : true,
-					store : new Ext.data.JsonStore({
-						root : 'root',
-						fields : ['id', 'name']
-					}),
-					valueField : 'id',
-					displayField : 'name',
-					typeAhead : true,
-					mode : 'local',
-					triggerAction : 'all',
-					selectOnFocus : true
+					columnWidth : 0.4,
+					xtype : 'label',
+					text : '微信关注时自动发券'
 				},
 				{
 					columnWidth : 0.2,
@@ -646,21 +637,12 @@ Ext.onReady(function() {
 							params.endDate = Ext.util.Format.date(endDate, 'Y-m-d 00:00:00');
 						}
 						
-						//TODO 设置优惠活动触发条件
-						params.triggers = '1';
-//						var oriented = Ext.getCmp('comboFilter4PromotionPublish').getValue();
-//						if(oriented == -1){
-//							//不发布给任何人
-//							params.oriented = 3;
-//							
-//						}else if(oriented == 0){
-//							//发布面向所有人
-//							params.oriented = 1;
-//							
-//						}else if(oriented > 0){
-//							//发布面向特定条件的会员
-//							params.oriented = 2;
-//						}
+						var checkboxStatus = Ext.getCmp('weixinissue_Checkbox_activeMgrMain').getValue();
+						
+						if(checkboxStatus){
+							// 设置优惠活动触发条件
+							params.triggers = Trigger.WX_SUBSCRIBE.type;
+						}
 						
 						var publishMask = new Ext.LoadMask(document.body, {
 							msg : '正在发布活动...'
@@ -673,7 +655,7 @@ Ext.onReady(function() {
 								var jr = Ext.decode(res.responseText);
 								if(jr.success){
 									//关闭窗体
-									publishPromotionWnd.destroy();
+									publishPromotionWnd.close();
 									
 									//刷新活动树
 									promotionTree.getRootNode().reload(function(){
@@ -709,33 +691,11 @@ Ext.onReady(function() {
 					id : 'btnCancelPublish',
 					iconCls : 'btn_close',
 					handler : function(){
-						publishPromotionWnd.destroy();
+						publishPromotionWnd.close();
 					}
 				}],
 				listeners : {
 					'show' : function(thiz){
-						//获取会员分析条件
-						Ext.Ajax.request({
-							url : '../../OperateMemberCond.do?',
-							params : {
-								dataSource : 'getByCond'
-							},
-							success : function(res, opt){
-								var jr = Ext.decode(res.responseText);
-								if(jr.success){
-									jr.root.unshift({id : 0, name : '全部会员'});
-									jr.root.push({id : -1, name : '不发布任何人'}, {id : -2, name : '不更改'});
-									Ext.getCmp('comboFilter4PromotionPublish').store.loadData(jr);
-									Ext.getCmp('comboFilter4PromotionPublish').setValue(-2);
-								}else{
-									Ext.example.msg('异常', '会员筛选条件数据加载失败');
-								}
-							},
-							failure : function(res, opt){
-								Ext.getCmp('comboFilter4PromotionPublish').store.loadData({root : [{id : -2, name : '不更改'}]});
-								Ext.getCmp('comboFilter4PromotionPublish').setValue(-1);
-							}
-						});
 						
 						//获取要发布的活动详情
 						Ext.Ajax.request({
@@ -750,6 +710,15 @@ Ext.onReady(function() {
 									promotionToPublish = jr.root[0];
 									Ext.getCmp('dateField4PromotionPublish').setValue(promotionToPublish.promotionEndDate);
 									thiz.setTitle(thiz.title + '---' + promotionToPublish.title);
+									
+									for(var i = 0; i < promotionToPublish.triggers.length; i++){
+										if(promotionToPublish.triggers[i].triggerType == Trigger.WX_SUBSCRIBE.type){
+											Ext.getCmp('weixinissue_Checkbox_activeMgrMain').setValue(true);
+										}else{
+											Ext.getCmp('weixinissue_Checkbox_activeMgrMain').setValue(false);
+										}
+									}
+									
 								}else{
 									Ext.example.msg('异常', jr.msg);
 								}

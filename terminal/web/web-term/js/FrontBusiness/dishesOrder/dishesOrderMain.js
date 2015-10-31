@@ -197,7 +197,8 @@ function repaid_initNorthPanel(){
 								for(var i = 0; i < selected.length; i++){
 									coupons.push(selected[i].json.couponId);
 								}
-								Ext.getCmp('selectCount').setText('你共选择了' + coupons.length + '张优惠券');
+								console.log(Ext.getCmp('selectCount'));
+								Ext.getCmp('selectCount').setText('您共选择了' + coupons.length + '张优惠券');
 								win.close();
 							}
 						},{
@@ -213,7 +214,9 @@ function repaid_initNorthPanel(){
 			},{
 			   xtype : 'label',
 			   width : 130,
+			   style : 'color:green',
 			   id : 'selectCount',
+			   html : '<span style="padding-left:2px;">你没有选择优惠券</span>'
 			 }]		
 		}, {
 			width : 160,
