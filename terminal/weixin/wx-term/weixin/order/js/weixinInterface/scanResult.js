@@ -93,10 +93,9 @@ $(function(){
 		Util.jump('member.html');
 	});
 	
-	var couponId = 0;
 	//查看优惠活动
 	$('#checkPromtionButton').on('click', function(){
-		Util.jump('sales.html?cid=' + couponId);
+		Util.jump('sales.html');
 	});
 });
 

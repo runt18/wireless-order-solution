@@ -150,7 +150,7 @@ function repaid_initNorthPanel(){
 				handler : function(thiz, e){
 					var cm = new Ext.grid.ColumnModel([
                        	new Ext.grid.CheckboxSelectionModel(),
-					    {header : '编号', dataIndex : 'couponType.id',hidden :true},
+					    {header : '编号', dataIndex : 'couponType.id', hidden :true},
 					    {header : '名称', dataIndex : 'couponType.name'},
 					    {header  : '状态', dataIndex : 'statusText' }
                     ]);
@@ -1447,12 +1447,6 @@ function showDetail(){
 	re_memberDetailWin.show();		
 }
 
-function couponStatus(v){
-	if(coupons){
-		return  v+ '<font color="red">已使用</font>';
-	}
-}
-
 Ext.onReady(function() {
 	var menuTabPanel = new Ext.TabPanel({
 		id : 'menuTabPanel',
@@ -1512,7 +1506,7 @@ Ext.onReady(function() {
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
 		}
 		
-		if(primaryOrderData.other.order.coupon){
+		if(primaryOrderData.other.order.coupon.length > 0){
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券:<font color="green">'+ primaryOrderData.other.order.coupon.length + '张, 共¥' + primaryOrderData.other.order.couponPrice + '元' +'</font>';
 		}
 		if(primaryOrderData.other.order.discount){

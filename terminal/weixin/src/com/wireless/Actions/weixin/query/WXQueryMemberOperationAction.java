@@ -37,23 +37,6 @@ import com.wireless.util.SQLUtil;
 
 public class WXQueryMemberOperationAction extends DispatchAction{
 	
-	/**
-	 * 近5条消费记录
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-	public ActionForward consumeDetails(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().print(getData(1, request.getParameter("fid"), request.getParameter("oid")).toString());
-		return null;
-	}
 	
 	/**
 	 * 近5条充值记录
@@ -82,7 +65,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward chargeAndPointTitle(ActionMapping mapping, ActionForm form,
+	public ActionForward recent(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
@@ -116,7 +99,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 	 * @param memberSerial
 	 * @return
 	 */
-	private synchronized static JObject getData(int type, String restaurantSerial, String memberSerial){
+	private JObject getData(int type, String restaurantSerial, String memberSerial){
 		JObject jobject = new JObject();
 		// 
 		if(type != 1 && type != 2 && type != 3){
@@ -184,7 +167,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 		return jobject;
 	}
 	
-	private synchronized static JObject getGeneral(String restaurantSerial, String memberSerial){
+	private JObject getGeneral(String restaurantSerial, String memberSerial){
 		JObject jobject = new JObject();
 		
 		DBCon dbCon = null;
@@ -194,7 +177,6 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			
 			List<MemberOperation> chargeDetail = new ArrayList<MemberOperation>();
 			List<MemberOperation> consumeDetail = new ArrayList<MemberOperation>();
-			List<MemberOperation> couponDetail = new ArrayList<MemberOperation>();
 			
 			// 获取餐厅编号
 			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
@@ -238,16 +220,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 				consumeDetail.addAll(MemberOperationDao.getByCond(staff, extraCond4History, orderClause));
 			}
 			
-			//查询优惠劵
-			
-			extraCond4Today.setContainsCoupon(true);
-			extraCond4History.setContainsCoupon(true);
-			
-			couponDetail = MemberOperationDao.getByCond(staff, extraCond4Today, orderClause);
-			// 当日数据不足查询记录数时, 获取历史数据填充满
-			if(couponDetail.size() < 1){
-				couponDetail.addAll(MemberOperationDao.getByCond(staff, extraCond4History, orderClause));
-			}
+
 			
 			final MemberOperation charge_mo;
 			if(!chargeDetail.isEmpty()){
@@ -264,13 +237,9 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 				consume_mo = null;
 			}
 			
-			final MemberOperation coupon_mo;
 			
-			if(!couponDetail.isEmpty()){
-				coupon_mo = couponDetail.get(0);
-			}else{
-				coupon_mo = null;
-			}			
+			//查询已用优惠劵的数量
+			final int usedCouponAmount = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setStatus(Coupon.Status.USED), " ORDER BY C.use_date DESC ").size();
 			
 			jobject.setExtra(new Jsonable(){
 
@@ -279,7 +248,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 					JsonMap jm = new JsonMap();
 					jm.putString("nearByCharge", charge_mo != null? NumericUtil.float2String2(charge_mo.getChargeMoney()) : (-1 + ""));
 					jm.putString("nearByConsume", consume_mo != null? NumericUtil.float2String2(consume_mo.getPayMoney()) : (-1 + ""));
-					jm.putString("couponConsume", coupon_mo != null? NumericUtil.float2String2(coupon_mo.getPayMoney()) : (-1 + ""));
+					jm.putInt("couponConsume", usedCouponAmount);
 					return jm;
 				}
 

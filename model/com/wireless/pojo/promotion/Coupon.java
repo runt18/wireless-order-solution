@@ -634,6 +634,7 @@ public class Coupon implements Jsonable{
 			jm.putString("issueStaff", this.issueStaff);
 			jm.putInt("issueMode", this.issueMode.val);
 			jm.putString("issueModeText", this.issueMode.desc);
+			jm.putInt("issueAssociateId", this.issueAssociateId);
 			jm.putString("issueDate", DateUtil.format(this.issueDate, DateUtil.Pattern.DATE_TIME));
 			jm.putString("issueComment", this.issueComment);
 		}		
@@ -641,6 +642,7 @@ public class Coupon implements Jsonable{
 			jm.putString("useStaff", this.useStaff);
 			jm.putInt("useMode", this.useMode.val);
 			jm.putString("useModeText", this.useMode.desc);
+			jm.putInt("useAssociateId", this.useAssociateId);
 			jm.putString("useDate", DateUtil.format(this.useDate, DateUtil.Pattern.DATE_TIME));
 			jm.putString("useComment", this.useComment);
 		}

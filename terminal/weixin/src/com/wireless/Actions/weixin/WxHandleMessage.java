@@ -29,7 +29,7 @@ import org.marker.weixin.session.WxSession;
 import com.alibaba.fastjson.JSON;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.OrderDao;
-import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
@@ -40,7 +40,6 @@ import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
-import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
@@ -272,20 +271,6 @@ public class WxHandleMessage extends HandleMessageAdapter {
 				}else{
 					session.callback(appendUrlParam(msg, new WxMenuAction.MsgProxy(msg.getHead(), reply.get(0)).toMsg()));
 				}
-//				try{
-//					session.callback(createWelcome(msg));
-//				}catch(BusinessException e){
-//					if(e.getErrCode() == PromotionError.PROMOTION_NOT_EXIST){
-//						List<WxMenuAction> reply = WxMenuActionDao.getByCond(staff, new WxMenuActionDao.ExtraCond().setCate(WxMenuAction.Cate.SUBSCRIBE_REPLY));
-//						if(reply.isEmpty()){
-//							session.callback(createNavi(msg));
-//						}else{
-//							session.callback(appendUrlParam(msg, new WxMenuAction.MsgProxy(msg.getHead(), reply.get(0)).toMsg()));
-//						}
-//					}else{
-//						throw e;
-//					}
-//				}
 				
 			}else if(msg.getEvent() == Event.UNSUBSCRIBE){
 				//会员取消关注
@@ -299,77 +284,43 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					
 				}else if(msg.getEventKey().equals(EventKey.PROMOTION_EVENT_KEY.val)){
 					//最新优惠
-					int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+					final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 					
-					Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
+					final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 					
-					List<Coupon> coupons = CouponDao.getByCond(staff, 
-															   new CouponDao.ExtraCond().addPromotionStatus(Promotion.Status.PROGRESS)
-															   							.setPromotionType(Promotion.Type.NORMAL)
-															   							.setMember(MemberDao.getByWxSerial(staff, msg.getFromUserName())), null);
+					final List<Promotion> promotions = PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().setStatus(Promotion.Status.PROGRESS));
 					
-					if(coupons.isEmpty()){
+					if(promotions.isEmpty()){
 						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("亲。。。暂时还没有优惠活动哦", "请留意我们的微信优惠通知哦", "", "")));
 					}else{
 						Msg4ImageText couponItem = new Msg4ImageText(msg);
-						if(coupons.size() == 1){
+						if(promotions.size() == 1){
+							Promotion promotion = PromotionDao.getById(staff, promotions.get(0).getId());
 							//只有一个优惠活动
-							Coupon coupon = CouponDao.getById(staff, coupons.get(0).getId());
 							StringBuilder desc = new StringBuilder();
 							//活动时间
-							desc.append("活动时间：" + coupon.getPromotion().getDateRange().getOpeningFormat() + " 至 " + coupon.getPromotion().getDateRange().getEndingFormat()).append("\n");
-							//活动规则
-							String rule;
-//							if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
-//								rule = "活动期内单次消费积分满" + coupon.getPromotion().getPoint() + "即可领取【" + coupon.getName() + "】";
-//							}else if(coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
-//								rule = "活动期内累计消费积分满" + coupon.getPromotion().getPoint() + "即可领取【" + coupon.getName() + "】";
-//							}else 
-							if(coupon.getPromotion().getRule() == Promotion.Rule.FREE){
-								rule = "活动期内免费领取【" + coupon.getName() + "】";
-							}else{
-								rule = "";
-							}
-							if(!rule.isEmpty()){
-								desc.append("活动规则：" + rule).append("\n");
-							}
-							//温馨提示
-//							String tip = "";
-//							if(coupon.getDrawProgress().isOk()){
-//								tip = "亲。。。你已符合优惠券领取条件，马上点击领取【" + coupon.getName() + "】";
-//							}else{
-//								if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE && coupon.getDrawProgress().getPoint() != 0){
-//									tip = "亲。。。您最近最多的单次消费积分是" + coupon.getDrawProgress().getPoint() + "，要加油哦:-)";
-//								}else if(coupon.getPromotion().getRule() == Promotion.Rule.TOTAL && coupon.getDrawProgress().getPoint() != 0){
-//									tip = "亲。。。您最近累计消费积分是" + coupon.getDrawProgress().getPoint() + "，要加油哦:-)";
-//								}else{
-//									tip = "";
-//								}
-//							}
-//							if(!tip.isEmpty()){
-//								desc.append("温馨提示：" + tip).append("\n");
-//							}
+							desc.append("活动时间：" + promotion.getDateRange().getOpeningFormat() + " 至 " + promotion.getDateRange().getEndingFormat()).append("\n");
 							
 							desc.append("\n点击查看优惠活动详情>>>>");
 							
-							couponItem.addItem(new Data4Item(coupon.getPromotion().getTitle(), 
+							couponItem.addItem(new Data4Item(promotion.getTitle(), 
 															 desc.toString(), 
-															 coupon.getCouponType().hasImage() ? coupon.getCouponType().getImage().getObjectUrl() : "", 
-															 createUrl(msg, WEIXIN_COUPON) + "&cid=" + coupon.getId()));
+															 promotion.getCouponType().hasImage() ? promotion.getCouponType().getImage().getObjectUrl() : "", 
+															 createUrl(msg, WEIXIN_COUPON) + "&pid=" + promotion.getId()));
 							
 						}else{
 							
 							//多个优惠活动
-							for(int i = 0; i < coupons.size(); i++){
-								coupons.set(i, CouponDao.getById(staff, coupons.get(i).getId()));
+							for(int i = 0; i < promotions.size(); i++){
+								promotions.set(i, PromotionDao.getById(staff, promotions.get(i).getId()));
 							}
 							
-							Collections.sort(coupons, new Comparator<Coupon>(){
+							Collections.sort(promotions, new Comparator<Promotion>(){
 								@Override
-								public int compare(Coupon c1, Coupon c2) {
-									if(c1.getPromotion().getDateRange().getOpeningTime() < c2.getPromotion().getDateRange().getOpeningTime()){
+								public int compare(Promotion p1, Promotion p2) {
+									if(p1.getDateRange().getOpeningTime() < p2.getDateRange().getOpeningTime()){
 										return -1;
-									}else if(c1.getPromotion().getDateRange().getOpeningTime() > c2.getPromotion().getDateRange().getOpeningTime()){
+									}else if(p1.getDateRange().getOpeningTime() > p2.getDateRange().getOpeningTime()){
 										return 1;
 									}else{
 										return 0;
@@ -377,15 +328,15 @@ public class WxHandleMessage extends HandleMessageAdapter {
 								}
 								
 							});
-							for(Coupon coupon : coupons){
+							for(Promotion promotion : promotions){
 								final String picUrl;
-								if(coupon.getCouponType().hasImage()){
-									picUrl = coupon.getCouponType().getImage().getObjectUrl();
+								if(promotion.getCouponType().hasImage()){
+									picUrl = promotion.getCouponType().getImage().getObjectUrl();
 								}else{
 									picUrl = "";
 								}
-								couponItem.addItem(new Data4Item(coupon.getPromotion().getTitle(), "", 
-												   picUrl, createUrl(msg, WEIXIN_COUPON) + "&cid=" + coupon.getId()));
+								couponItem.addItem(new Data4Item(promotion.getTitle(), "", 
+												   picUrl, createUrl(msg, WEIXIN_COUPON) + "&pid=" + promotion.getId()));
 							}
 						}
 						session.callback(couponItem);

@@ -930,7 +930,7 @@ function submitRepaidOrderMain(_c){
 			"commitOrderData" : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
 			'customNum' : _c.grid.order['customNum'],
 			'pricePlanId' : pricePlanId,
-			'coupons' : coupons ? coupons.join('') : '-1',
+			'coupons' : coupons ? coupons.join(',') : '-1',
 			'settleType' : settleType
 		},
 		success : function(response, options) {

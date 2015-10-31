@@ -29,30 +29,37 @@ public class WxOperateCouponAction extends DispatchAction{
 		
 		final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
 		final Staff staff = StaffDao.getAdminByRestaurant(rid);
+		final String oid = request.getParameter("oid");
+		final String couponId = request.getParameter("cid");
+		final String promotionId = request.getParameter("pid");
+		final String status = request.getParameter("status");
+		final String orderBy = request.getParameter("orderBy");
 		
 		JObject jobject = new JObject();
 		try{
 			CouponDao.ExtraCond extraCond = new CouponDao.ExtraCond();
 			
-			if(request.getParameter("cid") != null && !request.getParameter("cid").isEmpty()){
-				extraCond.setId(Integer.parseInt(request.getParameter("cid")));
+			if(couponId != null && !couponId.isEmpty()){
+				extraCond.setId(Integer.parseInt(couponId));
 			}
 			
-			if(request.getParameter("status") != null && !request.getParameter("status").isEmpty()){
-				if(request.getParameter("status").equalsIgnoreCase("drawn")){
+			if(status != null && !status.isEmpty()){
+				if(status.equalsIgnoreCase("issued")){
 					extraCond.setStatus(Coupon.Status.ISSUED);
+				}else if(status.equals("used")){
+					extraCond.setStatus(Coupon.Status.USED);
 				}
 			}
 			
-			if(request.getParameter("pid") != null && !request.getParameter("pid").isEmpty()){
-				extraCond.setPromotion(Integer.parseInt(request.getParameter("pid")));
+			if(promotionId != null && !promotionId.isEmpty()){
+				extraCond.setPromotion(Integer.parseInt(promotionId));
 			}
 			
-			if(request.getParameter("oid") != null && !request.getParameter("oid").isEmpty()){
-				extraCond.setMember(MemberDao.getByWxSerial(staff, request.getParameter("oid")));
+			if(oid != null && !oid.isEmpty()){
+				extraCond.setMember(MemberDao.getByWxSerial(staff, oid));
 			}
 			
-			final List<Coupon> result = CouponDao.getByCond(staff, extraCond, null);
+			final List<Coupon> result = CouponDao.getByCond(staff, extraCond, orderBy);
 			for(Coupon coupon : result){
 				coupon.getCouponType().setImage(OssImageDao.getById(staff, coupon.getCouponType().getImage().getId()));
 			}

@@ -34,6 +34,12 @@ public class PromotionDao {
 		private Promotion.Rule rule;
 		private Promotion.Type type;
 		private final List<Promotion.Trigger> triggers = new ArrayList<Promotion.Trigger>();
+		private int restaurantId;
+		
+		ExtraCond setRestaurant(int restaurantId){
+			this.restaurantId = restaurantId;
+			return this;
+		}
 		
 		public ExtraCond setPromotionId(int id){
 			this.promotionId = id;
@@ -106,7 +112,10 @@ public class PromotionDao {
 				triggerCond.append(trigger.getVal());
 			}
 			if(triggerCond.length() != 0){
-				String sql = " SELECT promotion_id FROM " + Params.dbName + ".promotion_trigger WHERE trigger_type IN ( " + triggerCond.toString() + ")";
+				String sql = " SELECT P.promotion_id " + 
+							 " FROM " + Params.dbName + ".promotion P " +
+							 " JOIN " + Params.dbName + ".promotion_trigger PT ON PT.promotion_id = P.promotion_id AND P.restaurant_id = " + restaurantId +
+							 " WHERE PT.trigger_type IN ( " + triggerCond.toString() + ")";
 				extraCond.append(" AND P.promotion_id IN (" + sql + ")");
 			}
 			
@@ -442,7 +451,7 @@ public class PromotionDao {
 			  " LEFT JOIN " + Params.dbName + ".oss_image OI ON P.oss_image_id = OI.oss_image_id " +
 			  " WHERE 1 = 1 " +
 			  " AND P.restaurant_id = " + staff.getRestaurantId() +
-			  (extraCond != null ? extraCond : "") +
+			  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()) : "") +
 			  " ORDER BY P.create_date ";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
