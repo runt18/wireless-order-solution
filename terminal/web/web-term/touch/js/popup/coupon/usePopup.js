@@ -29,7 +29,7 @@ function UseCouponPopup(param){
 
 			}, 'json');
 		}else{
-			$.post('../OperateCoupon.do',  {dataSource : 'getByCond',status : 'issued', memberId : param.useTo}, function(response, status, xhr){
+			$.post('../OperateCoupon.do',  {dataSource : 'getByCond', status : 'issued', expired : false, memberId : param.useTo}, function(response, status, xhr){
 				if(response.success){
 					if(response.root.length > 0){
 						availableCoupons = availableCoupons.concat(response.root);

@@ -83,6 +83,7 @@ public class OperateCouponAction extends DispatchAction{
 		final String memberId = request.getParameter("memberId");
 		final String operation = request.getParameter("operate");
 		final String associateId = request.getParameter("associateId");
+		final String expired = request.getParameter("expired");
 		
 		JObject jObject = new JObject();
 		try{
@@ -103,6 +104,10 @@ public class OperateCouponAction extends DispatchAction{
 			
 			if(memberId != null && !memberId.isEmpty()){
 				extraCond.setMember(Integer.parseInt(memberId));
+			}
+			
+			if(expired != null && !expired.isEmpty()){
+				extraCond.isExpired(Boolean.parseBoolean(expired));
 			}
 			
 			jObject.setRoot(CouponDao.getByCond(staff, extraCond, null));
