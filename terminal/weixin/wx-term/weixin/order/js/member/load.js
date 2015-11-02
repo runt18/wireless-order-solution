@@ -217,6 +217,7 @@ $(function(){
 				data : {
 					dataSource : 'getByCond',
 					status : 'issued',
+					expired : false,
 					oid : Util.mp.oid,
 					fid : Util.mp.fid
 				},
@@ -291,9 +292,9 @@ $(function(){
 				url : '../../WxOperateCoupon.do',
 				type : 'post',
 				data : {
-					dataSource : 'getByCond',
-					status : 'used',
-					orderBy : ' ORDER BY C.use_date DESC LIMIT 5 ',
+					dataSource : 'getDetails',
+					status : 'order_use',
+					limit : 5,
 					oid : Util.mp.oid,
 					fid : Util.mp.fid
 				},
@@ -311,9 +312,9 @@ $(function(){
 							for(var i = 0; i < data.root.length; i++){
 								var temp = data.root[i];
 								html.push(template.format({
-									time : fnDateInChinese(temp.useDate) + '</br><font style="font-size:13px;">' + temp.couponType.name +'</font>',
-									useMode : temp.useModeText + '</br><font style="font-size:13px;">(' + temp.useAssociateId + ')</font>',
-									couponMoney : (checkDot(temp.couponType.price) ? parseFloat(temp.couponType.price).toFixed(2) : temp.couponType.price) + '元'
+									time : fnDateInChinese(temp.operateDate) + '</br><font style="font-size:13px;">' + temp.couponName +'</font>',
+									useMode : temp.operateText + '</br><font style="font-size:13px;">(' + temp.associateId + ')</font>',
+									couponMoney : (checkDot(temp.couponPrice) ? parseFloat(temp.couponPrice).toFixed(2) : temp.couponPrice) + '元'
 								}));
 							}
 							tbody.html(html);
@@ -341,4 +342,65 @@ $(function(){
 		});
 	});
 	
+	//消费记录
+	$('#consumeDetails_li_member').click(function(){
+		var mainView = $('#consumeDetails_div_member');
+		var tbody = mainView.find('table > tbody');
+		
+		function showConsumeDetails(){
+		
+			// 加载近5条消费记录
+			Util.lm.show();
+			$.ajax({
+				url : '../../WXQueryMemberOperation.do',
+				type : 'post',
+				data : {
+					dataSource : 'consumeDetails',
+					oid : Util.mp.oid,
+					fid : Util.mp.fid
+				},
+				dataType : 'json',
+				success : function(data, status, xhr){
+					Util.lm.hide();
+					if(data.success){
+						if(data.root.length > 0){
+							var template = '<tr class="d-list-item-consume">' +
+											'<td style="text-align: center;">{date}</td>' +
+											'<td>{balance}</td>' +
+											'<td>{point}</td>' +
+										   '</tr>';
+							var html = [], temp = null;
+							for(var i = 0; i < data.root.length; i++){
+								temp = data.root[i];
+								html.push(template.format({
+									date : fnDateInChinese(temp.operateDateFormat) + '</br><font style="font-size:13px;">账单号:' + temp.orderId + '</font>',
+									balance : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + '元',
+									point : temp.deltaPoint.toFixed(0) + '分'
+								}));
+							}
+							tbody.html(html.join(''));
+						}else{
+							tbody.html('暂无消费记录');
+						}
+					}else{
+						Util.dialog.show({title: data.title, msg: data.msg});						
+					}
+				},
+				error : function(data, errotType, eeor){
+					Util.lm.hide();
+					Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+				}
+			});
+		}
+	
+		mainView.fadeToggle(function(){
+			if(mainView.css('display') == 'block'){
+				$('html, body').animate({scrollTop: 0}, 'fast'); 
+				$('html, body').animate({scrollTop: 300}, 'fast'); 
+				showConsumeDetails();
+			}else{
+				tbody.html('');
+			}
+		});
+	});
 });

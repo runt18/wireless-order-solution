@@ -77,7 +77,7 @@ wx.ready(function(){
 	    			
 	    			$('#restName').text(result.other.restName);
 	    			
-	    	    	$.post('../../WxOperatePromotion.do', {dataSource : 'promotions', fid : Util.mp.fid, oid : Util.mp.oid}, function(data){
+	    	    	$.post('../../WxOperatePromotion.do', {dataSource : 'getByCond', fid : Util.mp.fid, oid : Util.mp.oid}, function(data){
 	    	    		if(data.success){
 	    	    			var promotion = data.root[0].promotion;
 	    	    			

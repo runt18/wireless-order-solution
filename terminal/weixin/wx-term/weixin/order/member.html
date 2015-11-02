@@ -88,12 +88,12 @@ var member = {}, currentMemberLevelData={}, memberLevelData=[];
 
 <div id="divMemberPointContent" class="main-box">
 <ul class="m-b-list">
-	<li class="box-horizontal none-line" onclick="toggleConsumeDetails()">
+	<li id="consumeDetails_li_member" class="box-horizontal none-line">
 		<div >最近消费: <span id="spanNearByCost" style="color:#FF4500;">0</span>&nbsp;元</div>
 		<div class="event">消费记录&nbsp;&gt;</div>
 	</li>
 	<li>
-		<div id="divConsumeDetails" style="display:none; width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;	">
+		<div id="consumeDetails_div_member" style="display:none; width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;	">
 			<table id="table_consumeDetails" class="d-list" >
 				<thead>
 				<tr class="d-list-title">
