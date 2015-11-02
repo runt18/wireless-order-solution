@@ -21,9 +21,7 @@ import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
-import com.wireless.pojo.promotion.Promotion.Status;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.StringHtml;
 
 public class CouponDao {
@@ -35,8 +33,7 @@ public class CouponDao {
 		private int memberId;
 		private int couponTypeId;
 		private int promotionId;
-		private Promotion.Type promotionType;
-		private final List<Promotion.Status> promotionStatus = new ArrayList<Promotion.Status>();
+		private Boolean expired;
 		private CouponOperation.Operate operation;
 		private int associateId;
 		private DutyRange range;
@@ -45,6 +42,11 @@ public class CouponDao {
 		
 		ExtraCond setRestaurant(int restaurantId){
 			this.restaurantId = restaurantId;
+			return this;
+		}
+		
+		public ExtraCond isExpired(boolean onOff){
+			this.expired = onOff;
 			return this;
 		}
 		
@@ -88,16 +90,6 @@ public class CouponDao {
 			return this;
 		}
 		
-		public ExtraCond setPromotionType(Promotion.Type type){
-			this.promotionType = type;
-			return this;
-		}
-		
-		public ExtraCond addPromotionStatus(Promotion.Status status){
-			this.promotionStatus.add(status);
-			return this;
-		}
-		
 		public ExtraCond setOperation(CouponOperation.Operate operation, int associateId){
 			this.operation = operation;
 			this.associateId = associateId;
@@ -127,30 +119,12 @@ public class CouponDao {
 			if(promotionId != 0){
 				extraCond.append(" AND C.promotion_id = " + promotionId);
 			}
-			StringBuilder psCond = new StringBuilder();
-			for(Promotion.Status status : promotionStatus){
-				String cond = null;
-				long now = System.currentTimeMillis();
-				if(status == Status.CREATED){
-					cond = " (P.start_date > '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "')";
-				}else if(status == Status.PROGRESS){
-					cond = " (P.start_date <= '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "' AND P.finish_date >= '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "')";
-				}else if(status == Status.FINISH){
-					cond = " (P.finish_date < '" + DateUtil.format(now, DateUtil.Pattern.DATE) + "')";
+			if(expired != null){
+				if(expired){
+					extraCond.append(" AND CT.expired < NOW()");
+				}else{
+					extraCond.append(" AND CT.expired > NOW()");
 				}
-				if(cond != null){
-					if(psCond.length() == 0){
-						psCond.append(cond);
-					}else{
-						psCond.append(" OR " + cond);
-					}
-				}
-			}
-			if(psCond.length() != 0){
-				extraCond.append(" AND (" + psCond.toString() + ")");
-			}
-			if(promotionType != null){
-				extraCond.append(" AND P.type = " + promotionType.getVal());
 			}
 			if(this.operation != null || this.associateId != 0 || this.range != null){
 				String sql;
