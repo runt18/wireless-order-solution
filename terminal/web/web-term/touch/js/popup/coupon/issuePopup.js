@@ -24,7 +24,7 @@ function IssueCouponPopup(param){
 							for(var i = 0; i < response.root.length; i++){
 								var eachProgressCoupon = '<tr class="promotionClass_tr_issue">'
 													 + '<td style="width:250px">'
-													 + '<label style="height:50px"><input type="checkbox" data-theme="e" class="promotionClass_checkInput_issue" promotion-id="' + response.root[i].id + '">' + response.root[i].title + '</label>'
+													 + '<label style="height:50px"><input type="checkbox" data-theme="e" class="promotionClass_checkInput_issue" promotion-id="' + response.root[i].id + '">' + response.root[i].coupon.name + '</label>'
 													 + '</td>'
 													 + '<td style="width:35px"><input id="amount_input_issue_' + response.root[i].id + '" class="amountClass_input_issue" style="font-size:20px;font-weight: bold;width:35px;" maxlength="3" ></td>'
 													 + '</tr>';

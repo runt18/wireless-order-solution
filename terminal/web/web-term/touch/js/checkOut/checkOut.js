@@ -265,7 +265,7 @@ uo.showDescForUpdateOrder = function(){
 		}
 	}
 	
-	html = (uo.order.coupon.length > 0 ?'<span style = "margin-left: 20px;">使用优惠劵：<font color="green">' + uo.order.coupon.length + '张, 共¥' + uo.order.couponPrice + '</font></span>' : '') + 
+	html = (uo.order.usedCoupons.length > 0 ?'<span style = "margin-left: 20px;">使用优惠劵：<font color="green">' + uo.order.usedCoupons.length + '张, 共¥' + uo.order.couponPrice + '</font></span>' : '') + 
 		memberSpan +
 		(uo.order.discount?"<span style = 'margin-left: 20px;'>当前折扣：<font color='green'>" + uo.order.discount.name +"</font></span>" : "") +
 		(uo.order.discounter ? "<span style = 'margin-left: 20px;'>折扣人：<font color='green'>" + uo.order.discounter + "</font></span><span style = 'margin-left: 20px;'>折扣时间：<font color='green'>" + uo.order.discountDate + "</font></span>" : "") ;
