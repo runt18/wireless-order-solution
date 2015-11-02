@@ -1,11 +1,30 @@
 package com.wireless.pojo.promotion;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
 
 public class CouponOperation implements Jsonable{
 
+	public final static Comparator<CouponOperation> BY_DATE = new Comparator<CouponOperation>(){
+
+		@Override
+		public int compare(CouponOperation o1, CouponOperation o2) {
+			if(o1.getOperateDate() > o2.getOperateDate()){
+				return -1;
+			}else if(o1.getOperateDate() < o2.getOperateDate()){
+				return 1;
+			}else{
+				return 0;
+			}
+		}
+		
+	};
+	
 	public static class InsertBuilder{
 		private final int couponId;
 		private Operate operate;
@@ -32,17 +51,45 @@ public class CouponOperation implements Jsonable{
 		}
 	}
 	
+	public static enum OperateType{
+		ISSUE("发券"),
+		USE("用券");
+		
+		private final String desc;
+		
+		OperateType(String desc){
+			this.desc = desc;
+		}
+		
+		public List<Operate> operationOf(){
+			final List<Operate> operations = new ArrayList<Operate>();
+			for(Operate operate : Operate.values()){
+				if(operate.type == this){
+					operations.add(operate);
+				}
+			}
+			return operations;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
+	
 	public static enum Operate{
-		FAST_ISSUE(1, "手动发券"),
-		ORDER_ISSUE(2, "账单发券"),
-		FAST_USE(20, "手动用券"),
-		ORDER_USE(21, "账单用券"),
-		WX_SUBSCRIBE_ISSUE(22, "微信关注用券")
+		FAST_ISSUE(OperateType.ISSUE, 1, "手动发券"),
+		ORDER_ISSUE(OperateType.ISSUE, 2, "账单发券"),
+		FAST_USE(OperateType.USE, 20, "手动用券"),
+		ORDER_USE(OperateType.USE, 21, "账单用券"),
+		WX_SUBSCRIBE_ISSUE(OperateType.USE, 22, "微信关注用券")
 		;
-		Operate(int val, String desc){
+		Operate(OperateType type, int val, String desc){
+			this.type = type;
 			this.val = val;
 			this.desc = desc;
 		}
+		private final OperateType type;
 		private final int val;
 		private final String desc;
 		
@@ -188,6 +235,7 @@ public class CouponOperation implements Jsonable{
 		jm.putString("couponName", this.couponName);
 		jm.putFloat("couponPrice", this.couponPrice);
 		jm.putInt("operate", this.operate.val);
+		jm.putInt("associateId", this.associateId);
 		jm.putString("operateText", this.operate.toString());
 		jm.putString("operateDate", DateUtil.format(this.operateDate, DateUtil.Pattern.DATE_TIME));
 		jm.putString("operateStaff", this.operateStaff);
