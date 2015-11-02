@@ -132,6 +132,13 @@ DROP INDEX `ix_issue_associate_id` ;
 DROP TABLE `wireless_order_db`.`order_coupon_detail`;
 
 -- -----------------------------------------------------
+-- Modify the field 'birth_date' & 'order_date' to default null to table 'order_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` 
+CHANGE COLUMN `birth_date` `birth_date` DATETIME NULL DEFAULT NULL COMMENT 'the birth date to this order' ,
+CHANGE COLUMN `order_date` `order_date` DATETIME NULL DEFAULT NULL COMMENT 'the end date to this order' ;
+
+-- -----------------------------------------------------
 -- Modify the field 'coupon_price' to default null for table 'order_history' & 'order_archive'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_history` 
