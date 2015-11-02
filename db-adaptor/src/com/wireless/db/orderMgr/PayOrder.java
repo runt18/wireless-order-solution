@@ -234,7 +234,7 @@ public class PayOrder {
 			  " ,cancel_price = " + orderCalculated.getCancelPrice() + 
 			  " ,repaid_price =  " + orderCalculated.getRepaidPrice() + 
 			  " ,erase_price = " + orderCalculated.getErasePrice() + 
-			  (orderCalculated.hasCoupon() ? " ,coupon_price = " + orderCalculated.getCouponPrice() : "") + 
+			  (orderCalculated.hasUsedCoupon() ? " ,coupon_price = " + orderCalculated.getCouponPrice() : "") + 
 			  " ,pure_price = " + orderCalculated.getPurePrice() +
 			  " ,total_price = " + orderCalculated.getTotalPrice() +  
 			  " ,actual_price = " + orderCalculated.getActualPrice() + 
