@@ -20,6 +20,12 @@ public class CouponOperationDao {
 		private int couponId;
 		private DutyRange range;
 		private int staffId;
+		private int memberId;
+		
+		public ExtraCond setMember(int memberId){
+			this.memberId = memberId;
+			return this;
+		}
 		
 		public ExtraCond setStaff(Staff staff){
 			this.staffId = staff.getId();
@@ -43,6 +49,13 @@ public class CouponOperationDao {
 		
 		public ExtraCond setCoupon(int couponId){
 			this.couponId = couponId;
+			return this;
+		}
+		
+		public ExtraCond addOperation(CouponOperation.OperateType type){
+			for(CouponOperation.Operate operation : type.operationOf()){
+				addOperation(operation);
+			}
 			return this;
 		}
 		
@@ -82,6 +95,10 @@ public class CouponOperationDao {
 			}
 			if(staffId != 0){
 				extraCond.append(" AND operate_staff_id = " + staffId);
+			}
+			if(memberId != 0){
+				String sql = " SELECT coupon_id FROM " + Params.dbName + ".coupon WHERE member_id = " + memberId;
+				extraCond.append(" AND coupon_id IN ( " + sql + ")");
 			}
 			return extraCond.toString();
 		}
