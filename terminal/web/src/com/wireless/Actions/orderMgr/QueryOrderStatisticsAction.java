@@ -1,5 +1,6 @@
 package com.wireless.Actions.orderMgr;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,8 +34,8 @@ public class QueryOrderStatisticsAction extends Action {
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
-		List<Order> list = null;
-		List<Order> totalList = null;
+		final List<Order> list = new ArrayList<Order>();
+		final List<Order> totalList = new ArrayList<Order>();
 		
 		String dateType = request.getParameter("dataType");
 		DateType dateTypeEnmu = DateType.valueOf(Integer.parseInt(dateType));
@@ -144,8 +145,8 @@ public class QueryOrderStatisticsAction extends Action {
 			
 			
 			
-			list = OrderDao.getByCond(staff, extraCond, orderClause);
-			totalList = OrderDao.getByCond(staff, extraCond, null);
+			list.addAll(OrderDao.getByCond(staff, extraCond, orderClause));
+			totalList.addAll(OrderDao.getByCond(staff, extraCond, null));
 			
 			OrderSummary summary = OrderDao.getOrderSummary(staff, extraCond, dateTypeEnmu);
 			
