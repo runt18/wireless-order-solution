@@ -901,16 +901,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.putString("idCard", this.idCard);
 		jm.putString("weixinCard", this.weixin != null?this.weixin.getCard() + "":"");
 		jm.putString("company", this.company);
-		//jm.put("tastePref", this.tastePref);
-		//jm.put("taboo", this.taboo);
 		jm.putString("contactAddress", this.contactAddress);
-		//jm.put("comment", this.comment);
 		jm.putLong("createDate", this.createDate);
 		jm.putString("createDateFormat", DateUtil.format(this.createDate, Pattern.DATE.getPattern()));
 		jm.putString("memberCard", this.memberCard);
 		jm.putJsonableList("publicComment", this.publicComments, 0);
 		jm.putJsonable("privateComment", this.privateComment, 0);
 		jm.putBoolean("isRaw", this.isRaw());
+		jm.putString("referrer", this.getReferrer());
 		return jm;
 	}
 
