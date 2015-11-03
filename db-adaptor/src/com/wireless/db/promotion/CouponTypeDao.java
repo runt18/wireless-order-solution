@@ -3,7 +3,6 @@ package com.wireless.db.promotion;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -337,7 +336,7 @@ public class CouponTypeDao {
 			  (extraCond != null ? extraCond : " ") +
 			  (orderClause != null ? orderClause: "");
 
-		List<CouponType> result = new ArrayList<CouponType>();
+		final List<CouponType> result = new ArrayList<CouponType>();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			CouponType type = new CouponType(dbCon.rs.getInt("coupon_type_id"));
@@ -353,6 +352,6 @@ public class CouponTypeDao {
 		}
 		dbCon.rs.close();
 		
-		return Collections.unmodifiableList(result);
+		return result;
 	}
 }
