@@ -204,11 +204,19 @@ public class CouponDao {
 							  ")";
 						dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 						dbCon.rs = dbCon.stmt.getGeneratedKeys();
+						int couponId = 0;
 						if(dbCon.rs.next()){
-							issueCoupons.add(dbCon.rs.getInt(1));
+							couponId = dbCon.rs.getInt(1);
+							issueCoupons.add(couponId);
 						}else{
 							throw new SQLException("The id of coupon is not generated successfully.");
 						}
+						dbCon.rs.close();
+						
+						//Insert the associated the coupon operation.
+						CouponOperationDao.insert(dbCon, staff, new CouponOperation.InsertBuilder(couponId)
+																		  .setComment(builder.getComment())
+																		  .setOperate(builder.getOperation(), builder.getAssociateId()));
 					}
 				}catch(BusinessException | SQLException e){
 					e.printStackTrace();
@@ -219,10 +227,6 @@ public class CouponDao {
 
 		int[] result = new int[issueCoupons.size()];
 		for(int i = 0; i < result.length; i++){
-			//Insert the associated the coupon operation.
-			CouponOperationDao.insert(dbCon, staff, new CouponOperation.InsertBuilder(issueCoupons.get(i))
-															  .setComment(builder.getComment())
-															  .setOperate(builder.getOperation(), builder.getAssociateId()));
 			result[i] = issueCoupons.get(i).intValue();
 		}
 		
