@@ -149,7 +149,7 @@ public class WxMemberDao {
 		List<Member> associatedMembers = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(weixinSerial), null);
 		final int memberId;
 		if(associatedMembers.isEmpty()){
-			memberId = MemberDao.insert(dbCon, staff, Member.InsertBuilder.build4Weixin("微信会员", MemberTypeDao.getWxMemberType(dbCon, staff)));
+			memberId = MemberDao.insert(dbCon, staff, new Member.InsertBuilder("微信会员", MemberTypeDao.getWxMemberType(dbCon, staff)));
 			//Issue the coupon to this weixin member after subscribing.
 			for(Promotion promotion : PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().addTrigger(Promotion.Trigger.WX_SUBSCRIBE))){
 				CouponDao.issue(dbCon, staff, Coupon.IssueBuilder.newInstance4WxSubscribe().addPromotion(promotion).addMember(memberId));
