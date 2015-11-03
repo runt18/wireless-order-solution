@@ -41,6 +41,7 @@ import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
@@ -517,9 +518,9 @@ public class CalcBillStatisticsDao {
 		String sql;
 		
 		sql = " SELECT " +
-		      " COUNT(*) AS amount, ROUND(SUM(coupon_price), 2) AS total_coupon " +
+		      " COUNT(*) AS amount, ROUND(SUM(O.coupon_price), 2) AS total_coupon " +
 		      " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
-		      " JOIN " + Params.dbName + ".order_coupon_detail CD ON O.id = CD.order_id " + 
+		      " JOIN " + Params.dbName + ".coupon_operation CO ON O.id = CO.associate_id AND CO.operate = " + CouponOperation.Operate.ORDER_USE.getVal() + 
 		      " WHERE 1 = 1 " +
 		      (extraCond != null ? extraCond.toString() : "") +
 		      " AND O.restaurant_id = " + staff.getRestaurantId() +

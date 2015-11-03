@@ -21,28 +21,28 @@ public class Coupon implements Jsonable{
 		private final int memberId;
 		private final List<Integer> couponsToUse = SortedList.newInstance();
 		private String comment;
-		private final UseMode mode;
+		private final CouponOperation.Operate operation;
 		private final int associateId;
 
 		public static UseBuilder newInstance4Fast(int memberId){
-			return new UseBuilder(memberId, UseMode.FAST, 0);
+			return new UseBuilder(memberId, CouponOperation.Operate.FAST_USE, 0);
 		}
 		
 		public static UseBuilder newInstance4Fast(Member member){
-			return new UseBuilder(member.getId(), UseMode.FAST, 0);
+			return new UseBuilder(member.getId(), CouponOperation.Operate.FAST_USE, 0);
 		}
 		
 		public static UseBuilder newInstance4Order(Member member, int orderId){
-			return new UseBuilder(member.getId(), UseMode.ORDER, orderId);
+			return new UseBuilder(member.getId(), CouponOperation.Operate.ORDER_USE, orderId);
 		}
 		
 		public static UseBuilder newInstance4Order(int memberId, int orderId){
-			return new UseBuilder(memberId, UseMode.ORDER, orderId);
+			return new UseBuilder(memberId, CouponOperation.Operate.ORDER_USE, orderId);
 		}
 		
-		private UseBuilder(int memberId, UseMode mode, int associateId){
+		private UseBuilder(int memberId, CouponOperation.Operate operation, int associateId){
 			this.memberId = memberId;
-			this.mode = mode;
+			this.operation = operation;
 			this.associateId = associateId;
 		}
 		
@@ -50,8 +50,8 @@ public class Coupon implements Jsonable{
 			return this.memberId;
 		}
 		
-		public UseMode getMode(){
-			return this.mode;
+		public CouponOperation.Operate getOperation(){
+			return this.operation;
 		}
 		
 		public int getAssociateId(){
@@ -97,28 +97,28 @@ public class Coupon implements Jsonable{
 	public static class IssueBuilder{
 		private final Map<Integer, Integer> promotions = new HashMap<Integer, Integer>();
 		private final SortedList<Integer> members = SortedList.newInstance();
-		private final IssueMode issueMode;
+		private final CouponOperation.Operate operate;
 		private final int issueAssociateId;
 		private String comment;
 		
 		public static IssueBuilder newInstance4Fast(){
-			return new IssueBuilder(IssueMode.FAST, 0);
+			return new IssueBuilder(CouponOperation.Operate.FAST_ISSUE, 0);
 		}
 		
 		public static IssueBuilder newInstance4Order(Order order){
-			return new IssueBuilder(IssueMode.ORDER, order.getId());
+			return new IssueBuilder(CouponOperation.Operate.ORDER_ISSUE, order.getId());
 		}
 		
 		public static IssueBuilder newInstance4Order(int orderId){
-			return new IssueBuilder(IssueMode.ORDER, orderId);
+			return new IssueBuilder(CouponOperation.Operate.ORDER_ISSUE, orderId);
 		}
 		
 		public static IssueBuilder newInstance4WxSubscribe(){
-			return new IssueBuilder(IssueMode.WX_SUBSCRIBE, 0);
+			return new IssueBuilder(CouponOperation.Operate.WX_SUBSCRIBE_ISSUE, 0);
 		}
 		
-		private IssueBuilder(IssueMode mode, int associateId){
-			this.issueMode = mode;
+		private IssueBuilder(CouponOperation.Operate operate, int associateId){
+			this.operate = operate;
 			this.issueAssociateId = associateId;
 		}
 		
@@ -166,6 +166,10 @@ public class Coupon implements Jsonable{
 			return this;
 		}
 		
+		public CouponOperation.Operate getOperation(){
+			return this.operate;
+		}
+		
 		public IssueBuilder setComment(String comment){
 			this.comment = comment;
 			return this;
@@ -176,10 +180,6 @@ public class Coupon implements Jsonable{
 				return "";
 			}
 			return this.comment;
-		}
-		
-		public IssueMode getMode(){
-			return this.issueMode;
 		}
 		
 		public int getAssociateId(){
@@ -255,21 +255,6 @@ public class Coupon implements Jsonable{
 //		}
 //	}
 	
-	public static enum DrawType{
-		AUTO("自动"),
-		MANUAL("手动");
-		
-		private final String desc;
-		DrawType(String desc){
-			this.desc = desc;
-		}
-		
-		@Override
-		public String toString(){
-			return this.desc;
-		}
-	}
-	
 	public static enum Status{
 		UNKNOWN(0, "未知"),
 		CREATED(1, "已创建"),
@@ -309,86 +294,12 @@ public class Coupon implements Jsonable{
 		}
 	}
 	
-	
-	public static enum IssueMode{
-		FAST(1, "快速"),
-		ORDER(2, "账单"),
-		WX_SUBSCRIBE(3, "微信关注");
-		
-		private final int val;
-		private final String desc;
-		
-		IssueMode(int val, String desc){
-			this.val = val;
-			this.desc = desc;
-		}
-		
-		public int getVal(){
-			return this.val;
-		}
-		
-		public static IssueMode valueOf(int val){
-			for(IssueMode mode : values()){
-				if(mode.val == val){
-					return mode;
-				}
-			}
-			throw new IllegalArgumentException("The (val = " + val + ") passed is invalid.");
-		}
-		
-		@Override
-		public String toString(){
-			return this.desc;
-		}
-	}
-	
-	public static enum UseMode{
-		FAST(1, "快速"),
-		ORDER(2, "账单");
-		
-		private final int val;
-		private final String desc;
-		
-		UseMode(int val, String desc){
-			this.val = val;
-			this.desc = desc;
-		}
-		
-		public int getVal(){
-			return this.val;
-		}
-		
-		public static UseMode valueOf(int val){
-			for(UseMode mode : values()){
-				if(mode.val == val){
-					return mode;
-				}
-			}
-			throw new IllegalArgumentException("The (val = " + val + ") passed is invalid.");
-		}
-		
-		@Override
-		public String toString(){
-			return this.desc;
-		}
-	}
-	
 	private int id;
 	private int restaurantId;
 	private CouponType couponType;
 	private Promotion promotion;
 	private long birthDate;
 	private Member member;
-	private long issueDate;
-	private String issueStaff;
-	private IssueMode issueMode;
-	private int issueAssociateId;
-	private String issueComment;
-	private long useDate;
-	private String useStaff;
-	private UseMode useMode;
-	private int useAssociateId;
-	private String useComment;
 	private Status status = Status.UNKNOWN;
 	
 //	private Coupon(InsertBuilder builder){
@@ -504,97 +415,6 @@ public class Coupon implements Jsonable{
 		}
 	}
 	
-	public long getIssueDate() {
-		return issueDate;
-	}
-
-	public void setIssueDate(long issueDate) {
-		this.issueDate = issueDate;
-	}
-
-	public String getIssueStaff() {
-		if(this.issueStaff == null){
-			return "";
-		}
-		return issueStaff;
-	}
-
-	public void setIssueStaff(String issueStaff) {
-		this.issueStaff = issueStaff;
-	}
-
-	public IssueMode getIssueMode() {
-		return issueMode;
-	}
-
-	public void setIssueMode(IssueMode issueMode) {
-		this.issueMode = issueMode;
-	}
-
-	public int getIssueAssociateId() {
-		return issueAssociateId;
-	}
-
-	public void setIssueAssociateId(int issueAssociateId) {
-		this.issueAssociateId = issueAssociateId;
-	}
-
-	public String getIssueComment() {
-		if(this.issueComment == null){
-			return "";
-		}
-		return issueComment;
-	}
-
-	public void setIssueComment(String issueComment) {
-		this.issueComment = issueComment;
-	}
-
-	public long getUseDate() {
-		return useDate;
-	}
-
-	public void setUseDate(long useDate) {
-		this.useDate = useDate;
-	}
-
-	public String getUseStaff() {
-		if(this.useStaff == null){
-			return "";
-		}
-		return useStaff;
-	}
-
-	public void setUseStaff(String useStaff) {
-		this.useStaff = useStaff;
-	}
-
-	public UseMode getUseMode() {
-		return useMode;
-	}
-
-	public void setUseMode(UseMode useMode) {
-		this.useMode = useMode;
-	}
-
-	public int getUseAssociateId() {
-		return useAssociateId;
-	}
-
-	public void setUseAssociateId(int useAssociateId) {
-		this.useAssociateId = useAssociateId;
-	}
-
-	public void setUseComment(String comment){
-		this.useComment = comment;
-	}
-	
-	public String getUseComment(){
-		if(this.useComment == null){
-			return "";
-		}
-		return this.useComment;
-	}
 	
 	@Override
 	public int hashCode(){
@@ -630,22 +450,6 @@ public class Coupon implements Jsonable{
 		jm.putString("statusText", this.status.desc);
 		jm.putInt("statusValue", this.status.val);
 		jm.putString("birthDate", DateUtil.formatToDate(this.getBirthDate()));
-		if(this.issueDate != 0){
-			jm.putString("issueStaff", this.issueStaff);
-			jm.putInt("issueMode", this.issueMode.val);
-			jm.putString("issueModeText", this.issueMode.desc);
-			jm.putInt("issueAssociateId", this.issueAssociateId);
-			jm.putString("issueDate", DateUtil.format(this.issueDate, DateUtil.Pattern.DATE_TIME));
-			jm.putString("issueComment", this.issueComment);
-		}		
-		if(this.useDate != 0){
-			jm.putString("useStaff", this.useStaff);
-			jm.putInt("useMode", this.useMode.val);
-			jm.putString("useModeText", this.useMode.desc);
-			jm.putInt("useAssociateId", this.useAssociateId);
-			jm.putString("useDate", DateUtil.format(this.useDate, DateUtil.Pattern.DATE_TIME));
-			jm.putString("useComment", this.useComment);
-		}
 		if(flag == COUPON_JSONABLE_COMPLEX){
 			jm.putJsonable("promotion", this.promotion, 0);
 			jm.putJsonable("couponType", this.couponType, CouponType.COUPON_TYPE_JSONABLE_COMPLEX);

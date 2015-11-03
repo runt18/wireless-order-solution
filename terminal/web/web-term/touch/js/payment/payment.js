@@ -292,8 +292,8 @@ $(function(){
 		}
 		$('#orderDiscountDesc').html(discountDesc);
 		
-		if(orderMsg.coupon.length > 0){
-			$('#orderCouponInfo').html('使用优惠券:<font style="color:green;font-weight:bold;">'+ orderMsg.coupon.length + '张, 共¥' + orderMsg.couponPrice + '</font>');
+		if(orderMsg.usedCoupons.length > 0){
+			$('#orderCouponInfo').html('使用优惠券:<font style="color:green;font-weight:bold;">'+ orderMsg.usedCoupons.length + '张, 共¥' + orderMsg.couponPrice + '</font>');
 		}else{
 			$('#orderCouponInfo').html('');
 		}

@@ -253,22 +253,22 @@ function memberPayOrderToBindData(_c){
 	mpo_discountData = discountMsgs;
 	var newOrder = typeof data.newOrder == 'undefined' ? {} : data.newOrder;
 	
-	var coupons = typeof data.coupons == 'undefined' ? null : data.coupons;
 	
 	coupon.getEl().up('.x-form-item').setDisplayed(false);
 	pricePlanCbo.getEl().up('.x-form-item').setDisplayed(false);
 	
-	if(coupons){
-		coupon.getEl().up('.x-form-item').setDisplayed(true);
-		var list = [[-1,'不使用']];
-		mpo_couponData = coupons;
-		for (var i = 0; i < primaryOrderData.other.order.coupon.length; i++) {
-			list.push([primaryOrderData.other.order.coupon[i].couponId, primaryOrderData.other.order.coupon[i].couponType.name]);
-		}
-		if(coupon.store.getCount() == 0){
-			coupon.store.loadData(list);
-		}
-	}
+//	var coupons = typeof data.coupons == 'undefined' ? null : data.coupons;
+//	if(coupons){
+//		coupon.getEl().up('.x-form-item').setDisplayed(false);
+//		var list = [[-1,'不使用']];
+//		mpo_couponData = coupons;
+//		for (var i = 0; i < primaryOrderData.other.order.usedCoupons.length; i++) {
+//			list.push([primaryOrderData.other.order.usedCoupons[i].couponId, primaryOrderData.other.order.usedCoupons[i].couponType.name]);
+//		}
+//		if(coupon.store.getCount() == 0){
+//			coupon.store.loadData(list);
+//		}
+//	}
 	
 	
 	name.setText(typeof member['name'] != 'undefined'?member['name']:'----');

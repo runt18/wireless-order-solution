@@ -9,65 +9,7 @@ function fnDateInChinese(date){
 	return month+ '月' +day + '日' + ' ' + time;
 	
 }
-/**
- * 查看消费明细
- */
-function toggleConsumeDetails(){
-	
-	var mainView = $('#divConsumeDetails');
-	var tbody = mainView.find('table > tbody');
-	var templet = '<tr class="d-list-item-consume">'
-		+ '<td style="text-align: center;">{date}</td>'
-		+ '<td>{balance}</td>'
-		+ '<td>{point}</td>'
-		+ '</tr>';
-	mainView.fadeToggle(function(){
-		if(mainView.css('display') == 'block'){
-			$('html, body').animate({scrollTop: 0}, 'fast'); 
-			$('html, body').animate({scrollTop: 300}, 'fast'); 
-			if(!toggleConsumeDetails.load){
-				// 加载近5条消费记录
-				toggleConsumeDetails.load = function(){
-					Util.lm.show();
-					$.ajax({
-						url : '../../WXQueryMemberOperation.do',
-						type : 'post',
-						data : {
-							dataSource : 'consumeDetails',
-							oid : Util.mp.oid,
-							fid : Util.mp.fid
-						},
-						dataType : 'json',
-						success : function(data, status, xhr){
-							Util.lm.hide();
-							if(data.success){
-								var html = [], temp = null;
-								for(var i = 0; i < data.root.length; i++){
-									temp = data.root[i];
-									html.push(templet.format({
-										date : fnDateInChinese(temp.operateDateFormat) + '</br><font style="font-size:13px;">账单号:' + temp.orderId + '</font>',
-										balance : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + '元',
-										point : temp.deltaPoint.toFixed(0) + '分'
-									}));
-								}
-								tbody.html(html.length == 0 ? '暂无消费记录' : html.join(''));
-							}else{
-								Util.dialog.show({title: data.title, msg: data.msg});						
-							}
-						},
-						error : function(data, errotType, eeor){
-							Util.lm.hide();
-							Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
-						}
-					});
-				};
-			}
-			toggleConsumeDetails.load();
-		}else{
-			tbody.html('');
-		}
-	});
-}
+
 /**
  * 查看充值明细
  */

@@ -17,6 +17,7 @@ import com.aliyun.openservices.oss.OSSException;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.promotion.CouponTypeDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -26,6 +27,7 @@ import com.wireless.exception.PromotionError;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Coupon;
+import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.staffMgr.Staff;
@@ -272,29 +274,38 @@ public class TestPromotionDao {
 		}
 	}
 	
-	private void compare(Coupon.IssueBuilder issueBuilder, Promotion expectedPromotion, Member expectedMember, Coupon actual){
+	private void compare(Coupon.IssueBuilder issueBuilder, Promotion expectedPromotion, Member expectedMember, Coupon actual) throws SQLException{
 		Assert.assertEquals("coupon promotion id", expectedPromotion.getId(), actual.getPromotion().getId());
 		Assert.assertEquals("coupon restaurant id", mStaff.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("coupon member id", expectedMember.getId(), actual.getMember().getId());
 		Assert.assertEquals("coupon status", Coupon.Status.ISSUED, actual.getStatus());
 		Assert.assertTrue("coupon birth date", System.currentTimeMillis() - actual.getBirthDate() < 100000);
-		Assert.assertTrue("coupon issue date", System.currentTimeMillis() - actual.getIssueDate() < 100000);
-		Assert.assertEquals("coupon issue staff", mStaff.getName(), actual.getIssueStaff());
-		Assert.assertEquals("coupon issue mode", issueBuilder.getMode(), actual.getIssueMode());
-		Assert.assertEquals("coupon issue associate id", issueBuilder.getAssociateId(), actual.getIssueAssociateId());
-		Assert.assertEquals("coupon issue comment", issueBuilder.getComment(), actual.getIssueComment());
+		
+		CouponOperation operation = CouponOperationDao.getByCond(mStaff, new CouponOperationDao.ExtraCond().setCoupon(actual.getId())
+																										   .addOperation(CouponOperation.Operate.FAST_ISSUE)).get(0);
+		
+		Assert.assertTrue("coupon issue date", System.currentTimeMillis() - operation.getOperateDate() < 100000);
+		Assert.assertEquals("coupon issue staff", mStaff.getName(), operation.getOperateStaff());
+		Assert.assertEquals("coupon issue mode", issueBuilder.getOperation(), operation.getOperate());
+		Assert.assertEquals("coupon issue associate id", issueBuilder.getAssociateId(), operation.getAssociateId());
+		Assert.assertEquals("coupon issue comment", issueBuilder.getComment(), operation.getComment());
 
 	}
 	
-	private void compare(Coupon.UseBuilder useBuilder, Member expectedMember, Coupon actual){
+	private void compare(Coupon.UseBuilder useBuilder, Member expectedMember, Coupon actual) throws SQLException{
 		Assert.assertEquals("coupon restaurant id", mStaff.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("coupon member id", expectedMember.getId(), actual.getMember().getId());
 		Assert.assertEquals("coupon status", Coupon.Status.USED, actual.getStatus());
-		Assert.assertTrue("coupon use date", System.currentTimeMillis() - actual.getUseDate() < 100000);
-		Assert.assertEquals("coupon use staff", mStaff.getName(), actual.getUseStaff());
-		Assert.assertEquals("coupon use mode", useBuilder.getMode(), actual.getUseMode());
-		Assert.assertEquals("coupon use associate id", useBuilder.getAssociateId(), actual.getUseAssociateId());
-		Assert.assertEquals("coupon use comment", useBuilder.getComment(), actual.getUseComment());
+		
+		CouponOperation operation = CouponOperationDao.getByCond(mStaff, new CouponOperationDao.ExtraCond().setCoupon(actual.getId())
+				   .addOperation(CouponOperation.Operate.FAST_USE)).get(0);
+
+		
+		Assert.assertTrue("coupon use date", System.currentTimeMillis() - operation.getOperateDate() < 100000);
+		Assert.assertEquals("coupon use staff", mStaff.getName(), operation.getOperateStaff());
+		Assert.assertEquals("coupon use mode", useBuilder.getOperation(), operation.getOperate());
+		Assert.assertEquals("coupon use associate id", useBuilder.getAssociateId(), operation.getAssociateId());
+		Assert.assertEquals("coupon use comment", useBuilder.getComment(), operation.getComment());
 
 	}
 	

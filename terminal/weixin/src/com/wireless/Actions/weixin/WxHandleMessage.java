@@ -299,7 +299,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 							//只有一个优惠活动
 							StringBuilder desc = new StringBuilder();
 							//活动时间
-							desc.append("活动时间：" + promotion.getDateRange().getOpeningFormat() + " 至 " + promotion.getDateRange().getEndingFormat()).append("\n");
+							desc.append("活动结束时间：" + promotion.getDateRange().getEndingFormat()).append("\n");
 							
 							desc.append("\n点击查看优惠活动详情>>>>");
 							

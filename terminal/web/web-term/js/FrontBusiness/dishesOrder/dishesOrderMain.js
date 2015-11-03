@@ -1321,7 +1321,7 @@ function setRepaidOrderTitle(c){
 		if(re_member && re_member.hasMember){
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
 			if(re_member.coupon){
-				orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券: <span class="re_showMemberDetail">'+ primaryOrderData.other.order.coupon.length + '张, 共¥' + primaryOrderData.other.order.couponPrice + '元' +'</span>';
+				orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券: <span class="re_showMemberDetail">'+ primaryOrderData.other.order.usedCoupons.length + '张, 共¥' + primaryOrderData.other.order.couponPrice + '元' +'</span>';
 			}
 		}
 		orderFoodTitle += '&nbsp;&nbsp;&nbsp;当前折扣:<font color="green">'+ re_member.discount.name +'</font>';
@@ -1330,8 +1330,8 @@ function setRepaidOrderTitle(c){
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
 		}
 		
-		if(primaryOrderData.other.order.coupon){
-			orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券:<font color="green">'+ primaryOrderData.other.order.coupon.length + '张, 共¥' + primaryOrderData.other.order.couponPrice + '元' +'</font>';
+		if(primaryOrderData.other.order.usedCoupons.length > 0){
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券:<font color="green">'+ primaryOrderData.other.order.usedCoupons.length + '张, 共¥' + primaryOrderData.other.order.couponPrice + '元' +'</font>';
 		}
 		
 		if(primaryOrderData.other.order.discount){
@@ -1506,8 +1506,8 @@ Ext.onReady(function() {
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;会员名称: <span class="re_showMemberDetail">'+ re_member.name +'</span>';
 		}
 		
-		if(primaryOrderData.other.order.coupon.length > 0){
-			orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券:<font color="green">'+ primaryOrderData.other.order.coupon.length + '张, 共¥' + primaryOrderData.other.order.couponPrice + '元' +'</font>';
+		if(primaryOrderData.other.order.usedCoupons.length > 0){
+			orderFoodTitle += '&nbsp;&nbsp;&nbsp;优惠券:<font color="green">'+ primaryOrderData.other.order.usedCoupons.length + '张, 共¥' + primaryOrderData.other.order.couponPrice + '元' +'</font>';
 		}
 		if(primaryOrderData.other.order.discount){
 			orderFoodTitle += '&nbsp;&nbsp;&nbsp;账单折扣:<font color="green">'+ primaryOrderData.other.order.discount.name +'</font>';

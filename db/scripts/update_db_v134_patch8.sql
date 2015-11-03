@@ -82,6 +82,76 @@ CREATE TABLE IF NOT EXISTS `wireless_order_db`.`order_coupon_detail` (
   INDEX `ix_coupon_staff_id` (`coupon_staff_id` ASC)  COMMENT '')
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`coupon_operation`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`coupon_operation` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`coupon_operation` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+  `restaurant_id` INT NULL DEFAULT NULL COMMENT '',
+  `coupon_id` INT NULL DEFAULT NULL COMMENT '',
+  `coupon_name` VARCHAR(45) NULL DEFAULT NULL COMMENT '',
+  `coupon_price` FLOAT NULL DEFAULT NULL COMMENT '',
+  `operate` TINYINT NULL DEFAULT NULL COMMENT 'the operate as below\n1 - issue\n2 - use',
+  `associate_id` INT NULL DEFAULT NULL COMMENT '',
+  `operate_date` DATETIME NULL DEFAULT NULL COMMENT '',
+  `operate_staff` VARCHAR(45) NULL DEFAULT NULL COMMENT '',
+  `operate_staff_id` INT NULL DEFAULT NULL COMMENT '',
+  `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT '',
+  PRIMARY KEY (`id`)  COMMENT '',
+  INDEX `ix_coupon_staff_id` (`operate_staff_id` ASC)  COMMENT '',
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC)  COMMENT '',
+  INDEX `ix_associate_id` (`associate_id` ASC)  COMMENT '',
+  INDEX `ix_coupon_id` (`coupon_id` ASC)  COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Drop the field from table 'coupon'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`coupon` 
+DROP COLUMN `use_comment`,
+DROP COLUMN `use_associate_id`,
+DROP COLUMN `use_mode`,
+DROP COLUMN `use_staff`,
+DROP COLUMN `use_staff_id`,
+DROP COLUMN `use_date`,
+DROP COLUMN `issue_comment`,
+DROP COLUMN `issue_associate_id`,
+DROP COLUMN `issue_mode`,
+DROP COLUMN `issue_staff`,
+DROP COLUMN `issue_staff_id`,
+DROP COLUMN `issue_date`,
+DROP INDEX `ix_use_assocaite_id` ,
+DROP INDEX `ix_issue_associate_id` ;
+
+-- -----------------------------------------------------
+-- Drop the table 'order_coupon_detail' 
+-- -----------------------------------------------------
+DROP TABLE `wireless_order_db`.`order_coupon_detail`;
+
+-- -----------------------------------------------------
+-- Modify the field 'birth_date' & 'order_date' to default null to table 'order_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` 
+CHANGE COLUMN `birth_date` `birth_date` DATETIME NULL DEFAULT NULL COMMENT 'the birth date to this order' ,
+CHANGE COLUMN `order_date` `order_date` DATETIME NULL DEFAULT NULL COMMENT 'the end date to this order' ;
+
+-- -----------------------------------------------------
+-- Modify the field 'coupon_price' to default null for table 'order_history' & 'order_archive'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` 
+CHANGE COLUMN `coupon_price` `coupon_price` FLOAT NULL DEFAULT NULL COMMENT '' ;
+
+ALTER TABLE `wireless_order_db`.`order_archive` 
+CHANGE COLUMN `coupon_price` `coupon_price` FLOAT NULL DEFAULT NULL COMMENT '' ;
+
+-- -----------------------------------------------------
+-- Update the coupon_price to NULL in case of 0
+-- -----------------------------------------------------
+UPDATE wireless_order_db.`order` SET coupon_price = NULL WHERE coupon_price = 0;
+UPDATE wireless_order_db.order_history SET coupon_price = NULL WHERE coupon_price = 0;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

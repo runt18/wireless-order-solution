@@ -20,6 +20,7 @@ import com.wireless.db.member.MemberLevelDao;
 import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
@@ -30,6 +31,7 @@ import com.wireless.pojo.member.MemberLevel;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.promotion.Coupon;
+import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.NumericUtil;
@@ -37,6 +39,23 @@ import com.wireless.util.SQLUtil;
 
 public class WXQueryMemberOperationAction extends DispatchAction{
 	
+	/**
+	 * 近5条消费记录
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward consumeDetails(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().print(getData(1, request.getParameter("fid"), request.getParameter("oid")).toString());
+		return null;
+	}
 	
 	/**
 	 * 近5条充值记录
@@ -162,7 +181,9 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
+			if(dbCon != null){
+				dbCon.disconnect();
+			}
 		}
 		return jobject;
 	}
@@ -239,8 +260,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			
 			
 			//查询已用优惠劵的数量
-			final int usedCouponAmount = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setStatus(Coupon.Status.USED), " ORDER BY C.use_date DESC ").size();
-			
+			final int usedCouponAmount = CouponOperationDao.getByCond(staff, new CouponOperationDao.ExtraCond().addOperation(CouponOperation.OperateType.USE)).size();
 			jobject.setExtra(new Jsonable(){
 
 				@Override

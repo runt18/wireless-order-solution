@@ -29,7 +29,7 @@ function UseCouponPopup(param){
 
 			}, 'json');
 		}else{
-			$.post('../OperateCoupon.do',  {dataSource : 'getByCond',status : 'issued', memberId : param.useTo}, function(response, status, xhr){
+			$.post('../OperateCoupon.do',  {dataSource : 'getByCond', status : 'issued', expired : false, memberId : param.useTo}, function(response, status, xhr){
 				if(response.success){
 					if(response.root.length > 0){
 						availableCoupons = availableCoupons.concat(response.root);
@@ -57,11 +57,11 @@ function UseCouponPopup(param){
 					for(var i = 0; i < availCoupons.length; i++){
 						var eachProgressCoupon = '<tr>'
 											 + '<td style="width:250px">'
-											 + '<label style="height:50px"><input type="checkbox" class="useCouponClass" data-theme="e" coupon_id="' + availCoupons[i].couponId + '">' + availCoupons[i].promotion.title + '<font style="float:right" color="red">word</font>' +'</label>'
+											 + '<label style="height:50px"><input type="checkbox" class="useCouponClass" data-theme="e" coupon_id="' + availCoupons[i].couponId + '">' + availCoupons[i].couponType.name + '<font style="float:right" color="red">word</font>' +'</label>'
 											 + '</td>'
 											 + '</tr>';
 							
-						if(availCoupons[i].useDate){
+						if(availCoupons[i].statusText == '已使用'){
 							eachProgressCoupon = eachProgressCoupon.replace('word', '已使用');
 						}else{
 							eachProgressCoupon = eachProgressCoupon.replace('word', ' ');
@@ -117,6 +117,6 @@ function UseCouponPopup(param){
 
 
 UseCouponPopup.UseMode = {
-	FAST : { mode : 1, desc : '快速' },
-	ORDER : { mode : 2, desc : '账单' }
+	FAST : { mode : 20, desc : '快速' },
+	ORDER : { mode : 21, desc : '账单' }
 };
