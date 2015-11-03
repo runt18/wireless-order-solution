@@ -80,7 +80,7 @@ of.entry = function(c){
 		if(c.table.id){
 			param = '?table_id=' + c.table.id;
 		}else if(c.table.alias){
-			param = '?table_alias=' + c.table.alias
+			param = '?table_alias=' + c.table.alias;
 		}
 		
 		if(c.comment){

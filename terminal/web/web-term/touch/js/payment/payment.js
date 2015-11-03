@@ -590,7 +590,7 @@ $(function(){
 				Util.msg.alert({msg : '结账成功!', topTip : true});
 				if(systemStatus == 4){
 					//快餐模式下返回到点菜界面
-					of.entry({orderFoodOperateType : 'fast'});
+					of.entry({orderFoodOperateType : 'fast', table : pm.table});
 				}else{
 					//返回餐台界面
 					ts.loadData();
@@ -646,7 +646,7 @@ $(function(){
 						setTimeout(function(){
 							if(systemStatus == 4){
 								//快餐模式下返回到点菜界面
-								of.entry({orderFoodOperateType : 'fast'});
+								of.entry({orderFoodOperateType : 'fast', table : pm.table});
 							}else{
 								//返回餐台界面
 								ts.loadData();
@@ -752,7 +752,7 @@ $(function(){
 							setTimeout(function(){
 								if(systemStatus == 4){
 									//快餐模式下返回到点菜界面
-									of.entry({orderFoodOperateType : 'fast'});
+									of.entry({orderFoodOperateType : 'fast', table : pm.table});
 								}else{
 									//返回餐台界面
 									ts.loadData();
@@ -880,7 +880,7 @@ $(function(){
 							setTimeout(function(){
 								if(systemStatus == 4){
 									//快餐模式下返回到点菜界面
-									of.entry({orderFoodOperateType : 'fast'});
+									of.entry({orderFoodOperateType : 'fast', table : pm.table});
 								}else{
 									//返回餐台界面
 									ts.loadData();
