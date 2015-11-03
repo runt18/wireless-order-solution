@@ -51,50 +51,56 @@ public class OperateMemberAction extends DispatchAction{
 		
 		JObject jobject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String name = request.getParameter("name");
-			String mobile = request.getParameter("mobile");
-			String memberTypeId = request.getParameter("memberTypeId");
-			String sex = request.getParameter("sex");
-			String memberCard = request.getParameter("memberCard");
-			String birthday = request.getParameter("birthday");
-//			String tele = request.getParameter("telt");
-			String company = request.getParameter("company");
-			String addr = request.getParameter("addr");
-			String isPrint = request.getParameter("isPrint");
-			String sendSms = request.getParameter("sendSms");
+			final String pin = (String)request.getAttribute("pin");
+			final String name = request.getParameter("name");
+			final String mobile = request.getParameter("mobile");
+			final String memberTypeId = request.getParameter("memberTypeId");
+			final String sex = request.getParameter("sex");
+			final String memberCard = request.getParameter("memberCard");
+			final String birthday = request.getParameter("birthday");
+			final String company = request.getParameter("company");
+			final String addr = request.getParameter("addr");
+			final String referrer = request.getParameter("referrer");
+			final String isPrint = request.getParameter("isPrint");
+			final String sendSms = request.getParameter("sendSms");
 			String firstCharge = request.getParameter("firstCharge");
-			String firstActualCharge = request.getParameter("firstActualCharge");
-			String rechargeType = request.getParameter("rechargeType");
-					
-//			String privateComment = request.getParameter("privateComment");
-//			String publicComment = request.getParameter("publicComment");
+			final String firstActualCharge = request.getParameter("firstActualCharge");
+			final String rechargeType = request.getParameter("rechargeType");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			Member.InsertBuilder ib = null;
-			if(memberCard != null && !memberCard.isEmpty()){
-				ib = Member.InsertBuilder.build4Card(name, memberCard, Integer.valueOf(memberTypeId)); 
-				if(mobile != null && !mobile.isEmpty()){
-					ib.setMobile(mobile);
-				}
-			}else if(mobile != null && !mobile.isEmpty()){
-				ib = Member.InsertBuilder.build4Mobile(name, mobile, Integer.valueOf(memberTypeId));
-				if(memberCard != null && !memberCard.isEmpty()){
-					ib.setMemberCard(memberCard);
-				}				
-			}else{
-				ib = Member.InsertBuilder.build4Weixin(name, Integer.valueOf(memberTypeId));
+			final Member.InsertBuilder builder = new Member.InsertBuilder(name, Integer.parseInt(memberTypeId));
+			
+			if(mobile != null && !mobile.isEmpty()){
+				builder.setMobile(mobile);
 			}
 			
-			ib.setBirthday(DateUtil.parseDate(birthday))
-			  .setSex(Member.Sex.valueOf(Integer.valueOf(sex)))
-			  .setMemberCard(memberCard)
-			  .setCompany(company)
-			  .setContactAddr(addr)
-			  .setSex(Member.Sex.valueOf(Integer.valueOf(sex)));
+			if(memberCard != null && !memberCard.isEmpty()){
+				builder.setMemberCard(memberCard);
+			}	
 			
-			int memberID = MemberDao.insert(staff, ib);
+			if(referrer != null && !referrer.isEmpty()){
+				builder.setReferrer(Integer.parseInt(referrer));
+			}
+			
+			if(birthday != null && !birthday.isEmpty()){
+				builder.setBirthday(DateUtil.parseDate(birthday));
+			}
+			
+			if(company != null && !company.isEmpty()){
+				builder.setCompany(company);
+			}
+			
+			if(addr != null && !addr.isEmpty()){
+				builder.setContactAddr(addr);
+			}
+			
+			if(sex != null && !sex.isEmpty()){
+				builder.setSex(Member.Sex.valueOf(Integer.valueOf(sex)));
+			}
+			
+			
+			int memberID = MemberDao.insert(staff, builder);
 			jobject.initTip(true, "操作成功, 新会员资料已添加.");
 			
 			if(firstActualCharge != null && !firstActualCharge.isEmpty()){
@@ -126,21 +132,6 @@ public class OperateMemberAction extends DispatchAction{
 						e.printStackTrace();
 					}
 				}
-/*				for(Cookie cookie : request.getCookies()){
-				    if(cookie.getName().equals((request.getServerName() + "_chargeSms"))){
-				    	if(cookie.getValue().equals("true")){
-							try{
-								//Send SMS.
-								SMS.send(staff, mo.getMemberMobile(), new Msg4Charge(mo));
-								jobject.setMsg(jobject.getMsg() + "充值短信发送成功.");
-							}catch(Exception e){
-								jobject.setMsg(jobject.getMsg() + "充值短信发送失败(" + e.getMessage() + ")");
-								e.printStackTrace();
-							}
-				    	}
-					    break;
-				    }
-				}*/
 			}
 			
 		}catch(BusinessException e){
