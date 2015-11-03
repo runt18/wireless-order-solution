@@ -642,6 +642,8 @@ Ext.onReady(function() {
 						if(checkboxStatus){
 							// 设置优惠活动触发条件
 							params.triggers = Trigger.WX_SUBSCRIBE.type;
+						}else{
+							params.triggers = null;
 						}
 						
 						var publishMask = new Ext.LoadMask(document.body, {
