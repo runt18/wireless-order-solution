@@ -116,37 +116,33 @@ public class QueryMemberAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward normal(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward normal(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		
-		JObject jobject = new JObject();
-		List<Member> list = null;
-//		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
+		final JObject jobject = new JObject();
+		
 		try{
-			String pin = (String)request.getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final String pin = (String)request.getAttribute("pin");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String  orderClause = " ";
-			String id = request.getParameter("id");
-			String memberType = request.getParameter("memberType");
-			String memberTypeAttr = request.getParameter("memberTypeAttr");
-			String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
-			String memberMinBalance = request.getParameter("memberMinBalance");
-			String memberMaxBalance = request.getParameter("memberMaxBalance");
-			String MaxTotalMemberCost = request.getParameter("MaxTotalMemberCost");
-			String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
-			String consumptionMinAmount = request.getParameter("consumptionMinAmount");
-			String consumptionMaxAmount = request.getParameter("consumptionMaxAmount");
-			String beginDate = request.getParameter("beginDate");
-			String endDate = request.getParameter("endDate");
-			String searchType = request.getParameter("sType");
-			String forDetail = request.getParameter("forDetail");
-			String needSum = request.getParameter("needSum");
-			String orderBy = request.getParameter("orderBy");
+			final String start = request.getParameter("start");
+			final String limit = request.getParameter("limit");
+			final String id = request.getParameter("id");
+			final String memberType = request.getParameter("memberType");
+			final String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
+			final String memberMinBalance = request.getParameter("memberMinBalance");
+			final String memberMaxBalance = request.getParameter("memberMaxBalance");
+			final String MaxTotalMemberCost = request.getParameter("MaxTotalMemberCost");
+			final String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
+			final String consumptionMinAmount = request.getParameter("consumptionMinAmount");
+			final String consumptionMaxAmount = request.getParameter("consumptionMaxAmount");
+			final String beginDate = request.getParameter("beginDate");
+			final String endDate = request.getParameter("endDate");
+			final String referrer = request.getParameter("referrer");
+			final String searchType = request.getParameter("sType");
+			final String forDetail = request.getParameter("forDetail");
+			final String needSum = request.getParameter("needSum");
+			final String orderBy = request.getParameter("orderBy");
 			
 			MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
 			
@@ -195,8 +191,13 @@ public class QueryMemberAction extends DispatchAction {
 					extraCond.lessBalance(Float.parseFloat(memberMaxBalance));
 				}
 				
+				if(referrer != null && !referrer.isEmpty()){
+					extraCond.setReferrer(Integer.parseInt(referrer));
+				}
+				
 			}
 			
+			String orderClause = null;
 			if(orderBy != null){
 				if(orderBy.equals("create")){
 					orderClause = " ORDER BY M.member_id ";
@@ -209,29 +210,14 @@ public class QueryMemberAction extends DispatchAction {
 				}
 			}			
 			
-			list = MemberDao.getByCond(staff, extraCond, orderClause);
-			List<Member> newList = new ArrayList<Member>(list);  
-			if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty()){
-				newList.clear();
-				if(Integer.parseInt(memberTypeAttr) == MemberType.Attribute.INTERESTED.getVal()){
-					newList.addAll(MemberDao.getInterestedMember(staff, extraCond.toString()));
-				}else{
-					List<Member> attrMember = new ArrayList<Member>();  
-					for (Member member : list) {
-						if(member.getMemberType().getAttribute().getVal() == Integer.parseInt(memberTypeAttr)){
-							attrMember.add(member);
-						};
-					}
-					newList.addAll(attrMember);
-				}
-			}
-			jobject.setTotalProperty(newList.size());
+			List<Member> result = MemberDao.getByCond(staff, extraCond, orderClause);
+			jobject.setTotalProperty(result.size());
 			
 			Member sumMember = null;
 			if(needSum != null && !needSum.isEmpty()){
 				sumMember = new Member(-1);
 				float baseBalance = 0, extraBalance = 0;
-				for (Member m : newList) {
+				for (Member m : result) {
 					baseBalance += m.getBaseBalance();
 					extraBalance += m.getExtraBalance();
 				}
@@ -241,33 +227,21 @@ public class QueryMemberAction extends DispatchAction {
 				sumMember.setExtraBalance(extraBalance);				
 			}
 
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				result = DataPaging.getPagingData(result, true, start, limit);
+			}
 			
-			newList = DataPaging.getPagingData(newList, true, start, limit);
-			
-			if(!newList.isEmpty() && forDetail != null && !forDetail.isEmpty()){
-				newList.set(0, MemberDao.getById(staff, newList.get(0).getId()));
-				final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(newList.get(0).getId()).setStatus(Coupon.Status.ISSUED), null);
-				if(!coupons.isEmpty()){
-					jobject.setExtra(new Jsonable(){
-						@Override
-						public JsonMap toJsonMap(int flag) {
-							JsonMap jm = new JsonMap();
-							jm.putJsonableList("coupons", coupons, Coupon.COUPON_JSONABLE_SIMPLE);
-							return jm;
-						}
-						@Override
-						public void fromJsonMap(JsonMap jsonMap, int flag) {
-							
-						}
-					});					
+			if(forDetail != null && !forDetail.isEmpty()){
+				for(int i = 0; i < result.size(); i++){
+					result.set(i, MemberDao.getById(staff, result.get(i).getId()));
 				}
 			}
 			
 			if(needSum != null && !needSum.isEmpty()){
-				newList.add(sumMember);
+				result.add(sumMember);
 			}
 			
-			jobject.setRoot(newList);
+			jobject.setRoot(result);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
