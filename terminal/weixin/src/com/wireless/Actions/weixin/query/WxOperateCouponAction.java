@@ -121,7 +121,9 @@ public class WxOperateCouponAction extends DispatchAction{
 			
 			final List<Coupon> result = CouponDao.getByCond(staff, extraCond, null);
 			for(Coupon coupon : result){
-				coupon.getCouponType().setImage(OssImageDao.getById(staff, coupon.getCouponType().getImage().getId()));
+				if(coupon.getCouponType().hasImage()){
+					coupon.getCouponType().setImage(OssImageDao.getById(staff, coupon.getCouponType().getImage().getId()));
+				}
 			}
 			jObject.setRoot(result);
 			
