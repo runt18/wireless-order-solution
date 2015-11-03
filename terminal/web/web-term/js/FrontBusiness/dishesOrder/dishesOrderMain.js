@@ -165,7 +165,7 @@ function repaid_initNorthPanel(){
 					});
 					ds.baseParams = {
 						dataSource : 'getAvailableByOrder',
-						memberId : primaryOrderData.other.order.memberId,
+						memberId : re_member.id,
 						orderId : primaryOrderData.other.order.id
 					};
 					ds.load();
