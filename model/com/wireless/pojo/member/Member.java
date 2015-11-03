@@ -103,37 +103,20 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	public static class InsertBuilder{
 		private final Member data = new Member();
 		
-		private InsertBuilder(){
-			
+		public InsertBuilder(String name, int memberTypeId){
+			data.setName(name);
+			data.setMemberType(new MemberType(memberTypeId));
 		}
 		
-		public static InsertBuilder build4Weixin(String name, MemberType memberType){
-			return build4Weixin(name, memberType.getId());
+		public InsertBuilder(String name, MemberType memberType){
+			data.setName(name);
+			data.setMemberType(memberType);
 		}
 		
-		public static InsertBuilder build4Weixin(String name, int memberTypeId){
-			InsertBuilder builder = new InsertBuilder();
-			builder.data.setName(name);
-			builder.data.setMemberType(new MemberType(memberTypeId));
-			return builder;
+		public InsertBuilder setReferrer(int staffId){
+			data.setReferrerId(staffId);
+			return this;
 		}
-		
-		public static InsertBuilder build4Mobile(String name, String mobile, int memberTypeId){
-			InsertBuilder builder = new InsertBuilder();
-			builder.data.setName(name);
-			builder.data.setMobile(mobile);
-			builder.data.setMemberType(new MemberType(memberTypeId));
-			return builder;
-		}
-		
-		public static InsertBuilder build4Card(String name, String card, int memberTypeId){
-			InsertBuilder builder = new InsertBuilder();
-			builder.data.setName(name);
-			builder.data.setMemberCard(card);
-			builder.data.setMemberType(new MemberType(memberTypeId));
-			return builder;
-		}
-		
 		public InsertBuilder setSex(Sex sex){
 			this.data.setSex(sex);
 			return this;
@@ -193,11 +176,21 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		private String contactAddress;		// 联系地址
 		private int memberTypeId = -1;		// 会员类型编号
 		private String memberCard;			// 会员卡号
+		private int referrerId;				// 推荐人
 		private String privateComment;		// 私人评论
 		private String publicComment;		// 公开评论
 		
 		public UpdateBuilder(int memberId){
 			this.memberId = memberId;
+		}
+		
+		public UpdateBuilder setReferrer(int staffId){
+			this.referrerId = staffId;
+			return this;
+		}
+		
+		public boolean isReferrerChanged(){
+			return this.referrerId != 0;
 		}
 		
 		public UpdateBuilder setName(String name){
@@ -400,6 +393,8 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private long createDate;			// 创建时间
 	private MemberType memberType;		// 会员类型
 	private String memberCard;			// 会员卡号
+	private String referrer;		// 推荐人
+	private int referrerId;		// 推荐人Id
 	
 	private WxMember weixin;		// 微信信息
 	//Ta喜欢的菜品
@@ -469,6 +464,9 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}
 		if(builder.isPrivateCommentChanged()){
 			setPrivateComment(MemberComment.newPrivateComment(null, new Member(builder.memberId), builder.privateComment));
+		}
+		if(builder.isReferrerChanged()){
+			setReferrerId(builder.referrerId);
 		}
 	}
 	
@@ -1161,6 +1159,29 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 
 	public void setTotalCharge(float totalCharge) {
 		this.totalCharge = totalCharge;
+	}
+	
+	public void setReferrerId(int staffId){
+		this.referrerId = staffId;
+	}
+	
+	public int getReferrerId(){
+		return this.referrerId;
+	}
+	
+	public void setReferrer(String staff){
+		this.referrer = staff;
+	}
+	
+	public String getReferrer(){
+		if(this.referrer == null){
+			return "";
+		}
+		return this.referrer;
+	}
+	
+	public boolean hasReferrer(){
+		return this.referrerId != 0;
 	}
 	
 	public void addPublicComment(MemberComment comment){
