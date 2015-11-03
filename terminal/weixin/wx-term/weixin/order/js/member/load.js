@@ -312,7 +312,7 @@ $(function(){
 							for(var i = 0; i < data.root.length; i++){
 								var temp = data.root[i];
 								html.push(template.format({
-									time : fnDateInChinese(temp.operateDate) + '</br><font style="font-size:13px;">' + temp.couponName +'</font>',
+									time : fnDateInChinese(temp.operateDate) + '</br><div style="font-size:13px;text-align:center;">' + temp.couponName +'</div>',
 									useMode : temp.operateText + '</br><font style="font-size:13px;">(' + temp.associateId + ')</font>',
 									couponMoney : (checkDot(temp.couponPrice) ? parseFloat(temp.couponPrice).toFixed(2) : temp.couponPrice) + '元'
 								}));

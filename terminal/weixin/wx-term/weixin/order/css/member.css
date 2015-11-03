@@ -110,7 +110,7 @@ input[type=text], input[type=number]{
 	padding-bottom: 2px;
 }
 
-.d-list-item-consume,.d-list-item-coupon > td:nth-child(2), .d-list-item-consume,.d-list-item-coupon > td:nth-child(3){
+.d-list-item-consume,.d-list-item-coupon > td, .d-list-item-consume,.d-list-item-coupon > td:nth-child(3){
 	text-align: right;
 	color: #26a9d0;
 }
