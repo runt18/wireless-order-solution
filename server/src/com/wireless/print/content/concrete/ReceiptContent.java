@@ -266,12 +266,12 @@ public class ReceiptContent extends ConcreteContent {
 			}
 			line3.append("ƒ® ˝£∫" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getErasePrice()));
 		}
-		if(mOrder.hasCoupon()){
+		if(mOrder.hasUsedCoupon()){
 			if(line3.length() > 0){
 				line3.append("  ");
 			}
 			//TODO list the coupons
-			//line3.append(mOrder.getCoupon().getName() + "£∫" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getCouponPrice()));
+			line3.append(mOrder.getCouponPrice() > 0 ? "”≈ª›»Ø£∫" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getCouponPrice()) : "");
 		}
 		
 		StringBuilder line4 = new StringBuilder();
