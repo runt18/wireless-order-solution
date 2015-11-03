@@ -127,6 +127,7 @@ public class MemberDao {
 		private DutyRange createRange;
 		private String weixinCard;
 		private String weixinSerial;
+		private int referrerId;
 		private int restaurantId;
 		
 		public ExtraCond(MemberCond memberCond){
@@ -152,6 +153,11 @@ public class MemberDao {
 		
 		private ExtraCond setRestaurantId(int restaurantId){
 			this.restaurantId = restaurantId;
+			return this;
+		}
+		
+		public ExtraCond setReferrer(int referrerId){
+			this.referrerId = referrerId;
 			return this;
 		}
 		
@@ -409,6 +415,10 @@ public class MemberDao {
 			
 			if(this.createRange != null){
 				extraCond.append(" AND M.create_date BETWEEN '" + createRange.getOnDutyFormat() + "' AND '" + createRange.getOffDutyFormat() + "'");
+			}
+			
+			if(this.referrerId != 0){
+				extraCond.append(" AND M.referrer_id = " + referrerId);
 			}
 			return extraCond.toString();
 		}
