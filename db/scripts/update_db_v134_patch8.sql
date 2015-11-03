@@ -153,6 +153,21 @@ CHANGE COLUMN `coupon_price` `coupon_price` FLOAT NULL DEFAULT NULL COMMENT '' ;
 UPDATE wireless_order_db.`order` SET coupon_price = NULL WHERE coupon_price = 0;
 UPDATE wireless_order_db.order_history SET coupon_price = NULL WHERE coupon_price = 0;
 
+-- -----------------------------------------------------
+-- Add the field 'referrer' & 'referrer_id' to table 'member'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`member` 
+ADD COLUMN `referrer` VARCHAR(45) NULL DEFAULT NULL COMMENT '' AFTER `comment`,
+ADD COLUMN `referrer_id` INT NULL DEFAULT NULL COMMENT '' AFTER `referrer`,
+ADD INDEX `ix_referrer_id` (`referrer_id` ASC)  COMMENT '';
+
+-- -----------------------------------------------------
+-- Drop the field 'taboo' & 'taste_pref' to table 'member'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`member` 
+DROP COLUMN `taboo`,
+DROP COLUMN `taste_pref`;
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
