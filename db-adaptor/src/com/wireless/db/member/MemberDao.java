@@ -12,6 +12,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
@@ -721,6 +722,7 @@ public class MemberDao {
 			  " M.total_consumption, M.total_point, M.total_charge, " +
 			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
 			  " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, " +
+			  " M.referrer, M.referrer_id, " +
 			  " MT.member_type_id, MT.name AS member_type_name, MT.attribute, MT.exchange_rate, MT.charge_rate, MT.type, MT.initial_point, " +
 			  " WM.weixin_card " +
 			  " FROM " + Params.dbName + ".member M " +
@@ -761,6 +763,8 @@ public class MemberDao {
 			member.setIdCard(dbCon.rs.getString("id_card"));
 			member.setCompany(dbCon.rs.getString("company"));
 			member.setContactAddress(dbCon.rs.getString("contact_addr"));
+			member.setReferrer(dbCon.rs.getString("referrer"));
+			member.setReferrerId(dbCon.rs.getInt("referrer_id"));
 			
 			MemberType memberType = new MemberType(dbCon.rs.getInt("member_type_id"));
 			memberType.setName(dbCon.rs.getString("member_type_name"));
@@ -1102,10 +1106,14 @@ public class MemberDao {
 			throw new BusinessException(MemberError.MEMBER_CARD_DUPLICATED);
 		}
 		
+		if(member.hasReferrer()){
+			member.setReferrer(StaffDao.getById(dbCon, member.getReferrerId()).getName());
+		}
+		
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".member " +
 			  " (member_type_id, member_card, member_card_crc, restaurant_id, name, sex, tele, mobile, mobile_crc, birthday, " +
-			  " id_card, company, contact_addr, create_date, point)" +
+			  " id_card, company, contact_addr, create_date, referrer, referrer_id, point)" +
 			  " VALUES( " +
 			  member.getMemberType().getId() + "," + 
 			  "'" + member.getMemberCard() + "'," +
@@ -1121,6 +1129,8 @@ public class MemberDao {
 			 "'" + member.getCompany()+ "'," +
 			 "'" + member.getContactAddress() + "'," +
 			 " NOW(), " +
+			 (member.hasReferrer() ? "'" + member.getReferrer() + "'" : "NULL") + "," +
+			 (member.hasReferrer() ? member.getReferrerId() : "NULL") + "," +
 			 " (SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getId() + ")" + 
 			 ")";
 		
@@ -1221,6 +1231,12 @@ public class MemberDao {
 			}
 		}
 		
+		if(builder.isReferrerChanged()){
+			Staff referrer = StaffDao.getById(dbCon, member.getReferrerId());
+			member.setReferrer(referrer.getName());
+			member.setReferrerId(referrer.getId());
+		}
+		
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".member SET " +
 			  " member_id = " + member.getId() +
@@ -1236,6 +1252,8 @@ public class MemberDao {
 			  (builder.isBirthdayChanged() ? " ,birthday = '" + DateUtil.format(member.getBirthday()) + "'" : "") +
 			  (builder.isCompanyChanged() ? " ,company = '" + member.getCompany() + "'" : "") +
 			  (builder.isContactAddrChanged() ? " ,contact_addr = '" + member.getContactAddress() + "'" : "") +
+			  (builder.isReferrerChanged() ? " ,referrer = '" + member.getReferrer() + "'" : "") +
+			  (builder.isReferrerChanged() ? " ,referrer_id = " + member.getReferrerId() : "") +
 			  " WHERE member_id = " + member.getId(); 
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
