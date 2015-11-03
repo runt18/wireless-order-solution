@@ -984,6 +984,44 @@ function gridInit(){
 		}
 	});
 	
+	var referrerCombo = new Ext.form.ComboBox({
+		id : 'referrerCombo',
+		readOnly : false,
+		forceSelection : true,
+		width : 103,
+		listWidth : 120,
+		store : new Ext.data.SimpleStore({
+			fields : ['staffID', 'staffName']
+		}),
+		valueField : 'staffID',
+		displayField : 'staffName',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [[-1, '全部']];
+				Ext.Ajax.request({
+					url : '../../QueryStaff.do',
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						for(var i = 0; i < jr.root.length; i++){
+							data.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+						}
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+						
+					},
+					fialure : function(res, opt){
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					}
+				});
+			}
+		}
+	});
+	
 	var memberBasicGridExcavateMemberTbar = new Ext.Toolbar({
 		hidden : true,
 		height : 28,		
@@ -1047,7 +1085,10 @@ function gridInit(){
 				xtype : 'numberfield',
 				id : 'textMemberMaxBalance',
 				width : 60
-			}]
+			},{
+				xtype : 'tbtext',
+				text : '推荐人:'
+			}, referrerCombo]
 		
 	});
 	
@@ -1213,6 +1254,7 @@ function gridInit(){
 				gs.baseParams['endDate'] = Ext.getCmp('dateSearchDateEnd').getValue();
 				gs.baseParams['needSum'] = true;
 				gs.baseParams['orderBy'] = m_searchAdditionFilter;
+				gs.baseParams['referrer'] = referrerCombo.getValue() != -1 ? referrerCombo.getValue() : null;
 				gs.load({
 					params : {
 						start : 0,
@@ -1311,6 +1353,9 @@ function gridInit(){
 			}
 		}]
 	});
+	
+	
+
 	
 	memberBasicGrid = createGridPanel(
 		'memberBasicGrid',
@@ -1614,6 +1659,13 @@ function winInit(){
 					disabled : true,
 					value : 0.00
 				}]
+			},{
+				items : [{
+					id : 'memberReferrer_numfield_mmm',
+					fieldLabel : '推荐人',
+					disabled : true,
+					cls : 'disableInput',
+				}]
 			}]
 		});		
 		
@@ -1795,6 +1847,7 @@ function cm_operationMemberData(c){
 	var usedBalance = Ext.getCmp('cm_numberUsedBalance');
 	var point = Ext.getCmp('cm_numberMmeberPoint');
 	var usedPoint = Ext.getCmp('cm_numberUserPoint');
+	var referrer = Ext.getCmp('memberReferrer_numfield_mmm');
 	
 	
 	
@@ -1813,6 +1866,7 @@ function cm_operationMemberData(c){
 		memberID.setValue(data['id']);
 		name.setValue(data['name']);
 		mobile.setValue(data['mobile']);
+		referrer.setValue(data['referrer']);
 		memberCard.setValue(data['memberCard']);
 		weixinCard.setValue(data['weixinCard']);
 		sex.setValue(typeof data['sexValue'] == 'undefined' ? 0 : data['sexValue']);

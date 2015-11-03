@@ -53,25 +53,43 @@ function UseCouponPopup(param){
 			_useCouponPopup = new JqmPopup({
 				loadUrl : './popup/coupon/use.html',
 				pageInit : function(self){
-					var progressCoupon = "";
+					var progressCouponOne = "";
+					var progressCouponTwo = "";
+					var progressCouponThree = "";
 					for(var i = 0; i < availCoupons.length; i++){
+					
 						var eachProgressCoupon = '<tr>'
 											 + '<td style="width:250px">'
-											 + '<label style="height:50px"><input type="checkbox" class="useCouponClass" data-theme="e" coupon_id="' + availCoupons[i].couponId + '">' + availCoupons[i].couponType.name + '<font style="float:right" color="red">word</font>' +'</label>'
+											 + '<label style="height:50px"><input $(input_checked) type="checkbox" class="useCouponClass" data-theme="e" coupon_id="' + availCoupons[i].couponId + '">' + availCoupons[i].couponType.name + '<font style="float:right" color="red">$(word)</font>' +'</label>'
 											 + '</td>'
 											 + '</tr>';
-							
+						
 						if(availCoupons[i].statusText == '已使用'){
-							eachProgressCoupon = eachProgressCoupon.replace('word', '已使用');
+							eachProgressCoupon = eachProgressCoupon.replace('$(word)', '已使用').replace('$(input_checked)', 'checked');
 						}else{
-							eachProgressCoupon = eachProgressCoupon.replace('word', ' ');
+							eachProgressCoupon = eachProgressCoupon.replace('$(word)', ' ');
 						}
-						progressCoupon += eachProgressCoupon;
+						
+						
+						
+						if(i % 3 == 0){
+							progressCouponOne += eachProgressCoupon;
+						}else if(i % 3 == 1){
+							progressCouponTwo += eachProgressCoupon;
+						}else{
+							progressCouponThree += eachProgressCoupon;
+						}
 					}
 					
 					
-					self.find('[id = useTal_table_use]').append(progressCoupon);
-					self.find('[id = useTal_table_use]').trigger('create').trigger('refresh');
+					self.find('[id = useTal1_table_use]').append(progressCouponOne);
+					self.find('[id = useTal1_table_use]').trigger('create').trigger('refresh');
+					
+					self.find('[id = useTal2_table_use]').append(progressCouponTwo);
+					self.find('[id = useTal2_table_use]').trigger('create').trigger('refresh');
+					
+					self.find('[id = useTal3_table_use]').append(progressCouponThree);
+					self.find('[id = useTal3_table_use]').trigger('create').trigger('refresh');
 					
 					//更改标题
 					

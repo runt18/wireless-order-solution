@@ -614,8 +614,6 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 		}, 100);
 	});
 	
-	
-	
 });
 
 
@@ -764,8 +762,8 @@ $(function(){
 		}
 	});	
 	
+	
 });	
-
 
 /** 
  * 通过其他界面返回餐台选择
@@ -2553,6 +2551,7 @@ ts.member.openMemberOperationWin = function(){
 		$('#chbSendFirstCharge').attr('checked', false).checkboxradio("refresh");
 	}
 	
+	//判断是否有短信模块
 	if(Util.sys.smsModule){
 		$('#td4ChbSendFirstCharge').show();
 		$('#lab4FirstTimeSendSms').html('发送充值信息'+(Util.sys.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Util.sys.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Util.sys.smsCount+'条, 请及时充值</font>)'));
@@ -2636,81 +2635,6 @@ ts.member.add_changeMemberType = function(){
 	}
 };
 
-/**
- * 操作会员信息, 添加
- * @param c
- */
-ts.member.operateMemberHandler = function(){
-	var membetType = $('#cm_comboMemberType');
-	var memberName = $('#cm_txtMemberName');
-	var memberMobile = $('#cm_txtMemberMobile');
-	var memberCard = $('#cm_numberMemberCard');
-	var memberSex = $('#cm_comboMemberSex');
-	var birthday = $('#cm_dateMemberBirthday');
-	var firstCharge = $('#cm_numFirstCharge');
-	var firstActualCharge = $('#cm_numFirstActualCharge');
-	var rechargeType = $('#rd_comboFirstRechargeType');
-	
-	
-	if(!memberMobile.val() && !memberCard.val()){
-		Util.msg.tip('至少要输入手机或会员卡号');
-		return;
-	}	
-	
-	if(!memberName.val()){
-		Util.msg.tip('请输入会员名称');
-		return;
-	}	
-	
-	if(!membetType.val()){
-		Util.msg.tip('请选择会员类型');
-		return;
-	}	
-	
-	Util.LM.show();
-	
-	if($('#chbSendFirstCharge').attr('checked')){
-		setcookie(document.domain+'_chargeSms', true);
-	}else{
-		delcookie(document.domain+'_chargeSms');
-	}
-	$.post('../OperateMember.do', {
-		dataSource : 'insert',
-		name : memberName.val(),
-		mobile : memberMobile.val(),
-		memberTypeId : membetType.val(),
-		sex : memberSex.val(),
-		memberCard :memberCard.val(),
-		birthday : birthday.val() ? birthday.val().format('Y-m-d') : '',
-		firstCharge : firstCharge.val(),
-		firstActualCharge : firstActualCharge.val(),
-		rechargeType : rechargeType.val(),
-		isPrint : $('#chbPrintFirstRecharge').attr('checked')?true:false,
-		sendSms : $('#chbSendFirstCharge').attr('checked')?true:false
-	}, function(jr){
-		Util.LM.hide();
-		if(jr.success){
-			ts.member.closeAddMemberWin();
-			//更新短信
-			Util.sys.checkSmStat();
-			
-			Util.msg.alert({
-				topTip : true,
-				msg : jr.msg
-			});
-		}else{
-			Util.msg.alert({
-				renderTo : 'tableSelectMgr',
-				msg : jr.msg
-			});			
-		}
-		
-		if(typeof c.callback == 'function'){
-			c.callback({}, c, jr);
-		}		
-	});
-	
-};
 
 
 /**

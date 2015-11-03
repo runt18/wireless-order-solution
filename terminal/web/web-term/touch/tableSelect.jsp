@@ -58,6 +58,8 @@
 <script type="text/javascript" src="./js/popup/coupon/usePopup.js?v=<%=v %>"></script>
 <!-- 会员读取弹出控件 -->
 <script type="text/javascript" src="./js/popup/member/read.js"></script>
+<!--添加会员弹出控件 -->
+<script type="text/javascript" src="./js/popup/member/add.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -93,7 +95,7 @@
 	
 	<div data-role="popup" id="frontPageMemberOperation" data-theme="d" class="payment_searchMemberType">
 		<ul id="charge_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-			<li class="popupButtonList" onclick="ts.member.openMemberOperationWin()"><a >添加会员</a></li>
+			<li class="popupButtonList" id="addMember_a_tableSelect"><a >添加会员</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberChargeWin()"><a >会员充值</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberConsumeDetailWin()"><a >消费明细</a></li>
@@ -332,77 +334,6 @@
 		</div>
 	</div>		
 	
-	<!-- 添加会员 -->
-	<div id="addMemberInfo" class="ui-overlay-shadow ui-corner-all" style="width:900px;z-index: 1102;position: absolute; top: 40%; left: 50%; margin: -100px 0px 0px -450px;background-color: white;display: none;" align="center">	
-	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
-	        	填写会员资料
-	    </div> 
-	    <table>
-	    	<tr>
-	    		<td class="readMemberTd">会员名称:</td>
-	    		<td><input id="cm_txtMemberName"></td>
-  	
-	    		<td class="readMemberTd">会员手机:</td>
-	    		<td><input id="cm_txtMemberMobile"></td>    
-	    		
-	    		<td class="readMemberTd">会员卡号:</td>
-	    		<td><input id="cm_numberMemberCard" onkeypress="intOnly()"></td>     			
-	    	</tr>
-	    	<tr>
-	    		<td class="readMemberTd">性别:</td>
-	    		<td>
-	    			<select  id="cm_comboMemberSex" data-native-menu="false">
-						<option value="0">男</option>
-						<option value="1">女</option>
-					</select>	    		
-	    		</td>    
-	    		
-	    		<td class="readMemberTd">生日:</td>
-	    		<td><input type="date" data-role="datebox" id="cm_dateMemberBirthday" data-options='{"mode": "datebox"}'></td>   
-	    		
-	    		<td class="readMemberTd">会员类型:</td>
-	    		<td class="selectionCmp" style="line-height: 20px;padding: 0 3px;">
-					<select  id="cm_comboMemberType" data-native-menu="false" onchange="ts.member.add_changeMemberType()"></select>		 
-	    		</td>  		   		
-	    	</tr> 
-	    	<tr id="tr_memberFirstTimeCharge" style="display: none;">
-	    		<td class="readMemberTd">首次充值:</td>
-	    		<td><input id="cm_numFirstCharge" onkeypress="intOnly()" ></td>    
-	    		
-	    		<td class="readMemberTd">账户充额:</td>
-	    		<td><input id="cm_numFirstActualCharge" onkeypress="intOnly()"></td>  
-	    		
-	    		<td class="readMemberTd">收款方式:</td>
-	    		<td class="selectionCmp">
-	    			<select  id="rd_comboFirstRechargeType" data-native-menu="false" >
-						<option value="1">现金</option>
-						<option value="2">刷卡</option>
-					</select>	    		
-	    		</td>
-	    	</tr>	  
-	    	<tr id="tr_memberFirstTimeChargePrint" style="display: none;">
-	    		<td colspan="2">
-					<label>
-				        <input type="checkbox" id="chbPrintFirstRecharge" data-theme="e" checked="checked">打印充值信息
-				    </label>	    		
-	    		</td>
-	    		<td colspan="3" >
-	    			<div id="td4ChbSendFirstCharge" style="display: none;">
-						<label >
-					        <input type="checkbox" id="chbSendFirstCharge" data-theme="e"><font id="lab4FirstTimeSendSms">发送短信</font>
-					    </label>
-				    </div>	    		
-	    		</td>
-	    	</tr>	    	  
-	    </table>
-	    
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.member.operateMemberHandler()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.member.closeAddMemberWin()">取消</a>		 
-			 </div>
-	    </div>	
-	</div>		
 	
 	<!-- 会员充值 -->
 	<div id="memberChargeWin" class="ui-overlay-shadow ui-corner-all" style="width:900px;z-index: 1102;position: absolute; top: 40%; left: 50%; margin: -200px 0px 0px -450px;background-color: white;display: none;" align="center">	
@@ -1756,8 +1687,8 @@
 		    	<a id="hang_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">挂账</a>		    	
 		    	<a id="cashReceive_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">现金找零</a>
 		    	<a id="mixed_a_payment" data-role="button" data-theme="b" data-rel="popup" data-position-to="window" data-transition="pop" data-inline="true" style="width: 45%;">其他结账</a>
-		    	<a data-role="button" data-theme="b" id="memberBalance_a_payment" data-rel="popup" data-position-to="window" data-transition="pop">读取会员</a>
-		    	<a id="wx_a_payment" data-role="button" data-theme="b">微信支付</a>
+		    	<a data-role="button" data-theme="b" id="memberBalance_a_payment" data-rel="popup" data-position-to="window" data-transition="pop" data-inline="true" style="width: 45%;">读取会员</a>
+		    	<a id="wx_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">微信支付</a>
 		    </div>
 		    
 		</div>

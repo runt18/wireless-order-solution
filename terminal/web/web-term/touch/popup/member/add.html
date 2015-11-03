@@ -1,0 +1,85 @@
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+	<div id="addMember_div_memberAdd" data-role="popup" data-dismissible="false" class="ui-overlay-shadow ui-corner-all" style="z-index:10;margin-top:-20%;max-width:900px;min-width:800px; background-color: white;">	
+	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 50px;">
+	        	添加会员
+	    </div>  
+	    <table>
+		   <tr>
+	    		<td class="readMemberTd">会员名称:</td>
+	    		<td><input id="memberName_input_memberAdd"></td>
+  	
+	    		<td class="readMemberTd">会员手机:</td>
+	    		<td><input id="memberMobile_input_Add"></td>    
+	    		
+	    		<td class="readMemberTd">会员卡号:</td>
+	    		<td><input id="memberCard_input_memberAdd" onkeypress="intOnly()"></td>     			
+	    	</tr>
+	    	<tr>
+	    		<td class="readMemberTd">性别:</td>
+	    		<td class="selectionCmp" style="line-height: 20px;padding: 0 3px;">
+	    			<select  id="memberSex_select_memberAdd" data-native-menu="false">
+	    				<option value="0">男</option>
+	    				<option value="1">女</option>
+					</select>	    		
+	    		</td>    
+	    		
+	    		<td class="readMemberTd">生日:</td>
+	    		<td><input type="date" data-role="datebox" id="memberBirthday_input_memberAdd" data-options='{"mode": "datebox"}'></td>   
+	    		
+	    		<td class="readMemberTd">会员类型:</td>
+	    		<td class="selectionCmp" style="line-height: 20px;padding: 0 3px;">
+					<select  id="memberType_select_memberAdd"></select>		 
+	    		</td>  		   		
+	    	</tr> 
+	    	<tr id="memberMoney_tr_memberAdd" style="display: none;">
+	    		<td class="readMemberTd">首次充值:</td>
+	    		<td><input id="memberFirst_input_memberAdd" onkeypress="intOnly()" ></td>    
+	    		
+	    		<td class="readMemberTd">账户充额:</td>
+	    		<td><input id="memberActual_input_memberAdd" onkeypress="intOnly()"></td>  
+	    		
+	    		<td class="readMemberTd">收款方式:</td>
+	    		<td class="selectionCmp">
+	    			<select  id="memberRechargeType_select_memberAdd" data-native-menu="false" >
+						<option value="1">现金</option>
+						<option value="2">刷卡</option>
+					</select>	    		
+	    		</td>
+	    	</tr>
+	    	<tr>
+	    		<td class="readMemberTd">推荐人:</td>
+	    		<td class="selectionCmp" style="line-height: 20px;padding: 0 3px;">
+					<select  id="memberReferrer_select_memberAdd" data-native-menu="false"></select>		 
+	    		</td>  		
+	    	</tr>	  
+	    	<tr id="memberPrint_tr_memberAdd" style="display: none;">
+	    		<td colspan="2">
+					<label>
+				        <input type="checkbox" id="memberPrintRecharge_input_memberAdd" data-theme="e" checked="checked">打印充值信息
+				    </label>	    		
+	    		</td>
+	    		<td colspan="3" >
+	    			<div id="memberSendCmp_div_memberAdd" style="display: none;">
+						<label >
+					        <input type="checkbox" id="memberSendMsgPrint_input_memberAdd" data-theme="e"><font id="memberSendWord_font_memberAdd">发送短信</font>
+					    </label>
+				    </div>	    		
+	    		</td>
+	    	</tr>	    	
+	    </table>
+	    
+	  
+	    	
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
+			 <div data-role="controlgroup" data-corners="false" data-type="horizontal" class="bottomBarFullWidth ui-bar-b barBottomBeCorner">
+				 <a id="confirm_a_memberAdd" data-role="button" data-inline="true" class="countPopbottomBtn">确定</a>
+				 <a id="cancel_a_memberAdd" data-role="button" data-inline="true" class="countPopbottomBtn">取消</a>		 
+			 </div>
+	    </div>
+	    
+	</div>		
+		
+</body>
