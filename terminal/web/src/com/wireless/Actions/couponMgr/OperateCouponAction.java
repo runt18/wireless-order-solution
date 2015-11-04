@@ -20,12 +20,15 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.util.DataPaging;
 
 public class OperateCouponAction extends DispatchAction{
 
 	public ActionForward getOperations(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String pin = (String) request.getAttribute("pin");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
 		final String staffId = request.getParameter("staffId");
 		final String begin = request.getParameter("beginDate");
 		final String end = request.getParameter("endDate");
@@ -59,8 +62,20 @@ public class OperateCouponAction extends DispatchAction{
 			
 			//获取优惠券的操作记录
 			final List<CouponOperation> result = CouponOperationDao.getByCond(staff, extraCond);
-			
-			jObject.setRoot(result);
+
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				jObject.setTotalProperty(result.size());
+				CouponOperation total = new CouponOperation(0);
+				for (CouponOperation operation : result) {
+					total.setCouponPrice(operation.getCouponPrice() + operation.getCouponPrice());
+				}
+				List<CouponOperation> limitResult = DataPaging.getPagingData(result, true, start, limit);
+				limitResult.add(total);
+				jObject.setRoot(limitResult);
+				
+			}else{
+				jObject.setRoot(result);
+			}
 			
 		}catch(SQLException e){
 			jObject.initTip(e);
