@@ -8,8 +8,8 @@ function MemberReadPopup(param){
 	
 	var _self = this;
 	var _member = null;
-	var _selectedDiscount = null;
-	var _selectedPricePlan = null;
+	var _selectedDiscount = { id : null };
+	var _selectedPricePlan = { id : null };
 	
 	var _popupInstance = null;
 	_popupInstance = new JqmPopup({
