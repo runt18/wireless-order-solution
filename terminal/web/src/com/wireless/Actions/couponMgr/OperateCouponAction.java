@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -22,6 +23,55 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateCouponAction extends DispatchAction{
 
+	public ActionForward getOperations(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String) request.getAttribute("pin");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String staffId = request.getParameter("staffId");
+		final String begin = request.getParameter("beginDate");
+		final String end = request.getParameter("endDate");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
+		final String operateType = request.getParameter("operateType");
+		final JObject jObject = new JObject();
+		try{
+			
+			final CouponOperationDao.ExtraCond extraCond = new CouponOperationDao.ExtraCond();
+			
+			if(staffId != null & !staffId.isEmpty()){
+				extraCond.setStaff(Integer.parseInt(staffId));
+			}
+			
+			if(begin != null && !begin.isEmpty() && end != null && !end.isEmpty()){
+				extraCond.setRange(begin, end);
+			}
+			
+			if(opening != null && !opening.isEmpty() && ending != null && !ending.isEmpty()){
+				extraCond.setHourRange(opening, ending);
+			}
+			
+			if(operateType != null && operateType.isEmpty()){
+				if(operateType.equalsIgnoreCase("issue")){
+					extraCond.setOperateType(CouponOperation.OperateType.ISSUE);
+				}else if(operateType.equalsIgnoreCase("use")){
+					extraCond.setOperateType(CouponOperation.OperateType.USE);
+				}
+			}
+			
+			//获取优惠券的操作记录
+			final List<CouponOperation> result = CouponOperationDao.getByCond(staff, extraCond);
+			
+			jObject.setRoot(result);
+			
+		}catch(SQLException e){
+			jObject.initTip(e);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jObject.toString(Coupon.COUPON_JSONABLE_SIMPLE));
+		}
+		
+		return null;
+	}
+	
 	/**
 	 * 根据账单和会员获取可用的优惠券
 	 * @param mapping

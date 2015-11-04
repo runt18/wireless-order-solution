@@ -33,9 +33,11 @@ public class OperateDiscountAction extends DispatchAction{
 		try {
 			final Order.DiscountBuilder builder;
 			if(memberId != null && !memberId.isEmpty()){
-				int pricePlan = 0;
+				final int pricePlan;
 				if(pricePlanId != null && !pricePlanId.trim().isEmpty()){
 					pricePlan = Integer.parseInt(pricePlanId);
+				}else{
+					pricePlan = 0;
 				}
 				
 				builder = Order.DiscountBuilder.build4Member(orderId, MemberDao.getById(staff, Integer.parseInt(memberId)), discountId, pricePlan);
