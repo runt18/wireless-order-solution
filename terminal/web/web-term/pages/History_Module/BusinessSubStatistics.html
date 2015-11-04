@@ -62,6 +62,8 @@
 			addTab('memberRefundStatistics', '取款统计', 'Client_Module/memberRefundStatistics.html');			
 		}else if(c.type == 12){//会员价统计
 			addTab('memberPriceStatistics', '会员价统计 ', 'History_Module/memberPriceStatictics.html');
+		}else if(c.type == 13){//优惠券统计
+			addTab('couponStatistics', '优惠券统计 ', 'History_Module/CouponStatistics.html');
 		}else{
 			return;
 		}
@@ -147,7 +149,7 @@
 			<th>优惠劵</th>
 			<td class="text_right"><a id="businessSub_bssiCouponAmount" href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, operateType:6})">---</a></td>
 			<td class="text_right" id="businessSub_bssiCouponIncome">---</td>
-			<td class="text_center">----</td>
+			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 13})">查看详情</a></td>
 		</tr>
 	</table>
 </div>	

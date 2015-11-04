@@ -228,7 +228,7 @@ Ext.onReady(function(){
         		}
         		$('#memberPriceStatistics_div_mpStatistics').find('.memberPriceLinkId').each(function(index, element){
         			element.onclick = function(){
-        				memberPriceShowDetail(element.id);
+        				memberPriceShowDetail($(element).val());
         			};
         		});
         	}
@@ -257,7 +257,7 @@ Ext.onReady(function(){
 			msg : "数据加载中,请稍后..."
 		},
 		tbar : statisticsTbar,
-		bbar : pagingBar,
+		bbar : pagingBar
 	});
 	
 	//定义memberPriceGrid位置
@@ -300,7 +300,7 @@ Ext.onReady(function(){
 	
 	
 	function memberPricelinkOrderId(v){
-		return '<a class="memberPriceLinkId" id="' + v + '">'+ v +'</a>';
+		return '<a class="memberPriceLinkId">'+ v +'</a>';
 	}
 
 	function memberPriceShowDetail(orderID){
@@ -460,7 +460,7 @@ Ext.onReady(function(){
 		height : parseInt(Ext.getDom('memberPriceStatistics_div_mpStatistics').parentElement.style.height.replace(/px/g, '')),
 		layout : 'border',
 		frame : true,
-		items : [memberPricedetailPanel, memberPriceChartPanel],
+		items : [memberPricedetailPanel, memberPriceChartPanel]
 	});
 	
 	memberPricePanelHeight = memberPricedetailPanel.getHeight();

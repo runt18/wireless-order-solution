@@ -40,7 +40,7 @@ public class OperateCouponAction extends DispatchAction{
 			
 			final CouponOperationDao.ExtraCond extraCond = new CouponOperationDao.ExtraCond();
 			
-			if(staffId != null & !staffId.isEmpty()){
+			if(staffId != null && !staffId.isEmpty()){
 				extraCond.setStaff(Integer.parseInt(staffId));
 			}
 			
@@ -52,7 +52,7 @@ public class OperateCouponAction extends DispatchAction{
 				extraCond.setHourRange(opening, ending);
 			}
 			
-			if(operateType != null && operateType.isEmpty()){
+			if(operateType != null && !operateType.isEmpty()){
 				if(operateType.equalsIgnoreCase("issue")){
 					extraCond.setOperateType(CouponOperation.OperateType.ISSUE);
 				}else if(operateType.equalsIgnoreCase("use")){
@@ -66,8 +66,9 @@ public class OperateCouponAction extends DispatchAction{
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				jObject.setTotalProperty(result.size());
 				CouponOperation total = new CouponOperation(0);
+				total.setOperate(CouponOperation.Operate.FAST_ISSUE);
 				for (CouponOperation operation : result) {
-					total.setCouponPrice(operation.getCouponPrice() + operation.getCouponPrice());
+					total.setCouponPrice(total.getCouponPrice() + operation.getCouponPrice());
 				}
 				List<CouponOperation> limitResult = DataPaging.getPagingData(result, true, start, limit);
 				limitResult.add(total);
@@ -81,7 +82,7 @@ public class OperateCouponAction extends DispatchAction{
 			jObject.initTip(e);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jObject.toString(Coupon.COUPON_JSONABLE_SIMPLE));
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;
