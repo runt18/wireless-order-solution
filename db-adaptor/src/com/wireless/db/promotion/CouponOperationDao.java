@@ -1,6 +1,7 @@
 package com.wireless.db.promotion;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.staffMgr.Staff;
@@ -19,11 +21,18 @@ public class CouponOperationDao {
 		private int associateId;
 		private int couponId;
 		private DutyRange range;
+		private HourRange hourRange;
+		private CouponOperation.OperateType operateType;
 		private int staffId;
 		private int memberId;
 		
 		public ExtraCond setMember(int memberId){
 			this.memberId = memberId;
+			return this;
+		}
+		
+		public ExtraCond setOperateType(CouponOperation.OperateType operateType){
+			this.operateType = operateType;
 			return this;
 		}
 		
@@ -34,6 +43,11 @@ public class CouponOperationDao {
 		
 		public ExtraCond setStaff(int staffId){
 			this.staffId = staffId;
+			return this;
+		}
+
+		public ExtraCond setHourRange(String begin, String end) throws ParseException{
+			this.hourRange = new HourRange(begin, end);
 			return this;
 		}
 		
@@ -93,8 +107,21 @@ public class CouponOperationDao {
 			if(range != null){
 				extraCond.append(" AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
 			}
+			if(hourRange != null){
+				extraCond.append(" AND operate_date BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
+			}
 			if(staffId != 0){
 				extraCond.append(" AND operate_staff_id = " + staffId);
+			}
+			if(operateType != null){
+				StringBuilder operateTypeCond = new StringBuilder();
+				for(CouponOperation.Operate operate : operateType.operationOf()){
+					if(operateTypeCond.length() > 0){
+						operateTypeCond.append(",");
+					}
+					operateTypeCond.append(operate.getVal());
+				}
+				extraCond.append(" AND operate IN (" + operateTypeCond + ")");
 			}
 			if(memberId != 0){
 				String sql = " SELECT coupon_id FROM " + Params.dbName + ".coupon WHERE member_id = " + memberId;
@@ -178,7 +205,8 @@ public class CouponOperationDao {
 	public static List<CouponOperation> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".coupon_operation WHERE restaurant_id = " + staff.getRestaurantId() +
-			  (extraCond != null ? extraCond : "");
+			  (extraCond != null ? extraCond : "") +
+			  " ORDER BY operate_date DESC ";
 		
 		final List<CouponOperation> result = new ArrayList<>();
 		
