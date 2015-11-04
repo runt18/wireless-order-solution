@@ -13,6 +13,7 @@ import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 
 public class CouponOperationDao {
 
@@ -47,7 +48,7 @@ public class CouponOperationDao {
 		}
 
 		public ExtraCond setHourRange(String begin, String end) throws ParseException{
-			this.hourRange = new HourRange(begin, end);
+			this.hourRange = new HourRange(begin, end, DateUtil.Pattern.HOUR);
 			return this;
 		}
 		
