@@ -92,7 +92,6 @@ function UseCouponPopup(param){
 					self.find('[id = useTal3_table_use]').trigger('create').trigger('refresh');
 					
 					//更改标题
-					
 					if(param.title){
 						if(param.memberName){
 							self.find('[id=couponUseHeader_div_use]').html('<h3>' + param.title + '--' + param.memberName + '</h3>');
@@ -102,14 +101,12 @@ function UseCouponPopup(param){
 						
 					}
 					
-					
-					
 					//绑定确定按钮
 					self.find('[id = couponUseConfirm_a_use]').click(function(){
 						if(param.useCuoponMethod){
 							
 							var coupons = [];
-							self.find('[id="useTal_table_use"] .useCouponClass').each(function(index, element){
+							self.find('[id=use_div_use] .useCouponClass').each(function(index, element){
 								if(element.checked){
 									coupons.push($(element).attr('coupon_id'));
 								}
@@ -117,7 +114,6 @@ function UseCouponPopup(param){
 							param.useCuoponMethod(coupons);
 						}
 					});
-						
 					
 					//绑定取消按钮
 					self.find('[id = couponUseCancel_a_use]').click(function(){
