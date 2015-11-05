@@ -142,17 +142,35 @@ function AddMemberPopup(){
 				success : function(jr, status, xhr){
 					if(jr.success){
 						Util.LM.hide();
-						var html = ['<option></option>'];
+						var html = [];
+						var weixin;
 						for (var i = 0; i < jr.root.length; i++) {
+							if(jr.root[i].name == "微信会员"){
+								weixin = jr.root[i];
+								continue;
+							}
+							
 							html.push('<option value={id} data-attrVal={attrVal} data-chargeRate={chargeRate}>{name}</option>'.format({
 								id : jr.root[i].id,
 								attrVal : jr.root[i].attributeValue,
 								chargeRate : jr.root[i].chargeRate,
 								name : jr.root[i].name
 							}));
+							
 						}
-					
-						$('#memberType_select_memberAdd').html(html.join("")).selectmenu('refresh');
+						//加上微信会员选项
+						html.unshift('<option value={id} data-attrVal={attrVal} data-chargeRate={chargeRate}>{name}</option>'.format({
+							id : weixin.id,
+							attrVal : weixin.attributeValue,
+							chargeRate : weixin.chargeRate,
+							name : weixin.name
+						}));
+						
+						
+						$('#memberType_select_memberAdd').html(html.join(""));
+						$('#memberType_select_memberAdd').val(weixin.id);
+						$('#memberType_select_memberAdd').selectmenu('refresh'); 
+						
 					}else{
 						Util.msg.tip(jr.msg);
 					}
