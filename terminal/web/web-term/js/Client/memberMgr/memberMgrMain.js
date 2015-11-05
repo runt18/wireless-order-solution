@@ -1018,6 +1018,9 @@ function gridInit(){
 						thiz.setValue(-1);
 					}
 				});
+			},
+			select : function(){
+				Ext.getCmp('btnSearchMember').handler();
 			}
 		}
 	});
