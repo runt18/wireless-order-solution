@@ -1149,7 +1149,7 @@ uo.openMoreOperate = function(){
 				
 			}else if(uo.tempPayForPrintAllAction){//补打总单
 				Util.LM.show();
-				$.post('../PrintOrder.do', {'tableID' : uo.order.table.id, 'printType' : 14}, function(result){
+				$.post('../PrintOrder.do', {orderID : uo.order.id, printType : 14}, function(result){
 					Util.LM.hide();
 					delete uo.tempPayForPrintAllAction;
 					if(result.success){
@@ -1177,7 +1177,7 @@ uo.openMoreOperate = function(){
 					buttons : 'yesback',
 					certainCallback : function(){
 						Util.LM.show();
-						$.post('../PrintOrder.do', {'tableID' : uo.order.table.id, 'printType' : 15}, function(result){
+						$.post('../PrintOrder.do', {orderID : uo.order.id, printType : 15}, function(result){
 							Util.LM.hide();
 							delete uo.printDetailPatchAction;
 							if(result.success){

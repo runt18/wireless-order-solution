@@ -206,6 +206,7 @@ $(function(){
 
 	//加载显示账单基础信息
 	var orderMsg;
+	orderMsg = {};
 	//加载账单数据
 	function refreshOrderData(_c){
 		Util.LM.show();
@@ -224,7 +225,15 @@ $(function(){
 				if(jr.success){
 					// 加载显示账单基础信息
 					orderMsg = jr.other.order;
-					
+					//TODO
+					//触发客显显示账单金额
+					$.post('../PrintOrder.do', {display : orderMsg.actualPrice, printType : 16}, function(result){
+						Util.LM.hide();
+						if(!result.success){
+							Util.msg.tip( result.msg);
+						}
+					});
+					//显示账单信息
 					loadOrderBasicMsg();
 				}else{
 					Util.msg.alert({
@@ -418,7 +427,6 @@ $(function(){
 			},
 			success : function(jr, status, xhr){
 				if(jr.success){
-					var discountData = jr.root;
 					var html = '';
 					for (var i = 0; i < jr.root.length; i++) {
 						html += '<li data-icon="false" class="tempFoodKitchen" discount-id="' + jr.root[i].id + '"><a>'+ jr.root[i].name +'</a></li>';
@@ -455,7 +463,7 @@ $(function(){
 								error : function(request, status, err){
 								}
 							});
-						}
+						};
 					});
 				}
 			},
@@ -465,8 +473,7 @@ $(function(){
 	}
 	
 	//付款方式
-	var payTypeData;
-	
+	var payTypeData = null;
 	//加载付款方式
 	function loadPayTypeData(){
 		$.ajax({
@@ -530,7 +537,7 @@ $(function(){
 							}
 						}); 
 						console.log($(element).attr('plan-id'));
-					}
+					};
 				});
 			},
 			error : function(request, status, err){
@@ -540,7 +547,7 @@ $(function(){
 	}
 	
 	//餐厅设置参数
-	var restaurantData;
+	var restaurantData = null;
 
  	//加载餐厅设置参数
 	function loadSystemSettingData(){
@@ -933,8 +940,7 @@ $(function(){
 				memberName : orderMsg.member.name, 
 				issueMode : IssueCouponPopup.IssueMode.ORDER,
 				orderId : orderMsg.id,
-				issueTo : orderMsg.memberId,
-				
+				issueTo : orderMsg.memberId
 			});
 			issueCoupon.open();
 		});

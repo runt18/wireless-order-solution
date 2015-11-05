@@ -243,7 +243,7 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 			$.post('../PrintOrder.do',{
 				onDuty : dutyRange.onDutyFormat,
 				offDuty : dutyRange.offDutyFormat,
-				'printType' : printType,
+				printType : printType,
 				regionId : regionId		
 			}, function(resultJSON) {
 				Util.LM.hide();
