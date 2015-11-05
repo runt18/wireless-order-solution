@@ -151,7 +151,6 @@ Ext.onReady(function(){
 					ending : businessHour.ending
 				};
 				
-				
 				Ext.Ajax.request({
 					url : '../../QueryMemberPriceStatistics.do',
 					params : requestParams,

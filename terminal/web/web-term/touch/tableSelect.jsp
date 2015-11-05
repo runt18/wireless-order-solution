@@ -60,6 +60,8 @@
 <script type="text/javascript" src="./js/popup/member/read.js"></script>
 <!--添加会员弹出控件 -->
 <script type="text/javascript" src="./js/popup/member/add.js"></script>
+<!-- 完善会员资料 -->
+<script type="text/javascript" src="./js/popup/member/perfect.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -99,7 +101,7 @@
 			<li class="popupButtonList" onclick="ts.member.openMemberChargeWin()"><a >会员充值</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberConsumeDetailWin()"><a >消费明细</a></li>
-			<li class="popupButtonList" onclick="ts.member.openWeixinMemberFrontBind()"><a >微信会员绑定</a></li>
+			<li class="popupButtonList" id="memberWxBind_li_tableSelect"><a>微信会员绑定</a></li>
 			<li class="popupButtonList" id="fastIssue_a_tableSelect"><a >快速发券</a></li>
 			<li class="popupButtonList" id="fastUse_a_tableSelect"><a >快速用券</a></li>
 		</ul>
@@ -450,7 +452,8 @@
 	    		<td class="readMemberTdValue"><label id="numMemberPointForConsumePoint">----</label></td>   
 	    	</tr>	  
 	    	<tr id="tr_memberFirstTimeChargePrint">
-	    		<td class="readMemberTd">消费积分:</td>
+	    		<td class="readMemberTd">
+	    		消费积分:</td>
 	    		<td class="readMemberTdValue"><input id="numConsumePointForConsumePoint" onkeypress="intOnly()"></td>   
 	    	</tr>	    	  
 	    </table>
@@ -471,28 +474,7 @@
 			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4PointConsume(2)"><a >微信卡</a></li>
 		</ul>
 	</div>	
-	
-	
-	<!-- 微信会员绑定 -->
-	<div id="weixinMemberFrontBind" class="ui-overlay-shadow ui-corner-all" style="width:340px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -150px;background-color: white;display: none;" align="center">	
-	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
-	        	微信会员绑定
-	    </div> 
-	    <table>
-	    	<tr>
-		    	<td>
-		    		<input placeholder="请输入微信卡号" style="font-size:20px;font-weight: bold;" id="txtMember4FrontBind">
-		    	</td>
-		    </tr>
-	    </table>
-	    
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.member.readWeixinMemberFrontBind()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.member.closeWeixinMemberFrontBind()">取消</a>		 
-			 </div>
-	    </div>	
-	</div>		
+		
 	<!-- 系统共用会员绑定start -->
 	<div id="loadMemberBind4Tableselect"></div>
 	

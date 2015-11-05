@@ -30,7 +30,12 @@ function MemberReadPopup(param){
 			//确定按钮
 			self.find('[id=confirm_a_memberRead]').click(function(){
 				if(param.confirm && typeof param.confirm == 'function'){
-					param.confirm(_member, _selectedDiscount, _selectedPricePlan);
+					if(_member){
+						param.confirm(_member, _selectedDiscount, _selectedPricePlan);
+					}else{
+						Util.msg.tip('会员不能为空');			
+					}
+					
 				}
 			});
 			

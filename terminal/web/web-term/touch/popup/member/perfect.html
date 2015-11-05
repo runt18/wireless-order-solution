@@ -1,0 +1,78 @@
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+<!-- 系统共用会员绑定start -->
+ 	<div id="perfectMember_div_perfect" class="ui-overlay-shadow ui-corner-all"  data-dismissible="false"  style="width:740px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -250px 0px 0px -370px;background-color: white;" align="center">	
+	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
+	        	完善会员资料
+	    </div> 
+	    <table>
+	    	<tr>
+	    		<td class="readMemberTd">会员名称:</td>
+	    		<td><input id="perfectMemberName_input_perfect" data-type="txt"></td>
+	 	
+	    		<td class="readMemberTd">会员手机:</td>
+	    		<td><input id="perfectMemberMobile_input_perfect" onkeypress="intOnly()" data-type="num" class="countInputStyle"></td>    
+	    		
+	    		<td class="readMemberTd">会员卡号:</td>
+	    		<td><input id="perfectMemberCard_input_perfect" onkeypress="intOnly()" data-type="num" class="countInputStyle"></td>     			
+	    	</tr>
+	    	<tr>
+	    		<td class="readMemberTd">性别:</td>
+	    		<td >
+					<fieldset id="perfectMemberSexCombo_fieldset_perfect" data-role="controlgroup" data-type="horizontal" >
+				        <input type="radio" name="perfectMemberSex_input_perfect" data-theme="c" id="memberSexMan" value="0" checked="checked"><label for="memberSexMan">男</label>
+				        <input type="radio" name="perfectMemberSex_input_perfect" data-theme="c" id="memberSexWoman" value="1"><label for="memberSexWoman">女</label>
+				    </fieldset>			
+					   		
+	    		</td>    
+	    		
+	    		<td class="readMemberTd">生日:</td>
+	    		<td><input type="date" data-role="datebox" id="perfectMemberBirthday_input_perfect" data-type="neither" data-options='{"mode": "datebox"}'></td>   
+	    		
+	    		<td class="readMemberTd">会员类型:</td>
+	    		<td class="selectionCmp" style="line-height: 20px;padding: 0 3px;">
+					<select style="font-size: 20px;width: 135px;height: 38px;" id="perfectMemberType_select_perfect" onchange="ts.member.add_changeMemberType()"></select>		 
+	    		</td>  		   		
+	    	</tr> 
+	    </table>
+	    
+	    <div id="confirmMember_div_perfect" class="none">
+	    	<hr>
+	    	<h2>请确认会员资料</h2>
+		    <table id="tableConfirmMember_table_perfect" data-theme="b">
+
+		    	<tr>
+		    		<td class="readMemberTd">会员名称:</td>
+		    		<td id="confirmMemberName_td_perfect">微信会员</td>
+		 	
+		    		<td class="readMemberTd">会员手机:</td>
+		    		<td id="confirmMembeMobile_td_perfect">----</td>    
+		    		
+		    		<td class="readMemberTd">会员卡号:</td>
+		    		<td id="confirmMembeCard_td_perfect">----</td>     			
+		    	</tr>
+		    	<tr>
+		    		<td class="readMemberTd">性别:</td>
+		    		<td id="confirmMembeSex_td_perfect">----</td>    
+		    		
+		    		<td class="readMemberTd">生日:</td>
+		    		<td id="confirmMembeBirthday_td_perfect">----</td>   
+		    		
+		    		<td class="readMemberTd">会员类型:</td>
+		    		<td id="confirmMembeType_td_perfect">----</td>  		   		
+		    	</tr> 
+		    </table>	    	
+	    </div>
+	    
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a id="confirm_a_perfect" data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn">确定</a>
+				 <a id="cancel_a_perfect" data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn">取消</a>		 
+			 </div>
+	    </div>	
+	</div>	 
+	<!-- end会员绑定 -->
+	
+</body>
