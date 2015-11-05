@@ -614,6 +614,14 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 		}, 100);
 	});
 	
+	//添加会员
+	$('#addMember_a_tableSelect').click(function(){
+		$('#frontPageMemberOperation').popup('close');
+		setTimeout(function(){
+			var addMemberPopup = new  AddMemberPopup();
+			addMemberPopup.open();
+		}, 200);
+	});
 });
 
 
