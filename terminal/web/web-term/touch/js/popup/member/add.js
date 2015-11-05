@@ -98,7 +98,6 @@ function AddMemberPopup(){
 				
 			});
 			
-			
 			//取消按钮
 			self.find('[id=cancel_a_memberAdd]').click(function(){
 				_addMemberPopup.close();

@@ -324,12 +324,25 @@ $(function(){
 					
 					var memberSpan = "";
 					if(result.root[0].isRaw){
-						memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="text-decoration: underline;cursor: pointer;color:blue" onclick="ts.member.memberInfoBind(\'loadMemberBind4Payment\', \''+ result.root[0].name +'\')">' + result.root[0].name +"(点击绑定)</font></span>";
+						memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="text-decoration: underline;cursor: pointer;color:blue" id="memberBind_span_payment">' + result.root[0].name +"(点击绑定)</font></span>";
 					}else{
 						memberSpan = '<span style = "margin-left: 20px;">当前会员：<font style="color:green">' + result.root[0].name +"</font></span>";
 					}
 					
 					$('#memberInfo_span_payment').html(memberSpan);
+					
+					//会员绑定
+					$('#memberBind_span_payment').click(function(){
+						var perfectMemberPopup = new PerfectMemberPopup({
+							selectedMember : orderMsg.memberId,
+							selectedOrder : orderMsg.id,
+							memberName : orderMsg.member.name,
+							postBound : function(){
+								refreshOrderData();
+							}
+						});
+						perfectMemberPopup.open();
+					});
 				}
 			}, 'json');
 		}else{
@@ -1035,8 +1048,6 @@ $(function(){
 				$('#showMemberInfoWin').popup('open');
 			}
 		});
-		
-		
 		
 	});
 	
