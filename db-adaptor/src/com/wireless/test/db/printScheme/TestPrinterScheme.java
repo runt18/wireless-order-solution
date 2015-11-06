@@ -51,6 +51,7 @@ public class TestPrinterScheme {
 		assertEquals("printer alias", expected.getAlias(), actual.getAlias());
 		assertEquals("printer style", expected.getStyle().getVal(), actual.getStyle().getVal());
 		assertEquals("printer enabled", expected.isEnabled(), actual.isEnabled());
+		assertEquals("printer oriented", expected.getOriented(), actual.getOriented());
 		
 		//Compare the associated print functions
 		final List<PrintFunc> expectedFuncs = SortedList.newInstance(expected.getPrintFuncs());
@@ -94,7 +95,8 @@ public class TestPrinterScheme {
 			final List<Region> regions = RegionDao.getByStatus(dbCon, mStaff, Region.Status.BUSY);
 			
 			Printer.InsertBuilder builder = new Printer.InsertBuilder("GP-80250-200-test", PStyle.PRINT_STYLE_58MM)
-													   .setAlias("海鲜打印机");
+													   .setAlias("海鲜打印机")
+													   .setOriented(Printer.Oriented.ALL);
 			//Add a new printer
 			printerId = PrinterDao.insert(dbCon, mStaff, builder);
 			
@@ -283,7 +285,7 @@ public class TestPrinterScheme {
 			Printer.UpdateBuilder updateBuilder = new Printer.UpdateBuilder(printerId)
 															 .setName("GP-80250-201-test")
 															 .setStyle(PStyle.PRINT_STYLE_80MM)
-															 .setAlias("中厨打印机").setEnabled(false);
+															 .setAlias("中厨打印机").setEnabled(false).setOriented(Printer.Oriented.SPECIAL);
 			PrinterDao.update(dbCon, mStaff, updateBuilder);
 			
 			if(updateBuilder.isNameChanged()){
@@ -297,6 +299,9 @@ public class TestPrinterScheme {
 			}
 			if(updateBuilder.isEnabledChanged()){
 				expected.setEnabled(updateBuilder.build().isEnabled());
+			}
+			if(updateBuilder.isOrientedChanged()){
+				expected.setOriented(updateBuilder.build().getOriented());
 			}
 			//Compare after update printer
 			compare(expected, PrinterDao.getById(dbCon, mStaff, printerId));
