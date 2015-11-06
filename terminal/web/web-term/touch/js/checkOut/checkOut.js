@@ -357,7 +357,6 @@ uo.openCancelFoodCmp = function(c){
 	$('#shadowForPopup').show();
 	$('#cancelFoodSet').show();
 	
-	$('#numberKeyboard').show();
 	
 	$('#inputCancelFoodSet').focus();
 	$('#inputCancelFoodSet').select();
@@ -372,7 +371,6 @@ uo.closeCancelFoodCmp = function(){
 	$('#shadowForPopup').hide();
 	$('#cancelFoodSet').hide();
 	
-	$('#numberKeyboard').hide();
 };
 
 /**
@@ -929,8 +927,6 @@ uo.closeTransOrderFood = function(){
 	
 	$('#transFoodCmp').hide();
 	$('#shadowForPopup').hide();	
-	
-	$('#numberKeyboard').hide();
 	
 	$('#txtTableNumForTS').val('');
 	$('#txtFoodNumForTran').val('');

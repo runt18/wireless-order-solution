@@ -2786,7 +2786,6 @@ $(function(){
 		
 			$('#tempTasteName').val('');
 			$('#tempTastePrice').val('');	
-			$('#numberKeyboard').hide();	
 			
 			NumKeyBoardAttacher.instance().detach($('#tempTastePrice')[0]);
 			HandWritingAttacher.instance().attach($('#tempTasteName')[0]);
@@ -2866,8 +2865,6 @@ $(function(){
 			$('#tempFoodName_input_addTemp').val('');
 			$('#tempFoodPrice_input_addTemp').val('');
 			$('#tempFoodCount_input_addTemp').val(1);
-			//关闭键盘
-			$('#numberKeyboard').hide();	
 			//临时菜文本框detach
 			HandWritingAttacher.instance().detach($('#tempFoodName_input_addTemp')[0]);
 			//临时菜数量和价钱detach

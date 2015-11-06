@@ -828,32 +828,6 @@ ts.searchTableCompareByName = function (obj1, obj2) {
 
 
 window.onload = function(){
-	if(systemStatus == 2){
-		$('input[data-type=txt]').focus(function(){
-			//关闭数字键盘
-			$('#numberKeyboard').hide();
-			
-		});
-		
-		$('input[data-type=num]').focus(function(){
-			//if(getcookie('isNeedNumKeyboard') == 'true'){
-		
-			$('#numberKeyboard').show();	
-		});	
-		
-		$('input[data-type=neither]').focus(function(){
-		
-			//关闭数字键盘
-			$('#numberKeyboard').hide();	
-			
-		});		
-		
-		//设置数字键盘输入
-		$('.countInputStyle').focus(function(){
-			focusInput = this.id;
-		});	
-		
-	}
 	//沽清搜索
 	$('#searchSelloutFoodInput').focus(function(){
 		focusInput = this.id;
@@ -865,20 +839,6 @@ window.onload = function(){
 	//渲染会员读取窗口
 	$('#lookupOrderDetail').trigger('create').trigger('refresh');
 	
-	//渲染会员读取窗口
-	$('#readMemberWin').trigger('create').trigger('refresh');	
-	
-	//渲染完善会员资料窗口
-//	$('#finishMemberInfo').trigger('create').trigger('refresh');		
-	
-	//找零快捷键
-    $('#txtInputRecipt').on('keypress',function(event){
-        if(event.keyCode == "13")    
-        {
-        	payInputRecipt();
-        }
-    }); 
-    
 	//会员充值读卡
     $('#txtMemberCharge4Read').on('keypress',function(event){
         if(event.keyCode == "13")    
@@ -2572,110 +2532,6 @@ ts.addTables = function(o){
 };
 
 /**
- * 打开会员添加
- */
-ts.member.openMemberOperationWin = function(){
-	$('#frontPageMemberOperation').popup('close');
-	//充值金额
-	$('#cm_numFirstCharge').on('keyup', function(){
-		var chargeMoney = $('#cm_numFirstCharge').val();
-		var actualChargeMoney = $('#cm_numFirstActualCharge');
-		actualChargeMoney.val(Math.round(chargeMoney * ts.member.chargeRate));
-	});	
-	
-	if(getcookie(document.domain+'_chargeSms') == 'true'){
-		$('#chbSendFirstCharge').attr('checked', true).checkboxradio("refresh");
-	}else{
-		$('#chbSendFirstCharge').attr('checked', false).checkboxradio("refresh");
-	}
-	
-	//判断是否有短信模块
-	if(Util.sys.smsModule){
-		$('#td4ChbSendFirstCharge').show();
-		$('#lab4FirstTimeSendSms').html('发送充值信息'+(Util.sys.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Util.sys.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Util.sys.smsCount+'条, 请及时充值</font>)'));
-	}
-	
-//	var memberTypeData = [];
-	Util.LM.show();
-	$.ajax({
-		url : '../QueryMemberType.do',
-		type : 'post',
-		async:false,
-		data : {dataSource : 'normal'},
-		success : function(jr, status, xhr){
-			if(jr.success){
-//				memberTypeData = jr.root;
-				Util.LM.hide();
-				var html = ['<option></option>'];
-				for (var i = 0; i < jr.root.length; i++) {
-					html.push('<option value={id} data-attrVal={attrVal} data-chargeRate={chargeRate}>{name}</option>'.format({
-						id : jr.root[i].id,
-						attrVal : jr.root[i].attributeValue,
-						chargeRate : jr.root[i].chargeRate,
-						name : jr.root[i].name
-					}));
-				}
-				$('#cm_comboMemberType').html(html.join("")).selectmenu('refresh');
-				
-				$('#addMemberInfo').show();
-				$('#shadowForPopup').show();
-				setTimeout(function(){
-					$('#cm_txtMemberName').focus();
-				}, 250);
-			}else{
-				Util.msg.alert({
-					renderTo : 'tableSelectMgr',
-					msg : jr.msg
-				});
-			}
-		},
-		error : function(request, status, err){
-			Util.msg.alert({
-				renderTo : 'tableSelectMgr',
-				msg : request.msg
-			});
-		}
-	}); 		
-};
-
-/**
- * 关闭添加会员
- */
-ts.member.closeAddMemberWin = function(){
-	$('#addMemberInfo').hide();
-	$('#shadowForPopup').hide();
-	
-	$('#cm_txtMemberName').val('');
-	$('#cm_txtMemberMobile').val('');
-	$('#cm_numberMemberCard').val('');
-	$('#cm_dateMemberBirthday').val('');
-	$('#cm_numFirstCharge').val('');
-	$('#cm_numFirstActualCharge').val('');
-	
-	$('#numberKeyboard').hide();
-};
-
-/**
- * 改变会员类型时
- */
-ts.member.add_changeMemberType = function(){
-	var selected = $('#cm_comboMemberType').find('option:selected');
-	if(parseInt(selected.attr('data-attrVal')) == 0){
-		$('#tr_memberFirstTimeCharge').show();
-		$('#tr_memberFirstTimeChargePrint').show();
-		ts.member.chargeRate = parseFloat(selected.attr('data-chargeRate'));
-		setTimeout(function(){
-			$('#cm_numFirstCharge').focus();
-		}, 250);
-	}else{
-		$('#tr_memberFirstTimeCharge').hide();
-		$('#tr_memberFirstTimeChargePrint').hide();
-	}
-};
-
-
-
-/**
  * 打开会员充值
  */
 ts.member.openMemberChargeWin = function(){
@@ -3182,7 +3038,6 @@ ts.closeFeastPayWin = function(){
 	$('#shadowForPopup').hide();	
 	
 	//清空操作
-	$('#numberKeyboard').hide();
 	$('#feastPayWinTable').html('');
 	$('#feastPayTotalPrice').text(0);	
 	ts.addFeastDepartment.depts.length = 0;
@@ -3239,25 +3094,6 @@ ts.addFeastDepartment = function(index){
 	
 	$('#popupDepartmentsCmp').popup('close');
 	
-	//设置数字键盘输入
-	$('.numberInputStyle').focus(function(){
-		focusInput = this.id;
-	});		
-	
-	setTimeout(function(){
-		var numForAlias = $("#"+fieldId);
-		
-		$('#numberKeyboard').show();
-		
-		//设置数字键盘触发
-		numKeyBoardFireEvent = function (){
-			$("#"+fieldId).keyup();
-		};
-		
-		numForAlias.focus();
-		numForAlias.select();		
-	}, 250);
-
 };
 
 //记录添加的部门
@@ -3278,7 +3114,6 @@ ts.feastPayRemoveAction = function(c){
 		renderTo : 'tableSelectMgr',
 		buttons : 'yesback',
 		certainCallback : function(){
-			$('#numberKeyboard').hide();
 			for (var i = 0; i < ts.addFeastDepartment.depts.length; i++) {
 				if(numForAlias == ts.addFeastDepartment.depts[i]){
 					ts.addFeastDepartment.depts.splice(i, 1);
