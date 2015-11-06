@@ -129,7 +129,7 @@ li[role=option] a{
 	width: 130px;
 }
 
-#divConfirmMember td:nth-child(even){
+#perfectMember_div_perfect td:nth-child(even){
 	color : green;
 	font-weight: bold;
 }
