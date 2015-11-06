@@ -42,6 +42,8 @@ public class OperatePrinterAction extends DispatchAction{
 					jsonSB.append(", styleValue : '" + printer.getStyle().getVal() + "'");
 					jsonSB.append(", styleText : '" + printer.getStyle().getDesc() + "'");
 					jsonSB.append(", isEnabled : " + printer.isEnabled());
+					jsonSB.append(", orientedValue : '" + printer.getOriented().getVal() + "'");
+					jsonSB.append(", orientedText : '" + printer.getOriented().toString() + "'");
 					if(printer.getAlias().equals("")){
 						jsonSB.append(", text : '" + printer.getName() + "(" + printer.getStyle().getDesc() + ")'");
 					}else{
@@ -50,6 +52,8 @@ public class OperatePrinterAction extends DispatchAction{
 					jsonSB.append(", leaf : true" );
 					if(!printer.isEnabled()){
 						jsonSB.append(", iconCls : 'btn_error'");
+					}else if(printer.getOriented() == Printer.Oriented.SPECIAL){
+						jsonSB.append(", icon : '../../images/printShift.png'");
 					}else{
 						jsonSB.append(", icon : '../../images/printer.png'");
 					}

@@ -1,5 +1,10 @@
-var addPrintFunc, printerTree, kitchenTree, printerWin,
-	obj = {treeId : 'printerTree', option :[{name : '修改', fn : "operatePrinterHandler({otype:'update'})"}, {name : '删除', fn : "operatePrinterHandler({otype:'delete'})"}]};
+
+
+Ext.onReady(function(){
+	//初始化打印机和打印方案控件
+	init();
+	
+	var addPrintFunc, printerTree, kitchenTree, printerWin;
 
 
 function formatName(v){
@@ -610,6 +615,21 @@ function init(){
 						}
 					}]
 					
+				},{
+					items : [{
+						xtype : 'radio',
+						name : 'pType',
+						inputValue : 18,
+						hideLabel : true,
+						boxLabel : '客显',
+						listeners : {
+							check  : function(thiz, checked){
+								if(checked){
+									showPanel(thiz.inputValue);
+								}
+							}
+						}
+					}]
 				}]
 			},{
 				layout : 'column',
@@ -795,7 +815,7 @@ function init(){
 					var isEnabled = Ext.getCmp('enabled');
 					var styles = document.getElementsByName('pStyle');
 					var printerId = Ext.getCmp('printerId');
-					var faceType  = document.getElementsByName('isAll');
+					var orientedType  = document.getElementsByName('isAll');
 					
 					var dataSource = '';
 					
@@ -814,9 +834,11 @@ function init(){
 					}
 					
 					//面向类型
-					var faceTt
-					if(faceType.checked){
-						faceTypeId =  
+					var orientedTypeId = '';
+					for(var i = 0; i < orientedType.length; i++){
+						if(orientedType[i].checked){
+							orientedTypeId = orientedType[i].value; 
+						}
 					}
 					
 					if(!Ext.getCmp('txtPrinterName').isValid()){
@@ -850,7 +872,7 @@ function init(){
 							style : style,
 							printerId : printerId.getValue(),
 							isEnabled : isEnabled,
-							oriented : 
+							oriented : orientedTypeId,
 							dataSource : dataSource
 						},
 						success : function(res, opt){
@@ -1107,6 +1129,13 @@ function showPanel(v){
 		cancelFoodBtn.setBoxLabel('打印退菜分单');
 		addFoodBtn.show();
 		addFoodBtn.setBoxLabel('打印加菜分单');
+	}else if(v == 18){//客显
+		Ext.getCmp('kitchens').hide();
+		Ext.getCmp('kitchensTree').hide();
+		Ext.getCmp('depts').hide();
+		Ext.getCmp('regions').hide();
+		Ext.getCmp('printCommentPanel').hide();
+//		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/fendan.jpg)';
 	}else{
 		Ext.getCmp('kitchens').hide();
 		Ext.getCmp('kitchensTree').hide();
@@ -1370,6 +1399,7 @@ function operatePrinterHandler(c){
 		printerWin.show();
 		document.getElementById('enabled').checked = true;
 		document.getElementById('rdo80mm').checked = true;
+		document.getElementById('selectAll').checked = true;
 		printerName.focus(true, 100);
 	}else if(c.otype == 'update'){
 		var sn = Ext.ux.getSelNode(printerTree);
@@ -1385,7 +1415,7 @@ function operatePrinterHandler(c){
 		Ext.getCmp('txtPrinterAlias').setValue(sn.attributes.alias);
 		Ext.getCmp('printerId').setValue(sn.id);
 		var styles = document.getElementsByName('pStyle');
-		
+		var orientedType = document.getElementsByName('isAll');
 		
 		if(styles[0].value == sn.attributes.styleValue){
 			styles[0].checked = true;
@@ -1397,7 +1427,14 @@ function operatePrinterHandler(c){
 			styles[3].checked = true;
 		}
 		
-		if(sn.attributes.isEnabled ){
+		if(orientedType[0].value == sn.attributes.orientedValue){
+			orientedType[0].checked = true;
+		}else{
+			orientedType[1].checked = true;
+		}
+		
+		
+		if(sn.attributes.isEnabled){
 			document.getElementById('enabled').checked = true;
 		}else{
 			document.getElementById('unEnabled').checked = true;
@@ -1444,15 +1481,12 @@ function operatePrinterHandler(c){
 	}
 	
 }
-
-Ext.onReady(function(){
-	//初始化打印机和打印方案控件
-	init();
 	
+
 	var opt = function(){
-		return "<a href = \"javascript:printFuncOperactionHandler({type : 'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"
+		return "<a class=\"printUpdateLink\">" + "<img src='../../images/Modify.png'/>修改</a>"
 		 +"&nbsp;&nbsp;"
-		 + "<a href=\"javascript:deletePrintFuncOperationHandler()\">" + "<img src='../../images/del.png'/>删除</a>";
+		 + "<a class=\"printDeleteLink\">" + "<img src='../../images/del.png'/>删除</a>";
 	};
 	
 	printerTree = new Ext.tree.TreePanel({
@@ -1563,7 +1597,22 @@ Ext.onReady(function(){
 		    {name : 'repeat'},
 		    {name : 'comment'},
 		    {name : 'isIncludeCancel'}
-		])
+		]),
+		listeners : {
+			load : function(store, records, options){
+				$('#divPrint').find('.printUpdateLink').each(function(index, element){
+					element.onclick = function(){
+						printFuncOperactionHandler({type : 'update'});
+					};
+				});
+				$('#divPrint').find('.printDeleteLink').each(function(index, element){
+					element.onclick = function(){
+						deletePrintFuncOperationHandler();
+					};					
+				});
+				
+			}
+		}
 		
 	});
 	
@@ -1615,6 +1664,18 @@ Ext.onReady(function(){
 		frame : true,
 		items : [printerTree, printFuncGrid]
 	});
-	showFloatOption(obj);
+	
+	showFloatOption({
+		treeId : 'printerTree', 
+		option :[{
+			name : '修改', 
+			fn : function(){
+				operatePrinterHandler({otype:'update'});	
+			}
+			}, {
+			name : '删除', 
+			fn : function(){
+				operatePrinterHandler({otype:'delete'});
+			}}]});
 	
 });
