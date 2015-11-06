@@ -244,7 +244,8 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 				onDuty : dutyRange.onDutyFormat,
 				offDuty : dutyRange.offDutyFormat,
 				printType : printType,
-				regionId : regionId		
+				regionId : regionId,
+				orientedPrinter : getcookie(document.domain + '_printers')			//特定打印机打印
 			}, function(resultJSON) {
 				Util.LM.hide();
 				if(resultJSON.success){

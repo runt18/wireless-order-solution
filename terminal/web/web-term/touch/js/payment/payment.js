@@ -192,7 +192,7 @@ $(function(){
 		loadSystemSettingData();
 	
 	 	//加载账单信息
-		refreshOrderData({calc : false});
+		refreshOrderData();
 		
 		//加载折扣
 		loadDiscountData();
@@ -208,31 +208,23 @@ $(function(){
 	var orderMsg;
 	orderMsg = {};
 	//加载账单数据
-	function refreshOrderData(_c){
+	function refreshOrderData(){
+		console.log(getcookie(document.domain + '_printers').split(','));
 		Util.LM.show();
-		_c = _c || {};
 		$.ajax({
 			url : "../QueryOrderByCalc.do",
 			type : 'post',
 			data : {
 				tableID : pm.table.id,
 				orderID : orderMsg ? orderMsg.id : '',
-				calc : typeof _c.calc == 'boolean' ? _c.calc : true,
-				customNum : pm.table.customNum
+				customNum : pm.table.customNum,
+				orientedDisplay : getcookie(document.domain + '_printers')				//TODO 显示客显
 			},
 			success : function(jr, status, xhr){
 				Util.LM.hide();
 				if(jr.success){
 					// 加载显示账单基础信息
 					orderMsg = jr.other.order;
-					//TODO
-					//触发客显显示账单金额
-					$.post('../PrintOrder.do', {display : orderMsg.actualPrice, printType : 16}, function(result){
-						Util.LM.hide();
-						if(!result.success){
-							Util.msg.tip( result.msg);
-						}
-					});
 					//显示账单信息
 					loadOrderBasicMsg();
 				}else{
@@ -464,7 +456,7 @@ $(function(){
 								success : function(jr, status, xhr){
 									Util.LM.hide();
 									if(jr.success){
-										refreshOrderData({calc : true});
+										refreshOrderData();
 										Util.msg.tip('设置折扣成功');
 									}else{
 										Util.msg.alert({
@@ -537,7 +529,7 @@ $(function(){
 								Util.LM.hide();
 								if(jr.success){
 									//刷新页面
-									refreshOrderData({calc : true});
+									refreshOrderData();
 									Util.msg.tip('服务费设置成功');
 								}else{
 									Util.msg.alert({
@@ -1086,9 +1078,6 @@ $(function(){
 			c.temp = false;
 		}
 		
-		//是否发送短信
-		var sendSms = false;
-		
 		if(orderMsg == null){
 			Util.msg.alert({msg:"读取账单有误, 不能结账", renderTo:'paymentMgr'});
 			return;
@@ -1112,6 +1101,8 @@ $(function(){
 			settleType = SettleTypeEnum.NORMAL.val;
 		}
 		
+		//是否发送短信
+		var sendSms = false;
 		if(c.submitType == PayTypeEnum.MEMBER){
 			//会员结账
 			//FIXME 要加上抹数?
@@ -1138,16 +1129,17 @@ $(function(){
 			url : "../PayOrder.do",
 			type : 'post',
 			data : {
-				"orderID" : orderMsg.id,
-				"cashIncome" : c.cashIncome ? c.cashIncome : 0,
-				"payType" : settleType,
-				"payManner" : c.submitType.val,
-				"tempPay" : c.temp,
-				"comment" : $("#remark").val(),
-				'eraseQuota' : eraseQuota == '' ? 0 : eraseQuota,
-				'customNum' : orderMsg.customNum,
-				'payTypeCash' : c.mixedIncome ? c.mixedIncome : '',
-				'sendSms' : sendSms
+				orderID : orderMsg.id,
+				cashIncome : c.cashIncome ? c.cashIncome : 0,
+				payType : settleType,
+				payManner : c.submitType.val,
+				tempPay : c.temp,
+				comment : $("#remark").val(),
+				eraseQuota : eraseQuota == '' ? 0 : eraseQuota,
+				customNum : orderMsg.customNum,
+				payTypeCash : c.mixedIncome ? c.mixedIncome : '',
+				sendSms : sendSms,
+				orientedPrinter : getcookie(document.domain + '_printers')			//特定打印机打印
 			},
 			dataType : 'json',
 			success : function(resultJSON, status, xhr){

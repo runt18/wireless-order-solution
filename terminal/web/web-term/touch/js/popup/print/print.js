@@ -31,7 +31,9 @@ function PrintBindPopup(){
 		_printBindPopup.open(function(self){
 			Util.LM.show();
 			$.post('../OperatePrinter.do',{
-				dataSource : 'getByCond'
+				dataSource : 'getByCond',
+				isEnabled : true,		//可用的打印机
+				oriented : 2			//面向特定的打印机
 			},function(jr){
 				Util.LM.hide();
 				if(jr.success){

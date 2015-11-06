@@ -58,14 +58,6 @@ var uo = {
 	}
 
 	
-$(document).on("pagebeforeshow","#orderFoodListMgr",function(){
-	if(!jQuery.isEmptyObject(uo.table) && uo.fromBack){
-		delete uo.fromBack;
-		initOrderData({table : uo.table});
-	}
-});	
-	
-
 /**
  * 显示已点菜界面函数, 入口
  * @param {object} c  
@@ -109,19 +101,13 @@ function initOrderData(c){
 		url : '../QueryOrderByCalc.do',
 		type : 'post',
 		data : {
-			tableID : c.table.id
+			orderID : c.order ? c.order.id : null,
+			tableID : c.table ? c.table.id : null
 		},
 //		async : false,
 		success : function(data, status, xhr){
-//			uo.uoFood = [];
 			if(data.success){
 				uo.order = data.other.order;
-				uo.table = c.table;
-/*				uo.order.orderFoods = data.other.order.orderFoods;
-				for(x in  data.other.order.orderFoods){
-					uo.uoFood.push( data.other.order.orderFoods[x]);
-				}
-				uoOther = data.other;*/
 				if(uo.order.memberId > 0){
 					$.ajax({
 						url : '../QueryMember.do',
@@ -284,7 +270,7 @@ uo.showDescForUpdateOrder = function(){
 			selectedOrder : uo.order.id,
 			memberName : uo.orderMember.name,
 			postBound : function(){
-				initOrderData({table : uo.table});
+				initOrderData({order : uo.order});
 			}
 		});
 		perfectMemberPopup.open();
@@ -664,7 +650,7 @@ uo.openGiftOperate = function(){
 				Util.LM.hide();
 				if(result.success){
 					Util.msg.tip(result.msg);
-					initOrderData({table : uo.table});
+					initOrderData({order : uo.order});
 				}else{
 					Util.msg.tip('赠送失败');
 				}
@@ -725,7 +711,7 @@ uo.saveComment = function(){
 		if(data.success){
 			Util.msg.tip( '备注成功');	
 			uo.closeComment();
-			initOrderData({table : uo.table});
+			initOrderData({order : uo.order});
 		}else{
 			Util.msg.alert({
 				title : '提示',
@@ -843,7 +829,7 @@ uo.useMemberForOrderAction = function(){
 				Util.LM.hide();
 				if(data.success){
 					//异步刷新账单
-					initOrderData({table : uo.table});
+					initOrderData({order : uo.order});
 					uo.closeTransOrderFood();
 					Util.msg.tip('会员注入成功');	
 				}else{
@@ -985,19 +971,15 @@ uo.tempPayForUO = function(c){
 				payType : uo.order.settleTypeValue,
 				memberID : uo.order.member,
 				payManner : uo.order.payTypeValue,
-				cashIncome : '-1',
-//				comment : uo.order.comment,
 				customNum : uo.order.customNum,
 				discountID : typeof c.discountId != 'undefined' ? c.discountId : '',
 				tempPay : true,
-				isPrint : typeof c.isPrint == 'boolean' ? c.isPrint : true
+				isPrint : typeof c.isPrint == 'boolean' ? c.isPrint : true,
+				orientedPrinter : getcookie(document.domain + '_printers')
 			},
-			dataType : 'text',
+			dataType : 'json',
 			success : function(result, status, xhr){
 				Util.LM.hide();
-				if(typeof result == 'string'){
-					result = eval("(" + result + ")");
-				}
 				if(result.success){
 					Util.msg.tip('操作成功');
 					
@@ -1005,7 +987,7 @@ uo.tempPayForUO = function(c){
 						c.callback(result);
 					}
 					
-					initOrderData({table : uo.table});
+					initOrderData({order : uo.order});
 				}else{
 					Util.msg.alert({
 						title : '错误',
@@ -1065,7 +1047,7 @@ uo.chooseDiscount = function(c){
 					if(uo.discounting){
 						Util.msg.tip('打折成功');	
 						//异步刷新账单
-						initOrderData({table : uo.table});
+						initOrderData({order : uo.order});
 						uo.discounting = false;
 					}
 
@@ -1159,7 +1141,11 @@ uo.openMoreOperate = function(){
 				
 			}else if(uo.tempPayForPrintAllAction){//补打总单
 				Util.LM.show();
-				$.post('../PrintOrder.do', {orderID : uo.order.id, printType : 14}, function(result){
+				$.post('../PrintOrder.do', {
+					orderID : uo.order.id, 
+					printType : 14,
+					orientedPrinter : getcookie(document.domain + '_printers')			//特定打印机打印
+				}, function(result){
 					Util.LM.hide();
 					delete uo.tempPayForPrintAllAction;
 					if(result.success){
@@ -1187,7 +1173,11 @@ uo.openMoreOperate = function(){
 					buttons : 'yesback',
 					certainCallback : function(){
 						Util.LM.show();
-						$.post('../PrintOrder.do', {orderID : uo.order.id, printType : 15}, function(result){
+						$.post('../PrintOrder.do', {
+							orderID : uo.order.id, 
+							printType : 15,
+							orientedPrinter : getcookie(document.domain + '_printers')			//特定打印机打印
+						}, function(result){
 							Util.LM.hide();
 							delete uo.printDetailPatchAction;
 							if(result.success){
@@ -1263,7 +1253,8 @@ uo.submitUpdateOrderHandler = function(c){
 			data : {
 				commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
 				type : 7,
-				notPrint : c.notPrint?c.notPrint:false
+				notPrint : c.notPrint ? c.notPrint : false,
+				orientedPrinter : getcookie(document.domain + '_printers')			//特定打印机打印
 			},
 			success : function(data, status, xhr){
 				Util.LM.hide();
@@ -1283,14 +1274,14 @@ uo.submitUpdateOrderHandler = function(c){
 								uo.canceling = false;
 							}else if(uo.updateCustom){
 								Util.msg.tip('账单修改成功');	
-								initOrderData({table : uo.table});
+								initOrderData({order : uo.order});
 								uo.closeOperatePeople();
 							}else if(uo.weighOperate){
 								Util.msg.tip( '账单修改成功');	
-								initOrderData({table : uo.table});
+								initOrderData({order : uo.order});
 							}else if(uo.hurriedFood){
 								Util.msg.tip( '催菜成功');	
-								initOrderData({table : uo.table});
+								initOrderData({order : uo.order});
 								delete uo.hurriedFood;
 							}else{
 								Util.msg.alert({
@@ -1318,7 +1309,7 @@ uo.submitUpdateOrderHandler = function(c){
 								fn : function(btn){
 									if(btn == 'yes'){
 										uoCancelFoods = [];
-										initOrderData({table : uo.table});
+										initOrderData({order : uo.order});
 									}
 								}
 							});
@@ -1434,7 +1425,7 @@ $(function(){
 						if(data.success){
 							
 							//异步刷新账单
-							initOrderData({table : uo.table});
+							initOrderData({order : uo.order});
 							
 							Util.msg.alert({topTip : true, msg : '会员注入成功'});	
 							

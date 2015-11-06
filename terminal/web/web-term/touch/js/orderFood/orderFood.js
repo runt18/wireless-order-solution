@@ -1968,7 +1968,8 @@ of.submit = function(c){
 		data : {
 			commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
 			type : type,
-			notPrint : c.notPrint ? c.notPrint : false
+			notPrint : c.notPrint ? c.notPrint : false,
+			orientedPrinter : getcookie(document.domain + '_printers')			//特定打印机打印
 		},
 		success : function(data, status, xhr) {
 			if (data.success){
