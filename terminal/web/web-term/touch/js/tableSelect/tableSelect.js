@@ -3014,6 +3014,7 @@ ts.member.closeMemberConsumeDetailWin = function(){
  * 酒席分部门入账
  */
 ts.displayFeastPayWin = function(){
+	$('#tableSelectOtherOperateCmp').popup('close');
 	$.post('../QueryDept.do', {dataSource:'normal'}, function(result){
 		ts.depts4Feast = result.root;
 		
