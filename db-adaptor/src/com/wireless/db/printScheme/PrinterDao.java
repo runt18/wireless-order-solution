@@ -230,7 +230,7 @@ public class PrinterDao {
 		sql = " SELECT printer_id, restaurant_id, name, alias, style, enabled, oriented FROM " + Params.dbName + ".printer " +
 			  " WHERE restaurant_id = " + staff.getRestaurantId() + " " +
 			  (extraCond != null ? extraCond : "") +
-			  " ORDER BY enabled DESC, CONVERT(`name` USING GBK) ASC ";
+			  " ORDER BY enabled DESC, oriented ASC, CONVERT(`name` USING GBK) ASC ";
 
 		final List<Printer> result = new ArrayList<Printer>();
 		
