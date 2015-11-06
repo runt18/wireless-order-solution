@@ -38,6 +38,7 @@ import com.wireless.print.content.concrete.FoodDetailContent;
 import com.wireless.print.content.concrete.MemberReceiptContent;
 import com.wireless.print.content.concrete.OrderDetailContent;
 import com.wireless.print.content.concrete.ReceiptContent;
+import com.wireless.print.content.concrete.SecondDisplayContent;
 import com.wireless.print.content.concrete.ShiftContent;
 import com.wireless.print.content.concrete.SummaryContent;
 import com.wireless.print.content.concrete.TransFoodContent;
@@ -215,6 +216,28 @@ public class JobContentFactory {
 		return createDetailContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY), detailType);
 	}
 
+	public Content create2ndDisplayContent(Staff staff, List<Printer> printers, float display) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			
+			final List<JobContent> jobContents = new ArrayList<JobContent>();
+			
+			for(Printer printer : printers){
+				for(PrintFunc func : printer.getPrintFuncs()){
+					if(func.isTypeMatched(PType.PRINT_2ND_DISPLAY)){
+						jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_2ND_DISPLAY, new SecondDisplayContent(display)));
+					}
+				}
+			}
+			
+			return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 	/**
 	 * Create the receipt content
 	 * @param printType

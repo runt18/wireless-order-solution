@@ -382,9 +382,16 @@ class OrderHandler implements Runnable{
 	
 	private ProtocolPackage doInsertOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		//handle insert order request 
-		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true));
+		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setOriented(Printer.Oriented.ALL));
 		
-		Order orderToInsert = InsertOrder.exec(staff, new Parcel(request.body).readParcel(Order.InsertBuilder.CREATOR));
+		final Order.InsertBuilder builder = new Parcel(request.body).readParcel(Order.InsertBuilder.CREATOR);
+		
+		//Add the specific printers.
+		for(Printer orientedPrinter : builder.getPrinters()){
+			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setId(orientedPrinter.getId()).setOriented(Printer.Oriented.SPECIFIC)));
+		}
+		
+		Order orderToInsert = InsertOrder.exec(staff, builder);
 		
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
 			PrintHandler printHandler = new PrintHandler(staff);
@@ -437,8 +444,17 @@ class OrderHandler implements Runnable{
 	
 	private RespPackage doUpdateOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
 		//handle update order request
-		DiffResult diffResult = UpdateOrder.exec(staff, new Parcel(request.body).readParcel(Order.UpdateBuilder.CREATOR));
-		List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true));
+		final Order.UpdateBuilder builder = new Parcel(request.body).readParcel(Order.UpdateBuilder.CREATOR);
+		
+		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setOriented(Printer.Oriented.ALL));
+		
+		//Add the specific printers.
+		for(Printer orientedPrinter : builder.getPrinters()){
+			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setId(orientedPrinter.getId()).setOriented(Printer.Oriented.SPECIFIC)));
+		}
+		
+		final DiffResult diffResult = UpdateOrder.exec(staff, builder);
+
 		
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
 			
@@ -511,14 +527,14 @@ class OrderHandler implements Runnable{
 	private RespPackage doTransOrderFood(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		Order.TransferBuilder builder = new Parcel(request.body).readParcel(Order.TransferBuilder.CREATOR);
 		OrderDao.transfer(staff, builder);
-		ServerConnector.instance().ask(ReqPrintContent.buildTransFood(staff, builder));
+		ServerConnector.instance().ask(ReqPrintContent.buildTransFood(staff, builder).build());
 		return new RespACK(request.header);
 	}
 	
 	private RespPackage doTransTable(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		Table.TransferBuilder builder = new Parcel(request.body).readParcel(Table.TransferBuilder.CREATOR);
 		int orderId = TableDao.transfer(staff, builder);
-		ServerConnector.instance().ask(ReqPrintContent.buildTransTbl(staff, orderId, new Table.Builder(builder.getSrcTbl().getId()), new Table.Builder(builder.getDestTbl().getId())));
+		ServerConnector.instance().ask(ReqPrintContent.buildTransTbl(staff, orderId, new Table.Builder(builder.getSrcTbl().getId()), new Table.Builder(builder.getDestTbl().getId())).build());
 		return new RespACK(request.header);
 	}
 	
@@ -531,10 +547,10 @@ class OrderHandler implements Runnable{
 		Order.RepaidBuilder builder = new Parcel(request.body).readParcel(Order.RepaidBuilder.CREATOR);
 		OrderDao.repaid(staff, builder);
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
-			ServerConnector.instance().ask(ReqPrintContent.buildReceipt(staff, builder.getUpdateBuilder().build().getId()));
+			ServerConnector.instance().ask(ReqPrintContent.buildReceipt(staff, builder.getUpdateBuilder().build().getId()).build());
 			Order order = OrderDao.getById(staff, builder.getUpdateBuilder().build().getId(), DateType.TODAY);
 			if(order.isSettledByMember()){
-				ServerConnector.instance().ask(ReqPrintContent.buildMemberReceipt(staff, MemberOperationDao.getLastConsumptionByOrder(staff, order).getId()));
+				ServerConnector.instance().ask(ReqPrintContent.buildMemberReceipt(staff, MemberOperationDao.getLastConsumptionByOrder(staff, order).getId()).build());
 			}
 		}
 		return new RespACK(request.header);
@@ -543,7 +559,11 @@ class OrderHandler implements Runnable{
 	private RespPackage doPayOrder(final Staff staff, ProtocolPackage request)  throws SQLException, BusinessException{
 		final Order.PayBuilder payBuilder = new Parcel(request.body).readParcel(Order.PayBuilder.CREATOR);
 		
-		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true));
+		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setOriented(Printer.Oriented.ALL));
+		//Add the specific printers.
+		for(Printer orientedPrinter : payBuilder.getPrinters()){
+			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setId(orientedPrinter.getId()).setOriented(Printer.Oriented.SPECIFIC)));
+		}
 		
 		final PrintHandler printHandler = new PrintHandler(staff);
 
@@ -553,8 +573,8 @@ class OrderHandler implements Runnable{
 		 */
 		if(request.header.type == Type.PAY_TEMP_ORDER){
 			if(payBuilder.getPrintOption() == PrintOption.DO_PRINT){
-				printHandler.process(JobContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, staff,  printers,
-																				  	   PayOrder.payTemp(staff, payBuilder)));
+				printHandler.process(JobContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, staff,  printers, PayOrder.payTemp(staff, payBuilder)));
+
 			}else{
 				PayOrder.payTemp(staff, payBuilder);
 			}
@@ -576,22 +596,6 @@ class OrderHandler implements Runnable{
 				WirelessSocketServer.threadPool.execute(new Runnable(){
 					@Override
 					public void run() {
-//						try{
-//							//Perform this coupon draw.
-//							List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(order.getMemberId()).setStatus(Coupon.Status.PUBLISHED)
-//																									   .addPromotionStatus(Promotion.Status.PROGRESS), null);
-//							//Check to see whether or not any coupons associated with this member is qualified to take.
-//							for(Coupon coupon : coupons){
-//								coupon = CouponDao.getById(staff, coupon.getId());
-//								if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE || coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
-//									if(coupon.getDrawProgress().isOk()){
-//										CouponDao.draw(staff, coupon.getId());
-//									}
-//								}
-//							}
-//						}catch(SQLException | BusinessException e){
-//							e.printStackTrace();
-//						} 
 						
 						try{
 							//Perform the member upgrade
@@ -621,24 +625,30 @@ class OrderHandler implements Runnable{
 	}
 	
 	private RespPackage doPrintContent(final Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
-		PType printType = PType.valueOf(request.header.reserved);
-		List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true));
+		final PType printType = PType.valueOf(request.header.reserved);
+		final Parcel parcel = new Parcel(request.body);
+		
+		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setOriented(Printer.Oriented.ALL));
+		//Get the specific printers
+		final List<Printer> oriented = parcel.readParcelList(Printer.CREATOR);
+		for(Printer orientedPrinter : oriented){
+			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setId(orientedPrinter.getId()).setOriented(Printer.Oriented.SPECIFIC)));
+		}
 		
 		if(printType.isSummary()){
-			int orderId = new Parcel(request.body).readInt();
+			int orderId = parcel.readInt();
 			new PrintHandler(staff).process(JobContentFactory.instance().createSummaryContent(printType, staff, printers, orderId, FoodDetailContent.DetailType.TOTAL));
 			
 		}else if(printType.isDetail()){
-			int orderId = new Parcel(request.body).readInt();
+			int orderId = parcel.readInt();
 			new PrintHandler(staff).process(JobContentFactory.instance().createDetailContent(printType, staff, printers, orderId, FoodDetailContent.DetailType.TOTAL));
 			
 		}else if(printType.isReceipt()){
-			int orderId = new Parcel(request.body).readInt();
+			int orderId = parcel.readInt();
 			new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(printType, staff, printers, orderId));
 			
 		}else if(printType.isWxReceipt()){
-			Parcel p = new Parcel(request.body);
-			final Order.PayBuilder payBuilder = p.readParcel(Order.PayBuilder.CREATOR);
+			final Order.PayBuilder payBuilder = parcel.readParcel(Order.PayBuilder.CREATOR);
 			//打印微信支付单
 			Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
 			if(restaurant.hasBeeCloud()){
@@ -653,7 +663,6 @@ class OrderHandler implements Runnable{
 				final Order order = PayOrder.calc(staff, payBuilder);
 				BCPayResult bcPayResult = BCPay.startBCPay(PAY_CHANNEL.WX_NATIVE,
 														   Float.valueOf(order.getActualPrice() * 100).intValue(),
-														   //1,//FIXME 
 														   System.currentTimeMillis() + Integer.toString(payBuilder.getOrderId()),
 														   restaurant.getName() + "(账单号：" + payBuilder.getOrderId() + ")", 
 														   optional, 
@@ -668,14 +677,13 @@ class OrderHandler implements Runnable{
 			}
 			
 		}else if(printType.isTransTbl()){
-			Parcel p = new Parcel(request.body);
-			int orderId = p.readInt();
-			Table srcTbl = TableDao.getById(staff, p.readParcel(Table.CREATOR).getId());
-			Table destTbl = TableDao.getById(staff, p.readParcel(Table.CREATOR).getId());
+			int orderId = parcel.readInt();
+			Table srcTbl = TableDao.getById(staff, parcel.readParcel(Table.CREATOR).getId());
+			Table destTbl = TableDao.getById(staff, parcel.readParcel(Table.CREATOR).getId());
 			new PrintHandler(staff).process(JobContentFactory.instance().createTransContent(printType, staff, printers, orderId, srcTbl, destTbl));
 			
 		}else if(printType.isTransFood()){
-			Order.TransferBuilder builder = new Parcel(request.body).readParcel(Order.TransferBuilder.CREATOR);
+			Order.TransferBuilder builder = parcel.readParcel(Order.TransferBuilder.CREATOR);
 			Order srcOrder = OrderDao.getById(staff, builder.getSourceOrderId(), DateType.TODAY);
 			Table destTbl = TableDao.getById(staff, builder.getDestTbl().getId());
 			for(OrderFood foodOut : builder.getTransferFoods()){
@@ -684,10 +692,9 @@ class OrderHandler implements Runnable{
 			new PrintHandler(staff).process(JobContentFactory.instance().createTransFoodContent(printType, staff, printers, srcOrder.getId(), srcOrder.getDestTbl(), destTbl, builder.getTransferFoods()));
 			
 		}else if(printType.isShift()){
-			Parcel p = new Parcel(request.body);
-			long onDuty = p.readLong();
-			long offDuty = p.readLong();
-			Region.RegionId regionId = Region.RegionId.valueOf(p.readShort());
+			long onDuty = parcel.readLong();
+			long offDuty = parcel.readLong();
+			Region.RegionId regionId = Region.RegionId.valueOf(parcel.readShort());
 			if(regionId == Region.RegionId.REGION_NULL){
 				List<Region> regions = RegionDao.getByStatus(staff, Region.Status.BUSY);
 				if(!regions.isEmpty()){
@@ -697,8 +704,12 @@ class OrderHandler implements Runnable{
 			new PrintHandler(staff).process(JobContentFactory.instance().createShiftContent(printType, staff, printers, new DutyRange(onDuty, offDuty), regionId));
 			
 		}else if(printType.isMember()){
-			int moId = new Parcel(request.body).readInt();
+			int moId = parcel.readInt();
 			new PrintHandler(staff).process(JobContentFactory.instance().createMemberReceiptContent(printType, staff, printers, MemberOperationDao.getById(staff, DateType.TODAY, moId)));
+			
+		}else if(printType.is2ndDisplay()){
+			float display = parcel.readFloat();
+			new PrintHandler(staff).process(JobContentFactory.instance().create2ndDisplayContent(staff, printers, display));
 		}
 		
 		return new RespACK(request.header);
