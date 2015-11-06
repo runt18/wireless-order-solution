@@ -285,7 +285,7 @@ public class TestPrinterScheme {
 			Printer.UpdateBuilder updateBuilder = new Printer.UpdateBuilder(printerId)
 															 .setName("GP-80250-201-test")
 															 .setStyle(PStyle.PRINT_STYLE_80MM)
-															 .setAlias("中厨打印机").setEnabled(false).setOriented(Printer.Oriented.SPECIAL);
+															 .setAlias("中厨打印机").setEnabled(false).setOriented(Printer.Oriented.SPECIFIC);
 			PrinterDao.update(dbCon, mStaff, updateBuilder);
 			
 			if(updateBuilder.isNameChanged()){
