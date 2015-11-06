@@ -7,9 +7,42 @@ import java.util.List;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 
-public class Printer implements Jsonable{
+public class Printer implements Jsonable, Parcelable{
 
+	public static enum Oriented{
+		ALL(1, "全部"),
+		SPECIAL(2, "特定");
+		
+		Oriented(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		private final int val;
+		private final String desc;
+		
+		public static Oriented valueOf(int val){
+			for(Oriented oriented : values()){
+				if(oriented.val == val){
+					return oriented;
+				}
+			}
+			throw new IllegalArgumentException("The oriented(val = " + val + ") passed is invalid.");
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	} 
+	
 	private int mId;
 	
 	private int mRestaurantId;
@@ -22,13 +55,16 @@ public class Printer implements Jsonable{
 	
 	private boolean isEnabled;
 	
-	private List<PrintFunc> mFuncs = new ArrayList<PrintFunc>();
+	private Oriented oriented;
+	
+	private final List<PrintFunc> mFuncs = new ArrayList<PrintFunc>();
 	
 	public static class InsertBuilder{
 		private final String mName;
 		private final PStyle mStyle;
 		private String mAlias;
 		private boolean isEnabled = true;
+		private Oriented oriented = Oriented.ALL;
 		
 		public InsertBuilder(String name, PStyle style){
 			mName = name;
@@ -45,6 +81,11 @@ public class Printer implements Jsonable{
 			return this;
 		}
 		
+		public InsertBuilder setOriented(Oriented oriented){
+			this.oriented = oriented;
+			return this;
+		}
+		
 		public Printer build(){
 			return new Printer(this);
 		}
@@ -55,10 +96,20 @@ public class Printer implements Jsonable{
 		private PStyle mStyle;
 		private final int mPrinterId;
 		private String mAlias;
-		private int isEnabled = -1;
+		private Boolean isEnabled;
+		private Oriented oriented;
 		
 		public UpdateBuilder(int printerId){
 			mPrinterId = printerId;
+		}
+		
+		public UpdateBuilder setOriented(Oriented oriented){
+			this.oriented = oriented;
+			return this;
+		}
+		
+		public boolean isOrientedChanged(){
+			return this.oriented != null;
 		}
 		
 		public boolean isNameChanged(){
@@ -89,11 +140,11 @@ public class Printer implements Jsonable{
 		}
 		
 		public boolean isEnabledChanged(){
-			return this.isEnabled != -1;
+			return this.isEnabled != null;
 		}
 		
 		public UpdateBuilder setEnabled(boolean isEnabled){
-			this.isEnabled = isEnabled ? 1 : 0;
+			this.isEnabled = Boolean.valueOf(isEnabled);
 			return this;
 		}
 		
@@ -107,14 +158,16 @@ public class Printer implements Jsonable{
 		this.mStyle = builder.mStyle;
 		this.isEnabled = builder.isEnabled;
 		this.mAlias = builder.mAlias;
+		this.oriented = builder.oriented;
 	}
 	
 	private Printer(UpdateBuilder builder){
 		this.mId = builder.mPrinterId;
 		this.mName = builder.mName;
 		this.mStyle = builder.mStyle;
-		this.isEnabled = builder.isEnabled == 1;
+		this.isEnabled = builder.isEnabled;
 		this.mAlias = builder.mAlias;
+		this.oriented = builder.oriented;
 	}
 	
 	public Printer(int id){
@@ -173,6 +226,14 @@ public class Printer implements Jsonable{
 	
 	public void setEnabled(boolean isEnabled){
 		this.isEnabled = isEnabled;
+	}
+	
+	public void setOriented(Oriented oriented){
+		this.oriented = oriented;
+	}
+	
+	public Oriented getOriented(){
+		return this.oriented;
 	}
 	
 	/**
@@ -256,6 +317,8 @@ public class Printer implements Jsonable{
 		jm.putInt("styleValue", this.mStyle.getVal());
 		jm.putString("styleText", this.mStyle.getDesc());
 		jm.putBoolean("isEnabled", this.isEnabled);
+		jm.putInt("oriented", this.oriented.val);
+		jm.putString("orientedText", this.oriented.desc);
 		jm.putJsonableList("printFunc", this.mFuncs, 0);
 		return jm;
 	}
@@ -264,4 +327,36 @@ public class Printer implements Jsonable{
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
 	}
+
+	public final static int PARCEL_PRINTER_SIMPLE = 0;
+	
+	@Override
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeInt(flag);
+		if(flag == PARCEL_PRINTER_SIMPLE){
+			dest.writeInt(this.mId);
+		}
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		int flag = source.readInt();
+		if(flag == PARCEL_PRINTER_SIMPLE){
+			this.mId = source.readInt();
+		}
+	}
+	
+	public final static Parcelable.Creator<Printer> CREATOR = new Parcelable.Creator<Printer>(){
+
+		@Override
+		public Printer newInstance() {
+			return new Printer(0);
+		}
+		
+		@Override
+		public Printer[] newInstance(int size){
+			return new Printer[size];
+		}
+		
+	};
 }
