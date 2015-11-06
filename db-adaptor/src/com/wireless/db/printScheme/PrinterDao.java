@@ -18,7 +18,8 @@ public class PrinterDao {
 	public static class ExtraCond{
 		private int id;
 		private String name;
-		private boolean isEnabled;
+		private Boolean isEnabled;
+		private Printer.Oriented oriented;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -35,6 +36,11 @@ public class PrinterDao {
 			return this;
 		}
 		
+		public ExtraCond setOriented(Printer.Oriented oriented){
+			this.oriented = oriented;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -44,8 +50,11 @@ public class PrinterDao {
 			if(name != null){
 				extraCond.append(" AND name = '" + name + "'");
 			}
-			if(isEnabled){
-				extraCond.append(" AND enabled = 1");
+			if(isEnabled != null){
+				extraCond.append(" AND enabled = " + (isEnabled ? 1 : 0));
+			}
+			if(oriented != null){
+				extraCond.append(" AND oriented = " + oriented.getVal());
 			}
 			return extraCond.toString();
 		}
@@ -83,13 +92,14 @@ public class PrinterDao {
 		
 		//Insert a new printer
 		sql = " INSERT INTO " + Params.dbName + ".printer " +
-		      " ( restaurant_id, name, alias, style, enabled ) " +
+		      " ( restaurant_id, name, alias, style, enabled, oriented ) " +
 			  " VALUES ( " +
 		      staff.getRestaurantId() + "," +
 			  "'" + printerToAdd.getName() + "'," +
 		      "'" + printerToAdd.getAlias() + "'," +
 			  printerToAdd.getStyle().getVal() + "," +
-		      (printerToAdd.isEnabled() ? 1 : 0) +
+		      (printerToAdd.isEnabled() ? 1 : 0) + "," +
+			  printerToAdd.getOriented().getVal() +
 		      ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -127,6 +137,7 @@ public class PrinterDao {
 			  (builder.isAliasChanged() ? " ,alias = " + "'" + printerToUpdate.getAlias() + "'" : "") +
 			  (builder.isStyleChanged() ? " ,style = " + printerToUpdate.getStyle().getVal() : "") + 
 			  (builder.isEnabledChanged() ? " ,enabled = " + (printerToUpdate.isEnabled() ? 1 : 0) : "") +
+			  (builder.isOrientedChanged() ? " ,oriented = " + printerToUpdate.getOriented().getVal() : "") +
 			  " WHERE 1 = 1 " +
 			  " AND printer_id = " + printerToUpdate.getId();
 		
@@ -216,7 +227,7 @@ public class PrinterDao {
 	 */
 	public static List<Printer> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
-		sql = " SELECT printer_id, restaurant_id, name, alias, style, enabled FROM " + Params.dbName + ".printer " +
+		sql = " SELECT printer_id, restaurant_id, name, alias, style, enabled, oriented FROM " + Params.dbName + ".printer " +
 			  " WHERE restaurant_id = " + staff.getRestaurantId() + " " +
 			  (extraCond != null ? extraCond : "") +
 			  " ORDER BY enabled DESC, CONVERT(`name` USING GBK) ASC ";
@@ -231,6 +242,7 @@ public class PrinterDao {
 			printer.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			printer.setEnabled(dbCon.rs.getBoolean("enabled"));
 			printer.setAlias(dbCon.rs.getString("alias"));
+			printer.setOriented(Printer.Oriented.valueOf(dbCon.rs.getInt("oriented")));
 			result.add(printer);
 		}
 		dbCon.rs.close();
