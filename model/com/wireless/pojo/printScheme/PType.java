@@ -21,6 +21,7 @@ public enum PType {
 	PRINT_ORDER_DETAIL_PATCH(15, "补打明细"),
 	PRINT_TRANSFER_FOOD(16, "转菜"),
 	PRINT_WX_RECEIT(17, "微信支付"),
+	PRINT_2ND_DISPLAY(18, "客显"),
 	PRINT_HISTORY_DAILY_SETTLE_RECEIPT(122, "历史日结"),
 	PRINT_HISTORY_SHIFT_RECEIPT(123, "历史交班"),
 	PRINT_DAILY_SETTLE_RECEIPT(124, "日结表"),
@@ -95,5 +96,9 @@ public enum PType {
 	
 	public boolean isMember(){
 		return this == PType.PRINT_MEMBER_RECEIPT;
+	}
+	
+	public boolean is2ndDisplay(){
+		return this == PType.PRINT_2ND_DISPLAY;
 	}
 }

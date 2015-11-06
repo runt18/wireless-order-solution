@@ -382,7 +382,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private final int mPrinterId;
 		private int mRepeat = 1;
 		private PType mType ;
-		private List<Region> mRegions = SortedList.newInstance();
+		private final List<Region> mRegions = SortedList.newInstance();
 		private String mComment;
 		
 		private Builder(int printerId){
@@ -418,6 +418,13 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			builder.setType(PType.PRINT_TRANSFER_FOOD);
 			return builder;
 		}	
+		
+		public static Builder new2ndDisplay(int printerId){
+			Builder builder = new Builder(printerId);
+			builder.setType(PType.PRINT_2ND_DISPLAY);
+			builder.setComment("客显");
+			return builder;
+		}
 		
 		public Builder setRepeat(int repeat){
 			mRepeat = repeat;
@@ -714,6 +721,9 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}else if(mType == PType.PRINT_ALL_HURRIED_FOOD){
 			return typeToCompare == PType.PRINT_ALL_HURRIED_FOOD;
 			
+		}else if(mType == PType.PRINT_2ND_DISPLAY){
+			return typeToCompare == PType.PRINT_2ND_DISPLAY;
+					
 		}else{
 			return false;
 		}
