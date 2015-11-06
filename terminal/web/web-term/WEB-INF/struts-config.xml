@@ -380,9 +380,6 @@
 			type="com.wireless.Actions.inventoryMgr.monthlySettle.QueryCurrentMonthAction"
 			scope="request">
 		</action>
-		<action path="/QueryPrinterTree"
-			type="com.wireless.Actions.printScheme.QueryPrinterTreeAction" scope="request">
-		</action>
 		<action path="/QueryPrintFunc"
 			type="com.wireless.Actions.printScheme.QueryPrintFuncAction" scope="request">
 		</action>
