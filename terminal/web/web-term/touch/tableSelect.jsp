@@ -62,6 +62,8 @@
 <script type="text/javascript" src="./js/popup/member/add.js"></script>
 <!-- 完善会员资料 -->
 <script type="text/javascript" src="./js/popup/member/perfect.js"></script>
+<!-- 打印机绑定 -->
+<script type="text/javascript" src="./js/popup/print/print.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -85,6 +87,7 @@
 		</div>	
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="ts.displayPrintConnection()">打印机诊断</a>
+		 	<a data-role="button" data-inline="true" class="topBtnFont" id="printBind_a_tableSelect">打印机绑定</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop"  data-position-to="window" onclick="ts.displayFeastPayWin()">酒席入账</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageMemberOperation">会员</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="toOrderMgrPage()">账单</a>

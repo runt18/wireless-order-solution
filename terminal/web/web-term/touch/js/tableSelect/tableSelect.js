@@ -651,6 +651,13 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 		}, 200);
 	});
 	
+	//打印机绑定按钮
+	$('#printBind_a_tableSelect').click(function(){
+		var printBindPopup = new PrintBindPopup();
+		printBindPopup.open();
+	});
+	
+	
 	
 });
 
