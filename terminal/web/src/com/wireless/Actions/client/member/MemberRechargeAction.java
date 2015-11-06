@@ -49,7 +49,7 @@ public class MemberRechargeAction extends Action{
 					try{
 						ReqPrintContent reqPrintContent = ReqPrintContent.buildMemberReceipt(staff, mo.getId());
 						if(reqPrintContent != null){
-							ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
+							ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent.build());
 							if(resp.header.type == Type.ACK){
 								jobject.setMsg(jobject.getMsg() + "打印充值信息成功.");
 							}else{

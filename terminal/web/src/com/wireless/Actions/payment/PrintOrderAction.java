@@ -29,82 +29,40 @@ import com.wireless.sccon.ServerConnector;
 
 public class PrintOrderAction extends Action{
 
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		JObject jobject = new JObject();
-		int tableID = 0;
+		final JObject jobject = new JObject();
 		try {
-			/**
-			 * The parameters looks like below.
-			 * 
-			 * 1st example, print an order according to order id
-			 * pin=1 & orderID=654 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0 & printShift=0
-			 * 
-			 * 2nd example, print an order according to table id
-			 * pin=11 & tableID=101 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0 & printShift=0
-			 * 
-			 * 3rd example, print the shift record
-			 * pin=1 & printShift=1 & onDuty=2012-4-9 8:00:00 & offDuty=2012-4-9 14:00:00
-			 * 
-			 * 4th example, print daily settle to today
-			 * pin=1 & printDailySettle=1 
-			 * 
-			 * 5th example, print the history shift record
-			 * pin=1 & printHistoryShift=1 & onDuty=2012-4-9 8:00:00 & offDuty=2012-4-9 14:00:00
-			 * 
-			 * 6th example, print the history daily settle record
-			 * pin=1 & printHistoryDailySettle=1 & onDuty=2012-4-9 8:00:00 & offDuty=2012-4-9 14:00:00
-			 * 
-			 * pin : the pin the this terminal
-			 * 
-			 * orderID : the order id to print
-			 * 
-			 * tableID : the order associated with this table to print
-			 * 
-			 * printSync : 1 means print in sync, 0 means print in async
-			 * 
-			 * printOrder : 1 means to print the order, 0 or NULL means NOT
-			 * 
-			 * printDetail : 1 means to print the order detail, 0 or NULL means NOT
-			 * 
-			 * printReceipt : 1 means to print the receipt, 0 or NULL means NOT
-			 * 
-			 * printShift : 1 means to print the shift receipt, 0 or NULL means NOT
-			 * 
-			 * printDailySettle : 1 means to print the daily settle receipt, 0 or NULL means NOT
-			 * 
-			 * printTmpShift : 1 means to print the temporary daily settle receipt, 0 or NULL means NOT
-			 * 
-			 * printHistoryShift : 1 means to print the history shift receipt, 0 or NULL means NOT
-			 * 
-			 * printHistoryDailySettle : 1 means to print the history daily settle receipt, 0 or NULL means NOT
-			 * 
-			 * onDuty : the date time to be on duty
-			 * 
-			 * offDuty : the date time to be off duty
-			 * 
-			 */
-			String pin = (String)request.getAttribute("pin");
+			final String pin = (String)request.getAttribute("pin");
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			int orderId = 0;
-			if(request.getParameter("orderID") != null){
-				orderId = Integer.parseInt(request.getParameter("orderID"));
-			}else{				
-				if(request.getParameter("tableID") != null){
-					tableID = Integer.parseInt(request.getParameter("tableID"));
-					orderId = OrderDao.getByTableId(staff, tableID).getId();
-				}
+			final String orderParam = request.getParameter("orderID");
+			final String tableParam = request.getParameter("tableID");
+			final String printerParam = request.getParameter("orientedPrinter");
+			
+			final int orderId;
+			if(orderParam != null && !orderParam.isEmpty()){
+				orderId = Integer.parseInt(orderParam);
+			}else if(tableParam != null && !tableParam.isEmpty()){
+				orderId = OrderDao.getByTableId(staff, Integer.parseInt(tableParam)).getId();
+			}else{
+				orderId = 0;
 			}
 
-			long onDuty = 0;
+			final long onDuty;
 			if(request.getParameter("onDuty") != null){
 				onDuty = DateUtil.parseDate(request.getParameter("onDuty"));
+			}else{
+				onDuty = 0;
 			}
-			long offDuty = 0;
+			
+			final long offDuty;
 			if(request.getParameter("offDuty") != null){
 				offDuty = DateUtil.parseDate(request.getParameter("offDuty"));
+			}else{
+				offDuty = 0;
 			}
 			
 			String regionId = request.getParameter("regionId");
@@ -115,9 +73,8 @@ public class PrintOrderAction extends Action{
 				paymentRegion = false;
 			}
 			
-			ReqPrintContent reqPrintContent = null;
-			String pt = request.getParameter("printType");
-			int printType = Integer.valueOf(pt);
+			final ReqPrintContent reqPrintContent;
+			final int printType = Integer.valueOf(request.getParameter("printType"));
 			
 			switch(printType){
 				case 1:
@@ -172,6 +129,10 @@ public class PrintOrderAction extends Action{
 				case 15:
 					reqPrintContent = ReqPrintContent.buildDetailPatch(staff, orderId);
 					break;
+				case 16:
+					
+					reqPrintContent = ReqPrintContent.build2ndDisplay(staff, Float.parseFloat(request.getParameter("display")));
+					break;
 				default:
 					reqPrintContent = null;
 					break;
@@ -179,7 +140,13 @@ public class PrintOrderAction extends Action{
 			
 			if(reqPrintContent != null){
 
-				ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
+				if(printerParam != null && !printerParam.isEmpty()){
+					for(String printerId : printerParam.split(",")){
+						reqPrintContent.addPrinter(Integer.parseInt(printerId));
+					}
+				}
+				
+				ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent.build());
 				
 				if(resp.header.type == Type.ACK){
 					jobject.setSuccess(true);

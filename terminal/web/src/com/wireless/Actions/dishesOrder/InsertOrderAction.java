@@ -26,45 +26,58 @@ import com.wireless.sccon.ServerConnector;
 
 public class InsertOrderAction extends Action{
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		JObject jobject = new JObject();
+		final JObject jobject = new JObject();
 		try {
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			
-			String jsonText = request.getParameter("commitOrderData");
+			final String jsonText = request.getParameter("commitOrderData");
 			
-			int type = Integer.parseInt(request.getParameter("type"));
+			final int type = Integer.parseInt(request.getParameter("type"));
 
-			String notPrint = request.getParameter("notPrint");
+			final String notPrint = request.getParameter("notPrint");
+			
+			final String orientedPrinter = request.getParameter("orientedPrinter");
+			
 			final PrintOption printOption;
-			if(notPrint != null && Boolean.valueOf(notPrint)){
-				printOption = PrintOption.DO_NOT_PRINT;
+			if(notPrint != null && !notPrint.isEmpty()){
+				printOption = Boolean.valueOf(notPrint) ? PrintOption.DO_NOT_PRINT : PrintOption.DO_PRINT;
 			}else{
 				printOption = PrintOption.DO_PRINT;
 			}
 			
-//			ProtocolPackage resp = ServerConnector.instance().ask(
-//										new ReqInsertOrder(staff,
-//											orderToInsert,
-//											(type == 1) ? Type.INSERT_ORDER : (type == 7) ? Type.UPDATE_ORDER : Type.INSERT_ORDER_FORCE,
-//											notPrint != null && Boolean.valueOf(notPrint) ? PrintOption.DO_NOT_PRINT : PrintOption.DO_PRINT
-//										));
-			
 			final ProtocolPackage resp;
 			if(type == 1){
 				Order.InsertBuilder builder = JObject.parse(Order.InsertBuilder.JSON_CREATOR, 0, jsonText);
+				//加载特定打印机
+				if(orientedPrinter != null && !orientedPrinter.isEmpty()){
+					for(String printerId : orientedPrinter.split(",")){
+						builder.addPrinter(Integer.parseInt(printerId));
+					}
+				}
 				resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, printOption));
+				
 				
 			}else if(type == 7){
 				Order.UpdateBuilder builder = JObject.parse(Order.UpdateBuilder.JSON_CREATOR, 0, jsonText);
+				//加载特定打印机
+				if(orientedPrinter != null && !orientedPrinter.isEmpty()){
+					for(String printerId : orientedPrinter.split(",")){
+						builder.addPrinter(Integer.parseInt(printerId));
+					}
+				}
 				resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, printOption));
 				
 			}else{
 				Order.InsertBuilder builder = JObject.parse(Order.InsertBuilder.JSON_CREATOR, 0, jsonText);
 				builder.setForce(true);
+				//加载特定打印机
+				if(orientedPrinter != null && !orientedPrinter.isEmpty()){
+					for(String printerId : orientedPrinter.split(",")){
+						builder.addPrinter(Integer.parseInt(printerId));
+					}
+				}
 				resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, printOption));
 			}
 			

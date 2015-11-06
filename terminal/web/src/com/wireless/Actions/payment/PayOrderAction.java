@@ -1,7 +1,6 @@
 package com.wireless.Actions.payment;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,60 +29,32 @@ public class PayOrderAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String jsonResp = "{\"success\":$(result), \"data\":\"$(value)\"}";
-		PrintWriter out = null;
 		try {
-			
-			out = response.getWriter();			
-
-			/**
-			 * The parameters looks like below.
-			 * 
-			 * pin : the pin the this terminal
-			 * 
-			 * tempPay : indicates whether to pay order temporary
-			 * 
-			 * tableID : the table id to be paid order
-			 * 
-			 * payType : "1" means pay in "一般", 
-			 * 			 "2" means pay in "会员" 
-			 * 
-			 * discountType : "1" means to pay using discount 1
-			 * 				  "2" means to pay using discount 2
-			 * 				  "3" means to pay using discount 3
-			 * 
-			 * payManner : "1" means "现金"
-			 * 			   "2" means "刷卡"
-			 * 			   "3" means "会员卡"
-			 * 			   "4" means "签单"
-			 * 			   "5" means "挂账"
-			 * 
-			 * cashIncome : the cash that client pay for this order,
-			 * 				this parameter is optional, only takes effect while the pay manner is "现金"
-			 * 
-			 * 
-			 * memberID : the id to member, 
-			 * 			  this parameter is optional, only takes effect while the pay type is "会员" 
-			 * 
-			 * comment : the comment to this order
-			 *           this parameter is optional,
-			 *           No need to pass this parameter if no comment input. 
-			 */
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			
-			
-			int orderId = Integer.parseInt(request.getParameter("orderID"));
+			final int orderId = Integer.parseInt(request.getParameter("orderID"));
+
+			final String settleParam = request.getParameter("payType");
+			final String payMannerParam = request.getParameter("payManner");
+			final String cashIncome = request.getParameter("cashIncome");
+			final String eraseQuota = request.getParameter("eraseQuota");
+			final String comment = request.getParameter("comment");
+			final String customNum = request.getParameter("customNum");
+			final String tempPay = request.getParameter("tempPay");
+			final String isPrint = request.getParameter("isPrint");
+			final String orientedPrinter = request.getParameter("orientedPrinter");
 			
 			final Order.SettleType settleType;
-			if(request.getParameter("payType") != null){
-				settleType = Order.SettleType.valueOf(Integer.parseInt(request.getParameter("payType")));
+			if(settleParam != null && !settleParam.isEmpty()){
+				settleType = Order.SettleType.valueOf(Integer.parseInt(settleParam));
 			}else{
 				settleType = Order.SettleType.NORMAL;
 			}
-			
+
 			final PayType payType;
-			if(request.getParameter("payManner") != null){
-				payType = new PayType(Integer.parseInt(request.getParameter("payManner")));
+			if(payMannerParam != null && !payMannerParam.isEmpty()){
+				payType = new PayType(Integer.parseInt(payMannerParam));
 			}else{
 				payType = PayType.CASH;
 			}
@@ -96,10 +67,11 @@ public class PayOrderAction extends Action{
 			}
 			
 			//Get the cash income if the pay manner is "现金"
-			if(payType.equals(PayType.CASH)){
-				payBuilder.setReceivedCash(Float.parseFloat(request.getParameter("cashIncome")));
+			if(payType.equals(PayType.CASH) && cashIncome != null && !cashIncome.isEmpty()){
+				payBuilder.setReceivedCash(Float.parseFloat(cashIncome));
+				
 			}else if(payType.equals(PayType.MIXED)){
-				String payTypeCashs = request.getParameter("payTypeCash");
+				final String payTypeCashs = request.getParameter("payTypeCash");
 				
 				for (String pt : payTypeCashs.split("&")) {
 					String payTypeCash[] = pt.split(",");
@@ -107,23 +79,18 @@ public class PayOrderAction extends Action{
 				}
 			}
 			
-//			if(request.getParameter("pricePlanID") != null && !request.getParameter("pricePlanID").isEmpty() && !request.getParameter("pricePlanID").equals("-1")){
-//				payBuilder.setPricePlanId(Integer.parseInt(request.getParameter("pricePlanID")));
-//			}
-			
-			if(request.getParameter("eraseQuota") != null){
-				payBuilder.setErasePrice(Integer.parseInt(request.getParameter("eraseQuota")));
+			if(eraseQuota != null && !eraseQuota.isEmpty()){
+				payBuilder.setErasePrice(Integer.parseInt(eraseQuota));
 			}
 			
 			//Get the first 20 characters of the comment
-			String comment = request.getParameter("comment");
 			if(comment != null && !comment.isEmpty()){
 				payBuilder.setComment(comment.substring(0, comment.length() < 20 ? comment.length() : 20));
 			}	
 
 			//Get the custom number.
-			if(request.getParameter("customNum") != null && !request.getParameter("customNum").isEmpty()){
-				payBuilder.setCustomNum(Integer.valueOf(request.getParameter("customNum")));
+			if(customNum != null && !customNum.isEmpty()){
+				payBuilder.setCustomNum(Integer.valueOf(customNum));
 			}
 			
 			/**
@@ -131,22 +98,30 @@ public class PayOrderAction extends Action{
 			 * If pay order temporary, just print the receipt.
 			 * Otherwise perform to pay order and print the receipt.
 			 */
-			String tempPay = request.getParameter("tempPay");
-			if(tempPay != null){
+			if(tempPay != null && !tempPay.isEmpty()){
 				payBuilder.setTemp(Boolean.parseBoolean(tempPay));
 			}
 			
 			/**
 			 * 是否打印
 			 */
-			String isPrint = request.getParameter("isPrint");
-			if(isPrint != null && !isPrint.trim().isEmpty() && !Boolean.valueOf(isPrint.trim())){
-				payBuilder.setPrintOption(PrintOption.DO_NOT_PRINT);
+			if(isPrint != null && !isPrint.trim().isEmpty()){
+				if(Boolean.parseBoolean(isPrint)){
+					payBuilder.setPrintOption(PrintOption.DO_PRINT);
+				}else{
+					payBuilder.setPrintOption(PrintOption.DO_NOT_PRINT);
+				}
+			}
+			
+			if(orientedPrinter != null && !orientedPrinter.isEmpty()){
+				for(String printerId : orientedPrinter.split(",")){
+					payBuilder.addPrinter(Integer.parseInt(printerId));
+				}
 			}
 			
 			if(payType.equals(PayType.WX)){
 				//打印微信支付单
-				ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildWxReceipt(staff, payBuilder));
+				ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildWxReceipt(staff, payBuilder).build());
 				if(resp.header.type == Type.ACK){
 					jsonResp = jsonResp.replace("$(result)", "true");
 					jsonResp = jsonResp.replace("$(value)", "微信支付成功");
@@ -195,9 +170,7 @@ public class PayOrderAction extends Action{
 			jsonResp = jsonResp.replace("$(value)", e.getMessage());
 			
 		}finally{
-			out.print(jsonResp);
-			out.flush();
-			out.close();
+			response.getWriter().print(jsonResp);
 		}
 
 		return null;

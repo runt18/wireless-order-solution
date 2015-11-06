@@ -111,7 +111,7 @@ public class OperateMemberAction extends DispatchAction{
 				jobject.setMsg(jobject.getMsg() + "会员充值成功.");
 				if(isPrint != null && Boolean.valueOf(isPrint)){
 					try{
-						ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildMemberReceipt(staff, mo.getId()));
+						ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildMemberReceipt(staff, mo.getId()).build());
 						if(resp.header.type == Type.ACK){
 							jobject.setMsg(jobject.getMsg() + "打印充值信息成功.");
 						}else{
@@ -268,7 +268,7 @@ public class OperateMemberAction extends DispatchAction{
 			jobject.initTip(true, "操作成功, 会员充值成功.");
 			if(isPrint != null && Boolean.valueOf(isPrint)){
 				try{
-					ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildMemberReceipt(staff, mo.getId()));
+					ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildMemberReceipt(staff, mo.getId()).build());
 					if(resp.header.type == Type.ACK){
 						jobject.setMsg(jobject.getMsg() + "打印充值信息成功.");
 					}else{
@@ -353,7 +353,7 @@ public class OperateMemberAction extends DispatchAction{
 					try{
 						ReqPrintContent reqPrintContent = ReqPrintContent.buildMemberReceipt(staff, mo.getId());
 						if(reqPrintContent != null){
-							ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
+							ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent.build());
 							if(resp.header.type == Type.ACK){
 								jobject.setMsg(jobject.getMsg() + "打印取款信息成功.");
 							}else{

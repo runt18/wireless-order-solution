@@ -52,7 +52,7 @@ public class OperatePrinterAction extends DispatchAction{
 					jsonSB.append(", leaf : true" );
 					if(!printer.isEnabled()){
 						jsonSB.append(", iconCls : 'btn_error'");
-					}else if(printer.getOriented() == Printer.Oriented.SPECIAL){
+					}else if(printer.getOriented() == Printer.Oriented.SPECIFIC){
 						jsonSB.append(", icon : '../../images/printShift.png'");
 					}else{
 						jsonSB.append(", icon : '../../images/printer.png'");
