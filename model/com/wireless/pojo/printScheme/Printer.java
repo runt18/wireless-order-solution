@@ -14,7 +14,7 @@ public class Printer implements Jsonable, Parcelable{
 
 	public static enum Oriented{
 		ALL(1, "全部"),
-		SPECIAL(2, "特定");
+		SPECIFIC(2, "特定");
 		
 		Oriented(int val, String desc){
 			this.val = val;
