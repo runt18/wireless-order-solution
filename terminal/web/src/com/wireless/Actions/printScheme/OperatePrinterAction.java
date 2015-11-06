@@ -1,5 +1,8 @@
 package com.wireless.Actions.printScheme;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,118 +22,149 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class OperatePrinterAction extends DispatchAction{
 
-	public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+	public ActionForward printerTree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
-		
-		JObject jobject = new JObject();
-		String pin = (String)request.getAttribute("pin");
-		String printerId = request.getParameter("printerId");
-		DBCon dbCon = new DBCon();
+		final String pin = (String)request.getAttribute("pin");
+		final StringBuilder jsonSB = new StringBuilder();
 		try{
-			dbCon.connect();
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			PrinterDao.deleteById(dbCon, staff, Integer.parseInt(printerId));
-			jobject.initTip(true, "操作成功, 已删除打印机");
-			
-		}catch(BusinessException e){
-			jobject.initTip(e);
-			e.printStackTrace();
-		}catch(Exception e){
-			jobject.initTip4Exception(e);
-			e.printStackTrace();
+			final Staff staff = StaffDao.getById(Integer.parseInt(pin));
+			final List<Printer> result = PrinterDao.getByCond(staff, null);
+			if(!result.isEmpty()){
+				int index = 0;
+				for (Printer printer : result) {
+					jsonSB.append(index > 0 ? "," : "");
+					jsonSB.append("{");
+					jsonSB.append("printerId : '" + printer.getId() + "'");
+					jsonSB.append(", id : '" + printer.getId() + "'");
+					jsonSB.append(", restaurantId : '" + printer.getRestaurantId() + "'");
+					jsonSB.append(", name :'" + printer.getName() + "'");
+					jsonSB.append(", alias : '" + printer.getAlias() + "'");
+					jsonSB.append(", styleValue : '" + printer.getStyle().getVal() + "'");
+					jsonSB.append(", styleText : '" + printer.getStyle().getDesc() + "'");
+					jsonSB.append(", isEnabled : " + printer.isEnabled());
+					if(printer.getAlias().equals("")){
+						jsonSB.append(", text : '" + printer.getName() + "(" + printer.getStyle().getDesc() + ")'");
+					}else{
+						jsonSB.append(", text : '" + printer.getName() + "(" + printer.getAlias() + " " + printer.getStyle().getDesc() + ")'");
+					}
+					jsonSB.append(", leaf : true" );
+					if(!printer.isEnabled()){
+						jsonSB.append(", iconCls : 'btn_error'");
+					}else{
+						jsonSB.append(", icon : '../../images/printer.png'");
+					}
+					jsonSB.append("}");
+					index++;
+					
+				}
+			}
+		}catch(SQLException e){
+			JObject jObj = new JObject();
+			jObj.initTip(e);
+			response.getWriter().print(jObj.toString());
 		}finally{
-			dbCon.disconnect();
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print("[" + jsonSB.toString() + "]");
 		}
 		
 		return null;
-		
-		
 	}
 	
-	//FIXME
-	public ActionForward port(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		final JObject jObject = new JObject();
 		
-		
-		
-		String printerName = "";
-		
-		DBCon dbCon = new DBCon();
 		try{
-			dbCon.connect();
-
-			Staff staff;
 			
-			String account = request.getParameter("account");
-
-			int staffId = 0;
-			String sql;
-			sql = " SELECT STAFF.staff_id FROM " + 
-				  " restaurant REST JOIN staff STAFF ON REST.id = STAFF.restaurant_id " +
-				  " WHERE REST.account = '" + account + "'";
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				staffId = dbCon.rs.getInt("staff_id");
-			}else{
-				return null;
+			final String pin = (String)request.getAttribute("pin");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final String printerName = request.getParameter("printerName");
+			final String isEnabled = request.getParameter("isEnabled");
+			final String oriented = request.getParameter("oriented");
+			
+			PrinterDao.ExtraCond extraCond = new PrinterDao.ExtraCond();
+			if(printerName != null && !printerName.isEmpty()){
+				extraCond.setName(printerName);
 			}
-			dbCon.rs.close();
-
-			staff = StaffDao.verify(staffId);
+			if(isEnabled != null && !isEnabled.isEmpty()){
+				extraCond.setEnabled(Boolean.parseBoolean(isEnabled));
+			}
+			if(oriented != null && !oriented.isEmpty()){
+				extraCond.setOriented(Printer.Oriented.valueOf(Integer.parseInt(oriented)));
+			}
 			
-			printerName = request.getParameter("printerName");
-			String printerAlias = request.getParameter("printerAlias");
-			int style = Integer.parseInt(request.getParameter("style"));
-			
-			Printer.InsertBuilder builder = new Printer.InsertBuilder(printerName, PStyle.valueOf(style));
-			builder.setAlias(printerAlias);
-			PrinterDao.insert(dbCon, staff, builder);
-			response.getWriter().print("Port printer '" + printerName + "' successfully...");
+			jObject.setRoot(PrinterDao.getByCond(staff, extraCond));
 			
 		}catch(BusinessException e){
-			response.getWriter().print("Port printer '" + printerName + "' fail...");
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			response.getWriter().print("Port printer '" + printerName + "' fail...");
+			jObject.initTip4Exception(e);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
+	public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		
+		final JObject jObject = new JObject();
+		final DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			final String pin = (String)request.getAttribute("pin");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final String printerId = request.getParameter("printerId");
+			PrinterDao.deleteById(dbCon, staff, Integer.parseInt(printerId));
+			jObject.initTip(true, "操作成功, 已删除打印机");
+			
+		}catch(BusinessException e){
+			jObject.initTip(e);
+			e.printStackTrace();
+		}catch(Exception e){
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			dbCon.disconnect();
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;
+		
 		
 	}
 	
 	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		
-		JObject jobject = new JObject();
-		String pin = (String)request.getAttribute("pin");
+		final JObject jObject = new JObject();
 		
-		DBCon dbCon = new DBCon();
+		final DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			String printerName = request.getParameter("printerName");
-			String printerAlias = request.getParameter("printerAlias");
-			int style =Integer.parseInt(request.getParameter("style"));
-			String isEnabled = request.getParameter("isEnabled");
+			final String pin = (String)request.getAttribute("pin");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final String printerName = request.getParameter("printerName");
+			final String printerAlias = request.getParameter("printerAlias");
+			final int style =Integer.parseInt(request.getParameter("style"));
+			final String isEnabled = request.getParameter("isEnabled");
+			final String oriented = request.getParameter("oriented");
 			
 			Printer.InsertBuilder builder = new Printer.InsertBuilder(printerName, PStyle.valueOf(style));
 			builder.setAlias(printerAlias);
 			builder.setEnabled(Boolean.parseBoolean(isEnabled));
+			builder.setOriented(Printer.Oriented.valueOf(Integer.parseInt(oriented)));
 			PrinterDao.insert(dbCon, staff, builder);
-			jobject.initTip(true, "操作成功, 已添加打印机");
+			jObject.initTip(true, "操作成功, 已添加打印机");
 			
 		}catch(BusinessException e){
-			jobject.initTip(e);
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			dbCon.disconnect();
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;
@@ -140,38 +174,50 @@ public class OperatePrinterAction extends DispatchAction{
 	
 	public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
-		
-		JObject jobject = new JObject();
-		String pin = (String)request.getAttribute("pin");
-		DBCon dbCon = new DBCon();
+		final JObject jObject = new JObject();
+		final DBCon dbCon = new DBCon();
 		
 		try{
 			dbCon.connect();
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			String printerName = request.getParameter("printerName");
-			String printerAlias = request.getParameter("printerAlias");
-			int style =Integer.parseInt(request.getParameter("style"));
-			String printerId = request.getParameter("printerId");
-			String isEnabled = request.getParameter("isEnabled");
+			
+			final String pin = (String)request.getAttribute("pin");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final String printerName = request.getParameter("printerName");
+			final String printerAlias = request.getParameter("printerAlias");
+			final String style = request.getParameter("style");
+			final String printerId = request.getParameter("printerId");
+			final String isEnabled = request.getParameter("isEnabled");
+			final String oriented = request.getParameter("oriented");
 			
 			Printer.UpdateBuilder builder = new Printer.UpdateBuilder(Integer.parseInt(printerId));
-			builder.setName(printerName);
-			builder.setStyle(PStyle.valueOf(style));
-			builder.setAlias(printerAlias);
-			builder.setEnabled(Boolean.parseBoolean(isEnabled));
+			if(printerName != null && !printerName.isEmpty()){
+				builder.setName(printerName);
+			}
+			if(style != null && !style.isEmpty()){
+				builder.setStyle(PStyle.valueOf(Integer.parseInt(style)));
+			}
+			if(printerAlias != null && !printerAlias.isEmpty()){
+				builder.setAlias(printerAlias);
+			}
+			if(isEnabled != null && !isEnabled.isEmpty()){
+				builder.setEnabled(Boolean.parseBoolean(isEnabled));
+			}
+			if(oriented != null && !oriented.isEmpty()){
+				builder.setOriented(Printer.Oriented.valueOf(Integer.parseInt(oriented)));
+			}
 			
 			PrinterDao.update(dbCon, staff, builder);
 			
-			jobject.initTip(true, "操作成功,已修改打印机");
+			jObject.initTip(true, "操作成功,已修改打印机");
 		}catch(BusinessException e){
-			jobject.initTip(e);
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			dbCon.disconnect();
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;
