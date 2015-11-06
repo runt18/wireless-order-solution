@@ -795,12 +795,13 @@ function init(){
 					var isEnabled = Ext.getCmp('enabled');
 					var styles = document.getElementsByName('pStyle');
 					var printerId = Ext.getCmp('printerId');
+					var faceType  = document.getElementsByName('isAll');
 					
 					var dataSource = '';
 					
 					//机型
 					var style = '';
-					for ( var i = 0; i < styles.length; i++) {
+					for (var i = 0; i < styles.length; i++) {
 						if(styles[i].checked){
 							style = styles[i].value;
 						}
@@ -811,6 +812,13 @@ function init(){
 					}else{
 						isEnabled = 'false';
 					}
+					
+					//面向类型
+					var faceTt
+					if(faceType.checked){
+						faceTypeId =  
+					}
+					
 					if(!Ext.getCmp('txtPrinterName').isValid()){
 						return;
 					}
@@ -842,6 +850,7 @@ function init(){
 							style : style,
 							printerId : printerId.getValue(),
 							isEnabled : isEnabled,
+							oriented : 
 							dataSource : dataSource
 						},
 						success : function(res, opt){
@@ -1027,7 +1036,27 @@ function init(){
 						hideLabel : true,
 						boxLabel : '停用'
 					}]
-				},{
+				}, {
+					xtype : 'fieldset',
+					title : '选择类型',
+					autoHeight : true,
+					defaultType : 'radio',
+					hideLabels : true,
+					items : [{
+						id : 'selectAll',
+						name : 'isAll',
+						inputValue : 1,
+						hideLabel : true,
+						checked : true,
+						boxLabel : '面向全部'
+					},{
+						id : 'selectOnly',
+						name : 'isAll',
+						inputValue : 2,
+						hideLabel : true,
+						boxLabel : '面向特定'
+					}]
+				}, {
 					xtype : 'hidden',
 					id : 'printerId'
 				}]
@@ -1356,7 +1385,8 @@ function operatePrinterHandler(c){
 		Ext.getCmp('txtPrinterAlias').setValue(sn.attributes.alias);
 		Ext.getCmp('printerId').setValue(sn.id);
 		var styles = document.getElementsByName('pStyle');
-	
+		
+		
 		if(styles[0].value == sn.attributes.styleValue){
 			styles[0].checked = true;
 		}else if(styles[1].value == sn.attributes.styleValue){
