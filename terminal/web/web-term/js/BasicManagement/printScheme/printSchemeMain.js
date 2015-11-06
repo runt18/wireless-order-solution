@@ -767,7 +767,7 @@ function init(){
 					hideLabel : true
 				}]
 			}]
-		}],
+		}]
 	});
 	
 	
@@ -891,7 +891,7 @@ function init(){
 						frame : false,
 						defaults : {
 							columnWidth : .25,
-							layout : 'form',
+							layout : 'form'
 						},
 						items : [{
 							items : [{
@@ -1459,7 +1459,10 @@ Ext.onReady(function(){
 		}),
 		
 		loader : new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryPrinterTree.do',
+			dataUrl : '../../OperatePrinter.do',
+			baseParams : {
+				dataSource : 'printerTree'
+			},
 			listeners : {
 				load : function(thiz, node, res){
 					var rn = printerTree.getRootNode().childNodes;
