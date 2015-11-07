@@ -121,6 +121,8 @@ public class CouponOperation implements Jsonable{
 	private long operateDate;
 	private String operateStaff;
 	private String comment;
+	private int memberId;
+	private String memberName;
 	
 	private CouponOperation(InsertBuilder builder){
 		this.couponId = builder.couponId;
@@ -208,6 +210,25 @@ public class CouponOperation implements Jsonable{
 		return this.comment;
 	}
 	
+	public int getMemberId(){
+		return this.memberId;
+	}
+	
+	public void setMemberId(int memberId){
+		this.memberId = memberId;
+	}
+	
+	public String getMemberName(){
+		if(this.memberName == null){
+			return "";
+		}
+		return this.memberName;
+	}
+	
+	public void setMemberName(String name){
+		this.memberName = name;
+	}
+	
 	@Override
 	public int hashCode(){
 		return this.id * 37 + 17;
@@ -240,6 +261,8 @@ public class CouponOperation implements Jsonable{
 		jm.putString("operateDate", DateUtil.format(this.operateDate, DateUtil.Pattern.DATE_TIME));
 		jm.putString("operateStaff", this.operateStaff);
 		jm.putString("comment", this.comment);
+		jm.putInt("memberId", this.memberId);
+		jm.putString("memberName", this.memberName);
 		return jm;
 	}
 
