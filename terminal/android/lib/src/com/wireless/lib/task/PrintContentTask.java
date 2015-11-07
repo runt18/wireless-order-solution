@@ -25,7 +25,7 @@ public abstract class PrintContentTask extends AsyncTask<Void, Void, Void>{
 	protected Void doInBackground(Void... arg0) {
 		ProtocolPackage resp;
 		try {
-			resp = ServerConnector.instance().ask(mReqPrintContent);
+			resp = ServerConnector.instance().ask(mReqPrintContent.build());
 			if (resp.header.type == Type.NAK) {
 				mBusinessException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 			}
