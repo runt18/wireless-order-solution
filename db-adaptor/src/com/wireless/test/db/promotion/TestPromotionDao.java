@@ -282,14 +282,16 @@ public class TestPromotionDao {
 		Assert.assertTrue("coupon birth date", System.currentTimeMillis() - actual.getBirthDate() < 100000);
 		
 		CouponOperation operation = CouponOperationDao.getByCond(mStaff, new CouponOperationDao.ExtraCond().setCoupon(actual.getId())
-																										   .addOperation(CouponOperation.Operate.FAST_ISSUE)).get(0);
+																										   .addOperation(CouponOperation.Operate.FAST_ISSUE)
+																										   .setMemberFuzzy(expectedMember.getName())).get(0);
 		
 		Assert.assertTrue("coupon issue date", System.currentTimeMillis() - operation.getOperateDate() < 100000);
 		Assert.assertEquals("coupon issue staff", mStaff.getName(), operation.getOperateStaff());
 		Assert.assertEquals("coupon issue mode", issueBuilder.getOperation(), operation.getOperate());
 		Assert.assertEquals("coupon issue associate id", issueBuilder.getAssociateId(), operation.getAssociateId());
 		Assert.assertEquals("coupon issue comment", issueBuilder.getComment(), operation.getComment());
-
+		Assert.assertEquals("coupon issue member id", expectedMember.getId(), operation.getMemberId());
+		Assert.assertEquals("coupon issue member name", expectedMember.getName(), operation.getMemberName());
 	}
 	
 	private void compare(Coupon.UseBuilder useBuilder, Member expectedMember, Coupon actual) throws SQLException{
@@ -306,7 +308,8 @@ public class TestPromotionDao {
 		Assert.assertEquals("coupon use mode", useBuilder.getOperation(), operation.getOperate());
 		Assert.assertEquals("coupon use associate id", useBuilder.getAssociateId(), operation.getAssociateId());
 		Assert.assertEquals("coupon use comment", useBuilder.getComment(), operation.getComment());
-
+		Assert.assertEquals("coupon issue member id", expectedMember.getId(), operation.getMemberId());
+		Assert.assertEquals("coupon issue member name", expectedMember.getName(), operation.getMemberName());
 	}
 	
 }

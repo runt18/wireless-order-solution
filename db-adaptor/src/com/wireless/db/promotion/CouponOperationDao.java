@@ -7,9 +7,11 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.member.MemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.staffMgr.Staff;
@@ -23,12 +25,30 @@ public class CouponOperationDao {
 		private int couponId;
 		private DutyRange range;
 		private HourRange hourRange;
+		private CouponOperation.Operate operate;
 		private CouponOperation.OperateType operateType;
 		private int staffId;
 		private int memberId;
+		private String memberFuzzy;
+		private Staff internalStaff;
+		
+		private ExtraCond setInternalStaff(Staff staff){
+			this.internalStaff = staff;
+			return this;
+		}
+		
+		public ExtraCond setMemberFuzzy(String fuzzy){
+			this.memberFuzzy = fuzzy;
+			return this;
+		}
 		
 		public ExtraCond setMember(int memberId){
 			this.memberId = memberId;
+			return this;
+		}
+		
+		public ExtraCond setOperate(CouponOperation.Operate operate){
+			this.operate = operate;
 			return this;
 		}
 		
@@ -114,6 +134,9 @@ public class CouponOperationDao {
 			if(staffId != 0){
 				extraCond.append(" AND operate_staff_id = " + staffId);
 			}
+			if(operate != null){
+				extraCond.append(" AND operate = " + operate.getVal());
+			}
 			if(operateType != null){
 				StringBuilder operateTypeCond = new StringBuilder();
 				for(CouponOperation.Operate operate : operateType.operationOf()){
@@ -125,8 +148,23 @@ public class CouponOperationDao {
 				extraCond.append(" AND operate IN (" + operateTypeCond + ")");
 			}
 			if(memberId != 0){
-				String sql = " SELECT coupon_id FROM " + Params.dbName + ".coupon WHERE member_id = " + memberId;
-				extraCond.append(" AND coupon_id IN ( " + sql + ")");
+				extraCond.append(" AND member_id = " + memberId);
+			}
+			if(memberFuzzy != null){
+				final StringBuilder fuzzyCond = new StringBuilder();
+				try {
+					for(Member member : MemberDao.getByCond(internalStaff, new MemberDao.ExtraCond().setFuzzyName(memberFuzzy), null)){
+						if(fuzzyCond.length() > 0){
+							fuzzyCond.append(",");
+						}
+						fuzzyCond.append(member.getId());
+					}
+					if(fuzzyCond.length() > 0){
+						extraCond.append(" AND member_id IN ( " + fuzzyCond + ")");
+					}
+				} catch (SQLException | BusinessException ignored) {
+					ignored.printStackTrace();
+				}
 			}
 			return extraCond.toString();
 		}
@@ -156,7 +194,7 @@ public class CouponOperationDao {
 		Coupon coupon = CouponDao.getById(dbCon, staff, detail.getCouponId());
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".coupon_operation " +
-			  " (restaurant_id, coupon_id, coupon_name, coupon_price, operate, associate_id, operate_date, operate_staff, operate_staff_id, comment) VALUES( " +
+			  " (restaurant_id, coupon_id, coupon_name, coupon_price, operate, associate_id, operate_date, operate_staff, operate_staff_id, member_id, member_name, comment) VALUES( " +
 			  staff.getRestaurantId() + "," +
 			  coupon.getId() + "," +
 			  "'" + coupon.getName() + "'," +
@@ -166,6 +204,8 @@ public class CouponOperationDao {
 			  " NOW(), " +
 			  "'" + staff.getName() + "'," +
 			  staff.getId() + "," +
+			  coupon.getMember().getId() + "," +
+			  "'" + coupon.getMember().getName() + "'," +
 			  "'" + detail.getComment() + "'" +
 			  ")";
 		dbCon.stmt.executeUpdate(sql);
@@ -206,7 +246,7 @@ public class CouponOperationDao {
 	public static List<CouponOperation> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".coupon_operation WHERE restaurant_id = " + staff.getRestaurantId() +
-			  (extraCond != null ? extraCond : "") +
+			  (extraCond != null ? extraCond.setInternalStaff(staff) : "") +
 			  " ORDER BY operate_date DESC ";
 		
 		final List<CouponOperation> result = new ArrayList<>();
@@ -222,6 +262,8 @@ public class CouponOperationDao {
 			operation.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			operation.setOperateStaff(dbCon.rs.getString("operate_staff"));
 			operation.setComment(dbCon.rs.getString("comment"));
+			operation.setMemberId(dbCon.rs.getInt("member_id"));
+			operation.setMemberName(dbCon.rs.getString("member_name"));
 			result.add(operation);
 		}
 		dbCon.rs.close();
