@@ -1,6 +1,13 @@
 package com.wireless.fragment;
 
-import android.app.Activity;
+import com.wireless.parcel.ComboOrderFoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.dishesOrder.ComboOrderFood;
+import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.util.NumericUtil;
+import com.wireless.ui.R;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,14 +22,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
-import com.wireless.parcel.ComboOrderFoodParcel;
-import com.wireless.parcel.OrderFoodParcel;
-import com.wireless.pojo.dishesOrder.ComboOrderFood;
-import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.pojo.util.NumericUtil;
-import com.wireless.ui.R;
 
 public class PinzhuTasteFragment extends Fragment{
 	
@@ -52,15 +51,15 @@ public class PinzhuTasteFragment extends Fragment{
 	}
 	
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         // Verify that the host activity implements the callback interface
         try {
             // Instantiate the TastePickedListener so we can send events to the host
-        	mTmpTastePickedListener = (OnTmpTastePickedListener) activity;
+        	mTmpTastePickedListener = (OnTmpTastePickedListener) context;
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(activity.toString() + " must implement TmpTastePickedListener");
+            throw new ClassCastException(context.toString() + " must implement TmpTastePickedListener");
         }
     }
     

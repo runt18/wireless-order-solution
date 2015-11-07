@@ -3,7 +3,15 @@ package com.wireless.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
+import com.wireless.parcel.ComboOrderFoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.dishesOrder.ComboOrderFood;
+import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.util.NumericUtil;
+import com.wireless.ui.R;
+
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,14 +21,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
-
-import com.wireless.parcel.ComboOrderFoodParcel;
-import com.wireless.parcel.OrderFoodParcel;
-import com.wireless.pojo.dishesOrder.ComboOrderFood;
-import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.pojo.util.NumericUtil;
-import com.wireless.ui.R;
 
 public class PopTasteFragment extends Fragment{
 
@@ -48,15 +48,15 @@ public class PopTasteFragment extends Fragment{
 	}
 	
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         // Verify that the host activity implements the callback interface
         try {
             // Instantiate the TastePickedListener so we can send events to the host
-        	mTastePickedListener = (OnTastePickedListener) activity;
+        	mTastePickedListener = (OnTastePickedListener) context;
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(activity.toString() + " must implement TastePickedListener");
+            throw new ClassCastException(context.toString() + " must implement TastePickedListener");
         }
     }
 	
@@ -133,7 +133,7 @@ public class PopTasteFragment extends Fragment{
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final View view;
 			if(convertView == null){
-				view = LayoutInflater.from(parent.getContext()).inflate(R.layout.pick_taste_fgm_item, null);
+				view = LayoutInflater.from(parent.getContext()).inflate(R.layout.pick_taste_fgm_item, parent, false);
 			}else{
 				view = convertView;
 			}

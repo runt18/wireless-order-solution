@@ -1068,19 +1068,19 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	}
 	
 	@Override
-	public void onAttach(Activity activity){
-		super.onAttach(activity);
+	public void onAttach(Context context){
+		super.onAttach(context);
 		
 		try{
-			mBtnClickedListener = (OnButtonClickedListener)activity;
+			mBtnClickedListener = (OnButtonClickedListener)context;
 		}catch(ClassCastException ignored){}
 		
 		try{
-			mOrderChangedListener = (OnOrderChangedListener)activity;
+			mOrderChangedListener = (OnOrderChangedListener)context;
 		}catch(ClassCastException ignored){}
 		
 		try{
-			mCommitListener = (OnCommitListener)activity;
+			mCommitListener = (OnCommitListener)context;
 		}catch(ClassCastException ignored){}
 		
 	}

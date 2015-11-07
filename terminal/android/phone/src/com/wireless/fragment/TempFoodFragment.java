@@ -8,7 +8,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import android.app.Activity;
+import com.iflytek.cloud.ErrorCode;
+import com.iflytek.cloud.InitListener;
+import com.iflytek.cloud.RecognizerResult;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.ui.RecognizerDialog;
+import com.iflytek.cloud.ui.RecognizerDialogListener;
+import com.wireless.common.Params;
+import com.wireless.common.WirelessOrder;
+import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.util.NumericUtil;
+import com.wireless.ui.R;
+import com.wireless.ui.dialog.AskOrderAmountDialog.ActionType;
+import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -34,22 +49,6 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.iflytek.cloud.ErrorCode;
-import com.iflytek.cloud.InitListener;
-import com.iflytek.cloud.RecognizerResult;
-import com.iflytek.cloud.SpeechConstant;
-import com.iflytek.cloud.SpeechError;
-import com.iflytek.cloud.ui.RecognizerDialog;
-import com.iflytek.cloud.ui.RecognizerDialogListener;
-import com.wireless.common.Params;
-import com.wireless.common.WirelessOrder;
-import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.util.NumericUtil;
-import com.wireless.ui.R;
-import com.wireless.ui.dialog.AskOrderAmountDialog.ActionType;
-import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 
 public class TempFoodFragment extends Fragment {
 	
@@ -102,7 +101,7 @@ public class TempFoodFragment extends Fragment {
 	}
  
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(Context activity) {
         super.onAttach(activity);
         // Verify that the host activity implements the callback interface
         try {

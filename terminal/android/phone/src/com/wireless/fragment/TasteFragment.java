@@ -4,7 +4,18 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
+import com.wireless.common.WirelessOrder;
+import com.wireless.fragment.PopTasteFragment.OnTastePickedListener;
+import com.wireless.fragment.PopTasteFragment.TasteAdapter;
+import com.wireless.parcel.ComboOrderFoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.dishesOrder.ComboOrderFood;
+import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteCategory;
+import com.wireless.ui.R;
+
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,17 +27,6 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.wireless.common.WirelessOrder;
-import com.wireless.fragment.PopTasteFragment.OnTastePickedListener;
-import com.wireless.fragment.PopTasteFragment.TasteAdapter;
-import com.wireless.parcel.ComboOrderFoodParcel;
-import com.wireless.parcel.OrderFoodParcel;
-import com.wireless.pojo.dishesOrder.ComboOrderFood;
-import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.pojo.tasteMgr.TasteCategory;
-import com.wireless.ui.R;
 
 public class TasteFragment extends Fragment {
 	
@@ -99,7 +99,7 @@ public class TasteFragment extends Fragment {
 			categoryLayout.removeAllViews();
 			
 			for(final TasteCategory category : WirelessOrder.foodMenu.categorys){
-				View view = LayoutInflater.from(fragment.getActivity()).inflate(R.layout.pick_taste_by_all_fgm_category_item, null);
+				View view = LayoutInflater.from(fragment.getActivity()).inflate(R.layout.pick_taste_by_all_fgm_category_item, categoryLayout, false);
 
 				//设置该项名称
 				((TextView)view.findViewById(R.id.txtView_name_allTaste_category_item)).setText(category.getName());
@@ -166,15 +166,15 @@ public class TasteFragment extends Fragment {
 	}
 	
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         // Verify that the host activity implements the callback interface
         try {
             // Instantiate the TastePickedListener so we can send events to the host
-        	mTastePickedListener = (OnTastePickedListener) activity;
+        	mTastePickedListener = (OnTastePickedListener) context;
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(activity.toString() + " must implement TastePickedListener");
+            throw new ClassCastException(context.toString() + " must implement TastePickedListener");
         }
     }
     
