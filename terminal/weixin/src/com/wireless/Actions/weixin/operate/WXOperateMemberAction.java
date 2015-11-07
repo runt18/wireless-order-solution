@@ -36,7 +36,6 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.VerifySMS;
 import com.wireless.pojo.sms.VerifySMS.ExpiredPeriod;
 import com.wireless.pojo.sms.VerifySMS.InsertBuilder;
-import com.wireless.pojo.sms.VerifySMS.VerifyBuilder;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sms.SMS;
 import com.wireless.sms.msg.Msg4Verify;
@@ -216,33 +215,36 @@ public class WXOperateMemberAction extends DispatchAction {
 	public ActionForward bind(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		JObject jobject = new JObject();
-		DBCon dbCon = new DBCon();
+		
+		final String openId = request.getParameter("oid");
+		final String fromId = request.getParameter("fid");
+		final String mobile = request.getParameter("mobile");
+		final String name = request.getParameter("name");
+		
+		final JObject jobject = new JObject();
+		final DBCon dbCon = new DBCon();
 		try{
-			String openId = request.getParameter("oid");
-			String fromId = request.getParameter("fid");
-			String codeId = request.getParameter("codeId");
-			String code = request.getParameter("code");
+			
 			
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
-			Staff staff = StaffDao.getAdminByRestaurant(rid);
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
-			// 验证验证码
-			VerifySMSDao.verify(dbCon, new VerifyBuilder(Integer.valueOf(codeId), Integer.valueOf(code)));
+			final WxMember.BindBuilder builder = new WxMember.BindBuilder(openId, mobile);
 			
-			WxMemberDao.bind(dbCon, staff, new WxMember.BindBuilder(openId, request.getParameter("mobile")));
+			if(name != null && !name.isEmpty()){
+				builder.setName(name);
+			}
+			
+			WxMemberDao.bind(dbCon, staff, builder);
 			
 			dbCon.conn.commit();
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 			
-		}catch(SQLException e){
-			e.printStackTrace();
-			jobject.initTip(e);
 		}finally{
 			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
