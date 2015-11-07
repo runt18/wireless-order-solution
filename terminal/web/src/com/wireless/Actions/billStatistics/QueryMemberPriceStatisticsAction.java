@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcMemberPriceDao;
+import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -30,19 +31,18 @@ import com.wireless.util.DataPaging;
 public class QueryMemberPriceStatisticsAction extends DispatchAction{
 	
 	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
-		String pin = (String) request.getAttribute("pin");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		String beginDate = request.getParameter("beginDate");
-		String endDate = request.getParameter("endDate");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
-		String staffId = request.getParameter("staffId");
+		final JObject jobject = new JObject();
+		final String pin = (String) request.getAttribute("pin");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String beginDate = request.getParameter("beginDate");
+		final String endDate = request.getParameter("endDate");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
+		final String staffId = request.getParameter("staffId");
 		
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			List<Order> list;
 			
 			CalcMemberPriceDao.ExtraCond extraCond = new CalcMemberPriceDao.ExtraCond(DateType.HISTORY);
 			
@@ -54,20 +54,27 @@ public class QueryMemberPriceStatisticsAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			list = CalcMemberPriceDao.getMemberPriceDetail(staff, new DutyRange(beginDate, endDate), extraCond);
+			final List<Order> result;
+			DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
+			if(range != null){
+				result = CalcMemberPriceDao.getMemberPriceDetail(staff, range, extraCond);
+			}else{
+				result = CalcMemberPriceDao.getMemberPriceDetail(staff, new DutyRange(beginDate, endDate), extraCond);
+			}
 			
-			if(!list.isEmpty()){
-				jobject.setTotalProperty(list.size());
+			if(!result.isEmpty()){
+				jobject.setTotalProperty(result.size());
 				Order total = new Order();
-				for (Order item : list) {
+				for (Order item : result) {
 					total.setPurePrice(item.getPurePrice() + total.getPurePrice());
 					total.setActualPrice(item.getActualPrice() + total.getActualPrice());
 				}
-				list = DataPaging.getPagingData(list, true, start, limit);
-				list.add(total);
+				result.clear();
+				result.addAll(DataPaging.getPagingData(result, true, start, limit));
+				result.add(total);
 				
 			}
-			jobject.setRoot(list);
+			jobject.setRoot(result);
 		}catch (SQLException e) {
 			e.printStackTrace();
 			jobject.initTip(e);

@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcRepaidStatisticsDao;
+import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -30,22 +31,20 @@ import com.wireless.util.DataPaging;
 
 public class QueryRepaidReportAction extends DispatchAction{
 
-	public ActionForward normal(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
-		String pin = (String) request.getAttribute("pin");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		String beginDate = request.getParameter("beginDate");
-		String endDate = request.getParameter("endDate");
-		String staffId = request.getParameter("staffId");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final JObject jobject = new JObject();
+		final String pin = (String) request.getAttribute("pin");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String beginDate = request.getParameter("beginDate");
+		final String endDate = request.getParameter("endDate");
+		final String staffId = request.getParameter("staffId");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		try{
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
+			final CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
@@ -55,19 +54,24 @@ public class QueryRepaidReportAction extends DispatchAction{
 				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
 			
-			List<RepaidStatistics> list;
-			list = CalcRepaidStatisticsDao.getRepaidIncomeDetail(staff, new DutyRange(beginDate, endDate), extraCond);
+			List<RepaidStatistics> result;
+			DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
+			if(range != null){
+				result = CalcRepaidStatisticsDao.getRepaidIncomeDetail(staff, range, extraCond);
+			}else{
+				result = CalcRepaidStatisticsDao.getRepaidIncomeDetail(staff, new DutyRange(beginDate, endDate), extraCond);
+			}
 			
-			if(!list.isEmpty()){
-				jobject.setTotalProperty(list.size());
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				jobject.setTotalProperty(result.size());
 				RepaidStatistics total = new RepaidStatistics();
-				for (RepaidStatistics item : list) {
+				for (RepaidStatistics item : result) {
 					total.setRepaidPrice(total.getRepaidPrice() + item.getRepaidPrice());
 				}
-				list = DataPaging.getPagingData(list, true, start, limit);
-				list.add(total);
+				result = DataPaging.getPagingData(result, true, start, limit);
+				result.add(total);
 			}
-			jobject.setRoot(list);
+			jobject.setRoot(result);
 		}catch (SQLException e) {
 			e.printStackTrace();
 			jobject.initTip(e);

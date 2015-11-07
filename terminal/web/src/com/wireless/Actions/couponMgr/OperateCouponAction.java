@@ -12,11 +12,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.staffMgr.Staff;
@@ -47,7 +49,12 @@ public class OperateCouponAction extends DispatchAction{
 			}
 			
 			if(begin != null && !begin.isEmpty() && end != null && !end.isEmpty()){
-				extraCond.setRange(begin, end);
+				DutyRange range = DutyRangeDao.exec(staff, begin, end);
+				if(range != null){
+					extraCond.setRange(range);
+				}else{
+					extraCond.setRange(begin, end);
+				}
 			}
 			
 			if(opening != null && !opening.isEmpty() && ending != null && !ending.isEmpty()){

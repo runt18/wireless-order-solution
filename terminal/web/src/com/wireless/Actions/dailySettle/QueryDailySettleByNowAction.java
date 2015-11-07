@@ -19,6 +19,7 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryDailySettleByNowAction extends Action{
 
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		JObject jobject = new JObject();

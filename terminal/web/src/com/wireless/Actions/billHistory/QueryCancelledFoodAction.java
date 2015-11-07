@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcCancelStatisticsDao;
+import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -40,41 +41,43 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		
 		JObject jobject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String dateBeg = request.getParameter("dateBeg");
-			String dateEnd = request.getParameter("dateEnd");
-			String deptID = request.getParameter("deptID");
-			String reasonID = request.getParameter("reasonID");
-			String staffID = request.getParameter("staffID");
-			String opening = request.getParameter("opening");
-			String ending = request.getParameter("ending");
+			final String pin = (String)request.getAttribute("pin");
+			final String beginDate = request.getParameter("dateBeg");
+			final String endDate = request.getParameter("dateEnd");
+			final String deptId = request.getParameter("deptID");
+			final String reasonId = request.getParameter("reasonID");
+			final String staffId = request.getParameter("staffID");
+			final String opening = request.getParameter("opening");
+			final String ending = request.getParameter("ending");
 			
-			if(dateBeg == null || dateBeg.trim().isEmpty()){
+			if(beginDate == null || beginDate.trim().isEmpty()){
 				jobject.initTip(false, JObject.TIP_TITLE_ERROE, "操作失败, 请指定统计日期开始时间.");
 				return null;
 			}
-			if(dateEnd == null || dateEnd.trim().isEmpty()){
+			if(endDate == null || endDate.trim().isEmpty()){
 				jobject.initTip(false, JObject.TIP_TITLE_ERROE, "操作失败, 请指定统计日期结束时间.");
 				return null;
 			}
 			
-			
-			Integer did = Integer.valueOf(deptID);
-			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
-			OrderFoodDao.ExtraCond4CancelFood extraCond = new OrderFoodDao.ExtraCond4CancelFood(DateType.HISTORY);
+			final OrderFoodDao.ExtraCond4CancelFood extraCond = new OrderFoodDao.ExtraCond4CancelFood(DateType.HISTORY);
 			
-			extraCond.setDutyRange(new DutyRange(dateBeg, dateEnd));
+			DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
+			if(range != null){
+				extraCond.setDutyRange(range);
+			}else{
+				extraCond.setDutyRange(new DutyRange(beginDate, endDate));
+			}
 			
-			if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
-				extraCond.setReasonId(Integer.valueOf(reasonID));
+			if(reasonId != null && !reasonId.isEmpty() && !reasonId.equals("-1")){
+				extraCond.setReasonId(Integer.valueOf(reasonId));
 			}
-			if(did != -1){
-				extraCond.setDeptId(DeptId.valueOf(did));
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
-			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
-				extraCond.setStaffId(Integer.valueOf(staffID));
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
