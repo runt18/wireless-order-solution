@@ -80,6 +80,7 @@ import cn.beecloud.BCEumeration.PAY_CHANNEL;
 import cn.beecloud.BCPay;
 import cn.beecloud.BCPayResult;
 import cn.beecloud.BeeCloud;
+import cn.beecloud.bean.BCPayParameter;
 /**
  * @author yzhang
  *
@@ -653,7 +654,7 @@ class OrderHandler implements Runnable{
 			Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
 			if(restaurant.hasBeeCloud()){
 				BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
-				Map<String, String> optional = new HashMap<String, String>(){
+				Map<String, Object> optional = new HashMap<String, Object>(){
 					private static final long serialVersionUID = 1L;
 					{ 
 						put("payBuilder", JSON.toJSONString(payBuilder.toJsonMap(0)));
@@ -661,12 +662,15 @@ class OrderHandler implements Runnable{
 					}
 				};
 				final Order order = PayOrder.calc(staff, payBuilder);
-				BCPayResult bcPayResult = BCPay.startBCPay(PAY_CHANNEL.WX_NATIVE,
-														   Float.valueOf(order.getActualPrice() * 100).intValue(),
-														   System.currentTimeMillis() + Integer.toString(payBuilder.getOrderId()),
-														   restaurant.getName() + "(’Àµ•∫≈£∫" + payBuilder.getOrderId() + ")", 
-														   optional, 
-														   null, null, null, null);
+				BCPayParameter param = new BCPayParameter(PAY_CHANNEL.WX_NATIVE,
+														  //1,
+														  Float.valueOf(order.getActualPrice() * 100).intValue(), 
+														  System.currentTimeMillis() + Integer.toString(payBuilder.getOrderId()),	//billNo 
+														  restaurant.getName() + "(’Àµ•∫≈£∫" + payBuilder.getOrderId() + ")"			//title
+														  );
+				param.setOptional(optional);
+				BCPayResult bcPayResult = BCPay.startBCPay(param);
+				
 				if(bcPayResult.getType().ordinal() == 0){
 					new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(printType, staff, printers, order, bcPayResult.getCodeUrl()));
 				}else{
