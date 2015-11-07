@@ -34,7 +34,9 @@ public class OperateCouponAction extends DispatchAction{
 		final String end = request.getParameter("endDate");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
+		final String operate = request.getParameter("operate");
 		final String operateType = request.getParameter("operateType");
+		final String memberFuzzy = request.getParameter("memberFuzzy");
 		final JObject jObject = new JObject();
 		try{
 			
@@ -52,12 +54,20 @@ public class OperateCouponAction extends DispatchAction{
 				extraCond.setHourRange(opening, ending);
 			}
 			
+			if(operate != null && !operate.isEmpty()){
+				extraCond.setOperate(CouponOperation.Operate.valueOf(Integer.parseInt(operate)));
+			}
+			
 			if(operateType != null && !operateType.isEmpty()){
 				if(operateType.equalsIgnoreCase("issue")){
 					extraCond.setOperateType(CouponOperation.OperateType.ISSUE);
 				}else if(operateType.equalsIgnoreCase("use")){
 					extraCond.setOperateType(CouponOperation.OperateType.USE);
 				}
+			}
+			
+			if(memberFuzzy != null && !memberFuzzy.isEmpty()){
+				extraCond.setMemberFuzzy(memberFuzzy);
 			}
 			
 			//获取优惠券的操作记录
