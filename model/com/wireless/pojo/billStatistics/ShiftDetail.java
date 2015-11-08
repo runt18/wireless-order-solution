@@ -34,6 +34,8 @@ public class ShiftDetail implements Jsonable{
 	
 	private IncomeByBook incomeByBook;			//预订订金
 	
+	private CouponUsage couponUsage;			//优惠券使用情况
+	
 	private List<IncomeByDept> deptIncome;		//所有部门营业额
 
 	public ShiftDetail(DutyRange range){
@@ -47,6 +49,18 @@ public class ShiftDetail implements Jsonable{
 	
 	public String getOffDuty() {
 		return offDuty;
+	}
+	
+	public void setCouponUsage(CouponUsage usage){
+		this.couponUsage = usage;
+	}
+	
+	public CouponUsage getCouponUsage(){
+		return this.couponUsage;
+	}
+	
+	public boolean hasCouponUsage(){
+		return !this.couponUsage.getIssued().isEmpty() || !this.couponUsage.getUsed().isEmpty();
 	}
 	
 	public IncomeByPay getIncomeByPay(){
@@ -349,6 +363,11 @@ public class ShiftDetail implements Jsonable{
 		
 		//预订金额
 		jm.putFloat("bookIncome", this.getIncomeByBook().getIncome());
+		
+		//优惠券使用情况
+		if(hasCouponUsage()){
+			jm.putJsonable("couponUsage", this.getCouponUsage(), 0);
+		}
 		
 		//部门营收
 		jm.putJsonableList("deptStat", this.getDeptIncome(), 0);
