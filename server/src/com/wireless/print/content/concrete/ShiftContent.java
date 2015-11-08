@@ -130,7 +130,7 @@ public class ShiftContent extends ConcreteContent {
 		if(chargeIncome.getTotalAccountCharge() != 0 || chargeIncome.getTotalAccountRefund() != 0){
 			StringBuilder chargeInfo = new StringBuilder();
 			
-			chargeInfo.append(mSeperatorLine);
+			chargeInfo.append(mSeperatorLine).append(SEP);
 			if(chargeIncome.getChargeAmount() > 0){
 				chargeInfo.append(new CenterAlignedDecorator("会员充值(" + chargeIncome.getChargeAmount() + "次)", getStyle()).toString()).append(SEP);
 			}else{
@@ -166,8 +166,8 @@ public class ShiftContent extends ConcreteContent {
 		//replace the $(var_7) with the coupon usage
 		if(mShiftDetail.hasCouponUsage()){
 			StringBuilder couponUsage = new StringBuilder();
-			couponUsage.append(new CenterAlignedDecorator("优惠券使用统计", mStyle));
-			couponUsage.append(mSeperatorLine);
+			couponUsage.append(mSeperatorLine).append(SEP);
+			couponUsage.append(new CenterAlignedDecorator("优惠券统计", mStyle)).append(SEP).append(SEP);
 			for(CouponUsage.Usage used : mShiftDetail.getCouponUsage().getUsed()){
 				couponUsage.append("用券【" + used.getName() + "】" + used.getAmount() + "张, 共￥" + used.getPrice()).append(SEP);
 			}
