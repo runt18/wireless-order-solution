@@ -416,7 +416,9 @@ class OrderHandler implements Runnable{
 	
 	private ProtocolPackage doInsertOrderForce(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		//handle insert order request force
-		Order newOrder = new Parcel(request.body).readParcel(Order.InsertBuilder.CREATOR).build();
+		final Order.InsertBuilder builder = new Parcel(request.body).readParcel(Order.InsertBuilder.CREATOR);
+		
+		final Order newOrder = builder.build();
 		
 		Table tblToOrder = TableDao.getById(staff, newOrder.getDestTbl().getId());
 		
@@ -430,7 +432,8 @@ class OrderHandler implements Runnable{
 																					 new Order.UpdateBuilder(oriOrder)
 																							  .addOri(oriOrder.getOrderFoods())
 																							  .addNew(newOrder.getOrderFoods(), staff)
-																							  .setWxOrders(newOrder.getWxOrders()), 
+																							  .setWxOrders(newOrder.getWxOrders())
+																							  .addPrinters(builder.getPrinters()), 
 																					 PrintOption.valueOf(request.header.reserved)));
 			if(resp.header.type == Type.NAK){
 				throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
