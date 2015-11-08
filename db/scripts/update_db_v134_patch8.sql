@@ -168,6 +168,20 @@ ALTER TABLE `wireless_order_db`.`member`
 DROP COLUMN `taboo`,
 DROP COLUMN `taste_pref`;
 
+-- -----------------------------------------------------
+-- Add the field 'oriented' to table 'printer'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`printer` 
+ADD COLUMN `oriented` TINYINT NOT NULL DEFAULT 1 COMMENT 'the oriented as below\n1 - 全部\n2 - 特定' AFTER `enabled`;
+
+-- -----------------------------------------------------
+-- Add the field 'member_id' & 'member_name' to table 'coupon_operation'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`coupon_operation` 
+ADD COLUMN `member_id` INT NULL DEFAULT NULL COMMENT '' AFTER `operate_staff_id`,
+ADD COLUMN `member_name` VARCHAR(45) NULL DEFAULT NULL COMMENT '' AFTER `member_id`,
+ADD INDEX `ix_member_id` (`member_id` ASC)  COMMENT '';
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
