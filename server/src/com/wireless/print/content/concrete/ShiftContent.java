@@ -1,5 +1,6 @@
 package com.wireless.print.content.concrete;
 
+import com.wireless.pojo.billStatistics.CouponUsage;
 import com.wireless.pojo.billStatistics.IncomeByBook;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByPay.PaymentIncome;
@@ -151,7 +152,7 @@ public class ShiftContent extends ConcreteContent {
 			mTemplate = mTemplate.replace(PVar.VAR_5, "");
 		}
 		
-		//replace the $(var_5) with the book income
+		//replace the $(var_6) with the book income
 		IncomeByBook bookIncome = mShiftDetail.getIncomeByBook();
 		if(bookIncome.getIncome() > 0){
 			StringBuilder bookInfo = new StringBuilder();
@@ -162,6 +163,20 @@ public class ShiftContent extends ConcreteContent {
 			mTemplate = mTemplate.replace(PVar.VAR_6, "");
 		}
 		
+		//replace the $(var_7) with the coupon usage
+		if(mShiftDetail.hasCouponUsage()){
+			StringBuilder couponUsage = new StringBuilder();
+			couponUsage.append(mSeperatorLine);
+			for(CouponUsage.Usage used : mShiftDetail.getCouponUsage().getUsed()){
+				couponUsage.append("用券【" + used.getName() + "】" + used.getAmount() + "张, 共￥" + used.getPrice()).append(SEP);
+			}
+			for(CouponUsage.Usage issue : mShiftDetail.getCouponUsage().getIssued()){
+				couponUsage.append("发券【" + issue.getName() + "】" + issue.getAmount() + "张, 共￥" + issue.getPrice()).append(SEP);
+			}
+			mTemplate = mTemplate.replace(PVar.VAR_7, couponUsage);
+		}else{
+			mTemplate = mTemplate.replace(PVar.VAR_7, "");
+		}
 		return mTemplate;
 		
 	}

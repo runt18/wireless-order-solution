@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
+import com.wireless.db.billStatistics.CalcCouponStatisticsDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -14,6 +15,7 @@ import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.CouponUsage;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.dishesOrder.Order;
@@ -252,8 +254,9 @@ public class JobContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Restaurant restaurant = RestaurantDao.getById(dbCon, staff.getRestaurantId());
-			WxRestaurant wxRestaurant = WxRestaurantDao.get(dbCon, staff);
+			final Restaurant restaurant = RestaurantDao.getById(dbCon, staff.getRestaurantId());
+			final WxRestaurant wxRestaurant = WxRestaurantDao.get(dbCon, staff);
+			final CouponUsage couponUsage = CalcCouponStatisticsDao.calcUsage(dbCon, staff, new CalcCouponStatisticsDao.ExtraCond().setAssociateId(order.getId()));
 			final int receiptStyle = SystemDao.getSetting(dbCon, staff.getRestaurantId()).getReceiptStyle();
 			
 			final List<JobContent> jobContents = new ArrayList<JobContent>();
@@ -275,7 +278,8 @@ public class JobContentFactory {
 													  			   printType, 
 													  			   printer.getStyle()).setEnding(func.getComment())
 																					  .setMember(member)
-																					  .setWxPayUrl(wxPayUrl);
+																					  .setWxPayUrl(wxPayUrl)
+																					  .setCouponUsage(couponUsage);
 						jobContents.add(new JobContent(printer, func.getRepeat(), printType, content));
 					}
 				}

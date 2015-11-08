@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Map.Entry;
 
+import com.wireless.pojo.billStatistics.CouponUsage;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.Member;
@@ -32,6 +33,7 @@ public class ReceiptContent extends ConcreteContent {
 	private String ending;
 	private Member member;
 	private String wxPayUrl;
+	private CouponUsage couponUsage;
 	
 	public ReceiptContent(int receiptStyle, Restaurant restaurant, WxRestaurant wxRestaurant, Order order, String waiter, PType printType, PStyle style) {
 		super(printType, style);
@@ -55,6 +57,11 @@ public class ReceiptContent extends ConcreteContent {
 	
 	public ReceiptContent setWxPayUrl(String wxPayUrl){
 		this.wxPayUrl = wxPayUrl;
+		return this;
+	}
+	
+	public ReceiptContent setCouponUsage(CouponUsage usage){
+		this.couponUsage = usage;
 		return this;
 	}
 	
@@ -162,8 +169,7 @@ public class ReceiptContent extends ConcreteContent {
 				.append(SEP).append(new char[]{0x1B, 0x61, 0x00});
 		}
 		
-
-		
+		//混合结账信息
 		if(mOrder.getPaymentType().isMixed()){
 			StringBuilder mixedDetail = new StringBuilder();
 			for(Entry<PayType, Float> entry : mOrder.getMixedPayment().getPayments().entrySet()){
@@ -175,9 +181,21 @@ public class ReceiptContent extends ConcreteContent {
 			}
 			var3.append(SEP + new RightAlignedDecorator(mixedDetail.toString(), mStyle));
 		}
+		
+		//优惠券使用情况
+		if(this.couponUsage != null){
+			for(CouponUsage.Usage used : couponUsage.getUsed()){
+				var3.append(SEP).append(new RightAlignedDecorator("用券【" + used.getName() + "】" + used.getAmount() + "张, 共￥" + used.getPrice(), mStyle));
+			}
+			for(CouponUsage.Usage issued : couponUsage.getIssued()){
+				var3.append(SEP).append(new RightAlignedDecorator("发券【" + issued.getName() + "】" + issued.getAmount() + "张, 共￥" + issued.getPrice(), mStyle));
+			}
+		}
+		
+		//replace the $(var_3) with payment info
 		mTemplate = mTemplate.replace(PVar.VAR_3, var3.toString());
 		
-		//generate the comment and replace the $(var_3)
+		//generate the comment
 		if(mOrder.getComment().isEmpty()){
 			mTemplate = mTemplate.replace(PVar.RECEIPT_COMMENT, "");
 		}else{
@@ -270,16 +288,13 @@ public class ReceiptContent extends ConcreteContent {
 			if(line3.length() > 0){
 				line3.append("  ");
 			}
-			//TODO list the coupons
 			line3.append(mOrder.getCouponPrice() > 0 ? "优惠券：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getCouponPrice()) : "");
 		}
 		
-		StringBuilder line4 = new StringBuilder();
 		
 		String var = new RightAlignedDecorator(line1.toString(), mStyle).toString() +
 					 (line2.length() != 0 ? SEP + new RightAlignedDecorator(line2.toString(), mStyle) : "").toString() +
-					 (line3.length() != 0 ? SEP + new RightAlignedDecorator(line3.toString(), mStyle) : "").toString() +
-					 (line4.length() != 0 ? SEP + new RightAlignedDecorator(line4.toString(), mStyle) : "").toString();
+					 (line3.length() != 0 ? SEP + new RightAlignedDecorator(line3.toString(), mStyle) : "").toString();
 		
 		try{
 			var = new String(var.getBytes("GBK"), "GBK");
