@@ -72,6 +72,11 @@ public class CouponOperationDao {
 			return this;
 		}
 		
+		public ExtraCond setRange(DutyRange range){
+			this.range = range;
+			return this;
+		}
+		
 		public ExtraCond setRange(String begin, String end){
 			this.range = new DutyRange(begin, end);
 			return this;

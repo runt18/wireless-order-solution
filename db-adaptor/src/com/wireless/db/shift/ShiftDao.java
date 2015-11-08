@@ -7,6 +7,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
+import com.wireless.db.billStatistics.CalcCouponStatisticsDao;
 import com.wireless.db.billStatistics.CalcMemberStatisticsDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
@@ -280,6 +281,9 @@ public class ShiftDao {
 		
 		//Get the income by book
 		result.setIncomeByBook(CalcBillStatisticsDao.calcIncomeByBook(dbCon, staff, range));
+		
+		//Get the coupon usage
+		result.setCouponUsage(CalcCouponStatisticsDao.calcUsage(dbCon, staff, new CalcCouponStatisticsDao.ExtraCond().setRange(range)));
 		
 		//Get the gift, discount & total to each department during this period.
 		result.setDeptIncome(CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond));
