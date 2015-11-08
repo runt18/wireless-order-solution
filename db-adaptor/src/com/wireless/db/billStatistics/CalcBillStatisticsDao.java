@@ -524,7 +524,8 @@ public class CalcBillStatisticsDao {
 		      " WHERE 1 = 1 " +
 		      (extraCond != null ? extraCond.toString() : "") +
 		      " AND O.restaurant_id = " + staff.getRestaurantId() +
-		      " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
+		      " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+		      " GROUP BY O.id ";
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		IncomeByCoupon couponIncome = new IncomeByCoupon();
