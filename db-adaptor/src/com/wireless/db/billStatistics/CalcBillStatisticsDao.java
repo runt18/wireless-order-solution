@@ -517,15 +517,17 @@ public class CalcBillStatisticsDao {
 		
 		String sql;
 		
-		sql = " SELECT " +
-		      " COUNT(*) AS amount, ROUND(SUM(O.coupon_price), 2) AS total_coupon " +
-		      " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
-		      " JOIN " + Params.dbName + ".coupon_operation CO ON O.id = CO.associate_id AND CO.operate = " + CouponOperation.Operate.ORDER_USE.getVal() + 
-		      " WHERE 1 = 1 " +
-		      (extraCond != null ? extraCond.toString() : "") +
-		      " AND O.restaurant_id = " + staff.getRestaurantId() +
-		      " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-		      " GROUP BY O.id ";
+		sql = " SELECT COUNT(*) AS amount, SUM(TMP.coupon_price) AS total_coupon FROM " +
+			  " ( " +
+				  " SELECT O.coupon_price " +
+			      " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
+			      " JOIN " + Params.dbName + ".coupon_operation CO ON O.id = CO.associate_id AND CO.operate = " + CouponOperation.Operate.ORDER_USE.getVal() + 
+			      " WHERE 1 = 1 " +
+			      (extraCond != null ? extraCond.toString() : "") +
+			      " AND O.restaurant_id = " + staff.getRestaurantId() +
+			      " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			      " GROUP BY O.id " +
+			   " ) AS TMP ";
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		IncomeByCoupon couponIncome = new IncomeByCoupon();
