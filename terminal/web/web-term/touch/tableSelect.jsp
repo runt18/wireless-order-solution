@@ -87,7 +87,6 @@
 		</div>	
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="ts.displayPrintConnection()">打印机诊断</a>
-		 	<a data-role="button" data-inline="true" class="topBtnFont" id="printBind_a_tableSelect">打印机绑定</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageMemberOperation">会员</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="toOrderMgrPage()">账单</a>
 		 	<a id="personSettle_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">交款</a>
@@ -172,6 +171,7 @@
 	<div data-role="popup" id="tableSelectOtherOperateCmp" data-theme="d">
         <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
          	<li id="fastFood_li_tableSelect" class="tempFoodKitchen" style="display:none;"><a >快餐模式</a></li>
+         	<li id="printBind_a_tableSelect" class="tempFoodKitchen"><a>打印机绑定</a></li>
          	<li class="tempFoodKitchen"  onclick="ts.displayFeastPayWin()"><a>酒席入账</a></li>
             <li class="tempFoodKitchen" onclick="ts.openMultiOpenTableCmp()"><a >多台开席</a></li>
             <li class="tempFoodKitchen" onclick="ts.openMultiPayTableCmp()"><a >拼台</a></li>

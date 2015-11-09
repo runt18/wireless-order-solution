@@ -124,7 +124,31 @@ $(function(){
 	//	var weixinMemberCard = $('#divWXMemberCard');
 		var defaultMemberDiscount = $('#fontMemberDiscount');
 		var memberTotalPoint = $('#fontMemberPoint');
+		var myCoupon = $('#myCoupon');
 		
+		$.ajax({
+			url : '../../WxOperateCoupon.do',
+			type : 'post',
+			data : {
+				dataSource : 'getByCond',
+				status : 'issued',
+				expired : false,
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			dataType : 'json',
+			success : function(data, status, xhr){
+				Util.lm.hide();
+				if(data.success){
+					var couponAmount = 0;
+					if(data.root.length > 0){
+						myCoupon.html(data.root.length + '张');
+					}else{
+						myCoupon.html('无优惠券');
+					}
+				}
+			}
+		});
 	//	restaurantName.html(typeof data.restaurant == 'undefined' ? '--' : data.restaurant.name);
 		name.html(typeof data.name == 'undefined' ? '--' : data.name);
 		mobile.html(typeof data.mobile == 'undefined' ? '--' : data.mobile);

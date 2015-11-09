@@ -3,7 +3,7 @@
 function MemberReadPopup(param){
 	
 	param = param || {
-		confirm : function(member, discount, pricePlan){}	//会员读取后的确定事件
+		confirm : function(member, discount, pricePlan){},	//会员读取后的确定事件
 	};
 	
 	var _self = this;
@@ -108,9 +108,16 @@ function MemberReadPopup(param){
 			success : function(jr, status, xhr){
 				Util.LM.hide();
 				if(jr.success){
+					var coupons = [];
 					if(jr.root.length == 1){
 						Util.msg.alert({msg : '会员信息读取成功.', topTip : true});
-						loadMemberInfo(jr.root[0], self);
+						//获取优惠券信息
+						$.post('../OperateCoupon.do', {dataSource : 'getByCond', status : 'issued', expired : false, memberId : jr.root[0].id}, function(response, status, xhr){
+							if(response.success){
+									coupons = coupons.concat(response.root);
+									loadMemberInfo(jr.root[0], self, coupons);
+							}
+						}, 'json');
 						$('#selectSearch_div_memberRead').hide();
 						$('#eachSearch_ul_memberRead').hide();
 					}else if(jr.root.length > 1){
@@ -149,15 +156,17 @@ function MemberReadPopup(param){
 				alert(err);
 			}
 		}); 	
+		
 	}
 	
-	function loadMemberInfo(member, self){
+	function loadMemberInfo(member, self, coupon){
 		self.find('[id=name_lable_memberRead]').text(member.name);
 		self.find('[id=memberType_label_memberRead]').text(member.memberType.name);
 		self.find('[id=balance_label_memberRead]').text(member.totalBalance);
 		self.find('[id=point_label_memberRead]').text(member.point);
 		self.find('[id=phone_label_memberRead]').text(member.mobile ? member.mobile : '----');
 		self.find('[id=payment4MemberCard]').text(member.memberCard ? member.memberCard : '----');	
+		self.find('[id=memberCoupon_label_read]').text(coupon.length ? coupon.length + '张' : '没有优惠券');
 		
 		self.find('[id=defaultDiscount_label_memberRead]').text(member.memberType.discount.name);
 		self.find('[id=defaultDiscount_label_memberRead]').attr('data-value', member.memberType.discount.id);
