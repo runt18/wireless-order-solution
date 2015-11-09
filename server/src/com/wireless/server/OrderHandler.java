@@ -389,7 +389,7 @@ class OrderHandler implements Runnable{
 		
 		//Add the specific printers.
 		for(Printer orientedPrinter : builder.getPrinters()){
-			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setId(orientedPrinter.getId()).setOriented(Printer.Oriented.SPECIFIC)));
+			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setId(orientedPrinter.getId()).setOriented(Printer.Oriented.SPECIFIC)));
 		}
 		
 		Order orderToInsert = InsertOrder.exec(staff, builder);
@@ -454,7 +454,7 @@ class OrderHandler implements Runnable{
 		
 		//Add the specific printers.
 		for(Printer orientedPrinter : builder.getPrinters()){
-			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setId(orientedPrinter.getId()).setOriented(Printer.Oriented.SPECIFIC)));
+			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setId(orientedPrinter.getId()).setEnabled(true).setOriented(Printer.Oriented.SPECIFIC)));
 		}
 		
 		final DiffResult diffResult = UpdateOrder.exec(staff, builder);
@@ -566,7 +566,7 @@ class OrderHandler implements Runnable{
 		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setOriented(Printer.Oriented.ALL));
 		//Add the specific printers.
 		for(Printer orientedPrinter : payBuilder.getPrinters()){
-			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setId(orientedPrinter.getId()).setOriented(Printer.Oriented.SPECIFIC)));
+			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setId(orientedPrinter.getId()).setEnabled(true).setOriented(Printer.Oriented.SPECIFIC)));
 		}
 		
 		final PrintHandler printHandler = new PrintHandler(staff);
