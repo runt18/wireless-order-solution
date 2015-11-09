@@ -166,7 +166,7 @@ function MemberReadPopup(param){
 		self.find('[id=point_label_memberRead]').text(member.point);
 		self.find('[id=phone_label_memberRead]').text(member.mobile ? member.mobile : '----');
 		self.find('[id=payment4MemberCard]').text(member.memberCard ? member.memberCard : '----');	
-		self.find('[id=memberCoupon_label_read]').text(coupon.length ? coupon.length + '张' : '没有优惠券');
+		self.find('[id=memberCoupon_label_read]').text(coupon.length ? coupon.length + '张' : '----');
 		
 		self.find('[id=defaultDiscount_label_memberRead]').text(member.memberType.discount.name);
 		self.find('[id=defaultDiscount_label_memberRead]').attr('data-value', member.memberType.discount.id);

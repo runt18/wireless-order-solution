@@ -1,4 +1,5 @@
 Ext.onReady(function(){
+	
 	var beginDate = new Ext.form.DateField({
 		xtype : 'datefield',
 		format : 'Y-m-d',
@@ -143,12 +144,12 @@ Ext.onReady(function(){
 		xtype : 'textfield',
 		id : 'memeberName_textfield',
 		width : 150,
-		allowBlank : false
 	}, '->', {
 		text : '搜索',
 		id : 'coupon_btnSearch',
 		iconCls : 'btn_search',
 		handler : function(e){
+			
 			if(!beginDate.isValid() || !endDate.isValid){
 				return;
 			}
@@ -190,6 +191,12 @@ Ext.onReady(function(){
 //			}
 		}
 	}];
+	
+//	Ext.getCmp('memeberName_textfield').getEl().on('keypress', function(event){
+//		if(event.keyCode == '13'){
+//			Ext.getCmp('coupon_btnSearch').handler();
+//		}
+//	});
 	
 	//头部
 	var statisticsTbar = Ext.ux.initTimeBar({
@@ -285,6 +292,14 @@ Ext.onReady(function(){
 	
 	//定义couponGrid的位置
 	couponGrid.region = 'center';
+	
+	couponGrid.keys = [{
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			Ext.getCmp('coupon_btnSearch').handler();
+		}
+	}];
 	
 	var couponDetailPanel = new Ext.Panel({
 		title : '会员价明细',

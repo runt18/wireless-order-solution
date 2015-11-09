@@ -39,8 +39,6 @@ function PrintBindPopup(){
 				if(jr.success){
 					var prints1 = "";
 					var prints2 = "";
-					var prints3 = "";
-					
 					var printCookie = getcookie(document.domain + '_printers').split(',');
 					
 					for(var i = 0; i < jr.root.length; i++){
@@ -63,12 +61,10 @@ function PrintBindPopup(){
 						}
 						
 						
-						if(i % 3 == 0){
+						if(i % 2 == 0){
 							prints1 += eachPrint;
-						}else if(i % 3 == 1){
+						}else if(i % 2 == 1){
 							prints2 += eachPrint;
-						}else{
-							prints3 += eachPrint;
 						}
 					}
 					
@@ -77,9 +73,6 @@ function PrintBindPopup(){
 					
 					self.find('[id=printTal2_table_print]').append(prints2);
 					self.find('[id=printTal2_table_print]').trigger('create').trigger('refresh');
-					
-					self.find('[id=printTal3_table_print]').append(prints3);
-					self.find('[id=printTal3_table_print]').trigger('create').trigger('refresh');
 				}
 			}, 'json');
 			
