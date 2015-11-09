@@ -166,6 +166,8 @@ public class CouponOperationDao {
 					}
 					if(fuzzyCond.length() > 0){
 						extraCond.append(" AND member_id IN ( " + fuzzyCond + ")");
+					}else{
+						extraCond.append(" AND member_id = -1");
 					}
 				} catch (SQLException | BusinessException ignored) {
 					ignored.printStackTrace();
