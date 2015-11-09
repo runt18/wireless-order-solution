@@ -61,7 +61,8 @@ Ext.onReady(function(){
 		selectOnFocus : true,
 		listeners : {
 			render : function(thiz){
-				thiz.store.loadData([['', '全部'], ['issue', '账单发券'], ['use', '账单用券']]);
+				thiz.store.loadData([['', '全部'], ['1', '快速发券'], ['2', '账单发券'], ['20', '手动用券'], ['21', '账单用券'], ['22', '微信关注用券']]);
+				thiz.setValue('');
 			},
 			select : function(){
 				Ext.getCmp('coupon_btnSearch').handler();
@@ -132,7 +133,18 @@ Ext.onReady(function(){
 	}, {
 		xtype : 'tbtext',
 		text : '操作类型 :'
-	}, couponType, '->', {
+	}, couponType, {
+		xtype : 'tbtext',
+		width : 30
+	}, {
+		xtype : 'tbtext',
+		text : '会员手机/会员卡号/会员名'
+	}, {
+		xtype : 'textfield',
+		id : 'memeberName_textfield',
+		width : 150,
+		allowBlank : false
+	}, '->', {
 		text : '搜索',
 		id : 'coupon_btnSearch',
 		iconCls : 'btn_search',
@@ -147,6 +159,8 @@ Ext.onReady(function(){
 				businessHour =  Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'coupon_'}).data;
 			}
 			
+			var memeberName = Ext.getCmp('memeberName_textfield');
+			
 			var store = couponGrid.getStore();
 			store.baseParams['dataSource'] = 'getOperations',
 			store.baseParams['beginDate'] = Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00');
@@ -154,7 +168,8 @@ Ext.onReady(function(){
 			store.baseParams['staffId'] = couponStaff.getValue() < 0 ? '' : couponStaff.getValue();
 			store.baseParams['opening'] = businessHour.opening;
 			store.baseParams['ending'] = businessHour.ending;
-			store.baseParams['operateType'] = couponType.getValue();
+			store.baseParams['operate'] = couponType.getValue();
+			store.baseParams['memberFuzzy'] = memeberName.getValue();
 			store.load({
 				params : {
 					start : 0,
@@ -196,6 +211,7 @@ Ext.onReady(function(){
 	    {header : '面额', dataIndex : 'couponPrice', renderer : Ext.ux.txtFormat.gridDou},
 	    {header : '操作类型', dataIndex : 'operateText'},
 	    {header : '关联信息', dataIndex : 'associateId', renderer : couponLinkOrderId},
+	    {header : '会员', dataIndex : 'memberName', renderer : couponMemberName},
 	    {header : '操作人', dataIndex : 'operateStaff'},
 	    {header : '备注', dataIndex : 'comment'}
    ]);
@@ -213,6 +229,7 @@ Ext.onReady(function(){
              {name : 'operateText'},
              {name : 'associateId'},
              {name : 'operateStaff'},
+             {name : 'memberName'},
              {name : 'comment'}
         ]),
         listeners : {
@@ -282,6 +299,17 @@ Ext.onReady(function(){
 		return '<a class="couponLinkId">' + v + '</a>';
 	}
 	
+	
+	//会员名称
+	function couponMemberName(v){
+		if(v){
+			return '<font>'+ v + '</font>';
+		}else{
+			return '<font>无</font>'
+		}
+	}
+	
+
 	//显示账单窗口
 	function couponShowDetail(associateId){
 		couponWin = new Ext.Window({

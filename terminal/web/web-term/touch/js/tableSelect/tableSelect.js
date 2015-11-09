@@ -654,10 +654,13 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 	
 	//打印机绑定按钮
 	$('#printBind_a_tableSelect').click(function(){
-		var printBindPopup = new PrintBindPopup();
-		printBindPopup.open();
+		$('#tableSelectOtherOperateCmp').popup('close');
+		setTimeout(function(){
+			var printBindPopup = new PrintBindPopup();
+			printBindPopup.open();
+		}, 300);
+		
 	});
-	
 	
 	
 });

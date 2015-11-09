@@ -58,7 +58,7 @@ function UseCouponPopup(param){
 					var progressCouponThree = "";
 					for(var i = 0; i < availCoupons.length; i++){
 					
-						var eachProgressCoupon = '<tr>'
+						var eachProgressCoupon = '<tr align="center">'
 											 + '<td style="width:250px">'
 											 + '<label style="height:50px"><input $(input_checked) type="checkbox" class="useCouponClass" data-theme="e" coupon_id="' + availCoupons[i].couponId + '">' + availCoupons[i].couponType.name + '<font style="float:right" color="red">$(word)</font>' +'</label>'
 											 + '</td>'

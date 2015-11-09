@@ -697,7 +697,9 @@ of.foodHangup = function(c){
 			}
 			of.newFood[i].isHangup = isHangup;
 		}
-		of.initNewFoodContent();
+		of.initNewFoodContent({
+			data : of.newFood
+		});
 	}else if(c.type == 2){
 		var foodContent = $('#orderFoodsCmp > li[data-theme=e]');
 		if(foodContent.length != 1){
