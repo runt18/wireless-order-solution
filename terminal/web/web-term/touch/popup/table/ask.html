@@ -1,0 +1,28 @@
+<head>
+<meta charset="UTF-8">
+</head>
+<div id="tableSelect_div_askTable" data-role="popup" data-dismissible="false" class="ui-overlay-shadow ui-corner-all" style="width: 460px;min-width:500px;background-color: white;">	
+    <div id="title_div_askTable" data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b win_head">
+        	请输入相关信息
+    </div>
+    <table style="width:90%">
+	   	<tr>
+	   		<td>
+	   			<input id="left_input_askTable" class="numberInputStyle" onkeyup="value=value.replace(/[+]/g,'')" type="text" placeholder="填写台号">
+	   		</td>
+	   	</tr>
+    </table>
+    <hr>
+	<div id="matchedTables_div_askTable" style="width: inherit;"  align="left">
+<!-- 			<a onclick="" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index=0 data-value=2 data-theme="c">
+				<div>牡丹<br>111</div>
+			</a>    -->
+	</div>
+	<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
+		 <div data-role="controlgroup" data-type="horizontal" data-corners="false" class="bottomBarFullWidth ui-bar-b barBottomBeCorner" >
+		 	<a id="left_a_askTable" data-role="button" class="tablePopbottomBtn" data-theme="b" data-inline="true">结账(Enter)</a>
+			<a id="middle_a_askTable" data-role="button" data-theme="b" data-inline="true" class="tablePopbottomBtn">确定</a>
+			<a id="right_a_askTable" data-role="button" data-theme="b" data-inline="true" class="tablePopbottomBtn">取消</a>		 
+		 </div>
+    </div>
+</div>		
