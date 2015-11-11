@@ -46,6 +46,9 @@
 <script type="text/javascript" src="js/stopSet/stopSet.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/payment/payment.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/tableSelect/tableSelect.js?v=<%=v %>"></script>
+<!-- 共享数据 -->
+<script type="text/javascript" src="js/global/share.js?v=<%=v %>"></script>
+<script type="text/javascript" src="js/global/tables.js?v=<%=v %>"></script>
 <!-- 数字键盘控件 -->
 <script type="text/javascript" src="js/numKeyBoard/numKeyBoard.js?v=<%=v %>"></script>
 <!-- 餐台选择控件 -->
@@ -122,8 +125,7 @@
      </div>
      <div class="ui-block-b" style="width: 120px;height: inherit;border-left: 1px solid white;">
     	<a id="labTableStatus" data-role="button" data-theme="e" data-inline="true" class="regionBtn" data-icon="arrow-d" data-iconpos="right" data-rel="popup"  data-transition="pop" href="#popupAllStatusCmp">全部台</a>
-    	<a data-role="button" data-theme="e" data-inline="true" data-type="region" class="regionBtn" onclick="ts.addTables({event:this, id:-1})">全部区域</a>
-    	<div style="height: 470px;overflow-y: auto;overflow-x: hidden;">
+    	<div style="height: 510px;overflow-y: auto;overflow-x: hidden;">
     	<div id="divSelectRegionForTS">
 	    	<!-- <a data-role="button" data-inline="true" class="regionBtn" onclick="">区域1</a> -->
     	</div>
@@ -133,9 +135,9 @@
    
 	<div data-role="popup" id="popupAllStatusCmp" data-theme="d" >
         <ul data-role="listview" data-inset="true" style="min-width:100px;" data-theme="b">
-            <li class="tempFoodKitchen" data-icon="false"><a onclick="ts.selectFreeStatus({event:this})">空闲台( <label id="ts_freeTablesCount" style="color: #f7c942;">0</label> )</a></li>
-            <li class="tempFoodKitchen" data-icon="false"><a onclick="ts.selectBusyStatus({event:this})">就餐台( <label id="ts_busyTablesCount" style="color: #f7c942;">0</label> )</a></li>
-            <li class="tempFoodKitchen" data-icon="false"><a onclick="ts.selectAllStatus({event:this})">全部台</a></li>
+            <li id="idleTable_li_tableSelect" class="tempFoodKitchen" data-icon="false"><a>空闲台( <label id="ts_freeTablesCount" style="color: #f7c942;">0</label> )</a></li>
+            <li id="busyTable_li_tableSelect" class="tempFoodKitchen" data-icon="false"><a>就餐台( <label id="ts_busyTablesCount" style="color: #f7c942;">0</label> )</a></li>
+            <li id="allTable_li_tableSelect" class="tempFoodKitchen" data-icon="false"><a>全部台</a></li>
         </ul>
 	</div>	
 
