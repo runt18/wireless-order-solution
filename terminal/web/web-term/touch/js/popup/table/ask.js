@@ -140,7 +140,7 @@ function AskTablePopup(param){
 				html.push(tableCmpTemplate.format({
 					dataIndex : i,
 					id : matchedTables[i].id,
-					click : 'ts.toOrderFoodOrTransFood({alias:'+ matchedTables[i].alias +',id:'+ matchedTables[i].id +'})',
+					//click : 'ts.toOrderFoodOrTransFood({alias:'+ matchedTables[i].alias +',id:'+ matchedTables[i].id +'})',
 					alias : aliasOrName,
 					theme : matchedTables[i].statusValue == '1' ? "e" : "c",
 					name : matchedTables[i].name,
@@ -164,9 +164,9 @@ function AskTablePopup(param){
 		var matchedTables = [];
 		for(var i = 0; i < param.tables.length; i++){
 			if((param.tables[i].name + '').indexOf(inputVal.trim().toUpperCase()) != -1){
-				matchedTables.push(temp[i]);
+				matchedTables.push(param.tables[i]);
 			}else if((param.tables[i].alias + '').indexOf(inputVal.trim()) != -1){
-				matchedTables.push(temp[i]);
+				matchedTables.push(param.tables[i]);
 			}
 			if(matchedTables.length == 8){
 				break;
