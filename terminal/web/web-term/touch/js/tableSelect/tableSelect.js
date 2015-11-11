@@ -2285,7 +2285,7 @@ function initTableData(){
 				$(element).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e').attr('region-selected', true);
 				//显示所选区域的餐台
 				showTable();
-			}
+			};
 		});
 	}
 
@@ -2306,18 +2306,11 @@ function initTableData(){
 			random : Math.random()
 		},
 		success : function(data, status, xhr){
-			tables = [];
 			if(data.success){
-				
 				
 				WirelessOrder.tables = new TableList(data.root);
 				console.log(WirelessOrder.tables.getByStatus(TableList.Status.BUSY).getByRegion(0));
 				
-				
-				//把所有餐桌对象都放到本地数组tables中,freeTables存放空闲餐桌，busyTables存放就餐餐桌
-				for(x in data.root){	
-					tables.push(data.root[x]);
-				}
 				//设置各状态数量
 				$('#ts_freeTablesCount').text(WirelessOrder.tables.getIdleAmount());
 				$('#ts_busyTablesCount').text(WirelessOrder.tables.getBusyAmount());
