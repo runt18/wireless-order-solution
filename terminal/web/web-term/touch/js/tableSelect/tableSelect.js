@@ -657,33 +657,18 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 			tables : tables,
 			middleText : '点菜(+)',
 			middle : function(){
-				//查台
-				var tableInfo = $('#left_input_askTable').val();
-				var tableId = 0;
-				if(isNaN(tableInfo)){
-					var temp = tables.slice(0);
-					var table4Search = [];
-					for(var i = 0; i < temp.length; i++){
-						if((temp[i].name + '').indexOf(tableInfo.toUpperCase()) != -1){
-							table4Search.push(temp[i]);
-						}
-					}	
-					table4Search = table4Search.sort(ts.searchTableCompareByName);
-					if(table4Search.length > 0){
-						tableId = table4Search[0].id;
-					}else{
-						Util.msg.tip('没有此餐台, 请重新输入');			
-						tableInfo.focus();
-						return;
-					}
-					
-				}	
-				askTablePopup.close(function(){
-					updateTable({
-						id : tableId,
-						alias : !tableId?tableInfo:''
-					});	
-				}, 200);
+				var prefectMatched = askTablePopup.prefect();
+				if(prefectMatched){
+					askTablePopup.close(function(){
+						updateTable({
+							id : prefectMatched.id,
+							alias : !prefectMatched.id ? prefectMatched.alias : ''
+						});	
+					}, 200);
+				}else{
+					Util.msg.tip('没有此餐台,请重新输入');
+				}
+				
 			},
 			left : function(){
 				
@@ -700,7 +685,7 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 							$('#tableSelect_div_askTable').off('keydown');
 							updateTable({
 								id : perfectMatched.id,
-								alias : !tableId ? tableInfo : ''
+								alias : !perfectMatched.id ? perfectMatched.alias : ''
 							});	
 						}, 200);
 					}else{
