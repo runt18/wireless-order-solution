@@ -610,6 +610,8 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 		}, 300);
 		
 	});
+	
+	
 	//查台按钮
 	$('#searchTable_a_tableSelect').click(function(){
 		var askTablePopup = new AskTablePopup({
