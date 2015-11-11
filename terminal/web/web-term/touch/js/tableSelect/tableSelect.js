@@ -671,7 +671,28 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 				
 			},
 			left : function(){
+				var perfectMatched = askTablePopup.prefect();
 				
+				if(perfectMatched){
+					askTablePopup.close(function(){
+						$('#tableSelect_div_askTable').off('keydown');
+						updateTable({
+							toPay : true,
+							id : perfectMatched.id,
+							alias : !perfectMatched.id ? perfectMatched.alias : ''
+						});	
+					}, 200);
+				}else{
+					Util.msg.tip('没有此餐台,请重新输入');
+				}
+			},
+			tableSelect : function(e){
+				askTablePopup.close(function(){
+					updateTable({
+						id : e.id,
+						alias : e.alias
+					});	
+				}, 200);
 			}
 		});
 		
@@ -693,110 +714,28 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 					}
 					
 				}else if(event.keyCode == '13'){//回车
-					var tableInfo = $('#left_input_askTable').val();
-					var tableId = 0;
-					if(isNaN(tableInfo)){
-						var temp = tables.slice(0);
-						var table4Search = [];
-						for(var i = 0; i < temp.length; i++){
-							if((temp[i].name + '').indexOf(tableInfo.toUpperCase()) != -1){
-								table4Search.push(temp[i]);
-							}
-						}	
-						table4Search = table4Search.sort(ts.searchTableCompareByName);
-						if(table4Search.length > 0){
-							tableId = table4Search[0].id;
-						}else{
-							Util.msg.alert({
-								msg : '没有此餐台, 请重新输入',
-								topTip : true
-							});			
-							tableInfo.focus();
-							return;
-						}
+					var perfectMatched = askTablePopup.prefect();
+					
+					if(perfectMatched){
+						askTablePopup.close(function(){
+							$('#tableSelect_div_askTable').off('keydown');
+							updateTable({
+								toPay : true,
+								id : perfectMatched.id,
+								alias : !perfectMatched.id ? perfectMatched.alias : ''
+							});	
+						}, 200);
+					}else{
+						Util.msg.tip('没有此餐台,请重新输入');
 					}
-					
-					askTablePopup.close(function(){
-						$('#tableSelect_div_askTable').off('keydown');
-						updateTable({
-							toPay : true,
-							id : tableId,
-							alias : !tableId ? tableInfo : ''
-						});	
-					}, 200);
-					
 				}
+				//取消事件的冒泡行为
 				event.stopPropagation();
 			});
 		});
 	});
 	
-//	/**
-//	 * 输入台号后直接结账
-//	 */
-//	ts.toPaymentMgr = function(){
-//		var tableInfo = $('#txtTableNumForTS').val();
-//		var tableId = 0;
-//		if(isNaN(tableInfo)){
-//			var temp = tables.slice(0);
-//			var table4Search = [];
-//			for(var i = 0; i < temp.length; i++){
-//				if((temp[i].name + '').indexOf(tableInfo.toUpperCase()) != -1){
-//					table4Search.push(temp[i]);
-//				}
-//			}	
-//			table4Search = table4Search.sort(ts.searchTableCompareByName);
-//			if(table4Search.length > 0){
-//				tableId = table4Search[0].id;
-//			}else{
-//				Util.msg.alert({
-//					msg : '没有此餐台, 请重新输入',
-//					topTip : true
-//				});			
-//				tableInfo.focus();
-//				return;
-//			}
-//			
-//		}
-//		updateTable({
-//			toPay : true,
-//			id : tableId,
-//			alias : !tableId ? tableInfo : ''
-//		});	
-//	};
 
-	
-	
-
-//	/**
-//	 * 设置为查台
-//	 */
-//	ts.createOrderForLookup = function (){
-//
-//		ts.commitTableOrTran = 'lookup';
-//		//隐藏数量输入
-//		$('#td4TxtFoodNumForTran').hide();
-//		
-//		$('#certain4searchTableCmps').buttonMarkup('refresh');
-//		$('#certain4searchTableCmps .ui-btn-text').html('点菜(+)');
-//		
-//		//pos端 && 体验端增加结账按钮
-//		if(systemStatus == 1 || systemStatus == 3){
-//			$('#ts_toPaymentMgr').show();
-//			//设置为3个按钮并排
-//			$('#searchTableCmpsFoot a').addClass('tablePopbottomBtn');
-//		}
-//
-//		
-//		$("#txtTableNumForTS").val("");
-//		
-//		$('#transSomethingTitle').html("请输入桌号，查看已下单菜品");
-//		
-//		//打开控件
-//		uo.openTransOrderFood();	
-//	};
-//	
-//	
 	
 	
 	
