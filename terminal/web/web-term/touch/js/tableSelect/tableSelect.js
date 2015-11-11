@@ -5,35 +5,11 @@ var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 
 //全部餐桌
 var tables = [],
-	//设置就餐餐桌数组
-	busyTables = [],
-	//设置空闲餐桌数组
-	freeTables = [],
-	//暂结台数组
-	tempPayTables = [],
-	//当前状态下的被选中区域的餐桌数组
-	tempForRegion = [],
-	//被选中区域的所有状态餐桌数组
-	tempForAllStatus = [],
-	//临时餐桌数组
-	temp = [],
-	//定义存在餐桌的区域id数组
-	regionId = [],
-	region = [],
-	//设置当前状态类型（busy， free, allStatus）
-	statusType = "",
 	//作为收银端或触摸屏时, 餐台列表的高度
 	tableListHeight = 86,
 	
-	//数字键盘触发的input事件
-	numKeyBoardFireEvent,
-	
-
-	//数字键盘对应的<input>
-	focusInput = "inputTableCustomerCountSet",
-	
 	//餐桌选择包,tt：转台, rn: 区域
-	ts={
+	ts = {
 		table : {},
 		rn : {},
 		tt : {},
@@ -47,15 +23,13 @@ var tables = [],
 		multiPayTableChoosedTable : []
 	},
 	//登录操作包
-	ln={
-			restaurant : {},
-			staffData : {staffID:0, staffName:''}
+	ln = {
+		restaurant : {},
+		staffData : {staffID:0, staffName:''}
 	},	
 	/**
 	 * 元素模板
 	 */
-	//区域
-	regionCmpTemplet = '<a data-role="button" data-inline="true" class="regionBtn" onclick="">{name}</a>',
 	//餐台
 	tableCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
 //	'<div>{name}<br>{alias}</div></a>';
@@ -104,10 +78,9 @@ $(document).on('pageshow', "#tableSelectMgr", function(){
 	$(document).off('keydown');
 	//设置快捷键
 	$(document).on('keydown', function(event){
-		console.log('document');
-			if(event.which == "107"){//加号
-					$('#searchTable_a_tableSelect').click();
-	    	} 	
+		if(event.which == "107"){//加号
+			$('#searchTable_a_tableSelect').click();
+	    } 	
 	});	
 });
 			
@@ -164,6 +137,31 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 		tableListHeight = 130;	
 	}
 	
+	//空闲状态的餐台
+	$('#idleTable_li_tableSelect').click(function(){
+		//TODO
+		$('#labTableStatus .ui-btn-text').text($(this).text());
+		$('#labTableStatus').attr('table-status', TableList.Status.IDLE.val);
+		$('#popupAllStatusCmp').popup('close');
+		showTable();
+	});
+	
+	//就餐状态的餐台
+	$('#busyTable_li_tableSelect').click(function(){
+		$('#labTableStatus .ui-btn-text').text($(this).text());
+		$('#labTableStatus').attr('table-status', TableList.Status.BUSY.val);
+		$('#popupAllStatusCmp').popup('close');
+		showTable();
+	});
+	
+	//全部状态的餐台
+	$('#allTable_li_tableSelect').click(function(){
+		$('#labTableStatus .ui-btn-text').text($(this).text());
+		$('#labTableStatus').removeAttr('table-status');
+		$('#popupAllStatusCmp').popup('close');
+		showTable();
+	});
+	
 	var CommitTypeEnum = {
 		Daily : {
 			type : 1,
@@ -198,15 +196,6 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 			 		self.find('[id=confirm_a_daily]').click(function(){
 			 			submitDailyOperation();
 			 		});
-			 		//打印位置
-			 		self.find('[id=]').click(function(){
-						//显示打印区域
-						if($('#printPos_input_daily').attr('checked')){
-							$('#printPos_div_daily').show();
-						}else{
-							$('#printPos_div_daily').hide();
-						}
-			 		});
 				}
 			});
 		}
@@ -224,16 +213,11 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 		
 		//交款&交班&日结打印
 		function dailyOperationDaYin(printType, appendMsg){
-			var regionId = '';
-			if($('#printPos_input_daily').attr('checked')){
-				regionId = $('#printPos_select_daily').val(); 
-			}
 			Util.LM.show();
 			$.post('../PrintOrder.do',{
 				onDuty : dutyRange.onDutyFormat,
 				offDuty : dutyRange.offDutyFormat,
 				printType : printType,
-				regionId : regionId,
 				orientedPrinter : getcookie(document.domain + '_printers')			//特定打印机打印
 			}, function(resultJSON) {
 				Util.LM.hide();
@@ -305,23 +289,6 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 							+ '<td class="text_right">{2}</td>'
 							+ '<td class="text_right">{3}</td>'
 							+ '</tr>';
-			
-			//生成打印位置
-			var html = [];
-			for (var i = 0; i < region.length; i++) {
-				html.push('<option value={0}>{1}</option>'.format(region[i].id, region[i].name));
-			}
-			$('#printPos_select_daily').html(html.join(""));
-			
-			if(getcookie(document.domain + '_paymentCheck') == 'true'){
-				$('#printPos_div_daily').show();
-				$('#printPos_input_daily').attr("checked", true).checkboxradio("refresh");
-				$('#printPos_select_daily').val(parseInt(getcookie(document.domain+'_paymentRegion')));
-			}else{
-				$('#printPos_input_daily').attr("checked", false).checkboxradio("refresh");
-				$('#printPos_div_daily').hide();
-			}
-			$('#printPos_select_daily').selectmenu('refresh');	
 			
 			//设置标题
 			$('#title4DailyInfoTable').html('<font color="#f7c942">' + commitType.title + '</font> -- ' + commitType.title + '人 : '+ ln.staffData.staffName);
@@ -434,13 +401,6 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 		
 		//交班, 日结, 交款操作
 		function submitDailyOperation(){
-			var paymentRegion = $('#printPos_select_daily').val();
-			if($('#printPos_input_daily').attr('checked')){
-				setcookie(document.domain+'_paymentCheck', true);
-				setcookie(document.domain+'_paymentRegion', paymentRegion);
-			}else{
-				setcookie(document.domain+'_paymentCheck', false);
-			}
 			
 			if(commitType == CommitTypeEnum.Phrase){
 				//交班
@@ -534,7 +494,7 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 		dailyHandler(CommitTypeEnum.Phrase);
 	});
 	
-		//交班
+	//交班
 	$('#personSettle_a_tableSelect').click(function(){
 		dailyHandler(CommitTypeEnum.Person);
 	});
@@ -650,7 +610,6 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 		}, 300);
 		
 	});
-	
 	//查台按钮
 	$('#searchTable_a_tableSelect').click(function(){
 		var askTablePopup = new AskTablePopup({
@@ -734,7 +693,6 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 			});
 		});
 	});
-	
 
 	
 	
@@ -818,7 +776,7 @@ $(function(){
 				/**
 				 * 定时器，定时刷新餐桌选择页面数据
 				 */
-				window.setInterval("initTableData()", 20 * 60 * 1000);
+				window.setInterval(initTableData, 20 * 60 * 1000);
 				//加载基础数据
 				Util.LM.show();
 				initTableData();
@@ -2008,68 +1966,7 @@ function getTableById(tableId){
 	}
 }
 
-/**
- * 选择空闲餐桌
- */
-ts.selectFreeStatus = function(c){
-	
-	statusType = "free";
-	temp = getStatusTables("free", tempForAllStatus);
-	showTable(temp);
-	
-	$('#labTableStatus .ui-btn-text').text($(c.event).text());
-};
 
-/**
- * 选择就餐餐桌
- */
-ts.selectBusyStatus = function(c){
-	statusType = "busy";
-	temp = getStatusTables("busy", tempForAllStatus);
-	showTable(temp);
-	
-	$('#labTableStatus .ui-btn-text').text($(c.event).text());
-};
-
-/**
- * 选择全部餐桌
- */
-ts.selectAllStatus = function(c){
-	statusType = "allStatus";
-	temp = getStatusTables("allStatus", tempForAllStatus);
-	showTable(temp);
-	
-	$('#labTableStatus .ui-btn-text').text($(c.event).text());
-};
-
-/**
- * 取得当前区域下不同状态的餐桌数组 
- * @param {string} type 状态类型，分为空闲（free），就餐（busy），全部状态（allStatus）
- * @param {object} tempTables 区域数组对象
- * @returns {object} statusTables 餐桌数组对象 
- */
-function getStatusTables(type, tempTables){
-	var statusTables = [];
-	if(type == "free"){
-		for(x in tempTables){
-			if(tempTables[x].statusValue == 0){
-				statusTables.push(tempTables[x]);
-			}
-		}
-	}else if(type == "busy"){
-		for(x in tempTables){
-			if(tempTables[x].statusValue == 1){
-				statusTables.push(tempTables[x]);
-			}
-		}		
-	}else if(type == "allStatus"){
-/*		for(x in tempTables){
-			statusTables.push(tempTables[x]);
-		}	*/
-		statusTables = tempTables;
-	}
-	return statusTables;
-}
 
 /**
  * 根据alias或id返回table的最新状态
@@ -2372,17 +2269,33 @@ function handleTableForTS(c){
  */
 function initTableData(){
 	
+	//显示区域
+	function showRegion(){
+		//添加区域信息
+		var html = [];
+		html.push('<a data-role="button" data-inline="true" data-type="region" class="regionBtn">全部区域</a>');
+		WirelessOrder.regions.forEach(function(e){
+			html.push('<a data-role="button" data-inline="true" data-type="region" class="regionBtn" region-id="' + e.id + '">'+ e.name +'</a>');
+		});
+		
+		$('#divSelectRegionForTS').html(html.join("")).trigger('create').trigger('refresh').find('.regionBtn').each(function(index, element){
+			element.onclick = function(){
+				//恢复所有区域按钮为未选中状态
+				$('#divSelectRegionForTS .regionBtn').attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c').removeAttr('region-selected');
+				//设置点击的区域按钮是选中状态
+				$(element).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e').attr('region-selected', true);
+				//显示所选区域的餐台
+				showTable();
+			}
+		});
+	}
+
 	Util.LM.show();
-	regionId = [];
-	region = [];	
 	//加载区域
 	$.post('../QueryRegion.do', {dataSource : 'normal'}, function(rt){
-		rt.root.forEach(function(e){
-			region.push(e);
-			regionId.push(e.id);			
-		});
+		WirelessOrder.regions = rt.root;
 		//显示区域
-		showRegion(region);
+		showRegion();
 	}, 'json');
 	
 	
@@ -2395,39 +2308,31 @@ function initTableData(){
 		},
 		success : function(data, status, xhr){
 			tables = [];
-			busyTables = [];
-			freeTables = [];
 			if(data.success){
+				
+				
+				WirelessOrder.tables = new TableList(data.root);
+				console.log(WirelessOrder.tables.getByStatus(TableList.Status.BUSY).getByRegion(0));
+				
+				
 				//把所有餐桌对象都放到本地数组tables中,freeTables存放空闲餐桌，busyTables存放就餐餐桌
 				for(x in data.root){	
-					if(data.root[x].statusValue == 0){
-						freeTables.push(data.root[x]);
-					}else if(data.root[x].statusValue == 1){
-						busyTables.push(data.root[x]);
-						if(data.root[x].isTempPaid){
-							tempPayTables.push(data.root[x]);
-						}
-					}
 					tables.push(data.root[x]);
 				}
 				//设置各状态数量
-				$('#ts_freeTablesCount').text(freeTables.length);
-				$('#ts_busyTablesCount').text(busyTables.length);
-				$('#selectBarFreeTablesCount').text(freeTables.length);
-				$('#selectBarBusyTablesCount').text(busyTables.length);
-				$('#selectBarTempPayTablesCount').text(tempPayTables.length);
+				$('#ts_freeTablesCount').text(WirelessOrder.tables.getIdleAmount());
+				$('#ts_busyTablesCount').text(WirelessOrder.tables.getBusyAmount());
+				$('#selectBarFreeTablesCount').text(WirelessOrder.tables.getIdleAmount());
+				$('#selectBarBusyTablesCount').text(WirelessOrder.tables.getBusyAmount());
+				$('#selectBarTempPayTablesCount').text(WirelessOrder.tables.getTmpPaidAmount());
 				
 				ts.rn.selectingId = 'divAllArea';
 				ts.rn.pageNow = 1;
 				var regionH = $("#divToolRightForSelect").height() - 6 * 65;
 				ts.rn.limit = Math.floor(regionH/62);
-				ts.rn.pageCount = Math.ceil(region.length/ts.rn.limit);
+				ts.rn.pageCount = Math.ceil(WirelessOrder.regions.length/ts.rn.limit);
 				
-				//默认显示全部状态下的全部区域
-				statusType = "allStatus";
-				tempForAllStatus = tables;
-				temp = tables;
-				showTable(temp);
+				showTable();
 				
 				Util.LM.hide();
 			}else{
@@ -2462,7 +2367,7 @@ function initTableData(){
 function keepLoadTableData(){
 	if(!$('#divTableShowForSelect').html()){
 		ts.tp.init({
-		    data : temp
+		    data : WirelessOrder.tables
 		});
 		ts.tp.getFirstPage();
 	}else{
@@ -2474,85 +2379,48 @@ function keepLoadTableData(){
  * 显示餐桌
  * @param {object} temp 需要显示的餐桌数组
  */
-function showTable(temp){	
-	if(temp.length != 0){
+function showTable(){
+	
+	var tableStatus = null;
+	//取得当前的餐台状态条件
+	var tableStatusVal = $('#labTableStatus').attr('table-status');
+	if(tableStatusVal){
+		if(tableStatusVal == TableList.Status.IDLE.val){
+			tableStatus = TableList.Status.IDLE;
+		}else if(tableStatusVal == TableList.Status.BUSY.val){
+			tableStatus = TableList.Status.BUSY;
+		}
+	}
+	
+	//取得当前的选中区域
+	var regionId = null;
+	$('#divSelectRegionForTS .regionBtn').each(function(index, element){
+		if($(element).attr('region-selected')){
+			regionId = $(element).attr('region-id');
+		}
+	});
+
+	var result = WirelessOrder.tables;
+	if(tableStatus){
+		result = result.getByStatus(tableStatus);
+	}
+	if(regionId){
+		result = result.getByRegion(regionId);
+	}
+	
+	if(result.length != 0){
 		ts.tp.init({
-		    data : temp
+		    data : result
 		});
 		ts.tp.getFirstPage();
 		
-		//关闭可能存在的状态popup
-		$('#popupAllStatusCmp').popup('close');
-		
-/*		var explorer =navigator.userAgent ; 
-		if (explorer.indexOf("Firefox") >= 0) {
-			console.log($(".tempPayStatus").length)
-			$(".tempPayStatus").each(function(){
-				$(this).removeClass('tempPayStatus').addClass('tempPayStatus4Moz');
-			});
-		}  	*/	
 	}else{
 		$("#divTableShowForSelect").html("");
 	}	
 }
 
-/**
- * 显示区域
- */
-function showRegion(temp, pageNow){
-	//添加区域信息
-	var html = [];
-	for (var i = 0; i < temp.length; i++) {
-		//不显示酒席费空区域
-		html.push('<a data-role="button" data-inline="true" data-type="region" class="regionBtn" onclick="ts.addTables({event:this, id:'+ temp[i].id +'})">'+ temp[i].name +'</a>');
-	}
-	
-	$('#divSelectRegionForTS').html(html.join("")).trigger('create').trigger('refresh');
-}
 
-/**
- * 点击区域，显示不同状态的餐桌数组
- * @param {object} o 
- */
-ts.addTables = function(o){
-    //把当前区域餐桌数组清空
-    temp = [];
-    tempForAllStatus = [];
-    tempForRegion = [];
-    var statusTable = [];
-    //初始化当前区域的所有状态餐桌数组
-    for(x in tables){
-    	if(o.id == -1){
-    		tempForAllStatus.push(tables[x]);	
-    	}else if(tables[x].region.id == o.id){
-    		tempForAllStatus.push(tables[x]); 		
-    	} 
-     }
-   //判断当前处于哪个状态
-    if(statusType == "allStatus"){
-    	statusTable = tables;
-    }else if(statusType == "free"){
-    	statusTable = freeTables;
-    }else if(statusType == "busy"){
-    	statusTable = busyTables;
-    }
-    //获得当前状态的对应区域餐桌数组
-    for(x in statusTable){
-    	if(o.id == -1){
-    		tempForRegion.push(statusTable[x]);
-    	}else if(statusTable[x].region.id == o.id){
-    		tempForRegion.push(statusTable[x]);
-    	    ts.rn.selectingId = o.id;
-    	} 
-     }  
-    temp = tempForRegion;
-    //改变区域选中色
-	$('#tableAndRegionsCmp a[data-type=region]').attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
-	
-	$(o.event).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
-    
-    showTable(temp);
-};
+
 
 /**
  * 打开会员充值
@@ -3048,10 +2916,6 @@ ts.displayFeastPayWin = function(){
 	$('#feastPayWin').show();
 	$('#shadowForPopup').show();
 	
-	//设置数字键盘输入
-	$('.numberInputStyle').focus(function(){
-		focusInput = this.id;
-	});		
 };
 
 /**
