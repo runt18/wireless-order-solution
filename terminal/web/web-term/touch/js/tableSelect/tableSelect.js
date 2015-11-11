@@ -2309,7 +2309,6 @@ function initTableData(){
 			if(data.success){
 				
 				WirelessOrder.tables = new TableList(data.root);
-				console.log(WirelessOrder.tables.getByStatus(TableList.Status.BUSY).getByRegion(0));
 				
 				//设置各状态数量
 				$('#ts_freeTablesCount').text(WirelessOrder.tables.getIdleAmount());
