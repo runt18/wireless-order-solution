@@ -613,7 +613,7 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 	//查台按钮
 	$('#searchTable_a_tableSelect').click(function(){
 		var askTablePopup = new AskTablePopup({
-			tables : tables,
+			tables : WirelessOrder.tables,
 			middleText : '点菜(+)',
 			middle : function(){
 				var prefectMatched = askTablePopup.prefect();
@@ -1143,7 +1143,7 @@ ts.s = {
 					var data = null, temp = null;
 					if(ts.s.fileValue.trim().length > 0){
 						data = [];
-						temp = tables.slice(0);
+						temp = WirelessOrder.tables.slice(0);
 						for(var i = 0; i < temp.length; i++){
 							if(ts.commitTableOrTran == 'apartTable' && temp[i].alias == 0){
 								continue;
@@ -1560,7 +1560,7 @@ ts.submitForSelectTableOrTransFood = function(){
 		var tableInfo = $('#left_input_askTable').val();
 		var tableId = 0;
 		if(isNaN(tableInfo)){
-			var temp = tables.slice(0);
+			var temp = WirelessOrder.tables.slice(0);
 			var table4Search = [];
 			for(var i = 0; i < temp.length; i++){
 				if((temp[i].name + '').indexOf(tableInfo.toUpperCase()) != -1){
@@ -1946,9 +1946,9 @@ ts.renderToCreateOrder = function(tableNo, peopleNo, comment){
  * @returns {object} 
  */
 function getTableByAlias(tableAlias){
-	for(x in tables){
-		if(tables[x].alias == tableAlias){
-			return tables[x];		
+	for(x in WirelessOrder.tables){
+		if(WirelessOrder.tables[x].alias == tableAlias){
+			return WirelessOrder.tables[x];		
 		}
 	}
 }
@@ -1959,9 +1959,9 @@ function getTableByAlias(tableAlias){
  * @returns {object} 
  */
 function getTableById(tableId){
-	for(x in tables){
-		if(tables[x].id == tableId){
-			return tables[x];		
+	for(x in WirelessOrder.tables){
+		if(WirelessOrder.tables[x].id == tableId){
+			return WirelessOrder.tables[x];		
 		}
 	}
 }
@@ -3743,14 +3743,14 @@ ts.multiPayTableOrderFood = function(){
 		Util.msg.tip("请选择餐台");
 		return;
 	}
-	var tables = [];
+	var multiTables = [];
 	for (var i = 0; i < ts.multiPayTableChoosedTable.length; i++) {
-		tables.push(ts.multiPayTableChoosedTable[i].id);
+		multiTables.push(ts.multiPayTableChoosedTable[i].id);
 	}
 
 	$.post('../OperateTable.do', {
 		dataSource : 'mergeTable',
-		tables : tables.join(",")
+		tables : multiTables.join(",")
 	}, function(rt){
 		if(rt.success){
 			Util.msg.tip("并台成功, 已合并到 "+ ts.multiPayTableChoosedTable[0].name);

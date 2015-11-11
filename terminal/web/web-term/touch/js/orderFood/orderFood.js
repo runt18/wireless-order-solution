@@ -3076,7 +3076,7 @@ $(function(){
 					}else{
 						brandNo = 1;
 					}
-					var bandTemp = tables.slice(0);
+					var bandTemp = WirelessOrder.tables.slice(0);
 					
 					//遍历来判断输入的牌子号是否存在
 					for(var i = 0; i < bandTemp.length; i++){
@@ -3121,7 +3121,7 @@ $(function(){
 		$('#fastPay_a_orderFood').click(function(){
 			var brandNo = 1;
 			
-			var bandTemp = tables.slice(0);
+			var bandTemp = WirelessOrder.tables.slice(0);
 			//遍历来判断输入的牌子号是否存在
 			for(var i = 0; i < bandTemp.length; i++){
 				if(brandNo == bandTemp[i].alias){
