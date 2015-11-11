@@ -3,10 +3,8 @@ var Request = new Util_urlParaQuery();
 var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 
 
-//全部餐桌
-var tables = [],
 	//作为收银端或触摸屏时, 餐台列表的高度
-	tableListHeight = 86,
+var	tableListHeight = 86,
 	
 	//餐桌选择包,tt：转台, rn: 区域
 	ts = {
@@ -993,10 +991,9 @@ function initFoodData(c){
 				var maxIndex = this.length - 1;
 				var currentIndex;
 				var currentElement;
-				var resultIndex;
 			
 				while (minIndex <= maxIndex) {
-					resultIndex = currentIndex = (minIndex + maxIndex) / 2 | 0;
+					currentIndex = (minIndex + maxIndex) / 2 | 0;
 					currentElement = this[currentIndex];
 			
 					if (currentElement.id < searchElement.id) {
@@ -1011,12 +1008,12 @@ function initFoodData(c){
 				}
 			
 				return ~maxIndex;
-			}
+			};
 			
 			//判断菜品是否估清
 			of.foodList.isSellout = function(index){
 				return (this[index].status & 1 << 2) != 0;
-			}
+			};
 			//设置菜品是否估清
 			of.foodList.setSellout = function(index, onOff){
 				if(onOff){
@@ -1024,12 +1021,12 @@ function initFoodData(c){
 				}else{
 					this[index].status &= ~(1 << 2);
 				}
-			}
+			};
 			
 			//判断菜品是否限量估清
 			of.foodList.isLimit = function(index){
 				return (this[index].status & 1 << 10) != 0;
-			}
+			};
 			
 			//设置菜品是否限量估清
 			of.foodList.setLimit = function(index, onOff, limitAmount, limitRemain){
@@ -1042,7 +1039,7 @@ function initFoodData(c){
 					this[index].foodLimitAmount = 0;
 					this[index].foodLimitRemain = 0;
 				}
-			}
+			};
 			
 			//清除没有菜品的厨房
 			for(var i = of.kitchens.root.length - 1; i >= 0; i--){
@@ -1334,12 +1331,12 @@ ts.bookSearchByName = {
 ts.transTable = function(c){
 	var oldTable;
 	if(c && c.oldAlias){
-		oldTable = getTableByAlias(c.oldAlias);
+		oldTable = WirelessOrder.tables.getByAlias(c.oldAlias);
 	}else{
 		oldTable = uo.table;
 	}
 	
-	var newTable = getTableByAlias(c.alias);
+	var newTable = WirelessOrder.tables.getByAlias(c.alias);
 	
 	if(!oldTable || !newTable){
 		Util.msg.alert({
@@ -1417,7 +1414,7 @@ ts.toOrderFoodOrTransFood = function(c){
 			}
 			//选择餐台
 			if(table == null){
-				table = getTableById(c.id);
+				table = WirelessOrder.tables.getById(c.id);
 				if(table.statusValue == 1){
 					Util.msg.tip("此餐台已使用, 不能选择");
 					return;
@@ -1462,7 +1459,7 @@ ts.toOrderFoodOrTransFood = function(c){
 		
 		//选择餐台
 		if(table == null){
-			table = getTableById(c.id);
+			table = WirelessOrder.tables.getById(c.id);
 			
 			ts.bookChoosedTable.push(table);
 		}
@@ -1487,7 +1484,7 @@ ts.toOrderFoodOrTransFood = function(c){
 		
 		//选择餐台
 		if(table == null){
-			table = getTableById(c.id);
+			table = WirelessOrder.tables.getById(c.id);
 			if(table.statusValue == 1){
 				Util.msg.tip("此餐台已使用, 不能选择");
 				return;
@@ -1514,7 +1511,7 @@ ts.toOrderFoodOrTransFood = function(c){
 		
 		//选择餐台
 		if(table == null){
-			table = getTableById(c.id);
+			table = WirelessOrder.tables.getById(c.id);
 			if(table.statusValue == 0){
 				Util.msg.tip("此餐台未点餐, 不能选择");
 				return;
@@ -1538,14 +1535,14 @@ ts.submitForSelectTableOrTransFood = function(){
 	if(ts.commitTableOrTran == 'table'){//普通选台
 		ts.submitForSelectTableNumTS();
 	}else if(ts.commitTableOrTran == 'trans'){//单条转菜
-		var table = getTableByAlias($('#txtTableNumForTS').val());
+		var table = WirelessOrder.tables.getByAlias($('#txtTableNumForTS').val());
 		if(table){
 			uo.transFood({id:table.id});
 		}else{
 			Util.msg.tip('没有此餐台, 请重新输入');
 		}
 	}else if(ts.commitTableOrTran == 'allTrans'){//全单转菜
-		var table = getTableByAlias($('#txtTableNumForTS').val());
+		var table = WirelessOrder.tables.getByAlias($('#txtTableNumForTS').val());
 		if(table){
 			uo.transFood({id:table.id, allTrans : -1});
 		}else{
@@ -1588,7 +1585,7 @@ ts.submitForSelectTableOrTransFood = function(){
 	}else if(ts.commitTableOrTran == 'apartTable'){//拆台
 		$('#divSelectTablesForTs').hide();
 		$('#divSelectTablesSuffixForTs').show();
-		ts.table = getTableByAlias($('#txtTableNumForTS').val());
+		ts.table = WirelessOrder.tables.getByAlias($('#txtTableNumForTS').val());
 	}else if(ts.commitTableOrTran == 'member'){//会员
 		uo.useMemberForOrderAction();
 	}else if(ts.commitTableOrTran == 'bookTableChoose'){//预订台
@@ -1602,7 +1599,7 @@ ts.submitForSelectTableOrTransFood = function(){
 		
 		//选择餐台
 		if(table == null){
-			table = getTableByAlias($('#txtTableNumForTS').val());
+			table = WirelessOrder.tables.getByAlias($('#txtTableNumForTS').val());
 			if(table.statusValue == 1){
 				Util.msg.tip("此餐台已使用, 不能选择");
 				return;
@@ -1915,7 +1912,7 @@ ts.renderToCreateOrder = function(tableNo, peopleNo, comment){
 		ts.closeTableWithPeople();
 		
 		setTimeout(function(){
-			var tableToAlias = getTableByAlias(tableNo);
+			var tableToAlias = WirelessOrder.tables.getByAlias(tableNo);
 			//同时操作餐台时,选中状态没变化的餐桌处理
 			//直接写台豪点菜时判断是否已点菜, 是则先给co.order.orderFoods赋值
 			if(tableToAlias.statusValue == 1){
@@ -1947,26 +1944,26 @@ ts.renderToCreateOrder = function(tableNo, peopleNo, comment){
  * @param {int} tableAlias
  * @returns {object} 
  */
-function getTableByAlias(tableAlias){
-	for(x in WirelessOrder.tables){
-		if(WirelessOrder.tables[x].alias == tableAlias){
-			return WirelessOrder.tables[x];		
-		}
-	}
-}
+//function getTableByAlias(tableAlias){
+//	for(x in WirelessOrder.tables){
+//		if(WirelessOrder.tables[x].alias == tableAlias){
+//			return WirelessOrder.tables[x];		
+//		}
+//	}
+//}
 
 /**
  * 根据餐桌id，返回餐桌对象
  * @param {int} tableId
  * @returns {object} 
  */
-function getTableById(tableId){
-	for(x in WirelessOrder.tables){
-		if(WirelessOrder.tables[x].id == tableId){
-			return WirelessOrder.tables[x];		
-		}
-	}
-}
+//function getTableById(tableId){
+//	for(x in WirelessOrder.tables){
+//		if(WirelessOrder.tables[x].id == tableId){
+//			return WirelessOrder.tables[x];		
+//		}
+//	}
+//}
 
 
 

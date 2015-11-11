@@ -35,6 +35,7 @@ function TableList(source){
 		return this[index].statusVale == TableList.Status.IDLE.val;
 	};
 	
+	//根据区域查找tables
 	_tables.getByRegion = function(regionId){
 		var result = new TableList();
 		for(var i = 0; i < _tables.length; i++){
@@ -45,6 +46,7 @@ function TableList(source){
 		return result;
 	};
 	
+	//根据餐台状态查找tables
 	_tables.getByStatus = function(status){
 		var result = new TableList();
 		for(var i = 0; i < _tables.length; i++){
@@ -53,6 +55,26 @@ function TableList(source){
 			}
 		}
 		return result;
+	};
+	
+	//根据alias查找table
+	_tables.getByAlias = function(alias){
+		for(var i = 0; i < _tables.length; i++){
+			if(_tables[i].alias == alias){
+				return _tables[i];
+			}
+		}
+		return null;
+	};
+	
+	//根据id查找table
+	_tables.getById = function(id){
+		for(var i = 0; i < _tables.length; i++){
+			if(_tables[i].id == id){
+				return _tables[i];
+			}
+		}
+		return null;
 	};
 	
 	_tables.getIdleAmount = function(){
