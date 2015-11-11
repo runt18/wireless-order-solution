@@ -64,10 +64,12 @@
 <script type="text/javascript" src="./js/popup/member/perfect.js"></script>
 <!-- 打印机绑定 -->
 <script type="text/javascript" src="./js/popup/print/print.js"></script>
+<!-- 查台等控件绑定 -->
+<script type="text/javascript" src="./js/popup/table/ask.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
-		return false;
+		return false;	
 	} 
 </script>
 
@@ -157,7 +159,7 @@
 		 		预订
 		 	</div>	
 		 	</a>
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.createOrderForLookup()">查台</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="searchTable_a_tableSelect">查台</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.openApartTable()">拆台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.transTableForTS()">转台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.stopSellMgr()">沽清</a>
