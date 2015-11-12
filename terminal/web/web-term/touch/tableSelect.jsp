@@ -163,8 +163,8 @@
 		 	</div>	
 		 	</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="searchTable_a_tableSelect">查台</a>
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.openApartTable()">拆台</a>
-			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.transTableForTS()">转台</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="apartTable_a_tableSelect">拆台</a>
+			<a data-role="button" data-inline="true" class="bottomBtnFont" id="tranTable_a_tableSelect">转台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.stopSellMgr()">沽清</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#tableSelectOtherOperateCmp">更多</a>
 			<a href="javascript: ts.tp.getPreviousPage()" data-role="button" data-inline="true" class="bottomBtnFont">上一页</a>
@@ -198,7 +198,7 @@
 	    
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.openMultiOpenTable()">添加餐台</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="multiTables_a_tableSelect">添加餐台</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.multiOpenTableOrderFood()">确定</a>		 
 			 </div>
 	    </div>	    	    
@@ -219,7 +219,7 @@
 	    
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.openMultiPayTable()">添加餐台</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="combineTable_a_tableSelect">添加餐台</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.multiPayTableOrderFood()">确定</a>		 
 			 </div>
 	    </div>	    	    
@@ -731,7 +731,7 @@
 		    		</div>
 					<div data-role="footer" data-theme="b" class="ui-corner-bottom">
 						 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-							 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.openBookTable()">添加餐台</a>
+							 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="bookChoose_a_tableSelect">添加餐台</a>
 							 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.bookTableOrderFood()">入座</a>		 
 						 </div>
 				    </div>
@@ -839,7 +839,7 @@
 	    </div>
 		<div id="footer4AddBook" data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
 			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:25%" onclick="ts.openAddBookTable()">添加餐台</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:25%" id="addBookTable_a_tableSelect">添加餐台</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:25%" onclick="ts.toOrderFoodPage()">菜品预订</a>				 
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:25%" onclick="ts.commitAddBook()">确定</a>
 				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:24%" onclick="ts.closeAddBookInfo()">取消</a>		 
