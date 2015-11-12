@@ -694,7 +694,10 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 		});
 	});
 
-	
+	//快餐模式按钮
+	$('#fastFood_li_tableSelect').click(function(){
+		of.entry({orderFoodOperateType : 'fast'});
+	});
 	
 	
 });
@@ -702,10 +705,6 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 
 
 $(function(){
-	//快餐模式按钮
-	$('#fastFood_li_tableSelect').click(function(){
-		of.entry({orderFoodOperateType : 'fast'});
-	});
 	
 	
 	//餐厅选择界面高度
@@ -773,9 +772,7 @@ $(function(){
 				
 				$('#spanStaffNameForDisplayToTS').html('操作人: <font color="green">'+ data.other.staff.staffName + '</font>');
 				
-				/**
-				 * 定时器，定时刷新餐桌选择页面数据
-				 */
+				//定时器，定时刷新餐桌选择页面数据
 				window.setInterval(initTableData, 20 * 60 * 1000);
 				//加载基础数据
 				Util.LM.show();
@@ -855,7 +852,6 @@ ts.loadData = function(){
 	location.href = '#tableSelectMgr';
 	ts.commitTableOrTran = null;
 	initTableData();
-	of.loadFoodDateAction = window.setInterval("keepLoadTableData()", 500);	
 };
 
 //设置搜索出来的餐台升序排序, 按名称长短
@@ -2291,21 +2287,22 @@ function initTableData(){
 
 	Util.LM.show();
 	//加载区域
-	$.post('../QueryRegion.do', {dataSource : 'normal'}, function(rt){
-		WirelessOrder.regions = rt.root;
-		//显示区域
-		showRegion();
+	$.post('../QueryRegion.do', {dataSource : 'normal'}, function(response, status, xhr){
+		if(status == 'success'){
+			if(response.success){
+				WirelessOrder.regions = response.root;
+				//显示区域
+				showRegion();
+			}else{
+				Util.msg.tip(result.msg);
+			}
+		}
 	}, 'json');
 	
 	
 	// 加载菜单数据
-	$.ajax({
-		url : '../QueryTable.do',
-		type : 'post',
-		data : {
-			random : Math.random()
-		},
-		success : function(data, status, xhr){
+	$.post('../QueryTable.do', null, function(data, status, xhr){
+		if(status == 'success'){
 			if(data.success){
 				
 				WirelessOrder.tables = new TableList(data.root);
@@ -2335,15 +2332,6 @@ function initTableData(){
 					time : 2
 				});
 			}
-		},
-		error : function(request, status, err){
-			Util.LM.hide();
-			Util.msg.alert({
-				title : '温馨提示',
-				msg : err, 
-				renderTo : 'tableSelectMgr',
-				time : 2
-			});
 		}
 	});	
 	
@@ -2352,19 +2340,7 @@ function initTableData(){
 	
 }
 
-/**
- * 当div高度还未来得及变化时, 不断去渲染
- */
-function keepLoadTableData(){
-	if(!$('#divTableShowForSelect').html()){
-		ts.tp.init({
-		    data : WirelessOrder.tables
-		});
-		ts.tp.getFirstPage();
-	}else{
-		clearInterval(ts.loadTableDateAction);
-	}
-}
+
 
 /**
  * 显示餐桌
