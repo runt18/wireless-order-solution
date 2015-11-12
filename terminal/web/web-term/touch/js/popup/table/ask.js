@@ -102,18 +102,9 @@ function AskTablePopup(param){
 		});
 	};
 	
-	this.prefect = function(self){
+	this.prefect = function(){
 		//查台
-		var tableInfo = $('#left_input_askTable').val();
-		if(tableInfo){
-			for(var i = 0; i < tables.length; i++){
-				if(parseInt(tableInfo) == tables[i].alias){
-					return tables[i];
-				}
-			}	
-			
-		}	
-		return null;
+		return param.tables.getByAlias($('#left_input_askTable').val());
 	};
 	
 	
@@ -160,21 +151,9 @@ function AskTablePopup(param){
 			});
 		}
 		
-		//筛选出符合条件的餐台
-		var matchedTables = [];
-		for(var i = 0; i < param.tables.length; i++){
-			if((param.tables[i].name + '').indexOf(inputVal.trim().toUpperCase()) != -1){
-				matchedTables.push(param.tables[i]);
-			}else if((param.tables[i].alias + '').indexOf(inputVal.trim()) != -1){
-				matchedTables.push(param.tables[i]);
-			}
-			if(matchedTables.length == 8){
-				break;
-			}
-		}	
-		//显示匹配的餐台
-		showMatchedTable(matchedTables);
-		}
+		//显示匹配条件的餐台
+		showMatchedTable(param.tables.getByFuzzy(inputVal).slice(0, 8));
+	}
 	
 }
 
