@@ -11,7 +11,8 @@ function AskTablePopup(param){
 		middle : null,				//中间Button方法
 		rightText : '',				//右Button文字
 		right : null,				//右Button方法
-		tableSelect : null			//点击匹配餐台的方法
+		tableSelect : null,			//点击匹配餐台的方法
+		suffixSelect : null         //后缀的方法
 	};
 	
 	var _self = this;
@@ -61,15 +62,28 @@ function AskTablePopup(param){
 				});
 			}
 			
+			//后缀的方法
+			if(param.suffixSelect && typeof param.suffixSelect == 'function'){
+				self.find('[id=suffix_div_ask] a').each(function(index, element){
+					element.onclick = function(){
+						param.suffixSelect($(element).text());
+					}
+				});
+			}
+				
 			
 		}
 	});	
 	
 	this.open = function(afterOpen){
 		_popupInstance.open(function(self){
+			//数字键盘绑定填写台号框
 			NumKeyBoardAttacher.instance().attach(self.find('[id=left_input_askTable]')[0], function(inputVal){
-				matchTable(inputVal, self);
+				matchTable(inputVal, self);	
 			});
+			
+			//数字键盘绑定填写要转去的台号输入框
+			NumKeyBoardAttacher.instance().attach(self.find('[id=tranNum_input_ask]'));
 			
 			//键盘输入匹配
 			self.find('[id=left_input_askTable]').on('keyup', function(){
@@ -89,6 +103,8 @@ function AskTablePopup(param){
 	this.close = function(afterClose, timeout){
 		_popupInstance.close(function(self){
 			NumKeyBoardAttacher.instance().detach(self.find('[id=left_input_askTable]')[0]);
+			
+			NumKeyBoardAttacher.instance().detach(self.find('[id=tranNum_input_ask]'));
 			//删除keypress事件
 			self.find('[id=left_input_askTable]').off('keyup');
 			
@@ -109,51 +125,52 @@ function AskTablePopup(param){
 	
 	
 	function matchTable(inputVal, self){
-		self.find('[id=left_input_askTable]')[0].focus();
-		//显示匹配的餐台
-		function showMatchedTable(matchedTables){
-			var tableCmpTemplate = 
-				'<a data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
-					'<div style="height: 70px;">{name}<br>{alias}' +
-						'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
-						'<div class="bookTableStatus">{bookTableStatus}</div>'+
-					'</div>'+
-				'</a>';
-			var html = [];
-			for (var i = 0; i < matchedTables.length; i++) {
-				
-				var aliasOrName;
-				if(matchedTables[i].categoryValue == 1){
-					aliasOrName = matchedTables[i].alias;
-				}else{
-					aliasOrName = '<font color="green">' + matchedTables[i].categoryText +'</font>';
-				}
-				html.push(tableCmpTemplate.format({
-					dataIndex : i,
-					id : matchedTables[i].id,
-					//click : 'ts.toOrderFoodOrTransFood({alias:'+ matchedTables[i].alias +',id:'+ matchedTables[i].id +'})',
-					alias : aliasOrName,
-					theme : matchedTables[i].statusValue == '1' ? "e" : "c",
-					name : matchedTables[i].name,
-					tempPayStatus : matchedTables[i].isTempPaid ? '暂结' : '&nbsp;&nbsp;',
-					bookTableStatus : matchedTables[i].isBook ? '订' : '',
-					tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0 ? 'tempPayStatus4Moz' : 'tempPayStatus'
-				}));	
-			}
-			self.find('[id=matchedTables_div_askTable]').html(html.join(''));
-			self.find('[id=matchedTables_div_askTable] a').buttonMarkup( 'refresh' );
-			self.find('[id=matchedTables_div_askTable] a').each(function(index, element){
-				$(element).click(function(){
-					if(param.tableSelect){
-						param.tableSelect(matchedTables[$(element).attr('data-index')]);
+		if(param.tables){
+			self.find('[id=left_input_askTable]')[0].focus();
+			//显示匹配的餐台
+			function showMatchedTable(matchedTables){
+				var tableCmpTemplate = 
+					'<a data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
+						'<div style="height: 70px;">{name}<br>{alias}' +
+							'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
+							'<div class="bookTableStatus">{bookTableStatus}</div>'+
+						'</div>'+
+					'</a>';
+				var html = [];
+				for (var i = 0; i < matchedTables.length; i++) {
+					
+					var aliasOrName;
+					if(matchedTables[i].categoryValue == 1){
+						aliasOrName = matchedTables[i].alias;
+					}else{
+						aliasOrName = '<font color="green">' + matchedTables[i].categoryText +'</font>';
 					}
+					html.push(tableCmpTemplate.format({
+						dataIndex : i,
+						id : matchedTables[i].id,
+						//click : 'ts.toOrderFoodOrTransFood({alias:'+ matchedTables[i].alias +',id:'+ matchedTables[i].id +'})',
+						alias : aliasOrName,
+						theme : matchedTables[i].statusValue == '1' ? "e" : "c",
+						name : matchedTables[i].name,
+						tempPayStatus : matchedTables[i].isTempPaid ? '暂结' : '&nbsp;&nbsp;',
+						bookTableStatus : matchedTables[i].isBook ? '订' : '',
+						tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0 ? 'tempPayStatus4Moz' : 'tempPayStatus'
+					}));	
+				}
+				self.find('[id=matchedTables_div_askTable]').html(html.join(''));
+				self.find('[id=matchedTables_div_askTable] a').buttonMarkup( 'refresh' );
+				self.find('[id=matchedTables_div_askTable] a').each(function(index, element){
+					$(element).click(function(){
+						if(param.tableSelect){
+							param.tableSelect(matchedTables[$(element).attr('data-index')]);
+						}
+					});
 				});
-			});
+			}
+			
+			//显示匹配条件的餐台
+			showMatchedTable(param.tables.getByFuzzy(inputVal).slice(0, 8));
 		}
-		
-		//显示匹配条件的餐台
-		showMatchedTable(param.tables.getByFuzzy(inputVal).slice(0, 8));
 	}
-	
 }
 

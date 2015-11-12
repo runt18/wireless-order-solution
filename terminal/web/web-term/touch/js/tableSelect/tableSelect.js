@@ -614,6 +614,7 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 	$('#searchTable_a_tableSelect').click(function(){
 		var askTablePopup = new AskTablePopup({
 			tables : WirelessOrder.tables,
+			title : '查台',
 			middleText : '点菜(+)',
 			middle : function(){
 				var prefectMatched = askTablePopup.prefect();
@@ -645,11 +646,11 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 					Util.msg.tip('没有此餐台,请重新输入');
 				}
 			},
-			tableSelect : function(e){
+			tableSelect : function(selectedTable){
 				askTablePopup.close(function(){
 					updateTable({
-						id : e.id,
-						alias : e.alias
+						id : selectedTable.id,
+						alias : selectedTable.alias
 					});	
 				}, 200);
 			}
@@ -699,7 +700,315 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 		of.entry({orderFoodOperateType : 'fast'});
 	});
 	
+	//会员查询
+	$('#searchMember_a_tableSelect').click(function(){
+		$('#frontPageMemberOperation').popup('close');
+		setTimeout(function(){
+			var searchMemberPopup = null;
+			searchMemberPopup = new MemberReadPopup({
+				confirm : function(){
+					searchMemberPopup.close();
+				}
+			});
+			searchMemberPopup.open();
+		}, 300);
+	});
+		
+	//拆台
+	$('#apartTable_a_tableSelect').click(function(){
+		var _selectedTable = null;
+		var askTablePopup = new AskTablePopup({
+			tables : WirelessOrder.tables,
+			title : '拆台',
+			middle : function(){
+				Util.msg.tip('请选中一张餐桌或者编号');
+			},
+			tableSelect : function(selectedTable){
+				$('#matchedTables_div_askTable').hide();
+				$('#suffix_div_ask').show();
+				_selectedTable = selectedTable;
+			},
+			suffixSelect : function(suffixValue){
+				Util.LM.show();
+				var suffix = suffixValue;
+				$.post('../OperateTable.do', {
+					dataSource : 'apartTable',
+					tableID : _selectedTable.id,
+					suffix : suffix,
+					comment : $("#apartComment_input_ask").val()
+				}, function(result){
+					Util.LM.hide();
+					if(result.success){
+						askTablePopup.close(function(){
+							uo.entry({
+								table : result.root[0]
+							});
+						}, 200);
+					}else{
+						Util.msg.tip('操作失败, 请刷新页面后重试');
+					}
+				}).error(function(){
+					Util.LM.hide();
+					Util.msg.tip('操作失败, 请刷新页面重试');		
+				});		
+			}
+			
+		});
+		askTablePopup.open(function(){
+			$('#left_a_askTable').hide();
+			$('#apartComment_tr_ask').show();
+			$('#middle_a_askTable').css('width', '48%');
+			$('#right_a_askTable').css('width', '50%');
+		});
+	});
 	
+	//转台
+	$('#tranTable_a_tableSelect').click(function(){
+		var askTablePopup = new AskTablePopup({
+			title : '转台',
+			middle : function(){
+				var sourceTable = null;
+				var sourceAlias = $('#left_input_askTable').val();
+				var destAliasd = $('#tranNum_input_ask').val();
+				
+				if(destAliasd){
+					sourceTable = WirelessOrder.tables.getByAlias(sourceAlias);
+				}else{
+					sourceTable = uo.table;
+				}
+				
+				var destTable = WirelessOrder.tables.getByAlias(destAliasd);
+				
+				if(!sourceTable || !destTable){
+					Util.msg.tip('查找餐台出错,请检查台号是否正确');
+					return;
+				}
+				
+				Util.LM.show();
+				
+				$.post('../OperateTable.do', {
+					dataSource : 'transTable',
+					oldTableId : sourceTable.id,
+					newTableId : destTable.id
+				}, function(data){
+					Util.LM.hide();
+					if(data.success){
+						askTablePopup.close();
+						initTableData();
+						Util.msg.tip(data.msg);
+						ts.loadData();
+					}else{
+						Util.msg.tip(data.msg);
+					}
+				}).error(function(){
+					Util.LM.hide();
+					Util.msg.tip('操作失败,请刷新页面重试');
+				});
+			}
+		});
+		askTablePopup.open(function(){
+			$('#left_a_askTable').hide();
+			$('#tranNum_td_ask').show();
+			$('#middle_a_askTable').css('width', '48%');
+			$('#right_a_askTable').css('width', '50%');
+		});
+	});
+
+	//多台开席
+	$('#multiTables_a_tableSelect').click(function(){
+		var _selectedTable = null;
+		var askTablePopup = new AskTablePopup({
+			title : '多台开席选台',
+			tables : WirelessOrder.tables,
+			tableSelect : function(selectedTable){
+				_selectedTable = selectedTable;
+				var table = null;
+				for (var i = 0; i < ts.multiOpenTableChoosedTable.length; i++) {
+					if(ts.multiOpenTableChoosedTable[i].id == _selectedTable.id){
+						table = true;
+						ts.multiOpenTableChoosedTable.splice(i, 1);
+						break;
+					}
+				}
+				//选择餐台
+				if(table == null){
+					table = WirelessOrder.tables.getById(_selectedTable.id);
+					if(table.statusValue == 1){
+						Util.msg.tip("此餐台已使用, 不能选择");
+						return;
+					}
+					ts.multiOpenTableChoosedTable.push(table);
+				}
+				askTablePopup.close();
+				//刷新已点餐台
+				ts.loadBookChoosedTable({renderTo : 'multiOpenTableHadChoose', tables:ts.multiOpenTableChoosedTable});	
+
+			},
+			middle : function(){
+				Util.msg.tip('请选择一张餐桌');
+			}
+		});
+		askTablePopup.open(function(){
+			$('#left_a_askTable').hide();
+			$('#middle_a_askTable').css('width', '48%');
+			$('#right_a_askTable').css('width', '50%');
+		});
+	});
+	
+	//拼台
+	$('#combineTable_a_tableSelect').click(function(){
+		var _selectedTable = null;
+		var askTablePopup = new AskTablePopup({
+			title : '拼台',
+			tables : WirelessOrder.tables,
+			tableSelect : function(selectedTable){
+				_selectedTable = selectedTable;
+				var table = null;
+				
+				for (var i = 0; i < ts.multiPayTableChoosedTable.length; i++) {
+					if(ts.multiPayTableChoosedTable[i].id == _selectedTable.id){
+						table = true;
+						ts.multiPayTableChoosedTable.splice(i, 1);
+						break;
+					}
+				}
+				
+				//选择餐台
+				if(table == null){
+					table = WirelessOrder.tables.getById(_selectedTable.id);
+					if(table.statusValue == 0){
+						Util.msg.tip("此餐台未点餐, 不能选择");
+						return;
+					}
+					ts.multiPayTableChoosedTable.push(table);
+				}
+				
+				askTablePopup.close();
+				//刷新已点餐台
+				ts.loadBookChoosedTable({renderTo : 'multiPayTableHadChoose', tables:ts.multiPayTableChoosedTable});	
+				
+			},
+			middle : function(){
+				Util.msg.tip('请选择一张餐桌');
+			}
+		});
+		askTablePopup.open(function(){
+			$('#left_a_askTable').hide();
+			$('#middle_a_askTable').css('width', '48%');
+			$('#right_a_askTable').css('width', '50%');
+		});
+	});
+	
+	//预订添加餐桌
+	$('#addBookTable_a_tableSelect').click(function(){
+		var _selectedTable = null;
+		var askTablePopup = new AskTablePopup({
+			title : '选择餐桌',	
+			tables : WirelessOrder.tables,
+			tableSelect : function(selectedTable){
+				_selectedTable = selectedTable;
+				var table = null;
+				
+				for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+					if(ts.bookChoosedTable[i].id == _selectedTable.id){
+						table = true;
+						ts.bookChoosedTable.splice(i, 1);
+						break;
+					}
+				}
+				
+				//选择餐台
+				if(table == null){
+					table = WirelessOrder.tables.getById(_selectedTable.id);
+					
+					ts.bookChoosedTable.push(table);
+				}
+				//刷新已点餐台
+				ts.loadBookChoosedTable({renderTo : 'add_bookTableList', tables:ts.bookChoosedTable, otype:'display'});
+				
+				//显示预订添加界面餐台
+				$('#box4BookTableList').show();
+				askTablePopup.close();
+			}
+		});
+		askTablePopup.open(function(){
+			$('#left_a_askTable').hide();
+			$('#middle_a_askTable').css('width', '48%');
+			$('#right_a_askTable').css('width', '50%');
+		});
+		
+	});
+	
+	//入座选餐桌
+	$('#bookChoose_a_tableSelect').click(function(){
+		var _selectedTable = null;
+		var askTablePopup = new AskTablePopup({
+			title : '入座选桌',
+			tables : WirelessOrder.tables,
+			tableSelect : function(selectedTable){
+				_selectedTable = selectedTable;
+				var table = null;
+				if(typeof _selectedTable.otype == 'undefined' || _selectedTable.otype == 'commit'){
+					
+					for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+						if(ts.bookChoosedTable[i].id == _selectedTable.id){
+							table = true;
+							break;
+						}
+					}
+					//选择餐台
+					if(table == null){
+						table = WirelessOrder.tables.getById(_selectedTable.id);
+						if(table.statusValue == 1){
+							Util.msg.tip("此餐台已使用, 不能选择");
+							return;
+						}
+						ts.bookChoosedTable.push(table);
+					}			
+					//去除已订餐台
+					for (var i = 0; i < ts.bookOperateTable.oldTables.length; i++) {
+						if(ts.bookOperateTable.oldTables[i].id == _selectedTable.id){
+							ts.bookOperateTable.oldTables.splice(i, 1);
+							break;
+						}
+					}			
+				}else if(c.otype == 'display'){
+					for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+						if(ts.bookChoosedTable[i].id == _selectedTable.id){
+							table = ts.bookChoosedTable[i];
+							ts.bookChoosedTable.splice(i, 1);
+							break;
+						}
+					}
+					//退回原餐台
+					ts.bookOperateTable.oldTables.push(table);
+				}
+
+				//选台后关闭
+				askTablePopup.close();
+				//刷新入座餐台
+				ts.loadBookChoosedTable({renderTo : 'bookTableHadChoose', tables:ts.bookChoosedTable, otype : 'display'});
+				//刷新预订餐台
+				ts.loadBookChoosedTable({renderTo : 'bookTableToChoose', tables:ts.bookOperateTable.oldTables, otype : 'commit'});		
+
+				
+			}
+		});
+		
+		askTablePopup.open(function(){
+			$('#left_a_askTable').hide();
+			$('#middle_a_askTable').css('width', '48%');
+			$('#right_a_askTable').css('width', '50%');
+		});
+	});
+	
+	
+	
+	
+
+	
+	
+
 });
 
 
@@ -1442,93 +1751,6 @@ ts.toOrderFoodOrTransFood = function(c){
 	$('#divSelectTablesForTs').html("");
 };
 
-/**
- * 确定精确的搜索条件
- */
-ts.submitForSelectTableOrTransFood = function(){
-	if(ts.commitTableOrTran == 'table'){//普通选台
-		ts.submitForSelectTableNumTS();
-	}else if(ts.commitTableOrTran == 'trans'){//单条转菜
-		var table = WirelessOrder.tables.getByAlias($('#txtTableNumForTS').val());
-		if(table){
-			uo.transFood({id:table.id});
-		}else{
-			Util.msg.tip('没有此餐台, 请重新输入');
-		}
-	}else if(ts.commitTableOrTran == 'allTrans'){//全单转菜
-		var table = WirelessOrder.tables.getByAlias($('#txtTableNumForTS').val());
-		if(table){
-			uo.transFood({id:table.id, allTrans : -1});
-		}else{
-			Util.msg.tip('没有此餐台, 请重新输入');
-		}		
-	}else if(ts.commitTableOrTran == 'transTable'){
-		//转台
-		ts.transTable({alias:$('#txtTableNumForTS').val()});
-	}else if(ts.commitTableOrTran == 'tableTransTable'){
-		//前台转台
-		ts.transTable({alias:$('#numToOtherTable').val(), oldAlias:$('#txtTableNumForTS').val()});
-	}else if(ts.commitTableOrTran == 'lookup'){
-		//查台
-		var tableInfo = $('#left_input_askTable').val();
-		var tableId = 0;
-		if(isNaN(tableInfo)){
-			var temp = WirelessOrder.tables.slice(0);
-			var table4Search = [];
-			for(var i = 0; i < temp.length; i++){
-				if((temp[i].name + '').indexOf(tableInfo.toUpperCase()) != -1){
-					table4Search.push(temp[i]);
-				}
-			}	
-			table4Search = table4Search.sort(ts.searchTableCompareByName);
-			if(table4Search.length > 0){
-				tableId = table4Search[0].id;
-			}else{
-				Util.msg.tip('没有此餐台, 请重新输入');			
-				tableInfo.focus();
-				return;
-			}
-			
-		}		
-		updateTable({
-			id : tableId,
-			alias : !tableId?tableInfo:''
-		});			
-	}else if(ts.commitTableOrTran == 'openTable'){//开台
-		ts.createOrderForShowMessageTS();
-	}else if(ts.commitTableOrTran == 'apartTable'){//拆台
-		$('#divSelectTablesForTs').hide();
-		$('#divSelectTablesSuffixForTs').show();
-		ts.table = WirelessOrder.tables.getByAlias($('#txtTableNumForTS').val());
-	}else if(ts.commitTableOrTran == 'member'){//会员
-		uo.useMemberForOrderAction();
-	}else if(ts.commitTableOrTran == 'bookTableChoose'){//预订台
-		var table = null;
-		for (var i = 0; i < ts.bookChoosedTable.length; i++) {
-			if(ts.bookChoosedTable[i].alias == $('#txtTableNumForTS').val()){
-				table = true;
-				break;
-			}
-		}
-		
-		//选择餐台
-		if(table == null){
-			table = WirelessOrder.tables.getByAlias($('#txtTableNumForTS').val());
-			if(table.statusValue == 1){
-				Util.msg.tip("此餐台已使用, 不能选择");
-				return;
-			}
-			
-			ts.bookChoosedTable.push(table);
-			//刷新已点餐台
-			ts.loadBookChoosedTable({renderTo : 'bookTableHadChoose', tables:ts.bookChoosedTable, otype : 'display'});
-		}
-		
-		uo.closeTransOrderFood();
-
-	}
-};
-
 var printerConnectionTemplet = '<tr>' +
 		'<td>{index}</td>' +
 		'<td>{name}</td>' +
@@ -1619,141 +1841,6 @@ ts.closePrintConnection = function(){
 	$('#printerConnectionCmp').hide();
 	$('#shadowForPopup').hide();
 };
-
-
-
-
-
-
-
-
-/**
- * 设置控件为转台
- */
-ts.transTableForTS = function(){
-	//隐藏数量输入
-	$('#td4TxtFoodNumForTran').hide();
-	
-	//显示要转去的台号输入
-	$('#td4ToOtherTable').show();
-	
-	ts.commitTableOrTran = 'tableTransTable';
-	
-	$('#transSomethingTitle').html("请输入桌号，确定转台");
-	
-	//打开控件
-	uo.openTransOrderFood();
-};
-
-/**
- * 设置控件为直接开台
- */
-/*ts.createOrderForTS = function(){
-	//隐藏数量输入
-	$('#td4TxtFoodNumForTran').hide();
-	
-	//显示人数输入
-	$('#td4OpenTablePeople').show();
-	
-	ts.commitTableOrTran = 'openTable';
-	
-	$('#transSomethingTitle').html("请输入桌号和人数，确定开台");
-	
-	//打开控件
-	uo.openTransOrderFood();
-}*/
-
-
-/**
- * 设置预订入座选台
- */
-ts.openBookTable = function(){
-	//隐藏数量输入
-	$('#td4TxtFoodNumForTran').hide();
-	
-	ts.commitTableOrTran = 'bookTableChoose';
-	
-	$("#txtTableNumForTS").val("");
-	$("#txtTableComment").val("");
-	
-	$('#transSomethingTitle').html("请输入桌号，确认添加");
-	
-	//打开控件
-	uo.openTransOrderFood();		
-};
-
-/**
- * 设置手动预订选台
- */
-ts.openAddBookTable = function(){
-	//隐藏数量输入
-	$('#td4TxtFoodNumForTran').hide();
-	
-	ts.commitTableOrTran = 'addBookTableChoose';
-	
-	$("#txtTableNumForTS").val("");
-	$("#txtTableComment").val("");
-	
-	$('#transSomethingTitle').html("请输入桌号，确认添加");
-	
-	//打开控件
-	uo.openTransOrderFood();		
-};
-
-/**
- * 设置为拆台
- */
-ts.openApartTable = function(){
-	//隐藏数量输入
-	$('#td4TxtFoodNumForTran').hide();
-	//显示备注
-	$('#tr4TxtTableComment').show();
-	
-	ts.commitTableOrTran = 'apartTable';
-	
-	$("#txtTableNumForTS").val("");
-	$("#txtTableComment").val("");
-	
-	$('#transSomethingTitle').html("请输入桌号，确认拆台");
-	
-	//打开控件
-	uo.openTransOrderFood();		
-};
-
-
-/**
- * 拆台
- */
-ts.openApartTableAction = function(s){
-	Util.LM.show();
-	$.post('../OperateTable.do', {
-		dataSource : 'apartTable',
-		tableID : ts.table.id,
-		suffix : s,
-		comment : $("#txtTableComment").val()
-	}, function(result){
-		Util.LM.hide();
-		if(result.success){
-			uo.closeTransOrderFood();
-			uo.entry({
-				table : result.root[0]
-			});
-		}else{
-			Util.msg.alert({
-				msg : '操作失败, 请刷新页面后重试',
-				renderTo : 'tableSelectMgr'
-			});
-		}
-	}).error(function(){
-		Util.LM.hide();
-		Util.msg.alert({
-			title : '提示',
-			msg : '操作失败, 请刷新页面重试', 
-			renderTo : 'orderFoodListMgr'
-		});		
-	});		
-};
-
 
 /**
  * 关闭开台
@@ -1930,9 +2017,6 @@ function updateTable(c){
 function handleTableForTS(c){
 	var table = c.table;
 	if(table != null){
-		//关闭查台和shadow
-		$('#transFoodCmp').hide();
-		$('#shadowForPopup').hide();
 		//判断是否为已点菜餐桌
 		if(table.statusText == "就餐"){	
 			//判断餐桌是否已经改变状态
@@ -3225,7 +3309,6 @@ ts.loadBookChoosedTable = function(c){
 		html.push(tableCmpTemplet.format({
 			dataIndex : i,
 			id : c.tables[i].id,
-			click : 'ts.toOrderFoodOrTransFood({alias:'+ c.tables[i].alias +',id:'+ c.tables[i].id +', otype:\''+ c.otype +'\'})',
 			alias : aliasOrName,
 			theme : c.tables[i].statusValue == '1' ? "e" : "c",
 			name : c.tables[i].name == "" || typeof c.tables[i].name != 'string' ? c.tables[i].alias + "号桌" : c.tables[i].name,
@@ -3683,28 +3766,9 @@ ts.closeMultiOpenTableCmp = function(){
 };
 
 /**
- * 设置多台开席入座选台
- */
-ts.openMultiOpenTable = function(){
-	//隐藏数量输入
-	$('#td4TxtFoodNumForTran').hide();
-	
-	ts.commitTableOrTran = 'multiOpenTableChoose';
-	
-	$("#txtTableNumForTS").val("");
-	$("#txtTableComment").val("");
-	
-	$('#transSomethingTitle').html("请输入桌号，确认添加");
-	
-	//打开控件
-	uo.openTransOrderFood();		
-};
-
-/**
  * 多台点菜
  */
 ts.multiOpenTableOrderFood = function(){
-
 	if(ts.multiOpenTableChoosedTable.length == 0){
 		Util.msg.tip("请选择餐台");
 		return;

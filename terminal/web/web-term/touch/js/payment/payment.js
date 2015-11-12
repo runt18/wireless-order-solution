@@ -7,7 +7,7 @@ var pm = {table : {}},
 	//查询出来的菜品列表
 	orderFoodDetails = [],
 	
-
+ 
 	//账单详细
 	payment_lookupOrderDetailTemplet = '<tr>'
 		+ '<td>{dataIndex}</td>'
