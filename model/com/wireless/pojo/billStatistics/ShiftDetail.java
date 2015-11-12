@@ -60,7 +60,11 @@ public class ShiftDetail implements Jsonable{
 	}
 	
 	public boolean hasCouponUsage(){
-		return !this.couponUsage.getIssued().isEmpty() || !this.couponUsage.getUsed().isEmpty();
+		if(this.couponUsage != null){
+			return !this.couponUsage.getIssued().isEmpty() || !this.couponUsage.getUsed().isEmpty();
+		}else{
+			return false;
+		}
 	}
 	
 	public IncomeByPay getIncomeByPay(){
