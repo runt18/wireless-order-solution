@@ -173,7 +173,7 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 			type : 2,
 			title : '交款'
 		}
-	}
+	};
 	
 	var dailyPopup = null;
 	//日结处理函数

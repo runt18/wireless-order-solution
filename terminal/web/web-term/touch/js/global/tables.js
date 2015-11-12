@@ -77,6 +77,25 @@ function TableList(source){
 		return null;
 	};
 	
+	//模糊查找餐台
+	_tables.getByFuzzy = function(fuzzy){
+		var result = new TableList();
+		if(typeof fuzzy == 'number'){
+			fuzzy = (fuzzy + '').trim();
+		}else if(typeof fuzzy == 'string'){
+			fuzzy = fuzzy.trim();
+		}
+		_tables.forEach(function(e){
+			if(e.name.indexOf(fuzzy) != -1){
+				result.push(e);
+			}else if((e.alias + '').indexOf(fuzzy) != -1){
+				result.push(e);
+			}
+		});
+
+		return result;
+	};
+	
 	_tables.getIdleAmount = function(){
 		return _idleAmount;
 	};
