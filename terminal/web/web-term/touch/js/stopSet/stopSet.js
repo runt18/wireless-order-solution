@@ -341,22 +341,22 @@ ss.initDeptContent = function(){
 	//每行显示部门的个数
 	var displayDeptCount =  parseInt(usefullWidth / 88);	
 	
-	ss.deptPagingLimit = of.depts.root.length > displayDeptCount ? displayDeptCount-1 : displayDeptCount;
+	ss.deptPagingLimit = WirelessOrder.depts.length > displayDeptCount ? displayDeptCount-1 : displayDeptCount;
 	
-	var limit = of.depts.root.length >= ss.deptPagingStart + ss.deptPagingLimit ? ss.deptPagingLimit : ss.deptPagingLimit - (ss.deptPagingStart + ss.deptPagingLimit - of.depts.root.length);
+	var limit = WirelessOrder.depts.length >= ss.deptPagingStart + ss.deptPagingLimit ? ss.deptPagingLimit : ss.deptPagingLimit - (ss.deptPagingStart + ss.deptPagingLimit - WirelessOrder.depts.length);
 
 	
-	if(of.depts.root.length > 0){
+	if(WirelessOrder.depts.length > 0){
 		for (var i = 0; i < limit; i++) {
 			html.push(dept4StopSellCmpTemplet.format({
-				id : of.depts.root[ss.deptPagingStart + i].id,
-				name : of.depts.root[ss.deptPagingStart + i].name
+				id : WirelessOrder.depts[ss.deptPagingStart + i].id,
+				name : WirelessOrder.depts[ss.deptPagingStart + i].name
 			}));
 		}
 	}	
 	
 	//显示分页按钮
-	if(of.depts.root.length > displayDeptCount){
+	if(WirelessOrder.depts.length > displayDeptCount){
 		html.push('<a href="javascript:ss.deptGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
 				'<a href="javascript:ss.deptGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>');
 	}	
@@ -371,7 +371,7 @@ ss.initDeptContent = function(){
  */
 ss.deptGetNextPage = function(){
 	ss.deptPagingStart += ss.deptPagingLimit;
-	if(ss.deptPagingStart > of.depts.root.length){
+	if(ss.deptPagingStart > WirelessOrder.depts.length){
 		ss.deptPagingStart -= ss.deptPagingLimit;
 		return;
 	}
@@ -410,8 +410,8 @@ ss.initKitchenContent = function(c){
 	ss.kitchenPagingData = [];
 	var tempFoodData = []; // 菜品数据
 	var temp = null;
-	for(var i = 0; i < of.kitchens.root.length; i++){
-		temp = of.kitchens.root[i];
+	for(var i = 0; i < WirelessOrder.kitchens.length; i++){
+		temp = WirelessOrder.kitchens[i];
 		if(typeof c.deptId == 'number' && c.deptId != -1){
 			if(temp.dept.id == c.deptId){
 				ss.kitchenPagingData.push({
@@ -427,7 +427,7 @@ ss.initKitchenContent = function(c){
 					name : temp.name
 				});
 			}
-			tempFoodData = of.foodList;
+			tempFoodData = WirelessOrder.foods;
 		}
 	}
 	temp = null;
@@ -541,20 +541,20 @@ ss.findFoodByKitchen = function(c){
 	if(c.kitchenId == -1){
 		var dl = $('#depts4StopSellCmp a[data-theme=b]');
 		if(dl.length == 0 || parseInt(dl[0].getAttribute('data-value')) == -1){
-			for(var i = 0; i < of.kitchens.root.length; i++){
-				tempFoodData = tempFoodData.concat(of.kitchens.root[i].foods);
+			for(var i = 0; i < WirelessOrder.kitchens.length; i++){
+				tempFoodData = tempFoodData.concat(WirelessOrder.kitchens[i].foods);
 			}
 		}else{
-			for(var i = 0; i < of.kitchens.root.length; i++){
-				temp = of.kitchens.root[i];
+			for(var i = 0; i < WirelessOrder.kitchens.length; i++){
+				temp = WirelessOrder.kitchens[i];
 				if(temp.dept.id == parseInt(dl[0].getAttribute('data-value'))){
 					tempFoodData = tempFoodData.concat(temp.foods);		
 				}
 			}
 		}
 	}else{
-		for(var i = 0; i < of.kitchens.root.length; i++){
-			temp = of.kitchens.root[i];
+		for(var i = 0; i < WirelessOrder.kitchens.length; i++){
+			temp = WirelessOrder.kitchens[i];
 			if(typeof c.kitchenId == 'number' && c.kitchenId != -1){
 				if(temp.id == c.kitchenId){
 					tempFoodData = tempFoodData.concat(temp.foods);
@@ -675,10 +675,10 @@ ss.insertFood = function(c){
 	}
 	//
 	var data = null;
-	for(var i = 0; i < of.foodList.length; i++){
-		if(of.foodList[i].id == c.foodId){
+	for(var i = 0; i < WirelessOrder.foods.length; i++){
+		if(WirelessOrder.foods[i].id == c.foodId){
 			//返回连接空数组的副本
-			data = (of.foodList.concat()[i]);
+			data = (WirelessOrder.foods.concat()[i]);
 			break;
 		}
 	}

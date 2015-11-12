@@ -122,21 +122,21 @@ of.updataSelloutFoods = function(){
 		success : function(result, status, xhr){
 			if(result.success){
 				var stopFoods = result.root;
-				for (var j = 0; j < of.foodList.length; j++) {
+				for (var j = 0; j < WirelessOrder.foods.length; j++) {
 					//先把菜品全部变为不停售的, 因为可能之前是停售的, 现在不停售了
-					of.foodList[j].status &= ~(1 << 2);
+					WirelessOrder.foods[j].status &= ~(1 << 2);
 					for (var i = 0; i < stopFoods.length; i++) {
-						if(of.foodList[j].id == stopFoods[i].id){
+						if(WirelessOrder.foods[j].id == stopFoods[i].id){
 							if(stopFoods[i].foodLimitRemain == 0){
-								of.foodList[j].status |= (1 << 2);
+								WirelessOrder.foods[j].status |= (1 << 2);
 							}
 							
 							//更新限量沽清剩余
-							if((of.foodList[j].status & 1 << 10) != 0 || stopFoods[i].foodLimitAmount > 0){
+							if((WirelessOrder.foods[j].status & 1 << 10) != 0 || stopFoods[i].foodLimitAmount > 0){
 								//设置菜品为限量沽清属性
-								of.foodList[j].status |= (1 << 10);
-								of.foodList[j].foodLimitAmount = stopFoods[i].foodLimitAmount;
-								of.foodList[j].foodLimitRemain = stopFoods[i].foodLimitRemain;
+								WirelessOrder.foods[j].status |= (1 << 10);
+								WirelessOrder.foods[j].foodLimitAmount = stopFoods[i].foodLimitAmount;
+								WirelessOrder.foods[j].foodLimitRemain = stopFoods[i].foodLimitRemain;
 							}
 							break;
 						}
@@ -170,10 +170,10 @@ of.insertFood = function(c){
 	var foodData = null;
 	//如果菜品是时价属性
 	if(!c.foodUnitPriceInputed){
-		for(var i = 0; i < of.foodList.length; i++){
-			if(of.foodList[i].id == c.foodId){
+		for(var i = 0; i < WirelessOrder.foods.length; i++){
+			if(WirelessOrder.foods[i].id == c.foodId){
 				//返回连接空数组的副本
-				foodData = Util.clone(of.foodList[i]);
+				foodData = Util.clone(WirelessOrder.foods[i]);
 				break;
 			}
 		}
@@ -2041,7 +2041,6 @@ $(function(){
 	
 	//拼音 & 手写 & 厨房搜索
 	function search(value, qw){	
-		var sortMethod = null;
 		var data = null;
 		
 		function byConsumption(obj1, obj2){
@@ -2088,44 +2087,33 @@ $(function(){
 		}
 		
 		if(qw == 'pinyin' && value.trim().length > 0){
-			data = [];
-			for(var i = 0; i < of.foodList.length; i++){
-				if(of.foodList[i].pinyin.indexOf(value.trim().toLowerCase()) != -1){
-					data.push(of.foodList[i]);
-				}
-			}	
-			sortMethod = byConsumption;
+			data = WirelessOrder.foods.getByPinyin(value);
+			data.sort(byConsumption);
 			
 		}else if(qw == 'handWriting' && value.trim().length > 0){
-			data = [];
-			for(var i = 0; i < of.foodList.length; i++){
-				if(of.foodList[i].name.indexOf(value.trim()) != -1){
-					data.push(of.foodList[i]);
-				}
-			}		
-			sortMethod = byConsumption;
+			data = WirelessOrder.foods.getByName(value);
+			data.sort(byConsumption);
 							
 		}else if(qw == 'byDept'){
 			if(value.kitchenId != undefined && value.kitchenId != -1){
-				data = of.foodList.filter(function(item, pos, self){
-					return item.kitchen.id == value.kitchenId;
-				});
+				if(data){
+					data = data.getByKitchen(value.kitchenId);
+				}else{
+					data = WirelessOrder.foods.getByKitchen(value.kitchenId);
+				}
 			}
 			if(value.deptId != undefined && value.deptId != -1){
 				if(data){
-					data = data.filter(function(item, pos, self){
-						return item.kitchen.dept.id == value.deptId;
-					});
+					data = data.getByDept(value.deptId);
 				}else{
-					data = of.foodList.filter(function(item, pos, self){
-						return item.kitchen.dept.id == value.deptId;
-					});
+					data = WirelessOrder.foods.getByDept(value.deptId);
 				}
 			}
-			if(data == null){
-				data = of.foodList.slice(0);				
+			if(data){
+				data.sort(byAlias);
+			}else{
+				data = WirelessOrder.foods;				
 			}
-			sortMethod = byAlias;
 		}
 			
 		//创建菜品分页的控件
@@ -2159,7 +2147,7 @@ $(function(){
 		}
 		
 		foodPaging.init({
-			data : data ? data.sort(sortMethod) : of.foodList,
+			data : data,
 			callback : function(){
 				foodPaging.getFirstPage();
 			} 
@@ -2241,19 +2229,19 @@ $(function(){
 	
 
 		function updateSellout(selloutFoods){
-			for (var j = 0; j < of.foodList.length; j++) {
+			for (var j = 0; j < WirelessOrder.foods.length; j++) {
 				//先把菜品全部变为不停售的, 因为可能之前是停售的, 现在不停售了
-				of.foodList.setSellout(j, false);
-				of.foodList.setLimit(j, false);
+				WirelessOrder.foods.setSellout(j, false);
+				WirelessOrder.foods.setLimit(j, false);
 			}
 			
 			for(var i = 0; i < selloutFoods.length; i++){
-				var index = of.foodList.binaryIndex(selloutFoods[i]);
+				var index = WirelessOrder.foods.binaryIndex(selloutFoods[i]);
 				if(index >= 0){
 					//更新估清菜品的状态和限量估清的数量
-					of.foodList[index].status = selloutFoods[i].status;
-					if(of.foodList.isLimit(index)){
-						of.foodList.setLimit(index, true, selloutFoods[i].foodLimitAmount, selloutFoods[i].foodLimitRemain);
+					WirelessOrder.foods[index].status = selloutFoods[i].status;
+					if(WirelessOrder.foods.isLimit(index)){
+						WirelessOrder.foods.setLimit(index, true, selloutFoods[i].foodLimitAmount, selloutFoods[i].foodLimitRemain);
 					}
 				}
 			}
@@ -2362,16 +2350,16 @@ $(function(){
 			//每行显示部门的个数
 			var displayDeptCount =  parseInt(usefullWidth / 88);	
 			
-			var deptPagingLimit = of.depts.root.length > displayDeptCount ? displayDeptCount-1 : displayDeptCount;
+			var deptPagingLimit = WirelessOrder.depts.length > displayDeptCount ? displayDeptCount-1 : displayDeptCount;
 			
-			var limit = of.depts.root.length >= deptPagingStart + deptPagingLimit ? deptPagingLimit : deptPagingLimit - (deptPagingStart + deptPagingLimit - of.depts.root.length);
+			var limit = WirelessOrder.depts.length >= deptPagingStart + deptPagingLimit ? deptPagingLimit : deptPagingLimit - (deptPagingStart + deptPagingLimit - WirelessOrder.depts.length);
 			
 			
-			if(of.depts.root.length > 0){
+			if(WirelessOrder.depts.length > 0){
 				for (var i = 0; i < limit; i++) {
-					var dName = of.depts.root[deptPagingStart + i].name;
+					var dName = WirelessOrder.depts[deptPagingStart + i].name;
 					html.push(deptCmpTemplet.format({
-						id : of.depts.root[deptPagingStart + i].id,
+						id : WirelessOrder.depts[deptPagingStart + i].id,
 						name : dName.length > 4? dName.substring(0, 4) : dName
 					}));
 				}
@@ -2379,7 +2367,7 @@ $(function(){
 			//显示部门分页按钮
 			var deptPrevId = new Date().getTime() + '_prevPage';
 			var deptNextId = new Date().getTime() + '_nextPage';
-			if(of.depts.root.length > displayDeptCount){
+			if(WirelessOrder.depts.length > displayDeptCount){
 				html.push('<a id="' + deptPrevId + '" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">L</a>' +
 						'<a id="' + deptNextId + '" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="deptKitBtnFontPage">R</a>');
 			}	
@@ -2402,7 +2390,7 @@ $(function(){
 			//部门分页下一页	
 			$('#' + deptNextId).click(function(){
 				deptPagingStart += deptPagingLimit;
-				if(deptPagingStart > of.depts.root.length){
+				if(deptPagingStart > WirelessOrder.depts.length){
 					deptPagingStart -= deptPagingLimit;
 					return;
 				}
@@ -2440,8 +2428,8 @@ $(function(){
 					}
 				}
 				kitchenPagingData = [];
-				for(var i = 0; i < of.kitchens.root.length; i++){
-					var temp = of.kitchens.root[i];
+				for(var i = 0; i < WirelessOrder.kitchens.length; i++){
+					var temp = WirelessOrder.kitchens[i];
 					if(typeof deptId == 'number' && deptId != undefined){
 						if(temp.dept.id == deptId){
 							kitchenPagingData.push({
@@ -2466,7 +2454,7 @@ $(function(){
 						$(sl[i]).attr('data-theme', 'c');
 					}
 				}
-				kitchenPagingData = of.kitchens.root.slice(0);
+				kitchenPagingData = WirelessOrder.kitchens.slice(0);
 			}
 			
 			sl.buttonMarkup( "refresh" );
@@ -3228,13 +3216,7 @@ $(function(){
 			 		return;
 			 	}
 				 	
-			 	var data = null;
-			 	var temp = of.foodList.slice(0);
-			 	for(var i = 0; i < temp.length; i++){
-			 		if(temp[i].alias == alias.val()){
-			 			data = temp[i];
-			 		}
-			 	}
+			 	var data = WirelessOrder.foods.getByAlias(alias.val());
 			 	if(data == null){
 			 		Util.msg.alert({
 			 			topTip : true,

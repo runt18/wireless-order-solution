@@ -214,7 +214,6 @@ function NumKeyBoardPopup(param){
 		 new NumKeyBoard({
 			renderTo : document.getElementById('content_div_numKbPopup'),
 			result : function(value){
-				console.log(value);
 				input.focus();
 				//获取当前选中的文字
 				function getSelected(){

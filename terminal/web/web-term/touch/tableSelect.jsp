@@ -49,6 +49,7 @@
 <!-- 共享数据 -->
 <script type="text/javascript" src="js/global/share.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/global/tables.js?v=<%=v %>"></script>
+<script type="text/javascript" src="js/global/foods.js?v=<%=v %>"></script>
 <!-- 数字键盘控件 -->
 <script type="text/javascript" src="js/numKeyBoard/numKeyBoard.js?v=<%=v %>"></script>
 <!-- 餐台选择控件 -->
