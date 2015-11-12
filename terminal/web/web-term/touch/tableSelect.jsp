@@ -103,6 +103,7 @@
 	
 	<div data-role="popup" id="frontPageMemberOperation" data-theme="d" class="payment_searchMemberType">
 		<ul id="charge_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+			<li class="popupButtonList" id="searchMember_a_tableSelect"><a>会员查询</a></li>
 			<li class="popupButtonList" id="addMember_a_tableSelect"><a >添加会员</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberChargeWin()"><a >会员充值</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>

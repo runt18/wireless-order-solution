@@ -695,6 +695,22 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 	});
 
 	
+	//会员查询
+	$('#searchMember_a_tableSelect').click(function(){
+		$('#frontPageMemberOperation').popup('close');
+		setTimeout(function(){
+			var searchMemberPopup = null;
+			searchMemberPopup = new MemberReadPopup({
+				confirm : function(){
+					searchMemberPopup.close();
+				}
+			});
+			searchMemberPopup.open();
+		}, 300);
+	});
+		
+	
+	
 	
 	
 });
