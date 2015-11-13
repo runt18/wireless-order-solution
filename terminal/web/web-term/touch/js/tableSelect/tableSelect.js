@@ -63,6 +63,10 @@ $(function(){
 	//餐台刷新的定时器Id
 	var tableRefreshTimeoutId = null;
 	
+	$(window).on('beforeunload', function(){
+  		console.log('window unload');
+	});
+	
 	//改变窗口时
 	$(window).resize(function(){
 		//餐厅选择界面高度
