@@ -771,11 +771,7 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 				var sourceAlias = $('#left_input_askTable').val();
 				var destAliasd = $('#tranNum_input_ask').val();
 				
-				if(destAliasd){
-					sourceTable = WirelessOrder.tables.getByAlias(sourceAlias);
-				}else{
-					sourceTable = uo.table;
-				}
+				sourceTable = WirelessOrder.tables.getByAlias(sourceAlias);
 				
 				var destTable = WirelessOrder.tables.getByAlias(destAliasd);
 				
@@ -1547,62 +1543,6 @@ ts.bookSearchByName = {
 	}
 };
 
-/**
- * 执行转台
- * @param c  当前台号alias, 转去的台号oldAlias
- */
-ts.transTable = function(c){
-	var oldTable;
-	if(c && c.oldAlias){
-		oldTable = WirelessOrder.tables.getByAlias(c.oldAlias);
-	}else{
-		oldTable = uo.table;
-	}
-	
-	var newTable = WirelessOrder.tables.getByAlias(c.alias);
-	
-	if(!oldTable || !newTable){
-		Util.msg.alert({
-			title : '提示',
-			msg : '查找餐台出错, 请检查台号是否正确', 
-			renderTo : 'orderFoodListMgr'
-		});	
-		return;
-	}
-	
-	Util.LM.show();
-	
-	$.post('../OperateTable.do', {
-		dataSource : 'transTable',
-		oldTableId : oldTable.id,
-		newTableId : newTable.id
-	},function(data){
-		Util.LM.hide();
-		if(data.success){
-			uo.closeTransOrderFood();
-			initTableData();
-			Util.msg.alert({
-				msg : data.msg, 
-				topTip : true
-			});
-			//返回主界面
-			ts.loadData();
-		}else{
-			Util.msg.alert({
-				title : '提示',
-				msg : data.msg, 
-				renderTo : 'orderFoodListMgr'
-			});				
-		}			
-	}).error(function(){
-		Util.LM.hide();
-		Util.msg.alert({
-			title : '提示',
-			msg : '操作失败, 请刷新页面重试', 
-			renderTo : 'orderFoodListMgr'
-		});		
-	});	
-};
 
 /**
  * 搜索出来的结果点击直接提交

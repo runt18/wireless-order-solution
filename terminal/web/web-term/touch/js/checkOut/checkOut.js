@@ -24,38 +24,12 @@ var uo = {
 		+ '<td>' + '{comboFoodOpe}'
 		+ 		'<div data-role="controlgroup" data-type="horizontal" class="{isHideOpe}">'
 	    + 			'<a onclick="uo.openCancelFoodCmp({event:this})" data-index={dataIndex} data-role="button" data-theme="b">退菜</a>'
-	    +			'<a onclick="uo.transFoodForTS({event:this})" data-index={dataIndex} data-role="button" data-theme="b">转菜</a>'
+	    +			'<a class="tranFood" onclick="uo.transFoodForTS({event:this})" data-index={dataIndex}  data-role="button" data-theme="b">转菜</a>'
 	    +			'<a  data-index={dataIndex} data-role="button" data-theme="b"  data-rel="popup"  data-transition="pop" onclick="uo.openOrderFoodOtherOperate({event:this})">更多</a>'
 	    +		'</div>'
 	    +'</td>'
 		+ '<td>{waiter}</td>'
 		+ '</tr>';
-
-	function initSearchTables(c){
-		var html = [];
-		for (var i = 0; i < c.data.length; i++) {
-			
-			var aliasOrName;
-			if(c.data[i].categoryValue == 1){
-				aliasOrName = c.data[i].alias;
-			}else{
-				aliasOrName = '<font color="green">'+ c.data[i].categoryText +'</font>';
-			}
-			html.push(tableCmpTemplet.format({
-				dataIndex : i,
-				id : c.data[i].id,
-				click : 'ts.toOrderFoodOrTransFood({alias:'+ c.data[i].alias +',id:'+ c.data[i].id +'})',
-				alias : aliasOrName,
-				theme : c.data[i].statusValue == '1' ? "e" : "c",
-				name : c.data[i].name == "" || typeof c.data[i].name != 'string' ? c.data[i].alias + "号桌" : c.data[i].name,
-				tempPayStatus : c.data[i].isTempPaid? '暂结' : '&nbsp;&nbsp;',
-				bookTableStatus : c.data[i].isBook? '订' : '',
-				tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0?'tempPayStatus4Moz':'tempPayStatus'
-			}));	
-		}
-		$('#divSelectTablesForTs').html(html.join(''));
-		$('#divSelectTablesForTs a').buttonMarkup( "refresh" );
-	}
 
 	
 /**
@@ -211,7 +185,69 @@ uo.showOrder = function(){
 	}			
 	
 	$('#orderFoodListBody').html(html).trigger('create');
-	
+	//转菜
+	$('#orderFoodListBody .tranFood').each(function(index, element){
+		element.onclick= function(){
+			var _selectedTable = null;
+			var orderFood = uo.order.orderFoods[parseInt($(element).attr('data-index'))-1];		
+			var askTablePopup = new AskTablePopup({
+				tables : WirelessOrder.tables,
+				title : '转菜',
+				middle : function(){
+					var prefectTable = askTablePopup.prefect();
+					if(prefectTable){
+						var foodCount = $('#foodAmountText_input_ask').val();
+						Util.LM.show();
+						$.post('../OperateOrderFood.do', {
+							dataSource : 'transFood',
+							orderId : uo.order.id,
+							tableId : prefectTable.id,
+							transFoods : orderFood.orderFoodId + ',' + foodCount
+						}, function(data){
+							Util.LM.hide();
+							if(data.success){
+								askTablePopup.close();
+								Util.msg.tip(data.msg);
+								updateTable({id : uo.table.id});
+							}else{
+								Util.msg.tip(data.msg);
+							}
+						});
+					}else{
+						Util.msg.tip('没有此餐台, 请重新输入');
+					}
+				},
+				tableSelect : function(selectedTable){
+					_selectedTable = selectedTable;
+					var foodCount = $('#foodAmountText_input_ask').val();
+					Util.LM.show();
+					$.post('../OperateOrderFood.do', {
+						dataSource : 'transFood',
+						orderId : uo.order.id,
+						tableId : _selectedTable.id,
+						transFoods : orderFood.orderFoodId + ',' + foodCount
+					}, function(data){
+						Util.LM.hide();
+						if(data.success){
+							askTablePopup.close();
+							Util.msg.tip(data.msg);
+							updateTable({id : uo.table.id});
+						}else{
+							Util.msg.tip(data.msg);
+						}
+					});
+					
+				}
+			});
+			askTablePopup.open(function(){
+				$('#left_a_askTable').hide();
+				$('#foodAmount_td_ask').show();
+				$('#foodAmountText_input_ask').val(orderFood.count);
+				$('#middle_a_askTable').css('width', '48%');
+				$('#right_a_askTable').css('width', '50%');
+			});
+		}
+	});	
 	uo.showNorthForUpdateOrder();	
 };
 
@@ -723,238 +759,6 @@ uo.saveComment = function(){
 };
 
 /**
- * 设置控件为转菜
- * @param o
- */
-uo.transFoodForTS = function(c){
-	//显示数量输入
-	$('#td4TxtFoodNumForTran').show();
-	//设置操作类型为转菜
-	ts.commitTableOrTran = 'trans';
-	
-	var orderFood = uo.order.orderFoods[parseInt($(c.event).attr('data-index'))-1];
-	
-	$('#transSomethingTitle').html(orderFood.foodName +" -- 请输入桌号，菜品数量确定转菜");
-	
-	ts.tf.id = orderFood.orderFoodId;
-	ts.tf.count = orderFood.count + '';	
-	$('#txtFoodNumForTran').val(checkDot(ts.tf.count)?ts.tf.count : parseInt(ts.tf.count));	
-	
-	//打开控件
-	uo.openTransOrderFood();
-	
-};
-
-/**
- * 设置控件为全单转菜
- */
-uo.allTransFoodForTS = function (){
-	//隐藏数量输入
-	$('#td4TxtFoodNumForTran').hide();
-	
-	ts.commitTableOrTran = 'allTrans';
-	
-	$('#transSomethingTitle').html("请输入桌号，确定全部转菜");
-
-	//关闭更多操作
-	$('#updateFoodOtherOperateCmp').popup('close');	
-	
-	//打开控件
-	uo.openTransOrderFood();	
-};
-
-/**
- * 设置控件为转台
- */
-uo.transTableForTS = function(){
-	//隐藏数量输入
-	$('#td4TxtFoodNumForTran').hide();
-	ts.commitTableOrTran = 'transTable';
-	
-	$("#txtTableNumForTS").val("");
-	
-	$('#transSomethingTitle').html("请输入桌号，确定转台");
-	
-	//打开控件
-	uo.openTransOrderFood();
-};
-
-
-/**
- * 设置控件为会员
- */
-uo.useMemberForOrder = function(){
-	//隐藏数量输入
-	$('#td4TxtFoodNumForTran').hide();
-	ts.commitTableOrTran = 'member';
-	
-	$("#txtTableNumForTS").val("");
-	//设置为会员输入
-	$("#txtTableNumForTS").attr("placeholder", "请输入会员卡号或手机号");
-	//显示回删
-	$('#td4CmpDeleteWord').show();
-	
-	$('#transSomethingTitle').html("请输入会员资料, 确定使用会员");
-	
-	//打开控件
-	uo.openTransOrderFood();
-};
-
-/**
- * 登陆会员
- */
-uo.useMemberForOrderAction = function(){
-	var member = $('#txtTableNumForTS');
-	if(!member.val()){
-		Util.msg.tip('请输入会员信息');			
-		member.focus();
-		return;
-	}else if(member.val() <= 0 || isNaN(member.val())){
-		Util.msg.tip('请输入正确的会员信息');			
-		member.focus();
-		member.select();	
-		return;
-	};
-	Util.LM.show();
-	$.post('../QueryMember.do', {
-		dataSource : 'normal',
-		memberCardOrMobileOrName : member.val()
-	}, function(result){
-		if(result.success && result.root.length > 0){
-			$.post('../OperateDiscount.do', {
-				dataSource : 'setDiscount',
-				orderId : uo.order.id,
-				memberId : result.root[0].id
-			}, function(data){
-				Util.LM.hide();
-				if(data.success){
-					//异步刷新账单
-					initOrderData({order : uo.order});
-					uo.closeTransOrderFood();
-					Util.msg.tip('会员注入成功');	
-				}else{
-					Util.msg.alert({
-						title : '提示',
-						msg : '使用会员失败, 请刷新页面重试', 
-						renderTo : 'orderFoodListMgr',
-						time : 2
-					});					
-				}
-			});				
-		}else{
-			Util.LM.hide();
-			Util.msg.alert({
-				title : '提示',
-				msg : '未找到对应会员, 请输入正确信息', 
-				renderTo : 'orderFoodListMgr',
-				time : 2,
-				fn : function(){
-					$('#txtTableNumForTS').focus();
-				}
-			});
-			
-		}	
-	});
-};
-
-/**
- * 转菜操作
- */
-uo.openTransOrderFood = function (){
-	$('#transFoodCmp').trigger('create').trigger('refresh');
-	$('#transFoodCmp').show();
-	$('#shadowForPopup').show();
-	NumKeyBoardAttacher.instance().attach($('#txtTableNumForTS')[0], function(inputVal){
-		ts.s.fireEvent();
-	});
-	$('#txtTableNumForTS').focus();
-	NumKeyBoardAttacher.instance().attach($('#numToOtherTable')[0]);
-	NumKeyBoardAttacher.instance().attach($('#txtFoodNumForTran')[0]);
-};
-
-
- // 关闭转菜
-uo.closeTransOrderFood = function(){
-
-	if(ts.commitTableOrTran == 'openTable'){
-		//隐藏人数输入
-		$('#td4OpenTablePeople').hide();
-		$('#openTablePeople').val(1);
-	}else if(ts.commitTableOrTran == 'tableTransTable'){
-		//隐藏转去台
-		$('#td4ToOtherTable').hide();
-		$('#numToOtherTable').val('');		
-	}else if(ts.commitTableOrTran == 'apartTable'){
-		//隐藏拆台
-		$('#divSelectTablesSuffixForTs').hide();
-		//隐藏备注
-		$('#tr4TxtTableComment').hide();
-		//显示餐台选择
-		$('#divSelectTablesForTs').show();
-	}else if(ts.commitTableOrTran == 'member'){
-		//显示为台号信息
-		$("#txtTableNumForTS").attr("placeholder", "填写台号");
-		//隐藏回删
-		$('#td4CmpDeleteWord').hide();
-	}else if(ts.commitTableOrTran == 'lookup'){
-		//隐藏结账按钮
-		$('#ts_toPaymentMgr').hide();
-		$('#certain4searchTableCmps .ui-btn-text').html('确定');
-		//去除3个按钮并排
-		$('#searchTableCmpsFoot a').removeClass('tablePopbottomBtn');		
-	}
-
-	//不设置预订默认操作
-	if(ts.commitTableOrTran != 'bookTableChoose' && ts.commitTableOrTran != 'addBookTableChoose' && ts.commitTableOrTran != 'multiOpenTableChoose'){
-		//操作设置为默认
-		ts.commitTableOrTran = 'table';
-	}
-
-	
-	$('#transFoodCmp').hide();
-	$('#shadowForPopup').hide();	
-	
-	$('#txtTableNumForTS').val('');
-	$('#txtFoodNumForTran').val('');
-	
-	$('#divSelectTablesForTs').html('');
-	
-	NumKeyBoardAttacher.instance().detach($('#txtTableNumForTS')[0]);
-	NumKeyBoardAttacher.instance().detach($('#numToOtherTable')[0]);
-	NumKeyBoardAttacher.instance().detach($('#txtFoodNumForTran')[0]);
-};
-
-/**
- * 执行转菜
- */
-uo.transFood = function(c){
-	ts.tf.count = $('#txtFoodNumForTran').val();
-	Util.LM.show();
-	$.post('../OperateOrderFood.do', {
-		dataSource : 'transFood',
-		orderId : uo.order.id,
-		tableId : c.id,
-		transFoods : (c.allTrans?c.allTrans:(ts.tf.id + ',' + ts.tf.count))		
-	},function(data){
-		Util.LM.hide();
-		if(data.success){
-			uo.closeTransOrderFood();
-			Util.msg.tip(data.msg);			
-			//刷新已点菜
-			updateTable({id : uo.table.id});
-			ts.tf={};
-		}else{
-			Util.msg.alert({
-				title : '温馨提示',
-				msg : data.msg, 
-				renderTo : 'orderFoodListMgr',
-				time : 2
-			});				
-		}			
-	});
-};
-
-/**
  * 暂结
  */
 uo.tempPayForUO = function(c){
@@ -1440,7 +1244,150 @@ $(function(){
 			});
 			//打开会员读取Popup
 			memberReadPopup.open();
-		})
+		});
+		
+		//转台
+		$('#checkOutTranTable_a_tableSelect').click(function(){
+			var _selectedTable = null;
+			var askTablePopup = new AskTablePopup({
+				tables : WirelessOrder.tables,
+				title : '转台',
+				middle : function(){
+					var sourceTable = uo.table;
+					var destAlias = $('#left_input_askTable').val();
+					
+					var destTable = WirelessOrder.tables.getByAlias(destAlias);
+					
+					if(!sourceTable || !destTable){
+						Util.msg.tip('查找餐台出错,请检查台号是否正确');
+						return;
+					}
+					
+					Util.LM.show();
+					
+					$.post('../OperateTable.do', {
+						dataSource : 'transTable',
+						oldTableId : sourceTable.id,
+						newTableId : destTable.id
+					},function(data){
+						Util.LM.hide();
+						if(data.success){
+							askTablePopup.close(function(){
+								initTableData();
+								Util.msg.tip(data.msg);
+								//返回主界面
+								ts.loadData();
+							}, 200);
+						}else{
+							Util.msg.tip(data.msg);				
+						}			
+					}).error(function(){
+						Util.LM.hide();
+						Util.msg.tip('操作失败, 请刷新页面重试');		
+					});	
+					
+				},
+				tableSelect : function(selectedTable){
+					_selectedTable = selectedTable;
+					var sourceTable = uo.table;
+					
+					var destTable = _selectedTable;
+					
+					Util.LM.show();
+					
+					$.post('../OperateTable.do', {
+						dataSource : 'transTable',
+						oldTableId : sourceTable.id,
+						newTableId : destTable.id
+					},function(data){
+						Util.LM.hide();
+						if(data.success){
+							askTablePopup.close(function(){
+								initTableData();
+								Util.msg.tip(data.msg);
+								//返回主界面
+								ts.loadData();
+							}, 200);
+						}else{
+							Util.msg.tip(data.msg);				
+						}			
+					}).error(function(){
+						Util.LM.hide();
+						Util.msg.tip('操作失败, 请刷新页面重试');		
+					});	
+					
+				}
+			});
+			askTablePopup.open(function(){
+				$('#left_a_askTable').hide();
+				$('#middle_a_askTable').css('width', '48%');
+				$('#right_a_askTable').css('width', '50%');
+			});
+		});
+		
+		//全单转菜
+		$('#allTrantable_li_tableSelect').click(function(){
+			$('#updateFoodOtherOperateCmp').popup('close');
+			setTimeout(function(){
+				var _selectedTable = null;
+				var askTablePopup = new AskTablePopup({
+					tables : WirelessOrder.tables,
+					title : '全单转菜',
+					middle :function(){
+						var perfectMatched = askTablePopup.prefect();
+						if(perfectMatched){
+							Util.LM.show();
+							$.post('../OperateOrderFood.do', {
+								dataSource : 'transFood',
+								orderId : uo.order.id,
+								tableId : perfectMatched.id,
+								transFoods : -1		
+							},function(data){
+								Util.LM.hide();
+								if(data.success){
+									Util.msg.tip(data.msg);
+									askTablePopup.close(function(){
+										//刷新已点菜
+										updateTable({id : uo.table.id});
+									}, 200);
+								}else{
+									Util.msg.tip(data.msg);				
+								}			
+							});
+						}else{
+							Util.msg.tip('没有此餐台,请重新输入');
+						}
+					},
+					tableSelect : function(selectedTable){
+						_selectedTable = selectedTable;
+						Util.LM.show();
+						$.post('../OperateOrderFood.do', {
+							dataSource : 'transFood',
+							orderId : uo.order.id,
+							tableId : _selectedTable.id,
+							transFoods : -1	
+						},function(data){
+							Util.LM.hide();
+							if(data.success){
+								Util.msg.tip(data.msg);
+								askTablePopup.close(function(){
+									//刷新已点菜
+									updateTable({id : uo.table.id});
+								}, 200);
+							}else{
+								Util.msg.tip(data.msg);				
+							}			
+						});
+					}
+				});
+				askTablePopup.open(function(){
+					$('#left_a_askTable').hide();
+					$('#middle_a_askTable').css('width', '48%');
+					$('#right_a_askTable').css('width', '50%');
+				});
+			}, 200);
+		});
+		
 	});
 	
 });

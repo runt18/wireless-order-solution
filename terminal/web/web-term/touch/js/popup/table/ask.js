@@ -83,7 +83,8 @@ function AskTablePopup(param){
 			});
 			
 			//数字键盘绑定填写要转去的台号输入框
-			NumKeyBoardAttacher.instance().attach(self.find('[id=tranNum_input_ask]'));
+			NumKeyBoardAttacher.instance().attach(self.find('[id=tranNum_input_ask]')[0]);
+			NumKeyBoardAttacher.instance().attach(self.find('[id=foodAmountText_input_ask]')[0]);
 			
 			//键盘输入匹配
 			self.find('[id=left_input_askTable]').on('keyup', function(){
@@ -105,6 +106,7 @@ function AskTablePopup(param){
 			NumKeyBoardAttacher.instance().detach(self.find('[id=left_input_askTable]')[0]);
 			
 			NumKeyBoardAttacher.instance().detach(self.find('[id=tranNum_input_ask]'));
+			NumKeyBoardAttacher.instance().detach(self.find('[id=foodAmountText_input_ask]'));
 			//删除keypress事件
 			self.find('[id=left_input_askTable]').off('keyup');
 			
