@@ -1,7 +1,7 @@
 /**
  * 
  */
-function FoodList(source){
+WirelessOrder.FoodList = function(source){
 
 	var _foods = null;
 	
@@ -90,7 +90,7 @@ function FoodList(source){
 		}
 		
 		if(value != null){
-			var result = new FoodList();
+			var result = new WirelessOrder.FoodList();
 			_foods.forEach(function(e){
 				if(e.kitchen.id === value){
 					result.push(e);
@@ -112,7 +112,7 @@ function FoodList(source){
 		}
 		
 		if(value != null){
-			var result = new FoodList();
+			var result = new WirelessOrder.FoodList();
 			_foods.forEach(function(e){
 				if(e.kitchen.dept.id === value){
 					result.push(e);
@@ -127,7 +127,7 @@ function FoodList(source){
 	//根据拼音查找菜品
 	_foods.getByPinyin = function(pinyin){
 		var value = pinyin.trim().toLowerCase();
-		var result = new FoodList();
+		var result = new WirelessOrder.FoodList();
 		_foods.forEach(function(e){
 			if(e.pinyin.indexOf(value) != -1){
 				result.push(e);
@@ -139,7 +139,7 @@ function FoodList(source){
 	//根据菜名查找菜品
 	_foods.getByName = function(name){
 		var value = name.trim();
-		var result = new FoodList();
+		var result = new WirelessOrder.FoodList();
 		_foods.forEach(function(e){
 			if(e.name.indexOf(value) != -1){
 				result.push(e);

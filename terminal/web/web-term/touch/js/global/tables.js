@@ -1,7 +1,7 @@
 /**
  * 
  */
-function TableList(source){
+WirelessOrder.TableList = function(source){
 
 	//就餐餐台数量
 	var _busyAmount = 0;
@@ -14,9 +14,9 @@ function TableList(source){
 	if(source){
 		_tables = source.slice(0);
 		_tables.forEach(function(e){
-			if(e.statusValue == TableList.Status.BUSY.val){
+			if(e.statusValue == WirelessOrder.TableList.Status.BUSY.val){
 				_busyAmount++;
-			}else if(e.statusValue == TableList.Status.IDLE.val){
+			}else if(e.statusValue == WirelessOrder.TableList.Status.IDLE.val){
 				_idleAmount++;
 			}
 			if(e.isTempPaid){
@@ -28,16 +28,16 @@ function TableList(source){
 	}
 	
 	_tables.isBusy = function(index){
-		return this[index].statusValue == TableList.Status.BUSY.val;
+		return this[index].statusValue == WirelessOrder.TableList.Status.BUSY.val;
 	};
 	
 	_tables.isIdle = function(index){
-		return this[index].statusVale == TableList.Status.IDLE.val;
+		return this[index].statusVale == WirelessOrder.TableList.Status.IDLE.val;
 	};
 	
 	//根据区域查找tables
 	_tables.getByRegion = function(regionId){
-		var result = new TableList();
+		var result = new WirelessOrder.TableList();
 		for(var i = 0; i < _tables.length; i++){
 			if(_tables[i].region.id == regionId){
 				result.push(_tables[i]);
@@ -48,7 +48,7 @@ function TableList(source){
 	
 	//根据餐台状态查找tables
 	_tables.getByStatus = function(status){
-		var result = new TableList();
+		var result = new WirelessOrder.TableList();
 		for(var i = 0; i < _tables.length; i++){
 			if(_tables[i].statusValue == status.val){
 				result.push(_tables[i]);
@@ -79,7 +79,7 @@ function TableList(source){
 	
 	//模糊查找餐台
 	_tables.getByFuzzy = function(fuzzy){
-		var result = new TableList();
+		var result = new WirelessOrder.TableList();
 		if(typeof fuzzy == 'number'){
 			fuzzy = (fuzzy + '').trim();
 		}else if(typeof fuzzy == 'string'){
@@ -109,9 +109,9 @@ function TableList(source){
 	};
 	
 	return _tables;
-}
+};
 
-TableList.Status = {
+WirelessOrder.TableList.Status = {
 	IDLE : { val : 0, desc : '空闲'},
 	BUSY : { val : 1, desc : '就餐'}
 };

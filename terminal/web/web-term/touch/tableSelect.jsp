@@ -50,6 +50,7 @@
 <script type="text/javascript" src="js/global/share.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/global/tables.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/global/foods.js?v=<%=v %>"></script>
+<script type="text/javascript" src="js/global/staff.js?v=<%=v %>"></script>
 <!-- 数字键盘控件 -->
 <script type="text/javascript" src="js/numKeyBoard/numKeyBoard.js?v=<%=v %>"></script>
 <!-- 餐台选择控件 -->
@@ -139,18 +140,18 @@
    
 	<div data-role="popup" id="popupAllStatusCmp" data-theme="d" >
         <ul data-role="listview" data-inset="true" style="min-width:100px;" data-theme="b">
-            <li id="idleTable_li_tableSelect" class="tempFoodKitchen" data-icon="false"><a>空闲台( <label id="ts_freeTablesCount" style="color: #f7c942;">0</label> )</a></li>
-            <li id="busyTable_li_tableSelect" class="tempFoodKitchen" data-icon="false"><a>就餐台( <label id="ts_busyTablesCount" style="color: #f7c942;">0</label> )</a></li>
+            <li id="idleTable_li_tableSelect" class="tempFoodKitchen" data-icon="false"><a>空闲台( <label id="idleTableAmount_label_tableSelect" style="color: #f7c942;">0</label> )</a></li>
+            <li id="busyTable_li_tableSelect" class="tempFoodKitchen" data-icon="false"><a>就餐台( <label id="busyTableAmount_label_tableSelect" style="color: #f7c942;">0</label> )</a></li>
             <li id="allTable_li_tableSelect" class="tempFoodKitchen" data-icon="false"><a>全部台</a></li>
         </ul>
 	</div>	
 
 	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
 		<div class="bottomGeneralBar">
-			<div id="spanStaffNameForDisplayToTS" style="float: left;margin-left: 10px;">操作人: ---</div>
-			<div id="spanTableStatus4Free" style="float: left;margin-left: 15px;">空闲台: <font id="selectBarFreeTablesCount" color="green">--</font></div>
-			<div id="spanTableStatus4Busy" style="float: left;margin-left: 15px;">就餐台: <font id="selectBarBusyTablesCount" color="green">--</font></div>
-			<div id="spanTableStatus4TempPay" style="float: left;margin-left: 15px;">暂结台: <font id="selectBarTempPayTablesCount" color="green">--</font></div>
+			<div id="loginStaffName_div_tableSelect" style="float: left;margin-left: 10px;">操作人: ---</div>
+			<div style="float: left;margin-left: 15px;">空闲台: <font id="idleTableAmount_font_tableSelect" color="green">--</font></div>
+			<div style="float: left;margin-left: 15px;">就餐台: <font id="busyTableAmount_font_tableSelect" color="green">--</font></div>
+			<div style="float: left;margin-left: 15px;">暂结台: <font id="tmpPaidTableAmount_font_tableSelect" color="green">--</font></div>
 			<div id="divDescForTableSelect-padding-msg" style="float: right;margin-right: 20px;">共--项</div>
 		</div>	
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loginOut()">注销</a>
@@ -1126,7 +1127,7 @@
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="operateOrderFoodTaste({type:2})">口味</a>
 					 <!-- <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.updateUnitPrice()">单位</a> -->
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" id="addTaste_a_orderFood">手写口味</a>
-					 <a id="giftFoodOperate" data-role="button" data-inline="true" class="orderOperBtn" style="display: none;" data-theme="b" onclick="of.giftFood()">赠送</a>	
+					 <a id="giftFoodOperate_a_orderFood" data-role="button" data-inline="true" class="orderOperBtn" style="display: none;" data-theme="b" onclick="of.giftFood()">赠送</a>	
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.foodHangup({type:2})">叫起</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" data-rel="popup"  data-transition="pop" href="#orderFoodOtherOperateCmp">更多</a>
 					 <!--<a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="operateOrderFoodTaste({type:1})">全单口味</a>

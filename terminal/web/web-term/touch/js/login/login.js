@@ -151,7 +151,7 @@ function staffLoginHandler(c){
 				if(c && c.part == 'basic'){
 					location.href = '../pages/Mgr/DigieBasic.html';
 				}else{
-					location.href = 'tableSelect.jsp?status='+systemStatus;	
+					location.href = 'tableSelect.jsp?status=' + systemStatus + '#tableSelectMgr';	
 				}
 			}else{
 				
@@ -285,7 +285,7 @@ function initStaffContent(c){
 					templet : function(c){
 						return allStaff.format({
 							staffId : c.data.staffID,
-							staffName : c.data.staffName ,
+							staffName : c.data.staffName
 						});
 					}
 				});
@@ -300,7 +300,7 @@ function initStaffContent(c){
 			}else{
 				Util.msg.alert({
 					msg : '获取餐厅员工信息失败, 请联系客服员.',
-					renderTo : 'staffLoginPage',
+					renderTo : 'staffLoginPage'
 				});
 			}
 		},
@@ -308,7 +308,7 @@ function initStaffContent(c){
 			Util.LM.hide();
 			Util.msg.alert({
 				msg : '获取餐厅员工信息失败, 请联系客服员.',
-				renderTo : 'staffLoginPage',
+				renderTo : 'staffLoginPage'
 			});
 		}
 	});

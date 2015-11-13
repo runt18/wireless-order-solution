@@ -3,28 +3,17 @@ var Request = new Util_urlParaQuery();
 var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 
 
-	//作为收银端或触摸屏时, 餐台列表的高度
-var	tableListHeight = 86,
 	
-	//餐桌选择包,tt：转台, rn: 区域
-	ts = {
+//餐桌选择包
+var	ts = {
 		table : {},
-		rn : {},
-		tt : {},
 		tf : {},
-		dailyOpe : {},
 		member : {},
-		searchTable : false,
 		commitTableOrTran : 'table',
 		bookChoosedTable : [],
 		multiOpenTableChoosedTable : [],
 		multiPayTableChoosedTable : []
 	},
-	//登录操作包
-	ln = {
-		restaurant : {},
-		staffData : {staffID:0, staffName:''}
-	},	
 	/**
 	 * 元素模板
 	 */
@@ -65,615 +54,704 @@ var	tableListHeight = 86,
 			+ '<td>{unitPrice}</td>'
 			+ '</tr>';		
 
-//退出餐台选择界面
-$(document).on('pagehide', "#tableSelectMgr", function(){
 
-});
 
-//进入餐台选择界面
-$(document).on('pageshow', "#tableSelectMgr", function(){
-	//清除快捷键
-	$(document).off('keydown');
-	//设置快捷键
-	$(document).on('keydown', function(event){
-		if(event.which == "107"){//加号
-			$('#searchTable_a_tableSelect').click();
-	    } 	
-	});	
-});
-			
-//进入餐桌初始化
-$(document).on('pageinit', "#tableSelectMgr", function(){
-	//pos端 && 体验端 && touch端
-	if(systemStatus == 1){//pos端
-		//日结,交班等
-		$('#divPosOperation').show();
-		$('#btnOrderAndPay').show();
-		//下单并结账
-		$('#orderPay_li_orderFood').show();
-		//已点菜结账按钮
-		$('#payOrder_a_checkOut').show();
-		//收银端餐台列表高度
-		tableListHeight = 130;	
-
-	}else if(systemStatus == 3){//try端
-		//日结,交班等
-		$('#divPosOperation').show();
-		$('#btnOrderAndPay').show();
-		//下单并结账
-		$('#orderPay_li_orderFood').hide();
-		//已点菜结账按钮
-		$('#payOrder_a_checkOut').show();		
-		//收银端餐台列表高度
-		tableListHeight = 130;	
-		//try端不可进入后台
-		$('#btnToBasicPage').hide();
-		
-	}else if(systemStatus == 2){//touch端
-		//日结,交班等
-		$('#divPosOperation').hide();
-		$('#btnOrderAndPay').hide();
-		//下单并结账
-		$('#orderPay_li_orderFood').hide();
-		//已点菜结账按钮
-		$('#payOrder_a_checkOut').hide();
-		//收银端餐台列表高度
-		tableListHeight = 86;
-	}else if(systemStatus == 4){//快餐模式
-		//日结,交班等
-		$('#divPosOperation').show();
-		$('#btnOrderAndPay').show();
-		//下单并结账
-		$('#orderPay_li_orderFood').show();
-		//已点菜结账按钮
-		$('#payOrder_a_checkOut').show();
-		//快餐模式按钮
-		$('#fastFood_li_tableSelect').show();
-		//快餐模式的结账按钮
-		$('#fastPay_a_orderFood').show();
-		//收银端餐台列表高度
-		tableListHeight = 130;	
-	}
+$(function(){
 	
-	//空闲状态的餐台
-	$('#idleTable_li_tableSelect').click(function(){
-		//TODO
-		$('#labTableStatus .ui-btn-text').text($(this).text());
-		$('#labTableStatus').attr('table-status', TableList.Status.IDLE.val);
-		$('#popupAllStatusCmp').popup('close');
-		showTable();
+	//作为收银端或触摸屏时, 餐台列表的高度
+	var	tableListHeight = 86;
+	//餐台刷新的定时器Id
+	var tableRefreshTimeoutId = null;
+	
+	//改变窗口时
+	$(window).resize(function(){
+		//餐厅选择界面高度
+		$('#tableAndRegionsCmp').height(document.body.clientHeight - tableListHeight);	
+		//点菜界面高度
+		$('#orderFoodCenterCmp').height(document.body.clientHeight - 210);
+		document.getElementById('foodsCmp').style.height = (document.body.clientHeight - 210)+'px';		
+		//沽清菜界面高度
+		$('#stopSellCmp').height(document.body.clientHeight - 125);	
+		document.getElementById('foods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
+		document.getElementById('divFoods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
+		//已点菜界面高度
+		$('#orderFoodListCmp').height(document.body.clientHeight - 125);
+		//预订列表
+		$('#bookOrderListCmp').height(document.body.clientHeight - 170);	
+		//结账界面高度 & 菜品列表高度
+		$('#paymentCmp').height(document.body.clientHeight - 86);	
+		$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
 	});
 	
-	//就餐状态的餐台
-	$('#busyTable_li_tableSelect').click(function(){
-		$('#labTableStatus .ui-btn-text').text($(this).text());
-		$('#labTableStatus').attr('table-status', TableList.Status.BUSY.val);
-		$('#popupAllStatusCmp').popup('close');
-		showTable();
-	});
-	
-	//全部状态的餐台
-	$('#allTable_li_tableSelect').click(function(){
-		$('#labTableStatus .ui-btn-text').text($(this).text());
-		$('#labTableStatus').removeAttr('table-status');
-		$('#popupAllStatusCmp').popup('close');
-		showTable();
-	});
-	
-	var CommitTypeEnum = {
-		Daily : {
-			type : 1,
-			title : '日结'
-		},
-		Phrase : {
-			type : 0,
-			title : '交班'
-		},
-		Person : {
-			type : 2,
-			title : '交款'
+	//退出餐台选择界面
+	$('#tableSelectMgr').on('pagehide', function(){
+		//删除刷新餐台的定时器
+		if(tableRefreshTimeoutId){
+			clearTimeout(tableRefreshTimeoutId);
+			console.log('clear initTableData');
 		}
-	};
+	});
 	
-	var dailyPopup = null;
-	//日结处理函数
-	function dailyHandler(commitType){
-		if(dailyPopup == null){
-			var dailyPopup = new JqmPopup({
-				loadUrl : './popup/daily/daily.html',
-				pageInit : function(self){
-					//关闭
-			 		self.find('[id=close_a_daily]').click(function(){
-			 			dailyPopup.close();
-			 		});
-			 		//预打
-			 		self.find('[id=prePrint_a_daily]').click(function(){
-			 			prePrint();
-			 		});
-			 		//日结
-			 		self.find('[id=confirm_a_daily]').click(function(){
-			 			submitDailyOperation();
-			 		});
-				}
-			});
-		}
-		
-		//打开日结Popup
-		dailyPopup.open(function(){
-			showDailyInfo(commitType);
+	//进入餐台选择界面
+	$('#tableSelectMgr').on('pageshow', function(){
+		//清除快捷键
+		$(document).off('keydown');
+		//设置快捷键
+		$(document).on('keydown', function(event){
+			if(event.which == "107"){//加号
+				$('#searchTable_a_tableSelect').click();
+		    } 	
 		});
 		
-		//交班、日结的时间段
-		var dutyRange = {
-			onDutyFormat : null,
-			offDutyFormat : null	
+		//定时器，定时刷新餐桌选择页面数据
+		(function refreshTable(){
+			initTableData();
+			console.log('initTableData');
+			tableRefreshTimeoutId = setTimeout(arguments.callee, 15 * 60 * 1000);
+		})();
+	});
+	
+	//进入餐桌初始化
+	$('#tableSelectMgr').on('pageinit', function(){
+		
+		//初始化窗口大小
+		$(window).resize();
+	
+		/**
+		 * 餐桌分页包
+		 */
+		ts.tp = new Util.to.padding({
+			renderTo : 'divTableShowForSelect',
+			displayId : 'divDescForTableSelect-padding-msg',
+			templet : function(c){
+				var aliasOrName;
+				if(c.data.categoryValue == 1){//一般台
+					aliasOrName = c.data.alias;
+				}else if(c.data.categoryValue == 3){//搭台
+					var begin = c.data.name.indexOf("(");
+					var end = c.data.name.indexOf(")");
+					aliasOrName = '<font color="green">' + c.data.name.substring(begin+1, end) +'</font>';
+				}else{
+					aliasOrName = '<font color="green">'+ c.data.categoryText +'</font>';
+				}
+				return tableCmpTemplet.format({
+					dataIndex : c.index,
+					id : c.data.id,
+					click : 'ts.selectTable({event : this, id : '+ c.data.id +',tableAlias :'+ c.data.alias +'})',
+					alias : aliasOrName,
+					theme : c.data.statusValue == '1' ? "e" : "c",
+					name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
+					tempPayStatus : c.data.isTempPaid? '暂结' : '&nbsp;&nbsp;',
+					bookTableStatus : c.data.isBook? '订' : '',
+					tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0?'tempPayStatus4Moz':'tempPayStatus'
+				});				
+			}
+		});
+ 		
+	
+		Util.LM.show();		
+		
+		$.ajax({
+			url : '../VerifyLogin.do',
+			success : function(data, status, xhr){
+				if(data.success){
+					
+					WirelessOrder.login = new WirelessOrder.Staff(data.root[0]);
+					
+					$('#loginStaffName_div_tableSelect').html('操作人: <font color="green">'+ WirelessOrder.login.staffName + '</font>');
+					
+					Util.LM.show();
+					
+					//加载基础数据
+					initTableData();
+					initFoodData();
+					
+				}else{	
+					Util.LM.hide();	
+					Util.msg.alert({
+						msg : '请先登录',
+						topTip : true
+					});
+					setTimeout(function(){
+						location.href = 'verifyLogin.jsp?status='+systemStatus;
+					}, 2000);
+				}
+			},
+			error : function(request, status, error){
+				Util.LM.hide();	
+				Util.msg.alert({
+					msg : '操作有误,请刷新页面',
+					topTip : true
+				});
+				setTimeout(function(){
+					location.href = 'verifyLogin.jsp?status='+systemStatus;
+				}, 1000);
+			}
+		});
+		
+		//餐台选择, 转菜, 查台输入框
+		ts.s.init({file : 'txtTableNumForTS'});	
+		
+		//获取系统相关属性
+		Util.sys.checkSmStat();
+		
+		//刷新微信预订单
+		ts.refreshWeixinBook();
+		
+		//用户自定义日期
+		$('#conditionDayBeginDay').bind('change', function(){
+			if($('#conditionDayBeginDay').val() && $('#conditionDayEndDay').val() ){
+				ts.searchBookList({begin:$('#conditionDayBeginDay').val(), end:$('#conditionDayEndDay').val()});
+			}
+		});	
+		$('#conditionDayEndDay').bind('change', function(){
+			if($('#conditionDayBeginDay').val() && $('#conditionDayEndDay').val() ){
+				ts.searchBookList({begin:$('#conditionDayBeginDay').val(), end:$('#conditionDayEndDay').val()});
+			}
+		});	
+		
+		//pos端 && 体验端 && touch端
+		if(systemStatus == 1){//pos端
+			//日结,交班等
+			$('#divPosOperation').show();
+			$('#btnOrderAndPay').show();
+			//下单并结账
+			$('#orderPay_li_orderFood').show();
+			//已点菜结账按钮
+			$('#payOrder_a_checkOut').show();
+			//收银端餐台列表高度
+			tableListHeight = 130;	
+	
+		}else if(systemStatus == 3){//try端
+			//日结,交班等
+			$('#divPosOperation').show();
+			$('#btnOrderAndPay').show();
+			//下单并结账
+			$('#orderPay_li_orderFood').hide();
+			//已点菜结账按钮
+			$('#payOrder_a_checkOut').show();		
+			//收银端餐台列表高度
+			tableListHeight = 130;	
+			//try端不可进入后台
+			$('#btnToBasicPage').hide();
+			
+		}else if(systemStatus == 2){//touch端
+			//日结,交班等
+			$('#divPosOperation').hide();
+			$('#btnOrderAndPay').hide();
+			//下单并结账
+			$('#orderPay_li_orderFood').hide();
+			//已点菜结账按钮
+			$('#payOrder_a_checkOut').hide();
+			//收银端餐台列表高度
+			tableListHeight = 86;
+		}else if(systemStatus == 4){//快餐模式
+			//日结,交班等
+			$('#divPosOperation').show();
+			$('#btnOrderAndPay').show();
+			//下单并结账
+			$('#orderPay_li_orderFood').show();
+			//已点菜结账按钮
+			$('#payOrder_a_checkOut').show();
+			//快餐模式按钮
+			$('#fastFood_li_tableSelect').show();
+			//快餐模式的结账按钮
+			$('#fastPay_a_orderFood').show();
+			//收银端餐台列表高度
+			tableListHeight = 130;	
+		}
+		
+		//空闲状态的餐台
+		$('#idleTable_li_tableSelect').click(function(){
+			//TODO
+			$('#labTableStatus .ui-btn-text').text($(this).text());
+			$('#labTableStatus').attr('table-status', WirelessOrder.TableList.Status.IDLE.val);
+			$('#popupAllStatusCmp').popup('close');
+			showTable();
+		});
+		
+		//就餐状态的餐台
+		$('#busyTable_li_tableSelect').click(function(){
+			$('#labTableStatus .ui-btn-text').text($(this).text());
+			$('#labTableStatus').attr('table-status', WirelessOrder.TableList.Status.BUSY.val);
+			$('#popupAllStatusCmp').popup('close');
+			showTable();
+		});
+		
+		//全部状态的餐台
+		$('#allTable_li_tableSelect').click(function(){
+			$('#labTableStatus .ui-btn-text').text($(this).text());
+			$('#labTableStatus').removeAttr('table-status');
+			$('#popupAllStatusCmp').popup('close');
+			showTable();
+		});
+		
+		var CommitTypeEnum = {
+			Daily : {
+				type : 1,
+				title : '日结'
+			},
+			Phrase : {
+				type : 0,
+				title : '交班'
+			},
+			Person : {
+				type : 2,
+				title : '交款'
+			}
 		};
 		
-		//交款&交班&日结打印
-		function dailyOperationDaYin(printType, appendMsg){
-			Util.LM.show();
-			$.post('../PrintOrder.do',{
-				onDuty : dutyRange.onDutyFormat,
-				offDuty : dutyRange.offDutyFormat,
-				printType : printType,
-				orientedPrinter : getcookie(document.domain + '_printers')			//特定打印机打印
-			}, function(resultJSON) {
-				Util.LM.hide();
-				if(resultJSON.success){
-					Util.msg.alert({
-						msg : resultJSON.msg + (appendMsg ? ('<br/>' + appendMsg) : ''),
-						topTip : true
-					});			
-				}else{
-					Util.msg.alert({
-						msg : resultJSON.msg,
-						renderTo : 'tableSelectMgr'
-					});				
-				}
-		
-			});
-		}
-		
-		//预打
-		function prePrint(){
-			if(commitType == CommitTypeEnum.Person){
-				//交款
-				dailyOperationDaYin(12);
-			}else{
-				dailyOperationDaYin(5);
+		var dailyPopup = null;
+		//日结处理函数
+		function dailyHandler(commitType){
+			if(dailyPopup == null){
+				dailyPopup = new JqmPopup({
+					loadUrl : './popup/daily/daily.html',
+					pageInit : function(self){
+						//关闭
+				 		self.find('[id=close_a_daily]').click(function(){
+				 			dailyPopup.close();
+				 		});
+				 		//预打
+				 		self.find('[id=prePrint_a_daily]').click(function(){
+				 			prePrint();
+				 		});
+				 		//日结
+				 		self.find('[id=confirm_a_daily]').click(function(){
+				 			submitDailyOperation();
+				 		});
+					}
+				});
 			}
-		}
-		
-		//显示日结信息
-		function showDailyInfo(settleType){
 			
-			var memberTitle = '<tr>' 
-							+ '<th class="table_title text_center">会员操作</th>'
-							+ '<th class="table_title text_center">现金</th>'
-							+ '<th class="table_title text_center">刷卡</th>'
-							+ '<th class="table_title text_center">账户实充/扣额</th>'
-							+ '</tr>',
-							
-				memberTrModel = '<tr>'
-							+ '<th>会员充值</th>'
-							+ '<td class="text_right">{0}</td>'
-							+ '<td class="text_right">{1}</td>'
-							+ '<td class="text_right">{2}</td>'
-							+ '</tr>'
-							+ '<tr>'
-							+ '<th>会员退款</th>'
-							+ '<td class="text_right">{3}</td>'
-							+ '<td class="text_right">{4}</td>'
-							+ '<td class="text_right">{5}</td>'
-							+ '</tr>',
-							
-				deptTrModel = '<tr>'
-							+ '<th class="table_title text_center">部门汇总</th>'
-							+ '<th class="table_title text_center">折扣总额</th>'
-							+ '<th class="table_title text_center">赠送总额</th>'
-							+ '<th class="table_title text_center">应收总额</th>'
-							+ '</tr>',
-							
-				trModel = '<tr>'
-							+ '<th>{0}</th>'
-							+ '<td class="text_right">{1}</td>'
-							+ '<td class="text_right">{2}</td>'
-							+ '<td class="text_right">{3}</td>'
-							+ '</tr>',
-				
-				trPayIncomeModel = '<tr>'
-							+ '<th>{0}</th>'
-							+ '<td class="text_right">{1}</td>'
-							+ '<td class="text_right">{2}</td>'
-							+ '<td class="text_right">{3}</td>'
-							+ '</tr>';
-			
-			//设置标题
-			$('#title4DailyInfoTable').html('<font color="#f7c942">' + commitType.title + '</font> -- ' + commitType.title + '人 : '+ ln.staffData.staffName);
-			$('#confirm_a_daily .ui-btn-text').html(commitType.title);
-			
-			
-			if(settleType.type == 2){//交款
-				ts.dailyOpe.otype = 'jiaokuan';
-			}else if(settleType.type == 0){//交班
-				ts.dailyOpe.otype = 'jiaoban';
-			}else if(settleType.type == 1){//日结
-				ts.dailyOpe.otype = 'rijie';
-			}
-		
-			$.post('../QueryDailySettleByNow.do',{queryType : settleType.type}, function(jr){
-				if(jr.success){
-					var business = jr.other.business;
-					var deptStat = business.deptStat;
-					dutyRange.onDutyFormat = business.paramsOnDuty;
-					dutyRange.offDutyFormat = business.paramsOffDuty;
-					
-					var trContent = '';
-					for(var i = 0; i < deptStat.length; i++){
-						var temp = deptStat[i];
-						trContent += (trModel.format(
-								temp.dept.name, 
-								temp.discountPrice.toFixed(2), 
-								temp.giftPrice.toFixed(2), 
-								temp.income.toFixed(2)
-							)
-						);
-					}
-					
-					var memberTrDate = memberTrModel.format(business.memberChargeByCash.toFixed(2), 
-															business.memberChargeByCard.toFixed(2), 
-															business.memberAccountCharge.toFixed(2),
-															business.memberRefund.toFixed(2), 
-															0.00, 
-															business.memberAccountRefund.toFixed(2));
-					var table = '<table border="1" class="tb_base">{0}{1}</table><br><table border="1" class="tb_base">{2}{3}</table>'.format(memberTitle, memberTrDate, deptTrModel, trContent);
-					
-					//是否有预订金额
-					if(business.bookIncome > 0){
-						table += '<br><table border="1" class="tb_base"><tr><th class="table_title text_center">预订总金额:</th><th class="table_title text_center">'+ business.bookIncome +'</th></tr></table>';
-					}
-					
-					$('#memberIncome_div_daily').html(table);
-					
-					$('#startDate_td_daily').html(business.paramsOnDuty);
-					$('#endDate_td_daily').html(business.paramsOffDuty);
-		
-					$('#orderAmount_td_daily').html(business.orderAmount);
-					
-					$('#eraseAmount_td_daily').html(business.eraseAmount);
-					$('#eraseIncome_td_daily').html(business.eraseIncome.toFixed(2));
-					
-					$('#discountAmount_td_daily').html(business.discountAmount);
-					$('#discountIncome_td_daily').html(business.discountIncome.toFixed(2));
-					
-					$('#giftAmount_td_daily').html(business.giftAmount);
-					$('#giftIncome_td_daily').html(business.giftIncome.toFixed(2));
-					
-					$('#couponAmount_td_daily').html(business.couponAmount);
-					$('#couponIncome_td_daily').html(business.couponIncome.toFixed(2));
-					
-					$('#cancelAmount_td_daily').html(business.cancelAmount);
-					$('#cancelIncome_td_daily').html(business.cancelIncome.toFixed(2));
-					
-					$('#repaidAmount_td_daily').html(business.paidAmount);
-					$('#repaidIncome_td_daily').html(business.paidIncome.toFixed(2));
-					
-					$('#serviceAmount_td_daily').html(business.serviceAmount);
-					$('#serviceIncome_td_daily').html(business.serviceIncome.toFixed(2));
-					
-					
-					var trPayTypeContent = ['<tr>'
-					  + '<th class="table_title text_center">收款方式</th>'
-					  + '<th class="table_title text_center">账单数</th>'
-					  + '<th class="table_title text_center">应收总额</th>'
-					  + '<th class="table_title text_center">实收总额</th>'
-					  + '</tr>'];								
-					//输出付款方式集合
-					var totalCount = 0, totalShouldPay = 0, totalActual = 0;
-					for(var i = 0; i < business.paymentIncomes.length; i++){
-						var temp = business.paymentIncomes[i];
-						totalCount += temp.amount;
-						totalShouldPay += temp.total;
-						totalActual += temp.actual;
-						
-						trPayTypeContent.push(trPayIncomeModel.format(
-								temp.payType, 
-								temp.amount, 
-								temp.total.toFixed(2), 
-								temp.actual.toFixed(2)
-							)
-						);
-						
-					}
-					//汇总
-					trPayTypeContent.push(trPayIncomeModel.format(
-						'总计', 
-						totalCount, 
-						totalShouldPay.toFixed(2), 
-						totalActual.toFixed(2)
-					));
-					$('#payIncome_table_daily').html(trPayTypeContent.join(""));
-				}
+			//打开日结Popup
+			dailyPopup.open(function(){
+				showDailyInfo(commitType);
 			});
-		}
-		
-		//交班, 日结, 交款操作
-		function submitDailyOperation(){
 			
-			if(commitType == CommitTypeEnum.Phrase){
-				//交班
-				$.post('../DoShift.do', function(resultJSON){
-					if (resultJSON.success) {
-						dailyPopup.close();
-						dutyRange = resultJSON.other.dutyRange;
-						dailyOperationDaYin(4, resultJSON.msg);
-					} else {
-						dailyPopup.close(function(){
-							Util.msg.alert({
-								msg : resultJSON.msg,
-								renderTo : 'tableSelectMgr'
-							});
-						}, 200);
-					}		
-				});		
-			}else if(commitType == CommitTypeEnum.Daily){
-				// 未交班帳單檢查
-				$.post('../DailySettleCheck.do', function(resultJSON){
-					if (resultJSON.success) {
-						//日结
-						$.post('../DailySettleExec.do', function(data){
-							if (data.success) {
-								dailyPopup.close();
-								dutyRange = data.other.dutyRange;
-								dailyOperationDaYin(6, data.msg);
-							} else {
-								dailyPopup.close(function(){
-									Util.msg.alert({
-										msg : data.msg,
-										renderTo : 'tableSelectMgr'
-									});
-								}, 200);
-							}		
+			//交班、日结的时间段
+			var dutyRange = {
+				onDutyFormat : null,
+				offDutyFormat : null	
+			};
+			
+			//交款&交班&日结打印
+			function dailyOperationDaYin(printType, appendMsg){
+				Util.LM.show();
+				$.post('../PrintOrder.do',{
+					onDuty : dutyRange.onDutyFormat,
+					offDuty : dutyRange.offDutyFormat,
+					printType : printType,
+					orientedPrinter : getcookie(document.domain + '_printers')			//特定打印机打印
+				}, function(resultJSON) {
+					Util.LM.hide();
+					if(resultJSON.success){
+						Util.msg.alert({
+							msg : resultJSON.msg + (appendMsg ? ('<br/>' + appendMsg) : ''),
+							topTip : true
 						});			
-					} else {
-						dailyPopup.close(function(){
-							Util.msg.alert({
-								msg : resultJSON.msg,
-								renderTo : 'tableSelectMgr',				
-								buttons : 'YESBACK',
-								certainCallback : function(btn){
-									if(btn == 'yes'){
-										$.post('../DailySettleExec.do', function(data){
-											if (data.success) {
-												dailyPopup.close();
-												dutyRange = data.other.dutyRange;
-												dailyOperationDaYin(6, data.msg);
-											} else {
-												Util.msg.alert({
-													msg : data.msg,
-													renderTo : 'tableSelectMgr'
-												});
-											}		
+					}else{
+						Util.msg.alert({
+							msg : resultJSON.msg,
+							renderTo : 'tableSelectMgr'
+						});				
+					}
+			
+				});
+			}
+			
+			//预打
+			function prePrint(){
+				if(commitType == CommitTypeEnum.Person){
+					//交款
+					dailyOperationDaYin(12);
+				}else{
+					dailyOperationDaYin(5);
+				}
+			}
+			
+			//显示日结信息
+			function showDailyInfo(settleType){
+				
+				var memberTitle = '<tr>' 
+								+ '<th class="table_title text_center">会员操作</th>'
+								+ '<th class="table_title text_center">现金</th>'
+								+ '<th class="table_title text_center">刷卡</th>'
+								+ '<th class="table_title text_center">账户实充/扣额</th>'
+								+ '</tr>',
+								
+					memberTrModel = '<tr>'
+								+ '<th>会员充值</th>'
+								+ '<td class="text_right">{0}</td>'
+								+ '<td class="text_right">{1}</td>'
+								+ '<td class="text_right">{2}</td>'
+								+ '</tr>'
+								+ '<tr>'
+								+ '<th>会员退款</th>'
+								+ '<td class="text_right">{3}</td>'
+								+ '<td class="text_right">{4}</td>'
+								+ '<td class="text_right">{5}</td>'
+								+ '</tr>',
+								
+					deptTrModel = '<tr>'
+								+ '<th class="table_title text_center">部门汇总</th>'
+								+ '<th class="table_title text_center">折扣总额</th>'
+								+ '<th class="table_title text_center">赠送总额</th>'
+								+ '<th class="table_title text_center">应收总额</th>'
+								+ '</tr>',
+								
+					trModel = '<tr>'
+								+ '<th>{0}</th>'
+								+ '<td class="text_right">{1}</td>'
+								+ '<td class="text_right">{2}</td>'
+								+ '<td class="text_right">{3}</td>'
+								+ '</tr>',
+					
+					trPayIncomeModel = '<tr>'
+								+ '<th>{0}</th>'
+								+ '<td class="text_right">{1}</td>'
+								+ '<td class="text_right">{2}</td>'
+								+ '<td class="text_right">{3}</td>'
+								+ '</tr>';
+				
+				//设置标题
+				$('#title4DailyInfoTable').html('<font color="#f7c942">' + commitType.title + '</font> -- ' + commitType.title + '人 : '+ WirelessOrder.login.staffName);
+				$('#confirm_a_daily .ui-btn-text').html(commitType.title);
+				
+				$.post('../QueryDailySettleByNow.do',{queryType : settleType.type}, function(jr){
+					if(jr.success){
+						var business = jr.other.business;
+						var deptStat = business.deptStat;
+						dutyRange.onDutyFormat = business.paramsOnDuty;
+						dutyRange.offDutyFormat = business.paramsOffDuty;
+						
+						var trContent = '';
+						for(var i = 0; i < deptStat.length; i++){
+							var temp = deptStat[i];
+							trContent += (trModel.format(
+									temp.dept.name, 
+									temp.discountPrice.toFixed(2), 
+									temp.giftPrice.toFixed(2), 
+									temp.income.toFixed(2)
+								)
+							);
+						}
+						
+						var memberTrDate = memberTrModel.format(business.memberChargeByCash.toFixed(2), 
+																business.memberChargeByCard.toFixed(2), 
+																business.memberAccountCharge.toFixed(2),
+																business.memberRefund.toFixed(2), 
+																0.00, 
+																business.memberAccountRefund.toFixed(2));
+						var table = '<table border="1" class="tb_base">{0}{1}</table><br><table border="1" class="tb_base">{2}{3}</table>'.format(memberTitle, memberTrDate, deptTrModel, trContent);
+						
+						//是否有预订金额
+						if(business.bookIncome > 0){
+							table += '<br><table border="1" class="tb_base"><tr><th class="table_title text_center">预订总金额:</th><th class="table_title text_center">'+ business.bookIncome +'</th></tr></table>';
+						}
+						
+						$('#memberIncome_div_daily').html(table);
+						
+						$('#startDate_td_daily').html(business.paramsOnDuty);
+						$('#endDate_td_daily').html(business.paramsOffDuty);
+			
+						$('#orderAmount_td_daily').html(business.orderAmount);
+						
+						$('#eraseAmount_td_daily').html(business.eraseAmount);
+						$('#eraseIncome_td_daily').html(business.eraseIncome.toFixed(2));
+						
+						$('#discountAmount_td_daily').html(business.discountAmount);
+						$('#discountIncome_td_daily').html(business.discountIncome.toFixed(2));
+						
+						$('#giftAmount_td_daily').html(business.giftAmount);
+						$('#giftIncome_td_daily').html(business.giftIncome.toFixed(2));
+						
+						$('#couponAmount_td_daily').html(business.couponAmount);
+						$('#couponIncome_td_daily').html(business.couponIncome.toFixed(2));
+						
+						$('#cancelAmount_td_daily').html(business.cancelAmount);
+						$('#cancelIncome_td_daily').html(business.cancelIncome.toFixed(2));
+						
+						$('#repaidAmount_td_daily').html(business.paidAmount);
+						$('#repaidIncome_td_daily').html(business.paidIncome.toFixed(2));
+						
+						$('#serviceAmount_td_daily').html(business.serviceAmount);
+						$('#serviceIncome_td_daily').html(business.serviceIncome.toFixed(2));
+						
+						
+						var trPayTypeContent = ['<tr>'
+						  + '<th class="table_title text_center">收款方式</th>'
+						  + '<th class="table_title text_center">账单数</th>'
+						  + '<th class="table_title text_center">应收总额</th>'
+						  + '<th class="table_title text_center">实收总额</th>'
+						  + '</tr>'];								
+						//输出付款方式集合
+						var totalCount = 0, totalShouldPay = 0, totalActual = 0;
+						for(var i = 0; i < business.paymentIncomes.length; i++){
+							var temp = business.paymentIncomes[i];
+							totalCount += temp.amount;
+							totalShouldPay += temp.total;
+							totalActual += temp.actual;
+							
+							trPayTypeContent.push(trPayIncomeModel.format(
+									temp.payType, 
+									temp.amount, 
+									temp.total.toFixed(2), 
+									temp.actual.toFixed(2)
+								)
+							);
+							
+						}
+						//汇总
+						trPayTypeContent.push(trPayIncomeModel.format(
+							'总计', 
+							totalCount, 
+							totalShouldPay.toFixed(2), 
+							totalActual.toFixed(2)
+						));
+						$('#payIncome_table_daily').html(trPayTypeContent.join(""));
+					}
+				});
+			}
+			
+			//交班, 日结, 交款操作
+			function submitDailyOperation(){
+				
+				if(commitType == CommitTypeEnum.Phrase){
+					//交班
+					$.post('../DoShift.do', function(resultJSON){
+						if (resultJSON.success) {
+							dailyPopup.close();
+							dutyRange = resultJSON.other.dutyRange;
+							dailyOperationDaYin(4, resultJSON.msg);
+						} else {
+							dailyPopup.close(function(){
+								Util.msg.alert({
+									msg : resultJSON.msg,
+									renderTo : 'tableSelectMgr'
+								});
+							}, 200);
+						}		
+					});		
+				}else if(commitType == CommitTypeEnum.Daily){
+					// 未交班帳單檢查
+					$.post('../DailySettleCheck.do', function(resultJSON){
+						if (resultJSON.success) {
+							//日结
+							$.post('../DailySettleExec.do', function(data){
+								if (data.success) {
+									dailyPopup.close();
+									dutyRange = data.other.dutyRange;
+									dailyOperationDaYin(6, data.msg);
+								} else {
+									dailyPopup.close(function(){
+										Util.msg.alert({
+											msg : data.msg,
+											renderTo : 'tableSelectMgr'
 										});
+									}, 200);
+								}		
+							});			
+						} else {
+							dailyPopup.close(function(){
+								Util.msg.alert({
+									msg : resultJSON.msg,
+									renderTo : 'tableSelectMgr',				
+									buttons : 'YESBACK',
+									certainCallback : function(btn){
+										if(btn == 'yes'){
+											$.post('../DailySettleExec.do', function(data){
+												if (data.success) {
+													dailyPopup.close();
+													dutyRange = data.other.dutyRange;
+													dailyOperationDaYin(6, data.msg);
+												} else {
+													Util.msg.alert({
+														msg : data.msg,
+														renderTo : 'tableSelectMgr'
+													});
+												}		
+											});
+										}
 									}
-								}
-							});
-						}, 200);
-	
-					}		
-				});		
-			}else if(commitType == CommitTypeEnum.Person){
-				//交款
-				$.post('../DoPayment.do', function(resultJSON){
-					if (resultJSON.success) {
-						dailyPopup.close();
-						dutyRange = resultJSON.other.dutyRange;
-						dailyOperationDaYin(12, resultJSON.msg);
-					} else {
-						dailyPopup.close(function(){
-							Util.msg.alert({
-								msg : resultJSON.msg,
-								renderTo : 'tableSelectMgr'
-							});
-						}, 200);
-					}		
-				});		
+								});
+							}, 200);
+		
+						}		
+					});		
+				}else if(commitType == CommitTypeEnum.Person){
+					//交款
+					$.post('../DoPayment.do', function(resultJSON){
+						if (resultJSON.success) {
+							dailyPopup.close();
+							dutyRange = resultJSON.other.dutyRange;
+							dailyOperationDaYin(12, resultJSON.msg);
+						} else {
+							dailyPopup.close(function(){
+								Util.msg.alert({
+									msg : resultJSON.msg,
+									renderTo : 'tableSelectMgr'
+								});
+							}, 200);
+						}		
+					});		
+				}
 			}
 		}
-	}
-	
-	//日结
-	$('#dailySettle_a_tableSelect').click(function(){
-		dailyHandler(CommitTypeEnum.Daily);
-	});
-	
-	//交班
-	$('#phraseSettle_a_tableSelect').click(function(){
-		dailyHandler(CommitTypeEnum.Phrase);
-	});
-	
-	//交班
-	$('#personSettle_a_tableSelect').click(function(){
-		dailyHandler(CommitTypeEnum.Person);
-	});
-	
-	//快速发券
-	$('#fastIssue_a_tableSelect').click(function(){
-		$('#frontPageMemberOperation').popup('close');
-		setTimeout(function(){
-			var fastIssuePopup = new MemberReadPopup({
-				confirm : function(member){
-					if(member){
-						fastIssuePopup.close(function(){
-							var issueCouponPopup = new IssueCouponPopup({
-								title : '快速发放优惠券',
-								memberName : member.name,
-								issueMode : IssueCouponPopup.IssueMode.FAST,
-								issueTo : member.id
-							});
-							issueCouponPopup.open();
-						}, 200);
-					}else{
-						Util.msg.tip('请注入会员!');
-					}
-				}
-			});
-			fastIssuePopup.open();
-		}, 100);
-	});
-	
-	//快速用券
-	$('#fastUse_a_tableSelect').click(function(){
-		$('#frontPageMemberOperation').popup('close');
-		setTimeout(function(){
-			var fastUsePopup = new MemberReadPopup({
-				confirm : function(member){
-					if(member){
-						fastUsePopup.close(function(){
-							var useCouponPopup = new UseCouponPopup({
-								title : '快速使用优惠券',
-								memberName : member.name,
-								issueMode : UseCouponPopup.UseMode.FAST,
-								useTo  : member.id,
-								useCuoponMethod : function(coupons){
-									$.post('../OperateCoupon.do', {
-											dataSource : 'coupon', 
-											coupons : coupons.join(','), 
-											useTo : member.id, 
-											useMode : UseCouponPopup.UseMode.FAST.mode 
-										}, function(response, status,xhr){
-											if(response.success){
-												Util.msg.tip('使用成功!');
-												useCouponPopup.close();
-											}else{
-												Util.msg.tip(response.msg);
-											}
-									}, 'json');
-								}
-							});
-							useCouponPopup.open();
-						}, 200);
-					}else{
-						Util.msg.tip('请注入会员!');
-					}
-				}
-			});
-			fastUsePopup.open();
-		}, 100);
-	});
-	
-	//添加会员
-	$('#addMember_a_tableSelect').click(function(){
-		$('#frontPageMemberOperation').popup('close');
-		setTimeout(function(){
-			var addMemberPopup = new  AddMemberPopup();
-			addMemberPopup.open();
-		}, 200);
-	});
-	
-	//微信会员绑定
-	$('#memberWxBind_li_tableSelect').click(function(){
-		$('#frontPageMemberOperation').popup('close');
-		setTimeout(function(){
-			var memberWxReadPopup = null;
-			memberWxReadPopup = new MemberReadPopup({
-				confirm : function(member){
-					if(member && member.isRaw){
-						memberWxReadPopup.close(function(){
-							var memberWxBindPopup = null;
-							memberWxBindPopup = new PerfectMemberPopup({
-								memberName : member.name,
-								selectedMember : member.id,
-								postBound : function(){
-									memberWxBindPopup.close();
-								}
-							});
-							memberWxBindPopup.open();
-						}, 200);
-					}else{
-						Util.msg.tip('会员资料已完善');
-					}
-				}
-			});
-			memberWxReadPopup.open();
-		}, 200);
-	});
-	
-	//打印机绑定按钮
-	$('#printBind_a_tableSelect').click(function(){
-		$('#tableSelectOtherOperateCmp').popup('close');
-		setTimeout(function(){
-			var printBindPopup = new PrintBindPopup();
-			printBindPopup.open();
-		}, 300);
 		
-	});
-	
-	
-	//查台按钮
-	$('#searchTable_a_tableSelect').click(function(){
-		var askTablePopup = new AskTablePopup({
-			tables : WirelessOrder.tables,
-			title : '查台',
-			middleText : '点菜(+)',
-			middle : function(){
-				var prefectMatched = askTablePopup.prefect();
-				if(prefectMatched){
-					askTablePopup.close(function(){
-						updateTable({
-							id : prefectMatched.id,
-							alias : !prefectMatched.id ? prefectMatched.alias : ''
-						});	
-					}, 200);
-				}else{
-					Util.msg.tip('没有此餐台,请重新输入');
-				}
-				
-			},
-			left : function(){
-				var perfectMatched = askTablePopup.prefect();
-				
-				if(perfectMatched){
-					askTablePopup.close(function(){
-						$('#tableSelect_div_askTable').off('keydown');
-						updateTable({
-							toPay : true,
-							id : perfectMatched.id,
-							alias : !perfectMatched.id ? perfectMatched.alias : ''
-						});	
-					}, 200);
-				}else{
-					Util.msg.tip('没有此餐台,请重新输入');
-				}
-			},
-			tableSelect : function(selectedTable){
-				askTablePopup.close(function(){
-					updateTable({
-						id : selectedTable.id,
-						alias : selectedTable.alias
-					});	
-				}, 200);
-			}
+		//日结
+		$('#dailySettle_a_tableSelect').click(function(){
+			dailyHandler(CommitTypeEnum.Daily);
 		});
 		
-		askTablePopup.open(function(){
+		//交班
+		$('#phraseSettle_a_tableSelect').click(function(){
+			dailyHandler(CommitTypeEnum.Phrase);
+		});
+		
+		//交班
+		$('#personSettle_a_tableSelect').click(function(){
+			dailyHandler(CommitTypeEnum.Person);
+		});
+		
+		//快速发券
+		$('#fastIssue_a_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			setTimeout(function(){
+				var fastIssuePopup = null;
+				fastIssuePopup = new MemberReadPopup({
+					confirm : function(member){
+						if(member){
+							fastIssuePopup.close(function(){
+								var issueCouponPopup = new IssueCouponPopup({
+									title : '快速发放优惠券',
+									memberName : member.name,
+									issueMode : IssueCouponPopup.IssueMode.FAST,
+									issueTo : member.id
+								});
+								issueCouponPopup.open();
+							}, 200);
+						}else{
+							Util.msg.tip('请注入会员!');
+						}
+					}
+				});
+				fastIssuePopup.open();
+			}, 100);
+		});
+		
+		//快速用券
+		$('#fastUse_a_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			setTimeout(function(){
+				var fastUsePopup = null;
+				fastUsePopup = new MemberReadPopup({
+					confirm : function(member){
+						if(member){
+							fastUsePopup.close(function(){
+								var useCouponPopup = null;
+								useCouponPopup = new UseCouponPopup({
+									title : '快速使用优惠券',
+									memberName : member.name,
+									issueMode : UseCouponPopup.UseMode.FAST,
+									useTo  : member.id,
+									useCuoponMethod : function(coupons){
+										$.post('../OperateCoupon.do', {
+												dataSource : 'coupon', 
+												coupons : coupons.join(','), 
+												useTo : member.id, 
+												useMode : UseCouponPopup.UseMode.FAST.mode 
+											}, function(response, status,xhr){
+												if(response.success){
+													Util.msg.tip('使用成功!');
+													useCouponPopup.close();
+												}else{
+													Util.msg.tip(response.msg);
+												}
+										}, 'json');
+									}
+								});
+								useCouponPopup.open();
+							}, 200);
+						}else{
+							Util.msg.tip('请注入会员!');
+						}
+					}
+				});
+				fastUsePopup.open();
+			}, 100);
+		});
+		
+		//添加会员
+		$('#addMember_a_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			setTimeout(function(){
+				var addMemberPopup = new  AddMemberPopup();
+				addMemberPopup.open();
+			}, 200);
+		});
+		
+		//微信会员绑定
+		$('#memberWxBind_li_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			setTimeout(function(){
+				var memberWxReadPopup = null;
+				memberWxReadPopup = new MemberReadPopup({
+					confirm : function(member){
+						if(member && member.isRaw){
+							memberWxReadPopup.close(function(){
+								var memberWxBindPopup = null;
+								memberWxBindPopup = new PerfectMemberPopup({
+									memberName : member.name,
+									selectedMember : member.id,
+									postBound : function(){
+										memberWxBindPopup.close();
+									}
+								});
+								memberWxBindPopup.open();
+							}, 200);
+						}else{
+							Util.msg.tip('会员资料已完善');
+						}
+					}
+				});
+				memberWxReadPopup.open();
+			}, 200);
+		});
+		
+		//打印机绑定按钮
+		$('#printBind_a_tableSelect').click(function(){
+			$('#tableSelectOtherOperateCmp').popup('close');
+			setTimeout(function(){
+				var printBindPopup = new PrintBindPopup();
+				printBindPopup.open();
+			}, 300);
 			
-			$('#tableSelect_div_askTable').on('keydown', function(event){
-				if(event.keyCode == '107'){
-					var perfectMatched = askTablePopup.prefect();
-					if(perfectMatched){
+		});
+		
+		
+		//查台按钮
+		$('#searchTable_a_tableSelect').click(function(){
+			var askTablePopup = null;
+			askTablePopup = new AskTablePopup({
+				tables : WirelessOrder.tables,
+				title : '查台',
+				middleText : '点菜(+)',
+				middle : function(){
+					var prefectMatched = askTablePopup.prefect();
+					if(prefectMatched){
 						askTablePopup.close(function(){
-							$('#tableSelect_div_askTable').off('keydown');
 							updateTable({
-								id : perfectMatched.id,
-								alias : !perfectMatched.id ? perfectMatched.alias : ''
+								id : prefectMatched.id,
+								alias : !prefectMatched.id ? prefectMatched.alias : ''
 							});	
 						}, 200);
 					}else{
 						Util.msg.tip('没有此餐台,请重新输入');
 					}
 					
-				}else if(event.keyCode == '13'){//回车
+				},
+				left : function(){
 					var perfectMatched = askTablePopup.prefect();
 					
 					if(perfectMatched){
@@ -688,271 +766,191 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 					}else{
 						Util.msg.tip('没有此餐台,请重新输入');
 					}
-				}
-				//取消事件的冒泡行为
-				event.stopPropagation();
-			});
-		});
-	});
-
-	//快餐模式按钮
-	$('#fastFood_li_tableSelect').click(function(){
-		of.entry({orderFoodOperateType : 'fast'});
-	});
-	
-	//会员查询
-	$('#searchMember_a_tableSelect').click(function(){
-		$('#frontPageMemberOperation').popup('close');
-		setTimeout(function(){
-			var searchMemberPopup = null;
-			searchMemberPopup = new MemberReadPopup({
-				confirm : function(){
-					searchMemberPopup.close();
+				},
+				tableSelect : function(selectedTable){
+					askTablePopup.close(function(){
+						updateTable({
+							id : selectedTable.id,
+							alias : selectedTable.alias
+						});	
+					}, 200);
 				}
 			});
-			searchMemberPopup.open();
-		}, 300);
-	});
-		
-	//拆台
-	$('#apartTable_a_tableSelect').click(function(){
-		var _selectedTable = null;
-		var askTablePopup = new AskTablePopup({
-			tables : WirelessOrder.tables,
-			title : '拆台',
-			middle : function(){
-				Util.msg.tip('请选中一张餐桌或者编号');
-			},
-			tableSelect : function(selectedTable){
-				$('#matchedTables_div_askTable').hide();
-				$('#suffix_div_ask').show();
-				_selectedTable = selectedTable;
-			},
-			suffixSelect : function(suffixValue){
-				Util.LM.show();
-				var suffix = suffixValue;
-				$.post('../OperateTable.do', {
-					dataSource : 'apartTable',
-					tableID : _selectedTable.id,
-					suffix : suffix,
-					comment : $("#apartComment_input_ask").val()
-				}, function(result){
-					Util.LM.hide();
-					if(result.success){
-						askTablePopup.close(function(){
-							uo.entry({
-								table : result.root[0]
-							});
-						}, 200);
-					}else{
-						Util.msg.tip('操作失败, 请刷新页面后重试');
-					}
-				}).error(function(){
-					Util.LM.hide();
-					Util.msg.tip('操作失败, 请刷新页面重试');		
-				});		
-			}
 			
-		});
-		askTablePopup.open(function(){
-			$('#left_a_askTable').hide();
-			$('#apartComment_tr_ask').show();
-			$('#middle_a_askTable').css('width', '48%');
-			$('#right_a_askTable').css('width', '50%');
-		});
-	});
-	
-	//转台
-	$('#tranTable_a_tableSelect').click(function(){
-		var askTablePopup = new AskTablePopup({
-			title : '转台',
-			middle : function(){
-				var sourceTable = null;
-				var sourceAlias = $('#left_input_askTable').val();
-				var destAliasd = $('#tranNum_input_ask').val();
+			askTablePopup.open(function(){
 				
-				if(destAliasd){
-					sourceTable = WirelessOrder.tables.getByAlias(sourceAlias);
-				}else{
-					sourceTable = uo.table;
-				}
-				
-				var destTable = WirelessOrder.tables.getByAlias(destAliasd);
-				
-				if(!sourceTable || !destTable){
-					Util.msg.tip('查找餐台出错,请检查台号是否正确');
-					return;
-				}
-				
-				Util.LM.show();
-				
-				$.post('../OperateTable.do', {
-					dataSource : 'transTable',
-					oldTableId : sourceTable.id,
-					newTableId : destTable.id
-				}, function(data){
-					Util.LM.hide();
-					if(data.success){
-						askTablePopup.close();
-						initTableData();
-						Util.msg.tip(data.msg);
-						ts.loadData();
-					}else{
-						Util.msg.tip(data.msg);
+				$('#tableSelect_div_askTable').on('keydown', function(event){
+					if(event.keyCode == '107'){
+						var perfectMatched = askTablePopup.prefect();
+						if(perfectMatched){
+							askTablePopup.close(function(){
+								$('#tableSelect_div_askTable').off('keydown');
+								updateTable({
+									id : perfectMatched.id,
+									alias : !perfectMatched.id ? perfectMatched.alias : ''
+								});	
+							}, 200);
+						}else{
+							Util.msg.tip('没有此餐台,请重新输入');
+						}
+						
+					}else if(event.keyCode == '13'){//回车
+						var perfectMatched = askTablePopup.prefect();
+						
+						if(perfectMatched){
+							askTablePopup.close(function(){
+								$('#tableSelect_div_askTable').off('keydown');
+								updateTable({
+									toPay : true,
+									id : perfectMatched.id,
+									alias : !perfectMatched.id ? perfectMatched.alias : ''
+								});	
+							}, 200);
+						}else{
+							Util.msg.tip('没有此餐台,请重新输入');
+						}
 					}
-				}).error(function(){
-					Util.LM.hide();
-					Util.msg.tip('操作失败,请刷新页面重试');
+					//取消事件的冒泡行为
+					event.stopPropagation();
 				});
-			}
+			});
 		});
-		askTablePopup.open(function(){
-			$('#left_a_askTable').hide();
-			$('#tranNum_td_ask').show();
-			$('#middle_a_askTable').css('width', '48%');
-			$('#right_a_askTable').css('width', '50%');
-		});
-	});
-
-	//多台开席
-	$('#multiTables_a_tableSelect').click(function(){
-		var _selectedTable = null;
-		var askTablePopup = new AskTablePopup({
-			title : '多台开席选台',
-			tables : WirelessOrder.tables,
-			tableSelect : function(selectedTable){
-				_selectedTable = selectedTable;
-				var table = null;
-				for (var i = 0; i < ts.multiOpenTableChoosedTable.length; i++) {
-					if(ts.multiOpenTableChoosedTable[i].id == _selectedTable.id){
-						table = true;
-						ts.multiOpenTableChoosedTable.splice(i, 1);
-						break;
-					}
-				}
-				//选择餐台
-				if(table == null){
-					table = WirelessOrder.tables.getById(_selectedTable.id);
-					if(table.statusValue == 1){
-						Util.msg.tip("此餐台已使用, 不能选择");
-						return;
-					}
-					ts.multiOpenTableChoosedTable.push(table);
-				}
-				askTablePopup.close();
-				//刷新已点餐台
-				ts.loadBookChoosedTable({renderTo : 'multiOpenTableHadChoose', tables:ts.multiOpenTableChoosedTable});	
-
-			},
-			middle : function(){
-				Util.msg.tip('请选择一张餐桌');
-			}
-		});
-		askTablePopup.open(function(){
-			$('#left_a_askTable').hide();
-			$('#middle_a_askTable').css('width', '48%');
-			$('#right_a_askTable').css('width', '50%');
-		});
-	});
 	
-	//拼台
-	$('#combineTable_a_tableSelect').click(function(){
-		var _selectedTable = null;
-		var askTablePopup = new AskTablePopup({
-			title : '拼台',
-			tables : WirelessOrder.tables,
-			tableSelect : function(selectedTable){
-				_selectedTable = selectedTable;
-				var table = null;
-				
-				for (var i = 0; i < ts.multiPayTableChoosedTable.length; i++) {
-					if(ts.multiPayTableChoosedTable[i].id == _selectedTable.id){
-						table = true;
-						ts.multiPayTableChoosedTable.splice(i, 1);
-						break;
-					}
-				}
-				
-				//选择餐台
-				if(table == null){
-					table = WirelessOrder.tables.getById(_selectedTable.id);
-					if(table.statusValue == 0){
-						Util.msg.tip("此餐台未点餐, 不能选择");
-						return;
-					}
-					ts.multiPayTableChoosedTable.push(table);
-				}
-				
-				askTablePopup.close();
-				//刷新已点餐台
-				ts.loadBookChoosedTable({renderTo : 'multiPayTableHadChoose', tables:ts.multiPayTableChoosedTable});	
-				
-			},
-			middle : function(){
-				Util.msg.tip('请选择一张餐桌');
-			}
-		});
-		askTablePopup.open(function(){
-			$('#left_a_askTable').hide();
-			$('#middle_a_askTable').css('width', '48%');
-			$('#right_a_askTable').css('width', '50%');
-		});
-	});
-	
-	//预订添加餐桌
-	$('#addBookTable_a_tableSelect').click(function(){
-		var _selectedTable = null;
-		var askTablePopup = new AskTablePopup({
-			title : '选择餐桌',	
-			tables : WirelessOrder.tables,
-			tableSelect : function(selectedTable){
-				_selectedTable = selectedTable;
-				var table = null;
-				
-				for (var i = 0; i < ts.bookChoosedTable.length; i++) {
-					if(ts.bookChoosedTable[i].id == _selectedTable.id){
-						table = true;
-						ts.bookChoosedTable.splice(i, 1);
-						break;
-					}
-				}
-				
-				//选择餐台
-				if(table == null){
-					table = WirelessOrder.tables.getById(_selectedTable.id);
-					
-					ts.bookChoosedTable.push(table);
-				}
-				//刷新已点餐台
-				ts.loadBookChoosedTable({renderTo : 'add_bookTableList', tables:ts.bookChoosedTable, otype:'display'});
-				
-				//显示预订添加界面餐台
-				$('#box4BookTableList').show();
-				askTablePopup.close();
-			}
-		});
-		askTablePopup.open(function(){
-			$('#left_a_askTable').hide();
-			$('#middle_a_askTable').css('width', '48%');
-			$('#right_a_askTable').css('width', '50%');
+		//快餐模式按钮
+		$('#fastFood_li_tableSelect').click(function(){
+			of.entry({orderFoodOperateType : 'fast'});
 		});
 		
-	});
-	
-	//入座选餐桌
-	$('#bookChoose_a_tableSelect').click(function(){
-		var _selectedTable = null;
-		var askTablePopup = new AskTablePopup({
-			title : '入座选桌',
-			tables : WirelessOrder.tables,
-			tableSelect : function(selectedTable){
-				_selectedTable = selectedTable;
-				var table = null;
-				if(typeof _selectedTable.otype == 'undefined' || _selectedTable.otype == 'commit'){
+		//会员查询
+		$('#searchMember_a_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			setTimeout(function(){
+				var searchMemberPopup = null;
+				searchMemberPopup = new MemberReadPopup({
+					confirm : function(){
+						searchMemberPopup.close();
+					}
+				});
+				searchMemberPopup.open();
+			}, 300);
+		});
+			
+		//拆台
+		$('#apartTable_a_tableSelect').click(function(){
+			var _selectedTable = null;
+			var askTablePopup = null;
+			askTablePopup = new AskTablePopup({
+				tables : WirelessOrder.tables,
+				title : '拆台',
+				middle : function(){
+					Util.msg.tip('请选中一张餐桌或者编号');
+				},
+				tableSelect : function(selectedTable){
+					$('#matchedTables_div_askTable').hide();
+					$('#suffix_div_ask').show();
+					_selectedTable = selectedTable;
+				},
+				suffixSelect : function(suffixValue){
+					Util.LM.show();
+					var suffix = suffixValue;
+					$.post('../OperateTable.do', {
+						dataSource : 'apartTable',
+						tableID : _selectedTable.id,
+						suffix : suffix,
+						comment : $("#apartComment_input_ask").val()
+					}, function(result){
+						Util.LM.hide();
+						if(result.success){
+							askTablePopup.close(function(){
+								uo.entry({
+									table : result.root[0]
+								});
+							}, 200);
+						}else{
+							Util.msg.tip('操作失败, 请刷新页面后重试');
+						}
+					}).error(function(){
+						Util.LM.hide();
+						Util.msg.tip('操作失败, 请刷新页面重试');		
+					});		
+				}
+				
+			});
+			askTablePopup.open(function(){
+				$('#left_a_askTable').hide();
+				$('#apartComment_tr_ask').show();
+				$('#middle_a_askTable').css('width', '48%');
+				$('#right_a_askTable').css('width', '50%');
+			});
+		});
+		
+		//转台
+		$('#tranTable_a_tableSelect').click(function(){
+			var askTablePopup = null;
+			askTablePopup = new AskTablePopup({
+				title : '转台',
+				middle : function(){
+					var sourceTable = null;
+					var sourceAlias = $('#left_input_askTable').val();
+					var destAliasd = $('#tranNum_input_ask').val();
 					
-					for (var i = 0; i < ts.bookChoosedTable.length; i++) {
-						if(ts.bookChoosedTable[i].id == _selectedTable.id){
+					if(destAliasd){
+						sourceTable = WirelessOrder.tables.getByAlias(sourceAlias);
+					}else{
+						sourceTable = uo.table;
+					}
+					
+					var destTable = WirelessOrder.tables.getByAlias(destAliasd);
+					
+					if(!sourceTable || !destTable){
+						Util.msg.tip('查找餐台出错,请检查台号是否正确');
+						return;
+					}
+					
+					Util.LM.show();
+					
+					$.post('../OperateTable.do', {
+						dataSource : 'transTable',
+						oldTableId : sourceTable.id,
+						newTableId : destTable.id
+					}, function(data){
+						Util.LM.hide();
+						if(data.success){
+							askTablePopup.close();
+							initTableData();
+							Util.msg.tip(data.msg);
+							ts.loadData();
+						}else{
+							Util.msg.tip(data.msg);
+						}
+					}).error(function(){
+						Util.LM.hide();
+						Util.msg.tip('操作失败,请刷新页面重试');
+					});
+				}
+			});
+			askTablePopup.open(function(){
+				$('#left_a_askTable').hide();
+				$('#tranNum_td_ask').show();
+				$('#middle_a_askTable').css('width', '48%');
+				$('#right_a_askTable').css('width', '50%');
+			});
+		});
+	
+		//多台开席
+		$('#multiTables_a_tableSelect').click(function(){
+			var _selectedTable = null;
+			var askTablePopup = null;
+			askTablePopup = new AskTablePopup({
+				title : '多台开席选台',
+				tables : WirelessOrder.tables,
+				tableSelect : function(selectedTable){
+					_selectedTable = selectedTable;
+					var table = null;
+					for (var i = 0; i < ts.multiOpenTableChoosedTable.length; i++) {
+						if(ts.multiOpenTableChoosedTable[i].id == _selectedTable.id){
 							table = true;
+							ts.multiOpenTableChoosedTable.splice(i, 1);
 							break;
 						}
 					}
@@ -963,193 +961,178 @@ $(document).on('pageinit', "#tableSelectMgr", function(){
 							Util.msg.tip("此餐台已使用, 不能选择");
 							return;
 						}
-						ts.bookChoosedTable.push(table);
-					}			
-					//去除已订餐台
-					for (var i = 0; i < ts.bookOperateTable.oldTables.length; i++) {
-						if(ts.bookOperateTable.oldTables[i].id == _selectedTable.id){
-							ts.bookOperateTable.oldTables.splice(i, 1);
+						ts.multiOpenTableChoosedTable.push(table);
+					}
+					askTablePopup.close();
+					//刷新已点餐台
+					ts.loadBookChoosedTable({renderTo : 'multiOpenTableHadChoose', tables:ts.multiOpenTableChoosedTable});	
+	
+				},
+				middle : function(){
+					Util.msg.tip('请选择一张餐桌');
+				}
+			});
+			askTablePopup.open(function(){
+				$('#left_a_askTable').hide();
+				$('#middle_a_askTable').css('width', '48%');
+				$('#right_a_askTable').css('width', '50%');
+			});
+		});
+		
+		//拼台
+		$('#combineTable_a_tableSelect').click(function(){
+			var _selectedTable = null;
+			var askTablePopup = null;
+			askTablePopup = new AskTablePopup({
+				title : '拼台',
+				tables : WirelessOrder.tables,
+				tableSelect : function(selectedTable){
+					_selectedTable = selectedTable;
+					var table = null;
+					
+					for (var i = 0; i < ts.multiPayTableChoosedTable.length; i++) {
+						if(ts.multiPayTableChoosedTable[i].id == _selectedTable.id){
+							table = true;
+							ts.multiPayTableChoosedTable.splice(i, 1);
 							break;
 						}
-					}			
-				}else if(c.otype == 'display'){
+					}
+					
+					//选择餐台
+					if(table == null){
+						table = WirelessOrder.tables.getById(_selectedTable.id);
+						if(table.statusValue == 0){
+							Util.msg.tip("此餐台未点餐, 不能选择");
+							return;
+						}
+						ts.multiPayTableChoosedTable.push(table);
+					}
+					
+					askTablePopup.close();
+					//刷新已点餐台
+					ts.loadBookChoosedTable({renderTo : 'multiPayTableHadChoose', tables:ts.multiPayTableChoosedTable});	
+					
+				},
+				middle : function(){
+					Util.msg.tip('请选择一张餐桌');
+				}
+			});
+			askTablePopup.open(function(){
+				$('#left_a_askTable').hide();
+				$('#middle_a_askTable').css('width', '48%');
+				$('#right_a_askTable').css('width', '50%');
+			});
+		});
+		
+		//预订添加餐桌
+		$('#addBookTable_a_tableSelect').click(function(){
+			var _selectedTable = null;
+			var askTablePopup = null;
+			askTablePopup = new AskTablePopup({
+				title : '选择餐桌',	
+				tables : WirelessOrder.tables,
+				tableSelect : function(selectedTable){
+					_selectedTable = selectedTable;
+					var table = null;
+					
 					for (var i = 0; i < ts.bookChoosedTable.length; i++) {
 						if(ts.bookChoosedTable[i].id == _selectedTable.id){
-							table = ts.bookChoosedTable[i];
+							table = true;
 							ts.bookChoosedTable.splice(i, 1);
 							break;
 						}
 					}
-					//退回原餐台
-					ts.bookOperateTable.oldTables.push(table);
+					
+					//选择餐台
+					if(table == null){
+						table = WirelessOrder.tables.getById(_selectedTable.id);
+						
+						ts.bookChoosedTable.push(table);
+					}
+					//刷新已点餐台
+					ts.loadBookChoosedTable({renderTo : 'add_bookTableList', tables:ts.bookChoosedTable, otype:'display'});
+					
+					//显示预订添加界面餐台
+					$('#box4BookTableList').show();
+					askTablePopup.close();
 				}
-
-				//选台后关闭
-				askTablePopup.close();
-				//刷新入座餐台
-				ts.loadBookChoosedTable({renderTo : 'bookTableHadChoose', tables:ts.bookChoosedTable, otype : 'display'});
-				//刷新预订餐台
-				ts.loadBookChoosedTable({renderTo : 'bookTableToChoose', tables:ts.bookOperateTable.oldTables, otype : 'commit'});		
-
-				
-			}
+			});
+			askTablePopup.open(function(){
+				$('#left_a_askTable').hide();
+				$('#middle_a_askTable').css('width', '48%');
+				$('#right_a_askTable').css('width', '50%');
+			});
+			
 		});
 		
-		askTablePopup.open(function(){
-			$('#left_a_askTable').hide();
-			$('#middle_a_askTable').css('width', '48%');
-			$('#right_a_askTable').css('width', '50%');
-		});
-	});
-	
-	
-	
-	
-
-	
-	
-
-});
-
-
-
-$(function(){
-	
-	
-	//餐厅选择界面高度
-	$('#tableAndRegionsCmp').height(document.body.clientHeight - tableListHeight);	
-	//点菜界面高度
-	$('#orderFoodCenterCmp').height(document.body.clientHeight - 210);
-	document.getElementById('foodsCmp').style.height = (document.body.clientHeight - 210)+'px';		
-	//沽清菜界面高度
-	$('#stopSellCmp').height(document.body.clientHeight - 125);	
-	document.getElementById('foods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
-	document.getElementById('divFoods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
-	//已点菜界面高度
-	$('#orderFoodListCmp').height(document.body.clientHeight - 125);
-	//预订列表
-	$('#bookOrderListCmp').height(document.body.clientHeight - 170);	
-	//结账界面高度 & 菜品列表高度
-	$('#paymentCmp').height(document.body.clientHeight - 86);	
-	$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
-	
-	/**
-	 * 餐桌分页包
-	 */
-	ts.tp = new Util.to.padding({
-		renderTo : 'divTableShowForSelect',
-		displayId : 'divDescForTableSelect-padding-msg',
-		templet : function(c){
-			var aliasOrName;
-			if(c.data.categoryValue == 1){//一般台
-				aliasOrName = c.data.alias;
-			}else if(c.data.categoryValue == 3){//搭台
-				var begin = c.data.name.indexOf("(");
-				var end = c.data.name.indexOf(")");
-				aliasOrName = '<font color="green">' + c.data.name.substring(begin+1, end) +'</font>';
-			}else{
-				aliasOrName = '<font color="green">'+ c.data.categoryText +'</font>';
-			}
-			return tableCmpTemplet.format({
-				dataIndex : c.index,
-				id : c.data.id,
-				click : 'ts.selectTable({event : this, id : '+ c.data.id +',tableAlias :'+ c.data.alias +'})',
-				alias : aliasOrName,
-				theme : c.data.statusValue == '1' ? "e" : "c",
-				name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
-				tempPayStatus : c.data.isTempPaid? '暂结' : '&nbsp;&nbsp;',
-				bookTableStatus : c.data.isBook? '订' : '',
-				tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0?'tempPayStatus4Moz':'tempPayStatus'
-			});				
-		}
-	});
- 		
-	
-	Util.LM.show();		
-	
-	$.ajax({
-		url : '../VerifyLogin.do',
-		success : function(data, status, xhr){
-			if(data.success){
-				//刷新时去除#
-				if(location.href.indexOf('#') > 0){
-					location.href = 'tableSelect.jsp?status='+systemStatus;
-					return;
-				}
-				
-				ln.staffData = data.other.staff;
-				
-				$('#spanStaffNameForDisplayToTS').html('操作人: <font color="green">'+ data.other.staff.staffName + '</font>');
-				
-				//定时器，定时刷新餐桌选择页面数据
-				window.setInterval(initTableData, 20 * 60 * 1000);
-				//加载基础数据
-				Util.LM.show();
-				initTableData();
-				initFoodData();
-				
-				//验证员工权限	
+		//入座选餐桌
+		$('#bookChoose_a_tableSelect').click(function(){
+			var _selectedTable = null;
+			var askTablePopup = null;
+			askTablePopup = new AskTablePopup({
+				title : '入座选桌',
+				tables : WirelessOrder.tables,
+				tableSelect : function(selectedTable){
+					_selectedTable = selectedTable;
+					var table = null;
+					if(typeof _selectedTable.otype == 'undefined' || _selectedTable.otype == 'commit'){
 						
-				$.ajax({
-					url : "../QueryStaff.do",
-					type : 'post',
-					data : {
-						"privileges" : 1003,
-						"checkPrivilege" : true
-					},
-					success : function(jr, status, xhr){
-						if(jr.success){
-							if(jr.other.havePrivileges != null){
-								$('#giftFoodOperate').show();
+						for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+							if(ts.bookChoosedTable[i].id == _selectedTable.id){
+								table = true;
+								break;
 							}
 						}
-					},
-					error : function(request, status, err){
+						//选择餐台
+						if(table == null){
+							table = WirelessOrder.tables.getById(_selectedTable.id);
+							if(table.statusValue == 1){
+								Util.msg.tip("此餐台已使用, 不能选择");
+								return;
+							}
+							ts.bookChoosedTable.push(table);
+						}			
+						//去除已订餐台
+						for (var i = 0; i < ts.bookOperateTable.oldTables.length; i++) {
+							if(ts.bookOperateTable.oldTables[i].id == _selectedTable.id){
+								ts.bookOperateTable.oldTables.splice(i, 1);
+								break;
+							}
+						}			
+					}else if(c.otype == 'display'){
+						for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+							if(ts.bookChoosedTable[i].id == _selectedTable.id){
+								table = ts.bookChoosedTable[i];
+								ts.bookChoosedTable.splice(i, 1);
+								break;
+							}
+						}
+						//退回原餐台
+						ts.bookOperateTable.oldTables.push(table);
 					}
-				}); 				
-			}else{	
-				Util.LM.hide();	
-				Util.msg.alert({
-					msg : '请先登录',
-					topTip : true
-				});
-				setTimeout(function(){
-					location.href = 'verifyLogin.jsp?status='+systemStatus;
-				}, 2000);
-			}
-		},
-		error : function(request, status, error){
-			Util.LM.hide();	
-			Util.msg.alert({
-				msg : '操作有误,请刷新页面',
-				topTip : true
+	
+					//选台后关闭
+					askTablePopup.close();
+					//刷新入座餐台
+					ts.loadBookChoosedTable({renderTo : 'bookTableHadChoose', tables:ts.bookChoosedTable, otype : 'display'});
+					//刷新预订餐台
+					ts.loadBookChoosedTable({renderTo : 'bookTableToChoose', tables:ts.bookOperateTable.oldTables, otype : 'commit'});		
+	
+					
+				}
 			});
-			setTimeout(function(){
-				location.href = 'verifyLogin.jsp?status='+systemStatus;
-			}, 1000);
-		}
+			
+			askTablePopup.open(function(){
+				$('#left_a_askTable').hide();
+				$('#middle_a_askTable').css('width', '48%');
+				$('#right_a_askTable').css('width', '50%');
+			});
+		});
+	
 	});
-	
-	//餐台选择, 转菜, 查台输入框
-	ts.s.init({file : 'txtTableNumForTS'});	
-	
-	//获取系统相关属性
-	Util.sys.checkSmStat();
-	
-	//刷新微信预订单
-	ts.refreshWeixinBook();
-	
-	//用户自定义日期
-	$('#conditionDayBeginDay').bind('change', function(){
-		if($('#conditionDayBeginDay').val() && $('#conditionDayEndDay').val() ){
-			ts.searchBookList({begin:$('#conditionDayBeginDay').val(), end:$('#conditionDayEndDay').val()});
-		}
-	});	
-	$('#conditionDayEndDay').bind('change', function(){
-		if($('#conditionDayBeginDay').val() && $('#conditionDayEndDay').val() ){
-			ts.searchBookList({begin:$('#conditionDayBeginDay').val(), end:$('#conditionDayEndDay').val()});
-		}
-	});	
+
+	//跳转到主界面
+	//location.href = '#tableSelectMgr';
 	
 	//更新菜品列表
 	function initFoodData(){
@@ -1181,7 +1164,7 @@ $(function(){
 					}
 				}
 				
-				WirelessOrder.foods = new FoodList(foods);
+				WirelessOrder.foods = new WirelessOrder.FoodList(foods);
 				WirelessOrder.kitchens = kitchens;
 				WirelessOrder.depts = depts;
 				
@@ -1323,30 +1306,6 @@ window.onload = function(){
     });
     
 };
-
-//改变窗口时
-window.onresize = function(){
-
-	/**
-	 * 动态高度
-	 */	
-	//餐厅选择界面高度
-	$('#tableAndRegionsCmp').height(document.body.clientHeight - tableListHeight);	
-	//点菜界面高度
-	$('#orderFoodCenterCmp').height(document.body.clientHeight - 210);
-	document.getElementById('foodsCmp').style.height = (document.body.clientHeight - 210)+'px';		
-	//沽清菜界面高度
-	$('#stopSellCmp').height(document.body.clientHeight - 125);	
-	document.getElementById('foods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
-	document.getElementById('divFoods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
-	//已点菜界面高度
-	$('#orderFoodListCmp').height(document.body.clientHeight - 125);
-	//结账界面高度 & 菜品列表高度
-	$('#paymentCmp').height(document.body.clientHeight - 86);	
-	$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
-};
-
-
 
 
 /**
@@ -2302,25 +2261,19 @@ function initTableData(){
 	}, 'json');
 	
 	
-	// 加载菜单数据
+	// 加载餐台数据
 	$.post('../QueryTable.do', null, function(data, status, xhr){
 		if(status == 'success'){
 			if(data.success){
 				
-				WirelessOrder.tables = new TableList(data.root);
+				WirelessOrder.tables = new WirelessOrder.TableList(data.root);
 				
 				//设置各状态数量
-				$('#ts_freeTablesCount').text(WirelessOrder.tables.getIdleAmount());
-				$('#ts_busyTablesCount').text(WirelessOrder.tables.getBusyAmount());
-				$('#selectBarFreeTablesCount').text(WirelessOrder.tables.getIdleAmount());
-				$('#selectBarBusyTablesCount').text(WirelessOrder.tables.getBusyAmount());
-				$('#selectBarTempPayTablesCount').text(WirelessOrder.tables.getTmpPaidAmount());
-				
-				ts.rn.selectingId = 'divAllArea';
-				ts.rn.pageNow = 1;
-				var regionH = $("#divToolRightForSelect").height() - 6 * 65;
-				ts.rn.limit = Math.floor(regionH/62);
-				ts.rn.pageCount = Math.ceil(WirelessOrder.regions.length/ts.rn.limit);
+				$('#idleTableAmount_label_tableSelect').text(WirelessOrder.tables.getIdleAmount());
+				$('#busyTableAmount_label_tableSelect').text(WirelessOrder.tables.getBusyAmount());
+				$('#idleTableAmount_font_tableSelect').text(WirelessOrder.tables.getIdleAmount());
+				$('#busyTableAmount_font_tableSelect').text(WirelessOrder.tables.getBusyAmount());
+				$('#tmpPaidTableAmount_font_tableSelect').text(WirelessOrder.tables.getTmpPaidAmount());
 				
 				showTable();
 				
@@ -2354,10 +2307,10 @@ function showTable(){
 	//取得当前的餐台状态条件
 	var tableStatusVal = $('#labTableStatus').attr('table-status');
 	if(tableStatusVal){
-		if(tableStatusVal == TableList.Status.IDLE.val){
-			tableStatus = TableList.Status.IDLE;
-		}else if(tableStatusVal == TableList.Status.BUSY.val){
-			tableStatus = TableList.Status.BUSY;
+		if(tableStatusVal == WirelessOrder.TableList.Status.IDLE.val){
+			tableStatus = WirelessOrder.TableList.Status.IDLE;
+		}else if(tableStatusVal == WirelessOrder.TableList.Status.BUSY.val){
+			tableStatus = WirelessOrder.TableList.Status.BUSY;
 		}
 	}
 	

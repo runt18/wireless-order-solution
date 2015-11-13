@@ -428,13 +428,9 @@ uo.cancelFoodAction = function(){
 uo.openOrderFoodOtherOperate = function(c){
 	//获取选中行
 	uo.selectedFood = uo.order.orderFoods[parseInt($(c.event).attr('data-index'))-1];
+	//获取赠送权限
+	var giftPrivileges = WirelessOrder.login.hasPrivilege(WirelessOrder.Staff.Privilege.GIFT);
 	
-	var giftPrivileges = false;
-	for (var i = 0; i < ln.staffData.role.privileges.length; i++) {
-		if(ln.staffData.role.privileges[i].codeValue === 1003){
-			giftPrivileges = true;
-		}
-	}
 	if((uo.selectedFood.status & 1 << 3) != 0 && giftPrivileges && !uo.selectedFood.isGift){
 		$('#btnGiftFood').show();
 	}else{

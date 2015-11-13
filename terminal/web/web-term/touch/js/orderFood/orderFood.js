@@ -2626,6 +2626,12 @@ $(function(){
 	
 	//点菜界面初初始化
 	$('#orderFoodMgr').on('pageinit', function(){
+		//判断是否显示'赠送'按钮
+		if(WirelessOrder.login.hasPrivilege(WirelessOrder.Staff.Privilege.GIFT)){
+			$('#giftFoodOperate_a_orderFood').show();
+		}else{
+			$('#giftFoodOperate_a_orderFood').hide();
+		}
 		
 		//点菜页面的下一页
 		$('#getNextPage_a_orderFood').click(function(){
