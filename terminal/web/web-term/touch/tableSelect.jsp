@@ -907,7 +907,7 @@
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont none" id="payOrder_a_checkOut">结账</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loadOrderDetail();lookupOrderDetailByType('detail_all');">明细</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#popupDiscountCmp">折扣</a>
-			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.transTableForTS()">转台</a>
+			<a data-role="button" data-inline="true" class="bottomBtnFont" id="checkOutTranTable_a_tableSelect">转台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" id="memberRead_a_orderFood">会员</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#updateFoodOtherOperateCmp" onclick="uo.openMoreOperate()">更多</a>
 			<a href="javascript: Util.to.scroll({content:'orderFoodListCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
@@ -927,7 +927,7 @@
             <li class="tempFoodKitchen" onclick="uo.openCommentOperate()"><a >修改备注</a></li>
             <li class="tempFoodKitchen" onclick="uo.tempPayForPrintAll()"><a >补打总单</a></li>
             <li class="tempFoodKitchen" onclick="uo.printDetailPatch()"><a >补打明细</a></li>
-            <li class="tempFoodKitchen" onclick="uo.allTransFoodForTS()"><a >全单转菜</a></li>
+            <li class="tempFoodKitchen" id="allTrantable_li_tableSelect"><a >全单转菜</a></li>
             <li class="tempFoodKitchen" onclick="uo.allFoodHurried()"><a >全单催菜</a></li>
             <li class="tempFoodKitchen" onclick="uo.cancelTable()"><a >撤台</a></li>
             <li id="uo_btnCheckoutBook" class="tempFoodKitchen" onclick="ts.checkBookTable()"><a >查看预订</a></li>

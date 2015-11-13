@@ -835,70 +835,16 @@ $(function(){
 			}, 300);
 		});
 			
-		//拆台
-		$('#apartTable_a_tableSelect').click(function(){
-			var _selectedTable = null;
-			var askTablePopup = null;
-			askTablePopup = new AskTablePopup({
-				tables : WirelessOrder.tables,
-				title : '拆台',
-				middle : function(){
-					Util.msg.tip('请选中一张餐桌或者编号');
-				},
-				tableSelect : function(selectedTable){
-					$('#matchedTables_div_askTable').hide();
-					$('#suffix_div_ask').show();
-					_selectedTable = selectedTable;
-				},
-				suffixSelect : function(suffixValue){
-					Util.LM.show();
-					var suffix = suffixValue;
-					$.post('../OperateTable.do', {
-						dataSource : 'apartTable',
-						tableID : _selectedTable.id,
-						suffix : suffix,
-						comment : $("#apartComment_input_ask").val()
-					}, function(result){
-						Util.LM.hide();
-						if(result.success){
-							askTablePopup.close(function(){
-								uo.entry({
-									table : result.root[0]
-								});
-							}, 200);
-						}else{
-							Util.msg.tip('操作失败, 请刷新页面后重试');
-						}
-					}).error(function(){
-						Util.LM.hide();
-						Util.msg.tip('操作失败, 请刷新页面重试');		
-					});		
-				}
-				
-			});
-			askTablePopup.open(function(){
-				$('#left_a_askTable').hide();
-				$('#apartComment_tr_ask').show();
-				$('#middle_a_askTable').css('width', '48%');
-				$('#right_a_askTable').css('width', '50%');
-			});
-		});
-		
 		//转台
 		$('#tranTable_a_tableSelect').click(function(){
-			var askTablePopup = null;
-			askTablePopup = new AskTablePopup({
+			var askTablePopup = new AskTablePopup({
 				title : '转台',
 				middle : function(){
 					var sourceTable = null;
 					var sourceAlias = $('#left_input_askTable').val();
 					var destAliasd = $('#tranNum_input_ask').val();
 					
-					if(destAliasd){
-						sourceTable = WirelessOrder.tables.getByAlias(sourceAlias);
-					}else{
-						sourceTable = uo.table;
-					}
+					sourceTable = WirelessOrder.tables.getByAlias(sourceAlias);
 					
 					var destTable = WirelessOrder.tables.getByAlias(destAliasd);
 					
@@ -936,6 +882,7 @@ $(function(){
 				$('#right_a_askTable').css('width', '50%');
 			});
 		});
+					
 	
 		//多台开席
 		$('#multiTables_a_tableSelect').click(function(){
@@ -1506,62 +1453,6 @@ ts.bookSearchByName = {
 	}
 };
 
-/**
- * 执行转台
- * @param c  当前台号alias, 转去的台号oldAlias
- */
-ts.transTable = function(c){
-	var oldTable;
-	if(c && c.oldAlias){
-		oldTable = WirelessOrder.tables.getByAlias(c.oldAlias);
-	}else{
-		oldTable = uo.table;
-	}
-	
-	var newTable = WirelessOrder.tables.getByAlias(c.alias);
-	
-	if(!oldTable || !newTable){
-		Util.msg.alert({
-			title : '提示',
-			msg : '查找餐台出错, 请检查台号是否正确', 
-			renderTo : 'orderFoodListMgr'
-		});	
-		return;
-	}
-	
-	Util.LM.show();
-	
-	$.post('../OperateTable.do', {
-		dataSource : 'transTable',
-		oldTableId : oldTable.id,
-		newTableId : newTable.id
-	},function(data){
-		Util.LM.hide();
-		if(data.success){
-			uo.closeTransOrderFood();
-			initTableData();
-			Util.msg.alert({
-				msg : data.msg, 
-				topTip : true
-			});
-			//返回主界面
-			ts.loadData();
-		}else{
-			Util.msg.alert({
-				title : '提示',
-				msg : data.msg, 
-				renderTo : 'orderFoodListMgr'
-			});				
-		}			
-	}).error(function(){
-		Util.LM.hide();
-		Util.msg.alert({
-			title : '提示',
-			msg : '操作失败, 请刷新页面重试', 
-			renderTo : 'orderFoodListMgr'
-		});		
-	});	
-};
 
 /**
  * 搜索出来的结果点击直接提交
