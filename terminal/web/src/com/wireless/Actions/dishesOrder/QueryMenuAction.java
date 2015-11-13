@@ -38,24 +38,10 @@ public class QueryMenuAction extends DispatchAction {
 	 */
 	public ActionForward foodList(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		response.setContentType("text/json;charset=utf-8");
-		JObject jobject = new JObject();
+		final JObject jobject = new JObject();
 		String pin = (String) request.getAttribute("pin");
 		final DepartmentTree deptTree = new DepartmentTree.Builder(FoodDao.getPureByCond(StaffDao.verify(Integer.parseInt(pin)), null, null)).build();
 		jobject.setRoot(deptTree.asDeptNodes());
-//		jobject.setExtra(new Jsonable(){
-//
-//			@Override
-//			public JsonMap toJsonMap(int flag) {
-//				JsonMap jm = new JsonMap();
-//				jm.putJsonableList("foodList", deptTree.asFoodList(), Food.FOOD_JSONABLE_SIMPLE);
-//				return jm;
-//			}
-//	
-//			@Override
-//			public void fromJsonMap(JsonMap jsonMap, int flag) {
-//				
-//			}
-//		});
 		
 		response.getWriter().print(jobject.toString());
 		return null;
