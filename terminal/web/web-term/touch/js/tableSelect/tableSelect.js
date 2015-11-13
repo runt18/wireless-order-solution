@@ -193,8 +193,6 @@ $(function(){
 			}
 		});
 		
-		//餐台选择, 转菜, 查台输入框
-		ts.s.init({file : 'txtTableNumForTS'});	
 		
 		//获取系统相关属性
 		Util.sys.checkSmStat();
@@ -886,6 +884,54 @@ $(function(){
 				$('#right_a_askTable').css('width', '50%');
 			});
 		});
+		
+		//拆台
+		$('#apartTable_a_tableSelect').click(function(){
+			var _selectedTable = null;
+			var askTablePopup = new AskTablePopup({
+				tables : WirelessOrder.tables,
+				title : '拆台',
+				middle : function(){
+					Util.msg.tip('请选中一张餐桌或者编号');
+				},
+				tableSelect : function(selectedTable){
+					$('#matchedTables_div_askTable').hide();
+					$('#suffix_div_ask').show();
+					_selectedTable = selectedTable;
+				},
+				suffixSelect : function(suffixValue){
+					Util.LM.show();
+					var suffix = suffixValue;
+					$.post('../OperateTable.do', {
+						dataSource : 'apartTable',
+						tableID : _selectedTable.id,
+						suffix : suffix,
+						comment : $("#apartComment_input_ask").val()
+					}, function(result){
+						Util.LM.hide();
+						if(result.success){
+							askTablePopup.close(function(){
+								uo.entry({
+									table : result.root[0]
+								});
+							}, 200);
+						}else{
+							Util.msg.tip(result.msg);
+						}
+					}).error(function(){
+						Util.LM.hide();
+						Util.msg.tip('操作失败, 请刷新页面重试');		
+					});		
+				}
+				
+			});
+			askTablePopup.open(function(){
+				$('#left_a_askTable').hide();
+				$('#apartComment_tr_ask').show();
+				$('#middle_a_askTable').css('width', '48%');
+				$('#right_a_askTable').css('width', '50%');
+			});
+		});
 					
 	
 		//多台开席
@@ -1258,80 +1304,6 @@ window.onload = function(){
     
 };
 
-
-/**
- * 餐台选择匹配
- */
-ts.s = {
-	file : null,
-	fileValue : null,
-	init : function(c){
-		this.file = document.getElementById(c.file);
-		if(typeof this.file.oninput != 'function'){
-			this.file.oninput = function(e){
-				ts.s.fileValue = ts.s.file.value;
-				//数字键盘触发, 除了开台和点餐转台和会员
-				if(ts.commitTableOrTran != 'openTable' && ts.commitTableOrTran != 'tableTransTable' && ts.commitTableOrTran != 'member'){
-					var data = null, temp = null;
-					if(ts.s.fileValue.trim().length > 0){
-						data = [];
-						temp = WirelessOrder.tables.slice(0);
-						for(var i = 0; i < temp.length; i++){
-							if(ts.commitTableOrTran == 'apartTable' && temp[i].alias == 0){
-								continue;
-							}else if((temp[i].name + '').indexOf(ts.s.fileValue.trim().toUpperCase()) != -1){
-								data.push(temp[i]);
-							}else if((temp[i].alias + '').indexOf(ts.s.fileValue.trim()) != -1){
-								data.push(temp[i]);
-							}
-						}				
-					}
-					if(data != null){
-						initSearchTables({
-							data : data.slice(0, 8)
-						});					
-					}
-					//如果是拆台则关闭后缀
-					if(ts.commitTableOrTran == 'apartTable'){
-						$('#divSelectTablesSuffixForTs').hide();
-						$('#divSelectTablesForTs').show();
-					}
-					
-					data = null;
-					temp = null;					
-				}
-				
-
-			};
-		}
-		return this.file;
-	},
-	valueBack : function(){
-		if(this.file.value){
-			this.file.value = this.file.value.substring(0, this.file.value.length - 1);
-			this.file.oninput(this.file);			
-		}
-
-		this.file.focus();
-	},
-	select : function(){
-		this.file.select();
-	},
-	clear : function(){
-		this.file.value = '';
-		this.file.oninput(this.file);
-		this.file.select();
-	},
-	callback : function(){
-		co.s.clear();
-	},
-	onInput : function(){
-		this.file.oninput(this.file);		
-	},	
-	fireEvent : function(){
-		ts.s.onInput();
-	}
-};
 
 /**
  * 预订列表匹配

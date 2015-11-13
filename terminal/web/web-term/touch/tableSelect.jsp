@@ -1003,65 +1003,6 @@
 </div>	
 <!-- end 已点菜界面 -->
 
-<!-- 系统共用餐台操作:转台,查台, 拆台等 start -->
-<div id="transFoodCmp" class="ui-overlay-shadow ui-corner-all" style="width: 460px;z-index: 1102;position: absolute; top: 160px; left: 50%; margin: -100px 0px 0px -250px;min-width:500px;background-color: white;display: none;" align="center">	
-<!-- <div id="transFoodCmp" data-role="popup"  data-theme="c" data-dismissible="false" style="max-width:900px;" align="center"> -->
-    <div id="transSomethingTitle" data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b win_head">
-        	请输入相关信息
-    </div>
-    <table id="divTransFoodTableAlias" style="width:90%">
-   	<tr>
-   		<td>
-   			<input id="txtTableNumForTS" class="numberInputStyle" onkeyup="value=value.replace(/[+]/g,'')" type="text" placeholder="填写台号">
-   		</td>
-   		<td id="td4TxtFoodNumForTran">
-   			<input id="txtFoodNumForTran" class="numberInputStyle" type="text" placeholder="填写菜品数量">
-   		</td>    	
-   		<td id="td4ToOtherTable" style="display: none;">
-   			<input id="numToOtherTable" type="text" placeholder="填写要转去的台号">
-   		</td>     		
-		<td id="td4OpenTablePeople" style="display: none;">
-   			<input id="openTablePeople" type="text" placeholder="填写就餐人数">
-   		</td>  	
-   		<td id="td4CmpDeleteWord" style="display: none;">
-			<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:inherit;">
-			    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('txtTableNumForTS')">D</a>
-			</div>		    		
-   		</td>   				
-   	</tr>
-   	<tr id="tr4TxtTableComment" style="display: none;">
-   		<td >
-   			<input id="txtTableComment" type="text" placeholder="开台备注" class="numberInputStyle">
-   		</td>      	
-   	</tr>
-    </table>
-    <hr>
-	<div id="divSelectTablesForTs" style="width: inherit;"  align="left">
-<!-- 			<a onclick="" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index=0 data-value=2 data-theme="c">
-				<div>牡丹<br>111</div>
-			</a>    -->
-	</div>
-	<div id="divSelectTablesSuffixForTs" style="display: none;"  align="left">
-			<a onclick="ts.openApartTableAction('A')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">A</a>
-			<a onclick="ts.openApartTableAction('B')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">B</a>
-			<a onclick="ts.openApartTableAction('C')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">C</a>
-			<a onclick="ts.openApartTableAction('D')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">D</a>
-			<a onclick="ts.openApartTableAction('E')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">E</a>
-			<a onclick="ts.openApartTableAction('F')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">F</a>
-			<a onclick="ts.openApartTableAction('G')" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-theme="c">G</a>     
-	</div>	
-	<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 50px;">
-		 <div id="searchTableCmpsFoot" data-role="controlgroup" data-type="horizontal" data-corners="false" class="bottomBarFullWidth ui-bar-b barBottomBeCorner" >
-		 	<a id="ts_toPaymentMgr" data-role="button" class="none" data-theme="b" data-inline="true" onclick="ts.toPaymentMgr()">结账(Enter)</a>
-			<a id="certain4searchTableCmps" data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn" onclick="ts.submitForSelectTableOrTransFood()">确定</a>
-			<a  data-role="button" data-theme="b" data-inline="true" class="countPopbottomBtn" onclick="uo.closeTransOrderFood()">取消</a>		 
-		 </div>
-    </div>
-</div>		
-<!-- end 系统共用餐台操作-->
-
-
-
 <!-- 点菜界面 start-->
 <div data-role="page" id="orderFoodMgr" >
 	<div class="ui-grid-a" style="width: 100%;background-color: skyblue;border-bottom:1px solid white;">

@@ -105,8 +105,8 @@ function AskTablePopup(param){
 		_popupInstance.close(function(self){
 			NumKeyBoardAttacher.instance().detach(self.find('[id=left_input_askTable]')[0]);
 			
-			NumKeyBoardAttacher.instance().detach(self.find('[id=tranNum_input_ask]'));
-			NumKeyBoardAttacher.instance().detach(self.find('[id=foodAmountText_input_ask]'));
+			NumKeyBoardAttacher.instance().detach(self.find('[id=tranNum_input_ask]')[0]);
+			NumKeyBoardAttacher.instance().detach(self.find('[id=foodAmountText_input_ask]')[0]);
 			//删除keypress事件
 			self.find('[id=left_input_askTable]').off('keyup');
 			
