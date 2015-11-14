@@ -211,8 +211,9 @@ function printBillFunc(orderID) {
 	Ext.Ajax.request({
 		url : '../../PrintOrder.do',
 		params : {
-			'orderID' : orderID,
-			'printType' : 3
+			orderID : orderID,
+			printType : 3,
+			orientedPrinter : Ext.state.Manager.getProvider().get(document.domain + '_printers')			//特定打印机打印
 		},
 		success : function(response, options) {
 			tempMask.hide();

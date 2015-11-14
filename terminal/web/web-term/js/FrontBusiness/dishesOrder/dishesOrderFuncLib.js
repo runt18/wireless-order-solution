@@ -919,19 +919,20 @@ function submitRepaidOrderMain(_c){
 	Ext.Ajax.request({
 		url : "../../RepaidOrder.do",
 		params : {
-			'orderId' : _c.grid.order["id"],
-			'memberID' : member,
-			'discountID' : discount,
-			'servicePlan' : servicePlan.getValue(),
-			"payType" : _c.commit_payType,
-			'payType_money' : _c.payType_money,
-			"comment" : commentOut,
-			'erasePrice' : erasePrice.getValue(),
-			"commitOrderData" : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
-			'customNum' : _c.grid.order['customNum'],
-			'pricePlanId' : pricePlanId,
-			'coupons' : coupons ? coupons.join(',') : '-1',
-			'settleType' : settleType
+			orderId : _c.grid.order["id"],
+			memberID : member,
+			discountID : discount,
+			servicePlan : servicePlan.getValue(),
+			payType : _c.commit_payType,
+			payType_money : _c.payType_money,
+			comment : commentOut,
+			erasePrice : erasePrice.getValue(),
+			commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
+			customNum : _c.grid.order['customNum'],
+			pricePlanId : pricePlanId,
+			coupons : coupons ? coupons.join(',') : '-1',
+			settleType : settleType,
+			orientedPrinter : Ext.state.Manager.getProvider().get(document.domain + '_printers')		//特定打印机打印
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
