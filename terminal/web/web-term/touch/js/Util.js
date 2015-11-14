@@ -952,7 +952,7 @@ function setcookie(name,value, path, time){
  
     //不设置path默认使用当前相对路径, 会导致ajax不能上传cookie
     if(path){
-    	pathData = "path=/;";
+    	pathData = "path=" + path + ";";
     }else{
     	pathData = "path=/web-term/touch/;";
     }
@@ -968,12 +968,12 @@ function getcookie(name){
     }  
 }
 
-function delcookie(name){  
+function delcookie(name, path){  
     var exp = new Date();   
     //-1:关闭浏览器后删除, 0:立即删除, >0:不删除
     exp.setTime(0);  
     var cval=getcookie(name);  
-    if(cval!=null) document.cookie= name + "="+cval+";path=/;expires="+exp.toGMTString();  
+    if(cval!=null) document.cookie= name + "="+cval+";path=" + (path ? path : "/web-term/touch/") + ";expires="+exp.toGMTString();  
 }
 
 /**
