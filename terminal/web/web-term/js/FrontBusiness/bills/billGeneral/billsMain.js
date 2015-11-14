@@ -213,7 +213,7 @@ function printBillFunc(orderID) {
 		params : {
 			orderID : orderID,
 			printType : 3,
-			orientedPrinter : Ext.state.Manager.getProvider().get(document.domain + '_printers')			//特定打印机打印
+			orientedPrinter : Ext.util.Cookies.get(document.domain + '_printers')			//特定打印机打印
 		},
 		success : function(response, options) {
 			tempMask.hide();

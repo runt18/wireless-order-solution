@@ -932,7 +932,7 @@ function submitRepaidOrderMain(_c){
 			pricePlanId : pricePlanId,
 			coupons : coupons ? coupons.join(',') : '-1',
 			settleType : settleType,
-			orientedPrinter : Ext.state.Manager.getProvider().get(document.domain + '_printers')		//特定打印机打印
+			orientedPrinter : Ext.util.Cookies.get(document.domain + '_printers')		//特定打印机打印
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
