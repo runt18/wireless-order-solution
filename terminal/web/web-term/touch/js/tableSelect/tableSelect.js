@@ -58,13 +58,21 @@ var	ts = {
 
 $(function(){
 	
+	console.log(location.href);
+	console.log(location.pathname);
+	
+		
 	//作为收银端或触摸屏时, 餐台列表的高度
 	var	tableListHeight = 86;
 	//餐台刷新的定时器Id
 	var tableRefreshTimeoutId = null;
 	
-	$(window).on('beforeunload', function(){
-  		console.log('window unload');
+	var thisPathName = location.pathname;
+	$(window).on('unload', function(){
+  		if(location.href.indexOf(thisPathName) != -1){
+	  		location.href = '#tableSelectMgr';
+  			location.reload(true);
+  		}
 	});
 	
 	//改变窗口时
@@ -265,7 +273,6 @@ $(function(){
 		
 		//空闲状态的餐台
 		$('#idleTable_li_tableSelect').click(function(){
-			//TODO
 			$('#labTableStatus .ui-btn-text').text($(this).text());
 			$('#labTableStatus').attr('table-status', WirelessOrder.TableList.Status.IDLE.val);
 			$('#popupAllStatusCmp').popup('close');
@@ -754,17 +761,22 @@ $(function(){
 					
 				},
 				left : function(){
+					//结账
 					var perfectMatched = askTablePopup.prefect();
 					
 					if(perfectMatched){
-						askTablePopup.close(function(){
-							$('#tableSelect_div_askTable').off('keydown');
-							updateTable({
-								toPay : true,
-								id : perfectMatched.id,
-								alias : !perfectMatched.id ? perfectMatched.alias : ''
-							});	
-						}, 200);
+						if(perfectMatched.statusValue == WirelessOrder.TableList.Status.BUSY.val){
+							askTablePopup.close(function(){
+								$('#tableSelect_div_askTable').off('keydown');
+								updateTable({
+									toPay : true,
+									id : perfectMatched.id,
+									alias : !perfectMatched.id ? perfectMatched.alias : ''
+								});
+							}, 200);
+						}else{
+							Util.msg.tip('餐台是空闲状态，不能结账');
+						}
 					}else{
 						Util.msg.tip('没有此餐台,请重新输入');
 					}
@@ -779,38 +791,15 @@ $(function(){
 				}
 			});
 			
-			askTablePopup.open(function(){
+			askTablePopup.open(function(self){
 				
 				$('#tableSelect_div_askTable').on('keydown', function(event){
 					if(event.keyCode == '107'){
-						var perfectMatched = askTablePopup.prefect();
-						if(perfectMatched){
-							askTablePopup.close(function(){
-								$('#tableSelect_div_askTable').off('keydown');
-								updateTable({
-									id : perfectMatched.id,
-									alias : !perfectMatched.id ? perfectMatched.alias : ''
-								});	
-							}, 200);
-						}else{
-							Util.msg.tip('没有此餐台,请重新输入');
-						}
-						
-					}else if(event.keyCode == '13'){//回车
-						var perfectMatched = askTablePopup.prefect();
-						
-						if(perfectMatched){
-							askTablePopup.close(function(){
-								$('#tableSelect_div_askTable').off('keydown');
-								updateTable({
-									toPay : true,
-									id : perfectMatched.id,
-									alias : !perfectMatched.id ? perfectMatched.alias : ''
-								});	
-							}, 200);
-						}else{
-							Util.msg.tip('没有此餐台,请重新输入');
-						}
+						//快捷键'+'
+						$('#middle_a_askTable').click();
+					}else if(event.keyCode == '13'){
+						//快捷键'Enter'
+						$('#left_a_askTable').click();
 					}
 					//取消事件的冒泡行为
 					event.stopPropagation();
@@ -1844,7 +1833,7 @@ function handleTableForTS(c){
 	var table = c.table;
 	if(table != null){
 		//判断是否为已点菜餐桌
-		if(table.statusText == "就餐"){	
+		if(table.statusValue == WirelessOrder.TableList.Status.BUSY.val){	
 			//判断餐桌是否已经改变状态
 			if(c.event && $(c.event).attr('data-theme') != 'e'){
 				initTableData();

@@ -24,13 +24,16 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class RepaidOrderAction extends Action{
+	
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String jsonResp = "{success:$(result), data:'$(value)'}";
-		int orderId = Integer.parseInt(request.getParameter("orderId"));
-		String payTypeMoney = request.getParameter("payType_money");
-		String sType = request.getParameter("settleType");
-		String pricePlanId = request.getParameter("pricePlanId");
+		final int orderId = Integer.parseInt(request.getParameter("orderId"));
+		final String payTypeMoney = request.getParameter("payType_money");
+		final String sType = request.getParameter("settleType");
+		final String pricePlanId = request.getParameter("pricePlanId");
+		final String printers = request.getParameter("orientedPrinter");
 		
 		try {
 			
@@ -108,6 +111,13 @@ public class RepaidOrderAction extends Action{
 					}
 				}
 				repaidBuilder.setCouponBuilder(builder);
+			}
+			
+			//Set the oriented printers.
+			if(printers != null && !printers.isEmpty()){
+				for(String printerId : printers.split(",")){
+					repaidBuilder.addPrinter(Integer.parseInt(printerId));
+				}
 			}
 			
 			final ProtocolPackage resp = ServerConnector.instance().ask(new ReqRepayOrder(staff, repaidBuilder, PrintOption.DO_PRINT));

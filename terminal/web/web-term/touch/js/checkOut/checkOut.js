@@ -1068,9 +1068,7 @@ uo.submitUpdateOrderHandler = function(c){
 						}else{
 							if(uo.canceling){
 								Util.msg.tip('退菜成功');		
-								updateTable({
-									alias : uo.table.alias
-								});											
+								updateTable({id : uo.table.id});
 								uo.canceling = false;
 							}else if(uo.updateCustom){
 								Util.msg.tip('账单修改成功');	
