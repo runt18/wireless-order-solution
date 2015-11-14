@@ -14,7 +14,8 @@ function PrintBindPopup(){
 						printers.push($(element).attr('print_id'));
 					}
 				});
-				setcookie(document.domain + '_printers', printers.join(','), "/");
+				delcookie(document.domain + '_printers');
+				setcookie(document.domain + '_printers', printers.join(','), "/web-term/");
 				
 				_printBindPopup.close();
 			});
