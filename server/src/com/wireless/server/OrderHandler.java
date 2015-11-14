@@ -551,10 +551,10 @@ class OrderHandler implements Runnable{
 		Order.RepaidBuilder builder = new Parcel(request.body).readParcel(Order.RepaidBuilder.CREATOR);
 		OrderDao.repaid(staff, builder);
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
-			ServerConnector.instance().ask(ReqPrintContent.buildReceipt(staff, builder.getUpdateBuilder().build().getId()).build());
+			ServerConnector.instance().ask(ReqPrintContent.buildReceipt(staff, builder.getUpdateBuilder().build().getId()).setPrinters(builder.getPrinters()).build());
 			Order order = OrderDao.getById(staff, builder.getUpdateBuilder().build().getId(), DateType.TODAY);
 			if(order.isSettledByMember()){
-				ServerConnector.instance().ask(ReqPrintContent.buildMemberReceipt(staff, MemberOperationDao.getLastConsumptionByOrder(staff, order).getId()).build());
+				ServerConnector.instance().ask(ReqPrintContent.buildMemberReceipt(staff, MemberOperationDao.getLastConsumptionByOrder(staff, order).getId()).setPrinters(builder.getPrinters()).build());
 			}
 		}
 		return new RespACK(request.header);
