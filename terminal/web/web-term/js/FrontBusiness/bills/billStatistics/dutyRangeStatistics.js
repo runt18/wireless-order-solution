@@ -16,9 +16,9 @@ function dutyRangeStatPrintHandler(rowIndex) {
 			Ext.Ajax.request({
 				url : '../../PrintOrder.do',
 				params : {
-					'printType' : statType == 1?5:12,
-					'onDuty' : sn.attributes.onDuty,
-					'offDuty' : sn.attributes.offDuty
+					printType : statType == 1?5:12,
+					onDuty : sn.attributes.onDuty,
+					offDuty : sn.attributes.offDuty
 				},
 				success : function(response, options) {
 					tempMask.hide();
