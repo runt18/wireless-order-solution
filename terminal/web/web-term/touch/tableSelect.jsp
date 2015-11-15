@@ -95,7 +95,7 @@
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="ts.displayPrintConnection()">打印机诊断</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageMemberOperation">会员</a>
-		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="toOrderMgrPage()">账单</a>
+		 	<a id="todayBill_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">账单</a>
 		 	<a id="personSettle_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">交款</a>
 			<a id="phraseSettle_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">交班</a>
 			<a id="dailySettle_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">日结</a>
@@ -154,7 +154,7 @@
 			<div style="float: left;margin-left: 15px;">暂结台: <font id="tmpPaidTableAmount_font_tableSelect" color="green">--</font></div>
 			<div id="divDescForTableSelect-padding-msg" style="float: right;margin-right: 20px;">共--项</div>
 		</div>	
-		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loginOut()">注销</a>
+		 <a id="logout_a_tableSelect" data-role="button" data-inline="true" class="bottomBtnFont">注销</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="location.reload()" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.bookListEntry()">

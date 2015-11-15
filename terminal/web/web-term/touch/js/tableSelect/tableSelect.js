@@ -58,21 +58,23 @@ var	ts = {
 
 $(function(){
 	
-	console.log(location.href);
-	console.log(location.pathname);
-	
-		
 	//作为收银端或触摸屏时, 餐台列表的高度
 	var	tableListHeight = 86;
 	//餐台刷新的定时器Id
 	var tableRefreshTimeoutId = null;
 	
-	var thisPathName = location.pathname;
+	//刷新是返回到'#tableSelectMgr'
 	$(window).on('unload', function(){
-  		if(location.href.indexOf(thisPathName) != -1){
-	  		location.href = '#tableSelectMgr';
-  			location.reload(true);
-  		}
+		$.ajax({
+			url : '../VerifyLogin.do',
+			async : false,
+			success : function(data, status, xhr){
+				if(data.success){
+					location.href = '#tableSelectMgr';
+					location.reload(true);
+				}
+			}
+		});
 	});
 	
 	//改变窗口时
@@ -115,12 +117,20 @@ $(function(){
 		    } 	
 		});
 		
-		//定时器，定时刷新餐桌选择页面数据
-		(function refreshTable(){
-			initTableData();
-			console.log('initTableData');
-			tableRefreshTimeoutId = setTimeout(arguments.callee, 15 * 60 * 1000);
-		})();
+		$.ajax({
+			url : '../VerifyLogin.do',
+			success : function(data, status, xhr){
+				if(data.success){
+					//定时器，定时刷新餐桌选择页面数据
+					(function refreshTable(){
+						initTableData();
+						console.log('initTableData');
+						tableRefreshTimeoutId = setTimeout(arguments.callee, 15 * 60 * 1000);
+					})();
+				}
+			}
+		});
+
 	});
 	
 	//进入餐桌初始化
@@ -179,25 +189,19 @@ $(function(){
 					initFoodData();
 					
 				}else{	
-					Util.LM.hide();	
-					Util.msg.alert({
-						msg : '请先登录',
-						topTip : true
-					});
+					Util.msg.tip('请先登录');
 					setTimeout(function(){
-						location.href = 'verifyLogin.jsp?status='+systemStatus;
+						location.href = 'verifyLogin.jsp?status=' + systemStatus;
 					}, 2000);
 				}
+				Util.LM.hide();	
 			},
 			error : function(request, status, error){
 				Util.LM.hide();	
-				Util.msg.alert({
-					msg : '操作有误,请刷新页面',
-					topTip : true
-				});
+				Util.msg.tio('操作有误,请刷新页面');
 				setTimeout(function(){
-					location.href = 'verifyLogin.jsp?status='+systemStatus;
-				}, 1000);
+					location.href = 'verifyLogin.jsp?status=' + systemStatus;
+				}, 2000);
 			}
 		});
 		
@@ -1115,14 +1119,29 @@ $(function(){
 			});
 		});
 	
+		//当日账单
+		$('#todayBill_a_tableSelect').click(function(){
+			//新页面打开账单管理
+			window.open("../pages/FrontBusiness_Module/Bills.html");      
+			ts.searchBookList();
+		});
+		
+		//注销
+		$('#logout_a_tableSelect').click(function(){
+			Util.LM.show();
+			$.ajax({
+				url : '../LoginOut.do',
+				success : function(data, status, xhr){
+					location.href = 'verifyLogin.jsp?status=' + systemStatus;
+					//location.reload();
+				}
+			});	
+		});
+		
 	});
 
-	//跳转到主界面
-	//location.href = '#tableSelectMgr';
-	
 	//更新菜品列表
 	function initFoodData(){
-		Util.LM.show();
 		//加载菜品列表
 		$.ajax({
 			url : '../QueryMenu.do',
@@ -1153,8 +1172,6 @@ $(function(){
 				WirelessOrder.foods = new WirelessOrder.FoodList(foods);
 				WirelessOrder.kitchens = kitchens;
 				WirelessOrder.depts = depts;
-				
-				Util.LM.hide();	
 				
 				//加载临时厨房
 				$.post('../QueryMenu.do', {dataSource:'isAllowTempKitchen'}, function(data){
@@ -3640,27 +3657,7 @@ ts.multiOpenTableCommitOrderFood = function(){
 //===============end 多台开席
 
 
-/**
- * 新页面打开账单管理
- */
-function toOrderMgrPage(){
-	window.open("../pages/FrontBusiness_Module/Bills.html");      
-	ts.searchBookList();
-}
 
-/**
- * 注销操作
- */
-function loginOut(){
-	Util.LM.show();
-	$.ajax({
-		url : '../LoginOut.do',
-		success : function(data, status, xhr){
-			location.href = 'verifyLogin.jsp?status='+systemStatus;
-		}
-	});	
-	
-}
 
 
 
