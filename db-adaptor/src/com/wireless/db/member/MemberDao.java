@@ -2,6 +2,7 @@ package com.wireless.db.member;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -24,6 +25,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.pack.req.ReqQueryMember;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
@@ -129,6 +131,7 @@ public class MemberDao {
 		private String weixinSerial;
 		private int referrerId;
 		private int restaurantId;
+		private DateRange birthdayRange;
 		
 		public ExtraCond(MemberCond memberCond){
 			setRange(memberCond.getRange());
@@ -153,6 +156,11 @@ public class MemberDao {
 		
 		private ExtraCond setRestaurantId(int restaurantId){
 			this.restaurantId = restaurantId;
+			return this;
+		}
+		
+		public ExtraCond setBirthday(String begin, String end) throws ParseException{
+			this.birthdayRange = new DateRange(begin, end);
 			return this;
 		}
 		
@@ -362,6 +370,10 @@ public class MemberDao {
 				extraCond.append(" AND (M.base_balance + M.extra_balance)  <= " + maxBalance);
 			}else if(maxBalance > 0 && minBalance > 0){
 				extraCond.append(" AND (M.base_balance + M.extra_balance) BETWEEN " + minBalance + " AND " + maxBalance);
+			}
+			
+			if(birthdayRange != null){
+				extraCond.append(" AND M.birthday BETWEEN '" + birthdayRange.getOpeningFormat() + "' AND '" + birthdayRange.getEndingFormat() + "'");
 			}
 			
 			if(range != null){

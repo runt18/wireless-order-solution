@@ -224,7 +224,10 @@ public class WxMemberDao {
 	 */
 	public static int bind(DBCon dbCon, Staff staff, WxMember.BindBuilder builder) throws SQLException, BusinessException{
 		final WxMember weixinMember = getBySerial(dbCon, staff, builder.getSerial());
-		MemberDao.update(dbCon, staff, new Member.UpdateBuilder(weixinMember.getMemberId()).setMobile(builder.getMobile()).setName(builder.isNameChanged() ? builder.getName() : null));
+		MemberDao.update(dbCon, staff, new Member.UpdateBuilder(weixinMember.getMemberId())
+												 .setMobile(builder.getMobile())
+												 .setName(builder.isNameChanged() ? builder.getName() : null)
+												 .setBirthday(builder.isBirthdayChanged() ? builder.getBirthday() : null));
 		return weixinMember.getMemberId();
 	}
 	
