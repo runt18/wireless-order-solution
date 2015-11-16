@@ -21,6 +21,12 @@ public class ReqPrintContent{
 	private final Parcel parcel = new Parcel();
 	private final List<Printer> oriented = new ArrayList<Printer>();
 	
+	public ReqPrintContent setPrinters(final List<Printer> printers){
+		this.oriented.clear();
+		this.oriented.addAll(printers);
+		return this;
+	}
+	
 	public ReqPrintContent addPrinter(int printerId){
 		this.oriented.add(new Printer(printerId));
 		return this;
