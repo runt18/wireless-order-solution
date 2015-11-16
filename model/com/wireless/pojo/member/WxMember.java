@@ -7,6 +7,7 @@ public class WxMember {
 		private final String serial;
 		private final String mobile;
 		private String name;
+		private String birthday;
 		
 		public BindBuilder(String serial, String mobile){
 			this.serial = serial;
@@ -20,6 +21,19 @@ public class WxMember {
 		
 		public boolean isNameChanged(){
 			return this.name != null;
+		}
+		
+		public BindBuilder setBirthday(String birthday){
+			this.birthday = birthday;
+			return this;
+		}
+		
+		public boolean isBirthdayChanged(){
+			return this.birthday != null;
+		}
+		
+		public String getBirthday(){
+			return this.birthday;
 		}
 		
 		public String getSerial(){
