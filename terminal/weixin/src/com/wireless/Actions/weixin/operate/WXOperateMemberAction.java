@@ -220,6 +220,7 @@ public class WXOperateMemberAction extends DispatchAction {
 		final String fromId = request.getParameter("fid");
 		final String mobile = request.getParameter("mobile");
 		final String name = request.getParameter("name");
+		final String birthday = request.getParameter("birthday");
 		
 		final JObject jobject = new JObject();
 		final DBCon dbCon = new DBCon();
@@ -236,6 +237,10 @@ public class WXOperateMemberAction extends DispatchAction {
 			
 			if(name != null && !name.isEmpty()){
 				builder.setName(name);
+			}
+			
+			if(birthday != null && !birthday.isEmpty()){
+				builder.setBirthday(birthday);
 			}
 			
 			WxMemberDao.bind(dbCon, staff, builder);
