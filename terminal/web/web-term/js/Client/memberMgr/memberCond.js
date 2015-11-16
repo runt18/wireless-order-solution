@@ -561,7 +561,19 @@ function memberCondGridInit(){
 					}
 				}
 			
-			}), '->',{
+			}),'->', {
+				text : '批量发券',
+				iconCls : 'btn_edit_all',
+				handler : function(){
+					Ext.MessageBox.confirm('警示框', '你确定要批量发送优惠券吗?', function(btn){
+						if(btn == 'yes'){
+							//TODO
+						}else{
+							
+						}
+					});
+				}
+			}, '->',{
 				text : '搜索',
 				id : 'btnSearchMember',
 				iconCls : 'btn_search',

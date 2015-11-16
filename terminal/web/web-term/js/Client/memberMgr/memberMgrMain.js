@@ -954,6 +954,25 @@ function treeInit(){
 };
 
 function gridInit(){
+	var beginBirthday = new Ext.form.DateField({
+		id : 'beginBirthday_df_memebrMgrMain',
+		xtype : 'datefield',
+		format : 'Y-m-d',
+		width : 100,
+		maxValue : new Date(),
+		readOnly : false,
+	});
+	
+	var endBirthday = new Ext.form.DateField({
+		xtype : 'datafield',
+		id : 'endBirthday_df_memebrMgrMain',
+		format : 'Y-m-d',
+		width : 100,
+		maxValue : new Date(),
+		readOnly : false,
+		allowBlank : false
+	});
+	
 	var member_beginDate = new Ext.form.DateField({
 		xtype : 'datefield',	
 		id : 'dateSearchDateBegin',
@@ -1155,16 +1174,23 @@ function gridInit(){
 		
 	});	
 	
-	
-	
 	var memberBasicGridTbar = new Ext.Toolbar({
 		items : [{
 			xtype : 'tbtext',
 			text : String.format(Ext.ux.txtFormat.longerTypeName, '会员类型', 'memberTypeShowType', '----')
 		}, {
 			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		}, 
+			text : '&nbsp;&nbsp;&nbsp;&nbsp;'
+		},{
+			xtype: 'tbtext',
+			text : '会员生日'
+		},beginBirthday,{
+			xtype : 'tbtext',
+			text : '至'
+		},endBirthday,{
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;&nbsp;&nbsp;'
+		},
 		{
 			xtype : 'tbtext',
 			text : '会员手机/会员卡号/会员名:'
@@ -1258,6 +1284,8 @@ function gridInit(){
 				gs.baseParams['needSum'] = true;
 				gs.baseParams['orderBy'] = m_searchAdditionFilter;
 				gs.baseParams['referrer'] = referrerCombo.getValue() != -1 ? referrerCombo.getValue() : null;
+				gs.baseParams['beginBirthday'] = Ext.getCmp('beginBirthday_df_memebrMgrMain').getValue();
+				gs.baseParams['endBirthday'] = Ext.getCmp('endBirthday_df_memebrMgrMain').getValue();
 				gs.load({
 					params : {
 						start : 0,
