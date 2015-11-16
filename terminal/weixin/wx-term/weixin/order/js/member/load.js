@@ -198,6 +198,8 @@ $(function(){
 			return;
 		}
 		
+		var birthday = $('#birthday_input_member').val();
+		
 		$.ajax({
 			url : '../../WXOperateMember.do',
 			type : 'post',
@@ -206,7 +208,8 @@ $(function(){
 				oid : Util.mp.oid,
 				fid : Util.mp.fid,
 				mobile : mobile,
-				name : name
+				name : name,
+				birthday : birthday
 			},
 			dataType : 'json',
 			success : function(data, status, xhr){
