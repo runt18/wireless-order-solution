@@ -150,7 +150,6 @@ function AskTablePopup(param){
 					html.push(tableCmpTemplate.format({
 						dataIndex : i,
 						id : matchedTables[i].id,
-						//click : 'ts.toOrderFoodOrTransFood({alias:'+ matchedTables[i].alias +',id:'+ matchedTables[i].id +'})',
 						alias : aliasOrName,
 						theme : matchedTables[i].statusValue == '1' ? "e" : "c",
 						name : matchedTables[i].name,

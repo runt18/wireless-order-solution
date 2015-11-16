@@ -808,7 +808,6 @@
 				         <tbody style="font-weight:bold;color: blue">
 				         <tr >
 	    					<td colspan="6" id="add_bookTableList">
-	    					<!-- <a onclick="ts.toOrderFoodOrTransFood({alias:111,id:8147})" data-role="button" data-corners="false" data-inline="true" class="tableCmp ui-btn ui-shadow ui-btn-inline ui-btn-up-c" data-index="1" data-value="8147" data-theme="c" data-shadow="true" data-iconshadow="true" data-wrapperels="span"><span class="ui-btn-inner"><span class="ui-btn-text"><div style="height: 70px;">大厅111<br>111<div class="tempPayStatus"></div></div></span></span></a> -->
 	    					</td>
 	    				</tr>	
 				         </tbody>
