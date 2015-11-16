@@ -139,6 +139,8 @@ public class QueryMemberAction extends DispatchAction {
 			final String beginDate = request.getParameter("beginDate");
 			final String endDate = request.getParameter("endDate");
 			final String referrer = request.getParameter("referrer");
+			final String beginBirth = request.getParameter("beginBirthday");
+			final String endBirth = request.getParameter("endBirthday");
 			final String searchType = request.getParameter("sType");
 			final String forDetail = request.getParameter("forDetail");
 			final String needSum = request.getParameter("needSum");
@@ -193,6 +195,10 @@ public class QueryMemberAction extends DispatchAction {
 				
 				if(referrer != null && !referrer.isEmpty()){
 					extraCond.setReferrer(Integer.parseInt(referrer));
+				}
+				
+				if(beginBirth != null && !beginBirth.isEmpty() && endBirth != null && !endBirth.isEmpty()){
+					extraCond.setBirthday(beginBirth, endBirth);
 				}
 				
 			}
