@@ -258,7 +258,6 @@ Ext.onReady(function(){
         		}
         		$('#couponStatistics_div_cpStatistics').find('.couponLinkId').each(function(index, element){
         			element.onclick = function(){
-        				console.log($(element).text());
         				couponShowDetail($(element).text());
         			}
         		});
