@@ -17,24 +17,32 @@ import com.wireless.pojo.staffMgr.Device;
 
 public class QueryDeviceAction extends Action{
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws SQLException, Exception{
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws SQLException, Exception{
 		
-		JObject jobject = new JObject();
-		List<Device> devices ;
-		String rId = request.getParameter("rId");
-		String rName = request.getParameter("rName");
-		String extraCond = "", orderClause = null;
+		final JObject jobject = new JObject();
+		final String rId = request.getParameter("rId");
+		final String rName = request.getParameter("rName");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
 		try{
+			String extraCond = "";
 			if(rId != null && !rId.trim().isEmpty()){
 				extraCond += " AND DEV.restaurant_id = " + rId;
 			}else if(rName != null && !rName.trim().isEmpty()){
 				extraCond += " AND RES.restaurant_name LIKE '%" + rName + "%' ";
 			}
-			devices = DeviceDao.getDevices(extraCond, orderClause);
 			
-			if(!devices.isEmpty()){
-				jobject.setRoot(devices);
+			final String orderClause;
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				orderClause = " LIMIT " + start + "," + limit;
+			}else{
+				orderClause = null;
+			}
+			final List<Device> result = DeviceDao.getDevices(extraCond, orderClause);
+			
+			if(!result.isEmpty()){
+				jobject.setRoot(result);
 			}
 			
 		}catch(SQLException e){
