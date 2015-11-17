@@ -2,6 +2,7 @@ package com.wireless.db.staffMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -16,6 +17,66 @@ import com.wireless.pojo.staffMgr.Device.Status;
 
 public class DeviceDao {
 
+	public static class ExtraCond{
+		private int id;
+		private String deviceId;
+		private Device.Status status;
+		private int restaurantId;
+		private String restaurantName;
+		private boolean isOnlyAmount = false;
+		
+		public ExtraCond setOnlyAmount(boolean onOff){
+			this.isOnlyAmount = onOff;
+			return this;
+		}
+		
+		public ExtraCond setId(int id){
+			this.id = id;
+			return this;
+		}
+		
+		public ExtraCond setDeviceId(String deviceId){
+			this.deviceId = deviceId;
+			return this;
+		}
+		
+		public ExtraCond setStatus(Device.Status status){
+			this.status = status;
+			return this;
+		}
+		
+		public ExtraCond setRestaurant(int restaurantId){
+			this.restaurantId = restaurantId;
+			return this;
+		}
+		
+		public ExtraCond setRestaurant(String name){
+			this.restaurantName = name;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(id != 0){
+				extraCond.append(" AND DEV.id = " + id);
+			}
+			if(deviceId != null){
+				extraCond.append(" AND DEV.device_id = '" + deviceId + "'" + " AND DEV.device_id_crc = CRC32('" + deviceId + "')");
+			}
+			if(status != null){
+				extraCond.append(" AND DEV.status = " + status.getVal());
+			}
+			if(restaurantId != 0){
+				extraCond.append(" AND DEV.restaurant_id = " + restaurantId);
+			}
+			if(restaurantName != null){
+				extraCond.append(" AND RES.restaurant_name LIKE '%" + restaurantName + "%' ");
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	/**
 	 * Get the devices to specific restaurant.
 	 * @param dbCon
@@ -27,7 +88,7 @@ public class DeviceDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Device> getDevicesByRestaurant(DBCon dbCon, int restaurantId) throws SQLException{
-		return getDevices(dbCon, " AND DEV.restaurant_id = " + restaurantId, null);
+		return getByCond(dbCon, new ExtraCond().setRestaurant(restaurantId), null);
 	}
 	
 	/**
@@ -40,11 +101,11 @@ public class DeviceDao {
 	 * @throws BusinessException
 	 * 			throws if the specific device to search does NOT exist
 	 */
-	public static Device getWorkingDeviceById(String deviceId) throws SQLException, BusinessException{
+	public static Device getWorkingDevices(String deviceId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getWorkingDeviceById(dbCon, deviceId);
+			return getWorkingDevices(dbCon, deviceId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -62,9 +123,9 @@ public class DeviceDao {
 	 * @throws BusinessException
 	 * 			throws if the specific device to search does NOT exist
 	 */
-	public static Device getWorkingDeviceById(DBCon dbCon, String deviceId) throws SQLException, BusinessException{
+	public static Device getWorkingDevices(DBCon dbCon, String deviceId) throws SQLException, BusinessException{
 		deviceId = deviceId.trim().toUpperCase(Locale.getDefault());
-		List<Device> result = getDevices(dbCon, " AND DEV.device_id = '" + deviceId + "'" + " AND device_id_crc = CRC32('" + deviceId + "')" + " AND status = " + Device.Status.WORK.getVal(), null);
+		List<Device> result = getByCond(dbCon, new ExtraCond().setDeviceId(deviceId).setStatus(Device.Status.WORK), null);
 		if(result.isEmpty()){
 			throw new BusinessException(DeviceError.DEVICE_NOT_EXIST);
 		}else{
@@ -82,11 +143,11 @@ public class DeviceDao {
 	 * @throws BusinessException
 	 * 			throws if the specific device to search does NOT exist
 	 */
-	public static Device getDeviceById(String deviceId) throws SQLException, BusinessException{
+	public static Device getById(String deviceId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getDeviceById(dbCon, deviceId);
+			return getById(dbCon, deviceId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -104,9 +165,9 @@ public class DeviceDao {
 	 * @throws BusinessException
 	 * 			throws if the specific device to search does NOT exist
 	 */
-	public static Device getDeviceById(DBCon dbCon, String deviceId) throws SQLException, BusinessException{
+	public static Device getById(DBCon dbCon, String deviceId) throws SQLException, BusinessException{
 		deviceId = deviceId.trim().toUpperCase(Locale.getDefault());
-		List<Device> result = getDevices(dbCon, " AND DEV.device_id = '" + deviceId + "'" + " AND DEV.device_id_crc = CRC32('" + deviceId + "')", null);
+		List<Device> result = getByCond(dbCon, new ExtraCond().setDeviceId(deviceId), null);
 		if(result.isEmpty()){
 			throw new BusinessException(DeviceError.DEVICE_NOT_EXIST);
 		}else{
@@ -124,11 +185,11 @@ public class DeviceDao {
 	 * @throws BusinessException
 	 * 			throws if the specific device to search does NOT exist
 	 */
-	public static Device getDeviceById(int id) throws SQLException, BusinessException{
+	public static Device getById(int id) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getDeviceById(dbCon, id);
+			return getById(dbCon, id);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -146,8 +207,8 @@ public class DeviceDao {
 	 * @throws BusinessException
 	 * 			throws if the specific device to search does NOT exist
 	 */
-	public static Device getDeviceById(DBCon dbCon, int id) throws SQLException, BusinessException{
-		List<Device> result = getDevices(dbCon, " AND DEV.id = " + id, null);
+	public static Device getById(DBCon dbCon, int id) throws SQLException, BusinessException{
+		List<Device> result = getByCond(dbCon, new ExtraCond().setId(id), null);
 		if(result.isEmpty()){
 			throw new BusinessException(DeviceError.DEVICE_NOT_EXIST);
 		}else{
@@ -155,35 +216,48 @@ public class DeviceDao {
 		}
 	}
 
-	public static List<Device> getDevices(String extraCond, String orderClause) throws SQLException{
+	public static List<Device> getByCond(ExtraCond extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getDevices(dbCon, extraCond, orderClause);
+			return getByCond(dbCon, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	private static List<Device> getDevices(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
-		List<Device> result = new ArrayList<Device>();
+	private static List<Device> getByCond(DBCon dbCon, ExtraCond extraCond, String orderClause) throws SQLException{
 		
 		String sql;
-		sql = " SELECT DEV.id, restaurant_id, device_id, model_id, status, restaurant_name FROM " + 
-		      Params.dbName + ".device DEV " + "INNER JOIN " + Params.dbName + ".restaurant RES " +
+		sql = " SELECT " +
+			  (extraCond.isOnlyAmount ? 
+			  " COUNT(*)" : " DEV.id, restaurant_id, device_id, model_id, status, restaurant_name ") + 
+			  " FROM " + Params.dbName + ".device DEV " +
+			  " JOIN " + Params.dbName + ".restaurant RES " +
 		      " ON DEV.restaurant_id = RES.id " +
 			  " WHERE 1 = 1 " +
 		      (extraCond != null ? extraCond : " ") +
 		      (orderClause != null ? orderClause : "");
+		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			Device device = new Device(dbCon.rs.getString("device_id"));
-			device.setId(dbCon.rs.getInt("id"));
-			device.setModel(Model.valueOf(dbCon.rs.getInt("model_id")));
-			device.setStatus(Status.valueOf(dbCon.rs.getInt("status")));
-			device.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			device.setRestaurantName(dbCon.rs.getString("restaurant_name"));
-			result.add(device);
+		final List<Device> result;
+		if(extraCond.isOnlyAmount){
+			if(dbCon.rs.next()){
+				result = Collections.nCopies(dbCon.rs.getInt(1), null);
+			}else{
+				result = Collections.emptyList();
+			}
+		}else{
+			 result = new ArrayList<Device>();
+			while(dbCon.rs.next()){
+				Device device = new Device(dbCon.rs.getString("device_id"));
+				device.setId(dbCon.rs.getInt("id"));
+				device.setModel(Model.valueOf(dbCon.rs.getInt("model_id")));
+				device.setStatus(Status.valueOf(dbCon.rs.getInt("status")));
+				device.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				device.setRestaurantName(dbCon.rs.getString("restaurant_name"));
+				result.add(device);
+			}
 		}
 		dbCon.rs.close();
 		

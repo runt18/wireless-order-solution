@@ -31,7 +31,7 @@ public class TestDeviceDao {
 													 .setModel(Model.ANDROID);
 			deviceId = DeviceDao.insert(builder);
 
-			Device actual = DeviceDao.getDeviceById(newDeviceId);
+			Device actual = DeviceDao.getById(newDeviceId);
 			
 			Device expected = builder.build();
 			expected.setId(deviceId);
@@ -47,13 +47,13 @@ public class TestDeviceDao {
 			expected.setModel(Model.iOS);
 			expected.setStatus(Status.IDLE);
 			
-			actual = DeviceDao.getDeviceById(modifiedDeviceId);
+			actual = DeviceDao.getById(modifiedDeviceId);
 			compareDevice(expected, actual);
 			
 		}finally{
 			try{
 				DeviceDao.deleteById(deviceId);
-				DeviceDao.getDeviceById(deviceId);
+				DeviceDao.getById(deviceId);
 			}catch(BusinessException e){
 				assertEquals("Failed to delete the device", e.getErrCode().getCode(), DeviceError.DEVICE_NOT_EXIST.getCode());
 			}
