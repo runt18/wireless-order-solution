@@ -356,47 +356,6 @@ function restaurantRender(v, m, r, ri, ci, s){
 	return v + "(" + r.get('restaurantId') +")";
 }
 
-var ds = new Ext.data.Store({
-	proxy : new Ext.data.HttpProxy({
-		url : '../../QueryDevice.do'
-	}),
-	baseParams : {
-		isCookie : true
-	},
-	reader : new Ext.data.JsonReader({
-		totalProperty : 'totalProperty',
-		root : 'root'
-	}, [{
-		name : 'id'
-	},{
-		name : 'restaurantId'
-	},{
-		name : 'restaurantText'
-	},{
-		name : 'deviceId'
-	},{
-		name : 'deviceIdCrc'
-	},{
-		name : 'modelValue'
-	},{
-		name : 'modelText'
-	},{
-		name : 'statusValue'
-	},{
-		name : 'statusText'
-	}])
-});
-
-ds.load();
-
-var cm = new Ext.grid.ColumnModel([
-	new Ext.grid.RowNumberer(),
-	{header : '设备编号', dataIndex : 'deviceId', width : 200},
-	{header : '所属餐厅', dataIndex : 'restaurantText', width : 200, renderer : restaurantRender},
-	{header : '型号', dataIndex : 'modelText', width : 200},
-	{header : '状态', dataIndex : 'statusText', width : 200},
-	{header : '操作', dataIndex : 'optDevice', align: 'center', id : 'optDevice', renderer : optDevice, width : 200}
-]);
 var filterComb = new Ext.form.ComboBox({
 	fidldLabel : '过滤',
 	forceSelection : true,
@@ -440,6 +399,55 @@ var filterComb = new Ext.form.ComboBox({
 
 var deviceGrid;
 Ext.onReady(function(){
+
+	var cm = new Ext.grid.ColumnModel([
+	                               	new Ext.grid.RowNumberer(),
+	                               	{header : '设备编号', dataIndex : 'deviceId', width : 200},
+	                               	{header : '所属餐厅', dataIndex : 'restaurantText', width : 200, renderer : restaurantRender},
+	                               	{header : '型号', dataIndex : 'modelText', width : 200},
+	                               	{header : '状态', dataIndex : 'statusText', width : 200},
+	                               	{header : '操作', dataIndex : 'optDevice', align: 'center', id : 'optDevice', renderer : optDevice, width : 200}
+	                               ]);
+
+	var ds = new Ext.data.Store({
+		proxy : new Ext.data.HttpProxy({
+			url : '../../QueryDevice.do'
+		}),
+		baseParams : {
+			isCookie : true,
+		},
+		reader : new Ext.data.JsonReader({
+			totalProperty : 'totalProperty',
+			root : 'root'
+		}, [{
+			name : 'id'
+		},{
+			name : 'restaurantId'
+		},{
+			name : 'restaurantText'
+		},{
+			name : 'deviceId'
+		},{
+			name : 'deviceIdCrc'
+		},{
+			name : 'modelValue'
+		},{
+			name : 'modelText'
+		},{
+			name : 'statusValue'
+		},{
+			name : 'statusText'
+		}])
+	});
+	
+	ds.load({
+		params : {
+			start : 0,
+			limit : 18
+		}
+	});
+	
+
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
 	Ext.QuickTips.init();
 	
@@ -453,10 +461,9 @@ Ext.onReady(function(){
 		cm : cm,
 		store : ds,
 		//autoExpandColumn : 'optDevice',
-/*		viewConfig : {
+		viewConfig : {
 			forceFit : true
 		},
-		*/
 		tbar : new Ext.Toolbar({
 			items : [{
 				xtype : 'tbtext',
@@ -485,11 +492,24 @@ Ext.onReady(function(){
 				iconCls : 'btn_search',
 				handler : function(){
 					var store = deviceGrid.getStore();
+					store.baseParams['dataSource'] = 'execute';
 					store.baseParams['rId'] = Ext.getCmp('txtRestaurantId').getValue();
 					store.baseParams['rName'] = Ext.getCmp('txtRestaurantName').getValue();
-					store.load();
+					store.load({
+						params : {
+							start : 0,
+							limit : 18
+						}
+					});
 				}
 			}]
+		}),
+		bbar : new Ext.PagingToolbar({
+			pageSize : 18,
+			store : ds,
+			displayInfo : true,
+			displayMsg : "显示第{0} 条到 {1} 条记录, 共 {2}条",
+			emptyMsg : " 没有记录"
 		}),
 		keys : [{
 			key : Ext.EventObject.ENTER,
@@ -500,6 +520,7 @@ Ext.onReady(function(){
 		}]
 
 	});
+	
 	
 	var devicePanel = new Ext.Panel({
 		title : '管理中心',
