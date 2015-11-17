@@ -41,10 +41,8 @@ public class QueryDeviceAction extends Action{
 			}
 			final List<Device> result = DeviceDao.getByCond(extraCond, orderClause);
 			
-			if(!result.isEmpty()){
-				jobject.setTotalProperty(DeviceDao.getByCond(extraCond.setOnlyAmount(true), null).size());
-				jobject.setRoot(result);
-			}
+			jobject.setTotalProperty(DeviceDao.getByCond(extraCond.setOnlyAmount(true), null).size());
+			jobject.setRoot(result);
 			
 		}catch(SQLException e){
 			e.printStackTrace();
