@@ -18,7 +18,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 
 public class WxRemindAction extends DispatchAction {
 
-	private final static float LIVENESS_UPPER_LIMIT = 0.7f;
+	private final static float LIVENESS_UPPER_LIMIT = 0.9f;
 	private final static float LIVENESS_LOWER_LIMIT = 0f;
 	
 	private final static String OPEN_ID_4_MARCO = "odgTwtwjcJPhFm9xhNNnds7bNkNc";
@@ -30,7 +30,7 @@ public class WxRemindAction extends DispatchAction {
 		
 		final StringBuilder work = new StringBuilder();
 		for(Restaurant restaurant : RestaurantDao.getByCond(null, null)){
-			if(restaurant.getLiveness() > LIVENESS_LOWER_LIMIT && restaurant.getLiveness() < LIVENESS_UPPER_LIMIT){
+			if(restaurant.getLiveness() > LIVENESS_LOWER_LIMIT && restaurant.getLiveness() <= LIVENESS_UPPER_LIMIT){
 				if(work.length() != 0){
 					work.append(", ");
 				}
@@ -57,7 +57,7 @@ public class WxRemindAction extends DispatchAction {
 		return null;
 	}
 	
-	private final static long TWO_WEEKS = 3600 * 24 * 14 * 1000;
+	private final static long FOUR_WEEKS = 3600 * 24 * 30 * 1000;
 	
 	public ActionForward expired(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -67,7 +67,7 @@ public class WxRemindAction extends DispatchAction {
 		for(Restaurant restaurant : RestaurantDao.getByCond(null, null)){
 			long remaining = restaurant.getExpireDate() - System.currentTimeMillis();
 					
-			if(Math.abs(remaining) < TWO_WEEKS && remaining > 0){
+			if(Math.abs(remaining) < FOUR_WEEKS && remaining > 0){
 				if(work.length() != 0){
 					work.append(", ");
 				}
