@@ -26,11 +26,11 @@ public class QueryDeviceAction extends Action{
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
 		try{
-			String extraCond = "";
+			final DeviceDao.ExtraCond extraCond = new DeviceDao.ExtraCond();
 			if(rId != null && !rId.trim().isEmpty()){
-				extraCond += " AND DEV.restaurant_id = " + rId;
+				extraCond.setRestaurant(Integer.parseInt(rId));
 			}else if(rName != null && !rName.trim().isEmpty()){
-				extraCond += " AND RES.restaurant_name LIKE '%" + rName + "%' ";
+				extraCond.setRestaurant(rName);
 			}
 			
 			final String orderClause;
@@ -39,9 +39,10 @@ public class QueryDeviceAction extends Action{
 			}else{
 				orderClause = null;
 			}
-			final List<Device> result = DeviceDao.getDevices(extraCond, orderClause);
+			final List<Device> result = DeviceDao.getByCond(extraCond, orderClause);
 			
 			if(!result.isEmpty()){
+				jobject.setTotalProperty(DeviceDao.getByCond(extraCond.setOnlyAmount(true), null).size());
 				jobject.setRoot(result);
 			}
 			
