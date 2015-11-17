@@ -45,12 +45,19 @@ public class OperateMemberCondAction extends DispatchAction{
 		JObject jobject = new JObject(); 
 		
 		try{
-			Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
-			MemberCond.InsertBuilder insertBuilder = new MemberCond.InsertBuilder(name);
+			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
+			final MemberCond.InsertBuilder insertBuilder = new MemberCond.InsertBuilder(name);
 			int minAmount = 0, maxAmount = 0;
 			float minConsume = 0, maxConsume = 0, minBalance = 0, maxBalance = 0;
 			
-			RangeType rangeType = RangeType.valueOf(Integer.parseInt(memberCondDateRegion));
+
+			final RangeType rangeType;
+			if(memberCondDateRegion != null && !memberCondDateRegion.isEmpty()){
+				rangeType = RangeType.valueOf(Integer.parseInt(memberCondDateRegion));
+			}else{
+				rangeType = MemberCond.RangeType.LAST_1_MONTH;
+			}
+			
 			
 			//设置时间段
 			insertBuilder.setRangeType(rangeType);

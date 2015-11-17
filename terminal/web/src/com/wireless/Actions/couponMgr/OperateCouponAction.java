@@ -13,12 +13,16 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.DutyRangeDao;
+import com.wireless.db.member.MemberCondDao;
+import com.wireless.db.member.MemberDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.staffMgr.Staff;
@@ -219,10 +223,11 @@ public class OperateCouponAction extends DispatchAction{
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		CouponOperation.Operate issueMode = CouponOperation.Operate.valueOf(Integer.parseInt(request.getParameter("issueMode")));
-		String promotions = request.getParameter("promotions");
-		String members = request.getParameter("members");
-		String orderId = request.getParameter("orderId");
-		String comment = request.getParameter("comment");
+		final String promotions = request.getParameter("promotions");
+		final String members = request.getParameter("members");
+		final String condId = request.getParameter("condId");
+		final String orderId = request.getParameter("orderId");
+		final String comment = request.getParameter("comment");
 		
 		JObject jobject = new JObject();
 		try{
@@ -254,11 +259,20 @@ public class OperateCouponAction extends DispatchAction{
 					builder.addPromotion(promotionId, amount);
 				}
 			}			
-			//设置优惠券的发放对象
-			for(String memberId : members.split(",")){
-				builder.addMember(Integer.parseInt(memberId));
+			
+			if(members != null && !members.isEmpty()){
+				//设置优惠券的发放对象
+				for(String memberId : members.split(",")){
+					builder.addMember(Integer.parseInt(memberId));
+				}
+			}else if(condId != null && !condId.isEmpty()){
+				//根据会员条件筛选设置发放对象
+				final MemberCond memberCond = MemberCondDao.getById(staff, Integer.parseInt(condId));
+				for(Member member : MemberDao.getByCond(staff, new MemberDao.ExtraCond(memberCond), null)){
+					builder.addMember(member);
+				}
 			}
-		
+			
 			CouponDao.issue(staff, builder);
 			
 			jobject.initTip(true, "优惠券发放成功");
