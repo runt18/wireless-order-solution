@@ -233,6 +233,9 @@ public class WxRestaurantDao {
 			if(dbCon.rs.getInt("weixin_logo") != 0){
 				wr.setWeixinLogo(new OssImage(dbCon.rs.getInt("weixin_logo")));
 			}
+			wr.setPaymentTemplate(dbCon.rs.getString("payment_template"));
+			wr.setCouponDrawTemplate(dbCon.rs.getString("coupon_draw_template"));
+			wr.setCouponTimeoutTemplate(dbCon.rs.getString("coupon_timeout_template"));
 			result.add(wr);
 		}
 		dbCon.rs.close();
