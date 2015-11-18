@@ -62,7 +62,7 @@ Ext.onReady(function(){
 		selectOnFocus : true,
 		listeners : {
 			render : function(thiz){
-				thiz.store.loadData([['', '全部'], ['1', '快速发券'], ['2', '账单发券'], ['20', '手动用券'], ['21', '账单用券'], ['22', '微信关注用券']]);
+				thiz.store.loadData([['', '全部'], ['1', '快速发券'], ['2', '账单发券'], ['20', '手动用券'], ['21', '账单用券'], ['22', '微信关注用券'],['3', '批量发券']]);
 				thiz.setValue('');
 			},
 			select : function(){

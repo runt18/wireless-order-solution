@@ -87,9 +87,9 @@ Ext.onReady(function(){
 		gs.baseParams['memberCondEndDate'] = Ext.util.Format.date(Ext.getCmp('srchEnd_dateField_memberCond').getValue(), 'Y-m-d 23:59:59');
 		
 		if(c && c.searchByCond){
-			gs.baseParams['condId_hidden_memberCond'] = c.searchByCond;
+			gs.baseParams['memberCondId'] = c.searchByCond;
 		}else{
-			gs.baseParams['condId_hidden_memberCond'] = '';
+			gs.baseParams['memberCondId'] = '';
 		}
 		
 		gs.load({
@@ -368,7 +368,7 @@ Ext.onReady(function(){
 					expand : function(thiz){
 						var rn = memberCondTree.getRootNode().childNodes;
 						rn[0].select();
-	    				rn[0].fireEvent('click', rn[0]);
+						rn[0].fireEvent('click', rn[0]);
 					}
 				}
 			}),
@@ -382,6 +382,8 @@ Ext.onReady(function(){
 		    		queryMembersByCond({searchByCond:e.id});
 		    		Ext.getDom('memberCondName').innerHTML = e.text;
 		    		
+		    		clickTree = e.text;
+		    		clickTreeId = e.id;
 		    		Ext.Ajax.request({
 		    			url : '../../OperateMemberCond.do',
 		    			params : {
@@ -468,7 +470,8 @@ Ext.onReady(function(){
 
 	function memberCondGridInit(){
 		var member_beginDate = new Ext.form.DateField({
-			xtype : 'datefield',	
+			xtype : 'datefield',
+			disabled : true,
 			id : 'srchBegin_dateField_memberCond',
 			format : 'Y-m-d',
 			width : 100,
@@ -476,6 +479,7 @@ Ext.onReady(function(){
 		});
 		var member_endDate = new Ext.form.DateField({
 			xtype : 'datefield',
+			disabled : true,
 			id : 'srchEnd_dateField_memberCond',
 			format : 'Y-m-d',
 			width : 100,
@@ -483,15 +487,14 @@ Ext.onReady(function(){
 		});
 		var member_dateCombo = Ext.ux.createDateCombo({
 			width : 75,
+			disabled : true,
 			data : [[3, '近一个月'], [12, '近二个月'], [4, '近三个月'], [9, '近半年']],
 			beginDate : member_beginDate,
 			endDate : member_endDate,
-			callback : function(){
-				if(member_searchType){
-					Ext.getCmp('btnSearchMember').handler();
-				}
-			}
 		});
+		
+
+		
 		
 		var memberCond1stTBar = new Ext.Toolbar({
 			height : 28,		
@@ -516,6 +519,7 @@ Ext.onReady(function(){
 				new Ext.form.ComboBox({
 					id : 'memberType_combo_memberCond',
 					width : 100,
+					disabled : true,
 					readOnly : false,
 					forceSelection : true,
 					value : '=',
@@ -560,13 +564,85 @@ Ext.onReady(function(){
 					text : '批量发券',
 					iconCls : 'btn_edit_all',
 					handler : function(){
-						Ext.MessageBox.confirm('警示框', '你确定要批量发送优惠券吗?', function(btn){
-							if(btn == 'yes'){
-								//TODO
-							}else{
-								
-							}
+						var couponCm = new Ext.grid.ColumnModel([
+	                      	new Ext.grid.CheckboxSelectionModel(),
+						    {header : '编号', dataIndex : 'coupon.id', hidden :true},
+						    {header : '名称', dataIndex : 'coupon.name'},
+					    ]);
+						var couponDs = new Ext.data.Store({
+							proxy : new Ext.data.HttpProxy({url : '../../OperatePromotion.do'}),
+							reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'},[
+      						     {name : 'coupon.id'},
+      						     {name : 'coupon.name'},
+      						])
 						});
+						couponDs.baseParams = {
+								dataSource : 'getByCond',
+								status : 'progress'
+						};
+						couponDs.load();
+						
+						var selectCouponGrid = new Ext.grid.GridPanel({
+							id : 'selectCoupon',
+							border : true,
+							height : 300,
+							frame : true,
+							store : couponDs,
+							cm : couponCm,
+							sm : new Ext.grid.CheckboxSelectionModel(),
+							viewConfig : {
+								forceFit : true
+							},
+						});
+						
+						var issueCouponWin = new Ext.Window({
+							title : '选择发放优惠券',
+							modal : true,
+							layout : 'fit',
+							width : 300,
+							height : 500,
+							closeAction : 'hide',
+							items : [selectCouponGrid],
+							buttons : [{
+								text : '确定',
+								handler : function(){
+									var couponId = [];
+									var couponName = [];
+									var selected = Ext.getCmp('selectCoupon').getSelectionModel().getSelections();
+									for(var i = 0; i < selected.length; i++){
+										couponId.push(selected[i].id + ',1');
+										couponName.push(selected[i].json.coupon.name);
+									}
+									
+									var store = memberCondBasicGrid.getStore();
+									var amount = store.getCount();
+									if(selected.length != 0){
+										Ext.MessageBox.confirm('警示框', '您共发送【'+ amount + '】张优惠券,优惠券类型是:【'+ couponName.join(',') 
+												+'】,发送的会员类型是 :【' + clickTree + '】', function(btn){
+													if(btn == 'yes'){
+														Ext.Ajax.request({
+															url : '../../OperateCoupon.do',
+															params : {
+																issueMode : 3,
+																dataSource : 'issue',
+																promotions : couponId.join(';'),
+																condId : clickTreeId,
+															},
+															success : function(response){
+																issueCouponWin.close();
+															}
+														});
+														
+													}
+										});
+									}else{
+										Ext.example.msg('提示', '请选择优惠券!');
+									}
+									
+								}
+							}]
+						});
+						issueCouponWin.show();
 					}
 				}, '->',{
 					text : '搜索',
@@ -576,7 +652,7 @@ Ext.onReady(function(){
 						queryMembersByCond();
 						
 					}
-				}, '-', {
+				}, '-', { 
 					text : '导出',
 					iconCls : 'icon_tb_exoprt_excel',
 					handler : function(e){
@@ -611,6 +687,7 @@ Ext.onReady(function(){
 					id : 'comboConsumeMoney4CondBar',
 					xtype : 'combo',
 					readOnly : false,
+					disabled : true,
 					forceSelection : true,
 					value : 1,
 					width : 80,
@@ -635,6 +712,7 @@ Ext.onReady(function(){
 				{
 					xtype : 'numberfield',
 					id : 'minCost_numField_memberCond',
+					disabled : true,
 					width : 60
 				},
 				{
@@ -646,6 +724,7 @@ Ext.onReady(function(){
 				{
 					xtype : 'numberfield',
 					id : 'maxCost_numField_memberCond',
+					disabled : true,
 					width : 60,
 					hidden : true
 				},
@@ -654,6 +733,7 @@ Ext.onReady(function(){
 				{
 					id : 'consumptionAmount_combo_memberCond',
 					xtype : 'combo',
+					disabled : true,
 					readOnly : false,
 					forceSelection : true,
 					value : 1,
@@ -679,6 +759,7 @@ Ext.onReady(function(){
 				{
 					xtype : 'numberfield',
 					id : 'minAmount_numField_memberCond',
+					disabled : true,
 					width : 50
 				},
 				{
@@ -689,6 +770,7 @@ Ext.onReady(function(){
 				{
 					xtype : 'numberfield',
 					id : 'maxAmount4CondBar',
+					disabled : true,
 					width : 50
 				},
 				{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
@@ -696,6 +778,7 @@ Ext.onReady(function(){
 				{
 					id : 'comboBalance4CondBar',
 					xtype : 'combo',
+					disabled : true,
 					readOnly : false,
 					forceSelection : true,
 					value : 1,
@@ -721,6 +804,7 @@ Ext.onReady(function(){
 				{
 					xtype : 'numberfield',
 					id : 'minBalance_numField_memberCond',
+					disabled : true,
 					width : 50
 				},
 				{
@@ -731,6 +815,7 @@ Ext.onReady(function(){
 				{
 					xtype : 'numberfield',
 					id : 'maxBalance_numField_memberCond',
+					disabled : true,
 					width : 50
 				}			
 				]

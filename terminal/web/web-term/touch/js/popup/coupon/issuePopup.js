@@ -99,7 +99,6 @@ function IssueCouponPopup(param){
 								}
 							});
 								
-							
 							//绑定取消按钮
 							self.find('[id = couponIssueCancel_a_issue]').click(function(){
 								_issueCouponPopup.close();

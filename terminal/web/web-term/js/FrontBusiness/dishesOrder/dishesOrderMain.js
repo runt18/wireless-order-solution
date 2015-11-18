@@ -197,7 +197,6 @@ function repaid_initNorthPanel(){
 								for(var i = 0; i < selected.length; i++){
 									coupons.push(selected[i].json.couponId);
 								}
-								console.log(Ext.getCmp('selectCount'));
 								Ext.getCmp('selectCount').setText('您共选择了' + coupons.length + '张优惠券');
 								win.close();
 							}
