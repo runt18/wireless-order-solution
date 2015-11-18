@@ -36,10 +36,17 @@ var member = {}, currentMemberLevelData={}, memberLevelData=[];
 <div id="divMemberContent" class="main-box">
 
 <ul class="m-b-list">
-	<li class="box-horizontal">
+	<li class="box-horizontal none-line">
 		<div style="width: 45%">会员名: <span id="name_span_member">--</span></div>
 		<div id="phone_div_member" style="text-align: right;width: 55%">手机号: <span id="mobile_span_member">--</span></div>
 		<div id="bind_div_member" style="text-align: right;width: 55%">绑定手机号&nbsp;&gt;</div>
+		<li id="birthday_li_member">
+		<div style="margin-top:-29px;">
+			<font style="font-size: 11px;font-weight: bold;">
+			会员生日 <span id="memberBirthday_span_member" style="color:#26a9d0;">--.--</span>
+			</font>
+		</div>
+	</li>
 	</li>
 	<li>
 		<div id="bindMember_div_member" style="display: none;width: 100%;">
