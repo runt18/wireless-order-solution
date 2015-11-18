@@ -34,7 +34,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>192.168.33.100</param-value>
+			<param-value>127.0.0.1</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -46,7 +46,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
-			<param-value>HelloZ315</param-value>
+			<param-value>root</param-value>
 		</init-param>
 		<!-- Below is the configuration parameters to socket -->
 		<init-param>

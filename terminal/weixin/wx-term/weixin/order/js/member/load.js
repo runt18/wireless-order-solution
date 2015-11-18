@@ -120,6 +120,7 @@ $(function(){
 		var baseBalance = $('#spanMemberBaseBalance');
 		var extraBalance = $('#spanMemberExtraBalance');
 		var typeName = $('#spanMemberTypeName');
+		var birthday = $('#memberBirthday_span_member');
 		var typeNameInCard = $('#divMemberTypeName');
 	//	var weixinMemberCard = $('#divWXMemberCard');
 		var defaultMemberDiscount = $('#fontMemberDiscount');
@@ -161,6 +162,12 @@ $(function(){
 	//	weixinMemberCard.html(typeof data.memberType.name == 'undefined' ? '未激活' : data.memberType.name);
 		defaultMemberDiscount.html(typeof data.memberType.discount != 'undefined' && data.memberType.discount.type != 2 ? data.memberType.discount.name : '');
 		memberTotalPoint.html(typeof data.totalPoint == 'undefined' ? '--' : data.totalPoint);
+		if(data.birthdayFormat){
+			birthday.html(data.birthdayFormat);
+		}else{
+			$('#birthday_li_member').hide();
+		}
+		
 	}
 	
 	//绑定会员	

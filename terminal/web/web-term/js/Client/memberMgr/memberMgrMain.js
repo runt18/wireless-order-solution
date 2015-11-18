@@ -1420,11 +1420,7 @@ Ext.onReady(function(){
 			memberCard.setValue(data['memberCard']);
 			weixinCard.setValue(data['weixinCard']);
 			sex.setValue(typeof data['sexValue'] == 'undefined' ? 0 : data['sexValue']);
-			if(eval(data['birthday'] > 0)){
-				birthday.setValue(new Date(eval(data['birthday'])));
-			}else{
-				birthday.setValue();
-			}
+			birthday.setValue(data['birthdayFormat']);
 			addr.setValue(data['contactAddress']);
 			
 			totalBalance.setValue(parseFloat(data['totalBalance']).toFixed(2));
