@@ -241,6 +241,9 @@ public class OperateCouponAction extends DispatchAction{
 				
 			}else if(issueMode == CouponOperation.Operate.WX_SUBSCRIBE_ISSUE){
 				builder = Coupon.IssueBuilder.newInstance4WxSubscribe();
+			
+			}else if(issueMode == CouponOperation.Operate.BATCH_ISSUE){
+				builder = Coupon.IssueBuilder.newInstance4Batch();
 				
 			}else{
 				throw new BusinessException("【" + issueMode.toString() + "】的发券类型不正确");
