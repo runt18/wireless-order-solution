@@ -3208,7 +3208,7 @@ Ext.onReady(function(){
 					gs.load({
 						params : {
 							start : 0,
-							limit : 100
+							limit : 50
 						}
 					});
 					gs.on('load', function(store, records, options){
