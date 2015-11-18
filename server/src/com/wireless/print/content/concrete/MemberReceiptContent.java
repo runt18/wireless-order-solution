@@ -73,12 +73,12 @@ public class MemberReceiptContent extends ConcreteContent {
 											   "本次积分：" + mMo.getDeltaPoint(),
 											   getStyle())).append(SEP);
 				
-				s.append(new Grid2ItemsContent("可用余额：" + (mMo.getRemainingBaseMoney() + mMo.getRemainingExtraMoney()),
+				s.append(new Grid2ItemsContent("可用余额：" + (mMo.getRemainingTotalMoney()),
 											   "可用积分：" + mMo.getRemainingPoint(),
 											   getStyle())).append(SEP);
 			}else{
 				s.append(new Grid2ItemsContent("本次消费：" + NumericUtil.float2String(mMo.getPayMoney()),
-						   					   "可用余额：" + (mMo.getRemainingBaseMoney() + mMo.getRemainingExtraMoney()),
+						   					   "可用余额：" + (mMo.getRemainingTotalMoney()),
 						   					   getStyle())).append(SEP);
 			}
 			
@@ -88,7 +88,7 @@ public class MemberReceiptContent extends ConcreteContent {
 					   					   "账户充额：" + NumericUtil.float2String2(mMo.getDeltaBaseMoney() + mMo.getDeltaExtraMoney()),
 					   					   getStyle())).append(SEP);
 
-			s.append(new RightAlignedDecorator("账户余额：" + NumericUtil.float2String2(mMo.getRemainingBaseMoney() + mMo.getRemainingExtraMoney()), getStyle())).append(SEP);
+			s.append(new RightAlignedDecorator("账户余额：" + NumericUtil.float2String2(mMo.getRemainingTotalMoney()), getStyle())).append(SEP);
 			
 		}else if(mMo.getOperationType() == OperationType.REFUND){
 			
@@ -96,7 +96,7 @@ public class MemberReceiptContent extends ConcreteContent {
 					   					   "账户扣额：" + NumericUtil.float2String2(Math.abs(mMo.getDeltaBaseMoney() + mMo.getDeltaExtraMoney())),
 					   					   getStyle())).append(SEP);
 
-			s.append(new RightAlignedDecorator("账户余额：" + NumericUtil.float2String2(mMo.getRemainingBaseMoney() + mMo.getRemainingExtraMoney()), getStyle())).append(SEP);
+			s.append(new RightAlignedDecorator("账户余额：" + NumericUtil.float2String2(mMo.getRemainingTotalMoney()), getStyle())).append(SEP);
 		}
 
 		s.append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(CUT);
