@@ -145,7 +145,6 @@ Ext.onReady(function(){
 		var rechargeWin = Ext.getCmp('rechargeWin');
 		if(!rechargeWin){
 			rechargeWin = new Ext.Window({
-				id : 'rechargeWin',
 				title : '会员充值',
 				closable : false,
 				modal : true,
@@ -190,7 +189,7 @@ Ext.onReady(function(){
 				},
 				bbar : [{
 					xtype : 'checkbox',
-					id : 'chbPrintRecharge',
+					id : 'printRecharge_checkbox_member',
 					checked : true,
 					boxLabel : '打印充值信息'
 				},{
@@ -214,11 +213,11 @@ Ext.onReady(function(){
 						}
 						// 跨域调用充值方法
 						rechargeControlCenter({
-							isPrint : Ext.getCmp('chbPrintRecharge').getValue(),
+							isPrint : Ext.getCmp('printRecharge_checkbox_member').getValue(),
 							sendSms : sendSms,
 							callback : function(_c){
 								rechargeWin.hide();
-								Ext.getCmp('btnSearchMember').handler();
+								Ext.getCmp('searchMember_btn_member').handler();
 							}
 						});
 						
@@ -246,7 +245,6 @@ Ext.onReady(function(){
 		var takeMoneyWin = Ext.getCmp('takeMoneyWin');
 		if(!takeMoneyWin){
 			takeMoneyWin = new Ext.Window({
-				id : 'takeMoneyWin',
 				title : '会员取款',
 				closable : false,
 				modal : true,
@@ -291,7 +289,7 @@ Ext.onReady(function(){
 				},
 				bbar : [{
 					xtype : 'checkbox',
-					id : 'chbPrintTakeMoney',
+					id : 'printTakeMoney_checkbox_member',
 					checked : true,
 					boxLabel : '打印取款信息'
 				}, '->', {
@@ -300,10 +298,10 @@ Ext.onReady(function(){
 					handler : function(){
 						// 跨域调用取款方法
 						takeMoneyControlCenter({
-							isPrint : Ext.getCmp('chbPrintTakeMoney').getValue(),
+							isPrint : Ext.getCmp('printTakeMoney_checkbox_member').getValue(),
 							callback : function(_c){
 								takeMoneyWin.hide();
-								Ext.getCmp('btnSearchMember').handler();
+								Ext.getCmp('searchMember_btn_member').handler();
 							}
 						});
 					}
@@ -342,7 +340,6 @@ Ext.onReady(function(){
 		var mr_queryMemberOperationWin = Ext.getCmp('mr_queryMemberOperationWin');
 		if(!mr_queryMemberOperationWin){
 		mr_queryMemberOperationWin = new Ext.Window({
-				id : 'mr_queryMemberOperationWin',
 				modal : true,
 				closable : false,
 				resizable : false,
@@ -435,7 +432,6 @@ Ext.onReady(function(){
 	function initMemberCouponWin(){
 		if(!memberCouponWin){
 			memberCouponWin = new Ext.Window({
-				id : 'memberCouponWin',
 				title : '选择优惠劵',
 				closable : false,
 				modal : true,
@@ -450,16 +446,16 @@ Ext.onReady(function(){
 				}],
 				bbar : [{
 					xtype : 'checkbox',
-					id : 'chbSendCouponSms',
+					id : 'sendCouponSms_checkbox_member',
 					checked : true,
 					boxLabel : '发送通知短信'+(Ext.ux.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Ext.ux.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Ext.ux.smsCount+'条, 请及时充值</font>)'),
 					hidden : !Ext.ux.smsModule
 				},'->',{
 					text : '发放',
-					id : 'btn_memberCouponSend',
+					id : 'memberCouponSend_btn_member',
 					iconCls : 'btn_save',
 					handler : function(){
-						var sendSms = Ext.getCmp('chbSendCouponSms').getValue();
+						var sendSms = Ext.getCmp('sendCouponSms_checkbox_member').getValue();
 						if(sendSms){
 							Ext.ux.setCookie(document.domain+'_couponSms', true, 3650);
 						}else{
@@ -563,7 +559,7 @@ Ext.onReady(function(){
 					key : Ext.EventObject.ENTER,
 					scope : this,
 					fn : function(){
-						Ext.getCmp('btn_memberCouponSend').handler();
+						Ext.getCmp('memberCouponSend_btn_member').handler();
 					}
 				},{
 					key : Ext.EventObject.ESC,
@@ -622,9 +618,9 @@ Ext.onReady(function(){
 			});
 		}
 		if(Ext.ux.getCookie(document.domain+'_couponSms') == 'true'){
-			Ext.getCmp('chbSendCouponSms').setValue(true);
+			Ext.getCmp('sendCouponSms_checkbox_member').setValue(true);
 		}else{
-			Ext.getCmp('chbSendCouponSms').setValue(false);
+			Ext.getCmp('sendCouponSms_checkbox_member').setValue(false);
 		}	
 		memberCouponWin.show();
 	}
@@ -636,8 +632,8 @@ Ext.onReady(function(){
 	function initAdjustPointWin(){
 		if(!adjustPointWin){
 			var numAdjustPoint = new Ext.form.NumberField({
-				xtype : 'numberfield',
 				id : 'numAdjustPoint',
+				xtype : 'numberfield',
 				fieldLabel : '',
 				style : 'color:red;',
 				width : 100,
@@ -663,7 +659,7 @@ Ext.onReady(function(){
 				},
 				listeners : {
 					render : function(){
-						Ext.getCmp('radioAdjustPointIncrease').setValue(true);
+						Ext.getCmp('radioAdjustPointIncrease_radio_member').setValue(true);
 					}
 				}
 			});
@@ -687,7 +683,7 @@ Ext.onReady(function(){
 					items : [{
 						items : [{
 							xtype : 'radio',
-							id : 'radioAdjustPointIncrease',
+							id : 'radioAdjustPointIncrease_radio_member',
 							name : 'radioAdjustPoint',
 							inputValue : 1,
 							hideLabel : true,
@@ -786,7 +782,7 @@ Ext.onReady(function(){
 											if(jr.success){
 												adjustPointWin.hide();
 												Ext.example.msg(jr.title, jr.msg);
-												Ext.getCmp('btnSearchMember').handler();
+												Ext.getCmp('searchMember_btn_member').handler();
 											}else{
 												Ext.ux.showMsg(jr);
 											}
@@ -816,7 +812,7 @@ Ext.onReady(function(){
 				listeners : {
 					hide : function(){
 						numAdjustPoint.setValue();
-						Ext.getCmp('radioAdjustPointIncrease').setValue(true);
+						Ext.getCmp('radioAdjustPointIncrease_radio_member').setValue(true);
 					}
 				}
 			});
@@ -900,7 +896,6 @@ Ext.onReady(function(){
 		});
 		
 		memberTypeTree = new Ext.tree.TreePanel({
-			id : 'tree_memberTypeMgr',
 			title : '会员类型',
 //			region : 'west',
 			region : 'center',
@@ -942,7 +937,7 @@ Ext.onReady(function(){
 			tbar : memberTypeTreeTbar,
 			listeners : {
 		    	click : function(e){
-		    		Ext.getCmp('btnSearchMember').handler();
+		    		Ext.getCmp('searchMember_btn_member').handler();
 		    		Ext.getDom('memberTypeShowType').innerHTML = e.text;
 		    	}
 		    }
@@ -1347,7 +1342,7 @@ Ext.onReady(function(){
 										if(res.success){
 											memberBasicWin.hide();
 											Ext.example.msg(res.title, res.msg);
-											Ext.getCmp('btnSearchMember').handler();
+											Ext.getCmp('searchMember_btn_member').handler();
 //											memberTypeTree.getRootNode().reload();
 										}else{
 											Ext.ux.showMsg(res);
@@ -1811,7 +1806,6 @@ Ext.onReady(function(){
 	function m_memberTypeWinInit(){
 		if(!m_memberTypeWin){
 			m_memberTypeWin = new Ext.Window({
-				id : 'm_memberTypeWin',
 				title : '会员类型',
 				closable : false,
 				modal : true,
@@ -2400,7 +2394,6 @@ Ext.onReady(function(){
 	}
 	function initAddLevelWin(){
 		memberLevelAddWin = new Ext.Window({
-			id : 'memberLevelAddWin',
 			title : '添加等级',
 			closable : false,
 			modal : true,
@@ -2799,7 +2792,6 @@ Ext.onReady(function(){
 	
 	new Ext.Panel({
 		renderTo : 'divMember',
-		id : 'memberMgrPanel',
 		//width : parseInt(Ext.getDom('divMember').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divMember').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
@@ -2849,7 +2841,7 @@ Ext.onReady(function(){
 	initAddLevelWin();
 	
 	//获取member数据, 在render事件后触发修改数据时不能更新UI
-	Ext.getCmp('btnSearchMember').handler();
+	Ext.getCmp('searchMember_btn_member').handler();
 	
 	function gridInit(){
 		var beginBirthday = new Ext.form.DateField({
@@ -2878,7 +2870,7 @@ Ext.onReady(function(){
 			endDate : endBirthday,
 			callback : function(){
 				if(member_searchType){
-					Ext.getCmp('btnSearchMember').handler();
+					Ext.getCmp('searchMember_btn_member').handler();
 				}
 			}
 		});
@@ -2909,7 +2901,7 @@ Ext.onReady(function(){
 			endDate : member_endDate,
 			callback : function(){
 				if(member_searchType){
-					Ext.getCmp('btnSearchMember').handler();
+					Ext.getCmp('searchMember_btn_member').handler();
 				}
 			}
 		});
@@ -2950,7 +2942,7 @@ Ext.onReady(function(){
 					});
 				},
 				select : function(){
-					Ext.getCmp('btnSearchMember').handler();
+					Ext.getCmp('searchMember_btn_member').handler();
 				}
 			}
 		});
@@ -3033,7 +3025,7 @@ Ext.onReady(function(){
 				{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 				{
 					xtype : 'radio',
-					id : 'm_searchOrderby',
+					id : 'searchOrderBy_radio_member',
 					checked : true,
 					boxLabel : '创建时间',
 					name : 'memberSort',
@@ -3163,15 +3155,15 @@ Ext.onReady(function(){
 		    		Ext.getCmp('textMemberMaxBalance').setValue('');
 		    		
 		    		//设置按创建时间排序
-		    		Ext.getCmp('m_searchOrderby').setValue(true);
+		    		Ext.getCmp('searchOrderBy_radio_member').setValue(true);
 		    		
 		    		member_dateCombo.setValue(4);
-		    		Ext.getCmp('btnSearchMember').handler();
+		    		Ext.getCmp('searchMember_btn_member').handler();
 				}
 			},{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	 
 			{
 				text : '搜索',
-				id : 'btnSearchMember',
+				id : 'searchMember_btn_member',
 				iconCls : 'btn_search',
 				handler : function(){
 					
@@ -3288,7 +3280,7 @@ Ext.onReady(function(){
 				iconCls : 'btn_refresh',
 				handler : function(e){
 					Ext.getCmp('btnRefreshMemberType').handler();
-					Ext.getCmp('btnSearchMember').handler();
+					Ext.getCmp('searchMember_btn_member').handler();
 					var st = Ext.getCmp('mr_comboMemberSearchType');
 					st.setValue(0);
 					st.fireEvent('select', st, null, null);
@@ -3380,7 +3372,7 @@ Ext.onReady(function(){
 			key : Ext.EventObject.ENTER,
 			scope : this,
 			fn : function(){ 
-				Ext.getCmp('btnSearchMember').handler();
+				Ext.getCmp('searchMember_btn_member').handler();
 			}
 		}];
 	};
