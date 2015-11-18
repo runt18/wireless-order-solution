@@ -105,6 +105,10 @@ public class Coupon implements Jsonable{
 			return new IssueBuilder(CouponOperation.Operate.FAST_ISSUE, 0);
 		}
 		
+		public static IssueBuilder newInstance4Batch(){
+			return new IssueBuilder(CouponOperation.Operate.BATCH_ISSUE, 0);
+		}
+		
 		public static IssueBuilder newInstance4Order(Order order){
 			return new IssueBuilder(CouponOperation.Operate.ORDER_ISSUE, order.getId());
 		}

@@ -221,6 +221,9 @@ public class WxRestaurant implements Jsonable{
 	private String nickName;
 	private String headImgUrl;
 	private String refreshToken;
+	private String paymentTemplate;
+	private String couponDrawTemplate;
+	private String couponTimeoutTemplate;
 	
 	private WxRestaurant(UpdateBuilder builder){
 		this.weixinLogo = builder.weixinLogo;
@@ -387,6 +390,51 @@ public class WxRestaurant implements Jsonable{
 		this.refreshToken = refreshToken;
 	}
 
+	public void setPaymentTemplate(String paymentTemplate){
+		this.paymentTemplate = paymentTemplate;
+	}
+
+	public String getPaymentTemplate(){
+		if(this.paymentTemplate == null){
+			return "";
+		}
+		return this.paymentTemplate;
+	}
+	
+	public boolean hasPaymentTemplate(){
+		return this.getPaymentTemplate().length() != 0;
+	}
+
+	public void setCouponDrawTemplate(String couponDrawTemplate){
+		this.couponDrawTemplate = couponDrawTemplate;
+	}
+	
+	public String getCouponDrawTemplate(){
+		if(this.couponDrawTemplate == null){
+			return "";
+		}
+		return this.couponDrawTemplate;
+	}
+	
+	public boolean hasCouponDrawTemplate(){
+		return this.getCouponDrawTemplate().length() != 0;
+	}
+	
+	public void setCouponTimeoutTemplate(String couponTimeoutTemplate){
+		this.couponTimeoutTemplate = couponTimeoutTemplate;
+	}
+	
+	public String getCouponTimeoutTemplate(){
+		if(this.couponTimeoutTemplate == null){
+			return "";
+		}
+		return this.couponTimeoutTemplate;
+	}
+	
+	public boolean hasCouponTimeoutTemplate(){
+		return this.getCouponTimeoutTemplate().length() != 0;
+	}
+	
 	@Override
 	public int hashCode(){
 		return getWeixinSerial().hashCode();

@@ -80,6 +80,7 @@ public class CouponOperation implements Jsonable{
 	public static enum Operate{
 		FAST_ISSUE(OperateType.ISSUE, 1, "快速发券"),
 		ORDER_ISSUE(OperateType.ISSUE, 2, "账单发券"),
+		BATCH_ISSUE(OperateType.ISSUE, 3, "批量发券"),
 		FAST_USE(OperateType.USE, 20, "手动用券"),
 		ORDER_USE(OperateType.USE, 21, "账单用券"),
 		WX_SUBSCRIBE_ISSUE(OperateType.USE, 22, "微信关注用券")
