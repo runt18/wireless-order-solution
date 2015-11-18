@@ -155,44 +155,58 @@ public class OperateMemberAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward update(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward update(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		
-		JObject jobject = new JObject();
+		final JObject jobject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String id = request.getParameter("id");
-			String name = request.getParameter("name");
-			String mobile = request.getParameter("mobile");
-			String memberTypeId = request.getParameter("memberTypeId");
-			String sex = request.getParameter("sex");
-			String memberCard = request.getParameter("memberCard");
-			String birthday = request.getParameter("birthday");
-			String tele = request.getParameter("telt");
-			String addr = request.getParameter("addr");
-//			String privateComment = request.getParameter("privateComment");
-			//String publicComment = request.getParameter("publicComment");
-			String phonePublicComment = request.getParameter("phonePublicComment");
+			final String pin = (String)request.getAttribute("pin");
+			final String id = request.getParameter("id");
+			final String name = request.getParameter("name");
+			final String mobile = request.getParameter("mobile");
+			final String memberTypeId = request.getParameter("memberTypeId");
+			final String sex = request.getParameter("sex");
+			final String memberCard = request.getParameter("memberCard");
+			final String birthday = request.getParameter("birthday");
+			final String tele = request.getParameter("telt");
+			final String addr = request.getParameter("addr");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			Member.UpdateBuilder ub = new Member.UpdateBuilder(Integer.valueOf(id))
-											    .setName(name)
-											    .setMobile(mobile)
-											    .setMemberType(Integer.valueOf(memberTypeId))
-											    .setSex(Member.Sex.valueOf(Integer.valueOf(sex)))
-											    .setBirthday(birthday)
-											    .setMemberCard(memberCard)
-											    .setTele(tele)
-//											    .setPrivateComment(privateComment)
-											    .setContactAddr(addr);
-			if(phonePublicComment != null && !phonePublicComment.isEmpty()){
-				ub.setPublicComment(phonePublicComment);
+			final Member.UpdateBuilder builder = new Member.UpdateBuilder(Integer.valueOf(id));
+			
+			if(name != null && !name.isEmpty()){
+				builder.setName(name);
 			}
 			
-			MemberDao.update(staff, ub);
+			if(mobile != null && !mobile.isEmpty()){
+				builder.setMobile(mobile);
+			}
+			
+			if(memberTypeId != null && !memberTypeId.isEmpty()){
+				builder.setMemberType(Integer.valueOf(memberTypeId));
+			}
+			
+			if(sex != null && !sex.isEmpty()){
+				builder.setSex(Member.Sex.valueOf(Integer.valueOf(sex)));
+			}
+					
+			if(birthday != null && !birthday.isEmpty()){
+				builder.setBirthday(birthday);
+			}
+											
+			if(memberCard != null && !memberCard.isEmpty()){
+				builder.setMemberCard(memberCard);
+			}
+			
+			if(tele != null && !tele.isEmpty()){
+				builder.setTele(tele);
+			}
+								
+			if(addr != null && !addr.isEmpty()){
+				builder.setContactAddr(addr);
+			}
+											    
+			MemberDao.update(staff, builder);
 			jobject.initTip(true, "操作成功, 会员资料已修改.");
 		}catch(BusinessException e){
 			e.printStackTrace();

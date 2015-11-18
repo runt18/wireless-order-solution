@@ -170,7 +170,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		private Sex sex;					// 性别
 		private String tele;				// 电话
 		private String mobile;				// 手机
-		private long birthday;				// 生日
+		private Long birthday;				// 生日
 		private String idCard;				// 身份证
 		private String company;				// 公司
 		private String contactAddress;		// 联系地址
@@ -256,7 +256,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}
 		
 		public boolean isBirthdayChanged(){
-			return this.birthday != 0;
+			return this.birthday != null;
 		}
 		
 		public UpdateBuilder setIdCard(String idCard){

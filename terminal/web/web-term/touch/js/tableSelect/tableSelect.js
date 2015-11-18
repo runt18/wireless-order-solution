@@ -101,7 +101,6 @@ $(function(){
 		//删除刷新餐台的定时器
 		if(tableRefreshTimeoutId){
 			clearTimeout(tableRefreshTimeoutId);
-			console.log('clear initTableData');
 		}
 	});
 	
@@ -123,7 +122,6 @@ $(function(){
 					//定时器，定时刷新餐桌选择页面数据
 					(function refreshTable(){
 						initTableData();
-						console.log('initTableData');
 						tableRefreshTimeoutId = setTimeout(arguments.callee, 15 * 60 * 1000);
 					})();
 				}

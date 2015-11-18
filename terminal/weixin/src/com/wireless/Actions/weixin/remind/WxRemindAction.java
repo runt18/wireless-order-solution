@@ -83,11 +83,11 @@ public class WxRemindAction extends DispatchAction {
 			 */
 			Status status = Template.send(token, new Template.Builder().setToUser(OPEN_ID_4_MARCO)
 						.setTemplateId("UdyaL-jQJjC5aUh8A3VdeOrzkm2DQDZpUvny8kZ1kZ0")
-						.addKeyword(new Keyword("first", "1周内餐厅到期提醒")).addKeyword(new Keyword("work", work.toString())));
+						.addKeyword(new Keyword("first", "1月内餐厅到期提醒")).addKeyword(new Keyword("work", work.toString())));
 
 			status = Template.send(token, new Template.Builder().setToUser(OPEN_ID_4_VINCENT)
 					  						.setTemplateId("UdyaL-jQJjC5aUh8A3VdeOrzkm2DQDZpUvny8kZ1kZ0")
-					  						.addKeyword(new Keyword("first", "2周内餐厅到期提醒")).addKeyword(new Keyword("work", work.toString())));
+					  						.addKeyword(new Keyword("first", "1月内餐厅到期提醒")).addKeyword(new Keyword("work", work.toString())));
 			
 			response.getWriter().write(status.toString());
 		}
