@@ -197,7 +197,7 @@ Ext.onReady(function(){
 					text : '&nbsp;&nbsp;'
 				},{
 					xtype : 'checkbox',
-					id : 'chbSendCharge',
+					id : 'chbSendCharge_checkbox_member',
 					checked : true,
 					boxLabel : '发送充值信息'+(Ext.ux.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Ext.ux.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Ext.ux.smsCount+'条, 请及时充值</font>)'),
 					hidden : !Ext.ux.smsModule
@@ -205,7 +205,7 @@ Ext.onReady(function(){
 					text : '充值',
 					iconCls : 'icon_tb_recharge',
 					handler : function(e){
-						var sendSms = Ext.getCmp('chbSendCharge').getValue();
+						var sendSms = Ext.getCmp('chbSendCharge_checkbox_member').getValue();
 						if(sendSms){
 							Ext.ux.setCookie(document.domain+'_chargeSms', true, 3650);
 						}else{
@@ -232,9 +232,9 @@ Ext.onReady(function(){
 			});
 		}
 		if(Ext.ux.getCookie(document.domain+'_chargeSms') == 'true'){
-			Ext.getCmp('chbSendCharge').setValue(true);
+			Ext.getCmp('chbSendCharge_checkbox_member').setValue(true);
 		}else{
-			Ext.getCmp('chbSendCharge').setValue(false);
+			Ext.getCmp('chbSendCharge_checkbox_member').setValue(false);
 		}
 	}
 
@@ -462,7 +462,7 @@ Ext.onReady(function(){
 							Ext.ux.setCookie(document.domain+'_couponSms', false, 3650);
 						}		
 						
-						if(!Ext.getCmp('member_comboCoupon').isValid()){
+						if(!Ext.getCmp('comboCouponType_combo_member').isValid()){
 							return;
 						}
 						
@@ -478,7 +478,7 @@ Ext.onReady(function(){
 								'总共 '+ members.length +' 条短信, 是否发送' ,
 								function(e){
 									if(e == 'yes'){
-										var coupon = Ext.getCmp('member_comboCoupon');
+										var coupon = Ext.getCmp('comboCouponType_combo_member');
 										var membersData = '';
 										for (var i = 0; i < members.length; i++) {
 											if(i > 0){
@@ -513,7 +513,7 @@ Ext.onReady(function(){
 								}
 							);						
 						}else{
-							var coupon = Ext.getCmp('member_comboCoupon');
+							var coupon = Ext.getCmp('comboCouponType_combo_member');
 							var membersData = '';
 							for (var i = 0; i < members.length; i++) {
 								if(i > 0){
@@ -576,7 +576,7 @@ Ext.onReady(function(){
 					frame : true,
 					items : [{
 						xtype : 'combo',
-						id : 'member_comboCoupon',
+						id : 'comboCouponType_combo_member',
 						fieldLabel : '优惠劵类型',
 						readOnly : false,
 						forceSelection : true,
@@ -730,7 +730,7 @@ Ext.onReady(function(){
 						columnWidth : 1,
 						items : [{
 							xtype : 'textfield',
-							id : 'numMemberPointForNow',
+							id : 'numMemberPointForNow_textfield_member',
 							fieldLabel : '当前积分',
 							style : 'color:green;',
 							width : 100,
@@ -833,7 +833,7 @@ Ext.onReady(function(){
 		initAdjustPointWin();
 		adjustPointWin.show();
 		adjustPointWin.setTitle('调整积分, 会员:'+data['name']);
-		Ext.getCmp('numMemberPointForNow').setValue(data['point']);
+		Ext.getCmp('numMemberPointForNow_textfield_member').setValue(data['point']);
 	}
 
 	//---------------------
@@ -886,7 +886,7 @@ Ext.onReady(function(){
 				
 			},{
 				text : '刷新',
-				id : 'btnRefreshMemberType',
+				id : 'btnRefreshMemberType_btn_member',
 				iconCls : 'btn_refresh',
 				handler : function(){
 					Ext.getDom('memberTypeShowType').innerHTML = '----';
@@ -949,12 +949,12 @@ Ext.onReady(function(){
 		if(!memberBasicWin){
 			var memeberCardAliasID = {
 					xtype : 'numberfield',
-					id : 'cm_numberMemberCard',
+					id : 'numberMemberCard_numberField_member',
 					fieldLabel : '会员卡',
 					disabled : false
 			};
 			var memberDetailCmp = new Ext.Panel({
-				id : 'panelControlMemberContent',
+				id : 'panelControlMemberContent_panel_member',
 				frame : true,
 				border : false,
 				layout : 'column',
@@ -975,19 +975,19 @@ Ext.onReady(function(){
 					columnWidth : 1,
 					items : [{
 						xtype : 'hidden',
-						id : 'cm_numberMemberId',
+						id : 'numberMemberId_member',
 						fieldLabel : '会员编号'
 					}]
 				}, {
 					items : [{
-						id : 'cm_txtMemberName',
+						id : 'txtMemberName_text_member',
 						fieldLabel : '名称' + Ext.ux.txtFormat.xh,
 						allowBlank : false,
 						blankText : '名称不能为空.'
 					}]
 				}, {
 					items : [{
-						id : 'cm_txtMemberMobile',
+						id : 'txtMemberMobile_text_member',
 						style : 'font-weight: bold; color: #FF0000;',
 						fieldLabel : '手机',
 						regex : Ext.ux.RegText.phone.reg,
@@ -999,7 +999,7 @@ Ext.onReady(function(){
 					items : [{
 						disabled : false,
 						xtype : 'combo',
-						id : 'cm_comboMemberType',
+						id : 'comboMemberType_combo_member',
 						fieldLabel : '会员类型' + Ext.ux.txtFormat.xh,
 						readOnly : false,
 						forceSelection : true,
@@ -1016,9 +1016,9 @@ Ext.onReady(function(){
 						blankText : '类型不允许为空.',
 						listeners : {
 							select : function(thiz, record, index){
-								var firstCharge = Ext.getCmp('cm_numFirstCharge');
-								var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');
-								var rechargeType = Ext.getCmp('rd_comboFirstRechargeType');
+								var firstCharge = Ext.getCmp('numFirstCharge_numberField_member');
+								var firstActualCharge = Ext.getCmp('numFirstActualCharge_numberField_member');
+								var rechargeType = Ext.getCmp('comboFirstRechargeType_combo_member');
 								if(memberBasicWin.otype.toLowerCase() == Ext.ux.otype['insert'].toLowerCase() && record.get('attributeValue') == 0){
 									firstCharge.show();
 									firstCharge.getEl().up('.x-form-item').setDisplayed(true);	
@@ -1029,10 +1029,10 @@ Ext.onReady(function(){
 									
 									chargeRate = record.get('chargeRate');
 									
-									Ext.getCmp('chbPrintFirstRecharge').show();
+									Ext.getCmp('chbPrintFirstRecharge_checkbox_member').show();
 									
 									if(Ext.ux.smsModule)
-										Ext.getCmp('chbSendFirstCharge').show();
+										Ext.getCmp('chbSendFirstCharge_checkbox_member').show();
 									
 								}else{
 									firstCharge.hide();
@@ -1042,8 +1042,8 @@ Ext.onReady(function(){
 									rechargeType.hide();
 									rechargeType.getEl().up('.x-form-item').setDisplayed(false);							
 									
-									Ext.getCmp('chbPrintFirstRecharge').hide();
-									Ext.getCmp('chbSendFirstCharge').hide();
+									Ext.getCmp('chbPrintFirstRecharge_checkbox_member').hide();
+									Ext.getCmp('chbSendFirstCharge_checkbox_member').hide();
 								}						
 							}
 						}
@@ -1052,7 +1052,7 @@ Ext.onReady(function(){
 					items : [{
 							hidden : true,
 						xtype : 'numberfield',
-						id : 'cm_numFirstCharge',
+						id : 'numFirstCharge_numberField_member',
 						fieldLabel : '首次充值',
 						listeners : {
 							render : function(thiz){
@@ -1067,7 +1067,7 @@ Ext.onReady(function(){
 										thiz.setValue(parseInt(iv));
 										
 										var rm = thiz.getValue();
-										var pmm = Ext.getCmp('cm_numFirstActualCharge');
+										var pmm = Ext.getCmp('numFirstActualCharge_numberField_member');
 										pmm.setValue(Math.round(rm * chargeRate));
 									}
 								};
@@ -1078,13 +1078,13 @@ Ext.onReady(function(){
 					items : [{
 							hidden : true,
 						xtype : 'numberfield',
-						id : 'cm_numFirstActualCharge',
+						id : 'numFirstActualCharge_numberField_member',
 						fieldLabel : '账户充额'
 					}]
 				}, 	{
 					items : [{
 						xtype : 'combo',
-						id : 'rd_comboFirstRechargeType',
+						id : 'comboFirstRechargeType_combo_member',
 						fieldLabel : '收款方式',
 						readOnly : false,
 						forceSelection : true,
@@ -1104,7 +1104,7 @@ Ext.onReady(function(){
 					}, {
 					items : [{
 						xtype : 'combo',
-						id : 'cm_comboMemberSex',
+						id : 'comboMemberSex_combo_member',
 						fieldLabel : '性别' + Ext.ux.txtFormat.xh,
 						readOnly : false,
 						forceSelection : true,
@@ -1125,7 +1125,7 @@ Ext.onReady(function(){
 				}, {
 					items : [{
 						xtype : 'datefield',
-						id : 'cm_dateMemberBirthday',
+						id : 'dateMemberBirthday_dataField_member',
 						fieldLabel : '生日',
 						format : 'Y-m-d'
 					}]
@@ -1242,9 +1242,9 @@ Ext.onReady(function(){
 						});
 						
 						if(Ext.ux.getCookie(document.domain+'_chargeSms') == 'true'){
-							Ext.getCmp('chbSendFirstCharge').setValue(true);
+							Ext.getCmp('chbSendFirstCharge_checkbox_member').setValue(true);
 						}else{
-							Ext.getCmp('chbSendFirstCharge').setValue(false);
+							Ext.getCmp('chbSendFirstCharge_checkbox_member').setValue(false);
 						}	
 						
 						focusToAddMember();
@@ -1261,7 +1261,7 @@ Ext.onReady(function(){
 				}],
 				bbar : [{
 						xtype : 'checkbox',
-						id : 'chbPrintFirstRecharge',
+						id : 'chbPrintFirstRecharge_checkbox_member',
 						checked : true,
 						hidden : true,
 						boxLabel : '打印充值信息'
@@ -1270,7 +1270,7 @@ Ext.onReady(function(){
 						text : '&nbsp;&nbsp;'
 					},{
 						xtype : 'checkbox',
-						id : 'chbSendFirstCharge',
+						id : 'chbSendFirstCharge_checkbox_member',
 						checked : true,
 						boxLabel : '发送充值信息'+(Ext.ux.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Ext.ux.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Ext.ux.smsCount+'条, 请及时充值</font>)'),
 						hidden : true
@@ -1282,7 +1282,7 @@ Ext.onReady(function(){
 							if(typeof operateMemberHandler != 'function'){
 								Ext.example.msg('提示', '操作失败, 请求异常, 请尝试刷新页面后重试.');
 							}else{
-								var sendSms = Ext.getCmp('chbSendFirstCharge').getValue();
+								var sendSms = Ext.getCmp('chbSendFirstCharge_checkbox_member').getValue();
 								if(sendSms){
 									Ext.ux.setCookie(document.domain+'_chargeSms', true, 3650);
 								}else{
@@ -1292,8 +1292,8 @@ Ext.onReady(function(){
 								operateMemberHandler({
 									type : memberBasicWin.otype,
 									data : memberBasicWin.otype == Ext.ux.otype['update'] ? Ext.ux.getSelData(memberBasicGrid) : null,
-									isPrint : Ext.getCmp('chbPrintFirstRecharge').getValue(),
-									sendSms : Ext.getCmp('chbSendFirstCharge').getValue(),										
+									isPrint : Ext.getCmp('chbPrintFirstRecharge_checkbox_member').getValue(),
+									sendSms : Ext.getCmp('chbSendFirstCharge_checkbox_member').getValue(),										
 									setButtonStatus : function(s){
 										e.setDisabled(s);
 										btnClose.setDisabled(s);
@@ -1322,7 +1322,7 @@ Ext.onReady(function(){
 							if(typeof operateMemberHandler != 'function'){
 								Ext.example.msg('提示', '操作失败, 请求异常, 请尝试刷新页面后重试.');
 							}else{
-								var sendSms = Ext.getCmp('chbSendFirstCharge').getValue();
+								var sendSms = Ext.getCmp('chbSendFirstCharge_checkbox_member').getValue();
 								if(sendSms){
 									Ext.ux.setCookie(document.domain+'_chargeSms', true, 3650);
 								}else{
@@ -1332,8 +1332,8 @@ Ext.onReady(function(){
 								operateMemberHandler({
 									type : memberBasicWin.otype,
 									data : memberBasicWin.otype == Ext.ux.otype['update'] ? Ext.ux.getSelData(memberBasicGrid) : null,
-									isPrint : Ext.getCmp('chbPrintFirstRecharge').getValue(),
-									sendSms : Ext.getCmp('chbSendFirstCharge').getValue(),										
+									isPrint : Ext.getCmp('chbPrintFirstRecharge_checkbox_member').getValue(),
+									sendSms : Ext.getCmp('chbSendFirstCharge_checkbox_member').getValue(),										
 									setButtonStatus : function(s){
 										e.setDisabled(s);
 										btnClose.setDisabled(s);
@@ -1357,8 +1357,8 @@ Ext.onReady(function(){
 					iconCls : 'btn_close',
 					handler : function(){
 						memberBasicWin.hide();
-						Ext.getCmp('chbPrintFirstRecharge').hide();
-						Ext.getCmp('chbSendFirstCharge').hide();
+						Ext.getCmp('chbPrintFirstRecharge_checkbox_member').hide();
+						Ext.getCmp('chbSendFirstCharge_checkbox_member').hide();
 					}
 				}]
 			});	
@@ -1371,19 +1371,19 @@ Ext.onReady(function(){
 			return;
 			
 		var data = {};
-		var memberType = Ext.getCmp('cm_comboMemberType');
-		var firstCharge = Ext.getCmp('cm_numFirstCharge');	
-		var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');	
-		var rechargeType = Ext.getCmp('rd_comboFirstRechargeType');
-		var memberID = Ext.getCmp('cm_numberMemberId');
-		var name = Ext.getCmp('cm_txtMemberName');
-		var mobile = Ext.getCmp('cm_txtMemberMobile');
-		var memberCard = Ext.getCmp('cm_numberMemberCard');
+		var memberType = Ext.getCmp('comboMemberType_combo_member');
+		var firstCharge = Ext.getCmp('numFirstCharge_numberField_member');	
+		var firstActualCharge = Ext.getCmp('numFirstActualCharge_numberField_member');	
+		var rechargeType = Ext.getCmp('comboFirstRechargeType_combo_member');
+		var memberID = Ext.getCmp('numberMemberId_member');
+		var name = Ext.getCmp('txtMemberName_text_member');
+		var mobile = Ext.getCmp('txtMemberMobile_text_member');
+		var memberCard = Ext.getCmp('numberMemberCard_numberField_member');
 		var weixinCard = Ext.getCmp('cm_weixinMemberCard');
 
 		
-		var sex = Ext.getCmp('cm_comboMemberSex');
-		var birthday = Ext.getCmp('cm_dateMemberBirthday');
+		var sex = Ext.getCmp('comboMemberSex_combo_member');
+		var birthday = Ext.getCmp('dateMemberBirthday_dataField_member');
 		var addr = Ext.getCmp('cm_txtMemberContactAddress');
 		
 		var totalBalance = Ext.getCmp('cm_numberTotalBalance');
@@ -1447,10 +1447,10 @@ Ext.onReady(function(){
 						rechargeType.show();
 						rechargeType.getEl().up('.x-form-item').setDisplayed(true);
 					
-						Ext.getCmp('chbPrintFirstRecharge').show();
+						Ext.getCmp('chbPrintFirstRecharge_checkbox_member').show();
 						
 						if(Ext.ux.smsModule)
-							Ext.getCmp('chbSendFirstCharge').show();
+							Ext.getCmp('chbSendFirstCharge_checkbox_member').show();
 					
 					}else{
 						firstCharge.hide();
@@ -1460,15 +1460,15 @@ Ext.onReady(function(){
 						rechargeType.hide();
 						rechargeType.getEl().up('.x-form-item').setDisplayed(false);							
 						
-						Ext.getCmp('chbPrintFirstRecharge').hide();
-						Ext.getCmp('chbSendFirstCharge').hide();					
+						Ext.getCmp('chbPrintFirstRecharge_checkbox_member').hide();
+						Ext.getCmp('chbSendFirstCharge_checkbox_member').hide();					
 					}				
 				}else{
 					memberType.setValue();
 				}
 				
 			}
-			Ext.getCmp('panelControlMemberContent').doLayout();
+			Ext.getCmp('panelControlMemberContent_panel_member').doLayout();
 			
 		}else if(c.type.toUpperCase() == Ext.ux.otype['get'].toUpperCase()){
 			data = {
@@ -1531,14 +1531,14 @@ Ext.onReady(function(){
 			Ext.example.msg('提示', '操作失败, 获取请求类型失败, 请尝试刷新页面后重试.');
 			return;
 		}
-		var membetType = Ext.getCmp('cm_comboMemberType');
-		var memberName = Ext.getCmp('cm_txtMemberName');
-		var memberMobile = Ext.getCmp('cm_txtMemberMobile');
-		var memberSex = Ext.getCmp('cm_comboMemberSex');
-		var birthday = Ext.getCmp('cm_dateMemberBirthday');
-		var firstCharge = Ext.getCmp('cm_numFirstCharge');
-		var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');
-		var rechargeType = Ext.getCmp('rd_comboFirstRechargeType');
+		var membetType = Ext.getCmp('comboMemberType_combo_member');
+		var memberName = Ext.getCmp('txtMemberName_text_member');
+		var memberMobile = Ext.getCmp('txtMemberMobile_text_member');
+		var memberSex = Ext.getCmp('comboMemberSex_combo_member');
+		var birthday = Ext.getCmp('dateMemberBirthday_dataField_member');
+		var firstCharge = Ext.getCmp('numFirstCharge_numberField_member');
+		var firstActualCharge = Ext.getCmp('numFirstActualCharge_numberField_member');
+		var rechargeType = Ext.getCmp('comboFirstRechargeType_combo_member');
 		
 		if(!memberName.isValid() || !membetType.isValid() || !memberSex.isValid()){
 			return;
@@ -1551,12 +1551,12 @@ Ext.onReady(function(){
 			url : '../../OperateMember.do',                                                                            
 			params : {
 				dataSource : memberBasicWin.otype.toLowerCase(),
-				id : Ext.getCmp('cm_numberMemberId').getValue(),
+				id : Ext.getCmp('numberMemberId_member').getValue(),
 				name : memberName.getValue(),
 				mobile : memberMobile.getValue(),
 				memberTypeId : membetType.getValue(),
 				sex : memberSex.getValue(),
-				memberCard :Ext.getCmp('cm_numberMemberCard').getValue(),
+				memberCard :Ext.getCmp('numberMemberCard_numberField_member').getValue(),
 				birthday : birthday.getValue() ? birthday.getValue().format('Y-m-d') : '',
 				firstCharge : firstCharge.getValue(),
 				firstActualCharge : firstActualCharge.getValue(),
@@ -1583,7 +1583,7 @@ Ext.onReady(function(){
 	}
 
 	function focusToAddMember(){
-		Ext.getCmp('cm_txtMemberName').focus(true, 100);
+		Ext.getCmp('txtMemberName_text_member').focus(true, 100);
 	}
 
 	//----------------
@@ -1735,7 +1735,7 @@ Ext.onReady(function(){
 		columnWidth : 1,
 		items : [{
 			xtype : 'combo',
-			id : 'comboDiscount',
+			id : 'comboDiscount_combo_member',
 			fieldLabel : '默认方案' + Ext.ux.txtFormat.xh,
 			forceSelection : true,
 			allowBlank : false,
@@ -1771,7 +1771,7 @@ Ext.onReady(function(){
 		columnWidth : 1,
 		items : [{
 			xtype : 'combo',
-			id : 'comboDefaultPricePlan',
+			id : 'comboDefaultPricePlan_combo_member',
 			fieldLabel : '默认方案' + Ext.ux.txtFormat.xh,
 			forceSelection : true,
 			allowBlank : false,
@@ -1823,11 +1823,11 @@ Ext.onReady(function(){
 					},
 					items : [{
 						xtype : 'hidden',
-						id : 'numTypeID',
+						id : 'numTypeID_member',
 						fieldLabel : '类型编号'
 					}, {
 						xtype : 'textfield',
-						id : 'txtTypeName',
+						id : 'txtTypeName_textField_member',
 						fieldLabel : '类型名称' + Ext.ux.txtFormat.xh,
 						allowBlank : false,
 						blankText : '类型名称不能为空.',
@@ -1855,7 +1855,7 @@ Ext.onReady(function(){
 					    	labelWidth : 65,
 					    	items : [{
 								xtype : "radio",
-								id : 'rdoMemberType4Charge',
+								id : 'rdoMemberType4Charge_radio_member',
 								name : "radioMemberType",
 								boxLabel : '充值' , 
 								hideLabel : true,
@@ -1864,10 +1864,10 @@ Ext.onReady(function(){
 								listeners : {
 									render : function(e){
 //										Ext.ux.checkPaddingTop(e);
-										Ext.getDom('rdoMemberType4Charge').onclick = function(){
+										Ext.getDom('rdoMemberType4Charge_radio_member').onclick = function(){
 											e.setValue(true);
-											Ext.getCmp('numChargeRate').setValue(1.0);
-											Ext.getCmp('numChargeRate').setDisabled(false);											
+											Ext.getCmp('numChargeRate_numberField_member').setValue(1.0);
+											Ext.getCmp('numChargeRate_numberField_member').setDisabled(false);											
 											m_memberTypeWin.s_memberType = e.inputValue;
 										};
 									}
@@ -1879,7 +1879,7 @@ Ext.onReady(function(){
 					    	labelWidth : 65,
 					    	items : [{
 								xtype : "radio", 
-								id : 'rdoMemberType4Piont',
+								id : 'rdoMemberType4Piont_radio_member',
 								name : "radioMemberType",
 								boxLabel : '积分' , 
 								hideLabel : true, 
@@ -1887,10 +1887,10 @@ Ext.onReady(function(){
 								listeners : {
 									render : function(e){
 //										Ext.ux.checkPaddingTop(e);
-										Ext.getDom('rdoMemberType4Piont').onclick = function(){
+										Ext.getDom('rdoMemberType4Piont_radio_member').onclick = function(){
 											e.setValue(true);
-											Ext.getCmp('numChargeRate').setValue(0);
-											Ext.getCmp('numChargeRate').setDisabled(true);										
+											Ext.getCmp('numChargeRate_numberField_member').setValue(0);
+											Ext.getCmp('numChargeRate_numberField_member').setDisabled(true);										
 											m_memberTypeWin.s_memberType = e.inputValue;
 										};
 									}
@@ -1901,7 +1901,7 @@ Ext.onReady(function(){
 						
 					}, {
 						xtype : 'numberfield',
-						id : 'numExchangeRate',
+						id : 'numExchangeRate_numberField_member',
 						fieldLabel : '积分比率' + Ext.ux.txtFormat.xh,
 						value : 1.0,
 						minValue : 0.00,
@@ -1915,7 +1915,7 @@ Ext.onReady(function(){
 						text : '输入 1.5, 表示消费 100 元兑换 150 积分'
 					}, {
 						xtype : 'numberfield',
-						id : 'numInitialPoint',
+						id : 'numExchangeRate_numberField_member',
 						fieldLabel : '初始积分' + Ext.ux.txtFormat.xh,
 						value : 1,
 						minValue : 0.00,
@@ -1935,7 +1935,7 @@ Ext.onReady(function(){
 					}*/
 					, {
 						xtype : 'numberfield',
-						id : 'numChargeRate',
+						id : 'numChargeRate_numberField_member',
 						fieldLabel : '充值比率' + Ext.ux.txtFormat.xh,
 						value : 1.00,
 						minValue : 0.00,
@@ -1953,7 +1953,7 @@ Ext.onReady(function(){
 					},{
 						xtype : 'panel',
 						layout : 'column',
-						id : 'formMemberDiscount',
+						id : 'formMemberDiscount_panel_member',
 						frame : true,
 						width : 255,
 						defaults : {
@@ -1972,7 +1972,7 @@ Ext.onReady(function(){
 					},{
 						xtype : 'panel',
 						layout : 'column',
-						id : 'formMemberPricePlan',
+						id : 'formMemberPricePlan_panel_member',
 						frame : true,
 						width : 255,
 						defaults : {
@@ -1994,24 +1994,24 @@ Ext.onReady(function(){
 					}, {
 						xtype : 'textarea',
 						height : 40,
-						id : 'txtCommentForMemberType',
+						id : 'txtCommentForMemberType_area_member',
 						fieldLabel : '特权说明'
 					}]
 				}],
 				bbar : ['->', {
 					text : '保存',
-					id : 'btnSaveMemberType',
+					id : 'btnSaveMemberType_btn_member',
 					iconCls : 'btn_save',
 					handler : function(e){
-						var typeID = Ext.getCmp('numTypeID');
-						var typeName = Ext.getCmp('txtTypeName');
-						var chargeRate = Ext.getCmp('numChargeRate');
-						var exchangeRate = Ext.getCmp('numExchangeRate');
-						var initialPoint = Ext.getCmp('numInitialPoint');
-						var discount = Ext.getCmp('comboDiscount');
-						var pricePlan = Ext.getCmp('comboDefaultPricePlan');
+						var typeID = Ext.getCmp('numTypeID_member');
+						var typeName = Ext.getCmp('txtTypeName_textField_member');
+						var chargeRate = Ext.getCmp('numChargeRate_numberField_member');
+						var exchangeRate = Ext.getCmp('numExchangeRate_numberField_member');
+						var initialPoint = Ext.getCmp('numExchangeRate_numberField_member');
+						var discount = Ext.getCmp('comboDiscount_combo_member');
+						var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
 						var attribute = m_memberTypeWin.s_memberType;
-						var desc = Ext.getCmp('txtCommentForMemberType');
+						var desc = Ext.getCmp('txtCommentForMemberType_area_member');
 						
 						if(!typeName.isValid() || !chargeRate.isValid() || !exchangeRate.isValid() 
 								|| !initialPoint.isValid() || !discount.isValid()){
@@ -2031,8 +2031,8 @@ Ext.onReady(function(){
 							
 						}
 						
-						var save = Ext.getCmp('btnSaveMemberType');
-						var close = Ext.getCmp('btnCloseMemberType');
+						var save = Ext.getCmp('btnSaveMemberType_btn_member');
+						var close = Ext.getCmp('btnCloseMemberType_btn_member');
 						
 						save.setDisabled(true);
 						close.setDisabled(true);
@@ -2058,7 +2058,7 @@ Ext.onReady(function(){
 								if(jr.success){
 									Ext.example.msg(jr.title, jr.msg);
 									m_memberTypeWin.hide();
-									Ext.getCmp('btnRefreshMemberType').handler();
+									Ext.getCmp('btnRefreshMemberType_btn_member').handler();
 									member_loadMemberTypeChart();
 								}else{
 									Ext.ux.showMsg(jr);								
@@ -2075,11 +2075,11 @@ Ext.onReady(function(){
 					}
 				}, {
 					text : '关闭',
-					id : 'btnCloseMemberType',
+					id : 'btnCloseMemberType_btn_member',
 					iconCls : 'btn_close',
 					handler : function(e){
 						m_memberTypeWin.hide();
-						Ext.getCmp('txtTypeName').enable();
+						Ext.getCmp('txtTypeName_textField_member').enable();
 					}
 				}],
 				listeners : {
@@ -2096,23 +2096,23 @@ Ext.onReady(function(){
 									inputValue :  discountData[i].discountID,
 									listeners : {
 										focus : function(){
-											Ext.getCmp('comboDiscount').setValue();
-											Ext.getCmp('comboDiscount').clearInvalid();
+											Ext.getCmp('comboDiscount_combo_member').setValue();
+											Ext.getCmp('comboDiscount_combo_member').clearInvalid();
 										},
 										check : function(){
-											Ext.getCmp('comboDiscount').setValue();
-											Ext.getCmp('comboDiscount').clearInvalid();
+											Ext.getCmp('comboDiscount_combo_member').setValue();
+											Ext.getCmp('comboDiscount_combo_member').clearInvalid();
 										}
 									}
 								}]};
-								Ext.getCmp('formMemberDiscount').add(c);
+								Ext.getCmp('formMemberDiscount_panel_member').add(c);
 								//solveIE自动换行时格式错乱
 								if((i+1)%6 == 0){
-									Ext.getCmp('formMemberDiscount').add({columnWidth : 1});
+									Ext.getCmp('formMemberDiscount_panel_member').add({columnWidth : 1});
 								}
-								Ext.getCmp('formMemberDiscount').doLayout();
+								Ext.getCmp('formMemberDiscount_panel_member').doLayout();
 							}
-							Ext.getCmp('formMemberDiscount').add(defaultMemberTypeDiscount);
+							Ext.getCmp('formMemberDiscount_panel_member').add(defaultMemberTypeDiscount);
 						}
 						
 						if(pricePlanData.length > 0 && document.getElementsByName('memberPricePlan').length == 0){
@@ -2125,26 +2125,26 @@ Ext.onReady(function(){
 									inputValue :  pricePlanData[i].id,
 									listeners : {
 										focus : function(){
-											Ext.getCmp('comboDefaultPricePlan').setValue();
-											Ext.getCmp('comboDefaultPricePlan').clearInvalid();
+											Ext.getCmp('comboDefaultPricePlan_combo_member').setValue();
+											Ext.getCmp('comboDefaultPricePlan_combo_member').clearInvalid();
 										},
 										check : function(){
-											Ext.getCmp('comboDefaultPricePlan').setValue();
-											Ext.getCmp('comboDefaultPricePlan').clearInvalid();
+											Ext.getCmp('comboDefaultPricePlan_combo_member').setValue();
+											Ext.getCmp('comboDefaultPricePlan_combo_member').clearInvalid();
 										}
 									}
 								}]};
-								Ext.getCmp('formMemberPricePlan').add(c);
+								Ext.getCmp('formMemberPricePlan_panel_member').add(c);
 								//solveIE自动换行时格式错乱
 								if((i+1)%6 == 0){
-									Ext.getCmp('formMemberPricePlan').add({columnWidth : 1});
+									Ext.getCmp('formMemberPricePlan_panel_member').add({columnWidth : 1});
 								}
 							}
-							Ext.getCmp('formMemberPricePlan').add(defaultMemberTypePricePlan);		
-//							Ext.getCmp('formMemberPricePlan').syncSize();
-							Ext.getCmp('formMemberPricePlan').doLayout();
+							Ext.getCmp('formMemberPricePlan_panel_member').add(defaultMemberTypePricePlan);		
+//							Ext.getCmp('formMemberPricePlan_panel_member').syncSize();
+							Ext.getCmp('formMemberPricePlan_panel_member').doLayout();
 						}else{
-							Ext.getCmp('formMemberPricePlan').hide();
+							Ext.getCmp('formMemberPricePlan_panel_member').hide();
 						}						
 						
 					},
@@ -2162,19 +2162,19 @@ Ext.onReady(function(){
 								pricePlans[i].checked = false;
 							}
 						}
-						Ext.getCmp('formMemberPricePlan').removeAll();
+						Ext.getCmp('formMemberPricePlan_panel_member').removeAll();
 					}
 				},
 				keys : [{
 					key : Ext.EventObject.ENTER,
 					fn : function(){
-						Ext.getCmp('btnSaveMemberType').handler();
+						Ext.getCmp('btnSaveMemberType_btn_member').handler();
 					},
 					scope : this
 				}, {
 					key : Ext.EventObject.ESC,
 					fn : function(){
-						Ext.getCmp('btnCloseMemberType').handler();
+						Ext.getCmp('btnCloseMemberType_btn_member').handler();
 					},
 					scope : this
 				}]
@@ -2201,14 +2201,14 @@ Ext.onReady(function(){
 	};
 
 	function bindMemberTypeData(d){
-		var typeID = Ext.getCmp('numTypeID');
-		var typeName = Ext.getCmp('txtTypeName');
-		var chargeRate = Ext.getCmp('numChargeRate');
-		var exchangeRate = Ext.getCmp('numExchangeRate');
-		var initialPoint = Ext.getCmp('numInitialPoint');
-		var discount = Ext.getCmp('comboDiscount');
-		var pricePlan = Ext.getCmp('comboDefaultPricePlan');
-		var desc = Ext.getCmp('txtCommentForMemberType');
+		var typeID = Ext.getCmp('numTypeID_member');
+		var typeName = Ext.getCmp('txtTypeName_textField_member');
+		var chargeRate = Ext.getCmp('numChargeRate_numberField_member');
+		var exchangeRate = Ext.getCmp('numExchangeRate_numberField_member');
+		var initialPoint = Ext.getCmp('numExchangeRate_numberField_member');
+		var discount = Ext.getCmp('comboDiscount_combo_member');
+		var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
+		var desc = Ext.getCmp('txtCommentForMemberType_area_member');
 		
 		typeID.setValue(d['memberTypeId']);
 		typeName.setValue(d['memberTypeName']);
@@ -2220,12 +2220,12 @@ Ext.onReady(function(){
 		initialPoint.setValue(typeof d['initialPoint'] != 'undefined' ? d['initialPoint'] : 0);
 		
 		if(typeof d['attributeValue'] == 'undefined'){
-			Ext.getDom('rdoMemberType4Charge').onclick();
+			Ext.getDom('rdoMemberType4Charge_radio_member').onclick();
 		}else{
 			if(d['attributeValue'] == 0){
-				Ext.getDom('rdoMemberType4Charge').onclick();
+				Ext.getDom('rdoMemberType4Charge_radio_member').onclick();
 			}else if(d['attributeValue'] == 1){
-				Ext.getDom('rdoMemberType4Piont').onclick();
+				Ext.getDom('rdoMemberType4Piont_radio_member').onclick();
 			}
 		}
 		chargeRate.setValue(d['chargeRate']);
@@ -2269,7 +2269,7 @@ Ext.onReady(function(){
 			m_memberTypeWin.setTitle('添加会员类型');
 			m_memberTypeWin.show();
 			m_memberTypeWin.center();
-			Ext.getCmp('txtTypeName').focus(true, 100);
+			Ext.getCmp('txtTypeName_textField_member').focus(true, 100);
 			
 			bindMemberTypeData({
 				discountType : 0,
@@ -2296,7 +2296,7 @@ Ext.onReady(function(){
 					}
 				}
 			}
-			Ext.getCmp('comboDiscount').store.loadData(sd.attributes['discounts']);
+			Ext.getCmp('comboDiscount_combo_member').store.loadData(sd.attributes['discounts']);
 			
 			
 			var pricePlans = document.getElementsByName('memberPricePlan');
@@ -2308,8 +2308,8 @@ Ext.onReady(function(){
 				}
 			}	
 			
-			if(Ext.getCmp('comboDefaultPricePlan')){
-				Ext.getCmp('comboDefaultPricePlan').store.loadData(sd.attributes['pricePlans']);
+			if(Ext.getCmp('comboDefaultPricePlan_combo_member')){
+				Ext.getCmp('comboDefaultPricePlan_combo_member').store.loadData(sd.attributes['pricePlans']);
 			}
 			
 			bindMemberTypeData(sd.attributes);
@@ -2337,7 +2337,7 @@ Ext.onReady(function(){
 								var jr = Ext.decode(res.responseText);
 								if(jr.success){
 									Ext.example.msg(jr.title, jr.msg);
-									Ext.getCmp('btnRefreshMemberType').handler();
+									Ext.getCmp('btnRefreshMemberType_btn_member').handler();
 									member_loadMemberTypeChart();
 								}else{
 									Ext.ux.showMsg(jr);
@@ -2412,7 +2412,7 @@ Ext.onReady(function(){
 				id : 'btn_memberLevelAdd',
 				iconCls : 'btn_save',
 				handler : function(){
-					var pointThreshold = Ext.getCmp('txtPointThreshold');
+					var pointThreshold = Ext.getCmp('txtPointThreshold_numberfield_member');
 					var combo_memberTypeId = Ext.getCmp('combo_memberLevel_mType');
 					
 					if(!pointThreshold.isValid() || !combo_memberTypeId.isValid()){
@@ -2421,7 +2421,7 @@ Ext.onReady(function(){
 					Ext.Ajax.request({
 						url : '../../OperateMemberLevel.do',
 						params : {
-							id : Ext.getCmp('txtMemberLevelId').getValue(),
+							id : Ext.getCmp('txtMemberLevelId_text_member').getValue(),
 							pointThreshold : pointThreshold.getValue(),
 							memberTypeId : combo_memberTypeId.getValue(),
 							dataSource : memberLevelAddWin.otype
@@ -2495,7 +2495,7 @@ Ext.onReady(function(){
 				items : [{
 					xtype : 'numberfield',
 					fieldLabel : '等级积分',
-					id : 'txtPointThreshold',
+					id : 'txtPointThreshold_numberfield_member',
 					allowBlank : false,
 					width : 130,
 					validator : function(v){
@@ -2525,7 +2525,7 @@ Ext.onReady(function(){
 					allowBlank : false
 				}, {
 					xtype : 'hidden',
-					id : 'txtMemberLevelId'
+					id : 'txtMemberLevelId_text_member'
 				}]
 			}]
 		});
@@ -2604,9 +2604,9 @@ Ext.onReady(function(){
 			return;
 		}
 		var data = {};
-		var pointThreshold = Ext.getCmp('txtPointThreshold');
+		var pointThreshold = Ext.getCmp('txtPointThreshold_numberfield_member');
 		var combo_memberTypeId = Ext.getCmp('combo_memberLevel_mType');
-		var memberLevelId = Ext.getCmp('txtMemberLevelId');
+		var memberLevelId = Ext.getCmp('txtMemberLevelId_text_member');
 		if(c.type.toUpperCase() == Ext.ux.otype['set'].toUpperCase()){
 			data = c.data;
 			pointThreshold.setValue(data['pointThreshold']);
@@ -2878,7 +2878,7 @@ Ext.onReady(function(){
 		
 		var member_beginDate = new Ext.form.DateField({
 			xtype : 'datefield',	
-			id : 'dateSearchDateBegin',
+			id : 'dateSearchDateBegin_data_member',
 			format : 'Y-m-d',
 			width : 100,
 			maxValue : new Date(),
@@ -2959,7 +2959,6 @@ Ext.onReady(function(){
 				{
 					xtype : 'label',
 					hidden : false,
-					id : 'tbtextDisplanZ',
 					text : ' 至 '
 				}, 
 				member_endDate,
@@ -2967,7 +2966,7 @@ Ext.onReady(function(){
 				{xtype : 'tbtext', text : '消费金额:'},
 				{
 					xtype : 'numberfield',
-					id : 'textTotalMinMemberCost',
+					id : 'textTotalMinMemberCost_numberField_member',
 					width : 60
 				},
 				{
@@ -2976,14 +2975,14 @@ Ext.onReady(function(){
 				},			
 				{
 					xtype : 'numberfield',
-					id : 'textTotalMaxMemberCost',
+					id : 'textTotalMaxMemberCost_numberField_member',
 					width : 60
 				},
 				{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
 				{xtype : 'tbtext', text : '消费次数:'},
 				{
 					xtype : 'numberfield',
-					id : 'textTotalMinMemberCostCount',
+					id : 'textTotalMinMemberCostCount_numberField_member',
 					width : 50
 				},
 				{
@@ -2992,14 +2991,14 @@ Ext.onReady(function(){
 				},			
 				{
 					xtype : 'numberfield',
-					id : 'textTotalMaxMemberCostCount',
+					id : 'textTotalMaxMemberCostCount_numberField_member',
 					width : 50
 				},
 				{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
 				{xtype : 'tbtext', text : '余额:'},
 				{
 					xtype : 'numberfield',
-					id : 'textMemberMinBalance',
+					id : 'textMemberMinBalance_numberField_member',
 					width : 50
 				},
 				{
@@ -3008,7 +3007,7 @@ Ext.onReady(function(){
 				},				
 				{
 					xtype : 'numberfield',
-					id : 'textMemberMaxBalance',
+					id : 'textMemberMaxBalance_numberField_member',
 					width : 60
 				},{
 					xtype : 'tbtext',
@@ -3139,20 +3138,20 @@ Ext.onReady(function(){
 		    		memberBasicGrid.doLayout();//重新布局 	
 		    		
 		    		//日期清空
-		    		Ext.getCmp('dateSearchDateBegin').setValue('');
+		    		Ext.getCmp('dateSearchDateBegin_data_member').setValue('');
 		    		Ext.getCmp('dateSearchDateEnd').setValue('');	    		
 		    		
 		    		//消费金额清空
-		    		Ext.getCmp('textTotalMinMemberCost').setValue('');
-		    		Ext.getCmp('textTotalMaxMemberCost').setValue('');
+		    		Ext.getCmp('textTotalMinMemberCost_numberField_member').setValue('');
+		    		Ext.getCmp('textTotalMaxMemberCost_numberField_member').setValue('');
 		    		
 		    		//消费次数清空
-		    		Ext.getCmp('textTotalMinMemberCostCount').setValue('');
-		    		Ext.getCmp('textTotalMaxMemberCostCount').setValue('');
+		    		Ext.getCmp('textTotalMinMemberCostCount_numberField_member').setValue('');
+		    		Ext.getCmp('textTotalMaxMemberCostCount_numberField_member').setValue('');
 		    		
 		    		//清空余额
-		    		Ext.getCmp('textMemberMinBalance').setValue('=');
-		    		Ext.getCmp('textMemberMaxBalance').setValue('');
+		    		Ext.getCmp('textMemberMinBalance_numberField_member').setValue('=');
+		    		Ext.getCmp('textMemberMaxBalance_numberField_member').setValue('');
 		    		
 		    		//设置按创建时间排序
 		    		Ext.getCmp('searchOrderBy_radio_member').setValue(true);
@@ -3180,13 +3179,13 @@ Ext.onReady(function(){
 					}
 					
 					gs.baseParams['memberCardOrMobileOrName'] = Ext.getCmp('numberSearchByMemberPhoneOrCardOrName').getValue();
-					gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('textTotalMinMemberCost').getValue();
-					gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('textTotalMaxMemberCost').getValue();
-					gs.baseParams['consumptionMinAmount'] = Ext.getCmp('textTotalMinMemberCostCount').getValue();
-					gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('textTotalMaxMemberCostCount').getValue();
-					gs.baseParams['memberMinBalance'] = Ext.getCmp('textMemberMinBalance').getValue();
-					gs.baseParams['memberMaxBalance'] = Ext.getCmp('textMemberMaxBalance').getValue();
-					gs.baseParams['beginDate'] = Ext.getCmp('dateSearchDateBegin').getValue();
+					gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('textTotalMinMemberCost_numberField_member').getValue();
+					gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('textTotalMaxMemberCost_numberField_member').getValue();
+					gs.baseParams['consumptionMinAmount'] = Ext.getCmp('textTotalMinMemberCostCount_numberField_member').getValue();
+					gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('textTotalMaxMemberCostCount_numberField_member').getValue();
+					gs.baseParams['memberMinBalance'] = Ext.getCmp('textMemberMinBalance_numberField_member').getValue();
+					gs.baseParams['memberMaxBalance'] = Ext.getCmp('textMemberMaxBalance_numberField_member').getValue();
+					gs.baseParams['beginDate'] = Ext.getCmp('dateSearchDateBegin_data_member').getValue();
 					gs.baseParams['endDate'] = Ext.getCmp('dateSearchDateEnd').getValue();
 					gs.baseParams['needSum'] = true;
 					gs.baseParams['orderBy'] = m_searchAdditionFilter;
@@ -3279,7 +3278,7 @@ Ext.onReady(function(){
 				text : '重置',
 				iconCls : 'btn_refresh',
 				handler : function(e){
-					Ext.getCmp('btnRefreshMemberType').handler();
+					Ext.getCmp('btnRefreshMemberType_btn_member').handler();
 					Ext.getCmp('searchMember_btn_member').handler();
 					var st = Ext.getCmp('mr_comboMemberSearchType');
 					st.setValue(0);
@@ -3316,12 +3315,12 @@ Ext.onReady(function(){
 						'ExportHistoryStatisticsToExecl.do', 
 						memberType,
 						Ext.getCmp('numberSearchByMemberPhoneOrCardOrName').getValue(),
-						Ext.getCmp('textTotalMinMemberCost').getValue(),
-						Ext.getCmp('textTotalMaxMemberCost').getValue(),
-						Ext.getCmp('textTotalMinMemberCostCount').getValue(),
-						Ext.getCmp('textTotalMaxMemberCostCount').getValue(),
-						Ext.getCmp('textMemberMinBalance').getValue(),
-						Ext.getCmp('textMemberMaxBalance').getValue(),
+						Ext.getCmp('textTotalMinMemberCost_numberField_member').getValue(),
+						Ext.getCmp('textTotalMaxMemberCost_numberField_member').getValue(),
+						Ext.getCmp('textTotalMinMemberCostCount_numberField_member').getValue(),
+						Ext.getCmp('textTotalMaxMemberCostCount_numberField_member').getValue(),
+						Ext.getCmp('textMemberMinBalance_numberField_member').getValue(),
+						Ext.getCmp('textMemberMaxBalance_numberField_member').getValue(),
 						m_searchAdditionFilter,
 						'memberList'
 					);

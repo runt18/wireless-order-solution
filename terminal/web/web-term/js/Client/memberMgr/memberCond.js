@@ -617,8 +617,8 @@ Ext.onReady(function(){
 									var store = memberCondBasicGrid.getStore();
 									var amount = store.getCount();
 									if(selected.length != 0){
-										Ext.MessageBox.confirm('警示框', '您共发送【'+ amount + '】张优惠券,优惠券类型是:【'+ couponName.join(',') 
-												+'】,发送的会员类型是 :【' + clickTree + '】', function(btn){
+										Ext.MessageBox.confirm('警示框', '您共发送【'+ amount + '张优惠券】，优惠券类型是:【'+ couponName.join(',') 
+												+'】，发送的会员类型是 :【' + clickTree + '】', function(btn){
 													if(btn == 'yes'){
 														Ext.Ajax.request({
 															url : '../../OperateCoupon.do',
