@@ -2,8 +2,6 @@
 
 var Request = new common_urlParaQuery();
 var rid = Request["rid"];
-//rid = 40;
-//var basePath = "http://localhost:8080";
 var basePath = "http://wx.e-tones.net";
 
 /**
@@ -41,8 +39,8 @@ var floatBarNodeId = "";
 var nodey=0,barX=500, barY=800;
 //var menuTree_obj = {treeId : 'weixinMenuTree', option : [{name:'修改', fn:"floatBarUpdateHandler()"},{name:'删除', fn:"alert(2222)"}]};
 //悬浮操作内容
-var menuTree_obj = {treeId : 'weixinMenuTree',operateTree:Ext.ux.operateTree_weixinMenu, mult : [{m_type : 1, option :[{name:'添加子菜单', fn:"addChildMenu()"},{name:'修改', fn:"floatBarUpdateHandler()"},{name:'删除', fn:"deleteMenu()"}]}, 
-                                          											{m_type : 2, option :[{name:'修改', fn:"floatBarUpdateHandler()"},{name:'删除', fn:"deleteMenu()"}]},
+var menuTree_obj = {treeId : 'weixinMenuTree',operateTree:Ext.ux.operateTree_weixinMenu, mult : [{m_type : 1, option :[{name:'添加子菜单', fn : addChildMenu },{name:'修改', fn : floatBarUpdateHandler },{name:'删除', fn : deleteMenu}]}, 
+                                          											{m_type : 2, option :[{name:'修改', fn : floatBarUpdateHandler },{name:'删除', fn : deleteMenu }]}
                                           											]};
 
 var tree,tabs, updateDeptWin, p_box, imgFile,centerPanel,
@@ -1211,7 +1209,7 @@ Ext.onReady(function(){
 					width : 400,
 					frame : true,
 					defaults : {
-						layout : 'form',
+						layout : 'form'
 					},
 					items : [{
 						columnWidth: 1,
@@ -1327,7 +1325,7 @@ Ext.onReady(function(){
  	    },{
  	    	id : "tab_click",
  	        contentEl:'textReplyBox',
- 	        title: '文字', 
+ 	        title: '文字'
  	        //iconCls : 'tab_home'
  	    },{
  	    	id : 'tab_view',
