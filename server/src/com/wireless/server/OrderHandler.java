@@ -14,9 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.marker.weixin.api.Template;
-import org.marker.weixin.api.Token;
-import org.marker.weixin.api.Template.Keyword;
+import org.marker.weixin.api.BaseAPI;
 
 import com.alibaba.fastjson.JSON;
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
@@ -38,7 +36,6 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.DeviceDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.order.WxOrderDao;
-import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
 import com.wireless.exception.IOError;
@@ -72,9 +69,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Device;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
-import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.weixin.order.WxOrder;
-import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.print.content.ContentParcel;
 import com.wireless.print.content.concrete.FoodDetailContent;
 import com.wireless.print.scheme.JobContentFactory;
@@ -605,41 +600,10 @@ class OrderHandler implements Runnable{
 				printHandler.process(JobContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, staff, printers, lastOperation));
 				
 				//Perform to send the weixin msg to member.
-				final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
-				if(wxRestaurant.hasPaymentTemplate() && wxRestaurant.hasQrCode()){
-					final String serial = MemberDao.getById(staff, order.getMemberId()).getWeixin().getSerial();
-					WirelessSocketServer.threadPool.execute(new Runnable(){
-						@Override
-						public void run() {
-							/** 模板信息
-							 	{{first.DATA}}
-								消费金额：{{keyword1.DATA}}
-								消费门店：{{keyword2.DATA}}
-								获得积分：{{keyword3.DATA}}
-								当前积分：{{keyword4.DATA}}
-								当前余额：{{keyword5.DATA}}
-								{{remark.DATA}
-							 */
-							try {
-								//String appId = "wx6fde9cd2c7fc791e";
-								//String appSecret = "0a360a43b80e3a334e5e52da706a3134";
-								//final Token token = Token.newInstance(appId, appSecret);
-								final Token token = Token.newInstance(wxRestaurant.getWeixinAppId(), wxRestaurant.getWeixinAppSecret());
-								Template.send(token, new Template.Builder()
-										.setToUser(serial)
-										//.setToUser("odgTwt4tqd_mu-q9EY02rqHrp_M0")
-										.setTemplateId(wxRestaurant.getPaymentTemplate())
-										.addKeyword(new Keyword("first", "您好，消费已成功"))
-										.addKeyword(new Keyword("keyword1", NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(lastOperation.getPayMoney())))
-										.addKeyword(new Keyword("keyword2", wxRestaurant.getNickName()))
-										.addKeyword(new Keyword("keyword3", Integer.toString(lastOperation.getDeltaPoint())))
-										.addKeyword(new Keyword("keyword4", Integer.toString(lastOperation.getRemainingPoint())))
-										.addKeyword(new Keyword("keyword5", NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(lastOperation.getRemainingTotalMoney()))));
-							} catch (IOException ignored) {
-								ignored.printStackTrace();
-							}
-						}
-					});
+				try {
+					BaseAPI.doPost("http://ts.e-tones.net/wx-term/WxNotifyMember.do?dataSource=bill&orderId=" + order.getId() + "&staffId=" + staff.getId(), "");
+				} catch (Exception ignored) {
+					ignored.printStackTrace();
 				}
 				
 				//Perform SMS notification to member coupon dispatch & member upgrade in another thread so that not affect the order payment.
