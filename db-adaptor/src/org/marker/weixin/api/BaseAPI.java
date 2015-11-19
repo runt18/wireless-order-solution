@@ -83,7 +83,7 @@ public final class BaseAPI {
 	            content = bos.toString("UTF-8");
 	            
 	        } else {
-	            throw new IOException("error code is " + response.getStatusLine().getStatusCode());
+	            throw new IOException(response.getStatusLine().getStatusCode() + " : " + response.getStatusLine().getReasonPhrase());
 	        }
 			
 			return content;

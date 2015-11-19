@@ -302,6 +302,71 @@ public class WxMemberDao {
 	}
 	
 	/**
+	 * Get the weixin member to specific member id.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberId
+	 * 			the member id associated with this weixin member
+	 * @return the weixin member associated with this member id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the weixin member to this member id does NOT exist 
+	 */
+	public static WxMember getByMember(Staff staff, int memberId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByMember(dbCon, staff, memberId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the weixin member to specific member id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberId
+	 * 			the member id associated with this weixin member
+	 * @return the weixin member associated with this member id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the weixin member to this member id does NOT exist 
+	 */
+	public static WxMember getByMember(DBCon dbCon, Staff staff, int memberId) throws SQLException, BusinessException{
+		List<WxMember> result = getByCond(dbCon, staff, new ExtraCond().setMember(memberId));
+		if(result.isEmpty()){
+			throw new BusinessException(WxMemberError.WEIXIN_INFO_NOT_EXIST);
+		}else{
+			return result.get(0);
+		}
+	}
+	
+	/**
+	 * Get the weixin member according to extra condition {@link ExtraCond}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @return the result to weixin members
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<WxMember> getByCond(Staff staff, ExtraCond extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
 	 * Get the weixin member according to extra condition {@link ExtraCond}.
 	 * @param dbCon
 	 * 			the database connection
