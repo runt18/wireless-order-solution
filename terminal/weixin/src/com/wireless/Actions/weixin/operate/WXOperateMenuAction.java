@@ -123,7 +123,7 @@ public class WXOperateMenuAction extends DispatchAction {
 			Menu weixinMenu = JObject.parse(Menu.JSON_CREATOR, 0, menu);
 			WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(rid));
 			AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
-			System.out.println(weixinMenu.create(Token.newInstance(authorizerToken)));			
+			weixinMenu.create(Token.newInstance(authorizerToken));			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
