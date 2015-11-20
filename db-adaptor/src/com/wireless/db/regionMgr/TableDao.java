@@ -213,7 +213,7 @@ public class TableDao {
 			  " REGION.name AS region_name, REGION.region_id, " +
 			  " TBL.restaurant_id, TBL.table_id, TBL.table_alias, TBL.name AS tbl_name, TBL.category, TBL.minimum_cost, " +
 			  " O.custom_num, O.id, " + 
-			  " IF(O.temp_date IS NULL, 0, 1) AS temp_paid, " +
+			  " O.temp_date, O.temp_staff, " +
 			  " IF(O.status IS NULL, " + Table.Status.IDLE.getVal() + "," + Table.Status.BUSY.getVal() + ") AS tbl_status, " + 
 			  " IF(BT.table_id IS NULL, 0, 1 ) AS book_flag " +
 			  " FROM " + Params.dbName + ".table TBL " +
@@ -242,7 +242,10 @@ public class TableDao {
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			if(dbCon.rs.getInt("tbl_status") == Table.Status.BUSY.getVal()){
 				table.setStatus(Table.Status.BUSY);
-				table.setTempPaid(dbCon.rs.getBoolean("temp_paid"));
+				if(dbCon.rs.getTimestamp("temp_date") != null){
+					table.setTempDate(dbCon.rs.getTimestamp("temp_date").getTime());
+					table.setTempStaff(dbCon.rs.getString("temp_staff"));
+				}
 				table.setCategory(Category.valueOf(dbCon.rs.getInt("category")));
 				table.setCustomNum(dbCon.rs.getInt("custom_num"));
 				table.setOrderId(dbCon.rs.getInt("id"));
