@@ -104,17 +104,8 @@ $(function(){
 		}
 	});
 	
-	//进入餐台选择界面
-	$('#tableSelectMgr').on('pageshow', function(){
-		//清除快捷键
-		$(document).off('keydown');
-		//设置快捷键
-		$(document).on('keydown', function(event){
-			if(event.which == "107"){//加号
-				$('#searchTable_a_tableSelect').click();
-		    } 	
-		});
-		
+		//进入餐台选择界面
+	$('#tableSelectMgr').on('pagebeforeshow', function(){
 		$.ajax({
 			url : '../VerifyLogin.do',
 			success : function(data, status, xhr){
@@ -126,6 +117,18 @@ $(function(){
 					})();
 				}
 			}
+		});
+	});
+	
+	//进入餐台选择界面
+	$('#tableSelectMgr').on('pageshow', function(){
+		//清除快捷键
+		$(document).off('keydown');
+		//设置快捷键
+		$(document).on('keydown', function(event){
+			if(event.which == "107"){//加号
+				$('#searchTable_a_tableSelect').click();
+		    } 	
 		});
 
 	});
@@ -1950,9 +1953,7 @@ function initTableData(){
 				
 				showTable();
 				
-				Util.LM.hide();
 			}else{
-				Util.LM.hide();
 				Util.msg.alert({
 					title : data.title,
 					msg : data.msg,
@@ -1961,6 +1962,7 @@ function initTableData(){
 				});
 			}
 		}
+		Util.LM.hide();
 	});	
 	
 	//刷新餐台是刷新预订

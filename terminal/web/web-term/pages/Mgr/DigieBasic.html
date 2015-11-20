@@ -72,9 +72,6 @@ var sendToStatisticsPageBeginDate , sendToStatisticsPageEndDate, sendToPageOpera
 //月结等待
 var monthlySet = true;
 
-//会员右下角提示
-var memberTipWin;
-
 function addTab(id, title, url, callback){
  	if(tabs.items.length > 9){
 		tabs.remove(tabs.getComponent(1));
@@ -158,12 +155,6 @@ var tabs = new Ext.TabPanel({
     plugins: new Ext.ux.TabCloseMenu()
     
 });
-
-function page_tipHide(){
-	if($("#memberMgr") && $("#memberMgr").hasClass("x-hide-display")){
-		memberTipWin.hide('fast');
-	}
-}
 
 var wx = {info:{},sales:{}, logo:{}};
 Ext.onReady(function(){

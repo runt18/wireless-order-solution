@@ -1209,7 +1209,7 @@ Ext.onReady(function(){
 						id : 'memberReferrer_numfield_mmm',
 						fieldLabel : '推荐人',
 						disabled : true,
-						cls : 'disableInput',
+						cls : 'disableInput'
 					}]
 				}]
 			});		
@@ -2826,16 +2826,6 @@ Ext.onReady(function(){
 	Ext.getCmp('memberTypeLevelChartsPanel').getEl().setTop(memberBasicGrid.getHeight() * 0.35);
 	memberTypeTree.setHeight(memberBasicGrid.getHeight() * 0.35);
 	
-	memberTipWin = Ext.ux.ToastWindow({
-		width : 260,
-		height : 152,
-		html : '<div style="position:relative;background-color: whitesmoke;height :120px;" align="center">' +
-				'<br><p style="color: #f00;text-shadow: 1px 1px 0px #212121;font-size: 19px;">您可以对会员进行如下操作 : </p><br>' +
-				'<input type="button" value="发送优惠劵" class="operationBtn" style="margin-right:10px;" onclick="javascript:initMemberCouponWin();memberTipWin.hide();"/>' +
-				'<input  class="operationBtn" type="button" value="发送问候短信"/><br>' +
-				'<div style="position:absolute;left : 0; bottom: 3px;"><input id="chxMemberTip" type="checkbox" onclick="javascript:fnRemberTip()" />不再显示</div>'+
-			'</div>'
-	});
 	showFloatOption(memberMgr_obj);
 	
 	initAddLevelWin();
@@ -2850,7 +2840,7 @@ Ext.onReady(function(){
 			format : 'Y-m-d',
 			width : 100,
 			maxValue : new Date(),
-			readOnly : false,
+			readOnly : false
 		});
 		
 		var endBirthday = new Ext.form.DateField({
@@ -2882,7 +2872,7 @@ Ext.onReady(function(){
 			format : 'Y-m-d',
 			width : 100,
 			maxValue : new Date(),
-			readOnly : false,
+			readOnly : false
 //			allowBlank : false
 		});
 		var member_endDate = new Ext.form.DateField({
@@ -2891,7 +2881,7 @@ Ext.onReady(function(){
 			format : 'Y-m-d',
 			width : 100,
 			maxValue : new Date(),
-			readOnly : false,
+			readOnly : false
 //			allowBlank : false
 		});
 		var member_dateCombo = Ext.ux.createDateCombo({
@@ -3233,7 +3223,6 @@ Ext.onReady(function(){
 						}
 						
 						
-						//TODO
 						//绑定充值
 						$('#divMember').find('.addMoney_a_member').each(function(index, element){
 							element.onclick = function(){
