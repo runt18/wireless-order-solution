@@ -8,6 +8,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
 
 public class Table implements Parcelable, Comparable<Table>, Jsonable{
@@ -431,7 +432,8 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	private Category category = Category.NORMAL;;
 	private Status status = Status.IDLE;
 	private Region region;
-	private boolean tempPaidFlag = false;
+	private long tempDate;
+	private String tempStaff;
 	private boolean bookFlag = false;
 	
 	public Table(){
@@ -581,13 +583,28 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	public int getOrderId(){
 		return this.orderId;
 	}
-	
-	public boolean isTempPaid(){
-		return this.tempPaidFlag;
+
+	public void setTempStaff(String tempStaff){
+		this.tempStaff = tempStaff;
 	}
 	
-	public void setTempPaid(boolean onOff){
-		this.tempPaidFlag = onOff;
+	public String getTempStaff(){
+		if(this.tempStaff == null){
+			return "";
+		}
+		return this.tempStaff;
+	}
+	
+	public void setTempDate(long tempDate){
+		this.tempDate = tempDate;
+	}
+	
+	public long getTempDate(){
+		return this.tempDate;
+	}
+	
+	public boolean isTempPaid(){
+		return this.tempDate != 0;
 	}
 	
 	public boolean isBooked(){
@@ -710,6 +727,11 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		jm.putString("statusText", this.status.getDesc());
 		jm.putJsonable("region", this.region, 0);
 		jm.putBoolean("isTempPaid", this.isTempPaid());
+		if(isTempPaid()){
+			jm.putString("temp_date", DateUtil.format(this.tempDate, DateUtil.Pattern.DATE_TIME));
+			jm.putString("temp_staff", this.tempStaff);
+			jm.putBoolean("isTempPaidTimeout", System.currentTimeMillis() - this.tempDate > 10 * 3600 * 1000);
+		}
 		jm.putBoolean("isBook", this.bookFlag);
 		
 		return jm;
