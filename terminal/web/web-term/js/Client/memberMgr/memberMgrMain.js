@@ -3,8 +3,26 @@
 
 Ext.onReady(function(){
 	
-	var memberMgr_obj = {treeId : 'tree_memberTypeMgr', option : [{name:'修改', fn : updateMemberTypeHandler},{name:'删除', fn : deleteMemberTypeHandler}]};
-	var memberLevels, memberLevelDetail,memberTypeLevelChart;
+	var memberTypeData = {root:[]};
+	var discountData = [], pricePlanData = [];
+	var mtObj = {
+			operation : {
+				'insert' : 'INSERT',
+				'update' : 'UPDATE',
+				'delete' : 'DELETE'
+			}
+	};	
+		
+	var memberTypeTree = null;
+	var memberBasicGrid = null;
+	var memberBasicWin = null;
+	var adjustPointWin = null;
+	var memberCouponWin = null;
+	var m_memberTypeWin = null;
+	var m_searchAdditionFilter = 'create';
+	var memberLevels = null;
+	var memberLevelDetail = null;
+	var memberTypeLevelChart = null;
 	function insertMemberHandler(){
 		memberOperationHandler({
 			type : Ext.ux.otype['insert']
@@ -896,6 +914,7 @@ Ext.onReady(function(){
 		});
 		
 		memberTypeTree = new Ext.tree.TreePanel({
+			id : 'tree_memberTypeMgr',
 			title : '会员类型',
 //			region : 'west',
 			region : 'center',
@@ -2836,7 +2855,7 @@ Ext.onReady(function(){
 				'<div style="position:absolute;left : 0; bottom: 3px;"><input id="chxMemberTip" type="checkbox" onclick="javascript:fnRemberTip()" />不再显示</div>'+
 			'</div>'
 	});
-	showFloatOption(memberMgr_obj);
+	showFloatOption({treeId : 'tree_memberTypeMgr', option : [{name:'修改', fn : updateMemberTypeHandler},{name:'删除', fn : deleteMemberTypeHandler}]});
 	
 	initAddLevelWin();
 	
