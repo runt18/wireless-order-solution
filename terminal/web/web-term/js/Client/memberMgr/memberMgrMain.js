@@ -3,8 +3,26 @@
 
 Ext.onReady(function(){
 	
-	var memberMgr_obj = {treeId : 'tree_memberTypeMgr', option : [{name:'修改', fn : updateMemberTypeHandler},{name:'删除', fn : deleteMemberTypeHandler}]};
-	var memberLevels, memberLevelDetail,memberTypeLevelChart;
+	var memberTypeData = {root:[]};
+	var discountData = [], pricePlanData = [];
+	var mtObj = {
+			operation : {
+				'insert' : 'INSERT',
+				'update' : 'UPDATE',
+				'delete' : 'DELETE'
+			}
+	};	
+		
+	var memberTypeTree = null;
+	var memberBasicGrid = null;
+	var memberBasicWin = null;
+	var adjustPointWin = null;
+	var memberCouponWin = null;
+	var m_memberTypeWin = null;
+	var m_searchAdditionFilter = 'create';
+	var memberLevels = null;
+	var memberLevelDetail = null;
+	var memberTypeLevelChart = null;
 	function insertMemberHandler(){
 		memberOperationHandler({
 			type : Ext.ux.otype['insert']
@@ -896,6 +914,7 @@ Ext.onReady(function(){
 		});
 		
 		memberTypeTree = new Ext.tree.TreePanel({
+			id : 'tree_memberTypeMgr',
 			title : '会员类型',
 //			region : 'west',
 			region : 'center',
@@ -2826,7 +2845,17 @@ Ext.onReady(function(){
 	Ext.getCmp('memberTypeLevelChartsPanel').getEl().setTop(memberBasicGrid.getHeight() * 0.35);
 	memberTypeTree.setHeight(memberBasicGrid.getHeight() * 0.35);
 	
-	showFloatOption(memberMgr_obj);
+	memberTipWin = Ext.ux.ToastWindow({
+		width : 260,
+		height : 152,
+		html : '<div style="position:relative;background-color: whitesmoke;height :120px;" align="center">' +
+				'<br><p style="color: #f00;text-shadow: 1px 1px 0px #212121;font-size: 19px;">您可以对会员进行如下操作 : </p><br>' +
+				'<input type="button" value="发送优惠劵" class="operationBtn" style="margin-right:10px;" onclick="javascript:initMemberCouponWin();memberTipWin.hide();"/>' +
+				'<input  class="operationBtn" type="button" value="发送问候短信"/><br>' +
+				'<div style="position:absolute;left : 0; bottom: 3px;"><input id="chxMemberTip" type="checkbox" onclick="javascript:fnRemberTip()" />不再显示</div>'+
+			'</div>'
+	});
+	showFloatOption({treeId : 'tree_memberTypeMgr', option : [{name:'修改', fn : updateMemberTypeHandler},{name:'删除', fn : deleteMemberTypeHandler}]});
 	
 	initAddLevelWin();
 	
@@ -3223,6 +3252,7 @@ Ext.onReady(function(){
 						}
 						
 						
+						//TODO
 						//绑定充值
 						$('#divMember').find('.addMoney_a_member').each(function(index, element){
 							element.onclick = function(){
