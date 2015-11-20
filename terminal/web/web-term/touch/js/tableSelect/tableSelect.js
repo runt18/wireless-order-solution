@@ -165,7 +165,6 @@ $(function(){
 				}else{
 					tempPaid = '&nbsp;&nbsp;';
 				}
-				console.log(tempPaid);
 				return tableCmpTemplet.format({
 					dataIndex : c.index,
 					id : c.data.id,
@@ -324,28 +323,26 @@ $(function(){
 			}
 		};
 		
-		var dailyPopup = null;
 		//日结处理函数
 		function dailyHandler(commitType){
-			if(dailyPopup == null){
-				dailyPopup = new JqmPopup({
-					loadUrl : './popup/daily/daily.html',
-					pageInit : function(self){
-						//关闭
-				 		self.find('[id=close_a_daily]').click(function(){
-				 			dailyPopup.close();
-				 		});
-				 		//预打
-				 		self.find('[id=prePrint_a_daily]').click(function(){
-				 			prePrint();
-				 		});
-				 		//日结
-				 		self.find('[id=confirm_a_daily]').click(function(){
-				 			submitDailyOperation();
-				 		});
-					}
-				});
-			}
+			var dailyPopup = null;
+			dailyPopup = new JqmPopup({
+				loadUrl : './popup/daily/daily.html',
+				pageInit : function(self){
+					//关闭
+			 		self.find('[id=close_a_daily]').click(function(){
+			 			dailyPopup.close();
+			 		});
+			 		//预打
+			 		self.find('[id=prePrint_a_daily]').click(function(){
+			 			prePrint();
+			 		});
+			 		//日结
+			 		self.find('[id=confirm_a_daily]').click(function(){
+			 			submitDailyOperation();
+			 		});
+				}
+			});
 			
 			//打开日结Popup
 			dailyPopup.open(function(){
