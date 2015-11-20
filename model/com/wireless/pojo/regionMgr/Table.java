@@ -730,7 +730,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		if(isTempPaid()){
 			jm.putString("temp_date", DateUtil.format(this.tempDate, DateUtil.Pattern.DATE_TIME));
 			jm.putString("temp_staff", this.tempStaff);
-			jm.putBoolean("isTempPaidTimeout", System.currentTimeMillis() - this.tempDate > 10 * 3600 * 1000);
+			jm.putBoolean("isTempPaidTimeout", System.currentTimeMillis() - this.tempDate > 10 * 60 * 1000);
 		}
 		jm.putBoolean("isBook", this.bookFlag);
 		
