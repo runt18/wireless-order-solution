@@ -156,6 +156,16 @@ $(function(){
 				}else{
 					aliasOrName = '<font color="green">'+ c.data.categoryText +'</font>';
 				}
+				
+				var tempPaid = null;
+				if(c.data.isTempPaid && c.data.isTempPaidTimeout){
+					tempPaid = '<font color="red">暂结</font>';
+				}else if(c.data.isTempPaid && !c.data.isTempPaidTimeout){
+					tempPaid = '<font>暂结</font>';
+				}else{
+					tempPaid = '&nbsp;&nbsp;';
+				}
+				console.log(tempPaid);
 				return tableCmpTemplet.format({
 					dataIndex : c.index,
 					id : c.data.id,
@@ -163,7 +173,7 @@ $(function(){
 					alias : aliasOrName,
 					theme : c.data.statusValue == '1' ? "e" : "c",
 					name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
-					tempPayStatus : c.data.isTempPaid? '暂结' : '&nbsp;&nbsp;',
+					tempPayStatus : tempPaid,
 					bookTableStatus : c.data.isBook? '订' : '',
 					tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0?'tempPayStatus4Moz':'tempPayStatus'
 				});				

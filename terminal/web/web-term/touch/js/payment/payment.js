@@ -574,12 +574,9 @@ $(function(){
 				temp : true,
 				postPayment : function(resultJSON){
 					if(resultJSON.success){
-						Util.msg.alert({msg : resultJSON.data, topTip : true});
+						Util.msg.tip(resultJSON.data);
 					}else{
-						Util.msg.alert({
-							msg : resultJSON.data,
-							renderTo : 'paymentMgr'
-						});
+						Util.msg.tip(resultJSON.data);
 					}
 				}
 			});
