@@ -41,118 +41,6 @@ pm.entry = function(c){
 
 
 
-function loadOrderDetail(){
-	var tableId = 0;
-	var orderId = 0;
-	if($.mobile.activePage.attr( "id" ) == 'paymentMgr'){//结账界面中使用
-		tableId = pm.table.id;
-		orderId = orderMsg.id;
-	}else if($.mobile.activePage.attr( "id" ) == 'orderFoodListMgr'){//已点菜界面使用
-		tableId = uo.table.id;
-		orderId = uo.order.id;
-	}		
-	Util.LM.show();
-	$.ajax({
-		url : "../QueryDetail.do",
-		type : 'post',
-		data : {
-			queryType:'TodayByTbl',
-			tableID: tableId,
-			orderID : orderId
-		},
-		async : false,
-		dataType : 'json',
-		success : function(jr, status, xhr){
-			Util.LM.hide();
-			if(jr.success){
-				orderFoodDetails = jr.root;
-				pm.detailTotalPrice = jr.other.detailTotalPrice;
-			}else{
-				Util.msg.alert({
-					msg : jr.msg,
-					renderTo : 'paymentMgr'
-				});
-			}
-		},
-		error : function(request, status, err){
-		}
-	}); 	
-}
-
-function lookupOrderDetailByType(type){
-	if(type){
-		$('input[name=lookupType]').attr('checked', false);
-		$('input[data-type='+type+']').attr('checked', true);
-		$('input[name=lookupType]').checkboxradio('refresh');
-	}
-
-	$('#lab4CancelReasonOrComment').html('备注');
-	if(type == 'detail_all'){
-		lookupCondtion = "true"; 
-	}else if(type == 'detail_cancel'){
-		lookupCondtion = "tempData.operationValue == 2";
-		//退菜时, 显示字符为退菜
-		$('#lab4CancelReasonOrComment').html('退菜原因');
-	}else if(type == 'detail_discount'){
-		lookupCondtion = "tempData.discount < 1";
-	}else if(type == 'detail_gift'){
-		lookupCondtion = "tempData.isGift == true";
-	}else if(type == 'detail_trans'){
-		lookupCondtion = "tempData.operationValue == 3";
-	}
-	
-	//账单查看
-	var html = '';
-	for(var i = 0, index = 1; i < orderFoodDetails.length; i++){
-		if(eval(lookupCondtion)){
-			html += payment_lookupOrderDetailTemplet.format({
-				dataIndex : index,
-				id : orderFoodDetails[i].id,
-				name : orderFoodDetails[i].foodName,
-				count : orderFoodDetails[i].count,
-				isWeight : (orderFoodDetails[i].status & 1 << 7) != 0 ? 'initial' : 'none',
-				isGift : orderFoodDetails[i].isGift?'是':'否',	
-				discount : orderFoodDetails[i].discount,
-				tastePref : orderFoodDetails[i].tasteGroup.tastePref,
-				tastePrice : orderFoodDetails[i].tasteGroup.tastePrice,
-				unitPrice : (orderFoodDetails[i].unitPrice + orderFoodDetails[i].tasteGroup.tastePrice).toFixed(2),
-				cancelReason : orderFoodDetails[i].cancelReason.reason?orderFoodDetails[i].cancelReason.reason:'',
-				totalPrice : orderFoodDetails[i].totalPrice.toFixed(2),
-				orderDateFormat : orderFoodDetails[i].orderDateFormat.substring(11),
-				kitchenName : orderFoodDetails[i].kitchen.name,
-				operation : orderFoodDetails[i].operation,
-				waiter : orderFoodDetails[i].waiter 
-			});	
-			index ++;
-		}
-
-	}		
-	
-	//设置总价
-	$('#orderDetailTotalPrice').text(pm.detailTotalPrice);
-	
-	$('#payment_lookupOrderDetailBody').html(html).trigger('create');
-	
-	//账单基础信息
-	if($.mobile.activePage.attr( "id" ) == 'paymentMgr'){//结账界面中使用
-		$('#lookupOrderDetailHead_orderId').html('查看账单信息 -- 账单号:<font color="#f7c942">' + orderMsg.id + '</font> ');
-		$('#lookupOrderDetailHead_table').html('餐桌号:<font color="#f7c942">' + orderMsg.table.alias + '</font>&nbsp;' + (pm.table.name?'<font color="#f7c942" >(' + pm.table.name +')</font>' :''));    		
-	}else if($.mobile.activePage.attr( "id" ) == 'orderFoodListMgr'){//已点菜界面使用
-		$('#lookupOrderDetailHead_orderId').html('查看账单信息 -- 账单号:<font color="#f7c942">' + uo.order.id + '</font> ');
-		$('#lookupOrderDetailHead_table').html('餐桌号:<font color="#f7c942">' + uo.table.alias + '</font>&nbsp;' + (uo.table.name?'<font color="#f7c942" >(' + uo.table.name +')</font>' :''));		
-	}	
-
-	$('#shadowForPopup').show();
-	$('#lookupOrderDetail').show();
-	
-}
-
-function closeLookupOrderDetailWin(){
-	$('#shadowForPopup').hide();
-	$('#lookupOrderDetail').hide();	
-}
-
-
 $(function(){
 	
 	//当离开结账页面时
@@ -249,27 +137,27 @@ $(function(){
 		document.getElementById("spanCancelFoodAmount").innerHTML = checkDot(orderMsg.cancelPrice)?parseFloat(orderMsg.cancelPrice).toFixed(2) : orderMsg.cancelPrice;
 		document.getElementById("discountPrice").innerHTML = checkDot(orderMsg.discountPrice)?parseFloat(orderMsg.discountPrice).toFixed(2) : orderMsg.discountPrice;
 		if(orderMsg.categoryValue != 4 && orderMsg.cancelPrice > 0){
-			$('#spanSeeCancelFoodAmount').show();	
+			$('#spanSeeCancelFoodAmount_label_tableSelect').show();	
 			$('#lab_replaceCancelBtn').hide();
 		}else{
 			$('#lab_replaceCancelBtn').show();
-			$('#spanSeeCancelFoodAmount').hide();
+			$('#spanSeeCancelFoodAmount_label_tableSelect').hide();
 		}	
 		
 		if(orderMsg.giftPrice > 0){
-			$('#spanSeeGiftFoodAmount').show();	
+			$('#spanSeeGiftFoodAmount_label_tableSelect').show();	
 			$('#lab_replaceGiftBtn').hide();
 		}else{
 			$('#lab_replaceGiftBtn').show();
-			$('#spanSeeGiftFoodAmount').hide();
+			$('#spanSeeGiftFoodAmount_label_tableSelect').hide();
 		}	
 		
 		if(orderMsg.discountPrice > 0){
-			$('#spanSeeDiscountFoodAmount').show();	
+			$('#spanSeeDiscountFoodAmount_label_tableSelect').show();	
 			$('#lab_replaceDiscountBtn').hide();
 		}else{
 			$('#lab_replaceDiscountBtn').show();
-			$('#spanSeeDiscountFoodAmount').hide();
+			$('#spanSeeDiscountFoodAmount_label_tableSelect').hide();
 		}		
 		
 		//清空抹数和备注
@@ -1040,6 +928,41 @@ $(function(){
 				$('#showMemberInfoWin').popup('open');
 			}
 		});
+		
+		
+		//退菜明细
+		$('#spanSeeCancelFoodAmount_label_tableSelect').click(function(){
+			var cancelDetail = null;
+			cancelDetail = new DetailPopup({
+				table : pm.table,
+				order :  orderMsg,
+				detailType : DetailPopup.DetailType.CANCEL.val
+			});
+			cancelDetail.open();
+		});
+		
+		//折扣明细
+		$('#spanSeeDiscountFoodAmount_label_tableSelect').click(function(){
+			var discountDetail = null;
+			discountDetail = new DetailPopup({
+				table : pm.table,
+				order :  orderMsg,
+				detailType : DetailPopup.DetailType.DISCOUNT.val
+			});
+			discountDetail.open();
+		});
+		
+		//赠送明细
+		$('#spanSeeGiftFoodAmount_label_tableSelect').click(function(){
+			var giftDetail = null;
+			giftDetail = new DetailPopup({
+				table : pm.table,
+				order :  orderMsg,
+				detailType : DetailPopup.DetailType.GIFT.val
+			});
+			giftDetail.open();
+		});
+		
 		
 	});
 	

@@ -1382,6 +1382,16 @@ $(function(){
 			}, 200);
 		});
 		
+		// 绑定明细
+		$('#detail_a_tableSelect').click(function(){
+			var detailPopup = null;
+			detailPopup = new DetailPopup({
+				table : uo.table,
+				order :  uo.order
+			});
+			detailPopup.open();
+		});
+		
 	});
 	
 });
