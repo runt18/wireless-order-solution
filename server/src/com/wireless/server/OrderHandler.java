@@ -601,7 +601,7 @@ class OrderHandler implements Runnable{
 				
 				//Perform to send the weixin msg to member.
 				try {
-					BaseAPI.doPost("http://ts.e-tones.net/wx-term/WxNotifyMember.do?dataSource=bill&orderId=" + order.getId() + "&staffId=" + staff.getId(), "");
+					BaseAPI.doPost("http://wx.e-tones.net/wx-term/WxNotifyMember.do?dataSource=bill&orderId=" + order.getId() + "&staffId=" + staff.getId(), "");
 				} catch (Exception ignored) {
 					ignored.printStackTrace();
 				}
