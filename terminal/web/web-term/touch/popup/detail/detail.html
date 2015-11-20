@@ -1,0 +1,92 @@
+
+
+<head>
+<meta charset="UTF-8">
+
+</head>
+<body>
+<div id="" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: -200px; left: 50%;width:1020px; margin: -100px 0px 0px -510px;background-color: white;" align="center">
+    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
+    		<div id="" style="float: left;line-height: 35px;margin-left: 10px;">
+				<span id="orderDetail_span_detail" style="line-height: 35px;float: left;margin-left: 5px;">
+					查看账单信息 -- 账单号:<font color="#f7c942">-----</font>
+				</span>
+				<span id="tableDetail_span_detail" style="line-height: 35px;float: left;margin-left: 20px;">
+					 餐桌号:<font color="#f7c942">-- (---)</font>
+				</span>    			
+    		</div>
+        	<div style="float: right">
+  				<a id="detailPopup_a_detail" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
+        	</div>
+    </div>     
+    <table style="width: 100%">
+    	<tr>
+    		<td>
+			    <div style="padding: 0 10px" align="left">
+					<fieldset data-role="controlgroup" data-type="horizontal">
+						<label>
+				        	<input type="radio" name="lookupType" data-type="allDetail_input_detail" value="on">全部
+				        </label>
+				        <label>
+				        	<input type="radio" name="lookupType" data-type="giftDetail_input_detail" value="on">赠送
+				        </label>
+				        <label>
+				        	<input type="radio" name="lookupType" data-type="discountDetail_input_detail" value="on">折扣
+				        </label>
+				        <label>
+				        	<input type="radio" name="lookupType" data-type="transDetail_input_detail" value="on">转菜
+				        </label>
+				        <label>
+				        	<input type="radio" name="lookupType" data-type="cancelDetail_input_detail" value="on">退菜
+				        </label>
+				    </fieldset>
+			    </div>	    		
+    		</td>
+    		<td style="text-align: right;padding-right: 20px;font-size: 30px;color: green;">
+    			总金额 : <label id="totalPrice_label_detail">0</label>
+    		</td>
+    	</tr>
+    </table>
+
+    <div data-theme="d" class="ui-corner-bottom ui-content">
+    	<div style="max-height: 480px; overflow: auto;">
+		<table id="" data-role="table" style="width: 1450px;" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr" >
+         <thead>
+	           <tr class="ui-bar-d">
+	             <th style="width: 25px;"></th>
+	             <th style="width: 200px;">菜名</th>
+	             <th >单价</th>
+	             <th >数量</th>
+	             <th style="width: 120px;">口味</th>
+	             <th style="width: 85px;">口味价钱</th>
+	             <th >赠送</th>
+	             <th >折扣率</th>
+				 <th style="width: 90px;">厨房</th>
+				 <th style="width: 85px;">操作类型</th>
+				 <th >时间</th>
+				 <th >服务员</th>   
+				 <th id="" style="width: 350px;">备注</th>          
+	           </tr>
+         </thead>
+         <tbody id="foodDetail_tbody_detail">
+<!--          	<tr>
+         		<td>1</td>
+         		<td >2014-12-12 18:03:56</td>
+         		<td >龙虾排骨</td>
+         		<td>6.00</td>
+         		<td >1</td>
+         		<td><div style="height: 45px;overflow: hidden;">黄炆,拼上,即上,临叫</div></td>
+         		<td>8.88</td>
+         		<td>否</td>
+         		<td>2.6</td>
+         		<td>湘菜</td>
+         		<td >退菜</td>
+         		<td>管理员</td>
+         		<td>上菜太慢, 太辣</td>
+         	</tr> -->
+         </tbody>
+       </table>     
+		</div>
+    </div>
+</div>	
+</body>

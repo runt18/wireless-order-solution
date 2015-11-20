@@ -71,6 +71,8 @@
 <script type="text/javascript" src="./js/popup/print/print.js"></script>
 <!-- 查台等控件绑定 -->
 <script type="text/javascript" src="./js/popup/table/ask.js"></script>
+<!-- 明细控件绑定 -->
+<script type="text/javascript" src="./js/popup/detail/detail.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -904,7 +906,7 @@
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="ss" onclick="uo.goToCreateOrder()">点菜</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="uo.tempPayForUO()">暂结</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont none" id="payOrder_a_checkOut">结账</a>
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="loadOrderDetail();lookupOrderDetailByType('detail_all');">明细</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="detail_a_tableSelect">明细</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#popupDiscountCmp">折扣</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" id="checkOutTranTable_a_tableSelect">转台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" id="memberRead_a_orderFood">会员</a>
@@ -1513,17 +1515,17 @@
 		         	<tr>
 		         		<td>赠送:</td>
 		         		<td id="forFree">0.00</td>
-		         		<td ><label id="lab_replaceGiftBtn">----</label><a id="spanSeeGiftFoodAmount" href="#" style="display: none;" onclick="loadOrderDetail();lookupOrderDetailByType('detail_gift')">明细</a></td>
+		         		<td ><label id="lab_replaceGiftBtn">----</label><a id="spanSeeGiftFoodAmount_label_tableSelect" href="#" style="display: none;">明细</a></td>
 		         	</tr>
 		         	<tr>
 		         		<td>折扣:</td>
 		         		<td id="discountPrice">0.00</td>
-		         		<td ><label id="lab_replaceDiscountBtn">----</label><a id="spanSeeDiscountFoodAmount" href="#" style="display: none;" onclick="loadOrderDetail();lookupOrderDetailByType('detail_discount')">明细</a></td>
+		         		<td ><label id="lab_replaceDiscountBtn">----</label><a id="spanSeeDiscountFoodAmount_label_tableSelect" href="#" style="display: none;">明细</a></td>
 		         	</tr>
 		         	<tr>
 		         		<td>退菜:</td>
 		         		<td id="spanCancelFoodAmount">0.00</td>
-		         		<td ><label id="lab_replaceCancelBtn">----</label><a id="spanSeeCancelFoodAmount" href="#" style="display: none;" onclick="loadOrderDetail();lookupOrderDetailByType('detail_cancel')">明细</a></td>
+		         		<td ><label id="lab_replaceCancelBtn">----</label><a id="spanSeeCancelFoodAmount_label_tableSelect" href="#" style="display: none;" >明细</a></td>
 		         	</tr>	
 		         	<tr id="eraseQuota_tr_payment">
 		         		<td colspan="2" style="width: 200px;line-height: 60px;font-size: 20px;text-align: right;" >抹数金额(上限:￥<font id="eraseQuota_font_payment" color="red">--</font>)：</td>
@@ -1746,92 +1748,5 @@
 	 
 </div>
 <!-- end 结账界面 -->
-
-<!-- 系统共用结账明细控件 start -->
-<div id="lookupOrderDetail" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 150px; left: 50%;width:1020px; margin: -100px 0px 0px -510px;display: none;background-color: white;" align="center">
-    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-    		<div id="lookupOrderDetailHead" style="float: left;line-height: 35px;margin-left: 10px;">
-				<span id="lookupOrderDetailHead_orderId" style="line-height: 35px;float: left;margin-left: 5px;">
-					查看账单信息 -- 账单号:<font color="#f7c942">-----</font>
-				</span>
-				<span id="lookupOrderDetailHead_table" style="line-height: 35px;float: left;margin-left: 20px;">
-					 餐桌号:<font color="#f7c942">-- (---)</font>
-				</span>    			
-    		</div>
-        	<div style="float: right">
-  				<a onclick="closeLookupOrderDetailWin()" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-        	</div>
-    </div>     
-    <table style="width: 100%">
-    	<tr>
-    		<td>
-			    <div style="padding: 0 10px" align="left">
-					<fieldset data-role="controlgroup" data-type="horizontal">
-						<label>
-				        	<input type="radio" name="lookupType" data-type="detail_all" value="on" checked="checked" onclick="lookupOrderDetailByType('detail_all')">全部
-				        </label>
-				        <label>
-				        	<input type="radio" name="lookupType" data-type="detail_gift" value="on" onclick="lookupOrderDetailByType('detail_gift')">赠送
-				        </label>
-				        <label>
-				        	<input type="radio" name="lookupType" data-type="detail_discount" value="on" onclick="lookupOrderDetailByType('detail_discount')">折扣
-				        </label>
-				        <label>
-				        	<input type="radio" name="lookupType" data-type="detail_trans" value="on" onclick="lookupOrderDetailByType('detail_trans')">转菜
-				        </label>
-				        <label>
-				        	<input type="radio" name="lookupType" data-type="detail_cancel" value="on" onclick="lookupOrderDetailByType('detail_cancel')">退菜
-				        </label>
-				    </fieldset>
-			    </div>	    		
-    		</td>
-    		<td style="text-align: right;padding-right: 20px;font-size: 30px;color: green;">
-    			总金额 : <label id="orderDetailTotalPrice">0</label>
-    		</td>
-    	</tr>
-    </table>
-
-    <div data-theme="d" class="ui-corner-bottom ui-content">
-    	<div style="max-height: 480px; overflow: auto;">
-		<table id="payment_lookupOrderDetailTable" data-role="table" style="width: 1450px;" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr" >
-         <thead>
-	           <tr class="ui-bar-d">
-	             <th style="width: 25px;"></th>
-	             <th style="width: 200px;">菜名</th>
-	             <th >单价</th>
-	             <th >数量</th>
-	             <th style="width: 120px;">口味</th>
-	             <th style="width: 85px;">口味价钱</th>
-	             <th >赠送</th>
-	             <th >折扣率</th>
-				 <th style="width: 90px;">厨房</th>
-				 <th style="width: 85px;">操作类型</th>
-				 <th >时间</th>
-				 <th >服务员</th>   
-				 <th id="lab4CancelReasonOrComment" style="width: 350px;">备注</th>          
-	           </tr>
-         </thead>
-         <tbody id="payment_lookupOrderDetailBody">
-<!--          	<tr>
-         		<td>1</td>
-         		<td >2014-12-12 18:03:56</td>
-         		<td >龙虾排骨</td>
-         		<td>6.00</td>
-         		<td >1</td>
-         		<td><div style="height: 45px;overflow: hidden;">黄炆,拼上,即上,临叫</div></td>
-         		<td>8.88</td>
-         		<td>否</td>
-         		<td>2.6</td>
-         		<td>湘菜</td>
-         		<td >退菜</td>
-         		<td>管理员</td>
-         		<td>上菜太慢, 太辣</td>
-         	</tr> -->
-         </tbody>
-       </table>     
-		</div>
-    </div>
-</div>	
-<!-- end 结账明细控件 -->
 </body>
 </html>
