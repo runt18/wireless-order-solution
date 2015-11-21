@@ -790,7 +790,9 @@ public class StockAction implements Jsonable{
 		this.comment = comment;
 	}
 
-	public StockAction(){}
+	public StockAction(int id){
+		this.id = id;
+	}
 	
 	public StockAction(InsertBuilder build){
 		setRestaurantId(build.getRestaurantId());

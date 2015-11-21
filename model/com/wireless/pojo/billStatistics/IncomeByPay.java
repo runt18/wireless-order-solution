@@ -66,6 +66,11 @@ public class IncomeByPay implements Jsonable{
 		public void fromJsonMap(JsonMap jsonMap, int flag) {
 			
 		}
+		
+		@Override
+		public String toString(){
+			return this.payType + "," + this.total;
+		}
 	}
 	
 	private final int orderAmount;
