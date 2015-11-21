@@ -1,4 +1,5 @@
 //-------------lib.js------------
+
 function NewDate(str) { 
 	str = str.split('-'); 
 	var date = new Date(); 
@@ -162,10 +163,10 @@ function stockTaskNavHandler(e){
 						}
 					}
 					
-					if(secondStepPanelCenter.getStore().getCount() == 0){
-						Ext.example.msg('提示', '操作失败, 请选中货品信息.');
-						return;
-					}
+//					if(secondStepPanelCenter.getStore().getCount() == 0){
+//						Ext.example.msg('提示', '操作失败, 请选中货品信息.');
+//						return;
+//					}
 					//防止重复点击
 					btnNext.setDisabled(true);
 					
@@ -651,7 +652,7 @@ function updateStockActionHandler(c){
 	if(data['statusValue'] == 1 || c.reAudit){
 		stockTaskNavWin.otype = Ext.ux.otype['update'];
 		if(c.reAudit){
-			stockTaskNavWin.otype = "reaudit"
+			stockTaskNavWin.otype = "reaudit";
 		}
 		stockTaskNavWin.setTitle('修改库存单信息');
 		operateStockActionBasic({
@@ -1280,19 +1281,19 @@ function initControl(){
 		[
 			[true, false, false, true],
 			['货单编号', 'id', 50],
-			['货单类型', 'typeText',,,'stockTypeRenderer'],
+			['货单类型', 'typeText',,,stockTypeRenderer],
 			['货品类型', 'cateTypeText', 50],
 			['原始单号', 'oriStockId'],
 			['时间', 'oriStockDateFormat', 65],
-			['出库仓/供应商', 'center', 65,,'stockOutRenderer'],
-			['收货仓/供应商', 'center', 65,,'stockInRenderer'],
+			['出库仓/供应商', 'center', 65,,stockOutRenderer],
+			['收货仓/供应商', 'center', 65,,stockInRenderer],
 			['数量', 'amount',60,'right','Ext.ux.txtFormat.gridDou'],
 			['应收金额', 'price',80,'right', displayPrice],
 			['实际金额', 'actualPrice', 80, 'right', displayPrice],
 			['制单人', 'operatorName', 60],
 			['审核人', 'approverName', 60],
 			['审核状态', 'statusText', 60, 'center'],
-			['操作', 'center', 150, 'center', 'stockOperateRenderer']
+			['操作', 'center', 150, 'center', stockOperateRenderer]
 		],
 		StockRecord.getKeys(),
 		[['isPaging', true],  ['restaurantId', restaurantID]],
@@ -2333,8 +2334,8 @@ var btnLoginOut = new Ext.ux.ImageButton({
 
 Ext.onReady(function(){
 	//
-	getCurrentDay();
 	initControl();
+	getCurrentDay();
 	
 	new Ext.Panel({
 		title : '库存任务管理' + '&nbsp;&nbsp;<label style="color:#800000;font-weight:bold">当前会计月份是&nbsp;<label id="sam_labCurrentMonth" style="color:green;font-weight: bold;font-size:15px"> </label>&nbsp;月</label>' ,

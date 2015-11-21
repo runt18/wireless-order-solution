@@ -1,46 +1,18 @@
 //结账界面数据对象
-var pm = {table : {}},
- 
-	//筛选账单明细的条件
-	lookupCondtion = "true",
-	
-	//查询出来的菜品列表
-	orderFoodDetails = [],
-	
- 
-	//账单详细
-	payment_lookupOrderDetailTemplet = '<tr>'
-		+ '<td>{dataIndex}</td>'
-		+ '<td ><div style="height: 30px;overflow: hidden;">{name}</div></td>'
-		+ '<td>{unitPrice}</td>'
-		+ '<td>{count}<img style="margin-top: 10px;margin-left: 5px;display:{isWeight}" src="images/weight.png"></td>'
-		+ '<td><div style="height: 30px;overflow: hidden;">{tastePref}</div></td>'
-		+ '<td>{tastePrice}</td>'
-		+ '<td>{isGift}</td>'
-		+ '<td>{discount}</td>'
-		+ '<td>{kitchenName}</td>'
-		+ '<td>{operation}</td>'
-		+ '<td>{orderDateFormat}</td>'
-		+ '<td>{waiter}</td>'
-		+ '<td>{cancelReason}</td>'
-		+ '</tr>';
-
-
-
-pm.entry = function(c){
-	if(!c || !c.table){
-		Util.msg.alert({msg : '账单不存在', topTip: true});
-		return;
+var pm = {
+	table : {},
+	entry : function(c){
+		if(!c || !c.table){
+			Util.msg.alert({msg : '账单不存在', topTip: true});
+			return;
+		}
+		
+		pm.table = c.table;
+		
+		location.href = "#paymentMgr";
 	}
-	
-	pm.table = c.table;
-	
-	location.href = "#paymentMgr";
-	
 };
-
-
-
+ 
 $(function(){
 	
 	//当离开结账页面时
