@@ -171,7 +171,7 @@ function HandWritingPanel(param){
 
 	function senddata() {
 		var lg = "zh-cn";//选择语言
-		$.post("http://www.yibizi.com/json/hd_json.php?key=c4ca4238a0b923820dcc509a6f75849b", {
+		$.post("http://118.244.232.180/json/hd_json.php?key=c4ca4238a0b923820dcc509a6f75849b", {
 					bh : lg + bihua.join("")
 				}, function(data) {
 					if(param.result){
