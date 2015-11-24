@@ -158,9 +158,8 @@ Ext.onReady(function(){
 		}
 	};
 
-
+	var rechargeWin = null;
 	function initRechargeWin(){
-		var rechargeWin = Ext.getCmp('rechargeWin');
 		if(!rechargeWin){
 			rechargeWin = new Ext.Window({
 				title : '会员充值',
@@ -259,8 +258,8 @@ Ext.onReady(function(){
 	/**
 	 * 会员取款
 	 */
+	var takeMoneyWin = null;
 	function initTakeMoneyWin(){
-		var takeMoneyWin = Ext.getCmp('takeMoneyWin');
 		if(!takeMoneyWin){
 			takeMoneyWin = new Ext.Window({
 				title : '会员取款',
@@ -343,19 +342,19 @@ Ext.onReady(function(){
 	 */
 	function rechargeHandler(){
 		initRechargeWin();
-		Ext.getCmp('rechargeWin').show();		
+		rechargeWin.show();		
 	}
 
 	function takeMoneyHandler(){
 		initTakeMoneyWin();
-		Ext.getCmp('takeMoneyWin').show();
+		takeMoneyWin.show();
 	}
-	var	mr_queryMemberOperationWin;
+	
+	var mr_queryMemberOperationWin = null;
 	/**
 	 * 会员操作明细
 	 */
 	function queryMemberOperationHandler(title, url, params){
-		var mr_queryMemberOperationWin = Ext.getCmp('mr_queryMemberOperationWin');
 		if(!mr_queryMemberOperationWin){
 		mr_queryMemberOperationWin = new Ext.Window({
 				modal : true,
