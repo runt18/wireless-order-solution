@@ -1379,7 +1379,7 @@ $(function(){
 					$('#middle_a_askTable').css('width', '48%');
 					$('#right_a_askTable').css('width', '50%');
 				});
-			}, 200);
+			}, 500);
 		});
 		
 		// 绑定明细
