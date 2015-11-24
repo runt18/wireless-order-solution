@@ -1384,25 +1384,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("账单数");
 		cell.setCellStyle(headerStyle);
 		
-/*		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue("现金");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue("刷卡");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue("会员");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue("挂账");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue("签单");
-		cell.setCellStyle(headerStyle);*/
 		for (PayType payType : payTypeList) {
 			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(payType.getName());
@@ -1446,16 +1427,17 @@ public class HistoryStatisticsAction extends DispatchAction{
 				row = sheet.createRow(sheet.getLastRowNum() + 1);
 				row.setHeight((short) 350);
 				
-				// ***
+				//日期
 				cell = row.createCell(0);
 				cell.setCellValue(item.getDate());
 				cell.setCellStyle(strStyle);
 				
-				// ***
+				//应收
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByPay().getTotalIncome());
 				cell.setCellStyle(numStyle);
 				
+				//实收
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByPay().getTotalActual());
 				cell.setCellStyle(numStyle);
@@ -1465,80 +1447,62 @@ public class HistoryStatisticsAction extends DispatchAction{
 				ts.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 				ts.setDataFormat(wb.createDataFormat().getFormat("0"));
 				
+				//账单数
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getTotalAmount());
 				cell.setCellStyle(normalNumStyle);
 				
-				if(item.getIncomeByPay().getPaymentIncomes().size() > 0){
+				for(PayType payType : payTypeList) {
+					String value = "0.00";
 					for (PaymentIncome p : item.getIncomeByPay().getPaymentIncomes()) {
-						cell = row.createCell(row.getLastCellNum());
-						cell.setCellValue(p.getActual());
-						cell.setCellStyle(numStyle);
-					}					
-				}else{
-					for (int i = 0; i < payTypeList.size(); i++) {
-						cell = row.createCell(row.getLastCellNum());
-						cell.setCellValue("0.00");
-						cell.setCellStyle(numStyle);							
-					}
+						if(p.getPayType().equals(payType)){
+							value = NumericUtil.float2String2(p.getActual());
+						}
+					}	
+					cell = row.createCell(row.getLastCellNum());
+					cell.setCellValue(value);
+					cell.setCellStyle(numStyle);							
 				}
-
 				
+				//折扣额
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByDiscount().getTotalDiscount());
 				cell.setCellStyle(numStyle);
 				
+				//赠送额
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByGift().getTotalGift());
 				cell.setCellStyle(numStyle);
 				
+				//退菜额
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByCancel().getTotalCancel());
 				cell.setCellStyle(numStyle);
 				
+				//抹数额
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByErase().getTotalErase());
 				cell.setCellStyle(numStyle);
 				
+				//反结账
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByRepaid().getTotalRepaid());
 				cell.setCellStyle(numStyle);
 				
+				//优惠券
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByCoupon().getTotalCoupon());
 				cell.setCellStyle(numStyle);
 				
+				//会员充值
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByCharge().getTotalActualCharge());
 				cell.setCellStyle(numStyle);
 				
+				//会员退款
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByCharge().getTotalActualRefund());
 				cell.setCellStyle(numStyle);
-				
-//				sum.setCashAmount(sum.getCashAmount() + item.getCashAmount());
-//				sum.setCashIncome2(sum.getCashIncome2() + item.getCashIncome2());
-//				sum.setCreditCardAmount(sum.getCreditCardAmount() + item.getCreditCardAmount());
-//				sum.setCreditCardIncome2(sum.getCreditCardIncome2() + item.getCreditCardIncome2());
-//				sum.setSignAmount(sum.getSignAmount() + item.getSignAmount());
-//				sum.setSignIncome2(sum.getSignIncome2() + item.getSignIncome2());
-//				sum.setHangAmount(sum.getHangAmount() + item.getHangAmount());
-//				sum.setHangIncome2(sum.getHangIncome2() + item.getHangIncome2());
-//				
-//				sum.setEraseAmount(sum.getEraseAmount() + item.getEraseAmount());
-//				sum.setEraseIncome(sum.getEraseIncome() + item.getEraseIncome());
-//				sum.setDiscountAmount(sum.getDiscountAmount() + item.getDiscountAmount());
-//				sum.setDiscountIncome(sum.getDiscountIncome() + item.getDiscountIncome());
-//				sum.setGiftAmount(sum.getGiftAmount() + item.getGiftAmount());
-//				sum.setGiftIncome(sum.getGiftIncome() + item.getGiftIncome());
-//				sum.setCancelAmount(sum.getCancelAmount() + item.getCancelAmount());
-//				sum.setCancelIncome(sum.getCancelIncome() + item.getCancelIncome());
-//				sum.setPaidIncome(sum.getPaidIncome() + item.getPaidIncome());
-//				
-//				sum.setTotalPrice(sum.getTotalPrice() + item.getTotalPrice());
-//				sum.setTotalPrice2(sum.getTotalPrice2() + item.getTotalPrice2());
-//				
-//				sum.setOrderAmount(sum.getOrderAmount() + item.getOrderAmount());
 			}
 		}
 		

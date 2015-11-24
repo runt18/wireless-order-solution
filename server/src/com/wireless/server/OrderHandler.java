@@ -54,7 +54,6 @@ import com.wireless.pack.resp.RespPackage;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberComment;
@@ -385,16 +384,11 @@ class OrderHandler implements Runnable{
 	
 	private ProtocolPackage doInsertOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		//handle insert order request 
-		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setOriented(Printer.Oriented.ALL));
-		
 		final Order.InsertBuilder builder = new Parcel(request.body).readParcel(Order.InsertBuilder.CREATOR);
 		
-		//Add the specific printers.
-		for(Printer orientedPrinter : builder.getPrinters()){
-			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setId(orientedPrinter.getId()).setOriented(Printer.Oriented.SPECIFIC)));
-		}
+		final List<Printer> printers = getAvailPrinters(staff, builder.getPrinters());
 		
-		Order orderToInsert = InsertOrder.exec(staff, builder);
+		final Order orderToInsert = InsertOrder.exec(staff, builder);
 		
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
 			PrintHandler printHandler = new PrintHandler(staff);
@@ -452,15 +446,9 @@ class OrderHandler implements Runnable{
 		//handle update order request
 		final Order.UpdateBuilder builder = new Parcel(request.body).readParcel(Order.UpdateBuilder.CREATOR);
 		
-		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setOriented(Printer.Oriented.ALL));
-		
-		//Add the specific printers.
-		for(Printer orientedPrinter : builder.getPrinters()){
-			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setId(orientedPrinter.getId()).setEnabled(true).setOriented(Printer.Oriented.SPECIFIC)));
-		}
+		final List<Printer> printers = getAvailPrinters(staff, builder.getPrinters());
 		
 		final DiffResult diffResult = UpdateOrder.exec(staff, builder);
-
 		
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
 			
@@ -532,8 +520,12 @@ class OrderHandler implements Runnable{
 	
 	private RespPackage doTransOrderFood(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		Order.TransferBuilder builder = new Parcel(request.body).readParcel(Order.TransferBuilder.CREATOR);
-		OrderDao.transfer(staff, builder);
-		ServerConnector.instance().ask(ReqPrintContent.buildTransFood(staff, builder).build());
+		OrderDao.TransResult result = OrderDao.transfer(staff, builder);
+		//Print the transfer food.
+		new PrintHandler(staff).process(JobContentFactory.instance().createTransFoodContent(PType.PRINT_TRANSFER_FOOD, 
+				staff, getAvailPrinters(staff, null), 
+				builder.getSourceOrderId(), result.srcTbl, result.destTbl, result.transFoods));
+
 		return new RespACK(request.header);
 	}
 	
@@ -565,11 +557,7 @@ class OrderHandler implements Runnable{
 	private RespPackage doPayOrder(final Staff staff, ProtocolPackage request)  throws SQLException, BusinessException{
 		final Order.PayBuilder payBuilder = new Parcel(request.body).readParcel(Order.PayBuilder.CREATOR);
 		
-		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setOriented(Printer.Oriented.ALL));
-		//Add the specific printers.
-		for(Printer orientedPrinter : payBuilder.getPrinters()){
-			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setId(orientedPrinter.getId()).setEnabled(true).setOriented(Printer.Oriented.SPECIFIC)));
-		}
+		final List<Printer> printers = getAvailPrinters(staff, payBuilder.getPrinters());
 		
 		final PrintHandler printHandler = new PrintHandler(staff);
 
@@ -642,12 +630,8 @@ class OrderHandler implements Runnable{
 		final PType printType = PType.valueOf(request.header.reserved);
 		final Parcel parcel = new Parcel(request.body);
 		
-		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setOriented(Printer.Oriented.ALL));
-		//Get the specific printers
 		final List<Printer> oriented = parcel.readParcelList(Printer.CREATOR);
-		for(Printer orientedPrinter : oriented){
-			printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setId(orientedPrinter.getId()).setOriented(Printer.Oriented.SPECIFIC)));
-		}
+		final List<Printer> printers = getAvailPrinters(staff, oriented);
 		
 		if(printType.isSummary()){
 			int orderId = parcel.readInt();
@@ -699,15 +683,6 @@ class OrderHandler implements Runnable{
 			Table destTbl = TableDao.getById(staff, parcel.readParcel(Table.CREATOR).getId());
 			new PrintHandler(staff).process(JobContentFactory.instance().createTransContent(printType, staff, printers, orderId, srcTbl, destTbl));
 			
-		}else if(printType.isTransFood()){
-			Order.TransferBuilder builder = parcel.readParcel(Order.TransferBuilder.CREATOR);
-			Order srcOrder = OrderDao.getById(staff, builder.getSourceOrderId(), DateType.TODAY);
-			Table destTbl = TableDao.getById(staff, builder.getDestTbl().getId());
-			for(OrderFood foodOut : builder.getTransferFoods()){
-				foodOut.asFood().copyFrom(FoodDao.getById(staff, foodOut.asFood().getFoodId()));
-			}
-			new PrintHandler(staff).process(JobContentFactory.instance().createTransFoodContent(printType, staff, printers, srcOrder.getId(), srcOrder.getDestTbl(), destTbl, builder.getTransferFoods()));
-			
 		}else if(printType.isShift()){
 			long onDuty = parcel.readLong();
 			long offDuty = parcel.readLong();
@@ -730,6 +705,18 @@ class OrderHandler implements Runnable{
 		}
 		
 		return new RespACK(request.header);
+	}
+	
+	private List<Printer> getAvailPrinters(Staff staff, List<Printer> orientedPrinters) throws SQLException{
+		final List<Printer> printers = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setOriented(Printer.Oriented.ALL));
+		
+		//Add the specific printers.
+		if(orientedPrinters != null){
+			for(Printer orientedPrinter : orientedPrinters){
+				printers.addAll(PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setEnabled(true).setId(orientedPrinter.getId()).setOriented(Printer.Oriented.SPECIFIC)));
+			}
+		}		
+		return printers;
 	}
 }
 
