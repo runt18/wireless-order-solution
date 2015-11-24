@@ -1,7 +1,7 @@
 $(function(){
 	
 	$('html, body').animate({scrollTop: 0}, 'fast');
-	Util.lbar('', function(html){ $(document.body).append(html);  });
+//	Util.lbar('', function(html){$(document.body).append(html);  });
 	Util.lm.show();
 	$.ajax({
 		url : '../../WXOperateMember.do',
@@ -437,4 +437,13 @@ $(function(){
 			}
 		});
 	});
+	
+	
+	  $('#asdsad').click(function(){
+	    	var pickFoodComponent = new PickFoodComponent({
+	    		renderTo : $('#wxOrderFood_div_member')
+	    	});
+	    	pickFoodComponent.open();
+	    });
+	
 });
