@@ -100,7 +100,7 @@ public class OrderDetailContent extends ConcreteContent {
 			}else{
 				mPrintTemplate = mPrintTemplate.replace(PVar.VAR_2, 
 						new ExtraFormatDecorator(
-							new Grid2ItemsContent("餐台：" + tblName, 
+							new Grid2ItemsContent("餐台：" + tblName,
 												  "服务员：" + mWaiter, 
 											      getStyle()),
 							ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
@@ -142,7 +142,7 @@ public class OrderDetailContent extends ConcreteContent {
 					var1.append(new ExtraFormatDecorator("价钱：￥" + NumericUtil.float2String2(mDetailType.isTotal() ? mParent.calcPriceBeforeDiscount() : mParent.calcDeltaPriceBeforeDiscount()), mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 				}else{
 					var1.append(new ExtraFormatDecorator(
-									new Grid2ItemsContent("餐台：" + tblName, "价钱：￥" + NumericUtil.float2String2(mDetailType.isTotal() ? mParent.calcPriceBeforeDiscount() : mParent.calcDeltaPriceBeforeDiscount()), mStyle),
+									new Grid2ItemsContent("餐台：" + tblName  + "，人数：" + mOrder.getCustomNum(), "价钱：￥" + NumericUtil.float2String2(mDetailType.isTotal() ? mParent.calcPriceBeforeDiscount() : mParent.calcDeltaPriceBeforeDiscount()), mStyle),
 									ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 				}			
 				
