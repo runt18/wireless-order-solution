@@ -804,13 +804,14 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void transfer(Staff staff, Order.TransferBuilder builder) throws BusinessException, SQLException{
+	public static TransResult transfer(Staff staff, Order.TransferBuilder builder) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			transfer(dbCon, staff, builder);
+			TransResult result = transfer(dbCon, staff, builder);
 			dbCon.conn.commit();
+			return result;
 			
 		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
@@ -818,6 +819,21 @@ public class OrderDao {
 			
 		}finally{
 			dbCon.disconnect();
+		}
+	}
+	
+	public static class TransResult{
+		public final static TransResult EMPTY = new TransResult(null, null, null);
+		public final Table srcTbl;
+		public final Table destTbl;
+		public final List<OrderFood> transFoods = new ArrayList<OrderFood>();
+		
+		public TransResult(Table source, Table dest, List<OrderFood> transFoods){
+			this.destTbl = dest;
+			this.srcTbl = source;
+			if(transFoods != null){
+				this.transFoods.addAll(transFoods);
+			}
 		}
 	}
 	
@@ -834,10 +850,10 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void transfer(DBCon dbCon, Staff staff, Order.TransferBuilder builder) throws BusinessException, SQLException{
+	public static TransResult transfer(DBCon dbCon, Staff staff, Order.TransferBuilder builder) throws BusinessException, SQLException{
 		
 		if(builder.getTransferFoods().isEmpty()){
-			return;
+			return TransResult.EMPTY;
 		}
 		
 		if(!staff.getRole().hasPrivilege(Privilege.Code.TRANSFER_FOOD)){
@@ -865,6 +881,7 @@ public class OrderDao {
 				throw new BusinessException("菜品【" + FoodDao.getPureById(dbCon, staff, foodOut.getFoodId()).getName() + "】不在账单中");
 			}else{
 				final OrderFood foodToOut = source.getOrderFoods().get(index);
+				foodOut.asFood().setName(foodToOut.asFood().getName());
 				if(foodToOut.getCount() < foodOut.getCount()){
 					throw new BusinessException("菜品【" + source.getOrderFoods().get(index).getName() + "】的转菜数量大过已有数量");
 				}else{
@@ -887,6 +904,8 @@ public class OrderDao {
 			Order destOrder = getByTableId(dbCon, staff, destTbl.getId());
 			UpdateOrder.exec(dbCon, staff, new Order.UpdateBuilder(destOrder).addOri(destOrder.getOrderFoods()).addNew(builder.getTransferFoods(), staff));
 		}
+		
+		return new TransResult(source.getDestTbl(), destTbl, builder.getTransferFoods());
 	}
 
 	/**
