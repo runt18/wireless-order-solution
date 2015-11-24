@@ -1,5 +1,6 @@
 package com.wireless.Actions.inventoryMgr.stockAction;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,32 +38,38 @@ public class OperateStockActionAction extends DispatchAction{
 			throws Exception {
 		
 		
-		JObject jobject = new JObject();
+		final JObject jobject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String oriStockId = request.getParameter("oriStockId");
-			String oriStockDate = request.getParameter("oriStockDate");
-			String comment = request.getParameter("comment");
-			String typeValue = request.getParameter("type");
-			String subTypeValue = request.getParameter("subType");
-			String cateValue = request.getParameter("cate");
-			String actualPrice = request.getParameter("actualPrice");
-			String detail = request.getParameter("detail");
+			final String pin = (String)request.getAttribute("pin");
+			final String oriStockId = request.getParameter("oriStockId");
+			final String oriStockDate = request.getParameter("oriStockDate");
+			final String comment = request.getParameter("comment");
+			final String typeValue = request.getParameter("type");
+			final String subTypeValue = request.getParameter("subType");
+			final String cateValue = request.getParameter("cate");
+			final String actualPriceVal = request.getParameter("actualPrice");
+			final String detail = request.getParameter("detail");
 			
-			String deptIn = request.getParameter("deptIn");
-			String deptOut = request.getParameter("deptOut");
-			String supplier = request.getParameter("supplier");
+			final String deptIn = request.getParameter("deptIn");
+			final String deptOut = request.getParameter("deptOut");
+			final String supplier = request.getParameter("supplier");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			MaterialCate.Type cate = MaterialCate.Type.valueOf(Integer.valueOf(cateValue));
-			StockAction.SubType subType = StockAction.SubType.valueOf(Integer.valueOf(subTypeValue));
-			StockAction.Type type = StockAction.Type.valueOf(Integer.valueOf(typeValue));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final MaterialCate.Type cate = MaterialCate.Type.valueOf(Integer.valueOf(cateValue));
+			final StockAction.SubType subType = StockAction.SubType.valueOf(Integer.valueOf(subTypeValue));
+			final StockAction.Type type = StockAction.Type.valueOf(Integer.valueOf(typeValue));
 			
+			final float actualPrice;
+			if(actualPriceVal != null && !actualPriceVal.isEmpty()){
+				actualPrice = Float.parseFloat(actualPriceVal);
+			}else{
+				actualPrice = 0;
+			}
 			InsertBuilder builder = null;
 			if(type == StockAction.Type.STOCK_IN){
 				if(subType == StockAction.SubType.STOCK_IN){
 					// 采购  
-					builder = StockAction.InsertBuilder.newStockIn(staff.getRestaurantId(), Long.valueOf(oriStockDate), Float.parseFloat(actualPrice))
+					builder = StockAction.InsertBuilder.newStockIn(staff.getRestaurantId(), Long.valueOf(oriStockDate), actualPrice)
 							.setOriStockId(oriStockId)
 							.setOperatorId(staff.getId()).setOperator(staff.getName())
 							.setComment(comment)
@@ -92,7 +99,7 @@ public class OperateStockActionAction extends DispatchAction{
 			}else if(type == StockAction.Type.STOCK_OUT){
 				if(subType == StockAction.SubType.STOCK_OUT){
 					// 退货
-					builder = StockAction.InsertBuilder.newStockOut(staff.getRestaurantId(), Long.valueOf(oriStockDate), Float.parseFloat(actualPrice))
+					builder = StockAction.InsertBuilder.newStockOut(staff.getRestaurantId(), Long.valueOf(oriStockDate), actualPrice)
 							.setOriStockId(oriStockId)
 							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId(staff.getId()).setOperator(staff.getName())
@@ -122,10 +129,12 @@ public class OperateStockActionAction extends DispatchAction{
 				}
 			}
 			
-			String[] content = detail.split("<sp>");
-			for(String temp : content){
-				String[] item = temp.split("<spst>");
-				builder.addDetail(new StockActionDetail(Integer.valueOf(item[0]), Float.valueOf(item[1]), Float.valueOf(item[2])));
+			if(detail != null && !detail.isEmpty()){
+				String[] content = detail.split("<sp>");
+				for(String temp : content){
+					String[] item = temp.split("<spst>");
+					builder.addDetail(new StockActionDetail(Integer.valueOf(item[0]), Float.valueOf(item[1]), Float.valueOf(item[2])));
+				}
 			}
 			int id = StockActionDao.insertStockAction(staff, builder);
 			List<StockAction> root = new ArrayList<StockAction>();
@@ -155,9 +164,7 @@ public class OperateStockActionAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward update(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward update(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		
 		JObject jobject = new JObject();
@@ -365,14 +372,17 @@ public class OperateStockActionAction extends DispatchAction{
 				}
 			}
 			
-			String[] content = detail.split("<sp>");
-			for(String temp : content){
-				String[] item = temp.split("<spst>");
-				builder.addDetail(new StockActionDetail(Integer.valueOf(item[0]), Float.valueOf(item[1]), Float.valueOf(item[2])));
+			if(detail != null && !detail.isEmpty()){
+				String[] content = detail.split("<sp>");
+				for(String temp : content){
+					String[] item = temp.split("<spst>");
+					builder.addDetail(new StockActionDetail(Integer.valueOf(item[0]), Float.valueOf(item[1]), Float.valueOf(item[2])));
+				}
 			}
+			
 			StockActionDao.reAuditStockAction(staff, Integer.valueOf(id), builder);
 			jobject.initTip(true, "操作成功, 已反审核库存单信息.");
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){

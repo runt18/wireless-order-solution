@@ -22,9 +22,8 @@ import com.wireless.util.DataPaging;
 
 public class QueryStockActionAction extends Action{
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		
 		JObject jobject = new JObject();
@@ -122,10 +121,9 @@ public class QueryStockActionAction extends Action{
 					price += stockAction.getPrice();
 					actualPrice += stockAction.getActualPrice();
 				}
-				StockAction totalStockAction = new StockAction();
+				StockAction totalStockAction = new StockAction(0);
 				totalStockAction.setAmount(0);
 				totalStockAction.setCateType(1);
-				totalStockAction.setId(0);
 				totalStockAction.setRestaurantId(37);
 				totalStockAction.setType(1);
 				totalStockAction.setSubType(1);
