@@ -2,7 +2,8 @@ function PickFoodComponent(param){
 	
 	param = param || {
 		orderDataCount : null,
-		callback : '',
+		confirm : function(selectedFoods){},
+		onCartChange : function(selectedFoods){}
 	};
 	
 	//总的div
@@ -40,6 +41,14 @@ function PickFoodComponent(param){
 		openShoppingCar({otype:'show'});
 	};
 	
+	this.refresh = function(){
+		displayOrderFoodMsg();
+	};
+	
+	this.closeShopping = function(){
+		openShoppingCar({otype:'hide'});
+	};
+	
 	//渲染
 	function createWxPickFood(){
 		_container = $('<div/>');
@@ -54,18 +63,18 @@ function PickFoodComponent(param){
 		  	+'</div>'
 			+'<div id="divButtonForSC" class="hewarp">'
 				+'<ul>'
-					+'<li style="width: 33.33%">'
-						+'<a href="javascript:operateFood();"> '
+					+'<li style="width: 33.33%" id="shoppingCarClear_li_fastOrderFood">'
+						+'<a href="#"> '
 							+'<i class="foundicon-remove fcolor1"></i>清&nbsp;空'
 						+'</a>'
 					+'</li>'
-					+'<li style="width: 33.33%">'
-						+'<a href="javascript:orderOrTakeout(isTakeout);">'
+					+'<li style="width: 33.33%" id="shoppingCarSelect_li_fastOrderFood">'
+						+'<a href="#">'
 							+'<i class="foundicon-checkmark fcolor2"></i>选好了'
 						+'</a>'
 					+'</li>'
-					+'<li style="width: 33.33%">'
-						+'<a href="javascript:operateShoppingCart();">'
+					+'<li style="width: 33.33%" id="shoppingCarBack_li_fastOrderFood">'
+						+'<a href="#">'
 							+'<i class="foundicon-left-arrow fcolor3"></i>返&nbsp;回'
 						+'</a>'
 					+'</li>'
@@ -111,6 +120,21 @@ function PickFoodComponent(param){
 			element.onclick = function(){
 				showFoodAbout({otype : 'hide'});
 			};
+		});
+		
+		//购物车内的返回
+		_container.find('[id="shoppingCarBack_li_fastOrderFood"]').click(function(){
+			openShoppingCar({otype : 'hide'});
+		});
+		
+		//购物车内的清空
+		_container.find('[id="shoppingCarClear_li_fastOrderFood"]').click(function(){
+			operateFood({otype : 'clear'});
+		});
+		
+		//购物车的选好了
+		_container.find('[id="shoppingCarSelect_li_fastOrderFood"]').click(function(){
+			param.confirm(_orderData);
 		});
 		
 		_container.after($('#bottom'));
@@ -261,6 +285,7 @@ function PickFoodComponent(param){
 					$('#divFoodList').find('[foodStype="image"]').each(function(index, element){
 						element.onclick = function(){
 							showFoodAbout({id : $(element).attr('food-id'), otype : 'show', event : element});
+							
 						};
 					});
 					
@@ -268,6 +293,7 @@ function PickFoodComponent(param){
 					$('#divFoodList').find('[foodStype="word"]').each(function(index, element){
 						element.onclick = function(){
 							operateFood({otype : 'add', id : $($(element).next().find('div[data-r=r]')[0]).attr('food-id'), event : $(element).next().find('div[data-r=r]')[0]});
+							param.onCartChange(_orderData);
 						};
 					});
 					
@@ -275,6 +301,7 @@ function PickFoodComponent(param){
 					$('#divFoodList').find('[data-type="checkbox"]').each(function(index, element){
 						element.onclick =function(){
 							 operateFood({otype : 'add', id : $(element).attr('food-id'), event : element});
+							 param.onCartChange(_orderData);
 						};
 					});
 					
@@ -297,6 +324,7 @@ function PickFoodComponent(param){
 			aboutBox.find('div:first-child > div[data-type=img] > div[class=recommend-food-order]').html('下单');
 			aboutBox.find('div:first-child > div[data-type=img] > div[class=recommend-food-order]').click(function(){
 				saleOrderFood({otype:"order", id:c.id, event:this});
+				param.onCartChange(_orderData);
 			});
 			for(var i = 0; i < _orderData.length; i++){
 				if(_orderData[i].id == c.id){
@@ -341,9 +369,9 @@ function PickFoodComponent(param){
 	//添加进购物车
 	function operateFood(c){
 		var displayCount = null;
-		var calc = null;
+		var calc = true;
 		var temp = null;
-		if(c.event != 'undefined'){
+		if(typeof c.event != 'undefined'){
 			//购物车上方数量
 			displayCount = $(c.event.parentNode).find('div[data-type=count]');
 		}
@@ -421,14 +449,14 @@ function PickFoodComponent(param){
 										}
 									}
 									
-									params.orderData.splice(i, 1);
+									_orderData.splice(i, 1);
 									displayOrderFoodMsg();
 									
 									//刷新购物车界面, 没有菜品时隐藏
-									if(params.orderData.length > 0){
+									if(_orderData.length > 0){
 										$('#divShoppingCart').height('auto');
 									}else{
-										operateShoppingCart({event:this, otype:'hide'});
+										openShoppingCar({event:this, otype:'hide'});
 									}
 									
 								}
@@ -437,7 +465,7 @@ function PickFoodComponent(param){
 					}else{
 						_orderData[i].count--;					
 						if(displayCount){
-							displayCount.css('display', 'block').html(params.orderData[i].count);
+							displayCount.css('display', 'block').html(_orderData[i].count);
 						}
 					}
 					displayOrderFoodMsg();
@@ -458,11 +486,12 @@ function PickFoodComponent(param){
 							});
 						}
 						_orderData.length = 0;
-						$(param.orderDataCount).html('');
-						operateShoppingCart({otype:'hide'});
+						param.onCartChange(_orderData);
+						
 					}
 				}
 			});
+			openShoppingCar({otype:'hide'});
 		}
 	}
 	
@@ -480,7 +509,6 @@ function PickFoodComponent(param){
 	function displayOrderFoodMsg(){
 		var sumPrice = 0;
 		var temp = null;
-		var display = null;
 		for(var i = 0; i < _orderData.length; i++){
 			sumPrice += _orderData[i].unitPrice * _orderData[i].count;
 		}
@@ -488,15 +516,8 @@ function PickFoodComponent(param){
 		//点菜
 		Util.getDom('spanSumCountForSC').innerHTML = _orderData.length;
 		Util.getDom('spanSumPriceForSC').innerHTML = sumPrice.toFixed(2);
-		
-		display = param.orderDataCount;
-		if(_orderData.length > 0){
-			display.innerHTML = _orderData.length;
-			display.style.visibility = 'visible';
-		}else{
-			display.innerHTML = '';
-			display.style.visibility = 'hidden';
-		}
+
+		param.onCartChange(_orderData);
 		
 		var sl = $('div[class*=box-food-list-r] > div[class*=select-food]');
 		for(var i = 0; i < sl.length; i++){
@@ -513,15 +534,14 @@ function PickFoodComponent(param){
 	//打开购物车
 	
 	function openShoppingCar(c){
-		console.log(_orderData);
 		var shoppingBox = '<div data-value="{id}" class="div-fl-f-sc-box box-horizontal">'
 			+ '<div data-type="msg" class="div-full">'
 				+ '<div><b>{name}</b></div>'
 				+ '<div>价格: <span>￥{unitPrice}</span></div>'
 			+ '</div>'
-			+ '<div data-type="cut" onclick="operateFood({otype:\'cut\', id:{id}, event:this})">-</div>'
+			+ '<div data-type="cut" shoppingFoodId={id}>-</div>'
 			+ '<div data-type="count">{count}</div>'
-			+ '<div data-type="plus" onclick="operateFood({otype:\'plus\', id:{id}, event:this})">+</div>'
+			+ '<div data-type="plus" shoppingFoodId={id}>+</div>'
 			+ '</div>';
 		var shoppingCarBox = $('#divShoppingCart');
 		var shoppingCarMainView = $('#divFoodListForSC');
@@ -555,6 +575,21 @@ function PickFoodComponent(param){
 			}
 			
 			shoppingCarMainView.html(html.join(''));
+			//购物车里面的减号
+			shoppingCarMainView.find('[data-type="cut"]').each(function(index, element){
+				element.onclick = function(){
+					operateFood({otype:'cut', id : $(element).attr('shoppingFoodId'), event : element});
+				};
+			});
+			
+			//购物车里面的加号
+			shoppingCarMainView.find('[data-type="plus"]').each(function(index, element){
+				element.onclick = function(){
+					console.log("asds");
+					operateFood({otype : 'plus', id : $(element).attr('shoppingFoodId'), event : element});
+				}
+			});
+			
 			sumCountView.html(_orderData.length);
 			sumPriceView.html(sumPrice.toFixed(2));
 			
@@ -567,7 +602,6 @@ function PickFoodComponent(param){
 				shoppingCarBox.removeClass('left-nav-show');
 			}
 			shoppingCarBox.addClass('left-nav-hide');
-			$('#divShoppingCart').hide();
 			shoppingCarMainView.html(html.join(''));		
 		}
 		

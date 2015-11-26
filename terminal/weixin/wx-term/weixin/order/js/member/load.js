@@ -440,15 +440,72 @@ $(function(){
 	
 	 //自助点餐
 	 var pickFoodComponent = new PickFoodComponent({
-		 orderDataCount : document.getElementById('spanDisplayFoodCount')
+		 confirm : function(orderFoodData){
+			 if(orderFoodData.length == 0){
+				 Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.', btn : 'yes'});
+				 return;
+			 }
+			 Util.lm.show();
+			 
+			 var foods = "";
+			 var temp = null;
+			 for(var i =0; i < orderFoodData.length; i++){
+				 temp = orderFoodData[i];
+				 if(i > 0){
+					 foods += '&';
+				 }
+				 foods += (temp.id + ',' + temp.count);
+			 }
+			 $.ajax({
+					url : '../../WXOperateOrder.do',
+					dataType : 'json',
+					type : 'post',
+					data : {
+						dataSource : 'insertOrder',
+						oid : Util.mp.oid,
+						fid : Util.mp.fid,
+						foods : foods
+					},
+					success : function(data, status, xhr){
+						Util.lm.hide();
+						if(data.success){
+							orderFoodData = [];
+							//刷新界面
+							pickFoodComponent.refresh();
+							pickFoodComponent.closeShopping();
+							//清空列表
+//							Util.getDom('divFoodListForSC').innerHTML = '';
+//							Util.getDom('divFoodListForTO').innerHTML = '';
+							
+							Util.dialog.show({title : '请呼叫服务员确认订单', msg : '<font style="font-weight:bold;font-size:25px;">订单号: ' + data.other.order.code + '</font>', btn : 'yes' });
+						}else{
+							Util.dialog.show({ msg : data.msg });
+						}
+					},
+					error : function(xhr, errorType, error){
+						Util.lm.hide();
+						Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
+					}
+				});
+		 },
+		 onCartChange : function(orderFoodData){
+			 if(orderFoodData.length > 0){
+				 document.getElementById('spanDisplayFoodCount').innerHTML = orderFoodData.length;
+				 document.getElementById('spanDisplayFoodCount').style.visibility = 'visible';
+			 }else{
+				 document.getElementById('spanDisplayFoodCount').innerHTML ='';
+				 document.getElementById('spanDisplayFoodCount').style.visibility = 'hidden';
+			 }
+		 }
 	 });
 	 
-	  $('#asdsad').click(function(){
+	  $('#pickOrderFood_a_member').click(function(){
 	    	pickFoodComponent.open();
 	    	$('#bottom').show();
 	  });
 	  
-	  $('#shoppingCaf').click(function(){
+	  //打开购物车
+	  $('#shoppingCar_li_member').click(function(){
 		  pickFoodComponent.openShopping();
 	  });
 	
