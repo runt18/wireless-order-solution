@@ -29,6 +29,21 @@
 <link rel="stylesheet" href="css/table.css?v=<%=v %>">
 
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
+<!-- 解决jqm1.3.2的popup问题 -->
+<script type="text/javascript">
+	//Override of $.fn.animationComplete must be called before initialise jquery mobile js
+	$(document).on('mobileinit', function() {
+	    $.fn.animationComplete = function(callback) {
+	      if ($.support.cssTransitions) {
+	    	  var superfy = "WebKitTransitionEvent" in window ? "webkitAnimationEnd" : "animationend";
+	          return $(this).one(superfy, callback);
+	      }else{
+	          setTimeout(callback, 0);
+	          return $(this);
+	      }
+	    };
+	});
+</script>
 <script type="text/javascript" src="js/common/jquery.mobile-1.3.2.min.js"></script>
 <!-- 日期插件.js -->
 <script type="text/javascript" src="js/common/datebox.core.js"></script>
