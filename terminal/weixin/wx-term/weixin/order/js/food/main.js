@@ -376,7 +376,6 @@ function operateShoppingCart(c){
 			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.', btn : 'yes'});
 			return;
 		}
-		
 		Util.lm.show();
 		
 		var foods = "";

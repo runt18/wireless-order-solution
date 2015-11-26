@@ -17,15 +17,16 @@
 	
 	var isTakeout = false, to={};
 	
-	if(Util.mp.extra && Util.mp.extra==3){
-		isTakeout = true;
-		to={
-				useNewAddress : false,
-				defaultAddress : '',
-				member : {},
-				customerContects : []
-		};		
-	}
+	//外卖
+//	if(Util.mp.extra && Util.mp.extra==3){
+//		isTakeout = true;
+//		to={
+//				useNewAddress : false,
+//				defaultAddress : '',
+//				member : {},
+//				customerContects : []
+//		};		
+//	}
 
 
 var Templet = {
@@ -39,8 +40,6 @@ var Templet = {
 			+ '<div data-r="b" class={orderAction}><font>{foodCnt}</font>人点过</div>'
 		+ '</div>'
 		+ '<div data-r="r" class="box-horizontal box-food-list-r">'
-			//+ '<div data-r="l" data-type="count" data-value="{id}" style="display:{display}">{count}</div>'
-			//+ '<div data-r="r" onclick="operateFood({otype:\'add\', id:{id}, event:this})">+</div>'
 			+ '<div data-r="r" {selected} data-value="{id}" onclick="operateFood({otype:\'add\', id:{id}, event:this})"></div>'
 		+ '</div>'
 		+ '</div>',
@@ -54,7 +53,6 @@ var Templet = {
 		+ '<div data-type="plus" onclick="operateFood({otype:\'plus\', id:{id}, event:this})">+</div>'
 		+ '</div>',
 	deptBox : '<div data-value="{id}" onclick="filtersKitchen(this)">{name}</div>',
-	kitchenBox2 : '<div data-value="{id}" onclick="filtersFood(this)">{name}</div>',
 	kitchenBox : '<li><a data-value="{id}" onclick="filtersFood2(this)" class={star}>{name}</a></li>',
 	contectBox : '<div data-value={id} class="takeout_address_added {hidden}" onclick="selectAddress(this)">'+ 
 					'<div class="added_left">'+
@@ -78,6 +76,7 @@ function changeImg(e){
 	}
 }
 
+//
 function fireOperateFood(thiz){
 	operateFood({otype:'add', id:$($(thiz).next().find('div[data-r=r]')[0]).attr('data-value'), event:$(thiz).next().find('div[data-r=r]')[0]});
 }

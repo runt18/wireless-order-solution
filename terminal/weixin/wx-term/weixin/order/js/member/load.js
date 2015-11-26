@@ -438,12 +438,18 @@ $(function(){
 		});
 	});
 	
-	
+	 //自助点餐
+	 var pickFoodComponent = new PickFoodComponent({
+		 orderDataCount : document.getElementById('spanDisplayFoodCount')
+	 });
+	 
 	  $('#asdsad').click(function(){
-	    	var pickFoodComponent = new PickFoodComponent({
-	    		renderTo : $('#wxOrderFood_div_member')
-	    	});
 	    	pickFoodComponent.open();
-	    });
+	    	$('#bottom').show();
+	  });
+	  
+	  $('#shoppingCaf').click(function(){
+		  pickFoodComponent.openShopping();
+	  });
 	
 });
