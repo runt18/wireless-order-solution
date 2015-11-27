@@ -84,12 +84,6 @@ public class ReqPrintContent{
 		return req;
 	}
 	
-	public static ReqPrintContent buildTransFood(Staff staff, Order.TransferBuilder transferBuilder){
-		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_TRANSFER_FOOD);
-		req.parcel.writeParcel(transferBuilder, 0);
-		return req;
-	}
-	
 	public static ReqPrintContent buildTransTbl(Staff staff, int orderId, Table.Builder srcTbl, Table.Builder destTbl){
 		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_TRANSFER_TABLE);
 		req.parcel.writeInt(orderId);
