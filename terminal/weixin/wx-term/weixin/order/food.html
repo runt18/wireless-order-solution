@@ -13,200 +13,39 @@
 <script type="text/javascript" src="./js/Util.js"></script>
 <script type="text/javascript" src="./js/idangerous.swiper-2.4.2.min.js"></script>
 <script type="text/javascript" src="./js/food/load.js"></script>
-<script type="text/javascript" src="./js/food/main.js"></script>
 
+<script type="text/javascript" src="./js/fastOrderFood/fastOrderFood.js"></script>
 </head>
 <body>
 
-	<div id="divNavKitchen" class="box-horizontal">
-		<div id="divNavKitchen-kitchen">
-			<div data-r="title" class="div-l-n-title" data-value="-1"
-				onclick="filtersFood(this)">全部</div>
-			<div data-r="body"></div>
-		</div>
-		<div id="divNavKitchen-mask" class="div-full">z</div>
-	</div>
-
-	<!-- 购物车列表 -->
-	<div id="divShoppingCart" class="box-vertical">
-		<div id="divFoodListForSC">
-		</div>
-		<div id="divSumForSC">
-			菜品数量:&nbsp;<span id="spanSumCountForSC">--.--</span> &nbsp;&nbsp;
-			合计:&nbsp;<span id="spanSumPriceForSC">--.--</span>
-		</div>
-		<div id="divButtonForSC" class="hewarp">
-			<ul>
-				<li style="width: 33.33%"><a
-					href="javascript:operateFood({otype:'claer'});"> <i
-						class="foundicon-remove fcolor1"></i>清&nbsp;空
-				</a></li>
-				<li style="width: 33.33%"><a
-					href="javascript:orderOrTakeout(isTakeout);">
-						<i class="foundicon-checkmark fcolor2"></i>选好了
-				</a></li>
-				<li style="width: 33.33%"><a
-					href="javascript:operateShoppingCart({otype:'hide'});">
-						<i class="foundicon-left-arrow fcolor3"></i>返&nbsp;回
-				</a></li>
-			</ul>
-		</div>
-	</div>
-
-	<!-- 外卖信息 -->
-	<div id="divTakeout">
-		<div id="divTakeoutDetailBox" style="height: 460px;overflow-y:auto;">
-		<div class="takeoutDetail">
-			<p>送餐信息:</p>
-			<div id="divAddressList" class="takeout_address" align="center">
-<!-- 				<div class="takeout_address_added takeout_address_unselect" onclick="selectAddress(this)">
-					<div class="added_left">
-						<div style="float: left;width: 50%">收货人 : 鸣人</div>
-						<div style="float: right;width: 50%">13533464033</div>
-						<div >地址: 天河区大观南路晨晖商务大厦A301</div>
-					</div>
-					<div class="added_right">
-						<i class="foundicon-checkmark"></i>
-					</div>
-				</div>
-				
-				<div class="takeout_address_added takeout_address_unselect"  onclick="selectAddress(this)">
-					<div class="added_left">
-						<div style="float: left;width: 50%">收货人 : 鸣人</div>
-						<div style="float: right;width: 50%">13533464033</div>
-						<div >地址: 天河区大观南路晨晖商务大厦A301</div>
-					</div>
-					<div class="added_right">
-						<i class="foundicon-checkmark"></i>
-					</div>
-				</div>
-				
-				<div class="takeout_address_added takeout_address_unselect"  onclick="selectAddress(this)">
-					<div class="added_left">
-						<div style="float: left;width: 50%">收货人 : 鸣人</div>
-						<div style="float: right;width: 50%">13533464033</div>
-						<div >地址: 天河区大观南路晨晖商务大厦A301</div>
-					</div>
-					<div class="added_right">
-						<i class="foundicon-checkmark"></i>
-					</div>
-				</div>			
-				
-				<div align="right" class="takeout_other_address"><span onclick="showOtherAddress({event:this, otype:'other'})">→使用其他地址</span> </div>
-				<div align="right" class="takeout_other_address takeout_address_hidden"><span onclick="showOtherAddress({event:this, otype:'new'})">→填写新的地址</span> </div> -->
-			</div>
-			<!-- 手动地址 -->
-			<div id="divNewAddress4TO" class="takeout_address" align="center">
-				<table >
-					<tr>
-						<td>姓名:</td><td><input id="to_name" type="text" style="width:80px;"></td>
-						<td>&nbsp;&nbsp;电话:</td><td><input id="to_phone" type="number" placeholder="必填" style="width:100%;"></td>
-					</tr>
-					<tr>
-						<td>地址:</td><td colspan="3"><input id="to_address" placeholder="必填" type="text" style="width:100%;"></td>
-					</tr>
-				</table>
-			</div>			
-			<p>支付方式:</p>
-			<div id="divPayment4TO" class="takeout_payment">
-				<div >
-					货到付款 <input type="radio" checked="checked">
-				</div>
-			</div>
-			<p>菜品信息:</p>
-			<div id="divSumForTO" class="takeout_foodGeneral">
-				菜品数量:&nbsp;<span id="spanSumCountForTO">0</span> &nbsp;&nbsp;
-				合计:&nbsp;<span id="spanSumPriceForTO">0.00</span>
-			</div>
-			<div id="divFoodListForTO" class="div-full" style="height: auto;"></div>
-			
-		</div>
-		</div>
-		<div id="divButtonForTO" class="hewarp takeout_operate" >
-			<ul>
-				<li style="width: 50%"><a
-					href="javascript:to.takeoutCommit();">
-						<i class="foundicon-checkmark fcolor2"></i>下&nbsp;单
-				</a></li>
-				<li style="width: 50%"><a
-					href="javascript:operateShoppingCart({event:this, otype:'hide', takeout:true});">
-						<i class="foundicon-left-arrow fcolor3"></i>返&nbsp;回
-				</a></li>
-			</ul>
-		</div>
-
-	</div>
-
-
-	<!-- 厨房列表 -->
-	<div id="divMainView" class="box-vertical">
-		<section class="panel" id="panelNav">
-			<ul class="nav-aside" id="ulKitchenList">
-				<li class="li-k-title"><a href="#">全部厨房</a></li>
-			</ul>
-		</section>
-
-		<div id="divFoodList" class="div-full" style="margin-left: 80px;">
-			
-			<div id="divOperateFoodPaging">&nbsp;</div>
-		</div>
-
-		<div id="divBottomNav" class="hewarp">
-			<ul class="swiper-wrapper">
-				<li class="index swiper-slide"><a
-					href="javascript:Util.jump'index.html');"> <i
-						class="foundicon-home fcolor6"></i>首&nbsp;页
-				</a></li>
-				<li class="user swiper-slide">
-					<a id="foodOrderList" href="javascript:linkToOrders();"> 
-						<i class="foundicon-star fcolor1"></i><font id="food_order">我的订单</font>
-					</a>
-				</li>
-				<li class="special swiper-slide">
-				<a href="javascript:operateShoppingCart({event:this, otype:'show'});" title="购物车"> 
-				<i class="foundicon-cart fcolor2"><div id="spanDisplayFoodCount"></div></i>购物车
+<div id="bottom"  style="height:45;z-index:11111;">
+	<div class="hewarp">
+		<ul class="swiper-wrapper">
+			<li class="index swiper-slide">
+				<a href="javascript:Util.jump('index.html');" title="首页">
+				<i class="foundicon-home fcolor6"></i>首页
 				</a>
-				</li>
-				<li class="user swiper-slide"><a href="javascript:window.location.reload();" title="刷新"> <i class="foundicon-refresh fcolor3"></i>刷&nbsp;新</a></li>
-				<li class="special swiper-slide">
-					
+			</li>
+			<li class="user swiper-slide">
+				<a id="foodOrderList" > 
+					<i class="foundicon-star fcolor1"></i><font id="food_order">我的订单</font>
+				</a>
+			</li>
+			<li class="special swiper-slide" id="shoppingCar_li_member">
+				<a title="购物车"> 
+				<i class="foundicon-cart fcolor2"><div id="displayFoodCount_div_fastOrderFood"></div></i>购物车
+				</a>
+			</li>
 
-			</ul>
-		</div>
+			<li class="user swiper-slide">
+				<a href="javascript:window.location.reload();" title="刷新">
+				<i class="foundicon-refresh fcolor3"></i>刷新
+				</a>
+			</li>
+		</ul>
 	</div>
+</div>
 
-	<script>
-		var navBottomSwiper = new Swiper('#divBottomNav', {
-			paginationClickable : true,
-			slidesPerView : 'auto',
-			disableAutoResize : true
-		});
-		var li = $('#divBottomNav li');
-		var tw = $('#divBottomNav').width();
-		tw = li.length > 4 ? parseInt(tw / 4) : parseInt(tw / li.length);
-		for (var i = 0; i < li.length; i++) {
-			li[i].style.width = tw + 'px';
-		}
-	</script>
-
-	<div id="divFoodShowAbout">
-		<div data-region="img" class="d-fsa-img">
-			<div data-type="img" style="position: relative;">
-				<div class="recommend-food-detail">
-					&nbsp;<span id="recommendFoodName" data-type="n">菜名</span> <span
-						id="recommendFoodPrice" data-type="p"
-						style="margin-right: 5px; float: right; color: #ff6600">￥88</span>
-				</div>
-				<div class="recommend-food-order"
-					onclick="saleOrderFood({otype:'order', id:46712, event:this})">下单</div>
-				<!-- <span class="sale-food-border" ><input type="button" value="下单" style="font-size: 17px;"> </span> -->
-			</div>
-		</div>
-		<div data-region=desc class="d-fsa-desc">暂无简介</div>
-		
-		<div data-region="mask" class="d-fsa-mask div-full"
-			onclick="foodShowAbout({event:this, otype:'hide'})"></div>
-	</div>
 
 </body>
 </html>
