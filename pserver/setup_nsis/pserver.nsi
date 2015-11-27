@@ -170,7 +170,10 @@ Section Uninstall
   Delete "$INSTDIR\${EXECUTE_FILE}"
   Delete "$INSTDIR\uninst.ico"
   Delete "$INSTDIR\rn.ico"
-
+  
+  RMDir /r "$INSTDIR\Microsoft.VC90.MFC"
+  RMDir /r "$INSTDIR\Microsoft.VC90.CRT"
+  
   RMDir /r "$SMPROGRAMS\${PRODUCT_NAME} ${PRODUCT_VERSION}"
   RMDir "$INSTDIR"
 
