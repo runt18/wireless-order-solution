@@ -83,7 +83,7 @@ body{
 #divBottomNav-top > div[data-region=right]{
 }
 
-#spanDisplayFoodCount{
+#displayFoodCount_div_fastOrderFood{
 	color: red;
 	display: inline;
 	font-weight: bold;
@@ -135,15 +135,15 @@ body{
 	background: rgba(0, 0, 0, .5);
 }
 /* divMainView--------------------------------------------- */
-#divMainView{
+#mainView_div_fastOrderFood{
 	overflow: hidden;
 	background-color: #eee;
 	z-index: -1;
 }
-#divFoodList{
+#foods_div_fastOrderFood{
 	overflow-y: auto;
 }
-#divOperateFoodPaging{
+#foodList_div_fastOrderFood{
 	width: 100%;
 	line-height: 90px;
 	text-align: center;
@@ -214,7 +214,7 @@ body{
 	background-image: url(../images/checkbox-checked.png) !important;
 }
 /* --------------------------------------------- */
-#divShoppingCart{
+#shoppingCart_div_fastOrderFood{
 	overflow: hidden;
 	position: absolute;
 	width: 100%;
@@ -228,32 +228,18 @@ body{
 	z-index: 999 !important;
 	background-color: #eee;
 }
-#divShoppingCart > div{
+#shoppingCart_div_fastOrderFood > div{
 	width: 100%;
 }
 
 /*divTakeout-----------------------------------------------*/
 
-#divTakeout{
-	/* display : none; */
-	overflow: hidden;
-	position: absolute;
-	width: 100%;
-/* 	height: auto !important; */
-	font-size: 13px;
-	top: 0;
-	//-webkit-transform: translateX(-100%);
-	left: 200%;
-	bottom : 0;
-	z-index: 999 !important;
-	background-color: #eee;
-}
 
-#divFoodListForSC{
+#shoppingCartFood_div_fastOrderFood{
 	overflow-y: auto;
 	border-top: 2px solid black;
 }
-#divSumForSC{
+#shoppingFoodsum_div_fastOrderFood{
 	border-top: 1px solid #aaa;
 	background: rgba(255, 255, 255, 1);
 	line-height: 40px;
@@ -263,12 +249,10 @@ body{
 	color: #000;
 }
 
-#divSumForSC > span{
+#shoppingFoodsum_div_fastOrderFood > span{
 	color: #26a9d0;
 }
-#divButtonForSC{
-}
-#divButtonForSC > div{
+#shoppingBtn_div_fastOrderFood > div{
 	text-align: center;
 	line-height: 35px;
 	font-size: 15px;
@@ -335,7 +319,7 @@ color:#ff6600;
 	border-bottom: 1px solid #ccc;
 }
 /* --------------------------------------------- */
-#divFoodShowAbout{
+#foodShowAbout_div_fastOrderFood{
 	z-index: 99999;
 	position: absolute;
 	top: 0;
