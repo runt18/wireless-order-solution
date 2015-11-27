@@ -101,6 +101,8 @@ Section "MainSection" SEC01
   File "..\releasenote.txt"
   File "uninst.ico"
   File "rn.ico"
+  File /r "c:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.MFC"
+  File /r "c:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT"
   ;create start-menu items
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME} ${PRODUCT_VERSION}"
   CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME} ${PRODUCT_VERSION}\${PRODUCT_NAME}.lnk" "$INSTDIR\${EXECUTE_FILE}"
