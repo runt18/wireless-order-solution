@@ -1933,7 +1933,7 @@ Ext.onReady(function(){
 						text : '输入 1.5, 表示消费 100 元兑换 150 积分'
 					}, {
 						xtype : 'numberfield',
-						id : 'numExchangeRate_numberField_member',
+						id : 'numInitialPoint_numberField_member',
 						fieldLabel : '初始积分' + Ext.ux.txtFormat.xh,
 						value : 1,
 						minValue : 0.00,
@@ -2025,7 +2025,7 @@ Ext.onReady(function(){
 						var typeName = Ext.getCmp('txtTypeName_textField_member');
 						var chargeRate = Ext.getCmp('numChargeRate_numberField_member');
 						var exchangeRate = Ext.getCmp('numExchangeRate_numberField_member');
-						var initialPoint = Ext.getCmp('numExchangeRate_numberField_member');
+						var initialPoint = Ext.getCmp('numInitialPoint_numberField_member');
 						var discount = Ext.getCmp('comboDiscount_combo_member');
 						var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
 						var attribute = m_memberTypeWin.s_memberType;
@@ -2223,7 +2223,7 @@ Ext.onReady(function(){
 		var typeName = Ext.getCmp('txtTypeName_textField_member');
 		var chargeRate = Ext.getCmp('numChargeRate_numberField_member');
 		var exchangeRate = Ext.getCmp('numExchangeRate_numberField_member');
-		var initialPoint = Ext.getCmp('numExchangeRate_numberField_member');
+		var initialPoint = Ext.getCmp('numInitialPoint_numberField_member');
 		var discount = Ext.getCmp('comboDiscount_combo_member');
 		var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
 		var desc = Ext.getCmp('txtCommentForMemberType_area_member');
