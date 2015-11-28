@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
@@ -23,25 +22,21 @@ import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 
-public class WXQueryDeptAction extends DispatchAction{
+public class WxQueryDeptAction extends DispatchAction{
 	
 	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
-		DBCon dbCon = null;
 		try{
-			dbCon = new DBCon();
-			dbCon.connect();
 			
 			String fid = request.getParameter("fid");
-			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			
-			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
-			List<Department> depts = DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL);
-			List<Kitchen> kitchens = KitchenDao.getByType(dbCon, staff, Kitchen.Type.NORMAL);
+			Staff staff = StaffDao.getAdminByRestaurant(rid);
+			List<Department> depts = DepartmentDao.getByType(staff, Department.Type.NORMAL);
+			List<Kitchen> kitchens = KitchenDao.getByType(staff, Kitchen.Type.NORMAL);
 			
 			List<Map<String, Object>> deptList = new ArrayList<Map<String,Object>>();
 			List<Kitchen> tempKitchenList = null;
@@ -69,7 +64,6 @@ public class WXQueryDeptAction extends DispatchAction{
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		
@@ -86,19 +80,14 @@ public class WXQueryDeptAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward queryDepts(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
-		DBCon dbCon = null;
+		final JObject jobject = new JObject();
 		try{
-			dbCon = new DBCon();
-			dbCon.connect();
 			
-			String openId = request.getParameter("oid");
+			final String openId = request.getParameter("oid");
+			final int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			jobject.setRoot(DepartmentDao.getByType(staff, Department.Type.NORMAL));
 			
-			int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
-			Staff staff = StaffDao.getAdminByRestaurant(rid);
-			
-			List<Department> depts = DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL);
-			jobject.setRoot(depts);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -106,32 +95,24 @@ public class WXQueryDeptAction extends DispatchAction{
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		
 		return null;
 	}
 	
-	public ActionForward kitchen(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
+	public ActionForward kitchen(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final JObject jobject = new JObject();
 		
-		DBCon dbCon = null;
 		try{
-			dbCon = new DBCon();
-			dbCon.connect();
 			
-			String fid = request.getParameter("fid");
-			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
+			final String fid = request.getParameter("fid");
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
-			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
+			final List<Kitchen> list = new ArrayList<>(); 
 			
-			List<Kitchen> list = new ArrayList<>(); 
-			
-			List<Food> foods = FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().setSellout(false).setRecomment(true).setContainsImage(true), null);
-			if(!foods.isEmpty()){
+			if(!FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().setSellout(false).setRecomment(true).setContainsImage(true), null).isEmpty()){
 				Kitchen star = new Kitchen(-10);
 				star.setName("明星菜");
 				list.add(star);
@@ -148,7 +129,6 @@ public class WXQueryDeptAction extends DispatchAction{
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		return null;

@@ -897,7 +897,7 @@ static unsigned __stdcall PrintConsumerProc(LPVOID pvParam){
 					result = EndDocPrinter(hPrinter);
 					_ASSERT(result == TRUE);
 
-					result =  ClosePrinter(hPrinter);
+					result = ClosePrinter(hPrinter);
 					_ASSERT(result == TRUE);
 				}
 
