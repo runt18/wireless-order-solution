@@ -381,6 +381,7 @@ var filterComb = new Ext.form.ComboBox({
 			var deviceId = Ext.getCmp('txtDeviceId');
 			rId.setValue('');
 			rName.setValue('');
+			deviceId.setValue('');
 			if(index == 0){
 				rId.setVisible(false);
 				rName.setVisible(false);
