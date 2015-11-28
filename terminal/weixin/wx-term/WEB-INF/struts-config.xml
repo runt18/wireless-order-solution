@@ -43,12 +43,12 @@
 		<action path="/WXEntry" type="com.wireless.Actions.weixin.EntryAction"
 			scope="request">
 		</action>
-		<action path="/WXQueryFood"
-			type="com.wireless.Actions.weixin.query.WXQueryFoodAction" scope="request"
+		<action path="/WxQueryFood"
+			type="com.wireless.Actions.weixin.query.WxQueryFoodAction" scope="request"
 			parameter="dataSource">
 		</action>
-		<action path="/WXQueryDept"
-			type="com.wireless.Actions.weixin.query.WXQueryDeptAction" scope="request"
+		<action path="/WxQueryDept"
+			type="com.wireless.Actions.weixin.query.WxQueryDeptAction" scope="request"
 			parameter="dataSource">
 		</action>
 		<action path="/WXOperateMember"
