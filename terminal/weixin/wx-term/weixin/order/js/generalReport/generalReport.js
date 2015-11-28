@@ -379,7 +379,7 @@ function getBusinessStatisticsData(c){
 					        },'json');
 					        
 					        //获取部门列表
-					        $.post('../../WXQueryDept.do', {
+					        $.post('../../WxQueryDept.do', {
 					        	dataSource : "queryDepts",
 					        	oid : Util.mp.oid
 					        }, function(rt){

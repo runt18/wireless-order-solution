@@ -167,7 +167,7 @@ function PickFoodComponent(param){
 		var kitchenBox = '<li><a data-value="{id}" href="#" data-type="kitchenBox" class={star}>{name}</a></li>';
 		Util.lm.show();
 		$.ajax({
-			url : '../../WXQueryDept.do',
+			url : '../../WxQueryDept.do',
 			dataType : 'json',
 			type : 'post',
 			data : {
@@ -243,7 +243,7 @@ function PickFoodComponent(param){
 		var requestParams = {
 				dataSource : 'normal',
 				fid : Util.mp.fid,
-				kitchenId : typeof kitchenId != 'undefined' ? kitchenId : -1,
+				kitchenId : typeof kitchenId != 'undefined' ? kitchenId : -1
 		};
 		
 		//判断是否明星菜
@@ -254,7 +254,7 @@ function PickFoodComponent(param){
 		Util.lm.show();
 		
 		$.ajax({
-			url : '../../WXQueryFood.do',
+			url : '../../WxQueryFood.do',
 			dataType : 'json',
 			type : 'post',
 			data : requestParams,
@@ -293,7 +293,9 @@ function PickFoodComponent(param){
 					$('#foods_div_fastOrderFood').find('[foodStype="word"]').each(function(index, element){
 						element.onclick = function(){
 							operateFood({otype : 'add', id : $($(element).next().find('div[data-r=r]')[0]).attr('food-id'), event : $(element).next().find('div[data-r=r]')[0]});
-							param.onCartChange(_orderData);
+							if(param.onCartChange && typeof param.onCartChange == 'function'){
+								param.onCartChange(_orderData);
+							}
 						};
 					});
 					
@@ -301,7 +303,9 @@ function PickFoodComponent(param){
 					$('#foods_div_fastOrderFood').find('[data-type="checkbox"]').each(function(index, element){
 						element.onclick =function(){
 							 operateFood({otype : 'add', id : $(element).attr('food-id'), event : element});
-							 param.onCartChange(_orderData);
+							 if(param.onCartChange && typeof param.onCartChange == 'function'){
+							 	param.onCartChange(_orderData);
+							 }
 						};
 					});
 					
@@ -324,7 +328,9 @@ function PickFoodComponent(param){
 			aboutBox.find('div:first-child > div[data-type=img] > div[class=recommend-food-order]').html('下单');
 			aboutBox.find('div:first-child > div[data-type=img] > div[class=recommend-food-order]').click(function(){
 				saleOrderFood({otype:"order", id:c.id, event:this});
-				param.onCartChange(_orderData);
+				if(param.onCartChange && typeof param.onCartChange == 'function'){
+					param.onCartChange(_orderData);
+				}
 			});
 			for(var i = 0; i < _orderData.length; i++){
 				if(_orderData[i].id == c.id){
@@ -495,7 +501,9 @@ function PickFoodComponent(param){
 							});
 						}
 						_orderData.length = 0;
-						param.onCartChange(_orderData);
+						if(param.onCartChange && typeof param.onCartChange == 'function'){
+							param.onCartChange(_orderData);
+						}
 						
 					}
 				}
@@ -526,7 +534,9 @@ function PickFoodComponent(param){
 		Util.getDom('sumCount_span_fastOrderFood').innerHTML = _orderData.length;
 		Util.getDom('sumPrice_div_fastOrderFood').innerHTML = sumPrice.toFixed(2);
 
-		param.onCartChange(_orderData);
+		if(param.onCartChange && typeof param.onCartChange == 'function'){
+			param.onCartChange(_orderData);
+		}
 		
 		var sl = $('div[class*=box-food-list-r] > div[class*=select-food]');
 		for(var i = 0; i < sl.length; i++){

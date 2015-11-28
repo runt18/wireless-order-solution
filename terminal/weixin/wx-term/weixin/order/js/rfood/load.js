@@ -17,7 +17,7 @@ var Templet = {
 $(function(){
 	Util.lbar('', function(html){ $(document.body).append(html);  });
 	$.ajax({
-		url : '../../WXQueryFood.do',
+		url : '../../WxQueryFood.do',
 		dataType : 'json',
 		data : {
 			dataSource : 'isRecommend',
