@@ -378,18 +378,25 @@ var filterComb = new Ext.form.ComboBox({
 		select : function(combo, record, index){
 			var rId = Ext.getCmp('txtRestaurantId');
 			var rName = Ext.getCmp('txtRestaurantName');
+			var deviceId = Ext.getCmp('txtDeviceId');
 			rId.setValue('');
 			rName.setValue('');
 			if(index == 0){
 				rId.setVisible(false);
 				rName.setVisible(false);
+				deviceId.setVisible(false);
 			}else if (index == 1){
 				rId.setVisible(true);
 				rName.setVisible(false);
-				
+				deviceId.setVisible(false);
 			}else if(index == 2){
 				rId.setVisible(false);
 				rName.setVisible(true);
+				deviceId.setVisible(false);
+			}else if(index == 3){
+				deviceId.setVisible(true);
+				rName.setVisible(false);
+				rId.setVisible(false);
 			};
 		}
 	}
@@ -478,6 +485,11 @@ Ext.onReady(function(){
 				hidden : true
 			},{
 				xtype : 'textfield',
+				id : 'txtDeviceId',
+				width : 120,
+				hidden : true
+			},{
+				xtype : 'textfield',
 				id : 'txtRestaurantName',
 				width : 120,
 				hidden : true,
@@ -495,6 +507,7 @@ Ext.onReady(function(){
 					store.baseParams['dataSource'] = 'execute';
 					store.baseParams['rId'] = Ext.getCmp('txtRestaurantId').getValue();
 					store.baseParams['rName'] = Ext.getCmp('txtRestaurantName').getValue();
+					store.baseParams['deviceId'] = Ext.getCmp('txtDeviceId').getValue();
 					store.load({
 						params : {
 							start : 0,
