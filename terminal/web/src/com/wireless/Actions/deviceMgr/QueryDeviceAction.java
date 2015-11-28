@@ -25,14 +25,18 @@ public class QueryDeviceAction extends Action{
 		final String rName = request.getParameter("rName");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
+		final String deviceId = request.getParameter("deviceId");
 		try{
 			final DeviceDao.ExtraCond extraCond = new DeviceDao.ExtraCond();
 			if(rId != null && !rId.trim().isEmpty()){
 				extraCond.setRestaurant(Integer.parseInt(rId));
-			}else if(rName != null && !rName.trim().isEmpty()){
+			}
+			if(rName != null && !rName.trim().isEmpty()){
 				extraCond.setRestaurant(rName);
 			}
-			
+			if(deviceId != null && !deviceId.isEmpty()){
+				extraCond.setDeviceId(deviceId);
+			}
 			final String orderClause;
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				orderClause = " LIMIT " + start + "," + limit;
