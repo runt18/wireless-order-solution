@@ -66,6 +66,8 @@
 <script type="text/javascript" src="js/global/tables.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/global/foods.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/global/staff.js?v=<%=v %>"></script>
+<!-- 分页控件 -->
+<script type="text/javascript" src="./js/padding/padding.js"></script>
 <!-- 数字键盘控件 -->
 <script type="text/javascript" src="js/numKeyBoard/numKeyBoard.js?v=<%=v %>"></script>
 <!-- 餐台选择控件 -->
@@ -186,8 +188,8 @@
 			<a data-role="button" data-inline="true" class="bottomBtnFont" id="tranTable_a_tableSelect">转台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.stopSellMgr()">沽清</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#tableSelectOtherOperateCmp">更多</a>
-			<a href="javascript: ts.tp.getPreviousPage()" data-role="button" data-inline="true" class="bottomBtnFont">上一页</a>
-			<a href="javascript: ts.tp.getNextPage()" data-role="button" data-inline="true" class="bottomBtnFont">下一页</a>		 
+			<a data-role="button" data-inline="true" class="bottomBtnFont" id="prevTablePage_a_tableSelect">上一页</a>
+			<a data-role="button" data-inline="true" class="bottomBtnFont" id="nextTablePage_a_tableSelect">下一页</a>		 
 		 </div>
 	</div>
 
