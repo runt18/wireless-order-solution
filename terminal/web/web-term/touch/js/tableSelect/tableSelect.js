@@ -17,7 +17,7 @@ var	ts = {
 	 * 元素模板
 	 */
 	//餐台
-	tableCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
+	tableCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
 //	'<div>{name}<br>{alias}</div></a>';
 		'<div style="height: 70px;">{name}<br>{alias}' +
 			'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
@@ -139,45 +139,98 @@ $(function(){
 		//初始化窗口大小
 		$(window).resize();
 	
-		/**
-		 * 餐桌分页包
-		 */
-		ts.tp = new Util.to.padding({
-			renderTo : 'divTableShowForSelect',
-			displayId : 'divDescForTableSelect-padding-msg',
-			templet : function(c){
+		//餐台分页
+		ts.padding = new WirelessOrder.Padding({
+			renderTo : $('#divTableShowForSelect'),
+			displayTo : $('#divDescForTableSelect-padding-msg'),
+			itemLook : function(index, item){
 				var aliasOrName;
-				if(c.data.categoryValue == 1){//一般台
-					aliasOrName = c.data.alias;
-				}else if(c.data.categoryValue == 3){//搭台
-					var begin = c.data.name.indexOf("(");
-					var end = c.data.name.indexOf(")");
-					aliasOrName = '<font color="green">' + c.data.name.substring(begin+1, end) +'</font>';
+				if(item.categoryValue == 1){//一般台
+					aliasOrName = item.alias;
+				}else if(item.categoryValue == 3){//搭台
+					var begin = item.name.indexOf("(");
+					var end = item.name.indexOf(")");
+					aliasOrName = '<font color="green">' + item.name.substring(begin+1, end) +'</font>';
 				}else{
-					aliasOrName = '<font color="green">'+ c.data.categoryText +'</font>';
+					aliasOrName = '<font color="green">'+ item.categoryText +'</font>';
 				}
 				
-				var tempPaid = null;
-				if(c.data.isTempPaid && c.data.isTempPaidTimeout){
+				var tempPaid;
+				if(item.isTempPaid && item.isTempPaidTimeout){
 					tempPaid = '<font color="red">暂结</font>';
-				}else if(c.data.isTempPaid && !c.data.isTempPaidTimeout){
+				}else if(item.isTempPaid && !item.isTempPaidTimeout){
 					tempPaid = '<font>暂结</font>';
 				}else{
 					tempPaid = '&nbsp;&nbsp;';
 				}
 				return tableCmpTemplet.format({
-					dataIndex : c.index,
-					id : c.data.id,
-					click : 'ts.selectTable({event : this, id : '+ c.data.id +',tableAlias :'+ c.data.alias +'})',
+					dataIndex : index,
+					id : item.id,
+					//click : 'ts.selectTable({event : this, id : '+ item.id +',tableAlias :'+ item.alias +'})',
 					alias : aliasOrName,
-					theme : c.data.statusValue == '1' ? "e" : "c",
-					name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
+					theme : item.statusValue == '1' ? "e" : "c",
+					name : item.name,
 					tempPayStatus : tempPaid,
-					bookTableStatus : c.data.isBook? '订' : '',
+					bookTableStatus : item.isBook? '订' : '',
 					tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0?'tempPayStatus4Moz':'tempPayStatus'
-				});				
+				});	
+			},
+			itemClick : function(index, item){
+				updateTable({
+					id : item.id,
+					alias : item.tableAlias
+				});
+				console.log(item);
 			}
 		});
+		
+		//餐台上一页
+		$('#prevTablePage_a_tableSelect').click(function(){
+			ts.padding.prev();
+		});
+		
+		//餐台下一页
+		$('#nextTablePage_a_tableSelect').click(function(){
+			ts.padding.next();
+		});
+		
+		//FIXME
+//		ts.tp = new Util.to.padding({
+//			renderTo : 'divTableShowForSelect',
+//			displayId : 'divDescForTableSelect-padding-msg',
+//			templet : function(c){
+//				var aliasOrName;
+//				if(c.data.categoryValue == 1){//一般台
+//					aliasOrName = c.data.alias;
+//				}else if(c.data.categoryValue == 3){//搭台
+//					var begin = c.data.name.indexOf("(");
+//					var end = c.data.name.indexOf(")");
+//					aliasOrName = '<font color="green">' + c.data.name.substring(begin+1, end) +'</font>';
+//				}else{
+//					aliasOrName = '<font color="green">'+ c.data.categoryText +'</font>';
+//				}
+//				
+//				var tempPaid = null;
+//				if(c.data.isTempPaid && c.data.isTempPaidTimeout){
+//					tempPaid = '<font color="red">暂结</font>';
+//				}else if(c.data.isTempPaid && !c.data.isTempPaidTimeout){
+//					tempPaid = '<font>暂结</font>';
+//				}else{
+//					tempPaid = '&nbsp;&nbsp;';
+//				}
+//				return tableCmpTemplet.format({
+//					dataIndex : c.index,
+//					id : c.data.id,
+//					click : 'ts.selectTable({event : this, id : '+ c.data.id +',tableAlias :'+ c.data.alias +'})',
+//					alias : aliasOrName,
+//					theme : c.data.statusValue == '1' ? "e" : "c",
+//					name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
+//					tempPayStatus : tempPaid,
+//					bookTableStatus : c.data.isBook? '订' : '',
+//					tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0?'tempPayStatus4Moz':'tempPayStatus'
+//				});				
+//			}
+//		});
  		
 	
 		Util.LM.show();		
@@ -2014,10 +2067,13 @@ function showTable(){
 	}
 	
 	if(result.length != 0){
-		ts.tp.init({
-		    data : result
-		});
-		ts.tp.getFirstPage();
+		//FIXME
+//		ts.tp.init({
+//		    data : result
+//		});
+//		ts.tp.getFirstPage();
+		
+		ts.padding.data(result);
 		
 	}else{
 		$("#divTableShowForSelect").html("");
