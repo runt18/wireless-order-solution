@@ -179,7 +179,6 @@ $(function(){
 					id : item.id,
 					alias : item.tableAlias
 				});
-				console.log(item);
 			}
 		});
 		
@@ -192,44 +191,6 @@ $(function(){
 		$('#nextTablePage_a_tableSelect').click(function(){
 			ts.padding.next();
 		});
-		
-		//FIXME
-//		ts.tp = new Util.to.padding({
-//			renderTo : 'divTableShowForSelect',
-//			displayId : 'divDescForTableSelect-padding-msg',
-//			templet : function(c){
-//				var aliasOrName;
-//				if(c.data.categoryValue == 1){//一般台
-//					aliasOrName = c.data.alias;
-//				}else if(c.data.categoryValue == 3){//搭台
-//					var begin = c.data.name.indexOf("(");
-//					var end = c.data.name.indexOf(")");
-//					aliasOrName = '<font color="green">' + c.data.name.substring(begin+1, end) +'</font>';
-//				}else{
-//					aliasOrName = '<font color="green">'+ c.data.categoryText +'</font>';
-//				}
-//				
-//				var tempPaid = null;
-//				if(c.data.isTempPaid && c.data.isTempPaidTimeout){
-//					tempPaid = '<font color="red">暂结</font>';
-//				}else if(c.data.isTempPaid && !c.data.isTempPaidTimeout){
-//					tempPaid = '<font>暂结</font>';
-//				}else{
-//					tempPaid = '&nbsp;&nbsp;';
-//				}
-//				return tableCmpTemplet.format({
-//					dataIndex : c.index,
-//					id : c.data.id,
-//					alias : aliasOrName,
-//					theme : c.data.statusValue == '1' ? "e" : "c",
-//					name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
-//					tempPayStatus : tempPaid,
-//					bookTableStatus : c.data.isBook? '订' : '',
-//					tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0?'tempPayStatus4Moz':'tempPayStatus'
-//				});				
-//			}
-//		});
- 		
 	
 		Util.LM.show();		
 		
@@ -1625,34 +1586,6 @@ ts.renderToCreateOrder = function(tableNo, peopleNo, comment){
 };
 
 /**
- * 根据餐桌alias，返回餐桌对象
- * @param {int} tableAlias
- * @returns {object} 
- */
-//function getTableByAlias(tableAlias){
-//	for(x in WirelessOrder.tables){
-//		if(WirelessOrder.tables[x].alias == tableAlias){
-//			return WirelessOrder.tables[x];		
-//		}
-//	}
-//}
-
-/**
- * 根据餐桌id，返回餐桌对象
- * @param {int} tableId
- * @returns {object} 
- */
-//function getTableById(tableId){
-//	for(x in WirelessOrder.tables){
-//		if(WirelessOrder.tables[x].id == tableId){
-//			return WirelessOrder.tables[x];		
-//		}
-//	}
-//}
-
-
-
-/**
  * 根据alias或id返回table的最新状态
  * toPay : 是否去结账界面
  */
@@ -2053,14 +1986,7 @@ function showTable(){
 	}
 	
 	if(result.length != 0){
-		//FIXME
-//		ts.tp.init({
-//		    data : result
-//		});
-//		ts.tp.getFirstPage();
-		
 		ts.padding.data(result);
-		
 	}else{
 		$("#divTableShowForSelect").html("");
 	}	
