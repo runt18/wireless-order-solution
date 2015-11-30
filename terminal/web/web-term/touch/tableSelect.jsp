@@ -202,7 +202,7 @@
         </ul>
 	</div>		
 	
-	<!-- 多台开席选台 -->
+	<!-- 多台开席选台 -->of.addFood
 	<div id="multiOpenTableCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: 100px 0px 0px -200px;width:550px;display: none;background-color: white;" align="center">
 	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
 	       	 多台开席选台
@@ -1077,15 +1077,14 @@
 		     </div>
 		     <div class="ui-block-b" style="width: 99px;height: inherit;background-color: skyblue;border-left: 1px solid white;border-right: 1px solid white;" >
 				 <div data-role="controlgroup" >
-					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.addFood()">数量+1</a>
-					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.cutFood()">数量-1</a>	
-					 <a href="#" data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.setFood()">数量=</a>
-					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.deleteFood()">删除</a>
-					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="operateOrderFoodTaste({type:2})">口味</a>
-					 <!-- <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.updateUnitPrice()">单位</a> -->
+					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" id="foodAmountAdd_a_orderFood">数量+1</a>
+					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" id="foodAmountCut_a_orderFood">数量-1</a>	
+					 <a href="#" data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" id="foodAmountSet_a_orderFood">数量=</a>
+					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" id="deleteFood_a_orderFood">删除</a>
+					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" id="selectTaste_a_orderFood">口味</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" id="addTaste_a_orderFood">手写口味</a>
-					 <a id="giftFoodOperate_a_orderFood" data-role="button" data-inline="true" class="orderOperBtn" style="display: none;" data-theme="b" onclick="of.giftFood()">赠送</a>	
-					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.foodHangup({type:2})">叫起</a>
+					 <a id="giftFoodOperate_a_orderFood" data-role="button" data-inline="true" class="orderOperBtn" style="display: none;" data-theme="b">赠送</a>	
+					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" id="foopHangUp_a_orderFood">叫起</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" data-rel="popup"  data-transition="pop" href="#orderFoodOtherOperateCmp">更多</a>
 					 <!--<a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="operateOrderFoodTaste({type:1})">全单口味</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.foodHangup({type : 1})">全单叫起</a>
@@ -1096,10 +1095,10 @@
 		     <!-- 点菜更多操作 -->
 			<div data-role="popup" id="orderFoodOtherOperateCmp" data-theme="d">
 		        <ul data-role="listview" data-inset="true" style="min-width:130px;" data-theme="b">
-		        	<li class="tempFoodKitchen" onclick="of.updateUnitPrice()"><a>修改单位</a></li>	
-		        	<li class="tempFoodKitchen" onclick="of.updateFoodUnitPrice()"><a>修改时价</a></li>
-		            <li class="tempFoodKitchen" onclick="operateOrderFoodTaste({type:1})"><a >全单口味</a></li>
-		            <li class="tempFoodKitchen" onclick="of.foodHangup({type : 1})"><a >全单叫起</a></li>
+		        	<li class="tempFoodKitchen" id="updateUnit_li_orderFood"><a>修改单位</a></li>	
+		        	<li class="tempFoodKitchen" id="updatePrice_li_orderFood"><a>修改时价</a></li>
+		            <li class="tempFoodKitchen" id="allFoodTaste_li_orderFood"><a >全单口味</a></li>
+		            <li class="tempFoodKitchen" id="allFoodHangUp_li_orderFood"><a>全单叫起</a></li>
 		        </ul>
 			</div>		     
 		   </div>			     
