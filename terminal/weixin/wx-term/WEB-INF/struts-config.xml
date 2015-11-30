@@ -63,8 +63,8 @@
 			type="com.wireless.Actions.weixin.query.WXQueryInfoAction" scope="request"
 			parameter="dataSource">
 		</action>
-		<action path="/WXOperateOrder"
-			type="com.wireless.Actions.weixin.operate.WXOperateOrderAction"
+		<action path="/WxOperateOrder"
+			type="com.wireless.Actions.weixin.operate.WxOperateOrderAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/WXQueryMemberOperation"

@@ -24,7 +24,7 @@ import com.wireless.pojo.member.TakeoutAddress;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.order.WxOrder;
 
-public class WXOperateOrderAction extends DispatchAction {
+public class WxOperateOrderAction extends DispatchAction {
 	
 	/**
 	 * 
@@ -38,30 +38,33 @@ public class WXOperateOrderAction extends DispatchAction {
 	public ActionForward insertOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try{
-			String oid = request.getParameter("oid");
-			String fid = request.getParameter("fid");
-			String foods = request.getParameter("foods");
+			final String oid = request.getParameter("oid");
+			final String fid = request.getParameter("fid");
+			final String foods = request.getParameter("foods");
 			
-			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			
-			Staff mStaff = StaffDao.getAdminByRestaurant(rid);
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
-			WxOrder.InsertBuilder4Inside insertBuilder = new WxOrder.InsertBuilder4Inside(oid);
+			final WxOrder.InsertBuilder4Inside builder = new WxOrder.InsertBuilder4Inside(oid);
 			
-			for (String of : foods.split("&")) {
-				String orderFoods[] = of.split(",");
-				OrderFood orderFood = new OrderFood(FoodDao.getById(mStaff, Integer.parseInt(orderFoods[0])));
-				orderFood.setCount(Float.parseFloat(orderFoods[1]));
-				
-				insertBuilder.add(orderFood);
+			if(foods != null && !foods.isEmpty()){
+				for (String of : foods.split("&")) {
+					String orderFoods[] = of.split(",");
+					OrderFood orderFood = new OrderFood(FoodDao.getById(staff, Integer.parseInt(orderFoods[0])));
+					orderFood.setCount(Float.parseFloat(orderFoods[1]));
+					
+					builder.add(orderFood);
+				}
 			}
-			int wxOrderId = WxOrderDao.insert(mStaff, insertBuilder);
 			
-			final WxOrder wxOrder = WxOrderDao.getById(mStaff, wxOrderId);
+			final int wxOrderId = WxOrderDao.insert(staff, builder);
 			
-			jobject.setExtra(new Jsonable(){
+			final WxOrder wxOrder = WxOrderDao.getById(staff, wxOrderId);
+			
+			jObject.setExtra(new Jsonable(){
 
 				@Override
 				public JsonMap toJsonMap(int flag) {
@@ -76,15 +79,15 @@ public class WXOperateOrderAction extends DispatchAction {
 				}
 				
 			});
-			jobject.initTip(true, "下单成功,请呼叫服务员确认。");
+			jObject.initTip(true, "下单成功,请呼叫服务员确认。");
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
