@@ -73,20 +73,24 @@ WirelessOrder.Padding = function(c){
 		}
 	}
 	
+	//更新data
 	this.data = function(data){
 		init(data);
 	}
 	
+	//第一页
 	this.first = function(){
 		_start = 0;
 		changePage();
 	};
 	
+	//最后一页
 	this.last = function(){
 		_start = _length - _length % _limit;
 		changePage();
 	};
 	
+	//下一页
 	this.next = function(c){
 		if(_start + _limit <= (_length - 1)){
 			_start += _limit;
@@ -94,6 +98,7 @@ WirelessOrder.Padding = function(c){
 		}
 	};
 	
+	//上一页
 	this.prev = function(){
 		if(_start - _limit >= 0){
 			_start -= _limit;

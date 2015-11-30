@@ -166,7 +166,6 @@ $(function(){
 				return tableCmpTemplet.format({
 					dataIndex : index,
 					id : item.id,
-					//click : 'ts.selectTable({event : this, id : '+ item.id +',tableAlias :'+ item.alias +'})',
 					alias : aliasOrName,
 					theme : item.statusValue == '1' ? "e" : "c",
 					name : item.name,
@@ -221,7 +220,6 @@ $(function(){
 //				return tableCmpTemplet.format({
 //					dataIndex : c.index,
 //					id : c.data.id,
-//					click : 'ts.selectTable({event : this, id : '+ c.data.id +',tableAlias :'+ c.data.alias +'})',
 //					alias : aliasOrName,
 //					theme : c.data.statusValue == '1' ? "e" : "c",
 //					name : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
@@ -1584,18 +1582,6 @@ ts.displayPrintConnection = function(){
 ts.closePrintConnection = function(){
 	$('#printerConnectionCmp').hide();
 	$('#shadowForPopup').hide();
-};
-
-/**
- * 选中一张餐桌
- * @param c
- */
-ts.selectTable = function(c){
-	updateTable({
-		id : c.id,
-		alias : c.tableAlias,
-		event : c.event
-	});
 };
 
 /**
