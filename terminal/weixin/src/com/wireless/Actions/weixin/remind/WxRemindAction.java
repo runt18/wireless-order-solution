@@ -18,7 +18,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 
 public class WxRemindAction extends DispatchAction {
 
-	private final static float LIVENESS_UPPER_LIMIT = 0.9f;
+	private final static float LIVENESS_UPPER_LIMIT = 0.7f;
 	private final static float LIVENESS_LOWER_LIMIT = 0f;
 	
 	private final static String OPEN_ID_4_MARCO = "odgTwtwjcJPhFm9xhNNnds7bNkNc";
@@ -29,7 +29,7 @@ public class WxRemindAction extends DispatchAction {
 		Token token = Token.newInstance(FinanceWeixinAction.APP_ID, FinanceWeixinAction.APP_SECRET);
 		
 		final StringBuilder work = new StringBuilder();
-		for(Restaurant restaurant : RestaurantDao.getByCond(null, null)){
+		for(Restaurant restaurant : RestaurantDao.getByCond(null, " ORDER BY liveness ASC ")){
 			if(restaurant.getLiveness() > LIVENESS_LOWER_LIMIT && restaurant.getLiveness() <= LIVENESS_UPPER_LIMIT){
 				if(work.length() != 0){
 					work.append(", ");
