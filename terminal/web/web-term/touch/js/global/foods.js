@@ -167,6 +167,16 @@ WirelessOrder.FoodList = function(source){
 		}
 	}
 	
+	//根据菜品id查找
+	_foods.getById = function(id){
+		var index = this.binaryIndex({id : id});
+		if(index >= 0){
+			return _foods[index];
+		}else{
+			return null;
+		}
+	}
+	
 	return _foods;
 }
 

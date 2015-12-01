@@ -25,22 +25,6 @@ var of = {
 	 */
 	
 	
-	//菜品列表
-	foodCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-value={id} onclick="{click}">' +
-							'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
-								'<div class="food-status-font {commonStatus}">' +
-									'<font color="orange">{weigh}</font>' +
-									'<font color="blue">{currPrice}</font>' +
-									'<font color="FireBrick">{sellout}</font>' +
-									'<font color="green">{gift}</font>' +
-								'</div>'+
-								'<div class="food-status-limit {limitStatus}">' +
-									'<font color="orange">限: {foodLimitAmount}</font><br>' +
-									'<font color="green">剩: {foodLimitRemain}</font>' +
-								'</div>'+								
-								
-							'</div>'+
-						  '</a>',
 	//已点菜列表					  
 	orderFoodCmpTemplet = '	<li data-icon={isGift} data-index={dataIndex} data-unique={unique} data-theme="c" data-value={id} data-type="orderFoodCmp" onclick="of.selectNewFood({event:this, foodId:{id}})" ><a >'+
 									'<h1 style="font-size:20px;">{name}</h1>' +
@@ -155,166 +139,6 @@ of.updataSelloutFoods = function(){
 			});
 		}
 	}); 
-};
-
-
-
-/**
- * 点菜
- */
-of.insertFood = function(c){
-	if(c == null || typeof c.foodId != 'number'){
-		return;
-	}
-	//
-	var foodData = null;
-	//如果菜品是时价属性
-	if(!c.foodUnitPriceInputed){
-		for(var i = 0; i < WirelessOrder.foods.length; i++){
-			if(WirelessOrder.foods[i].id == c.foodId){
-				//返回连接空数组的副本
-				foodData = Util.clone(WirelessOrder.foods[i]);
-				break;
-			}
-		}
-		if(foodData == null){
-		 	Util.msg.alert({
-				msg : '添加菜品失败, 程序异常, 请刷新后重试或联系客服人员',
-				renderTo : 'orderFoodMgr'
-			});
-			return;
-		}else{
-			if((foodData.status & 1 << 2) != 0){
-				Util.msg.tip('此菜品已停售!'); 
-				return;
-			}
-		}
-		
-		if((foodData.status & 1 << 4) != 0){
-			c.foodData = foodData;
-			of.openFoodUnitPriceWin(c);
-			return;
-		}
-	}else{
-		foodData = c.foodData;
-	}
-
-	//
-	var has = false;
-	for(var i = 0; i < of.newFood.length; i++){
-		//对比是否同一个菜
-		if(of.newFood[i].id == foodData.id){
-			//再对比口味 & 赠送属性 & 单位 & 时价
-			if(of.newFood[i].tasteGroup.normalTasteContent.length == 0 && !of.newFood[i].isGift && !of.newFood[i].foodUnit && (of.newFood[i].status & 1 << 4) == 0){
-				has = true;
-				of.newFood[i].count++;
-				of.selectedOrderFood = of.newFood[i];
-				//重新赋值唯一标示
-				foodData.unique = of.newFood[i].unique;
-				break;				
-			}
-
-		}
-	}
-	if(!has){
-		foodData.count = 1;
-		foodData.isHangup = false;
-		if((foodData.status & 1 << 4) != 0){
-			foodData.isCurrPrice = true;
-		}
-		foodData.tasteGroup = {
-			tastePref : '无口味',
-			price : 0,
-			normalTasteContent : []
-		};
-		//生成唯一标示
-		foodData.unique = new Date().getTime();
-		
-		//是否为套菜
-		foodData.combo = [];
-		if((foodData.status & 1 << 5) != 0){
-			//获取对应套菜
-			$.ajax({
-				url : '../QueryFoodCombination.do',
-				type : 'post',
-				async:false,
-				dataType : 'json',
-				data : {
-					foodID:foodData.id
-				},
-				success : function(rt, status, xhr){
-					if(rt.success && rt.root.length > 0){
-						//组合子菜给套菜
-						for (var j = 0; j < rt.root.length; j++) {
-							
-							foodData.combo.push({
-								comboFood : rt.root[j],
-								tasteGroup : {
-									normalTasteContent : [],
-									tastePref : ''
-								}
-							});
-						}
-					}
-				},
-				error : function(request, status, err){
-					alert(request.msg);
-				}
-			}); 
-		}		
-		
-		of.newFood.push(foodData);
-		
-		//最新添加的作为选中菜品
-		of.selectedOrderFood = of.newFood[of.newFood.length -1];
-	}
-	
-	//
-	of.initNewFoodContent({
-		data : foodData
-	});
-	
-	//获取菜品常用口味
-	$.post('../QueryFoodTaste.do', {foodID:c.foodId}, function(jr){
-		if(jr.success){
-			of.commonTastes = jr.root;
-			//获取菜品多单位
-			$.post('../QueryMenu.do', {dataSource:'getMultiPrices',foodId:c.foodId}, function(result){
-				if(result.success){
-					of.multiPrices = result.root;
-					
-					if((foodData.status & 1 << 5) != 0){
-						comboFoodTasteUnitLoad();							
-					}else{
-						if(of.commonTastes.length == 0 && of.multiPrices.length == 0){
-							$('#divFoodTasteFloat').hide();
-						}else{
-							foodCommonTasteLoad();
-						}
-					}
-				}	
-				foodData = null;
-			});
-		}	
-	});	
-
-	if(typeof c.callback == 'function'){
-		c.callback();
-	}
-	
-	//判断拼音键盘是否显示来清空
-	if($("#orderPinyinCmp").is(":visible")){
-		$('#pinyinVal_a_orderFood').click();	
-		$('#handDel_a_orderFood').click();	
-	}
-	
-	//判断手写键盘是否显示来重写
-	if($("#orderHandCmp").is(":visible")){
-		$('#rewrite_a_orderFood').click();
-		$('#handDel_a_orderFood').click();
-	}
-	
-
 };
 
 /**
@@ -460,100 +284,6 @@ of.selectNewFood = function(c){
 	of.selectedOrderFood = of.newFood[orderFood.attr('data-index')];
 };
 
-
-/**
- * 修改时价
- */
-of.updateFoodUnitPrice = function(){
-	$('#orderFoodOtherOperateCmp').popup('close');	
-	if((of.selectedOrderFood.status & 1 << 4) != 0){
-		of.saveForFoodUnitPrice.updatePrice = true;
-		setTimeout(function(){
-			of.openFoodUnitPriceWin({foodData : of.selectedOrderFood});
-		}, 250);
-	}else{
-		Util.msg.tip('此菜品不能设置时价');
-	}
-};
-
-/**
- * 打开时价
- */
-//TODO
-of.openFoodUnitPriceWin = function(c){
-	var curPricePopup = null;
-	curPricePopup = new NumKeyBoardPopup({
-		header : '输入时价--' + c.foodData.name,
-		left : function(){
-			of.openFoodUnitPriceWin.param = c;
-			var unitPrice = parseFloat($('#input_input_numKbPopup').val());
-			if(of.saveForFoodUnitPrice.updatePrice){
-				//删除标志位
-				delete of.saveForFoodUnitPrice.updatePrice;
-				//重新设置时价
-				of.selectedOrderFood.unitPrice = unitPrice;
-				of.initNewFoodContent({
-					data : of.selectedOrderFood
-				});		
-			}else{
-				//设置时价
-				of.openFoodUnitPriceWin.param.foodData.unitPrice = unitPrice;
-				//标示为已输入时价状态
-				of.openFoodUnitPriceWin.param.foodUnitPriceInputed = true;
-				
-				setTimeout(function(){
-					of.insertFood(of.openFoodUnitPriceWin.param);
-				}, 250);	
-				
-				curPricePopup.close();
-			}
-		},
-		right : function(){
-			curPricePopup.close();
-		}
-	});
-		
-	curPricePopup.open(function(self){
-		self.find('[id=input_input_numKbPopup]').val(c.foodData.unitPrice);
-		self.find('[id=middle_a_numKbPopup]').hide();
-		setTimeout(function(){
-		//	self.find('[id=input_input_numKbPopup]').select();
-			self.find('[id=input_input_numKbPopup]').focus();
-			self.find('[id=input_input_numKbPopup]').select();
-		}, 200);
-		
-	});
-		
-};
-/**
- * 输入时价
- */
-of.saveForFoodUnitPrice = function(c){
-	var unitPrice = parseFloat($("#" + focusInput).val());
-	if(of.saveForFoodUnitPrice.updatePrice){
-		//删除标志位
-		delete of.saveForFoodUnitPrice.updatePrice;
-		//重新设置时价
-		of.selectedOrderFood.unitPrice = unitPrice;
-		of.initNewFoodContent({
-			data : of.selectedOrderFood
-		});		
-	}else{
-		//设置时价
-		of.openFoodUnitPriceWin.param.foodData.unitPrice = unitPrice;
-		//标示为已输入时价状态
-		of.openFoodUnitPriceWin.param.foodUnitPriceInputed = true;
-		
-		setTimeout(function(){
-			of.insertFood(of.openFoodUnitPriceWin.param);
-		}, 250);		
-	}
-
-
-	$('#orderFoodUnitPriceSet').popup('close');
-};
-
-
 /**
  * 口味操作 
  * type : 1全单, 2单个口味
@@ -582,7 +312,7 @@ function operateOrderFoodTaste(c){
 		$.ajax({
 			url : '../QueryFoodTaste.do',
 			type : 'post',
-			data : {foodID:of.selectedOrderFood.id},
+			data : {foodID : of.selectedOrderFood.id},
 			async : false,
 			dataType : 'json',
 			success : function(rt){
@@ -591,7 +321,7 @@ function operateOrderFoodTaste(c){
 				$.ajax({
 					url : '../QueryMenu.do',
 					type : 'post',
-					data : {dataSource:"getMultiPrices", foodId:of.selectedOrderFood.id},
+					data : {dataSource : "getMultiPrices", foodId : of.selectedOrderFood.id},
 					async : false,
 					dataType : 'json',
 					success : function(rt){
@@ -1813,11 +1543,9 @@ function closePinyin(){
 $(function(){
 	//菜品分页
 	var foodPaging = null;
-	
 	//拼音 & 手写 & 厨房搜索
 	function search(value, qw){	
 		var data = null;
-		
 		function byConsumption(obj1, obj2){
 			//菜品搜索结果按点菜数量排序
 		    var val1 = obj1.foodCnt;
@@ -1893,46 +1621,67 @@ $(function(){
 			
 		//创建菜品分页的控件
 		if(foodPaging == null){
-			foodPaging = Util.to.padding({
-				renderTo : "foodsCmp",
-				displayId : 'foodPagingDesc',
-				templet : function(c){
+			//菜品列表
+			var foodCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-index={dataIndex} data-value={id} onclick="{click}">' +
+									'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
+										'<div class="food-status-font {commonStatus}">' +
+											'<font color="orange">{weigh}</font>' +
+											'<font color="blue">{currPrice}</font>' +
+											'<font color="FireBrick">{sellout}</font>' +
+											'<font color="green">{gift}</font>' +
+										'</div>'+
+										'<div class="food-status-limit {limitStatus}">' +
+											'<font color="orange">限: {foodLimitAmount}</font><br>' +
+											'<font color="green">剩: {foodLimitRemain}</font>' +
+										'</div>'+								
+									'</div>'+
+								  '</a>';
+			
+			foodPaging = new WirelessOrder.Padding({
+				renderTo : $('#foodsCmp_div_orderFood'),
+				displayTo : $('#foodPagingDesc_div_orderFood'),
+				itemLook : function(index, item){
 					return foodCmpTemplet.format({
-						id : c.data.id,
-						name : c.data.name.substring(0, 10),
-						unitPrice : c.data.unitPrice,
-						click : 'of.insertFood({foodId:' + c.data.id + '})',
-						sellout : (c.data.status & 1 << 2) != 0 ? '停' : '',
-						currPrice : (c.data.status & 1 << 4) != 0 ? '时' : '',		
-						gift : (c.data.status & 1 << 3) != 0 ? '赠' : ''	,
-						weigh : (c.data.status & 1 << 7) != 0 ? '称' : '',
-						commonStatus : (c.data.status & 1 << 10) != 0 ? 'none' : '',
-						limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
-						foodLimitAmount : c.data.foodLimitAmount,
-						foodLimitRemain : c.data.foodLimitRemain
+						dataIndex : index,
+						id : item.id,
+						name : item.name.substring(0, 10),
+						unitPrice : item.unitPrice,
+						sellout : (item.status & 1 << 2) != 0 ? '停' : '',
+						currPrice : (item.status & 1 << 4) != 0 ? '时' : '',		
+						gift : (item.status & 1 << 3) != 0 ? '赠' : ''	,
+						weigh : (item.status & 1 << 7) != 0 ? '称' : '',
+						commonStatus : (item.status & 1 << 10) != 0 ? 'none' : '',
+						limitStatus : (item.status & 1 << 10) != 0 ? '' : 'none',
+						foodLimitAmount : item.foodLimitAmount,
+						foodLimitRemain : item.foodLimitRemain
 					});
 				},
-				pagedCallBack : function(){
+				itemClick : function(index, item){
+					//是否停售
+					if((item.status & 1 << 2) != 0){
+						Util.msg.tip('此菜品已停售!'); 
+						return;
+					}
+					
+					//是否时价
+					if((item.status & 1 << 4) != 0){
+						openCurrentPriceWin(item);
+						return;
+					}
+					
+					insertFood(item);
+				},
+				onPageChanged : function(){
 					setTimeout(function(){
 						$(".food-status-font").css("position", "absolute");
-					}, 250);				
+					}, 250);	
 				}
 			});		
 		}
 		
-		foodPaging.init({
-			data : data,
-			callback : function(){
-				foodPaging.getFirstPage();
-			} 
-		});
+		foodPaging.data(data);
 	}
 
-	//退出点菜界面
-//	$('#orderFoodMgr').on('pagehide', function(){
-//		//关闭常用口味Popup
-//		$(".commonTasteFloat").hide();
-//	});
 	
 	//进入点菜界面
 	$('#orderFoodMgr').on('pagebeforeshow', function(e){
@@ -2098,7 +1847,7 @@ $(function(){
 			 //第一次加载不成功,延迟来一直加载达到菜品显示出来为止
 			(function initFoodContent(){
 				//console.log($('#foodsCmp')[0].clientHeight);
-				if($('#foodsCmp')[0].clientHeight != 0){
+				if($('#foodsCmp_div_orderFood')[0].clientHeight != 0){
 					search({}, 'byDept');
 				}else{
 					setTimeout(arguments.callee, 500);
@@ -2408,12 +2157,12 @@ $(function(){
 		
 		//点菜页面的下一页
 		$('#getNextPage_a_orderFood').click(function(){
-			foodPaging.getNextPage();
+			foodPaging.next();
 		});
 		
 		//点菜页面的上一页
 		$('#getPrevious_a_orderFood').click(function(){
-			foodPaging.getPreviousPage();
+			foodPaging.prev();
 		});
 		
 		var updateTempTaste = false;
@@ -3003,9 +2752,9 @@ $(function(){
 			 		});
 			 		alias.focus();
 			 	}else{
-			 		of.insertFood({foodId : data.id});
+			 		insertFood(WirelessOrder.foods.getById(data.id));
 			 	}
-			 	alias.val("");
+			 	alias.val('');
 			},
 			right : function(){
 				aliasPopup.close();
@@ -3021,6 +2770,97 @@ $(function(){
 			});
 
 		});
+		
+		//菜品数量+1
+		$('#foodAmountAdd_a_orderFood').click(function(){
+			operateFoodCount({count : 1});
+		});
+		
+		//菜品数量减1
+		$('#foodAmountCut_a_orderFood').click(function(){
+			operateFoodCount({count : -1});
+		});
+		
+		//打开数量设置
+		$('#foodAmountSet_a_orderFood').click(function(){
+			operateFoodCount({otype : 'set'});
+		});
+		
+		//删除当前选中的菜
+		$('#deleteFood_a_orderFood').click(function(){
+			operateFoodCount({otype : 'delete'});
+		});
+		
+		//选择口味
+		$('#selectTaste_a_orderFood').click(function(){
+			operateOrderFoodTaste({type:2});
+		});
+		
+		//赠送
+		$('#giftFoodOperate_a_orderFood').click(function(){
+			giftFood();
+		});
+		
+		//叫起
+		$('#foopHangUp_a_orderFood').click(function(){
+			foodHangUp({type:2});
+		});
+		
+		//修改单位
+		$('#updateUnit_li_orderFood').click(function(){
+			updateUnit();
+		});
+		
+		//修改时价
+		$('#updatePrice_li_orderFood').click(function(){
+			$('#orderFoodOtherOperateCmp').popup('close');	
+			setTimeout(function(){
+				if((of.selectedOrderFood.status & 1 << 4) != 0){
+					setTimeout(function(){
+						var curPricePopup = null;
+						curPricePopup = new NumKeyBoardPopup({
+							header : '修改时价--' + of.selectedOrderFood.name,
+							left : function(){
+								var  selectedOrderFood = of.selectedOrderFood;
+								var unitPrice = parseFloat($('#input_input_numKbPopup').val());
+									//重新设置时价
+								selectedOrderFood.unitPrice = unitPrice;
+								of.initNewFoodContent({
+									data : selectedOrderFood
+								});	
+								curPricePopup.close();
+							},
+							right : function(){
+								curPricePopup.close();
+							}
+						});
+						curPricePopup.open(function(self){
+							self.find('[id=input_input_numKbPopup]').val(of.selectedOrderFood.unitPrice);
+							self.find('[id=middle_a_numKbPopup]').hide();
+							setTimeout(function(){
+							//	self.find('[id=input_input_numKbPopup]').select();
+								self.find('[id=input_input_numKbPopup]').focus();
+								self.find('[id=input_input_numKbPopup]').select();
+							}, 200);
+							
+						});
+					}, 250);
+				}else{
+					Util.msg.tip('此菜品不能设置时价');
+				}
+			}, 300);
+		});
+		
+		//全单口味
+		$('#allFoodTaste_li_orderFood').click(function(){
+			operateOrderFoodTaste({type:1})
+		});
+		
+		//全单叫起
+		$('#allFoodHangUp_li_orderFood').click(function(){
+			foodHangUp({type : 1});
+		});
+		
 		
 	});
 	
@@ -3054,7 +2894,6 @@ $(function(){
 				});
 				return;
 			}else if(c.otype.toLowerCase() == 'set'){
-				of.calculator = $('#calculator4orderFoodCount');
 				//数量=初始化
 				var foodCount = null;
 				foodCount = new NumKeyBoardPopup({
@@ -3142,7 +2981,7 @@ $(function(){
 	/**
 	 * 修改多单位
 	 */
-	of.updateUnitPrice = function(c){
+	function updateUnit(c){
 		//关闭更多控件
 		$('#orderFoodOtherOperateCmp').popup('close');	
 		
@@ -3212,64 +3051,152 @@ $(function(){
 			});			
 
 		}
-	};
+	}
+	
+	/**
+	 * 点菜
+	 */
+	function insertFood(food){
+		var foodData = Util.clone(food);
+		var has = false;
+		for(var i = 0; i < of.newFood.length; i++){
+			//对比是否同一个菜
+			if(of.newFood[i].id == foodData.id){
+				//再对比口味 & 赠送属性 & 单位 & 时价
+				if(of.newFood[i].tasteGroup.normalTasteContent.length == 0 && !of.newFood[i].isGift && !of.newFood[i].foodUnit && (of.newFood[i].status & 1 << 4) == 0){
+					has = true;
+					of.newFood[i].count++;
+					of.selectedOrderFood = of.newFood[i];
+					//重新赋值唯一标示
+					foodData.unique = of.newFood[i].unique;
+					break;				
+				}
 
+			}
+		}
+		
+		if(!has){
+			foodData.count = 1;
+			foodData.isHangup = false;
+			if((foodData.status & 1 << 4) != 0){
+				foodData.isCurrPrice = true;
+			}
+			foodData.tasteGroup = {
+				tastePref : '无口味',
+				price : 0,
+				normalTasteContent : []
+			};
+			//生成唯一标示
+			foodData.unique = new Date().getTime();
+			
+			//是否为套菜
+			foodData.combo = [];
+			if((foodData.status & 1 << 5) != 0){
+				//获取对应套菜
+				$.ajax({
+					url : '../QueryFoodCombination.do',
+					type : 'post',
+					async:false,
+					dataType : 'json',
+					data : {
+						foodID:foodData.id
+					},
+					success : function(rt, status, xhr){
+						if(rt.success && rt.root.length > 0){
+							//组合子菜给套菜
+							for (var j = 0; j < rt.root.length; j++) {
+								
+								foodData.combo.push({
+									comboFood : rt.root[j],
+									tasteGroup : {
+										normalTasteContent : [],
+										tastePref : ''
+									}
+								});
+							}
+						}
+					},
+					error : function(request, status, err){
+						alert(request.msg);
+					}
+				}); 
+			}		
+			
+			of.newFood.push(foodData);
+			
+			//最新添加的作为选中菜品
+			of.selectedOrderFood = of.newFood[of.newFood.length -1];
+		}
+		
+		of.initNewFoodContent({
+			data : foodData
+		});
+		
+		//获取菜品常用口味
+		$.post('../QueryFoodTaste.do', {foodID : food.foodId}, function(jr){
+			if(jr.success){
+				of.commonTastes = jr.root;
+				//获取菜品多单位
+				$.post('../QueryMenu.do', {dataSource:'getMultiPrices',foodId:food.foodId}, function(result){
+					if(result.success){
+						of.multiPrices = result.root;
+						
+						if((foodData.status & 1 << 5) != 0){
+							comboFoodTasteUnitLoad();							
+						}else{
+							if(of.commonTastes.length == 0 && of.multiPrices.length == 0){
+								$('#divFoodTasteFloat').hide();
+							}else{
+								foodCommonTasteLoad();
+							}
+						}
+					}	
+				});
+			}	
+		});	
+		
+		//判断拼音键盘是否显示来清空
+		if($("#orderPinyinCmp").is(":visible")){
+			$('#pinyinVal_a_orderFood').click();	
+			$('#handDel_a_orderFood').click();	
+		}
+		
+		//判断手写键盘是否显示来重写
+		if($("#orderHandCmp").is(":visible")){
+			$('#rewrite_a_orderFood').click();
+			$('#handDel_a_orderFood').click();
+		}
+	};
+	
+	 //打开时价
+	function openCurrentPriceWin(food){
+		var curPricePopup = null;
+		curPricePopup = new NumKeyBoardPopup({
+			header : '输入时价--' + food.name,
+			left : function(){
+				var unitPrice = parseFloat($('#input_input_numKbPopup').val());
+				//设置时价
+				food.unitPrice = unitPrice;
+				insertFood(food);
+				curPricePopup.close();
+			},
+			right : function(){
+				curPricePopup.close();
+			}
+		});
+			
+		curPricePopup.open(function(self){
+			self.find('[id=input_input_numKbPopup]').val(food.unitPrice);
+			self.find('[id=middle_a_numKbPopup]').hide();
+			setTimeout(function(){
+			//	self.find('[id=input_input_numKbPopup]').select();
+				self.find('[id=input_input_numKbPopup]').focus();
+				self.find('[id=input_input_numKbPopup]').select();
+			}, 200);
+		});
+	};
 	
 	
-	//菜品数量+1
-	$('#foodAmountAdd_a_orderFood').click(function(){
-		operateFoodCount({count : 1});
-	});
-	
-	//菜品数量减1
-	$('#foodAmountCut_a_orderFood').click(function(){
-		operateFoodCount({count : -1});
-	});
-	
-	//打开数量设置
-	$('#foodAmountSet_a_orderFood').click(function(){
-		operateFoodCount({otype : 'set'});
-	});
-	
-	//删除当前选中的菜
-	$('#deleteFood_a_orderFood').click(function(){
-		operateFoodCount({otype : 'delete'});
-	});
-	
-	//选择口味
-	$('#selectTaste_a_orderFood').click(function(){
-		operateOrderFoodTaste({type:2});
-	});
-	
-	//赠送
-	$('#giftFoodOperate_a_orderFood').click(function(){
-		giftFood();
-	});
-	
-	//叫起
-	$('#foopHangUp_a_orderFood').click(function(){
-		foodHangUp({type:2});
-	});
-	
-	//修改单位
-	$('#updateUnit_li_orderFood').click(function(){
-		of.updateUnitPrice();
-	});
-	
-	//修改时价
-	$('#updatePrice_li_orderFood').click(function(){
-		of.updateFoodUnitPrice();
-	});
-	
-	//全单口味
-	$('#allFoodTaste_li_orderFood').click(function(){
-		operateOrderFoodTaste({type:1})
-	});
-	
-	//全单叫起
-	$('#allFoodHangUp_li_orderFood').click(function(){
-		foodHangUp({type : 1});
-	});
 	
 });
 
