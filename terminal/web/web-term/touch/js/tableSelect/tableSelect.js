@@ -82,7 +82,7 @@ $(function(){
 		$('#tableAndRegionsCmp').height(document.body.clientHeight - tableListHeight);	
 		//点菜界面高度
 		$('#orderFoodCenterCmp').height(document.body.clientHeight - 210);
-		document.getElementById('foodsCmp').style.height = (document.body.clientHeight - 210)+'px';		
+		document.getElementById('foodsCmp_div_orderFood').style.height = (document.body.clientHeight - 210)+'px';		
 		//沽清菜界面高度
 		$('#stopSellCmp').height(document.body.clientHeight - 125);	
 		document.getElementById('foods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';

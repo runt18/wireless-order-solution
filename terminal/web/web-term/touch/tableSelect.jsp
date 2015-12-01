@@ -1108,7 +1108,7 @@
 	     </div>
 	     
 	     <!-- 菜品列表 -->
-	     <div id="foodsCmp" class="ui-block-b" style="width: 65%;background-color: skyblue;" onmouseout="javascript:mouseOutFoodSelect = true;" onmouseover="javascript:mouseOutFoodSelect = false;">
+	     <div id="foodsCmp_div_orderFood" class="ui-block-b" style="width: 65%;background-color: skyblue;" onmouseout="javascript:mouseOutFoodSelect = true;" onmouseover="javascript:mouseOutFoodSelect = false;">
 
 	     </div>			
 	</div>
@@ -1116,7 +1116,7 @@
 	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
 		<div id="divDescForCreateOrde" class="bottomGeneralBar">
 			<div style="float: left;margin-left: 20px;">总数量: --, 合计: ￥--.--</div>
-			<div id="foodPagingDesc" style="float: right;margin-right: 20px;">共0项, 第1/1页, 每页?项</div>
+			<div id="foodPagingDesc_div_orderFood" style="float: right;margin-right: 20px;">共0项, 第1/1页, 每页?项</div>
 		</div>	
 		
 		<div id="normalOperateFoodCmp" style="height: 60px;padding-top: 25px;">		
