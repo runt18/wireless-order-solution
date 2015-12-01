@@ -21,15 +21,22 @@ WirelessOrder.Padding = function(c){
 		_data = data || [];
 		_length = _data.length;
 		
-		//
-		var ch = c.renderTo[0].clientHeight;
-		var cw = c.renderTo[0].clientWidth;
-		
-		//根据屏幕大小计算显示的个数
-		_limit = parseInt(ch / (65 + 18)) * parseInt(cw / (100 + 12));
-		
-		//显示第一页
-		_self.first();
+		 //第一次加载不成功,延迟来一直加载达到菜品显示出来为止
+		(function(){
+			//console.log($('#foodsCmp')[0].clientHeight);
+			if(c.renderTo[0].clientHeight != 0){
+				var ch = c.renderTo[0].clientHeight;
+				var cw = c.renderTo[0].clientWidth;
+				
+				//根据屏幕大小计算显示的个数
+				_limit = parseInt(ch / (65 + 18)) * parseInt(cw / (100 + 12));
+				
+				//显示第一页
+				_self.first();
+			}else{
+				setTimeout(arguments.callee, 500);
+			}
+		})();
 		
 	};
 	
@@ -76,7 +83,7 @@ WirelessOrder.Padding = function(c){
 	//更新data
 	this.data = function(data){
 		init(data);
-	}
+	};
 	
 	//第一页
 	this.first = function(){

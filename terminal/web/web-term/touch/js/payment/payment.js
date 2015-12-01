@@ -69,7 +69,7 @@ $(function(){
 	orderMsg = {};
 	//加载账单数据
 	function refreshOrderData(){
-		console.log(getcookie(document.domain + '_printers').split(','));
+		//console.log(getcookie(document.domain + '_printers').split(','));
 		Util.LM.show();
 		$.ajax({
 			url : "../QueryOrderByCalc.do",
@@ -78,7 +78,7 @@ $(function(){
 				tableID : pm.table.id,
 				orderID : orderMsg ? orderMsg.id : '',
 				customNum : pm.table.customNum,
-				orientedDisplay : getcookie(document.domain + '_printers')				//TODO 显示客显
+				orientedDisplay : getcookie(document.domain + '_printers')				//显示客显
 			},
 			success : function(jr, status, xhr){
 				Util.LM.hide();

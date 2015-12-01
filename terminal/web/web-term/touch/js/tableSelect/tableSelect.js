@@ -104,7 +104,7 @@ $(function(){
 		}
 	});
 	
-		//进入餐台选择界面
+	//进入餐台选择界面
 	$('#tableSelectMgr').on('pagebeforeshow', function(){
 		$.ajax({
 			url : '../VerifyLogin.do',
@@ -1274,21 +1274,8 @@ $(function(){
  */
 ts.loadData = function(){
 	location.href = '#tableSelectMgr';
-	initTableData();
+	//initTableData();
 };
-
-//设置搜索出来的餐台升序排序, 按名称长短
-ts.searchTableCompareByName = function (obj1, obj2) {
-    var val1 = obj1.name.length;
-    var val2 = obj2.name.length;
-    if (val1 > val2) {
-        return 1;
-    } else if (val1 < val2) {
-        return -1;
-    } else {
-        return 0;
-    }            
-}; 
 
 
 window.onload = function(){
