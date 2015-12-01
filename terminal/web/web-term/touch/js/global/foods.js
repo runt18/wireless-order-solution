@@ -21,6 +21,54 @@ WirelessOrder.FoodList = function(source){
 		_foods = [];
 	}
 	
+	var SPECIAL_FLAG = 1 << 0;		/* 特价 */
+	var RECOMMEND_FLAG = 1 << 1;	/* 推荐 */ 
+	var SELL_OUT_FLAG = 1 << 2;		/* 售完 */
+	var GIFT_FLAG = 1 << 3;			/* 赠送 */
+	var CUR_PRICE_FLAG = 1 << 4;	/* 时价 */
+	var COMBO_FLAG = 1 << 5;		/* 套菜 */
+	var HOT_FLAG = 1 << 6;			/* 热销 */
+	var WEIGHT_FLAG = 1 << 7;		/* 称重 */
+	var COMMISION_FLAG = 1 << 8;	/* 提成 */
+	var TEMP_FLAG = 1 << 9;			/* 临时 */
+	var LIMIT_FLAG = 1 << 10;		/* 限量估清 */
+	
+	_foods.status = {
+		isSpecial : function(food){
+			return (food.status & SPECIAL_FLAG) != 0;
+		},
+		isRecommend : function(food){
+			return (food.status & RECOMMEND_FLAG) != 0;
+		},
+		isSellout : function(food){
+			return (food.status & SELL_OUT_FLAG) != 0;
+		},
+		isGift : function(food){
+			return (food.status & GIFT_FLAG) != 0;
+		},
+		isCurPrice : function(food){
+			return (food.status & CUR_PRICE_FLAG) != 0;
+		},
+		isCombo : function(food){
+			return (food.status & COMBO_FLAG) != 0;
+		},
+		isHot : function(food){
+			return (food.status & HOT_FLAG) != 0;
+		},
+		isWeight : function(food){
+			return (food.status & WEIGHT_FLAG) != 0;
+		},
+		isCommision : function(food){
+			return (food.status & COMMISION_FLAG) != 0;
+		},
+		isTemp : function(food){
+			return (food.status & TEMP_FLAG) != 0;
+		},
+		isLimit : function(food){
+			return (food.status & LIMIT_FLAG) != 0;
+		}	
+	};
+	
 	//二分查找菜品的index
 	_foods.binaryIndex = function(searchElement){
 		'use strict';
@@ -36,11 +84,9 @@ WirelessOrder.FoodList = function(source){
 	
 			if (currentElement.id < searchElement.id) {
 				minIndex = currentIndex + 1;
-			}
-			else if (currentElement.id > searchElement.id) {
+			}else if (currentElement.id > searchElement.id) {
 				maxIndex = currentIndex - 1;
-			}
-			else {
+			}else {
 				return currentIndex;
 			}
 		}
@@ -50,31 +96,31 @@ WirelessOrder.FoodList = function(source){
 	
 	//判断菜品是否估清
 	_foods.isSellout = function(index){
-		return (_foods[index].status & 1 << 2) != 0;
+		return this.status.isSellout(_foods[index]);
 	};
 	
 	//设置菜品是否估清
 	_foods.setSellout = function(index, onOff){
 		if(onOff){
-			_foods[index].status |= (1 << 2);
+			_foods[index].status |= SELL_OUT_FLAG;
 		}else{
-			_foods[index].status &= ~(1 << 2);
+			_foods[index].status &= ~SELL_OUT_FLAG;
 		}
 	};
 	
 	//判断菜品是否限量估清
 	_foods.isLimit = function(index){
-		return (_foods[index].status & 1 << 10) != 0;
+		return this.status.isLimit(_foods[index]);
 	};
 	
 	//设置菜品是否限量估清
 	_foods.setLimit = function(index, onOff, limitAmount, limitRemain){
 		if(onOff){
-			_foods[index].status |= (1 << 10);
+			_foods[index].status |= LIMIT_FLAG;
 			_foods[index].foodLimitAmount = limitAmount;
 			_foods[index].foodLimitRemain = limitRemain;
 		}else{
-			_foods[index].status &= ~(1 << 10);
+			_foods[index].status &= ~LIMIT_FLAG;
 			_foods[index].foodLimitAmount = 0;
 			_foods[index].foodLimitRemain = 0;
 		}
@@ -100,7 +146,7 @@ WirelessOrder.FoodList = function(source){
 		}else{
 			return null;
 		}
-	}
+	};
 	
 	//查找相应部门的菜品
 	_foods.getByDept = function(deptId){
@@ -122,7 +168,7 @@ WirelessOrder.FoodList = function(source){
 		}else{
 			return null;
 		}
-	}
+	};
 	
 	//根据拼音查找菜品
 	_foods.getByPinyin = function(pinyin){
@@ -146,7 +192,7 @@ WirelessOrder.FoodList = function(source){
 			}
 		});
 		return result;
-	}
+	};
 	
 	//根据助记码查找菜品
 	_foods.getByAlias = function(aliasId){
@@ -165,7 +211,7 @@ WirelessOrder.FoodList = function(source){
 		}else{
 			return null;
 		}
-	}
+	};
 	
 	//根据菜品id查找
 	_foods.getById = function(id){
@@ -175,10 +221,8 @@ WirelessOrder.FoodList = function(source){
 		}else{
 			return null;
 		}
-	}
+	};
 	
 	return _foods;
-}
-
-
+};
 

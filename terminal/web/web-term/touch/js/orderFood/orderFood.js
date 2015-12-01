@@ -18,8 +18,6 @@ var of = {
 	//不同条件下选出的口味
 	tastesDate = [],
 
-	//口味动态弹出时鼠标范围
-	mouseOutFoodSelect = false,	
 	/**
 	 * 元素模板
 	 */
@@ -159,7 +157,7 @@ of.initNewFoodContent = function(c){
 		var temp = of.newFood[i];
 		sumCount += temp.count;
 		//称重属性是整个菜加口味价钱, 不是每份菜
-		if((temp.status & 1 << 7) != 0){
+		if(WirelessOrder.foods.status.isWeight(temp)){
 			tempUnitPrice = temp.unitPrice;
 			var tasteGroupPrice = typeof temp.tasteGroup.price != 'number' ? 0 :  temp.tasteGroup.price;
 			sumPrice += (temp.count * tempUnitPrice) + tasteGroupPrice;
@@ -190,7 +188,7 @@ of.initNewFoodContent = function(c){
 		var comboFoodLi = [];
 		
 		//是否为套菜
-		if((temp.status & 1 << 5) != 0){
+		if(WirelessOrder.foods.status.isCombo(temp)){
 			//套菜列表							
 			var comboFoodLiTemplate = '<li class="ui-li ui-li-static">┕{name}<font color="blue">{unit}</font> X <font color="lime">{amount}</font><font color="green"> {tastes}</font></li>';
 			for (var j = 0; j < temp.combo.length; j++) {
@@ -333,7 +331,6 @@ function operateOrderFoodTaste(c){
 			error : function(rt){}
 		});
 		
-		mouseOutFoodSelect = false;
 		comboFoodTasteUnitLoad();
 		return;
 	}
@@ -1622,7 +1619,7 @@ $(function(){
 		//创建菜品分页的控件
 		if(foodPaging == null){
 			//菜品列表
-			var foodCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-index={dataIndex} data-value={id} onclick="{click}">' +
+			var foodCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-index={dataIndex} data-value={id}>' +
 									'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
 										'<div class="food-status-font {commonStatus}">' +
 											'<font color="orange">{weigh}</font>' +
@@ -1646,30 +1643,29 @@ $(function(){
 						id : item.id,
 						name : item.name.substring(0, 10),
 						unitPrice : item.unitPrice,
-						sellout : (item.status & 1 << 2) != 0 ? '停' : '',
-						currPrice : (item.status & 1 << 4) != 0 ? '时' : '',		
-						gift : (item.status & 1 << 3) != 0 ? '赠' : ''	,
-						weigh : (item.status & 1 << 7) != 0 ? '称' : '',
-						commonStatus : (item.status & 1 << 10) != 0 ? 'none' : '',
-						limitStatus : (item.status & 1 << 10) != 0 ? '' : 'none',
+						sellout : WirelessOrder.foods.status.isSellout(item) ? '停' : '',
+						currPrice : WirelessOrder.foods.status.isCurPrice(item) ? '时' : '',		
+						gift : WirelessOrder.foods.status.isGift(item) ? '赠' : ''	,
+						weigh : WirelessOrder.foods.status.isWeight(item) ? '称' : '',
+						commonStatus : WirelessOrder.foods.status.isLimit(item) ? 'none' : '',
+						limitStatus : WirelessOrder.foods.status.isLimit(item) ? '' : 'none',
 						foodLimitAmount : item.foodLimitAmount,
 						foodLimitRemain : item.foodLimitRemain
 					});
 				},
 				itemClick : function(index, item){
-					//是否停售
-					if((item.status & 1 << 2) != 0){
-						Util.msg.tip('此菜品已停售!'); 
-						return;
-					}
-					
-					//是否时价
-					if((item.status & 1 << 4) != 0){
+					if(WirelessOrder.foods.status.isSellout(item)){
+						//是否停售
+						Util.msg.tip('此菜品已停售!');
+						
+					}else if(WirelessOrder.foods.status.isCurPrice(item)){
+						//是否时价
 						openCurrentPriceWin(item);
-						return;
+						
+					}else{
+						//加入新点菜
+						insertFood(item);
 					}
-					
-					insertFood(item);
 				},
 				onPageChanged : function(){
 					setTimeout(function(){
@@ -2815,7 +2811,7 @@ $(function(){
 		$('#updatePrice_li_orderFood').click(function(){
 			$('#orderFoodOtherOperateCmp').popup('close');	
 			setTimeout(function(){
-				if((of.selectedOrderFood.status & 1 << 4) != 0){
+				if(WirelessOrder.foods.status.isCurPrice(of.selectedOrderFood)){
 					setTimeout(function(){
 						var curPricePopup = null;
 						curPricePopup = new NumKeyBoardPopup({
@@ -2963,7 +2959,7 @@ $(function(){
 		}
 		var data = of.newFood[foodContent.attr('data-index')];
 		
-		if((data.status & 1 << 3) == 0){
+		if(!WirelessOrder.foods.status.isGift(data)){
 			Util.msg.alert({
 				msg : '此菜品不可赠送',
 				topTip : true
@@ -3063,7 +3059,7 @@ $(function(){
 			//对比是否同一个菜
 			if(of.newFood[i].id == foodData.id){
 				//再对比口味 & 赠送属性 & 单位 & 时价
-				if(of.newFood[i].tasteGroup.normalTasteContent.length == 0 && !of.newFood[i].isGift && !of.newFood[i].foodUnit && (of.newFood[i].status & 1 << 4) == 0){
+				if(of.newFood[i].tasteGroup.normalTasteContent.length == 0 && !of.newFood[i].isGift && !of.newFood[i].foodUnit && !WirelessOrder.foods.status.isGift(of.newFood[i])){
 					has = true;
 					of.newFood[i].count++;
 					of.selectedOrderFood = of.newFood[i];
@@ -3078,7 +3074,8 @@ $(function(){
 		if(!has){
 			foodData.count = 1;
 			foodData.isHangup = false;
-			if((foodData.status & 1 << 4) != 0){
+			//是否时价
+			if(WirelessOrder.foods.status.isCurPrice(foodData)){
 				foodData.isCurrPrice = true;
 			}
 			foodData.tasteGroup = {
@@ -3091,7 +3088,7 @@ $(function(){
 			
 			//是否为套菜
 			foodData.combo = [];
-			if((foodData.status & 1 << 5) != 0){
+			if(WirelessOrder.foods.status.isCombo(foodData)){
 				//获取对应套菜
 				$.ajax({
 					url : '../QueryFoodCombination.do',
@@ -3141,7 +3138,7 @@ $(function(){
 					if(result.success){
 						of.multiPrices = result.root;
 						
-						if((foodData.status & 1 << 5) != 0){
+						if(WirelessOrder.foods.status.isCombo(foodData)){
 							comboFoodTasteUnitLoad();							
 						}else{
 							if(of.commonTastes.length == 0 && of.multiPrices.length == 0){

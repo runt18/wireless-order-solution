@@ -1108,7 +1108,7 @@
 	     </div>
 	     
 	     <!-- 菜品列表 -->
-	     <div id="foodsCmp_div_orderFood" class="ui-block-b" style="width: 65%;background-color: skyblue;" onmouseout="javascript:mouseOutFoodSelect = true;" onmouseover="javascript:mouseOutFoodSelect = false;">
+	     <div id="foodsCmp_div_orderFood" class="ui-block-b" style="width: 65%;background-color: skyblue;">
 
 	     </div>			
 	</div>
@@ -1157,7 +1157,7 @@
 		 
 	</div>
 	
-	<div id="orderFoodTasteCmp" data-role="popup" data-theme="c" data-dismissible="false" style="width:820px;" class="ui-corner-all" align="center" onmouseout="javascript:mouseOutFoodSelect = true;" onmouseover="javascript:mouseOutFoodSelect = false;">
+	<div id="orderFoodTasteCmp" data-role="popup" data-theme="c" data-dismissible="false" style="width:820px;" class="ui-corner-all" align="center">
 	    <div data-role="header" data-theme="b" class="ui-corner-top">
 	    	<!-- 口味组 -->
 	    	<div id="tasteGroupCmp" data-role="controlgroup" data-type="horizontal" >
@@ -1258,7 +1258,7 @@
 	
 		
 	
-	<div id="addTempTasteCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: -100px 0px 0px -250px;min-width:500px;display: none;background-color: white;" align="center" onmouseout="javascript:mouseOutFoodSelect = true;" onmouseover="javascript:mouseOutFoodSelect = false;">
+	<div id="addTempTasteCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: -100px 0px 0px -250px;min-width:500px;display: none;background-color: white;" align="center">
 	<!-- <div id="addTempTasteCmp" data-role="popup"  data-theme="c" data-dismissible="false" style="min-width:550px;" class="ui-corner-all" align="center"> -->
 	    <div data-role="header" data-theme="b" class="ui-corner-top">
 	        <h1>添加临时口味</h1>
