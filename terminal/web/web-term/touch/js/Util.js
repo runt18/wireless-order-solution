@@ -97,162 +97,162 @@ Util.to.scroll = function(c){
 	}
 };
 
-//新版分页
-Util.to.padding = function(c){
-	if(c == null || typeof c.renderTo == 'undefined' || typeof c.templet != 'function'){
-		return;
-	}
-	var obj = {
-		renderTo : c.renderTo,
-		templet : c.templet,
-		dom : null,
-		start : 0,
-		limit : c.limit,
-		data : [],
-		length : 0,
-		pageData : [],
-		displayMsg : typeof c.displayMsg != 'undefined' ? c.displayMsg : '共{0}项, 第{1}/{2}页, 每页{3}项',
-		displayId : c.displayId,
-		isEmpty : function(){
-			return this.data == null || this.data.length <= 0;
-		},
-		getData : function(){
-			return this.data;
-		},
-		getPageData : function(){
-			return this.pageData;
-		},
-		clear : function(){
-			this.start = 0;
-			this.limit = 20;
-			this.data = [];
-			this.length = 0;
-			this.pageData = [];
-		},
-		clearContent : function(){
-			if(this.dom){
-				this.dom.html('');
-			}
-			this.showMsg();
-		},
-		pagedCallBack : c.pagedCallBack,//执行分页后调用
-		showMsg : function(){
-			if(this.displayId != null && this.displayId != ''){
-				var md = $('#'+this.displayId);
-				if(md){
-					if(this.length > 0){
-						md.html(this.displayMsg.format(this.length,
-							parseInt(this.start / this.limit) + 1,
-							parseInt(this.length / this.limit) + (this.length % this.limit == 0 ? 0 : 1),
-							this.limit
-						));
-					}else{
-						md.html('');
-					}
-				}
-				md = null;
-			}
-		},
-		init : function(ic){
-			ic = ic == null ? {data:[]} : ic;
-			
-//			console.log('renddiv')
-//			console.log(this.renderTo)
-			
-			this.dom = $('#'+this.renderTo);
-			
-			this.clearContent();
-			//重置右下角分页导航信息
-			this.showMsg();			
-			//
-			var ch = this.dom[0].clientHeight, cw = this.dom[0].clientWidth;
-			
-//			console.log(this.dom)
-//			console.log('ch+cw:' +ch + ',' +cw)
-//			console.log('limit:'+this.limit)
-			
-			if(!this.limit){
-				this.limit = parseInt(ch / (65 + 18)) * parseInt(cw / (100 + 12));
-			}
-			//
-			this.data = ic.data == null || typeof ic.data == 'undefined' ? [] : ic.data;
-			this.length = this.data.length;
-			if(typeof ic.callback == 'function'){
-				ic.callback();
-			}
-		},
-		initContent : function(c){
-			c = c || {};
-			this.pageData = [];
-			this.clearContent();
-			
-/*			console.log('limit:'+this.limit)
-			console.log('padata')
-			console.log(this.data)*/
-			
-			if(!this.isEmpty()){
-				var html = [];
-				var start = this.start;
-				var limit = this.data.length >= this.start + this.limit ? this.limit : this.limit - (this.start + this.limit -this.data.length);
-				
-				var temp = null;
-				for(var i = 0; i < limit; i++){
-					temp = this.data[start+i];
-					this.pageData.push(temp);
-					if(temp != null){
-						html.push(this.templet({
-							index : i,
-							data : temp
-						}));	
-					}
-				}
-				temp = null;
-/*				console.log('html')
-				console.log(html)*/
-				
-				this.dom.html(html.join("")).trigger('create');
-				
-				if(c.around){
-					this.dom.buttonMarkup( "refresh" );
-				}
-				
-				if(typeof this.pagedCallBack == 'function'){
-					this.pagedCallBack();
-				}
-				
-			}
-		},
-		getFirstPage : function(c){
-			this.start = 0;
-			this.initContent(c);
-		},
-		getLastPage : function(){
-			this.start = this.data.length - this.data.length % this.limit;
-			this.initContent();
-		},
-		getNextPage : function(c){
-			this.start += this.limit;
-			if(this.start > (this.data.length-1)){
-				this.start -= this.limit;
-				return;
-			}
-			this.initContent(c);
-		},
-		getPreviousPage : function(c){
-			this.start -= this.limit;
-			if(this.start < 0){
-				this.start += this.limit;
-				return;
-			}
-			this.initContent(c);
-		}
-	};
-	obj.init({
-		data : c.data,
-		callback : c.callback
-	});
-	return obj;
-};
+////新版分页
+//Util.to.padding = function(c){
+//	if(c == null || typeof c.renderTo == 'undefined' || typeof c.templet != 'function'){
+//		return;
+//	}
+//	var obj = {
+//		renderTo : c.renderTo,
+//		templet : c.templet,
+//		dom : null,
+//		start : 0,
+//		limit : c.limit,
+//		data : [],
+//		length : 0,
+//		pageData : [],
+//		displayMsg : typeof c.displayMsg != 'undefined' ? c.displayMsg : '共{0}项, 第{1}/{2}页, 每页{3}项',
+//		displayId : c.displayId,
+//		isEmpty : function(){
+//			return this.data == null || this.data.length <= 0;
+//		},
+//		getData : function(){
+//			return this.data;
+//		},
+//		getPageData : function(){
+//			return this.pageData;
+//		},
+//		clear : function(){
+//			this.start = 0;
+//			this.limit = 20;
+//			this.data = [];
+//			this.length = 0;
+//			this.pageData = [];
+//		},
+//		clearContent : function(){
+//			if(this.dom){
+//				this.dom.html('');
+//			}
+//			this.showMsg();
+//		},
+//		pagedCallBack : c.pagedCallBack,//执行分页后调用
+//		showMsg : function(){
+//			if(this.displayId != null && this.displayId != ''){
+//				var md = $('#'+this.displayId);
+//				if(md){
+//					if(this.length > 0){
+//						md.html(this.displayMsg.format(this.length,
+//							parseInt(this.start / this.limit) + 1,
+//							parseInt(this.length / this.limit) + (this.length % this.limit == 0 ? 0 : 1),
+//							this.limit
+//						));
+//					}else{
+//						md.html('');
+//					}
+//				}
+//				md = null;
+//			}
+//		},
+//		init : function(ic){
+//			ic = ic == null ? {data:[]} : ic;
+//			
+////			console.log('renddiv')
+////			console.log(this.renderTo)
+//			
+//			this.dom = $('#'+this.renderTo);
+//			
+//			this.clearContent();
+//			//重置右下角分页导航信息
+//			this.showMsg();			
+//			//
+//			var ch = this.dom[0].clientHeight, cw = this.dom[0].clientWidth;
+//			
+////			console.log(this.dom)
+////			console.log('ch+cw:' +ch + ',' +cw)
+////			console.log('limit:'+this.limit)
+//			
+//			if(!this.limit){
+//				this.limit = parseInt(ch / (65 + 18)) * parseInt(cw / (100 + 12));
+//			}
+//			//
+//			this.data = ic.data == null || typeof ic.data == 'undefined' ? [] : ic.data;
+//			this.length = this.data.length;
+//			if(typeof ic.callback == 'function'){
+//				ic.callback();
+//			}
+//		},
+//		initContent : function(c){
+//			c = c || {};
+//			this.pageData = [];
+//			this.clearContent();
+//			
+///*			console.log('limit:'+this.limit)
+//			console.log('padata')
+//			console.log(this.data)*/
+//			
+//			if(!this.isEmpty()){
+//				var html = [];
+//				var start = this.start;
+//				var limit = this.data.length >= this.start + this.limit ? this.limit : this.limit - (this.start + this.limit -this.data.length);
+//				
+//				var temp = null;
+//				for(var i = 0; i < limit; i++){
+//					temp = this.data[start+i];
+//					this.pageData.push(temp);
+//					if(temp != null){
+//						html.push(this.templet({
+//							index : i,
+//							data : temp
+//						}));	
+//					}
+//				}
+//				temp = null;
+///*				console.log('html')
+//				console.log(html)*/
+//				
+//				this.dom.html(html.join("")).trigger('create');
+//				
+//				if(c.around){
+//					this.dom.buttonMarkup( "refresh" );
+//				}
+//				
+//				if(typeof this.pagedCallBack == 'function'){
+//					this.pagedCallBack();
+//				}
+//				
+//			}
+//		},
+//		getFirstPage : function(c){
+//			this.start = 0;
+//			this.initContent(c);
+//		},
+//		getLastPage : function(){
+//			this.start = this.data.length - this.data.length % this.limit;
+//			this.initContent();
+//		},
+//		getNextPage : function(c){
+//			this.start += this.limit;
+//			if(this.start > (this.data.length-1)){
+//				this.start -= this.limit;
+//				return;
+//			}
+//			this.initContent(c);
+//		},
+//		getPreviousPage : function(c){
+//			this.start -= this.limit;
+//			if(this.start < 0){
+//				this.start += this.limit;
+//				return;
+//			}
+//			this.initContent(c);
+//		}
+//	};
+//	obj.init({
+//		data : c.data,
+//		callback : c.callback
+//	});
+//	return obj;
+//};
 
 //新版消息弹框
 Util.msg = {

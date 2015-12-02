@@ -1433,8 +1433,8 @@
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : false})">开售</a>
 			 	<!-- <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a> -->
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="searchSelloutFood('on')">搜索</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.tp.getPreviousPage()">上一页</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.tp.getNextPage()">下一页</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.tp.prev()">上一页</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.tp.next()">下一页</a>
 			 </div>
 		</div>
 		<!-- 搜索组件 -->

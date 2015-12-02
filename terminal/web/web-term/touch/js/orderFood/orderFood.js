@@ -533,33 +533,34 @@ function initTasteCmp(c){
 		glist.buttonMarkup("refresh");
 		of.ot.tasteGroupClick = true;
 	}
-	of.ot.tastePaging = Util.to.padding({
-		renderTo : "tastesCmp",
-		data : tastesDate,
-		displayId : 'tastePagingDesc',
-		templet : function(c){
+	of.ot.tastePaging = new WirelessOrder.Padding({
+		renderTo : $('#tastesCmp'),
+		displayTo : $('#tastePagingDesc'),
+		itemLook : function(index, item){
 			//默认不选中
 			var theme = "c";
 			//当从口味组进入时, 恢复选中状态
 			if(of.ot.tasteGroupClick){
 				for (var k = 0; k < of.ot.choosedTastes.length; k++) {
-					if(c.data.taste.id == of.ot.choosedTastes[k].taste.id){
+					if(item.taste.id == of.ot.choosedTastes[k].taste.id){
 						theme = "e";
 						break;
 					}
 				}
 			}			
 			return tasteCmpTemplet.format({
-				index : c.index,
-				id : c.data.taste.id,
-				name : c.data.taste.name,
-				click : "chooseTaste({event: this, id: "+ c.data.taste.id +"})",
-				price : c.data.taste.calcValue == 1?(c.data.taste.rate * 100) + '%' : ('￥'+ c.data.taste.price),
+				index : index,
+				id : item.taste.id,
+				name : item.taste.name,
+				price : item.taste.calcValue == 1?(item.taste.rate * 100) + '%' : ('￥'+ item.taste.price),
 				theme : theme//是否选中
 			});
+		},
+		itemClick : function(index, item){
+			chooseTaste({event: this, id: item.taste.id});
 		}
 	});	
-	of.ot.tastePaging.getFirstPage();
+	of.ot.tastePaging.data(tastesDate);
 }
 
 /**
@@ -567,14 +568,14 @@ function initTasteCmp(c){
  */
 function tasteCmpNextPage(){
 	of.ot.tasteGroupClick = true;
-	of.ot.tastePaging.getNextPage();
+	of.ot.tastePaging.next();
 }
 /**
  * 口味分页
  */
 function tasteCmpPrePage(){
 	of.ot.tasteGroupClick = true;
-	of.ot.tastePaging.getPreviousPage();
+	of.ot.tastePaging.prev();
 }
 
 
@@ -3130,11 +3131,11 @@ $(function(){
 		});
 		
 		//获取菜品常用口味
-		$.post('../QueryFoodTaste.do', {foodID : food.foodId}, function(jr){
+		$.post('../QueryFoodTaste.do', {foodID : food.id}, function(jr){
 			if(jr.success){
 				of.commonTastes = jr.root;
 				//获取菜品多单位
-				$.post('../QueryMenu.do', {dataSource:'getMultiPrices',foodId:food.foodId}, function(result){
+				$.post('../QueryMenu.do', {dataSource:'getMultiPrices',foodId:food.id}, function(result){
 					if(result.success){
 						of.multiPrices = result.root;
 						

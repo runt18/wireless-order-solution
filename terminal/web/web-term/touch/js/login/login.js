@@ -15,7 +15,7 @@ var lg = {
 		bbs : []
 	};
 
-var allStaff = '<a data-role="button" data-inline="true" class="loginName" onclick="selectedName(this)" data-value="{staffId}" data-theme="c"><div>{staffName}</div></a>';
+var allStaff = '<a data-role="button" data-inline="true" class="loginName" data-index={dataIndex} onclick="selectedName(this)" data-value="{staffId}" data-theme="c"><div>{staffName}</div></a>';
 
 $(function(){
 	
@@ -278,18 +278,18 @@ function initStaffContent(c){
 				$('#divAllStaffForUserLogin').height(75 * Math.ceil(data.root.length/5));
 				$('#selectStaffCmp').height($('#selectStaffCmp-popup').height());
 				
-				lg.staffPaging = Util.to.padding({
-					renderTo : "divAllStaffForUserLogin",
-					data : data.root,
-					limit : 20, 
-					templet : function(c){
+				lg.staffPaging = new WirelessOrder.Padding({
+					renderTo : $('#divAllStaffForUserLogin'),
+					limit : 20,
+					itemLook : function(index, item){
 						return allStaff.format({
-							staffId : c.data.staffID,
-							staffName : c.data.staffName
+							dataIndex : index,
+							staffId : item.staffID,
+							staffName : item.staffName
 						});
 					}
 				});
-				lg.staffPaging.getFirstPage();		
+				lg.staffPaging.data(data.root)	;
 				
 				$('.loginName').click(function(){
 					$('.loginName').attr('data-theme', 'c');
@@ -449,10 +449,7 @@ function selectedName(thiz){
  * 打开员工选择
  */
 function openStaffSelectCmp(){
-	lg.staffPaging.init({
-		data : lg.staffs
-	});
-	lg.staffPaging.getFirstPage();
+	lg.staffPaging.data(lg.staffs);
 //	$('#selectStaffCmp').parent().addClass("pop").addClass("in");
 	$('#selectStaffCmp').popup('open');
 	

@@ -7,7 +7,8 @@ WirelessOrder.Padding = function(c){
 		displayTo : null,							//显示分页信息的div
 		itemLook : function(index, item){},			//分页中每个item的显示样式
 		itemClick : function(index, item){},		//分页中每个item的click函数
-		onPageChanged : function(pageNo, items){}	//页数变化时的回调函数
+		onPageChanged : function(pageNo, items){},	//页数变化时的回调函数
+		limit : null                                //限制个数
 	};
 	
 	var _self = this;
@@ -28,8 +29,12 @@ WirelessOrder.Padding = function(c){
 				var ch = c.renderTo[0].clientHeight;
 				var cw = c.renderTo[0].clientWidth;
 				
-				//根据屏幕大小计算显示的个数
-				_limit = parseInt(ch / (65 + 18)) * parseInt(cw / (100 + 12));
+				if(c.limit){
+					_limit = c.limit;
+				}else{
+					//根据屏幕大小计算显示的个数
+					_limit = parseInt(ch / (65 + 18)) * parseInt(cw / (100 + 12));
+				}
 				
 				//显示第一页
 				_self.first();
@@ -41,7 +46,10 @@ WirelessOrder.Padding = function(c){
 	};
 	
 	function changePage(){
-		if(_length > 0){
+		if(_length == 0){
+			c.renderTo.html('').trigger('create');
+			
+		}else if(_length > 0){
 			var html = [];
 			var limit = _length >= _start + _limit ? _limit : _limit - (_start + _limit - _length);
 			
