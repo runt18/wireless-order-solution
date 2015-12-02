@@ -18,11 +18,6 @@ var of = {
 	//不同条件下选出的口味
 	tastesDate = [],
 
-	/**
-	 * 元素模板
-	 */
-	
-	
 	//已点菜列表					  
 	orderFoodCmpTemplet = '	<li data-icon={isGift} data-index={dataIndex} data-unique={unique} data-theme="c" data-value={id} data-type="orderFoodCmp" onclick="of.selectNewFood({event:this, foodId:{id}})" ><a >'+
 									'<h1 style="font-size:20px;">{name}</h1>' +
@@ -38,8 +33,6 @@ var of = {
 	tasteCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>',
 	//选中口味
 	choosedTasteCmpTemplet = '<a onclick="removeTaste({event: this, id: {id}})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id}><div>{name}<br>￥{price}</div></a>',
-	//口味组
-	tasteGroupCmpTemplet = '<a data-role="button" data-inline="true" class="tastePopTopBtn" data-value={id} data-index={index} data-theme="{theme}" onclick="initTasteCmp({event:this, id:{id}})">{name}</a>';
 	//套菜组
 	comboFoodGroupCmpTemplet = '<a data-role="button" data-inline="true" class="comboFoodPopTopBtn" data-value={id} data-index={index} data-theme="{theme}" onclick="initComboFoodTasteCmp({event:this, id:{id}, isComboFood : {isComboFood}})"><div>{name}</div></a>';
 	//多单位
@@ -77,11 +70,13 @@ of.entry = function(c){
 		}
 	}
 	
+	//初始化菜品
 	if(c.initFoods){
 		of.initFoods = c.initFoods;
 	}else{
 		of.initFoods = [];
 	}
+	
 	//去点餐界面
 	location.href = '#orderFoodMgr' + (param || '');
 
@@ -486,7 +481,7 @@ of.ot.back = function(){
  */
 function chooseTaste(c){
 	var currentTaste = $(c.event);
-	var tdata;
+	var tdata = null;
 	for (var i = 0; i < tastesDate.length; i++) {
 		if(tastesDate[i].taste.id == c.id){
 			tdata = tastesDate[i];
@@ -2870,7 +2865,7 @@ $(function(){
 		
 		//全单口味
 		$('#allFoodTaste_li_orderFood').click(function(){
-			operateOrderFoodTaste({type:1})
+			operateOrderFoodTaste({type:1});
 		});
 		
 		//全单叫起
@@ -3042,16 +3037,21 @@ $(function(){
 		}
 		
 		if(c.type == 1){
-			//关闭更多控件
+			//关闭'更多'控件
 			$('#orderFoodOtherOperateCmp').popup('close');
 			
-			var isHangup;
-			for(var i = 0; i < of.newFood.length; i++){
-				if(i == 0){
-					isHangup = typeof of.newFood[i].isHangup != 'boolean' ? true : !of.newFood[0].isHangup;
+			if(of.newFood.length > 0){
+				var isHangup;
+				if(of.newFood[0].isHangup){
+					isHangup = false;
+				}else{
+					isHangup = true;
 				}
-				of.newFood[i].isHangup = isHangup;
+				of.newFood.forEach(function(e){
+					e.isHangup = isHangup;
+				});
 			}
+			
 			of.initNewFoodContent({
 				data : of.newFood
 			});
@@ -3062,7 +3062,7 @@ $(function(){
 				return;
 			}
 			var data = of.newFood[foodContent.attr('data-index')];
-			data.isHangup = typeof data.isHangup != 'boolean' ? true : !data.isHangup;;
+			data.isHangup = typeof data.isHangup != 'boolean' ? true : !data.isHangup;
 			of.initNewFoodContent({
 				data : data
 			});			
