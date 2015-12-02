@@ -2,7 +2,8 @@
 var of = {
 	table : {},
 	order : {},
-	initFoods : null,		//进入点菜界面时的菜品数据
+	initFoods : [],		//进入点菜界面时的菜品数据
+	newFood : [],		//新点菜的菜品数据
 	ot : {
 		tasteGroupPagingStart : 0,
 		choosedTastes : [],
@@ -11,7 +12,6 @@ var of = {
 	selectedOrderFood : {},
 	commonTastes : [],
 	multiPrices : [],
-	newFood : [],
 	//从哪个功能进入点菜
 	orderFoodOperateType : 'normal'
 },
@@ -56,7 +56,7 @@ of.entry = function(c){
 		orderFoodOperateType : null,			//操作类型
 		table : null,							//餐台
 		comment : null,							//开台备注
-		foods : null							//初始菜品
+		initFoods : null						//初始菜品
 	};
 	
 	//设置点菜界面操作类型
@@ -75,6 +75,12 @@ of.entry = function(c){
 		if(c.comment){
 			param += '&comment=' + c.comment;	
 		}
+	}
+	
+	if(c.initFoods){
+		of.initFoods = c.initFoods;
+	}else{
+		of.initFoods = [];
 	}
 	//去点餐界面
 	location.href = '#orderFoodMgr' + (param || '');
@@ -1860,7 +1866,7 @@ $(function(){
 			of.initFoods.forEach(function(e){
 				var index = WirelessOrder.foods.binaryIndex(e);
 				if(index >= 0){
-					of.newFood.push(WirelessOrder.foods[index]);
+					insertFood(WirelessOrder.foods[index]);
 				}
 			});
 			

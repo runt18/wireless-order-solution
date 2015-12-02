@@ -7,11 +7,11 @@ var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 //餐桌选择包
 var	ts = {
 		table : {},
-		tf : {},
 		member : {},
 		bookChoosedTable : [],
 		multiOpenTableChoosedTable : [],
-		multiPayTableChoosedTable : []
+		multiPayTableChoosedTable : [],
+		bookFoods : []			//预订菜品
 	},
 	/**
 	 * 元素模板
@@ -1666,6 +1666,7 @@ function handleTableForTS(c){
 							
 							Util.LM.show();
 							
+							var orderDataModel = {};
 							orderDataModel.tableID = ts.table.id;
 							orderDataModel.customNum = customNum;
 							orderDataModel.orderFoods = [];
@@ -1776,6 +1777,7 @@ function handleTableForTS(c){
 						
 						Util.LM.show();
 						
+						var orderDataModel = {};
 						orderDataModel.tableID = ts.table.id;
 						orderDataModel.customNum = customNum;
 						orderDataModel.orderFoods = [];
@@ -2808,7 +2810,7 @@ ts.bookOperateTable = function(c){
 	}
 	
 	//清空菜品
-	of.newFood.length = 0;
+	ts.bookFoods.length = 0;
 	var book = ts.bookList[c.index];
 	$.ajax({
 		url : '../QueryBook.do',
@@ -2823,9 +2825,9 @@ ts.bookOperateTable = function(c){
 			if(data.success){
 				book = data.root[0];
 				if(data.root[0].order && data.root[0].order.orderFoods.length > 0){
-					of.newFood = data.root[0].order.orderFoods;
+					ts.bookFoods = data.root[0].order.orderFoods;
 				}else{
-					of.newFood.length = 0;
+					ts.bookFoods.length = 0;
 				}
 			}
 		}
@@ -2926,6 +2928,7 @@ ts.bookTableOrderFood = function(){
 
 	//进入点菜界面
 	of.entry({
+		initFoods : ts.bookFoods,
 		table : ts.bookChoosedTable[0],
 		comment : '',
 		orderFoodOperateType : 'bookSeat'
@@ -2937,7 +2940,7 @@ ts.bookTableOrderFood = function(){
  */
 ts.bookTableCommitOrderFood = function(){
 	
-	if(of.newFood.length == 0){
+	if(ts.bookFoods.length == 0){
 		Util.msg.alert({
 			msg : "请选择菜品",
 			renderTo : 'orderFoodMgr'
@@ -2947,8 +2950,9 @@ ts.bookTableCommitOrderFood = function(){
 	
 	var bookOrderFoods = [];
 	for (var i = 0; i < ts.bookChoosedTable.length; i++) {
+		var orderDataModel = {};
 		orderDataModel.tableID = ts.bookChoosedTable[i].id;
-		orderDataModel.orderFoods = of.newFood.slice(0);
+		orderDataModel.orderFoods = ts.bookFoods.slice(0);
 		orderDataModel.categoryValue =  ts.bookChoosedTable[i].categoryValue;	
 		bookOrderFoods.push(JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)));
 	}
@@ -2987,7 +2991,7 @@ ts.addBookInfo = function(c){
 		ts.addBookInfo.otype = "insert";
 		
 		//清空菜品
-		of.newFood.length = 0;
+		ts.bookFoods.length = 0;
 		//清空已选餐台
 		ts.bookChoosedTable.length = 0;
 		
@@ -3086,7 +3090,7 @@ ts.closeAddBookInfo = function(){
 	$('#add_bookTableList').html('');	
 	
 	//清空菜品
-	of.newFood.length = 0;
+	ts.bookFoods.length = 0;
 	$('#box4BookOrderFoodList').hide();
 	$('#bookOrderFoodListBody').html('');
 	
@@ -3124,29 +3128,31 @@ ts.bookFoodChooseFinish = function(){
 	
 	if(of.newFood.length == 0){
 		Util.msg.alert({
-			msg : "请选择菜品",
+			msg : '请选择菜品',
 			renderTo : 'orderFoodMgr'
 		});		
 		return ;
+	}else{
+		ts.bookFoods = of.newFood.slice(0);
 	}
 	
 	//返回预订界面
 	history.back();
 	
 	var html = [];
-	for (var i = 0; i < of.newFood.length; i++) {
+	ts.bookFoods.forEach(function(e, index){
 		html.push(bookOrderFoodListCmpTemplet.format({
-			dataIndex : i + 1,
-			id : of.newFood[i].id,
-			name : of.newFood[i].name,
-			count : of.newFood[i].count,
-			isWeight : (of.newFood[i].status & 1 << 7) != 0 ? 'initial' : 'none',
-			tastePref : of.newFood[i].tasteGroup.tastePref,
-			unitPrice : of.newFood[i].unitPrice.toFixed(2) + (of.newFood[i].isGift?'&nbsp;[<font style="font-weight:bold;">已赠送</font>]':''),
-			isComboFoodTd : "",
-			foodNameStyle : "commonFoodName"
+			dataIndex : index + 1,
+			id : e.id,
+			name : e.name,
+			count : e.count,
+			isWeight : WirelessOrder.foods.status.isWeight(e) ? 'initial' : 'none',
+			tastePref : e.tasteGroup.tastePref,
+			unitPrice : e.unitPrice.toFixed(2) + (e.isGift ? '&nbsp;[<font style="font-weight:bold;">已赠送</font>]' : ''),
+			isComboFoodTd : '',
+			foodNameStyle : 'commonFoodName'
 		}));
-	}
+	});
 	
 	$('#bookOrderFoodListBody').html(html.join('')).trigger('create');
 	
@@ -3198,8 +3204,8 @@ ts.commitAddBook = function(){
 	}
 	
 	var orderFoods = [];
-	for (var i = 0; i < of.newFood.length; i++) {
-		orderFoods.push(JSON.stringify(of.newFood[i]));
+	for (var i = 0; i < ts.bookFoods.length; i++) {
+		orderFoods.push(JSON.stringify(ts.bookFoods[i]));
 	}
 	
 	Util.LM.show();
@@ -3389,6 +3395,7 @@ ts.multiOpenTableCommitOrderFood = function(){
 	
 	var orderFoods = [];
 	for (var i = 0; i < ts.multiOpenTableChoosedTable.length; i++) {
+		var orderDataModel = {};
 		orderDataModel.tableID = ts.multiOpenTableChoosedTable[i].id;
 		orderDataModel.orderFoods = of.newFood.slice(0);
 		orderDataModel.categoryValue =  ts.multiOpenTableChoosedTable[i].categoryValue;	
