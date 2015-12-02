@@ -10,7 +10,7 @@ var ss = {
 	 * 元素模板
 	 */
 	//菜品
-	stopSellFoodTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-value={id} onclick="{click}">' +
+	stopSellFoodTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-index={dataIndex} data-value={id} onclick="{click}">' +
 								'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
 								'<div class="food-status-limit {limitStatus}">' +
 									'<font color="orange">限: {foodLimitAmount}</font><br>' +
@@ -101,8 +101,8 @@ ss.s = {
 					}				
 				}
 					
-				ss.s.foodPaging.init({
-					data : data ? data.sort(function (obj1, obj2) {
+				ss.s.foodPaging.data(
+					data ? data.sort(function (obj1, obj2) {
 											    var val1 = obj1.status;
 											    var val2 = obj2.status;
 											    if ((val1 & 1 << 10) < (val2 & 1 << 10)) {
@@ -112,31 +112,31 @@ ss.s = {
 											    } else {
 											        return 0;
 											    }            
-											}) : ss.showFoodByCond.showFoodDatas.slice(0),
-					callback : function(){
-						ss.s.foodPaging.getFirstPage();
-					}
-				});
+											}) : ss.showFoodByCond.showFoodDatas.slice(0)
+				);
 				data = null;
 				temp = null;
 			};
 		}
 		
 		if(!ss.s.foodPaging){
-			ss.s.foodPaging = Util.to.padding({
-				renderTo : "foods4StopSellCmp",
-				templet : function(c){
+			ss.s.foodPaging = new WirelessOrder.Padding({
+				renderTo : $('#foods4StopSellCmp'),
+				itemLook : function(index, item){
 					return stopSellFoodTemplet.format({
-						id : c.data.id,
-						name : c.data.name,
-						unitPrice : c.data.unitPrice,
-						click : 'ss.insertFood({foodId:'+c.data.id+', type:'+ (ss.status == 'stop' ? '\'deSellOut\'' : '\'sellOut\'')  +'})',
-						limitStatus : ((c.data.status & 1 << 10) != 0 || c.data.foodLimitAmount > 0) ? '' : 'none',
-						foodLimitAmount : c.data.foodLimitAmount,
-						foodLimitRemain : c.data.foodLimitRemain
+						dataIndex : index,
+						id : item.id,
+						name : item.name,
+						unitPrice : item.unitPrice,
+						limitStatus : ((item.status & 1 << 10) != 0 || item.foodLimitAmount > 0) ? '' : 'none',
+						foodLimitAmount : item.foodLimitAmount,
+						foodLimitRemain : item.foodLimitRemain
 					});
 				},
-				pagedCallBack : function(){
+				itemClick : function(index, item){
+					ss.insertFood({foodId : item.id, type : ss.status == 'stop' ? 'deSellOut' : 'sellOut'});
+				},
+				onPageChanged : function(){
 					//FIXME .food-status-font中position:absolute不起作用
 					setTimeout(function(){
 						$(".food-status-limit").css("position", "absolute");
@@ -229,48 +229,55 @@ ss.init = function(){
 	if(!this.initFlag===true){
 		this.initFlag = true;
 		
-		ss.stoptp = new Util.to.padding({
-			renderTo : 'foods4StopSellCmp',
-			displayId : 'foods4StopSellCmp-padding-msg',
-			templet : function(c){
+		ss.stoptp = new WirelessOrder.Padding({
+			renderTo : $('#foods4StopSellCmp'),
+			displayTo : $('#foods4StopSellCmp-padding-msg'),
+			itemLook : function(index, item){
 				return stopSellFoodTemplet.format({
-					id : c.data.id,
-					name : c.data.name,
-					unitPrice : c.data.unitPrice,
-					click : 'ss.insertFood({foodId:'+c.data.id+', type:\'deSellOut\'})',
-					limitStatus : ((c.data.status & 1 << 10) != 0 || c.data.foodLimitAmount > 0) ? '' : 'none',
-					foodLimitAmount : c.data.foodLimitAmount,
-					foodLimitRemain : c.data.foodLimitRemain
+					dataIndex : index,
+					id : item.id,
+					name : item.name,
+					unitPrice : item.unitPrice,
+					limitStatus : ((item.status & 1 << 10) != 0 || item.foodLimitAmount > 0) ? '' : 'none',
+					foodLimitAmount : item.foodLimitAmount,
+					foodLimitRemain : item.foodLimitRemain
 				});
 			},
-			pagedCallBack : function(){
+			itemClick : function(index, item){
+				ss.insertFood({foodId : item.id, type : 'deSellOut'});
+			},
+			onPageChanged : function(){
 				//FIXME .food-status-limit中position:absolute不起作用
 				setTimeout(function(){
 					$(".food-status-limit").css("position", "absolute");
-				}, 250);				
+				}, 250);	
 			}
 		});
-		ss.normaltp = new Util.to.padding({
-			renderTo : 'foods4StopSellCmp',
-			displayId : 'foods4StopSellCmp-padding-msg',
-			templet : function(c){
+		ss.normaltp = new WirelessOrder.Padding({
+			renderTo : $('#foods4StopSellCmp'),
+			displayTo : $('#foods4StopSellCmp-padding-msg'),
+			itemLook : function(index, item){
 				return stopSellFoodTemplet.format({
-					id : c.data.id,
-					name : c.data.name,
-					unitPrice : c.data.unitPrice,
-					click : 'ss.insertFood({foodId:'+c.data.id+', type:\'sellOut\'})',
-					limitStatus : (c.data.status & 1 << 10) != 0 ? '' : 'none',
-					foodLimitAmount : c.data.foodLimitAmount,
-					foodLimitRemain : c.data.foodLimitRemain
+					dataIndex : index,
+					id : item.id,
+					name : item.name,
+					unitPrice : item.unitPrice,
+					limitStatus : (item.status & 1 << 10) != 0 ? '' : 'none',
+					foodLimitAmount : item.foodLimitAmount,
+					foodLimitRemain : item.foodLimitRemain
 				});
 			},
-			pagedCallBack : function(){
+			itemClick : function(index, item){
+				ss.insertFood({foodId : item.id, type : 'sellOut'});
+			},
+			onPageChanged : function(){
 				//FIXME .food-status-limit中position:absolute不起作用
 				setTimeout(function(){
 					$(".food-status-limit").css("position", "absolute");
-				}, 250);				
+				}, 250);
 			}
 		});
+		
 		ss.tp = ss.normaltp;
 	}
 };
@@ -507,7 +514,6 @@ ss.showFoodByCond = function(c){
 	if(ss.extra == ''){
 		return;
 	}
-	
 	ss.showFoodByCond.showFoodDatas = [];
 	for (var i = 0; i < ss.iteratorData.length; i++) {
 		var tempFoodData = ss.iteratorData[i];
@@ -515,10 +521,7 @@ ss.showFoodByCond = function(c){
 			ss.showFoodByCond.showFoodDatas.push(tempFoodData);
 		}
 	}
-	ss.tp.init({
-		data : ss.showFoodByCond.showFoodDatas
-	});
-	ss.tp.getFirstPage();
+	ss.tp.data(ss.showFoodByCond.showFoodDatas);
 };
 
 
@@ -602,6 +605,7 @@ ss.searchData = function(c){
 	}else{
 		ss.extra += '(tempFoodData.status & 1 << 2) == 0';
 	}
+	
 	ss.showFoodByCond();
 	
 };

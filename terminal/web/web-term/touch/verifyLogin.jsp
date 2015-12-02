@@ -24,6 +24,10 @@
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="js/common/jquery.mobile-1.3.2.min.js"></script>
 <script type="text/javascript" src="../js/components/md5.js"></script>
+<!-- 共享数据 -->
+<script type="text/javascript" src="js/global/share.js?v=<%=v %>"></script>
+<!-- 分页控件 -->
+<script type="text/javascript" src="./js/padding/padding.js"></script>
 <!--keyboard  -->
 <script type="text/javascript" src="js/keyboard/keyboard.js"></script>
 <!-- 工具类 -->
@@ -105,8 +109,8 @@
 			
 		<div id="staffPaddingBar" data-role="footer" data-tap-toggle="false" data-theme="b" class="bar">
 			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-				<a onclick="lg.staffPaging.getPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="staffsPaging">L</a>
-				<a onclick="lg.staffPaging.getNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="staffsPaging">R</a>				
+				<a onclick="lg.staffPaging.prev()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="staffsPaging">L</a>
+				<a onclick="lg.staffPaging.next()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="staffsPaging">R</a>				
 			 </div>
 		</div>			
      </div>
