@@ -2,6 +2,7 @@
 var of = {
 	table : {},
 	order : {},
+	initFoods : null,		//进入点菜界面时的菜品数据
 	ot : {
 		tasteGroupPagingStart : 0,
 		choosedTastes : [],
@@ -10,7 +11,6 @@ var of = {
 	selectedOrderFood : {},
 	commonTastes : [],
 	multiPrices : [],
-	calculator : {},
 	newFood : [],
 	//从哪个功能进入点菜
 	orderFoodOperateType : 'normal'
@@ -51,6 +51,13 @@ var of = {
  * 入口, 加载点菜页面数据
  */
 of.entry = function(c){
+	
+	c = c || {
+		orderFoodOperateType : null,			//操作类型
+		table : null,							//餐台
+		comment : null,							//开台备注
+		foods : null							//初始菜品
+	};
 	
 	//设置点菜界面操作类型
 	of.orderFoodOperateType = c.orderFoodOperateType;
@@ -1478,7 +1485,6 @@ of.submit = function(c){
 		success : function(data, status, xhr) {
 			if (data.success){
 
-				of.newFood = [];
 				Util.LM.hide();								
 				closePinyin();
 				closeHandWriting();
@@ -1681,6 +1687,8 @@ $(function(){
 	
 	//进入点菜界面
 	$('#orderFoodMgr').on('pagebeforeshow', function(e){
+		
+		of.newFood = [];
 		of.order = null;
 		of.table = null;
 		
@@ -1699,8 +1707,9 @@ $(function(){
 				success : function(data, status, xhr){
 					if(data.success && data.root.length > 0){
 						of.table = data.root[0];
-						if(param.comment)
-						of.table.comment = param.comment;
+						if(param.comment){
+							of.table.comment = param.comment;
+						}
 	
 						//获取沽清菜品的数据
 						$.post('../QueryMenu.do', {dataSource : 'stopAndLimit'}, function(result){
@@ -1777,7 +1786,6 @@ $(function(){
 				
 			//正常点菜
 			if(of.orderFoodOperateType == 'normal'){
-				of.newFood = [];
 				$('#normalOrderFood_a_orderFood').show();
 				$('#btnOrderAndPay').show();
 				$('#addBookOrderFood').hide();
@@ -1808,7 +1816,6 @@ $(function(){
 				//快餐模式的结账
 				$('#fastPay_a_orderFood').hide();
 			}else if(of.orderFoodOperateType == 'multiOpenTable'){
-				of.newFood = [];
 				$('#multiOpenTable').show();
 				$('#addBookOrderFood').hide();
 				$('#bookSeatOrderFood').hide();
@@ -1819,7 +1826,6 @@ $(function(){
 				//快餐模式的结账
 				$('#fastPay_a_orderFood').hide();
 			}else if(of.orderFoodOperateType == 'fast'){
-				of.newFood = [];
 				//下单
 				$('#normalOrderFood_a_orderFood').hide();
 				$('#btnOrderAndPay').hide();
@@ -1840,15 +1846,23 @@ $(function(){
 			initKitchenContent();
 			
 	
-			 //第一次加载不成功,延迟来一直加载达到菜品显示出来为止
-			(function initFoodContent(){
-				//console.log($('#foodsCmp')[0].clientHeight);
+			//第一次加载不成功,延迟来一直加载达到菜品显示出来为止
+			(function(){
 				if($('#foodsCmp_div_orderFood')[0].clientHeight != 0){
 					search({}, 'byDept');
 				}else{
 					setTimeout(arguments.callee, 500);
 				}
 			})();
+			
+			//初始化添加的菜品
+			of.initFoods.forEach(function(e){
+				var index = WirelessOrder.foods.binaryIndex(e);
+				if(index >= 0){
+					of.newFood.push(WirelessOrder.foods[index]);
+				}
+			});
+			
 			of.initNewFoodContent();
 		
 		};
