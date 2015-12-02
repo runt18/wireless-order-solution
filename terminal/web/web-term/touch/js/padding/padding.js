@@ -65,7 +65,7 @@ WirelessOrder.Padding = function(c){
 				c.renderTo.children().each(function(index, element){
 					element.onclick = function(){
 						var index = parseInt($(element).attr('data-index'));
-						c.itemClick(index, itemsToThisPage[index]);
+						c.itemClick(index, itemsToThisPage[index], element);
 					};
 				});
 			}

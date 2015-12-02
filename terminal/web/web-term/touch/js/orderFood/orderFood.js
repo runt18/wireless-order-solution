@@ -31,8 +31,8 @@ var of = {
 								'</a></li>',
 	//口味列表
 	tasteCmpTemplet = '<a onclick="{click}" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>',
-	//选中口味
-	choosedTasteCmpTemplet = '<a onclick="removeTaste({event: this, id: {id}})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id}><div>{name}<br>￥{price}</div></a>',
+	//口味组
+	tasteGroupCmpTemplet = '<a data-role="button" data-inline="true" class="tastePopTopBtn" data-value={id} data-index={index} data-theme="{theme}" onclick="initTasteCmp({event:this, id:{id}})">{name}</a>';
 	//套菜组
 	comboFoodGroupCmpTemplet = '<a data-role="button" data-inline="true" class="comboFoodPopTopBtn" data-value={id} data-index={index} data-theme="{theme}" onclick="initComboFoodTasteCmp({event:this, id:{id}, isComboFood : {isComboFood}})"><div>{name}</div></a>';
 	//多单位
@@ -479,11 +479,11 @@ of.ot.back = function(){
  * 选中口味
  * @param c
  */
-function chooseTaste(c){
-	var currentTaste = $(c.event);
+function chooseTaste(element, tasteId){
+	var currentTaste = $(element);
 	var tdata = null;
 	for (var i = 0; i < tastesDate.length; i++) {
-		if(tastesDate[i].taste.id == c.id){
+		if(tastesDate[i].taste.id == tasteId){
 			tdata = tastesDate[i];
 		}
 	}
@@ -564,8 +564,8 @@ function initTasteCmp(c){
 				theme : theme//是否选中
 			});
 		},
-		itemClick : function(index, item){
-			chooseTaste({event: this, id: item.taste.id});
+		itemClick : function(index, item, element){
+			chooseTaste(element, item.taste.id);
 		}
 	});	
 	of.ot.tastePaging.data(tastesDate);
