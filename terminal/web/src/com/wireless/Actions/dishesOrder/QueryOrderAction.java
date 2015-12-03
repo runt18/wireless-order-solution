@@ -20,9 +20,8 @@ import com.wireless.pojo.util.DateType;
 
 public class QueryOrderAction extends Action {
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		response.setContentType("text/json;charset=utf-8");
 		JObject jobject = new JObject();
