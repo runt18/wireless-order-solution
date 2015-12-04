@@ -54,6 +54,12 @@ public class ReqPrintContent{
 		return req;
 	}
 	
+	public static ReqPrintContent buildWxOrder(Staff staff, int wxOrderId){
+		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_WX_ORDER);
+		req.parcel.writeInt(wxOrderId);
+		return req;
+	}
+	
 	public static ReqPrintContent buildWxReceipt(Staff staff, Order.PayBuilder payBuilder){
 		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_WX_RECEIT);
 		req.parcel.writeParcel(payBuilder, 0);
