@@ -23,6 +23,24 @@ import com.wireless.util.StringHtml;
 
 public class WxRestaurantDao {
 	
+	public static class ExtraCond{
+		private String qrCode;
+		
+		public ExtraCond setQrCode(String qrCode){
+			this.qrCode = qrCode;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			final StringBuilder extraCond = new StringBuilder();
+			if(qrCode != null){
+				extraCond.append(" AND qrcode = '" + qrCode + "'");
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	/**
 	 * Insert a new record.
 	 * @param dbCon
@@ -199,8 +217,44 @@ public class WxRestaurantDao {
 			return wr;
 		}
 	}
+
+	/**
+	 * Get the weixin restaurant to specific extra condition {@link ExtraCond}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the weixin restaurant result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<WxRestaurant> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
-	private static List<WxRestaurant> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	/**
+	 * Get the weixin restaurant to specific extra condition {@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the weixin restaurant result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<WxRestaurant> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".weixin_restaurant" +
 			  " WHERE 1 = 1 " +
@@ -208,7 +262,7 @@ public class WxRestaurantDao {
 			  (extraCond != null ? extraCond : " ") +
 			  (orderClause != null ? orderClause : "");
 		
-		List<WxRestaurant> result = new ArrayList<WxRestaurant>();
+		final List<WxRestaurant> result = new ArrayList<WxRestaurant>();
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
@@ -409,59 +463,6 @@ public class WxRestaurantDao {
 		return isBound;
 
 	}
-	
-//	/**
-//	 * bind the weixin serial and restaurant account.
-//	 * @param weixinRestaurantSerial
-//	 * 			the weinxin serial to bind
-//	 * @param account
-//	 * 			the restaurant to bind
-//	 * @throws SQLException
-//	 * 			throws if failed to execute any SQL statement
-//	 * @throws BusinessException
-//	 * 			throws if the account does NOT exist
-//	 */
-//	public static void bind(String weixinRestaurantSerial, String account) throws SQLException, BusinessException{
-//		DBCon dbCon = new DBCon();
-//		try{
-//			dbCon.connect();
-//			bind(dbCon, weixinRestaurantSerial, account);
-//		}finally{
-//			dbCon.disconnect();
-//		}
-//	}
-//	
-//	/**
-//	 * bind the weixin serial and restaurant account.
-//	 * @param dbCon
-//	 * 			the database connection
-//	 * @param weixinRestaurantSerial
-//	 * 			the weinxin serial to bind
-//	 * @param account
-//	 * 			the restaurant to bind
-//	 * @throws SQLException
-//	 * 			throws if failed to execute any SQL statement
-//	 * @throws BusinessException
-//	 * 			throws if the account does NOT exist
-//	 */
-//	public static void bind(DBCon dbCon, String weixinRestaurantSerial, String account) throws SQLException, BusinessException{
-//		if(!isBound(dbCon, weixinRestaurantSerial, account)){
-//			Restaurant restaurant = RestaurantDao.getByAccount(dbCon, account);
-//			String sql;
-//			
-//			sql  = " UPDATE " + Params.dbName + ".weixin_restaurant SET " +
-//				   " restaurant_id = " + restaurant.getId() +
-//				   " ,weixin_serial_crc = CRC32('" + weixinRestaurantSerial + "')" +
-//				   " ,weixin_serial = '" + weixinRestaurantSerial + "'" +
-//				   " ,bind_date = NOW() " +
-//				   " ,status = " + WxRestaurant.Status.BOUND.getVal() +
-//				   " WHERE restaurant_id = " + restaurant.getId();
-//			
-//			if(dbCon.stmt.executeUpdate(sql) == 0){
-//				throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
-//			}
-//		}
-//	}
 	
 	/**
 	 * Get the restaurant id according to its weixin serial.
