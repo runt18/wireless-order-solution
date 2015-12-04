@@ -1,8 +1,9 @@
 $(function(){
 	
 	$.ajax({
-		url : '../WxInterface.do',
+		url : '../../WxInterface.do',
 		dataType : 'json',
+		type : 'post',
 		data : {
 			dataSource : 'jsApiSign',
 			url: location.href.split('#')[0],
@@ -54,7 +55,7 @@ $(function(){
 											 foods += (temp.id + ',' + temp.count);
 										 }
 										 $.ajax({
-												url : '../WxOperateOrder.do',
+												url : '../../WxOperateOrder.do',
 												dataType : 'json',
 												type : 'post',
 												data : {
