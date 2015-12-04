@@ -634,14 +634,17 @@ class OrderHandler implements Runnable{
 		final List<Printer> printers = getAvailPrinters(staff, oriented);
 		
 		if(printType.isSummary()){
+			//点菜总单
 			int orderId = parcel.readInt();
 			new PrintHandler(staff).process(JobContentFactory.instance().createSummaryContent(printType, staff, printers, orderId, FoodDetailContent.DetailType.TOTAL));
 			
 		}else if(printType.isDetail()){
+			//点菜分单
 			int orderId = parcel.readInt();
 			new PrintHandler(staff).process(JobContentFactory.instance().createDetailContent(printType, staff, printers, orderId, FoodDetailContent.DetailType.TOTAL));
 			
 		}else if(printType.isReceipt()){
+			//结账单
 			int orderId = parcel.readInt();
 			new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(printType, staff, printers, orderId));
 			
@@ -678,12 +681,14 @@ class OrderHandler implements Runnable{
 			}
 			
 		}else if(printType.isTransTbl()){
+			//转台
 			int orderId = parcel.readInt();
 			Table srcTbl = TableDao.getById(staff, parcel.readParcel(Table.CREATOR).getId());
 			Table destTbl = TableDao.getById(staff, parcel.readParcel(Table.CREATOR).getId());
 			new PrintHandler(staff).process(JobContentFactory.instance().createTransContent(printType, staff, printers, orderId, srcTbl, destTbl));
 			
 		}else if(printType.isShift()){
+			//交班
 			long onDuty = parcel.readLong();
 			long offDuty = parcel.readLong();
 			Region.RegionId regionId = Region.RegionId.valueOf(parcel.readShort());
@@ -696,12 +701,19 @@ class OrderHandler implements Runnable{
 			new PrintHandler(staff).process(JobContentFactory.instance().createShiftContent(printType, staff, printers, new DutyRange(onDuty, offDuty), regionId));
 			
 		}else if(printType.isMember()){
+			//会员小票
 			int moId = parcel.readInt();
 			new PrintHandler(staff).process(JobContentFactory.instance().createMemberReceiptContent(printType, staff, printers, MemberOperationDao.getById(staff, DateType.TODAY, moId)));
 			
 		}else if(printType.is2ndDisplay()){
+			//客显
 			float display = parcel.readFloat();
 			new PrintHandler(staff).process(JobContentFactory.instance().create2ndDisplayContent(staff, printers, display));
+			
+		}else if(printType.isWxOrder()){
+			//微信订单
+			int wxOrderId = parcel.readInt();
+			new PrintHandler(staff).process(JobContentFactory.instance().createWxOrderContent(staff, printers, wxOrderId));
 		}
 		
 		return new RespACK(request.header);
