@@ -35,7 +35,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
-public class WxOperateInterface extends DispatchAction{
+public class WxOperateInterfaceAction extends DispatchAction{
 	
 	public static class AccessToken implements Jsonable{
 		private String access_token;
