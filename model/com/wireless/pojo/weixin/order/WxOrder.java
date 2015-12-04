@@ -160,8 +160,8 @@ public class WxOrder implements Jsonable, Parcelable{
 			return this;
 		}
 		
-		public InsertBuilder setTable(int tableId){
-			this.table = new Table(tableId);
+		public InsertBuilder setTable(Table table){
+			this.table = table;
 			return this;
 		}
 		
