@@ -54,7 +54,7 @@ $(function(){
 											 foods += (temp.id + ',' + temp.count);
 										 }
 										 $.ajax({
-												url : '../../WxOperateOrder.do',
+												url : '../WxOperateOrder.do',
 												dataType : 'json',
 												type : 'post',
 												data : {
