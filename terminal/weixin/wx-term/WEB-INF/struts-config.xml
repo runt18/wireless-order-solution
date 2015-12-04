@@ -92,7 +92,7 @@
 			scope="request">
 		</action>
 		<action path="/WxInterface"
-			type="com.wireless.Actions.weixin.operate.WxOperateInterface"
+			type="com.wireless.Actions.weixin.operate.WxOperateInterfaceAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/WXQueryBusinessStatistics"
