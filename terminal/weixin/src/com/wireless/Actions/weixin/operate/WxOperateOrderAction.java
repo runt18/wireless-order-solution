@@ -11,13 +11,13 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.TableError;
 import com.wireless.json.JObject;
-import com.wireless.json.JsonMap;
-import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.TakeoutAddress;
@@ -43,12 +43,34 @@ public class WxOperateOrderAction extends DispatchAction {
 			final String oid = request.getParameter("oid");
 			final String fid = request.getParameter("fid");
 			final String foods = request.getParameter("foods");
+			final String tableAlias = request.getParameter("tableAlias");
+			final String qrCode = request.getParameter("qrCode");
 			
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+
+			//检查二维码是否正确
+			if(qrCode != null && !qrCode.isEmpty()){
+				if(WxRestaurantDao.getByCond(staff, new WxRestaurantDao.ExtraCond().setQrCode(qrCode), null).isEmpty()){
+					throw new BusinessException("扫描的二维码不正确");
+				}
+			}
 			
 			final WxOrder.InsertBuilder4Inside builder = new WxOrder.InsertBuilder4Inside(oid);
+
+			//检查餐台号是否存在
+			if(tableAlias != null && !tableAlias.isEmpty()){
+				try{
+					builder.setTable(TableDao.getByAlias(staff, Integer.parseInt(tableAlias)));
+				}catch(BusinessException e){
+					if(e.equals(TableError.TABLE_NOT_EXIST)){
+						throw new BusinessException("对不起，您输入的餐台号不存在");
+					}else{
+						throw e;
+					}
+				}
+			}
 			
 			if(foods != null && !foods.isEmpty()){
 				for (String of : foods.split("&")) {
@@ -62,24 +84,9 @@ public class WxOperateOrderAction extends DispatchAction {
 			
 			final int wxOrderId = WxOrderDao.insert(staff, builder);
 			
-			final WxOrder wxOrder = WxOrderDao.getById(staff, wxOrderId);
+			jObject.setExtra(WxOrderDao.getById(staff, wxOrderId));
+			jObject.initTip(true, "下单成功");
 			
-			jObject.setExtra(new Jsonable(){
-
-				@Override
-				public JsonMap toJsonMap(int flag) {
-					JsonMap jm = new JsonMap();
-					jm.putJsonable("order", wxOrder, 0);
-					return jm;
-				}
-
-				@Override
-				public void fromJsonMap(JsonMap jsonMap, int flag) {
-					
-				}
-				
-			});
-			jObject.initTip(true, "下单成功,请呼叫服务员确认。");
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jObject.initTip(e);

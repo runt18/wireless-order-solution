@@ -18,7 +18,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.marker.weixin.api.Token;
 import org.marker.weixin.auth.AuthParam;
 import org.marker.weixin.auth.AuthorizerToken;
 import org.marker.weixin.js.JsApiSign;
@@ -96,24 +95,6 @@ public class WxOperateInterface extends DispatchAction{
 		}
 		
 	}		
-	
-	/**
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-	public ActionForward getToken(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception {
-        
-		Token token = Token.newInstance("wx99cd7d58d4e03702", "30f318b5655f47aca0afd12b6b5922a5");
-		
-        response.getWriter().print(token.getAccessToken());
-        
-		return null;
-	}
 	
 	/**
 	 * 
