@@ -91,8 +91,8 @@
 			type="com.wireless.Actions.weixin.query.WXQueryTakeoutAddressAction"
 			scope="request">
 		</action>
-		<action path="/WXInterface"
-			type="com.wireless.Actions.weixin.operate.WXOperateWeixinInterface"
+		<action path="/WxInterface"
+			type="com.wireless.Actions.weixin.operate.WxOperateInterface"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/WXQueryBusinessStatistics"

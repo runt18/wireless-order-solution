@@ -619,7 +619,7 @@ function getBusinessStatisticsData(c){
 }
 
 $(function () {
-	$.post('../../WXInterface.do', {
+	$.post('../../WxInterface.do', {
 		dataSource : 'getRestaurant',
 		rid : rid
 	}, function(rt){
