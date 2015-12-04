@@ -72,7 +72,7 @@ of.entry = function(c){
 	
 	//初始化菜品
 	if(c.initFoods){
-		of.initFoods = c.initFoods;
+		of.initFoods = c.initFoods.slice(0);
 	}else{
 		of.initFoods = [];
 	}
