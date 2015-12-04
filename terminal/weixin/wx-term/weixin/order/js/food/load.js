@@ -1,7 +1,7 @@
 $(function(){
 	
 	$.ajax({
-		url : '../../WxInterface.do',
+		url : '../WxInterface.do',
 		dataType : 'json',
 		data : {
 			dataSource : 'jsApiSign',
