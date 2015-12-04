@@ -14,7 +14,11 @@ ADD COLUMN `payment_template` VARCHAR(100) NULL DEFAULT NULL COMMENT '' AFTER `r
 ADD COLUMN `coupon_draw_template` VARCHAR(100) NULL DEFAULT NULL COMMENT '' AFTER `payment_template`,
 ADD COLUMN `coupon_timeout_template` VARCHAR(100) NULL DEFAULT NULL COMMENT '' AFTER `coupon_draw_template`;
 
-
+-- -----------------------------------------------------
+-- Add the field 'table_id' to table 'weixin_order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`weixin_order` 
+ADD COLUMN `table_id` INT NULL DEFAULT NULL COMMENT '' AFTER `address`;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
