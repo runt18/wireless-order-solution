@@ -1,6 +1,7 @@
 package com.wireless.Actions.dishesOrder;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.order.WxOrder;
 
 public class QueryWxOrderAction extends DispatchAction {
 	
@@ -24,6 +26,7 @@ public class QueryWxOrderAction extends DispatchAction {
 		final String orderId = request.getParameter("orderId");
 		final String code = request.getParameter("code");
 		final String id = request.getParameter("id");
+		final String detail = request.getParameter("detail");
 		
 		JObject jObject = new JObject();
 		try{
@@ -43,7 +46,16 @@ public class QueryWxOrderAction extends DispatchAction {
 				extraCond.setCode(Integer.parseInt(code));
 			}
 			
-			jObject.setRoot(WxOrderDao.getByCond(staff, extraCond, null));
+			if(detail != null && !detail.isEmpty()){
+				if(Boolean.parseBoolean(detail)){
+					List<WxOrder> result = WxOrderDao.getByCond(staff, extraCond, null);
+					for(int i = 0; i < result.size(); i++){
+						result.set(i, WxOrderDao.getById(staff, result.get(i).getId()));
+					}
+				}
+			}else{
+				jObject.setRoot(WxOrderDao.getByCond(staff, extraCond, null));
+			}
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
