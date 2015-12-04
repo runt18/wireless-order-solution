@@ -11,6 +11,7 @@ import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -20,6 +21,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.TakeoutAddress;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
@@ -147,6 +149,15 @@ public class WxOrderDao {
 	public static int insert(DBCon dbCon, Staff staff, WxOrder.InsertBuilder4Inside builder) throws SQLException, BusinessException{
 		
 		WxOrder wxOrder = builder.build();
+		
+		List<Member> members = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(wxOrder.getWeixinSerial()), null);
+		if(members.isEmpty()){
+			throw new BusinessException("没找到相应的会员信息", WxOrderError.WX_INSERT_ORDER_NOT_ALLOW);
+		}else{
+			if(members.get(0).isRaw()){
+				throw new BusinessException("会员必须绑定手机或实体卡才能下单", WxOrderError.WX_INSERT_ORDER_NOT_ALLOW);
+			}
+		}
 		
 		//Make the previous inside committed orders invalid.
 		for(WxOrder order : getByCond(dbCon, staff, new ExtraCond().setWeixin(wxOrder.getWeixinSerial()).setType(WxOrder.Type.INSIDE).addStatus(WxOrder.Status.COMMITTED), null)){
@@ -428,6 +439,11 @@ public class WxOrderDao {
 		}
 		dbCon.rs.close();
 		wxOrder.setMember(MemberDao.getByWxSerial(dbCon, staff, wxOrder.getWeixinSerial()));
+		if(wxOrder.hasTable()){
+			try{
+				wxOrder.setTable(TableDao.getById(dbCon, staff, wxOrder.getTable().getId()));
+			}catch(BusinessException ignored){}
+		}
 	}
 	/**
 	 * Get the weixin order according to specific extra condition{@link ExtraCond}.
@@ -487,6 +503,9 @@ public class WxOrderDao {
 			wxOrder.setOrderId(dbCon.rs.getInt("order_id"));
 			wxOrder.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
 			wxOrder.setWeixinSerial(dbCon.rs.getString("weixin_serial"));
+			if(dbCon.rs.getInt("table_id") != 0){
+				wxOrder.setTable(new Table(dbCon.rs.getInt("table_id")));
+			}
 			result.add(wxOrder);
 		}
 		dbCon.rs.close();

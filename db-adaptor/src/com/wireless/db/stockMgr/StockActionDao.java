@@ -73,22 +73,17 @@ public class StockActionDao {
 		
 		//获取月份最大天数
 		int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
-		
-		long lastDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day);
-		
+		long maxDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + day);
 		
 		//比较盘点时间和月结时间,取最大值
-		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + staff.getRestaurantId() + 
-								" UNION ALL " +
-								" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + staff.getRestaurantId() + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
-		long maxDate = 0;
-		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
+		String sql = " SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + staff.getRestaurantId() + 
+					 " UNION ALL " +
+					 " SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + staff.getRestaurantId() + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
+		long minDate = 0;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			if(dbCon.rs.getTimestamp("date") != null){
-				maxDate = dbCon.rs.getTimestamp("date").getTime();
-			}else{
-				Calendar max = Calendar.getInstance();
-				maxDate = DateUtil.parseDate(max.get(Calendar.YEAR) + "-" + (max.get(Calendar.MONTH)+1) + "-01");
+				minDate = dbCon.rs.getTimestamp("date").getTime();
 			}
 		}
 		dbCon.rs.close();
@@ -96,10 +91,10 @@ public class StockActionDao {
 		//如果是消耗类型或初始化类型的单则不需要限定时间
 		if(builder.getSubType() != SubType.INIT && builder.getSubType() != SubType.USE_UP && builder.getSubType() != SubType.MORE && builder.getSubType() != SubType.LESS){
 			//货单原始时间必须大于最后一次已审核盘点时间或月结,小于当前月最后一天
-			if(builder.getOriStockDate() < maxDate){
+			if(minDate != 0 && builder.getOriStockDate() < minDate){
 				throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
 
-			}else if(builder.getOriStockDate() > lastDate){
+			}else if(builder.getOriStockDate() > maxDate){
 				throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
 			}
 		}
@@ -202,14 +197,14 @@ public class StockActionDao {
 	 * @throws BusinessException 
 	 * 			if the OriStockIdDate is before than the last stockTake time
 	 */	
-	public static int insertStockAction(Staff term, InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insertStockAction(Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
-		int stockActionId;
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			stockActionId = insertStockAction(dbCon,term, builder);
+			int stockActionId = insertStockAction(dbCon, staff, builder);
 			dbCon.conn.commit();
+			return stockActionId;
 		}catch(BusinessException e){
 			dbCon.conn.rollback();
 			throw e;
@@ -221,7 +216,6 @@ public class StockActionDao {
 			dbCon.conn.setAutoCommit(true);
 			dbCon.disconnect();
 		}
-		return stockActionId;
 	}
 	/**
 	 * Delete the stockAction according to extra condition of a specified restaurant defined in terminal.
@@ -336,31 +330,28 @@ public class StockActionDao {
 		//获取月份最大天数
 		int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
 		
-		long lastDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day);
+		long maxDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day);
 		
 		
 		//比较盘点时间和月结时间,取最大值
-		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + staff.getRestaurantId() + 
+		String selectMinDate = "SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + staff.getRestaurantId() + 
 				" UNION ALL " +
 				" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + staff.getRestaurantId() + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
-		long maxDate = 0;
-		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
+		long minDate = 0;
+		dbCon.rs = dbCon.stmt.executeQuery(selectMinDate);
 		if(dbCon.rs.next()){
 			if(dbCon.rs.getTimestamp("date") != null){
-				maxDate = dbCon.rs.getTimestamp("date").getTime();
-			}else{
-				Calendar max = Calendar.getInstance();
-				maxDate = DateUtil.parseDate(max.get(Calendar.YEAR) + "-" + (max.get(Calendar.MONTH)+1) + "-01");
+				minDate = dbCon.rs.getTimestamp("date").getTime();
 			}
 		}
 		dbCon.rs.close();
 		
 
 		//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
-		if(builder.getOriStockDate() < maxDate){
+		if(minDate != 0 && builder.getOriStockDate() < minDate){
 			throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
 
-		}else if(builder.getOriStockDate() > lastDate){
+		}else if(builder.getOriStockDate() > maxDate){
 			throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
 		}
 	
@@ -734,31 +725,28 @@ public class StockActionDao {
 		//获取月份最大天数
 		int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
 		
-		long lastDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day);
+		long maxDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day);
 		
 		
 		//比较盘点时间和月结时间,取最大值
-		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + staff.getRestaurantId() + 
-				" UNION ALL " +
-				" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + staff.getRestaurantId() + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
-		long maxDate = 0;
-		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
+		String sql = " SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + staff.getRestaurantId() + 
+					 " UNION ALL " +
+					 " SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + staff.getRestaurantId() + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
+		long minDate = 0;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			if(dbCon.rs.getTimestamp("date") != null){
-				maxDate = dbCon.rs.getTimestamp("date").getTime();
-			}else{
-				Calendar max = Calendar.getInstance();
-				maxDate = DateUtil.parseDate(max.get(Calendar.YEAR) + "-" + (max.get(Calendar.MONTH)+1) + "-01");
+				minDate = dbCon.rs.getTimestamp("date").getTime();
 			}
 		}
 		dbCon.rs.close();
 		
 
 		//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
-		if(builder.getOriStockDate() < maxDate){
+		if(minDate != 0 && builder.getOriStockDate() < minDate){
 			throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
 
-		}else if(builder.getOriStockDate() > lastDate){
+		}else if(builder.getOriStockDate() > maxDate){
 			throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
 		}		
 		
@@ -885,7 +873,7 @@ public class StockActionDao {
 		dbCon.rs.close(); 
 		StockAction reAuditStockAction = builder.build();
 
-		String sql = "UPDATE " + Params.dbName + ".stock_action SET " + 
+		sql = "UPDATE " + Params.dbName + ".stock_action SET " + 
 				" ori_stock_id = '" + builder.getOriStockId() + "' " +
 				", ori_stock_date = '" + DateUtil.format(builder.getOriStockDate()) + "' " +
 				", comment = '" + builder.getComment() + "' " +
