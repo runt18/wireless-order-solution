@@ -13,6 +13,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.TakeoutAddress;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.DateUtil;
 
 public class WxOrder implements Jsonable, Parcelable{
@@ -138,6 +139,7 @@ public class WxOrder implements Jsonable, Parcelable{
 		private final String weixinSerial;
 		private final Type type;
 		private final Status status;
+		private Table table;
 		private final WxOrder order = new WxOrder(0);
 		
 		InsertBuilder(String weixinSerial, Type type, Status status){
@@ -155,6 +157,11 @@ public class WxOrder implements Jsonable, Parcelable{
 			for(OrderFood of : foodsToAdd){
 				add(of);
 			}
+			return this;
+		}
+		
+		public InsertBuilder setTable(int tableId){
+			this.table = new Table(tableId);
 			return this;
 		}
 		
@@ -206,6 +213,7 @@ public class WxOrder implements Jsonable, Parcelable{
 	private int id;
 	private String weixinSerial;
 	private Member member;
+	private Table table;
 	private long birthDate;
 	private int code;
 	private int orderId;
@@ -226,6 +234,7 @@ public class WxOrder implements Jsonable, Parcelable{
 		setType(builder.type);
 		setStatus(builder.status);
 		setFoods(builder.order.getFoods());
+		setTable(builder.table);
 		if(builder.type == Type.TAKE_OUT){
 			setTakoutAddress(((InsertBuilder4Takeout)builder).address);
 		}
@@ -343,6 +352,18 @@ public class WxOrder implements Jsonable, Parcelable{
 		addFoods(foods);
 	}
 	
+	public void setTable(Table table){
+		this.table = table;
+	}
+
+	public Table getTable(){
+		return this.table;
+	}
+	
+	public boolean hasTable(){
+		return this.table != null;
+	}
+	
 	@Override
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof WxOrder)){
@@ -373,8 +394,9 @@ public class WxOrder implements Jsonable, Parcelable{
 		jm.putInt("type", this.type.getVal());
 		jm.putInt("statusVal", this.status.getVal());
 		jm.putString("statusDesc", this.status.getDesc());
-		jm.putJsonableList("foods", this.foods, flag);
-		jm.putJsonable("member", this.member, flag);
+		jm.putJsonableList("foods", this.foods, 0);
+		jm.putJsonable("member", this.member, 0);
+		jm.putJsonable("table", this.table, 0);
 		return jm;
 	}
 	@Override
