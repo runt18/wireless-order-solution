@@ -31,49 +31,66 @@ $(function(){
 				 return;
 			 }
 			 
-			wx.scanQRCode({
-			    needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
-			    scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
-			    success: function (res) {
-			    	 Util.lm.show();
-					 var foods = "";
-					 var temp = null;
-					 for(var i =0; i < orderFoodData.length; i++){
-						 temp = orderFoodData[i];
-						 if(i > 0){
-							 foods += '&';
-						 }
-						 foods += (temp.id + ',' + temp.count);
-					 }
-					 $.ajax({
-							url : '../../WxOperateOrder.do',
-							dataType : 'json',
-							type : 'post',
-							data : {
-								dataSource : 'insertOrder',
-								oid : Util.mp.oid,
-								fid : Util.mp.fid,
-								foods : foods
-							},
-							success : function(data, status, xhr){
-								Util.lm.hide();
-								if(data.success){
-									//刷新界面
-									pickFoodComponent.refresh();
-									pickFoodComponent.closeShopping();
-									
-									Util.dialog.show({title : '请呼叫服务员确认订单', msg : '<font style="font-weight:bold;font-size:25px;">订单号: ' + data.other.order.code + '</font>', btn : 'yes' });
-								}else{
-									Util.dialog.show({ msg : data.msg });
-								}
-							},
-							error : function(xhr, errorType, error){
-								Util.lm.hide();
-								Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
-							}
-						});
-				}
-			});
+			 Util.dialog.show({
+		    		title : '请输入您当前所在餐桌号',
+		    		msg : '<input style="font-weight:bold;font-size:18px;"></input>',
+		    		callback : function(btn, element){
+		    			if(btn == 'yes'){
+		    				if($('#'+Util.dialog.mid + ' input').val() == ""){
+			    				Util.dialog.show({ msg : '餐桌号不能为空', btn :'yes'});
+			    			}else{
+			    				wx.scanQRCode({
+			    				    needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+			    				    scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+			    				    success: function (res) {
+					    				 Util.lm.show();
+										 var foods = "";
+										 var temp = null;
+										 for(var i =0; i < orderFoodData.length; i++){
+											 temp = orderFoodData[i];
+											 if(i > 0){
+												 foods += '&';
+											 }
+											 foods += (temp.id + ',' + temp.count);
+										 }
+										 $.ajax({
+												url : '../../WxOperateOrder.do',
+												dataType : 'json',
+												type : 'post',
+												data : {
+													dataSource : 'insertOrder',
+													oid : Util.mp.oid,
+													fid : Util.mp.fid,
+													foods : foods,
+													tableAlias : $('#' + Util.dialog.mid + ' input').val(),
+													qrCode :  res.resultStr
+												},
+												success : function(data, status, xhr){
+													Util.lm.hide();
+													if(data.success){
+														//刷新界面
+														pickFoodComponent.refresh();
+														pickFoodComponent.closeShopping();
+														
+														Util.dialog.show({title : '请呼叫服务员确认订单', msg : '<font style="font-weight:bold;font-size:25px;">订单号: ' + data.other.code + '</font>', btn : 'yes' });
+													}else{
+														Util.dialog.show({ msg : data.msg });
+													}
+												},
+												error : function(xhr, errorType, error){
+													Util.lm.hide();
+													Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
+												}
+											});
+			    				    	}
+			    				}); 
+			    			}
+		    			}
+		    		}
+		    	});
+			 
+			 
+			
 		 },
 		 onCartChange : function(orderFoodData){
 			 if(orderFoodData.length > 0){
