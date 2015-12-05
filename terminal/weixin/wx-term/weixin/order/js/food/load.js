@@ -91,7 +91,7 @@ $(function(){
 													oid : Util.mp.oid,
 													fid : Util.mp.fid,
 													foods : foods,
-													tableAlias : $('#' + Util.dialog.mid + ' input').val(),
+													tableAlias : $('#numberInput_a_load').text(),
 													qrCode :  res.resultStr
 												},
 												success : function(data, status, xhr){
