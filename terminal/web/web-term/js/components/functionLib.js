@@ -495,12 +495,23 @@ Ext.ux.operateTree_weixinMenu = function (node, mult){
 		if(node.attributes.m_type == mult[j].m_type){
 			if(!$("#div_floatBar").m_type || $("#div_floatBar").m_type != node.attributes.m_type){
 				$('#div_floatBar').html("");
-				for (var i = 0; i < mult[j].option.length; i++) {
-					if(i > 0){
+				mult[j].option.forEach(function(fn, index){
+					if(index > 0){
 						$("#div_floatBar").append('|&nbsp;');
 					}
-					$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+mult[j].option[i].fn+'>'+ mult[j].option[i].name +'</a>&nbsp;');
-				}	
+					if(typeof fn.fn == 'string'){
+						$("#div_floatBar").append('<a href="javascript:void(0)" onclick=' + fn.fn + '>' + fn.name +'</a>&nbsp;');
+					}else if(typeof fn.fn == 'function'){
+						$("#div_floatBar").append($('<a href="javascript:void(0)">' + fn.name + '</a>&nbsp').click(fn.fn));
+					}
+				});
+//				for (var i = 0; i < mult[j].option.length; i++) {
+//					if(i > 0){
+//						$("#div_floatBar").append('|&nbsp;');
+//					}
+//					$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+mult[j].option[i].fn+'>'+ mult[j].option[i].name +'</a>&nbsp;');
+//					
+//				}	
 				$("#div_floatBar").m_type = node.attributes.m_type; 
 				
 				break;
@@ -515,21 +526,21 @@ function showFloatOption(obj_b){
 	var nodex = 0;
 	var offset, liOffset;
 	//把bar加到tree上
-	$("#"+obj_b.treeId).mouseover(function(){
+	$("#" + obj_b.treeId).mouseover(function(){
 		//生成浮动bar
 		
 		if(!obj_b.mult){//有多种浮动框情况时不执行单一浮动框
 			if($("#div_floatBar").find("a").length == 0){
-				for (var i = 0; i < obj_b.option.length; i++) {
-					if(i > 0){
+				obj_b.option.forEach(function(fn, index){
+					if(index > 0){
 						$("#div_floatBar").append('|&nbsp;');
 					}
-					if(typeof obj_b.option[i].fn == 'string'){
-						$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+obj_b.option[i].fn+'>'+ obj_b.option[i].name +'</a>&nbsp;');
-					}else if(typeof obj_b.option[i].fn == 'function'){
-						$("#div_floatBar").append($('<a href="javascript:void(0)">' + obj_b.option[i].name + '</a>&nbsp').click(obj_b.option[i].fn));
+					if(typeof fn.fn == 'string'){
+						$("#div_floatBar").append('<a href="javascript:void(0)" onclick=' + fn.fn + '>' + fn.name +'</a>&nbsp;');
+					}else if(typeof fn.fn == 'function'){
+						$("#div_floatBar").append($('<a href="javascript:void(0)">' + fn.name + '</a>&nbsp').click(fn.fn));
 					}
-				}
+				});
 			}		
 		}
 
