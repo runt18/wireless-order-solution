@@ -262,7 +262,7 @@ Util.dialog = {
 		+ '<div id={tid} class="dialog-title">{title}</div>'
 		+ '<div id={mid} class="dialog-msg">{msg}</div>'
 		+ '<div class="dialog-button">'
-			+  '<button onclick="Util.dialog.event(\'yes\');">确定</button>&nbsp;&nbsp;<button id="dialog_cancel" onclick="Util.dialog.event(\'cancel\');">取消</button>'
+			+  '<button onclick="Util.dialog.event(\'yes\');">{leftText}</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="dialog_cancel" onclick="Util.dialog.event(\'cancel\');">取消</button>'
 		+ '</div>'
 		+ '</div>'
 		+ '</div>',
@@ -271,7 +271,8 @@ Util.dialog = {
 			document.body.insertAdjacentHTML('afterBegin', this.templet.format({
 				id: Util.dialog.id,
 				tid: Util.dialog.tid,
-				mid: Util.dialog.mid
+				mid: Util.dialog.mid,
+				leftText : c.leftText ? c.leftText : '确定'
 			}));
 			this.box = Util.getDom(this.id);
 		}

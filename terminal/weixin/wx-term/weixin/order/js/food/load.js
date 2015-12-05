@@ -34,6 +34,7 @@ $(function(){
 			 
 			 Util.dialog.show({
 		    		title : '请输入您当前所在餐桌号',
+		    		leftText : '扫码确认',
 		    		msg : '<h3>请输入:<a id="numberInput_a_load" style="color:red;"></a></h3><br/>'
 		    			+'<div id="numberKyes_div_load" style="margin-top:-40px;"></div>',
 		    		dialogInit : function(box){
@@ -65,7 +66,7 @@ $(function(){
 		    		},
 		    		callback : function(btn, element){
 		    			if(btn == 'yes'){
-		    				if($('#'+Util.dialog.mid + ' input').val() == ""){
+		    				if($('#numberInput_a_load').text() == ""){
 			    				Util.dialog.show({ msg : '餐桌号不能为空', btn :'yes'});
 			    			}else{
 			    				wx.scanQRCode({
