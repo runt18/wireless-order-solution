@@ -34,7 +34,35 @@ $(function(){
 			 
 			 Util.dialog.show({
 		    		title : '请输入您当前所在餐桌号',
-		    		msg : '<input style="font-weight:bold;font-size:18px;"></input>',
+		    		msg : '<h3>请输入:<a id="numberInput_a_load" style="color:red;"></a></h3><br/>'
+		    			+'<div id="numberKyes_div_load" style="margin-top:-40px;"></div>',
+		    		dialogInit : function(box){
+		    			$('#numberKyes_div_load').width($(box).width());
+		    			var numKeys = new Array("7", "8", "9", "0", "4", "5", "6", "删除", "1", "2", "3", "清空");
+		    			var keys = "";
+		    			for(var i = 0; i < numKeys.length; i++){
+		    				var eachButton = '<input type="button" style="width:60px;height:55px;font-size:16px;" value="' + numKeys[i] + '">';
+		    				if(i % 4 == 0){
+		    					keys += '<br/>';
+		    				}
+		    				keys += eachButton;
+		    			}	
+		    			$('#numberKyes_div_load').append(keys);
+		    			$('#numberKyes_div_load input').each(function(index, element){
+		    				element.onclick = function(){
+		    					if($(element).val() == '删除'){
+		    						var s = $('#numberInput_a_load').text();
+		    						$('#numberInput_a_load').text(s.substring(0, s.length - 1));
+		    					}else if($(element).val() == '清空'){
+		    						$('#numberInput_a_load').text('');
+		    					}else{
+		    						$('#numberInput_a_load').text($('#numberInput_a_load').text() + $(element).val());
+		    					}
+		    					
+		    				}
+		    			});
+		    			
+		    		},
 		    		callback : function(btn, element){
 		    			if(btn == 'yes'){
 		    				if($('#'+Util.dialog.mid + ' input').val() == ""){

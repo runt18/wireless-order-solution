@@ -90,6 +90,8 @@
 <script type="text/javascript" src="./js/popup/table/ask.js"></script>
 <!-- 明细控件绑定 -->
 <script type="text/javascript" src="./js/popup/detail/detail.js"></script>
+<!-- 微信预定 -->
+<script type="text/javascript" src="./js/popup/wxOrder/wxOrder.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -176,6 +178,7 @@
 		 <a id="logout_a_tableSelect" data-role="button" data-inline="true" class="bottomBtnFont">注销</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="location.reload()" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="WxOrder_a_tableSelect">微定</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.bookListEntry()">
 		 	<div>
 		 		<!-- 预订单数 -->
