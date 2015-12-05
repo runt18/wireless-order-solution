@@ -1158,6 +1158,123 @@ $(function(){
 		});
 		
 		
+		//微信预定
+		$('#WxOrder_a_tableSelect').click(function(){
+			var wxOrderPopup = new WxOrderPopup({
+				left : function(){
+					var code = $('#code_input_wxOrder').val();
+					if(code == ""){
+						Util.msg.tip("请输入微信预订号");
+					}else{
+						$.ajax({
+							url : '../QueryWxOrder.do',
+							type : 'post',
+							async : false,
+							dataType : 'json',
+							data : {
+								dataSource : 'getByCond',
+								code : code,
+								detail : true
+							},
+							success : function(result, status, xhr){
+								if(result.success){
+									if(result.root.length == 0){
+										Util.msg.tip("此微信订单号不存在");
+									}else{
+										wxOrderPopup.close(function(){
+											var askPopup = new AskTablePopup({
+												tables : WirelessOrder.tables,
+												title : '请选择餐桌',
+												leftText : '确定',
+												left : function(){
+													var inputVal  = $('#left_input_askTable').val();
+													if(inputVal == ""){
+														Util.msg.tip("请选择餐桌");
+													}else{
+														//结账
+														var perfectMatched = askPopup.prefect();
+														if(perfectMatched){
+															askPopup.close(function(){
+																of.entry({
+																	orderFoodOperateType : 'normal',
+																	initFoods : result.root[0].foods,
+																	table : perfectMatched
+																});
+															}, 200);
+														}else{
+															Util.msg.tip('没有此餐台,请重新输入');
+														}
+													}
+												},
+												tableSelect : function(selectedTable){
+													askPopup.close(function(){
+														of.entry({
+															orderFoodOperateType : 'normal',
+															initFoods : result.root[0].foods,
+															table : selectedTable
+														});
+													}, 200);
+												}
+							
+											});
+											
+											askPopup.open(function(self){
+												$('#middle_a_askTable').hide();
+												$('#left_a_askTable').css('width', '48%');
+												$('#right_a_askTable').css('width', '50%');
+												if(result.root[0].table){
+													$('#addCmp_div_askTable').show();
+												}
+												var tableTemplate = 
+													'<a data-role="button" data-corners="false" data-inline="true" class="tableCmp"  data-value={id} data-theme={theme}>' +
+														'<div style="height: 70px;">{name}<br>{alias}' +
+															'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
+															'<div class="bookTableStatus">{bookTableStatus}</div>'+
+														'</div>'+
+													'</a>';
+												var html = [];
+												var aliasOrName;
+												if(result.root[0].table.categoryValue == 1){
+													aliasOrName = result.root[0].table.alias;
+												}else{
+													aliasOrName = '<font color="green">' + result.root[0].table.categoryText +'</font>';
+												}
+												html.push(tableTemplate.format({
+													id : result.root[0].table.id,
+													alias : aliasOrName,
+													theme : result.root[0].table.statusValue == '1' ? "e" : "c",
+													name : result.root[0].table.name,
+													tempPayStatus : result.root[0].table.isTempPaid ? '暂结' : '&nbsp;&nbsp;',
+													bookTableStatus :result.root[0].table.isBook ? '订' : '',
+													tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0 ? 'tempPayStatus4Moz' : 'tempPayStatus'
+												}));	
+												$('#tables_div_askTable').html(html.join(''));
+												$('#tables_div_askTable a').buttonMarkup('refresh');
+												$('#tables_div_askTable a').each(function(index, element){
+													element.onclick = function(){
+														askPopup.close(function(){
+															of.entry({
+																orderFoodOperateType : 'normal',
+																initFoods : result.root[0].foods,
+																table : result.root[0].table
+															});
+														}, 200);
+													}
+												});
+											});
+										}, 200);
+									}
+								}else{
+									Util.msg.tip(result.msg);
+								}
+							}
+						});
+					}
+				}
+			});
+			wxOrderPopup.open();
+		});
+		
 	});
 
 	//更新菜品列表
@@ -3281,7 +3398,6 @@ ts.closeMultiPayTableCmp = function(){
 
 /**
  * 设置多台开席入座选台
- */
 ts.openMultiPayTable = function(){
 	//隐藏数量输入
 	$('#td4TxtFoodNumForTran').hide();

@@ -52,6 +52,7 @@ public class QueryWxOrderAction extends DispatchAction {
 					for(int i = 0; i < result.size(); i++){
 						result.set(i, WxOrderDao.getById(staff, result.get(i).getId()));
 					}
+					jObject.setRoot(result);
 				}
 			}else{
 				jObject.setRoot(WxOrderDao.getByCond(staff, extraCond, null));

@@ -277,6 +277,10 @@ Util.dialog = {
 		}
 		Util.getDom(Util.dialog.tid).innerHTML = typeof c.title == 'string' ? c.title : '温馨提示';
 		Util.getDom(Util.dialog.mid).innerHTML = typeof c.msg == 'string' ? c.msg : '';
+		if(c.dialogInit){
+			c.dialogInit(this.box.firstChild);
+		}
+		
 		if(c.btn && c.btn == 'yes'){
 			$('#dialog_cancel').hide();
 		}else{
@@ -287,7 +291,7 @@ Util.dialog = {
 		this.hide();
 		if(typeof this.defineConfig.callback == 'function'){
 			this.defineConfig.callback(btn, this.defineConfig);
-		}
+		} 
 	},
 	show : function(c){
 		this.defineConfig = null;
@@ -297,7 +301,7 @@ Util.dialog = {
 		var view = this.box.firstChild;
 		view.style.marginTop = parseInt(view.offsetHeight / 2 * -1) + 'px';
 		$('#div-loadmask-m-dialog').height(document.body.clientHeight + 15);
-	},
+	}, 
 	hide : function(){
 		if(this.box){ this.box.style.display = 'none'; }
 	}

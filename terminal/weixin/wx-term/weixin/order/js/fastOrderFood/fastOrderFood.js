@@ -223,6 +223,7 @@ function PickFoodComponent(param){
 		Util.getDom('foods_div_fastOrderFood').innerHTML = '';
 		Util.getDom('foods_div_fastOrderFood').appendChild(clone);
 		initFoodData(_kitchenId);
+		
 	}
 	
 	//加载菜品
@@ -266,7 +267,7 @@ function PickFoodComponent(param){
 					var count = null;
 					var temp = null;
 					for(var i = 0; i < _foodData.length; i++){
-//						count = getOrderFoodCount(_foodData.id);
+						count = getOrderFoodCount(_foodData[i].id);
 						foodHtml.push(foodBox.format({
 							foodId : _foodData[i].id,
 							img : _foodData[i].img.thumbnail,
@@ -308,7 +309,6 @@ function PickFoodComponent(param){
 							 }
 						};
 					});
-					
 					
 				}else{
 					Util.getDom('foodList_div_fastOrderFood').innerHTML = '没有记录.';
