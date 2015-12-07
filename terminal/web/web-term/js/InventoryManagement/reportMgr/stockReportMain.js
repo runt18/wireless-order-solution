@@ -1,128 +1,127 @@
-var materialCateData = {root:[]};
-
-var logOutBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/ResLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '登出',
-	handler : function(btn){
-		
-	}
-});
-
-var deptComb = new Ext.form.ComboBox({
-	forceSelection : true,
-	width : 110,
-	maxheight : 300,
-	id : 'comboDept',
-	store : new Ext.data.SimpleStore({
-		fields : ['id', 'name']
-	}),
-	valueField : 'id',
-	displayField : 'name',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	listeners : {
-		render : function(thiz){
-			var data = [[-1,'全部']];
-			Ext.Ajax.request({
-				url : '../../QueryDept.do',
-				params: { 
-			    	dataSource : 'normal'
-			    }, 
-				success : function(res, opt){
-					var jr = Ext.decode(res.responseText);
-					for(var i = 0; i < jr.root.length; i++){
-						data.push([jr.root[i]['id'], jr.root[i]['name']]);
-					}
-					thiz.store.loadData(data);
-					thiz.setValue(-1);
-				},
-				fialure : function(res, opt){
-					thiz.store.loadData(data);
-					thiz.setValue(-1);
-				}
-			});
-		},
-		select : function(){
-			Ext.getCmp('general_btnSearch').handler();		
+Ext.onReady(function(){
+	var materialCateData = {root:[]};
+	
+	var logOutBut = new Ext.ux.ImageButton({
+		imgPath : '../../images/ResLogout.png',
+		imgWidth : 50,
+		imgHeight : 50,
+		tooltip : '登出',
+		handler : function(btn){
+			
 		}
-		
-	}
-});
-
-var materialStore = new Ext.data.Store({
-	//proxy : new Ext.data.MemoryProxy(data),
-	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
-	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-	         {name : 'id'},
-	         {name : 'cateName'},
-	         {name : 'name'},
-	         {name : 'pinyin'}
-	]),
-	listeners : {
-		load : function(thiz, records, ops){
-			var PersonRecord = Ext.data.Record.create([
+	});
+	
+	var deptComb = new Ext.form.ComboBox({
+		forceSelection : true,
+		width : 110,
+		maxheight : 300,
+		store : new Ext.data.SimpleStore({
+			fields : ['id', 'name']
+		}),
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [[-1,'全部']];
+				Ext.Ajax.request({
+					url : '../../QueryDept.do',
+					params: { 
+				    	dataSource : 'normal'
+				    }, 
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						for(var i = 0; i < jr.root.length; i++){
+							data.push([jr.root[i]['id'], jr.root[i]['name']]);
+						}
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					},
+					fialure : function(res, opt){
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					}
+				});
+			},
+			select : function(){
+				Ext.getCmp('search_btn_stockReport').handler();		
+			}
+			
+		}
+	});
+	
+	var materialStore = new Ext.data.Store({
+		//proxy : new Ext.data.MemoryProxy(data),
+		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
+		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 		         {name : 'id'},
 		         {name : 'cateName'},
 		         {name : 'name'},
-		         {name : 'pinyin'}				
-			]);
-			var newRecord= new PersonRecord({cateName: "货品",id: -1,name: "全部",pinyin: "QB"});   
-			thiz.insert(0,newRecord); 
-		}
-	}
-});
-materialStore.load({  
-    params: { 
-    	dataSource : 'normal'
-    }  
-}); 
-var materialComb = new Ext.form.ComboBox({
-	forceSelection : true,
-	width : 110,
-	listWidth : 250,
-	maxheight : 300,
-	id : 'comboMaterial',
-	store : materialStore,
-	valueField : 'id',
-	displayField : 'name',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	tpl:'<tpl for=".">' 
-		+ '<div class="x-combo-list-item" style="height:18px;">'
-		+ '{id} -- {cateName} -- {name} -- {pinyin}'
-		+ '</div>'
-		+ '</tpl>',
-	listeners : {
-		beforequery : function(e){
-			var combo = e.combo;
-			if(!e.forceAll){
-				var value = e.query;
-				combo.store.filterBy(function(record){
-					return record.get('name').indexOf(value) != -1
-							|| (record.get('id')+'').indexOf(value) != -1
-							|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
-				});
-				combo.expand();
-				combo.select(0, true);
-				return false;
-			
+		         {name : 'pinyin'}
+		]),
+		listeners : {
+			load : function(thiz, records, ops){
+				var PersonRecord = Ext.data.Record.create([
+			         {name : 'id'},
+			         {name : 'cateName'},
+			         {name : 'name'},
+			         {name : 'pinyin'}				
+				]);
+				var newRecord= new PersonRecord({cateName: "货品",id: -1,name: "全部",pinyin: "QB"});   
+				thiz.insert(0,newRecord); 
 			}
-		},
-		select : function(){
-			Ext.getCmp('general_btnSearch').handler();		
 		}
-		
-	}
-});
+	});
+	materialStore.load({  
+	    params: { 
+	    	dataSource : 'normal'
+	    }  
+	}); 
+	var materialComb = new Ext.form.ComboBox({
+		forceSelection : true,
+		width : 110,
+		listWidth : 250,
+		maxheight : 300,
+		store : materialStore,
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		tpl:'<tpl for=".">' 
+			+ '<div class="x-combo-list-item" style="height:18px;">'
+			+ '{id} -- {cateName} -- {name} -- {pinyin}'
+			+ '</div>'
+			+ '</tpl>',
+		listeners : {
+			beforequery : function(e){
+				var combo = e.combo;
+				if(!e.forceAll){
+					var value = e.query;
+					combo.store.filterBy(function(record){
+						return record.get('name').indexOf(value) != -1
+								|| (record.get('id')+'').indexOf(value) != -1
+								|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
+					});
+					combo.expand();
+					combo.select(0, true);
+					return false;
+				
+				}
+			},
+			select : function(){
+				Ext.getCmp('search_btn_stockReport').handler();		
+			}
+			
+		}
+	});
+	
+	var stockReportTree;
 
-var stockReportTree;
-Ext.onReady(function(){
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 
@@ -195,30 +194,9 @@ Ext.onReady(function(){
 
 		{xtype : 'tbtext', text : '查看日期:'},
 		{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-//		{
-//			xtype : 'datefield',
-//			id : 'sr_beginDate',
-//			allowBlank : false,
-//			format : 'Y-m-d',
-//			value : date,
-//			maxValue : new Date(),
-//			width : 100
-//		}, {
-//			xtype : 'label',
-//			id : 'to',
-//			text : ' 至 '
-//		}, {
-//			xtype : 'datefield',
-//			id : 'sr_endDate',
-//			allowBlank : false,
-//			format : 'Y-m-d',
-//			value : new Date(),
-//			maxValue : new Date(),
-//			width : 100
-//		},
 		{
 			xtype : 'datefield',
-			id : 'sr_beginDate',
+			id : 'beginDate_dateField_stockReport',
 			allowBlank : false,
 			maxValue : new Date(),
 			value : new Date(),
@@ -234,7 +212,7 @@ Ext.onReady(function(){
 		deptComb,
 		'->', {
 			text : '搜索',
-			id : 'general_btnSearch',
+			id : 'search_btn_stockReport',
 			iconCls : 'btn_search',
 			handler : function(){
 				var cateType = '', cateId = '', materialId = '';
@@ -252,7 +230,7 @@ Ext.onReady(function(){
 				if(materialComb.getValue() != ''){
 					materialId = materialComb.getValue();
 				}
-				sgs.baseParams['beginDate'] = Ext.getCmp('sr_beginDate').getValue().format('Y-m');
+				sgs.baseParams['beginDate'] = Ext.getCmp('beginDate_dateField_stockReport').getValue().format('Y-m');
 				sgs.baseParams['cateType'] = cateType;
 				sgs.baseParams['cateId'] = cateId;
 				sgs.baseParams['materialId'] = materialId;
@@ -288,8 +266,8 @@ Ext.onReady(function(){
 					url = String.format(
 						url,
 						'ExportHistoryStatisticsToExecl.do',
-						Ext.getCmp('sr_beginDate').getValue().format('Y-m-d'),
-						Ext.getCmp('sr_endDate').getValue().format('Y-m-d'),
+						Ext.getCmp('beginDate_dateField_stockReport').getValue().format('Y-m'),
+						'',
 						cateId,
 						materialId,
 						cateType,
@@ -314,7 +292,6 @@ Ext.onReady(function(){
 	
 	 stockReportTree = new Ext.tree.TreePanel({
 		title : '货品类型',
-		id : 'tree',
 		region : 'west',
 		width : 160,
 		border : false,
@@ -339,7 +316,7 @@ Ext.onReady(function(){
 			click : function(e){
 				//var node = this.getSelectionModel().getSelectedNode();
 				Ext.getDom('cateTypeValue').innerHTML = e.text;
-				Ext.getCmp('general_btnSearch').handler();
+				Ext.getCmp('search_btn_stockReport').handler();
 				var cateType = '', cateId = '';
 				var rn = stockReportTree.getSelectionModel().getSelectedNode();
 				if(!rn){
@@ -366,7 +343,6 @@ Ext.onReady(function(){
 	
 	var stockReportGrid = new Ext.grid.GridPanel({
 		title : '进销存汇总',
-		id : 'stock_report_grid',
 		region : 'center',
 //		width : 1400,
 		height : '500',
@@ -414,10 +390,8 @@ Ext.onReady(function(){
 	});
 	
     new Ext.Panel({
-		id : 'panelReport',
-		renderTo : 'divStockReport',
-		//width : parseInt(Ext.getDom('divStockReport').parentElement.style.width.replace(/px/g,'')),
-		height : parseInt(Ext.getDom('divStockReport').parentElement.style.height.replace(/px/g,'')),
+		renderTo : 'report_div_stockReport',
+		height : parseInt(Ext.getDom('report_div_stockReport').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',//布局
 		//margins : '5 5 5 5',
 		//子集
@@ -425,5 +399,5 @@ Ext.onReady(function(){
 	});
 	
     //加载页面执行查询
-    Ext.getCmp('general_btnSearch').handler();
+    Ext.getCmp('search_btn_stockReport').handler();
 });
