@@ -4062,7 +4062,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		String beginDate = request.getParameter("beginDate");
-		String endDate = request.getParameter("endDate");
+		String endDate;
 		String cateType = request.getParameter("cateType");
 		String cateId = request.getParameter("cateId");
 		String materialId = request.getParameter("materialId");
@@ -4082,6 +4082,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 			stockReports = StockReportDao.getStockCollectByTime(staff, beginDate, endDate, extra, null);
 			
 		}else{
+			endDate = beginDate + "-31";
+			beginDate += "-01";
+			
 			if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
 				extra += " AND M.material_id = " + materialId;
 			}
@@ -4154,19 +4157,55 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row.setHeight((short) 350);
 		
 		cell = row.createCell(0);
-		cell.setCellValue("物料编号");
+		cell.setCellValue("品行编号");
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue("物料名称");
+		cell.setCellValue("品行名称");
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("期初数量");
 		cell.setCellStyle(headerStyle);
+
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("入库采购");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("入库调拨");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("入库报溢");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("入库盘盈");
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("入库小计");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("出库退货");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("出库调拨");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("出库报损");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("出库盘亏");
+		cell.setCellStyle(headerStyle);
+
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("出库消耗");
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
@@ -4189,34 +4228,87 @@ public class HistoryStatisticsAction extends DispatchAction{
 			row = sheet.createRow(sheet.getLastRowNum() + 1);
 			row.setHeight((short) 350);
 			
+			//品行编号
 			cell = row.createCell(0);
 			cell.setCellValue(s.getMaterial().getId());
 			cell.setCellStyle(strStyle);
 			
+			//品行名称
 			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getMaterial().getName());
 			cell.setCellStyle(strStyle);
 			
+			//期初数量
 			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getPrimeAmount());
 			cell.setCellStyle(numStyle);
 			
+			//入库采购
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockIn());
+			cell.setCellStyle(numStyle);
+			
+			//入库调拨
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockInTransfer());
+			cell.setCellStyle(numStyle);
+			
+			//入库报溢
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockSpill());
+			cell.setCellStyle(numStyle);
+			
+			//入库盘盈
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockTakeMore());
+			cell.setCellStyle(numStyle);
+			
+			//入库小计
 			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getStockInAmount());
 			cell.setCellStyle(numStyle);
 			
+			//出库退货
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockOut());
+			cell.setCellStyle(numStyle);
+			
+			//出库调拨
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockOutTransfer());
+			cell.setCellStyle(numStyle);
+			
+			//出库报损
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockDamage());
+			cell.setCellStyle(numStyle);
+			
+			//出库盘亏
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockTakeLess());
+			cell.setCellStyle(numStyle);
+
+			//出库消耗
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getUseUp());
+			cell.setCellStyle(numStyle);
+			
+			//出库小计
 			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getStockOutAmount());
 			cell.setCellStyle(numStyle);
 			
+			//期末数量
 			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getFinalAmount());
 			cell.setCellStyle(numStyle);
 			
+			//期末单价
 			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getFinalPrice());
 			cell.setCellStyle(numStyle);
 			
+			//期末金额
 			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getFinalMoney());
 			cell.setCellStyle(numStyle);
