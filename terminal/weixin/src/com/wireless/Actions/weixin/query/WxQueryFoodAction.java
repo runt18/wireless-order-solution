@@ -76,7 +76,7 @@ public class WxQueryFoodAction extends DispatchAction{
 			String kitchenId = request.getParameter("kitchenId");
 			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			
-			root = FoodDao.getPureByCond(StaffDao.getAdminByRestaurant(rid),
+			root = FoodDao.getByCond(StaffDao.getAdminByRestaurant(rid),
 										new FoodDao.ExtraCond().setSellout(false).setContainsImage(true).setKitchen(Integer.parseInt(kitchenId)), 
 										" ORDER BY FOOD.food_alias ");
 			

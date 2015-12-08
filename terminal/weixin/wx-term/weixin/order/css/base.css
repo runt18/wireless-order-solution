@@ -63,6 +63,15 @@ z-index: 99999;
 	border-radius: 5px;
 }
 
+.unit_css_fastOrderFood{
+	background-color: #fff;
+	border: 1px solid darkgray;
+	font-size: 16px;
+	border-radius: 5px;
+	width: 29%;
+	height:30px;
+}
+
 .m-b-line-show{
 	display: block !important;
 	-webkit-animation: line-show-inDownBig .3s ease both;
