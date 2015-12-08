@@ -228,7 +228,8 @@ function PickFoodComponent(param){
 	
 	//加载菜品
 	function initFoodData(kitchenId){
-		var foodBox = '<div class="box-horizontal box-food-list">'
+		var foodBox ='<div class="box-food-list">'
+			+ '<div class="box-horizontal ">'
 			+ '<div data-r="l">'
 				+ '<div food-id={foodId} foodStype="image" href="#" style="background-image: url({img});"></div>'
 			+ '</div>'
@@ -240,7 +241,16 @@ function PickFoodComponent(param){
 			+ '<div data-r="r" class="box-horizontal box-food-list-r">'
 				+ '<div data-r="r" food-id={foodId} {selected} data-type="checkbox" href="#"></div>'
 			+ '</div>'
+			+'</div>'
+			+ '<div id="standard_div_fastOrderFood" style="width:100%" class="box-horizontal"></div>'
 			+ '</div>';
+			
+		var unitPrice = '<div multiUnit-Id={multiId} style="background-color: #fff;border: 1px solid darkgray;font-size: 16px;border-radius: 5px;width:29%;height:30px;">'
+						+ '<ul class="m-b-list">{unitPrice}/{unitName}</ul>'
+						+ '</div>';
+			
+				
+			
 		var requestParams = {
 				dataSource : 'normal',
 				fid : Util.mp.fid,
@@ -264,6 +274,7 @@ function PickFoodComponent(param){
 				Util.lm.hide();
 				if(data.root.length > 0){
 					var foodHtml = [];
+					var multiUnit = [];
 					var count = null;
 					var temp = null;
 					for(var i = 0; i < _foodData.length; i++){
@@ -279,9 +290,21 @@ function PickFoodComponent(param){
 							display : count > 0 ? 'block' : 'none',
 							orderAction : _foodData[i].foodCnt > 0 ? '' : 'html-hide'
 						}));
-					}
-					Util.getDom('foodList_div_fastOrderFood').insertAdjacentHTML('beforeBegin', foodHtml.join(''));
+						
+						if(_foodData[i].multiUnitPrice.length > 0){
+							for(var j = 0; j < _foodData[i].multiUnitPrice.length; j++){
+								multiUnit.push(unitPrice.format({
+									multiId : _foodData[i].multiUnitPrice[j].id,
+									unitPrice : _foodData[i].multiUnitPrice[j].price,
+									unitName : _foodData[i].multiUnitPrice[j].unit
+								}));
+							}
+						}
+					} 
 					
+					
+					Util.getDom('foodList_div_fastOrderFood').insertAdjacentHTML('beforeBegin', foodHtml.join(''));
+					Util.getDom('standard_div_fastOrderFood').insertAdjacentHTML('beforeEnd', multiUnit.join(''));
 					//图片点击展示菜品详情
 					$('#foods_div_fastOrderFood').find('[foodStype="image"]').each(function(index, element){
 						element.onclick = function(){
@@ -296,7 +319,7 @@ function PickFoodComponent(param){
 							operateFood({otype : 'add', id : $($(element).next().find('div[data-r=r]')[0]).attr('food-id'), event : $(element).next().find('div[data-r=r]')[0]});
 							if(param.onCartChange && typeof param.onCartChange == 'function'){
 								param.onCartChange(_orderData);
-							}
+						 	}
 						};
 					});
 					
@@ -606,7 +629,6 @@ function PickFoodComponent(param){
 			//购物车里面的加号
 			shoppingCarMainView.find('[data-type="plus"]').each(function(index, element){
 				element.onclick = function(){
-					console.log("asds");
 					operateFood({otype : 'plus', id : $(element).attr('shoppingFoodId'), event : element});
 				}
 			});
