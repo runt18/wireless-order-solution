@@ -32,6 +32,9 @@ $(function(){
 				 return;
 			 }
 			 
+//			 var url = "http://weixin.qq.com/r/CXXq8j7ExWO6rXqR9yAb";
+//			 console.log(url.split('?'));
+			 
 			 wx.scanQRCode({ 
 			    needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
 			    scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
@@ -44,7 +47,8 @@ $(function(){
 						 foods += (e.id + ',' + e.count);
 					 });
 					 
-			    	if(res.resultStr.split('?').length < 1){
+					 
+			    	if(res.resultStr.split('?').length == 1){
 			    		//url不带餐桌号就要输入台号
 			    		 Util.dialog.show({
 				    		title : '请输入您当前所在餐桌号',
