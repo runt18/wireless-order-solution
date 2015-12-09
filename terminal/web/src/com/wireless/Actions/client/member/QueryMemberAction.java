@@ -475,26 +475,24 @@ public class QueryMemberAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward byMemberCond(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
-		String pin = (String) request.getAttribute("pin");
-		String memberCondId = request.getParameter("memberCondId");
-		String memberType = request.getParameter("memberType");
-		String memberCondMinConsume = request.getParameter("memberCondMinConsume");
-		String memberCondMaxConsume = request.getParameter("memberCondMaxConsume");
-		String memberCondMinAmount = request.getParameter("memberCondMinAmount");
-		String memberCondMaxAmount = request.getParameter("memberCondMaxAmount");
-		String memberCondMinBalance = request.getParameter("memberCondMinBalance");
-		String memberCondMaxBalance = request.getParameter("memberCondMaxBalance");
-		String memberCondBeginDate = request.getParameter("memberCondBeginDate");
-		String memberCondEndDate = request.getParameter("memberCondEndDate");
+	public ActionForward byMemberCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		final JObject jObject = new JObject();
+		final String pin = (String) request.getAttribute("pin");
+		final String memberCondId = request.getParameter("memberCondId");
+		final String memberType = request.getParameter("memberType");
+		final String memberCondMinConsume = request.getParameter("memberCondMinConsume");
+		final String memberCondMaxConsume = request.getParameter("memberCondMaxConsume");
+		final String memberCondMinAmount = request.getParameter("memberCondMinAmount");
+		final String memberCondMaxAmount = request.getParameter("memberCondMaxAmount");
+		final String memberCondMinBalance = request.getParameter("memberCondMinBalance");
+		final String memberCondMaxBalance = request.getParameter("memberCondMaxBalance");
+		final String memberCondBeginDate = request.getParameter("memberCondBeginDate");
+		final String memberCondEndDate = request.getParameter("memberCondEndDate");
 		
 		try{
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			MemberCond memberCond;
+			final MemberCond memberCond;
 			if(memberCondId != null && !memberCondId.isEmpty()){
 				memberCond = MemberCondDao.getById(staff, Integer.parseInt(memberCondId));
 			}else{
@@ -535,19 +533,18 @@ public class QueryMemberAction extends DispatchAction {
 				memberCond.setMinConsumeMoney(minConsume);
 			}
 			
-			List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond(memberCond), null);
 			
-			jobject.setRoot(members);
+			jObject.setRoot(MemberDao.getByCond(staff, new MemberDao.ExtraCond(memberCond), null));
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}	
