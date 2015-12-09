@@ -36,7 +36,8 @@ public class TestMemberCond {
 																   .setRange(System.currentTimeMillis(), System.currentTimeMillis() + 1000)
 																   .setBalance(100, 200)
 																   .setConsumeAmount(5, 8)
-																   .setConsumeMoney(20, 100);
+																   .setConsumeMoney(20, 100)
+																   .setLastConsumption(10);
 			id = MemberCondDao.insert(mStaff, insertBuilder);
 			
 			MemberCond expected = insertBuilder.build();
@@ -49,7 +50,8 @@ public class TestMemberCond {
 																   .setRange(System.currentTimeMillis(), System.currentTimeMillis() + 3000)
    																   .setBalance(50, 300)
 																   .setConsumeAmount(6, 10)
-																   .setConsumeMoney(200, 500);
+																   .setConsumeMoney(200, 500)
+																   .setLastConsumption(20);
 			MemberCondDao.update(mStaff, updateBuilder);
 			if(updateBuilder.isNameChanged()){
 				expected.setName(updateBuilder.build().getName());
@@ -74,6 +76,9 @@ public class TestMemberCond {
 			}
 			if(updateBuilder.isRangeChanged()){
 				expected.setRange(updateBuilder.build().getRange());
+			}
+			if(updateBuilder.isLastConsumptionChanged()){
+				expected.setLastConsumption(updateBuilder.build().getLastConsumption());
 			}
 			actual = MemberCondDao.getById(mStaff, id);
 			compare(expected, actual);
@@ -101,5 +106,6 @@ public class TestMemberCond {
 		Assert.assertEquals("member condition max consume money", expected.getMaxConsumeMoney(), actual.getMaxConsumeMoney(), 0.01);
 		Assert.assertEquals("member condition max consume amount", expected.getMaxConsumeAmount(), actual.getMaxConsumeAmount());
 		Assert.assertEquals("member condition min consume amount", expected.getMinConsumeAmount(), actual.getMinConsumeAmount());
+		Assert.assertEquals("member condition last consumption", expected.getLastConsumption(), actual.getLastConsumption());
 	}
 }

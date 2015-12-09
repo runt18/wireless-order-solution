@@ -72,7 +72,7 @@ public class MemberCondDao {
 		MemberCond cond = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".member_cond" +
-			  " ( restaurant_id, name, member_type_id, range_type, begin_date, end_date, min_consume_money, max_consume_money, min_consume_amount, max_consume_amount, min_balance, max_balance ) VALUES ( " +
+			  " ( restaurant_id, name, member_type_id, range_type, begin_date, end_date, min_consume_money, max_consume_money, min_consume_amount, max_consume_amount, min_balance, max_balance, last_consumption ) VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + cond.getName() + "'" + "," +
 			  (cond.hasMemberType() ? cond.getMemberType().getId() : " NULL ") + "," +
@@ -84,7 +84,8 @@ public class MemberCondDao {
 			  cond.getMinConsumeAmount() + "," +
 			  cond.getMaxConsumeAmount() + "," +
 			  cond.getMinBalance() + "," +
-			  cond.getMaxBalance() + 
+			  cond.getMaxBalance() + "," +
+			  cond.getLastConsumption() +
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -146,6 +147,7 @@ public class MemberCondDao {
 			  (builder.isConsumeMoneyChanged() ? " ,min_consume_money = " + cond.getMinConsumeMoney() + " ,max_consume_money = " + cond.getMaxConsumeMoney() : "") +
 			  (builder.isRangeTypeChanged() ? " ,range_type = " + cond.getRangeType().getVal() : "") +
 			  (builder.isRangeChanged() ? " ,begin_date = '" + cond.getRange().getOnDutyFormat() + "' ,end_date = '" + cond.getRange().getOffDutyFormat() + "'" : "") +
+			  (builder.isLastConsumptionChanged() ? " ,last_consumption = " + cond.getLastConsumption() : "") +
 			  " WHERE id = " + cond.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -282,6 +284,7 @@ public class MemberCondDao {
 			memberCond.setMaxConsumeAmount(dbCon.rs.getInt("max_consume_amount"));
 			memberCond.setMinConsumeMoney(dbCon.rs.getFloat("min_consume_money"));
 			memberCond.setMaxConsumeMoney(dbCon.rs.getFloat("max_consume_money"));
+			memberCond.setLastConsumption(dbCon.rs.getInt("last_consumption"));
 			result.add(memberCond);
 		}
 		dbCon.rs.close();
