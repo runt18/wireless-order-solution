@@ -18,9 +18,15 @@ public class MemberCond implements Jsonable{
 		private int maxConsumeAmount;
 		private float minBalance;
 		private float maxBalance;
+		private int lastConsumption;
 		
 		public InsertBuilder(String name){
 			this.name = name;
+		}
+		
+		public InsertBuilder setLastConsumption(int lastConsumption){
+			this.lastConsumption = lastConsumption;
+			return this;
 		}
 		
 		public InsertBuilder setRangeType(RangeType rangeType){
@@ -94,9 +100,19 @@ public class MemberCond implements Jsonable{
 		private int maxConsumeAmount;
 		private float minBalance;
 		private float maxBalance;
+		private int lastConsumption;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
+		}
+		
+		public UpdateBuilder setLastConsumption(int lastConsumption){
+			this.lastConsumption = lastConsumption;
+			return this;
+		}
+		
+		public boolean isLastConsumptionChanged(){
+			return this.lastConsumption != 0;
 		}
 		
 		public UpdateBuilder setName(String name){
@@ -235,7 +251,7 @@ public class MemberCond implements Jsonable{
 	private int maxConsumeAmount;
 	private float minBalance;
 	private float maxBalance;
-	
+	private int lastConsumption;
 	
 	private MemberCond(UpdateBuilder builder){
 		setId(builder.id);
@@ -249,6 +265,7 @@ public class MemberCond implements Jsonable{
 		setMaxConsumeAmount(builder.maxConsumeAmount);
 		setMinBalance(builder.minBalance);
 		setMaxBalance(builder.maxBalance);
+		setLastConsumption(builder.lastConsumption);
 	}
 	
 	private MemberCond(InsertBuilder builder){
@@ -262,6 +279,7 @@ public class MemberCond implements Jsonable{
 		setMaxConsumeAmount(builder.maxConsumeAmount);
 		setMinBalance(builder.minBalance);
 		setMaxBalance(builder.maxBalance);
+		setLastConsumption(builder.lastConsumption);
 	}
 	
 	public MemberCond(int id){
@@ -375,6 +393,14 @@ public class MemberCond implements Jsonable{
 		this.maxBalance = maxBalance;
 	}
 
+	public void setLastConsumption(int lastConsumption){
+		this.lastConsumption = lastConsumption;
+	}
+	
+	public int getLastConsumption(){
+		return this.lastConsumption;
+	}
+	
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
@@ -392,6 +418,7 @@ public class MemberCond implements Jsonable{
 		jm.putInt("maxConsumeAmount", this.maxConsumeAmount);
 		jm.putFloat("minBalance", this.minBalance);
 		jm.putFloat("maxBalance", this.maxBalance);
+		jm.putInt("lastConsumption", this.lastConsumption);
 		return jm;
 	}
 
