@@ -18,21 +18,20 @@ public class MemberCond implements Jsonable{
 		private int maxConsumeAmount;
 		private float minBalance;
 		private float maxBalance;
-		private int lastConsumption;
+		private int minLastConsumption;
+		private int maxLastConsumption;
 		
 		public InsertBuilder(String name){
 			this.name = name;
 		}
 		
-		public InsertBuilder setLastConsumption(int lastConsumption){
-			this.lastConsumption = lastConsumption;
+		public InsertBuilder setLastConsumption(int min, int max){
+			this.minLastConsumption = min;
+			this.maxLastConsumption = max;
 			return this;
 		}
 		
 		public InsertBuilder setRangeType(RangeType rangeType){
-//			if(rangeType == RangeType.USER_DEFINE){
-//				throw new IllegalArgumentException("不能设置自定义查询时间段");
-//			}
 			this.rangeType = rangeType;
 			return this;
 		}
@@ -100,19 +99,21 @@ public class MemberCond implements Jsonable{
 		private int maxConsumeAmount;
 		private float minBalance;
 		private float maxBalance;
-		private int lastConsumption;
+		private int minLastConsumption;
+		private int maxLastConsumption;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
 		}
 		
-		public UpdateBuilder setLastConsumption(int lastConsumption){
-			this.lastConsumption = lastConsumption;
+		public UpdateBuilder setLastConsumption(int min, int max){
+			this.minLastConsumption = min;
+			this.maxLastConsumption = max;
 			return this;
 		}
 		
 		public boolean isLastConsumptionChanged(){
-			return this.lastConsumption != 0;
+			return this.minLastConsumption != 0 || this.maxLastConsumption != 0;
 		}
 		
 		public UpdateBuilder setName(String name){
@@ -251,7 +252,8 @@ public class MemberCond implements Jsonable{
 	private int maxConsumeAmount;
 	private float minBalance;
 	private float maxBalance;
-	private int lastConsumption;
+	private int minLastConsumption;
+	private int maxLastConsumption;
 	
 	private MemberCond(UpdateBuilder builder){
 		setId(builder.id);
@@ -265,7 +267,8 @@ public class MemberCond implements Jsonable{
 		setMaxConsumeAmount(builder.maxConsumeAmount);
 		setMinBalance(builder.minBalance);
 		setMaxBalance(builder.maxBalance);
-		setLastConsumption(builder.lastConsumption);
+		setMinLastConsumption(builder.minLastConsumption);
+		setMaxLastConsumption(builder.maxLastConsumption);
 	}
 	
 	private MemberCond(InsertBuilder builder){
@@ -279,7 +282,8 @@ public class MemberCond implements Jsonable{
 		setMaxConsumeAmount(builder.maxConsumeAmount);
 		setMinBalance(builder.minBalance);
 		setMaxBalance(builder.maxBalance);
-		setLastConsumption(builder.lastConsumption);
+		setMinLastConsumption(builder.minLastConsumption);
+		setMaxLastConsumption(builder.maxLastConsumption);
 	}
 	
 	public MemberCond(int id){
@@ -393,12 +397,20 @@ public class MemberCond implements Jsonable{
 		this.maxBalance = maxBalance;
 	}
 
-	public void setLastConsumption(int lastConsumption){
-		this.lastConsumption = lastConsumption;
+	public void setMinLastConsumption(int minLastConsumption){
+		this.minLastConsumption = minLastConsumption;
 	}
 	
-	public int getLastConsumption(){
-		return this.lastConsumption;
+	public int getMinLastConsumption(){
+		return this.minLastConsumption;
+	}
+	
+	public void setMaxLastConsumption(int maxLastConsumption){
+		this.maxLastConsumption = maxLastConsumption;
+	}
+	
+	public int getMaxLastConsumption(){
+		return this.maxLastConsumption;
 	}
 	
 	@Override
@@ -418,7 +430,8 @@ public class MemberCond implements Jsonable{
 		jm.putInt("maxConsumeAmount", this.maxConsumeAmount);
 		jm.putFloat("minBalance", this.minBalance);
 		jm.putFloat("maxBalance", this.maxBalance);
-		jm.putInt("lastConsumption", this.lastConsumption);
+		jm.putInt("minLastConsumption", this.minLastConsumption);
+		jm.putInt("maxLastConsumption", this.maxLastConsumption);
 		return jm;
 	}
 
