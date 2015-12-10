@@ -37,7 +37,7 @@ public class TestMemberCond {
 																   .setBalance(100, 200)
 																   .setConsumeAmount(5, 8)
 																   .setConsumeMoney(20, 100)
-																   .setLastConsumption(10);
+																   .setLastConsumption(10, 20);
 			id = MemberCondDao.insert(mStaff, insertBuilder);
 			
 			MemberCond expected = insertBuilder.build();
@@ -51,7 +51,7 @@ public class TestMemberCond {
    																   .setBalance(50, 300)
 																   .setConsumeAmount(6, 10)
 																   .setConsumeMoney(200, 500)
-																   .setLastConsumption(20);
+																   .setLastConsumption(10, 30);
 			MemberCondDao.update(mStaff, updateBuilder);
 			if(updateBuilder.isNameChanged()){
 				expected.setName(updateBuilder.build().getName());
@@ -78,7 +78,8 @@ public class TestMemberCond {
 				expected.setRange(updateBuilder.build().getRange());
 			}
 			if(updateBuilder.isLastConsumptionChanged()){
-				expected.setLastConsumption(updateBuilder.build().getLastConsumption());
+				expected.setMinLastConsumption(updateBuilder.build().getMinLastConsumption());
+				expected.setMaxLastConsumption(updateBuilder.build().getMaxLastConsumption());
 			}
 			actual = MemberCondDao.getById(mStaff, id);
 			compare(expected, actual);
@@ -106,6 +107,7 @@ public class TestMemberCond {
 		Assert.assertEquals("member condition max consume money", expected.getMaxConsumeMoney(), actual.getMaxConsumeMoney(), 0.01);
 		Assert.assertEquals("member condition max consume amount", expected.getMaxConsumeAmount(), actual.getMaxConsumeAmount());
 		Assert.assertEquals("member condition min consume amount", expected.getMinConsumeAmount(), actual.getMinConsumeAmount());
-		Assert.assertEquals("member condition last consumption", expected.getLastConsumption(), actual.getLastConsumption());
+		Assert.assertEquals("member condition min last consumption", expected.getMinLastConsumption(), actual.getMinLastConsumption());
+		Assert.assertEquals("member condition max last consumption", expected.getMaxLastConsumption(), actual.getMaxLastConsumption());
 	}
 }

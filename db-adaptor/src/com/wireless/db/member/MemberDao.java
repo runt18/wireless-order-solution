@@ -132,7 +132,8 @@ public class MemberDao {
 		private int referrerId;
 		private int restaurantId;
 		private DateRange birthdayRange;
-		private int lastConsumption;
+		private int minLastConsumption;
+		private int maxLastConsumption;
 		
 		public ExtraCond(MemberCond memberCond){
 			setRange(memberCond.getRange());
@@ -145,7 +146,7 @@ public class MemberDao {
 			this.maxConsumeAmount = memberCond.getMaxConsumeAmount();
 			this.minTotalConsume = memberCond.getMinConsumeMoney();
 			this.maxTotalConsume = memberCond.getMaxConsumeMoney();
-			this.lastConsumption = memberCond.getLastConsumption();
+			this.minLastConsumption = memberCond.getMinLastConsumption();
 		}
 		
 		public ExtraCond(ReqQueryMember.ExtraCond extraCond){
@@ -158,11 +159,6 @@ public class MemberDao {
 		
 		private ExtraCond setRestaurantId(int restaurantId){
 			this.restaurantId = restaurantId;
-			return this;
-		}
-		
-		public ExtraCond setLastConsumption(int lastConsumption){
-			this.lastConsumption = lastConsumption;
 			return this;
 		}
 		
@@ -440,8 +436,12 @@ public class MemberDao {
 				extraCond.append(" AND M.referrer_id = " + referrerId);
 			}
 			
-			if(this.lastConsumption != 0){
-				extraCond.append(" AND DATEDIFF(NOW(), M.last_consumption) <= " + this.lastConsumption);
+			if(this.minLastConsumption > 0 && this.maxLastConsumption == 0){
+				extraCond.append(" AND DATEDIFF(NOW(), M.last_consumption) >= " + this.minLastConsumption);
+			}else if(this.maxLastConsumption > 0 && this.minLastConsumption == 0){
+				extraCond.append(" AND DATEDIFF(NOW(), M.last_consumption) <= " + this.maxLastConsumption);
+			}else if(this.minLastConsumption > 0 && this.maxLastConsumption > 0){
+				extraCond.append(" AND DATEDIFF(NOW(), M.last_consumption) BETWEEN " + this.minLastConsumption + " AND " + this.maxLastConsumption);
 			}
 			return extraCond.toString();
 		}
