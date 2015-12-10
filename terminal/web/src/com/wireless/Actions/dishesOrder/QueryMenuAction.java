@@ -38,12 +38,12 @@ public class QueryMenuAction extends DispatchAction {
 	 */
 	public ActionForward foodList(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		response.setContentType("text/json;charset=utf-8");
-		final JObject jobject = new JObject();
-		String pin = (String) request.getAttribute("pin");
-		final DepartmentTree deptTree = new DepartmentTree.Builder(FoodDao.getPureByCond(StaffDao.verify(Integer.parseInt(pin)), null, null)).build();
-		jobject.setRoot(deptTree.asDeptNodes());
+		final JObject jObject = new JObject();
+		final String pin = (String) request.getAttribute("pin");
+		final DepartmentTree deptTree = new DepartmentTree.Builder(FoodDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), null, null)).build();
+		jObject.setRoot(deptTree.asDeptNodes());
 		
-		response.getWriter().print(jobject.toString());
+		response.getWriter().print(jObject.toString());
 		return null;
 	}
 	/**
