@@ -90,7 +90,7 @@ $(function(){
 					if(foods){
 						foods += '，';
 					}
-					foods += temp.foods[j].name;
+					foods += temp.foods[j].foodName;
 				}
 				if(Util.mp.extra == 3){//外卖
 					html.push(Template.takeout.format({

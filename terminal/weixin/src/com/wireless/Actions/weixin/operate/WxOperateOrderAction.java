@@ -82,7 +82,8 @@ public class WxOperateOrderAction extends DispatchAction {
 					String orderFoods[] = of.split(",");
 					OrderFood orderFood = new OrderFood(FoodDao.getById(staff, Integer.parseInt(orderFoods[0])));
 					orderFood.setCount(Float.parseFloat(orderFoods[1]));
-					if(orderFoods.length > 2){
+					//foodunit多单位
+					if(orderFoods.length > 2 && Integer.parseInt(orderFoods[2]) != 0){
 						orderFood.setFoodUnit(FoodUnitDao.getById(staff, Integer.parseInt(orderFoods[2])));
 					}
 					

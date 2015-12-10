@@ -91,6 +91,16 @@ body{
 	vertical-align: top;
 	font-size: 18px;
 }
+
+#kitchenFoodAmount_div_fastOrderFood{
+	color: #00ff40;
+	display: inline;
+	font-weight: bold;
+	visibility: hidden;
+	vertical-align: right;
+	text-align:right;
+	font-size: 16px;
+}
 /* divNavKitchen--------------------------------------------- */
 .divNavKitchen-item-select{
 /* 	background: #fb7251 !important;
@@ -517,7 +527,6 @@ color:#ff6600;
 
 .nav-aside li a {
 	color: #fff;
-	padding: 0 5px;
 	display: block;
 	font-weight: bold;
 	font-size: 15px;
