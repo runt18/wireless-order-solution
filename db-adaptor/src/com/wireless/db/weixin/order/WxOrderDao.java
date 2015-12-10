@@ -10,6 +10,7 @@ import com.wireless.db.Params;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.menuMgr.FoodUnitDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -286,10 +287,11 @@ public class WxOrderDao {
 		//Insert the associated order foods.
 		for(OrderFood of : wxOrder.getFoods()){
 			sql = " INSERT INTO " + Params.dbName + ".weixin_order_food " +
-				  " (wx_order_id, food_id, food_count) VALUES( " +
+				  " (wx_order_id, food_id, food_count, food_unit_id) VALUES( " +
 				  wxOrderId + "," +
 				  of.getFoodId() + "," +
-				  of.getCount() + 
+				  of.getCount() + "," +
+				  (of.hasFoodUnit() ? of.getFoodUnit().getId() : "NULL") + 
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
@@ -436,6 +438,9 @@ public class WxOrderDao {
 			OrderFood of = new OrderFood();
 			of.asFood().copyFrom(FoodDao.getById(staff, dbCon.rs.getInt("food_id")));
 			of.setCount(dbCon.rs.getFloat("food_count"));
+			if(dbCon.rs.getInt("food_unit_id") != 0){
+				of.setFoodUnit(FoodUnitDao.getById(staff, dbCon.rs.getInt("food_unit_id")));
+			}
 			wxOrder.addFood(of);
 		}
 		dbCon.rs.close();

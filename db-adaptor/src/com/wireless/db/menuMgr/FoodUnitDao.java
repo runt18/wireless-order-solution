@@ -78,6 +78,28 @@ public class FoodUnitDao {
 
 	/**
 	 * Get the food unit to specific id.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param id
+	 * 			the id to food unit
+	 * @return the food unit to specific id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the food unit to this id does NOT exist
+	 */
+	public static FoodUnit getById(Staff staff, int id) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getById(dbCon, staff, id);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the food unit to specific id.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
