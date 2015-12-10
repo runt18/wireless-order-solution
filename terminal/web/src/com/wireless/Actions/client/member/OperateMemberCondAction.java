@@ -42,7 +42,8 @@ public class OperateMemberCondAction extends DispatchAction{
 		final String memberCondDateRegion = request.getParameter("memberCondDateRegion");
 		final String memberCondBeginDate = request.getParameter("memberCondBeginDate");
 		final String memberCondEndDate = request.getParameter("memberCondEndDate");
-		final String lastConsumption = request.getParameter("lastConsumption");
+		final String minLastConsumption = request.getParameter("minLastConsumption");
+		final String maxLastConsumption = request.getParameter("maxLastConsumption");
 		final JObject jObject = new JObject(); 
 		
 		try{
@@ -77,9 +78,10 @@ public class OperateMemberCondAction extends DispatchAction{
 			if(memberCondMinBalance != null && !memberCondMinBalance.isEmpty() && memberCondMaxBalance != null && !memberCondMaxBalance.isEmpty()){
 				builder.setBalance(Float.parseFloat(memberCondMinBalance), Float.parseFloat(memberCondMaxBalance));
 			}
+			
 			//距离最近消费天数
-			if(lastConsumption != null && !lastConsumption.isEmpty()){
-				builder.setLastConsumption(Integer.parseInt(lastConsumption));
+			if(minLastConsumption != null && !minLastConsumption.isEmpty() && maxLastConsumption != null && !maxLastConsumption.isEmpty()){
+				builder.setLastConsumption(Integer.parseInt(minLastConsumption), Integer.parseInt(maxLastConsumption));
 			}
 			
 			MemberCondDao.insert(staff, builder);
@@ -120,7 +122,8 @@ public class OperateMemberCondAction extends DispatchAction{
 		final String memberCondDateRegion = request.getParameter("memberCondDateRegion");
 		final String memberCondBeginDate = request.getParameter("memberCondBeginDate");
 		final String memberCondEndDate = request.getParameter("memberCondEndDate");
-		final String lastConsumption = request.getParameter("lastConsumption");
+		final String minLastConsumption = request.getParameter("minLastConsumption");
+		final String maxLastConsumption = request.getParameter("maxLastConsumption");
 		final JObject jObject = new JObject(); 
 		
 		try{
@@ -155,8 +158,8 @@ public class OperateMemberCondAction extends DispatchAction{
 				builder.setBalance(Float.parseFloat(memberCondMinBalance), Float.parseFloat(memberCondMaxBalance));
 			}
 			//距离最近消费天数
-			if(lastConsumption != null && !lastConsumption.isEmpty()){
-				builder.setLastConsumption(Integer.parseInt(lastConsumption));
+			if(minLastConsumption != null && !minLastConsumption.isEmpty() && maxLastConsumption != null && !maxLastConsumption.isEmpty()){
+				builder.setLastConsumption(Integer.parseInt(minLastConsumption), Integer.parseInt(maxLastConsumption));
 			}
 			
 			MemberCondDao.update(staff, builder);
