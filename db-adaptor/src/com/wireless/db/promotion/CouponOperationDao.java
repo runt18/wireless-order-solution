@@ -14,6 +14,7 @@ import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
+import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 
@@ -23,6 +24,7 @@ public class CouponOperationDao {
 		private final List<CouponOperation.Operate> operations = new ArrayList<CouponOperation.Operate>();
 		private int associateId;
 		private int couponId;
+		private int couponTypeId;
 		private DutyRange range;
 		private HourRange hourRange;
 		private CouponOperation.Operate operate;
@@ -92,6 +94,16 @@ public class CouponOperationDao {
 			return this;
 		}
 		
+		public ExtraCond setCouponType(int couponTypeId){
+			this.couponTypeId = couponTypeId;
+			return this;
+		}
+		
+		public ExtraCond setCouponType(CouponType couponType){
+			this.couponTypeId = couponType.getId();
+			return this;
+		}
+		
 		public ExtraCond addOperation(CouponOperation.OperateType type){
 			for(CouponOperation.Operate operation : type.operationOf()){
 				addOperation(operation);
@@ -129,6 +141,10 @@ public class CouponOperationDao {
 			}
 			if(couponId != 0){
 				extraCond.append(" AND coupon_id = " + couponId);
+			}
+			if(couponTypeId != 0){
+				String sql = " SELECT coupon_id FROM " + Params.dbName + ".coupon WHERE coupon_type_id = " + couponTypeId;
+				extraCond.append(" AND coupon_id IN (" + sql + ")");
 			}
 			if(range != null){
 				extraCond.append(" AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
