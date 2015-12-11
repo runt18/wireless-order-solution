@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
 import com.wireless.json.JObject;
@@ -26,6 +27,7 @@ import com.wireless.sccon.ServerConnector;
 
 public class InsertOrderAction extends Action{
 	
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		final JObject jobject = new JObject();
@@ -37,6 +39,8 @@ public class InsertOrderAction extends Action{
 			final int type = Integer.parseInt(request.getParameter("type"));
 
 			final String notPrint = request.getParameter("notPrint");
+			
+			final String wxCode = request.getParameter("wxCode");
 			
 			final String orientedPrinter = request.getParameter("orientedPrinter");
 			
@@ -56,6 +60,12 @@ public class InsertOrderAction extends Action{
 						builder.addPrinter(Integer.parseInt(printerId));
 					}
 				}
+				//加载微信账单
+				if(wxCode != null && !wxCode.isEmpty()){
+					for(String code : wxCode.split(",")){
+						builder.addWxOrder(WxOrderDao.getByCode(staff, Integer.parseInt(code)));
+					}
+				}
 				resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, printOption));
 				
 				
@@ -67,6 +77,12 @@ public class InsertOrderAction extends Action{
 						builder.addPrinter(Integer.parseInt(printerId));
 					}
 				}
+				//加载微信账单
+				if(wxCode != null && !wxCode.isEmpty()){
+					for(String code : wxCode.split(",")){
+						builder.addWxOrder(WxOrderDao.getByCode(staff, Integer.parseInt(code)));
+					}
+				}
 				resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, printOption));
 				
 			}else{
@@ -76,6 +92,12 @@ public class InsertOrderAction extends Action{
 				if(orientedPrinter != null && !orientedPrinter.isEmpty()){
 					for(String printerId : orientedPrinter.split(",")){
 						builder.addPrinter(Integer.parseInt(printerId));
+					}
+				}
+				//加载微信账单
+				if(wxCode != null && !wxCode.isEmpty()){
+					for(String code : wxCode.split(",")){
+						builder.addWxOrder(WxOrderDao.getByCode(staff, Integer.parseInt(code)));
 					}
 				}
 				resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, printOption));
