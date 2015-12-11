@@ -58,7 +58,7 @@ $(function(){
 			    		//url不带餐桌号就要输入台号
 			    		 Util.dialog.show({
 				    		title : '请输入您当前所在餐桌号',
-				    		leftText : '扫码确认',
+				    		leftText : '确认',
 				    		msg : '<h3>请输入:<a id="numberInput_a_load" style="color:red;"></a></h3><br/>'
 				    			+'<div id="numberKyes_div_load" style="margin-top:-40px;"></div>',
 				    		dialogInit : function(box){
