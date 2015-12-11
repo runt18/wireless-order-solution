@@ -43,6 +43,7 @@ public class OperateCouponAction extends DispatchAction{
 		final String operate = request.getParameter("operate");
 		final String operateType = request.getParameter("operateType");
 		final String memberFuzzy = request.getParameter("memberFuzzy");
+		final String couponId = request.getParameter("couponId");
 		final JObject jObject = new JObject();
 		try{
 			
@@ -79,6 +80,10 @@ public class OperateCouponAction extends DispatchAction{
 			
 			if(memberFuzzy != null && !memberFuzzy.isEmpty()){
 				extraCond.setMemberFuzzy(memberFuzzy);
+			}
+			
+			if(couponId != null && !couponId.isEmpty()){
+				extraCond.setCoupon(Integer.parseInt(couponId));
 			}
 			
 			//获取优惠券的操作记录
