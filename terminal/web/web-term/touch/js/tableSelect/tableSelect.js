@@ -1198,6 +1198,7 @@ $(function(){
 																of.entry({
 																	orderFoodOperateType : 'normal',
 																	initFoods : result.root[0].foods,
+																	wxCode : result.root[0].code,
 																	table : perfectMatched
 																});
 															}, 200);
@@ -1256,6 +1257,7 @@ $(function(){
 															of.entry({
 																orderFoodOperateType : 'normal',
 																initFoods : result.root[0].foods,
+																wxCode : result.root[0].code,
 																table : result.root[0].table
 															});
 														}, 200);
@@ -3263,7 +3265,7 @@ ts.bookFoodChooseFinish = function(){
 			id : e.id,
 			name : e.name,
 			count : e.count,
-			isWeight : WirelessOrder.foods.status.isWeight(e) ? 'initial' : 'none',
+			isWeight : e.isWeight() ? 'initial' : 'none',
 			tastePref : e.tasteGroup.tastePref,
 			unitPrice : e.unitPrice.toFixed(2) + (e.isGift ? '&nbsp;[<font style="font-weight:bold;">已赠送</font>]' : ''),
 			isComboFoodTd : '',
