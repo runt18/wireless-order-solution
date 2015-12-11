@@ -50,7 +50,7 @@ Ext.onReady(function(){
 	var couponType = new Ext.form.ComboBox({
 		xtype : 'combo',
 		forceSelection : true,
-		width : 100,
+		width : 80,
 		store : new Ext.data.SimpleStore({
 			fields : ['value', 'text']
 		}),
@@ -62,7 +62,8 @@ Ext.onReady(function(){
 		selectOnFocus : true,
 		listeners : {
 			render : function(thiz){
-				thiz.store.loadData([['', '全部'], ['1', '快速发券'], ['2', '账单发券'], ['20', '手动用券'], ['21', '账单用券'], ['22', '微信关注用券'],['3', '批量发券']]);
+				thiz.store.loadData([['', '全部'], ['issue', '发券'], ['1', '快速发券'], ['2', '账单发券'], ['3', '批量发券'], 
+				                     ['use', '用券'], ['20', '手动用券'], ['21', '账单用券'], ['22', '微信关注用券']]);
 				thiz.setValue('');
 			},
 			select : function(){
@@ -78,7 +79,7 @@ Ext.onReady(function(){
 	var couponStaff = new Ext.form.ComboBox({
 		readOnly : false,
 		forceSelection : true,
-		width : 103,
+		width : 73,
 		listWidth : 120,
 		store : new Ext.data.SimpleStore({
 			fields : ['staffID', 'staffName']
@@ -123,20 +124,56 @@ Ext.onReady(function(){
 		}
 	});
 	
+	//优惠券类型的选择
+	var coupon = new Ext.form.ComboBox({
+		readOnly : false,
+		forceSelection : true,
+		width : 103,
+		listWidth : 120,
+		store : new Ext.data.SimpleStore({
+			fields : ['id', 'name']
+		}),
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [['', '全部']];
+				Ext.Ajax.request({
+					url : '../../OperatePromotion.do',
+					params : {
+						dataSource : 'getByCond'
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						for(var i = 0; i < jr.root.length; i++){
+							data.push([jr.root[i].coupon['id'], jr.root[i].coupon['name']]);
+						}
+						thiz.store.loadData(data);
+						thiz.setValue('');
+						
+					},
+					fialure : function(res, opt){
+						thiz.store.loadData(data);
+						thiz.setValue('');
+					}
+				});
+				
+			},
+			select : function(){
+				Ext.getCmp('coupon_btnSearch').handler();
+			}
+		}
+	});
+	
 	
 	//toorbar
 	var couponStatisticsTbarItem = [{
 		xtype : 'tbtext',
-		text : '操作人员:'
-	}, couponStaff,{
-		xtype : 'tbtext',
-		width : 30
-	}, {
-		xtype : 'tbtext',
-		text : '操作类型 :'
-	}, couponType, {
-		xtype : 'tbtext',
-		width : 30
+		width : 10
 	}, {
 		xtype : 'tbtext',
 		text : '会员手机/会员卡号/会员名'
@@ -169,7 +206,14 @@ Ext.onReady(function(){
 			store.baseParams['staffId'] = couponStaff.getValue() < 0 ? '' : couponStaff.getValue();
 			store.baseParams['opening'] = businessHour.opening;
 			store.baseParams['ending'] = businessHour.ending;
-			store.baseParams['operate'] = couponType.getValue();
+			store.baseParams['couponTypeId'] = coupon.getValue();
+			if(couponType.getValue() == 'issue' || couponType.getValue() == 'use' ){
+				store.baseParams['operate'] = null;
+				store.baseParams['operateType'] = couponType.getValue();
+			}else{
+				store.baseParams['operateType'] = null;
+				store.baseParams['operate'] = couponType.getValue();
+			}
 			store.baseParams['memberFuzzy'] = memeberName.getValue();
 			store.load({
 				params : {
@@ -194,7 +238,7 @@ Ext.onReady(function(){
 	
 //	Ext.getCmp('memeberName_textfield').getEl().on('keypress', function(event){
 //		if(event.keyCode == '13'){
-//			Ext.getCmp('coupon_btnSearch').handler();
+//			Ext.getCmp('').handler();
 //		}
 //	});
 	
@@ -208,6 +252,7 @@ Ext.onReady(function(){
 		callback : function businessHourSelect(){
 			hours = null;}
 	}).concat(couponStatisticsTbarItem);
+	
 	
 	
 	//couponGrid的栏目
@@ -251,7 +296,6 @@ Ext.onReady(function(){
         				sumCell.style.color= 'green';
         			}
         			couponGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
-        			couponGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
         			couponGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
         			couponGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
         			couponGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
@@ -286,12 +330,35 @@ Ext.onReady(function(){
 			msg : '数据加载中,请稍后....'
 		},
 		tbar : statisticsTbar,
-		bbar : pagingBar
+		bbar : pagingBar,
+		listeners : {
+			render : function(){
+				var secondToolBar = new Ext.Toolbar({
+					items : [{
+						xtype : 'tbtext',
+						text : '操作人员:'
+					}, couponStaff,{
+						xtype : 'tbtext',
+						width : 10
+					}, {
+						xtype : 'tbtext',
+						text : '操作类型 :'
+					}, couponType, {
+						xtype : 'tbtext',
+						width : 10
+					},{
+						xtype : 'tbtext',
+						text : '优惠券类型'
+					}, coupon]
+				});
+				secondToolBar.render(couponGrid.tbar);
+			}
+		}
 	});
 	
 	//定义couponGrid的位置
 	couponGrid.region = 'center';
-	
+
 	couponGrid.keys = [{
 		key : Ext.EventObject.ENTER,
 		scope : this,
