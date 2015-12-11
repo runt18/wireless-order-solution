@@ -44,6 +44,7 @@ public class OperateCouponAction extends DispatchAction{
 		final String operateType = request.getParameter("operateType");
 		final String memberFuzzy = request.getParameter("memberFuzzy");
 		final String couponId = request.getParameter("couponId");
+		final String couponTypeId = request.getParameter("couponTypeId");
 		final JObject jObject = new JObject();
 		try{
 			
@@ -84,6 +85,10 @@ public class OperateCouponAction extends DispatchAction{
 			
 			if(couponId != null && !couponId.isEmpty()){
 				extraCond.setCoupon(Integer.parseInt(couponId));
+			}
+			
+			if(couponTypeId != null && !couponTypeId.isEmpty()){
+				extraCond.setCouponType(Integer.parseInt(couponTypeId));
 			}
 			
 			//获取优惠券的操作记录
