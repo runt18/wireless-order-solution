@@ -91,6 +91,7 @@ public class OperateCouponAction extends DispatchAction{
 				for (CouponOperation operation : result) {
 					total.setCouponPrice(total.getCouponPrice() + operation.getCouponPrice());
 				}
+				total.setCouponName("共" + result.size() + "条");
 				List<CouponOperation> limitResult = DataPaging.getPagingData(result, true, start, limit);
 				limitResult.add(total);
 				jObject.setRoot(limitResult);

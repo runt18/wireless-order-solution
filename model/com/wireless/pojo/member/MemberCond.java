@@ -93,14 +93,14 @@ public class MemberCond implements Jsonable{
 		private MemberType memberType = DUMMY;
 		private RangeType rangeType;
 		private DutyRange range;
-		private float minConsumeMoney;
-		private float maxConsumeMoney;
-		private int minConsumeAmount;
-		private int maxConsumeAmount;
-		private float minBalance;
-		private float maxBalance;
-		private int minLastConsumption;
-		private int maxLastConsumption;
+		private float minConsumeMoney = -1;
+		private float maxConsumeMoney = -1;
+		private int minConsumeAmount = -1;
+		private int maxConsumeAmount = -1;
+		private float minBalance = -1;
+		private float maxBalance = -1;
+		private int minLastConsumption = -1;
+		private int maxLastConsumption = -1;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
@@ -113,7 +113,7 @@ public class MemberCond implements Jsonable{
 		}
 		
 		public boolean isLastConsumptionChanged(){
-			return this.minLastConsumption != 0 || this.maxLastConsumption != 0;
+			return this.minLastConsumption >= 0 || this.maxLastConsumption >= 0;
 		}
 		
 		public UpdateBuilder setName(String name){
@@ -173,7 +173,7 @@ public class MemberCond implements Jsonable{
 		}
 		
 		public boolean isConsumeMoneyChanged(){
-			return minConsumeMoney != 0 || maxConsumeMoney != 0;
+			return minConsumeMoney >= 0 || maxConsumeMoney >= 0;
 		}
 		
 		public UpdateBuilder setConsumeAmount(int min, int max){
@@ -186,7 +186,7 @@ public class MemberCond implements Jsonable{
 		}
 		
 		public boolean isConsumeAmountChanged(){
-			return minConsumeAmount != 0 || maxConsumeAmount != 0;
+			return minConsumeAmount >= 0 || maxConsumeAmount >= 0;
 		}
 		
 		public UpdateBuilder setBalance(float min, float max){
@@ -199,7 +199,7 @@ public class MemberCond implements Jsonable{
 		}
 		
 		public boolean isBalanceChanged(){
-			return minBalance != 0 || maxBalance != 0;
+			return minBalance >= 0 || maxBalance >= 0;
 		}
 		
 		public MemberCond build(){

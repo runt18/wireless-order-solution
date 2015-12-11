@@ -1,5 +1,4 @@
-﻿
-Ext.onReady(function(){
+﻿Ext.onReady(function(){
 	//会员分析条件的TreePanel
 	var memberCondTree;
 	var memberCondBasicGrid; 
@@ -120,7 +119,7 @@ Ext.onReady(function(){
 			$('#betweenCost4CondWin').hide();
 			$('#maxCost4CondWin').show();
 			$('#minCost4CondWin').hide();
-			Ext.getCmp('maxCost4CondWin').focus(true, 100);
+			Ext.getCmp('maxCost4CondWin').focus(true, 100);	
 		}else if(value == 3){
 			//介于
 			Ext.getCmp('betweenCost4CondWin').show();
@@ -834,6 +833,7 @@ Ext.onReady(function(){
 				['类型', 'memberType.name'],
 				['创建时间','createDateFormat'],
 				['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
+				['最近消费','lastConsumption',150],
 				['消费总额', 'totalConsumption',,'right', 'Ext.ux.txtFormat.gridDou'],
 				['累计积分', 'totalPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
 				['当前积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
@@ -1186,7 +1186,7 @@ Ext.onReady(function(){
 			readOnly : false,
 			forceSelection : true,
 			value : 1,
-			width : 80,
+			width : 80, 
 			store : new Ext.data.SimpleStore({
 				fields : ['value', 'text'],
 				data : [[1, '近一个月'], [2, '近二个月'], [3, '近三个月'], [4, '自定义']]
@@ -1227,6 +1227,58 @@ Ext.onReady(function(){
 			columnWidth : 1,
 			style :'margin-bottom:5px;',
 			border : false		
+		},{
+			columnWidth : 0.3,
+			xtype : 'label',
+			text : '距离最近消费天数:'
+		},{
+			columnWidth : 0.2,
+			id : 'costDay_combo_memberCond',
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			width : 80,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text'],
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					thiz.store.loadData([['null', '无设定'], ['max', '大于'], ['min', '小于']]);
+					thiz.setValue('null');
+					if(Ext.getCmp('costDay_combo_memberCond').getValue() == 'null'){
+						Ext.getCmp('costDay_numberField_memeberCond').disable();
+					}else{
+						Ext.getCmp('costDay_numberField_memeberCond').enable();
+					}
+				},
+				select : function(){
+					if(Ext.getCmp('costDay_combo_memberCond').getValue() == 'null'){
+						Ext.getCmp('costDay_numberField_memeberCond').disable();
+					}else{
+						Ext.getCmp('costDay_numberField_memeberCond').enable();
+					}
+					Ext.getCmp('costDay_numberField_memeberCond').setValue('');
+					
+				}
+			}
+		}, {
+			columnWidth : 0.3,
+			xtype : 'numberfield',
+			id : 'costDay_numberField_memeberCond'
+		},{
+			columnWidth : 0.1,
+			xtype : 'label',
+			text : '天'
+		},{
+			columnWidth : 1,
+			style :'margin-bottom:5px;',
+			border : false		
 		}],
 		bbar : ['->',{
 			text : '保存',
@@ -1236,15 +1288,91 @@ Ext.onReady(function(){
 				var id = Ext.getCmp('condId_hidden_memberCond').getValue();
 				var name = Ext.getCmp('txtMemberCondName').getValue();
 				var memberType = Ext.getCmp('memberCondByType').getValue();
+				
 				var minCost4CondWin = Ext.getCmp('minCost4CondWin').getValue();
 				var maxCost4CondWin = Ext.getCmp('maxCost4CondWin').getValue();
+				var cost4CondWinType = Ext.getCmp('comboCost4CondWin').getValue();
+				var minCost;
+				var maxCost
+				if(cost4CondWinType == 1){//大于
+					minCost = minCost4CondWin;
+					maxCost = 0;
+				}else if(cost4CondWinType == 2){//小于
+					minCost = 0;
+					maxCost = maxCost4CondWin;
+				}else if(cost4CondWinType == 3){//介于
+					minCost = minCost4CondWin;
+					maxCost = maxCost4CondWin;
+				}else{//无限定
+					minCost = 0;
+					maxCost = 0;
+				}
+				
 				var minAmount4CondWin = Ext.getCmp('minAmount4CondWin').getValue();
 				var maxAmount4CondWin = Ext.getCmp('maxAmount4CondWin').getValue();
+				var	amount4CondWinType = Ext.getCmp('comboAmount4CondWin').getValue();
+				var minAmount;
+				var maxAmount;
+				if(amount4CondWinType == 1){//大于
+					minAmount = minAmount4CondWin;
+					maxAmount = 0;
+					
+				}else if(amount4CondWinType == 2){//小于
+					minAmount = 0;
+					maxAmount = maxAmount4CondWin;
+					
+				}else if(amount4CondWinType == 3){//介于
+					minAmount = minAmount4CondWin;
+					maxAmount = maxAmount4CondWin;
+					
+				}else{//无限定
+					minAmount = 0;
+					maxAmount = 0;
+				}
+				
+				
 				var minBalance4CondWin = Ext.getCmp('minBalance4CondWin').getValue();
 				var maxBalance4CondWin = Ext.getCmp('maxBalance4CondWin').getValue();
+				var balance4CondWinType = Ext.getCmp('comboBalance4CondWin').getValue();
+				var minBalance;
+				var maxBalance;
+				if(balance4CondWinType == 1){//大于
+					minBalance = minBalance4CondWin;
+					maxBalance = 0;
+					
+				}else if(balance4CondWinType == 2){//小于
+					minBalance = 0;
+					maxBalance = maxBalance4CondWin;
+					
+				}else if(balance4CondWinType == 3){//介于
+					minBalance = minBalance4CondWin;
+					maxBalance = maxBalance4CondWin;
+					
+				}else{//无限定
+					minBalance = 0;
+					maxBalance = 0;
+				}
+				
 				var memberCondDateRegion = Ext.getCmp('memberCondDateRegion').getValue();
 				var memberCondBeginDate = Ext.getCmp('memberCondBeginDate').getValue();
 				var memberCondEndDate = Ext.getCmp('memberCondEndDate').getValue();
+				//距离最近消费天数
+				var costDayType = Ext.getCmp('costDay_combo_memberCond').getValue();
+				var costDay = Ext.getCmp('costDay_numberField_memeberCond').getValue();
+				var maxDay;
+				var minDay;
+				if(costDayType == 'max'){
+					minDay = costDay;
+					maxDay = 0;
+					
+				}else if(costDayType == 'min'){
+					minDay = 0;
+					maxDay = costDay;
+					
+				}else{
+					minDay = 0;
+					maxDay = 0;
+				}
 				
 				Ext.Ajax.request({
 					url : '../../OperateMemberCond.do',
@@ -1253,16 +1381,17 @@ Ext.onReady(function(){
 						id : id,
 						name : name,
 						memberType : memberType,
-						memberCondMinConsume : minCost4CondWin,
-						memberCondMaxConsume : maxCost4CondWin,
-						memberCondMinAmount : minAmount4CondWin,
-						memberCondMaxAmount : maxAmount4CondWin,
-						
-						memberCondMinBalance : minBalance4CondWin,
-						memberCondMaxBalance : maxBalance4CondWin,
+						memberCondMinConsume : minCost,
+						memberCondMaxConsume : maxCost,
+						memberCondMinAmount : minAmount,
+						memberCondMaxAmount : maxAmount,
+						memberCondMinBalance : minBalance,
+						memberCondMaxBalance : maxBalance,
 						memberCondDateRegion : memberCondDateRegion,
 						memberCondBeginDate : memberCondBeginDate,
-						memberCondEndDate : memberCondEndDate
+						memberCondEndDate : memberCondEndDate,
+						minLastConsumption : minDay,
+						maxLastConsumption : maxDay
 					},
 					success : function(response, options) {
 						var jr = Ext.util.JSON.decode(response.responseText);

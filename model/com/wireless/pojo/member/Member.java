@@ -882,6 +882,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.putInt("totalPoint", this.totalPoint);
 		jm.putFloat("totalConsumption", this.totalConsumption);
 		jm.putInt("consumptionAmount", this.consumptionAmount);
+		jm.putString("lastConsumption", DateUtil.format(this.getLastConsumption()));
 		jm.putFloat("baseBalance", this.baseBalance);
 		jm.putFloat("extraBalance", this.extraBalance);
 		jm.putFloat("totalBalance", this.getTotalBalance());

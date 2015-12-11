@@ -961,6 +961,7 @@
             <li style="line-height: 40px;" id="btnWeighFood" onclick="uo.weighAction()"><a >称重</a></li>
             <li style="line-height: 40px;" id="btnGiftFood" onclick="uo.giftAction()"><a >赠送</a></li>
             <li style="line-height: 40px;" onclick="uo.hurriedFoodAction()"><a >催菜</a></li>
+            <li style="line-height: 40px;" id="addPrint_li_tableSelect"><a>补打</a></li> 
         </ul>
 	</div>		
 
