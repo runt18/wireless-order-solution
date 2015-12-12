@@ -1175,7 +1175,7 @@ function showPanel(v){
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/transferFood2.jpg)';
 			Ext.getCmp('printCommentPanel').hide();			
 		}else if(v == 19){
-			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/jiezhang.jpg)';
+			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/wxOrder.jpg)';
 			Ext.getCmp('printCommentPanel').hide();		
 		}
 	}
