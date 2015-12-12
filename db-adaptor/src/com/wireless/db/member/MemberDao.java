@@ -756,6 +756,7 @@ public class MemberDao {
 			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
 			  " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, " +
 			  " M.referrer, M.referrer_id, " +
+			  " M.wx_order_amount, " +
 			  " MT.member_type_id, MT.name AS member_type_name, MT.attribute, MT.exchange_rate, MT.charge_rate, MT.type, MT.initial_point, " +
 			  " WM.weixin_card " +
 			  " FROM " + Params.dbName + ".member M " +
@@ -798,6 +799,7 @@ public class MemberDao {
 			member.setContactAddress(dbCon.rs.getString("contact_addr"));
 			member.setReferrer(dbCon.rs.getString("referrer"));
 			member.setReferrerId(dbCon.rs.getInt("referrer_id"));
+			member.setWxOrderAmount(dbCon.rs.getInt("wx_order_amount"));
 			
 			MemberType memberType = new MemberType(dbCon.rs.getInt("member_type_id"));
 			memberType.setName(dbCon.rs.getString("member_type_name"));
@@ -1287,6 +1289,7 @@ public class MemberDao {
 			  (builder.isContactAddrChanged() ? " ,contact_addr = '" + member.getContactAddress() + "'" : "") +
 			  (builder.isReferrerChanged() ? " ,referrer = '" + member.getReferrer() + "'" : "") +
 			  (builder.isReferrerChanged() ? " ,referrer_id = " + member.getReferrerId() : "") +
+			  (builder.isWxOrderAmountChanged() ? " ,wx_order_amount = " + member.getWxOrderAmount() : "") +
 			  " WHERE member_id = " + member.getId(); 
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
