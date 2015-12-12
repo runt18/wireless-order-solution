@@ -101,7 +101,7 @@ $(function(){
 												oid : Util.mp.oid,
 												fid : Util.mp.fid,
 												foods : foods,
-												tableAlias : $('#numberInput_a_load').text(),
+												tableAlias : $('#numberInput_a_load').text()
 //												qrCode :  res.resultStr
 											},
 											success : function(data, status, xhr){
@@ -116,7 +116,7 @@ $(function(){
 														msg : '<font style="font-weight:bold;font-size:25px;text-align:center;">订单号: ' + data.other.code + '</font>',
 														callback : function(btn){
 															window.location.reload();
-															Util.jump('orderList.html', Util.mp.extra);
+															 $('#foodOrderList').click();
 														},
 														btn : 'yes' });
 												}else{
@@ -153,7 +153,15 @@ $(function(){
 									pickFoodComponent.refresh();
 									pickFoodComponent.closeShopping();
 									
-									Util.dialog.show({title : '请呼叫服务员确认订单',callback : function(btn){window.location.reload();Util.jump('orderList.html', Util.mp.extra);}, msg : '<font style="font-weight:bold;font-size:25px;">订单号: ' + data.other.code + '</font>', btn : 'yes' });
+									Util.dialog.show({
+									title : '请呼叫服务员确认订单',
+									callback : function(btn){
+										window.location.reload();
+										 $('#foodOrderList').click();
+									}, 
+									msg : '<font style="font-weight:bold;font-size:25px;">订单号: ' + data.other.code + '</font>',
+									btn : 'yes'
+									});
 								}else{
 									Util.dialog.show({ msg : data.msg });
 								}
@@ -175,7 +183,7 @@ $(function(){
 				 document.getElementById('displayFoodCount_div_fastOrderFood').innerHTML ='';
 				 document.getElementById('displayFoodCount_div_fastOrderFood').style.visibility = 'hidden';
 			 }
-		 },
+		 }
 	 });  
 	 
 	 pickFoodComponent.open();
