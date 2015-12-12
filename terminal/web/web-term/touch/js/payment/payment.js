@@ -645,131 +645,57 @@ $(function(){
 		//混合结账
 		$('#mixed_a_payment').click(function(){
 			if(orderMsg.memberId > 0){
-				Util.msg.alert({msg:'会员不支持混合结账', topTip:true});
+				Util.msg.tip('会员不支持混合结账');
 				return;
 			}
 			
-			//混合结账选项
-			var maxTr = '<tr>' +
-					'<td><label><input data-theme="e" id={checkboxId} data-for={numberfieldId} type="checkbox" name="mixPayCheckbox">{name}</label></td>'+
-					'<td style="padding-right: 10px;"><input data-theme="c" id={numberfieldId} class="mixPayInputFont numberInputStyle" disabled="disabled" ></td>'+
-					'</tr>';
-			var html = [];
-			var checkBoxes = [];
-			for (var i = 0; i < payTypeData.length; i++) {
-				var checkBoxId = "chbForPayType" + payTypeData[i].id;
-				var numberfieldId = "numForPayType" + payTypeData[i].id;
-				checkBoxes.push(checkBoxId);
-				html.push(maxTr.format({
-					name : payTypeData[i].name,
-					checkboxId : checkBoxId,
-					numberfieldId : numberfieldId
-				}));
-			}
-			
-			$('#mixedPay_tbl_payment').html(html.join('')).trigger('create');
-			
-			//混合结账中每个CheckBox按钮的事件
-			for(var i = 0; i < checkBoxes.length; i++){
-				$('#' + checkBoxes[i]).click(function(){
-					
-					var curCheckbox = $(this);
-					var numForAlias = $("#" + curCheckbox.attr('data-for'));
-					
-					if(curCheckbox.attr('checked')){
-						
-						var mixedPayMoney = orderMsg.actualPrice;
-						for (var i = 0; i < payTypeData.length; i++) {
-							var checked = $('#chbForPayType' + payTypeData[i].id).attr('checked');
-							var money = $('#numForPayType' + payTypeData[i].id).val();
-							if(checked && money){
-								mixedPayMoney = (mixedPayMoney * 10000 - parseInt(money) * 10000) / 10000; 
+			var mixPayPopup = new createMixPayPopup({
+				left : function(mixedIncome){
+					paySubmit({
+						submitType : PayTypeEnum.MIXED,
+						temp : true,
+						mixedIncome : mixedIncome,
+						postPayment : function(resultJSON){
+							
+							if(resultJSON.success){
+									Util.msg.tip(resultJSON.data);
+							}else{
+								Util.msg.tip(resultJSON.data);
 							}
 						}
-						
-						numForAlias.val(mixedPayMoney < 0 ? 0 : mixedPayMoney);							
-						
-						numForAlias.removeAttr("disabled"); 
-						numForAlias.parent().removeClass('ui-disabled');
-				
-						numForAlias.focus();
-						numForAlias.select();
-						
-					}else{
-						
-						numForAlias.attr("disabled", true); 
-						numForAlias.parent().addClass('ui-disabled');
-				
-						numForAlias.val('');		
-					}	
-				});
-			}
-			
-			$('#mixedPayWin').popup('open');
-			
-		});
-		
-		//混合结账-暂结
-		$('#mixedTempPay_a_payment').click(function(){
-			mixPay(true);
-		});
-		
-		//混合结账-结账
-		$('#mixedPay_a_payment').click(function(){
-			mixPay(false);
-		});
-		
-		function mixPay(temp){
-			
-			var mixedIncome = '';
-			for (var i = 0; i < payTypeData.length; i++) {
-				var checked = $('#chbForPayType' + payTypeData[i].id).attr('checked');
-				if(checked && $('#numForPayType' + payTypeData[i].id).val()){
-					if(mixedIncome.length != 0){
-						mixedIncome += '&';
-					}
-					mixedIncome += (payTypeData[i].id + ',' + $('#numForPayType' + payTypeData[i].id).val());  
-				}
-			}	
-			
-			paySubmit({
-				submitType : PayTypeEnum.MIXED,
-				temp : temp,
-				mixedIncome : mixedIncome,
-				postPayment : function(resultJSON){
-					
-					if(resultJSON.success){
-						if(temp){
-							Util.msg.alert({msg : resultJSON.data, topTip : true});
-						}else{
-							//关闭混合结账界面
-							$('#mixedPayCancel_a_payment').click();
-							Util.msg.alert({msg : '结账成功!', topTip : true});
-							//等完全关闭后再返回
-							setTimeout(function(){
-								if(systemStatus == 4){
-									//快餐模式下返回到点菜界面
-									of.entry({orderFoodOperateType : 'fast', table : pm.table});
-								}else{
-									//返回餐台界面
-									ts.loadData();
-								}
-							}, 250);
+					});
+				},
+				middle : function(mixedIncome){
+					paySubmit({
+						submitType : PayTypeEnum.MIXED,
+						temp : false,
+						mixedIncome : mixedIncome,
+						postPayment : function(resultJSON){
+							
+							if(resultJSON.success){
+									//关闭混合结账界面
+									mixPayPopup.close();
+									Util.msg.tip('结账成功!');
+									//等完全关闭后再返回
+									setTimeout(function(){
+										if(systemStatus == 4){
+											//快餐模式下返回到点菜界面
+											of.entry({orderFoodOperateType : 'fast', table : pm.table});
+										}else{
+											//返回餐台界面
+											ts.loadData();
+										}
+									}, 250);
+							}else{
+								Util.msg.tip(resultJSON.data);
+							}
 						}
-					}else{
-						Util.msg.alert({
-							msg : resultJSON.data,
-							renderTo : 'paymentMgr'
-						});
-					}
-				}
+					});
+				},
+				orderMessage : orderMsg
 			});
 			
-		}
-		
-		//混合结账-取消
-		$('#mixedPayCancel_a_payment').click(function(){
-			$('#mixedPayWin').popup('close');
+			mixPayPopup.open();
 		});
 		
 		//抹数联动
@@ -971,7 +897,7 @@ $(function(){
 		}
 		
 		if(orderMsg == null){
-			Util.msg.alert({msg:"读取账单有误, 不能结账", renderTo:'paymentMgr'});
+			Util.msg.tip("读取账单有误, 不能结账");
 			return;
 		}
 		
@@ -999,7 +925,7 @@ $(function(){
 			//会员结账
 			//FIXME 要加上抹数?
 			if(orderMsg.member.totalBalance < orderMsg.actualPrice){
-				Util.msg.alert({msg : '会员卡余额小于合计金额，不能结帐!', topTip:true});
+				Util.msg.tip('会员卡余额小于合计金额，不能结帐!');
 				return;			
 			}			
 			
@@ -1045,10 +971,7 @@ $(function(){
 			error : function(request, status, err){
 				Util.LM.hide();
 				isPaying = false;
-				Util.msg.alert({
-					msg : "结账出错, 请刷新页面后重试",
-					renderTo : 'paymentMgr'
-				});
+				Util.msg.tip("结账出错, 请刷新页面后重试");
 			}
 		}); 		
 	};

@@ -70,7 +70,6 @@ function AskTablePopup(param){
 					}
 				});
 			}
-				
 			
 		}
 	});	
@@ -159,7 +158,7 @@ function AskTablePopup(param){
 					}));	
 				}
 				self.find('[id=matchedTables_div_askTable]').html(html.join(''));
-				self.find('[id=matchedTables_div_askTable] a').buttonMarkup( 'refresh' );
+				self.find('[id=matchedTables_div_askTable] a').buttonMarkup('refresh');
 				self.find('[id=matchedTables_div_askTable] a').each(function(index, element){
 					$(element).click(function(){
 						if(param.tableSelect){
