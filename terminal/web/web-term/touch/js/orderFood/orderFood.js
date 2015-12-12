@@ -2961,81 +2961,6 @@ $(function(){
 	 * 点菜
 	 */
 	function insertFood(food){
-//		var foodData;
-//		if(food instanceof WirelessOrder.OrderFood){
-//			foodData = food;
-//		}else{
-//			foodData = new WirelessOrder.OrderFood(food);
-//		}
-//
-//		var index = -1;
-//		for(var i = 0; i < of.newFood.length; i++){
-//			//对比是否同一个菜
-//			if(of.newFood[i].id == foodData.id){
-//				//再对比口味 & 赠送属性 & 单位 & 时价
-//				if(of.newFood[i].tasteGroup.normalTasteContent.length == 0 && !of.newFood[i].isGift && !of.newFood[i].foodUnit && !of.newFood[i].isAllowGift()){
-//					index = i;
-//					break;				
-//				}
-//			}
-//		}
-//		
-//		if(index >= 0){
-//			of.newFood[index].addCount(1);
-//			of.selectedOrderFood = of.newFood[index];
-//			of.newFood.select(index);
-//			//重新赋值唯一标示
-//			foodData.unique = of.newFood[index].unique;
-//			
-//		}else{
-//
-//			foodData.tasteGroup = {
-//				tastePref : '无口味',
-//				price : 0,
-//				normalTasteContent : []
-//			};
-//			//生成唯一标示
-//			foodData.unique = new Date().getTime();
-//			
-//			//是否为套菜
-//			foodData.combo = [];
-//			if(foodData.isCombo()){
-//				//获取对应套菜
-//				$.ajax({
-//					url : '../QueryFoodCombination.do',
-//					type : 'post',
-//					async : false,
-//					dataType : 'json',
-//					data : {
-//						foodID : foodData.id
-//					},
-//					success : function(rt, status, xhr){
-//						if(rt.success && rt.root.length > 0){
-//							//组合子菜给套菜
-//							for (var j = 0; j < rt.root.length; j++) {
-//								
-//								foodData.combo.push({
-//									comboFood : rt.root[j],
-//									tasteGroup : {
-//										normalTasteContent : [],
-//										tastePref : ''
-//									}
-//								});
-//							}
-//						}
-//					},
-//					error : function(request, status, err){
-//						alert(request.msg);
-//					}
-//				}); 
-//			}		
-//			
-//			of.newFood.push(foodData);
-//			of.newFood.select(-1);
-//			
-//			//最新添加的作为选中菜品
-//			of.selectedOrderFood = of.newFood[of.newFood.length - 1];
-//		}
 		
 		//增加新点菜
 		of.newFood.add(food);
@@ -3084,9 +3009,10 @@ $(function(){
 			header : '输入时价--' + food.name,
 			left : function(){
 				var unitPrice = parseFloat($('#input_input_numKbPopup').val());
-				//设置时价
-				food.unitPrice = unitPrice;
-				insertFood(food);
+				//设置时价，深拷贝一次food，以免污染原始数据
+				var curPriceFood = $.extend(true, {}, food);
+				curPriceFood.unitPrice = unitPrice;
+				insertFood(curPriceFood);
 				curPricePopup.close();
 			},
 			right : function(){
