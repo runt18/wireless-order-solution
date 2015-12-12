@@ -51,6 +51,8 @@ public class WxOrderContent extends ConcreteContent {
 		sb.append(SEP);
 		sb.append(new ExtraFormatDecorator("订单号：" + wxOrder.getCode(), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X)).append(SEP);
 		
+		sb.append(new ExtraFormatDecorator("第" + (wxOrder.getMember().getWxOrderAmount() + 1) + "次下单", mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X)).append(SEP);
+		
 		if(!wxOrder.getFoods().isEmpty()){
 			sb.append(mSeperatorLine);
 			for(OrderFood of: wxOrder.getFoods()){
