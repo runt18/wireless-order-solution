@@ -70,7 +70,7 @@ function PickFoodComponent(param){
 					+'</li>'
 					+'<li style="width: 33.33%" id="shoppingCarSelect_li_fastOrderFood">'
 						+'<a href="#">'
-							+'<i class="foundicon-checkmark fcolor2"></i>选好了'
+							+'<i class="foundicon-checkmark fcolor2"></i>扫码下单'
 						+'</a>'
 					+'</li>'
 					+'<li style="width: 33.33%" id="shoppingCarBack_li_fastOrderFood">'
@@ -489,9 +489,11 @@ function PickFoodComponent(param){
 					var selectUnit = $(c.event).parent().parent().parent().find('[data-type="unitPrice"]')
 					var selectUnitPrice = null;
 					var unitPriceId = null;
+					var selectUnitName = null;
 					for(var k = 0; k < selectUnit.length; k++){
 						if($(selectUnit[k]).hasClass('selectUnitPrice_css_fastOrderFood')){
 							selectUnitPrice = $(selectUnit[k]).find('[data-type="unitPrice_a_fastOrderFood"]').text();
+							selectUnitName = $(selectUnit[k]).find('[data-type="unitPrice_a_fastOrderFood"]').parent().text();
 							unitPriceId = $($(selectUnit[k]).find('[data-type="unitPrice_a_fastOrderFood"]')).parent().parent().attr('multiUnit-Id');
 						}
 					}
@@ -506,6 +508,7 @@ function PickFoodComponent(param){
 							kitchenId : add.kitchen.id,
 							multiUnitPrice : add.multiUnitPrice,
 							selectUnitPrice : selectUnitPrice,
+							selectUnitName : selectUnitName,
 							unitPriceId : unitPriceId
 						});
 						add = _orderData[_orderData.length - 1];
@@ -711,7 +714,7 @@ function PickFoodComponent(param){
 				html.push(shoppingBox.format({
 					id : temp.id,
 					name : temp.name,
-					unitPrice : temp.selectUnitPrice != null ? temp.selectUnitPrice : temp.unitPrice,
+					unitPrice : temp.selectUnitName != null ? temp.selectUnitName : temp.unitPrice,
 					count :temp.count
 				}));
 			}
@@ -746,8 +749,6 @@ function PickFoodComponent(param){
 			shoppingCarBox.addClass('left-nav-hide');
 			shoppingCarMainView.html(html.join(''));		
 		}
-		
-		
 		
 	}
 	
