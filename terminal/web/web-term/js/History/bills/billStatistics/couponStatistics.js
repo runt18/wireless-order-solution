@@ -228,19 +228,10 @@ Ext.onReady(function(){
 				StaffName = '';
 			}
 			
-//			requestParams = {
-//					
-//					
-//					
-//			}
+
 		}
 	}];
 	
-//	Ext.getCmp('memeberName_textfield').getEl().on('keypress', function(event){
-//		if(event.keyCode == '13'){
-//			Ext.getCmp('').handler();
-//		}
-//	});
 	
 	//头部
 	var statisticsTbar = Ext.ux.initTimeBar({

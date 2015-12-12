@@ -619,6 +619,21 @@ function init(){
 					items : [{
 						xtype : 'radio',
 						name : 'pType',
+						inputValue : 19,
+						hideLabel : true,
+						boxLabel : '微信订单',
+						listeners : {
+							check  : function(thiz, checked){
+								if(checked){
+									showPanel(thiz.inputValue);
+								}
+							}
+						}
+					}]
+				},{
+					items : [{
+						xtype : 'radio',
+						name : 'pType',
 						inputValue : 18,
 						hideLabel : true,
 						boxLabel : '客显',
@@ -1159,6 +1174,9 @@ function showPanel(v){
 		}else if(v == 16){//转菜
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/transferFood2.jpg)';
 			Ext.getCmp('printCommentPanel').hide();			
+		}else if(v == 19){
+			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/jiezhang.jpg)';
+			Ext.getCmp('printCommentPanel').hide();		
 		}
 	}
 	Ext.getCmp('paperDemoCmp').doLayout();

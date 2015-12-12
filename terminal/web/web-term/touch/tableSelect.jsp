@@ -92,6 +92,8 @@
 <script type="text/javascript" src="./js/popup/detail/detail.js"></script>
 <!-- 微信预定 -->
 <script type="text/javascript" src="./js/popup/wxOrder/wxOrder.js"></script>
+<!-- 混合结账 -->
+<script type="text/javascript" src="./js/popup/mixedPay/mixedPay.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -1686,39 +1688,6 @@
 	    </div>
 	 </div>	
 	 
-<!-- 混合结账操作 -->	 
-	<div id="mixedPayWin" data-role="popup"  data-overlay-theme="e" data-theme="d" data-dismissible="false" class="ui-corner-all" align="center">
-	    <div data-role="header" class="ui-corner-top" data-theme="b">
-	        <h1>混合结账</h1>
-	    </div>
-	    <div style="width: 100%;padding: 5px 10px;" >
-	    <table id="mixedPay_tbl_payment">
-<!-- 	    	<tr>
-	    		<td><label><input type="checkbox" name="checkbox-0 " data-for="cashinput" onclick="mixPayCheckboxAction({event:this})">现金</label></td>
-	    		<td style="padding-right: 10px;"><input id="cashinput" style="font-size:20px;font-weight: bold;width: 170px;" disabled="disabled" onblur="setMixPayPrice({event:this, id:'cashinput'})"></td>
-	    	</tr>
-	    	<tr>
-	    		<td>
-					<label><input type="checkbox" name="checkbox-0 " data-for="cardinput" onclick="mixPayCheckboxAction({event:this})">刷卡</label>
-				</td>
-	    		<td style="padding-right: 10px;"><input id="cardinput" style="font-size:20px;font-weight: bold;;width: 170px;" disabled="disabled"></td>
-	    	</tr>
-	    	<tr>
-	    		<td>
-					<label><input type="checkbox" name="checkbox-0 " onclick="mixPayCheckboxAction({event:this})">签单</label>
-				</td>
-	    		<td style="padding-right: 10px;"><input style="font-size:20px;font-weight: bold;;width: 170px;"></td>
-	    	</tr>	  -->   		    	
-	    </table>
-	    </div>
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-			 	 <a id="mixedTempPay_a_payment" data-role="button" data-inline="true" class="tablePopbottomBtn">暂结</a>
-				 <a id="mixedPay_a_payment" data-role="button" data-inline="true" class="tablePopbottomBtn">结账</a>
-				 <a id="mixedPayCancel_a_payment" data-role="button" data-inline="true" class="tablePopbottomBtn">取消</a>		 
-			 </div>
-	    </div>
-	 </div>	
 	 <!-- 显示会员信息 -->
 	<div id="showMemberInfoWin" data-role="popup"  data-overlay-theme="e" data-theme="d" data-dismissible="false" class="ui-corner-all" style="min-width:700px;" align="center">	
 	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
