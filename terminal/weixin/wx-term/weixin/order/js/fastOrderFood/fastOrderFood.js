@@ -172,7 +172,8 @@ function PickFoodComponent(param){
 			type : 'post',
 			data : {
 				dataSource : 'kitchen',
-				fid : Util.mp.params.r
+				fid : Util.mp.params.r,
+				oid : Util.mp.oid
 			},
 			success : function(data, status, xhr){
 				Util.lm.hide();
@@ -252,14 +253,26 @@ function PickFoodComponent(param){
 				
 			
 		var requestParams = {
-				dataSource : 'normal',
-				fid : Util.mp.fid,
-				kitchenId : typeof kitchenId != 'undefined' ? kitchenId : -1
+			fid : Util.mp.fid,
+			oid : Util.mp.oid,
+			start : 0,
+			limit : 20,
+			kitchenId : typeof kitchenId != 'undefined' ? kitchenId : -1
 		};
 		
-		//判断是否明星菜
-		if(kitchenId && kitchenId == -10){
-			requestParams.dataSource = 'isRecommend';
+		if(kitchenId){
+			if(kitchenId == -10){
+				//明星菜
+				requestParams.dataSource = 'star';
+			}else if(kitchenId == -9){
+				//我的最爱
+				requestParams.dataSource = 'favor';
+			}else if(kitchenId == -8){
+				//向你推荐
+				requestParams.dataSource = 'recommend';
+			}else{
+				requestParams.dataSource = 'normal';
+			}
 		} 
 		
 		Util.lm.show();
