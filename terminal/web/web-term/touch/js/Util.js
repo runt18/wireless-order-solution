@@ -364,29 +364,6 @@ function delcookie(name, path){
 }
 
 /**
- * 检查是否为小数
- * @param num
- * @returns {Boolean}
- */
-function checkDot(num){
-	if(!isNaN(num)){
-		num = num + ""; 
-	}
-	var dot = num.indexOf(".");
-	if(dot != -1){
-	    var dotCnt = num.substring(dot+1,dot+2);
-	    var dotCnt2 = num.substring(dot+2);
-	    if(dotCnt >= 1 || dotCnt2 >= 1){
-	        return true;
-	    }else{
-	    	return false;
-	    }
-	}else{
-		return false;
-	}
-}
-
-/**
  * 克隆对象
  * @param myObj
  * @returns

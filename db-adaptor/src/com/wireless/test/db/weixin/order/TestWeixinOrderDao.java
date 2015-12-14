@@ -25,7 +25,7 @@ import com.wireless.test.db.TestInit;
 public class TestWeixinOrderDao {
 	
 	private static Staff mStaff;
-	private static final String WEIXIN_MEMBER_SERIAL = "oACWTjsRKuGYTjEpEyG7fPTg06fd";
+	private static final String WEIXIN_MEMBER_SERIAL = "oM02TjtmLtadFjiGtlUuxTFjJhno";
 
 	@BeforeClass
 	public static void initDbParam() throws PropertyVetoException, SQLException, BusinessException{
@@ -51,6 +51,7 @@ public class TestWeixinOrderDao {
 			WxOrder expected = insertBuilder.build();
 			WxOrder actual = WxOrderDao.getById(mStaff, wxOrderId);
 
+			Assert.assertEquals("member to wx order", MemberDao.getByWxSerial(mStaff, WEIXIN_MEMBER_SERIAL), actual.getMember());
 			Assert.assertEquals("restaurant to wx order", mStaff.getRestaurantId(), actual.getRestaurantId());
 			Assert.assertEquals("status to wx order", expected.getStatus(), actual.getStatus());
 			Assert.assertEquals("type to wx order", expected.getType(), actual.getType());

@@ -165,6 +165,10 @@ public class WxOrder implements Jsonable, Parcelable{
 			return this;
 		}
 		
+		public String getWxSerial(){
+			return this.weixinSerial;
+		}
+		
 		public WxOrder build(){
 			return new WxOrder(this);
 		}
@@ -211,7 +215,6 @@ public class WxOrder implements Jsonable, Parcelable{
 	}
 	
 	private int id;
-	private String weixinSerial;
 	private Member member;
 	private Table table;
 	private long birthDate;
@@ -230,7 +233,6 @@ public class WxOrder implements Jsonable, Parcelable{
 	}
 	
 	private WxOrder(InsertBuilder builder){
-		setWeixinSerial(builder.weixinSerial);
 		setType(builder.type);
 		setStatus(builder.status);
 		setFoods(builder.order.getFoods());
@@ -252,13 +254,6 @@ public class WxOrder implements Jsonable, Parcelable{
 		this.id = id;
 	}
 	
-	public String getWeixinSerial() {
-		return weixinSerial;
-	}
-	
-	public void setWeixinSerial(String weixinSerial) {
-		this.weixinSerial = weixinSerial;
-	}
 	
 	public Member getMember(){
 		return member;
@@ -381,7 +376,7 @@ public class WxOrder implements Jsonable, Parcelable{
 	@Override
 	public String toString(){
 		return "id=" + id +
-			   ", memberSerial=" + weixinSerial	+
+			   ", memberId=" + this.member.getId()	+
 			   ", code=" + code;
 	}
 	
@@ -414,7 +409,8 @@ public class WxOrder implements Jsonable, Parcelable{
 		}else if(flag == WX_ORDER_PARCELABLE_COMPLEX){
 			dest.writeInt(getId());
 			dest.writeInt(getCode());
-			dest.writeString(getWeixinSerial());
+			//FIXME dest.writeString(getWeixinSerial());
+			dest.writeString(null);
 			dest.writeLong(getBirthDate());
 			dest.writeByte(getType().getVal());
 			dest.writeByte(getStatus().getVal());
@@ -432,7 +428,8 @@ public class WxOrder implements Jsonable, Parcelable{
 		}else if(flag == WX_ORDER_PARCELABLE_COMPLEX){
 			setId(source.readInt());
 			setCode(source.readInt());
-			setWeixinSerial(source.readString());
+			//FIXME setWeixinSerial(source.readString());
+			source.readString();
 			setBirthDate(source.readLong());
 			setType(WxOrder.Type.valueOf(source.readByte()));
 			setStatus(WxOrder.Status.valueOf(source.readByte()));

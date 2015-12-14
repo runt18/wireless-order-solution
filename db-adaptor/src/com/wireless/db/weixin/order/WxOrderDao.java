@@ -16,7 +16,6 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.MemberError;
 import com.wireless.exception.WxOrderError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -37,6 +36,7 @@ public class WxOrderDao {
 		private final List<WxOrder.Status> status = new ArrayList<WxOrder.Status>();
 		private WxOrder.Type type;
 		private String weixinSerial;
+		private int memberId;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -73,6 +73,11 @@ public class WxOrderDao {
 			return this;
 		}
 		
+		public ExtraCond setMember(Member member){
+			this.memberId = member.getId();
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -86,10 +91,14 @@ public class WxOrderDao {
 				extraCond.append(" AND order_id = " + orderId);
 			}
 			if(weixinSerial != null){
-				extraCond.append(" AND weixin_serial = '" + weixinSerial + "' AND weixin_serial_crc = CRC32('" + weixinSerial + "')");
+				String sql = " SELECT member_id FROM " + Params.dbName + ".weixin_member WHERE weixin_serial = '" + weixinSerial + "' AND weixin_serial_crc = CRC32('" + weixinSerial + "')";
+				extraCond.append(" AND member_id IN (" + sql + ")");
 			}
 			if(type != null){
 				extraCond.append(" AND type = " + type.getVal());
+			}
+			if(memberId != 0){
+				extraCond.append(" AND member_id = " + memberId);
 			}
 			final StringBuilder statusCond = new StringBuilder();
 			for(WxOrder.Status s : status){
@@ -151,17 +160,18 @@ public class WxOrderDao {
 		
 		WxOrder wxOrder = builder.build();
 		
-		List<Member> members = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(wxOrder.getWeixinSerial()), null);
+		List<Member> members = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(builder.getWxSerial()), null);
 		if(members.isEmpty()){
 			throw new BusinessException("没找到相应的会员信息", WxOrderError.WX_INSERT_ORDER_NOT_ALLOW);
 		}else{
 			if(members.get(0).isRaw()){
 				throw new BusinessException("会员必须绑定手机或实体卡才能下单", WxOrderError.WX_INSERT_ORDER_NOT_ALLOW);
 			}
+			wxOrder.setMember(members.get(0));
 		}
 		
 		//Make the previous inside committed orders invalid.
-		for(WxOrder order : getByCond(dbCon, staff, new ExtraCond().setWeixin(wxOrder.getWeixinSerial()).setType(WxOrder.Type.INSIDE).addStatus(WxOrder.Status.COMMITTED), null)){
+		for(WxOrder order : getByCond(dbCon, staff, new ExtraCond().setMember(wxOrder.getMember()).setType(WxOrder.Type.INSIDE).addStatus(WxOrder.Status.COMMITTED), null)){
 			try{
 				update(dbCon, staff, new WxOrder.UpdateBuilder(order.getId()).setStatus(WxOrder.Status.INVALID));
 			}catch(BusinessException ignored){
@@ -218,7 +228,7 @@ public class WxOrderDao {
 	public static int insert(DBCon dbCon, Staff staff, WxOrder.InsertBuilder4Takeout builder) throws SQLException, BusinessException{
 		WxOrder wxOrder = builder.build();
 		
-		Member member = MemberDao.getByWxSerial(dbCon, staff, wxOrder.getWeixinSerial());
+		Member member = MemberDao.getByWxSerial(dbCon, staff, builder.getWxSerial());
 		if(TakeoutAddressDao.getByCond(dbCon, staff, new TakeoutAddressDao.ExtraCond().setMember(member).setId(wxOrder.getTakeoutAddress().getId())).isEmpty()){
 			throw new BusinessException("外卖地址信息不属于此会员", WxOrderError.WX_TAKE_OUT_ORDER_NOT_ALLOW);
 		}
@@ -247,10 +257,13 @@ public class WxOrderDao {
 		
 		String sql;
 		
-		//Check to see whether the member to this weixin serial exist.
-		if(MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(wxOrder.getWeixinSerial()), null).isEmpty()){
-			throw new BusinessException("微信序列号对应的会员不存在", MemberError.MEMBER_NOT_EXIST);
-		}
+//		//Check to see whether the member to this weixin serial exist.
+//		final List<Member> result = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(wxOrder.getWeixinSerial()), null);
+//		if(result.isEmpty()){
+//			throw new BusinessException("微信序列号对应的会员不存在", MemberError.MEMBER_NOT_EXIST);
+//		}else{
+//			wxOrder.setMember(result.get(0));
+//		}
 		
 		//Generate the operation code.
 		sql = " SELECT IFNULL(MAX(code) + 1, 100) FROM " + Params.dbName + ".weixin_order WHERE restaurant_id = " + staff.getRestaurantId();
@@ -263,12 +276,11 @@ public class WxOrderDao {
 		
 		//Insert the weixin order.
 		sql = " INSERT INTO " + Params.dbName + ".`weixin_order` " +
-			  " (restaurant_id, table_id, weixin_serial, weixin_serial_crc, birth_date, status, type, code) " +
+			  " (restaurant_id, table_id, member_id, birth_date, status, type, code) " +
 			  " VALUES( " +
 			  staff.getRestaurantId() + ","	+
 			  (wxOrder.hasTable() ? wxOrder.getTable().getId() : " NULL ") + "," +
-			  "'" + wxOrder.getWeixinSerial() + "'," +
-			  "CRC32('" + wxOrder.getWeixinSerial() + "'),"	+
+			  wxOrder.getMember().getId() + "," +
 			  " NOW(), " +
 			  wxOrder.getStatus().getVal() + "," +
 			  wxOrder.getType().getVal() + "," +
@@ -325,6 +337,12 @@ public class WxOrderDao {
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WxOrderError.WX_ORDER_NOT_EXIST);
+		}
+		
+		if(wxOrder.getStatus() == WxOrder.Status.ORDER_ATTACHED){
+			//Count the wx order amount after order attached.
+			Member member = MemberDao.getById(dbCon, staff, getById(dbCon, staff, wxOrder.getId()).getMember().getId());
+			MemberDao.update(dbCon, staff, new Member.UpdateBuilder(member.getId()).setWxOrderAmount(member.getWxOrderAmount() + 1));
 		}
 	}
 	
@@ -444,7 +462,7 @@ public class WxOrderDao {
 			wxOrder.addFood(of);
 		}
 		dbCon.rs.close();
-		wxOrder.setMember(MemberDao.getByWxSerial(dbCon, staff, wxOrder.getWeixinSerial()));
+		wxOrder.setMember(MemberDao.getById(dbCon, staff, wxOrder.getMember().getId()));
 		if(wxOrder.hasTable()){
 			try{
 				wxOrder.setTable(TableDao.getById(dbCon, staff, wxOrder.getTable().getId()));
@@ -508,7 +526,7 @@ public class WxOrderDao {
 			wxOrder.setCode(dbCon.rs.getInt("code"));
 			wxOrder.setOrderId(dbCon.rs.getInt("order_id"));
 			wxOrder.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
-			wxOrder.setWeixinSerial(dbCon.rs.getString("weixin_serial"));
+			wxOrder.setMember(new Member(dbCon.rs.getInt("member_id")));
 			if(dbCon.rs.getInt("table_id") != 0){
 				wxOrder.setTable(new Table(dbCon.rs.getInt("table_id")));
 			}

@@ -366,6 +366,25 @@ uo.selectCancelReason = function(c){
  * 打开退菜操作
  */
 uo.openCancelFoodCmp = function(c){
+
+ 	//检查是否为小数
+	function checkDot(num){
+		if(!isNaN(num)){
+			num = num + ""; 
+		}
+		var dot = num.indexOf(".");
+		if(dot != -1){
+		    var dotCnt = num.substring(dot + 1, dot + 2);
+		    var dotCnt2 = num.substring(dot + 2);
+		    if(dotCnt >= 1 || dotCnt2 >= 1){
+		        return true;
+		    }else{
+		    	return false;
+		    }
+		}else{
+			return false;
+		}
+	}
 	//刷新原因界面
 	uo.loadCancelReasonData(uo.reasons);
 	

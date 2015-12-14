@@ -174,14 +174,24 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		private String idCard;				// 身份证
 		private String company;				// 公司
 		private String contactAddress;		// 联系地址
-		private int memberTypeId = -1;		// 会员类型编号
+		private int memberTypeId;			// 会员类型编号
 		private String memberCard;			// 会员卡号
 		private int referrerId;				// 推荐人
+		private int wxOrderAmount = -1;		// 微信订单数量
 		private String privateComment;		// 私人评论
 		private String publicComment;		// 公开评论
 		
 		public UpdateBuilder(int memberId){
 			this.memberId = memberId;
+		}
+		
+		public UpdateBuilder setWxOrderAmount(int wxOrderAmount){
+			this.wxOrderAmount = wxOrderAmount;
+			return this;
+		}
+		
+		public boolean isWxOrderAmountChanged(){
+			return this.wxOrderAmount != 0;
 		}
 		
 		public UpdateBuilder setReferrer(int staffId){
@@ -222,7 +232,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}
 		
 		public boolean isMemberTypeChanged(){
-			return this.memberTypeId >= 0;
+			return this.memberTypeId != 0;
 		}
 		
 		public UpdateBuilder setSex(Sex sex){
@@ -393,10 +403,11 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private long createDate;			// 创建时间
 	private MemberType memberType;		// 会员类型
 	private String memberCard;			// 会员卡号
-	private String referrer;		// 推荐人
-	private int referrerId;		// 推荐人Id
+	private String referrer;			// 推荐人
+	private int referrerId;				// 推荐人Id
+	private int wxOrderAmount;			// 微信订单数量
 	
-	private WxMember weixin;		// 微信信息
+	private WxMember weixin;			// 微信信息
 	//Ta喜欢的菜品
 	private final List<Food> favorFoods = new ArrayList<Food>();
 	//向Ta推荐的菜品
@@ -467,6 +478,9 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}
 		if(builder.isReferrerChanged()){
 			setReferrerId(builder.referrerId);
+		}
+		if(builder.isWxOrderAmountChanged()){
+			setWxOrderAmount(builder.wxOrderAmount);
 		}
 	}
 	
@@ -1181,6 +1195,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	public boolean hasReferrer(){
 		return this.referrerId != 0;
+	}
+	
+	public void setWxOrderAmount(int wxOrderAmount){
+		this.wxOrderAmount = wxOrderAmount;
+	}
+
+	public int getWxOrderAmount(){
+		return this.wxOrderAmount;
 	}
 	
 	public void addPublicComment(MemberComment comment){
