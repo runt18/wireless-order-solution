@@ -15,12 +15,15 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
+import com.wireless.db.member.MemberDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.finance.WeixinFinanceDao;
+import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
@@ -107,6 +110,7 @@ public class WxQueryDeptAction extends DispatchAction{
 		try{
 			
 			final String fid = request.getParameter("fid");
+			final String oid = request.getParameter("oid");
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
@@ -116,6 +120,19 @@ public class WxQueryDeptAction extends DispatchAction{
 				Kitchen star = new Kitchen(-10);
 				star.setName("明星菜");
 				list.add(star);
+			}
+			
+			Member member = MemberDao.getById(staff, WxMemberDao.getBySerial(staff, oid).getMemberId());
+			if(!member.getFavorFoods().isEmpty()){
+				Kitchen favor = new Kitchen(-9);
+				favor.setName("我的最爱");
+				list.add(favor);
+			}
+			
+			if(!member.getRecommendFoods().isEmpty()){
+				Kitchen recommend = new Kitchen(-8);
+				recommend.setName("为你推荐");
+				list.add(recommend);
 			}
 			
 			list.addAll(KitchenDao.getByCond(staff, new KitchenDao.ExtraCond().setContainsImage(true), null));
