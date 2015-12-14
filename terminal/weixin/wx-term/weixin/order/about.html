@@ -26,10 +26,13 @@ $(function(){
 		},
 		success : function(data, status, xhr){
 			if(data.success){
-				console.log($('#divInfoContent').height());
-				$('#divInfoContent').html('<object data="http://www.baidu.com"/>');		        
-				//$('#divInfoContent').load('http://view.news.qq.com/original/intouchtoday/n3364.html');
-				//Util.getDom('divInfoContent').innerHTML = data.other.info;
+					var RegUrl = new RegExp(); 
+					RegUrl.compile("^[A-Za-z]+://[A-Za-z0-9-_]+\\.[A-Za-z0-9-_%&\?\/.=]+$");
+					if (!RegUrl.test(data.other.info)) { 
+						$('#divInfoContent').html('<object height="'+ document.documentElement.clientHeight +'" width="'+ document.documentElement.clientWidth +'" data="http://www.baidu.com"/>');	
+					} else{
+						Util.getDom('divInfoContent').innerHTML = data.other.info;
+					}
 			}else{
 				alert(data.msg)
 				Util.getDom('divInfoContent').innerHTML = '暂无简介信息';
