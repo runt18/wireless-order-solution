@@ -286,7 +286,7 @@ Ext.onReady(function() {
 		});
 		
 		Ext.Ajax.request({
-			url : '../../QueryCoupon.do',
+			url : '../../OperateCoupon.do',
 			params : {
 				dataSource : 'status',
 				promotionId : promotionId 
@@ -294,9 +294,9 @@ Ext.onReady(function() {
 			success : function(res, opt){
 				var jr = Ext.decode(res.responseText);
 				if(jr.other){
-					Ext.getCmp('couponPublished').setText(jr.other.couponPublished + "人参与");
-					Ext.getCmp('couponDrawn').setText(jr.other.couponDrawn + "已领取");
-					Ext.getCmp('couponUsed').setText(jr.other.couponUsed + "已使用");
+					Ext.getCmp('couponIssued_text_promotionMgr').setText(jr.other.couponIssued + "人领取");
+					Ext.getCmp('couponUsed_text_promotionMgr').setText(jr.other.couponUsed + "已使用");
+					Ext.getCmp('couponExpired_text_promotionMgr').setText(jr.other.couponExpired + "已过期");
 				}
 			},
 			failure : function(res, opt){
@@ -339,7 +339,7 @@ Ext.onReady(function() {
 		'',
 		'',
 		'',
-		'../../QueryCoupon.do',
+		'../../OperateCoupon.do',
 		[
 			[true, false, false, true],
 			['会员名称', 'member.name'],
@@ -347,7 +347,7 @@ Ext.onReady(function() {
 			['状态', 'statusText', 125]
 		],
 		['member.name', 'member.mobile','statusText'],
-		[['isPaging', true],['dataSource', 'byCondtion']],
+		[['isPaging', true],['dataSource', 'getByCond']],
 		15,
 		'',
 		new Ext.Toolbar({
@@ -422,15 +422,15 @@ Ext.onReady(function() {
 						columnWidth : 0.33
 					},
 					items : [{
-						id : 'couponPublished',
+						id : 'couponIssued_text_promotionMgr',
 						xtype : 'label',
-						text : '5人参与'						
+						text : '5人领取'						
 					},{
-						id : 'couponDrawn',
+						id : 'couponUsed_text_promotionMgr',
 						xtype : 'label',
 						text : '2人领取优惠券'						
 					},{
-						id : 'couponUsed',
+						id : 'couponExpired_text_promotionMgr',
 						xtype : 'label',
 						text : '2张优惠劵已使用'						
 					},{

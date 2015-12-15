@@ -301,137 +301,153 @@ function operateOrderFoodTaste(c){
 		});
 		return;		
 	}	
-	
-	//套菜
-	if((of.selectedOrderFood.status & 1 << 5) != 0 && !c.comboFoodMoreTaste){
-		//获取对应菜品的常用口味并加载
-		$.ajax({
-			url : '../QueryFoodTaste.do',
-			type : 'post',
-			data : {foodID : of.selectedOrderFood.id},
-			async : false,
-			dataType : 'json',
-			success : function(rt){
-				 of.commonTastes = rt.root; 
-				 //获取对应菜品的多单位并加载				
-				 of.multiPrices = WirelessOrder.foods.getById(of.selectedOrderFood.id).multiUnitPrice; 
-			},
-			error : function(rt){}
-		});
-		
-		comboFoodTasteUnitLoad();
-		return;
+
+	var selectedOrderFood = of.newFood.getSelected();
+	//全单口味
+	if(c.type == 1){
+		of.selectedOrderFood = {};
+	}else{
+		of.selectedOrderFood = selectedOrderFood;
 	}
 	
+	if(selectedOrderFood){
+		//套菜
+		if(selectedOrderFood.isCombo() && !c.comboFoodMoreTaste){
+			//获取对应菜品的常用口味并加载
+			$.ajax({
+				url : '../QueryFoodTaste.do',
+				type : 'post',
+				data : {foodID : selectedOrderFood.id},
+				async : false,
+				dataType : 'json',
+				success : function(rt){
+					 of.commonTastes = rt.root; 
+					 //获取对应菜品的多单位并加载				
+					 of.multiPrices = selectedOrderFood.multiUnitPrice; 
+				},
+				error : function(rt){}
+			});
+			
+			comboFoodTasteUnitLoad();
+			return;
+		}
+		
+		
+		of.ot.allBill = c.type;
+		
+		//var selectedOrderFood = typeof of.newFood[foodContent.attr('data-index')] != 'undefined' ? of.newFood[foodContent.attr('data-index')] : of.newFood[0];
+		
+		if(c.type == 2 && selectedOrderFood.isTemp()){
+			Util.msg.alert({
+				msg : '临时菜不能选择口味.',
+				topTip : true
+			});
+			return;
+		}
+
+		
+		//存放选中口味
+		var foodTasteGroup = [];
+		//普通口味时
+		if(c.type == 2){
+			//获取常用口味组
+			if(of.commonTastes.length <= 0){
+				of.commonTastes = of.allTastes;
+			}
+			//关闭弹出常用口味 && 手写板
+			closeFoodCommonTaste();
+		
+			for (var i = 0; i < of.tasteGroups.length; i++) {
+				if(of.tasteGroups[i].id == -10){//表示常用
+					of.tasteGroups[i].name = '常用口味';
+					of.tasteGroups[i].items = of.commonTastes;
+				}
+			}
+			
+			//赋值给口味数据组
+			tastesDate = of.commonTastes;
+			of.ot.tasteGroupClick = true;
+			
+			if(typeof of.selectedOrderFood.tasteGroup != 'undefined'){
 	
-	of.ot.allBill = c.type;
-	
-	var selectedOrderFood = typeof of.newFood[foodContent.attr('data-index')] != 'undefined' ? of.newFood[foodContent.attr('data-index')] : of.newFood[0];
-	
-	if(c.type == 2 && typeof selectedOrderFood.isTemporary == 'boolean' && selectedOrderFood.isTemporary){
+				//是否为子菜
+				if((of.selectedOrderFood.status & 1 << 5) != 0 && chooseOrderFoodCommonTaste.curComboFoodId){
+					for (var j = 0; j < of.selectedOrderFood.combo.length; j++) {
+						var comboOrderFood = of.selectedOrderFood.combo[j];
+						if(chooseOrderFoodCommonTaste.curComboFoodId == comboOrderFood.comboFood.id){
+							//获取子菜的tasteGroup
+							var tg = comboOrderFood.tasteGroup.normalTasteContent.slice(0);
+							
+							for (var i = 0; i < tg.length; i++) {
+								foodTasteGroup.push({taste:tg[i]});
+							}
+							
+							//临时口味
+							if(typeof comboOrderFood.tasteGroup.tmpTaste != 'undefined'){
+								foodTasteGroup.push({taste : comboOrderFood.tasteGroup.tmpTaste});
+							}
+							
+						}
+					}
+					
+				}else{
+					//获取主菜或非套菜的tasteGroup
+					var tg = of.selectedOrderFood.tasteGroup.normalTasteContent.slice(0);
+					
+					for (var i = 0; i < tg.length; i++) {
+						foodTasteGroup.push({taste:tg[i]});
+					}
+					
+					//临时口味
+					if(typeof of.selectedOrderFood.tasteGroup.tmpTaste != 'undefined'){
+						foodTasteGroup.push({taste : of.selectedOrderFood.tasteGroup.tmpTaste});
+					}				
+				}
+			}	
+		}else{
+			//关闭更多控件
+			$('#orderFoodOtherOperateCmp').popup('close');
+			
+			for (var i = 0; i < of.tasteGroups.length; i++) {
+				if(of.tasteGroups[i].id == -10){//表示常用
+					of.tasteGroups[i].name = '所有口味';
+					of.tasteGroups[i].items = of.allTastes;
+				}
+			}		
+			if(of.ot.allBillTaste){
+				foodTasteGroup = foodTasteGroup.concat(of.ot.allBillTaste);
+				of.ot.tasteGroupClick = true;
+			}
+			tastesDate = of.allTastes;			
+		}
+		
+		//全单口味则只把全单类型的放入
+		of.ot.choosedTastes = foodTasteGroup;
+		
+		//初始化口味操作组件
+		initTasteGroupCmp();
+		initTasteCmp();
+		initChoosedTasteCmp();
+		
+		//单项口味不用延迟
+		if(c.type == 2){
+			$('#orderFoodTasteCmp').popup('open');
+	//		$('#orderFoodTasteCmp').parent().addClass("pop").addClass("in");		
+		}else{
+			//先关闭更多再打开全单口味
+			setTimeout(function(){
+				$('#orderFoodTasteCmp').popup('open');
+				//$('#orderFoodTasteCmp').parent().addClass("pop").addClass("in");
+			},500);		
+		}
+	}else{
 		Util.msg.alert({
-			msg : '临时菜不能选择口味.',
+			msg : '还未选择菜品',
 			topTip : true
 		});
-		return;
 	}
-	//全单口味
-	of.selectedOrderFood = (c.type == 1 ? {} :selectedOrderFood);
 	
-	//存放选中口味
-	var foodTasteGroup = [];
-	//普通口味时
-	if(c.type == 2){
-		//获取常用口味组
-		if(of.commonTastes.length <= 0){
-			of.commonTastes = of.allTastes;
-		}
-		//关闭弹出常用口味 && 手写板
-		closeFoodCommonTaste();
-	
-		for (var i = 0; i < of.tasteGroups.length; i++) {
-			if(of.tasteGroups[i].id == -10){//表示常用
-				of.tasteGroups[i].name = '常用口味';
-				of.tasteGroups[i].items = of.commonTastes;
-			}
-		}
-		
-		//赋值给口味数据组
-		tastesDate = of.commonTastes;
-		of.ot.tasteGroupClick = true;
-		
-		if(typeof of.selectedOrderFood.tasteGroup != 'undefined'){
 
-			//是否为子菜
-			if((of.selectedOrderFood.status & 1 << 5) != 0 && chooseOrderFoodCommonTaste.curComboFoodId){
-				for (var j = 0; j < of.selectedOrderFood.combo.length; j++) {
-					var comboOrderFood = of.selectedOrderFood.combo[j];
-					if(chooseOrderFoodCommonTaste.curComboFoodId == comboOrderFood.comboFood.id){
-						//获取子菜的tasteGroup
-						var tg = comboOrderFood.tasteGroup.normalTasteContent.slice(0);
-						
-						for (var i = 0; i < tg.length; i++) {
-							foodTasteGroup.push({taste:tg[i]});
-						}
-						
-						//临时口味
-						if(typeof comboOrderFood.tasteGroup.tmpTaste != 'undefined'){
-							foodTasteGroup.push({taste : comboOrderFood.tasteGroup.tmpTaste});
-						}
-						
-					}
-				}
-				
-			}else{
-				//获取主菜或非套菜的tasteGroup
-				var tg = of.selectedOrderFood.tasteGroup.normalTasteContent.slice(0);
-				
-				for (var i = 0; i < tg.length; i++) {
-					foodTasteGroup.push({taste:tg[i]});
-				}
-				
-				//临时口味
-				if(typeof of.selectedOrderFood.tasteGroup.tmpTaste != 'undefined'){
-					foodTasteGroup.push({taste : of.selectedOrderFood.tasteGroup.tmpTaste});
-				}				
-			}
-		}	
-	}else{
-		//关闭更多控件
-		$('#orderFoodOtherOperateCmp').popup('close');
-		
-		for (var i = 0; i < of.tasteGroups.length; i++) {
-			if(of.tasteGroups[i].id == -10){//表示常用
-				of.tasteGroups[i].name = '所有口味';
-				of.tasteGroups[i].items = of.allTastes;
-			}
-		}		
-		if(of.ot.allBillTaste){
-			foodTasteGroup = foodTasteGroup.concat(of.ot.allBillTaste);
-			of.ot.tasteGroupClick = true;
-		}
-		tastesDate = of.allTastes;			
-	}
-	
-	//全单口味则只把全单类型的放入
-	of.ot.choosedTastes = foodTasteGroup;
-	
-	//初始化口味操作组件
-	initTasteGroupCmp();
-	initTasteCmp();
-	initChoosedTasteCmp();
-	
-	//单项口味不用延迟
-	if(c.type == 2){
-		$('#orderFoodTasteCmp').popup('open');
-//		$('#orderFoodTasteCmp').parent().addClass("pop").addClass("in");		
-	}else{
-		//先关闭更多再打开全单口味
-		setTimeout(function(){
-			$('#orderFoodTasteCmp').popup('open');
-			//$('#orderFoodTasteCmp').parent().addClass("pop").addClass("in");
-		},500);		
-	}
 	
 
 }
@@ -964,7 +980,7 @@ of.ot.saveOrderFoodTaste = function(){
 		of.ot.allBillTaste = of.ot.choosedTastes;
 		for(var i = 0; i < of.newFood.length; i++){
 			
-			if(typeof of.newFood[i].isTemporary == 'undefined'){//临时菜无口味
+			if(!of.newFood[i].isTemp()){//临时菜无口味
 				
 				//全单口味应该是拼接普通口味
 				if(of.newFood[i].tasteGroup.tastePref == "无口味"){
@@ -2872,6 +2888,7 @@ $(function(){
 					topTip : true
 				});
 			}
+			of.initNewFoodContent();
 		}else{
 			Util.msg.tip('请选中一道菜品');
 		}
@@ -2881,37 +2898,46 @@ $(function(){
 	/**
 	 * 修改多单位
 	 */
-	function updateUnit(c){
+	function updateUnit(){
 		//关闭更多控件
 		$('#orderFoodOtherOperateCmp').popup('close');	
 		
-		//获取菜品多单位
-		var foodUnits = WirelessOrder.foods.getById(of.selectedOrderFood.id).multiUnitPrice;
-		if(foodUnits.length > 0){
-			//隐藏常用口味
-			$('#collapsibleCommonTaste').hide();
-			
-			var html = [];
-			for (var i = 0; i < foodUnits.length; i++) {
-				html.push(multiPriceCmpTemplet.format({
-					index : i,
-					id : foodUnits[i].id,
-					multiPrice : '¥' + foodUnits[i].price + " / " + foodUnits[i].unit,
-					theme : of.selectedOrderFood.foodUnit && of.selectedOrderFood.foodUnit.id == foodUnits[i].id ? "e" : "c"
-				}));		
-			}
-			
-			$("#divFloatFoodMultiPrices").html(html.join('')).trigger('create').find('.multiPriceCmp').each(function(index, element){
-				element.onclick = function(){
-					of.chooseOrderFoodUnit(element, foodUnits[$(element).attr('data-index')]);
-				};
-			});	
-			$('#collapsibleMultiPrice').show().trigger('expand');
-			
-			$('#txtChooosedFoodName').text(of.selectedOrderFood.name);
-									
+		var selectedFood = of.newFood.getSelected();
+		
+		if(selectedFood){
+			setTimeout(function(){
+				//获取菜品多单位
+				var foodUnits = WirelessOrder.foods.getById(selectedFood.id).multiUnitPrice;
+				if(foodUnits.length > 0){
+					//隐藏常用口味
+					$('#collapsibleCommonTaste').hide();
+					
+					var html = [];
+					for (var i = 0; i < foodUnits.length; i++) {
+						html.push(multiPriceCmpTemplet.format({
+							index : i,
+							id : foodUnits[i].id,
+							multiPrice : '¥' + foodUnits[i].price + " / " + foodUnits[i].unit,
+							theme : selectedFood.foodUnit && selectedFood.foodUnit.id == foodUnits[i].id ? 'e' : 'c'
+						}));		
+					}
+					
+					$("#divFloatFoodMultiPrices").html(html.join('')).trigger('create').find('.multiPriceCmp').each(function(index, element){
+						element.onclick = function(){
+							of.chooseOrderFoodUnit(element, foodUnits[$(element).attr('data-index')]);
+						};
+					});	
+					$('#collapsibleMultiPrice').show().trigger('expand');
+					
+					$('#txtChooosedFoodName').text(selectedFood.name);
+											
+				}else{
+					Util.msg.tip('此菜品无其他单位');
+				}
+			}, 250);
+
 		}else{
-			Util.msg.tip('此菜品无其他单位');
+			Util.msg.tip('无选中菜品');
 		}
 	};
 	
