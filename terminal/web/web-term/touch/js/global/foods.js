@@ -338,7 +338,7 @@ WirelessOrder.OrderFood = function(food, isTemporary){
 		}
 		if(typeof _orderFood.foodUnit === 'undefined' && _orderFood.hasFoodUnit()){
 			//菜品有多单位，并且未设置单位，则初始化菜品是首个单位价钱
-			_orderFood.setFoodUnit(food.getFoodUnit()[0]);
+			_orderFood.setFoodUnit(_orderFood.getFoodUnit()[0]);
 		}
 	}
 
