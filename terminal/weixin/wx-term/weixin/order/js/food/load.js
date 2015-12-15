@@ -26,7 +26,7 @@ $(function(){
 	
 	 //自助点餐
 	 var pickFoodComponent = new PickFoodComponent({
-		 confirm : function(orderFoodData){
+		 confirm : function(orderFoodData, comment){
 			 if(orderFoodData.length == 0){
 				 Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.', btn : 'yes'});
 				 return;
@@ -101,7 +101,8 @@ $(function(){
 												oid : Util.mp.oid,
 												fid : Util.mp.fid,
 												foods : foods,
-												tableAlias : $('#numberInput_a_load').text()
+												tableAlias : $('#numberInput_a_load').text(),
+												comment : comment
 //												qrCode :  res.resultStr
 											},
 											success : function(data, status, xhr){
@@ -144,6 +145,7 @@ $(function(){
 								fid : Util.mp.fid,
 								foods : foods,
 								tableAlias : res.resultStr.split('?')[1],
+								comment : comment,
 								qrCode :  res.resultStr.split('?')[0]
 							},
 							success : function(data, status, xhr){
