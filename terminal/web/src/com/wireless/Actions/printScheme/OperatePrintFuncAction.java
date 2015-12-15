@@ -192,6 +192,10 @@ public class OperatePrintFuncAction extends DispatchAction{
 				//客显
 				PrintFunc.Builder builder = Builder.new2ndDisplay(printerId);
 				PrintFuncDao.addFunc(dbCon, staff, builder);
+				
+			}else if(PType.valueOf(printType) == PType.PRINT_WX_ORDER){
+				//微信订单
+				PrintFuncDao.addFunc(dbCon, staff, Builder.newWxOrder(printerId));
 			}
 		
 			jobject.initTip(true, "操作成功, 已添加方案");

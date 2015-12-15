@@ -3,6 +3,7 @@ package com.wireless.Actions.couponMgr;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +21,8 @@ import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberCond;
@@ -182,6 +185,8 @@ public class OperateCouponAction extends DispatchAction{
 		final String operation = request.getParameter("operate");
 		final String associateId = request.getParameter("associateId");
 		final String expired = request.getParameter("expired");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
 		
 		JObject jObject = new JObject();
 		try{
@@ -189,6 +194,8 @@ public class OperateCouponAction extends DispatchAction{
 			if(status != null && !status.isEmpty()){
 				if(status.equalsIgnoreCase("issued")){
 					extraCond.setStatus(Coupon.Status.ISSUED);
+				}else if(Pattern.compile("[0-9]*").matcher(status).matches()){
+					extraCond.setStatus(Coupon.Status.valueOf(Integer.parseInt(status)));
 				}
 			}
 			
@@ -208,8 +215,12 @@ public class OperateCouponAction extends DispatchAction{
 				extraCond.isExpired(Boolean.parseBoolean(expired));
 			}
 			
-			jObject.setRoot(CouponDao.getByCond(staff, extraCond, null));
-			
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				jObject.setTotalProperty(CouponDao.getByCond(staff, extraCond.setOnlyAmount(true), null).size());
+				jObject.setRoot(CouponDao.getByCond(staff, extraCond.setOnlyAmount(false), " LIMIT " + start + ", " + limit));
+			}else{
+				jObject.setRoot(CouponDao.getByCond(staff, extraCond, null));
+			}
 		}catch(SQLException e){
 			jObject.initTip(e);
 			e.printStackTrace();
@@ -344,5 +355,47 @@ public class OperateCouponAction extends DispatchAction{
 		}
 		return null;
 	}
-	
+
+	/**
+	 * 优惠券使用情况
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward status(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
+		String pId = request.getParameter("promotionId");
+		
+		JObject jobject = new JObject();
+		try{
+			final int couponIssued = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.ISSUED).setOnlyAmount(true), null).size();
+			final int couponUsed = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.USED).setOnlyAmount(true), null).size();
+			final int couponExpired = CouponDao.getByCond(staff, new CouponDao.ExtraCond().isExpired(true), null).size();
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putInt("couponIssued", couponIssued);
+					jm.putInt("couponUsed", couponUsed);
+					jm.putInt("couponExpired", couponExpired);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jm, int flag) {
+				}
+				
+			});
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 }

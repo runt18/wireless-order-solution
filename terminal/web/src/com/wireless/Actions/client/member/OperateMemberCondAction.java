@@ -135,7 +135,9 @@ public class OperateMemberCondAction extends DispatchAction{
 			//设置时间段
 			builder.setRangeType(rangeType);
 			if(rangeType == RangeType.USER_DEFINE){
-				builder.setRange(memberCondBeginDate, memberCondEndDate);
+				if(memberCondBeginDate != null && !memberCondBeginDate.isEmpty() && memberCondEndDate != null && !memberCondEndDate.isEmpty()){
+					builder.setRange(memberCondBeginDate, memberCondEndDate);
+				}
 			}
 			
 			if(memberType != null && !memberType.isEmpty()){
