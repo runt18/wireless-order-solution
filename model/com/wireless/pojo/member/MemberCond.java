@@ -422,8 +422,8 @@ public class MemberCond implements Jsonable{
 			jm.putInt("memberType", this.memberType.getId() );
 		}
 		jm.putInt("rangeType", this.getRangeType().getVal());
-		jm.putString("beginDate", this.getRange().getOnDutyFormat(DateUtil.Pattern.DATE));
-		jm.putString("endDate", this.getRange().getOffDutyFormat(DateUtil.Pattern.DATE));
+		jm.putString("beginDate", this.getRange() != null ? this.getRange().getOnDutyFormat(DateUtil.Pattern.DATE) : null);
+		jm.putString("endDate", this.getRange()!= null ? this.getRange().getOffDutyFormat(DateUtil.Pattern.DATE) : null);
 		jm.putFloat("minConsumeMoney", this.minConsumeMoney);
 		jm.putFloat("maxConsumeMoney", this.maxConsumeMoney);
 		jm.putInt("minConsumeAmount", this.minConsumeAmount);
