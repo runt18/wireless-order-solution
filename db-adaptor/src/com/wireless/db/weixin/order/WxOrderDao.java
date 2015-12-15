@@ -276,7 +276,7 @@ public class WxOrderDao {
 		
 		//Insert the weixin order.
 		sql = " INSERT INTO " + Params.dbName + ".`weixin_order` " +
-			  " (restaurant_id, table_id, member_id, birth_date, status, type, code) " +
+			  " (restaurant_id, table_id, member_id, birth_date, status, type, code, comment) " +
 			  " VALUES( " +
 			  staff.getRestaurantId() + ","	+
 			  (wxOrder.hasTable() ? wxOrder.getTable().getId() : " NULL ") + "," +
@@ -284,7 +284,8 @@ public class WxOrderDao {
 			  " NOW(), " +
 			  wxOrder.getStatus().getVal() + "," +
 			  wxOrder.getType().getVal() + "," +
-			  code +
+			  code + "," +
+			  (wxOrder.hasComment() ? "'" + wxOrder.getComment() + "'" : " NULL ") +
 			  " ) ";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -518,6 +519,7 @@ public class WxOrderDao {
 			wxOrder.setRestaurant(dbCon.rs.getInt("restaurant_id"));
 			wxOrder.setStatus(WxOrder.Status.valueOf(dbCon.rs.getInt("status")));
 			wxOrder.setType(WxOrder.Type.valueOf(dbCon.rs.getInt("type")));
+			wxOrder.setComment(dbCon.rs.getString("comment"));
 			if(wxOrder.getType() == WxOrder.Type.TAKE_OUT){
 				TakeoutAddress address = new TakeoutAddress(dbCon.rs.getInt("address_id"));
 				address.setAddress(dbCon.rs.getString("address"));

@@ -45,7 +45,7 @@ public class TestWeixinOrderDao {
 			OrderFood of2 = new OrderFood(foods.get(1));
 			of2.setCount(2);
 			
-			WxOrder.InsertBuilder4Inside insertBuilder = new WxOrder.InsertBuilder4Inside(WEIXIN_MEMBER_SERIAL).add(of1).add(of2);
+			WxOrder.InsertBuilder4Inside insertBuilder = (WxOrder.InsertBuilder4Inside)new WxOrder.InsertBuilder4Inside(WEIXIN_MEMBER_SERIAL).add(of1).add(of2).setComment("测试备注");
 			wxOrderId = WxOrderDao.insert(mStaff, insertBuilder);
 			
 			WxOrder expected = insertBuilder.build();
@@ -55,6 +55,7 @@ public class TestWeixinOrderDao {
 			Assert.assertEquals("restaurant to wx order", mStaff.getRestaurantId(), actual.getRestaurantId());
 			Assert.assertEquals("status to wx order", expected.getStatus(), actual.getStatus());
 			Assert.assertEquals("type to wx order", expected.getType(), actual.getType());
+			Assert.assertEquals("comment to wx order", expected.getComment(), actual.getComment());
 			for(OrderFood of : expected.getFoods()){
 				int index = actual.getFoods().indexOf(of);
 				Assert.assertTrue(of.getName() + " does NOT contain in wx order", index >= 0);
