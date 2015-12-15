@@ -268,15 +268,9 @@ public class MemberCondDao {
 				memberCond.setRange(new DutyRange(c.getTime().getTime(), System.currentTimeMillis()));
 				
 			}else if(memberCond.getRangeType() == MemberCond.RangeType.USER_DEFINE){
-				long onDuty = 0;
-				if(dbCon.rs.getTimestamp("begin_date") != null){
-					onDuty = dbCon.rs.getTimestamp("begin_date").getTime();
+				if(dbCon.rs.getTimestamp("begin_date") != null && dbCon.rs.getTimestamp("end_date") != null){
+					memberCond.setRange(new DutyRange(dbCon.rs.getTimestamp("begin_date").getTime(), dbCon.rs.getTimestamp("end_date").getTime()));
 				}
-				long offDuty = 0;
-				if(dbCon.rs.getTimestamp("end_date") != null){
-					offDuty = dbCon.rs.getTimestamp("end_date").getTime();
-				}
-				memberCond.setRange(new DutyRange(onDuty, offDuty));
 			}
 			
 			memberCond.setMinBalance(dbCon.rs.getFloat("min_balance"));

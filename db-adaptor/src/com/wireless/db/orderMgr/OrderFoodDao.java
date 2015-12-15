@@ -843,52 +843,5 @@ public class OrderFoodDao {
 		return new ArchiveResult(archiveFrom, archiveTo, ofAmount, tgAmount);
 	}
 	
-//	static ArchiveResult archive(DBCon dbCon, Staff staff, String paidOrder) throws SQLException{
-//		
-//		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `operation`, `food_id`, `order_date`, `order_count`," + 
-//				"`unit_price`, `commission`, `name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
-//				"`discount`, `dept_id`, `kitchen_id`, " +
-//				"`food_unit_id`, `food_unit`, `food_unit_price`," +
-//				"`staff_id`, `waiter`, `is_temporary`, `is_paid`, `is_gift`";
-//
-//		String sql;
-//		
-//		//Move the records from today to history.
-//		sql = " INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ") " +
-//			  " SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food " +
-//			  " WHERE " +
-//			  " order_id IN ( " + paidOrder + " ) ";
-//		
-//		int orderAmount = dbCon.stmt.executeUpdate(sql);
-//		
-//		int maxId = 0;
-//		//Calculate the max order food id from both today and history.
-//		sql = " SELECT MAX(id) + 1 FROM (" +
-//			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_food " +
-//			  " UNION " +
-//			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_food_history) AS all_order_food";
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
-//		if(dbCon.rs.next()){
-//			maxId = dbCon.rs.getInt(1);
-//		}
-//		dbCon.rs.close();
-//		
-//		sql = " DELETE FROM " + Params.dbName + ".order_food WHERE restaurant_id = " + Restaurant.ADMIN;
-//		dbCon.stmt.executeUpdate(sql);
-//		
-//		//Insert the max id.
-//		sql = " INSERT INTO " + Params.dbName + ".order_food " +
-//			  " (id, restaurant_id) VALUES(" +
-//			  maxId + "," +
-//			  Restaurant.ADMIN + 
-//			  ")";
-//		dbCon.stmt.executeUpdate(sql);
-//		
-//		//Delete the paid order food from 'order_food' table.
-//		sql = " DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrder + ")";
-//		dbCon.stmt.executeUpdate(sql);
-//		
-//		return new ArchiveResult(maxId, orderAmount);
-//	}
 	
 }
