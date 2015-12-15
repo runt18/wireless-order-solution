@@ -160,6 +160,11 @@ public class WxOrder implements Jsonable, Parcelable{
 			return this;
 		}
 		
+		public InsertBuilder setComment(String comment){
+			this.order.setComment(comment);
+			return this;
+		}
+		
 		public InsertBuilder setTable(Table table){
 			this.table = table;
 			return this;
@@ -223,6 +228,7 @@ public class WxOrder implements Jsonable, Parcelable{
 	private Type type;
 	private Status status;
 	private int restaurantId;
+	private String comment;
 	private final List<OrderFood> foods = new ArrayList<OrderFood>();
 	private TakeoutAddress address;
 	
@@ -235,6 +241,7 @@ public class WxOrder implements Jsonable, Parcelable{
 	private WxOrder(InsertBuilder builder){
 		setType(builder.type);
 		setStatus(builder.status);
+		setComment(builder.order.comment);
 		setFoods(builder.order.getFoods());
 		setTable(builder.table);
 		if(builder.type == Type.TAKE_OUT){
@@ -309,6 +316,21 @@ public class WxOrder implements Jsonable, Parcelable{
 	
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+	
+	public String getComment(){
+		if(this.comment == null){
+			return "";
+		}
+		return this.comment;
+	}
+	
+	public void setComment(String comment){
+		this.comment = comment;
+	}
+	
+	public boolean hasComment(){
+		return getComment().length() > 0;
 	}
 	
 	public int getRestaurantId() {
@@ -389,6 +411,7 @@ public class WxOrder implements Jsonable, Parcelable{
 		jm.putInt("type", this.type.getVal());
 		jm.putInt("statusVal", this.status.getVal());
 		jm.putString("statusDesc", this.status.getDesc());
+		jm.putString("comment", this.comment);
 		jm.putJsonableList("foods", this.foods, 0);
 		jm.putJsonable("member", this.member, 0);
 		jm.putJsonable("table", this.table, 0);
