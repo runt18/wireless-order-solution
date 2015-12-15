@@ -300,7 +300,12 @@ Util.dialog = {
 		this.init(this.defineConfig);
 		this.box.style.display = 'block';
 		var view = this.box.firstChild;
-		view.style.marginTop = parseInt(view.offsetHeight / 2 * -1) + 'px';
+		if(c.top){
+			view.style.marginTop = parseInt(c.top) + 'px';
+		}else{
+			view.style.marginTop = parseInt(view.offsetHeight / 2 * -1) + 'px';
+		}
+		
 		$('#div-loadmask-m-dialog').height(document.body.clientHeight + 15);
 	}, 
 	hide : function(){

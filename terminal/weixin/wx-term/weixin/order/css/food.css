@@ -228,7 +228,7 @@ body{
 	overflow: hidden;
 	position: absolute;
 	width: 100%;
-/* 	height: auto !important; */
+ 	height: auto !important;
 	font-size: 13px;
 /* 	top: 0; */
 	left: 0;
@@ -336,12 +336,27 @@ color:#ff6600;
 	left: -100%;
 	width: 100%;
 	height: 100% ;
-	//-webkit-transform: translateX(-100%);
 }
+
+#comment_div_fastOrderFood{
+	z-index: 99999;
+	position: absolute;
+	top: 35px;
+	left: -100%;
+	width: 100%;
+	height: 100% ;
+}
+
 .d-fsa-img > div{
 	height: 230px;
 	background-size: 100% 100%;
 }
+
+.d-sss-img > div{
+	height: 140px;
+	background-size: 100% 100%;
+}
+
 .d-fsa-msg{
 	line-height: 30px;
 	background: #ffffff;
@@ -375,6 +390,26 @@ color:#ff6600;
     border-radius: 5px;
 }
 
+.commend-food-order{
+	/* width: 50px; */
+	height: 20px;	
+	position: absolute;
+	right: 2px;
+	bottom: 10px;	
+	font-size:18px;
+
+    background-color:#6fba26;
+    padding:5px;
+    font-family: 'Open Sans', sans-serif;
+    text-decoration:none;
+    color:#fff;
+    background-image: linear-gradient(bottom, rgb(100,170,30) 0%, rgb(129,212,51) 100%);
+    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 3px 0px 0px #156785, 0px 4px 4px #999;
+    border-radius: 5px;
+}
+
+
+
 .recommend-food-order:active {
     background-image: linear-gradient(bottom, rgb(100,170,30) 100%, rgb(129,212,51) 0%);
     box-shadow: inset 0px 1px 0px #2ab7ec, 0px 2px 0px 0px #156785, 0px 5px 3px #999;
@@ -382,19 +417,8 @@ color:#ff6600;
     text-shadow: 0px 1px 1px rgba(255,255,255,0.3);
     background: rgb(44,160,202);
 }
-.recommend-food-order:before {
-    background-color:#6fba26 ;
-    content:"";
-    display:block; 
-    position:absolute;
-    width:100%;
-    height:100%;
-    padding-left:2px;
-    padding-right:2px;
-    padding-bottom:4px;
-    left:-2px;
-    z-index:-1;
-    border-radius: 5px;
+.commend-food-detail{
+	height: 25px;background-color: #6fba26;width: 100%;padding-top: 3px;font-weight: bolder;color: white;font-size: 20px;
 }
 
 .recommend-food-detail{
@@ -579,6 +603,16 @@ color:#ff6600;
 
 .star-kitchen-name {
 	color: red !important;
+	font-size: 18px !important;
+}
+
+.favor-kitchen-name {
+	color: #26a9d0 !important;
+	font-size: 18px !important;
+}
+
+.recommend-kitchen-name {
+	color: yellow !important;
 	font-size: 18px !important;
 }
 
