@@ -53,6 +53,10 @@ public class WxOrderContent extends ConcreteContent {
 		
 		sb.append(new ExtraFormatDecorator("第" + (wxOrder.getMember().getWxOrderAmount() + 1) + "次下单", mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X)).append(SEP);
 		
+		if(wxOrder.hasComment()){
+			sb.append(new ExtraFormatDecorator("备注：" + wxOrder.getComment(), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X)).append(SEP);
+		}
+		
 		if(!wxOrder.getFoods().isEmpty()){
 			sb.append(mSeperatorLine);
 			for(OrderFood of: wxOrder.getFoods()){
