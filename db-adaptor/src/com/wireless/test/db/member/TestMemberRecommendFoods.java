@@ -18,6 +18,6 @@ public class TestMemberRecommendFoods {
 	
 	@Test
 	public void testMemberRecommendFoods() throws SQLException{
-		MemberDao.calcRecommendFoods();
+		System.out.println(MemberDao.calcRecommendFoods());
 	}
 }

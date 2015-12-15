@@ -134,7 +134,7 @@ public class CalcFoodAssociationDao {
 			dbCon.stmt.execute(sql);
 			
 			//Get the total order amount to this restaurant.
-			sql = " SET @food_id_to_calc = " + orderAmount + ";";
+			sql = " SET @total_order_amount = " + orderAmount + ";";
 			dbCon.stmt.execute(sql);
 			
 			//Get the probability to food.
