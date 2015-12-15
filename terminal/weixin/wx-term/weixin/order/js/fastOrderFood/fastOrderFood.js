@@ -167,7 +167,7 @@ function PickFoodComponent(param){
 		var kitchenBox = '<li><a data-value="{id}" href="#" data-type="kitchenBox" class={star}>{name}<div style="text-align:right;" id="kitchenFoodAmount_div_fastOrderFood"></div></a></li>';
 		Util.lm.show();
 		$.ajax({
-			url : '../../WxQueryDept.do',
+			url : '../../WxQueryDept.do', 
 			dataType : 'json',
 			type : 'post',
 			data : {
