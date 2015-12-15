@@ -49,6 +49,7 @@ public class WxOperateOrderAction extends DispatchAction {
 			final String fid = request.getParameter("fid");
 			final String foods = request.getParameter("foods");
 			final String tableAlias = request.getParameter("tableAlias");
+			final String comment = request.getParameter("comment");
 			final String qrCode = request.getParameter("qrCode");
 			
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
@@ -75,6 +76,10 @@ public class WxOperateOrderAction extends DispatchAction {
 						throw e;
 					}
 				}
+			}
+			
+			if(comment != null && !comment.isEmpty()){
+				builder.setComment(comment);
 			}
 			
 			if(foods != null && !foods.isEmpty()){

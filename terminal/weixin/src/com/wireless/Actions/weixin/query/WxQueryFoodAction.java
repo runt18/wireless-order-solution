@@ -41,7 +41,7 @@ public class WxQueryFoodAction extends DispatchAction{
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
-			List<Food> result = FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().setSellout(false).setRecomment(true).setContainsImage(true), " ORDER BY FOOD.food_alias");
+			List<Food> result = FoodDao.getByCond(staff, new FoodDao.ExtraCond().setSellout(false).setRecomment(true).setContainsImage(true), " ORDER BY FOOD.food_alias");
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				result = DataPaging.getPagingData(result, true, Integer.parseInt(start), Integer.parseInt(limit));
 			}
@@ -79,6 +79,10 @@ public class WxQueryFoodAction extends DispatchAction{
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			List<Food> result = MemberDao.getById(staff, WxMemberDao.getBySerial(staff, oid).getMemberId()).getFavorFoods();
+			
+			for(Food food : result){
+				food.copyFrom(FoodDao.getById(staff, food.getFoodId()));
+			}
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				result = DataPaging.getPagingData(result, true, Integer.parseInt(start), Integer.parseInt(limit));
@@ -119,6 +123,10 @@ public class WxQueryFoodAction extends DispatchAction{
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			List<Food> result = MemberDao.getById(staff, WxMemberDao.getBySerial(staff, oid).getMemberId()).getRecommendFoods();
+			
+			for(Food food : result){
+				food.copyFrom(FoodDao.getById(staff, food.getFoodId()));
+			}
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				result = DataPaging.getPagingData(result, true, Integer.parseInt(start), Integer.parseInt(limit));
