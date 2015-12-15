@@ -1150,7 +1150,7 @@ function showPanel(v){
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').hide();
 		Ext.getCmp('printCommentPanel').hide();
-//		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/fendan.jpg)';
+		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/2ndDisplay.jpg)';
 	}else{
 		Ext.getCmp('kitchens').hide();
 		Ext.getCmp('kitchensTree').hide();
