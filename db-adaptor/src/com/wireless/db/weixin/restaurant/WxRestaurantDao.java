@@ -153,6 +153,10 @@ public class WxRestaurantDao {
 			  (builder.isNickNameChanged() ? " ,nick_name = '" + wr.getNickName() + "'" : "") +
 			  (builder.isHeadImgUrlChanged() ? " ,head_img_url = '" + wr.getHeadImgUrl() + "'" : "") +
 			  (builder.isRefreshTokenChanged() ? " ,refresh_token = '" + wr.getRefreshToken() + "'" : "") +
+			  (builder.isPaymentTemplateChanged() ? " ,payment_template = '" + wr.getPaymentTemplate() + "'" : "") +
+			  (builder.isCouponDrawTemplateChanged() ? " ,coupon_draw_template = '" + wr.getCouponDrawTemplate() + "'" : "") +
+			  (builder.isCouponTimeoutTemplateChanged() ? " ,coupon_timeout_template = '" + wr.getCouponTimeoutTemplate() + "'" : "") +
+			  (builder.isChargeTemplateChanged() ? " ,charge_template = '" + wr.getChargeTemplate() + "'" : "") +
 			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
@@ -290,6 +294,7 @@ public class WxRestaurantDao {
 			wr.setPaymentTemplate(dbCon.rs.getString("payment_template"));
 			wr.setCouponDrawTemplate(dbCon.rs.getString("coupon_draw_template"));
 			wr.setCouponTimeoutTemplate(dbCon.rs.getString("coupon_timeout_template"));
+			wr.setChargeTemplate(dbCon.rs.getString("charge_template"));
 			result.add(wr);
 		}
 		dbCon.rs.close();
