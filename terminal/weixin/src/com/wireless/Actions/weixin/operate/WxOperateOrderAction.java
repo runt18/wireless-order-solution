@@ -32,7 +32,74 @@ import com.wireless.sccon.ServerConnector;
 public class WxOperateOrderAction extends DispatchAction {
 	
 	/**
-	 * 
+	 * 微信自助扫码下单
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward self(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		final JObject jObject = new JObject();
+		try{
+			//final String oid = request.getParameter("oid");
+			final String fid = request.getParameter("fid");
+			final String wxOrderId = request.getParameter("wid");
+			final String tableAlias = request.getParameter("tableAlias");
+			final String qrCode = request.getParameter("qrCode");
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			
+			//检查二维码是否正确
+			if(qrCode != null && !qrCode.isEmpty()){
+				if(WxRestaurantDao.getByCond(staff, new WxRestaurantDao.ExtraCond().setQrCode(qrCode), null).isEmpty()){
+					throw new BusinessException("扫描的二维码不正确");
+				}
+			}
+			
+			final WxOrder.UpdateBuilder builder = new WxOrder.UpdateBuilder(Integer.parseInt(wxOrderId));
+			
+			//检查餐台号是否存在
+			if(tableAlias != null && !tableAlias.isEmpty()){
+				try{
+					builder.setTable(TableDao.getByAlias(staff, Integer.parseInt(tableAlias)));
+				}catch(BusinessException e){
+					if(e.equals(TableError.TABLE_NOT_EXIST)){
+						throw new BusinessException("对不起，您输入的餐台号不存在");
+					}else{
+						throw e;
+					}
+				}
+			}
+			
+			WxOrderDao.update(staff, builder);
+			
+			//打印微信账单
+			ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildWxOrder(staff, Integer.parseInt(wxOrderId)).build());
+			if(resp.header.type == Type.ACK){
+				jObject.initTip(true, "自助扫码下单成功(完成打印)");
+			}else{
+				jObject.initTip(true, "自助扫码下单成功");
+			}
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 微信自助单餐下单
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -98,14 +165,6 @@ public class WxOperateOrderAction extends DispatchAction {
 			
 			final int wxOrderId = WxOrderDao.insert(staff, builder);
 			jObject.setExtra(WxOrderDao.getById(staff, wxOrderId));
-			
-			//打印微信账单
-			ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildWxOrder(staff, wxOrderId).build());
-			if(resp.header.type == Type.ACK){
-				jObject.initTip(true, "下单成功(完成打印)");
-			}else{
-				jObject.initTip(true, "下单成功");
-			}
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
