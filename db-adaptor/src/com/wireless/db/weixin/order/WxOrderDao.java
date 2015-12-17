@@ -311,6 +311,27 @@ public class WxOrderDao {
 		
 		return wxOrderId;
 	}
+
+	/**
+	 * Update the wx order according to specific builder {@link WxOrder#UpdateBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the update builder {@link WxOrder#UpdateBuilder}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the wx order to update does NOT exist
+	 */
+	public static void update(Staff staff, WxOrder.UpdateBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			update(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
 	/**
 	 * Update the wx order according to specific builder {@link WxOrder#UpdateBuilder}.
