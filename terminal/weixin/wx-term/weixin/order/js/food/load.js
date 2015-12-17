@@ -59,8 +59,8 @@ $(function(){
 				},
 				success : function(data, status, xhr){
 					 Util.dialog.show({
-						title : '请呼叫服务员确认订单',
-						leftText : '扫码下单',
+						title : '温馨提示',
+						leftText : '自助扫码',
 						callback : function(btn){
 		//					window.location.reload();
 		//					 $('#foodOrderList').click();
@@ -190,7 +190,7 @@ $(function(){
 							}); 
 						   }
 						}, 
-						msg : '<font style="font-weight:bold;font-size:25px;">订单号: ' + data.other.code + '</font>'
+						msg : '<font style="font-weight:bold;font-size:25px;color:blue;">订单号: ' + data.other.code + '</font><br><font style="color:green;">1.您可呼叫服务员来确认订单</font><br><font style="color:green;">2.您可选择自助扫描二维码下单</font>'
 					});
 				},
 				error : function(xhr, errorType, error){
