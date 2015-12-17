@@ -257,12 +257,13 @@ Util.dialog = {
 	id : 'div-loadmask-m-dialog',
 	tid : 'div-loadmask-m-dialog-t',
 	mid : 'div-loadmask-m-dialog-m',
+	bid : 'div-loadmask-m-dialog-b',
 //	btn : {yesno : '<button onclick="Util.dialog.event(\'yes\');">确定</button>&nbsp;&nbsp;<button onclick="Util.dialog.event(\'cancel\');">取消</button>', yes : '<button onclick="Util.dialog.event(\'yes\');">确定</button>'},
 	templet : '<div id="{id}" class="div-mask div-mask-dialog"><div class="dialog">'
 		+ '<div id={tid} class="dialog-title">{title}</div>'
 		+ '<div id={mid} class="dialog-msg">{msg}</div>'
 		+ '<div class="dialog-button">'
-			+  '<button onclick="Util.dialog.event(\'yes\');">{leftText}</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="dialog_cancel" onclick="Util.dialog.event(\'cancel\');">取消</button>'
+			+  '<button id={bid} onclick="Util.dialog.event(\'yes\');">确定</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="dialog_cancel" onclick="Util.dialog.event(\'cancel\');">取消</button>'
 		+ '</div>'
 		+ '</div>'
 		+ '</div>',
@@ -272,12 +273,13 @@ Util.dialog = {
 				id: Util.dialog.id,
 				tid: Util.dialog.tid,
 				mid: Util.dialog.mid,
-				leftText : c.leftText ? c.leftText : '确定'
+				bid : Util.dialog.bid
 			}));
 			this.box = Util.getDom(this.id);
 		}
 		Util.getDom(Util.dialog.tid).innerHTML = typeof c.title == 'string' ? c.title : '温馨提示';
 		Util.getDom(Util.dialog.mid).innerHTML = typeof c.msg == 'string' ? c.msg : '';
+		Util.getDom(Util.dialog.bid).innerHTML = typeof c.leftText == 'string' ? c.leftText : '确定';
 		if(c.dialogInit){
 			c.dialogInit(this.box.firstChild);
 		}

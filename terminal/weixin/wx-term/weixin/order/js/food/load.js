@@ -116,7 +116,7 @@ $(function(){
 																dataSource : 'self',
 																oid : Util.mp.oid,
 																fid : Util.mp.fid,
-																wxOrderId : data.other.code,
+																wid : data.other.id,
 																tableAlias : $('#numberInput_a_load').text(),
 																qrCode :  res.resultStr.split('?')[0]
 															},
@@ -128,6 +128,7 @@ $(function(){
 																	pickFoodComponent.closeShopping();
 																	
 																	Util.dialog.show({
+																		title : '温馨提示',
 																		msg : '下单成功',
 																		callback : function(btn){
 																			window.location.reload();
@@ -157,7 +158,7 @@ $(function(){
 												dataSource : 'self',
 												oid : Util.mp.oid,
 												fid : Util.mp.fid,
-												wxOrderId : data.other.code,
+												wid : data.other.id,
 												tableAlias : res.resultStr.split('?')[1],
 												qrCode :  res.resultStr.split('?')[0]
 											},
