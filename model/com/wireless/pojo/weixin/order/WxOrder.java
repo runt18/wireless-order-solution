@@ -98,6 +98,7 @@ public class WxOrder implements Jsonable, Parcelable{
 		private final int id;
 		private int orderId;
 		private Status status;
+		private int tableId;
 		
 		public UpdateBuilder(WxOrder wxOrder){
 			this.id = wxOrder.getId();
@@ -105,6 +106,20 @@ public class WxOrder implements Jsonable, Parcelable{
 		
 		public UpdateBuilder(int id){
 			this.id = id;
+		}
+		
+		public UpdateBuilder setTable(int tableId){
+			this.tableId = tableId;
+			return this;
+		}
+		
+		public UpdateBuilder setTable(Table table){
+			this.tableId = table.getId();
+			return this;
+		}
+		
+		public boolean isTableChanged(){
+			return this.tableId > 0;
 		}
 		
 		public UpdateBuilder setStatus(Status status){
@@ -236,6 +251,7 @@ public class WxOrder implements Jsonable, Parcelable{
 		setId(builder.id);
 		setStatus(builder.status);
 		setOrderId(builder.orderId);
+		setTable(new Table(builder.tableId));
 	}
 	
 	private WxOrder(InsertBuilder builder){
