@@ -191,7 +191,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}
 		
 		public boolean isWxOrderAmountChanged(){
-			return this.wxOrderAmount != 0;
+			return this.wxOrderAmount > 0;
 		}
 		
 		public UpdateBuilder setReferrer(int staffId){

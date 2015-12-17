@@ -19,6 +19,46 @@ public class WxRestaurant implements Jsonable{
 		private String qrCode;
 		private QrCodeStatus qrCodeStatus;
 		private String wxSerial;
+		private String paymentTemplate;
+		private String couponDrawTemplate;
+		private String couponTimeoutTemplate;
+		private String chargeTemplate;
+		
+		public UpdateBuilder setChargeTemplate(String template){
+			this.chargeTemplate = template;
+			return this;
+		}
+		
+		public boolean isChargeTemplateChanged(){
+			return this.chargeTemplate != null;
+		}
+		
+		public UpdateBuilder setPaymentTemplate(String template){
+			this.paymentTemplate = template;
+			return this;
+		}
+		
+		public boolean isPaymentTemplateChanged(){
+			return this.paymentTemplate != null;
+		}
+		
+		public UpdateBuilder setCouponDrawTemplate(String template){
+			this.couponDrawTemplate = template;
+			return this;
+		}
+		
+		public boolean isCouponDrawTemplateChanged(){
+			return this.couponDrawTemplate != null;
+		}
+		
+		public UpdateBuilder setCouponTimeoutTemplate(String template){
+			this.couponTimeoutTemplate = template;
+			return this;
+		}
+		
+		public boolean isCouponTimeoutTemplateChanged(){
+			return this.couponTimeoutTemplate != null;
+		}
 		
 		public boolean isWxSerialChanged(){
 			return this.wxSerial != null;
@@ -224,6 +264,7 @@ public class WxRestaurant implements Jsonable{
 	private String paymentTemplate;
 	private String couponDrawTemplate;
 	private String couponTimeoutTemplate;
+	private String chargeTemplate;
 	
 	private WxRestaurant(UpdateBuilder builder){
 		this.weixinLogo = builder.weixinLogo;
@@ -237,6 +278,10 @@ public class WxRestaurant implements Jsonable{
 		this.qrCode = builder.qrCode;
 		this.qrCodeStatus = builder.qrCodeStatus;
 		this.weixinSerial = builder.wxSerial;
+		this.paymentTemplate = builder.paymentTemplate;
+		this.couponDrawTemplate = builder.couponDrawTemplate;
+		this.couponTimeoutTemplate = builder.couponTimeoutTemplate;
+		this.chargeTemplate = builder.chargeTemplate;
 	}
 	
 	public WxRestaurant(int restaurantId){
@@ -433,6 +478,21 @@ public class WxRestaurant implements Jsonable{
 	
 	public boolean hasCouponTimeoutTemplate(){
 		return this.getCouponTimeoutTemplate().length() != 0;
+	}
+	
+	public void setChargeTemplate(String template){
+		this.chargeTemplate = template;
+	}
+	
+	public String getChargeTemplate(){
+		if(this.chargeTemplate == null){
+			return "";
+		}
+		return this.chargeTemplate;
+	}
+	
+	public boolean hasChargeTemplate(){
+		return getChargeTemplate().length() > 0;
 	}
 	
 	@Override
