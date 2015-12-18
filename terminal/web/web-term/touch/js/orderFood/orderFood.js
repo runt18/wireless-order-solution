@@ -1546,7 +1546,7 @@ $(function(){
 			if(data){
 				data.sort(byAlias);
 			}else{
-				data = WirelessOrder.foods;				
+				data = WirelessOrder.foods.slice(0).sort(byAlias);				
 			}
 		}
 			
