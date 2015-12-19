@@ -106,6 +106,9 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	//the price plan to this order food
 	private PricePlan mPricePlan;
+
+	//the plan price to this order food
+	private float mPlanPrice;
 	
 	//the unit to this order food
 	private FoodUnit mFoodUnit;
@@ -484,6 +487,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		this.mTasteGroup = src.mTasteGroup;
 		this.mFoodUnit = src.mFoodUnit;
 		this.mPricePlan = src.mPricePlan;
+		this.mPlanPrice = src.mPlanPrice;
 	}
 	
 	public void clearTasetGroup(){
@@ -594,6 +598,14 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	public boolean isRepaid(){
 		return isRepaid;
+	}
+
+	public void setPlanPrice(float planPrice){
+		this.mPlanPrice = planPrice;
+	}
+	
+	public float getPlanPrice(){
+		return this.mPlanPrice;
 	}
 	
 	void setPricePlan(PricePlan pricePlan){
