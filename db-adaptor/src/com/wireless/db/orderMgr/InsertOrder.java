@@ -219,7 +219,7 @@ public class InsertOrder {
 
 		//Insert the detail records to 'order_food' table.
 		for(OrderFood foodToInsert : orderToInsert.getOrderFoods()){
-			OrderFoodDao.insertExtra(dbCon, staff, new OrderFoodDao.ExtraBuilder(orderToInsert.getId(), foodToInsert));
+			OrderFoodDao.insertExtra(dbCon, staff, new OrderFoodDao.ExtraBuilder(orderToInsert, foodToInsert));
 		}
 		
 		//Associated the weixin order.

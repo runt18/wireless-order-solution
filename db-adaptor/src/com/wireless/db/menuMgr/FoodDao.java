@@ -671,19 +671,19 @@ public class FoodDao {
 		Food f = builder.build();
 		
 		//Check to see whether the food is used by unpaid order.
-		sql = " SELECT food_id " +
-			  " FROM " + Params.dbName + ".order_food OF " +
-			  " JOIN " + Params.dbName + ".order O ON 1 = 1 " + 
-			  " AND OF.order_id = O.id " +
-			  " AND O.restaurant_id = " + staff.getRestaurantId() +
-			  " AND O.status = " + Order.Status.UNPAID.getVal() +
-			  " WHERE OF.food_id = " + f.getFoodId() +
-			  " LIMIT 1 ";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			throw new BusinessException(FoodError.FOOD_IN_USED);
-		}
-		dbCon.rs.close();
+//		sql = " SELECT food_id " +
+//			  " FROM " + Params.dbName + ".order_food OF " +
+//			  " JOIN " + Params.dbName + ".order O ON 1 = 1 " + 
+//			  " AND OF.order_id = O.id " +
+//			  " AND O.restaurant_id = " + staff.getRestaurantId() +
+//			  " AND O.status = " + Order.Status.UNPAID.getVal() +
+//			  " WHERE OF.food_id = " + f.getFoodId() +
+//			  " LIMIT 1 ";
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		if(dbCon.rs.next()){
+//			throw new BusinessException(FoodError.FOOD_IN_USED);
+//		}
+//		dbCon.rs.close();
 		
 		//Check to see whether the alias is duplicated.
 		if(builder.isAliasChanged() && f.getAliasId() != 0){

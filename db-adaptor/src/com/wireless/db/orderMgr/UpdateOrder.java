@@ -176,12 +176,12 @@ public class UpdateOrder {
 		
 		//insert the extra order food records
 		for(OrderFood extraFood : diffResult.extraFoods){
-			OrderFoodDao.insertExtra(dbCon, staff, new OrderFoodDao.ExtraBuilder(diffResult.newOrder.getId(), extraFood).setPaid(!diffResult.oriOrder.isUnpaid()));
+			OrderFoodDao.insertExtra(dbCon, staff, new OrderFoodDao.ExtraBuilder(diffResult.newOrder, extraFood).setPaid(!diffResult.oriOrder.isUnpaid()));
 		}
 		
 		//insert the canceled order food records 
 		for(OrderFood cancelledFood : diffResult.cancelledFoods){
-			OrderFoodDao.insertCancelled(dbCon, staff, new OrderFoodDao.CancelBuilder(diffResult.newOrder.getId(), cancelledFood).setPaid(!diffResult.oriOrder.isUnpaid()));
+			OrderFoodDao.insertCancelled(dbCon, staff, new OrderFoodDao.CancelBuilder(diffResult.newOrder, cancelledFood).setPaid(!diffResult.oriOrder.isUnpaid()));
 		}
 		
 		/*

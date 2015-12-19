@@ -698,14 +698,15 @@ public class CalcBillStatisticsDao {
 	
 	private static String makeSql4CalcFood(Staff staff, DutyRange range, ExtraCond extraCond){
 		
-		return " SELECT " +
+		return (
+			   " SELECT " +
 			   " OF.order_id, OF.food_id, " +
  			   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
 			   " SUM(order_count) AS food_amount, " +
-			   " CASE WHEN OF.is_gift = 1 THEN (IF(OF.food_unit_price IS NULL, OF.unit_price, OF.food_unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
-			   " (IF(OF.food_unit_price IS NULL, OF.unit_price, OF.food_unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
-			   " CASE WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (IF(OF.food_unit_price IS NULL, OF.unit_price, OF.food_unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
-					" WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (IF(OF.food_unit_price IS NULL, OF.unit_price, OF.food_unit_price) * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
+			   " CASE WHEN OF.is_gift = 1 THEN ($(unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
+			   " ($(unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
+			   " CASE WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN ($(unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
+					" WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN ($(unit_price) * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
 				  	" ELSE 0 " +
 				  	" END AS food_income, " +
 			   " CASE WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
@@ -722,8 +723,10 @@ public class CalcBillStatisticsDao {
 			   (extraCond == null ? "" : extraCond.toString()) +
 			   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			   " GROUP BY OF.order_id, OF.food_id, OF.taste_group_id, OF.food_unit_id, OF.is_gift " +
-			   " HAVING food_amount > 0 ";
+			   " HAVING food_amount > 0 "
+			   ).replace("$(unit_price)", "IFNULL(OF.plan_price, IFNULL(OF.food_unit_price, OF.unit_price))");
 	}
+	
 	
 	/**
 	 * Calculate the income to each department according to extra condition.
