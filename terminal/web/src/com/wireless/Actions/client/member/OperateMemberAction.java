@@ -306,7 +306,12 @@ public class OperateMemberAction extends DispatchAction{
 				}
 			}
 			
-			final String serverName = request.getServerName();
+			final String serverName;
+			if(request.getServerName().equals("e-tones.net")){
+				serverName = "wx.e-tones.net";
+			}else{
+				serverName = request.getServerName();
+			}
 			//Perform to send the weixin charge msg to member.
 			new Thread(new Runnable(){
 				@Override
