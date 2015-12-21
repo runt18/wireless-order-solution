@@ -587,17 +587,16 @@ class OrderHandler implements Runnable{
 				//Perform to print the member receipt if settled by member.
 				printHandler.process(JobContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, staff, printers, lastOperation));
 				
-				//Perform to send the weixin msg to member.
-				try {
-					BaseAPI.doPost("http://wx.e-tones.net/wx-term/WxNotifyMember.do?dataSource=bill&orderId=" + order.getId() + "&staffId=" + staff.getId(), "");
-				} catch (Exception ignored) {
-					ignored.printStackTrace();
-				}
-				
 				//Perform SMS notification to member coupon dispatch & member upgrade in another thread so that not affect the order payment.
 				WirelessSocketServer.threadPool.execute(new Runnable(){
 					@Override
 					public void run() {
+						//Perform to send the weixin msg to member.
+						try {
+							BaseAPI.doPost("http://wx.e-tones.net/wx-term/WxNotifyMember.do?dataSource=bill&orderId=" + order.getId() + "&staffId=" + staff.getId(), "");
+						} catch (Exception ignored) {
+							ignored.printStackTrace();
+						}
 						
 						try{
 							//Perform the member upgrade

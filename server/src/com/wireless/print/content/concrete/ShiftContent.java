@@ -95,7 +95,7 @@ public class ShiftContent extends ConcreteContent {
 		var2.append(new Grid2ItemsContent("反结帐金额：" + mShiftDetail.getPaidIncome(), pos2Item, "帐单数：" + mShiftDetail.getPaidAmount(), getStyle()) + SEP);
 		var2.append(new Grid2ItemsContent("服务费金额：" + mShiftDetail.getServiceIncome(), pos2Item, "账单数：" + mShiftDetail.getServiceAmount(), getStyle()) + SEP);
 		var2.append(new Grid2ItemsContent("优惠券金额：" + mShiftDetail.getCouponIncome(), pos2Item, "账单数：" + mShiftDetail.getCouponAmount(), getStyle()) + SEP);
-		var2.append(new Grid2ItemsContent("会员优惠金额：" + mShiftDetail.getMemberPriceIncome(), pos2Item, "账单数：" + mShiftDetail.getMemberPriceAmount(), getStyle()));
+		//var2.append(new Grid2ItemsContent("会员优惠金额：" + mShiftDetail.getMemberPriceIncome(), pos2Item, "账单数：" + mShiftDetail.getMemberPriceAmount(), getStyle()));
 		mTemplate = mTemplate.replace(PVar.VAR_2, var2);
 
 		
