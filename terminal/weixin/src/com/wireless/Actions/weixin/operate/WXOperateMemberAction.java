@@ -44,23 +44,57 @@ public class WXOperateMemberAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		String openId = request.getParameter("oid");
+		String fromId = request.getParameter("fid");
+		try{
+
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			
+			List<Member> result = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setWeixinSerial(openId), null);
+			if(result.isEmpty()){
+				throw new BusinessException("对不起，没有找到此会员");
+			}else{
+				jobject.setRoot(MemberDao.getById(staff, result.get(0).getId()));
+			}
+			
+		}catch(SQLException | BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取微信会员信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward getInfo(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		DBCon dbCon = new DBCon();
 		String openId = request.getParameter("oid");
 		String fromId = request.getParameter("fid");
 		int rid = 0;
 		try{
 
-			dbCon.connect();
-			rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
+			rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
-			final Restaurant restaurant = RestaurantDao.getById(dbCon, rid);
+			final Restaurant restaurant = RestaurantDao.getById(rid);
 			
-			final Member member = MemberDao.getByWxSerial(dbCon, staff, openId);
-			member.setMemberType(MemberTypeDao.getById(dbCon, staff, member.getMemberType().getId()));
+			final Member member = MemberDao.getByWxSerial(staff, openId);
+			member.setMemberType(MemberTypeDao.getById(staff, member.getMemberType().getId()));
 			
 			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getAdminByRestaurant(rid), member.getId());
 			
@@ -117,7 +151,6 @@ public class WXOperateMemberAction extends DispatchAction {
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
