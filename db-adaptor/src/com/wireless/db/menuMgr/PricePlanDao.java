@@ -9,6 +9,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PricePlanError;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Role;
@@ -21,6 +22,7 @@ public class PricePlanDao {
 		private MemberType memberType;
 		private Role role;
 		private String roleCond;
+		private int orderId;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -37,6 +39,16 @@ public class PricePlanDao {
 			return this;
 		}
 		
+		public ExtraCond setOrder(Order order){
+			this.orderId = order.getId();
+			return this;
+		}
+		
+		public ExtraCond setOrder(int orderId){
+			this.orderId = orderId;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder(); 
@@ -50,6 +62,10 @@ public class PricePlanDao {
 			}
 			if(role != null){
 				extraCond.append(" AND price_plan_id IN(" + roleCond + ")");
+			}
+			if(orderId != 0){
+				String sql = " SELECT price_plan_id FROM " + Params.dbName + ".order WHERE id = " + orderId;
+				extraCond.append(" AND price_plan_id IN (" + sql + ")");
 			}
 			return extraCond.toString();
 		}

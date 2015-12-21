@@ -43,6 +43,15 @@ public class WxNotifyMemberAction extends DispatchAction{
 			//final Token token = Token.newInstance(appId, appSecret);
 			final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
 			final Token token = Token.newInstance(authorizerToken);
+			/**
+			 * {{first.DATA}}
+			 * 店面：{{keyword1.DATA}}
+			 * 充值时间：{{keyword2.DATA}}
+			 * 充值金额：{{keyword3.DATA}}
+			 * 赠送金额：{{keyword4.DATA}}
+			 * 可用余额：{{keyword5.DATA}}
+			 * {{remark.DATA}}
+			 */
 			Template.send(token, new Template.Builder()
 					.setToUser(wxMember.getSerial())
 					.setTemplateId(wxRestaurant.getChargeTemplate())
@@ -75,6 +84,15 @@ public class WxNotifyMemberAction extends DispatchAction{
 //			final Token token = Token.newInstance(appId, appSecret);
 			final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
 			final Token token = Token.newInstance(authorizerToken);
+			/**
+			 * {{first.DATA}}
+			 * 消费金额：{{keyword1.DATA}}
+			 * 消费门店：{{keyword2.DATA}}
+			 * 获得积分：{{keyword3.DATA}}
+			 * 当前积分：{{keyword4.DATA}}
+			 * 当前余额：{{keyword5.DATA}}
+			 * {{remark.DATA}}
+			 */
 			Template.send(token, new Template.Builder()
 					.setToUser(wxMember.getSerial())
 					//.setToUser("odgTwt4tqd_mu-q9EY02rqHrp_M0")

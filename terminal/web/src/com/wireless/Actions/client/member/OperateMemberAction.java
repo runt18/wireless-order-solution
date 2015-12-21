@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.marker.weixin.api.BaseAPI;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.member.MemberDao;
@@ -264,69 +265,70 @@ public class OperateMemberAction extends DispatchAction{
 	 */
 	public ActionForward charge(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		JObject jobject = new JObject();
+		JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String memberID = request.getParameter("memberID");
-			String rechargeMoney = request.getParameter("rechargeMoney");
-			String payMannerMoney = request.getParameter("payMannerMoney");
-			String rechargeType = request.getParameter("rechargeType");
-			String comment = request.getParameter("comment");
-			String isPrint = request.getParameter("isPrint");
-			String sendSms = request.getParameter("sendSms");
+			final String pin = (String)request.getAttribute("pin");
+			final String memberId = request.getParameter("memberID");
+			final String rechargeMoney = request.getParameter("rechargeMoney");
+			final String payMannerMoney = request.getParameter("payMannerMoney");
+			final String rechargeType = request.getParameter("rechargeType");
+			final String comment = request.getParameter("comment");
+			final String isPrint = request.getParameter("isPrint");
+			final String sendSms = request.getParameter("sendSms");
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			MemberOperation mo = MemberDao.charge(staff, Integer.valueOf(memberID), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
+			final MemberOperation mo = MemberDao.charge(staff, Integer.valueOf(memberId), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
 			mo.setComment(comment);
-			jobject.initTip(true, "操作成功, 会员充值成功.");
+			jObject.initTip(true, "操作成功, 会员充值成功.");
 			if(isPrint != null && Boolean.valueOf(isPrint)){
 				try{
 					ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildMemberReceipt(staff, mo.getId()).build());
 					if(resp.header.type == Type.ACK){
-						jobject.setMsg(jobject.getMsg() + "打印充值信息成功.");
+						jObject.setMsg(jObject.getMsg() + "打印充值信息成功.");
 					}else{
-						jobject.setMsg(jobject.getMsg() + "打印充值信息失败.");
+						jObject.setMsg(jObject.getMsg() + "打印充值信息失败.");
 					}
 				}catch(IOException e){
 					e.printStackTrace();
-					jobject.setMsg(jobject.getMsg() + "打印操作请求失败.");
+					jObject.setMsg(jObject.getMsg() + "打印操作请求失败.");
 				}
 			}
-/*			for(Cookie cookie : request.getCookies()){
-			    if(cookie.getName().equals((request.getServerName() + "_chargeSms"))){
-			    	if(cookie.getValue().equals("true")){
-						try{
-							//Send SMS.
-							SMS.send(staff, mo.getMemberMobile(), new Msg4Charge(mo));
-							jobject.setMsg(jobject.getMsg() + "充值短信发送成功.");
-						}catch(Exception e){
-							jobject.setMsg(jobject.getMsg() + "充值短信发送失败(" + e.getMessage() + ")");
-							e.printStackTrace();
-						}
-			    	}
-				    break;
-			    }
-			}*/
+			
 			if(sendSms != null && Boolean.valueOf(sendSms)){
 				try{
 					//Send SMS.
 					SMS.send(staff, mo.getMemberMobile(), new Msg4Charge(mo));
-					jobject.setMsg(jobject.getMsg() + "充值短信发送成功.");
+					jObject.setMsg(jObject.getMsg() + "充值短信发送成功.");
 				}catch(Exception e){
-					jobject.setMsg(jobject.getMsg() + "充值短信发送失败(" + e.getMessage() + ")");
+					jObject.setMsg(jObject.getMsg() + "充值短信发送失败(" + e.getMessage() + ")");
 					e.printStackTrace();
 				}
-			}			
+			}
+			
+			final String serverName = request.getServerName();
+			//Perform to send the weixin charge msg to member.
+			new Thread(new Runnable(){
+				@Override
+				public void run() {
+					try {
+						BaseAPI.doPost("http://" + serverName + "/wx-term/WxNotifyMember.do?dataSource=charge&moId=" + mo.getId() + "&staffId=" + staff.getId(), "");
+					} catch (Exception ignored) {
+						ignored.printStackTrace();
+					}
+				}
+				
+			}).run();
+
 			
 		}catch(BusinessException e){	
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

@@ -288,11 +288,11 @@ public class OperatePromotionAction extends DispatchAction{
 	}		
 	
 	public ActionForward getPromotionTree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
-		String pin = (String) request.getAttribute("pin");
+		final String pin = (String) request.getAttribute("pin");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		String rule = request.getParameter("rule");
+		final String rule = request.getParameter("rule");
 		
-		PromotionDao.ExtraCond extra = new PromotionDao.ExtraCond();
+		final PromotionDao.ExtraCond extra = new PromotionDao.ExtraCond();
 		if(rule != null && !rule.isEmpty() && !rule.equals("-1")){
 			extra.setRule(Promotion.Rule.valueOf(Integer.parseInt(rule)));
 		}
@@ -351,8 +351,8 @@ public class OperatePromotionAction extends DispatchAction{
 	}	
 	
 	private String children(Staff staff, PromotionDao.ExtraCond extra) throws SQLException, BusinessException{
-		List<Promotion> promotions = PromotionDao.getByCond(staff, extra);
-		StringBuilder sb = new StringBuilder();
+		final List<Promotion> promotions = PromotionDao.getByCond(staff, extra);
+		final StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < promotions.size(); i++) {
 			if(i > 0){
 				sb.append(",");

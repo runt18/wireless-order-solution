@@ -13,7 +13,6 @@ import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.menuMgr.FoodUnitDao;
 import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponOperationDao;
@@ -1099,28 +1098,10 @@ public class OrderDao {
 		
 		//Update each food's discount & unit price.
 		for(OrderFood of : order.getOrderFoods()){
-			Float foodUnitPrice = null;
-			if(of.hasFoodUnit() && order.hasPricePlan()){
-				if(of.asFood().getPricePlan().containsKey(order.getPricePlan())){
-					foodUnitPrice = of.asFood().getPrice(order.getPricePlan());
-				}else{
-					foodUnitPrice = FoodUnitDao.getById(dbCon, staff, of.getFoodUnit().getId()).getPrice();
-				}
-			}else if(of.hasFoodUnit() && !order.hasPricePlan()){
-				try{
-					foodUnitPrice = FoodUnitDao.getById(dbCon, staff, of.getFoodUnit().getId()).getPrice();
-				}catch(BusinessException ignored){
-				}
-			}else{
-				foodUnitPrice = null;
-			}
 			sql = " UPDATE " + Params.dbName + ".order_food " +
 				  " SET food_id = " + of.getFoodId() +
 				  " ,discount = " + of.getDiscount() + 
-				  " ,unit_price = " + of.asFood().getPrice(order.hasPricePlan() ? order.getPricePlan() : null) +
-				  //(of.hasFoodUnit() && order.hasPricePlan() ? " ,food_unit_price = " + of.asFood().getPrice(order.getPricePlan()) : "") +
-				  //(of.hasFoodUnit() && !order.hasPricePlan() ? " ,food_unit_price = " + FoodUnitDao.getById(dbCon, staff, of.getFoodUnit().getId()).getPrice() : "") +
-				  (foodUnitPrice != null ? " ,food_unit_price = " + foodUnitPrice.floatValue() : "") +
+				  " ,plan_price = " + (order.hasPricePlan() && of.asFood().hasPricePlan() ?  + of.asFood().getPrice(order.getPricePlan()) : " NULL ") +
 				  " WHERE order_id = " + order.getId() + 
 				  " AND food_id = " + of.getFoodId() +
 				  (of.hasFoodUnit() ? " AND food_unit_id = " + of.getFoodUnit().getId() : "");

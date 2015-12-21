@@ -44,20 +44,22 @@ public class WxRemindAction extends DispatchAction {
 			 * 待办工作：{{work.DATA}}
 			 * {{remark.DATA}}
 			 */
-			Status status = Template.send(token, new Template.Builder().setToUser(OPEN_ID_4_MARCO)
+			Status status;
+			status = Template.send(token, new Template.Builder().setToUser(OPEN_ID_4_MARCO)
 						.setTemplateId("UdyaL-jQJjC5aUh8A3VdeOrzkm2DQDZpUvny8kZ1kZ0")
 						.addKeyword(new Keyword("first", "餐厅活跃度异常")).addKeyword(new Keyword("work", work.toString())));
 			
 			status = Template.send(token, new Template.Builder().setToUser(OPEN_ID_4_VINCENT)
 					  						.setTemplateId("UdyaL-jQJjC5aUh8A3VdeOrzkm2DQDZpUvny8kZ1kZ0")
-					  						.addKeyword(new Keyword("first", "餐厅活跃度异常")).addKeyword(new Keyword("work", work.toString())));
+					  						.addKeyword(new Keyword("first", "餐厅活跃度异常"))
+					  						.addKeyword(new Keyword("work", work.toString())));
 			
 			response.getWriter().write(status.toString());
 		}
 		return null;
 	}
 	
-	private final static long FOUR_WEEKS = 3600 * 24 * 30 * 1000;
+	private final static long FOUR_WEEKS = 3600 * 24 * 30 * 1000L;
 	
 	public ActionForward expired(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -74,20 +76,21 @@ public class WxRemindAction extends DispatchAction {
 				work.append(restaurant.getName() + "(" + restaurant.getLiveness() + ")");
 			}
 		}
-		
 		if(work.length() != 0){
 			/**
 			 * {{first.DATA}}
 			 * 待办工作：{{work.DATA}}
 			 * {{remark.DATA}}
 			 */
-			Status status = Template.send(token, new Template.Builder().setToUser(OPEN_ID_4_MARCO)
+			Status status; 
+			status = Template.send(token, new Template.Builder().setToUser(OPEN_ID_4_MARCO)
 						.setTemplateId("UdyaL-jQJjC5aUh8A3VdeOrzkm2DQDZpUvny8kZ1kZ0")
 						.addKeyword(new Keyword("first", "1月内餐厅到期提醒")).addKeyword(new Keyword("work", work.toString())));
 
 			status = Template.send(token, new Template.Builder().setToUser(OPEN_ID_4_VINCENT)
 					  						.setTemplateId("UdyaL-jQJjC5aUh8A3VdeOrzkm2DQDZpUvny8kZ1kZ0")
-					  						.addKeyword(new Keyword("first", "1月内餐厅到期提醒")).addKeyword(new Keyword("work", work.toString())));
+					  						.addKeyword(new Keyword("first", "1月内餐厅到期提醒"))
+					  						.addKeyword(new Keyword("work", work.toString())));
 			
 			response.getWriter().write(status.toString());
 		}

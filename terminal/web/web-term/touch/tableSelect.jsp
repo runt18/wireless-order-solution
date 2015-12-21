@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
 <% 
-	float v = 1.7f; 
+	float v = 1.8f; 
 	response.setHeader("Pragma","No-cache"); 
 	response.setHeader("Cache-Control","no-cache"); 
 	response.setDateHeader("Expires", 0);  
@@ -863,7 +863,7 @@
             <li style="line-height: 40px;" id="btnWeighFood" onclick="uo.weighAction()"><a >称重</a></li>
             <li style="line-height: 40px;" id="btnGiftFood" onclick="uo.giftAction()"><a >赠送</a></li>
             <li style="line-height: 40px;" onclick="uo.hurriedFoodAction()"><a >催菜</a></li>
-            <li style="line-height: 40px;" id="addPrint_li_tableSelect"><a>补打</a></li> 
+            <!-- <li style="line-height: 40px;" id="addPrint_li_tableSelect"><a>补打</a></li>  -->
         </ul>
 	</div>		
 

@@ -15,6 +15,7 @@ import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.FoodDao.ExtraCond4Combo;
 import com.wireless.db.menuMgr.FoodDao.ExtraCond4Price;
 import com.wireless.db.menuMgr.FoodUnitDao;
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -280,6 +281,7 @@ public class OrderFoodDao {
 					" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.commission, OF.is_paid, " +
 					" OF.unit_price, OF.order_count, OF.staff_id, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
 					" OF.food_unit_id, OF.food_unit, OF.food_unit_price, " +
+					" IFNULL(OF.plan_price, -1) AS plan_price, " +
 					" OF.cancel_reason_id, IF(OF.cancel_reason_id = 1, '无原因', OF.cancel_reason) cancel_reason, " +
 					" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
 					" OF.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
@@ -297,6 +299,7 @@ public class OrderFoodDao {
 					" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.commission, OF.is_paid, " +
 					" OF.unit_price, OF.order_count, OF.staff_id, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
 					" OF.food_unit_id, OF.food_unit, OF.food_unit_price, " +
+					" IFNULL(OF.plan_price, -1) AS plan_price, " +
 					" OF.cancel_reason_id, OF.cancel_reason, " +
 					" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
 					" OF.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
@@ -345,6 +348,7 @@ public class OrderFoodDao {
 			}
 			
 			of.setCount(dbCon.rs.getFloat("order_count"));
+			of.setPlanPrice(dbCon.rs.getFloat("plan_price"));
 			of.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
 			of.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			of.setStaffId(dbCon.rs.getInt("staff_id"));
@@ -398,6 +402,7 @@ public class OrderFoodDao {
 			  " MIN(OF.id) AS id, MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_id) AS kitchen_id, " + 
 			  " MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
 			  " MAX(OF.food_unit) AS food_unit, MAX(OF.food_unit_price) AS food_unit_price, " +
+			  " IFNULL(MAX(OF.plan_price), -1) AS plan_price, " +
 			  " MAX(OF.unit_price) AS unit_price, MAX(OF.commission) AS commission, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
 			  " MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, MAX(OF.order_date) AS pay_datetime, SUM(OF.order_count) AS order_sum " +
 			  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " " + extraCond.orderFoodTblAlias +
@@ -413,6 +418,8 @@ public class OrderFoodDao {
 		final List<OrderFood> result = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood of = new OrderFood(dbCon.rs.getLong("id"));
+			of.setOrderId(dbCon.rs.getInt("order_id"));
+			of.setPlanPrice(dbCon.rs.getFloat("plan_price"));
 			of.asFood().setFoodId(dbCon.rs.getInt("food_id"));
 			of.asFood().setName(dbCon.rs.getString("name"));
 			of.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -470,10 +477,12 @@ public class OrderFoodDao {
 						of.addCombo(new ComboOrderFood(comboFood));
 					}
 				}
-				//Get the price plan
-				//of
 				//Get the detail to associated price plan.
 				of.asFood().setPricePlan(FoodDao.getPricePlan(dbCon, staff, new ExtraCond4Price(of.asFood())));
+				//使用下单时的价格作为方案价钱
+				if(of.getPlanPrice() >= 0){
+					of.asFood().addPricePlan(PricePlanDao.getByCond(dbCon, staff, new PricePlanDao.ExtraCond().setOrder(of.getOrderId())).get(0), of.getPlanPrice());
+				}
 			}
 			//Get the detail to taste group.
 			if(of.getTasteGroup() != null){
@@ -489,12 +498,12 @@ public class OrderFoodDao {
 	}
 	
 	static class ExtraBuilder{
-		private final int orderId;
+		private final Order order;
 		private final OrderFood extra;
 		private boolean isPaid = false;
 		
-		public ExtraBuilder(int orderId, OrderFood extra){
-			this.orderId = orderId;
+		public ExtraBuilder(Order order, OrderFood extra){
+			this.order = order;
 			this.extra = extra;
 			this.extra.setOperation(Operation.ADD);
 		}
@@ -545,6 +554,7 @@ public class OrderFoodDao {
 			  " ( " + 
 			  " `restaurant_id`, `order_id`, `operation`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 			  " `food_unit_id`, `food_unit`, `food_unit_price`, " +
+			  " `plan_price`, " +
 			  " `discount`, `taste_group_id`, " +
 			  " `dept_id`, `kitchen_id`, " +
 			  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, `is_gift`, " +
@@ -553,7 +563,7 @@ public class OrderFoodDao {
 			  " VALUES " +
 			  "(" +
 			  staff.getRestaurantId() + ", " +
-			  builder.orderId + ", " +
+			  builder.order.getId() + ", " +
 			  builder.extra.getOperation().getVal() + "," +
 			  builder.extra.getFoodId() + ", " +
 			  Math.abs(builder.extra.getDelta()) + ", " + 
@@ -564,6 +574,7 @@ public class OrderFoodDao {
 			  (builder.extra.hasFoodUnit() ? builder.extra.getFoodUnit().getId() : " NULL ") + "," +
 			  (builder.extra.hasFoodUnit() ? "'" + builder.extra.getFoodUnit().getUnit() + "'" : " NULL ") + "," +
 			  (builder.extra.hasFoodUnit() ? builder.extra.getFoodUnit().getPrice() : " NULL ") + "," +
+			  (builder.order.hasPricePlan() ? builder.extra.asFood().getPrice(builder.order.getPricePlan()) : " NULL") + "," +
 			  builder.extra.getDiscount() + ", " +
 			  (builder.extra.hasTasteGroup() ? builder.extra.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 			  builder.extra.getKitchen().getDept().getId() + ", " +
@@ -604,8 +615,8 @@ public class OrderFoodDao {
 		
 		private final CancelBuilder cancelBuilder;;
 		
-		public TransferBuilder(int orderId, OrderFood foodOut){
-			cancelBuilder = new CancelBuilder(orderId, foodOut);
+		public TransferBuilder(Order order, OrderFood foodOut){
+			cancelBuilder = new CancelBuilder(order, foodOut);
 			cancelBuilder.cancel.setOperation(Operation.TRANSFER);
 		}
 		
@@ -615,12 +626,12 @@ public class OrderFoodDao {
 	}
 	
 	static class CancelBuilder{
-		private final int orderId;
+		private final Order order;
 		private final OrderFood cancel;
 		private boolean isPaid = false;
 		
-		public CancelBuilder(int orderId, OrderFood cancel){
-			this.orderId = orderId;
+		public CancelBuilder(Order order, OrderFood cancel){
+			this.order = order;
 			this.cancel = cancel;
 		}
 		
@@ -637,11 +648,12 @@ public class OrderFoodDao {
 			  " ( " +
 			  " `restaurant_id`, `order_id`, `operation`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 			  " `food_unit_id`, `food_unit`, `food_unit_price`, " +
+			  " `plan_price`, " +
 			  " `discount`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`, " +
 			  " `dept_id`, `kitchen_id`, " +
 			  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, `is_gift`, `combo_id`) VALUES (" +
 			  staff.getRestaurantId() + ", " +
-			  builder.orderId + ", " +
+			  builder.order.getId() + ", " +
 			  builder.cancel.getOperation().getVal() + "," +
 			  builder.cancel.getFoodId() + ", " +
 			  "-" + Math.abs(builder.cancel.getDelta()) + ", " + 
@@ -652,6 +664,7 @@ public class OrderFoodDao {
 			  (builder.cancel.hasFoodUnit() ? builder.cancel.getFoodUnit().getId() : " NULL ") + "," +
 			  (builder.cancel.hasFoodUnit() ? "'" + builder.cancel.getFoodUnit().getUnit() + "'" : " NULL ") + "," +
 			  (builder.cancel.hasFoodUnit() ? builder.cancel.getFoodUnit().getPrice() : " NULL ") + "," +
+			  (builder.order.hasPricePlan() ? builder.cancel.asFood().getPrice(builder.order.getPricePlan()) : " NULL") + "," +
 			  builder.cancel.getDiscount() + ", " +
 			  (builder.cancel.hasTasteGroup() ? builder.cancel.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 			  (builder.cancel.hasCancelReason() ? builder.cancel.getCancelReason().getId() : CancelReason.NO_REASON) + ", " +
@@ -803,6 +816,7 @@ public class OrderFoodDao {
 				  " ( " + 
 				  " `restaurant_id`, `order_id`, `operation`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 				  " `food_unit_id`, `food_unit`, `food_unit_price`, " +
+				  " `plan_price`, " +
 				  " `discount`, `taste_group_id`, " +
 				  " `dept_id`, `kitchen_id`, " +
 				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, `is_gift`, " +
@@ -822,6 +836,7 @@ public class OrderFoodDao {
 				  (of.hasFoodUnit() ? of.getFoodUnit().getId() : " NULL ") + "," +
 				  (of.hasFoodUnit() ? "'" + of.getFoodUnit().getUnit() + "'" : " NULL ") + "," +
 				  (of.hasFoodUnit() ? of.getFoodUnit().getPrice() : " NULL ") + "," +
+				  (of.getPlanPrice() >= 0 ? of.getPlanPrice() : " NULL ") + "," +
 				  of.getDiscount() + ", " +
 				  tgId + "," +
 				  of.getKitchen().getDept().getId() + ", " +
