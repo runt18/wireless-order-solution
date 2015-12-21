@@ -60,6 +60,7 @@
 <script type="text/javascript" src="js/checkOut/checkOut.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/stopSet/stopSet.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/payment/payment.js?v=<%=v %>"></script>
+<script type="text/javascript" src="js/books/book.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/tableSelect/tableSelect.js?v=<%=v %>"></script>
 <!-- 共享数据 -->
 <script type="text/javascript" src="js/global/share.js?v=<%=v %>"></script>
@@ -74,6 +75,8 @@
 <!-- <script type="text/javascript" src="./js/popup/table/askTable.js"></script> -->
 <!-- JqmPopup弹出控件 -->
 <script type="text/javascript" src="./js/popup/jqmPopup.js?v=<%=v %>"></script>
+<!-- JqmPopupDiv弹出控件 -->
+<script type="text/javascript" src="./js/popup/jqmPopupDiv.js?v=<%=v %>"></script>
 <!-- issuePopup弹出控件 -->
 <script type="text/javascript" src="./js/popup/coupon/issuePopup.js?v=<%=v %>"></script>
 <!-- usepopup弹出控件 -->
@@ -94,6 +97,8 @@
 <script type="text/javascript" src="./js/popup/wxOrder/wxOrder.js"></script>
 <!-- 混合结账 -->
 <script type="text/javascript" src="./js/popup/mixedPay/mixedPay.js"></script>
+<!-- 添加预订信息 -->
+<script type="text/javascript" src="./js/popup/books/books.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -181,7 +186,7 @@
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="location.reload()" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="WxOrder_a_tableSelect">微定</a>
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.bookListEntry()">
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont"  onclick="ts.bookListEntry()">
 		 	<div>
 		 		<!-- 预订单数 -->
 		 		<div id="amount4Book" style="display:none;width:28px;height: 28px;border-radius: 14px;background-color: red;float: right;margin-top: -11px;line-height:28px;">0</div>
@@ -628,6 +633,9 @@
 <!-- 弹出框时, 挡住其他操作的div阴影 -->
 <div id="shadowForPopup" style="z-index: 1101;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%; background: #DDD;display: none;" ></div>
 
+
+
+
 <!-- 预订订单列表start -->
 <div data-role="page" id="bookOrderListMgr" data-theme="e">
 	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b" style="height: 40px;">
@@ -639,48 +647,45 @@
     	<tr>
     		<td style="width:10%;">
 			    <div style="padding: 0 10px" align="left" >
-					<fieldset data-role="controlgroup" data-type="horizontal" data-theme="b" style="width:400px;">
+					<fieldset id="daySelect_fieldset_tableSelect" data-role="controlgroup" data-type="horizontal" data-theme="b" style="width:400px;">
 						<label>
-				        	<input type="radio" name="bookDateType" data-type="bookDate_all" value="" checked="checked" onclick="ts.searchBookList()">全部
+				        	<input type="radio" name="bookDateType" data-type="bookDate_all" value="" checked="checked">全部
 				        </label>
 				        <label>
-				        	<input type="radio" name="bookDateType" id="bookDate_today" value="" onclick="ts.searchBookList()">今天
+				        	<input type="radio" id="bookDate_today" name="bookDateType" value="" >今天
 				        </label>
 				        <label>
-				        	<input type="radio" name="bookDateType" id="bookDate_tomorrow" value="" onclick="ts.searchBookList()">明天
+				        	<input type="radio" id="bookDate_tomorrow" name="bookDateType" value="">明天
 				        </label>
 				        <label>
-				        	<input type="radio" name="bookDateType" id="bookDate_afterday" value="" onclick="ts.searchBookList()">后天
+				        	<input type="radio" id="bookDate_afterday" name="bookDateType" value="">后天
 				        </label>
 				        <label>
-				        	<input type="radio" name="bookDateType" id="bookDate_conditionday" value="" onclick="ts.openConditionDay()">自定义
+				        	<input type="radio" name="bookDateType" data-type="condition" value="" id="openConditionDay_input_tableSelect">自定义
 				        </label>				        
 				    </fieldset>
 			    </div>	    		
     		</td>
-    		<td id="conditionDayBegin" style="width:15%;display: none">
-    			<input type="date" data-role="datebox" id="conditionDayBeginDay" data-type="neither" data-options='{"mode": "datebox"}' style="font-size: 12px;line-height: 30px;">
+    		<td id="conditionDayBegin_td_tableSelect" style="width:15%;display: none">
+    			<input type="date" data-role="datebox" id="conditionDayBeginDay_input_tableSelect" data-type="neither" data-options='{"mode": "datebox"}' style="font-size: 12px;line-height: 30px;">
     		</td>
-    		<td id="conditionDayEnd" style="width:15%;display: none;">
-    			<input type="date" data-role="datebox" id="conditionDayEndDay" data-type="neither" data-options='{"mode": "datebox"}' style="font-size: 12px;line-height: 30px;">
+    		<td id="conditionDayEnd_td_tableSelect" style="width:15%;display: none;">
+    			<input type="date" data-role="datebox" id="conditionDayEndDay_input_tableSelect" data-type="neither" data-options='{"mode": "datebox"}' style="font-size: 12px;line-height: 30px;">
     		</td>    		
     		<td style="width:15%;">
-    			<input type="text" id="searchBookPerson" placeholder="姓名">
+    			<input type="text" id="searchBookPerson_input_tableSelect" placeholder="姓名">
     		</td>
     		<td style="width:15%;">
-    			<input type="text" id="searchBookPhone" placeholder="电话" onkeypress="intOnly()">
+    			<input type="text" id="searchBookPhone_input_tableSelect" placeholder="电话" onkeypress="intOnly()">
     		</td>
     		<td style="line-height: 20px;padding: 0 3px;width:9%;">
-				<select  id="searchBookStatus" onchange="ts.searchBookList()" style="font-size: 20px;">
+				<select  id="searchBookStatus" style="font-size: 20px;">
 					<option value="-1">订单状态</option>
 					<option value="1">待确认</option>
 					<option value="2">待入座</option>
 					<option value="3">已入座</option>
 				</select>
     		</td>    		
-<!--     		<td style="text-align: right;width:10%;">
-    			<a data-role="button" onclick="ts.searchBookList()">搜索</a>
-    		</td> -->
     	</tr>
     </table>	
 	<div id="bookOrderListCmp" style="overflow-y: auto;">
@@ -720,11 +725,11 @@
 	</div>
 	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
 
-		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.bookListBack()">返回</a>
-		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.refreshBookList()">刷新</a>
+		 <a data-role="button" data-inline="true" class="bottomBtnFont" id="bookBack_a_tableSelect">返回</a>
+		 <a data-role="button" data-inline="true" class="bottomBtnFont" id="bookRefresh_a_tableSelect">刷新</a>
 		 
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.addBookInfo({type:'add'})">添加</a>
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="addBooksInfo">添加</a>
 			<a href="javascript: Util.to.scroll({content:'bookOrderListCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
 			<a href="javascript: Util.to.scroll({content:'bookOrderListCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>		 
 		 </div>
@@ -767,111 +772,6 @@
 	    	    
 	</div>	
 	
-	<!-- 添加预订 -->
-	<div id="addBookInfo" class="ui-overlay-shadow ui-corner-all" style="width:1000px;z-index: 1102;position: absolute; top: 20%; left: 50%; margin: -100px 0px 0px -450px;background-color: white;display: none;" align="center">	
-	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
-	        <span id="title4AddBook">填写预订</span>	
-        	<div id="btnCloseAddBook" style="float: right">
-  				<a onclick="ts.closeAddBookInfo()" data-role="button" data-corners="false" class="popupWinCloseBtn4Book">X</a>      		
-        	</div>			        	
-	    </div> 
-	    <div style="max-height: 600px;min-height: 225px;overflow-y: auto;">
-	    <table>
-	    	<tr>
-	    		<td class="readMemberTd">预订日期:</td>
-	    		<td><input type="date" data-role="datebox" id="add_bookDate" data-options='{"mode": "datebox"}' ></td>
-	    		
-	    		<td class="readMemberTd">预订时间:</td>
-	    		<td id="add_bookTimeBox"><input id="add_bookTime" class="bookTime" ></td>
-  	
-	    		<td class="readMemberTd">预留时长(单位/分钟):</td>
-	    		<td class="selectionCmp" style="line-height: 20px;padding: 0 3px;width: 100px;">
-					<input id="cm_bookReserved" onkeypress="intOnly()" > 
-	    		</td>  		  	
- 			
-	    	</tr>
-	    	<tr>
-	    		<td class="readMemberTd">预订人:</td>
-	    		<td><input id="add_bookPerson" ></td>    
-	    		
-	    		<td class="readMemberTd">预订电话:</td>
-	    		<td><input id="add_bookPhone" onkeypress="intOnly()" ></td>   
-	    		
-	    		<td class="readMemberTd">预订人数:</td>
-	    		<td><input id="add_bookAmount" onkeypress="intOnly()" ></td>     	    	
-	    	</tr>
-	    	<tr>
-	    		<td class="readMemberTd">经手人:</td>
-	    		<td>
-	    			<select  id="add_staff" style="font-size: 20px;">
-						<!-- <option value="29">管理员</option> -->
-					</select>	    		
-	    		</td>    
-	    		<td class="readMemberTd">类型:</td>
-	    		<td>
-	    			<select  id="cm_bookCate" style="font-size: 20px;">
-						<option value="散台">散台</option>
-						<option value="包间">包间</option>												
-						<option value="婚宴">婚宴</option>
-						<option value="寿宴">寿宴</option>
-						<option value="满月">满月</option>
-						<option value="年会">年会</option>
-						<option value="周岁">周岁</option>			
-						<option value="入学">入学</option>
-						<option value="生日">生日</option>
-					</select>	    		
-	    		</td>    
-	    		<td class="readMemberTd">订金:</td>
-	    		<td><input id="add_bookMoney" onkeypress="intOnly()"></td>   
-	    	</tr> 
-	    
-	    	<tr >
-	    		<td colspan="6" id="box4BookTableList" style="display:none;">
-	    			<table id="" data-theme="c" data-role="table" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr">
-						<caption style="font-weight: bold;color: black;margin-bottom: initial;">预定餐台列表( 点击餐台可取消选择 ):</caption>
-				         <tbody style="font-weight:bold;color: blue">
-				         <tr >
-	    					<td colspan="6" id="add_bookTableList">
-	    					</td>
-	    				</tr>	
-				         </tbody>
-				     </table>	
-						    			
-	    		</td>    
-	    	</tr>	  
-	    	<tr>
-	    		<td colspan="6" id="box4BookOrderFoodList" style="display:none;">
-					<table id="" data-theme="c" data-role="table" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr">
-						<caption style="font-weight: bold;color: black;margin-bottom: initial;">预定菜列表:</caption>
-				         <thead>
-				           <tr class="ui-bar-d">
-				             <th style="width: 5px;"></th>
-				             <th style="width: 25%;">菜名</th>
-				             <th >数量</th>
-				             <th style="width: 15%;">口味</th>
-				             <th >单价</th>
-				           </tr>
-				         </thead>
-				         <!-- 菜品列表 -->
-				         <tbody id="bookOrderFoodListBody" style="font-weight:bold;color: blue">
-				         </tbody>
-				     </table>	    		
-	    		</td>
-	    	</tr>
-	    	
-	    </table>
-	    <br>
-	    </div>
-		<div id="footer4AddBook" data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:25%" id="addBookTable_a_tableSelect">添加餐台</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:25%" onclick="ts.toOrderFoodPage()">菜品预订</a>				 
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:25%" onclick="ts.commitAddBook()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:24%" onclick="ts.closeAddBookInfo()">取消</a>		 
-			 </div>
-	    </div>	
-	</div>		
-		
 </div>
 <!-- end 预订订单列表 -->
 
@@ -1132,7 +1032,7 @@
 			 	<a onclick="Util.to.scroll({content:'divOrderFoodsCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>
 			 </div>
 			 <div data-role="controlgroup" class="ui-btn-right" data-type="horizontal">
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="addBookOrderFood" onclick="ts.bookFoodChooseFinish()">选好了</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="addBookOrderFood_a_orderFood" onclick="ts.bookFoodChooseFinish()">选好了</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="bookSeatOrderFood" onclick="ts.bookTableCommitOrderFood()">入座</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="multiOpenTable" onclick="ts.multiOpenTableCommitOrderFood()">多台开席</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="normalOrderFood_a_orderFood">下单</a>

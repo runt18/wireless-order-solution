@@ -2786,6 +2786,10 @@ $(function(){
 			foodHangUp({type : 1});
 		});
 		
+		//预订选好了
+		$('#addBookOrderFood_a_orderFood').click(function(){
+			
+		});
 		
 	});
 	
