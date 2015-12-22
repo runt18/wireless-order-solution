@@ -15,12 +15,16 @@ import org.marker.weixin.auth.AuthorizerToken;
 
 import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.WxMember;
+import com.wireless.pojo.promotion.Coupon;
+import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
@@ -28,6 +32,60 @@ import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class WxNotifyMemberAction extends DispatchAction{
+	
+	//发券模板信息
+	public ActionForward issue(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String coupons = request.getParameter("couponId");
+		final String staffId = request.getParameter("staffId");
+		final Staff staff = StaffDao.getById(Integer.parseInt(staffId));
+		for(String couponId : coupons.split(",")){
+			final CouponOperation co = CouponOperationDao.getByCond(staff, new CouponOperationDao.ExtraCond().setCoupon(Integer.parseInt(couponId)).setOperateType(CouponOperation.OperateType.ISSUE)).get(0);
+			final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+			if(wxRestaurant.hasCouponDrawTemplate() && wxRestaurant.hasQrCode()){
+				final WxMember wxMember = WxMemberDao.getByMember(staff, co.getMemberId());
+				//String appId = "wx49b3278a8728ff76";
+				//String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
+				//final Token token = Token.newInstance(appId, appSecret);
+				final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+				final Token token = Token.newInstance(authorizerToken);
+				/**
+				 * {{first.DATA}}
+				 * 优惠券：{{keyword1.DATA}}
+				 * 来源：{{keyword2.DATA}}
+				 * 过期时间：{{keyword3.DATA}}
+				 * 使用说明：{{keyword4.DATA}}
+				 * {{remark.DATA}}
+				 */
+				Coupon coupon = CouponDao.getById(staff, co.getCouponId());
+				String serverName;
+				if(request.getServerName().equals("e-tones.net")){
+					serverName = "wx.e-tones.net";
+				}else{
+					serverName = request.getServerName(); 
+				}
+				final String url = "http://" + serverName + "/wx-term/weixin/order/sales.html?pid=" + coupon.getPromotion().getId() + 
+								   "&fid=" + wxMember.getSerial() + 
+								   "&r=" + wxRestaurant.getWeixinSerial() +
+								   "&time=1450689776892";
+				//System.out.println(
+				Template.send(token, new Template.Builder()
+						.setToUser(wxMember.getSerial())
+						.setTemplateId(wxRestaurant.getCouponDrawTemplate())
+						.addKeyword(new Keyword("first", "亲爱的会员，您已成功领取优惠券"))
+						.addKeyword(new Keyword("keyword1", co.getCouponName()))		//优惠券名称
+						.addKeyword(new Keyword("keyword2", co.getOperate().toString()))	//来源
+						.addKeyword(new Keyword("keyword3", DateUtil.format(coupon.getExpired(), DateUtil.Pattern.DATE)))	//过期时间
+						.addKeyword(new Keyword("keyword4", "结账时使用"))				//使用说明
+						.addKeyword(new Keyword("remark", "如有疑问，请联系商家客服。"))
+						.setUrl(url)
+						);
+				//);
+			}
+			
+		}
+
+		return null;
+	}
 	
 	//发送充值模板信息
 	public ActionForward charge(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {

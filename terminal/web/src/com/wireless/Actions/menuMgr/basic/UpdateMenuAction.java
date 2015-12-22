@@ -98,7 +98,7 @@ public class UpdateMenuAction extends Action {
 				builder.emptyUnit();
 			}
 			
-			FoodDao.update(staff, builder);
+			FoodDao.update(staff, builder.setCheckUsed(true));
 			
 			jobject.initTip(true, "操作成功, 已修改菜品'" + foodName + "'信息.");
 			

@@ -22,6 +22,7 @@ public class CouponOperationDao {
 
 	public static class ExtraCond{
 		private final List<CouponOperation.Operate> operations = new ArrayList<CouponOperation.Operate>();
+		private int id;
 		private int associateId;
 		private int couponId;
 		private int couponTypeId;
@@ -36,6 +37,11 @@ public class CouponOperationDao {
 		
 		private ExtraCond setInternalStaff(Staff staff){
 			this.internalStaff = staff;
+			return this;
+		}
+		
+		public ExtraCond setId(int id){
+			this.id = id;
 			return this;
 		}
 		
@@ -126,6 +132,9 @@ public class CouponOperationDao {
 		@Override
 		public String toString(){
 			final StringBuilder extraCond = new StringBuilder();
+			if(id != 0){
+				extraCond.append(" AND id = " + id);
+			}
 			final StringBuilder operateCond = new StringBuilder();
 			for(CouponOperation.Operate operation : operations){
 				if(operateCond.length() > 0){

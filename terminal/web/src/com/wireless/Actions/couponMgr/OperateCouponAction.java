@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.marker.weixin.api.BaseAPI;
 
 import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.member.MemberCondDao;
@@ -298,8 +299,29 @@ public class OperateCouponAction extends DispatchAction{
 				}
 			}
 			
-			CouponDao.issue(staff, builder);
+			final int[] coupons = CouponDao.issue(staff, builder);
 			
+			final String serverName;
+			if(request.getServerName().equals("e-tones.net")){
+				serverName = "wx.e-tones.net";
+			}else{
+				serverName = request.getServerName();
+			}
+			//Perform to send the weixin charge msg to member.
+			new Thread(new Runnable(){
+				@Override
+				public void run() {
+					for(int couponId : coupons){
+						try {
+							//System.out.println("http://" + serverName + "/wx-term/WxNotifyMember.do?dataSource=issue&couponId=" + couponId + "&staffId=" + staff.getId());
+							BaseAPI.doPost("http://" + serverName + "/wx-term/WxNotifyMember.do?dataSource=issue&couponId=" + couponId + "&staffId=" + staff.getId(), "");
+						} catch (Exception ignored) {
+							ignored.printStackTrace();
+						}
+					}
+				}
+				
+			}).run();
 			jobject.initTip(true, "优惠券发放成功");
 			
 		}catch(BusinessException | SQLException e){
