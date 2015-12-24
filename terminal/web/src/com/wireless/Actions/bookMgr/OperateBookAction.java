@@ -1,5 +1,7 @@
 package com.wireless.Actions.bookMgr;
 
+import java.util.Calendar;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,12 +15,84 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 
 public class OperateBookAction extends DispatchAction{
+	
+	/**
+	 * 查找预订信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final JObject jObject = new JObject();
+		final String bookId = request.getParameter("bookId");
+		final String name = request.getParameter("name");
+		final String phone = request.getParameter("phone");
+		final String status = request.getParameter("status");
+		final String bookDate = request.getParameter("bookDate");
+		final String beginDate = request.getParameter("beginDate");
+		final String endDate = request.getParameter("endDate");
+		final String tableId = request.getParameter("tableId");
+		try{
+			
+			final String pin = (String) request.getAttribute("pin");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			final BookDao.ExtraCond extra = new BookDao.ExtraCond();
+			
+			if(name != null && !name.isEmpty()){
+				extra.setMember(name);
+			}
+			if(phone != null && !phone.isEmpty()){
+				extra.setTele(phone);
+			}
+			if(status != null && !status.isEmpty() && !status.equals("-1")){
+				extra.addStatus(Book.Status.valueOf(Integer.parseInt(status)));
+			}
+			if(tableId != null && !tableId.isEmpty()){
+				extra.setTable(Integer.parseInt(tableId));
+			}
+			
+			if(bookDate != null && !bookDate.isEmpty()){
+				DutyRange range = new DutyRange(DateUtil.parseDate(bookDate), DateUtil.parseDate(bookDate + " 23:59:59"));
+				extra.setBookRange(range);
+			}else if(beginDate != null && !beginDate.isEmpty()){
+				DutyRange range = new DutyRange(DateUtil.parseDate(beginDate), DateUtil.parseDate(endDate + " 23:59:59"));
+				extra.setBookRange(range);				
+			}else{
+				Calendar c = Calendar.getInstance();
+				DutyRange range = new DutyRange(DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + c.get(Calendar.DATE)), 0);
+				extra.setBookRange(range);
+			}
+			
+			if(bookId != null && !bookId.isEmpty()){
+				jObject.setRoot(BookDao.getById(staff, Integer.parseInt(bookId)));
+			}else{
+				jObject.setRoot(BookDao.getByCond(staff, extra));
+			}
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		
+		return null;
+	}
 	
 	/**
 	 * 入座
