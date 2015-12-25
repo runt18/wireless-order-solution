@@ -1,221 +1,222 @@
+Ext.onReady(function(){
 
-
-var businessSubGeneralPanel;
-
-function newDate(str) { 
-	str = str.split('-'); 
-	var date = new Date(); 
-	date.setUTCFullYear(str[0], str[1] - 1, str[2]); 
-	date.setUTCHours(0, 0, 0, 0); 
-	return date; 
-} 
-
-function businessSub_showBusinessStatWin(x){
-	var date = newDate(x).getTime();
-	businessSub_businessStatWin = new Ext.Window({
-		title : '营业统计 -- <font style="color:green;">历史</font>',
-		id : 'businessSub_businessStatWin',
-		width : 885,
-		height : 580,
-		closable : false,
-		modal : true,
-		resizable : false,	
-		layout: 'fit',
-		bbar : ['->', {
-			text : '关闭',
-			iconCls : 'btn_close',
-			handler : function(){
-				businessSub_businessStatWin.destroy();
-			}
-		}],
-		keys : [{
-			key : Ext.EventObject.ESC,
-			scope : this,
-			fn : function(){
-				businessSub_businessStatWin.destroy();
-			}
-		}],
-		listeners : {
-			hide : function(thiz){
-				thiz.body.update('');
-			},
-			show : function(thiz){
-				thiz.load({
-					autoLoad : false,
-					url : '../window/history/businessStatistics.jsp',
-					scripts : true,
-					nocache : true,
-					text : '功能加载中, 请稍后......',
-					params : {
-						dataSource : 'history',
-						dutyRange : "range",
-						offDuty : date,
-						onDuty : date,
-						queryPattern : 3
-					}
-				});
-			}
-		}
-	});
-	businessSub_businessStatWin.show();
-	businessSub_businessStatWin.center();
-}
-
-function businessSub_initRegionCombo(statistic){
-	var combo = {
-		xtype : 'combo',
-		forceSelection : true,
-		width : 90,
-		value : -1,
-		id : statistic+'comboRegion',
-		store : new Ext.data.SimpleStore({
-			fields : ['id', 'name']
-		}),
-		valueField : 'id',
-		displayField : 'name',
-		typeAhead : true,
-		mode : 'local',
-		triggerAction : 'all',
-		selectOnFocus : true,
-		allowBlank : false,
-		readOnly : false,
-		listeners : {
-			render : function(thiz){
-				var data = [[-1,'全部']];
-				Ext.Ajax.request({
-					url : '../../QueryRegion.do',
-					params : {
-						dataSource : 'normal'
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						for(var i = 0; i < jr.root.length; i++){
-							data.push([jr.root[i]['id'], jr.root[i]['name']]);
-						}
-						thiz.store.loadData(data);
-						thiz.setValue(-1);
-						
-						businessSub_dateCombo.setValue(1);
-						businessSub_dateCombo.fireEvent('select', businessSub_dateCombo, null, 1);						
-					},
-					fialure : function(res, opt){
-						thiz.store.loadData(data);
-						thiz.setValue(-1);
-					}
-				});
-			},
-			select : function(thiz, record, index){
-				Ext.getCmp(statistic+'btnSearch').handler();
-			}
-		}
-	};
-	return combo;
-}
-
-function businessSub_changeChartWidth(w, h){
-	if(businessSub_highChart){
-		businessSub_highChart.setSize(w, h);
-	}
-}
-
-function businessSub_showChart(c){
-	var hourBegin = Ext.getCmp('businessSub_txtBusinessHourBegin').getEl().dom.textContent;
-	var hourEnd = Ext.getCmp('businessSub_txtBusinessHourEnd').getEl().dom.textContent;
+	var businessSubGeneralPanel;
 	
-	var chartData = eval('(' + c.jdata.other.businessChart + ')');
-	businessSub_highChart = new Highcharts.Chart({
-		plotOptions : {
-			line : {
-				cursor : 'pointer',
-				dataLabels : {
-					enabled : true,
-					style : {
-						fontWeight: 'bold', 
-						color: 'green' 
-					}
+	function newDate(str) { 
+		str = str.split('-'); 
+		var date = new Date(); 
+		date.setUTCFullYear(str[0], str[1] - 1, str[2]); 
+		date.setUTCHours(0, 0, 0, 0); 
+		return date; 
+	} 
+
+	function businessSub_showBusinessStatWin(x){
+		var date = newDate(x).getTime();
+		businessSub_businessStatWin = new Ext.Window({
+			title : '营业统计 -- <font style="color:green;">历史</font>',
+			id : 'businessSub_businessStatWin',
+			width : 885,
+			height : 580,
+			closable : false,
+			modal : true,
+			resizable : false,	
+			layout: 'fit',
+			bbar : ['->', {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(){
+					businessSub_businessStatWin.destroy();
+				}
+			}],
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					businessSub_businessStatWin.destroy();
+				}
+			}],
+			listeners : {
+				hide : function(thiz){
+					thiz.body.update('');
 				},
-				events : {
-					click : function(e){
-						businessSub_showBusinessStatWin(e.point.category);
-					}
+				show : function(thiz){
+					thiz.load({
+						autoLoad : false,
+						url : '../window/history/businessStatistics.jsp',
+						scripts : true,
+						nocache : true,
+						text : '功能加载中, 请稍后......',
+						params : {
+							dataSource : 'history',
+							dutyRange : "range",
+							offDuty : date,
+							onDuty : date,
+							queryPattern : 3
+						}
+					});
 				}
 			}
-		},
-        chart: {  
-        	renderTo: 'divBusinessSubStatisticsDetailChart'
-    	}, 
-        title: {
-            text: '<b>营业走势图（'+c.dateBegin+ '至' +c.dateEnd+'）'+hourBegin+ ' - ' + hourEnd + businessSub_titleRegionName + '</b>'
-        },
-        labels: {
-        	items : [{
-        		html : '<b>总营业额:' + chartData.totalMoney + ' 元</b>, <b>日均收入:' + chartData.avgMoney + ' 元</b>, <b>日均账单:' + chartData.avgCount + ' 张</b>',
-	        	style : {left :/*($('#businessReceiptsChart').width()*0.80)*/'0px', top: '0px'}
-        	}]
-        },
-        xAxis: {
-            categories: chartData.xAxis,
-            labels : {
-            	formatter : function(){
-            		return this.value.substring(5);
-            	}
-            }
-        },
-        yAxis: {
-        	min: 0,
-            title: {
-                text: '金额 (元)'
-            },
-            plotLines: [{
-                value: 0,
-                width: 2,
-                color: '#808080'
-            }]
-        },
-        tooltip: {
-//	        	crosshairs: true,
-            formatter: function() {
-                return '<b>' + this.series.name + '</b><br/>'+
-                    this.x +': '+ '<b>'+this.y+'</b> ';
-            }
-        },
-//	        series : [{  
-//	            name: 'aaaaaa',  
-//	            data: [6, 9, 2, 7, 13, 21, 10]
-//	        }],
-        series : chartData.ser,
-        exporting : {
-        	enabled : true
-        },
-        credits : {
-        	enabled : false
-        }
-	});
-	
-	if(businessSub_chartPanel && businessSub_chartPanel.isVisible()){
-		businessSub_chartPanel.show();
+		});
+		businessSub_businessStatWin.show();
+		businessSub_businessStatWin.center();
 	}
-}
-var businessSub_dateCombo;
-var businessSub_trModel = '<tr>'
-			+ '<th>{0}</th>'
-			+ '<td class="text_right">{1}</td>'
-			+ '<td class="text_right">{2}</td>'
-			+ '<td class="text_right">{3}</td>'
-			+ '<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 5, deptId : {4}, deptName : \'{5}\'})">查看详情</a></td>'
-			+ '</tr>';
-			
-var trPayIncomeModel = '<tr>'
-			+ '<th>{0}</th>'
-			+ '<td class="text_right">{1}</td>'
-			+ '<td class="text_right">{2}</td>'
-			+ '<td class="text_right">{3}</td>'
-			+ '</tr>';			
-			
-var businessSub_titleRegionName = '', businessSub_panelDrag = false;
-var businessSub_chartPanel, businessSub_generalPanelHeight, businessSub_chartPanelHeight, businessSub_highChart;
-var business_chartData;
-Ext.onReady(function(){
+
+	function businessSub_initRegionCombo(statistic){
+		var combo = {
+			xtype : 'combo',
+			forceSelection : true,
+			width : 90,
+			value : -1,
+			id : statistic+'comboRegion',
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			readOnly : false,
+			listeners : {
+				render : function(thiz){
+					var data = [[-1,'全部']];
+					Ext.Ajax.request({
+						url : '../../QueryRegion.do',
+						params : {
+							dataSource : 'normal'
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+							
+							businessSub_dateCombo.setValue(1);
+							businessSub_dateCombo.fireEvent('select', businessSub_dateCombo, null, 1);						
+						},
+						fialure : function(res, opt){
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						}
+					});
+				},
+				select : function(thiz, record, index){
+					Ext.getCmp(statistic+'btnSearch').handler();
+				}
+			}
+		};
+		return combo;
+	}
+
+	function businessSub_changeChartWidth(w, h){
+		if(businessSub_highChart){
+			businessSub_highChart.setSize(w, h);
+		}
+	}
+
+	function businessSub_showChart(c){
+		var hourBegin = Ext.getCmp('businessSub_txtBusinessHourBegin').getEl().dom.textContent;
+		var hourEnd = Ext.getCmp('businessSub_txtBusinessHourEnd').getEl().dom.textContent;
+		
+		var chartData = eval('(' + c.jdata.other.businessChart + ')');
+		businessSub_highChart = new Highcharts.Chart({
+			plotOptions : {
+				line : {
+					cursor : 'pointer',
+					dataLabels : {
+						enabled : true,
+						style : {
+							fontWeight: 'bold', 
+							color: 'green' 
+						}
+					},
+					events : {
+						click : function(e){
+							businessSub_showBusinessStatWin(e.point.category);
+						}
+					}
+				}
+			},
+	        chart: {  
+	        	renderTo: 'divBusinessSubStatisticsDetailChart'
+	    	}, 
+	        title: {
+	            text: '<b>营业走势图（'+c.dateBegin+ '至' +c.dateEnd+'）'+hourBegin+ ' - ' + hourEnd + businessSub_titleRegionName + '</b>'
+	        },
+	        labels: {
+	        	items : [{
+	        		html : '<b>总营业额:' + chartData.totalMoney + ' 元</b>, <b>日均收入:' + chartData.avgMoney + ' 元</b>, <b>日均账单:' + chartData.avgCount + ' 张</b>',
+		        	style : {left :/*($('#businessReceiptsChart').width()*0.80)*/'0px', top: '0px'}
+	        	}]
+	        },
+	        xAxis: {
+	            categories: chartData.xAxis,
+	            labels : {
+	            	formatter : function(){
+	            		return this.value.substring(5);
+	            	}
+	            }
+	        },
+	        yAxis: {
+	        	min: 0,
+	            title: {
+	                text: '金额 (元)'
+	            },
+	            plotLines: [{
+	                value: 0,
+	                width: 2,
+	                color: '#808080'
+	            }]
+	        },
+	        tooltip: {
+	//	        	crosshairs: true,
+	            formatter: function() {
+	                return '<b>' + this.series.name + '</b><br/>'+
+	                    this.x +': '+ '<b>'+this.y+'</b> ';
+	            }
+	        },
+	//	        series : [{  
+	//	            name: 'aaaaaa',  
+	//	            data: [6, 9, 2, 7, 13, 21, 10]
+	//	        }],
+	        series : chartData.ser,
+	        exporting : {
+	        	enabled : true
+	        },
+	        credits : {
+	        	enabled : false
+	        }
+		});
+		
+		if(businessSub_chartPanel && businessSub_chartPanel.isVisible()){
+			businessSub_chartPanel.show();
+		}
+	}
+	
+	var businessSub_dateCombo;
+	var businessSub_trModel = '<tr>'
+				+ '<th>{0}</th>'
+				+ '<td class="text_right">{1}</td>'
+				+ '<td class="text_right">{2}</td>'
+				+ '<td class="text_right">{3}</td>'
+				+ '<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 5, deptId : {4}, deptName : \'{5}\'})">查看详情</a></td>'
+				+ '</tr>';
+				
+	var trPayIncomeModel = '<tr>'
+				+ '<th>{0}</th>'
+				+ '<td class="text_right">{1}</td>'
+				+ '<td class="text_right">{2}</td>'
+				+ '<td class="text_right">{3}</td>'
+				+ '</tr>';			
+				
+	var businessSub_titleRegionName = '', businessSub_panelDrag = false;
+	var businessSub_chartPanel, businessSub_generalPanelHeight, businessSub_chartPanelHeight, businessSub_highChart;
+	var business_chartData;
+
 	var businessSub_beginDate = new Ext.form.DateField({
 		xtype : 'datefield',	
 		id : 'businessSub_dateSearchDateBegin',
@@ -348,6 +349,9 @@ Ext.onReady(function(){
 						totalActual.toFixed(2)
 					));
 				
+
+					Ext.getDom('businessSub_roundAmount').innerHTML = businessSub_business.roundAmount;
+					Ext.getDom('businessSub_roundIncome').innerHTML = businessSub_business.roundIncome.toFixed(2);
 					
 					Ext.getDom('businessSub_bssiEraseAmount').innerHTML = businessSub_business.eraseAmount;
 					Ext.getDom('businessSub_bssiEraseIncome').innerHTML = businessSub_business.eraseIncome.toFixed(2);
@@ -379,9 +383,6 @@ Ext.onReady(function(){
 					
 					Ext.getDom('bussiMemberRefund').innerHTML = businessSub_business.memberRefund.toFixed();
 					Ext.getDom('bussiMemberAccountRefund').innerHTML = businessSub_business.memberAccountRefund.toFixed(2);
-					
-					Ext.getDom('businessSub_bssiMemberPriceAmount').innerHTML = businessSub_business.memberPriceAmount;
-					Ext.getDom('businessSub_bssiMemberPriceIncome').innerHTML = businessSub_business.memberPriceIncome.toFixed(2);
 					
 					Ext.getDom('businessStatisticsSummary').innerHTML = trPayTypeContent;
 					
