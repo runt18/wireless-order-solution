@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wireless.beeCloud.WebHook;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.ErrorCode;
@@ -55,19 +56,17 @@ public class BeeCloudHookAction extends Action{
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		StringBuilder sb = new StringBuilder();
-		
+		System.out.println("aaa");
 		String line = null;
 		BufferedReader reader = request.getReader();
 		while ((line = reader.readLine()) != null){
 			sb.append(line);
 		}
-		
-		JSONObject jObj = JSONObject.parseObject(sb.toString());
-		
-		ChannelType channelType = ChannelType.valueOf(jObj.getString("channelType"));
-		if(jObj.getBooleanValue("tradeSuccess")){
-			
-			JSONObject jObj4optional = jObj.getJSONObject("optional");
+		System.out.println(sb.toString());
+		WebHook hookResponse = JObject.parse(WebHook.JSON_CREATOR, 0, sb.toString());
+		//System.out.println(hookResponse);
+		if(hookResponse.isTradeSuccess()){
+			JSONObject jObj4optional = JSONObject.parseObject(hookResponse.getOptional());
 			Order.PayBuilder payBuilder = JObject.parse(Order.PayBuilder.JSON_CREATOR, 0, jObj4optional.getJSONObject("payBuilder").toJSONString());
 			Staff staff = StaffDao.verify(jObj4optional.getIntValue("staffId"));
 			
@@ -75,14 +74,33 @@ public class BeeCloudHookAction extends Action{
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
 				
 				if(resp.header.type == Type.ACK){
-					System.out.println(channelType.desc + "结账成功");
+					System.out.println("结账成功");
 				}else{
-					System.out.println(channelType.desc + "结账失败" + "," + new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
+					System.out.println("结账失败" + "," + new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
 				}
-			}			
-		}else{
-			System.out.println(channelType.desc + "失败");
+			}
 		}
+//		JSONObject jObj = JSONObject.parseObject(sb.toString());
+//		
+//		ChannelType channelType = ChannelType.valueOf(jObj.getString("channelType"));
+//		if(jObj.getBooleanValue("tradeSuccess")){
+//			
+//			JSONObject jObj4optional = jObj.getJSONObject("optional");
+//			Order.PayBuilder payBuilder = JObject.parse(Order.PayBuilder.JSON_CREATOR, 0, jObj4optional.getJSONObject("payBuilder").toJSONString());
+//			Staff staff = StaffDao.verify(jObj4optional.getIntValue("staffId"));
+//			
+//			if(OrderDao.getStatusById(staff, payBuilder.getOrderId()) == Order.Status.UNPAID){
+//				ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
+//				
+//				if(resp.header.type == Type.ACK){
+//					System.out.println(channelType.desc + "结账成功");
+//				}else{
+//					System.out.println(channelType.desc + "结账失败" + "," + new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
+//				}
+//			}			
+//		}else{
+//			System.out.println(channelType.desc + "失败");
+//		}
 		response.getWriter().print("success");
 		return null;
 	}
