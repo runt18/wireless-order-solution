@@ -1,6 +1,7 @@
 package com.wireless.Actions.bookMgr;
 
 import java.util.Calendar;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,44 +44,50 @@ public class OperateBookAction extends DispatchAction{
 		final String beginDate = request.getParameter("beginDate");
 		final String endDate = request.getParameter("endDate");
 		final String tableId = request.getParameter("tableId");
+		final String detail = request.getParameter("detail");
 		try{
 			
 			final String pin = (String) request.getAttribute("pin");
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final BookDao.ExtraCond extra = new BookDao.ExtraCond();
+			final BookDao.ExtraCond extraCond = new BookDao.ExtraCond();
 			
+			if(bookId != null && !bookId.isEmpty()){
+				extraCond.setId(Integer.parseInt(bookId));
+			}
 			if(name != null && !name.isEmpty()){
-				extra.setMember(name);
+				extraCond.setMember(name);
 			}
 			if(phone != null && !phone.isEmpty()){
-				extra.setTele(phone);
+				extraCond.setTele(phone);
 			}
 			if(status != null && !status.isEmpty() && !status.equals("-1")){
-				extra.addStatus(Book.Status.valueOf(Integer.parseInt(status)));
+				extraCond.addStatus(Book.Status.valueOf(Integer.parseInt(status)));
 			}
 			if(tableId != null && !tableId.isEmpty()){
-				extra.setTable(Integer.parseInt(tableId));
+				extraCond.setTable(Integer.parseInt(tableId));
 			}
 			
 			if(bookDate != null && !bookDate.isEmpty()){
 				DutyRange range = new DutyRange(DateUtil.parseDate(bookDate), DateUtil.parseDate(bookDate + " 23:59:59"));
-				extra.setBookRange(range);
+				extraCond.setBookRange(range);
 			}else if(beginDate != null && !beginDate.isEmpty()){
 				DutyRange range = new DutyRange(DateUtil.parseDate(beginDate), DateUtil.parseDate(endDate + " 23:59:59"));
-				extra.setBookRange(range);				
+				extraCond.setBookRange(range);				
 			}else{
 				Calendar c = Calendar.getInstance();
 				DutyRange range = new DutyRange(DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + c.get(Calendar.DATE)), 0);
-				extra.setBookRange(range);
+				extraCond.setBookRange(range);
 			}
 			
-			if(bookId != null && !bookId.isEmpty()){
-				jObject.setRoot(BookDao.getById(staff, Integer.parseInt(bookId)));
-			}else{
-				jObject.setRoot(BookDao.getByCond(staff, extra));
+			final List<Book> result = BookDao.getByCond(staff, extraCond);
+			if(detail != null && !detail.isEmpty() && Boolean.parseBoolean(detail)){
+				for(int i = 0; i < result.size(); i++){
+					result.set(i, BookDao.getById(staff, result.get(i).getId()));
+				}
 			}
 			
+			jObject.setRoot(result);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jObject.initTip(e);
@@ -107,15 +114,15 @@ public class OperateBookAction extends DispatchAction{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		String bookId = request.getParameter("bookId");
-		String bookOrderFoodsText = request.getParameter("bookOrderFoods");
+		String bookOrdersText = request.getParameter("bookOrders");
 		JObject jobject = new JObject();
 		
-		String[] bookOrderFoods = bookOrderFoodsText.split("<li>");
+		String[] bookOrders = bookOrdersText.split("<li>");
 		
 		Book.SeatBuilder seatBuilder = new Book.SeatBuilder(Integer.parseInt(bookId));
 		
-		for (int i = 0; i < bookOrderFoods.length; i++) {
-			Order.InsertBuilder builder = JObject.parse(Order.InsertBuilder.JSON_CREATOR, 0, bookOrderFoods[i]);
+		for (int i = 0; i < bookOrders.length; i++) {
+			Order.InsertBuilder builder = JObject.parse(Order.InsertBuilder.JSON_CREATOR, 0, bookOrders[i]);
 			seatBuilder.addOrder(builder);
 		}
 		

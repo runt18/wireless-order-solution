@@ -98,7 +98,9 @@
 <!-- 混合结账 -->
 <script type="text/javascript" src="./js/popup/mixedPay/mixedPay.js"></script>
 <!-- 添加预订信息 -->
-<script type="text/javascript" src="./js/popup/books/books.js"></script>
+<script type="text/javascript" src="./js/popup/bookInfo/bookInfo.js"></script>
+<!-- 入座 -->
+<script type="text/javascript" src="./js/popup/seat/seat.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -734,44 +736,6 @@
 			<a href="javascript: Util.to.scroll({content:'bookOrderListCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>		 
 		 </div>
 	</div>	
-	<!-- 入座选台 -->
-	<div id="bookOperateChooseTable" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: 100px 0px 0px -200px;width:550px;display: none;background-color: white;" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
-	       	 入座选台
-        	<div style="float: right">
-  				<a onclick="ts.closeBookOperateTable()" data-role="button" data-corners="false" class="popupWinCloseBtn4Book">X</a>      		
-        	</div>		
-	    </div>
-	    
-		<div class="ui-grid-a">
-		    <div class="ui-block-a">
-		    	<div class="ui-bar-e" >
-				    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
-				       	 已订餐台
-				    </div>		    	
-				    <div id="bookTableToChoose" class="ui-bar ui-bar-e" style="height:360px;text-align: left;">
-				    </div>
-			    </div>
-		    </div>
-		    <div class="ui-block-b">
-		    	<div class="ui-bar-e" style="height:360px;text-align: left;">
-			    	<div data-role="header" data-theme="b" class="ui-corner-top win_head" align="center">
-				       	 入座餐台
-				    </div>	
-		    		<div data-role="content" id="bookTableHadChoose" style="height:  -webkit-calc(100% - 63px);height: -moz-calc(100% - 63px);height: -ms-calc(100% - 63px);height: -o-calc(100% - 63px);">
-		    		</div>
-					<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-						 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-							 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="bookChoose_a_tableSelect">添加餐台</a>
-							 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.bookTableOrderFood()">入座</a>		 
-						 </div>
-				    </div>
-		    	</div>
-		    </div>
-		</div>
-	    	    
-	</div>	
-	
 </div>
 <!-- end 预订订单列表 -->
 
@@ -853,7 +817,6 @@
             <li class="tempFoodKitchen" id="allTrantable_li_tableSelect"><a >全单转菜</a></li>
             <li class="tempFoodKitchen" onclick="uo.allFoodHurried()"><a >全单催菜</a></li>
             <li class="tempFoodKitchen" onclick="uo.cancelTable()"><a >撤台</a></li>
-            <li id="uo_btnCheckoutBook" class="tempFoodKitchen" onclick="ts.checkBookTable()"><a >查看预订</a></li>
         </ul>
 	</div>		
 	
@@ -1032,8 +995,8 @@
 			 	<a onclick="Util.to.scroll({content:'divOrderFoodsCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>
 			 </div>
 			 <div data-role="controlgroup" class="ui-btn-right" data-type="horizontal">
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="addBookOrderFood_a_orderFood" onclick="ts.bookFoodChooseFinish()">选好了</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="bookSeatOrderFood" onclick="ts.bookTableCommitOrderFood()">入座</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="addBookOrderFood">选好了</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="bookSeatOrderFood_a_orderFood">入座</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="multiOpenTable" onclick="ts.multiOpenTableCommitOrderFood()">多台开席</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="normalOrderFood_a_orderFood">下单</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="fastPay_a_orderFood">结账</a>

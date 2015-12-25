@@ -56,12 +56,6 @@ uo.entry = function(c){
 	initOrderData({table : c.table});
 	uo.table = c.table;
 	
-	//是否为预订台
-	if(c.table.isBook){
-		$('#uo_btnCheckoutBook').show();
-	}else{
-		$('#uo_btnCheckoutBook').hide();
-	}	
 	
 };
 	

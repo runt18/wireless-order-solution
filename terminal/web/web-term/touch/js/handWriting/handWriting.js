@@ -89,7 +89,7 @@ function HandWritingPanel(param){
 	function onMouseMove(event) {
 		//console.log('mouse move');
 	    //ev = event || window.event; 
-		//var mousePos = mousePosition(event); 
+		//var mousePos = mousePosition(event); w
 		if(drawing){
 			//lastX=event.clientX;
 	    	//lastY=event.clientY;

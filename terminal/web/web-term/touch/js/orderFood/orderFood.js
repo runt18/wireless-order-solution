@@ -5,6 +5,7 @@ var of = {
 	wxCode : 0,			//微信账单号
 	initFoods : [],		//进入点菜界面时的菜品数据
 	newFood : null,		//新点菜的菜品数据
+	commit : function(selectedFoods){},     //通用的一个回调方法  
 	ot : {
 		tasteGroupPagingStart : 0,
 		choosedTastes : [],
@@ -40,14 +41,17 @@ of.entry = function(c){
 		table : null,							//餐台
 		comment : null,							//开台备注
 		initFoods : null,						//初始菜品
-		wxCode : null							//微信账单号							
+		wxCode : null,							//微信账单号							
+		commit : function(selectedFoods){}      //通用的commit
 	};
 	
+	//设置入座的回调函数
+	of.commit = c.commit;
 	//设置点菜界面操作类型
 	of.orderFoodOperateType = c.orderFoodOperateType;
 	//清空选中的全单口味
 	of.ot.allBillTaste && delete of.ot.allBillTaste;
-	
+
 	var param = null;
 	if(c.table){
 		if(c.table.id){
@@ -1713,14 +1717,14 @@ $(function(){
 				$('#normalOrderFood_a_orderFood').show();
 				$('#btnOrderAndPay').show();
 				$('#addBookOrderFood').hide();
-				$('#bookSeatOrderFood').hide();
+				$('#bookSeatOrderFood_a_orderFood').hide();
 				$('#multiOpenTable').hide();
 				//快餐模式的牌子号
 				$('#brand_a_orderFood').hide();
 				//快餐模式的结账
 				$('#fastPay_a_orderFood').hide();
 			}else if(of.orderFoodOperateType == 'bookSeat'){
-				$('#bookSeatOrderFood').show();
+				$('#bookSeatOrderFood_a_orderFood').show();
 				$('#addBookOrderFood').hide();
 				$('#btnOrderAndPay').hide();
 				$('#normalOrderFood_a_orderFood').hide();		
@@ -1731,7 +1735,7 @@ $(function(){
 				$('#fastPay_a_orderFood').hide();
 			}else if(of.orderFoodOperateType == 'addBook'){
 				$('#addBookOrderFood').show();
-				$('#bookSeatOrderFood').hide();
+				$('#bookSeatOrderFood_a_orderFood').hide();
 				$('#normalOrderFood_a_orderFood').hide();
 				$('#btnOrderAndPay').hide();	
 				$('#multiOpenTable').hide();
@@ -1742,7 +1746,7 @@ $(function(){
 			}else if(of.orderFoodOperateType == 'multiOpenTable'){
 				$('#multiOpenTable').show();
 				$('#addBookOrderFood').hide();
-				$('#bookSeatOrderFood').hide();
+				$('#bookSeatOrderFood_a_orderFood').hide();
 				$('#normalOrderFood_a_orderFood').hide();
 				$('#btnOrderAndPay').hide();
 				//快餐模式的牌子号
@@ -1754,7 +1758,7 @@ $(function(){
 				$('#normalOrderFood_a_orderFood').hide();
 				$('#btnOrderAndPay').hide();
 				$('#addBookOrderFood').hide();
-				$('#bookSeatOrderFood').hide();
+				$('#bookSeatOrderFood_a_orderFood').hide();
 				$('#multiOpenTable').hide();
 				//快餐模式的牌子号
 				$('#brand_a_orderFood').show();
@@ -2781,6 +2785,11 @@ $(function(){
 		//全单叫起
 		$('#allFoodHangUp_li_orderFood').click(function(){
 			foodHangUp({type : 1});
+		});
+		
+		//使用入座的回调
+		$('#bookSeatOrderFood_a_orderFood').click(function(){
+			of.commit(of.newFood);
 		});
 		
 	});

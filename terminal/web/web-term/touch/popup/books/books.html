@@ -1,0 +1,107 @@
+<head>
+<meta charset="UTF-8">
+</head>
+<div class="ui-overlay-shadow ui-corner-all" style="width:1000px;position: absolute;z-index: 1102; top: 20%; left: 50%; margin: -100px 0px 0px -450px;background-color: white;" align="center">	
+    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
+        <span id="title4AddBook">填写预订</span>	
+       	<div id="btnCloseAddBook" style="float: right">
+ 				<a id="close_a_books" data-role="button" data-corners="false" class="popupWinCloseBtn4Book">X</a>      		
+       	</div>			        	
+    </div>
+     
+    <div style="max-height: 600px;min-height: 255px;overflow-y: auto;">
+	    <table>
+	    	<tr>
+	    		<td class="readMemberTd">预订日期:</td>
+	    		<td><input type="date" data-role="datebox" id="bookDate_input_books" data-options='{"mode": "datebox"}' ></td>
+	    		
+	    		<td class="readMemberTd">预订时间:</td>
+	    		<td id="add_bookTimeBox"><input id="bookTime_input_books" class="bookTime" ></td>
+	 	
+	    		<td class="readMemberTd">预留时长(单位/分钟):</td>
+	    		<td class="selectionCmp" style="line-height: 20px;padding: 0 3px;width: 100px;">
+					<input id="bookReserved_input_books" onkeypress="intOnly()" > 
+	    		</td>  		  	
+				
+	    	</tr>
+	    	<tr>
+	    		<td class="readMemberTd">预订人:</td>
+	    		<td><input id="bookPerson_input_books" ></td>    
+	    		
+	    		<td class="readMemberTd">预订电话:</td>
+	    		<td><input id="bookPhone_input_books" onkeypress="intOnly()" ></td>   
+	    		
+	    		<td class="readMemberTd">预订人数:</td>
+	    		<td><input id="bookPersonAmount_input_books" onkeypress="intOnly()" ></td>     	    	
+	    	</tr>
+	    	<tr>
+	    		<td class="readMemberTd">经手人:</td>
+	    		<td>
+	    			<select  id="staff_select_books" style="font-size: 20px;">
+						<!-- <option value="29">管理员</option> -->
+					</select>	    		
+	    		</td>    
+	    		<td class="readMemberTd">类型:</td>
+	    		<td>
+	    			<select  id="bookCate_select_books" style="font-size: 20px;">
+						<option value="散台">散台</option>
+						<option value="包间">包间</option>												
+						<option value="婚宴">婚宴</option>
+						<option value="寿宴">寿宴</option>
+						<option value="满月">满月</option>
+						<option value="年会">年会</option>
+						<option value="周岁">周岁</option>			
+						<option value="入学">入学</option>
+						<option value="生日">生日</option>
+					</select>	    		
+	    		</td>    
+	    		<td class="readMemberTd">订金:</td>
+	    		<td><input id="bookMoney_input_books" onkeypress="intOnly()"></td>   
+	    	</tr> 
+	    
+	    	<tr id="bookTableList_tr_books" style="display:none;">
+	    		<td colspan="6">
+	    			<table data-theme="c" data-role="table" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr">
+						<caption style="font-weight: bold;color: black;margin-bottom: initial;">预定餐台列表( 点击餐台可取消选择 ):</caption>
+				         <tbody style="font-weight:bold;color: blue">
+				         <tr >
+	    					<td colspan="6" id="tableList_td_books">
+	    					</td>
+	    				</tr>	
+				         </tbody>
+				     </table>	
+						    			
+	    		</td>    
+	    	</tr>	  
+	    	<tr>
+	    		<td colspan="6" id="bookOrderFoodList_td_books" style="display:none;">
+					<table id="" data-theme="c" data-role="table" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr">
+						<caption style="font-weight: bold;color: black;margin-bottom: initial;">预定菜列表:</caption>
+				         <thead>
+				           <tr class="ui-bar-d">
+				             <th style="width: 5px;"></th>
+				             <th style="width: 25%;">菜名</th>
+				             <th >数量</th>
+				             <th style="width: 15%;">口味</th>
+				             <th >单价</th>
+				           </tr>
+				         </thead>
+				         <!-- 菜品列表 -->
+				         <tbody id="foodList_tbody_books" style="font-weight:bold;color: blue">
+				         </tbody>
+				     </table>	    		
+	    		</td>
+	    	</tr>
+	    	
+	    </table>
+   	 	<br>
+    </div>
+	<div id="bookInfoFoot_div_books" data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
+		 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth ui-bar-b barBottomBeCorner">
+			 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:25%" id="left_a_books">添加餐台</a>
+			 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:25%" id="middle_a_books">菜品预订</a>				 
+			 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:25%" id="right_a_books">确定</a>
+			 <a  data-role="button" data-inline="true" class="countPopbottomBtn" style="width:24%" id="cancel_a_books">取消</a>		 
+		 </div>
+    </div>	
+</div>		
