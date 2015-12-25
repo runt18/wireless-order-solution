@@ -10,13 +10,13 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.marker.weixin.api.BaseAPI;
 
-import com.alibaba.fastjson.JSON;
+import com.wireless.beeCloud.BeeCloud;
+import com.wireless.beeCloud.Bill;
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.member.MemberCommentDao;
@@ -45,6 +45,7 @@ import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
+import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pack.req.ReqQueryMember;
 import com.wireless.pack.resp.RespACK;
@@ -76,12 +77,6 @@ import com.wireless.sccon.ServerConnector;
 import com.wireless.sms.SMS;
 import com.wireless.sms.msg.Msg4Consume;
 import com.wireless.sms.msg.Msg4Upgrade;
-
-import cn.beecloud.BCEumeration.PAY_CHANNEL;
-import cn.beecloud.BCPay;
-import cn.beecloud.BCPayResult;
-import cn.beecloud.BeeCloud;
-import cn.beecloud.bean.BCPayParameter;
 /**
  * @author yzhang
  *
@@ -648,33 +643,70 @@ class OrderHandler implements Runnable{
 			new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(printType, staff, printers, orderId));
 			
 		}else if(printType.isWxReceipt()){
-			final Order.PayBuilder payBuilder = parcel.readParcel(Order.PayBuilder.CREATOR);
 			//打印微信支付单
 			Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
 			if(restaurant.hasBeeCloud()){
-				BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
-				Map<String, Object> optional = new HashMap<String, Object>(){
-					private static final long serialVersionUID = 1L;
-					{ 
-						put("payBuilder", JSON.toJSONString(payBuilder.toJsonMap(0)));
-						put("staffId", Integer.toString(staff.getId()));	
+				final Order.PayBuilder payBuilder = parcel.readParcel(Order.PayBuilder.CREATOR);
+				//JsonMap optional = new JsonMap();
+				//optional.putJsonable("payBuilder", payBuilder, 0);
+				//optional.putInt("staffId", staff.getId());
+				BeeCloud app = BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
+				try{
+					final String billNo = System.currentTimeMillis() + Integer.toString(payBuilder.getOrderId());
+					Bill.Response response = app.bill().ask(new Bill.Request().setChannel(Bill.Channel.WX_NATIVE)
+																			  .setTotalFee(1)
+																			  //.setTotalFee(Float.valueOf(order.getActualPrice() * 100).intValue())
+																			  .setBillNo(billNo)
+																			  .setTitle(restaurant.getName() + "(账单号：" + payBuilder.getOrderId() + ")")
+																			  //.setOptional(optional),
+																			  ,
+															new Callable<ProtocolPackage>() {
+																@Override
+																public ProtocolPackage call() throws Exception {
+																	return ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
+																}
+															});
+					
+					if(response.isOk()){
+						final Order order = PayOrder.calc(staff, payBuilder);
+						new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(printType, staff, printers, order, response.getCodeUrl()));
+					}else{
+						throw new BusinessException(response.getResultMsg() + "," + response.getErrDetail());
 					}
-				};
-				final Order order = PayOrder.calc(staff, payBuilder);
-				BCPayParameter param = new BCPayParameter(PAY_CHANNEL.WX_NATIVE,
-														  //1,
-														  Float.valueOf(order.getActualPrice() * 100).intValue(), 
-														  System.currentTimeMillis() + Integer.toString(payBuilder.getOrderId()),	//billNo 
-														  restaurant.getName() + "(账单号：" + payBuilder.getOrderId() + ")"			//title
-														  );
-				param.setOptional(optional);
-				BCPayResult bcPayResult = BCPay.startBCPay(param);
-				
-				if(bcPayResult.getType().ordinal() == 0){
-					new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(printType, staff, printers, order, bcPayResult.getCodeUrl()));
-				}else{
-					throw new BusinessException(bcPayResult.getErrMsg() + "," + bcPayResult.getErrDetail());
+					
+				}catch(Exception e){
+					throw new BusinessException(e.getMessage());
 				}
+//				Map<String, String> optional = new HashMap<String, String>(){
+//				private static final long serialVersionUID = 1L;
+//				{ 
+//					put("payBuilder", JSON.toJSONString(payBuilder.toJsonMap(0)));
+//					put("staffId", Integer.toString(staff.getId()));	
+//				}
+//				};
+//				BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
+//				Map<String, Object> optional = new HashMap<String, Object>(){
+//					private static final long serialVersionUID = 1L;
+//					{ 
+//						put("payBuilder", JSON.toJSONString(payBuilder.toJsonMap(0)));
+//						put("staffId", Integer.toString(staff.getId()));	
+//					}
+//				};
+//				final Order order = PayOrder.calc(staff, payBuilder);
+//				BCPayParameter param = new BCPayParameter(PAY_CHANNEL.WX_NATIVE,
+//														  //1,
+//														  Float.valueOf(order.getActualPrice() * 100).intValue(), 
+//														  System.currentTimeMillis() + Integer.toString(payBuilder.getOrderId()),	//billNo 
+//														  restaurant.getName() + "(账单号：" + payBuilder.getOrderId() + ")"			//title
+//														  );
+//				param.setOptional(optional);
+//				BCPayResult bcPayResult = BCPay.startBCPay(param);
+//				
+//				if(bcPayResult.getType().ordinal() == 0){
+//					new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(printType, staff, printers, order, bcPayResult.getCodeUrl()));
+//				}else{
+//					throw new BusinessException(bcPayResult.getErrMsg() + "," + bcPayResult.getErrDetail());
+//				}
 			}else{
 				throw new BusinessException(RestaurantError.BEE_CLOUD_NOT_BOUND);
 			}

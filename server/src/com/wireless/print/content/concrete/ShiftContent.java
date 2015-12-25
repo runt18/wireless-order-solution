@@ -88,6 +88,7 @@ public class ShiftContent extends ConcreteContent {
 		mTemplate = mTemplate.replace(PVar.VAR_1, var1);		
 		
 		StringBuilder var2 = new StringBuilder();
+		var2.append(new Grid2ItemsContent("尾数金额：" + mShiftDetail.getRoundIncome(), pos2Item, "账单数：" + mShiftDetail.getRoundAmount(), getStyle()) + SEP);
 		var2.append(new Grid2ItemsContent("折扣金额：" + mShiftDetail.getDiscountIncome(), pos2Item, "账单数：" + mShiftDetail.getDiscountAmount(), getStyle()) + SEP);
 		var2.append(new Grid2ItemsContent("赠送金额：" + mShiftDetail.getGiftIncome(), pos2Item, "账单数：" + mShiftDetail.getGiftAmount(), getStyle()) + SEP);
 		var2.append(new Grid2ItemsContent("退菜金额：" + mShiftDetail.getCancelIncome(), pos2Item, "账单数：" + mShiftDetail.getCancelAmount(), getStyle()) + SEP);
