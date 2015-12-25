@@ -1588,11 +1588,7 @@ $(function(){
 					});
 				},
 				itemClick : function(index, item){
-					if(item.isSellout()){
-						//是否停售
-						Util.msg.tip('此菜品已停售!');
-						
-					}else if(item.isCurPrice()){
+					if(item.isCurPrice()){
 						//是否时价
 						openCurrentPriceWin(item);
 						
@@ -2691,6 +2687,7 @@ $(function(){
 		$('#aliasOrderFood_a_orderFood').click(function(){
 			aliasPopup.open(function(self){
 				self.find('[id=middle_a_numKbPopup]').hide();
+				$('#input_input_numKbPopup').focus();
 				closePinyin();
 				closeHandWriting();
 			});
@@ -2784,11 +2781,6 @@ $(function(){
 		//全单叫起
 		$('#allFoodHangUp_li_orderFood').click(function(){
 			foodHangUp({type : 1});
-		});
-		
-		//预订选好了
-		$('#addBookOrderFood_a_orderFood').click(function(){
-			
 		});
 		
 	});
@@ -2991,44 +2983,47 @@ $(function(){
 	 * 点菜
 	 */
 	function insertFood(food){
-		
-		//增加新点菜
-		of.newFood.add(food);
-		//最新添加的作为选中菜品
-		of.selectedOrderFood = of.newFood.getSelected();
-		//刷新新点菜
-		of.initNewFoodContent();
-		
-		//获取菜品常用口味
-		$.post('../QueryFoodTaste.do', {foodID : food.id}, function(jr){
-			if(jr.success){
-				of.commonTastes = jr.root;
-				
-				//获取菜品多单位
-				of.multiPrices = WirelessOrder.foods.getById(food.id).multiUnitPrice;
-				
-				if(of.newFood.getSelected().isCombo()){
-					comboFoodTasteUnitLoad();							
-				}else{
-					if(of.commonTastes.length == 0 && of.multiPrices.length == 0){
-						$('#divFoodTasteFloat').hide();
+		if(food.isSellout()){
+			Util.msg.tip('菜品已停售');
+		}else{
+			//增加新点菜
+			of.newFood.add(food);
+			//最新添加的作为选中菜品
+			of.selectedOrderFood = of.newFood.getSelected();
+			//刷新新点菜
+			of.initNewFoodContent();
+			
+			//获取菜品常用口味
+			$.post('../QueryFoodTaste.do', {foodID : food.id}, function(jr){
+				if(jr.success){
+					of.commonTastes = jr.root;
+					
+					//获取菜品多单位
+					of.multiPrices = WirelessOrder.foods.getById(food.id).multiUnitPrice;
+					
+					if(of.newFood.getSelected().isCombo()){
+						comboFoodTasteUnitLoad();							
 					}else{
-						foodCommonTasteLoad();
+						if(of.commonTastes.length == 0 && of.multiPrices.length == 0){
+							$('#divFoodTasteFloat').hide();
+						}else{
+							foodCommonTasteLoad();
+						}
 					}
-				}
-			}	
-		});	
-		
-		//判断拼音键盘是否显示来清空
-		if($("#orderPinyinCmp").is(":visible")){
-			$('#pinyinVal_a_orderFood').click();	
-			$('#handDel_a_orderFood').click();	
-		}
-		
-		//判断手写键盘是否显示来重写
-		if($("#orderHandCmp").is(":visible")){
-			$('#rewrite_a_orderFood').click();
-			$('#handDel_a_orderFood').click();
+				}	
+			});	
+			
+			//判断拼音键盘是否显示来清空
+			if($("#orderPinyinCmp").is(":visible")){
+				$('#pinyinVal_a_orderFood').click();	
+				$('#handDel_a_orderFood').click();	
+			}
+			
+			//判断手写键盘是否显示来重写
+			if($("#orderHandCmp").is(":visible")){
+				$('#rewrite_a_orderFood').click();
+				$('#handDel_a_orderFood').click();
+			}
 		}
 	};
 	

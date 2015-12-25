@@ -663,11 +663,6 @@ $(function(){
 	
 		//混合结账
 		$('#mixed_a_payment').click(function(){
-			if(orderMsg.memberId > 0){
-				Util.msg.tip('会员不支持混合结账');
-				return;
-			}
-			
 			var mixPayPopup = new createMixPayPopup({
 				left : function(mixedIncome){
 					paySubmit({

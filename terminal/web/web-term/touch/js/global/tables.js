@@ -22,18 +22,18 @@ WirelessOrder.TableList = function(source){
 			if(e.isTempPaid){
 				_tmpPaidAmount++;
 			}
+			
+			e.isBusy = function(){
+				return parseInt(this.statusValue) === WirelessOrder.TableList.Status.BUSY.val;
+			}
+			
+			e.isIdle = function(){
+				return parseInt(this.statusValue) === WirelessOrder.TableList.Status.IDLE.val;
+			}
 		});
 	}else{
 		_tables = [];		
 	}
-	
-	_tables.isBusy = function(index){
-		return this[index].statusValue == WirelessOrder.TableList.Status.BUSY.val;
-	};
-	
-	_tables.isIdle = function(index){
-		return this[index].statusVale == WirelessOrder.TableList.Status.IDLE.val;
-	};
 	
 	//根据区域查找tables
 	_tables.getByRegion = function(regionId){
