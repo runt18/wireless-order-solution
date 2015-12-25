@@ -274,7 +274,10 @@ public class ShiftDao {
 		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, range, extraCond));
 		
 		//Get the total & amount to member price
-		result.setMemberPriceIncome(CalcBillStatisticsDao.calcMemberPrice(dbCon, staff, range, extraCond));
+		//result.setMemberPriceIncome(CalcBillStatisticsDao.calcMemberPrice(dbCon, staff, range, extraCond));
+		
+		//Get the total & amount to round price
+		result.setRoundIncome(CalcBillStatisticsDao.calcRoundPrice(dbCon, staff, range, extraCond));
 		
 		//Get the income by charge
 		result.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(extraCond.dateType)));

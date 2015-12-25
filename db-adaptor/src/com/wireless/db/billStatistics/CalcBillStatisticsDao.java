@@ -31,6 +31,7 @@ import com.wireless.pojo.billStatistics.IncomeByMemberPrice;
 import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.billStatistics.IncomeByPay.PaymentIncome;
 import com.wireless.pojo.billStatistics.IncomeByRepaid;
+import com.wireless.pojo.billStatistics.IncomeByRound;
 import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.pojo.billStatistics.IncomeTrendByDept;
 import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
@@ -597,6 +598,45 @@ public class CalcBillStatisticsDao {
 		dbCon.rs.close();
 		
 		return repaidIncome;
+	}
+	
+	/**
+	 * Calculate the rould price according to specific range and extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to income by repaid {@link IncomeByRound}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static IncomeByRound calcRoundPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+		
+		String sql;
+		sql = " SELECT " +
+		      " ROUND(SUM(IFNULL(O.actual_price, 0) + IFNULL(O.erase_price, 0) + IFNULL(O.coupon_price, 0) - IFNULL(O.total_price, 0)), 2) AS round_price " +
+		      " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
+		      " WHERE 1 = 1 " +
+		      " AND O.restaurant_id = " + staff.getRestaurantId() +
+		      " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+		      " GROUP BY O.id " +
+		      " HAVING round_price <> 0 ";
+		
+		sql = " SELECT COUNT(*) AS amount, SUM(round_price) AS price FROM ( " + sql + " ) AS TMP ";
+			
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		IncomeByRound roundIncome = new IncomeByRound();
+		if(dbCon.rs.next()){
+			roundIncome.setAmount(dbCon.rs.getInt("amount"));
+			roundIncome.setTotal(dbCon.rs.getFloat("price"));
+		}
+		dbCon.rs.close();
+		
+		return roundIncome;
 	}
 	
 	/**
