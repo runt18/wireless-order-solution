@@ -263,7 +263,7 @@ $(function(){
 							if(data.success){
 								//进入点菜界面
 								of.entry({
-									initFoods : data.root[0].order.orderFoods,
+									initFoods : data.root[0].order ? data.root[0].order.orderFoods : null,
 									table : tables[0],
 									comment : '',
 									orderFoodOperateType : 'bookSeat',
