@@ -3,11 +3,6 @@ package com.wireless.json;
 
 public interface Jsonable {
 
-	public static enum Type{
-		PAIR,
-		LIST;
-	}
-
 	/**
 	 * Flatten the object to a key-value map.
 	 * @param flag additional flags about how the object should be flatten

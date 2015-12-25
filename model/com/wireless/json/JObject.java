@@ -102,7 +102,6 @@ public class JObject implements Jsonable {
 		jm.putString("msg", this.msg);
 		jm.putString("title", this.title);
 		jm.putJsonable("other", this.extra, 0);
-		
 		return jm;
 	}
 

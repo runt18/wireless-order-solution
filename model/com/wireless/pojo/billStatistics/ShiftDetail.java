@@ -28,7 +28,9 @@ public class ShiftDetail implements Jsonable{
 	
 	private IncomeByErase incomeByErase;		//抹数数据
 	
-	private IncomeByMemberPrice incomeByMemberPrice;	//会员价数据
+	private IncomeByRound incomeByRound;		//尾数数据
+	
+	//private IncomeByMemberPrice incomeByMemberPrice;	//会员价数据
 	
 	private IncomeByCharge incomeByCharge; 		//会员充值信息
 	
@@ -216,25 +218,43 @@ public class ShiftDetail implements Jsonable{
 		}
 	}
 	
-	public void setMemberPriceIncome(IncomeByMemberPrice memberPriceIncome){
-		this.incomeByMemberPrice = memberPriceIncome;
+	public void setRoundIncome(IncomeByRound roundIncome){
+		this.incomeByRound = roundIncome;
 	}
 	
-	public int getMemberPriceAmount(){
-		if(this.incomeByMemberPrice != null){
-			return this.incomeByMemberPrice.getMemberPriceAmount();
-		}else{
+	public int getRoundAmount(){
+		if(this.incomeByRound == null){
 			return 0;
 		}
+		return this.incomeByRound.getAmount();
 	}
 	
-	public float getMemberPriceIncome(){
-		if(this.incomeByMemberPrice != null){
-			return this.incomeByMemberPrice.getMemberPrice();
-		}else{
+	public float getRoundIncome(){
+		if(this.incomeByRound == null){
 			return 0;
 		}
+		return this.incomeByRound.getTotal();
 	}
+	
+//	public void setMemberPriceIncome(IncomeByMemberPrice memberPriceIncome){
+//		this.incomeByMemberPrice = memberPriceIncome;
+//	}
+//	
+//	public int getMemberPriceAmount(){
+//		if(this.incomeByMemberPrice != null){
+//			return this.incomeByMemberPrice.getMemberPriceAmount();
+//		}else{
+//			return 0;
+//		}
+//	}
+//	
+//	public float getMemberPriceIncome(){
+//		if(this.incomeByMemberPrice != null){
+//			return this.incomeByMemberPrice.getMemberPrice();
+//		}else{
+//			return 0;
+//		}
+//	}
 	
 	public void setEraseIncome(IncomeByErase eraseIncome){
 		this.incomeByErase = eraseIncome;
@@ -361,9 +381,13 @@ public class ShiftDetail implements Jsonable{
 		jm.putInt("serviceAmount", this.getServiceAmount());
 		jm.putFloat("serviceIncome", this.getServiceIncome());
 		
+		//尾数处理
+		jm.putInt("roundAmount", this.getRoundAmount());
+		jm.putFloat("roundIncome", this.getRoundIncome());
+		
 		//会员价
-		jm.putInt("memberPriceAmount", this.getMemberPriceAmount());
-		jm.putFloat("memberPriceIncome", this.getMemberPriceIncome());
+		//jm.putInt("memberPriceAmount", this.getMemberPriceAmount());
+		//jm.putFloat("memberPriceIncome", this.getMemberPriceIncome());
 		
 		//预订金额
 		jm.putFloat("bookIncome", this.getIncomeByBook().getIncome());
