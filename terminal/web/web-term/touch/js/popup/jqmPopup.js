@@ -3,7 +3,7 @@
  */
 (function(){
 	
-	var _loadedUrlCahe = {};
+	var _loadedUrlCache = {};
 	
 	JqmPopup = function(o){
 		
@@ -56,12 +56,12 @@
 
 			}else{
 				if(_o.loadUrl){
-					if(_loadedUrlCahe[_o.loadUrl]){
-						_init(_loadedUrlCahe[_o.loadUrl]);
+					if(_loadedUrlCache[_o.loadUrl]){
+						_init(_loadedUrlCache[_o.loadUrl]);
 						_open(pageOpen);
 					}else{
 						$('<div/>').load(_o.loadUrl, function(response, status, xhr){
-							_loadedUrlCahe[_o.loadUrl] = response;
+							_loadedUrlCache[_o.loadUrl] = response;
 							if(xhr.status == '200'){
 								_init(response);
 								_open(pageOpen);
