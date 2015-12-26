@@ -83,6 +83,7 @@ function CreateInSeatDiv(param){
 	function initTables(tables, type){
 		var html = [];
 		for (var i = 0; i < tables.length; i++) {
+			tables[i] = new WirelessOrder.TableWrapper(tables[i]);
 			var aliasOrName;
 			if(tables[i].isNormal()){//一般台
 				aliasOrName = tables[i].alias;

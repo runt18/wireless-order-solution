@@ -17,7 +17,7 @@ function CreateAddBookInfo(param){
 		pageInit : function(self){
 			//右上角的关闭按钮
 			self.find('[id="close_a_books"]').click(function(){
-					_self.close();
+				_self.close();
 			});
 			
 			
@@ -210,6 +210,7 @@ function CreateAddBookInfo(param){
 		
 		var html = [];
 		for (var i = 0; i < tables.length; i++) {
+			tables[i] = new WirelessOrder.TableWrapper(tables[i]);
 			var aliasOrName;
 			if(tables[i].isNormal()){//一般台
 				aliasOrName = tables[i].alias;
