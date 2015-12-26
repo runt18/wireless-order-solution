@@ -23,13 +23,28 @@ WirelessOrder.TableList = function(source){
 				_tmpPaidAmount++;
 			}
 			
+			//判断是否就餐
 			e.isBusy = function(){
 				return parseInt(this.statusValue) === WirelessOrder.TableList.Status.BUSY.val;
-			}
+			};
 			
+			//判断是否空闲
 			e.isIdle = function(){
 				return parseInt(this.statusValue) === WirelessOrder.TableList.Status.IDLE.val;
-			}
+			};
+			
+			//判断是否一般状态
+			e.isNormal = function(){
+				return this.categoryValue == WirelessOrder.TableList.Category.NORMAL.val;
+			};
+			//判断是否搭台
+			e.isJoin = function(){
+				return this.categoryValue == WirelessOrder.TableList.Category.JOIN.val;
+			};
+			//判断是否酒席
+			e.isFeast = function(){
+				return this.categoryValue == WirelessOrder.TableList.Category.JOIN.val;
+			};
 		});
 	}else{
 		_tables = [];		
@@ -116,4 +131,9 @@ WirelessOrder.TableList.Status = {
 	BUSY : { val : 1, desc : '就餐'}
 };
 
+WirelessOrder.TableList.Category = {
+	NORMAL : { val : 1, desc : '一般'},
+	JOIN : { val : 3, desc : '搭台'},
+	FEAST : { varl : 5, desc : '酒席费'}
+};
 
