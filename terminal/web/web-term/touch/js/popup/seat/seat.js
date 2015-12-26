@@ -1,8 +1,8 @@
 function CreateInSeatDiv(param){
 	
 	param = param || {
-		seat : function(tables){},  //右边的方法	
-		book : '',             //预订数据
+		seat : function(tables){},  //入座的方法	
+		book : ''             //预订数据
 	};
 	
 	//已定餐台
