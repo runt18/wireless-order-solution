@@ -188,10 +188,10 @@
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="location.reload()" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="WxOrder_a_tableSelect">微定</a>
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont"  onclick="ts.bookListEntry()">
+		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="book_a_tableSelect">
 		 	<div>
 		 		<!-- 预订单数 -->
-		 		<div id="amount4Book" style="display:none;width:28px;height: 28px;border-radius: 14px;background-color: red;float: right;margin-top: -11px;line-height:28px;">0</div>
+		 		<div id="bookAmount_div_tableSelect" style="display:none;width:28px;height: 28px;border-radius: 14px;background-color: red;float: right;margin-top: -11px;line-height:28px;">0</div>
 		 		预订
 		 	</div>	
 		 	</a>

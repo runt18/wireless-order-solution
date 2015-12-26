@@ -1,12 +1,12 @@
 function CreateAddBookInfo(param){
 	param = param || {
 		title : '',   //标题
-		middle : function(tables){},	//中间的方法
-		right : function(tables){},	//右边的方法
+		bookFoods : function(tables){},	//菜品预订的方法
+		confirm : function(tables){},	//确认的方法
 		cancel : function(){},   //取消的方法
 		type : '',                //打开预订信息的类型
 		book : '',                //预订的信息
-		isNeedFoot : ''            //是否需要脚部
+		isNeedFoot : true            //是否需要脚部
 	}
 	
 	var _self = this;
@@ -67,16 +67,16 @@ function CreateAddBookInfo(param){
 			});
 			
 			//中间的方法
-			self.find('[id="middle_a_books"]').click(function(){
-				if(param.middle && typeof param.middle == 'function'){
-					param.middle(_tables);
+			self.find('[id="bookFoods_a_books"]').click(function(){
+				if(param.bookFoods && typeof param.bookFoods == 'function'){
+					param.bookFoods(_tables);
 				}
 			});
 			
 			//右边的方法
-			self.find('[id="right_a_books"]').click(function(){
-				if(param.right && typeof param.right == 'function'){
-					param.right(_tables);
+			self.find('[id="confirm_a_books"]').click(function(){
+				if(param.confirm && typeof param.confirm == 'function'){
+					param.confirm(_tables);
 				}
 			});
 			
@@ -87,14 +87,6 @@ function CreateAddBookInfo(param){
 	this.open = function(afterOpen){
 		
 		_addBookInfo.open(function(self){	
-			//时分插件
-			self.find('[id="add_bookTimeBox"]').html('<input id="bookTime_input_books" class="bookTime" >').trigger('create');
-			self.find('.bookTime').timepicki();	
-			
-			var now = new Date();
-			self.find('[id="bookDate_input_books"]').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
-			self.find('[id="bookMoney_input_books"]').val(0);
-			
 			//加载经手人
 			$.post('../QueryStaff.do', function(data){
 				if(data.success){
@@ -111,7 +103,17 @@ function CreateAddBookInfo(param){
 				}
 			}, 'json');
 			
+			//时分插件
+			self.find('[id="add_bookTimeBox"]').html('<input id="bookTime_input_books" class="bookTime" >').trigger('create');
+			self.find('.bookTime').timepicki();	
+			
+			var now = new Date();
+			self.find('[id="bookDate_input_books"]').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
+			self.find('[id="bookMoney_input_books"]').val(0);
+			
 			if(param.isNeedFoot){
+				self.find('[id="bookInfoFoot_div_books"]').show();
+			}else{
 				self.find('[id="bookInfoFoot_div_books"]').hide();
 			}
 			
@@ -132,6 +134,8 @@ function CreateAddBookInfo(param){
 						self.find('[id="bookReserved_input_books"]').val(data.root[0].reserved);
 						self.find('[id="staff_select_books"]').val(data.root[0].staffId).selectmenu("refresh");
 						self.find('[id="bookMoney_input_books"]').val(data.root[0].money);
+						self.find('[id="staff_select_books"]').selectmenu("refresh");
+						self.find('[id="bookCate_select_books"]').selectmenu("refresh");
 						if(data.root[0].tables.length > 0){
 							self.find('[id="bookTableList_tr_books"]').show();
 							_tables = data.root[0].tables;
@@ -174,7 +178,7 @@ function CreateAddBookInfo(param){
 					}
 				});
 			}
-			$('#shadowForPopup').show();
+//			$('#shadowForPopup').show();
 		})
 		
 		if(afterOpen && typeof afterOpen == 'function'){
@@ -185,7 +189,7 @@ function CreateAddBookInfo(param){
 	
 	this.close = function(afterClose, timeout){
 		_addBookInfo.close();
-		$('#shadowForPopup').hide();
+//		$('#shadowForPopup').hide();
 		if(afterClose && typeof afterClose == 'function'){
 			if(timeout){
 				setTimeout(afterClose, timeout);

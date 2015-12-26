@@ -1,9 +1,8 @@
 function CreateInSeatDiv(param){
 	
 	param = param || {
-		//FIXME  要传出book
-		right : function(tables){},  //右边的方法	
-		book : '',             //预订数据
+		seat : function(tables){},  //入座的方法	
+		book : ''             //预订数据
 	};
 	
 	//已定餐台
@@ -59,8 +58,8 @@ function CreateInSeatDiv(param){
 			});
 			
 			//入座的回调函数
-			self.find('[id="right_a_seat"]').click(function(){
-				param.right(_seatTables);
+			self.find('[id="seat_a_seat"]').click(function(){
+				param.seat(_seatTables);
 			});
 			
 			
@@ -71,7 +70,6 @@ function CreateInSeatDiv(param){
 		_seatDiv.open(function(self){
 			initTables(param.book.tables);
 		});
-		$('#shadowForPopup').show();
 		if(afterOpen && typeof afterOpen == 'function'){
 			afterOpen();
 		}
@@ -79,7 +77,6 @@ function CreateInSeatDiv(param){
 	
 	this.close = function(afterClose, timeout){
 		_seatDiv.close();
-		$('#shadowForPopup').hide();
 	}
 	
 	//入座餐桌

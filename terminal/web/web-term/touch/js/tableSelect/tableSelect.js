@@ -8,10 +8,8 @@ var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 var	ts = {
 		table : {},
 		member : {},
-		bookChoosedTable : [],
 		multiOpenTableChoosedTable : [],
-		multiPayTableChoosedTable : [],
-		bookFoods : []			//预订菜品
+		multiPayTableChoosedTable : []
 	},
 	/**
 	 * 元素模板
@@ -122,6 +120,21 @@ $(function(){
 				$('#searchTable_a_tableSelect').click();
 		    } 	
 		});
+		
+		//刷新微信预订单
+		(function refreshWeixinBook(){
+			$.post('../OperateBook.do', {dataSource: 'getByCond', status:1}, function(data){
+				if(data.success){
+					if(data.root && data.root.length > 0){
+						$('#bookAmount_div_tableSelect').html(data.root.length);
+						$('#bookAmount_div_tableSelect').show();
+					}else{
+						$('#bookAmount_div_tableSelect').hide();
+					}
+				}
+			}, 'json');	
+		})();
+
 	});
 	
 	//进入餐桌初始化
@@ -220,9 +233,6 @@ $(function(){
 		
 		//获取系统相关属性
 		Util.sys.checkSmStat();
-		
-		//刷新微信预订单
-		ts.refreshWeixinBook();
 		
 		//pos端 && 体验端 && touch端
 		if(systemStatus == 1){//pos端
@@ -1012,70 +1022,6 @@ $(function(){
 			});
 		});
 		
-//		//入座选餐桌
-//		$('#bookChoose_a_tableSelect').click(function(){
-//			var _selectedTable = null;
-//			var askTablePopup = null;
-//			askTablePopup = new AskTablePopup({
-//				title : '入座选桌',
-//				tables : WirelessOrder.tables,
-//				tableSelect : function(selectedTable){
-//					_selectedTable = selectedTable;
-//					var table = null;
-//					if(typeof _selectedTable.otype == 'undefined' || _selectedTable.otype == 'commit'){
-//						
-//						for (var i = 0; i < ts.bookChoosedTable.length; i++) {
-//							if(ts.bookChoosedTable[i].id == _selectedTable.id){
-//								table = true;
-//								break;
-//							}
-//						}
-//						//选择餐台
-//						if(table == null){
-//							table = WirelessOrder.tables.getById(_selectedTable.id);
-//							if(table.statusValue == 1){
-//								Util.msg.tip("此餐台已使用, 不能选择");
-//								return;
-//							}
-//							ts.bookChoosedTable.push(table);
-//						}			
-//						//去除已订餐台
-//						for (var i = 0; i < ts.bookOperateTable.oldTables.length; i++) {
-//							if(ts.bookOperateTable.oldTables[i].id == _selectedTable.id){
-//								ts.bookOperateTable.oldTables.splice(i, 1);
-//								break;
-//							}
-//						}			
-//					}else if(c.otype == 'display'){
-//						for (var i = 0; i < ts.bookChoosedTable.length; i++) {
-//							if(ts.bookChoosedTable[i].id == _selectedTable.id){
-//								table = ts.bookChoosedTable[i];
-//								ts.bookChoosedTable.splice(i, 1);
-//								break;
-//							}
-//						}
-//						//退回原餐台
-//						ts.bookOperateTable.oldTables.push(table);
-//					}
-//	
-//					//选台后关闭
-//					askTablePopup.close();
-//					//刷新入座餐台
-//					ts.loadBookChoosedTable({renderTo : 'bookTableHadChoose', tables:ts.bookChoosedTable, otype : 'display'});
-//					//刷新预订餐台
-//					ts.loadBookChoosedTable({renderTo : 'bookTableToChoose', tables:ts.bookOperateTable.oldTables, otype : 'commit'});		
-//	
-//					
-//				}
-//			});
-//			
-//			askTablePopup.open(function(){
-//				$('#left_a_askTable').hide();
-//				$('#middle_a_askTable').css('width', '48%');
-//				$('#right_a_askTable').css('width', '50%');
-//			});
-//		});
-	
 		//当日账单
 		$('#todayBill_a_tableSelect').click(function(){
 			//新页面打开账单管理
@@ -1212,6 +1158,11 @@ $(function(){
 				}
 			});
 			wxOrderPopup.open();
+		});
+		
+		//预订按钮
+		$('#book_a_tableSelect').click(function(){
+			books.entry();
 		});
 		
 	});
@@ -1864,9 +1815,6 @@ function initTableData(){
 		}
 		Util.LM.hide();
 	});	
-	
-	//刷新餐台是刷新预订
-	ts.refreshWeixinBook();
 	
 }
 
@@ -2536,34 +2484,6 @@ ts.doFeastOrder = function(){
 
 
 //预订=============================================
-/**
- * 刷新微信预订单
- */
-ts.refreshWeixinBook = function(){
-	$.post('../OperateBook.do', {dataSource: 'getByCond', status:1}, function(data){
-		if(data.success){
-			if(data.root && data.root.length > 0){
-				$('#amount4Book').html(data.root.length);
-				$('#amount4Book').show();
-			}else{
-				$('#amount4Book').hide();
-			}
-		}
-	}, 'json');	
-};
-
-
-
-
-/**
- * 进入订单列表Entry
- */
-ts.bookListEntry = function(){
-	//去已预订界面
-	location.href="#bookOrderListMgr";
-	
-};
-
 
 /**
  * 加载已选餐台
@@ -2622,20 +2542,6 @@ ts.closeMultiPayTableCmp = function(){
 	$('#multiPayTableHadChoose').html('');
 };
 
-/**
- * 设置多台开席入座选台
-ts.openMultiPayTable = function(){
-	//隐藏数量输入
-	$('#td4TxtFoodNumForTran').hide();
-	
-	$("#txtTableNumForTS").val("");
-	$("#txtTableComment").val("");
-	
-	$('#transSomethingTitle').html("请输入桌号，确认添加");
-	
-	//打开控件
-	uo.openTransOrderFood();		
-};
 
 /**
  * 多台并台
