@@ -111,7 +111,7 @@ function CreateAddBookInfo(param){
 			self.find('[id="bookDate_input_books"]').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
 			self.find('[id="bookMoney_input_books"]').val(0);
 			
-			if(param.isNeedFoot){
+			if(param.isNeedFoot == true || typeof param.isNeedFoot == 'undefined'){
 				self.find('[id="bookInfoFoot_div_books"]').show();
 			}else{
 				self.find('[id="bookInfoFoot_div_books"]').hide();
