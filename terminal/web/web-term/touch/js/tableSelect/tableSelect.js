@@ -1578,7 +1578,7 @@ function handleTableForTS(c){
 					},
 					right : function(){
 						customerPopup.close(function(){
-							ts.checkBookTable();
+							books.entry();
 						}, 200);
 						
 					},

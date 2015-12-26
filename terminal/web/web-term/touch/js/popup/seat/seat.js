@@ -82,6 +82,13 @@ function CreateInSeatDiv(param){
 	//入座餐桌
 	function initTables(tables, type){
 		var html = [];
+		//餐台
+		var tableTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
+			'<div style="height: 70px;">{name}<br>{alias}' +
+				'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
+				'<div class="bookTableStatus">{bookTableStatus}</div>'+
+			'</div>'+
+		'</a>';
 		for (var i = 0; i < tables.length; i++) {
 			var aliasOrName;
 			if(tables[i].categoryValue == 1){//一般台
@@ -93,7 +100,7 @@ function CreateInSeatDiv(param){
 			}else{
 				aliasOrName = '<font color="green">'+ tables[i].categoryText +'</font>';
 			}		
-			html.push(tableCmpTemplet.format({
+			html.push(tableTemplet.format({
 				dataIndex : i,
 				id : tables[i].id,
 				alias : aliasOrName,
@@ -103,9 +110,20 @@ function CreateInSeatDiv(param){
 				bookTableStatus : tables[i].isBook? '订' : '',
 				tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0?'tempPayStatus4Moz':'tempPayStatus'		
 			}));				
-		}
+		} 
 		if(type == "seat"){
 			$('#seatTable_div_seat').html(html.join("")).trigger('create');
+			$('#seatTable_div_seat').find('a').each(function(index, element){
+				element.onclick = function(){
+					console.log(element);
+					for(var i= 0; i < _seatTables.length; i++){
+						if($(element).attr('data-value') == _seatTables[i].id){
+							_seatTables.splice(i, 1);
+						}
+						initTables(_seatTables, 'seat');
+					}
+				}
+			});
 		}else{
 			$('#bookTable_div_seat').html(html.join("")).trigger('create');
 		}

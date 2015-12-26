@@ -278,17 +278,13 @@ $(function(){
 									comment : '',
 									orderFoodOperateType : 'bookSeat',
 									commit : function(selectedFoods){
-										if(book.tables.length == 0){
-											Util.msg.tip('请选择菜品')	
-											return;
-										}
 										
 										var bookOrders = [];
-										for(var i = 0; i < book.tables.length; i++){
+										for(var i = 0; i < tables.length; i++){
 											var orderDataModel = {};
-											orderDataModel.tableID = book.tables[i].id;
+											orderDataModel.tableID = tables[i].id;
 											orderDataModel.orderFoods = selectedFoods.slice(0);
-											orderDataModel.categoryValue = book.tables[i].categoryValue;
+											orderDataModel.categoryValue = tables[i].categoryValue;
 											bookOrders.push(JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)));
 										}
 										
