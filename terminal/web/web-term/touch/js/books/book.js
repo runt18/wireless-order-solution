@@ -1,3 +1,13 @@
+//进入订单列表Entry
+var books = {
+	entry : function(){},    //book入口
+	bookFoods : []
+};
+books.entry = function(){
+	//去已预订界面
+	location.href="#bookOrderListMgr";
+	
+};
 $(function(){
 	//预订列表
 	var bookList = null;
@@ -221,7 +231,7 @@ $(function(){
 					title : '查看预订--' + book.sourceDesc,
 					type : 'look',
 					book : book,
-					isNeedFoot : 'no'
+					isNeedFoot : false
 				});																																	
 				lookBookInfo.open();
 			}
@@ -249,7 +259,7 @@ $(function(){
 				
 				var inSeatPopup = new CreateInSeatDiv({
 					book : book,
-					right : function(tables){
+					seat : function(tables){
 						if(tables.length == 0){
 							Util.msg.tip("请选择餐台");
 							return;
@@ -291,7 +301,7 @@ $(function(){
 											Util.LM.hide();
 											if(data.success){
 												Util.msg.tip(data.msg);
-												bookListEntry();
+												books.entry();
 											}else{
 												Util.msg.tip(data.msg);
 											}
@@ -300,7 +310,7 @@ $(function(){
 									}
 								});	
 								inSeatPopup.close();
-							}else{
+							}else{''
 								Util.msg.tip(data.msg);
 							} 		
 						});
@@ -330,7 +340,7 @@ $(function(){
 					title : '确认预订',
 					book : book,
 					type : 'change',
-					middle : function(tables){
+					bookFoods : function(tables){
 						var bookTables = [];
 						//关闭shadow
 						$('#shadowForPopup').hide();
@@ -347,7 +357,7 @@ $(function(){
 							orderFoodOperateType : 'addBook'
 						});	
 					},
-					right : function(tables){
+					confirm : function(tables){
 						var bookDate = $('#bookDate_input_books').val();
 						var time = $('#bookTime_input_books').val();
 						var member = $('#bookPerson_input_books').val();
@@ -389,8 +399,8 @@ $(function(){
 						
 						
 						var orderFoods = [];
-						for (var i = 0; i < ts.bookFoods.length; i++) {
-							orderFoods.push(JSON.stringify(ts.bookFoods[i]));
+						for (var i = 0; i < books.bookFoods.length; i++) {
+							orderFoods.push(JSON.stringify(books.bookFoods[i]));
 						}
 						
 						Util.LM.show();
@@ -414,7 +424,6 @@ $(function(){
 								Util.msg.tip(data.msg);
 								changeBookInfo.close();
 								searchBookList();
-								ts.refreshWeixinBook();
 							}else{
 								Util.msg.tip(data.msg);
 							}
@@ -554,7 +563,7 @@ $(function(){
 		//添加
 		$('#addBooksInfo').click(function(){
 			var addBookInfo = new CreateAddBookInfo({
-				middle : function(tables){
+				bookFoods : function(tables){
 					//关闭shadow
 					$('#shadowForPopup').hide();
 					//进入点菜界面
@@ -565,7 +574,7 @@ $(function(){
 						orderFoodOperateType : 'addBook'
 					});	
 				},
-				right : function(tables){
+				confirm : function(tables){
 					var bookDate = $('#bookDate_input_books').val();
 					var time = $('#bookTime_input_books').val();
 					var member = $('#bookPerson_input_books').val();
@@ -606,8 +615,8 @@ $(function(){
 					}
 					
 					var orderFoods = [];
-					for (var i = 0; i < ts.bookFoods.length; i++) {
-						orderFoods.push(JSON.stringify(ts.bookFoods[i]));
+					for (var i = 0; i < books.bookFoods.length; i++) {
+						orderFoods.push(JSON.stringify(books.bookFoods[i]));
 					}
 					
 					Util.LM.show();
@@ -630,7 +639,6 @@ $(function(){
 							Util.msg.tip(data.msg);
 							addBookInfo.close();
 							searchBookList();
-							ts.refreshWeixinBook();
 						}
 					});
 				}
@@ -648,7 +656,7 @@ $(function(){
 					});		
 					return ;
 				}else{
-					ts.bookFoods = of.newFood.slice(0);
+					books.bookFoods = of.newFood.slice(0);
 				}
 				
 				//返回预订界面
@@ -663,7 +671,7 @@ $(function(){
 							+ '<td>{unitPrice}</td>'
 							+ '</tr>';
 							
-				ts.bookFoods.forEach(function(e, index){
+				books.bookFoods.forEach(function(e, index){
 					html.push(bookOrderFoodListCmpTemplet.format({
 						dataIndex : index + 1,
 						id : e.id,
@@ -683,10 +691,4 @@ $(function(){
 				$('#bookOrderFoodList_td_books').show();	
 		});
 	});
-	
-	
-	
-	
-	
-	
 });
