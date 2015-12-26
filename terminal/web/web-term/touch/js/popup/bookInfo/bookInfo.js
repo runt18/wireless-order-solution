@@ -125,7 +125,7 @@ function CreateAddBookInfo(param){
 					detail : true
 				}, function(data){
 					if(data.success){
-						self.find('[id="bookDate_input_books"]').text(data.root[0].bookDate.substring(0, 11));
+						self.find('[id="bookDate_input_books"]').val(data.root[0].bookDate.substring(0, 10));
 						self.find('[id="bookTime_input_books"]').val(data.root[0].bookDate.substring(11, 16));
 						self.find('[id="bookPerson_input_books"]').val(data.root[0].member);
 						self.find('[id="bookPhone_input_books"]').val(data.root[0].tele);
