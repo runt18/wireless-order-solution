@@ -353,7 +353,7 @@ function PickFoodComponent(param){
 							img : _foodData[i].img ? _foodData[i].img.thumbnail : noImage,
 							hasImage : _foodData[i].img ? 'no' : 'yes',
 							name : (_foodData[i].name.length > 7 ? _foodData[i].name.substring(0, 6) + "…" : _foodData[i].name),
-							unitPrice :  (_foodData[i].status && (1 << 4)) != 0 ? '时价' : '￥' + _foodData[i].unitPrice,
+							unitPrice :  (_foodData[i].status & (1 << 4)) != 0 ? '时价' : '￥' + _foodData[i].unitPrice,
 							foodCnt : parseInt(_foodData[i].foodCnt),
 							count : count,
 							selected : count > 0 ? 'class="select-food"' : '',
