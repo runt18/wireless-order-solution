@@ -17,7 +17,7 @@ function CreateAddBookInfo(param){
 		pageInit : function(self){
 			//右上角的关闭按钮
 			self.find('[id="close_a_books"]').click(function(){
-					_self.close();
+				_self.close();
 			});
 			
 			
@@ -122,7 +122,7 @@ function CreateAddBookInfo(param){
 				$.post('../OperateBook.do', {
 					dataSource : 'getByCond',
 					bookId : param.book.id,
-					detail : 'true'
+					detail : true
 				}, function(data){
 					if(data.success){
 						self.find('[id="bookDate_input_books"]').val(data.root[0].bookDate.substring(0, 10));
@@ -210,10 +210,11 @@ function CreateAddBookInfo(param){
 		
 		var html = [];
 		for (var i = 0; i < tables.length; i++) {
+			tables[i] = new WirelessOrder.TableWrapper(tables[i]);
 			var aliasOrName;
-			if(tables[i].categoryValue == 1){//一般台
+			if(tables[i].isNormal()){//一般台
 				aliasOrName = tables[i].alias;
-			}else if(tables[i].categoryValue == 3){//搭台
+			}else if(tables[i].isJoin()){//搭台
 				var begin = tables[i].name.indexOf("(");
 				var end = tables[i].name.indexOf(")");
 				aliasOrName = '<font color="green">' + tables[i].name.substring(begin+1, end) +'</font>';
@@ -224,7 +225,7 @@ function CreateAddBookInfo(param){
 				dataIndex : i,
 				id : tables[i].id,
 				alias : aliasOrName,
-				theme : tables[i].statusValue == '1' ? "e" : "c",
+				theme : tables[i].isBusy() ? "e" : "c",
 				name : tables[i].name == "" || typeof tables[i].name != 'string' ? tables[i].alias + "号桌" : tables[i].name,
 				tempPayStatus : tables[i].isTempPaid? '暂结' : '&nbsp;&nbsp;',
 				bookTableStatus : tables[i].isBook ? '订' : '',

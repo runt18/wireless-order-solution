@@ -23,13 +23,8 @@ WirelessOrder.TableList = function(source){
 				_tmpPaidAmount++;
 			}
 			
-			e.isBusy = function(){
-				return parseInt(this.statusValue) === WirelessOrder.TableList.Status.BUSY.val;
-			}
-			
-			e.isIdle = function(){
-				return parseInt(this.statusValue) === WirelessOrder.TableList.Status.IDLE.val;
-			}
+			e = new WirelessOrder.TableWrapper(e);
+
 		});
 	}else{
 		_tables = [];		
@@ -111,9 +106,41 @@ WirelessOrder.TableList = function(source){
 	return _tables;
 };
 
+WirelessOrder.TableWrapper = function(table){
+	//判断是否就餐
+	table.isBusy = function(){
+		return parseInt(this.statusValue) === WirelessOrder.TableList.Status.BUSY.val;
+	};
+	
+	//判断是否空闲
+	table.isIdle = function(){
+		return parseInt(this.statusValue) === WirelessOrder.TableList.Status.IDLE.val;
+	};
+	
+	//判断是否一般状态
+	table.isNormal = function(){
+		return this.categoryValue == WirelessOrder.TableList.Category.NORMAL.val;
+	};
+	//判断是否搭台
+	table.isJoin = function(){
+		return this.categoryValue == WirelessOrder.TableList.Category.JOIN.val;
+	};
+	//判断是否酒席
+	table.isFeast = function(){
+		return this.categoryValue == WirelessOrder.TableList.Category.JOIN.val;
+	};
+	
+	return table;
+};
+
 WirelessOrder.TableList.Status = {
 	IDLE : { val : 0, desc : '空闲'},
 	BUSY : { val : 1, desc : '就餐'}
 };
 
+WirelessOrder.TableList.Category = {
+	NORMAL : { val : 1, desc : '一般'},
+	JOIN : { val : 3, desc : '搭台'},
+	FEAST : { varl : 5, desc : '酒席费'}
+};
 
