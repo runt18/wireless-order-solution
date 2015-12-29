@@ -24,26 +24,31 @@
 <script type="text/javascript" src="js/book/bookFood.js"></script>
 
 <script type="text/javascript" src="./js/idangerous.swiper-2.4.2.min.js"></script>
-<script type="text/javascript" src="./js/food/load.js"></script>
-<script type="text/javascript" src="./js/food/main.js"></script>
+
+<!--禁止触摸时选中文字  -->
+<script type="text/javascript">
+	document.onselectstart = function(){
+		return false;	
+	} 
+</script>
 </head>
 
 <body>
 <div  id="div4BookDetail" >
-<div  class="main-box" style="height: 52px;">
+<div  class="main-box" id="bookTime_div_book" style="height: 52px;">
 
 	<div id="bookDate4Today" class="bookDate">
-		<div class="bookDateDetail bookDateCheck">
+		<div data-type="bookTime" class="bookDateDetail bookDateCheck">
 			今天<br>02-10周日
 		</div>
 	</div>
 	<div id="bookDate4Tomorrow" class="bookDate">
-		<div class="bookDateDetail">
+		<div data-type="bookTime" class="bookDateDetail">
 			明天<br>02-11周一
 		</div>
 	</div>
 	<div id="bookDate4AfterDay" class="bookDate">
-		<div class="bookDateDetail">
+		<div data-type="bookTime" class="bookDateDetail">
 			后天<br>02-09周六
 		</div>
 	</div>
@@ -54,21 +59,34 @@
 </div>
 
 <div class="main-box" style="">
-	<ul class="m-b-list" id="ul4BookRegion">
-		<li style="line-height: 40px;">选择座位区域</li>
-		<li class="box-horizontal">
-			<div data-for="region1">大厅 </div>
-			<div class="event"><input id="region1" type="radio" name="bookRegion" class="radioInput"> </div>
-		</li>
+	<ul class="m-b-list" id="ul4BooskRegion">
+		<li style="line-height: 40px;">选择区域</li>
+		
+		
 	</ul>	
 
+						
+
+
+
 </div>
-<div class="main-box" style="">
+<div class="main-box" id="bookPersonAmoung_div_book">
 	<ul class="m-b-list">
-		<li style="line-height: 40px;font-size:18px;">
-			<label for="bookPerson3">2-4人</label><input id="bookPerson3" type="radio" name="bookPerson" value="4" checked="checked" class="radioInput"/>
+		<li class="box-horizontal" style="line-height: 40px;margin-left:-10px;font-size:18px;">
+			<div data-type="personAmount" data-value="4" class="region_css_book selectedRegion_css_book" style="width:31%;" href="#">
+				<ul class="m-b-list">2-4人</ul>
+			</div>
+			<div data-type="personAmount" data-value="9" class="region_css_book" style="width:31%;" href="#">
+				<ul class="m-b-list" >5-9人</ul>
+			</div>
+			<div data-type="personAmount" data-value="15" class="region_css_book" style="width:31%;" href="#">
+				<ul class="m-b-list" >10-15人</ul>
+			</div>
+		<!--  
+		<label for="bookPerson3">2-4人</label><input id="bookPerson3" type="radio" name="bookPerson" value="4" checked="checked" class="radioInput"/>
 			&nbsp;&nbsp;&nbsp;<label for="bookPerson6">5-9人</label><input id="bookPerson6" type="radio" value="9" name="bookPerson" class="radioInput"/>
 			&nbsp;&nbsp;&nbsp;<label for="bookPerson10">10-15人</label><input id="bookPerson10" type="radio" value="15" name="bookPerson" class="radioInput"/>
+		-->
 		</li>
 <!-- 		<li>
 			人数: <input id="txtBookPeopleCount" type="number" class="bookPerson"/>
@@ -110,10 +128,8 @@
 			<div id="div4bookFoodList" class="bookFoodList"></div>
 		</li>	
 		<li class="box-horizontal" >
-<!-- 			<div id="bookFoodTotalMoney" style="color: green;"></div> -->
-<!-- 			<div class="event"><input type="button" class="commitBook" value="确认提交" onclick="commitBook()"> </div> -->
 			<div style="margin-top: 3px;height: 55px;width: 100%;text-align: center;" >
-				<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="commitBook()">确认提交</a>	
+				<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" id="commit_a_book">确认提交</a>	
 			</div>	
 		</li>					
 	</ul>	
