@@ -647,6 +647,7 @@ class OrderHandler implements Runnable{
 			Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
 			if(restaurant.hasBeeCloud()){
 				final Order.PayBuilder payBuilder = parcel.readParcel(Order.PayBuilder.CREATOR);
+				final Order order = PayOrder.calc(staff, payBuilder);
 				//JsonMap optional = new JsonMap();
 				//optional.putJsonable("payBuilder", payBuilder, 0);
 				//optional.putInt("staffId", staff.getId());
@@ -654,8 +655,8 @@ class OrderHandler implements Runnable{
 				try{
 					final String billNo = System.currentTimeMillis() + Integer.toString(payBuilder.getOrderId());
 					Bill.Response response = app.bill().ask(new Bill.Request().setChannel(Bill.Channel.WX_NATIVE)
-																			  .setTotalFee(1)
-																			  //.setTotalFee(Float.valueOf(order.getActualPrice() * 100).intValue())
+																			  //.setTotalFee(1)
+																			  .setTotalFee(Float.valueOf(order.getActualPrice() * 100).intValue())
 																			  .setBillNo(billNo)
 																			  .setTitle(restaurant.getName() + "(’Àµ•∫≈£∫" + payBuilder.getOrderId() + ")")
 																			  //.setOptional(optional),
@@ -663,12 +664,15 @@ class OrderHandler implements Runnable{
 															new Callable<ProtocolPackage>() {
 																@Override
 																public ProtocolPackage call() throws Exception {
-																	return ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
+																	if(OrderDao.getStatusById(staff, payBuilder.getOrderId()) == Order.Status.UNPAID){
+																		return ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
+																	}else{
+																		return null;
+																	}
 																}
 															});
 					
 					if(response.isOk()){
-						final Order order = PayOrder.calc(staff, payBuilder);
 						new PrintHandler(staff).process(JobContentFactory.instance().createReceiptContent(printType, staff, printers, order, response.getCodeUrl()));
 					}else{
 						throw new BusinessException(response.getResultMsg() + "," + response.getErrDetail());
@@ -692,7 +696,7 @@ class OrderHandler implements Runnable{
 //						put("staffId", Integer.toString(staff.getId()));	
 //					}
 //				};
-//				final Order order = PayOrder.calc(staff, payBuilder);
+//				
 //				BCPayParameter param = new BCPayParameter(PAY_CHANNEL.WX_NATIVE,
 //														  //1,
 //														  Float.valueOf(order.getActualPrice() * 100).intValue(), 
