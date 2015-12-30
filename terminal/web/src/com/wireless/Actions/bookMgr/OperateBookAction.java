@@ -155,27 +155,25 @@ public class OperateBookAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward insert(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String bookDate = request.getParameter("bookDate");
-		String member = request.getParameter("member");
-		String tele = request.getParameter("tele");
-		String amount = request.getParameter("amount");
-		String cate = request.getParameter("cate");
-		String reserved = request.getParameter("reserved");
-		String comment = request.getParameter("comment");
-		String staffId = request.getParameter("staff");
-		String money = request.getParameter("money");
-		String tables = request.getParameter("tables");
-		String orderFoods = request.getParameter("orderFoods");
+	public ActionForward insert(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String bookDate = request.getParameter("bookDate");
+		final String member = request.getParameter("member");
+		final String tele = request.getParameter("tele");
+		final String amount = request.getParameter("amount");
+		final String cate = request.getParameter("cate");
+		final String reserved = request.getParameter("reserved");
+		final String comment = request.getParameter("comment");
+		final String staffId = request.getParameter("staff");
+		final String money = request.getParameter("money");
+		final String tables = request.getParameter("tables");
+		final String orderFoods = request.getParameter("orderFoods");
 		
-		JObject jobject = new JObject();
+		JObject jObject = new JObject();
 		
 		try{
-			String pin = (String) request.getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			Staff emloyee = StaffDao.getById(Integer.parseInt(staffId));
+			final String pin = (String) request.getAttribute("pin");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff emloyee = StaffDao.getById(Integer.parseInt(staffId));
 			Book.InsertBuilder4Manual insertBuilder = new Book.InsertBuilder4Manual().setBookDate(bookDate)
 					 .setMember(member)
 					 .setTele(tele)
@@ -190,7 +188,7 @@ public class OperateBookAction extends DispatchAction{
 				insertBuilder.addTable(TableDao.getById(staff, Integer.parseInt(tableString)));
 			}
 			
-			if(!orderFoods.isEmpty()){
+			if(orderFoods != null && !orderFoods.isEmpty()){
 				for (String orderFood : orderFoods.split("&")) {
 					OrderFood of = JObject.parse(OrderFood.JSON_CREATOR, 0, orderFood);
 					insertBuilder.addOrderFood(of, emloyee);
@@ -199,15 +197,15 @@ public class OperateBookAction extends DispatchAction{
 			
 			BookDao.insert(staff, insertBuilder);
 			
-			jobject.initTip(true, "添加成功");
+			jObject.initTip(true, "添加成功");
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

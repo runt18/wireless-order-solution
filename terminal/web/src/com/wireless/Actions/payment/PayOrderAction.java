@@ -1,6 +1,7 @@
 package com.wireless.Actions.payment;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,6 +11,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.beeCloud.BeeCloud;
+import com.wireless.beeCloud.Bill;
+import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.orderMgr.PayOrder;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
@@ -21,11 +27,13 @@ import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.dishesOrder.PrintOption;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class PayOrderAction extends Action{
 	
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String jsonResp = "{\"success\":$(result), \"data\":\"$(value)\"}";
@@ -44,6 +52,7 @@ public class PayOrderAction extends Action{
 			final String tempPay = request.getParameter("tempPay");
 			final String isPrint = request.getParameter("isPrint");
 			final String orientedPrinter = request.getParameter("orientedPrinter");
+			final String authCode = request.getParameter("authCode");
 			
 			final Order.SettleType settleType;
 			if(settleParam != null && !settleParam.isEmpty()){
@@ -120,13 +129,48 @@ public class PayOrderAction extends Action{
 			}
 			
 			if(payType.equals(PayType.WX)){
-				//打印微信支付单
-				ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildWxReceipt(staff, payBuilder).build());
-				if(resp.header.type == Type.ACK){
-					jsonResp = jsonResp.replace("$(result)", "true");
-					jsonResp = jsonResp.replace("$(value)", "微信支付成功");
+				if(authCode != null && !authCode.isEmpty()){
+					//微信扫描枪支付
+					Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
+					if(restaurant.hasBeeCloud()){
+						BeeCloud app = BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
+						final Order order = PayOrder.calc(staff, payBuilder);
+						final String billNo = System.currentTimeMillis() + Long.toString(orderId);
+						Bill.Response beeCloudResponse = app.bill().ask(new Bill.Request().setChannel(Bill.Channel.WX_SCAN)
+																				  .setTotalFee(1)
+																				  //.setTotalFee(Float.valueOf(order.getActualPrice() * 100).intValue())
+																				  .setBillNo(billNo)
+																				  .setTitle(restaurant.getName() + "(账单号：" + order.getId() + ")")
+																				  .setAuthCode(authCode)
+																				  ,
+																new Callable<ProtocolPackage>() {
+																	@Override
+																	public ProtocolPackage call() throws Exception {
+																		if(OrderDao.getStatusById(staff, order.getId()) == Order.Status.UNPAID){
+																			return ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
+																		}else{
+																			return null;
+																		}
+																	}
+																});
+						
+						if(beeCloudResponse.isOk()){
+							jsonResp = jsonResp.replace("$(result)", "true");
+							jsonResp = jsonResp.replace("$(value)", "微信支付成功");
+						}else{
+							throw new BusinessException(beeCloudResponse.getResultMsg() + "," + beeCloudResponse.getErrDetail());
+						}
+						
+					}
 				}else{
-					throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+					//微信二维码支付，打印微信支付单
+					ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildWxReceipt(staff, payBuilder).build());
+					if(resp.header.type == Type.ACK){
+						jsonResp = jsonResp.replace("$(result)", "true");
+						jsonResp = jsonResp.replace("$(value)", "微信支付成功");
+					}else{
+						throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+					}
 				}
 			}else{
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
