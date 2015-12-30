@@ -80,6 +80,24 @@ z-index: 99999;
 	background-color:#ffff00;
 }
 
+
+.region_css_book{
+	background-color: #fff;
+	border: 1px solid #008000;
+	font-size: 16px;
+	border-radius: 5px;
+	width:29%;
+	height:40px;
+	text-align:center;
+	margin-top:5px;
+	margin-left:5px;
+	margin-bottom:5px;
+	}
+
+.selectedRegion_css_book{
+	background-color:#ffff00;
+}
+
 .m-b-line-show{
 	display: block !important;
 	-webkit-animation: line-show-inDownBig .3s ease both;
