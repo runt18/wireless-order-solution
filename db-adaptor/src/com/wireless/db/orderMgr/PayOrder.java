@@ -353,9 +353,9 @@ public class PayOrder {
 		//Set the settle type.
 		orderToCalc.setSettleType(orderToCalc.hasMember() ? SettleType.MEMBER : SettleType.NORMAL);
 		
-		if(orderToCalc.getPaymentType().isMixed() && orderToCalc.isSettledByMember()){
-			throw new BusinessException("会员不支持混合结账");
-		}
+//		if(orderToCalc.getPaymentType().isMixed() && orderToCalc.isSettledByMember()){
+//			throw new BusinessException("会员不支持混合结账");
+//		}
 		
 		if(orderToCalc.isSettledByNormal() && orderToCalc.getPaymentType().isMember()){
 			throw new IllegalArgumentException("普通结账不能使用【会员卡】的付款方式");
