@@ -7,9 +7,13 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/BeeCloud"
+			type="com.wireless.Actions.beeCloud.BeeCloudAction" scope="request"
+			parameter="dataSource">
+		</action>
 		<action path="/QueryWxOrder"
-			type="com.wireless.Actions.dishesOrder.QueryWxOrderAction"
-			scope="request" parameter="dataSource">
+			type="com.wireless.Actions.dishesOrder.QueryWxOrderAction" scope="request"
+			parameter="dataSource">
 		</action>
 		<action path="/QueryMemberPriceStatistics"
 			type="com.wireless.Actions.billStatistics.QueryMemberPriceStatisticsAction"
