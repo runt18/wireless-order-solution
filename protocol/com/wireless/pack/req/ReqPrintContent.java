@@ -60,9 +60,10 @@ public class ReqPrintContent{
 		return req;
 	}
 	
-	public static ReqPrintContent buildWxReceipt(Staff staff, Order.PayBuilder payBuilder){
+	public static ReqPrintContent buildWxReceipt(Staff staff, Order.PayBuilder payBuilder, String codeUrl){
 		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_WX_RECEIT);
 		req.parcel.writeParcel(payBuilder, 0);
+		req.parcel.writeString(codeUrl);
 		for(Printer printer : payBuilder.getPrinters()){
 			req.oriented.add(printer);
 		}
