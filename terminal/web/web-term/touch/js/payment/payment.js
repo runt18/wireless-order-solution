@@ -499,6 +499,7 @@ $(function(){
 											url : "../QueryOrderByCalc.do",
 											type : 'post',
 											data : {
+												orderID : orderMsg.id
 											},
 											success : function(jr, status, xhr){
 												
