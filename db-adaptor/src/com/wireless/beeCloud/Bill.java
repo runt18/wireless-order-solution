@@ -56,16 +56,17 @@ public class Bill {
 		Response response = JObject.parse(Response.JSON_CREATOR, 0, responseStr);
 		if(response.isOk() && postAction != null){
 			final long now = System.currentTimeMillis();
+			final ScheduledThreadPoolExecutor schedule = new ScheduledThreadPoolExecutor(1);
 			new Callable<ProtocolPackage>() {
 				@Override
 				public ProtocolPackage call() throws Exception {
 					if(System.currentTimeMillis() - now > timeout * 60 * 1000){
+						schedule.shutdown();
 						app.revert.ask(request.billNo, request.channel);
 						return null;
 					}else if(new Status(app).ask(request.channel, request.billNo).isPaySuccess()){
 						return postAction.call();
 					}else{
-						ScheduledThreadPoolExecutor schedule = new ScheduledThreadPoolExecutor(1);
 						schedule.schedule(this, 5, TimeUnit.SECONDS);
 						return null;
 					}
