@@ -36,7 +36,7 @@ public class PayOrderAction extends Action{
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		String jsonResp = "{\"success\":$(result), \"data\":\"$(value)\"}";
+		String jsonResp = "{\"success\":$(result), \"data\":\"$(value)\", \"billNo\":\"$(billNo)\"}";
 		try {
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
@@ -129,48 +129,60 @@ public class PayOrderAction extends Action{
 			}
 			
 			if(payType.equals(PayType.WX)){
-				if(authCode != null && !authCode.isEmpty()){
-					//微信扫描枪支付
-					Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
-					if(restaurant.hasBeeCloud()){
-						BeeCloud app = BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
-						final Order order = PayOrder.calc(staff, payBuilder);
-						final String billNo = System.currentTimeMillis() + Long.toString(orderId);
-						Bill.Response beeCloudResponse = app.bill().ask(new Bill.Request().setChannel(Bill.Channel.WX_SCAN)
-																				  .setTotalFee(1)
-																				  //.setTotalFee(Float.valueOf(order.getActualPrice() * 100).intValue())
-																				  .setBillNo(billNo)
-																				  .setTitle(restaurant.getName() + "(账单号：" + order.getId() + ")")
-																				  .setAuthCode(authCode)
-																				  ,
-																new Callable<ProtocolPackage>() {
-																	@Override
-																	public ProtocolPackage call() throws Exception {
-																		if(OrderDao.getStatusById(staff, order.getId()) == Order.Status.UNPAID){
-																			return ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
-																		}else{
-																			return null;
-																		}
+				Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
+				if(restaurant.hasBeeCloud()){
+					final Bill.Channel channel;
+					if(authCode != null && !authCode.isEmpty()){
+						//微信扫描枪支付
+						channel = Bill.Channel.WX_SCAN;
+					}else{
+						//微信二维码支付
+						channel = Bill.Channel.WX_NATIVE;
+					}
+					BeeCloud app = BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
+					final Order order = PayOrder.calc(staff, payBuilder);
+					final String billNo = System.currentTimeMillis() + Long.toString(orderId);
+					//JsonMap optional = new JsonMap();
+					//optional.putJsonable("payBuilder", payBuilder, 0);
+					//optional.putInt("staffId", staff.getId());
+					Bill.Response beeCloudResponse = app.bill().ask(new Bill.Request().setChannel(channel)
+																			  .setTotalFee(1)
+																			  //.setTotalFee(Float.valueOf(order.getActualPrice() * 100).intValue())
+																			  .setBillNo(billNo)
+																			  .setTitle(restaurant.getName() + "(账单号：" + order.getId() + ")")
+																			  //.setOptional(optional),
+																			  .setAuthCode(authCode),
+															new Callable<ProtocolPackage>() {
+																@Override
+																public ProtocolPackage call() throws Exception {
+																	if(OrderDao.getStatusById(staff, order.getId()) == Order.Status.UNPAID){
+																		return ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
+																	}else{
+																		return null;
 																	}
-																});
-						
-						if(beeCloudResponse.isOk()){
+																}
+															});
+					
+					if(beeCloudResponse.isOk()){
+						if(authCode != null && !authCode.isEmpty()){
 							jsonResp = jsonResp.replace("$(result)", "true");
 							jsonResp = jsonResp.replace("$(value)", "微信支付成功");
+							jsonResp = jsonResp.replace("$(billNo)", billNo);
 						}else{
-							throw new BusinessException(beeCloudResponse.getResultMsg() + "," + beeCloudResponse.getErrDetail());
+							//打印微信支付单
+							ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildWxReceipt(staff, payBuilder, beeCloudResponse.getCodeUrl()).build());
+							if(resp.header.type == Type.ACK){
+								jsonResp = jsonResp.replace("$(result)", "true");
+								jsonResp = jsonResp.replace("$(value)", "微信支付成功");
+								jsonResp = jsonResp.replace("$(billNo)", billNo);
+							}else{
+								throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+							}
 						}
-						
-					}
-				}else{
-					//微信二维码支付，打印微信支付单
-					ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildWxReceipt(staff, payBuilder).build());
-					if(resp.header.type == Type.ACK){
-						jsonResp = jsonResp.replace("$(result)", "true");
-						jsonResp = jsonResp.replace("$(value)", "微信支付成功");
 					}else{
-						throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+						throw new BusinessException(beeCloudResponse.getResultMsg() + "," + beeCloudResponse.getErrDetail());
 					}
+					
 				}
 			}else{
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
