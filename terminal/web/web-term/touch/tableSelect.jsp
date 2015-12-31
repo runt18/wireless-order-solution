@@ -101,6 +101,8 @@
 <script type="text/javascript" src="./js/popup/bookInfo/bookInfo.js"></script>
 <!-- 入座 -->
 <script type="text/javascript" src="./js/popup/seat/seat.js"></script>
+<!-- 微信扫描 -->
+<script type="text/javascript" src="./js/popup/wxPayment/wxPayment.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -216,7 +218,7 @@
         </ul>
 	</div>		
 	
-	<!-- 多台开席选台 -->of.addFood
+	<!-- 多台开席选台 -->
 	<div id="multiOpenTableCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: 100px 0px 0px -200px;width:550px;display: none;background-color: white;" align="center">
 	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
 	       	 多台开席选台
@@ -1435,8 +1437,16 @@
 		    	<a id="cashReceive_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">现金找零</a>
 		    	<a id="mixed_a_payment" data-role="button" data-theme="b" data-rel="popup" data-position-to="window" data-transition="pop" data-inline="true" style="width: 45%;">其他结账</a>
 		    	<a data-role="button" data-theme="b" id="memberBalance_a_payment" data-rel="popup" data-position-to="window" data-transition="pop" data-inline="true" style="width: 45%;">读取会员</a>
-		    	<a id="wx_a_payment" data-role="button" data-theme="b" data-inline="true" style="width: 45%;">微信支付</a>
+		    	<a id="wxPay_li_tableSelecy" data-role="button" data-theme="b" data-inline="true" data-rel="popup"  data-transition="pop" style="width: 45%;" href="#wxPayPopup_div_tableSelect">微信支付</a>
 		    </div>
+		    
+		     <!-- 账单更多操作 -->
+			<div data-role="popup" id="wxPayPopup_div_tableSelect" data-theme="d">
+		        <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+		            <li class="tempFoodKitchen" id="wx_li_payment""><a >二维码支付</a></li>
+		            <li class="tempFoodKitchen" id="authCode_li_payment"><a >扫描枪支付</a></li>
+		        </ul>
+			</div>	
 		    
 		</div>
 		<div class="ui-block-b" data-role="content" style="width : -webkit-calc(100% - 330px);width: -moz-calc(100% - 330px);width : -ms-calc(100% - 330px);width: -o-calc(100% - 330px);height: inherit;">

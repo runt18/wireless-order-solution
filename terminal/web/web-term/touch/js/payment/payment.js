@@ -458,9 +458,9 @@ $(function(){
 	
 	//页面初始化
 	$('#paymentMgr').on("pageinit", function(){ 
-		//console.log('paymentMgr --- pageinit');
 		//微信支付Button
-		$('#wx_a_payment').click(function(){
+		$('#wx_li_payment').click(function(){
+			$('#wxPayPopup_div_tableSelect').popup('close');
 			 paySubmit({
 			  	submitType : PayTypeEnum.WX,
 			  	postPayment : function(resultJSON){
@@ -474,6 +474,93 @@ $(function(){
 			  		}
 			  	}
 			 });
+		});
+		
+		
+		//扫描枪支付
+		$('#authCode_li_payment').click(function(){
+			$('#wxPayPopup_div_tableSelect').popup('close');
+			setTimeout(function(){
+				var wxPaymentPopup = new CreateWxPaymentPopup({
+	  				pay : function(inputValue){
+		  				paySubmit({
+						  	submitType : PayTypeEnum.WX,
+						  	authCode :　inputValue,
+						  	postPayment : function(resultJSON){
+					  			if(resultJSON.success){
+					  				var elapsed = 0;   //逝去的时间
+					  				
+					  				//扫描的处理方法
+					  				(function(){
+					  					//指向自身
+					  					var thiz = arguments.callee;
+					  					Util.LM.show();
+										$.ajax({
+											url : "../QueryOrderByCalc.do",
+											type : 'post',
+											data : {
+											},
+											success : function(jr, status, xhr){
+												
+												if(jr.success && jr.other.order.statusValue == '1'){
+													//账单支付成功 && 账单已结账的情况下的处理
+													Util.LM.hide();
+									  				Util.msg.tip('扫描支付成功');
+									  				wxPaymentPopup.close(function(){
+									  					ts.loadData();
+									  				}, 200);
+												}else if(elapsed >= 10){//支付超时的处理
+													//弹出继续等待的popup
+													Util.LM.hide();
+													wxPaymentPopup.close(function(){
+														var wxPayTip = new CreateWxPaymentPopup({
+						  									title : '温馨提示',
+						  									leftText : '继续等待',
+						  									content : '支付超时,请继续选择下面操作',
+						  									rightText : '取消支付',
+						  									pay : function(){
+						  										elapsed = 0;
+						  										wxPayTip.close(thiz);
+						  									},
+						  									right : function(){
+						  										//取消支付
+						  										$.ajax({
+						  											url : '../BeeCloud.do',
+						  											type : 'post',
+						  											data : {
+						  												dataSource : 'cancel',
+						  												channel : 'wx_scan',
+						  												billNo : resultJSON.billNo
+						  											},
+						  											success : function(jr){
+						  												if(jr.success){
+						  													Util.msg.tip(jr.msg);
+						  												}else{
+						  													Util.msg.tip(jr.msg);
+						  												}
+						  											}
+						  										})
+						  									}
+														});
+														wxPayTip.open();
+													}, 200);
+												}else{
+													//延迟两秒执行自身
+													setTimeout(thiz, 2000);
+													elapsed += 2;
+												}
+											}
+										});
+					  				})();
+					  			}else{
+						  			Util.msg.tip('对不起，支付失败' + '</br>错误信息：' + resultJSON.data);
+					  			}
+					  		}
+					    });
+	  				}
+	  			});
+	  			wxPaymentPopup.open();
+			}, 300);
 		});
 		
 		function postPayment(resultJSON){
@@ -898,6 +985,7 @@ $(function(){
 		c = c || {
 			submitType : PayTypeEnum.CASH,		//结账类型
 			postPayment : null,					//结账处理函数
+			authCode : null,                   //扫描二维码的值  
 			temp : temp,						//是否暂结
 			mixedIncome : mixedIncome			//混合结账数据
 		};
@@ -971,7 +1059,8 @@ $(function(){
 				customNum : orderMsg.customNum,
 				payTypeCash : c.mixedIncome ? c.mixedIncome : '',
 				sendSms : sendSms,
-				orientedPrinter : getcookie(document.domain + '_printers')			//特定打印机打印
+				orientedPrinter : getcookie(document.domain + '_printers'),			//特定打印机打印
+				authCode : c.authCode ? c.authCode : null             //扫描二维码的值
 			},
 			dataType : 'json',
 			success : function(resultJSON, status, xhr){
