@@ -168,7 +168,7 @@ public class OperateBookAction extends DispatchAction{
 		final String tables = request.getParameter("tables");
 		final String orderFoods = request.getParameter("orderFoods");
 		
-		JObject jObject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
 			final String pin = (String) request.getAttribute("pin");
