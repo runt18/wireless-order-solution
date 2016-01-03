@@ -70,6 +70,12 @@ public class ReqPrintContent{
 		return req;
 	}
 	
+	public static ReqPrintContent buildBook(Staff staff, int bookId){
+		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_BOOK);
+		req.parcel.writeInt(bookId);
+		return req;
+	}
+	
 	public static ReqPrintContent buildMemberReceipt(Staff staff, int memberOperationId){
 		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_MEMBER_RECEIPT);
 		req.parcel.writeInt(memberOperationId);
