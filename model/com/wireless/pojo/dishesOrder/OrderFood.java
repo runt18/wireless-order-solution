@@ -3,7 +3,6 @@ package com.wireless.pojo.dishesOrder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.zip.CRC32;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StaffError;
@@ -646,9 +645,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	public int getFoodId(){
 		if(isTemporary){
-			CRC32 crc = new CRC32();
-			crc.update((mFood.getName() + mFood.getPrice() + mFood.getKitchen().getId()).getBytes());
-			return Math.abs((int)crc.getValue() % Integer.MAX_VALUE);
+			return new StringBuilder().append(mFood.getName()).append(mFood.getPrice()).append(mFood.getKitchen().getId()).toString().hashCode();
 		}else{
 			return mFood.getFoodId();
 		}
