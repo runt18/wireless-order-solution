@@ -732,7 +732,10 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			
 		}else if(mType == PType.PRINT_WX_ORDER){
 			return typeToCompare == PType.PRINT_WX_ORDER;
-					
+			
+		}else if(mType == PType.PRINT_BOOK){
+			return typeToCompare == PType.PRINT_BOOK;
+			
 		}else{
 			return false;
 		}

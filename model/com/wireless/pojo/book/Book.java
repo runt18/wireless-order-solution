@@ -577,6 +577,10 @@ public class Book implements Jsonable{
 		this.staff = staff;
 	}
 	
+	public boolean hasStaff(){
+		return this.staff != null;
+	}
+	
 	public float getMoney() {
 		return money;
 	}
@@ -618,6 +622,10 @@ public class Book implements Jsonable{
 			return "";
 		}
 		return this.comment;
+	}
+	
+	public boolean hasComment(){
+		return getComment().trim().length() != 0;
 	}
 	
 	public boolean isExpired(){

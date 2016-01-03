@@ -23,6 +23,7 @@ public enum PType {
 	PRINT_WX_RECEIT(17, "微信支付"),
 	PRINT_2ND_DISPLAY(18, "客显"),
 	PRINT_WX_ORDER(19, "微信账单"),
+	PRINT_BOOK(20, "预订"),
 	PRINT_HISTORY_DAILY_SETTLE_RECEIPT(122, "历史日结"),
 	PRINT_HISTORY_SHIFT_RECEIPT(123, "历史交班"),
 	PRINT_DAILY_SETTLE_RECEIPT(124, "日结表"),
@@ -86,6 +87,10 @@ public enum PType {
 	
 	public boolean isWxReceipt(){
 		return this == PType.PRINT_WX_RECEIT;
+	}
+	
+	public boolean isBook(){
+		return this == PType.PRINT_BOOK;
 	}
 	
 	public boolean isShift(){
