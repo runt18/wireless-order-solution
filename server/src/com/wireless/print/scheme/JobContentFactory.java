@@ -7,6 +7,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.billStatistics.CalcCouponStatisticsDao;
+import com.wireless.db.book.BookDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -19,6 +20,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.CouponUsage;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.member.Member;
@@ -47,6 +49,7 @@ import com.wireless.print.content.concrete.ShiftContent;
 import com.wireless.print.content.concrete.SummaryContent;
 import com.wireless.print.content.concrete.TransFoodContent;
 import com.wireless.print.content.concrete.TransTableContent;
+import com.wireless.print.content.concrete.BookContent;
 import com.wireless.print.content.concrete.WxOrderContent;
 
 public class JobContentFactory {
@@ -254,6 +257,27 @@ public class JobContentFactory {
 					if(func.isTypeMatched(PType.PRINT_WX_ORDER)){
 						WxOrder wxOrder = WxOrderDao.getById(dbCon, staff, wxOrderId);
 						jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_WX_ORDER, new WxOrderContent(wxOrder, printer.getStyle())));
+					}
+				}
+			}
+			
+			return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public Content createBookContent(Staff staff, List<Printer> printers, int bookId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			final List<JobContent> jobContents = new ArrayList<JobContent>();
+			
+			for(Printer printer : printers){
+				for(PrintFunc func : printer.getPrintFuncs()){
+					if(func.isTypeMatched(PType.PRINT_BOOK)){
+						Book book = BookDao.getById(dbCon, staff, bookId);
+						jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_BOOK, new BookContent(book, printer.getStyle())));
 					}
 				}
 			}

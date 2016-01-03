@@ -677,6 +677,11 @@ class OrderHandler implements Runnable{
 			//Î¢ÐÅ¶©µ¥
 			int wxOrderId = parcel.readInt();
 			new PrintHandler(staff).process(JobContentFactory.instance().createWxOrderContent(staff, printers, wxOrderId));
+			
+		}else if(printType.isBook()){
+			//Ô¤¶©
+			int bookId = parcel.readInt();
+			new PrintHandler(staff).process(JobContentFactory.instance().createBookContent(staff, printers, bookId));
 		}
 		
 		return new RespACK(request.header);
