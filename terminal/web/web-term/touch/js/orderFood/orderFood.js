@@ -1480,6 +1480,7 @@ $(function(){
 	var foodPaging = null;
 	//拼音 & 手写 & 厨房搜索
 	function search(value, qw){	
+		//如果口味
 		var data = null;
 		function byConsumption(obj1, obj2){
 			//菜品搜索结果按点菜数量排序
@@ -1718,7 +1719,7 @@ $(function(){
 				$('#btnOrderAndPay').show();
 				$('#addBookOrderFood').hide();
 				$('#bookSeatOrderFood_a_orderFood').hide();
-				$('#multiOpenTable').hide();
+				$('#multiOpenTable_a_tableSelect').hide();
 				//快餐模式的牌子号
 				$('#brand_a_orderFood').hide();
 				//快餐模式的结账
@@ -1728,7 +1729,7 @@ $(function(){
 				$('#addBookOrderFood').hide();
 				$('#btnOrderAndPay').hide();
 				$('#normalOrderFood_a_orderFood').hide();		
-				$('#multiOpenTable').hide();
+				$('#multiOpenTable_a_tableSelect').hide();
 				//快餐模式的牌子号
 				$('#brand_a_orderFood').hide();
 				//快餐模式的结账
@@ -1738,13 +1739,13 @@ $(function(){
 				$('#bookSeatOrderFood_a_orderFood').hide();
 				$('#normalOrderFood_a_orderFood').hide();
 				$('#btnOrderAndPay').hide();	
-				$('#multiOpenTable').hide();
+				$('#multiOpenTable_a_tableSelect').hide();
 				//快餐模式的牌子号
 				$('#brand_a_orderFood').hide();
 				//快餐模式的结账
 				$('#fastPay_a_orderFood').hide();
 			}else if(of.orderFoodOperateType == 'multiOpenTable'){
-				$('#multiOpenTable').show();
+				$('#multiOpenTable_a_tableSelect').show();
 				$('#addBookOrderFood').hide();
 				$('#bookSeatOrderFood_a_orderFood').hide();
 				$('#normalOrderFood_a_orderFood').hide();
@@ -1759,7 +1760,7 @@ $(function(){
 				$('#btnOrderAndPay').hide();
 				$('#addBookOrderFood').hide();
 				$('#bookSeatOrderFood_a_orderFood').hide();
-				$('#multiOpenTable').hide();
+				$('#multiOpenTable_a_tableSelect').hide();
 				//快餐模式的牌子号
 				$('#brand_a_orderFood').show();
 				//快餐模式的结账
@@ -2435,6 +2436,9 @@ $(function(){
 					document.getElementById('searchWord_div_orderFood').innerHTML = zifu;
 					$('#searchWord_div_orderFood').find('input').each(function(index, element){
 						element.onclick = function(){
+							if($('#divFoodTasteFloat').css('display') == 'block'){
+								$('#divFoodTasteFloat').hide();
+							}
 							$('#handWritingInput_input_orderFood').val($('#handWritingInput_input_orderFood').val() + element.value);
 							$('#handWritingInput_input_orderFood').trigger('input');
 							$('#rewrite_a_orderFood').click();
@@ -2500,6 +2504,9 @@ $(function(){
 			document.getElementById('pinyin_div_orderFood').innerHTML = keys;
 			$('#pinyin_div_orderFood input').each(function(index, element){
 				element.onclick = function(){
+					if($('#divFoodTasteFloat').css('display') == 'block'){
+						$('#divFoodTasteFloat').hide();
+					}
 					$('#pinyinInput_input_orderFood').val($('#pinyinInput_input_orderFood').val() + element.value);
 					$('#pinyinInput_input_orderFood').trigger('input');		
 				};
@@ -2789,6 +2796,11 @@ $(function(){
 		
 		//使用入座的回调
 		$('#bookSeatOrderFood_a_orderFood').click(function(){
+			of.commit(of.newFood);
+		});
+		
+		//多台开席
+		$('#multiOpenTable_a_tableSelect').click(function(){
 			of.commit(of.newFood);
 		});
 		
