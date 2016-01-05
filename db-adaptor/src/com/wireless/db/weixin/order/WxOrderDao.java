@@ -355,6 +355,7 @@ public class WxOrderDao {
 			  " wx_order_id = " + wxOrder.getId() +
 			  (builder.isStatusChanged() ? " ,status = " + wxOrder.getStatus().getVal() : "") +
 			  (builder.isOrderChanged() ? " ,order_id = " + wxOrder.getOrderId() : "") +
+			  (builder.isTableChanged() ? " ,table_id = " + wxOrder.getTable().getId() : "") +
 			  " WHERE wx_order_id = " + wxOrder.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){

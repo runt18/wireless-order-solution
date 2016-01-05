@@ -202,7 +202,8 @@ uo.showOrder = function(){
 							if(data.success){
 								askTablePopup.close();
 								Util.msg.tip(data.msg);
-								updateTable({id : uo.table.id});
+								//刷新账单
+								initOrderData({order : uo.order});
 							}else{
 								Util.msg.tip(data.msg);
 							}
@@ -225,7 +226,8 @@ uo.showOrder = function(){
 						if(data.success){
 							askTablePopup.close();
 							Util.msg.tip(data.msg);
-							updateTable({id : uo.table.id});
+							//刷新账单
+							initOrderData({order : uo.order});
 						}else{
 							Util.msg.tip(data.msg);
 						}
@@ -1081,7 +1083,8 @@ uo.submitUpdateOrderHandler = function(c){
 						}else{
 							if(uo.canceling){
 								Util.msg.tip('退菜成功');		
-								updateTable({id : uo.table.id});
+								//刷新账单
+								initOrderData({order : uo.order});
 								uo.canceling = false;
 							}else if(uo.updateCustom){
 								Util.msg.tip('账单修改成功');	
@@ -1101,7 +1104,7 @@ uo.submitUpdateOrderHandler = function(c){
 									renderTo : 'orderFoodListMgr',
 									time : 3,
 									fn : function(btn){
-										initTableData();
+										ts.loadData();
 									}
 								});							
 							}
@@ -1280,9 +1283,8 @@ $(function(){
 						Util.LM.hide();
 						if(data.success){
 							askTablePopup.close(function(){
-								initTableData();
 								Util.msg.tip(data.msg);
-								//返回主界面
+								//返回餐台选择界面
 								ts.loadData();
 							}, 200);
 						}else{
@@ -1310,9 +1312,8 @@ $(function(){
 						Util.LM.hide();
 						if(data.success){
 							askTablePopup.close(function(){
-								initTableData();
 								Util.msg.tip(data.msg);
-								//返回主界面
+								//返回餐台选择界面
 								ts.loadData();
 							}, 200);
 						}else{
@@ -1354,8 +1355,8 @@ $(function(){
 								if(data.success){
 									Util.msg.tip(data.msg);
 									askTablePopup.close(function(){
-										//刷新已点菜
-										updateTable({id : uo.table.id});
+										//刷新账单
+										initOrderData({order : uo.order});
 									}, 200);
 								}else{
 									Util.msg.tip(data.msg);				
@@ -1378,8 +1379,8 @@ $(function(){
 							if(data.success){
 								Util.msg.tip(data.msg);
 								askTablePopup.close(function(){
-									//刷新已点菜
-									updateTable({id : uo.table.id});
+									//刷新账单
+									initOrderData({order : uo.order});
 								}, 200);
 							}else{
 								Util.msg.tip(data.msg);				

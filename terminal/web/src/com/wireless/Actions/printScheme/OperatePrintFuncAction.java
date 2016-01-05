@@ -58,7 +58,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -196,18 +196,22 @@ public class OperatePrintFuncAction extends DispatchAction{
 			}else if(PType.valueOf(printType) == PType.PRINT_WX_ORDER){
 				//微信订单
 				PrintFuncDao.addFunc(dbCon, staff, Builder.newWxOrder(printerId));
+				
+			}else if(PType.valueOf(printType) == PType.PRINT_BOOK){
+				//微信预订
+				PrintFuncDao.addFunc(dbCon, staff, Builder.newWxBook(printerId));
 			}
 		
-			jobject.initTip(true, "操作成功, 已添加方案");
+			jObject.initTip(true, "操作成功, 已添加方案");
 		}catch(BusinessException | SQLException e){
-			jobject.initTip(e);
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			dbCon.disconnect();
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;

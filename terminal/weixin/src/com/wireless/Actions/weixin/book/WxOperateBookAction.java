@@ -25,6 +25,9 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -32,6 +35,7 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
+import com.wireless.sccon.ServerConnector;
 
 public class WxOperateBookAction extends DispatchAction {
 	
@@ -45,17 +49,17 @@ public class WxOperateBookAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
-		String bookDate = request.getParameter("bookDate");
-		String member = request.getParameter("member");
-		String phone = request.getParameter("phone");
-		String count = request.getParameter("count");
-		String region = request.getParameter("region");
-		String foods = request.getParameter("foods");
+		JObject jObject = new JObject();
+		final String bookDate = request.getParameter("bookDate");
+		final String member = request.getParameter("member");
+		final String phone = request.getParameter("phone");
+		final String count = request.getParameter("count");
+		final String region = request.getParameter("region");
+		final String foods = request.getParameter("foods");
 		try{
-			int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
-			Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
-			Book.InsertBuilder4Weixin insertBuilder = new Book.InsertBuilder4Weixin().setBookDate(bookDate)
+			final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
+			final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
+			final Book.InsertBuilder4Weixin insertBuilder = new Book.InsertBuilder4Weixin().setBookDate(bookDate)
 															  .setMember(member)
 															  .setTele(phone)
 															  .setAmount(Integer.parseInt(count))
@@ -71,13 +75,21 @@ public class WxOperateBookAction extends DispatchAction {
 			}
 			
 			
-			BookDao.insert(staff, insertBuilder);
-			jobject.setSuccess(true);
+			final int bookId = BookDao.insert(staff, insertBuilder);
+			
+			//打印预订信息
+			ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildBook(staff, bookId).build());
+			if(resp.header.type == Type.ACK){
+				jObject.initTip(true, "预订信息打印成功");
+			}else{
+				jObject.initTip(true, "预订成功");
+			}
+			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

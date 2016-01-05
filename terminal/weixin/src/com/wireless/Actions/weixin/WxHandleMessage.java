@@ -70,10 +70,15 @@ public class WxHandleMessage extends HandleMessageAdapter {
 	private final String WEIXIN_DEFAULT_LOGO;
 	
 	public static enum EventKey{
+		SELF_ORDER_EVENT_KEY("self_order_event_key", "自助点餐"),
+		SELF_BOOK_EVENT_KEY("self_book_event_key", "自助预订"),
+		INTRO_EVENT_KEY("intro_event_key","餐厅简介"),
+		STAR_EVENT_KEY("star_event_key", "明星菜品"),
 		NAVI_EVENT_KEY("navi_event_key", "餐厅导航"),
 		PROMOTION_EVENT_KEY("promotion_event_key", "优惠活动"),
 		MEMBER_EVENT_KEY("member_event_key", "我的会员卡"),
 		ORDER_EVENT_KEY("order_event_key", "我的订单"),
+		MY_QRCODE_EVENT_KEY("my_qrcode_event_key", "我的二维码"),
 		SCAN_EVENT_KEY("scan_event_key", "扫一扫");
 		
 		EventKey(String val, String desc){
@@ -281,6 +286,28 @@ public class WxHandleMessage extends HandleMessageAdapter {
 				if(msg.getEventKey().equals(EventKey.NAVI_EVENT_KEY.val)){
 					//餐厅导航
 					session.callback(createNavi(msg));
+					
+				}else if(msg.getEventKey().equals(EventKey.SELF_BOOK_EVENT_KEY.val)){
+					//自助预订
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("自助预订", "点击去预订", "", createUrl(msg, WEIXIN_BOOK))));
+					
+				}else if(msg.getEventKey().equals(EventKey.SELF_ORDER_EVENT_KEY.val)){
+					//自助点餐
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("自助点餐", "点击去自助点餐", "", createUrl(msg, WEIXIN_FOOD))));
+					
+				}else if(msg.getEventKey().equals(EventKey.INTRO_EVENT_KEY.val)){
+					//餐厅简介
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("餐厅简介", "点击去餐厅简介", "", createUrl(msg, WEIXIN_ABOUT))));
+					
+				}else if(msg.getEventKey().equals(EventKey.STAR_EVENT_KEY.val)){
+					//明星菜品
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("明星菜品", "点击去明星菜品", "", createUrl(msg, WEIXIN_RFOOD))));
+					
+				}else if(msg.getEventKey().equals(EventKey.MY_QRCODE_EVENT_KEY.val)){
+					//我的二维码
+					Member member = MemberDao.getByWxSerial(StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())), msg.getFromUserName());
+					final String qrCodeUrl = "http://qr.liantu.com/api.php?text=" + member.getWeixin().getCard();
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("我的二维码", "扫描二维码完成会员注入", qrCodeUrl + "&w=70", qrCodeUrl)));
 					
 				}else if(msg.getEventKey().equals(EventKey.PROMOTION_EVENT_KEY.val)){
 					//最新优惠

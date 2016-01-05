@@ -7,7 +7,7 @@ var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 //餐桌选择包
 var	ts = {
 		table : {},
-		member : {},
+		member : {}
 	},
 	/**
 	 * 元素模板
@@ -1170,7 +1170,7 @@ $(function(){
 		$('#feastPay_li_tableSelect').click(function(){
 			$('#tableSelectOtherOperateCmp').popup('close');
 			setTimeout(function(){
-				var feastPay = new CreateFeastPay({
+				var feastPay = new FeastPaidPopup({
 					confirm : function(result){
 						if(result.success){
 							feastPay.close();
@@ -1299,6 +1299,412 @@ $(function(){
 		
 	}
 	
+	
+	/**
+	 * 根据alias或id返回table的最新状态
+	 * toPay : 是否去结账界面
+	 */
+	function updateTable(c){
+		var table = null;
+		$.ajax({
+			url : '../QueryTable.do',
+			type : 'post',
+			data : {
+				tableID : !c.alias || c.alias == 0 ? c.id : '', 
+				alias : c.alias
+			},
+	//		async : false,
+			success : function(data, status, xhr){
+				if(data.success && data.root.length > 0){
+					table = data.root[0];
+					c.table = table;
+					if(c.toPay){
+						//关闭选台
+						pm.entry(c);
+					}else{
+						handleTableForTS(c);
+					}
+				}else{
+					Util.msg.alert({
+						msg : '没有此餐台, 请重新输入',
+						topTip : true
+					});				
+				}
+	
+			},
+			error : function(request, status, err){
+				Util.msg.alert({
+					title : '温馨提示',
+					msg : err, 
+					renderTo : 'orderFoodListMgr',
+					time : 2
+				});
+			}
+		});
+	}
+
+	/**
+	 * 当选中餐桌时，依据餐桌状态处理餐桌
+	 */
+	function handleTableForTS(c){
+		var table = c.table;
+		if(table != null){
+			//判断是否为已点菜餐桌
+			if(table.statusValue == WirelessOrder.TableList.Status.BUSY.val){	
+				//判断餐桌是否已经改变状态
+				if(c.event && $(c.event).attr('data-theme') != 'e'){
+					initTableData();
+				}
+				//去已点菜界面
+				uo.entry({
+					table : table
+				});
+	
+			}else{
+				ts.table = table;
+				//判断餐桌是否已经改变状态
+				if(c.event && $(c.event).attr('data-theme') == 'e'){ 
+					initTableData();
+				}
+				
+				if(ts.table.isBook){
+					var customerPopup = null;
+					customerPopup = new NumKeyBoardPopup({
+						header : '请输入人数--' + c.table.name,
+						leftText : '开台',
+						rightText : '查看预订',
+						left : function(){
+								var customNum = $('#input_input_numKbPopup').val();
+								
+								if(isNaN(customNum)){
+									Util.msg.alert({
+										msg : '请填写正确的人数',
+										topTip : true
+									});			
+									$('#input_input_numKbPopup').focus();
+									return;
+								}else if(customNum <= 0){
+									Util.msg.alert({
+										msg : '就餐人数不能少于0',
+										topTip : true
+									});
+									$('#input_input_numKbPopup').focus();
+									return;
+								}
+								
+								Util.LM.show();
+								
+								var orderDataModel = {};
+								orderDataModel.tableID = ts.table.id;
+								orderDataModel.customNum = customNum;
+								orderDataModel.orderFoods = [];
+								orderDataModel.categoryValue =  ts.table.categoryValue;
+								orderDataModel.comment = $('#inputTableOpenCommon').val();
+								
+								$.post('../InsertOrder.do', {
+									commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
+									type : 1,
+									notPrint : false
+								}, function(result){
+									Util.LM.hide();
+									if (result.success) {
+										initTableData();
+										Util.msg.alert({
+											msg : '开台成功!',
+											topTip : true
+										});
+									}else{
+										Util.msg.alert({
+											msg : result.msg,
+											topTip : true
+										});			
+									}
+								});
+								customerPopup.close();	
+						},
+						right : function(){
+							customerPopup.close(function(){
+								books.entry();
+							}, 200);
+							
+						},
+						middle : function(){
+								var customNum = $('#input_input_numKbPopup').val();
+								var comment = $('#inputTableOpenCommon').val();
+								if(isNaN(customNum)){
+									Util.msg.alert({
+										msg : '请填写正确的人数',
+										topTip : true
+									});			
+									$('#input_input_numKbPopup').focus();
+									return;
+								}else if(customNum <= 0){
+									Util.msg.alert({
+										msg : '就餐人数不能少于0',
+										topTip : true
+									});
+									$('#input_input_numKbPopup').focus();
+									return;
+								}
+								
+								ts.renderToCreateOrder(ts.table.alias, customNum, comment);
+								customerPopup.close();
+							}
+					});
+					
+					customerPopup.open(function(self){
+						self.find('[id=input_input_numKbPopup]').val(1);
+						self.find('[id=left_a_numKbPopup]').css({
+							'width' : '32%',
+							'float' : 'left'
+						});
+						self.find('[id=middle_a_numKbPopup]').css({
+							'width' : '32%',
+							'float' : 'left'
+						});
+						self.find('[id=right_a_numKbPopup]').css({
+							'width' : '34%',
+							'height' : '10%',
+							'float' : 'left'
+						});
+						
+						var remark = '<div>'+
+									'<input id="inputTableOpenCommon" placeholder="开台备注" data-type="num" class="countInputStyle" >'+
+								'</div>';
+						self.find('[id=content_div_numKbPopup]').append(remark);
+						self.find('[id=content_div_numKbPopup]').trigger('create');
+						
+						setTimeout(function(){
+							self.find('[id=input_input_numKbPopup]').select();
+						}, 200);
+						
+					});
+				}else{
+					var customerPopup = null;
+					customerPopup = new NumKeyBoardPopup({
+						header : '请输入人数--' + c.table.name,
+						leftText : '开台',
+						left : function(){
+							var customNum = $('#input_input_numKbPopup').val();
+							
+							if(isNaN(customNum)){
+								Util.msg.alert({
+									msg : '请填写正确的人数',
+									topTip : true
+								});			
+								$('#input_input_numKbPopup').focus();
+								return;
+							}else if(customNum <= 0){
+								Util.msg.alert({
+									msg : '就餐人数不能少于0',
+									topTip : true
+								});
+								$('#input_input_numKbPopup').focus();
+								return;
+							}
+							
+							Util.LM.show();
+							
+							var orderDataModel = {};
+							orderDataModel.tableID = ts.table.id;
+							orderDataModel.customNum = customNum;
+							orderDataModel.orderFoods = [];
+							orderDataModel.categoryValue =  ts.table.categoryValue;
+							orderDataModel.comment = $('#inputTableOpenCommon').val();
+							
+							$.post('../InsertOrder.do', {
+								commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
+								type : 1,
+								notPrint : false
+							}, function(result){
+								Util.LM.hide();
+								if (result.success) {
+									initTableData();
+									Util.msg.alert({
+										msg : '开台成功!',
+										topTip : true
+									});
+								}else{
+									Util.msg.alert({
+										msg : result.msg,
+										topTip : true
+									});			
+								}
+							});
+							customerPopup.close();	
+						},
+						right : function(){
+							customerPopup.close();
+						},
+						middle : function(){
+								var customNum = $('#input_input_numKbPopup').val();
+								var comment = $('#inputTableOpenCommon').val();
+								if(isNaN(customNum)){
+									Util.msg.alert({
+										msg : '请填写正确的人数',
+										topTip : true
+									});			
+									$('#input_input_numKbPopup').focus();
+									return;
+								}else if(customNum <= 0){
+									Util.msg.alert({
+										msg : '就餐人数不能少于0',
+										topTip : true
+									});
+									$('#input_input_numKbPopup').focus();
+									return;
+								}
+								
+								ts.renderToCreateOrder(ts.table.alias, customNum, comment);
+								customerPopup.close();
+							}
+					});
+					
+					customerPopup.open(function(self){
+						self.find('[id=input_input_numKbPopup]').val(1);
+						self.find('[id=left_a_numKbPopup]').css({
+							'width' : '32%',
+							'float' : 'left'
+						});
+						self.find('[id=middle_a_numKbPopup]').css({
+							'width' : '32%',
+							'float' : 'left'
+						});
+						self.find('[id=right_a_numKbPopup]').css({
+							'width' : '34%',
+							'height' : '10%',
+							'float' : 'left'
+						});
+						
+						var remark = '<div>'+
+									'<input id="inputTableOpenCommon" placeholder="开台备注" data-type="num" class="countInputStyle" >'+
+								'</div>';
+						self.find('[id=content_div_numKbPopup]').append(remark);
+						self.find('[id=content_div_numKbPopup]').trigger('create');
+						
+						setTimeout(function(){
+							self.find('[id=input_input_numKbPopup]').select();
+						}, 200);
+						
+					});
+				}
+			}
+		}
+	}
+
+	/**
+	 * 初始化餐桌信息，保存到tables数组中
+	 * freeTables存放空闲餐桌，busyTables存放就餐餐桌
+	 */
+	function initTableData(){
+		
+		//显示区域
+		function showRegion(){
+			//添加区域信息
+			var html = [];
+			html.push('<a data-role="button" data-inline="true" data-type="region" class="regionBtn">全部区域</a>');
+			WirelessOrder.regions.forEach(function(e){
+				html.push('<a data-role="button" data-inline="true" data-type="region" class="regionBtn" region-id="' + e.id + '">'+ e.name +'</a>');
+			});
+			
+			$('#divSelectRegionForTS').html(html.join("")).trigger('create').trigger('refresh').find('.regionBtn').each(function(index, element){
+				element.onclick = function(){
+					//恢复所有区域按钮为未选中状态
+					$('#divSelectRegionForTS .regionBtn').attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c').removeAttr('region-selected');
+					//设置点击的区域按钮是选中状态
+					$(element).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e').attr('region-selected', true);
+					//显示所选区域的餐台
+					showTable();
+				};
+			});
+		}
+	
+		Util.LM.show();
+		//加载区域
+		$.post('../QueryRegion.do', {dataSource : 'normal'}, function(response, status, xhr){
+			if(status == 'success'){
+				if(response.success){
+					WirelessOrder.regions = response.root;
+					//显示区域
+					showRegion();
+				}else{
+					Util.msg.tip(result.msg);
+				}
+			}
+		}, 'json');
+		
+		
+		// 加载餐台数据
+		$.post('../QueryTable.do', null, function(data, status, xhr){
+			if(status == 'success'){
+				if(data.success){
+					
+					WirelessOrder.tables = new WirelessOrder.TableList(data.root);
+					
+					//设置各状态数量
+					$('#idleTableAmount_label_tableSelect').text(WirelessOrder.tables.getIdleAmount());
+					$('#busyTableAmount_label_tableSelect').text(WirelessOrder.tables.getBusyAmount());
+					$('#idleTableAmount_font_tableSelect').text(WirelessOrder.tables.getIdleAmount());
+					$('#busyTableAmount_font_tableSelect').text(WirelessOrder.tables.getBusyAmount());
+					$('#tmpPaidTableAmount_font_tableSelect').text(WirelessOrder.tables.getTmpPaidAmount());
+					
+					showTable();
+					
+				}else{
+					Util.msg.alert({
+						title : data.title,
+						msg : data.msg,
+						renderTo : 'tableSelectMgr',
+						time : 2
+					});
+				}
+			}
+			Util.LM.hide();
+		});	
+		
+	}
+
+
+
+	/**
+	 * 显示餐桌
+	 * @param {object} temp 需要显示的餐桌数组
+	 */
+	function showTable(){
+		
+		var tableStatus = null;
+		//取得当前的餐台状态条件
+		var tableStatusVal = $('#labTableStatus').attr('table-status');
+		if(tableStatusVal){
+			if(tableStatusVal == WirelessOrder.TableList.Status.IDLE.val){
+				tableStatus = WirelessOrder.TableList.Status.IDLE;
+			}else if(tableStatusVal == WirelessOrder.TableList.Status.BUSY.val){
+				tableStatus = WirelessOrder.TableList.Status.BUSY;
+			}
+		}
+		
+		//取得当前的选中区域
+		var regionId = null;
+		$('#divSelectRegionForTS .regionBtn').each(function(index, element){
+			if($(element).attr('region-selected')){
+				regionId = $(element).attr('region-id');
+			}
+		});
+	
+		var result = WirelessOrder.tables;
+		if(tableStatus){
+			result = result.getByStatus(tableStatus);
+		}
+		if(regionId){
+			result = result.getByRegion(regionId);
+		}
+		
+		if(result.length != 0){
+			ts.padding.data(result);
+		}else{
+			$("#divTableShowForSelect").html("");
+		}	
+	}
 });	
 
 /** 
@@ -1306,7 +1712,6 @@ $(function(){
  */
 ts.loadData = function(){
 	location.href = '#tableSelectMgr';
-	//initTableData();
 };
 
 
@@ -1478,415 +1883,6 @@ ts.renderToCreateOrder = function(tableNo, peopleNo, comment){
 		});
 	}
 };
-
-/**
- * 根据alias或id返回table的最新状态
- * toPay : 是否去结账界面
- */
-function updateTable(c){
-	var table = null;
-	$.ajax({
-		url : '../QueryTable.do',
-		type : 'post',
-		data : {
-			tableID : !c.alias || c.alias == 0 ? c.id : '', 
-			alias : c.alias
-		},
-//		async : false,
-		success : function(data, status, xhr){
-			if(data.success && data.root.length > 0){
-				table = data.root[0];
-				c.table = table;
-				if(c.toPay){
-					//关闭选台
-					pm.entry(c);
-				}else{
-					handleTableForTS(c);
-				}
-			}else{
-				Util.msg.alert({
-					msg : '没有此餐台, 请重新输入',
-					topTip : true
-				});				
-			}
-
-		},
-		error : function(request, status, err){
-			Util.msg.alert({
-				title : '温馨提示',
-				msg : err, 
-				renderTo : 'orderFoodListMgr',
-				time : 2
-			});
-		}
-	});
-}
-
-/**
- * 当选中餐桌时，依据餐桌状态处理餐桌
- */
-function handleTableForTS(c){
-	var table = c.table;
-	if(table != null){
-		//判断是否为已点菜餐桌
-		if(table.statusValue == WirelessOrder.TableList.Status.BUSY.val){	
-			//判断餐桌是否已经改变状态
-			if(c.event && $(c.event).attr('data-theme') != 'e'){
-				initTableData();
-			}
-			//去已点菜界面
-			uo.entry({
-				table : table
-			});
-
-		}else{
-			ts.table = table;
-			//判断餐桌是否已经改变状态
-			if(c.event && $(c.event).attr('data-theme') == 'e'){ 
-				initTableData();
-			}
-			
-			if(ts.table.isBook){
-				var customerPopup = null;
-				customerPopup = new NumKeyBoardPopup({
-					header : '请输入人数--' + c.table.name,
-					leftText : '开台',
-					rightText : '查看预订',
-					left : function(){
-							var customNum = $('#input_input_numKbPopup').val();
-							
-							if(isNaN(customNum)){
-								Util.msg.alert({
-									msg : '请填写正确的人数',
-									topTip : true
-								});			
-								$('#input_input_numKbPopup').focus();
-								return;
-							}else if(customNum <= 0){
-								Util.msg.alert({
-									msg : '就餐人数不能少于0',
-									topTip : true
-								});
-								$('#input_input_numKbPopup').focus();
-								return;
-							}
-							
-							Util.LM.show();
-							
-							var orderDataModel = {};
-							orderDataModel.tableID = ts.table.id;
-							orderDataModel.customNum = customNum;
-							orderDataModel.orderFoods = [];
-							orderDataModel.categoryValue =  ts.table.categoryValue;
-							orderDataModel.comment = $('#inputTableOpenCommon').val();
-							
-							$.post('../InsertOrder.do', {
-								commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
-								type : 1,
-								notPrint : false
-							}, function(result){
-								Util.LM.hide();
-								if (result.success) {
-									initTableData();
-									Util.msg.alert({
-										msg : '开台成功!',
-										topTip : true
-									});
-								}else{
-									Util.msg.alert({
-										msg : result.msg,
-										topTip : true
-									});			
-								}
-							});
-							customerPopup.close();	
-					},
-					right : function(){
-						customerPopup.close(function(){
-							books.entry();
-						}, 200);
-						
-					},
-					middle : function(){
-							var customNum = $('#input_input_numKbPopup').val();
-							var comment = $('#inputTableOpenCommon').val();
-							if(isNaN(customNum)){
-								Util.msg.alert({
-									msg : '请填写正确的人数',
-									topTip : true
-								});			
-								$('#input_input_numKbPopup').focus();
-								return;
-							}else if(customNum <= 0){
-								Util.msg.alert({
-									msg : '就餐人数不能少于0',
-									topTip : true
-								});
-								$('#input_input_numKbPopup').focus();
-								return;
-							}
-							
-							ts.renderToCreateOrder(ts.table.alias, customNum, comment);
-							customerPopup.close();
-						}
-				});
-				
-				customerPopup.open(function(self){
-					self.find('[id=input_input_numKbPopup]').val(1);
-					self.find('[id=left_a_numKbPopup]').css({
-						'width' : '32%',
-						'float' : 'left'
-					});
-					self.find('[id=middle_a_numKbPopup]').css({
-						'width' : '32%',
-						'float' : 'left'
-					});
-					self.find('[id=right_a_numKbPopup]').css({
-						'width' : '34%',
-						'height' : '10%',
-						'float' : 'left'
-					});
-					
-					var remark = '<div>'+
-								'<input id="inputTableOpenCommon" placeholder="开台备注" data-type="num" class="countInputStyle" >'+
-							'</div>';
-					self.find('[id=content_div_numKbPopup]').append(remark);
-					self.find('[id=content_div_numKbPopup]').trigger('create');
-					
-					setTimeout(function(){
-						self.find('[id=input_input_numKbPopup]').select();
-					}, 200);
-					
-				});
-			}else{
-				var customerPopup = null;
-				customerPopup = new NumKeyBoardPopup({
-					header : '请输入人数--' + c.table.name,
-					leftText : '开台',
-					left : function(){
-						var customNum = $('#input_input_numKbPopup').val();
-						
-						if(isNaN(customNum)){
-							Util.msg.alert({
-								msg : '请填写正确的人数',
-								topTip : true
-							});			
-							$('#input_input_numKbPopup').focus();
-							return;
-						}else if(customNum <= 0){
-							Util.msg.alert({
-								msg : '就餐人数不能少于0',
-								topTip : true
-							});
-							$('#input_input_numKbPopup').focus();
-							return;
-						}
-						
-						Util.LM.show();
-						
-						var orderDataModel = {};
-						orderDataModel.tableID = ts.table.id;
-						orderDataModel.customNum = customNum;
-						orderDataModel.orderFoods = [];
-						orderDataModel.categoryValue =  ts.table.categoryValue;
-						orderDataModel.comment = $('#inputTableOpenCommon').val();
-						
-						$.post('../InsertOrder.do', {
-							commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
-							type : 1,
-							notPrint : false
-						}, function(result){
-							Util.LM.hide();
-							if (result.success) {
-								initTableData();
-								Util.msg.alert({
-									msg : '开台成功!',
-									topTip : true
-								});
-							}else{
-								Util.msg.alert({
-									msg : result.msg,
-									topTip : true
-								});			
-							}
-						});
-						customerPopup.close();	
-					},
-					right : function(){
-						customerPopup.close();
-					},
-					middle : function(){
-							var customNum = $('#input_input_numKbPopup').val();
-							var comment = $('#inputTableOpenCommon').val();
-							if(isNaN(customNum)){
-								Util.msg.alert({
-									msg : '请填写正确的人数',
-									topTip : true
-								});			
-								$('#input_input_numKbPopup').focus();
-								return;
-							}else if(customNum <= 0){
-								Util.msg.alert({
-									msg : '就餐人数不能少于0',
-									topTip : true
-								});
-								$('#input_input_numKbPopup').focus();
-								return;
-							}
-							
-							ts.renderToCreateOrder(ts.table.alias, customNum, comment);
-							customerPopup.close();
-						}
-				});
-				
-				customerPopup.open(function(self){
-					self.find('[id=input_input_numKbPopup]').val(1);
-					self.find('[id=left_a_numKbPopup]').css({
-						'width' : '32%',
-						'float' : 'left'
-					});
-					self.find('[id=middle_a_numKbPopup]').css({
-						'width' : '32%',
-						'float' : 'left'
-					});
-					self.find('[id=right_a_numKbPopup]').css({
-						'width' : '34%',
-						'height' : '10%',
-						'float' : 'left'
-					});
-					
-					var remark = '<div>'+
-								'<input id="inputTableOpenCommon" placeholder="开台备注" data-type="num" class="countInputStyle" >'+
-							'</div>';
-					self.find('[id=content_div_numKbPopup]').append(remark);
-					self.find('[id=content_div_numKbPopup]').trigger('create');
-					
-					setTimeout(function(){
-						self.find('[id=input_input_numKbPopup]').select();
-					}, 200);
-					
-				});
-			}
-		}
-	}
-}
-
-/**
- * 初始化餐桌信息，保存到tables数组中
- * freeTables存放空闲餐桌，busyTables存放就餐餐桌
- */
-function initTableData(){
-	
-	//显示区域
-	function showRegion(){
-		//添加区域信息
-		var html = [];
-		html.push('<a data-role="button" data-inline="true" data-type="region" class="regionBtn">全部区域</a>');
-		WirelessOrder.regions.forEach(function(e){
-			html.push('<a data-role="button" data-inline="true" data-type="region" class="regionBtn" region-id="' + e.id + '">'+ e.name +'</a>');
-		});
-		
-		$('#divSelectRegionForTS').html(html.join("")).trigger('create').trigger('refresh').find('.regionBtn').each(function(index, element){
-			element.onclick = function(){
-				//恢复所有区域按钮为未选中状态
-				$('#divSelectRegionForTS .regionBtn').attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c').removeAttr('region-selected');
-				//设置点击的区域按钮是选中状态
-				$(element).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e').attr('region-selected', true);
-				//显示所选区域的餐台
-				showTable();
-			};
-		});
-	}
-
-	Util.LM.show();
-	//加载区域
-	$.post('../QueryRegion.do', {dataSource : 'normal'}, function(response, status, xhr){
-		if(status == 'success'){
-			if(response.success){
-				WirelessOrder.regions = response.root;
-				//显示区域
-				showRegion();
-			}else{
-				Util.msg.tip(result.msg);
-			}
-		}
-	}, 'json');
-	
-	
-	// 加载餐台数据
-	$.post('../QueryTable.do', null, function(data, status, xhr){
-		if(status == 'success'){
-			if(data.success){
-				
-				WirelessOrder.tables = new WirelessOrder.TableList(data.root);
-				
-				//设置各状态数量
-				$('#idleTableAmount_label_tableSelect').text(WirelessOrder.tables.getIdleAmount());
-				$('#busyTableAmount_label_tableSelect').text(WirelessOrder.tables.getBusyAmount());
-				$('#idleTableAmount_font_tableSelect').text(WirelessOrder.tables.getIdleAmount());
-				$('#busyTableAmount_font_tableSelect').text(WirelessOrder.tables.getBusyAmount());
-				$('#tmpPaidTableAmount_font_tableSelect').text(WirelessOrder.tables.getTmpPaidAmount());
-				
-				showTable();
-				
-			}else{
-				Util.msg.alert({
-					title : data.title,
-					msg : data.msg,
-					renderTo : 'tableSelectMgr',
-					time : 2
-				});
-			}
-		}
-		Util.LM.hide();
-	});	
-	
-}
-
-
-
-/**
- * 显示餐桌
- * @param {object} temp 需要显示的餐桌数组
- */
-function showTable(){
-	
-	var tableStatus = null;
-	//取得当前的餐台状态条件
-	var tableStatusVal = $('#labTableStatus').attr('table-status');
-	if(tableStatusVal){
-		if(tableStatusVal == WirelessOrder.TableList.Status.IDLE.val){
-			tableStatus = WirelessOrder.TableList.Status.IDLE;
-		}else if(tableStatusVal == WirelessOrder.TableList.Status.BUSY.val){
-			tableStatus = WirelessOrder.TableList.Status.BUSY;
-		}
-	}
-	
-	//取得当前的选中区域
-	var regionId = null;
-	$('#divSelectRegionForTS .regionBtn').each(function(index, element){
-		if($(element).attr('region-selected')){
-			regionId = $(element).attr('region-id');
-		}
-	});
-
-	var result = WirelessOrder.tables;
-	if(tableStatus){
-		result = result.getByStatus(tableStatus);
-	}
-	if(regionId){
-		result = result.getByRegion(regionId);
-	}
-	
-	if(result.length != 0){
-		ts.padding.data(result);
-	}else{
-		$("#divTableShowForSelect").html("");
-	}	
-}
-
-
-
 
 /**
  * 打开会员充值
