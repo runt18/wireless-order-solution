@@ -8,8 +8,6 @@ var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 var	ts = {
 		table : {},
 		member : {},
-		multiOpenTableChoosedTable : [],
-		multiPayTableChoosedTable : []
 	},
 	/**
 	 * 元素模板
@@ -35,13 +33,8 @@ var	ts = {
 			+ '<td class="text_right">{deltaPoint}</td>'
 			+ '<td>{staffName}</td>'
 			+ '<td>{comment}</td>'
-			+ '</tr>',
-	//酒席入账部门
-	feastPayDeptTemplet = '<tr id={tr4Feast}>' +
-			'<td><a data-role="button" data-theme="e" >{deptName}</a></td>' +
-			'<td style="padding-right: 10px;"><input id={numberfieldId} class="mixPayInputFont numberInputStyle" onkeypress="intOnly()"></td>'+
-			'<td> <a data-role="button" data-for="{deptId}" data-text={deptName} data-icon="delete" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-inline="true" onclick="ts.feastPayRemoveAction({event:this})">D</a></td>'+
-		'</tr>';
+			+ '</tr>';
+
 
 
 
@@ -934,49 +927,6 @@ $(function(){
 			});
 		});
 					
-	
-		//多台开席
-		$('#multiTables_a_tableSelect').click(function(){
-			var _selectedTable = null;
-			var askTablePopup = null;
-			askTablePopup = new AskTablePopup({
-				title : '多台开席选台',
-				tables : WirelessOrder.tables,
-				tableSelect : function(selectedTable){
-					_selectedTable = selectedTable;
-					var table = null;
-					for (var i = 0; i < ts.multiOpenTableChoosedTable.length; i++) {
-						if(ts.multiOpenTableChoosedTable[i].id == _selectedTable.id){
-							table = true;
-							ts.multiOpenTableChoosedTable.splice(i, 1);
-							break;
-						}
-					}
-					//选择餐台
-					if(table == null){
-						table = WirelessOrder.tables.getById(_selectedTable.id);
-						if(table.statusValue == 1){
-							Util.msg.tip("此餐台已使用, 不能选择");
-							return;
-						}
-						ts.multiOpenTableChoosedTable.push(table);
-					}
-					askTablePopup.close();
-					//刷新已点餐台
-					ts.loadBookChoosedTable({renderTo : 'multiOpenTableHadChoose', tables:ts.multiOpenTableChoosedTable});	
-	
-				},
-				middle : function(){
-					Util.msg.tip('请选择一张餐桌');
-				}
-			});
-			askTablePopup.open(function(){
-				$('#left_a_askTable').hide();
-				$('#middle_a_askTable').css('width', '48%');
-				$('#right_a_askTable').css('width', '50%');
-			});
-		});
-		
 		//拼台
 		$('#combineTable_a_tableSelect').click(function(){
 			var _selectedTable = null;
@@ -1163,6 +1113,126 @@ $(function(){
 		//预订按钮
 		$('#book_a_tableSelect').click(function(){
 			books.entry();
+		});
+		
+		//多台开席
+		$('#multiOpen_li_tableSelect').click(function(){
+			$('#tableSelectOtherOperateCmp').popup('close');
+			setTimeout(function(){
+				var handlerTable = new CreateHandlerTable({
+					type : 'multiOpenTable',
+					title : '多台开席选台',
+					right : function(selectedTable){
+						if(selectedTable.length == 0){
+							Util.msg.tip("请选择餐台");
+							return;
+						}
+
+						handlerTable.close(function(){
+							//进入点菜界面
+							of.entry({
+								table : selectedTable[0],
+								comment : '',
+								orderFoodOperateType : 'multiOpenTable',
+								commit : function(selectedFoods){
+									if(selectedFoods.length == 0){
+										Util.msg.tip("请选择菜品");		
+										return ;
+									}
+									
+									var orderFoods = [];
+									for (var i = 0; i < selectedTable.length; i++) {
+										var orderDataModel = {};
+										orderDataModel.tableID = selectedTable[i].id;
+										orderDataModel.orderFoods = selectedFoods.slice(0);
+										orderDataModel.categoryValue =  selectedTable[i].categoryValue;	
+										orderFoods.push(JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)));
+									}
+									
+									Util.LM.show();
+									$.post('../OperateOrderFood.do', {
+										dataSource : 'multiOpenTable',
+										multiTableOrderFoods : orderFoods.join("<li>")
+									}, function(data){
+										Util.LM.hide();
+										if(data.success){
+											Util.msg.tip(data.msg);
+											//清空已选餐台
+											ts.loadData();
+										}else{
+											Util.msg.tip(data.msg);
+										}
+									}, 'json');
+								}
+							});	
+						}, 300);
+					}
+				});
+				handlerTable.open();
+			}, 200);
+		});
+		
+		//多台并台
+		$('#MultiPayTable_li_tableSelect').click(function(){
+			$('#tableSelectOtherOperateCmp').popup('close');
+			setTimeout(function(){
+				var handlerTable = new CreateHandlerTable({
+					title : '拼台(菜品将合并到第一张餐台)',
+					type : 'spellingTable',
+					right : function(selectedTable){
+						if(selectedTable.length == 0){
+							Util.msg.tip("请选择餐台");
+							return;
+						}
+						var multiTables = [];
+						for (var i = 0; i < selectedTable.length; i++) {
+							multiTables.push(selectedTable[i].id);
+						}
+
+						$.post('../OperateTable.do', {
+							dataSource : 'mergeTable',
+							tables : multiTables.join(",")
+						}, function(rt){
+							if(rt.success){
+								Util.msg.tip("并台成功, 已合并到 "+ selectedTable[0].name);
+								//关闭选台
+								handlerTable.close();
+								//进入已点菜界面
+								uo.entry({
+									table : selectedTable[0]
+								});
+							}else{
+								Util.msg.tip('tableSelectMgr');
+							}
+						}, 'json');
+					}
+				});
+				handlerTable.open();
+			}, 300);
+		});
+		
+		//酒席入账
+		$('#feastPay_li_tableSelect').click(function(){
+			$('#tableSelectOtherOperateCmp').popup('close');
+			setTimeout(function(){
+				var feastPay = new CreateFeastPay({
+					confirm : function(result){
+						if(result.success){
+							feastPay.close();
+							//先跳转到结账界面再操作
+							updateTable({
+								toPay : true,
+								id : result.other.tableId
+							});	
+							//刷新餐台数据
+							initTableData();
+						}else{
+							Util.msg.tip(result.msg);
+						}
+					}
+				});
+				feastPay.open();
+			}, 300);
 		});
 		
 	});
@@ -2335,154 +2405,6 @@ ts.member.closeMemberConsumeDetailWin = function(){
 	$('#front_memberConsumeDetailBody').html('');
 };
 
-/**
- * 酒席分部门入账
- */
-ts.displayFeastPayWin = function(){
-	$('#tableSelectOtherOperateCmp').popup('close');
-	$.post('../QueryDept.do', {dataSource:'normal'}, function(result){
-		ts.depts4Feast = result.root;
-		
-		var html=[];
-		for (var i = 0; i < ts.depts4Feast.length; i++) {
-			html.push('<li class="popupButtonList" data-icon="false"><a onclick="ts.addFeastDepartment({index})">{name}</a></li>'.format({
-				index : i,
-				name : ts.depts4Feast[i].name
-			}));
-		}
-		
-		$('#departmentsListCmp').html(html.join('')).listview('refresh');		
-	});
-	
-	$('#feastPayWin').show();
-	$('#shadowForPopup').show();
-	
-};
-
-/**
- * 关闭酒席入账
- */
-ts.closeFeastPayWin = function(){
-	$('#feastPayWin').hide();
-	$('#shadowForPopup').hide();	
-	
-	//清空操作
-	$('#feastPayWinTable').html('');
-	$('#feastPayTotalPrice').text(0);	
-	ts.addFeastDepartment.depts.length = 0;
-};
-
-/**
- * 计算酒席入账总金额
- */
-ts.calcFeastPay = function(){
-	var totalMoney = 0;
-	//清空酒席记录再重新赋值
-	ts.addFeastDepartment.deptFeast.length = 0;
-	
-	for (var i = 0; i < ts.addFeastDepartment.depts.length; i++) {
-		if($('#numForFeast'+ts.addFeastDepartment.depts[i]).val()){
-			totalMoney += parseFloat($('#numForFeast'+ts.addFeastDepartment.depts[i]).val());
-			//console.log(typeof $('#numForFeast'+ts.addFeastDepartment.depts[i]).val())
-			ts.addFeastDepartment.deptFeast.push(ts.addFeastDepartment.depts[i] + "," + $('#numForFeast'+ts.addFeastDepartment.depts[i]).val());
-		}
-	}
-	
-	$('#feastPayTotalPrice').text(totalMoney);	
-};
-
-/**
- * 添加入账部门
- */
-ts.addFeastDepartment = function(index){
-	
-	var dept = ts.depts4Feast[index], fieldId = "numForFeast" + dept.id; 
-	
-	for (var i = 0; i < ts.addFeastDepartment.depts.length; i++) {
-		if(ts.addFeastDepartment.depts[i] == dept.id){
-			Util.msg.tip("此部门已添加");
-			return;
-		}
-	}
-	
-	ts.addFeastDepartment.depts.push(dept.id);
-	
-	var html = feastPayDeptTemplet.format({
-		numberfieldId : fieldId,
-		deptName : dept.name,
-		deptId : dept.id,
-		tr4Feast : 'tr4Feast'+dept.id
-	});
-	
-	$('#feastPayWinTable').append(html).trigger('create');
-	
-	//找零快捷键
-    $('#'+fieldId).on('keyup', function(btn){
-    	ts.calcFeastPay();
-	});	
-	
-	$('#popupDepartmentsCmp').popup('close');
-	
-};
-
-//记录添加的部门
-ts.addFeastDepartment.depts = [];
-//记录添加的部门和金额
-ts.addFeastDepartment.deptFeast = [];
-
-/**
- * 移除部门收益
- */
-ts.feastPayRemoveAction = function(c){
-	var curField = $(c.event);
-	var numForAlias = parseInt(curField.attr('data-for'));
-	var name = curField.attr('data-text');
-	
-	Util.msg.alert({
-		msg : '是否去除 <font color="green">' + name +'</font> 收益?',
-		renderTo : 'tableSelectMgr',
-		buttons : 'yesback',
-		certainCallback : function(){
-			for (var i = 0; i < ts.addFeastDepartment.depts.length; i++) {
-				if(numForAlias == ts.addFeastDepartment.depts[i]){
-					ts.addFeastDepartment.depts.splice(i, 1);
-					break;
-				}
-			}
-
-			$('#tr4Feast'+numForAlias).remove();		
-			
-			ts.calcFeastPay();
-		}
-	});
-};
-
-/**
- * 确定酒席入账
- */
-ts.doFeastOrder = function(){
-	Util.LM.show();
-	$.post('../FeastOrder.do', {deptFeasts : ts.addFeastDepartment.deptFeast.join('&')}, function(result){
-		Util.LM.hide();
-		if(result.success){
-			ts.closeFeastPayWin();
-			//先跳转到结账界面再操作
-			updateTable({
-				toPay : true,
-				id : result.other.tableId
-			});	
-			//刷新餐台数据
-			initTableData();
-		}else{
-			Util.msg.alert({
-				msg : result.msg,
-				renderTo : 'tableSelectMgr'
-			});
-		}
-	}, "json");
-};
-
-
 //预订=============================================
 
 /**
@@ -2517,170 +2439,4 @@ ts.loadBookChoosedTable = function(c){
 
 
 //==============end 预订
-
-//===============并台start
-/**
- * 打开多台开席
- */
-ts.openMultiPayTableCmp = function(){
-	//初始化选择餐台
-	ts.multiPayTableChoosedTable.length = 0;
-	//关闭更多
-	$('#tableSelectOtherOperateCmp').popup('close');
-	setTimeout(function(){
-		$('#multiPayTableCmp').show();
-		$('#shadowForPopup').show();
-	}, 250);
-};
-
-/**
- * 关闭预订入座
- */
-ts.closeMultiPayTableCmp = function(){
-	$('#multiPayTableCmp').hide();
-	$('#shadowForPopup').hide();
-	$('#multiPayTableHadChoose').html('');
-};
-
-
-/**
- * 多台并台
- */
-ts.multiPayTableOrderFood = function(){
-
-	if(ts.multiPayTableChoosedTable.length == 0){
-		Util.msg.tip("请选择餐台");
-		return;
-	}
-	var multiTables = [];
-	for (var i = 0; i < ts.multiPayTableChoosedTable.length; i++) {
-		multiTables.push(ts.multiPayTableChoosedTable[i].id);
-	}
-
-	$.post('../OperateTable.do', {
-		dataSource : 'mergeTable',
-		tables : multiTables.join(",")
-	}, function(rt){
-		if(rt.success){
-			Util.msg.tip("并台成功, 已合并到 "+ ts.multiPayTableChoosedTable[0].name);
-			//关闭选台
-			ts.closeMultiPayTableCmp();		
-			//进入已点菜界面
-			uo.entry({
-				table : ts.multiPayTableChoosedTable[0]
-			});
-		}else{
-			Util.msg.alert({
-				renderTo : 'tableSelectMgr',
-				msg : rt.msg
-			});
-		}
-	}, 'json');
-};
-
-
-//===============end并台
-
-//=================多台开席start
-
-/**
- * 打开多台开席
- */
-ts.openMultiOpenTableCmp = function(){
-	//初始化选择餐台
-	ts.multiOpenTableChoosedTable.length = 0;
-	//关闭更多
-	$('#tableSelectOtherOperateCmp').popup('close');
-	setTimeout(function(){
-		$('#multiOpenTableCmp').show();
-		$('#shadowForPopup').show();
-	}, 250);
-};
-
-/**
- * 关闭预订入座
- */
-ts.closeMultiOpenTableCmp = function(){
-	$('#multiOpenTableCmp').hide();
-	$('#shadowForPopup').hide();
-	$('#multiOpenTableHadChoose').html('');
-};
-
-/**
- * 多台点菜
- */
-ts.multiOpenTableOrderFood = function(){
-	if(ts.multiOpenTableChoosedTable.length == 0){
-		Util.msg.tip("请选择餐台");
-		return;
-	}
-	
-	setTimeout(function(){
-		//关闭选台
-		ts.closeMultiOpenTableCmp();				
-	}, 500);
-
-	//进入点菜界面
-	of.entry({
-		table : ts.multiOpenTableChoosedTable[0],
-		comment : '',
-		orderFoodOperateType : 'multiOpenTable'
-	});	
-};
-
-/**
- * 多台开席落单
- */
-ts.multiOpenTableCommitOrderFood = function(){
-	
-	if(of.newFood.length == 0){
-		Util.msg.alert({
-			msg : "请选择菜品",
-			renderTo : 'orderFoodMgr'
-		});		
-		return ;
-	}
-	
-	var orderFoods = [];
-	for (var i = 0; i < ts.multiOpenTableChoosedTable.length; i++) {
-		var orderDataModel = {};
-		orderDataModel.tableID = ts.multiOpenTableChoosedTable[i].id;
-		orderDataModel.orderFoods = of.newFood.slice(0);
-		orderDataModel.categoryValue =  ts.multiOpenTableChoosedTable[i].categoryValue;	
-		orderFoods.push(JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)));
-	}
-	
-	Util.LM.show();
-	$.post('../OperateOrderFood.do', {
-		dataSource : 'multiOpenTable',
-		multiTableOrderFoods : orderFoods.join("<li>")
-	}, function(data){
-		Util.LM.hide();
-		if(data.success){
-			Util.msg.tip(data.msg);
-			//清空已选餐台
-			ts.multiOpenTableChoosedTable.length = 0;
-			ts.loadData();
-		}else{
-			Util.msg.alert({
-				renderTo : 'orderFoodMgr',
-				msg : data.msg
-			});
-		}
-	}, 'json');
-};
-
-//===============end 多台开席
-
-
-
-
-
-
-
-
-
-
-
-
 

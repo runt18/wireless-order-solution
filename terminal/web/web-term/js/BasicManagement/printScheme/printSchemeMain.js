@@ -645,6 +645,21 @@ function init(){
 							}
 						}
 					}]
+				},{
+					items : [{
+						xtype : 'radio',
+						name : 'pType',
+						inputValue : 20,
+						hideLabel : true,
+						boxLabel : '微信预订',
+						listeners : {
+							check  : function(thiz, checked){
+								if(checked){
+									showPanel(thiz.inputValue);
+								}
+							}
+						}
+					}]
 				}]
 			},{
 				layout : 'column',
@@ -1174,7 +1189,7 @@ function showPanel(v){
 		}else if(v == 16){//转菜
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/transferFood2.jpg)';
 			Ext.getCmp('printCommentPanel').hide();			
-		}else if(v == 19){
+		}else if(v == 19 || v == 20){
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/wxOrder.jpg)';
 			Ext.getCmp('printCommentPanel').hide();		
 		}

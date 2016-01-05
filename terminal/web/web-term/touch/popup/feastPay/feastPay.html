@@ -1,0 +1,39 @@
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+	<div id="feastPayWin_div_feastPay" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 200px; left: 50%;width:400px; margin: -100px 0px 0px -200px;background-color: white;" align="center">
+	    <div data-role="header" class="ui-corner-top ui-header ui-bar-b" data-theme="b" style="line-height: 50px;">
+	          酒席入账
+	    </div>
+	    
+	    <div style="padding: 5px 10px;" >
+		    <a data-rel="popup" data-role="button" data-transition="pop" data-theme="b" data-icon="plus" href="#popupDepartmentsCmp">添加入账部门</a>
+		    <table id="feastPayWinTable_table_feastPay">
+<!-- 		    	<tr id="tr4Feast">
+		    		<td><a data-role="button" data-theme="e" >现金</a></td>
+		    		<td style="padding-right: 10px;"><input id="" class="mixPayInputFont numberInputStyle" onkeypress="intOnly()"></td>
+		    		<td> <a data-role="button" data-for="" data-icon="delete" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-inline="true" >D</a></td>
+		    	</tr> -->
+		    </table>
+		    <div style="text-align: right;padding-right: 20px;font-size: 30px;color: green;">
+    			总金额 : <label id="feastPayTotalPrice_label_feastPay">0</label>
+    		</div>
+	    </div>
+	    
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth ui-bar-b barBottomBeCorner">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="confirm_a_feastPay">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="cancel_a_feastPay">取消</a>		 
+			 </div>
+	    </div>		
+	    
+	    <div data-role="popup" id="popupDepartmentsCmp" data-theme="d" >
+        <ul id="departmentsListCmp_ul_feastPay" data-role="listview" data-inset="true" style="min-width:100px;" data-theme="b">
+            <!-- <li class="popupButtonList " data-icon="false"><a onclick="">部门一</a></li> -->
+        </ul>
+	</div> 
+	</div>
+	
+		
+</body>

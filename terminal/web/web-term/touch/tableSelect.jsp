@@ -103,6 +103,10 @@
 <script type="text/javascript" src="./js/popup/seat/seat.js"></script>
 <!-- 微信扫描 -->
 <script type="text/javascript" src="./js/popup/wxPayment/wxPayment.js"></script>
+<!-- 开席&拼台 -->
+<script type="text/javascript" src="./js/popup/handlerTable/handlerTable.js"></script>
+<!-- 酒席入账 -->
+<script type="text/javascript" src="./js/popup/feastPay/feastPay.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -212,54 +216,11 @@
         <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
          	<li id="fastFood_li_tableSelect" class="tempFoodKitchen" style="display:none;"><a >快餐模式</a></li>
          	<li id="printBind_a_tableSelect" class="tempFoodKitchen"><a>打印机绑定</a></li>
-         	<li class="tempFoodKitchen"  onclick="ts.displayFeastPayWin()"><a>酒席入账</a></li>
-            <li class="tempFoodKitchen" onclick="ts.openMultiOpenTableCmp()"><a >多台开席</a></li>
-            <li class="tempFoodKitchen" onclick="ts.openMultiPayTableCmp()"><a >拼台</a></li>
+         	<li class="tempFoodKitchen" id="feastPay_li_tableSelect"><a>酒席入账</a></li>
+            <li class="tempFoodKitchen" id="multiOpen_li_tableSelect"><a >多台开席</a></li>
+            <li class="tempFoodKitchen" id="MultiPayTable_li_tableSelect"><a>拼台</a></li>
         </ul>
 	</div>		
-	
-	<!-- 多台开席选台 -->
-	<div id="multiOpenTableCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: 100px 0px 0px -200px;width:550px;display: none;background-color: white;" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
-	       	 多台开席选台
-        	<div style="float: right">
-  				<a onclick="ts.closeMultiOpenTableCmp()" data-role="button" data-corners="false" class="popupWinCloseBtn4Book">X</a>      		
-        	</div>		
-	    </div>
-	    
-	    <div data-role="content" id="multiOpenTableHadChoose" style="height:100px" align="left">
-	    
-   		</div>	    
-	    
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="multiTables_a_tableSelect">添加餐台</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.multiOpenTableOrderFood()">确定</a>		 
-			 </div>
-	    </div>	    	    
-	</div>		
-	
-	<!-- 并台埋单 -->
-	<div id="multiPayTableCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: 100px 0px 0px -200px;width:550px;display: none;background-color: white;" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top win_head">
-	       	拼台(菜品将合并到第一张餐台)
-        	<div style="float: right">
-  				<a onclick="ts.closeMultiPayTableCmp()" data-role="button" data-corners="false" class="popupWinCloseBtn4Book">X</a>      		
-        	</div>		
-	    </div>
-	    
-	    <div data-role="content" id="multiPayTableHadChoose" style="height:100px" align="left">
-	    
-   		</div>	    
-	    
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="combineTable_a_tableSelect">添加餐台</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.multiPayTableOrderFood()">确定</a>		 
-			 </div>
-	    </div>	    	    
-	</div>		
-	
 	
 	<!-- 远程诊断打印机 -->
 	<div id="printerConnectionCmp" class="ui-overlay-shadow ui-corner-all" style="width:1020px;z-index: 1102;position: absolute; top: 150px; left: 50%; margin: -100px 0px 0px -500px;background-color: white;display: none;" align="center">
@@ -597,40 +558,7 @@
 			</div>
 	    </div>
 	</div>			
-	
-	<!-- 酒席入账 -->
-	<div id="feastPayWin" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 200px; left: 50%;width:400px; margin: -100px 0px 0px -200px;display: none;background-color: white;" align="center">
-	    <div data-role="header" class="ui-corner-top" data-theme="b">
-	        <h1>酒席入账</h1>
-	    </div>
-	    <div style="padding: 5px 10px;" >
-		    <a data-rel="popup" data-role="button" data-transition="pop" data-theme="b" data-icon="plus" href="#popupDepartmentsCmp">添加入账部门</a>
-		    <table id="feastPayWinTable">
-<!-- 		    	<tr id="tr4Feast">
-		    		<td><a data-role="button" data-theme="e" >现金</a></td>
-		    		<td style="padding-right: 10px;"><input id="" class="mixPayInputFont numberInputStyle" onkeypress="intOnly()"></td>
-		    		<td> <a data-role="button" data-for="" data-icon="delete" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-inline="true" >D</a></td>
-		    	</tr> -->
-		    </table>
-		    <div style="text-align: right;padding-right: 20px;font-size: 30px;color: green;">
-    			总金额 : <label id="feastPayTotalPrice">0</label>
-    		</div>
-	    </div>
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.doFeastOrder()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.closeFeastPayWin()">取消</a>		 
-			 </div>
-	    </div>	    
-	    
-	 </div>	
-	 
-	<div data-role="popup" id="popupDepartmentsCmp" data-theme="d" >
-        <ul id="departmentsListCmp" data-role="listview" data-inset="true" style="min-width:100px;" data-theme="b">
-            <!-- <li class="popupButtonList " data-icon="false"><a onclick="">部门一</a></li> -->
-        </ul>
-	</div>		 
-</div>
+</div>	
 <!-- end 餐台选择  -->
 
 
@@ -999,7 +927,7 @@
 			 <div data-role="controlgroup" class="ui-btn-right" data-type="horizontal">
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="addBookOrderFood">选好了</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="bookSeatOrderFood_a_orderFood">入座</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="multiOpenTable" onclick="ts.multiOpenTableCommitOrderFood()">多台开席</a>
+			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="multiOpenTable_a_tableSelect">多台开席</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="normalOrderFood_a_orderFood">下单</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="fastPay_a_orderFood">结账</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="brand_a_orderFood">牌号</a>
