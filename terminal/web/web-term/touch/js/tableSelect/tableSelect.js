@@ -927,51 +927,6 @@ $(function(){
 			});
 		});
 					
-		//拼台
-		$('#combineTable_a_tableSelect').click(function(){
-			var _selectedTable = null;
-			var askTablePopup = null;
-			askTablePopup = new AskTablePopup({
-				title : '拼台',
-				tables : WirelessOrder.tables,
-				tableSelect : function(selectedTable){
-					_selectedTable = selectedTable;
-					var table = null;
-					
-					for (var i = 0; i < ts.multiPayTableChoosedTable.length; i++) {
-						if(ts.multiPayTableChoosedTable[i].id == _selectedTable.id){
-							table = true;
-							ts.multiPayTableChoosedTable.splice(i, 1);
-							break;
-						}
-					}
-					
-					//选择餐台
-					if(table == null){
-						table = WirelessOrder.tables.getById(_selectedTable.id);
-						if(table.statusValue == 0){
-							Util.msg.tip("此餐台未点餐, 不能选择");
-							return;
-						}
-						ts.multiPayTableChoosedTable.push(table);
-					}
-					
-					askTablePopup.close();
-					//刷新已点餐台
-					ts.loadBookChoosedTable({renderTo : 'multiPayTableHadChoose', tables:ts.multiPayTableChoosedTable});	
-					
-				},
-				middle : function(){
-					Util.msg.tip('请选择一张餐桌');
-				}
-			});
-			askTablePopup.open(function(){
-				$('#left_a_askTable').hide();
-				$('#middle_a_askTable').css('width', '48%');
-				$('#right_a_askTable').css('width', '50%');
-			});
-		});
-		
 		//当日账单
 		$('#todayBill_a_tableSelect').click(function(){
 			//新页面打开账单管理
@@ -2403,39 +2358,4 @@ ts.member.closeMemberConsumeDetailWin = function(){
 	$('#consumeDetail_memberName').val('');
 	$('#front_memberConsumeDetailBody').html('');
 };
-
-//预订=============================================
-
-/**
- * 加载已选餐台
- */
-ts.loadBookChoosedTable = function(c){
-	var html = [];
-	for (var i = 0; i < c.tables.length; i++) {
-		var aliasOrName;
-		if(c.tables[i].categoryValue == 1){//一般台
-			aliasOrName = c.tables[i].alias;
-		}else if(c.tables[i].categoryValue == 3){//搭台
-			var begin = c.tables[i].name.indexOf("(");
-			var end = c.tables[i].name.indexOf(")");
-			aliasOrName = '<font color="green">' + c.tables[i].name.substring(begin+1, end) +'</font>';
-		}else{
-			aliasOrName = '<font color="green">'+ c.tables[i].categoryText +'</font>';
-		}		
-		html.push(tableCmpTemplet.format({
-			dataIndex : i,
-			id : c.tables[i].id,
-			alias : aliasOrName,
-			theme : c.tables[i].statusValue == '1' ? "e" : "c",
-			name : c.tables[i].name == "" || typeof c.tables[i].name != 'string' ? c.tables[i].alias + "号桌" : c.tables[i].name,
-			tempPayStatus : c.tables[i].isTempPaid? '暂结' : '&nbsp;&nbsp;',
-			bookTableStatus : c.tables[i].isBook? '订' : '',
-			tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0?'tempPayStatus4Moz':'tempPayStatus'		
-		}));				
-	}
-	$('#'+c.renderTo).html(html.join("")).trigger('create');	
-};
-
-
-//==============end 预订
 

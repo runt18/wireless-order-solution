@@ -521,8 +521,6 @@ $(function(){
 			//返回到餐桌界面
 			ts.loadData();
 			
-			delete ts.bookTable4Search;
-			
 			$('#searchBookPerson_input_tableSelect').val("");
 			$('#searchBookPhone_input_tableSelect').val("");
 			$('#searchBookStatus').val(-1).selectmenu("refresh");
