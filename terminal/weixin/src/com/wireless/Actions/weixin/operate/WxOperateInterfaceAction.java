@@ -122,7 +122,7 @@ public class WxOperateInterfaceAction extends DispatchAction{
 			
 			AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRes.getWeixinAppId(), wxRes.getRefreshToken());
 			
-			System.out.println(authorizerToken.getRefreshToken());
+			//System.out.println(authorizerToken.getRefreshToken());
 			
 			WxRestaurantDao.update(staff, new WxRestaurant.UpdateBuilder().setRefreshToken(authorizerToken.getRefreshToken()));
 			
