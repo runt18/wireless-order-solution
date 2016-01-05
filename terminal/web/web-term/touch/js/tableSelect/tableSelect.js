@@ -7,7 +7,7 @@ var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 //餐桌选择包
 var	ts = {
 		table : {},
-		member : {},
+		member : {}
 	},
 	/**
 	 * 元素模板
@@ -1351,7 +1351,6 @@ $(function(){
  */
 ts.loadData = function(){
 	location.href = '#tableSelectMgr';
-	//initTableData();
 };
 
 
