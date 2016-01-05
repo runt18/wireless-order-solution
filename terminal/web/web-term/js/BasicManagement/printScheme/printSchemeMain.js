@@ -1189,8 +1189,11 @@ function showPanel(v){
 		}else if(v == 16){//转菜
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/transferFood2.jpg)';
 			Ext.getCmp('printCommentPanel').hide();			
-		}else if(v == 19 || v == 20){
+		}else if(v == 19 ){
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/wxOrder.jpg)';
+			Ext.getCmp('printCommentPanel').hide();		
+		}else if(v == 20){
+			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/wxBook.jpg)';
 			Ext.getCmp('printCommentPanel').hide();		
 		}
 	}
