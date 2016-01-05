@@ -2640,10 +2640,6 @@ $(function(){
 					//清空状态栏
 					$('#divDescForCreateOrde div:first').html('');
 					$('#orderFoodsCmp').listview('refresh');
-					//更新餐台
-					if(of.order == null){
-						initTableData();
-					}
 					
 					//更新餐台
 					$.post('../QueryTable.do', {tableID : of.table.id}, function(result){

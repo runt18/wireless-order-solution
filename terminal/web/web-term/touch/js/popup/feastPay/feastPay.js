@@ -1,6 +1,6 @@
-function CreateFeastPay(param){
+function FeastPaidPopup(param){
 	param = param || {
-		confirm : function(deptFeast){},   //确定按钮
+		confirm : function(deptFeast){}   //确定按钮
 	}
 	
 	//入账的部门
@@ -46,7 +46,7 @@ function CreateFeastPay(param){
 			inputId : 'feastInput' + new Date().getTime(),
 			id : dept.id,
 			deptName : dept.name,
-			deptId : dept.id,
+			deptId : dept.id
 		});
 		$('#feastPayWinTable_table_feastPay').append(html).trigger('create');
 		
