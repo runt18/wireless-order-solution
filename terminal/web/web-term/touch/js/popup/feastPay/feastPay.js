@@ -73,12 +73,13 @@ function FeastPaidPopup(param){
 		
 		//金额跟随键盘输入变化
 		$('#feastPayWinTable_table_feastPay').find('[data-type="feastPayInput"]').each(function(index, element){
+			$(element).focus();
 			NumKeyBoardAttacher.instance().attach(element, function(){
 				calcFeastPay();
 			});
-//			element.onkeyup = function(){
-//				calcFeastPay();
-//			}
+			element.oninput = function(){
+				calcFeastPay();
+			}
 		});
 	}
 	
