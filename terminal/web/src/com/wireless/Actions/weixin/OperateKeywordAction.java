@@ -1,4 +1,4 @@
-package com.wireless.Actions.weixin.operate;
+package com.wireless.Actions.weixin;
 
 import java.sql.SQLException;
 
@@ -17,7 +17,7 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.action.WxKeyword;
 
-public class WxOperateKeywordAction extends DispatchAction {
+public class OperateKeywordAction extends DispatchAction {
 	
 	/**
 	 * 新建微信关键字回复
@@ -32,9 +32,9 @@ public class WxOperateKeywordAction extends DispatchAction {
 		final JObject jObject = new JObject();
 		final String callback = request.getParameter("callback");
 		final String keyword = request.getParameter("keyword");
-		final String rid = request.getParameter("rid");
+		final String pin = (String)request.getAttribute("pin");
 		try{
-			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			final WxKeyword.InsertBuilder builder = new WxKeyword.InsertBuilder(keyword, WxKeyword.Type.NORMAL);
 			WxKeywordDao.insert(staff, builder);
 			jObject.initTip(true, "新建微信关键字回复成功");
@@ -65,9 +65,10 @@ public class WxOperateKeywordAction extends DispatchAction {
 		final JObject jObject = new JObject();
 		final String callback = request.getParameter("callback");
 		final String id = request.getParameter("id");
-		final String rid = request.getParameter("rid");
+		final String pin = (String)request.getAttribute("pin");
+
 		try{
-			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			final WxKeywordDao.ExtraCond extraCond = new WxKeywordDao.ExtraCond();
 			if(id != null && !id.isEmpty()){
 				extraCond.setId(Integer.parseInt(id));
@@ -100,9 +101,10 @@ public class WxOperateKeywordAction extends DispatchAction {
 		final JObject jObject = new JObject();
 		final String callback = request.getParameter("callback");
 		final String id = request.getParameter("id");
-		final String rid = request.getParameter("rid");
+		final String pin = (String)request.getAttribute("pin");
+
 		try{
-			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			final WxKeywordDao.ExtraCond extraCond = new WxKeywordDao.ExtraCond();
 			if(id != null && !id.isEmpty()){
 				extraCond.setId(Integer.parseInt(id));
@@ -127,11 +129,11 @@ public class WxOperateKeywordAction extends DispatchAction {
 		final JObject jObject = new JObject();
 		final String callback = request.getParameter("callback");
 		final String id = request.getParameter("id");
-		final String rid = request.getParameter("rid");
+		final String pin = (String)request.getAttribute("pin");
 		final String actionId = request.getParameter("actionId");
 		final String keyword = request.getParameter("keyword");
 		try{
-			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			final WxKeyword.UpdateBuilder builder = new WxKeyword.UpdateBuilder(Integer.parseInt(id));
 			if(actionId != null && !actionId.isEmpty()){
 				builder.setAction(Integer.parseInt(actionId));
