@@ -285,10 +285,12 @@ public class WxKeywordDao {
 	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		int amount = 0;
 		for(WxKeyword keyword : getByCond(dbCon, staff, extraCond)){
-			String sql;
-			sql = " DELETE FROM " + Params.dbName + ".weixin_keyword WHERE id = " + keyword.getId();
-			if(dbCon.stmt.executeUpdate(sql) == 1){
-				amount++;
+			if(keyword.getType() != WxKeyword.Type.EXCEPTION){
+				String sql;
+				sql = " DELETE FROM " + Params.dbName + ".weixin_keyword WHERE id = " + keyword.getId();
+				if(dbCon.stmt.executeUpdate(sql) == 1){
+					amount++;
+				}
 			}
 		}
 		return amount;
