@@ -1,4 +1,4 @@
-package com.wireless.db.weixin.menuAction;
+package com.wireless.pojo.weixin.action;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

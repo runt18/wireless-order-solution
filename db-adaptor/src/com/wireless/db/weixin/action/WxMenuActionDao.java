@@ -1,4 +1,4 @@
-package com.wireless.db.weixin.menuAction;
+package com.wireless.db.weixin.action;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -21,6 +21,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.WxMenuError;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.action.WxMenuAction;
 
 public class WxMenuActionDao {
 

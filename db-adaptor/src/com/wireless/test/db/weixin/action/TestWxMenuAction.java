@@ -1,4 +1,4 @@
-package com.wireless.test.db.weixin.menuAction;
+package com.wireless.test.db.weixin.action;
 
 import java.beans.PropertyVetoException;
 import java.io.File;
@@ -31,14 +31,14 @@ import com.aliyun.openservices.oss.OSSClient;
 import com.aliyun.openservices.oss.OSSException;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.menuAction.WxMenuAction;
-import com.wireless.db.weixin.menuAction.WxMenuActionDao;
+import com.wireless.db.weixin.action.WxMenuActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.OssImageError;
 import com.wireless.exception.WxMenuError;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.oss.OssImage.ImageType;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.action.WxMenuAction;
 import com.wireless.test.db.TestInit;
 import com.wireless.test.db.oss.TestOssImage;
 
