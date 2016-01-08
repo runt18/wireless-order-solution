@@ -17,14 +17,14 @@ import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.menuAction.WxMenuAction;
-import com.wireless.db.weixin.menuAction.WxMenuAction.Cate;
-import com.wireless.db.weixin.menuAction.WxMenuActionDao;
+import com.wireless.db.weixin.action.WxMenuActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.action.WxMenuAction;
+import com.wireless.pojo.weixin.action.WxMenuAction.Cate;
 
 public class OperateMenuAction extends DispatchAction{
 	/**

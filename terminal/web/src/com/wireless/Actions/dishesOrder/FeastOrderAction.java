@@ -19,6 +19,7 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 
 public class FeastOrderAction extends Action{
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String deptFeasts = request.getParameter("deptFeasts");
 		
