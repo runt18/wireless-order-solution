@@ -32,9 +32,8 @@ import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.action.WxMenuActionDao;
 import com.wireless.db.weixin.member.WxMemberDao;
-import com.wireless.db.weixin.menuAction.WxMenuAction;
-import com.wireless.db.weixin.menuAction.WxMenuActionDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
@@ -45,6 +44,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.pojo.weixin.action.WxMenuAction;
 import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
@@ -206,7 +206,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		naviItem.addItem(item4Order);
 		
 		Data4Item item4Book = new Data4Item();
-		item4Book.setTitle("预订");
+		item4Book.setTitle("自助预订");
 		item4Book.setUrl(createUrl(msg, WEIXIN_BOOK));
 		item4Book.setPicUrl(WEIXIN_BOOK_ICON);
 		naviItem.addItem(item4Book);		
@@ -306,8 +306,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 				}else if(msg.getEventKey().equals(EventKey.MY_QRCODE_EVENT_KEY.val)){
 					//我的二维码
 					Member member = MemberDao.getByWxSerial(StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())), msg.getFromUserName());
-					final String qrCodeUrl = "http://qr.liantu.com/api.php?text=" + member.getWeixin().getCard();
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("我的二维码", "扫描二维码完成会员注入", qrCodeUrl + "&w=70", qrCodeUrl)));
+					final String qrCodeUrl = "http://qr.liantu.com/api.php?text=" + member.getWeixin().getCard() + "&w=70";
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("我的二维码", "扫描二维码完成会员注入", qrCodeUrl, qrCodeUrl)));
 					
 				}else if(msg.getEventKey().equals(EventKey.PROMOTION_EVENT_KEY.val)){
 					//最新优惠
@@ -370,7 +370,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					}
 					
 				}else if(msg.getEventKey().equals(EventKey.MEMBER_EVENT_KEY.val)){
-					//会员信息
+					//我的会员卡
 					try{
 						Member member = MemberDao.getByWxSerial(StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())), msg.getFromUserName());
 						StringBuilder title = new StringBuilder();
@@ -382,7 +382,9 @@ public class WxHandleMessage extends HandleMessageAdapter {
 							title.append("，可用积分" + NumericUtil.float2String2(member.getTotalPoint()) + "分");
 						}
 						
-						session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title.toString(), "点击查看您的更多信息", "", createUrl(msg, WEIXIN_MEMBER))));
+						final String qrCodeUrl = "http://qr.liantu.com/api.php?text=" + member.getWeixin().getCard() + "&w=70";
+
+						session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title.toString(), "1、店员扫描我的二维码完成会员注入\r\n2、点击查看您的更多信息>>>", qrCodeUrl, createUrl(msg, WEIXIN_MEMBER))));
 						
 					}catch(BusinessException | SQLException e){
 						//session.callback(new Msg4ImageText(msg).addItem(new Data4Item("亲。。。您的微信会员卡还未激活哦 :-(", "点击激活您的微信会员卡", "", createUrl(msg, WEIXIN_MEMBER))));
