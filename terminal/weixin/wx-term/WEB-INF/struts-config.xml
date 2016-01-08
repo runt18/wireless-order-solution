@@ -7,6 +7,10 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/WxOperateKeyword"
+			type="com.wireless.Actions.weixin.operate.WxOperateKeywordAction" scope="request"
+			parameter="dataSource">
+		</action>
 		<action path="/WxNotifyMember"
 			type="com.wireless.Actions.weixin.query.WxNotifyMemberAction" scope="request"
 			parameter="dataSource">
