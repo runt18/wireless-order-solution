@@ -1,6 +1,8 @@
 package com.wireless.Actions.weixin;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +16,8 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.action.WxKeywordDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.action.WxKeyword;
 
@@ -65,6 +69,7 @@ public class OperateKeywordAction extends DispatchAction {
 		final JObject jObject = new JObject();
 		final String callback = request.getParameter("callback");
 		final String id = request.getParameter("id");
+		final String tree = request.getParameter("tree");
 		final String pin = (String)request.getAttribute("pin");
 
 		try{
@@ -73,7 +78,42 @@ public class OperateKeywordAction extends DispatchAction {
 			if(id != null && !id.isEmpty()){
 				extraCond.setId(Integer.parseInt(id));
 			}
-			jObject.setRoot(WxKeywordDao.getByCond(staff, extraCond));
+			final List<WxKeyword> result = WxKeywordDao.getByCond(staff, extraCond);
+			jObject.setRoot(result);
+			
+			if(tree != null && !tree.isEmpty() && Boolean.parseBoolean(tree)){
+				final List<Jsonable> children = new ArrayList<>();
+				for(final WxKeyword keyword : result){
+					children.add(new Jsonable(){
+						@Override
+						public JsonMap toJsonMap(int flag) {
+							JsonMap jm = new JsonMap();
+							jm.putBoolean("leaf", true);
+							jm.putInt("keywordId", keyword.getId());
+							jm.putString("text", keyword.getKeyword());
+							jm.putInt("actionId", keyword.getActionId());
+							jm.putInt("type", keyword.getType().getVal());
+							return jm;
+						}
+						@Override
+						public void fromJsonMap(JsonMap jm, int flag) {
+							
+						}
+					});
+				}
+				jObject.setExtra(new Jsonable(){
+					@Override
+					public JsonMap toJsonMap(int flag) {
+						JsonMap jm = new JsonMap();
+						jm.putJsonableList("children", children, flag);
+						return jm;
+					}
+					@Override
+					public void fromJsonMap(JsonMap jm, int flag) {
+						
+					}
+				});
+			}
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
