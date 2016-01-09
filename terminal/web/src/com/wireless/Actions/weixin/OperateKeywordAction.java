@@ -16,8 +16,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.action.WxKeywordDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.json.JsonMap;
-import com.wireless.json.Jsonable;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.action.WxKeyword;
 
@@ -72,58 +70,44 @@ public class OperateKeywordAction extends DispatchAction {
 		final String tree = request.getParameter("tree");
 		final String pin = (String)request.getAttribute("pin");
 
+		final List<WxKeyword> result = new ArrayList<>();
 		try{
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			final WxKeywordDao.ExtraCond extraCond = new WxKeywordDao.ExtraCond();
 			if(id != null && !id.isEmpty()){
 				extraCond.setId(Integer.parseInt(id));
 			}
-			final List<WxKeyword> result = WxKeywordDao.getByCond(staff, extraCond);
-			jObject.setRoot(result);
+			result.addAll(WxKeywordDao.getByCond(staff, extraCond));
 			
-			if(tree != null && !tree.isEmpty() && Boolean.parseBoolean(tree)){
-				final List<Jsonable> children = new ArrayList<>();
-				for(final WxKeyword keyword : result){
-					children.add(new Jsonable(){
-						@Override
-						public JsonMap toJsonMap(int flag) {
-							JsonMap jm = new JsonMap();
-							jm.putBoolean("leaf", true);
-							jm.putInt("keywordId", keyword.getId());
-							jm.putString("text", keyword.getKeyword());
-							jm.putInt("actionId", keyword.getActionId());
-							jm.putInt("type", keyword.getType().getVal());
-							return jm;
-						}
-						@Override
-						public void fromJsonMap(JsonMap jm, int flag) {
-							
-						}
-					});
-				}
-				jObject.setExtra(new Jsonable(){
-					@Override
-					public JsonMap toJsonMap(int flag) {
-						JsonMap jm = new JsonMap();
-						jm.putJsonableList("children", children, flag);
-						return jm;
-					}
-					@Override
-					public void fromJsonMap(JsonMap jm, int flag) {
-						
-					}
-				});
-			}
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(false, e.getMessage());
 		}finally{
-			if(callback != null && !callback.isEmpty()){
-				response.getWriter().print(callback + "(" + jObject.toString() + ")");
+			if(tree != null && !tree.isEmpty() && Boolean.parseBoolean(tree)){
+				final StringBuilder children = new StringBuilder();
+				int i = 0;
+				for(final WxKeyword keyword : result){
+					children.append(i > 0 ? "," : "");
+					children.append("{");
+					children.append("leaf:true");
+					children.append("keywordId:'" + keyword.getId() + "'");
+					children.append("text:'" + keyword.getKeyword() + "'");
+					children.append("actionId:'" + keyword.getActionId() + "'");
+					children.append("type:'" + keyword.getType().getVal() + "'");
+					children.append("}");
+					i++;
+				}
+				response.getWriter().print("[" + children.toString() + "]");
 			}else{
-				response.getWriter().print(jObject.toString());
+				jObject.setRoot(result);
+				if(callback != null && !callback.isEmpty()){
+					response.getWriter().print(callback + "(" + jObject.toString() + ")");
+				}else{
+					response.getWriter().print(jObject.toString());
+				}
 			}
+				
 		}
 		return null;
 	}
