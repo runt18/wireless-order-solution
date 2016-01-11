@@ -102,7 +102,7 @@ public class Page{
 		DISCOUNT_STATISTICS("discountStatistics", "折扣统计", "History_Module/DiscountStatistics.html", "../../images/discountStatistics.png"),
 		GIFT_STATISTICS("giftStatistics", "赠送统计", "History_Module/GiftStatistics.html", "../../images/giftStatistics.png"),
 		ERASE_STATISTICS("eraseStatistics", "抹数统计", "History_Module/EraseStatistic.html", "../../images/giftStatistics.png"),
-		MEMBE_RPRICE_STATISTICS("memberPriceStatistics", "会员价统计 ", "History_Module/memberPriceStatictics.html", "../../images/giftStatistics.png"),
+//		MEMBE_RPRICE_STATISTICS("memberPriceStatistics", "会员价统计 ", "History_Module/memberPriceStatictics.html", "../../images/giftStatistics.png"),
 		COUPON_STATISTICS("couponStatistics", "优惠券统计 ", "History_Module/CouponStatistics.html", "../../images/giftStatistics.png");
 		//BUSINESS_CHART("businessChart", "营业走势图", "History_Module/BusinessChart.html", "../../images/businessChart.png"),
 		
@@ -219,7 +219,8 @@ public class Page{
 		MEMBER_CREATED_STATISTICS("memberCreatedStatistics", "开卡统计", "Client_Module/memberCreatedStatistics.html", "../../images/cancelReasonMgr1.png"),
 		MEMBER_COND("memberCond", "会员分析", "Client_Module/memberCond.html", "../../images/history.png"),
 		ACTIVE("activeMgr", "优惠活动管理", "Client_Module/ActiveManagement.html", "../../images/memberMgr.png"),
-		WX_STEPS_BIND("WXBind", "微信公众号设置", "Client_Module/WeixinAuth.html", "../../images/discountStatistics.png");
+		WX_STEPS_BIND("WXBind", "微信公众号设置", "Client_Module/WeixinAuth.html", "../../images/discountStatistics.png"),
+		MEMBER_MENU_SET("WxMenu", "微信菜单设置", "MgrCenter_Module/weixinMenuMgr.html", "../../images/memberMgr.png");
 //		MEMBER_LEVEL("memberLevel", "会员等级", "Client_Module/MemberLevelManagement.html", "../../images/memberLevel.png");
 //		COUPON("coupon", "优惠劵管理", "Client_Module/CouponManagement.html", "../../images/book.png" );
 		

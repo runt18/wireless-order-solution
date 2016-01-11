@@ -529,20 +529,20 @@ function showFloatOption(obj_b){
 	$("#" + obj_b.treeId).mouseover(function(){
 		//生成浮动bar
 		
-		if(!obj_b.mult){//有多种浮动框情况时不执行单一浮动框
-			if($("#div_floatBar").find("a").length == 0){
-				obj_b.option.forEach(function(fn, index){
-					if(index > 0){
-						$("#div_floatBar").append('|&nbsp;');
-					}
-					if(typeof fn.fn == 'string'){
-						$("#div_floatBar").append('<a href="javascript:void(0)" onclick=' + fn.fn + '>' + fn.name +'</a>&nbsp;');
-					}else if(typeof fn.fn == 'function'){
-						$("#div_floatBar").append($('<a href="javascript:void(0)">' + fn.name + '</a>&nbsp').click(fn.fn));
-					}
-				});
-			}		
-		}
+//		if(!obj_b.mult){//有多种浮动框情况时不执行单一浮动框
+		if($("#div_floatBar").find("a").length == 0){
+			obj_b.option.forEach(function(fn, index){
+				if(index > 0){
+					$("#div_floatBar").append('|&nbsp;');
+				}
+				if(typeof fn.fn == 'string'){
+					$("#div_floatBar").append('<a href="javascript:void(0)" onclick=' + fn.fn + '>' + fn.name +'</a>&nbsp;');
+				}else if(typeof fn.fn == 'function'){
+					$("#div_floatBar").append($('<a href="javascript:void(0)">' + fn.name + '</a>&nbsp').click(fn.fn));
+				}
+			});
+		}		
+//		}
 
 
 		liOffset = $("#"+obj_b.treeId).find("ul").offset();
@@ -554,9 +554,9 @@ function showFloatOption(obj_b){
 			offset = $(this).find("a").offset();
 			nodex = offset.left - 18;
 			barX = (offset.left + $(this).find("a").width() + 150);
-			if(obj_b.mult){
-				obj_b.operateTree(Ext.getCmp(obj_b.treeId).getNodeById(floatBarNodeId), obj_b.mult);
-			}
+//			if(obj_b.mult){
+//				obj_b.operateTree(Ext.getCmp(obj_b.treeId).getNodeById(floatBarNodeId), obj_b.mult);
+//			}
 			
 			if($('#div_floatBar').html()){
 				$('#div_floatBar').css({left:offset.left+$(this).find("a").width(), top:(Ext.isIE?(offset.top-12):(offset.top-2))});

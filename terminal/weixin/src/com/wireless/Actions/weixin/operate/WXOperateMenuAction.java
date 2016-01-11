@@ -14,8 +14,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.marker.weixin.api.Menu;
 import org.marker.weixin.api.Token;
-import org.marker.weixin.auth.AuthParam;
-import org.marker.weixin.auth.AuthorizerToken;
 import org.marker.weixin.msg.Data4Item;
 import org.marker.weixin.msg.Msg;
 import org.marker.weixin.msg.Msg4Head.MsgType;
@@ -25,16 +23,14 @@ import org.marker.weixin.msg.Msg4Text;
 import com.wireless.Actions.weixin.WxHandleMessage;
 import com.wireless.Actions.weixin.WxHandleMessage.EventKey;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.menuAction.WxMenuAction;
-import com.wireless.db.weixin.menuAction.WxMenuAction.Cate;
-import com.wireless.db.weixin.menuAction.WxMenuActionDao;
-import com.wireless.db.weixin.restaurant.WxRestaurantDao;
+import com.wireless.db.weixin.action.WxMenuActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.weixin.restaurant.WxRestaurant;
+import com.wireless.pojo.weixin.action.WxMenuAction;
+import com.wireless.pojo.weixin.action.WxMenuAction.Cate;
 
 public class WXOperateMenuAction extends DispatchAction {
 	/**
@@ -49,15 +45,15 @@ public class WXOperateMenuAction extends DispatchAction {
 	public ActionForward weixinMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject(); 
 		
-//		String appId = "wx49b3278a8728ff76";
-//		String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
-//		System.out.println(Menu.newInstance(Token.newInstance(appId, appSecret)));
-//		jobject.setRoot(Menu.newInstance(Token.newInstance(appId, appSecret)));
+		String appId = "wx6c03b8cab601465d";
+		String appSecret = "c12ec7d212bcc74785f3912c4c9c39e1";
+		System.out.println(Menu.newInstance(Token.newInstance(appId, appSecret)));
+		jobject.setRoot(Menu.newInstance(Token.newInstance(appId, appSecret)));
 		
-		int rid = Integer.parseInt(request.getParameter("rid"));
-		WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(rid));
-		AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
-		jobject.setRoot(Menu.newInstance(Token.newInstance(authorizerToken)));
+//		int rid = Integer.parseInt(request.getParameter("rid"));
+//		WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(rid));
+//		AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+//		jobject.setRoot(Menu.newInstance(Token.newInstance(authorizerToken)));
 		
 		response.getWriter().print(jobject.toString());
 		
@@ -73,6 +69,7 @@ public class WXOperateMenuAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward systemMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String callback = request.getParameter("callback");
 		JObject jobject = new JObject(); 
 
 		List<Jsonable> list = new ArrayList<>();
@@ -97,7 +94,7 @@ public class WXOperateMenuAction extends DispatchAction {
 		}
 		jobject.setRoot(list);
 		
-		response.getWriter().print(jobject.toString());
+		response.getWriter().print(callback + "(" + jobject.toString() + ")");
 		
 		return null;
 	}
@@ -112,23 +109,26 @@ public class WXOperateMenuAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward commitMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
 		String menu = request.getParameter("menu");
 		int rid = Integer.parseInt(request.getParameter("rid"));
-		//String appId = "wx49b3278a8728ff76";
-		//String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
-		
+		String appId = "wx6c03b8cab601465d";
+		String appSecret = "c12ec7d212bcc74785f3912c4c9c39e1";
+		final String callback = request.getParameter("callback");
 		JObject jobject = new JObject(); 
 		
 		try{
 			Menu weixinMenu = JObject.parse(Menu.JSON_CREATOR, 0, menu);
-			WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(rid));
-			AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
-			weixinMenu.create(Token.newInstance(authorizerToken));			
+//			WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(rid));
+//			AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+//			weixinMenu.create(Token.newInstance(authorizerToken));
+			weixinMenu.create(Token.newInstance(appId, appSecret));	
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(callback + "(" + jobject.toString() + ")");
 		}
 
 		return null;
@@ -152,6 +152,7 @@ public class WXOperateMenuAction extends DispatchAction {
 		String rid = request.getParameter("rid");
 		String subItems = request.getParameter("subItems");
 		String subscribe = request.getParameter("subscribe");
+		final String callback = request.getParameter("callback");
 		JObject jobject = new JObject(); 
 		
 		try{
@@ -210,7 +211,7 @@ public class WXOperateMenuAction extends DispatchAction {
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(callback + "(" + jobject.toString() + ")");
 		}
 		
 		return null;
@@ -226,6 +227,7 @@ public class WXOperateMenuAction extends DispatchAction {
 		String rid = request.getParameter("rid");
 		String subItems = request.getParameter("subItems");
 		String subscribe = request.getParameter("subscribe");
+		final String callback = request.getParameter("callback");
 		JObject jobject = new JObject(); 
 		
 		try{
@@ -267,7 +269,7 @@ public class WXOperateMenuAction extends DispatchAction {
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(callback + "(" + jobject.toString() + ")");
 		}
 		
 		return null;
@@ -286,6 +288,7 @@ public class WXOperateMenuAction extends DispatchAction {
 		String text = request.getParameter("text");
 		String rid = request.getParameter("rid");
 		String subscribe = request.getParameter("subscribe");
+		final String callback = request.getParameter("callback");
 		JObject jobject = new JObject();
 		
 		final WxMenuAction.Cate cate;
@@ -324,7 +327,7 @@ public class WXOperateMenuAction extends DispatchAction {
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(callback + "(" + jobject.toString() + ")");
 		}
 		
 		return null;
@@ -343,6 +346,7 @@ public class WXOperateMenuAction extends DispatchAction {
 		String rid = request.getParameter("rid");
 		String key = request.getParameter("key");
 		String subscribe = request.getParameter("subscribe");
+		final String callback = request.getParameter("callback");
 		JObject jobject = new JObject(); 
 		
 		final WxMenuAction.Cate cate;
@@ -368,7 +372,7 @@ public class WXOperateMenuAction extends DispatchAction {
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(callback + "(" + jobject.toString() + ")");
 		}
 		
 		return null;
@@ -385,6 +389,7 @@ public class WXOperateMenuAction extends DispatchAction {
 	public ActionForward menuReply(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String key = request.getParameter("key");
 		String rid = request.getParameter("rid");
+		final String callback = request.getParameter("callback");
 		JObject jobject = new JObject(); 
 		
 		try{
@@ -416,7 +421,7 @@ public class WXOperateMenuAction extends DispatchAction {
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(callback + "(" + jobject.toString() + ")");
 		}
 
 		return null;
@@ -433,6 +438,8 @@ public class WXOperateMenuAction extends DispatchAction {
 	 */
 	public ActionForward subscribeReply(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String rid = request.getParameter("rid");
+		final String callback = request.getParameter("callback");
+		
 		JObject jobject = new JObject(); 
 		final int key;
 		try{
@@ -488,7 +495,7 @@ public class WXOperateMenuAction extends DispatchAction {
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(callback + "(" + jobject.toString() + ")");
 		}
 
 		return null;
@@ -505,6 +512,7 @@ public class WXOperateMenuAction extends DispatchAction {
 	 */
 	public ActionForward deleteSubscribe(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String rid = request.getParameter("rid");
+		final String callback = request.getParameter("callback");
 		JObject jobject = new JObject(); 
 		try{
 			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
@@ -526,7 +534,7 @@ public class WXOperateMenuAction extends DispatchAction {
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(callback + "(" + jobject.toString() + ")");
 		}
 		
 		return null;
@@ -544,6 +552,7 @@ public class WXOperateMenuAction extends DispatchAction {
 	public ActionForward deleteMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String key = request.getParameter("key");
 		String rid = request.getParameter("rid");
+		final String callback = request.getParameter("callback");
 		JObject jobject = new JObject(); 
 		
 		try{
@@ -555,7 +564,7 @@ public class WXOperateMenuAction extends DispatchAction {
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(callback + "(" + jobject.toString() + ")");
 		}
 
 		return null;

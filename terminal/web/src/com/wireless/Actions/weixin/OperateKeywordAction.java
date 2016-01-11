@@ -91,10 +91,10 @@ public class OperateKeywordAction extends DispatchAction {
 					children.append(i > 0 ? "," : "");
 					children.append("{");
 					children.append("leaf:true");
-					children.append("keywordId:'" + keyword.getId() + "'");
-					children.append("text:'" + keyword.getKeyword() + "'");
-					children.append("actionId:'" + keyword.getActionId() + "'");
-					children.append("type:'" + keyword.getType().getVal() + "'");
+					children.append(",keywordId:'" + keyword.getId() + "'");
+					children.append(",text:'" + (keyword.getType() == WxKeyword.Type.EXCEPTION ? "例外回复" : keyword.getKeyword()) + "'");
+					children.append(",actionId:'" + keyword.getActionId() + "'");
+					children.append(",type:'" + keyword.getType().getVal() + "'");
 					children.append("}");
 					i++;
 				}

@@ -3,65 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <title>微信菜单设置</title>
-<link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
-<!-- ext火狐字体问题 -->
-<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
-<link rel="stylesheet" type="text/css" href="../../css/myExt.css"/>
-<link rel="stylesheet" type="text/css" href="../../css/header.css" />
-<link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
-
-<script type="text/javascript" src="../../extjs/ext-base.js"></script>
-<script type="text/javascript" src="../../extjs/ext-all.js"></script>
-<script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
-
-<script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
-<script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
-<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
-
-<script type="text/javascript" src="../../extjs/examples.js"></script>
-
-<script type="text/javascript" src="../../js/components/functionLib.js"></script>
-
-<script type="text/javascript" src="../../extjs/ext-plugins-define.js"></script>
-
-<style type="text/css">
-#systemReplyBox label{
-	margin-right: 20px;
-}
-</style>
-
 </head>
-<body>
-	<div id="div4MenuInit" align="center">
-		<br>
-		<h2>点击左侧菜单或添加一个新菜单，然后设置菜单内容</h2>
-		<br>
-	</div>
-	<div id="textReplyBox" style="padding: 10px">
-		<textarea id="menuTxtReply" rows="6" cols="80" style="font-size: 18px;" autofocus></textarea>
-		<br>
-		<input type="button" value="保存" onclick="operateMenuContent()" style="width: 90px;font-size: 20px;">
-	</div>
-	<div id="urlReplyBox" style="padding: 10px" >
-		<textarea id="url4Menu" rows="6" cols="80" style="font-size: 18px;" autofocus></textarea>
-		<br>
-		<input type="button" value="保存" onclick="operateMenuUrl()" style="width: 90px;font-size: 20px;">		
-	</div>
-	<div id="systemReplyBox" style="padding: 10px">
-		<div id="div4systemReplyBox" style="width:600px;height: 50px;border: 1px dashed gray;padding:20px;">
-<!-- 			<input id="r1" type="radio" name="systemSet" value="navi_event_key"><label for="r1">餐厅导航</label>-->
-		</div>
-		<input type="button" value="设置" onclick="setSystemMenu()" style="width: 90px;font-size: 20px;">
-	</div>
-	
-	<div id="divSetAutoReply" style="height: 300px;padding: 20px;">
-		<a href="javascript:getSubscribeReply()" >设置关注自动回复</a>
-		<br><br>
-		<a id="btnDeleteSubscribe" href="javascript:deleteSubscribeReply()" >删除关注自动回复</a>
-	</div>
-	
-	<div class="floatBar" id="div_floatBar" style="height: 15px;background-color: #DFE8F6;position: absolute;display: none"></div>
-	
 <script type="text/javascript" src="../../js/MgrCenter/weixinMenuMgr.js"></script>	
+
+<body>
+<div id = "weixinMenuWin_div_weixin">
+	
+	<div id="textReplyBox_div_weixin" style="padding: 10px">
+		<textarea id="menuTxtReply_textarea_weixin" rows="6" cols="80" style="font-size: 18px;" autofocus></textarea>
+		<br>
+		<input id="textReplySave_input_weixin" type="button" value="保存" style="width: 90px;font-size: 20px;">
+	</div>
+	
+	<div id="urlReplyBox_div_weixin" style="padding: 10px" >
+		<textarea id="urlTextarea_textarea_weixin" rows="6" cols="80" style="font-size: 18px;" autofocus></textarea>
+		<br>
+		<input type="button" value="保存" id="urlReply_input_weixin" style="width: 90px;font-size: 20px;">		
+	</div>
+	
+	<div id="systemReplyBox_div_weixin" style="padding: 10px;width:90%;height: 90%;">
+		<table style="width:100%;height:100%">
+			<tr>
+				<th style="width:20%;" id="systemReplyBox_th_weixin"></th>
+				<th style="width:70%;" id="systemReplyImg_th_weixin"></th>
+			</tr>
+		
+		</table>
+		<input type="button" value="设置" id="setSystemMenu_input_weixin" style="width: 90px;font-size: 20px;">
+	</div>
+	
+	<div id="divSetAutoReply_div_weixin" style="height: 300px;padding-left: 60px;padding-top:20px;">
+		<a style="float:left;" id="getSubscribe_a_weixin"><button>添加自动回复</button></a>
+		<br><br>
+		<a id="btnDeleteSubscribe_a_weixin"><button>删除自动回复</button></a>
+	</div>
+</div>
 </body>
 </html>
