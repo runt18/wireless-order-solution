@@ -1,3 +1,29 @@
+/**
+ * 拓展string方法
+ * @param args
+ * @returns {String}
+ */
+String.prototype.format = function(args){
+    var result = this;
+    if (arguments.length > 0){    
+        if (arguments.length == 1 && typeof args == "object"){
+            for(var key in args) {
+                if(args[key] != undefined){
+                    var reg = new RegExp("({" + key + "})", "g");
+                    result = result.replace(reg, args[key]);
+                }
+            }
+        }else{
+        	for(var i = 0; i < arguments.length; i++){
+        		if (arguments[i] != undefined) {
+        			var reg= new RegExp("({)" + i + "(})", "g");
+        			result = result.replace(reg, arguments[i]);
+                }
+            }
+        }
+    }
+    return result;
+};
 
 Ext.onReady(function(){
 	var rid = restaurantID;
@@ -46,6 +72,9 @@ Ext.onReady(function(){
 		}else if(tn && tn.attributes.key && !isNaN(tn.attributes.key)){
 			dataSource = "updateText";
 			key = tn.attributes.key;
+		}else if(tn && tn.attributes.actionId != 0){
+			dataSource = "updateText";
+			key = tn.attributes.actionId;
 		}	
 		
 		$.ajax({ 
@@ -71,9 +100,10 @@ Ext.onReady(function(){
 			        		data : {
 			        			dataSource : 'update',
 			        			id : tn.attributes.keywordId,
-			        			actionId : rt.other.key
+			        			actionId : rt.other ? rt.other.key : tn.attributes.actionId
 			        		},
 			        		success : function(data){
+			        			 keywordTree.getRootNode().reload();
 			        			 Ext.example.msg('提示', rt.msg);
 			        		}
 			        	});
@@ -86,11 +116,12 @@ Ext.onReady(function(){
 			        			subscribeKey = rt.other.key;
 			        		}
 			        	}
+		        		Ext.example.msg('提示', rt.msg);
 		        	}
 				}
-		        Ext.example.msg('提示', rt.msg);
+		        
 		    }, 
-		    error:function(xhr){ 
+		    error:function(xhr){  
 		        var rt = JSON.parse(xhr.responseText);
 		        Ext.example.msg('提示', rt.msg);
 		    } 
@@ -214,7 +245,7 @@ Ext.onReady(function(){
 			        				labelWidth : 60,
 			        				fileUpload : true,
 			        				items : [sub_imgFile],
-			        				listeners : {
+			        				listeners : { 
 			        		    		render : function(e){
 			        		    			//Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
 			        		 	  		}
@@ -223,7 +254,7 @@ Ext.onReady(function(){
 			        			
 			        			Ext.getCmp('foodMultiPrice_column_weixin').add({
 			        				cls : 'multiClass'+i,
-			        				columnWidth: 0.35, 
+			        				columnWidth: 0.35,  
 			        				layout : 'column',
 			        				frame : true,
 			        				items : [sub_box, sub_form]	 		
@@ -417,7 +448,15 @@ Ext.onReady(function(){
 						    },
 						    dataType : "json",		//jsonp数据类型 
 						    success : function(data){ 
-								 Ext.example.msg('提示', data.msg);
+						    		//刷新
+								 keywordTree.getRootNode().reload();
+								 if(tn.attributes.type == 2){
+									 Ext.example.msg('提示', '例外回复不能删除');
+								 }else{
+									 Ext.example.msg('提示', data.msg);
+								 }
+								 
+								 
 						    }, 
 						    error : function(xhr){ 
 						        var rt = JSON.parse(xhr.responseText);
@@ -441,17 +480,17 @@ Ext.onReady(function(){
 	    jsonp: "callback",//服务端用于接收callback调用的function名的参数 
 	    jsonpCallback : "jsonpCallback",
 	    success : function(data){ 
-	    	var systemMenuTemplate = '<div style="float:left;"><input id="{id}" type="radio" name="systemSet" value={key}><label for="{id}">{desc}</label><div><br>';
+	    	var systemMenuTemplate = '<div style="float:left;"><input id={id} type="radio" name="systemSet" value={key}><label for={id}>{s}</label><div><br>';
 	    	 if(data.success){
 	        	var html = [];
 	        	for (var i = 0; i < data.root.length; i++) {
 	        		html.push(systemMenuTemplate.format({
 	        			id : "r"+(i+1),
 	        			key : data.root[i].key,
-	        			desc : data.root[i].desc
+	        			s : data.root[i].desc
 	        		}));
 				}
-	        	$("#systemReplyBox_th_weixin").html(html.join(""));
+	        	$("#systemReplyBox_th_weixin").html(html.join("")).trigger('create').trigger('refresh');
 	        	$("#systemReplyImg_th_weixin").attr("style","background:url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E7%82%B9%E8%8F%9C%E6%80%BB%E5%8D%95.jpg) no-repeat;width:100%;height:128px;");
 	        }
 	    }, 
@@ -1444,6 +1483,9 @@ Ext.onReady(function(){
 					}else if(tn && tn.attributes.key && !isNaN(tn.attributes.key)){
 						dataSource = "updateImageText";
 						key = tn.attributes.key;
+					}else if(tn && tn.attributes.actionId != 0){
+						dataSource = "updateImageText";
+						key = tn.attributes.actionId;
 					}
 					
 					$.ajax({ 
@@ -1477,6 +1519,7 @@ Ext.onReady(function(){
 						        			actionId : rt.other.key
 						        		},
 						        		success : function(data){
+						        			 keywordTree.getRootNode().reload();
 						        			 Ext.example.msg('提示', rt.msg);
 						        		}
 						        	});
@@ -1772,10 +1815,10 @@ Ext.onReady(function(){
 		
 		Ext.getCmp('foodMultiPrice_column_weixin').add({
 			cls : 'multiClass'+multiFoodPriceCount,
-			columnWidth: 0.55,
+			columnWidth: 0.40,
 			labelWidth : 40,
 			defaults : {
-				width : 300
+				width : 200
 			},
 			items :[{
 				xtype : 'textfield',
@@ -1826,7 +1869,8 @@ Ext.onReady(function(){
 			layout : 'column',
 			frame : true,
 			items : [sub_box, sub_form]	 		
-	 	});			
+	 	});	
+		
 		
 		Ext.getCmp('foodMultiPrice_column_weixin').add({
 			cls : 'multiClass'+multiFoodPriceCount,
