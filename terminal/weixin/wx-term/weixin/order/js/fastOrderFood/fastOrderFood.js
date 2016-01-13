@@ -290,7 +290,7 @@ function PickFoodComponent(param){
 			+ '</div>';
 			
 		var unitPrice = '<div multiUnit-Id={multiId} class="unit_css_fastOrderFood" data-type="unitPrice" href="#">'
-						+ '<ul class="m-b-list" style="margin-top:10px;font-size:13px;"><a data-type="unitPrice_a_fastOrderFood">{unitPrice}</a>&nbsp;/&nbsp;{unitName}</ul>'
+						+ '<ul class="m-b-list" style="margin-top:10px;margin-left:-2px;font-size:12px;"><a data-type="unitPrice_a_fastOrderFood">{unitPrice}</a>&nbsp;/&nbsp;{unitName}</ul>'
 						+ '</div>';
 			
 				
