@@ -69,10 +69,10 @@ Ext.onReady(function(){
 		if(subscribeKey != -1){
 			dataSource = "updateText";
 			key = subscribeKey;
-		}else if(tn && tn.attributes.key && !isNaN(tn.attributes.key)){
+		}else if(tn && tn.attributes.key && tn.attributes.key !=-1 && !isNaN(tn.attributes.key)){
 			dataSource = "updateText";
 			key = tn.attributes.key;
-		}else if(tn && tn.attributes.actionId != 0){
+		}else if(tn && tn.attributes.actionId && tn.attributes.actionId != 0){
 			dataSource = "updateText";
 			key = tn.attributes.actionId;
 		}	
@@ -151,6 +151,7 @@ Ext.onReady(function(){
 		clearTabContent();
 		isKeyword = false;
 		centerPanel.setTitle('设置 -- 自动回复');
+		tabs.enable();
 		Ext.getCmp('tabView_tab_weixin').disable();
 		Ext.getCmp('tabSystem_tab_weixin').disable();
 		//清除tree选中
@@ -183,7 +184,6 @@ Ext.onReady(function(){
 						$('#itemContent_textfield_weixin').val(item.description);	
 						$('#itemUrl_textarea_weixin').val(item.url);	
 		        		imgFile.setImg(item.picUrl);
-		        		
 		        		p_box.image = item.picUrl;
 		        		
 		        		//如果有子显示项
@@ -202,10 +202,10 @@ Ext.onReady(function(){
 			        			
 			        			Ext.getCmp('foodMultiPrice_column_weixin').add({
 			        				cls : 'multiClass'+i,
-			        				columnWidth: 0.55,
+			        				columnWidth: 0.4,
 			        				labelWidth : 40,
 			        				defaults : {
-			        					width : 300
+			        					width : 250
 			        				},
 			        				items :[{
 			        					xtype : 'textfield',
@@ -229,6 +229,67 @@ Ext.onReady(function(){
 			        		 	    	title : '图片预览'
 			        		 	    }
 			        			});
+			        			
+			        			var sub_btnUpload = new Ext.Button({
+			        				hidden : true,
+			        				id : 'sub_btnWeixinReplyUploadImage',
+			        		        text : '上传图片',
+			        		        listeners : {
+			        		        	render : function(thiz){
+			        		        		thiz.getEl().setVisible(false);
+			        		        	}
+			        		        },
+			        		        handler : function(e){
+			        		        	var check = true, img = '';
+			        		        	if(Ext.isIE){
+			        		        		Ext.getDom(imgFile.getId()).select();
+			        		        		img = document.selection.createRange().text;
+			        		        	}else{
+			        		 	        	img = Ext.getDom(imgFile.getId()).value;
+			        		        	}
+			        		        	if(typeof(img) != 'undefined' && img.length > 0){
+			        			 	        var type = img.substring(img.lastIndexOf('.') + 1, img.length);
+			        			 	        check = false;
+			        			 	        for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
+			        			 	        	if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
+			        			 	        		check = true;
+			        				 	           	break;
+			        				 	        }
+			        			 	        }
+			        			 	        if(!check){
+			        				 	       	Ext.example.msg('提示', '图片类型不正确.');
+			        				 	        return;
+			        		 	        	}
+			        		        	}else{
+			        		        		Ext.example.msg('提示', '未选择图片.');
+			        		 	        	return;
+			        		        	}
+			        		        	menu_uploadMask.show();
+			        		        	Ext.Ajax.request({
+			        		        		url : '../../OperateImage.do?dataSource=upload&ossType=10&rid='+rid,
+			        		 	   			isUpload : true,
+			        		 	   			form : sub_form.getForm().getEl(),
+			        		 	   			success : function(response, options){
+			        		 	   				menu_uploadMask.hide();
+			        		 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
+			        		 	   				if(jr.success){
+			        			  	   				var ossImage = jr.root[0];
+			        			  	   				sub_box.image = ossImage.image;
+			        			  	   				sub_box.ossId = ossImage.imageId;	   				
+			        		 	   				}else{
+			        		 	   					Ext.ux.showMsg(jr);
+			        		 	   					imgFile.setImg("");
+			        		 	   				}
+
+			        		 	   				
+			        		 	   			},
+			        		 	   			failure : function(response, options){
+			        		 	   				menu_uploadMask.hide();
+			        		 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+			        		 	   			}
+			        		        	});
+			        		        }
+			        		});
 			        			var sub_imgFile = Ext.ux.plugins.createImageFile({
 			        				id : subImgFileId,
 			        				formId : subFormId,
@@ -245,12 +306,13 @@ Ext.onReady(function(){
 			        				labelWidth : 60,
 			        				fileUpload : true,
 			        				items : [sub_imgFile],
-			        				listeners : { 
+			        				listeners : {
 			        		    		render : function(e){
-			        		    			//Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+			        		    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
 			        		 	  		}
-			        		    	}
-			        			});	
+			        		    	},
+			        				buttons : [sub_btnUpload]
+			        			});		
 			        			
 			        			Ext.getCmp('foodMultiPrice_column_weixin').add({
 			        				cls : 'multiClass'+i,
@@ -386,7 +448,7 @@ Ext.onReady(function(){
 			'是否删除: ' + tn.text,
 			function(e){
 				if(e == 'yes'){
-					if(tn.attributes.key && !isNaN(tn.attributes.key)){
+					if(tn.attributes.key != -1 && !isNaN(tn.attributes.key)){
 						$.ajax({ 
 						    type : "post", 
 						    async : false,
@@ -400,13 +462,15 @@ Ext.onReady(function(){
 						    jsonp: "callback",	//服务端用于接收callback调用的function名的参数 
 						    jsonpCallback : "jsonpCallback",
 						    success : function(data){ 
-								 Ext.example.msg('提示', data.msg);
+					    		Ext.example.msg('提示', data.msg);
 						    }, 
 						    error : function(xhr){ 
 						        var rt = JSON.parse(xhr.responseText);
 						        Ext.example.msg('提示', rt.msg);
 						    }
 						}); 	
+					}else{
+						Ext.example.msg('提示', "删除成功");
 					}
 					tn.remove();
 					clearTabContent();
@@ -480,14 +544,14 @@ Ext.onReady(function(){
 	    jsonp: "callback",//服务端用于接收callback调用的function名的参数 
 	    jsonpCallback : "jsonpCallback",
 	    success : function(data){ 
-	    	var systemMenuTemplate = '<div style="float:left;"><input id={id} type="radio" name="systemSet" value={key}><label for={id}>{s}</label><div><br>';
+	    	var systemMenuTemplate = '<div style="float:left;"><input id={id} type="radio" name="systemSet" value={key}><label for={id}>{desc}</label><div><br>';
 	    	 if(data.success){
 	        	var html = [];
 	        	for (var i = 0; i < data.root.length; i++) {
 	        		html.push(systemMenuTemplate.format({
 	        			id : "r"+(i+1),
 	        			key : data.root[i].key,
-	        			s : data.root[i].desc
+	        			desc : data.root[i].desc
 	        		}));
 				}
 	        	$("#systemReplyBox_th_weixin").html(html.join("")).trigger('create').trigger('refresh');
@@ -517,7 +581,8 @@ Ext.onReady(function(){
 					if(!tn || typeof tn.attributes.children == 'undefined'){
 						Ext.example.msg('提示', '操作失败, 请选中一个父菜单再进行操作.');
 						return;
-					}	
+						
+					}
 					updateDeptWin.otype = 'addChild';
 					operateDeptHandler(tn);
 			}
@@ -777,7 +842,7 @@ Ext.onReady(function(){
 										$('#itemContent_textfield_weixin').val(item.description);	
 										$('#itemUrl_textarea_weixin').val(item.url);	
 						        		imgFile.setImg(item.picUrl);
-						        		
+						        		p_box.image = item.picUrl;
 										var tab = tabs.getComponent("tabImageText_tab_weixin");
 										tabs.setActiveTab(tab);
 										
@@ -797,10 +862,10 @@ Ext.onReady(function(){
 							        			
 							        			Ext.getCmp('foodMultiPrice_column_weixin').add({
 							        				cls : 'multiClass'+i,
-							        				columnWidth: 0.55,
+							        				columnWidth: 0.4,
 							        				labelWidth : 40,
 							        				defaults : {
-							        					width : 300
+							        					width : 250
 							        				},
 							        				items :[{
 							        					xtype : 'textfield',
@@ -824,6 +889,67 @@ Ext.onReady(function(){
 							        		 	    	title : '图片预览'
 							        		 	    }
 							        			});
+							        			
+							        			var sub_btnUpload = new Ext.Button({
+							        				hidden : true,
+							        				id : 'sub_btnWeixinReplyUploadImage',
+							        		        text : '上传图片',
+							        		        listeners : {
+							        		        	render : function(thiz){
+							        		        		thiz.getEl().setVisible(false);
+							        		        	}
+							        		        },
+							        		        handler : function(e){
+							        		        	var check = true, img = '';
+							        		        	if(Ext.isIE){
+							        		        		Ext.getDom(imgFile.getId()).select();
+							        		        		img = document.selection.createRange().text;
+							        		        	}else{
+							        		 	        	img = Ext.getDom(imgFile.getId()).value;
+							        		        	}
+							        		        	if(typeof(img) != 'undefined' && img.length > 0){
+							        			 	        var type = img.substring(img.lastIndexOf('.') + 1, img.length);
+							        			 	        check = false;
+							        			 	        for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
+							        			 	        	if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
+							        			 	        		check = true;
+							        				 	           	break;
+							        				 	        }
+							        			 	        }
+							        			 	        if(!check){
+							        				 	       	Ext.example.msg('提示', '图片类型不正确.');
+							        				 	        return;
+							        		 	        	}
+							        		        	}else{
+							        		        		Ext.example.msg('提示', '未选择图片.');
+							        		 	        	return;
+							        		        	}
+							        		        	menu_uploadMask.show();
+							        		        	Ext.Ajax.request({
+							        		        		url : '../../OperateImage.do?dataSource=upload&ossType=10&rid='+rid,
+							        		 	   			isUpload : true,
+							        		 	   			form : sub_form.getForm().getEl(),
+							        		 	   			success : function(response, options){
+							        		 	   				menu_uploadMask.hide();
+							        		 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
+							        		 	   				if(jr.success){
+							        			  	   				var ossImage = jr.root[0];
+							        			  	   				sub_box.image = ossImage.image;
+							        			  	   				sub_box.ossId = ossImage.imageId;	   				
+							        		 	   				}else{
+							        		 	   					Ext.ux.showMsg(jr);
+							        		 	   					imgFile.setImg("");
+							        		 	   				}
+
+							        		 	   				
+							        		 	   			},
+							        		 	   			failure : function(response, options){
+							        		 	   				menu_uploadMask.hide();
+							        		 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+							        		 	   			}
+							        		        	});
+							        		        }
+							        		});
 							        			var sub_imgFile = Ext.ux.plugins.createImageFile({
 							        				id : subImgFileId,
 							        				formId : subFormId,
@@ -842,9 +968,10 @@ Ext.onReady(function(){
 							        				items : [sub_imgFile],
 							        				listeners : {
 							        		    		render : function(e){
-							        		    			//Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+							        		    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
 							        		 	  		}
-							        		    	}
+							        		    	},
+							        				buttons : [sub_btnUpload]
 							        			});	
 							        			
 							        			Ext.getCmp('foodMultiPrice_column_weixin').add({
@@ -870,6 +997,7 @@ Ext.onReady(function(){
 							        		 		}] 		 		
 							        		 	});	
 							        			
+							        			sub_imgFile.image = rt.root[i].picUrl;
 							        			Ext.getCmp('foodMultiPrice_column_weixin').doLayout();
 							        			
 							        			sub_imgFile.setImg(rt.root[i].picUrl);
@@ -887,10 +1015,6 @@ Ext.onReady(function(){
 					}
 					
 
-				}else if(typeof tn.attributes.type == "undefined"){
-//					Ext.getCmp('contentPanel').removeAll();
-					contentPanel.add(northPanel);
-					contentPanel.doLayout();
 				}else{
 					var tab = tabs.getComponent("tabSystem_tab_weixin");
 					tabs.setActiveTab(tab);
@@ -1022,7 +1146,7 @@ Ext.onReady(function(){
 									$('#itemContent_textfield_weixin').val(item.description);	
 									$('#itemUrl_textarea_weixin').val(item.url);	
 					        		imgFile.setImg(item.picUrl);
-					        		
+					        		p_box.image = item.picUrl;
 									var tab = tabs.getComponent("tabImageText_tab_weixin");
 									tabs.setActiveTab(tab);
 									
@@ -1042,10 +1166,10 @@ Ext.onReady(function(){
 						        			
 						        			Ext.getCmp('foodMultiPrice_column_weixin').add({
 						        				cls : 'multiClass'+i,
-						        				columnWidth: 0.55,
+						        				columnWidth: 0.4,
 						        				labelWidth : 40,
 						        				defaults : {
-						        					width : 300
+						        					width : 250
 						        				},
 						        				items :[{
 						        					xtype : 'textfield',
@@ -1069,6 +1193,67 @@ Ext.onReady(function(){
 						        		 	    	title : '图片预览'
 						        		 	    }
 						        			});
+						        			
+						        			var sub_btnUpload = new Ext.Button({
+						        				hidden : true,
+						        				id : 'sub_btnWeixinReplyUploadImage',
+						        		        text : '上传图片',
+						        		        listeners : {
+						        		        	render : function(thiz){
+						        		        		thiz.getEl().setVisible(false);
+						        		        	}
+						        		        },
+						        		        handler : function(e){
+						        		        	var check = true, img = '';
+						        		        	if(Ext.isIE){
+						        		        		Ext.getDom(imgFile.getId()).select();
+						        		        		img = document.selection.createRange().text;
+						        		        	}else{
+						        		 	        	img = Ext.getDom(imgFile.getId()).value;
+						        		        	}
+						        		        	if(typeof(img) != 'undefined' && img.length > 0){
+						        			 	        var type = img.substring(img.lastIndexOf('.') + 1, img.length);
+						        			 	        check = false;
+						        			 	        for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
+						        			 	        	if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
+						        			 	        		check = true;
+						        				 	           	break;
+						        				 	        }
+						        			 	        }
+						        			 	        if(!check){
+						        				 	       	Ext.example.msg('提示', '图片类型不正确.');
+						        				 	        return;
+						        		 	        	}
+						        		        	}else{
+						        		        		Ext.example.msg('提示', '未选择图片.');
+						        		 	        	return;
+						        		        	}
+						        		        	menu_uploadMask.show();
+						        		        	Ext.Ajax.request({
+						        		        		url : '../../OperateImage.do?dataSource=upload&ossType=10&rid='+rid,
+						        		 	   			isUpload : true,
+						        		 	   			form : sub_form.getForm().getEl(),
+						        		 	   			success : function(response, options){
+						        		 	   				menu_uploadMask.hide();
+						        		 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
+						        		 	   				if(jr.success){
+						        			  	   				var ossImage = jr.root[0];
+						        			  	   				sub_box.image = ossImage.image;
+						        			  	   				sub_box.ossId = ossImage.imageId;	   				
+						        		 	   				}else{
+						        		 	   					Ext.ux.showMsg(jr);
+						        		 	   					imgFile.setImg("");
+						        		 	   				}
+
+						        		 	   				
+						        		 	   			},
+						        		 	   			failure : function(response, options){
+						        		 	   				menu_uploadMask.hide();
+						        		 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+						        		 	   			}
+						        		        	});
+						        		        }
+						        		});
 						        			var sub_imgFile = Ext.ux.plugins.createImageFile({
 						        				id : subImgFileId,
 						        				formId : subFormId,
@@ -1087,9 +1272,10 @@ Ext.onReady(function(){
 						        				items : [sub_imgFile],
 						        				listeners : {
 						        		    		render : function(e){
-						        		    			//Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+						        		    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
 						        		 	  		}
-						        		    	}
+						        		    	},
+						        				buttons : [sub_btnUpload]
 						        			});	
 						        			
 						        			Ext.getCmp('foodMultiPrice_column_weixin').add({
@@ -1114,7 +1300,7 @@ Ext.onReady(function(){
 						        			    	}
 						        		 		}] 		 		
 						        		 	});	
-						        			
+						        			sub_imgFile.image = rt.root[i].picUrl;
 						        			Ext.getCmp('foodMultiPrice_column_weixin').doLayout();
 						        			
 						        			sub_imgFile.setImg(rt.root[i].picUrl);
@@ -1184,6 +1370,7 @@ Ext.onReady(function(){
 	//图片
 	var imgFile;
 	imgFile = Ext.ux.plugins.createImageFile({
+		id : 'imgField_img_weixin',
 		img : p_box,
 		width : 300,
 		height : 200,
@@ -1480,10 +1667,10 @@ Ext.onReady(function(){
 					if(subscribeKey != -1){
 						dataSource = "updateImageText";
 						key = subscribeKey;
-					}else if(tn && tn.attributes.key && !isNaN(tn.attributes.key)){
+					}else if(tn && tn.attributes.key && tn.attributes.key != -1 && !isNaN(tn.attributes.key)){
 						dataSource = "updateImageText";
 						key = tn.attributes.key;
-					}else if(tn && tn.attributes.actionId != 0){
+					}else if(tn && tn.attributes.actionId && tn.attributes.actionId != 0){
 						dataSource = "updateImageText";
 						key = tn.attributes.actionId;
 					}
@@ -1516,7 +1703,7 @@ Ext.onReady(function(){
 						        		data : {
 						        			dataSource : 'update',
 						        			id : tn.attributes.keywordId,
-						        			actionId : rt.other.key
+						        			actionId : rt.other ? rt.other.key : tn.attributes.actionId
 						        		},
 						        		success : function(data){
 						        			 keywordTree.getRootNode().reload();
@@ -1840,6 +2027,67 @@ Ext.onReady(function(){
 	 	    	title : '图片预览'
 	 	    }
 		});
+		
+		var sub_btnUpload = new Ext.Button({
+			hidden : true,
+			id : 'sub_btnWeixinReplyUploadImage',
+	        text : '上传图片',
+	        listeners : {
+	        	render : function(thiz){
+	        		thiz.getEl().setVisible(false);
+	        	}
+	        },
+	        handler : function(e){
+	        	var check = true, img = '';
+	        	if(Ext.isIE){
+	        		Ext.getDom(imgFile.getId()).select();
+	        		img = document.selection.createRange().text;
+	        	}else{
+	 	        	img = Ext.getDom(imgFile.getId()).value;
+	        	}
+	        	if(typeof(img) != 'undefined' && img.length > 0){
+		 	        var type = img.substring(img.lastIndexOf('.') + 1, img.length);
+		 	        check = false;
+		 	        for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
+		 	        	if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
+		 	        		check = true;
+			 	           	break;
+			 	        }
+		 	        }
+		 	        if(!check){
+			 	       	Ext.example.msg('提示', '图片类型不正确.');
+			 	        return;
+	 	        	}
+	        	}else{
+	        		Ext.example.msg('提示', '未选择图片.');
+	 	        	return;
+	        	}
+	        	menu_uploadMask.show();
+	        	Ext.Ajax.request({
+	        		url : '../../OperateImage.do?dataSource=upload&ossType=10&rid='+rid,
+	 	   			isUpload : true,
+	 	   			form : sub_form.getForm().getEl(),
+	 	   			success : function(response, options){
+	 	   				menu_uploadMask.hide();
+	 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
+	 	   				if(jr.success){
+		  	   				var ossImage = jr.root[0];
+		  	   				sub_box.image = ossImage.image;
+		  	   				sub_box.ossId = ossImage.imageId;	   				
+	 	   				}else{
+	 	   					Ext.ux.showMsg(jr);
+	 	   					imgFile.setImg("");
+	 	   				}
+
+	 	   				
+	 	   			},
+	 	   			failure : function(response, options){
+	 	   				menu_uploadMask.hide();
+	 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+	 	   			}
+	        	});
+	        }
+	});
 		var sub_imgFile = Ext.ux.plugins.createImageFile({
 			id : subImgFileId,
 			formId : subFormId,
@@ -1858,9 +2106,10 @@ Ext.onReady(function(){
 			items : [sub_imgFile],
 			listeners : {
 	    		render : function(e){
-	    			//Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+	    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
 	 	  		}
-	    	}
+	    	},
+			buttons : [sub_btnUpload]
 		});	
 		
 		Ext.getCmp('foodMultiPrice_column_weixin').add({
@@ -1976,9 +2225,15 @@ Ext.onReady(function(){
 			deptName.setValue();
 			deptName.clearInvalid();
 		}
-		updateDeptWin.show();
-		updateDeptWin.center();
-		deptName.focus(true, 100);
+//		
+//		if(tree.root.childNodes.length >= 3 && updateDeptWin.otype == 'insert'){
+//			Ext.example.msg('提示', '父菜单不能超过3个.');
+//		}else{
+			updateDeptWin.show();
+			updateDeptWin.center();
+			deptName.focus(true, 100);
+//		}
+		
 	}
 	
 
@@ -1990,7 +2245,6 @@ Ext.onReady(function(){
 		$('#itemTitle_textfield_weixin').val("");			
 		$('#itemContent_textfield_weixin').val("");	
 		$('#itemUrl_textarea_weixin').val("");			
-		delete p_box.image;	
 		imgFile.setImg("");
 		
 		if(multiFoodPriceCount > 0){
