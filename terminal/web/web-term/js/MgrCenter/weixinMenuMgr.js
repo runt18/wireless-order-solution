@@ -503,7 +503,7 @@ Ext.onReady(function(){
 	
 	$.ajax({ 
 	    type : "post", 
-	    url : basePath + "/wx-term/WXOperateMenu.do",
+	    url : basePath + "/wx-term/WxOperateMenu.do",
 	    data : {
 	    	dataSource : 'systemMenu'
 	    },
@@ -621,7 +621,7 @@ Ext.onReady(function(){
 				$.ajax({ 
 				    type : "post", 
 				    async : false, 
-				    url : basePath+"/wx-term/WXOperateMenu.do",
+				    url : basePath+"/wx-term/WxOperateMenu.do",
 				    data : {
 				    	dataSource : 'commitMenu',
 				    	rid :rid,
@@ -673,7 +673,7 @@ Ext.onReady(function(){
 				weixinMenuLM.show();
 				$.ajax({ 
 				    type : "get", 
-				    url :  basePath + "/wx-term/WXOperateMenu.do?dataSource=weixinMenu&rid=" + rid,
+				    url :  basePath + "/wx-term/WxOperateMenu.do?dataSource=weixinMenu&rid=" + rid,
 				    jsonp: "jsonpCallback",	//服务端用于接收callback调用的function名的参数 
 				    dataType : "json",		//jsonp数据类型
 				    success : function(rt){
