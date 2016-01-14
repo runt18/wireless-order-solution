@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.marker.weixin.HandleMessageAdapter;
 import org.marker.weixin.msg.Data4Item;
 import org.marker.weixin.msg.Msg;
@@ -25,6 +27,7 @@ import org.marker.weixin.msg.Msg4Head.MsgType;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 import org.marker.weixin.session.WxSession;
+import org.xml.sax.SAXException;
 
 import com.alibaba.fastjson.JSON;
 import com.wireless.db.member.MemberDao;
@@ -32,6 +35,7 @@ import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.action.WxKeywordDao;
 import com.wireless.db.weixin.action.WxMenuActionDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.order.WxOrderDao;
@@ -44,6 +48,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.pojo.weixin.action.WxKeyword;
 import com.wireless.pojo.weixin.action.WxMenuAction;
 import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
@@ -244,21 +249,31 @@ public class WxHandleMessage extends HandleMessageAdapter {
 	}
 	
 	/**
-	 * 文本信息, 操作请求指令集
+	 * 文本信息, 关键字回复
 	 */
 	@Override
 	public void onTextMsg(Msg4Text msg) {
-		// 绑定餐厅和公众平台信息
-		//WxRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
-		if(msg.getContent().equalsIgnoreCase("M")){
-			session.callback(createNavi(msg));
-		}else{
-			session.callback(new Msg4Text(msg, "回复【m】获取餐厅导航"));
+		try {
+			final Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
+			final List<WxKeyword> matched = WxKeywordDao.getByCond(staff, new WxKeywordDao.ExtraCond().setKeyword(msg.getContent()));
+			final int actionId;
+			if(matched.isEmpty()){
+				actionId = WxKeywordDao.getByCond(staff, new WxKeywordDao.ExtraCond().setType(WxKeyword.Type.EXCEPTION)).get(0).getActionId();
+			}else{
+				actionId = matched.get(0).getActionId();
+			}
+			if(actionId != 0){
+				session.callback(new WxMenuAction.MsgProxy(msg.getHead(), WxMenuActionDao.getById(staff, actionId)).toMsg());
+			}else{
+				session.callback(createNavi(msg));
+			}
+		} catch (SQLException | BusinessException | SAXException | IOException | ParserConfigurationException e) {
+			session.callback(new Msg4Text(msg, e.getMessage()));
 		}
 	}
 	
 	/**
-	 * 推送事件, 关注或取消关注使用
+	 * 推送事件, 关注或取消关注，菜单回复使用
 	 */
 	@Override
 	public void onEventMsg(Msg4Event msg) {
