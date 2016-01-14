@@ -7,8 +7,10 @@
 	<global-forwards />
 
 	<action-mappings>
-		<action path="/OperateKeyword"
-			type="com.wireless.Actions.weixin.OperateKeywordAction"
+		<action path="/OperateReply" type="com.wireless.Actions.weixin.OperateReplyAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateKeyword" type="com.wireless.Actions.weixin.OperateKeywordAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/BeeCloud" type="com.wireless.Actions.beeCloud.BeeCloudAction"
