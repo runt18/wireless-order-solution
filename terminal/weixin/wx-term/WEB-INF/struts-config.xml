@@ -103,8 +103,8 @@
 			type="com.wireless.Actions.weixin.book.WxOperateBookAction" scope="request"
 			parameter="dataSource">
 		</action>
-		<action path="/WXOperateMenu"
-			type="com.wireless.Actions.weixin.operate.WXOperateMenuAction" scope="request"
+		<action path="/WxOperateMenu"
+			type="com.wireless.Actions.weixin.operate.WxOperateMenuAction" scope="request"
 			parameter="dataSource">
 		</action>
 
