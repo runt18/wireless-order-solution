@@ -31,7 +31,7 @@ body{
 	position: relative;
 	min-width: 30px;
 	color: #000;
-	right: 250px;
+	float : right;
 	top: 10px;
 	font-size: 18px;
 	font-weight: bold;
