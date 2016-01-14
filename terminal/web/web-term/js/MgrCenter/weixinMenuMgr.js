@@ -1,33 +1,7 @@
-/**
- * 拓展string方法
- * @param args
- * @returns {String}
- */
-String.prototype.format = function(args){
-    var result = this;
-    if (arguments.length > 0){    
-        if (arguments.length == 1 && typeof args == "object"){
-            for(var key in args) {
-                if(args[key] != undefined){
-                    var reg = new RegExp("({" + key + "})", "g");
-                    result = result.replace(reg, args[key]);
-                }
-            }
-        }else{
-        	for(var i = 0; i < arguments.length; i++){
-        		if (arguments[i] != undefined) {
-        			var reg= new RegExp("({)" + i + "(})", "g");
-        			result = result.replace(reg, arguments[i]);
-                }
-            }
-        }
-    }
-    return result;
-};
-
 Ext.onReady(function(){
 	var rid = restaurantID;
-	var basePath = "http://localhost:8080";
+	//var basePath = "http://localhost:8080";
+	var basePath = 'http://ts.e-tones.net';
 	//关键字点击的标识符
 	var isKeyword = false;
 	
@@ -79,10 +53,9 @@ Ext.onReady(function(){
 		
 		$.ajax({ 
 		    type : "post", 
-		    async:false, 
-		    url : basePath + "/wx-term/WXOperateMenu.do",
-		    dataType : "jsonp",		//jsonp数据类型 
-		    jsonpCallback : 'jsonpCallback',
+		    async : false, 
+		    url : '../../OperateReply.do',
+		    dataType : "json",		//jsonp数据类型 
 		    data : {
 		    	dataSource : dataSource,
 		    	rid : rid,
@@ -163,10 +136,8 @@ Ext.onReady(function(){
 		$.ajax({ 
 		    type : "post", 
 		    async : false, 
-		    url : basePath + "/wx-term/WXOperateMenu.do",
-		    dataType : "jsonp",		//jsonp数据类型 
-		    jsonp: "callback",	//服务端用于接收callback调用的function名的参数 
-		    jsonCallback : "jsonpCallback",
+		    url : "../../OperateReply.do",
+		    dataType : "json",		//jsonp数据类型 
 		    data : {
 		    	dataSource : 'subscribeReply',
 		    	rid : rid
@@ -374,9 +345,8 @@ Ext.onReady(function(){
 					$.ajax({ 
 					    type : "post", 
 					    async:false, 
-					    url : basePath+"/wx-term/WXOperateMenu.do",
-					    dataType : "jsonp",		//jsonp数据类型 
-					    jsonp: "callback",	//服务端用于接收callback调用的function名的参数 
+					    url : "../../OperateReply.do",
+					    dataType : "json",		//jsonp数据类型 
 					    data : {
 					    	dataSource : "deleteSubscribe",
 					    	rid : rid
@@ -406,21 +376,21 @@ Ext.onReady(function(){
 
 	//系统设置的保存按钮
 	$('#setSystemMenu_input_weixin').click(function(){
-			var tn = Ext.ux.getSelNode(tree);
-			if(!tn){
-				Ext.example.msg('提示', '操作失败, 请选中一个菜单再进行操作.');
-				return;
-			}	
-			
-			var key = $('input[name="systemSet"]:checked').val();
-			
-			tn.attributes.type = "click";
-			if(key == "scan_event_key"){
-				tn.attributes.type = "scancode_waitmsg";
-			}
-			tn.attributes.key = key;
-			
-			Ext.example.msg('提示', '设置成功');
+		var tn = Ext.ux.getSelNode(tree);
+		if(!tn){
+			Ext.example.msg('提示', '操作失败, 请选中一个菜单再进行操作.');
+			return;
+		}	
+		
+		var key = $('input[name="systemSet"]:checked').val();
+		
+		tn.attributes.type = "click";
+		if(key == "scan_event_key"){
+			tn.attributes.type = "scancode_waitmsg";
+		}
+		tn.attributes.key = key;
+		
+		Ext.example.msg('提示', '设置成功');
 	});
 	
 	//菜单管理的悬浮条
@@ -452,15 +422,13 @@ Ext.onReady(function(){
 						$.ajax({ 
 						    type : "post", 
 						    async : false,
-						    url : basePath + "/wx-term/WXOperateMenu.do",
+						    url : "../../OperateReply.do",
 						    data : {
-						    	dataSource : 'deleteMenu',
+						    	dataSource : 'delete',
 							    rid : rid,
 							    key : tn.attributes.key
 						    },
-						    dataType : "jsonp",		//jsonp数据类型 
-						    jsonp: "callback",	//服务端用于接收callback调用的function名的参数 
-						    jsonpCallback : "jsonpCallback",
+						    dataType : "json",		//jsonp数据类型 
 						    success : function(data){ 
 					    		Ext.example.msg('提示', data.msg);
 						    }, 
@@ -503,35 +471,34 @@ Ext.onReady(function(){
 			'是否删除: ' + tn.text,
 			function(e){
 				if(e == 'yes'){
-						$.ajax({ 
-						    type : "post", 
-						    url : "../../OperateKeyword.do",
-						    data : {
-						    	dataSource : 'deleteByCond',
-						    	id : tn.attributes.keywordId
-						    },
-						    dataType : "json",		//jsonp数据类型 
-						    success : function(data){ 
-						    		//刷新
-								 keywordTree.getRootNode().reload();
-								 if(tn.attributes.type == 2){
-									 Ext.example.msg('提示', '例外回复不能删除');
-								 }else{
-									 Ext.example.msg('提示', data.msg);
-								 }
-								 
-								 
-						    }, 
-						    error : function(xhr){ 
-						        var rt = JSON.parse(xhr.responseText);
-						        Ext.example.msg('提示', rt.msg);
-						    }
-						}); 	
-					tn.remove();
-					clearTabContent();
-				}
+					$.ajax({ 
+					    type : "post", 
+					    url : "../../OperateKeyword.do",
+					    data : {
+					    	dataSource : 'deleteByCond',
+					    	id : tn.attributes.keywordId
+					    },
+					    dataType : "json",		//jsonp数据类型 
+					    success : function(data){ 
+					    		//刷新
+							 keywordTree.getRootNode().reload();
+							 if(tn.attributes.type == 2){
+								 Ext.example.msg('提示', '例外回复不能删除');
+							 }else{
+								 Ext.example.msg('提示', data.msg);
+							 }
+							 
+							 
+					    }, 
+					    error : function(xhr){ 
+					        var rt = JSON.parse(xhr.responseText);
+					        Ext.example.msg('提示', rt.msg);
+					    }
+					}); 	
+				tn.remove();
+				clearTabContent();
 			}
-		);	
+		});	
 	}
 	
 	$.ajax({ 
@@ -545,10 +512,21 @@ Ext.onReady(function(){
 	    jsonpCallback : "jsonpCallback",
 	    success : function(data){ 
 	    	var systemMenuTemplate = '<div style="float:left;"><input id={id} type="radio" name="systemSet" value={key}><label for={id}>{desc}</label><div><br>';
-	    	 if(data.success){
+	    	function format(str, args){
+	    		var result = str;
+	            for(var key in args) {
+	                if(args[key] != undefined){
+	                    var reg = new RegExp("({" + key + "})", "g");
+	                    result = result.replace(reg, args[key]);
+	                }
+	            }
+			    return result;
+	    	}
+	    	if(data.success){
 	        	var html = [];
 	        	for (var i = 0; i < data.root.length; i++) {
-	        		html.push(systemMenuTemplate.format({
+	        		html.push(format(systemMenuTemplate, 
+	        		{
 	        			id : "r"+(i+1),
 	        			key : data.root[i].key,
 	        			desc : data.root[i].desc
@@ -695,8 +673,7 @@ Ext.onReady(function(){
 				weixinMenuLM.show();
 				$.ajax({ 
 				    type : "get", 
-//					    async:false, 
-				    url :  basePath + "/wx-term/WXOperateMenu.do?dataSource=weixinMenu&rid="+rid,
+				    url :  basePath + "/wx-term/WXOperateMenu.do?dataSource=weixinMenu&rid=" + rid,
 				    jsonp: "jsonpCallback",	//服务端用于接收callback调用的function名的参数 
 				    dataType : "json",		//jsonp数据类型
 				    success : function(rt){
@@ -819,10 +796,8 @@ Ext.onReady(function(){
 						$.ajax({ 
 						    type : "post", 
 						    async : false, 
-						    url : basePath + "/wx-term/WXOperateMenu.do",
-						    dataType : "jsonp",			//jsonp数据类型 
-						    jsonp: "callback",		//服务端用于接收callback调用的function名的参数 
-						    jsonpCallback : "jsonpCallback",
+						    url : "../../OperateReply.do",
+						    dataType : "json",			//jsonp数据类型 
 						    data : {
 						    	dataSource : 'menuReply',
 						    	rid : rid,
@@ -1123,10 +1098,8 @@ Ext.onReady(function(){
 					$.ajax({ 
 					    type : "post", 
 					    async : false, 
-					    url : basePath + "/wx-term/WXOperateMenu.do",
-					    dataType : "jsonp",			//jsonp数据类型 
-					    jsonp: "callback",		//服务端用于接收callback调用的function名的参数 
-					    jsonpCallback : "jsonpCallback",
+					    url : "../../OperateReply.do",
+					    dataType : "json",			//jsonp数据类型 
 					    data : {
 					    	dataSource : 'menuReply',
 					    	rid : rid,
@@ -1678,10 +1651,8 @@ Ext.onReady(function(){
 					$.ajax({ 
 					    type : "post", 
 					    async : false, 
-					    url : basePath + "/wx-term/WXOperateMenu.do",
-					    dataType : "jsonp",//jsonp数据类型 
-					    jsonp: "callback",//服务端用于接收callback调用的function名的参数 
-					    jsonpCallback : "jsonpCallback",
+					    url : "../../OperateReply.do",
+					    dataType : "json",//jsonp数据类型 
 					    data : {
 					    	dataSource : dataSource,
 					    	rid : rid,
@@ -1963,9 +1934,8 @@ Ext.onReady(function(){
 	//判断是否已设置自动关注
 	$.ajax({ 
 	    type : "post", 
-	    url : basePath + "/wx-term/WXOperateMenu.do",
-	    dataType : "jsonp",		//jsonp数据类型 
-	    jsonp: "callback",	//服务端用于接收callback调用的function名的参数 
+	    url : "../../OperateReply.do",
+	    dataType : "json",		//jsonp数据类型 
 	    data : {
 	    	dataSource : 'subscribeReply',
 	    	rid : rid
