@@ -259,20 +259,6 @@ class OrderHandler implements Runnable{
 					//handle the request to query member
 					response = new RespPackage(request.header).fillBody(MemberDao.getByCond(staff, new MemberDao.ExtraCond(new Parcel(request.body).readParcel(ReqQueryMember.ExtraCond.CREATOR)), null), Member.MEMBER_PARCELABLE_SIMPLE);
 					
-				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_INTERESTED_MEMBER){
-					//handle the request to query interested member
-					response = new RespPackage(request.header).fillBody(MemberDao.getInterestedMember(staff, null), Member.MEMBER_PARCELABLE_SIMPLE);
-					
-				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.INTERESTED_IN_MEMBER){
-					//handle the request to be interested in specific member
-					MemberDao.interestedIn(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId());
-					response = new RespACK(request.header);
-					
-				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.CANCEL_INTERESTED_IN_MEMBER){
-					//handle the request to cancel interested in specific member
-					MemberDao.cancelInterestedIn(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId());
-					response = new RespACK(request.header);
-					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_MEMBER_DETAIL){
 					//handle the request to query member detail
 					response = new RespPackage(request.header).fillBody(MemberDao.getById(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId()), Member.MEMBER_PARCELABLE_COMPLEX);
