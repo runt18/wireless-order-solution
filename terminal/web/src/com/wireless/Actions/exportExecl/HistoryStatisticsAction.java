@@ -3025,17 +3025,13 @@ public class HistoryStatisticsAction extends DispatchAction{
 		List<Member> newList = new ArrayList<Member>(list);  
 		if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty()){
 			newList.clear();
-			if(Integer.parseInt(memberTypeAttr) == MemberType.Attribute.INTERESTED.getVal()){
-				newList.addAll(MemberDao.getInterestedMember(staff, extraCond.toString()));
-			}else{
-				List<Member> attrMember = new ArrayList<Member>();  
-				for (Member member : list) {
-					if(member.getMemberType().getAttribute().getVal() == Integer.parseInt(memberTypeAttr)){
-						attrMember.add(member);
-					};
-				}
-				newList.addAll(attrMember);
+			List<Member> attrMember = new ArrayList<Member>();  
+			for (Member member : list) {
+				if(member.getMemberType().getAttribute().getVal() == Integer.parseInt(memberTypeAttr)){
+					attrMember.add(member);
+				};
 			}
+			newList.addAll(attrMember);
 		}
 		
 		String title = "会员列表";
