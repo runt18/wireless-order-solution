@@ -36,19 +36,23 @@ public class WxOperateMenuAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward weixinMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject(); 
-		
+		final String callback = request.getParameter("callback");
 //		String appId = "wx6c03b8cab601465d";
 //		String appSecret = "c12ec7d212bcc74785f3912c4c9c39e1";
 //		System.out.println(Menu.newInstance(Token.newInstance(appId, appSecret)));
 //		jobject.setRoot(Menu.newInstance(Token.newInstance(appId, appSecret)));
 		
+		final JObject jObject = new JObject(); 
 		int rid = Integer.parseInt(request.getParameter("rid"));
 		WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(rid));
 		AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
-		jobject.setRoot(Menu.newInstance(Token.newInstance(authorizerToken)));
+		jObject.setRoot(Menu.newInstance(Token.newInstance(authorizerToken)));
 		
-		response.getWriter().print(jobject.toString());
+		if(callback != null && !callback.isEmpty()){
+			response.getWriter().print(callback + "(" + jObject.toString() + ")");
+		}else{
+			response.getWriter().print(jObject.toString());
+		}
 		
 		return null;
 	}			
@@ -63,7 +67,7 @@ public class WxOperateMenuAction extends DispatchAction {
 	 */
 	public ActionForward systemMenu(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String callback = request.getParameter("callback");
-		JObject jobject = new JObject(); 
+		JObject jObject = new JObject(); 
 
 		List<Jsonable> list = new ArrayList<>();
 		for(final EventKey key : WxHandleMessage.EventKey.values()){
@@ -85,9 +89,13 @@ public class WxOperateMenuAction extends DispatchAction {
 			
 			list.add(j);
 		}
-		jobject.setRoot(list);
+		jObject.setRoot(list);
 		
-		response.getWriter().print(callback + "(" + jobject.toString() + ")");
+		if(callback != null && !callback.isEmpty()){
+			response.getWriter().print(callback + "(" + jObject.toString() + ")");
+		}else{
+			response.getWriter().print(jObject.toString());
+		}
 		
 		return null;
 	}

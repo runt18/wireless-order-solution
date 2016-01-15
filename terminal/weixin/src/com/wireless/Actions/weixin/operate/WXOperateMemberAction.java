@@ -156,70 +156,6 @@ public class WXOperateMemberAction extends DispatchAction {
 		return null;
 	}
 	
-	/**
-	 * 获取短信验证码
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-//	public ActionForward getVerifyCode(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-//		request.setCharacterEncoding("UTF-8");
-//		response.setCharacterEncoding("UTF-8");
-//		JObject jobject = new JObject();
-//		DBCon dbCon = new DBCon();
-//		try{
-//			dbCon.connect();
-//			dbCon.conn.setAutoCommit(false);
-//			
-//			String mobile = request.getParameter("mobile");
-//			String fromId = request.getParameter("fid");
-//
-//			final VerifySMS sms = VerifySMSDao.getById(dbCon, VerifySMSDao.insert(dbCon, new InsertBuilder(ExpiredPeriod.MINUTE_10)));
-//			int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
-//			SMS.send(dbCon, StaffDao.getAdminByRestaurant(restaurantId), mobile, new Msg4Verify(sms.getCode()));
-//			dbCon.conn.commit();
-//			
-//			jobject.initTip(true, "操作成功, 已发送短信验证码, 请注意查看.");
-//			jobject.setExtra(new Jsonable(){
-//
-//				@Override
-//				public JsonMap toJsonMap(int flag) {
-//					JsonMap jm = new JsonMap();
-//					jm.putJsonable("code", sms, 0);
-//					return jm;
-//				}
-//
-//				@Override
-//				public void fromJsonMap(JsonMap jsonMap, int flag) {
-//					
-//				}
-//				
-//			});
-//			
-//		}catch(BusinessException  | SQLException e){
-//			dbCon.conn.rollback();
-//			e.printStackTrace();
-//			jobject.initTip(e);
-//			
-//		}catch(IOException e){
-//			dbCon.conn.rollback();
-//			e.printStackTrace();
-//			jobject.initTip4Exception(e);
-//			
-//		}catch(Exception e){
-//			dbCon.conn.rollback();
-//			e.printStackTrace();
-//			jobject.initTip4Exception(e);
-//			
-//		}finally{
-//			dbCon.disconnect();
-//			response.getWriter().print(jobject.toString());
-//		}
-//		return null;
-//	}
 	
 	/**
 	 * 
@@ -239,6 +175,7 @@ public class WXOperateMemberAction extends DispatchAction {
 		final String mobile = request.getParameter("mobile");
 		final String name = request.getParameter("name");
 		final String birthday = request.getParameter("birthday");
+		final String age = request.getParameter("age");
 		
 		final JObject jobject = new JObject();
 		final DBCon dbCon = new DBCon();
@@ -259,6 +196,10 @@ public class WXOperateMemberAction extends DispatchAction {
 			
 			if(birthday != null && !birthday.isEmpty()){
 				builder.setBirthday(birthday);
+			}
+			
+			if(age != null && !age.isEmpty()){
+				builder.setAge(Member.Age.valueOf(Integer.parseInt(age)));
 			}
 			
 			WxMemberDao.bind(dbCon, staff, builder);
