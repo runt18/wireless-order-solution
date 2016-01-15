@@ -16,7 +16,6 @@ import org.marker.weixin.api.BaseAPI;
 
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
 import com.wireless.db.frontBusiness.QueryMenu;
-import com.wireless.db.member.MemberCommentDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberLevelDao;
 import com.wireless.db.member.MemberOperationDao;
@@ -52,8 +51,6 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.member.Member;
-import com.wireless.pojo.member.MemberComment;
-import com.wireless.pojo.member.MemberComment.CommitBuilder;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.printScheme.PType;
@@ -279,16 +276,6 @@ class OrderHandler implements Runnable{
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_MEMBER_DETAIL){
 					//handle the request to query member detail
 					response = new RespPackage(request.header).fillBody(MemberDao.getById(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId()), Member.MEMBER_PARCELABLE_COMPLEX);
-					
-				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.COMMIT_MEMBER_COMMENT){
-					//handle the request to commit member comment
-					MemberComment comment = new Parcel(request.body).readParcel(MemberComment.CREATOR);
-					if(comment.isPublic()){
-						MemberCommentDao.commit(staff, CommitBuilder.newPublicBuilder(staff.getId(), comment.getMember().getId(), comment.getComment()));
-					}else{
-						MemberCommentDao.commit(staff, CommitBuilder.newPrivateBuilder(staff.getId(), comment.getMember().getId(), comment.getComment()));
-					}
-					response = new RespACK(request.header);
 					
 				}else{
 					response = new RespNAK(request.header);
