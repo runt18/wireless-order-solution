@@ -64,6 +64,7 @@ public class TestMember {
 		assertEquals("member sex", expected.getSex(), actual.getSex());
 		//assertTrue("member create date", System.currentTimeMillis() - actual.getCreateDate() < 5000);
 		assertEquals("member id card", expected.getIdCard(), actual.getIdCard());
+		assertEquals("member age", expected.getAge(), actual.getAge());
 		assertEquals("member birthday", expected.getBirthday(), actual.getBirthday());
 		assertEquals("member company", expected.getCompany(), actual.getCompany());
 		assertEquals("member contact address", expected.getContactAddress(), actual.getContactAddress());
@@ -295,7 +296,8 @@ public class TestMember {
 													 		   .setIdCard("440711198103154818")
 													 		   .setMemberCard("100010000")
 													 		   .setTele("020-87453214")
-													 		   .setReferrer(referrer.getId());
+													 		   .setReferrer(referrer.getId())
+													 		   .setAge(Member.Age.AGE_80);
 			
 			memberId = MemberDao.insert(mStaff, builder);
 			
@@ -327,7 +329,8 @@ public class TestMember {
 														   .setIdCard("4101234789965412")
 														   .setMemberCard("1000100001")
 														   .setTele("0750-3399559")
-														   .setReferrer(referrer.getId());
+														   .setReferrer(referrer.getId())
+														   .setAge(Member.Age.AGE_00);
 			MemberDao.update(mStaff, updateBuilder);
 			
 			expect = updateBuilder.build();

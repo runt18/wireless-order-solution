@@ -566,9 +566,8 @@ public class MemberDao {
 	public static int getMemberCount(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		int count = 0;
 		String querySQL = "SELECT COUNT(M.member_id) "
-				+ " FROM (" + Params.dbName + ".member M " 
-				+ " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id) " 
-				+ " LEFT JOIN " + Params.dbName + ".interested_member IM ON M.member_id = IM.member_id " 
+				+ " FROM " + Params.dbName + ".member M " 
+				+ " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " 
 				+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
@@ -680,49 +679,6 @@ public class MemberDao {
 	}
 	
 	/**
-	 * Get the interested member according to extra condition.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @return the result to interested members
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException 
-	 * 			throws if any member type does NOT exist
-	 */
-	public static List<Member> getInterestedMember(Staff staff, String extraCond) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getInterestedMember(dbCon, staff, extraCond, null);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the interested member according to extra condition.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param extraCond
-	 * 			the extra condition
-	 * @param orderClause
-	 * 			the order clause
-	 * @return the result to interested members
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException 
-	 * 			throws if any member type does NOT exist
-	 */
-	private static List<Member> getInterestedMember(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
-		extraCond = " AND M.member_id IN( SELECT member_id FROM interested_member WHERE staff_id = " + staff.getId() + ")" + (extraCond != null ? extraCond : "");
-		return getByCond(dbCon, staff, extraCond, null);
-	}
-	
-	/**
 	 * Get member by extra condition.
 	 * @param dbCon
 	 * 			the database connection
@@ -745,7 +701,7 @@ public class MemberDao {
 			  " M.base_balance, M.extra_balance, M.consumption_amount, M.last_consumption, M.used_balance," +
 			  " M.total_consumption, M.total_point, M.total_charge, " +
 			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
-			  " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, " +
+			  " M.tele, M.mobile, M.age, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, " +
 			  " M.referrer, M.referrer_id, " +
 			  " M.wx_order_amount, " +
 			  " MT.member_type_id, MT.name AS member_type_name, MT.attribute, MT.exchange_rate, MT.charge_rate, MT.type, MT.initial_point, " +
@@ -782,6 +738,7 @@ public class MemberDao {
 			member.setCreateDate(dbCon.rs.getTimestamp("create_date").getTime());
 			member.setTele(dbCon.rs.getString("tele"));
 			member.setMobile(dbCon.rs.getString("mobile"));
+			member.setAge(Member.Age.valueOf(dbCon.rs.getInt("age")));
 			ts = dbCon.rs.getTimestamp("birthday");
 			if(ts != null){
 				member.setBirthday(ts.getTime());
@@ -1141,7 +1098,7 @@ public class MemberDao {
 		
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".member " +
-			  " (member_type_id, member_card, member_card_crc, restaurant_id, branch_id, name, sex, tele, mobile, mobile_crc, birthday, " +
+			  " (member_type_id, member_card, member_card_crc, restaurant_id, branch_id, name, sex, tele, mobile, mobile_crc, age, birthday, " +
 			  " id_card, company, contact_addr, create_date, referrer, referrer_id, point)" +
 			  " VALUES( " +
 			  member.getMemberType().getId() + "," + 
@@ -1153,15 +1110,16 @@ public class MemberDao {
 			  "'" + member.getTele() + "'," + 
 			  "'" + member.getMobile() + "'," +
 			  " CRC32('" + member.getMobile() + "')," +
-			 (member.getBirthday() != 0 ? ("'" + DateUtil.format(member.getBirthday()) + "'") : "NULL")	+ "," +
-			 "'" + member.getIdCard() + "'," + 
-			 "'" + member.getCompany()+ "'," +
-			 "'" + member.getContactAddress() + "'," +
-			 " NOW(), " +
-			 (member.hasReferrer() ? "'" + member.getReferrer() + "'" : "NULL") + "," +
-			 (member.hasReferrer() ? member.getReferrerId() : "NULL") + "," +
-			 " (SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getId() + ")" + 
-			 ")";
+			  (member.getAge() != null ? member.getAge().getVal() : " NULL ") + "," +
+			  (member.getBirthday() != 0 ? ("'" + DateUtil.format(member.getBirthday()) + "'") : "NULL") + "," +
+			  "'" + member.getIdCard() + "'," + 
+			  "'" + member.getCompany()+ "'," +
+			  "'" + member.getContactAddress() + "'," +
+			  " NOW(), " +
+			  (member.hasReferrer() ? "'" + member.getReferrer() + "'" : "NULL") + "," +
+			  (member.hasReferrer() ? member.getReferrerId() : "NULL") + "," +
+			  " (SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getId() + ")" + 
+			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -1268,6 +1226,7 @@ public class MemberDao {
 			  (builder.isTeleChanged() ? " ,tele = '" + member.getTele() + "'" : "") +
 			  (builder.isSexChanged() ? " ,sex = " + member.getSex().getVal() : "")	+
 			  (builder.isIdChardChanged() ? " ,id_card = '" + member.getIdCard() + "'" : "") +
+			  (builder.isAgeChanged() ? " ,age = " + member.getAge().getVal() : "") +
 			  (builder.isBirthdayChanged() ? " ,birthday = '" + DateUtil.format(member.getBirthday()) + "'" : "") +
 			  (builder.isCompanyChanged() ? " ,company = '" + member.getCompany() + "'" : "") +
 			  (builder.isContactAddrChanged() ? " ,contact_addr = '" + member.getContactAddress() + "'" : "") +
@@ -1373,14 +1332,6 @@ public class MemberDao {
 			//Delete the coupon associated with this member
 			CouponDao.deleteByCond(dbCon, staff, new CouponDao.ExtraCond().setMember(member.getId()));
 			
-			//Delete the interested member.
-			sql = " DELETE FROM " + Params.dbName + ".interested_member WHERE member_id = " + member.getId();
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Delete the member comment.
-			sql = " DELETE FROM " + Params.dbName + ".member_comment WHERE member_id = " + member.getId();
-			dbCon.stmt.executeUpdate(sql);
-			
 			//Delete the member operation.
 			//sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE member_id = " + memberId;
 			//dbCon.stmt.executeUpdate(sql);
@@ -1439,90 +1390,6 @@ public class MemberDao {
 		if(deleteByCond(dbCon, staff, new ExtraCond().setId(memberId)) == 0){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}
-	}
-	
-	/**
-	 * Perform to be interested in specific member.
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param memberId
-	 * 			the member to be interested in
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static void interestedIn(Staff staff, int memberId) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			interestedIn(dbCon, staff, memberId);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Perform to be interested in specific member.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param memberId
-	 * 			the member to be interested in
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static void interestedIn(DBCon dbCon, Staff staff, int memberId) throws SQLException{
-		String sql;
-		sql = " SELECT * FROM " + Params.dbName + ".interested_member WHERE member_id = " + memberId + " AND " + " staff_id = " + staff.getId();
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(!dbCon.rs.next()){
-			sql = " INSERT INTO " + Params.dbName + ".interested_member " +
-				  " (`staff_id`, `member_id`, `start_date`) " + 
-				  " VALUES (" +
-				  staff.getId() + "," +
-				  memberId + "," +
-				  "NOW()" + 
-				  " ) ";
-			dbCon.stmt.executeUpdate(sql);
-		}
-		
-		dbCon.rs.close();
-	}
-	
-	/**
-	 * Cancel interested in the specific member
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param memberId
-	 * 			the member to cancel interested
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static void cancelInterestedIn(Staff staff, int memberId) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			cancelInterestedIn(dbCon, staff, memberId);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Cancel interested in the specific member
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param memberId
-	 * 			the member to cancel interested
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static void cancelInterestedIn(DBCon dbCon, Staff staff, int memberId) throws SQLException{
-		String sql;
-		sql = " DELETE FROM " + Params.dbName + ".interested_member WHERE member_id = " + memberId + " AND " + " staff_id = " + staff.getId();
-		dbCon.stmt.executeUpdate(sql);
 	}
 	
 	/**
@@ -2251,6 +2118,9 @@ public class MemberDao {
 		}
 		if(dest.hasMemberCard()){
 			updateBuilder.setMemberCard(dest.getMemberCard());
+		}
+		if(dest.getAge() != null){
+			updateBuilder.setAge(dest.getAge());
 		}
 		if(dest.getBirthday() != 0){
 			updateBuilder.setBirthday(dest.getBirthday());
