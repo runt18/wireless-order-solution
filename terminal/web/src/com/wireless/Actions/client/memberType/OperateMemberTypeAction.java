@@ -38,7 +38,6 @@ public class OperateMemberTypeAction extends DispatchAction{
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = (String) request.getAttribute("restaurantID");
 			String typeName = request.getParameter("typeName");
 			String discountID = request.getParameter("discountID");
 			String pricePlanId = request.getParameter("pricePlanId");
@@ -59,7 +58,7 @@ public class OperateMemberTypeAction extends DispatchAction{
 				mDiscountCheckedList = new String[0];
 			}
 			
-			MemberType.InsertBuilder insert = new MemberType.InsertBuilder(Integer.valueOf(restaurantID), typeName.trim(), new Discount(Integer.valueOf(discountID)));
+			MemberType.InsertBuilder insert = new MemberType.InsertBuilder(typeName.trim(), new Discount(Integer.valueOf(discountID)));
 			insert.setAttribute(Attribute.valueOf(Integer.valueOf(attr)));
 			insert.setChargeRate(Float.valueOf(chargeRate));
 			insert.setExchangeRate(Float.valueOf(exchangeRate));

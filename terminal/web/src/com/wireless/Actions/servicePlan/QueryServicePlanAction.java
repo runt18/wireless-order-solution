@@ -52,7 +52,7 @@ public class QueryServicePlanAction extends DispatchAction{
 			
 			int i = 0;
 			for (ServicePlan sp : ServicePlanDao.getAll(StaffDao.verify(Integer.parseInt(pin)))) {
-				spTree.append(i>0? "," : "");
+				spTree.append(i > 0 ? "," : "");
 				spTree.append("{");
 				spTree.append("leaf : true");
 				spTree.append(",text:'" + sp.getName() + "'");
