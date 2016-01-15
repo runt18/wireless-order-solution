@@ -16,6 +16,7 @@ public class DateUtil {
 		MO_SEQ("yyyyMMddHHmmss", "member operation seq"),
 		DATE_TIME("yyyy-MM-dd HH:mm:ss", "date_time"),
 		DATE("yyyy-MM-dd", "date"),
+		DAY("MM-dd", "day"),
 		TIME("HH:mm:ss", "time"),
 		HOUR("HH:mm", "hour");
 		

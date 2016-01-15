@@ -920,8 +920,12 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.putString("name", this.name);
 		jm.putString("tele", this.tele);
 		jm.putString("mobile", this.getMobile());
+		if(this.age != null){
+			jm.putInt("age", this.age.val);
+			jm.putString("ageText", this.age.desc);
+		}
 		jm.putLong("birthday", this.birthday);
-		jm.putString("birthdayFormat", this.birthday != 0 ? DateUtil.formatToDate(this.birthday) : "");
+		jm.putString("birthdayFormat", this.birthday != 0 ? DateUtil.format(this.birthday, DateUtil.Pattern.DAY) : "");
 		jm.putString("idCard", this.idCard);
 		jm.putString("weixinCard", this.weixin != null?this.weixin.getCard() + "":"");
 		jm.putString("company", this.company);
