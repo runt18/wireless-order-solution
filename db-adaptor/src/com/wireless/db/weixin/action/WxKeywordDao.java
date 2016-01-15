@@ -19,6 +19,7 @@ public class WxKeywordDao {
 		private int id;
 		private int actionId;
 		private String keyword;
+		private WxKeyword.Type type;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -40,6 +41,11 @@ public class WxKeywordDao {
 			return this;
 		}
 		
+		public ExtraCond setType(WxKeyword.Type type){
+			this.type = type;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -47,10 +53,13 @@ public class WxKeywordDao {
 				extraCond.append(" AND id = " + id);
 			}
 			if(keyword != null && !keyword.isEmpty()){
-				extraCond.append(" AND keyword = %" + keyword + "%");
+				extraCond.append(" AND keyword LIKE '%" + keyword + "%'");
 			}
 			if(actionId != 0){
 				extraCond.append(" AND action_id = " + actionId);
+			}
+			if(type != null){
+				extraCond.append(" AND type = " + type.getVal());
 			}
 			return extraCond.toString();
 		}
@@ -147,6 +156,11 @@ public class WxKeywordDao {
 	 */
 	public static void update(DBCon dbCon, Staff staff, WxKeyword.UpdateBuilder builder) throws SQLException, BusinessException{
 		WxKeyword keyword = builder.build();
+		
+		if(getByCond(dbCon, staff, new ExtraCond().setId(keyword.getId())).get(0).getType() == WxKeyword.Type.EXCEPTION && builder.isKeywordChanged()){
+			throw new BusinessException("例外回复的关键字不能修改");
+		}
+		
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".weixin_keyword SET " +
 			  " id = " + keyword.getId() +

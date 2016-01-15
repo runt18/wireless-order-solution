@@ -57,8 +57,30 @@ public class TestRestaurantDao {
 		TestInit.init();
 	}
 	
+	@Test
+	public void testChain() throws SQLException, BusinessException{
+		Restaurant group = RestaurantDao.getById(40);
+		Restaurant branch = RestaurantDao.getById(41);
+		RestaurantDao.update(new Restaurant.UpdateBuilder(group.getId()).addBranch(branch));
+		
+		group = RestaurantDao.getById(group.getId());
+		branch = RestaurantDao.getById(branch.getId());
+		Assert.assertEquals("type to group restaurant", Restaurant.Type.GROUP, group.getType());
+		Assert.assertEquals("branch to group restaurant", branch, group.getBranches().get(0));
+		
+		Assert.assertEquals("type to branch restaurant", Restaurant.Type.BRANCE, branch.getType());
+		
+		RestaurantDao.update(new Restaurant.UpdateBuilder(group.getId()).clearBranch());
+		group = RestaurantDao.getById(group.getId());
+		branch = RestaurantDao.getById(branch.getId());
+		Assert.assertEquals("type to group restaurant after clearing branch", Restaurant.Type.RESTAURANT, group.getType());
+		Assert.assertEquals("branch to group restaurant after clearing branch", false, group.hasBranches());
+		
+		Assert.assertEquals("type to branch restaurant after clearing branch", Restaurant.Type.RESTAURANT, branch.getType());
+	}
+	
 	@Test 
-	public void testCalcExpired() throws SQLException{
+	public void testCalcExpired() throws SQLException, BusinessException{
 		System.out.println(RestaurantDao.calcExpired());
 	}
 	

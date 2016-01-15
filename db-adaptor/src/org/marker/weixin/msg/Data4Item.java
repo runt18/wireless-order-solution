@@ -71,7 +71,7 @@ public class Data4Item implements Jsonable{
 		JsonMap jm = new JsonMap();
 		jm.putString("title", title);
 		jm.putString("description", description);
-		jm.putString("picUrl", picUrl);
+		jm.putString("picUrl", getPicUrl());
 		jm.putString("url", url);
 		return jm;
 	}

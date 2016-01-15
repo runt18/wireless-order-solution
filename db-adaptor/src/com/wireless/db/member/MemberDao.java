@@ -29,10 +29,7 @@ import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
-import com.wireless.pojo.distMgr.Discount;
-import com.wireless.pojo.distMgr.Discount.Type;
 import com.wireless.pojo.member.Member;
-import com.wireless.pojo.member.MemberComment.CommitBuilder;
 import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
@@ -627,27 +624,21 @@ public class MemberDao {
 			eachMember.getMemberType().copyFrom(MemberTypeDao.getById(dbCon, staff, eachMember.getMemberType().getId()));
 			
 			//Get the discounts to each member
-			sql = " SELECT MD.discount_id, MD.type, D.name, D.type AS d_type FROM " + Params.dbName + ".member_type_discount MD " +
-					" JOIN " + Params.dbName + ".discount D " +
-					" ON MD.discount_id = D.discount_id " +
-					" WHERE member_type_id = " + eachMember.getMemberType().getId();
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			while(dbCon.rs.next()){
-				Discount discount = new Discount(dbCon.rs.getInt("MD.discount_id"));
-				discount.setName(dbCon.rs.getString("D.name"));
-				discount.setType(Type.valueOf(dbCon.rs.getInt("d_type")));
-				eachMember.getMemberType().addDiscount(discount);
-				if(MemberType.DiscountType.valueOf(dbCon.rs.getInt("type")) == MemberType.DiscountType.DEFAULT){
-					eachMember.getMemberType().setDefaultDiscount(discount);
-				}
-			}
-			dbCon.rs.close();
-			
-			//Get the public comments to each member
-			eachMember.setPublicComments(MemberCommentDao.getPublicCommentByMember(dbCon, staff, eachMember));
-			
-			//Get the private comment to each member
-			eachMember.setPrivateComment(MemberCommentDao.getPrivateCommentByMember(dbCon, staff, eachMember));
+//			sql = " SELECT MD.discount_id, MD.type, D.name, D.type AS d_type FROM " + Params.dbName + ".member_type_discount MD " +
+//					" JOIN " + Params.dbName + ".discount D " +
+//					" ON MD.discount_id = D.discount_id " +
+//					" WHERE member_type_id = " + eachMember.getMemberType().getId();
+//			dbCon.rs = dbCon.stmt.executeQuery(sql);
+//			while(dbCon.rs.next()){
+//				Discount discount = new Discount(dbCon.rs.getInt("MD.discount_id"));
+//				discount.setName(dbCon.rs.getString("D.name"));
+//				discount.setType(Type.valueOf(dbCon.rs.getInt("d_type")));
+//				eachMember.getMemberType().addDiscount(discount);
+//				if(MemberType.DiscountType.valueOf(dbCon.rs.getInt("type")) == MemberType.DiscountType.DEFAULT){
+//					eachMember.getMemberType().setDefaultDiscount(discount);
+//				}
+//			}
+//			dbCon.rs.close();
 			
 			//Get the favor foods to each member
 			sql = " SELECT " +
@@ -750,7 +741,7 @@ public class MemberDao {
 		final List<Member> result = new ArrayList<Member>();
 		String sql;
 		sql = " SELECT "	+
-			  " M.member_id, M.restaurant_id, M.point, M.used_point, " +
+			  " M.member_id, M.restaurant_id, M.branch_id, M.point, M.used_point, " +
 			  " M.base_balance, M.extra_balance, M.consumption_amount, M.last_consumption, M.used_balance," +
 			  " M.total_consumption, M.total_point, M.total_charge, " +
 			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
@@ -763,7 +754,7 @@ public class MemberDao {
 			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " +
 			  " LEFT JOIN " + Params.dbName + ".weixin_member WM ON WM.member_id = M.member_id " +
 			  " WHERE 1 = 1 " +
-			  " AND M.restaurant_id = " + staff.getRestaurantId() +
+			  " AND M.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond : " ") +
 			  (orderClause != null ? orderClause : "");
 			
@@ -771,6 +762,7 @@ public class MemberDao {
 		while(dbCon.rs.next()){
 			Member member = new Member(dbCon.rs.getInt("member_id"));
 			member.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			member.setBranchId(dbCon.rs.getInt("branch_id"));
 			member.setBaseBalance(dbCon.rs.getFloat("base_balance"));
 			member.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
 			member.setUsedBalance(dbCon.rs.getFloat("used_balance"));
@@ -1133,27 +1125,29 @@ public class MemberDao {
 		Member member = builder.build();
 
 		//检查是否信息有重复
-		//Check to see whether the mobile or member card is duplicated.
+		//Check to see whether the mobile is duplicated.
 		if(member.hasMobile() && !getByCond(dbCon, staff, new ExtraCond().setMobile(member.getMobile()), null).isEmpty()){
 			throw new BusinessException(MemberError.MOBLIE_DUPLICATED);
 		}
+		//Check to see whether the member card is duplicated.
 		if(member.hasMemberCard() && !getByCond(dbCon, staff, new ExtraCond().setCard(member.getMemberCard()), null).isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_CARD_DUPLICATED);
 		}
 		
+		//设置推荐人
 		if(member.hasReferrer()){
 			member.setReferrer(StaffDao.getById(dbCon, member.getReferrerId()).getName());
 		}
 		
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".member " +
-			  " (member_type_id, member_card, member_card_crc, restaurant_id, name, sex, tele, mobile, mobile_crc, birthday, " +
+			  " (member_type_id, member_card, member_card_crc, restaurant_id, branch_id, name, sex, tele, mobile, mobile_crc, birthday, " +
 			  " id_card, company, contact_addr, create_date, referrer, referrer_id, point)" +
 			  " VALUES( " +
 			  member.getMemberType().getId() + "," + 
 			  "'" + member.getMemberCard() + "'," +
 			  " CRC32('" + member.getMemberCard() + "')," +
-			  staff.getRestaurantId() + "," + 
+			  (staff.isBranch() ? staff.getGroupId() + "," + staff.getRestaurantId() : staff.getRestaurantId() + "," + " NULL ") + "," +
 			  "'" + member.getName() + "'," + 
 			  member.getSex().getVal() + "," + 
 			  "'" + member.getTele() + "'," + 
@@ -1177,16 +1171,6 @@ public class MemberDao {
 		}else{
 			throw new SQLException("The id of member is not generated successfully.");
 		}	
-		
-		//Commit the private comment
-		if(member.hasPrivateComment()){
-			MemberCommentDao.commit(dbCon, staff, CommitBuilder.newPrivateBuilder(staff.getId(), memberId, member.getPrivateComment().getComment()));
-		}
-		
-		//Commit the public comment
-		if(member.hasPublicComments()){
-			MemberCommentDao.commit(dbCon, staff, CommitBuilder.newPublicBuilder(staff.getId(), memberId, member.getPublicComments().get(0).getComment()));
-		}
 		
 		return memberId;
 	}
@@ -1296,15 +1280,6 @@ public class MemberDao {
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}
 		
-		//Commit the private comment
-		if(builder.isPrivateCommentChanged()){
-			MemberCommentDao.commit(dbCon, staff, CommitBuilder.newPrivateBuilder(staff.getId(), member.getId(), member.getPrivateComment().getComment()));
-		}
-		
-		//Commit the public comment
-		if(builder.isPublicCommentChanged()){
-			MemberCommentDao.commit(dbCon, staff, CommitBuilder.newPublicBuilder(staff.getId(), member.getId(), member.getPublicComments().get(0).getComment()));
-		}
 	}
 	
 	/**

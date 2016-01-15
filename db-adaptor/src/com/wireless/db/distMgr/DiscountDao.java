@@ -329,6 +329,28 @@ public class DiscountDao {
 	public static List<Discount> getAll(DBCon dbCon, Staff staff) throws SQLException{
 		return getByCond(dbCon, staff, null, ShowType.BY_PLAN);
 	}
+
+	/**
+	 * Get the discount along with its discount plan to specified extra condition.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the discount along with its discount plan to specified extra condition 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Discount> getByCond(Staff staff, ExtraCond extraCond, ShowType showType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond, showType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
 	/**
 	 * Get the discount along with its discount plan to specified extra condition.
@@ -825,7 +847,7 @@ public class DiscountDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			if(dbCon.rs.getInt(1) > 0){
-				throw new BusinessException("当前有账单正在使用此折扣方案, 不能删除", DiscountError.RESERVED_NOT_ALLOW_DELETE);
+				throw new BusinessException("当前有账单正在使用此折扣方案, 不能删除", DiscountError.DELETE_NOT_ALLOW);
 			}
 		}
 		
@@ -834,7 +856,7 @@ public class DiscountDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			if(Discount.Type.valueOf(dbCon.rs.getInt("type")) == Type.RESERVED){
-				throw new BusinessException("系统保留的折扣方案不能删除", DiscountError.RESERVED_NOT_ALLOW_DELETE);
+				throw new BusinessException("系统保留的折扣方案不能删除", DiscountError.DELETE_NOT_ALLOW);
 			}
 		}else{
 			throw new BusinessException(DiscountError.DISCOUNT_NOT_EXIST);
@@ -846,7 +868,17 @@ public class DiscountDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			if(dbCon.rs.getInt(1) > 0){
-				throw new BusinessException(DiscountError.DISCOUNT_USED_BY_MEMBER_TYPE);
+				throw new BusinessException("有会员类型正在使用此折扣方案，不能删除", DiscountError.DELETE_NOT_ALLOW);
+			}
+		}
+		dbCon.rs.close();
+		
+		//Check to see whether the discount to delete is used by member chain.
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member_chain_discount WHERE discount_id = " + id;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			if(dbCon.rs.getInt(1) > 0){
+				throw new BusinessException("会员连锁正在使用此折扣方案，不能删除", DiscountError.DELETE_NOT_ALLOW);
 			}
 		}
 		dbCon.rs.close();

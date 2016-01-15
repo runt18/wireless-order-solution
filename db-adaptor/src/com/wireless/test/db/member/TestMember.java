@@ -9,22 +9,22 @@ import java.sql.SQLException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.member.MemberCommentDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberDao.ActiveExtraCond;
 import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.Member.AdjustType;
 import com.wireless.pojo.member.Member.Sex;
-import com.wireless.pojo.member.MemberComment;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberType;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
@@ -70,28 +70,12 @@ public class TestMember {
 		assertEquals("member referrer name", expected.getReferrer(), actual.getReferrer());
 		assertEquals("member referrer id", expected.getReferrerId(), actual.getReferrerId());
 		
-		assertEquals("public comment - size", expected.getPublicComments().size(), actual.getPublicComments().size());
-		for(int i = 0; i < expected.getPublicComments().size(); i++){
-			assertEquals("public comment - staff id", expected.getPublicComments().get(i).getStaff().getId(), actual.getPublicComments().get(i).getStaff().getId());
-			assertEquals("public comment - member id", expected.getPublicComments().get(i).getMember().getId(), actual.getPublicComments().get(i).getMember().getId());
-			assertEquals("public comment - type", expected.getPublicComments().get(i).getType().getVal(), actual.getPublicComments().get(i).getType().getVal());
-			assertEquals("public comment - comment", expected.getPublicComments().get(i).getComment(), actual.getPublicComments().get(i).getComment());
-			assertEquals("public comment - last modified", Math.abs(expected.getPublicComments().get(i).getLastModified() - actual.getPublicComments().get(i).getLastModified()) / 5000, 0);
-		}
-		
-		assertEquals("private comment", expected.hasPrivateComment(), actual.hasPrivateComment());
-		if(expected.hasPrivateComment()){
-			assertEquals("private comment - staff id", expected.getPrivateComment().getStaff().getId(), actual.getPrivateComment().getStaff().getId());
-			assertEquals("private comment - member id", expected.getPrivateComment().getMember().getId(), actual.getPrivateComment().getMember().getId());
-			assertEquals("private comment - type", expected.getPrivateComment().getType().getVal(), actual.getPrivateComment().getType().getVal());
-			assertEquals("private comment - comment", expected.getPrivateComment().getComment(), actual.getPrivateComment().getComment());
-			assertEquals("private comment - last modified", Math.abs(expected.getPrivateComment().getLastModified() - actual.getPrivateComment().getLastModified()) / 5000, 0);
-		}
 	}
 	
 	private void compareMemberOperation(MemberOperation expected, MemberOperation actual){
 		assertEquals("mo - id", expected.getId(), actual.getId());
 		assertEquals("mo - associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
+		assertEquals("mo - associated branch id", expected.getBranchId(), actual.getBranchId());
 		assertEquals("mo - staff id", expected.getStaffId(), actual.getStaffId());
 		assertEquals("mo - member name", expected.getMemberName(), actual.getMemberName());
 		assertEquals("mo - member mobile", expected.getMemberMobile(), actual.getMemberMobile());
@@ -115,6 +99,184 @@ public class TestMember {
 	}
 	
 	@Test
+	public void testMemberChain() throws BusinessException, SQLException{
+		Restaurant group = RestaurantDao.getById(41);
+		Staff groupStaff = StaffDao.getAdminByRestaurant(group.getId());
+		Restaurant branch = RestaurantDao.getById(40);
+		Staff branchStaff = StaffDao.getAdminByRestaurant(branch.getId());
+		
+		RestaurantDao.update(new Restaurant.UpdateBuilder(group.getId()).addBranch(branch));
+		groupStaff = StaffDao.getById(groupStaff.getId());
+		branchStaff = StaffDao.getById(branchStaff.getId());
+		
+		MemberType memberType = MemberTypeDao.getWxMemberType(branchStaff);
+		int memberId = 0;
+		
+		try{
+			//Insert a new member
+			Member.InsertBuilder builder = new Member.InsertBuilder("张三", memberType.getId())
+															   .setMobile("13694260535")
+													 		   .setSex(Sex.FEMALE)
+													 		   .setBirthday(DateUtil.parseDate("1981-03-15"))
+													 		   .setCompany("Digie Co.,Ltd")
+													 		   .setContactAddr("广州市东圃镇晨晖商务大厦")
+													 		   .setIdCard("440711198103154818")
+													 		   .setMemberCard("100010000")
+													 		   .setTele("020-87453214")
+													 		   ;
+			
+			//Test to insert member by branch.
+			memberId = MemberDao.insert(branchStaff, builder);
+			
+			Member actual = MemberDao.getById(branchStaff, memberId);
+			assertEquals("id to member get by branch", memberId, actual.getId());
+			assertEquals("group id to member get by branch", groupStaff.getRestaurantId(), actual.getRestaurantId());
+			assertEquals("branch id to member get by branch", branchStaff.getRestaurantId(), actual.getBranchId());
+
+			actual = MemberDao.getById(groupStaff, memberId);
+			assertEquals("id to member get by group", memberId, actual.getId());
+			assertEquals("group id to member get by group", groupStaff.getRestaurantId(), actual.getRestaurantId());
+			assertEquals("branch id to member get by group", branchStaff.getRestaurantId(), actual.getBranchId());
+			
+			//Test to update member by branch
+			MemberDao.update(branchStaff, new Member.UpdateBuilder(memberId).setName("王五"));
+			actual = MemberDao.getById(branchStaff, memberId);
+			assertEquals("id to member get by branch", memberId, actual.getId());
+			assertEquals("name to member get by branch", "王五", actual.getName());
+
+			actual = MemberDao.getById(groupStaff, memberId);
+			assertEquals("id to member get by group", memberId, actual.getId());
+			assertEquals("name to member get by group", "王五", actual.getName());
+			
+			//Test charge 4 chain
+			testCharge4Chain(groupStaff, branchStaff, actual);
+			testCharge4Chain(branchStaff, groupStaff, actual);
+			
+			//Test consume 4 chain
+			testConsume4Chain(groupStaff, branchStaff, actual);
+			testConsume4Chain(branchStaff, branchStaff, actual);
+			
+			//Test adjust point 4 chain
+			testAdjustPoint4Chain(groupStaff, branchStaff, actual);
+			testAdjustPoint4Chain(branchStaff, groupStaff, actual);
+			
+			//Test point consume 4 chain
+			testPointConsume4Chain(groupStaff, branchStaff, actual);
+			testPointConsume4Chain(branchStaff, groupStaff, actual);
+			
+			//Test refund 4 chain
+			testRefund4Chain(groupStaff, branchStaff, actual);
+			testRefund4Chain(branchStaff, groupStaff, actual);
+			
+		}finally{
+			if(memberId != 0){
+				//Delete the member 		
+				MemberDao.deleteById(groupStaff, memberId);
+				//Check to see whether the member is deleted
+				try{
+					MemberDao.getById(branchStaff, memberId);
+					assertTrue("failed to delete member", false);
+				}catch(BusinessException ignored){
+					
+				}
+			}
+			
+			RestaurantDao.update(new Restaurant.UpdateBuilder(group.getId()).clearBranch());
+		}
+	}
+	
+	private void testCharge4Chain(Staff groupStaff, Staff branchStaff, Member expected) throws BusinessException, SQLException{
+		//Test to charge by branch staff.
+		MemberOperation mo = MemberDao.charge(branchStaff, expected.getId(), 100, 120, ChargeType.CASH);
+		expected.charge(100, 120, ChargeType.CASH);
+		
+		Member actual = MemberDao.getById(branchStaff, expected.getId());
+		compareMember(expected, actual);
+		compareMemberOperation(mo, MemberOperationDao.getById(branchStaff, DateType.TODAY, mo.getId()));
+		
+		actual = MemberDao.getById(groupStaff, expected.getId());
+		compareMember(expected, actual);
+		compareMemberOperation(mo, MemberOperationDao.getById(groupStaff, DateType.TODAY, mo.getId()));
+	}
+	
+	private void testConsume4Chain(Staff groupStaff, Staff branchStaff, Member expected) throws BusinessException, SQLException{
+		MemberDao.charge(branchStaff, expected.getId(), 100, 120, ChargeType.CASH);
+		expected.charge(100, 120, ChargeType.CASH);
+		
+		final int orderId = 10;
+		
+		//使用会员卡余额消费
+		MemberOperation mo = MemberDao.consume(branchStaff, expected.getId(), 50, PayType.MEMBER, orderId);
+		expected.consume(50, PayType.MEMBER);
+		
+		compareMember(expected, MemberDao.getById(branchStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(branchStaff, DateType.TODAY, mo.getId()));
+
+		compareMember(expected, MemberDao.getById(groupStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(groupStaff, DateType.TODAY, mo.getId()));
+		
+		//使用现金消费
+		mo = MemberDao.consume(branchStaff, expected.getId(), 50, PayType.CASH, orderId);
+		expected.consume(50, PayType.CASH);
+		
+		compareMember(expected, MemberDao.getById(branchStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(branchStaff, DateType.TODAY, mo.getId()));
+		
+		compareMember(expected, MemberDao.getById(groupStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(groupStaff, DateType.TODAY, mo.getId()));
+		
+		//使用会员卡余额反结账
+		mo = MemberDao.reConsume(branchStaff, expected.getId(), 50, PayType.MEMBER, orderId);
+		expected.reConsume(50, PayType.MEMBER);
+		
+		compareMember(expected, MemberDao.getById(branchStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(branchStaff, DateType.TODAY, mo.getId()));
+		
+		compareMember(expected, MemberDao.getById(groupStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(groupStaff, DateType.TODAY, mo.getId()));
+		
+		//使用现金反结账
+		mo = MemberDao.reConsume(branchStaff, expected.getId(), 50, PayType.CASH, orderId);
+		expected.reConsume(50, PayType.CASH);
+		
+		compareMember(expected, MemberDao.getById(branchStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(branchStaff, DateType.TODAY, mo.getId()));
+		
+		compareMember(expected, MemberDao.getById(groupStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(groupStaff, DateType.TODAY, mo.getId()));
+	}
+	
+	private void testPointConsume4Chain(Staff groupStaff, Staff branchStaff, Member expected) throws SQLException, BusinessException{
+		MemberOperation mo = MemberDao.pointConsume(branchStaff, expected.getId(), 20);
+		expected.pointConsume(20);
+		
+		compareMember(expected, MemberDao.getById(branchStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(branchStaff, DateType.TODAY, mo.getId()));
+		compareMember(expected, MemberDao.getById(groupStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(groupStaff, DateType.TODAY, mo.getId()));
+	}
+	
+	private void testAdjustPoint4Chain(Staff groupStaff, Staff branchStaff, Member expected) throws SQLException, BusinessException{
+		MemberOperation mo = MemberDao.adjustPoint(branchStaff, expected.getId(), 20, AdjustType.INCREASE);
+		expected.adjustPoint(20, AdjustType.INCREASE);
+		
+		compareMember(expected, MemberDao.getById(branchStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(branchStaff, DateType.TODAY, mo.getId()));
+		compareMember(expected, MemberDao.getById(groupStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(groupStaff, DateType.TODAY, mo.getId()));
+	}
+	
+	private void testRefund4Chain(Staff groupStaff, Staff branchStaff, Member expected) throws SQLException, BusinessException{
+		MemberOperation mo = MemberDao.refund(branchStaff, expected.getId(), 10, 10);
+		expected.refund(10, 10);
+		
+		compareMember(expected, MemberDao.getById(branchStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(branchStaff, DateType.TODAY, mo.getId()));
+		compareMember(expected, MemberDao.getById(groupStaff, expected.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getById(groupStaff, DateType.TODAY, mo.getId()));
+	}
+	
+	@Test
 	public void testMemberBasicOperation() throws BusinessException, SQLException{
 		
 		MemberType memberType = MemberTypeDao.getWxMemberType(mStaff);
@@ -132,22 +294,10 @@ public class TestMember {
 													 		   .setContactAddr("广州市东圃镇晨晖商务大厦")
 													 		   .setIdCard("440711198103154818")
 													 		   .setMemberCard("100010000")
-													 		   .setPrivateComment("嫉妒咸鱼")
-													 		   .setPublicComment("喜欢甜品")
 													 		   .setTele("020-87453214")
 													 		   .setReferrer(referrer.getId());
 			
 			memberId = MemberDao.insert(mStaff, builder);
-			
-			//Commit a private comment to member just inserted
-			MemberComment.CommitBuilder privateCommentBuilder = MemberComment.CommitBuilder.newPrivateBuilder(mStaff.getId(), memberId, "张老板好客，大方");
-			
-			MemberCommentDao.commit(mStaff, privateCommentBuilder);
-			
-			//Commit a public comment to member just inserted
-			MemberComment.CommitBuilder publicCommentBuilder = MemberComment.CommitBuilder.newPublicBuilder(mStaff.getId(), memberId, "张老板是高富帅！！！");
-			
-			MemberCommentDao.commit(mStaff, publicCommentBuilder);
 			
 			Member expect = builder.build();
 			expect.setId(memberId);
@@ -158,16 +308,6 @@ public class TestMember {
 			expect.setPoint(memberType.getInitialPoint());
 			//Set the initial point to expected member
 			expect.setPoint(memberType.getInitialPoint());
-			//Set the private member comment
-			MemberComment privateComment = privateCommentBuilder.build();
-			privateComment.setLastModified(System.currentTimeMillis());
-			expect.setPrivateComment(privateComment);
-			//Set the last public member comment since the staff and member id NOT be set in insert builder
-			expect.getPublicComments().get(expect.getPublicComments().size() - 1).setStaff(mStaff);
-			expect.getPublicComments().get(expect.getPublicComments().size() - 1).setMember(new Member(memberId));
-			expect.getPublicComments().get(expect.getPublicComments().size() - 1).setLastModified(System.currentTimeMillis());
-			//Set the public member comment
-			expect.addPublicComment(publicCommentBuilder.build());
 			
 			Member actual = MemberDao.getById(mStaff, memberId);
 			
@@ -186,21 +326,9 @@ public class TestMember {
 														   .setContactAddr("广州市萝岗区科学城")
 														   .setIdCard("4101234789965412")
 														   .setMemberCard("1000100001")
-														   .setPrivateComment("咩都要")
-														   .setPublicComment("垃圾桶")
 														   .setTele("0750-3399559")
 														   .setReferrer(referrer.getId());
 			MemberDao.update(mStaff, updateBuilder);
-			
-			//Commit a private comment to member just inserted
-			privateCommentBuilder = MemberComment.CommitBuilder.newPrivateBuilder(mStaff.getId(), memberId, "老板小气。。。抠门");
-			
-			MemberCommentDao.commit(mStaff, privateCommentBuilder);
-			
-			//Commit a public comment to member just inserted
-			publicCommentBuilder = MemberComment.CommitBuilder.newPublicBuilder(mStaff.getId(), memberId, "张老板是白富美！！！");
-			
-			MemberCommentDao.commit(mStaff, publicCommentBuilder);
 			
 			expect = updateBuilder.build();
 			expect.setId(memberId);
@@ -210,16 +338,6 @@ public class TestMember {
 			expect.setReferrerId(referrer.getId());
 			//Set the initial point to expected member
 			expect.setPoint(memberType.getInitialPoint());
-			//Set the private member comment
-			privateComment = privateCommentBuilder.build();
-			privateComment.setLastModified(System.currentTimeMillis());
-			expect.setPrivateComment(privateComment);
-			//Set the last public member comment since the staff and member id NOT be set in insert builder
-			expect.getPublicComments().get(expect.getPublicComments().size() - 1).setStaff(mStaff);
-			expect.getPublicComments().get(expect.getPublicComments().size() - 1).setMember(new Member(memberId));
-			expect.getPublicComments().get(expect.getPublicComments().size() - 1).setLastModified(System.currentTimeMillis());
-			//Set the public member comment
-			expect.addPublicComment(publicCommentBuilder.build());
 			
 			actual = MemberDao.getById(mStaff, memberId);
 			
@@ -232,14 +350,14 @@ public class TestMember {
 			//Perform to test consumption
 			testConsume(expect);
 			
-			//Perform to test point consumption
-			testPointConsume(expect);
-			
 			//Perform to test point adjust
 			testAdjustPoint(expect);
 			
+			//Perform to test point consumption
+			testPointConsume(expect);
+			
 			//Perform to test balance adjust
-			testAdjustBalance(expect);
+			testRefund(expect);
 			
 		}finally{
 			if(memberId != 0){
@@ -250,12 +368,6 @@ public class TestMember {
 					MemberDao.getById(mStaff, memberId);
 					assertTrue("failed to delete member", false);
 				}catch(BusinessException ignored){}
-				
-				//Check to see whether the private member comment is deleted
-				assertEquals("failed to delete member private comment", "", MemberCommentDao.getPrivateCommentByMember(mStaff, new Member(memberId)).getComment());
-				
-				//Check to see whether the private member comments are deleted
-				assertTrue("failed to delete member public comments", MemberCommentDao.getPublicCommentByMember(mStaff, new Member(memberId)).isEmpty());
 				
 				//Check to see whether the associated member operations are deleted
 				//assertTrue("failed to delete today member operation", MemberOperationDao.getTodayByMemberId(mStaff, memberId).isEmpty());
@@ -322,16 +434,16 @@ public class TestMember {
 	}
 	
 	private void testAdjustPoint(Member expect) throws SQLException, BusinessException{
-		MemberOperation mo = MemberDao.adjustPoint(mStaff, expect.getId(), 10, AdjustType.INCREASE);
-		expect.adjustPoint(10, AdjustType.INCREASE);
+		MemberOperation mo = MemberDao.adjustPoint(mStaff, expect.getId(), 20, AdjustType.INCREASE);
+		expect.adjustPoint(20, AdjustType.INCREASE);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
 	}
 	
-	private void testAdjustBalance(Member expect) throws SQLException, BusinessException{
-		MemberOperation mo = MemberDao.adjustBalance(mStaff, expect.getId(), 10);
-		expect.adjustBalance(10);
+	private void testRefund(Member expect) throws SQLException, BusinessException{
+		MemberOperation mo = MemberDao.refund(mStaff, expect.getId(), 10, 10);
+		expect.refund(10, 10);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));

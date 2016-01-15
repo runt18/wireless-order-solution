@@ -10,6 +10,7 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.RestaurantError;
 import com.wireless.exception.StaffError;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
@@ -473,8 +474,10 @@ public class StaffDao {
 	private static List<Staff> getByCond(DBCon dbCon, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		
 		String sql = " SELECT "	+
-					 " STAFF.staff_id, STAFF.restaurant_id, STAFF.name, STAFF.role_id, STAFF.tele, STAFF.pwd, STAFF.type AS staff_type" +
+					 " STAFF.staff_id, STAFF.restaurant_id, STAFF.name, STAFF.role_id, STAFF.tele, STAFF.pwd, STAFF.type AS staff_type, " +
+					 " REST.type AS restaurant_type " +
 					 " FROM " + Params.dbName + ".staff STAFF " + " " +
+					 " JOIN " + Params.dbName + ".restaurant REST ON REST.id = STAFF.restaurant_id " +
 					 " LEFT JOIN " + Params.dbName + ".role ROLE " +
 					 " ON STAFF.role_id = ROLE.role_id " +
 					 " WHERE 1=1 " +
@@ -494,13 +497,24 @@ public class StaffDao {
 			staff.setMobile(dbCon.rs.getString("tele"));
 			staff.setPwd(dbCon.rs.getString("pwd"));
 			staff.setType(Staff.Type.valueOf(dbCon.rs.getInt("staff_type")));
+			staff.setRestaurantType(Restaurant.Type.valueOf(dbCon.rs.getInt("restaurant_type")));
 			
 			result.add(staff);
 		}
 		dbCon.rs.close();
 		
-		//Get the associated role to each staff
 		for(Staff staff : result){
+			//Get the group id to each staff in case of branch.
+			if(staff.isBranch()){
+				sql = " SELECT group_id FROM " + Params.dbName + ".restaurant_chain WHERE branch_id = " + staff.getRestaurantId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					staff.setGroupId(dbCon.rs.getInt("group_id"));
+				}
+				dbCon.rs.close();
+			}
+			
+			//Get the associated role to each staff.
 			staff.setRole(RoleDao.getById(dbCon, staff, staff.getRole().getId()));
 		}
 		

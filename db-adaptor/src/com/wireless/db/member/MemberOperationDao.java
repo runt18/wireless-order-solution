@@ -21,6 +21,7 @@ import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberOperation.OperationCate;
 import com.wireless.pojo.member.MemberOperation.OperationType;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
@@ -70,6 +71,7 @@ public class MemberOperationDao {
 		private int payTypeId;
 		private int chargeTypeId;
 		private boolean containsCoupon;
+		private int branchId;
 		private int restaurantId;
 		
 		public ExtraCond(DateType dateType){
@@ -84,6 +86,15 @@ public class MemberOperationDao {
 		ExtraCond setRestaurant(int restaurantId){
 			this.restaurantId = restaurantId;
 			return this;
+		}
+		
+		public ExtraCond setBranch(int branchId){
+			this.branchId = branchId;
+			return this;
+		}
+		
+		public ExtraCond setBranch(Restaurant branch){
+			return setBranch(branch.getId());
 		}
 		
 		public ExtraCond addMember(int memberId){
@@ -235,6 +246,9 @@ public class MemberOperationDao {
 			if(containsCoupon){
 				extraCond.append(" AND MO.coupon_id > 0 AND MO.operate_type = " + OperationType.CONSUME.getValue());
 			}
+			if(branchId != 0){
+				extraCond.append(" AND MO.branch_id = " + branchId);
+			}
 			return extraCond.toString();
 		}
 	}
@@ -258,8 +272,13 @@ public class MemberOperationDao {
 		long now = System.currentTimeMillis();
 		mo.setOperateDate(now);
 		mo.setOperateSeq(mo.getOperationType().getPrefix().concat(DateUtil.format(now, Pattern.MO_SEQ)));
-		
-		mo.setRestaurantId(staff.getRestaurantId());
+
+		if(staff.isBranch()){
+			mo.setRestaurantId(staff.getGroupId());
+			mo.setBranchId(staff.getRestaurantId());
+		}else{
+			mo.setRestaurantId(staff.getRestaurantId());
+		}
 		mo.setStaffId(staff.getId());
 		mo.setStaffName(staff.getName());
 		
@@ -267,14 +286,14 @@ public class MemberOperationDao {
 		sql = " INSERT INTO " +
 			  Params.dbName + ".member_operation " +
 			  "(" +
-			  " restaurant_id, staff_id, staff_name, member_id, member_card, member_name, member_mobile," +
+			  " restaurant_id, branch_id, staff_id, staff_name, member_id, member_card, member_name, member_mobile," +
 			  " operate_seq, operate_date, operate_type, pay_type_id, pay_money, order_id, charge_type, charge_money, " +
 			  " coupon_id, coupon_money, coupon_name, " +
 			  " delta_base_money, delta_extra_money, delta_point, "	+
 			  " remaining_base_money, remaining_extra_money, remaining_point, comment "	+
 			  ")" +
 			  " VALUES( " +
-		      mo.getRestaurantId() + "," + 
+		      (staff.isBranch() ? staff.getGroupId() + "," + staff.getRestaurantId() : staff.getRestaurantId() + "," + " NULL ") + "," + 
 		      mo.getStaffId() + "," +
 		      "'" + mo.getStaffName() + "'," + 
 		      mo.getMemberId() + "," +
@@ -370,7 +389,7 @@ public class MemberOperationDao {
 	public static List<MemberOperation> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
-			  " MO.id, MO.restaurant_id, MO.staff_id, MO.staff_name, " +
+			  " MO.id, MO.restaurant_id, MO.branch_id, MO.staff_id, MO.staff_name, " +
 			  " MO.member_id, MO.member_card, MO.member_name, MO.member_mobile, " +
 			  " MO.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, MO.pay_money, " +
 			  " MO.operate_seq, MO.operate_date, MO.operate_type, MO.order_id, MO.charge_type, MO.charge_money,"	+
@@ -381,7 +400,7 @@ public class MemberOperationDao {
 			  " LEFT JOIN " + Params.dbName + ".member M ON MO.member_id = M.member_id "	+
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = MO.pay_type_id " +
 			  " WHERE 1 = 1 " +
-			  " AND MO.restaurant_id = " + staff.getRestaurantId() +
+			  " AND MO.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  extraCond.setRestaurant(staff.getRestaurantId()).toString() +
 			  (orderClause != null ? orderClause : " ORDER BY MO.id DESC ");
 		
@@ -394,6 +413,7 @@ public class MemberOperationDao {
 													   dbCon.rs.getString("member_card"));
 			mo.setId(dbCon.rs.getInt("id"));
 			mo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			mo.setBranchId(dbCon.rs.getInt("branch_id"));
 			mo.setStaffId(dbCon.rs.getInt("staff_id"));
 			mo.setStaffName(dbCon.rs.getString("staff_name"));
 			mo.setOperateSeq(dbCon.rs.getString("operate_seq"));

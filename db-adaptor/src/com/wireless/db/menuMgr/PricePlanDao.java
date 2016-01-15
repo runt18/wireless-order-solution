@@ -289,8 +289,10 @@ public class PricePlanDao {
 	 * 			the price plan id to delete
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the price plan to delete does NOT exist
 	 */
-	public static void deleteById(Staff staff, int id) throws SQLException{
+	public static void deleteById(Staff staff, int id) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -310,15 +312,28 @@ public class PricePlanDao {
 	 * 			the price plan id to delete
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the price plan to delete does NOT exist
 	 */
-	public static void deleteById(DBCon dbCon, Staff staff, int id) throws SQLException{
-		delete(dbCon, staff, new ExtraCond().setId(id));
+	public static void deleteById(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
+		if(deleteByCond(dbCon, staff, new ExtraCond().setId(id)) == 0){
+			throw new BusinessException(PricePlanError.PRICE_PLAN_NOT_EXIST);
+		}
 	}
 	
-	private static int delete(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+	private static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		int amount = 0;
 		for(PricePlan plan : getByCond(dbCon, staff, extraCond)){
 			String sql;
+			//Check to see whether the price plan to delete is used by member chain.
+			sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member_chain_price WHERE price_plan_id = " + plan.getId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				if(dbCon.rs.getInt(1) > 0){
+					throw new BusinessException("会员连锁正在使用此价格方案，不能删除", PricePlanError.DELETE_NOT_ALLOW);
+				}
+			}
+			dbCon.rs.close();
 			//Delete the price plan.
 			sql = " DELETE FROM " + Params.dbName + ".price_plan WHERE price_plan_id = " + plan.getId();
 			dbCon.stmt.executeUpdate(sql);

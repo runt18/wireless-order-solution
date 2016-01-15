@@ -13,6 +13,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.member.MemberType;
+import com.wireless.pojo.member.MemberType.DiscountType;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -81,7 +82,7 @@ public class MemberTypeDao {
 		String sql = " INSERT INTO " + Params.dbName + ".member_type " 
 				   + " ( `restaurant_id`, `name`, `type`, `exchange_rate`, `charge_rate`, `attribute`, `initial_point`, `desc` )"
 				   + " VALUES("
-				   + mt.getRestaurantId() + ","	
+				   + staff.getRestaurantId() + ","	
 				   + "'" + mt.getName() + "',"
 				   + mt.getType().getVal() + "," +
 				   + mt.getExchangeRate() + ","	
@@ -96,7 +97,7 @@ public class MemberTypeDao {
 		if(dbCon.rs.next()){
 			mt.setId(dbCon.rs.getInt(1));
 		}else{
-			throw new SQLException("Failed to generated the discount id.");
+			throw new SQLException("Failed to generated the member type id.");
 		}
 		
 		//Insert the discounts associated with this member type.
@@ -138,6 +139,62 @@ public class MemberTypeDao {
 			dbCon.stmt.executeUpdate(sql);
 		}
 		
+		//Update the chain discounts.
+		for(MemberType.Discount4Chain chainDiscount : builder.getChainDiscounts()){
+			for(Discount discount : chainDiscount.getDiscounts()){
+				sql = " INSERT INTO " + Params.dbName + ".member_chain_discount " +
+					  " (group_member_type_id, branch_id, discount_id, type) VALUES ( " +
+					  mt.getId() + "," +
+					  chainDiscount.getBranchId() + "," +
+					  discount.getId() + "," +
+					  DiscountType.NORMAL.getVal() + 
+					  ")";
+				dbCon.stmt.executeUpdate(sql);
+			}
+			sql = " UPDATE " + Params.dbName + ".member_chain_discount SET type = " + DiscountType.DEFAULT.getVal() + 
+				  " WHERE group_member_type_id = " + mt.getId() +
+				  " AND branch_id = " + chainDiscount.getBranchId() +
+				  " AND discount_id = " + chainDiscount.getDefaultDiscount().getId();
+			dbCon.stmt.executeUpdate(sql);
+		}
+		
+		//Update the chain prices.
+		for(MemberType.Price4Chain chainPrice : builder.getChainPrices()){
+			for(PricePlan plan : chainPrice.getPrices()){
+				sql = " INSERT INTO " + Params.dbName + ".member_chain_price " +
+					  " (group_member_type_id, branch_id, price_plan_id, type) VALUES ( " +
+					  mt.getId() + "," +
+					  chainPrice.getBranchId() + "," +
+					  plan.getId() + "," +
+					  MemberType.PriceType.NORMAL.getVal() + 
+					  ")";
+				dbCon.stmt.executeUpdate(sql);
+			}
+			sql = " UPDATE " + Params.dbName + ".member_chain_price SET type = " + MemberType.PriceType.DEFAULT.getVal() + 
+				  " WHERE group_member_type_id = " + mt.getId() +
+				  " AND branch_id = " + chainPrice.getBranchId() +
+				  " AND price_plan_id = " + chainPrice.getDefaultPrice().getId();
+			dbCon.stmt.executeUpdate(sql);
+		}
+		
+		//Update the chain prices.
+		for(MemberType.Price4Chain chainPrice : builder.getChainPrices()){
+			for(PricePlan plan : chainPrice.getPrices()){
+				sql = " INSERT INTO " + Params.dbName + ".member_chain_price " +
+					  " (group_member_type_id, branch_id, price_plan_id, type) VALUES ( " +
+					  mt.getId() + "," +
+					  chainPrice.getBranchId() + "," +
+					  plan.getId() + "," +
+					  MemberType.PriceType.NORMAL.getVal() + 
+					  ")";
+				dbCon.stmt.executeUpdate(sql);
+			}
+			sql = " UPDATE " + Params.dbName + ".member_chain_price SET type = " + MemberType.PriceType.DEFAULT.getVal() + 
+				  " WHERE group_member_type_id = " + mt.getId() +
+				  " AND branch_id = " + chainPrice.getBranchId() +
+				  " AND price_plan_id = " + chainPrice.getDefaultPrice().getId();
+			dbCon.stmt.executeUpdate(sql);
+		}
 		return mt.getId();
 	}
 	
@@ -211,6 +268,22 @@ public class MemberTypeDao {
 		//Delete the discounts associated with this member type.
 		sql = " DELETE FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + memberTypeId;
 		dbCon.stmt.executeUpdate(sql);
+		
+		if(staff.isGroup()){
+			//Delete the chain discounts associated with this member type.
+			sql = " DELETE FROM " + Params.dbName + ".member_chain_discount " + 
+				  " WHERE 1 = 1 " +
+				  " AND group_member_type_id = " + memberTypeId +
+				  " AND branch_id IN ( SELECT branch_id FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + staff.getRestaurantId() + ")";
+			dbCon.stmt.executeUpdate(sql);
+			
+			//Delete the chain price plans associated with this member type.
+			sql = " DELETE FROM " + Params.dbName + ".member_chain_price " + 
+				  " WHERE 1 = 1 " +
+				  " AND group_member_type_id = " + memberTypeId +
+				  " AND branch_id IN ( SELECT branch_id FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + staff.getRestaurantId() + ")";
+			dbCon.stmt.executeUpdate(sql);
+		}
 		
 		//Delete the member type.
 		sql = " DELETE FROM " + Params.dbName + ".member_type WHERE member_type_id = " + memberTypeId;
@@ -328,6 +401,80 @@ public class MemberTypeDao {
 				dbCon.stmt.executeUpdate(sql);
 			}
 		}
+		
+		//Update the chain discounts.
+		if(builder.isChainDiscountChanged() && staff.isGroup()){
+			sql = " DELETE FROM " + Params.dbName + ".member_chain_discount " + 
+				  " WHERE 1 = 1 " +
+				  " AND group_member_type_id = " + mt.getId() +
+				  " AND branch_id IN ( SELECT branch_id FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + staff.getRestaurantId() + ")";
+			dbCon.stmt.executeUpdate(sql);
+			
+			for(MemberType.Discount4Chain chainDiscount : builder.getChainDiscounts()){
+				//Check to see whether the branch belongs to the group.
+				sql = " SELECT COUNT(*) FROM " + Params.dbName + ".restaurant_chain WHERE branch_id = " + chainDiscount.getBranchId() + " AND group_id = " + staff.getRestaurantId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					if(dbCon.rs.getInt(1) == 0){
+						continue;
+					}
+				}
+				dbCon.rs.close();
+				
+				for(Discount discount : chainDiscount.getDiscounts()){
+					sql = " INSERT INTO " + Params.dbName + ".member_chain_discount " +
+						  " (group_member_type_id, branch_id, discount_id, type) VALUES ( " +
+						  mt.getId() + "," +
+						  chainDiscount.getBranchId() + "," +
+						  discount.getId() + "," +
+						  DiscountType.NORMAL.getVal() + 
+						  ")";
+					dbCon.stmt.executeUpdate(sql);
+				}
+				sql = " UPDATE " + Params.dbName + ".member_chain_discount SET type = " + DiscountType.DEFAULT.getVal() + 
+					  " WHERE group_member_type_id = " + mt.getId() + 
+					  " AND branch_id = " + chainDiscount.getBranchId() +
+					  " AND discount_id = " + chainDiscount.getDefaultDiscount().getId();
+				dbCon.stmt.executeUpdate(sql);
+			}
+		}
+		
+		//Update the chain prices.
+		if(builder.isChainPricesChanged() && staff.isGroup()){
+			sql = " DELETE FROM " + Params.dbName + ".member_chain_price " + 
+				  " WHERE 1 = 1 " +
+				  " AND group_member_type_id = " + mt.getId() +
+				  " AND branch_id IN ( SELECT branch_id FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + staff.getRestaurantId() + ")";
+			dbCon.stmt.executeUpdate(sql);
+			
+			for(MemberType.Price4Chain chainPrice : builder.getChainPrices()){
+				//Check to see whether the branch belongs to the group.
+				sql = " SELECT COUNT(*) FROM " + Params.dbName + ".restaurant_chain WHERE branch_id = " + chainPrice.getBranchId() + " AND group_id = " + staff.getRestaurantId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					if(dbCon.rs.getInt(1) == 0){
+						continue;
+					}
+				}
+				dbCon.rs.close();
+				
+				for(PricePlan pp : chainPrice.getPrices()){
+					sql = " INSERT INTO " + Params.dbName + ".member_chain_price " +
+						  " (group_member_type_id, branch_id, price_plan_id, type) VALUES ( " +
+						  mt.getId() + "," +
+						  chainPrice.getBranchId() + "," +
+						  pp.getId() + "," +
+						  DiscountType.NORMAL.getVal() + 
+						  ")";
+					dbCon.stmt.executeUpdate(sql);
+				}
+				sql = " UPDATE " + Params.dbName + ".member_chain_price SET type = " + MemberType.PriceType.DEFAULT.getVal() + 
+					  " WHERE group_member_type_id = " + mt.getId() + 
+					  " AND branch_id = " + chainPrice.getBranchId() +
+					  " AND price_plan_id = " + chainPrice.getDefaultPrice().getId();
+				dbCon.stmt.executeUpdate(sql);
+			}
+		}
 	}
 	
 	/**
@@ -374,13 +521,13 @@ public class MemberTypeDao {
 	 * 			throws if any discount associated with the member type is NOT found
 	 */
 	public static List<MemberType> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
-		List<MemberType> result = new ArrayList<MemberType>();
+		final List<MemberType> result = new ArrayList<MemberType>();
 		String sql;
 		sql = " SELECT " +
 			  " member_type_id, restaurant_id, exchange_rate, charge_rate, name, attribute, initial_point, type, `desc` " +
 			  " FROM " + Params.dbName + ".member_type MT " +
 			  " WHERE 1 = 1 " +
-			  " AND MT.restaurant_id = " + staff.getRestaurantId() +
+			  " AND MT.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond.toString() : " ") +
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -400,29 +547,56 @@ public class MemberTypeDao {
 		dbCon.rs.close();
 		
 		for(MemberType eachType : result){
-			//Get the discount associated with this member type.
-			sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + eachType.getId();
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			while(dbCon.rs.next()){
-				Discount distToMemberType = DiscountDao.getById(staff, dbCon.rs.getInt("discount_id"));
-				eachType.addDiscount(distToMemberType);
-				if(MemberType.DiscountType.valueOf(dbCon.rs.getInt("type")) == MemberType.DiscountType.DEFAULT){
-					eachType.setDefaultDiscount(distToMemberType);
+			if(staff.isBranch()){
+				//Get the chain discount associated with this member type.
+				sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_chain_discount WHERE group_member_type_id = " + eachType.getId() + " AND branch_id = " + staff.getRestaurantId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				while(dbCon.rs.next()){
+					Discount distToMemberType = DiscountDao.getById(staff, dbCon.rs.getInt("discount_id"));
+					eachType.addDiscount(distToMemberType);
+					if(MemberType.DiscountType.valueOf(dbCon.rs.getInt("type")) == MemberType.DiscountType.DEFAULT){
+						eachType.setDefaultDiscount(distToMemberType);
+					}
 				}
-			}
-			dbCon.rs.close();
-			
-			//Get the price plan associated with this member type.
-			sql = " SELECT price_plan_id, type FROM " + Params.dbName + ".member_type_price WHERE member_type_id = " + eachType.getId();
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			while(dbCon.rs.next()){
-				PricePlan price = PricePlanDao.getById(staff, dbCon.rs.getInt("price_plan_id"));
-				eachType.addPricePlan(price);
-				if(dbCon.rs.getInt("type") == MemberType.PriceType.DEFAULT.getVal()){
-					eachType.setDefaultPrice(price);
+				dbCon.rs.close();
+				
+				//Get the chain price associated with this member type.
+				sql = " SELECT price_plan_id, type FROM " + Params.dbName + ".member_chain_price WHERE group_member_type_id = " + eachType.getId() + " AND branch_id = " + staff.getRestaurantId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				while(dbCon.rs.next()){
+					PricePlan pp = PricePlanDao.getById(staff, dbCon.rs.getInt("price_plan_id"));
+					eachType.addPricePlan(pp);
+					if(MemberType.PriceType.valueOf(dbCon.rs.getInt("type")) == MemberType.PriceType.DEFAULT){
+						eachType.setDefaultPrice(pp);
+					}
 				}
+				dbCon.rs.close();
+			}else{
+				//Get the discount associated with this member type.
+				sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + eachType.getId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				while(dbCon.rs.next()){
+					Discount distToMemberType = DiscountDao.getById(staff, dbCon.rs.getInt("discount_id"));
+					eachType.addDiscount(distToMemberType);
+					if(MemberType.DiscountType.valueOf(dbCon.rs.getInt("type")) == MemberType.DiscountType.DEFAULT){
+						eachType.setDefaultDiscount(distToMemberType);
+					}
+				}
+				dbCon.rs.close();
+				
+				//Get the price plan associated with this member type.
+				sql = " SELECT price_plan_id, type FROM " + Params.dbName + ".member_type_price WHERE member_type_id = " + eachType.getId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				while(dbCon.rs.next()){
+					PricePlan price = PricePlanDao.getById(staff, dbCon.rs.getInt("price_plan_id"));
+					eachType.addPricePlan(price);
+					if(dbCon.rs.getInt("type") == MemberType.PriceType.DEFAULT.getVal()){
+						eachType.setDefaultPrice(price);
+					}
+				}
+				dbCon.rs.close();
 			}
-			dbCon.rs.close();
+
 		}
 		return result;
 	}

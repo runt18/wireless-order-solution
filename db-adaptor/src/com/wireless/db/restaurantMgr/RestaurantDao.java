@@ -25,6 +25,7 @@ import com.wireless.db.system.BillBoardDao;
 import com.wireless.db.system.BusinessHourDao;
 import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
+import com.wireless.db.weixin.action.WxKeywordDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ModuleError;
@@ -51,6 +52,7 @@ import com.wireless.pojo.system.BusinessHour;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.weixin.action.WxKeyword;
 
 public class RestaurantDao {
 	
@@ -161,7 +163,7 @@ public class RestaurantDao {
 		}
 	}
 	
-	public static List<Restaurant> getByCond(String extraCond, String orderClause) throws SQLException{
+	public static List<Restaurant> getByCond(String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -171,7 +173,7 @@ public class RestaurantDao {
 		}
 	}
 	
-	public static List<Restaurant> getByCond(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	public static List<Restaurant> getByCond(DBCon dbCon, String extraCond, String orderClause) throws SQLException, BusinessException{
 		
 		List<Restaurant> result = new ArrayList<Restaurant>();
 		
@@ -201,6 +203,9 @@ public class RestaurantDao {
 			if(dbCon.rs.getTimestamp("birth_date") != null){
 				restaurant.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
 			}
+			
+			restaurant.setType(Restaurant.Type.valueOf(dbCon.rs.getInt("type")));
+			
 			restaurant.setPublicKey(dbCon.rs.getString("public_key"));
 			restaurant.setPrivateKey(dbCon.rs.getString("private_key"));
 			
@@ -210,17 +215,26 @@ public class RestaurantDao {
 		}
 		dbCon.rs.close();
 		
-		//Get the modules to each restaurant.
 		for(Restaurant eachRestaurant : result){
+			//Get the modules to each restaurant.
 			sql = " SELECT M.module_id, M.code FROM " + Params.dbName + ".restaurant_module RM "	+
 				  " JOIN " + Params.dbName + ".module M " + " ON RM.module_id = M.module_id " + 
 				  " WHERE RM.restaurant_id = " + eachRestaurant.getId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
-				eachRestaurant.addModule(new Module(dbCon.rs.getInt("module_id"), 
-													Module.Code.valueOf(dbCon.rs.getInt("code"))));
+				eachRestaurant.addModule(new Module(dbCon.rs.getInt("module_id"), Module.Code.valueOf(dbCon.rs.getInt("code"))));
 			}
 			dbCon.rs.close();
+			
+			if(eachRestaurant.getType() == Restaurant.Type.GROUP){
+				//Get the branches to each restaurant
+				sql = " SELECT branch_id FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + eachRestaurant.getId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				while(dbCon.rs.next()){
+					eachRestaurant.addBranch(RestaurantDao.getById(dbCon.rs.getInt("branch_id")));
+				}
+				dbCon.rs.close();
+			}
 		}
 		
 		return result;
@@ -304,6 +318,50 @@ public class RestaurantDao {
 		if(builder.isPwdChanged()){
 			Staff admin = StaffDao.getAdminByRestaurant(dbCon, builder.getId());
 			StaffDao.update(dbCon, admin, new Staff.UpdateBuilder(admin.getId()).setStaffPwd(builder.getPwd()));
+		}
+		
+		//Update the branches.
+		if(builder.isBranchChanged()){
+			//Update the branches to restaurant & delete from restaurant chain
+			sql = " UPDATE " + Params.dbName + ".restaurant SET type = " + Restaurant.Type.RESTAURANT.getVal() + " WHERE id IN ( " +
+					  " SELECT branch_id FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + restaurant.getId() + ")";
+			dbCon.stmt.executeUpdate(sql);
+				
+			sql = " DELETE FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + restaurant.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			if(restaurant.hasBranches()){
+				sql = " UPDATE " + Params.dbName + ".restaurant SET type = " + Restaurant.Type.GROUP.getVal() + " WHERE id = " + restaurant.getId();
+				dbCon.stmt.executeUpdate(sql);
+				
+				for(Restaurant branch : restaurant.getBranches()){
+					sql = " DELETE FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + branch.getId();
+					dbCon.stmt.executeUpdate(sql);
+					
+					sql = " INSERT INTO " + Params.dbName + ".restaurant_chain " +
+						  " ( group_id, branch_id ) VALUES ( " +
+						  restaurant.getId() + "," +
+						  branch.getId() + 
+						  ")";
+					dbCon.stmt.executeUpdate(sql);
+					
+					sql = " UPDATE " + Params.dbName + ".restaurant SET type = " + Restaurant.Type.BRANCE.getVal() + " WHERE id = " + branch.getId();
+					dbCon.stmt.executeUpdate(sql);
+				}
+			}else{
+				sql = " UPDATE " + Params.dbName + ".restaurant SET type = " + Restaurant.Type.RESTAURANT.getVal() + " WHERE id = " + restaurant.getId();
+				dbCon.stmt.executeUpdate(sql);
+			}
+			
+			//Clear the unused member chain discount.
+			sql = " DELETE FROM " + Params.dbName + ".member_chain_discount WHERE branch_id NOT IN ( " +
+				  " SELECT branch_id FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + restaurant.getId() + ")";
+			dbCon.stmt.executeUpdate(sql);
+			
+			//Clear the unused member chain price plan.
+			sql = " DELETE FROM " + Params.dbName + ".member_chain_price WHERE branch_id NOT IN ( " +
+				  " SELECT branch_id FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + restaurant.getId() + ")";
+			dbCon.stmt.executeUpdate(sql);
 		}
 	}
 	
@@ -429,6 +487,9 @@ public class RestaurantDao {
 			//Insert the member condition
 			initMemberCond(dbCon, staff);
 			
+			//Insert the 'exception' weixin keyword
+			initWxKeyword(dbCon, staff);
+			
 			return restaurant.getId();
 			
 		}catch(Exception e){
@@ -438,6 +499,10 @@ public class RestaurantDao {
 			throw new SQLException(e);
 		}
 
+	}
+	
+	private static void initWxKeyword(DBCon dbCon, Staff staff) throws SQLException{
+		WxKeywordDao.insert(dbCon, staff, new WxKeyword.InsertBuilder(null, WxKeyword.Type.EXCEPTION));
 	}
 	
 	private static void initMemberCond(DBCon dbCon, Staff staff) throws SQLException{
@@ -498,8 +563,7 @@ public class RestaurantDao {
 	}
 	
 	private static void initMemberType(DBCon dbCon, Staff staff) throws SQLException{
-		MemberType.InsertBuilder builder = new MemberType.InsertBuilder(staff.getRestaurantId(), 
-																		"微信会员", 
+		MemberType.InsertBuilder builder = new MemberType.InsertBuilder("微信会员", 
 																		DiscountDao.getDefault(dbCon, staff))
 														 .setType(MemberType.Type.WEIXIN);
 		MemberTypeDao.insert(dbCon, staff, builder);
@@ -830,7 +894,16 @@ public class RestaurantDao {
 //		dbCon.stmt.executeUpdate(sql);
 //	}
 	
-	public static void deleteById(int restaurantId) throws SQLException{
+	/**
+	 * Delete the restaurant to specific id.
+	 * @param restaurantId
+	 * 			the restaurant id to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the restaurant belongs to group
+	 */
+	public static void deleteById(int restaurantId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -845,11 +918,31 @@ public class RestaurantDao {
 		}
 	}
 	
-	public static void deleteById(DBCon dbCon, int restaurantId) throws SQLException{
+	/**
+	 * Delete the restaurant to specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param restaurantId
+	 * 			the restaurant id to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the restaurant belongs to group
+	 */
+	public static void deleteById(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
 		String sql;
+
+		Restaurant restaurant = getById(dbCon, restaurantId);
+		if(restaurant.hasBranches()){
+			throw new BusinessException("集团下还有门店，不能删除");
+		}
 		
 		//Delete the restaurant
 		sql = " DELETE FROM " + Params.dbName + ".restaurant WHERE id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the restaurant chain
+		sql = " DELETE FROM " + Params.dbName + ".restaurant_chain WHERE branch_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Delete '商品' material category
@@ -869,7 +962,7 @@ public class RestaurantDao {
 			  "( SELECT discount_id FROM " + Params.dbName + ".discount WHERE restaurant_id = " + restaurantId + ")";
 		dbCon.stmt.executeUpdate(sql);
 		
-		//Delete the '无折扣'折扣方案
+		//Delete the discount
 		sql = " DELETE FROM " + Params.dbName + ".discount WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 		
@@ -878,6 +971,7 @@ public class RestaurantDao {
 			  " ( SELECT plan_id FROM " + Params.dbName + ".service_plan WHERE restaurant_id = " + restaurantId + ")";
 		dbCon.stmt.executeUpdate(sql);
 		
+		//Delete the service plan
 		sql = " DELETE FROM " + Params.dbName + ".service_plan WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 		
@@ -922,6 +1016,11 @@ public class RestaurantDao {
 			  " SELECT member_type_id FROM " + Params.dbName + ".member_type WHERE restaurant_id = " + restaurantId + ")";
 		dbCon.stmt.executeUpdate(sql);
 		
+		//Delete the member type price plan
+		sql = " DELETE FROM " + Params.dbName + ".member_type_price WHERE member_type_id IN (" +
+			  " SELECT member_type_id FROM " + Params.dbName + ".member_type WHERE restaurant_id = " + restaurantId + ")";
+		dbCon.stmt.executeUpdate(sql);
+		
 		//Delete the member type
 		sql = " DELETE FROM " + Params.dbName + ".member_type WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
@@ -940,6 +1039,10 @@ public class RestaurantDao {
 
 		//Delete the business hour
 		sql = " DELETE FROM " + Params.dbName + ".business_hour WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the weixin keyword
+		sql = " DELETE FROM " + Params.dbName + ".weixin_keyword WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 	}
 	
@@ -1036,7 +1139,7 @@ public class RestaurantDao {
 		}
 	}
 	
-	public static ExpiredResult calcExpired() throws SQLException{
+	public static ExpiredResult calcExpired() throws SQLException, BusinessException{
 		final int TWO_WEEKS = 3600 * 24 * 1000 * 7;
 		long beginTime = System.currentTimeMillis();
 		int amount = 0;
