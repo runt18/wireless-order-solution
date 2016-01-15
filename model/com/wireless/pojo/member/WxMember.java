@@ -8,6 +8,7 @@ public class WxMember {
 		private final String mobile;
 		private String name;
 		private String birthday;
+		private Member.Age age;
 		
 		public BindBuilder(String serial, String mobile){
 			this.serial = serial;
@@ -46,6 +47,15 @@ public class WxMember {
 		
 		public String getName(){
 			return this.name;
+		}
+		
+		public Member.Age getAge(){
+			return this.age;
+		}
+		
+		public BindBuilder setAge(Member.Age age){
+			this.age = age;
+			return this;
 		}
 	}
 	
