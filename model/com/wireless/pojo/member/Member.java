@@ -2,7 +2,6 @@ package com.wireless.pojo.member;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import com.wireless.exception.BusinessException;
@@ -17,12 +16,46 @@ import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
-import com.wireless.pojo.util.SortedList;
 
 public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	public static final int MEMBER_PARCELABLE_SIMPLE = 0;
 	public static final int MEMBER_PARCELABLE_COMPLEX = 1;
+	
+	public static enum Age{
+		UNKNOWN(0, "未填写"),
+		AGE_60(1, "60后"),
+		AGE_70(2, "70后"),
+		AGE_80(3, "80后"),
+		AGE_90(4, "90后"),
+		AGE_00(5, "00后");
+		
+		private final int val;
+		private final String desc;
+		
+		Age(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public static Age valueOf(int val){
+			for(Age age : values()){
+				if(age.val == val){
+					return age;
+				}
+			}
+			throw new IllegalArgumentException("The age(val = " + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
 	
 	/**
 	 * 积分调整类型
@@ -129,20 +162,16 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			this.data.setBirthday(birthday);
 			return this;
 		}
+		public InsertBuilder setAge(Age age){
+			this.data.setAge(age);
+			return this;
+		}
 		public InsertBuilder setIdCard(String idCard){
 			this.data.setIdCard(idCard);
 			return this;
 		}
 		public InsertBuilder setCompany(String company){
 			this.data.setCompany(company);
-			return this;
-		}
-		public InsertBuilder setPrivateComment(String comment){
-			this.data.setPrivateComment(MemberComment.newPrivateComment(null, null, comment));
-			return this;
-		}
-		public InsertBuilder setPublicComment(String comment){
-			this.data.addPublicComment(MemberComment.newPublicComment(null, null, comment));
 			return this;
 		}
 		public InsertBuilder setContactAddr(String addr){
@@ -170,6 +199,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		private Sex sex;					// 性别
 		private String tele;				// 电话
 		private String mobile;				// 手机
+		private Age age;					// 年龄段
 		private Long birthday;				// 生日
 		private String idCard;				// 身份证
 		private String company;				// 公司
@@ -178,8 +208,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		private String memberCard;			// 会员卡号
 		private int referrerId;				// 推荐人
 		private int wxOrderAmount = -1;		// 微信订单数量
-		private String privateComment;		// 私人评论
-		private String publicComment;		// 公开评论
 		
 		public UpdateBuilder(int memberId){
 			this.memberId = memberId;
@@ -253,6 +281,15 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			return this.tele != null;
 		}
 		
+		public UpdateBuilder setAge(Age age){
+			this.age = age;
+			return this;
+		}
+		
+		public boolean isAgeChanged(){
+			return this.age != null;
+		}
+		
 		public UpdateBuilder setBirthday(String birthday){
 			if(birthday != null){
 				this.birthday = DateUtil.parseDate(birthday);
@@ -287,24 +324,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			return this.company != null;
 		}
 		
-		public UpdateBuilder setPrivateComment(String comment){
-			this.privateComment = comment;
-			return this;
-		}
-		
-		public boolean isPrivateCommentChanged(){
-			return this.privateComment != null;
-		}
-		
-		public UpdateBuilder setPublicComment(String comment){
-			this.publicComment = comment;
-			return this;
-		}
-		
-		public boolean isPublicCommentChanged(){
-			return this.publicComment != null;
-		}
-		
 		public UpdateBuilder setContactAddr(String addr){
 			this.contactAddress = addr;
 			return this;
@@ -335,6 +354,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		private String name;
 		private Sex sex;
 		private long birthday;
+		private Age age;
 		private final MemberType memberType = new MemberType(0);
 		
 		public BindBuilder(int memberId, String mobile, String card){
@@ -352,6 +372,11 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			return this;
 		}
 
+		public BindBuilder setAge(Age age){
+			this.age = age;
+			return this;
+		}
+		
 		public BindBuilder setBirthday(long birthday) {
 			this.birthday = birthday;
 			return this;
@@ -374,6 +399,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			dest.setName(name);
 			dest.setSex(sex);
 			dest.setBirthday(birthday);
+			dest.setAge(age);
 			dest.setMemberType(memberType);
 			return new Member[]{ source, dest };
 		}
@@ -381,6 +407,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	private int id;
 	private int restaurantId;
+	private int branchId;
 	private float totalConsumption;		// 消费总额
 	private int totalPoint;				// 累计积分
 	private float totalCharge;			// 累计充值额
@@ -396,6 +423,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private Sex sex = Sex.MALE;			// 性别
 	private String tele;				// 电话
 	private String mobile;				// 手机
+	private Age age;					// 年龄段
 	private long birthday;				// 生日
 	private String idCard;				// 身份证
 	private String company;				// 公司
@@ -412,24 +440,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private final List<Food> favorFoods = new ArrayList<Food>();
 	//向Ta推荐的菜品
 	private final List<Food> recommendFoods = new ArrayList<Food>();
-	
-	//会员的公开评论
-	private SortedList<MemberComment> publicComments = SortedList.newInstance(new Comparator<MemberComment>(){
-		@Override
-		public int compare(MemberComment arg0, MemberComment arg1) {
-			//按评论时间倒序
-			if(arg0.getLastModified() > arg1.getLastModified()){
-				return -1;
-			}else if(arg0.getLastModified() < arg1.getLastModified()){
-				return 1;
-			}else{
-				return 0;
-			}
-		}	
-	
-	});
-	
-	private MemberComment privateComment;	//某个员工的私有评论
 	
 	private Member(){
 		
@@ -455,6 +465,9 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		if(builder.isBirthdayChanged()){
 			setBirthday(builder.birthday);
 		}
+		if(builder.isAgeChanged()){
+			setAge(builder.age);
+		}
 		if(builder.isIdChardChanged()){
 			setIdCard(builder.idCard);
 		}
@@ -469,12 +482,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}
 		if(builder.isMemberCardChanged()){
 			setMemberCard(builder.memberCard);
-		}
-		if(builder.isPublicCommentChanged()){
-			addPublicComment(MemberComment.newPublicComment(null, new Member(builder.memberId), builder.publicComment));
-		}
-		if(builder.isPrivateCommentChanged()){
-			setPrivateComment(MemberComment.newPrivateComment(null, new Member(builder.memberId), builder.privateComment));
 		}
 		if(builder.isReferrerChanged()){
 			setReferrerId(builder.referrerId);
@@ -842,8 +849,9 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			dest.writeString(this.getMemberCard());
 			dest.writeInt(this.getConsumptionAmount());
 			dest.writeLong(this.getLastConsumption());
-			dest.writeParcelList(this.publicComments, 0);
-			dest.writeParcel(this.privateComment, 0);
+			//FIXME
+			dest.writeParcelList(null, 0);
+			dest.writeParcel(null, 0);
 			dest.writeParcelList(this.favorFoods, Food.FOOD_PARCELABLE_SIMPLE);
 			dest.writeParcelList(this.recommendFoods, Food.FOOD_PARCELABLE_SIMPLE);
 		}
@@ -869,8 +877,9 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			setMemberCard(source.readString());
 			setConsumptionAmount(source.readInt());
 			setLastConsumption(source.readLong());
-			setPublicComments(source.readParcelList(MemberComment.CREATOR));
-			setPrivateComment(source.readParcel(MemberComment.CREATOR));
+			//FIXME
+			source.readParcelList(null);
+			source.readParcel(null);
 			setFavorFoods(source.readParcelList(Food.CREATOR));
 			setRecommendFoods(source.readParcelList(Food.CREATOR));
 		}
@@ -920,8 +929,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.putLong("createDate", this.createDate);
 		jm.putString("createDateFormat", DateUtil.format(this.createDate, Pattern.DATE.getPattern()));
 		jm.putString("memberCard", this.memberCard);
-		jm.putJsonableList("publicComment", this.publicComments, 0);
-		jm.putJsonable("privateComment", this.privateComment, 0);
 		jm.putBoolean("isRaw", this.isRaw());
 		jm.putString("referrer", this.getReferrer());
 		return jm;
@@ -950,6 +957,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
+	}
+	
+	public void setBranchId(int branchId){
+		this.branchId = branchId;
+	}
+	
+	public int getBranchId(){
+		return this.branchId;
 	}
 	
 	public float getBaseBalance() {
@@ -1067,6 +1082,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	public boolean hasMobile(){
 		return this.getMobile().trim().length() != 0;
+	}
+	
+	public Age getAge(){
+		return this.age;
+	}
+	
+	public void setAge(Age age){
+		this.age = age;
 	}
 	
 	public long getBirthday() {
@@ -1205,57 +1228,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		return this.wxOrderAmount;
 	}
 	
-	public void addPublicComment(MemberComment comment){
-		if(comment != null){
-			if(comment.getType() != MemberComment.Type.PUBLIC){
-				throw new IllegalArgumentException("The comment should be public.");
-			}
-			if(comment.getMemberId() != this.id){
-				throw new IllegalArgumentException("The comment does NOT belong to this member.");
-			}
-			for(MemberComment publicComment : publicComments){
-				if(comment.getStaffId() == publicComment.getStaffId()){
-					publicComment.setComment(comment.getComment());
-					return;
-				}
-			}
-			this.publicComments.add(comment);
-		}
-	}
-	
-	public void setPublicComments(List<MemberComment> comments){
-		if(comments != null){
-			this.publicComments.clear();
-			this.publicComments.addAll(comments);
-		}
-	}
-	
-	public List<MemberComment> getPublicComments(){
-		return Collections.unmodifiableList(this.publicComments);
-	}
-	
-	public boolean hasPublicComments(){
-		return this.publicComments.size() != 0;
-	}
-	
-	public void setPrivateComment(MemberComment comment){
-		if(comment != null){
-			this.privateComment = comment;
-		}
-	}
-	
-	public MemberComment getPrivateComment(){
-		if(this.privateComment != null){
-			return this.privateComment;
-		}else{
-			return MemberComment.newPrivateComment(null, this, "");
-		}
-	}
-	
-	public boolean hasPrivateComment(){
-		return this.privateComment != null && !this.privateComment.getComment().trim().equals("");
-	}
-
 	public List<Food> getFavorFoods(){
 		return Collections.unmodifiableList(this.favorFoods);
 	}

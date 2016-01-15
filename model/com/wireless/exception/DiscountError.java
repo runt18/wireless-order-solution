@@ -5,9 +5,9 @@ public class DiscountError extends ErrorEnum{
 	 *  code range : 9300 - 9499 
 	 */
 	public static final ErrorCode DISCOUNT_NOT_EXIST = build(9499, "操作失败, 操作的折扣方案不存在");
-	public static final ErrorCode RESERVED_NOT_ALLOW_DELETE = build(9498, "操作失败, 保留的折扣方案不能删除");
+	public static final ErrorCode DELETE_NOT_ALLOW = build(9498, "操作失败, 保留的折扣方案不能删除");
 	//public static final ErrorCode PLAN_UPDATE_FAIL_SINCE_KITCHEN_NOT_EXIST = build(9497, "操作失败, 折扣修改的相应厨房不存在");
-	public static final ErrorCode DISCOUNT_USED_BY_MEMBER_TYPE = build(9497, "操作失败, 有会员类型正在使用此折扣方案");
+	//public static final ErrorCode DISCOUNT_USED_BY_MEMBER_TYPE = build(9497, "操作失败, 有会员类型正在使用此折扣方案");
 
 	public static final ErrorCode DISCOUNT_INSERT_FAIL = build(9499, "操作失败, 添加折扣方案基础信息失败, 请检查数据内容是否正确.");
 	public static final ErrorCode DISCOUNT_DELETE_FAIL = build(9498, "操作失败, 删除折扣方案基础信息失败, 该方案不存在或已被删除.");

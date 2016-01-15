@@ -10,6 +10,7 @@ import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.PricePlan;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 
 public class MemberType implements Jsonable, Parcelable{
 	
@@ -158,13 +159,82 @@ public class MemberType implements Jsonable, Parcelable{
 		}
 	}
 	
-	//The helper class to insert a member type
-	public static class InsertBuilder{
-		private final int restaurantId;
-		private final String name;
+	public static class Discount4Chain{
+		private final int branchId;
+		private final List<Discount> discounts = new ArrayList<Discount>();
 		private final Discount defaultDiscount;
 		
+		public Discount4Chain(Restaurant branch, Discount defaultDiscount){
+			this(branch.getId(), defaultDiscount);
+		}
+		
+		public Discount4Chain(int branchId, Discount defaultDiscount){
+			this.branchId = branchId;
+			this.discounts.add(defaultDiscount);
+			this.defaultDiscount = defaultDiscount;
+		}
+		
+		public Discount4Chain addDiscount(Discount discount){
+			if(!this.discounts.contains(discount)){
+				this.discounts.add(discount);
+			}
+			return this;
+		}
+		
+		public List<Discount> getDiscounts(){
+			return Collections.unmodifiableList(this.discounts);
+		}
+		
+		public Discount getDefaultDiscount(){
+			return this.defaultDiscount;
+		}
+		
+		public int getBranchId(){
+			return this.branchId;
+		}
+	}
+	
+	public static class Price4Chain{
+		private final int branchId;
+		private final List<PricePlan> prices = new ArrayList<PricePlan>();
+		private final PricePlan defaultPrice;
+		
+		public Price4Chain(Restaurant branch, PricePlan defaultPrice){
+			this(branch.getId(), defaultPrice);
+		}
+		
+		public Price4Chain(int branchId, PricePlan defaultPrice){
+			this.branchId = branchId;
+			this.prices.add(defaultPrice);
+			this.defaultPrice = defaultPrice;
+		}
+		
+		public Price4Chain addPrice(PricePlan price){
+			if(!this.prices.contains(price)){
+				this.prices.add(price);
+			}
+			return this;
+		}
+		
+		public List<PricePlan> getPrices(){
+			return Collections.unmodifiableList(this.prices);
+		}
+		
+		public PricePlan getDefaultPrice(){
+			return this.defaultPrice;
+		}
+		
+		public int getBranchId(){
+			return this.branchId;
+		}
+	}
+	
+	//The helper class to insert a member type
+	public static class InsertBuilder{
+		private final String name;
+		
 		private Type type = Type.NORMAL;
+		private final Discount defaultDiscount;
 		private final List<Discount> discounts = new ArrayList<Discount>();
 		private PricePlan defaultPrice;
 		private final List<PricePlan> prices = new ArrayList<PricePlan>();
@@ -174,10 +244,13 @@ public class MemberType implements Jsonable, Parcelable{
 		private int initialPoint = 0;
 		private String desc;
 
-		public InsertBuilder(int restaurantId, String name, Discount defaultDiscount){
-			this.restaurantId = restaurantId;
+		private final List<Discount4Chain> chainDiscounts = new ArrayList<Discount4Chain>();
+
+		private final List<Price4Chain> chainPrices = new ArrayList<Price4Chain>();
+		
+		public InsertBuilder(String name, Discount defaultDiscount){
 			this.name = name;
-			discounts.add(defaultDiscount);
+			this.discounts.add(defaultDiscount);
 			this.defaultDiscount = defaultDiscount;
 		}
 
@@ -239,6 +312,24 @@ public class MemberType implements Jsonable, Parcelable{
 			return this;
 		}
 		
+		public InsertBuilder addChainDiscount(Discount4Chain chainDiscount){
+			this.chainDiscounts.add(chainDiscount);
+			return this;
+		}
+		
+		public List<Discount4Chain> getChainDiscounts(){
+			return Collections.unmodifiableList(this.chainDiscounts);
+		}
+		
+		public InsertBuilder addChainPrice(Price4Chain chainPrice){
+			this.chainPrices.add(chainPrice);
+			return this;
+		}
+		
+		public List<Price4Chain> getChainPrices(){
+			return Collections.unmodifiableList(this.chainPrices);
+		}
+		
 		public MemberType build(){
 			return new MemberType(this);
 		}
@@ -257,6 +348,9 @@ public class MemberType implements Jsonable, Parcelable{
 		private Attribute attribute;
 		private int initialPoint = -1;
 		private String desc;
+		
+		private List<Discount4Chain> chainDiscounts;
+		private List<Price4Chain> chainPrices;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
@@ -378,6 +472,53 @@ public class MemberType implements Jsonable, Parcelable{
 			return this;
 		}
 		
+		public boolean isChainDiscountChanged(){
+			return this.chainDiscounts != null;
+		}
+		
+		public UpdateBuilder clearChainDiscount(){
+			if(this.chainDiscounts == null){
+				this.chainDiscounts = new ArrayList<Discount4Chain>();
+			}
+			this.chainDiscounts.clear();
+			return this;
+		}
+		
+		public UpdateBuilder addChainDiscount(Discount4Chain chainDiscount){
+			if(this.chainDiscounts == null){
+				this.chainDiscounts = new ArrayList<Discount4Chain>();
+			}
+			this.chainDiscounts.add(chainDiscount);
+			return this;
+		}
+		
+		public List<Discount4Chain> getChainDiscounts(){
+			return Collections.unmodifiableList(this.chainDiscounts);
+		}
+		
+		public UpdateBuilder clearChainPrice(){
+			if(this.chainPrices == null){
+				this.chainPrices = new ArrayList<Price4Chain>();
+			}
+			return this;
+		}
+		
+		public UpdateBuilder addChainPrice(Price4Chain chainPrice){
+			if(this.chainPrices == null){
+				this.chainPrices = new ArrayList<Price4Chain>();
+			}
+			this.chainPrices.add(chainPrice);
+			return this;
+		}
+		
+		public List<Price4Chain> getChainPrices(){
+			return Collections.unmodifiableList(this.chainPrices);
+		}
+		
+		public boolean isChainPricesChanged(){
+			return this.chainPrices != null;
+		}
+		
 		public MemberType build(){
 			return new MemberType(this);
 		}
@@ -398,7 +539,6 @@ public class MemberType implements Jsonable, Parcelable{
 	private String desc;
 	
 	private MemberType(InsertBuilder builder){
-		setRestaurantId(builder.restaurantId);
 		setName(builder.name);
 		setType(builder.type);
 		setDiscounts(builder.discounts);

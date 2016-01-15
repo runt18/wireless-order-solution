@@ -158,6 +158,7 @@ public class MemberOperation implements Jsonable {
 
 	private int id;
 	private int restaurantId;
+	private int branchId;
 	private int staffId;
 	private String staffName;
 	private Member member;
@@ -268,6 +269,14 @@ public class MemberOperation implements Jsonable {
 		this.restaurantId = restaurantId;
 	}
 
+	public void setBranchId(int branchId){
+		this.branchId = branchId;
+	}
+	
+	public int getBranchId(){
+		return this.branchId;
+	}
+	
 	public int getStaffId() {
 		return staffId;
 	}

@@ -107,11 +107,35 @@ public class Restaurant implements Parcelable, Jsonable{
 		private RSACoder coder;
 		private String beeCloudAppId;
 		private String beeCloudAppSecret;
+		private List<Restaurant> branches;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
 		}
 
+		public boolean isBranchChanged(){
+			return branches != null;
+		}
+		
+		public UpdateBuilder clearBranch(){
+			if(branches == null){
+				branches = new ArrayList<Restaurant>();
+			}
+			return this;
+		}
+		
+		public UpdateBuilder addBranch(Restaurant restaurant){
+			if(branches == null){
+				branches = new ArrayList<Restaurant>();
+			}
+			branches.add(restaurant);
+			return this;
+		}
+		
+		public UpdateBuilder addBranch(int restaurantId){
+			return addBranch(new Restaurant(restaurantId));
+		}
+		
 		public UpdateBuilder setAccount(String account){
 			this.account = account;
 			return this;
@@ -261,6 +285,38 @@ public class Restaurant implements Parcelable, Jsonable{
 	public static final int RESERVED_6 = 9;
 	public static final int RESERVED_7 = 10;
 	
+	public static enum Type{
+		RESTAURANT(1, "餐厅"),
+		GROUP(2, "集团"),
+		BRANCE(3, "门店");
+		
+		private final int val;
+		private final String desc;
+		
+		Type(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		public static Type valueOf(int val){
+			for(Type type : values()){
+				if(type.val == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The type(val = " + val + ") is invalid.");
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
+	
 	public static enum RecordAlive{
 		NEVER_EXPIRED(1, 0, "无限期"),
 		THREE_MONTHS(2, 3600 * 24 * 90, "90天"),
@@ -326,11 +382,13 @@ public class Restaurant implements Parcelable, Jsonable{
 	private long birthDate;
 	private long expireDate;
 	private int dianpingId;
+	private Type type;
 	private String publicKey;
 	private String privateKey;
 	private String beeCloudAppId;
 	private String beeCloudAppSecret;
 	private final List<Module> modules = new ArrayList<Module>();
+	private final List<Restaurant> branches = new ArrayList<Restaurant>();
 	
 	public Restaurant(){
 		
@@ -391,9 +449,14 @@ public class Restaurant implements Parcelable, Jsonable{
 		String now = new SimpleDateFormat(DateUtil.Pattern.DATE.getPattern(), Locale.getDefault()).format(new Date());
 		try {
 			setBirthDate(new SimpleDateFormat(DateUtil.Pattern.DATE.getPattern(), Locale.getDefault()).parse(now).getTime());
-		} catch (ParseException ignored) {}
+		} catch (ParseException ignored) {
+			
+		}
 		if(builder.isModuleChanged()){
 			setModule(builder.modules);
+		}
+		if(builder.isBranchChanged()){
+			setBranches(builder.branches);
 		}
 		if(builder.isRSAChanged()){
 			setPublicKey(builder.coder.getPublicKey());
@@ -539,6 +602,14 @@ public class Restaurant implements Parcelable, Jsonable{
 		}
 	}
 
+	public Type getType(){
+		return this.type;
+	}
+	
+	public void setType(Type type){
+		this.type = type;
+	}
+	
 	public String getPublicKey(){
 		return this.publicKey;
 	}
@@ -598,6 +669,25 @@ public class Restaurant implements Parcelable, Jsonable{
 	
 	public boolean hasModule(Module.Code code){
 		return modules.contains(new Module(code));
+	}
+	
+	public void setBranches(List<Restaurant> branches){
+		this.branches.clear();
+		for(Restaurant branch : branches){
+			addBranch(branch);
+		}
+	}
+	
+	public void addBranch(Restaurant restaurant){
+		this.branches.add(restaurant);
+	}
+	
+	public List<Restaurant> getBranches(){
+		return Collections.unmodifiableList(this.branches);
+	}
+	
+	public boolean hasBranches(){
+		return !this.branches.isEmpty();
 	}
 	
 	@Override

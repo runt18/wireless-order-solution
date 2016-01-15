@@ -4,6 +4,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 public class Staff implements Parcelable, Jsonable{ 
 
 	public final static byte ST_PARCELABLE_COMPLEX = 1;
@@ -97,7 +98,10 @@ public class Staff implements Parcelable, Jsonable{
 	private String pwd;
 	//the role to this staff
 	private Role role;
-	
+	//the group id to this staff
+	private int groupId;
+	//the restaurant type to this staff
+	private Restaurant.Type restaurantType;
 
 	public static class AdminBuilder extends InsertBuilder{
 		
@@ -289,6 +293,30 @@ public class Staff implements Parcelable, Jsonable{
 		if(role != null){
 			this.role = role;
 		}
+	}
+	
+	public int getGroupId(){
+		return this.groupId;
+	}
+	
+	public void setGroupId(int groupId){
+		this.groupId = groupId;
+	}
+	
+	public void setRestaurantType(Restaurant.Type type){
+		this.restaurantType = type;
+	}
+	
+	public boolean isGroup(){
+		return this.restaurantType == Restaurant.Type.GROUP;
+	}
+	
+	public boolean isBranch(){
+		return this.restaurantType == Restaurant.Type.BRANCE;
+	}
+	
+	public boolean isRestaurant(){
+		return this.restaurantType == Restaurant.Type.RESTAURANT;
 	}
 	
 	@Override 
