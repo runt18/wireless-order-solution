@@ -332,7 +332,7 @@ public class CouponTypeDao {
 		sql = " SELECT " +
 			  " coupon_type_id, restaurant_id, name, price, expired, comment, oss_image_id " +
 			  " FROM " + Params.dbName + ".coupon_type " +
-			  " WHERE restaurant_id = " + staff.getRestaurantId() +
+			  " WHERE restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond : " ") +
 			  (orderClause != null ? orderClause: "");
 

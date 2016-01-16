@@ -195,7 +195,7 @@ public class CouponDao {
 						//Issue a new coupon.
 						sql = " INSERT INTO " + Params.dbName + ".coupon " +
 							  "(`restaurant_id`, `coupon_type_id`, `promotion_id`, `birth_date`, `member_id`, `status`) VALUES (" +
-							  staff.getRestaurantId() + "," +
+							  (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) + "," +
 							  promotion.getCouponType().getId() + "," +
 							  promotion.getId() + "," +
 							  " NOW(), " +
@@ -586,7 +586,7 @@ public class CouponDao {
 			  " JOIN " + Params.dbName + ".member M ON C.member_id = M.member_id " +
 			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " +
 			  " WHERE 1 = 1 " +
-			  " AND C.restaurant_id = " + staff.getRestaurantId() +
+			  " AND C.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()) : " ") +
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

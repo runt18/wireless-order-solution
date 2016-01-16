@@ -226,8 +226,9 @@ public class CouponOperationDao {
 		Coupon coupon = CouponDao.getById(dbCon, staff, detail.getCouponId());
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".coupon_operation " +
-			  " (restaurant_id, coupon_id, coupon_name, coupon_price, operate, associate_id, operate_date, operate_staff, operate_staff_id, member_id, member_name, comment) VALUES( " +
-			  staff.getRestaurantId() + "," +
+			  " (restaurant_id, branch_id, coupon_id, coupon_name, coupon_price, operate, associate_id, operate_date, operate_staff, operate_staff_id, member_id, member_name, comment) VALUES( " +
+			  (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) + "," +
+			  (staff.isBranch() ? staff.getRestaurantId() : "NULL") + "," +
 			  coupon.getId() + "," +
 			  "'" + coupon.getName() + "'," +
 			  coupon.getPrice() + "," +
@@ -277,7 +278,9 @@ public class CouponOperationDao {
 	 */
 	public static List<CouponOperation> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
-		sql = " SELECT * FROM " + Params.dbName + ".coupon_operation WHERE restaurant_id = " + staff.getRestaurantId() +
+		sql = " SELECT * FROM " + Params.dbName + ".coupon_operation " + 
+			  " WHERE 1 = 1 " + 
+			  " AND restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond.setInternalStaff(staff) : "") +
 			  " ORDER BY operate_date DESC ";
 		
@@ -287,6 +290,8 @@ public class CouponOperationDao {
 		while(dbCon.rs.next()){
 			CouponOperation operation = new CouponOperation(dbCon.rs.getInt("id"));
 			operation.setCouponId(dbCon.rs.getInt("coupon_id"));
+			operation.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			operation.setBranchId(dbCon.rs.getInt("branch_id"));
 			operation.setCouponName(dbCon.rs.getString("coupon_name"));
 			operation.setCouponPrice(dbCon.rs.getFloat("coupon_price"));
 			operation.setAssociateId(dbCon.rs.getInt("associate_id"));

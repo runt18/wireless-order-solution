@@ -225,22 +225,22 @@ public class PromotionDao {
 			OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder4Html(OssImage.Type.WX_PROMOTION, promotionId).setHtml(promotion.getBody()));
 			
 			//Generate the image to this promotion's body.
-			try{
-				HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
-				imageGenerator.loadHtml(promotion.getBody());
-				ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
-				ImageIO.write(new CompressImage().imageZoomOut(imageGenerator.getBufferedImage(), 360, 280), OssImage.ImageType.PNG.getSuffix(), bosJpg);
-				bosJpg.flush();
-			
-				int ossImageId = OssImageDao.insert(dbCon, staff, 
-								   					new OssImage.InsertBuilder(OssImage.Type.PROMOTION, promotionId)
-									 		   				    .setImgResource(OssImage.ImageType.PNG, new ByteArrayInputStream(bosJpg.toByteArray())));
-				
-				sql = " UPDATE " + Params.dbName + ".promotion SET oss_image_id = " + ossImageId + " WHERE promotion_id = " + promotionId;
-				dbCon.stmt.executeUpdate(sql);
-			}catch(IOException e){
-				e.printStackTrace();
-			}
+//			try{
+//				HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
+//				imageGenerator.loadHtml(promotion.getBody());
+//				ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
+//				ImageIO.write(new CompressImage().imageZoomOut(imageGenerator.getBufferedImage(), 360, 280), OssImage.ImageType.PNG.getSuffix(), bosJpg);
+//				bosJpg.flush();
+//			
+//				int ossImageId = OssImageDao.insert(dbCon, staff, 
+//								   					new OssImage.InsertBuilder(OssImage.Type.PROMOTION, promotionId)
+//									 		   				    .setImgResource(OssImage.ImageType.PNG, new ByteArrayInputStream(bosJpg.toByteArray())));
+//				
+//				sql = " UPDATE " + Params.dbName + ".promotion SET oss_image_id = " + ossImageId + " WHERE promotion_id = " + promotionId;
+//				dbCon.stmt.executeUpdate(sql);
+//			}catch(IOException e){
+//				e.printStackTrace();
+//			}
 		}
 		
 		return promotionId;
@@ -450,7 +450,7 @@ public class PromotionDao {
 			  " FROM " + Params.dbName + ".promotion P " +
 			  " LEFT JOIN " + Params.dbName + ".oss_image OI ON P.oss_image_id = OI.oss_image_id " +
 			  " WHERE 1 = 1 " +
-			  " AND P.restaurant_id = " + staff.getRestaurantId() +
+			  " AND P.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()) : "") +
 			  " ORDER BY P.create_date ";
 		
