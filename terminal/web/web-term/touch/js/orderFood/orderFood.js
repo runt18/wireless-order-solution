@@ -2567,25 +2567,29 @@ $(function(){
 						}
 						
 						if(of.table){
-							of.submit({
-								notPrint : false,
-								postSubmit : function(){
-									//清空已点菜
-									$('#orderFoodsCmp').html('');
-									//清空状态栏
-									$('#divDescForCreateOrde div:first').html(''); 
-									$('#orderFoodsCmp').listview('refresh');
-									
-									//更新餐台
-									$.post('../QueryTable.do', {tableID : of.table.id}, function(result){
-										of.table = result.root[0];
-									});
-									//更新账单
-									$.post('../QueryOrderByCalc.do', {tableID : of.table.id}, function(result){
-										of.order = result.other.order;
-									});
-								} 
-							});
+							brandPopup.close(function(){
+								of.submit({
+									notPrint : false,
+									force : true,
+									postSubmit : function(){
+										//清空已点菜
+										$('#orderFoodsCmp').html('');
+										of.newFood.clear();
+										//清空状态栏
+										$('#divDescForCreateOrde div:first').html(''); 
+										$('#orderFoodsCmp').listview('refresh');
+										
+										//更新餐台
+										$.post('../QueryTable.do', {tableID : of.table.id}, function(result){
+											of.table = result.root[0];
+										});
+										//更新账单
+										$.post('../QueryOrderByCalc.do', {tableID : of.table.id}, function(result){
+											of.order = result.other.order;
+										});
+									} 
+								});
+							}, 200);
 						}else{
 							Util.msg.alert({
 								msg : '没有此餐桌号.', 
@@ -2695,9 +2699,11 @@ $(function(){
 			$('#orderMore_div_orderFood').popup('close');
 			of.submit({
 				notPrint : false,
+				force : true,
 				postSubmit : function(){
 					//清空已点菜
 					$('#orderFoodsCmp').html('');
+					of.newFood.clear();
 					//清空状态栏
 					$('#divDescForCreateOrde div:first').html('');
 					$('#orderFoodsCmp').listview('refresh');
