@@ -2556,42 +2556,45 @@ $(function(){
 					
 					if($("#input_input_numKbPopup").val()){
 						brandNo = parseInt($("#input_input_numKbPopup").val());
-					}else{
-						brandNo = 1;
-					}
-					var bandTemp = WirelessOrder.tables.slice(0);
-					
-					//遍历来判断输入的牌子号是否存在
-					for(var i = 0; i < bandTemp.length; i++){
-						if(brandNo == bandTemp[i].alias){
-							of.table = bandTemp[i];
-							return;
+						
+						var bandTemp = WirelessOrder.tables.slice(0);
+						
+						//遍历来判断输入的牌子号是否存在
+						for(var i = 0; i < bandTemp.length; i++){
+							if(brandNo == bandTemp[i].alias){
+								of.table = bandTemp[i];
+							}
 						}
-					}
-					
-					if(of.table){
-						of.submit({
-							notPrint : false,
-							postSubmit : function(){
-								//清空已点菜
-								$('#orderFoodsCmp').html('');
-								//清空状态栏
-								$('#divDescForCreateOrde div:first').html('');
-								$('#orderFoodsCmp').listview('refresh');
-								
-								//更新餐台
-								$.post('../QueryTable.do', {tableID : of.table.id}, function(result){
-									of.table = result.root[0];
-								});
-								//更新账单
-								$.post('../QueryOrderByCalc.do', {tableID : of.table.id}, function(result){
-									of.order = result.other.order;
-								});
-							} 
-						});
+						
+						if(of.table){
+							of.submit({
+								notPrint : false,
+								postSubmit : function(){
+									//清空已点菜
+									$('#orderFoodsCmp').html('');
+									//清空状态栏
+									$('#divDescForCreateOrde div:first').html(''); 
+									$('#orderFoodsCmp').listview('refresh');
+									
+									//更新餐台
+									$.post('../QueryTable.do', {tableID : of.table.id}, function(result){
+										of.table = result.root[0];
+									});
+									//更新账单
+									$.post('../QueryOrderByCalc.do', {tableID : of.table.id}, function(result){
+										of.order = result.other.order;
+									});
+								} 
+							});
+						}else{
+							Util.msg.alert({
+								msg : '没有此餐桌号.', 
+								topTip : true
+							});
+						}
 					}else{
 						Util.msg.alert({
-							msg : '没有此餐桌号.', 
+							msg : '请输入牌子号.', 
 							topTip : true
 						});
 					}
