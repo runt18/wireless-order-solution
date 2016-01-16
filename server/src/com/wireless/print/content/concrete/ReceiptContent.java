@@ -209,9 +209,9 @@ public class ReceiptContent extends ConcreteContent {
 																		  SEP +
 																		  new CenterAlignedDecorator(hasEnding() ? ending : "΢��ɨһɨ", mStyle).toString());
 
-		}else if(mPrintType == PType.PRINT_RECEIPT){
+		}else if(mPrintType == PType.PRINT_RECEIPT || mPrintType == PType.PRINT_TEMP_RECEIPT){
 			if(hasEnding()){
-				mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, ending);
+				mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new CenterAlignedDecorator(ending, mStyle).toString());
 			}else{
 				final StringBuilder receiptEnding = new StringBuilder();
 				if(!mRestaurant.getAddress().isEmpty()){
