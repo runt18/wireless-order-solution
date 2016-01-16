@@ -227,7 +227,10 @@ public class WxMemberDao {
 		MemberDao.update(dbCon, staff, new Member.UpdateBuilder(weixinMember.getMemberId())
 												 .setMobile(builder.getMobile())
 												 .setName(builder.isNameChanged() ? builder.getName() : null)
-												 .setBirthday(builder.isBirthdayChanged() ? builder.getBirthday() : null));
+												 .setBirthday(builder.isBirthdayChanged() ? builder.getBirthday() : null)
+												 .setAge(builder.isAgeChanged() ? builder.getAge() : null)
+												 .setSex(builder.isSexChanged() ? builder.getSex() : null)
+						);
 		return weixinMember.getMemberId();
 	}
 	
