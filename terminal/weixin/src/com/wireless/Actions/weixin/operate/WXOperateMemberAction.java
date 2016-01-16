@@ -178,14 +178,8 @@ public class WXOperateMemberAction extends DispatchAction {
 		final String age = request.getParameter("age");
 		
 		final JObject jobject = new JObject();
-		final DBCon dbCon = new DBCon();
 		try{
-			
-			
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			
-			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			final WxMember.BindBuilder builder = new WxMember.BindBuilder(openId, mobile);
@@ -195,22 +189,20 @@ public class WXOperateMemberAction extends DispatchAction {
 			}
 			
 			if(birthday != null && !birthday.isEmpty()){
-				builder.setBirthday(birthday);
+				builder.setBirthday(Member.Age.valueOf(Integer.parseInt(age)).suffix + "-" + birthday);
 			}
 			
 			if(age != null && !age.isEmpty()){
 				builder.setAge(Member.Age.valueOf(Integer.parseInt(age)));
 			}
 			
-			WxMemberDao.bind(dbCon, staff, builder);
+			WxMemberDao.bind(staff, builder);
 			
-			dbCon.conn.commit();
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 			
 		}finally{
-			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
