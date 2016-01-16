@@ -115,6 +115,8 @@ public class CouponOperation implements Jsonable{
 	
 	private int id;
 	private int couponId;
+	private int restaurantId;
+	private int branchId;
 	private String couponName;
 	private float couponPrice;
 	private Operate operate;
@@ -142,6 +144,22 @@ public class CouponOperation implements Jsonable{
 	
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public void setRestaurantId(int restaurantId){
+		this.restaurantId = restaurantId;
+	}
+	
+	public int getRestaurantId(){
+		return this.restaurantId;
+	}
+	
+	public void setBranchId(int branchId){
+		this.branchId = branchId;
+	}
+	
+	public int getBranchId(){
+		return this.branchId;
 	}
 	
 	public int getCouponId() {

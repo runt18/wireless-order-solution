@@ -23,19 +23,21 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	public static final int MEMBER_PARCELABLE_COMPLEX = 1;
 	
 	public static enum Age{
-		UNKNOWN(0, "未填写"),
-		AGE_60(1, "60后"),
-		AGE_70(2, "70后"),
-		AGE_80(3, "80后"),
-		AGE_90(4, "90后"),
-		AGE_00(5, "00后");
+		UNKNOWN(0, "未填写", "1900"),
+		AGE_60(1, "60后", "1960"),
+		AGE_70(2, "70后", "1970"),
+		AGE_80(3, "80后", "1980"),
+		AGE_90(4, "90后", "1990"),
+		AGE_00(5, "00后", "2000");
 		
 		private final int val;
 		private final String desc;
+		public final String suffix;
 		
-		Age(int val, String desc){
+		Age(int val, String desc, String suffix){
 			this.val = val;
 			this.desc = desc;
+			this.suffix = suffix;
 		}
 		
 		public static Age valueOf(int val){
