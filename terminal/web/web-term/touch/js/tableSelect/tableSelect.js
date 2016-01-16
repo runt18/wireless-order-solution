@@ -274,6 +274,7 @@ $(function(){
 			$('#fastFood_li_tableSelect').show();
 			//快餐模式的结账按钮
 			$('#fastPay_a_orderFood').show();
+			$('#fastPay_a_orderFood').text('快速结账');
 			//收银端餐台列表高度
 			tableListHeight = 130;	
 		}

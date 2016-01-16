@@ -269,6 +269,10 @@ function NumKeyBoardPopup(param){
 				self.find('[id=right_a_numKbPopup] span span').text(param.rightText);
 			}
 			
+			if(param.middleText){
+				self.find('[id=middle_a_numKbPopup] span span').text(param.middleText);
+			}
+			
 			if(param.leftText){
 				self.find('[id=left_a_numKbPopup] span span').text(param.leftText);
 			}
