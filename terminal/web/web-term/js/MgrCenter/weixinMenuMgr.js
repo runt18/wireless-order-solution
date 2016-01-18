@@ -1,7 +1,7 @@
 Ext.onReady(function(){
 	var rid = restaurantID;
 	//var basePath = "http://localhost:8080";
-	var basePath = 'http://ts.e-tones.net';
+	var basePath = 'http://wx.e-tones.net';
 	//关键字点击的标识符
 	var isKeyword = false;
 	
@@ -502,14 +502,14 @@ Ext.onReady(function(){
 	}
 	
 	$.ajax({ 
-	    type : "post", 
+	    type : 'post', 
 	    url : basePath + "/wx-term/WxOperateMenu.do",
 	    data : {
 	    	dataSource : 'systemMenu'
 	    },
 	    dataType : "jsonp",//jsonp数据类型 
 	    jsonp: "callback",//服务端用于接收callback调用的function名的参数 
-	    jsonpCallback : "jsonpCallback",
+	    jsonpCallback : "jsonpCallback4SystemMenu",
 	    success : function(data){ 
 	    	var systemMenuTemplate = '<div style="float:left;"><input id={id} type="radio" name="systemSet" value={key}><label for={id}>{desc}</label><div><br>';
 	    	function format(str, args){
@@ -672,10 +672,15 @@ Ext.onReady(function(){
 			render : function(){
 				weixinMenuLM.show();
 				$.ajax({ 
-				    type : "get", 
-				    url :  basePath + "/wx-term/WxOperateMenu.do?dataSource=weixinMenu&rid=" + rid,
-				    jsonp: "jsonpCallback",	//服务端用于接收callback调用的function名的参数 
-				    dataType : "json",		//jsonp数据类型
+				    type : "post", 
+				    url :  basePath + '/wx-term/WxOperateMenu.do?',
+				    data : {
+				    	dataSource : 'weixinMenu',
+				    	rid : rid
+				    },
+				    jsonp: "callback",	//服务端用于接收callback调用的function名的参数
+				    jsonpCallback : 'jsonpCallback',
+				    dataType : "jsonp",		//jsonp数据类型
 				    success : function(rt){
 				    	weixinMenuLM.hide();
 				    	var root = {
