@@ -38,8 +38,6 @@ $(function(){
 				return;
 			}
 			
-			container.find('[id="shoppingCarSelect_li_fastOrderFood"]').attr("disabled", "true");
-			
 			$.ajax({
 				url : '../../WXOperateMember.do',
 				type : 'post',
@@ -269,6 +267,7 @@ $(function(){
 		 	
 
 		 },
+		 bottomId : 'bottom',
 		 onCartChange : function(orderFoodData){
 			 if(orderFoodData.length > 0){
 				 document.getElementById('displayFoodCount_div_fastOrderFood').innerHTML = orderFoodData.length;

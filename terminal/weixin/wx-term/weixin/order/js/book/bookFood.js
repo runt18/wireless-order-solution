@@ -1,3 +1,7 @@
+	//选只订座的方式
+	function operateSeat(){
+		$('#div4bookFoodList').hide();	
+	}
 $(function(){
 	var bookDates = [],
 	bookFoodShoppingBox = '<div data-value="{id}" class="div-fl-f-sc-box box-horizontal">'
@@ -5,9 +9,9 @@ $(function(){
 			+ '<div><b>{name}</b></div>'
 			+ '<div>价格: <span>￥{unitPrice}</span></div>'
 		+ '</div>'
-		+ '<div data-type="cut" onclick="operateBookFood({otype:\'cut\', id:{id}, event:this})">-</div>'
+		+ '<div data-type="cut" data-value={id}>-</div>'
 		+ '<div data-type="count">{count}</div>'
-		+ '<div data-type="plus" onclick="operateBookFood({otype:\'plus\', id:{id}, event:this})">+</div>'
+		+ '<div data-type="plus" data-value={id} onclick="operateBookFood({otype:\'plus\', id:{id}, event:this})">+</div>'
 		+ '</div>';
 	
 	
@@ -138,7 +142,7 @@ $(function(){
 					$('#' + $(this).data("for")).click();
 				});
 			}
-		}, 'json');	
+		}, 'json');		
 	})();
 	
 	
@@ -208,7 +212,7 @@ $(function(){
 			phone : phone,
 			count : count,
 			region : region,
-//				foods : foods
+//			foods : foods
 		}, function(data){
 			if(data.success){
 				Util.dialog.show({msg: '预订成功', btn:'yes',
@@ -235,19 +239,69 @@ $(function(){
 		}
 	});
 	
+	//渲染菜品
+	function initFood(food){
+		var html = [], temp, sumPrice = 0;
+		
+		for(var i = 0; i < food.length; i++){
+			temp = food[i];
+			sumPrice += (temp.unitPrice * temp.count);
+			html.push(bookFoodShoppingBox.format({
+				id : temp.id,
+				name : temp.name,
+				unitPrice : temp.unitPrice,
+				count : temp.count
+			}));
+		}
+		$('#div4bookFoodList').html(html.join(''));	
+	}
 	
-//	//选只订座的方式
-//	function operateSeat(){
-//		$('#div4bookFoodList').html('');	
-////		$('#bookFoodTotalMoney').html('');
-//	}
 	
+	//预订点菜
+	var pickFoodComponent = null;
+	$('#bookTypeTableAndFood').click(function(){
+		 pickFoodComponent = new PickFoodComponent({
+			 bottomId : 'bottoms',
+			 confirm : function(selectedFoods, comment){
+				if(selectedFoods){
+					initFood(selectedFoods);
+					pickFoodComponent.hide();
+					 $('#div4BookDetail').show();
+					 $('#div4bookFoodList').show();	
+					 $('#bottoms').hide();
+				}else{
+					$('#div4bookFoodList').html('');	
+				}
+				
+				$('html, body').animate({scrollTop: 1000}, 'fast');  
+			 },
+			 onCartChange : function(orderFoodData){
+				 if(orderFoodData.length > 0){
+					 document.getElementById('displayFoodCount_div_fastOrderFood').innerHTML = orderFoodData.length;
+					 document.getElementById('displayFoodCount_div_fastOrderFood').style.visibility = 'visible';
+				 }else{
+					 document.getElementById('displayFoodCount_div_fastOrderFood').innerHTML ='';
+					 document.getElementById('displayFoodCount_div_fastOrderFood').style.visibility = 'hidden';
+				 }
+			 }
+		 });
+		 $('#div4BookDetail').hide();
+		 $('#bottoms').show();
+		 pickFoodComponent.show();
+		
+	});
+	
+	
+	//打开购物车
+	$('#shoppingCar_li_member').click(function(){
+		pickFoodComponent.openShopping();
+	});
 	
 //	//去预订点菜
 //	function toBookFood(){
 //		$('#div4BookDetail').hide();
-//		$('#div4FoodList').show();
-//		
+//		$('#div4FoodList').show(  );
+//			
 //		//清空数据
 //		var li = $('.select-food');
 //

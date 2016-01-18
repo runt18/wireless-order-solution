@@ -3,7 +3,8 @@ function PickFoodComponent(param){
 	param = param || {
 		orderDataCount : null,
 		confirm : function(selectedFoods, comment, container){},
-		onCartChange : function(selectedFoods){}
+		onCartChange : function(selectedFoods){},
+		bottomId : null              //尾部栏
 	};
 	
 	//总的div
@@ -33,7 +34,7 @@ function PickFoodComponent(param){
 	this.close = function(){
 		$('#WXCmp_div_member').show();
 		if(_container){
-			_container.remove();
+			_container[0].remove();
 			_container = null;
 		}
 		
@@ -169,7 +170,7 @@ function PickFoodComponent(param){
 			param.confirm(_orderData, _commentData, _container);
 		});
 		
-		_container.after($('#bottom'));
+		_container.after($('#' + param.bottomId));
 		$('body').append(_container);
 	}
 	
