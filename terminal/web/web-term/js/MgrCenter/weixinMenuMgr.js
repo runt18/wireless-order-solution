@@ -1,7 +1,7 @@
 Ext.onReady(function(){
 	var rid = restaurantID;
-//	var basePath = "http://localhost:8080";
-	var basePath = 'http://ts.e-tones.net';
+	//var basePath = "http://localhost:8080";
+	var basePath = 'http://wx.e-tones.net';
 	//关键字点击的标识符
 	var isKeyword = false;
 	
@@ -87,11 +87,6 @@ Ext.onReady(function(){
 			        			tn.attributes.key = rt.other.key;
 			        		}else{
 			        			subscribeKey = rt.other.key;
-			        			//显示删除
-			        			Ext.getCmp('delAutoReply_btn_weixin').enable();
-			        			//隐藏添加
-			        			Ext.getCmp('addAutoReply_btn_weixin').disable();
-			        			$('#getSubscribe_a_weixin').show();
 			        		}
 			        	}
 		        		Ext.example.msg('提示', rt.msg);
@@ -124,7 +119,261 @@ Ext.onReady(function(){
 		Ext.example.msg('提示', '操作成功');
 	});
 	
+	//添加自动回复
+	$('#getSubscribe_a_weixin').click(function(){
+		clearTabContent();
+		isKeyword = false;
+		centerPanel.setTitle('设置 -- 自动回复');
+		tabs.enable();
+		Ext.getCmp('tabView_tab_weixin').disable();
+		Ext.getCmp('tabSystem_tab_weixin').disable();
+		//清除tree选中
+		tree.getSelectionModel().clearSelections();
+		//清除tree选中
+		keywordTree.getSelectionModel().clearSelections();
+		
+		subscribe = true;
+		$.ajax({ 
+		    type : "post", 
+		    async : false, 
+		    url : "../../OperateReply.do",
+		    dataType : "json",		//jsonp数据类型 
+		    data : {
+		    	dataSource : 'subscribeReply',
+		    	rid : rid
+		    },
+		    success : function(rt){ 
+		        if(rt.success){
+		        	subscribeKey = rt.other.key;
+		        	if(rt.root && rt.root.length > 0){
+		    			var tab = tabs.getComponent("tabImageText_tab_weixin");
+		    			tabs.setActiveTab(tab);
+		        		
+		        		var item = rt.root[0];
+		        		
+						$('#itemTitle_textfield_weixin').val(item.title);			
+						$('#itemContent_textfield_weixin').val(item.description);	
+						$('#itemUrl_textarea_weixin').val(item.url);	
+		        		imgFile.setImg(item.picUrl);
+		        		p_box.image = item.picUrl;
+		        		
+		        		//如果有子显示项
+		        		if(rt.root.length > 1){
+		        			multiFoodPriceCount = rt.root.length - 1;
+		        			for (var i = 1; i < rt.root.length; i++) {
+		        				var subTitleId = 'subTitle' + i,  
+		        				subUrlId = 'subUrl' + i, 
+		        				subImgFileId = 'subImgFile' + i;
+		        				subFormId = 'subForm' + i;
+		        			
+			        			Ext.getCmp('foodMultiPrice_column_weixin').add({
+			        				cls : 'multiClass'+i,
+			        		 		columnWidth : 1	 		
+			        		 	});								
+			        			
+			        			Ext.getCmp('foodMultiPrice_column_weixin').add({
+			        				cls : 'multiClass'+i,
+			        				columnWidth: 0.4,
+			        				labelWidth : 40,
+			        				defaults : {
+			        					width : 250
+			        				},
+			        				items :[{
+			        					xtype : 'textfield',
+			        					id : subTitleId,
+			        					fieldLabel : '标题',
+			        					value : rt.root[i].title,
+			        					allowBlank : false
+			        				},{
+			        					xtype : 'textarea',
+			        					id : subUrlId,
+			        					fieldLabel : '链接',
+			        					value : rt.root[i].url
+			        				}]
+			        			});	
+
+			        			var sub_box = new Ext.BoxComponent({
+			        				xtype : 'box',
+			        		 	    height : 55,
+			        		 	    autoEl : {
+			        		 	    	tag : 'img',
+			        		 	    	title : '图片预览'
+			        		 	    }
+			        			});
+			        			
+			        			var sub_btnUpload = new Ext.Button({
+			        				hidden : true,
+			        				id : 'sub_btnWeixinReplyUploadImage',
+			        		        text : '上传图片',
+			        		        listeners : {
+			        		        	render : function(thiz){
+			        		        		thiz.getEl().setVisible(false);
+			        		        	}
+			        		        },
+			        		        handler : function(e){
+			        		        	var check = true, img = '';
+			        		        	if(Ext.isIE){
+			        		        		Ext.getDom(imgFile.getId()).select();
+			        		        		img = document.selection.createRange().text;
+			        		        	}else{
+			        		 	        	img = Ext.getDom(imgFile.getId()).value;
+			        		        	}
+			        		        	if(typeof(img) != 'undefined' && img.length > 0){
+			        			 	        var type = img.substring(img.lastIndexOf('.') + 1, img.length);
+			        			 	        check = false;
+			        			 	        for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
+			        			 	        	if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
+			        			 	        		check = true;
+			        				 	           	break;
+			        				 	        }
+			        			 	        }
+			        			 	        if(!check){
+			        				 	       	Ext.example.msg('提示', '图片类型不正确.');
+			        				 	        return;
+			        		 	        	}
+			        		        	}else{
+			        		        		Ext.example.msg('提示', '未选择图片.');
+			        		 	        	return;
+			        		        	}
+			        		        	menu_uploadMask.show();
+			        		        	Ext.Ajax.request({
+			        		        		url : '../../OperateImage.do?dataSource=upload&ossType=10&rid='+rid,
+			        		 	   			isUpload : true,
+			        		 	   			form : sub_form.getForm().getEl(),
+			        		 	   			success : function(response, options){
+			        		 	   				menu_uploadMask.hide();
+			        		 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
+			        		 	   				if(jr.success){
+			        			  	   				var ossImage = jr.root[0];
+			        			  	   				sub_box.image = ossImage.image;
+			        			  	   				sub_box.ossId = ossImage.imageId;	   				
+			        		 	   				}else{
+			        		 	   					Ext.ux.showMsg(jr);
+			        		 	   					imgFile.setImg("");
+			        		 	   				}
+
+			        		 	   				
+			        		 	   			},
+			        		 	   			failure : function(response, options){
+			        		 	   				menu_uploadMask.hide();
+			        		 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+			        		 	   			}
+			        		        	});
+			        		        }
+			        		});
+			        			var sub_imgFile = Ext.ux.plugins.createImageFile({
+			        				id : subImgFileId,
+			        				formId : subFormId,
+			        				img : sub_box,
+			        				imgSize : 100,
+			        				//打开图片后的操作
+			        				uploadCallback : function(c){
+			        					subImageOperate(c);
+			        				}
+			        			});
+			        			
+			        			var sub_form = new Ext.form.FormPanel({
+			        				id : subFormId,
+			        				labelWidth : 60,
+			        				fileUpload : true,
+			        				items : [sub_imgFile],
+			        				listeners : {
+			        		    		render : function(e){
+			        		    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+			        		 	  		}
+			        		    	},
+			        				buttons : [sub_btnUpload]
+			        			});		
+			        			
+			        			Ext.getCmp('foodMultiPrice_column_weixin').add({
+			        				cls : 'multiClass'+i,
+			        				columnWidth: 0.35,  
+			        				layout : 'column',
+			        				frame : true,
+			        				items : [sub_box, sub_form]	 		
+			        		 	});			
+			        			
+			        			Ext.getCmp('foodMultiPrice_column_weixin').add({
+			        				cls : 'multiClass'+i,
+			        		 		columnWidth : .1,
+			        		 		items : [{
+			        			    	xtype : 'button',
+			        			    	text : '删除',
+			        			    	style:'margin-top:40px;margin-left:10px;',
+			        			    	multiIndex : i,
+			        			    	iconCls : 'btn_delete',
+			        			    	handler : function(e){
+			        			    		deleteMultiPriceHandler(e);
+			        			    	}
+			        		 		}] 		 		
+			        		 	});	
+			        			
+			        			Ext.getCmp('foodMultiPrice_column_weixin').doLayout();
+			        			
+			        			sub_imgFile.setImg(rt.root[i].picUrl);
+			        			
+			        			sub_imgFile.image = rt.root[i].picUrl;
+							}
+		        		}
+		        		
+		        	}else if(rt.other){
+		    			var tab = tabs.getComponent("tabClick_tab_weixin");
+		    			tabs.setActiveTab(tab);
+		    			
+		        		$('#menuTxtReply_textarea_weixin').val(rt.other.text);
+		        	}
+				}else{
+	    			var tab = tabs.getComponent("tabImageText_tab_weixin");
+	    			tabs.setActiveTab(tab);
+					Ext.getCmp('itemTitle_textfield_weixin').focus(true, 100);	
+				}
+		    }, 
+		    error:function(xhr){ 
+		    	Ext.example.msg(xhr.responseText);
+		    }
+		});
+	});
 	
+	//删除自动回复
+	$('#btnDeleteSubscribe_a_weixin').click(function(){
+		centerPanel.setTitle('设置 --');
+		Ext.Msg.confirm(
+			'提示',
+			'是否删除自动回复',
+			function(e){
+				if(e == 'yes'){
+					$.ajax({ 
+					    type : "post", 
+					    async:false, 
+					    url : "../../OperateReply.do",
+					    dataType : "json",		//jsonp数据类型 
+					    data : {
+					    	dataSource : "deleteSubscribe",
+					    	rid : rid
+					    },
+					    success : function(rt){ 
+					    	if(rt.success){
+					    		Ext.example.msg('提示', rt.msg);
+					    		$('#btnDeleteSubscribe_a_weixin').hide();
+					    	}else{
+					    		 Ext.example.msg('提示', rt.msg);
+					    	}
+					    }, 
+					    error:function(xhr){ 
+					        Ext.example.msg('提示', rt.msg);
+					    	if(rt.success){
+					    		$('#btnDeleteSubscribe_a_weixin').hide();
+					    	}
+					    } 
+					}); 	
+					
+					clearTabContent();
+					
+				}
+			}
+		);		
+	});
+
 	//系统设置的保存按钮
 	$('#setSystemMenu_input_weixin').click(function(){
 		var tn = Ext.ux.getSelNode(tree);
@@ -253,14 +502,14 @@ Ext.onReady(function(){
 	}
 	
 	$.ajax({ 
-	    type : "post", 
+	    type : 'post', 
 	    url : basePath + "/wx-term/WxOperateMenu.do",
 	    data : {
 	    	dataSource : 'systemMenu'
 	    },
 	    dataType : "jsonp",//jsonp数据类型 
 	    jsonp: "callback",//服务端用于接收callback调用的function名的参数 
-	    jsonpCallback : "jsonpCallback",
+	    jsonpCallback : "jsonpCallback4SystemMenu",
 	    success : function(data){ 
 	    	var systemMenuTemplate = '<div style="float:left;"><input id={id} type="radio" name="systemSet" value={key}><label for={id}>{desc}</label><div><br>';
 	    	function format(str, args){
@@ -423,10 +672,15 @@ Ext.onReady(function(){
 			render : function(){
 				weixinMenuLM.show();
 				$.ajax({ 
-				    type : "get", 
-				    url :  basePath + "/wx-term/WxOperateMenu.do?dataSource=weixinMenu&rid=" + rid,
-				    jsonp: "jsonpCallback",	//服务端用于接收callback调用的function名的参数 
-				    dataType : "json",		//jsonp数据类型
+				    type : "post", 
+				    url :  basePath + '/wx-term/WxOperateMenu.do?',
+				    data : {
+				    	dataSource : 'weixinMenu',
+				    	rid : rid
+				    },
+				    jsonp: "callback",	//服务端用于接收callback调用的function名的参数
+				    jsonpCallback : 'jsonpCallback',
+				    dataType : "jsonp",		//jsonp数据类型
 				    success : function(rt){
 				    	weixinMenuLM.hide();
 				    	var root = {
@@ -1060,490 +1314,6 @@ Ext.onReady(function(){
 		}
 	});
 	
-	//查看自动回复
-	$('#getSubscribe_a_weixin').click(function(){
-		clearTabContent();
-		isKeyword = false;
-		centerPanel.setTitle('设置 -- 自动回复');
-		tabs.enable();
-		Ext.getCmp('tabView_tab_weixin').disable();
-		Ext.getCmp('tabSystem_tab_weixin').disable();
-		//清除tree选中
-		tree.getSelectionModel().clearSelections();
-		//清除tree选中
-		keywordTree.getSelectionModel().clearSelections();
-		
-		subscribe = true;
-		$.ajax({ 
-		    type : "post", 
-		    async : false, 
-		    url : "../../OperateReply.do",
-		    dataType : "json",		//jsonp数据类型 
-		    data : {
-		    	dataSource : 'subscribeReply',
-		    	rid : rid
-		    },
-		    success : function(rt){ 
-		        if(rt.success){
-		        	subscribeKey = rt.other.key;
-		        	if(rt.root && rt.root.length > 0){
-		    			var tab = tabs.getComponent("tabImageText_tab_weixin");
-		    			tabs.setActiveTab(tab);
-		        		
-		        		var item = rt.root[0];
-		        		
-						$('#itemTitle_textfield_weixin').val(item.title);			
-						$('#itemContent_textfield_weixin').val(item.description);	
-						$('#itemUrl_textarea_weixin').val(item.url);	
-		        		imgFile.setImg(item.picUrl);
-		        		p_box.image = item.picUrl;
-		        		
-		        		//如果有子显示项
-		        		if(rt.root.length > 1){
-		        			multiFoodPriceCount = rt.root.length - 1;
-		        			for (var i = 1; i < rt.root.length; i++) {
-		        				var subTitleId = 'subTitle' + i,  
-		        				subUrlId = 'subUrl' + i, 
-		        				subImgFileId = 'subImgFile' + i;
-		        				subFormId = 'subForm' + i;
-		        			
-			        			Ext.getCmp('foodMultiPrice_column_weixin').add({
-			        				cls : 'multiClass'+i,
-			        		 		columnWidth : 1	 		
-			        		 	});								
-			        			
-			        			Ext.getCmp('foodMultiPrice_column_weixin').add({
-			        				cls : 'multiClass'+i,
-			        				columnWidth: 0.4,
-			        				labelWidth : 40,
-			        				defaults : {
-			        					width : 250
-			        				},
-			        				items :[{
-			        					xtype : 'textfield',
-			        					id : subTitleId,
-			        					fieldLabel : '标题',
-			        					value : rt.root[i].title,
-			        					allowBlank : false
-			        				},{
-			        					xtype : 'textarea',
-			        					id : subUrlId,
-			        					fieldLabel : '链接',
-			        					value : rt.root[i].url
-			        				}]
-			        			});	
-
-			        			var sub_box = new Ext.BoxComponent({
-			        				xtype : 'box',
-			        		 	    height : 55,
-			        		 	    autoEl : {
-			        		 	    	tag : 'img',
-			        		 	    	title : '图片预览'
-			        		 	    }
-			        			});
-			        			
-			        			var sub_btnUpload = new Ext.Button({
-			        				hidden : true,
-			        				id : 'sub_btnWeixinReplyUploadImage',
-			        		        text : '上传图片',
-			        		        listeners : {
-			        		        	render : function(thiz){
-			        		        		thiz.getEl().setVisible(false);
-			        		        	}
-			        		        },
-			        		        handler : function(e){
-			        		        	var check = true, img = '';
-			        		        	if(Ext.isIE){
-			        		        		Ext.getDom(imgFile.getId()).select();
-			        		        		img = document.selection.createRange().text;
-			        		        	}else{
-			        		 	        	img = Ext.getDom(imgFile.getId()).value;
-			        		        	}
-			        		        	if(typeof(img) != 'undefined' && img.length > 0){
-			        			 	        var type = img.substring(img.lastIndexOf('.') + 1, img.length);
-			        			 	        check = false;
-			        			 	        for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
-			        			 	        	if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
-			        			 	        		check = true;
-			        				 	           	break;
-			        				 	        }
-			        			 	        }
-			        			 	        if(!check){
-			        				 	       	Ext.example.msg('提示', '图片类型不正确.');
-			        				 	        return;
-			        		 	        	}
-			        		        	}else{
-			        		        		Ext.example.msg('提示', '未选择图片.');
-			        		 	        	return;
-			        		        	}
-			        		        	menu_uploadMask.show();
-			        		        	Ext.Ajax.request({
-			        		        		url : '../../OperateImage.do?dataSource=upload&ossType=10&rid='+rid,
-			        		 	   			isUpload : true,
-			        		 	   			form : sub_form.getForm().getEl(),
-			        		 	   			success : function(response, options){
-			        		 	   				menu_uploadMask.hide();
-			        		 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
-			        		 	   				if(jr.success){
-			        			  	   				var ossImage = jr.root[0];
-			        			  	   				sub_box.image = ossImage.image;
-			        			  	   				sub_box.ossId = ossImage.imageId;	   				
-			        		 	   				}else{
-			        		 	   					Ext.ux.showMsg(jr);
-			        		 	   					imgFile.setImg("");
-			        		 	   				}
-
-			        		 	   				
-			        		 	   			},
-			        		 	   			failure : function(response, options){
-			        		 	   				menu_uploadMask.hide();
-			        		 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
-			        		 	   			}
-			        		        	});
-			        		        }
-			        		});
-			        			var sub_imgFile = Ext.ux.plugins.createImageFile({
-			        				id : subImgFileId,
-			        				formId : subFormId,
-			        				img : sub_box,
-			        				imgSize : 100,
-			        				//打开图片后的操作
-			        				uploadCallback : function(c){
-			        					subImageOperate(c);
-			        				}
-			        			});
-			        			
-			        			var sub_form = new Ext.form.FormPanel({
-			        				id : subFormId,
-			        				labelWidth : 60,
-			        				fileUpload : true,
-			        				items : [sub_imgFile],
-			        				listeners : {
-			        		    		render : function(e){
-			        		    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
-			        		 	  		}
-			        		    	},
-			        				buttons : [sub_btnUpload]
-			        			});		
-			        			
-			        			Ext.getCmp('foodMultiPrice_column_weixin').add({
-			        				cls : 'multiClass'+i,
-			        				columnWidth: 0.35,  
-			        				layout : 'column',
-			        				frame : true,
-			        				items : [sub_box, sub_form]	 		
-			        		 	});			
-			        			
-			        			Ext.getCmp('foodMultiPrice_column_weixin').add({
-			        				cls : 'multiClass'+i,
-			        		 		columnWidth : .1,
-			        		 		items : [{
-			        			    	xtype : 'button',
-			        			    	text : '删除',
-			        			    	style:'margin-top:40px;margin-left:10px;',
-			        			    	multiIndex : i,
-			        			    	iconCls : 'btn_delete',
-			        			    	handler : function(e){
-			        			    		deleteMultiPriceHandler(e);
-			        			    	}
-			        		 		}] 		 		
-			        		 	});	
-			        			
-			        			Ext.getCmp('foodMultiPrice_column_weixin').doLayout();
-			        			
-			        			sub_imgFile.setImg(rt.root[i].picUrl);
-			        			
-			        			sub_imgFile.image = rt.root[i].picUrl;
-							}
-		        		}
-		        		
-		        	}else if(rt.other){
-		    			var tab = tabs.getComponent("tabClick_tab_weixin");
-		    			tabs.setActiveTab(tab);
-		    			
-		        		$('#menuTxtReply_textarea_weixin').val(rt.other.text);
-		        	}
-				}else{
-	    			var tab = tabs.getComponent("tabImageText_tab_weixin");
-	    			tabs.setActiveTab(tab);
-					Ext.getCmp('itemTitle_textfield_weixin').focus(true, 100);	
-				}
-		    }, 
-		    error:function(xhr){ 
-		    	Ext.example.msg(xhr.responseText);
-		    }
-		});
-	});
-	
-	//关键字回复的添加关键字按钮
-	var atuoRellyTbar = new Ext.Toolbar({
-		items : ['->', {
-			text : '添加自动回复',
-			id : 'addAutoReply_btn_weixin',
-			iconCls : 'btn_add',
-			handler : function(){
-				clearTabContent();
-				isKeyword = false;
-				centerPanel.setTitle('设置 -- 自动回复');
-				tabs.enable();
-				Ext.getCmp('tabView_tab_weixin').disable();
-				Ext.getCmp('tabSystem_tab_weixin').disable();
-				//清除tree选中
-				tree.getSelectionModel().clearSelections();
-				//清除tree选中
-				keywordTree.getSelectionModel().clearSelections();
-				
-				subscribe = true;
-				$.ajax({ 
-				    type : "post", 
-				    async : false, 
-				    url : "../../OperateReply.do",
-				    dataType : "json",		//jsonp数据类型 
-				    data : {
-				    	dataSource : 'subscribeReply',
-				    	rid : rid
-				    },
-				    success : function(rt){ 
-				        if(rt.success){
-				        	subscribeKey = rt.other.key;
-				        	if(rt.root && rt.root.length > 0){
-				    			var tab = tabs.getComponent("tabImageText_tab_weixin");
-				    			tabs.setActiveTab(tab);
-				        		
-				        		var item = rt.root[0];
-				        		
-								$('#itemTitle_textfield_weixin').val(item.title);			
-								$('#itemContent_textfield_weixin').val(item.description);	
-								$('#itemUrl_textarea_weixin').val(item.url);	
-				        		imgFile.setImg(item.picUrl);
-				        		p_box.image = item.picUrl;
-				        		
-				        		//如果有子显示项
-				        		if(rt.root.length > 1){
-				        			multiFoodPriceCount = rt.root.length - 1;
-				        			for (var i = 1; i < rt.root.length; i++) {
-				        				var subTitleId = 'subTitle' + i,  
-				        				subUrlId = 'subUrl' + i, 
-				        				subImgFileId = 'subImgFile' + i;
-				        				subFormId = 'subForm' + i;
-				        			
-					        			Ext.getCmp('foodMultiPrice_column_weixin').add({
-					        				cls : 'multiClass'+i,
-					        		 		columnWidth : 1	 		
-					        		 	});								
-					        			
-					        			Ext.getCmp('foodMultiPrice_column_weixin').add({
-					        				cls : 'multiClass'+i,
-					        				columnWidth: 0.4,
-					        				labelWidth : 40,
-					        				defaults : {
-					        					width : 250
-					        				},
-					        				items :[{
-					        					xtype : 'textfield',
-					        					id : subTitleId,
-					        					fieldLabel : '标题',
-					        					value : rt.root[i].title,
-					        					allowBlank : false
-					        				},{
-					        					xtype : 'textarea',
-					        					id : subUrlId,
-					        					fieldLabel : '链接',
-					        					value : rt.root[i].url
-					        				}]
-					        			});	
-
-					        			var sub_box = new Ext.BoxComponent({
-					        				xtype : 'box',
-					        		 	    height : 55,
-					        		 	    autoEl : {
-					        		 	    	tag : 'img',
-					        		 	    	title : '图片预览'
-					        		 	    }
-					        			});
-					        			
-					        			var sub_btnUpload = new Ext.Button({
-					        				hidden : true,
-					        				id : 'sub_btnWeixinReplyUploadImage',
-					        		        text : '上传图片',
-					        		        listeners : {
-					        		        	render : function(thiz){
-					        		        		thiz.getEl().setVisible(false);
-					        		        	}
-					        		        },
-					        		        handler : function(e){
-					        		        	var check = true, img = '';
-					        		        	if(Ext.isIE){
-					        		        		Ext.getDom(imgFile.getId()).select();
-					        		        		img = document.selection.createRange().text;
-					        		        	}else{
-					        		 	        	img = Ext.getDom(imgFile.getId()).value;
-					        		        	}
-					        		        	if(typeof(img) != 'undefined' && img.length > 0){
-					        			 	        var type = img.substring(img.lastIndexOf('.') + 1, img.length);
-					        			 	        check = false;
-					        			 	        for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
-					        			 	        	if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
-					        			 	        		check = true;
-					        				 	           	break;
-					        				 	        }
-					        			 	        }
-					        			 	        if(!check){
-					        				 	       	Ext.example.msg('提示', '图片类型不正确.');
-					        				 	        return;
-					        		 	        	}
-					        		        	}else{
-					        		        		Ext.example.msg('提示', '未选择图片.');
-					        		 	        	return;
-					        		        	}
-					        		        	menu_uploadMask.show();
-					        		        	Ext.Ajax.request({
-					        		        		url : '../../OperateImage.do?dataSource=upload&ossType=10&rid='+rid,
-					        		 	   			isUpload : true,
-					        		 	   			form : sub_form.getForm().getEl(),
-					        		 	   			success : function(response, options){
-					        		 	   				menu_uploadMask.hide();
-					        		 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
-					        		 	   				if(jr.success){
-					        			  	   				var ossImage = jr.root[0];
-					        			  	   				sub_box.image = ossImage.image;
-					        			  	   				sub_box.ossId = ossImage.imageId;	   				
-					        		 	   				}else{
-					        		 	   					Ext.ux.showMsg(jr);
-					        		 	   					imgFile.setImg("");
-					        		 	   				}
-
-					        		 	   				
-					        		 	   			},
-					        		 	   			failure : function(response, options){
-					        		 	   				menu_uploadMask.hide();
-					        		 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
-					        		 	   			}
-					        		        	});
-					        		        }
-					        		});
-					        			var sub_imgFile = Ext.ux.plugins.createImageFile({
-					        				id : subImgFileId,
-					        				formId : subFormId,
-					        				img : sub_box,
-					        				imgSize : 100,
-					        				//打开图片后的操作
-					        				uploadCallback : function(c){
-					        					subImageOperate(c);
-					        				}
-					        			});
-					        			
-					        			var sub_form = new Ext.form.FormPanel({
-					        				id : subFormId,
-					        				labelWidth : 60,
-					        				fileUpload : true,
-					        				items : [sub_imgFile],
-					        				listeners : {
-					        		    		render : function(e){
-					        		    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
-					        		 	  		}
-					        		    	},
-					        				buttons : [sub_btnUpload]
-					        			});		
-					        			
-					        			Ext.getCmp('foodMultiPrice_column_weixin').add({
-					        				cls : 'multiClass'+i,
-					        				columnWidth: 0.35,  
-					        				layout : 'column',
-					        				frame : true,
-					        				items : [sub_box, sub_form]	 		
-					        		 	});			
-					        			
-					        			Ext.getCmp('foodMultiPrice_column_weixin').add({
-					        				cls : 'multiClass'+i,
-					        		 		columnWidth : .1,
-					        		 		items : [{
-					        			    	xtype : 'button',
-					        			    	text : '删除',
-					        			    	style:'margin-top:40px;margin-left:10px;',
-					        			    	multiIndex : i,
-					        			    	iconCls : 'btn_delete',
-					        			    	handler : function(e){
-					        			    		deleteMultiPriceHandler(e);
-					        			    	}
-					        		 		}] 		 		
-					        		 	});	
-					        			
-					        			Ext.getCmp('foodMultiPrice_column_weixin').doLayout();
-					        			
-					        			sub_imgFile.setImg(rt.root[i].picUrl);
-					        			
-					        			sub_imgFile.image = rt.root[i].picUrl;
-									}
-				        		}
-				        		
-				        	}else if(rt.other){
-				    			var tab = tabs.getComponent("tabClick_tab_weixin");
-				    			tabs.setActiveTab(tab);
-				    			
-				        		$('#menuTxtReply_textarea_weixin').val(rt.other.text);
-				        	}
-						}else{
-			    			var tab = tabs.getComponent("tabImageText_tab_weixin");
-			    			tabs.setActiveTab(tab);
-							Ext.getCmp('itemTitle_textfield_weixin').focus(true, 100);	
-						}
-				    }, 
-				    error:function(xhr){ 
-				    	Ext.example.msg(xhr.responseText);
-				    }
-				});
-			}
-		},{
-			text : '删除自动回复',
-			id : 'delAutoReply_btn_weixin',
-			iconCls : 'btn_add',
-			handler : function(){
-				centerPanel.setTitle('设置 --');
-				Ext.Msg.confirm(
-					'提示',
-					'是否删除自动回复',
-					function(e){
-						if(e == 'yes'){
-							$.ajax({ 
-							    type : "post", 
-							    async:false, 
-							    url : "../../OperateReply.do",
-							    dataType : "json",		//jsonp数据类型 
-							    data : {
-							    	dataSource : "deleteSubscribe",
-							    	rid : rid
-							    },
-							    success : function(rt){ 
-							    	if(rt.success){
-							    		Ext.example.msg('提示', rt.msg);
-							    		Ext.getCmp('delAutoReply_btn_weixin').disable();
-					        			Ext.getCmp('addAutoReply_btn_weixin').enable();
-							    		$('#getSubscribe_a_weixin').hide();
-							    	}else{
-							    		 Ext.example.msg('提示', rt.msg);
-							    	}
-							    }, 
-							    error:function(xhr){ 
-							        Ext.example.msg('提示', rt.msg);
-							    	if(rt.success){
-							    		Ext.getCmp('delAutoReply_btn_weixin').disable();
-					        			Ext.getCmp('addAutoReply_btn_weixin').enable();
-							    		$('#getSubscribe_a_weixin').hide();
-							    	}
-							    } 
-							}); 	
-							
-							clearTabContent();
-							
-						}
-					}
-				);	
-			}
-		}
-		]
-	});	
-	
 	
 	var treePanel = new Ext.Panel({
 		layout : 'border',
@@ -1554,8 +1324,7 @@ Ext.onReady(function(){
 					title : '关注回复',
 					region : 'center',
 					height : 20,
-					contentEl : 'divSetAutoReply_div_weixin',
-					tbar : atuoRellyTbar
+					contentEl : 'divSetAutoReply_div_weixin'
 				}), keywordTree]
 	});	
 	
@@ -1925,10 +1694,7 @@ Ext.onReady(function(){
 						        		}else{
 						        			subscribeKey = rt.other.key;
 						        			//显示删除
-						        			Ext.getCmp('delAutoReply_btn_weixin').enable();
-						        			//隐藏添加
-						        			Ext.getCmp('addAutoReply_btn_weixin').disable();
-						        			$('#getSubscribe_a_weixin').show();
+						        			$('#btnDeleteSubscribe_a_weixin').show();
 						        		}
 						        	}
 					        		Ext.example.msg('提示', rt.msg);
@@ -2181,12 +1947,9 @@ Ext.onReady(function(){
 	    },
 	    success : function(rt){ 
 	        if(rt.success){
-	        	Ext.getCmp('delAutoReply_btn_weixin').enable();
+	        	$('#btnDeleteSubscribe_a_weixin').show();
 	        }else{
-	        	Ext.getCmp('delAutoReply_btn_weixin').disable();
-	        	//隐藏添加
-    			Ext.getCmp('addAutoReply_btn_weixin').enable();
-	        	$('#getSubscribe_a_weixin').hide();
+	        	$('#btnDeleteSubscribe_a_weixin').hide();
 	        }
 	    },
 	    error : function(xhr){
