@@ -2,8 +2,9 @@ function PickFoodComponent(param){
 	
 	param = param || {
 		orderDataCount : null,
-		confirm : function(selectedFoods, comment){},
-		onCartChange : function(selectedFoods){}
+		confirm : function(selectedFoods, comment, container){},
+		onCartChange : function(selectedFoods){},
+		bottomId : null              //尾部栏
 	};
 	
 	//总的div
@@ -33,7 +34,7 @@ function PickFoodComponent(param){
 	this.close = function(){
 		$('#WXCmp_div_member').show();
 		if(_container){
-			_container.remove();
+			_container[0].remove();
 			_container = null;
 		}
 		
@@ -166,10 +167,10 @@ function PickFoodComponent(param){
 		
 		//购物车的选好了
 		_container.find('[id="shoppingCarSelect_li_fastOrderFood"]').click(function(){
-			param.confirm(_orderData, _commentData);
+			param.confirm(_orderData, _commentData, _container);
 		});
 		
-		_container.after($('#bottom'));
+		_container.after($('#' + param.bottomId));
 		$('body').append(_container);
 	}
 	
@@ -729,7 +730,14 @@ function PickFoodComponent(param){
 		var generalHeight = 87, foodHeight = 51;
 		if(c.otype == 'show'){
 			if(_orderData.length == 0){
-				Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.', btn : 'yes'});
+				var dialog = new DialogPopup({
+					titleText : '温馨提示',
+					content : '你的购物车没有菜品,请先选菜',
+					left : function(){
+						dialog.close();
+					}
+				})
+				dialog.open();
 				return;
 			}
 			
