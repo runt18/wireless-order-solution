@@ -206,6 +206,7 @@ $(function(){
 		}
 		
 		var birthday = $('#birthday_input_member').val();
+		var age = $('#memberAge_select_member').val();
 		
 		$.ajax({
 			url : '../../WXOperateMember.do',
@@ -216,7 +217,8 @@ $(function(){
 				fid : Util.mp.fid,
 				mobile : mobile,
 				name : name,
-				birthday : birthday
+				birthday : birthday,
+				age : age
 			},
 			dataType : 'json',
 			success : function(data, status, xhr){
@@ -443,5 +445,5 @@ $(function(){
 	  $('#pickOrderFood_a_member').click(function(){
 		  Util.jump('food.html');
 	  });
-	  
+	
 });
