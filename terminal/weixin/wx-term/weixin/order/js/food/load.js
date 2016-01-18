@@ -162,97 +162,146 @@ $(function(){
 					comment : comment
 				},
 				success : function(data, status, xhr){
-					if(data.success){
-						var dialogOrder = new DialogPopup({
-							titleText : '温馨提示',
-							leftText : '自助扫码',
-							content : '<font style="font-weight:bold;font-size:25px;color:blue;">订单号: ' + data.other.code + '</font><br><font style="color:green;">1.您可呼叫服务员来确认订单</font><br><font style="color:green;">2.您可选择自助扫描二维码下单</font>',
-							left : function(){
-								dialogOrder.close(function(){
-									var dialog = new DialogPopup({
-							    			titleText : '请输入台号',
-							    			leftText : '确认提交',
-						 	    			content : '<h3>请输入:<a data-type="numberInput_a_load" style="color:red;"></a></h3><br/>'
-								    					+'<div data-type="numberKyes_div_load" style="margin-top:-40px;"></div>',
-								    		contentCallback : function(dialogDiv){
-								    			dialogDiv.find('[data-type="numberKyes_div_load"]').width(dialogDiv.width());
-							    				var numKeys = new Array("7", "8", "9", "0", "4", "5", "6", "删除", "1", "2", "3", "清空");
-								    			var keys = "";
-								    			for(var i = 0; i < numKeys.length; i++){
-								    				var eachButton = '<input type="button" class="a_demo_two" style="width:60px;height:55px;font-size:18px;" value="' + numKeys[i] + '">';
-								    				if(i % 4 == 0){
-								    					keys += '<br/>';
-								    				}
-								    				keys += eachButton;
-								    			}	
-								    			dialogDiv.find('[data-type="numberKyes_div_load"]').append(keys);
-								    			dialogDiv.find('[data-type="numberKyes_div_load"] input').each(function(index, element){
-								    				element.onclick = function(){
-								    					if($(element).val() == '删除'){
-								    						var s = dialogDiv.find('[data-type="numberInput_a_load"]').text();
-								    						dialogDiv.find('[data-type="numberInput_a_load"]').text(s.substring(0, s.length - 1));
-								    					}else if($(element).val() == '清空'){
-								    						dialogDiv.find('[data-type="numberInput_a_load"]').text('');
-								    					}else{
-								    						dialogDiv.find('[data-type="numberInput_a_load"]').text(dialogDiv.find('[data-type="numberInput_a_load"]').text() + $(element).val());
-								    					}
-								    				}
-								    			});
-								    		},
-								    		left : function(dialogDiv){
-								    			if(dialogDiv.find('[data-type="numberInput_a_load"]').text() == ""){
-								    				Util.dialog.show({ msg : '餐桌号不能为空', btn :'yes'});
-								    			}else{
-								    				 Util.lm.show();
-													 $.ajax({
-														url : '../../WxOperateOrder.do',
-														dataType : 'json',
-														type : 'post',
-														data : {
-															dataSource : 'self',
-															oid : Util.mp.oid,
-															fid : Util.mp.fid,
-															wid : data.other.id,
-															tableAlias : dialogDiv.find('[data-type="numberInput_a_load"]').text()
-	//																	qrCode :  res.resultStr.split('?')[0]
-														},
-														success : function(data, status, xhr){
-															Util.lm.hide();
-															if(data.success){
-																dialog.close(function(){
-																		//刷新界面
-																	pickFoodComponent.refresh();
-																	pickFoodComponent.closeShopping();
-																	
-																	var dialogClose = new DialogPopup({
-																		content : '下单成功',
-																		titleText : '温馨提示',
-																		left : function(){
-																			dialogClose.close();
-																			window.location.reload();
-																			 $('#foodOrderList').click();
+						if(data.success){
+							wx.scanQRCode({ 
+							    needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+							    scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+							    success: function (res) {
+							    	if(res.resultStr.split('?').length == 1){
+							    		//url不带餐桌号就要输入台号
+						    			var dialogOrder = new DialogPopup({
+											titleText : '温馨提示',
+											leftText : '自助扫码',
+											content : '<font style="font-weight:bold;font-size:25px;color:blue;">订单号: ' + data.other.code + '</font><br><font style="color:green;">1.您可呼叫服务员来确认订单</font><br><font style="color:green;">2.您可选择自助扫描二维码下单</font>',
+											left : function(){
+												dialogOrder.close(function(){
+													var dialog = new DialogPopup({
+										    			titleText : '请输入台号',
+										    			leftText : '确认提交',
+									 	    			content : '<h3>请输入台号:<a data-type="numberInput_a_load" style="color:red;"></a></h3><br/>'
+											    					+'<div data-type="numberKyes_div_load" style="margin-top:-40px;"></div>',
+											    		contentCallback : function(dialogDiv){
+											    			dialogDiv.find('[data-type="numberKyes_div_load"]').width(dialogDiv.width());
+										    				var numKeys = new Array("7", "8", "9", "0", "4", "5", "6", "删除", "1", "2", "3", "清空");
+											    			var keys = "";
+											    			for(var i = 0; i < numKeys.length; i++){
+											    				var eachButton = '<input type="button" class="a_demo_two" style="width:60px;height:55px;font-size:18px;" value="' + numKeys[i] + '">';
+											    				if(i % 4 == 0){
+											    					keys += '<br/>';
+											    				}
+											    				keys += eachButton;
+											    			}	
+											    			dialogDiv.find('[data-type="numberKyes_div_load"]').append(keys);
+											    			dialogDiv.find('[data-type="numberKyes_div_load"] input').each(function(index, element){
+											    				element.onclick = function(){
+											    					if($(element).val() == '删除'){
+											    						var s = dialogDiv.find('[data-type="numberInput_a_load"]').text();
+											    						dialogDiv.find('[data-type="numberInput_a_load"]').text(s.substring(0, s.length - 1));
+											    					}else if($(element).val() == '清空'){
+											    						dialogDiv.find('[data-type="numberInput_a_load"]').text('');
+											    					}else{
+											    						dialogDiv.find('[data-type="numberInput_a_load"]').text(dialogDiv.find('[data-type="numberInput_a_load"]').text() + $(element).val());
+											    					}
+											    				}
+											    			});
+											    		},
+											    		left : function(dialogDiv){
+											    			if(dialogDiv.find('[data-type="numberInput_a_load"]').text() == ""){
+											    				Util.dialog.show({ msg : '餐桌号不能为空', btn :'yes'});
+											    			}else{
+											    				 Util.lm.show();
+																 $.ajax({
+																	url : '../../WxOperateOrder.do',
+																	dataType : 'json',
+																	type : 'post',
+																	data : {
+																		dataSource : 'self',
+																		oid : Util.mp.oid,
+																		fid : Util.mp.fid,
+																		wid : data.other.id,
+																		tableAlias : dialogDiv.find('[data-type="numberInput_a_load"]').text()
+				//																	qrCode :  res.resultStr.split('?')[0]
+																	},
+																	success : function(data, status, xhr){
+																		Util.lm.hide();
+																		if(data.success){
+																			dialog.close(function(){
+																					//刷新界面
+																				pickFoodComponent.refresh();
+																				pickFoodComponent.closeShopping();
+																				
+																				var dialogClose = new DialogPopup({
+																					content : '下单成功',
+																					titleText : '温馨提示',
+																					left : function(){
+																						dialogClose.close();
+																						window.location.reload();
+																						 $('#foodOrderList').click();
+																					}
+																				})
+																				dialogClose.open();
+																			}, 200);
+																		}else{
+																			Util.dialog.show({ msg : data.msg });
 																		}
-																	})
-																	dialogClose.open();
-																}, 200);
-															}else{
-																Util.dialog.show({ msg : data.msg });
-															}
-														},
-														error : function(xhr, errorType, error){
-															Util.lm.hide();
-															Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
-														}
-													});
-								    			}
-								    		}
-							    		});
-							    		dialog.open(); 
-								}, 200);
-							}
-						});
-						
-						dialogOrder.open();
+																	},
+																	error : function(xhr, errorType, error){
+																		Util.lm.hide();
+																		Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
+																	}
+																});
+											    			}
+											    		}
+										    		});
+										    		dialog.open(); 
+												}, 200);
+											}
+										});
+										
+										dialogOrder.open();
+								 }else{
+									 Util.lm.show();
+									 $.ajax({
+										url : '../../WxOperateOrder.do',
+										dataType : 'json',
+										type : 'post',
+										data : {
+											dataSource : 'self',
+											oid : Util.mp.oid,
+											fid : Util.mp.fid,
+											wid : data.other.id,
+											tableAlias : res.resultStr.split('?')[1],
+											qrCode :  res.resultStr.split('?')[0]
+										},
+										success : function(data, status, xhr){
+											Util.lm.hide();
+											if(data.success){
+												//刷新界面
+												pickFoodComponent.refresh();
+												pickFoodComponent.closeShopping();
+												
+												var dialogClose = new DialogPopup({
+													content : '下单成功',
+													titleText : '温馨提示',
+													left : function(){
+														dialogClose.close();
+														window.location.reload();
+														 $('#foodOrderList').click();
+													}
+												})
+												dialogClose.open();
+											}else{
+												Util.dialog.show({ msg : data.msg });
+											}
+										},
+										error : function(xhr, errorType, error){
+											Util.lm.hide();
+											Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
+										}
+									});
+								 }
+						    }
+						}); 
 				 	}else{
 				 		Util.dialog.show({ msg : data.msg });
 				 	}
