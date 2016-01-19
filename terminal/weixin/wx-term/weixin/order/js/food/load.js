@@ -256,45 +256,47 @@ $(function(){
 									    		dialog.open(); 
 											}, 200);
 								    	}else{
-    										 Util.lm.show();
-											 $.ajax({
-												url : '../../WxOperateOrder.do',
-												dataType : 'json',
-												type : 'post',
-												data : {
-													dataSource : 'self',
-													oid : Util.mp.oid,
-													fid : Util.mp.fid,
-													wid : data.other.id,
-													tableAlias : res.resultStr.split('?')[1],
-													qrCode :  res.resultStr.split('?')[0]
-												},
-												success : function(data, status, xhr){
-													Util.lm.hide();
-													if(data.success){
-														//刷新界面
-														pickFoodComponent.refresh();
-														pickFoodComponent.closeShopping();
-														
-														var dialogClose = new DialogPopup({
-															content : '下单成功',
-															titleText : '温馨提示',
-															left : function(){
-																dialogClose.close();
-																window.location.reload();
-																 $('#foodOrderList').click();
-															}
-														})
-														dialogClose.open();
-													}else{
-														Util.dialog.show({ msg : data.msg });
+										 	 dialogOrder.close(function(){
+										 	 	 Util.lm.show();
+										 	 	 $.ajax({
+													url : '../../WxOperateOrder.do',
+													dataType : 'json',
+													type : 'post',
+													data : {
+														dataSource : 'self',
+														oid : Util.mp.oid,
+														fid : Util.mp.fid,
+														wid : data.other.id,
+														tableAlias : res.resultStr.split('?')[1],
+														qrCode :  res.resultStr.split('?')[0]
+													},
+													success : function(data, status, xhr){
+														Util.lm.hide();
+														if(data.success){
+															//刷新界面
+															pickFoodComponent.refresh();
+															pickFoodComponent.closeShopping();
+															
+															var dialogClose = new DialogPopup({
+																content : '下单成功',
+																titleText : '温馨提示',
+																left : function(){
+																	dialogClose.close();
+																	window.location.reload();
+																	 $('#foodOrderList').click();
+																}
+															})
+															dialogClose.open();
+														}else{
+															Util.dialog.show({ msg : data.msg });
+														}
+													},
+													error : function(xhr, errorType, error){
+														Util.lm.hide();
+														Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
 													}
-												},
-												error : function(xhr, errorType, error){
-													Util.lm.hide();
-													Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
-												}
-											});
+												});
+										 	 }, 200);
 								    	}
 								    }
 								});
