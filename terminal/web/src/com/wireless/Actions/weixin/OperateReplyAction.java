@@ -16,12 +16,14 @@ import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 import org.marker.weixin.msg.Msg4Head.MsgType;
 
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.action.WxMenuActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.action.WxMenuAction;
 import com.wireless.pojo.weixin.action.WxMenuAction.Cate;
@@ -39,6 +41,7 @@ public class OperateReplyAction extends DispatchAction {
 	public ActionForward insertImageText(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String title = request.getParameter("title");
 		final String image = request.getParameter("image");
+		final String imageId = request.getParameter("imageId");
 		final String content = request.getParameter("content");
 		final String url = request.getParameter("url");
 		final String pin = (String)request.getAttribute("pin");
@@ -58,6 +61,8 @@ public class OperateReplyAction extends DispatchAction {
 			}
 			
 			final WxMenuAction.InsertBuilder4ImageText builder = new WxMenuAction.InsertBuilder4ImageText(new Data4Item(title, content, image, url), cate);
+			//Associated the main oss image with this reply.
+			OssImageDao.update(staff, new OssImage.UpdateBuilder(Integer.parseInt(imageId)).setAssociated(OssImage.Type.WX_REPLY, 1));
 			if(subItems != null && !subItems.isEmpty()){
 				String[] subItemArry = subItems.split("<ul>");
 				for (String s : subItemArry) {
@@ -65,6 +70,10 @@ public class OperateReplyAction extends DispatchAction {
 					String subOssImage = subItem[2];
 					if(subItem[2].equals("-1")){
 						subOssImage = "";
+					}
+					if(!subItem[3].equals("-1")){
+						//Associated the sub oss image with this reply.
+						OssImageDao.update(staff, new OssImage.UpdateBuilder(Integer.parseInt(subItem[3])).setAssociated(OssImage.Type.WX_REPLY, 1));
 					}
 					builder.addItem(new Data4Item(subItem[0], "", subOssImage, subItem[1]));
 				}
@@ -115,6 +124,7 @@ public class OperateReplyAction extends DispatchAction {
 	 */
 	public ActionForward updateImageText(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String title = request.getParameter("title");
+		final String imageId = request.getParameter("imageId");
 		final String image = request.getParameter("image");
 		final String content = request.getParameter("content");
 		final String url = request.getParameter("url");
@@ -129,6 +139,12 @@ public class OperateReplyAction extends DispatchAction {
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			final WxMenuAction.UpdateBuilder4ImageText builder = new WxMenuAction.UpdateBuilder4ImageText(Integer.parseInt(key), new Data4Item(title, content, image, url));
+			
+			if(imageId != null && !imageId.isEmpty()){
+				//Associated the main oss image with this reply.
+				OssImageDao.update(staff, new OssImage.UpdateBuilder(Integer.parseInt(imageId)).setAssociated(OssImage.Type.WX_REPLY, 1));
+			}
+			
 			if(subscribe != null && !subscribe.isEmpty() && Boolean.parseBoolean(subscribe)){
 				builder.setCate(Cate.SUBSCRIBE_REPLY);
 			}else{
@@ -139,11 +155,15 @@ public class OperateReplyAction extends DispatchAction {
 				String[] subItemArry = subItems.split("<ul>");
 				for (String s : subItemArry) {
 					String[] subItem = s.split("<li>");
-					String sub_ossImage = subItem[2];
+					String subImage = subItem[2];
 					if(subItem[2].equals("-1")){
-						sub_ossImage = "";
+						subImage = "";
 					}
-					builder.addItem(new Data4Item(subItem[0], "", sub_ossImage, subItem[1]));
+					if(!subItem[3].equals("-1")){
+						//Associated the sub oss image with this reply.
+						OssImageDao.update(staff, new OssImage.UpdateBuilder(Integer.parseInt(subItem[3])).setAssociated(OssImage.Type.WX_REPLY, 1));
+					}
+					builder.addItem(new Data4Item(subItem[0], "", subImage, subItem[1]));
 				}
 				
 			}
