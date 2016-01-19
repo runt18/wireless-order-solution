@@ -648,10 +648,6 @@
 			type="com.wireless.Actions.inventoryMgr.report.QuerySaleOfMaterialAction"
 			scope="request">
 		</action>
-		<action path="/OperateMenu"
-			type="com.wireless.Actions.client.member.OperateMenuAction" scope="request"
-			parameter="dataSource">
-		</action>
 		<action path="/QueryMemberStatistics"
 			type="com.wireless.Actions.client.member.QueryMemberStatisticsAction"
 			scope="request" parameter="dataSource">
