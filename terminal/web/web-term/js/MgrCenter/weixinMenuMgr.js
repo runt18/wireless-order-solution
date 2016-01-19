@@ -246,7 +246,7 @@ Ext.onReady(function(){
 			        		 	   				if(jr.success){
 			        			  	   				var ossImage = jr.root[0];
 			        			  	   				sub_box.image = ossImage.image;
-			        			  	   				sub_box.ossId = ossImage.imageId;	   				
+			        			  	   				sub_box.imageId = ossImage.imageId;	   				
 			        		 	   				}else{
 			        		 	   					Ext.ux.showMsg(jr);
 			        		 	   					imgFile.setImg("");
@@ -915,7 +915,7 @@ Ext.onReady(function(){
 							        		 	   				if(jr.success){
 							        			  	   				var ossImage = jr.root[0];
 							        			  	   				sub_box.image = ossImage.image;
-							        			  	   				sub_box.ossId = ossImage.imageId;	   				
+							        			  	   				sub_box.imageId = ossImage.imageId;	   				
 							        		 	   				}else{
 							        		 	   					Ext.ux.showMsg(jr);
 							        		 	   					imgFile.setImg("");
@@ -1217,7 +1217,7 @@ Ext.onReady(function(){
 						        		 	   				if(jr.success){
 						        			  	   				var ossImage = jr.root[0];
 						        			  	   				sub_box.image = ossImage.image;
-						        			  	   				sub_box.ossId = ossImage.imageId;	   				
+						        			  	   				sub_box.imageId = ossImage.imageId;	   				
 						        		 	   				}else{
 						        		 	   					Ext.ux.showMsg(jr);
 						        		 	   					imgFile.setImg("");
@@ -1402,7 +1402,7 @@ Ext.onReady(function(){
 	 	   				if(jr.success){
 		  	   				var ossImage = jr.root[0];
 		  	   				p_box.image = ossImage.image;
-		  	   				p_box.ossId = ossImage.imageId;	   				
+		  	   				p_box.imageId = ossImage.imageId;	   				
 	 	   				}else{
 	 	   					Ext.ux.showMsg(jr);
 	 	   					imgFile.setImg("");
@@ -1494,7 +1494,7 @@ Ext.onReady(function(){
 	 	   				if(jr.success){
 		  	   				var ossImage = jr.root[0];
 		  	   				p_box.image = ossImage.image;
-		  	   				p_box.ossId = ossImage.imageId;	   				
+		  	   				p_box.imageId = ossImage.imageId;	   				
 	 	   				}else{
 	 	   					Ext.ux.showMsg(jr);
 	 	   					imgFile.setImg("");
@@ -1633,7 +1633,10 @@ Ext.onReady(function(){
 								if(subItems){
 									subItems += '<ul>';
 								}
-								subItems += (title.getValue() + "<li>" + url.getValue() + "<li>" + (image.image?image.image:-1));						
+								subItems += (title.getValue() + "<li>" + 
+											 url.getValue() + "<li>" + 
+											 (image.image ? image.image : -1) + "<li>" + 
+											 (image.imageId ? image.imageId : -1));						
 							
 							}
 						}		
@@ -1653,6 +1656,7 @@ Ext.onReady(function(){
 						key = tn.attributes.actionId;
 					}
 					
+					
 					$.ajax({ 
 					    type : "post", 
 					    async : false, 
@@ -1661,13 +1665,14 @@ Ext.onReady(function(){
 					    data : {
 					    	dataSource : dataSource,
 					    	rid : rid,
-					    	key : key != null ? key : "",
+					    	key : key != null ? key : null,
 					    	title : $("#itemTitle_textfield_weixin").val(),
-					    	image : p_box.image ? p_box.image : "",
+					    	image : p_box.image ? p_box.image : null,
+					    	imageId : p_box.imageId ? p_box.imageId : null,
 					    	content : $("#itemContent_textfield_weixin").val(),
 					    	url : $("#itemUrl_textarea_weixin").val(),
 					    	subItems : subItems,
-					    	subscribe : subscribe ? subscribe : ""
+					    	subscribe : subscribe ? subscribe : null
 					    },
 					    success : function(rt){ 
 					        if(rt.success){
@@ -2048,7 +2053,7 @@ Ext.onReady(function(){
 	 	   				if(jr.success){
 		  	   				var ossImage = jr.root[0];
 		  	   				sub_box.image = ossImage.image;
-		  	   				sub_box.ossId = ossImage.imageId;	   				
+		  	   				sub_box.imageId = ossImage.imageId;	   				
 	 	   				}else{
 	 	   					Ext.ux.showMsg(jr);
 	 	   					imgFile.setImg("");
@@ -2168,7 +2173,9 @@ Ext.onReady(function(){
 					var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
 					if(jr.success){
 		   				var ossImage = jr.root[0];
-		   				imgFile.image = ossImage.image;	   				
+		   				console.log(ossImage);
+		   				imgFile.image = ossImage.image;	 
+		   				imgFile.imageId = ossImage.imageId;
 					}else{
 						Ext.ux.showMsg(jr);
 						imgFile.setImg("");
