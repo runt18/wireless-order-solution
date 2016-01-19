@@ -1,6 +1,7 @@
 package com.wireless.Actions.weixin.operate;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,7 +115,7 @@ public class WxOperateMenuAction extends DispatchAction {
 		response.setCharacterEncoding("UTF-8");
 		
 		final int rid = Integer.parseInt(request.getParameter("rid"));
-		final String menu = request.getParameter("menu");
+		final String menu = URLDecoder.decode(request.getParameter("menu"), "UTF-8");
 		final String callback = request.getParameter("callback");
 //		String appId = "wx6c03b8cab601465d";
 //		String appSecret = "c12ec7d212bcc74785f3912c4c9c39e1";
