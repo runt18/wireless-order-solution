@@ -18,6 +18,7 @@
 <script type="text/javascript">
 var member = {}, currentMemberLevelData={}, memberLevelData=[];
 </script>
+<script type="text/javascript" src="./js/dialog/dialog.js"></script>
 <script type="text/javascript" src="./js/member/load.js"></script>
 <script type="text/javascript" src="./js/member/main.js"></script>
 
@@ -62,15 +63,25 @@ var member = {}, currentMemberLevelData={}, memberLevelData=[];
 						会员姓名: <input id="name_input_member" class="txtVerifyMobile"/>
 					</li>
 					<li class="none-line" style="line-height: 50px;">
-						会员生日: <input id="birthday_input_member" class="txtVerifyMobile" style="font-size:20px;" type="date">
+							会员生日: <input id="birthdayMonth_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:60px;">&nbsp;月
+						&nbsp;<input id="birthdayDay_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:60px;">&nbsp;日
+					</li>
+					<li class="box-horizontal none-line" style="line-height: 50px;font-size:18px;">
+						性别:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div data-type="personSex" data-value="0" class="region_css_book selectedRegion_css_book" style="width:31%;" href="#">
+							<ul class="m-b-list">先生</ul>
+						</div>
+						<div data-type="personSex" data-value="1" class="region_css_book" style="width:31%;" href="#">
+							<ul class="m-b-list">女士</ul>
+						</div>
 					</li>
 					<li class="none-line" style="line-height: 50px;">	
-						年龄段: &nbsp;&nbsp;&nbsp;&nbsp;<select id="memberAge_select_member" style="font-size: 16px;padding: 3px 5px 3px 5px;width: 120px;">
-							<option value ="1">60后</option>  
-							<option value ="2">70后</option>
-							<option value="3">80后</option>
-							<option value="4">90后</option>
-							<option value="5">00后</option>
+						年龄段: &nbsp;&nbsp;&nbsp;&nbsp;<select id="memberAge_select_member" style="font-size: 20px;padding: 3px 5px 3px 5px;width:180px;">
+								<option value="5">00后</option>
+								<option value="4">90后</option>
+								<option value="3">80后</option>
+								<option value ="2">70后</option>
+								<option value ="1">60后</option>  
+								<option value ="6">50后</option>
 							</select>			
 					</li>
 					<li class="none-line">

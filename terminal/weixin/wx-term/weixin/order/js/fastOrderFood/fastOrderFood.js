@@ -20,7 +20,7 @@ function PickFoodComponent(param){
 	//备注信息
 	var _commentData = null;
 	
-	this.open = function(){
+	this.open = function(afterOpen){
 		$('#WXCmp_div_member').hide();
 		//渲染
 		createWxPickFood();
@@ -29,6 +29,9 @@ function PickFoodComponent(param){
 		window.onresize();
 		//加载厨房
 		initKitchen();
+		if(afterOpen){
+			afterOpen(_container);
+		}
 	};
 	
 	this.close = function(){

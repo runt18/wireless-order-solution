@@ -101,8 +101,11 @@ function DialogPopup(param){
 	}
 	
 	
-	this.open = function(){
+	this.open = function(afterOpen){
 		_init();
+		if(afterOpen){
+			afterOpen();
+		}
 	};
 	
 	
