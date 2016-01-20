@@ -41,9 +41,7 @@ import com.wireless.util.SQLUtil;
 
 public class QueryMemberAction extends DispatchAction {
 	
-	public ActionForward count(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward count(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String memberType = request.getParameter("memberTypes");
 		String[] memberTypes = memberType.split(",");
 		String pin = (String) request.getAttribute("pin");
@@ -95,9 +93,7 @@ public class QueryMemberAction extends DispatchAction {
 			});
 			
 			jobject.setRoot(mts);
-		}catch(BusinessException e){
-			e.printStackTrace();
-		}catch(SQLException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 		}catch(Exception e){
 			e.printStackTrace();
