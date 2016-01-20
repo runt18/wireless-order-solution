@@ -269,6 +269,10 @@ public class MemberTypeDao {
 		sql = " DELETE FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + memberTypeId;
 		dbCon.stmt.executeUpdate(sql);
 		
+		//Delete the price plans associated with this member type.
+		sql = " DELETE FROM " + Params.dbName + ".member_type_price WHERE member_type_id = " + memberTypeId;
+		dbCon.stmt.executeUpdate(sql);
+		
 		if(staff.isGroup()){
 			//Delete the chain discounts associated with this member type.
 			sql = " DELETE FROM " + Params.dbName + ".member_chain_discount " + 
