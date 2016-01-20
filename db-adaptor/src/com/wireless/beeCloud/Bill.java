@@ -65,6 +65,7 @@ public class Bill {
 						app.revert.ask(request.billNo, request.channel);
 						return null;
 					}else if(new Status(app).ask(request.channel, request.billNo).isPaySuccess()){
+						schedule.shutdown();
 						return postAction.call();
 					}else{
 						schedule.schedule(this, 5, TimeUnit.SECONDS);

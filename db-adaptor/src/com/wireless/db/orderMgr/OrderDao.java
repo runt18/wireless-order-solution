@@ -1108,7 +1108,7 @@ public class OrderDao {
 			sql = " UPDATE " + Params.dbName + ".order_food " +
 				  " SET food_id = " + of.getFoodId() +
 				  " ,discount = " + of.getDiscount() + 
-				  " ,plan_price = " + (order.hasPricePlan() && of.asFood().hasPricePlan() ?  + of.asFood().getPrice(order.getPricePlan()) : " NULL ") +
+				  " ,plan_price = " + (order.hasPricePlan() && of.asFood().hasPricePlan() ?  of.asFood().getPrice(order.getPricePlan()) : " NULL ") +
 				  " WHERE order_id = " + order.getId() + 
 				  " AND food_id = " + of.getFoodId() +
 				  (of.hasFoodUnit() ? " AND food_unit_id = " + of.getFoodUnit().getId() : "");

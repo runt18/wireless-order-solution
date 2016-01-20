@@ -65,7 +65,7 @@ public class TestWxMenuAction {
 			String fileName = System.getProperty("user.dir") + "/src/" + TestOssImage.class.getPackage().getName().replaceAll("\\.", "/") + "/test.jpg";
 			
 			//Test to insert a new weixin image text msg action.
-			ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_ACTION_IMAGE, 1)
+			ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_REPLY, 1)
 																.setImgResource(ImageType.JPG, new FileInputStream(new File(fileName))));
 			OssImage image = OssImageDao.getById(mStaff, ossImageId);
 			WxMenuAction.InsertBuilder4ImageText insert4ImageText = new WxMenuAction.InsertBuilder4ImageText(new Data4Item("测试Title", "测试Description", image.getObjectUrl(), "http://www.baidu.com"), WxMenuAction.Cate.NORMAL);
@@ -120,7 +120,7 @@ public class TestWxMenuAction {
 			
 			Thread.sleep(1000);
 			//Test to update the msg action to image text.
-			ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_ACTION_IMAGE, 1)
+			ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_REPLY, 1)
 																.setImgResource(ImageType.JPG, new FileInputStream(new File(fileName))));
 			image = OssImageDao.getById(mStaff, ossImageId);
 			WxMenuAction.UpdateBuilder4ImageText update4ImageText = new WxMenuAction.UpdateBuilder4ImageText(actionId, new Data4Item("测试Title", "测试Description", image.getObjectUrl(), "http://www.baidu.com"));
