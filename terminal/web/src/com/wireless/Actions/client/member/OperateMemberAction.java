@@ -279,6 +279,7 @@ public class OperateMemberAction extends DispatchAction{
 			final String comment = request.getParameter("comment");
 			final String isPrint = request.getParameter("isPrint");
 			final String sendSms = request.getParameter("sendSms");
+			final String orientedPrinters = request.getParameter("orientedPrinter");
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -287,7 +288,13 @@ public class OperateMemberAction extends DispatchAction{
 			jObject.initTip(true, "操作成功, 会员充值成功.");
 			if(isPrint != null && Boolean.valueOf(isPrint)){
 				try{
-					ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildMemberReceipt(staff, mo.getId()).build());
+					final ReqPrintContent reqPrint = ReqPrintContent.buildMemberReceipt(staff, mo.getId());
+					if(orientedPrinters != null && !orientedPrinters.isEmpty()){
+						for(String orientedPrinter : orientedPrinters.split(",")){
+							reqPrint.addPrinter(Integer.parseInt(orientedPrinter));
+						}
+					}
+					ProtocolPackage resp = ServerConnector.instance().ask(reqPrint.build());
 					if(resp.header.type == Type.ACK){
 						jObject.setMsg(jObject.getMsg() + "打印充值信息成功.");
 					}else{
