@@ -22,6 +22,7 @@
 
 <script type="text/javascript" src="js/Util.js"></script>
 <script type="text/javascript" src="js/book/bookFood.js"></script>
+<script type="text/javascript" src="./js/dialog/dialog.js"></script>
 <script type="text/javascript" src="js/fastOrderFood/fastOrderFood.js"></script>
 
 <script type="text/javascript" src="./js/idangerous.swiper-2.4.2.min.js"></script>
@@ -35,20 +36,20 @@
 </head>
 
 <body>
-<div  id="div4BookDetail" >
+<div  id="div4BookDetail_div_book" >
 <div  class="main-box" id="bookTime_div_book" style="height: 52px;">
 
-	<div id="bookDate4Today" class="bookDate">
+	<div id="bookDate4Today_div_book" class="bookDate">
 		<div data-type="bookTime" class="bookDateDetail bookDateCheck">
 			今天<br>02-10周日
 		</div>
 	</div>
-	<div id="bookDate4Tomorrow" class="bookDate">
+	<div id="bookDate4Tomorrow_div_book" class="bookDate">
 		<div data-type="bookTime" class="bookDateDetail">
 			明天<br>02-11周一
 		</div>
 	</div>
-	<div id="bookDate4AfterDay" class="bookDate">
+	<div id="bookDate4AfterDay_div_book" class="bookDate">
 		<div data-type="bookTime" class="bookDateDetail">
 			后天<br>02-09周六
 		</div>
@@ -56,11 +57,11 @@
 </div>
 
 <div align="center">
-	<input id="bookTime" type="button" name="time" value="点击我选择时间！" class="bookTime" />
+	<input id="bookTime_input_book" type="button" name="time" value="点击我选择时间！" class="bookTime" />
 </div>
 
 <div class="main-box" style="">
-	<ul class="m-b-list" id="ul4BooskRegion">
+	<ul class="m-b-list" id="ul4BooskRegion_ul_book">
 		<li style="line-height: 40px;">选择区域</li>
 		
 		
@@ -69,6 +70,7 @@
 
 <div class="main-box" id="bookPersonAmoung_div_book">
 	<ul class="m-b-list">
+		<li style="line-height: 40px;">选择人数: </li>
 		<li class="box-horizontal" style="line-height: 40px;margin-left:-10px;font-size:18px;">
 			<div data-type="personAmount" data-value="4" class="region_css_book selectedRegion_css_book" style="width:31%;" href="#">
 				<ul class="m-b-list">2-4人</ul>
@@ -89,10 +91,10 @@
 			人数: <input id="txtBookPeopleCount" type="number" class="bookPerson"/>
 		</li> -->
 		<li>
-			姓名: <input id="txtBookName" type="text" class="bookPerson"/>
+			姓名: <input id="txtBookName_input_book" type="text" class="bookPerson"/>
 		</li>
 		<li >
-			电话: <input id="txtBookPhone" type="number" maxlength="11" class="bookPerson"/>
+			电话: <input id="txtBookPhone_input_book" type="number" maxlength="11" class="bookPerson"/>
 		</li>					
 	</ul>	
 </div>
@@ -106,13 +108,13 @@
 		<li style="line-height: 40px;">
 			预订方式
 		</li>
-		<li class="box-horizontal" >
+		<li class="box-horizontal" id="bookTable_li_book">
 			<div data-for="bookTypeOnlyTable" class="bookRadioSelect">只订座</div>
-			<div class="event"><input id="bookTypeOnlyTable" type="radio" name="bookType" value="onlyTable" checked="checked" class="radioInput" onclick="operateSeat()"> </div>
+			<div class="event"><input id="bookTypeOnlyTable_input_book" type="radio" name="bookType" value="onlyTable" checked="checked" class="radioInput"> </div>
 		</li>
-		<li class="box-horizontal" >
+		<li class="box-horizontal" id="bookFood_li_book">
 			<div data-for="bookTypeTableAndFood" class="bookRadioSelect">提前点菜</div>
-			<div class="event"><input id="bookTypeTableAndFood" type="radio" name="bookType" value="tableAndFood"  class="radioInput"> </div>
+			<div class="event"><input id="bookTypeTableAndFood_input_book" type="radio" name="bookType" value="tableAndFood"  class="radioInput"> </div>
 		</li>	 
 	</ul>	
 </div>
@@ -120,7 +122,7 @@
 <div class="main-box" style="">
 	<ul class="m-b-list">
 		<li style="line-height: 15px;" >
-			<div id="div4bookFoodList" class="bookFoodList"></div>
+			<div id="div4bookFoodList_div_book" class="bookFoodList"></div>
 		</li>	
 		<li class="box-horizontal" >
 			<div style="margin-top: 3px;height: 55px;width: 100%;text-align: center;" >
@@ -135,29 +137,19 @@
 <div id="bottoms" style="height:45;z-index:11111;display:none;">
 	<div class="hewarp">
 		<ul class="swiper-wrapper">
-			<li class="index swiper-slide">
-				<a href="javascript:Util.jump('index.html');" title="首页">
-				<i class="foundicon-home fcolor6"></i>首页
-				</a>
-			</li>
-			<li class="user swiper-slide">
-				<a id="foodOrderList" > 
-					<i class="foundicon-star fcolor1"></i><font id="food_order">我的预订</font>
-				</a>
-			</li>
-			<li class="special swiper-slide" id="shoppingCar_li_member">
+			<li style="width:49%;" class="special swiper-slide" id="shoppingCar_li_member">
 				<a title="购物车"> 
 				<i class="foundicon-cart fcolor2"><div id="displayFoodCount_div_fastOrderFood"></div></i>购物车
 				</a>
 			</li>
 
-			<li class="user swiper-slide">
-				<a href="javascript:window.location.reload();" title="刷新">
-				<i class="foundicon-refresh fcolor3"></i>刷新
+			<li style="width:49%;" class="user swiper-slide">
+				<a href="#" id="back_a_book" title="返回">
+				<i class="foundicon-refresh fcolor3"></i>返回
 				</a>
 			</li>
 		</ul>
-	</div>
+	</div> 
 </div>
 </body>
 </html>

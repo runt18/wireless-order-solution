@@ -1,19 +1,5 @@
-	//选只订座的方式
-	function operateSeat(){
-		$('#div4bookFoodList').hide();	
-	}
 $(function(){
-	var bookDates = [],
-	bookFoodShoppingBox = '<div data-value="{id}" class="div-fl-f-sc-box box-horizontal">'
-		+ '<div data-type="msg" class="div-full">'
-			+ '<div><b>{name}</b></div>'
-			+ '<div>价格: <span>￥{unitPrice}</span></div>'
-		+ '</div>'
-		+ '<div data-type="cut" data-value={id}>-</div>'
-		+ '<div data-type="count">{count}</div>'
-		+ '<div data-type="plus" data-value={id} onclick="operateBookFood({otype:\'plus\', id:{id}, event:this})">+</div>'
-		+ '</div>';
-	
+	var bookDates = [];
 	
 	$(".bookTime").timepicki();
 	
@@ -26,8 +12,8 @@ $(function(){
 		}, function(data){
 			if(data.success){
 				var member = data.other.member;
-				$('#txtBookName').val(member.name);
-				$('#txtBookPhone').val(member.mobile);
+				$('#txtBookName_input_book').val(member.name);
+				$('#txtBookPhone_input_book').val(member.mobile);
 			}
 		}, 'json');
 	})();
@@ -50,9 +36,9 @@ $(function(){
 		bookDates.push(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
 
 		
-		$('#bookDate4AfterDay').html('<div class="bookDateDetail" data-type="bookTime" data-value=2>后天<br>'+ afterday +'</div>');
-		$('#bookDate4Today').html('<div class="bookDateDetail bookDateCheck" data-type="bookTime" data-value=0>今天<br>'+ today +'</div>');
-		$('#bookDate4Tomorrow').html('<div class="bookDateDetail" data-type="bookTime" data-value=1>明天<br>'+ tomorrow +'</div>');	
+		$('#bookDate4AfterDay_div_book').html('<div class="bookDateDetail" data-type="bookTime" data-value=2>后天<br>'+ afterday +'</div>');
+		$('#bookDate4Today_div_book').html('<div class="bookDateDetail bookDateCheck" data-type="bookTime" data-value=0>今天<br>'+ today +'</div>');
+		$('#bookDate4Tomorrow_div_book').html('<div class="bookDateDetail" data-type="bookTime" data-value=1>明天<br>'+ tomorrow +'</div>');	
 		
 		//预订时间
 		$('#bookTime_div_book').find('[data-type="bookTime"]').each(function(index, element){
@@ -104,8 +90,8 @@ $(function(){
 						bookRegion += bookRegionTemplate;
 				 		li = '<li class="box-horizontal">' + bookRegion +  '</li>';
 					}
-					 $('#ul4BooskRegion').append(li);
-					 $('#ul4BooskRegion').trigger('create').trigger('refresh');
+					 $('#ul4BooskRegion_ul_book').append(li);
+					 $('#ul4BooskRegion_ul_book').trigger('create').trigger('refresh');
 				 }
 				
 				if((regions.length - index[index.length-1]) > 0){
@@ -119,18 +105,18 @@ $(function(){
 						 bookRegion += bookRegionTemplate;
 						 li = '<li class="box-horizontal">' + bookRegion +  '</li>';
 					}
-					 $('#ul4BooskRegion').append(li);
-					 $('#ul4BooskRegion').trigger('create').trigger('refresh');
+					 $('#ul4BooskRegion_ul_book').append(li);
+					 $('#ul4BooskRegion_ul_book').trigger('create').trigger('refresh');
 				}
 				
 				//预订区域的点击事件
-				$('#ul4BooskRegion').find('[data-type="bookRegions"]').each(function(index, element){
-					$('#ul4BooskRegion').find('[data-type="bookRegions"]:first').addClass('selectedRegion_css_book');
+				$('#ul4BooskRegion_ul_book').find('[data-type="bookRegions"]').each(function(index, element){
+					$('#ul4BooskRegion_ul_book').find('[data-type="bookRegions"]:first').addClass('selectedRegion_css_book');
 					element.onclick = function(){
 						if($(element).hasClass('selectedRegion_css_book')){
 							$(element).addClass('selectedRegion_css_book');
 						}else{
-							$('#ul4BooskRegion').find('[data-type="bookRegions"]').removeClass('selectedRegion_css_book');
+							$('#ul4BooskRegion_ul_book').find('[data-type="bookRegions"]').removeClass('selectedRegion_css_book');
 							$(element).addClass('selectedRegion_css_book');
 						}
 					}
@@ -154,7 +140,7 @@ $(function(){
 				date = bookDates[$(this).data('value')];
 			}
 		});
-		time = $('#bookTime').val();
+		time = $('#bookTime_input_book').val();
 		if(time.indexOf('PM') > 0){
 			var hourString = time.substring(0, time.indexOf(':'));
 			var hour = parseInt(hourString) + 12;
@@ -165,12 +151,19 @@ $(function(){
 			var minute = time.substr(time.indexOf(':')+1, 2);	
 			time = hour + ":" + minute + ':' + "59";
 		}else{
-			Util.dialog.show({msg: '请选择时间', btn:'yes'});
+			var dialog = new DialogPopup({
+					content : '请选择时间',
+					titleText : '温馨提示',
+					left : function(){
+						dialog.close();
+					}
+				})
+			dialog.open();
 			return;
 		}
 		
 		//预订区域
-		$('#ul4BooskRegion').find('[data-type="bookRegions"]').each(function(index, element){
+		$('#ul4BooskRegion_ul_book').find('[data-type="bookRegions"]').each(function(index, element){
 			if($(element).hasClass('selectedRegion_css_book')){
 				region = $(element).attr('data-value');
 			}
@@ -183,27 +176,59 @@ $(function(){
 			}
 		});
 		
-		name = $('#txtBookName').val();
-		phone = $('#txtBookPhone').val();
+		name = $('#txtBookName_input_book').val();
+		phone = $('#txtBookPhone_input_book').val();
 		
 		if(!name){
-			Util.dialog.show({msg: '请填写姓名', btn:'yes'});
+			var dialog = new DialogPopup({
+					content : '请填写姓名',
+					titleText : '温馨提示',
+					left : function(){
+						dialog.close();
+					}
+				})
+			dialog.open();
 			return;
 		}	
 		if(!phone){
-			Util.dialog.show({msg: '请填写电话', btn:'yes'});
+			var dialog = new DialogPopup({
+				content : '请填写电话',
+				titleText : '温馨提示',
+				left : function(){
+					dialog.close();
+				}
+			})
+			dialog.open();
 			return;
 		}	
 		
-//			var foods = "";
-//			for(var i = 0; i < params.orderData.length; i++){
-//				temp = params.orderData[i];
-//				if(i > 0){
-//					foods += '&';
-//				}
-//				foods += (temp.id + ',' + temp.count);
-//			}
-//			
+		var foods = "";
+		if($('#bookTypeOnlyTable_input_book').attr('checked') == 'checked'){
+			foods = "";
+		}else{
+			if(bookFoods.length < 1){
+				var dialog = new DialogPopup({
+					content : '请选择菜品',
+					titleText : '温馨提示',
+					left : function(){
+						dialog.close(function(){
+							$('#bookFood_li_book').click();
+						}, 200);
+					}
+				})
+				dialog.open();
+				return;
+			}else{
+				for(var i = 0; i < bookFoods.length; i++){
+					temp = bookFoods[i];
+					if(i > 0){
+						foods += '&';
+					}
+					foods += (temp.id + ',' + temp.count);
+				}
+			}
+		}
+		Util.lm.show();	
 		$.post('../../WxOperateBook.do', {
 			fid : Util.mp.fid,
 			dataSource : 'insert',
@@ -212,16 +237,20 @@ $(function(){
 			phone : phone,
 			count : count,
 			region : region,
-//			foods : foods
+			foods : foods
 		}, function(data){
 			if(data.success){
-				Util.dialog.show({msg: '预订成功', btn:'yes',
-					callback : function(btn){
-						if(btn == 'yes'){
+				Util.lm.hide();
+				var dialog = new DialogPopup({
+					content : '预订成功',
+					titleText : '温馨提示',
+					left : function(){
+						dialog.close(function(){
 							Util.jump('orderList.html?book=1');
-						}
+						}, 200);
 					}
-				});
+				})
+				dialog.open();
 			}
 		}, 'json');
 	});
@@ -239,8 +268,26 @@ $(function(){
 		}
 	});
 	
+	//底部栏的返回
+	$('#back_a_book').click(function(){
+		pickFoodComponent.close();
+		$('#div4BookDetail_div_book').show();
+		$('#div4bookFoodList_div_book').show();	
+		$('#bottoms').hide();
+	});
+	
 	//渲染菜品
 	function initFood(food){
+		var bookFoodShoppingBox = '<div data-value="{id}" class="div-fl-f-sc-box box-horizontal">'
+			+ '<div data-type="msg" class="div-full">'
+				+ '<div><b>{name}</b></div>'
+				+ '<div>价格: <span>￥{unitPrice}</span></div>'
+			+ '</div>'
+			+ '<div data-type="cut" data-value={id}>-</div>'
+			+ '<div data-type="count">{count}</div>'
+			+ '<div data-type="plus" data-value={id}>+</div>'
+			+ '</div>';
+		
 		var html = [], temp, sumPrice = 0;
 		
 		for(var i = 0; i < food.length; i++){
@@ -253,24 +300,81 @@ $(function(){
 				count : temp.count
 			}));
 		}
-		$('#div4bookFoodList').html(html.join(''));	
+		$('#div4bookFoodList_div_book').html(html.join(''));	
+		
+		//菜品数量增加
+		$('#div4bookFoodList_div_book').find('[data-type="plus"]').each(function(index, element){
+			element.onclick = function(){
+				for(var i = 0; i < bookFoods.length; i++){
+					if($(element).attr('data-value') == bookFoods[i].id){
+						bookFoods[i].count++;
+						$(element).parent().find('[data-type="count"]').text(bookFoods[i].count);
+					}
+				}
+			}
+		});
+		
+		//菜品数量减少
+		$('#div4bookFoodList_div_book').find('[data-type="cut"]').each(function(index, element){
+			element.onclick = function(){
+				for(var i = 0; i < bookFoods.length; i++){
+					if($(element).attr('data-value') == bookFoods[i].id){
+						bookFoods[i].count--;
+						if(bookFoods[i].count < 1){
+							var dialog = new DialogPopup({
+									content : '是否删除该菜品',
+									titleText : '温馨提示',
+									left : function(){
+										dialog.close(function(){
+											bookFoods.splice(i, 1);
+											$(element).parent().remove();
+										}, 200);
+									}
+								})
+							dialog.open();
+							break;
+						}else{
+							$(element).parent().find('[data-type="count"]').text(bookFoods[i].count);
+						}
+					}
+				}
+			}
+		});
+		
 	}
 	
 	
+	//只订桌
+	$('#bookTable_li_book').click(function(){
+		$('#div4bookFoodList_div_book').hide();	
+		$('#bookTypeOnlyTable_input_book').attr('checked', 'checked');
+	})
+	
 	//预订点菜
+	var bookFoods = [];     //预订的菜品
 	var pickFoodComponent = null;
-	$('#bookTypeTableAndFood').click(function(){
+	$('#bookFood_li_book').click(function(){
+		 $('#bookTypeTableAndFood_input_book').attr('checked', 'checked');
+		 document.getElementById('displayFoodCount_div_fastOrderFood').innerHTML ='';
+		 document.getElementById('displayFoodCount_div_fastOrderFood').style.visibility = 'hidden';
 		 pickFoodComponent = new PickFoodComponent({
 			 bottomId : 'bottoms',
 			 confirm : function(selectedFoods, comment){
 				if(selectedFoods){
-					initFood(selectedFoods);
-					pickFoodComponent.hide();
-					 $('#div4BookDetail').show();
-					 $('#div4bookFoodList').show();	
-					 $('#bottoms').hide();
+					if(bookFoods.length > 0){
+						for(var i = 0; i < selectedFoods.length; i++){
+							bookFoods.push(selectedFoods[i]);
+						}
+					}else{
+						bookFoods = selectedFoods;
+					}
+					initFood(bookFoods);
+					pickFoodComponent.close();
+					$('#div4BookDetail_div_book').show();
+					$('#div4bookFoodList_div_book').show();	
+					$('#bottoms').hide();
 				}else{
-					$('#div4bookFoodList').html('');	
+					$('#div4bookFoodList_div_book').html('');	
 				}
 				
 				$('html, body').animate({scrollTop: 1000}, 'fast');  
@@ -285,9 +389,11 @@ $(function(){
 				 }
 			 }
 		 });
-		 $('#div4BookDetail').hide();
+		 $('#div4BookDetail_div_book').hide();
 		 $('#bottoms').show();
-		 pickFoodComponent.show();
+		 pickFoodComponent.open(function(container){
+		 	orderContainer = container;
+		 });
 		
 	});
 	
@@ -296,162 +402,5 @@ $(function(){
 	$('#shoppingCar_li_member').click(function(){
 		pickFoodComponent.openShopping();
 	});
-	
-//	//去预订点菜
-//	function toBookFood(){
-//		$('#div4BookDetail').hide();
-//		$('#div4FoodList').show(  );
-//			
-//		//清空数据
-//		var li = $('.select-food');
-//
-//		if(li.length > 0){
-//			li.each(function(e){
-//				$(this).removeClass("select-food");
-//			});
-//		}
-//		params.orderData.length = 0;
-//		$('#spanDisplayFoodCount').html('');
-//		
-//		//加载底部栏
-//		var navBottomSwiper = new Swiper('#divBottomNav', {
-//			paginationClickable : true,
-//			slidesPerView : 'auto',
-//			disableAutoResize : true
-//		});
-//		var li = $('#divBottomNav li');
-//		var tw = $('#divBottomNav').width();
-//		tw = li.length > 4 ? parseInt(tw / 4) : parseInt(tw / li.length);
-//		for (var i = 0; i < li.length; i++) {
-//			li[i].style.width = tw + 'px';
-//		}	
-//	}
-	
-	
-//	//返回预订信息
-//	function toBookDetail(hasFoods){
-//		$('#div4FoodList').hide();	
-//		$('#div4BookDetail').show();
-//		if(hasFoods && params.orderData.length > 0){
-//			var html = [], temp, sumPrice = 0;
-//			
-//			for(var i = 0; i < params.orderData.length; i++){
-//				temp = params.orderData[i];
-//				sumPrice += (temp.unitPrice * temp.count);
-//				html.push(bookFoodShoppingBox.format({
-//					id : temp.id,
-//					name : temp.name,
-//					unitPrice : temp.unitPrice,
-//					count : temp.count
-//				}));
-//			}
-//			$('#div4bookFoodList').html(html.join(''));	
-////			$('#bookFoodTotalMoney').html('¥'+sumPrice);
-//		}else{
-//			$('#div4bookFoodList').html('');	
-////			$('#bookFoodTotalMoney').html('');
-//		}
-//		
-//		$('html, body').animate({scrollTop: 1000}, 'fast');  
-//	}
-	
-	
-//	//操作预定菜列表
-//	function operateBookFood(c){
-//		var displayCount = null;
-//		if(typeof c.event != 'undefined'){
-//			displayCount = $(c.event.parentNode).find('div[data-type=count]');
-//		}
-//		
-//		if(c.otype == 'plus'){
-//			for(var i = 0; i < params.orderData.length; i++){
-//				if(params.orderData[i].id == c.id){
-//					params.orderData[i].count ++;					
-//					if(displayCount){
-//						displayCount.css('display', 'block').html(params.orderData[i].count);
-//					}				
-//					break;
-//				}
-//			}
-//			calcBookFoodTotalMoney();	
-//		}else if(c.otype == 'cut'){
-//			for(var i = 0; i < params.orderData.length; i++){
-//				temp = params.orderData[i];
-//				if(temp.id == c.id){
-//					if(temp.count - 1 == 0){
-//						Util.dialog.show({
-//							msg : '是否删除该菜品?',
-//							callback : function(btn){
-//								if(btn == 'yes'){
-//									var tl = $('#div4bookFoodList > div');
-//									for(var j = 0; j < tl.length; j++){
-//										if(parseInt(tl[j].getAttribute('data-value')) == temp.id){
-//											$(tl[j]).remove();
-//											break;
-//										}
-//									}
-//									
-//									params.orderData.splice(i, 1);
-//									
-//									calcBookFoodTotalMoney();
-//								}
-//							}
-//						});
-//						
-//	/*					if(confirm("是否删除该菜品？"))
-//						 {
-//							var tl = $('#div4bookFoodList > div');
-//							for(var j = 0; j < tl.length; j++){
-//								if(parseInt(tl[j].getAttribute('data-value')) == temp.id){
-//									$(tl[j]).remove();
-//									break;
-//								}
-//							}
-//							
-//							params.orderData.splice(i, 1);
-//						 }*/
-//
-//					}else{
-//						params.orderData[i].count--;					
-//						if(displayCount){
-//							displayCount.css('display', 'block').html(params.orderData[i].count);
-//						}
-//						calcBookFoodTotalMoney();
-//					}
-//					break;
-//				}
-//			}
-//		}else if(c.otype == 'claer'){
-//			Util.dialog.show({
-//				msg : '是否清空已选菜品?',
-//				callback : function(btn){
-//					if(btn == 'yes'){
-//						//清空数据
-//						var li = $('.select-food');
-//
-//						if(li.length > 0){
-//							li.each(function(e){
-//								$(this).removeClass("select-food");
-//							});
-//						}
-//						params.orderData.length = 0;
-//						$('#spanDisplayFoodCount').html('');
-//						operateShoppingCart({otype:'hide'});
-//					}
-//				}
-//			});
-//		}
-//	}
-	
-	
-
-//	//计算预订菜总价钱
-//	function calcBookFoodTotalMoney(){
-//		var sumPrice = 0;
-//		for(var i = 0; i < params.orderData.length; i++){
-//			sumPrice += (params.orderData[i].unitPrice * params.orderData[i].count);
-//		}
-//		$('#bookFoodTotalMoney').html('¥'+sumPrice);	
-//	}
 	
 });

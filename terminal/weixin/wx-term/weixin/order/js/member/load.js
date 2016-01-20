@@ -1,5 +1,39 @@
 $(function(){
 	
+	//会员生日判定
+	//月
+	$('#birthdayMonth_input_member').on('blur', function(){
+		var month = parseInt($('#birthdayMonth_input_member').val());
+		if(month < 1 || month > 12){
+			Util.dialog.show({title:'提示', msg: '月份输入错误,请重新输入', btn : 'yes', callback : function(){
+				$('#birthdayMonth_input_member').val('');
+				$('#birthdayMonth_input_member').focus();
+			}});
+		}
+	});
+	//日
+	$('#birthdayDay_input_member').on('blur', function(){
+		var month = parseInt($('#birthdayDay_input_member').val());
+		if(month < 1 || month > 31){
+			Util.dialog.show({title:'提示', msg: '天数输入错误,请重新输入', btn : 'yes', callback : function(){
+				$('#birthdayDay_input_member').val('');
+				$('#birthdayDay_input_member').focus();
+			}});
+		}
+	});
+	
+	//性别点击
+	$('#bindMember_div_member').find('[data-type="personSex"]').each(function(index, element){
+		element.onclick = function(){
+			if($(element).hasClass('selectedRegion_css_book')){
+				$(element).addClass('selectedRegion_css_book');
+			}else{
+				$('#bindMember_div_member').find('[data-type="personSex"]').removeClass('selectedRegion_css_book');
+				$(element).addClass('selectedRegion_css_book');
+			}
+		}
+	});
+	
 	$('html, body').animate({scrollTop: 0}, 'fast');
 //	Util.lbar('', function(html){$(document.body).append(html);  });
 	Util.lm.show();
@@ -126,7 +160,8 @@ $(function(){
 		var defaultMemberDiscount = $('#fontMemberDiscount');
 		var memberTotalPoint = $('#fontMemberPoint');
 		var myCoupon = $('#myCoupon');
-		
+		//年龄
+		$('#memberAge_select_member').val("3");
 		$.ajax({
 			url : '../../WxOperateCoupon.do',
 			type : 'post',
@@ -205,8 +240,28 @@ $(function(){
 			return;
 		}
 		
-		var birthday = $('#birthday_input_member').val();
+		var month = $('#birthdayMonth_input_member').val();
+		var day = $('#birthdayDay_input_member').val();
+		if(month == '' || day == ''){
+			Util.dialog.show({
+				msg: '生日不能为空',
+				callback : function(){
+					$('#birthdayMonth_input_member').focus();
+				},
+				btn: 'yes'
+			});
+			return;
+		}
+		
+		var birthday = month + '-' + day;
 		var age = $('#memberAge_select_member').val();
+		var sex;
+		$('#bindMember_div_member').find('[data-type="personSex"]').each(function(index, element){
+			if($(element).hasClass('selectedRegion_css_book')){
+				sex = $(element).attr('data-value');
+			}
+		});
+		
 		
 		$.ajax({
 			url : '../../WXOperateMember.do',
@@ -218,6 +273,7 @@ $(function(){
 				mobile : mobile,
 				name : name,
 				birthday : birthday,
+				sex : sex,
 				age : age
 			},
 			dataType : 'json',

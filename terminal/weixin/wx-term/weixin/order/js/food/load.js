@@ -37,7 +37,7 @@ $(function(){
 				dialog.open();
 				return;
 			}
-			
+			Util.lm.show();
 			$.ajax({
 				url : '../../WXOperateMember.do',
 				type : 'post',
@@ -50,31 +50,80 @@ $(function(){
 				success : function(data){
 //					$("#shoppingCarSelect_li_fastOrderFood").removeAttr("disabled");
 					if(data.success){
+						Util.lm.hide();
 						if(data.root[0].isRaw){
 							var dialogMemberBind = new DialogPopup({
 								titleText : '请完善会员资料',
 								content : '<div style="width: 100%;">'
 											+'<ul class="m-b-list">'
 												+'<li class="none-line" style="line-height: 50px;padding-top: 10px;">'
-												+'手机号码: <input data-type="mobileNum_input_member" style="font-size: 18px;padding: 3px 5px 3px 5px;width: 120px;"  type="tel"  maxlength="11"/>'			
+													+'手机号码: <input data-type="mobileNum_input_member" style="font-size: 20px;padding: 3px 5px 3px 5px;width: 120px;"  type="tel"  maxlength="11"/>'			
 												+'</li>'		
 												+'<li class="none-line" style="line-height: 50px;">'	
-												+'会员姓名: <input data-type="mobileName_input_member" style="font-size: 18px;padding: 3px 5px 3px 5px;width: 120px;">'			
-												+'</li>'		
-												+'<li class="none-line" style="line-height: 50px;">'	
-												+'会员生日: <input data-type="mobileDay_input_member" style="font-size: 18px;padding: 3px 5px 3px 5px;width: 120px;" type="date">'			
+													+'会员姓名: <input data-type="mobileName_input_member" style="font-size: 20px;padding: 3px 5px 3px 5px;width: 120px;">'			
+												+'</li>'	
+												+'<li class="none-line" style="line-height: 50px;">'
+														+'会员生日: <input data-type="birthdayMonth_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:45px;">&nbsp;月'
+													+'&nbsp;<input data-type="birthdayDay_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:45px;">&nbsp;日'
+												+'</li>'
+												+'<li class="box-horizontal none-line" style="line-height: 50px;font-size:18px;">'
+												+'性别:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div data-type="personSex" data-value="0" class="region_css_book selectedRegion_css_book" style="width:31%;" href="#">'	
+														+'<ul class="m-b-list">先生</ul>'
+													+'</div>'
+													+'<div data-type="personSex" data-value="1" class="region_css_book" style="width:31%;" href="#">'
+														+'<ul class="m-b-list">女士</ul>'
+													+'</div>'
 												+'</li>'
 												+'<li class="none-line" style="line-height: 50px;">'	
-												+'年龄段: &nbsp;&nbsp;&nbsp;&nbsp;<select data-type="age_select_member" style="font-size: 18px;padding: 3px 5px 3px 5px;width: 120px;">'
-														+'<option value ="1">60后</option>'  
-														+'<option value ="2">70后</option>' 
+													+'年龄段: &nbsp;&nbsp;&nbsp;&nbsp;<select data-type="age_select_member" style="font-size: 20px;padding: 3px 5px 3px 5px;width: 120px;">'
+														+'<option value ="5">00后</option>'  
+														+'<option value ="4">90后</option>' 
 														+'<option value="3">80后</option>' 
-														+'<option value="4">90后</option>' 
-														+'<option value="5">00后</option>' 
+														+'<option value="2">70后</option>' 
+														+'<option value="1">60后</option>' 
+														+'<option value="6">50后</option>' 
 														+'</select>'			
 												+'</li>'
 											+'</ul>'	
 										 +'</div>',
+								contentCallback : function(diaologDiv){
+									diaologDiv.find('[data-type="age_select_member"]').val("3");
+									
+									//会员生日判定
+									//月
+									diaologDiv.find('[data-type="birthdayMonth_input_member"]').on('blur', function(){
+										var month = parseInt(diaologDiv.find('[data-type="birthdayMonth_input_member"]').val());
+										if(month < 1 || month > 12){
+											Util.dialog.show({title:'提示', msg: '月份输入错误,请重新输入', btn : 'yes', callback : function(){
+												diaologDiv.find('[data-type="birthdayMonth_input_member"]').val('');
+												$diaologDiv.find('[data-type="birthdayMonth_input_member"]').focus();
+											}});
+										}
+									});
+									//日
+									diaologDiv.find('[data-type="birthdayDay_input_member"]').on('blur', function(){
+										var month = parseInt(diaologDiv.find('[data-type="birthdayDay_input_member"]').val());
+										if(month < 1 || month > 31){
+											Util.dialog.show({title:'提示', msg: '天数输入错误,请重新输入', btn : 'yes', callback : function(){
+												diaologDiv.find('[data-type="birthdayDay_input_member"]').val('');
+												diaologDiv.find('[data-type="birthdayDay_input_member"]').focus();
+											}});
+										}
+									});
+									
+									//性别点击
+									diaologDiv.find('[data-type="personSex"]').each(function(index, element){
+										element.onclick = function(){
+											if($(element).hasClass('selectedRegion_css_book')){
+												$(element).addClass('selectedRegion_css_book');
+											}else{
+												diaologDiv.find('[data-type="personSex"]').removeClass('selectedRegion_css_book');
+												$(element).addClass('selectedRegion_css_book');
+											}
+										}
+									});
+									
+								},
 								leftText : '确认',
 								left : function(diaologDiv){
 									var mobile = diaologDiv.find('[data-type="mobileNum_input_member"]').val().trim();
@@ -99,8 +148,29 @@ $(function(){
 										return;
 									}
 									
-									var birthday = diaologDiv.find('[data-type="mobileDay_input_member"]').val();
+									var month =  diaologDiv.find('[data-type="birthdayMonth_input_member"]').val();
+									var day = diaologDiv.find('[data-type="birthdayDay_input_member"]').val();
+									if(month == '' || day == ''){
+										Util.dialog.show({
+											msg: '生日不能为空',
+											callback : function(){
+												diaologDiv.find('[data-type="birthdayMonth_input_member"]').focus();
+											},
+											btn: 'yes'
+										});
+										return;
+									}
+									
+									
+									var birthday = month + '-' + day;
 									var age = diaologDiv.find('[data-type="age_select_member"]').val();
+									var sex;
+									diaologDiv.find('[data-type="personSex"]').each(function(index, element){
+										if($(element).hasClass('selectedRegion_css_book')){
+											sex = $(element).attr('data-value');
+										}
+									});
+									
 									
 									$.ajax({
 										url : '../../WXOperateMember.do',
@@ -112,6 +182,7 @@ $(function(){
 											mobile : mobile,
 											name : name,
 											birthday : birthday,
+											sex : sex,
 											age : age
 										},
 										dataType : 'json',
@@ -149,7 +220,7 @@ $(function(){
 				 }
 				 foods += (e.id + ',' + e.count + ',' + unitId);
 			  });
-			  
+			   Util.lm.show();
 			  $.ajax({
 				url : '../../WxOperateOrder.do',
 				dataType : 'json',
@@ -163,6 +234,7 @@ $(function(){
 				},
 				success : function(data, status, xhr){
 					if(data.success){
+						 Util.lm.hide();
 						var dialogOrder = new DialogPopup({
 							titleText : '温馨提示',
 							leftText : '自助扫码',

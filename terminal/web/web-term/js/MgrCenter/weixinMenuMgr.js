@@ -1772,8 +1772,7 @@ Ext.onReady(function(){
 		items : [tree, new Ext.Panel({
 					title : '关注回复',
 					region : 'center',
-					height : 20,
-
+					height : 60,
 					contentEl : 'divSetAutoReply_div_weixin',
 					tbar : atuoRellyTbar
 				}), keywordTree]
