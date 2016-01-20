@@ -1,5 +1,9 @@
 package com.wireless.pojo.member;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -20,6 +24,11 @@ public class MemberCond implements Jsonable{
 		private float maxBalance;
 		private int minLastConsumption;
 		private int maxLastConsumption;
+		private float minTotalCharge;
+		private float maxTotalCharge;
+		private final List<Member.Age> ages = new ArrayList<Member.Age>();
+		private Member.Sex sex;
+		private boolean isRaw;
 		
 		public InsertBuilder(String name){
 			this.name = name;
@@ -54,6 +63,11 @@ public class MemberCond implements Jsonable{
 			return this;
 		}
 		
+		public InsertBuilder setRaw(boolean onOff){
+			this.isRaw = onOff;
+			return this;
+		}
+		
 		public InsertBuilder setConsumeMoney(float min, float max){
 			if(max > 0 && max < min){
 				throw new IllegalArgumentException("消费最大金额不能小于最小金额");
@@ -81,6 +95,22 @@ public class MemberCond implements Jsonable{
 			return this;
 		}
 		
+		public InsertBuilder setSex(Member.Sex sex){
+			this.sex = sex;
+			return this;
+		}
+		
+		public InsertBuilder addAge(Member.Age age){
+			this.ages.add(age);
+			return this;
+		}
+		
+		public InsertBuilder setCharge(float minCharge, float maxCharge){
+			this.minTotalCharge = minCharge;
+			this.maxTotalCharge = maxCharge;
+			return this;
+		}
+		
 		public MemberCond build(){
 			return new MemberCond(this);
 		}
@@ -101,9 +131,62 @@ public class MemberCond implements Jsonable{
 		private float maxBalance = -1;
 		private int minLastConsumption = -1;
 		private int maxLastConsumption = -1;
+		private Float minCharge;
+		private Float maxCharge;
+		private Member.Sex sex;
+		private List<Member.Age> ages;
+		private Boolean isRaw;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
+		}
+		
+		public UpdateBuilder setRaw(boolean onOff){
+			this.isRaw = onOff;
+			return this;
+		}
+		
+		public boolean isRawChanged(){
+			return this.isRaw != null;
+		}
+		
+		public UpdateBuilder setSex(Member.Sex sex){
+			this.sex = sex;
+			return this;
+		}
+		
+		public boolean isSexChanged(){
+			return this.sex != null;
+		}
+		
+		public UpdateBuilder setCharge(float min, float max){
+			this.minCharge = min;
+			this.maxCharge = max;
+			return this;
+		}
+		
+		public boolean isChargeChanged(){
+			return this.minCharge != null || this.maxCharge != null;
+		}
+		
+		public UpdateBuilder addAge(Member.Age age){
+			if(this.ages == null){
+				this.ages = new ArrayList<Member.Age>();
+			}
+			this.ages.add(age);
+			return this;
+		}
+		
+		public UpdateBuilder clearAge(){
+			if(this.ages == null){
+				this.ages = new ArrayList<Member.Age>();
+			}
+			this.ages.clear();
+			return this;
+		}
+		
+		public boolean isAgeChanged(){
+			return this.ages != null;
 		}
 		
 		public UpdateBuilder setLastConsumption(int min, int max){
@@ -254,6 +337,11 @@ public class MemberCond implements Jsonable{
 	private float maxBalance;
 	private int minLastConsumption;
 	private int maxLastConsumption;
+	private Member.Sex sex;
+	private final List<Member.Age> ages = new ArrayList<Member.Age>();
+	private float minCharge;
+	private float maxCharge;
+	private boolean isRaw;
 	
 	private MemberCond(UpdateBuilder builder){
 		setId(builder.id);
@@ -269,6 +357,11 @@ public class MemberCond implements Jsonable{
 		setMaxBalance(builder.maxBalance);
 		setMinLastConsumption(builder.minLastConsumption);
 		setMaxLastConsumption(builder.maxLastConsumption);
+		setMinCharge(builder.minCharge != null ? builder.minBalance : 0);
+		setMaxCharge(builder.maxCharge != null ? builder.maxCharge : 0);
+		setSex(builder.sex);
+		setAges(builder.ages);
+		setRaw(builder.isRaw != null ? builder.isRaw : false);
 	}
 	
 	private MemberCond(InsertBuilder builder){
@@ -284,6 +377,11 @@ public class MemberCond implements Jsonable{
 		setMaxBalance(builder.maxBalance);
 		setMinLastConsumption(builder.minLastConsumption);
 		setMaxLastConsumption(builder.maxLastConsumption);
+		setSex(builder.sex);
+		setAges(builder.ages);
+		setMinCharge(builder.minTotalCharge);
+		setMaxCharge(builder.maxTotalCharge);
+		setRaw(builder.isRaw);
 	}
 	
 	public MemberCond(int id){
@@ -304,6 +402,57 @@ public class MemberCond implements Jsonable{
 	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
+	}
+
+	public boolean isRaw(){
+		return this.isRaw;
+	}
+	
+	public void setRaw(boolean onOff){
+		this.isRaw = onOff;
+	}
+	
+	public void setSex(Member.Sex sex){
+		this.sex = sex;
+	}
+	
+	public boolean hasSex(){
+		return this.sex != null;
+	}
+	
+	public Member.Sex getSex(){
+		return this.sex;
+	}
+	
+	public void setAges(List<Member.Age> ages){
+		if(ages != null){
+			this.ages.clear();
+			this.ages.addAll(ages);
+		}
+	}
+	
+	public void addAge(Member.Age age){
+		this.ages.add(age);
+	}
+	
+	public List<Member.Age> getAges(){
+		return Collections.unmodifiableList(this.ages);
+	}
+	
+	public void setMinCharge(float minCharge){
+		this.minCharge = minCharge;
+	}
+	
+	public float getMinCharge(){
+		return this.minCharge;
+	}
+	
+	public void setMaxCharge(float maxCharge){
+		this.maxCharge = maxCharge;
+	}
+	
+	public float getMaxCharge(){
+		return this.maxCharge;
 	}
 	
 	public String getName() {
