@@ -177,7 +177,7 @@ public class OperateMemberAction extends DispatchAction{
 			
 			final Member.UpdateBuilder builder = new Member.UpdateBuilder(Integer.valueOf(id));
 			
-			if(name != null && !name.isEmpty()){
+			if(name != null){
 				builder.setName(name);
 			}
 			
@@ -197,7 +197,7 @@ public class OperateMemberAction extends DispatchAction{
 				builder.setBirthday(birthday);
 			}
 											
-			if(memberCard != null && !memberCard.isEmpty()){
+			if(memberCard != null){
 				builder.setMemberCard(memberCard);
 			}
 			

@@ -15,6 +15,7 @@ import com.wireless.db.member.MemberCondDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.member.MemberCond.RangeType;
 import com.wireless.pojo.member.MemberType;
@@ -44,6 +45,11 @@ public class OperateMemberCondAction extends DispatchAction{
 		final String memberCondEndDate = request.getParameter("memberCondEndDate");
 		final String minLastConsumption = request.getParameter("minLastConsumption");
 		final String maxLastConsumption = request.getParameter("maxLastConsumption");
+		final String sex = request.getParameter("sex");
+		final String ageVal = request.getParameter("age");
+		final String isRaw = request.getParameter("isRaw");
+		final String minCharge = request.getParameter("memberCondMinCharge");
+		final String maxCharge = request.getParameter("memberCondMaxCharge");
 		final JObject jObject = new JObject(); 
 		
 		try{
@@ -82,6 +88,28 @@ public class OperateMemberCondAction extends DispatchAction{
 			//距离最近消费天数
 			if(minLastConsumption != null && !minLastConsumption.isEmpty() && maxLastConsumption != null && !maxLastConsumption.isEmpty()){
 				builder.setLastConsumption(Integer.parseInt(minLastConsumption), Integer.parseInt(maxLastConsumption));
+			}
+			
+			//性别
+			if(sex != null && !sex.isEmpty()){
+				builder.setSex(Member.Sex.valueOf(Integer.parseInt(sex)));
+			}
+			
+			//是否Raw
+			if(isRaw != null && !isRaw.isEmpty()){
+				builder.setRaw(Boolean.parseBoolean(isRaw));
+			}
+			
+			//年龄段
+			if(ageVal != null && !ageVal.isEmpty()){
+				for(String age : ageVal.split(",")){
+					builder.addAge(Member.Age.valueOf(Integer.parseInt(age)));
+				}
+			}
+			
+			//充值金额
+			if(minCharge != null && !minCharge.isEmpty() && maxCharge != null && !maxCharge.isEmpty()){
+				builder.setCharge(Float.parseFloat(minCharge), Float.parseFloat(maxCharge));
 			}
 			
 			MemberCondDao.insert(staff, builder);
@@ -124,6 +152,11 @@ public class OperateMemberCondAction extends DispatchAction{
 		final String memberCondEndDate = request.getParameter("memberCondEndDate");
 		final String minLastConsumption = request.getParameter("minLastConsumption");
 		final String maxLastConsumption = request.getParameter("maxLastConsumption");
+		final String sex = request.getParameter("sex");
+		final String ageVal = request.getParameter("age");
+		final String isRaw = request.getParameter("isRaw");
+		final String minCharge = request.getParameter("memberCondMinCharge");
+		final String maxCharge = request.getParameter("memberCondMaxCharge");
 		final JObject jObject = new JObject(); 
 		
 		try{
@@ -162,6 +195,28 @@ public class OperateMemberCondAction extends DispatchAction{
 			//距离最近消费天数
 			if(minLastConsumption != null && !minLastConsumption.isEmpty() && maxLastConsumption != null && !maxLastConsumption.isEmpty()){
 				builder.setLastConsumption(Integer.parseInt(minLastConsumption), Integer.parseInt(maxLastConsumption));
+			}
+			
+			//性别
+			if(sex != null && !sex.isEmpty()){
+				builder.setSex(Member.Sex.valueOf(Integer.parseInt(sex)));
+			}
+			
+			//是否Raw
+			if(isRaw != null && !isRaw.isEmpty()){
+				builder.setRaw(Boolean.parseBoolean(isRaw));
+			}
+			
+			//年龄段
+			if(ageVal != null && !ageVal.isEmpty()){
+				for(String age : ageVal.split(",")){
+					builder.addAge(Member.Age.valueOf(Integer.parseInt(age)));
+				}
+			}
+			
+			//充值金额
+			if(minCharge != null && !minCharge.isEmpty() && maxCharge != null && !maxCharge.isEmpty()){
+				builder.setCharge(Float.parseFloat(minCharge), Float.parseFloat(maxCharge));
 			}
 			
 			MemberCondDao.update(staff, builder);
@@ -210,10 +265,7 @@ public class OperateMemberCondAction extends DispatchAction{
 						.append("}");				
 			}
 			
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch(Exception e){
@@ -248,10 +300,7 @@ public class OperateMemberCondAction extends DispatchAction{
 			
 			jobject.setRoot(MemberCondDao.getByCond(staff, extraCond));
 			
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch(Exception e){
@@ -275,24 +324,20 @@ public class OperateMemberCondAction extends DispatchAction{
 	 */
 	public ActionForward getById(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		JObject jobject = new JObject(); 
+		final JObject jObject = new JObject(); 
 		try{
-			Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
-			String id = request.getParameter("id");
-			MemberCond cond = MemberCondDao.getById(staff, Integer.parseInt(id));
-			jobject.setRoot(cond);
+			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
+			final String id = request.getParameter("id");
+			jObject.setRoot(MemberCondDao.getById(staff, Integer.parseInt(id)));
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
-			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;
@@ -309,23 +354,20 @@ public class OperateMemberCondAction extends DispatchAction{
 	 */
 	public ActionForward deleteById(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		JObject jobject = new JObject(); 
+		final JObject jObject = new JObject(); 
 		try{
-			Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
-			String id = request.getParameter("id");
+			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
+			final String id = request.getParameter("id");
 			MemberCondDao.deleteById(staff, Integer.parseInt(id));
-			jobject.initTip(true, "删除成功");
-		}catch(BusinessException e){
+			jObject.initTip(true, "删除成功");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
-			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;

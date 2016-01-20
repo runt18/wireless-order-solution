@@ -28,7 +28,8 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		AGE_70(2, "70后", "1970"),
 		AGE_80(3, "80后", "1980"),
 		AGE_90(4, "90后", "1990"),
-		AGE_00(5, "00后", "2000");
+		AGE_00(5, "00后", "2000"),
+		AGE_50(6, "50后", "1950");
 		
 		private final int val;
 		private final String desc;
