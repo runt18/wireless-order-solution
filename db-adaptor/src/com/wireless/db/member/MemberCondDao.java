@@ -11,6 +11,7 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.member.MemberCond.RangeType;
 import com.wireless.pojo.member.MemberType;
@@ -70,9 +71,21 @@ public class MemberCondDao {
 	 */
 	public static int insert(DBCon dbCon, Staff staff, MemberCond.InsertBuilder builder) throws SQLException{
 		MemberCond cond = builder.build();
+
+		StringBuilder ages = new StringBuilder();
+		for(Member.Age age : cond.getAges()){
+			if(ages.length() > 0){
+				ages.append(",");
+			}
+			ages.append(age.getVal());
+		}
+		
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".member_cond" +
-			  " ( restaurant_id, name, member_type_id, range_type, begin_date, end_date, min_consume_money, max_consume_money, min_consume_amount, max_consume_amount, min_balance, max_balance, min_last_consumption, max_last_consumption ) VALUES ( " +
+			  " ( restaurant_id, name, member_type_id, range_type, begin_date, end_date" +
+			  " ,min_consume_money, max_consume_money, min_consume_amount, max_consume_amount, min_balance, max_balance, min_last_consumption, max_last_consumption " +
+			  " ,min_charge, max_charge, sex, age, raw " + 
+			  " ) VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + cond.getName() + "'" + "," +
 			  (cond.hasMemberType() ? cond.getMemberType().getId() : " NULL ") + "," +
@@ -86,7 +99,12 @@ public class MemberCondDao {
 			  cond.getMinBalance() + "," +
 			  cond.getMaxBalance() + "," +
 			  cond.getMinLastConsumption() + "," +
-			  cond.getMaxLastConsumption() +
+			  cond.getMaxLastConsumption() + "," +
+			  cond.getMinCharge() + "," +
+			  cond.getMaxCharge() + "," +
+			  (cond.hasSex() ? cond.getSex().getVal() : " NULL ") + "," +
+			  (ages.length() > 0 ? "'" + ages.toString() + "'" : " NULL ") + "," +
+			  (cond.isRaw() ? "1" : "0") +
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -138,6 +156,17 @@ public class MemberCondDao {
 	 */
 	public static void update(DBCon dbCon, Staff staff, MemberCond.UpdateBuilder builder) throws SQLException, BusinessException{
 		MemberCond cond = builder.build();
+		
+		StringBuilder ages = new StringBuilder();
+		if(builder.isAgeChanged()){
+			for(Member.Age age : cond.getAges()){
+				if(ages.length() > 0){
+					ages.append(",");
+				}
+				ages.append(age.getVal());
+			}
+		}
+		
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".member_cond SET " +
 			  " id = " + cond.getId() +
@@ -149,6 +178,10 @@ public class MemberCondDao {
 			  (builder.isRangeTypeChanged() ? " ,range_type = " + cond.getRangeType().getVal() : "") +
 			  (builder.isRangeChanged() ? " ,begin_date = '" + cond.getRange().getOnDutyFormat() + "' ,end_date = '" + cond.getRange().getOffDutyFormat() + "'" : "") +
 			  (builder.isLastConsumptionChanged() ? " ,min_last_consumption = " + cond.getMinLastConsumption()  + ",max_last_consumption = " + cond.getMaxLastConsumption() : "") +
+			  (builder.isSexChanged() ? " ,sex = " + cond.getSex().getVal() : "") +
+			  (builder.isChargeChanged() ? " ,min_charge = " + cond.getMinCharge() + " ,max_charge = " + cond.getMaxCharge() : "") +
+			  (builder.isAgeChanged() ? " ,age = '" + ages.toString() + "'" : "") +
+			  (builder.isRawChanged() ? " ,raw = " + (cond.isRaw() ? "1" : "0") : "") +
 			  " WHERE id = " + cond.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -232,7 +265,7 @@ public class MemberCondDao {
 	 */
 	public static List<MemberCond> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
-		sql = " SELECT * FROM " + Params.dbName + ".member_cond " +
+		sql = " SELECT *, IFNULL(sex, -1) FROM " + Params.dbName + ".member_cond " +
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond.toString() : "");
@@ -281,6 +314,17 @@ public class MemberCondDao {
 			memberCond.setMaxConsumeMoney(dbCon.rs.getFloat("max_consume_money"));
 			memberCond.setMinLastConsumption(dbCon.rs.getInt("min_last_consumption"));
 			memberCond.setMaxLastConsumption(dbCon.rs.getInt("max_last_consumption"));
+			memberCond.setMinCharge(dbCon.rs.getFloat("min_charge"));
+			memberCond.setMaxCharge(dbCon.rs.getFloat("max_charge"));
+			if(dbCon.rs.getInt("sex") >= 0){
+				memberCond.setSex(Member.Sex.valueOf(dbCon.rs.getInt("sex")));
+			}
+			if(dbCon.rs.getString("age") != null && !dbCon.rs.getString("age").isEmpty()){
+				for(String age : dbCon.rs.getString("age").split(",")){
+					memberCond.addAge(Member.Age.valueOf(Integer.parseInt(age)));
+				}
+			}
+			memberCond.setRaw(dbCon.rs.getBoolean("raw"));
 			result.add(memberCond);
 		}
 		dbCon.rs.close();

@@ -11,6 +11,7 @@ import com.wireless.db.member.MemberCondDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
@@ -37,7 +38,12 @@ public class TestMemberCond {
 																   .setBalance(100, 200)
 																   .setConsumeAmount(5, 8)
 																   .setConsumeMoney(20, 100)
-																   .setLastConsumption(10, 20);
+																   .setLastConsumption(10, 20)
+																   .setSex(Member.Sex.FEMALE)
+																   .addAge(Member.Age.AGE_80)
+																   .addAge(Member.Age.AGE_70)
+																   .setCharge(5,  10)
+																   .setRaw(false);
 			id = MemberCondDao.insert(mStaff, insertBuilder);
 			
 			MemberCond expected = insertBuilder.build();
@@ -51,7 +57,11 @@ public class TestMemberCond {
    																   .setBalance(50, 300)
 																   .setConsumeAmount(6, 10)
 																   .setConsumeMoney(200, 500)
-																   .setLastConsumption(10, 30);
+																   .setLastConsumption(10, 30)
+																   .setSex(Member.Sex.MALE)
+																   .clearAge()
+																   .setCharge(10, 20)
+																   .setRaw(true);
 			MemberCondDao.update(mStaff, updateBuilder);
 			if(updateBuilder.isNameChanged()){
 				expected.setName(updateBuilder.build().getName());
@@ -81,6 +91,19 @@ public class TestMemberCond {
 				expected.setMinLastConsumption(updateBuilder.build().getMinLastConsumption());
 				expected.setMaxLastConsumption(updateBuilder.build().getMaxLastConsumption());
 			}
+			if(updateBuilder.isSexChanged()){
+				expected.setSex(updateBuilder.build().getSex());
+			}
+			if(updateBuilder.isAgeChanged()){
+				expected.setAges(updateBuilder.build().getAges());
+			}
+			if(updateBuilder.isChargeChanged()){
+				expected.setMinCharge(updateBuilder.build().getMinCharge());
+				expected.setMaxCharge(updateBuilder.build().getMaxCharge());
+			}
+			if(updateBuilder.isRawChanged()){
+				expected.setRaw(updateBuilder.build().isRaw());
+			}
 			actual = MemberCondDao.getById(mStaff, id);
 			compare(expected, actual);
 		}finally{
@@ -109,5 +132,10 @@ public class TestMemberCond {
 		Assert.assertEquals("member condition min consume amount", expected.getMinConsumeAmount(), actual.getMinConsumeAmount());
 		Assert.assertEquals("member condition min last consumption", expected.getMinLastConsumption(), actual.getMinLastConsumption());
 		Assert.assertEquals("member condition max last consumption", expected.getMaxLastConsumption(), actual.getMaxLastConsumption());
+		Assert.assertEquals("member condition min charge", expected.getMinCharge(), actual.getMinCharge(), 0.01);
+		Assert.assertEquals("member condition max charge", expected.getMaxCharge(), actual.getMaxCharge(), 0.01);
+		Assert.assertEquals("member condition sex", expected.getSex(), actual.getSex());
+		Assert.assertEquals("member condition ages", expected.getAges(), actual.getAges());
+		Assert.assertEquals("member condition raw", expected.isRaw(), actual.isRaw());
 	}
 }

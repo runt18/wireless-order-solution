@@ -122,6 +122,8 @@ public class MemberDao {
 		private float maxTotalConsume;
 		private float minBalance;
 		private float maxBalance;
+		private float minTotalCharge;
+		private float maxTotalCharge;
 		private DutyRange range;
 		private DutyRange createRange;
 		private String weixinCard;
@@ -131,6 +133,9 @@ public class MemberDao {
 		private DateRange birthdayRange;
 		private int minLastConsumption;
 		private int maxLastConsumption;
+		private Member.Sex sex;
+		private final List<Member.Age> ages = new ArrayList<Member.Age>();
+		private Boolean isRaw;
 		
 		public ExtraCond(MemberCond memberCond){
 			setRange(memberCond.getRange());
@@ -144,6 +149,13 @@ public class MemberDao {
 			this.minTotalConsume = memberCond.getMinConsumeMoney();
 			this.maxTotalConsume = memberCond.getMaxConsumeMoney();
 			this.minLastConsumption = memberCond.getMinLastConsumption();
+			if(memberCond.hasSex()){
+				this.sex = memberCond.getSex();
+			}
+			this.minTotalCharge = memberCond.getMinCharge();
+			this.maxTotalCharge = memberCond.getMaxCharge();
+			this.isRaw = memberCond.isRaw();
+			
 		}
 		
 		public ExtraCond(ReqQueryMember.ExtraCond extraCond){
@@ -156,6 +168,21 @@ public class MemberDao {
 		
 		private ExtraCond setRestaurantId(int restaurantId){
 			this.restaurantId = restaurantId;
+			return this;
+		}
+		
+		public ExtraCond setSex(Member.Sex sex){
+			this.sex = sex;
+			return this;
+		}
+		
+		public ExtraCond addAge(Member.Age age){
+			this.ages.add(age);
+			return this;
+		}
+		
+		public ExtraCond setRaw(boolean onOff){
+			this.isRaw = onOff;
 			return this;
 		}
 		
@@ -211,6 +238,24 @@ public class MemberDao {
 		
 		public ExtraCond setMemberType(MemberType memberType){
 			this.memberTypeId = memberType.getId();
+			return this;
+		}
+		
+		public ExtraCond greaterCharge(float min){
+			if(min < 0){
+				throw new IllegalArgumentException("最小充值额不能小于0");
+			}
+			this.minTotalCharge = min;
+			this.maxTotalCharge = 0;
+			return this;
+		}
+		
+		public ExtraCond lessCharge(float max){
+			if(max < 0){
+				throw new IllegalArgumentException("最大充值额不能小于0");
+			}
+			this.minTotalCharge = 0;
+			this.maxTotalCharge = max;
 			return this;
 		}
 		
@@ -364,12 +409,22 @@ public class MemberDao {
 				extraCond.append(" AND MT.member_type_id = " + memberTypeId);
 			}
 			
+			//会员余额
 			if(minBalance > 0 && maxBalance == 0){
 				extraCond.append(" AND (M.base_balance + M.extra_balance) >= " + minBalance);
 			}else if(maxBalance > 0 && minBalance == 0){
 				extraCond.append(" AND (M.base_balance + M.extra_balance)  <= " + maxBalance);
 			}else if(maxBalance > 0 && minBalance > 0){
 				extraCond.append(" AND (M.base_balance + M.extra_balance) BETWEEN " + minBalance + " AND " + maxBalance);
+			}
+
+			//会员充值额
+			if(minTotalCharge > 0 && maxTotalCharge == 0){
+				extraCond.append(" AND M.total_charge >= " + minTotalCharge);
+			}else if(maxTotalCharge > 0 && minTotalCharge == 0){
+				extraCond.append(" AND M.total_charge <= " + maxTotalCharge);
+			}else if(maxTotalCharge > 0 && minTotalCharge > 0){
+				extraCond.append(" AND M.total_charge BETWEEN " + minTotalCharge + " AND " + maxTotalCharge);
 			}
 			
 			if(birthdayRange != null){
@@ -425,20 +480,45 @@ public class MemberDao {
 				
 			}
 			
+			//会员创建时间
 			if(this.createRange != null){
 				extraCond.append(" AND M.create_date BETWEEN '" + createRange.getOnDutyFormat() + "' AND '" + createRange.getOffDutyFormat() + "'");
 			}
 			
+			//推荐人
 			if(this.referrerId != 0){
 				extraCond.append(" AND M.referrer_id = " + referrerId);
 			}
 			
+			//最近消费日期
 			if(this.minLastConsumption > 0 && this.maxLastConsumption == 0){
 				extraCond.append(" AND DATEDIFF(NOW(), M.last_consumption) >= " + this.minLastConsumption);
 			}else if(this.maxLastConsumption > 0 && this.minLastConsumption == 0){
 				extraCond.append(" AND DATEDIFF(NOW(), M.last_consumption) <= " + this.maxLastConsumption);
 			}else if(this.minLastConsumption > 0 && this.maxLastConsumption > 0){
 				extraCond.append(" AND DATEDIFF(NOW(), M.last_consumption) BETWEEN " + this.minLastConsumption + " AND " + this.maxLastConsumption);
+			}
+			
+			//性别
+			if(this.sex != null){
+				extraCond.append(" AND M.sex = " + this.sex.getVal());
+			}
+
+			//年龄段
+			final StringBuilder ageCond = new StringBuilder();
+			for(Member.Age age : this.ages){
+				if(ageCond.length() != 0){
+					ageCond.append(",");
+				}
+				ageCond.append(age.getVal());
+			}
+			if(ageCond.length() > 0){
+				extraCond.append(" AND M.age IN (" + ageCond + ")");
+			}
+			
+			//是否Raw
+			if(isRaw != null && isRaw){
+				extraCond.append(" AND LENGTH(TRIM(M.mobile)) > 0 AND LENGTH(TRIM(M.member_card)) > 0");
 			}
 			return extraCond.toString();
 		}
