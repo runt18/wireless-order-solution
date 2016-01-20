@@ -176,6 +176,7 @@ public class WXOperateMemberAction extends DispatchAction {
 		final String name = request.getParameter("name");
 		final String birthday = request.getParameter("birthday");
 		final String age = request.getParameter("age");
+		final String sex = request.getParameter("sex");				
 		
 		final JObject jobject = new JObject();
 		try{
@@ -194,6 +195,10 @@ public class WXOperateMemberAction extends DispatchAction {
 			
 			if(age != null && !age.isEmpty()){
 				builder.setAge(Member.Age.valueOf(Integer.parseInt(age)));
+			}
+			
+			if(sex != null && !sex.isEmpty()){
+				builder.setSex(Member.Sex.valueOf(Integer.parseInt(sex)));
 			}
 			
 			WxMemberDao.bind(staff, builder);
