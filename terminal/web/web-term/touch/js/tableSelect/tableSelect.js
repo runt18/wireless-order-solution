@@ -2077,7 +2077,6 @@ ts.member.rechargeControlCenter = function(_c){
 			ts.member.closeMemberChargeWin();
 			//更新短信
 			Util.sys.checkSmStat();
-			
 			Util.msg.alert({
 				topTip : true,
 				msg : jr.msg
