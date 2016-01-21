@@ -619,7 +619,7 @@ Ext.onReady(function(){
 		region : 'north',
 		id : 'weixinMenuTree',
 		width : 270,
-		height : 250,
+		height : 230,
 		border : false,
 		rootVisible : false,
 		frame : true,
@@ -1005,7 +1005,7 @@ Ext.onReady(function(){
 		region : 'south',
 		id : 'weixinkeyWord_tree_weixin',
 		width : 270,
-		height : 400,
+		height : 300,
 		border : false,
 		rootVisible : true,
 		frame : true,
@@ -1763,19 +1763,21 @@ Ext.onReady(function(){
 		]
 	});	
 	
+	var autoReply = new Ext.Panel({
+		title : '关注回复',
+		region : 'center',
+		height : 200,
+		contentEl : 'divSetAutoReply_div_weixin',
+		tbar : atuoRellyTbar
+	})
+	
 	
 	var treePanel = new Ext.Panel({
 		layout : 'border',
 		width : 270,
 		frame : false,
 		region : 'west',
-		items : [tree, new Ext.Panel({
-					title : '关注回复',
-					region : 'center',
-					height : 60,
-					contentEl : 'divSetAutoReply_div_weixin',
-					tbar : atuoRellyTbar
-				}), keywordTree]
+		items : [tree, autoReply, keywordTree]
 	});	
 	
 	
