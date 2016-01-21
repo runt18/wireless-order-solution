@@ -431,8 +431,27 @@ public class MemberCond implements Jsonable{
 		}
 	}
 	
+	public void setAges(String ageString){
+		if(ageString != null && !ageString.isEmpty()){
+			for(String age : ageString.split(",")){
+				addAge(Member.Age.valueOf(Integer.parseInt(age)));
+			}
+		}
+	}
+	
 	public void addAge(Member.Age age){
 		this.ages.add(age);
+	}
+	
+	public String getAgesString(){
+		StringBuilder ages = new StringBuilder();
+		for(Member.Age age : this.ages){
+			if(ages.length() > 0){
+				ages.append(",");
+			}
+			ages.append(age.getVal());
+		}
+		return ages.toString();
 	}
 	
 	public List<Member.Age> getAges(){
@@ -581,6 +600,16 @@ public class MemberCond implements Jsonable{
 		jm.putFloat("maxBalance", this.maxBalance);
 		jm.putInt("minLastConsumption", this.minLastConsumption);
 		jm.putInt("maxLastConsumption", this.maxLastConsumption);
+		if(hasSex()){
+			jm.putInt("sex", this.sex.getVal());
+			jm.putString("sexText", this.sex.getDesc());
+		}
+		jm.putBoolean("isRaw", this.isRaw);
+		jm.putFloat("minCharge", this.minCharge);
+		jm.putFloat("maxCharge", this.maxCharge);
+		if(!this.ages.isEmpty()){
+			jm.putString("age", this.getAgesString());
+		}
 		return jm;
 	}
 

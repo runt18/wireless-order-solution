@@ -2069,8 +2069,9 @@ ts.member.rechargeControlCenter = function(_c){
 		rechargeMoney : rechargeMoney.val(),
 		rechargeType : rechargeType.val(),
 		payMannerMoney : payMannerMoney.val(),
-		isPrint : $('#chbPrintRecharge').attr('checked')?true:false,
-		sendSms : $('#chbSendCharge').attr('checked')?true:false	
+		isPrint : $('#chbPrintRecharge').attr('checked') ? true : false,
+		sendSms : $('#chbSendCharge').attr('checked') ? true : false,
+		orientedPrinter : getcookie(document.domain + '_printers')
 	}, function(jr){
 		Util.LM.hide();
 		if(jr.success){
