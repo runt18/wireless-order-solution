@@ -1098,7 +1098,7 @@ public class OrderDao {
 			  " ,discount_staff = '" + staff.getName() + "'" +
   			  " ,discount_date = NOW() " +
 			  " ,discount_id = " + order.getDiscount().getId() +
-			  " ,price_plan_id = " + (builder.hasPricePlan() ? order.getPricePlan().getId() : " NULL ") +
+			  " ,price_plan_id = " + (order.hasPricePlan() ? order.getPricePlan().getId() : " NULL ") +
 			  " ,member_id = " + builder.getMemberId() +
 			  " WHERE id = " + order.getId();
 		dbCon.stmt.executeUpdate(sql);

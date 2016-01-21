@@ -449,17 +449,19 @@ public class MemberDao {
 				}else if(maxTotalConsume > 0 && minTotalConsume > 0){
 					havingCond.append(" AND SUM(pay_money) BETWEEN " + minTotalConsume + " AND " + maxTotalConsume);
 				}
-				String sql;
-				sql = " SELECT member_id FROM " + Params.dbName + ".member_operation_history " +
-					  " WHERE 1 = 1 " +
-					  " AND restaurant_id = " + restaurantId +
-					  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
-					  " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-					  " GROUP BY member_id " +
-					  " HAVING 1 = 1 " +
-					  havingCond.toString();
-				
-				extraCond.append(" AND M.member_id IN ( " + sql + ")");
+				if(havingCond.length() > 0){
+					String sql;
+					sql = " SELECT member_id FROM " + Params.dbName + ".member_operation_history " +
+						  " WHERE 1 = 1 " +
+						  " AND restaurant_id = " + restaurantId +
+						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
+						  " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+						  " GROUP BY member_id " +
+						  " HAVING 1 = 1 " +
+						  havingCond.toString();
+					
+					extraCond.append(" AND M.member_id IN ( " + sql + ")");
+				}
 				
 			}else{
 				if(minConsumeAmount > 0 && maxConsumeAmount == 0){
