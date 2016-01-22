@@ -136,6 +136,7 @@ public class MemberCond implements Jsonable{
 		private boolean isSexChanged = false;
 		private Member.Sex sex;
 		private List<Member.Age> ages;
+		private boolean isRawChanged = false;
 		private Boolean isRaw;
 		
 		public UpdateBuilder(int id){
@@ -143,12 +144,13 @@ public class MemberCond implements Jsonable{
 		}
 		
 		public UpdateBuilder setRaw(boolean onOff){
+			this.isRawChanged = true;
 			this.isRaw = onOff;
 			return this;
 		}
 		
 		public boolean isRawChanged(){
-			return this.isRaw != null;
+			return this.isRawChanged;
 		}
 		
 		public UpdateBuilder setSex(Member.Sex sex){
@@ -343,7 +345,7 @@ public class MemberCond implements Jsonable{
 	private final List<Member.Age> ages = new ArrayList<Member.Age>();
 	private float minCharge;
 	private float maxCharge;
-	private boolean isRaw;
+	private Boolean isRaw;
 	
 	private MemberCond(UpdateBuilder builder){
 		setId(builder.id);
@@ -406,6 +408,10 @@ public class MemberCond implements Jsonable{
 		this.restaurantId = restaurantId;
 	}
 
+	public boolean hasRaw(){
+		return this.isRaw != null;
+	}
+	
 	public boolean isRaw(){
 		return this.isRaw;
 	}
@@ -434,7 +440,7 @@ public class MemberCond implements Jsonable{
 	}
 	
 	public void setAges(String ageString){
-		if(ageString != null && !ageString.isEmpty()){
+		if(ageString != null && ageString.length() > 0){
 			for(String age : ageString.split(",")){
 				addAge(Member.Age.valueOf(Integer.parseInt(age)));
 			}
@@ -606,7 +612,9 @@ public class MemberCond implements Jsonable{
 			jm.putInt("sex", this.sex.getVal());
 			jm.putString("sexText", this.sex.getDesc());
 		}
-		jm.putBoolean("isRaw", this.isRaw);
+		if(hasRaw()){
+			jm.putBoolean("isRaw", this.isRaw());
+		}
 		jm.putFloat("minCharge", this.minCharge);
 		jm.putFloat("maxCharge", this.maxCharge);
 		if(!this.ages.isEmpty()){
