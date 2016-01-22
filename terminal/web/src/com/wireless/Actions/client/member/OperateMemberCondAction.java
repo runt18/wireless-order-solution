@@ -199,7 +199,9 @@ public class OperateMemberCondAction extends DispatchAction{
 			
 			//性别
 			if(sex != null && !sex.isEmpty()){
-				builder.setSex(Member.Sex.valueOf(Integer.parseInt(sex)));
+				if(Integer.parseInt(sex) > 0){
+					builder.setSex(Member.Sex.valueOf(Integer.parseInt(sex)));
+				}
 			}
 			
 			//是否Raw
@@ -209,7 +211,7 @@ public class OperateMemberCondAction extends DispatchAction{
 			
 			//年龄段
 			if(ageVal != null && !ageVal.isEmpty()){
-				if(ageVal.equals("-1")){
+				if(Integer.parseInt(ageVal) < 0){
 					builder.clearAge();
 				}else{
 					for(String age : ageVal.split(",")){
