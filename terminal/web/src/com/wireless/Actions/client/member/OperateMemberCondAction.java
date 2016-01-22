@@ -199,7 +199,7 @@ public class OperateMemberCondAction extends DispatchAction{
 			
 			//性别
 			if(sex != null && !sex.isEmpty()){
-				if(Integer.parseInt(sex) > 0){
+				if(Integer.parseInt(sex) >= 0){
 					builder.setSex(Member.Sex.valueOf(Integer.parseInt(sex)));
 				}else{
 					builder.setSex(null);
