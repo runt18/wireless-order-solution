@@ -208,7 +208,11 @@ public class OperateMemberCondAction extends DispatchAction{
 			
 			//是否Raw
 			if(isRaw != null && !isRaw.isEmpty()){
-				builder.setRaw(Boolean.parseBoolean(isRaw));
+				if(Integer.parseInt(isRaw) >= 0){
+					builder.setRaw(Boolean.parseBoolean(isRaw));
+				}else{
+					builder.setRaw(null);
+				}
 			}
 			
 			//年龄段
