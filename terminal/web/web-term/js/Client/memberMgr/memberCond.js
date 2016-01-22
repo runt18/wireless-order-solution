@@ -86,7 +86,6 @@
 		gs.baseParams['memberCondEndDate'] = Ext.util.Format.date(Ext.getCmp('srchEnd_dateField_memberCond').getValue(), 'Y-m-d 23:59:59');
 		gs.baseParams['sex'] = Ext.getCmp('memberCondSex_combo_memebercond').getValue();
 		gs.baseParams['age'] = Ext.getCmp('memberCondAge_combo_memebercond').getValue();
-		
 		gs.baseParams['isRaw'] = !Ext.getCmp('isBind_checkbox_memberCond').getValue();
 		gs.baseParams['memberCondMinCharge'] = Ext.getCmp('memberMinCharge_numberField_memberCond').getValue();
 		gs.baseParams['memberCondMaxCharge'] = Ext.getCmp('memberMaxCharge_numberField_memberCond').getValue();
@@ -325,15 +324,14 @@
 		//ToolBar
 		value = Ext.getCmp('comboCharge4CondBar_combo_memeberCond').getValue();
 		if(value == 1){
-			//小于
 			Ext.getCmp('betweenCharge_text_memberCond').hide();
 			Ext.getCmp('minCharge_numField_memberCond').show();
 			Ext.getCmp('maxCharge_numField_memberCond').hide();
 		}else if(value == 2){
-			//大于
+			//小于
 			Ext.getCmp('betweenCharge_text_memberCond').hide();
-			Ext.getCmp('minCharge_numField_memberCond').show();
-			Ext.getCmp('maxCharge_numField_memberCond').hide();
+			Ext.getCmp('minCharge_numField_memberCond').hide();
+			Ext.getCmp('maxCharge_numField_memberCond').show();
 		}else if(value == 3){
 			//介于
 			Ext.getCmp('betweenCharge_text_memberCond').show();
@@ -1060,17 +1058,19 @@
 		Ext.getCmp('minBalance4CondWin').setValue(data.minBalance && data.minBalance > 0 ? data.minBalance : "");
 		Ext.getCmp('maxBalance4CondWin').setValue(data.maxBalance && data.maxBalance > 0 ? data.maxBalance : "");
 		Ext.getCmp('memberCondDateRegion').setValue(data.rangeType);
-		if(data.sex){
-			Ext.getCmp('memberCondSex_combo_memebercond').setValue(data.sex);
-		}else{
+		
+		if(typeof data.sex == 'undefined'){
 			Ext.getCmp('memberCondSex_combo_memebercond').setValue(-1);
+		}else{
+			Ext.getCmp('memberCondSex_combo_memebercond').setValue(data.sex);
 		}
 		
-		if(data.age){
-			Ext.getCmp('memberCondAge_combo_memebercond').setValue(data.age);
-		}else{
+		if(typeof data.age == 'undefined'){
 			Ext.getCmp('memberCondAge_combo_memebercond').setValue(-1);
-		}		
+		}else{
+			Ext.getCmp('memberCondAge_combo_memebercond').setValue(data.age);
+		}	
+		
 		Ext.getCmp('memberMinCharge_numberField_memberCond').setValue(data.minCharge && data.minCharge > 0 ? data.minCharge : "");
 		Ext.getCmp('memberMaxCharge_numberField_memberCond').setValue(data.maxCharge && data.maxCharge > 0 ? data.maxCharge : "");
 		if(data.isRaw){
