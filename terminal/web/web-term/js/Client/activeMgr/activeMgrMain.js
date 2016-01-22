@@ -128,9 +128,6 @@ Ext.onReady(function() {
 				promotionUploadMask.hide();
 				if(jr.success){
 					promotionGuideWin.hide();
-					//创建活动Win关闭后，清除图片的信息
-					promotionGuideWin.ossId = null;
-					promotionGuideWin.image = null;
 					
 					var promotionId;
 					if(params.dataSource == 'insert'){
@@ -826,6 +823,11 @@ Ext.onReady(function() {
 							
 							updatePromotionCouponPanel(thiz.promotion.pType);
 						}
+					},
+					hide : function(thiz){
+						//创建活动Win关闭后，清除图片的信息
+	 	   				thiz.image = null;
+	 	   				thiz.ossId = null;							
 					}
 				},
 				keys : [{
