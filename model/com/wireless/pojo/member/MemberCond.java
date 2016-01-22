@@ -357,7 +357,7 @@ public class MemberCond implements Jsonable{
 		setMaxBalance(builder.maxBalance);
 		setMinLastConsumption(builder.minLastConsumption);
 		setMaxLastConsumption(builder.maxLastConsumption);
-		setMinCharge(builder.minCharge != null ? builder.minBalance : 0);
+		setMinCharge(builder.minCharge != null ? builder.minCharge : 0);
 		setMaxCharge(builder.maxCharge != null ? builder.maxCharge : 0);
 		setSex(builder.sex);
 		setAges(builder.ages);
@@ -608,6 +608,14 @@ public class MemberCond implements Jsonable{
 		jm.putFloat("minCharge", this.minCharge);
 		jm.putFloat("maxCharge", this.maxCharge);
 		if(!this.ages.isEmpty()){
+			final StringBuilder ageText = new StringBuilder();
+			for(Member.Age age : ages){
+				if(ageText.length() > 0){
+					ageText.append(",");
+				}
+				ageText.append(age.toString());
+			}
+			jm.putString("ageText", ageText.toString());
 			jm.putString("age", this.getAgesString());
 		}
 		return jm;

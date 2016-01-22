@@ -209,8 +209,12 @@ public class OperateMemberCondAction extends DispatchAction{
 			
 			//年龄段
 			if(ageVal != null && !ageVal.isEmpty()){
-				for(String age : ageVal.split(",")){
-					builder.addAge(Member.Age.valueOf(Integer.parseInt(age)));
+				if(ageVal.equals("-1")){
+					builder.clearAge();
+				}else{
+					for(String age : ageVal.split(",")){
+						builder.addAge(Member.Age.valueOf(Integer.parseInt(age)));
+					}
 				}
 			}
 			
