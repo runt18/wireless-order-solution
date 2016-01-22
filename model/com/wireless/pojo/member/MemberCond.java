@@ -133,6 +133,7 @@ public class MemberCond implements Jsonable{
 		private int maxLastConsumption = -1;
 		private Float minCharge;
 		private Float maxCharge;
+		private boolean isSexChanged = false;
 		private Member.Sex sex;
 		private List<Member.Age> ages;
 		private Boolean isRaw;
@@ -151,12 +152,13 @@ public class MemberCond implements Jsonable{
 		}
 		
 		public UpdateBuilder setSex(Member.Sex sex){
+			this.isSexChanged = true;
 			this.sex = sex;
 			return this;
 		}
 		
 		public boolean isSexChanged(){
-			return this.sex != null;
+			return this.isSexChanged;
 		}
 		
 		public UpdateBuilder setCharge(float min, float max){
