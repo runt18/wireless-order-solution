@@ -84,7 +84,13 @@
 		gs.baseParams['maxBalance4CondWin'] = Ext.getCmp('maxBalance_numField_memberCond').getValue();
 		gs.baseParams['memberCondBeginDate'] = Ext.util.Format.date(Ext.getCmp('srchBegin_dateField_memberCond').getValue(), 'Y-m-d 00:00:00');
 		gs.baseParams['memberCondEndDate'] = Ext.util.Format.date(Ext.getCmp('srchEnd_dateField_memberCond').getValue(), 'Y-m-d 23:59:59');
+		gs.baseParams['sex'] = Ext.getCmp('memberCondSex_combo_memebercond').getValue();
+		gs.baseParams['age'] = Ext.getCmp('memberCondAge_combo_memebercond').getValue();
 		
+		gs.baseParams['isRaw'] = !Ext.getCmp('isBind_checkbox_memberCond').getValue();
+		gs.baseParams['memberCondMinCharge'] = Ext.getCmp('memberMinCharge_numberField_memberCond').getValue();
+		gs.baseParams['memberCondMaxCharge'] = Ext.getCmp('memberMaxCharge_numberField_memberCond').getValue();
+			
 		if(c && c.searchByCond){
 			gs.baseParams['memberCondId'] = c.searchByCond;
 		}else{
@@ -138,7 +144,6 @@
 			$('#minCost4CondWin').show();
 			$('#maxCost4CondWin').show();
 		}
-		
 		
 		//ToolBar
 		value = Ext.getCmp('comboConsumeMoney4CondBar').getValue();
@@ -294,7 +299,7 @@
 		}else if(value == 2){
 			//大于
 			Ext.getCmp('betweenBalance_text_memberCond').hide();
-			Ext.getCmp('maxAmount4CondBar').show();
+			Ext.getCmp('minBalance_numField_memberCond').show();
 			Ext.getCmp('maxBalance_numField_memberCond').hide();
 		}else if(value == 3){
 			//介于
@@ -312,6 +317,84 @@
 			$('#betweenCost_numField_memberCond').show();
 			$('#minBalance_numField_memberCond').show();
 			$('#maxBalance_numField_memberCond').show();
+		}
+		
+	}
+	
+	function refreshCharge(){
+		//ToolBar
+		value = Ext.getCmp('comboCharge4CondBar_combo_memeberCond').getValue();
+		if(value == 1){
+			//小于
+			Ext.getCmp('betweenCharge_text_memberCond').hide();
+			Ext.getCmp('minCharge_numField_memberCond').show();
+			Ext.getCmp('maxCharge_numField_memberCond').hide();
+		}else if(value == 2){
+			//大于
+			Ext.getCmp('betweenCharge_text_memberCond').hide();
+			Ext.getCmp('minCharge_numField_memberCond').show();
+			Ext.getCmp('maxCharge_numField_memberCond').hide();
+		}else if(value == 3){
+			//介于
+			Ext.getCmp('betweenCharge_text_memberCond').show();
+			Ext.getCmp('minCharge_numField_memberCond').show();
+			Ext.getCmp('maxCharge_numField_memberCond').show();
+		}else{
+			//无设定
+			Ext.getCmp('betweenCharge_text_memberCond').show();
+			Ext.getCmp('minCharge_numField_memberCond').show();
+			Ext.getCmp('maxCharge_numField_memberCond').show();
+		}
+		
+		//修改弹出框
+		var value = Ext.getCmp('memberCharge_combo_memberCond').getValue();
+		if(value == 1){
+			//大于
+			Ext.getCmp('memberChargeWith_label_memberCond').hide();
+			Ext.getCmp('memberMinCharge_numberField_memberCond').show();
+			Ext.getCmp('memberMaxCharge_numberField_memberCond').hide();
+			Ext.getCmp('memberChargeWith_label_memberCond').enable();
+			Ext.getCmp('memberMinCharge_numberField_memberCond').enable();
+			Ext.getCmp('memberMaxCharge_numberField_memberCond').enable();
+			$('#memberChargeWith_label_memberCond').hide();
+			$('#memberMinCharge_numberField_memberCond').show();
+			$('#memberMaxCharge_numberField_memberCond').hide();
+			Ext.getCmp('memberMinCharge_numberField_memberCond').focus(true, 100);
+		}else if(value == 2){
+			//小于
+			Ext.getCmp('memberChargeWith_label_memberCond').hide();
+			Ext.getCmp('memberMinCharge_numberField_memberCond').hide();
+			Ext.getCmp('memberMaxCharge_numberField_memberCond').show();
+			Ext.getCmp('memberChargeWith_label_memberCond').enable();
+			Ext.getCmp('memberMinCharge_numberField_memberCond').enable();
+			Ext.getCmp('memberMaxCharge_numberField_memberCond').enable();
+			$('#memberChargeWith_label_memberCond').hide();
+			$('#memberMinCharge_numberField_memberCond').hide();
+			$('#memberMaxCharge_numberField_memberCond').show();
+			Ext.getCmp('memberMaxCharge_numberField_memberCond').focus(true, 100);	
+		}else if(value == 3){
+			//介于
+			Ext.getCmp('memberChargeWith_label_memberCond').show();
+			Ext.getCmp('memberMinCharge_numberField_memberCond').show();
+			Ext.getCmp('memberMaxCharge_numberField_memberCond').show();
+			Ext.getCmp('memberChargeWith_label_memberCond').enable();
+			Ext.getCmp('memberMinCharge_numberField_memberCond').enable();
+			Ext.getCmp('memberMaxCharge_numberField_memberCond').enable();
+			$('#memberChargeWith_label_memberCond').show();
+			$('#memberMinCharge_numberField_memberCond').show();
+			$('#memberMaxCharge_numberField_memberCond').show();
+			Ext.getCmp('memberMinCharge_numberField_memberCond').focus(true, 100);
+		}else{
+			//无设定
+			Ext.getCmp('memberChargeWith_label_memberCond').show();
+			Ext.getCmp('memberMinCharge_numberField_memberCond').show();
+			Ext.getCmp('memberMaxCharge_numberField_memberCond').show();
+			Ext.getCmp('memberChargeWith_label_memberCond').disable();
+			Ext.getCmp('memberMinCharge_numberField_memberCond').disable();
+			Ext.getCmp('memberMaxCharge_numberField_memberCond').disable();
+			$('#memberChargeWith_label_memberCond').show();
+			$('#memberMinCharge_numberField_memberCond').show();
+			$('#memberMaxCharge_numberField_memberCond').show();
 		}
 	}
 
@@ -333,6 +416,9 @@
 				iconCls : 'btn_refresh',
 				handler : function(){
 					Ext.getDom('memberCondName').innerHTML = '----';
+					Ext.getDom('isBind_tbtext_memberCond').innerHTML = '----';
+					Ext.getDom('memeberAge_tbtext_memberCond').innerHTML = '----';
+					Ext.getDom('memeberSex_tbtext_memberCond').innerHTML = '----';
 					memberCondTree.getRootNode().reload();
 				}
 			}]
@@ -340,7 +426,7 @@
 		
 		memberCondTree = new Ext.tree.TreePanel({
 			id : 'condition_tree_memberCond',
-			title : '筛选条件',
+			title : 	'筛选条件',
 	//		region : 'west',
 			region : 'center',
 			width : 240,
@@ -371,7 +457,7 @@
 					}
 				}
 			}),
-			tbar : memberTypeTreeTbar,
+			tbar : memberTypeTreeTbar, 
 			listeners : {
 		    	click : function(e){
 		    		if(e.id == -1){
@@ -401,7 +487,29 @@
 		    		    		Ext.getCmp('maxBalance_numField_memberCond').setValue(jr.root[0].maxBalance > 0 ? jr.root[0].maxBalance : '');
 		    		    		Ext.getCmp('srchBegin_dateField_memberCond').setValue(jr.root[0].beginDate);
 		    		    		Ext.getCmp('srchEnd_dateField_memberCond').setValue(jr.root[0].endDate);
-		    					
+		    		    		Ext.getCmp('minCharge_numField_memberCond').setValue(jr.root[0].minCharge > 0 ? jr.root[0].minCharge : '');
+		    		    		Ext.getCmp('maxCharge_numField_memberCond').setValue(jr.root[0].maxCharge > 0 ? jr.root[0].maxCharge : '');
+		    		    		
+		    		    		
+		    		    		if(jr.root[0].isRaw){
+		    		    			Ext.getDom('isBind_tbtext_memberCond').innerHTML  = '未绑定';
+		    		    		}else{
+		    		    			Ext.getDom('isBind_tbtext_memberCond').innerHTML = '已绑定';
+		    		    		}
+		    		    		
+		    		    		if(jr.root[0].ageText){
+		    		    			Ext.getDom('memeberAge_tbtext_memberCond').innerHTML = jr.root[0].ageText;
+		    		    		}else{
+		    		    			Ext.getDom('memeberAge_tbtext_memberCond').innerHTML = '----';
+		    		    		}
+		    		    		
+		    		    		if(jr.root[0].sexText){
+		    		    			Ext.getDom('memeberSex_tbtext_memberCond').innerHTML = jr.root[0].sexText;
+		    		    		}else{
+		    		    			Ext.getDom('memeberSex_tbtext_memberCond').innerHTML = '----';
+		    		    		}
+		    		    		
+		    		    		
 		    		    		//消费金额
 	    		    			if(jr.root[0].minConsumeMoney > 0 && jr.root[0].maxConsumeMoney == 0){
 	    		    				//大于
@@ -433,6 +541,22 @@
 	    		    				Ext.getCmp('consumptionAmount_combo_memberCond').setValue(0);
 	    		    			}
 	    		    			refreshConsumeAmount();
+	    		    			
+	    		    			//充值
+	    		    			if(jr.root[0].minCharge > 0 && jr.root[0].maxCharge == 0){
+	    		    				//充值大于
+	    		    				Ext.getCmp('comboCharge4CondBar_combo_memeberCond').setValue(1);
+	    		    			}else if(jr.root[0].minCharge == 0 && jr.root[0].maxCharge > 0){
+	    		    				//充值小于
+	    		    				Ext.getCmp('comboCharge4CondBar_combo_memeberCond').setValue(2);
+	    		    			}else if(jr.root[0].minCharge > 0 && jr.root[0].maxCharge > 0){
+	    		    				//充值介于
+	    		    				Ext.getCmp('comboCharge4CondBar_combo_memeberCond').setValue(3);
+	    		    			}else{
+	    		    				//充值无设定
+	    		    				Ext.getCmp('comboCharge4CondBar_combo_memeberCond').setValue(0);
+	    		    			}
+	    		    			refreshCharge();
 	    		    			
 	    		    			//余额
 	    		    			if(jr.root[0].minBalance > 0 && jr.root[0].maxBalance == 0){
@@ -643,15 +767,7 @@
 						});
 						issueCouponWin.show();
 					}
-				}, '->',{
-					text : '搜索',
-					id : 'btnSearchMember',
-					iconCls : 'btn_search',
-					handler : function(){
-						queryMembersByCond();
-						
-					}
-				}, '-', { 
+				},{ 
 					text : '导出',
 					iconCls : 'icon_tb_exoprt_excel',
 					handler : function(e){
@@ -816,9 +932,72 @@
 					id : 'maxBalance_numField_memberCond',
 					disabled : true,
 					width : 50
-				}			
-				]
+				}]
 			
+		});	
+		
+		
+		
+		var memberCond3ndTBar = new Ext.Toolbar({
+			height : 28,		
+			items : [
+					{
+						xtype : 'tbtext',
+						text : String.format(Ext.ux.txtFormat.longerTypeName, '是否绑定', 'isBind_tbtext_memberCond', '----')
+					},
+					{
+						xtype : 'tbtext',
+						text : String.format(Ext.ux.txtFormat.longerTypeName, '年龄段', 'memeberAge_tbtext_memberCond', '----')
+					},
+					{
+						xtype : 'tbtext',
+						text : String.format(Ext.ux.txtFormat.longerTypeName, '性别', 'memeberSex_tbtext_memberCond', '----')
+					},
+					{xtype : 'tbtext', text : '充值额:'},
+					{
+						id : 'comboCharge4CondBar_combo_memeberCond',
+						xtype : 'combo',
+						disabled : true,
+						readOnly : false,
+						forceSelection : true,
+						value : 1,
+						width : 80,
+						store : new Ext.data.SimpleStore({
+							fields : ['value', 'text'],
+							data : [[1, '大于'], [2, '小于'], [3, '介于'], [0, '无设定']]
+						}),
+						valueField : 'value',
+						displayField : 'text',
+						typeAhead : true,
+						mode : 'local',
+						triggerAction : 'all',
+						selectOnFocus : true,
+						listeners : {
+							select : function(combo, record, index){
+								Ext.getCmp('minCharge_numField_memberCond').setValue();
+								Ext.getCmp('maxCharge_numField_memberCond').setValue();
+								refreshBalance();
+							}
+						}
+					},
+					{
+						xtype : 'numberfield',
+						id : 'minCharge_numField_memberCond',
+						disabled : true,
+						width : 50
+					},
+					{
+						id : 'betweenCharge_text_memberCond',
+						xtype : 'tbtext',
+						text : '&nbsp;-&nbsp;'
+					},			
+					{
+						xtype : 'numberfield',
+						id : 'maxCharge_numField_memberCond',
+						disabled : true,
+						width : 50
+					}
+			]
 		});	
 		
 		memberCondBasicGrid = createGridPanel(
@@ -831,6 +1010,7 @@
 				[true, false, false, true],
 				['名称', 'name'],
 				['类型', 'memberType.name'],
+				['年龄段','ageText'],
 				['创建时间','createDateFormat'],
 				['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
 				['最近消费','lastConsumption',150],
@@ -846,7 +1026,7 @@
 			[['isPaging', true],['dataSource', 'byMemberCond']],
 			100,
 			'',
-			[memberCond1stTBar, memberCond2ndTBar]
+			[memberCond1stTBar, memberCond2ndTBar,memberCond3ndTBar]
 		);	
 		memberCondBasicGrid.region = 'center';
 		memberCondBasicGrid.loadMask = { msg : '数据加载中，请稍等...' };
@@ -880,13 +1060,31 @@
 		Ext.getCmp('minBalance4CondWin').setValue(data.minBalance && data.minBalance > 0 ? data.minBalance : "");
 		Ext.getCmp('maxBalance4CondWin').setValue(data.maxBalance && data.maxBalance > 0 ? data.maxBalance : "");
 		Ext.getCmp('memberCondDateRegion').setValue(data.rangeType);
+		if(data.sex){
+			Ext.getCmp('memberCondSex_combo_memebercond').setValue(data.sex);
+		}else{
+			Ext.getCmp('memberCondSex_combo_memebercond').setValue(-1);
+		}
+		
+		if(data.age){
+			Ext.getCmp('memberCondAge_combo_memebercond').setValue(data.age);
+		}else{
+			Ext.getCmp('memberCondAge_combo_memebercond').setValue(-1);
+		}		
+		Ext.getCmp('memberMinCharge_numberField_memberCond').setValue(data.minCharge && data.minCharge > 0 ? data.minCharge : "");
+		Ext.getCmp('memberMaxCharge_numberField_memberCond').setValue(data.maxCharge && data.maxCharge > 0 ? data.maxCharge : "");
+		if(data.isRaw){
+			Ext.getCmp('isBind_checkbox_memberCond').setValue(false);
+		}else{
+			Ext.getCmp('isBind_checkbox_memberCond').setValue(true);
+		}
+		
 		
 		if(data.name){
 			//修改
 			if(data.minConsumeMoney > 0 && data.maxConsumeMoney == 0){
 				//消费金额大于
 				Ext.getCmp('comboCost4CondWin').setValue(1);
-				//Ext.getCmp('comboCost4CondWin').fireEvent('select', null, null, 0);
 			}else if(data.minConsumeMoney == 0 && data.maxConsumeMoney > 0){
 				//消费金额小于
 				Ext.getCmp('comboCost4CondWin').setValue(2);
@@ -899,10 +1097,20 @@
 			}
 			refreshConsumeCost();	
 			
+			if(data.minCharge > 0 && data.maxCharge == 0){
+				Ext.getCmp('memberCharge_combo_memberCond').setValue(1);
+			}else if(data.minCharge == 0 && data.maxCharge > 0){
+				Ext.getCmp('memberCharge_combo_memberCond').setValue(2);
+			}else if(data.minCharge > 0 && data.maxCharge > 0){
+				Ext.getCmp('memberCharge_combo_memberCond').setValue(3);
+			}else{
+				Ext.getCmp('memberCharge_combo_memberCond').setValue(0);
+			}
+			refreshCharge();
+			
 			if(data.minConsumeAmount > 0 && data.maxConsumeAmount == 0){
 				//消费次数大于
 				Ext.getCmp('comboAmount4CondWin').setValue(1);
-				//Ext.getCmp('comboCost4CondWin').fireEvent('select', null, null, 0);
 			}else if(data.minConsumeAmount == 0 && data.maxConsumeAmount > 0){
 				//消费次数小于
 				Ext.getCmp('comboAmount4CondWin').setValue(2);
@@ -918,7 +1126,6 @@
 			if(data.minBalance > 0 && data.maxBalance == 0){
 				//余额大于
 				Ext.getCmp('comboBalance4CondWin').setValue(1);
-				//Ext.getCmp('comboCost4CondWin').fireEvent('select', null, null, 0);
 			}else if(data.minBalance == 0 && data.maxBalance > 0){
 				//余额小于
 				Ext.getCmp('comboBalance4CondWin').setValue(2);
@@ -932,9 +1139,20 @@
 			refreshBalance();
 			
 		}else{
+			Ext.getCmp('isBind_checkbox_memberCond').setValue(false);
+			
 			//新增
 			Ext.getCmp('comboCost4CondWin').setValue(0);
 			Ext.getCmp('comboCost4CondWin').fireEvent('select', null, null, 0);
+			
+			Ext.getCmp('memberCharge_combo_memberCond').setValue(0);
+			Ext.getCmp('memberCharge_combo_memberCond').fireEvent('select', null, null, 0);
+			
+			Ext.getCmp('memberCondSex_combo_memebercond').setValue(-1);
+			Ext.getCmp('memberCondSex_combo_memebercond').fireEvent('select', null, null, -1);
+			
+			Ext.getCmp('memberCondAge_combo_memebercond').setValue(-1);
+			Ext.getCmp('memberCondAge_combo_memebercond').fireEvent('select', null, null, -1);
 			
 			Ext.getCmp('comboAmount4CondWin').setValue(0);
 			Ext.getCmp('comboAmount4CondWin').fireEvent('select', null, null, 0);
@@ -1033,8 +1251,66 @@
 			columnWidth : 0.2,
 			xtype : 'label',
 			text : '会员类型:'
-		} ,comboMemberType4CondWin,
-		{
+		} ,comboMemberType4CondWin,{
+			xtype : 'label',
+			columnWidth : 0.2,
+			text : '',
+			width : 10,
+			hidden : true
+		},{
+			columnWidth : 0.2,
+ 	    	xtype : 'checkbox',
+ 	    	checked : false,
+			hideLabel : true,
+ 	    	id : 'isBind_checkbox_memberCond',
+ 	    	boxLabel : '是否绑定'
+	 	},{
+			columnWidth : 1,
+			style :'margin-bottom:5px;',
+			border : false
+		},{
+			columnWidth : 0.2,
+			xtype : 'label',
+			text : '充值金额:'
+		}, {
+			columnWidth : 0.2,
+			id : 'memberCharge_combo_memberCond',
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			value : 0,
+			width : 80,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text'],
+				data : [[1, '大于'], [2, '小于'], [3, '介于'], [0, '无设定']]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				select : function(combo, record, index){
+					Ext.getCmp('memberMinCharge_numberField_memberCond').setValue();
+					Ext.getCmp('memberMaxCharge_numberField_memberCond').setValue();
+					refreshCharge();	
+				}
+			}
+		}, {
+			columnWidth : 0.3,
+			xtype : 'numberfield',
+			id : 'memberMinCharge_numberField_memberCond'
+		},{
+			xtype : 'label',
+			id : 'memberChargeWith_label_memberCond',
+			text : ' ~ ',
+			hidden : true
+		}, {
+			columnWidth : 0.3,
+			xtype : 'numberfield',
+			id : 'memberMaxCharge_numberField_memberCond',
+		},{
 			columnWidth : 1,
 			style :'margin-bottom:5px;',
 			border : false
@@ -1279,6 +1555,58 @@
 			columnWidth : 1,
 			style :'margin-bottom:5px;',
 			border : false		
+		},{
+			columnWidth : 0.3,
+			xtype : 'label',
+			text : '性别:'
+		},{
+			columnWidth : 0.2,
+			id : 'memberCondSex_combo_memebercond',
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			value : -1,
+			width : 80, 
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text'],
+				data : [[-1, '无'], [0, '男'], [1, '女']]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+		},{
+			columnWidth : 1,
+			style :'margin-bottom:5px;',
+			border : false		
+		},{
+			columnWidth : 0.3,
+			xtype : 'label',
+			text : '年龄段:'
+		},{
+			columnWidth : 0.2,
+			id : 'memberCondAge_combo_memebercond',
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			value : -1,
+			width : 80, 
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text'],
+				data : [[-1, '无'], [5, '00后'], [4, '90后'],[3, '80后'], [2, '70后'],[1, '60后'],[6, '50后']]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+		},{
+			columnWidth : 1,
+			style :'margin-bottom:5px;',
+			border : false		
 		}],
 		bbar : ['->',{
 			text : '保存',
@@ -1289,11 +1617,33 @@
 				var name = Ext.getCmp('txtMemberCondName').getValue();
 				var memberType = Ext.getCmp('memberCondByType').getValue();
 				
+				//充值金额
+				var memberChargeType = Ext.getCmp('memberCharge_combo_memberCond').getValue();
+				var memberChargemMin = Ext.getCmp('memberMinCharge_numberField_memberCond').getValue();
+				var memberChargeMax = Ext.getCmp('memberMaxCharge_numberField_memberCond').getValue();
+				var minCharge;
+				var maxCharge;
+				if(memberChargeType == 1){//大于
+					minCharge = memberChargemMin;
+					maxCharge = 0;
+				}else if(memberChargeType == 2){//小于
+					minCharge = 0;
+					maxCharge = memberChargeMax;
+				}else if(memberChargeType == 3){//介于
+					minCharge = memberChargemMin;
+					maxCharge = memberChargeMax;
+				}else{//无限定
+					minCharge = 0;
+					maxCharge = 0;
+				}
+				
+				
+				
 				var minCost4CondWin = Ext.getCmp('minCost4CondWin').getValue();
 				var maxCost4CondWin = Ext.getCmp('maxCost4CondWin').getValue();
 				var cost4CondWinType = Ext.getCmp('comboCost4CondWin').getValue();
 				var minCost;
-				var maxCost
+				var maxCost;
 				if(cost4CondWinType == 1){//大于
 					minCost = minCost4CondWin;
 					maxCost = 0;
@@ -1373,7 +1723,9 @@
 					minDay = 0;
 					maxDay = 0;
 				}
-				
+				var sex = Ext.getCmp('memberCondSex_combo_memebercond').getValue();
+				var age = Ext.getCmp('memberCondAge_combo_memebercond').getValue();
+				var isRaw = Ext.getCmp('isBind_checkbox_memberCond').getValue();
 				Ext.Ajax.request({
 					url : '../../OperateMemberCond.do',
 					params : {
@@ -1391,7 +1743,12 @@
 						memberCondBeginDate : memberCondBeginDate,
 						memberCondEndDate : memberCondEndDate,
 						minLastConsumption : minDay,
-						maxLastConsumption : maxDay
+						maxLastConsumption : maxDay,
+						sex : sex,
+						age : age,
+						memberCondMinCharge : minCharge,
+						memberCondMaxCharge : maxCharge,
+						isRaw : !isRaw
 					},
 					success : function(response, options) {
 						var jr = Ext.util.JSON.decode(response.responseText);
