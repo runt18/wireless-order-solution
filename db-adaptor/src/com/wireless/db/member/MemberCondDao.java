@@ -160,7 +160,7 @@ public class MemberCondDao {
 			  (builder.isRangeTypeChanged() ? " ,range_type = " + cond.getRangeType().getVal() : "") +
 			  (builder.isRangeChanged() ? " ,begin_date = '" + cond.getRange().getOnDutyFormat() + "' ,end_date = '" + cond.getRange().getOffDutyFormat() + "'" : "") +
 			  (builder.isLastConsumptionChanged() ? " ,min_last_consumption = " + cond.getMinLastConsumption()  + ",max_last_consumption = " + cond.getMaxLastConsumption() : "") +
-			  (builder.isSexChanged() ? " ,sex = " + cond.getSex().getVal() : "") +
+			  (builder.isSexChanged() ? " ,sex = " + (cond.getSex() != null ? cond.getSex().getVal() : " NULL ") : "") +
 			  (builder.isChargeChanged() ? " ,min_charge = " + cond.getMinCharge() + " ,max_charge = " + cond.getMaxCharge() : "") +
 			  (builder.isAgeChanged() ? " ,age = " + (!cond.getAges().isEmpty() ? "'" + cond.getAgesString() + "'" : " NULL ") : "") +
 			  (builder.isRawChanged() ? " ,raw = " + (cond.isRaw() ? "1" : "0") : "") +
