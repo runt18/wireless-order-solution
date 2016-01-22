@@ -528,7 +528,7 @@ Ext.onReady(function() {
 		);
 	}
 	
-	//修改互动
+	//修改活动
 	function fnUpdatePromotion(){
 		var node = Ext.ux.getSelNode(promotionTree);
 		if (!node || node.attributes.id == -1) {
@@ -818,6 +818,9 @@ Ext.onReady(function() {
 							
 							Ext.getDom('radioSelfCoupon').checked = true; 
 							Ext.getCmp('couponTypeBox').setImg(thiz.promotion.coupon.ossImage ? thiz.promotion.coupon.ossImage.image : 'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg');
+							
+							//手动调用预览，更新显示图文
+							btnPreview.handler();
 							
 							updatePromotionCouponPanel(thiz.promotion.pType);
 						}

@@ -611,7 +611,7 @@
 			disabled : true,
 			data : [[3, '近一个月'], [12, '近二个月'], [4, '近三个月'], [9, '近半年']],
 			beginDate : member_beginDate,
-			endDate : member_endDate,
+			endDate : member_endDate
 		});
 		
 
@@ -688,13 +688,13 @@
 						var couponCm = new Ext.grid.ColumnModel([
 	                      	new Ext.grid.CheckboxSelectionModel(),
 						    {header : '编号', dataIndex : 'coupon.id', hidden :true},
-						    {header : '名称', dataIndex : 'coupon.name'},
+						    {header : '名称', dataIndex : 'coupon.name'}
 					    ]);
 						var couponDs = new Ext.data.Store({
 							proxy : new Ext.data.HttpProxy({url : '../../OperatePromotion.do'}),
 							reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'},[
       						     {name : 'coupon.id'},
-      						     {name : 'coupon.name'},
+      						     {name : 'coupon.name'}
       						])
 						});
 						couponDs.baseParams = {
@@ -713,7 +713,7 @@
 							sm : new Ext.grid.CheckboxSelectionModel(),
 							viewConfig : {
 								forceFit : true
-							},
+							}
 						});
 						
 						var issueCouponWin = new Ext.Window({
@@ -747,7 +747,7 @@
 																issueMode : 3,
 																dataSource : 'issue',
 																promotions : couponId.join(';'),
-																condId : clickTreeId,
+																condId : clickTreeId
 															},
 															success : function(response){
 																issueCouponWin.close();
@@ -1309,7 +1309,7 @@
 		}, {
 			columnWidth : 0.3,
 			xtype : 'numberfield',
-			id : 'memberMaxCharge_numberField_memberCond',
+			id : 'memberMaxCharge_numberField_memberCond'
 		},{
 			columnWidth : 1,
 			style :'margin-bottom:5px;',
@@ -1515,7 +1515,7 @@
 			forceSelection : true,
 			width : 80,
 			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
+				fields : ['value', 'text']
 			}),
 			valueField : 'value',
 			displayField : 'text',
@@ -1576,7 +1576,7 @@
 			typeAhead : true,
 			mode : 'local',
 			triggerAction : 'all',
-			selectOnFocus : true,
+			selectOnFocus : true
 		},{
 			columnWidth : 1,
 			style :'margin-bottom:5px;',
@@ -1602,7 +1602,7 @@
 			typeAhead : true,
 			mode : 'local',
 			triggerAction : 'all',
-			selectOnFocus : true,
+			selectOnFocus : true
 		},{
 			columnWidth : 1,
 			style :'margin-bottom:5px;',
