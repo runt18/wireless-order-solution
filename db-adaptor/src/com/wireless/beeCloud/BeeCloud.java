@@ -173,24 +173,43 @@ public class BeeCloud {
 	}
     
     public static void main(String[] args) throws Exception{
-    	final String APP_ID = "c3918fd6-6162-4d21-815d-01b6757c673c";
-    	final String APP_SECRET = "a4b4b3c0-79a6-49a9-ac00-fff8dd12d868";
-    	final String BILL_NO = System.currentTimeMillis() + "";
-    	final Bill.Channel CHANNEL = Bill.Channel.WX_NATIVE;
-    	System.out.println(BILL_NO);
-    	BeeCloud app = BeeCloud.registerApp(APP_ID, APP_SECRET);
-    	System.out.println(app.bill().ask(new Bill.Request().setChannel(CHANNEL).setTotalFee(1).setBillNo(BILL_NO).setTitle("a"), null));
+    	final String appId = "c3918fd6-6162-4d21-815d-01b6757c673c";
+    	final String appSecret = "a4b4b3c0-79a6-49a9-ac00-fff8dd12d868";
+    	//final String openId = "oM02TjtmLtadFjiGtlUuxTFjJhno";
+    	final String billNo = System.currentTimeMillis() + "";
+    	final Bill.Channel channel = Bill.Channel.WX_NATIVE;
+    	BeeCloud app = BeeCloud.registerApp(appId, appSecret);
+    	System.out.println(app.bill().ask(new Bill.Request().setChannel(channel).setTotalFee(1).setBillNo(billNo).setTitle("a"), null));
+    	//System.out.println(app.bill().ask(new Bill.Request().setChannel(Bill.Channel.WX_JSAPI).setOpenId(openId).setTotalFee(1).setBillNo(billNo).setTitle("a"), null));
     	
-    	Status.Response response;
-    	do{
-    		response = app.status().ask(CHANNEL, BILL_NO);
-    		if(response != null){
-    			System.out.println(response);
-    		}
-    		Thread.sleep(5000);
-    		System.out.println(app.revert().ask(BILL_NO, CHANNEL));
-    	}while(!response.isPaySuccess());
+//    	Status.Response response;
+//    	do{
+//    		response = app.status().ask(channel, billNo);
+//    		if(response != null){
+//    			System.out.println(response);
+//    		}
+//    		Thread.sleep(5000);
+//    		System.out.println(app.revert().ask(billNo, channel));
+//    	}while(!response.isPaySuccess());
     	//System.out.println(app.status().ask(Bill.Channel.WX_SCAN, BILL_NO));
+    	
+//    	cn.beecloud.BeeCloud.registerApp(appId, null, appSecret, null);
+//    	BCOrder bcOrder = new BCOrder(PAY_CHANNEL.WX_JSAPI, 1, billNo, "a");
+//    	bcOrder.setBillTimeout(360);
+//    	bcOrder.setOpenId(openId);
+//    	try {
+//    	    bcOrder = BCPay.startBCPay(bcOrder);
+//    	    System.out.println(bcOrder.getObjectId());
+//    	    Map<String, String> map = bcOrder.getWxJSAPIMap();
+//    	    System.out.println(map.get("appId").toString());
+//    	    System.out.println(map.get("timeStamp").toString());
+//    	    System.out.println(map.get("nonceStr").toString());
+//    	    System.out.println(map.get("package").toString());
+//    	    System.out.println(map.get("signType").toString());
+//    	    System.out.println(map.get("paySign").toString());
+//    	} catch (BCException e) {
+//    		System.out.println(e.getMessage());
+//    	}
     }
     
 }

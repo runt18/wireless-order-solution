@@ -96,7 +96,7 @@ public class MemberCondDao {
 			  cond.getMaxCharge() + "," +
 			  (cond.hasSex() ? cond.getSex().getVal() : " NULL ") + "," +
 			  (!cond.getAges().isEmpty() ? "'" + cond.getAgesString() + "'" : " NULL ") + "," +
-			  (cond.isRaw() ? "1" : "0") +
+			  (cond.hasRaw() ? (cond.isRaw() ? "1" : "0") : " NULL ") +
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -163,7 +163,7 @@ public class MemberCondDao {
 			  (builder.isSexChanged() ? " ,sex = " + (cond.getSex() != null ? cond.getSex().getVal() : " NULL ") : "") +
 			  (builder.isChargeChanged() ? " ,min_charge = " + cond.getMinCharge() + " ,max_charge = " + cond.getMaxCharge() : "") +
 			  (builder.isAgeChanged() ? " ,age = " + (!cond.getAges().isEmpty() ? "'" + cond.getAgesString() + "'" : " NULL ") : "") +
-			  (builder.isRawChanged() ? " ,raw = " + (cond.isRaw() ? "1" : "0") : "") +
+			  (builder.isRawChanged() ? " ,raw = " + (cond.hasRaw() ? (cond.isRaw() ? "1" : "0") : " NULL"): "") +
 			  " WHERE id = " + cond.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -247,7 +247,7 @@ public class MemberCondDao {
 	 */
 	public static List<MemberCond> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
-		sql = " SELECT *, IFNULL(sex, -1) FROM " + Params.dbName + ".member_cond " +
+		sql = " SELECT *, IFNULL(sex, -1) AS cond_sex, IFNULL(raw, -1) AS cond_raw FROM " + Params.dbName + ".member_cond " +
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond.toString() : "");
@@ -298,11 +298,13 @@ public class MemberCondDao {
 			memberCond.setMaxLastConsumption(dbCon.rs.getInt("max_last_consumption"));
 			memberCond.setMinCharge(dbCon.rs.getFloat("min_charge"));
 			memberCond.setMaxCharge(dbCon.rs.getFloat("max_charge"));
-			if(dbCon.rs.getInt("sex") >= 0){
+			if(dbCon.rs.getInt("cond_sex") >= 0){
 				memberCond.setSex(Member.Sex.valueOf(dbCon.rs.getInt("sex")));
 			}
 			memberCond.setAges(dbCon.rs.getString("age"));
-			memberCond.setRaw(dbCon.rs.getBoolean("raw"));
+			if(dbCon.rs.getInt("cond_raw") >= 0){
+				memberCond.setRaw(dbCon.rs.getBoolean("raw"));
+			}
 			result.add(memberCond);
 		}
 		dbCon.rs.close();

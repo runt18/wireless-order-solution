@@ -1,18 +1,13 @@
 package com.wireless.db.promotion;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.oss.CompressImage;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
@@ -23,8 +18,6 @@ import com.wireless.pojo.promotion.Promotion.Status;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.StringHtml;
-
-import gui.ava.html.image.generator.HtmlImageGenerator;
 
 public class PromotionDao {
 
@@ -291,7 +284,7 @@ public class PromotionDao {
 
 		Promotion promotion = builder.build();
 		
-		Promotion original = getById(dbCon, staff, promotion.getId());
+		//Promotion original = getById(dbCon, staff, promotion.getId());
 		
 		//Update the coupon type.
 		if(builder.isCouponTypeChanged()){
@@ -331,27 +324,27 @@ public class PromotionDao {
 			OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder4Html(OssImage.Type.WX_PROMOTION, promotion.getId()).setHtml(promotion.getBody()));
 			
 			//Re-Generate the image to promotion's body. 
-			try{
-				HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
-				imageGenerator.loadHtml(promotion.getBody());
-				ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
-				ImageIO.write(new CompressImage().imageZoomOut(imageGenerator.getBufferedImage(), 360, 280), OssImage.ImageType.PNG.getSuffix(), bosJpg);
-				bosJpg.flush();
-
-				if(original.hasImage()){
-					OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(original.getImage().getId()).setImgResource(OssImage.ImageType.PNG, new ByteArrayInputStream(bosJpg.toByteArray())));
-				}else{
-					int ossImageId = OssImageDao.insert(dbCon, staff, 
-		   											    new OssImage.InsertBuilder(OssImage.Type.PROMOTION, promotion.getId())
-			 		   				    						    .setImgResource(OssImage.ImageType.PNG, new ByteArrayInputStream(bosJpg.toByteArray())));
-
-					sql = " UPDATE " + Params.dbName + ".promotion SET oss_image_id = " + ossImageId + " WHERE promotion_id = " + promotion.getId();
-					dbCon.stmt.executeUpdate(sql);
-				}
+//			try{
+//				HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
+//				imageGenerator.loadHtml(promotion.getBody());
+//				ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
+//				ImageIO.write(new CompressImage().imageZoomOut(imageGenerator.getBufferedImage(), 360, 280), OssImage.ImageType.PNG.getSuffix(), bosJpg);
+//				bosJpg.flush();
+//
+//				if(original.hasImage()){
+//					OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(original.getImage().getId()).setImgResource(OssImage.ImageType.PNG, new ByteArrayInputStream(bosJpg.toByteArray())));
+//				}else{
+//					int ossImageId = OssImageDao.insert(dbCon, staff, 
+//		   											    new OssImage.InsertBuilder(OssImage.Type.PROMOTION, promotion.getId())
+//			 		   				    						    .setImgResource(OssImage.ImageType.PNG, new ByteArrayInputStream(bosJpg.toByteArray())));
+//
+//					sql = " UPDATE " + Params.dbName + ".promotion SET oss_image_id = " + ossImageId + " WHERE promotion_id = " + promotion.getId();
+//					dbCon.stmt.executeUpdate(sql);
+//				}
 				
-			}catch(IOException e){
-				e.printStackTrace();
-			}
+//			}catch(IOException e){
+//				e.printStackTrace();
+//			}
 		}
 		
 	} 
