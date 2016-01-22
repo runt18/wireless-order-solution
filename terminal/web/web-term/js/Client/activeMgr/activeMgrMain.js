@@ -101,20 +101,19 @@ Ext.onReady(function() {
 		var params = {};
 		if(promotionGuideWin.otype == 'insert'){
 			params.dataSource = 'insert';
-
 		}else{
 			params.dataSource = 'update';
 			params.id = promotionGuideWin.promotion.id;
 			params.cId = promotionGuideWin.promotion.coupon.id;
 		}
-		
+
+		if(promotionGuideWin.ossId){
+			params.image = promotionGuideWin.ossId;
+		}
 		params.couponName = couponName.getValue();
 		params.price = price.getValue();
 		params.expiredDate = expiredDate.getValue().format('Y-m-d');
-		params.image = promotionGuideWin.ossId;
 		params.title = title.getValue();
-		//params.beginDate = beginDate.getValue().format('Y-m-d');
-		//params.endDate = endDate.getValue().format('Y-m-d');
 		
 		params.body = Ext.getCmp('guide_2nd_promotionEditor').getValue();	
 		params.entire = buildPromotionHeader(title.getValue()) + params.body;
@@ -129,6 +128,9 @@ Ext.onReady(function() {
 				promotionUploadMask.hide();
 				if(jr.success){
 					promotionGuideWin.hide();
+					//创建活动Win关闭后，清除图片的信息
+					promotionGuideWin.ossId = null;
+					promotionGuideWin.image = null;
 					
 					var promotionId;
 					if(params.dataSource == 'insert'){
