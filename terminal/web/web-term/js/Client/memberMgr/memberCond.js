@@ -1009,6 +1009,7 @@
 				['名称', 'name'],
 				['类型', 'memberType.name'],
 				['年龄段','ageText'],
+				['性别','sexText'],
 				['创建时间','createDateFormat'],
 				['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
 				['最近消费','lastConsumption',150],
