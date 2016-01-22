@@ -63,6 +63,37 @@ ADD COLUMN `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT '' AFTER `table_id`;
 ALTER TABLE `wireless_order_db`.`weixin_restaurant` 
 ADD COLUMN `charge_template` VARCHAR(100) NULL DEFAULT NULL COMMENT '' AFTER `coupon_timeout_template`;
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`order_food_price`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`order_food_price` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`order_food_price` (
+  `order_food_id` INT NOT NULL COMMENT '',
+  `food_unit` VARCHAR(45) NULL DEFAULT NULL COMMENT '',
+  `food_unit_price` FLOAT NULL DEFAULT NULL COMMENT '',
+  `plan_price` FLOAT NULL DEFAULT NULL COMMENT '',
+  PRIMARY KEY (`order_food_id`)  COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Add the field 'plan_price' to table 'order_food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food` 
+ADD COLUMN `plan_price` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `commission`;
+
+-- -----------------------------------------------------
+-- Add the field 'plan_price' to table 'order_food_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food_history` 
+ADD COLUMN `plan_price` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `order_date`;
+
+-- -----------------------------------------------------
+-- Add the field 'plan_price' to table 'order_food_archive'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food_archive` 
+ADD COLUMN `plan_price` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `order_date`;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

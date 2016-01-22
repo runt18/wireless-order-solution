@@ -27,7 +27,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.weixin_keyword
 (restaurant_id, type)
-SELECT id, 2 FROM wireless_order_db.restaurant WHERE id > 10
+SELECT id, 2 FROM wireless_order_db.restaurant WHERE id > 10;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

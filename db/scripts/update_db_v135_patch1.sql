@@ -7,36 +7,36 @@ SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`order_food_price`
+-- Add the field 'age' to table 'member'
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`order_food_price` ;
-
-CREATE TABLE IF NOT EXISTS `wireless_order_db`.`order_food_price` (
-  `order_food_id` INT NOT NULL COMMENT '',
-  `food_unit` VARCHAR(45) NULL DEFAULT NULL COMMENT '',
-  `food_unit_price` FLOAT NULL DEFAULT NULL COMMENT '',
-  `plan_price` FLOAT NULL DEFAULT NULL COMMENT '',
-  PRIMARY KEY (`order_food_id`)  COMMENT '')
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+ALTER TABLE `wireless_order_db`.`member` 
+ADD COLUMN `age` TINYINT NULL DEFAULT NULL COMMENT 'the age as below.\n0 - unknown\n1 - 1960s\n2 - 1970s\n3 - 1980s\n4 - 1990s\n5 - 2000s' AFTER `birthday`;
 
 -- -----------------------------------------------------
--- Add the field 'plan_price' to table 'order_food'
+-- Drop the table 'member_comment'
 -- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`order_food` 
-ADD COLUMN `plan_price` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `commission`;
+DROP TABLE `wireless_order_db`.`member_comment`;
 
 -- -----------------------------------------------------
--- Add the field 'plan_price' to table 'order_food_history'
+-- Drop the table 'member_user'
 -- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`order_food_history` 
-ADD COLUMN `plan_price` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `commission`;
+DROP TABLE `wireless_order_db`.`member_user`;
 
 -- -----------------------------------------------------
--- Add the field 'plan_price' to table 'order_food_archive'
+-- Drop the table 'interested_member'
 -- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`order_food_archive` 
-ADD COLUMN `plan_price` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `commission`;
+DROP TABLE `wireless_order_db`.`interested_member`;
+
+-- -----------------------------------------------------
+-- Add the field 'sex', 'age', 'min_charge', 'max_charge' to table 'member_cond'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`member_cond` 
+ADD COLUMN `sex` TINYINT NULL DEFAULT NULL COMMENT '' AFTER `max_last_consumption`,
+ADD COLUMN `age` VARCHAR(45) NULL DEFAULT NULL COMMENT '' AFTER `sex`,
+ADD COLUMN `min_charge` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `age`,
+ADD COLUMN `max_charge` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `min_charge`,
+ADD COLUMN `raw` TINYINT NULL DEFAULT 0 COMMENT '' AFTER `max_charge`;
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
