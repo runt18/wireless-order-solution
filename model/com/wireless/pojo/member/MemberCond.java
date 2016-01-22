@@ -143,7 +143,7 @@ public class MemberCond implements Jsonable{
 			this.id = id;
 		}
 		
-		public UpdateBuilder setRaw(boolean onOff){
+		public UpdateBuilder setRaw(Boolean onOff){
 			this.isRawChanged = true;
 			this.isRaw = onOff;
 			return this;
