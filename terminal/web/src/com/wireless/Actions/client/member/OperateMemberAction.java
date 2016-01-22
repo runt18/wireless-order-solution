@@ -181,7 +181,7 @@ public class OperateMemberAction extends DispatchAction{
 				builder.setName(name);
 			}
 			
-			if(mobile != null && !mobile.isEmpty()){
+			if(mobile != null){
 				builder.setMobile(mobile);
 			}
 			
