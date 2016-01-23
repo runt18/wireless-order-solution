@@ -20,6 +20,7 @@ import com.wireless.pojo.token.Token;
 
 public class VerifyRestaurantAction extends Action {
 
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		final JObject jobject = new JObject();
@@ -38,10 +39,7 @@ public class VerifyRestaurantAction extends Action {
 			cookie.setPath("/web-term/touch/");
 			response.addCookie(cookie);
 			
-		}catch (BusinessException e) {
-			jobject.initTip(e);
-			e.printStackTrace();
-		}catch(SQLException e){
+		}catch (BusinessException | SQLException e) {
 			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){

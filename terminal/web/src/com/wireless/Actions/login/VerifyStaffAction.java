@@ -15,6 +15,7 @@ import com.wireless.pojo.staffMgr.Privilege.Code;
 
 public class VerifyStaffAction extends Action{
 
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 
@@ -31,8 +32,7 @@ public class VerifyStaffAction extends Action{
 			jobject.initTip(e);
 		}catch(Exception e){
 			
-		}
-		finally{
+		}finally{
 			response.getWriter().print(jobject.toString());
 		}
 		return null;

@@ -1,5 +1,7 @@
 package com.wireless.Actions.login;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,7 +31,7 @@ public class VerifyLoginAction extends Action {
 				jObject.initTip(false, "false");
 			}
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
