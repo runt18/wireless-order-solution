@@ -142,7 +142,7 @@ function staffLoginHandler(c){
 			pin : lg.staff.staffID,
 			pwd : MD5(pwd.val().trim()),
 			account : lg.restaurant.account,
-			token : getcookie(document.domain+"_digie_token")
+			token : getcookie(document.domain + '_digie_token')
 		},
 		type : 'post',
 		success : function(data, status, xhr){
