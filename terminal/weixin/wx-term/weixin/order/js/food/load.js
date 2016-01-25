@@ -62,18 +62,14 @@ $(function(){
 												+'<li class="none-line" style="line-height: 50px;">'	
 													+'会员姓名: <input data-type="mobileName_input_member" style="font-size: 20px;padding: 3px 5px 3px 5px;width: 120px;">'			
 												+'</li>'	
-												+'<li class="none-line" style="line-height: 50px;">'
-														+'会员生日: <input data-type="birthdayMonth_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:45px;">&nbsp;月'
-													+'&nbsp;<input data-type="birthdayDay_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:45px;">&nbsp;日'
+												+'性别:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div data-type="personSex" data-value="0" class="region_css_book selectedRegion_css_book" style="width:31%;" href="#">'	
+													+'<ul class="m-b-list">先生</ul>'
+												+'</div>'
+												+'<div data-type="personSex" data-value="1" class="region_css_book" style="width:31%;" href="#">'
+													+'<ul class="m-b-list">女士</ul>'
+												+'</div>'
 												+'</li>'
 												+'<li class="box-horizontal none-line" style="line-height: 50px;font-size:18px;">'
-												+'性别:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div data-type="personSex" data-value="0" class="region_css_book selectedRegion_css_book" style="width:31%;" href="#">'	
-														+'<ul class="m-b-list">先生</ul>'
-													+'</div>'
-													+'<div data-type="personSex" data-value="1" class="region_css_book" style="width:31%;" href="#">'
-														+'<ul class="m-b-list">女士</ul>'
-													+'</div>'
-												+'</li>'
 												+'<li class="none-line" style="line-height: 50px;">'	
 													+'年龄段: &nbsp;&nbsp;&nbsp;&nbsp;<select data-type="age_select_member" style="font-size: 20px;padding: 3px 5px 3px 5px;width: 120px;">'
 														+'<option value ="5">00后</option>'  
@@ -83,6 +79,10 @@ $(function(){
 														+'<option value="1">60后</option>' 
 														+'<option value="6">50后</option>' 
 														+'</select>'			
+												+'</li>'
+												+'<li class="none-line" style="line-height: 50px;">'
+														+'会员生日: <input data-type="birthdayMonth_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:45px;">&nbsp;月'
+													+'&nbsp;<input data-type="birthdayDay_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:45px;">&nbsp;日'
 												+'</li>'
 											+'</ul>'	
 										 +'</div>',
@@ -137,10 +137,10 @@ $(function(){
 										return;
 									}
 									
-									var name = diaologDiv.find('[data-type="mobileName_input_member"]').val().trim();
-									if(!/^([^x00-xff]{2,16})|([a-zA-z][a-zA-z0-9]{3,17})$/.test(name)){
+									var name = diaologDiv.find('[data-type="mobileName_input_member"]').val();
+									if(name == ''){
 										Util.dialog.show({
-											msg: '请输入至少两个中文字或字母开头4至18位的会员名称',
+											msg: '会员名不能为空',
 											callback : function(){
 												diaologDiv.find('[data-type="mobileName_input_member"]').select();
 											}

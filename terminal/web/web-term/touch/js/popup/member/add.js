@@ -34,6 +34,7 @@ function AddMemberPopup(){
 				var firstActualCharge = $('#memberActual_input_memberAdd');
 				var rechargeType = $('#memberRechargeType_select_memberAdd');
 				var referrer = $('#memberReferrer_select_memberAdd');
+				var age =$('#memberAge_select_memberAdd')
 				
 				if(!memberMobile.val() && !memberCard.val()){
 					Util.msg.tip('至少要输入手机或会员卡号');
@@ -71,7 +72,8 @@ function AddMemberPopup(){
 					rechargeType : rechargeType.val(),
 					referrer : referrer.val(),
 					isPrint : $('#memberPrintRecharge_input_memberAdd').attr('checked')?true:false,
-					sendSms : $('#memberSendMsgPrint_input_memberAdd').attr('checked')?true:false
+					sendSms : $('#memberSendMsgPrint_input_memberAdd').attr('checked')?true:false,
+					age : age.val()
 				}, function(jr){
 					Util.LM.hide();
 					if(jr.success){
