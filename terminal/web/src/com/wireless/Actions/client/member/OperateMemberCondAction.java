@@ -91,12 +91,12 @@ public class OperateMemberCondAction extends DispatchAction{
 			}
 			
 			//性别
-			if(sex != null && !sex.isEmpty()){
+			if(sex != null && !sex.isEmpty() && !sex.equals("-1")){
 				builder.setSex(Member.Sex.valueOf(Integer.parseInt(sex)));
 			}
 			
 			//是否Raw
-			if(isRaw != null && !isRaw.isEmpty()){
+			if(isRaw != null && !isRaw.isEmpty() && !isRaw.equals("-1")){
 				builder.setRaw(Boolean.parseBoolean(isRaw));
 			}
 			
@@ -208,10 +208,10 @@ public class OperateMemberCondAction extends DispatchAction{
 			
 			//是否Raw
 			if(isRaw != null && !isRaw.isEmpty()){
-				if(Integer.parseInt(isRaw) >= 0){
-					builder.setRaw(Boolean.parseBoolean(isRaw));
-				}else{
+				if(isRaw.equals(-1)){
 					builder.setRaw(null);
+				}else{
+					builder.setRaw(Boolean.parseBoolean(isRaw));
 				}
 			}
 			
