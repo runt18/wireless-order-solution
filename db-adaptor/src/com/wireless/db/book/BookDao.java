@@ -617,6 +617,7 @@ public class BookDao {
 			book.setSource(Book.Source.valueOf(dbCon.rs.getInt("book_source")));
 			book.setStatus(Book.Status.valueOf(dbCon.rs.getInt("book_status")));
 			book.setMoney(dbCon.rs.getFloat("book_money"));
+			book.setWxPayMoney(dbCon.rs.getFloat("wx_pay_money"));
 			book.setComment(dbCon.rs.getString("comment"));
 			result.add(book);
 		}

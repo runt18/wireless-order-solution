@@ -14,7 +14,7 @@ public class Revert {
 	}
 	
 	public Response ask(String billNo, Bill.Channel channel) throws Exception{
-		final String url = "https://" + BeeCloud.DYNC + "/2/rest" + (channel.online ? "" : "/offline") + "/bill/" + billNo;
+		final String url = "https://" + BeeCloud.DYNC + "/2/rest/offline/bill/" + billNo;
 		return JObject.parse(Response.JSON_CREATOR, 0, this.app.doPost(url, new Request(this.app, channel).toString()));
 	}
 	

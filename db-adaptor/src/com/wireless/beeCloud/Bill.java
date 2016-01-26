@@ -64,7 +64,9 @@ public class Bill {
 				public ProtocolPackage call() throws Exception {
 					if(System.currentTimeMillis() - now > timeout * 60 * 1000){
 						schedule.shutdown(); 
-						app.revert.ask(request.billNo, request.channel);
+						if(!request.channel.online){
+							app.revert.ask(request.billNo, request.channel);
+						}
 						return null;
 					}else if(new Status(app).ask(request.channel, request.billNo).isPaySuccess()){
 						schedule.shutdown();
