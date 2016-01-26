@@ -86,7 +86,14 @@
 		gs.baseParams['memberCondEndDate'] = Ext.util.Format.date(Ext.getCmp('srchEnd_dateField_memberCond').getValue(), 'Y-m-d 23:59:59');
 		gs.baseParams['sex'] = Ext.getCmp('memberCondSex_combo_memebercond').getValue();
 		gs.baseParams['age'] = Ext.getCmp('memberCondAge_combo_memebercond').getValue();
-		gs.baseParams['isRaw'] = !Ext.getCmp('isBind_checkbox_memberCond').getValue();
+		if(Ext.getCmp('isBind_checkbox_memberCond').getValue() == '0'){
+			gs.baseParams['isRaw'] = false;
+		}else if(Ext.getCmp('isBind_checkbox_memberCond').getValue() == '1'){
+			gs.baseParams['isRaw'] = true;
+		}else{
+			gs.baseParams['isRaw'] = Ext.getCmp('isBind_checkbox_memberCond').getValue();
+		}
+		
 		gs.baseParams['memberCondMinCharge'] = Ext.getCmp('memberMinCharge_numberField_memberCond').getValue();
 		gs.baseParams['memberCondMaxCharge'] = Ext.getCmp('memberMaxCharge_numberField_memberCond').getValue();
 			
@@ -414,9 +421,9 @@
 				iconCls : 'btn_refresh',
 				handler : function(){
 					Ext.getDom('memberCondName').innerHTML = '----';
-					Ext.getDom('isBind_tbtext_memberCond').innerHTML = '----';
-					Ext.getDom('memeberAge_tbtext_memberCond').innerHTML = '----';
-					Ext.getDom('memeberSex_tbtext_memberCond').innerHTML = '----';
+					Ext.getDom('isBind_tbtext_memberCond').innerHTML = '无设定';
+					Ext.getDom('memeberAge_tbtext_memberCond').innerHTML = '无设定';
+					Ext.getDom('memeberSex_tbtext_memberCond').innerHTML = '无设定';
 					memberCondTree.getRootNode().reload();
 				}
 			}]
@@ -488,23 +495,26 @@
 		    		    		Ext.getCmp('minCharge_numField_memberCond').setValue(jr.root[0].minCharge > 0 ? jr.root[0].minCharge : '');
 		    		    		Ext.getCmp('maxCharge_numField_memberCond').setValue(jr.root[0].maxCharge > 0 ? jr.root[0].maxCharge : '');
 		    		    		
-		    		    		
-		    		    		if(jr.root[0].isRaw){
-		    		    			Ext.getDom('isBind_tbtext_memberCond').innerHTML  = '未绑定';
+		    		    		if(typeof jr.root[0].isRaw == 'undefined'){
+		    		    			Ext.getDom('isBind_tbtext_memberCond').innerHTML  = '无设定';
 		    		    		}else{
-		    		    			Ext.getDom('isBind_tbtext_memberCond').innerHTML = '已绑定';
+		    		    			if(jr.root[0].isRaw){
+			    		    			Ext.getDom('isBind_tbtext_memberCond').innerHTML  = '未绑定';
+			    		    		}else{
+			    		    			Ext.getDom('isBind_tbtext_memberCond').innerHTML = '已绑定';
+			    		    		}
 		    		    		}
 		    		    		
 		    		    		if(jr.root[0].ageText){
 		    		    			Ext.getDom('memeberAge_tbtext_memberCond').innerHTML = jr.root[0].ageText;
 		    		    		}else{
-		    		    			Ext.getDom('memeberAge_tbtext_memberCond').innerHTML = '----';
+		    		    			Ext.getDom('memeberAge_tbtext_memberCond').innerHTML = '无设定';
 		    		    		}
 		    		    		
 		    		    		if(jr.root[0].sexText){
 		    		    			Ext.getDom('memeberSex_tbtext_memberCond').innerHTML = jr.root[0].sexText;
 		    		    		}else{
-		    		    			Ext.getDom('memeberSex_tbtext_memberCond').innerHTML = '----';
+		    		    			Ext.getDom('memeberSex_tbtext_memberCond').innerHTML = '无设定';
 		    		    		}
 		    		    		
 		    		    		
@@ -941,7 +951,7 @@
 			items : [
 					{
 						xtype : 'tbtext',
-						text : String.format(Ext.ux.txtFormat.longerTypeName, '是否绑定', 'isBind_tbtext_memberCond', '----')
+						text : String.format(Ext.ux.txtFormat.longerTypeName, '是否绑定会员', 'isBind_tbtext_memberCond', '----')
 					},
 					{
 						xtype : 'tbtext',
@@ -1074,13 +1084,16 @@
 		
 		Ext.getCmp('memberMinCharge_numberField_memberCond').setValue(data.minCharge && data.minCharge > 0 ? data.minCharge : "");
 		Ext.getCmp('memberMaxCharge_numberField_memberCond').setValue(data.maxCharge && data.maxCharge > 0 ? data.maxCharge : "");
-		if(data.isRaw){
-			Ext.getCmp('isBind_checkbox_memberCond').setValue(false);
+		if(typeof data.isRaw == 'undefined'){
+			Ext.getCmp('isBind_checkbox_memberCond').setValue(-1);
 		}else{
-			Ext.getCmp('isBind_checkbox_memberCond').setValue(true);
+			if(data.isRaw){
+				Ext.getCmp('isBind_checkbox_memberCond').setValue(1);
+			}else{
+				Ext.getCmp('isBind_checkbox_memberCond').setValue(0);
+			}
 		}
-		
-		
+			
 		if(data.name){
 			//修改
 			if(data.minConsumeMoney > 0 && data.maxConsumeMoney == 0){
@@ -1140,7 +1153,8 @@
 			refreshBalance();
 			
 		}else{
-			Ext.getCmp('isBind_checkbox_memberCond').setValue(false);
+			Ext.getCmp('isBind_checkbox_memberCond').setValue(-1);
+			Ext.getCmp('isBind_checkbox_memberCond').fireEvent('select', null, null, -1);
 			
 			//新增
 			Ext.getCmp('comboCost4CondWin').setValue(0);
@@ -1259,13 +1273,32 @@
 			width : 10,
 			hidden : true
 		},{
+			columnWidth : 1,
+			style :'margin-bottom:5px;',
+			border : false
+		},{
 			columnWidth : 0.2,
- 	    	xtype : 'checkbox',
- 	    	checked : false,
-			hideLabel : true,
- 	    	id : 'isBind_checkbox_memberCond',
- 	    	boxLabel : '是否绑定'
-	 	},{
+			xtype : 'label',
+			text : '是否绑定:'
+		}, {
+			columnWidth : 0.2,
+			id : 'isBind_checkbox_memberCond',
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			value : -1,
+			width : 80,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text'],
+				data : [[-1, '无设定'], [0, '已绑定'], [1, '未绑定']]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true
+		},{
 			columnWidth : 1,
 			style :'margin-bottom:5px;',
 			border : false
@@ -1726,7 +1759,16 @@
 				}
 				var sex = Ext.getCmp('memberCondSex_combo_memebercond').getValue();
 				var age = Ext.getCmp('memberCondAge_combo_memebercond').getValue();
-				var isRaw = Ext.getCmp('isBind_checkbox_memberCond').getValue();
+				var bindValve = Ext.getCmp('isBind_checkbox_memberCond').getValue();
+				var isRaw;
+				if(bindValve == '0'){
+					isRaw = false;
+				}else if(bindValve == '1'){
+					isRaw = true;
+				}else{
+					isRaw = bindValve;
+				}
+				
 				Ext.Ajax.request({
 					url : '../../OperateMemberCond.do',
 					params : {
@@ -1749,7 +1791,7 @@
 						age : age,
 						memberCondMinCharge : minCharge,
 						memberCondMaxCharge : maxCharge,
-						isRaw : !isRaw
+						isRaw : isRaw
 					},
 					success : function(response, options) {
 						var jr = Ext.util.JSON.decode(response.responseText);

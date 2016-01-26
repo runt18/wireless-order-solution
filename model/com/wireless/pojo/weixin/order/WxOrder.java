@@ -431,6 +431,7 @@ public class WxOrder implements Jsonable, Parcelable{
 		jm.putJsonableList("foods", this.foods, 0);
 		jm.putJsonable("member", this.member, 0);
 		jm.putJsonable("table", this.table, 0);
+		jm.putInt("orderId", this.orderId);
 		return jm;
 	}
 	@Override

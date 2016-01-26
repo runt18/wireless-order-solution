@@ -101,7 +101,7 @@ public class OperateMemberCondAction extends DispatchAction{
 			}
 			
 			//年龄段
-			if(ageVal != null && !ageVal.isEmpty()){
+			if(ageVal != null && !ageVal.isEmpty() && !ageVal.equals("-1")){
 				for(String age : ageVal.split(",")){
 					builder.addAge(Member.Age.valueOf(Integer.parseInt(age)));
 				}
@@ -208,7 +208,7 @@ public class OperateMemberCondAction extends DispatchAction{
 			
 			//是否Raw
 			if(isRaw != null && !isRaw.isEmpty()){
-				if(isRaw.equals(-1)){
+				if(isRaw.equals("-1")){
 					builder.setRaw(null);
 				}else{
 					builder.setRaw(Boolean.parseBoolean(isRaw));

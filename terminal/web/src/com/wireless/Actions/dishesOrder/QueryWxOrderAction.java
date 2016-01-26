@@ -27,6 +27,7 @@ public class QueryWxOrderAction extends DispatchAction {
 		final String code = request.getParameter("code");
 		final String id = request.getParameter("id");
 		final String detail = request.getParameter("detail");
+		final String status = request.getParameter("status");
 		
 		JObject jObject = new JObject();
 		try{
@@ -44,6 +45,12 @@ public class QueryWxOrderAction extends DispatchAction {
 			
 			if(code != null && !code.isEmpty()){
 				extraCond.setCode(Integer.parseInt(code));
+			}
+			
+			if(status != null && !status.isEmpty()){
+				for(String eachStatus : status.split(",")){
+					extraCond.addStatus(WxOrder.Status.valueOf(Integer.parseInt(eachStatus)));
+				}
 			}
 			
 			if(detail != null && !detail.isEmpty()){

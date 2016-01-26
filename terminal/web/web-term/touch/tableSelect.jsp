@@ -61,6 +61,7 @@
 <script type="text/javascript" src="js/stopSet/stopSet.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/payment/payment.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/books/book.js?v=<%=v %>"></script>
+<script type="text/javascript" src="js/wxOrder/wxOrder.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/tableSelect/tableSelect.js?v=<%=v %>"></script>
 <!-- 共享数据 -->
 <script type="text/javascript" src="js/global/share.js?v=<%=v %>"></script>
@@ -565,7 +566,72 @@
 <!-- 弹出框时, 挡住其他操作的div阴影 -->
 <div id="shadowForPopup" style="z-index: 1101;opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%; background: #DDD;display: none;" ></div>
 
+<!-- 微定订单列表start -->
+<div data-role="page" id="wxOrderWin_div_wxOrder" data-theme="e">
+	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b" style="height: 40px;">
+		<span id="" class="ui-btn-left" style="line-height: 40px;">
+			微信预订列表
+		</span>
+	</div>
+    <table style="width: 1024px;">
+    	<tr>
+    		<td style="width:20%;float:left;">
+    			<input type="text" id="searchWxOrderNumber_input_wxOrder" placeholder="订单号">
+    		</td>
+    		<td style="line-height: 20px;padding: 0 3px;width:20%;float:left">
+				<select  id="searchWxOrderStatus_select_wxOrder" style="font-size: 20px;">
+					<option value="-1">订单状态</option>
+					<option value="2">已提交</option>
+					<option value="3">已下单</option>
+				</select>
+    		</td>    		
+    	</tr>
+    </table>	
+	<div id="wxOrderListCmp_div_wxOrder" style="overflow-y: auto;">
+		<table id="wxOrderListTitle_table_wxOrder" data-theme="c" data-role="table" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr">
+	         <thead>
+	           <tr class="ui-bar-d">
+	             <th style="width: 5px;"></th>
+	             <th style="width: 200px;">订单编号</th>
+	             <th style="width: 200px;">下单时间</th>
+	             <th style="width: 200px;">会员名称</th>
+				 <th style="width: 100px;">联系电话</th>
+				 <th style="width: 140px;">台号</th>
+				 <th style="width: 90px;">状态</th>
+				 <th style="width: 230px;">操作</th>             
+	           </tr>
+	         </thead>
+	         <!-- 菜品列表 -->
+	         <tbody id="wxOrderList_tbody_wxOrder" style="font-weight:bold;color: blue">
+	<!--            <tr>
+					<td>1</td>
+					<td>2014-12-11 18:06:53</td>
+					<td>大厅</td>
+					<td>李先生</td>
+					<td>13533464033</td>
+					<td>8</td>
+					<td><a href="#">查看</a></td>
+					<td>未处理</td>
+					<td>小明</td>
+					<td>
+						<div data-role="controlgroup" data-type="horizontal"><a href="#" data-role="button">确认</a><a href=""  data-role="button" >取消</a></div>					
+					</td>
+	           </tr> -->
+	         </tbody>
+	    </table>
+	</div>
+	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
 
+		 <a data-role="button" data-inline="true" class="bottomBtnFont" id="wxOrderBack_a_wxOrder">返回</a>
+		 <a data-role="button" data-inline="true" class="bottomBtnFont" id="wxOrderRefresh_a_wxOrder">刷新</a>
+		 
+		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
+			<a href="javascript: Util.to.scroll({content:'wxOrderWin_div_wxBook', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
+			<a href="javascript: Util.to.scroll({content:'wxOrderWin_div_wxBook', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>		 
+		 </div>
+	</div>	
+</div>
+<!-- end 微定订单列表 -->
 
 
 <!-- 预订订单列表start -->

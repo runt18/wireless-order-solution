@@ -229,10 +229,10 @@ $(function(){
 			return;
 		}
 		
-		var name = $('#name_input_member').val().trim();
-		if(!/^([^x00-xff]{2,16})|([a-zA-z][a-zA-z0-9]{3,17})$/.test(name)){
+		var name = $('#name_input_member').val();
+		if(name == ''){
 			Util.dialog.show({
-				msg: '请输入至少两个中文字或字母开头4至18位的会员名称',
+				msg: '会员名称不能为空',
 				callback : function(){
 					$('#name_input_member').select();
 				}

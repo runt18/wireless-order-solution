@@ -1151,6 +1151,24 @@ Ext.onReady(function(){
 				{
 					columnWidth : 1,
 					items : [{
+						xtype : 'combo',
+						id : 'comboMemberAge_combo_member',
+						fieldLabel : '年龄段',
+						readOnly : false,
+						forceSelection : true,
+						value : -1,
+						store : new Ext.data.SimpleStore({
+							fields : ['value', 'text'],
+							data : [[-1, '无'],[5,'00后'], [4, '90后'], [3, '80后'], [2, '70后'], [1, '60后'], [6, '50后']]
+						}),
+						valueField : 'value',
+						displayField : 'text',
+						typeAhead : true,
+						mode : 'local',
+						triggerAction : 'all',
+						selectOnFocus : true,
+						allowBlank : true,
+					},{
 						id : 'cm_txtMemberContactAddress',
 						fieldLabel : '联系地址',
 						width : 535
@@ -1402,6 +1420,7 @@ Ext.onReady(function(){
 		
 		var sex = Ext.getCmp('comboMemberSex_combo_member');
 		var birthday = Ext.getCmp('dateMemberBirthday_dataField_member');
+		var age = Ext.getCmp('comboMemberAge_combo_member');
 		var addr = Ext.getCmp('cm_txtMemberContactAddress');
 		
 		var totalBalance = Ext.getCmp('cm_numberTotalBalance');
@@ -1434,6 +1453,11 @@ Ext.onReady(function(){
 			weixinCard.setValue(data['weixinCard']);
 			sex.setValue(typeof data['sexValue'] == 'undefined' ? 0 : data['sexValue']);
 			birthday.setValue(data['birthdayFormat']);
+			if(data['ageVal']){
+				age.setValue(data['ageVal']);
+			}else{
+				age.setValue(-1);
+			}
 			addr.setValue(data['contactAddress']);
 			
 			totalBalance.setValue(parseFloat(data['totalBalance']).toFixed(2));
@@ -1554,6 +1578,7 @@ Ext.onReady(function(){
 		var memberMobile = Ext.getCmp('txtMemberMobile_text_member');
 		var memberSex = Ext.getCmp('comboMemberSex_combo_member');
 		var birthday = Ext.getCmp('dateMemberBirthday_dataField_member');
+		var age = Ext.getCmp('comboMemberAge_combo_member');
 		var firstCharge = Ext.getCmp('numFirstCharge_numberField_member');
 		var firstActualCharge = Ext.getCmp('numFirstActualCharge_numberField_member');
 		var rechargeType = Ext.getCmp('comboFirstRechargeType_combo_member');
@@ -1581,7 +1606,8 @@ Ext.onReady(function(){
 				rechargeType : rechargeType.getValue(),
 				isPrint : c.isPrint,
 				sendSms : c.sendSms,
-				addr : Ext.getCmp('cm_txtMemberContactAddress').getValue()
+				addr : Ext.getCmp('cm_txtMemberContactAddress').getValue(),
+				age : age.getValue()
 			},
 			success : function(res, opt){
 				c.setButtonStatus(false);

@@ -365,7 +365,9 @@ public class MemberCond implements Jsonable{
 		setMaxCharge(builder.maxCharge != null ? builder.maxCharge : 0);
 		setSex(builder.sex);
 		setAges(builder.ages);
-		setRaw(builder.isRaw != null ? builder.isRaw : false);
+		if(builder.isRaw != null){
+			setRaw(builder.isRaw);
+		}
 	}
 	
 	private MemberCond(InsertBuilder builder){

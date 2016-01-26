@@ -532,7 +532,7 @@ public class WxOrderDao {
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond.toString() : " ") +
-			  (orderClause != null ? orderClause : "");
+			  (orderClause != null ? orderClause : " ORDER BY birth_date DESC ");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		List<WxOrder> result = new ArrayList<WxOrder>();
