@@ -11,7 +11,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.SMStatDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -29,51 +28,63 @@ import com.wireless.util.DataPaging;
 
 public class QueryRestaurantAction extends Action{
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws Exception{
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		String isPaging = request.getParameter("isPaging");
-		String name = request.getParameter("name");
-		String account = request.getParameter("account");
-		String expireDate = request.getParameter("expireDate");
-		String alive = request.getParameter("alive");
-		String byId = request.getParameter("byId");
-		List<Restaurant> list = new ArrayList<Restaurant>();
-		Restaurant restaurant= null;
-		JObject jobject = new JObject();
-		String extraCond = "", orderClause = " ORDER BY id";
-		List<Jsonable> resList = new ArrayList<Jsonable>();
-		DBCon dbCon = new DBCon();
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String isPaging = request.getParameter("isPaging");
+		final String id = request.getParameter("id");
+		final String name = request.getParameter("name");
+		final String fuzzy = request.getParameter("fuzzy");
+		final String account = request.getParameter("account");
+		final String expireDate = request.getParameter("expireDate");
+		final String alive = request.getParameter("alive");
+		final String byId = request.getParameter("byId");
+		final JObject jObject = new JObject();
+		
 		try{
-			if(name != null && !name.trim().isEmpty()){
-				extraCond += (" AND (restaurant_name like '%" + name + "%' OR account like '%" + name + "%') ");
-			}else if(account != null && !account.trim().isEmpty()){
-				extraCond = " AND account = '" + account + "' " ;
-			}else if((expireDate != null && !expireDate.isEmpty()) || (alive != null && !alive.isEmpty())){
-				if(alive == null || alive.isEmpty()){
-					orderClause = (" ORDER BY expire_date" );
-				}else if(expireDate == null || expireDate.isEmpty()){
-					orderClause = (" ORDER BY liveness" );
-				}else if(expireDate != null && alive != null){
-					orderClause = (" ORDER BY expire_date, liveness" );
-				}
-			}
-			dbCon.connect();
-			if(Boolean.parseBoolean(byId)){
-				restaurant = RestaurantDao.getById(dbCon, Integer.parseInt((String) request.getAttribute("restaurantID")));
-				list.add(restaurant);
-				jobject.setRoot(list);
+
+			if(byId != null && !byId.isEmpty() && Boolean.parseBoolean(byId)){
+				jObject.setRoot(RestaurantDao.getById(Integer.parseInt((String) request.getAttribute("restaurantID"))));
+				
 			}else{
-				list.addAll(RestaurantDao.getByCond(extraCond, orderClause));
+				final RestaurantDao.ExtraCond extraCond = new RestaurantDao.ExtraCond();
+				if(id != null && !id.isEmpty()){
+					extraCond.setId(Integer.parseInt(id));
+				}
+				if(name != null && !name.trim().isEmpty()){
+					extraCond.setFuzzy(name);
+				}
+				if(account != null && !account.trim().isEmpty()){
+					extraCond.setAccount(account);
+				}
+				if(fuzzy != null && !fuzzy.isEmpty()){
+					extraCond.setFuzzy(fuzzy);
+				}
+				
+				final String orderClause;
+				if((expireDate != null && !expireDate.isEmpty()) || (alive != null && !alive.isEmpty())){
+					if(alive == null || alive.isEmpty()){
+						orderClause = (" ORDER BY expire_date" );
+					}else if(expireDate == null || expireDate.isEmpty()){
+						orderClause = (" ORDER BY liveness" );
+					}else if(expireDate != null && alive != null){
+						orderClause = (" ORDER BY expire_date, liveness" );
+					}else{
+						orderClause = " ORDER BY id";
+					}
+				}else{
+					orderClause = " ORDER BY id";
+				}
+				final List<Restaurant> list = RestaurantDao.getByCond(extraCond, orderClause);
+				List<Jsonable> result = new ArrayList<Jsonable>();
 				if(!list.isEmpty()){
 					for(final Restaurant rest : list) {
 						
-						
-						Staff adminStaff = StaffDao.getAdminByRestaurant(dbCon, rest.getId()); 
+						Staff adminStaff = StaffDao.getAdminByRestaurant(rest.getId()); 
 						//为restaurant加上短信条数
-						final SMStat sms = SMStatDao.get(dbCon, adminStaff);
+						final SMStat sms = SMStatDao.get(adminStaff);
 						
 						final WxRestaurant wxRest = WxRestaurantDao.get(adminStaff);
 						
@@ -89,7 +100,7 @@ public class QueryRestaurantAction extends Action{
 						}
 						final int usedCode = used, unUsedCode = unUsed;
 
-						resList.add(new Jsonable() {
+						result.add(new Jsonable() {
 							@Override
 							public JsonMap toJsonMap(int flag) {
 								JsonMap jm = new JsonMap();
@@ -108,15 +119,14 @@ public class QueryRestaurantAction extends Action{
 						});
 						
 					}
-					jobject.setTotalProperty(list.size());
-					resList = DataPaging.getPagingData(resList, isPaging, start, limit);
+					jObject.setTotalProperty(list.size());
+					result = DataPaging.getPagingData(result, isPaging, start, limit);
 				}
-				jobject.setRoot(resList);
+				jObject.setRoot(result);
 			}
 			
 		}finally{
-			dbCon.disconnect();
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 		
