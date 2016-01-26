@@ -134,7 +134,8 @@ $(function(){
 											of.entry({
 												orderFoodOperateType : 'normal',
 												initFoods : result.root[0].foods,
-												table : selectedTable
+												table : selectedTable,
+												wxCode : result.root[0].code
 											});
 										}, 200);
 									}
