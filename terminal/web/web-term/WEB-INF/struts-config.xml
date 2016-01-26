@@ -73,9 +73,6 @@
 		<action path="/AdminLogin" type="com.wireless.Actions.login.AdminLoginAction"
 			scope="request">
 		</action>
-		<action path="/QueryRestaurant" type="com.wireless.Actions.login.QueryRestaurantAction"
-			scope="request">
-		</action>
 		<action path="/QueryOrderStatistics"
 			type="com.wireless.Actions.orderMgr.QueryOrderStatisticsAction"
 			scope="request">
