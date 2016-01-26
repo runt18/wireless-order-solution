@@ -211,6 +211,7 @@ $(function(){
 	
 	
 	$('#wxOrderWin_div_wxOrder').on('pageshow', function(){
+		$('#searchwxOrderStatus_select_wxOrder').val(2).selectmenu("refresh");
 		//查询列表
 		searchList();
 		
@@ -227,13 +228,13 @@ $(function(){
 			//返回到餐桌界面
 			ts.loadData();
 			$('#searchwxOrderNumber_input_wxOrder').val("");
-			$('#searchwxOrderStatus_select_wxOrder').val(-1).selectmenu("refresh");
+			$('#searchWxOrderStatus_select_wxOrder').val(2).selectmenu("refresh");
 		});
 		
 		//刷新
 		$('#wxOrderRefresh_a_wxOrder').click(function(){
 			$('#searchWxOrderNumber_input_wxOrder').val("");
-			$('#searchwxOrderStatus_select_wxOrder').val(-1).selectmenu("refresh");
+			$('#searchWxOrderStatus_select_wxOrder').val(2).selectmenu("refresh");
 			searchList();
 		});
 		
