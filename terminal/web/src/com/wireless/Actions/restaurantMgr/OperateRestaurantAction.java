@@ -35,8 +35,8 @@ import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant.QrCodeStatus;
 
 public class OperateRestaurantAction extends DispatchAction {
-	public ActionForward insert(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws Exception{
+	
+	public ActionForward insert(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		JObject jobject = new JObject();
 		String account = request.getParameter("account");
@@ -82,34 +82,65 @@ public class OperateRestaurantAction extends DispatchAction {
 		
 	}
 	
-	public ActionForward update(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception{
+	public ActionForward update(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
-		String id = request.getParameter("id");
-		String account = request.getParameter("account");
-		String name = request.getParameter("name");
-		String pwd = request.getParameter("pwd");
-		String info = request.getParameter("info");
-		String tele1 = request.getParameter("tele1");
-		String tele2 = request.getParameter("tele2");
-		String dianping = request.getParameter("dianping");
-		String address = request.getParameter("address");
-		String recordAlive = request.getParameter("recordAlive");
-		String expireDate = request.getParameter("expireDate");
-		String moduleCheckeds = request.getParameter("moduleCheckeds");
+		final String id = request.getParameter("id");
+		final String account = request.getParameter("account");
+		final String name = request.getParameter("name");
+		final String pwd = request.getParameter("pwd");
+		final String info = request.getParameter("info");
+		final String tele1 = request.getParameter("tele1");
+		final String tele2 = request.getParameter("tele2");
+		final String dianping = request.getParameter("dianping");
+		final String address = request.getParameter("address");
+		final String recordAlive = request.getParameter("recordAlive");
+		final String expireDate = request.getParameter("expireDate");
+		final String moduleCheckeds = request.getParameter("moduleCheckeds");
+		final String branches = request.getParameter("branches");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try{
-			Restaurant.UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(id));
-			builder.setAccount(account)
-					.setRestaurantName(name)
-					.setTele1(tele1)
-					.setTele2(tele2)
-					.setAddress(address)
-					.setRecordAlive(RecordAlive.valueOf(Integer.parseInt(recordAlive)))
-					.setExpireDate(DateUtil.parseDate(expireDate))
-					.setRestaurantInfo(info);
+			final Restaurant.UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(id));
+			
+			//账户
+			if(account != null && !account.isEmpty()){
+				builder.setAccount(account);
+			}
+			
+			//餐厅名称
+			if(name != null && !name.isEmpty()){
+				builder.setRestaurantName(name);
+			}
+			
+			//电话1
+			if(tele1 != null && !tele1.isEmpty()){
+				builder.setTele1(tele1);
+			}
+			
+			//电话2
+			if(tele2 != null && !tele2.isEmpty()){
+				builder.setTele2(tele2);
+			}
+			
+			//地址
+			if(address != null && !address.isEmpty()){
+				builder.setAddress(address);
+			}
+			
+			//账单有效期
+			if(recordAlive != null && !recordAlive.isEmpty()){
+				builder.setRecordAlive(RecordAlive.valueOf(Integer.parseInt(recordAlive)));
+			}
+			
+			//过期时间
+			if(expireDate != null && !expireDate.isEmpty()){
+				builder.setExpireDate(DateUtil.parseDate(expireDate));
+			}
+			
+			//餐厅信息
+			if(info != null && !info.isEmpty()){
+				builder.setRestaurantInfo(info);
+			}
 			
 			if(dianping != null && !dianping.isEmpty()){
 				builder.setDianpingId(Integer.parseInt(dianping));
@@ -117,27 +148,35 @@ public class OperateRestaurantAction extends DispatchAction {
 				builder.setDianpingId(0);
 			}
 			
+			//密码
 			if(pwd != null && !pwd.isEmpty()){
 				builder.setPwd(pwd);
 			}
+			
+			//模块
 			if(moduleCheckeds != null && !moduleCheckeds.isEmpty() ){
-				String[] modules = moduleCheckeds.split(",");
-				for (String module : modules) {
+				for (String module : moduleCheckeds.split(",")) {
 					builder.addModule(Code.valueOf(Integer.parseInt(module)));
 				}
 			}
 			
+			//连锁分店
+			if(branches != null && !branches.isEmpty()){
+				for(String branchId : branches.split(",")){
+					builder.addBranch(Integer.parseInt(branchId));
+				}
+			}else{
+				builder.clearBranch();
+			}
+			
 			RestaurantDao.update(builder);
 			
-			jobject.initTip(true, "修改成功");
-		}catch(BusinessException e){
+			jObject.initTip(true, "修改成功");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
-			e.printStackTrace();
-			jobject.initTip(false, "含有非法字符");
+			jObject.initTip(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 		
