@@ -775,7 +775,13 @@ public class Restaurant implements Parcelable, Jsonable{
 			jm.putString("recordAliveText", RecordAlive.valueOfSeconds(this.recordAlive).getDesc());
 			jm.putString("birthDate", DateUtil.formatToDate(this.birthDate));
 			jm.putString("expireDate", DateUtil.formatToDate(this.expireDate));
+			
+			if(this.type == Restaurant.Type.GROUP){
+				jm.putJsonableList("branches", this.getBranches(), flag);
+			}
 		}
+		jm.putInt("typeVal", this.type.val);
+		jm.putString("typeText", this.type.desc);
 
 		return jm;
 	}
