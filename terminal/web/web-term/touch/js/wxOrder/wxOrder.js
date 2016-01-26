@@ -7,8 +7,8 @@ wxOrder = {
 $(function(){
 	var wxOrderList = null;
 	var WxStatus = {
-			COMMITTED : { val : 2, desc : '已提交'},
-			ORDER_ATTACHED : { varl : 3, desc : '已下单'}
+			COMMITTED : { val : 2, desc : '待确认'},
+			ORDER_ATTACHED : { val : 3, desc : '已下单'}
 		};
 		
 	
@@ -48,8 +48,12 @@ $(function(){
 			},
 			success : function(data){
 				Util.LM.hide();
-				wxOrderList = data.root;
-				loadWXOrderList(data.root);
+				if(data.success){
+					wxOrderList = data.root;
+					loadWXOrderList(data.root);
+				}else{
+					Util.msg.tip(data.msg);					
+				}
 			}
 		});
 	}
@@ -77,16 +81,16 @@ $(function(){
 				button : data[i].statusVal == WxStatus.COMMITTED.val ? '下单' : '账单已处理(' + data[i].orderId + ')',
 				memberName : data[i].member.name,
 				tel : data[i].member.mobile,
-				tableName : data[i].table.name,
+				tableName : data[i].table ? data[i].table.name : '---',
 				status : data[i].statusDesc,
-				tableId : data[i].table.id
+				tableId : data[i].table ? data[i].table.id : '---'
 			}));
 		}
 		$('#wxOrderList_tbody_wxOrder').html(html.join("")).trigger('create');
 		
 		$('#wxOrderList_tbody_wxOrder').find('[data-type="wxOrderConfirm_a_wxOrder"]').each(function(index, element){
 			element.onclick = function(){
-				if($(element).attr('data-status') == WxStatus.ORDER_ATTACHED.val){
+				if($(element).attr('data-status') == WxStatus.COMMITTED.val){
 					var code = $('#wxOrderList_tbody_wxOrder').find('[data-type="wxOrderConfirm_a_wxOrder"]').attr('data-value');
 					$.ajax({
 						url : '../QueryWxOrder.do',
@@ -153,34 +157,37 @@ $(function(){
 										'</a>';
 									var html = [];
 									var aliasOrName;
-									if(result.root[0].table.categoryValue == 1){
-										aliasOrName = result.root[0].table.alias;
-									}else{
-										aliasOrName = '<font color="green">' + result.root[0].table.categoryText +'</font>';
-									}
-									html.push(tableTemplate.format({
-										id : result.root[0].table.id,
-										alias : aliasOrName,
-										theme : result.root[0].table.statusValue == '1' ? "e" : "c",
-										name : result.root[0].table.name,
-										tempPayStatus : result.root[0].table.isTempPaid ? '暂结' : '&nbsp;&nbsp;',
-										bookTableStatus :result.root[0].table.isBook ? '订' : '',
-										tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0 ? 'tempPayStatus4Moz' : 'tempPayStatus'
-									}));	
-									$('#tables_div_askTable').html(html.join(''));
-									$('#tables_div_askTable a').buttonMarkup('refresh');
-									$('#tables_div_askTable a').each(function(index, element){
-										element.onclick = function(){
-											askPopup.close(function(){
-												of.entry({
-													orderFoodOperateType : 'normal',
-													initFoods : result.root[0].foods,
-													wxCode : result.root[0].code,
-													table : result.root[0].table
-												});
-											}, 200);
+									if(result.root[0].table){
+										if(result.root[0].table.categoryValue == 1){
+											aliasOrName = result.root[0].table.alias;
+										}else{
+											aliasOrName = '<font color="green">' + result.root[0].table.categoryText +'</font>';
 										}
-									});
+										
+										html.push(tableTemplate.format({
+											id : result.root[0].table.id,
+											alias : aliasOrName,
+											theme : result.root[0].table.statusValue == '1' ? "e" : "c",
+											name : result.root[0].table.name,
+											tempPayStatus : result.root[0].table.isTempPaid ? '暂结' : '&nbsp;&nbsp;',
+											bookTableStatus :result.root[0].table.isBook ? '订' : '',
+											tempPayStatusClass : navigator.userAgent.indexOf("Firefox") >= 0 ? 'tempPayStatus4Moz' : 'tempPayStatus'
+										}));	
+										$('#tables_div_askTable').html(html.join(''));
+										$('#tables_div_askTable a').buttonMarkup('refresh');
+										$('#tables_div_askTable a').each(function(index, element){
+											element.onclick = function(){
+												askPopup.close(function(){
+													of.entry({
+														orderFoodOperateType : 'normal',
+														initFoods : result.root[0].foods,
+														wxCode : result.root[0].code,
+														table : result.root[0].table
+													});
+												}, 200);
+											}
+										});
+									}
 								});
 							}else{
 								Util.msg.tip(result.msg);
@@ -190,8 +197,10 @@ $(function(){
 				}else{
 					var table= null;
 					for(var i = 0; i < data.length; i++){
-						if(data[i].table.id == $(element).attr('data-table')){
-							table = data[i].table;
+						if(data[i].table){
+							if(data[i].table.id == $(element).attr('data-table')){
+								table = data[i].table;
+							}
 						}
 					}
 					uo.entry({table : table});
@@ -223,9 +232,9 @@ $(function(){
 		
 		//刷新
 		$('#wxOrderRefresh_a_wxOrder').click(function(){
-			$('#searchwxOrderNumber_input_wxOrder').val("");
+			$('#searchWxOrderNumber_input_wxOrder').val("");
 			$('#searchwxOrderStatus_select_wxOrder').val(-1).selectmenu("refresh");
-			wxOrder.entry();
+			searchList();
 		});
 		
 	});
