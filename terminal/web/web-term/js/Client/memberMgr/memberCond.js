@@ -1603,7 +1603,7 @@
 			width : 80, 
 			store : new Ext.data.SimpleStore({
 				fields : ['value', 'text'],
-				data : [[-1, '无'], [0, '男'], [1, '女']]
+				data : [[-1, '无设定'], [0, '男'], [1, '女']]
 			}),
 			valueField : 'value',
 			displayField : 'text',
@@ -1629,7 +1629,7 @@
 			width : 80, 
 			store : new Ext.data.SimpleStore({
 				fields : ['value', 'text'],
-				data : [[-1, '无'], [5, '00后'], [4, '90后'],[3, '80后'], [2, '70后'],[1, '60后'],[6, '50后']]
+				data : [[-1, '无设定'], [5, '00后'], [4, '90后'],[3, '80后'], [2, '70后'],[1, '60后'],[6, '50后']]
 			}),
 			valueField : 'value',
 			displayField : 'text',
