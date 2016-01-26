@@ -122,7 +122,7 @@ public class Setting implements Jsonable{
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getRestaurantID() {
+	public int getRestaurantId() {
 		return restaurantID;
 	}
 	
@@ -174,7 +174,7 @@ public class Setting implements Jsonable{
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putInt("id", this.getId());
-		jm.putInt("restaurantID", this.getRestaurantID());
+		jm.putInt("restaurantID", this.getRestaurantId());
 		jm.putString("priceTailText", this.getPriceTailText());
 		jm.putInt("priceTailValue", this.getPriceTailValue());
 		jm.putInt("receiptStyle", this.getReceiptStyle());

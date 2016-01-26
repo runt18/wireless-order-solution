@@ -12,6 +12,7 @@ public class RestaurantError extends ErrorEnum{
 	public static final ErrorCode DUPLICATED_RESTAURANT_ACCOUNT = build(9295, "餐厅帐号已存在.");
 	public static final ErrorCode BUSINESS_HOUR_NOT_FOUND = build(9294, "此市别不存在.");
 	public static final ErrorCode BEE_CLOUD_NOT_BOUND = build(9293, "BeeCloud账号未绑定");
+	public static final ErrorCode RESTAURANT_CHAIN_ERROR = build(9293, "连锁问题");
 	
 	private RestaurantError(){
 		

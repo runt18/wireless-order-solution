@@ -26,19 +26,24 @@ public class SystemSetting implements Jsonable{
 	public int getRestaurantID() {
 		return this.getRestaurant() != null ? this.getRestaurant().getId(): 0;
 	}
+	
 	public void setRestaurantID(int rid) {
 		if(this.getRestaurant() != null)
 			this.getRestaurant().setId(rid);
 	}
+	
 	public Restaurant getRestaurant() {
 		return restaurant;
 	}
+	
 	public void setRestaurant(Restaurant restaurant) {
 		this.restaurant = restaurant;
 	}
+	
 	public Setting getSetting() {
 		return setting;
 	}
+	
 	public void setSetting(Setting setting) {
 		this.setting = setting;
 	}

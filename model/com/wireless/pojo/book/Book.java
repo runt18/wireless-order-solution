@@ -190,6 +190,23 @@ public class Book implements Jsonable{
 		}
 	}
 	
+	public static class WxPayBuilder{
+		private final UpdateBuilder builder = new UpdateBuilder(0);
+
+		public WxPayBuilder (int bookId, float money){
+			builder.id = bookId;
+			builder.wxPayMoney = money;
+		}
+
+		public UpdateBuilder getBuilder(){
+			return this.builder;
+		}
+		
+		public Book build(){
+			return builder.build();
+		}
+	}
+	
 	public static class UpdateBuilder{
 		private int id;
 		private long bookDate;
@@ -201,6 +218,7 @@ public class Book implements Jsonable{
 		private int amount;
 		private Staff staff;
 		private float money;
+		private float wxPayMoney;
 		private Source source;
 		private Status status;
 		private String category;
@@ -210,6 +228,15 @@ public class Book implements Jsonable{
 		
 		public UpdateBuilder(int id){
 			this.id = id;
+		}
+		
+		public UpdateBuilder setWxPayMoney(float money){
+			this.wxPayMoney = money;
+			return this;
+		}
+		
+		public boolean isWxPayChanged(){
+			return this.wxPayMoney != 0;
 		}
 		
 		UpdateBuilder setBookDate(String date){
@@ -458,6 +485,7 @@ public class Book implements Jsonable{
 	private long confirmDate;
 	private Staff staff;
 	private float money;
+	private float wxPayMoney;
 	private Source source;
 	private Status status;
 	private String category;
@@ -476,6 +504,7 @@ public class Book implements Jsonable{
 		this.amount = builder.amount;
 		this.staff = builder.staff;
 		this.money = builder.money;
+		this.wxPayMoney = builder.wxPayMoney;
 		this.source = builder.source;
 		this.status = builder.status;
 		this.category = builder.category;
@@ -587,6 +616,18 @@ public class Book implements Jsonable{
 	
 	public void setMoney(float money) {
 		this.money = money;
+	}
+	
+	public float getWxPayMoney(){
+		return this.wxPayMoney;
+	}
+	
+	public void setWxPayMoney(float money){
+		this.wxPayMoney = money;
+	}
+	
+	public boolean hasWxPay(){
+		return this.wxPayMoney != 0;
 	}
 	
 	public Source getSource() {
