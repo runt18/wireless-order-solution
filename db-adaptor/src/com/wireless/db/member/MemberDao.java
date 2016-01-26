@@ -155,6 +155,7 @@ public class MemberDao {
 			this.minTotalCharge = memberCond.getMinCharge();
 			this.maxTotalCharge = memberCond.getMaxCharge();
 			this.isRaw = memberCond.isRaw();
+			this.ages.addAll(memberCond.getAges());
 			
 		}
 		

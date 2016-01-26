@@ -431,7 +431,7 @@ public class CalcCancelStatisticsDao {
 		sql = " SELECT " +
 			  " OF.food_id, OF.name, OF.dept_id, OF.staff_id, OF.waiter, OF.cancel_reason_id, IFNULL(OF.cancel_reason, '无原因') AS cancel_reason, " +
 			  " ABS(OF.order_count) AS cancel_amount, " +
-			  " ABS((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount) AS cancel_price " +
+			  " ABS((IF(OF.is_gift = 1, 0, $(unit_price)) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount) AS cancel_price " +
 			  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderFoodTbl + " OF " + 
 			  " JOIN " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 			  " ON 1 = 1 " +
@@ -445,6 +445,6 @@ public class CalcCancelStatisticsDao {
 			  " AND OF.operation = " + OrderFood.Operation.CANCEL.getVal() +
 			  extraCond;
 		
-		return sql;
+		return sql.replace("$(unit_price)", "IFNULL(OF.plan_price, IFNULL(OF.food_unit_price, OF.unit_price))");
 	}
 }

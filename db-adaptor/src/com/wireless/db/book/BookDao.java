@@ -378,6 +378,42 @@ public class BookDao {
 		return bookId;
 	}
 	
+	/**
+	 * Update the wx paid money.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the wx pay builder {@link Book#WxPayBuilder}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 */
+	public static void update(Staff staff, Book.WxPayBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			update(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update the wx paid money.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the wx pay builder {@link Book#WxPayBuilder}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 */
+	public static void update(DBCon dbCon, Staff staff, Book.WxPayBuilder builder) throws SQLException, BusinessException{
+		update(dbCon, staff, builder.getBuilder());
+	}
+	
 	private static void update(DBCon dbCon, Staff staff, Book.UpdateBuilder builder) throws SQLException, BusinessException{
 		Book book = builder.build();
 		
@@ -398,6 +434,7 @@ public class BookDao {
 			  (builder.isStatusChanged() && book.getStatus() == Book.Status.CONFIRMED ? " ,book_confirm_date = NOW() " : "") +
 			  (builder.isStatusChanged() ? " ,book_status = " + book.getStatus().getVal() : "") +
 			  (builder.isMoneyChanged() ? " ,book_money = " + book.getMoney() : "") +
+			  (builder.isWxPayChanged() ? " ,wx_pay_money = " + book.getWxPayMoney() : "") +
 			  (builder.isCommentChanged() ? " ,comment = '" + book.getComment() + "'" : "") +
 			  " WHERE book_id = " + book.getId();
 		

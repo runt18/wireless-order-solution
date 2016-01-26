@@ -338,7 +338,7 @@ public class PayOrder {
 		String sql;
 		
 		//Get the setting.
-		Setting setting = SystemDao.getSetting(dbCon, staff.getRestaurantId());
+		Setting setting = SystemDao.getByCond(dbCon, staff, null).get(0).getSetting();
 		
 		//Check to see whether has erase quota and the order exceed the erase quota.
 		if(setting.hasEraseQuota() && payBuilder.getErasePrice() > setting.getEraseQuota()){

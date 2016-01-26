@@ -56,6 +56,51 @@ import com.wireless.pojo.weixin.action.WxKeyword;
 
 public class RestaurantDao {
 	
+	public static class ExtraCond{
+		private int id;
+		private String fuzzy;
+		private String name;
+		private String account;
+		
+		public ExtraCond setId(int id){
+			this.id = id;
+			return this;
+		}
+		
+		public ExtraCond setFuzzy(String fuzzy){
+			this.fuzzy = fuzzy;
+			return this;
+		}
+		
+		public ExtraCond setName(String name){
+			this.name = name;
+			return this;
+		}
+		
+		public ExtraCond setAccount(String account){
+			this.account = account;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			final StringBuilder extraCond = new StringBuilder();
+			if(id != 0){
+				extraCond.append(" AND id = " + id);
+			}
+			if(fuzzy != null){
+				extraCond.append(" AND (restaurant_name LIKE '%" + fuzzy + "%' OR account LIKE '%" + fuzzy + "%')");
+			}
+			if(name != null){
+				extraCond.append(" AND restaurant_name LIKE '%" + name + "%'");
+			}
+			if(account != null){
+				extraCond.append(" AND account = '" + account + "'");
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	public static final class LivessnessResult{
 		private final int amount;
 		private final int elapsed;
@@ -114,7 +159,7 @@ public class RestaurantDao {
 	 * 				if the restaurant to query does NOT exist
 	 */
 	public static Restaurant getById(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
-		List<Restaurant> result = getByCond(dbCon, " AND id = " + restaurantId, null);
+		List<Restaurant> result = getByCond(dbCon, new ExtraCond().setId(restaurantId), null);
 		if(result.isEmpty()){
 			throw new BusinessException(RestaurantError.RESTAURANT_NOT_FOUND);
 		}else{
@@ -155,7 +200,7 @@ public class RestaurantDao {
 	 * 			throws if the restaurant associated with this account does NOT exist
 	 */
 	public static Restaurant getByAccount(DBCon dbCon, String account) throws SQLException, BusinessException{
-		List<Restaurant> result = getByCond(dbCon, " AND account = '" + account + "'", null);
+		List<Restaurant> result = getByCond(dbCon, new ExtraCond().setAccount(account), null);
 		if(result.isEmpty()){
 			throw new BusinessException(RestaurantError.RESTAURANT_NOT_FOUND);
 		}else{
@@ -163,7 +208,7 @@ public class RestaurantDao {
 		}
 	}
 	
-	public static List<Restaurant> getByCond(String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static List<Restaurant> getByCond(ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -173,14 +218,14 @@ public class RestaurantDao {
 		}
 	}
 	
-	public static List<Restaurant> getByCond(DBCon dbCon, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static List<Restaurant> getByCond(DBCon dbCon, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		
 		List<Restaurant> result = new ArrayList<Restaurant>();
 		
 		String sql = " SELECT * FROM " + Params.dbName + ".restaurant " +
 				 	 " WHERE 1 = 1 " +
 				 	 " AND id > " + Restaurant.RESERVED_7 + " " +
-				 	 (extraCond != null ? extraCond : "") + " " +
+				 	 (extraCond != null ? extraCond.toString() : "") + " " +
 				 	 (orderClause != null ? orderClause : "");
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -253,7 +298,12 @@ public class RestaurantDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
 			update(dbCon, builder);
+			dbCon.conn.commit();
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -335,18 +385,23 @@ public class RestaurantDao {
 				dbCon.stmt.executeUpdate(sql);
 				
 				for(Restaurant branch : restaurant.getBranches()){
-					sql = " DELETE FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + branch.getId();
-					dbCon.stmt.executeUpdate(sql);
-					
-					sql = " INSERT INTO " + Params.dbName + ".restaurant_chain " +
-						  " ( group_id, branch_id ) VALUES ( " +
-						  restaurant.getId() + "," +
-						  branch.getId() + 
-						  ")";
-					dbCon.stmt.executeUpdate(sql);
-					
-					sql = " UPDATE " + Params.dbName + ".restaurant SET type = " + Restaurant.Type.BRANCE.getVal() + " WHERE id = " + branch.getId();
-					dbCon.stmt.executeUpdate(sql);
+					//Check to see whether the branch is group.
+					if(RestaurantDao.getById(dbCon, branch.getId()).getType() == Restaurant.Type.RESTAURANT){
+						sql = " DELETE FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + branch.getId();
+						dbCon.stmt.executeUpdate(sql);
+						
+						sql = " INSERT INTO " + Params.dbName + ".restaurant_chain " +
+							  " ( group_id, branch_id ) VALUES ( " +
+							  restaurant.getId() + "," +
+							  branch.getId() + 
+							  ")";
+						dbCon.stmt.executeUpdate(sql);
+						
+						sql = " UPDATE " + Params.dbName + ".restaurant SET type = " + Restaurant.Type.BRANCE.getVal() + " WHERE id = " + branch.getId();
+						dbCon.stmt.executeUpdate(sql);
+					}else{
+						throw new BusinessException("普通餐厅才能成为连锁门店", RestaurantError.RESTAURANT_CHAIN_ERROR);
+					}
 				}
 			}else{
 				sql = " UPDATE " + Params.dbName + ".restaurant SET type = " + Restaurant.Type.RESTAURANT.getVal() + " WHERE id = " + restaurant.getId();

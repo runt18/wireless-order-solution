@@ -273,7 +273,7 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareSetting(Staff staff) throws SQLException, BusinessException{
-		Assert.assertEquals("setting", SystemDao.getSetting(staff.getRestaurantId()).getRestaurantID(), staff.getRestaurantId());
+		Assert.assertEquals("setting", SystemDao.getByCond(staff, null).get(0).getSetting().getRestaurantId(), staff.getRestaurantId());
 	}
 	
 	private void compareCancelReason(Staff staff, int restaurantId) throws SQLException{

@@ -1,12 +1,14 @@
 package com.wireless.beeCloud;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.http.client.ClientProtocolException;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -20,7 +22,7 @@ public class Status {
 	}
 	
 	public Response ask(Bill.Channel channel, String billNo) throws KeyManagementException, ClientProtocolException, NoSuchAlgorithmException, IOException{
-		String response = app.doPost("https://" + BeeCloud.DYNC + "/1/rest/offline/bill/status", new Request(app, billNo, channel).toString());
+		String response = app.doGet("https://" + BeeCloud.DYNC + "/2/rest/bills?para=" + URLEncoder.encode(new Request(app, billNo, channel).toString(), "UTF-8"));
 		return JObject.parse(Response.JSON_CREATOR, 0, response);
 	}
 	
@@ -67,6 +69,12 @@ public class Status {
 		private int resultCode;
 		private String resultMsg;
 		private String errDetail;
+		//private boolean payResult;
+		
+		private String billNo;
+		private String title;
+		private String channel;
+		private String subChannel;
 		private boolean payResult;
 		
 		public int getResultCode() {
@@ -91,7 +99,12 @@ public class Status {
 			jm.putInt("result_code", this.resultCode);
 			jm.putString("result_msg", this.resultMsg);
 			jm.putString("err_detail", this.errDetail);
-			jm.putBoolean("pay_result", this.payResult);
+			
+			jm.putBoolean("spay_result", this.payResult);
+			jm.putString("bill_no", this.billNo);
+			jm.putString("title", this.title);
+			jm.putString("channel", this.channel);
+			jm.putString("sub_channel", this.subChannel);
 			return jm;
 		}
 
@@ -100,7 +113,13 @@ public class Status {
 			this.resultCode = jm.getInt("result_code");
 			this.resultMsg = jm.getString("result_msg");
 			this.errDetail = jm.getString("err_detail");
-			this.payResult = jm.getBoolean("pay_result");
+			
+			JSONObject billObject = (JSONObject)jm.getJSONObject().getJSONArray("bills").get(0);
+			this.billNo = billObject.getString("bill_no");
+			this.title = billObject.getString("title");
+			this.channel = billObject.getString("channel");
+			this.subChannel = billObject.getString("sub_channel");
+			this.payResult = billObject.getBoolean("spay_result");
 		}
 		
 		@Override

@@ -14,15 +14,17 @@ import com.wireless.pack.ProtocolPackage;
 public class Bill {
 	
 	public static enum Channel{
-		WX_NATIVE("WX_NATIVE", "微信二维码支付"),
-		WX_SCAN("WX_SCAN", "微信条形码支付"),
-		WX_JSAPI("WX_JSAPI", "微信公众号支付");
+		WX_NATIVE("WX_NATIVE", "微信二维码支付", false),
+		WX_SCAN("WX_SCAN", "微信条形码支付", false),
+		WX_JSAPI("WX_JSAPI", "微信公众号支付", true);
+		
 		final String val;
 		final String desc;
-		
-		Channel(String val, String desc){
+		final boolean online;
+		Channel(String val, String desc, boolean online){
 			this.val = val;
 			this.desc = desc;
+			this.online = online;
 		}
 		
 		@Override
@@ -48,11 +50,11 @@ public class Bill {
 //	}
 
 	public Response ask(final Request request, final Callable<ProtocolPackage> postAction) throws Exception{
-		return ask(request, postAction, 10);
+		return ask(request, postAction, 5);
 	}
 	
 	public Response ask(final Request request, final Callable<ProtocolPackage> postAction, final int timeout) throws Exception{
-		String responseStr = app.doPost("https://" + BeeCloud.DYNC + "/2/rest/bill", request.setBeeCloud(app).toString());
+		String responseStr = app.doPost("https://" + BeeCloud.DYNC + "/2/rest" + (request.channel.online ? "" : "/offline") + "/bill", request.setBeeCloud(app).toString());
 		Response response = JObject.parse(Response.JSON_CREATOR, 0, responseStr);
 		if(response.isOk() && postAction != null){
 			final long now = System.currentTimeMillis();
@@ -61,7 +63,7 @@ public class Bill {
 				@Override
 				public ProtocolPackage call() throws Exception {
 					if(System.currentTimeMillis() - now > timeout * 60 * 1000){
-						schedule.shutdown();
+						schedule.shutdown(); 
 						app.revert.ask(request.billNo, request.channel);
 						return null;
 					}else if(new Status(app).ask(request.channel, request.billNo).isPaySuccess()){

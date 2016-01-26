@@ -17,6 +17,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
@@ -103,18 +104,18 @@ public class BeeCloud {
             super();  
             SSLContext ctx = SSLContext.getInstance("TLS");  
             X509TrustManager tm = new X509TrustManager() {  
-                    @Override  
-                    public void checkClientTrusted(X509Certificate[] chain,  
-                            String authType) throws CertificateException {  
-                    }  
-                    @Override  
-                    public void checkServerTrusted(X509Certificate[] chain,  
-                            String authType) throws CertificateException {  
-                    }  
-                    @Override  
-                    public X509Certificate[] getAcceptedIssuers() {  
-                        return null;  
-                    }  
+                @Override  
+                public void checkClientTrusted(X509Certificate[] chain,  
+                	String authType) throws CertificateException {  
+                }  
+                @Override  
+                public void checkServerTrusted(X509Certificate[] chain,  
+                    String authType) throws CertificateException {  
+                }  
+                @Override  
+                public X509Certificate[] getAcceptedIssuers() {  
+                    return null;  
+                }  
             };  
             ctx.init(null, new TrustManager[]{tm}, null);  
             SSLSocketFactory ssf = new SSLSocketFactory(ctx,SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);  
@@ -172,44 +173,71 @@ public class BeeCloud {
 	    }
 	}
     
+	String doGet(String url) throws ClientProtocolException, IOException, KeyManagementException, NoSuchAlgorithmException{
+		
+	    HttpClient client = new SSLClient();
+	    
+	    HttpGet request = new HttpGet(url);
+
+        request.setHeader("Content-Type", "application/json");
+        request.setHeader("Accept", "application/json");
+        
+        ByteArrayOutputStream bos = null;
+        InputStream bis = null;
+        byte[] buf = new byte[10240];
+
+        String content = null;
+        
+	    try{
+
+	        HttpResponse response = client.execute(request);
+	
+	        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+	            bis = response.getEntity().getContent();
+	
+	            bos = new ByteArrayOutputStream();
+	            int count;
+	            while ((count = bis.read(buf)) != -1) {
+	                bos.write(buf, 0, count);
+	            }
+	            bis.close();
+	            content = bos.toString("UTF-8");
+	            
+	        } else {
+	            throw new IOException(response.getStatusLine().getStatusCode() + " : " + response.getStatusLine().getReasonPhrase());
+	        }
+			
+			return content;
+	    }finally{
+            if (bis != null) {
+                try {
+                    bis.close();// 最后要关闭BufferedReader
+                } catch (Exception ignored) { }
+            }
+	    }
+	}
+	
     public static void main(String[] args) throws Exception{
     	final String appId = "c3918fd6-6162-4d21-815d-01b6757c673c";
     	final String appSecret = "a4b4b3c0-79a6-49a9-ac00-fff8dd12d868";
-    	//final String openId = "oM02TjtmLtadFjiGtlUuxTFjJhno";
+//    	final String openId = "oM02TjtmLtadFjiGtlUuxTFjJhno";
     	final String billNo = System.currentTimeMillis() + "";
-    	final Bill.Channel channel = Bill.Channel.WX_NATIVE;
+    	final Bill.Channel channel = Bill.Channel.WX_SCAN;
     	BeeCloud app = BeeCloud.registerApp(appId, appSecret);
-    	System.out.println(app.bill().ask(new Bill.Request().setChannel(channel).setTotalFee(1).setBillNo(billNo).setTitle("a"), null));
+    	System.out.println(app.bill().ask(new Bill.Request().setChannel(channel).setTotalFee(1).setBillNo(billNo).setTitle("a").setAuthCode("130503365785167059"), null));
     	//System.out.println(app.bill().ask(new Bill.Request().setChannel(Bill.Channel.WX_JSAPI).setOpenId(openId).setTotalFee(1).setBillNo(billNo).setTitle("a"), null));
     	
-//    	Status.Response response;
-//    	do{
-//    		response = app.status().ask(channel, billNo);
-//    		if(response != null){
-//    			System.out.println(response);
-//    		}
-//    		Thread.sleep(5000);
-//    		System.out.println(app.revert().ask(billNo, channel));
-//    	}while(!response.isPaySuccess());
+    	Status.Response response;
+    	do{
+    		response = app.status().ask(channel, billNo);
+    		if(response != null){
+    			System.out.println(response);
+    		}
+    		Thread.sleep(5000);
+    		System.out.println(app.revert().ask(billNo, channel));
+    	}while(true);
     	//System.out.println(app.status().ask(Bill.Channel.WX_SCAN, BILL_NO));
     	
-//    	cn.beecloud.BeeCloud.registerApp(appId, null, appSecret, null);
-//    	BCOrder bcOrder = new BCOrder(PAY_CHANNEL.WX_JSAPI, 1, billNo, "a");
-//    	bcOrder.setBillTimeout(360);
-//    	bcOrder.setOpenId(openId);
-//    	try {
-//    	    bcOrder = BCPay.startBCPay(bcOrder);
-//    	    System.out.println(bcOrder.getObjectId());
-//    	    Map<String, String> map = bcOrder.getWxJSAPIMap();
-//    	    System.out.println(map.get("appId").toString());
-//    	    System.out.println(map.get("timeStamp").toString());
-//    	    System.out.println(map.get("nonceStr").toString());
-//    	    System.out.println(map.get("package").toString());
-//    	    System.out.println(map.get("signType").toString());
-//    	    System.out.println(map.get("paySign").toString());
-//    	} catch (BCException e) {
-//    		System.out.println(e.getMessage());
-//    	}
     }
     
 }
