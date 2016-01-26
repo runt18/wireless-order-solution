@@ -305,7 +305,7 @@ public class JobContentFactory {
 			final Restaurant restaurant = RestaurantDao.getById(dbCon, staff.getRestaurantId());
 			final WxRestaurant wxRestaurant = WxRestaurantDao.get(dbCon, staff);
 			final CouponUsage couponUsage = CalcCouponStatisticsDao.calcUsage(dbCon, staff, new CalcCouponStatisticsDao.ExtraCond().setAssociateId(order.getId()));
-			final int receiptStyle = SystemDao.getSetting(dbCon, staff.getRestaurantId()).getReceiptStyle();
+			final int receiptStyle = SystemDao.getByCond(dbCon, staff, null).get(0).getSetting().getReceiptStyle();
 			
 			final List<JobContent> jobContents = new ArrayList<JobContent>();
 			
