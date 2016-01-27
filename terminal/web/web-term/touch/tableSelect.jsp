@@ -581,7 +581,6 @@
     		<td style="line-height: 20px;padding: 0 3px;width:20%;float:left">
 				<select  id="searchWxOrderStatus_select_wxOrder" style="font-size: 20px;">
 					<option value="2">待确认</option>
-					<option value="-1">订单状态</option>
 					<option value="3">已下单</option>
 				</select>
     		</td>    		

@@ -31,10 +31,6 @@ $(function(){
 	//查询列表
 	function searchList(){
 		var status = $('#searchWxOrderStatus_select_wxOrder').val();
-		if(status == -1){
-			var val = ['2', '3'];
-			status = val.join(',');
-		}
 		
 		Util.LM.show();
 		$.ajax({
@@ -212,7 +208,6 @@ $(function(){
 	
 	
 	$('#wxOrderWin_div_wxOrder').on('pageshow', function(){
-		$('#searchwxOrderStatus_select_wxOrder').val(2).selectmenu("refresh");
 		//查询列表
 		searchList();
 		
