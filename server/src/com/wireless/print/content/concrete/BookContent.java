@@ -26,7 +26,11 @@ public class BookContent extends ConcreteContent {
 		
 		sb.append(new ExtraFormatDecorator(
 				new CenterAlignedDecorator(book.getSource() == Book.Source.WEIXIN ? "微信预订" : "预订", getStyle()), ExtraFormatDecorator.LARGE_FONT_V_1X)).append(SEP);
-		sb.append(mSeperatorLine);
+		if(book.hasWxPay()){
+			sb.append(new ExtraFormatDecorator(
+					new CenterAlignedDecorator("(已微信支付" + book.getWxPayMoney() + "元)", getStyle()), ExtraFormatDecorator.LARGE_FONT_V_1X));
+		}
+		sb.append(SEP).append(mSeperatorLine);
 
 		sb.append(new ExtraFormatDecorator(
 				"预订时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(book.getBookDate()), mStyle,
@@ -50,7 +54,7 @@ public class BookContent extends ConcreteContent {
 				"预订餐台：" + bookTable, mStyle,
 				ExtraFormatDecorator.LARGE_FONT_V_1X));
 		
-		sb.append(SEP).append(SEP);
+		sb.append(SEP).append(SEP).append(mSeperatorLine);
 
 		sb.append(new ExtraFormatDecorator(
 					new Grid2ItemsContent(
@@ -60,7 +64,7 @@ public class BookContent extends ConcreteContent {
 				    mStyle,
 				    ExtraFormatDecorator.LARGE_FONT_V_1X)).append(SEP);
 		
-		sb.append(SEP);
+		sb.append(SEP).append(mSeperatorLine);
 
 		sb.append(new ExtraFormatDecorator(
 				new Grid2ItemsContent(
@@ -70,7 +74,7 @@ public class BookContent extends ConcreteContent {
 			    mStyle,
 			    ExtraFormatDecorator.LARGE_FONT_V_1X)).append(SEP);
 	
-		sb.append(SEP);
+		sb.append(SEP).append(mSeperatorLine);
 
 		if(book.hasStaff()){
 			sb.append(new ExtraFormatDecorator(

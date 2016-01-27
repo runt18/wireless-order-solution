@@ -146,8 +146,8 @@ public class PayOrderAction extends Action{
 					//optional.putJsonable("payBuilder", payBuilder, 0);
 					//optional.putInt("staffId", staff.getId());
 					Bill.Response beeCloudResponse = app.bill().ask(new Bill.Request().setChannel(channel)
-																			  .setTotalFee(1)
-																			  //.setTotalFee(Float.valueOf(order.getActualPrice() * 100).intValue())
+																			  //.setTotalFee(1)
+																			  .setTotalFee(Float.valueOf(order.getActualPrice() * 100).intValue())
 																			  .setBillNo(billNo)
 																			  .setTitle(restaurant.getName() + "(账单号：" + order.getId() + ")")
 																			  //.setOptional(optional),

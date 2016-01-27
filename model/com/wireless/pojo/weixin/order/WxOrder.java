@@ -23,7 +23,7 @@ public class WxOrder implements Jsonable, Parcelable{
 	
 	public static enum Status{
 		INVALID(1, "已失效"),
-		COMMITTED(2, "已提交"),
+		COMMITTED(2, "待确认"),
 		ORDER_ATTACHED(3, "已下单");
 		
 		private final int val;
@@ -86,7 +86,7 @@ public class WxOrder implements Jsonable, Parcelable{
 		private final UpdateBuilder builder;
 		
 		public AttachBuilder(WxOrder wxOrder, Order order){
-			builder = new UpdateBuilder(wxOrder).setOrder(order).setStatus(Status.ORDER_ATTACHED);
+			builder = new UpdateBuilder(wxOrder).setOrder(order).setTable(order.getDestTbl()).setStatus(Status.ORDER_ATTACHED);
 		}
 		
 		public UpdateBuilder asBuilder(){
