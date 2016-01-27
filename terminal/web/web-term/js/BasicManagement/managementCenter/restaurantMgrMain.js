@@ -373,11 +373,226 @@ function optRestaurant(v, m, r, ri, ci, s){
 	var operate =  "<a href = \"javascript:optRestaurantHandler({otype:'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"
 					+ "&nbsp;&nbsp;<a href = \"javascript:displayCodeHandle()\">" + "<img src='../../images/Modify.png'/>生成验证码</a>";
 	
-	if(r.get('qrCode') == true){
-		operate += "&nbsp;&nbsp;<a href = \"javascript:setWeixinMenu()\">" + "<img src='../../images/Modify.png'/>设置菜单</a>";
+	if(r.get('typeVal') != "3"){
+		operate += "&nbsp;&nbsp;<a href = \"javascript:chainSet()\">" + "<img src='../../images/Modify.png'/>连锁设置</a>"
 	}
 	
+	
 	return operate;
+}
+
+//连锁设置
+var chainGrid;
+function chainSet(){
+	//获取当前选中栏的信息
+	var tn = Ext.ux.getSelData(restaurantPanel);
+	
+	//连锁管理的头部工具栏
+	var chainTbar = new Ext.Toolbar({
+		height : 26,
+		items : ['->', {
+			text : '添加',
+			iconCls : 'btn_add',
+			handler : function(){
+				chainManagePanel.setTitle('添加价格方案');
+				Ext.getCmp('branchesId_number_chain').setValue("");
+				chainManagePanel.show();
+				chainGridPanel.syncSize();
+				chainGridPanel.doLayout();
+			}
+		}]
+	});
+	
+	//当前选中栏是否有门店 ? 有 : 无
+	var data;
+	if(tn.branches){
+		data=tn.branches;
+	}else{
+		data = [];
+	}
+	
+	//门店grid
+    var chainStore = new Ext.data.JsonStore({data:data,fields:["id", "name"]});
+    chainGrid = new Ext.grid.GridPanel({
+    	region : 'center',
+        columns : [{header:"门店编号",dataIndex:"id"},
+                   {header:"门店账号",dataIndex : "name"},
+                   {header:"操作", dataIndex : 'operation', renderer : chainGridOperation}],
+        store : chainStore,
+    }); 
+    
+//  //添加单个记录
+//    var ss ='1001';
+//    var name = '说的';
+//    
+//    var data = { 'account': ss,'name': name  };
+//
+//    var p = new chainStore.recordType(data,data.id);
+//    
+//    chainStore.add(p);
+//
+//    var datar = new Array();
+//    var jsonDataEncode = "";
+//    var records = grid.getStore().getRange();
+//    for (var i = 0; i < records.length; i++) {
+//        datar.push(records[i].data);
+//    }
+//    jsonDataEncode = Ext.util.JSON.encode(datar);
+//    console.log(jsonDataEncode);
+    
+	var chainManagePanel = new Ext.Panel({
+		title : '&nbsp;',
+		hidden : true,
+		frame : true,
+		region : 'south',
+		layout : 'column',
+		autoHeight : true,
+		defaults : {
+			xtype : 'form',
+			layout : 'form',
+			labelWidth : 55
+		},
+		items : [{
+			columnWidth : 1,
+			items : [{
+				xtype : 'numberfield',
+				width : 220,
+				id : 'branchesId_number_chain',
+				fieldLabel : '门店编号',
+				allowBlank : false,
+				blankText : '门店编号不能为空.',
+				validator : function(v){
+					if(Ext.util.Format.trim(v).length > 0){
+						return true;
+					}else{
+						return '门店编号不能为空.';
+					}
+				}
+			}]
+		}],	
+		buttonAlign : 'center',
+		buttons : [{
+			text : '保存',
+			handler : function(){
+				var id = Ext.getCmp('branchesId_number_chain').getValue();
+				
+				 Ext.Ajax.request({
+					url : '../../QueryRestaurants.do',
+					params : {
+						id : id
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						if(jr.success && jr.root.length > 0){
+							var data = {'id' : id, 'name' : jr.root[0].name};
+						    var store =  new chainStore.recordType(data);
+						    chainGrid.getStore().add(store);
+						    chainManagePanel.hide();
+							chainGridPanel.doLayout();	
+						}else{
+							Ext.ux.showMsg({success : true, title : '提示',msg : '没有此餐厅'});
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.decode(res.responseText));
+					}
+				});
+			}
+		}, {
+			text : '取消',
+			handler : function(){
+				chainManagePanel.hide();
+				chainGridPanel.doLayout();
+			}
+		}]
+	});
+    
+    
+	
+	//连锁设置的窗口
+	var chainGridPanel = new Ext.Window({
+		modal : true,
+		resizable : false,
+		closable : false,
+		draggable : false,
+		width : 330,
+		height : 390,
+		layout : 'border',
+		items : [chainGrid, chainManagePanel],
+		tbar : chainTbar,
+		bbar : ['->',{
+			text : '保存',
+			iconCls : 'btn_add',
+			handler : function(){
+				//将grid的数据变成json对象
+			    var data = [];
+			    var jsonDataEncode = "";
+			    var records = chainGrid.getStore().getRange();
+			    for (var i = 0; i < records.length; i++) {
+			        data.push(records[i].data);
+			    }
+			    jsonDataEncode = Ext.util.JSON.encode(data);
+			    
+			    //将json对象变成js对象
+			    var chainJson = JSON.parse(jsonDataEncode);
+			    
+			    var branchesId = [];
+			    for(var i = 0; i < chainJson.length; i++){
+			    	branchesId.push(chainJson[i].id);
+			    }
+			    console.log(branchesId);
+			    
+			    Ext.Ajax.request({
+					url : '../../OperateRestaurant.do',
+					params : {
+						dataSource : 'update',
+						id : tn.id,
+						branches : branchesId.join(','),
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						if(jr.success){
+							chainGridPanel.hide();
+							chainManagePanel.hide();
+							Ext.example.msg(jr.title, jr.msg);
+							Ext.getCmp('grid').store.reload();
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.decode(res.responseText));
+					}
+				});
+			    
+			}
+		}, {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function(){
+				chainGridPanel.close();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				chainGridPanel.close();	
+			}
+		}]
+	});
+	chainGridPanel.show();
+	chainGridPanel.setTitle('连锁管理---' + tn.name);
+
+}
+
+function chainGridOperation(){
+	return "<a href = \"javascript:deleteChain()\">" + "<img src='../../images/Modify.png'/>删除</a>";
+}
+
+//删除门店
+function deleteChain(){
+	chainGrid.getStore().removeAt(chainGrid.getStore().indexOf(chainGrid.getSelectionModel().getSelected()));
 }
 
 function optSms(v){
@@ -388,7 +603,7 @@ function optSms(v){
 function unUsedCode(v){
 	return ''
 	+ "<a href = \"javascript:displayCodesHandler()\">" + "<img src='../../images/search.gif'/>"+ v +"</a>";
-}
+}	
 
 function hideAddress(v){
 	if(v.length > 7){
@@ -435,7 +650,6 @@ function optSmsHandler(){
 			}
 		});
 	if(!adjustSmsWin){
-
 		adjustSmsWin = new Ext.Window({
 			title : '&nbsp;',
 			modal : true,
@@ -867,12 +1081,19 @@ Ext.onReady(function(){
 			name : 'unUsedCode'
 		}, {
 			name : 'qrCode'
+		},{
+			name : 'typeVal'
+		},{
+			name : 'branches'
+		},{
+			name : 'typeText'
 		}])
 	});
 	
 	var cm = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
 		{header : '餐厅编号', dataIndex : 'id',width : 40},
+		{header : '餐厅类型', dataIndex : 'typeText',width : 70},
 		{header : '账户名', dataIndex : 'account',width : 70},
 		{header : '创建时间', dataIndex : 'birthDate'},
 		{header : '账号有效期', dataIndex : 'expireDate'},
