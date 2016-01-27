@@ -372,6 +372,11 @@ $(function(){
 								    	}
 								    }
 								});
+							},
+							afterClose : function(){
+								dialogOrder.close();
+								window.location.reload();
+							 	$('#foodOrderList').click();
 							}
 						});
 						dialogOrder.open();	
