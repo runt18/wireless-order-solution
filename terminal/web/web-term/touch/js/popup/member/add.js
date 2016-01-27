@@ -6,6 +6,8 @@ function AddMemberPopup(){
 		pageInit : function(self){
 			self.find('[id=addMember_div_memberAdd]').trigger('create').trigger('refresh');
 			
+			self.find('[id="memberAge_select_memberAdd"]').attr('value','3').selectmenu("refresh");;
+			
 			//会员类型改变的时候做出的操作
 			self.find('[id=memberType_select_memberAdd]').on('change', function(e){
 				var selected = $(e.target).find('option:selected');
