@@ -194,8 +194,8 @@ public class UpdateOrder {
 			  (builder.isCustomChanged() ? " ,custom_num = " + diffResult.newOrder.getCustomNum() : "") +
 			  " ,category = " + diffResult.newOrder.getCategory().getVal() +
 			  " ,order_date = NOW() " +
-			  " ,staff_id = " + staff.getId() + 
-			  " ,waiter = " + "'" + staff.getName() + "'" +
+			  //" ,staff_id = " + staff.getId() + 
+			  //" ,waiter = " + "'" + staff.getName() + "'" +
 			  " ,temp_staff = NULL " +
 			  " ,temp_date = NULL " +
 			  " WHERE id = " + diffResult.newOrder.getId();

@@ -226,8 +226,7 @@ public class PayOrder {
 		//Update the order.
 		sql = " UPDATE " + Params.dbName + ".order SET " +
 			  " id = " + orderCalculated.getId() +
-			  " ,staff_id = " + staff.getId() + 
-			  " ,waiter = '" + staff.getName() + "'" +
+			  (orderCalculated.isUnpaid() ? " ,staff_id = " + staff.getId() + " ,waiter = '" + staff.getName() + "'" : "") +
 			  " ,category = " + orderCalculated.getCategory().getVal() + 
 			  " ,gift_price = " + orderCalculated.getGiftPrice() + 
 			  " ,discount_price = " + orderCalculated.getDiscountPrice() + 
