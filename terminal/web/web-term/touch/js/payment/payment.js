@@ -256,11 +256,23 @@ $(function(){
 				+ '<td>{orderDateFormat}</td>'
 				+ '<td>{waiter}</td>'
 				+ '</tr>';
+				
+				var count = null;
+				if((orderMsg.orderFoods[i].status & 1 << 7) != 0){
+					if(orderMsg.orderFoods[i].count > 1){
+						 count = orderMsg.orderFoods[i].count;
+					}else{
+						 count = '<font color="red" style="font-size:25px;">' + orderMsg.orderFoods[i].count + '</font>';
+					}
+				}else{
+					 count = orderMsg.orderFoods[i].count;
+				}
+				
 			html.push(orderFoodTemplate.format({
 				dataIndex : i + 1,
 				id : orderMsg.orderFoods[i].id,
-				name : orderMsg.orderFoods[i].foodName + ((orderMsg.orderFoods[i].status & 1 << 7) != 0 ? '<font color="red">[称重确认]</font>' : ''),
-				count : orderMsg.orderFoods[i].count,
+				name :  (orderMsg.orderFoods[i].status & 1 << 7) != 0 ? orderMsg.orderFoods[i].foodName + '<font color="red" style="font-size:25px;">[称重确认]</font>' : orderMsg.orderFoods[i].foodName,
+				count : count,
 				isWeight : (orderMsg.orderFoods[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 				tastePref : orderMsg.orderFoods[i].tasteGroup.tastePref,
 				tastePrice : orderMsg.orderFoods[i].tasteGroup.tastePrice,
