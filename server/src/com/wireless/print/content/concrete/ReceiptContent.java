@@ -141,7 +141,7 @@ public class ReceiptContent extends ConcreteContent {
 		
 		
 		//generate the order food list and replace the $(var_1) with the ordered foods
-		mTemplate = mTemplate.replace(PVar.VAR_1, new FoodListContent(buildReciptFormat(), mOrder.getOrderFoods(), mPrintType, mStyle, FoodDetailContent.DetailType.TOTAL).toString());
+		mTemplate = mTemplate.replace(PVar.VAR_1, new FoodListContent(buildReciptConfig(), mOrder.getOrderFoods(), mPrintType, mStyle, FoodDetailContent.DetailType.TOTAL).toString());
 		
 		//replace the $(var_3) with the actual price
 		StringBuilder var3 = new StringBuilder();
@@ -308,7 +308,7 @@ public class ReceiptContent extends ConcreteContent {
 	 * @param mReceiptStyle
 	 * @return the string format
 	 */
-	public DisplayConfig buildReciptFormat(){
+	public DisplayConfig buildReciptConfig(){
 		if((mReceiptStyle & Setting.RECEIPT_DEF) == Setting.RECEIPT_DEF){
 			return FoodDetailContent.DISPLAY_CONFIG_4_RECEIPT;
 			

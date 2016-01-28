@@ -98,7 +98,7 @@ public class OperateMemberAction extends DispatchAction{
 				builder.setSex(Member.Sex.valueOf(Integer.valueOf(sex)));
 			}
 			
-			if(age != null && !age.isEmpty()){
+			if(age != null && !age.isEmpty() && !age.equals("-1")){
 				builder.setAge(Member.Age.valueOf(Integer.parseInt(age)));
 			}
 			
