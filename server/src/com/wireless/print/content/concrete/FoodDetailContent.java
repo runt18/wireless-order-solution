@@ -46,7 +46,7 @@ public class FoodDetailContent extends ConcreteContent {
 		}
 	};
 	
-	public final static DisplayConfig DISPLAY_CONFIG_4_SUMMARY = new DisplayConfig(new DisplayItem[]{ DisplayItem.DISCOUNT }){
+	public final static DisplayConfig DISPLAY_CONFIG_4_SUMMARY = new DisplayConfig(new DisplayItem[]{ DisplayItem.DISCOUNT, DisplayItem.PRICE }){
 		@Override
 		public DisplayConfig mask(DisplayItem item){
 			throw new UnsupportedOperationException();
@@ -164,12 +164,16 @@ public class FoodDetailContent extends ConcreteContent {
 		
 		detail.append(_of.getName());
 		
-		if(_displayConfig.contains(DisplayItem.AMOUNT)){
-			if(isWeighConfirm && _detailType.isDelta()){
-				detail.append("(" + NumericUtil.float2String2((_of.getCount() - Math.abs(_of.getDelta()))) + "->" + NumericUtil.float2String2(_of.getCount()) + ")");
-			}else{
-				detail.append("(" + NumericUtil.float2String2(_detailType.isTotal() ? _of.getCount() : Math.abs(_of.getDelta())) + ")");
-			}
+		final String amount;
+		if(isWeighConfirm && _detailType.isDelta()){
+			amount = NumericUtil.float2String2((_of.getCount() - Math.abs(_of.getDelta()))) + "->" + NumericUtil.float2String2(_of.getCount());
+		}else{
+			amount = NumericUtil.float2String2(_detailType.isTotal() ? _of.getCount() : Math.abs(_of.getDelta()));
+		}
+
+		if(mPrintType.isDetail() || (_displayConfig.contains(DisplayItem.AMOUNT) && _displayConfig.contains(DisplayItem.PRICE))){
+			//数量和价格都显示时
+			detail.append("(" + amount + ")");
 		}
 		
 		if(_displayConfig.contains(DisplayItem.TASTE) && _of.hasTasteGroup()){
@@ -207,12 +211,19 @@ public class FoodDetailContent extends ConcreteContent {
 			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_detailType.isTotal() ? _of.calcPriceBeforeDiscount() : _of.calcDeltaPriceBeforeDiscount());
 		}
 		
-		if(_displayConfig.contains(DisplayItem.PRICE)){
-			return new Grid2ItemsContent(detail.toString(), foodPrice, getStyle()).toString();
-		}else{
+		if(mPrintType.isDetail()){
 			return detail.toString();
+		}else{
+			if(_displayConfig.contains(DisplayItem.AMOUNT) && _displayConfig.contains(DisplayItem.PRICE)){
+				//如果数量和价钱都显示
+				return new Grid2ItemsContent(detail.toString(), foodPrice, getStyle()).toString();
+			}else if(_displayConfig.contains(DisplayItem.AMOUNT) && !_displayConfig.contains(DisplayItem.PRICE)){
+				//如果只显示数量
+				return new Grid2ItemsContent(detail.toString(), amount, getStyle()).toString();
+			}else{
+				return detail.toString();
+			}
 		}
-
 	}
 	
 }

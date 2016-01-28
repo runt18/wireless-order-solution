@@ -153,7 +153,7 @@ public class OrderDetailContent extends ConcreteContent {
 				mPrintTemplate = mPrintTemplate.replace(PVar.VAR_1,
 													    new ExtraFormatDecorator(
 													    	new ComboDetailContent(FoodDetailContent.DISPLAY_CONFIG_4_SUMMARY, mParent, mChild, mPrintType, mStyle, mDetailType),
-													    	ExtraFormatDecorator.LARGE_FONT_V_2X).toString());
+													    	ExtraFormatDecorator.LARGE_FONT_VH_1X).toString());
 			}
 		}
 		

@@ -13,9 +13,9 @@ public class FoodListContent extends ConcreteContent {
 	private final List<OrderFood> mOrderFoods;
 	private final FoodDetailContent.DetailType mDetailType;
 	
-	public FoodListContent(DisplayConfig format, List<OrderFood> orderFoods, PType printType, PStyle style, FoodDetailContent.DetailType detailType) {
+	public FoodListContent(DisplayConfig config, List<OrderFood> orderFoods, PType printType, PStyle style, FoodDetailContent.DetailType detailType) {
 		super(printType, style);
-		mDisplayConfig = format;
+		mDisplayConfig = config;
 		mOrderFoods = orderFoods;
 		mDetailType = detailType;
 	}
