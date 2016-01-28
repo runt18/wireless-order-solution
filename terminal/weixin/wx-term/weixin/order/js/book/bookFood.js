@@ -238,9 +238,9 @@ $(function(){
 			phone : phone,
 			count : count,
 			region : region,
-			foods : foods
-			//FIXME
-			//wxPayMoney : 1
+			foods : foods,
+			//FIXME 控制是否微信支付
+			wxPay : false
 		}, function(data){
 			Util.lm.hide();	
 			
@@ -248,15 +248,14 @@ $(function(){
 				Util.lm.hide();
 				var bookId = data.root[0].bookId;
 				
-				if(false){
+				if(data.root[0].wxPay){
 					//微信支付预订金额
 					$.post('../../WxOperateBook.do', {
 						bookId : bookId,
 						fid : Util.mp.fid,
 						oid : Util.mp.oid,
 						dataSource : 'wxPay',
-						//FIXME
-						wxPayMoney : 1
+						bookId : bookId
 					}, function(result){
 						if(result.success){
 							payParam = result.other;

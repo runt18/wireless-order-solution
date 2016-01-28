@@ -42,41 +42,41 @@ function reAuth(){
 	
 $(function(){
 	$.ajax({
-	url : '../../WxAuth.do',
-	type : 'post',
-	data : { rid : rid, auth_code : authCode },
-	success : function(result){
-		console.log('Fixme : should be success');
-		$('#authFailure').show();
-	},
-	error : function(result){
-		$.ajax({
-			url : '../../WXQueryInfo.do',
-			type : 'post',
-			data : {
-				dataSource : 'restInfo',
-				rid : rid
-			},
-			dataType : 'json',
-			success : function(data){
-				$('#loading').hide();
-				if(data.success){
-					var rest = data.root[0];
-					$('#wxRestLogo').attr('src', rest.headImgUrl);
-					$('#wxNickName').text(rest.nickName);
-					$('#authSuccess').show();
-				}else{
-//					$('#wxRestLogo').attr('src', 'images/member_card.jpg');
-//					$('#wxNickName').text('品饺');
-					$('#authFailure').show();			
+		url : '../../WxAuth.do',
+		type : 'post',
+		data : { rid : rid, auth_code : authCode },
+		success : function(result){
+			console.log('Fixme : should be success');
+			$('#authFailure').show();
+		},
+		error : function(result){
+			$.ajax({
+				url : '../../WXQueryInfo.do',
+				type : 'post',
+				data : {
+					dataSource : 'restInfo',
+					rid : rid
+				},
+				dataType : 'json',
+				success : function(data){
+					$('#loading').hide();
+					if(data.success){
+						var rest = data.root[0];
+						$('#wxRestLogo').attr('src', rest.headImgUrl);
+						$('#wxNickName').text(rest.nickName);
+						$('#authSuccess').show();
+					}else{
+	//					$('#wxRestLogo').attr('src', 'images/member_card.jpg');
+	//					$('#wxNickName').text('品饺');
+						$('#authFailure').show();			
+					}
+				},
+				error : function(xhr, status){
+					console.log('failure');
 				}
-			},
-			error : function(xhr, status){
-				console.log('failure');
-			}
-		});		
-	}
-});	
+			});		
+		}
+	});	
 	
 
 	
