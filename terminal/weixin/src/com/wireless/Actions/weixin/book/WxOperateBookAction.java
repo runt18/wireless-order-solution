@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +15,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.beeCloud.BeeCloud;
+import com.wireless.beeCloud.Bill;
 import com.wireless.db.DBCon;
 import com.wireless.db.book.BookDao;
 import com.wireless.db.menuMgr.FoodDao;
@@ -40,7 +43,7 @@ import com.wireless.sccon.ServerConnector;
 public class WxOperateBookAction extends DispatchAction {
 	
 	/**
-	 * 
+	 * 新建微信预订
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -56,8 +59,11 @@ public class WxOperateBookAction extends DispatchAction {
 		final String count = request.getParameter("count");
 		final String region = request.getParameter("region");
 		final String foods = request.getParameter("foods");
+		final String wxPayMoney = request.getParameter("wxPayMoney");
+		final String fid = request.getParameter("fid");
+		//final String openId = request.getParameter("oid");
 		try{
-			final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
+			final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 			final Book.InsertBuilder4Weixin insertBuilder = new Book.InsertBuilder4Weixin().setBookDate(bookDate)
 															  .setMember(member)
@@ -73,16 +79,35 @@ public class WxOperateBookAction extends DispatchAction {
 					insertBuilder.addOrderFood(orderFood, staff);
 				}
 			}
-			
-			
+
 			final int bookId = BookDao.insert(staff, insertBuilder);
+
+			jObject.setRoot(new Jsonable(){
+
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putInt("bookId", bookId);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jm, int flag) {
+					
+				}
+				
+			});
 			
-			//打印预订信息
-			ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildBook(staff, bookId).build());
-			if(resp.header.type == Type.ACK){
-				jObject.initTip(true, "预订信息打印成功");
+			if(wxPayMoney != null && !wxPayMoney.isEmpty() && Float.parseFloat(wxPayMoney) > 0){
+				//TODO
 			}else{
-				jObject.initTip(true, "预订成功");
+				//打印预订信息
+				ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildBook(staff, bookId).build());
+				if(resp.header.type == Type.ACK){
+					jObject.initTip(true, "预订信息打印成功");
+				}else{
+					jObject.initTip(true, "预订成功");
+				}
 			}
 			
 		}catch(Exception e){
@@ -94,6 +119,77 @@ public class WxOperateBookAction extends DispatchAction {
 		return null;
 	}
 	
+	/**
+	 * 更新预订账单的微信支付金额
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward wxPay(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jObject = new JObject();
+		final String fid = request.getParameter("fid");
+		final String openId = request.getParameter("oid");
+		final String bookId = request.getParameter("bookId");
+		final String wxPayMoney = request.getParameter("wxPayMoney");
+		try{
+			final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
+
+			if(wxPayMoney != null && !wxPayMoney.isEmpty()){
+				Restaurant restaurant = RestaurantDao.getById(restaurantId);
+				if(restaurant.hasBeeCloud()){
+					BeeCloud app = BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
+					final String billNo = System.currentTimeMillis() + "";
+					Bill.Response beeCloudResponse = app.bill().ask(new Bill.Request().setChannel(Bill.Channel.WX_JSAPI)
+																					  .setOpenId(openId)
+																					  .setBillNo(billNo)
+																					  .setTotalFee(Integer.parseInt(wxPayMoney))
+																					  .setTitle(restaurant.getName() + "微信预订支付(" + bookId + ")"), 
+					new Callable<ProtocolPackage>(){
+
+						@Override
+						public ProtocolPackage call() throws Exception {
+							System.out.println("wx pay success");
+							try{
+								//更新预订账单中的微信支付的金额状态
+								BookDao.update(staff, new Book.WxPayBuilder(Integer.parseInt(bookId), Float.parseFloat(wxPayMoney)));
+							}catch(BusinessException e){
+								e.printStackTrace();
+							}
+							//打印预订信息
+							ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildBook(staff, Integer.parseInt(bookId)).build());
+//							if(resp.header.type == Type.ACK){
+//								jObject.initTip(true, "预订信息打印成功");
+//							}else{
+//								jObject.initTip(true, "预订成功");
+//							}
+							return resp;
+						}
+						
+					});
+					if(beeCloudResponse.isOk()){
+						jObject.setExtra(beeCloudResponse);
+					}else{
+						throw new BusinessException(beeCloudResponse.getErrDetail() + "," + beeCloudResponse.getResultMsg());
+					}
+				}else{
+					throw new BusinessException("对不起，您的公众号还没开通微信支付");
+				}
+			}else{
+				throw new BusinessException("微信支付的金额不能小于0");
+			}
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
 	/**
 	 * 获取区域
 	 * @param mapping
