@@ -231,6 +231,7 @@ $(function(){
 		Util.lm.show();	
 		$.post('../../WxOperateBook.do', {
 			fid : Util.mp.fid,
+			oid : Util.mp.oid,
 			dataSource : 'insert',
 			bookDate : date + " " + time,
 			member : name,
@@ -238,23 +239,97 @@ $(function(){
 			count : count,
 			region : region,
 			foods : foods
+			//FIXME
+			//wxPayMoney : 1
 		}, function(data){
+			Util.lm.hide();	
+			
 			if(data.success){
 				Util.lm.hide();
-				var dialog = new DialogPopup({
-					content : '预订成功',
-					titleText : '温馨提示',
-					left : function(){
-						dialog.close(function(){
-							Util.jump('orderList.html?book=1');
-						}, 200);
-					}
-				})
-				dialog.open();
+				var bookId = data.root[0].bookId;
+				
+				if(false){
+					//微信支付预订金额
+					$.post('../../WxOperateBook.do', {
+						bookId : bookId,
+						fid : Util.mp.fid,
+						oid : Util.mp.oid,
+						dataSource : 'wxPay',
+						//FIXME
+						wxPayMoney : 1
+					}, function(result){
+						if(result.success){
+							payParam = result.other;
+							if (typeof WeixinJSBridge == "undefined") {
+								if (document.addEventListener) {
+									document.addEventListener('WeixinJSBridgeReady', onBridgeReady,	false);
+								} else if (document.attachEvent) {
+									document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+									document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+								}
+							} else {
+								onBridgeReady();
+							}
+							var dialog = new DialogPopup({
+								content : '预订成功',
+								titleText : '温馨提示',
+								left : function(){
+									dialog.close(function(){
+										Util.jump('orderList.html?book=1');
+									}, 200);
+								}
+							})
+							dialog.open();
+						}else{
+							payParam = null;
+							var dialog = new DialogPopup({
+								content : result.msg,
+								titleText : '微信支付失败',
+								left : function(){
+									dialog.close();
+								}
+							})
+							dialog.open();
+						} 
+					}, 'json');
+				}else{
+					var dialog = new DialogPopup({
+						content : '预订成功',
+						titleText : '温馨提示',
+						left : function(){
+							dialog.close(function(){
+								Util.jump('orderList.html?book=1');
+							}, 200);
+						}
+					})
+					dialog.open();
+				}
 			}
 		}, 'json');
 	});
 	
+	//微信支付的参数
+	var payParam = null;
+	//微信支付回调函数
+	function onBridgeReady() {
+		if(payParam){
+			WeixinJSBridge.invoke('getBrandWCPayRequest', {
+				// 以下参数的值由BCPayByChannel方法返回来的数据填入即可
+				"appId" : payParam.appId,
+				"timeStamp" : payParam.timeStamp,
+				"nonceStr" : payParam.nonceStr,
+				"package" : payParam.package,
+				"signType" : payParam.signType,
+				"paySign" : payParam.paySign
+				}, function(res) {
+//					alert(res.err_msg);
+//					alert(JSON.stringify(res));
+					if (res.err_msg == "get_brand_wcpay_request:ok") {
+						// 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+					} 
+				});
+		}
+	}
 	
 	//预订人数的点击事件
 	$('#bookPersonAmoung_div_book').find('[data-type="personAmount"]').each(function(index, element){
