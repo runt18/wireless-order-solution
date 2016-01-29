@@ -727,8 +727,11 @@ public class Book implements Jsonable{
 		jm.putString("comment", this.comment);
 		jm.putJsonableList("tables", this.tables, flag);
 		jm.putBoolean("isExpired", this.isExpired());
+		jm.putBoolean("hasWxPay", this.hasWxPay());
+		jm.putFloat("wxPayMoney", this.wxPayMoney);
 		if(this.order != null){
 			jm.putJsonable("order", this.order, flag);
+			jm.putFloat("price", this.order.calcTotalPrice());
 		}
 		return jm;
 	}

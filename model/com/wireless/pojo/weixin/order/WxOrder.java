@@ -385,6 +385,12 @@ public class WxOrder implements Jsonable, Parcelable{
 		addFoods(foods);
 	}
 	
+	public float calcPrice(){
+		Order order = new Order();
+		order.setOrderFoods(this.foods);
+		return order.calcTotalPrice();
+	}
+	
 	public void setTable(Table table){
 		this.table = table;
 	}
@@ -432,6 +438,7 @@ public class WxOrder implements Jsonable, Parcelable{
 		jm.putJsonable("member", this.member, 0);
 		jm.putJsonable("table", this.table, 0);
 		jm.putInt("orderId", this.orderId);
+		jm.putFloat("price", this.calcPrice());
 		return jm;
 	}
 	@Override
