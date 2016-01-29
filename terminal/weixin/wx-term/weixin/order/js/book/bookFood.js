@@ -134,7 +134,7 @@ $(function(){
 	
 	//预订提交
 	$('#commit_a_book').click(function(){
-		var date, time, region, name, phone, count;
+		var date, time, region, name, phone, count, pay;
 		$('.bookDateDetail').each(function(){
 			if($(this).hasClass("bookDateCheck")){
 				date = bookDates[$(this).data('value')];
@@ -173,6 +173,18 @@ $(function(){
 		$('#bookPersonAmoung_div_book').find('[data-type="personAmount"]').each(function(index, element){
 			if($(element).hasClass('selectedRegion_css_book')){
 				count = parseInt($(element).attr('data-value'));
+			}
+		});
+		
+		//支付方式
+		$('#payMethod_div_book').find('[data-type="payMethod"]').each(function(index, element){
+			if($(element).hasClass('selectedRegion_css_book')){
+				count = parseInt($(element).attr('data-value'));
+				if($(element).attr('data-value') == 'pay'){
+					pay = false;
+				}else{
+					pay = true;
+				}
 			}
 		});
 		
@@ -239,8 +251,7 @@ $(function(){
 			count : count,
 			region : region,
 			foods : foods,
-			//FIXME 控制是否微信支付
-			wxPay : false
+			wxPay : pay
 		}, function(data){
 			Util.lm.hide();	
 			
@@ -341,6 +352,19 @@ $(function(){
 			}
 		}
 	});
+	
+	//付款方式的点击事件
+	$('#payMethod_div_book').find('[data-type="payMethod"]').each(function(index, element){
+		element.onclick = function(){
+			if($(element).hasClass('selectedRegion_css_book')){
+				$(element).addClass('selectedRegion_css_book');
+			}else{
+				$('#payMethod_div_book').find('[data-type="payMethod"]').removeClass('selectedRegion_css_book');
+				$(element).addClass('selectedRegion_css_book');
+			}
+		}
+	});
+	
 	
 	//底部栏的返回
 	$('#back_a_book').click(function(){
