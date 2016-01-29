@@ -75,7 +75,7 @@
 			type="com.wireless.Actions.weixin.query.WxOperatePromotionAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/WXQueryOrder"
+		<action path="/WxQueryOrder"
 			type="com.wireless.Actions.weixin.query.WxQueryOrderAction" scope="request"
 			parameter="dataSource">
 		</action>
