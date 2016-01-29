@@ -15,16 +15,16 @@
 </style>
 </head>
 <body>
-	<div id="loading">
+	<div id="loading_div_authResponse">
 		<h3>系统正在处理, 请稍后......</h3>
 	</div>	
 	<br>
 	<br>
-	<div id="authSuccess" align="center" style="display: none">
+	<div id="authSuccess_div_authResponse" align="center" style="display: none">
 		<div>
 			<div>
-				<img id="wxRestLogo" alt="" src="" width="200px" height="200px">
-				<br>微信公众号 : <label id="wxNickName">pinjiao</label>
+				<img id="wxRestLogo_img_authResponse" alt="" src="" width="200px" height="200px">
+				<br>微信公众号 : <label id="wxNickName_label_authResponse">pinjiao</label>
 			</div>
 			<h1>绑定成功, 请继续其他操作</h1>
 		</div>
@@ -38,7 +38,7 @@
 			<h1>微信公众号绑定失败, 请重新绑定</h1>
 		</div>
 		<div>
-			<button onclick="reAuth()" class="btn">重新绑定</button>
+			<button id="reAuth_button_authResponse" class="btn">重新绑定</button>
 		</div>
 	</div>	
 
