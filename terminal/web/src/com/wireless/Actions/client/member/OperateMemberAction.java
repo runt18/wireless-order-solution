@@ -323,18 +323,21 @@ public class OperateMemberAction extends DispatchAction{
 			}else{
 				serverName = request.getServerName();
 			}
+			
 			//Perform to send the weixin charge msg to member.
-			new Thread(new Runnable(){
-				@Override
-				public void run() {
-					try {
-						BaseAPI.doPost("http://" + serverName + "/wx-term/WxNotifyMember.do?dataSource=charge&moId=" + mo.getId() + "&staffId=" + staff.getId(), "");
-					} catch (Exception ignored) {
-						ignored.printStackTrace();
+			if(MemberDao.getById(staff, Integer.parseInt(memberId)).hasWeixin()){
+				new Thread(new Runnable(){
+					@Override
+					public void run() {
+						try {
+							BaseAPI.doPost("http://" + serverName + "/wx-term/WxNotifyMember.do?dataSource=charge&moId=" + mo.getId() + "&staffId=" + staff.getId(), "");
+						} catch (Exception ignored) {
+							ignored.printStackTrace();
+						}
 					}
-				}
-				
-			}).run();
+					
+				}).run();
+			}
 
 			
 		}catch(BusinessException e){	
