@@ -163,15 +163,20 @@ public class OperateMemberCondAction extends DispatchAction{
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			final MemberCond.UpdateBuilder builder = new MemberCond.UpdateBuilder(Integer.parseInt(id)).setName(name);
 			
-			RangeType rangeType = RangeType.valueOf(Integer.parseInt(memberCondDateRegion));
-			
-			//设置时间段
-			builder.setRangeType(rangeType);
-			if(rangeType == RangeType.USER_DEFINE){
-				if(memberCondBeginDate != null && !memberCondBeginDate.isEmpty() && memberCondEndDate != null && !memberCondEndDate.isEmpty()){
-					builder.setRange(memberCondBeginDate, memberCondEndDate);
+			if(memberCondDateRegion != null && !memberCondDateRegion.isEmpty()){
+				RangeType rangeType = RangeType.valueOf(Integer.parseInt(memberCondDateRegion));
+				//设置时间段
+				builder.setRangeType(rangeType);
+				if(rangeType == RangeType.USER_DEFINE){
+					if(memberCondBeginDate != null && !memberCondBeginDate.isEmpty() && memberCondEndDate != null && !memberCondEndDate.isEmpty()){
+						builder.setRange(memberCondBeginDate, memberCondEndDate);
+					}
 				}
+			}else{
+				builder.setRangeType(null);
 			}
+			
+
 			
 			if(memberType != null && !memberType.isEmpty()){
 				if(memberType.equals("-1")){

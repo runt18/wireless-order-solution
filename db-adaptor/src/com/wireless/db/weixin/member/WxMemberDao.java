@@ -385,7 +385,7 @@ public class WxMemberDao {
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".weixin_member " + 
 			  " WHERE 1 = 1 " +
-			  " AND restaurant_id = " + staff.getRestaurantId() +
+			  " AND restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond.toString() : "");
 		
 		List<WxMember> result = new ArrayList<WxMember>();

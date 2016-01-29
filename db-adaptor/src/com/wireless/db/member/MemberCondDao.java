@@ -157,7 +157,7 @@ public class MemberCondDao {
 			  (builder.isBalanceChanged() ? " ,min_balance = " + cond.getMinBalance() + " ,max_balance = " + cond.getMaxBalance() : "") +
 			  (builder.isConsumeAmountChanged() ? " ,min_consume_amount = " + cond.getMinConsumeAmount() + " ,max_consume_amount = " + cond.getMaxConsumeAmount() : "") +
 			  (builder.isConsumeMoneyChanged() ? " ,min_consume_money = " + cond.getMinConsumeMoney() + " ,max_consume_money = " + cond.getMaxConsumeMoney() : "") +
-			  (builder.isRangeTypeChanged() ? " ,range_type = " + cond.getRangeType().getVal() : "") +
+			  (builder.isRangeTypeChanged() ? " ,range_type = " + (cond.getRangeType() != null ? cond.getRangeType().getVal() : "NULL")  : "") +
 			  (builder.isRangeChanged() ? " ,begin_date = '" + cond.getRange().getOnDutyFormat() + "' ,end_date = '" + cond.getRange().getOffDutyFormat() + "'" : "") +
 			  (builder.isLastConsumptionChanged() ? " ,min_last_consumption = " + cond.getMinLastConsumption()  + ",max_last_consumption = " + cond.getMaxLastConsumption() : "") +
 			  (builder.isSexChanged() ? " ,sex = " + (cond.getSex() != null ? cond.getSex().getVal() : " NULL ") : "") +
@@ -262,32 +262,34 @@ public class MemberCondDao {
 				memberCond.setMemberType(new MemberType(dbCon.rs.getInt("member_type_id")));
 			}
 			
-			memberCond.setRangeType(RangeType.valueOf(dbCon.rs.getInt("range_type")));
-			
-			if(memberCond.getRangeType() == MemberCond.RangeType.LAST_1_MONTH){
-				//近1月
-				Calendar c = Calendar.getInstance();
-				c.add(Calendar.MONTH, -1);
-				memberCond.setRange(new DutyRange(c.getTime().getTime(), System.currentTimeMillis()));
+			if(dbCon.rs.getInt("range_type") != 0){
+				memberCond.setRangeType(RangeType.valueOf(dbCon.rs.getInt("range_type")));
 				
-			}if(memberCond.getRangeType() == MemberCond.RangeType.LAST_2_MONTHS){
-				//近2月
-				Calendar c = Calendar.getInstance();
-				c.add(Calendar.MONTH, -2);
-				memberCond.setRange(new DutyRange(c.getTime().getTime(), System.currentTimeMillis()));
-				
-			}if(memberCond.getRangeType() == MemberCond.RangeType.LAST_3_MONTHS){
-				//近3月
-				Calendar c = Calendar.getInstance();
-				c.add(Calendar.MONTH, -3);
-				memberCond.setRange(new DutyRange(c.getTime().getTime(), System.currentTimeMillis()));
-				
-			}else if(memberCond.getRangeType() == MemberCond.RangeType.USER_DEFINE){
-				if(dbCon.rs.getTimestamp("begin_date") != null && dbCon.rs.getTimestamp("end_date") != null){
-					memberCond.setRange(new DutyRange(dbCon.rs.getTimestamp("begin_date").getTime(), dbCon.rs.getTimestamp("end_date").getTime()));
+				if(memberCond.getRangeType() == MemberCond.RangeType.LAST_1_MONTH){
+					//近1月
+					Calendar c = Calendar.getInstance();
+					c.add(Calendar.MONTH, -1);
+					memberCond.setRange(new DutyRange(c.getTime().getTime(), System.currentTimeMillis()));
+					
+				}if(memberCond.getRangeType() == MemberCond.RangeType.LAST_2_MONTHS){
+					//近2月
+					Calendar c = Calendar.getInstance();
+					c.add(Calendar.MONTH, -2);
+					memberCond.setRange(new DutyRange(c.getTime().getTime(), System.currentTimeMillis()));
+					
+				}if(memberCond.getRangeType() == MemberCond.RangeType.LAST_3_MONTHS){
+					//近3月
+					Calendar c = Calendar.getInstance();
+					c.add(Calendar.MONTH, -3);
+					memberCond.setRange(new DutyRange(c.getTime().getTime(), System.currentTimeMillis()));
+					
+				}else if(memberCond.getRangeType() == MemberCond.RangeType.USER_DEFINE){
+					if(dbCon.rs.getTimestamp("begin_date") != null && dbCon.rs.getTimestamp("end_date") != null){
+						memberCond.setRange(new DutyRange(dbCon.rs.getTimestamp("begin_date").getTime(), dbCon.rs.getTimestamp("end_date").getTime()));
+					}
 				}
 			}
-			
+
 			memberCond.setMinBalance(dbCon.rs.getFloat("min_balance"));
 			memberCond.setMaxBalance(dbCon.rs.getFloat("max_balance"));
 			memberCond.setMinConsumeAmount(dbCon.rs.getInt("min_consume_amount"));

@@ -459,6 +459,9 @@
 						var rn = memberCondTree.getRootNode().childNodes;
 						rn[0].select();
 						rn[0].fireEvent('click', rn[0]);
+					},
+					click : function(){
+						
 					}
 				}
 			}),
@@ -479,7 +482,7 @@
 		    			params : {
 		    				dataSource : "getById",
 		    				id : e.id
-		    			},
+		    			},	
 		    			success : function(response, options) {
 		    				var jr = Ext.util.JSON.decode(response.responseText);
 		    				if(jr.success){
@@ -951,7 +954,7 @@
 			items : [
 					{
 						xtype : 'tbtext',
-						text : String.format(Ext.ux.txtFormat.longerTypeName, '是否绑定会员', 'isBind_tbtext_memberCond', '----')
+						text : String.format(Ext.ux.txtFormat.longerTypeName, '绑定手机', 'isBind_tbtext_memberCond', '----')
 					},
 					{
 						xtype : 'tbtext',
@@ -1068,7 +1071,12 @@
 		Ext.getCmp('maxAmount4CondWin').setValue(data.maxConsumeAmount && data.maxConsumeAmount > 0 ? data.maxConsumeAmount : "");
 		Ext.getCmp('minBalance4CondWin').setValue(data.minBalance && data.minBalance > 0 ? data.minBalance : "");
 		Ext.getCmp('maxBalance4CondWin').setValue(data.maxBalance && data.maxBalance > 0 ? data.maxBalance : "");
-		Ext.getCmp('memberCondDateRegion').setValue(data.rangeType);
+		if(data.rangeType == null){
+			Ext.getCmp('memberCondDateRegion').setValue(null);
+		}else{
+			Ext.getCmp('memberCondDateRegion').setValue(data.rangeType);
+		}
+		
 		
 		if(typeof data.sex == 'undefined'){
 			Ext.getCmp('memberCondSex_combo_memebercond').setValue(-1);
@@ -1279,7 +1287,7 @@
 		},{
 			columnWidth : 0.2,
 			xtype : 'label',
-			text : '是否绑定:'
+			text : '绑定手机:'
 		}, {
 			columnWidth : 0.2,
 			id : 'isBind_checkbox_memberCond',
@@ -1495,11 +1503,11 @@
 			xtype : 'combo',
 			readOnly : false,
 			forceSelection : true,
-			value : 1,
+			value : null,
 			width : 80, 
 			store : new Ext.data.SimpleStore({
 				fields : ['value', 'text'],
-				data : [[1, '近一个月'], [2, '近二个月'], [3, '近三个月'], [4, '自定义']]
+				data : [[null, '无设定'], [1, '近一个月'], [2, '近二个月'], [3, '近三个月'], [4, '自定义']]
 			}),
 			valueField : 'value',
 			displayField : 'text',
@@ -1798,15 +1806,18 @@
 						if(jr.success){
 							Ext.example.msg(jr.title, jr.msg);
 							memberCondWin.hide();
-							for(var i = 0; i < memberCondTree.getRootNode().childNodes.length; i++){
-								var node = memberCondTree.getRootNode().childNodes[i];
-								if(node.id == id){
-									node.select();
-									node.fireEvent('click', node);
-									break;
-								}
-							}
 							memberCondTree.getRootNode().reload();
+							
+							setTimeout(function(){
+	 							for(var i = 0; i < memberCondTree.getRootNode().childNodes.length; i++){
+									var node = memberCondTree.getRootNode().childNodes[i];
+									if(node.id == id){
+										node.select();
+										node.fireEvent('click', node);
+										break;
+									}
+								}
+							}, 500);
 						}else{
 							Ext.ux.showMsg(jr);
 						}

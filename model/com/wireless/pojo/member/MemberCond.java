@@ -122,6 +122,7 @@ public class MemberCond implements Jsonable{
 		private final static MemberType DUMMY = new MemberType(0);
 		private MemberType memberType = DUMMY;
 		private RangeType rangeType;
+		private boolean isRangeChanged = false;
 		private DutyRange range;
 		private float minConsumeMoney = -1;
 		private float maxConsumeMoney = -1;
@@ -222,13 +223,14 @@ public class MemberCond implements Jsonable{
 		}
 		
 		public boolean isRangeTypeChanged(){
-			return this.rangeType != null;
+			return this.isRangeChanged;
 		}
 		
 		public UpdateBuilder setRangeType(RangeType rangeType){
 //			if(rangeType == RangeType.USER_DEFINE){
 //				throw new IllegalArgumentException("不能设置自定义查询时间段");
 //			}
+			this.isRangeChanged = true;
 			this.rangeType = rangeType;
 			return this;
 		}
@@ -599,9 +601,11 @@ public class MemberCond implements Jsonable{
 		if( this.memberType != null){
 			jm.putInt("memberType", this.memberType.getId() );
 		}
-		jm.putInt("rangeType", this.getRangeType().getVal());
-		jm.putString("beginDate", this.getRange() != null ? this.getRange().getOnDutyFormat(DateUtil.Pattern.DATE) : null);
-		jm.putString("endDate", this.getRange()!= null ? this.getRange().getOffDutyFormat(DateUtil.Pattern.DATE) : null);
+		if(this.rangeType != null){
+			jm.putInt("rangeType", this.getRangeType().getVal());
+			jm.putString("beginDate", this.getRange() != null ? this.getRange().getOnDutyFormat(DateUtil.Pattern.DATE) : null);
+			jm.putString("endDate", this.getRange()!= null ? this.getRange().getOffDutyFormat(DateUtil.Pattern.DATE) : null);
+		}
 		jm.putFloat("minConsumeMoney", this.minConsumeMoney);
 		jm.putFloat("maxConsumeMoney", this.maxConsumeMoney);
 		jm.putInt("minConsumeAmount", this.minConsumeAmount);
