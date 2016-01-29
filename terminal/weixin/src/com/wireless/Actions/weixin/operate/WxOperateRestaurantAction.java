@@ -60,7 +60,7 @@ public class WxOperateRestaurantAction extends DispatchAction {
 	}
 	
 	/**
-	 * 获取微信餐厅的简介
+	 * 获取微信餐厅的餐厅信息
 	 * @param mapping
 	 * @param form
 	 * @param request

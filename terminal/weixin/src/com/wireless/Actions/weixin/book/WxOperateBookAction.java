@@ -1,5 +1,6 @@
 package com.wireless.Actions.weixin.book;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -59,7 +60,7 @@ public class WxOperateBookAction extends DispatchAction {
 		final String count = request.getParameter("count");
 		final String region = request.getParameter("region");
 		final String foods = request.getParameter("foods");
-		final String wxPayMoney = request.getParameter("wxPayMoney");
+		final String wxPay = request.getParameter("wxPay");
 		final String fid = request.getParameter("fid");
 		//final String openId = request.getParameter("oid");
 		try{
@@ -82,13 +83,30 @@ public class WxOperateBookAction extends DispatchAction {
 
 			final int bookId = BookDao.insert(staff, insertBuilder);
 
+			final JsonMap result = new JsonMap();
+			result.putInt("bookId", bookId);
+			
+			if(wxPay != null && !wxPay.isEmpty() && Boolean.parseBoolean(wxPay)){
+				result.putBoolean("wxPay", true);
+			}else{
+				//打印预订信息
+				try{
+					ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildBook(staff, bookId).build());
+					if(resp.header.type == Type.ACK){
+						jObject.initTip(true, "预订信息打印成功");
+					}else{
+						jObject.initTip(true, "预订成功");
+					}
+				}catch(IOException | BusinessException ignored){
+					ignored.printStackTrace();
+				}
+			}
+			
 			jObject.setRoot(new Jsonable(){
 
 				@Override
 				public JsonMap toJsonMap(int flag) {
-					JsonMap jm = new JsonMap();
-					jm.putInt("bookId", bookId);
-					return jm;
+					return result;
 				}
 
 				@Override
@@ -97,19 +115,6 @@ public class WxOperateBookAction extends DispatchAction {
 				}
 				
 			});
-			
-			if(wxPayMoney != null && !wxPayMoney.isEmpty() && Float.parseFloat(wxPayMoney) > 0){
-				//TODO
-			}else{
-				//打印预订信息
-				ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildBook(staff, bookId).build());
-				if(resp.header.type == Type.ACK){
-					jObject.initTip(true, "预订信息打印成功");
-				}else{
-					jObject.initTip(true, "预订成功");
-				}
-			}
-			
 		}catch(Exception e){
 			e.printStackTrace();
 			jObject.initTip4Exception(e);
@@ -133,12 +138,12 @@ public class WxOperateBookAction extends DispatchAction {
 		final String fid = request.getParameter("fid");
 		final String openId = request.getParameter("oid");
 		final String bookId = request.getParameter("bookId");
-		final String wxPayMoney = request.getParameter("wxPayMoney");
 		try{
 			final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 
-			if(wxPayMoney != null && !wxPayMoney.isEmpty()){
+			final Book book = BookDao.getById(staff, Integer.parseInt(bookId));
+			if(book.hasOrder() && book.getOrder().calcTotalPrice() > 0){
 				Restaurant restaurant = RestaurantDao.getById(restaurantId);
 				if(restaurant.hasBeeCloud()){
 					BeeCloud app = BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
@@ -146,16 +151,16 @@ public class WxOperateBookAction extends DispatchAction {
 					Bill.Response beeCloudResponse = app.bill().ask(new Bill.Request().setChannel(Bill.Channel.WX_JSAPI)
 																					  .setOpenId(openId)
 																					  .setBillNo(billNo)
-																					  .setTotalFee(Integer.parseInt(wxPayMoney))
+																					  .setTotalFee(Float.valueOf((book.getOrder().calcTotalPrice() * 100)).intValue())
+																					  //.setTotalFee(1)
 																					  .setTitle(restaurant.getName() + "微信预订支付(" + bookId + ")"), 
 					new Callable<ProtocolPackage>(){
 
 						@Override
 						public ProtocolPackage call() throws Exception {
-							System.out.println("wx pay success");
 							try{
 								//更新预订账单中的微信支付的金额状态
-								BookDao.update(staff, new Book.WxPayBuilder(Integer.parseInt(bookId), Float.parseFloat(wxPayMoney)));
+								BookDao.update(staff, new Book.WxPayBuilder(Integer.parseInt(bookId), book.getOrder().calcTotalPrice()));
 							}catch(BusinessException e){
 								e.printStackTrace();
 							}

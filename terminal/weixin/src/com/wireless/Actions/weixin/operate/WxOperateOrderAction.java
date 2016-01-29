@@ -49,14 +49,21 @@ public class WxOperateOrderAction extends DispatchAction {
 			final String fid = request.getParameter("fid");
 			final String wxOrderId = request.getParameter("wid");
 			final String tableAlias = request.getParameter("tableAlias");
+			final String branchId = request.getParameter("branchId");
 			final String qrCode = request.getParameter("qrCode");
-			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}	
 			
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			//检查二维码是否正确
 			if(qrCode != null && !qrCode.isEmpty()){
-				if(WxRestaurantDao.getByCond(staff, new WxRestaurantDao.ExtraCond().setQrCode(qrCode), null).isEmpty()){
+				final Staff staff4QrCode = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(fid));
+				if(WxRestaurantDao.getByCond(staff4QrCode, new WxRestaurantDao.ExtraCond().setQrCode(qrCode), null).isEmpty()){
 					throw new BusinessException("扫描的二维码不正确");
 				}
 			}
@@ -114,18 +121,24 @@ public class WxOperateOrderAction extends DispatchAction {
 		try{
 			final String oid = request.getParameter("oid");
 			final String fid = request.getParameter("fid");
+			final String branchId = request.getParameter("branchId");
 			final String foods = request.getParameter("foods");
 			final String tableAlias = request.getParameter("tableAlias");
 			final String comment = request.getParameter("comment");
 			final String qrCode = request.getParameter("qrCode");
 			
-			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
-			
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}				
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 
 			//检查二维码是否正确
 			if(qrCode != null && !qrCode.isEmpty()){
-				if(WxRestaurantDao.getByCond(staff, new WxRestaurantDao.ExtraCond().setQrCode(qrCode), null).isEmpty()){
+				final Staff staff4QrCode = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(fid));
+				if(WxRestaurantDao.getByCond(staff4QrCode, new WxRestaurantDao.ExtraCond().setQrCode(qrCode), null).isEmpty()){
 					throw new BusinessException("扫描的二维码不正确");
 				}
 			}

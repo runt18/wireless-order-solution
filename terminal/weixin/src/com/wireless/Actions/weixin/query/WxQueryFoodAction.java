@@ -35,10 +35,16 @@ public class WxQueryFoodAction extends DispatchAction{
 	public ActionForward star(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final JObject jObject = new JObject();
 		try{
+			final String branchId = request.getParameter("branchId");
 			final String fid = request.getParameter("fid");
 			final String start = request.getParameter("start");
 			final String limit = request.getParameter("limit");
-			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			List<Food> result = FoodDao.getByCond(staff, new FoodDao.ExtraCond().setSellout(false).setRecomment(true).setContainsImage(true), " ORDER BY FOOD.food_alias");
@@ -71,12 +77,17 @@ public class WxQueryFoodAction extends DispatchAction{
 	public ActionForward favor(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final JObject jObject = new JObject();
 		try{
+			final String branchId = request.getParameter("branchId");
 			final String fid = request.getParameter("fid");
 			final String oid = request.getParameter("oid");
 			final String start = request.getParameter("start");
 			final String limit = request.getParameter("limit");
-			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
-			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			List<Food> result = MemberDao.getById(staff, WxMemberDao.getBySerial(staff, oid).getMemberId()).getFavorFoods();
 			
@@ -115,11 +126,17 @@ public class WxQueryFoodAction extends DispatchAction{
 	public ActionForward recommend(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final JObject jObject = new JObject();
 		try{
+			final String branchId = request.getParameter("branchId");
 			final String fid = request.getParameter("fid");
 			final String oid = request.getParameter("oid");
 			final String start = request.getParameter("start");
 			final String limit = request.getParameter("limit");
-			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}			
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			List<Food> result = MemberDao.getById(staff, WxMemberDao.getBySerial(staff, oid).getMemberId()).getRecommendFoods();
@@ -160,16 +177,21 @@ public class WxQueryFoodAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		List<Food> root = null;
 		
-		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
+		final String isPaging = request.getParameter("isPaging");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String branchId = request.getParameter("branchId");
+		final String fid = request.getParameter("fid");
+		final String kitchenId = request.getParameter("kitchenId");
 		
 		try{
 			
-			String fid = request.getParameter("fid");
-			String kitchenId = request.getParameter("kitchenId");
-			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
-			
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}			
 			root = FoodDao.getByCond(StaffDao.getAdminByRestaurant(rid),
 										new FoodDao.ExtraCond().setSellout(false).setContainsImage(true).setKitchen(Integer.parseInt(kitchenId)), 
 										" ORDER BY FOOD.food_alias ");

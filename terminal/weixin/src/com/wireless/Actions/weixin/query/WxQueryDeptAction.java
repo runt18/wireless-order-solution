@@ -18,7 +18,6 @@ import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.finance.WeixinFinanceDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
@@ -33,9 +32,14 @@ public class WxQueryDeptAction extends DispatchAction{
 	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		try{
-			
+			final String branchId = request.getParameter("branchId");
 			String fid = request.getParameter("fid");
-			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}
 			
 			Staff staff = StaffDao.getAdminByRestaurant(rid);
 			List<Department> depts = DepartmentDao.getByType(staff, Department.Type.NORMAL);
@@ -85,9 +89,14 @@ public class WxQueryDeptAction extends DispatchAction{
 	public ActionForward queryDepts(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final JObject jobject = new JObject();
 		try{
-			
+			final String branchId = request.getParameter("branchId");
 			final String openId = request.getParameter("oid");
-			final int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(openId);
+			}
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			jobject.setRoot(DepartmentDao.getByType(staff, Department.Type.NORMAL));
 			
@@ -108,10 +117,15 @@ public class WxQueryDeptAction extends DispatchAction{
 		final JObject jobject = new JObject();
 		
 		try{
-			
+			final String branchId = request.getParameter("branchId");
 			final String fid = request.getParameter("fid");
 			final String oid = request.getParameter("oid");
-			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			final List<Kitchen> list = new ArrayList<>(); 
