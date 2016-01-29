@@ -796,7 +796,7 @@ public class MemberDao {
 			  " AND M.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond : " ") +
 			  (orderClause != null ? orderClause : "");
-			
+		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			Member member = new Member(dbCon.rs.getInt("member_id"));

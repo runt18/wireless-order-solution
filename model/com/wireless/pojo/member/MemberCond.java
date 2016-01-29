@@ -417,7 +417,7 @@ public class MemberCond implements Jsonable{
 	}
 	
 	public boolean isRaw(){
-		return this.isRaw;
+		return this.isRaw != null ? this.isRaw() : false;
 	}
 	
 	public void setRaw(boolean onOff){
