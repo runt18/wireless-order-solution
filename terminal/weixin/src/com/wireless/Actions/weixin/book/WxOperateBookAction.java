@@ -18,7 +18,6 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.beeCloud.BeeCloud;
 import com.wireless.beeCloud.Bill;
-import com.wireless.db.DBCon;
 import com.wireless.db.book.BookDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.regionMgr.RegionDao;
@@ -62,9 +61,15 @@ public class WxOperateBookAction extends DispatchAction {
 		final String foods = request.getParameter("foods");
 		final String wxPay = request.getParameter("wxPay");
 		final String fid = request.getParameter("fid");
+		final String branchId = request.getParameter("branchId");
 		//final String openId = request.getParameter("oid");
 		try{
-			final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			final int restaurantId;
+			if(branchId != null && !branchId.isEmpty()){
+				restaurantId = Integer.parseInt(branchId);
+			}else{
+				restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}	
 			final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 			final Book.InsertBuilder4Weixin insertBuilder = new Book.InsertBuilder4Weixin().setBookDate(bookDate)
 															  .setMember(member)
@@ -138,13 +143,19 @@ public class WxOperateBookAction extends DispatchAction {
 		final String fid = request.getParameter("fid");
 		final String openId = request.getParameter("oid");
 		final String bookId = request.getParameter("bookId");
+		final String branchId = request.getParameter("branchId");
 		try{
-			final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
-			final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}	
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 
 			final Book book = BookDao.getById(staff, Integer.parseInt(bookId));
 			if(book.hasOrder() && book.getOrder().calcTotalPrice() > 0){
-				Restaurant restaurant = RestaurantDao.getById(restaurantId);
+				Restaurant restaurant = RestaurantDao.getById(rid);
 				if(restaurant.hasBeeCloud()){
 					BeeCloud app = BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
 					final String billNo = System.currentTimeMillis() + "";
@@ -152,7 +163,7 @@ public class WxOperateBookAction extends DispatchAction {
 																					  .setOpenId(openId)
 																					  .setBillNo(billNo)
 																					  .setTotalFee(Float.valueOf((book.getOrder().calcTotalPrice() * 100)).intValue())
-																					  //.setTotalFee(1)
+																					  .setTotalFee(1)
 																					  .setTitle(restaurant.getName() + "微信预订支付(" + bookId + ")"), 
 					new Callable<ProtocolPackage>(){
 
@@ -195,6 +206,7 @@ public class WxOperateBookAction extends DispatchAction {
 		}
 		return null;
 	}
+	
 	/**
 	 * 获取区域
 	 * @param mapping
@@ -205,22 +217,23 @@ public class WxOperateBookAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward region(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
-		DBCon dbCon = null;
+		final JObject jObject = new JObject();
+		final String fid = request.getParameter("fid");
+		final String branchId = request.getParameter("branchId");
 		try{
-			dbCon = new DBCon();
-			dbCon.connect();
-			
-			String fid = request.getParameter("fid");
-			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
-			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
-			jobject.setRoot(RegionDao.getByStatus(staff, Region.Status.BUSY));
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}	
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			jObject.setRoot(RegionDao.getByStatus(staff, Region.Status.BUSY));
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}		
 		return null;
 	}
@@ -235,19 +248,23 @@ public class WxOperateBookAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward invitation(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
-		String id = request.getParameter("bookId");
-		String fid = request.getParameter("fid");
-		final WxRestaurant wxRest;
-		final Restaurant rest;
+		final JObject jObject = new JObject();
+		final String id = request.getParameter("bookId");
+		final String fid = request.getParameter("fid");
+		final String branchId = request.getParameter("branchId");
 		try{
-			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
-			Staff staff = StaffDao.getAdminByRestaurant(rid);
-			rest = RestaurantDao.getById(rid);
-			wxRest = WxRestaurantDao.get(staff);
-			jobject.setRoot(BookDao.getById(staff, Integer.parseInt(id)));
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}	
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			final Restaurant rest = RestaurantDao.getById(rid);
+			final WxRestaurant wxRest = WxRestaurantDao.get(staff);
+			jObject.setRoot(BookDao.getById(staff, Integer.parseInt(id)));
 			
-			jobject.setExtra(new Jsonable() {
+			jObject.setExtra(new Jsonable() {
 				
 				@Override
 				public JsonMap toJsonMap(int flag) {
@@ -264,12 +281,12 @@ public class WxOperateBookAction extends DispatchAction {
 			});
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;
@@ -285,38 +302,52 @@ public class WxOperateBookAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward getByCond(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
-		String fid = request.getParameter("fid");
+		final JObject jObject = new JObject();
+		final String fid = request.getParameter("fid");
 		try{
-			int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
-			Staff staff = StaffDao.getAdminByRestaurant(rid);
-			BookDao.ExtraCond extra = new BookDao.ExtraCond();
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			final BookDao.ExtraCond extraCond = new BookDao.ExtraCond();
 			
+			//只显示当前的预订订单
 			SimpleDateFormat yyyymmdd = new SimpleDateFormat("yyyy-MM-dd");
 			String begin = yyyymmdd.format(new Date());
 			Calendar c = Calendar.getInstance();
 			c.add(Calendar.MONTH, 1);
 			String end = yyyymmdd.format(c.getTime());
 			
-			extra.setBookRange(new DutyRange(begin, end));
-			extra.addStatus(Book.Status.CREATED);
+			extraCond.setBookRange(new DutyRange(begin, end));
 			
-			//获取详细的order & orderFoods信息
-			List<Book> books = new ArrayList<>();
-			for (Book book : BookDao.getByCond(staff, extra)) {
-				books.add(BookDao.getById(staff, book.getId()));
+			//只显示【创建】状态的预订订单
+			extraCond.addStatus(Book.Status.CREATED);
+			
+			final List<Book> result = new ArrayList<Book>();
+			
+			//集团下需要显示所有门店的预订订单
+			if(staff.isGroup()){
+				for(Restaurant branches : RestaurantDao.getById(staff.getRestaurantId()).getBranches()){
+					result.addAll(BookDao.getByCond(StaffDao.getAdminByRestaurant(branches.getId()), extraCond));
+				}
 			}
 			
-			jobject.setRoot(books);
+			//获取集团的预订订单
+			result.addAll(BookDao.getByCond(staff, extraCond));
+			
+			//获取详细的order & orderFoods信息
+			for(int i = 0; i < result.size(); i++) {
+				result.set(i, BookDao.getById(staff, result.get(i).getId()));
+			}
+			
+			jObject.setRoot(result);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;
