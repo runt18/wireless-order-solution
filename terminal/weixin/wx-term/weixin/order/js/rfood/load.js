@@ -20,7 +20,7 @@ $(function(){
 		url : '../../WxQueryFood.do',
 		dataType : 'json',
 		data : {
-			dataSource : 'isRecommend',
+			dataSource : 'star',
 			fid : Util.mp.params.r
 		},
 		success : function(data, status, xhr){
