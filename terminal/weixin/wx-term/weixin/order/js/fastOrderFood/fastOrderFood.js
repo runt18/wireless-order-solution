@@ -1,5 +1,6 @@
 function PickFoodComponent(param){
 	
+	
 	param = param || {
 		orderDataCount : null,
 		confirm : function(selectedFoods, comment, container){},
@@ -210,7 +211,8 @@ function PickFoodComponent(param){
 			data : {
 				dataSource : 'kitchen',
 				fid : Util.mp.fid,
-				oid : Util.mp.oid
+				oid : Util.mp.oid,
+				branchId : typeof Util.mp.extra != 'undefined' ? Util.mp.extra : ''
 			},
 			success : function(data, status, xhr){
 				Util.lm.hide();
@@ -304,7 +306,8 @@ function PickFoodComponent(param){
 			oid : Util.mp.oid,
 			start : 0,
 			limit : 20,
-			kitchenId : typeof kitchenId != 'undefined' ? kitchenId : -1
+			kitchenId : typeof kitchenId != 'undefined' ? kitchenId : -1,
+			branchId : typeof Util.mp.extra != 'undefined' ? Util.mp.extra : ''
 		};
 		
 		if(kitchenId){

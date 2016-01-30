@@ -3,12 +3,14 @@ $(function(){
 	
 	$(".bookTime").timepicki();
 	
+	console.log(Util.mp.extra + ": 阿萨德那时候");
+	
 	//加载会员信息
 	(function loadBookMember(){
 		$.post('../../WXOperateMember.do', {
 			dataSource : 'getInfo',
 			oid : Util.mp.oid,
-			fid : Util.mp.fid		
+			fid : Util.mp.fid
 		}, function(data){
 			if(data.success){
 				var member = data.other.member;
@@ -58,7 +60,8 @@ $(function(){
 		var regions;
 		$.post('../../WxOperateBook.do', {
 			fid : Util.mp.fid,
-			dataSource : 'region'
+			dataSource : 'region',
+			branchId : typeof Util.mp.extra != 'undefined' ? Util.mp.extra : ''
 		}, function(data){
 			if(data.success){
 				regions = data.root;
@@ -179,7 +182,6 @@ $(function(){
 		//支付方式
 		$('#payMethod_div_book').find('[data-type="payMethod"]').each(function(index, element){
 			if($(element).hasClass('selectedRegion_css_book')){
-				count = parseInt($(element).attr('data-value'));
 				if($(element).attr('data-value') == 'pay'){
 					pay = false;
 				}else{
@@ -251,7 +253,8 @@ $(function(){
 			count : count,
 			region : region,
 			foods : foods,
-			wxPay : pay
+			wxPay : pay,
+			branchId : typeof Util.mp.extra != 'undefined' ? Util.mp.extra : ''
 		}, function(data){
 			Util.lm.hide();	
 			
@@ -266,7 +269,7 @@ $(function(){
 						fid : Util.mp.fid,
 						oid : Util.mp.oid,
 						dataSource : 'wxPay',
-						bookId : bookId
+						branchId : typeof Util.mp.extra != 'undefined' ? Util.mp.extra : ''
 					}, function(result){
 						if(result.success){
 							payParam = result.other;
@@ -321,7 +324,7 @@ $(function(){
 	//微信支付的参数
 	var payParam = null;
 	//微信支付回调函数
-	function onBridgeReady() {
+	function onBridgeReady(){
 		if(payParam){
 			WeixinJSBridge.invoke('getBrandWCPayRequest', {
 				// 以下参数的值由BCPayByChannel方法返回来的数据填入即可

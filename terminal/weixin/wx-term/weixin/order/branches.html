@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
+<title>预订</title>
+
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/member.css">
+<link type="text/css" rel="stylesheet" href="./css/mbar.css">
+<link type="text/css" rel="stylesheet" href="./css/general_foundicons.css">
+<!-- 时分选择css -->
+<link rel="stylesheet" type="text/css" href="css/timepicki.css"/>
+
+<link rel="stylesheet" href="css/book.css">
+<link rel="stylesheet" href="css/food.css">
+
+<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
+
+<script type="text/javascript" src="js/Util.js"></script>
+<script type="text/javascript" src="./js/dialog/dialog.js"></script>
+<script type="text/javascript" src="js/fastOrderFood/fastOrderFood.js"></script>
+<script type="text/javascript" src="./js/branches/branches.js"></script>
+<script type="text/javascript" src="./js/idangerous.swiper-2.4.2.min.js"></script>
+
+<!--禁止触摸时选中文字  -->
+<script type="text/javascript">
+	document.onselectstart = function(){
+		return false;	
+	} 
+</script>
+</head>
+
+<body>
+<div id="branchesWin_div_branches" style="display:none;">
+<div style="float:none;width:100%;" class="headselect">
+	<a style="display : block!important;line-height: 40px!important;background: #ea5946;
+	color: #fff!important;text-align: center; word-spacing: nowrap; overflow: hidden;font-size: 18px; position: relative;">请选择商铺门店</a>
+</div>
+
+<div id="branches_div_branches"></div>
+
+</div>
+</body>
+</html>

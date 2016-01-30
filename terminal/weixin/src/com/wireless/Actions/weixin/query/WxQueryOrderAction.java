@@ -80,10 +80,10 @@ public class WxQueryOrderAction extends DispatchAction {
 			
 			for (WxOrder wxOrder : result) {
 				if(wxOrder.getStatus() == WxOrder.Status.COMMITTED || wxOrder.getStatus() == WxOrder.Status.ORDER_ATTACHED){
-					wxOrder.addFoods(WxOrderDao.getById(staff, wxOrder.getId()).getFoods());
+					wxOrder.addFoods(WxOrderDao.getById(StaffDao.getAdminByRestaurant(wxOrder.getRestaurantId()), wxOrder.getId()).getFoods());
 				}
 				if(ordersType == WxOrder.Type.TAKE_OUT){
-					wxOrder.setTakoutAddress(TakeoutAddressDao.getById(staff, wxOrder.getTakeoutAddress().getId()));
+					wxOrder.setTakoutAddress(TakeoutAddressDao.getById(StaffDao.getAdminByRestaurant(wxOrder.getRestaurantId()), wxOrder.getTakeoutAddress().getId()));
 				}
 			}
 			

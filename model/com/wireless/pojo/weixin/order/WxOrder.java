@@ -428,6 +428,7 @@ public class WxOrder implements Jsonable, Parcelable{
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putInt("id", this.id);
+		jm.putInt("restaurantId", this.restaurantId);
 		jm.putInt("code", this.code);
 		jm.putString("date", DateUtil.format(this.birthDate));
 		jm.putInt("type", this.type.getVal());

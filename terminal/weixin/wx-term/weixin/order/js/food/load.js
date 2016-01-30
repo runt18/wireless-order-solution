@@ -1,5 +1,6 @@
 $(function(){
 	
+	
 	$.ajax({
 		url : '../../WxInterface.do',
 		dataType : 'json',
@@ -230,7 +231,8 @@ $(function(){
 					oid : Util.mp.oid,
 					fid : Util.mp.fid,
 					foods : foods,
-					comment : comment
+					comment : comment,
+					branchId : typeof Util.mp.extra != 'undefined' ? Util.mp.extra : ''
 				},
 				success : function(data, status, xhr){
 					if(data.success){
@@ -291,8 +293,9 @@ $(function(){
 																	oid : Util.mp.oid,
 																	fid : Util.mp.fid,
 																	wid : data.other.id,
-																	tableAlias : dialogDiv.find('[data-type="numberInput_a_load"]').text()
-			//																	qrCode :  res.resultStr.split('?')[0]
+																	tableAlias : dialogDiv.find('[data-type="numberInput_a_load"]').text(),
+																	qrCode :  res.resultStr.split('?')[0],
+																	branchId : typeof Util.mp.extra != 'undefined' ? Util.mp.extra : ''
 																},
 																success : function(data, status, xhr){
 																	Util.lm.hide();
@@ -340,7 +343,8 @@ $(function(){
 														fid : Util.mp.fid,
 														wid : data.other.id,
 														tableAlias : res.resultStr.split('?')[1],
-														qrCode :  res.resultStr.split('?')[0]
+														qrCode :  res.resultStr.split('?')[0],
+														branchId : typeof Util.mp.extra != 'undefined' ? Util.mp.extra : ''
 													},
 													success : function(data, status, xhr){
 														Util.lm.hide();
@@ -412,6 +416,6 @@ $(function(){
 	  
 	  
 	  $('#foodOrderList').click(function(){
-		  Util.jump('orderList.html', Util.mp.extra);
+		  Util.jump('orderList.html');
 	  });
 });

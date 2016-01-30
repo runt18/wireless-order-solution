@@ -459,9 +459,6 @@
 						var rn = memberCondTree.getRootNode().childNodes;
 						rn[0].select();
 						rn[0].fireEvent('click', rn[0]);
-					},
-					click : function(){
-						
 					}
 				}
 			}),
