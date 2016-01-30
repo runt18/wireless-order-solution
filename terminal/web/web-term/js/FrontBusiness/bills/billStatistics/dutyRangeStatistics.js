@@ -18,7 +18,8 @@ function dutyRangeStatPrintHandler(rowIndex) {
 				params : {
 					printType : statType == 1?5:12,
 					onDuty : sn.attributes.onDuty,
-					offDuty : sn.attributes.offDuty
+					offDuty : sn.attributes.offDuty,
+					orientedPrinter : getcookie(document.domain + '_printers')
 				},
 				success : function(response, options) {
 					tempMask.hide();
