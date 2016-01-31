@@ -84,17 +84,15 @@ public class QueryRepaidReportAction extends DispatchAction{
 		return null;
 	}
 	
-	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String staffID = request.getParameter("staffID");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String staffID = request.getParameter("staffID");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
 			CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
@@ -123,7 +121,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 			
 			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/cancelList.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/cancelList.size())*100)/100 +
 					",\"ser\":[{\"name\":\'反结账金额\', \"data\" : " + data + "}, {\"name\":\'反结账数量\', \"data\" : " + amountData + "}]}";
-			jobject.setExtra(new Jsonable(){
+			jObject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
@@ -140,12 +138,12 @@ public class QueryRepaidReportAction extends DispatchAction{
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;

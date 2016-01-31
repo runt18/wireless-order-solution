@@ -36,69 +36,73 @@ import com.wireless.util.DataPaging;
 public class QueryCancelledFoodAction extends DispatchAction{
 	
 	public ActionForward getDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String limit = request.getParameter("limit");
-		String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String start = request.getParameter("start");
+		final String pin = (String)request.getAttribute("pin");
+		final String beginDate = request.getParameter("dateBeg");
+		final String endDate = request.getParameter("dateEnd");
+		final String deptId = request.getParameter("deptID");
+		final String reasonId = request.getParameter("reasonID");
+		final String staffId = request.getParameter("staffID");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try{
-			final String pin = (String)request.getAttribute("pin");
-			final String beginDate = request.getParameter("dateBeg");
-			final String endDate = request.getParameter("dateEnd");
-			final String deptId = request.getParameter("deptID");
-			final String reasonId = request.getParameter("reasonID");
-			final String staffId = request.getParameter("staffID");
-			final String opening = request.getParameter("opening");
-			final String ending = request.getParameter("ending");
 			
 			if(beginDate == null || beginDate.trim().isEmpty()){
-				jobject.initTip(false, JObject.TIP_TITLE_ERROE, "操作失败, 请指定统计日期开始时间.");
+				jObject.initTip(false, JObject.TIP_TITLE_ERROE, "操作失败, 请指定统计日期开始时间.");
 				return null;
 			}
 			if(endDate == null || endDate.trim().isEmpty()){
-				jobject.initTip(false, JObject.TIP_TITLE_ERROE, "操作失败, 请指定统计日期结束时间.");
+				jObject.initTip(false, JObject.TIP_TITLE_ERROE, "操作失败, 请指定统计日期结束时间.");
 				return null;
 			}
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
 			final OrderFoodDao.ExtraCond4CancelFood extraCond = new OrderFoodDao.ExtraCond4CancelFood(DateType.HISTORY);
+			final CalcCancelStatisticsDao.ExtraCond extraCond4Total = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
 			if(range != null){
 				extraCond.setDutyRange(range);
+				extraCond4Total.setRange(range);
 			}else{
 				extraCond.setDutyRange(new DutyRange(beginDate, endDate));
+				extraCond4Total.setRange(range);
 			}
 			
 			if(reasonId != null && !reasonId.isEmpty() && !reasonId.equals("-1")){
-				extraCond.setReasonId(Integer.valueOf(reasonId));
+				extraCond.setReasonId(Integer.parseInt(reasonId));
+				extraCond4Total.setReasonId(Integer.parseInt(reasonId));
 			}
 			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
+				extraCond4Total.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
 			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffId));
+				extraCond4Total.setStaffId(Integer.parseInt(staffId));
 			}
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+				extraCond4Total.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			List<OrderFood> cancelList = OrderFoodDao.getSingleDetail(staff, extraCond, null);
 			if(!cancelList.isEmpty()){
-				jobject.setTotalProperty(cancelList.size());
-				float totalPrice = 0, totalCount = 0;
-				for (OrderFood orderFood : cancelList) {
-					totalPrice += orderFood.calcPrice();
-					totalCount += orderFood.getCount();
-				}
+				jObject.setTotalProperty(cancelList.size());
+				
+				final float[] totalResult = CalcCancelStatisticsDao.calcByCond(staff, extraCond4Total);
 				
 				Food totalFood = new Food(0);
 				totalFood.setKitchen(cancelList.get(0).asFood().getKitchen());
-				totalFood.setPrice(totalPrice);
+				totalFood.setPrice(totalResult[1]);
 				
 				OrderFood total = new OrderFood(totalFood);
 				
-				total.setCount(totalCount);
+				total.setCount(totalResult[0]);
 				
 				total.setCancelReason(cancelList.get(0).getCancelReason());
 				
@@ -107,23 +111,21 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				cancelList.add(total);
 				
 			}
-			jobject.setRoot(cancelList);
+			jObject.setRoot(cancelList);
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		} finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
 	
-	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pin = (String)request.getAttribute("pin");
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");
@@ -199,9 +201,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		return null;
 	}
 	
-	public ActionForward getReasonChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward getReasonChart(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pin = (String)request.getAttribute("pin");
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");
@@ -246,9 +246,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		return null;
 	}
 	
-	public ActionForward getStaffChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward getStaffChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pin = (String)request.getAttribute("pin");
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");

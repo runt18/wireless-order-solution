@@ -98,9 +98,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		return null;
 	}
 	
-	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pin = (String)request.getAttribute("pin");
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");
@@ -113,6 +111,9 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		JObject jobject = new JObject();
 		
 		try{
+			
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
 			CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(region != null && !region.equals("-1")){
@@ -130,7 +131,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<GiftIncomeByEachDay> giftList = CalcGiftStatisticsDao.calcGiftIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
+			List<GiftIncomeByEachDay> giftList = CalcGiftStatisticsDao.calcGiftIncomeByEachDay(staff, new DutyRange(dateBeg, dateEnd), extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
