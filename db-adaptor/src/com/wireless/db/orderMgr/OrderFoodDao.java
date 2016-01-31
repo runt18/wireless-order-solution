@@ -88,7 +88,7 @@ public class OrderFoodDao {
 		private Region.RegionId regionId;
 		private int staffId;
 		private String foodName;
-		private boolean isGift;
+		private Boolean isGift;
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
@@ -166,8 +166,8 @@ public class OrderFoodDao {
 			if(foodName != null){
 				extraCond.append(" AND " + orderFoodTblAlias + ".name LIKE '%" + foodName + "%'");
 			}
-			if(isGift){
-				extraCond.append(" AND " + orderFoodTblAlias + ".is_gift = 1");
+			if(isGift != null){
+				extraCond.append(" AND " + orderFoodTblAlias + ".is_gift = " + (isGift.booleanValue() ? "1" : "0"));
 			}
 			return extraCond.toString();
 		}

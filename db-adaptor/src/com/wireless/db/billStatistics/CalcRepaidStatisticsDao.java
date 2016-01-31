@@ -10,11 +10,13 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByEachDay;
 import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByStaff;
 import com.wireless.pojo.billStatistics.repaid.RepaidStatistics;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
@@ -31,7 +33,9 @@ public class CalcRepaidStatisticsDao {
 		private final String tasteGroupTbl;
 		
 		private int staffId;
+		private int orderId;
 		private HourRange hourRange;
+		private DutyRange range;
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
@@ -46,6 +50,15 @@ public class CalcRepaidStatisticsDao {
 			}
 		}
 		
+		public ExtraCond setOrder(int orderId){
+			this.orderId = orderId;
+			return this;
+		}
+		
+		public ExtraCond setOrder(Order order){
+			this.orderId = order.getId();
+			return this;
+		}
 		
 		public ExtraCond setStaffId(int staffId){
 			this.staffId = staffId;
@@ -57,6 +70,11 @@ public class CalcRepaidStatisticsDao {
 			return this;
 		}
 		
+		public ExtraCond setRange(DutyRange range){
+			this.range = range;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -65,6 +83,12 @@ public class CalcRepaidStatisticsDao {
 			}
 			if(hourRange != null){
 				extraCond.append(" AND TIME(O.order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
+			}
+			if(range != null){
+				extraCond.append(" AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
+			}
+			if(orderId != 0){
+				extraCond.append(" AND O.id = " + orderId);
 			}
 			return extraCond.toString();
 		}
@@ -95,7 +119,7 @@ public class CalcRepaidStatisticsDao {
 	}
 	
 	public static List<RepaidStatistics> getRepaidIncomeDetail(DBCon dbCon, Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException{
-		String sql = makeSql4RepaidFood(staff, dutyRange, extraCond);
+		String sql = makeSql4RepaidFood(staff, extraCond.setRange(dutyRange));
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		List<RepaidStatistics> result = new ArrayList<RepaidStatistics>();
@@ -182,7 +206,7 @@ public class CalcRepaidStatisticsDao {
 					  " ROUND(SUM(TMP.repaid_amount), 2) AS repaid_amount, " +
 					  " ROUND(SUM(TMP.repaid_price), 2) AS repaid_price " +
 				      " FROM (" +
-					  makeSql4RepaidFood(staff, range, extraCond) + 
+					  makeSql4RepaidFood(staff, extraCond.setRange(range)) + 
 					  " ) AS TMP ";
 			    dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if(dbCon.rs.next()){
@@ -245,7 +269,7 @@ public class CalcRepaidStatisticsDao {
 			  " ROUND(SUM(TMP.repaid_amount), 2) AS repaid_amount, " +
 			  " ROUND(SUM(TMP.repaid_price), 2) AS repaid_price " +
 			  " FROM (" +
-			  makeSql4RepaidFood(staff, range, extraCond) +
+			  makeSql4RepaidFood(staff, extraCond.setRange(range)) +
 			  " ) AS TMP " +
 			  " GROUP BY TMP.staff_id ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -260,26 +284,76 @@ public class CalcRepaidStatisticsDao {
 		
 		return result;
 	}
+
+	/**
+	 * Calculate the repaid price & income to specific extra condition {@link ExtraCond}.
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result stored in float[2], repaid_amount = float[0], repaid_price = float[1] 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static float[] calcByCond(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calcByCond(dbCon, staff, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
-	private static String makeSql4RepaidFood(Staff staff, DutyRange range, ExtraCond extraCond){
+	/**
+	 * Calculate the repaid price & income to specific extra condition {@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result stored in float[2], repaid_amount = float[0], repaid_price = float[1] 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static float[] calcByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		final float[] result = new float[2];
+		String sql;
+		sql = " SELECT " +
+			  " ROUND(SUM(TMP.repaid_amount), 2) AS repaid_amount, " +
+			  " ROUND(SUM(TMP.repaid_price), 2) AS repaid_price " +
+			  " FROM (" +
+			  makeSql4RepaidFood(staff, extraCond) +
+			  " ) AS TMP ";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			result[0] = dbCon.rs.getFloat("repaid_amount");
+			result[1] = dbCon.rs.getFloat("repaid_price");
+		}
+		dbCon.rs.close();
+		return result;
+	}
+	
+	private static String makeSql4RepaidFood(Staff staff, ExtraCond extraCond){
 		String sql;
 		sql = " SELECT " +
 			  " OF.dept_id, OF.staff_id, OF.waiter, OF.order_date, OF.order_id, O.repaid_price detail_repaid_price, O.total_price, O.actual_price, " + 
 			  " O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, " +
 			  " ABS(OF.order_count) AS repaid_amount, " +
-			  " ABS((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount) AS repaid_price " +
+			  " (($(unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount) AS repaid_price " +
 			  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
 			  " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " +
 			  " AND OF.order_id = O.id " +
 			  " AND O.restaurant_id = " + staff.getRestaurantId() +
-			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND OF.is_paid = 1 " +
 			  " JOIN " + Params.dbName + "." + extraCond.tasteGroupTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = O.pay_type_id " + 
 			  " WHERE 1 = 1 " +
 			  extraCond;
 		
-		return sql;
+		return sql.replace("$(unit_price)", "IFNULL(OF.plan_price, IFNULL(OF.food_unit_price, OF.unit_price))");
 	}
 
 }

@@ -304,12 +304,14 @@ public class CalcGiftStatisticsDao {
 		return result;
 	}
 	
+	
+	
 	private static String makeSql4GiftFood(Staff staff, DutyRange range, ExtraCond extraCond){
 		String sql;
-		sql = " SELECT " +
+		sql = (" SELECT " +
 			  " OF.dept_id, OF.staff_id, OF.waiter, " +
 			  " ABS(OF.order_count) AS gift_amount, " +
-			  " ABS((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount) AS gift_price " +
+			  " (($(unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count) AS gift_price " +
 			  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
 			  " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O " +
 			  " ON 1 = 1 " +
@@ -319,7 +321,7 @@ public class CalcGiftStatisticsDao {
 			  " JOIN " + Params.dbName + "." + extraCond.tasteGroupTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 			  " WHERE 1 = 1 " +
 			  " AND OF.is_gift = 1 " +
-			  extraCond;
+			  extraCond).replace("$(unit_price)", "IFNULL(OF.plan_price, IFNULL(OF.food_unit_price, OF.unit_price))");
 		
 		return sql;
 	}

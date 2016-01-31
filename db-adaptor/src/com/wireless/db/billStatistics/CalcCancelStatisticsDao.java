@@ -19,6 +19,7 @@ import com.wireless.pojo.billStatistics.cancel.CancelIncomeByFood;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByStaff;
 import com.wireless.pojo.crMgr.CancelReason;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.regionMgr.Region;
@@ -35,8 +36,11 @@ public class CalcCancelStatisticsDao {
 		private int staffId;
 		private int reasonId;
 		private Region.RegionId regionId;
+		private DutyRange range;
 		private HourRange hourRange;
 		private String foodName;
+		private int orderId;
+		private boolean skipCancelPrice;
 		
 		public ExtraCond(DateType dateType){
 			this.dbTbl = new DBTbl(dateType);
@@ -67,8 +71,28 @@ public class CalcCancelStatisticsDao {
 			return this;
 		}
 		
+		public ExtraCond setRange(DutyRange range){
+			this.range = range;
+			return this;
+		}
+		
 		public ExtraCond setHourRange(HourRange hourRange){
 			this.hourRange = hourRange;
+			return this;
+		}
+		
+		public ExtraCond setOrder(int orderId){
+			this.orderId = orderId;
+			return this;
+		}
+		
+		public ExtraCond setOrder(Order order){
+			this.orderId = order.getId();
+			return this;
+		}
+		
+		ExtraCond setSkipCancelPrice(boolean skip){
+			this.skipCancelPrice = skip;
 			return this;
 		}
 		
@@ -87,11 +111,20 @@ public class CalcCancelStatisticsDao {
 			if(regionId != null){
 				extraCond.append(" AND O.region_id = " + regionId.getId());
 			}
+			if(range != null){
+				extraCond.append(" AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
+			}
 			if(hourRange != null){
 				extraCond.append(" AND TIME(O.order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
 			}
 			if(foodName != null){
 				extraCond.append(" AND OF.name LIKE '%" + foodName + "%'");
+			}
+			if(orderId != 0){
+				extraCond.append(" AND O.id = " + orderId);
+			}
+			if(!skipCancelPrice){
+				extraCond.append(" AND O.cancel_price <> 0 ");
 			}
 			return extraCond.toString();
 		}
@@ -158,7 +191,7 @@ public class CalcCancelStatisticsDao {
 					  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
 					  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
 				      " FROM (" +
-					  makeSql4CancelFood(staff, range, extraCond) + 
+					  makeSql4CancelFood(staff, extraCond.setRange(range)) + 
 					  " ) AS TMP ";
 			    dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if(dbCon.rs.next()){
@@ -221,7 +254,7 @@ public class CalcCancelStatisticsDao {
 			  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
 			  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
 			  " FROM (" +
-			  makeSql4CancelFood(staff, range, extraCond) +
+			  makeSql4CancelFood(staff, extraCond.setRange(range)) +
 			  " ) AS TMP " +
 			  " JOIN " + Params.dbName + ".department D ON TMP.dept_id = D.dept_id AND D.restaurant_id = " + staff.getRestaurantId() + 
 			  " GROUP BY TMP.dept_id ";
@@ -288,7 +321,7 @@ public class CalcCancelStatisticsDao {
 			  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
 			  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
 			  " FROM (" +
-			  makeSql4CancelFood(staff, range, extraCond) +
+			  makeSql4CancelFood(staff, extraCond.setRange(range)) +
 			  " ) AS TMP " +
 			  " GROUP BY TMP.staff_id ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -348,7 +381,7 @@ public class CalcCancelStatisticsDao {
 			  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
 			  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
 			  " FROM (" +
-			  makeSql4CancelFood(staff, range, extraCond) +
+			  makeSql4CancelFood(staff, extraCond.setRange(range)) +
 			  " ) AS TMP " +
 			  " GROUP BY TMP.cancel_reason_id ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -409,7 +442,7 @@ public class CalcCancelStatisticsDao {
 			  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
 			  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
 			  " FROM (" +
-			  makeSql4CancelFood(staff, range, extraCond) +
+			  makeSql4CancelFood(staff, extraCond.setRange(range)) +
 			  " ) AS TMP " +
 			  " GROUP BY TMP.food_id " +
 			  " ORDER BY cancel_amount DESC ";
@@ -425,20 +458,69 @@ public class CalcCancelStatisticsDao {
 		
 		return result;
 	}
+
+	/**
+	 * Calculate the cancel price & income to specific extra condition {@link ExtraCond}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result stored in float[2], cancel_amoun = float[0], cancel_price = float[1] 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static float[] calcByCond(Staff staff, ExtraCond extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calcByCond(dbCon, staff, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
-	private static String makeSql4CancelFood(Staff staff, DutyRange range, ExtraCond extraCond){
+	/**
+	 * Calculate the cancel price & income to specific extra condition {@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result stored in float[2], cancel_amoun = float[0], cancel_price = float[1] 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static float[] calcByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+		final float[] result = new float[2];
+		String sql;
+		sql = " SELECT " +
+			  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
+			  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
+			  " FROM (" +
+			  makeSql4CancelFood(staff, extraCond.setSkipCancelPrice(true)) +
+			  " ) AS TMP ";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			result[0] = dbCon.rs.getFloat("cancel_amount");
+			result[1] = dbCon.rs.getFloat("cancel_price");
+		}
+		dbCon.rs.close();
+		
+		return result;
+	}
+	
+	private static String makeSql4CancelFood(Staff staff, ExtraCond extraCond){
 		String sql;
 		sql = " SELECT " +
 			  " OF.food_id, OF.name, OF.dept_id, OF.staff_id, OF.waiter, OF.cancel_reason_id, IFNULL(OF.cancel_reason, '无原因') AS cancel_reason, " +
 			  " ABS(OF.order_count) AS cancel_amount, " +
-			  " ABS((IF(OF.is_gift = 1, 0, $(unit_price)) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount) AS cancel_price " +
+			  " ABS(($(unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount) AS cancel_price " +
 			  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderFoodTbl + " OF " + 
 			  " JOIN " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 			  " ON 1 = 1 " +
 			  " AND OF.order_id = O.id " +
 			  " AND O.restaurant_id = " + staff.getRestaurantId() +
-			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			  " AND O.cancel_price <> 0 " +
 			  " JOIN " + Params.dbName + "." + extraCond.dbTbl.tgTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 			  " WHERE 1 = 1 " +
 			  " AND OF.order_count < 0 " +

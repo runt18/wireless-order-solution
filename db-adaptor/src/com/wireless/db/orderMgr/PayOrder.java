@@ -5,6 +5,8 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.billStatistics.CalcCancelStatisticsDao;
+import com.wireless.db.billStatistics.CalcRepaidStatisticsDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.regionMgr.TableDao;
@@ -334,7 +336,7 @@ public class PayOrder {
 	 */
 	public static Order calc(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws BusinessException, SQLException{
 		
-		String sql;
+		//String sql;
 		
 		//Get the setting.
 		Setting setting = SystemDao.getByCond(dbCon, staff, null).get(0).getSetting();
@@ -403,34 +405,21 @@ public class PayOrder {
 			orderToCalc.setComment(payBuilder.getComment());
 		}
 		
-		float cancelPrice = 0;
 		//Calculate the cancel price to this order.
-		sql = " SELECT " + 
-			  " ABS(ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2)) AS cancel_price " +
-			  " FROM " + Params.dbName + ".order_food OF" + 
-			  " JOIN " + Params.dbName + ".taste_group TG ON OF.taste_group_id = TG.taste_group_id " +
-			  " WHERE 1 = 1 " + 
-			  " AND OF.order_count < 0 " +
-			  " AND OF.operation = " + OrderFood.Operation.CANCEL.getVal() +
-			  " AND OF.order_id = " + orderToCalc.getId();
-		
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			cancelPrice = dbCon.rs.getFloat("cancel_price");
-		}
-		
-		float repaidPrice = 0;
+		final float cancelPrice = CalcCancelStatisticsDao.calcByCond(dbCon, staff, new CalcCancelStatisticsDao.ExtraCond(DateType.TODAY).setOrder(orderToCalc))[1];
 		//Calculate the repaid price to this order.
-		sql = " SELECT " + 
-			  " ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2) AS repaid_price " +
-			  " FROM " + Params.dbName + ".order_food OF" + 
-			  " JOIN " + Params.dbName + ".taste_group TG ON OF.taste_group_id = TG.taste_group_id " +
-			  " WHERE OF.is_paid = 1 AND OF.order_id = " + orderToCalc.getId();
+		float repaidPrice = CalcRepaidStatisticsDao.calcByCond(dbCon, staff, new CalcRepaidStatisticsDao.ExtraCond(DateType.TODAY).setOrder(orderToCalc))[1];
+//		sql = " SELECT " + 
+//			  " ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2) AS repaid_price " +
+//			  " FROM " + Params.dbName + ".order_food OF" + 
+//			  " JOIN " + Params.dbName + ".taste_group TG ON OF.taste_group_id = TG.taste_group_id " +
+//			  " WHERE OF.is_paid = 1 AND OF.order_id = " + orderToCalc.getId();
 			
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			repaidPrice = dbCon.rs.getFloat("repaid_price");
-		}
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		if(dbCon.rs.next()){
+//			repaidPrice = dbCon.rs.getFloat("repaid_price");
+//		}
+//		dbCon.rs.close();
 		
 		//Calculate the total price.
 		final float totalPrice = orderToCalc.calcTotalPrice();			
