@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -332,6 +334,20 @@ public class WxOperateBookAction extends DispatchAction {
 			
 			//获取集团的预订订单
 			result.addAll(BookDao.getByCond(staff, extraCond));
+			
+			//按下单日期降序显示
+			Collections.sort(result, new Comparator<Book>(){
+				@Override
+				public int compare(Book o1, Book o2) {
+					if(o1.getBookDate() > o2.getBookDate()){
+						return -1;
+					}else if(o1.getBookDate() < o2.getBookDate()){
+						return 1;
+					}else{
+						return 0;
+					}
+				}
+			});
 			
 			//获取详细的order & orderFoods信息
 			for(int i = 0; i < result.size(); i++) {
