@@ -168,16 +168,21 @@ function MemberReadPopup(param){
 		self.find('[id=payment4MemberCard]').text(member.memberCard ? member.memberCard : '----');	
 		self.find('[id=memberCoupon_label_read]').text(coupon.length ? coupon.length + '张' : '----');
 		
-		self.find('[id=defaultDiscount_label_memberRead]').text(member.memberType.discount.name);
-		self.find('[id=defaultDiscount_label_memberRead]').attr('data-value', member.memberType.discount.id);
-		_selectedDiscount = member.memberType.discount;
-	
+		if(member.memberType.discount){
+			self.find('[id=defaultDiscount_label_memberRead]').text(member.memberType.discount.name);
+			self.find('[id=defaultDiscount_label_memberRead]').attr('data-value', member.memberType.discount.id);
+			_selectedDiscount = member.memberType.discount;
+		}
+		
 		var discounts = member.memberType.discounts;
 		
 		var discountHtml = '', pricePlanHtml = '';
-		for (var i = 0; i < discounts.length; i++) {
-			discountHtml += '<li data-icon="false" class="popupButtonList" data-index="' + i + '"><a>' + discounts[i].name +'</a></li>';
+		if(discounts){
+			for (var i = 0; i < discounts.length; i++) {
+				discountHtml += '<li data-icon="false" class="popupButtonList" data-index="' + i + '"><a>' + discounts[i].name +'</a></li>';
+			}
 		}
+		
 		self.find('[id=eachDiscount_ul_memberRead]').html(discountHtml).trigger('create');
 		self.find('[id=eachDiscount_ul_memberRead] .popupButtonList').each(function(index, element){
 			element.onclick = function(){
