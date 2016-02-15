@@ -129,14 +129,27 @@ function initOrderData(c){
 /**
  * 初始化账单
  */
+
 uo.showOrder = function(){
 	var html = '';
+	
 	for(var i = 0; i < uo.order.orderFoods.length; i++){
+		var count = null;
+		if((uo.order.orderFoods[i].status & 1 << 7) != 0){
+			if(uo.order.orderFoods[i].count > 1){
+				 count = uo.order.orderFoods[i].count;
+			}else{
+				 count = '<font color="red" style="font-size:25px;">' + uo.order.orderFoods[i].count + '</font>';
+			}
+		}else{
+			 count = uo.order.orderFoods[i].count;
+		}
+		
 		html += orderFoodListCmpTemplet.format({
 			dataIndex : i + 1,
 			id : uo.order.orderFoods[i].id,
-			name : uo.order.orderFoods[i].foodName,
-			count : uo.order.orderFoods[i].count,
+			name : (uo.order.orderFoods[i].status & 1 << 7) != 0 ? uo.order.orderFoods[i].foodName + '<font color="red" style="font-size:25px;">[称重确认]</font>' : uo.order.orderFoods[i].foodName,
+			count : count,
 			isWeight : (uo.order.orderFoods[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 			hasWeigh : (uo.order.orderFoods[i].status & 1 << 7) != 0 ?'orderFoodMoreOperateCmp':'',
 			tastePref : uo.order.orderFoods[i].tasteGroup.tastePref,

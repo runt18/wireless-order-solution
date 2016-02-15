@@ -520,31 +520,6 @@ function orderFood_formatFoodName(record, iname, name, type){
 	record.commit();
 }
 
-function orderGiftFoodOperationHandler(c){
-	var record = orderSingleGridPanel.getSelectionModel().getSelected();
-	reloadData = c.id;
-	for(var i = 0; i < orderSingleGridPanel.order.orderFoods.length; i++){	
-		var temp = orderSingleGridPanel.order.orderFoods[i];
-		if(record.get('id') == temp.id){
-			if(c.checked == true){
-//				
-				temp.isGift = true;
-				record.set('isGift', true);
-				orderFood_formatFoodName(record, 'displayFoodName', 'name', 1);
-				$('#'+c.id).attr('checked', 'checked');
-				
-			}else{
-				temp.isGift = false;
-				record.set('isGift', false);
-				orderFood_formatFoodName(record, 'displayFoodName', 'name', 1);
-			}	
-			break;
-		}
-
-	}
-	reloadData = null;
-	
-}
 /**
  * 修改菜品数量入口
  */
@@ -662,7 +637,7 @@ function orderGiftRenderer(value, cellmeta, record, rowIndex, columnIndex, store
 			giftRender.checkeds.push(checkId);
 		}
 		
-		value = Ext.ux.staffGift?'&nbsp;<input type="checkbox" id="'+(reloadData?reloadData:checkId)+'" style="height:18px;width:18px;vertical-align: middle;" onclick="orderGiftFoodOperationHandler(this)"/>赠送':'';
+		value = '';
 	}	
 	return value;	
 
