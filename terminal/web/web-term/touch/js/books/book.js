@@ -186,7 +186,8 @@ $(function(){
 								'<td><a data-type="lookOut" data-value={bookId} href="#">{lookout}</a></td>' +
 								'<td><div data-role="controlgroup" data-type="horizontal"><a href="#" data-role="button" data-value={bookId} data-type="change" data-theme="b">{confirmOrUpdate}</a><a data-role="button" data-theme="b" data-value={bookId} data-type="inSeat">入座</a><a data-role="button" data-theme="b" data-value={bookId} data-type="delete" href="#">删除</a></div></td>' +
 								'</tr>';
-	
+								
+								
 		var html = [];
 		for (var i = 0; i < data.length; i++) {
 			var region = [];
@@ -199,6 +200,17 @@ $(function(){
 				region = data[i].region;
 			}
 			
+			var status = null;
+			if(data[i].hasWxPay){
+				status = '<span style="color:red">已微信支付('+ data[i].wxPayMoney +')</span>';
+			}else{
+				if(data[i].status == 1){
+					status = '<span style="color:green">'+ data[i].statusDesc +' ('+ data[i].sourceDesc +')</span>';
+				}else{
+					status = data[i].statusDesc;
+				}
+			}
+			
 			html.push(bookListTemplate.format({
 				list : i+1,
 				index : i,
@@ -209,7 +221,7 @@ $(function(){
 				member : data[i].member,
 				tele : data[i].tele,
 				amount : data[i].amount,
-				status : data[i].status == 1? '<span style="color:green">'+ data[i].statusDesc +' ('+ data[i].sourceDesc +')</span>' : data[i].statusDesc,
+				status : status,
 				confirmOrUpdate : data[i].status == 1? '确认' : '修改',
 				staff : data[i].staff
 			}));

@@ -3,7 +3,6 @@ $(function(){
 	
 	$(".bookTime").timepicki();
 	
-	console.log(Util.mp.extra + ": 阿萨德那时候");
 	
 	//加载会员信息
 	(function loadBookMember(){
@@ -126,7 +125,7 @@ $(function(){
 				});
 				
 				
-				//预订区域 & 类型
+				//预订区域 & 类型的点击事件
 				$('.bookRadioSelect').on('click', function(){
 					$('#' + $(this).data("for")).click();
 				});
@@ -257,7 +256,6 @@ $(function(){
 			branchId : typeof Util.mp.extra != 'undefined' ? Util.mp.extra : ''
 		}, function(data){
 			Util.lm.hide();	
-			
 			if(data.success){
 				Util.lm.hide();
 				var bookId = data.root[0].bookId;
