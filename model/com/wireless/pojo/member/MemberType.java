@@ -528,7 +528,7 @@ public class MemberType implements Jsonable, Parcelable{
 	private String name;
 	private Type type = Type.NORMAL;
 	private List<Discount> discounts = new ArrayList<Discount>();
-	private Discount defaultDiscount = new Discount();
+	private Discount defaultDiscount;
 	private List<PricePlan> prices = new ArrayList<PricePlan>();
 	private PricePlan defaultPrice;
 	private float exchangeRate;
@@ -646,7 +646,7 @@ public class MemberType implements Jsonable, Parcelable{
 	}
 	
 	public void addDiscount(Discount discount){
-		if(!discounts.contains(discount)){
+		if(discount != null && !discounts.contains(discount)){
 			discounts.add(discount);
 		}
 	}
@@ -660,6 +660,10 @@ public class MemberType implements Jsonable, Parcelable{
 		this.defaultDiscount = defaultDiscount;
 	}
 
+	public boolean hasDefaultDiscount(){
+		return this.defaultDiscount != null;
+	}
+	
 	public void setPrices(List<PricePlan> plans){
 		if(plans != null){
 			this.prices.clear();
