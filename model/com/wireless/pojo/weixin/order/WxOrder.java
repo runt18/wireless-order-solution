@@ -243,6 +243,7 @@ public class WxOrder implements Jsonable, Parcelable{
 	private Type type;
 	private Status status;
 	private int restaurantId;
+	private String restaurantName;
 	private String comment;
 	private final List<OrderFood> foods = new ArrayList<OrderFood>();
 	private TakeoutAddress address;
@@ -357,6 +358,17 @@ public class WxOrder implements Jsonable, Parcelable{
 		this.restaurantId = restaurantId;
 	}
 	
+	public String getRestaurantName(){
+		if(this.restaurantName == null){
+			return "";
+		}
+		return this.restaurantName;
+	}
+	
+	public void setRestaurantName(String name){
+		this.restaurantName = name;
+	}
+	
 	public List<OrderFood> getFoods() {
 		return Collections.unmodifiableList(foods);
 	}
@@ -429,6 +441,7 @@ public class WxOrder implements Jsonable, Parcelable{
 		JsonMap jm = new JsonMap();
 		jm.putInt("id", this.id);
 		jm.putInt("restaurantId", this.restaurantId);
+		jm.putString("restaurantName", this.restaurantName);
 		jm.putInt("code", this.code);
 		jm.putString("date", DateUtil.format(this.birthDate));
 		jm.putInt("type", this.type.getVal());

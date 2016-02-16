@@ -475,6 +475,7 @@ public class Book implements Jsonable{
 	
 	private int id;
 	private int restaurantId;
+	private String restaurantName;
 	private long bookDate;
 	private int reserved;
 	private String region;
@@ -531,6 +532,17 @@ public class Book implements Jsonable{
 	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
+	}
+	
+	public String getRestaurantName(){
+		if(this.restaurantName == null){
+			return "";
+		}
+		return this.restaurantName;
+	}
+
+	public void setRestaurantName(String name){
+		this.restaurantName = name;
 	}
 	
 	public int getReserved(){
@@ -709,6 +721,7 @@ public class Book implements Jsonable{
 		JsonMap jm = new JsonMap();
 		jm.putInt("id", this.id);
 		jm.putInt("restaurantId", this.restaurantId);
+		jm.putString("restaurantName", this.restaurantName);
 		jm.putString("bookDate", DateUtil.format(this.bookDate));
 		jm.putInt("reserved", this.reserved / 60);
 		jm.putString("region", this.region);
