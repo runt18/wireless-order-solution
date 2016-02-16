@@ -20,16 +20,33 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateDiscountAction extends DispatchAction{
 
+	/**
+	 * 会员注入和设置折扣
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward setDiscount(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		final int orderId = Integer.parseInt(request.getParameter("orderId"));
-		final int discountId = Integer.parseInt(request.getParameter("discountId") != null?request.getParameter("discountId"):"0");
-		String pricePlanId = request.getParameter("pricePlan");
-		String memberId = request.getParameter("memberId");
-		String pin = (String) request.getAttribute("pin");
+		final String discountId = request.getParameter("discountId");
+		final String pricePlanId = request.getParameter("pricePlan");
+		final String memberId = request.getParameter("memberId");
+		final String pin = (String) request.getAttribute("pin");
 		
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
+		
+		final int discount;
+		if(discountId != null && !discountId.isEmpty()){
+			discount = Integer.parseInt(discountId);
+		}else{
+			discount = 0;
+		}
+		
 		try {
 			final Order.DiscountBuilder builder;
 			if(memberId != null && !memberId.isEmpty()){
@@ -39,29 +56,26 @@ public class OperateDiscountAction extends DispatchAction{
 				}else{
 					pricePlan = 0;
 				}
-				
-				builder = Order.DiscountBuilder.build4Member(orderId, MemberDao.getById(staff, Integer.parseInt(memberId)), discountId, pricePlan);
+				builder = Order.DiscountBuilder.build4Member(orderId, MemberDao.getById(staff, Integer.parseInt(memberId)), discount, pricePlan);
 			}else{
-				builder = Order.DiscountBuilder.build4Normal(orderId, discountId);
+				builder = Order.DiscountBuilder.build4Normal(orderId, discount);
 			}
 			OrderDao.discount(staff, builder);
 		}catch(BusinessException e){
-			jobject.initTip(e);
+			jObject.initTip(e);
 			e.printStackTrace();
 			
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;
 	}
 	
-	public ActionForward insert(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");

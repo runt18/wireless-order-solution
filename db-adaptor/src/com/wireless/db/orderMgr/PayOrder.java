@@ -409,17 +409,6 @@ public class PayOrder {
 		final float cancelPrice = CalcCancelStatisticsDao.calcByCond(dbCon, staff, new CalcCancelStatisticsDao.ExtraCond(DateType.TODAY).setOrder(orderToCalc))[1];
 		//Calculate the repaid price to this order.
 		float repaidPrice = CalcRepaidStatisticsDao.calcByCond(dbCon, staff, new CalcRepaidStatisticsDao.ExtraCond(DateType.TODAY).setOrder(orderToCalc))[1];
-//		sql = " SELECT " + 
-//			  " ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2) AS repaid_price " +
-//			  " FROM " + Params.dbName + ".order_food OF" + 
-//			  " JOIN " + Params.dbName + ".taste_group TG ON OF.taste_group_id = TG.taste_group_id " +
-//			  " WHERE OF.is_paid = 1 AND OF.order_id = " + orderToCalc.getId();
-			
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
-//		if(dbCon.rs.next()){
-//			repaidPrice = dbCon.rs.getFloat("repaid_price");
-//		}
-//		dbCon.rs.close();
 		
 		//Calculate the total price.
 		final float totalPrice = orderToCalc.calcTotalPrice();			
