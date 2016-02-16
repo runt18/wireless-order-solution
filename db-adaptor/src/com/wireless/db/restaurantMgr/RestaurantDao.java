@@ -371,7 +371,7 @@ public class RestaurantDao {
 		}
 		
 		//Update the branches.
-		if(builder.isBranchChanged() && RestaurantDao.getById(dbCon, restaurant.getId()).getType() == Restaurant.Type.GROUP){
+		if(builder.isBranchChanged() && RestaurantDao.getById(dbCon, restaurant.getId()).getType() != Restaurant.Type.BRANCE){
 			//Update the branches to restaurant & delete from restaurant chain
 			sql = " UPDATE " + Params.dbName + ".restaurant SET type = " + Restaurant.Type.RESTAURANT.getVal() + " WHERE id IN ( " +
 					  " SELECT branch_id FROM " + Params.dbName + ".restaurant_chain WHERE group_id = " + restaurant.getId() + ")";
