@@ -488,49 +488,6 @@ public class CouponDao {
 			coupon.setMember(MemberDao.getById(dbCon, staff, coupon.getMember().getId()));
 			coupon.setPromotion(PromotionDao.getById(dbCon, staff, coupon.getPromotion().getId()));
 
-//			if(coupon.getStatus() == Coupon.Status.PUBLISHED && coupon.getPromotion().getStatus() == Promotion.Status.PROGRESS){
-//				if(coupon.getPromotion().getRule() == Promotion.Rule.TOTAL || coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
-//					String sql;
-//					sql = " SELECT delta_point, operate_date FROM " + Params.dbName + ".member_operation " +
-//						  " WHERE 1 = 1 " +
-//						  " AND member_id = " + coupon.getMember().getId() +
-//						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
-//						  " AND operate_date BETWEEN 'begin_operate_date' AND '" + coupon.getPromotion().getDateRange().getEndingFormat() + "'" +
-//						  " UNION " +
-//						  " SELECT delta_point, operate_date FROM " + Params.dbName + ".member_operation_history " +
-//						  " WHERE 1 = 1 " +
-//						  " AND member_id = " + coupon.getMember().getId() +
-//						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
-//						  " AND operate_date BETWEEN 'begin_operate_date' AND '" + coupon.getPromotion().getDateRange().getEndingFormat() + "'";
-//					
-//					if(coupon.getPromotion().getRule() == Promotion.Rule.ONCE){
-//						String sql4LastDraw;
-//						sql4LastDraw = " SELECT draw_date FROM " + Params.dbName + ".coupon WHERE 1 = 1 " + 
-//								  	   " AND promotion_id = " + coupon.getPromotion().getId() +
-//								  	   " AND member_id = " + coupon.getMember().getId() +
-//								  	   " AND status = " + Coupon.Status.DRAWN.getVal() +
-//								  	   " ORDER BY draw_date DESC LIMIT 1 ";
-//						dbCon.rs = dbCon.stmt.executeQuery(sql4LastDraw);
-//						if(dbCon.rs.next()){
-//							sql = sql.replaceAll("begin_operate_date", DateUtil.format(dbCon.rs.getTimestamp("draw_date").getTime(), DateUtil.Pattern.DATE_TIME));
-//						}else{
-//							sql = sql.replaceAll("begin_operate_date", coupon.getPromotion().getDateRange().getOpeningFormat());
-//						}
-//						dbCon.rs.close();
-//						sql = " SELECT MAX(delta_point) AS max_point FROM ( " + sql + " ) AS TMP ";
-//						
-//					}else if(coupon.getPromotion().getRule() == Promotion.Rule.TOTAL){
-//						sql = " SELECT SUM(delta_point) AS total_point FROM ( " + sql.replaceAll("begin_operate_date", coupon.getPromotion().getDateRange().getOpeningFormat()) + " ) AS TMP ";
-//					}
-//					
-//					dbCon.rs = dbCon.stmt.executeQuery(sql);
-//					if(dbCon.rs.next()){
-//						coupon.setDrawProgress(dbCon.rs.getInt(1));
-//					}
-//					dbCon.rs.close();				
-//				}
-//
-//			}
 			return coupon;
 		}
 	}
@@ -587,7 +544,7 @@ public class CouponDao {
 			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " +
 			  " WHERE 1 = 1 " +
 			  " AND C.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
-			  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()) : " ") +
+			  (extraCond != null ? extraCond.setRestaurant(staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) : " ") +
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		

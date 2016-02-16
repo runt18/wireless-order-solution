@@ -87,13 +87,13 @@ public class BookDao {
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
 			if(id != 0){
-				extraCond.append(" AND book_id = " + id);
+				extraCond.append(" AND B.book_id = " + id);
 			}
 			if(tele != null){
-				extraCond.append(" AND book_tele LIKE %" + tele + "%");
+				extraCond.append(" AND B.book_tele LIKE %" + tele + "%");
 			}
 			if(member != null){
-				extraCond.append(" AND book_member LIKE %" + member + "%");
+				extraCond.append(" AND B.book_member LIKE %" + member + "%");
 			}
 			StringBuilder status = new StringBuilder();
 			for(Book.Status s : statuses){
@@ -103,27 +103,27 @@ public class BookDao {
 				status.append(s.getVal());
 			}
 			if(status.length() != 0){
-				extraCond.append(" AND book_status IN ( " + status.toString() + ")");
+				extraCond.append(" AND B.book_status IN ( " + status.toString() + ")");
 			}
 			if(bookRange != null){
 				if(bookRange.getOnDuty() != 0){
-					extraCond.append(" AND book_date >= '" + bookRange.getOnDutyFormat() + "'");
+					extraCond.append(" AND B.book_date >= '" + bookRange.getOnDutyFormat() + "'");
 				}
 				if(bookRange.getOffDuty() != 0){
-					extraCond.append(" AND book_date <= '" + bookRange.getOffDutyFormat() + "'");
+					extraCond.append(" AND B.book_date <= '" + bookRange.getOffDutyFormat() + "'");
 				}
 			}
 			if(confirmRange != null){
 				if(confirmRange.getOnDuty() != 0){
-					extraCond.append(" AND book_confirm_date >= '" + confirmRange.getOnDutyFormat() + "'");
+					extraCond.append(" AND B.book_confirm_date >= '" + confirmRange.getOnDutyFormat() + "'");
 				}
 				if(confirmRange.getOffDuty() != 0){
-					extraCond.append(" AND book_confirm_date <= '" + confirmRange.getOffDutyFormat() + "'");
+					extraCond.append(" AND B.book_confirm_date <= '" + confirmRange.getOffDutyFormat() + "'");
 				}
 			}
 			if(tableId != 0){
 				String sql = " SELECT book_id FROM " + Params.dbName + ".book_table WHERE table_id = " + tableId;
-				extraCond.append(" AND book_id IN (" + sql + ")");
+				extraCond.append(" AND B.book_id IN (" + sql + ")");
 			}
 			return extraCond.toString();
 		}
@@ -589,8 +589,10 @@ public class BookDao {
 	 */
 	public static List<Book> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
-		sql = " SELECT * FROM " + Params.dbName + ".book WHERE 1 = 1 " +
-			  " AND restaurant_id = " + staff.getRestaurantId() +
+		sql = " SELECT B.*, R.restaurant_name FROM " + Params.dbName + ".book B " +
+			  " JOIN " + Params.dbName + ".restaurant R ON B.restaurant_id = R.id " +
+			  " WHERE 1 = 1 " +
+			  " AND B.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond.toString() : "") +
 			  " ORDER BY book_date ASC ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -598,6 +600,7 @@ public class BookDao {
 		while(dbCon.rs.next()){
 			Book book = new Book(dbCon.rs.getInt("book_id"));
 			book.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			book.setRestaurantName(dbCon.rs.getString("restaurant_name"));
 			book.setBookDate(dbCon.rs.getTimestamp("book_date").getTime());
 			book.setReserved(dbCon.rs.getInt("book_reserved"));
 			book.setRegion(dbCon.rs.getString("book_region"));

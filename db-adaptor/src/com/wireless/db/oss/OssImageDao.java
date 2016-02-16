@@ -504,7 +504,7 @@ public class OssImageDao {
     		  (extraCond != null ? extraCond.toString() : "");
     	dbCon.rs = dbCon.stmt.executeQuery(sql);
     	
-    	List<OssImage> result = new ArrayList<OssImage>();
+    	final List<OssImage> result = new ArrayList<OssImage>();
     	while(dbCon.rs.next()){
     		OssImage ossImage = new OssImage(dbCon.rs.getInt("oss_image_id"));
     		ossImage.setRestaurantId(dbCon.rs.getInt("restaurant_id"));

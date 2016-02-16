@@ -82,23 +82,23 @@ public class WxOrderDao {
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
 			if(id != 0){
-				extraCond.append(" AND wx_order_id = " + id);
+				extraCond.append(" AND WO.wx_order_id = " + id);
 			}
 			if(code != 0){
-				extraCond.append(" AND code = " + code);
+				extraCond.append(" AND WO.code = " + code);
 			}
 			if(orderId != 0){
-				extraCond.append(" AND order_id = " + orderId);
+				extraCond.append(" AND WO.order_id = " + orderId);
 			}
 			if(weixinSerial != null){
 				String sql = " SELECT member_id FROM " + Params.dbName + ".weixin_member WHERE weixin_serial = '" + weixinSerial + "' AND weixin_serial_crc = CRC32('" + weixinSerial + "')";
-				extraCond.append(" AND member_id IN (" + sql + ")");
+				extraCond.append(" AND WO.member_id IN (" + sql + ")");
 			}
 			if(type != null){
-				extraCond.append(" AND type = " + type.getVal());
+				extraCond.append(" AND WO.type = " + type.getVal());
 			}
 			if(memberId != 0){
-				extraCond.append(" AND member_id = " + memberId);
+				extraCond.append(" AND WO.member_id = " + memberId);
 			}
 			final StringBuilder statusCond = new StringBuilder();
 			for(WxOrder.Status s : status){
@@ -109,7 +109,7 @@ public class WxOrderDao {
 				}
 			}
 			if(statusCond.length() != 0){
-				extraCond.append(" AND status IN ( " + statusCond.toString() + ")");
+				extraCond.append(" AND WO.status IN ( " + statusCond.toString() + ")");
 			}
 			return extraCond.toString();
 		}
@@ -528,9 +528,10 @@ public class WxOrderDao {
 	 */
 	public static List<WxOrder> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
-		sql = " SELECT * FROM " + Params.dbName + ".weixin_order " +
+		sql = " SELECT WO.*, R.restaurant_name FROM " + Params.dbName + ".weixin_order WO " +
+			  " JOIN " + Params.dbName + ".restaurant R ON WO.restaurant_id = R.id " +
 			  " WHERE 1 = 1 " +
-			  " AND restaurant_id = " + staff.getRestaurantId() +
+			  " AND WO.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond.toString() : " ") +
 			  (orderClause != null ? orderClause : " ORDER BY birth_date DESC ");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -539,6 +540,7 @@ public class WxOrderDao {
 		while(dbCon.rs.next()){
 			WxOrder wxOrder = new WxOrder(dbCon.rs.getInt("wx_order_id"));
 			wxOrder.setRestaurant(dbCon.rs.getInt("restaurant_id"));
+			wxOrder.setRestaurantName(dbCon.rs.getString("restaurant_name"));
 			wxOrder.setStatus(WxOrder.Status.valueOf(dbCon.rs.getInt("status")));
 			wxOrder.setType(WxOrder.Type.valueOf(dbCon.rs.getInt("type")));
 			wxOrder.setComment(dbCon.rs.getString("comment"));

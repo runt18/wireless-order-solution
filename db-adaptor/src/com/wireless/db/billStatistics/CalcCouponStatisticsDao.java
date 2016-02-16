@@ -112,7 +112,7 @@ public class CalcCouponStatisticsDao {
 			  " FROM " + Params.dbName + ".coupon_operation CO " +
 			  " LEFT JOIN " + Params.dbName + ".coupon C ON CO.coupon_id = C.coupon_id " +
 			  " WHERE 1 = 1 " +
-			  " AND CO.restaurant_id = " + staff.getRestaurantId() +
+			  " AND CO.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond.toString() : "");
 		return sql;
 	}

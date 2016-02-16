@@ -9,6 +9,7 @@ import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.oss.OssImageDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.oss.OssImage;
@@ -321,7 +322,7 @@ public class CouponTypeDao {
 		}else{
 			CouponType type = result.get(0);
 			if(type.hasImage()){
-				type.setImage(OssImageDao.getById(dbCon, staff, type.getImage().getId()));
+				type.setImage(OssImageDao.getById(dbCon, staff.isBranch() ? StaffDao.getAdminByRestaurant(dbCon, staff.getGroupId()) : staff, type.getImage().getId()));
 			}
 			return type;
 		}
