@@ -56,8 +56,8 @@
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/WxOperateRestaurant"
-			type="com.wireless.Actions.weixin.operate.WxOperateRestaurantAction" scope="request"
-			parameter="dataSource">
+			type="com.wireless.Actions.weixin.operate.WxOperateRestaurantAction"
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/WXQueryInfo"
 			type="com.wireless.Actions.weixin.query.WXQueryInfoAction" scope="request"
@@ -74,10 +74,6 @@
 		<action path="/WxOperatePromotion"
 			type="com.wireless.Actions.weixin.query.WxOperatePromotionAction"
 			scope="request" parameter="dataSource">
-		</action>
-		<action path="/WxQueryOrder"
-			type="com.wireless.Actions.weixin.query.WxQueryOrderAction" scope="request"
-			parameter="dataSource">
 		</action>
 		<action path="/WxOperateCoupon"
 			type="com.wireless.Actions.weixin.query.WxOperateCouponAction" scope="request"
