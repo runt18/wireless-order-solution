@@ -76,15 +76,14 @@ public class OperateDiscountAction extends DispatchAction{
 	}
 	
 	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String discountName = request.getParameter("discountName");
+		final String rate = request.getParameter("rate");
+		final String isDefault = request.getParameter("isDefault");		
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
 			
-			String discountName = request.getParameter("discountName");
-			String rate = request.getParameter("rate");
-			String isDefault = request.getParameter("isDefault");
-			
-			Discount.InsertBuilder builder = new Discount.InsertBuilder(discountName)
+			final Discount.InsertBuilder builder = new Discount.InsertBuilder(discountName)
 												.setRate(Float.valueOf(rate));
 			
 			if(isDefault != null && !isDefault.isEmpty()){
@@ -93,74 +92,70 @@ public class OperateDiscountAction extends DispatchAction{
 			
 			DiscountDao.insert(StaffDao.verify(Integer.parseInt(pin)), builder);
 			
-			jobject.initTip(true,  "操作成功, 已添加新折扣方案!");
+			jObject.initTip(true,  "操作成功, 已添加新折扣方案!");
 			
 		}catch(BusinessException e){
-			jobject.initTip(e);
+			jObject.initTip(e);
 			e.printStackTrace();
 			
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}	
 	
-	public ActionForward update(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
+	public ActionForward update(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String discountId = request.getParameter("discountID");
+		final String discountName = request.getParameter("discountName");
+		final String isDefault = request.getParameter("isDefault");
+		final JObject jObject = new JObject();
 		
 		try{
-			String pin = (String)request.getAttribute("pin");
+			final Discount.UpdateBuilder builder = new Discount.UpdateBuilder(Integer.parseInt(discountId));
 			
-			String discountID = request.getParameter("discountID");
-			String discountName = request.getParameter("discountName");
-			String isDefault = request.getParameter("isDefault");
-			
-			Discount.UpdateBuilder builder = new Discount.UpdateBuilder(Integer.valueOf(discountID))
-													.setName(discountName.trim());
+			if(discountName != null && !discountName.trim().isEmpty()){
+				builder.setName(discountName.trim());
+			}
 			if(isDefault != null && !isDefault.isEmpty()){
 				builder.setDefault();
 			}
 			
 			DiscountDao.update(StaffDao.verify(Integer.parseInt(pin)), builder);
 			
-			jobject.initTip(true,  "操作成功, 已修改折扣方案!");
+			jObject.initTip(true,  "操作成功, 已修改折扣方案!");
 		}catch(BusinessException e){
-			jobject.initTip(e);
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;
 	}	
 	
-	public ActionForward delete(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
+	public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String) request.getAttribute("pin");
+		final String discountId = request.getParameter("discountID");
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String) request.getAttribute("pin");
-			String discountID = request.getParameter("discountID");
+			DiscountDao.delete(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(discountId));
 			
-			DiscountDao.delete(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(discountID));
-			
-			jobject.initTip(true, "操作成功, 已删除选中方案信息.");
+			jObject.initTip(true, "操作成功, 已删除选中方案信息.");
 			
 		}catch(BusinessException e){
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;
