@@ -1,4 +1,10 @@
 $(function(){
+	var branches = {
+		RESTAURANT : {val : 1, text : '餐厅'},
+		GROUP : {val : 2, text : '集团'},
+		BRANCE : {val : 3, text : '门店'}
+	}
+	
 	$.ajax({
 		url : '../../WxOperateRestaurant.do',
 		type : 'post',
@@ -8,7 +14,7 @@ $(function(){
 		},
 		dataType : 'json',
 		success : function(data){
-			if(data.root[0].branches){
+			if(data.root[0].typeVal == branches.GROUP.val){
 				console.log(data.root[0].branches); 
 				var branchesTemplet =  '<div class="main-box" data-value={breanchesId} data-type="braches_div_branches">'
 							+'<ul class="m-b-list">'
