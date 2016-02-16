@@ -351,7 +351,7 @@ public class WxOperateBookAction extends DispatchAction {
 			
 			//获取详细的order & orderFoods信息
 			for(int i = 0; i < result.size(); i++) {
-				result.set(i, BookDao.getById(staff, result.get(i).getId()));
+				result.set(i, BookDao.getById(StaffDao.getAdminByRestaurant(result.get(i).getRestaurantId()), result.get(i).getId()));
 			}
 			
 			jObject.setRoot(result);
