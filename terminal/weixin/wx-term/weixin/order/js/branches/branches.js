@@ -43,15 +43,14 @@ $(function(){
 				//各个门店的点击事件
 				$('#branches_div_branches').find('[data-type="braches_div_branches"]').each(function(index, element){
 					element.onclick = function(){
-//						Util.mp.params.redirecturl
-						console.log($(element).attr('data-value'));
-						Util.jump(Util.mp.params.redirecturl, $(element).attr('data-value'));
+						console.log(Util.mp.params.redirect_url);
+						Util.jump(Util.mp.params.redirect_url, $(element).attr('data-value'));
 //						Util.jump('book.html', $(element).attr('data-value'));
 					}
 				});
 				
 			}else{
-				Util.jump(Util.mp.params.redirecturl);
+				Util.jump(Util.mp.params.redirect_url);
 			}
 		}
 	});
