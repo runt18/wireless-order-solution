@@ -78,38 +78,52 @@ $(function(){
 				}
 				//除掉数组第一位的0
 				index.splice(0, 1);
+				if(index.length > 0){
+					for(var j = 0; j < index.length; j++){
+						partialregions = regions.slice(index[j]-3, index[j]);
+							 var li = '';
+							 var bookRegion= '';
+							 
+							 
+						 for(var i = 0; i < partialregions.length; i++){
+							 bookRegionTemplate = '<div style="width:30%;" data-type="bookRegions" data-value="' + partialregions[i].name + '" class="region_css_book" href="#">'
+												+'<ul class="m-b-list">'+ partialregions[i].name.slice(0, 4) +  '</ul>'
+												+'</div>'
+							bookRegion += bookRegionTemplate;
+					 		li = '<li class="box-horizontal">' + bookRegion +  '</li>';
+						}
+						 $('#ul4BooskRegion_ul_book').append(li);
+						 $('#ul4BooskRegion_ul_book').trigger('create').trigger('refresh');
+					 }
 				
-				for(var j = 0; j < index.length; j++){
-					partialregions = regions.slice(index[j]-3, index[j]);
+					if((regions.length - index[index.length-1]) > 0){
+						partialregions = regions.slice(index[index.length-1], regions.length);
 						 var li = '';
 						 var bookRegion= '';
-						 
-						 
-					 for(var i = 0; i < partialregions.length; i++){
-						 bookRegionTemplate = '<div style="width:30%;" data-type="bookRegions" data-value="' + partialregions[i].name + '" class="region_css_book" href="#">'
-											+'<ul class="m-b-list">'+ partialregions[i].name.slice(0, 4) +  '</ul>'
-											+'</div>'
-						bookRegion += bookRegionTemplate;
-				 		li = '<li class="box-horizontal">' + bookRegion +  '</li>';
+						 for(var i = 0; i < partialregions.length; i++){
+							 var bookRegionTemplate = '<div style="width:30%;" data-type="bookRegions" data-value="' + partialregions[i].name + '" class="region_css_book" href="#">'
+													+'<ul class="m-b-list">'+ partialregions[i].name.slice(0, 4) +  '</ul>'
+													+'</div>'
+							 bookRegion += bookRegionTemplate;
+							 li = '<li class="box-horizontal">' + bookRegion +  '</li>';
+						}
+						 $('#ul4BooskRegion_ul_book').append(li);
+						 $('#ul4BooskRegion_ul_book').trigger('create').trigger('refresh');
 					}
-					 $('#ul4BooskRegion_ul_book').append(li);
-					 $('#ul4BooskRegion_ul_book').trigger('create').trigger('refresh');
-				 }
-				
-				if((regions.length - index[index.length-1]) > 0){
-					partialregions = regions.slice(index[index.length-1], regions.length);
+				}else{
 					 var li = '';
 					 var bookRegion= '';
-					 for(var i = 0; i < partialregions.length; i++){
-						 var bookRegionTemplate = '<div style="width:30%;" data-type="bookRegions" data-value="' + partialregions[i].name + '" class="region_css_book" href="#">'
-												+'<ul class="m-b-list">'+ partialregions[i].name.slice(0, 4) +  '</ul>'
+					 for(var i = 0; i < regions.length; i++){
+						 var bookRegionTemplate = '<div style="width:30%;" data-type="bookRegions" data-value="' + regions[i].name + '" class="region_css_book" href="#">'
+												+'<ul class="m-b-list">'+ regions[i].name.slice(0, 4) +  '</ul>'
 												+'</div>'
 						 bookRegion += bookRegionTemplate;
 						 li = '<li class="box-horizontal">' + bookRegion +  '</li>';
 					}
-					 $('#ul4BooskRegion_ul_book').append(li);
-					 $('#ul4BooskRegion_ul_book').trigger('create').trigger('refresh');
+					$('#ul4BooskRegion_ul_book').append(li);
+					$('#ul4BooskRegion_ul_book').trigger('create').trigger('refresh');
 				}
+				
 				
 				//预订区域的点击事件
 				$('#ul4BooskRegion_ul_book').find('[data-type="bookRegions"]').each(function(index, element){

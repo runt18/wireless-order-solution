@@ -335,7 +335,7 @@ function PickFoodComponent(param){
 			success : function(data, status, xhr){
 				_foodData = data.root;
 				Util.lm.hide();
-				if(data.root.length > 0){
+				if(data.root && data.root.length > 0){
 					var foodHtml = [];
 					
 					var count = null;
@@ -372,9 +372,6 @@ function PickFoodComponent(param){
 					} 
 					
 					Util.getDom('foodList_div_fastOrderFood').insertAdjacentHTML('beforeBegin', foodHtml.join(''));
-					
-					
-					
 					
 					//多规格的点击事件
 					$('#foods_div_fastOrderFood').find('[data-type="eachFood_div_fastOrderFood"]').each(function(index, element){

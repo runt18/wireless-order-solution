@@ -44,10 +44,10 @@ $(function(){
 	Util.lbar('', function(html){ $(document.body).append(html);  });
 	//获取订单列表
 	$.ajax({
-		url : '../../WxQueryOrder.do',
+		url : '../../WxOperateOrder.do',
 		dataType : 'json',
 		data : {
-			dataSource : 'getByMember',
+			dataSource : 'getByCond',
 			oid : Util.mp.oid,
 			fid : Util.mp.fid
 		},
