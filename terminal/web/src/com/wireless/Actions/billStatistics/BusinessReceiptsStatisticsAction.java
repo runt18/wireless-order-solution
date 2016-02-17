@@ -21,6 +21,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.IncomeByPay;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
@@ -28,83 +29,48 @@ import com.wireless.util.DataPaging;
 
 public class BusinessReceiptsStatisticsAction extends DispatchAction {
 	
-	public ActionForward normal(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		String includingChart = request.getParameter("includingChart");
+	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String onDuty = request.getParameter("dateBegin");
+		final String offDuty = request.getParameter("dateEnd");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
+		final String isPaging = request.getParameter("isPaging");
+		final String region = request.getParameter("region");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String includingChart = request.getParameter("includingChart");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String onDuty = request.getParameter("dateBegin");
-			String offDuty = request.getParameter("dateEnd");
-			String opening = request.getParameter("opening");
-			String ending = request.getParameter("ending");
-			
 
-			
-			CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
+			final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
 			if(opening != null && !opening.isEmpty()){
 				HourRange hr = new HourRange(opening, ending, Pattern.HOUR);
 				extraCond.setHourRange(hr);
 			}
-
+			
+			if(region != null && !region.isEmpty()){
+				extraCond.setRegion(Region.RegionId.valueOf(Integer.parseInt(region)));
+			}
 			
 			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), extraCond));
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
 			if(incomesByEachDay.size() == 1 && incomesByEachDay.get(0).getIncomeByPay() == null){
-				jobject.setRoot(new ArrayList<Jsonable>(0));
+				jObject.setRoot(new ArrayList<Jsonable>(0));
 				
 			}else{
-/*				IncomeByEachDay total = new IncomeByEachDay(start);
-				IncomeByPay payTotal = new IncomeByPay();
-				IncomeByCancel cancelTotal = new IncomeByCancel();
-				IncomeByDiscount discountTotal = new IncomeByDiscount();
-				IncomeByErase eraseTotal = new IncomeByErase();
-				IncomeByGift giftTotal = new IncomeByGift();
-				IncomeByRepaid repaidTotal = new IncomeByRepaid();
-				IncomeByCoupon couponTotal = new IncomeByCoupon();
-				for (IncomeByEachDay eachDay : incomesByEachDay) {
-					payTotal.setCashActual(eachDay.getIncomeByPay().getCashActual() + payTotal.getCashActual());
-					payTotal.setCashAmount(eachDay.getIncomeByPay().getCashAmount() + payTotal.getCashAmount());
-					payTotal.setCreditCardActual(eachDay.getIncomeByPay().getCreditCardActual() + payTotal.getCreditCardActual());
-					payTotal.setCreditCardAmount(eachDay.getIncomeByPay().getCreditCardAmount() + payTotal.getCreditCardAmount());
-					payTotal.setHangActual(eachDay.getIncomeByPay().getHangActual() + payTotal.getHangActual());
-					payTotal.setHangAmount(eachDay.getIncomeByPay().getHangAmount() + payTotal.getHangAmount());
-					payTotal.setSignActual(eachDay.getIncomeByPay().getSignActual() + payTotal.getSignActual());
-					payTotal.setSignAmount(eachDay.getIncomeByPay().getSignAmount() + payTotal.getSignAmount());
-					payTotal.setMemberCardActual(eachDay.getIncomeByPay().getMemberCardActual() + payTotal.getMemberCardActual());
-					payTotal.setMemeberCardAmount(eachDay.getIncomeByPay().getMemberCardAmount() + payTotal.getMemberCardAmount());
-					cancelTotal.setTotalCancel(eachDay.getIncomeByCancel().getTotalCancel() + cancelTotal.getTotalCancel());
-					discountTotal.setTotalDiscount(eachDay.getIncomeByDiscount().getDiscountAmount() + discountTotal.getTotalDiscount());
-					eraseTotal.setErasePrice(eachDay.getIncomeByErase().getEraseAmount() + eraseTotal.getTotalErase());
-					giftTotal.setTotalGift(eachDay.getIncomeByGift().getGiftAmount() + giftTotal.getTotalGift());
-					repaidTotal.setTotalRepaid(eachDay.getIncomeByRepaid().getRepaidAmount() + repaidTotal.getTotalRepaid());
-					couponTotal.setTotalCoupon(eachDay.getIncomeByCoupon().getTotalCoupon() + couponTotal.getTotalCoupon());
-					couponTotal.setCouponAmount(eachDay.getIncomeByCoupon().getCouponAmount() + couponTotal.getCouponAmount());
-				}
 				
-				total.setIncomeByCancel(cancelTotal);
-				total.setIncomeByDiscount(discountTotal);
-				total.setIncomeByErase(eraseTotal);
-				total.setIncomeByGift(giftTotal);
-				total.setIncomeByPay(payTotal);
-				total.setIncomeByRepaid(repaidTotal);
-				total.setIncomeByCoupon(couponTotal);*/
-				
-				jobject.setTotalProperty(incomesByEachDay.size());
+				jObject.setTotalProperty(incomesByEachDay.size());
 				incomesByEachDay = DataPaging.getPagingData(incomesByEachDay, isPaging, start, limit);
 				
 //				incomesByEachDay.add(total);
-				jobject.setRoot(incomesByEachDay);
+				jObject.setRoot(incomesByEachDay);
 			}
 			if(includingChart != null && !includingChart.isEmpty()){
 				List<String> xAxis = new ArrayList<String>();
@@ -113,17 +79,17 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				float totalMoney = 0, totalCount = 0;
 				int count = 0;
 				for (IncomeByEachDay e : incomesByEachDay) {
-					xAxis.add("\'"+e.getDate()+"\'");
+					xAxis.add("\'" + e.getDate() + "\'");
 					data.add(e.getIncomeByPay().getTotalActual());
 					countList.add(e.getTotalAmount());
 					totalMoney += e.getIncomeByPay().getTotalActual();
 					totalCount += e.getTotalAmount();
-					count ++ ;
+					count++ ;
 				}
 				
 				final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/count)*100)/100 + ", \"avgCount\" : " + Math.round((totalCount/count)*100)/100 + 
 									",\"ser\":[{\"name\":\'营业额\', \"data\" : " + data + "},{\"name\":\'账单数\', \"data\":" + countList + "}]}";
-				jobject.setExtra(new Jsonable(){
+				jObject.setExtra(new Jsonable(){
 					@Override
 					public JsonMap toJsonMap(int flag) {
 						JsonMap jm = new JsonMap();
@@ -139,7 +105,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				});
 			}
 			
-			response.getWriter().print(jobject.toString(IncomeByPay.PAY_TYPE_FOR_STATISTICS));
+			response.getWriter().print(jObject.toString(IncomeByPay.PAY_TYPE_FOR_STATISTICS));
 		}
 		return null;
 	}
