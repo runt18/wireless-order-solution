@@ -161,12 +161,14 @@ public class OperateRestaurantAction extends DispatchAction {
 			}
 			
 			//连锁分店
-			if(branches != null && !branches.isEmpty()){
-				for(String branchId : branches.split(",")){
-					builder.addBranch(Integer.parseInt(branchId));
+			if(branches != null){
+				if(branches.isEmpty()){
+					builder.clearBranch();
+				}else{
+					for(String branchId : branches.split(",")){
+						builder.addBranch(Integer.parseInt(branchId));
+					}
 				}
-			}else{
-				builder.clearBranch();
 			}
 			
 			RestaurantDao.update(builder);
