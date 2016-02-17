@@ -1,9 +1,6 @@
 $(function(){
 	var bookDates = [];
 	
-	$(".bookTime").timepicki();
-	
-	
 	//加载会员信息
 	(function loadBookMember(){
 		$.post('../../WXOperateMember.do', {
@@ -156,27 +153,15 @@ $(function(){
 				date = bookDates[$(this).data('value')];
 			}
 		});
-		time = $('#bookTime_input_book').val();
-		if(time.indexOf('PM') > 0){
-			var hourString = time.substring(0, time.indexOf(':'));
-			var hour = parseInt(hourString) + 12;
-			var minute = time.substr(time.indexOf(':') + 1, 2);
-			time = hour + ":" + minute + ':' + "59";
-		}else if(time.indexOf('AM') > 0){
-			var hour = time.substring(0, time.indexOf(':'));
-			var minute = time.substr(time.indexOf(':')+1, 2);	
-			time = hour + ":" + minute + ':' + "59";
-		}else{
-			var dialog = new DialogPopup({
-					content : '请选择时间',
-					titleText : '温馨提示',
-					left : function(){
-						dialog.close();
-					}
-				})
-			dialog.open();
-			return;
-		}
+
+		
+		//预订时间
+		$('#selectBookTime_ul_book').find('[data-type="time"]').each(function(index, element){
+			if($(element).hasClass('selectedRegion_css_book')){
+				time = $(element).attr('data-value') + ':' + "00";
+			}
+		});
+		
 		
 		//预订区域
 		$('#ul4BooskRegion_ul_book').find('[data-type="bookRegions"]').each(function(index, element){
@@ -300,7 +285,7 @@ $(function(){
 								titleText : '温馨提示',
 								left : function(){
 									dialog.close(function(){
-										Util.jump('orderList.html?book=1');
+										Util.jump('orderList.html?book=1', typeof Util.mp.extra != 'undefined' ? Util.mp.extra : '');
 									}, 200);
 								}
 							})
@@ -323,7 +308,7 @@ $(function(){
 						titleText : '温馨提示',
 						left : function(){
 							dialog.close(function(){
-								Util.jump('orderList.html?book=1');
+								Util.jump('orderList.html?book=1', typeof Util.mp.extra != 'undefined' ? Util.mp.extra : '');
 							}, 200);
 						}
 					})
@@ -355,6 +340,18 @@ $(function(){
 				});
 		}
 	}
+	
+	//选择预订时间的点击事件
+	$('#selectBookTime_ul_book').find('[data-type="time"]').each(function(index, element){
+		element.onclick = function(){
+			if($(element).hasClass('selectedRegion_css_book')){
+				$(element).addClass('selectedRegion_css_book');
+			}else{
+				$('#selectBookTime_ul_book').find('[data-type="time"]').removeClass('selectedRegion_css_book');
+				$(element).addClass('selectedRegion_css_book');
+			}
+		}
+	});
 	
 	//预订人数的点击事件
 	$('#bookPersonAmoung_div_book').find('[data-type="personAmount"]').each(function(index, element){

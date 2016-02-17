@@ -416,6 +416,6 @@ $(function(){
 	  
 	  
 	  $('#foodOrderList').click(function(){
-		  Util.jump('orderList.html');
+		  Util.jump('orderList.html', typeof Util.mp.extra != 'undefined' ? Util.mp.extra : '');
 	  });
 });

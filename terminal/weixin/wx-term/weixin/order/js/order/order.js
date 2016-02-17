@@ -10,8 +10,9 @@ $(function(){
 	var Template = {
 		
 		inside: '<div class="box-order {orderBorder}">' +
+					'<div ><span style="font-weight: bold;font-size:20px;">餐厅名称: {restaurantName}</div>' +
 					'<div class="{orderClass}"><div style="height: 20px;">' +
-							'<div style="float: left;">订单号:{code}</div>' +
+							'<div style="float: left;font-size:16px;">订单号:{code}</div>' +
 							'<div style="float: right;color:#26a9d0;">{status}</div>' +
 					'</div></div>' +
 					'<div>点单日期: <span style="font-weight: bold">{orderDate}</span></div>' +
@@ -22,8 +23,9 @@ $(function(){
 					'<div {display}>菜名: <span style="font-weight: bold;">{foods}</span></div>' +
 				'</div>',
 		book : '<div class="box-order orderBorder_commit">'	+
+					'<div ><span style="font-weight: bold;font-size:20px;">餐厅名称: {restaurantName}</div>' +
 					'<div class="box-order-commit"><div style="height: 20px;">' +
-						'<div style="float: left;">预订单号:{code}</div>' +
+						'<div style="float: left;font-size:16px;">预订单号:{code}</div>' +
 						'<div style="float: right;color:#26a9d0;">{status}</div>' +
 					'</div></div>' +
 					'<div>预定日期: <span style="font-weight: bold">{orderDate}</div>' +
@@ -63,6 +65,7 @@ $(function(){
 					foods += temp.foods[j].foodName;
 				}
 				html.push(Template.inside.format({
+					restaurantName : temp.restaurantName,
 					code : temp.code,
 					status : temp.statusDesc,
 					orderDate : temp.date,
@@ -116,6 +119,7 @@ $(function(){
 				}
 				
 				html.push(Template.book.format({
+					restaurantName : bookInfo.restaurantName,
 					code : bookInfo.id,
 					status : bookInfo.statusDesc,
 					orderDate : bookInfo.bookDate,
@@ -165,7 +169,7 @@ $(function(){
 								titleText : '温馨提示',
 								left : function(){
 									dialog.close(function(){
-										Util.jump('orderList.html?book=2');
+										Util.jump('orderList.html?book=2', typeof Util.mp.extra != 'undefined' ? Util.mp.extra : '');
 									}, 200);
 								}
 							})

@@ -56,15 +56,29 @@
 	</div>
 </div>
 
-<div align="center">
-	<input id="bookTime_input_book" type="button" name="time" value="点击我选择时间！" class="bookTime" />
+<!-- 选择时间 -->
+<div class="main-box" style="">
+	<ul class="m-b-list" id="selectBookTime_ul_book">
+		<li  style="line-height:40px;">选择预订时间</li>
+		<li class="box-horizontal" style="line-height: 40px;margin-left:-10px;font-size:18px;">
+			<div data-type="time" data-value="7:00" class="region_css_book" style="width:31%;" href="#">
+				<ul class="m-b-list">早(7:00)</ul>
+			</div>
+			
+			<div data-type="time" data-value="12:00" class="region_css_book" style="width:31%;" href="#">
+				<ul class="m-b-list">午(12:00)</ul>
+			</div>
+			
+			<div data-type="time" data-value="9:00" class="region_css_book selectedRegion_css_book" style="width:31%;" href>
+				<ul class="m-b-list">晚(19:00)</ul>
+			</div>
+		</li>
+	</ul>
 </div>
 
 <div class="main-box" style="">
 	<ul class="m-b-list" id="ul4BooskRegion_ul_book">
 		<li style="line-height: 40px;">选择区域</li>
-		
-		
 	</ul>	
 </div>
 

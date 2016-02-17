@@ -50,7 +50,7 @@ $(function(){
 				$('#branches_div_branches').find('[data-type="braches_div_branches"]').each(function(index, element){
 					element.onclick = function(){
 						console.log(Util.mp.params.redirect_url);
-						Util.jump(Util.mp.params.redirect_url, $(element).attr('data-value'));
+						Util.jump(Util.mp.params.redirect_ur, $(element).attr('data-value'));
 //						Util.jump('book.html', $(element).attr('data-value'));
 					}
 				});

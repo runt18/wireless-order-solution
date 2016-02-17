@@ -499,7 +499,7 @@ $(function(){
 	
 	 //自助点餐
 	  $('#pickOrderFood_a_member').click(function(){
-		  Util.jump('food.html');
+		  Util.jump('food.html', typeof Util.mp.extra != 'undefined' ? Util.mp.extra : '');
 	  });
 	
 });

@@ -9,7 +9,7 @@
 				</a>
 			</li>
 			<li class="order swiper-slide">
-				<a href="javascript:Util.jump('food.html');" title="自助点餐">
+				<a id="selfOrderFood_a_mbar" href="#" title="自助点餐">
 				<i class="foundicon-website fcolor5"></i>自助点餐
 				</a>
 			</li>
@@ -55,4 +55,8 @@ for(var i = 0;i < li.length; i++){
 	li[i].style.width = tw + 'px';
 }
 
+
+$('#selfOrderFood_a_mbar').click(function(){
+	javascript:Util.jump('food.html', Util.mp.extra);
+})
 </script>
