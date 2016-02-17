@@ -31,7 +31,7 @@ import com.wireless.pojo.staffMgr.Staff;
 public class QueryMemberTypeAction extends DispatchAction {
 	
 	/**
-	 * 
+	 * 获取会员类型
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -42,6 +42,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		final String pin = (String)request.getAttribute("pin");
+		final String memberTypeId = request.getParameter("memberTypeId");
 		final String branchId = request.getParameter("branchId");
 		final String name = request.getParameter("name");
 		final String attr = request.getParameter("attr");
@@ -58,6 +59,11 @@ public class QueryMemberTypeAction extends DispatchAction {
 			}
 			
 			final MemberTypeDao.ExtraCond extraCond = new MemberTypeDao.ExtraCond();
+			
+			if(memberTypeId != null && !memberTypeId.isEmpty()){
+				extraCond.setId(Integer.parseInt(memberTypeId));
+			}
+			
 			if(name != null && !name.trim().isEmpty()){
 				extraCond.setName(name);
 			}
