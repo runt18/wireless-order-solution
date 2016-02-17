@@ -1,6 +1,32 @@
 $(function(){
-	
-	
+ 	if(Util.mp.extra){
+		$.ajax({
+			url : '../../WxOperateRestaurant.do',
+			dataType : 'json',
+			type : 'post',
+			data : {
+				dataSource : 'detail',
+				branchId : Util.mp.extra
+			},
+			success : function(data, status, xhr){
+				document.title = data.root[0].name; 
+			}
+		});
+	}else{
+		$.ajax({
+			url : '../../WxOperateRestaurant.do',
+			dataType : 'json',
+			type : 'post',
+			data : {
+				dataSource : 'detail',
+				fid : Util.mp.fid
+			},
+			success : function(data, status, xhr){
+				document.title = data.root[0].name; 
+			}
+		});
+	}
+	 
 	$.ajax({
 		url : '../../WxInterface.do',
 		dataType : 'json',

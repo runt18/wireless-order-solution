@@ -1,6 +1,34 @@
 $(function(){
 	var bookDates = [];
 	
+	if(Util.mp.extra){
+		$.ajax({
+			url : '../../WxOperateRestaurant.do',
+			dataType : 'json',
+			type : 'post',
+			data : {
+				dataSource : 'detail',
+				branchId : Util.mp.extra
+			},
+			success : function(data, status, xhr){
+				document.title = data.root[0].name; 
+			}
+		});
+	}else{
+		$.ajax({
+			url : '../../WxOperateRestaurant.do',
+			dataType : 'json',
+			type : 'post',
+			data : {
+				dataSource : 'detail',
+				fid : Util.mp.fid
+			},
+			success : function(data, status, xhr){
+				document.title = data.root[0].name; 
+			}
+		});
+	}
+	
 	//加载会员信息
 	(function loadBookMember(){
 		$.post('../../WXOperateMember.do', {

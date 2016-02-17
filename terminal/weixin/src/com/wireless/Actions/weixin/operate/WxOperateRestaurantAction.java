@@ -69,10 +69,17 @@ public class WxOperateRestaurantAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward detail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
 		final String fid = request.getParameter("fid");
+		final String branchId = request.getParameter("branchId");
 		final JObject jObject = new JObject();
 		try{
-			final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			final int restaurantId;
+			if(branchId != null && !branchId.isEmpty()){
+				restaurantId = Integer.parseInt(branchId);
+			}else{
+				restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}
 			
 			jObject.setRoot(RestaurantDao.getById(restaurantId));
 			
