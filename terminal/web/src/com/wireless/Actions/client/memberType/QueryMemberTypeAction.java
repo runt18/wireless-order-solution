@@ -39,31 +39,25 @@ public class QueryMemberTypeAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward normal(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String name = request.getParameter("name");
+		final String attr = request.getParameter("attr");
+		final String type = request.getParameter("type");
 		
-		JObject jobject = new JObject();
-		List<MemberType> list = new ArrayList<MemberType>();
+		final JObject jObject = new JObject();
 		
 		try{
 			
-			String pin = (String)request.getAttribute("pin");
-			String rid = request.getParameter("rid");
-			Staff staff;
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			if(pin != null){
-				staff = StaffDao.verify(Integer.parseInt(pin));
-			}else{
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 			}
 			
-			String name = request.getParameter("name");
-			String attr = request.getParameter("attr");
-			String type = request.getParameter("type");
-			
-			MemberTypeDao.ExtraCond extraCond = new MemberTypeDao.ExtraCond();
+			final MemberTypeDao.ExtraCond extraCond = new MemberTypeDao.ExtraCond();
 			if(name != null && !name.trim().isEmpty()){
 				extraCond.setName(name);
 			}
@@ -75,20 +69,21 @@ public class QueryMemberTypeAction extends DispatchAction {
 				extraCond.setType(MemberType.Type.valueOf(type));
 			}
 			
-			list = MemberTypeDao.getByCond(staff, extraCond, " ORDER BY MT.member_type_id ");
+			final List<MemberType> result = MemberTypeDao.getByCond(staff, extraCond, " ORDER BY MT.member_type_id ");
+			
+			jObject.setTotalProperty(result.size());
+			jObject.setRoot(result);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
-		}finally{
-			jobject.setTotalProperty(list.size());
-			jobject.setRoot(list);
+			jObject.initTip4Exception(e);
 			
-			response.getWriter().print(jobject.toString());
+		}finally{
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -102,22 +97,16 @@ public class QueryMemberTypeAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward tree(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward tree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		final String pin = (String)request.getAttribute("pin");
+		final StringBuilder typeNode = new StringBuilder();
 		
-		StringBuilder typeNode = new StringBuilder();
 		try{
-			String pin = (String)request.getAttribute("pin");
-//			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			List<MemberType> list = MemberTypeDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), null, " ORDER BY MT.member_type_id ");
-//			List<MemberLevel> levelList = MemberLevelDao.getMemberLevels(staff);
-//			List<Member> interestedMembers = MemberDao.getInterestedMember(staff, null);
-			MemberType item = null;
+			final List<MemberType> list = MemberTypeDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), null, " ORDER BY MT.member_type_id ");
 			
 			for(int i = 0; i < list.size(); i++){
-				item = list.get(i);
+				MemberType item = list.get(i);
 				if(i > 0){
 					typeNode.append(",");
 				}
@@ -139,71 +128,6 @@ public class QueryMemberTypeAction extends DispatchAction {
 				.append("}");				
 			}
 			
-			
-/*			
-			typeNode.append("{")
-					.append("text:'会员类型'")
-					.append(", MemberTypeId : -1")
-					.append(",expanded:true")
-					.append(",children:[");
-			StringBuilder change = new StringBuilder(), point = new StringBuilder(), interested = new StringBuilder();
-			change.append("{")
-				  .append("text:'充值属性'")
-				  .append(",attr:"+MemberType.Attribute.CHARGE.getVal())
-				  .append(",children:[");
-			point.append("{")
-				 .append("text:'积分属性'")
-				 .append(",attr:"+MemberType.Attribute.POINT.getVal())
-				 .append(",expanded:true")
-				 .append(",children:[");
-			boolean hc = false, hp = false;
-			for(int i = 0; i < list.size(); i++){
-				item = list.get(i);
-				if(item.getAttribute() == MemberType.Attribute.CHARGE){
-					change.append(hc ? "," : "");
-					children(item, change);
-					if(!hc){hc = true;}
-				}else if(item.getAttribute() == MemberType.Attribute.POINT){
-					point.append(hp ? "," : "");
-					children(item, point);
-					if(!hp){hp = true;}
-				}
-			}
-			change.append("]}");
-			point.append("]}");
-
-			
-			typeNode.append(change).append(",").append(point).append("]");
-			typeNode.append("}");
-			tsb.append("[").append(typeNode);
-			if(!levelList.isEmpty()){
-				levelNode.append("{")
-				 .append("text:'会员级别'")
-				 .append(",children:[");
-				for (int i = 0; i < levelList.size(); i++) {
-					if(i > 0){
-						levelNode.append(",");
-					}
-					levelNode.append("{")
-							.append("text:'" + levelList.get(i).getMemberType().getName() + "  (Lv"+ (i+1) +", "+ levelList.get(i).getPointThreshold() +"分)'")
-							.append(",leaf:true")
-							.append(",memberTypeId:" + levelList.get(i).getMemberType().getId())
-							.append(",memberTypeName:'" + levelList.get(i).getMemberType().getName() + "'")
-							.append("}");
-				}
-				levelNode.append("]}");
-				tsb.append(",").append(levelNode);
-			}
-			if(!interestedMembers.isEmpty()){
-				interested.append("{")
-				 .append("text:'关注的会员'")
-				 .append(",attr:"+MemberType.Attribute.INTERESTED.getVal())
-				 .append(",leaf:true")
-				 .append("}");
-				tsb.append(",").append(interested);
-			}
-			tsb.append("]");*/
-			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
@@ -211,24 +135,6 @@ public class QueryMemberTypeAction extends DispatchAction {
 		}
 		return null;
 	}
-	
-//	private StringBuilder children(MemberType item, StringBuilder sb){
-//		sb.append("{")
-//			.append("text:'" + item.getName() + "'")
-//			.append(",leaf:true")
-//			.append(",memberTypeId:" + item.getId())
-//			.append(",memberTypeName:'" + item.getName() + "'")
-//			.append(",type:" + item.getType().getVal())
-//			.append(",chargeRate:" + item.getChargeRate())
-//			.append(",exchangeRate:" + item.getExchangeRate())
-//			.append(",initialPoint:" + item.getInitialPoint())
-//			.append(",attributeValue:" + item.getAttribute().getVal())
-//			.append(",desc:'" + item.getDesc() + "'")
-//			.append(",discount:" + item.getDefaultDiscount().getId() )
-////			.append(",discounts:" + item.getDiscounts())
-//			.append("}");
-//		return sb;
-//	}
 	
 	private StringBuilder children(List<Discount> items){
 		StringBuilder sb = new StringBuilder();
@@ -260,9 +166,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 
 	}		
 	
-	public ActionForward notBelongType(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward notBelongType(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pin = (String) request.getAttribute("pin");
 		JObject jobject = new JObject();
 		try{
