@@ -180,7 +180,7 @@ function repaid_initNorthPanel(){
 						sm : new Ext.grid.CheckboxSelectionModel(),
 						viewConfig : {
 							forceFit : true
-						},
+						}
 					});
 					
 					var win = new Ext.Window({
