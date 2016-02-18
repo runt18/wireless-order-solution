@@ -266,7 +266,7 @@ $(function(){
 						var dialogOrder = new DialogPopup({
 							titleText : '温馨提示',
 							leftText : '自助扫码',
-							content : '<font style="font-weight:bold;font-size:25px;color:blue;">订单号: ' + data.other.code + '</font><br><font style="color:green;">1.您可呼叫服务员来确认订单</font><br><font style="color:green;">2.您可选择自助扫描二维码下单</font>',
+							content : '<font style="font-weight:bold;font-size:25px;color:blue;">订单号: ' + data.other.code + '</font><br><font style="color:green;">1.您可呼叫服务员来确认订单</font><br><font style="color:green;">2.您可选择扫描桌上二维码下单</font>',
 							left : function(){	
 								wx.scanQRCode({ 
 								    needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
