@@ -32,7 +32,7 @@ import com.wireless.pojo.util.DateUtil;
 public class BusinessStatisticsAction extends DispatchAction {
 	
 	/**
-	 * history
+	 * 营业统计
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -42,25 +42,32 @@ public class BusinessStatisticsAction extends DispatchAction {
 	 */
 	public ActionForward history(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		JObject jObject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		
+		final String onDuty = request.getParameter("onDuty");
+		final String offDuty = request.getParameter("offDuty");
+		
+		final String dutyRange = request.getParameter("dutyRange");
+		
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
+		
+		final String region = request.getParameter("region");
+		
+		final String chart = request.getParameter("chart");
+		
+		final String branchId = request.getParameter("branchId");
+		
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String onDuty = request.getParameter("onDuty");
-			String offDuty = request.getParameter("offDuty");
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			String dutyRange = request.getParameter("dutyRange");
-			
-			String opening = request.getParameter("opening");
-			String ending = request.getParameter("ending");
-			
-			String region = request.getParameter("region");
-			
-			final String chart = request.getParameter("chart");
-			
-			CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY); 
+			final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY); 
 			
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
