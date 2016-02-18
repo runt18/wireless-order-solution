@@ -311,7 +311,7 @@ public class WxOperateBookAction extends DispatchAction {
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			final BookDao.ExtraCond extraCond = new BookDao.ExtraCond();
 			
-			//只显示当前的预订订单
+			//只显示当月的预订订单
 			SimpleDateFormat yyyymmdd = new SimpleDateFormat("yyyy-MM-dd");
 			String begin = yyyymmdd.format(new Date());
 			Calendar c = Calendar.getInstance();

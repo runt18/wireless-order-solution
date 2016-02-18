@@ -9,9 +9,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +33,7 @@ import org.marker.weixin.session.WxSession;
 import org.xml.sax.SAXException;
 
 import com.alibaba.fastjson.JSON;
+import com.wireless.db.book.BookDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.promotion.PromotionDao;
@@ -41,6 +45,8 @@ import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.promotion.Promotion;
@@ -407,21 +413,44 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					}
 						
 				}else if(msg.getEventKey().equals(EventKey.ORDER_EVENT_KEY.val)){
-					int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+					final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 					
-					Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
+					final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 					
-					List<WxOrder> orders = WxOrderDao.getByCond(staff, new WxOrderDao.ExtraCond().setWeixin(msg.getFromUserName()).addStatus(WxOrder.Status.COMMITTED), " ORDER BY birth_date DESC");
+					final List<WxOrder> orders = WxOrderDao.getByCond(staff, new WxOrderDao.ExtraCond().setWeixin(msg.getFromUserName()).addStatus(WxOrder.Status.COMMITTED), " ORDER BY birth_date DESC");
 					
-					String title, description = "";
+					//只显示当月的预订订单
+					final BookDao.ExtraCond extraCond = new BookDao.ExtraCond();
+					SimpleDateFormat yyyymmdd = new SimpleDateFormat("yyyy-MM-dd");
+					String begin = yyyymmdd.format(new Date());
+					Calendar c = Calendar.getInstance();
+					c.add(Calendar.MONTH, 1);
+					String end = yyyymmdd.format(c.getTime());
 					
-					if(!orders.isEmpty()){
-						title = "您的最新订单号是: " + orders.get(0).getCode(); 
-						description = "点击查看所有订单";
-						session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title, description, "", createUrl(msg, WEIXIN_ORDER))));
-					}else{
+					extraCond.setBookRange(new DutyRange(begin, end));
+					
+					//只显示【创建】状态的预订订单
+					extraCond.addStatus(Book.Status.CREATED);
+					final List<Book> books = BookDao.getByCond(staff, extraCond);
+					
+					final StringBuilder title = new StringBuilder();
+					String description = "";
+					
+					if(orders.isEmpty() && books.isEmpty()){
 						description = "点击去自助点餐";
 						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("暂无订单", description, "", createUrl(msg, WEIXIN_FOOD))));
+					}else{
+						title.append("您有");
+						if(!orders.isEmpty()){
+							title.append("微信订单" + orders.size() + "张");
+						}
+						if(!books.isEmpty()){
+							if(title.length() > 0){
+								title.append(",");
+							}
+							title.append("微信预订" + books.size() + "张");
+						}
+						session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title.toString(), description, "", createUrl(msg, WEIXIN_ORDER))));
 					}
 					
 				}else if(msg.getEventKey().equals(EventKey.SCAN_EVENT_KEY.val)){
