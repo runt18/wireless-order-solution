@@ -10,7 +10,7 @@ $(function(){
 	var Template = {
 		
 		inside: '<div class="box-order {orderBorder}">' +
-					'<div ><span style="font-weight: bold;font-size:20px;">餐厅名称: {restaurantName}</div>' +
+					'<div ><span style="font-weight: bold;font-size:20px;color:green;">{restaurantName}</div>' +
 					'<div class="{orderClass}"><div style="height: 20px;">' +
 							'<div style="float: left;font-size:16px;">订单号:{code}</div>' +
 							'<div style="float: right;color:#26a9d0;">{status}</div>' +
@@ -23,7 +23,7 @@ $(function(){
 					'<div {display}>菜名: <span style="font-weight: bold;">{foods}</span></div>' +
 				'</div>',
 		book : '<div class="box-order orderBorder_commit">'	+
-					'<div ><span style="font-weight: bold;font-size:20px;">餐厅名称: {restaurantName}</div>' +
+					'<div ><span style="font-weight: bold;font-size:20px;color:green;">{restaurantName}</div>' +
 					'<div class="box-order-commit"><div style="height: 20px;">' +
 						'<div style="float: left;font-size:16px;">预订单号:{code}</div>' +
 						'<div style="float: right;color:#26a9d0;">{status}</div>' +

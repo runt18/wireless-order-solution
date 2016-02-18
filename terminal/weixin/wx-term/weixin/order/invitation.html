@@ -63,40 +63,28 @@ body,html{
 			$("#invitationPeople").html(bookData.member);
 			$("#invitationRestPhone").html(data.other.rest.tele1);
 			$("#invitationRestAddress").html(data.other.rest.address);
-			$("#invitationRestQrcode").attr("src", data.other.wxRest.qrCodeUrl);
+			$("#invitationRestQrcode").attr("src", "http://qr.liantu.com/api.php?text=" + data.other.wxRest.qrCode);
 		}
 	});
 	
 </script>
 </head>
 <body>
-
-<div style="background-color: #ef4437;position: absolute;">
-	<img alt="" src="images/invitation-top.png" style="width: 100%">
-	<div class="invitationContent">
-		<p>尊敬的朋友们:</p>
-		<p>&emsp;兹定于 <font id="invitationDate">2015-08-23 11:30</font> 在  <font id="invitationRest">西柠</font> 邀请您举杯共聚。</p>
-		<p>&emsp;恭请光临！</p>
-		<p style="float: right;">邀请人: <font id="invitationPeople">X生</font></p>
-		<br><br><br>
-		<p>餐厅电话: <font id="invitationRestPhone">00000000</font></p>
-		<p>餐厅地址: <font id="invitationRestAddress">广州市天河区东圃镇黄村福元路晨晖商务大厦A301</font></p>
-		<p>如需一键导航请通过下面二维码关注本餐厅</p>
-	</div>	
-	<div class="invitationCode">
-		<img id="invitationRestQrcode" alt="" src="images/shopcode.png" height="150">
+	<div style="background-color: #ef4437;position: absolute;">
+		<img alt="" src="images/invitation-top.png" style="width: 100%">
+		<div class="invitationContent">
+			<p>尊敬的朋友们:</p>
+			<p>&emsp;兹定于 <font id="invitationDate">2015-08-23 11:30</font> 在  <font id="invitationRest">西柠</font> 邀请您举杯共聚。</p>
+			<p>&emsp;恭请光临！</p>
+			<p style="float: right;">邀请人: <font id="invitationPeople">X生</font></p>
+			<br><br><br>
+			<p>餐厅电话: <font id="invitationRestPhone">00000000</font></p>
+			<p>餐厅地址: <font id="invitationRestAddress">广州市天河区东圃镇黄村福元路晨晖商务大厦A301</font></p>
+			<p>如需一键导航请通过下面二维码关注本餐厅</p>
+		</div>	
+		<div class="invitationCode">
+			<img id="invitationRestQrcode" alt="" src="images/shopcode.png" height="150">
+		</div>
 	</div>
-</div>
-
-<!-- <div class="ddb-nav-footer ng-scope">
-    <a class="nav-item" >
-        <i class="foundicon-page fcolor6"></i>
-        门店介绍
-    </a>
-    <a class="nav-item">
-        <i class="foundicon-home fcolor6"></i>
-        如何到店
-    </a>
-</div> -->
 </body>
 </html>
