@@ -21,10 +21,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
-import com.wireless.pojo.billStatistics.cancel.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByEachDay;
-import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason;
-import com.wireless.pojo.billStatistics.cancel.CancelIncomeByStaff;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Food;
@@ -39,6 +36,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		final String limit = request.getParameter("limit");
 		final String start = request.getParameter("start");
 		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
 		final String beginDate = request.getParameter("dateBeg");
 		final String endDate = request.getParameter("dateEnd");
 		final String deptId = request.getParameter("deptID");
@@ -59,7 +57,10 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				return null;
 			}
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 
 			final OrderFoodDao.ExtraCond4CancelFood extraCond = new OrderFoodDao.ExtraCond4CancelFood(DateType.HISTORY);
 			final CalcCancelStatisticsDao.ExtraCond extraCond4Total = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
@@ -126,34 +127,40 @@ public class QueryCancelledFoodAction extends DispatchAction{
 	}
 	
 	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String deptID = request.getParameter("deptID");
-		String reasonID = request.getParameter("reasonID");
-		String staffID = request.getParameter("staffID");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String deptId = request.getParameter("deptID");
+		final String reasonId = request.getParameter("reasonID");
+		final String staffId = request.getParameter("staffID");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
-			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
-				extraCond.setReasonId(Integer.valueOf(reasonID));
+			final CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(reasonId != null && !reasonId.isEmpty() && !reasonId.equals("-1")){
+				extraCond.setReasonId(Integer.valueOf(reasonId));
 			}
-			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
-			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
-				extraCond.setStaffId(Integer.valueOf(staffID));
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<CancelIncomeByEachDay> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
+			List<CancelIncomeByEachDay> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByEachDay(staff, new DutyRange(dateBeg, dateEnd), extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
@@ -173,7 +180,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			
 			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/cancelList.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/cancelList.size())*100)/100 +
 					",\"ser\":[{\"name\":\'退菜金额\', \"data\" : " + data + "},{\"name\":\'退菜数量\', \"data\" : " + amountData + "}]}";
-			jobject.setExtra(new Jsonable(){
+			jObject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
@@ -190,149 +197,159 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
 	}
 	
 	public ActionForward getReasonChart(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String deptID = request.getParameter("deptID");
-		String reasonID = request.getParameter("reasonID");
-		String staffID = request.getParameter("staffID");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String deptId = request.getParameter("deptID");
+		final String reasonId = request.getParameter("reasonID");
+		final String staffId = request.getParameter("staffID");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
 			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
 			
-			if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
-				extraCond.setReasonId(Integer.valueOf(reasonID));
+			if(reasonId != null && !reasonId.isEmpty() && !reasonId.equals("-1")){
+				extraCond.setReasonId(Integer.valueOf(reasonId));
 			}
-			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
-			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
-				extraCond.setStaffId(Integer.valueOf(staffID));
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<CancelIncomeByReason> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByReason(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
-			
-			jobject.setRoot(cancelList);
+			jObject.setRoot(CalcCancelStatisticsDao.calcCancelIncomeByReason(staff, new DutyRange(dateBeg, dateEnd), extraCond));
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
 	}
 	
 	public ActionForward getStaffChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String deptID = request.getParameter("deptID");
-		String reasonID = request.getParameter("reasonID");
-		String staffID = request.getParameter("staffID");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String deptId = request.getParameter("deptID");
+		final String reasonId = request.getParameter("reasonID");
+		final String staffId = request.getParameter("staffID");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
-			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
-				extraCond.setReasonId(Integer.valueOf(reasonID));
+			final CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(reasonId != null && !reasonId.isEmpty() && !reasonId.equals("-1")){
+				extraCond.setReasonId(Integer.valueOf(reasonId));
 			}
-			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
-			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
-				extraCond.setStaffId(Integer.valueOf(staffID));
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<CancelIncomeByStaff> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByStaff(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
-			
-			jobject.setRoot(cancelList);
+			jObject.setRoot(CalcCancelStatisticsDao.calcCancelIncomeByStaff(staff, new DutyRange(dateBeg, dateEnd), extraCond));
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
 	}
 	
-	public ActionForward getDeptChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String deptID = request.getParameter("deptID");
-		String reasonID = request.getParameter("reasonID");
-		String staffID = request.getParameter("staffID");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+	public ActionForward getDeptChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String deptId = request.getParameter("deptID");
+		final String reasonId = request.getParameter("reasonID");
+		final String staffId = request.getParameter("staffID");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
-			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
-				extraCond.setReasonId(Integer.valueOf(reasonID));
+			final CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(reasonId != null && !reasonId.isEmpty() && !reasonId.equals("-1")){
+				extraCond.setReasonId(Integer.valueOf(reasonId));
 			}
-			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
-			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
-				extraCond.setStaffId(Integer.valueOf(staffID));
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<CancelIncomeByDept> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByDept(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
-			
-			jobject.setRoot(cancelList);
+			jObject.setRoot(CalcCancelStatisticsDao.calcCancelIncomeByDept(staff, new DutyRange(dateBeg, dateEnd), extraCond));
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;

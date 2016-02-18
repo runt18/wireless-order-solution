@@ -22,6 +22,7 @@ import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
@@ -29,8 +30,18 @@ import com.wireless.util.DataPaging;
 
 public class BusinessReceiptsStatisticsAction extends DispatchAction {
 	
+	/**
+	 * 收款统计
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
 		final String onDuty = request.getParameter("dateBegin");
 		final String offDuty = request.getParameter("dateEnd");
 		final String opening = request.getParameter("opening");
@@ -45,6 +56,12 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
 		try{
 
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
 			final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
 			if(opening != null && !opening.isEmpty()){
 				HourRange hr = new HourRange(opening, ending, Pattern.HOUR);
@@ -55,7 +72,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				extraCond.setRegion(Region.RegionId.valueOf(Integer.parseInt(region)));
 			}
 			
-			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), extraCond));
+			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(staff, new DutyRange(onDuty, offDuty), extraCond));
 			
 		}catch(Exception e){
 			e.printStackTrace();
