@@ -19,6 +19,7 @@ Ext.onReady(function(){
 	var adjustPointWin = null;
 	var memberCouponWin = null;
 	var m_memberTypeWin = null;
+	var memberDisountWin = null;
 	var m_searchAdditionFilter = 'create';
 	var memberLevels = null;
 	var memberLevelDetail = null;
@@ -1810,7 +1811,53 @@ Ext.onReady(function(){
 		}]
 		
 	};
-
+	var selectRestaurant = new Ext.form.ComboBox({
+		columnWidth : 0.3,
+		id : 'selectRestaurant_combo_memeberMgrMain',
+		xtype : 'combo',
+		readOnly : false,
+		forceSelection : true,
+		store : new Ext.data.JsonStore({
+			fields : ['id', 'name']
+		}),
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				Ext.Ajax.request({
+					url : '../../QueryRestaurants.do',
+					params : {
+						id : restaurantID
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						//FIXME
+						console.log(jr);
+						var ss = [];
+						ss.push({'id':jr.root[0].id, 'name' : jr.root[0].name + '(集团)'});
+						for(var i = 0; i < jr.root[0].branches.length; i++){
+							ss.push({'id':jr.root[0].branches[i].id, 'name':jr.root[0].branches[i].name});
+						}
+						selectRestaurant.store.loadData(ss);
+						selectRestaurant.setValue(jr.root[0].id);
+					},
+					failure : function(res, opt){
+						selectRestaurant.store.loadData({root:[{typeId:-1, name:'全部'}]});
+						selectRestaurant.setValue(-1);
+					}
+				});
+			}
+		}
+	});
+	
+	
+	
+	
+	//默认会员价
 	var defaultMemberTypePricePlan = {
 		columnWidth : 1,
 		items : [{
@@ -1847,6 +1894,170 @@ Ext.onReady(function(){
 		
 	};
 
+	//会员折扣和会员价设置
+	function memberDiscountWinInit(){
+		if(!memberDisountWin){
+			memberDisountWin = new Ext.Window({
+				title : '设置门店折扣',
+				closable : false,
+				resizable : false,
+				width : 275,
+				items : [{
+					xtype : 'panel',
+					layout : 'column',
+					frame : true,
+					width : 255,
+					defaults : {
+						columnWidth : .5,
+						layout : 'form',
+						labelWidth : 80
+					},
+					items : [{
+						columnWidth : 0.4,
+						xtype : 'label',
+						text : '选择餐厅类型:'
+					}, selectRestaurant]
+				},{
+					xtype : 'panel',
+					layout : 'column',
+					id : 'formMemberDiscount_panel_member',
+					frame : true,
+					width : 255,
+					defaults : {
+						columnWidth : .333,
+						layout : 'form',
+						labelWidth : 80
+					},
+					items : [{
+						columnWidth : 1,
+						xtype : 'label',
+						style : 'text-align:left;padding-bottom:3px;',
+						text : '选择折扣方案:'
+						
+					}]
+					
+				},{
+					xtype : 'panel',
+					layout : 'column',
+					id : 'formMemberPricePlan_panel_member',
+					frame : true,
+					width : 255,
+					defaults : {
+						columnWidth : .333,
+						layout : 'form',
+						labelWidth : 80
+					},
+					items : [{
+						columnWidth : 1,
+						xtype : 'label',
+						style : 'text-align:left;padding-bottom:3px;',
+						text : '选择价格方案:'
+					}]
+					
+				}, {
+					xtype : 'label',
+					html : '&nbsp;'
+				}],
+				bbar : ['->', {
+					text : '保存',
+					iconCls : 'btn_save',
+					handler : function(e){
+					}
+				}, {
+					text : '关闭',
+					iconCls : 'btn_close',
+					handler : function(e){
+						memberDisountWin.close();
+					}
+				}],
+				listeners : {
+					beforeshow : function(e){
+						//获得价格方案时, 重新渲染
+						
+						if(document.getElementsByName('memberDiscount').length == 0){
+							for (var i = 0; i < discountData.length; i++) {
+								var c = {items : [{
+									xtype : "checkbox", 
+									name : "memberDiscount",
+									boxLabel : checkLabel(discountData[i].text) , 
+									hideLabel : true, 
+									inputValue :  discountData[i].discountID,
+									listeners : {
+										focus : function(){
+											Ext.getCmp('comboDiscount_combo_member').setValue();
+											Ext.getCmp('comboDiscount_combo_member').clearInvalid();
+										},
+										check : function(){
+											Ext.getCmp('comboDiscount_combo_member').setValue();
+											Ext.getCmp('comboDiscount_combo_member').clearInvalid();
+										}
+									}
+								}]};
+								Ext.getCmp('formMemberDiscount_panel_member').add(c);
+								//solveIE自动换行时格式错乱
+								if((i+1)%6 == 0){
+									Ext.getCmp('formMemberDiscount_panel_member').add({columnWidth : 1});
+								}
+								Ext.getCmp('formMemberDiscount_panel_member').doLayout();
+							}
+							Ext.getCmp('formMemberDiscount_panel_member').add(defaultMemberTypeDiscount);
+						}
+						
+						if(pricePlanData.length > 0 && document.getElementsByName('memberPricePlan').length == 0){
+							for (var i = 0; i < pricePlanData.length; i++) {
+								var c = {items : [{
+									xtype : "checkbox", 
+									name : "memberPricePlan",
+									boxLabel : checkLabel(pricePlanData[i].name) , 
+									hideLabel : true, 
+									inputValue :  pricePlanData[i].id,
+									listeners : {
+										focus : function(){
+											Ext.getCmp('comboDefaultPricePlan_combo_member').setValue();
+											Ext.getCmp('comboDefaultPricePlan_combo_member').clearInvalid();
+										},
+										check : function(){
+											Ext.getCmp('comboDefaultPricePlan_combo_member').setValue();
+											Ext.getCmp('comboDefaultPricePlan_combo_member').clearInvalid();
+										}
+									}
+								}]};
+								Ext.getCmp('formMemberPricePlan_panel_member').add(c);
+								//solveIE自动换行时格式错乱
+								if((i+1)%6 == 0){
+									Ext.getCmp('formMemberPricePlan_panel_member').add({columnWidth : 1});
+								}
+							}
+							Ext.getCmp('formMemberPricePlan_panel_member').add(defaultMemberTypePricePlan);		
+//							Ext.getCmp('formMemberPricePlan_panel_member').syncSize();
+							Ext.getCmp('formMemberPricePlan_panel_member').doLayout();
+						}else{
+							Ext.getCmp('formMemberPricePlan_panel_member').hide();
+						}						
+						
+					},
+					hide : function(){
+						var discounts = document.getElementsByName('memberDiscount');
+						for (var i = 0; i < discounts.length; i++) {
+							if(discounts[i].checked){
+								discounts[i].checked = false;
+							}
+						}
+						
+						var pricePlans = document.getElementsByName('memberPricePlan');
+						for (var i = 0; i < pricePlans.length; i++) {
+							if(pricePlans[i].checked){
+								pricePlans[i].checked = false;
+							}
+						}
+						Ext.getCmp('formMemberPricePlan_panel_member').removeAll();
+					}
+				}
+			})
+		}
+	}
+	
+	//会员类型设置
 	function m_memberTypeWinInit(){
 		if(!m_memberTypeWin){
 			m_memberTypeWin = new Ext.Window({
@@ -1970,14 +2181,7 @@ Ext.onReady(function(){
 						xtype : 'label',
 						style : 'color:green;fontSize:15px;',
 						text : '说明:  新会员赠送积分.'
-					}
-	/*				, {
-						xtype : 'label',
-						autoWidth : true,
-						style : 'color:green;font-szie:12px;width : 250px',
-						text : '说明:  所有属性都可使用积分功能, 积分类型只使用该会员类型的折扣信息, 充值则可使用会员资料中基本金额、赠送金额等更多信息'
-					}*/
-					, {
+					}, {
 						xtype : 'numberfield',
 						id : 'numChargeRate_numberField_member',
 						fieldLabel : '充值比率' + Ext.ux.txtFormat.xh,
@@ -1995,47 +2199,6 @@ Ext.onReady(function(){
 						style : 'color:green;fontSize:15px;',
 						text : '输入 1.5, 表示 100 元送 50 元'
 					},{
-						xtype : 'panel',
-						layout : 'column',
-						id : 'formMemberDiscount_panel_member',
-						frame : true,
-						width : 255,
-						defaults : {
-							columnWidth : .333,
-							layout : 'form',
-							labelWidth : 80
-						},
-						items : [{
-							columnWidth : 1,
-							xtype : 'label',
-							style : 'text-align:left;padding-bottom:3px;',
-							text : '选择折扣方案:'
-							
-						}]
-						
-					},{
-						xtype : 'panel',
-						layout : 'column',
-						id : 'formMemberPricePlan_panel_member',
-						frame : true,
-						width : 255,
-						defaults : {
-							columnWidth : .333,
-							layout : 'form',
-							labelWidth : 80
-						},
-						items : [{
-							columnWidth : 1,
-							xtype : 'label',
-							style : 'text-align:left;padding-bottom:3px;',
-							text : '选择价格方案:'
-							
-						}]
-						
-					}, {
-						xtype : 'label',
-						html : '&nbsp;'
-					}, {
 						xtype : 'textarea',
 						height : 40,
 						id : 'txtCommentForMemberType_area_member',
@@ -2126,89 +2289,6 @@ Ext.onReady(function(){
 						Ext.getCmp('txtTypeName_textField_member').enable();
 					}
 				}],
-				listeners : {
-					beforeshow : function(e){
-						//获得价格方案时, 重新渲染
-						
-						if(document.getElementsByName('memberDiscount').length == 0){
-							for (var i = 0; i < discountData.length; i++) {
-								var c = {items : [{
-									xtype : "checkbox", 
-									name : "memberDiscount",
-									boxLabel : checkLabel(discountData[i].text) , 
-									hideLabel : true, 
-									inputValue :  discountData[i].discountID,
-									listeners : {
-										focus : function(){
-											Ext.getCmp('comboDiscount_combo_member').setValue();
-											Ext.getCmp('comboDiscount_combo_member').clearInvalid();
-										},
-										check : function(){
-											Ext.getCmp('comboDiscount_combo_member').setValue();
-											Ext.getCmp('comboDiscount_combo_member').clearInvalid();
-										}
-									}
-								}]};
-								Ext.getCmp('formMemberDiscount_panel_member').add(c);
-								//solveIE自动换行时格式错乱
-								if((i+1)%6 == 0){
-									Ext.getCmp('formMemberDiscount_panel_member').add({columnWidth : 1});
-								}
-								Ext.getCmp('formMemberDiscount_panel_member').doLayout();
-							}
-							Ext.getCmp('formMemberDiscount_panel_member').add(defaultMemberTypeDiscount);
-						}
-						
-						if(pricePlanData.length > 0 && document.getElementsByName('memberPricePlan').length == 0){
-							for (var i = 0; i < pricePlanData.length; i++) {
-								var c = {items : [{
-									xtype : "checkbox", 
-									name : "memberPricePlan",
-									boxLabel : checkLabel(pricePlanData[i].name) , 
-									hideLabel : true, 
-									inputValue :  pricePlanData[i].id,
-									listeners : {
-										focus : function(){
-											Ext.getCmp('comboDefaultPricePlan_combo_member').setValue();
-											Ext.getCmp('comboDefaultPricePlan_combo_member').clearInvalid();
-										},
-										check : function(){
-											Ext.getCmp('comboDefaultPricePlan_combo_member').setValue();
-											Ext.getCmp('comboDefaultPricePlan_combo_member').clearInvalid();
-										}
-									}
-								}]};
-								Ext.getCmp('formMemberPricePlan_panel_member').add(c);
-								//solveIE自动换行时格式错乱
-								if((i+1)%6 == 0){
-									Ext.getCmp('formMemberPricePlan_panel_member').add({columnWidth : 1});
-								}
-							}
-							Ext.getCmp('formMemberPricePlan_panel_member').add(defaultMemberTypePricePlan);		
-//							Ext.getCmp('formMemberPricePlan_panel_member').syncSize();
-							Ext.getCmp('formMemberPricePlan_panel_member').doLayout();
-						}else{
-							Ext.getCmp('formMemberPricePlan_panel_member').hide();
-						}						
-						
-					},
-					hide : function(){
-						var discounts = document.getElementsByName('memberDiscount');
-						for (var i = 0; i < discounts.length; i++) {
-							if(discounts[i].checked){
-								discounts[i].checked = false;
-							}
-						}
-						
-						var pricePlans = document.getElementsByName('memberPricePlan');
-						for (var i = 0; i < pricePlans.length; i++) {
-							if(pricePlans[i].checked){
-								pricePlans[i].checked = false;
-							}
-						}
-						Ext.getCmp('formMemberPricePlan_panel_member').removeAll();
-					}
-				},
 				keys : [{
 					key : Ext.EventObject.ENTER,
 					fn : function(){
@@ -2233,6 +2313,13 @@ Ext.onReady(function(){
 			type : mtObj.operation['insert']
 		});
 	};
+	
+	function setMemberDiscount(){
+		memberDiscountWinInit();
+		memberDisountWin.show();
+		memberDisountWin.center();
+	}
+	
 	function updateMemberTypeHandler(){
 		memberTypeOperationHandler({
 			type : mtObj.operation['update']
@@ -2303,6 +2390,7 @@ Ext.onReady(function(){
 		return checkeds;
 	}
 
+	//会员类型操作
 	function memberTypeOperationHandler(c){
 		if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
 			return;
@@ -2880,7 +2968,7 @@ Ext.onReady(function(){
 				'<div style="position:absolute;left : 0; bottom: 3px;"><input id="chxMemberTip" type="checkbox" onclick="javascript:fnRemberTip()" />不再显示</div>'+
 			'</div>'
 	});
-	showFloatOption({treeId : 'tree_memberTypeMgr', option : [{name:'修改', fn : updateMemberTypeHandler},{name:'删除', fn : deleteMemberTypeHandler}]});
+	showFloatOption({treeId : 'tree_memberTypeMgr', option : [{name:'折扣设置', fn : setMemberDiscount}, {name:'修改', fn : updateMemberTypeHandler},{name:'删除', fn : deleteMemberTypeHandler}]});
 	
 	initAddLevelWin();
 	
@@ -3277,7 +3365,6 @@ Ext.onReady(function(){
 						}
 						
 						
-						//TODO
 						//绑定充值
 						$('#divMember').find('.addMoney_a_member').each(function(index, element){
 							element.onclick = function(){
