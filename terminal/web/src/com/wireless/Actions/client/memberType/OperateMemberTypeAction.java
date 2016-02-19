@@ -55,30 +55,35 @@ public class OperateMemberTypeAction extends DispatchAction{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final MemberType.InsertBuilder insert = new MemberType.InsertBuilder(typeName.trim(), new Discount(Integer.valueOf(defaultDiscount)));
-			insert.setAttribute(Attribute.valueOf(Integer.valueOf(attr)));
-			insert.setChargeRate(Float.valueOf(chargeRate));
-			insert.setExchangeRate(Float.valueOf(exchangeRate));
-			insert.setInitialPoint(Integer.valueOf(initialPoint));
-			insert.setDesc(desc);
+			final MemberType.InsertBuilder builder = new MemberType.InsertBuilder(typeName.trim());
+			
+			builder.setAttribute(Attribute.valueOf(Integer.valueOf(attr)));
+			builder.setChargeRate(Float.valueOf(chargeRate));
+			builder.setExchangeRate(Float.valueOf(exchangeRate));
+			builder.setInitialPoint(Integer.valueOf(initialPoint));
+			builder.setDesc(desc);
+			
+			if(defaultDiscount != null && !defaultDiscount.isEmpty()){
+				builder.setDefaultDiscount(new Discount(Integer.parseInt(defaultDiscount)));
+			}
 			
 			if(discounts != null && !discounts.isEmpty()){
 				for (String discountId : discounts.split(",")) {
-					insert.addDiscount(new Discount(Integer.parseInt(discountId)));
+					builder.addDiscount(new Discount(Integer.parseInt(discountId)));
 				}
 			}
 			
 			if(pricePlans != null && !pricePlans.trim().isEmpty()){
 				for (String pricePlanId : pricePlans.split(",")) {
-					insert.addPrice(new PricePlan(Integer.parseInt(pricePlanId)));
+					builder.addPrice(new PricePlan(Integer.parseInt(pricePlanId)));
 				}
 			}			
 			
 			if(defaultPricePlan != null && !defaultPricePlan.isEmpty()){
-				insert.setDefaultPrice(new PricePlan(Integer.parseInt(defaultPricePlan)));
+				builder.setDefaultPrice(new PricePlan(Integer.parseInt(defaultPricePlan)));
 			}
 			
-			MemberTypeDao.insert(staff, insert);
+			MemberTypeDao.insert(staff, builder);
 			jObject.initTip(true, "操作成功, 已添加新会员类型.");
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
