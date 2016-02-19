@@ -17,10 +17,10 @@ $(function(){
 			if(data.root[0].typeVal == branches.GROUP.val){
 				var branchesTemplet =  '<div class="main-box" data-value={breanchesId} data-type="braches_div_branches">'
 							+'<ul class="m-b-list">'
-								+'<li style="line-height: 40px;width:80%;">'
-									+'<h4><i class="foundicon-home fcolor6"></i>&nbsp;&nbsp;{restaurant}</h4>'	
-									+"<p>地址：{address}</p>"	
-									+"<p>电话: {telephone}</p>"	  
+								+'<li style="line-height: 40px;width:98%;">'
+									+'<h3><i class="foundicon-home fcolor6"></i>&nbsp;&nbsp;{restaurant}</h3>'	
+									+'<div style="margin-top:-3px;color: #666;">地址: {address}</div>'
+									+'<div style="margin-top:-3px;color: #666;">电话: {telephone}</div>'  
 								+"</li>"
 							+"</ul>"	
 						+"</div>";
@@ -47,10 +47,22 @@ $(function(){
 				
 				//各个门店的点击事件
 				$('#branches_div_branches').find('[data-type="braches_div_branches"]').each(function(index, element){
+//					element.onmousedown = function(){
+//						$(element).css({
+//							'border-color' : '#26A9D0'
+//						});
+//					};
+//					element.onmouseup = function(){						
+//						$(element).css({
+//							'border-color' : 'darkgray'
+//						});
+//					};
 					element.onclick = function(){
+						$(element).css({
+						    'background-color': '#ddd'
+						});
 						Util.jump(Util.mp.params.redirect_url, $(element).attr('data-value'));
-//						Util.jump('book.html', $(element).attr('data-value'));
-					}
+					};
 				});
 				
 			}else{
