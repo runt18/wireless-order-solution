@@ -1168,7 +1168,7 @@ Ext.onReady(function(){
 						mode : 'local',
 						triggerAction : 'all',
 						selectOnFocus : true,
-						allowBlank : true,
+						allowBlank : true
 					},{
 						id : 'cm_txtMemberContactAddress',
 						fieldLabel : '联系地址',

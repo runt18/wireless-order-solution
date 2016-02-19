@@ -876,7 +876,7 @@ public class MemberOperationDao {
 			return new ArchiveResult(0, 0);
 		}
 		
-		final String item = "`restaurant_id`, `staff_id`, `staff_name`, `member_id`, `member_name`, `member_mobile`, `member_card`, `operate_seq`, `operate_date`," +
+		final String item = "`restaurant_id`, `branch_id`, `staff_id`, `staff_name`, `member_id`, `member_name`, `member_mobile`, `member_card`, `operate_seq`, `operate_date`," +
 							"`operate_type`, `pay_type_id`, `pay_money`, `coupon_id`, `coupon_money`, `coupon_name`, `order_id`, `charge_type`, `charge_money`, `delta_base_money`," +
 							"`delta_extra_money`, `delta_point`, `remaining_base_money`, `remaining_extra_money`, `remaining_point`, `comment`";
 		

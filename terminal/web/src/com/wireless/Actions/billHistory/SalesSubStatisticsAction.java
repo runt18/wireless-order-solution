@@ -22,21 +22,41 @@ import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Region.RegionId;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 
 public class SalesSubStatisticsAction extends Action {
 	
+	/**
+	 * 销售统计
+	 */
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		List<SalesDetail> salesDetailList = null;
-		String isPaging = request.getParameter("isPaging");
-		String limit = request.getParameter("limit");
-		String start = request.getParameter("start");
-		JObject jobject = new JObject();
-		String dataType = request.getParameter("dataType");
-		String queryType = request.getParameter("queryType");
+		
+		final String pin = (String)request.getAttribute("pin");
+
+		final String branchId = request.getParameter("branchId");
+		
+		String dateBeg = request.getParameter("dateBeg");
+		String dateEnd = request.getParameter("dateEnd");
+		
+		final String businessHourBeg = request.getParameter("opening");
+		final String businessHourEnd = request.getParameter("ending");
+		final String orderType = request.getParameter("orderType");
+		final String deptID = request.getParameter("deptID");
+		final String foodName = request.getParameter("foodName");
+		final String region = request.getParameter("region");
+		final String staffId = request.getParameter("staffId");
+		
+		final String isPaging = request.getParameter("isPaging");
+		final String limit = request.getParameter("limit");
+		final String start = request.getParameter("start");
+		final JObject jObject = new JObject();
+		final String dataType = request.getParameter("dataType");
+		final String queryType = request.getParameter("queryType");
 		try{
 			/**
 			 * The parameters looks like below.
@@ -62,42 +82,44 @@ public class SalesSubStatisticsAction extends Action {
 			 * 			   "1" means "按销量排序"
 			 * 
 			 */
-			String pin = (String)request.getAttribute("pin");
-			String restaurantId = (String)request.getAttribute("restaurantID");		
-			String dateBeg = request.getParameter("dateBeg");
-			String dateEnd = request.getParameter("dateEnd");
 			
-			String businessHourBeg = request.getParameter("opening");
-			String businessHourEnd = request.getParameter("ending");
-			String orderType = request.getParameter("orderType");
-			String deptID = request.getParameter("deptID");
-			String foodName = request.getParameter("foodName");
-			String region = request.getParameter("region");
-			String staffId = request.getParameter("staffId");
+			final int qt;
+			if(queryType != null && !queryType.isEmpty()){
+				qt = Integer.valueOf(queryType);
+			}else{
+				qt = SaleDetailsDao.QUERY_BY_DEPT;
+			}
 			
+			final int ot;
+			if(orderType != null && !orderType.isEmpty()){
+				ot = Integer.parseInt(orderType);
+			}else{
+				ot = SaleDetailsDao.ORDER_BY_SALES;
+			}
 			
-			pin = pin != null && pin.length() > 0 ? pin.trim() : "";
-			restaurantId = restaurantId != null && restaurantId.length() > 0 ? restaurantId.trim() : "";
-			dataType = dataType != null && dataType.length() > 0 ? dataType.trim() : "1";
-			queryType = queryType != null && queryType.length() > 0 ? queryType.trim() : "0";
-			orderType = orderType != null && orderType.length() > 0 ? orderType.trim() : "1";
-			deptID = deptID != null && deptID.length() > 0 ? deptID.trim() : "-1";
+			final DateType dt;
+			if(dataType != null && !dataType.isEmpty()){
+				dt = DateType.valueOf(Integer.valueOf(dataType));
+			}else{
+				dt = DateType.HISTORY;
+			}
 			
-			Integer qt = Integer.valueOf(queryType), ot = (orderType != null && !orderType.isEmpty()) ? Integer.parseInt(orderType) : SaleDetailsDao.ORDER_BY_SALES;
-			DateType dt = DateType.valueOf(Integer.valueOf(dataType));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(dt);
+			final CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(dt);
 				
 			if(dt.isHistory()){
 				dateBeg = dateBeg != null && dateBeg.length() > 0 ? dateBeg.trim() + " 00:00:00" : "";
 				dateEnd = dateEnd != null && dateEnd.length() > 0 ? dateEnd.trim() + " 23:59:59" : "";
 			}
 			
-			DutyRange dutyRange = new DutyRange(dateBeg, dateEnd);
+			final DutyRange dutyRange = new DutyRange(dateBeg, dateEnd);
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
-				
 			}
 			
 			if(businessHourBeg != null && !businessHourBeg.isEmpty()){
@@ -106,33 +128,33 @@ public class SalesSubStatisticsAction extends Action {
 			}
 			if(qt == SaleDetailsDao.QUERY_BY_DEPT){
 				
-				salesDetailList = SaleDetailsDao.execByDept(StaffDao.verify(Integer.parseInt(pin)),	dutyRange, extraCond);
+				salesDetailList = SaleDetailsDao.execByDept(staff, dutyRange, extraCond);
 				
 			}else if(qt == SaleDetailsDao.QUERY_BY_FOOD){
 				if(foodName != null && !foodName.isEmpty()){
 					extraCond.setFoodName(foodName);
 				}
-				if(deptID != null && !deptID.equals("-1")){
+				if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
 					extraCond.setDept(Department.DeptId.valueOf(Integer.parseInt(deptID)));
 				}
 				if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
 					extraCond.setStaffId4OrderFood(Integer.parseInt(staffId));
 				}
-				salesDetailList = SaleDetailsDao.getByFood(StaffDao.verify(Integer.parseInt(pin)), dutyRange, extraCond, ot);
+				salesDetailList = SaleDetailsDao.getByFood(staff, dutyRange, extraCond, ot);
 				
 			}else if(qt == SaleDetailsDao.QUERY_BY_KITCHEN){
-				salesDetailList = SaleDetailsDao.getByKitchen(StaffDao.verify(Integer.parseInt(pin)), dutyRange, extraCond);
+				salesDetailList = SaleDetailsDao.getByKitchen(staff, dutyRange, extraCond);
 			}
 				
 		} catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		} finally{
-			jobject.setTotalProperty(salesDetailList.size());
+			jObject.setTotalProperty(salesDetailList.size());
 			
 			SalesDetail summary = null;
 			if(queryType != null && !(Integer.valueOf(queryType) == SaleDetailsDao.QUERY_BY_KITCHEN) && !salesDetailList.isEmpty()){
@@ -162,8 +184,8 @@ public class SalesSubStatisticsAction extends Action {
 			if(summary != null){
 				salesDetailList.add(summary);
 			}
-			jobject.setRoot(salesDetailList);
-			response.getWriter().print(jobject.toString());
+			jObject.setRoot(salesDetailList);
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
