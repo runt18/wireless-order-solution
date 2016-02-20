@@ -10,7 +10,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -31,20 +30,18 @@ public class QueryDiscountAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward role(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
+	public ActionForward role(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		final JObject jObject = new JObject();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt((String) request.getAttribute("pin")));
 			Role role = new Role(Integer.valueOf(staff.getRole().getId()));
 			List<Discount> root = DiscountDao.getByRole(staff, role);
-			jobject.setRoot(root);
-			jobject.setTotalProperty(root.size());
+			jObject.setRoot(root);
+			jObject.setTotalProperty(root.size());
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -58,19 +55,17 @@ public class QueryDiscountAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward getByMemberType(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
-		String memberType = request.getParameter("memberTypeId");
+	public ActionForward getByMemberType(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final JObject jObject = new JObject();
+		final String memberType = request.getParameter("memberTypeId");
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt((String) request.getAttribute("pin")));
 			List<Discount> root = DiscountDao.getByMemberType(staff, new MemberType(Integer.parseInt(memberType)));
-			jobject.setRoot(root);
+			jObject.setRoot(root);
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -84,17 +79,13 @@ public class QueryDiscountAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward tree(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		DBCon dbCon = new DBCon();
-		StringBuffer tsb = new StringBuffer();
+	public ActionForward tree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final StringBuffer tsb = new StringBuffer();
 		try{
-			dbCon.connect();
-			String pin = (String)request.getAttribute("pin");
 			
 			int i = 0;
-			for(Discount discount : DiscountDao.getPureAll(dbCon, StaffDao.getById(Integer.parseInt(pin)))){
+			for(Discount discount : DiscountDao.getPureAll(StaffDao.getById(Integer.parseInt(pin)))){
 				tsb.append(i > 0 ? "," : "");
 				tsb.append("{");
 				tsb.append("leaf:true");
@@ -117,7 +108,6 @@ public class QueryDiscountAction extends DispatchAction{
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			dbCon.disconnect();
 			response.getWriter().print("[" + tsb.toString() + "]");
 		}
 		return null;
