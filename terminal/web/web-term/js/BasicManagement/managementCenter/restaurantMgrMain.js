@@ -418,7 +418,7 @@ function chainSet(){
         columns : [{header:"门店编号",dataIndex:"id"},
                    {header:"门店账号",dataIndex : "name"},
                    {header:"操作", dataIndex : 'operation', renderer : chainGridOperation}],
-        store : chainStore,
+        store : chainStore
     }); 
     
 //  //添加单个记录
@@ -477,8 +477,9 @@ function chainSet(){
 				var id = Ext.getCmp('branchesId_number_chain').getValue();
 				
 				 Ext.Ajax.request({
-					url : '../../QueryRestaurants.do',
+					url : '../../OperateRestaurant.do',
 					params : {
+						dataSource : 'getByCond',
 						id : id
 					},
 					success : function(res, opt){
@@ -547,7 +548,7 @@ function chainSet(){
 					params : {
 						dataSource : 'update',
 						id : tn.id,
-						branches : branchesId.join(','),
+						branches : branchesId.join(',')
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -832,24 +833,24 @@ function displayCodeHandle(){
 					columnWidth : 1,
 					items : [{
 						xtype : 'label',
-						html : '&nbsp;',
+						html : '&nbsp;'
 					}]
 				},{
 					items : [{
 						xtype : 'label',
-						text : '已使用:',
+						text : '已使用:'
 					}]
 				}, {
 					items : [{
 						xtype : 'label',
 						id : 'numUsedCode',
 						style : 'color:green;',
-						text : 0,
+						text : 0
 					}]
 				},{
 					items : [{
 						xtype : 'label',
-						text : '未使用:',
+						text : '未使用:'
 					}]
 				}, {
 					columnWidth : .23,
@@ -857,7 +858,7 @@ function displayCodeHandle(){
 						xtype : 'label',
 						id : 'numUnUsedCode',
 						style : 'color:green;',
-						text : 0,
+						text : 0
 					}]
 				}]
 			}],
@@ -1038,7 +1039,7 @@ Ext.onReady(function(){
 	
 	var ds = new Ext.data.Store({
 		proxy : new Ext.data.HttpProxy({
-			url : '../../QueryRestaurants.do'
+			url : '../../OperateRestaurant.do'
 		}),
 		reader : new Ext.data.JsonReader({
 			totalProperty : 'totalProperty',
@@ -1164,6 +1165,7 @@ Ext.onReady(function(){
 					}
 					
 					store.baseParams['name'] = Ext.getCmp('txtSearchName').getValue();
+					store.baseParams['dataSource'] = 'getByCond';
 					store.load({
 						params : {
 							expireDate : expireDate,
@@ -1232,5 +1234,6 @@ Ext.onReady(function(){
     });
     
     initModulesData();
+    ds.baseParams['dataSource'] = 'getByCond';
     ds.load();
 });

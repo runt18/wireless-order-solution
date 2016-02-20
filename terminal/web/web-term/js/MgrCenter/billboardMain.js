@@ -255,8 +255,9 @@ function operateBillboard(c){
 
 function loadRestaurantData(){
 	Ext.Ajax.request({
-		url : '../../QueryRestaurants.do',
+		url : '../../OperateRestaurant.do',
 		params : {
+			dataSource : 'getByCond',
 			isCookie : true
 		},
 		success : function(response, options){
