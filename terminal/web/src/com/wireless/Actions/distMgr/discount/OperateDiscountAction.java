@@ -33,10 +33,16 @@ public class OperateDiscountAction extends DispatchAction{
 	 */
 	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
 		final String id = request.getParameter("discountId");
 		final JObject jObject = new JObject();
 		try{
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
 			final DiscountDao.ExtraCond extraCond = new DiscountDao.ExtraCond();
 			
 			if(id != null && !id.isEmpty()){
