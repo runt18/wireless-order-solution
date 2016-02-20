@@ -731,19 +731,21 @@ public class OrderDao {
 	 * 			the staff to perform this action
 	 * @param builder
 	 * 			the builder to repaid order {@link Order#RepaidBuilder}
+	 * @return the difference result {@link UpdateOrder#DiffResult}
 	 * @throws BusinessException
 	 * 			throws if cases below
 	 * 			<li>the staff has no privilege for re-payment
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void repaid(Staff staff, Order.RepaidBuilder builder) throws BusinessException, SQLException{
+	public static UpdateOrder.DiffResult repaid(Staff staff, Order.RepaidBuilder builder) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			repaid(dbCon, staff, builder);
+			UpdateOrder.DiffResult diffResult = repaid(dbCon, staff, builder);
 			dbCon.conn.commit();
+			return diffResult;
 		}catch(SQLException | BusinessException e){
 			dbCon.conn.rollback();
 			throw e;
@@ -759,14 +761,15 @@ public class OrderDao {
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the builder to repaid order {@link Order#RepaidBuilder}
+	 * 			the builder to repaid order {@link UpdateOrder#RepaidBuilder}
+	 * @return the difference result {@link UpdateOrder#DiffResult}
 	 * @throws BusinessException
 	 * 			throws if cases below
 	 * 			<li>the staff has no privilege for re-payment
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void repaid(DBCon dbCon, Staff staff, Order.RepaidBuilder builder) throws BusinessException, SQLException{
+	public static UpdateOrder.DiffResult repaid(DBCon dbCon, Staff staff, Order.RepaidBuilder builder) throws BusinessException, SQLException{
 		if(staff.getRole().hasPrivilege(Privilege.Code.RE_PAYMENT)){
 			Order oriOrder = OrderDao.getById(staff, builder.getPayBuilder().getOrderId(), DateType.TODAY);
 			//Restore the account if perform member consumption before.
@@ -786,8 +789,10 @@ public class OrderDao {
 			if(builder.hasCouponBuilder()){
 				coupon(dbCon, staff, builder.getCouponBuilder());
 			}
-			UpdateOrder.exec(dbCon, staff, builder.getUpdateBuilder());
+			UpdateOrder.DiffResult diff = UpdateOrder.exec(dbCon, staff, builder.getUpdateBuilder());
 			PayOrder.pay(dbCon, staff, builder.getPayBuilder());
+			
+			return diff;
 		}else{
 			throw new BusinessException(StaffError.PAYMENT_NOT_ALLOW);
 		}
