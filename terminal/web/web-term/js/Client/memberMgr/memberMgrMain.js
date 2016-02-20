@@ -1835,14 +1835,12 @@ Ext.onReady(function(){
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
-						//FIXME
-						console.log(jr);
-						var ss = [];
-						ss.push({'id':jr.root[0].id, 'name' : jr.root[0].name + '(集团)'});
+						var restaurant = [];
+						restaurant.push({'id':jr.root[0].id, 'name' : jr.root[0].name + '(集团)'});
 						for(var i = 0; i < jr.root[0].branches.length; i++){
-							ss.push({'id':jr.root[0].branches[i].id, 'name':jr.root[0].branches[i].name});
+							restaurant.push({'id':jr.root[0].branches[i].id, 'name':jr.root[0].branches[i].name});
 						}
-						selectRestaurant.store.loadData(ss);
+						selectRestaurant.store.loadData(restaurant);
 						selectRestaurant.setValue(jr.root[0].id);
 					},
 					failure : function(res, opt){
@@ -1850,11 +1848,24 @@ Ext.onReady(function(){
 						selectRestaurant.setValue(-1);
 					}
 				});
+			},
+			select : function(){
+				Ext.Ajax.request({
+					url : '../../WxOperateRestaurant.do',
+					params : {
+						dataSource : 'detail',
+						branchId : selectRestaurant.getValue()
+					},
+					success : function(res, opt){
+						
+					}
+				});
+				
+				
+				
 			}
 		}
 	});
-	
-	
 	
 	
 	//默认会员价
@@ -1903,6 +1914,10 @@ Ext.onReady(function(){
 				resizable : false,
 				width : 275,
 				items : [{
+					xtype : 'hidden',
+					id : 'discountID_member',
+					fieldLabel : '折扣编号'
+				},{
 					xtype : 'panel',
 					layout : 'column',
 					frame : true,
@@ -1962,18 +1977,84 @@ Ext.onReady(function(){
 					text : '保存',
 					iconCls : 'btn_save',
 					handler : function(e){
+						var discount = Ext.getCmp('comboDiscount_combo_member');
+						var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
+						var typeID = Ext.getCmp('discountID_member').getValue();
+						var memberDiscountCheckeds = "", memberPricePlanCheckeds = "";
+//						memberPricdePlanCheckeds = getChecked(memberPricePlanCheckeds, document.getElementsByName('memberPricePlan'));
+//						
+//						if(memberPricePlanCheckeds){
+//							if(!pricePlan.isValid()){
+//								return;
+//							}
+//						}else{
+//							if(pricePlan){
+//								pricePlan.clearInvalid();
+//							}
+//						}
+						
+						//折扣
+						var memberDiscount = selectRestaurant.getValue() + ',' + discount.getValue() + ',' + getChecked(memberDiscountCheckeds, document.getElementsByName('memberDiscount'));
+						
+						//会员价
+						var memberPricePlan = selectRestaurant.getValue() + ',' + pricePlan.getValue() + ',' + getChecked(memberPricePlanCheckeds, document.getElementsByName('memberPricePlan'));
+						
+						
+						
+						Ext.Ajax.request({
+							url : '../../WxOperateRestaurant.do',
+							params : {
+								dataSource : 'detail',
+								fid : selectRestaurant.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								console.log(jr);
+							},
+							failure : function(res, opt){
+								
+							}
+							
+						});
+						
+						
+//						Ext.Ajax.request({
+//							url : '../../OperateMemberType.do',
+//							params : {
+//								dataSource : 'update',
+//								typeID : typeID,
+//								restaurantID : restaurantID,
+//								pricePlanId : pricePlan.getValue(),
+//								discountID : discount.getValue(),
+//								memberDiscountCheckeds : getChecked(memberDiscountCheckeds, document.getElementsByName('memberDiscount')),
+//								memberPricePlanCheckeds : getChecked(memberPricePlanCheckeds, document.getElementsByName('memberPricePlan'))
+//							},
+//							success : function(res, opt){
+//								var jr = Ext.decode(res.responseText);
+//								if(jr.success){
+//									Ext.example.msg(jr.title, jr.msg);
+//									Ext.getCmp('btnRefreshMemberType_btn_member').handler();
+////									member_loadMemberTypeChart();
+//								}else{
+//									Ext.ux.showMsg(jr);								
+//								}
+//							},
+//							failure : function(res, opt){
+//								Ext.ux.showMsg(Ext.decode(res.responseText));
+//							}
+//						});
+						
 					}
 				}, {
 					text : '关闭',
 					iconCls : 'btn_close',
 					handler : function(e){
-						memberDisountWin.close();
+						memberDisountWin.hide();
 					}
 				}],
 				listeners : {
 					beforeshow : function(e){
 						//获得价格方案时, 重新渲染
-						
 						if(document.getElementsByName('memberDiscount').length == 0){
 							for (var i = 0; i < discountData.length; i++) {
 								var c = {items : [{
@@ -2215,29 +2296,14 @@ Ext.onReady(function(){
 						var chargeRate = Ext.getCmp('numChargeRate_numberField_member');
 						var exchangeRate = Ext.getCmp('numExchangeRate_numberField_member');
 						var initialPoint = Ext.getCmp('numInitialPoint_numberField_member');
-						var discount = Ext.getCmp('comboDiscount_combo_member');
-						var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
 						var attribute = m_memberTypeWin.s_memberType;
 						var desc = Ext.getCmp('txtCommentForMemberType_area_member');
 						
 						if(!typeName.isValid() || !chargeRate.isValid() || !exchangeRate.isValid() 
-								|| !initialPoint.isValid() || !discount.isValid()){
+								|| !initialPoint.isValid()){
 							return;
 						}
-						var memberDiscountCheckeds = "", memberPricePlanCheckeds = "";
-						memberPricePlanCheckeds = getChecked(memberPricePlanCheckeds, document.getElementsByName('memberPricePlan'));
-						
-						if(memberPricePlanCheckeds){
-							if(!pricePlan.isValid()){
-								return;
-							}
-						}else{
-							if(pricePlan){
-								pricePlan.clearInvalid();
-							}
-							
-						}
-						
+
 						var save = Ext.getCmp('btnSaveMemberType_btn_member');
 						var close = Ext.getCmp('btnCloseMemberType_btn_member');
 						
@@ -2250,15 +2316,15 @@ Ext.onReady(function(){
 								restaurantID : restaurantID,
 								typeID : typeID.getValue(),
 								typeName : typeName.getValue(),
-								discountID : discount.getValue(),
-								pricePlanId : pricePlan?pricePlan.getValue() : '',
+//								discountID : discount.getValue(),
+//								pricePlanId : pricePlan?pricePlan.getValue() : '',
 								exchangeRate : exchangeRate.getValue(),
 								initialPoint : initialPoint.getValue(),
 								chargeRate : chargeRate.getValue(),
 								attr : attribute,
 								desc : desc.getValue(),
-								memberDiscountCheckeds : getChecked(memberDiscountCheckeds, document.getElementsByName('memberDiscount')),
-								memberPricePlanCheckeds : memberPricePlanCheckeds
+//								memberDiscountCheckeds : getChecked(memberDiscountCheckeds, document.getElementsByName('memberDiscount')),
+//								memberPricePlanCheckeds : memberPricePlanCheckeds
 							},
 							success : function(res, opt){
 								var jr = Ext.decode(res.responseText);
@@ -2314,10 +2380,67 @@ Ext.onReady(function(){
 		});
 	};
 	
+	//设置会员折扣
 	function setMemberDiscount(){
 		memberDiscountWinInit();
 		memberDisountWin.show();
 		memberDisountWin.center();
+
+		var sd = Ext.ux.getSelNode(memberTypeTree);
+		if(!sd){
+			Ext.example.msg('提示', '请选中一个会员类型再进行操作.');
+			return;
+		}
+		
+		
+		//FIXME
+		//加载折扣方案
+		loadPricePlanData();
+		var typeID = Ext.getCmp('discountID_member');
+		
+		typeID.setValue(sd.attributes['memberTypeId']);
+		
+		var discounts = document.getElementsByName('memberDiscount');
+		for (var i = 0; i < sd.attributes['discounts'].length; i++) {
+			for (var j = 0; j < discounts.length; j++) {
+				if(sd.attributes['discounts'][i].discountID == discounts[j].value){
+					
+					discounts[j].checked = true;
+				}
+			}
+		}
+		Ext.getCmp('comboDiscount_combo_member').store.loadData(sd.attributes['discounts']);
+		
+		
+		
+		var pricePlans = document.getElementsByName('memberPricePlan');
+		for (var i = 0; i < sd.attributes['pricePlans'].length; i++) {
+			for (var j = 0; j < pricePlans.length; j++) {
+				if(sd.attributes['pricePlans'][i].id == pricePlans[j].value){
+					pricePlans[j].checked = true;
+				}
+			}
+		}	
+		
+		if(Ext.getCmp('comboDefaultPricePlan_combo_member')){
+			Ext.getCmp('comboDefaultPricePlan_combo_member').store.loadData(sd.attributes['pricePlans']);
+		}
+		
+		
+		
+		var discount = Ext.getCmp('comboDiscount_combo_member');
+		var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
+		
+		discount.setValue(sd.attributes['discount']);
+		if(pricePlan){
+			pricePlan.setValue(sd.attributes['pricePlan'] > 0 ? sd.attributes['pricePlan'] : '');
+		}
+		
+		
+		discount.clearInvalid();
+		if(pricePlan){
+			pricePlan.clearInvalid();
+		}
 	}
 	
 	function updateMemberTypeHandler(){
@@ -2337,8 +2460,6 @@ Ext.onReady(function(){
 		var chargeRate = Ext.getCmp('numChargeRate_numberField_member');
 		var exchangeRate = Ext.getCmp('numExchangeRate_numberField_member');
 		var initialPoint = Ext.getCmp('numInitialPoint_numberField_member');
-		var discount = Ext.getCmp('comboDiscount_combo_member');
-		var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
 		var desc = Ext.getCmp('txtCommentForMemberType_area_member');
 		
 		typeID.setValue(d['memberTypeId']);
@@ -2360,10 +2481,7 @@ Ext.onReady(function(){
 			}
 		}
 		chargeRate.setValue(d['chargeRate']);
-		discount.setValue(d['discount']);
-		if(pricePlan){
-			pricePlan.setValue(d['pricePlan'] > 0?d['pricePlan'] : '');
-		}
+	
 		
 		desc.setValue(d['desc']);
 		
@@ -2371,10 +2489,6 @@ Ext.onReady(function(){
 		typeName.clearInvalid();
 		chargeRate.clearInvalid();
 		initialPoint.clearInvalid();
-		discount.clearInvalid();
-		if(pricePlan){
-			pricePlan.clearInvalid();
-		}
 	};
 
 	function getChecked(checkeds, checkBoxs){
@@ -2416,33 +2530,8 @@ Ext.onReady(function(){
 				Ext.example.msg('提示', '请选中一个会员类型再进行操作.');
 				return;
 			}
-			loadPricePlanData();
 			m_memberTypeWin.setTitle('修改会员类型');
 			m_memberTypeWin.show();
-			var discounts = document.getElementsByName('memberDiscount');
-			for (var i = 0; i < sd.attributes['discounts'].length; i++) {
-				for (var j = 0; j < discounts.length; j++) {
-					if(sd.attributes['discounts'][i].discountID == discounts[j].value){
-						
-						discounts[j].checked = true;
-					}
-				}
-			}
-			Ext.getCmp('comboDiscount_combo_member').store.loadData(sd.attributes['discounts']);
-			
-			
-			var pricePlans = document.getElementsByName('memberPricePlan');
-			for (var i = 0; i < sd.attributes['pricePlans'].length; i++) {
-				for (var j = 0; j < pricePlans.length; j++) {
-					if(sd.attributes['pricePlans'][i].id == pricePlans[j].value){
-						pricePlans[j].checked = true;
-					}
-				}
-			}	
-			
-			if(Ext.getCmp('comboDefaultPricePlan_combo_member')){
-				Ext.getCmp('comboDefaultPricePlan_combo_member').store.loadData(sd.attributes['pricePlans']);
-			}
 			
 			bindMemberTypeData(sd.attributes);
 			
