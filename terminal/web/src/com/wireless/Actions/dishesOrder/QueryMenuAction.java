@@ -17,7 +17,6 @@ import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.FoodTasteDao;
-import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
@@ -325,25 +324,6 @@ public class QueryMenuAction extends DispatchAction {
 		return null;
 	}
 	
-	public ActionForward getPricePlan(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
-		List<? extends Jsonable> root = new ArrayList<Jsonable>();
-		try{
-			String pin = (String)request.getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			
-			root = PricePlanDao.getByCond(staff, null);
-			
-		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip4Exception(e);
-		}finally{
-			jobject.setRoot(root);
-			response.getWriter().print(jobject.toString());
-		}
-		return null;
-	}	
 	
 	public ActionForward getFoodPrices(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
