@@ -307,10 +307,6 @@
 			type="com.wireless.Actions.restaurantMgr.OperateRestaurantAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/RestaurantQueryByID"
-			type="com.wireless.Actions.restaurantMgr.RestaurantQueryByIDAction"
-			scope="request">
-		</action>
 		<action path="/QueryMaterialDept"
 			type="com.wireless.Actions.inventoryMgr.material.QueryMaterialDeptAction"
 			scope="request" parameter="dataSource">
@@ -417,10 +413,6 @@
 		</action>
 		<action path="/OperateRole" type="com.wireless.Actions.roleMgr.OperateRoleAction"
 			scope="request" parameter="dataSource">
-		</action>
-		<action path="/QueryRestaurants"
-			type="com.wireless.Actions.restaurantMgr.QueryRestaurantAction"
-			scope="request">
 		</action>
 		<action path="/VerifyLogin" type="com.wireless.Actions.login.VerifyLoginAction"
 			scope="request">
