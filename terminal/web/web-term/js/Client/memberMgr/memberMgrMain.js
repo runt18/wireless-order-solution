@@ -1752,11 +1752,11 @@ Ext.onReady(function(){
 
 	function loadPricePlanData(){
 		$.ajax({
-			url : '../../QueryMenu.do',
+			url : '../../OperatePricePlan.do',
 			type : 'post',
 			async:false,
 			data : {
-				dataSource : 'getPricePlan'
+				dataSource : 'getByCond'
 			},
 			success : function(jr, status, xhr){
 				pricePlanData = jr.root;

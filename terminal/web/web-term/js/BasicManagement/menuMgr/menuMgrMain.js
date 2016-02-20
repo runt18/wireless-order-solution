@@ -3643,14 +3643,14 @@ function initPricePlanWin(){
 		'',
 		'',
 		'',
-		'../../QueryMenu.do',
+		'../../OperatePricePlan.do',
 		[
 			[true, false, false, false], 
 			['名称', 'name'],
 			['操作', 'operation', 60, 'center', 'pricePlanRenderer']
 		],
 		['id', 'name'],
-		[['dataSource', 'getPricePlan']],
+		[['dataSource', 'getByCond']],
 		0,
 		'',
 		pricePlanGridTbar
@@ -3790,9 +3790,9 @@ function initPricePlanWin(){
 
 function getPricePlan(){
 	Ext.Ajax.request({
-		url : "../../QueryMenu.do",
+		url : "../../OperatePricePlan.do",
 		params : {
-			dataSource : 'getPricePlan'
+			dataSource : 'getByCond'
 		},
 		success : function(response){
 			var jr = Ext.util.JSON.decode(response.responseText);
