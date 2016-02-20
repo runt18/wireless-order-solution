@@ -776,20 +776,4 @@ function showInputReciptWin(){
 	Ext.getCmp('txtInputRecipt').focus(true, 100);
 }
 
-function getWeixinOrders(){
-	Ext.Ajax.request({
-		url : '../../QueryCommissionStatistics.do',
-		params: {dataSource : 'getWeixinUserByOrder', tableID : tableID},
-		success : function(res){
-			var jr = Ext.decode(res.responseText);
-			if(jr.success){
-				weixinOrders = jr.root;
-			}
-		},
-		failure : function(){
-		
-		}
-	});
-}
-
 

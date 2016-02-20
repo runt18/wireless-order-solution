@@ -1829,8 +1829,9 @@ Ext.onReady(function(){
 		listeners : {
 			render : function(thiz){
 				Ext.Ajax.request({
-					url : '../../QueryRestaurants.do',
+					url : '../../OperateRestaurant.do',
 					params : {
+						dataSource : 'getByCond',
 						id : restaurantID
 					},
 					success : function(res, opt){

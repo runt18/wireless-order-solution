@@ -295,7 +295,6 @@ Ext.onReady(function() {
 		failure : function(){}
 	});
 	
-	getWeixinOrders();
 });
 
 function setFormButtonStatus(_s){

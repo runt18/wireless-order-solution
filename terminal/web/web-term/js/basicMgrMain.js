@@ -757,7 +757,11 @@ var resturantMgr = new Ext.Window({
     listeners:{
 		 "show":function(){
 			 Ext.Ajax.request({
-				   url: '../../QueryRestaurants.do',
+				   url: '../../OperateRestaurant.do',
+				   params : {
+				   		dataSource : 'getByCond',
+				   		byId : true
+				   },
 				   success: function(response,options){
 					   var resultJSON = Ext.util.JSON.decode(response.responseText);
 					   if(resultJSON.success && resultJSON.root.length > 0){
@@ -769,9 +773,6 @@ var resturantMgr = new Ext.Window({
 				   },
 				   failure: function(response,options){
 					   
-				   },
-				   params: {
-					   byId:true
 				   }
 				});
 		 }
