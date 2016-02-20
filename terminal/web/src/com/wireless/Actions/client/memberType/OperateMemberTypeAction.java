@@ -174,6 +174,7 @@ public class OperateMemberTypeAction extends DispatchAction{
 					for(String pricePlanId : pricePlans.split(",")){
 						chainPrice.addPrice(PricePlanDao.getById(StaffDao.getAdminByRestaurant(branch.getId()), Integer.parseInt(pricePlanId)));
 					}
+					builder.addChainPrice(chainPrice);
 				}
 				
 			}else{

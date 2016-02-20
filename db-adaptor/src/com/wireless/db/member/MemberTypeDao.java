@@ -113,11 +113,13 @@ public class MemberTypeDao {
 		}
 
 		//Update the default discount.
-		sql = " UPDATE " + Params.dbName + ".member_type_discount" +
-			  " SET type = " + MemberType.DiscountType.DEFAULT.getVal() +
-			  " WHERE member_type_id = " + mt.getId() +
-			  " AND discount_id = " + mt.getDefaultDiscount().getId();
-		dbCon.stmt.executeUpdate(sql);
+		if(mt.hasDefaultDiscount()){
+			sql = " UPDATE " + Params.dbName + ".member_type_discount" +
+					  " SET type = " + MemberType.DiscountType.DEFAULT.getVal() +
+					  " WHERE member_type_id = " + mt.getId() +
+					  " AND discount_id = " + mt.getDefaultDiscount().getId();
+			dbCon.stmt.executeUpdate(sql);
+		}
 
 		//Insert the price plans associated with this member type.
 		for(PricePlan plan : mt.getPrices()){

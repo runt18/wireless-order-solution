@@ -228,7 +228,11 @@ public class OperateRestaurantAction extends DispatchAction {
 		try{
 
 			if(byId != null && !byId.isEmpty() && Boolean.parseBoolean(byId)){
-				jObject.setRoot(RestaurantDao.getById(Integer.parseInt((String) request.getAttribute("restaurantID"))));
+				if(id != null && !id.isEmpty()){
+					jObject.setRoot(RestaurantDao.getById(Integer.parseInt(id)));
+				}else{
+					jObject.setRoot(RestaurantDao.getById(Integer.parseInt((String) request.getAttribute("restaurantID"))));
+				}
 				
 			}else{
 				final RestaurantDao.ExtraCond extraCond = new RestaurantDao.ExtraCond();

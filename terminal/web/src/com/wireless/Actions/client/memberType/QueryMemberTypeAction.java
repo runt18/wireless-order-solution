@@ -128,9 +128,9 @@ public class QueryMemberTypeAction extends DispatchAction {
 				.append(",attributeValue:" + item.getAttribute().getVal())
 				.append(",desc:'" + item.getDesc() + "'")
 				.append(",pricePlans:[" + priceChildren(item.getPrices()) + "]" )
-				.append(",pricePlan:" + (item.getDefaultPrice() != null?item.getDefaultPrice().getId() : -1))
+				.append(",pricePlan:" + (item.getDefaultPrice() != null ? item.getDefaultPrice().getId() : -1))
 				.append(",discounts:[" + children(item.getDiscounts()) + "]" )
-				.append(",discount:" + item.getDefaultDiscount().getId())
+				.append(",discount:" + (item.hasDefaultDiscount() ? item.getDefaultDiscount().getId() : -1))
 				.append("}");				
 			}
 			

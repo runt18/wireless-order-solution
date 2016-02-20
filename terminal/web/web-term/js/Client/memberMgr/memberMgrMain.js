@@ -1787,10 +1787,10 @@ Ext.onReady(function(){
 			blankText : '折扣方案不能为空.',
 			width : 135,
 			store : new Ext.data.JsonStore({
-				fields : [ 'discountID', 'text' ]
+				fields : [ 'id', 'name' ]
 			}),
-			valueField : 'discountID',
-			displayField : 'text',
+			valueField : 'id',
+			displayField : 'name',
 			typeAhead : true,
 			mode : 'local',
 			triggerAction : 'all',
@@ -1801,7 +1801,7 @@ Ext.onReady(function(){
 					var mDiscountSelecteds = document.getElementsByName('memberDiscount');
 					for (var i = 0; i < mDiscountSelecteds.length; i++) {
 						if(mDiscountSelecteds[i].checked){
-							mDiscountSelectedList.push({'discountID':mDiscountSelecteds[i].value,'text':mDiscountSelecteds[i].nextSibling.innerHTML});
+							mDiscountSelectedList.push({'id':mDiscountSelecteds[i].value,'name':mDiscountSelecteds[i].nextSibling.innerHTML});
 						}
 						
 					}
@@ -1851,7 +1851,7 @@ Ext.onReady(function(){
 				});
 			},
 			select : function(){
-				var typeID = Ext.getCmp('discountID_member').getValue();
+				//加载折扣
 				Ext.Ajax.request({
 					url : '../../OperateDiscount.do',
 					params : {
@@ -1860,7 +1860,6 @@ Ext.onReady(function(){
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
-						console.log(jr)
 						
 						Ext.getCmp('formMemberDiscount_panel_member').removeAll();
 
@@ -1890,43 +1889,116 @@ Ext.onReady(function(){
 						}
 						Ext.getCmp('formMemberDiscount_panel_member').add(defaultMemberTypeDiscount);
 						Ext.getCmp('formMemberDiscount_panel_member').doLayout();
-						
-						if(pricePlanData.length > 0 && document.getElementsByName('memberPricePlan').length == 0){
-						for (var i = 0; i < pricePlanData.length; i++) {
-							var c = {items : [{
-								xtype : "checkbox", 
-								name : "memberPricePlan",
-								boxLabel : checkLabel(pricePlanData[i].name) , 
-								hideLabel : true, 
-								inputValue :  pricePlanData[i].id,
-								listeners : {
-									focus : function(){
-										Ext.getCmp('comboDefaultPricePlan_combo_member').setValue();
-										Ext.getCmp('comboDefaultPricePlan_combo_member').clearInvalid();
-									},
-									check : function(){
-										Ext.getCmp('comboDefaultPricePlan_combo_member').setValue();
-										Ext.getCmp('comboDefaultPricePlan_combo_member').clearInvalid();
+					}
+				});
+				
+				//加载价格方案
+				Ext.Ajax.request({
+					url : '../../OperatePricePlan.do',
+					params : {
+						dataSource : 'getByCond',
+						branchId : selectRestaurant.getValue(),
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						if(jr.root.length > 0){
+							Ext.getCmp('formMemberPricePlan_panel_member').removeAll();
+							for (var i = 0; i < jr.root.length; i++) {
+								var c = {items : [{
+									xtype : "checkbox", 
+									name : "memberPricePlan",
+									boxLabel : checkLabel(jr.root[i].name) , 
+									hideLabel : true, 
+									inputValue :  jr.root[i].id,
+									listeners : {
+										focus : function(){
+											Ext.getCmp('comboDefaultPricePlan_combo_member').setValue();
+											Ext.getCmp('comboDefaultPricePlan_combo_member').clearInvalid();
+										},
+										check : function(){
+											Ext.getCmp('comboDefaultPricePlan_combo_member').setValue();
+											Ext.getCmp('comboDefaultPricePlan_combo_member').clearInvalid();
+										}
 									}
+								}]};
+								Ext.getCmp('formMemberPricePlan_panel_member').add(c);
+								//solveIE自动换行时格式错乱
+								if((i+1)%6 == 0){
+									Ext.getCmp('formMemberPricePlan_panel_member').add({columnWidth : 1});
 								}
-							}]};
-							Ext.getCmp('formMemberPricePlan_panel_member').add(c);
-							//solveIE自动换行时格式错乱
-							if((i+1)%6 == 0){
-								Ext.getCmp('formMemberPricePlan_panel_member').add({columnWidth : 1});
+							}
+							Ext.getCmp('formMemberPricePlan_panel_member').add(defaultMemberTypePricePlan);		
+	//						Ext.getCmp('formMemberPricePlan_panel_member').syncSize();
+							Ext.getCmp('formMemberPricePlan_panel_member').doLayout();
+						}else{
+							Ext.getCmp('formMemberPricePlan_panel_member').removeAll();
+						}
+					}
+				});
+				
+				var typeID = Ext.getCmp('discountID_member').getValue();
+				Ext.Ajax.request({
+					url : '../../QueryMemberType.do',
+					params : {
+						dataSource : 'normal',
+						memberTypeId : typeID,
+						branchId : selectRestaurant.getValue()
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						console.log(jr);
+						
+						var discounts = document.getElementsByName('memberDiscount');
+					
+						
+						for (var i = 0; i < jr.root[0].discounts.length; i++) {
+							for (var j = 0; j < discounts.length; j++) {
+								if(jr.root[0].discounts[i].id == discounts[j].attributes.value.value){
+									discounts[j].checked = true;
+								}
 							}
 						}
-						Ext.getCmp('formMemberPricePlan_panel_member').add(defaultMemberTypePricePlan);		
-//						Ext.getCmp('formMemberPricePlan_panel_member').syncSize();
-						Ext.getCmp('formMemberPricePlan_panel_member').doLayout();
-					}else{
-						Ext.getCmp('formMemberPricePlan_panel_member').hide();
-					}
+						Ext.getCmp('comboDiscount_combo_member').store.loadData(jr.root[0].discounts);
+						
+						var pricePlans = document.getElementsByName('memberPricePlan');
+						
+						for (var i = 0; i < jr.root[0].pricePlans.length; i++) {
+							for (var j = 0; j < pricePlans.length; j++) {
+								if(jr.root[0].pricePlans[i].id == pricePlans[j].attributes.value.value){
+									pricePlans[j].checked = true;
+								}
+							}
+						}	
+						
+						if(Ext.getCmp('comboDefaultPricePlan_combo_member')){
+							Ext.getCmp('comboDefaultPricePlan_combo_member').store.loadData(jr.root[0].pricePlans);
+						}
+						
+						var discount = Ext.getCmp('comboDiscount_combo_member');
+						var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
+						
+						discount.setValue(jr.root[0].discounts[0] ? jr.root[0].discounts[0].id : '');
+						if(pricePlan){
+							pricePlan.setValue(jr.root[0].pricePlans[0] ? jr.root[0].pricePlans[0].id : '');
+						}
 						
 					}
 				});
 				
-
+			
+//				
+//				
+//				
+//				var discount = Ext.getCmp('comboDiscount_combo_member');
+//				var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
+//				
+//				discount.setValue(sd.attributes['discount']);
+//				if(pricePlan){
+//					pricePlan.setValue(sd.attributes['pricePlan'] > 0 ? sd.attributes['pricePlan'] : '');
+//				}
+//				
+				
+				
 			}
 		}
 	});
@@ -1976,6 +2048,7 @@ Ext.onReady(function(){
 				title : '设置门店折扣',
 				closable : false,
 				resizable : false,
+				modal : true,
 				width : 275,
 				items : [{
 					xtype : 'hidden',
@@ -1994,14 +2067,13 @@ Ext.onReady(function(){
 					items : [{
 						columnWidth : 0.4,
 						xtype : 'label',
-						text : '选择餐厅类型:'
+						text : '选择餐厅:'
 					}, selectRestaurant]
 				},{
 					columnWidth : 1,
 					xtype : 'label',
 					style : 'text-align:left;padding-bottom:3px;',
 					text : '选择折扣方案:'
-					
 				},{
 					xtype : 'panel',
 					layout : 'column',
@@ -2464,53 +2536,54 @@ Ext.onReady(function(){
 		}
 		
 		//FIXME
+		
 		//加载折扣方案
 		loadPricePlanData();
 		var typeID = Ext.getCmp('discountID_member');
 		
 		typeID.setValue(sd.attributes['memberTypeId']);
+		Ext.getCmp('selectRestaurant_combo_memeberMgrMain').setValue(restaurantID);
+//		var discounts = document.getElementsByName('memberDiscount');
+//		for (var i = 0; i < sd.attributes['discounts'].length; i++) {
+//			for (var j = 0; j < discounts.length; j++) {
+//				if(sd.attributes['discounts'][i].discountID == discounts[j].value){
+//					
+//					discounts[j].checked = true;
+//				}
+//			}
+//		}
+//		Ext.getCmp('comboDiscount_combo_member').store.loadData(sd.attributes['discounts']);
+//		
+//		
+//		
+//		var pricePlans = document.getElementsByName('memberPricePlan');
+//		for (var i = 0; i < sd.attributes['pricePlans'].length; i++) {
+//			for (var j = 0; j < pricePlans.length; j++) {
+//				if(sd.attributes['pricePlans'][i].id == pricePlans[j].value){
+//					pricePlans[j].checked = true;
+//				}
+//			}
+//		}	
+//		
+//		if(Ext.getCmp('comboDefaultPricePlan_combo_member')){
+//			Ext.getCmp('comboDefaultPricePlan_combo_member').store.loadData(sd.attributes['pricePlans']);
+//		}
+//		
+//		
+//		
+//		var discount = Ext.getCmp('comboDiscount_combo_member');
+//		var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
+//		
+//		discount.setValue(sd.attributes['discount']);
+//		if(pricePlan){
+//			pricePlan.setValue(sd.attributes['pricePlan'] > 0 ? sd.attributes['pricePlan'] : '');
+//		}
+		Ext.getCmp('selectRestaurant_combo_memeberMgrMain').fireEvent('select');
 		
-		var discounts = document.getElementsByName('memberDiscount');
-		for (var i = 0; i < sd.attributes['discounts'].length; i++) {
-			for (var j = 0; j < discounts.length; j++) {
-				if(sd.attributes['discounts'][i].discountID == discounts[j].value){
-					
-					discounts[j].checked = true;
-				}
-			}
-		}
-		Ext.getCmp('comboDiscount_combo_member').store.loadData(sd.attributes['discounts']);
-		
-		
-		
-		var pricePlans = document.getElementsByName('memberPricePlan');
-		for (var i = 0; i < sd.attributes['pricePlans'].length; i++) {
-			for (var j = 0; j < pricePlans.length; j++) {
-				if(sd.attributes['pricePlans'][i].id == pricePlans[j].value){
-					pricePlans[j].checked = true;
-				}
-			}
-		}	
-		
-		if(Ext.getCmp('comboDefaultPricePlan_combo_member')){
-			Ext.getCmp('comboDefaultPricePlan_combo_member').store.loadData(sd.attributes['pricePlans']);
-		}
-		
-		
-		
-		var discount = Ext.getCmp('comboDiscount_combo_member');
-		var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
-		
-		discount.setValue(sd.attributes['discount']);
-		if(pricePlan){
-			pricePlan.setValue(sd.attributes['pricePlan'] > 0 ? sd.attributes['pricePlan'] : '');
-		}
-		
-		
-		discount.clearInvalid();
-		if(pricePlan){
-			pricePlan.clearInvalid();
-		}
+//		discount.clearInvalid();
+//		if(pricePlan){
+//			pricePlan.clearInvalid();
+//		}
 	}
 	
 	function updateMemberTypeHandler(){
