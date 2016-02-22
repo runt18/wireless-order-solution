@@ -122,9 +122,6 @@
 			type="com.wireless.Actions.deptMgr.kitchenMgr.OperateKitchenAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/QueryDept" type="com.wireless.Actions.deptMgr.QueryDeptAction"
-			scope="request" parameter="dataSource">
-		</action>
 		<action path="/OperateDept" type="com.wireless.Actions.deptMgr.OperateDeptAction"
 			scope="request" parameter="dataSource">
 		</action>
