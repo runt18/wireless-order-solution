@@ -311,7 +311,7 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareRegion(Staff staff, int restaurantId) throws SQLException{
-		List<Region> regions = RegionDao.getAll(staff);
+		List<Region> regions = RegionDao.getByCond(staff, null, null);
 		for(Region r : regions){
 			Region.RegionId regionId = Region.RegionId.valueOf(r.getId());
 			Assert.assertEquals("region associated restaurant id", r.getRestaurantId(), restaurantId);

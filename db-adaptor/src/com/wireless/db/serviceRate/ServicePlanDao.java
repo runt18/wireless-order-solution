@@ -161,7 +161,7 @@ public class ServicePlanDao {
 			sql = " INSERT INTO " +  Params.dbName + ".service_rate "	+ 
 				  " (plan_id, restaurant_id, region_id, rate) VALUES ";
 			int i = 0;
-			for(Region region : RegionDao.getByStatus(dbCon, staff, Region.Status.BUSY)){
+			for(Region region : RegionDao.getByCond(dbCon, staff, new RegionDao.ExtraCond().setStatus(Region.Status.BUSY), null)){
 				sql += ( i > 0 ? "," : "");
 				sql += ("(" + spId + "," + staff.getRestaurantId() + "," + region.getId() + "," + builder.getRate() + ")");
 				i++;
