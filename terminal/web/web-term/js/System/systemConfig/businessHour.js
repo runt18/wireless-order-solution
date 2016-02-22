@@ -222,7 +222,7 @@ function initBusinessHourWin(){
 		'',
 		'',
 		'',
-		'../../QueryBusinessHour.do',
+		'../../OperateBusinessHour.do',
 		[
 			[true, false, false, false], 
 			['市别', 'name', 60],
@@ -231,7 +231,7 @@ function initBusinessHourWin(){
 			['操作', 'operation',, 'center', 'businessHourRenderer']
 		],
 		['id', 'name', 'restaurantId', 'opening', 'ending'],
-		[],
+		[['dataSource', 'getByCond']],
 		0,
 		'',
 		businessHourGridTbar

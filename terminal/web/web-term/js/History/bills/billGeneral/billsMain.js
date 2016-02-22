@@ -768,7 +768,10 @@ Ext.onReady(function() {
 					render : function(thiz){
 						var data = [[-1,'全天']];
 						$.ajax({
-							url : '../../QueryBusinessHour.do',
+							url : '../../OperateBusinessHour.do',
+							data : {
+								dataSource : 'getByCond'
+							},
 							type : 'post',
 							dataType : 'json',
 							async : false,
