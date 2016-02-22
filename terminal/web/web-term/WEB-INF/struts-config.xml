@@ -30,9 +30,6 @@
 		<action path="/QueryOTA" type="com.wireless.Actions.ota.QueryOTAction"
 			scope="request">
 		</action>
-		<action path="/QueryRegion" type="com.wireless.Actions.regionMgr.QueryRegionAction"
-			scope="request" parameter="dataSource">
-		</action>
 		<action path="/OperateRegion"
 			type="com.wireless.Actions.regionMgr.OperateRegionAction" scope="request"
 			parameter="dataSource">
