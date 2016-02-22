@@ -1,5 +1,8 @@
 package com.wireless.Actions.regionMgr;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,7 +21,7 @@ import com.wireless.pojo.staffMgr.Staff;
 public class OperateRegionAction extends DispatchAction{
 	
 	/**
-	 * 
+	 * 更新区域
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -26,102 +29,214 @@ public class OperateRegionAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward update(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward update(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String id = request.getParameter("id");
+		final String name = request.getParameter("name");
 		
-		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String id = request.getParameter("id");
-			String name = request.getParameter("name");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			RegionDao.update(staff, new Region.UpdateBuilder(Short.valueOf(id), name.trim()));
-			jobject.initTip(true, "操作成功, 已修改区域信息.");
-		}catch(BusinessException e){
+			jObject.initTip(true, "操作成功, 已修改区域信息.");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
 	
-	public ActionForward insert(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	/**
+	 * 新建区域信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward insert(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		
-		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String name = request.getParameter("name");
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String name = request.getParameter("name");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			RegionDao.add(staff, new Region.AddBuilder(name));
-			jobject.initTip(true, "操作成功, 已添加区域信息.");
-		}catch(BusinessException e){
+			jObject.initTip(true, "操作成功, 已添加区域信息.");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}	
 	
-	public ActionForward delete(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	/**
+	 * 删除区域
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward delete(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		final String pin = (String)request.getAttribute("pin");
+		final String id = request.getParameter("id");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String id = request.getParameter("id");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			RegionDao.remove(staff, Integer.parseInt(id));
-			jobject.initTip(true, "删除成功");
-		}catch(BusinessException e){
+			jObject.initTip(true, "删除成功");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}	
 	
-	public ActionForward swap(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	/**
+	 * 获取区域
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String id = request.getParameter("id");
+		final String status = request.getParameter("status");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String regionA = request.getParameter("regionA");
-			String regionB = request.getParameter("regionB");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final RegionDao.ExtraCond extraCond = new RegionDao.ExtraCond();
+			
+			if(id != null && !id.isEmpty()){
+				extraCond.setId(Integer.parseInt(id));
+			}
+
+			if(status != null && !status.isEmpty()){
+				extraCond.setStatus(Region.Status.valueOf(Integer.parseInt(status)));
+			}else{
+				extraCond.setStatus(Region.Status.BUSY);
+			}
+			
+			jObject.setRoot(RegionDao.getByCond(staff, extraCond, null));
+			
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 互换区域
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward swap(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		final String pin = (String)request.getAttribute("pin");
+		final String regionA = request.getParameter("regionA");
+		final String regionB = request.getParameter("regionB");
+		
+		final JObject jObject = new JObject();
+		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			RegionDao.move(staff, new Region.MoveBuilder(Integer.parseInt(regionA), Integer.parseInt(regionB)));
 			//jobject.initTip(true, "删除成功");
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}	
 
+	/**
+	 * 生成区域树状
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward tree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		final String pin = (String)request.getAttribute("pin");
+		
+		final StringBuilder tsb = new StringBuilder();
+		try{
+			Staff staff = StaffDao.getById(Integer.parseInt(pin));
+			List<Region> list = RegionDao.getByStatus(staff, Region.Status.BUSY);
+			if(!list.isEmpty()){
+				tsb.append("[");
+				for(int i = 0; i < list.size(); i++){
+					Region temp = list.get(i);
+					tsb.append(i > 0 ? "," : "")
+					   .append("{")
+					   .append("leaf:" + true)
+					   .append(",")
+					   .append("id:" + temp.getId())
+					   .append(",")
+					   .append("regionId:" + temp.getId())
+					   .append(",")
+					   .append("regionName:'" + temp.getName() + "'")
+					   .append(",")
+					   .append("restaurantId:" + temp.getRestaurantId())
+					   .append(",")
+					   .append("text:'" + temp.getName() + "'")
+					   .append("}");
+				}
+				tsb.append("]");
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(tsb.toString());
+		}
+		return null;
+	}
 }
