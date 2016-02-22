@@ -547,9 +547,6 @@
 		<action path="/RepaidOrder"
 			type="com.wireless.Actions.dishesOrder.RepaidOrderAction" scope="request">
 		</action>
-		<action path="/QueryBusinessHour"
-			type="com.wireless.Actions.system.QueryBusinessHourAction" scope="request">
-		</action>
 		<action path="/OperateBusinessHour"
 			type="com.wireless.Actions.system.OperateBusinessHourAction" scope="request"
 			parameter="dataSource">
