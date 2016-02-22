@@ -21,9 +21,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
-import com.wireless.pojo.billStatistics.discount.DiscountIncomeByDept;
 import com.wireless.pojo.billStatistics.discount.DiscountIncomeByEachDay;
-import com.wireless.pojo.billStatistics.discount.DiscountIncomeByStaff;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.staffMgr.Staff;
@@ -33,9 +31,19 @@ import com.wireless.util.DataPaging;
 
 public class QueryDiscountStatisticsAction extends DispatchAction{
 
+	/**
+	 * 获取折扣数据
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final JObject jobject = new JObject();
 		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
 		final String beginDate = request.getParameter("beginDate");
@@ -46,9 +54,13 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 		final String ending = request.getParameter("ending");
 		
 		try{
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
 				extraCond.setStaffId(Integer.valueOf(staffId));
@@ -95,39 +107,53 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 		return null;
 	}
 	
-	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String deptID = request.getParameter("deptID");
-		String staffID = request.getParameter("staffId");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+	/**
+	 * 获取折扣走势图（按折扣额）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String deptId = request.getParameter("deptID");
+		final String staffId = request.getParameter("staffId");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
-			CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 			}
-			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
-				extraCond.setStaffId(Integer.valueOf(staffID));
+			
+			final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
+			}
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
-			List<DiscountIncomeByEachDay> cancelList = CalcDiscountStatisticsDao.calcDiscountIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
+			List<DiscountIncomeByEachDay> result = CalcDiscountStatisticsDao.calcDiscountIncomeByEachDay(staff, new DutyRange(dateBeg, dateEnd), extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
 			List<Float> amountData = new ArrayList<Float>();
 			float totalMoney = 0, totalCount = 0;
-			for (DiscountIncomeByEachDay c : cancelList) {
-				xAxis.add("\'"+c.getRange().getOffDutyFormat()+"\'");
+			for (DiscountIncomeByEachDay c : result) {
+				xAxis.add("\'" + c.getRange().getOffDutyFormat() + "\'");
 				data.add(c.getmDiscountPrice());
 				amountData.add(c.getmDiscountAmount());
 				
@@ -135,9 +161,9 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 				totalCount += c.getmDiscountAmount();
 			}
 			
-			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/cancelList.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/cancelList.size())*100)/100 + 
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/result.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/result.size())*100)/100 + 
 					",\"ser\":[{\"name\":\'折扣金额\', \"data\" : " + data + "}, {\"name\":\'折扣数量\', \"data\" : " + amountData + "}]}";
-			jobject.setExtra(new Jsonable(){
+			jObject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
@@ -152,97 +178,126 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 			
 			});
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
 	}
 	
-	public ActionForward getStaffChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String deptID = request.getParameter("deptID");
-		String staffID = request.getParameter("staffId");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+	/**
+	 * 获取折扣走势图（按员工）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getStaffChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String deptId = request.getParameter("deptID");
+		final String staffId = request.getParameter("staffId");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
-			CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
-			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 			}
-			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
-				extraCond.setStaffId(Integer.valueOf(staffID));
+			
+			final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
+			
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffId));
+			}
+			
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
-			List<DiscountIncomeByStaff> cancelList = CalcDiscountStatisticsDao.calcDiscountIncomeByStaff(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
 			
-			jobject.setRoot(cancelList);
+			jObject.setRoot(CalcDiscountStatisticsDao.calcDiscountIncomeByStaff(staff, new DutyRange(dateBeg, dateEnd), extraCond));
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
 	}
+	
+	/**
+	 * 获取折扣走势图（按部门）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getDeptChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String deptId = request.getParameter("deptID");
+		final String staffId = request.getParameter("staffId");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-	public ActionForward getDeptChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String deptID = request.getParameter("deptID");
-		String staffID = request.getParameter("staffId");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
-		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
-			CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 			}
-			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
-				extraCond.setStaffId(Integer.valueOf(staffID));
+			
+			final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
+			}
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
-			List<DiscountIncomeByDept> cancelList = CalcDiscountStatisticsDao.calcDiscountIncomeByDept(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
 			
-			jobject.setRoot(cancelList);
+			jObject.setRoot(CalcDiscountStatisticsDao.calcDiscountIncomeByDept(staff, new DutyRange(dateBeg, dateEnd), extraCond));
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
