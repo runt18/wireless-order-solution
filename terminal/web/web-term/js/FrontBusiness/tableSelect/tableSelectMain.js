@@ -410,10 +410,10 @@ function shiftButHandler(){
 				render : function(thiz){
 					var data = [];
 					$.ajax({
-						url : '../../QueryRegion.do',
+						url : '../../OperateRegion.do',
 						type : 'post',
 						async: false,
-						data : {dataSource : 'normal'},
+						data : {dataSource : 'getByCond'},
 						success : function(jr, status, xhr){
 							for(var i = 0; i < jr.root.length; i++){
 								data.push([jr.root[i]['id'], jr.root[i]['name']]);
@@ -598,10 +598,10 @@ function dailySettleButHandler(){
 				render : function(thiz){
 					var data = [];
 					$.ajax({
-						url : '../../QueryRegion.do',
+						url : '../../OperateRegion.do',
 						type : 'post',
 						async: false,
-						data : {dataSource : 'normal'},
+						data : {dataSource : 'getByCond'},
 						success : function(jr, status, xhr){
 							for(var i = 0; i < jr.root.length; i++){
 								data.push([jr.root[i]['id'], jr.root[i]['name']]);
@@ -786,10 +786,10 @@ function paymentHandler(){
 				render : function(thiz){
 					var data = [];
 					$.ajax({
-						url : '../../QueryRegion.do',
+						url : '../../OperateRegion.do',
 						type : 'post',
 						async: false,
-						data : {dataSource : 'normal'},
+						data : {dataSource : 'getByCond'},
 						success : function(jr, status, xhr){
 							for(var i = 0; i < jr.root.length; i++){
 								data.push([jr.root[i]['id'], jr.root[i]['name']]);
@@ -1894,7 +1894,7 @@ Ext.onReady(function() {
 			text : "全部区域",
 			regionId : -1,
 			loader : new Ext.tree.TreeLoader({
-				url : "../../QueryRegion.do",
+				url : "../../OperateRegion.do",
 				baseParams : {
 					dataSource : 'tree'
 				},

@@ -37,9 +37,9 @@ $(function(){
 				render : function(thiz){
 					var data = [[-1,'全部']];
 					Ext.Ajax.request({
-						url : '../../QueryRegion.do',
+						url : '../../OperateRegion.do',
 						params : {
-							dataSource : 'normal'
+							dataSource : 'getByCond'
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);

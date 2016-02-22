@@ -1510,7 +1510,7 @@ $(function(){
 	
 		Util.LM.show();
 		//加载区域
-		$.post('../QueryRegion.do', {dataSource : 'normal'}, function(response, status, xhr){
+		$.post('../OperateRegion.do', {dataSource : 'getByCond'}, function(response, status, xhr){
 			if(status == 'success'){
 				if(response.success){
 					WirelessOrder.regions = response.root;

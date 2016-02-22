@@ -688,12 +688,12 @@ Ext.onReady(function() {
 						var data = [[-1,'全部']];
 						
 						$.ajax({
-							url : '../../QueryRegion.do',
+							url : '../../OperateRegion.do',
 							type : 'post',
 							dataType : 'json',
 							async : false,
 							data : {
-								dataSource : 'normal'
+								dataSource : 'getByCond'
 							},
 							success : function(jr){
 								for(var i = 0; i < jr.root.length; i++){
