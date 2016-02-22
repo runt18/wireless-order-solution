@@ -103,7 +103,7 @@ function FeastPaidPopup(param){
 	
 	this.open = function(afterOpen){
 		_feastPay.open(function(){
-			$.post('../QueryDept.do',{dataSource : 'normal'}, function(result){
+			$.post('../OperateDept.do',{dataSource : 'getByCond'}, function(result){
 				_dept = result.root;
 				
 				var html = [];

@@ -36,7 +36,6 @@ Ext.onReady(function(){
 			
 			hours = sendToStatisticsPageHours;
 			
-			//TODO
 			Ext.getCmp('coupon_btnSearch').handler();
 			
 			Ext.getCmp('coupon_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">' + hours.openingText + '</font>');
@@ -180,7 +179,7 @@ Ext.onReady(function(){
 	}, {
 		xtype : 'textfield',
 		id : 'memeberName_textfield',
-		width : 150,
+		width : 150
 	}, '->', {
 		text : '搜索',
 		id : 'coupon_btnSearch',
@@ -363,7 +362,7 @@ Ext.onReady(function(){
 		layout : 'border',
 		region : 'center',
 		frame : true,
-		items : [couponGrid],
+		items : [couponGrid]
 	});
 	
 	//关联链接

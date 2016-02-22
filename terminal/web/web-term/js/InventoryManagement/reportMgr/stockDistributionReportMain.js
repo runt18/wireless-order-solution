@@ -211,11 +211,14 @@ Ext.onReady(function(){
 	
 	var deptProperty = [];
 	$.ajax({
-		url : '../../QueryDept.do',
+		url : '../../OperateDept.do',
 		type : 'post',
 		dataType : 'json',
 		async : false,
-		data : {dataSource : 'normal'},
+		data : {
+			dataSource : 'getByCond',
+			inventory : true
+		},
 		success : function(data){
 			deptProperty = data.root;
 		},

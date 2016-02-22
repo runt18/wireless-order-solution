@@ -17,10 +17,9 @@ function formatName(v){
 
 function loadInformation(){
 	Ext.Ajax.request({
-		url : '../../QueryDept.do',
+		url : '../../OperateDept.do',
 		params : {
-			dataSource : 'normal',
-			isDept : true
+			dataSource : 'getByCond'
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);

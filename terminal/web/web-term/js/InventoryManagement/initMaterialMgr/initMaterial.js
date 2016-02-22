@@ -59,8 +59,11 @@ function initMaterialControl(){
 			render : function(thiz){
 				var data = [];
 				Ext.Ajax.request({
-					url : '../../QueryDept.do',
-					params : {dataSource : 'normal'},
+					url : '../../OperateDept.do',
+					params : {
+						dataSource : 'getByCond',
+						inventory : true
+					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
 						for(var i = 0; i < jr.root.length; i++){
