@@ -1,5 +1,7 @@
 package com.wireless.Actions.system;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,13 +15,14 @@ import com.wireless.db.system.BusinessHourDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.HourRange;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.BusinessHour;
 import com.wireless.pojo.util.DateUtil;
 
 public class OperateBusinessHourAction extends DispatchAction{
 
 	/**
-	 * 
+	 * 新增市别
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -27,36 +30,35 @@ public class OperateBusinessHourAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward insert(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
-		try{
-			String pin = (String) request.getAttribute("pin");
-			String name = request.getParameter("name");
-			String opening = request.getParameter("opening");
-			String ending = request.getParameter("ending");
-			
-			BusinessHour.InsertBuilder insert = new BusinessHour.InsertBuilder(name, new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String) request.getAttribute("pin");
+		final String name = request.getParameter("name");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 
-			BusinessHourDao.insert(StaffDao.verify(Integer.parseInt(pin)), insert);
-			jobject.initTip(true, "操作成功, 已添加市别信息.");
+		final JObject jObject = new JObject();
+		try{
 			
-		}catch(BusinessException e){
+			final BusinessHour.InsertBuilder builder = new BusinessHour.InsertBuilder(name, new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+
+			BusinessHourDao.insert(StaffDao.verify(Integer.parseInt(pin)), builder);
+			jObject.initTip(true, "操作成功, 已添加市别信息.");
+			
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 				
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
 	
 	/**
-	 * 
+	 * 修改市别
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -64,40 +66,44 @@ public class OperateBusinessHourAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward update(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
+	public ActionForward update(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String) request.getAttribute("pin");
+		final String id = request.getParameter("id");
+		final String name = request.getParameter("name");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
+		
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String) request.getAttribute("pin");
-			String id = request.getParameter("id");
-			String name = request.getParameter("name");
-			String opening = request.getParameter("opening");
-			String ending = request.getParameter("ending");
 			
-			BusinessHour.UpdateBuilder update = new BusinessHour.UpdateBuilder(Integer.parseInt(id));
-			update.setName(name);
-			update.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+			final BusinessHour.UpdateBuilder builder = new BusinessHour.UpdateBuilder(Integer.parseInt(id));
+			if(name != null && !name.isEmpty()){
+				builder.setName(name);
+			}
 			
-			BusinessHourDao.update(StaffDao.verify(Integer.parseInt(pin)),update);
+			if(opening != null && !opening.isEmpty() && ending != null && !ending.isEmpty()){
+				builder.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+			}
 			
-			jobject.initTip(true, "操作成功, 已市别信息.");
+			BusinessHourDao.update(StaffDao.verify(Integer.parseInt(pin)), builder);
 			
-		}catch(BusinessException e){
+			jObject.initTip(true, "操作成功, 已市别信息.");
+			
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
 	
 	/**
-	 * 
+	 * 删除市别
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -105,24 +111,60 @@ public class OperateBusinessHourAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward delete(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
+	public ActionForward delete(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String) request.getAttribute("pin");
+		final String id = request.getParameter("id");
+		final JObject jObject = new JObject();
 		try{
-			String id = request.getParameter("id");
-			BusinessHourDao.delete(Integer.valueOf(id));
-			jobject.initTip(true, "操作成功, 已删除市别.");
-		}catch(BusinessException e){
+			BusinessHourDao.deleteById(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(id));
+			jObject.initTip(true, "操作成功, 已删除市别.");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
 
+	/**
+	 * 获取市别数据
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String id = request.getParameter("id");
+		final JObject jObject = new JObject();
+		try{
+			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final BusinessHourDao.ExtraCond extraCond = new BusinessHourDao.ExtraCond();
+			
+			if(id != null && !id.isEmpty()){
+				extraCond.setId(Integer.parseInt(id));
+			}
+			
+			jObject.setRoot(BusinessHourDao.getByCond(staff, extraCond, null));
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
 }
