@@ -149,14 +149,14 @@ function initPayTypeWin(){
 			'',
 			'',
 			'',
-			'../../QueryPayType.do',
+			'../../OperatePayType.do',
 			[
 				[true, false, false, false], 
 				['名称', 'name'],
 				['操作', 'operation', 60, 'center', 'payTypeRenderer']
 			],
 			['id', 'name', 'typeValue'],
-			[['dataSource', 'exceptMember']],
+			[['dataSource', 'getByCond'], ['designed', 'true'], ['extra', 'true']],
 			0,
 			'',
 			payTypeGridTbar
@@ -295,9 +295,11 @@ function initPayTypeWin(){
 
 function getPayType(){
 	Ext.Ajax.request({
-		url : "../../QueryPayType.do",
+		url : "../../OperatePayType.do",
 		params : {
-			dataSource : 'exceptMember'
+			dataSource : 'getByCond',
+			designed : true,
+			extra : true
 		},
 		success : function(response){
 			var jr = Ext.util.JSON.decode(response.responseText);

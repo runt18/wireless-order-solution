@@ -639,11 +639,11 @@ Ext.onReady(function() {
 				listeners : {
 					render : function(thiz){
 						$.ajax({
-							url : '../../QueryPayType.do',
+							url : '../../OperatePayType.do',
 							type : 'post',
 							dataType : 'json',
 							data : {
-								dataSource : 'allPayType'
+								dataSource : 'getByCond'
 							},
 							async : false,
 							success : function(jr){

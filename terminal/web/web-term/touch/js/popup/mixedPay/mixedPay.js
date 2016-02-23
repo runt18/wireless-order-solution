@@ -63,10 +63,12 @@ function createMixPayPopup(param){
 	this.open = function(afterOpen){
 		_mixPayPopup.open(function(self){
 			$.ajax({
-				url : "../QueryPayType.do",
+				url : "../OperatePayType.do",
 				type : 'post',
 				data : {
-					dataSource : 'exceptMember'
+					dataSource : 'getByCond',
+					designed : true,
+					extra : true
 				},
 				success : function(jr, status, xhr){
 					if(jr.success){
