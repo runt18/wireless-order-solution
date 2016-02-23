@@ -214,9 +214,9 @@ function mcs_initBusinessReceipsGrid(c){
 			listeners : {
 				render : function(thiz){
 					Ext.Ajax.request({
-						url : '../../QueryPayType.do?',
+						url : '../../OperatePayType.do',
 						params : {
-							dataSource : 'allPayType'
+							dataSource : 'getByCond'
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);

@@ -639,11 +639,14 @@ $(function(){
 	Ext.onReady(function(){
 		//获取总共的付款方式, 动态生成columnModel & Store的Records
 		$.ajax({
-			url : '../../QueryPayType.do',
+			url : '../../OperatePayType.do',
 			type : 'post',
 			async:false,
 			data : {
-				dataSource : 'exceptMixed'
+				dataSource : 'getByCond',
+				designed : true,
+				extra : true,
+				member : true
 			},
 			success : function(jr, status, xhr){
 				business_receipts_payType = jr.root;

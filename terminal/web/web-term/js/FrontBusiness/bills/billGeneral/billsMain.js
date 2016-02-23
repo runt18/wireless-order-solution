@@ -459,8 +459,8 @@ Ext.onReady(function(){
 				listeners : {
 					render : function(thiz){
 						Ext.Ajax.request({
-							url : '../../QueryPayType.do',
-							params : {dataSource : 'allPayType'},
+							url : '../../OperatePayType.do',
+							params : {dataSource : 'getByCond'},
 							success : function(res){
 								var jr = Ext.decode(res.responseText);
 								jr.root.unshift({id:-1, name:'全部'});

@@ -109,7 +109,10 @@ Ext.onReady(function(){
 				render : function(thiz){
 					var data = [[-1,'全部']];
 					Ext.Ajax.request({
-						url : '../../QueryCancelReason.do',
+						url : '../../OperateCancelReason.do',
+						params : {
+							dataSource : 'getByCond'
+						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
 							for(var i = 0; i < jr.root.length; i++){
