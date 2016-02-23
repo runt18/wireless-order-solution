@@ -578,9 +578,6 @@
 		<action path="/WXQueryDaZhongInfo" type="com.wireless.Actions.init.QueryDazhongDataAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/QueryPayType" type="com.wireless.Actions.orderMgr.QueryPayTypeAction"
-			scope="request" parameter="dataSource">
-		</action>
 		<action path="/OperatePayType"
 			type="com.wireless.Actions.orderMgr.OperatePayTypeAction" scope="request"
 			parameter="dataSource">
