@@ -41,7 +41,7 @@ uo.entry = function(c){
 	//加载退菜原因
 	if(uo.reasons.length <= 0){
 		//加载退菜原因
-		$.post('../QueryCancelReason.do', function(result){
+		$.post('../OperateCancelReason.do', { dataSource : 'getByCond'}, function(result){
 			if(result.success){
 				uo.reasons = result.root;
 				uo.loadCancelReasonData(result.root);

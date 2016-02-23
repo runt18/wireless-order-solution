@@ -282,8 +282,9 @@ cancelReasonOperationHandler = function(c){
 			fn : function(btn){
 				if(btn == 'yes'){
 					Ext.Ajax.request({
-						url : '../../DeleteCancelReason.do',
+						url : '../../OperateCancelReason.do',
 						params : {
+							dataSource : 'delete',
 							id : sd['id']
 						},
 						success : function(res, opt){
@@ -369,14 +370,14 @@ function initCancelReasonWin(){
 		'',
 		'',
 		'',
-		'../../QueryCancelReason.do',
+		'../../OperateCancelReason.do',
 		[
 			[true, false, false, false], 
 			['原因', 'reason'],
 			['操作', 'operation', 60, 'center', 'cancelReasonRenderer']
 		],
 		['id', 'reason', 'restaurantID'],
-		[['restaurantID', restaurantID]],
+		[['restaurantID', restaurantID], ['dataSource', 'getByCond']],
 		0,
 		'',
 		crGridTbar
@@ -444,19 +445,21 @@ function initCancelReasonWin(){
 				var cancelReason = oCancelReasonData({
 					type :  bmObj.operation['get']
 				}).data;
-				var action;
+				
+				var dataSource;
 				if(oPanel.otype == bmObj.operation['insert']){
-					action = '../../InsertCancelReason.do';
+					dataSource = 'insert';
 					(delete cancelReason['id']);
 				}else if(oPanel.otype == bmObj.operation['update']){
-					action = '../../UpdateCancelReason.do';
+					dataSource = 'update';
 				}else{
 					return;
 				}
 				
 				Ext.Ajax.request({
-					url : action,
+					url : '../../OperateCancelReason.do',
 					params : {
+						dataSource : dataSource,
 						id : cancelReason['id'],
 						reason : cancelReason['reason']
 					},
