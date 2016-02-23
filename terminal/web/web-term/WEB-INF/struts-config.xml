@@ -249,25 +249,9 @@
 			type="com.wireless.Actions.client.member.OperateMemberAction" scope="request"
 			parameter="dataSource">
 		</action>
-		<action path="/QueryCancelReason"
-			type="com.wireless.Actions.menuMgr.cencalReason.QueryCancelReasonAction"
-			scope="request">
-		</action>
-		<action path="/QueryCancelReasonTree"
-			type="com.wireless.Actions.menuMgr.cencalReason.QueryCancelReasonTreeAction"
-			scope="request">
-		</action>
-		<action path="/UpdateCancelReason"
-			type="com.wireless.Actions.menuMgr.cencalReason.UpdateCancelReasonAction"
-			scope="request">
-		</action>
-		<action path="/InsertCancelReason"
-			type="com.wireless.Actions.menuMgr.cencalReason.InsertCancelReasonAction"
-			scope="request">
-		</action>
-		<action path="/DeleteCancelReason"
-			type="com.wireless.Actions.menuMgr.cencalReason.DeleteCancelReasonAction"
-			scope="request">
+		<action path="/OperateCancelReason"
+			type="com.wireless.Actions.menuMgr.cancelReason.OperateCancelReasonAction"
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/ExportHistoryStatisticsToExecl"
 			type="com.wireless.Actions.exportExecl.HistoryStatisticsAction"
