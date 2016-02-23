@@ -17,8 +17,6 @@ public class PayTypeDao {
 	public static class ExtraCond{
 		private int id;
 		private final List<PayType.Type> types = new ArrayList<>();
-		private PayType.Type extraType;
-		private int restaurantId;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -26,11 +24,7 @@ public class PayTypeDao {
 		}
 		
 		public ExtraCond addType(PayType.Type type){
-			if(type == PayType.Type.EXTRA){
-				extraType = type;
-			}else{
-				types.add(type);
-			}
+			types.add(type);
 			return this;
 		}
 		
@@ -53,13 +47,6 @@ public class PayTypeDao {
 				extraCond.append(" AND type IN(" + typeCond.toString() + ")");
 			}
 			
-			if(extraType != null){
-				if(extraCond.length() != 0){
-					extraCond.append(" OR (restaurant_id = " + restaurantId + " AND type = " + PayType.Type.EXTRA.getVal() + ")");
-				}else{
-					extraCond.append(" AND restaurant_id = " + restaurantId + " AND type = " + PayType.Type.EXTRA.getVal());
-				}
-			}
 			return extraCond.toString();
 		}
 	}
@@ -258,22 +245,13 @@ public class PayTypeDao {
 
 		String sql;
 		
-		if(extraCond == null){
-			extraCond = new ExtraCond();
-			for(PayType.Type type : PayType.Type.values()){
-				extraCond.addType(type);
-			}
-		}
-		
-		extraCond.restaurantId = staff.getRestaurantId();
-		
 		sql = " SELECT * FROM " + Params.dbName + ".pay_type" + 
 			  " WHERE 1 = 1 " +
-			  extraCond.toString();
-			  //(extraCond != null ? extraCond.toString() : " AND restaurant_id = " + staff.getRestaurantId());
+			  " AND restaurant_id IN (0, " + staff.getRestaurantId() + ")" +
+			  (extraCond != null ? extraCond.toString() : "");
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		List<PayType> result = new ArrayList<PayType>();
+		final List<PayType> result = new ArrayList<PayType>();
 		while(dbCon.rs.next()){
 			PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
 			payType.setName(dbCon.rs.getString("name"));
@@ -322,7 +300,7 @@ public class PayTypeDao {
 	 * 			throws if the pay type to delete does NOT exist
 	 */
 	public static void deleteById(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
-		if(delete(dbCon, staff, new ExtraCond().setId(id)) == 0){
+		if(deleteByCond(dbCon, staff, new ExtraCond().setId(id)) == 0){
 			throw new BusinessException(PayTypeError.PAY_TYPE_NOT_EXIST);
 		}
 	}
@@ -337,11 +315,11 @@ public class PayTypeDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int delete(Staff staff, ExtraCond extraCond) throws SQLException{
+	public static int deleteByCond(Staff staff, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return delete(dbCon, staff, extraCond);
+			return deleteByCond(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -359,7 +337,7 @@ public class PayTypeDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int delete(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		int amount = 0;
 		for(PayType type : getByCond(dbCon, staff, extraCond)){
 			if(type.getType() == PayType.Type.EXTRA){
