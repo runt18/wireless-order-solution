@@ -1,9 +1,6 @@
 package com.wireless.Actions.login;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,108 +23,85 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 
 public class QueryStaffAction extends Action {
+	
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-//		response.setContentType("text/json;charset=utf-8");
-		PrintWriter out = null;
-		String pin = (String) request.getAttribute("pin");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		String isName =request.getParameter("isName");
-		String name = request.getParameter("name");
-		String cate = request.getParameter("cate");
-		String privileges = request.getParameter("privileges");
-		String checkPrivilege = request.getParameter("checkPrivilege");
-		String hasDetail = request.getParameter("hasDetail");
+		final String pin = (String) request.getAttribute("pin");
+		final String restaurantId = request.getParameter("restaurantID");
+		final String branchId = request.getParameter("branchId");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String isPaging = request.getParameter("isPaging");
+		final String isName =request.getParameter("isName");
+		final String name = request.getParameter("name");
+		final String cate = request.getParameter("cate");
+		final String privileges = request.getParameter("privileges");
+		final String checkPrivilege = request.getParameter("checkPrivilege");
+		final String hasDetail = request.getParameter("hasDetail");
 		
-		JObject jobject = new JObject();
-		List<Staff> staffList = new ArrayList<Staff>();
-		Staff staff = new Staff();
-		int index = 0;
-		int pageSize = 0;
-		if (start != null) {
-			index = Integer.parseInt(start);
-			pageSize = Integer.parseInt(limit);
-		}
-		
+		final JObject jObject = new JObject();
 
-		// 是否分頁
-		String isPaging = request.getParameter("isPaging");
-		// 是否combo
-		//String isCombo = request.getParameter("isCombo");
 		final JsonMap extra = new JsonMap();
 		
 		try {
 			
-			out = response.getWriter();
-			String restaurantID ;
-				
-			restaurantID = request.getParameter("restaurantID");
-			if(pin != null){
+			Staff staff;
+			if(restaurantId != null && !restaurantId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(restaurantId));
+			}else{
 				staff = StaffDao.verify(Integer.parseInt(pin));
+				if(branchId != null && !branchId.isEmpty()){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}
 			}
+			
 			if(isName != null){
 				extra.putJsonable("staff", staff, Staff.ST_PARCELABLE_SIMPLE);
-				Restaurant restaurant;
-				if(request.getSession().getAttribute("restaurantID") == null){
-					restaurant = new Restaurant();
-				}else{
-					restaurant = RestaurantDao.getById(Integer.parseInt((String) request.getSession().getAttribute("restaurantID")));
-				}
-				extra.putJsonable("restaurant", restaurant, Restaurant.RESTAURANT_PARCELABLE_SIMPLE);
+				extra.putJsonable("restaurant", RestaurantDao.getById(staff.getRestaurantId()), Restaurant.RESTAURANT_PARCELABLE_SIMPLE);
+				
 			}else {
+				
+				final StaffDao.ExtraCond extraCond = new StaffDao.ExtraCond();
 				if(name != null && !name.trim().isEmpty()){
-					staffList = StaffDao.getByName(staff, name);
-				}else if(cate != null && !cate.trim().isEmpty()){
-					staffList = StaffDao.getByRole(staff, Integer.parseInt(cate));
-				}else if(privileges != null && !privileges.isEmpty()){
-					String privilegeCodes[] = privileges.split(",");
-					StaffDao.ExtraCond extraCond = new StaffDao.ExtraCond();
+					extraCond.setName(name);
 					
-					for (String pc : privilegeCodes) {
+				}else if(cate != null && !cate.trim().isEmpty()){
+					extraCond.setRole(Integer.parseInt(cate));
+					
+				}else if(privileges != null && !privileges.isEmpty()){
+					for (String pc : privileges.split(",")) {
 						extraCond.addPrivilegeCode(Privilege.Code.valueOf(Integer.parseInt(pc)));
 					}
-					
-					staffList = StaffDao.getByCond(staff, extraCond);
-					
-					if(staffList.contains(staff)){
-						extra.putBoolean("havePrivileges", true);
-					}
-					if(checkPrivilege != null && !checkPrivilege.isEmpty()){
-						staffList.clear();
-					}
-				}else{
-					if(restaurantID == null || restaurantID.isEmpty()){
-						restaurantID = (String) request.getSession().getAttribute("restaurantID");
-					}
-					
-					if(restaurantID != null){
-						staffList = StaffDao.getByRestaurant(Integer.parseInt(restaurantID));
-					}
 				}
-				if(restaurantID != null){
-					Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));
-					extra.putJsonable("restaurant", restaurant, Restaurant.RESTAURANT_PARCELABLE_COMPLEX);					
+				
+				List<Staff> staffList = StaffDao.getByCond(staff, extraCond);
+				
+				if(staffList.contains(staff)){
+					extra.putBoolean("havePrivileges", true);
 				}
-				jobject.setTotalProperty(staffList.size());
-				staffList = DataPaging.getPagingData(staffList, isPaging, index, pageSize);
-				jobject.setRoot(staffList);
+				
+				if(checkPrivilege != null && !checkPrivilege.isEmpty()){
+					staffList.clear();
+				}
+				
+				extra.putJsonable("restaurant", RestaurantDao.getById(staff.getRestaurantId()), Restaurant.RESTAURANT_PARCELABLE_COMPLEX);					
+				jObject.setTotalProperty(staffList.size());
+				
+				if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+					staffList = DataPaging.getPagingData(staffList, isPaging, Integer.parseInt(start), Integer.parseInt(limit));
+				}
+				jObject.setRoot(staffList);
 			}
 
-			jobject.setMsg("normal");
+			jObject.setMsg("normal");
 			
 
-		}catch (BusinessException e){
+		}catch (BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 
-		} catch (IOException e) {
-			e.printStackTrace();
-			jobject.initTip(false, "未处理异常");
 		} finally {
-			jobject.setExtra(new Jsonable(){
+			jObject.setExtra(new Jsonable(){
 
 				@Override
 				public JsonMap toJsonMap(int flag) {
@@ -140,7 +114,7 @@ public class QueryStaffAction extends Action {
 				}
 				
 			});
-			out.write(jobject.toString(hasDetail != null ? Staff.ST_PARCELABLE_COMPLEX : Staff.ST_PARCELABLE_SIMPLE));
+			response.getWriter().write(jObject.toString(hasDetail != null ? Staff.ST_PARCELABLE_COMPLEX : Staff.ST_PARCELABLE_SIMPLE));
 		}
 
 		return null;
