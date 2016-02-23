@@ -231,7 +231,7 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareBusinessHour(Staff staff) throws SQLException{
-		List<BusinessHour> actualHours = BusinessHourDao.get(staff);
+		List<BusinessHour> actualHours = BusinessHourDao.getByCond(staff, null, null);
 		for(BusinessHour hour : actualHours){
 			if(!hour.getName().equals("早市") && 
 			   !hour.getName().equals("午市") &&
