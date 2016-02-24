@@ -490,15 +490,25 @@ Ext.onReady(function(){
 	    });	
 	};
 
-function erase_fnChangeStaffChart(thiz, v){
-	$(thiz).find('input').attr('checked', 'checked');
-	erase_staffPieChart = erase_loadStaffPieChart(v);
-	erase_staffColumnChart = erase_loadStaffColumnChart(v);
-	erase_staffPieChart.setSize(eraseStatChartTabPanel.getWidth()*0.4, erase_panelDrag ? eraseStatChartTabPanel.getHeight() - erase_cutAfterDrag : eraseStatChartTabPanel.getHeight()-erase_cutChartHeight);
-	erase_staffColumnChart.setSize(eraseStatChartTabPanel.getWidth()*0.6, erase_panelDrag ? eraseStatChartTabPanel.getHeight() - erase_cutAfterDrag : eraseStatChartTabPanel.getHeight()-erase_cutChartHeight);
+	//按员工汇总抹数数量的柱状和饼图
+	$('#staffByAmount_span_eraseChart').click(function(){
+		erase_fnChangeStaffChart(this, 1);
+	});
 	
-	eraseDetailsStatPanel.otype = v;
-}
+	//按员工汇总抹数金额的柱状和饼图
+	$('#staffByFee_span_eraseChart').click(function(){
+		erase_fnChangeStaffChart(this, 0);
+	});
+	
+	function erase_fnChangeStaffChart(thiz, v){
+		$(thiz).find('input').attr('checked', 'checked');
+		erase_staffPieChart = erase_loadStaffPieChart(v);
+		erase_staffColumnChart = erase_loadStaffColumnChart(v);
+		erase_staffPieChart.setSize(eraseStatChartTabPanel.getWidth()*0.4, erase_panelDrag ? eraseStatChartTabPanel.getHeight() - erase_cutAfterDrag : eraseStatChartTabPanel.getHeight()-erase_cutChartHeight);
+		erase_staffColumnChart.setSize(eraseStatChartTabPanel.getWidth()*0.6, erase_panelDrag ? eraseStatChartTabPanel.getHeight() - erase_cutAfterDrag : eraseStatChartTabPanel.getHeight()-erase_cutChartHeight);
+		
+		eraseDetailsStatPanel.otype = v;
+	}
 
 	var erase_setStatisticsDate = function(){
 		if(sendToPageOperation){

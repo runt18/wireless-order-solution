@@ -685,6 +685,16 @@ Ext.onReady(function(){
 		}
 	}
 
+	//按退菜原因汇总金额的柱状和饼图
+	$('#reasonByFee_span_cancelChart').click(function(){
+		cancel_fnChangeReasonChart(this, 0);
+	});
+
+	//按退菜原因汇总数量的柱状和饼图
+	$('#reasonByAmount_span_cancelChart').click(function(){
+		cancel_fnChangeReasonChart(this, 1);
+	});
+	
 	function cancel_fnChangeReasonChart(thiz, v){
 		$(thiz).find('input').attr('checked', 'checked');
 		
@@ -696,6 +706,16 @@ Ext.onReady(function(){
 		cancelFoodDetailsStatPanel.otype = v;
 	}
 	
+	//按部门汇总退菜数量的柱状和饼图
+	$('#deptByFee_span_cancelChart').click(function(){
+		cancel_fnChangeDeptChart(this, 0);
+	});
+
+	//按部门汇总退菜金额的柱状和饼图
+	$('#deptByAmount_span_cancelChart').click(function(){
+		cancel_fnChangeDeptChart(this, 1);
+	});
+	
 	function cancel_fnChangeDeptChart(thiz, v){
 		$(thiz).find('input').attr('checked', 'checked');
 		cancel_deptPieChart = cancel_loadDeptPieChart(v);
@@ -705,6 +725,18 @@ Ext.onReady(function(){
 		
 		cancelFoodDetailsStatPanel.otype = v;
 	}
+	
+	//按员工汇总退菜数量的柱状和饼图
+	$('#staffByAmount_span_cancelChart').click(function(){
+		cancel_fnChangeStaffChart(this, 1);
+	});
+	
+	//按员工汇总退菜金额的柱状和饼图
+	$('#staffByFee_span_cancelChart').click(function(){
+		cancel_fnChangeStaffChart(this, 0);
+	});
+
+	
 	function cancel_fnChangeStaffChart(thiz, v){
 		$(thiz).find('input').attr('checked', 'checked');
 		cancel_staffPieChart = cancel_loadStaffPieChart(v);

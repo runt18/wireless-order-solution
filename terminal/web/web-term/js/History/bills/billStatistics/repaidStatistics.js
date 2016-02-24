@@ -475,7 +475,16 @@ Ext.onReady(function(){
 		
 	}
 
+	//按员工汇总反结账数量的柱状和饼图
+	$('#staffByAmount_span_repaidChart').click(function(){
+		repaid_fnChangeStaffChart(this, 1);
+	});
 
+	//按员工汇总反结账金额的柱状和饼图
+	$('#staffByFee_span_repaidChart').click(function(){
+		repaid_fnChangeStaffChart(this, 0);
+	});
+	
 	function repaid_fnChangeStaffChart(thiz, v){
 		$(thiz).find('input').attr('checked', 'checked');
 		repaid_staffPieChart = repaid_loadStaffPieChart(v);
