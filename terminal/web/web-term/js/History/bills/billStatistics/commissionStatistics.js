@@ -120,6 +120,121 @@ Ext.onReady(function(){
 				}
 			}
 		});
+		
+		//门店选择
+		var branch_combo_commission = new Ext.form.ComboBox({
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+							thiz.fireEvent('select');
+						}
+					});
+				},
+				select : function(){
+					//加载部门
+					var dept = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateDept.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_commission.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								dept.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							
+							commission_deptCombo.store.loadData(dept);
+							commission_deptCombo.setValue(-1);
+						}
+					});
+					
+					//加载操作人员
+					var staff = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../QueryStaff.do',
+						params : {
+							branchId : branch_combo_commission.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+							}
+							
+							commission_combo_staffs.store.loadData(staff);
+							commission_combo_staffs.setValue(-1);
+						}
+					});
+					
+					//加载市别
+					var hour = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateBusinessHour.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_commission.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+							}
+							
+							hour.push([-2, '自定义']);
+							
+							Ext.getCmp('commission_comboBusinessHour').store.loadData(hour);
+							Ext.getCmp('commission_comboBusinessHour').setValue(-1);
+						}
+					});
+					
+					Ext.getCmp('commission_btnSearch').handler();
+				}
+			}
+		});
+		
+		
+		
+		
+		
 		//---------------------grid
 		var cm = new Ext.grid.ColumnModel([
 			new Ext.grid.RowNumberer(),
@@ -160,8 +275,11 @@ Ext.onReady(function(){
 			}, commission_combo_staffs, 
 			{
 				xtype : 'tbtext',
-				text : '&nbsp;&nbsp;部门:'
-			},commission_deptCombo ,'->', {
+				text : '&nbsp;&nbsp;部门选择:'
+			},commission_deptCombo ,{
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;门店选择:'
+			}, branch_combo_commission, '->', {
 				text : '搜索',
 				id : 'commission_btnSearch',
 				iconCls : 'btn_search',
@@ -185,6 +303,7 @@ Ext.onReady(function(){
 					store.baseParams['deptId'] = commission_deptCombo.getValue();
 					store.baseParams['opening'] = businessHour.opening;
 					store.baseParams['ending'] = businessHour.ending;	
+					store.baseParams['branchId'] = branch_combo_commission.getValue();
 					
 					store.load({
 						params : {
@@ -212,7 +331,8 @@ Ext.onReady(function(){
 						deptID : commission_deptCombo.getValue(),
 						staffID : commission_combo_staffs.getValue(),
 						opening : businessHour.opening,
-						ending : businessHour.ending
+						ending : businessHour.ending,
+						branchId : branch_combo_commission.getValue()
 					};
 					
 					
@@ -246,7 +366,7 @@ Ext.onReady(function(){
 				if(!commission_beginDate.isValid() || !commission_endDate.isValid()){
 					return;
 				}
-				var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&deptId={4}&dataSource={5}';
+				var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&deptId={4}&dataSource={5}&branchId={6}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
@@ -254,7 +374,8 @@ Ext.onReady(function(){
 						Ext.util.Format.date(commission_endDate.getValue(), 'Y-m-d 23:59:59'),
 						commission_combo_staffs.getValue(),
 						commission_deptCombo.getValue(),
-						'commissionStatisticsList'
+						'commissionStatisticsList',
+						branch_combo_commission.getValue()
 				);
 				window.location = url;
 			}

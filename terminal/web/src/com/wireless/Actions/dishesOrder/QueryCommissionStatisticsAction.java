@@ -56,7 +56,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			if(branchId != null && branchId.isEmpty()){
+			if(branchId != null && !branchId.isEmpty()){
 				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 			}
 			

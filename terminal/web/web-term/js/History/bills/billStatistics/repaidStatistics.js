@@ -77,6 +77,96 @@ Ext.onReady(function(){
 		}
 	});
 	
+	var branch_combo_repaidStatistics = new Ext.form.ComboBox({
+		readOnly : false,
+		forceSelection : true,
+		width : 123,
+		listWidth : 120,
+		store : new Ext.data.SimpleStore({
+			fields : ['id', 'name']
+		}),
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [];
+				Ext.Ajax.request({
+					url : '../../OperateRestaurant.do',
+					params : {
+						dataSource : 'getByCond',
+						id : restaurantID 
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						if(jr.root[0].typeVal != '2'){
+							data.push([jr.root[0]['id'], jr.root[0]['name']]);
+						}else{
+							data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+							
+							for(var i = 0; i < jr.root[0].branches.length; i++){
+								data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+							}
+						}
+						
+						thiz.store.loadData(data);
+						thiz.setValue(jr.root[0].id);
+						thiz.fireEvent('select');
+					}
+				});
+			},
+			select : function(){
+				//加载员工
+				var staff = [[-1, '全部']];
+				Ext.Ajax.request({
+					url : '../../QueryStaff.do',
+					params : {
+						branchId : branch_combo_repaidStatistics.getValue()
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						for(var i = 0; i < jr.root.length; i++){
+							staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+						}
+						
+						repaid_combo_staffs.store.loadData(staff);
+						repaid_combo_staffs.setValue(-1);
+					}
+				});
+				
+				//加载市别
+				var hour = [[-1, '全部']];
+				Ext.Ajax.request({
+					url : '../../OperateBusinessHour.do',
+					params : {
+						dataSource : 'getByCond',
+						branchId : branch_combo_repaidStatistics.getValue()
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						for(var i = 0; i < jr.root.length; i++){
+							hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+						}
+						
+						hour.push([-2, '自定义']);
+						
+						Ext.getCmp('repaid_comboBusinessHour').store.loadData(hour);
+						Ext.getCmp('repaid_comboBusinessHour').setValue(-1);
+					}
+				});
+				
+				Ext.getCmp('repaid_btnSearch').handler();
+			}
+		}
+	});
+
+	
 	function showRepaidDetailChart(jdata){
 		var dateBegin = Ext.util.Format.date(repaid_beginDate.getValue(), 'Y-m-d');
 		var dateEnd = Ext.util.Format.date(repaid_endDate.getValue(), 'Y-m-d');
@@ -255,7 +345,13 @@ Ext.onReady(function(){
 		var repaidStatisticsTbarItem = [{
 				xtype : 'tbtext',
 				text : '操作人员:'
-			}, repaid_combo_staffs, '->', {
+			}, repaid_combo_staffs,{
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;'
+			}, {
+				xtype : 'tbtext',
+				text : '门店选择'
+			}, branch_combo_repaidStatistics,'->', {
 				text : '搜索',
 				id : 'repaid_btnSearch',
 				iconCls : 'btn_search',
@@ -277,7 +373,8 @@ Ext.onReady(function(){
 					store.baseParams['endDate'] = Ext.util.Format.date(repaid_endDate.getValue(), 'Y-m-d 23:59:59');
 					store.baseParams['staffId'] = repaid_combo_staffs.getValue();
 					store.baseParams['opening'] = businessHour.opening;
-					store.baseParams['ending'] = businessHour.ending;				
+					store.baseParams['ending'] = businessHour.ending;	
+					store.baseParams['branchId'] = branch_combo_repaidStatistics.getValue();
 					store.load({
 						params : {
 							start : 0,
@@ -297,7 +394,8 @@ Ext.onReady(function(){
 						dateEnd : Ext.util.Format.date(repaid_endDate.getValue(), 'Y-m-d 23:59:59'),
 						staffID : repaid_combo_staffs.getValue(),
 						opening : businessHour.opening,
-						ending : businessHour.ending
+						ending : businessHour.ending,
+						branchId : branch_combo_repaidStatistics.getValue()
 					};
 					
 					repaid_chartLoadMarsk.show();
@@ -331,14 +429,15 @@ Ext.onReady(function(){
 				if(!repaid_beginDate.isValid() || !repaid_endDate.isValid()){
 					return;
 				}
-				var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&dataSource={4}';
+				var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&dataSource={4}&branchId={5}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
 						Ext.util.Format.date(repaid_beginDate.getValue(), 'Y-m-d 00:00:00'), 
 						Ext.util.Format.date(repaid_endDate.getValue(), 'Y-m-d 23:59:59'),
 						repaid_combo_staffs.getValue(),
-						'repaidStatisticsList'
+						'repaidStatisticsList',
+						branch_combo_repaidStatistics.getValue()
 					);
 				window.location = url;
 			}

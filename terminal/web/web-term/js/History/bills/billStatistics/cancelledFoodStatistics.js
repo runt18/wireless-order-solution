@@ -230,7 +230,6 @@ Ext.onReady(function(){
 							
 							cancel_combo_staffs.store.loadData(staff);
 							cancel_combo_staffs.setValue(-1);
-							
 						}
 					});
 					

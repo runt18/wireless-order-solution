@@ -111,6 +111,7 @@ Ext.onReady(function(){
 		};
 		return combo;
 	}
+	
 
 	function businessSub_changeChartWidth(w, h){
 		if(businessSub_highChart){
@@ -250,9 +251,82 @@ Ext.onReady(function(){
 	    disabled : false
 	});	
 	
+	var branchSelect_combo_businessSubStatistics = new Ext.form.ComboBox({
+		readOnly : false,
+		forceSelection : true,
+		id : 'branchSelect_combo_businessSubStatistics',
+		width : 123,
+		listWidth : 120,
+		store : new Ext.data.SimpleStore({
+			fields : ['id', 'name']
+		}),
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [];
+				Ext.Ajax.request({
+					url : '../../OperateRestaurant.do',
+					params : {
+						dataSource : 'getByCond',
+						id : restaurantID
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						if(jr.root[0].typeVal != '2'){
+							data.push([jr.root[0]['id'], jr.root[0]['name']]);
+						}else{
+							data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+							
+							for(var i = 0; i < jr.root[0].branches.length; i++){
+								data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+							}
+						}
+						
+						thiz.store.loadData(data);
+						thiz.setValue(jr.root[0].id);
+						thiz.fireEvent('select');
+					},
+					failure : function(res, opt){
+						thiz.store.loadData([-1, '全部']);
+						thiz.setValue(-1);
+					}
+				});
+			},
+			select : function(){
+				var data = [[-1,'全部']];
+				Ext.Ajax.request({
+					url : '../../OperateRegion.do',
+					params : {
+						dataSource : 'getByCond',
+						branchId : branchSelect_combo_businessSubStatistics.getValue()
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						for(var i = 0; i < jr.root.length; i++){
+							data.push([jr.root[i]['id'], jr.root[i]['name']]);
+						}
+						Ext.getCmp('businessSub_comboRegion').store.loadData(data);
+						Ext.getCmp('businessSub_comboRegion').setValue(-1);
+					}
+				});
+				Ext.getCmp('businessSub_btnSearch').handler();
+			}
+		}
+	});
+	
 	var businessSubStatisticsTbarItem = [
-		{xtype : 'tbtext', text : '区域:'},
+        {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+		{xtype : 'tbtext', text : '区域选择:'},
 		businessSub_initRegionCombo('businessSub_'),
+		{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+		{xtype : 'tbtext', text : '门店选择:'},
+		branchSelect_combo_businessSubStatistics,
 		'->', {
 		text : '搜索',
 		id : 'businessSub_btnSearch',
@@ -282,6 +356,7 @@ Ext.onReady(function(){
 					ending : data.ending,
 					chart : true,
 					region : region.getValue(),
+					branchId : branchSelect_combo_businessSubStatistics.getValue(),
 					dutyRange : 'range',
 					dataSource : 'history'
 				},
@@ -415,7 +490,7 @@ Ext.onReady(function(){
 			var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessSub_'}).data;
 			var region = Ext.getCmp('businessSub_comboRegion');
 			
-			var url = '../../{0}?dataSource={1}&onDuty={2}&offDuty={3}&dataType={4}&opening={5}&ending={6}&region={7}';
+			var url = '../../{0}?dataSource={1}&onDuty={2}&offDuty={3}&dataType={4}&opening={5}&ending={6}&region={7}&branchId={8}';
 			url = String.format(
 					url, 
 					'ExportHistoryStatisticsToExecl.do', 
@@ -425,7 +500,8 @@ Ext.onReady(function(){
 					'history',
 					data.opening,
 					data.ending,
-					region.getValue()
+					region.getValue(),
+					branchSelect_combo_businessSubStatistics.getValue()
 				);
 			window.location = url;
 		}
