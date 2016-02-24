@@ -513,6 +513,16 @@ Ext.onReady(function(){
 		});	
 	}
 
+	//按员工汇总提成数量的柱状和饼图
+	$('#staffByAmount_span_commissionChart').click(function(){
+		commission_fnChangeStaffChart(this, 1);
+	});
+
+	//按员工汇总提成金额的柱状和饼图
+	$('#staffByFee_span_commissionChart').click(function(){
+		commission_fnChangeStaffChart(this, 0);
+	});
+	
 	function commission_fnChangeStaffChart(thiz, v){
 		$(thiz).find('input').attr('checked', 'checked');
 		commission_staffPieChart = commission_loadStaffPieChart(v);

@@ -16,9 +16,9 @@
 <div id="divRepaidDetailChart" data-type="repaidChart" style="height : 400px;"></div>
 
 <div id="divRepaidStaffCharts" >
-	<div id="repaid_DivChartChange" class="chartChangeFont">
-		&nbsp;&nbsp;<span onclick="repaid_fnChangeStaffChart(this,1)"><input  type="radio" name="repaid_staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
-		<span onclick="repaid_fnChangeStaffChart(this,0)"><input type="radio" name="repaid_staffChange"  />按金额显示</span> 
+	<div id="repaid_DivChartChange" class="chartChangeFont">&nbsp;&nbsp;
+		<span id="staffByAmount_span_repaidChart"><input  type="radio" name="repaid_staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
+		<span id="staffByFee_span_repaidChart"><input type="radio" name="repaid_staffChange"  />按金额显示</span> 
 	</div>	
 	<div>
 		<div id="divRepaidStaffPieChart" data-type="repaidChart" data-value="repaid_staffPieChart" style="height : 300px;display:none;width : 40%;float:left;"></div>

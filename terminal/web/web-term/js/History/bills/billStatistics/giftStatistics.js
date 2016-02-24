@@ -545,6 +545,16 @@ Ext.onReady(function(){
 	    giftDeptChartPanel.otype = type;
 	};
 	
+	//按员工汇总赠送数量的柱状和饼图
+	$('#staffByAmount_span_giftChart').click(function(){
+		gift_fnChangeStaffChart(this, 1);
+	});
+	
+	//按员工汇总赠送金额的柱状和饼图
+	$('#staffByFee_span_giftChart').click(function(){
+		gift_fnChangeStaffChart(this, 0);
+	});
+	
 	function gift_fnChangeStaffChart(thiz, v){
 		$(thiz).find('input').attr('checked', 'checked');
 		gift_staffPieChart = gift_loadStaffPieChart(v);
@@ -552,6 +562,16 @@ Ext.onReady(function(){
 		gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutBeforeDrag);
 		gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutBeforeDrag);
 	}
+	
+	//按部门汇总赠送金额的柱状和饼图
+	$('#deptByFee_span_giftChart').click(function(){
+		gift_fnChangeDeptChart(this, 0);
+	});
+	
+	//按部门汇总赠送数量的柱状和饼图
+	$('#deptByAmount_span_giftChart').click(function(){
+		gift_fnChangeDeptChart(this, 1);
+	});
 	
 	function gift_fnChangeDeptChart(thiz, v){
 		$(thiz).find('input').attr('checked', 'checked');

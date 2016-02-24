@@ -11,9 +11,9 @@
 <div id="divDiscountDetailChart" data-type="discountChart" data-value="discount_detailChart" style="height : 400px;"></div>
 
 <div id="divDiscountStaffCharts" >
-	<div id="discountStaff_DivChartChange" class="chartChangeFont">
-		&nbsp;&nbsp;<span onclick="discount_fnChangeStaffChart(this,1)"><input  type="radio" name="discount_staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
-		<span onclick="discount_fnChangeStaffChart(this,0)"><input type="radio" name="discount_staffChange"  />按金额显示</span> 
+	<div id="discountStaff_DivChartChange" class="chartChangeFont">&nbsp;&nbsp;
+		<span id="staffByAmount_span_discountChart" onclick="discount_fnChangeStaffChart(this,1)"><input type="radio" name="discount_staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
+		<span id="staffByFee_span_discountChart" onclick="discount_fnChangeStaffChart(this,0)"><input type="radio" name="discount_staffChange"  />按金额显示</span> 
 	</div>
 	<div>
 		<div id="divDiscountStaffPieChart" data-type="discountChart" data-value="discount_staffPieChart" style="height : 300px;display:none;width:40%;float:left;"></div>
@@ -22,10 +22,9 @@
 </div>
 
 <div id="divDiscountDeptCharts" >
-	<div id="discountDept_DivChartChange" class="chartChangeFont">
-		<!-- <a id="linkToChangeDeptChart" href="#" class="changeChart">查看数量比例图</a> -->
-		&nbsp;&nbsp;<span onclick="discount_fnChangeDeptChart(this,0)"><input type="radio" name="discount_deptChange" checked="checked"  />按金额显示</span> &nbsp;&nbsp;&nbsp;
-		<span onclick="discount_fnChangeDeptChart(this,1)"><input type="radio" name="discount_deptChange"  />按数量显示</span>  
+	<div id="discountDept_DivChartChange" class="chartChangeFont">&nbsp;&nbsp;
+		<span id="deptByFee_span_discountChart" onclick="discount_fnChangeDeptChart(this,0)"><input type="radio" name="discount_deptChange" checked="checked"  />按金额显示</span> &nbsp;&nbsp;&nbsp;
+		<span id="deptByAmount_span_discountChart" onclick="discount_fnChangeDeptChart(this,1)"><input type="radio" name="discount_deptChange"  />按数量显示</span>  
 	</div>
 	<div>
 		<div id="divDiscountDeptPieChart" data-type="discountChart" data-value="discount_deptPieChart" style="height : 300px;display:none;width:40%;float:left;"></div>

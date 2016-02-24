@@ -555,6 +555,16 @@ Ext.onReady(function(){
 	
 	};
 	
+	//按员工汇总折扣数量的柱状和饼图
+	$('#staffByAmount_span_discountChart').click(function(){
+		discount_fnChangeStaffChart(this, 1);
+	});
+	
+	//按员工汇总折扣金额的柱状和饼图
+	$('#staffByFee_span_discountChart').click(function(){
+		discount_fnChangeStaffChart(this, 0);
+	});
+	
 	function discount_fnChangeStaffChart(thiz, v){
 		$(thiz).find('input').attr('checked', 'checked');
 		discount_staffPieChart = discount_loadStaffPieChart(v);
@@ -564,6 +574,16 @@ Ext.onReady(function(){
 		
 		discountDetailsStatPanel.otype = v;
 	}
+	
+	//按部门汇总折扣数量的柱状和饼图
+	$('#deptByFee_span_discountChart').click(function(){
+		discount_fnChangeDeptChart(this, 0);
+	});
+	
+	//按部门汇总折扣金额的柱状和饼图
+	$('#deptByAmount_span_discountChart').click(function(){
+		discount_fnChangeDeptChart(this, 1);
+	});
 	
 	function discount_fnChangeDeptChart(thiz, v){
 		$(thiz).find('input').attr('checked', 'checked');
