@@ -1,55 +1,4 @@
 
-var CancelStat = {
-	linkOrderId : function(v){
-		return '<a href=\"javascript:CancelStat.cancellFood_billDetailHandler('+ v +')\">'+ v +'</a>';
-	},
-	cancellFood_billDetailHandler :	function (orderID) {
-		var cancellFoodOrderDetailWin;
-		function cancellFood_showBillDetailWin(){
-			cancellFoodOrderDetailWin = new Ext.Window({
-				layout : 'fit',
-				width : 1100,
-				height : 440,
-				closable : false,
-				resizable : false,
-				modal : true,
-				bbar : ['->', {
-					text : '关闭',
-					iconCls : 'btn_close',
-					handler : function() {
-						cancellFoodOrderDetailWin.destroy();
-					}
-				} ],
-				keys : [{
-					key : Ext.EventObject.ESC,
-					scope : this,
-					fn : function(){
-						cancellFoodOrderDetailWin.destroy();
-					}
-				}],
-				listeners : {
-					show : function(thiz) {
-						thiz.load({
-							url : '../window/history/orderDetail.jsp', 
-							scripts : true,
-							params : {
-								orderId : orderID,
-								foodStatus : 'isReturn'
-							},
-							method : 'post'
-						});
-						thiz.center();	
-					}
-				}
-			});
-		}
-		cancellFood_showBillDetailWin();
-		cancellFoodOrderDetailWin.show();
-		cancellFoodOrderDetailWin.setTitle('账单号: ' + orderID);
-		cancellFoodOrderDetailWin.center();
-	}
-};
-
 Ext.onReady(function(){
 	var cancelFoodStatWin, cancelFoodStatWinTabPanel, cancelFoodDetailsStatPanel, cancelFoodByDeptStatPanel, cancelFoodByReasonStatPanel;
 	var cfdsGrid;
@@ -530,10 +479,12 @@ Ext.onReady(function(){
 			 ['日期','orderDateFormat',150], 
 			 ['菜名','name',180],
 	         ['部门','kitchen.dept.name'], 
-	         ['账单号', 'orderId',,,'CancelStat.linkOrderId'],
-	         ['单价','unitPrice',,'right','Ext.ux.txtFormat.gridDou'],
-	         ['退菜数量','count',,'right','Ext.ux.txtFormat.gridDou'], 
-	         ['退菜金额','totalPrice',,'right','Ext.ux.txtFormat.gridDou'],		              
+	         ['账单号', 'orderId', null, null, function(v){
+	         	return '<a class="orderLinkId">' + v + '</a>';
+	         }],
+	         ['单价','unitPrice', null, 'right', Ext.ux.txtFormat.gridDou],
+	         ['退菜数量','count', null, 'right', Ext.ux.txtFormat.gridDou], 
+	         ['退菜金额','totalPrice', null, 'right', Ext.ux.txtFormat.gridDou],		              
 	         ['操作人','waiter'], 
 	         ['退菜原因','cancelReason.reason', 200]
 			],
@@ -546,6 +497,53 @@ Ext.onReady(function(){
 		cfdsGrid.region = 'center';
 	
 		cfdsGrid.getStore().on('load', function(store, records, options){
+			
+			function showCancelDetail(orderID){
+				var cancellFoodOrderDetailWin;
+				function cancellFood_showBillDetailWin(){
+					cancellFoodOrderDetailWin = new Ext.Window({
+						layout : 'fit',
+						width : 1100,
+						height : 440,
+						closable : false,
+						resizable : false,
+						modal : true,
+						bbar : ['->', {
+							text : '关闭',
+							iconCls : 'btn_close',
+							handler : function() {
+								cancellFoodOrderDetailWin.destroy();
+							}
+						} ],
+						keys : [{
+							key : Ext.EventObject.ESC,
+							scope : this,
+							fn : function(){
+								cancellFoodOrderDetailWin.destroy();
+							}
+						}],
+						listeners : {
+							show : function(thiz) {
+								thiz.load({
+									url : '../window/history/orderDetail.jsp', 
+									scripts : true,
+									params : {
+										orderId : orderID,
+										foodStatus : 'isReturn'
+									},
+									method : 'post'
+								});
+								thiz.center();	
+							}
+						}
+					});
+				}
+				cancellFood_showBillDetailWin();
+				cancellFoodOrderDetailWin.show();
+				cancellFoodOrderDetailWin.setTitle('账单号: ' + orderID);
+				cancellFoodOrderDetailWin.center();
+			}
+			
 			if(store.getCount() > 0){
 				var sumRow = cfdsGrid.getView().getRow(store.getCount()-1);	
 				
@@ -567,6 +565,12 @@ Ext.onReady(function(){
 				cfdsGrid.getView().getCell(store.getCount()-1, 7).innerHTML = sumData.get('unitPrice').toFixed(2);
 				cfdsGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 				cfdsGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+				
+				$('#cancelledFoodPanel').find('.orderLinkId').each(function(index, element){
+        			element.onclick = function(){
+        				showCancelDetail($(element).text());
+        			}
+        		});
 			}
 		});
 		//

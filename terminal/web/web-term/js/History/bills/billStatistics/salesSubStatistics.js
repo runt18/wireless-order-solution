@@ -1,8 +1,6 @@
 
 var SalesState = {
-	loadChartRender : function(){
-		return '<a href="javascript:Ext.getCmp(\'deptStatistic_btnSearch\').handler(true)">查看走势图</a>';
-	}
+
 };
 
 function kitchenGroupTextTpl(rs){
@@ -407,17 +405,17 @@ $(function(){
 			'',
 			'../../SalesSubStatistics.do',
 			[[true, false, false, true], 
-	         ['菜品','food.name', 150], 
-	         ['销量','salesAmount','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
-	         ['口味总额','tasteIncome','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
-	         ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou'],
-	         ['单位成本','avgCost','','right','Ext.ux.txtFormat.gridDou'],
-	         ['成本','cost','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['成本率','costRate','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou']
+	         ['菜品', 'food.name', 150], 
+	         ['销量', 'salesAmount', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['营业额', 'income', null, 'right', Ext.ux.txtFormat.gridDou], 
+	         ['口味总额', 'tasteIncome', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['折扣额', 'discount', null, 'right', Ext.ux.txtFormat.gridDou], 
+	         ['赠送额', 'gifted', null, 'right', Ext.ux.txtFormat.gridDou],
+	         ['单位成本', 'avgCost','', 'right', Ext.ux.txtFormat.gridDou],
+	         ['成本', 'cost', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['成本率', 'costRate', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利', 'profit', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利率', 'profitRate', '', 'right', Ext.ux.txtFormat.gridDou]
 	         //['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], 
 			],
 			SalesSubStatRecord.getKeys().concat(['food', 'food.name']),
@@ -687,14 +685,14 @@ $(function(){
 			'../../SalesSubStatistics.do',
 			[[true, false, false, false], 
 		     ['分厨','kitchen.name'], 
-		     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
-		     ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
-		     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou'],
-		     ['成本','cost','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['成本率','costRate','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou'],
-		     ['dept.id','dept.id', 10]
+		     ['营业额', 'income', null,'right', Ext.ux.txtFormat.gridDou], 
+		     ['折扣额', 'discount', null,'right', Ext.ux.txtFormat.gridDou], 
+		     ['赠送额', 'gifted', null,'right', Ext.ux.txtFormat.gridDou],
+		     ['成本', 'cost','','right', Ext.ux.txtFormat.gridDou], 
+	         ['成本率', 'costRate','','right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利', 'profit','','right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利率', 'profitRate','','right', Ext.ux.txtFormat.gridDou],
+		     ['dept.id', 'dept.id', 10]
 			],
 			SalesSubStatRecord.getKeys().concat(['dept', 'dept.id', 'dept.name', 'kitchen', 'kitchen.name']),
 			[['dataType', 1], ['queryType', 2]],
@@ -708,7 +706,7 @@ $(function(){
 		);
 		kitchenStatPanelGrid.view = new Ext.grid.GroupingView({   
 	        forceFit:true,   
-	        groupTextTpl : '{[kitchenGroupTextTpl(values.rs)]}'
+	        groupTextTpl : '{[values.rs[0].get(\'dept.name\')]}'
 	    });
 		kitchenStatPanelGrid.on('render', function(){
 			dateCombo.setValue(1);
@@ -1088,15 +1086,17 @@ $(function(){
 			'',
 			'../../SalesSubStatistics.do',
 			[[true, false, false, false], 
-		     ['部门','dept.name'],
-		     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
-		     ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
-		     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou'],
-		     ['成本','cost','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['成本率','costRate','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou'],
-	         ['操作','operateChart','','center','SalesState.loadChartRender']
+		     ['部门', 'dept.name'],
+		     ['营业额', 'income', null, 'right', Ext.ux.txtFormat.gridDou], 
+		     ['折扣额', 'discount', null, 'right', Ext.ux.txtFormat.gridDou], 
+		     ['赠送额', 'gifted', null, 'right', Ext.ux.txtFormat.gridDou],
+		     ['成本', 'cost','', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['成本率', 'costRate','', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利', 'profit', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利率', 'profitRate', '', 'right', Ext.ux.txtFormat.gridDou],
+	         ['操作', 'operateChart', '', 'center', function(v){
+	         	return '<a href="javascript:Ext.getCmp(\'deptStatistic_btnSearch\').handler(true)">查看走势图</a>';
+	         }]
 			],
 			SalesSubStatRecord.getKeys().concat(['dept', 'dept.name', 'dept.id']),
 			[['dataType', 1], ['queryType', 0]],

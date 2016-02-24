@@ -34,9 +34,18 @@ import com.wireless.util.DataPaging;
 
 public class OperateCouponAction extends DispatchAction{
 
+	/**
+	 * 获取优惠券操作明细
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward getOperations(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String pin = (String) request.getAttribute("pin");
-		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String branchId = request.getParameter("branchId");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
 		final String staffId = request.getParameter("staffId");
@@ -52,6 +61,12 @@ public class OperateCouponAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		try{
 			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+
 			final CouponOperationDao.ExtraCond extraCond = new CouponOperationDao.ExtraCond();
 			
 			if(staffId != null && !staffId.isEmpty()){

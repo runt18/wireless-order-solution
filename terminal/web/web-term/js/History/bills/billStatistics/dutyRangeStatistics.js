@@ -174,7 +174,7 @@ function dutyRangeStatPanelInit(c){
 	     [c.statType == 1?'交班人':'交款人', 'staffName', 60],
 	     ['开始时间', 'onDutyFormat'], 
 	     ['结束时间', 'offDutyFormat'], 
-	     ['操作','Operation', 100, 'center', 'dutyRangeStatPanelOperationRenderer']
+	     ['操作','Operation', 100, 'center', dutyRangeStatPanelOperationRenderer]
 		],
 		['staffId','staffName', 'onDuty', 'offDuty', 'onDutyFormat', 'offDutyFormat'],
 		[ ['dataSource', 'history'], ['isPaging', true]],
