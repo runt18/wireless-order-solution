@@ -221,6 +221,137 @@ Ext.onReady(function(){
 			}
 		});
 		
+		//门店选择
+		var branch_combo_cancelledFood = new Ext.form.ComboBox({
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+							thiz.fireEvent('select');
+						}
+					});
+				},
+				select : function(){
+					//加载员工
+					var staff = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../QueryStaff.do',
+						params : {
+							branchId : branch_combo_cancelledFood.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+							}
+							
+							cancel_combo_staffs.store.loadData(staff);
+							cancel_combo_staffs.setValue(-1);
+							
+						}
+					});
+					
+					//加载部门
+					var dept = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateDept.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_cancelledFood.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								dept.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							
+							cancel_deptCombo.store.loadData(dept);
+							cancel_deptCombo.setValue(-1);
+						}
+					});
+					
+					//加载退菜原因
+					var cancelReason = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateCancelReason.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_cancelledFood.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								cancelReason.push([jr.root[i]['id'], jr.root[i]['reason']]);
+							}
+							
+							reasonCombo.store.loadData(cancelReason);
+							reasonCombo.setValue(-1);
+						}
+					});
+					
+					//加载市别
+					var hour = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateBusinessHour.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_cancelledFood.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+							}
+							
+							hour.push([-2, '自定义']);
+							
+							Ext.getCmp('cancel_comboBusinessHour').store.loadData(hour);
+							Ext.getCmp('cancel_comboBusinessHour').setValue(-1);
+						}
+					});
+					
+					Ext.getCmp('cancel_btnSearch').handler();
+				}
+			}	
+		});
+		
 		var cfdsGridDateTbar = Ext.ux.initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:cancel_dateCombo, tbarType : 0, statistic : 'cancel_', callback : function businessHourSelect(){cancel_hours = null;}});
 		
 		var cfdsGridTbar = new Ext.Toolbar({
@@ -230,13 +361,19 @@ Ext.onReady(function(){
 				text:'&nbsp;退菜原因:'
 			}, reasonCombo, {
 				xtype : 'tbtext',
-				text : '&nbsp;&nbsp;部门: '
-			},cancel_deptCombo, {
+				text : '&nbsp;&nbsp;部门选择: '
+			}, cancel_deptCombo, {
 				xtype : 'tbtext',
-				text : '&nbsp;&nbsp;员工: '
-			},cancel_combo_staffs, {
+				text : '&nbsp;&nbsp;员工选择: '
+			}, cancel_combo_staffs, {
 				xtype:'tbtext',
-				text:'&nbsp;'
+				text:'&nbsp;&nbsp;'
+			},{
+				xtype:'tbtext',
+				text:'门店选择'
+			}, branch_combo_cancelledFood, {
+				xtype:'tbtext',
+				text:'&nbsp;&nbsp;'
 			}, '->', {
 				text : '搜索',
 				id : 'cancel_btnSearch',
@@ -277,6 +414,7 @@ Ext.onReady(function(){
 					gs.baseParams['staffID'] = cancel_combo_staffs.getValue();
 					gs.baseParams['opening'] = opening;
 					gs.baseParams['ending'] = ending;
+					gs.baseParams['branchId'] = branch_combo_cancelledFood.getValue()
 					gs.load({
 						params : {
 							start : 0,
@@ -304,7 +442,8 @@ Ext.onReady(function(){
 						reasonID : reasonCombo.getValue(),
 						staffID : cancel_combo_staffs.getValue(),
 						opening : opening,
-						ending : ending
+						ending : ending,
+						branchId : branch_combo_cancelledFood.getValue()
 					};
 					cancel_chartLoadMarsk.show();
 					
@@ -363,7 +502,7 @@ Ext.onReady(function(){
 						Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 					}
 					
-					var url = '../../{0}?deptID={1}&dateBeg={2}&dateEnd={3}&reasonID={4}&dataSource={5}&staffID={6}';
+					var url = '../../{0}?deptID={1}&dateBeg={2}&dateEnd={3}&reasonID={4}&dataSource={5}&staffID={6}&branchId={7}';
 					
 					url = String.format(
 						url,
@@ -373,7 +512,8 @@ Ext.onReady(function(){
 						Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59'),
 						reasonCombo.getValue(),
 						'cancelledFood',
-						cancel_combo_staffs.getValue()
+						cancel_combo_staffs.getValue(),
+						branch_combo_cancelledFood.getValue()
 					);
 					window.location = url;
 	
