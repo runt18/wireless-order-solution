@@ -203,47 +203,39 @@ function createGridPanel(id, title, height, width, url, cmData, readerData,
 	if (cmData[0][1])
 		g_cmData.push(g_ckbox);
 	for (var i = 1; i < cmData.length; i++) {
+		
 		data = cmData[i];
-		var sb = new StringBuilder();
-		sb.append("{");
-		sb.append("header:'");
-		sb.append(data[0]);
-		sb.append("',dataIndex:'");
-		sb.append(data[1] + "'");
+		
+		var columnData = {};
+		columnData.header = data[0];
+		columnData.dataIndex = data[1];
 		
 		if(group != null && typeof group != 'undefined' && group.name == data[0]){
 			if(typeof group.hide == 'boolean'){
-				sb.append(",hidden:" + group.hide);
-				sb.append(",hideable:" + !group.hide);
+				columnData.hidden = group.hide;
+				columnData.hideable = !group.hide;
 			}
 		}
 		
-		if (data.length > 2 && data[2] != null && data[2] != '') {
-			sb.append(",width:");
-			sb.append(data[2]);
+		if (data[2]) {
+			columnData.width = data[2];
 		}
-		if (data.length > 3 && data[3] != null && data[3] != '' && data[3].length > 0) {
-			sb.append(",align:'");
-			sb.append(data[3]);
-			sb.append("'");
+		if (data[3]) {
+			columnData.align = data[3];
 		}
-		if (data.length > 4 && data[4] != null && data[4] != '' && data[4].length > 0) {
-			sb.append(",renderer:");
-			sb.append(data[4]);
+		if (data[4]) {
+			if(typeof data[4] === 'string'){
+				columnData.renderer = eval(data[4]);
+			}else{
+				columnData.renderer = data[4];
+			}
 		}
-		if (data.length > 5 && data[5] != null && data[5] != '' && data[5].length > 0) {
-			sb.append(",sortable:");
-			sb.append(data[5]);
+		if (data[5]) {
+			columnData.sortable = data[5];
 		}else{
-			sb.append(",sortable:false");
+			columnData.sortable = false;
 		}
-		
-		
-		sb.append("}");
-
-		/** 将字符串转换成对象。再将转换后的对象付值给obj * */
-		eval("g_cmData.push(" + sb.toString()+")");
-
+		g_cmData.push(columnData);
 	}
 
 	/** 构造列模型 * */

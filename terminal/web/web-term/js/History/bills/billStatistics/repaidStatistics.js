@@ -1,53 +1,4 @@
 
-var RepaidStat = {
-	res_billDetailHandler : function(orderID){
-		var repaidOrderDetailWin;
-		function res_showBillDetailWin(){
-			repaidOrderDetailWin = new Ext.Window({
-				layout : 'fit',
-				width : 1100,
-				height : 440,
-				closable : false,
-				resizable : false,
-				modal : true,
-				bbar : ['->', {
-					text : '关闭',
-					iconCls : 'btn_close',
-					handler : function() {
-						repaidOrderDetailWin.destroy();
-					}
-				} ],
-				keys : [{
-					key : Ext.EventObject.ESC,
-					scope : this,
-					fn : function(){
-						repaidOrderDetailWin.destroy();
-					}
-				}],
-				listeners : {
-					show : function(thiz) {
-						thiz.load({
-							url : '../window/history/orderDetail.jsp', 
-							scripts : true,
-							params : {
-								orderId : orderID,
-								foodStatus : 'isRepaid'
-							},
-							method : 'post'
-						});
-						thiz.center();	
-					}
-				}
-			});
-		}
-		res_showBillDetailWin();
-		repaidOrderDetailWin.show();
-		repaidOrderDetailWin.setTitle('账单号: ' + orderID);
-		repaidOrderDetailWin.center();
-	}
-}
-
-
 Ext.onReady(function(){
 	
 	var repaidStatisticsGrid;
@@ -265,7 +216,7 @@ Ext.onReady(function(){
 	}
 
 	function linkOrderId(v){
-		return '<a href=\"javascript:RepaidStat.res_billDetailHandler('+ v +')\">'+ v +'</a>';
+		return '<a class="orderLinkId">' + v + '</a>';
 	}
 	//反结账明细的表格
 	function initGrid(){
@@ -423,6 +374,52 @@ Ext.onReady(function(){
 		
 		repaidStatisticsGrid.getStore().on('load', function(store, records, options){
 			
+			function showOrder(orderID){
+				var repaidOrderDetailWin;
+				function res_showBillDetailWin(){
+					repaidOrderDetailWin = new Ext.Window({
+						layout : 'fit',
+						width : 1100,
+						height : 440,
+						closable : false,
+						resizable : false,
+						modal : true,
+						bbar : ['->', {
+							text : '关闭',
+							iconCls : 'btn_close',
+							handler : function() {
+								repaidOrderDetailWin.destroy();
+							}
+						} ],
+						keys : [{
+							key : Ext.EventObject.ESC,
+							scope : this,
+							fn : function(){
+								repaidOrderDetailWin.destroy();
+							}
+						}],
+						listeners : {
+							show : function(thiz) {
+								thiz.load({
+									url : '../window/history/orderDetail.jsp', 
+									scripts : true,
+									params : {
+										orderId : orderID,
+										foodStatus : 'isRepaid'
+									},
+									method : 'post'
+								});
+								thiz.center();	
+							}
+						}
+					});
+				}
+				res_showBillDetailWin();
+				repaidOrderDetailWin.show();
+				repaidOrderDetailWin.setTitle('账单号: ' + orderID);
+				repaidOrderDetailWin.center();
+			}
+
 			if(store.getCount() > 0){
 				var sumRow = repaidStatisticsGrid.getView().getRow(store.getCount() - 1);	
 				sumRow.style.backgroundColor = '#EEEEEE';			
@@ -440,6 +437,14 @@ Ext.onReady(function(){
 				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
 				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+				
+				Ext.getCmp('repaidStatisticsPanel')
+				$('#repaidStatisticsPanel').find('.orderLinkId').each(function(index, element){
+        			element.onclick = function(){
+        				showOrder($(element).text());
+
+        			}
+        		});
 			}
 		});
 		

@@ -1,55 +1,3 @@
-var DiscountStat = {
-	discount_linkOrderId : function(v){
-		if(!isNaN(v)){
-			return '<a href=\"javascript:DiscountStat.discount_showBillDetailWin('+ v +')\">'+ v +'</a>';
-		}else{
-			return v;
-		}
-	},
-	discount_showBillDetailWin : function(orderID){
-		var discountViewBillWin;
-		discountViewBillWin = new Ext.Window({
-			layout : 'fit',
-			title : '查看账单',
-			width : 510,
-			height : 550,
-			resizable : false,
-			closable : false,
-			modal : true,
-			bbar : ['->', {
-				text : '关闭',
-				iconCls : 'btn_close',
-				handler : function() {
-					discountViewBillWin.destroy();
-				}
-			}],
-			keys : [{
-				key : Ext.EventObject.ESC,
-				scope : this,
-				fn : function(){
-					discountViewBillWin.destroy();
-				}
-			}],
-			listeners : {
-				show : function(thiz) {
-					var sd = Ext.ux.getSelData(discountStatisticsGrid);
-					thiz.load({
-						url : '../window/history/viewBillDetail.jsp', 
-						scripts : true,
-						params : {
-							orderId : sd.id,
-							queryType : 'History'
-						},
-						method : 'post'
-					});
-					thiz.center();	
-				}
-			}
-		});
-		discountViewBillWin.show();
-		discountViewBillWin.center();
-	}
-}
 
 Ext.onReady(function(){
 
@@ -301,11 +249,13 @@ Ext.onReady(function(){
 			'../../QueryDiscountStatistics.do',
 			[[true, false, false, true], 
 			 ['日期','orderDateFormat'], 
-			 ['账单号', 'id',,,'DiscountStat.discount_linkOrderId'],
-	         ['折扣额','discountPrice',,'right','Ext.ux.txtFormat.gridDou'], 
-	         ['实收金额','actualPrice',,'right','Ext.ux.txtFormat.gridDou'],
-	         ['操作人','discounter'], 
-	         ['备注','comment', 200]
+			 ['账单号', 'id', null, null, function(v){
+			 	return '<a class="orderLinkId">' + v + '</a>';
+			 }],
+	         ['折扣额', 'discountPrice', null, 'right', Ext.ux.txtFormat.gridDou], 
+	         ['实收金额', 'actualPrice', null, 'right', Ext.ux.txtFormat.gridDou],
+	         ['操作人', 'discounter'], 
+	         ['备注', 'comment', 200]
 			],
 			['orderDateFormat', 'id', 'discountPrice', 'actualPrice', 'waiter', 'comment'],
 			[ ['dataSource', 'getDetail']],
@@ -315,6 +265,51 @@ Ext.onReady(function(){
 		);
 		discountStatisticsGrid.region = 'center';
 		discountStatisticsGrid.getStore().on('load', function(store, records, options){
+			
+			function showDicountDetail(orderID){
+				var discountViewBillWin;
+				discountViewBillWin = new Ext.Window({
+					layout : 'fit',
+					title : '查看账单',
+					width : 510,
+					height : 550,
+					resizable : false,
+					closable : false,
+					modal : true,
+					bbar : ['->', {
+						text : '关闭',
+						iconCls : 'btn_close',
+						handler : function() {
+							discountViewBillWin.destroy();
+						}
+					}],
+					keys : [{
+						key : Ext.EventObject.ESC,
+						scope : this,
+						fn : function(){
+							discountViewBillWin.destroy();
+						}
+					}],
+					listeners : {
+						show : function(thiz) {
+							var sd = Ext.ux.getSelData(discountStatisticsGrid);
+							thiz.load({
+								url : '../window/history/viewBillDetail.jsp', 
+								scripts : true,
+								params : {
+									orderId : sd.id,
+									queryType : 'History'
+								},
+								method : 'post'
+							});
+							thiz.center();	
+						}
+					}
+				});
+				discountViewBillWin.show();
+				discountViewBillWin.center();
+			}
+			
 			if(store.getCount() > 0){
 				var sumRow = discountStatisticsGrid.getView().getRow(store.getCount()-1);	
 				sumRow.style.backgroundColor = '#EEEEEE';			
@@ -329,6 +324,12 @@ Ext.onReady(function(){
 				discountStatisticsGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
 				discountStatisticsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
 				discountStatisticsGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+				
+				$('#discountStatisticsPanel').find('.orderLinkId').each(function(index, element){
+        			element.onclick = function(){
+        				showDicountDetail($(element).text());
+        			}
+        		});
 			}
 		});
 		//

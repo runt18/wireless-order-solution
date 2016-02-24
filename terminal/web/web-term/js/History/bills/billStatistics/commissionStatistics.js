@@ -1,57 +1,4 @@
 
-var CommissionStat = {
-	linkOrderId : function(v){
-		return '<a href=\"javascript:CommissionStat.comi_billDetailHandler('+ v +')\">'+ v +'</a>';
-	},
-	comi_billDetailHandler : function(orderID){
-		var commissionOrderDetailWin;
-		function comi_showBillDetailWin(){
-			commissionOrderDetailWin = new Ext.Window({
-				layout : 'fit',
-				width : 1100,
-				height : 440,
-				closable : false,
-				resizable : false,
-				modal : true,
-				bbar : ['->', {
-					text : '关闭',
-					iconCls : 'btn_close',
-					handler : function() {
-						commissionOrderDetailWin.destroy();
-					}
-				} ],
-				keys : [{
-					key : Ext.EventObject.ESC,
-					scope : this,
-					fn : function(){
-						commissionOrderDetailWin.destroy();
-					}
-				}],
-				listeners : {
-					show : function(thiz) {
-						var sd = Ext.ux.getSelData(commissionStatisticsGrid);
-						thiz.load({
-							url : '../window/history/orderDetail.jsp', 
-							scripts : true,
-							params : {
-								orderId : sd.orderId,
-								foodStatus : 'isCommission'
-							},
-							method : 'post'
-						});
-						thiz.center();	
-					}
-				}
-			});
-		}
-		
-		comi_showBillDetailWin();
-		commissionOrderDetailWin.show();
-		commissionOrderDetailWin.setTitle('账单号: ' + orderID);
-		commissionOrderDetailWin.center();
-	}
-}
-
 Ext.onReady(function(){
 	
 	var commissionStatisticsGrid, commissionDeptTree, commissionTotalGrid, commissionTotalDeptTree, commissionOrderDetailWin;
@@ -179,7 +126,9 @@ Ext.onReady(function(){
 			{header : '日期', dataIndex : 'orderDateFormat'},
 			{header : '菜名', dataIndex : 'foodName'},
 			{header : '部门', dataIndex : 'dept'},
-			{header : '账单号', dataIndex : 'orderId', renderer : CommissionStat.linkOrderId},
+			{header : '账单号', dataIndex : 'orderId', renderer : function(v){
+				return '<a class="orderLinkId">' + v + '</a>';
+			}},
 			{header : '单价', dataIndex : 'unitPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
 			{header : '数量', dataIndex : 'amount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
 			{header : '总额', dataIndex : 'totalPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
@@ -341,6 +290,54 @@ Ext.onReady(function(){
 		
 		commissionStatisticsGrid.getStore().on('load', function(store, records, options){
 			
+			function showCommissionDetail(orderID){
+				var commissionOrderDetailWin;
+				function comi_showBillDetailWin(){
+					commissionOrderDetailWin = new Ext.Window({
+						layout : 'fit',
+						width : 1100,
+						height : 440,
+						closable : false,
+						resizable : false,
+						modal : true,
+						bbar : ['->', {
+							text : '关闭',
+							iconCls : 'btn_close',
+							handler : function() {
+								commissionOrderDetailWin.destroy();
+							}
+						} ],
+						keys : [{
+							key : Ext.EventObject.ESC,
+							scope : this,
+							fn : function(){
+								commissionOrderDetailWin.destroy();
+							}
+						}],
+						listeners : {
+							show : function(thiz) {
+								var sd = Ext.ux.getSelData(commissionStatisticsGrid);
+								thiz.load({
+									url : '../window/history/orderDetail.jsp', 
+									scripts : true,
+									params : {
+										orderId : sd.orderId,
+										foodStatus : 'isCommission'
+									},
+									method : 'post'
+								});
+								thiz.center();	
+							}
+						}
+					});
+				}
+				
+				comi_showBillDetailWin();
+				commissionOrderDetailWin.show();
+				commissionOrderDetailWin.setTitle('账单号: ' + orderID);
+				commissionOrderDetailWin.center();
+			}
+			
 			if(store.getCount() > 0){
 				var sumRow = commissionStatisticsGrid.getView().getRow(store.getCount() - 1);	
 				sumRow.style.backgroundColor = '#EEEEEE';			
@@ -357,6 +354,12 @@ Ext.onReady(function(){
 				commissionStatisticsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
 				commissionStatisticsGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 				commissionStatisticsGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+				
+				$('#commissionStatisticsPanel').find('.orderLinkId').each(function(index, element){
+        			element.onclick = function(){
+        				showCommissionDetail($(element).text());
+        			}
+        		});
 			}
 		});
 		
