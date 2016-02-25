@@ -720,18 +720,30 @@ Ext.onReady(function(){
 			[true, false, false, true], 
 			['帐单号', 'id'],
 			['流水号', 'seqId'],
-			['台号', 'table.alias',120,,'function(v,m,r){if(v != 0){return v+\"(\"+r.get("table.name")+\")\";}else{return r.get("table.name");}}'],
+			['台号', 'table.alias', 120, null, function(v,m,r){
+				if(v != 0){
+					return v + "(" + r.get("table.name") + ")";
+				}else{
+					return r.get("table.name");
+				}
+			}],
 			['区域', 'table.region.name'],
 			['日期', 'orderDateFormat', 150],
-			['账单类型', 'categoryText',,'center'],
-			['结账方式', 'settleTypeText',,'center'],
-			['收款方式', 'payTypeText',,'center'],
-			['优惠劵金额', 'couponPrice',,'right','couponPriceHandler'],
-			['应收', 'totalPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['实收', 'actualPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['状态', 'statusText',,'center', 'function(v,m,r){if(r.get("statusValue")==2){return \'<font color=\"#FF0000\">反结账</font>\';}else{return v;}}'],
-			['备注', 'comment',,'center', 'commentTip'],
-			['操作', 'operator', 270, 'center', 'billOpt']
+			['账单类型', 'categoryText', null, 'center'],
+			['结账方式', 'settleTypeText', null, 'center'],
+			['收款方式', 'payTypeText', null, 'center'],
+			['优惠劵金额', 'couponPrice', null, 'right', couponPriceHandler],
+			['应收', 'totalPrice', null, 'right', Ext.ux.txtFormat.gridDou],
+			['实收', 'actualPrice', null, 'right', Ext.ux.txtFormat.gridDou],
+			['状态', 'statusText', null, 'center', function(v,m,r){
+				if(r.get("statusValue") == 2){
+					return '<font color=\"#FF0000\">反结账</font>';
+				}else{
+					return v;
+				}
+			}],
+			['备注', 'comment', null, 'center', commentTip],
+			['操作', 'operator', 270, 'center', billOpt]
 		],
 		OrderRecord.getKeys(),
 		[['dataType', 0]],
