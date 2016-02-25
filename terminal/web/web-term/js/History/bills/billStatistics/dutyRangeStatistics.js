@@ -1,4 +1,7 @@
-﻿function dutyRangeStatPrintHandler(rowIndex) {
+﻿
+var dutyRangeStatWin = null;
+
+function dutyRangeStatPrintHandler(rowIndex) {
 	var gs = Ext.ux.getSelData(dutyRangeStatPanel);
 	var tempMask = new Ext.LoadMask(document.body, {
 		msg : '正在打印请稍候.......',
@@ -27,7 +30,7 @@
 function dutyRangeStatDetalHandler(){
 	var gs = Ext.ux.getSelData(dutyRangeStatPanel);
 	if(gs != false){
-		var dutyRangeStatWin = Ext.getCmp('dutyRangeStatWin');
+		dutyRangeStatWin = Ext.getCmp('dutyRangeStatWin');
 		if(!dutyRangeStatWin){
 			dutyRangeStatWin = new Ext.Window({
 				title : '营业统计 -- <font style="color:green;">历史</font> -- '+(statType == 1?'交班人':'交款人')+':&nbsp;<font style="color:red;">' + gs['staffName'] + '</font>',
