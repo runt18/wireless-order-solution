@@ -88,7 +88,6 @@ public class QueryEraseStatisticAction extends DispatchAction{
 					total.setErasePrice(item.getErasePrice() + total.getErasePrice());
 					total.setActualPrice(item.getActualPrice() + total.getActualPrice());
 				}
-				total.setDestTbl(result.get(0).getDestTbl());
 				result = DataPaging.getPagingData(result, true, start, limit);
 				result.add(total);
 				
