@@ -1,5 +1,6 @@
 package com.wireless.Actions.deptMgr;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.DepartmentTree.DeptNode;
@@ -61,7 +63,7 @@ public class QueryDeptTreeAction extends Action{
 				jsonSB.append(",leaf:true");
 				jsonSB.append("}");
 			}
-		} catch(Exception e){
+		} catch(BusinessException | SQLException e){
 			e.printStackTrace();
 		} finally{
 			response.getWriter().print("[" + jsonSB.toString() + "]");
