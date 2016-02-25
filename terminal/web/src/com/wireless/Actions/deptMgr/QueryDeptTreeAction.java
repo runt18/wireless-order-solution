@@ -26,12 +26,18 @@ public class QueryDeptTreeAction extends Action{
 		
 		final String pin = (String) request.getAttribute("pin");
 		
+		final String branchId = request.getParameter("branchId");
+		
 		final String warehouse = request.getParameter("warehouse");
 		
 		final StringBuffer jsonSB = new StringBuffer();
 		
 		try{
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
 			List<Department> deptList;
 			
