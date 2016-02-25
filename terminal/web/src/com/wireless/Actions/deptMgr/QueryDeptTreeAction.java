@@ -28,7 +28,7 @@ public class QueryDeptTreeAction extends Action{
 		
 		final String warehouse = request.getParameter("warehouse");
 		
-		final StringBuffer jsonSB = new StringBuffer();
+		final StringBuilder jsonSB = new StringBuilder();
 		
 		try{
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
