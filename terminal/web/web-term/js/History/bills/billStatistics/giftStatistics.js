@@ -352,7 +352,21 @@ Ext.onReady(function(){
 				text : '导出',
 				iconCls : 'icon_tb_exoprt_excel',
 				handler : function(){
-					
+					if(!beginDate.isValid() || !endDate.isValid()){
+						return;
+					}
+					var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&region={4}&foodName={5}&dataSource={6}';
+					url = String.format(
+							url, 
+							'ExportHistoryStatisticsToExecl.do', 
+							Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00'),	//begin
+							Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59'),		//end
+							gift_combo_staffs.getValue(),									//staff
+							Ext.getCmp('giftStatistic_comboRegion').getValue(),				//region
+							Ext.getCmp('gift_foodName').getValue(),							//food name
+						    'giftDetail'													//dataSource
+					);
+					window.location = url;
 				}
 			}]
 		});

@@ -10,7 +10,7 @@ Ext.onReady(function(){
 		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
-				Ext.ux.checkDuft(true, thiz.getId(), endDate.getId());
+				Ext.ux.checkDuft(true, thiz.getId(), discount_endDate.getId());
 			}
 		}
 	});
@@ -23,7 +23,7 @@ Ext.onReady(function(){
 		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
-				Ext.ux.checkDuft(false, beginDate.getId(), thiz.getId());
+				Ext.ux.checkDuft(false, discount_beginDate.getId(), thiz.getId());
 			}
 		}
 	});
@@ -222,15 +222,15 @@ Ext.onReady(function(){
 			text : '导出',
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
-				if(!beginDate.isValid() || !endDate.isValid()){
+				if(!discount_beginDate.isValid() || !discount_endDate.isValid()){
 					return;
 				}
 				var url = '../../{0}?beginDate={1}&endDate={2}&staffID={3}&deptID={4}&dataSource={5}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
-						Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00'),
-						Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59'),
+						Ext.util.Format.date(discount_beginDate.getValue(), 'Y-m-d 00:00:00'),
+						Ext.util.Format.date(discount_endDate.getValue(), 'Y-m-d 23:59:59'),
 						discount_combo_staffs.getValue(),
 						discount_deptCombo.getValue(),
 						'discountStatisticsList'
@@ -239,7 +239,15 @@ Ext.onReady(function(){
 			}
 		}];
 		
-		var discountStatisticsGridTbar = Ext.ux.initTimeBar({beginDate:discount_beginDate, endDate:discount_endDate,dateCombo:discount_dateCombo, tbarType : 1, statistic : 'discount_', callback : function businessHourSelect(){discount_hours = null;}}).concat(discountStatisticsGridTbarItem);
+		var discountStatisticsGridTbar = Ext.ux.initTimeBar({
+			beginDate : discount_beginDate, 
+			endDate : discount_endDate,
+			dateCombo : discount_dateCombo, 
+			tbarType : 1, 
+			statistic : 'discount_', 
+			callback : function businessHourSelect(){
+				discount_hours = null;
+			}}).concat(discountStatisticsGridTbarItem);
 		
 		discountStatisticsGrid = createGridPanel(
 			'',
