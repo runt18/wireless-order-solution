@@ -135,6 +135,114 @@ Ext.onReady(function(){
 			}
 		});
 		
+		//门店选择
+		var branch_combo_gift = new Ext.form.ComboBox({
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+							thiz.fireEvent('select');
+						}
+					});
+				},
+				select : function(){
+					//加载赠送人
+					var staff = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../QueryStaff.do',
+						params : {
+							branchId : branch_combo_gift.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+							}
+							
+							gift_combo_staffs.store.loadData(staff);
+							gift_combo_staffs.setValue(-1);
+						}
+					});
+					
+					//加载区域
+					var region = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateRegion.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_gift.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								region.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							Ext.getCmp('giftStatistic_comboRegion').store.loadData(region);
+							Ext.getCmp('giftStatistic_comboRegion').setValue(-1);
+						}
+					});
+					
+					//加载市别
+					var hour = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateBusinessHour.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_gift.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+							}
+							
+							hour.push([-2, '自定义']);
+							
+							Ext.getCmp('giftStatistic_comboBusinessHour').store.loadData(hour);
+							Ext.getCmp('giftStatistic_comboBusinessHour').setValue(-1);
+						}
+					});
+					
+					Ext.getCmp('giftStatistic_btnSearch').handler();
+				}
+			}
+		});
+		
 		var grid_giftStatisticsTbar = new Ext.Toolbar({
 			items : [{
 				xtype:'tbtext',
@@ -153,7 +261,10 @@ Ext.onReady(function(){
 			},{
 				xtype : 'tbtext',
 				text : '&nbsp;&nbsp;赠送人:'
-			},gift_combo_staffs, '->', {
+			},gift_combo_staffs, {
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;门店选择:'
+			},branch_combo_gift, '->', {
 				text : '搜索',
 				id : 'giftStatistic_btnSearch',
 				iconCls : 'btn_search',
@@ -177,6 +288,7 @@ Ext.onReady(function(){
 					gs.baseParams['giftStaffId'] = gift_combo_staffs.getValue();
 					gs.baseParams['opening'] = businessHour.opening;
 					gs.baseParams['ending'] = businessHour.ending;
+					gs.baseParams['branchId'] = branch_combo_gift.getValue();
 					gs.load({
 						params : {
 							start : 0,
@@ -198,7 +310,8 @@ Ext.onReady(function(){
 						giftStaffId : gift_combo_staffs.getValue(),
 						foodName : Ext.getCmp('gift_foodName').getValue(),
 						opening : businessHour.opening,
-						ending : businessHour.ending
+						ending : businessHour.ending,
+						branchId : branch_combo_gift.getValue()
 					};
 					gift_chartLoadMarsk.show();
 					Ext.Ajax.request({
@@ -233,6 +346,12 @@ Ext.onReady(function(){
 						
 					}
 					
+					
+				}
+			},'-', {
+				text : '导出',
+				iconCls : 'icon_tb_exoprt_excel',
+				handler : function(){
 					
 				}
 			}]
