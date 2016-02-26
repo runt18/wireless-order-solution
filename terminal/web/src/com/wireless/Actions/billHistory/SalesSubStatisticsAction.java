@@ -46,7 +46,7 @@ public class SalesSubStatisticsAction extends Action {
 		final String businessHourBeg = request.getParameter("opening");
 		final String businessHourEnd = request.getParameter("ending");
 		final String orderType = request.getParameter("orderType");
-		final String deptID = request.getParameter("deptID");
+		final String deptId = request.getParameter("deptID");
 		final String foodName = request.getParameter("foodName");
 		final String region = request.getParameter("region");
 		final String staffId = request.getParameter("staffId");
@@ -105,6 +105,7 @@ public class SalesSubStatisticsAction extends Action {
 			}
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
 			if(branchId != null && !branchId.isEmpty()){
 				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 			}
@@ -134,8 +135,8 @@ public class SalesSubStatisticsAction extends Action {
 				if(foodName != null && !foodName.isEmpty()){
 					extraCond.setFoodName(foodName);
 				}
-				if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-					extraCond.setDept(Department.DeptId.valueOf(Integer.parseInt(deptID)));
+				if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+					extraCond.setDept(Department.DeptId.valueOf(Integer.parseInt(deptId)));
 				}
 				if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
 					extraCond.setStaffId4OrderFood(Integer.parseInt(staffId));

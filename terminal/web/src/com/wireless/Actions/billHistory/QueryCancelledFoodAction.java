@@ -1,5 +1,6 @@
 package com.wireless.Actions.billHistory;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,15 @@ import com.wireless.util.DataPaging;
 
 public class QueryCancelledFoodAction extends DispatchAction{
 	
+	/**
+	 * 获取退菜明细
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward getDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String limit = request.getParameter("limit");
 		final String start = request.getParameter("start");
@@ -113,7 +123,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				
 			}
 			jObject.setRoot(cancelList);
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 			
@@ -126,6 +136,15 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 获取退菜走势图（按数量）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String pin = (String)request.getAttribute("pin");
 		final String branchId = request.getParameter("branchId");
@@ -195,7 +214,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			
 			});
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
@@ -208,6 +227,15 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 获取退菜走势图（按原因）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward getReasonChart(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String pin = (String)request.getAttribute("pin");
 		final String branchId = request.getParameter("branchId");
@@ -244,7 +272,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			
 			jObject.setRoot(CalcCancelStatisticsDao.calcCancelIncomeByReason(staff, new DutyRange(dateBeg, dateEnd), extraCond));
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
@@ -257,6 +285,15 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 获取退菜走势图（按员工）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward getStaffChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String pin = (String)request.getAttribute("pin");
 		final String branchId = request.getParameter("branchId");
@@ -293,7 +330,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			
 			jObject.setRoot(CalcCancelStatisticsDao.calcCancelIncomeByStaff(staff, new DutyRange(dateBeg, dateEnd), extraCond));
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
@@ -306,6 +343,15 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 获取退菜走势图（按部门）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward getDeptChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		final String pin = (String)request.getAttribute("pin");
 		final String branchId = request.getParameter("branchId");
@@ -342,7 +388,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			
 			jObject.setRoot(CalcCancelStatisticsDao.calcCancelIncomeByDept(staff, new DutyRange(dateBeg, dateEnd), extraCond));
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){

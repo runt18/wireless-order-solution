@@ -63,9 +63,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 			}
 			
-			final OrderFoodDao.ExtraCond extraCond = new OrderFoodDao.ExtraCond(DateType.HISTORY);
-			
-			extraCond.setGift(true);
+			final OrderFoodDao.ExtraCond extraCond = new OrderFoodDao.ExtraCond(DateType.HISTORY).setGift(true);
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));

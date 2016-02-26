@@ -85,7 +85,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 				result.add(total);
 			}
 			jObject.setRoot(result);
-		}catch (SQLException e) {
+		}catch (SQLException | BusinessException e) {
 			e.printStackTrace();
 			jObject.initTip(e);
 		} catch (Exception e) {
@@ -164,7 +164,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 			
 			});
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
@@ -216,7 +216,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 			
 			jObject.setRoot(CalcRepaidStatisticsDao.calcRepaidIncomeByStaff(staff, new DutyRange(dateBeg, dateEnd), extraCond));
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
