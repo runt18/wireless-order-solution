@@ -129,7 +129,33 @@ $(function(){
 				}
 			}, 'json');	
 		})();
-
+		
+		//刷新微信订单
+		(function refreshWxBook(){
+			
+			$.ajax({
+				url : '../QueryWxOrder.do',
+				type : 'post',
+				dataType : 'json',
+				data : {
+					dataSource : 'getByCond',
+					status : '2'
+				},
+				success : function(data){
+					Util.LM.hide();
+					if(data.success){
+						if(data.root && data.root.length > 0){
+							$('#wxbookAmount_div_tableSelect').html(data.root.length);
+							$('#wxbookAmount_div_tableSelect').show();
+						}else{
+							$('#wxbookAmount_div_tableSelect').hide();
+						}
+					}
+				}
+			});
+			
+		})();
+		
 	});
 	
 	//进入餐桌初始化

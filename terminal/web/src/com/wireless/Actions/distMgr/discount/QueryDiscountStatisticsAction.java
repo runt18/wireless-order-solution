@@ -88,7 +88,6 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 					total.setDiscountPrice(item.getDiscountPrice() + total.getDiscountPrice());
 					total.setActualPrice(item.getActualPrice() + total.getActualPrice());
 				}
-				total.setDestTbl(result.get(0).getDestTbl());
 				result = DataPaging.getPagingData(result, true, start, limit);
 				result.add(total);
 				

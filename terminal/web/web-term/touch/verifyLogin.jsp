@@ -153,8 +153,10 @@
 	            <button type="button" data-theme="b" data-inline="true" data-icon="check" onclick="staffLoginHandler()">前台点菜</button>
             </div>
         </div>
+        <div style="position:absolute;bottom:15px;left:10px;"><a href="http://wx.e-tones.net/manual/智易云餐厅用户手册.chm">智易系统帮助文档</a></div>
 	</div>
 </div>
+
 </body>
 <script src="http://code.54kefu.net/kefu/js/b150/852550.js" type="text/javascript" charset="utf-8"></script>	
 </html>
