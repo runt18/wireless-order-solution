@@ -2,7 +2,7 @@
 Ext.onReady(function(){
 
 	var discount_beginDate = new Ext.form.DateField({
-		id : 'discount_dateSearchDateBegin',
+		id : 'beginDate_combo_discountStatistics',
 		xtype : 'datefield',		
 		format : 'Y-m-d',
 		width : 100,
@@ -15,7 +15,7 @@ Ext.onReady(function(){
 		}
 	});
 	var discount_endDate = new Ext.form.DateField({
-		id : 'discount_dateSearchDateEnd',
+		id : 'endDate_combo_discountStatistics',
 		xtype : 'datefield',
 		format : 'Y-m-d',
 		width : 100,
@@ -34,7 +34,7 @@ Ext.onReady(function(){
 			beginDate : discount_beginDate,
 			endDate : discount_endDate,
 			callback : function(){
-				Ext.getCmp('discount_btnSearch').handler();
+				Ext.getCmp('search_btn_discountStatistics').handler();
 			}
 		});
 		
@@ -74,7 +74,7 @@ Ext.onReady(function(){
 					});
 				},
 				select : function(){
-					Ext.getCmp('discount_btnSearch').handler();
+					Ext.getCmp('search_btn_discountStatistics').handler();
 				}
 			}
 		});
@@ -107,13 +107,6 @@ Ext.onReady(function(){
 							}
 							thiz.store.loadData(data);
 							thiz.setValue(-1);
-							
-							if(sendToPageOperation){
-								discount_setStatisticsDate();
-							}else{
-								discount_dateCombo.setValue(1);
-								discount_dateCombo.fireEvent('select', discount_dateCombo, null, 1);			
-							}							
 						},
 						fialure : function(res, opt){
 							thiz.store.loadData(data);
@@ -122,20 +115,132 @@ Ext.onReady(function(){
 					});				
 				},
 				select : function(){
-					Ext.getCmp('discount_btnSearch').handler();
+					Ext.getCmp('search_btn_discountStatistics').handler();
 				}
 			}
 		});	
 		
+		//加载门店
+		var branch_combo_discount = new Ext.form.ComboBox({
+			id : 'branch_combo_discount',
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth :120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+							thiz.fireEvent('select');
+						}
+					});
+				},
+				select : function(){
+					//加载员工
+					var staff = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../QueryStaff.do',
+						params : {
+							branchId : branch_combo_discount.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+							}
+							
+							discount_combo_staffs.store.loadData(staff);
+							discount_combo_staffs.setValue(-1);
+						}
+					});
+					
+					//加载部门
+					var region = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateRegion.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_discount.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								region.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							discount_deptCombo.store.loadData(region);
+							discount_deptCombo.setValue(-1);
+						}
+					});
+					
+					//加载市别
+					var hour = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateBusinessHour.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_discount.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+							}
+							
+							hour.push([-2, '自定义']);
+							
+							Ext.getCmp('discount_comboBusinessHour').store.loadData(hour);
+							Ext.getCmp('discount_comboBusinessHour').setValue(-1);
+						}
+					});
+					
+					Ext.getCmp('search_btn_discountStatistics').handler();
+				}
+			}
+		});
+		
 		var discountStatisticsGridTbarItem = [{
 				xtype : 'tbtext',
-				text : '&nbsp;&nbsp;员工: '
+				text : '&nbsp;&nbsp;员工选择: '
 			},discount_combo_staffs,{
 				xtype : 'tbtext',
-				text : '&nbsp;&nbsp;部门: '
-			}, discount_deptCombo ,'->',{
+				text : '&nbsp;&nbsp;部门选择: '
+			}, discount_deptCombo , {
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;门店选择:'
+			}, branch_combo_discount, '->',{
 				text : '搜索',
-				id : 'discount_btnSearch',
+				id : 'search_btn_discountStatistics',
 				iconCls : 'btn_search',
 				handler : function(e){
 					if(!discount_beginDate.isValid() || !discount_endDate.isValid()){
@@ -157,6 +262,7 @@ Ext.onReady(function(){
 					store.baseParams['deptID'] = discount_deptCombo.getValue();
 					store.baseParams['opening'] = businessHour.opening;
 					store.baseParams['ending'] = businessHour.ending;	
+					store.baseParams['branchId'] = branch_combo_discount.getValue();
 					
 					store.load({
 						params : {
@@ -184,7 +290,8 @@ Ext.onReady(function(){
 						deptID : discount_deptCombo.getValue(),
 						staffId : discount_combo_staffs.getValue(),
 						opening : businessHour.opening,
-						ending : businessHour.ending				
+						ending : businessHour.ending,
+						branchId : branch_combo_discount.getValue()
 					};
 					discount_chartLoadMarsk.show();
 					Ext.Ajax.request({
@@ -225,7 +332,7 @@ Ext.onReady(function(){
 				if(!beginDate.isValid() || !endDate.isValid()){
 					return;
 				}
-				var url = '../../{0}?beginDate={1}&endDate={2}&staffID={3}&deptID={4}&dataSource={5}';
+				var url = '../../{0}?beginDate={1}&endDate={2}&staffID={3}&deptID={4}&dataSource={5}&branchId={6}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
@@ -233,7 +340,8 @@ Ext.onReady(function(){
 						Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59'),
 						discount_combo_staffs.getValue(),
 						discount_deptCombo.getValue(),
-						'discountStatisticsList'
+						'discountStatisticsList',
+						branch_combo_discount.getValue()
 				);
 				window.location = url;
 			}
@@ -370,8 +478,8 @@ Ext.onReady(function(){
 	}
 
 	function showDiscountDetailChart(jdata){
-		var dateBegin = Ext.util.Format.date(Ext.getCmp('discount_dateSearchDateBegin').getValue(), 'Y-m-d');
-		var dateEnd = Ext.util.Format.date(Ext.getCmp('discount_dateSearchDateEnd').getValue(), 'Y-m-d');
+		var dateBegin = Ext.util.Format.date(Ext.getCmp('beginDate_combo_discountStatistics').getValue(), 'Y-m-d');
+		var dateEnd = Ext.util.Format.date(Ext.getCmp('endDate_combo_discountStatistics').getValue(), 'Y-m-d');
 		
 		var hourBegin = Ext.getCmp('discount_txtBusinessHourBegin').getEl().dom.textContent;
 		var hourEnd = Ext.getCmp('discount_txtBusinessHourEnd').getEl().dom.textContent;
@@ -535,24 +643,6 @@ Ext.onReady(function(){
 		content.series = type==1?discount_deptChartData.chartAmountData:discount_deptChartData.chartPriceData;
 		
 		return newPieChart({rt: 'divDiscountDeptPieChart', title : content.title, unit: content.unit, series: content.series});
-	};
-	
-	var discount_setStatisticsDate = function(){
-		if(sendToPageOperation){
-			Ext.getCmp('discount_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-			Ext.getCmp('discount_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
-			
-			discount_hours = sendToStatisticsPageHours;
-			
-			Ext.getCmp('discount_btnSearch').handler();
-			
-			Ext.getCmp('discount_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+discount_hours.openingText+'</font>');
-			Ext.getCmp('discount_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+discount_hours.endingText+'</font>');
-			Ext.getCmp('discount_comboBusinessHour').setValue(discount_hours.hourComboValue);		
-			
-			sendToPageOperation = false;		
-		}
-	
 	};
 	
 	//按员工汇总折扣数量的柱状和饼图
@@ -747,5 +837,7 @@ Ext.onReady(function(){
     
     discount_rz.resizeTo(discountDetailsStatPanel.getWidth(), discount_totalHeight*0.4);	
 	
-	Ext.getCmp('discountStatistics').updateStatisticsDate = discount_setStatisticsDate;
+    discount_dateCombo.setValue(1);
+	discount_dateCombo.fireEvent('select', discount_dateCombo, null, 1);			
+//	Ext.getCmp('discountStatistics').updateStatisticsDate = discount_setStatisticsDate;
 });

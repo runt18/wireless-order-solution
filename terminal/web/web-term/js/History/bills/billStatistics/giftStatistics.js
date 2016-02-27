@@ -52,7 +52,7 @@ Ext.onReady(function(){
 	
 	function initGiftStatisticsGrid(){
 		var beginDate = new Ext.form.DateField({
-			id : 'gift_dateSearchDateBegin',
+			id : 'beginDate_combo_giftStatistics',
 			xtype : 'datefield',		
 			format : 'Y-m-d',
 			width : 100,
@@ -66,7 +66,7 @@ Ext.onReady(function(){
 			}
 		});
 		var endDate = new Ext.form.DateField({
-			id : 'gift_dateSearchDateEnd',
+			id : 'endDate_combo_giftStatistics',
 			xtype : 'datefield',
 			format : 'Y-m-d',
 			width : 100,
@@ -116,12 +116,6 @@ Ext.onReady(function(){
 							thiz.store.loadData(data);
 							thiz.setValue(-1);
 	
-							if(sendToPageOperation){
-								gift_setStatisticsDate();
-							}else{
-								gift_dateCombo.setValue(1);
-								gift_dateCombo.fireEvent('select', gift_dateCombo, null, 1);				
-							}							
 						},
 						fialure : function(res, opt){
 							thiz.store.loadData(data);
@@ -137,6 +131,7 @@ Ext.onReady(function(){
 		
 		//门店选择
 		var branch_combo_gift = new Ext.form.ComboBox({
+			id : 'branch_combo_gift',
 			readOnly : false,
 			forceSelection : true,
 			width : 123,
@@ -477,8 +472,8 @@ Ext.onReady(function(){
 	}
 
 	function showGiftDetailChart(jdata){
-		var dateBegin = Ext.util.Format.date(Ext.getCmp('gift_dateSearchDateBegin').getValue(), 'Y-m-d');
-		var dateEnd = Ext.util.Format.date(Ext.getCmp('gift_dateSearchDateEnd').getValue(), 'Y-m-d');
+		var dateBegin = Ext.util.Format.date(Ext.getCmp('beginDate_combo_giftStatistics').getValue(), 'Y-m-d');
+		var dateEnd = Ext.util.Format.date(Ext.getCmp('endDate_combo_giftStatistics').getValue(), 'Y-m-d');
 		
 		var hourBegin = Ext.getCmp('giftStatistic_txtBusinessHourBegin').getEl().dom.textContent;
 		var hourEnd = Ext.getCmp('giftStatistic_txtBusinessHourEnd').getEl().dom.textContent;
@@ -700,24 +695,6 @@ Ext.onReady(function(){
 		gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutBeforeDrag);
 	}
 
-	var gift_setStatisticsDate = function(){
-		if(sendToPageOperation){
-			Ext.getCmp('gift_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-			Ext.getCmp('gift_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
-			
-			giftStatistic_hours = sendToStatisticsPageHours;
-			
-			Ext.getCmp('giftStatistic_btnSearch').handler();
-			
-			Ext.getCmp('giftStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+giftStatistic_hours.openingText+'</font>');
-			Ext.getCmp('giftStatistic_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+giftStatistic_hours.endingText+'</font>');
-			Ext.getCmp('giftStatistic_comboBusinessHour').setValue(giftStatistic_hours.hourComboValue);
-			
-			sendToPageOperation = false;		
-		}
-	
-	};
-	
 	var grid_giftStatistics, giftViewBillWin;
 	var gift_cutAfterDrag=75, gift_cutBeforeDrag=70, giftStatistic_hours;
 	var giftDetailsStatPanel, giftStatChartTabPanel, giftDetailChartPanel, giftStaffChartPanel, giftDeptChartPanel;
@@ -878,9 +855,7 @@ Ext.onReady(function(){
     giftStatChartTabPanel.setHeight(gift_totalHeight*0.6);
     
     gift_rz.resizeTo(giftDetailsStatPanel.getWidth(), gift_totalHeight*0.4);
-    
-     Ext.getCmp('giftStatistics').updateStatisticsDate = gift_setStatisticsDate;	
-	
+
 	
 	
 });
