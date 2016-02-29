@@ -1,348 +1,347 @@
-﻿//mcrs:memberCreatedStatistics
-var mcrs_grid, mcrs_search_memberType
-	,mcrs_search_onDuty, mcrs_search_offDuty, mcrs_search_memberName, mcrs_search_dateCombo;
-var mcrs_modal = true;
-
-var mcrs_highChart, mcrs_PanelHeight = 0, mcrs_panelDrag = false;
-
-var mcrs_southPanel;
-
-function mcrs_showChart(){
-	var dateBegin = Ext.util.Format.date(mcrs_search_onDuty.getValue(), 'Y-m-d');
-	var dateEnd = Ext.util.Format.date(mcrs_search_offDuty.getValue(), 'Y-m-d');
+﻿
+Ext.onReady(function(){
 	
-	var chartData;
-	$.ajax({
-		url : '../../QueryMemberStatistics.do',
-		type : 'post',
-		dataType : 'json',
-		data : {
-			dataSource :'createdStatistics',
-			dateBegin : dateBegin,
-			dateEnd : dateEnd + " 23:59:59"
-		},
-		async : false,
-		success : function(data){
-			chartData = eval('(' + data.other.businessChart + ')');
-		},
-		error : function(xhr){
-		}
-	});
+	var mcrs_grid, mcrs_search_memberType
+		,mcrs_search_onDuty, mcrs_search_offDuty, mcrs_search_memberName, mcrs_search_dateCombo;
+	var mcrs_modal = true;
 	
+	var mcrs_highChart, mcrs_PanelHeight = 0, mcrs_panelDrag = false;
 	
-	mcrs_highChart = new Highcharts.Chart({
-		plotOptions : {
-			line : {
-				cursor : 'pointer',
-				dataLabels : {
-					enabled : true,
-					style : {
-						fontWeight: 'bold', 
-						color: 'green' 
-					}
-				}
-			}
-		},
-        chart: {  
-        	renderTo: 'memberCreatedChart'
-    	}, 
-        title: {
-            text: '<b>会员开卡走势图（'+ dateBegin +'至'+ dateEnd +'）</b>'
-        },
-        labels: {
-        	items : [{
-        		html : '<b>日均开卡数:' + chartData.avgCount + ' 个</b>',
-	        	style : {left :/*($('#memberCreatedChart').width()*0.80)*/'0px', top: '0px'}
-        	}]
-        },
-        xAxis: {
-            categories: chartData.xAxis,
-            labels : {
-            	formatter : function(){
-            		return this.value.substring(5);
-            	}
-            }
-        },
-        yAxis: {
-        	min: 0,
-            title: {
-                text: '数量 (个)'
-            },
-            plotLines: [{
-                value: 0,
-                width: 2,
-                color: '#808080'
-            }]
-        },
-        tooltip: {
-//	        	crosshairs: true,
-            formatter: function() {
-                return '<b>' + this.series.name + '</b><br/>'+
-                    this.x +': '+ '<b>'+this.y+'</b> ';
-            }
-        },
-//	        series : [{  
-//	            name: 'aaaaaa',  
-//	            data: [6, 9, 2, 7, 13, 21, 10]
-//	        }],
-        series : chartData.ser,
-        exporting : {
-        	enabled : true
-        },
-        credits : {
-        	enabled : false
-        }
-	});
-}
-
-
-function mcrs_initBusinessReceipsGrid(c){
+	var mcrs_southPanel;
 	
-	mcrs_search_memberType = new Ext.form.ComboBox({
-		id : 'mcrs_search_memberType',
-		width : 90,
-		forceSelection : true,
-		readOnly : false,
-		store : new Ext.data.JsonStore({
-			root : 'root',
-			fields : ['id', 'name']
-		}),
-		valueField : 'id',
-		displayField : 'name',
-		listClass : ' x-menu ',
-		typeAhead : true,
-		mode : 'local',
-		triggerAction : 'all',
-		selectOnFocus : true,
-		listeners : {
-			render : function(thiz){
-				Ext.Ajax.request({
-					url : '../../QueryMemberType.do?',
-					params : {
-						isCookie : true,
-						dataSource : 'normal',
-						restaurantID : restaurantID
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						if(jr.success){
-							jr.root.unshift({id:-1, name:'全部'});
-						}else{
-							Ext.example.msg('异常', '会员类型数据加载失败, 请联系客服人员.');
-						}
-						thiz.store.loadData(jr);
-						thiz.setValue(-1);
-						
-					},
-					failure : function(res, opt){
-						thiz.store.loadData({root:[{typeId:-1, name:'全部'}]});
-						thiz.setValue(-1);
-					}
-				});
-			},
-			select : function(){
-				mcrs_searchMemberOperation();
-			}
-		}
-	});
-	mcrs_search_onDuty = new Ext.form.DateField({
-		xtype : 'datefield',
-		width : 100,
-		format : 'Y-m-d',
-		maxValue : new Date(),
-		hideParent : true,
-		hidden : mcrs_modal ? false : true,
-		readOnly : false,
-		allowBlank : false
-	});
-	mcrs_search_offDuty = new Ext.form.DateField({
-		xtype : 'datefield',
-		width : 100,
-		format : 'Y-m-d',
-		maxValue : new Date(),
-		hideParent : true,
-		hidden : mcrs_modal ? false : true,
-		readOnly : false,
-		allowBlank : false
-	});
-	mcrs_search_dateCombo = Ext.ux.createDateCombo({
-		beginDate : mcrs_search_onDuty,
-		endDate : mcrs_search_offDuty,
-		callback : function(){
-			mcrs_searchMemberOperation();
-		}
-	});
-	mcrs_search_memberName = new Ext.form.TextField({
-		xtype : 'textfield',
-		width : 100
+	function mcrs_showChart(){
+		var dateBegin = Ext.util.Format.date(mcrs_search_onDuty.getValue(), 'Y-m-d');
+		var dateEnd = Ext.util.Format.date(mcrs_search_offDuty.getValue(), 'Y-m-d');
 		
-	});
-	var mcrs_mo_tbar = new Ext.Toolbar({
-		height : 26,
-		items : [{ 
-			xtype : 'tbtext', 
-			text : (mcrs_modal ? '&nbsp;&nbsp;日期:&nbsp;' : ' ')
-		}, mcrs_search_dateCombo, {
-			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;'
-		}, mcrs_search_onDuty, { 
-			xtype : 'tbtext',
-			text : (mcrs_modal ? '&nbsp;至&nbsp;' : ' ')
-		}, mcrs_search_offDuty, 
-		{
-			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;会员类型:'
-		}, mcrs_search_memberType, 
-		{
-			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
-		}, mcrs_search_memberName, '->', {
-			text : '搜索',
-			iconCls : 'btn_search',
-			handler : function(e){
-				mcrs_searchMemberOperation();
+		var chartData;
+		$.ajax({
+			url : '../../QueryMemberStatistics.do',
+			type : 'post',
+			dataType : 'json',
+			data : {
+				dataSource :'createdStatistics',
+				dateBegin : dateBegin,
+				dateEnd : dateEnd + " 23:59:59"
+			},
+			async : false,
+			success : function(data){
+				chartData = eval('(' + data.other.businessChart + ')');
+			},
+			error : function(xhr){
 			}
-		}, {
-			text : '重置',
-			iconCls : 'btn_refresh',
-			handler : function(e){
-				mcrs_search_memberType.setValue(-1);
-				mcrs_search_memberName.setValue();
-				mcrs_searchMemberOperation();
-			}
-			
-		}, '-', {
-				text : '导出',
-				iconCls : 'icon_tb_exoprt_excel',
-				handler : function(){
-					var onDuty = '', offDuty = '';
-					onDuty = Ext.util.Format.date(mcrs_search_onDuty.getValue(), 'Y-m-d 00:00:00');
-					offDuty = Ext.util.Format.date(mcrs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
-					
-					var memberType = mcrs_search_memberType.getRawValue() != '' ? mcrs_search_memberType.getValue() : '';
-					var url = '../../{0}?memberType={1}&dataSource={2}&dateBegin={3}&dateEnd={4}&memberCardOrMobileOrName={5}&create=true';
-					url = String.format(
-							url, 
-							'ExportHistoryStatisticsToExecl.do', 
-							memberType > 0 ? memberType : '', 
-							'memberList',
-							onDuty,
-							offDuty,
-							mcrs_search_memberName.getValue()
-						);
-					window.location = url;
+		});
+		
+		
+		mcrs_highChart = new Highcharts.Chart({
+			plotOptions : {
+				line : {
+					cursor : 'pointer',
+					dataLabels : {
+						enabled : true,
+						style : {
+							fontWeight: 'bold', 
+							color: 'green' 
+						}
+					}
 				}
-			}]
-	});
-/*	mcrs_grid = createGridPanel(
-		'mcrs_grid',
-		'',
-		'',
-		'',
-		'../../QueryMemberOperation.do',
-		[
-			[true, false, false, true],
-			['日期', 'operateDateFormat'],
-			['操作类型', 'operateTypeText', 90, 'center'],
-			['会员名称', 'member.name', 60],
-			['实收金额', 'deltaBaseMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-			['账户充额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-			['剩余金额', 'remainingTotalMoney'],
-			['充值方式', 'chargeTypeText'],
-			['操作人', 'staffName', 90, 'center'],
-		],
-		MemberOperationRecord.getKeys(),
-		[ ['isPaging', true]],
-		GRID_PADDING_LIMIT_20,
-		'',
-		mcrs_mo_tbar
-	);*/
-	
-	mcrs_grid = createGridPanel(
+			},
+	        chart: {  
+	        	renderTo: 'memberCreatedChart'
+	    	}, 
+	        title: {
+	            text: '<b>会员开卡走势图（'+ dateBegin +'至'+ dateEnd +'）</b>'
+	        },
+	        labels: {
+	        	items : [{
+	        		html : '<b>日均开卡数:' + chartData.avgCount + ' 个</b>',
+		        	style : {left :/*($('#memberCreatedChart').width()*0.80)*/'0px', top: '0px'}
+	        	}]
+	        },
+	        xAxis: {
+	            categories: chartData.xAxis,
+	            labels : {
+	            	formatter : function(){
+	            		return this.value.substring(5);
+	            	}
+	            }
+	        },
+	        yAxis: {
+	        	min: 0,
+	            title: {
+	                text: '数量 (个)'
+	            },
+	            plotLines: [{
+	                value: 0,
+	                width: 2,
+	                color: '#808080'
+	            }]
+	        },
+	        tooltip: {
+	//	        	crosshairs: true,
+	            formatter: function() {
+	                return '<b>' + this.series.name + '</b><br/>'+
+	                    this.x +': '+ '<b>'+this.y+'</b> ';
+	            }
+	        },
+	//	        series : [{  
+	//	            name: 'aaaaaa',  
+	//	            data: [6, 9, 2, 7, 13, 21, 10]
+	//	        }],
+	        series : chartData.ser,
+	        exporting : {
+	        	enabled : true
+	        },
+	        credits : {
+	        	enabled : false
+	        }
+		});
+	}
+
+
+	function mcrs_initBusinessReceipsGrid(c){
+		
+		mcrs_search_memberType = new Ext.form.ComboBox({
+			id : 'mcrs_search_memberType',
+			width : 90,
+			forceSelection : true,
+			readOnly : false,
+			store : new Ext.data.JsonStore({
+				root : 'root',
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			listClass : ' x-menu ',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					Ext.Ajax.request({
+						url : '../../QueryMemberType.do?',
+						params : {
+							isCookie : true,
+							dataSource : 'normal',
+							restaurantID : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								jr.root.unshift({id:-1, name:'全部'});
+							}else{
+								Ext.example.msg('异常', '会员类型数据加载失败, 请联系客服人员.');
+							}
+							thiz.store.loadData(jr);
+							thiz.setValue(-1);
+							
+						},
+						failure : function(res, opt){
+							thiz.store.loadData({root:[{typeId:-1, name:'全部'}]});
+							thiz.setValue(-1);
+						}
+					});
+				},
+				select : function(){
+					mcrs_searchMemberOperation();
+				}
+			}
+		});
+		mcrs_search_onDuty = new Ext.form.DateField({
+			xtype : 'datefield',
+			width : 100,
+			format : 'Y-m-d',
+			maxValue : new Date(),
+			hideParent : true,
+			hidden : mcrs_modal ? false : true,
+			readOnly : false,
+			allowBlank : false
+		});
+		mcrs_search_offDuty = new Ext.form.DateField({
+			xtype : 'datefield',
+			width : 100,
+			format : 'Y-m-d',
+			maxValue : new Date(),
+			hideParent : true,
+			hidden : mcrs_modal ? false : true,
+			readOnly : false,
+			allowBlank : false
+		});
+		mcrs_search_dateCombo = Ext.ux.createDateCombo({
+			beginDate : mcrs_search_onDuty,
+			endDate : mcrs_search_offDuty,
+			callback : function(){
+				mcrs_searchMemberOperation();
+			}
+		});
+		mcrs_search_memberName = new Ext.form.TextField({
+			xtype : 'textfield',
+			width : 100
+			
+		});
+		var mcrs_mo_tbar = new Ext.Toolbar({
+			height : 26,
+			items : [{ 
+				xtype : 'tbtext', 
+				text : (mcrs_modal ? '&nbsp;&nbsp;日期:&nbsp;' : ' ')
+			}, mcrs_search_dateCombo, {
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;'
+			}, mcrs_search_onDuty, { 
+				xtype : 'tbtext',
+				text : (mcrs_modal ? '&nbsp;至&nbsp;' : ' ')
+			}, mcrs_search_offDuty, 
+			{
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;会员类型:'
+			}, mcrs_search_memberType, 
+			{
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
+			}, mcrs_search_memberName, '->', {
+				text : '搜索',
+				iconCls : 'btn_search',
+				handler : function(e){
+					mcrs_searchMemberOperation();
+				}
+			}, {
+				text : '重置',
+				iconCls : 'btn_refresh',
+				handler : function(e){
+					mcrs_search_memberType.setValue(-1);
+					mcrs_search_memberName.setValue();
+					mcrs_searchMemberOperation();
+				}
+				
+			}, '-', {
+					text : '导出',
+					iconCls : 'icon_tb_exoprt_excel',
+					handler : function(){
+						var onDuty = '', offDuty = '';
+						onDuty = Ext.util.Format.date(mcrs_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+						offDuty = Ext.util.Format.date(mcrs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
+						
+						var memberType = mcrs_search_memberType.getRawValue() != '' ? mcrs_search_memberType.getValue() : '';
+						var url = '../../{0}?memberType={1}&dataSource={2}&dateBegin={3}&dateEnd={4}&memberCardOrMobileOrName={5}&create=true';
+						url = String.format(
+								url, 
+								'ExportHistoryStatisticsToExecl.do', 
+								memberType > 0 ? memberType : '', 
+								'memberList',
+								onDuty,
+								offDuty,
+								mcrs_search_memberName.getValue()
+							);
+						window.location = url;
+					}
+				}]
+		});
+	/*	mcrs_grid = createGridPanel(
 			'mcrs_grid',
 			'',
 			'',
 			'',
-			'../../QueryMemberStatistics.do',
+			'../../QueryMemberOperation.do',
 			[
 				[true, false, false, true],
-				['名称', 'name'],
-				['类型', 'memberType.name'],
-				['创建时间','createDateFormat'],
-				['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
-				['消费总额', 'totalConsumption',,'right', 'Ext.ux.txtFormat.gridDou'],
-				['累计积分', 'totalPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
-				['当前积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
-				['总充值额', 'totalCharge',,'right'],
-				['账户余额', 'totalBalance',,'right'],
-				['手机号码', 'mobile', 125],
-				['会员卡号', 'memberCard', 125]
+				['日期', 'operateDateFormat'],
+				['操作类型', 'operateTypeText', 90, 'center'],
+				['会员名称', 'member.name', 60],
+				['实收金额', 'deltaBaseMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+				['账户充额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+				['剩余金额', 'remainingTotalMoney'],
+				['充值方式', 'chargeTypeText'],
+				['操作人', 'staffName', 90, 'center'],
 			],
-			MemberBasicRecord.getKeys(),
-			[['isPaging', true],  ['dataSource', 'createdMember']],
+			MemberOperationRecord.getKeys(),
+			[ ['isPaging', true]],
 			GRID_PADDING_LIMIT_20,
 			'',
-			[mcrs_mo_tbar]
-		);	
-	mcrs_grid.region = "center";
-	mcrs_grid.frame = false;
-	mcrs_grid.border = false;
-	mcrs_grid.on('render', function(thiz){
-		mcrs_search_dateCombo.setValue(1);
-		mcrs_search_dateCombo.fireEvent('select', mcrs_search_dateCombo, null, 1);
-	});
+			mcrs_mo_tbar
+		);*/
+		
+		mcrs_grid = createGridPanel(
+				'',
+				'',
+				'',
+				'',
+				'../../QueryMemberStatistics.do',
+				[
+					[true, false, false, true],
+					['名称', 'name'],
+					['类型', 'memberType.name'],
+					['创建时间','createDateFormat'],
+					['消费次数', 'consumptionAmount', null,'right', Ext.ux.txtFormat.gridDou],
+					['消费总额', 'totalConsumption', null,'right', Ext.ux.txtFormat.gridDou],
+					['累计积分', 'totalPoint', null, 'right', Ext.ux.txtFormat.gridDou],
+					['当前积分', 'point', null, 'right', Ext.ux.txtFormat.gridDou],
+					['总充值额', 'totalCharge', null, 'right'],
+					['账户余额', 'totalBalance', null, 'right'],
+					['手机号码', 'mobile', 125],
+					['会员卡号', 'memberCard', 125]
+				],
+				MemberBasicRecord.getKeys(),
+				[['isPaging', true],  ['dataSource', 'createdMember']],
+				GRID_PADDING_LIMIT_20,
+				'',
+				[mcrs_mo_tbar]
+			);	
+		mcrs_grid.region = "center";
+		mcrs_grid.frame = false;
+		mcrs_grid.border = false;
+		mcrs_grid.on('render', function(thiz){
+			mcrs_search_dateCombo.setValue(1);
+			mcrs_search_dateCombo.fireEvent('select', mcrs_search_dateCombo, null, 1);
+		});
+		
 	
-
-/*	mcrs_grid.getStore().on('load', function(store, records, options){
-		if(store.getCount() > 0){
-			var sumRow = mcrs_grid.getView().getRow(store.getCount() - 1);	
-			sumRow.style.backgroundColor = '#EEEEEE';			
-			for(var i = 0; i < mcrs_grid.getColumnModel().getColumnCount(); i++){
-				var sumCell = mcrs_grid.getView().getCell(store.getCount() - 1, i);
-				sumCell.style.fontSize = '15px';
-				sumCell.style.fontWeight = 'bold';
-				sumCell.style.color = 'green';
+	/*	mcrs_grid.getStore().on('load', function(store, records, options){
+			if(store.getCount() > 0){
+				var sumRow = mcrs_grid.getView().getRow(store.getCount() - 1);	
+				sumRow.style.backgroundColor = '#EEEEEE';			
+				for(var i = 0; i < mcrs_grid.getColumnModel().getColumnCount(); i++){
+					var sumCell = mcrs_grid.getView().getCell(store.getCount() - 1, i);
+					sumCell.style.fontSize = '15px';
+					sumCell.style.fontWeight = 'bold';
+					sumCell.style.color = 'green';
+				}
+				mcrs_grid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+				mcrs_grid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+				mcrs_grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+				mcrs_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+				mcrs_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+				mcrs_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 			}
-			mcrs_grid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
-			mcrs_grid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
-			mcrs_grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
-			mcrs_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
-			mcrs_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
-			mcrs_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
-		}
-	});*/
-}
-
-function mcrs_searchMemberOperation(){
-	var onDuty = '', offDuty = '';
-	onDuty = Ext.util.Format.date(mcrs_search_onDuty.getValue(), 'Y-m-d 00:00:00');
-	offDuty = Ext.util.Format.date(mcrs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
-	
-	var memberType = mcrs_search_memberType.getRawValue() != '' ? mcrs_search_memberType.getValue() : '';
-	
-	var gs = mcrs_grid.getStore();
-	gs.baseParams['memberType'] = memberType > 0 ? memberType : '';
-	gs.baseParams['memberCardOrMobileOrName'] = mcrs_search_memberName.getValue();
-	gs.baseParams['dateBegin'] = onDuty;
-	gs.baseParams['dateEnd'] = offDuty;
-	gs.load({
-		params : {
-			start : 0,
-			limit : GRID_PADDING_LIMIT_20
-		}
-	});
-	//每日充值统计
-	mcrs_showChart();
-}
-
-function mcrs_changeChartWidth(w,h){
-	if(mcrs_highChart != undefined){
-		mcrs_highChart.setSize(w, h);
+		});*/
 	}
-	
-}
 
-Ext.onReady(function(){
+	function mcrs_searchMemberOperation(){
+		var onDuty = '', offDuty = '';
+		onDuty = Ext.util.Format.date(mcrs_search_onDuty.getValue(), 'Y-m-d 00:00:00');
+		offDuty = Ext.util.Format.date(mcrs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
+		
+		var memberType = mcrs_search_memberType.getRawValue() != '' ? mcrs_search_memberType.getValue() : '';
+		
+		var gs = mcrs_grid.getStore();
+		gs.baseParams['memberType'] = memberType > 0 ? memberType : '';
+		gs.baseParams['memberCardOrMobileOrName'] = mcrs_search_memberName.getValue();
+		gs.baseParams['dateBegin'] = onDuty;
+		gs.baseParams['dateEnd'] = offDuty;
+		gs.load({
+			params : {
+				start : 0,
+				limit : GRID_PADDING_LIMIT_20
+			}
+		});
+		//每日充值统计
+		mcrs_showChart();
+	}
+
+	function mcrs_changeChartWidth(w,h){
+		if(mcrs_highChart != undefined){
+			mcrs_highChart.setSize(w, h);
+		}
+	}
 	
 	mcrs_southPanel = new Ext.Panel({
 		contentEl : 'memberCreatedChart',
