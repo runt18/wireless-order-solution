@@ -54,11 +54,7 @@ public class QueryMemberOperationAction extends Action{
 		final String total = request.getParameter("total");
 		try{
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			
-			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-			}
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			final DateType dateType;
 			if(dataSource.equalsIgnoreCase("today")){
@@ -89,6 +85,10 @@ public class QueryMemberOperationAction extends Action{
 			
 			if(chargeType != null && !chargeType.isEmpty() && !chargeType.equals("-1")){
 				extraCond.setChargeType(Integer.parseInt(chargeType));
+			}
+			
+			if(branchId != null && !branchId.isEmpty()){
+				extraCond.setBranch(Integer.parseInt(branchId));
 			}
 			
 			if(fuzzy != null && !fuzzy.trim().isEmpty()){

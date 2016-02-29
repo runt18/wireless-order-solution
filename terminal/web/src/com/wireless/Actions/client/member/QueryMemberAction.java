@@ -140,11 +140,7 @@ public class QueryMemberAction extends DispatchAction {
 		
 		try{
 
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			
-			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-			}
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			final MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
 			
@@ -199,6 +195,10 @@ public class QueryMemberAction extends DispatchAction {
 				
 				if(beginBirth != null && !beginBirth.isEmpty() && endBirth != null && !endBirth.isEmpty()){
 					extraCond.setBirthday(beginBirth, endBirth);
+				}
+				
+				if(branchId != null && !branchId.isEmpty()){
+					extraCond.setBranch(Integer.parseInt(branchId));
 				}
 				
 			}
