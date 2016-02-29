@@ -113,36 +113,40 @@ public class QueryMemberAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward normal(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String id = request.getParameter("id");
+		final String memberType = request.getParameter("memberType");
+		final String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
+		final String memberMinBalance = request.getParameter("memberMinBalance");
+		final String memberMaxBalance = request.getParameter("memberMaxBalance");
+		final String maxTotalMemberCost = request.getParameter("MaxTotalMemberCost");
+		final String minTotalMemberCost = request.getParameter("MinTotalMemberCost");
+		final String consumptionMinAmount = request.getParameter("consumptionMinAmount");
+		final String consumptionMaxAmount = request.getParameter("consumptionMaxAmount");
+		final String beginDate = request.getParameter("beginDate");
+		final String endDate = request.getParameter("endDate");
+		final String referrer = request.getParameter("referrer");
+		final String beginBirth = request.getParameter("beginBirthday");
+		final String endBirth = request.getParameter("endBirthday");
+		final String searchType = request.getParameter("sType");
+		final String forDetail = request.getParameter("forDetail");
+		final String needSum = request.getParameter("needSum");
+		final String orderBy = request.getParameter("orderBy");
 		
 		final JObject jobject = new JObject();
 		
 		try{
-			final String pin = (String)request.getAttribute("pin");
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final String start = request.getParameter("start");
-			final String limit = request.getParameter("limit");
-			final String id = request.getParameter("id");
-			final String memberType = request.getParameter("memberType");
-			final String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
-			final String memberMinBalance = request.getParameter("memberMinBalance");
-			final String memberMaxBalance = request.getParameter("memberMaxBalance");
-			final String MaxTotalMemberCost = request.getParameter("MaxTotalMemberCost");
-			final String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
-			final String consumptionMinAmount = request.getParameter("consumptionMinAmount");
-			final String consumptionMaxAmount = request.getParameter("consumptionMaxAmount");
-			final String beginDate = request.getParameter("beginDate");
-			final String endDate = request.getParameter("endDate");
-			final String referrer = request.getParameter("referrer");
-			final String beginBirth = request.getParameter("beginBirthday");
-			final String endBirth = request.getParameter("endBirthday");
-			final String searchType = request.getParameter("sType");
-			final String forDetail = request.getParameter("forDetail");
-			final String needSum = request.getParameter("needSum");
-			final String orderBy = request.getParameter("orderBy");
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
+			final MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
 			
 			if(id != null && !id.trim().isEmpty() && Integer.valueOf(id.trim()) > 0){
 				extraCond.setId(Integer.parseInt(id));
@@ -162,12 +166,12 @@ public class QueryMemberAction extends DispatchAction {
 					}
 				}
 				
-				if(MinTotalMemberCost != null && !MinTotalMemberCost.isEmpty()){
-					extraCond.greaterTotalConsume(Integer.parseInt(MinTotalMemberCost));
+				if(minTotalMemberCost != null && !minTotalMemberCost.isEmpty()){
+					extraCond.greaterTotalConsume(Integer.parseInt(minTotalMemberCost));
 				}
 				
-				if(MaxTotalMemberCost != null && !MaxTotalMemberCost.isEmpty()){
-					extraCond.lessTotalConsume(Integer.parseInt(MaxTotalMemberCost));
+				if(maxTotalMemberCost != null && !maxTotalMemberCost.isEmpty()){
+					extraCond.lessTotalConsume(Integer.parseInt(maxTotalMemberCost));
 				}
 				
 				if(consumptionMinAmount != null && !consumptionMinAmount.isEmpty()){
