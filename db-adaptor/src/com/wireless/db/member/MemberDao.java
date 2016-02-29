@@ -37,6 +37,7 @@ import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.member.WxMember;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.restaurantMgr.Module;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
@@ -111,6 +112,7 @@ public class MemberDao {
 	
 	public static class ExtraCond implements Parcelable{
 		private int id;
+		private int branchId;
 		private String card;
 		private String mobile;
 		private String name;
@@ -169,6 +171,16 @@ public class MemberDao {
 		
 		private ExtraCond setRestaurantId(int restaurantId){
 			this.restaurantId = restaurantId;
+			return this;
+		}
+		
+		public ExtraCond setBranch(int branchId){
+			this.branchId = branchId;
+			return this;
+		}
+		
+		public ExtraCond setBranch(Restaurant branch){
+			this.branchId = branch.getId();
 			return this;
 		}
 		
@@ -523,6 +535,12 @@ public class MemberDao {
 			if(isRaw != null && isRaw){
 				extraCond.append(" AND LENGTH(TRIM(M.mobile)) > 0 AND LENGTH(TRIM(M.member_card)) > 0");
 			}
+			
+			//门店
+			if(branchId != 0){
+				extraCond.append(" AND M.branch_id = " + branchId);
+			}
+			
 			return extraCond.toString();
 		}
 
