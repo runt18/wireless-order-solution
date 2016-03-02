@@ -40,6 +40,7 @@ import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.print.content.Content;
 import com.wireless.print.content.ContentCombinator;
+import com.wireless.print.content.concrete.BookContent;
 import com.wireless.print.content.concrete.FoodDetailContent;
 import com.wireless.print.content.concrete.MemberReceiptContent;
 import com.wireless.print.content.concrete.OrderDetailContent;
@@ -49,8 +50,8 @@ import com.wireless.print.content.concrete.ShiftContent;
 import com.wireless.print.content.concrete.SummaryContent;
 import com.wireless.print.content.concrete.TransFoodContent;
 import com.wireless.print.content.concrete.TransTableContent;
-import com.wireless.print.content.concrete.BookContent;
 import com.wireless.print.content.concrete.WxOrderContent;
+import com.wireless.print.content.concrete.WxWaiterContent;
 
 public class JobContentFactory {
 
@@ -147,6 +148,17 @@ public class JobContentFactory {
 		}
 	}
 	
+	/**
+	 * 生成点餐分单的内容
+	 * @param printType
+	 * @param staff
+	 * @param printers
+	 * @param order
+	 * @param detailType
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
 	public Content createDetailContent(PType printType, Staff staff, List<Printer> printers, Order order, FoodDetailContent.DetailType detailType) throws BusinessException, SQLException{
 		final List<JobContent> jobContents = new ArrayList<JobContent>();
 		
@@ -169,7 +181,13 @@ public class JobContentFactory {
 																			   				  printer.getStyle(), detailType)));
 									}else{
 										for(Kitchen kitchen : func.getKitchens()){
-											if(kitchen.equals(childFood.asFood().getKitchen())){
+											final int printKitchenId;
+											if(childFood.asFood().hasPrintKitchen()){
+												printKitchenId = childFood.asFood().getPrintKitchenId();
+											}else{
+												printKitchenId = childFood.asFood().getKitchen().getId();
+											}
+											if(kitchen.getId() == printKitchenId){
 												//Add the detail content of this child order food matched the kitchen to the job contents.
 												jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 																			   new OrderDetailContent(of, 
@@ -194,7 +212,13 @@ public class JobContentFactory {
 																		   				  printer.getStyle(), detailType)));
 								}else{
 									for(Kitchen kitchen : func.getKitchens()){
-										if(of.getKitchen().equals(kitchen)){
+										final int printKitchenId;
+										if(of.asFood().hasPrintKitchen()){
+											printKitchenId = of.asFood().getPrintKitchenId();
+										}else{
+											printKitchenId = of.asFood().getKitchen().getId();
+										}
+										if(kitchen.getId() == printKitchenId){
 											//Add the detail content of this order food matched the kitchen to the job contents.
 											jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 																		   new OrderDetailContent(of, 
@@ -220,10 +244,30 @@ public class JobContentFactory {
 		}
 	}
 	
+	/**
+	 * 生成点菜分单
+	 * @param printType
+	 * @param staff
+	 * @param printers
+	 * @param orderId
+	 * @param detailType
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
 	public Content createDetailContent(PType printType, Staff staff, List<Printer> printers, int orderId, FoodDetailContent.DetailType detailType) throws BusinessException, SQLException{
 		return createDetailContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY), detailType);
 	}
 
+	/**
+	 * 生成客显内容
+	 * @param staff
+	 * @param printers
+	 * @param display
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
 	public Content create2ndDisplayContent(Staff staff, List<Printer> printers, float display) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -266,7 +310,46 @@ public class JobContentFactory {
 			dbCon.disconnect();
 		}
 	}
+
+	/**
+	 * 生成微信小二
+	 * @param staff
+	 * @param printers
+	 * @param bookId
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public Content createWxWaiterContent(Staff staff, List<Printer> printers, int orderId, String qrCodeContent) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			final List<JobContent> jobContents = new ArrayList<JobContent>();
+			
+			for(Printer printer : printers){
+				for(PrintFunc func : printer.getPrintFuncs()){
+					if(func.isTypeMatched(PType.PRINT_WX_WAITER)){
+						Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
+						jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_BOOK, new WxWaiterContent(printer.getStyle(), order, qrCodeContent)));
+					}
+				}
+			}
+			
+			return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
+	/**
+	 * 生成微信预订
+	 * @param staff
+	 * @param printers
+	 * @param bookId
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
 	public Content createBookContent(Staff staff, List<Printer> printers, int bookId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -289,7 +372,7 @@ public class JobContentFactory {
 	}
 	
 	/**
-	 * Create the receipt content
+	 * 生成结账单
 	 * @param printType
 	 * @param staff
 	 * @param printers
@@ -340,10 +423,30 @@ public class JobContentFactory {
 		}
 	}
 	
+	/**
+	 * 生成结账单
+	 * @param printType
+	 * @param staff
+	 * @param printers
+	 * @param order
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
 	public Content createReceiptContent(PType printType, Staff staff, List<Printer> printers, Order order) throws BusinessException, SQLException{
 		return createReceiptContent(printType, staff, printers, order, null);
 	}
 	
+	/**
+	 * 生成结账单
+	 * @param printType
+	 * @param staff
+	 * @param printers
+	 * @param orderId
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
 	public Content createReceiptContent(PType printType, Staff staff, List<Printer> printers, int orderId) throws BusinessException, SQLException{
 		return createReceiptContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY), null);
 	}
@@ -401,6 +504,16 @@ public class JobContentFactory {
 		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
 	
+	/**
+	 * 生成会员对账单
+	 * @param printType
+	 * @param staff
+	 * @param printers
+	 * @param mo
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
 	public Content createMemberReceiptContent(PType printType, Staff staff, List<Printer> printers, MemberOperation mo) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -436,6 +549,16 @@ public class JobContentFactory {
 		}
 	}
 	
+	/**
+	 * 生成转台单
+	 * @param printType
+	 * @param staff
+	 * @param printers
+	 * @param orderId
+	 * @param srcTbl
+	 * @param destTbl
+	 * @return
+	 */
 	public Content createTransContent(PType printType, Staff staff, List<Printer> printers, int orderId, Table srcTbl, Table destTbl){
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
@@ -460,6 +583,17 @@ public class JobContentFactory {
 		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
 	
+	/**
+	 * 生成转菜单
+	 * @param printType
+	 * @param staff
+	 * @param printers
+	 * @param orderId
+	 * @param srcTbl
+	 * @param destTbl
+	 * @param transferFoods
+	 * @return
+	 */
 	public Content createTransFoodContent(PType printType, Staff staff, List<Printer> printers, int orderId, Table srcTbl, Table destTbl, List<OrderFood> transferFoods){
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
