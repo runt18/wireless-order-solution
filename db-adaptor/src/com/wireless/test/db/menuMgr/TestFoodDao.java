@@ -118,7 +118,8 @@ public class TestFoodDao {
 													   .addPrice(planId, 4)
 													   .setAliasId(65500).setDesc("测试描述")
 													   .setHot(true).setCommission(2.0f).setGift(true).setWeigh(false).setLimit(true, 10)
-													   .addUnit(2.5f, "半只");
+													   .addUnit(2.5f, "半只")
+													   .setPrintKitchen(KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(0));
 			foodId = FoodDao.insert(mStaff, insertBuilder); 
 			
 			Food expected = insertBuilder.build();
@@ -150,7 +151,9 @@ public class TestFoodDao {
 													   .addPrice(planId, 5)
 													   .setHot(false).setCommission(3).setSellOut(true).setRecommend(true)
 													   .setGift(false).setWeigh(true).setLimit(true, 5)
-													   .addUnit(3f, "份");
+													   .addUnit(3f, "份")
+													   //.setPrintKitchen(KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(2))
+													   ;
 			FoodDao.update(mStaff, updateBuilder);
 			
 			expected = updateBuilder.build();
@@ -236,6 +239,7 @@ public class TestFoodDao {
 		Assert.assertEquals("name : " + tag, expected.getName(), actual.getName());
 		Assert.assertEquals("price : " + tag, expected.getPrice(), actual.getPrice(), 0.01);
 		Assert.assertEquals("kitchen : " + tag, expected.getKitchen(), actual.getKitchen());
+		Assert.assertEquals("print kitchen : " + tag, expected.getPrintKitchenId(), actual.getPrintKitchenId());
 		Assert.assertEquals("alias : " + tag, expected.getAliasId(), actual.getAliasId());
 		Assert.assertEquals("desc : " + tag, expected.getDesc(), actual.getDesc());
 		Assert.assertEquals("current price : " + tag, expected.isCurPrice(), actual.isCurPrice());

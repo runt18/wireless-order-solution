@@ -51,10 +51,11 @@ public class QRCode implements Jsonable{
 	}
 	
 	public static enum Key4Json{
-		EXPIRED_SECONDS("expired_seconds"),
+		EXPIRED_SECONDS("expire_seconds"),
 		ACTION_NAME("action_name"),
 		ACTION_INFO("action_info"),
 		SCENE_ID("scene_id"),
+		SCENE_STR("scene_str"),
 		TICKET("ticket");
 		private final String key;
 		Key4Json(String key){
