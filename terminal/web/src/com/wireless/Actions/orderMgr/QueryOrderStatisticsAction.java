@@ -11,7 +11,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderDao.ExtraCond;
@@ -41,15 +40,11 @@ public class QueryOrderStatisticsAction extends Action {
 		DateType dateTypeEnmu = DateType.valueOf(Integer.parseInt(dateType));
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");
-		String isRange = request.getParameter("isRange");
 		
 		String businessHourBeg = request.getParameter("opening");
 		String businessHourEnd = request.getParameter("ending");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
-		
-		DBCon dbCon = new DBCon();
-		
 		
 		OrderDao.ExtraCond extraCond = new ExtraCond(DateType.valueOf(Integer.parseInt(dateType)));
 		try{
@@ -122,19 +117,15 @@ public class QueryOrderStatisticsAction extends Action {
 				extraCond.setRegionId(Region.RegionId.valueOf(Short.parseShort(region)));
 			}
 			if(dateBeg != null && !dateBeg.isEmpty()){
-				dbCon.connect();
-				
-				if(isRange != null && !isRange.isEmpty()){
-					
-					DutyRange range = DutyRangeDao.exec(dbCon, staff, 
-							DateUtil.format(DateUtil.parseDate(dateBeg), DateUtil.Pattern.DATE_TIME), 
-							DateUtil.format(DateUtil.parseDate(dateEnd), DateUtil.Pattern.DATE_TIME));				
-					
-					extraCond.setOrderRange(new DutyRange(range.getOnDutyFormat(), range.getOffDutyFormat()));
-				}else{
-					extraCond.setOrderRange(new DutyRange(dateBeg, dateEnd));
+				DutyRange range = DutyRangeDao.exec(staff, 
+						DateUtil.format(DateUtil.parseDate(dateBeg), DateUtil.Pattern.DATE_TIME), 
+						DateUtil.format(DateUtil.parseDate(dateEnd), DateUtil.Pattern.DATE_TIME));	
+				if(range == null){
+					range = new DutyRange(dateBeg, dateEnd);
 				}
+				extraCond.setOrderRange(range);
 			}
+			
 			if(businessHourBeg != null && !businessHourBeg.isEmpty()){
 				extraCond.setHourRange(new HourRange(businessHourBeg, businessHourEnd, DateUtil.Pattern.HOUR));
 			}
@@ -160,7 +151,6 @@ public class QueryOrderStatisticsAction extends Action {
 			e.printStackTrace();
 			jobject.initTip4Exception(e);
 		}finally{
-			dbCon.disconnect();
 			if(!list.isEmpty() && dateTypeEnmu == DateType.TODAY){
 				Order sum = new Order();
 				sum.setDestTbl(new Table());
