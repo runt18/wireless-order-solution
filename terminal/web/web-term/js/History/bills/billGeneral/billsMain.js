@@ -681,6 +681,7 @@
 				}),
 				valueField : 'id',
 				displayField : 'name',
+				value : -1,
 				typeAhead : true,
 				mode : 'local',
 				triggerAction : 'all',
