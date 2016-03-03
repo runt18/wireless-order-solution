@@ -4,15 +4,6 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Insert title here</title>
-<script type="text/javascript">
-	var orderId =  '<%=request.getParameter("orderId") %>';
- 	var queryType =  '<%=request.getParameter("queryType") %>';
- 	var foodStatus = '<%=request.getParameter("foodStatus") %>';
- 	<%--	if(reload){
-		load();
-	} --%>
-	
-</script>
 <script type="text/javascript" src="../../js/window/history/orderDetail.js"></script>
 </head>
 <body>

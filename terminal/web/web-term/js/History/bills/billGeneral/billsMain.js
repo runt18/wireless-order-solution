@@ -302,6 +302,10 @@
 						method : 'post'
 					});
 					thiz.center();	
+					
+					thiz.orderId = sd.id;
+					thiz.foodStatus = foodStatus;
+					thiz.branchId = Ext.getCmp('branch_combo_history').getValue();
 				}
 			}
 		});
