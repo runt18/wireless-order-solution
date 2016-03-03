@@ -108,6 +108,8 @@
 <script type="text/javascript" src="./js/popup/handlerTable/handlerTable.js"></script>
 <!-- 酒席入账 -->
 <script type="text/javascript" src="./js/popup/feastPay/feastPay.js"></script>
+<!-- 会员充值 -->
+<script type="text/javascript" src="./js/popup/member/recharge.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -144,7 +146,7 @@
 		<ul id="charge_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
 			<li class="popupButtonList" id="searchMember_a_tableSelect"><a>会员查询</a></li>
 			<li class="popupButtonList" id="addMember_a_tableSelect"><a >添加会员</a></li>
-			<li class="popupButtonList" onclick="ts.member.openMemberChargeWin()"><a >会员充值</a></li>
+			<li class="popupButtonList" id="memberRecharge_a_tableSelect"><a >会员充值</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberConsumeDetailWin()"><a >消费明细</a></li>
 			<li class="popupButtonList" id="memberWxBind_li_tableSelect"><a>微信会员绑定</a></li>
@@ -343,92 +345,6 @@
 	
 	
 	<!-- 会员充值 -->
-	<div id="memberChargeWin" class="ui-overlay-shadow ui-corner-all" style="width:900px;z-index: 1102;position: absolute; top: 40%; left: 50%; margin: -200px 0px 0px -450px;background-color: white;display: none;" align="center">	
-	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
-	        	会员充值
-	    </div> 
-	    <table>
-		    <tr>
-		    	<td></td>
-		    	<td colspan="3">
-		    		<input placeholder="手机号/卡号/微信卡号" style="font-size:20px;font-weight: bold;" id="txtMemberCharge4Read">
-		    	</td>
-		    	<td>
-		    		<a data-role="button" id="btnReadMember4Charge" class="numberInputStyle" data-theme="b" onclick="ts.member.readMemberByCondtion4Charge()">读取会员</a>
-		    	</td>
-		    	<td></td>
-		    </tr>
-	    	<tr>
-	    		<td class="readMemberTd">账户余额:</td>
-	    		<td class="readMemberTdValue"><label id="rd_numTotalBalance">----</label></td>    	
-	    		<td class="readMemberTd">基础余额:</td>
-	    		<td class="readMemberTdValue"><label id="rd_numBaseBalance">----</label></td>
-	    		<td class="readMemberTd">赠送余额:</td>
-	    		<td class="readMemberTdValue"><label id="rd_numExtraBalance">----</label></td>       			
-	    	</tr>
-	    	<tr>
-	    		<td class="readMemberTd">实收金额:</td>
-	    		<td><input id="rd_numPayMannerMoney" onkeypress="intOnly()" ></td>    
-	    		
-	    		<td class="readMemberTd">账户充额:</td>
-	    		<td><input id="rd_numRechargeMoney" onkeypress="intOnly()"></td>  
-	    		
-	    		<td class="readMemberTd">收款方式:</td>
-	    		<td class="selectionCmp">
-	    			<select  id="rd_comboRechargeType" data-native-menu="false" >
-						<option value="1">现金</option>
-						<option value="2">刷卡</option>
-					</select>	    		
-	    		</td>
-	    	</tr>	
-	    	<tr>
-	    		<td class="readMemberTd">会员名称:</td>
-	    		<td class="readMemberTdValue"><label id="rd_txtMemberName">----</label></td>
-	    		<td class="readMemberTd">会员类别:</td>
-	    		<td class="readMemberTdValue"><label id="rd_txtMmeberType">----</label></td>   
-	    		<td class="readMemberTd">性别:</td>
-	    		<td class="readMemberTdValue"><label id="rd_txtMemberSex">----</label></td>     		   		
-	    	</tr> 
-	    	<tr>
-	    		<td class="readMemberTd">手机:</td>
-	    		<td class="readMemberTdValue"><label id="rd_numMemberMobileForRecharge">----</label></td>
-	    		<td class="readMemberTd">实体卡号:</td>
-	    		<td class="readMemberTdValue"><label id="rd_numMemberCardForRecharge">----</label></td>   
-	    		<td class="readMemberTd">微信会员卡:</td>
-	    		<td class="readMemberTdValue"><label id="rd_numWeixinMemberCard">----</label></td>     		   		
-	    	</tr> 
-	    	<tr>
-	    		<td colspan="2">
-					<label>
-				        <input type="checkbox" id="chbPrintRecharge" data-theme="e" checked="checked">打印充值信息
-				    </label>	    		
-	    		</td>
-	    		<td colspan="3" >
-	    			<div id="td4ChbSendCharge" style="display: none;">
-						<label >
-					        <input type="checkbox" id="chbSendCharge" data-theme="e"><label id="lab4SendSms">发送短信</label>
-					    </label>
-				    </div>	    		
-	    		</td>
-	    	</tr>		    		    	
-	    </table>
-	    
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.member.rechargeControlCenter()">充值</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.member.closeMemberChargeWin()">取消</a>		 
-			 </div>
-	    </div>	
-	</div>		
-	
-	<div data-role="popup" id="charge_searchMemberType" data-theme="d" class="payment_searchMemberType">
-		<ul id="charge_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-			<li data-role="divider" data-theme="e" style="line-height: 30px;">选择号码来源:</li>
-			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4Charge(1)"><a >手机卡</a></li>
-			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4Charge(3)"><a >会员实体卡</a></li>
-			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4Charge(2)"><a >微信卡</a></li>
-		</ul>
-	</div>
 	
 	<!-- 积分消费 -->
 	<div id="memberPointConsume" class="ui-overlay-shadow ui-corner-all" style="width:340px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -150px;background-color: white;display: none;" align="center">	
