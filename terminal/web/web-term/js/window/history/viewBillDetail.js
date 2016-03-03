@@ -1,75 +1,79 @@
 
-var history_viewBillGrid;
-var viewBillGenPanel;
+Ext.onReady(function(){
 
-function setOrderDetail(orderDetail){
-	Ext.getDom('billIDBV').innerHTML = orderID;
-	Ext.getDom('billTypeBV').innerHTML = orderDetail['categoryText'];
-	Ext.getDom('tableNbrBV').innerHTML = orderDetail['tableAlias'];
-	Ext.getDom('personNbrBV').innerHTML = orderDetail['customNum'];
-	Ext.getDom('billDateBV').innerHTML = orderDetail['orderDateFormat'];
-	Ext.getDom('payTypeBV').innerHTML = orderDetail['settleTypeText'];
-	Ext.getDom('payMannerBV').innerHTML = orderDetail['payTypeText'];
-	Ext.getDom('serviceRateBV').innerHTML = (orderDetail['serviceRate']*100) + '％';
-	Ext.getDom('serviceStaffBV').innerHTML = orderDetail['waiter'];
-	Ext.getDom('forFreeBV').innerHTML = '￥' + orderDetail['giftPrice'].toFixed(2);
-	Ext.getDom('shouldPayBV').innerHTML = '￥' + orderDetail['totalPrice'].toFixed(2);
-	Ext.getDom('actrualPayBV').innerHTML = '￥' + orderDetail['actualPrice'].toFixed(2);
-	Ext.getDom('discountBV').innerHTML = '￥' + orderDetail['discountPrice'].toFixed(2);
-	Ext.getDom('erasePuotaPriceBV').innerHTML = '￥' + orderDetail['erasePrice'].toFixed(2);
-	Ext.getDom('cancelPriceBV').innerHTML = '￥' + orderDetail['cancelPrice'].toFixed(2);
-	var couponPrice = isNaN(orderDetail['couponPrice'])?0:orderDetail['couponPrice'];
-	Ext.getDom('couponBV').innerHTML = '￥' + couponPrice.toFixed(2);
+	var orderID = Ext.WindowMgr.getActive().orderId;
+	var queryType = Ext.WindowMgr.getActive().queryType;
+	var branchId = Ext.WindowMgr.getActive().branchId;
 	
-	if(orderDetail['mixedPayment'] && orderDetail['mixedPayment'].payTypes.length > 0){
-		var mixedPayTypes = '(';
-		for (var i = 0; i < orderDetail['mixedPayment'].payTypes.length; i++) {
-			if(i > 0){
-				mixedPayTypes += ', ';
+	var history_viewBillGrid;
+	var viewBillGenPanel;
+	
+	function setOrderDetail(orderDetail){
+		Ext.getDom('billIDBV').innerHTML = orderID;
+		Ext.getDom('billTypeBV').innerHTML = orderDetail['categoryText'];
+		Ext.getDom('tableNbrBV').innerHTML = orderDetail['tableAlias'];
+		Ext.getDom('personNbrBV').innerHTML = orderDetail['customNum'];
+		Ext.getDom('billDateBV').innerHTML = orderDetail['orderDateFormat'];
+		Ext.getDom('payTypeBV').innerHTML = orderDetail['settleTypeText'];
+		Ext.getDom('payMannerBV').innerHTML = orderDetail['payTypeText'];
+		Ext.getDom('serviceRateBV').innerHTML = (orderDetail['serviceRate']*100) + '％';
+		Ext.getDom('serviceStaffBV').innerHTML = orderDetail['waiter'];
+		Ext.getDom('forFreeBV').innerHTML = '￥' + orderDetail['giftPrice'].toFixed(2);
+		Ext.getDom('shouldPayBV').innerHTML = '￥' + orderDetail['totalPrice'].toFixed(2);
+		Ext.getDom('actrualPayBV').innerHTML = '￥' + orderDetail['actualPrice'].toFixed(2);
+		Ext.getDom('discountBV').innerHTML = '￥' + orderDetail['discountPrice'].toFixed(2);
+		Ext.getDom('erasePuotaPriceBV').innerHTML = '￥' + orderDetail['erasePrice'].toFixed(2);
+		Ext.getDom('cancelPriceBV').innerHTML = '￥' + orderDetail['cancelPrice'].toFixed(2);
+		var couponPrice = isNaN(orderDetail['couponPrice'])?0:orderDetail['couponPrice'];
+		Ext.getDom('couponBV').innerHTML = '￥' + couponPrice.toFixed(2);
+		
+		if(orderDetail['mixedPayment'] && orderDetail['mixedPayment'].payTypes.length > 0){
+			var mixedPayTypes = '(';
+			for (var i = 0; i < orderDetail['mixedPayment'].payTypes.length; i++) {
+				if(i > 0){
+					mixedPayTypes += ', ';
+				}
+				mixedPayTypes += orderDetail['mixedPayment'].payTypes[i].name + ':' + orderDetail['mixedPayment'].payTypes[i].money + '元';
 			}
-			mixedPayTypes += orderDetail['mixedPayment'].payTypes[i].name + ':' + orderDetail['mixedPayment'].payTypes[i].money + '元';
+			mixedPayTypes += ')';
+			Ext.getDom('billDetail_mixedPay').innerHTML = mixedPayTypes;
 		}
-		mixedPayTypes += ')';
-		Ext.getDom('billDetail_mixedPay').innerHTML = mixedPayTypes;
+		
 	}
 	
-}
-
-function load(){
-
-	Ext.Ajax.request({
-		url : '../../QueryOrder.do',
-		params : {
-			'orderID' : orderID,
-			'queryType' : queryType
-		},
-		success : function(response, options) {
-			var jr = Ext.decode(response.responseText);
-			if (jr.success == true) {
-				setOrderDetail(jr.other.order);
-				history_viewBillGrid.getStore().loadData({root:jr.other.order.orderFoods});
-			} else {
-				Ext.ux.showMsg(jr);
-			}
-		},
-		failure : function(response, options) {
-			var jr = Ext.decode(response.responseText);
-			Ext.ux.showMsg(jr);	
-		}
-	});
-}
-
-function viewBill_formatFoodName(record, iname, name){
-	var img = '';
-	if(record.get('isGift'))
-		img += '&nbsp;<img src="../../images/forFree.png"></img>';
+	function load(){
 	
-	record.set(iname, record.get(name) + img);
-	record.commit();		
-}
-
-
-Ext.onReady(function(){
+		Ext.Ajax.request({
+			url : '../../QueryOrder.do',
+			params : {
+				orderID : orderID,
+				queryType : queryType ? queryType : 'history',
+				branchId : branchId
+			},
+			success : function(response, options) {
+				var jr = Ext.decode(response.responseText);
+				if (jr.success == true) {
+					setOrderDetail(jr.other.order);
+					history_viewBillGrid.getStore().loadData({root:jr.other.order.orderFoods});
+				} else {
+					Ext.ux.showMsg(jr);
+				}
+			},
+			failure : function(response, options) {
+				var jr = Ext.decode(response.responseText);
+				Ext.ux.showMsg(jr);	
+			}
+		});
+	}
+	
+	function viewBill_formatFoodName(record, iname, name){
+		var img = '';
+		if(record.get('isGift'))
+			img += '&nbsp;<img src="../../images/forFree.png"></img>';
+		
+		record.set(iname, record.get(name) + img);
+		record.commit();		
+	}
 	
 	history_viewBillGrid = createGridPanel(
 		'',
@@ -81,9 +85,9 @@ Ext.onReady(function(){
 		    [true, false, false, false], 
 		    ['菜名', 'displayFoodName', 130] , 
 		    ['口味', 'tasteGroup.tastePref', 100],
-		    ['数量', 'count', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
-		    ['折扣', 'discount', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
-		    ['金额', 'totalPrice', 100, 'right', 'Ext.ux.txtFormat.gridDou']
+		    ['数量', 'count', 50, 'right', Ext.ux.txtFormat.gridDou],
+		    ['折扣', 'discount', 50, 'right', Ext.ux.txtFormat.gridDou],
+		    ['金额', 'totalPrice', 100, 'right', Ext.ux.txtFormat.gridDou]
 		],
 		OrderFoodRecord.getKeys(),
 	    [],
