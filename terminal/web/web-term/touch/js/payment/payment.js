@@ -373,10 +373,12 @@ $(function(){
 	//加载付款方式
 	function loadPayTypeData(){
 		$.ajax({
-			url : "../QueryPayType.do",
+			url : "../OperatePayType.do",
 			type : 'post',
 			data : {
-				dataSource : 'exceptMember'
+				dataSource : 'getByCond',
+				designed : true,
+				extra : true
 			},
 			success : function(jr, status, xhr){
 				if(jr.success){

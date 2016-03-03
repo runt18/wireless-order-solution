@@ -61,11 +61,13 @@
 					
 					if(isRepaid){
 						$.ajax({
-							url : '../../QueryPayType.do',
+							url : '../../OperatePayType.do',
 							type : 'post',
 							async:false,
 							data : {
-								dataSource : 'exceptMember'
+								dataSource : 'getByCond',
+								designed : true,
+								extra : true
 							},
 							success : function(jr, status, xhr){
 								repaid_payType = jr.root;

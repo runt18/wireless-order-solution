@@ -1130,9 +1130,10 @@ function initControl(){
 				render : function(thiz){
 					var data = [[-1,'全部']];
 					Ext.Ajax.request({
-						url : '../../QueryDept.do',
+						url : '../../OperateDept.do',
 						params : {
-							dataSource : 'normal'
+							dataSource : 'getByCond',
+							inventory : true
 							
 						},
 						success : function(res, opt){
@@ -1572,10 +1573,10 @@ function initControl(){
 	    				width : 103,
 	    				listWidth : 120,
 	    				store : new Ext.data.JsonStore({
-	    					url: '../../QueryDept.do?',
+	    					url: '../../OperateDept.do?',
 	    					baseParams : {
-	    						dataSource : 'normal'
-	    						
+	    						dataSource : 'getByCond',
+	    						inventory : true
 	    					},
 	    					root : 'root',
 	    					fields : DeptRecord.getKeys()
@@ -1634,10 +1635,10 @@ function initControl(){
 	    				width : 103,
 	    				listWidth : 120,
 	    				store : new Ext.data.JsonStore({
-	    					url: '../../QueryDept.do?',
+	    					url: '../../OperateDept.do?',
 	    					baseParams : {
-	    						dataSource : 'normal'
-	    						
+	    						dataSource : 'getByCond',
+	    						inventory : true
 	    					},
 	    					root : 'root',
 	    					fields : DeptRecord.getKeys()

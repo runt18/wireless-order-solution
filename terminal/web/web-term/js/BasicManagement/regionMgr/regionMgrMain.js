@@ -360,7 +360,7 @@ function initTree(){
 			id : -1,
 			regionId : -1,
 			loader : new Ext.tree.TreeLoader({
-				dataUrl : '../../QueryRegion.do',
+				dataUrl : '../../OperateRegion.do',
 				baseParams : {
 					dataSource : 'tree'
 				}

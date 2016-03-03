@@ -286,8 +286,12 @@ Ext.onReady(function() {
 	
 	
 	Ext.Ajax.request({
-		url : '../../QueryPayType.do',
-		params : {dataSource : 'exceptMember'},
+		url : '../../OperatePayType.do',
+		params : {
+			dataSource : 'getByCond',
+			designed : true,
+			extra : true
+		},
 		success : function(res){
 			var jr = Ext.decode(res.responseText);
 			payTypeData = jr.root;
@@ -295,7 +299,6 @@ Ext.onReady(function() {
 		failure : function(){}
 	});
 	
-	getWeixinOrders();
 });
 
 function setFormButtonStatus(_s){

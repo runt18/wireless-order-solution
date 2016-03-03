@@ -231,7 +231,7 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareBusinessHour(Staff staff) throws SQLException{
-		List<BusinessHour> actualHours = BusinessHourDao.get(staff);
+		List<BusinessHour> actualHours = BusinessHourDao.getByCond(staff, null, null);
 		for(BusinessHour hour : actualHours){
 			if(!hour.getName().equals("早市") && 
 			   !hour.getName().equals("午市") &&
@@ -277,7 +277,7 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareCancelReason(Staff staff, int restaurantId) throws SQLException{
-		List<CancelReason> cancelReasons = CancelReasonDao.get(staff);
+		List<CancelReason> cancelReasons = CancelReasonDao.getByCond(staff, null, null);
 		for(CancelReason.DefaultCR defCR : CancelReason.DefaultCR.values()){
 			boolean isExist = false;
 			for(CancelReason cr : cancelReasons){
@@ -311,7 +311,7 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareRegion(Staff staff, int restaurantId) throws SQLException{
-		List<Region> regions = RegionDao.getAll(staff);
+		List<Region> regions = RegionDao.getByCond(staff, null, null);
 		for(Region r : regions){
 			Region.RegionId regionId = Region.RegionId.valueOf(r.getId());
 			Assert.assertEquals("region associated restaurant id", r.getRestaurantId(), restaurantId);

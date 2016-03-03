@@ -14,14 +14,34 @@ import com.wireless.pojo.system.BusinessHour;
 
 public class BusinessHourDao {
 
+	public static class ExtraCond {
+		private int id;
+		public ExtraCond setId(int id){
+			this.id = id;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			final StringBuilder extraCond = new StringBuilder();
+			if(id != 0){
+				extraCond.append(" AND id = " + id);
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	/**
-	 * 
-	 * @param dbCon
+	 * Insert the business hour according to specific builder {@link BusinessHour#InsertBuilder}.
 	 * @param builder
-	 * @return
+	 * 			the insert builder
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the id to business hour just insert
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int insert(Staff staff, BusinessHour.InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insert(Staff staff, BusinessHour.InsertBuilder builder) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -31,16 +51,28 @@ public class BusinessHourDao {
 		}
 	}
 	
+	/**
+	 * Insert the business hour according to specific builder {@link BusinessHour#InsertBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the insert builder
+	 * @return the id to business hour just insert
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
 	public static int insert(DBCon dbCon, Staff staff, BusinessHour.InsertBuilder builder) throws SQLException{
 		BusinessHour bh = builder.build();
-		String insertSQl = " INSERT INTO business_hour ( name, opening, ending, restaurant_id) "
+		String sql = " INSERT INTO business_hour ( name, opening, ending, restaurant_id) "
 				+ "VALUES("
 				+ "'" + bh.getName() + "',"
 				+ "'" + bh.getOpeningFormat() + "',"
 				+ "'" + bh.getEndingFormat() + "',"
 				+ staff.getRestaurantId()
 				+ ")";
-		dbCon.stmt.executeUpdate(insertSQl, Statement.RETURN_GENERATED_KEYS);
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
 		if(dbCon.rs.next()){
 			bh.setId(dbCon.rs.getInt(1));
@@ -49,23 +81,39 @@ public class BusinessHourDao {
 	}
 	
 	/**
-	 * 
-	 * @param dbCon
-	 * @param update
-	 * @return
+	 * Update the business hour according to specific builder {@link BusinessHour#UpdateBuilder}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the update builder
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
+	 * 			throws if the business hour to update does NOT exist
 	 */
-	public static void update(Staff staff, BusinessHour.UpdateBuilder update) throws SQLException, BusinessException{
+	public static void update(Staff staff, BusinessHour.UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			update(dbCon, staff, update);
+			update(dbCon, staff, builder);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
+	/**
+	 * Update the business hour according to specific builder {@link BusinessHour#UpdateBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the update builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the business hour to update does NOT exist
+	 */
 	public static void update(DBCon dbCon, Staff staff, BusinessHour.UpdateBuilder update) throws SQLException, BusinessException{
 		BusinessHour bh = update.build();
 		String sql;
@@ -79,72 +127,109 @@ public class BusinessHourDao {
 			throw new BusinessException(RestaurantError.BUSINESS_HOUR_NOT_FOUND);
 		}
 	}
+
+	/**
+	 * Delete businessHour by id. 
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param id
+	 * 			the id to business hour 
+	 * @throws SQLException
+	 *			if failed to execute any SQL Statement  			
+	 * @throws BusinessException
+	 * 			if the supplier to delete does NOT exist
+	 */
+	public static void deleteById(Staff staff, int id) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			deleteById(dbCon, staff, id);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
 	/**
 	 * Delete businessHour by id. 
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
-	 * @param supplierId
-	 * 			the supplier_id of supplier
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param id
+	 * 			the id to business hour 
 	 * @throws SQLException
 	 *			if failed to execute any SQL Statement  			
 	 * @throws BusinessException
-	 * 			if the supplier to delete does not exist
+	 * 			if the supplier to delete does NOT exist
 	 */
-	public static void delete(int id) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			delete(dbCon, id);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	public static void delete(DBCon dbCon, int id) throws SQLException, BusinessException{
-		delete(dbCon," AND id = " + id);
-	}
-	
-	private static void delete(DBCon dbCon, String extraCond) throws SQLException, BusinessException{
-		String sql;
-		sql = " DELETE FROM " + Params.dbName + ".business_hour " +
-			  " WHERE 1=1 " +
-			  (extraCond != null ? extraCond : "");
-		if(dbCon.stmt.executeUpdate(sql) == 0){
+	public static void deleteById(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
+		if(deleteByCond(dbCon, staff, new ExtraCond().setId(id)) == 0){
 			throw new BusinessException(RestaurantError.BUSINESS_HOUR_NOT_FOUND);
 		}
 	}
 	
 	/**
-	 * Get the businessHours to specific restaurant.
+	 * Delete the business hour according to specific extra condition {@link ExtraCond}.
 	 * @param staff
 	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @return the amount to business hour deleted
 	 * @throws SQLException
-	 * 			if failed to execute any SQL Statement 
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<BusinessHour> get(Staff staff) throws SQLException{
+	public static int deleteByCond(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return get(dbCon, staff);
+			return deleteByCond(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * Get the businessHours to specific restaurant.
+	 * Delete the business hour according to specific extra condition {@link ExtraCond}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @return the amount to business hour deleted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	private static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+		int amount = 0;
+		for(BusinessHour bh : getByCond(dbCon, staff, extraCond, null)){
+			String sql;
+			sql = " DELETE FROM " + Params.dbName + ".business_hour " +
+				  " WHERE id = " + bh.getId();
+			if(dbCon.stmt.executeUpdate(sql) != 0){
+				amount++;
+			}
+		}
+		return amount;
+	}
+	
+	/**
+	 * Get the businessHours according extra condition.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement 
 	 */
-	public static List<BusinessHour> get(DBCon dbCon, Staff staff) throws SQLException{
-		return getByCond(dbCon, staff, null, null);
+	public static List<BusinessHour> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	
 	/**
@@ -158,14 +243,14 @@ public class BusinessHourDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement 
 	 */
-	private static List<BusinessHour> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
-		List<BusinessHour> result = new ArrayList<BusinessHour>();
+	public static List<BusinessHour> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+		final List<BusinessHour> result = new ArrayList<BusinessHour>();
 		String sql;
 		sql = " SELECT " +
 			  " id, restaurant_id, name, opening, ending " +
 			  " FROM " + Params.dbName + ".business_hour " +
 			  " WHERE restaurant_id = " + staff.getRestaurantId() + " " +
-			  (extraCond == null ? "" : extraCond) + " " +
+			  (extraCond == null ? "" : extraCond.toString()) + " " +
 			  (orderClause == null ? "" : orderClause);
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

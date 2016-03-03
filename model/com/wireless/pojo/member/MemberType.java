@@ -233,7 +233,7 @@ public class MemberType implements Jsonable, Parcelable{
 		private final String name;
 		
 		private Type type = Type.NORMAL;
-		private final Discount defaultDiscount;
+		private Discount defaultDiscount;
 		private final List<Discount> discounts = new ArrayList<Discount>();
 		private PricePlan defaultPrice;
 		private final List<PricePlan> prices = new ArrayList<PricePlan>();
@@ -246,6 +246,10 @@ public class MemberType implements Jsonable, Parcelable{
 		private final List<Discount4Chain> chainDiscounts = new ArrayList<Discount4Chain>();
 
 		private final List<Price4Chain> chainPrices = new ArrayList<Price4Chain>();
+		
+		public InsertBuilder(String name){
+			this.name = name;
+		}
 		
 		public InsertBuilder(String name, Discount defaultDiscount){
 			this.name = name;
@@ -263,6 +267,11 @@ public class MemberType implements Jsonable, Parcelable{
 				discounts.add(discount);
 			}
 			return this;
+		}
+
+		public InsertBuilder setDefaultDiscount(Discount defaultDiscount){
+			this.defaultDiscount = defaultDiscount;
+			return addDiscount(defaultDiscount);
 		}
 		
 		public InsertBuilder addPrice(PricePlan price){

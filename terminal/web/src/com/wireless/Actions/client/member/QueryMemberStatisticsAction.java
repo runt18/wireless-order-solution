@@ -15,6 +15,7 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.billStatistics.CalcMemberStatisticsDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -26,10 +27,10 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.util.DataPaging;
 
-public class QueryMemberStatisticsAction  extends DispatchAction {
+public class QueryMemberStatisticsAction extends DispatchAction {
 	
 	/**
-	 * 会员充值报表
+	 * 会员充值走势图
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -38,41 +39,39 @@ public class QueryMemberStatisticsAction  extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward chargeStatistics(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String pin = (String) request.getAttribute("pin");
-		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBegin = request.getParameter("dateBegin");
+		final String dateEnd = request.getParameter("dateEnd");
 		JObject jObject = new JObject();
 		try{
 			
-			String dateBegin = request.getParameter("dateBegin");
-			String dateEnd = request.getParameter("dateEnd");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
+			final CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
 			
-			String chartData = null ;
-			
-			final MemberStatistics memberStatistics;
-			
-			memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
+			final MemberStatistics memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
 			for (StatisticsByEachDay e : memberStatistics.getStatistics()) {
-
-					xAxis.add("\""+e.getDate()+"\"");
-					data.add(e.getCharge().getTotalAccountCharge());
+				xAxis.add("\"" + e.getDate() + "\"");
+				data.add(e.getCharge().getTotalAccountCharge());
 			}
 			
-			chartData = "{\"xAxis\":" + xAxis + ",\"avgMoney\" : " + memberStatistics.getAverageCharge() + ", \"avgCount\" : " + memberStatistics.getAverageChargeAmount() +  
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"avgMoney\" : " + memberStatistics.getAverageCharge() + ", \"avgCount\" : " + memberStatistics.getAverageChargeAmount() +  
 					",\"ser\":[{\"name\":\"充值额\", \"data\" : " + data + "}]}";	
 			
-			final String chartDatas = chartData;
 			
 			jObject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
-					jm.putString("businessChart", chartDatas);
+					jm.putString("businessChart", chartData);
 					return jm;
 				}
 
@@ -82,75 +81,7 @@ public class QueryMemberStatisticsAction  extends DispatchAction {
 				}
 				
 			});
-		}catch(SQLException e){
-			e.printStackTrace();
-			jObject.initTip(e);
-			
-		}catch(Exception e){
-			e.printStackTrace();
-			jObject.initTip4Exception(e);
-			
-		}finally{
-			
-			response.getWriter().print(jObject.toString());
-		}
-		return null;
-	}
-	/**
-	 * 退款
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-	public ActionForward refundStatistics(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String pin = (String) request.getAttribute("pin");
-		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		JObject jObject = new JObject();
-		try{
-			
-			String dateBegin = request.getParameter("dateBegin");
-			String dateEnd = request.getParameter("dateEnd");
-			
-			CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
-			
-			String chartData = null ;
-			
-			final MemberStatistics memberStatistics;
-			
-			memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
-			
-			List<String> xAxis = new ArrayList<String>();
-			List<Float> data = new ArrayList<Float>();
-			for (StatisticsByEachDay e : memberStatistics.getStatistics()) {
-
-					xAxis.add("\""+e.getDate()+"\"");
-					data.add(e.getCharge().getTotalAccountRefund());
-			}
-			
-			chartData = "{\"xAxis\":" + xAxis + ",\"avgMoney\" : " + memberStatistics.getAverageRefund() + ", \"avgCount\" : " + memberStatistics.getAverageRefundAmount() +  
-					",\"ser\":[{\"name\":\"退款额\", \"data\" : " + data + "}]}";	
-			
-			final String chartDatas = chartData;
-			
-			jObject.setExtra(new Jsonable(){
-				@Override
-				public JsonMap toJsonMap(int flag) {
-					JsonMap jm = new JsonMap();
-					jm.putString("businessChart", chartDatas);
-					return jm;
-				}
-
-				@Override
-				public void fromJsonMap(JsonMap jsonMap, int flag) {
-					
-				}
-				
-			});
-		}catch(SQLException e){
+		}catch(SQLException | BusinessException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 			
@@ -166,7 +97,7 @@ public class QueryMemberStatisticsAction  extends DispatchAction {
 	}
 	
 	/**
-	 * 消费
+	 * 会员退款走势图
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -174,42 +105,40 @@ public class QueryMemberStatisticsAction  extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward consumeStatistics(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String pin = (String) request.getAttribute("pin");
+	public ActionForward refundStatistics(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBegin = request.getParameter("dateBegin");
+		final String dateEnd = request.getParameter("dateEnd");
 		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		JObject jObject = new JObject();
+		final JObject jObject = new JObject();
 		try{
 			
-			String dateBegin = request.getParameter("dateBegin");
-			String dateEnd = request.getParameter("dateEnd");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			String chartData = null ;
+			final CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
 			
-			final MemberStatistics memberStatistics;
-			
-			memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
+			final MemberStatistics memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
 			for (StatisticsByEachDay e : memberStatistics.getStatistics()) {
-
-					xAxis.add("\""+e.getDate()+"\"");
-					data.add(e.getConsumption().getTotalConsume());
+				xAxis.add("\"" + e.getDate() + "\"");
+				data.add(e.getCharge().getTotalAccountRefund());
 			}
 			
-			chartData = "{\"xAxis\":" + xAxis + ",\"avgMoney\" : " + memberStatistics.getAverageConsume() + ", \"avgCount\" : " + memberStatistics.getAverageConsumeAmount() +  
-					",\"ser\":[{\"name\":\"消费额\", \"data\" : " + data + "}]}";	
-			
-			final String chartDatas = chartData;
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"avgMoney\" : " + memberStatistics.getAverageRefund() + ", \"avgCount\" : " + memberStatistics.getAverageRefundAmount() +  
+					",\"ser\":[{\"name\":\"退款额\", \"data\" : " + data + "}]}";	
 			
 			jObject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
-					jm.putString("businessChart", chartDatas);
+					jm.putString("businessChart", chartData);
 					return jm;
 				}
 
@@ -219,7 +148,73 @@ public class QueryMemberStatisticsAction  extends DispatchAction {
 				}
 				
 			});
-		}catch(SQLException e){
+		}catch(SQLException | BusinessException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip4Exception(e);
+			
+		}finally{
+			
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 会员消费走势图
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward consumeStatistics(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBegin = request.getParameter("dateBegin");
+		final String dateEnd = request.getParameter("dateEnd");		
+		final JObject jObject = new JObject();
+		try{
+			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			final MemberStatistics memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
+			
+			List<String> xAxis = new ArrayList<String>();
+			List<Float> data = new ArrayList<Float>();
+			for (StatisticsByEachDay e : memberStatistics.getStatistics()) {
+				xAxis.add("\""+e.getDate()+"\"");
+				data.add(e.getConsumption().getTotalConsume());
+			}
+			
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"avgMoney\" : " + memberStatistics.getAverageConsume() + ", \"avgCount\" : " + memberStatistics.getAverageConsumeAmount() +  
+					",\"ser\":[{\"name\":\"消费额\", \"data\" : " + data + "}]}";	
+			
+			jObject.setExtra(new Jsonable(){
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("businessChart", chartData);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
+		}catch(SQLException | BusinessException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 			
@@ -235,7 +230,7 @@ public class QueryMemberStatisticsAction  extends DispatchAction {
 	}	
 	
 	/**
-	 * 开卡走势图
+	 * 会员开卡走势图
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -244,41 +239,38 @@ public class QueryMemberStatisticsAction  extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward createdStatistics(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String pin = (String) request.getAttribute("pin");
-		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		JObject jObject = new JObject();
+		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBegin = request.getParameter("dateBegin");
+		final String dateEnd = request.getParameter("dateEnd");
+		final JObject jObject = new JObject();
 		try{
 			
-			String dateBegin = request.getParameter("dateBegin");
-			String dateEnd = request.getParameter("dateEnd");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			String chartData = null ;
+			final CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
 			
-			final MemberStatistics memberStatistics;
-			
-			memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
+			final MemberStatistics memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
 			
 			List<String> xAxis = new ArrayList<>();
 			List<Integer> data = new ArrayList<>();
 			for (StatisticsByEachDay e : memberStatistics.getStatistics()) {
-
-					xAxis.add("\""+e.getDate()+"\"");
-					data.add(e.getCreateMembers().size());
+				xAxis.add("\""+e.getDate()+"\"");
+				data.add(e.getCreateMembers().size());
 			}
 			
-			chartData = "{\"xAxis\":" + xAxis + ",\"avgCount\" : " + memberStatistics.getAverageCreated() +  
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"avgCount\" : " + memberStatistics.getAverageCreated() +  
 					",\"ser\":[{\"name\":\"开卡数\", \"data\" : " + data + "}]}";	
-			
-			final String chartDatas = chartData;
 			
 			jObject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
-					jm.putString("businessChart", chartDatas);
+					jm.putString("businessChart", chartData);
 					return jm;
 				}
 
@@ -288,7 +280,7 @@ public class QueryMemberStatisticsAction  extends DispatchAction {
 				}
 				
 			});
-		}catch(SQLException e){
+		}catch(SQLException | BusinessException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
@@ -301,7 +293,7 @@ public class QueryMemberStatisticsAction  extends DispatchAction {
 	}		
 	
 	/**
-	 * 开卡会员
+	 * 获取开卡会员的数据
 	 * @param mapping
 	 * @param form
 	 * @param request

@@ -55,30 +55,35 @@ public class OperateMemberTypeAction extends DispatchAction{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final MemberType.InsertBuilder insert = new MemberType.InsertBuilder(typeName.trim(), new Discount(Integer.valueOf(defaultDiscount)));
-			insert.setAttribute(Attribute.valueOf(Integer.valueOf(attr)));
-			insert.setChargeRate(Float.valueOf(chargeRate));
-			insert.setExchangeRate(Float.valueOf(exchangeRate));
-			insert.setInitialPoint(Integer.valueOf(initialPoint));
-			insert.setDesc(desc);
+			final MemberType.InsertBuilder builder = new MemberType.InsertBuilder(typeName.trim());
+			
+			builder.setAttribute(Attribute.valueOf(Integer.valueOf(attr)));
+			builder.setChargeRate(Float.valueOf(chargeRate));
+			builder.setExchangeRate(Float.valueOf(exchangeRate));
+			builder.setInitialPoint(Integer.valueOf(initialPoint));
+			builder.setDesc(desc);
+			
+			if(defaultDiscount != null && !defaultDiscount.isEmpty()){
+				builder.setDefaultDiscount(new Discount(Integer.parseInt(defaultDiscount)));
+			}
 			
 			if(discounts != null && !discounts.isEmpty()){
 				for (String discountId : discounts.split(",")) {
-					insert.addDiscount(new Discount(Integer.parseInt(discountId)));
+					builder.addDiscount(new Discount(Integer.parseInt(discountId)));
 				}
 			}
 			
 			if(pricePlans != null && !pricePlans.trim().isEmpty()){
 				for (String pricePlanId : pricePlans.split(",")) {
-					insert.addPrice(new PricePlan(Integer.parseInt(pricePlanId)));
+					builder.addPrice(new PricePlan(Integer.parseInt(pricePlanId)));
 				}
 			}			
 			
 			if(defaultPricePlan != null && !defaultPricePlan.isEmpty()){
-				insert.setDefaultPrice(new PricePlan(Integer.parseInt(defaultPricePlan)));
+				builder.setDefaultPrice(new PricePlan(Integer.parseInt(defaultPricePlan)));
 			}
 			
-			MemberTypeDao.insert(staff, insert);
+			MemberTypeDao.insert(staff, builder);
 			jObject.initTip(true, "操作成功, 已添加新会员类型.");
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
@@ -104,6 +109,7 @@ public class OperateMemberTypeAction extends DispatchAction{
 	public ActionForward update(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
 		final String typeID = request.getParameter("typeID");
 		final String typeName = request.getParameter("typeName");
 		final String defaultDiscount = request.getParameter("discountID");
@@ -115,9 +121,6 @@ public class OperateMemberTypeAction extends DispatchAction{
 		final String desc = request.getParameter("desc");
 		final String discounts = request.getParameter("memberDiscountCheckeds");
 		final String pricePlans = request.getParameter("memberPricePlanCheckeds");
-		
-		final String branchDiscountVal = request.getParameter("branchDiscount");
-		final String branchPriceVal = request.getParameter("branchPrice");
 		
 		final JObject jObject = new JObject();
 		try{
@@ -137,10 +140,6 @@ public class OperateMemberTypeAction extends DispatchAction{
 				builder.setExchangeRate(Float.valueOf(exchangeRate));
 			}
 			
-			if(defaultDiscount != null && !defaultDiscount.trim().isEmpty()){
-				builder.setDefaultDiscount(new Discount(Integer.valueOf(defaultDiscount)));
-			}
-			
 			if(chargeRate != null && !chargeRate.trim().isEmpty()){
 				builder.setChargeRate(Float.valueOf(chargeRate));
 			}
@@ -153,55 +152,52 @@ public class OperateMemberTypeAction extends DispatchAction{
 				builder.setName(typeName);
 			}
 			
-			if(discounts != null && !discounts.isEmpty()){
-				for (String discountId : discounts.split(",")) {
-					builder.addDiscount(new Discount(Integer.parseInt(discountId)));
-				}
-			}		
-			
-			if(pricePlans != null){
-				if(pricePlans.trim().isEmpty()){
-					builder.setEmptyPrice();
-				}else{
-					for (String pricePlanId : pricePlans.split(",")) {
-						builder.addPrice(new PricePlan(Integer.parseInt(pricePlanId)));
-					}
-					builder.setDefaultPrice(new PricePlan(Integer.parseInt(defaultPricePlan)));
-				}
-			}			
-
-			//门店折扣，格式如下"branchId, defaultBranchDiscount, branchDiscount_1, ..., branchDiscount_X"
-			if(branchDiscountVal != null && !branchDiscountVal.isEmpty()){
-				String[] branchDiscount = branchDiscountVal.split(",");
+			if(branchId != null && !branchId.isEmpty()){
 				//branch restaurant
-				Restaurant branch = RestaurantDao.getById(Integer.parseInt(branchDiscount[0]));
+				Restaurant branch = RestaurantDao.getById(Integer.parseInt(branchId));
 				//default branch discount
-				Discount defaultBranchDiscount = DiscountDao.getById(StaffDao.getAdminByRestaurant(branch.getId()), Integer.parseInt(branchDiscount[1]));
-				MemberType.Discount4Chain chainDiscount = new MemberType.Discount4Chain(branch, defaultBranchDiscount);
+				final Discount defaultBranchDiscount = DiscountDao.getById(StaffDao.getAdminByRestaurant(Integer.parseInt(branchId)), Integer.parseInt(defaultDiscount));
+				final MemberType.Discount4Chain chainDiscount = new MemberType.Discount4Chain(branch, defaultBranchDiscount);
 				//branch discounts
-				if(branchDiscount.length > 2){
-					for(int i = 2; i < branchDiscount.length; i++){
-						chainDiscount.addDiscount(DiscountDao.getById(StaffDao.getAdminByRestaurant(branch.getId()), Integer.parseInt(branchDiscount[i])));
+				if(discounts != null && !discounts.isEmpty()){
+					for (String discountId : discounts.split(",")) {
+						chainDiscount.addDiscount(DiscountDao.getById(StaffDao.getAdminByRestaurant(Integer.parseInt(branchId)), Integer.parseInt(discountId)));
 					}
 				}
 				builder.addChainDiscount(chainDiscount);
-			}
-			
-			//门店价格方案，格式如下"branchId, defaultBranchPrice, branchPrice_2, ..., branchPrice_X"
-			if(branchPriceVal != null && !branchPriceVal.isEmpty()){
-				String[] branchPrice = branchPriceVal.split(",");
-				//branch restaurant
-				Restaurant branch = RestaurantDao.getById(Integer.parseInt(branchPrice[0]));
-				//default branch price
-				PricePlan defaultBranchPrice = PricePlanDao.getById(StaffDao.getAdminByRestaurant(branch.getId()), Integer.parseInt(branchPrice[1]));
-				MemberType.Price4Chain chainPrice =  new MemberType.Price4Chain(branch, defaultBranchPrice);
-				//branch prices
-				if(branchPrice.length > 2){
-					for(int i = 2; i < branchPrice.length; i++){
-						chainPrice.addPrice(PricePlanDao.getById(StaffDao.getAdminByRestaurant(branch.getId()), Integer.parseInt(branchPrice[i])));
+				
+				if(pricePlans != null && !pricePlans.isEmpty()){
+					//default branch price
+					final PricePlan defaultBranchPrice = PricePlanDao.getById(StaffDao.getAdminByRestaurant(branch.getId()), Integer.parseInt(defaultPricePlan));
+					MemberType.Price4Chain chainPrice =  new MemberType.Price4Chain(branch, defaultBranchPrice);
+					//branch prices
+					for(String pricePlanId : pricePlans.split(",")){
+						chainPrice.addPrice(PricePlanDao.getById(StaffDao.getAdminByRestaurant(branch.getId()), Integer.parseInt(pricePlanId)));
 					}
+					builder.addChainPrice(chainPrice);
 				}
-				builder.addChainPrice(chainPrice);
+				
+			}else{
+				if(defaultDiscount != null && !defaultDiscount.trim().isEmpty()){
+					builder.setDefaultDiscount(new Discount(Integer.valueOf(defaultDiscount)));
+				}
+	
+				if(discounts != null && !discounts.isEmpty()){
+					for (String discountId : discounts.split(",")) {
+						builder.addDiscount(new Discount(Integer.parseInt(discountId)));
+					}
+				}		
+				
+				if(pricePlans != null){
+					if(pricePlans.trim().isEmpty()){
+						builder.setEmptyPrice();
+					}else{
+						for (String pricePlanId : pricePlans.split(",")) {
+							builder.addPrice(new PricePlan(Integer.parseInt(pricePlanId)));
+						}
+						builder.setDefaultPrice(new PricePlan(Integer.parseInt(defaultPricePlan)));
+					}
+				}			
 			}
 			
 			MemberTypeDao.update(staff, builder);

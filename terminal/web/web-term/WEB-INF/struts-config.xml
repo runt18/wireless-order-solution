@@ -30,9 +30,6 @@
 		<action path="/QueryOTA" type="com.wireless.Actions.ota.QueryOTAction"
 			scope="request">
 		</action>
-		<action path="/QueryRegion" type="com.wireless.Actions.regionMgr.QueryRegionAction"
-			scope="request" parameter="dataSource">
-		</action>
 		<action path="/OperateRegion"
 			type="com.wireless.Actions.regionMgr.OperateRegionAction" scope="request"
 			parameter="dataSource">
@@ -123,9 +120,6 @@
 		</action>
 		<action path="/OperateKitchen"
 			type="com.wireless.Actions.deptMgr.kitchenMgr.OperateKitchenAction"
-			scope="request" parameter="dataSource">
-		</action>
-		<action path="/QueryDept" type="com.wireless.Actions.deptMgr.QueryDeptAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/OperateDept" type="com.wireless.Actions.deptMgr.OperateDeptAction"
@@ -255,25 +249,9 @@
 			type="com.wireless.Actions.client.member.OperateMemberAction" scope="request"
 			parameter="dataSource">
 		</action>
-		<action path="/QueryCancelReason"
-			type="com.wireless.Actions.menuMgr.cencalReason.QueryCancelReasonAction"
-			scope="request">
-		</action>
-		<action path="/QueryCancelReasonTree"
-			type="com.wireless.Actions.menuMgr.cencalReason.QueryCancelReasonTreeAction"
-			scope="request">
-		</action>
-		<action path="/UpdateCancelReason"
-			type="com.wireless.Actions.menuMgr.cencalReason.UpdateCancelReasonAction"
-			scope="request">
-		</action>
-		<action path="/InsertCancelReason"
-			type="com.wireless.Actions.menuMgr.cencalReason.InsertCancelReasonAction"
-			scope="request">
-		</action>
-		<action path="/DeleteCancelReason"
-			type="com.wireless.Actions.menuMgr.cencalReason.DeleteCancelReasonAction"
-			scope="request">
+		<action path="/OperateCancelReason"
+			type="com.wireless.Actions.menuMgr.cancelReason.OperateCancelReasonAction"
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/ExportHistoryStatisticsToExecl"
 			type="com.wireless.Actions.exportExecl.HistoryStatisticsAction"
@@ -306,10 +284,6 @@
 		<action path="/OperateRestaurant"
 			type="com.wireless.Actions.restaurantMgr.OperateRestaurantAction"
 			scope="request" parameter="dataSource">
-		</action>
-		<action path="/RestaurantQueryByID"
-			type="com.wireless.Actions.restaurantMgr.RestaurantQueryByIDAction"
-			scope="request">
 		</action>
 		<action path="/QueryMaterialDept"
 			type="com.wireless.Actions.inventoryMgr.material.QueryMaterialDeptAction"
@@ -417,10 +391,6 @@
 		</action>
 		<action path="/OperateRole" type="com.wireless.Actions.roleMgr.OperateRoleAction"
 			scope="request" parameter="dataSource">
-		</action>
-		<action path="/QueryRestaurants"
-			type="com.wireless.Actions.restaurantMgr.QueryRestaurantAction"
-			scope="request">
 		</action>
 		<action path="/VerifyLogin" type="com.wireless.Actions.login.VerifyLoginAction"
 			scope="request">
@@ -561,9 +531,6 @@
 		<action path="/RepaidOrder"
 			type="com.wireless.Actions.dishesOrder.RepaidOrderAction" scope="request">
 		</action>
-		<action path="/QueryBusinessHour"
-			type="com.wireless.Actions.system.QueryBusinessHourAction" scope="request">
-		</action>
 		<action path="/OperateBusinessHour"
 			type="com.wireless.Actions.system.OperateBusinessHourAction" scope="request"
 			parameter="dataSource">
@@ -609,9 +576,6 @@
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/WXQueryDaZhongInfo" type="com.wireless.Actions.init.QueryDazhongDataAction"
-			scope="request" parameter="dataSource">
-		</action>
-		<action path="/QueryPayType" type="com.wireless.Actions.orderMgr.QueryPayTypeAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/OperatePayType"

@@ -28,9 +28,10 @@ Ext.onReady(function(){
 			render : function(thiz){
 				var data = [[-1,'全部']];
 				Ext.Ajax.request({
-					url : '../../QueryDept.do',
+					url : '../../OperateDept.do',
 					params: { 
-				    	dataSource : 'normal'
+				    	dataSource : 'getByCond',
+				    	inventory : true
 				    }, 
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);

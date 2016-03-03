@@ -1,8 +1,24 @@
 Ext.onReady(function(){
+	
+	var systemCheckbox = {
+			SELF_ORDER_EVENT_KEY : {val : "self_order_event_key", text : "自助点餐", image : 'http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxReplySample/%E8%87%AA%E5%8A%A9%E7%82%B9%E9%A4%90.png'},
+			SELF_BOOK_EVENT_KEY : {val : "self_book_event_key", text : "自助预订", image : 'http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxReplySample/%E8%87%AA%E5%8A%A9%E9%A2%84%E8%AE%A2.png'},
+			INTRO_EVENT_KEY : {val : "intro_event_key", text : "餐厅简介", image : 'http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxReplySample/%E9%A4%90%E5%8E%85%E7%AE%80%E4%BB%8B.jpg'},
+			STAR_EVENT_KEY : {val : "star_event_key", text : "明星菜品", image : ''},
+			NAVI_EVENT_KEY : {val : "navi_event_key", text : "餐厅导航", image : 'http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxReplySample/%E9%A4%90%E5%8E%85%E5%AF%BC%E8%88%AA.png'},
+			PROMOTION_EVENT_KEY : {val : "promotion_event_key", text : "优惠活动", image : ''},
+			MEMBER_EVENT_KEY : {val : "member_event_key", text : "我的会员卡", image : ''},
+			ORDER_EVENT_KEY : {val : "order_event_key", text : "我的订单", image : 'http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxReplySample/%E6%88%91%E7%9A%84%E8%AE%A2%E5%8D%95.png'},
+			MY_QRCODE_EVENT_KEY : {val : "my_qrcode_event_key", text : "我的二维码", image : 'http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxReplySample/%E6%88%91%E7%9A%84%E4%BA%8C%E7%BB%B4%E7%A0%81.png'},
+			SCAN_EVENT_KEY : {val : "scan_event_key", text : "扫一扫"}
+	};
+
+
+	
 	var rid = restaurantID;
 //	var basePath = "http://localhost:8080";
 	var basePath = 'http://wx.e-tones.net';
-	//关键字点击的标识符
+	//关键字点击的标识符 	
 	var isKeyword = false;
 	
 	//悬浮操作内容
@@ -498,7 +514,36 @@ Ext.onReady(function(){
 	        		}));
 				}
 	        	$("#systemReplyBox_th_weixin").html(html.join("")).trigger('create').trigger('refresh');
-	        	$("#systemReplyImg_th_weixin").attr("style","background:url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E7%82%B9%E8%8F%9C%E6%80%BB%E5%8D%95.jpg) no-repeat;width:100%;height:128px;");
+	        	
+	        	
+	        	$("#systemReplyBox_th_weixin").find('input[name="systemSet"]').each(function(index, element){
+	        		element.onclick = function(){
+	        			
+	        			if($(element).attr('value') == systemCheckbox.SELF_ORDER_EVENT_KEY.val){//自助点餐
+	        				$("#systemReplyImg_th_weixin").attr("style","background:url("+ systemCheckbox.SELF_ORDER_EVENT_KEY.image +") no-repeat;width:100%;height:128px;");
+	        			}else if($(element).attr('value') == systemCheckbox.SELF_BOOK_EVENT_KEY.val){//自助预订
+	        				$("#systemReplyImg_th_weixin").attr("style","background:url("+ systemCheckbox.SELF_BOOK_EVENT_KEY.image +") no-repeat;width:100%;height:128px;");
+	        			}else if($(element).attr('value') == systemCheckbox.INTRO_EVENT_KEY.val){//餐厅简介
+	        				$("#systemReplyImg_th_weixin").attr("style","background:url("+ systemCheckbox.INTRO_EVENT_KEY.image +") no-repeat;width:100%;height:128px;");
+	        			}else if($(element).attr('value') == systemCheckbox.STAR_EVENT_KEY.val){//明星菜品
+	        				$("#systemReplyImg_th_weixin").attr("style","background:url("+ systemCheckbox.STAR_EVENT_KEY.image +") no-repeat;width:100%;height:128px;");
+	        			}else if($(element).attr('value') == systemCheckbox.NAVI_EVENT_KEY.val){//餐厅导航
+	        				$("#systemReplyImg_th_weixin").attr("style","background:url("+ systemCheckbox.NAVI_EVENT_KEY.image +") no-repeat;width:100%;height:128px;");
+	        			}else if($(element).attr('value') == systemCheckbox.PROMOTION_EVENT_KEY.val){//优惠活动
+	        				$("#systemReplyImg_th_weixin").attr("style","background:url("+ systemCheckbox.PROMOTION_EVENT_KEY.image +") no-repeat;width:100%;height:128px;");
+	        			}else if($(element).attr('value') == systemCheckbox.MEMBER_EVENT_KEY.val){//我的会员卡
+	        				$("#systemReplyImg_th_weixin").attr("style","background:url("+ systemCheckbox.MEMBER_EVENT_KEY.image +") no-repeat;width:100%;height:128px;");
+	        			}else if($(element).attr('value') == systemCheckbox.ORDER_EVENT_KEY.val){//我的订单
+	        				$("#systemReplyImg_th_weixin").attr("style","background:url("+ systemCheckbox.ORDER_EVENT_KEY.image +") no-repeat;width:100%;height:128px;");
+	        			}else if($(element).attr('value') == systemCheckbox.MY_QRCODE_EVENT_KEY.val){//我的二维码
+	        				$("#systemReplyImg_th_weixin").attr("style","background:url("+ systemCheckbox.MY_QRCODE_EVENT_KEY.image +") no-repeat;width:100%;height:128px;");
+	        			}else{//扫一扫
+	        				$("#systemReplyImg_th_weixin").attr("style","background:url("+ systemCheckbox.SCAN_EVENT_KEY.image +") no-repeat;width:100%;height:128px;");
+	        			}
+	        			
+	        		}
+	        	});
+	        	
 	        }
 	    }, 
 	    error : function(xhr){ 

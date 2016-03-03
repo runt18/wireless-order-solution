@@ -546,10 +546,10 @@ function initWin(){
     				readOnly : false,
     				forceSelection : true,
     				store : new Ext.data.JsonStore({
-    					url: '../../QueryDept.do?',
+    					url: '../../OperateDept.do?',
     					baseParams : {
-    						dataSource : 'normal'
-    						
+    						dataSource : 'getByCond',
+    						inventory : true
     					},
     					root : 'root',
     					fields : DeptRecord.getKeys()

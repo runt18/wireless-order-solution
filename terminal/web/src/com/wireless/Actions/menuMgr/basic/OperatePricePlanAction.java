@@ -15,80 +15,136 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.PricePlan;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class OperatePricePlanAction extends DispatchAction{
 
+	/**
+	 * 增加价格方案
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String name = request.getParameter("name");
-		String pin = (String) request.getAttribute("pin");
+		final String name = request.getParameter("name");
+		final String pin = (String) request.getAttribute("pin");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try{
 			PricePlanDao.insert(StaffDao.verify(Integer.parseInt(pin)), new PricePlan.InsertBuilder(name));
-			jobject.initTip(true, "添加成功");
-		}catch(BusinessException e){
-			jobject.initTip(e);
-			e.printStackTrace();
-		}catch(SQLException e){
-			jobject.initTip(e);
+			jObject.initTip(true, "添加成功");
+		}catch(BusinessException | SQLException e){
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
 	}
 	
+	/**
+	 * 更新价格方案
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String id = request.getParameter("id");
-		String name = request.getParameter("name");
-		String pin = (String) request.getAttribute("pin");
+		final String id = request.getParameter("id");
+		final String name = request.getParameter("name");
+		final String pin = (String) request.getAttribute("pin");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try{
 			PricePlanDao.update(StaffDao.verify(Integer.parseInt(pin)), new PricePlan.UpdateBuilder(Integer.parseInt(id)).setName(name));
-			jobject.initTip(true, "修改成功");
-		}catch(BusinessException e){
-			jobject.initTip(e);
-			e.printStackTrace();
-		}catch(SQLException e){
-			jobject.initTip(e);
+			jObject.initTip(true, "修改成功");
+		}catch(BusinessException | SQLException e){
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
 	}	
 	
+	/**
+	 * 删除价格方案
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String id = request.getParameter("id");
-		String pin = (String) request.getAttribute("pin");
+		final String id = request.getParameter("id");
+		final String pin = (String) request.getAttribute("pin");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try{
 			PricePlanDao.deleteById(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(id));
-			jobject.initTip(true, "删除成功");
-		}catch(BusinessException e){
-			jobject.initTip(e);
-			e.printStackTrace();
-		}catch(SQLException e){
-			jobject.initTip(e);
+			jObject.initTip(true, "删除成功");
+		}catch(BusinessException | SQLException e){
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
 	}	
 
+	/**
+	 * 获取价格方案
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String id = request.getParameter("pricePlanId");
+		final JObject jObject = new JObject();
+		try{
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final PricePlanDao.ExtraCond extraCond = new PricePlanDao.ExtraCond();
+			
+			if(id != null && !id.isEmpty()){
+				extraCond.setId(Integer.parseInt(id));
+			}
+			
+			jObject.setRoot(PricePlanDao.getByCond(staff, extraCond));
+			
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}	
 }

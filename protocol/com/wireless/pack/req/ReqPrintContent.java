@@ -48,6 +48,13 @@ public class ReqPrintContent{
 		return request;
 	}
 	
+	public static ReqPrintContent buildWxWaiter(Staff staff, int orderId, String qrCodeContent){
+		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_WX_WAITER);
+		req.parcel.writeInt(orderId);
+		req.parcel.writeString(qrCodeContent);
+		return req;
+	}
+	
 	public static ReqPrintContent build2ndDisplay(Staff staff, float display){
 		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_2ND_DISPLAY);
 		req.parcel.writeFloat(display);

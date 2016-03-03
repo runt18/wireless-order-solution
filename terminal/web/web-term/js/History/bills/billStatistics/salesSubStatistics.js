@@ -1,9 +1,11 @@
 
 var SalesState = {
-	loadChartRender : function(){
-		return '<a href="javascript:Ext.getCmp(\'deptStatistic_btnSearch\').handler(true)">查看走势图</a>';
-	}
+
 };
+
+function kitchenGroupTextTpl(rs){
+	return '部门:'+rs[0].get('dept.name');
+}
 
 $(function(){
 	
@@ -37,9 +39,9 @@ $(function(){
 				render : function(thiz){
 					var data = [[-1,'全部']];
 					Ext.Ajax.request({
-						url : '../../QueryRegion.do',
+						url : '../../OperateRegion.do',
 						params : {
-							dataSource : 'normal'
+							dataSource : 'getByCond'
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
@@ -187,18 +189,133 @@ $(function(){
 				}
 			}
 		});
+		
+		var branch_combo_foodstatistics = new Ext.form.ComboBox({
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+						},
+						failure : function(res, opt){
+							thiz.store.loadData([-1, '全部']);
+							thiz.setValue(-1);
+						}
+					});
+				},
+				select : function(){
+					//加载区域
+					var region = [[-1,'全部']];
+					Ext.Ajax.request({
+						url : '../../OperateRegion.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_foodstatistics.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								region.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							Ext.getCmp('foodStatistic_comboRegion').store.loadData(region);
+							Ext.getCmp('foodStatistic_comboRegion').setValue(-1);
+						}
+					});
+					
+					
+					//加载市别
+					var hour = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateBusinessHour.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_foodstatistics.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+							}
+							
+							hour.push([-2, '自定义']);
+							
+							Ext.getCmp('foodStatistic_comboBusinessHour').store.loadData(hour);
+							Ext.getCmp('foodStatistic_comboBusinessHour').setValue(-1);
+						}
+					});
+					
+					//加载员工
+					var staff = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../QueryStaff.do',
+						params : {
+							branchId : branch_combo_foodstatistics.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+							}
+							
+							Ext.getCmp('foodSale_combo_staffs').store.loadData(staff);
+							Ext.getCmp('foodSale_combo_staffs').setValue(-1);
+						}
+					});
+					
+					Ext.getCmp('foodStatistic_btnSearch').handler();
+					
+				}
+			}
+		});
+		
 	
 		var orderFoodStatPanelGridTbarItem = [{
 				xtype : 'tbtext',
-				text : String.format(Ext.ux.txtFormat.typeName, '部门', 'lab_salesSubDept_food', '----')
+				text : String.format(Ext.ux.txtFormat.typeName, '部门选择', 'lab_salesSubDept_food', '----')
 			},
-		    {xtype:'tbtext',text:'&nbsp;&nbsp;菜品:'}, foodName,
+		    {xtype:'tbtext',text:'&nbsp;&nbsp;菜品选择:'}, foodName,
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			{xtype : 'tbtext', text : '区域:'},
+			{xtype : 'tbtext', text : '区域选择:'},
 			initRegionCombo('foodStatistic_'),
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			{xtype : 'tbtext', text : '员工:'},
+			{xtype : 'tbtext', text : '员工选择:'},
 			foodSale_combo_staffs,
+			{xtype : 'tbtext', text : '门店选择:'},
+			branch_combo_foodstatistics,
 		    '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
@@ -225,6 +342,7 @@ $(function(){
 				gs.baseParams['staffId'] = foodSale_combo_staffs.getValue();
 				gs.baseParams['opening'] = data.opening;
 				gs.baseParams['ending'] = data.ending;
+				gs.baseParams['branchId'] = branch_combo_foodstatistics.getValue();
 				gs.load({
 					params : {
 						start : 0,
@@ -257,7 +375,7 @@ $(function(){
 					ending = '';
 				}
 				
-				var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&deptID={5}&foodName={6}&opening={7}&ending={8}';
+				var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&deptID={5}&foodName={6}&opening={7}&ending={8}&branchId={9}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
@@ -268,7 +386,8 @@ $(function(){
 						salesSubDeptId,
 						foodName.getValue(),
 						opening,
-						ending
+						ending,
+						branch_combo_foodstatistics.getValue()
 					);
 				window.location = url;
 			}
@@ -286,17 +405,17 @@ $(function(){
 			'',
 			'../../SalesSubStatistics.do',
 			[[true, false, false, true], 
-	         ['菜品','food.name', 150], 
-	         ['销量','salesAmount','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
-	         ['口味总额','tasteIncome','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
-	         ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou'],
-	         ['单位成本','avgCost','','right','Ext.ux.txtFormat.gridDou'],
-	         ['成本','cost','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['成本率','costRate','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou']
+	         ['菜品', 'food.name', 150], 
+	         ['销量', 'salesAmount', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['营业额', 'income', null, 'right', Ext.ux.txtFormat.gridDou], 
+	         ['口味总额', 'tasteIncome', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['折扣额', 'discount', null, 'right', Ext.ux.txtFormat.gridDou], 
+	         ['赠送额', 'gifted', null, 'right', Ext.ux.txtFormat.gridDou],
+	         ['单位成本', 'avgCost','', 'right', Ext.ux.txtFormat.gridDou],
+	         ['成本', 'cost', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['成本率', 'costRate', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利', 'profit', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利率', 'profitRate', '', 'right', Ext.ux.txtFormat.gridDou]
 	         //['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], 
 			],
 			SalesSubStatRecord.getKeys().concat(['food', 'food.name']),
@@ -349,10 +468,6 @@ $(function(){
 		});	
 	}
 	
-	function kitchenGroupTextTpl(rs){
-		return '部门:'+rs[0].get('dept.name');
-	}
-	
 	function kitchenStatPanelInit(){
 		var beginDate = new Ext.form.DateField({
 			xtype : 'datefield',		
@@ -386,9 +501,105 @@ $(function(){
 			}
 		});
 		
+		//分厨统计的区域
+		var branch_combo_kitchenStatistics = new  Ext.form.ComboBox({
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+							thiz.fireEvent('select');
+						},
+						failure : function(res, opt){
+							thiz.store.loadData([-1, '全部']);
+							thiz.setValue(-1);
+						}
+					});
+				},
+				select : function(){
+					//加载区域
+					var region = [[-1,'全部']];
+					Ext.Ajax.request({
+						url : '../../OperateRegion.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_kitchenStatistics.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								region.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							Ext.getCmp('kitchenStatistic_comboRegion').store.loadData(region);
+							Ext.getCmp('kitchenStatistic_comboRegion').setValue(-1);
+						}
+					});
+					
+					//加载市别
+					var hour = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateBusinessHour.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_kitchenStatistics.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+							}
+							
+							hour.push([-2, '自定义']);
+							
+							Ext.getCmp('kitchenStatistic_comboBusinessHour').store.loadData(hour);
+							Ext.getCmp('kitchenStatistic_comboBusinessHour').setValue(-1);
+						}
+					});
+					Ext.getCmp('kitchenStatistic_btnSearch').handler();
+				}
+			}
+		});
+		
+		
 		var kitchenStatPanelGridTbarItem = [
-				{xtype : 'tbtext', text : '区域:'},
-				initRegionCombo('kitchenStatistic_'),'->', {
+				{xtype : 'tbtext', text : '区域选择:'},
+				initRegionCombo('kitchenStatistic_'),
+				{xtype : 'tbtext', text : '&nbsp;&nbsp;'}, 
+				{xtype : 'tbtext', text : '门店选择:'},
+				branch_combo_kitchenStatistics, '->', {
 				text : '展开/收缩',
 				iconCls : 'icon_tb_toggleAllGroups',
 				handler : function(){
@@ -416,6 +627,7 @@ $(function(){
 					gs.baseParams['region'] = Ext.getCmp("kitchenStatistic_comboRegion").getValue();
 					gs.baseParams['opening'] = data.opening;
 					gs.baseParams['ending'] = data.ending;
+					gs.baseParams['branchId'] = branch_combo_kitchenStatistics.getValue();
 					gs.load();
 					kitchenStatPanelGrid.getView().expandAllGroups();
 				}
@@ -444,7 +656,7 @@ $(function(){
 						ending = '';
 					}
 					
-					var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&opening={5}&ending={6}';
+					var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&opening={5}&ending={6}&branchId={7}';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
@@ -453,7 +665,8 @@ $(function(){
 							beginDate.getValue().format('Y-m-d 00:00:00'),
 							endDate.getValue().format('Y-m-d 23:59:59'),
 							opening,
-							ending
+							ending,
+							branch_combo_kitchenStatistics.getValue()
 						);
 					window.location = url;
 				}
@@ -472,14 +685,14 @@ $(function(){
 			'../../SalesSubStatistics.do',
 			[[true, false, false, false], 
 		     ['分厨','kitchen.name'], 
-		     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
-		     ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
-		     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou'],
-		     ['成本','cost','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['成本率','costRate','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou'],
-		     ['dept.id','dept.id', 10]
+		     ['营业额', 'income', null,'right', Ext.ux.txtFormat.gridDou], 
+		     ['折扣额', 'discount', null,'right', Ext.ux.txtFormat.gridDou], 
+		     ['赠送额', 'gifted', null,'right', Ext.ux.txtFormat.gridDou],
+		     ['成本', 'cost','','right', Ext.ux.txtFormat.gridDou], 
+	         ['成本率', 'costRate','','right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利', 'profit','','right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利率', 'profitRate','','right', Ext.ux.txtFormat.gridDou],
+		     ['dept.id', 'dept.id', 10]
 			],
 			SalesSubStatRecord.getKeys().concat(['dept', 'dept.id', 'dept.name', 'kitchen', 'kitchen.name']),
 			[['dataType', 1], ['queryType', 2]],
@@ -493,7 +706,7 @@ $(function(){
 		);
 		kitchenStatPanelGrid.view = new Ext.grid.GroupingView({   
 	        forceFit:true,   
-	        groupTextTpl : '{[kitchenGroupTextTpl(values.rs)]}'
+	        groupTextTpl : '{[values.rs[0].get(\'dept.name\')]}'
 	    });
 		kitchenStatPanelGrid.on('render', function(){
 			dateCombo.setValue(1);
@@ -662,9 +875,101 @@ $(function(){
 			}
 		});
 		
+		//门店combo
+		var branch_combo_deptStatistics = new Ext.form.ComboBox({
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id', 
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							thiz.store.loadData(data)
+							thiz.setValue(jr.root[0].id);
+							thiz.fireEvent('select')
+						}
+					});
+				},
+				select : function(){
+					//加载区域
+					var region = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateRegion.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_deptStatistics.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								region.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}	
+							Ext.getCmp('deptStatistic_comboRegion').store.loadData(region);
+							Ext.getCmp('deptStatistic_comboRegion').setValue(-1);
+						}
+					});
+					
+					//加载市别
+					var hour = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateBusinessHour.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_deptStatistics.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+							}
+							
+							hour.push([-2, '自定义']);
+							
+							Ext.getCmp('deptStatistic_comboBusinessHour').store.loadData(hour);
+							Ext.getCmp('deptStatistic_comboBusinessHour').setValue(-1);
+						}
+					});
+					
+					Ext.getCmp('deptStatistic_btnSearch').handler();
+				}
+			}
+		});
+		
 		var deptStatPanelGridTbarItem = [
-			{xtype : 'tbtext', text : '区域:'},
+			{xtype : 'tbtext', text : '区域选择:'},
 			initRegionCombo('deptStatistic_'),
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '门店选择'},
+			branch_combo_deptStatistics,
 			'->', {
 				text : '搜索',
 				id : 'deptStatistic_btnSearch',
@@ -711,6 +1016,7 @@ $(function(){
 						gs.baseParams['region'] = Ext.getCmp("deptStatistic_comboRegion").getValue();
 						gs.baseParams['opening'] = data.opening;
 						gs.baseParams['ending'] = data.ending;
+						gs.baseParams['branchId'] = branch_combo_deptStatistics.getValue();
 						
 						gs.load();			
 						
@@ -752,7 +1058,7 @@ $(function(){
 					}				
 					
 					
-					var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&opening={5}&ending={6}';
+					var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&opening={5}&ending={6}&branchId={7}';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
@@ -761,7 +1067,8 @@ $(function(){
 							beginDate.getValue().format('Y-m-d 00:00:00'),
 							endDate.getValue().format('Y-m-d 23:59:59'),
 							opening,
-							ending
+							ending,
+							branch_combo_deptStatistics.getValue()
 						);
 					window.location = url;
 				}
@@ -779,15 +1086,17 @@ $(function(){
 			'',
 			'../../SalesSubStatistics.do',
 			[[true, false, false, false], 
-		     ['部门','dept.name'],
-		     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
-		     ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
-		     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou'],
-		     ['成本','cost','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['成本率','costRate','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], 
-	         ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou'],
-	         ['操作','operateChart','','center','SalesState.loadChartRender']
+		     ['部门', 'dept.name'],
+		     ['营业额', 'income', null, 'right', Ext.ux.txtFormat.gridDou], 
+		     ['折扣额', 'discount', null, 'right', Ext.ux.txtFormat.gridDou], 
+		     ['赠送额', 'gifted', null, 'right', Ext.ux.txtFormat.gridDou],
+		     ['成本', 'cost','', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['成本率', 'costRate','', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利', 'profit', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利率', 'profitRate', '', 'right', Ext.ux.txtFormat.gridDou],
+	         ['操作', 'operateChart', '', 'center', function(v){
+	         	return '<a href="javascript:Ext.getCmp(\'deptStatistic_btnSearch\').handler(true)">查看走势图</a>';
+	         }]
 			],
 			SalesSubStatRecord.getKeys().concat(['dept', 'dept.name', 'dept.id']),
 			[['dataType', 1], ['queryType', 0]],

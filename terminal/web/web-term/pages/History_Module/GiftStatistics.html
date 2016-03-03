@@ -8,9 +8,6 @@
 	cursor: pointer;
 }
 </style>
-<script type="text/javascript">
-	var grid_giftStatistics, giftViewBillWin;
-</script>
 <script type="text/javascript" src="../../js/History/bills/billStatistics/giftStatistics.js"></script>
 </head>
 <body>
@@ -19,9 +16,9 @@
 <div id="divGiftDetailChart" data-type="giftChart" data-value="gift_detailChart" style="height : 400px;"></div>
 
 <div id="divGiftStaffCharts" >
-	<div id="giftStaff_DivChartChange" class="chartChangeFont">
-		&nbsp;&nbsp;<span onclick="gift_fnChangeStaffChart(this,1)"><input  type="radio" name="gift_staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
-		<span onclick="gift_fnChangeStaffChart(this,0)"><input type="radio" name="gift_staffChange"  />按金额显示</span> 
+	<div id="giftStaff_DivChartChange" class="chartChangeFont">&nbsp;&nbsp;
+		<span id="staffByAmount_span_giftChart"><input  type="radio" name="gift_staffChange" checked="checked" />按数量显示</span> &nbsp;&nbsp;&nbsp;
+		<span id="staffByFee_span_giftChart"><input type="radio" name="gift_staffChange"  />按金额显示</span> 
 	</div>
 	<div>
 		<div id="divGiftStaffAmountPieChart" data-type="giftChart" data-value="gift_staffPieChart" style="height : 300px;display:none;width:40%;float:left;"></div>
@@ -31,10 +28,9 @@
 </div>
 
 <div id="divGiftDeptCharts" >
-	<div id="giftDept_DivChartChange" class="chartChangeFont">
-		<!-- <a id="linkToChangeDeptChart" href="#" class="changeChart">查看数量比例图</a> -->
-		&nbsp;&nbsp;<span onclick="gift_fnChangeDeptChart(this,0)"><input type="radio" name="gift_deptChange" checked="checked"  />按金额显示</span> &nbsp;&nbsp;&nbsp;
-		<span onclick="gift_fnChangeDeptChart(this,1)"><input type="radio" name="gift_deptChange"  />按数量显示</span>  
+	<div id="giftDept_DivChartChange" class="chartChangeFont">&nbsp;&nbsp;
+		<span id="deptByFee_span_giftChart"><input type="radio" name="gift_deptChange" checked="checked"  />按金额显示</span> &nbsp;&nbsp;&nbsp;
+		<span id="deptByAmount_span_giftChart"><input type="radio" name="gift_deptChange"  />按数量显示</span>  
 	</div>
 	<div>
 		<div id="divGiftDeptPieChart" data-type="giftChart" data-value="gift_deptPieChart" style="height : 300px;display:none;width:40%;float:left;"></div>

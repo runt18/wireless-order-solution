@@ -13,6 +13,33 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class RegionDao {
 
+	public static class ExtraCond{
+		private int id;
+		private Region.Status status;
+		
+		public ExtraCond setId(int id){
+			this.id = id;
+			return this;
+		}
+		
+		public ExtraCond setStatus(Region.Status status){
+			this.status = status;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			final StringBuilder extraCond = new StringBuilder();
+			if(id != 0){
+				extraCond.append(" AND REGION.region_id = " + id);
+			}
+			if(status != null){
+				extraCond.append(" AND REGION.status = " + status.getVal());
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	/**
 	 * Move the department up to another.  
 	 * @param dbCon
@@ -362,44 +389,12 @@ public class RegionDao {
 	 * 			throws if the region to this id does NOT exist
 	 */
 	public static Region getById(DBCon dbCon, Staff staff, int regionId) throws SQLException, BusinessException{
-		List<Region> result = getByCond(dbCon, staff, " AND REGION.region_id = " + regionId, null);
+		List<Region> result = getByCond(dbCon, staff, new ExtraCond().setId(regionId), null);
 		if(result.isEmpty()){
 			throw new BusinessException(RegionError.REGION_NOT_EXIST);
 		}else{
 			return result.get(0);
 		}
-	}
-	
-	/**
-	 * Get all the regions to specific restaurant.
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @return the regions to this restaurant
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<Region> getAll(Staff staff) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getAll(dbCon, staff);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get all the regions to specific restaurant.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @return the regions to this restaurant
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<Region> getAll(DBCon dbCon, Staff staff) throws SQLException{
-		return getByCond(dbCon, staff, null, null);
 	}
 	
 	/**
@@ -435,11 +430,33 @@ public class RegionDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Region> getByStatus(DBCon dbCon, Staff staff, Region.Status status) throws SQLException{
-		return getByCond(dbCon, staff, " AND REGION.status = " + status.getVal(), null);
+		return getByCond(dbCon, staff, new ExtraCond().setStatus(status), null);
 	}
 	
 	/**
-	 * Get regions to a specified restaurant defined in terminal {@link Staff} and other extra condition.
+	 * Get regions according to other extra condition {@link ExtraCond}.
+	 * @param staff
+	 * 			the terminal
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the list holding the region result
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static List<Region> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException {
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond, null);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get regions according to other extra condition {@link ExtraCond}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -452,14 +469,14 @@ public class RegionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	private static List<Region> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException {
-		List<Region> result = new ArrayList<Region>();
+	public static List<Region> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException {
+		final List<Region> result = new ArrayList<Region>();
 
 		String sql = " SELECT " +
 				     " REGION.region_id, REGION.restaurant_id, REGION.name, REGION.status, REGION.display_id " +
 				     " FROM " + Params.dbName + ".region REGION" +
 				     " WHERE REGION.restaurant_id = " + staff.getRestaurantId() + " " +
-				     (extraCond == null ? "" : extraCond) +
+				     (extraCond == null ? "" : extraCond.toString()) +
 				     (orderClause == null ? " ORDER BY display_id " : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 

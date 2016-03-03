@@ -22,9 +22,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
-import com.wireless.pojo.billStatistics.gift.GiftIncomeByDept;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByEachDay;
-import com.wireless.pojo.billStatistics.gift.GiftIncomeByStaff;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Region.RegionId;
 import com.wireless.pojo.staffMgr.Staff;
@@ -34,8 +32,18 @@ import com.wireless.util.DataPaging;
 
 public class QueryGiftStatisticAction extends DispatchAction{
 
+	/**
+	 * 获取赠送明细数据
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
 		final String onDuty = request.getParameter("onDuty");
@@ -49,7 +57,11 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		final JObject jobject = new JObject();
 		try{
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
 			final OrderFoodDao.ExtraCond extraCond = new OrderFoodDao.ExtraCond(DateType.HISTORY);
 			
@@ -98,23 +110,37 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 获取赠送走势图（按数量）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String region = request.getParameter("region");
-		String foodName = request.getParameter("foodName");
-		String giftStaffId = request.getParameter("giftStaffId");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String region = request.getParameter("region");
+		final String foodName = request.getParameter("foodName");
+		final String giftStaffId = request.getParameter("giftStaffId");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY);
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
@@ -131,7 +157,12 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<GiftIncomeByEachDay> giftList = CalcGiftStatisticsDao.calcGiftIncomeByEachDay(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			DutyRange range = DutyRangeDao.exec(staff, dateBeg, dateEnd);
+			if(range == null){
+				range = new DutyRange(dateBeg, dateEnd);
+			}
+			
+			final List<GiftIncomeByEachDay> giftList = CalcGiftStatisticsDao.calcGiftIncomeByEachDay(staff, range, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
@@ -148,7 +179,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			
 			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/giftList.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/giftList.size())*100)/100 + 
 					",\"ser\":[{\"name\":\'赠送金额\', \"data\" : " + data + "}, {\"name\":\'赠送数量\', \"data\" : " + amountData + "}]}";
-			jobject.setExtra(new Jsonable(){
+			jObject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
@@ -163,34 +194,49 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			
 			});
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
 	}	
-	public ActionForward getStaffChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String region = request.getParameter("region");
-		String foodName = request.getParameter("foodName");
-		String giftStaffId = request.getParameter("giftStaffId");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+	
+	/**
+	 * 获取赠送走势图（按员工）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getStaffChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String region = request.getParameter("region");
+		final String foodName = request.getParameter("foodName");
+		final String giftStaffId = request.getParameter("giftStaffId");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
-			CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
@@ -207,39 +253,57 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<GiftIncomeByStaff> giftList = CalcGiftStatisticsDao.calcGiftIncomeByStaff(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
+			DutyRange range = DutyRangeDao.exec(staff, dateBeg, dateEnd);
+			if(range == null){
+				range = new DutyRange(dateBeg, dateEnd);
+			}
 			
-			jobject.setRoot(giftList);
+			jObject.setRoot(CalcGiftStatisticsDao.calcGiftIncomeByStaff(staff, range, extraCond));
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
 	}
 	
-	public ActionForward getDeptChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String region = request.getParameter("region");
-		String foodName = request.getParameter("foodName");
-		String giftStaffId = request.getParameter("giftStaffId");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+	/**
+	 * 获取赠送走势图（按部门）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getDeptChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String region = request.getParameter("region");
+		final String foodName = request.getParameter("foodName");
+		final String giftStaffId = request.getParameter("giftStaffId");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
-			CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
@@ -255,18 +319,22 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
-			List<GiftIncomeByDept> giftList = CalcGiftStatisticsDao.calcGiftIncomeByDept(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
 			
-			jobject.setRoot(giftList);
+			DutyRange range = DutyRangeDao.exec(staff, dateBeg, dateEnd);
+			if(range == null){
+				range = new DutyRange(dateBeg, dateEnd);
+			}
 			
-		}catch(BusinessException e){
+			jObject.setRoot(CalcGiftStatisticsDao.calcGiftIncomeByDept(staff, range, extraCond));
+			
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;

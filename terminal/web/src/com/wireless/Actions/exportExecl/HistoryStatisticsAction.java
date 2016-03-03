@@ -42,6 +42,7 @@ import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.orderMgr.PayTypeDao;
 import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
@@ -86,7 +87,6 @@ import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.util.SQLUtil;
 
 @SuppressWarnings("deprecation")
 public class HistoryStatisticsAction extends DispatchAction{
@@ -271,43 +271,43 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("名称");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("销量");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("营业额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("折扣额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("赠送额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("成本");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("成本率");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("毛利");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("毛利率");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("均价");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("单位成本");
 		cell.setCellStyle(headerStyle);
 		
@@ -322,44 +322,44 @@ public class HistoryStatisticsAction extends DispatchAction{
 				cell.setCellStyle(strStyle);
 				
 				// ***
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getSalesAmount());
 				cell.setCellStyle(normalNumStyle);
 				
 				// ***
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getIncome());
 				cell.setCellStyle(numStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getDiscount());
 				cell.setCellStyle(numStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getGifted());
 				cell.setCellStyle(numStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getCost());
 				cell.setCellStyle(numStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getCostRate());
 				cell.setCellStyle(numStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getProfit());
 				cell.setCellStyle(numStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getProfitRate());
 				cell.setCellStyle(numStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getAvgPrice());
 				cell.setCellStyle(numStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getAvgCost());
 				cell.setCellStyle(numStyle);
 			}
@@ -498,47 +498,47 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("日期");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("单号");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("货品名称");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("部门");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("入库类型");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("入库数量");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("入库金额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("出库类型");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("出库数量");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("出库金额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("结存数量");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("操作人");
 		cell.setCellStyle(headerStyle);		
 		
@@ -553,139 +553,139 @@ public class HistoryStatisticsAction extends DispatchAction{
 				cell.setCellStyle(strStyle);
 				
 				// ***
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getOriStockId());
 				cell.setCellStyle(strStyle);
 				
 				// ***
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getMaterialName());
 				cell.setCellStyle(strStyle);
 				
 				if(item.getStockActionSubType() == SubType.STOCK_IN || item.getStockActionSubType() == SubType.MORE || item.getStockActionSubType() == SubType.SPILL){
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.getDeptIn());
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.getStockActionSubType().getText());
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.getStockActionAmount());
 					cell.setCellStyle(numStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.totalMoney());
 					cell.setCellStyle(numStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue("----");
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue("----");
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue("----");
 					cell.setCellStyle(strStyle);
 					
 				}else if(item.getStockActionSubType() == SubType.STOCK_IN_TRANSFER){
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.getDeptOut() + " -> " + item.getDeptIn());
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.getStockActionSubType().getText());
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.getStockActionAmount());
 					cell.setCellStyle(numStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.totalMoney());
 					cell.setCellStyle(numStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue("----");
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue("----");
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue("----");
 					cell.setCellStyle(strStyle);
 				}else if(item.getStockActionSubType() == SubType.STOCK_OUT_TRANSFER){
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.getDeptOut() + " -> " + item.getDeptIn());
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue("----");
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue("----");
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue("----");
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.getStockActionSubType().getText());
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.getStockActionAmount());
 					cell.setCellStyle(numStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.totalMoney());
 					cell.setCellStyle(numStyle);
 
 				}
 				else{
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.getDeptOut());
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue("----");
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue("----");
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue("----");
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.getStockActionSubType().getText());
 					cell.setCellStyle(strStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.getStockActionAmount());
 					cell.setCellStyle(numStyle);
 					
-					cell = row.createCell(row.getLastCellNum());
+					cell = row.createCell((int)row.getLastCellNum());
 					cell.setCellValue(item.totalMoney());
 					cell.setCellStyle(numStyle);
 				}				
 				
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getRemaining());
 				cell.setCellStyle(numStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getOperater());
 				cell.setCellStyle(strStyle);
 			}
@@ -2231,7 +2231,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 	}	
 	
 	/**
-	 * 充值明细
+	 * 会员充值/取款明细导出excel
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -2247,20 +2247,25 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		response.setContentType("application/vnd.ms-excel;");
 		
-		String pin = (String)request.getAttribute("pin");
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		
+		final String fuzzy = request.getParameter("fuzzy");
+		final String dataSource = request.getParameter("dataSources");
+		final String memberType = request.getParameter("memberType");
+		final String operateType = request.getParameter("operateType");
+		final String onDuty = request.getParameter("onDuty");
+		final String offDuty = request.getParameter("offDuty");
+		final String detailOperate = request.getParameter("detailOperate");
+		final String payType = request.getParameter("payType");
+		final String isRefund = request.getParameter("isRefund");
+
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		if(branchId != null && !branchId.isEmpty()){
+			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+		}
 		
-		String fuzzy = request.getParameter("fuzzy");
-		String dataSource = request.getParameter("dataSources");
-		String memberType = request.getParameter("memberType");
-		String operateType = request.getParameter("operateType");
-		String onDuty = request.getParameter("onDuty");
-		String offDuty = request.getParameter("offDuty");
-		String detailOperate = request.getParameter("detailOperate");
-		String payType = request.getParameter("payType");
-		String isRefund = request.getParameter("isRefund");
 		final MemberOperationDao.ExtraCond extraCond;
-		
 		if(dataSource.equalsIgnoreCase("today")){
 			extraCond = new MemberOperationDao.ExtraCond(DateType.TODAY);
 		}else{
@@ -2325,15 +2330,17 @@ public class HistoryStatisticsAction extends DispatchAction{
 			}
 		}
 		
-		DecimalFormat df = new DecimalFormat("0.00");
-		String title = "会员充值明细表";
-		
+		final DecimalFormat df = new DecimalFormat("0.00");
+		String title;
 		if(isRefund != null){
 			title = "会员取款明细表";
 			response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("会员取款明细表.xls").getBytes("GBK"),  "ISO8859_1"));
 		}else{
+			title = "会员充值明细表";
 			response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("会员充值明细表.xls").getBytes("GBK"),  "ISO8859_1"));
 		}
+		title += "(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")";
+		
 		//标题
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet(title);
@@ -2408,35 +2415,35 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("会员名称");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("会员类型");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("手机号码");
 		cell.setCellStyle(headerStyle);		
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("实收/实退");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("充值/退款");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("收款方式");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("操作人");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("操作时间");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("操作类型");
 		cell.setCellStyle(headerStyle);
 		
@@ -2448,35 +2455,35 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell.setCellValue(mo.getMemberName());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getMember().getMemberType().getName());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getMemberMobile().isEmpty()? "----" : mo.getMemberMobile());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(df.format(mo.getChargeMoney()));
 			cell.setCellStyle(numStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(df.format(mo.getDeltaTotalMoney()));
 			cell.setCellStyle(numStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getChargeType() == null ? "现金" : mo.getChargeType().getName());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getStaffName());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(DateUtil.format(mo.getOperateDate()));
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getOperationType().getName());
 			cell.setCellStyle(strStyle);
 		}
@@ -2501,33 +2508,35 @@ public class HistoryStatisticsAction extends DispatchAction{
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public ActionForward consumeDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
+	public ActionForward consumeDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		
 		response.setContentType("application/vnd.ms-excel;");
 		
-		String pin = (String)request.getAttribute("pin");
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dataSource = request.getParameter("dataSources");
+		final String memberType = request.getParameter("memberType");
+		final String operateType = request.getParameter("operateType");
+		final String onDuty = request.getParameter("onDuty");
+		final String offDuty = request.getParameter("offDuty");
+		final String fuzzy = request.getParameter("fuzzy");
+		final String payType = request.getParameter("payType");
+		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		//String restaurantID = request.getParameter("restaurantID");
-		String dataSource = request.getParameter("dataSources");
-		String memberType = request.getParameter("memberType");
-		String operateType = request.getParameter("operateType");
-		String onDuty = request.getParameter("onDuty");
-		String offDuty = request.getParameter("offDuty");
-		String fuzzy = request.getParameter("fuzzy");
-		String payType = request.getParameter("payType");
-		
-		MemberOperationDao.ExtraCond extraCond = null;
+		if(branchId != null && branchId.isEmpty()){
+			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+		}
 		
 		DateType dy;
-		
 		if(dataSource.equalsIgnoreCase("today")){
 			dy = DateType.TODAY;
 		}else{
 			dy = DateType.HISTORY;
 		}
 
+		final MemberOperationDao.ExtraCond extraCond;
 		if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
 			if(OperationCate.valueOf(Integer.valueOf(operateType)) == OperationCate.CONSUME_TYPE){
 				extraCond = new MemberOperationDao.ExtraCond4Consume(dy);
@@ -2588,7 +2597,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		}
 		
 		DecimalFormat df = new DecimalFormat("0.00");
-		String title = "会员消费明细表";
+		String title = "会员消费明细表(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")";
 		//标题
 		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("会员消费表明细.xls").getBytes("GBK"),  "ISO8859_1"));
 		HSSFWorkbook wb = new HSSFWorkbook();
@@ -2661,38 +2670,38 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("单据号");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("消费时间");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("会员名称");
 		cell.setCellStyle(headerStyle);
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("手机号");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("会员类型");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("付款方式");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("消费金额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("所得积分");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("操作人");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("备注");
 		cell.setCellStyle(headerStyle);
 		
@@ -2704,39 +2713,39 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell.setCellValue(mo.getOrderId());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(DateUtil.format(mo.getOperateDate()));
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getMemberName());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getMemberMobile());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getMember().getMemberType().getName());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getPayType().getName());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(df.format(mo.getPayMoney()));
 			cell.setCellStyle(numStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(df.format(mo.getDeltaPoint()));
 			cell.setCellStyle(numStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getStaffName());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getComment());
 			cell.setCellStyle(strStyle);
 		}
@@ -2749,7 +2758,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 		return null;
 	}
 	
-	
+	/**
+	 * 退菜统计导出excel
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws Exception
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
 	public ActionForward cancelledFood(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
 		
 		
@@ -2932,32 +2952,43 @@ public class HistoryStatisticsAction extends DispatchAction{
 		return null;
 	}
 	
-	public ActionForward memberList(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
+	/**
+	 * 会员开卡统计导出excel
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward memberList(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		
 		response.setContentType("application/vnd.ms-excel;");
 		
-		String pin = (String)request.getAttribute("pin");
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		List<Member> list = null;
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
 		
-		String  orderClause = " ";
-		String id = request.getParameter("id");
-		String memberType = request.getParameter("memberType");
-		String memberTypeAttr = request.getParameter("memberTypeAttr");
-		String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
-		String memberMinBalance = request.getParameter("memberMinBalance");
-		String memberMaxBalance = request.getParameter("memberMaxBalance");
-		String MaxTotalMemberCost = request.getParameter("MaxTotalMemberCost");
-		String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
-		String consumptionMinAmount = request.getParameter("consumptionMinAmount");
-		String consumptionMaxAmount = request.getParameter("consumptionMaxAmount");
-		String dateBegin = request.getParameter("dateBegin");
-		String dateEnd = request.getParameter("dateEnd");
-		String orderBy = request.getParameter("orderBy");
+		final String id = request.getParameter("id");
+		final String memberType = request.getParameter("memberType");
+		final String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
+		final String memberMinBalance = request.getParameter("memberMinBalance");
+		final String memberMaxBalance = request.getParameter("memberMaxBalance");
+		final String MaxTotalMemberCost = request.getParameter("MaxTotalMemberCost");
+		final String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
+		final String consumptionMinAmount = request.getParameter("consumptionMinAmount");
+		final String consumptionMaxAmount = request.getParameter("consumptionMaxAmount");
+		final String dateBegin = request.getParameter("dateBegin");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String orderBy = request.getParameter("orderBy");
 		//是否开卡统计
-		String create = request.getParameter("create");
-		
+		final String create = request.getParameter("create");
+
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		if(branchId != null && !branchId.isEmpty()){
+			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+		}
+
 		MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
 		
 		if(id != null && !id.trim().isEmpty() && Integer.valueOf(id.trim()) > 0){
@@ -3001,6 +3032,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			
 		}
 		
+		String orderClause = " ";
 		if(orderBy == null || orderBy.equals("create")){
 			orderClause = " ORDER BY M.member_id ";
 		}else if(orderBy.equals("consumeMoney")){
@@ -3011,30 +3043,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 			orderClause = " ORDER BY M.total_point DESC ";
 		}
 		
-		Map<Object, Object> paramsSet = new HashMap<Object, Object>();
-		paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-		paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-/*			if(isPaging != null && isPaging.trim().equals("true")){
-			countSet = new HashMap<Object, Object>();
-			countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-			jobject.setTotalProperty(MemberDao.getMemberCount(countSet));
-			// 分页
-			orderClause += " LIMIT " + start + "," + limit;
-		}*/
-		list = MemberDao.getByCond(staff, extraCond, orderClause);
-		List<Member> newList = new ArrayList<Member>(list);  
-		if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty()){
-			newList.clear();
-			List<Member> attrMember = new ArrayList<Member>();  
-			for (Member member : list) {
-				if(member.getMemberType().getAttribute().getVal() == Integer.parseInt(memberTypeAttr)){
-					attrMember.add(member);
-				};
-			}
-			newList.addAll(attrMember);
-		}
+		final List<Member> result = MemberDao.getByCond(staff, extraCond, orderClause);  
 		
-		String title = "会员列表";
+		final String title = "会员列表(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")";
 		
 		//标题
 		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("会员列表.xls").getBytes("GBK"),  "ISO8859_1"));
@@ -3075,7 +3086,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(0);
 		
-		cell.setCellValue("会员数量: " + newList.size());
+		cell.setCellValue("会员数量: " + result.size());
 //		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 9));
@@ -3092,43 +3103,43 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("名称");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("类型");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("消费次数");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("消费总额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("累计积分");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("当前积分");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("总充值额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("账户余额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("手机号码");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("会员卡号");
 		cell.setCellStyle(headerStyle);
 		
-		for (Member member : newList) {
+		for (Member member : result) {
 			row = sheet.createRow(sheet.getLastRowNum() + 1);
 			row.setHeight((short) 350);
 			
@@ -3136,39 +3147,39 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell.setCellValue(member.getName());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getMemberType().getName());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getConsumptionAmount());
 			cell.setCellStyle(normalNumStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getTotalConsumption());
 			cell.setCellStyle(numStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getTotalPoint());
 			cell.setCellStyle(normalNumStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getPoint());
 			cell.setCellStyle(normalNumStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getBaseBalance());
 			cell.setCellStyle(numStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getTotalBalance());
 			cell.setCellStyle(numStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getMobile());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getMemberCard());
 			cell.setCellStyle(strStyle);
 		}

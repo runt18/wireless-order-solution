@@ -1,7 +1,8 @@
 ﻿
 $(function(){
 
-
+	var setBranch =false;
+	var setRegion = false;
 	receivablesStaticRecordCount = 93;
 	var highChart;
 	
@@ -27,8 +28,9 @@ $(function(){
 				dateBegin : c.dateBegin,
 				dateEnd : c.dateEnd,
 				opening : c.opening,
-				ending : c.ending
-				
+				ending : c.ending,
+				region : c.regionId,
+				branchId : c.branchId
 			},
 			success : function(res, opt){
 				tempLoadMask.hide();
@@ -350,7 +352,142 @@ $(function(){
 			}
 		});
 		
-		var businessReceiptGridTbarItem = ['->', {
+		//区域选择
+		
+		var regionSelect_combo_businessReceips = new Ext.form.ComboBox({
+			readOnly : false,
+			forceSelection : true,
+			width : 103,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [[-1,'全部']];
+					Ext.Ajax.request({
+						url : '../../OperateRegion.do',
+						params : {
+							dataSource : 'getByCond'
+						},
+						success : function(res, opt){
+							
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							thiz.store.loadData(data);
+						},
+						failure : function(res, opt){
+							thiz.store.loadData({root:[{id:-1, name:'全部'}]});
+							thiz.setValue(-1);
+						}
+					});
+				},
+				select : function(){
+					Ext.getCmp('businessReceipt_btnSearch').handler();
+				}
+			}
+		});
+		
+		//门店选择
+		var branchSelect_combo_businessReceips = new Ext.form.ComboBox({
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							
+							thiz.store.loadData(data);
+							if(setBranch){
+								thiz.setValue(sendToStatisticsBranch);
+							}else{
+								thiz.setValue(jr.root[0].id);
+							}
+							thiz.fireEvent('select');
+						},
+						failure : function(res, opt){
+							thiz.store.loadData({root:[{id:-1, name:'全部'}]});
+							thiz.setValue(-1);
+						}
+					});
+				},
+				select : function(){
+					var data = [[-1,'全部']];
+					Ext.Ajax.request({
+						url : '../../OperateRegion.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branchSelect_combo_businessReceips.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							regionSelect_combo_businessReceips.store.loadData(data);
+							if(setRegion){
+								regionSelect_combo_businessReceips.setValue(sendToStatisticsRegion);
+							}else{
+								regionSelect_combo_businessReceips.setValue(-1);
+							}
+							
+						}
+					});
+					Ext.getCmp('businessReceipt_btnSearch').handler();
+				}
+			}
+		});
+		
+		
+		
+		
+		
+		var businessReceiptGridTbarItem = [
+        {xtype : 'tbtext', text : '&nbsp;&nbsp;'}, {
+			xtype : 'tbtext',
+			text : '区域选择:'
+		}, regionSelect_combo_businessReceips,
+		{xtype : 'tbtext', text : '&nbsp;&nbsp;'}, {
+			xtype : 'tbtext',
+			text : '门店选择'
+		}, branchSelect_combo_businessReceips, '->', {
 			text : '搜索',
 			id : 'businessReceipt_btnSearch',
 			iconCls : 'btn_search',
@@ -368,11 +505,22 @@ $(function(){
 					data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessReceipt_'}).data;
 				}
 				
+				var regionId;
+				var branchId = branchSelect_combo_businessReceips.getValue();
+				if(regionSelect_combo_businessReceips.getValue() == '-1'){
+					regionId = '';
+				}else{
+					regionId = regionSelect_combo_businessReceips.getValue();
+				}
+				
+				
 				initBusinessReceipsData({
 					dateBegin : Ext.util.Format.date(dateBegin.getValue(), 'Y-m-d 00:00:00'), 
 					dateEnd :Ext.util.Format.date(dateEnd.getValue(), 'Y-m-d 23:59:59'),
 					opening : data.opening,
-					ending : data.ending
+					ending : data.ending,
+					regionId : regionId,
+					branchId : branchId
 				});
 				
 			}
@@ -382,8 +530,15 @@ $(function(){
 			handler : function(){
 				var onDuty = Ext.getCmp('receipts_dateSearchDateBegin');
 				var offDuty = Ext.getCmp('receipts_dateSearchDateEnd');
+				var regionId;
+				var branchId = branchSelect_combo_businessReceips.getValue();
+				if(regionSelect_combo_businessReceips.getValue() == '-1'){
+					regionId = '';
+				}else{
+					regionId = regionSelect_combo_businessReceips.getValue();
+				}
 				
-				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}';
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&region={6}&branchId={7}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
@@ -391,7 +546,9 @@ $(function(){
 						restaurantID, 
 						'businessReceips',
 						Ext.util.Format.date(onDuty.getValue(), 'Y-m-d 00:00:00'),
-						Ext.util.Format.date(offDuty.getValue(), 'Y-m-d 23:59:59')
+						Ext.util.Format.date(offDuty.getValue(), 'Y-m-d 23:59:59'),
+						regionId,
+						branchId
 					);
 				
 				window.location = url;
@@ -402,6 +559,7 @@ $(function(){
 			height : 26,
 			items : [Ext.ux.initTimeBar({beginDate:receipts_beginDate, endDate:receipts_endDate,dateCombo:receipts_dateCombo, tbarType : 1, statistic : 'businessReceipt_', callback : function businessHourSelect(){receipt_hours = null;}}).concat(businessReceiptGridTbarItem)]
 		});
+		
 		
 		receivablesStatResultGrid = new Ext.grid.GridPanel({
 			xtype : "grid",
@@ -465,28 +623,30 @@ $(function(){
 			Ext.getCmp('receipts_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
 			Ext.getCmp('receipts_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
 			receipt_hours = sendToStatisticsPageHours;
-			
 			Ext.getCmp('businessReceipt_btnSearch').handler();
 			Ext.getCmp('businessReceipt_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+receipt_hours.openingText+'</font>');
 			Ext.getCmp('businessReceipt_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+receipt_hours.endingText+'</font>');
 			Ext.getCmp('businessReceipt_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
 			
-			sendToPageOperation = false;		
+			sendToPageOperation = false;	
+			setBranch = true;
+			setRegion = true;
 		}
-	
 	};
-	
 	var receipt_hours;
 	var business_receipts_payType;
-	
+
 	Ext.onReady(function(){
 		//获取总共的付款方式, 动态生成columnModel & Store的Records
 		$.ajax({
-			url : '../../QueryPayType.do',
+			url : '../../OperatePayType.do',
 			type : 'post',
 			async:false,
 			data : {
-				dataSource : 'exceptMixed'
+				dataSource : 'getByCond',
+				designed : true,
+				extra : true,
+				member : true
 			},
 			success : function(jr, status, xhr){
 				business_receipts_payType = jr.root;

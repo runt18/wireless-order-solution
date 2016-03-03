@@ -75,7 +75,11 @@ public class OrderDetailContent extends ConcreteContent {
 				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("加菜" + (mParent.isHangup() ? "叫起" : "") + "分单-" + tblName));
 				
 			}else if(mPrintType == PType.PRINT_CANCELLED_FOOD_DETAIL){
-				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("!!!退菜分单!!!-" + tblName));
+				if(mOrder.isUnpaid()){
+					mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("!!!退菜分单!!!-" + tblName));
+				}else{
+					mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("!!!反结账退菜!!!-" + tblName));
+				}
 				
 			}else{
 				mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("点菜分单-" + tblName));

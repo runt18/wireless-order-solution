@@ -3,11 +3,6 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
-<script type="text/javascript">
-	var commissionStatisticsGrid, commissionDeptTree, commissionTotalGrid, commissionTotalDeptTree, commissionOrderDetailWin;
-	var commissionDetailPanel, commissionTotalPanel;
-	var limitCount = 20;
-</script>
 <script type="text/javascript" src="../../js/History/bills/billStatistics/commissionStatistics.js"></script>
 </head>
 <body>
@@ -16,9 +11,9 @@
 <div id="divCommissionDetailChart" data-type="commissionChart" data-value="commissionDetailChart" style="height : 400px;"></div>
 
 <div id="divCommissionStaffCharts" >
-	<div id="commissionStaff_DivChartChange" class="chartChangeFont">
-		&nbsp;&nbsp;<span onclick="commission_fnChangeStaffChart(this,1)"><input  type="radio" name="commission_staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
-		<span onclick="commission_fnChangeStaffChart(this,0)"><input type="radio" name="commission_staffChange"  />按金额显示</span> 
+	<div id="commissionStaff_DivChartChange" class="chartChangeFont">&nbsp;&nbsp;
+		<span id="staffByAmount_span_commissionChart"><input  type="radio" name="commission_staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
+		<span id="staffByFee_span_commissionChart"><input type="radio" name="commission_staffChange"  />按金额显示</span> 
 	</div>	
 	<div>
 		<div id="divCommissionStaffPieChart" data-type="commissionChart" data-value="commission_staffPieChart" style="height : 300px;display:none;width : 40%;float : left;"></div>

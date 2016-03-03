@@ -8,9 +8,6 @@
 	cursor: pointer;
 }
 </style>
-<script type="text/javascript">
-	var grid_eraseStatistics, eraseViewBillWin;
-</script>
 <script type="text/javascript" src="../../js/History/bills/billStatistics/eraseStatistic.js"></script>
 </head>
 <body>
@@ -19,9 +16,9 @@
 <div id="divEraseDetailChart" data-type="eraseChart" data-value="erase_detailChart" style="height : 400px;"></div>
 
 <div id="divEraseStaffCharts" >
-	<div id="eraseStaff_DivChartChange" class="chartChangeFont">
-		&nbsp;&nbsp;<span onclick="erase_fnChangeStaffChart(this,1)"><input  type="radio" name="erase_staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
-		<span onclick="erase_fnChangeStaffChart(this,0)"><input type="radio" name="erase_staffChange"  />按金额显示</span> 
+	<div id="eraseStaff_DivChartChange" class="chartChangeFont">&nbsp;&nbsp;
+		<span id="staffByAmount_span_eraseChart"><input  type="radio" name="erase_staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
+		<span id="staffByFee_span_eraseChart"><input type="radio" name="erase_staffChange"  />按金额显示</span> 
 	</div>
 	<div>
 		<div id="divEraseStaffPieChart" data-type="eraseChart" data-value="erase_staffPieChart" style="height : 300px;display:none;width:40%;float:left;"></div>

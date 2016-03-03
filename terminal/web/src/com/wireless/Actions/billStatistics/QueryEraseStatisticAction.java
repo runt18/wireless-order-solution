@@ -22,7 +22,6 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.erase.EraseIncomeByEachDay;
-import com.wireless.pojo.billStatistics.erase.EraseIncomeByStaff;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.staffMgr.Staff;
@@ -32,9 +31,19 @@ import com.wireless.util.DataPaging;
 
 public class QueryEraseStatisticAction extends DispatchAction{
 
+	/**
+	 * 获取抹数明细
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		final JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
 		final String beginDate = request.getParameter("beginDate");
@@ -45,10 +54,13 @@ public class QueryEraseStatisticAction extends DispatchAction{
 		final String ending = request.getParameter("ending");
 		
 		try{
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY);
+			final CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
 				extraCond.setStaffId(Integer.valueOf(staffId));
@@ -70,62 +82,81 @@ public class QueryEraseStatisticAction extends DispatchAction{
 			}
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
-				jobject.setTotalProperty(result.size());
+				jObject.setTotalProperty(result.size());
 				Order total = new Order();
 				for (Order item : result) {
 					total.setErasePrice(item.getErasePrice() + total.getErasePrice());
 					total.setActualPrice(item.getActualPrice() + total.getActualPrice());
 				}
-				total.setDestTbl(result.get(0).getDestTbl());
 				result = DataPaging.getPagingData(result, true, start, limit);
 				result.add(total);
 				
 			}
-			jobject.setRoot(result);
-		}catch (SQLException e) {
+			jObject.setRoot(result);
+		}catch (BusinessException | SQLException e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
 	
-	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String deptID = request.getParameter("deptID");
-		String staffID = request.getParameter("staffId");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+	/**
+	 * 获取抹数走势图（按数量）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String deptId = request.getParameter("deptID");
+		final String staffId = request.getParameter("staffId");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
 			CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY);
 			
-			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
-			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
-				extraCond.setStaffId(Integer.valueOf(staffID));
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
-			List<EraseIncomeByEachDay> cancelList = CalcEraseStatisticsDao.calcEraseIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
+			
+			DutyRange range = DutyRangeDao.exec(staff, dateBeg, dateEnd);
+			if(range == null){
+				range = new DutyRange(dateBeg, dateEnd);
+			}
+			
+			final List<EraseIncomeByEachDay> result = CalcEraseStatisticsDao.calcEraseIncomeByEachDay(staff, range, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
 			List<Float> amountData = new ArrayList<Float>();
 			float totalMoney = 0, totalCount = 0;
-			for (EraseIncomeByEachDay c : cancelList) {
+			for (EraseIncomeByEachDay c : result) {
 				xAxis.add("\'"+c.getRange().getOffDutyFormat()+"\'");
 				data.add(c.getErasePrice());
 				amountData.add(c.getEraseAmount());
@@ -134,9 +165,9 @@ public class QueryEraseStatisticAction extends DispatchAction{
 				totalCount += c.getEraseAmount();
 			}
 			
-			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/cancelList.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/cancelList.size())*100)/100 + 
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/result.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/result.size())*100)/100 + 
 					",\"ser\":[{\"name\":\'抹数金额\', \"data\" : " + data + "}, {\"name\":\'抹数数量\', \"data\" : " + amountData + "}]}";
-			jobject.setExtra(new Jsonable(){
+			jObject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
@@ -151,55 +182,73 @@ public class QueryEraseStatisticAction extends DispatchAction{
 			
 			});
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
 	}
 	
-	public ActionForward getStaffChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String deptID = request.getParameter("deptID");
-		String staffID = request.getParameter("staffId");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+	/**
+	 * 获取抹数走势图（按员工）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getStaffChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String deptId = request.getParameter("deptID");
+		final String staffId = request.getParameter("staffId");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
-			CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY);
-			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 			}
-			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
-				extraCond.setStaffId(Integer.valueOf(staffID));
+			
+			final CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY);
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
+			}
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
-			List<EraseIncomeByStaff> cancelList = CalcEraseStatisticsDao.calcEraseIncomeByStaff(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
 			
-			jobject.setRoot(cancelList);
+			DutyRange range = DutyRangeDao.exec(staff, dateBeg, dateEnd);
+			if(range == null){
+				range = new DutyRange(dateBeg, dateEnd);
+			}
 			
-		}catch(BusinessException e){
+			jObject.setRoot(CalcEraseStatisticsDao.calcEraseIncomeByStaff(staff, range, extraCond));
+			
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;

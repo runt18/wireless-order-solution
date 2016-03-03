@@ -8,7 +8,10 @@ Ext.ux.businessHourComboData = [['00', '00' ], ['01', '01' ], ['02', '02' ], ['0
 Ext.ux.initTimeBar = function(c){
 	var businessHourData = [[-1,'全天']];
 	$.ajax({
-		url : '../../QueryBusinessHour.do',
+		url : '../../OperateBusinessHour.do',
+		data : {
+			dataSource : 'getByCond'
+		},
 		type : 'post',
 		async : false,
 		success : function(jr, status, xhr){
@@ -116,22 +119,6 @@ Ext.ux.initTimeBar = function(c){
 					readOnly : false,
 					listeners : {
 						render : function(thiz){
-/*							Ext.Ajax.request({
-								url : '../../QueryBusinessHour.do',
-								success : function(res, opt){
-									var jr = Ext.decode(res.responseText);
-									for(var i = 0; i < jr.root.length; i++){
-										data.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
-									}
-									data.push([-2,'自定义']);
-									thiz.store.loadData(data);
-									thiz.setValue(-1);
-								},
-								fialure : function(res, opt){
-									thiz.store.loadData(data);
-									thiz.setValue(-1);
-								}
-							});*/
 							thiz.store.loadData(businessHourData);
 							thiz.setValue(-1);
 						},

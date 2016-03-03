@@ -1,4 +1,5 @@
-﻿function dailySettleStatDetalHandler(){
+﻿
+function dailySettleStatDetalHandler(){
 	var gs = Ext.ux.getSelData(dailySettleStatGrid);
 	if(gs != false){
 		var dailySettleStatWin = Ext.getCmp('dailySettleStatWin');
@@ -168,7 +169,7 @@ function dailySettleStatGridInit(){
 		 ['操作人', 'staffName'],
 		 ['开始时间', 'onDutyFormat'],
 		 ['结束时间', 'offDutyFormat'],
-		 ['操作', 'operator', 130, 'center', 'dailySettleStatResultGridRenderer']
+		 ['操作', 'operator', 130, 'center', dailySettleStatResultGridRenderer]
 		],
 		['staffName', 'onDuty', 'onDutyFormat', 'offDuty', 'offDutyFormat'],
 		[ ['isPaging', true], ['restaurantID', restaurantID]],

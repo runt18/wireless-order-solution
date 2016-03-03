@@ -505,7 +505,22 @@ class OrderHandler implements Runnable{
 	
 	private RespPackage doRepayOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		Order.RepaidBuilder builder = new Parcel(request.body).readParcel(Order.RepaidBuilder.CREATOR);
-		OrderDao.repaid(staff, builder);
+		UpdateOrder.DiffResult diffResult = OrderDao.repaid(staff, builder);
+		
+		//Only print the detail to cancel order food.
+		if(!diffResult.cancelledFoods.isEmpty()){
+			PrintHandler printHandler = new PrintHandler(staff);
+			Order cancelledOrder = OrderDao.getById(staff, diffResult.newOrder.getId(), DateType.TODAY);
+			cancelledOrder.setOrderFoods(diffResult.cancelledFoods);
+			//print the detail to canceled foods
+			printHandler.process(JobContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD_DETAIL,
+																				  staff,
+																				  getAvailPrinters(staff, builder.getPrinters()),
+																				  cancelledOrder,
+																				  FoodDetailContent.DetailType.DELTA));
+
+		}
+		//Print the member receipt.
 		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
 			ServerConnector.instance().ask(ReqPrintContent.buildReceipt(staff, builder.getUpdateBuilder().build().getId()).setPrinters(builder.getPrinters()).build());
 			Order order = OrderDao.getById(staff, builder.getUpdateBuilder().build().getId(), DateType.TODAY);
@@ -655,6 +670,12 @@ class OrderHandler implements Runnable{
 			//Ô¤¶©
 			int bookId = parcel.readInt();
 			new PrintHandler(staff).process(JobContentFactory.instance().createBookContent(staff, printers, bookId));
+			
+		}else if(printType.isWxWaiter()){
+			//Î¢ÐÅÐ¡¶þ
+			int orderId = parcel.readInt();
+			String qrCodeContent = parcel.readString();
+			new PrintHandler(staff).process(JobContentFactory.instance().createWxWaiterContent(staff, printers, orderId, qrCodeContent));
 		}
 		
 		return new RespACK(request.header);

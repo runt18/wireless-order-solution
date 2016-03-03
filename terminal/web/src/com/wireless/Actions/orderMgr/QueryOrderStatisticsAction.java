@@ -1,6 +1,6 @@
 package com.wireless.Actions.orderMgr;
 
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +11,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderDao.ExtraCond;
@@ -21,10 +20,8 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
@@ -33,39 +30,41 @@ public class QueryOrderStatisticsAction extends Action {
 	
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
-		final List<Order> list = new ArrayList<Order>();
-		final List<Order> totalList = new ArrayList<Order>();
-		
-		String dateType = request.getParameter("dataType");
-		DateType dateTypeEnmu = DateType.valueOf(Integer.parseInt(dateType));
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String isRange = request.getParameter("isRange");
-		
-		String businessHourBeg = request.getParameter("opening");
-		String businessHourEnd = request.getParameter("ending");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		
-		DBCon dbCon = new DBCon();
-		
-		
-		OrderDao.ExtraCond extraCond = new ExtraCond(DateType.valueOf(Integer.parseInt(dateType)));
-		try{
-			String pin = (String)request.getAttribute("pin");
 
-			String comboType = request.getParameter("havingCond");
-			String orderId = request.getParameter("orderId");
-			String seqId = request.getParameter("seqId");
-			String tableAlias = request.getParameter("tableAlias");
-			String tableName = request.getParameter("tableName");
-			String region = request.getParameter("region");
-			String staffId = request.getParameter("staffId");
-			String common = request.getParameter("common");
-			String comboPayType = request.getParameter("comboPayType");
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String comboType = request.getParameter("havingCond");
+		final String orderId = request.getParameter("orderId");
+		final String seqId = request.getParameter("seqId");
+		final String tableAlias = request.getParameter("tableAlias");
+		final String tableName = request.getParameter("tableName");
+		final String region = request.getParameter("region");
+		final String staffId = request.getParameter("staffId");
+		final String comment = request.getParameter("common");
+		final String comboPayType = request.getParameter("comboPayType");
+
+		final String dateType = request.getParameter("dataType");
+		final DateType dateTypeEnmu = DateType.valueOf(Integer.parseInt(dateType));
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		
+		final String businessHourBeg = request.getParameter("opening");
+		final String businessHourEnd = request.getParameter("ending");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		
+		final JObject jObject = new JObject();
+		try{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final OrderDao.ExtraCond extraCond = new ExtraCond(DateType.valueOf(Integer.parseInt(dateType)))
+													.addStatus(Order.Status.PAID)
+													.addStatus(Order.Status.REPAID);
 			
 			if(comboType != null && !comboType.trim().isEmpty()){
 				int comboVal = Integer.valueOf(comboType);
@@ -99,80 +98,81 @@ public class QueryOrderStatisticsAction extends Action {
 			if(orderId != null && !orderId.isEmpty()){
 				extraCond.setOrderId(Integer.parseInt(orderId));
 			}
+			
 			if(seqId != null && !seqId.isEmpty()){
 				extraCond.setSeqId(Integer.parseInt(seqId));
 			}
+			
 			if(comboPayType != null && !comboPayType.isEmpty() && !comboPayType.equals("-1")){
 				//按结帐方式
 				extraCond.setPayType(new PayType(Integer.parseInt(comboPayType)));
 			}
-			if(common != null && !common.isEmpty()){
-				extraCond.setComment(common);
+			
+			if(comment != null && !comment.isEmpty()){
+				extraCond.setComment(comment);
 			}
+			
 			if(tableAlias != null && !tableAlias.isEmpty()){
 				extraCond.setTableAlias(Integer.parseInt(tableAlias));
 			}
+			
 			if(tableName != null && !tableName.isEmpty()){
 				extraCond.setTableName(tableName);
 			}
+			
 			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
 				extraCond.setStaff(Integer.parseInt(staffId));
 			}
+			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(Region.RegionId.valueOf(Short.parseShort(region)));
 			}
-			if(dateBeg != null && !dateBeg.isEmpty()){
-				dbCon.connect();
-				
-				if(isRange != null && !isRange.isEmpty()){
-					
-					DutyRange range = DutyRangeDao.exec(dbCon, staff, 
-							DateUtil.format(DateUtil.parseDate(dateBeg), DateUtil.Pattern.DATE_TIME), 
-							DateUtil.format(DateUtil.parseDate(dateEnd), DateUtil.Pattern.DATE_TIME));				
-					
-					extraCond.setOrderRange(new DutyRange(range.getOnDutyFormat(), range.getOffDutyFormat()));
-				}else{
-					extraCond.setOrderRange(new DutyRange(dateBeg, dateEnd));
+			
+			if(dateBeg != null && !dateBeg.isEmpty() && dateEnd != null && !dateEnd.isEmpty()){
+				DutyRange range = DutyRangeDao.exec(staff, 
+						DateUtil.format(DateUtil.parseDate(dateBeg), DateUtil.Pattern.DATE_TIME), 
+						DateUtil.format(DateUtil.parseDate(dateEnd), DateUtil.Pattern.DATE_TIME));	
+				if(range == null){
+					range = new DutyRange(dateBeg, dateEnd);
 				}
+				extraCond.setOrderRange(range);
 			}
+			
 			if(businessHourBeg != null && !businessHourBeg.isEmpty()){
 				extraCond.setHourRange(new HourRange(businessHourBeg, businessHourEnd, DateUtil.Pattern.HOUR));
 			}
-			extraCond.addStatus(Order.Status.PAID);
-			extraCond.addStatus(Order.Status.REPAID);
 			
-			String orderClause = " ORDER BY "+ extraCond.orderTblAlias +".order_date ASC " + " LIMIT " + start + "," + limit;
+			String orderClause = " ORDER BY " + extraCond.orderTblAlias + ".order_date ASC ";
 			
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				orderClause += " LIMIT " + start + "," + limit;
+			}
 			
+			final List<Order> result = OrderDao.getByCond(staff, extraCond, orderClause);
+			jObject.setTotalProperty(OrderDao.getByCond(staff, extraCond.setOnlyAmount(true), null).size());
 			
-			list.addAll(OrderDao.getByCond(staff, extraCond, orderClause));
-			totalList.addAll(OrderDao.getByCond(staff, extraCond, null));
+			if(!result.isEmpty() && dateTypeEnmu == DateType.TODAY){
+				Order sum = new Order();
+				for(int i = 0; i < result.size(); i++){
+					sum.setTotalPrice(sum.getTotalPrice() + result.get(i).getTotalPrice());
+					sum.setActualPrice(sum.getActualPrice() + result.get(i).getActualPrice());
+				}
+				sum.setDestTbl(result.get(0).getDestTbl());
+				result.add(sum);
+			}
 			
-			OrderSummary summary = OrderDao.getOrderSummary(staff, extraCond, dateTypeEnmu);
+			jObject.setRoot(result);
 			
-			jobject.setTotalProperty(summary.getTotalAmount());
-			jobject.setRoot(list);
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
+			
 		}finally{
-			dbCon.disconnect();
-			if(!list.isEmpty() && dateTypeEnmu == DateType.TODAY){
-				Order sum = new Order();
-				sum.setDestTbl(new Table());
-				for(int i = 0; i < totalList.size(); i++){
-					sum.setTotalPrice(sum.getTotalPrice() + totalList.get(i).getTotalPrice());
-					sum.setActualPrice(sum.getActualPrice() + totalList.get(i).getActualPrice());
-				}
-				sum.setDestTbl(totalList.get(0).getDestTbl());
-				list.add(sum);
-				jobject.setRoot(list);
-			}
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

@@ -468,13 +468,14 @@ public class FoodDao {
 		}
 		
 		sql = " INSERT INTO " + Params.dbName + ".food" +
-			  " (`name`, `food_alias`, `price`, `commission`, `restaurant_id`, `kitchen_id`, `status`, `limit_amount`, `oss_image_id`, `desc` ) VALUES ( " +
+			  " (`name`, `food_alias`, `price`, `commission`, `restaurant_id`, `kitchen_id`, `print_kitchen_id`, `status`, `limit_amount`, `oss_image_id`, `desc` ) VALUES ( " +
 			  "'" + f.getName() + "'," +
 			  f.getAliasId() + "," +
 			  f.getPrice() + "," +
 			  f.getCommission() + "," +
 			  staff.getRestaurantId() + "," +
 			  f.getKitchen().getId() + "," +
+			  (f.hasPrintKitchen() ? f.getPrintKitchenId() : "NULL") + "," +
 			  f.getStatus() + "," +
 			  (f.isLimit() ? f.getLimitAmount() : "NULL") + "," +
 			  (f.hasImage() ? f.getImage().getId() : "NULL") + "," +
@@ -804,6 +805,7 @@ public class FoodDao {
 			  (builder.isAliasChanged() ? ",food_alias = " + f.getAliasId() : "") +
 			  (builder.isNameChanged() ? ",name = '" + f.getName() + "'" : "") +
 			  (builder.isKitchenChanged() ? ",kitchen_id = " + f.getKitchen().getId() : "") +
+			  (builder.isPrintKitchenChanged() ? ",print_kitchen_id = " + f.getPrintKitchenId() : "") +
 			  (builder.isPriceChanged() ? ",price = " + f.getPrice() : "") +
 			  (builder.isCommissionChanged() ? ",commission = " + f.getCommission() : "") +
 			  (builder.isDescChanged() ? ",`desc` = '" + f.getDesc() + "'" : "") +
@@ -1093,7 +1095,7 @@ public class FoodDao {
 		String sql = " SELECT " +
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 					 " FOOD.name, FOOD.price, FOOD.commission, FOOD.status, FOOD.desc, " +
-					 " FOOD.order_amount, FOOD.limit_amount, FOOD.limit_remaing, " +
+					 " FOOD.order_amount, FOOD.limit_amount, FOOD.limit_remaing, FOOD.print_kitchen_id, " +
 					 " KITCHEN.kitchen_id, KITCHEN.display_id AS kitchen_display_id, KITCHEN.name AS kitchen_name, " +
 					 " KITCHEN.type AS kitchen_type , KITCHEN.is_allow_temp AS is_allow_temp, " +
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, DEPT.display_id AS dept_display_id, " +
@@ -1117,6 +1119,7 @@ public class FoodDao {
 			f.setRestaurantId(restaurantId);
 			f.setAliasId(dbCon.rs.getInt("food_alias"));
 			f.setName(dbCon.rs.getString("name"));
+			f.setPrintKitchenId(dbCon.rs.getInt("print_kitchen_id"));
 			
 			//Generate the pinyin to each food
 			f.setPinyin(PinyinUtil.cn2Spell(f.getName()));

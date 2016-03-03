@@ -19,7 +19,7 @@ function dutyRangeStatPrintHandler(rowIndex) {
 					printType : statType == 1?5:12,
 					onDuty : sn.attributes.onDuty,
 					offDuty : sn.attributes.offDuty,
-					orientedPrinter : getcookie(document.domain + '_printers')
+					orientedPrinter : Ext.ux.getCookie(document.domain + '_printers')
 				},
 				success : function(response, options) {
 					tempMask.hide();

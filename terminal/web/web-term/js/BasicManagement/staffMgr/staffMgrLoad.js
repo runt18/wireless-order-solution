@@ -16,7 +16,6 @@
 			if (rootData.length != 0) {
 				if (resultJSON.msg == "normal") {
 					staffData = rootData;
-					alert('qsloda');
 					// 我也說不清這裡為什麽要刷一次，就是找個藉口刷新一下表格
 					staffStore.reload({
 						params : {

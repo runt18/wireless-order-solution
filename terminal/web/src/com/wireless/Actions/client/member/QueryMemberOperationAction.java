@@ -1,5 +1,6 @@
 package com.wireless.Actions.client.member;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,50 +30,49 @@ public class QueryMemberOperationAction extends Action{
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		String isPaging = request.getParameter("isPaging");
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final JObject jObject = new JObject();
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String isPaging = request.getParameter("isPaging");
+		final String dataSource = request.getParameter("dataSource");
+		
+		final String memberType = request.getParameter("memberType");
+		
+		final String fuzzy = request.getParameter("fuzzy");
+		
+		final String payType = request.getParameter("payType");
+		//现金,刷卡,签单
+		final String chargeType = request.getParameter("chargeType");
+		//消费类型,充值类型,积分,金额调整
+		final String operateType = request.getParameter("operateType");
+		//充值,取款,积分消费,反结账...
+		final String detailOperate = request.getParameter("detailOperate");
+		final String onDuty = request.getParameter("onDuty");
+		final String offDuty = request.getParameter("offDuty");
+		final String total = request.getParameter("total");
 		try{
 			
-			String pin = (String)request.getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String dataSource = request.getParameter("dataSource");
-			
-			String memberType = request.getParameter("memberType");
-			
-			String fuzzy = request.getParameter("fuzzy");
-			
-			String payType = request.getParameter("payType");
-			//现金,刷卡,签单
-			String chargeType = request.getParameter("chargeType");
-			//消费类型,充值类型,积分,金额调整
-			String operateType = request.getParameter("operateType");
-			//充值,取款,积分消费,反结账...
-			String detailOperate = request.getParameter("detailOperate");
-			String onDuty = request.getParameter("onDuty");
-			String offDuty = request.getParameter("offDuty");
-			String total = request.getParameter("total");
-			
-			MemberOperationDao.ExtraCond extraCond = null;
-			
-			DateType dy;
-			
+			final DateType dateType;
 			if(dataSource.equalsIgnoreCase("today")){
-				dy = DateType.TODAY;
+				dateType = DateType.TODAY;
 			}else{
-				dy = DateType.HISTORY;
+				dateType = DateType.HISTORY;
 			}
+			
+			final MemberOperationDao.ExtraCond extraCond;
 
 			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
 				if(OperationCate.valueOf(Integer.valueOf(operateType)) == OperationCate.CONSUME_TYPE){
-					extraCond = new MemberOperationDao.ExtraCond4Consume(dy);
+					extraCond = new MemberOperationDao.ExtraCond4Consume(dateType);
 				}else{
-					extraCond = new MemberOperationDao.ExtraCond(dy);
+					extraCond = new MemberOperationDao.ExtraCond(dateType);
 				}
 			}else{
-				extraCond = new MemberOperationDao.ExtraCond(dy);
+				extraCond = new MemberOperationDao.ExtraCond(dateType);
 			}
 
 			if(memberType != null && !memberType.trim().isEmpty()){
@@ -87,6 +87,10 @@ public class QueryMemberOperationAction extends Action{
 				extraCond.setChargeType(Integer.parseInt(chargeType));
 			}
 			
+			if(branchId != null && !branchId.isEmpty()){
+				extraCond.setBranch(Integer.parseInt(branchId));
+			}
+			
 			if(fuzzy != null && !fuzzy.trim().isEmpty()){
 				List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setFuzzyName(fuzzy), null);
 				extraCond.addMember(-1);
@@ -97,7 +101,7 @@ public class QueryMemberOperationAction extends Action{
 			
 			//如果没选择小分类,则选择所有的小分类
 			if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
-				extraCond.addOperationType(OperationType.valueOf(Integer.valueOf(detailOperate)));
+				extraCond.addOperationType(OperationType.valueOf(Integer.parseInt(detailOperate)));
 			}else{
 				if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
 					for(OperationType type : OperationType.typeOf(OperationCate.valueOf(Integer.parseInt(operateType)))){
@@ -112,7 +116,7 @@ public class QueryMemberOperationAction extends Action{
 				if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
 					extraCond.setOperateDate(new DutyRange(onDuty, offDuty));
 				}
-				jobject.setTotalProperty(MemberOperationDao.getAmountByCond(staff, extraCond));
+				jObject.setTotalProperty(MemberOperationDao.getAmountByCond(staff, extraCond));
 				
 //				orderClause += " LIMIT " + start + "," + limit;
 			}
@@ -151,17 +155,17 @@ public class QueryMemberOperationAction extends Action{
 					list.add(sum);
 				}
 			}
-			jobject.setRoot(list);
+			jObject.setRoot(list);
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 				
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

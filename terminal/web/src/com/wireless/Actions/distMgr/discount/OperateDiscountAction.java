@@ -1,5 +1,7 @@
 package com.wireless.Actions.distMgr.discount;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,6 +22,44 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateDiscountAction extends DispatchAction{
 
+	/**
+	 * 获取折扣方案
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String id = request.getParameter("discountId");
+		final JObject jObject = new JObject();
+		try{
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final DiscountDao.ExtraCond extraCond = new DiscountDao.ExtraCond();
+			
+			if(id != null && !id.isEmpty()){
+				extraCond.setDiscountId(Integer.parseInt(id));
+			}
+			
+			final List<Discount> root = DiscountDao.getByCond(staff, extraCond, DiscountDao.ShowType.BY_PLAN);
+			jObject.setRoot(root);
+			jObject.setTotalProperty(root.size());
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
 	/**
 	 * 会员注入和设置折扣
 	 * @param mapping
@@ -75,6 +115,15 @@ public class OperateDiscountAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 新建折扣方案
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String pin = (String)request.getAttribute("pin");
 		final String discountName = request.getParameter("discountName");
@@ -107,6 +156,15 @@ public class OperateDiscountAction extends DispatchAction{
 		return null;
 	}	
 	
+	/**
+	 * 更新折扣方案
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward update(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String pin = (String)request.getAttribute("pin");
 		final String discountId = request.getParameter("discountID");
@@ -140,6 +198,15 @@ public class OperateDiscountAction extends DispatchAction{
 		return null;
 	}	
 	
+	/**
+	 * 删除折扣方案
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String pin = (String) request.getAttribute("pin");
 		final String discountId = request.getParameter("discountID");
