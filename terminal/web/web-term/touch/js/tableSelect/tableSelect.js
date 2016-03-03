@@ -833,7 +833,16 @@ $(function(){
 				searchMemberPopup.open();
 			}, 300);
 		});
-			
+		
+		
+		//TODO会员充值
+		$('#memberRecharge_a_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			setTimeout(function(){
+				var memberRecharge = new MemberRechargePopup();
+				memberRecharge.open();
+			},300);
+		});
 		//转台
 		$('#tranTable_a_tableSelect').click(function(){
 			var askTablePopup = new AskTablePopup({
@@ -1617,7 +1626,7 @@ window.onload = function(){
 	$('#lookupOrderDetail').trigger('create').trigger('refresh');
 	
 	//会员充值读卡
-    $('#txtMemberCharge4Read').on('keypress',function(event){
+    $('#loadMember_input_recharge').on('keypress',function(event){
         if(event.keyCode == "13")    
         {
         	ts.member.readMemberByCondtion4Charge();
@@ -1779,28 +1788,28 @@ ts.renderToCreateOrder = function(tableNo, peopleNo, comment){
 ts.member.openMemberChargeWin = function(){
 	$('#frontPageMemberOperation').popup('close');
 	//充值金额
-	$('#rd_numPayMannerMoney').on('keyup', function(){
-		var chargeMoney = $('#rd_numPayMannerMoney').val();
-		var actualChargeMoney = $('#rd_numRechargeMoney');
+	$('#PayMannerMoney_input_recharge').on('keyup', function(){
+		var chargeMoney = $('#PayMannerMoney_input_recharge').val();
+		var actualChargeMoney = $('#rechargeMoney_input_recharge');
 		actualChargeMoney.val(Math.round(chargeMoney * ts.member.chargeRate));
 	});	
 	
 	if(getcookie(document.domain+'_chargeSms') == 'true'){
-		$('#chbSendCharge').attr('checked', true).checkboxradio("refresh");
+		$('#sendReChargeMsg_check_recharge').attr('checked', true).checkboxradio("refresh");
 	}else{
-		$('#chbSendCharge').attr('checked', false).checkboxradio("refresh");
+		$('#sendReChargeMsg_check_recharge').attr('checked', false).checkboxradio("refresh");
 	}
 	
 	if(Util.sys.smsModule){
 		$('#td4ChbSendCharge').show();
-		$('#lab4SendSms').html('发送充值信息'+(Util.sys.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Util.sys.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Util.sys.smsCount+'条, 请及时充值</font>)'));
+		$('#rechargeMsgs_label_recharge').html('发送充值信息'+(Util.sys.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Util.sys.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Util.sys.smsCount+'条, 请及时充值</font>)'));
 	}
 	
 	$('#memberChargeWin').show();
 	$('#shadowForPopup').show();
 	
 	setTimeout(function(){
-		$('#txtMemberCharge4Read').focus();
+		$('#loadMember_input_recharge').focus();
 	}, 250);
 };
 
@@ -1812,7 +1821,7 @@ ts.member.closeMemberChargeWin = function(){
 	$('#shadowForPopup').hide();
 	
 	ts.member.loadMemberInfo4Charge();
-	$('#txtMemberCharge4Read').val('');
+	$('#loadMember_input_recharge').val('');
 	
 	delete ts.member.rechargeMember;
 };
@@ -1821,7 +1830,7 @@ ts.member.closeMemberChargeWin = function(){
  * 充值读取会员
  */
 ts.member.readMemberByCondtion4Charge = function(stype){
-	var memberInfo = $('#txtMemberCharge4Read');
+	var memberInfo = $('#loadMember_input_recharge');
 	
 	if(!memberInfo.val()){
 		Util.msg.alert({msg:'请填写会员相关信息', topTip:true});
@@ -1854,8 +1863,9 @@ ts.member.readMemberByCondtion4Charge = function(stype){
 					ts.member.rechargeMember = jr.root[0];
 					ts.member.loadMemberInfo4Charge(jr.root[0]);
 				}else if(jr.root.length > 1){
+					Util.msg.alert({msg:'检查到有多个账号.', topTip:true});
 					$('#charge_searchMemberType').popup('open');
-					$('#charge_searchMemberType').css({top:$('#btnReadMember4Charge').position().top - 270, left:$('#btnReadMember4Charge').position().left-300});
+					$('#charge_searchMemberType').css({top:$('#loadMember_button_recharge').position().top - 270, left:$('#loadMember_button_recharge').position().left-300});
 				}else{
 					Util.msg.alert({msg:'该会员信息不存在, 请重新输入条件后重试.', renderTo : 'tableSelectMgr', fn : function(){
 						memberInfo.focus();
@@ -1869,6 +1879,7 @@ ts.member.readMemberByCondtion4Charge = function(stype){
 			}
 		},
 		error : function(request, status, err){
+			Util.msg.alert({msg:'读取错误.', topTip:true});
 		}
 	}); 		
 };
@@ -1880,24 +1891,24 @@ ts.member.loadMemberInfo4Charge = function(member){
 	member = member == null || typeof member == 'undefined' ? {} : member;
 	var memberType = member.memberType ? member.memberType : {};
 	
-	$('#rd_numPayMannerMoney').val('');
-	$('#rd_numRechargeMoney').val('');
+	$('#PayMannerMoney_input_recharge').val('');
+	$('#rechargeMoney_input_recharge').val('');
 	
-	$('#rd_numBaseBalance').text(typeof member.baseBalance != 'undefined'?member.baseBalance:'----');
-	$('#rd_numExtraBalance').text(typeof member.extraBalance != 'undefined'?member.extraBalance:'----');
-	$('#rd_numTotalBalance').text(typeof member.totalBalance != 'undefined'?member.totalBalance:'----');
-	$('#rd_txtMemberName').text(member.name?member.name:'----');
-	$('#rd_txtMmeberType').text(memberType.name?memberType.name:'----');
-	$('#rd_txtMemberSex').text(member.sexText?member.sexText:'----');	
+	$('#baseBalance_label_recharge').text(typeof member.baseBalance != 'undefined'?member.baseBalance:'----');
+	$('#extraBalance_label_recharge').text(typeof member.extraBalance != 'undefined'?member.extraBalance:'----');
+	$('#totalBalance_label_recharge').text(typeof member.totalBalance != 'undefined'?member.totalBalance:'----');
+	$('#memberName_label_recharge').text(member.name?member.name:'----');
+	$('#memberType_label_recharge').text(memberType.name?memberType.name:'----');
+	$('#memberSex_label_recharge').text(member.sexText?member.sexText:'----');	
 	
-	$('#rd_numMemberMobileForRecharge').text(member.mobile?member.mobile:'----');
-	$('#rd_numMemberCardForRecharge').text(member.memberCard?member.memberCard:'----');	
-	$('#rd_numWeixinMemberCard').text(member.weixinCard?member.weixinCard:'----');
+	$('#memberMobileNum_label_recharge').text(member.mobile?member.mobile:'----');
+	$('#memberCard_label_recharge').text(member.memberCard?member.memberCard:'----');	
+	$('#weixinMemberCard_label_recharge').text(member.weixinCard?member.weixinCard:'----');
 	
 	if(!jQuery.isEmptyObject(member)){
 		//充值比率
 		ts.member.chargeRate = member.memberType.chargeRate;
-		$('#rd_numPayMannerMoney').focus();		
+		$('#PayMannerMoney_input_recharge').focus();		
 	}
 
 };
@@ -1922,9 +1933,9 @@ ts.member.rechargeControlCenter = function(_c){
 		return;
 	}
 	
-	var rechargeMoney = $('#rd_numRechargeMoney');
-	var rechargeType = $('#rd_comboRechargeType');
-	var payMannerMoney = $('#rd_numPayMannerMoney');
+	var rechargeMoney = $('#rechargeMoney_input_recharge');
+	var rechargeType = $('#rechargeType_select_recharge');
+	var payMannerMoney = $('#PayMannerMoney_input_recharge');
 //	var comment = $('#rd_txtRechargeComment');
 	
 	if(!rechargeMoney.val()){
@@ -1943,7 +1954,7 @@ ts.member.rechargeControlCenter = function(_c){
 		return;		
 	}
 	//设置cookie
-	if($('#chbSendCharge').attr('checked')){
+	if($('#sendReChargeMsg_check_recharge').attr('checked')){
 		setcookie(document.domain+'_chargeSms', true);
 	}else{
 		delcookie(document.domain+'_chargeSms');
@@ -1957,8 +1968,8 @@ ts.member.rechargeControlCenter = function(_c){
 		rechargeMoney : rechargeMoney.val(),
 		rechargeType : rechargeType.val(),
 		payMannerMoney : payMannerMoney.val(),
-		isPrint : $('#chbPrintRecharge').attr('checked') ? true : false,
-		sendSms : $('#chbSendCharge').attr('checked') ? true : false,
+		isPrint : $('#printRecharge_checkbox_recharge').attr('checked') ? true : false,
+		sendSms : $('#sendReChargeMsg_check_recharge').attr('checked') ? true : false,
 		orientedPrinter : getcookie(document.domain + '_printers')
 	}, function(jr){
 		Util.LM.hide();
