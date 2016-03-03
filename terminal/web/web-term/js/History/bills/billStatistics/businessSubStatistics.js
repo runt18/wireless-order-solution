@@ -16,6 +16,8 @@
 		var sendToStatisticsRegion = Ext.getCmp('businessSub_comboRegion').getValue();
 		
 		var sendToStatisticsOperateType = c.operateType;
+		var sendToStatisticsOperatePayType = c.payType;
+		
 		
 		if(!sendToStatisticsPageHours.opening){
 			sendToStatisticsPageHours.openingText = "00:00";
@@ -371,6 +373,11 @@
 										Ext.getCmp(this.id).fireEvent('check', Ext.getCmp(this.id), true);
 									}
 								});
+								
+								if(sendToStatisticsOperatePayType){
+									Ext.getCmp('comboPayType').setValue(sendToStatisticsOperatePayType);
+								}
+							
 								
 								Ext.getCmp('txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+history_hours.openingText+'</font>');
 								Ext.getCmp('txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+history_hours.endingText+'</font>');
