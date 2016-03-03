@@ -1,7 +1,6 @@
 ﻿Ext.onReady(function() {
 	
 	//历史账单
-	var searchType = false;
 	var searchAdditionFilter = 'searchAdditionFilterAll';
 	
 	var history_hours;
@@ -19,40 +18,36 @@
 				start : 0,
 				limit : GRID_PADDING_LIMIT_20
 		};
-		if(searchType){
-			gs.baseParams['dateBeg'] = Ext.util.Format.date(Ext.getCmp('dateSearchDateBegin').getValue(), 'Y-m-d 00:00:00');
-			gs.baseParams['dateEnd'] = Ext.util.Format.date(Ext.getCmp('dateSearchDateEnd').getValue(), 'Y-m-d 23:59:59');
-			gs.baseParams['comboPayType'] = Ext.getCmp('comboPayType').getValue();
-			gs.baseParams['common'] = Ext.getCmp('textSearchValue').getValue();
-			if(c.isRange){
-				gs.baseParams['isRange'] = true;
-			}
-			if(isNaN(Ext.getCmp('textTableAliasOrName').getValue())){
-				gs.baseParams['tableName'] = Ext.getCmp('textTableAliasOrName').getValue();
-				gs.baseParams['tableAlias'] = '';
-			}else{
-				gs.baseParams['tableAlias'] = Ext.getCmp('textTableAliasOrName').getValue();
-				gs.baseParams['tableName'] = '';
-			}
-			gs.baseParams['region'] = Ext.getCmp('history_comboRegion').getValue();
-			gs.baseParams['staffId'] = Ext.getCmp('historyBill_combo_staffs').getValue();
-			
-			var businessHour;
-			
-			if(history_hours){
-				businessHour = history_hours;
-			}else{
-				businessHour = history_oBusinessHourData({type : 'get'}).data;
-			}
-			
-			if(parseInt(businessHour.businessHourType) != -1){
-				gs.baseParams['opening'] = businessHour.opening;
-				gs.baseParams['ending'] = businessHour.ending;
-			}else{
-				gs.baseParams['opening'] = '';
-			}
+		gs.baseParams['dateBeg'] = Ext.util.Format.date(Ext.getCmp('dateSearchDateBegin').getValue(), 'Y-m-d 00:00:00');
+		gs.baseParams['dateEnd'] = Ext.util.Format.date(Ext.getCmp('dateSearchDateEnd').getValue(), 'Y-m-d 23:59:59');
+		gs.baseParams['comboPayType'] = Ext.getCmp('comboPayType').getValue();
+		gs.baseParams['common'] = Ext.getCmp('textSearchValue').getValue();
+		if(c.isRange){
+			gs.baseParams['isRange'] = true;
+		}
+		if(isNaN(Ext.getCmp('textTableAliasOrName').getValue())){
+			gs.baseParams['tableName'] = Ext.getCmp('textTableAliasOrName').getValue();
+			gs.baseParams['tableAlias'] = '';
 		}else{
-			gs.baseParams = {};
+			gs.baseParams['tableAlias'] = Ext.getCmp('textTableAliasOrName').getValue();
+			gs.baseParams['tableName'] = '';
+		}
+		gs.baseParams['region'] = Ext.getCmp('history_comboRegion').getValue();
+		gs.baseParams['staffId'] = Ext.getCmp('historyBill_combo_staffs').getValue();
+		gs.baseParams['branchId'] = branch_combo_history.getValue();
+		var businessHour;
+		
+		if(history_hours){
+			businessHour = history_hours;
+		}else{
+			businessHour = history_oBusinessHourData({type : 'get'}).data;
+		}
+		
+		if(parseInt(businessHour.businessHourType) != -1){
+			gs.baseParams['opening'] = businessHour.opening;
+			gs.baseParams['ending'] = businessHour.ending;
+		}else{
+			gs.baseParams['opening'] = '';
 		}
 		gs.baseParams['orderId'] = Ext.getCmp('numberSearchValue').getValue();
 		
@@ -71,47 +66,35 @@
 	function billQueryExportHandler() {
 		var url;
 		sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;
-		if(searchType){
-			var businessHour = history_oBusinessHourData({type : 'get'}).data;
-			var opening, ending;
-			if(parseInt(businessHour.businessHourType) != -1){
-				opening = businessHour.opening;
-				ending = businessHour.ending;
-			}else{
-				opening = '';
-				ending = '';
-			}
-			url = '../../{0}?dateBeg={1}&dateEnd={2}&comboPayType={3}&common={4}&orderId={5}&tableName={6}&tableAlias={7}&region={8}&havingCond={9}&dataSource={10}&dataType={11}&seqId={12}&opening={13}&ending={14}';
-			url = String.format(
-				url, 
-				'ExportHistoryStatisticsToExecl.do', 
-				Ext.util.Format.date(Ext.getCmp('dateSearchDateBegin').getValue(), 'Y-m-d 00:00:00'), 
-				Ext.util.Format.date(Ext.getCmp('dateSearchDateEnd').getValue(), 'Y-m-d 23:59:59'),
-				Ext.getCmp('comboPayType').getValue(),
-				Ext.getCmp('textSearchValue').getValue(),
-				Ext.getCmp('numberSearchValue').getValue(),
-				Ext.getCmp('textTableAliasOrName').getValue(),
-				Ext.getCmp('textTableAliasOrName').getValue(),
-				Ext.getCmp('history_comboRegion').getValue(),
-				sAdditionFilter,
-				'historyOrder',
-				1,
-				Ext.getCmp('numberSearchSeqIdValue').getValue(),
-				opening,
-				ending
-			);
+		var businessHour = history_oBusinessHourData({type : 'get'}).data;
+		var opening, ending;
+		if(parseInt(businessHour.businessHourType) != -1){
+			opening = businessHour.opening;
+			ending = businessHour.ending;
 		}else{
-			url = '../../{0}?orderId={1}&dataType={2}&havingCond={3}&dataSource={4}&seqId={5}';
-			url = String.format(
-					url, 
-					'ExportHistoryStatisticsToExecl.do', 
-					Ext.getCmp('numberSearchValue').getValue(), 
-					1,
-					sAdditionFilter,
-					'historyOrder',
-					Ext.getCmp('numberSearchSeqIdValue').getValue()
-			);
+			opening = '';
+			ending = '';
 		}
+		url = '../../{0}?dateBeg={1}&dateEnd={2}&comboPayType={3}&common={4}&orderId={5}&tableName={6}&tableAlias={7}&region={8}&havingCond={9}&dataSource={10}&dataType={11}&seqId={12}&opening={13}&ending={14}&branchId={15}';
+		url = String.format(
+			url, 
+			'ExportHistoryStatisticsToExecl.do', 
+			Ext.util.Format.date(Ext.getCmp('dateSearchDateBegin').getValue(), 'Y-m-d 00:00:00'), 
+			Ext.util.Format.date(Ext.getCmp('dateSearchDateEnd').getValue(), 'Y-m-d 23:59:59'),
+			Ext.getCmp('comboPayType').getValue(),
+			Ext.getCmp('textSearchValue').getValue(),
+			Ext.getCmp('numberSearchValue').getValue(),
+			Ext.getCmp('textTableAliasOrName').getValue(),
+			Ext.getCmp('textTableAliasOrName').getValue(),
+			Ext.getCmp('history_comboRegion').getValue(),
+			sAdditionFilter,
+			'historyOrder',
+			1,
+			Ext.getCmp('numberSearchSeqIdValue').getValue(),
+			opening,
+			ending,
+			branch_combo_history.getValue()
+		);
 		window.location = url;
 	};
 	
@@ -510,57 +493,11 @@
 				});
 			},
 			select : function(){
-				if(searchType){
 					Ext.getCmp('btnSreachForMainOrderGrid').handler();
 				}
 			}
-		}
 	});
 	
-	var history_setStatisticsDate = function(){
-		if(sendToPageOperation){
-			if(searchType){
-				Ext.getCmp('btnBillCommonSearch').handler();
-			}
-			
-			Ext.getCmp('btnBillHeightSearch').handler();
-			
-			Ext.getCmp('dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-			Ext.getCmp('dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
-			
-			Ext.getCmp('history_comboRegion').setValue(sendToStatisticsRegion);
-			
-			history_hours = sendToStatisticsPageHours;
-			
-			
-			if(sendToStatisticsPayType == -1){
-				Ext.getCmp('comboPayType').setValue(-1);
-			}else{
-				for (var i = 0; i < historyPayTypes.length; i++) {
-					if(historyPayTypes[i].name == sendToStatisticsPayType){
-						Ext.getCmp('comboPayType').setValue(historyPayTypes[i].id);
-						break;
-					}
-				}
-			}
-			
-			$('input[name="conditionRadio"]').each(function(){
-				if(this.value == sendToStatisticsOperateType){
-					Ext.getCmp(this.id).setValue(true);
-					Ext.getCmp(this.id).fireEvent('check', Ext.getCmp(this.id), true);
-				}
-			});
-			
-			billQueryHandler({isRange:true});
-			
-			Ext.getCmp('txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+history_hours.openingText+'</font>');
-			Ext.getCmp('txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+history_hours.endingText+'</font>');
-			Ext.getCmp('history_comboBusinessHour').setValue(history_hours.hourComboValue);		
-			
-			sendToPageOperation = false;		
-		}
-	
-	};
 
 	var history_beginDate = new Ext.form.DateField({
 		xtype : 'datefield',	
@@ -585,8 +522,136 @@
 		beginDate : history_beginDate,
 		endDate : history_endDate,
 		callback : function(){
-			if(searchType){
-				Ext.getCmp('btnSreachForMainOrderGrid').handler();
+			Ext.getCmp('btnSreachForMainOrderGrid').handler();
+		}
+	});
+	
+	//门店选择
+	var branch_combo_history = new Ext.form.ComboBox({
+		id : 'branch_combo_history',
+		readOnly : false,
+		forceSelection : true,
+		width : 123,
+		listWidth : 120,
+		store : new Ext.data.SimpleStore({
+			fields : ['id', 'name']
+		}),
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [];
+				Ext.Ajax.request({
+					url : '../../OperateRestaurant.do',
+					params : {
+						dataSource : 'getByCond',
+						id : restaurantID
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						if(jr.root[0].typeVal != '2'){
+							data.push([jr.root[0]['id'], jr.root[0]['name']]);
+						}else{
+							data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+							 
+							for(var i = 0; i < jr.root[0].branches.length; i++){
+								data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+							}
+						}
+						
+						thiz.store.loadData(data);
+						thiz.setValue(jr.root[0].id);
+						thiz.fireEvent('select');
+					}
+				});
+			},
+			select : function(isJump){
+				//加载区域
+				var region = [[-1, '全部']]
+				Ext.Ajax.request({
+					url : '../../OperateRegion.do',
+					params : {
+						dataSource : 'getByCond',
+						branchId : branch_combo_history.getValue()
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						for(var i = 0; i < jr.root.length; i++){
+							region.push([jr.root[i]['id'], jr.root[i]['name']]);
+						}
+						
+						Ext.getCmp('history_comboRegion').getStore().loadData(region);
+						Ext.getCmp('history_comboRegion').setValue(-1);
+					}
+				});
+				
+				//加载操作人员
+				var staff = [[-1, '全部']];
+				Ext.Ajax.request({
+					url : '../../QueryStaff.do',
+					params : {
+						branchId : branch_combo_history.getValue()
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						for(var i = 0; i < jr.root.length; i++){
+							staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+						}
+						
+						historyBill_combo_staffs.store.loadData(staff);
+						historyBill_combo_staffs.setValue(-1);
+					}
+				})
+				
+				
+				//加载收款方式
+				var payType = [[-1, '全部']];
+				Ext.Ajax.request({
+					url : '../../OperatePayType.do',
+					params : {
+						dataSource : 'getByCond',
+						branchId : branch_combo_history.getValue()
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						jr.root.unshift({id:-1, name:'全部'});
+						Ext.getCmp('comboPayType').getStore().loadData(jr.root);
+						Ext.getCmp('comboPayType').setValue(-1);			
+					}
+				});
+				
+				//加载市别
+				var hour = [[-1, '全部']];
+				Ext.Ajax.request({
+					url : '../../OperateBusinessHour.do',
+					params : {
+						dataSource : 'getByCond',
+						branchId : branch_combo_history.getValue()
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						for(var i = 0; i < jr.root.length; i++){
+							hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+						}
+						
+						hour.push([-2, '自定义']);
+						
+						Ext.getCmp('history_comboBusinessHour').getStore().loadData(hour);
+						Ext.getCmp('history_comboBusinessHour').setValue(-1);
+					}
+				});
+				if(!isJump){
+					Ext.getCmp('btnSreachForMainOrderGrid').handler();	
+				}
 			}
 		}
 	});
@@ -594,7 +659,6 @@
 	
 	historyExtraBar = new Ext.Toolbar({
 		id : 'historyExtraBar',
-		hidden : true,
 		height : 28,
 		items : [{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;'},
 			{xtype : 'tbtext', text : '台名/台号:'},
@@ -642,11 +706,9 @@
 						});
 					},
 					select : function(){
-						if(searchType){
 							Ext.getCmp('btnSreachForMainOrderGrid').handler();
 						}
 					}
-				}
 			},
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{xtype : 'tbtext', text : '操作人员:'},
@@ -697,9 +759,7 @@
 						
 					},
 					select : function(){
-						if(searchType){
-							Ext.getCmp('btnSreachForMainOrderGrid').handler();
-						}
+						Ext.getCmp('btnSreachForMainOrderGrid').handler();
 					}
 				}
 			},
@@ -710,13 +770,16 @@
 				id : 'textSearchValue',
 				hidden : false,
 				width : 100
-			}
+			},{
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;门店选择:'
+			},
+			branch_combo_history
 		]
 	});
 	
 	var historyHighTimeBar = new Ext.Toolbar({
 		id : 'historyHighTimeBar',
-		hidden : true,
 		height : 28,
 		items : [
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;'},
@@ -779,10 +842,7 @@
 					},
 					select : function(thiz, record, index){
 						history_oBusinessHourData({data : record.json, type : 'set'});
-						if(searchType){
-							Ext.getCmp('btnSreachForMainOrderGrid').handler();
-						}
-						
+						Ext.getCmp('btnSreachForMainOrderGrid').handler();
 					}
 				}
 			},
@@ -1079,53 +1139,6 @@
 			handler : function(){
 				billQueryExportHandler();
 			}
-		}, {
-			text : '高级条件↓',
-	    	id : 'btnBillHeightSearch',
-	    	handler : function(){
-	    		searchType = true;
-				Ext.getCmp('btnBillHeightSearch').hide();
-	    		Ext.getCmp('btnBillCommonSearch').show();
-	    		
-	    		Ext.getCmp('historyExtraBar').show();
-	    		Ext.getCmp('historyHighTimeBar').show();
-	    		
-	    		billsGrid.setHeight(billsGrid.getHeight()-56);
-	    		billsGrid.syncSize(); //强制计算高度
-	    		billsGrid.doLayout();//重新布局 	
-			}
-		}, {
-			 text : '高级条件↑',
-	    	 id : 'btnBillCommonSearch',
-	    	 hidden : true,
-	    	 handler : function(thiz){
-	    	 	searchType = false;
-	    		Ext.getCmp('btnBillHeightSearch').show();
-	    		Ext.getCmp('btnBillCommonSearch').hide();
-	    		
-	    		Ext.getCmp('historyExtraBar').hide();
-	    		Ext.getCmp('historyHighTimeBar').hide();
-	    		
-	    		Ext.getCmp('textSearchValue').setValue();
-	    		Ext.getCmp('textTableAliasOrName').setValue();
-	    		
-	    		history_dateCombo.setValue(1);
-	    		history_dateCombo.fireEvent('select', history_dateCombo,null,1);
-	    		
-	    		
-	    		Ext.getCmp('history_comboBusinessHour').setValue(-1);
-	    		Ext.getCmp('history_comboBusinessHour').fireEvent('select', Ext.getCmp('history_comboBusinessHour'),-1,-1);
-	    		
-	    		Ext.getCmp('comboPayType').setValue(-1);
-	    		Ext.getCmp('history_comboRegion').setValue(-1);
-	    		Ext.getCmp('historyBill_combo_staffs').setValue(-1);
-	    		
-
-	    		
-	    		billsGrid.setHeight(billsGrid.getHeight()+56);
-	    		billsGrid.syncSize();
-	    		billsGrid.doLayout();
-	    	 }
 		}]
 	});
 
@@ -1201,10 +1214,8 @@
 	});
 	
 	billsGrid.on('render', function(){
-		if(!sendToPageOperation){
-			history_dateCombo.setValue(1);
-			history_dateCombo.fireEvent('select', history_dateCombo,null,1);
-		}
+		history_dateCombo.setValue(1);
+		history_dateCombo.fireEvent('select', history_dateCombo,null,1);
 	});
 	billsGrid.on('bodyresize', function(e, w, h){
 		
@@ -1245,10 +1256,6 @@
 	});
 	billHistoryOnLoad();
 //	billQueryHandler();
-	
-	history_setStatisticsDate();
-	
-	Ext.getCmp('history').updateStatisticsDate = history_setStatisticsDate;
 	
 	//--------------------------------------------------------------------
 	

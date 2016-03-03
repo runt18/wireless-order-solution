@@ -45,7 +45,7 @@ Ext.onReady(function(){
 	}
 	
 	var erase_beginDate = new Ext.form.DateField({
-		id : 'erase_dateSearchDateBegin',
+		id : 'beginDate_combo_erase',
 		xtype : 'datefield',		
 		format : 'Y-m-d',
 		width : 100,
@@ -59,7 +59,7 @@ Ext.onReady(function(){
 	});
 	
 	var erase_endDate = new Ext.form.DateField({
-		id : 'erase_dateSearchDateEnd',
+		id : 'endDate_combo_erase',
 		xtype : 'datefield',
 		format : 'Y-m-d',
 		width : 100,
@@ -152,12 +152,6 @@ Ext.onReady(function(){
 							thiz.store.loadData(data);
 							thiz.setValue(-1);
 							
-							if(sendToPageOperation){
-								erase_setStatisticsDate();
-							}else{
-								erase_dateCombo.setValue(1);
-								erase_dateCombo.fireEvent('select', erase_dateCombo, null, 1);			
-							}							
 						},
 						fialure : function(res, opt){
 							thiz.store.loadData(data);
@@ -173,6 +167,7 @@ Ext.onReady(function(){
 		
 		//加载门店
 		var branch_combo_eraseStatistics = new Ext.form.ComboBox({
+			id : 'branch_combo_eraseStatistics',
 			readOnly : false,
 			forceSelection : true,
 			width : 123,
@@ -214,7 +209,7 @@ Ext.onReady(function(){
 						}
 					});
 				},
-				select : function(){
+				select : function(isJump){
 					//加载员工
 					var staff = [[-1, '全部']];
 					Ext.Ajax.request({
@@ -235,9 +230,9 @@ Ext.onReady(function(){
 					});
 					
 					//加载部门
-					var region = [[-1, '全部']];
+					var dept = [[-1, '全部']];
 					Ext.Ajax.request({
-						url : '../../OperateRegion.do',
+						url : '../../OperateDept.do',
 						params : {
 							dataSource : 'getByCond',
 							branchId : branch_combo_eraseStatistics.getValue()
@@ -245,9 +240,9 @@ Ext.onReady(function(){
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
 							for(var i = 0; i < jr.root.length; i++){
-								region.push([jr.root[i]['id'], jr.root[i]['name']]);
+								dept.push([jr.root[i]['id'], jr.root[i]['name']]);
 							}
-							erase_deptCombo.store.loadData(region);
+							erase_deptCombo.store.loadData(dept);
 							erase_deptCombo.setValue(-1);
 						}
 					});
@@ -274,7 +269,9 @@ Ext.onReady(function(){
 						}
 					});
 					
-					Ext.getCmp('erase_btnSearch').handler();
+					if(!isJump){
+						Ext.getCmp('erase_btnSearch').handler();
+					}
 				}
 			}
 		});
@@ -483,8 +480,8 @@ Ext.onReady(function(){
 	}
 
 	function showEraseOrderChart(jdata){
-		var dateBegin = Ext.util.Format.date(Ext.getCmp('erase_dateSearchDateBegin').getValue(), 'Y-m-d');
-		var dateEnd = Ext.util.Format.date(Ext.getCmp('erase_dateSearchDateEnd').getValue(), 'Y-m-d');
+		var dateBegin = Ext.util.Format.date(Ext.getCmp('beginDate_combo_erase').getValue(), 'Y-m-d');
+		var dateEnd = Ext.util.Format.date(Ext.getCmp('endDate_combo_erase').getValue(), 'Y-m-d');
 		
 		var hourBegin = Ext.getCmp('erase_txtBusinessHourBegin').getEl().dom.textContent;
 		var hourEnd = Ext.getCmp('erase_txtBusinessHourEnd').getEl().dom.textContent;
@@ -624,23 +621,6 @@ Ext.onReady(function(){
 		eraseDetailsStatPanel.otype = v;
 	}
 
-	var erase_setStatisticsDate = function(){
-		if(sendToPageOperation){
-			Ext.getCmp('erase_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-			Ext.getCmp('erase_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
-			
-			erase_hours = sendToStatisticsPageHours;
-			
-			Ext.getCmp('erase_btnSearch').handler();
-			
-			Ext.getCmp('erase_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+erase_hours.openingText+'</font>');
-			Ext.getCmp('erase_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+erase_hours.endingText+'</font>');
-			Ext.getCmp('erase_comboBusinessHour').setValue(erase_hours.hourComboValue);		
-			
-			sendToPageOperation = false;		
-		}
-	
-	};
 	var eraseViewBillWin;
 	var erase_cutAfterDrag = 190, erase_cutBeforeDrag = 40, erase_hours;
 	var titleEraseDeptName, titleEraseStaffName;
@@ -756,6 +736,7 @@ Ext.onReady(function(){
     eraseStatChartTabPanel.setHeight(erase_totalHeight*0.6);	
     
     erase_rz.resizeTo(eraseDetailsStatPanel.getWidth(), erase_totalHeight*0.4);	
-	
-	Ext.getCmp('eraseStatistics').updateStatisticsDate = erase_setStatisticsDate;
+    
+    erase_dateCombo.setValue(1);
+	erase_dateCombo.fireEvent('select', erase_dateCombo, null, 1);	
 });

@@ -4,68 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script type="text/javascript" src="../../js/History/bills/billStatistics/businessSubStatistics.js"></script>
 <script type="text/javascript">
-	function linkToBusinessStatistics(c){
-		var dateBegin = Ext.getCmp('businessSub_dateSearchDateBegin');
-		var dateEnd = Ext.getCmp('businessSub_dateSearchDateEnd');
-		
-		if(!dateBegin.isValid() || !dateEnd.isValid()){
-			return;
-		}
-		
-		sendToStatisticsPageBeginDate = dateBegin.getValue();
-		sendToStatisticsPageEndDate = dateEnd.getValue();
-		sendToStatisticsPageHours = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessSub_'}).data; 
-		sendToStatisticsPageHours.hourComboValue = Ext.getCmp('businessSub_comboBusinessHour').getValue();
-		sendToStatisticsPageHours.deptId = c.deptId;
-		sendToStatisticsPageHours.deptName = c.deptName;
-		
-		sendToStatisticsRegion = Ext.getCmp('businessSub_comboRegion').getValue();
-		
-		sendToStatisticsPayType = c.payType;
-		
-		sendToStatisticsOperateType = c.operateType;
-		
-		if(!sendToStatisticsPageHours.opening){
-			sendToStatisticsPageHours.openingText = "00:00";
-			sendToStatisticsPageHours.endingText = "00:00";
-		}else{
-			sendToStatisticsPageHours.openingText = sendToStatisticsPageHours.opening;
-			sendToStatisticsPageHours.endingText = sendToStatisticsPageHours.ending;
-		}
-		
-		sendToPageOperation = true;
-		
-		if(c.type == 1){//折扣统计
-			addTab('discountStatistics', '折扣统计', 'History_Module/DiscountStatistics.html');
-		}else if(c.type == 2){//赠送统计
-			addTab('giftStatistics', '赠送统计', 'History_Module/GiftStatistics.html');
-		}else if(c.type == 3){//退菜统计
-			addTab('cancelledFood', '退菜统计', 'History_Module/CancelledFood.html');
-		}else if(c.type == 4){//反结账统计
-			addTab('repaidStatistics', '反结账统计', 'History_Module/RepaidStatistics.html');
-		}else if(c.type == 5){//部门统计
-			sendToStatisticsPageDeptId = c.deptId;
-			sendToStatisticsPageDeptName = c.deptName;
-			addTab('salesSubStatistics', '销售统计', 'History_Module/SalesSubStatistics.html');
-			
-		}else if(c.type == 6){//收款统计
-			addTab('businessReceiptsStatistics', '收款统计', 'History_Module/BusinessReceiptsStatistics.html');			
-		}else if(c.type == 7){//提成统计
-			addTab('commissionStatistics', '提成统计', 'History_Module/CommissionStatistics.html');			
-		}else if(c.type == 8){//历史账单
-			addTab('history', '历史账单', 'History_Module/HistoryStatistics.html');			
-		}else if(c.type == 9){//抹数统计
-			addTab('eraseStatistics', '抹数统计', 'History_Module/EraseStatistic.html');			
-		}else if(c.type == 10){//充值统计
-			addTab('memberChargeStatistics', '充值统计', 'Client_Module/memberChargeStatistics.html');			
-		}else if(c.type == 11){//取款统计
-			addTab('memberRefundStatistics', '取款统计', 'Client_Module/memberRefundStatistics.html');			
-		}else if(c.type == 13){//优惠券统计
-			addTab('couponStatistics', '优惠券统计 ', 'History_Module/CouponStatistics.html');
-		}else{
-			return;
-		}
-	}
+
 </script>
 <title>Insert title here</title>
 </head>

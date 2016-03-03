@@ -173,7 +173,7 @@ Ext.onReady(function(){
 						}
 					});
 				},
-				select : function(){
+				select : function(isJump){
 					//加载赠送人
 					var staff = [[-1, '全部']];
 					Ext.Ajax.request({
@@ -233,7 +233,10 @@ Ext.onReady(function(){
 						}
 					});
 					
-					Ext.getCmp('giftStatistic_btnSearch').handler();
+					if(!isJump){
+						Ext.getCmp('giftStatistic_btnSearch').handler();
+					}
+				
 				}
 			}
 		});
@@ -856,6 +859,7 @@ Ext.onReady(function(){
     
     gift_rz.resizeTo(giftDetailsStatPanel.getWidth(), gift_totalHeight*0.4);
 
-	
+    gift_dateCombo.setValue(1);
+    gift_dateCombo.fireEvent('select', gift_dateCombo, null, 1);
 	
 });

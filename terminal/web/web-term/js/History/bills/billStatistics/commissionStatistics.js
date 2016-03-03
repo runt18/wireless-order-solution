@@ -6,7 +6,7 @@ Ext.onReady(function(){
 	var limitCount = 20;
 	
 	var commission_beginDate = new Ext.form.DateField({
-		id : 'commission_dateSearchDateBegin',
+		id : 'beginDate_combo_commission',
 		xtype : 'datefield',		
 		format : 'Y-m-d',
 		width : 100,
@@ -15,7 +15,7 @@ Ext.onReady(function(){
 		allowBlank : false
 	});
 	var commission_endDate = new Ext.form.DateField({
-		id : 'commission_dateSearchDateEnd',
+		id : 'endDate_combo_commission',
 		xtype : 'datefield',
 		format : 'Y-m-d',
 		width : 100,
@@ -60,13 +60,6 @@ Ext.onReady(function(){
 							}
 							thiz.store.loadData(data);
 							thiz.setValue(-1);
-							
-							if(sendToPageOperation){
-								commission_setStatisticsDate();
-							}else{
-								commission_dateCombo.setValue(1);
-								commission_dateCombo.fireEvent('select', commission_dateCombo, null, 1);			
-							}		
 							
 						},
 						fialure : function(res, opt){
@@ -123,6 +116,7 @@ Ext.onReady(function(){
 		
 		//门店选择
 		var branch_combo_commission = new Ext.form.ComboBox({
+			id : 'branch_combo_commission',
 			readOnly : false,
 			forceSelection : true,
 			width : 123,
@@ -164,7 +158,7 @@ Ext.onReady(function(){
 						}
 					});
 				},
-				select : function(){
+				select : function(isJump){
 					//加载部门
 					var dept = [[-1, '全部']];
 					Ext.Ajax.request({
@@ -226,7 +220,9 @@ Ext.onReady(function(){
 						}
 					});
 					
-					Ext.getCmp('commission_btnSearch').handler();
+					if(!isJump){
+						Ext.getCmp('commission_btnSearch').handler();
+					}
 				}
 			}
 		});
@@ -546,8 +542,8 @@ Ext.onReady(function(){
 	}
 
 	function showCommissionDetailChart(jdata){
-		var dateBegin = Ext.util.Format.date(Ext.getCmp('commission_dateSearchDateBegin').getValue(), 'Y-m-d');
-		var dateEnd = Ext.util.Format.date(Ext.getCmp('commission_dateSearchDateEnd').getValue(), 'Y-m-d');
+		var dateBegin = Ext.util.Format.date(Ext.getCmp('beginDate_combo_commission').getValue(), 'Y-m-d');
+		var dateEnd = Ext.util.Format.date(Ext.getCmp('endDate_combo_commission').getValue(), 'Y-m-d');
 		
 		var hourBegin = Ext.getCmp('commission_txtBusinessHourBegin').getEl().dom.textContent;
 		var hourEnd = Ext.getCmp('commission_txtBusinessHourEnd').getEl().dom.textContent;
@@ -672,23 +668,6 @@ Ext.onReady(function(){
 	    });	
 	};
 
-	var commission_setStatisticsDate = function(){
-		if(sendToPageOperation){
-			commission_beginDate.setValue(sendToStatisticsPageBeginDate);
-			commission_endDate.setValue(sendToStatisticsPageEndDate);	
-			
-			commission_hours = sendToStatisticsPageHours;
-			
-			Ext.getCmp('commission_btnSearch').handler();
-			
-			Ext.getCmp('commission_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+commission_hours.openingText+'</font>');
-			Ext.getCmp('commission_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+commission_hours.endingText+'</font>');
-			Ext.getCmp('commission_comboBusinessHour').setValue(commission_hours.hourComboValue);	
-			
-			sendToPageOperation = false;
-		}
-	};
-
 	var commission_cutAfterDrag = 70, commission_cutBeforeDrag = 40, commission_hours;
 	var requestParams, commission_panelDrag = false;
 	var commissionStatChartTabPanel;
@@ -800,6 +779,6 @@ Ext.onReady(function(){
     
     commissionRZ.resizeTo(commissionDetailPanel.getWidth(), commission_totalHeight*0.45);
     
-    Ext.getCmp('commissionStatistics').updateStatisticsDate = commission_setStatisticsDate;
-    
+    commission_dateCombo.setValue(1);
+	commission_dateCombo.fireEvent('select', commission_dateCombo, null, 1);	    
 });

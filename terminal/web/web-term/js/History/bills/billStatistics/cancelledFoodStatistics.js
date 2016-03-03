@@ -7,7 +7,7 @@ Ext.onReady(function(){
 	function cancelFoodDetailsStatPanelInit(){
 		
 		var beginDate = new Ext.form.DateField({
-			id : 'cancel_dateSearchDateBegin',
+			id : 'beginDate_combo_cancelledFood',
 			xtype : 'datefield',		
 			format : 'Y-m-d',
 			width : 100,
@@ -20,7 +20,7 @@ Ext.onReady(function(){
 			}
 		});
 		var endDate = new Ext.form.DateField({
-			id : 'cancel_dateSearchDateEnd',
+			id : 'endDate_combo_cancelledFood',
 			xtype : 'datefield',
 			format : 'Y-m-d',
 			width : 100,
@@ -151,12 +151,6 @@ Ext.onReady(function(){
 							thiz.store.loadData(data);
 							thiz.setValue(-1);
 							
-							if(sendToPageOperation){
-								cancel_setStatisticsDate();
-							}else{
-								cancel_dateCombo.setValue(1);
-								cancel_dateCombo.fireEvent('select', cancel_dateCombo, null, 1);			
-							}							
 						},
 						fialure : function(res, opt){
 							thiz.store.loadData(data);
@@ -172,6 +166,7 @@ Ext.onReady(function(){
 		
 		//门店选择
 		var branch_combo_cancelledFood = new Ext.form.ComboBox({
+			id : 'branch_combo_cancelledFood',
 			readOnly : false,
 			forceSelection : true,
 			width : 123,
@@ -748,8 +743,8 @@ Ext.onReady(function(){
 	};
 
 	function showCancelDetailChart(jdata){
-		var dateBegin = Ext.util.Format.date(Ext.getCmp('cancel_dateSearchDateBegin').getValue(), 'Y-m-d');
-		var dateEnd = Ext.util.Format.date(Ext.getCmp('cancel_dateSearchDateEnd').getValue(), 'Y-m-d');
+		var dateBegin = Ext.util.Format.date(Ext.getCmp('beginDate_combo_cancelledFood').getValue(), 'Y-m-d');
+		var dateEnd = Ext.util.Format.date(Ext.getCmp('endDate_combo_cancelledFood').getValue(), 'Y-m-d');
 		
 		var hourBegin = Ext.getCmp('cancel_txtBusinessHourBegin').getEl().dom.textContent;
 		var hourEnd = Ext.getCmp('cancel_txtBusinessHourEnd').getEl().dom.textContent;
@@ -886,22 +881,6 @@ Ext.onReady(function(){
 		cancelFoodDetailsStatPanel.otype = v;
 	}
 
-	var cancel_setStatisticsDate = function(){
-		if(sendToPageOperation){
-			Ext.getCmp('cancel_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-			Ext.getCmp('cancel_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
-			
-			cancel_hours = sendToStatisticsPageHours;
-			
-			Ext.getCmp('cancel_btnSearch').handler();
-			
-			Ext.getCmp('cancel_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+cancel_hours.openingText+'</font>');
-			Ext.getCmp('cancel_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+cancel_hours.endingText+'</font>');
-			Ext.getCmp('cancel_comboBusinessHour').setValue(cancel_hours.hourComboValue);		
-			
-			sendToPageOperation = false;
-		}
-	};
 	var cancel_cutAfterDrag=70, cancel_cutBeforeDrag=40;
 	var cancel_requestParams, cancel_panelDrag=false, cancelPanelHeight, cancelTabPanelHeight, cancel_hours;
 	var cancel_detailChart, cancel_staffPieChart, cancel_staffColumnChart, cancel_deptPieChart, cancel_deptColumnChart, cancel_reasonPieChart, cancel_reasonColumnChart;
@@ -1087,5 +1066,7 @@ Ext.onReady(function(){
     
     cancel_rz.resizeTo(cancelFoodDetailsStatPanel.getWidth(), cancel_totalHeight*0.45);
 	
-	Ext.getCmp('cancelledFood').updateStatisticsDate = cancel_setStatisticsDate;
+	
+	cancel_dateCombo.setValue(1);
+	cancel_dateCombo.fireEvent('select', cancel_dateCombo, null, 1);	
 });

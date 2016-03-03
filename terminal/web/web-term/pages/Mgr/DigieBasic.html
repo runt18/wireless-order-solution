@@ -62,21 +62,16 @@ var nodey=0,barX=500, barY=800;
 var restaurantID;
 //子页面第一次加载
 var tabChildrenPage = false;
-//收款统计
-var receivablesStaticRecordCount = 10;
 
-//传递给统计页面的时间段
-var sendToStatisticsPageBeginDate , sendToStatisticsPageEndDate, sendToPageOperation = false, 
-	sendToStatisticsPageDeptId, sendToStatisticsPageDeptName, sendToStatisticsRegion, sendToStatisticsPayType, sendToStatisticsOperateType;
-
+var wx = {info:{},sales:{}, logo:{}};
 //月结等待
 var monthlySet = true;
 
-function addTab(id, title, url, callback){
- 	if(tabs.items.length > 9){
-		tabs.remove(tabs.getComponent(1));
+Ext.ux.addTab = function(id, title, url, callback){
+ 	if(Ext.getCmp('tabs_tab_digieBasic').items.length > 9){
+ 		Ext.getCmp('tabs_tab_digieBasic').remove(Ext.getCmp('tabs_tab_digieBasic').getComponent(1));
 	} 	
-	var tab = tabs.getComponent(id);
+	var tab = Ext.getCmp('tabs_tab_digieBasic').getComponent(id);
 	
 	if(!tab){
  	    tab = new Ext.Panel({
@@ -92,7 +87,7 @@ function addTab(id, title, url, callback){
 	        closable:true,
 	        listeners : {
 	        	render : function(){
-	        		tabChildrenPage = false;
+					tabChildrenPage = false;
 	        	},
 	        	//不同版本Ext的事件不一致
 	        	bodyresize : function(e, w, h){
@@ -108,50 +103,43 @@ function addTab(id, title, url, callback){
 	        		} 
 	        		e.doLayout();
  	        		tabChildrenPage = true; 
-	        	},
-	        	show : function(thiz){
-	        		if(thiz.updateStatisticsDate){
-	        			thiz.updateStatisticsDate();
-	        		}
 	        	}
-	        	//
-/* 	        	,activate:function(){
-	        	      this.getUpdater().refresh();
-	            } */
 	        }
 	    }); 
-	    tabs.add(tab).doLayout();
+ 	   Ext.getCmp('tabs_tab_digieBasic').add(tab).doLayout();
 
+	}	
+	Ext.getCmp('tabs_tab_digieBasic').setActiveTab(tab);
+	if(typeof callback == 'function'){
+		setTimeout(function(){
+			callback(tab);
+		}, 1000);
 	}
-	tabs.setActiveTab(tab);
- 	
-    if(typeof callback == 'function'){
-    	callback();
-    }
 }
 
-var tabs = new Ext.TabPanel({
-    region:'center',
-    id : 'tabs',
-    deferredRender:false,
-    activeTab:0,
-    border : false,
-    defaults: {autoScroll:true},
-    enableTabScroll:true,
-    minTabWidth: 115,
-    //autoDestroy : false,
-    items:[{
-        contentEl:'center',
-        title: '主页', 
-        icon: '../../images/home.png',
-        iconCls : 'tab_home'
-    }],
-    plugins: new Ext.ux.TabCloseMenu()
-    
-});
 
-var wx = {info:{},sales:{}, logo:{}};
 Ext.onReady(function(){
+	var tabs = new Ext.TabPanel({
+	    region:'center',
+	    id : 'tabs_tab_digieBasic',
+	    deferredRender:false,
+	    activeTab:0,
+	    border : false,
+	    defaults: {autoScroll:true},
+	    enableTabScroll:true,
+	    minTabWidth: 115,
+	    //autoDestroy : false,
+	    items:[{
+	        contentEl:'center',
+	        title: '主页', 
+	        icon: '../../images/home.png',
+	        iconCls : 'tab_home'
+	    }],
+	    plugins: new Ext.ux.TabCloseMenu()
+	    
+	});
+	
+	
 	wx.lm = new Ext.LoadMask(document.body, {
 		msg : '正在获取数据...'
 	});
@@ -184,7 +172,7 @@ Ext.onReady(function(){
 					var title = e.attributes.text;
 					var url = e.attributes.url;
 					if(url != ""){
-						addTab(id, title, url);
+						Ext.ux.addTab(id, title, url);
 					}else{
 						if(e.attributes.mId == "monthSettle"){
 							if(!monthlySet){
@@ -357,9 +345,9 @@ Ext.onReady(function(){
     //自动打开指定页面
     var urlParams = new common_urlParaQuery();
     if(urlParams.page == 1){//菜谱
-    	addTab("menuMgr", "菜谱管理", "BasicManagement_Module/MenuManagement.html");
+    	Ext.ux.addTab("menuMgr", "菜谱管理", "BasicManagement_Module/MenuManagement.html");
     }else if(urlParams.page == 2){//打印方案
-    	addTab("printMgr", "打印方案", "BasicManagement_Module/PrintScheme.html");
+    	Ext.ux.addTab("printMgr", "打印方案", "BasicManagement_Module/PrintScheme.html");
     }
     
 });	
