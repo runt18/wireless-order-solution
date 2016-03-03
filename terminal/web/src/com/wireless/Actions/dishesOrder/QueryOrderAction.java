@@ -1,5 +1,7 @@
 package com.wireless.Actions.dishesOrder;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,41 +26,40 @@ public class QueryOrderAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		response.setContentType("text/json;charset=utf-8");
-		JObject jobject = new JObject();
+		
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String queryType = request.getParameter("queryType");
+		final String tableId = request.getParameter("tableID");
+		final String orderId = request.getParameter("orderID");
+		
+		final JObject jObject = new JObject();
 		try {
 			
-			/**
-			 * The parameters looks like below. 1st example, query order by
-			 * table id pin=0x1 & tableID=201 2nd example, query order by order
-			 * id pin=0x01 & orderID=40 pin : the pin the this terminal tableID
-			 * : the order with this table ID to query
-			 */
-			String pin = (String)request.getAttribute("pin");
-			String queryType = request.getParameter("queryType");
-			String tid = request.getParameter("tableID");
-			//String restaurantID = (String)request.getAttribute("restaurantID");
-			String oid = request.getParameter("orderID");
-			
-			final Order order;
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			if(queryType != null && queryType.trim().equals("History")){
-				if (oid != null && !oid.trim().isEmpty()){
-					order = OrderDao.getById(staff, Integer.valueOf(oid), DateType.HISTORY);
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final Order order;
+			if(queryType != null && queryType.trim().equalsIgnoreCase("history")){
+				if (orderId != null && !orderId.trim().isEmpty()){
+					order = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.HISTORY);
 				}else{
 					order = null;
 				}
 			}else{
-				if(tid != null && !tid.trim().isEmpty()){
-					order = OrderDao.getByTableId(staff, Integer.parseInt(tid));
-				} else if (oid != null && !oid.trim().isEmpty()){
-					order = OrderDao.getById(staff, Integer.valueOf(oid), DateType.TODAY);
+				if(tableId != null && !tableId.trim().isEmpty()){
+					order = OrderDao.getByTableId(staff, Integer.parseInt(tableId));
+				} else if (orderId != null && !orderId.trim().isEmpty()){
+					order = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY);
 				}else{
 					order = null;
 				}
 			}			
 			
-			jobject.setExtra(new Jsonable(){
+			jObject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
@@ -73,16 +74,16 @@ public class QueryOrderAction extends Action {
 				
 			});
 			
-		} catch (BusinessException e) {
+		} catch (BusinessException | SQLException e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			
 		} finally {
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
