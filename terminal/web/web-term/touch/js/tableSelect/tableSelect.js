@@ -859,7 +859,17 @@ $(function(){
 				searchMemberPopup.open();
 			}, 300);
 		});
-			
+		
+		
+		//TODO
+		//会员充值
+		$('#memberRecharge_a_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			setTimeout(function(){
+				var memberRecharge = new MemberRechargePopup();
+				memberRecharge.open();
+			},300);
+		});
 		//转台
 		$('#tranTable_a_tableSelect').click(function(){
 			var askTablePopup = new AskTablePopup({
@@ -1641,14 +1651,6 @@ window.onload = function(){
 	
 	//渲染会员读取窗口
 	$('#lookupOrderDetail').trigger('create').trigger('refresh');
-	
-	//会员充值读卡
-    $('#txtMemberCharge4Read').on('keypress',function(event){
-        if(event.keyCode == "13")    
-        {
-        	ts.member.readMemberByCondtion4Charge();
-        }
-    });	
     
 	//积分消费读卡
     $('#txtMember4PointConsume').on('keypress',function(event){
@@ -1797,212 +1799,6 @@ ts.renderToCreateOrder = function(tableNo, peopleNo, comment){
 			topTip : true
 		});
 	}
-};
-
-/**
- * 打开会员充值
- */
-ts.member.openMemberChargeWin = function(){
-	$('#frontPageMemberOperation').popup('close');
-	//充值金额
-	$('#rd_numPayMannerMoney').on('keyup', function(){
-		var chargeMoney = $('#rd_numPayMannerMoney').val();
-		var actualChargeMoney = $('#rd_numRechargeMoney');
-		actualChargeMoney.val(Math.round(chargeMoney * ts.member.chargeRate));
-	});	
-	
-	if(getcookie(document.domain+'_chargeSms') == 'true'){
-		$('#chbSendCharge').attr('checked', true).checkboxradio("refresh");
-	}else{
-		$('#chbSendCharge').attr('checked', false).checkboxradio("refresh");
-	}
-	
-	if(Util.sys.smsModule){
-		$('#td4ChbSendCharge').show();
-		$('#lab4SendSms').html('发送充值信息'+(Util.sys.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Util.sys.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Util.sys.smsCount+'条, 请及时充值</font>)'));
-	}
-	
-	$('#memberChargeWin').show();
-	$('#shadowForPopup').show();
-	
-	setTimeout(function(){
-		$('#txtMemberCharge4Read').focus();
-	}, 250);
-};
-
-/**
- * 关闭会员充值
- */
-ts.member.closeMemberChargeWin = function(){
-	$('#memberChargeWin').hide();
-	$('#shadowForPopup').hide();
-	
-	ts.member.loadMemberInfo4Charge();
-	$('#txtMemberCharge4Read').val('');
-	
-	delete ts.member.rechargeMember;
-};
-
-/**
- * 充值读取会员
- */
-ts.member.readMemberByCondtion4Charge = function(stype){
-	var memberInfo = $('#txtMemberCharge4Read');
-	
-	if(!memberInfo.val()){
-		Util.msg.alert({msg:'请填写会员相关信息', topTip:true});
-		memberInfo.focus();
-		return;
-	}
-	
-	if(stype){
-		$('#charge_searchMemberType').popup('close');
-	}else{
-		stype = '';
-	}
-	Util.LM.show();
-	$.ajax({
-		url : "../QueryMember.do",
-		type : 'post',
-		data : {
-			dataSource:'normal',
-			sType: stype,
-			forDetail : true,
-			memberCardOrMobileOrName:memberInfo.val()
-		},
-//		async : false,
-		dataType : 'json',
-		success : function(jr, status, xhr){
-			Util.LM.hide();
-			if(jr.success){
-				if(jr.root.length == 1){
-					Util.msg.alert({msg:'会员信息读取成功.', topTip:true});
-					ts.member.rechargeMember = jr.root[0];
-					ts.member.loadMemberInfo4Charge(jr.root[0]);
-				}else if(jr.root.length > 1){
-					$('#charge_searchMemberType').popup('open');
-					$('#charge_searchMemberType').css({top:$('#btnReadMember4Charge').position().top - 270, left:$('#btnReadMember4Charge').position().left-300});
-				}else{
-					Util.msg.alert({msg:'该会员信息不存在, 请重新输入条件后重试.', renderTo : 'tableSelectMgr', fn : function(){
-						memberInfo.focus();
-					}});
-				}
-			}else{
-				Util.msg.alert({
-					msg : jr.msg,
-					renderTo : 'tableSelectMgr'
-				});
-			}
-		},
-		error : function(request, status, err){
-		}
-	}); 		
-};
-
-/**
- * 充值时加载会员信息
- */
-ts.member.loadMemberInfo4Charge = function(member){
-	member = member == null || typeof member == 'undefined' ? {} : member;
-	var memberType = member.memberType ? member.memberType : {};
-	
-	$('#rd_numPayMannerMoney').val('');
-	$('#rd_numRechargeMoney').val('');
-	
-	$('#rd_numBaseBalance').text(typeof member.baseBalance != 'undefined'?member.baseBalance:'----');
-	$('#rd_numExtraBalance').text(typeof member.extraBalance != 'undefined'?member.extraBalance:'----');
-	$('#rd_numTotalBalance').text(typeof member.totalBalance != 'undefined'?member.totalBalance:'----');
-	$('#rd_txtMemberName').text(member.name?member.name:'----');
-	$('#rd_txtMmeberType').text(memberType.name?memberType.name:'----');
-	$('#rd_txtMemberSex').text(member.sexText?member.sexText:'----');	
-	
-	$('#rd_numMemberMobileForRecharge').text(member.mobile?member.mobile:'----');
-	$('#rd_numMemberCardForRecharge').text(member.memberCard?member.memberCard:'----');	
-	$('#rd_numWeixinMemberCard').text(member.weixinCard?member.weixinCard:'----');
-	
-	if(!jQuery.isEmptyObject(member)){
-		//充值比率
-		ts.member.chargeRate = member.memberType.chargeRate;
-		$('#rd_numPayMannerMoney').focus();		
-	}
-
-};
-
-/**
- * 充值操作
- * @param _c
- */
-ts.member.rechargeControlCenter = function(_c){
-	_c = _c == null || typeof _c == 'undefined' ? {} : _c;
-	
-	if(ts.member.rechargeMember == null || typeof ts.member.rechargeMember == 'undefined'){
-		Util.msg.tip('未读取会员信息, 请先刷卡.');
-		return;
-	}
-	
-	if(ts.member.rechargeMember.memberType.attributeValue != 0){
-		Util.msg.alert({
-			renderTo : 'tableSelectMgr',
-			msg : '积分属性会员不允许充值, 请重新刷卡.'
-		});
-		return;
-	}
-	
-	var rechargeMoney = $('#rd_numRechargeMoney');
-	var rechargeType = $('#rd_comboRechargeType');
-	var payMannerMoney = $('#rd_numPayMannerMoney');
-//	var comment = $('#rd_txtRechargeComment');
-	
-	if(!rechargeMoney.val()){
-		Util.msg.alert({
-			topTip : true,
-			msg : '请输入充值金额'
-		});
-		return;
-	}
-	
-	if(!payMannerMoney.val()){
-		Util.msg.alert({
-			topTip : true,
-			msg : '请输入账户充额'
-		});
-		return;		
-	}
-	//设置cookie
-	if($('#chbSendCharge').attr('checked')){
-		setcookie(document.domain+'_chargeSms', true);
-	}else{
-		delcookie(document.domain+'_chargeSms');
-	}
-	
-	Util.LM.show();
-	
-	$.post('../OperateMember.do', {
-		dataSource : 'charge',
-		memberID : ts.member.rechargeMember.id,
-		rechargeMoney : rechargeMoney.val(),
-		rechargeType : rechargeType.val(),
-		payMannerMoney : payMannerMoney.val(),
-		isPrint : $('#chbPrintRecharge').attr('checked') ? true : false,
-		sendSms : $('#chbSendCharge').attr('checked') ? true : false,
-		orientedPrinter : getcookie(document.domain + '_printers')
-	}, function(jr){
-		Util.LM.hide();
-		if(jr.success){
-			ts.member.closeMemberChargeWin();
-			//更新短信
-			Util.sys.checkSmStat();
-			Util.msg.alert({
-				topTip : true,
-				msg : jr.msg
-			});
-		}else{
-			Util.msg.alert({
-				renderTo : 'tableSelectMgr',
-				msg : jr.msg
-			});
-		}		
-	});
 };
 
 
