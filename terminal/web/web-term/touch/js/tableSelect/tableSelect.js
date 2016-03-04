@@ -860,8 +860,6 @@ $(function(){
 			}, 300);
 		});
 		
-		
-		//TODO
 		//会员充值
 		$('#memberRecharge_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
@@ -870,6 +868,16 @@ $(function(){
 				memberRecharge.open();
 			},300);
 		});
+		
+		//补发实体卡
+		$('#patchCard_a_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			setTimeout(function(){
+				var patchCardPopup = new PatchCardPopup();
+				patchCardPopup.open();
+			},300);
+		});
+
 		//转台
 		$('#tranTable_a_tableSelect').click(function(){
 			var askTablePopup = new AskTablePopup({
@@ -2066,4 +2074,3 @@ ts.member.closeMemberConsumeDetailWin = function(){
 	$('#consumeDetail_memberName').val('');
 	$('#front_memberConsumeDetailBody').html('');
 };
-

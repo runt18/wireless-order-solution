@@ -1,0 +1,68 @@
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+
+	<div id="container_div_patchCard" data-dismissible="false" class="ui-overlay-shadow ui-corner-all" style="width:900px;z-index: 1102;position: absolute; top: -40px; left: 50%; margin: -200px 0px 0px -450px;background-color: white;display:block;" align="center">	
+	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
+	        	补发实体卡
+	    </div> 
+	    <table>
+		    <tr>
+		    	<td></td>
+		    	<td colspan="3">
+		    		<input placeholder="手机号/卡号/微信卡号" style="font-size:20px;font-weight: bold;" id="loadMember_input_patchCard">
+		    	</td>
+		    	<td>
+		    		<a data-role="button" id="loadMember_button_patchCard" class="numberInputStyle" data-theme="b" >读取会员</a>
+		    	</td>
+		    	<td></td>
+		    </tr>
+	    	<tr>
+	    		<td class="readMemberTd">账户余额:</td>
+	    		<td class="readMemberTdValue" style="width:150px;"><label id="totalBalance_label_patchCard">----</label></td>    	
+	    		<td class="readMemberTd">基础余额:</td>
+	    		<td class="readMemberTdValue" style="width:150px;"><label id="baseBalance_label_patchCard">----</label></td>
+	    		<td class="readMemberTd">赠送余额:</td>
+	    		<td class="readMemberTdValue" style="width:140px;"><label id="extraBalance_label_patchCard">----</label></td>       			
+	    	</tr>
+	    	<tr>
+	    		<td class="readMemberTd">会员名称:</td>
+	    		<td class="readMemberTdValue"><label id="memberName_label_patchCard">----</label></td>
+	    		<td class="readMemberTd">会员类别:</td>
+	    		<td class="readMemberTdValue"><label id="memberType_label_patchCard">----</label></td>   
+	    		<td class="readMemberTd">性别:</td>
+	    		<td class="readMemberTdValue"><label id="memberSex_label_patchCard">----</label></td>     		   		
+	    	</tr> 
+	    	<tr>
+	    		<td class="readMemberTd">手机:</td>
+	    		<td class="readMemberTdValue"><label id="memberMobileNum_label_patchCard">----</label></td>
+	    		<td class="readMemberTd">实体卡号:</td>
+	    		<td class="readMemberTdValue">
+	    			<label id="memberCard_label_patchCard" style="display:block;">----</label>
+	    			<div id="setMemberCard_div_patchCard" style="display:none;">
+	    				<input type="text" placeholder="实体卡号" id="setMemberCard_input_patchCard"/>
+	    			</div>
+	    		</td>   
+	    		<td class="readMemberTd">微信会员卡:</td>
+	    		<td class="readMemberTdValue"><label id="weixinMemberCard_label_patchCard">----</label></td>     		   		
+	    	</tr> 	    		    	
+	    </table>
+		    
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom ui-bar-b" style="height: 47px;">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="checkpatchCard_a_patchCard">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="canelpatchCard_a_patchCard">取消</a>		 
+			 </div>
+			 <div id="searchMemberType_div_patchCard" data-theme="d" class="payment_searchMemberType" style="z-index:20008;width:100px;position:absolute;top:55px;left:80%;display:none;">
+				<ul id="searchMemberTypeCmp_ul_patchCard" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+					<li  class="popupButtonList" value="1"><a >手机卡</a></li>
+					<li  class="popupButtonList" value="3"><a >会员实体卡</a></li>
+					<li  class="popupButtonList" value="2"><a >微信卡</a></li>
+				</ul>
+			</div>
+	    </div>	
+	</div>		
+	
+</body>
+</html>

@@ -148,7 +148,7 @@ function MemberRechargePopup(){
 	function writeMemberMsg(self,member){
 		var memberType = member.memberType ? member.memberType : {};
 		
-		self.find('[id=PayMannerMoney_input_recharge]').val('');
+		self.find('[id=payMannerMoney_input_recharge]').val('');
 		self.find('[id=rechargeMoney_input_recharge]').val('');
 		
 		self.find('[id=baseBalance_label_recharge]').text(member.baseBalance);
@@ -178,7 +178,7 @@ function MemberRechargePopup(){
 	
 		var rechargeMoney = self.find('[id=rechargeMoney_input_recharge]');
 		var rechargeType = self.find('[id=rechargeType_select_recharge]');
-		var payMannerMoney = self.find('[id=PayMannerMoney_input_recharge]');
+		var payMannerMoney = self.find('[id=payMannerMoney_input_recharge]');
 		
 		if(!rechargeMoney.val()){
 			Util.msg.tip('请输入充值金额');

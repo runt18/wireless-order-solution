@@ -110,6 +110,8 @@
 <script type="text/javascript" src="./js/popup/feastPay/feastPay.js"></script>
 <!-- 会员充值 -->
 <script type="text/javascript" src="./js/popup/member/recharge.js"></script>
+<!-- 补发实体卡 -->
+<script type="text/javascript" src="./js/popup/member/patchCard.js?v=<%= v %>"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -149,6 +151,7 @@
 			<li class="popupButtonList" id="memberRecharge_a_tableSelect"><a >会员充值</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberConsumeDetailWin()"><a >消费明细</a></li>
+			<li class="popupButtonList" id="patchCard_a_tableSelect"><a>补发实体卡</a></li>
 			<li class="popupButtonList" id="memberWxBind_li_tableSelect"><a>微信会员绑定</a></li>
 			<li class="popupButtonList" id="fastIssue_a_tableSelect"><a >快速发券</a></li>
 			<li class="popupButtonList" id="fastUse_a_tableSelect"><a >快速用券</a></li>
