@@ -528,6 +528,9 @@ Ext.onReady(function(){
 									method : 'post'
 								});
 								thiz.center();	
+								thiz.orderId = orderID;
+								thiz.foodStatus = 'isReturn';
+								
 							}
 						}
 					});

@@ -17,7 +17,7 @@
 		
 		var sendToStatisticsOperateType = c.operateType;
 		var sendToStatisticsOperatePayType = c.payType;
-		
+		var sendToStatisticsOperatePayTypeId = c.payTypeId;
 		
 		if(!sendToStatisticsPageHours.opening){
 			sendToStatisticsPageHours.openingText = "00:00";
@@ -375,7 +375,7 @@
 								});
 								
 								if(sendToStatisticsOperatePayType){
-									Ext.getCmp('comboPayType').setValue(sendToStatisticsOperatePayType);
+									Ext.getCmp('comboPayType').setValue(sendToStatisticsOperatePayTypeId);
 								}
 							
 								
@@ -923,9 +923,10 @@ Ext.onReady(function(){
 						totalShouldPay += temp.total;
 						totalActual += temp.actual;
 						
+					
 						trPayTypeContent += (String.format(trPayIncomeModel, 
 								temp.payType, 
-								'<a href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, payType:\''+ temp.payType +'\'})">' + temp.amount + '</a>', 
+								'<a href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, payType:\''+ temp.payType +'\', payTypeId : \'' + temp.id + '\'})">' + temp.amount + '</a>', 
 								temp.total.toFixed(2), 
 								temp.actual.toFixed(2)
 							)

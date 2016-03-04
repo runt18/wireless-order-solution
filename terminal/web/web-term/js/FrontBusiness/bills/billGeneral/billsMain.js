@@ -93,13 +93,11 @@ function showViewBillWin(){
 				thiz.load({
 					url : '../window/history/viewBillDetail.jsp', 
 					scripts : true,
-					params : {
-						orderId : sd.id,
-						queryType : 'Today'
-					},
 					method : 'post'
 				});
 				thiz.center();	
+				thiz.orderId = sd.id;
+				thiz.queryType = 'Today';
 			}
 		}
 	});
