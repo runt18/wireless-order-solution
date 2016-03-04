@@ -589,13 +589,10 @@ function comi_showBillDetailWin(orderID){
 				thiz.load({
 					url : '../window/history/viewBillDetail.jsp', 
 					scripts : true,
-					params : {
-						orderId : sd.orderId,
-						queryType : 'History'
-					},
 					method : 'post'
 				});
 				thiz.center();	
+				thiz.orderId = sd.orderId;
 			}
 		}
 	});

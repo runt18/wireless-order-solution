@@ -295,10 +295,6 @@
 					thiz.load({
 						url : '../window/history/orderDetail.jsp', 
 						scripts : true,
-						params : {
-							orderId : sd.id,
-							foodStatus : foodStatus
-						},
 						method : 'post'
 					});
 					thiz.center();	

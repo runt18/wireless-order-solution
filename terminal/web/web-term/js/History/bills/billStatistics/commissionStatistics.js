@@ -437,13 +437,11 @@ Ext.onReady(function(){
 								thiz.load({
 									url : '../window/history/orderDetail.jsp', 
 									scripts : true,
-									params : {
-										orderId : sd.orderId,
-										foodStatus : 'isCommission'
-									},
 									method : 'post'
 								});
-								thiz.center();	
+								thiz.center();
+								thiz.orderId = sd.orderId;
+								thiz.foodStatus = 'isCommission';
 							}
 						}
 					});

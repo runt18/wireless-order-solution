@@ -32,13 +32,12 @@ function member_showViewBillWin(){
 				thiz.load({
 					url : '../window/history/viewBillDetail.jsp', 
 					scripts : true,
-					params : {
-						orderId : sd.orderId,
-						queryType : queryType
-					},
 					method : 'post'
 				});
 				thiz.center();	
+				thiz.orderId = sd.orderId;
+				thiz.queryType = queryType;
+				
 			}
 		}
 	});

@@ -501,13 +501,11 @@ Ext.onReady(function(){
 								thiz.load({
 									url : '../window/history/orderDetail.jsp', 
 									scripts : true,
-									params : {
-										orderId : orderID,
-										foodStatus : 'isRepaid'
-									},
 									method : 'post'
 								});
 								thiz.center();	
+								thiz.orderId = orderID;
+								thiz.foodStatus = 'isRepaid';
 							}
 						}
 					});

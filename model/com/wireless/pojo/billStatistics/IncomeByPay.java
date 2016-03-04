@@ -55,6 +55,7 @@ public class IncomeByPay implements Jsonable{
 		@Override
 		public JsonMap toJsonMap(int flag) {
 			JsonMap jm = new JsonMap();
+			jm.putInt("id", this.payType.getId());
 			jm.putString("payType", this.payType.getName());
 			jm.putFloat("total", this.total);
 			jm.putFloat("actual", this.actual);
