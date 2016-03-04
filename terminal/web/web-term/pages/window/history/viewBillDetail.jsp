@@ -4,11 +4,6 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Insert title here</title>
-<script type="text/javascript">
-	var orderID =  '<%=request.getParameter("orderId") %>';
- 	var queryType =  '<%=request.getParameter("queryType") %>';
-	
-</script>
 <script type="text/javascript" src="../../js/window/history/viewBillDetail.js"></script>
 </head>
 <body>

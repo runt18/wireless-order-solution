@@ -1,5 +1,6 @@
 package com.wireless.Actions.orderMgr;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,31 +26,37 @@ import com.wireless.util.DataPaging;
 
 public class QueryDetailAction extends Action {
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
-		List<OrderFood> list = null;
-		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String orderID = request.getParameter("orderID");
+		final String tableID = request.getParameter("tableID");
+		final String queryType = request.getParameter("queryType");
+		final String isPaging = request.getParameter("isPaging");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		
+		final JObject jObject = new JObject();
+
 		try{
-			
-			String pin = (String)request.getAttribute("pin");
+
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			String orderID = request.getParameter("orderID");
-			String tableID = request.getParameter("tableID");
-			String queryType = request.getParameter("queryType");
-			
-			
-			if (queryType.equals("Today")) {
+			List<OrderFood> list = null;
+
+			if (queryType.equalsIgnoreCase("today")) {
 				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.TODAY).setOrder(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
-			}else if (queryType.equals("TodayByTbl")) {
+			}else if (queryType.equalsIgnoreCase("TodayByTbl")) {
 				list = OrderFoodDao.getSingleDetailByTableId(staff, Integer.parseInt(tableID));
 				if(orderID != null && !orderID.trim().isEmpty()){
 					final float totalPrice = OrderDao.getById(staff, Integer.parseInt(orderID), DateType.TODAY).calcTotalPrice();
-					jobject.setExtra(new Jsonable() {
+					jObject.setExtra(new Jsonable() {
 						
 						@Override
 						public JsonMap toJsonMap(int flag) {
@@ -67,20 +74,26 @@ public class QueryDetailAction extends Action {
 			}else {
 				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.HISTORY).setOrder(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
 			}
-		}catch(BusinessException e){
+			
+			if(list != null){
+				if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+					list = DataPaging.getPagingData(list, isPaging, start, limit);
+				}
+				jObject.setRoot(list);
+			}
+
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
+			
 		}finally{
-			if(list != null){
-				list = DataPaging.getPagingData(list, isPaging, start, limit);
-				jobject.setRoot(list);
-			}
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
+		
 		return null;
 	}
 	

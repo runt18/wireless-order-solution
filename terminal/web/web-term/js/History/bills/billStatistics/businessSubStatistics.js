@@ -1,5 +1,496 @@
-Ext.onReady(function(){
+	function linkToBusinessStatistics(c){
+		var dateBegin = Ext.getCmp('businessSub_dateSearchDateBegin');
+		var dateEnd = Ext.getCmp('businessSub_dateSearchDateEnd');
+		var sendToStatisticsPageHours;
+		if(!dateBegin.isValid() || !dateEnd.isValid()){
+			return;
+		}
+		
+		//传递给统计页面的时间段
+		var sendToStatisticsPageBeginDate = dateBegin.getValue();
+		var sendToStatisticsPageEndDate = dateEnd.getValue();
+		
+		sendToStatisticsPageHours = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessSub_'}).data; 
+		sendToStatisticsPageHours.hourComboValue = Ext.getCmp('businessSub_comboBusinessHour').getValue();
+		
+		var sendToStatisticsRegion = Ext.getCmp('businessSub_comboRegion').getValue();
+		
+		var sendToStatisticsOperateType = c.operateType;
+		var sendToStatisticsOperatePayType = c.payType;
+		
+		
+		if(!sendToStatisticsPageHours.opening){
+			sendToStatisticsPageHours.openingText = "00:00";
+			sendToStatisticsPageHours.endingText = "00:00";
+		}else{
+			sendToStatisticsPageHours.openingText = sendToStatisticsPageHours.opening;
+			sendToStatisticsPageHours.endingText = sendToStatisticsPageHours.ending;
+		}
+		
+//		sendToPageOperation = true;
+		
+		var businessSubStatisticsLoading = new Ext.LoadMask(document.body, {
+			msg : '正在获取数据...'
+		});
+		
+		if(c.type == 1){//折扣统计
+			Ext.ux.addTab('discountStatistics', '折扣统计', 'History_Module/DiscountStatistics.html', function(){
 
+				businessSubStatisticsLoading.show();
+				(function(){
+					if(Ext.getCmp('branch_combo_discount').getValue()){
+						Ext.getCmp('discount_comboBusinessHour').setValue('');
+						//门店
+						Ext.getCmp('branch_combo_discount').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+						
+						var isJump = true;
+						Ext.getCmp('branch_combo_discount').fireEvent('select', isJump);
+						
+						(function(){
+							if(Ext.getCmp('discount_comboBusinessHour').getValue()){
+								Ext.getCmp('beginDate_combo_discountStatistics').setValue(sendToStatisticsPageBeginDate);
+								Ext.getCmp('endDate_combo_discountStatistics').setValue(sendToStatisticsPageEndDate);	
+								Ext.getCmp('discount_deptCombo').setValue(sendToStatisticsRegion);
+								
+								discount_hours = sendToStatisticsPageHours;
+								
+								Ext.getCmp('discount_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+discount_hours.openingText+'</font>');
+								Ext.getCmp('discount_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+discount_hours.endingText+'</font>');
+								Ext.getCmp('discount_comboBusinessHour').setValue(discount_hours.hourComboValue);
+								
+								Ext.getCmp('search_btn_discountStatistics').handler();
+								
+								businessSubStatisticsLoading.hide();
+							}else{
+								setTimeout(arguments.callee, 500);
+							}
+						})();
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+				})();
+				
+			});
+			
+		}else if(c.type == 2){//赠送统计
+			Ext.ux.addTab('giftStatistics', '赠送统计', 'History_Module/GiftStatistics.html', function(){
+				
+				businessSubStatisticsLoading.show();
+				
+				(function(){
+					if(Ext.getCmp('branch_combo_gift').getValue()){
+						//设置市别为空
+						Ext.getCmp('giftStatistic_comboBusinessHour').setValue('');
+					
+						//设置门店选择的值
+						Ext.getCmp('branch_combo_gift').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+						
+						//设置是跳转页面
+						var isJump = true;
+						Ext.getCmp('branch_combo_gift').fireEvent('select', isJump);
+						
+						(function(){			
+							if(Ext.getCmp('giftStatistic_comboBusinessHour').getValue()){
+								Ext.getCmp('beginDate_combo_giftStatistics').setValue(sendToStatisticsPageBeginDate);
+								Ext.getCmp('endDate_combo_giftStatistics').setValue(sendToStatisticsPageEndDate);		
+								
+								giftStatistic_hours = sendToStatisticsPageHours;
+								
+								Ext.getCmp('giftStatistic_comboRegion').setValue(sendToStatisticsRegion);
+								
+								Ext.getCmp('giftStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+giftStatistic_hours.openingText+'</font>');
+								Ext.getCmp('giftStatistic_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+giftStatistic_hours.endingText+'</font>');
+								Ext.getCmp('giftStatistic_comboBusinessHour').setValue(giftStatistic_hours.hourComboValue);
+								
+								Ext.getCmp('giftStatistic_btnSearch').handler();
+								businessSubStatisticsLoading.hide();
+							}else{
+								setTimeout(arguments.callee, 500);
+							}
+						})();
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+				})();
+				
+			});
+			
+		}else if(c.type == 3){//退菜统计
+			Ext.ux.addTab('cancelledFood', '退菜统计', 'History_Module/CancelledFood.html',function(){
+				
+				businessSubStatisticsLoading.show();
+				
+				(function(){
+					
+					if(Ext.getCmp('branch_combo_cancelledFood').getValue()){
+						
+						//设置市别为空
+						Ext.getCmp('cancel_comboBusinessHour').setValue('');
+						
+						//设置门店选择的值
+						Ext.getCmp('branch_combo_cancelledFood').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+						
+						//设置是跳转页面
+						var isJump = true;
+						Ext.getCmp('branch_combo_cancelledFood').fireEvent('select', isJump);
+						
+						(function(){
+							if(Ext.getCmp('cancel_comboBusinessHour').getValue()){
+								
+								//设置开始日期和结束日期
+								Ext.getCmp('beginDate_combo_cancelledFood').setValue(sendToStatisticsPageBeginDate);
+								Ext.getCmp('endDate_combo_cancelledFood').setValue(sendToStatisticsPageEndDate);
+								
+								cancel_hours = sendToStatisticsPageHours;
+								
+								//设置市别文字
+								Ext.getCmp('cancel_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+cancel_hours.openingText+'</font>');
+								Ext.getCmp('cancel_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+cancel_hours.endingText+'</font>');
+								Ext.getCmp('cancel_comboBusinessHour').setValue(cancel_hours.hourComboValue);
+								
+								Ext.getCmp('cancel_btnSearch').handler();
+								businessSubStatisticsLoading.hide();
+							}else{
+								setTimeout(arguments.callee, 500);
+							}
+						})();
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+				})();
+				
+			});	
+		}else if(c.type == 4){//反结账统计
+			Ext.ux.addTab('repaidStatistics', '反结账统计', 'History_Module/RepaidStatistics.html', function(){
+				businessSubStatisticsLoading.show();
+				(function(){
+					
+					if(Ext.getCmp('branch_combo_repaidStatistics').getValue()){
+						//设置市别为空
+						Ext.getCmp('repaid_comboBusinessHour').setValue('');
+						
+						//设置门店选择的值
+						Ext.getCmp('branch_combo_repaidStatistics').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+						
+						//设置是跳转页面
+						var isJump = true;
+						Ext.getCmp('branch_combo_repaidStatistics').fireEvent('select', isJump);
+						
+						(function(){
+							
+							if(Ext.getCmp('repaid_comboBusinessHour').getValue()){
+								Ext.getCmp('beginDate_combo_repaid').setValue(sendToStatisticsPageBeginDate);
+								Ext.getCmp('endDate_combo_repaind').setValue(sendToStatisticsPageEndDate);	
+								
+								repaid_hours = sendToStatisticsPageHours;
+								
+								Ext.getCmp('repaid_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+repaid_hours.openingText+'</font>');
+								Ext.getCmp('repaid_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+repaid_hours.endingText+'</font>');
+								Ext.getCmp('repaid_comboBusinessHour').setValue(repaid_hours.hourComboValue);	
+								
+								Ext.getCmp('repaid_btnSearch').handler();
+								
+								businessSubStatisticsLoading.hide();
+							}else{
+								setTimeout(arguments.callee, 500);
+							}
+							
+						})();
+						
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+				})();
+			});
+		}else if(c.type == 5){//部门统计
+			sendToStatisticsPageDeptId = c.deptId;
+			sendToStatisticsPageDeptName = c.deptName;
+			Ext.ux.addTab('salesSubStatistics', '销售统计', 'History_Module/SalesSubStatistics.html', function(){
+				businessSubStatisticsLoading.show();
+				
+				(function(){
+					Ext.getCmp('salesSubWinTabPanel_tabPanel_salesSubStatistics').setActiveTab(Ext.getCmp('deptStatPanel_panel_salesSubStatistics'));
+					if(Ext.getCmp('salesSubWinTabPanel_tabPanel_salesSubStatistics').getActiveTab().id == 'deptStatPanel_panel_salesSubStatistics'){
+						if(Ext.getCmp('branch_combo_deptStatistics').getValue()){
+							//设置市别为空
+							Ext.getCmp('deptStatistic_comboBusinessHour').setValue('');
+							
+							//设置门店选择的值
+							Ext.getCmp('branch_combo_deptStatistics').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+							
+							//设置是跳转页面
+							var isJump = true;
+							Ext.getCmp('branch_combo_deptStatistics').fireEvent('select', isJump);
+							
+							(function(){
+								if(Ext.getCmp('deptStatistic_comboBusinessHour').getValue()){
+									Ext.getCmp('deptStatistic_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
+									Ext.getCmp('deptStatistic_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);
+									
+									salesSub_hours = sendToStatisticsPageHours;
+									
+									Ext.getCmp('deptStatistic_comboRegion').setValue(sendToStatisticsRegion);
+									
+									Ext.getCmp('deptStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+salesSub_hours.openingText+'</font>');
+									Ext.getCmp('deptStatistic_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+salesSub_hours.endingText+'</font>');
+									Ext.getCmp('deptStatistic_comboBusinessHour').setValue(salesSub_hours.hourComboValue);
+									
+									Ext.getCmp('salesSubDeptId_textField_salesSub').setValue(sendToStatisticsPageDeptId);
+									Ext.getCmp('salesSubDeptName_textField_salesSub').setValue(sendToStatisticsPageDeptName);
+									
+									Ext.getCmp('deptStatistic_btnSearch').handler();
+									businessSubStatisticsLoading.hide();
+								}else{
+									setTimeout(arguments.callee, 500);
+								}
+							})();
+						}else{
+							setTimeout(arguments.callee, 500);
+						}
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+				})();
+				
+			});
+		}else if(c.type == 6){//收款统计
+			Ext.ux.addTab('businessReceiptsStatistics', '收款统计', 'History_Module/BusinessReceiptsStatistics.html', function(){
+				businessSubStatisticsLoading.show();
+				
+				(function(){
+					
+					if(Ext.getCmp('branchSelect_combo_businessReceips').getValue()){
+						
+						//设置市别为空
+						Ext.getCmp('businessReceipt_comboBusinessHour').setValue('');
+						
+						//设置门店选择的值
+						Ext.getCmp('branchSelect_combo_businessReceips').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+						
+						//设置是跳转页面
+						var isJump = true;
+						Ext.getCmp('branchSelect_combo_businessReceips').fireEvent('select', isJump);
+						
+						(function(){
+							if(Ext.getCmp('businessReceipt_comboBusinessHour').getValue()){
+								
+								Ext.getCmp('beginDate_combo_receipts').setValue(sendToStatisticsPageBeginDate);
+								Ext.getCmp('endDate_combo_receipts').setValue(sendToStatisticsPageEndDate);
+								
+								receipt_hours = sendToStatisticsPageHours;
+								
+								Ext.getCmp('regionSelect_combo_businessReceips').setValue(sendToStatisticsRegion);
+								
+								Ext.getCmp('businessReceipt_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+receipt_hours.openingText+'</font>');
+								Ext.getCmp('businessReceipt_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+receipt_hours.endingText+'</font>');
+								Ext.getCmp('businessReceipt_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
+								Ext.getCmp('businessReceipt_btnSearch').handler();
+								businessSubStatisticsLoading.hide();
+								
+							}else{
+								setTimeout(arguments.callee, 500);
+							}
+						})();
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+					
+				})();
+				
+			});			
+		}else if(c.type == 7){//提成统计
+			Ext.ux.addTab('commissionStatistics', '提成统计', 'History_Module/CommissionStatistics.html', function(){
+				
+				businessSubStatisticsLoading.show();
+				
+				(function(){
+					if(Ext.getCmp('branch_combo_commission').getValue()){
+						
+						//设置市别为空
+						Ext.getCmp('commission_comboBusinessHour').setValue('');
+						
+						//设置门店选择的值
+						Ext.getCmp('branch_combo_commission').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+						
+						//设置是跳转页面
+						var isJump = true;
+						Ext.getCmp('branch_combo_commission').fireEvent('select', isJump);
+						
+						(function(){
+							if(Ext.getCmp('commission_comboBusinessHour').getValue()){
+								Ext.getCmp('beginDate_combo_commission').setValue(sendToStatisticsPageBeginDate);
+								Ext.getCmp('endDate_combo_commission').setValue(sendToStatisticsPageEndDate);	
+								
+								commission_hours = sendToStatisticsPageHours;
+								
+								Ext.getCmp('commission_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+commission_hours.openingText+'</font>');
+								Ext.getCmp('commission_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+commission_hours.endingText+'</font>');
+								Ext.getCmp('commission_comboBusinessHour').setValue(commission_hours.hourComboValue);	
+								
+								
+								Ext.getCmp('commission_btnSearch').handler();
+								businessSubStatisticsLoading.hide();
+							}else{
+								setTimeout(arguments.callee, 500);
+							}
+						})();
+						
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+				})();
+				
+			});			
+		}else if(c.type == 8){//历史账单
+			Ext.ux.addTab('history', '历史账单', 'History_Module/HistoryStatistics.html', function(){
+				businessSubStatisticsLoading.show();
+				
+				(function(){
+					if(Ext.getCmp('branch_combo_history').getValue()){
+						//设置市别为空
+						Ext.getCmp('history_comboBusinessHour').setValue('');
+						
+						//设置门店选择的值
+						Ext.getCmp('branch_combo_history').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+						
+						//设置是跳转页面
+						var isJump = true;
+						Ext.getCmp('branch_combo_history').fireEvent('select', isJump);
+						
+						(function(){
+							if(Ext.getCmp('history_comboBusinessHour').getValue()){
+								
+								Ext.getCmp('dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
+								Ext.getCmp('dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
+								
+								Ext.getCmp('history_comboRegion').setValue(sendToStatisticsRegion);
+								
+								history_hours = sendToStatisticsPageHours;
+								
+								$('input[name="conditionRadio"]').each(function(){
+									if(this.value == sendToStatisticsOperateType){
+										Ext.getCmp(this.id).setValue(true);
+										Ext.getCmp(this.id).fireEvent('check', Ext.getCmp(this.id), true);
+									}
+								});
+								
+								if(sendToStatisticsOperatePayType){
+									Ext.getCmp('comboPayType').setValue(sendToStatisticsOperatePayType);
+								}
+							
+								
+								Ext.getCmp('txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+history_hours.openingText+'</font>');
+								Ext.getCmp('txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+history_hours.endingText+'</font>');
+								Ext.getCmp('history_comboBusinessHour').setValue(history_hours.hourComboValue);
+								
+								Ext.getCmp('btnSreachForMainOrderGrid').handler();
+								
+								businessSubStatisticsLoading.hide();
+							}else{
+								setTimeout(arguments.callee, 500);
+							}
+						})();
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+				})();
+			});			
+		}else if(c.type == 9){//抹数统计
+			Ext.ux.addTab('eraseStatistics', '抹数统计', 'History_Module/EraseStatistic.html', function(){
+				businessSubStatisticsLoading.show();
+				
+				(function(){
+					if(Ext.getCmp('branch_combo_eraseStatistics').getValue()){
+						
+						//设置市别为空
+						Ext.getCmp('erase_comboBusinessHour').setValue('');
+						
+						//设置门店选择的值
+						Ext.getCmp('branch_combo_eraseStatistics').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+						
+						//设置是跳转页面
+						var isJump = true;
+						Ext.getCmp('branch_combo_eraseStatistics').fireEvent('select', isJump);
+						
+						(function(){
+							if(Ext.getCmp('erase_comboBusinessHour').getValue()){
+								
+								Ext.getCmp('beginDate_combo_erase').setValue(sendToStatisticsPageBeginDate);
+								Ext.getCmp('endDate_combo_erase').setValue(sendToStatisticsPageEndDate);	
+								
+								erase_hours = sendToStatisticsPageHours;
+								
+								Ext.getCmp('erase_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+erase_hours.openingText+'</font>');
+								Ext.getCmp('erase_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+erase_hours.endingText+'</font>');
+								Ext.getCmp('erase_comboBusinessHour').setValue(erase_hours.hourComboValue);	
+								
+								Ext.getCmp('erase_btnSearch').handler();
+								businessSubStatisticsLoading.hide();
+								
+							}else{
+								setTimeout(arguments.callee, 500);
+							}
+						})();
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+				})();
+			});			
+		}else if(c.type == 10){//充值统计
+			Ext.ux.addTab('memberChargeStatistics', '充值统计', 'Client_Module/memberChargeStatistics.html');			
+		}else if(c.type == 11){//取款统计
+			Ext.ux.addTab('memberRefundStatistics', '取款统计', 'Client_Module/memberRefundStatistics.html');			
+		}else if(c.type == 13){//优惠券统计
+			Ext.ux.addTab('couponStatistics', '优惠券统计 ', 'History_Module/CouponStatistics.html', function(){
+				businessSubStatisticsLoading.show();
+				
+				(function(){
+					
+					if(Ext.getCmp('branch_combo_coupon').getValue()){
+						
+						//设置市别为空
+						Ext.getCmp('coupon_comboBusinessHour').setValue('');
+						
+						//设置门店选择的值
+						Ext.getCmp('branch_combo_coupon').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+						
+						//设置是跳转页面
+						var isJump = true;
+						Ext.getCmp('branch_combo_coupon').fireEvent('select', isJump);
+						
+						(function(){
+							if(Ext.getCmp('coupon_comboBusinessHour').getValue()){
+								Ext.getCmp('beginDate_combo_coupon').setValue(sendToStatisticsPageBeginDate);
+								Ext.getCmp('endDate_combo_coupon').setValue(sendToStatisticsPageEndDate);
+								
+								hours = sendToStatisticsPageHours;
+								
+								
+								Ext.getCmp('coupon_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">' + hours.openingText + '</font>');
+								Ext.getCmp('coupon_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">' + hours.endingText + '</font>');
+								Ext.getCmp('coupon_comboBusinessHour').setValue(hours.hourComboValue);	
+								
+								Ext.getCmp('coupon_btnSearch').handler();
+								businessSubStatisticsLoading.hide();
+								
+							}else{
+								setTimeout(arguments.callee, 500);
+							}
+						})();
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+				})();
+			});
+		}else{
+			return;
+		}
+	}
+Ext.onReady(function(){
+	
+
+	
+	
 	var businessSubGeneralPanel;
 	
 	function newDate(str) { 
@@ -315,6 +806,31 @@ Ext.onReady(function(){
 						Ext.getCmp('businessSub_comboRegion').setValue(-1);
 					}
 				});
+				
+				
+				var hour = [[-1, '全天']];
+				Ext.Ajax.request({
+					url : '../../OperateBusinessHour.do',
+					params : {
+						dataSource : 'getByCond',
+						branchId : branchSelect_combo_businessSubStatistics.getValue()
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						for(var i = 0; i < jr.root.length; i++){
+							hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+						}
+						
+						hour.push([-2, '自定义']);
+						
+						Ext.getCmp('businessSub_comboBusinessHour').store.loadData(hour);
+						Ext.getCmp('businessSub_comboBusinessHour').setValue(-1);
+					}
+				});
+				
+				
+				
 				Ext.getCmp('businessSub_btnSearch').handler();
 			}
 		}

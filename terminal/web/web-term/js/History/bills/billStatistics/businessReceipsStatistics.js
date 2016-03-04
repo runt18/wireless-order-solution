@@ -1,9 +1,7 @@
 ﻿
 $(function(){
 
-	var setBranch =false;
-	var setRegion = false;
-	receivablesStaticRecordCount = 93;
+	var receivablesStaticRecordCount = 93;
 	var highChart;
 	
 	var businessPanelHeight = 0, panelDrag = false;
@@ -110,8 +108,8 @@ $(function(){
 	}
 	
 	function recipe_showChart(jdata){
-		var dateBegin = Ext.util.Format.date(Ext.getCmp('receipts_dateSearchDateBegin').getValue(), 'Y-m-d');
-		var dateEnd = Ext.util.Format.date(Ext.getCmp('receipts_dateSearchDateEnd').getValue(), 'Y-m-d');
+		var dateBegin = Ext.util.Format.date(Ext.getCmp('beginDate_combo_receipts').getValue(), 'Y-m-d');
+		var dateEnd = Ext.util.Format.date(Ext.getCmp('endDate_combo_receipts').getValue(), 'Y-m-d');
 		
 		var hourBegin = Ext.getCmp('businessReceipt_txtBusinessHourBegin').getEl().dom.textContent;
 		var hourEnd = Ext.getCmp('businessReceipt_txtBusinessHourEnd').getEl().dom.textContent;
@@ -327,7 +325,7 @@ $(function(){
 		
 		var receipts_beginDate = new Ext.form.DateField({
 			xtype : 'datefield',	
-			id : 'receipts_dateSearchDateBegin',
+			id : 'beginDate_combo_receipts',
 			format : 'Y-m-d',
 			width : 100,
 			maxValue : new Date(),
@@ -336,7 +334,7 @@ $(function(){
 		});
 		var receipts_endDate = new Ext.form.DateField({
 			xtype : 'datefield',
-			id : 'receipts_dateSearchDateEnd',
+			id : 'endDate_combo_receipts',
 			format : 'Y-m-d',
 			width : 100,
 			maxValue : new Date(),
@@ -353,8 +351,8 @@ $(function(){
 		});
 		
 		//区域选择
-		
 		var regionSelect_combo_businessReceips = new Ext.form.ComboBox({
+			id : 'regionSelect_combo_businessReceips',
 			readOnly : false,
 			forceSelection : true,
 			width : 103,
@@ -398,6 +396,7 @@ $(function(){
 		
 		//门店选择
 		var branchSelect_combo_businessReceips = new Ext.form.ComboBox({
+			id : 'branchSelect_combo_businessReceips',
 			readOnly : false,
 			forceSelection : true,
 			width : 123,
@@ -435,11 +434,7 @@ $(function(){
 							
 							
 							thiz.store.loadData(data);
-							if(setBranch){
-								thiz.setValue(sendToStatisticsBranch);
-							}else{
-								thiz.setValue(jr.root[0].id);
-							}
+							thiz.setValue(jr.root[0].id);
 							thiz.fireEvent('select');
 						},
 						failure : function(res, opt){
@@ -448,7 +443,9 @@ $(function(){
 						}
 					});
 				},
-				select : function(){
+				select : function(isJump){
+					
+//					/加载区域
 					var data = [[-1,'全部']];
 					Ext.Ajax.request({
 						url : '../../OperateRegion.do',
@@ -462,15 +459,39 @@ $(function(){
 								data.push([jr.root[i]['id'], jr.root[i]['name']]);
 							}
 							regionSelect_combo_businessReceips.store.loadData(data);
-							if(setRegion){
-								regionSelect_combo_businessReceips.setValue(sendToStatisticsRegion);
-							}else{
-								regionSelect_combo_businessReceips.setValue(-1);
-							}
+							regionSelect_combo_businessReceips.setValue(-1);
 							
 						}
 					});
-					Ext.getCmp('businessReceipt_btnSearch').handler();
+					
+					//加载市别
+					var hour = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateBusinessHour.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branchSelect_combo_businessReceips.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+							}
+							
+							hour.push([-2, '自定义']);
+							
+							Ext.getCmp('businessReceipt_comboBusinessHour').store.loadData(hour);
+							Ext.getCmp('businessReceipt_comboBusinessHour').setValue(-1);
+						}
+					});
+					
+					
+					if(!isJump){
+						Ext.getCmp('businessReceipt_btnSearch').handler();	
+					}
+					
+					
 				}
 			}
 		});
@@ -492,8 +513,8 @@ $(function(){
 			id : 'businessReceipt_btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
-				var dateBegin = Ext.getCmp('receipts_dateSearchDateBegin');
-				var dateEnd = Ext.getCmp('receipts_dateSearchDateEnd');
+				var dateBegin = Ext.getCmp('beginDate_combo_receipts');
+				var dateEnd = Ext.getCmp('endDate_combo_receipts');
 				
 				if(!dateBegin.isValid() || !dateEnd.isValid()){
 					return;
@@ -528,8 +549,8 @@ $(function(){
 			text : '导出',
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
-				var onDuty = Ext.getCmp('receipts_dateSearchDateBegin');
-				var offDuty = Ext.getCmp('receipts_dateSearchDateEnd');
+				var onDuty = Ext.getCmp('beginDate_combo_receipts');
+				var offDuty = Ext.getCmp('endDate_combo_receipts');
 				var regionId;
 				var branchId = branchSelect_combo_businessReceips.getValue();
 				if(regionSelect_combo_businessReceips.getValue() == '-1'){
@@ -618,21 +639,6 @@ $(function(){
 		
 	}
 	
-	var receipts_setStatisticsDate = function(){
-		if(sendToPageOperation){
-			Ext.getCmp('receipts_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-			Ext.getCmp('receipts_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
-			receipt_hours = sendToStatisticsPageHours;
-			Ext.getCmp('businessReceipt_btnSearch').handler();
-			Ext.getCmp('businessReceipt_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+receipt_hours.openingText+'</font>');
-			Ext.getCmp('businessReceipt_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+receipt_hours.endingText+'</font>');
-			Ext.getCmp('businessReceipt_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
-			
-			sendToPageOperation = false;	
-			setBranch = true;
-			setRegion = true;
-		}
-	};
 	var receipt_hours;
 	var business_receipts_payType;
 
@@ -688,14 +694,9 @@ $(function(){
 	    });
 	    rz.on('resize', receivablesStatResultGrid.syncSize, receivablesStatResultGrid);//注册事件(作用:将调好的大小传个scope执行)
 		
-		Ext.getCmp('businessReceiptsStatistics').updateStatisticsDate = receipts_setStatisticsDate;
 		
-		if(sendToPageOperation){
-			receipts_setStatisticsDate();
-		}else{
-			receipts_dateCombo.setValue(1);
-			receipts_dateCombo.fireEvent('select', null, null, 1);			
-		}
+		receipts_dateCombo.setValue(1);
+		receipts_dateCombo.fireEvent('select', null, null, 1);			
 	});
 
 });

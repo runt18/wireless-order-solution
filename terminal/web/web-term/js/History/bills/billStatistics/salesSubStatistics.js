@@ -1,12 +1,4 @@
 
-var SalesState = {
-
-};
-
-function kitchenGroupTextTpl(rs){
-	return '部门:'+rs[0].get('dept.name');
-}
-
 $(function(){
 	
 	var salesSubQueryType = 0;
@@ -170,13 +162,6 @@ $(function(){
 							thiz.store.loadData(data);
 							thiz.setValue(-1);
 							
-							if(sendToPageOperation){
-								cancel_setStatisticsDate();
-							}
-	//						else{
-	//							cancel_dateCombo.setValue(1);
-	//							cancel_dateCombo.fireEvent('select', cancel_dateCombo, null, 1);			
-	//						}							
 						},
 						fialure : function(res, opt){
 							thiz.store.loadData(data);
@@ -191,6 +176,7 @@ $(function(){
 		});
 		
 		var branch_combo_foodstatistics = new Ext.form.ComboBox({
+			id : 'branch_combo_foodstatistics',
 			readOnly : false,
 			forceSelection : true,
 			width : 123,
@@ -295,6 +281,22 @@ $(function(){
 							Ext.getCmp('foodSale_combo_staffs').setValue(-1);
 						}
 					});
+					
+					Ext.Ajax.request({
+						url : '../../QueryDeptTree.do',
+						params : {
+							branchId : branch_combo_foodstatistics.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							 var root = new Ext.tree.TreeNode({expanded : true, text : '全部', leaf : false, deptID : '-1'});   
+							 
+							 root.appendChild(jr);
+							orderFoodStatPanelDeptTree.setRootNode(root);
+						}
+					});
+					
+					
 					
 					Ext.getCmp('foodStatistic_btnSearch').handler();
 					
@@ -433,11 +435,8 @@ $(function(){
 		}];
 		orderFoodStatPanelGrid.region = 'center';
 		orderFoodStatPanelGrid.on('render', function(){
-			if(sendToPageOperation){
-				dateCombo.setValue(1);
-				dateCombo.fireEvent('select', dateCombo, null, 1);		
-			}
-	
+			dateCombo.setValue(1);
+			dateCombo.fireEvent('select', dateCombo, null, 1);		
 		});
 		orderFoodStatPanelGrid.getStore().on('load', function(store, records, options){
 			if(store.getCount() > 0){
@@ -588,6 +587,7 @@ $(function(){
 							Ext.getCmp('kitchenStatistic_comboBusinessHour').setValue(-1);
 						}
 					});
+					
 					Ext.getCmp('kitchenStatistic_btnSearch').handler();
 				}
 			}
@@ -877,6 +877,7 @@ $(function(){
 		
 		//门店combo
 		var branch_combo_deptStatistics = new Ext.form.ComboBox({
+			id : 'branch_combo_deptStatistics',
 			readOnly : false,
 			forceSelection : true,
 			width : 123,
@@ -918,7 +919,7 @@ $(function(){
 						}
 					});
 				},
-				select : function(){
+				select : function(isJump){
 					//加载区域
 					var region = [[-1, '全部']];
 					Ext.Ajax.request({
@@ -959,7 +960,10 @@ $(function(){
 						}
 					});
 					
-					Ext.getCmp('deptStatistic_btnSearch').handler();
+					if(!isJump){
+						Ext.getCmp('deptStatistic_btnSearch').handler();	
+					}
+					
 				}
 			}
 		});
@@ -969,7 +973,17 @@ $(function(){
 			initRegionCombo('deptStatistic_'),
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{xtype : 'tbtext', text : '门店选择'},
-			branch_combo_deptStatistics,
+			branch_combo_deptStatistics, {
+				xtype : 'textfield',
+				id : 'salesSubDeptId_textField_salesSub',
+				hidden : true,
+				width : 150
+			}, {
+				xtype : 'textfield',
+				id : 'salesSubDeptName_textField_salesSub',
+				hidden : true,
+				width : 150
+			},
 			'->', {
 				text : '搜索',
 				id : 'deptStatistic_btnSearch',
@@ -1005,10 +1019,8 @@ $(function(){
 							ending : data.ending,
 							deptId : selectDeptId});
 					}else{
-	//					if(!sendToPageOperation){
-	//						Ext.getCmp('southDeptChartPanel').collapse();
-	//					}
-	//					titleDeptName = '';
+						
+						titleDeptName = '';
 						titleRegionName = Ext.getCmp("deptStatistic_comboRegion").getValue() == -1 ? '' : ', ' + Ext.getCmp('deptStatistic_comboRegion').getEl().dom.value;
 						var gs = deptStatPanelGrid.getStore();
 						gs.baseParams['dateBeg'] = beginDate.getRawValue();
@@ -1020,7 +1032,10 @@ $(function(){
 						
 						gs.load();			
 						
-						if(typeof selectDeptId != 'undefined'){
+						selectDeptId = Ext.getCmp('salesSubDeptId_textField_salesSub').getValue();
+						titleDeptName = Ext.getCmp('salesSubDeptName_textField_salesSub').getEl().dom.value;
+						
+						if(selectDeptId){
 							Ext.getCmp('southDeptChartPanel').expand();
 							loadDeptStatisticChartData({dateBeg : beginDate.getRawValue() + ' 00:00:00', 
 								dateEnd : endDate.getRawValue() + ' 23:59:59', 
@@ -1028,6 +1043,8 @@ $(function(){
 								opening : data.opening,
 								ending : data.ending,
 								deptId : selectDeptId});						
+						}else{
+							Ext.getCmp('southDeptChartPanel').collapse();
 						}
 					}
 				}
@@ -1120,28 +1137,15 @@ $(function(){
 				deptStatPanelGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 			}
 			
-			if(sendToPageOperation){
-				Ext.getCmp('southDeptChartPanel').expand();
-				titleDeptName = sendToStatisticsPageDeptName;
-				loadDeptStatisticChartData({dateBeg : beginDate.getRawValue() + ' 00:00:00', 
-					dateEnd : endDate.getRawValue() + ' 23:59:59', 
-					region : Ext.getCmp("deptStatistic_comboRegion").getValue(),
-					opening : data.opening,
-					ending : data.ending,
-					deptId : sendToStatisticsPageDeptId});	
-			
-				sendToPageOperation = false;		
-			}
 		});
 		deptStatPanelGrid.on('render', function(){
-			if(!sendToPageOperation){
-				dateCombo.setValue(1);
-				dateCombo.fireEvent('select', dateCombo, null, 1);		
-			}
+			dateCombo.setValue(1);
+			dateCombo.fireEvent('select', dateCombo, null, 1);		
 		});
 		
 		
 		deptStatPanel = new Ext.Panel({
+			id : 'deptStatPanel_panel_salesSubStatistics',
 			title : '部门统计',
 			layout : 'border',
 			items : [deptStatPanelGrid, southDeptChart],
@@ -1167,6 +1171,7 @@ $(function(){
 		}
 		
 		salesSubWinTabPanel = new Ext.TabPanel({
+			id : 'salesSubWinTabPanel_tabPanel_salesSubStatistics',
 			xtype : 'tabpanel',
 			region : 'center',
 			frame : true,
@@ -1181,31 +1186,6 @@ $(function(){
 		});	
 	}
 	
-	var saleSub_setStatisticsDate = function(){
-		if(sendToPageOperation){
-			Ext.getCmp('deptStatistic_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-			Ext.getCmp('deptStatistic_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);
-			
-			salesSub_hours = sendToStatisticsPageHours;
-			
-			if(typeof salesSub_hours.deptId != 'undefined'){
-				titleDeptName = salesSub_hours.deptName;
-				selectDeptId = salesSub_hours.deptId;
-			}		
-			
-			salesSubWinTabPanel.setActiveTab(deptStatPanel);
-	
-			Ext.getCmp('deptStatistic_btnSearch').handler();
-			
-			Ext.getCmp('deptStatistic_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
-			
-			if(typeof salesSub_hours.opening != 'undefined'){
-				Ext.getCmp('deptStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+salesSub_hours.openingText+'</font>');
-				Ext.getCmp('deptStatistic_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+salesSub_hours.endingText+'</font>');		
-			}		
-			sendToPageOperation = false;		
-		}	
-	};
 	
 	Ext.onReady(function(){
 		if(!salesSubWinTabPanel){
@@ -1224,13 +1204,7 @@ $(function(){
 			items : [salesSubWinTabPanel]
 		});
 								
-		if(sendToPageOperation){
-			saleSub_setStatisticsDate();		
-		}else{
 			salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
-		}
-		
-		Ext.getCmp('salesSubStatistics').updateStatisticsDate = saleSub_setStatisticsDate;
 		
 	});
 	

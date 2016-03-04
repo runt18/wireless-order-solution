@@ -5,6 +5,7 @@ Ext.onReady(function(){
 	var limitCount = 20;
 	
 	var repaid_beginDate = new Ext.form.DateField({
+		id : 'beginDate_combo_repaid',
 		xtype : 'datefield',		
 		format : 'Y-m-d',
 		width : 100,
@@ -13,6 +14,7 @@ Ext.onReady(function(){
 		allowBlank : false
 	});
 	var repaid_endDate = new Ext.form.DateField({
+		id : 'endDate_combo_repaind',
 		xtype : 'datefield',
 		format : 'Y-m-d',
 		width : 100,
@@ -57,13 +59,6 @@ Ext.onReady(function(){
 						thiz.store.loadData(data);
 						thiz.setValue(-1);
 						
-						if(sendToPageOperation){
-							repaid_setStatisticsDate();
-						}else{
-							repaid_dateCombo.setValue(1);
-							repaid_dateCombo.fireEvent('select', repaid_dateCombo, null, 1);			
-						}	
-						
 					},
 					fialure : function(res, opt){
 						thiz.store.loadData(data);
@@ -78,6 +73,7 @@ Ext.onReady(function(){
 	});
 	
 	var branch_combo_repaidStatistics = new Ext.form.ComboBox({
+		id : 'branch_combo_repaidStatistics',
 		readOnly : false,
 		forceSelection : true,
 		width : 123,
@@ -119,7 +115,7 @@ Ext.onReady(function(){
 					}
 				});
 			},
-			select : function(){
+			select : function(isJump){
 				//加载员工
 				var staff = [[-1, '全部']];
 				Ext.Ajax.request({
@@ -161,7 +157,10 @@ Ext.onReady(function(){
 					}
 				});
 				
-				Ext.getCmp('repaid_btnSearch').handler();
+				if(!isJump){
+					Ext.getCmp('repaid_btnSearch').handler();
+				}
+				
 			}
 		}
 	});
@@ -594,23 +593,6 @@ Ext.onReady(function(){
 		repaidStaffChartPanel.otype = v;
 	}	
 	
-	var repaid_setStatisticsDate = function(){
-		if(sendToPageOperation){
-			repaid_beginDate.setValue(sendToStatisticsPageBeginDate);
-			repaid_endDate.setValue(sendToStatisticsPageEndDate);	
-			
-			repaid_hours = sendToStatisticsPageHours;
-			
-			Ext.getCmp('repaid_btnSearch').handler();
-			
-			Ext.getCmp('repaid_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+repaid_hours.openingText+'</font>');
-			Ext.getCmp('repaid_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+repaid_hours.endingText+'</font>');
-			Ext.getCmp('repaid_comboBusinessHour').setValue(repaid_hours.hourComboValue);	
-			
-			sendToPageOperation = false;
-		}
-	};
-	
 	
 	var repaid_cutAfterDrag=70, repaid_cutBeforeDrag=0;
 	var requestParams = {}, repaid_tabPanelHeight, repaidPanelHeight, repaid_hours;
@@ -730,6 +712,8 @@ Ext.onReady(function(){
     repaidStatChartTabPanel.setHeight(repaid_totalHeight*0.6);	
     
     repaid_rz.resizeTo(repaidDetailPanel.getWidth(), repaid_totalHeight*0.4);
+    
+    repaid_dateCombo.setValue(1);
+	repaid_dateCombo.fireEvent('select', repaid_dateCombo, null, 1);	
 	
-	Ext.getCmp('repaidStatistics').updateStatisticsDate = repaid_setStatisticsDate;
 });

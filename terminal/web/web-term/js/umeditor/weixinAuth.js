@@ -963,7 +963,7 @@ function operateWxPromotionData(data){
 }
 
 function linkToUploadImg(){
-	addTab("menuMgr", "菜谱管理", "BasicManagement_Module/MenuManagement.html");
+	Ext.ux.addTab("menuMgr", "菜谱管理", "BasicManagement_Module/MenuManagement.html");
 }
 
 

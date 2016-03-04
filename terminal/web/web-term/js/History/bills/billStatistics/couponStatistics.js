@@ -1,6 +1,7 @@
 Ext.onReady(function(){
-	
+	var hours;
 	var beginDate = new Ext.form.DateField({
+		id: 'beginDate_combo_coupon',
 		xtype : 'datefield',
 		format : 'Y-m-d',
 		width : 100,
@@ -10,6 +11,7 @@ Ext.onReady(function(){
 	});
 	
 	var endDate = new Ext.form.DateField({
+		id : 'endDate_combo_coupon',
 		xtype : 'datafield',
 		format : 'Y-m-d',
 		width : 100,
@@ -26,25 +28,6 @@ Ext.onReady(function(){
 			Ext.getCmp('coupon_btnSearch').handler();
 		}
 	});
-	
-	//设置显示时间
-	var hours = null;
-	function setStatisticsDate(){
-		if(sendToPageOperation){
-			beginDate.setValue(sendToStatisticsPageBeginDate);
-			endDate.setValue(sendToStatisticsPageEndDate);
-			
-			hours = sendToStatisticsPageHours;
-			
-			Ext.getCmp('coupon_btnSearch').handler();
-			
-			Ext.getCmp('coupon_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">' + hours.openingText + '</font>');
-			Ext.getCmp('coupon_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">' + hours.endingText + '</font>');
-			Ext.getCmp('coupon_comboBusinessHour').setValue(hours.hourComboValue);	
-			
-			sendToPageOperation = false;
-		}
-	};
 	//操作类型的select
 	var couponType = new Ext.form.ComboBox({
 		xtype : 'combo',
@@ -103,12 +86,6 @@ Ext.onReady(function(){
 						thiz.store.loadData(data);
 						thiz.setValue(-1);
 						
-						if(sendToPageOperation){
-							setStatisticsDate();
-						}else{
-							dataCombo.setValue(1);
-							dataCombo.fireEvent('select', dataCombo, null, 1);
-						}
 					},
 					fialure : function(res, opt){
 						thiz.store.loadData(data);
@@ -168,6 +145,99 @@ Ext.onReady(function(){
 		}
 	});
 	
+	//门店选择
+	var branch_combo_coupon = new Ext.form.ComboBox({
+		id : 'branch_combo_coupon',
+		readOnly : false,
+		forceSelection : true,
+		width : 123,
+		listWidth :120,
+		store : new Ext.data.SimpleStore({
+			fields : ['id', 'name']
+		}),
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [];
+				Ext.Ajax.request({
+					url : '../../OperateRestaurant.do',
+					params : {
+						dataSource : 'getByCond',
+						id : restaurantID
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						if(jr.root[0].typeVal != '2'){
+							data.push([jr.root[0]['id'], jr.root[0]['name']]);
+						}else{
+							data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+							 
+							for(var i = 0; i < jr.root[0].branches.length; i++){
+								data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+							}
+						}
+						
+						thiz.store.loadData(data);
+						thiz.setValue(jr.root[0].id);
+						thiz.fireEvent('select');
+					}
+				});
+			},
+			select : function(isJump){
+				//加载操作人员
+				var staff = [[-1, '全部']];
+				Ext.Ajax.request({
+					url : '../../QueryStaff.do',
+					params : {
+						branchId : branch_combo_coupon.getValue()
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						for(var i = 0; i < jr.root.length; i++){
+							staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+						}
+						
+						couponStaff.store.loadData(staff);
+						couponStaff.setValue(-1);
+					}
+				});
+				
+				//加载市别
+				var hour = [[-1, '全部']];
+				Ext.Ajax.request({
+					url : '../../OperateBusinessHour.do',
+					params : {
+						dataSource : 'getByCond',
+						branchId : branch_combo_coupon.getValue()
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						for(var i = 0; i < jr.root.length; i++){
+							hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+						}
+						
+						hour.push([-2, '自定义']);
+						
+						Ext.getCmp('coupon_comboBusinessHour').store.loadData(hour);
+						Ext.getCmp('coupon_comboBusinessHour').setValue(-1);
+					}
+				});
+				
+				if(!isJump){
+					Ext.getCmp('coupon_btnSearch').handler();	
+				}
+			}
+		}
+	});
+	
 	
 	//toorbar
 	var couponStatisticsTbarItem = [{
@@ -206,6 +276,8 @@ Ext.onReady(function(){
 			store.baseParams['opening'] = businessHour.opening;
 			store.baseParams['ending'] = businessHour.ending;
 			store.baseParams['couponTypeId'] = coupon.getValue();
+			store.baseParams['branchId'] = branch_combo_coupon.getValue()
+			
 			if(couponType.getValue() == 'issue' || couponType.getValue() == 'use' ){
 				store.baseParams['operate'] = null;
 				store.baseParams['operateType'] = couponType.getValue();
@@ -339,7 +411,13 @@ Ext.onReady(function(){
 					},{
 						xtype : 'tbtext',
 						text : '优惠券类型'
-					}, coupon]
+					}, coupon,  {
+						xtype : 'tbtext',
+						width : 10
+					},{
+						xtype : 'tbtext',
+						text : '门店选择'
+					}, branch_combo_coupon]
 				});
 				secondToolBar.render(couponGrid.tbar);
 			}
@@ -435,6 +513,7 @@ Ext.onReady(function(){
 		items : [couponDetailPanel]
 	});
 	
-	
+	dataCombo.setValue(1);
+	dataCombo.fireEvent('select', dataCombo, null, 1);
 	
 });

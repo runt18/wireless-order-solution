@@ -164,7 +164,8 @@ Ext.onReady(function(){
 						}
 					});
 				},
-				select : function(){
+				select : function(isJump){
+					
 					//加载员工
 					var staff = [[-1, '全部']];
 					Ext.Ajax.request({
@@ -224,7 +225,10 @@ Ext.onReady(function(){
 						}
 					});
 					
-					Ext.getCmp('search_btn_discountStatistics').handler();
+					//是否跳转
+					if(!isJump){
+						Ext.getCmp('search_btn_discountStatistics').handler();
+					}
 				}
 			}
 		});
@@ -234,7 +238,7 @@ Ext.onReady(function(){
 				text : '&nbsp;&nbsp;员工选择: '
 			},discount_combo_staffs,{
 				xtype : 'tbtext',
-				text : '&nbsp;&nbsp;部门选择: '
+				text : '&nbsp;&nbsp;区域选择: '
 			}, discount_deptCombo , {
 				xtype : 'tbtext',
 				text : '&nbsp;&nbsp;门店选择:'
@@ -837,6 +841,7 @@ Ext.onReady(function(){
     
     discount_rz.resizeTo(discountDetailsStatPanel.getWidth(), discount_totalHeight*0.4);	
 	
+
     discount_dateCombo.setValue(1);
 	discount_dateCombo.fireEvent('select', discount_dateCombo, null, 1);			
 //	Ext.getCmp('discountStatistics').updateStatisticsDate = discount_setStatisticsDate;

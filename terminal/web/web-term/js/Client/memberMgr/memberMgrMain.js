@@ -3239,6 +3239,86 @@ Ext.onReady(function(){
 			}
 		});
 		
+		//门店选择
+		var branch_combo_memberMgrMain = new Ext.form.ComboBox({
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([-1, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							
+							thiz.store.loadData(data);
+							
+							if(jr.root[0].typeVal != '2'){
+								thiz.setValue(jr.root[0].id);
+							}else{
+								thiz.setValue(-1);
+							}
+							
+							thiz.fireEvent('select');
+						}
+					});
+				},
+				select : function(){
+					var staff = [[-1, '全部']];
+					
+					
+					if(branch_combo_memberMgrMain.getValue() == -1){
+						referrerCombo.store.loadData([]);
+					}else{
+						Ext.Ajax.request({
+							url : '../../QueryStaff.do',
+							params : {
+								branchId : branch_combo_memberMgrMain.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+								}
+								
+								referrerCombo.store.loadData(staff);
+								referrerCombo.setValue(-1);
+							}
+						});
+					}
+					
+					Ext.getCmp('searchMember_btn_member').handler();
+				}
+			}
+		});
+		
 		
 		var member_beginDate = new Ext.form.DateField({
 			xtype : 'datefield',	
@@ -3449,7 +3529,10 @@ Ext.onReady(function(){
 				},endBirthday,{
 					xtype : 'tbtext',
 					text : '&nbsp;&nbsp;&nbsp;&nbsp;'
-				}]
+				}, {
+					xtype : 'tbtext',
+					text : '门店选择'
+				}, branch_combo_memberMgrMain]
 			
 		});	
 		
@@ -3556,6 +3639,7 @@ Ext.onReady(function(){
 					gs.baseParams['referrer'] = referrerCombo.getValue() != -1 ? referrerCombo.getValue() : null;
 					gs.baseParams['beginBirthday'] = Ext.getCmp('beginBirthday_df_memebrMgrMain').getValue();
 					gs.baseParams['endBirthday'] = Ext.getCmp('endBirthday_df_memebrMgrMain').getValue();
+					gs.baseParams['branchId'] = branch_combo_memberMgrMain.getValue() != -1 ? branch_combo_memberMgrMain.getValue() : null;
 					gs.load({
 						params : {
 							start : 0,
@@ -3672,7 +3756,8 @@ Ext.onReady(function(){
 					}
 					
 					var url = '../../{0}?memberType={1}&memberCardOrMobileOrName={2}&MinTotalMemberCost={3}' +
-							'&MaxTotalMemberCost={4}&consumptionMinAmount={5}&consumptionMaxAmount={6}&memberBalance={7}&memberBalanceEqual={8}&orderBy={9}&dataSource={10}';
+							'&MaxTotalMemberCost={4}&consumptionMinAmount={5}&consumptionMaxAmount={6}&memberBalance={7}&memberBalanceEqual={8}&orderBy={9}&dataSource={10}' +
+							'&branchId={11}';
 					url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
@@ -3685,7 +3770,8 @@ Ext.onReady(function(){
 						Ext.getCmp('textMemberMinBalance_numberField_member').getValue(),
 						Ext.getCmp('textMemberMaxBalance_numberField_member').getValue(),
 						m_searchAdditionFilter,
-						'memberList'
+						'memberList',
+						branch_combo_memberMgrMain.getValue()
 					);
 					
 					window.location = url;
