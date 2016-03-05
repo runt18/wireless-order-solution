@@ -521,14 +521,11 @@ Ext.onReady(function(){
 								thiz.load({
 									url : '../window/history/orderDetail.jsp', 
 									scripts : true,
-									params : {
-										orderId : orderID,
-										foodStatus : 'isReturn'
-									},
 									method : 'post'
 								});
 								thiz.center();	
 								thiz.orderId = orderID;
+								thiz.branchId = branch_combo_cancelledFood.getValue();
 								thiz.foodStatus = 'isReturn';
 								
 							}

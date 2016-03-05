@@ -124,7 +124,7 @@ function MemberRechargePopup(){
 						self.find('[id=searchMemberTypeCmp_ul_recharge]').show();
 						self.find('[id=searchMemberTypeCmp_ul_recharge]').find('li').each(function(index, element){
 							$(element).click(function(){
-								readMemberMsg(self,$(element).val());
+								readMemberMsg(self, $(element).val());
 							});
 						});
 					}else{
@@ -219,15 +219,15 @@ function MemberRechargePopup(){
 	
 	
 	//金额联动
-	function getCharge(basePay, getBalance, rate){
+	function getCharge(basePay, balance, rate){
 		if(basePay.val()){
 			if(rate){
-				getBalance.val(parseInt(basePay.val()) * parseInt(rate));
+				balance.val(parseInt(basePay.val()) * parseInt(rate));
 			}else{
-				getBalance.val(basePay.val());
+				balance.val(basePay.val());
 			}
 		}else{
-			getBalance.val(0);
+			balance.val(0);
 		}
 	}
 }
