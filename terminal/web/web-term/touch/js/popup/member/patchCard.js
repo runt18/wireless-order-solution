@@ -54,6 +54,13 @@ function PatchCardPopup(){
 	this.close = function(afterClose, timeout){
 		_patchPopup.close(function(self){
 			NumKeyBoardAttacher.instance().detach(self.find('[id=loadMember_input_patchCard]')[0]);
+			if(typeof afterClose === 'function'){
+				if(timeout){
+					afterClose();
+				}else{
+					setTimeout(afterClose, timeout);
+				}
+			}
 		});
 	};
 	
