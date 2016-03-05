@@ -134,14 +134,16 @@ function PatchCardPopup(){
 		
 		self.find('[id=memberMobileNum_label_patchCard]').text(member.mobile ? member.mobile : '----');
 		self.find('[id=weixinmemberCard_label_patchCard]').text(member.weixinCard ? member.weixinCard : '----');
-		self.find('[id=memberCard_label_patchCard]').text(member.memberCard ? member.memberCard : '----');
+		self.find('[id=memberCard_label_patchCard]').text(member.memberCard);
 		
 		if(member.memberCard != ''){
 			self.find('[id=memberCard_label_patchCard]').css('display', 'block');
 			self.find('[id=setMemberCard_div_patchCard]').css('display', 'none');
+			self.find('[id=tips_td_patchCard]').text('(已有实体卡)');
 		}else{
 			self.find('[id=memberCard_label_patchCard]').css('display', 'none');
 			self.find('[id=setMemberCard_div_patchCard]').css('display', 'block');
+			self.find('[id=tips_td_patchCard]').text('&nbsp;');
 			self.find('[id=setMemberCard_input_patchCard]').focus();
 		}
 		
