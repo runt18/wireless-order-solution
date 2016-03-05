@@ -350,7 +350,23 @@ Ext.onReady(function(){
 				text : '导出',
 				iconCls : 'icon_tb_exoprt_excel',
 				handler : function(){
+					if(!Ext.getCmp('beginDate_combo_giftStatistics').isValid() || !Ext.getCmp('endDate_combo_giftStatistics').isValid()){
+						return;
+					}
 					
+					var url = '../../{0}?beginDate={1}&endDate={2}&region={3}&foodName={4}&staffID={5}&dataSource={6}&branchId={7}';
+					url = String.format(
+							url, 
+							'ExportHistoryStatisticsToExecl.do', 
+							Ext.util.Format.date(Ext.getCmp('beginDate_combo_giftStatistics').getValue(), 'Y-m-d 00:00:00'),
+							Ext.util.Format.date(Ext.getCmp('endDate_combo_giftStatistics').getValue(), 'Y-m-d 23:59:59'),
+							Ext.getCmp('giftStatistic_comboRegion').getValue(),
+							Ext.getCmp('gift_foodName').getValue(),
+							gift_combo_staffs.getValue(),
+							'giftStatisticsList',
+							Ext.getCmp('branch_combo_gift').getValue()
+					);
+					window.location = url;
 				}
 			}]
 		});
@@ -370,7 +386,7 @@ Ext.onReady(function(){
 			    ['菜品名称', 'name', 100], 
 			    ['数量','count', 60, 'right', Ext.ux.txtFormat.gridDou],
 			    ['单价','unitPrice', 60, 'right', Ext.ux.txtFormat.gridDou],
-			    ['总价','actualPrice', 60, 'right', Ext.ux.txtFormat.gridDou],
+			    ['总价','totalPrice', 60, 'right', Ext.ux.txtFormat.gridDou],
 			    ['赠送人','waiter', null,'center']
 			],
 			['orderId', 'orderDateFormat', 'name', 'count', 'unitPrice', 'actualPrice', 'waiter'],

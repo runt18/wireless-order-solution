@@ -376,15 +376,15 @@ Ext.onReady(function(){
 			text : '导出',
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
-				if(!beginDate.isValid() || !endDate.isValid()){
+				if(!erase_beginDate.isValid() || !erase_endDate.isValid()){
 					return;
 				}
 				var url = '../../{0}?beginDate={1}&endDate={2}&staffID={3}&deptID={4}&dataSource={5}&branchId={6}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
-						Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00'),
-						Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59'),
+						Ext.util.Format.date(erase_beginDate.getValue(), 'Y-m-d 00:00:00'),
+						Ext.util.Format.date(erase_endDate.getValue(), 'Y-m-d 23:59:59'),
 						erase_combo_staffs.getValue(),
 						erase_deptCombo.getValue(),
 						'eraseStatisticsList',
