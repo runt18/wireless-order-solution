@@ -179,13 +179,10 @@ function showBillDetailWin(){
 				thiz.load({
 					url : '../window/history/orderDetail.jsp', 
 					scripts : true,
-					params : {
-						orderId : sd.id,
-						queryType : 'Today',
-						foodStatus : foodStatus
-					},
 					method : 'post'
 				});
+				thiz.orderId = sd.id;
+				thiz.foodStatus = foodStatus;
 				thiz.center();	
 			}
 		}

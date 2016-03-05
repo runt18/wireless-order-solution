@@ -254,11 +254,11 @@
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/ExportHistoryStatisticsToExecl"
-			type="com.wireless.Actions.exportExecl.HistoryStatisticsAction"
+			type="com.wireless.Actions.exportExcel.HistoryStatisticsAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/ExportTodayStatisticsToExecl"
-			type="com.wireless.Actions.exportExecl.TodayStatisticsAction" scope="request"
+			type="com.wireless.Actions.exportExcel.TodayStatisticsAction" scope="request"
 			parameter="dataSource">
 		</action>
 		<action path="/DutyRangeStat"

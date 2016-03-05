@@ -49,7 +49,7 @@ public class QueryEraseStatisticAction extends DispatchAction{
 		final String beginDate = request.getParameter("beginDate");
 		final String endDate = request.getParameter("endDate");
 		final String staffId = request.getParameter("staffID");
-		final String deptID = request.getParameter("deptID");
+		final String deptId = request.getParameter("deptID");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
 		
@@ -66,8 +66,8 @@ public class QueryEraseStatisticAction extends DispatchAction{
 				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
 			
-			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));

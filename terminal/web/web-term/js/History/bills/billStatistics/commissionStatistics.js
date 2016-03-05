@@ -441,6 +441,7 @@ Ext.onReady(function(){
 								});
 								thiz.center();
 								thiz.orderId = sd.orderId;
+								thiz.branchId = branch_combo_commission.getValue();
 								thiz.foodStatus = 'isCommission';
 							}
 						}

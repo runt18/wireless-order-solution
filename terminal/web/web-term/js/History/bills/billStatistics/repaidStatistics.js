@@ -505,6 +505,7 @@ Ext.onReady(function(){
 								});
 								thiz.center();	
 								thiz.orderId = orderID;
+								thiz.branchId = branch_combo_repaidStatistics.getValue();
 								thiz.foodStatus = 'isRepaid';
 							}
 						}
