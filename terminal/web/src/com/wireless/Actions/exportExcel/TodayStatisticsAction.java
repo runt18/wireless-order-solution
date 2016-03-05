@@ -1,4 +1,4 @@
-package com.wireless.Actions.exportExecl;
+package com.wireless.Actions.exportExcel;
 
 import java.io.OutputStream;
 import java.util.Date;
