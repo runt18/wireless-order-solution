@@ -1,5 +1,3 @@
-
-
 function MemberRechargePopup(){
 	
 	var _self = this;
