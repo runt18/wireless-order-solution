@@ -3201,7 +3201,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 	}
 	
 	/**
-	 * 提成统计
+	 * 提成统计导出excel
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -3215,17 +3215,20 @@ public class HistoryStatisticsAction extends DispatchAction{
 	public ActionForward commissionStatisticsList(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
 		response.setContentType("application/vnd.ms-excel;");
 		
-		String pin = (String)request.getAttribute("pin");
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String beginDate = request.getParameter("beginDate");
+		final String endDate = request.getParameter("endDate");
+		final String staffId = request.getParameter("staffId");
+		final String deptId = request.getParameter("deptId");
+		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		String beginDate = request.getParameter("beginDate");
-		String endDate = request.getParameter("endDate");
-		String staffId = request.getParameter("staffId");
-		String deptId = request.getParameter("deptId");
+		if(branchId != null && !branchId.isEmpty()){
+			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+		}
 		
-		List<CommissionStatistics> list;
-		
-		CalcCommissionStatisticsDao.ExtraCond extraCond = new CalcCommissionStatisticsDao.ExtraCond(DateType.HISTORY);
+		final CalcCommissionStatisticsDao.ExtraCond extraCond = new CalcCommissionStatisticsDao.ExtraCond(DateType.HISTORY);
 		
 		if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
 			extraCond.setStaffId(Integer.valueOf(staffId));
@@ -3234,7 +3237,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		if(deptId != null && !deptId.equals("-1")){
 			extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 		}
-		list = CalcCommissionStatisticsDao.getCommissionStatisticsDetail(staff, new DutyRange(beginDate, endDate), extraCond);
+		final List<CommissionStatistics> list = CalcCommissionStatisticsDao.getCommissionStatisticsDetail(staff, new DutyRange(beginDate, endDate), extraCond);
 		
 		CommissionStatistics total = new CommissionStatistics();
 		total.setCommission(0);
@@ -3244,7 +3247,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 				total.setCommission(item.getCommission() + total.getCommission());
 			}
 		}
-		String title = "提成统计";
+		final String title = "提成统计(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")";
 		
 		//标题
 		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("提成统计.xls").getBytes("GBK"),  "ISO8859_1"));
@@ -3300,35 +3303,35 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("日期");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("菜名");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("部门");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("账单号");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("单价");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("数量");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("总额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("提成");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("人员");
 		cell.setCellStyle(headerStyle);
 		
@@ -3340,35 +3343,35 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell.setCellValue(DateUtil.format(commission.getOrderDate()));
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(commission.getFoodName());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(commission.getDept().getName());
 			cell.setCellStyle(strStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(commission.getOrderId());
 			cell.setCellStyle(normalNumStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(commission.getUnitPrice());
 			cell.setCellStyle(numStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(commission.getAmount());
 			cell.setCellStyle(numStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(commission.getTotalPrice());
 			cell.setCellStyle(numStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(commission.getCommission());
 			cell.setCellStyle(numStyle);
 			
-			cell = row.createCell(row.getLastCellNum());
+			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(commission.getWaiter());
 			cell.setCellStyle(strStyle);
 			
@@ -3902,114 +3905,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 	}	
 	
 	
-	public ActionForward commissionTotalList(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
-		response.setContentType("application/vnd.ms-excel;");
-		
-		String pin = (String)request.getAttribute("pin");
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		
-		String beginDate = request.getParameter("beginDate");
-		String endDate = request.getParameter("endDate");
-		String deptId = request.getParameter("deptId");
-		
-		DutyRange range = new DutyRange(beginDate, endDate);
-		List<CommissionStatistics> list;
-		if(deptId != null && !deptId.equals("-1")){
-			list = CalcBillStatisticsDao.calcCommissionTotalByDept(staff, range, Integer.parseInt(deptId), DateType.HISTORY);
-		}else{
-			list = CalcBillStatisticsDao.calcCommissionTotal(staff, range, DateType.HISTORY);
-		}
-		CommissionStatistics total = null;
-		if(!list.isEmpty()){
-			total = new CommissionStatistics();
-			for (CommissionStatistics item : list) {
-//				total.setTotalPrice(item.getTotalPrice() + total.getTotalPrice());
-				total.setCommission(item.getCommission() + total.getCommission());
-			}
-		}
-		String title = "提成汇总";
-		
-		//标题
-		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("提成汇总.xls").getBytes("GBK"),  "ISO8859_1"));
-		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet(title);
-		HSSFRow row = null;
-		HSSFCell cell = null;
-		initParams(wb);
-		
-		sheet.setColumnWidth(0, 5000);
-		sheet.setColumnWidth(1, 5000);
-		sheet.setColumnWidth(2, 5000);
-		
-		//冻结行
-		sheet.createFreezePane(0, 4, 0, 4);
-		
-//------------------报表头
-		row = sheet.createRow(0);
-		row.setHeight((short) 550);
-		
-		cell = row.createCell(0);
-		cell.setCellValue(title);
-		cell.setCellStyle(titleStyle);
-		
-		//合并单元格
-		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 2));
-//---------------摘要------------------		
-		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		row.setHeight((short) 350);
-		
-		cell = row.createCell(0);
-		
-		cell.setCellValue("日期: " + beginDate + "  至  " + endDate +  "      提成总额: " + total.getCommission());
-//		cell.setCellStyle(strStyle);
-		
-		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 2));
-//----------------		
-//----------------空白
-		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		row.setHeight((short) 350);
-		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 2));
-		
-		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		row.setHeight((short) 350);
-		
-		cell = row.createCell(0);
-		cell.setCellValue("销售总额");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue("提成总额");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue("人员");
-		cell.setCellStyle(headerStyle);
-		
-		for (CommissionStatistics commission : list) {
-			row = sheet.createRow(sheet.getLastRowNum() + 1);
-			row.setHeight((short) 350);
-			
-			cell = row.createCell(0);
-			cell.setCellValue(commission.getTotalPrice());
-			cell.setCellStyle(numStyle);
-
-			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(commission.getCommission());
-			cell.setCellStyle(numStyle);
-			
-			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(commission.getWaiter());
-			cell.setCellStyle(strStyle);
-			
-		}
-		
-		OutputStream os = response.getOutputStream();
-		wb.write(os);
-		os.flush();
-		os.close();
-		
-		return null;
-	}
 
 	/**
 	 * 反结账明细导出excel
