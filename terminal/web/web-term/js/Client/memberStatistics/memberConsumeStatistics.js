@@ -178,6 +178,80 @@ Ext.onReady(function(){
 			width : 100
 			
 		});
+		
+		//门店选择
+		var branch_combo_memberConsume = new Ext.form.ComboBox({
+			id : 'branch_combo_memberConsume',
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth :120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([-1, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+							thiz.fireEvent('select');
+						}
+					});
+				},
+				select : function(){
+					if(branch_combo_memberConsume.getValue() == -1){
+						Ext.getCmp('memberConsume_comboPayType').disable();
+					}else{
+						Ext.getCmp('memberConsume_comboPayType').enable();
+						//加载收款方式
+						var payType = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperatePayType.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_memberRefund.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								jr.root.unshift({id:-1, name:'全部'});
+								Ext.getCmp('memberConsume_comboPayType').getStore().loadData(jr.root);
+							}
+						});
+					}
+					Ext.getCmp('memberConsume_comboPayType').setValue(-1);
+					
+					Ext.getCmp('memberConsume_btn_search').handler();
+					
+				}
+			}
+		});
+		
 		var mcus_mo_tbar = new Ext.Toolbar({
 			height : 26,
 			items : [{ 
@@ -241,8 +315,12 @@ Ext.onReady(function(){
 			{
 				xtype : 'tbtext',
 				text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
-			}, mcus_search_memberName, '->', {
+			}, mcus_search_memberName, {
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;门店选择 :'
+			}, branch_combo_memberConsume, '->', {
 				text : '搜索',
+				id : 'memberConsume_btn_search',
 				iconCls : 'btn_search',
 				handler : function(e){
 					mcus_searchMemberOperation();
@@ -253,6 +331,7 @@ Ext.onReady(function(){
 				handler : function(e){
 					mcus_search_memberType.setValue(-1);
 					mcus_search_memberName.setValue();
+					branch_combo_memberConsume.setValue(-1);
 					mcus_searchMemberOperation();
 				}
 				
@@ -286,7 +365,7 @@ Ext.onReady(function(){
 						offDuty = Ext.util.Format.date(mcus_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 						
 						var memberType = mcus_search_memberType.getRawValue() != '' ? mcus_search_memberType.getValue() : '';
-						var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&operateType=1&payType={7}';
+						var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&operateType=1&payType={7}&branchId={8}';
 						url = String.format(
 								url, 
 								'ExportHistoryStatisticsToExecl.do', 
@@ -296,7 +375,8 @@ Ext.onReady(function(){
 								offDuty,
 								mcus_search_memberName.getValue(),
 								'history',
-								Ext.getCmp('memberConsume_comboPayType').getValue()
+								Ext.getCmp('memberConsume_comboPayType').getValue(),
+								Ext.getCmp('branch_combo_memberConsume').getValue()
 							);
 						window.location = url;
 					}
@@ -377,6 +457,7 @@ Ext.onReady(function(){
 		gs.baseParams['onDuty'] = onDuty;
 		gs.baseParams['offDuty'] = offDuty;
 		gs.baseParams['total'] = true;
+		gs.baseParams['branchId'] = Ext.getCmp('branch_combo_memberConsume').getValue();
 		gs.load({
 			params : {
 				start : 0,

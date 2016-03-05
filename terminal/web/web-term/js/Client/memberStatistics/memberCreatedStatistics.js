@@ -179,6 +179,58 @@ Ext.onReady(function(){
 			width : 100
 			
 		});
+		
+		//门店选择
+		var branch_combo_memberCreate = new Ext.form.ComboBox({
+			id : 'branch_combo_memberCreate',
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([-1, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+							thiz.fireEvent('select');
+						}
+					});
+				},
+				select : function(){
+					mcrs_searchMemberOperation();
+				}
+			}
+		});
+		
+		
 		var mcrs_mo_tbar = new Ext.Toolbar({
 			height : 26,
 			items : [{ 
@@ -198,7 +250,10 @@ Ext.onReady(function(){
 			{
 				xtype : 'tbtext',
 				text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
-			}, mcrs_search_memberName, '->', {
+			}, mcrs_search_memberName, {
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;门店选择:'
+			}, branch_combo_memberCreate, '->', {
 				text : '搜索',
 				iconCls : 'btn_search',
 				handler : function(e){
@@ -210,6 +265,7 @@ Ext.onReady(function(){
 				handler : function(e){
 					mcrs_search_memberType.setValue(-1);
 					mcrs_search_memberName.setValue();
+					branch_combo_memberCreate.setValue(-1);
 					mcrs_searchMemberOperation();
 				}
 				
@@ -222,7 +278,7 @@ Ext.onReady(function(){
 						offDuty = Ext.util.Format.date(mcrs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 						
 						var memberType = mcrs_search_memberType.getRawValue() != '' ? mcrs_search_memberType.getValue() : '';
-						var url = '../../{0}?memberType={1}&dataSource={2}&dateBegin={3}&dateEnd={4}&memberCardOrMobileOrName={5}&create=true';
+						var url = '../../{0}?memberType={1}&dataSource={2}&dateBegin={3}&dateEnd={4}&memberCardOrMobileOrName={5}&create=true&branchId={6}';
 						url = String.format(
 								url, 
 								'ExportHistoryStatisticsToExecl.do', 
@@ -230,7 +286,8 @@ Ext.onReady(function(){
 								'memberList',
 								onDuty,
 								offDuty,
-								mcrs_search_memberName.getValue()
+								mcrs_search_memberName.getValue(),
+								branch_combo_memberCreate.getValue()
 							);
 						window.location = url;
 					}
@@ -327,6 +384,7 @@ Ext.onReady(function(){
 		gs.baseParams['memberCardOrMobileOrName'] = mcrs_search_memberName.getValue();
 		gs.baseParams['dateBegin'] = onDuty;
 		gs.baseParams['dateEnd'] = offDuty;
+		gs.baseParams['branchId'] = Ext.getCmp('branch_combo_memberCreate').getValue();
 		gs.load({
 			params : {
 				start : 0,
