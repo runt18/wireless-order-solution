@@ -112,6 +112,8 @@
 <script type="text/javascript" src="./js/popup/member/recharge.js"></script>
 <!-- 补发实体卡 -->
 <script type="text/javascript" src="./js/popup/member/patchCard.js?v=<%= v %>"></script>
+<!-- 打印机诊断 -->
+<script type="text/javascript" src="./js/popup/diagPrinter/diagPrinter.js?v=<%= v %>"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -134,7 +136,8 @@
 			</div>
 		</div>	
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="ts.displayPrintConnection()">打印机诊断</a>
+		 	<!-- ts.displayPrintConnection() -->
+		 	<a id="checkPrinter_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont" >打印机诊断</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageMemberOperation">会员</a>
 		 	<a id="todayBill_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">账单</a>
 		 	<a id="personSettle_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">交款</a>
@@ -233,126 +236,6 @@
         </ul>
 	</div>		
 	
-	<!-- 远程诊断打印机 -->
-	<div id="printerConnectionCmp" class="ui-overlay-shadow ui-corner-all" style="width:1020px;z-index: 1102;position: absolute; top: 150px; left: 50%; margin: -100px 0px 0px -500px;background-color: white;display: none;" align="center">
-	    <div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-	    		<div id="printerConnectionCmpTitle" style="float: left;line-height: 35px;margin-left: 10px;">
-					远程打印机诊断, 共 <span id="printerConnectionCount" style="color: DarkOrange;">0</span> 台打印机在使用
-	    		</div>
-	        	<div style="float: right">
-	  				<a onclick="ts.closePrintConnection()" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-	        	</div>
-	    </div> 	    
-	    
-	    <div data-role="content">
-			<div class="ui-grid-a">
-			    <div class="ui-block-a ui-bar-c" style="width: 100%;line-height: 45px;">
-			    	<a href="javascript:void()" onclick="ts.displayPrintConnection()" style="color: blue;margin-right: 20px;">刷新</a>打印服务状态: 
-			    	<span id="printerServiceState"> 未知 </span> 
-				</div>
-			</div><!-- /grid-a -->				
-			<br> 
-			<div style="max-height: 500px;overflow: auto;"> 
-			<table id="printer" data-role="table" data-mode="columntoggle"  class="ui-body-d ui-shadow table-stripe ui-responsive">	
-				<caption style="font-weight: bold;margin-bottom: 0;color: blue">打印机列表</caption>
-				<tr>
-					<th></th>
-					<th >打印机</th>
-					<th >驱动</th>
-					<th >端口</th>
-					<th >网关</th>
-					<th >连接状态</th>
-					<th >机盖</th>
-					<th >卷纸</th>
-					<th >切刀</th>
-				</tr>
-				<tbody id="printerConnectionList" >
-<!-- 					<tr>
-						<td>192.168.1.201</td>
-						<td>中厨</td>
-						<td>192.168.1.201</td>
-						<td><a href="#printerPingErrorCmp" data-rel="popup" data-transition="pop">未连接(打印机不出单, 点击解决)</a></td>
-						<td><a href="#">未安装(请联系客服)</a></td>
-						<td><a href="#">未关闭(请盖好打印机)</a></td>
-						<td><a href="#">已用完(请更换打印纸)</a></td>
-						<td><a href="#">已损坏(请更换切刀)</a></td>
-					</tr>	 -->
-				</tbody>			
-			</table>	
-			</div>    
-		</div>	
-	</div>
-	
-	<!-- 打印服务没开时提示 -->
-	<div id="printerServiceUnopenCmp" data-role="popup"  data-dismissible="false" style="width:900px;" class="ui-corner-all" align="center">
-		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
-				打印服务检查
-	   		</div>
-	       	<div style="float: right">
-	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-	       	</div>
-       	</div>	
-       	<div data-role="content">
-			<h2>所有打印机不出单:</h2>
-				<p>屏幕右下角打开电脑菜单 -> 所有程序 -> e点通打印服务 -> 点击e点通打印服务即可</p>
-				
-			<img alt="" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintError/openService.jpg">
-		</div>
-	</div>	
-	
-	<!-- 打印服务开两个时提示 -->
-	<div id="printerServiceOpenTwiceCmp" data-role="popup"  data-dismissible="false" style="width:900px;" class="ui-corner-all" align="center">
-		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
-				打印服务检查
-	   		</div>
-	       	<div style="float: right">
-	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-	       	</div>
-       	</div>	
-       	<div data-role="content">
-			<h2>所有打印机出重单:</h2>
-				<p>屏幕右下角打开电脑菜单 -> 所有程序 -> e点通打印服务 -> 卸载e点通打印服务即可</p>
-			<img alt="" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintError/closeService.jpg">	
-		</div>
-	</div>					
-	
-	<!-- ping不通时提示 -->
-	<div id="printerPingErrorCmp" data-role="popup"  data-dismissible="false" style="width:900px;" class="ui-corner-all" align="center">
-		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
-				网线检查
-	   		</div>
-	       	<div style="float: right">
-	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-	       	</div>
-       	</div>	
-       	<div data-role="content" style="max-height:650px;overflow: auto;">
-			<h3>1, 检查当前打印机后面接网线的地方有没有黄色的灯亮着</h3>
-			<img alt="" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintError/theYellowLight.jpg">
-			<h3>2, 检查交换机连上路由器的灯是否亮着</h3>
-			<img alt="" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintError/luyouqi.jpg">
-		</div>
-	</div>	
-	
-	<!-- 联系客服提示 -->
-	<div id="printerDriverErrorCmp" data-role="popup"  data-dismissible="false" style="width:350px;" class="ui-corner-all" align="center">
-		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
-				驱动失败
-	   		</div>
-	       	<div style="float: right">
-	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-	       	</div>
-       	</div>	
-       	<div data-role="content">
-			<h3>请安装驱动, 或联系客服QQ: 850774706</h3>
-		</div>
-	</div>		
-	
-	
-	<!-- 会员充值 -->
 	
 	<!-- 积分消费 -->
 	<div id="memberPointConsume" class="ui-overlay-shadow ui-corner-all" style="width:340px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -150px;background-color: white;display: none;" align="center">	

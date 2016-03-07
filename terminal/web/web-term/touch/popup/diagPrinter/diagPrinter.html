@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>智易点餐系统</title>
+</head>
+<body>
+	<div id="printerConnectionCmp_div_checkPrinter" data-dismissible="false" class="ui-overlay-shadow ui-corner-all" style="width:1020px;z-index: 1102;position: absolute; top: -100px; left: 50%; margin: -100px 0px 0px -500px;background-color: white;" align="center">
+	    <div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
+	    		<div style="float: left;line-height: 35px;margin-left: 10px;">
+					远程打印机诊断, 共 <span id="printerConnectionCount_span_checkPrinter" style="color: DarkOrange;">0</span> 台打印机在使用
+	    		</div>
+	        	<div style="float: right">
+	  				<a id="closePrintConnection_a_checkPrinter" data-role="button" data-corners="false" class="popupWinCloseBtn" style="line-height:22px;color:#fff;"><span style="font-size:18px;">X</span></a>      		
+	        	</div>
+	    </div> 	    
+	    
+	    <div data-role="content">
+			<div class="ui-grid-a">
+			    <div class="ui-block-a ui-bar-c" style="width: 100%;line-height: 45px;">
+			    	<a href="javascript:void(0)" id="refresh_a_checkPrinter" style="color: blue;margin-right: 20px;">刷新</a>打印服务状态: 
+			    	<span id="printerServiceState_span_checkPrinter"> 未知 </span> 
+				</div>
+			</div><!-- /grid-a -->				
+			<br> 
+			<div style="max-height: 500px;overflow: auto;"> 
+			<table id="printer" data-role="table" data-mode="columntoggle"  class="ui-body-d ui-shadow table-stripe ui-responsive">	
+				<caption style="font-weight: bold;margin-bottom: 0;color: blue">打印机列表</caption>
+				<thead>
+					<tr>
+						<th></th>
+						<th >打印机</th>
+						<th >驱动</th>
+						<th >端口</th>
+						<th >网关</th>
+						<th >连接状态</th>
+						<th >机盖</th>
+						<th >卷纸</th>
+						<th >切刀</th>
+					</tr>
+				</thead>
+				<tbody id="printerConnectionList_tbody_checkPrinter" >
+				
+				</tbody>			
+			</table>	
+			</div>    
+		</div>	
+	</div>
+</body>
+</html>

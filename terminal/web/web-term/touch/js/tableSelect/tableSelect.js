@@ -762,6 +762,14 @@ $(function(){
 			}, 200);
 		});
 		
+		
+		//打印机诊断
+		$('#diagPrinter_a_tableSelect').click(function(){
+			var diagPrinterPopup = new DiagPrinterPopup();
+			diagPrinterPopup.open();
+		});
+		
+		
 		//打印机绑定按钮
 		$('#printBind_a_tableSelect').click(function(){
 			$('#tableSelectOtherOperateCmp').popup('close');
@@ -1676,97 +1684,6 @@ window.onload = function(){
         }
     });
     
-};
-
-
-var printerConnectionTemplet = '<tr>' +
-		'<td>{index}</td>' +
-		'<td>{name}</td>' +
-		'<td >{driver}</td>' +
-		'<td>{port}</td>' +
-		'<td>{gateway}</td>' +
-		'<td >{ping}</td>' +
-		'<td >{coverOpen}</td>' +
-		'<td >{paperEnd}</td>' +
-		'<td >{cutterError}</td>' +
-	'</tr>';
-
-/**
- * 打开远程诊断
- */
-ts.displayPrintConnection = function(){
-	Util.LM.show();
-	$.ajax({
-		url : '../PrinterDiagnosis.do',
-		type : 'post',
-		dataType : 'json',
-		success : function(result){
-			Util.LM.hide();
-			if(result.success){
-				$('#printerConnectionCount').text(result.root[0].printers.length);
-/*				var root =[{
-					printerName : '192.168.1.202',
-					printerAlias : '中厨',
-					printerPort : '192.168.1.202',
-					driver : false,
-					ping : false,
-					coverOpen : true,
-					paperEnd : true,
-					cutterError : true
-				}];*/
-				
-				if(result.root[0].connectionAmount == 1){
-					$('#printerServiceState').html('<font color="green">正常</font>');
-				}else if(result.root[0].connectionAmount == 2){
-					$('#printerServiceState').html('<a href="#printerServiceOpenTwiceCmp" data-rel="popup" data-transition="pop">服务重叠 (所有打印机出重单, 点击解决)</a>');
-				}else{
-					$('#printerServiceState').html('<a href="#printerServiceUnopenCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>');
-				}
-				
-				var html = [];
-				for (var i = 0; i < result.root[0].printers.length; i++) {
-					var printer = result.root[0].printers[i];
-					var details = printer.driver && printer.ping;
-					html.push(printerConnectionTemplet.format({
-						index : i+1,
-						name : printer.printerName + (printer.printerAlias?'('+printer.printerAlias+')':''),
-						driver : printer.driver ? '<font color="green">正常</font>' : '<a href="#printerDriverErrorCmp" data-rel="popup" data-transition="pop">失败</a>', 
-						port : printer.printerPort?printer.printerPort:'----',
-						gateway : printer.gateway?printer.gateway:'----',
-						ping : printer.ping ? '<font color="green">正常</font>' : '<a href="#printerPingErrorCmp" data-rel="popup" data-transition="pop">失败</a>',
-						coverOpen : !details? "----" : printer.coverOpen ? '<a href="#">未关闭</a>' : '<font color="green">正常</font>',
-						paperEnd : 	!details? "----" : printer.paperEnd ? '<a href="#">已用完</a>' : '<font color="green">正常</font>',
-						cutterError : 	!details? "----" : printer.paperEnd ? '<a href="#">已损坏</a>' : '<font color="green">正常</font>'
-					}));
-				}
-				$('#printerConnectionList').html(html.join('')).trigger('create').trigger('refresh');
-				
-			
-			}else{
-				$('#printerServiceState').html('<a href="#printerServiceUnopenCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>');
-				$('#printerConnectionCount').text(0);
-				$('#printerConnectionList').html('');
-			}
-			
-			$('#printerConnectionCmp').show();
-			$('#shadowForPopup').show();	
-		},
-		error : function(result){
-			Util.LM.hide();
-			Util.msg.alert({
-				renderTo : 'tableSelectMgr',
-				msg : '诊断出错, 请联系客服'
-			});
-		}
-	});
-};
-
-/**
- * 关闭远程诊断
- */
-ts.closePrintConnection = function(){
-	$('#printerConnectionCmp').hide();
-	$('#shadowForPopup').hide();
 };
 
 /**
