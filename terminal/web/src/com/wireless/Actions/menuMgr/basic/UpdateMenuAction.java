@@ -1,5 +1,7 @@
 package com.wireless.Actions.menuMgr.basic;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,68 +19,129 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class UpdateMenuAction extends Action {
+	
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		
+		final String foodId = request.getParameter("foodID");
+		final String foodName = request.getParameter("foodName");
+		final String foodPrice = request.getParameter("foodPrice");
+		final String foodPrices = request.getParameter("foodPrices");
+		
+		final String kitchenId = request.getParameter("kitchenID");
+		final String printKitchenId = request.getParameter("printKitchenId");
+		final String foodDesc = request.getParameter("foodDesc");
+		final String isSpecial = request.getParameter("isSpecial");
+		final String isRecommend = request.getParameter("isRecommend");
+		final String isGift = request.getParameter("isFree");
+		final String isSellout = request.getParameter("isStop");
+		final String isCurrPrice = request.getParameter("isCurrPrice");
+		final String isHot = request.getParameter("isHot");
+		final String isWeight = request.getParameter("isWeight");
+		final String isCommission = request.getParameter("isCommission");
+		final String isLimit = request.getParameter("isLimit");
+		final String limitCount = request.getParameter("limitCount");
+		
+		final String commission = request.getParameter("commission");
+		final String foodAliasId = request.getParameter("foodAliasID");
+		final String foodImage = request.getParameter("foodImage");
+		final String multiFoodPrices = request.getParameter("multiFoodPrices");
+		
+		final JObject jObject = new JObject();
 		try {
 			
-			String pin = (String)request.getAttribute("pin");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String foodID = request.getParameter("foodID");
-			String foodName = request.getParameter("foodName");
-			String foodPrice = request.getParameter("foodPrice");
-			String foodPrices = request.getParameter("foodPrices");
+			final Food.UpdateBuilder builder = new Food.UpdateBuilder(Integer.parseInt(foodId));
 			
-			String kitchenID = request.getParameter("kitchenID");
-			String foodDesc = request.getParameter("foodDesc");
-			String isSpecial = request.getParameter("isSpecial");
-			String isRecommend = request.getParameter("isRecommend");
-			String isFree = request.getParameter("isFree");
-			String isStop = request.getParameter("isStop");
-			String isCurrPrice = request.getParameter("isCurrPrice");
-			String isHot = request.getParameter("isHot");
-			String isWeight = request.getParameter("isWeight");
-			String isCommission = request.getParameter("isCommission");
-			String isLimit = request.getParameter("isLimit");
-			String limitCount = request.getParameter("limitCount");
+			if(foodName != null && !foodName.isEmpty()){
+				builder.setName(foodName);
+			}
 			
-			String commission = request.getParameter("commission");
-			String foodAliasId = request.getParameter("foodAliasID");
-			String foodImage = request.getParameter("foodImage");
-			String multiFoodPrices = request.getParameter("multiFoodPrices");
+			//价钱
+			if(foodPrice != null && !foodPrice.isEmpty()){
+				builder.setPrice(Float.parseFloat(foodPrice));
+			}
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			//所属厨房
+			if(kitchenId != null && !kitchenId.isEmpty()){
+				builder.setKitchen(new Kitchen(Integer.parseInt(kitchenId)));
+			}
 			
-			Food.UpdateBuilder builder = new Food.UpdateBuilder(Integer.parseInt(foodID))
-												 .setName(foodName)
-												 .setPrice(Float.parseFloat(foodPrice))
-												 .setKitchen(new Kitchen(Integer.parseInt(kitchenID)))
-												 .setDesc(foodDesc)
-												 .setSpecial(Boolean.parseBoolean(isSpecial))
-												 .setRecommend(Boolean.parseBoolean(isRecommend))
-												 .setSellOut(Boolean.parseBoolean(isStop))
-												 .setGift(Boolean.parseBoolean(isFree))
-												 .setCurPrice(Boolean.parseBoolean(isCurrPrice))
-												 .setHot(Boolean.parseBoolean(isHot))
-												 .setWeigh(Boolean.parseBoolean(isWeight))
-												 .setLimit(Boolean.parseBoolean(isLimit), Integer.parseInt(limitCount));
+			//打印厨房
+			if(printKitchenId != null && !printKitchenId.isEmpty()){
+				builder.setPrintKitchen(Integer.parseInt(printKitchenId));
+			}
 			
+			//简介
+			if(foodDesc != null && !foodDesc.isEmpty()){
+				builder.setDesc(foodDesc);
+			}
+			
+			//是否特价
+			if(isSpecial != null && !isSpecial.isEmpty()){
+				builder.setSpecial(Boolean.parseBoolean(isSpecial));
+			}
+			
+			//是否推荐
+			if(isRecommend != null && !isRecommend.isEmpty()){
+				builder.setRecommend(Boolean.parseBoolean(isRecommend));
+			}
+			
+			//是否停售
+			if(isSellout != null && !isSellout.isEmpty()){
+				builder.setSellOut(Boolean.parseBoolean(isSellout));
+			}
+			
+			//是否赠送
+			if(isGift != null && !isGift.isEmpty()){
+				builder.setGift(Boolean.parseBoolean(isGift));
+			}
+			
+			//是否时价
+			if(isCurrPrice != null && !isCurrPrice.isEmpty()){
+				builder.setCurPrice(Boolean.parseBoolean(isCurrPrice));
+			}
+			
+			//是否热销
+			if(isHot != null && !isHot.isEmpty()){
+				builder.setHot(Boolean.parseBoolean(isHot));
+			}
+			
+			//是否称重
+			if(isWeight != null && !isWeight.isEmpty()){
+				builder.setWeigh(Boolean.parseBoolean(isWeight));
+			}
+			
+			//是否限量估清
+			if(isLimit != null && !isLimit.isEmpty() && Boolean.parseBoolean(isLimit)){
+				builder.setLimit(true, Integer.parseInt(limitCount));
+			}else{
+				builder.setLimit(false, 0);
+			}
+			
+			//菜品图片
 			if(foodImage != null && !foodImage.isEmpty()){
 				builder.setImage(Integer.parseInt(foodImage));
 			}
 			
-			if(!foodAliasId.isEmpty()){
+			//助记码
+			if(foodAliasId != null && !foodAliasId.isEmpty()){
 				builder.setAliasId(Integer.parseInt(foodAliasId));
 			}else{
 				builder.setAliasId(0);
 			}
 			
+			//是否提成
 			if(Boolean.parseBoolean(isCommission)){
 				builder.setCommission(Float.parseFloat(commission));
 			}else{
 				builder.setCommission(false);
 			}
 			
+			//价格方案
 			if(foodPrices != null && !foodPrices.isEmpty()){
 				String[] food_prices = foodPrices.split("&");
 				for (String p : food_prices) {
@@ -87,7 +150,7 @@ public class UpdateMenuAction extends Action {
 				}
 			}
 			
-			
+			//多单位
 			if(multiFoodPrices != null && !multiFoodPrices.isEmpty()){
 				String[] multiPrices = multiFoodPrices.split("&");
 				for (String p : multiPrices) {
@@ -100,16 +163,17 @@ public class UpdateMenuAction extends Action {
 			
 			FoodDao.update(staff, builder.setCheckUsed(true));
 			
-			jobject.initTip(true, "操作成功, 已修改菜品'" + foodName + "'信息.");
+			jObject.initTip(true, "操作成功, 已修改菜品'" + foodName + "'信息.");
 			
-		} catch (BusinessException e) {
+		} catch (BusinessException | SQLException e) {
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		} finally {
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
