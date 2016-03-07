@@ -148,6 +148,7 @@ Ext.onReady(function(){
 			}
 		});
 		mcs_search_onDuty = new Ext.form.DateField({
+			id : 'beginDate_combo_memberCharge',
 			xtype : 'datefield',
 			width : 100,
 			format : 'Y-m-d',
@@ -158,6 +159,7 @@ Ext.onReady(function(){
 			allowBlank : false
 		});
 		mcs_search_offDuty = new Ext.form.DateField({
+			id : 'endDate_combo_memberCharge',
 			xtype : 'datefield',
 			width : 100,
 			format : 'Y-m-d',
@@ -179,6 +181,83 @@ Ext.onReady(function(){
 			width : 100
 			
 		});
+		
+		//门店选择
+		var branch_combo_memberCharge = new Ext.form.ComboBox({
+			id : 'branch_combo_memberCharge',
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([-1, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+							thiz.fireEvent('select');
+						}
+					});
+				},
+				select : function(isJump){
+					if(branch_combo_memberCharge.getValue() == -1){
+						Ext.getCmp('memberRecharge_comboPayType').disable();
+					}else{
+						Ext.getCmp('memberRecharge_comboPayType').enable();
+						//加载收款方式
+						var payType = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperatePayType.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_memberCharge.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								jr.root.unshift({id:-1, name:'全部'});
+								Ext.getCmp('memberRecharge_comboPayType').getStore().loadData(jr.root);
+							}
+						});
+					}
+					
+					Ext.getCmp('memberRecharge_comboPayType').setValue(-1);
+					
+					if(!isJump){
+						Ext.getCmp('memberChargeSearchBtn').handler();
+					}
+					
+				}  
+			}
+		});
+		
 		var mcs_mo_tbar = new Ext.Toolbar({
 			height : 26,
 			items : [{ 
@@ -242,7 +321,10 @@ Ext.onReady(function(){
 			{
 				xtype : 'tbtext',
 				text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
-			}, mcs_search_memberName, '->', {
+			}, mcs_search_memberName,{
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;门店选择:'
+			}, branch_combo_memberCharge, '->', {
 				text : '搜索',
 				id : 'memberChargeSearchBtn',
 				iconCls : 'btn_search',
@@ -255,6 +337,7 @@ Ext.onReady(function(){
 				handler : function(e){
 					mcs_search_memberType.setValue(-1);
 					mcs_search_memberName.setValue();
+					branch_combo_memberCharge.setValue(-1);
 					mcs_searchMemberOperation();
 				}
 				
@@ -267,7 +350,7 @@ Ext.onReady(function(){
 						offDuty = Ext.util.Format.date(mcs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 						
 						var memberType = mcs_search_memberType.getRawValue() != '' ? mcs_search_memberType.getValue() : '';
-						var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&payType={8}';
+						var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&payType={8}&branchId={9}';
 						url = String.format(
 								url, 
 								'ExportHistoryStatisticsToExecl.do', 
@@ -278,7 +361,8 @@ Ext.onReady(function(){
 								mcs_search_memberName.getValue(),
 								'history',
 								1,
-								Ext.getCmp('memberRecharge_comboPayType').getValue()
+								Ext.getCmp('memberRecharge_comboPayType').getValue(),
+								branch_combo_memberCharge.getValue()
 							);
 						window.location = url;
 					}
@@ -312,13 +396,8 @@ Ext.onReady(function(){
 		mcs_grid.frame = false;
 		mcs_grid.border = false;
 		mcs_grid.on('render', function(thiz){
-			if(sendToPageOperation){
-				memberCharge_setStatisticsDate();
-			}else{
-				mcs_search_dateCombo.setValue(1);
-				mcs_search_dateCombo.fireEvent('select', mcs_search_dateCombo, null, 1);		
-			}	
-	
+			mcs_search_dateCombo.setValue(1);
+			mcs_search_dateCombo.fireEvent('select', mcs_search_dateCombo, null, 1);		
 		});
 		
 	
@@ -361,6 +440,7 @@ Ext.onReady(function(){
 		gs.baseParams['onDuty'] = onDuty;
 		gs.baseParams['offDuty'] = offDuty;
 		gs.baseParams['total'] = true;
+		gs.baseParams['branchId'] = Ext.getCmp('branch_combo_memberCharge').getValue();
 		gs.load({
 			params : {
 				start : 0,
@@ -377,22 +457,6 @@ Ext.onReady(function(){
 		}
 		
 	}
-	
-	var memberCharge_setStatisticsDate = function(){
-		if(sendToPageOperation){
-			mcs_search_onDuty.setValue(sendToStatisticsPageBeginDate);
-			mcs_search_offDuty.setValue(sendToStatisticsPageEndDate);	
-			
-			Ext.getCmp('memberChargeSearchBtn').handler();
-			
-			
-			sendToPageOperation = false;		
-		}
-	
-	};
-
-
-	
 	mcs_southPanel = new Ext.Panel({
 		contentEl : 'memberChargeChart',
 		region : 'south'
@@ -449,6 +513,5 @@ Ext.onReady(function(){
 	});
 	
 	
-	Ext.getCmp('memberChargeStatistics').updateStatisticsDate = memberCharge_setStatisticsDate;
 	
 });
