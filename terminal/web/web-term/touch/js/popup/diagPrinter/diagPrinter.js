@@ -128,6 +128,7 @@ function DiagPrinterPopup(){
 				}
 			},
 			error : function(request, status, err){
+				Util.LM.hide();
 				Util.msg.tip('诊断出错,请联系客服');
 			}
 			
