@@ -154,6 +154,57 @@ Ext.onReady(function(){
 		style : 'text-align:left;',
 		value : cdd_memberOperationOnMobile
 	});
+	
+	//门店选择
+	var branch_combo_memberOperation = new Ext.form.ComboBox({
+		id : 'branch_combo_memberOperation',
+		readOnly : false,
+		forceSelection : true,
+		width : 123,
+		listWidth : 120,
+		store : new Ext.data.SimpleStore({
+			fields : ['id', 'name']
+		}),
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [];
+				Ext.Ajax.request({
+					url : '../../OperateRestaurant.do',
+					params : {
+						dataSource : 'getByCond',
+						id : restaurantID
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText); 
+						
+						if(jr.root[0].typeVal != '2'){
+							data.push([jr.root[0]['id'], jr.root[0]['name']]);
+						}else{
+							data.push([-1, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+							
+							for(var i = 0; i < jr.root[0].branches.length; i++){
+								data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+							}
+						}
+						
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+						thiz.fireEvent('select');
+					}
+				});
+			},
+			select : function(){
+				cdd_searchMemberOperation();
+			}
+		}
+	});
+	
 	cdd_search_onDuty = new Ext.form.DateField({
 		xtype : 'datefield',
 		width : 100,
@@ -234,7 +285,10 @@ Ext.onReady(function(){
 		}, cdd_search_comboOperateType, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;手机号/卡号/会员名称:'
-		}, cdd_search_memerbMobile, '->', {
+		}, cdd_search_memerbMobile, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;门店选择 : '
+		}, branch_combo_memberOperation, '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
 			handler : function(e){
@@ -247,6 +301,7 @@ Ext.onReady(function(){
 				cdd_search_comboOperateType.setValue(-1);
 				cdd_search_memberType.setValue(-1);
 				cdd_search_memerbMobile.setValue();
+				branch_combo_memberOperation.setValue(-1);
 				cdd_searchMemberOperation();
 			}
 		}]
@@ -355,6 +410,7 @@ function cdd_searchMemberOperation(){
 	gs.baseParams['operateType'] = operateType > 0 ? operateType : '';
 	gs.baseParams['onDuty'] = onDuty;
 	gs.baseParams['offDuty'] = offDuty;
+	gs.baseParams['branchId'] = Ext.getCmp('branch_combo_memberOperation').getValue();
 	gs.load({
 		params : {
 			start : 0,

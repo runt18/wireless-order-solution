@@ -1,5 +1,7 @@
 package com.wireless.Actions.menuMgr.basic;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,67 +20,95 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class InsertMenuAction extends Action {
 	
+	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
 		
-		JObject jobject = new JObject();
+		final String foodAliasId = request.getParameter("foodAliasID");
+		final String foodName = request.getParameter("foodName");
+		final String foodPrice = request.getParameter("foodPrice");
+		final String foodPrices = request.getParameter("foodPrices");
+		
+		final String kitchenId = request.getParameter("kitchenID");
+		final String printKitchenId = request.getParameter("printKitchenId");
+		final String foodDesc = request.getParameter("foodDesc");
+		final String isSpecial = request.getParameter("isSpecial");
+		final String isRecommend = request.getParameter("isRecommend");
+		final String isGift = request.getParameter("isFree");
+		final String isSellout = request.getParameter("isStop");
+		final String isCurrPrice = request.getParameter("isCurrPrice");
+		final String isHot = request.getParameter("isHot");
+		final String isWeight = request.getParameter("isWeight");
+		final String isCommission = request.getParameter("isCommission");
+		final String isLimit = request.getParameter("isLimit");
+		final String limitCount = request.getParameter("limitCount");			
+		
+		final String commission = request.getParameter("commission");
+		final String multiFoodPrices = request.getParameter("multiFoodPrices");
+		
+		final JObject jObject = new JObject();
 				
 		try {
-			/**
-			 * The parameters looks like below. 1st example, filter the order
-			 * whose id equals 321 pin=0x1 & type=1 & ope=1 & value=321 2nd
-			 * example, filter the order date greater than or equal 2011-7-14
-			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
-			 * 
-			 * pin : the pin the this terminal dishNumber: dishName: dishSpill:
-			 * dishPrice: kitchen: isSpecial : isRecommend : isFree : isStop :
-			 * 
-			 */
-			String pin = (String)request.getAttribute("pin");
 			
-			String foodAliasId = request.getParameter("foodAliasID");
-			String foodName = request.getParameter("foodName");
-			String foodPrice = request.getParameter("foodPrice");
-			String foodPrices = request.getParameter("foodPrices");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String kitchenId = request.getParameter("kitchenID");
-			String foodDesc = request.getParameter("foodDesc");
-			String isSpecial = request.getParameter("isSpecial");
-			String isRecommend = request.getParameter("isRecommend");
-			String isGift = request.getParameter("isFree");
-			String isSellout = request.getParameter("isStop");
-			String isCurrPrice = request.getParameter("isCurrPrice");
-			String isHot = request.getParameter("isHot");
-			String isWeight = request.getParameter("isWeight");
-			String isCommission = request.getParameter("isCommission");
-			String isLimit = request.getParameter("isLimit");
-			String limitCount = request.getParameter("limitCount");			
+			final Food.InsertBuilder builder = new Food.InsertBuilder(foodName, Float.parseFloat(foodPrice), new Kitchen(Integer.parseInt(kitchenId)));
 			
-			String commission = request.getParameter("commission");
-			String multiFoodPrices = request.getParameter("multiFoodPrices");
-//			String stockStatus = request.getParameter("stockStatus");
+			//是否特价
+			if(isSpecial != null && !isSpecial.isEmpty()){
+				builder.setSpecial(Boolean.parseBoolean(isSpecial));
+			}
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			//是否推荐
+			if(isRecommend != null && !isRecommend.isEmpty()){
+				builder.setRecommend(Boolean.parseBoolean(isRecommend));
+			}
 			
-			Food.InsertBuilder builder = new Food.InsertBuilder(foodName, Float.parseFloat(foodPrice), new Kitchen(Integer.parseInt(kitchenId)))
-												 .setDesc(foodDesc)
-//												 .setStockStatus(Food.StockStatus.valueOf(Integer.valueOf(stockStatus)))
-												 .setSpecial(Boolean.valueOf(isSpecial))
-												 .setRecommend(Boolean.valueOf(isRecommend))
-												 .setSellOut(Boolean.valueOf(isSellout))
-												 .setGift(Boolean.valueOf(isGift))
-												 .setCurPrice(Boolean.valueOf(isCurrPrice))
-												 .setHot(Boolean.valueOf(isHot))
-												 .setWeigh(Boolean.valueOf(isWeight));
+			//是否停售
+			if(isSellout != null && !isSellout.isEmpty()){
+				builder.setSellOut(Boolean.parseBoolean(isSellout));
+			}
 			
+			//是否赠送
+			if(isGift != null && !isGift.isEmpty()){
+				builder.setGift(Boolean.parseBoolean(isGift));
+			}
+			
+			//是否时价
+			if(isCurrPrice != null && !isCurrPrice.isEmpty()){
+				builder.setCurPrice(Boolean.parseBoolean(isCurrPrice));
+			}
+			
+			//是否热销
+			if(isHot != null && !isHot.isEmpty()){
+				builder.setHot(Boolean.parseBoolean(isHot));
+			}
+			
+			//是否称重
+			if(isWeight != null && !isWeight.isEmpty()){
+				builder.setWeigh(Boolean.parseBoolean(isWeight));
+			}
+			
+			//简介
+			if(foodDesc != null && !foodDesc.isEmpty()){
+				builder.setDesc(foodDesc);
+			}
+			
+			//打印厨房
+			if(printKitchenId != null && !printKitchenId.isEmpty()){
+				builder.setPrintKitchen(Integer.parseInt(printKitchenId));
+			}
+			
+			//助记码
 			if(foodAliasId != null && !foodAliasId.isEmpty()){
 				builder.setAliasId(Integer.parseInt(foodAliasId));
 			}
 			
-			if(Boolean.valueOf(isCommission)){
+			if(isCommission != null && isCommission.isEmpty() && Boolean.valueOf(isCommission)){
 				builder.setCommission(Float.parseFloat(commission));
 			}
 			
-			if(Boolean.parseBoolean(isLimit)){
+			if(isLimit != null && !isLimit.isEmpty() && Boolean.parseBoolean(isLimit)){
 				builder.setLimit(Boolean.parseBoolean(isLimit), Integer.parseInt(limitCount));
 			}else{
 				builder.setLimit(false, 0);
@@ -102,16 +132,16 @@ public class InsertMenuAction extends Action {
 			
 			FoodDao.insert(staff, builder);
 			
-			jobject.initTip(true, "操作成功, 添加新菜品'" + foodName + "'信息");
+			jObject.initTip(true, "操作成功, 添加新菜品'" + foodName + "'信息");
 			
-		} catch (BusinessException e) {
+		} catch (BusinessException | SQLException e) {
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		} finally {
-			response.getWriter().write(jobject.toString());
+			response.getWriter().write(jObject.toString());
 		}
 		return null;
 	}

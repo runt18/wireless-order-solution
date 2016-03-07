@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
 <% 
-	float v = 1.8f; 
+	float v = 1.9f; 
 	response.setHeader("Pragma","No-cache"); 
 	response.setHeader("Cache-Control","no-cache"); 
 	response.setDateHeader("Expires", 0);  
@@ -83,33 +83,33 @@
 <!-- usepopup弹出控件 -->
 <script type="text/javascript" src="./js/popup/coupon/usePopup.js?v=<%=v %>"></script>
 <!-- 会员读取弹出控件 -->
-<script type="text/javascript" src="./js/popup/member/read.js"></script>
+<script type="text/javascript" src="./js/popup/member/read.js?v=<%=v %>"></script>
 <!--添加会员弹出控件 -->
-<script type="text/javascript" src="./js/popup/member/add.js"></script>
+<script type="text/javascript" src="./js/popup/member/add.js?v=<%=v %>"></script>
 <!-- 完善会员资料 -->
-<script type="text/javascript" src="./js/popup/member/perfect.js"></script>
+<script type="text/javascript" src="./js/popup/member/perfect.js?v=<%=v %>"></script>
 <!-- 打印机绑定 -->
-<script type="text/javascript" src="./js/popup/print/print.js"></script>
+<script type="text/javascript" src="./js/popup/print/print.js?v=<%=v %>"></script>
 <!-- 查台等控件绑定 -->
-<script type="text/javascript" src="./js/popup/table/ask.js"></script>
+<script type="text/javascript" src="./js/popup/table/ask.js?v=<%=v %>"></script>
 <!-- 明细控件绑定 -->
-<script type="text/javascript" src="./js/popup/detail/detail.js"></script>
+<script type="text/javascript" src="./js/popup/detail/detail.js?v=<%=v %>"></script>
 <!-- 微信预定 -->
-<script type="text/javascript" src="./js/popup/wxOrder/wxOrder.js"></script>
+<script type="text/javascript" src="./js/popup/wxOrder/wxOrder.js?v=<%=v %>"></script>
 <!-- 混合结账 -->
-<script type="text/javascript" src="./js/popup/mixedPay/mixedPay.js"></script>
+<script type="text/javascript" src="./js/popup/mixedPay/mixedPay.js?v=<%=v %>"></script>
 <!-- 添加预订信息 -->
-<script type="text/javascript" src="./js/popup/bookInfo/bookInfo.js"></script>
+<script type="text/javascript" src="./js/popup/bookInfo/bookInfo.js?v=<%=v %>"></script>
 <!-- 入座 -->
-<script type="text/javascript" src="./js/popup/seat/seat.js"></script>
+<script type="text/javascript" src="./js/popup/seat/seat.js?v=<%=v %>"></script>
 <!-- 微信扫描 -->
-<script type="text/javascript" src="./js/popup/wxPayment/wxPayment.js"></script>
+<script type="text/javascript" src="./js/popup/wxPayment/wxPayment.js?v=<%=v %>"></script>
 <!-- 开席&拼台 -->
-<script type="text/javascript" src="./js/popup/handlerTable/handlerTable.js"></script>
+<script type="text/javascript" src="./js/popup/handlerTable/handlerTable.js?v=<%=v %>"></script>
 <!-- 酒席入账 -->
-<script type="text/javascript" src="./js/popup/feastPay/feastPay.js"></script>
+<script type="text/javascript" src="./js/popup/feastPay/feastPay.js?v=<%=v %>"></script>
 <!-- 会员充值 -->
-<script type="text/javascript" src="./js/popup/member/recharge.js"></script>
+<script type="text/javascript" src="./js/popup/member/recharge.js?v=<%=v %>"></script>
 <!-- 补发实体卡 -->
 <script type="text/javascript" src="./js/popup/member/patchCard.js?v=<%= v %>"></script>
 <!-- 打印机诊断 -->
@@ -287,9 +287,6 @@
 		</ul>
 	</div>	
 		
-	<!-- 系统共用会员绑定start -->
-	<div id="loadMemberBind4Tableselect"></div>
-	
 	<!-- 会员消费明细  -->
 	<div id="memberConsumeDetailWin" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 200px; left: 50%;width:1200px; margin: -100px 0px 0px -600px;display: none;background-color: white;" align="center">
 	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">

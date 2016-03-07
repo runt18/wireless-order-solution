@@ -437,9 +437,69 @@
 				})();
 			});			
 		}else if(c.type == 10){//充值统计
-			Ext.ux.addTab('memberChargeStatistics', '充值统计', 'Client_Module/memberChargeStatistics.html');			
+			Ext.ux.addTab('memberChargeStatistics', '充值统计', 'Client_Module/memberChargeStatistics.html', function(){
+				businessSubStatisticsLoading.show();
+				
+				(function(){
+					if(Ext.getCmp('branch_combo_memberCharge').getValue()){
+						
+						Ext.getCmp('memberRecharge_comboPayType').setValue('');
+						
+						//设置门店选择的值
+						Ext.getCmp('branch_combo_memberCharge').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+						
+						//设置是跳转页面
+						var isJump = true;
+						Ext.getCmp('branch_combo_memberCharge').fireEvent('select', isJump);
+						
+						(function(){
+							if(Ext.getCmp('memberRecharge_comboPayType').getValue()){
+								
+								Ext.getCmp('beginDate_combo_memberCharge').setValue(sendToStatisticsPageBeginDate);
+								Ext.getCmp('endDate_combo_memberCharge').setValue(sendToStatisticsPageEndDate);	
+								
+								Ext.getCmp('memberChargeSearchBtn').handler();
+								businessSubStatisticsLoading.hide();
+							}else{
+								setTimeout(arguments.callee, 500);
+							}
+						})();
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+				})();
+			});			
 		}else if(c.type == 11){//取款统计
-			Ext.ux.addTab('memberRefundStatistics', '取款统计', 'Client_Module/memberRefundStatistics.html');			
+			Ext.ux.addTab('memberRefundStatistics', '取款统计', 'Client_Module/memberRefundStatistics.html', function(){
+				businessSubStatisticsLoading.show();
+				
+				(function(){
+					if(Ext.getCmp('branch_combo_memberRefund').getValue()){
+						Ext.getCmp('memberRefund_comboPayType').setValue('');
+						
+						//设置门店选择的值
+						Ext.getCmp('branch_combo_memberRefund').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+						
+						//设置是跳转页面
+						var isJump = true;
+						Ext.getCmp('branch_combo_memberRefund').fireEvent('select', isJump);
+						
+						(function(){
+							if(Ext.getCmp('memberRefund_comboPayType').getValue()){
+								Ext.getCmp('beginDate_combo_memberRefund').setValue(sendToStatisticsPageBeginDate);
+								Ext.getCmp('endDate_combo_memberRefund').setValue(sendToStatisticsPageEndDate);	
+								
+								Ext.getCmp('memberRefundSearchBtn').handler();
+								businessSubStatisticsLoading.hide();
+							}else{
+								setTimeout(arguments.callee, 500);
+							}
+						})();
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+				})();
+			});			
 		}else if(c.type == 13){//优惠券统计
 			Ext.ux.addTab('couponStatistics', '优惠券统计 ', 'History_Module/CouponStatistics.html', function(){
 				businessSubStatisticsLoading.show();

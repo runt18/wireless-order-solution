@@ -392,6 +392,7 @@ Ext.onReady(function(){
 			scripts : true,
 			params : params
 		});
+		
 	}
 
 	/**
@@ -400,50 +401,6 @@ Ext.onReady(function(){
 	function queryMemberOperationSummaryHandler(){
 		var title = '会员操作明细';
 		queryMemberOperationHandler(title, '../window/client/memberOperation.jsp', {modal : true});
-		/*var mr_queryMemberConsumeSummaryWin = Ext.getCmp('mr_queryMemberConsumeSummaryWin');
-		if(!mr_queryMemberConsumeSummaryWin){
-			mr_queryMemberConsumeSummaryWin = new Ext.Window({
-				id : 'mr_queryMemberConsumeSummaryWin',
-				title : '会员操作汇总',
-				modal : true,
-				closable : false,
-				resizable : false,
-				width : 1200,
-				height : 500,
-				keys : [{
-					key : Ext.EventObject.ESC,
-					scope : this,
-					fn : function(){
-						mr_queryMemberConsumeSummaryWin.hide();
-					}
-				}],
-				bbar : ['->', {
-					text : '关闭',
-					iconCls : 'btn_close',
-					handler : function(e){
-						mr_queryMemberConsumeSummaryWin.hide();
-					}
-				}],
-				listeners : {
-					hide : function(thiz){
-						thiz.body.update('');
-					},
-					show : function(thiz){
-						var data = Ext.ux.getSelData(memberBasicGrid);
-						var memberCard = !data ? '' : data['memberCard.aliasID'] ;
-						thiz.center();
-						thiz.load({
-							url : '../window/client/memberOperationSummary.jsp',
-							scripts : true,
-							params : {
-								memberCard : memberCard
-							}
-						});
-					}
-				}
-			});
-		}
-		mr_queryMemberConsumeSummaryWin.show();*/
 	};
 
 
