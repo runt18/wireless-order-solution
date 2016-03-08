@@ -780,6 +780,15 @@ $(function(){
 			
 		});
 		
+		//消费明细
+		$('#consumeDetail_a_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			var consumeDetail = new ConsumeDetail();
+			setTimeout(function(){
+				consumeDetail.open();
+			}, 300);
+		});
+		
 		
 		//查台按钮
 		$('#searchTable_a_tableSelect').click(function(){
@@ -1875,119 +1884,4 @@ ts.member.memberPointConsumeAction = function(){
 			});
 		}		
 	});
-};
-
-/**
- * 查询会员消费明细
- */
-ts.member.searchMemberDetail = function(){
-	Util.LM.show();
-//	var memberType = $('#consumeDetail_memberType').val();
-	var operateType = -1;
-	var detailOpes = $('input[name=memberConsumeType]'); 
-	for (var i = 0; i < detailOpes.length; i++) {
-		
-		if($(detailOpes[i]).attr("checked")){
-			operateType = $(detailOpes[i]).attr("data-value");
-			break;
-		}
-	}
-	var name = $('#consumeDetail_memberName').val();
-	
-	$.ajax({
-		url : '../QueryMemberOperation.do',
-		type : 'post',
-		dataType : 'json',
-		data : {
-			isPaging:false,
-			dataSource:'today',
-			fuzzy: name,
-			operateType:operateType		
-		},
-		success : function(result, status, xhr){
-			Util.LM.hide();
-			if(result.success){
-				var html = [];
-				for(var i = 0, index = 1; i < result.root.length; i++){
-					html.push(memberConsumeTrTemplet.format({
-						dataIndex : index,
-						orderId : result.root[i].orderId != 0?result.root[i].orderId:'----',
-						operateDateFormat : result.root[i].operateDateFormat,
-						memberName : result.root[i].member.name,
-						memberType : result.root[i].member.memberType.name,
-						otype : result.root[i].operateTypeText,
-						money : result.root[i].payMoney?result.root[i].payMoney:(result.root[i].deltaTotalMoney?result.root[i].deltaTotalMoney:0),	
-						deltaPoint : result.root[i].deltaPoint > 0? '+'+result.root[i].deltaPoint : result.root[i].deltaPoint,
-						staffName : result.root[i].staffName,
-						comment : result.root[i].comment
-					}));	
-					index ++;
-				}	
-				
-				$('#front_memberConsumeDetailBody').html(html.join("")).trigger('create');
-			}
-		},
-		error : function(request, status, err){
-			Util.LM.hide();
-			Util.msg.alert({
-				renderTo : 'tableSelectMgr',
-				msg : request.msg
-			});
-		}
-	});		
-}; 
-
-/**
- * 打开会员消费明细
- */
-ts.member.openMemberConsumeDetailWin = function(){
-	$('#frontPageMemberOperation').popup('close');
-	
-	$.ajax({
-		url : '../QueryMemberType.do',
-		type : 'post',
-		async:false,
-		data : {dataSource : 'normal'},
-		success : function(jr, status, xhr){
-			if(jr.success){
-				var html = ['<option value=-1 >全部</option>'];
-				for (var i = 0; i < jr.root.length; i++) {
-					html.push('<option value={id} >{name}</option>'.format({
-						id : jr.root[i].id,
-						attrVal : jr.root[i].attributeValue,
-						chargeRate : jr.root[i].chargeRate,
-						name : jr.root[i].name
-					}));
-				}
-				$('#consumeDetail_memberType').html(html.join("")).selectmenu('refresh');
-			}else{
-				Util.msg.alert({
-					renderTo : 'tableSelectMgr',
-					msg : jr.msg
-				});
-			}
-		},
-		error : function(request, status, err){
-			Util.msg.alert({
-				renderTo : 'tableSelectMgr',
-				msg : request.msg
-			});
-		}
-	});	
-	
-	ts.member.searchMemberDetail();
-	
-	$('#memberConsumeDetailWin').show();
-	$('#shadowForPopup').show();
-};
-
-/**
- * 关闭会员消费明细
- */
-ts.member.closeMemberConsumeDetailWin = function(){
-	$('#memberConsumeDetailWin').hide();
-	$('#shadowForPopup').hide();
-	
-	$('#consumeDetail_memberName').val('');
-	$('#front_memberConsumeDetailBody').html('');
 };
