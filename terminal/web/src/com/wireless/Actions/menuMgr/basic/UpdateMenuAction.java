@@ -71,8 +71,12 @@ public class UpdateMenuAction extends Action {
 			}
 			
 			//打印厨房
-			if(printKitchenId != null && !printKitchenId.isEmpty()){
-				builder.setPrintKitchen(Integer.parseInt(printKitchenId));
+			if(printKitchenId != null){
+				if(printKitchenId.isEmpty()){
+					builder.setPrintKitchen(0);
+				}else{
+					builder.setPrintKitchen(Integer.parseInt(printKitchenId));
+				}
 			}
 			
 			//简介
