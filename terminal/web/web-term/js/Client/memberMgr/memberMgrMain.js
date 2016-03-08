@@ -2075,6 +2075,7 @@ Ext.onReady(function(){
 					columnWidth : 1,
 					xtype : 'label',
 					style : 'text-align:left;padding-bottom:3px;',
+					id : 'pricePlanWord_text_memberMgr',
 					text : '选择价格方案:'
 				},{
 					xtype : 'panel',
@@ -2114,10 +2115,10 @@ Ext.onReady(function(){
 //						}
 						
 						//折扣
-						var memberDiscount = selectRestaurant.getValue() + ',' + discount.getValue() + ',' + getChecked(memberDiscountCheckeds, document.getElementsByName('memberDiscount'));
+//						var memberDiscount = selectRestaurant.getValue() + ',' + discount.getValue() + ',' + getChecked(memberDiscountCheckeds, document.getElementsByName('memberDiscount'));
 						
 						//会员价
-						var memberPricePlan = selectRestaurant.getValue() + ',' + pricePlan.getValue() + ',' + getChecked(memberPricePlanCheckeds, document.getElementsByName('memberPricePlan'));
+//						var memberPricePlan = selectRestaurant.getValue() + ',' + pricePlan.getValue() + ',' + getChecked(memberPricePlanCheckeds, document.getElementsByName('memberPricePlan'));
 						
 						Ext.Ajax.request({
 							url : '../../OperateRestaurant.do',
@@ -2149,7 +2150,7 @@ Ext.onReady(function(){
 										dataSource : 'update',
 										typeID : typeID,
 										restaurantID : restaurantID,
-										pricePlanId : pricePlan.getValue(),
+										pricePlanId : pricePlan ? pricePlan.getValue() : null,
 										discountID : discount.getValue(),
 										memberDiscountCheckeds : getChecked(memberDiscountCheckeds, document.getElementsByName('memberDiscount')),
 										memberPricePlanCheckeds : getChecked(memberPricePlanCheckeds, document.getElementsByName('memberPricePlan')),
@@ -2158,6 +2159,22 @@ Ext.onReady(function(){
 									success : function(res, opt){
 										var jr = Ext.decode(res.responseText);
 										if(jr.success){
+											Ext.Ajax.request({
+												url : '../../OperateRestaurant.do',
+												params : {
+													dataSource : 'getByCond',
+													byId : true,
+													id : restaurantID
+												},
+												success : function(res, opt){
+													var jr = Ext.decode(res.responseText);
+													if(jr.success){
+														if(jr.root[0].typeVal != 2){
+															memberDisountWin.hide();
+														}
+													}
+												}
+											})
 											Ext.example.msg(jr.title, jr.msg);
 											Ext.getCmp('btnRefreshMemberType_btn_member').handler();
 //											member_loadMemberTypeChart();
@@ -2241,6 +2258,7 @@ Ext.onReady(function(){
 							Ext.getCmp('formMemberPricePlan_panel_member').doLayout();
 						}else{
 							Ext.getCmp('formMemberPricePlan_panel_member').hide();
+							Ext.getCmp('pricePlanWord_text_memberMgr').hide();
 						}						
 						
 					},
