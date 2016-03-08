@@ -213,7 +213,7 @@ Ext.onReady(function(){
 							if(jr.root[0].typeVal != '2'){
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
 							}else{
-								data.push([-1, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								data.push([null, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 								
 								for(var i = 0; i < jr.root[0].branches.length; i++){
 									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
@@ -221,13 +221,13 @@ Ext.onReady(function(){
 							}
 							
 							thiz.store.loadData(data);
-							thiz.setValue(-1);
+							thiz.setValue(null);
 							thiz.fireEvent('select');
 						}
 					});
 				},
 				select : function(isJump){
-					if(branch_combo_memberRefund.getValue() == -1){
+					if(branch_combo_memberRefund.getValue() == null){
 						Ext.getCmp('memberRefund_comboPayType').disable();
 					}else{
 						Ext.getCmp('memberRefund_comboPayType').enable();
@@ -336,7 +336,7 @@ Ext.onReady(function(){
 				handler : function(e){
 					mrs_search_memberType.setValue(-1);
 					mrs_search_memberName.setValue();
-					branch_combo_memberRefund.setValue(-1);
+					branch_combo_memberRefund.setValue(null);
 					mrs_searchMemberOperation();
 				}
 				
