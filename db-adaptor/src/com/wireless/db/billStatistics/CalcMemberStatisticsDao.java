@@ -31,13 +31,25 @@ public class CalcMemberStatisticsDao {
 	public static class ExtraCond{
 		private final DBTbl dbTbl;
 		private int staffId;
+		private int branchId;
+		private MemberOperation.OperationType operateType;
 		
 		public ExtraCond(DateType dateType){
 			this.dbTbl = new DBTbl(dateType);
 		}
 		
-		public ExtraCond setStaffId(int staffId){
+		public ExtraCond setStaff(int staffId){
 			this.staffId = staffId;
+			return this;
+		}
+		
+		public ExtraCond setBranch(int branchId){
+			this.branchId = branchId;
+			return this;
+		}
+		
+		public ExtraCond setOperateType(MemberOperation.OperationType operateType){
+			this.operateType = operateType;
 			return this;
 		}
 		
@@ -46,6 +58,12 @@ public class CalcMemberStatisticsDao {
 			StringBuilder extraCond = new StringBuilder();
 			if(staffId > 0){
 				extraCond.append(" AND staff_id = " + staffId);
+			}
+			if(branchId != 0){
+				extraCond.append(" AND branch_id = " + branchId);
+			}
+			if(operateType != null){
+				extraCond.append(" AND operate_type = " + operateType.getValue());
 			}
 			return extraCond.toString();
 		}
@@ -96,7 +114,7 @@ public class CalcMemberStatisticsDao {
 			
 			List<Member> creates = null;
 			try {
-				creates = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setCreateRange(new DutyRange(dateBegin.getTime(), c.getTime().getTime())), null);
+				creates = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setCreateRange(new DutyRange(dateBegin.getTime(), c.getTime().getTime())).setBranch(extraCond.branchId), null);
 			} catch (BusinessException e) {
 				creates = Collections.emptyList();
 				e.printStackTrace();
@@ -112,12 +130,11 @@ public class CalcMemberStatisticsDao {
 	
 	public static IncomeByConsume calcIncomeByConsume(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		String sql;
+		
 		sql = " SELECT IFNULL(PT.name, '其他') AS pay_type, SUM(TMP.actual_price) AS total_consume, COUNT(*) AS consume_amount FROM ( " +
 				" SELECT OH.actual_price, OH.pay_type_id FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " OH " +
-				" JOIN " + Params.dbName + "." + extraCond.dbTbl.moTbl + " MOH ON MOH.order_id = OH.id " +
+				" JOIN ( " +  makeSql(staff, range, extraCond.setOperateType(OperationType.CONSUME)) + " ) AS TMP ON TMP.order_id = OH.id " +
 				" WHERE OH.restaurant_id = " + staff.getRestaurantId() +
-			    " AND MOH.operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-				" AND MOH.operate_type = " + MemberOperation.OperationType.CONSUME.getValue() +
 				" GROUP BY OH.id " +
 			  " ) AS TMP " +
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = TMP.pay_type_id " +
@@ -177,14 +194,9 @@ public class CalcMemberStatisticsDao {
 		 sql = " SELECT " +
 			   " COUNT(*) AS charge_amount, " +
 			   " SUM(delta_base_money + delta_extra_money) AS total_account_charge, " +
-		 	   " SUM(IF(charge_type = " + ChargeType.CASH.getValue() + ", charge_money, 0)) AS total_actual_charge_by_cash, " +
-		 	   " SUM(IF(charge_type = " + ChargeType.CREDIT_CARD.getValue() + ", charge_money, 0)) AS total_actual_charge_by_card " +
-			   " FROM " + Params.dbName + "." + extraCond.dbTbl.moTbl +
-			   " WHERE 1 = 1 " +
-			   (extraCond != null ? extraCond.toString() : "") +
-			   " AND restaurant_id = " + staff.getRestaurantId() +
-			   " AND operate_type = " + OperationType.CHARGE.getValue() +
-			   " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
+			   " SUM(IF(charge_type = " + ChargeType.CASH.getValue() + ", charge_money, 0)) AS total_actual_charge_by_cash, " +
+			   " SUM(IF(charge_type = " + ChargeType.CREDIT_CARD.getValue() + ", charge_money, 0)) AS total_actual_charge_by_card " +
+			   " FROM (" + makeSql(staff, range, extraCond.setOperateType(OperationType.CHARGE)) + ") AS TMP";
 		 
 		 dbCon.rs = dbCon.stmt.executeQuery(sql);
 		 
@@ -200,17 +212,12 @@ public class CalcMemberStatisticsDao {
 		 dbCon.rs.close();
 		 
 		 // Calculate the refund. 
+		 
 		 sql = " SELECT " +
 			   " COUNT(*) AS refund_amount, " +
 			   " SUM(delta_base_money + delta_extra_money) AS total_account_refund, " +
-		 	   " SUM(charge_money) AS total_actual_refund " +
-			   " FROM " + Params.dbName + "." + extraCond.dbTbl.moTbl +
-			   " WHERE 1 = 1 " +
-			   (extraCond != null ? extraCond.toString() : "") +
-			   " AND restaurant_id = " + staff.getRestaurantId() +
-			   " AND operate_type = " + OperationType.REFUND.getValue() +
-			   " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
-		 
+			   " SUM(charge_money) AS total_actual_refund " +
+			   " FROM (" + makeSql(staff, range, extraCond.setOperateType(OperationType.REFUND)) + ") AS TMP";
 		 dbCon.rs = dbCon.stmt.executeQuery(sql);
 		 
 		 if(dbCon.rs.next()){
@@ -224,4 +231,14 @@ public class CalcMemberStatisticsDao {
 		 return incomeByCharge;
 		 
 	 }	
+	 
+	 private static String makeSql(Staff staff, DutyRange range, ExtraCond extraCond){
+		 String sql;
+		 sql = " SELECT * FROM " + Params.dbName + "." + extraCond.dbTbl.moTbl +
+			   " WHERE 1 = 1 " +
+			   " AND restaurant_id = " + staff.getRestaurantId() +
+			   " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+		 	   (extraCond != null ? extraCond.toString() : "");
+		 return sql;
+	 }
 }
