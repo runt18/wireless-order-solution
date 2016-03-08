@@ -36,12 +36,10 @@ public class QueryKitchenAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward tree(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		StringBuilder jsb = new StringBuilder();
+	public ActionForward tree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final StringBuilder jsb = new StringBuilder();
 		try{
-			String pin = (String)request.getAttribute("pin");
 			List<Kitchen> list = KitchenDao.getByType(StaffDao.verify(Integer.parseInt(pin)), Type.NORMAL);
 			for(int i = 0; i < list.size(); i++){
 				if(i > 0){
@@ -63,13 +61,11 @@ public class QueryKitchenAction extends DispatchAction {
 		return null;
 	}
 	
-	public ActionForward deptKitchenTree(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		StringBuilder jsonSB = new StringBuilder();
+	public ActionForward deptKitchenTree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final StringBuilder jsonSB = new StringBuilder();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final String pin = (String)request.getAttribute("pin");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			List<DeptNode> depts = new DepartmentTree.Builder(DepartmentDao.getByType(staff, Department.Type.NORMAL), KitchenDao.getByType(staff, Kitchen.Type.NORMAL)).build().asDeptNodes();
 			for (int i = 0; i < depts.size(); i++) {
@@ -129,33 +125,27 @@ public class QueryKitchenAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward normal(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		final String pin = (String)request.getAttribute("pin");
 		
-		JObject jobject = new JObject();
-		List<Kitchen> root = null;
-		String flag = request.getParameter("flag");
+		final JObject jObject = new JObject();
+		final String flag = request.getParameter("flag");
 		try{
-			String pin = (String)request.getAttribute("pin");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			
-			
-//			root = KitchenDao.getByType(staff, Type.NORMAL);
-			root = new DepartmentTree.Builder(DepartmentDao.getByType(staff, Department.Type.NORMAL), KitchenDao.getByType(staff, Kitchen.Type.NORMAL)).build().asKitchenList();
+			final List<Kitchen> root = new DepartmentTree.Builder(DepartmentDao.getByType(staff, Department.Type.NORMAL), KitchenDao.getByType(staff, Kitchen.Type.NORMAL)).build().asKitchenList();
+			if(root != null){
+				jObject.setTotalProperty(root.size());
+				jObject.setRoot(root);
+			}
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			if(root != null){
-				jobject.setTotalProperty(root.size());
-				jobject.setRoot(root);
-			}
-			response.getWriter().print(jobject.toString(flag != null?Kitchen.KITCHEN_JSONABLE_SIMPLE : Kitchen.KITCHEN_JSONABLE_COMPLEX));
+			response.getWriter().print(jObject.toString(flag != null ? Kitchen.KITCHEN_JSONABLE_SIMPLE : Kitchen.KITCHEN_JSONABLE_COMPLEX));
 		}
 		return null;
 	}
@@ -169,9 +159,7 @@ public class QueryKitchenAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward printKitchenTree(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward printKitchenTree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		StringBuilder jsonSB = new StringBuilder();
 		try{
 			String pin = (String)request.getAttribute("pin");
