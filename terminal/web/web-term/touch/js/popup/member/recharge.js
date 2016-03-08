@@ -222,7 +222,7 @@ function MemberRechargePopup(){
 	function getCharge(basePay, balance, rate){
 		if(basePay.val()){
 			if(rate){
-				balance.val(parseInt(basePay.val()) * parseFloat(rate));
+				balance.val(Number(parseInt(basePay.val()) * parseFloat(rate)).toFixed(2));
 			}else{
 				balance.val(basePay.val());
 			}
