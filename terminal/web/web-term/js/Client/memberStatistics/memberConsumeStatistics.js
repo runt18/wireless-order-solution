@@ -20,7 +20,8 @@ Ext.onReady(function(){
 			data : {
 				dataSource :'consumeStatistics',
 				dateBegin : dateBegin,
-				dateEnd : dateEnd + " 23:59:59"
+				dateEnd : dateEnd + " 23:59:59",
+				branchId : Ext.getCmp('branch_combo_memberConsume').getValue()
 			},
 			async : false,
 			success : function(data){

@@ -21,7 +21,8 @@ Ext.onReady(function(){
 			data : {
 				dataSource :'refundStatistics',
 				dateBegin : dateBegin,
-				dateEnd : dateEnd + " 23:59:59"
+				dateEnd : dateEnd + " 23:59:59",
+				branchId : Ext.getCmp('branch_combo_memberRefund').getValue()
 			},
 			async : false,
 			success : function(data){

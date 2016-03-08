@@ -1047,7 +1047,7 @@ var allFoodMiniGrid = createGridPanel(
 	    [true, false, false, true], 
 	    ['编号', 'alias', 70] , 
 	    ['菜名', 'name', 200] , 
-	    ['价格', 'unitPrice', '', 'right', 'Ext.ux.txtFormat.gridDou']
+	    ['价格', 'unitPrice', '', 'right', Ext.ux.txtFormat.gridDou]
 	],
 	FoodBasicRecord.getKeys(),
     [ ['restaurantId', restaurantID], ['isPaging', true]],
@@ -1504,9 +1504,75 @@ var basicOperationPanel = new Ext.Panel({
 		 	},{
 		 	    items : [{
 		 	    	xtype : 'checkbox',
+		 	    	id : 'selectPrintRestaurant_checkBox_menuMgrMain',
+		 	    	hideLabel : true,
+		 	    	width : 25,
+		 	    	listeners : {
+		 	    		check : function(checkbox, checked){
+ 	    					var selectRestaurant = Ext.getCmp('restaurant_checkbox_menuMgrMain');
+		 	    			
+		 	    			if(checked){
+		 	    				selectRestaurant.enable();
+							}else{
+								selectRestaurant.disable();
+							}
+						}
+		 	    	}
+		 	    }]
+		 	},{
+		 		columnWidth : .5,
+		 		items : [{
+		 			xtype : 'combo',
+		 	    	id : 'restaurant_checkbox_menuMgrMain',
+		 	    	fieldLabel : '打印厨房',
+		 	    	width : 80,
+		 	    	listWidth : 99,
+		 	    	labelStyle : 'width:55px;',
+		 	    	store : new Ext.data.SimpleStore({
+						fields : ['id', 'name']
+					}),
+					valueField : 'id',
+					displayField : 'name',
+					mode : 'local',
+					triggerAction : 'all',
+					typeAhead : true,
+					selectOnFocus : true,
+					forceSelection : true,
+					allowBlank : false,
+					readOnly : false,
+					listeners : {
+						render : function(thiz){
+							var kitchenData = [];
+							Ext.Ajax.request({
+								url : '../../QueryKitchen.do',
+								params : {
+									dataSource : 'normal'
+								},
+								success : function(res, opt){
+									var jr = Ext.decode(res.responseText);
+									for(var i = 0; i < jr.root.length; i++){
+										kitchenData.push([jr.root[i]['id'], jr.root[i]['name']]);
+									}
+									thiz.store.loadData(kitchenData);
+									thiz.setValue(jr.root[0].id);
+									Ext.getCmp('restaurant_checkbox_menuMgrMain').disable();
+								},
+								fialure : function(res, opt){
+									thiz.store.loadData(kitchenData);
+								}
+							});
+						}
+					}
+		 		}]
+		 	},{
+		 		columnWidth : 0.9
+		 	},
+			{
+		 	    items : [{
+		 	    	xtype : 'checkbox',
 		 	    	id : 'chbForFoodAlias',
 		 	    	hideLabel : true,
-		 	    	width : 16,
+		 	    	width : 10,
 		 	    	listeners : {
 		 	    		check : function(checkbox, checked){
 		 	    			var numForAlias = Ext.getCmp('numBasicForFoodAliasID');
@@ -1530,11 +1596,12 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	}
 		 	    }]
 		 	},{
-		 		columnWidth : .5,
+		 		columnWidth : .55,
 		 		items : [{
 		 			xtype : 'numberfield',
 		 	    	id : 'numBasicForFoodAliasID',
 		 	    	fieldLabel : '助记码',
+		 	    	labelStyle : 'margin-left:10px;',
 		 	    	maxValue : 65535,
 		 	    	minValue : 1,
 		 	    	width : 80,
@@ -1988,6 +2055,15 @@ function resetbBasicOperation(_d){
 		}
 	}
 	
+	
+	if(data.printKitchenId){
+		Ext.getCmp('selectPrintRestaurant_checkBox_menuMgrMain').setValue(true);
+		Ext.getCmp('restaurant_checkbox_menuMgrMain').setValue(data.printKitchenId);
+	}else{
+		Ext.getCmp('selectPrintRestaurant_checkBox_menuMgrMain').setValue(false);
+	}
+	
+	
 	var status = typeof(data.status) == 'undefined' ? 0 : parseInt(data.status);
 	
 	foodName.setValue(data.name);
@@ -2103,7 +2179,7 @@ function basicOperationBasicHandler(c){
 	
 	var commission = Ext.getCmp('numCommission');
 	var limitCount = Ext.getCmp('numLimitCount');
-	
+
 	var isCombination = false;
 	var comboContent = '';
 	var kitchenID = '';
@@ -2158,14 +2234,6 @@ function basicOperationBasicHandler(c){
 		}		
 	}
 
-	
-/*	for(var i = 0; i < kitchenData.length; i++){
-		if(kitchenData[i].alias == foodKitchenAlias.getValue()){
-			kitchenID = kitchenData[i].id;
-			break;
-		}
-	}*/
-	
 	if(c.type == mmObj.operation.insert){
 		Ext.getCmp('btnAddForOW').setDisabled(true);
 		Ext.getCmp('btnCloseForOW').setDisabled(true);
@@ -2173,6 +2241,14 @@ function basicOperationBasicHandler(c){
 	}else if(c.type == mmObj.operation.update){
 		setButtonStateOne(true);
 	}
+	
+	var printKitchenId;
+	if(Ext.getCmp('selectPrintRestaurant_checkBox_menuMgrMain').checked){
+		printKitchenId = Ext.getCmp('restaurant_checkbox_menuMgrMain').getValue();
+	}else{
+		printKitchenId = '';
+	}
+	
 	
 	Ext.Ajax.request({
 		url : actionURL,
@@ -2200,7 +2276,8 @@ function basicOperationBasicHandler(c){
 			limitCount : limitCount.getValue(),
 			comboContent : comboContent,
 			foodImage : foodOperationWin.foodImage,
-			multiFoodPrices : multiFoodPrices
+			multiFoodPrices : multiFoodPrices,
+			printKitchenId : printKitchenId
 		},
 		success : function(res, opt){
 			var jr = Ext.util.JSON.decode(res.responseText);
@@ -2562,8 +2639,8 @@ function fppOperation(){
 			[
 				[true, false, false, false], 
 				['方案', 'pricePlan.name'],
-				['价格', 'unitPrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-				['操作', 'operation', 80, 'center', 'fppGridOperationRenderer']
+				['价格', 'unitPrice', 60, 'right', Ext.ux.txtFormat.gridDou],
+				['操作', 'operation', 80, 'center', fppGridOperationRenderer]
 			],
 			FoodPricePlan.getKeys(),
 			[['restaurantID', restaurantID], ['searchType', 1], ['searchValue', 0]],
@@ -2826,6 +2903,15 @@ function menuIsHaveImage(value, cellmeta, record, rowIndex, columnIndex, store){
 	return '<a href=\"javascript:btnFood.handler()" ' + style + ' >' + content + '</a>';
 };
 
+function menuIsBranchId(value, cellmeta, record, rowIndex, columnIndex, store){
+	if(record.json.printKitchenId == 0){
+		return value;
+	}else{
+		return value + '<font color="red" style="font-size:16px;"> * </font>'; 
+	}
+	
+}
+
 function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return '' 
 		 + '<a href=\"javascript:foodRelationWinShow()">套菜关联</a>'
@@ -2860,9 +2946,10 @@ function initMenuGrid(){
     		align : 'right',
     		renderer : Ext.ux.txtFormat.gridDou
     	}, {
-    		header : '打印厨房',
+    		header : '厨房',
     		dataIndex : 'kitchen.name',
-    		width : 65
+    		width : 65,
+    		renderer : menuIsBranchId
     	}, {
     		header : '图片状态',
     		width : 65,
@@ -3646,7 +3733,7 @@ function initPricePlanWin(){
 		[
 			[true, false, false, false], 
 			['名称', 'name'],
-			['操作', 'operation', 60, 'center', 'pricePlanRenderer']
+			['操作', 'operation', 60, 'center', pricePlanRenderer]
 		],
 		['id', 'name'],
 		[['dataSource', 'getByCond']],

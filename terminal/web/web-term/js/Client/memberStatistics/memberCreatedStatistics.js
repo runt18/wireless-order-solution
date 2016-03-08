@@ -21,7 +21,8 @@ Ext.onReady(function(){
 			data : {
 				dataSource :'createdStatistics',
 				dateBegin : dateBegin,
-				dateEnd : dateEnd + " 23:59:59"
+				dateEnd : dateEnd + " 23:59:59",
+				branchId :Ext.getCmp('branch_combo_memberCreate').getValue()
 			},
 			async : false,
 			success : function(data){
