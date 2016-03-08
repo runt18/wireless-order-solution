@@ -143,7 +143,7 @@ function PatchCardPopup(){
 		}else{
 			self.find('[id=memberCard_label_patchCard]').css('display', 'none');
 			self.find('[id=setMemberCard_div_patchCard]').css('display', 'block');
-			self.find('[id=tips_td_patchCard]').text('&nbsp;');
+			self.find('[id=tips_td_patchCard]').text('');
 			self.find('[id=setMemberCard_input_patchCard]').focus();
 		}
 		
