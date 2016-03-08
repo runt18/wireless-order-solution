@@ -762,6 +762,14 @@ $(function(){
 			}, 200);
 		});
 		
+		
+		//打印机诊断
+		$('#diagPrinter_a_tableSelect').click(function(){
+			var diagPrinterPopup = new DiagPrinterPopup();
+			diagPrinterPopup.open();
+		});
+		
+		
 		//打印机绑定按钮
 		$('#printBind_a_tableSelect').click(function(){
 			$('#tableSelectOtherOperateCmp').popup('close');
@@ -770,6 +778,15 @@ $(function(){
 				printBindPopup.open();
 			}, 300);
 			
+		});
+		
+		//消费明细
+		$('#consumeDetail_a_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			var consumeDetail = new ConsumeDetail();
+			setTimeout(function(){
+				consumeDetail.open();
+			}, 300);
 		});
 		
 		
@@ -1678,97 +1695,6 @@ window.onload = function(){
     
 };
 
-
-var printerConnectionTemplet = '<tr>' +
-		'<td>{index}</td>' +
-		'<td>{name}</td>' +
-		'<td >{driver}</td>' +
-		'<td>{port}</td>' +
-		'<td>{gateway}</td>' +
-		'<td >{ping}</td>' +
-		'<td >{coverOpen}</td>' +
-		'<td >{paperEnd}</td>' +
-		'<td >{cutterError}</td>' +
-	'</tr>';
-
-/**
- * 打开远程诊断
- */
-ts.displayPrintConnection = function(){
-	Util.LM.show();
-	$.ajax({
-		url : '../PrinterDiagnosis.do',
-		type : 'post',
-		dataType : 'json',
-		success : function(result){
-			Util.LM.hide();
-			if(result.success){
-				$('#printerConnectionCount').text(result.root[0].printers.length);
-/*				var root =[{
-					printerName : '192.168.1.202',
-					printerAlias : '中厨',
-					printerPort : '192.168.1.202',
-					driver : false,
-					ping : false,
-					coverOpen : true,
-					paperEnd : true,
-					cutterError : true
-				}];*/
-				
-				if(result.root[0].connectionAmount == 1){
-					$('#printerServiceState').html('<font color="green">正常</font>');
-				}else if(result.root[0].connectionAmount == 2){
-					$('#printerServiceState').html('<a href="#printerServiceOpenTwiceCmp" data-rel="popup" data-transition="pop">服务重叠 (所有打印机出重单, 点击解决)</a>');
-				}else{
-					$('#printerServiceState').html('<a href="#printerServiceUnopenCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>');
-				}
-				
-				var html = [];
-				for (var i = 0; i < result.root[0].printers.length; i++) {
-					var printer = result.root[0].printers[i];
-					var details = printer.driver && printer.ping;
-					html.push(printerConnectionTemplet.format({
-						index : i+1,
-						name : printer.printerName + (printer.printerAlias?'('+printer.printerAlias+')':''),
-						driver : printer.driver ? '<font color="green">正常</font>' : '<a href="#printerDriverErrorCmp" data-rel="popup" data-transition="pop">失败</a>', 
-						port : printer.printerPort?printer.printerPort:'----',
-						gateway : printer.gateway?printer.gateway:'----',
-						ping : printer.ping ? '<font color="green">正常</font>' : '<a href="#printerPingErrorCmp" data-rel="popup" data-transition="pop">失败</a>',
-						coverOpen : !details? "----" : printer.coverOpen ? '<a href="#">未关闭</a>' : '<font color="green">正常</font>',
-						paperEnd : 	!details? "----" : printer.paperEnd ? '<a href="#">已用完</a>' : '<font color="green">正常</font>',
-						cutterError : 	!details? "----" : printer.paperEnd ? '<a href="#">已损坏</a>' : '<font color="green">正常</font>'
-					}));
-				}
-				$('#printerConnectionList').html(html.join('')).trigger('create').trigger('refresh');
-				
-			
-			}else{
-				$('#printerServiceState').html('<a href="#printerServiceUnopenCmp" data-rel="popup" data-transition="pop">未打开 (所有打印机不出单, 点击解决)</a>');
-				$('#printerConnectionCount').text(0);
-				$('#printerConnectionList').html('');
-			}
-			
-			$('#printerConnectionCmp').show();
-			$('#shadowForPopup').show();	
-		},
-		error : function(result){
-			Util.LM.hide();
-			Util.msg.alert({
-				renderTo : 'tableSelectMgr',
-				msg : '诊断出错, 请联系客服'
-			});
-		}
-	});
-};
-
-/**
- * 关闭远程诊断
- */
-ts.closePrintConnection = function(){
-	$('#printerConnectionCmp').hide();
-	$('#shadowForPopup').hide();
-};
-
 /**
  * 去沽清界面
  */
@@ -1958,119 +1884,4 @@ ts.member.memberPointConsumeAction = function(){
 			});
 		}		
 	});
-};
-
-/**
- * 查询会员消费明细
- */
-ts.member.searchMemberDetail = function(){
-	Util.LM.show();
-//	var memberType = $('#consumeDetail_memberType').val();
-	var operateType = -1;
-	var detailOpes = $('input[name=memberConsumeType]'); 
-	for (var i = 0; i < detailOpes.length; i++) {
-		
-		if($(detailOpes[i]).attr("checked")){
-			operateType = $(detailOpes[i]).attr("data-value");
-			break;
-		}
-	}
-	var name = $('#consumeDetail_memberName').val();
-	
-	$.ajax({
-		url : '../QueryMemberOperation.do',
-		type : 'post',
-		dataType : 'json',
-		data : {
-			isPaging:false,
-			dataSource:'today',
-			fuzzy: name,
-			operateType:operateType		
-		},
-		success : function(result, status, xhr){
-			Util.LM.hide();
-			if(result.success){
-				var html = [];
-				for(var i = 0, index = 1; i < result.root.length; i++){
-					html.push(memberConsumeTrTemplet.format({
-						dataIndex : index,
-						orderId : result.root[i].orderId != 0?result.root[i].orderId:'----',
-						operateDateFormat : result.root[i].operateDateFormat,
-						memberName : result.root[i].member.name,
-						memberType : result.root[i].member.memberType.name,
-						otype : result.root[i].operateTypeText,
-						money : result.root[i].payMoney?result.root[i].payMoney:(result.root[i].deltaTotalMoney?result.root[i].deltaTotalMoney:0),	
-						deltaPoint : result.root[i].deltaPoint > 0? '+'+result.root[i].deltaPoint : result.root[i].deltaPoint,
-						staffName : result.root[i].staffName,
-						comment : result.root[i].comment
-					}));	
-					index ++;
-				}	
-				
-				$('#front_memberConsumeDetailBody').html(html.join("")).trigger('create');
-			}
-		},
-		error : function(request, status, err){
-			Util.LM.hide();
-			Util.msg.alert({
-				renderTo : 'tableSelectMgr',
-				msg : request.msg
-			});
-		}
-	});		
-}; 
-
-/**
- * 打开会员消费明细
- */
-ts.member.openMemberConsumeDetailWin = function(){
-	$('#frontPageMemberOperation').popup('close');
-	
-	$.ajax({
-		url : '../QueryMemberType.do',
-		type : 'post',
-		async:false,
-		data : {dataSource : 'normal'},
-		success : function(jr, status, xhr){
-			if(jr.success){
-				var html = ['<option value=-1 >全部</option>'];
-				for (var i = 0; i < jr.root.length; i++) {
-					html.push('<option value={id} >{name}</option>'.format({
-						id : jr.root[i].id,
-						attrVal : jr.root[i].attributeValue,
-						chargeRate : jr.root[i].chargeRate,
-						name : jr.root[i].name
-					}));
-				}
-				$('#consumeDetail_memberType').html(html.join("")).selectmenu('refresh');
-			}else{
-				Util.msg.alert({
-					renderTo : 'tableSelectMgr',
-					msg : jr.msg
-				});
-			}
-		},
-		error : function(request, status, err){
-			Util.msg.alert({
-				renderTo : 'tableSelectMgr',
-				msg : request.msg
-			});
-		}
-	});	
-	
-	ts.member.searchMemberDetail();
-	
-	$('#memberConsumeDetailWin').show();
-	$('#shadowForPopup').show();
-};
-
-/**
- * 关闭会员消费明细
- */
-ts.member.closeMemberConsumeDetailWin = function(){
-	$('#memberConsumeDetailWin').hide();
-	$('#shadowForPopup').hide();
-	
-	$('#consumeDetail_memberName').val('');
-	$('#front_memberConsumeDetailBody').html('');
 };

@@ -22,25 +22,33 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateKitchenAction extends DispatchAction{
 
-	public ActionForward swap(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	/**
+	 * 获取厨房信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		
-		String kitchenA = request.getParameter("kitchenA");
-		String kitchenB = request.getParameter("kitchenB");
 		
-		String pin = (String) request.getAttribute("pin");
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String pin = (String) request.getAttribute("pin");
+		final String id = request.getParameter("id");
+		final JObject jobject = new JObject();
 		
-		Kitchen.MoveBuilder builder = new MoveBuilder(Integer.parseInt(kitchenA), Integer.parseInt(kitchenB));
-		
-		JObject jobject = new JObject();
 		try{
-			KitchenDao.move(staff, builder);
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			final KitchenDao.ExtraCond extraCond = new KitchenDao.ExtraCond();
+			
+			if(id != null && !id.isEmpty()){
+				extraCond.setId(Integer.parseInt(id));
+			}
+			
+			jobject.setRoot(KitchenDao.getByCond(staff, extraCond, null));
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch(Exception e){
@@ -53,87 +61,132 @@ public class OperateKitchenAction extends DispatchAction{
 		return null;
 	}
 	
-	public ActionForward addKitchen(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
+	/**
+	 * 厨房互换
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward swap(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		
+		final String kitchenA = request.getParameter("kitchenA");
+		final String kitchenB = request.getParameter("kitchenB");
+		
+		final String pin = (String) request.getAttribute("pin");
+		final JObject jobject = new JObject();
 		
 		try{
-			String kitchenName = request.getParameter("kitchenName");
-			String deptID = request.getParameter("deptID");
-			String isAllowTemp = request.getParameter("isAllowTemp");
-			String pin = (String) request.getAttribute("pin");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Kitchen.MoveBuilder builder = new MoveBuilder(Integer.parseInt(kitchenA), Integer.parseInt(kitchenB));
+			KitchenDao.move(staff, builder);
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * 增加厨房
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward addKitchen(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final JObject jObject = new JObject();
+		final String kitchenName = request.getParameter("kitchenName");
+		final String deptID = request.getParameter("deptID");
+		final String isAllowTemp = request.getParameter("isAllowTemp");
+		final String pin = (String) request.getAttribute("pin");		
+		try{
 			
 			KitchenDao.add(StaffDao.verify(Integer.parseInt(pin)), 
 							 new Kitchen.AddBuilder(kitchenName, Department.DeptId.valueOf(Integer.parseInt(deptID)))
 								.setAllowTmp(Boolean.parseBoolean(isAllowTemp)));
 			
-			jobject.initTip(true, "操作成功,已添加厨房信息.");
-		}catch(BusinessException e){
+			jObject.initTip(true, "操作成功,已添加厨房信息.");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
-			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		} finally {
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
 	
-	public ActionForward updateKitchen(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
+	/**
+	 * 修改厨房
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward updateKitchen(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final JObject jObject = new JObject();
+		final String kitchenId = request.getParameter("kitchenID");
+		final String kitchenName = request.getParameter("kitchenName");
+		final String deptId = request.getParameter("deptID");
+		final String isAllowTemp = request.getParameter("isAllowTemp");
+		final String pin = (String) request.getAttribute("pin");
 		
 		try{
-			String kitchenID = request.getParameter("kitchenID");
-			String kitchenName = request.getParameter("kitchenName");
-			String deptID = request.getParameter("deptID");
-			String isAllowTemp = request.getParameter("isAllowTemp");
-			String pin = (String) request.getAttribute("pin");
 			
 			KitchenDao.update(StaffDao.verify(Integer.parseInt(pin)), 
-							 new UpdateBuilder(Integer.valueOf(kitchenID))
+							 new UpdateBuilder(Integer.valueOf(kitchenId))
 									.setName(kitchenName)
-									.setDeptId(Department.DeptId.valueOf(Integer.parseInt(deptID)))
+									.setDeptId(Department.DeptId.valueOf(Integer.parseInt(deptId)))
 									.setAllowTmp(Boolean.parseBoolean(isAllowTemp)));
 			
-			jobject.initTip(true, "操作成功,已修改厨房信息.");
-		}catch(BusinessException e){
+			jObject.initTip(true, "操作成功,已修改厨房信息.");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
-			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		} finally {
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
 	
-	public ActionForward removeKitchen(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
+	/**
+	 * 删除厨房
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward removeKitchen(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final JObject jobject = new JObject();
+		final String kitchenId = request.getParameter("kitchenID");
+		final String pin = (String) request.getAttribute("pin");
 		
 		try{
-			String kitchenID = request.getParameter("kitchenID");
-			String pin = (String) request.getAttribute("pin");
 			
-			KitchenDao.remove(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(kitchenID));
+			KitchenDao.remove(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(kitchenId));
 			
 			jobject.initTip(true, "操作成功,已修改厨房信息.");
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch (Exception e) {

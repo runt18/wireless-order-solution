@@ -112,6 +112,10 @@
 <script type="text/javascript" src="./js/popup/member/recharge.js?v=<%=v %>"></script>
 <!-- 补发实体卡 -->
 <script type="text/javascript" src="./js/popup/member/patchCard.js?v=<%= v %>"></script>
+<!-- 打印机诊断 -->
+<script type="text/javascript" src="./js/popup/diagPrinter/diagPrinter.js?v=<%= v %>"></script>
+<!-- 消费明细 -->
+<script type="text/javascript" src="./js/popup/consumeDetail/consumeDetail.js?v=<%= v %>"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -134,7 +138,8 @@
 			</div>
 		</div>	
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-		 	<a data-role="button" data-inline="true" class="topBtnFont" onclick="ts.displayPrintConnection()">打印机诊断</a>
+		 	<!-- ts.displayPrintConnection() -->
+		 	<a id="diagPrinter_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont" >打印机诊断</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageMemberOperation">会员</a>
 		 	<a id="todayBill_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">账单</a>
 		 	<a id="personSettle_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">交款</a>
@@ -150,7 +155,8 @@
 			<li class="popupButtonList" id="addMember_a_tableSelect"><a >添加会员</a></li>
 			<li class="popupButtonList" id="memberRecharge_a_tableSelect"><a >会员充值</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
-			<li class="popupButtonList" onclick="ts.member.openMemberConsumeDetailWin()"><a >消费明细</a></li>
+			<!-- onclick="ts.member.openMemberConsumeDetailWin()" -->
+			<li class="popupButtonList" id="consumeDetail_a_tableSelect"><a >消费明细</a></li>
 			<li class="popupButtonList" id="patchCard_a_tableSelect"><a>补发实体卡</a></li>
 			<li class="popupButtonList" id="memberWxBind_li_tableSelect"><a>微信会员绑定</a></li>
 			<li class="popupButtonList" id="fastIssue_a_tableSelect"><a >快速发券</a></li>
@@ -233,126 +239,6 @@
         </ul>
 	</div>		
 	
-	<!-- 远程诊断打印机 -->
-	<div id="printerConnectionCmp" class="ui-overlay-shadow ui-corner-all" style="width:1020px;z-index: 1102;position: absolute; top: 150px; left: 50%; margin: -100px 0px 0px -500px;background-color: white;display: none;" align="center">
-	    <div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-	    		<div id="printerConnectionCmpTitle" style="float: left;line-height: 35px;margin-left: 10px;">
-					远程打印机诊断, 共 <span id="printerConnectionCount" style="color: DarkOrange;">0</span> 台打印机在使用
-	    		</div>
-	        	<div style="float: right">
-	  				<a onclick="ts.closePrintConnection()" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-	        	</div>
-	    </div> 	    
-	    
-	    <div data-role="content">
-			<div class="ui-grid-a">
-			    <div class="ui-block-a ui-bar-c" style="width: 100%;line-height: 45px;">
-			    	<a href="javascript:void()" onclick="ts.displayPrintConnection()" style="color: blue;margin-right: 20px;">刷新</a>打印服务状态: 
-			    	<span id="printerServiceState"> 未知 </span> 
-				</div>
-			</div><!-- /grid-a -->				
-			<br> 
-			<div style="max-height: 500px;overflow: auto;"> 
-			<table id="printer" data-role="table" data-mode="columntoggle"  class="ui-body-d ui-shadow table-stripe ui-responsive">	
-				<caption style="font-weight: bold;margin-bottom: 0;color: blue">打印机列表</caption>
-				<tr>
-					<th></th>
-					<th >打印机</th>
-					<th >驱动</th>
-					<th >端口</th>
-					<th >网关</th>
-					<th >连接状态</th>
-					<th >机盖</th>
-					<th >卷纸</th>
-					<th >切刀</th>
-				</tr>
-				<tbody id="printerConnectionList" >
-<!-- 					<tr>
-						<td>192.168.1.201</td>
-						<td>中厨</td>
-						<td>192.168.1.201</td>
-						<td><a href="#printerPingErrorCmp" data-rel="popup" data-transition="pop">未连接(打印机不出单, 点击解决)</a></td>
-						<td><a href="#">未安装(请联系客服)</a></td>
-						<td><a href="#">未关闭(请盖好打印机)</a></td>
-						<td><a href="#">已用完(请更换打印纸)</a></td>
-						<td><a href="#">已损坏(请更换切刀)</a></td>
-					</tr>	 -->
-				</tbody>			
-			</table>	
-			</div>    
-		</div>	
-	</div>
-	
-	<!-- 打印服务没开时提示 -->
-	<div id="printerServiceUnopenCmp" data-role="popup"  data-dismissible="false" style="width:900px;" class="ui-corner-all" align="center">
-		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
-				打印服务检查
-	   		</div>
-	       	<div style="float: right">
-	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-	       	</div>
-       	</div>	
-       	<div data-role="content">
-			<h2>所有打印机不出单:</h2>
-				<p>屏幕右下角打开电脑菜单 -> 所有程序 -> e点通打印服务 -> 点击e点通打印服务即可</p>
-				
-			<img alt="" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintError/openService.jpg">
-		</div>
-	</div>	
-	
-	<!-- 打印服务开两个时提示 -->
-	<div id="printerServiceOpenTwiceCmp" data-role="popup"  data-dismissible="false" style="width:900px;" class="ui-corner-all" align="center">
-		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
-				打印服务检查
-	   		</div>
-	       	<div style="float: right">
-	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-	       	</div>
-       	</div>	
-       	<div data-role="content">
-			<h2>所有打印机出重单:</h2>
-				<p>屏幕右下角打开电脑菜单 -> 所有程序 -> e点通打印服务 -> 卸载e点通打印服务即可</p>
-			<img alt="" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintError/closeService.jpg">	
-		</div>
-	</div>					
-	
-	<!-- ping不通时提示 -->
-	<div id="printerPingErrorCmp" data-role="popup"  data-dismissible="false" style="width:900px;" class="ui-corner-all" align="center">
-		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
-				网线检查
-	   		</div>
-	       	<div style="float: right">
-	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-	       	</div>
-       	</div>	
-       	<div data-role="content" style="max-height:650px;overflow: auto;">
-			<h3>1, 检查当前打印机后面接网线的地方有没有黄色的灯亮着</h3>
-			<img alt="" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintError/theYellowLight.jpg">
-			<h3>2, 检查交换机连上路由器的灯是否亮着</h3>
-			<img alt="" src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintError/luyouqi.jpg">
-		</div>
-	</div>	
-	
-	<!-- 联系客服提示 -->
-	<div id="printerDriverErrorCmp" data-role="popup"  data-dismissible="false" style="width:350px;" class="ui-corner-all" align="center">
-		<div data-role="header" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-	   		<div style="float: left;line-height: 35px;margin-left: 10px;">
-				驱动失败
-	   		</div>
-	       	<div style="float: right">
-	 				<a onclick="" data-rel="back" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-	       	</div>
-       	</div>	
-       	<div data-role="content">
-			<h3>请安装驱动, 或联系客服QQ: 850774706</h3>
-		</div>
-	</div>		
-	
-	
-	<!-- 会员充值 -->
 	
 	<!-- 积分消费 -->
 	<div id="memberPointConsume" class="ui-overlay-shadow ui-corner-all" style="width:340px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -150px;background-color: white;display: none;" align="center">	
@@ -402,85 +288,9 @@
 			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4PointConsume(3)"><a >会员实体卡</a></li>
 			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4PointConsume(2)"><a >微信卡</a></li>
 		</ul>
-	</div>	
-		
-	<!-- 会员消费明细  -->
-	<div id="memberConsumeDetailWin" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 200px; left: 50%;width:1200px; margin: -100px 0px 0px -600px;display: none;background-color: white;" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-	    		<div id="memberConsumeDetailHead" style="float: left;line-height: 35px;margin-left: 10px;">
-					<span style="line-height: 35px;float: left;margin-left: 5px;">
-						会员消费明细 -- <font color="#f7c942">当日</font>
-					</span>
-	    		</div>
-	        	<div style="float: right">
-	  				<a onclick="ts.member.closeMemberConsumeDetailWin()" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-	        	</div>
-	    </div>     
-	    <table style="width: 100%;border-bottom: 1px solid gray;">
-	    	<tr>
-	    		<td class="table_toolBarLab">操作类型:</td>	  
-	    		<td class="table_toolBarCmp" style="width: 320px;">
-					<fieldset data-role="controlgroup" data-type="horizontal">
-						<label>
-				        	<input type="radio" name="memberConsumeType" data-value="-1" value="on" checked="checked" onclick="ts.member.searchMemberDetail()">全部
-				        </label>
-				        <label>
-				        	<input type="radio" name="memberConsumeType" data-value="1" value="on" onclick="ts.member.searchMemberDetail()">消费
-				        </label>
-				        <label>
-				        	<input type="radio" name="memberConsumeType" data-value="2" value="on" onclick="ts.member.searchMemberDetail()">充值
-				        </label>
-				        <label>
-				        	<input type="radio" name="memberConsumeType" data-value="3" value="on" onclick="ts.member.searchMemberDetail()">积分
-				        </label>				        
-				    </fieldset>				        		
-	    		</td>
-	    		<td class="table_toolBarLab" style="width: 150px;">手机号/会员名/卡号:</td>	  
-	    		<td class="table_toolBarCmp">
-	    			<input id="consumeDetail_memberName">		        		
-	    		</td>		    		 		
-	    		<td style="text-align: right;padding-right: 20px;">
-	    			<a data-role="button" data-icon="search" data-iconpos="left" data-inline="true" data-theme="b" onclick="ts.member.searchMemberDetail()">搜索</a>
-	    		</td>
-	    	</tr>
-	    </table>
-	
-	    <div data-theme="d" class="ui-corner-bottom ui-content">
-	    	<div style="max-height: 480px; overflow-y: auto;">
-			<table  data-role="table"  data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr" >
-	         <thead>
-		           <tr class="ui-bar-d">
-		             <th style="width: 25px;"></th>
-		             <th style="width: 100px;">账单号</th>
-		             <th >消费时间</th>
-		             <th >会员名称</th>
-		             <th >会员类型</th>
-		             <th >操作类型</th>
-		             <th class="text_right">金额</th>
-		             <th class="text_right">积分情况</th>
-		             <th >操作人</th>
-					 <th id="lab4CancelReasonOrComment" style="width: 250px;">备注</th>          
-		           </tr>
-	         </thead>
-	         <tbody id="front_memberConsumeDetailBody">
-	         	<tr>
-	         		<td>1</td>
-	         		<td >56487</td>
-	         		<td >2014-12-12 18:03:56</td>
-	         		<td >龙虾排骨</td>
-	         		<td >充值</td>
-	         		<td>黄炆,拼上</td>
-	         		<td>8.88</td>
-	         		<td>2.6</td>
-	         		<td>管理员</td>
-	         		<td>上菜太慢, 太辣</td>
-	         	</tr>
-	         </tbody>
-	       </table>     
-			</div>
-	    </div>
-	</div>			
-</div>	
+	</div>		
+</div>			
+
 <!-- end 餐台选择  -->
 
 
@@ -873,10 +683,6 @@
 					 <a id="giftFoodOperate_a_orderFood" data-role="button" data-inline="true" class="orderOperBtn" style="display: none;" data-theme="b">赠送</a>	
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" id="foopHangUp_a_orderFood">叫起</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" data-rel="popup"  data-transition="pop" href="#orderFoodOtherOperateCmp">更多</a>
-					 <!--<a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="operateOrderFoodTaste({type:1})">全单口味</a>
-					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.foodHangup({type : 1})">全单叫起</a>
-					 <a onclick="foodCommonTasteLoad()" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-transition="pop" data-theme="b">数字键盘</a> -->
-					 
 				 </div>		
 		     </div>
 		     <!-- 点菜更多操作 -->
@@ -970,8 +776,6 @@
 				 <a  data-role="button" data-inline="true" class="tastePopTopBtn" onclick="of.ot.back()">取消</a>
 				 <a  data-role="button" data-inline="true" class="tastePopTopBtn" onclick="tasteCmpPrePage()">上一页</a>
 				 <a  data-role="button" data-inline="true" class="tastePopTopBtn" onclick="tasteCmpNextPage()">下一页</a>
-<!-- 				 <a data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="tasteGroupPage" onclick="tasteCmpPrePage()">L</a>
-				 <a data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="tasteGroupPage" onclick="tasteCmpNextPage()">R</a>	 -->	 
 			 </div>
 	    </div>
 	</div>	 
@@ -1019,17 +823,11 @@
 	   	<div class="handWritingbutton"><a id="pinyinVal_a_orderFood"  data-role="button" data-theme="d" class="ui-corner-bottom">清空</a></div>	
 	    <div class="handWritingbutton"><a data-role="button" data-theme="e" class="ui-corner-bottom" id="closePinyin_a_orderFood">关闭</a></div>	
 	   		
-	   		
-	<!-- 拼音键盘 -->
-	   		<div id="pinyin_div_orderFood" style="width:100%;height:100%;display:none;margin-top:8%;" > 
-	  
-	    	</div>	
+		<!-- 拼音键盘 -->
+	  	<div id="pinyin_div_orderFood" style="width:100%;height:100%;display:none;margin-top:8%;" ></div>	
 	</div>	
 	
-	
-	
-	
-		<!-- 手写搜索 -->
+	<!-- 手写搜索 -->
 	<div id="orderHandCmp" class="ui-overlay-shadow ui-corner-all handWritingWindow" >
 	   	<div class="handWritingtext"><input type="text" value="" id="handWritingInput_input_orderFood" style="font-size: 15px;font-weight: bold;"></div>
 	   	<div class="handWritingbutton"><a id="handDel_a_orderFood"  data-role="button" data-theme="d" class="ui-corner-bottom">清空</a></div>	
@@ -1518,9 +1316,6 @@
 			 </div>
 	    </div>	
 	</div>		 
-	 
-	 <!-- 系统共用会员绑定start -->
-	<div id="loadMemberBind4Payment"></div>
 	 
 </div>
 <!-- end 结账界面 -->
