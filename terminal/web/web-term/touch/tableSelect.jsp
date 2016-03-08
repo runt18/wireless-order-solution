@@ -114,6 +114,8 @@
 <script type="text/javascript" src="./js/popup/member/patchCard.js?v=<%= v %>"></script>
 <!-- 打印机诊断 -->
 <script type="text/javascript" src="./js/popup/diagPrinter/diagPrinter.js?v=<%= v %>"></script>
+<!-- 消费明细 -->
+<script type="text/javascript" src="./js/popup/consumeDetail/consumeDetail.js?v=<%= v %>"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -153,7 +155,8 @@
 			<li class="popupButtonList" id="addMember_a_tableSelect"><a >添加会员</a></li>
 			<li class="popupButtonList" id="memberRecharge_a_tableSelect"><a >会员充值</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
-			<li class="popupButtonList" onclick="ts.member.openMemberConsumeDetailWin()"><a >消费明细</a></li>
+			<!-- onclick="ts.member.openMemberConsumeDetailWin()" -->
+			<li class="popupButtonList" id="consumeDetail_a_tableSelect"><a >消费明细</a></li>
 			<li class="popupButtonList" id="patchCard_a_tableSelect"><a>补发实体卡</a></li>
 			<li class="popupButtonList" id="memberWxBind_li_tableSelect"><a>微信会员绑定</a></li>
 			<li class="popupButtonList" id="fastIssue_a_tableSelect"><a >快速发券</a></li>
@@ -285,85 +288,9 @@
 			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4PointConsume(3)"><a >会员实体卡</a></li>
 			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4PointConsume(2)"><a >微信卡</a></li>
 		</ul>
-	</div>	
-		
-	<!-- 会员消费明细  -->
-	<div id="memberConsumeDetailWin" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 200px; left: 50%;width:1200px; margin: -100px 0px 0px -600px;display: none;background-color: white;" align="center">
-	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
-	    		<div id="memberConsumeDetailHead" style="float: left;line-height: 35px;margin-left: 10px;">
-					<span style="line-height: 35px;float: left;margin-left: 5px;">
-						会员消费明细 -- <font color="#f7c942">当日</font>
-					</span>
-	    		</div>
-	        	<div style="float: right">
-	  				<a onclick="ts.member.closeMemberConsumeDetailWin()" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
-	        	</div>
-	    </div>     
-	    <table style="width: 100%;border-bottom: 1px solid gray;">
-	    	<tr>
-	    		<td class="table_toolBarLab">操作类型:</td>	  
-	    		<td class="table_toolBarCmp" style="width: 320px;">
-					<fieldset data-role="controlgroup" data-type="horizontal">
-						<label>
-				        	<input type="radio" name="memberConsumeType" data-value="-1" value="on" checked="checked" onclick="ts.member.searchMemberDetail()">全部
-				        </label>
-				        <label>
-				        	<input type="radio" name="memberConsumeType" data-value="1" value="on" onclick="ts.member.searchMemberDetail()">消费
-				        </label>
-				        <label>
-				        	<input type="radio" name="memberConsumeType" data-value="2" value="on" onclick="ts.member.searchMemberDetail()">充值
-				        </label>
-				        <label>
-				        	<input type="radio" name="memberConsumeType" data-value="3" value="on" onclick="ts.member.searchMemberDetail()">积分
-				        </label>				        
-				    </fieldset>				        		
-	    		</td>
-	    		<td class="table_toolBarLab" style="width: 150px;">手机号/会员名/卡号:</td>	  
-	    		<td class="table_toolBarCmp">
-	    			<input id="consumeDetail_memberName">		        		
-	    		</td>		    		 		
-	    		<td style="text-align: right;padding-right: 20px;">
-	    			<a data-role="button" data-icon="search" data-iconpos="left" data-inline="true" data-theme="b" onclick="ts.member.searchMemberDetail()">搜索</a>
-	    		</td>
-	    	</tr>
-	    </table>
-	
-	    <div data-theme="d" class="ui-corner-bottom ui-content">
-	    	<div style="max-height: 480px; overflow-y: auto;">
-			<table  data-role="table"  data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr" >
-	         <thead>
-		           <tr class="ui-bar-d">
-		             <th style="width: 25px;"></th>
-		             <th style="width: 100px;">账单号</th>
-		             <th >消费时间</th>
-		             <th >会员名称</th>
-		             <th >会员类型</th>
-		             <th >操作类型</th>
-		             <th class="text_right">金额</th>
-		             <th class="text_right">积分情况</th>
-		             <th >操作人</th>
-					 <th id="lab4CancelReasonOrComment" style="width: 250px;">备注</th>          
-		           </tr>
-	         </thead>
-	         <tbody id="front_memberConsumeDetailBody">
-	         	<tr>
-	         		<td>1</td>
-	         		<td >56487</td>
-	         		<td >2014-12-12 18:03:56</td>
-	         		<td >龙虾排骨</td>
-	         		<td >充值</td>
-	         		<td>黄炆,拼上</td>
-	         		<td>8.88</td>
-	         		<td>2.6</td>
-	         		<td>管理员</td>
-	         		<td>上菜太慢, 太辣</td>
-	         	</tr>
-	         </tbody>
-	       </table>     
-			</div>
-	    </div>
-	</div>			
-</div>	
+	</div>		
+</div>			
+
 <!-- end 餐台选择  -->
 
 

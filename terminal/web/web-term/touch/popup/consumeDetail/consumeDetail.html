@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>智易点餐系统</title>
+</head>
+<body>
+		<!-- 会员消费明细  -->
+	<div class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: -126px; left: 50%;width:1200px; margin: -100px 0px 0px -600px;background-color: white;" align="center">
+	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="height: 35px;">
+	    		<div style="float: left;line-height: 35px;margin-left: 10px;">
+					<span style="line-height: 35px;float: left;margin-left: 5px;">
+						会员消费明细 -- <font color="#f7c942">当日</font>
+					</span>
+	    		</div>
+	        	<div style="float: right">
+	  				<a id="colseDetail_a_consumeDetail" data-role="button" data-corners="false" class="popupWinCloseBtn" style="line-height:22px;color:#fff;"><span style="font-size:18px;">X</span></a>      		
+	        	</div>
+	    </div>     
+	    <table style="width: 100%;border-bottom: 1px solid gray;">
+	    	<tr>
+	    		<td class="table_toolBarLab">操作类型:</td>	  
+	    		<td class="table_toolBarCmp" style="width: 320px;">
+					<fieldset data-role="controlgroup" data-type="horizontal">
+						<label>
+				        	<input type="radio" name="memberConsumeType" data-value="-1" value="on" checked="checked">全部
+				        </label>
+				        <label>
+				        	<input type="radio" name="memberConsumeType" data-value="1" value="on" >消费
+				        </label>
+				        <label>
+				        	<input type="radio" name="memberConsumeType" data-value="2" value="on" >充值
+				        </label>
+				        <label>
+				        	<input type="radio" name="memberConsumeType" data-value="3" value="on" ">积分
+				        </label>				        
+				    </fieldset>				        		
+	    		</td>
+	    		<td class="table_toolBarLab" style="width: 150px;">手机号/会员名/卡号:</td>	  
+	    		<td class="table_toolBarCmp">
+	    			<input id="memberName_input_consumeDetail" type="text">		        		
+	    		</td>		    		 		
+	    		<td style="text-align: right;padding-right: 20px;">
+	    			<a id="searchMember_button_consumeDetail" data-role="button" data-icon="search" data-iconpos="left" data-inline="true" data-theme="b">搜索</a>
+	    		</td>
+	    	</tr>
+	    </table>
+	
+	    <div data-theme="d" class="ui-corner-bottom ui-content">
+	    	<div style="max-height: 480px; overflow-y: auto;">
+			<table  data-role="table"  data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive infoTableMgr" >
+	         <thead>
+		           <tr class="ui-bar-d">
+		             <th style="width: 25px;"></th>
+		             <th style="width: 100px;">账单号</th>
+		             <th >消费时间</th>
+		             <th >会员名称</th>
+		             <th >会员类型</th>
+		             <th >操作类型</th>
+		             <th class="text_right">金额</th>
+		             <th class="text_right">积分情况</th>
+		             <th >操作人</th>
+					 <th id="lab4CancelReasonOrComment" style="width: 250px;">备注</th>          
+		           </tr>
+	         </thead>
+	         <tbody id="memberConsumeDetailBody_tbody_consumeDetail">
+	         </tbody>
+	       </table>     
+			</div>
+	    </div>
+	</div>			
+</body>
+</html>
