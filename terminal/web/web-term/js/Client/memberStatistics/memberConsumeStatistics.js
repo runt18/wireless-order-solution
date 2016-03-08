@@ -234,7 +234,7 @@ Ext.onReady(function(){
 							url : '../../OperatePayType.do',
 							params : {
 								dataSource : 'getByCond',
-								branchId : branch_combo_memberRefund.getValue()
+								branchId : branch_combo_memberConsume.getValue()
 							},
 							success : function(res, opt){
 								var jr = Ext.decode(res.responseText);
