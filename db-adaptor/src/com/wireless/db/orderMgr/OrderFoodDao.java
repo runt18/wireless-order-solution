@@ -404,10 +404,11 @@ public class OrderFoodDao {
 			  " MAX(OF.food_unit) AS food_unit, MAX(OF.food_unit_price) AS food_unit_price, " +
 			  " IFNULL(MAX(OF.plan_price), -1) AS plan_price, " +
 			  " MAX(OF.unit_price) AS unit_price, MAX(OF.commission) AS commission, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
-			  " MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, MAX(OF.order_date) AS pay_datetime, SUM(OF.order_count) AS order_sum " +
+			  " MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, MAX(OF.order_date) AS pay_datetime, SUM(OF.order_count) AS order_sum, " +
+			  " MAX(F.print_kitchen_id) AS print_kitchen_id " +
 			  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " " + extraCond.orderFoodTblAlias +
-			  " JOIN " + Params.dbName + "." + extraCond.orderTbl + " " + extraCond.orderTblAlias +
-			  " ON OF.order_id = O.id " +
+			  " JOIN " + Params.dbName + "." + extraCond.orderTbl + " " + extraCond.orderTblAlias + " ON OF.order_id = O.id " +
+			  " LEFT JOIN " + Params.dbName + ".food F ON OF.food_id = F.food_id " +
 			  " WHERE 1 = 1 " +
 			  (extraCond == null ? "" : extraCond) +
 			  " GROUP BY OF.food_id, OF.taste_group_id, OF.food_unit_id, OF.is_temporary, OF.is_gift " + (extraCond.dateType.isToday() ? ", OF.combo_id" : "") +
@@ -424,6 +425,7 @@ public class OrderFoodDao {
 			of.asFood().setName(dbCon.rs.getString("name"));
 			of.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			of.asFood().setStatus(dbCon.rs.getShort("food_status"));
+			of.asFood().setPrintKitchenId(dbCon.rs.getInt("print_kitchen_id"));
 			if(extraCond.dateType.isToday()){
 				int comboId = dbCon.rs.getInt("combo_id");
 				of.setComboId(comboId);
@@ -444,6 +446,7 @@ public class OrderFoodDao {
 			of.asFood().setCommission(dbCon.rs.getFloat("commission"));
 			of.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
 			of.setWaiter(dbCon.rs.getString("waiter"));
+			
 			of.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			of.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
 			of.getKitchen().getDept().setRestaurantId(dbCon.rs.getInt("restaurant_id"));

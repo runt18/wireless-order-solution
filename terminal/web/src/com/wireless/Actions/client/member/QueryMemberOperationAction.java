@@ -87,7 +87,7 @@ public class QueryMemberOperationAction extends Action{
 				extraCond.setChargeType(Integer.parseInt(chargeType));
 			}
 			
-			if(branchId != null && !branchId.isEmpty()){
+			if(branchId != null && !branchId.isEmpty() && !branchId.equals("-1")){
 				extraCond.setBranch(Integer.parseInt(branchId));
 			}
 			

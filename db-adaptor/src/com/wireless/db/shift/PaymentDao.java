@@ -361,7 +361,7 @@ public class PaymentDao {
 		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, range, extraCond4CalcBill));
 		
 		//Get the income by charge
-		result.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(extraCond.dateType).setStaffId(extraCond.staffId)));
+		result.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(extraCond.dateType).setStaff(extraCond.staffId)));
 		
 		return result;
 	}

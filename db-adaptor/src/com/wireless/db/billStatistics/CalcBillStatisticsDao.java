@@ -1263,7 +1263,7 @@ public class CalcBillStatisticsDao {
 				income.setIncomeByService(calcServicePrice(dbCon, staff, range, extraCond));
 				
 				//Get the charge income by both cash and credit card
-				income.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY).setStaffId(extraCond.staffId)));
+				income.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY).setStaff(extraCond.staffId)));
 				
 			}
 			result.add(income);

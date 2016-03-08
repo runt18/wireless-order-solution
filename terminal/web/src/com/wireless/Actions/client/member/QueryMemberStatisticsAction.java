@@ -43,17 +43,17 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 		final String branchId = request.getParameter("branchId");
 		final String dateBegin = request.getParameter("dateBegin");
 		final String dateEnd = request.getParameter("dateEnd");
-		JObject jObject = new JObject();
+		final JObject jObject = new JObject();
 		try{
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-
-			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-			}
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			final CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
 			
+			if(branchId != null && !branchId.isEmpty()){
+				extraCond.setBranch(Integer.parseInt(branchId));
+			}
+
 			final MemberStatistics memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
@@ -114,14 +114,14 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 		final JObject jObject = new JObject();
 		try{
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			
-			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-			}
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			final CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
 			
+			if(branchId != null && !branchId.isEmpty()){
+				extraCond.setBranch(Integer.parseInt(branchId));
+			}
+
 			final MemberStatistics memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
@@ -180,13 +180,13 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 		final JObject jObject = new JObject();
 		try{
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
-			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-			}
-			
 			final CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(branchId != null && !branchId.isEmpty()){
+				extraCond.setBranch(Integer.parseInt(branchId));
+			}
 			
 			final MemberStatistics memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
 			
@@ -246,14 +246,14 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 		final JObject jObject = new JObject();
 		try{
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			
-			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-			}
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			final CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
 			
+			if(branchId != null && !branchId.isEmpty()){
+				extraCond.setBranch(Integer.parseInt(branchId));
+			}
+
 			final MemberStatistics memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(dateBegin, dateEnd), extraCond);
 			
 			List<String> xAxis = new ArrayList<>();
@@ -302,42 +302,50 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward createdMember(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String pin = (String) request.getAttribute("pin");
-		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		JObject jobject = new JObject();
+		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBegin = request.getParameter("dateBegin");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String memberType = request.getParameter("memberType");
+		final String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final JObject jObject = new JObject();
 		try{
 			
-			String dateBegin = request.getParameter("dateBegin");
-			String dateEnd = request.getParameter("dateEnd");
-			String memberType = request.getParameter("memberType");
-			String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
-			String start = request.getParameter("start");
-			String limit = request.getParameter("limit");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
+			final MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
+			
+			if(branchId != null && !branchId.isEmpty()){
+				extraCond.setBranch(Integer.parseInt(branchId));
+			}
+			
 			if(memberType != null && !memberType.trim().isEmpty() && !memberType.equals("-1"))
 				extraCond.setMemberType(Integer.parseInt(memberType));
 			if(dateBegin != null && !dateBegin.isEmpty()){
 				extraCond.setCreateRange(new DutyRange(dateBegin, dateEnd));
 			}
+			
 			if(memberCardOrMobileOrName != null && !memberCardOrMobileOrName.trim().isEmpty()){
 				extraCond.setFuzzyName(memberCardOrMobileOrName);
 			}
+			
 			List<Member> list = MemberDao.getByCond(staff, extraCond, null);
-			list = DataPaging.getPagingData(list, true, start, limit);
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				list = DataPaging.getPagingData(list, true, start, limit);
+			}
+			jObject.setTotalProperty(list.size());
+			jObject.setRoot(list);
 			
-			jobject.setTotalProperty(list.size());
-			jobject.setRoot(list);
-			
-		}catch(SQLException e){
+		}catch(SQLException | BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}	
