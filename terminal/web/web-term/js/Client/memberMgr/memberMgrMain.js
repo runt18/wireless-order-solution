@@ -1105,9 +1105,7 @@ Ext.onReady(function(){
 						fieldLabel : '生日',
 						format : 'Y-m-d'
 					}]
-				}, 
-				{
-					columnWidth : 1,
+				}, {
 					items : [{
 						xtype : 'combo',
 						id : 'comboMemberAge_combo_member',
@@ -1126,7 +1124,16 @@ Ext.onReady(function(){
 						triggerAction : 'all',
 						selectOnFocus : true,
 						allowBlank : true
-					},{
+					}]
+				}, {
+					items : [{
+						id : 'branch_tbtext_memberMgrMain',
+						fieldLabel : '所属门店',
+						disabled : true
+					}] 
+				}, {
+					columnWidth : 1,
+					items : [{
 						id : 'cm_txtMemberContactAddress',
 						fieldLabel : '联系地址',
 						width : 535
@@ -1389,8 +1396,7 @@ Ext.onReady(function(){
 		var usedPoint = Ext.getCmp('cm_numberUserPoint');
 		var referrer = Ext.getCmp('memberReferrer_numfield_mmm');
 		
-		
-		
+		var branchBelong = Ext.getCmp('branch_tbtext_memberMgrMain');
 		firstCharge.setValue();
 		firstActualCharge.setValue();
 		
@@ -1411,6 +1417,27 @@ Ext.onReady(function(){
 			weixinCard.setValue(data['weixinCard']);
 			sex.setValue(typeof data['sexValue'] == 'undefined' ? 0 : data['sexValue']);
 			birthday.setValue(data['birthdayFormat']);
+			
+			
+			
+			
+			$.ajax({
+				url : '../../OperateRestaurant.do',
+				type : 'post',
+				async : false,
+				data : {
+					dataSource : 'getByCond',
+					byId : true,
+					id : data['branchId']
+				},
+				success : function(jr, status, xhr){
+					branchBelong.setValue(jr.root[0].name);
+				},
+				error : function(request, status, err){
+				}
+			}); 
+			
+			
 			if(data['ageVal']){
 				age.setValue(data['ageVal']);
 			}else{
@@ -2112,7 +2139,7 @@ Ext.onReady(function(){
 									branchId = restaurantInfo.id;
 								}else{
 									restaurantId = restaurantInfo.id;
-									branchId = '';
+									branchId = null;
 								}
 								
 								
@@ -3226,7 +3253,7 @@ Ext.onReady(function(){
 							if(jr.root[0].typeVal != '2'){
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
 							}else{
-								data.push([-1, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								data.push([null, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 								
 								for(var i = 0; i < jr.root[0].branches.length; i++){
 									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
@@ -3239,7 +3266,7 @@ Ext.onReady(function(){
 							if(jr.root[0].typeVal != '2'){
 								thiz.setValue(jr.root[0].id);
 							}else{
-								thiz.setValue(-1);
+								thiz.setValue(null);
 							}
 							
 							thiz.fireEvent('select');
@@ -3250,7 +3277,7 @@ Ext.onReady(function(){
 					var staff = [[-1, '全部']];
 					
 					
-					if(branch_combo_memberMgrMain.getValue() == -1){
+					if(branch_combo_memberMgrMain.getValue() == null){
 						referrerCombo.store.loadData([]);
 					}else{
 						Ext.Ajax.request({
@@ -3596,7 +3623,7 @@ Ext.onReady(function(){
 					gs.baseParams['referrer'] = referrerCombo.getValue() != -1 ? referrerCombo.getValue() : null;
 					gs.baseParams['beginBirthday'] = Ext.getCmp('beginBirthday_df_memebrMgrMain').getValue();
 					gs.baseParams['endBirthday'] = Ext.getCmp('endBirthday_df_memebrMgrMain').getValue();
-					gs.baseParams['branchId'] = branch_combo_memberMgrMain.getValue() != -1 ? branch_combo_memberMgrMain.getValue() : null;
+					gs.baseParams['branchId'] = branch_combo_memberMgrMain.getValue();
 					gs.load({
 						params : {
 							start : 0,

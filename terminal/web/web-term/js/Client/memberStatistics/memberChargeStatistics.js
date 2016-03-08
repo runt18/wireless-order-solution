@@ -21,7 +21,8 @@ Ext.onReady(function(){
 			data : {
 				dataSource :'chargeStatistics',
 				dateBegin : dateBegin,
-				dateEnd : dateEnd + " 23:59:59"
+				dateEnd : dateEnd + " 23:59:59",
+				branchId : Ext.getCmp('branch_combo_memberCharge').getValue() 
 			},
 			async : false,
 			success : function(data){
@@ -213,7 +214,7 @@ Ext.onReady(function(){
 							if(jr.root[0].typeVal != '2'){
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
 							}else{
-								data.push([-1, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								data.push([null, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 								
 								for(var i = 0; i < jr.root[0].branches.length; i++){
 									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
@@ -221,13 +222,13 @@ Ext.onReady(function(){
 							}
 							
 							thiz.store.loadData(data);
-							thiz.setValue(-1);
+							thiz.setValue(null);
 							thiz.fireEvent('select');
 						}
 					});
 				},
 				select : function(isJump){
-					if(branch_combo_memberCharge.getValue() == -1){
+					if(branch_combo_memberCharge.getValue() == null){
 						Ext.getCmp('memberRecharge_comboPayType').disable();
 					}else{
 						Ext.getCmp('memberRecharge_comboPayType').enable();
@@ -337,7 +338,7 @@ Ext.onReady(function(){
 				handler : function(e){
 					mcs_search_memberType.setValue(-1);
 					mcs_search_memberName.setValue();
-					branch_combo_memberCharge.setValue(-1);
+					branch_combo_memberCharge.setValue(null);
 					mcs_searchMemberOperation();
 				}
 				

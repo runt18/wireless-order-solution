@@ -683,10 +683,6 @@
 					 <a id="giftFoodOperate_a_orderFood" data-role="button" data-inline="true" class="orderOperBtn" style="display: none;" data-theme="b">赠送</a>	
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" id="foopHangUp_a_orderFood">叫起</a>
 					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" data-rel="popup"  data-transition="pop" href="#orderFoodOtherOperateCmp">更多</a>
-					 <!--<a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="operateOrderFoodTaste({type:1})">全单口味</a>
-					 <a data-role="button" data-inline="true" class="orderOperBtn" data-theme="b" onclick="of.foodHangup({type : 1})">全单叫起</a>
-					 <a onclick="foodCommonTasteLoad()" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-transition="pop" data-theme="b">数字键盘</a> -->
-					 
 				 </div>		
 		     </div>
 		     <!-- 点菜更多操作 -->
@@ -780,8 +776,6 @@
 				 <a  data-role="button" data-inline="true" class="tastePopTopBtn" onclick="of.ot.back()">取消</a>
 				 <a  data-role="button" data-inline="true" class="tastePopTopBtn" onclick="tasteCmpPrePage()">上一页</a>
 				 <a  data-role="button" data-inline="true" class="tastePopTopBtn" onclick="tasteCmpNextPage()">下一页</a>
-<!-- 				 <a data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="tasteGroupPage" onclick="tasteCmpPrePage()">L</a>
-				 <a data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="tasteGroupPage" onclick="tasteCmpNextPage()">R</a>	 -->	 
 			 </div>
 	    </div>
 	</div>	 
@@ -829,17 +823,11 @@
 	   	<div class="handWritingbutton"><a id="pinyinVal_a_orderFood"  data-role="button" data-theme="d" class="ui-corner-bottom">清空</a></div>	
 	    <div class="handWritingbutton"><a data-role="button" data-theme="e" class="ui-corner-bottom" id="closePinyin_a_orderFood">关闭</a></div>	
 	   		
-	   		
-	<!-- 拼音键盘 -->
-	   		<div id="pinyin_div_orderFood" style="width:100%;height:100%;display:none;margin-top:8%;" > 
-	  
-	    	</div>	
+		<!-- 拼音键盘 -->
+	  	<div id="pinyin_div_orderFood" style="width:100%;height:100%;display:none;margin-top:8%;" ></div>	
 	</div>	
 	
-	
-	
-	
-		<!-- 手写搜索 -->
+	<!-- 手写搜索 -->
 	<div id="orderHandCmp" class="ui-overlay-shadow ui-corner-all handWritingWindow" >
 	   	<div class="handWritingtext"><input type="text" value="" id="handWritingInput_input_orderFood" style="font-size: 15px;font-weight: bold;"></div>
 	   	<div class="handWritingbutton"><a id="handDel_a_orderFood"  data-role="button" data-theme="d" class="ui-corner-bottom">清空</a></div>	
@@ -1328,9 +1316,6 @@
 			 </div>
 	    </div>	
 	</div>		 
-	 
-	 <!-- 系统共用会员绑定start -->
-	<div id="loadMemberBind4Payment"></div>
 	 
 </div>
 <!-- end 结账界面 -->
