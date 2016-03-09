@@ -159,6 +159,7 @@ public class MemberOperation implements Jsonable {
 	private int id;
 	private int restaurantId;
 	private int branchId;
+	private String branchName;
 	private int staffId;
 	private String staffName;
 	private Member member;
@@ -245,6 +246,8 @@ public class MemberOperation implements Jsonable {
 			jm.putFloat("takeMoney", this.takeMoney);
 		}
 
+		jm.putInt("branchId", this.branchId);
+		jm.putString("branchName", this.branchName);
 		return jm;
 	}
 
@@ -275,6 +278,17 @@ public class MemberOperation implements Jsonable {
 	
 	public int getBranchId(){
 		return this.branchId;
+	}
+	
+	public void setBranchName(String branchName){
+		this.branchName = branchName;
+	}
+	
+	public String getBranchName(){
+		if(this.branchName == null){
+			return "";
+		}
+		return this.branchName;
 	}
 	
 	public int getStaffId() {
