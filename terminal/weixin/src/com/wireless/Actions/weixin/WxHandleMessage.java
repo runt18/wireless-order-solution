@@ -71,7 +71,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 	private final String WEIXIN_ORDER;
 	private final String WEIXIN_DIANPING;
 	private final String WEIXIN_SCANNING;
-	private final String wEIXIN_SCANNING_RESULT;
+	private final String WEIXIN_SCANNING_RESULT;
+	private final String WEIXIN_WAITER;
 	
 	private final String WEIXIN_FOOD_ICON;
 	private final String WEIXIN_BOOK_ICON;
@@ -121,7 +122,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		this.WEIXIN_ORDER = root + "/weixin/order/orderList.html";
 		this.WEIXIN_DIANPING = root + "/weixin/order/dianping.html";
 		this.WEIXIN_SCANNING = root + "/weixin/order/scan.html";
-		this.wEIXIN_SCANNING_RESULT = root + "/weixin/order/scanResult.html";
+		this.WEIXIN_SCANNING_RESULT = root + "/weixin/order/scanResult.html";
+		this.WEIXIN_WAITER = root + "/weixin/order/waiter.html";
 		
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
 		this.WEIXIN_BOOK_ICON = root + "/weixin/order/images/icon_book.jpg";
@@ -289,40 +291,76 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注
-				Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
-				WxMemberDao.interest(staff, msg.getFromUserName());
-				final List<WxMenuAction> reply = WxMenuActionDao.getByCond(staff, new WxMenuActionDao.ExtraCond().setCate(WxMenuAction.Cate.SUBSCRIBE_REPLY));
-				if(reply.isEmpty()){
-					session.callback(createNavi(msg));
+				if(msg.getTicket().isEmpty()){
+					Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
+					WxMemberDao.interest(staff, msg.getFromUserName());
+					final List<WxMenuAction> reply = WxMenuActionDao.getByCond(staff, new WxMenuActionDao.ExtraCond().setCate(WxMenuAction.Cate.SUBSCRIBE_REPLY));
+					if(reply.isEmpty()){
+						session.callback(createNavi(msg));
+					}else{
+						session.callback(appendUrlParam(msg, new WxMenuAction.MsgProxy(msg.getHead(), reply.get(0)).toMsg()));
+					}
+	
 				}else{
-					session.callback(appendUrlParam(msg, new WxMenuAction.MsgProxy(msg.getHead(), reply.get(0)).toMsg()));
-				}
-				
+					//TODO 扫描带参二维码，进入微信店小二
+					//session.callback(new Msg4Text(msg, msg.getEventKey().replace("qrscene_", "")));
+					final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+					WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId));
+					final String picUrl;
+					if(wxRestaurant.hasWeixinLogo()){
+						picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
+					}else{
+						picUrl = "";
+					}
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("微信店小二", "点击去微信店小二，可自助浏览菜品信息，呼叫服务，自助下单", picUrl, createUrl(msg, WEIXIN_WAITER))));
+				}				
 			}else if(msg.getEvent() == Event.UNSUBSCRIBE){
 				//会员取消关注
 				//WeixinMemberDao.cancel(msg.getFromUserName(), msg.getToUserName());
 				
+			}else if(msg.getEvent() == Event.SCAN){
+				//TODO 扫描带参二维码,进入微信店小二
+				//session.callback(new Msg4Text(msg, msg.getEventKey()));
+				final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+				WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId));
+				final String picUrl;
+				if(wxRestaurant.hasWeixinLogo()){
+					picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
+				}else{
+					picUrl = "";
+				}
+				session.callback(new Msg4ImageText(msg).addItem(new Data4Item("微信店小二", "点击去微信店小二，可自助浏览菜品信息，呼叫服务，自助下单", picUrl, createUrl(msg, WEIXIN_WAITER))));
+				
 			}else if(msg.getEvent() == Event.CLICK){
+				final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+				final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 
+				WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+				String picUrl;
+				if(wxRestaurant.hasWeixinLogo()){
+					picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
+				}else{
+					picUrl = "";
+				}
 				if(msg.getEventKey().equals(EventKey.NAVI_EVENT_KEY.val)){
 					//餐厅导航
 					session.callback(createNavi(msg));
 					
 				}else if(msg.getEventKey().equals(EventKey.SELF_BOOK_EVENT_KEY.val)){
 					//自助预订
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("自助预订", "点击去预订", "", createUrl(msg, WEIXIN_BOOK))));
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("自助预订", "点击去预订", picUrl, createUrl(msg, WEIXIN_BOOK))));
 					
 				}else if(msg.getEventKey().equals(EventKey.SELF_ORDER_EVENT_KEY.val)){
 					//自助点餐
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("自助点餐", "点击去自助点餐", "", createUrl(msg, WEIXIN_FOOD))));
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("自助点餐", "点击去自助点餐", picUrl, createUrl(msg, WEIXIN_FOOD))));
 					
 				}else if(msg.getEventKey().equals(EventKey.INTRO_EVENT_KEY.val)){
 					//餐厅简介
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("餐厅简介", "点击去餐厅简介", "", createUrl(msg, WEIXIN_ABOUT))));
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("餐厅简介", "点击去餐厅简介", picUrl, createUrl(msg, WEIXIN_ABOUT))));
 					
 				}else if(msg.getEventKey().equals(EventKey.STAR_EVENT_KEY.val)){
 					//明星菜品
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("明星菜品", "点击去明星菜品", "", createUrl(msg, WEIXIN_RFOOD))));
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("明星菜品", "点击去明星菜品", picUrl, createUrl(msg, WEIXIN_RFOOD))));
 					
 				}else if(msg.getEventKey().equals(EventKey.MY_QRCODE_EVENT_KEY.val)){
 					//我的二维码
@@ -332,9 +370,6 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					
 				}else if(msg.getEventKey().equals(EventKey.PROMOTION_EVENT_KEY.val)){
 					//最新优惠
-					final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
-					
-					final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 					
 					final List<Promotion> promotions = PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().setStatus(Promotion.Status.PROGRESS));
 					
@@ -377,7 +412,6 @@ public class WxHandleMessage extends HandleMessageAdapter {
 								
 							});
 							for(Promotion promotion : promotions){
-								final String picUrl;
 								if(promotion.getCouponType().hasImage()){
 									picUrl = promotion.getCouponType().getImage().getObjectUrl();
 								}else{
@@ -413,9 +447,6 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					}
 						
 				}else if(msg.getEventKey().equals(EventKey.ORDER_EVENT_KEY.val)){
-					final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
-					
-					final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 					
 					final List<WxOrder> orders = WxOrderDao.getByCond(staff, new WxOrderDao.ExtraCond().setWeixin(msg.getFromUserName()).addStatus(WxOrder.Status.COMMITTED), " ORDER BY birth_date DESC");
 					
@@ -457,9 +488,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("点击此处开始扫描", "点我扫描支付二维码", "", createUrl(msg, WEIXIN_SCANNING))));
 					
 				}else{
-					int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 					
-					Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 					Msg msg4Action = new WxMenuAction.MsgProxy(msg.getHead(), WxMenuActionDao.getById(staff, Integer.parseInt(msg.getEventKey()))).toMsg();
 					session.callback(appendUrlParam(msg, msg4Action));
 					
@@ -478,7 +507,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 						.append("原价：" + NumericUtil.float2String2(order.calcPureTotalPrice()) + "元").append("，")
 						.append("会员价：" + NumericUtil.float2String2(order.calcTotalPrice()) + "元").append("，")
 						.append("点击查看账单详情");
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item(member.getName() + "信息读取成功", body.toString(), "", createUrl(msg, wEIXIN_SCANNING_RESULT) + "&orderId=" + order.getId())));
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item(member.getName() + "信息读取成功", body.toString(), "", createUrl(msg, WEIXIN_SCANNING_RESULT) + "&orderId=" + order.getId())));
 				}
 			}
 			

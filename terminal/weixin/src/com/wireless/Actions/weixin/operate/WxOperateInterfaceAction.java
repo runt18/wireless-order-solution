@@ -148,9 +148,7 @@ public class WxOperateInterfaceAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward getOpenid(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward getOpenid(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String APP_ID = "wx6fde9cd2c7fc791e";
 		final String APP_SECRET = "0a360a43b80e3a334e5e52da706a3134";
 		
@@ -171,7 +169,7 @@ public class WxOperateInterfaceAction extends DispatchAction{
 		}
 		return null;
 	}	
-	
+
 	/**
 	 * 获取餐厅信息
 	 * @param mapping

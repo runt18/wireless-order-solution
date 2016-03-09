@@ -17,10 +17,10 @@ import com.wireless.json.Jsonable;
 public class FinanceQRCodeAction extends Action {
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-	    String callbackFunName = request.getParameter("callbackparam");
-	    String restaurantId = request.getParameter("restaurantId");
+	    final String callbackFunName = request.getParameter("callbackparam");
+	    final String restaurantId = request.getParameter("restaurantId");
 		final String codeUrl = new QRCode().setSceneId(Integer.parseInt(restaurantId)).createUrl(Token.newInstance(FinanceWeixinAction.APP_ID, FinanceWeixinAction.APP_SECRET));
-		JObject jObj = new JObject();
+		final JObject jObj = new JObject();
 		jObj.setExtra(new Jsonable(){
 
 			@Override
