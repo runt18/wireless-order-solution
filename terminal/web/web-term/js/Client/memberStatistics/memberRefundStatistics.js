@@ -229,12 +229,10 @@ Ext.onReady(function(){
 							}else{
 								thiz.setValue(null);
 							}
-							
-							thiz.fireEvent('select');
 						}
 					});
 				},
-				select : function(isJump){
+				select : function(isJump, record, index, isJump){
 					if(branch_combo_memberRefund.getValue() == null){
 						Ext.getCmp('memberRefund_comboPayType').disable();
 					}else{
@@ -523,4 +521,7 @@ Ext.onReady(function(){
 		
 	});
 	
+	setTimeout(function(){
+		Ext.getCmp('memberRefundSearchBtn').handler();
+	}, 200);
 });

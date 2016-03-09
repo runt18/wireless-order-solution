@@ -449,8 +449,7 @@
 						Ext.getCmp('branch_combo_memberCharge').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
 						
 						//设置是跳转页面
-						var isJump = true;
-						Ext.getCmp('branch_combo_memberCharge').fireEvent('select', isJump);
+						Ext.getCmp('branch_combo_memberCharge').fireEvent('select', this, null, null, true);
 						
 						(function(){
 							if(Ext.getCmp('memberRecharge_comboPayType').getValue()){
@@ -482,7 +481,7 @@
 						
 						//设置是跳转页面
 						var isJump = true;
-						Ext.getCmp('branch_combo_memberRefund').fireEvent('select', isJump);
+						Ext.getCmp('branch_combo_memberRefund').fireEvent('select', this, null, null, isJump);
 						
 						(function(){
 							if(Ext.getCmp('memberRefund_comboPayType').getValue()){

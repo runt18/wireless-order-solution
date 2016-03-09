@@ -230,11 +230,10 @@ Ext.onReady(function(){
 								thiz.setValue(null);
 							}
 							
-							thiz.fireEvent('select');
 						}
 					});
 				},
-				select : function(isJump){
+				select : function(thiz, record, index, isJump){
 					if(branch_combo_memberCharge.getValue() == null){
 						Ext.getCmp('memberRecharge_comboPayType').disable();
 					}else{
@@ -242,6 +241,7 @@ Ext.onReady(function(){
 						//加载收款方式
 						var payType = [[-1, '全部']];
 						Ext.Ajax.request({
+							
 							url : '../../OperatePayType.do',
 							params : {
 								dataSource : 'getByCond',
@@ -258,7 +258,7 @@ Ext.onReady(function(){
 					
 					Ext.getCmp('memberRecharge_comboPayType').setValue(-1);
 					
-					if(!isJump){
+					if(!isJump || typeof isJump != 'boolean'){
 						Ext.getCmp('memberChargeSearchBtn').handler();
 					}
 					
@@ -522,5 +522,7 @@ Ext.onReady(function(){
 	});
 	
 	
-	
+	setTimeout(function(){
+		Ext.getCmp('memberChargeSearchBtn').handler();
+	}, 300);
 });
