@@ -49,7 +49,9 @@ public class MemberOperationDao {
 				operationCond.append(type.getValue());
 			}
 			extraCond.append(" AND MO.id IN (" +
-							 " SELECT MAX(id) FROM wireless_order_db." + super.dbTbl.moTbl + " WHERE restaurant_id = " + super.restaurantId +
+							 " SELECT MAX(id) FROM wireless_order_db." + super.dbTbl.moTbl + 
+							 " WHERE 1 = 1 " + 
+							 " AND " + (super.branchId != 0 ? " branch_id = " + super.branchId : " restaurant_id = " + super.restaurantId) +
 							 " AND operate_type IN (" + operationCond.toString() + ") GROUP BY order_id )");
 			
 			return super.toString() + extraCond.toString();
@@ -293,7 +295,8 @@ public class MemberOperationDao {
 			  " remaining_base_money, remaining_extra_money, remaining_point, comment "	+
 			  ")" +
 			  " VALUES( " +
-		      (staff.isBranch() ? staff.getGroupId() + "," + staff.getRestaurantId() : staff.getRestaurantId() + "," + " NULL ") + "," + 
+		      (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) + "," +
+			  staff.getRestaurantId() + "," +
 		      mo.getStaffId() + "," +
 		      "'" + mo.getStaffName() + "'," + 
 		      mo.getMemberId() + "," +
@@ -389,7 +392,7 @@ public class MemberOperationDao {
 	public static List<MemberOperation> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
-			  " MO.id, MO.restaurant_id, MO.branch_id, MO.staff_id, MO.staff_name, " +
+			  " MO.id, MO.restaurant_id, MO.branch_id, R.restaurant_name AS branch_name, MO.staff_id, MO.staff_name, " +
 			  " MO.member_id, MO.member_card, MO.member_name, MO.member_mobile, " +
 			  " MO.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, MO.pay_money, " +
 			  " MO.operate_seq, MO.operate_date, MO.operate_type, MO.order_id, MO.charge_type, MO.charge_money,"	+
@@ -399,6 +402,7 @@ public class MemberOperationDao {
 			  " FROM " + Params.dbName + "." + extraCond.dbTbl.moTbl + " MO " +
 			  " LEFT JOIN " + Params.dbName + ".member M ON MO.member_id = M.member_id "	+
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = MO.pay_type_id " +
+			  " LEFT JOIN " + Params.dbName + ".restaurant R ON R.id = MO.branch_id " +
 			  " WHERE 1 = 1 " +
 			  " AND MO.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  extraCond.setRestaurant(staff.getRestaurantId()).toString() +
@@ -414,6 +418,7 @@ public class MemberOperationDao {
 			mo.setId(dbCon.rs.getInt("id"));
 			mo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			mo.setBranchId(dbCon.rs.getInt("branch_id"));
+			mo.setBranchName(dbCon.rs.getString("branch_name"));
 			mo.setStaffId(dbCon.rs.getInt("staff_id"));
 			mo.setStaffName(dbCon.rs.getString("staff_name"));
 			mo.setOperateSeq(dbCon.rs.getString("operate_seq"));
@@ -864,7 +869,10 @@ public class MemberOperationDao {
 		DBTbl fromTbl = new DBTbl(archiveFrom);
 		DBTbl toTbl = new DBTbl(archiveTo);
 		
-		sql = " SELECT COUNT(*) FROM " + Params.dbName + "." + fromTbl.moTbl + " WHERE restaurant_id = " + staff.getRestaurantId();
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + "." + fromTbl.moTbl + 
+			  " WHERE 1 = 1 " + 
+			  " AND restaurant_id = " + (staff.isBranch() ? staff.getGroupId() :  staff.getRestaurantId()) +
+			  " AND branch_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		int moAmount = 0;
 		if(dbCon.rs.next()){
@@ -883,15 +891,20 @@ public class MemberOperationDao {
 		//Move the member operation record from 'member_operation' to 'member_operation_history'
 		sql = " INSERT INTO " + Params.dbName + "." + toTbl.moTbl + "(" + item + ")" +
 			  " SELECT " + item + " FROM " + Params.dbName + "." + fromTbl.moTbl + " MO " +
-			  " JOIN " + Params.dbName + ".restaurant REST ON REST.id = MO.restaurant_id " +
-			  " WHERE restaurant_id = " + staff.getRestaurantId() +
+			  " JOIN " + Params.dbName + ".restaurant REST ON REST.id = IFNULL(MO.branch_id, MO.restaurant_id) " +
+			  " WHERE 1 = 1 " + 
+			  " AND restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
+			  " AND branch_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond.toString() : "");
 		moAmount = dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the member operation to this restaurant
 		sql = " DELETE MO FROM " + Params.dbName + "." + fromTbl.moTbl + " MO " +
 			  " JOIN " + Params.dbName + ".restaurant REST ON REST.id = MO.restaurant_id " +
-			  " WHERE restaurant_id = " + staff.getRestaurantId() + (extraCond != null ? extraCond.toString() : "");
+			  " WHERE 1 = 1 " + 
+			  " AND restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
+			  " AND branch_id = " + staff.getRestaurantId() +
+			  (extraCond != null ? extraCond.toString() : "");
 		dbCon.stmt.executeUpdate(sql);
 		
 		return new ArchiveResult(0, moAmount);

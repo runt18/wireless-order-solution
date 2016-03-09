@@ -134,7 +134,6 @@ public class CalcMemberStatisticsDao {
 		sql = " SELECT IFNULL(PT.name, '其他') AS pay_type, SUM(TMP.actual_price) AS total_consume, COUNT(*) AS consume_amount FROM ( " +
 				" SELECT OH.actual_price, OH.pay_type_id FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " OH " +
 				" JOIN ( " +  makeSql(staff, range, extraCond.setOperateType(OperationType.CONSUME)) + " ) AS TMP ON TMP.order_id = OH.id " +
-				" WHERE OH.restaurant_id = " + staff.getRestaurantId() +
 				" GROUP BY OH.id " +
 			  " ) AS TMP " +
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = TMP.pay_type_id " +
@@ -236,7 +235,8 @@ public class CalcMemberStatisticsDao {
 		 String sql;
 		 sql = " SELECT * FROM " + Params.dbName + "." + extraCond.dbTbl.moTbl +
 			   " WHERE 1 = 1 " +
-			   " AND restaurant_id = " + staff.getRestaurantId() +
+			   " AND restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
+			   " AND branch_id = " + staff.getRestaurantId() +
 			   " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 		 	   (extraCond != null ? extraCond.toString() : "");
 		 return sql;
