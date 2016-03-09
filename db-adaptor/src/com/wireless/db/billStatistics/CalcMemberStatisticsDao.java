@@ -236,7 +236,6 @@ public class CalcMemberStatisticsDao {
 		 sql = " SELECT * FROM " + Params.dbName + "." + extraCond.dbTbl.moTbl +
 			   " WHERE 1 = 1 " +
 			   " AND restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
-			   " AND branch_id = " + staff.getRestaurantId() +
 			   " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 		 	   (extraCond != null ? extraCond.toString() : "");
 		 return sql;
