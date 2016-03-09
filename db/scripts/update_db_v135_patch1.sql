@@ -37,6 +37,25 @@ ADD COLUMN `min_charge` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `age`,
 ADD COLUMN `max_charge` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `min_charge`,
 ADD COLUMN `raw` TINYINT NULL DEFAULT 0 COMMENT '' AFTER `max_charge`;
 
+-- -----------------------------------------------------
+-- Add the field 'wx_pay_money' to table 'book'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`book` 
+ADD COLUMN `wx_pay_money` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `book_money`;
+
+-- -----------------------------------------------------
+-- Add the field 'print_kitchen_id' to table 'food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food` 
+ADD COLUMN `print_kitchen_id` INT NULL DEFAULT NULL COMMENT '' AFTER `kitchen_id`;
+
+-- -----------------------------------------------------
+-- Add the branch_id to table 'member', 'member_operation'
+-- -----------------------------------------------------
+UPDATE `wireless_order_db`.`member` SET branch_id = restaurant_id WHERE branch_id IS NULL;
+UPDATE `wireless_order_db`.`member_operation` SET branch_id = restaurant_id WHERE branch_id IS NULL;
+UPDATE `wireless_order_db`.`member_operation_history` SET branch_id = restaurant_id WHERE branch_id IS NULL;
+UPDATE `wireless_order_db`.`member_operation_archive` SET branch_id = restaurant_id WHERE branch_id IS NULL;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
