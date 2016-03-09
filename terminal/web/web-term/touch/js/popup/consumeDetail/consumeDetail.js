@@ -3,12 +3,13 @@ function ConsumeDetail(){
 	var _consumeDetail = new JqmPopup({
 		loadUrl : './popup/consumeDetail/consumeDetail.html',
 		pageInit : function(self){
-			//选择行筛选
+			//操作类型筛选
 			self.find('input[name=memberConsumeType]').each(function(index, element){
 				element.onclick = function(){
 					searchMemberDetail(self);
 				}
 			});
+			
 			//搜索功能
 			self.find('[id=searchMember_button_consumeDetail]').click(function(){
 				searchMemberDetail(self);
@@ -24,17 +25,20 @@ function ConsumeDetail(){
 					}
 				});
 			});
+			
 			//关闭按钮
 			self.find('[id=colseDetail_a_consumeDetail]').click(function(){
 				_self.close();
 			});
 			
-			//初始化搜索
-			searchMemberDetail(self);
 		}
 	});
 	this.open = function(afterOpen){
-		_consumeDetail.open();
+		_consumeDetail.open(function(self){
+			//初始搜索
+			searchMemberDetail(self);
+		});
+		
 		if(afterOpen && typeof afterOpen == 'function'){
 			afterOpen();
 		}
@@ -51,32 +55,28 @@ function ConsumeDetail(){
 		}
 	}
 	
-	
-	//会员消费明细
-	memberConsumeTrTemplet = '<tr>'
-			+ '<td>{dataIndex}</td>'
-			+ '<td>{orderId}</td>'
-			+ '<td>{operateDateFormat}</td>'
-			+ '<td>{memberName}</td>'
-			+ '<td>{memberType}</td>'
-			+ '<td>{otype}</td>'
-			+ '<td class="text_right">{money}</td>'
-			+ '<td class="text_right">{deltaPoint}</td>'
-			+ '<td>{staffName}</td>'
-			+ '<td>{comment}</td>'
-			+ '</tr>';
-
-			
 	//查询会员消费明细		
 	function searchMemberDetail(self){
+		//会员消费明细
+		var memberConsumeTrTemplet = '<tr>'
+				+ '<td>{dataIndex}</td>'
+				+ '<td>{orderId}</td>'
+				+ '<td>{operateDateFormat}</td>'
+				+ '<td>{memberName}</td>'
+				+ '<td>{memberType}</td>'
+				+ '<td>{otype}</td>'
+				+ '<td class="text_right">{money}</td>'
+				+ '<td class="text_right">{deltaPoint}</td>'
+				+ '<td>{staffName}</td>'
+				+ '<td>{comment}</td>'
+				+ '</tr>';
+		
 		Util.LM.show();
-//		var memberType = $('#consumeDetail_memberType').val();
-		var operateType = -1;
-		var detailOpes = self.find('input[name=memberConsumeType]'); 
-		for (var i = 0; i < detailOpes.length; i++) {
-			
-			if($(detailOpes[i]).attr("checked")){
-				operateType = $(detailOpes[i]).attr("data-value");
+		var operateType = null;
+		var detailOperates = self.find('input[name=memberConsumeType]'); 
+		for (var i = 0; i < detailOperates.length; i++) {
+			if($(detailOperates[i]).attr("checked")){
+				operateType = $(detailOperates[i]).attr("data-value");
 				break;
 			}
 		}
