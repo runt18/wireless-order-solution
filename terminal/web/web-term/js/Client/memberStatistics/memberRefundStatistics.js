@@ -423,9 +423,10 @@ Ext.onReady(function(){
 				mrs_grid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
 				mrs_grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
 				mrs_grid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
-				mrs_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+				mrs_grid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
 				mrs_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 				mrs_grid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+				mrs_grid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
 			}
 		});
 	}
