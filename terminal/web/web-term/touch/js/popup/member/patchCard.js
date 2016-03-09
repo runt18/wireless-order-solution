@@ -157,7 +157,7 @@ function PatchCardPopup(){
 		}
 		//获取实体卡输入框值
 		var memberCardNum = self.find('[id=setMemberCard_input_patchCard]').val();
-		if(_patchCardMember.memberCard !== ''){
+		if(_patchCardMember.memberCard == ''){
 			if(memberCardNum != ''){
 				$.ajax({
 					url : '../OperateMember.do',
@@ -193,6 +193,7 @@ function PatchCardPopup(){
 			}
 			
 		}else{
+			console.log(0);
 			_self.close();
 		}
 	}

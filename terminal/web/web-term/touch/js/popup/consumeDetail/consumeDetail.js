@@ -13,17 +13,14 @@ function ConsumeDetail(){
 			//搜索功能
 			self.find('[id=searchMember_button_consumeDetail]').click(function(){
 				searchMemberDetail(self);
-				var value = self.find('[id=memberName_input_consumeDetail]').val();
 			});
 			
-			//enter
-			self.find('[id=memberName_input_consumeDetail]').focus(function(){
-				self.find('[id=memberName_input_consumeDetail]').keyup(function(e){
-					//keyCode 13 为enter
-					if(e.keyCode == 13){
-						searchMemberDetail(self);
-					}
-				});
+			//enter键
+			self.find('[id=memberName_input_consumeDetail]').keyup(function(e){
+				//keyCode 13 为enter
+				if(e.keyCode == 13){
+					searchMemberDetail(self);
+				}
 			});
 			
 			//关闭按钮
