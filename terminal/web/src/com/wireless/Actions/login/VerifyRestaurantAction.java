@@ -15,7 +15,6 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.token.TokenDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.token.Token;
 
 public class VerifyRestaurantAction extends Action {
@@ -23,14 +22,12 @@ public class VerifyRestaurantAction extends Action {
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
-		final JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		final String account = request.getParameter("account");
 		final String encryptedToken = request.getParameter("token");
 		final String nextEncryptedToken;
 		try {
-			final Restaurant r = RestaurantDao.getByAccount(account);
-			
-			jobject.setRoot(r);
+			jObject.setRoot(RestaurantDao.getByAccount(account));
 			
 			nextEncryptedToken = TokenDao.verify(new Token.VerifyBuilder(account, encryptedToken));
 			
@@ -40,13 +37,13 @@ public class VerifyRestaurantAction extends Action {
 			response.addCookie(cookie);
 			
 		}catch (BusinessException | SQLException e) {
-			jobject.initTip(e);
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}		
 		return null;
 	}

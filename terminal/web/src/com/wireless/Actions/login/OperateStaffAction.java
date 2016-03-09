@@ -46,12 +46,11 @@ public class OperateStaffAction extends Action{
 				
 				final HttpSession session = request.getSession();
 				session.setAttribute("pin", Integer.toString(staff.getId()));
-				session.setAttribute("restaurantID", staff.getRestaurantId()+"");
+				session.setAttribute("restaurantID", Integer.toString(staff.getRestaurantId()));
 				session.setAttribute("dynamicKey", System.currentTimeMillis() % 100000);
 				jObject.initTip(true, "登陆成功");				
 				
 			}else{
-//				tokenContent = null;
 				jObject.initTip(false, "密码输入错误");
 			}
 			
