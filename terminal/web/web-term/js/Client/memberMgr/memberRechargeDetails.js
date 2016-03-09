@@ -153,8 +153,15 @@ Ext.onReady(function(){
 							}
 						}
 						
+						
 						thiz.store.loadData(data);
-						thiz.setValue(null);
+						
+						if(jr.root[0].typeVal != '2'){
+							thiz.setValue(jr.root[0].id);
+						}else{
+							thiz.setValue(null);
+						}
+						
 						thiz.fireEvent('select');
 					}
 				});
@@ -277,7 +284,6 @@ Ext.onReady(function(){
 			handler : function(e){
 				mrd_search_comboOperateType.setValue(-1);
 				mrd_search_memberType.setValue(-1);
-				Ext.getCmp('branch_combo_memberRechargeDetail').setValue(null);
 				mrd_search_memberName.setValue();
 				mrd_searchMemberOperation();
 			}
@@ -349,6 +355,7 @@ Ext.onReady(function(){
 			['会员名称', 'member.name', 60],
 			['会员类型', 'member.memberType.name'],
 			['手机号码', 'member.mobile', 60],
+			['所属门店', 'branchName', 60],
 			['实收/实退', 'chargeMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['充值/退款', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['收款方式', 'chargeTypeText'],

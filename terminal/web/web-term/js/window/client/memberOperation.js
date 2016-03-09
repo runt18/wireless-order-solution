@@ -181,7 +181,7 @@ Ext.onReady(function(){
 						id : restaurantID
 					},
 					success : function(res, opt){
-						var jr = Ext.decode(res.responseText); 
+						var jr = Ext.decode(res.responseText);
 						
 						if(jr.root[0].typeVal != '2'){
 							data.push([jr.root[0]['id'], jr.root[0]['name']]);
@@ -193,8 +193,15 @@ Ext.onReady(function(){
 							}
 						}
 						
+						
 						thiz.store.loadData(data);
-						thiz.setValue(null);
+						
+						if(jr.root[0].typeVal != '2'){
+							thiz.setValue(jr.root[0].id);
+						}else{
+							thiz.setValue(null);
+						}
+						
 						thiz.fireEvent('select');
 					}
 				});
@@ -301,7 +308,6 @@ Ext.onReady(function(){
 				cdd_search_comboOperateType.setValue(-1);
 				cdd_search_memberType.setValue(-1);
 				cdd_search_memerbMobile.setValue();
-				branch_combo_memberOperation.setValue(null);
 				cdd_searchMemberOperation();
 			}
 		}]
@@ -317,6 +323,7 @@ Ext.onReady(function(){
 			['流水号', 'seq', 110],
 			['操作类型', 'operateTypeText', 60],
 			['会员名称', 'member.name', 60],
+			['所属门店', 'branchName', 60],
 			['变动积分', 'operateTypeValue', 60, 'right', 'cdd_deltaPointRenderer'],
 			['剩余积分', 'operateTypeValue', 60, 'right', 'cdd_remainingPointRenderer'],
 			['收款金额', 'operateTypeValue', 60, 'right', 'cdd_payMoneyRenderer'],

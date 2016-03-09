@@ -13,7 +13,7 @@ Ext.onReady(function(){
 			}
 	};	
 		
-	var memberTypeTree = null;
+	var memberTypeTree = null;	
 	var memberBasicGrid = null;
 	var memberBasicWin = null;
 	var adjustPointWin = null;
@@ -1798,10 +1798,9 @@ Ext.onReady(function(){
 	var selectRestaurant = new Ext.form.ComboBox({
 		columnWidth : 0.3,
 		id : 'selectRestaurant_combo_memeberMgrMain',
-		xtype : 'combo',
 		readOnly : false,
 		forceSelection : true,
-		store : new Ext.data.JsonStore({
+		store : new Ext.data.SimpleStore({
 			fields : ['id', 'name']
 		}),
 		valueField : 'id',
@@ -1812,6 +1811,7 @@ Ext.onReady(function(){
 		selectOnFocus : true,
 		listeners : {
 			render : function(thiz){
+				var data = [];
 				Ext.Ajax.request({
 					url : '../../OperateRestaurant.do',
 					params : {
@@ -1820,17 +1820,26 @@ Ext.onReady(function(){
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
-						var restaurant = [];
-						restaurant.push({'id':jr.root[0].id, 'name' : jr.root[0].name + '(集团)'});
-						for(var i = 0; i < jr.root[0].branches.length; i++){
-							restaurant.push({'id':jr.root[0].branches[i].id, 'name':jr.root[0].branches[i].name});
+						
+						if(jr.root[0].typeVal != '2'){
+							data.push([jr.root[0]['id'], jr.root[0]['name']]);
+						}else{
+							data.push([null, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+							
+							for(var i = 0; i < jr.root[0].branches.length; i++){
+								data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+							}
 						}
-						selectRestaurant.store.loadData(restaurant);
-						selectRestaurant.setValue(jr.root[0].id);
-					},
-					failure : function(res, opt){
-						selectRestaurant.store.loadData({root:[{typeId:-1, name:'全部'}]});
-						selectRestaurant.setValue(-1);
+						
+						
+						thiz.store.loadData(data);
+						
+						if(jr.root[0].typeVal != '2'){
+							thiz.setValue(jr.root[0].id);
+						}else{
+							thiz.setValue(null);
+						}
+						
 					}
 				});
 			},

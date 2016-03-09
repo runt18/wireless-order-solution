@@ -2258,7 +2258,7 @@ function basicOperationBasicHandler(c){
 			foodName : foodName.getValue().trim(),
 			foodAliasID : document.getElementById('chbForFoodAlias').checked?foodAliasID.getValue():'',
 			foodPinyin : foodPinyin.getValue(),
-			foodPrice : foodPrice.getValue()?foodPrice.getValue():0,
+			foodPrice : foodPrice.getValue()?foodPrice.getValue() : 0,
 			foodPrices : foodPrices,
 			kitchenID : foodKitchenAlias.getValue(),
 			foodDesc : foodDesc.getValue().trim(),

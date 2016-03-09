@@ -221,8 +221,15 @@ Ext.onReady(function(){
 								}
 							}
 							
+							
 							thiz.store.loadData(data);
-							thiz.setValue(null);
+							
+							if(jr.root[0].typeVal != '2'){
+								thiz.setValue(jr.root[0].id);
+							}else{
+								thiz.setValue(null);
+							}
+							
 							thiz.fireEvent('select');
 						}
 					});
@@ -379,6 +386,7 @@ Ext.onReady(function(){
 				['日期', 'operateDateFormat'],
 				['操作类型', 'operateTypeText', 90, 'center'],
 				['会员名称', 'member.name', 60],
+				['操作门店', 'branchName', 60],
 				['手机号码', 'member.mobile', 125],
 				['实退金额', 'deltaBaseMoney', 60, 'right', Ext.ux.txtFormat.gridDou],
 				['账户退额', 'deltaTotalMoney', 60, 'right', Ext.ux.txtFormat.gridDou],

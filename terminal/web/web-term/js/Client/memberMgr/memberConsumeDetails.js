@@ -207,8 +207,15 @@ Ext.onReady(function(){
 							}
 						}
 						
+						
 						thiz.store.loadData(data);
-						thiz.setValue(null);
+						
+						if(jr.root[0].typeVal != '2'){
+							thiz.setValue(jr.root[0].id);
+						}else{
+							thiz.setValue(null);
+						}
+						
 						thiz.fireEvent('select');
 					}
 				});
@@ -358,7 +365,6 @@ Ext.onReady(function(){
 			handler : function(e){
 				mcd_search_memberType.setValue(-1);
 				mcd_search_memberName.setValue();
-				Ext.getCmp('branch_combo_memberConsumeDetail').setValue(null);
 				mcd_searchMemberOperation();
 			}
 			
@@ -414,6 +420,7 @@ Ext.onReady(function(){
 			['消费时间', 'operateDateFormat'],
 			['会员名称', 'member.name', 60],
 			['手机', 'member.mobile'],
+			['所属门店', 'branchName', 60],
 			['会员类型', 'member.memberType.name'],
 			['收款方式', 'payTypeText'],
 			['消费金额', 'payMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],

@@ -219,8 +219,15 @@ Ext.onReady(function(){
 								}
 							}
 							
+							
 							thiz.store.loadData(data);
-							thiz.setValue(null);
+							
+							if(jr.root[0].typeVal != '2'){
+								thiz.setValue(jr.root[0].id);
+							}else{
+								thiz.setValue(null);
+							}
+							
 							thiz.fireEvent('select');
 						}
 					});
@@ -266,7 +273,6 @@ Ext.onReady(function(){
 				handler : function(e){
 					mcrs_search_memberType.setValue(-1);
 					mcrs_search_memberName.setValue();
-					branch_combo_memberCreate.setValue(null);
 					mcrs_searchMemberOperation();
 				}
 				
@@ -329,6 +335,7 @@ Ext.onReady(function(){
 					['名称', 'name'],
 					['类型', 'memberType.name'],
 					['创建时间','createDateFormat'],
+					['操作门店', 'branchName', 60],
 					['消费次数', 'consumptionAmount', null,'right', Ext.ux.txtFormat.gridDou],
 					['消费总额', 'totalConsumption', null,'right', Ext.ux.txtFormat.gridDou],
 					['累计积分', 'totalPoint', null, 'right', Ext.ux.txtFormat.gridDou],
