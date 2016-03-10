@@ -39,11 +39,35 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.sccon.ServerConnector;
 
 public class WxOperateWaiterAction extends DispatchAction{
 
+	/**
+	 * 获取账单信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String fromId = request.getParameter("fid");
+		//final String oid = request.getParameter("oid");
+		final String orderId = request.getParameter("orderId");
+		final JObject jObject= new JObject();
+		try{
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			jObject.setRoot(OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY));
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
 	/**
 	 * 打印微信小二
 	 * @param mapping

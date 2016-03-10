@@ -29,16 +29,16 @@ import com.wireless.pojo.staffMgr.Staff;
 public class WxOperateCouponAction extends DispatchAction{
 	
 	public ActionForward getDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String fromId = request.getParameter("fid");
+		final String fromId = request.getParameter("fid");
+		final String oid = request.getParameter("oid");
+		final String operate = request.getParameter("operate");
+		final String associateId = request.getParameter("associateId");
+		final String limit = request.getParameter("limit");
 		
-		JObject jObject = new JObject();
+		final JObject jObject = new JObject();
 		try{
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
-			final String oid = request.getParameter("oid");
-			final String operate = request.getParameter("operate");
-			final String associateId = request.getParameter("associateId");
-			final String limit = request.getParameter("limit");
 			final WxMember wxMember = WxMemberDao.getBySerial(staff, oid);
 			
 			final CouponOperationDao.ExtraCond extraCond = new CouponOperationDao.ExtraCond().setMember(wxMember.getMemberId());
@@ -60,7 +60,7 @@ public class WxOperateCouponAction extends DispatchAction{
 			
 			if(limit != null && !limit.isEmpty()){
 				if(result.size() > Integer.parseInt(limit)){
-					result = result.subList(0,  Integer.parseInt(limit));
+					result = result.subList(0, Integer.parseInt(limit));
 				}
 			}
 			
