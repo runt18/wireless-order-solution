@@ -35,13 +35,19 @@ function PickFoodComponent(param){
 		}
 	};
 	
-	this.close = function(){
+	this.close = function(afterClose, timeout){
 		$('#WXCmp_div_member').show();
 		if(_container){
 			_container[0].remove();
 			_container = null;
 		}
-		
+	if(afterClose && typeof afterClose == 'function'){
+			if(timeout){
+				setTimeout(afterClose, timeout)
+			}else{
+				afterClose();
+			}
+		}
 	};
 	
 	this.openShopping = function(){
