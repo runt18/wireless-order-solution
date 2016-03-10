@@ -280,7 +280,7 @@ public class ShiftDao {
 		result.setRoundIncome(CalcBillStatisticsDao.calcRoundPrice(dbCon, staff, range, extraCond));
 		
 		//Get the income by charge
-		result.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(extraCond.dateType)));
+		result.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(extraCond.dateType).setBranch(staff.getRestaurantId())));
 		
 		//Get the income by book
 		result.setIncomeByBook(CalcBillStatisticsDao.calcIncomeByBook(dbCon, staff, range));
