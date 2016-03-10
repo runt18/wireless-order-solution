@@ -258,7 +258,7 @@ Ext.onReady(function(){
 					
 					Ext.getCmp('memberRecharge_comboPayType').setValue(-1);
 					
-					if(!isJump || typeof isJump != 'boolean'){
+					if(!isJump){
 						Ext.getCmp('memberChargeSearchBtn').handler();
 					}
 					
