@@ -17,7 +17,6 @@
 		
 		var sendToStatisticsOperateType = c.operateType;
 		var sendToStatisticsOperatePayType = c.payType;
-		var sendToStatisticsOperatePayTypeId = c.payTypeId;
 		
 		if(!sendToStatisticsPageHours.opening){
 			sendToStatisticsPageHours.openingText = "00:00";
@@ -375,7 +374,9 @@
 								});
 								
 								if(sendToStatisticsOperatePayType){
-									Ext.getCmp('comboPayType').setValue(sendToStatisticsOperatePayTypeId);
+									Ext.getCmp('comboPayType').setValue(sendToStatisticsOperatePayType);
+								}else{
+									Ext.getCmp('comboPayType').setValue(-1);
 								}
 							
 								
@@ -441,7 +442,7 @@
 				businessSubStatisticsLoading.show();
 				
 				(function(){
-					if(Ext.getCmp('branch_combo_memberCharge').getValue()){
+					if(Ext.getCmp('branch_combo_memberCharge').getValue() || Ext.getCmp('branch_combo_memberCharge').getValue() == null){
 						
 						Ext.getCmp('memberRecharge_comboPayType').setValue('');
 						
@@ -473,7 +474,7 @@
 				businessSubStatisticsLoading.show();
 				
 				(function(){
-					if(Ext.getCmp('branch_combo_memberRefund').getValue()){
+					if(Ext.getCmp('branch_combo_memberRefund').getValue() || Ext.getCmp('branch_combo_memberRefund').getValue() == null){
 						Ext.getCmp('memberRefund_comboPayType').setValue('');
 						
 						//设置门店选择的值
@@ -985,7 +986,7 @@ Ext.onReady(function(){
 					
 						trPayTypeContent += (String.format(trPayIncomeModel, 
 								temp.payType, 
-								'<a href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, payType:\''+ temp.payType +'\', payTypeId : \'' + temp.id + '\'})">' + temp.amount + '</a>', 
+								'<a href="javascript:void(0)" style="font-size:18px;" onclick="linkToBusinessStatistics({type : 8, payType:\''+ temp.id +'\'})">' + temp.amount + '</a>', 
 								temp.total.toFixed(2), 
 								temp.actual.toFixed(2)
 							)
