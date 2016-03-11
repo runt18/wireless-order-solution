@@ -17,56 +17,34 @@
 <script type="text/javascript" src="./js/fastOrderFood/fastOrderFood.js"></script>
 </head>
 <body>
-<div id="bigbox" style="overflow-y:auto;">
+<div id="weixinWaiter_div_waiter" style="overflow-y:auto;">
 	<div class="main-box" style="background-color: cornsilk;">
 		<ul class="m-b-list">
-			<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-			<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
-				<div style="width:60%;">账单号 : <font color="red" style="font-weight:bold;">051321</font></div>
-				<div style="width:40%;">餐台号 : <font color="red" style="font-weight:bold;">15</font></div>
+			<li class="box-horizontal" style="border-bottom:0px;line-height:10px;">&nbsp;</li>
+			<li  class="box-horizontal" style="border-bottom:0px;line-height:10px;">
+				<div style="width:60%;">账单号 : <font color="red" style="font-weight:bold;" id="orderId_font_waiter">051321</font></div>
+				<div style="width:40%;">餐台号 : <font color="red" style="font-weight:bold;" id="tableNum_font_waiter">15</font></div>
 			</li>
-			<li style="border-bottom:0px;line-height:15px;">&nbsp;</li>
+			
+			<li class="box-horizontal" style="border-bottom:0px;line-height:10px;">&nbsp;</li>
+			
 			<div class="box-horizontal" style="line-height:20px;border-bottom:0px;">
-				<div style="width:60%;">开台时间 : <font color="red" style="font-weight:bold;">16:05:00</font></div>
-				<div style="width:40%;">开台人 : <font color="red" style="font-weight:bold;">陈大壮</font></div>
+				<div style="width:99%;">开台时间 : <font color="red" style="font-weight:bold;" id="openTableTime_font_waiter">16:05:00</font></div>
 			</div>
+			
+			<li class="box-horizontal" style="border-bottom:0px;line-height:8px;">&nbsp;</li>
+			
+			<div class="box-horizontal" style="line-height:10px;border-bottom:0px;">
+				<div>开台人 : <font color="red" style="font-weight:bold;" id="openTablePeople_font_waiter">陈大壮</font></div>
+			</div>
+			
 			<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
 		</ul>
 	</div>
 	
-	<div class="main-box" style="background-color: cornsilk;">
-		<ul class="m-b-list">
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
-					<div style="width:79%;">1、超级无敌好吃的牛肉饭</div>
-					<div style="width:19%;"><font style="font-weight:bold;color:green">1238元</font></div>
-				</li>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				
-				<div class="box-horizontal" style="line-height:15px;border-bottom:0px;">
-					<div style="width:98%;"><font style="font-family:Arial;font-size:12px;">去皮 、加辣、变态辣</font></div>
-				</div>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-		</ul>
-	</div>
 	
-	<div class="main-box" style="background-color: cornsilk;">
-		<ul class="m-b-list">
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
-					<div style="width:79%;">1、超级无敌好吃的牛肉饭</div>
-					<div style="width:19%;"><font style="font-weight:bold;color:green">1238元</font></div>
-				</li>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				
-				<div class="box-horizontal" style="line-height:15px;border-bottom:0px;">
-					<div style="width:98%;"><font style="font-family:Arial;font-size:12px;">去皮 、加辣、变态辣</font></div>
-				</div>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-		</ul>
-	</div>
 	
-	<div class="main-box" style="background-color: cornsilk;">
+	<!-- <div class="main-box" style="background-color: cornsilk;">
 		<ul class="m-b-list">
 				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
 				<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
@@ -81,168 +59,38 @@
 				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
 		</ul>
 	</div>
+	 -->
+	 
 	
-	<div class="main-box" style="background-color: cornsilk;">
-		<ul class="m-b-list">
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
-					<div style="width:79%;">1、超级无敌好吃的牛肉饭</div>
-					<div style="width:19%;"><font style="font-weight:bold;color:green">1238元</font></div>
-				</li>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				
-				<div class="box-horizontal" style="line-height:15px;border-bottom:0px;">
-					<div style="width:98%;"><font style="font-family:Arial;font-size:12px;">去皮 、加辣、变态辣</font></div>
-				</div>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-		</ul>
-	</div>
-	
-	<div class="main-box" style="background-color: cornsilk;">
-		<ul class="m-b-list">
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
-					<div style="width:79%;">1、超级无敌好吃的牛肉饭</div>
-					<div style="width:19%;"><font style="font-weight:bold;color:green">1238元</font></div>
-				</li>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				
-				<div class="box-horizontal" style="line-height:15px;border-bottom:0px;">
-					<div style="width:98%;"><font style="font-family:Arial;font-size:12px;">去皮 、加辣、变态辣</font></div>
-				</div>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-		</ul>
-	</div>
-	
-	<div class="main-box" style="background-color: cornsilk;">
-		<ul class="m-b-list">
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
-					<div style="width:79%;">1、超级无敌好吃的牛肉饭</div>
-					<div style="width:19%;"><font style="font-weight:bold;color:green">1238元</font></div>
-				</li>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				
-				<div class="box-horizontal" style="line-height:15px;border-bottom:0px;">
-					<div style="width:98%;"><font style="font-family:Arial;font-size:12px;">去皮 、加辣、变态辣</font></div>
-				</div>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-		</ul>
-	</div>
-	
-	<div class="main-box" style="background-color: cornsilk;">
-		<ul class="m-b-list">
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
-					<div style="width:79%;">1、超级无敌好吃的牛肉饭</div>
-					<div style="width:19%;"><font style="font-weight:bold;color:green">1238元</font></div>
-				</li>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				
-				<div class="box-horizontal" style="line-height:15px;border-bottom:0px;">
-					<div style="width:98%;"><font style="font-family:Arial;font-size:12px;">去皮 、加辣、变态辣</font></div>
-				</div>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-		</ul>
-	</div>
-	
-	<div class="main-box" style="background-color: cornsilk;">
-		<ul class="m-b-list">
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
-					<div style="width:79%;">1、超级无敌好吃的牛肉饭</div>
-					<div style="width:19%;"><font style="font-weight:bold;color:green">1238元</font></div>
-				</li>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				
-				<div class="box-horizontal" style="line-height:15px;border-bottom:0px;">
-					<div style="width:98%;"><font style="font-family:Arial;font-size:12px;">去皮 、加辣、变态辣</font></div>
-				</div>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-		</ul>
-	</div>
-	
-	<div class="main-box" style="background-color: cornsilk;">
-		<ul class="m-b-list">
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
-					<div style="width:79%;">1、超级无敌好吃的牛肉饭</div>
-					<div style="width:19%;"><font style="font-weight:bold;color:green">1238元</font></div>
-				</li>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				
-				<div class="box-horizontal" style="line-height:15px;border-bottom:0px;">
-					<div style="width:98%;"><font style="font-family:Arial;font-size:12px;">去皮 、加辣、变态辣</font></div>
-				</div>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-		</ul>
-	</div>
-	
-	<div class="main-box" style="background-color: cornsilk;">
-		<ul class="m-b-list">
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
-					<div style="width:79%;">1、超级无敌好吃的牛肉饭</div>
-					<div style="width:19%;"><font style="font-weight:bold;color:green">1238元</font></div>
-				</li>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				
-				<div class="box-horizontal" style="line-height:15px;border-bottom:0px;">
-					<div style="width:98%;"><font style="font-family:Arial;font-size:12px;">去皮 、加辣、变态辣</font></div>
-				</div>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-		</ul>
-	</div>
-	
-	<div class="main-box" style="background-color: cornsilk;">
-		<ul class="m-b-list">
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
-					<div style="width:79%;">1、超级无敌好吃的牛肉饭</div>
-					<div style="width:19%;"><font style="font-weight:bold;color:green">1238元</font></div>
-				</li>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				
-				<div class="box-horizontal" style="line-height:15px;border-bottom:0px;">
-					<div style="width:98%;"><font style="font-family:Arial;font-size:12px;">去皮 、加辣、变态辣</font></div>
-				</div>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-		</ul>
-	</div>
-	
-	<div class="main-box" style="background-color: cornsilk;">
-		<ul class="m-b-list">
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">
-					<div style="width:79%;">1、超级无敌好吃的牛肉饭</div>
-					<div style="width:19%;"><font style="font-weight:bold;color:green">1238元</font></div>
-				</li>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-				
-				<div class="box-horizontal" style="line-height:15px;border-bottom:0px;">
-					<div style="width:98%;"><font style="font-family:Arial;font-size:12px;">去皮 、加辣、变态辣</font></div>
-				</div>
-				<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>
-		</ul>
-	</div>
+	<div id="orderList_div_waiter"></div>
 </div>
 
-<div style="width: 100%;" id="waiterBottom_div_waiter">
+
+
+
+
+
+<div id="bottom_div_waiter"  style="height:45;z-index:11111;">
 	<div class="hewarp">
-		<ul class="swiper-wrapper" style="padding-left: 0px; padding-right: 0px; width: 100%;">
-			<li style="width:33%;" class="index swiper-slide swiper-slide-visible swiper-slide-active">
+		<ul class="swiper-wrapper">
+			<li class="index swiper-slide" style="width:25%;">
 				<a title="首页">
 				<i class="foundicon-phone fcolor6"></i>呼叫结账
 				</a>
 			</li>
-			<li style="width:24%;" class="special swiper-slide">
+			<li class="user swiper-slide" style="width:25%;">
 				<a title="自助点餐" id="orderBySelf_a_waiter"> 
 					<i class="foundicon-star fcolor1"></i>自助点餐
 				</a>
 			</li>
-			<li style="width:24%;" class="special swiper-slide">
+			<li class="special swiper-slide" style="width:25%;">
 				<a title="为我评价"> 
 				<i class="foundicon-heart fcolor2"></i>为我评价
+				</a>
+			</li>
+			<li class="user swiper-slide" style="width:25%;">
+				<a href="javascript:window.location.reload();" title="刷新">
+				<i class="foundicon-refresh fcolor3"></i>刷新
 				</a>
 			</li>
 		</ul>
