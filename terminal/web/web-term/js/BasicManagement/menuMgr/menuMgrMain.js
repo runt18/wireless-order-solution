@@ -1565,7 +1565,25 @@ var basicOperationPanel = new Ext.Panel({
 					}
 		 		}]
 		 	},{
-		 		columnWidth : 0.9
+		 		columnWidth : .5,
+		 	    items : [{
+		 	    	xtype : 'combo',
+		 	    	hidden : true,
+		 	    	width : 86,
+		 	    	listWidth : 99,
+		 	    	store : new Ext.data.SimpleStore({
+						fields : ['id', 'name']
+					}),
+					valueField : 'id',
+					displayField : 'name',
+					mode : 'local',
+					triggerAction : 'all',
+					typeAhead : true,
+					selectOnFocus : true,
+					forceSelection : true,
+					allowBlank : false,
+					readOnly : false
+		 	    }]
 		 	},
 			{
 		 	    items : [{
@@ -1595,13 +1613,13 @@ var basicOperationPanel = new Ext.Panel({
 						}
 		 	    	}
 		 	    }]
-		 	},{
-		 		columnWidth : .55,
+		 	}, {
+		 		columnWidth : .5,
 		 		items : [{
 		 			xtype : 'numberfield',
 		 	    	id : 'numBasicForFoodAliasID',
 		 	    	fieldLabel : '助记码',
-		 	    	labelStyle : 'margin-left:10px;',
+		 	    	labelStyle : 'margin-left:12px;',
 		 	    	maxValue : 65535,
 		 	    	minValue : 1,
 		 	    	width : 80,

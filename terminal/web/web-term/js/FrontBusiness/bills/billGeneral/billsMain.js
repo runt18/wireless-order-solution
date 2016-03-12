@@ -756,12 +756,22 @@ Ext.onReady(function(){
 	billsGrid.getStore().on('load', function(thiz, rs, options){
 		for(var i = 0; i < rs.length; i++){
 			if(eval(rs[i].get('id') == 0)){
-				document.getElementById("shouldPaySum").innerHTML = rs[i].get('totalPrice').toFixed(2);
-				document.getElementById("actualPaySum").innerHTML = rs[i].get('actualPrice').toFixed(2);
 				thiz.remove(rs[i]);
-				return;
 			}
 		}
+	
+		$.post('../../QueryDailySettleByNow.do',{queryType : '1'}, function(jr){
+			if(jr.success){
+				var total = null;
+				var actual = null;
+				for(var i = 0; i < jr.other.business.paymentIncomes.length; i++){
+					total += jr.other.business.paymentIncomes[i].total;
+					actual += jr.other.business.paymentIncomes[i].actual;
+				}
+				document.getElementById("shouldPaySum").innerHTML = total.toFixed(2);
+				document.getElementById("actualPaySum").innerHTML = actual.toFixed(2);
+			}
+		});
 	});
 	billsGrid.keys = [{
 		key : Ext.EventObject.ENTER,

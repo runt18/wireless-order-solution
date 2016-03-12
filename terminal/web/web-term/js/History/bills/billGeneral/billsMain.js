@@ -1,9 +1,9 @@
-﻿Ext.onReady(function() {
+﻿var history_hours;
+Ext.onReady(function() {
 	
 	//历史账单
 	var searchAdditionFilter = 'searchAdditionFilterAll';
 	
-	var history_hours;
 	var billsGrid;
 	var foodStatus;
 	var historyExtraBar;
@@ -1748,6 +1748,10 @@
 		dailySettleStatWin.show();
 		dailySettleStatWin.center();
 	};
+	
+	setTimeout(function(){
+		Ext.getCmp('btnSreachForMainOrderGrid').handler();
+	}, 200);
 
 });
 

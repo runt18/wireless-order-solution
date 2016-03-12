@@ -453,12 +453,10 @@ Ext.onReady(function(){
 							thiz.load({
 								url : '../window/history/viewBillDetail.jsp', 
 								scripts : true,
-								params : {
-									orderId : sd.orderId,
-									queryType : 'History'
-								},
 								method : 'post'
 							});
+							thiz.orderId = sd.orderId;
+							thiz.queryType = 'History';
 							thiz.center();	
 						}
 					}
