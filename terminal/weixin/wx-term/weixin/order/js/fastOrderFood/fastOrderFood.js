@@ -67,7 +67,7 @@ function PickFoodComponent(param){
 		_container = $('<div/>');
 		
 		
-		var shoppingCarList = '<div id="shadowForPopup_div_fastOrderFood" style="height:188px;display:none;opacity:0; position: absolute; top:0; left:0; width: 100%;background: #DDD;display: none;" ></div>'
+		var shoppingCarList = '<div id="shadowForPopup_div_fastOrderFood" style="height:188px;display:none;opacity:0; position: absolute; top:0; left:0; width: 100%;background: #DDD;display: none;z-index: 200" ></div>'
 			+'<div id="shoppingCart_div_fastOrderFood" class="box-vertical">'
 		  	+'<div id="shoppingCartFood_div_fastOrderFood"></div>'
 		  	+'<div id="shoppingFoodsum_div_fastOrderFood">'
@@ -803,7 +803,8 @@ function PickFoodComponent(param){
 			//当菜品列表高过屏幕高度时, 固定列表div的高度
 			shoppingCarMainView.height('auto');
 			shoppingCarBox.height(generalHeight + _orderData.length * foodHeight);
-			$('#shadowForPopup_div_fastOrderFood').height($('#shadowForPopup_div_fastOrderFood').height() - shoppingCarBox.height());
+			$('#shadowForPopup_div_fastOrderFood').height($(document.body).height() - shoppingCarBox.height());
+			
 		}else if(c.otype = 'hide'){
 			if(shoppingCarBox.hasClass('left-nav-show')){
 				shoppingCarBox.removeClass('left-nav-show');
