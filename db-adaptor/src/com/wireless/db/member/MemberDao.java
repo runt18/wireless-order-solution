@@ -1205,7 +1205,8 @@ public class MemberDao {
 			  member.getMemberType().getId() + "," + 
 			  "'" + member.getMemberCard() + "'," +
 			  " CRC32('" + member.getMemberCard() + "')," +
-			  (staff.isBranch() ? staff.getGroupId() + "," + staff.getRestaurantId() : staff.getRestaurantId() + "," + " NULL ") + "," +
+			  (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) + "," +
+			  staff.getRestaurantId() + "," +
 			  "'" + member.getName() + "'," + 
 			  member.getSex().getVal() + "," + 
 			  "'" + member.getTele() + "'," + 
