@@ -6,7 +6,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.websocket.Session;
 
-import com.wireless.json.JObject;
+import com.alibaba.fastjson.JSONObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
@@ -62,7 +62,7 @@ public class WxWaiter {
 	
 	public static class Msg4CallPay extends Msg{
 		public Msg4CallPay(String table, String expectPayType) {
-			super(MsgType.CALL_PAY, table + "客人呼叫" + (expectPayType != null ? "使用" + expectPayType : "") + "结账，请留意处理");
+			super(MsgType.CALL_PAY, table + "的客人呼叫" + (expectPayType != null ? "使用" + expectPayType : "") + "结账，请留意处理");
 		}
 		
 	}
@@ -86,9 +86,7 @@ public class WxWaiter {
 	public void send(Msg msg){
 		for(Session session : sessions){
 			try{
-				JObject jObj = new JObject();
-				jObj.setRoot(msg);
-				session.getBasicRemote().sendText(jObj.toString());
+				session.getBasicRemote().sendText(JSONObject.toJSONString(msg.toJsonMap(0)));
 			}catch(IOException e){
 				try {
 					session.close();

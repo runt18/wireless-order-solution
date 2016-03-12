@@ -11,6 +11,7 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -29,8 +30,10 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
+import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -38,13 +41,57 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.WxMember;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.ws.watier.WxWaiter;
+import com.wireless.ws.watier.WxWaiterServerPoint;
 
 public class WxOperateWaiterAction extends DispatchAction{
 
+	/**
+	 * 呼叫结账
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward callPay(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String fromId = request.getParameter("fid");
+		final String oid = request.getParameter("oid");
+		final String orderId = request.getParameter("orderId");
+		final String payType = request.getParameter("payType");
+		final String sessionId = request.getParameter("sessionId");
+		final JObject jObject= new JObject();
+		try{
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			
+			final WxMember wxMember = WxMemberDao.getBySerial(staff, oid);
+			final Member member = MemberDao.getById(staff, wxMember.getMemberId());
+			final Order order = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY);
+			
+			//websocket通知Touch呼叫结账
+	        WxWaiter waiter = WxWaiterServerPoint.getWxWaiter(staff.getRestaurantId());
+	        if(waiter != null){
+	        	waiter.send(new WxWaiter.Msg4CallPay(order.getDestTbl().getName(), payType));
+	        }
+	        
+		}catch(BusinessException | SQLException e){
+			jObject.initTip(e);
+			e.printStackTrace();
+			
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
 	/**
 	 * 获取账单信息
 	 * @param mapping
