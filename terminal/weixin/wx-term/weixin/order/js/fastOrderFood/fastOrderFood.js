@@ -41,7 +41,7 @@ function PickFoodComponent(param){
 			_container[0].remove();
 			_container = null;
 		}
-	if(afterClose && typeof afterClose == 'function'){
+		if(afterClose && typeof afterClose == 'function'){
 			if(timeout){
 				setTimeout(afterClose, timeout)
 			}else{
