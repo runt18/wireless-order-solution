@@ -1,20 +1,20 @@
 $(function(){
 	initWaiterOrder();
 	
-				
+	var fastFoodWaiterData = {};		
 	function initWaiterOrder(orderId){
 		$.ajax({
 			url : '../../WxOperateWaiter.do',
 			data : {
 				dataSource : 'getOrder',
 				fid : Util.mp.fid,
-				orderId : '6534897'
+				orderId : '7086709'
 			},
 			type : 'post',
 			dataType : 'json',
 			success : function(data, status, xhr){
-				console.log(data);
 				
+				fastFoodWaiterData.tableAlias = data.root[0].table.Alias;
 				//赋值账单号
 				$('#orderId_font_waiter').text(data.root[0].id);
 				
@@ -110,7 +110,8 @@ $(function(){
 						fid : Util.mp.fid,
 						foods : foods,
 						comment : _commentData ? _commentData : '',
-						branchId : ''
+						branchId : '',
+						tableAlias : fastFoodWaiterData.tableAlias
 					},
 					success : function(response, status, xhr){
 						if(response.success){
@@ -123,11 +124,7 @@ $(function(){
 									//确认后回调
 									finishOrderDialog.close(function(){
 										orderFoodPopup.closeShopping();
-										orderFoodPopup.close(function(_orderData){
-											$('#bigbox').show();
-											$('#waiterBottom_div_waiter').show();
-											$('#fastFoodBottom_div_waiter').hide();
-										});
+										$('#closeFastFood_a_waiter').click();
 									});
 								}
 							});
@@ -154,8 +151,8 @@ $(function(){
 		
 		//弹出所建立的popup
 		orderFoodPopup.open(function(){
-			$('#bigbox').hide();
-			$('#waiterBottom_div_waiter').hide();
+			$('#weixinWaiter_div_waiter').hide();
+			$('#bottom_div_waiter').hide();
 			$('#fastFoodBottom_div_waiter').show();
 		});
 	});
@@ -164,9 +161,10 @@ $(function(){
 	//返回按钮
 	$('#closeFastFood_a_waiter').click(function(){
 		orderFoodPopup.close(function(){
-			$('#bigbox').show();
-			$('#waiterBottom_div_waiter').show();
+			$('#weixinWaiter_div_waiter').show();
+			$('#bottom_div_waiter').show();
 			$('#fastFoodBottom_div_waiter').hide();
+			$('#shoppingCart_i_waiter').html('');
 		});
 	});
 	
