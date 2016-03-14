@@ -19,21 +19,7 @@ var	ts = {
 			'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
 			'<div class="bookTableStatus">{bookTableStatus}</div>'+
 		'</div>'+
-	'</a>',
-	
-	//会员消费明细
-	memberConsumeTrTemplet = '<tr>'
-			+ '<td>{dataIndex}</td>'
-			+ '<td>{orderId}</td>'
-			+ '<td>{operateDateFormat}</td>'
-			+ '<td>{memberName}</td>'
-			+ '<td>{memberType}</td>'
-			+ '<td>{otype}</td>'
-			+ '<td class="text_right">{money}</td>'
-			+ '<td class="text_right">{deltaPoint}</td>'
-			+ '<td>{staffName}</td>'
-			+ '<td>{comment}</td>'
-			+ '</tr>';
+	'</a>';
 
 
 
@@ -107,6 +93,21 @@ $(function(){
 	
 	//进入餐台选择界面
 	$('#tableSelectMgr').on('pageshow', function(){
+
+		$.ajax({
+			url : '../OperateRestaurant.do',
+			data : {
+				dataSource : 'getByCond',
+				byId : true
+			},
+			type : 'post',
+			dataType : 'json',
+			success : function(data){
+				console.log(data);
+			}
+		});
+		
+		
 		//清除快捷键
 		$(document).off('keydown');
 		//设置快捷键
