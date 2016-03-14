@@ -87,11 +87,11 @@ public class EntryAction extends Action{
 	 * @throws IOException 
 	 */
 	private void reply(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		InputStream is = request.getInputStream();
-		OutputStream os = response.getOutputStream();
-		WxSession session = WxSession.newInstance();
+		final InputStream is = request.getInputStream();
+		final OutputStream os = response.getOutputStream();
+		final WxSession session = WxSession.newInstance();
 		try{
-			session.addOnHandleMessageListener(new WxHandleMessage(session, "http://" + request.getLocalAddr() + "/wx-term"));
+			session.addOnHandleMessageListener(new WxHandleMessage(request, session, "http://" + request.getLocalAddr() + "/wx-term"));
 			session.process(is, os);
 		}finally{
 			session.close();
