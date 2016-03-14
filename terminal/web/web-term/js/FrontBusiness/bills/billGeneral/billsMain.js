@@ -183,6 +183,7 @@ function showBillDetailWin(){
 				});
 				thiz.orderId = sd.id;
 				thiz.foodStatus = foodStatus;
+				thiz.queryType = 'Today';
 				thiz.center();	
 			}
 		}
