@@ -36,7 +36,9 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.WxRestaurantError;
 import com.wireless.json.JObject;
+import com.wireless.listener.SessionListener;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPrintContent;
@@ -62,25 +64,34 @@ public class WxOperateWaiterAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward callPay(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		final String fromId = request.getParameter("fid");
-		final String oid = request.getParameter("oid");
 		final String orderId = request.getParameter("orderId");
 		final String payType = request.getParameter("payType");
 		final String sessionId = request.getParameter("sessionId");
+
 		final JObject jObject= new JObject();
 		try{
-			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
-			final Staff staff = StaffDao.getAdminByRestaurant(rid);
-			
-			final WxMember wxMember = WxMemberDao.getBySerial(staff, oid);
-			final Member member = MemberDao.getById(staff, wxMember.getMemberId());
-			final Order order = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY);
-			
-			//websocket通知Touch呼叫结账
-	        WxWaiter waiter = WxWaiterServerPoint.getWxWaiter(staff.getRestaurantId());
-	        if(waiter != null){
-	        	waiter.send(new WxWaiter.Msg4CallPay(order.getDestTbl().getName(), payType));
-	        }
+			final HttpSession session = SessionListener.sessions.get(sessionId);
+			if(session != null){
+				final String fromId = (String)session.getAttribute("fid");
+				final String oid = (String)session.getAttribute("oid");
+				final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
+				final Staff staff = StaffDao.getAdminByRestaurant(rid);
+				
+				final WxMember wxMember = WxMemberDao.getBySerial(staff, oid);
+				final Member member = MemberDao.getById(staff, wxMember.getMemberId());
+				final Order order = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY);
+				
+				//web socket通知Touch呼叫结账
+		        WxWaiter waiter = WxWaiterServerPoint.getWxWaiter(staff.getRestaurantId());
+		        if(waiter != null){
+		        	waiter.send(new WxWaiter.Msg4CallPay(order.getDestTbl().getName(), payType));
+		        }
+				
+		        //TODO 打印账单
+		       
+			}else{
+				throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+			}
 	        
 		}catch(BusinessException | SQLException e){
 			jObject.initTip(e);
@@ -102,19 +113,31 @@ public class WxOperateWaiterAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward getOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		final String fromId = request.getParameter("fid");
-		//final String oid = request.getParameter("oid");
 		final String orderId = request.getParameter("orderId");
+		final String sessionId = request.getParameter("sessionId");
+
 		final JObject jObject= new JObject();
 		try{
-			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
-			final Staff staff = StaffDao.getAdminByRestaurant(rid);
-			jObject.setRoot(OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY));
+			final HttpSession session = SessionListener.sessions.get(sessionId);
+			if(session != null){
+				final String fromId = (String)session.getAttribute("fid");
+				final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
+				final Staff staff = StaffDao.getAdminByRestaurant(rid);
+				jObject.setRoot(OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY));
+				
+			}else{
+				throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+			}
+			
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
 		}finally{
 			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
+	
 	/**
 	 * 打印微信小二
 	 * @param mapping

@@ -24,7 +24,7 @@ public class WxRecEventAction extends Action {
 		WxAuthSession session = new WxAuthSession(timestamp, nonce, msgSignature, AuthParam.TOKEN, AuthParam.ENCRYPT_AES_KEY, AuthParam.APP_ID);
 		try{
 			session.addOnHandleMessageListener(new WxAccessHandleMessage(session));
-			session.addOnHandleMessageListener(new WxHandleMessage(session, "http://" + request.getLocalAddr() + "/wx-term"));
+			session.addOnHandleMessageListener(new WxHandleMessage(request, session, "http://" + request.getLocalAddr() + "/wx-term"));
 			session.process(request.getInputStream(), response.getOutputStream());
 		}finally{
 			session.close();
