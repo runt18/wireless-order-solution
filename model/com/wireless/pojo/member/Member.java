@@ -904,6 +904,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		JsonMap jm = new JsonMap();
 		jm.putInt("id", this.id);
 		jm.putInt("rid", this.restaurantId);
+		jm.putInt("branchId", this.branchId);
 		jm.putFloat("totalCharge", this.totalCharge);
 		jm.putInt("totalPoint", this.totalPoint);
 		jm.putFloat("totalConsumption", this.totalConsumption);
