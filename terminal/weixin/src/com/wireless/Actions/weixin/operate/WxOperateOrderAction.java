@@ -146,7 +146,6 @@ public class WxOperateOrderAction extends DispatchAction {
 		final String sessionId = request.getParameter("sessionId");
 		final JObject jObject = new JObject();
 		try{
-
 			
 			if(sessionId != null && !sessionId.isEmpty()){
 				HttpSession session = SessionListener.sessions.get(sessionId);
