@@ -1,5 +1,6 @@
 package com.wireless.Actions.weixin.operate;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -264,6 +265,7 @@ public class WxOperateOrderAction extends DispatchAction {
 		final String oid = request.getParameter("oid");
 		final String fid = request.getParameter("fid");
 		final String orderType = request.getParameter("type");
+		final String id = request.getParameter("id");
 		
 		final JObject jObject = new JObject();
 		
@@ -272,22 +274,27 @@ public class WxOperateOrderAction extends DispatchAction {
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
-			final WxOrder.Type ordersType;
+			final WxOrderDao.ExtraCond extraCond = new WxOrderDao.ExtraCond().setWeixin(oid);
+			
 			if(orderType != null && !orderType.isEmpty()){
-				ordersType = WxOrder.Type.valueOf(Integer.parseInt(orderType));
+				extraCond.setType(WxOrder.Type.valueOf(Integer.parseInt(orderType)));
 			}else{
-				ordersType = WxOrder.Type.INSIDE;
+				extraCond.setType(WxOrder.Type.INSIDE);
 			}
 
+			if(id != null && !id.isEmpty()){
+				extraCond.setId(Integer.parseInt(id));
+			}
+			
 			final List<WxOrder> result = new ArrayList<WxOrder>();
 			//集团下需要显示所有门店的订单
 			if(staff.isGroup()){
 				for(Restaurant branches : RestaurantDao.getById(staff.getRestaurantId()).getBranches()){
-					result.addAll(WxOrderDao.getByCond(StaffDao.getAdminByRestaurant(branches.getId()), new WxOrderDao.ExtraCond().setWeixin(oid).setType(ordersType), null));
+					result.addAll(WxOrderDao.getByCond(StaffDao.getAdminByRestaurant(branches.getId()), extraCond, null));
 				}
 			}
 			
-			result.addAll(WxOrderDao.getByCond(staff, new WxOrderDao.ExtraCond().setWeixin(oid).setType(ordersType), null));
+			result.addAll(WxOrderDao.getByCond(staff, extraCond, null));
 			
 			//按下单日期降序显示
 			Collections.sort(result, new Comparator<WxOrder>(){
@@ -307,13 +314,13 @@ public class WxOperateOrderAction extends DispatchAction {
 				if(wxOrder.getStatus() == WxOrder.Status.COMMITTED || wxOrder.getStatus() == WxOrder.Status.ORDER_ATTACHED){
 					wxOrder.addFoods(WxOrderDao.getById(StaffDao.getAdminByRestaurant(wxOrder.getRestaurantId()), wxOrder.getId()).getFoods());
 				}
-				if(ordersType == WxOrder.Type.TAKE_OUT){
+				if(WxOrder.Type.valueOf(Integer.parseInt(orderType)) == WxOrder.Type.TAKE_OUT){
 					wxOrder.setTakoutAddress(TakeoutAddressDao.getById(StaffDao.getAdminByRestaurant(wxOrder.getRestaurantId()), wxOrder.getTakeoutAddress().getId()));
 				}
 			}
 			
 			jObject.setRoot(result);
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
