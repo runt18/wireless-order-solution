@@ -37,7 +37,7 @@ $(function(){
 					$('#orderId_font_waiter').text(data.root[0].id);
 					
 					//赋值给餐台号
-					$('#tableNum_font_waiter').text(data.root[0].tableAlias);
+					$('#tableNum_font_waiter').text(data.root[0].table.name);
 					
 					//赋值给开台时间
 					$('#openTableTime_font_waiter').text(data.root[0].birthDate);
