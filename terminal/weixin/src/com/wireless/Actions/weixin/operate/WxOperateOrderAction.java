@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -25,7 +26,9 @@ import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.TableError;
+import com.wireless.exception.WxRestaurantError;
 import com.wireless.json.JObject;
+import com.wireless.listener.SessionListener;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPrintContent;
@@ -36,6 +39,8 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.ws.watier.WxWaiter;
+import com.wireless.ws.watier.WxWaiterServerPoint;
 
 public class WxOperateOrderAction extends DispatchAction {
 	
@@ -51,14 +56,14 @@ public class WxOperateOrderAction extends DispatchAction {
 	public ActionForward self(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
+		//final String oid = request.getParameter("oid");
+		final String fid = request.getParameter("fid");
+		final String wxOrderId = request.getParameter("wid");
+		final String tableAlias = request.getParameter("tableAlias");
+		final String branchId = request.getParameter("branchId");
+		final String qrCode = request.getParameter("qrCode");		
 		final JObject jObject = new JObject();
 		try{
-			//final String oid = request.getParameter("oid");
-			final String fid = request.getParameter("fid");
-			final String wxOrderId = request.getParameter("wid");
-			final String tableAlias = request.getParameter("tableAlias");
-			final String branchId = request.getParameter("branchId");
-			final String qrCode = request.getParameter("qrCode");
 			final int rid;
 			if(branchId != null && !branchId.isEmpty()){
 				rid = Integer.parseInt(branchId);
@@ -101,7 +106,13 @@ public class WxOperateOrderAction extends DispatchAction {
 				jObject.initTip(true, "自助扫码下单成功");
 			}
 			
-		}catch(BusinessException e){
+			//web socket通知Touch微信下单
+	        WxWaiter waiter = WxWaiterServerPoint.getWxWaiter(staff.getRestaurantId());
+	        if(waiter != null){
+	        	waiter.send(new WxWaiter.Msg4WxOrder(WxOrderDao.getById(staff, Integer.parseInt(wxOrderId))));
+	        }
+	        
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
@@ -125,15 +136,27 @@ public class WxOperateOrderAction extends DispatchAction {
 	public ActionForward insertOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
+		String oid = request.getParameter("oid");
+		String fid = request.getParameter("fid");
+		final String branchId = request.getParameter("branchId");
+		final String foods = request.getParameter("foods");
+		final String tableAlias = request.getParameter("tableAlias");
+		final String comment = request.getParameter("comment");
+		final String qrCode = request.getParameter("qrCode");
+		final String sessionId = request.getParameter("sessionId");
 		final JObject jObject = new JObject();
 		try{
-			final String oid = request.getParameter("oid");
-			final String fid = request.getParameter("fid");
-			final String branchId = request.getParameter("branchId");
-			final String foods = request.getParameter("foods");
-			final String tableAlias = request.getParameter("tableAlias");
-			final String comment = request.getParameter("comment");
-			final String qrCode = request.getParameter("qrCode");
+
+			
+			if(sessionId != null && !sessionId.isEmpty()){
+				HttpSession session = SessionListener.sessions.get(sessionId);
+				if(session != null){
+					oid = (String)session.getAttribute("oid");
+					fid = (String)session.getAttribute("fid");
+				}else{
+					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+				}
+			}
 			
 			final int rid;
 			if(branchId != null && !branchId.isEmpty()){
@@ -262,14 +285,24 @@ public class WxOperateOrderAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		final String oid = request.getParameter("oid");
-		final String fid = request.getParameter("fid");
+		String oid = request.getParameter("oid");
+		String fid = request.getParameter("fid");
 		final String orderType = request.getParameter("type");
 		final String id = request.getParameter("id");
-		
+		final String status = request.getParameter("status");
+		final String sessionId = request.getParameter("sessionId");
 		final JObject jObject = new JObject();
 		
 		try {
+			if(sessionId != null && !sessionId.isEmpty()){
+				HttpSession session = SessionListener.sessions.get(sessionId);
+				if(session != null){
+					oid = (String)session.getAttribute("oid");
+					fid = (String)session.getAttribute("fid");
+				}else{
+					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+				}
+			}
 			
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
@@ -282,6 +315,10 @@ public class WxOperateOrderAction extends DispatchAction {
 				extraCond.setType(WxOrder.Type.INSIDE);
 			}
 
+			if(status != null && !status.isEmpty()){
+				extraCond.addStatus(WxOrder.Status.valueOf(Integer.parseInt(status)));
+			}
+			
 			if(id != null && !id.isEmpty()){
 				extraCond.setId(Integer.parseInt(id));
 			}
