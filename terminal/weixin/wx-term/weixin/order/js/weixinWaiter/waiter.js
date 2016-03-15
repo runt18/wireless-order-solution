@@ -1,6 +1,26 @@
 $(function(){
+	var fastFoodWaiterData = {};
 	initWaiterOrder();
-	function initWaiterOrder(orderId){
+	function initWaiterOrder(){
+		$.ajax({
+			url : '../../WxOperateOrder.do',
+			type : 'post',
+			datatype : 'json',
+			data : {
+				dataSource : 'getByCond',
+				sessionId : Util.mp.params.sessionId, 
+				status : '2'
+			},
+			success : function(data, status, xhr){
+				//FIXME
+				console.log(data);
+				if(data.success){
+					initFoodList(data.root[0], true);
+				}else{
+//					location.href = 'linkTimeout.html';
+				}
+			}
+		});
 		$.ajax({
 			url : '../../WxOperateWaiter.do',
 			data : {
@@ -12,7 +32,7 @@ $(function(){
 			dataType : 'json',
 			success : function(data, status, xhr){
 				if(data.success){
-					fastFoodWaiterData.tableAlias = data.root[0].table.Alias;
+					fastFoodWaiterData.tableAlias = data.root[0].tableAlias;
 					///赋值账单号
 					$('#orderId_font_waiter').text(data.root[0].id);
 					
@@ -26,26 +46,26 @@ $(function(){
 					$('#openTablePeople_font_waiter').text(data.root[0].waiter);
 					
 					//加载菜品数据
-					initFoodList(data.root[0]);
+					initFoodList(data.root[0], false);
 				}else{
 					//TODO 显示连接超时的界面
-					location.href = 'linkTimeout.html';
+//					location.href = 'linkTimeout.html';
 				}
 			}
-		});		
+		});	
 	}
 	
 	
 			
 			
-	function initFoodList(data){
+	function initFoodList(data, isWxOrder){
 		
 		var orderListTemplete = '<div class="main-box" style="background-color: cornsilk;">'+
 									'<ul class="m-b-list">'+
 										'<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>'+
 										'<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">'+
-											'<div style="width:90%;">{index}、{foodName}</div>'+
-											'<div style="width:10%;"><font style="font-weight:bold;color:green">{foodPrice}元</font></div>'+
+											'<div style="width:85%;"><span data-type="foodIndex">{index}</span>、{foodName}</div>'+
+											'<div style="width:15%;"><font style="font-weight:bold;color:green">{foodPrice}元</font></div>'+
 										'</li>'+
 										'<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>'+	
 											'<div class="box-horizontal" style="line-height:15px;border-bottom:0px;">'+
@@ -55,19 +75,33 @@ $(function(){
 									'</ul>'+
 								'</div>';
 		
-		var html = [];
+		if(!isWxOrder){
+			var html = [];
+			data.orderFoods.forEach(function(temp, i){
+				html.push(orderListTemplete.format({
+					index : i+1,
+					foodName : temp.name,
+					foodPrice : temp.totalPrice,
+					foodUnit : temp.tasteGroup.tastePref
+				}));
+			});
+			$('#orderList_div_waiter').append(html.join(''));
+		}else{
+			var html = [];
+			data.foods.forEach(function(temp, i){
+				html.push(orderListTemplete.format({
+					index : i+1,
+					foodName : temp.foodName,
+					foodPrice : temp.totalPrice,
+					foodUnit : temp.tasteGroup.tastePref + '<span style="color:red;float:right;">&nbsp;&nbsp;<strong>(待确认)</strong></span>'
+				}));
+			});
+			$('#orderList_div_waiter').prepend(html.join(''));
+		}
 		
-		data.orderFoods.forEach(function(temp, i){
-			html.push(orderListTemplete.format({
-				index : i+1,
-				foodName : temp.foodName,
-				foodPrice : temp.totalPrice,
-				foodUnit : temp.tasteGroup.tastePref
-			}));
-		});
-		
-		
-		$('#orderList_div_waiter').html(html.join(''));
+		$('#orderList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
+			element.innerHTML = index + 1;
+		});;
 	}
 	
 	
@@ -107,14 +141,16 @@ $(function(){
 						
 					foods += element.id + ',' + element.count + ',' + unitId;
 				});
+				
 				$.ajax({
 					url : '../../WxOperateOrder.do',
 					type : 'post',
 					dataType : 'json',
 					data : {
 						dataSource : 'insertOrder',
-						oid : Util.mp.oid,
-						fid : Util.mp.fid,
+//						oid : Util.mp.oid,
+//						fid : Util.mp.fid,
+						sessionId : Util.mp.params.sessionId,
 						foods : foods,
 						comment : _commentData ? _commentData : '',
 						branchId : '',
@@ -132,14 +168,19 @@ $(function(){
 									finishOrderDialog.close(function(){
 										orderFoodPopup.closeShopping();
 										$('#closeFastFood_a_waiter').click();
+										$('#orderList_div_waiter').html('');
+										initWaiterOrder();
 									});
 								}
 							});
+							
 							finishOrderDialog.open();
+							
 						}else{
 							Util.dialog.show({msg : response.msg});
 						}
 					},
+					
 					error : function(xhr, status, err){
 						Util.dialog.show({msg : err.msg});
 					}
@@ -149,6 +190,7 @@ $(function(){
 				var foodTypeCount = _orderData.length;
 				if(foodTypeCount > 0){
 					$('#shoppingCart_i_waiter').html('<span style="color:red;font-weight:bold;">' + foodTypeCount +'</span>');
+			
 				}else{
 					$('#shoppingCart_i_waiter').html('');
 				}

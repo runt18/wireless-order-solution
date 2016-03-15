@@ -367,9 +367,9 @@ public class WxOperateOrderAction extends DispatchAction {
 				if(wxOrder.getStatus() == WxOrder.Status.COMMITTED || wxOrder.getStatus() == WxOrder.Status.ORDER_ATTACHED){
 					wxOrder.addFoods(WxOrderDao.getById(StaffDao.getAdminByRestaurant(wxOrder.getRestaurantId()), wxOrder.getId()).getFoods());
 				}
-				if(WxOrder.Type.valueOf(Integer.parseInt(orderType)) == WxOrder.Type.TAKE_OUT){
-					wxOrder.setTakoutAddress(TakeoutAddressDao.getById(StaffDao.getAdminByRestaurant(wxOrder.getRestaurantId()), wxOrder.getTakeoutAddress().getId()));
-				}
+//				if(WxOrder.Type.valueOf(Integer.parseInt(orderType)) == WxOrder.Type.TAKE_OUT){
+//					wxOrder.setTakoutAddress(TakeoutAddressDao.getById(StaffDao.getAdminByRestaurant(wxOrder.getRestaurantId()), wxOrder.getTakeoutAddress().getId()));
+//				}
 			}
 			
 			jObject.setRoot(result);

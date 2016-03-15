@@ -116,6 +116,15 @@
 <script type="text/javascript" src="./js/popup/diagPrinter/diagPrinter.js?v=<%= v %>"></script>
 <!-- 消费明细 -->
 <script type="text/javascript" src="./js/popup/consumeDetail/consumeDetail.js?v=<%= v %>"></script>
+<!-- 跑马灯 -->
+<script type="text/javascript" src="./js/runHorse/runHorse.js"></script>
+<!-- 重连socket -->
+<script type="text/javascript" src="./js/socket/reconnecting-websocket.js"></script>
+<!-- 语音播报 -->
+<script src="http://blog.faultylabs.com/files/md5.js"></script>	
+<script src="http://webapi.openspeech.cn/socket.io/socket.io.js"></script>
+<script src='http://webapi.openspeech.cn/fingerprint.js'></script>
+<script src="http://webapi.openspeech.cn/tts.min.js"></script>
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
