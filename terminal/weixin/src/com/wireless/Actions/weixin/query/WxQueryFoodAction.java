@@ -1,9 +1,11 @@
 package com.wireless.Actions.weixin.query;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -16,7 +18,9 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.WxRestaurantError;
 import com.wireless.json.JObject;
+import com.wireless.listener.SessionListener;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
@@ -33,12 +37,22 @@ public class WxQueryFoodAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward star(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String branchId = request.getParameter("branchId");
+		String fid = request.getParameter("fid");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String sessionId = request.getParameter("sessionId");
 		final JObject jObject = new JObject();
 		try{
-			final String branchId = request.getParameter("branchId");
-			final String fid = request.getParameter("fid");
-			final String start = request.getParameter("start");
-			final String limit = request.getParameter("limit");
+
+			if(sessionId != null && !sessionId.isEmpty()){
+				HttpSession session = SessionListener.sessions.get(sessionId);
+				if(session != null){
+					fid = (String)session.getAttribute("rid");
+				}else{
+					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+				}
+			}
 			final int rid;
 			if(branchId != null && !branchId.isEmpty()){
 				rid = Integer.parseInt(branchId);
@@ -53,7 +67,7 @@ public class WxQueryFoodAction extends DispatchAction{
 			}
 			jObject.setTotalProperty(result.size());
 			jObject.setRoot(result);
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
@@ -75,13 +89,25 @@ public class WxQueryFoodAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward favor(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String branchId = request.getParameter("branchId");
+		String fid = request.getParameter("fid");
+		String oid = request.getParameter("oid");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String sessionId = request.getParameter("sessionId");
 		final JObject jObject = new JObject();
 		try{
-			final String branchId = request.getParameter("branchId");
-			final String fid = request.getParameter("fid");
-			final String oid = request.getParameter("oid");
-			final String start = request.getParameter("start");
-			final String limit = request.getParameter("limit");
+
+			if(sessionId != null && !sessionId.isEmpty()){
+				HttpSession session = SessionListener.sessions.get(sessionId);
+				if(session != null){
+					fid = (String)session.getAttribute("rid");
+					oid = (String)session.getAttribute("oid");
+				}else{
+					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+				}
+			}
+			
 			final int rid;
 			if(branchId != null && !branchId.isEmpty()){
 				rid = Integer.parseInt(branchId);
@@ -102,7 +128,7 @@ public class WxQueryFoodAction extends DispatchAction{
 			jObject.setTotalProperty(result.size());
 			jObject.setRoot(result);
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
@@ -124,13 +150,24 @@ public class WxQueryFoodAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward recommend(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String branchId = request.getParameter("branchId");
+		String fid = request.getParameter("fid");
+		String oid = request.getParameter("oid");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String sessionId = request.getParameter("sessionId");
 		final JObject jObject = new JObject();
 		try{
-			final String branchId = request.getParameter("branchId");
-			final String fid = request.getParameter("fid");
-			final String oid = request.getParameter("oid");
-			final String start = request.getParameter("start");
-			final String limit = request.getParameter("limit");
+			
+			if(sessionId != null && !sessionId.isEmpty()){
+				HttpSession session = SessionListener.sessions.get(sessionId);
+				if(session != null){
+					fid = (String)session.getAttribute("rid");
+					oid = (String)session.getAttribute("oid");
+				}else{
+					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+				}
+			}
 			final int rid;
 			if(branchId != null && !branchId.isEmpty()){
 				rid = Integer.parseInt(branchId);
@@ -152,7 +189,7 @@ public class WxQueryFoodAction extends DispatchAction{
 			jObject.setTotalProperty(result.size());
 			jObject.setRoot(result);
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
@@ -174,17 +211,25 @@ public class WxQueryFoodAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward normal(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		final JObject jObject = new JObject();
-		List<Food> root = null;
 		
 		final String isPaging = request.getParameter("isPaging");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
 		final String branchId = request.getParameter("branchId");
-		final String fid = request.getParameter("fid");
+		String fid = request.getParameter("fid");
 		final String kitchenId = request.getParameter("kitchenId");
-		
+		final String sessionId = request.getParameter("sessionId");
+		final JObject jObject = new JObject();
 		try{
+			
+			if(sessionId != null && !sessionId.isEmpty()){
+				HttpSession session = SessionListener.sessions.get(sessionId);
+				if(session != null){
+					fid = (String)session.getAttribute("rid");
+				}else{
+					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+				}
+			}
 			
 			final int rid;
 			if(branchId != null && !branchId.isEmpty()){
@@ -192,22 +237,24 @@ public class WxQueryFoodAction extends DispatchAction{
 			}else{
 				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			}			
-			root = FoodDao.getByCond(StaffDao.getAdminByRestaurant(rid),
+			
+			List<Food> root = FoodDao.getByCond(StaffDao.getAdminByRestaurant(rid),
 										new FoodDao.ExtraCond().setSellout(false).setContainsImage(true).setKitchen(Integer.parseInt(kitchenId)), 
 										" ORDER BY FOOD.food_alias ");
 			
-		}catch(BusinessException e){
+			if(root != null && !root.isEmpty()){
+				jObject.setTotalProperty(root.size());
+				root = DataPaging.getPagingData(root, isPaging, start, limit);
+			}
+			jObject.setRoot(root);			
+			
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
 			jObject.initTip4Exception(e);
 		}finally{
-			if(root != null && !root.isEmpty()){
-				jObject.setTotalProperty(root.size());
-				root = DataPaging.getPagingData(root, isPaging, start, limit);
-			}
-			jObject.setRoot(root);
 			response.getWriter().print(jObject.toString());
 		}
 		

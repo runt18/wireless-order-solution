@@ -87,8 +87,13 @@ public class WxOperateWaiterAction extends DispatchAction{
 		        	waiter.send(new WxWaiter.Msg4CallPay(order.getDestTbl().getName(), payType));
 		        }
 				
-		        //TODO 打印账单
-		       
+		        //打印呼叫结账单
+		        try{
+		        	ServerConnector.instance().ask(ReqPrintContent.buildWxCallPay(staff, order.getId(), member.getId(), payType).build());
+		        }catch(IOException ignored){
+		        	ignored.printStackTrace();
+		        }
+		        
 			}else{
 				throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
 			}
@@ -150,18 +155,18 @@ public class WxOperateWaiterAction extends DispatchAction{
 	public ActionForward print(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		final String callback = request.getParameter("callback");
 		final String restaurantId = request.getParameter("restaurantId");
-		final String tableId = request.getParameter("tableId");
+		final String orderId = request.getParameter("orderId");
 		final JObject jObject= new JObject();
 		try{
 			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(restaurantId));
-			Order order = OrderDao.getByTableId(staff, Integer.parseInt(tableId));
+			Order order = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY);
 			WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
 			
 			//生成带账单ID的微信二维码
 			final String qrCodeUrl = new QRCode().setSceneId(order.getId())
-												 .setExpired(14400)
+												 .setExpired(14400)	//4 hour
 												 .createUrl(Token.newInstance(AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken())));
-			
+												 //.createUrl(Token.newInstance(FinanceWeixinAction.APP_ID, FinanceWeixinAction.APP_SECRET));
 			//获取此二维码的内容
             LuminanceSource source = new BufferedImageLuminanceSource(toBufferedImage(ImageIO.read(new URL(qrCodeUrl)).getScaledInstance(400, 400, Image.SCALE_SMOOTH)));  
             BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));  

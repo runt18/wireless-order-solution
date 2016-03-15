@@ -1,5 +1,6 @@
 package com.wireless.Actions.weixin.query;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -21,7 +23,9 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.WxRestaurantError;
 import com.wireless.json.JObject;
+import com.wireless.listener.SessionListener;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -114,12 +118,25 @@ public class WxQueryDeptAction extends DispatchAction{
 	}
 	
 	public ActionForward kitchen(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		final String branchId = request.getParameter("branchId");
+		String fid = request.getParameter("fid");
+		String oid = request.getParameter("oid");
+		final String sessionId = request.getParameter("sessionId");
 		final JObject jobject = new JObject();
 		
 		try{
-			final String branchId = request.getParameter("branchId");
-			final String fid = request.getParameter("fid");
-			final String oid = request.getParameter("oid");
+
+			if(sessionId != null && !sessionId.isEmpty()){
+				HttpSession session = SessionListener.sessions.get(sessionId);
+				if(session != null){
+					fid = (String)session.getAttribute("rid");
+					oid = (String)session.getAttribute("oid");
+				}else{
+					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+				}
+			}
+			
 			final int rid;
 			if(branchId != null && !branchId.isEmpty()){
 				rid = Integer.parseInt(branchId);
@@ -153,7 +170,7 @@ public class WxQueryDeptAction extends DispatchAction{
 			
 			jobject.setRoot(list);
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch(Exception e){
