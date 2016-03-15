@@ -130,7 +130,7 @@ public class WxQueryDeptAction extends DispatchAction{
 			if(sessionId != null && !sessionId.isEmpty()){
 				HttpSession session = SessionListener.sessions.get(sessionId);
 				if(session != null){
-					fid = (String)session.getAttribute("rid");
+					fid = (String)session.getAttribute("fid");
 					oid = (String)session.getAttribute("oid");
 				}else{
 					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);

@@ -57,13 +57,24 @@ public class WxOperateOrderAction extends DispatchAction {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		//final String oid = request.getParameter("oid");
-		final String fid = request.getParameter("fid");
+		String fid = request.getParameter("fid");
 		final String wxOrderId = request.getParameter("wid");
 		final String tableAlias = request.getParameter("tableAlias");
 		final String branchId = request.getParameter("branchId");
 		final String qrCode = request.getParameter("qrCode");		
+		final String sessionId = request.getParameter("sessionId");
 		final JObject jObject = new JObject();
 		try{
+			
+			if(sessionId != null && !sessionId.isEmpty()){
+				HttpSession session = SessionListener.sessions.get(sessionId);
+				if(session != null){
+					fid = (String)session.getAttribute("fid");
+				}else{
+					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+				}
+			}
+			
 			final int rid;
 			if(branchId != null && !branchId.isEmpty()){
 				rid = Integer.parseInt(branchId);
@@ -206,10 +217,16 @@ public class WxOperateOrderAction extends DispatchAction {
 				}
 			}
 			
-			final int wxOrderId = WxOrderDao.insert(staff, builder);
-			jObject.setExtra(WxOrderDao.getById(staff, wxOrderId));
+			final WxOrder wxOrder = WxOrderDao.getById(staff, WxOrderDao.insert(staff, builder));
+			jObject.setExtra(wxOrder);
 			
-		}catch(BusinessException e){
+			//web socket通知Touch微信下单
+	        WxWaiter waiter = WxWaiterServerPoint.getWxWaiter(staff.getRestaurantId());
+	        if(waiter != null){
+	        	waiter.send(new  WxWaiter.Msg4WxOrder(wxOrder));
+	        }
+			
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
