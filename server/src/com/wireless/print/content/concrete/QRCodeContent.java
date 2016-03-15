@@ -30,13 +30,13 @@ public class QRCodeContent extends ConcreteContent{
 	private final CorrectionLevel level;
 	
 	public QRCodeContent(PType printType, PStyle style, String content) {
-		this(printType, style, (char)0x06, CorrectionLevel.Q, content);
+		this(printType, style, 0x06, CorrectionLevel.Q, content);
 	}
 
-	public QRCodeContent(PType printType, PStyle style, char size, CorrectionLevel level, String content) {
+	public QRCodeContent(PType printType, PStyle style, int size, CorrectionLevel level, String content) {
 		super(printType, style);
 		this.level = level;
-		this.size = size;
+		this.size = (char)size;
 		this.content = content.toCharArray();
 	}
 	

@@ -47,6 +47,7 @@ import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPackage;
 import com.wireless.parcel.Parcel;
+import com.wireless.parcel.wrapper.IntParcel;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PrintOption;
@@ -368,7 +369,7 @@ class OrderHandler implements Runnable{
 		if(orderToInsert.getCategory().isJoin()){
 			return new RespPackage(request.header).fillBody(orderToInsert.getDestTbl(), Table.TABLE_PARCELABLE_4_QUERY);
 		}else{
-			return new RespACK(request.header);
+			return new RespACK(request.header).fillBody(new IntParcel(orderToInsert.getId()), 0);
 		}
 	}
 	
@@ -396,7 +397,7 @@ class OrderHandler implements Runnable{
 			if(resp.header.type == Type.NAK){
 				throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 			}else{
-				return new RespACK(request.header);
+				return new RespACK(request.header).fillBody(new IntParcel(oriOrder.getId()), 0);
 			}
 			
 		}else{
@@ -404,7 +405,7 @@ class OrderHandler implements Runnable{
 		}
 	}
 	
-	private RespPackage doUpdateOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+	private ProtocolPackage doUpdateOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
 		//handle update order request
 		final Order.UpdateBuilder builder = new Parcel(request.body).readParcel(Order.UpdateBuilder.CREATOR);
 		
@@ -472,7 +473,7 @@ class OrderHandler implements Runnable{
 			}
 
 		}
-		return new RespACK(request.header);
+		return new RespACK(request.header).fillBody(new IntParcel(diffResult.oriOrder.getId()), 0);
 	}
 	
 	private RespPackage doGiftOrderFood(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
@@ -676,6 +677,13 @@ class OrderHandler implements Runnable{
 			int orderId = parcel.readInt();
 			String qrCodeContent = parcel.readString();
 			new PrintHandler(staff).process(JobContentFactory.instance().createWxWaiterContent(staff, printers, orderId, qrCodeContent));
+			
+		}else if(printType.isWxCallPay()){
+			//Œ¢–≈∫ÙΩ–Ω·’À
+			int orderId = parcel.readInt();
+			int memberId = parcel.readInt();
+			final String payType = parcel.readString();
+			new PrintHandler(staff).process(JobContentFactory.instance().createWxCallPayContent(staff, printers, orderId, memberId, payType));
 		}
 		
 		return new RespACK(request.header);

@@ -50,6 +50,7 @@ import com.wireless.print.content.concrete.ShiftContent;
 import com.wireless.print.content.concrete.SummaryContent;
 import com.wireless.print.content.concrete.TransFoodContent;
 import com.wireless.print.content.concrete.TransTableContent;
+import com.wireless.print.content.concrete.WxCallPayContent;
 import com.wireless.print.content.concrete.WxOrderContent;
 import com.wireless.print.content.concrete.WxWaiterContent;
 
@@ -329,8 +330,42 @@ public class JobContentFactory {
 			for(Printer printer : printers){
 				for(PrintFunc func : printer.getPrintFuncs()){
 					if(func.isTypeMatched(PType.PRINT_WX_WAITER)){
-						Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
-						jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_BOOK, new WxWaiterContent(printer.getStyle(), order, qrCodeContent)));
+						final Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
+						final Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
+						jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_WX_WAITER, new WxWaiterContent(printer.getStyle(), order, restaurant, qrCodeContent)));
+					}
+				}
+			}
+			
+			return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 生成微信呼叫结账单
+	 * @param staff
+	 * @param printers
+	 * @param orderId
+	 * @param memberId
+	 * @param payType
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public Content createWxCallPayContent(Staff staff, List<Printer> printers, int orderId, int memberId, String payType) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			final List<JobContent> jobContents = new ArrayList<JobContent>();
+			
+			for(Printer printer : printers){
+				for(PrintFunc func : printer.getPrintFuncs()){
+					if(func.isTypeMatched(PType.PRINT_WX_CALL_PAY)){
+						final Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
+						final Member member = MemberDao.getById(staff, memberId);
+						jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_WX_CALL_PAY, new WxCallPayContent(printer.getStyle(), order, member, payType)));
 					}
 				}
 			}
