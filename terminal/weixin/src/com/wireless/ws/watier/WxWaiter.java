@@ -74,7 +74,7 @@ public class WxWaiter {
 			super(MsgType.WX_ORDER, "【" + wxOrder.getTable().getName() + "】的会员【" + wxOrder.getMember().getName() + "】有微信下单，请留意处理");
 		}
 	}
-	
+
     private final Set<Session> sessions = new CopyOnWriteArraySet<>();
 	private final int restaurantId;
 	
