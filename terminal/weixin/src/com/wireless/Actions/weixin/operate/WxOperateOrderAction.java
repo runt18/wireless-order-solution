@@ -223,7 +223,7 @@ public class WxOperateOrderAction extends DispatchAction {
 			//web socket通知Touch微信下单
 	        WxWaiter waiter = WxWaiterServerPoint.getWxWaiter(staff.getRestaurantId());
 	        if(waiter != null){
-	        	waiter.send(new WxWaiter.Msg4WxOrder(wxOrder));
+	        	waiter.send(new  WxWaiter.Msg4WxOrder(wxOrder));
 	        }
 			
 		}catch(BusinessException | SQLException e){
