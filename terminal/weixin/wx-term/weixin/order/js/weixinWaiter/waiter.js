@@ -221,4 +221,89 @@ $(function(){
 	$('#shoppingCarControler_a_waiter').click(function(){
 		orderFoodPopup.openShopping();
 	});
+	
+	
+	//呼叫结账按钮
+	$('#callPay_li_waiter').click(function(){
+		var callPayDialog = new DialogPopup({
+			titleText : '呼叫结账',
+			content : '<div>选择付款方式:</div>'+ 
+					'<div style="margin-left:-10px;">' +
+					'<ul class="m-b-list">' +
+					'<li class="box-horizontal" style="line-height: 40px;font-size:18px;">' +
+					'<div data-type="payType" data-value="现金" class="region_css_book selectedRegion_css_book" style="width:31%;" href="#">'+
+					'<ul class="m-b-list">现金</ul>' +
+					'</div>' +
+					'<div data-type="payType" data-value="刷卡" class="region_css_book" style="width:31%;" href="#">' +
+					'<ul class="m-b-list">刷卡</ul>'+
+					'</div>' +
+					'<div data-type="payType" data-value="其他" class="region_css_book" style="width:%;" href>' +
+					'<ul class="m-b-list">其他</ul>' +
+					'</div>' +
+					'</li>' +
+					'</ul>' +
+					'</div>',
+			contentCallback : function(self){
+				self.find('[data-type="payType"]').each(function(index, element){
+					element.onclick = function(){
+						if($(element).hasClass('selectedRegion_css_book')){
+							$(element).addClass('selectedRegion_css_book');
+						}else{
+							self.find('[data-type="payType"]').removeClass('selectedRegion_css_book');
+							$(element).addClass('selectedRegion_css_book');
+						}
+					}
+				});
+			},
+			leftText : '确认',
+			left : function(self){
+				var payType = null;
+				self.find('[data-type="payType"]').each(function(index, element){
+					if($(element).hasClass('selectedRegion_css_book')){
+						payType = $(element).attr('data-value');
+					}
+				});
+				
+				$.ajax({
+					url : '../../WxOperateWaiter.do',
+					data : {
+						dataSource : 'callPay',
+						sessionId : Util.mp.params.sessionId,
+						orderId : Util.mp.params.orderId,
+						payType : payType
+					},
+					type : 'post',
+					dataType : 'json',
+					success : function(data){
+						if(data.success){
+							callPayDialog.close(function(){
+								var callSuccess = new DialogPopup({
+									titleText : '温馨提示',
+									content : '呼叫成功',
+									leftText : '确认',
+									left : function(){
+										callSuccess.close();
+									}
+								});
+								callSuccess.open();
+							}, 200);
+						}else{
+							callPayDialog.close(function(){
+								var callFailure = new DialogPopup({
+									titleText : '温馨提示',
+									content : '呼叫失败',
+									leftText : '确认',
+									left : function(){
+										callFailure.close();
+									}
+								});
+								callFailure.open();
+							}, 200);
+						}
+					}
+				});
+			}
+		});
+		callPayDialog.open();
+	});
 })
