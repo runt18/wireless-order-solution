@@ -24,7 +24,8 @@ public enum PType {
 	PRINT_2ND_DISPLAY(18, "客显"),
 	PRINT_WX_ORDER(19, "微信账单"),
 	PRINT_BOOK(20, "微信预订"),
-	PRINT_WX_WAITER(21, "微信小二"),
+	PRINT_WX_WAITER(21, "微信店小二"),
+	PRINT_WX_CALL_PAY(22, "微信呼叫结账"),
 	PRINT_HISTORY_DAILY_SETTLE_RECEIPT(122, "历史日结"),
 	PRINT_HISTORY_SHIFT_RECEIPT(123, "历史交班"),
 	PRINT_DAILY_SETTLE_RECEIPT(124, "日结表"),
@@ -96,6 +97,10 @@ public enum PType {
 	
 	public boolean isWxWaiter(){
 		return this == PType.PRINT_WX_WAITER;
+	}
+	
+	public boolean isWxCallPay(){
+		return this == PType.PRINT_WX_CALL_PAY;
 	}
 	
 	public boolean isShift(){
