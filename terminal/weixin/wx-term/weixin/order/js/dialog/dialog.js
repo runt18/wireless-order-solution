@@ -9,10 +9,10 @@ function DialogPopup(param){
 		contentCallback : function(){},   //内容的回调
 		leftText : null,      //左边按钮文字
 		leftClass : null,     //左边按钮的样式
-		left : function(){},  //左边按钮的方法
+		left : function(_dialogDiv){},  //左边按钮的方法
 		rightText : null,	  //右边按钮文字
 		rightClass : null,    //右边按钮的样式
-		right : function(){},  //右边按钮的方法
+		right : function(_dialogDiv){},  //右边按钮的方法
 		afterClose : function(){}    //点击阴影和关闭的回调函数
 	}
 	
@@ -96,13 +96,10 @@ function DialogPopup(param){
 		//右边按钮的方法
 		if(param.right && typeof param.right == 'function'){
 			_dialogDiv.find('[data-type="right_button_dialogPopup"]').click(function(){
-				param.right();
+				param.right(_dialogDiv);
 			});
 		}
-		
-		
 	}
-	
 	
 	this.open = function(afterOpen){
 		_init();

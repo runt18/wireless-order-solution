@@ -481,7 +481,6 @@ function init(){
 					xtype : 'label',
 					text : '请选择功能:'
 				},{
-					
 					items : [{
 						xtype : 'radio',
 						name : 'pType',
@@ -618,21 +617,6 @@ function init(){
 					items : [{
 						xtype : 'radio',
 						name : 'pType',
-						inputValue : 19,
-						hideLabel : true,
-						boxLabel : '微信订单',
-						listeners : {
-							check  : function(thiz, checked){
-								if(checked){
-									showPanel(thiz.inputValue);
-								}
-							}
-						}
-					}]
-				},{
-					items : [{
-						xtype : 'radio',
-						name : 'pType',
 						inputValue : 18,
 						hideLabel : true,
 						boxLabel : '客显',
@@ -644,7 +628,21 @@ function init(){
 							}
 						}
 					}]
-				},{
+				}]
+			}, {
+				layout : 'column',
+				frame : true,
+				id : 'weixinPrinterType',
+				defaults : {
+					columnWidth : .25,
+					layout : 'form',
+					labelWidth : 70
+				},
+				items : [{
+					columnWidth : 1,
+					xtype : 'label',
+					text : '请选择微信功能:'
+				}, {
 					items : [{
 						xtype : 'radio',
 						name : 'pType',
@@ -659,8 +657,53 @@ function init(){
 							}
 						}
 					}]
+				}, {
+					items : [{
+						xtype : 'radio',
+						name : 'pType',
+						inputValue : 19,
+						hideLabel : true,
+						boxLabel : '微信订单',
+						listeners : {
+							check  : function(thiz, checked){
+								if(checked){
+									showPanel(thiz.inputValue);
+								}
+							}
+						}
+					}]
+				}, {
+					items : [{
+						xtype : 'radio',
+						name : 'ptype',
+						inputValue : 21,
+						hideLabel : true,
+						boxLabel : '微信店小二',
+						listeners : {
+							check : function(thiz, checked){
+								if(checked){
+									showPanel(thiz.inputValue);
+								}
+							}
+						}
+					}]
+				},{
+					items : [{
+						xtype : 'radio',
+						name : 'ptype',
+						inputValue : 22,
+						hideLabel : true,
+						boxLabel : '呼叫结账',
+						listeners : {
+							check : function(thiz, checked){
+								if(checked){
+									showPanel(thiz.inputValue);
+								}
+							}
+						}
+					}]
 				}]
-			},{
+			}, {
 				layout : 'column',
 				id : 'depts',
 				frame : true,
@@ -780,7 +823,6 @@ function init(){
 								}else{
 									Ext.getCmp('kitchens').enable();
 								}
-								
 							}
 						}
 					}]
@@ -1165,6 +1207,18 @@ function showPanel(v){
 		Ext.getCmp('regions').hide();
 		Ext.getCmp('printCommentPanel').hide();
 		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/2ndDisplay.jpg)';
+	}else if(v == 21){//微信店小二
+		Ext.getCmp('kitchens').hide();
+		Ext.getCmp('kitchensTree').hide();
+		Ext.getCmp('depts').hide();
+		Ext.getCmp('regions').hide();
+		Ext.getCmp('printCommentPanel').hide();
+	}else if(v == 22){//呼叫结账
+		Ext.getCmp('kitchens').hide();
+		Ext.getCmp('kitchensTree').hide();
+		Ext.getCmp('depts').hide();
+		Ext.getCmp('regions').hide();
+		Ext.getCmp('printCommentPanel').hide();
 	}else{
 		Ext.getCmp('kitchens').hide();
 		Ext.getCmp('kitchensTree').hide();
@@ -1278,6 +1332,7 @@ function printFuncOperactionHandler(c){
 		Ext.getCmp('txtRepeat').setValue(1);
 		
 		Ext.getCmp('printerType').show();
+		Ext.getCmp('weixinPrinterType').show();
 		Ext.getCmp('btnSaveNext').show();
 		
 		document.getElementById('radioOrder').checked = true;
@@ -1349,6 +1404,7 @@ function printFuncOperactionHandler(c){
 		Ext.getCmp('kitchensTree').hide();
 		
 		Ext.getCmp('printerType').hide();
+		Ext.getCmp('weixinPrinterType').hide();
 		Ext.getCmp('btnSaveNext').hide();
 		
 		
