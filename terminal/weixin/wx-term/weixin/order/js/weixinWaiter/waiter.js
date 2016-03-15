@@ -1,34 +1,36 @@
 $(function(){
 	initWaiterOrder();
-	
-	var fastFoodWaiterData = {};		
 	function initWaiterOrder(orderId){
 		$.ajax({
 			url : '../../WxOperateWaiter.do',
 			data : {
 				dataSource : 'getOrder',
-				fid : Util.mp.fid,
-				orderId : '7086709'
+				sessionId : Util.mp.params.sessionId,
+				orderId : Util.mp.params.orderId
 			},
 			type : 'post',
 			dataType : 'json',
 			success : function(data, status, xhr){
-				
-				fastFoodWaiterData.tableAlias = data.root[0].table.Alias;
-				//赋值账单号
-				$('#orderId_font_waiter').text(data.root[0].id);
-				
-				//赋值给餐台号
-				$('#tableNum_font_waiter').text(data.root[0].tableAlias);
-				
-				//赋值给开台时间
-				$('#openTableTime_font_waiter').text(data.root[0].birthDate);
-				
-				//赋值给开台人
-				$('#openTablePeople_font_waiter').text(data.root[0].waiter);
-				
-				//加载菜品数据
-				initFoodList(data.root[0]);
+				if(data.success){
+					fastFoodWaiterData.tableAlias = data.root[0].table.Alias;
+					///赋值账单号
+					$('#orderId_font_waiter').text(data.root[0].id);
+					
+					//赋值给餐台号
+					$('#tableNum_font_waiter').text(data.root[0].tableAlias);
+					
+					//赋值给开台时间
+					$('#openTableTime_font_waiter').text(data.root[0].birthDate);
+					
+					//赋值给开台人
+					$('#openTablePeople_font_waiter').text(data.root[0].waiter);
+					
+					//加载菜品数据
+					initFoodList(data.root[0]);
+				}else{
+					//TODO 显示连接超时的界面
+					location.href = 'linkTimeout.html';
+				}
 			}
 		});		
 	}
@@ -37,6 +39,7 @@ $(function(){
 			
 			
 	function initFoodList(data){
+		
 		var orderListTemplete = '<div class="main-box" style="background-color: cornsilk;">'+
 									'<ul class="m-b-list">'+
 										'<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>'+
@@ -89,15 +92,19 @@ $(function(){
 			confirm : function(_orderData, _commentData){
 				var foods = '';
 				var unitId = 0; 
+				
 				_orderData.forEach(function(element, index){
 					if(index > 0){
 						foods += '&';
 					}
+					
 					if(element.unitPriceId){
-					unitId = element.unitPriceId;
+						unitId = element.unitPriceId;
+						
 					}else{
 						unitId = 0;
 					}
+						
 					foods += element.id + ',' + element.count + ',' + unitId;
 				});
 				$.ajax({
