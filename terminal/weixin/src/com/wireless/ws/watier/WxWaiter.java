@@ -10,11 +10,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.weixin.order.WxOrder;
 
 public class WxWaiter {
 
 	public static enum MsgType{
-		CALL_PAY(1, "呼叫结账");
+		CALL_PAY(1, "呼叫结账"),
+		WX_ORDER(2, "微信下单"),
+		WX_BOOK(3, "微信预订");
 		
 		private final int val;
 		private final String desc;
@@ -62,9 +65,14 @@ public class WxWaiter {
 	
 	public static class Msg4CallPay extends Msg{
 		public Msg4CallPay(String table, String expectPayType) {
-			super(MsgType.CALL_PAY, table + "的客人呼叫" + (expectPayType != null ? "使用" + expectPayType : "") + "结账，请留意处理");
+			super(MsgType.CALL_PAY, "【" + table + "】的客人呼叫" + (expectPayType != null ? "使用" + expectPayType : "") + "结账，请留意处理");
 		}
-		
+	}
+	
+	public static class Msg4WxOrder extends Msg{
+		public Msg4WxOrder(WxOrder wxOrder) {
+			super(MsgType.WX_ORDER, "【" + wxOrder.getTable().getName() + "】的会员【" + wxOrder.getMember().getName() + "】有微信下单，请留意处理");
+		}
 	}
 	
     private final Set<Session> sessions = new CopyOnWriteArraySet<>();
