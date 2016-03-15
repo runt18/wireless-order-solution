@@ -119,11 +119,11 @@ function CreateRunHorse(param){
 		//超时处理
 		var overTimeId = runHorseShower.attr('id');
 		
-		setTimeout(function(){
-			if(overTimeId){
-				$('#' + overTimeId).html('');
-			}
-		},10000);
+//		setTimeout(function(){
+//			if(overTimeId){
+//				$('#' + overTimeId).html('');
+//			}
+//		},10000);
 		
 		//开关消息中心
 		container.click(function(){
