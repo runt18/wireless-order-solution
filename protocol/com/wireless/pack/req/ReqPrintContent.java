@@ -47,6 +47,14 @@ public class ReqPrintContent{
 		
 		return request;
 	}
+
+	public static ReqPrintContent buildWxCallPay(Staff staff, int orderId, int memberId, String content){
+		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_WX_WAITER);
+		req.parcel.writeInt(orderId);
+		req.parcel.writeInt(memberId);
+		req.parcel.writeString(content);
+		return req;
+	}
 	
 	public static ReqPrintContent buildWxWaiter(Staff staff, int orderId, String qrCodeContent){
 		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_WX_WAITER);
