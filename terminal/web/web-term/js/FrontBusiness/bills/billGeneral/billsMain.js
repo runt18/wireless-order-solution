@@ -729,7 +729,7 @@ Ext.onReady(function(){
 			['结账方式', 'settleTypeText', null, 'center'],
 			['收款方式', 'payTypeText', null, 'center'],
 			['优惠劵金额', 'couponPrice', null, 'right', couponPriceHandler],
-			['应收', 'totalPrice', null, 'right', Ext.ux.txtFormat.gridDou],
+			['原价', 'totalPrice', null, 'right', Ext.ux.txtFormat.gridDou],
 			['实收', 'actualPrice', null, 'right', Ext.ux.txtFormat.gridDou],
 			['状态', 'statusText', null, 'center', function(v,m,r){
 				if(r.get("statusValue") == 2){

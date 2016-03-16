@@ -94,20 +94,6 @@ $(function(){
 	//进入餐台选择界面
 	$('#tableSelectMgr').on('pageshow', function(){
 
-		$.ajax({
-			url : '../OperateRestaurant.do',
-			data : {
-				dataSource : 'getByCond',
-				byId : true
-			},
-			type : 'post',
-			dataType : 'json',
-			success : function(data){
-				console.log(data);
-			}
-		});
-		
-		
 		//清除快捷键
 		$(document).off('keydown');
 		//设置快捷键

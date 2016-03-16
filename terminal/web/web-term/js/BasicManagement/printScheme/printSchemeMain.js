@@ -675,7 +675,7 @@ function init(){
 				}, {
 					items : [{
 						xtype : 'radio',
-						name : 'ptype',
+						name : 'pType',
 						inputValue : 21,
 						hideLabel : true,
 						boxLabel : '微信店小二',
@@ -690,7 +690,7 @@ function init(){
 				},{
 					items : [{
 						xtype : 'radio',
-						name : 'ptype',
+						name : 'pType',
 						inputValue : 22,
 						hideLabel : true,
 						boxLabel : '呼叫结账',
