@@ -15,7 +15,7 @@ $(function(){
 				if(data.success){
 					initFoodList(data.root[0], true);
 				}else{
-					location.href = 'linkTimeout.html';
+					location.href = 'waiterTimeout.html';
 				}
 			}
 		});
@@ -46,7 +46,7 @@ $(function(){
 					//加载菜品数据
 					initFoodList(data.root[0], false);
 				}else{
-					location.href = 'linkTimeout.html';
+					location.href = 'waiterTimeout.html';
 				}
 			}
 		});	
