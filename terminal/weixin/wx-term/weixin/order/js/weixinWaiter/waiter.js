@@ -17,7 +17,7 @@ $(function(){
 						initFoodList(data.root[0], true);
 					}
 				}else{
-					location.href = 'linkTimeout.html';
+					location.href = 'waiterTimeout.html';
 				}
 			}
 		});
@@ -48,7 +48,7 @@ $(function(){
 					//加载菜品数据
 					initFoodList(data.root[0], false);
 				}else{
-					location.href = 'linkTimeout.html';
+					location.href = 'waiterTimeout.html';
 				}
 			}
 		});	
@@ -159,7 +159,7 @@ $(function(){
 						if(response.success){
 							//提示框设置
 							var finishOrderDialog = new DialogPopup({
-								titleText : '提示tips',
+								titleText : '温馨提示',
 								content : '下单成功,确认返回账单',
 								leftText : '确认',
 								left : function(){

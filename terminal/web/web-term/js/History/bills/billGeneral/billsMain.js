@@ -1171,7 +1171,7 @@ Ext.onReady(function() {
 					return v; 
 				}
 			}],
-			['应收', 'totalPrice', null, 'right', Ext.ux.txtFormat.gridDou],
+			['原价', 'totalPrice', null, 'right', Ext.ux.txtFormat.gridDou],
 			['实收', 'actualPrice', null, 'right', Ext.ux.txtFormat.gridDou],
 			['状态', 'statusText', null, 'center', function(v, m, r){
 				if(r.get("statusValue") == 2){
