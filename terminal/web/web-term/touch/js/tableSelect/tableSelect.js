@@ -67,12 +67,21 @@ $(function(){
 		$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
 	});
 	
+	//建立跑马灯
+	if(parseInt(window.location.search.split('=')[1].substr(0, 1)) != 2){
+		var runHorseDiv = new CreateRunHorse();
+	}
+	
 	//退出餐台选择界面
 	$('#tableSelectMgr').on('pagehide', function(){
+		
 		//删除刷新餐台的定时器
 		if(tableRefreshTimeoutId){
 			clearTimeout(tableRefreshTimeoutId);
 		}
+		
+		
+		runHorseDiv.close();
 	});
 	
 	//进入餐台选择界面
@@ -143,6 +152,8 @@ $(function(){
 			
 		})();
 		
+		//显示跑马灯
+		runHorseDiv.open();
 	});
 	
 	//进入餐桌初始化
@@ -293,10 +304,6 @@ $(function(){
 			//收银端餐台列表高度
 			tableListHeight = 130;	
 		}
-		
-		//跑马灯
-		var runHorseMsg = new CreateRunHorse();
-		runHorseMsg.open();
 		
 		//空闲状态的餐台
 		$('#idleTable_li_tableSelect').click(function(){
@@ -753,10 +760,6 @@ $(function(){
 			}, 200);
 		});
 		
-		(function(){
-			var runHorseDiv = new CreateRunHorse();
-			runHorseDiv.open();
-		})();
 		
 		
 		//打印机诊断

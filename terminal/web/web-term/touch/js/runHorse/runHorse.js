@@ -3,7 +3,7 @@ function CreateRunHorse(param){
 	param = param || {
 		//要显示的样式 	
 		css : {
-			'top' : '5px',
+			'top' : '12px',
 			'left' : '20%',
 			'z-index' : '10000',
 			'position' : 'absolute',
@@ -22,8 +22,10 @@ function CreateRunHorse(param){
 	var _messages = [];		//messages
 	//消息中心载体id
 	var _displayPanelId = null;	//displayPanel
+	//语音播报对象
 	var _audio = null;
 	
+	var _self = this;
 	
 	//跑马灯初始化
 	function init(){
@@ -40,9 +42,14 @@ function CreateRunHorse(param){
 			success : function(data, status, xhr){
 				restaurantId = data.root[0].id;
 				//建立连接
-				var host = null;
-				host = window.location.host;
-				_messageSocket = new ReconnectingWebSocket('ws://' + host + '/wx-term/ws/wx-waiter/' + restaurantId, null, {debug : false});  
+				var hostname = null;
+				var port = null
+				hostname = window.location.hostname;
+				port = window.location.port; 
+				if(hostname === 'e-tones.net'){
+					hostname = 'wx.e-tones.net';
+				}
+				_messageSocket = new ReconnectingWebSocket('ws://' + hostname + ':' + port + '/wx-term/ws/wx-waiter/' + restaurantId, null, {debug : false});  
 		  
 				//webSocket的onmessage事件
 				_messageSocket.onmessage = function(e){
@@ -78,6 +85,11 @@ function CreateRunHorse(param){
 					
 					//实时更新消息中心数据
 					msgManagerShower();
+					
+					
+					$('#' + _containerId).select(function(){
+						_self.close();
+					});
 				}
 			}
 		});
@@ -93,6 +105,7 @@ function CreateRunHorse(param){
 		container.css(param.css);
 		
 		container.attr('id', 'runHorse' + new Date().getTime());
+		container.attr('data-type', 'runHorse');
 		_containerId = container.attr('id');
 		
 		//展示形式
@@ -105,19 +118,21 @@ function CreateRunHorse(param){
 			showWord = '';
 		}
 		//展示端
-		var runHorseShower = $('<marquee behavior="slide" width="290" style="color:#ddd;font-size:18px;font-family:"微软雅黑";">'+ showWord +'</marquee>');
+		var runHorseShower = $('<marquee loop="5" width="380" style="color:yellow;font-size:22px;font-family:"微软雅黑";">'+ showWord +'</marquee>');
 		
 		runHorseShower.attr('id', 'shower' + new Date().getTime());
 		
-		//消息中心小图标
-		var tips = $('<span class="ui-icon ui-icon-info ui-icon-shadow" style="position:absolute;top:1px;">&nbsp;</span>');
+		//消息中心提示
+		var tips = $('<span style="display:inline-block;color:wheat;border:1px solid wheat;font-size:18px;text-shadow:0px 0px 40px;position:relative;top:-7px;">共(<span data-type="showMsgCount">0</span>)条消息</span>');
 		
 		container.append(runHorseShower).append(tips);
+		
+		container.find('[data-type=showMsgCount]').text(_messages.length);
 		
 		$('body').append(container);
 		
 		//超时处理
-		var overTimeId = runHorseShower.attr('id');
+//		var overTimeId = runHorseShower.attr('id');
 		
 //		setTimeout(function(){
 //			if(overTimeId){
@@ -151,8 +166,15 @@ function CreateRunHorse(param){
 				'box-shadow' : '4px 4px 21px #000'
 			});
 			_displayPanelId = msgManagerContainer.attr('id');
+			//消息显示栏
 			var table = $('<table style="width:100%;"><thead class="ui-bar-d"><tr><td style="width:18%;height:36px;">时间</td><td style="width:64%;height:36px;">内容</td><td style="width:18%;height:36px;">类型</td></tr></thead><tbody></tbody></table>');
+			var closeMsgShower = $('<span style="display:block;width:28px;height:28px;line-height:28px;text-align:center;background:red;color:#fff;position:absolute;border-radius:14px;top:0;right:0;font-weight:normal;cursor:pointer;">X</span>');
 			msgManagerContainer.append(table);
+			msgManagerContainer.append(closeMsgShower);
+			//关闭消息中心按钮设置
+			closeMsgShower.click(function(){
+				msgManagerContainer.slideUp();
+			});
 			$('body').append(msgManagerContainer);
 		}
 		
@@ -164,10 +186,10 @@ function CreateRunHorse(param){
 			_messages.forEach(function(element, index){
 				var showWord = element.typeText + ':' + element.content + ',' + element.hour;
 				if(index == (_messages.length - 1)){
-					$('#' + _displayPanelId).find('tbody').prepend('<tr style="color:red;"><td style="height:36px;">' + element.hour + '</td><td style="height:36px;">' + element.content + '</td><td style="height:36px;">' + element.typeText + '</td></tr>');
+					$('#' + _displayPanelId).find('tbody').prepend('<tr style="color:red;"><td style="height:36px;border:1px solid #666;">' + element.hour + '</td><td style="height:36px;border:1px solid #666;">' + element.content + '</td><td style="height:36px;border:1px solid #666;">' + element.typeText + '</td></tr>');
 //					$('#' + _displayPanelId).prepend('<p style="border-bottom:1px solid #ccc;width:95%;text-align:center;color:red;">' + showWord + '</p>');
 				}else{
-					$('#' + _displayPanelId).find('tbody').prepend('<tr><td style="height:36px;">' + element.hour + '</td><td style="height:36px;">' + element.content + '</td><td style="height:36px;">' + element.typeText + '</td></tr>');
+					$('#' + _displayPanelId).find('tbody').prepend('<tr><td style="height:36px;border:1px solid #666;">' + element.hour + '</td><td style="height:36px;border:1px solid #666;">' + element.content + '</td><td style="height:36px;border:1px solid #666;">' + element.typeText + '</td></tr>');
 //					$('#' + _displayPanelId).prepend('<p style="border-bottom:1px solid #ccc;width:95%;text-align:center;">' + showWord + '</p>');
 				}
 			});		
