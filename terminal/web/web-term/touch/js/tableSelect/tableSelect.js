@@ -6,21 +6,9 @@ var systemStatus = Request["status"]?parseInt(Request["status"]):2;
 	
 //餐桌选择包
 var	ts = {
-		table : {},
-		member : {}
-	},
-	/**
-	 * 元素模板
-	 */
-	//餐台
-	tableCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
-//	'<div>{name}<br>{alias}</div></a>';
-		'<div style="height: 70px;">{name}<br>{alias}' +
-			'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
-			'<div class="bookTableStatus">{bookTableStatus}</div>'+
-		'</div>'+
-	'</a>';
-
+	table : {},
+	member : {}
+};
 
 
 
@@ -189,6 +177,12 @@ $(function(){
 				}else{
 					tempPaid = '&nbsp;&nbsp;';
 				}
+				var tableCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
+					'<div style="height: 70px;">{name}<br>{alias}' +
+						'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
+						'<div class="bookTableStatus">{bookTableStatus}</div>'+
+					'</div>'+
+				'</a>';
 				return tableCmpTemplet.format({
 					dataIndex : index,
 					id : item.id,
@@ -793,7 +787,7 @@ $(function(){
 		//消费明细
 		$('#consumeDetail_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
-			var consumeDetail = new ConsumeDetail();
+			var consumeDetail = new ConsumeDetailPopup();
 			setTimeout(function(){
 				consumeDetail.open();
 			}, 300);

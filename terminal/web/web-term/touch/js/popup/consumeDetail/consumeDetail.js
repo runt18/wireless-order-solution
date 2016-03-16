@@ -1,4 +1,4 @@
-function ConsumeDetail(){
+function ConsumeDetailPopup(){
 	var _self = this;
 	var _consumeDetail = new JqmPopup({
 		loadUrl : './popup/consumeDetail/consumeDetail.html',
