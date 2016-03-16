@@ -25,6 +25,7 @@ function CreateRunHorse(param){
 	//语音播报对象
 	var _audio = null;
 	
+	var _self = this;
 	
 	//跑马灯初始化
 	function init(){
@@ -84,6 +85,11 @@ function CreateRunHorse(param){
 					
 					//实时更新消息中心数据
 					msgManagerShower();
+					
+					
+					$('#' + _containerId).select(function(){
+						_self.close();
+					});
 				}
 			}
 		});
@@ -99,6 +105,7 @@ function CreateRunHorse(param){
 		container.css(param.css);
 		
 		container.attr('id', 'runHorse' + new Date().getTime());
+		container.attr('data-type', 'runHorse');
 		_containerId = container.attr('id');
 		
 		//展示形式

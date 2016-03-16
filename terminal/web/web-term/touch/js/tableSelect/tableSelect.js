@@ -67,12 +67,21 @@ $(function(){
 		$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
 	});
 	
+	//建立跑马灯
+	if(parseInt(window.location.search.split('=')[1].substr(0, 1)) != 2){
+		var runHorseDiv = new CreateRunHorse();
+	}
+	
 	//退出餐台选择界面
 	$('#tableSelectMgr').on('pagehide', function(){
+		
 		//删除刷新餐台的定时器
 		if(tableRefreshTimeoutId){
 			clearTimeout(tableRefreshTimeoutId);
 		}
+		
+		
+		runHorseDiv.close();
 	});
 	
 	//进入餐台选择界面
@@ -157,6 +166,8 @@ $(function(){
 			
 		})();
 		
+		//显示跑马灯
+		runHorseDiv.open();
 	});
 	
 	//进入餐桌初始化
@@ -762,13 +773,6 @@ $(function(){
 				memberWxReadPopup.open();
 			}, 200);
 		});
-		
-		
-		
-		if($('body').find('[data-type=horizontal]').css('display') != 'none'){
-			var runHorseDiv = new CreateRunHorse();
-			runHorseDiv.open();
-		}
 		
 		
 		
