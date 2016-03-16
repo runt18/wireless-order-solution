@@ -157,7 +157,7 @@ $(function(){
 						if(response.success){
 							//提示框设置
 							var finishOrderDialog = new DialogPopup({
-								titleText : '提示tips',
+								titleText : '温馨提示',
 								content : '下单成功,确认返回账单',
 								leftText : '确认',
 								left : function(){
