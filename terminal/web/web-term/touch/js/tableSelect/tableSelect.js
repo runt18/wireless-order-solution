@@ -308,10 +308,6 @@ $(function(){
 			tableListHeight = 130;	
 		}
 		
-		//跑马灯
-		var runHorseMsg = new CreateRunHorse();
-		runHorseMsg.open();
-		
 		//空闲状态的餐台
 		$('#idleTable_li_tableSelect').click(function(){
 			$('#labTableStatus .ui-btn-text').text($(this).text());
@@ -767,10 +763,13 @@ $(function(){
 			}, 200);
 		});
 		
-		(function(){
+		
+		
+		if($('body').find('[data-type=horizontal]').css('display') != 'none'){
 			var runHorseDiv = new CreateRunHorse();
 			runHorseDiv.open();
-		})();
+		}
+		
 		
 		
 		//打印机诊断

@@ -12,12 +12,10 @@ $(function(){
 				status : '2'
 			},
 			success : function(data, status, xhr){
-				//FIXME
-				console.log(data);
 				if(data.success){
 					initFoodList(data.root[0], true);
 				}else{
-//					location.href = 'linkTimeout.html';
+					location.href = 'linkTimeout.html';
 				}
 			}
 		});
@@ -48,8 +46,7 @@ $(function(){
 					//加载菜品数据
 					initFoodList(data.root[0], false);
 				}else{
-					//TODO 显示连接超时的界面
-//					location.href = 'linkTimeout.html';
+					location.href = 'linkTimeout.html';
 				}
 			}
 		});	

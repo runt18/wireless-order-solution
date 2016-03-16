@@ -3,7 +3,7 @@ function CreateRunHorse(param){
 	param = param || {
 		//要显示的样式 	
 		css : {
-			'top' : '5px',
+			'top' : '12px',
 			'left' : '20%',
 			'z-index' : '10000',
 			'position' : 'absolute',
@@ -22,6 +22,7 @@ function CreateRunHorse(param){
 	var _messages = [];		//messages
 	//消息中心载体id
 	var _displayPanelId = null;	//displayPanel
+	//语音播报对象
 	var _audio = null;
 	
 	
@@ -105,19 +106,21 @@ function CreateRunHorse(param){
 			showWord = '';
 		}
 		//展示端
-		var runHorseShower = $('<marquee behavior="slide" width="290" style="color:#ddd;font-size:18px;font-family:"微软雅黑";">'+ showWord +'</marquee>');
+		var runHorseShower = $('<marquee loop="5" width="380" style="color:#ddd;font-size:22px;font-family:"微软雅黑";">'+ showWord +'</marquee>');
 		
 		runHorseShower.attr('id', 'shower' + new Date().getTime());
 		
-		//消息中心小图标
-		var tips = $('<span class="ui-icon ui-icon-info ui-icon-shadow" style="position:absolute;top:1px;">&nbsp;</span>');
+		//消息中心提示
+		var tips = $('<span style="display:inline-block;color:#B9F8FF;border:1px solid #B9F8FF;font-size:18px;text-shadow:0px 0px 40px;position:relative;top:-7px;">共(<span data-type="showMsgCount">0</span>)条消息</span>');
 		
 		container.append(runHorseShower).append(tips);
+		
+		container.find('[data-type=showMsgCount]').text(_messages.length);
 		
 		$('body').append(container);
 		
 		//超时处理
-		var overTimeId = runHorseShower.attr('id');
+//		var overTimeId = runHorseShower.attr('id');
 		
 //		setTimeout(function(){
 //			if(overTimeId){
@@ -151,8 +154,15 @@ function CreateRunHorse(param){
 				'box-shadow' : '4px 4px 21px #000'
 			});
 			_displayPanelId = msgManagerContainer.attr('id');
+			//消息显示栏
 			var table = $('<table style="width:100%;"><thead class="ui-bar-d"><tr><td style="width:18%;height:36px;">时间</td><td style="width:64%;height:36px;">内容</td><td style="width:18%;height:36px;">类型</td></tr></thead><tbody></tbody></table>');
+			var closeMsgShower = $('<span style="display:block;width:20px;height:20px;line-height:20px;text-align:center;background:#444;color:#fff;position:absolute;border-radius:10px;top:0;right:0;font-weight:normal;cursor:pointer;">X</span>');
 			msgManagerContainer.append(table);
+			msgManagerContainer.append(closeMsgShower);
+			//关闭消息中心按钮设置
+			closeMsgShower.click(function(){
+				msgManagerContainer.slideUp();
+			});
 			$('body').append(msgManagerContainer);
 		}
 		
