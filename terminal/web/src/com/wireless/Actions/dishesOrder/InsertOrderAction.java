@@ -1,6 +1,7 @@
 package com.wireless.Actions.dishesOrder;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,7 +10,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.marker.weixin.api.BaseAPI;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.order.WxOrderDao;
@@ -20,7 +20,6 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.parcel.Parcel;
-import com.wireless.parcel.wrapper.IntParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.staffMgr.Staff;
@@ -41,8 +40,6 @@ public class InsertOrderAction extends Action{
 		final String wxCode = request.getParameter("wxCode");
 		
 		final String orientedPrinter = request.getParameter("orientedPrinter");		
-		
-		final String wxWaiter = request.getParameter("wxWaiter");
 		
 		final JObject jObject = new JObject();
 		try {
@@ -112,27 +109,6 @@ public class InsertOrderAction extends Action{
 			
 			if(resp.header.type == Type.ACK){
 				jObject.initTip(true, ("下单成功."));
-				//FIXME 新下单时打印【微信店小二】
-				//if(type == 1 && wxWaiter != null && !wxWaiter.isEmpty() && Boolean.parseBoolean(wxWaiter)){
-					final String serverName;
-					if(request.getServerName().equals("e-tones.net")){
-						serverName = "wx.e-tones.net";
-					}else{
-						serverName = request.getServerName(); 
-					}
-					final int serverPoint = request.getServerPort();
-					final int orderId = new Parcel(resp.body).readParcel(IntParcel.CREATOR).intValue();
-					new Thread(){
-						@Override
-						public void run(){
-							try {
-								BaseAPI.doGet("http://" + serverName + ":" + serverPoint + "/wx-term/WxOperateWaiter.do?dataSource=print&restaurantId=" + staff.getRestaurantId() + "&orderId=" + orderId);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-					}.start();
-				//}
 				
 			}else if(resp.header.type == Type.NAK){
 				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
@@ -142,8 +118,8 @@ public class InsertOrderAction extends Action{
 				jObject.initTip(false, ("下单不成功，请重新确认."));
 			}
 			
-		}catch(BusinessException e){
-			jObject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+		}catch(BusinessException | SQLException e){
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(IOException e){
 			jObject.initTip(false, JObject.TIP_TITLE_EXCEPTION, 9997, "服务器请求不成功，请重新检查网络是否连通.");
