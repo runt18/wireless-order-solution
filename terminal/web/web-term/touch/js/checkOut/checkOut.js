@@ -1419,6 +1419,53 @@ $(function(){
 			detailPopup.open();
 		});
 		
+		
+		//微信店小二补打
+		$('#weixinWaiter_li_tableSelect').click(function(){
+			var url = null;
+			if(window.location.hostname === 'e-tones.net'){
+				url = 'http://wx.' + hostname + ':' + window.location.port + '/wx-term/WxOperateWaiter.do';
+			}else{
+				url = window.location.origin + '/wx-term/WxOperateWaiter.do';
+			}
+			
+			Util.LM.show();
+			$.ajax({
+				url : '../OperateRestaurant.do',
+				data : {
+					dataSource : 'getByCond',
+					byId : true
+				},
+				type : 'post',
+				dataType : 'json',
+				success : function(data){
+					$.ajax({
+						type : 'post',
+						url : url,
+						data : {
+							dataSource : 'print',
+							restaurantId : data.root[0].id,
+							orderId : uo.order.id
+						},
+						dataType : 'jsonp',
+						jsonp : 'callback',
+						success : function(data){
+							Util.LM.hide();
+							if(data.success){
+								Util.msg.tip(data.msg);
+							}else{
+								Util.msg.tip(data.msg);
+							}
+						},
+						error : function(xhr, e){
+							Util.LM.hide();
+							Util.msg.tip(data.msg);
+						}
+					});
+				}
+			});
+		});
+		
 	});
 	
 });

@@ -296,7 +296,7 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					cls : 'cLeft',
-					html : '应收:'
+					html : '原价:'
 				}]
 			}, {
 				items : [{
