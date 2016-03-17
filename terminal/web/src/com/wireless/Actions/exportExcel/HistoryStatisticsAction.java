@@ -3727,7 +3727,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			
 			//总价
 			cell = row.createCell((int)row.getLastCellNum());
-			cell.setCellValue(of.calcPrice());
+			cell.setCellValue(of.getPrice() * of.getCount());
 			cell.setCellStyle(numStyle);
 			
 			//赠送人

@@ -63,7 +63,7 @@ public class ExtraFormatDecorator extends ConcreteContentDecorator {
 	public final static FormatDescriptor LARGE_FONT_VH_2X = new FormatDescriptor(FORMAT_LARGE_FONT_WIRE, FORMAT_LARGE_FONT_VH_2X_THERMAL);
 	public final static FormatDescriptor LARGE_FONT_VH_3X = new FormatDescriptor(FORMAT_LARGE_FONT_WIRE, FORMAT_LARGE_FONT_VH_3X_THERMAL);
 	
-	public final static FormatDescriptor CENTER_ALIGN = new FormatDescriptor(new Format(new char[]{0x1B, 0x61, 0x01}, new char[]{}), new Format(new char[]{}, new char[]{}));
+	public final static FormatDescriptor CENTER_ALIGN = new FormatDescriptor(new Format(new char[]{}, new char[]{}), new Format(new char[]{0x1B, 0x61, 0x01}, new char[]{'\r', '\n', 0x1B, 0x61, 0x00}));
 	
 	private final String _header;
 	private final String _tail;

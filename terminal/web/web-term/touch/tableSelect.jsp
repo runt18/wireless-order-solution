@@ -546,14 +546,14 @@
 	 <!-- 账单更多操作 -->
 	<div data-role="popup" id="updateFoodOtherOperateCmp" data-theme="d">
         <ul data-role="listview" data-inset="true" style="min-width:170px;" data-theme="b">
-            <li class="tempFoodKitchen" onclick="uo.showOperatePeople()"><a >人数</a></li>
+            <li class="tempFoodKitchen" onclick="uo.showOperatePeople()"><a >修改人数</a></li>
             <li class="tempFoodKitchen" onclick="uo.openCommentOperate()"><a >修改备注</a></li>
+            <li class="tempFoodKitchen" id="weixinWaiter_li_tableSelect"><a>补打微信店小二</a></li>
             <li class="tempFoodKitchen" onclick="uo.tempPayForPrintAll()"><a >补打总单</a></li>
             <li class="tempFoodKitchen" onclick="uo.printDetailPatch()"><a >补打明细</a></li>
             <li class="tempFoodKitchen" id="allTrantable_li_tableSelect"><a >全单转菜</a></li>
             <li class="tempFoodKitchen" onclick="uo.allFoodHurried()"><a >全单催菜</a></li>
             <li class="tempFoodKitchen" onclick="uo.cancelTable()"><a >撤台</a></li>
-            <li class="tempFoodKitchen" id="weixinWaiter_li_tableSelect"><a>微信店小二补打</a></li>
         </ul>
 	</div>		
 	

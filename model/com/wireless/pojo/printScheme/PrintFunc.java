@@ -438,6 +438,18 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return builder;
 		}
 		
+		public static Builder newWxWaiter(int printerId){
+			Builder builder = new Builder(printerId);
+			builder.setType(PType.PRINT_WX_WAITER);
+			return builder;
+		}
+		
+		public static Builder newWxCallPay(int printerId){
+			Builder builder = new Builder(printerId);
+			builder.setType(PType.PRINT_WX_CALL_PAY);
+			return builder;
+		}
+		
 		public Builder setRepeat(int repeat){
 			mRepeat = repeat;
 			return this;

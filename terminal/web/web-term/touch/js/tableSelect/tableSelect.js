@@ -1,25 +1,15 @@
 //餐桌选择包
 var	ts = {
-		table : {},
-		member : {}
-	},
-	/**
-	 * 元素模板
-	 */
-	//餐台
-	tableCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
-//	'<div>{name}<br>{alias}</div></a>';
-		'<div style="height: 70px;">{name}<br>{alias}' +
-			'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
-			'<div class="bookTableStatus">{bookTableStatus}</div>'+
-		'</div>'+
-	'</a>';
-
+	table : {},
+	member : {}
+};
 
 
 
 $(function(){
 	
+	//消息中心跑马灯
+	var runHorseDiv;
 	//作为收银端或触摸屏时, 餐台列表的高度
 	var	tableListHeight = 86;
 	//餐台刷新的定时器Id
@@ -63,7 +53,7 @@ $(function(){
 	
 	//建立跑马灯
 	if(parseInt(window.location.search.split('=')[1].substr(0, 1)) != 2){
-		var runHorseDiv = new CreateRunHorse();
+		runHorseDiv = new CreateRunHorse();
 	}
 	
 	//退出餐台选择界面
@@ -74,7 +64,11 @@ $(function(){
 			clearTimeout(tableRefreshTimeoutId);
 		}
 		
-		
+	});
+
+	//退出餐台选择界面
+	$('#tableSelectMgr').on('pagebeforehide', function(){
+		//关闭跑马灯
 		runHorseDiv.close();
 	});
 	
@@ -180,6 +174,12 @@ $(function(){
 				}else{
 					tempPaid = '&nbsp;&nbsp;';
 				}
+				var tableCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
+					'<div style="height: 70px;">{name}<br>{alias}' +
+						'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
+						'<div class="bookTableStatus">{bookTableStatus}</div>'+
+					'</div>'+
+				'</a>';
 				return tableCmpTemplet.format({
 					dataIndex : index,
 					id : item.id,
@@ -777,7 +777,7 @@ $(function(){
 		//消费明细
 		$('#consumeDetail_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
-			var consumeDetail = new ConsumeDetail();
+			var consumeDetail = new ConsumeDetailPopup();
 			setTimeout(function(){
 				consumeDetail.open();
 			}, 300);

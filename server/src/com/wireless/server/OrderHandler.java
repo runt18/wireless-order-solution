@@ -345,7 +345,7 @@ class OrderHandler implements Runnable{
 		}
 	}
 	
-	private ProtocolPackage doInsertOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
+	private ProtocolPackage doInsertOrder(final Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		//handle insert order request 
 		final Order.InsertBuilder builder = new Parcel(request.body).readParcel(Order.InsertBuilder.CREATOR);
 		
@@ -366,6 +366,31 @@ class OrderHandler implements Runnable{
 																		     	  orderToInsert,
 																		     	  FoodDetailContent.DetailType.DELTA));
 		}
+		
+		final String host;
+		if(_conn.getLocalAddress().getHostAddress().equals("e-tones.net")){
+			host = "wx.e-tones.net";
+		}else{
+			host = _conn.getLocalAddress().getHostAddress();
+		}
+		final String port;
+		if(_conn.getLocalAddress().isAnyLocalAddress() || _conn.getLocalAddress().isLoopbackAddress()){
+			port = "8080";
+		}else{
+			port = "80";
+		}
+		//新下单时打印【微信店小二】
+		WirelessSocketServer.threadPool.execute(new Runnable(){
+			@Override
+			public void run() {
+				try {
+					BaseAPI.doGet("http://" + host + ":" + port + "/wx-term/WxOperateWaiter.do?dataSource=print&restaurantId=" + staff.getRestaurantId() + "&orderId=" + orderToInsert.getId());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
 		if(orderToInsert.getCategory().isJoin()){
 			return new RespPackage(request.header).fillBody(orderToInsert.getDestTbl(), Table.TABLE_PARCELABLE_4_QUERY);
 		}else{
