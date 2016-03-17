@@ -14,6 +14,8 @@ var	ts = {
 
 $(function(){
 	
+	//消息中心跑马灯
+	var runHorseDiv;
 	//作为收银端或触摸屏时, 餐台列表的高度
 	var	tableListHeight = 86;
 	//餐台刷新的定时器Id
@@ -57,7 +59,7 @@ $(function(){
 	
 	//建立跑马灯
 	if(parseInt(window.location.search.split('=')[1].substr(0, 1)) != 2){
-		var runHorseDiv = new CreateRunHorse();
+		runHorseDiv = new CreateRunHorse();
 	}
 	
 	//退出餐台选择界面
@@ -68,7 +70,11 @@ $(function(){
 			clearTimeout(tableRefreshTimeoutId);
 		}
 		
-		
+	});
+
+	//退出餐台选择界面
+	$('#tableSelectMgr').on('pagebeforehide', function(){
+		//关闭跑马灯
 		runHorseDiv.close();
 	});
 	
