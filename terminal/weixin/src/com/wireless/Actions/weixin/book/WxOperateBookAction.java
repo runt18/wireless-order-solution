@@ -1,6 +1,7 @@
 package com.wireless.Actions.weixin.book;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,6 +42,8 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.ws.watier.WxWaiter;
+import com.wireless.ws.watier.WxWaiterServerPoint;
 
 public class WxOperateBookAction extends DispatchAction {
 	
@@ -110,21 +113,25 @@ public class WxOperateBookAction extends DispatchAction {
 			}
 			
 			jObject.setRoot(new Jsonable(){
-
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					return result;
 				}
-
 				@Override
 				public void fromJsonMap(JsonMap jm, int flag) {
 					
 				}
-				
 			});
-		}catch(Exception e){
+			
+			//web socket通知Touch微信预订
+	        WxWaiter waiter = WxWaiterServerPoint.getWxWaiter(staff.getRestaurantId());
+	        if(waiter != null){
+	        	waiter.send(new WxWaiter.Msg4WxBook(BookDao.getById(staff, bookId)));
+	        }
+	        
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jObject.initTip4Exception(e);
+			jObject.initTip(e);
 		}finally{
 			response.getWriter().print(jObject.toString());
 		}
