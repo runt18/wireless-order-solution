@@ -68,6 +68,7 @@
 <script type="text/javascript" src="js/global/tables.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/global/foods.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/global/staff.js?v=<%=v %>"></script>
+<script type="text/javascript" src="js/global/systemStatus.js?<%=v %>"></script>
 <!-- 分页控件 -->
 <script type="text/javascript" src="./js/padding/padding.js"></script>
 <!-- 数字键盘控件 -->

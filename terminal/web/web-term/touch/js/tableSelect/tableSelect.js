@@ -1,9 +1,3 @@
-var Request = new Util_urlParaQuery();
-//1:pos端	2:touch		3:试用 
-var systemStatus = Request["status"]?parseInt(Request["status"]):2;
-
-
-	
 //餐桌选择包
 var	ts = {
 		table : {},
@@ -235,7 +229,7 @@ $(function(){
 				}else{	
 					Util.msg.tip('请先登录');
 					setTimeout(function(){
-						location.href = 'verifyLogin.jsp?status=' + systemStatus;
+						location.href = 'verifyLogin.jsp?status=' + WirelessOrder.systemStatus.val;
 					}, 2000);
 				}
 				Util.LM.hide();	
@@ -244,7 +238,7 @@ $(function(){
 				Util.LM.hide();	
 				Util.msg.tio('操作有误,请刷新页面');
 				setTimeout(function(){
-					location.href = 'verifyLogin.jsp?status=' + systemStatus;
+					location.href = 'verifyLogin.jsp?status=' +  WirelessOrder.systemStatus.val;
 				}, 2000);
 			}
 		});
@@ -254,7 +248,7 @@ $(function(){
 		Util.sys.checkSmStat();
 		
 		//pos端 && 体验端 && touch端
-		if(systemStatus == 1){//pos端
+		if(WirelessOrder.systemStatus.isPos()){//pos端
 			//日结,交班等
 			$('#divPosOperation').show();
 			$('#btnOrderAndPay').show();
@@ -265,7 +259,7 @@ $(function(){
 			//收银端餐台列表高度
 			tableListHeight = 130;	
 	
-		}else if(systemStatus == 3){//try端
+		}else if(WirelessOrder.systemStatus.isTry()){//try端
 			//日结,交班等
 			$('#divPosOperation').show();
 			$('#btnOrderAndPay').show();
@@ -278,7 +272,7 @@ $(function(){
 			//try端不可进入后台
 			$('#btnToBasicPage').hide();
 			
-		}else if(systemStatus == 2){//touch端
+		}else if(WirelessOrder.systemStatus.isTouch()){//touch端
 			//日结,交班等
 			$('#divPosOperation').hide();
 			$('#btnOrderAndPay').hide();
@@ -288,7 +282,7 @@ $(function(){
 			$('#payOrder_a_checkOut').hide();
 			//收银端餐台列表高度
 			tableListHeight = 86;
-		}else if(systemStatus == 4){//快餐模式
+		}else if(Wireless.systemStatus.isFastFood()){//快餐模式
 			//日结,交班等
 			$('#divPosOperation').show();
 			$('#btnOrderAndPay').show();
@@ -1003,7 +997,7 @@ $(function(){
 			$.ajax({
 				url : '../LoginOut.do',
 				success : function(data, status, xhr){
-					location.href = 'verifyLogin.jsp?status=' + systemStatus;
+					location.href = 'verifyLogin.jsp?status=' + WirelessOrder.systemStatus.val;
 					//location.reload();
 				}
 			});	

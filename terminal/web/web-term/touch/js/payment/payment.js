@@ -581,7 +581,7 @@ $(function(){
 		function postPayment(resultJSON){
 			if(resultJSON.success){
 				Util.msg.alert({msg : '结账成功!', topTip : true});
-				if(systemStatus == 4){
+				if(WirelessOrder.systemStatus.isFastFood()){
 					//快餐模式下返回到点菜界面
 					of.entry({orderFoodOperateType : 'fast', table : pm.table});
 				}else{
@@ -637,7 +637,7 @@ $(function(){
 						Util.msg.alert({msg : '结账成功!', topTip : true});
 						$('#memberPayCancel_a_payment').click();
 						setTimeout(function(){
-							if(systemStatus == 4){
+							if(WirelessOrder.systemStatus.isFastFood()){
 								//快餐模式下返回到点菜界面
 								of.entry({orderFoodOperateType : 'fast', table : pm.table});
 							}else{
@@ -740,7 +740,7 @@ $(function(){
 							$('#receivedCashCancel_a_payment').click();
 							//等完全关闭后再返回
 							setTimeout(function(){
-								if(systemStatus == 4){
+								if(WirelessOrder.systemStatus.isFastFood()){
 									//快餐模式下返回到点菜界面
 									of.entry({orderFoodOperateType : 'fast', table : pm.table});
 								}else{
@@ -794,7 +794,7 @@ $(function(){
 									Util.msg.tip('结账成功!');
 									//等完全关闭后再返回
 									setTimeout(function(){
-										if(systemStatus == 4){
+										if(WirelessOrder.systemStatus.isFastFood()){
 											//快餐模式下返回到点菜界面
 											of.entry({orderFoodOperateType : 'fast', table : pm.table});
 										}else{
