@@ -14,6 +14,7 @@ $(function(){
 			success : function(data, status, xhr){
 				if(data.success){
 					initFoodList(data.root[0], true);
+					
 				}else{
 					location.href = 'waiterTimeout.html';
 				}
@@ -46,7 +47,8 @@ $(function(){
 					//加载菜品数据
 					initFoodList(data.root[0], false);
 					
-					if(data.success){
+					//已经结账的账单处理
+					if(data.root[0].statusValue == 1){
 						$('#bottom_div_waiter').css({
 							'background' : 'rgb(228, 240, 245)',
 							'padding' : '4px 0'
