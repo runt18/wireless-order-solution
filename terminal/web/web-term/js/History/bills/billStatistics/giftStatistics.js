@@ -386,7 +386,7 @@ Ext.onReady(function(){
 			    ['菜品名称', 'name', 100], 
 			    ['数量','count', 60, 'right', Ext.ux.txtFormat.gridDou],
 			    ['单价','unitPrice', 60, 'right', Ext.ux.txtFormat.gridDou],
-			    ['总价','totalPrice', 60, 'right', Ext.ux.txtFormat.gridDou],
+			    ['总价','totalPrice', 60, 'right', giftTotalPrice],
 			    ['赠送人','waiter', null,'center']
 			],
 			['orderId', 'orderDateFormat', 'name', 'count', 'unitPrice', 'actualPrice', 'waiter'],
@@ -475,6 +475,12 @@ Ext.onReady(function(){
 	//		dateCombo.setValue(1);
 	//		dateCombo.fireEvent('select', dateCombo, null, 1);
 	//	});
+	}
+	
+	
+	function giftTotalPrice(s, d, data, f){
+		var totalPrice = parseFloat(data.json.unitPrice * data.json.count);
+		return totalPrice;
 	}
 
 	function gift_changeChartWidth(w,h){
