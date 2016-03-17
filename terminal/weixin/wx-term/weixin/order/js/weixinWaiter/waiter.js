@@ -45,6 +45,14 @@ $(function(){
 					
 					//加载菜品数据
 					initFoodList(data.root[0], false);
+					
+					if(data.success){
+						$('#bottom_div_waiter').css({
+							'background' : 'rgb(228, 240, 245)',
+							'padding' : '4px 0'
+						});
+						$('#bottom_div_waiter').html('<span style="display:block;color:#156785;font-size:34px;text-align:center;">账单已结账</span>');
+					}
 				}else{
 					location.href = 'waiterTimeout.html';
 				}
