@@ -49,7 +49,7 @@ public class ReqPrintContent{
 	}
 
 	public static ReqPrintContent buildWxCallPay(Staff staff, int orderId, int memberId, String content){
-		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_WX_WAITER);
+		ReqPrintContent req = new ReqPrintContent(staff, PType.PRINT_WX_CALL_PAY);
 		req.parcel.writeInt(orderId);
 		req.parcel.writeInt(memberId);
 		req.parcel.writeString(content);
