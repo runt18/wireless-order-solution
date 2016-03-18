@@ -51,8 +51,8 @@ $(function(){
 		$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
 	});
 	
-	//建立跑马灯
-	if(parseInt(window.location.search.split('=')[1].substr(0, 1)) != 2){
+	//建立跑马灯   只有在pos端的情况下才创建
+	if(WirelessOrder.systemStatus.isPos()){ 
 		runHorseDiv = new CreateRunHorse();
 	}
 	
@@ -69,7 +69,9 @@ $(function(){
 	//退出餐台选择界面
 	$('#tableSelectMgr').on('pagebeforehide', function(){
 		//关闭跑马灯
-		runHorseDiv.close();
+		if(runHorseDiv){
+			runHorseDiv.close();
+		}
 	});
 	
 	//进入餐台选择界面
@@ -141,7 +143,10 @@ $(function(){
 		})();
 		
 		//显示跑马灯
-		runHorseDiv.open();
+		if(runHorseDiv){
+			runHorseDiv.open();	
+		}
+		
 	});
 	
 	//进入餐桌初始化
@@ -282,7 +287,7 @@ $(function(){
 			$('#payOrder_a_checkOut').hide();
 			//收银端餐台列表高度
 			tableListHeight = 86;
-		}else if(Wireless.systemStatus.isFastFood()){//快餐模式
+		}else if(WirelessOrder.systemStatus.isFastFood()){//快餐模式
 			//日结,交班等
 			$('#divPosOperation').show();
 			$('#btnOrderAndPay').show();

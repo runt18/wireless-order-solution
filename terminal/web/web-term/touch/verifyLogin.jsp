@@ -26,6 +26,8 @@
 <script type="text/javascript" src="../js/components/md5.js"></script>
 <!-- 共享数据 -->
 <script type="text/javascript" src="js/global/share.js?v=<%=v %>"></script>
+<!-- 获取systemStatus -->
+<script type="text/javascript" src="js/global/systemStatus.js?<%=v %>"></script>
 <!-- 分页控件 -->
 <script type="text/javascript" src="./js/padding/padding.js"></script>
 <!--keyboard  -->
@@ -34,6 +36,7 @@
 <script type="text/javascript" src="js/Util.js?v=<%=v %>"></script>
 <!-- 自定义js -->
 <script type="text/javascript" src="js/login/login.js?v=<%=v %>"></script>
+
 
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
 </head>
