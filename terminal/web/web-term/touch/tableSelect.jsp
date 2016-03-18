@@ -120,16 +120,16 @@
 <script type="text/javascript" src="./js/runHorse/runHorse.js"></script>
 <!-- 重连socket -->
 <script type="text/javascript" src="./js/socket/reconnecting-websocket.js"></script>
-<!-- 语音播报 -->
-<script src="http://blog.faultylabs.com/files/md5.js"></script>	
-<script src="http://webapi.openspeech.cn/socket.io/socket.io.js"></script>
-<script src='http://webapi.openspeech.cn/fingerprint.js'></script>
-<script src="http://webapi.openspeech.cn/tts.min.js"></script>
+
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
 		return false;	
 	} 
+	
+	$.getScript('http://blog.faultylabs.com/files/md5.js', function(data, status, xhr){
+		console.log('导入成功');
+	});
 </script>
 
 </head>
