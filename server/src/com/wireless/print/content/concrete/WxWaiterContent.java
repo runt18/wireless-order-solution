@@ -25,9 +25,10 @@ public class WxWaiterContent extends ConcreteContent {
 	public String toString(){
 		final StringBuilder content = new StringBuilder();
 		
-		content.append(new String(new char[]{0x1B, 0x61, 0x01}) + 
-					   new ExtraFormatDecorator(restaurant.getName(), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X) +
-					   SEP + new String(new char[]{0x1B, 0x61, 0x00}));
+		content.append(new ExtraFormatDecorator( 
+					   	new ExtraFormatDecorator(restaurant.getName(), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X),
+					   	ExtraFormatDecorator.CENTER_ALIGN))
+			   .append(SEP);
 		
 		content.append(mSeperatorLine);
 		content.append(SEP);

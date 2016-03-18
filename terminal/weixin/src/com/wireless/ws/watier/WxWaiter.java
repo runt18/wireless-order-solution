@@ -9,6 +9,7 @@ import javax.websocket.Session;
 import com.alibaba.fastjson.JSONObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.book.Book;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.weixin.order.WxOrder;
 
@@ -75,6 +76,12 @@ public class WxWaiter {
 		}
 	}
 
+	public static class Msg4WxBook extends Msg{
+		public Msg4WxBook(Book book) {
+			super(MsgType.WX_ORDER, "会员【" + book.getMember() + "】有微信预订，请留意处理");
+		}
+	}
+	
     private final Set<Session> sessions = new CopyOnWriteArraySet<>();
 	private final int restaurantId;
 	

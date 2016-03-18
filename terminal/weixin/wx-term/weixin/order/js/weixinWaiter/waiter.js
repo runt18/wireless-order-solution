@@ -13,7 +13,9 @@ $(function(){
 			},
 			success : function(data, status, xhr){
 				if(data.success){
-					initFoodList(data.root[0], true);
+					if(data.root.length > 0){
+						initFoodList(data.root[0], true);
+					}
 					
 				}else{
 					location.href = 'waiterTimeout.html';
@@ -108,7 +110,7 @@ $(function(){
 		
 		$('#orderList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
 			element.innerHTML = index + 1;
-		});;
+		});
 	}
 	
 	

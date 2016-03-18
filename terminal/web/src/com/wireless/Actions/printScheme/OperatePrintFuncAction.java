@@ -190,8 +190,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 				
 			}else if(PType.valueOf(printType) == PType.PRINT_2ND_DISPLAY){
 				//客显
-				PrintFunc.Builder builder = Builder.new2ndDisplay(printerId);
-				PrintFuncDao.addFunc(dbCon, staff, builder);
+				PrintFuncDao.addFunc(dbCon, staff, Builder.new2ndDisplay(printerId));
 				
 			}else if(PType.valueOf(printType) == PType.PRINT_WX_ORDER){
 				//微信订单
@@ -200,6 +199,17 @@ public class OperatePrintFuncAction extends DispatchAction{
 			}else if(PType.valueOf(printType) == PType.PRINT_BOOK){
 				//微信预订
 				PrintFuncDao.addFunc(dbCon, staff, Builder.newWxBook(printerId));
+				
+			}else if(PType.valueOf(printType) == PType.PRINT_WX_WAITER){
+				//微信店小二
+				PrintFuncDao.addFunc(dbCon, staff, Builder.newWxWaiter(printerId));
+				
+			}else if(PType.valueOf(printType) == PType.PRINT_WX_CALL_PAY){
+				//微信呼叫结账
+				PrintFuncDao.addFunc(dbCon, staff, Builder.newWxCallPay(printerId));
+				
+			}else{
+				throw new BusinessException(PType.valueOf(printType).toString() + "不支持此打印功能");
 			}
 		
 			jObject.initTip(true, "操作成功, 已添加方案");

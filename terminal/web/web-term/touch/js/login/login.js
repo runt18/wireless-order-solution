@@ -1,10 +1,7 @@
 
-var Request = new Util_urlParaQuery();
-var systemStatus = Request["status"]?parseInt(Request["status"]):2;
-
 //刷新时去除#
 if(location.href.indexOf('#') > 0){
-	location.href = 'verifyLogin.jsp?status='+systemStatus;
+	location.href = 'verifyLogin.jsp?status='+WirelessOrder.systemStatus.val;
 }
 
 //登陆界面数据对象
@@ -30,7 +27,7 @@ $(function(){
 	});
 	
 	//pos && 体验端可以使用前后登陆
-	if(systemStatus == 1 || systemStatus == 3){
+	if(WirelessOrder.systemStatus.isPos() || WirelessOrder.systemStatus.isTry()){
 		$('#btnLogin4Pos').show();
 		$('#btnLogin4Touch').hide();
 	}else{
@@ -151,7 +148,7 @@ function staffLoginHandler(c){
 				if(c && c.part == 'basic'){
 					location.href = '../pages/Mgr/DigieBasic.html';
 				}else{
-					location.href = 'tableSelect.jsp?status=' + systemStatus + '#tableSelectMgr';	
+					location.href = 'tableSelect.jsp?status=' + WirelessOrder.systemStatus.val + '#tableSelectMgr';	
 				}
 			}else{
 				

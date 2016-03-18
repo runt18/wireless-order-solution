@@ -1,31 +1,15 @@
-var Request = new Util_urlParaQuery();
-//1:pos端	2:touch		3:试用 
-var systemStatus = Request["status"]?parseInt(Request["status"]):2;
-
-
-	
 //餐桌选择包
 var	ts = {
-		table : {},
-		member : {}
-	},
-	/**
-	 * 元素模板
-	 */
-	//餐台
-	tableCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
-//	'<div>{name}<br>{alias}</div></a>';
-		'<div style="height: 70px;">{name}<br>{alias}' +
-			'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
-			'<div class="bookTableStatus">{bookTableStatus}</div>'+
-		'</div>'+
-	'</a>';
-
+	table : {},
+	member : {}
+};
 
 
 
 $(function(){
 	
+	//消息中心跑马灯
+	var runHorseDiv;
 	//作为收银端或触摸屏时, 餐台列表的高度
 	var	tableListHeight = 86;
 	//餐台刷新的定时器Id
@@ -67,9 +51,9 @@ $(function(){
 		$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
 	});
 	
-	//建立跑马灯
-	if(parseInt(window.location.search.split('=')[1].substr(0, 1)) != 2){
-		var runHorseDiv = new CreateRunHorse();
+	//建立跑马灯   只有在pos端的情况下才创建
+	if(WirelessOrder.systemStatus.isPos()){ 
+		runHorseDiv = new CreateRunHorse();
 	}
 	
 	//退出餐台选择界面
@@ -80,8 +64,14 @@ $(function(){
 			clearTimeout(tableRefreshTimeoutId);
 		}
 		
-		
-		runHorseDiv.close();
+	});
+
+	//退出餐台选择界面
+	$('#tableSelectMgr').on('pagebeforehide', function(){
+		//关闭跑马灯
+		if(runHorseDiv){
+			runHorseDiv.close();
+		}
 	});
 	
 	//进入餐台选择界面
@@ -153,7 +143,10 @@ $(function(){
 		})();
 		
 		//显示跑马灯
-		runHorseDiv.open();
+		if(runHorseDiv){
+			runHorseDiv.open();	
+		}
+		
 	});
 	
 	//进入餐桌初始化
@@ -186,6 +179,12 @@ $(function(){
 				}else{
 					tempPaid = '&nbsp;&nbsp;';
 				}
+				var tableCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="tableCmp" data-index={dataIndex} data-value={id} data-theme={theme}>' +
+					'<div style="height: 70px;">{name}<br>{alias}' +
+						'<div class="{tempPayStatusClass}">{tempPayStatus}</div>'+
+						'<div class="bookTableStatus">{bookTableStatus}</div>'+
+					'</div>'+
+				'</a>';
 				return tableCmpTemplet.format({
 					dataIndex : index,
 					id : item.id,
@@ -235,7 +234,7 @@ $(function(){
 				}else{	
 					Util.msg.tip('请先登录');
 					setTimeout(function(){
-						location.href = 'verifyLogin.jsp?status=' + systemStatus;
+						location.href = 'verifyLogin.jsp?status=' + WirelessOrder.systemStatus.val;
 					}, 2000);
 				}
 				Util.LM.hide();	
@@ -244,7 +243,7 @@ $(function(){
 				Util.LM.hide();	
 				Util.msg.tio('操作有误,请刷新页面');
 				setTimeout(function(){
-					location.href = 'verifyLogin.jsp?status=' + systemStatus;
+					location.href = 'verifyLogin.jsp?status=' +  WirelessOrder.systemStatus.val;
 				}, 2000);
 			}
 		});
@@ -254,7 +253,7 @@ $(function(){
 		Util.sys.checkSmStat();
 		
 		//pos端 && 体验端 && touch端
-		if(systemStatus == 1){//pos端
+		if(WirelessOrder.systemStatus.isPos()){//pos端
 			//日结,交班等
 			$('#divPosOperation').show();
 			$('#btnOrderAndPay').show();
@@ -265,7 +264,7 @@ $(function(){
 			//收银端餐台列表高度
 			tableListHeight = 130;	
 	
-		}else if(systemStatus == 3){//try端
+		}else if(WirelessOrder.systemStatus.isTry()){//try端
 			//日结,交班等
 			$('#divPosOperation').show();
 			$('#btnOrderAndPay').show();
@@ -278,7 +277,7 @@ $(function(){
 			//try端不可进入后台
 			$('#btnToBasicPage').hide();
 			
-		}else if(systemStatus == 2){//touch端
+		}else if(WirelessOrder.systemStatus.isTouch()){//touch端
 			//日结,交班等
 			$('#divPosOperation').hide();
 			$('#btnOrderAndPay').hide();
@@ -288,7 +287,7 @@ $(function(){
 			$('#payOrder_a_checkOut').hide();
 			//收银端餐台列表高度
 			tableListHeight = 86;
-		}else if(systemStatus == 4){//快餐模式
+		}else if(WirelessOrder.systemStatus.isFastFood()){//快餐模式
 			//日结,交班等
 			$('#divPosOperation').show();
 			$('#btnOrderAndPay').show();
@@ -783,7 +782,7 @@ $(function(){
 		//消费明细
 		$('#consumeDetail_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
-			var consumeDetail = new ConsumeDetail();
+			var consumeDetail = new ConsumeDetailPopup();
 			setTimeout(function(){
 				consumeDetail.open();
 			}, 300);
@@ -1003,7 +1002,7 @@ $(function(){
 			$.ajax({
 				url : '../LoginOut.do',
 				success : function(data, status, xhr){
-					location.href = 'verifyLogin.jsp?status=' + systemStatus;
+					location.href = 'verifyLogin.jsp?status=' + WirelessOrder.systemStatus.val;
 					//location.reload();
 				}
 			});	
