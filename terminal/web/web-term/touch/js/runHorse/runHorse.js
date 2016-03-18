@@ -14,14 +14,14 @@ function CreateRunHorse(param){
 	
 	//socket
 	var _messageSocket = null;
-	//跑马灯载体id
-	var _containerId = null;
+	//跑马灯载体
+	var _container = null;
 	//socket接受的新消息
 	var _activeMsg = null;	//activeMsg
 	//信息存储器
 	var _messages = [];		//messages
-	//消息中心载体id
-	var _displayPanelId = null;	//displayPanel
+	//消息中心载体
+	var _displayPanel = null;
 	//语音播报对象
 	var _audio = null;
 	
@@ -56,14 +56,6 @@ function CreateRunHorse(param){
 					_activeMsg = JSON.parse(e.data);
 					
 					if(_activeMsg){
-						//展示跑马灯及效果
-						if(_containerId){
-							$('#' + _containerId).remove();
-							showActiveMsg();
-							
-						}else{
-							showActiveMsg();
-						}
 					
 					//保存数据入数组
 						if(_messages.length >= param.size){
@@ -73,6 +65,12 @@ function CreateRunHorse(param){
 						}else{
 							_messages.push(_activeMsg);
 						}
+						
+						//展示跑马灯及效果
+						if(_container){
+							$(_container).remove();
+						}
+						showActiveMsg();
 						
 						//语音播报
 						play(_activeMsg.content);
@@ -87,7 +85,7 @@ function CreateRunHorse(param){
 					msgManagerShower();
 					
 					
-					$('#' + _containerId).select(function(){
+					$(_container).select(function(){
 						_self.close();
 					});
 				}
@@ -106,7 +104,7 @@ function CreateRunHorse(param){
 		
 		container.attr('id', 'runHorse' + new Date().getTime());
 		container.attr('data-type', 'runHorse');
-		_containerId = container.attr('id');
+		_container = container;
 		
 		//展示形式
 		var showWord = null;
@@ -131,15 +129,6 @@ function CreateRunHorse(param){
 		
 		$('body').append(container);
 		
-		//超时处理
-//		var overTimeId = runHorseShower.attr('id');
-		
-//		setTimeout(function(){
-//			if(overTimeId){
-//				$('#' + overTimeId).html('');
-//			}
-//		},10000);
-		
 		//开关消息中心
 		container.click(function(){
 			msgManagerShower().slideToggle();
@@ -150,7 +139,7 @@ function CreateRunHorse(param){
 	//返回消息中心dom元素及消息中心样式
 	function msgManagerShower(){
 		//初始化消息中心的样式
-		if(!_displayPanelId ){
+		if(!_displayPanel ){
 			var msgManagerContainer = $('<div>');
 			msgManagerContainer.attr('id', 'msgManager' + new Date().getTime());
 			msgManagerContainer.css({
@@ -165,7 +154,7 @@ function CreateRunHorse(param){
 				'position' : 'absolute',
 				'box-shadow' : '4px 4px 21px #000'
 			});
-			_displayPanelId = msgManagerContainer.attr('id');
+			_displayPanel = msgManagerContainer;
 			//消息显示栏
 			var table = $('<table style="width:100%;"><thead class="ui-bar-d"><tr><td style="width:18%;height:36px;">时间</td><td style="width:64%;height:36px;">内容</td><td style="width:18%;height:36px;">类型</td></tr></thead><tbody></tbody></table>');
 			var closeMsgShower = $('<span style="display:block;width:28px;height:28px;line-height:28px;text-align:center;background:red;color:#fff;position:absolute;border-radius:14px;top:0;right:0;font-weight:normal;cursor:pointer;">X</span>');
@@ -182,54 +171,80 @@ function CreateRunHorse(param){
 		if(_messages.length != 0 ){
 			//消息中心内容填写
 //			$('#' + _displayPanelId).html('');
-			$('#' + _displayPanelId).find('tbody').html('');
+			$(_displayPanel).find('tbody').html('');
 			_messages.forEach(function(element, index){
 				var showWord = element.typeText + ':' + element.content + ',' + element.hour;
 				if(index == (_messages.length - 1)){
-					$('#' + _displayPanelId).find('tbody').prepend('<tr style="color:red;"><td style="height:36px;border:1px solid #666;">' + element.hour + '</td><td style="height:36px;border:1px solid #666;">' + element.content + '</td><td style="height:36px;border:1px solid #666;">' + element.typeText + '</td></tr>');
+					$(_displayPanel).find('tbody').prepend('<tr style="color:red;"><td style="height:36px;border:1px solid #666;">' + element.hour + '</td><td style="height:36px;border:1px solid #666;">' + element.content + '</td><td style="height:36px;border:1px solid #666;">' + element.typeText + '</td></tr>');
 //					$('#' + _displayPanelId).prepend('<p style="border-bottom:1px solid #ccc;width:95%;text-align:center;color:red;">' + showWord + '</p>');
 				}else{
-					$('#' + _displayPanelId).find('tbody').prepend('<tr><td style="height:36px;border:1px solid #666;">' + element.hour + '</td><td style="height:36px;border:1px solid #666;">' + element.content + '</td><td style="height:36px;border:1px solid #666;">' + element.typeText + '</td></tr>');
+					$(_displayPanel).find('tbody').prepend('<tr><td style="height:36px;border:1px solid #666;">' + element.hour + '</td><td style="height:36px;border:1px solid #666;">' + element.content + '</td><td style="height:36px;border:1px solid #666;">' + element.typeText + '</td></tr>');
 //					$('#' + _displayPanelId).prepend('<p style="border-bottom:1px solid #ccc;width:95%;text-align:center;">' + showWord + '</p>');
 				}
 			});		
 		}
 		
-		return $('#' + _displayPanelId);
+		return $(_displayPanel);
 	}
 	
 	
 	//语音播报
-	var session = new IFlyTtsSession({
-        'url' : 'http://webapi.openspeech.cn/',							
-        'interval' : '30000', 
-	      'disconnect_hint' : 'disconnect',
-	      'sub' : 'tts'
-   });
-
-	function play(content) {
-	
-		var appid = "568f230c";                             
-		var timestamp = new Date().toLocaleTimeString();                     
-		var expires = 60000;                          	
-		
-		var signature = faultylabs.MD5(appid + '&' + timestamp + '&' + expires + '&' + "3444ec156adf96e8");		
-		
-		var params = { "params" : "vcn = vixy, aue = speex-wb;7, ent = intp65, spd = 50, vol = 50, tte = utf8, caller.appid=" + appid + ",timestamp=" + timestamp + ",expires=" + expires, "signature" : signature, "gat" : "mp3"};	
-		session.start(params, content, function (err, obj){
-			if(err) {
-				alert("语音合成发生错误，错误代码 ：" + err);
-			} else {
-				if(_audio != null){
-					_audio.pause();
-				}
-				_audio = new Audio();
-				_audio.src = '';
-				_audio.play();
-				_audio.src = "http://webapi.openspeech.cn/" + obj.audio_url;
-				_audio.play();
-			}
+	var session = null;
+//	$.getScript('http://blog.faultylabs.com/files/md5.js').done(function(){
+//		$.getScript('http://webapi.openspeech.cn/socket.io/socket.io.js').done(function(){
+//			$.getScript('http://webapi.openspeech.cn/fingerprint.js').done(function(){
+//				$.getScript('http://webapi.openspeech.cn/tts.min.js').done(function(){
+//					session = new IFlyTtsSession({
+//				        'url' : 'http://webapi.openspeech.cn/',							
+//				        'interval' : '30000', 
+//					      'disconnect_hint' : 'disconnect',
+//					      'sub' : 'tts'
+//					});
+//				});
+//			});
+//		});
+//	});
+	$.getScript('http://blog.faultylabs.com/files/md5.js', function(){
+		$.getScript('http://webapi.openspeech.cn/socket.io/socket.io.js', function(){
+			$.getScript('http://webapi.openspeech.cn/fingerprint.js', function(){
+				$.getScript('http://webapi.openspeech.cn/tts.min.js', function(){
+					session = new IFlyTtsSession({
+				        'url' : 'http://webapi.openspeech.cn/',							
+				        'interval' : '30000', 
+					      'disconnect_hint' : 'disconnect',
+					      'sub' : 'tts'
+					});
+				});
+			});
 		});
+	});
+	//语音播报函数
+	function play(content) {
+		if(session){
+			var appid = "568f230c";                             
+			var timestamp = new Date().toLocaleTimeString();                     
+			var expires = 60000;                          	
+			
+			var signature = faultylabs.MD5(appid + '&' + timestamp + '&' + expires + '&' + "3444ec156adf96e8");		
+			
+			var params = { "params" : "vcn = vixy, aue = speex-wb;7, ent = intp65, spd = 50, vol = 50, tte = utf8, caller.appid=" + appid + ",timestamp=" + timestamp + ",expires=" + expires, "signature" : signature, "gat" : "mp3"};	
+			session.start(params, content, function (err, obj){
+				if(err) {
+					alert("语音合成发生错误，错误代码 ：" + err);
+				} else {
+					if(_audio != null){
+						_audio.pause();
+					}
+					_audio = new Audio();
+					_audio.src = '';
+					_audio.play();
+					_audio.src = "http://webapi.openspeech.cn/" + obj.audio_url;
+					_audio.play();
+				}
+			});
+		}else{
+			//TODO
+		}
 	};
 	
 	
@@ -246,8 +261,12 @@ function CreateRunHorse(param){
 	
 	this.close = function(afterClose, timeout){
 		
-		if(_containerId){
-			$('#' + _containerId).remove();
+		if(_container){
+			$(_container).remove();
+		}
+		if(_displayPanel){
+			$(_displayPanel).remove();
+			_displayPanel = null;
 		}
 		_messageSocket.close();
 	}
