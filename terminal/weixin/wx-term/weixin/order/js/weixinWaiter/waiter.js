@@ -50,7 +50,7 @@ $(function(){
 					initFoodList(data.root[0], false);
 					
 					//已经结账的账单处理
-					if(data.root[0].statusValue == 1){
+					if(data.root[0].statusValue !== 0){
 						$('#bottom_div_waiter').css({
 							'background' : 'rgb(228, 240, 245)',
 							'padding' : '4px 0'
