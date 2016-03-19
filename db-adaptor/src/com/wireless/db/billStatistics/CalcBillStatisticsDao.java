@@ -257,6 +257,44 @@ public class CalcBillStatisticsDao {
 			dbCon.disconnect();
 		}
 	}
+
+	/**
+	 * Calculate the customer amount according to extra condition
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the customer amount
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int calcCustomerAmount(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+		
+		String sql;
+		
+		//Get the total & amount to erase price
+		sql = " SELECT " +
+			  " SUM(custom_num) AS custom_amount " +
+			  " FROM " +
+			  Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
+			  " WHERE 1 = 1 " +
+			  (extraCond != null ? extraCond.toString() : "") +
+			  " AND restaurant_id = " + staff.getRestaurantId() +
+			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		int customAmount = 0;
+		if(dbCon.rs.next()){
+			customAmount = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
+		
+		return customAmount;
+	}
 	
 	/**
 	 * Calculate the erase price according to extra condition
@@ -1237,6 +1275,9 @@ public class CalcBillStatisticsDao {
 			
 			IncomeByEachDay income = new IncomeByEachDay(DateUtil.format(dateBegin, DateUtil.Pattern.DATE));
 			if(range != null){
+				
+				//Calculate the customer amount
+				income.setCustomerAmount(calcCustomerAmount(dbCon, staff, range, extraCond));
 				
 				//Calculate the general income
 				income.setIncomeByPay(calcIncomeByPayType(dbCon, staff, range, extraCond));

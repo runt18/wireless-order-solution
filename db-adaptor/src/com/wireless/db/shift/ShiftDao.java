@@ -248,6 +248,9 @@ public class ShiftDao {
 		
 		ShiftDetail result = new ShiftDetail(range);
 		
+		//Calculate the customer amount
+		result.setCustomerAmount(CalcBillStatisticsDao.calcCustomerAmount(dbCon, staff, range, extraCond));
+		
 		//Calculate the general income
 		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, range, extraCond));
 		
