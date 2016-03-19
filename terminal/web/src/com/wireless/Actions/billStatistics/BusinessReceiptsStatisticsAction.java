@@ -26,6 +26,7 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DataPaging;
 
 public class BusinessReceiptsStatisticsAction extends DispatchAction {
@@ -90,22 +91,35 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				jObject.setRoot(incomesByEachDay);
 			}
 			if(includingChart != null && !includingChart.isEmpty()){
-				List<String> xAxis = new ArrayList<String>();
-				List<Float> data = new ArrayList<Float>();
-				List<Integer> countList = new ArrayList<Integer>();
-				float totalMoney = 0, totalCount = 0;
+				final List<String> xAxis = new ArrayList<String>();
+				final List<Float> incomes = new ArrayList<Float>();
+				final List<Integer> orderAmounts = new ArrayList<Integer>();
+				final List<Integer> customerAmounts = new ArrayList<Integer>();
+				float totalMoney = 0, totalCount = 0; 
+				int totalCustomerAmount = 0;
 				int count = 0;
 				for (IncomeByEachDay e : incomesByEachDay) {
 					xAxis.add("\'" + e.getDate() + "\'");
-					data.add(e.getIncomeByPay().getTotalActual());
-					countList.add(e.getTotalAmount());
+					incomes.add(e.getIncomeByPay().getTotalActual());
+					orderAmounts.add(e.getTotalAmount());
+					customerAmounts.add(e.getCustomerAmount());
 					totalMoney += e.getIncomeByPay().getTotalActual();
 					totalCount += e.getTotalAmount();
+					totalCustomerAmount += e.getCustomerAmount();
 					count++ ;
 				}
 				
-				final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/count)*100)/100 + ", \"avgCount\" : " + Math.round((totalCount/count)*100)/100 + 
-									",\"ser\":[{\"name\":\'营业额\', \"data\" : " + data + "},{\"name\":\'账单数\', \"data\":" + countList + "}]}";
+				final String chartData = "{\"xAxis\":" + xAxis + 
+											",\"totalMoney\" : " + totalMoney + 
+											",\"avgMoney\" : " + NumericUtil.roundFloat((totalMoney/count)) + 
+											", \"avgCount\" : " + NumericUtil.roundFloat((totalCount/count)) +
+											", \"totalCustomer\" : " + totalCustomerAmount +
+											", \"avgCustomer\" : " + NumericUtil.roundFloat(totalCustomerAmount / count) +
+										 ",\"ser\":[" +
+											"{\"name\":\'营业额\', \"data\" : " + incomes + "}," +
+											"{\"name\":\'账单数\', \"data\":" + orderAmounts + "}," + 
+											"{\"name\":\'客流量\', \"data\":" + customerAmounts + "}" +
+										 "]}";
 				jObject.setExtra(new Jsonable(){
 					@Override
 					public JsonMap toJsonMap(int flag) {
