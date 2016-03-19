@@ -746,6 +746,7 @@ public class MemberDao {
 				  " FROM " + Params.dbName + ".member_favor_food MFF " +
 				  " JOIN " + Params.dbName + ".food F ON MFF.food_id = F.food_id " +
 				  " WHERE MFF.member_id = " + eachMember.getId() +
+				  " AND F.restaurant_id = " + staff.getRestaurantId() +
 				  " ORDER BY point DESC ";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
@@ -763,6 +764,7 @@ public class MemberDao {
 				  " FROM " + Params.dbName + ".member_recommend_food MRF " +
 				  " JOIN " + Params.dbName + ".food F ON MRF.food_id = F.food_id " +
 				  " WHERE MRF.member_id = " + eachMember.getId() +
+				  " AND F.restaurant_id = " + staff.getRestaurantId() +
 				  " ORDER BY point DESC ";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
