@@ -171,7 +171,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		if(!url.contains("?")){
 			s.append("?1=1");
 		}
-		return s.append("&session_id=" + session.getId()).toString();
+		return s.append("&sessionId=" + session.getId()).toString();
 	}
 	
 	private Msg createNavi(Msg msg){
@@ -287,7 +287,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 				}else{
 					//TODO 扫描带参二维码，进入微信店小二
 					final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
-					final WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId));
+					final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
+					final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
 					final String picUrl;
 					if(wxRestaurant.hasWeixinLogo()){
 						picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
@@ -295,11 +296,16 @@ public class WxHandleMessage extends HandleMessageAdapter {
 						picUrl = "";
 					}
 					
+					final int orderId = Integer.parseInt(msg.getEventKey().replace("qrscene_", ""));
 					HttpSession httpSession = request.getSession(true);
-					httpSession.setAttribute("fid", msg.getFromUserName());
-					httpSession.setAttribute("oid", msg.getToUserName());
+					httpSession.setAttribute("fid", msg.getToUserName());
+					httpSession.setAttribute("oid", msg.getFromUserName());
+					final int branchId = OrderDao.getById(staff, orderId, DateType.TODAY).getRestaurantId();
+					httpSession.setAttribute("branchId", Integer.toString(branchId));
 					httpSession.setMaxInactiveInterval(3600 * 2);	//2 hour
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("微信店小二", "点击去微信店小二，可自助浏览菜品信息，呼叫服务，自助下单", picUrl, createUrl4Session(WEIXIN_WAITER, httpSession))));
+					session.callback(new Msg4ImageText(msg).addItem(
+							new Data4Item("微信店小二", "点击去微信店小二，可自助浏览菜品信息，呼叫服务，自助下单", picUrl,
+										  createUrl4Session(WEIXIN_WAITER + "?orderId=" + orderId + "&branchId=" + branchId, httpSession))));
 				}				
 			}else if(msg.getEvent() == Event.UNSUBSCRIBE){
 				//会员取消关注
@@ -308,7 +314,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			}else if(msg.getEvent() == Event.SCAN){
 				//TODO 扫描带参二维码,进入微信店小二
 				final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
-				WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId));
+				final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
+				WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
 				final String picUrl;
 				if(wxRestaurant.hasWeixinLogo()){
 					picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
@@ -316,11 +323,17 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					picUrl = "";
 				}
 				
+				final int orderId = Integer.parseInt(msg.getEventKey());
 				HttpSession httpSession = request.getSession(true);
-				httpSession.setAttribute("fid", msg.getFromUserName());
-				httpSession.setAttribute("oid", msg.getToUserName());
+				httpSession.setAttribute("fid", msg.getToUserName());
+				httpSession.setAttribute("oid", msg.getFromUserName());
+				final int branchId = OrderDao.getById(staff, orderId, DateType.TODAY).getRestaurantId();
+				httpSession.setAttribute("branchId", Integer.toString(branchId));
 				httpSession.setMaxInactiveInterval(3600 * 2);	//2 hour
-				session.callback(new Msg4ImageText(msg).addItem(new Data4Item("微信店小二", "点击去微信店小二，可自助浏览菜品信息，呼叫服务，自助下单", picUrl, createUrl4Session(WEIXIN_WAITER, httpSession))));
+				session.callback(new Msg4ImageText(msg).addItem(
+						new Data4Item("微信店小二", "点击去微信店小二，可自助浏览菜品信息，呼叫服务，自助下单", 
+									  picUrl, 
+									  createUrl4Session(WEIXIN_WAITER + "?orderId=" + orderId + "&branchId=" + branchId, httpSession))));
 				
 			}else if(msg.getEvent() == Event.CLICK){
 				final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());

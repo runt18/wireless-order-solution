@@ -37,7 +37,7 @@ public class WxQueryFoodAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward star(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		final String branchId = request.getParameter("branchId");
+		String branchId = request.getParameter("branchId");
 		String fid = request.getParameter("fid");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
@@ -49,6 +49,7 @@ public class WxQueryFoodAction extends DispatchAction{
 				HttpSession session = SessionListener.sessions.get(sessionId);
 				if(session != null){
 					fid = (String)session.getAttribute("fid");
+					branchId = (String)session.getAttribute("branchId");
 				}else{
 					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
 				}
@@ -89,7 +90,7 @@ public class WxQueryFoodAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward favor(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		final String branchId = request.getParameter("branchId");
+		String branchId = request.getParameter("branchId");
 		String fid = request.getParameter("fid");
 		String oid = request.getParameter("oid");
 		final String start = request.getParameter("start");
@@ -103,6 +104,7 @@ public class WxQueryFoodAction extends DispatchAction{
 				if(session != null){
 					fid = (String) session.getAttribute("fid");
 					oid = (String) session.getAttribute("oid");
+					branchId = (String)session.getAttribute("branchId");
 				}else{
 					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
 				}
@@ -113,7 +115,8 @@ public class WxQueryFoodAction extends DispatchAction{
 				rid = Integer.parseInt(branchId);
 			}else{
 				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
-			}			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			}			
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			List<Food> result = MemberDao.getById(staff, WxMemberDao.getBySerial(staff, oid).getMemberId()).getFavorFoods();
 			
@@ -150,7 +153,7 @@ public class WxQueryFoodAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward recommend(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		final String branchId = request.getParameter("branchId");
+		String branchId = request.getParameter("branchId");
 		String fid = request.getParameter("fid");
 		String oid = request.getParameter("oid");
 		final String start = request.getParameter("start");
@@ -164,6 +167,7 @@ public class WxQueryFoodAction extends DispatchAction{
 				if(session != null){
 					fid = (String)session.getAttribute("fid");
 					oid = (String)session.getAttribute("oid");
+					branchId = (String)session.getAttribute("branchId");
 				}else{
 					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
 				}
@@ -215,7 +219,7 @@ public class WxQueryFoodAction extends DispatchAction{
 		final String isPaging = request.getParameter("isPaging");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
-		final String branchId = request.getParameter("branchId");
+		String branchId = request.getParameter("branchId");
 		String fid = request.getParameter("fid");
 		final String kitchenId = request.getParameter("kitchenId");
 		final String sessionId = request.getParameter("sessionId");
@@ -226,6 +230,7 @@ public class WxQueryFoodAction extends DispatchAction{
 				HttpSession session = SessionListener.sessions.get(sessionId);
 				if(session != null){
 					fid = (String)session.getAttribute("fid");
+					branchId = (String)session.getAttribute("branchId");
 				}else{
 					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
 				}

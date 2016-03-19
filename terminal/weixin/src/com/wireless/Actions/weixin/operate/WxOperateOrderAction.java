@@ -60,7 +60,7 @@ public class WxOperateOrderAction extends DispatchAction {
 		String fid = request.getParameter("fid");
 		final String wxOrderId = request.getParameter("wid");
 		final String tableAlias = request.getParameter("tableAlias");
-		final String branchId = request.getParameter("branchId");
+		String branchId = request.getParameter("branchId");
 		final String qrCode = request.getParameter("qrCode");		
 		final String sessionId = request.getParameter("sessionId");
 		final JObject jObject = new JObject();
@@ -70,6 +70,7 @@ public class WxOperateOrderAction extends DispatchAction {
 				HttpSession session = SessionListener.sessions.get(sessionId);
 				if(session != null){
 					fid = (String)session.getAttribute("fid");
+					branchId = (String)session.getAttribute("branchId");
 				}else{
 					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
 				}
@@ -149,7 +150,7 @@ public class WxOperateOrderAction extends DispatchAction {
 		response.setCharacterEncoding("UTF-8");
 		String oid = request.getParameter("oid");
 		String fid = request.getParameter("fid");
-		final String branchId = request.getParameter("branchId");
+		String branchId = request.getParameter("branchId");
 		final String foods = request.getParameter("foods");
 		final String tableAlias = request.getParameter("tableAlias");
 		final String comment = request.getParameter("comment");
@@ -163,6 +164,7 @@ public class WxOperateOrderAction extends DispatchAction {
 				if(session != null){
 					oid = (String)session.getAttribute("oid");
 					fid = (String)session.getAttribute("fid");
+					branchId = (String)session.getAttribute("branchId");
 				}else{
 					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
 				}
@@ -303,6 +305,7 @@ public class WxOperateOrderAction extends DispatchAction {
 	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String oid = request.getParameter("oid");
 		String fid = request.getParameter("fid");
+		String branchId = request.getParameter("branchId");
 		final String orderType = request.getParameter("type");
 		final String id = request.getParameter("id");
 		final String status = request.getParameter("status");
@@ -315,12 +318,19 @@ public class WxOperateOrderAction extends DispatchAction {
 				if(session != null){
 					oid = (String)session.getAttribute("oid");
 					fid = (String)session.getAttribute("fid");
+					branchId = (String)session.getAttribute("branchId");
 				}else{
 					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
 				}
 			}
 			
-			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId); 
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+			}
+			
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			final WxOrderDao.ExtraCond extraCond = new WxOrderDao.ExtraCond().setWeixin(oid);

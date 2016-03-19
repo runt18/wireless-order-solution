@@ -72,10 +72,9 @@ public class WxOperateWaiterAction extends DispatchAction{
 		try{
 			final HttpSession session = SessionListener.sessions.get(sessionId);
 			if(session != null){
-				final String fromId = (String)session.getAttribute("fid");
+				final String branchId = (String)session.getAttribute("branchId");
 				final String oid = (String)session.getAttribute("oid");
-				final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
-				final Staff staff = StaffDao.getAdminByRestaurant(rid);
+				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 				
 				final WxMember wxMember = WxMemberDao.getBySerial(staff, oid);
 				final Member member = MemberDao.getById(staff, wxMember.getMemberId());
@@ -125,9 +124,8 @@ public class WxOperateWaiterAction extends DispatchAction{
 		try{
 			final HttpSession session = SessionListener.sessions.get(sessionId);
 			if(session != null){
-				final String fromId = (String)session.getAttribute("fid");
-				final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
-				final Staff staff = StaffDao.getAdminByRestaurant(rid);
+				final String branchId = (String)session.getAttribute("branchId");
+				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 				jObject.setRoot(OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY));
 				
 			}else{

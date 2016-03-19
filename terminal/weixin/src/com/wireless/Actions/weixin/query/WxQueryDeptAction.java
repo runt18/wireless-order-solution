@@ -119,7 +119,7 @@ public class WxQueryDeptAction extends DispatchAction{
 	
 	public ActionForward kitchen(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		final String branchId = request.getParameter("branchId");
+		String branchId = request.getParameter("branchId");
 		String fid = request.getParameter("fid");
 		String oid = request.getParameter("oid");
 		final String sessionId = request.getParameter("sessionId");
@@ -132,6 +132,7 @@ public class WxQueryDeptAction extends DispatchAction{
 				if(session != null){
 					fid = (String)session.getAttribute("fid");
 					oid = (String)session.getAttribute("oid");
+					branchId = (String)session.getAttribute("branchId");
 				}else{
 					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
 				}
