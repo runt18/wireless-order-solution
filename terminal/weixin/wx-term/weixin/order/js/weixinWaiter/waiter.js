@@ -163,7 +163,8 @@ $(function(){
 						foods : foods,
 						comment : _commentData ? _commentData : '',
 						branchId : '',
-						tableAlias : fastFoodWaiterData.tableAlias
+						tableAlias : fastFoodWaiterData.tableAlias,
+						print : true
 					},
 					success : function(response, status, xhr){
 						if(response.success){
