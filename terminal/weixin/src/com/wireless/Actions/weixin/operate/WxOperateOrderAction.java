@@ -156,6 +156,7 @@ public class WxOperateOrderAction extends DispatchAction {
 		final String comment = request.getParameter("comment");
 		final String qrCode = request.getParameter("qrCode");
 		final String sessionId = request.getParameter("sessionId");
+		final String print = request.getParameter("print");
 		final JObject jObject = new JObject();
 		try{
 			
@@ -222,10 +223,20 @@ public class WxOperateOrderAction extends DispatchAction {
 			final WxOrder wxOrder = WxOrderDao.getById(staff, WxOrderDao.insert(staff, builder));
 			jObject.setExtra(wxOrder);
 			
+			if(print != null && !print.isEmpty() && Boolean.parseBoolean(print)){
+				//打印微信账单
+				ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildWxOrder(staff, wxOrder.getId()).build());
+				if(resp.header.type == Type.ACK){
+					jObject.initTip(true, "自助扫码下单成功(完成打印)");
+				}else{
+					jObject.initTip(true, "自助扫码下单成功");
+				}
+			}
+			
 			//web socket通知Touch微信下单
 	        WxWaiter waiter = WxWaiterServerPoint.getWxWaiter(staff.getRestaurantId());
 	        if(waiter != null){
-	        	waiter.send(new  WxWaiter.Msg4WxOrder(wxOrder));
+	        	waiter.send(new WxWaiter.Msg4WxOrder(wxOrder));
 	        }
 			
 		}catch(BusinessException | SQLException e){
