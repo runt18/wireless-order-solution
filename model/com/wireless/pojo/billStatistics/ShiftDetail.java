@@ -12,6 +12,8 @@ public class ShiftDetail implements Jsonable{
 	private final String onDuty;				//开始时间
 	private final String offDuty;				//结束时间
 	
+	private int customerAmount;					//客流量
+	
 	private IncomeByPay incomeByPay;	//各种收款方式数据
 	
 	private IncomeByDiscount incomeByDiscount;	//折扣数据
@@ -51,6 +53,14 @@ public class ShiftDetail implements Jsonable{
 	
 	public String getOffDuty() {
 		return offDuty;
+	}
+	
+	public int getCustomerAmount(){
+		return this.customerAmount;
+	}
+	
+	public void setCustomerAmount(int amount){
+		this.customerAmount = amount;
 	}
 	
 	public void setCouponUsage(CouponUsage usage){
@@ -349,6 +359,7 @@ public class ShiftDetail implements Jsonable{
 		jm.putFloat("totalActual", this.getTotalActual());
 		jm.putFloat("totalIncome", this.getTotalIncome());
 		jm.putInt("orderAmount", this.getOrderAmount());
+		jm.putInt("customerAmount", this.customerAmount);
 		
 		//各付款方式营收
 		jm.putJsonable(this.getIncomeByPay(), flag);

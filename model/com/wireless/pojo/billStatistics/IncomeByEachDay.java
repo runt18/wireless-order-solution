@@ -9,6 +9,7 @@ public class IncomeByEachDay implements Jsonable{
 
 	private final String date;
 	
+	private int customerAmount;
 	private IncomeByPay incomeByPay;
 	private IncomeByErase incomeByErase;
 	private IncomeByDiscount incomeByDiscount;
@@ -25,6 +26,14 @@ public class IncomeByEachDay implements Jsonable{
 	
 	public String getDate(){
 		return date;
+	}
+	
+	public void setCustomerAmount(int amount){
+		this.customerAmount = amount;
+	}
+	
+	public int getCustomerAmount(){
+		return this.customerAmount;
 	}
 	
 	public float getTotalActual(){
@@ -165,24 +174,9 @@ public class IncomeByEachDay implements Jsonable{
 		jm.putFloat("totalActual", this.incomeByPay == null ? 0 : this.incomeByPay.getTotalActual());
 		jm.putFloat("totalIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getTotalIncome());
 		jm.putInt("orderAmount", this.getTotalAmount());
+		jm.putInt("customerAmount", this.customerAmount);
 		
 		jm.putJsonable(this.getIncomeByPay(), flag);
-		
-		//FIXME
-//		jm.putFloat("cashIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getCashActual());
-//		jm.putInt("cashAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getCashAmount());
-//		
-//		jm.putFloat("creditCardIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardActual());
-//		jm.putInt("creditCardAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardAmount());
-//		
-//		jm.putFloat("hangIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getHangActual());
-//		jm.putInt("hangAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getHangAmount());
-//		
-//		jm.putFloat("signIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getSignActual());
-//		jm.putInt("signAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getSignAmount());
-//		
-//		jm.putFloat("memberActual", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardActual());
-//		jm.putInt("memberAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardAmount());
 		
 		jm.putFloat("discountIncome", this.getIncomeByDiscount().getTotalDiscount());
 		
@@ -196,22 +190,13 @@ public class IncomeByEachDay implements Jsonable{
 		
 		jm.putFloat("paidIncome", this.getIncomeByRepaid().getTotalRepaid());
 		
-//		if(flag > 0){
-			jm.putInt("paidAmount", this.getIncomeByRepaid().getRepaidAmount());
-			jm.putInt("eraseAmount", this.getIncomeByErase().getEraseAmount());
-			jm.putInt("couponAmount", this.getIncomeByCoupon().getCouponAmount());
-			jm.putInt("cancelAmount", this.getIncomeByCancel().getCancelAmount());
-			jm.putInt("giftAmount", this.getIncomeByGift().getGiftAmount());
-			jm.putInt("discountAmount", this.getIncomeByDiscount().getDiscountAmount());
-			//FIXME
-//			jm.putFloat("signIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getSignIncome());
-//			jm.putFloat("hangIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getHangIncome());
-//			jm.putFloat("creditCardIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardIncome());
-//			jm.putFloat("cashIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getCashIncome());
-//			jm.putFloat("memberIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardIncome());
-			jm.putFloat("totalActualCharge", this.getIncomeByCharge().getTotalActualCharge());
-			jm.putFloat("totalActualRefund", this.getIncomeByCharge().getTotalActualRefund());
-//		}
+		jm.putInt("eraseAmount", this.getIncomeByErase().getEraseAmount());
+		jm.putInt("couponAmount", this.getIncomeByCoupon().getCouponAmount());
+		jm.putInt("cancelAmount", this.getIncomeByCancel().getCancelAmount());
+		jm.putInt("giftAmount", this.getIncomeByGift().getGiftAmount());
+		jm.putInt("discountAmount", this.getIncomeByDiscount().getDiscountAmount());
+		jm.putFloat("totalActualCharge", this.getIncomeByCharge().getTotalActualCharge());
+		jm.putFloat("totalActualRefund", this.getIncomeByCharge().getTotalActualRefund());
 		return jm;
 	}
 
