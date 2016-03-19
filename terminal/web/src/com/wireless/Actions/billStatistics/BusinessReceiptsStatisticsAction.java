@@ -127,9 +127,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 		return null;
 	}
 	
-	public ActionForward chart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward chart(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String time = request.getParameter("time");
 		JObject jobject = new JObject();
 		Calendar c = Calendar.getInstance();
