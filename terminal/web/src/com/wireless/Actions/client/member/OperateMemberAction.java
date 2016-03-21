@@ -600,10 +600,7 @@ public class OperateMemberAction extends DispatchAction{
 			}
 			
 			jobject.initTip(true, "微信会员绑定成功");
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch(Exception e){
@@ -615,4 +612,31 @@ public class OperateMemberAction extends DispatchAction{
 		return null;
 	}	
 	
+	/**
+	 * 补打微信电子卡
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward patchWxCard(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		final JObject jobject = new JObject();
+		final String destMemberId = request.getParameter("memberId");
+		final String wxMemberId = request.getParameter("wxMemberId");
+		final String pin = (String)request.getAttribute("pin");
+
+		try{
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			MemberDao.patchWxCard(staff, Integer.parseInt(destMemberId), Integer.parseInt(wxMemberId));
+			jobject.initTip(true, "补打微信电子卡成功");
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 }
