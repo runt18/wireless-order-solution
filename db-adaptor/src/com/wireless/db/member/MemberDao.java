@@ -2239,6 +2239,70 @@ public class MemberDao {
 	}
 	
 	/**
+	 * patch the wx card to an exist member.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param destMemberId
+	 * 			the member attached to
+	 * @param wxMemberId
+	 * 			the id to wx member
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the destination member does NOT exist
+	 * 			<li>the weixin member does NOT exist
+	 */
+	public static void patchWxCard(Staff staff, int destMemberId, int wxMemberId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			patchWxCard(dbCon, staff, destMemberId, wxMemberId);
+			dbCon.conn.commit();
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * patch the wx card to an exist member.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param destMemberId
+	 * 			the member attached to
+	 * @param wxMemberId
+	 * 			the id to wx member
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the destination member does NOT exist
+	 * 			<li>the weixin member does NOT exist
+	 */
+	public static void patchWxCard(DBCon dbCon, Staff staff, int destMemberId, int wxMemberId) throws SQLException, BusinessException{
+		Member wxMember = getById(staff, wxMemberId);
+		
+		//Delete the wx member.
+		MemberDao.deleteById(staff, wxMember.getId());
+		
+		String sql;
+		//Associated the weixin member with the destination.  
+		sql = " UPDATE " + Params.dbName + ".weixin_member SET " + 
+			  " member_id = " + destMemberId +
+			  " ,status = " + WxMember.Status.BOUND.getVal() + 
+			  " ,bind_date = NOW() " +
+			  " WHERE weixin_card = " + wxMember.getWeixin().getCard();
+		
+		dbCon.stmt.executeUpdate(sql);
+	}
+	
+	/**
 	 * Calculate most favor foods to each member.
 	 * @return the result to calculate favor foods
 	 * @throws SQLException
