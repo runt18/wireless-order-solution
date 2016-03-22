@@ -45,7 +45,13 @@
 	    			</div>
 	    		</td>   
 	    		<td class="readMemberTd">微信会员卡:</td>
-	    		<td class="readMemberTdValue"><label id="weixinMemberCard_label_patchCard">----</label></td>     		   		
+	    		<td class="readMemberTdValue">
+	    			<label id="weixinMemberCard_label_patchCard">----</label>
+	    			<div id="setMemeberWxCard_div_patchCard" style="display:none;position:relative;">
+						<input type="text" placeholder="微信卡号" id="setMemberWxCard_input_patchCard" onkeypress="intOnly()"/>	    			
+	    				<a id="setMemeberWxCard_a_patchCard" data-role="button" class="numberInputStyle" style="width: 75px;height: 36px;line-height: 14px; position: absolute;top:-10px;left:102px;">读取</a>
+	    			</div>
+	    		</td>     		   		
 	    	</tr> 
 	    	<tr>
 	    		<td></td>
@@ -55,6 +61,30 @@
 	    		<td></td>
 	    		<td></td>
 	    	</tr>	    		    	
+	    </table>
+	    
+	    <table id="wxCardMessages_table_patchCard" style="border-top:1px solid #666;display:none;margin:0px 52px;padding-top:10px;">
+	    	<tr>
+	    		<td></td>
+	    		<td colspan="4" style="text-align:center;color:red;font-size:32px;">请确认微信卡号【<span id="wxCardIdContainer_span_patchCard"></span>】的信息</td>
+	    		<td></td>
+	    	</tr>
+	    	<tr>
+	    		<td class="readMemberTd">账户余额:</td>
+	    		<td class="readMemberTdValue" style="width:165px;"><label id="wxTotalBalance_label_patchCard">----</label></td>    	
+	    		<td class="readMemberTd">基础余额:</td>
+	    		<td class="readMemberTdValue" style="width:165px;"><label id="wxBaseBalance_label_patchCard">----</label></td>
+	    		<td class="readMemberTd">赠送余额:</td>
+	    		<td class="readMemberTdValue" style="width:150px;"><label id="wxExtraBalance_label_patchCard">----</label></td>       			
+	    	</tr>
+	    	<tr>
+	    		<td class="readMemberTd">会员名称:</td>
+	    		<td class="readMemberTdValue"><label id="wxMemberName_label_patchCard">----</label></td>
+	    		<td class="readMemberTd">会员类别:</td>
+	    		<td class="readMemberTdValue"><label id="wxMemberType_label_patchCard">----</label></td>   
+	    		<td class="readMemberTd">性别:</td>
+	    		<td class="readMemberTdValue"><label id="wxMemberSex_label_patchCard">----</label></td>     		   		
+	    	</tr>     		    	
 	    </table>
 		    
 		<div data-role="footer" data-theme="b" class="ui-corner-bottom ui-bar-b" style="height: 47px;">

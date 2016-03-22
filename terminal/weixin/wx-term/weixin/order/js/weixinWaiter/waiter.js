@@ -23,6 +23,18 @@ $(function(){
 			}
 		});
 		$.ajax({
+			url : '../../WxOperateRestaurant.do',
+			dataType : 'json',
+			type : 'post',
+			data : {
+				dataSource : 'detail',
+				branchId : Util.mp.params.branchId
+			},
+			success : function(data, status, xhr){
+				document.title = data.root[0].name;
+			}
+		});
+		$.ajax({
 			url : '../../WxOperateWaiter.do',
 			data : {
 				dataSource : 'getOrder',

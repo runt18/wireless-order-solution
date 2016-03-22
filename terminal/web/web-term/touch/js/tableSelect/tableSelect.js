@@ -894,6 +894,16 @@ $(function(){
 			},300);
 		});
 
+		//补发电子卡
+		$('#patchWxCard_a_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			setTimeout(function(){
+				var patchWxCardPopup = new PatchWxCardPopup();
+				patchWxCardPopup.open();
+			},300);
+		});
+		
+		
 		//转台
 		$('#tranTable_a_tableSelect').click(function(){
 			var askTablePopup = new AskTablePopup({

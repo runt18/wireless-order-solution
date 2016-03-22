@@ -113,12 +113,15 @@
 <script type="text/javascript" src="./js/popup/member/recharge.js?v=<%=v %>"></script>
 <!-- 补发实体卡 -->
 <script type="text/javascript" src="./js/popup/member/patchCard.js?v=<%= v %>"></script>
+<!-- 补发电子卡 -->
+<script type="text/javascript" src="./js/popup/member/patchWxCard.js?v=<%= v %>"></script>
 <!-- 打印机诊断 -->
 <script type="text/javascript" src="./js/popup/diagPrinter/diagPrinter.js?v=<%= v %>"></script>
 <!-- 消费明细 -->
 <script type="text/javascript" src="./js/popup/consumeDetail/consumeDetail.js?v=<%= v %>"></script>
 <!-- 跑马灯 -->
 <script type="text/javascript" src="./js/runHorse/runHorse.js"></script>
+<script type="text/javascript" src="./js/runHorse/sea.js"></script>
 <!-- 重连socket -->
 <script type="text/javascript" src="./js/socket/reconnecting-websocket.js"></script>
 
@@ -127,10 +130,7 @@
 	document.onselectstart = function(){
 		return false;	
 	} 
-	
-	$.getScript('http://blog.faultylabs.com/files/md5.js', function(data, status, xhr){
-		console.log('导入成功');
-	});
+
 </script>
 
 </head>
@@ -168,6 +168,7 @@
 			<!-- onclick="ts.member.openMemberConsumeDetailWin()" -->
 			<li class="popupButtonList" id="consumeDetail_a_tableSelect"><a >消费明细</a></li>
 			<li class="popupButtonList" id="patchCard_a_tableSelect"><a>补发实体卡</a></li>
+			<li class="popupButtonList" id="patchWxCard_a_tableSelect"><a>补发电子卡</a></li>
 			<li class="popupButtonList" id="memberWxBind_li_tableSelect"><a>微信会员绑定</a></li>
 			<li class="popupButtonList" id="fastIssue_a_tableSelect"><a >快速发券</a></li>
 			<li class="popupButtonList" id="fastUse_a_tableSelect"><a >快速用券</a></li>
