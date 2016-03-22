@@ -9,7 +9,7 @@ function PatchWxCardPopup(){
 	var keys = {
 		enter : 13
 	}
-
+	//TODO
 	_patchPopup = new JqmPopup({
 		loadUrl : './popup/member/patchCard.html',
 		pageInit : function(self){
