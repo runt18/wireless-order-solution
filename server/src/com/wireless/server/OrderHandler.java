@@ -7,9 +7,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
+import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import org.marker.weixin.api.BaseAPI;
@@ -55,6 +59,7 @@ import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.printScheme.PType;
+import com.wireless.pojo.printScheme.PrintFunc;
 import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
@@ -75,15 +80,15 @@ import com.wireless.sms.msg.Msg4Upgrade;
  */
 class OrderHandler implements Runnable{
 	
-	private Socket _conn = null;
+	private Socket _connection = null;
 	private int _timeout = 10000;	//default timeout is 10s
 	 
 	OrderHandler(Socket connection){
-		_conn = connection;
+		_connection = connection;
 	}	
 	
 	OrderHandler(Socket connection, int timeout){
-		_conn = connection;
+		_connection = connection;
 		_timeout = timeout;
 	}
 	
@@ -93,8 +98,8 @@ class OrderHandler implements Runnable{
 		InputStream in = null;
 		OutputStream out = null;
 		try{
-			in = new BufferedInputStream(new DataInputStream(_conn.getInputStream()));
-			out = new BufferedOutputStream(new DataOutputStream(_conn.getOutputStream()));
+			in = new BufferedInputStream(new DataInputStream(_connection.getInputStream()));
+			out = new BufferedOutputStream(new DataOutputStream(_connection.getOutputStream()));
 			
 			// Get the request from socket stream.
 			request.readFromStream(in, _timeout);
@@ -311,9 +316,9 @@ class OrderHandler implements Runnable{
 					out.close();
 					out = null;
 				}
-				if(_conn != null){
-					_conn.close();
-					_conn = null;
+				if(_connection != null){
+					_connection.close();
+					_connection = null;
 				}
 			}catch(IOException e){
 				System.err.println(e.toString());
@@ -367,29 +372,8 @@ class OrderHandler implements Runnable{
 																		     	  FoodDetailContent.DetailType.DELTA));
 		}
 		
-		final String host;
-		if(_conn.getLocalAddress().getHostAddress().equals("e-tones.net")){
-			host = "wx.e-tones.net";
-		}else{
-			host = _conn.getLocalAddress().getHostAddress();
-		}
-		final String port;
-		if(_conn.getLocalAddress().isAnyLocalAddress() || _conn.getLocalAddress().isLoopbackAddress()){
-			port = "8080";
-		}else{
-			port = "80";
-		}
 		//新下单时打印【微信店小二】
-		WirelessSocketServer.threadPool.execute(new Runnable(){
-			@Override
-			public void run() {
-				try {
-					BaseAPI.doGet("http://" + host + ":" + port + "/wx-term/WxOperateWaiter.do?dataSource=print&restaurantId=" + staff.getRestaurantId() + "&orderId=" + orderToInsert.getId());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		printWxWaiter(staff, orderToInsert, printers);
 		
 		if(orderToInsert.getCategory().isJoin()){
 			return new RespPackage(request.header).fillBody(orderToInsert.getDestTbl(), Table.TABLE_PARCELABLE_4_QUERY);
@@ -397,6 +381,55 @@ class OrderHandler implements Runnable{
 			return new RespACK(request.header).fillBody(new IntParcel(orderToInsert.getId()), 0);
 		}
 	}
+	
+	private void printWxWaiter(final Staff staff, final Order orderToInsert, List<Printer> printers){
+		//新下单时打印【微信店小二】
+		for(Printer printer : printers){
+			for(PrintFunc func : printer.getPrintFuncs()){
+				if(func.isTypeMatched(PType.PRINT_WX_WAITER)){
+					final String host;
+					if(localContains("192.168")){
+						host = null;
+					}else if(localContains("42.121.54.177")){
+						host = "ts.e-tones.net";
+					}else{
+						host = "wx.e-tones.net";
+					}
+					
+					if(host != null){
+						WirelessSocketServer.threadPool.execute(new Runnable(){
+							@Override
+							public void run() {
+								try {
+									BaseAPI.doGet("http://" + host + "/wx-term/WxOperateWaiter.do?dataSource=print&restaurantId=" + staff.getRestaurantId() + "&orderId=" + orderToInsert.getId());
+									//BaseAPI.doGet("http://ts.e-tones.net/wx-term/WxOperateWaiter.do?dataSource=print&restaurantId=" + staff.getRestaurantId() + "&orderId=" + orderToInsert.getId());
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						});
+					}
+					break;
+				}
+			}
+		}
+	}
+	
+	private boolean localContains(String host){
+        try {
+            Enumeration<NetworkInterface> b = NetworkInterface.getNetworkInterfaces();
+            while(b.hasMoreElements()){
+                for(InterfaceAddress f : b.nextElement().getInterfaceAddresses()){
+                    if(f.getAddress().getHostAddress().contains(host)){
+                    	return true;
+                    }
+                }
+            }
+            return false;
+        } catch (SocketException e) {
+            return false;
+        }
+    }
 	
 	private ProtocolPackage doInsertOrderForce(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		//handle insert order request force
