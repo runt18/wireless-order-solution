@@ -1,5 +1,6 @@
 package com.wireless.Actions.billStatistics;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.PaymentGeneral;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 
 public class PaymentStatisticsAction extends DispatchAction{
@@ -29,21 +31,17 @@ public class PaymentStatisticsAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward today(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward today(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		JObject jobject = new JObject();
-		List<PaymentGeneral> list = null;
+		final JObject jObject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
 		try{
-			String pin = (String)request.getAttribute("pin");
-			list = PaymentDao.getToday(StaffDao.verify(Integer.parseInt(pin)));
-		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.setRoot(PaymentDao.getToday(StaffDao.verify(Integer.parseInt(pin))));
+		}catch(BusinessException | SQLException e){
+			jObject.initTip(e);
 			e.printStackTrace();
 		}finally{
-			jobject.setRoot(list);
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -59,34 +57,40 @@ public class PaymentStatisticsAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward history(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward history(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		final JObject jObject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String onDuty = request.getParameter("onDuty");
+		final String offDuty = request.getParameter("offDuty");
+		final String branchId = request.getParameter("branchId");
+		final String isPaging = request.getParameter("isPaging");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
 		
-		JObject jobject = new JObject();
-		List<PaymentGeneral> list = null;
-		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String onDuty = request.getParameter("onDuty");
-			String offDuty = request.getParameter("offDuty");
-			list = PaymentDao.getHistory(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty));
 			
-		}catch(BusinessException e){	
+			final Staff staff;
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}else{
+				staff = StaffDao.verify(Integer.parseInt(pin));
+			}
+			
+			final List<PaymentGeneral> list = PaymentDao.getHistory(staff, new DutyRange(onDuty, offDuty));
+			if(list != null){
+				jObject.setTotalProperty(list.size());
+				jObject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
+			}
+		}catch(BusinessException | SQLException e){	
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			if(list != null){
-				jobject.setTotalProperty(list.size());
-				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
-			}
-			response.getWriter().print(jobject.toString());
+
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
