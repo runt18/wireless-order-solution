@@ -20,6 +20,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.PaymentGeneral;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
 import com.wireless.pojo.billStatistics.ShiftGeneral.StaffPayment;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
@@ -36,27 +37,18 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward today(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward today(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		final String pin = (String)request.getAttribute("pin");
 		
-		JObject jobject = new JObject();
-		List<ShiftGeneral> list = null;
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			list = ShiftGeneralDao.getTodayShift(StaffDao.verify(Integer.parseInt(pin)));
-		}catch(BusinessException e){
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
+			jObject.setRoot(ShiftGeneralDao.getTodayShift(StaffDao.verify(Integer.parseInt(pin))));
+		}catch(BusinessException | SQLException e){
+			jObject.initTip(e);
 			e.printStackTrace();
-			
-		}catch(SQLException e){
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
-			e.printStackTrace();
-			
 		}finally{
-			jobject.setRoot(list);
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -157,34 +149,36 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward history(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward history(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		final JObject jObject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String isPaging = request.getParameter("isPaging");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String branchId = request.getParameter("branchId");
+		final String onDuty = request.getParameter("onDuty");
+		final String offDuty = request.getParameter("offDuty");
 		
-		JObject jobject = new JObject();
-		List<ShiftGeneral> list = null;
-		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String onDuty = request.getParameter("onDuty");
-			String offDuty = request.getParameter("offDuty");
-			list = ShiftGeneralDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), new ExtraCond(DateType.HISTORY).setRange(new DutyRange(onDuty, offDuty)));
-			
-		}catch(BusinessException e){	
-			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
-		}catch(SQLException e){
-			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
-		}finally{
-			if(list != null){
-				jobject.setTotalProperty(list.size());
-				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
+			final Staff staff;
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}else{
+				staff = StaffDao.verify(Integer.parseInt(pin));
 			}
-			response.getWriter().print(jobject.toString());
+			
+			final List<ShiftGeneral> list = ShiftGeneralDao.getByRange(staff, new ExtraCond(DateType.HISTORY).setRange(new DutyRange(onDuty, offDuty)));
+			if(list != null){
+				jObject.setTotalProperty(list.size());
+				jObject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
+			}
+			
+		}catch(BusinessException | SQLException e){	
+			e.printStackTrace();
+			jObject.initTip(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
