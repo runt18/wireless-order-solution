@@ -1374,6 +1374,54 @@ Ext.onReady(function() {
 				}
 			}
 		});
+		
+		var branchSelect_combo_dutyRange = new Ext.form.ComboBox({
+			id : 'branchSelect_combo_dutyRange',
+			readOnly : false,
+			forceSelection : true,
+			width : 113,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [[-1, '全部']];
+			
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+						
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+							thiz.fireEvent('select');
+						}
+					});	
+				}
+			}
+		});
+		
 		var dateCombo = Ext.ux.createDateCombo({
 			beginDate : beginDate,
 			endDate : endDate,
@@ -1392,6 +1440,12 @@ Ext.onReady(function() {
 				xtype:'tbtext',
 				text:'&nbsp;至&nbsp;'
 			}, endDate, {
+				xtype : 'tbtext',
+				text : '&nbsp;'
+			}, {
+				xtype : 'tbtext',
+				text : '门店选择:'
+			}, branchSelect_combo_dutyRange, {
 				xtype:'tbtext',
 				text:'&nbsp;'
 			}, '->', {
@@ -1405,6 +1459,7 @@ Ext.onReady(function() {
 					var gs = dutyRangeStatPanel.getStore();
 					gs.baseParams['onDuty'] = Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00');
 					gs.baseParams['offDuty'] = Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59');
+					gs.baseParams['branchId'] = Ext.getCmp('branchSelect_combo_dutyRange').getValue();
 					gs.load({
 						params : {
 							start : 0,
@@ -1630,6 +1685,54 @@ Ext.onReady(function() {
 				}
 			}
 		});
+		
+		var branchSelect_combo_dailtSettle = new Ext.form.ComboBox({
+			id : 'branchSelect_combo_dailtSettle',
+			readOnly : false,
+			forceSelection : true,
+			width : 113,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [[-1, '全部']];
+					
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getByCond',
+							id : restaurantID
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							if(jr.root[0].typeVal != '2'){
+								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							}else{
+								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								 
+								for(var i = 0; i < jr.root[0].branches.length; i++){
+									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
+								}
+							}
+							
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+							thiz.fireEvent('select');
+						}
+					});
+				}
+			}
+		});
+		
 		var dateCombo = Ext.ux.createDateCombo({
 			beginDate : onDuty,
 			endDate : offDuty,
@@ -1649,7 +1752,13 @@ Ext.onReady(function() {
 			},onDuty, {
 				xtype : 'tbtext',
 				text : '&nbsp;至&nbsp;'
-			}, offDuty, '->', {
+			}, offDuty, {
+				xtype : 'tbtext',
+				text : '&nbsp;'
+			}, {
+				xtype : 'tbtext',
+				text : '门店选择'
+			}, branchSelect_combo_dailtSettle, '->', {
 				text : '搜索',
 				id : 'btnSearchBydDilySettleStatGrid',
 				iconCls : 'btn_search',
@@ -1660,6 +1769,7 @@ Ext.onReady(function() {
 					var gs = dailySettleStatGrid.getStore();
 					gs.baseParams['onDuty'] = Ext.util.Format.date(onDuty.getValue(), 'Y-m-d 00:00:00');
 					gs.baseParams['offDuty'] = Ext.util.Format.date(offDuty.getValue(), 'Y-m-d 23:59:59');
+					gs.baseParams['branchId'] = Ext.getCmp('branchSelect_combo_dailtSettle').getValue();
 					gs.load({
 						params : {
 							start : 0,

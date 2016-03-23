@@ -161,11 +161,10 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 		final String offDuty = request.getParameter("offDuty");
 		
 		try{
-			final Staff staff;
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
 			if(branchId != null && !branchId.isEmpty()){
 				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-			}else{
-				staff = StaffDao.verify(Integer.parseInt(pin));
 			}
 			
 			final List<ShiftGeneral> list = ShiftGeneralDao.getByRange(staff, new ExtraCond(DateType.HISTORY).setRange(new DutyRange(onDuty, offDuty)));
