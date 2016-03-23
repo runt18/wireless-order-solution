@@ -52,6 +52,7 @@ $(function(){
 			type : 'post',
 			dataType : 'json',
 			success : function(data, status, xhr){
+				console.log(data);
 				if(data.success){
 					fastFoodWaiterData._tableAlias = data.root[0].tableAlias;
 					///赋值账单号
@@ -66,32 +67,43 @@ $(function(){
 					//赋值给开台人
 					$('#openTablePeople_font_waiter').text(data.root[0].waiter);
 					
-					//赋值会员价金额
-					$('#actualPrice_span_waiter').text(data.root[0].actualPrice);
-					
-					//赋值折扣金额
-					$('#discountPrice_span_waiter').text(data.root[0].discountPrice);
-					
 					//赋值原价
 					$('#actualPriceBeforeDiscount_span_waiter').text(data.root[0].actualPriceBeforeDiscount);
 					
 					
 					//读取账单会员数据
-					$.ajax({
-						url : '../../WXOperateMember.do',
-						type : 'post',
-						dataType : 'json',
-						data : {
-							dataSource : 'getByCond',
-							sessionId : Util.mp.params.sessionId,
-							memberId : data.root[0].memberId
-						},
-						success : function(data, status, xhr){
-							$('#memberName_span_waiter').text(data.root[0].name);
-						}
-					});
+					if(data.root[0].memberId != 0){
+						$.ajax({
+							url : '../../WXOperateMember.do',
+							type : 'post',
+							dataType : 'json',
+							data : {
+								dataSource : 'getByCond',
+								sessionId : Util.mp.params.sessionId,
+								memberId : data.root[0].memberId
+							},
+							success : function(data, status, xhr){
+								
+								$('#memberName_span_waiter').text(data.root[0].name);
+							}
+						});
+						
+						//赋值会员价金额
+						$('#actualPrice_span_waiter').text(data.root[0].actualPrice + '元');
+						
+						//赋值折扣金额
+						$('#discountPrice_span_waiter').text(data.root[0].discountPrice + '元');
 					
-					$('memberName_span_waiter').text();
+					}else{
+						
+						$('#memberName_span_waiter').text('——');
+						
+						//赋值会员价金额
+						$('#actualPrice_span_waiter').text(data.root[0].actualPrice + '元');
+						
+						//赋值折扣金额
+						$('#discountPrice_span_waiter').text(data.root[0].discountPrice + '元');
+					}
 					
 					//加载菜品数据
 					initFoodList(data.root[0], false);
@@ -254,7 +266,7 @@ $(function(){
 		});
 	});
 	
-	
+	//TODO
 	//返回按钮
 	$('#closeFastFood_a_waiter').click(function(){
 		orderFoodPopup.close(function(){
