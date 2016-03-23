@@ -70,11 +70,10 @@ public class PaymentStatisticsAction extends DispatchAction{
 		
 		try{
 			
-			final Staff staff;
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
 			if(branchId != null && !branchId.isEmpty()){
 				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-			}else{
-				staff = StaffDao.verify(Integer.parseInt(pin));
 			}
 			
 			final List<PaymentGeneral> list = PaymentDao.getHistory(staff, new DutyRange(onDuty, offDuty));

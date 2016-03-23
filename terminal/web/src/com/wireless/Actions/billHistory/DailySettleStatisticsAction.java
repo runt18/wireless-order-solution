@@ -1,5 +1,6 @@
 package com.wireless.Actions.billHistory;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,41 +16,43 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 
 public class DailySettleStatisticsAction extends Action {
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		JObject jobject = new JObject();
-		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
+		final JObject jObject = new JObject();
 		
-		List<ShiftGeneral> list = null;
+		final String pin = (String)request.getAttribute("pin");
+		final String isPaging = request.getParameter("isPaging");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String branchId = request.getParameter("branchId");
 		
 		try{
 			
-			String pin = (String)request.getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
-			list = DailyGeneralDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty);
-			
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
-			
-		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip4Exception(e);
-		}finally{
+			List<ShiftGeneral> list = DailyGeneralDao.getByRange(staff, onDuty, offDuty);
 			if(list != null){
-				jobject.setTotalProperty(list.size());
-				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
+				jObject.setTotalProperty(list.size());
+				jObject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
 			}
-			response.getWriter().print(jobject.toString());
+			
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+			
+		}finally{
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;
