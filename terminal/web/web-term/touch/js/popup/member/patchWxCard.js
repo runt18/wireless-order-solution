@@ -211,6 +211,7 @@ function PatchWxCardPopup(){
 		self.find('[id=weixinMemberCard_label_patchCard]').text(member.weixinCard);		
 		
 		if(member.weixinCard != ''){
+			self.find('#tipsWxCard_td_patchCard').text('(已有电子卡)');
 			self.find('[id=weixinMemberCard_label_patchCard]').css('display', 'block');
 			self.find('[id=setMemeberWxCard_div_patchCard]').css('display', 'none');
 		}else{
