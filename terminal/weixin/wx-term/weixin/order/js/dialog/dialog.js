@@ -3,17 +3,17 @@ function DialogPopup(param){
 	var _self = this;
 	var _dialogDiv = null;
 	param = param || {
-		titleText : null,      //标题内容
-		titleClass : null,     //标题样式
-		content : null,       //内容
-		contentCallback : function(){},   //内容的回调
-		leftText : null,      //左边按钮文字
-		leftClass : null,     //左边按钮的样式
-		left : function(_dialogDiv){},  //左边按钮的方法
-		rightText : null,	  //右边按钮文字
-		rightClass : null,    //右边按钮的样式
-		right : function(_dialogDiv){},  //右边按钮的方法
-		afterClose : function(){}    //点击阴影和关闭的回调函数
+		titleText : null,      				//标题内容
+		titleClass : null,     				//标题样式
+		content : null,       				//内容
+		contentCallback : function(){},   	//内容的回调
+		leftText : null,      				//左边按钮文字
+		leftClass : null,     				//左边按钮的样式
+		left : function(_dialogDiv){},  	//左边按钮的方法
+		rightText : null,	  				//右边按钮文字
+		rightClass : null,    				//右边按钮的样式
+		right : function(_dialogDiv){},  	//右边按钮的方法
+		afterClose : function(){}   		//点击阴影和关闭的回调函数
 	}
 	
 	
@@ -44,9 +44,6 @@ function DialogPopup(param){
 		//点击shadow关闭
 		_dialogDiv.click(function(){
 			_self.close();
-			if(param.afterClose){
-				param.afterClose();
-			}
 		});
 		
 		_dialogDiv.find('.dialog-dialogPopup').click(function(e){
@@ -57,9 +54,6 @@ function DialogPopup(param){
 		//右上角的关闭按钮
 		_dialogDiv.find('[data-type="dialogClose_div_dialogPopup"]').click(function(){
 			_self.close();
-			if(param.afterClose){
-				param.afterClose();
-			}
 		})
 		
 		//contentdMember
@@ -117,6 +111,10 @@ function DialogPopup(param){
 			}else{
 				afterClose();
 			}
+			
+		}else if(param.afterClose && typeof param.afterClose == 'function'){
+			param.afterClose();
+			
 		}
 	};
 	

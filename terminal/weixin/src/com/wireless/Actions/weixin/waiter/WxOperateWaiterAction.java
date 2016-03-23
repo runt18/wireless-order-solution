@@ -32,6 +32,7 @@ import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.orderMgr.PayOrder;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
@@ -126,7 +127,8 @@ public class WxOperateWaiterAction extends DispatchAction{
 			if(session != null){
 				final String branchId = (String)session.getAttribute("branchId");
 				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-				jObject.setRoot(OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY));
+				//jObject.setRoot(OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY));
+				jObject.setRoot(PayOrder.calc(staff, Order.PayBuilder.build4Normal(Integer.parseInt(orderId))));
 				
 			}else{
 				throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);

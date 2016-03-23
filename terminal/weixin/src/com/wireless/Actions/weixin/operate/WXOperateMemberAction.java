@@ -56,6 +56,7 @@ public class WXOperateMemberAction extends DispatchAction {
 		String fromId = request.getParameter("fid");
 		String branchId = request.getParameter("branchId");
 		final String sessionId = request.getParameter("sessionId");
+		final String memberId = request.getParameter("memberId");
 		try{
 			
 			if(sessionId != null && !sessionId.isEmpty()){
@@ -78,7 +79,14 @@ public class WXOperateMemberAction extends DispatchAction {
 			
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
-			List<Member> result = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setWeixinSerial(openId), null);
+			final MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
+			if(memberId != null && !memberId.isEmpty()){
+				extraCond.setId(Integer.parseInt(memberId));
+			}else{
+				extraCond.setWeixinSerial(openId);
+			}
+			
+			List<Member> result = MemberDao.getByCond(staff, extraCond, null);
 			if(result.isEmpty()){
 				throw new BusinessException("对不起，没有找到此会员", MemberError.MEMBER_NOT_EXIST);
 			}else{
