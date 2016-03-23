@@ -258,12 +258,12 @@ public class ReceiptContent extends ConcreteContent {
 	 */
 	private String buildTotalPrice(boolean isTempReceipt){
 		
-		StringBuilder line1 = new StringBuilder();
-		line1.append("应收：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.calcPriceBeforeDiscount()))
+		final StringBuilder line1 = new StringBuilder();
+		line1.append("原价：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.calcPureTotalPrice()))
 			 .append("  ")
-			 .append("赠送：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.calcGiftPrice()));
+			 .append("应收：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.calcPriceBeforeDiscount()));
 	
-		StringBuilder line2 = new StringBuilder();
+		final StringBuilder line2 = new StringBuilder();
 		if(mOrder.getPaymentType().isCash() && !isTempReceipt && mOrder.getReceivedCash() != 0){
 			float chargeMoney = NumericUtil.roundFloat(mOrder.getReceivedCash() - mOrder.getActualPrice());
 			
@@ -273,28 +273,30 @@ public class ReceiptContent extends ConcreteContent {
 			
 		}
 
-		StringBuilder line3 = new StringBuilder();
-		if(mOrder.calcDiscountPrice() != 0){
-			line3.append("折扣：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.calcDiscountPrice()));
-		}
+		final StringBuilder line3 = new StringBuilder();
+		line3.append("折扣：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.calcDiscountPrice()))
+			 .append("  ")
+			 .append("赠送：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.calcGiftPrice()));
 		
+		final StringBuilder line4 = new StringBuilder();
 		if(mOrder.getErasePrice() > 0){
-			if(line3.length() > 0){
-				line3.append("  ");
+			if(line4.length() > 0){
+				line4.append("  ");
 			}
-			line3.append("抹数：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getErasePrice()));
+			line4.append("抹数：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getErasePrice()));
 		}
 		if(mOrder.hasUsedCoupon()){
-			if(line3.length() > 0){
-				line3.append("  ");
+			if(line4.length() > 0){
+				line4.append("  ");
 			}
-			line3.append(mOrder.getCouponPrice() > 0 ? "优惠券：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getCouponPrice()) : "");
+			line4.append(mOrder.getCouponPrice() > 0 ? "优惠券：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getCouponPrice()) : "");
 		}
 		
 		
 		String var = new RightAlignedDecorator(line1.toString(), mStyle).toString() +
 					 (line2.length() != 0 ? SEP + new RightAlignedDecorator(line2.toString(), mStyle) : "").toString() +
-					 (line3.length() != 0 ? SEP + new RightAlignedDecorator(line3.toString(), mStyle) : "").toString();
+					 (line3.length() != 0 ? SEP + new RightAlignedDecorator(line3.toString(), mStyle) : "").toString() +
+		 			 (line4.length() != 0 ? SEP + new RightAlignedDecorator(line4.toString(), mStyle) : "").toString();
 		
 		try{
 			var = new String(var.getBytes("GBK"), "GBK");
