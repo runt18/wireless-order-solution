@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -23,9 +24,12 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.MemberError;
+import com.wireless.exception.WxRestaurantError;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.listener.SessionListener;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.WxMember;
@@ -47,26 +51,45 @@ public class WXOperateMemberAction extends DispatchAction {
 	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		String openId = request.getParameter("oid");
 		String fromId = request.getParameter("fid");
+		String branchId = request.getParameter("branchId");
+		final String sessionId = request.getParameter("sessionId");
 		try{
-
-			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
+			
+			if(sessionId != null && !sessionId.isEmpty()){
+				HttpSession session = SessionListener.sessions.get(sessionId);
+				if(session != null){
+					openId = (String)session.getAttribute("oid");
+					fromId = (String)session.getAttribute("fid");
+					branchId = (String)session.getAttribute("branchId");
+				}else{
+					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+				}
+			}
+			
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
+			}
+			
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			List<Member> result = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setWeixinSerial(openId), null);
 			if(result.isEmpty()){
-				throw new BusinessException("对不起，没有找到此会员");
+				throw new BusinessException("对不起，没有找到此会员", MemberError.MEMBER_NOT_EXIST);
 			}else{
-				jobject.setRoot(MemberDao.getById(staff, result.get(0).getId()));
+				jObject.setRoot(MemberDao.getById(staff, result.get(0).getId()));
 			}
 			
 		}catch(SQLException | BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -158,7 +181,7 @@ public class WXOperateMemberAction extends DispatchAction {
 	
 	
 	/**
-	 * 
+	 * 完善会员资料
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -170,17 +193,35 @@ public class WXOperateMemberAction extends DispatchAction {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		
-		final String openId = request.getParameter("oid");
-		final String fromId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
+		String fromId = request.getParameter("fid");
+		String branchId = request.getParameter("branchId");
 		final String mobile = request.getParameter("mobile");
 		final String name = request.getParameter("name");
 		final String birthday = request.getParameter("birthday");
 		final String age = request.getParameter("age");
 		final String sex = request.getParameter("sex");				
-		
-		final JObject jobject = new JObject();
+		final String sessionId = request.getParameter("sessionId");
+		final JObject jObject = new JObject();
 		try{
-			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
+			if(sessionId != null && !sessionId.isEmpty()){
+				HttpSession session = SessionListener.sessions.get(sessionId);
+				if(session != null){
+					openId = (String)session.getAttribute("oid");
+					fromId = (String)session.getAttribute("fid");
+					branchId = (String)session.getAttribute("branchId");
+				}else{
+					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+				}
+			}
+			
+			final int rid;
+			if(branchId != null && !branchId.isEmpty()){
+				rid = Integer.parseInt(branchId);
+			}else{
+				rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
+			}
+			
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			final WxMember.BindBuilder builder = new WxMember.BindBuilder(openId, mobile);
@@ -205,10 +246,10 @@ public class WXOperateMemberAction extends DispatchAction {
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
