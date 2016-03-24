@@ -413,7 +413,7 @@ $(function(){
 				sessionId : Util.mp.params.sessionId,
 				foods : foods,
 				comment : fastFoodWaiterData._commentData ? fastFoodWaiterData._commentData : '',
-				branchId : '',
+				branchId : Util.mp.params.branchId,
 				tableAlias : fastFoodWaiterData._tableAlias,
 				print : true
 			},

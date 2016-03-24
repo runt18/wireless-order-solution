@@ -162,7 +162,8 @@ function CreateRunHorse(param){
 				'overflow-y' : 'scroll',
 				'border' : '3px soild #000',
 				'position' : 'absolute',
-				'box-shadow' : '4px 4px 21px #000'
+				'box-shadow' : '4px 4px 21px #000',
+				'z-index' : '2'
 			});
 			_displayPanel = msgManagerContainer;
 			//消息显示栏
