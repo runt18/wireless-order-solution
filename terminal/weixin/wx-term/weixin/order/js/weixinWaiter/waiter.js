@@ -283,10 +283,19 @@ $(function(){
 	});
 	
 	//为我评价功能
-//	$('#reviewService_a_waiter').click(function(){
+	$('#reviewService_a_waiter').click(function(){
 //		var completeMemberDialog = new CompleteMemberMsg();
 //		completeMemberDialog.open();
-//	});
+		var remindDialog = new DialogPopup({
+			leftText : '确定',
+			left : function(){
+				remindDialog.close();
+			},
+			content : '<span style="display: block;text-align: center;font-size: 22px;font-weight: bold;color:#666;">尽请期待...<span>',
+			titleText : '温磬提示'
+		});
+		remindDialog.open();
+	});
 	
 	//呼叫结账按钮
 	$('#callPay_li_waiter').click(function(){

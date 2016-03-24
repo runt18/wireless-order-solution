@@ -6,7 +6,7 @@ function CompleteMemberMsg(param){
 	var completeMemberDialog = new DialogPopup({
 
 		titleText : '请完善会员资料',
-		content : '<div style="width: 100%;">'
+		content : '<div style="width: 100%;" data-fix="container">'
 					+'<ul class="m-b-list">'
 						+'<li class="none-line" style="line-height: 50px;padding-top: 10px;">'
 							+'手机号码: <input data-type="mobileNum_input_member" style="font-size: 20px;padding: 3px 5px 3px 5px;width: 120px;"  type="tel"  maxlength="11"/>'			
@@ -34,7 +34,7 @@ function CompleteMemberMsg(param){
 								+'</select>'			
 						+'</li>'
 						+'<li class="none-line" style="line-height: 50px;">'
-								+'会员生日: <input data-type="birthdayMonth_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:45px;">月'
+								+'会员生日: <input data-type="birthdayMonth_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:45px;" data-fix="input">月'
 							+'<input data-type="birthdayDay_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:45px;">日'
 						+'</li>'
 					+'</ul>'	
@@ -185,10 +185,13 @@ function CompleteMemberMsg(param){
 					}
 				});
 			}
-		}
+		},
+		
+		dismissible : true
 	
 	});
 	
+
 	this.open = function(){
 		completeMemberDialog.open();
 	};

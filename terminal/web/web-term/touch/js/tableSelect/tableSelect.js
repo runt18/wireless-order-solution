@@ -54,6 +54,7 @@ $(function(){
 	//建立跑马灯   只有在pos端的情况下才创建
 	if(WirelessOrder.systemStatus.isPos()){ 
 		runHorseDiv = new CreateRunHorse();
+		runHorseDiv.open();
 	}
 	
 	//退出餐台选择界面
@@ -70,7 +71,7 @@ $(function(){
 	$('#tableSelectMgr').on('pagebeforehide', function(){
 		//关闭跑马灯
 		if(runHorseDiv){
-			runHorseDiv.close();
+			runHorseDiv.toHide();
 		}
 	});
 	
@@ -144,7 +145,7 @@ $(function(){
 		
 		//显示跑马灯
 		if(runHorseDiv){
-			runHorseDiv.open();	
+			runHorseDiv.toShow();	
 		}
 		
 	});
@@ -760,11 +761,14 @@ $(function(){
 		});
 		
 		
-		
+		//TODO
 		//打印机诊断
 		$('#diagPrinter_a_tableSelect').click(function(){
-			var diagPrinterPopup = new DiagPrinterPopup();
-			diagPrinterPopup.open();
+//			var diagPrinterPopup = new DiagPrinterPopup();
+//			diagPrinterPopup.open();
+			if(runHorseDiv){
+				runHorseDiv.toHide();
+			}
 		});
 		
 		
@@ -1016,6 +1020,9 @@ $(function(){
 					//location.reload();
 				}
 			});	
+			if(runHorseDiv){
+				runHorseDiv.close();
+			}
 		});
 		
 		

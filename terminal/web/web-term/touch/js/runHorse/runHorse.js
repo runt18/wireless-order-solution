@@ -24,6 +24,8 @@ function CreateRunHorse(param){
 	var _displayPanel = null;
 	//语音播报对象
 	var _audio = null;
+	//判断控件是否隐藏
+	var isHide = false;
 	
 	var _self = this;
 	
@@ -72,6 +74,12 @@ function CreateRunHorse(param){
 						}
 						showActiveMsg();
 						
+						if(isHide){
+							$(_container).css('display', 'none');
+						}else{
+							$(_container).css('display', 'block');
+						}
+						
 						//语音播报
 						play(_activeMsg.content);
 					}
@@ -93,7 +101,6 @@ function CreateRunHorse(param){
 		});
 		
 	}
-	
 	
 	//渲染跑马灯样式及提示新的信息
 	function showActiveMsg(){
@@ -132,6 +139,9 @@ function CreateRunHorse(param){
 		//开关消息中心
 		container.click(function(){
 			msgManagerShower().slideToggle();
+			setTimeout(function(){
+				runHorseShower.html('');
+			}, 2000);
 		});
 	}
 	
@@ -244,6 +254,7 @@ function CreateRunHorse(param){
 			});
 		}else{
 			//TODO
+			console.log('语音播报文件还没导入');
 		}
 	};
 	
@@ -271,5 +282,14 @@ function CreateRunHorse(param){
 		_messageSocket.close();
 	}
 
+	this.toHide = function(){
+		$(_container).hide();
+		$(_displayPanel).hide();
+		isHide = true;
+	}
 	
+	this.toShow = function(){
+		$(_container).show();
+		isHide = false;
+	}
 }

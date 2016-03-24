@@ -13,7 +13,8 @@ function DialogPopup(param){
 		rightText : null,	  				//右边按钮文字
 		rightClass : null,    				//右边按钮的样式
 		right : function(_dialogDiv){},  	//右边按钮的方法
-		afterClose : function(){}   		//点击阴影和关闭的回调函数
+		afterClose : function(){},   		//点击阴影和关闭的回调函数
+		dismissible : false
 	}
 	
 	
@@ -42,9 +43,11 @@ function DialogPopup(param){
 		}
 		
 		//点击shadow关闭
-		_dialogDiv.click(function(){
-			_self.close();
-		});
+		if(!param.dismissible){
+			_dialogDiv.click(function(){
+				_self.close();
+			});
+		}
 		
 		_dialogDiv.find('.dialog-dialogPopup').click(function(e){
 			e.stopPropagation();
@@ -55,6 +58,7 @@ function DialogPopup(param){
 		_dialogDiv.find('[data-type="dialogClose_div_dialogPopup"]').click(function(){
 			_self.close();
 		})
+		
 		
 		//contentdMember
 		_dialogDiv.find('[data-type="dialogContent_div_dialogPopup"]').html(param.content);
