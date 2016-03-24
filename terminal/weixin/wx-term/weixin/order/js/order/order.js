@@ -51,7 +51,8 @@ $(function(){
 		data : {
 			dataSource : 'getByCond',
 			oid : Util.mp.oid,
-			fid : Util.mp.fid
+			fid : Util.mp.fid,
+			includeBranch : true
 		},
 		success : function(data, status, xhr){
 			var html = [];

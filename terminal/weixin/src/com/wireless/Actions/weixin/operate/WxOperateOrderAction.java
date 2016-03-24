@@ -320,6 +320,7 @@ public class WxOperateOrderAction extends DispatchAction {
 		final String orderType = request.getParameter("type");
 		final String id = request.getParameter("id");
 		final String status = request.getParameter("status");
+		final String includeBranch = request.getParameter("includeBranch");
 		final String sessionId = request.getParameter("sessionId");
 		final JObject jObject = new JObject();
 		
@@ -362,7 +363,7 @@ public class WxOperateOrderAction extends DispatchAction {
 			
 			final List<WxOrder> result = new ArrayList<WxOrder>();
 			//集团下需要显示所有门店的订单
-			if(staff.isGroup()){
+			if(staff.isGroup() && includeBranch != null && !includeBranch.isEmpty() && Boolean.parseBoolean(includeBranch)){
 				for(Restaurant branches : RestaurantDao.getById(staff.getRestaurantId()).getBranches()){
 					result.addAll(WxOrderDao.getByCond(StaffDao.getAdminByRestaurant(branches.getId()), extraCond, null));
 				}
