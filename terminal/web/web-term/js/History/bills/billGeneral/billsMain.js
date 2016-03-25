@@ -1392,7 +1392,7 @@ Ext.onReady(function() {
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-					var data = [[-1, '全部']];
+					var data = [];
 			
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
@@ -1703,7 +1703,7 @@ Ext.onReady(function() {
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-					var data = [[-1, '全部']];
+					var data = [];
 					
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
