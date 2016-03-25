@@ -1,4 +1,4 @@
-package com.wireless.ws.watier;
+package com.wireless.ws.waiter;
 
 import java.io.IOException;
 import java.util.Set;

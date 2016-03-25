@@ -51,8 +51,8 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.sccon.ServerConnector;
-import com.wireless.ws.watier.WxWaiter;
-import com.wireless.ws.watier.WxWaiterServerPoint;
+import com.wireless.ws.waiter.WxWaiter;
+import com.wireless.ws.waiter.WxWaiterServerPoint;
 
 public class WxOperateWaiterAction extends DispatchAction{
 
