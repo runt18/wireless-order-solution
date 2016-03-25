@@ -2252,6 +2252,7 @@ public class MemberDao {
 	 * 			throws if any cases below
 	 * 			<li>the destination member does NOT exist
 	 * 			<li>the weixin member does NOT exist
+	 * 			<li>the destination member has weixin card before
 	 */
 	public static void patchWxCard(Staff staff, int destMemberId, int wxMemberId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
@@ -2284,9 +2285,15 @@ public class MemberDao {
 	 * 			throws if any cases below
 	 * 			<li>the destination member does NOT exist
 	 * 			<li>the weixin member does NOT exist
+	 * 			<li>the destination member has weixin card before
 	 */
 	public static void patchWxCard(DBCon dbCon, Staff staff, int destMemberId, int wxMemberId) throws SQLException, BusinessException{
+		Member destMember = getById(staff, destMemberId);
 		Member wxMember = getById(staff, wxMemberId);
+		
+		if(destMember.hasWeixin()){
+			throw new BusinessException("此会员已有微信电子卡，不能再执行补发操作");
+		}
 		
 		//Delete the wx member.
 		MemberDao.deleteById(staff, wxMember.getId());
