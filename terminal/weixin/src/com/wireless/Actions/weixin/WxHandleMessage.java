@@ -35,6 +35,8 @@ import org.marker.weixin.session.WxSession;
 import org.xml.sax.SAXException;
 
 import com.alibaba.fastjson.JSON;
+import com.wireless.db.DBCon;
+import com.wireless.db.Params;
 import com.wireless.db.book.BookDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.OrderDao;
@@ -55,6 +57,7 @@ import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.weixin.action.WxKeyword;
 import com.wireless.pojo.weixin.action.WxMenuAction;
@@ -62,6 +65,70 @@ import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class WxHandleMessage extends HandleMessageAdapter {
+	
+	public static enum QrCodeType{
+		WAITER(1, "微信店小二"),
+		TEMP_PAY(2, "账单暂结"),
+		REPRESENT(3, "我要代言");
+		
+		public final int val;
+		public final String desc;
+		QrCodeType(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public static QrCodeType valueOf(int val){
+			for(QrCodeType type : values()){
+				if(val == type.val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The qr code type(val = " + val + ") is invalid.");
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
+	
+	public static class QrCodeParam{
+		private final QrCodeType type;
+		private final int param;
+		
+		private QrCodeParam(QrCodeType type, int param){
+			this.type = type;
+			this.param = param;
+		}
+		
+		public static QrCodeParam newWaiter(int orderId){
+			return new QrCodeParam(QrCodeType.WAITER, orderId);
+		}
+		
+		public static QrCodeParam newTempPay(int orderId){
+			return new QrCodeParam(QrCodeType.TEMP_PAY, orderId);
+		}
+		
+		public static QrCodeParam newRepresent(int memberId){
+			return new QrCodeParam(QrCodeType.REPRESENT, memberId);
+		}
+		
+		public static QrCodeParam parse(String qrParam){
+			return new QrCodeParam(
+					QrCodeType.valueOf(Integer.parseInt(qrParam.substring(0, 1))),
+					Integer.parseInt(qrParam.substring(1)));
+		}
+		
+		public int sceneId(){
+			return Integer.parseInt(toString());
+		}
+		
+		@Override
+		public String toString(){
+			return type.val + "" + param;
+		}
+	}
 	
 	private final String WEIXIN_INDEX;
 	private final String WEIXIN_FOOD;
@@ -274,9 +341,9 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注
+				Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
+				WxMemberDao.interest(staff, msg.getFromUserName());
 				if(msg.getTicket().isEmpty()){
-					Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
-					WxMemberDao.interest(staff, msg.getFromUserName());
 					final List<WxMenuAction> reply = WxMenuActionDao.getByCond(staff, new WxMenuActionDao.ExtraCond().setCate(WxMenuAction.Cate.SUBSCRIBE_REPLY));
 					if(reply.isEmpty()){
 						session.callback(createNavi(msg));
@@ -286,26 +353,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 	
 				}else{
 					//TODO 扫描带参二维码，进入微信店小二
-					final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
-					final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
-					final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
-					final String picUrl;
-					if(wxRestaurant.hasWeixinLogo()){
-						picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
-					}else{
-						picUrl = "";
-					}
-					
-					final int orderId = Integer.parseInt(msg.getEventKey().replace("qrscene_", ""));
-					HttpSession httpSession = request.getSession(true);
-					httpSession.setAttribute("fid", msg.getToUserName());
-					httpSession.setAttribute("oid", msg.getFromUserName());
-					final int branchId = OrderDao.getById(staff, orderId, DateType.TODAY).getRestaurantId();
-					httpSession.setAttribute("branchId", Integer.toString(branchId));
-					httpSession.setMaxInactiveInterval(3600 * 2);	//2 hour
-					session.callback(new Msg4ImageText(msg).addItem(
-							new Data4Item("微信店小二", "点击去微信店小二，可自助浏览菜品信息，呼叫服务，自助下单", picUrl,
-										  createUrl4Session(WEIXIN_WAITER + "?orderId=" + orderId + "&branchId=" + branchId, httpSession))));
+					processQrCode(msg);
+
 				}				
 			}else if(msg.getEvent() == Event.UNSUBSCRIBE){
 				//会员取消关注
@@ -313,27 +362,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 				
 			}else if(msg.getEvent() == Event.SCAN){
 				//TODO 扫描带参二维码,进入微信店小二
-				final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
-				final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
-				WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
-				final String picUrl;
-				if(wxRestaurant.hasWeixinLogo()){
-					picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
-				}else{
-					picUrl = "";
-				}
-				
-				final int orderId = Integer.parseInt(msg.getEventKey());
-				HttpSession httpSession = request.getSession(true);
-				httpSession.setAttribute("fid", msg.getToUserName());
-				httpSession.setAttribute("oid", msg.getFromUserName());
-				final int branchId = OrderDao.getById(staff, orderId, DateType.TODAY).getRestaurantId();
-				httpSession.setAttribute("branchId", Integer.toString(branchId));
-				httpSession.setMaxInactiveInterval(3600 * 2);	//2 hour
-				session.callback(new Msg4ImageText(msg).addItem(
-						new Data4Item("微信店小二", "点击去微信店小二，可自助浏览菜品信息，呼叫服务，自助下单", 
-									  picUrl, 
-									  createUrl4Session(WEIXIN_WAITER + "?orderId=" + orderId + "&branchId=" + branchId, httpSession))));
+				processQrCode(msg);
 				
 			}else if(msg.getEvent() == Event.CLICK){
 				final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
@@ -521,6 +550,44 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		}
 	}
 	
+	private void processQrCode(Msg4Event msg) throws SQLException, BusinessException{
+		QrCodeParam qrParam;
+		if(msg.getEvent() == Event.SUBSCRIBE){
+			qrParam = QrCodeParam.parse(msg.getEventKey().replace("qrscene_", ""));
+		}else{
+			qrParam = QrCodeParam.parse(msg.getEventKey());
+		}
+		if(qrParam.type == QrCodeType.WAITER){
+			//扫描带参二维码,进入微信店小二
+			final int groupId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+			final int orderId = Integer.parseInt(msg.getEventKey().substring(1));
+			final int branchId = getRestaurantByOrder(orderId);
+			final Staff staff = StaffDao.getAdminByRestaurant(branchId);
+			WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(groupId));
+			final String picUrl;
+			if(wxRestaurant.hasWeixinLogo()){
+				picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
+			}else{
+				picUrl = "";
+			}
+			
+			HttpSession httpSession = request.getSession(true);
+			httpSession.setAttribute("fid", msg.getToUserName());
+			httpSession.setAttribute("oid", msg.getFromUserName());
+			final Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
+			httpSession.setAttribute("branchId", Integer.toString(branchId));
+			httpSession.setMaxInactiveInterval(3600 * 2);	//2 hour
+			final StringBuilder desc = new StringBuilder().append("账单号：" + order.getId()).append("\r\n")
+														  .append("餐台：" + order.getDestTbl().getName()).append("\r\n")
+														  .append("开台时间：" + DateUtil.format(order.getBirthDate())).append("\r\n")
+														  .append("服务员 ：" + order.getWaiter()).append("\r\n")
+														  .append("点击去微信店小二，可自助浏览菜品信息，呼叫服务，自助下单");
+			session.callback(new Msg4ImageText(msg).addItem(
+					new Data4Item("微信店小二(" + RestaurantDao.getById(branchId).getName() + ")", desc.toString(), picUrl,
+								  createUrl4Session(WEIXIN_WAITER + "?orderId=" + orderId + "&branchId=" + branchId, httpSession))));
+		}
+	}
+	
 	/**
 	 *获取大众点评数据
 	 */
@@ -605,5 +672,22 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			return false;
 		}    	
     }
-	
+
+    private int getRestaurantByOrder(int orderId) throws SQLException{
+    	DBCon dbCon = new DBCon();
+    	try{
+    		dbCon.connect();
+    		String sql = " SELECT restaurant_id FROM " + Params.dbName + ".order WHERE id = " + orderId;
+    		dbCon.rs = dbCon.stmt.executeQuery(sql);
+    		int restaurantId = 0;
+    		if(dbCon.rs.next()){
+    			restaurantId = dbCon.rs.getInt("restaurant_id");
+    		}
+    		dbCon.rs.close();
+    		return restaurantId;
+    	}finally{
+    		dbCon.disconnect();
+    	}
+    }
+    
 }
