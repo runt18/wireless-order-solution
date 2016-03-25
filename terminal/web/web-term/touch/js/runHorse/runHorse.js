@@ -283,13 +283,13 @@ function CreateRunHorse(param){
 		_messageSocket.close();
 	}
 
-	this.toHide = function(){
+	this.hide = function(){
 		$(_container).hide();
 		$(_displayPanel).hide();
 		isHide = true;
 	}
 	
-	this.toShow = function(){
+	this.show = function(){
 		$(_container).show();
 		isHide = false;
 	}
