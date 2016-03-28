@@ -42,8 +42,8 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.sccon.ServerConnector;
-import com.wireless.ws.watier.WxWaiter;
-import com.wireless.ws.watier.WxWaiterServerPoint;
+import com.wireless.ws.waiter.WxWaiter;
+import com.wireless.ws.waiter.WxWaiterServerPoint;
 
 public class WxOperateBookAction extends DispatchAction {
 	

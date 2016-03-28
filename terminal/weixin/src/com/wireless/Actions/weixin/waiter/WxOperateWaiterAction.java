@@ -30,6 +30,7 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
+import com.wireless.Actions.weixin.WxHandleMessage;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.PayOrder;
@@ -50,8 +51,8 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.sccon.ServerConnector;
-import com.wireless.ws.watier.WxWaiter;
-import com.wireless.ws.watier.WxWaiterServerPoint;
+import com.wireless.ws.waiter.WxWaiter;
+import com.wireless.ws.waiter.WxWaiterServerPoint;
 
 public class WxOperateWaiterAction extends DispatchAction{
 
@@ -159,11 +160,16 @@ public class WxOperateWaiterAction extends DispatchAction{
 		final JObject jObject= new JObject();
 		try{
 			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(restaurantId));
-			Order order = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY);
-			WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+			final Order order = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY);
+			final WxRestaurant wxRestaurant;
+			if(staff.isBranch()){
+				wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(staff.getGroupId()));
+			}else{
+				wxRestaurant = WxRestaurantDao.get(staff);
+			}
 			
 			//生成带账单ID的微信二维码
-			final String qrCodeUrl = new QRCode().setSceneId(order.getId())
+			final String qrCodeUrl = new QRCode().setSceneId(WxHandleMessage.QrCodeParam.newWaiter(order.getId()).sceneId())
 												 .setExpired(14400)	//4 hour
 												 .createUrl(Token.newInstance(AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken())));
 												 //.createUrl(Token.newInstance(FinanceWeixinAction.APP_ID, FinanceWeixinAction.APP_SECRET));
@@ -173,7 +179,7 @@ public class WxOperateWaiterAction extends DispatchAction{
             @SuppressWarnings("serial")
 			Result qrCode = new MultiFormatReader().decode(bitmap, new HashMap<DecodeHintType, Object>(){{ put(DecodeHintType.CHARACTER_SET, "GBK"); }});
             
-            System.out.println(qrCode.getText());
+            //System.out.println(qrCode.getText());
             
             ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildWxWaiter(staff, order.getId(), qrCode.getText()).build());
             

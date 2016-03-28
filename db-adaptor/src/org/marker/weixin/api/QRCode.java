@@ -39,6 +39,11 @@ public class QRCode implements Jsonable{
 		this.expired = expired;
 		return this;
 	}
+
+	public QRCode setSceneId(String sceneId){
+		this.sceneId = Integer.parseInt(sceneId);
+		return this;
+	}
 	
 	public QRCode setSceneId(int sceneId){
 		this.sceneId = sceneId;

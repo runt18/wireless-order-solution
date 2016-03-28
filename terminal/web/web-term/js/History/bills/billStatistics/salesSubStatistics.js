@@ -192,7 +192,7 @@ $(function(){
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-					var data = [];
+					var data = [[-1, '全部']];
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
 						params : {
@@ -213,7 +213,8 @@ $(function(){
 							}
 							
 							thiz.store.loadData(data);
-							thiz.setValue(jr.root[0].id);
+//							thiz.setValue(jr.root[0].id);
+							thiz.setValue(-1);
 						},
 						failure : function(res, opt){
 							thiz.store.loadData([-1, '全部']);
@@ -538,7 +539,8 @@ $(function(){
 							}
 							
 							thiz.store.loadData(data);
-							thiz.setValue(jr.root[0].id);
+//							thiz.setValue(jr.root[0].id);
+							thiz.setValue(-1);
 							thiz.fireEvent('select');
 						},
 						failure : function(res, opt){
@@ -893,7 +895,7 @@ $(function(){
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-					var data = [];
+					var data = [[-1, '全部']];
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
 						params : {
@@ -914,7 +916,8 @@ $(function(){
 							}
 							
 							thiz.store.loadData(data)
-							thiz.setValue(jr.root[0].id);
+//							thiz.setValue(jr.root[0].id);
+							thiz.setValue(-1);
 							thiz.fireEvent('select')
 						}
 					});

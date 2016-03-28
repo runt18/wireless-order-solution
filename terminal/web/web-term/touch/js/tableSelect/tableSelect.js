@@ -51,12 +51,6 @@ $(function(){
 		$('#payment_orderFoodListCmp').height(document.body.clientHeight - 126);	
 	});
 	
-	//建立跑马灯   只有在pos端的情况下才创建
-	if(WirelessOrder.systemStatus.isPos()){ 
-		runHorseDiv = new CreateRunHorse();
-		runHorseDiv.open();
-	}
-	
 	//退出餐台选择界面
 	$('#tableSelectMgr').on('pagehide', function(){
 		
@@ -71,7 +65,7 @@ $(function(){
 	$('#tableSelectMgr').on('pagebeforehide', function(){
 		//关闭跑马灯
 		if(runHorseDiv){
-			runHorseDiv.toHide();
+			runHorseDiv.hide();
 		}
 	});
 	
@@ -145,7 +139,7 @@ $(function(){
 		
 		//显示跑马灯
 		if(runHorseDiv){
-			runHorseDiv.toShow();	
+			runHorseDiv.show();	
 		}
 		
 	});
@@ -153,6 +147,12 @@ $(function(){
 	//进入餐桌初始化
 	$('#tableSelectMgr').on('pageinit', function(){
 		
+		//建立跑马灯   只有在pos端的情况下才创建
+		if(WirelessOrder.systemStatus.isPos()){ 
+			runHorseDiv = new CreateRunHorse();
+			runHorseDiv.open();
+		}
+	
 		//初始化窗口大小
 		$(window).resize();
 	
@@ -761,14 +761,10 @@ $(function(){
 		});
 		
 		
-		//TODO
 		//打印机诊断
 		$('#diagPrinter_a_tableSelect').click(function(){
-//			var diagPrinterPopup = new DiagPrinterPopup();
-//			diagPrinterPopup.open();
-			if(runHorseDiv){
-				runHorseDiv.toHide();
-			}
+			var diagPrinterPopup = new DiagPrinterPopup();
+			diagPrinterPopup.open();
 		});
 		
 		

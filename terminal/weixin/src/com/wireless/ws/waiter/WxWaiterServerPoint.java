@@ -1,4 +1,4 @@
-package com.wireless.ws.watier;
+package com.wireless.ws.waiter;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
