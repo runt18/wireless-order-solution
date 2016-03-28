@@ -2,7 +2,10 @@ Ext.onReady(function(){
 	var hours;
 	var highChart;
 	var chartPanel;
+	var businessPanelHeight = 0;
 	
+	
+	//开始时间选择栏
 	var beginDate = new Ext.form.DateField({
 		id : 'beginDate_combo_passengerFlow',
 		xtype : 'datefield',
@@ -13,6 +16,8 @@ Ext.onReady(function(){
 		allowBlank : false
 	});
 	
+	
+	//结束时间选择栏
 	var endDate = new Ext.form.DateField({
 		id : 'endDate_combo_passengerFlow',
 		xtype : 'datefield',
@@ -23,6 +28,8 @@ Ext.onReady(function(){
 		allowBlank : false
 	});
 	
+	
+	//日期控件栏
 	var dataCombo = Ext.ux.createDateCombo({
 		beginDate : beginDate,
 		endDate : endDate,
@@ -228,37 +235,11 @@ Ext.onReady(function(){
 	},'-',{
 		text : '导出',
 		iconCls : 'icon_tb_exoprt_excel',
-//		handler : function(){
-//			var onDuty = Ext.getCmp('beginDate_combo_passengerFlow');
-//			var offDuty = Ext.getCmp('endDate_combo_passengerFlow');
-//			var regionId;
-//			var branchId = branchSelect_combo_passengerFlow.getValue();
-//			if(regionSelect_combo_passengerFlow.getValue() == '-1'){
-//				regionId = '';
-//			}else{
-//				regionId = regionSelect_combo_passengerFlow.getValue();
-//			}
-//			
-//			var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&region={6}&branchId={7}';
-//			url = String.format(
-//					url, 
-//					'ExportHistoryStatisticsToExecl.do', 
-//					-10, 
-//					restaurantID, 
-//					'passengerFlow',
-//					Ext.util.Format.date(onDuty.getValue(), 'Y-m-d 00:00:00'),
-//					Ext.util.Format.date(offDuty.getValue(), 'Y-m-d 23:59:59'),
-//					regionId,
-//					branchId
-//				);
-//			
-//			window.location = url;
-//		}
 	}];
 	
 	
 	
-	//couponGrid的栏目
+	//头栏栏目
 	var cm = new Ext.grid.ColumnModel([
 	    new Ext.grid.RowNumberer(),
 	    {header : '操作日期', dataIndex : 'offDutyToDate'},
@@ -271,18 +252,22 @@ Ext.onReady(function(){
 	cm.defaultSortable = true;
 	
 	var ds = new Ext.data.Store({
-		pageSize : 5,
 		proxy : new Ext.data.HttpProxy({url : '../../BusinessReceiptsStatistics.do'}),
-		reader : new Ext.data.JsonReader({totalProperty : ' totalProperty', root : 'root'}, [
+		reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'}, [
 		      {name : 'offDutyToDate'},
 		      {name : 'totalActual'},
 		      {name : 'customerAmount'},
 		      {name : 'averageCost'}
-         ])
+         ]),
+         baseParams : {
+        	 start : 0,
+        	 limit : 10
+         }
 	})
 	
-	ds.baseParams['dataSource'] = 'normal';
-	ds.load({params : {start : 0, limit : 5}});
+	
+	
+	//头部栏
 	var passengerFlowTbar = Ext.ux.initTimeBar({
 		beginDate : beginDate,
 		endDate : endDate,
@@ -295,24 +280,26 @@ Ext.onReady(function(){
 	}).concat(passengerFlowTbarFor2);
 	
 
-	
+	//底部栏
 	var pagingBar = new Ext.PagingToolbar({
-		pageSize : 5,
+		pageSize : 10,
 		store : ds,
 		displayInfo : true,
 		displayMsg : "显示第{0} 条到 {1} 条记录, 共 {2}条",
 		emptyMsg : " 没有记录"
 	});
 	
+	
+	//数据显示面板
 	var passengerFlowStatistics = new Ext.grid.GridPanel({
 		border : false,
 		frame : false,
-		scroll : false,
+		autoScroll : true,
 		cm : cm,
 		sm : new Ext.grid.RowSelectionModel({
 			singleSelect : true
 		}),
-		store : ds,
+		ds : ds,
 		viewConfig : {
 			forceFit : true
 		},
@@ -322,12 +309,28 @@ Ext.onReady(function(){
 		tbar : passengerFlowTbar,
 		bbar : pagingBar,
 		listeners : {
-			bodyresize : function(){}
+			bodyresize : function(el, wd, hg){
+				var chartHeight;
+				if(hg < businessPanelHeight){
+					chartHeight = 250 + (businessPanelHeight - hg);
+				}else{
+					chartHeight = 250 + (hg - businessPanelHeight);
+				}
+				if(highChart){
+					highChart.setSize(wd, chartHeight);
+				}
+				
+				chartPanel.getEl().setTop((hg + 55)) ;
+				chartPanel.setHeight(chartHeight);
+				
+				passengerFlowStatistics.doLayout();
+			}
 		}
 	});
 	
 	passengerFlowStatistics.doLayout();
 	
+	//走势图
 	chartPanel = new Ext.Panel({
 		contentEl : 'passengerFlowChart_div_passengerFlowStatistics',
 		region : 'south'
@@ -343,34 +346,54 @@ Ext.onReady(function(){
 		}
 	}
 	
-	var couponDetailPanel = new Ext.Panel({
-		title : '客流统计',
-		layout : 'border',
-		region : 'center',
-		frame : true,
-		items : [passengerFlowStatistics, chartPanel]
-	});
-	
 	
 	new Ext.Panel({
+		title : '客流统计',
+		region : 'center',
+		frame : true,
 		renderTo : 'passengerFlow_div_passenferFlowStatistics',
-		id : 'couponStatisticsPanel',
+		id : 'passengerFlowStatisticsPanel',
 		width : parseInt(Ext.getDom('passengerFlow_div_passenferFlowStatistics').parentElement.style.width.replace(/px/g, '')),
 		height : parseInt(Ext.getDom('passengerFlow_div_passenferFlowStatistics').parentElement.style.height.replace(/px/g, '')),
 		layout : 'border',
 		frame : true,
-		items : [couponDetailPanel]
+		items : [passengerFlowStatistics, chartPanel]
 	});
-		
+	
+	businessPanelHeight = passengerFlowStatistics.getHeight();
+	
+	var reSize = new Ext.Resizable(passengerFlowStatistics.getEl(), {
+	  wrap: true, //在构造Resizable时自动在制定的id的外边包裹一层div
+	  minHeight:100, //限制改变的最小的高度
+	  pinned:false, //控制可拖动区域的显示状态，false是鼠标悬停在拖拉区域上才出现
+	  handles: 's',//设置拖拉的方向（n,s,e,w,all...）
+	});
+	reSize.on('resize', passengerFlowStatistics.syncSize, passengerFlowStatistics);//注册事件(作用:将调好的大小传个scope执行)
 	
 	
 	function initPassengerFlowData(c){
+		
 		
 		var tempLoadMask = new Ext.LoadMask(document.body, {
 			msg : '正在获取信息, 请稍候......',
 			remove : true
 		});
-		tempLoadMask.show();
+		
+		var store = passengerFlowStatistics.getStore();
+		store.baseParams['dataSource'] = 'normal';
+		store.baseParams['includingChart'] = 'true';
+		store.baseParams['isPaging'] = 'true';
+		store.baseParams['dateBegin'] = c.dateBegin;
+		store.baseParams['dateEnd'] = c.dateEnd;
+		store.baseParams['opening'] = c.opening;
+		store.baseParams['ending'] = c.ending;
+		store.baseParams['region'] = c.regionId;
+		store.baseParams['branchId'] = c.branchId;
+		store.baseParams['start'] = 0;
+		store.baseParams['limit'] = 10;
+		
+		store.load();
+
 		Ext.Ajax.request({
 			url : '../../BusinessReceiptsStatistics.do',
 			params : {
@@ -385,25 +408,22 @@ Ext.onReady(function(){
 				branchId : c.branchId
 			},
 			success : function(res, opt){
-				tempLoadMask.hide();
 				var jr = Ext.decode(res.responseText);
 				if(jr.success){
-					passengerFlowStatistics.getStore().loadData(jr);
-					Ext.get('passengerFlow_div_passenferFlowStatistics').setHeight(couponDetailPanel.getHeight());
 					showChart(jr);
+					
 				}else{
 					Ext.ux.showMsg(jr);
 				}
 			},
 			failure : function(res, opt){
-				tempLoadMask.hide();
 				Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
 			}
 		});
 	}
 	
 	
-	//TODO改变宽度
+	
 	//图表
 	function showChart(data){
 		var dateBegin = Ext.util.Format.date(Ext.getCmp('beginDate_combo_passengerFlow').getValue(), 'Y-m-d');
