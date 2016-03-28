@@ -121,7 +121,6 @@
 <script type="text/javascript" src="./js/popup/consumeDetail/consumeDetail.js?v=<%= v %>"></script>
 <!-- 跑马灯 -->
 <script type="text/javascript" src="./js/runHorse/runHorse.js"></script>
-<script type="text/javascript" src="./js/runHorse/sea.js"></script>
 <!-- 重连socket -->
 <script type="text/javascript" src="./js/socket/reconnecting-websocket.js"></script>
 
