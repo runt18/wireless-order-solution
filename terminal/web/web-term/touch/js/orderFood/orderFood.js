@@ -599,8 +599,13 @@ function comboFoodTasteUnitLoad(){
 	
 	initComboFoodGroupCmp();
 	
-	$('#divComboFoodFloat').show();
 	
+	if($("#orderPinyinCmp").is(":hidden") && $("#orderHandCmp").is(":hidden")){
+		$('#divComboFoodFloat').css({top : 'initial', bottom : '90px'});
+	}else{
+		$('#divComboFoodFloat').css({top : 'initial', bottom : '48.5%'});
+	}
+	$('#divComboFoodFloat').show();
 	//关闭可能的动态口味
 	closeFoodCommonTaste();
 	
