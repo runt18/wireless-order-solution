@@ -14,7 +14,7 @@ Ext.onReady(function(){
 		maxValue : new Date(),
 		readOnly : false,
 		allowBlank : false
-	});
+	}); 
 	
 	
 	//结束时间选择栏
