@@ -77,16 +77,15 @@ function dutyRangeStatDetalHandler(){
 							url : '../window/history/businessStatistics.jsp',
 							scripts : true,
 							nocache : true,
-							text : '功能加载中, 请稍后......',
-							params : {
-								d : '_' + new Date().getTime(),
-								dataSource : 'today',
-								queryPattern : statType == 2? 5 : 2,
-								onDuty : statType == 1?gs['onDuty']:gs['onDutyFormat'],
-								offDuty : statType == 1?gs['offDuty']:gs['offDutyFormat'],
-								businessStatic : statType
-							}
+							text : '功能加载中, 请稍后......'
 						});
+						
+						thiz.d = '_' + new Date().getTime();
+						thiz.dataSource = 'today';
+						thiz.queryPattern = (statType == 1 ? gs['onDuty'] : gs['onDutyFormat']);
+						thiz.onDuty = (statType == 1 ? gs['onDuty'] : gs['onDutyFormat']);
+						thiz.offDuty = (statType == 1?gs['offDuty']:gs['offDutyFormat']);
+						thiz.businessStatic = statType;
 					}
 				}
 			});
@@ -204,17 +203,17 @@ function dutyRangePanelInit(c){
 						url : '../window/history/businessStatistics.jsp',
 						scripts : true,
 						nocache : true,
-						text : '功能加载中, 请稍后......',
-						params : {
-							d : '_' + new Date().getTime(),
-							dataSource : 'today',
-							queryPattern : 6,
-							onDuty : treeNode.attributes['onDutyFormat'],
-							offDuty : treeNode.attributes['offDutyFormat'],
-							businessStatic : statType
-						}
+						text : '功能加载中, 请稍后......'
 					});	
         			
+					dutyRangeStatGeneral.d = '_' + new Date().getTime();
+					dutyRangeStatGeneral.dataSource = 'today';
+					dutyRangeStatGeneral.queryPattern = 6;
+					dutyRangeStatGeneral.onDuty = reeNode.attributes['onDutyFormat'];
+					dutyRangeStatGeneral.offDuty = treeNode.attributes['offDutyFormat'];
+					dutyRangeStatGeneral.businessStatic = statType;
+					
+					
         		}
         		if(typeof treeNode.attributes.onDuty != 'undefined' && treeNode.isLeaf()){
         			statType = 2;
@@ -249,16 +248,15 @@ function dutyRangePanelInit(c){
 					url : '../window/history/businessStatistics.jsp',
 					scripts : true,
 					nocache : true,
-					text : '功能加载中, 请稍后......',
-					params : {
-						d : '_' + new Date().getTime(),
-						dataSource : 'today',
-						queryPattern : 5,
-						onDuty : treeNode.attributes['onDutyFormat'],
-						offDuty : treeNode.attributes['offDutyFormat'],
-						businessStatic : statType
-					}
+					text : '功能加载中, 请稍后......'
 				});
+				
+				thiz.d = '_' + new Date().getTime();
+				thiz.dataSource = 'today';
+				thiz.queryPattern = 5;
+				thiz.onDuty = treeNode.attributes['onDutyFormat'];
+				tihz.offDuty = treeNode.attributes['offDutyFormat'];
+				thiz.businessStatic = statType;
 			}
 		}
 	});

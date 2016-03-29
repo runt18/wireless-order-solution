@@ -91,15 +91,15 @@ $(function(){
 						url : '../window/history/businessStatistics.jsp',
 						scripts : true,
 						nocache : true,
-						text : '功能加载中, 请稍后......',
-						params : {
-							dataSource : 'history',
-							dutyRange : "range",
-							offDuty : date,
-							onDuty : date,
-							queryPattern : 3
-						}
+						text : '功能加载中, 请稍后......'
 					});
+					
+					thiz.dataSource = 'history';
+					thiz.dutyRange = 'range';
+					thiz.offDuty = date;
+					thiz.onDuty = date;
+					thiz.queryPattern = 3;
+					thiz.branchId = Ext.getCmp('branchSelect_combo_businessReceips').getValue();
 				}
 			}
 		});

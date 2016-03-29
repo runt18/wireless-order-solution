@@ -156,9 +156,10 @@ Ext.onReady(function(){
 	    {header : '操作日期', dataIndex : 'offDutyToDate'},
 	    {header : '实收', dataIndex : 'totalActual'},
 	    {header : '人数', dataIndex : 'customerAmount'},
-	    {header : '人均消费', dataIndex : 'averageCost'}
+	    {header : '人均消费', dataIndex : 'averageCost', render : function1}
    ]);	
 	
+   
 	//默认排序
 	cm.defaultSortable = true;
 	
@@ -167,7 +168,7 @@ Ext.onReady(function(){
 		reader : new Ext.data.JsonReader({totalProperty : ' totalProperty', root : 'root',}, [
 		      {name : 'offDutyToDate'},
 		      {name : 'totalActual'},
-		      {name : 'customerAmount'},
+		      {name : 'customerAmount'}
          ])
 	})
 	

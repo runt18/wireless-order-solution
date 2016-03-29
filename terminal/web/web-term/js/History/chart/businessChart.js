@@ -68,6 +68,12 @@ function each(x){
 						queryPattern : 3
 					}
 				});
+				
+				thiz.dataSource = 'history';
+				thiz.dutyRange = 'range';
+				thiz.offDuty = date;
+				thiz.onDuty = date;
+				thiz.queryPattern = 3
 			}
 		}
 	});

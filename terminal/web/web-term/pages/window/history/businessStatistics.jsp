@@ -5,42 +5,6 @@
 	<meta http-equiv="cache-control" content="no-cache">
 	
 	<title>营业统计</title>
-	<script type="text/javascript">
-	var dateType = {
-		USE_SELF_DATE : 1, //用统计框自带的时间控件
-		USE_TIME_FORMAT : 2, //时间格式化传来的long型参数
-		USE_DATE_FORMAT : 3, //日期格式化传来的long型参数
-		NO_TRANSFER : 4, //不用传时间参数到后台
-		USE_NOPARST : 5 //不格式化传来的参数
-	};
-		var dataSource = '<%=request.getParameter("dataSource") %>';
-		var queryPattern = <%=request.getParameter("queryPattern") %>;
-		
-		dataSource = dataSource != 'null' && dataSource != '' ? dataSource : 'today';
-		var dutyRange = '<%=request.getParameter("dutyRange") %>';
-		var queryType = '<%=request.getParameter("queryType") %>';
-		var staffId = '<%=request.getParameter("staffId") %>';
-		//标示是否显示部门的汇总。2：交款
-		var businessStatic = '<%=request.getParameter("businessStatic") %>';
-		
-		queryPattern = queryPattern == null ? dateType.USE_SELF_DATE : parseInt(queryPattern);
-		//TODO
-		if(queryPattern == dateType.USE_TIME_FORMAT || queryPattern == dateType.USE_DATE_FORMAT){
-			var onDuty = '<%=request.getParameter("onDuty") %>';
-			var offDuty = '<%=request.getParameter("offDuty") %>';
-			if(onDuty != 'null' && offDuty != 'null'){
-				onDuty = new Date(parseInt(onDuty));
-				offDuty =  new Date(parseInt(offDuty));
-			}else{
-				onDuty = null;
-				offDuty = null;
-			}
-		}else if(queryPattern == dateType.USE_NOPARST){
-			onDuty = '<%=request.getParameter("onDuty") %>';
-			offDuty = '<%=request.getParameter("offDuty") %>';
-		}
-		var business;
-	</script>
 	<script type="text/javascript" src="../../js/window/history/businessStatistics.js"></script>
 	
 </head>
