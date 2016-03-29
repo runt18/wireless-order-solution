@@ -325,8 +325,16 @@ public class OrderFood implements Parcelable, Jsonable {
 	 * </pre>
 	 * @return the unit price to this order food
 	 */
+	private float getUnitPrice(boolean isPure){
+		if(isPure){
+			return NumericUtil.roundFloat(getPurePrice() + (!hasTasteGroup() || mFood.isWeight() ? 0 : mTasteGroup.getPrice()));
+		}else{
+			return NumericUtil.roundFloat(getFoodPrice() + (!hasTasteGroup() || mFood.isWeight() ? 0 : mTasteGroup.getPrice()));
+		}
+	}
+	
 	private float getUnitPrice(){
-		return NumericUtil.roundFloat(getFoodPrice() + (!hasTasteGroup() || mFood.isWeight() ? 0 : mTasteGroup.getPrice()));
+		return getUnitPrice(false);
 	}
 	
 	/**
@@ -356,14 +364,20 @@ public class OrderFood implements Parcelable, Jsonable {
 	 * }else{
 	 *    return {@link OrderFood#getUnitPrice()} * count 
 	 * }
+	 * </pre>
+	 * @param isPure true means pure price except the price plan, false means unit price
 	 * @return the total price to this food before discount
 	 */
-	private float getPriceBeforeDiscount(float count){
+	private float getPriceBeforeDiscount(float count, boolean isPure){
 		if(mFood.isWeight()){
-			return NumericUtil.roundFloat(getUnitPrice() * count + (hasTasteGroup() ? mTasteGroup.getPrice() : 0));			
+			return NumericUtil.roundFloat(getUnitPrice(isPure) * count + (hasTasteGroup() ? mTasteGroup.getPrice() : 0));			
 		}else{
-			return NumericUtil.roundFloat(getUnitPrice() * count);	
+			return NumericUtil.roundFloat(getUnitPrice(isPure) * count);	
 		}
+	}
+	
+	private float getPriceBeforeDiscount(float count){
+		return getPriceBeforeDiscount(count, false);
 	}
 	
 	public float calcDeltaPriceBeforeDiscount(){
@@ -383,6 +397,16 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	/**
+	 * Calculate the pure price to this order food.
+	 * <pre>
+	 * return {@link OrderFood#getPriceBeforeDiscount()}
+	 * @return the pure price to this order food
+	 */
+	public float calcPurePrice(){
+		return getPriceBeforeDiscount(getCount(), true);
+	}
+	
+	/**
 	 * Calculate the price with taste before discount to a specific food.
 	 * <pre>
 	 * if(isGift){
@@ -390,7 +414,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	 * }else{
 	 *    return {@link OrderFood#getPriceBeforeDiscount()}
 	 * }
-	 * @return The price represented as float.
+	 * @return the price before discount to this order food
 	 */	
 	public float calcPriceBeforeDiscount(){
 		if(isGift){
@@ -668,6 +692,14 @@ public class OrderFood implements Parcelable, Jsonable {
 	public String getName(){
 		return mFood.getName() + (mFoodUnit != null && mFoodUnit.getUnit().length() != 0 ? "/" + mFoodUnit.getUnit() : "");
 	}
+
+	private float getPurePrice(){
+		if(mFoodUnit != null){
+			return mFoodUnit.getPrice();
+		}else{
+			return mFood.getPrice();
+		}
+	}
 	
 	public float getFoodPrice(){
 		if(mPricePlan != null && mFood.getPricePlan().containsKey(mPricePlan)){
@@ -808,11 +840,11 @@ public class OrderFood implements Parcelable, Jsonable {
 
 		}else if(flag == OF_PARCELABLE_4_COMMIT){
 			if(this.isTemporary){
-				dest.writeString(mFood.getName());
-				dest.writeFloat(mFood.getPrice());
-				dest.writeParcel(mFood.getKitchen(), Kitchen.KITCHEN_PARCELABLE_SIMPLE);
+				dest.writeString(this.mFood.getName());
+				dest.writeFloat(this.mFood.getPrice());
+				dest.writeParcel(this.mFood.getKitchen(), Kitchen.KITCHEN_PARCELABLE_SIMPLE);
 			}else{
-				dest.writeShort(mFood.getStatus());
+				dest.writeShort(this.mFood.getStatus());
 				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
 			}
 			dest.writeLong(this.getId());
@@ -838,19 +870,19 @@ public class OrderFood implements Parcelable, Jsonable {
 		this.isGift = source.readBoolean();
 		
 		if(flag == OF_PARCELABLE_4_QUERY){
-			if(!isTemporary){
-				mFood.setStatus(source.readShort());
+			if(!this.isTemporary){
+				this.mFood.setStatus(source.readShort());
 				setTasteGroup(source.readParcel(TasteGroup.CREATOR));
 			}
 			this.setId(source.readLong());
-			mFood.setName(source.readString());
-			mFood.setPrice(source.readFloat());
-			mFood.setKitchen(source.readParcel(Kitchen.CREATOR));
-			if(mFood.isCombo()){
-				mFood.setChildFoods(source.readParcelList(ComboFood.CREATOR));
+			this.mFood.setName(source.readString());
+			this.mFood.setPrice(source.readFloat());
+			this.mFood.setKitchen(source.readParcel(Kitchen.CREATOR));
+			if(this.mFood.isCombo()){
+				this.mFood.setChildFoods(source.readParcelList(ComboFood.CREATOR));
 			}
-			mFood.setFoodId(source.readInt());
-			mFood.setAliasId(source.readShort());
+			this.mFood.setFoodId(source.readInt());
+			this.mFood.setAliasId(source.readShort());
 			this.setFoodUnit(source.readParcel(FoodUnit.CREATOR));
 			this.setDiscount(source.readFloat());
 			this.setCount(source.readFloat());
@@ -861,17 +893,17 @@ public class OrderFood implements Parcelable, Jsonable {
 			this.mCombo = source.readParcelList(ComboOrderFood.CREATOR);
 			
 		}else if(flag == OF_PARCELABLE_4_COMMIT){
-			if(isTemporary){
-				mFood.setName(source.readString());
-				mFood.setPrice(source.readFloat());
-				mFood.setKitchen(source.readParcel(Kitchen.CREATOR));
+			if(this.isTemporary){
+				this.mFood.setName(source.readString());
+				this.mFood.setPrice(source.readFloat());
+				this.mFood.setKitchen(source.readParcel(Kitchen.CREATOR));
 			}else{
-				mFood.setStatus(source.readShort());
+				this.mFood.setStatus(source.readShort());
 				setTasteGroup(source.readParcel(TasteGroup.CREATOR));
 			}
 			this.setId(source.readLong());
-			mFood.setFoodId(source.readInt());
-			mFood.setAliasId(source.readShort());
+			this.mFood.setFoodId(source.readInt());
+			this.mFood.setAliasId(source.readShort());
 			this.setFoodUnit(source.readParcel(FoodUnit.CREATOR));
 			this.setCount(source.readFloat());
 			this.setHangup(source.readBoolean());
