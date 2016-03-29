@@ -1327,17 +1327,19 @@ Ext.onReady(function() {
 								url : '../window/history/businessStatistics.jsp',
 								scripts : true,
 								nocache : true,
-								text : '功能加载中, 请稍后......',
-								params : {
-									d : '_' + new Date().getTime(),
-									dataSource : statType == 2?'paymentHistory':'history',
-									queryPattern : statType == 2? 5 : 2,
-									onDuty : statType == 1?gs['onDuty']:gs['onDutyFormat'],
-									offDuty : statType == 1?gs['offDuty']:gs['offDutyFormat'],
-									businessStatic : statType,
-									staffId : statType == 2?gs['staffId']:''
-								}
+								text : '功能加载中, 请稍后......'
 							});
+							
+							thiz.d = '_' + new Date().getTime();
+							
+							thiz.dataSource = (statType == 2 ? 'paymentHistory' : 'history');
+							thiz.queryPattern = (statType == 2 ? 5 : 2);
+							thiz.onDuty = (statType == 1 ? gs['onDuty'] : gs['onDutyFormat']);
+							thiz.offDuty = (statType == 1 ? gs['offDuty'] : gs['offDutyFormat']);
+							thiz.businessStatic = statType;
+							thiz.staffId = (statType == 2 ? gs['staffId'] : '');
+							thiz.branchId = Ext.getCmp('branchSelect_combo_dutyRange').getValue();
+							
 						}
 					}
 				});
@@ -1611,15 +1613,15 @@ Ext.onReady(function() {
 								url : '../window/history/businessStatistics.jsp',
 								scripts : true,
 								nocache : true,
-								text : '功能加载中, 请稍后......',
-								params : {
-									d : '_' + new Date().getTime(),
-									queryPattern : 2,
-									dataSource : 'history',
-									onDuty : gs['onDuty'],
-									offDuty : gs['offDuty']
-								}
+								text : '功能加载中, 请稍后......'
 							});
+							
+							thiz.d = '_' + new Date().getTime();
+							thiz.queryPattern = 2;
+							thiz.dataSource = 'history';
+							thiz.onDuty = gs['onDuty'];
+							thiz.offDuty = gs['offDuty'];
+							thiz.branchId = Ext.getCmp('branchSelect_combo_dailtSettle').getValue();
 						}
 					}
 				});

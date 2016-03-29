@@ -38,15 +38,14 @@ function dailySettleStatDetalHandler(){
 							url : '../window/history/businessStatistics.jsp',
 							scripts : true,
 							nocache : true,
-							text : '功能加载中, 请稍后......',
-							params : {
-								d : '_' + new Date().getTime(),
-								queryPattern : 2,
-								dataSource : 'history',
-								onDuty : gs['onDuty'],
-								offDuty : gs['offDuty']
-							}
+							text : '功能加载中, 请稍后......'
 						});
+						
+						thiz.d = '_' + new Date().getTime();
+						thiz.queryPattern = 2;
+						thiz.dataSource = 'history';
+						thiz.onDuty = gs['onDuty'];
+						thiz.offDuty = gs['offDuty'];
 					}
 				}
 			});

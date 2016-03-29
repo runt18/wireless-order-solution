@@ -599,13 +599,8 @@ function comboFoodTasteUnitLoad(){
 	
 	initComboFoodGroupCmp();
 	
-	
-	if($("#orderPinyinCmp").is(":hidden") && $("#orderHandCmp").is(":hidden")){
-		$('#divComboFoodFloat').css({top : 'initial', bottom : '90px'});
-	}else{
-		$('#divComboFoodFloat').css({top : 'initial', bottom : '48.5%'});
-	}
 	$('#divComboFoodFloat').show();
+	
 	//关闭可能的动态口味
 	closeFoodCommonTaste();
 	
@@ -1096,7 +1091,7 @@ function foodCommonTasteLoad(){
 				name : of.commonTastes[i].taste.name,
 				click : "chooseOrderFoodCommonTaste({event: this, id: "+ of.commonTastes[i].taste.id +"})",
 //				price : of.commonTastes[i].taste.price,
-				price : of.commonTastes[i].taste.calcValue == 1?(of.commonTastes[i].taste.rate * 100) + '%' : ('￥'+ of.commonTastes[i].taste.price),
+				price : of.commonTastes[i].taste.calcValue == 1 ? (of.commonTastes[i].taste.rate * 100) + '%' : ('￥'+ of.commonTastes[i].taste.price),
 				theme : "c"
 			}));		
 		}
@@ -1874,7 +1869,7 @@ $(function(){
 		}
 
 
-		/**
+b		/**
 		 * 初始化分厨选择
 		 * @param c
 		 */

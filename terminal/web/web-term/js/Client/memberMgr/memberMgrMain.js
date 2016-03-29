@@ -1849,7 +1849,7 @@ Ext.onReady(function(){
 					url : '../../OperateDiscount.do',
 					params : {
 						dataSource : 'getByCond',
-						branchId : selectRestaurant.getValue(),
+						branchId : selectRestaurant.getValue()
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -1890,7 +1890,7 @@ Ext.onReady(function(){
 					url : '../../OperatePricePlan.do',
 					params : {
 						dataSource : 'getByCond',
-						branchId : selectRestaurant.getValue(),
+						branchId : selectRestaurant.getValue()
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -2476,7 +2476,7 @@ Ext.onReady(function(){
 								initialPoint : initialPoint.getValue(),
 								chargeRate : chargeRate.getValue(),
 								attr : attribute,
-								desc : desc.getValue(),
+								desc : desc.getValue()
 //								memberDiscountCheckeds : getChecked(memberDiscountCheckeds, document.getElementsByName('memberDiscount')),
 //								memberPricePlanCheckeds : memberPricePlanCheckeds
 							},
@@ -2546,7 +2546,6 @@ Ext.onReady(function(){
 			return;
 		}
 		
-		//FIXME
 		
 		//加载折扣方案
 		loadPricePlanData();

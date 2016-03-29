@@ -1,4 +1,53 @@
 Ext.onReady(function(){
+	var dateType = {
+		USE_SELF_DATE : 1, //用统计框自带的时间控件
+		USE_TIME_FORMAT : 2, //时间格式化传来的long型参数
+		USE_DATE_FORMAT : 3, //日期格式化传来的long型参数
+		NO_TRANSFER : 4, //不用传时间参数到后台
+		USE_NOPARST : 5 //不格式化传来的参数
+	};
+	
+	var dataSource; 
+	if(Ext.WindowMgr.getActive().dataSource != 'null' && Ext.WindowMgr.getActive().dataSource != ''){
+		dataSource = Ext.WindowMgr.getActive().dataSource;
+	}else{
+		dataSource = 'today';
+	}
+	
+	var dutyRange = Ext.WindowMgr.getActive().dutyRange;
+	
+	
+	var queryType = Ext.WindowMgr.getActive().queryType;
+	
+	var staffId = Ext.WindowMgr.getActive().staffId;
+	
+	var businessStatic = Ext.WindowMgr.getActive().businessStatic;
+	
+	var queryPattern;
+	if(Ext.WindowMgr.getActive().queryPattern == null){
+		queryPattern = dateType.USE_SELF_DATE;
+	}else{
+		queryPattern = parseInt(Ext.WindowMgr.getActive().queryPattern);
+	}
+	
+	if(queryPattern == dateType.USE_TIME_FORMAT || queryPattern == dateType.USE_DATE_FORMAT){
+		var onDuty;
+		var offDuty;
+		
+		if(onDuty != 'null' && offDuty != 'null'){
+			onDuty = new Date(parseInt(Ext.WindowMgr.getActive().onDuty));
+			offDuty = new Date(parseInt(Ext.WindowMgr.getActive().offDuty));
+		}else{
+			onDuty = null;
+			offDuty = null;
+		}
+	}else if(queryPattern == dateType.USE_NOPARST){
+		onDuty = Ext.WindowMgr.getActive().onDuty;
+		offDuty = Ext.WindowMgr.getActive().offDuty;
+	}
+	
+	var branchId = Ext.WindowMgr.getActive().branchId;
+	var business;
 	
 	var memberTitle = '<tr>' 
 					+ '<th class="table_title text_center">会员操作</th>'
@@ -24,7 +73,7 @@ Ext.onReady(function(){
 			  + '<th class="table_title text_center">赠送总额</th>'
 			  + '<th class="table_title text_center">应收总额</th>'
 			  + '</tr>';
-	var trModel = '<tr>'
+	var trModel = '<tr>' 
 				+ '<th>{0}</th>'
 				+ '<td class="text_right">{1}</td>'
 				+ '<td class="text_right">{2}</td>'
@@ -139,7 +188,8 @@ Ext.onReady(function(){
 							onDuty : paramsOnDuty,
 							offDuty : paramsOffDuty,
 							dutyRange : dutyRange,
-							staffId : staffId
+							staffId : staffId,
+							branchId : branchId ? branchId : null
 					};
 					if(queryPattern == 1){
 						if(!beginDate.isValid() || !endDate.isValid()){
