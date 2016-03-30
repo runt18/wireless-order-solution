@@ -227,7 +227,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			
 			if(qt == SaleDetailsDao.QUERY_BY_DEPT){
 				
-				salesDetailList = SaleDetailsDao.execByDept(
+				salesDetailList = SaleDetailsDao.getByDept(
 						staff, 
 						dutyRange,
 						extraConds);
