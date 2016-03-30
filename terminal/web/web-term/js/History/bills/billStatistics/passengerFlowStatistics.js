@@ -79,7 +79,7 @@ Ext.onReady(function(){
 					}
 				});
 			},
-			select : function(isJump){
+			select : function(){
 				
 				Ext.getCmp('passengerFlow_btnSearch').handler();
 			}
