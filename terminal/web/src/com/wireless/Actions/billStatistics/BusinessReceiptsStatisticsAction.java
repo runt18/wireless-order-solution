@@ -111,10 +111,10 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				
 				final String chartData = "{\"xAxis\":" + xAxis + 
 											",\"totalMoney\" : " + totalMoney + 
-											",\"avgMoney\" : " + NumericUtil.roundFloat((totalMoney/count)) + 
-											", \"avgCount\" : " + NumericUtil.roundFloat((totalCount/count)) +
+											",\"avgMoney\" : " + (count > 0 ? NumericUtil.roundFloat((totalMoney / count)) : "0") + 
+											", \"avgCount\" : " + (count > 0 ? NumericUtil.roundFloat((totalCount / count)) : "0") +
 											", \"totalCustomer\" : " + totalCustomerAmount +
-											", \"avgCustomer\" : " + NumericUtil.roundFloat(totalCustomerAmount / count) +
+											", \"avgCustomer\" : " + (count > 0 ? NumericUtil.roundFloat(totalCustomerAmount / count) : "0") +
 										 ",\"ser\":[" +
 											"{\"name\":\'营业额\', \"data\" : " + incomes + "}," +
 											"{\"name\":\'账单数\', \"data\":" + orderAmounts + "}," + 

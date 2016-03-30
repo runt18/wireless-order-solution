@@ -90,6 +90,7 @@ function DiagPrinterPopup(){
 						self.find('[id=printerServiceState_span_checkPrinter]').attr('value', 3);
 					}
 					self.find('[id=printerServiceState_span_checkPrinter]')[0].onclick = function(){
+						alert(0);
 						var val = self.find('[id=printerServiceState_span_checkPrinter]').attr('value');
 						if(val == 1){
 							//未开启error
@@ -124,7 +125,10 @@ function DiagPrinterPopup(){
 					self.find('[id=printerServiceState_span_checkPrinter]').html('<a href="javascript:void(0);" style="color:red; ">未打开 (所有打印机不出单, 点击解决)</a>');
 					self.find('[id=printerConnectionCount_span_checkPrinter]').text(0);
 					self.find('[id=printerConnectionList_tbody_checkPrinter]').html('');
-					
+					self.find('[id=printerServiceState_span_checkPrinter]')[0].onclick = function(){
+							//未开启error
+							showError('./popup/diagPrinter/printerDisOpenError.html', 'close_a_disOpenError');
+						}
 				}
 			},
 			error : function(request, status, err){
