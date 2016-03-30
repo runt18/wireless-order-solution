@@ -1096,6 +1096,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		final String region = request.getParameter("region");
 		
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		if(branchId != null && !branchId.isEmpty()){
+			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+		}
+		
 		final CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(DateType.HISTORY);
 		
 		if(region != null && !region.equals("-1")){
@@ -1107,13 +1113,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setHourRange(hr);
 		}
 		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		
-		if(branchId != null && !branchId.isEmpty()){
-			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-		}
-		
-		List<SalesDetail> list = SaleDetailsDao.execByDept(staff, new DutyRange(onDuty, offDuty), extraCond);
+		List<SalesDetail> list = SaleDetailsDao.getByDept(staff, new DutyRange(onDuty, offDuty), extraCond);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("部门销售统计");

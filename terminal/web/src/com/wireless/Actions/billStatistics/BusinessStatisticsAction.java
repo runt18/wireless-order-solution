@@ -1,5 +1,6 @@
 package com.wireless.Actions.billStatistics;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
-import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.shift.PaymentDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -63,11 +63,18 @@ public class BusinessStatisticsAction extends DispatchAction {
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
+			final CalcBillStatisticsDao.ExtraCond extraCond;
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(branchId.equals("-1")){
+					extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY).setChain(true);
+				}else{
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+					extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
+				}
+			}else{
+				extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
 			}
 			
-			final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY); 
 			
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
@@ -82,7 +89,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			if(chart != null && !chart.isEmpty()){
 				incomesByEachDay = new ArrayList<IncomeByEachDay>();
 				
-				incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), extraCond));
+				incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(staff, new DutyRange(onDuty, offDuty), extraCond));
 				
 				List<String> xAxis = new ArrayList<String>();
 				List<Float> data = new ArrayList<Float>();
@@ -105,13 +112,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			final String chartDatas = chartData;
 			final ShiftDetail shiftDetail;
 			if(!dutyRange.equals("null") && !dutyRange.trim().isEmpty()){
-				DutyRange range = DutyRangeDao.exec(staff, onDuty, offDuty);
-				
-				if(range != null){
-					shiftDetail = ShiftDao.getByRange(staff, range, extraCond);
-				}else{
-					shiftDetail = new ShiftDetail(new DutyRange(onDuty, offDuty));
-				}
+				shiftDetail = CalcBillStatisticsDao.calcSalesIncome(staff, new DutyRange(onDuty, offDuty), extraCond);
 			}else{
 				shiftDetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), extraCond);
 			}
@@ -133,7 +134,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 				}
 				
 			});
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 			
@@ -159,15 +160,15 @@ public class BusinessStatisticsAction extends DispatchAction {
 	 */
 	public ActionForward today(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		final String pin = (String)request.getAttribute("pin");
+		final String onDuty = request.getParameter("onDuty");
+		final String offDuty = request.getParameter("offDuty");
 		
-		
-		JObject jObject = new JObject();
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String onDuty = request.getParameter("onDuty");
-			String offDuty = request.getParameter("offDuty");
-			
-			final ShiftDetail sdetail = ShiftDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), new CalcBillStatisticsDao.ExtraCond(DateType.TODAY));
+
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final ShiftDetail sdetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), new CalcBillStatisticsDao.ExtraCond(DateType.TODAY));
 			
 			if(sdetail != null){
 				jObject.setExtra(new Jsonable(){
@@ -188,7 +189,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 				jObject.initTip(false, JObject.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
 			}
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 			

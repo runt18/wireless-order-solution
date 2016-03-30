@@ -514,7 +514,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		String ending = request.getParameter("ending");
 		
 		String region = request.getParameter("region");
-		
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(DateType.TODAY);
 		
 		if(region != null && !region.equals("-1")){
@@ -528,9 +528,9 @@ public class TodayStatisticsAction extends DispatchAction{
 		
 		DutyRange dutyRange = new DutyRange(onDuty, offDuty);
 		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
 		
-		List<SalesDetail> list = SaleDetailsDao.execByDept(
+		List<SalesDetail> list = SaleDetailsDao.getByDept(
 				staff, 
 				dutyRange,
 				extraCond);

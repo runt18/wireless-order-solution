@@ -28,23 +28,21 @@ import com.wireless.pojo.util.DateUtil.Pattern;
 
 public class SalesSubStatisticsChartAction extends Action {
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String pin = (String)request.getAttribute("pin");
-		String onDuty = request.getParameter("dateBeg");
-		String offDuty = request.getParameter("dateEnd");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
-		String region = request.getParameter("region");
-		String deptId = request.getParameter("deptId");
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String onDuty = request.getParameter("dateBeg");
+		final String offDuty = request.getParameter("dateEnd");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
+		final String region = request.getParameter("region");
+		final String deptId = request.getParameter("deptId");
 		
-		List<IncomeTrendByDept> incomesByEachDay;
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try{
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
+			final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
 			if(opening != null && !opening.isEmpty()){
 				HourRange hr = new HourRange(opening, ending, Pattern.HOUR);
 				extraCond.setHourRange(hr);
@@ -56,11 +54,8 @@ public class SalesSubStatisticsChartAction extends Action {
 
 			if(deptId != null && !deptId.equals("-1")){
 				extraCond.setDept(Department.DeptId.valueOf(Integer.parseInt(deptId)));
-				
 			}
-			incomesByEachDay = CalcBillStatisticsDao.calcIncomeTrendByDept(staff, new DutyRange(onDuty, offDuty), extraCond);
-			
-			
+			final List<IncomeTrendByDept> incomesByEachDay = CalcBillStatisticsDao.calcIncomeTrendByDept(staff, new DutyRange(onDuty, offDuty), extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
@@ -75,7 +70,7 @@ public class SalesSubStatisticsChartAction extends Action {
 			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/count)*100)/100 + 
 					",\"ser\":[{\"name\":\'营业额\', \"data\" : " + data + "}]}";
 			
-			jobject.setExtra(new Jsonable(){
+			jObject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
@@ -92,9 +87,9 @@ public class SalesSubStatisticsChartAction extends Action {
 
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);			
+			jObject.initTip(e);			
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

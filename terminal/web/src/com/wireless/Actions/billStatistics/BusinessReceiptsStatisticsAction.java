@@ -1,5 +1,6 @@
 package com.wireless.Actions.billStatistics;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -54,16 +56,22 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 		final String includingChart = request.getParameter("includingChart");
 		
 		final JObject jObject = new JObject();
-		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
 		try{
 
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
+			final CalcBillStatisticsDao.ExtraCond extraCond;
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(branchId.equals("-1")){
+					extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY).setChain(true);
+				}else{
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+					extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
+				}
+			}else{
+				extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
 			}
 			
-			final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
 			if(opening != null && !opening.isEmpty()){
 				HourRange hr = new HourRange(opening, ending, Pattern.HOUR);
 				extraCond.setHourRange(hr);
@@ -73,12 +81,8 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				extraCond.setRegion(Region.RegionId.valueOf(Integer.parseInt(region)));
 			}
 			
-			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(staff, new DutyRange(onDuty, offDuty), extraCond));
+			List<IncomeByEachDay> incomesByEachDay = CalcBillStatisticsDao.calcIncomeByEachDay(staff, new DutyRange(onDuty, offDuty), extraCond);
 			
-		}catch(Exception e){
-			e.printStackTrace();
-			jObject.initTip4Exception(e);
-		}finally{
 			if(incomesByEachDay.size() == 1 && incomesByEachDay.get(0).getIncomeByPay() == null){
 				jObject.setRoot(new ArrayList<Jsonable>(0));
 				
@@ -136,6 +140,10 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				});
 			}
 			
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+		}finally{
 			response.getWriter().print(jObject.toString(IncomeByPay.PAY_TYPE_FOR_STATISTICS));
 		}
 		return null;
@@ -148,6 +156,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 		Calendar endDate = Calendar.getInstance();
 		endDate.add(Calendar.DATE, -1);
 		
+		final String pin = (String)request.getAttribute("pin");
 		if(Integer.parseInt(time) == 7){
 			c.add(Calendar.DATE, -7);
 		}else if(Integer.parseInt(time) == 14){
@@ -158,8 +167,8 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 		
 		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(DateUtil.format(c.getTime()), DateUtil.format(endDate.getTime())), new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(staff, new DutyRange(DateUtil.format(c.getTime()), DateUtil.format(endDate.getTime())), new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)));
 			
 //			jobject.setRoot(incomesByEachDay);
 			

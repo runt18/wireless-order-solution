@@ -12,7 +12,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -23,34 +22,25 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 
 public class DailySettleStatDetailAction extends Action {
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		JObject jobject = new JObject();
-		
-		List<Jsonable> list = new ArrayList<Jsonable>();
-		DBCon dbCon = new DBCon();
+		final JObject jObject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String onDuty = request.getParameter("onDuty");
+		final String offDuty = request.getParameter("offDuty");
 
 		try {
 
-			String pin = (String)request.getAttribute("pin");
-
-			
-			dbCon.connect();
 			// get the query condition
-			String onDuty = request.getParameter("onDuty");
-			String offDuty = request.getParameter("offDuty");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final ShiftDetail result = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 
-			final ShiftDetail result = ShiftDao.getByRange(dbCon, 
-										StaffDao.verify(dbCon, Integer.parseInt(pin)), 
-										new DutyRange(onDuty, offDuty),
-										new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
-
-			dbCon.rs.close();
-			
+			final List<Jsonable> list = new ArrayList<Jsonable>();
 			list.add(new Jsonable() {
 				
 				@Override
@@ -60,26 +50,6 @@ public class DailySettleStatDetailAction extends Action {
 
 					jm.putJsonable(result.getIncomeByPay(), flag);
 					
-/*					jm.putInt("cashBillCount", result.getCashAmount());
-					jm.putFloat("cashAmount", result.getCashTotalIncome());
-					jm.putFloat("cashActual", result.getCashActualIncome());
-
-					jm.putInt("creditBillCount", result.getCreditCardAmount());
-					jm.putFloat("creditAmount", result.getCreditTotalIncome());
-					jm.putFloat("creditActual", result.getCreditActualIncome());
-
-					jm.putInt("memberBillCount", result.getMemberCardAmount());
-					jm.putFloat("memberAmount", result.getMemberTotalIncome());
-					jm.putFloat("memberActual", result.getMemberActualIncome());
-
-					jm.putInt("signBillCount", result.getSignAmount());
-					jm.putFloat("signAmount", result.getSignTotalIncome());
-					jm.putFloat("signActual", result.getSignActualIncome());
-
-					jm.putInt("hangBillCount", result.getHangAmount());
-					jm.putFloat("hangAmount", result.getHangTotalIncome());
-					jm.putFloat("hangActual", result.getHangActualIncome());*/
-
 					jm.putFloat("discountAmount", result.getDiscountIncome());
 					jm.putInt("discountBillCount", result.getDiscountAmount());
 
@@ -129,23 +99,19 @@ public class DailySettleStatDetailAction extends Action {
 					
 				}
 			});
-
-		} catch (BusinessException e) {
-			e.printStackTrace();
-			jobject.initTip(e);
 			
-		} catch (SQLException e) {
-			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.setRoot(list);
 
+		} catch (BusinessException | SQLException e) {
+			e.printStackTrace();
+			jObject.initTip(e);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 
 		} finally {
-			dbCon.disconnect();
-			jobject.setRoot(list);
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;

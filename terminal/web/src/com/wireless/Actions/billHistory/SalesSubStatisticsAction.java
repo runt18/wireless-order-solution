@@ -1,5 +1,7 @@
 package com.wireless.Actions.billHistory;
 
+import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +13,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
-import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
 import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -34,7 +35,6 @@ public class SalesSubStatisticsAction extends Action {
 	 */
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		List<SalesDetail> salesDetailList = null;
 		
 		final String pin = (String)request.getAttribute("pin");
 
@@ -104,12 +104,19 @@ public class SalesSubStatisticsAction extends Action {
 				dt = DateType.HISTORY;
 			}
 			
+			final CalcBillStatisticsDao.ExtraCond extraCond;
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(branchId.equals("-1")){
+					extraCond = new CalcBillStatisticsDao.ExtraCond(dt).setChain(true);
+				}else{
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+					extraCond = new CalcBillStatisticsDao.ExtraCond(dt);
+				}
+			}else{
+				extraCond = new CalcBillStatisticsDao.ExtraCond(dt);
 			}
 			
-			final CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(dt);
 				
 			if(dt.isHistory()){
 				dateBeg = dateBeg != null && dateBeg.length() > 0 ? dateBeg.trim() + " 00:00:00" : "";
@@ -126,9 +133,12 @@ public class SalesSubStatisticsAction extends Action {
 				HourRange hr = new HourRange(businessHourBeg, businessHourEnd, DateUtil.Pattern.HOUR);
 				extraCond.setHourRange(hr);
 			}
+			
+			List<SalesDetail> salesDetailList;
+			
 			if(qt == SaleDetailsDao.QUERY_BY_DEPT){
 				
-				salesDetailList = SaleDetailsDao.execByDept(staff, dutyRange, extraCond);
+				salesDetailList = SaleDetailsDao.getByDept(staff, dutyRange, extraCond);
 				
 			}else if(qt == SaleDetailsDao.QUERY_BY_FOOD){
 				if(foodName != null && !foodName.isEmpty()){
@@ -144,16 +154,11 @@ public class SalesSubStatisticsAction extends Action {
 				
 			}else if(qt == SaleDetailsDao.QUERY_BY_KITCHEN){
 				salesDetailList = SaleDetailsDao.getByKitchen(staff, dutyRange, extraCond);
-			}
 				
-		} catch(BusinessException e){
-			e.printStackTrace();
-			jObject.initTip(e);
+			}else{
+				salesDetailList = Collections.emptyList();
+			}
 			
-		} catch(Exception e){
-			e.printStackTrace();
-			jObject.initTip4Exception(e);
-		} finally{
 			jObject.setTotalProperty(salesDetailList.size());
 			
 			SalesDetail summary = null;
@@ -185,6 +190,16 @@ public class SalesSubStatisticsAction extends Action {
 				salesDetailList.add(summary);
 			}
 			jObject.setRoot(salesDetailList);
+			
+		} catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip4Exception(e);
+		} finally{
+
 			response.getWriter().print(jObject.toString());
 		}
 		return null;
