@@ -500,8 +500,9 @@ public class JobContentFactory {
 	 * @return the shift content
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public Content createShiftContent(PType printType, Staff staff, List<Printer> printers, DutyRange range, Region.RegionId regionId) throws SQLException{
+	public Content createShiftContent(PType printType, Staff staff, List<Printer> printers, DutyRange range, Region.RegionId regionId) throws SQLException, BusinessException{
 		
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
