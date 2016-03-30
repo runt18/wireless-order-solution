@@ -276,7 +276,7 @@ $(function(){
 				isWeight : (orderMsg.orderFoods[i].status & 1 << 7) != 0 ? 'initial' : 'none',
 				tastePref : orderMsg.orderFoods[i].tasteGroup.tastePref,
 				tastePrice : orderMsg.orderFoods[i].tasteGroup.tastePrice,
-				unitPrice : (orderMsg.orderFoods[i].unitPrice + orderMsg.orderFoods[i].tasteGroup.tastePrice).toFixed(2),
+				unitPrice : (orderMsg.orderFoods[i].unitPrice).toFixed(2),
 				discount : orderMsg.orderFoods[i].discount,
 				totalPrice : orderMsg.orderFoods[i].totalPrice.toFixed(2),
 				orderDateFormat : orderMsg.orderFoods[i].orderDateFormat.substring(11),
