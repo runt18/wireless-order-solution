@@ -459,7 +459,7 @@ Ext.onReady(function(){
 	        labels: {
 	        	items : [{
 	        		html : '<b>总营业额:' + chartData.totalMoney + ' 元</b><br><b>日均收入:' + chartData.avgMoney + ' 元</b><br><b>总客流量:' + chartData.totalCustomer + ' 人</b><br><b>日均客流:' + chartData.avgCustomer + ' 人</b><br><b>人均消费' + ((chartData.totalMoney/chartData.totalCustomer) ? (chartData.totalMoney/chartData.totalCustomer).toFixed(2) : 0) + '元<b>',
-		        	style : {left :/*($('#businessReceiptsChart').width()*0.80)*/'0px', top: '0px'}
+		        	style : {left :'0px', top: '0px'}
 	        	}]
 	        },
 	        xAxis: {
