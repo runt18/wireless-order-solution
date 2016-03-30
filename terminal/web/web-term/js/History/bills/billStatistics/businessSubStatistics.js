@@ -585,7 +585,6 @@
 	}
 Ext.onReady(function(){
 	
-
 	var businessSubGeneralPanel;
 	
 	function newDate(str) { 
