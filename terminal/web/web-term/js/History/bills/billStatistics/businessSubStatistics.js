@@ -548,8 +548,6 @@
 	}
 Ext.onReady(function(){
 	
-
-	
 	
 	var businessSubGeneralPanel;
 	
