@@ -542,6 +542,43 @@
 					}
 				})();
 			});
+		}else if(c.type == 12){//客流统计
+			Ext.ux.addTab('passengerFlowStatistics', '客流统计 ', 'History_Module/PassengerFlowStatistics.html', function(){
+				businessSubStatisticsLoading.show();
+				
+				(function(){
+					if(Ext.getCmp('branchSelect_combo_passengerFlow').getValue()){
+						//设置市别为空
+						Ext.getCmp('passengerFlow_comboBusinessHour').setValue('');
+						//设置门店选择的值
+						Ext.getCmp('branchSelect_combo_passengerFlow').setValue(Ext.getCmp('branchSelect_combo_businessSubStatistics').getValue());
+						
+						var isJump = true;
+						Ext.getCmp('branchSelect_combo_passengerFlow').fireEvent('select', this, null, null, isJump);
+						
+								
+								(function(){
+									if(Ext.getCmp('passengerFlow_comboBusinessHour').getValue() ){
+										Ext.getCmp('beginDate_combo_passengerFlow').setValue(sendToStatisticsPageBeginDate);
+										Ext.getCmp('endDate_combo_passengerFlow').setValue(sendToStatisticsPageEndDate);
+										Ext.getCmp('regionSelect_combo_passengerFlow').setValue(sendToStatisticsRegion);
+										hours = sendToStatisticsPageHours;
+										
+										Ext.getCmp('passengerFlow_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">' + hours.openingText + '</font>');
+										Ext.getCmp('passengerFlow_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">' + hours.endingText + '</font>');
+										Ext.getCmp('passengerFlow_comboBusinessHour').setValue(hours.hourComboValue);	
+										
+										Ext.getCmp('passengerFlow_btnSearch').handler();
+										businessSubStatisticsLoading.hide();
+									}else{
+										setTimeout(arguments.callee, 500);
+									}
+								})();
+					}else{
+						setTimeout(arguments.callee, 500);
+					}
+				})();
+			});
 		}else{
 			return;
 		}
@@ -549,8 +586,6 @@
 Ext.onReady(function(){
 	
 
-	
-	
 	var businessSubGeneralPanel;
 	
 	function newDate(str) { 
@@ -1040,6 +1075,8 @@ Ext.onReady(function(){
 					Ext.getDom('businessStatisticsSummary').innerHTML = trPayTypeContent;
 					
 					Ext.getDom('businessStatisticsDeptGeneral').innerHTML = trContent;
+					
+					Ext.getDom('passengerFlowAccount').innerHTML = businessSub_business.customerAmount + '人';
 					
 					businessSub_showChart({
 						jdata : jr,
