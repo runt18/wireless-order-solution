@@ -306,8 +306,9 @@ public class PaymentDao {
 	 * @return the detail to this payment
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static ShiftDetail getDetail(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static ShiftDetail getDetail(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -330,8 +331,9 @@ public class PaymentDao {
 	 * @return the detail to this payment
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static ShiftDetail getDetail(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static ShiftDetail getDetail(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
 		ShiftDetail result = new ShiftDetail(range);
 		
 		CalcBillStatisticsDao.ExtraCond extraCond4CalcBill = new CalcBillStatisticsDao.ExtraCond(extraCond.dateType).setStaffId(extraCond.staffId);

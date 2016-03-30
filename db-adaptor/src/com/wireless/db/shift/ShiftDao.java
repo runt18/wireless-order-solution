@@ -219,8 +219,9 @@ public class ShiftDao {
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static ShiftDetail getByRange(Staff staff, DutyRange range, CalcBillStatisticsDao.ExtraCond extraCond) throws SQLException{
+	public static ShiftDetail getByRange(Staff staff, DutyRange range, CalcBillStatisticsDao.ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -243,8 +244,9 @@ public class ShiftDao {
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static ShiftDetail getByRange(DBCon dbCon, Staff staff, DutyRange range, CalcBillStatisticsDao.ExtraCond extraCond) throws SQLException{
+	public static ShiftDetail getByRange(DBCon dbCon, Staff staff, DutyRange range, CalcBillStatisticsDao.ExtraCond extraCond) throws SQLException, BusinessException{
 		
 		ShiftDetail result = new ShiftDetail(range);
 		

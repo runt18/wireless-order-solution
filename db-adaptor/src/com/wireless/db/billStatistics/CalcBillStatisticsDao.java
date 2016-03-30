@@ -7,13 +7,18 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.db.book.BookDao;
 import com.wireless.db.orderMgr.PayTypeDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.shift.ShiftDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
@@ -34,6 +39,7 @@ import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.billStatistics.IncomeByRound;
 import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.pojo.billStatistics.IncomeTrendByDept;
+import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
 import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
@@ -44,6 +50,7 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
@@ -54,6 +61,7 @@ public class CalcBillStatisticsDao {
 		public final DateType dateType;
 		private final DBTbl dbTbl;
 
+		private boolean isChain = false;
 		private Region.RegionId regionId;
 		private Department.DeptId deptId;
 		private String foodName;
@@ -64,6 +72,15 @@ public class CalcBillStatisticsDao {
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
 			this.dbTbl = new DBTbl(dateType);
+		}
+		
+		public ExtraCond setChain(boolean onOff){
+			this.isChain = onOff;
+			return this;
+		}
+		
+		public boolean isChain(){
+			return this.isChain;
 		}
 		
 		public ExtraCond setRegion(Region.RegionId regionId){
@@ -133,8 +150,9 @@ public class CalcBillStatisticsDao {
 	 * @return the income by pay {@link IncomeByPayType}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static IncomeByPay calcIncomeByPayType(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{	
+	public static IncomeByPay calcIncomeByPayType(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{	
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -157,80 +175,98 @@ public class CalcBillStatisticsDao {
 	 * @return the income by pay {@link IncomeByPayType}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static IncomeByPay calcIncomeByPayType(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{		
+	public static IncomeByPay calcIncomeByPayType(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{		
 		
 		IncomeByPay incomeByPay;
 		
-		String sql;
-		//Calculate the order amount.
-		sql = " SELECT COUNT(*) FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " + 
-			  " WHERE 1 = 1 " +
-			  (extraCond != null ? extraCond.toString() : "") +
-			  " AND O.restaurant_id = " + staff.getRestaurantId() +
-			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			  " AND (O.status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			incomeByPay = new IncomeByPay(dbCon.rs.getInt(1));
+		if(extraCond.isChain()){
+			//append the income in case of chain.
+			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
+			incomeByPay = calcIncomeByPayType(dbCon, groupStaff, range, extraCond.setChain(false));
+			
+			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
+				IncomeByPay branchIncome = calcIncomeByPayType(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), range, extraCond.setChain(false));
+				for(IncomeByPay.PaymentIncome incomeByPayType : branchIncome.getPaymentIncomes()){
+					incomeByPay.addIncome4Chain(incomeByPayType);
+				}
+			}
+			
+			//Restore the chain status to extra condition.
+			extraCond.setChain(true);
 		}else{
-			incomeByPay = new IncomeByPay(0);
-		}
-		dbCon.rs.close();
-		
-		//Calculate the single payment to each pay type.
-		sql = " SELECT " +
-			  " O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, " +
-			  " COUNT(*) AS amount, ROUND(SUM(O.total_price), 2) AS total_income, ROUND(SUM(O.actual_price), 2) AS actual_income " +
-			  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
-			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
-			  " WHERE 1 = 1 " +
-			  (extraCond != null ? extraCond.toString() : "") +
-			  " AND O.restaurant_id = " + staff.getRestaurantId() + 
-			  " AND O.pay_type_id <> " + PayType.MIXED.getId() +
-			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			  " AND (O.status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
-			  " GROUP BY O.pay_type_id ";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
-			payType.setName(dbCon.rs.getString("pay_type_name"));
-			int amount = dbCon.rs.getInt("amount");
-			float total = dbCon.rs.getFloat("total_income");
-			float actual = dbCon.rs.getFloat("actual_income");
-			incomeByPay.addPaymentIncome(new IncomeByPay.PaymentIncome(payType, amount, total, actual));
-		}
-		dbCon.rs.close();
+			
+			String sql;
+			//Calculate the order amount.
+			sql = " SELECT COUNT(*) FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " + 
+				  " WHERE 1 = 1 " +
+				  (extraCond != null ? extraCond.toString() : "") +
+				  " AND O.restaurant_id = " + staff.getRestaurantId() +
+				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+				  " AND (O.status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				incomeByPay = new IncomeByPay(dbCon.rs.getInt(1));
+			}else{
+				incomeByPay = new IncomeByPay(0);
+			}
+			dbCon.rs.close();
+			
+			//Calculate the single payment to each pay type.
+			sql = " SELECT " +
+				  " O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, " +
+				  " COUNT(*) AS amount, ROUND(SUM(O.total_price), 2) AS total_income, ROUND(SUM(O.actual_price), 2) AS actual_income " +
+				  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
+				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
+				  " WHERE 1 = 1 " +
+				  (extraCond != null ? extraCond.toString() : "") +
+				  " AND O.restaurant_id = " + staff.getRestaurantId() + 
+				  " AND O.pay_type_id <> " + PayType.MIXED.getId() +
+				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+				  " AND (O.status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
+				  " GROUP BY O.pay_type_id ";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
+				payType.setName(dbCon.rs.getString("pay_type_name"));
+				int amount = dbCon.rs.getInt("amount");
+				float total = dbCon.rs.getFloat("total_income");
+				float actual = dbCon.rs.getFloat("actual_income");
+				incomeByPay.addPaymentIncome(new IncomeByPay.PaymentIncome(payType, amount, total, actual));
+			}
+			dbCon.rs.close();
 
-		//Calculate the mixed payment income to each pay type.
-		sql = " SELECT " +
-			  " MP.pay_type_id, IFNULL(MAX(PT.name), '其他') AS pay_type_name, " +
-			  " COUNT(*) AS amount, ROUND(SUM(MP.price), 2) AS total_income, ROUND(SUM(MP.price), 2) AS actual_income " +
-			  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
-			  " JOIN " + Params.dbName + "." + extraCond.dbTbl.mixedTbl + " MP ON O.id = MP.order_id " +
-			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON MP.pay_type_id = PT.pay_type_id " +
-			  " WHERE 1 = 1 " +
-			  (extraCond != null ? extraCond.toString() : "") +
-			  " AND O.restaurant_id = " + staff.getRestaurantId() + 
-			  " AND O.pay_type_id = " + PayType.MIXED.getId() +
-			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			  " AND (O.status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
-			  " GROUP BY MP.pay_type_id ";
-		
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
-			payType.setName(dbCon.rs.getString("pay_type_name"));
-			int amount = dbCon.rs.getInt("amount");
-			float total = dbCon.rs.getFloat("total_income");
-			float actual = dbCon.rs.getFloat("actual_income");
-			incomeByPay.addPaymentIncome(new IncomeByPay.PaymentIncome(payType, amount, total, actual));
-		}
-		dbCon.rs.close();
-		
-		//Append the designed and member payment type if NOT contained within the result.
-		for(PayType payType : PayTypeDao.getByCond(dbCon, staff, new PayTypeDao.ExtraCond().addType(PayType.Type.DESIGNED).addType(PayType.Type.MEMBER))){
-			incomeByPay.addPaymentIncome(new PaymentIncome(payType, 0, 0, 0));
+			//Calculate the mixed payment income to each pay type.
+			sql = " SELECT " +
+				  " MP.pay_type_id, IFNULL(MAX(PT.name), '其他') AS pay_type_name, " +
+				  " COUNT(*) AS amount, ROUND(SUM(MP.price), 2) AS total_income, ROUND(SUM(MP.price), 2) AS actual_income " +
+				  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
+				  " JOIN " + Params.dbName + "." + extraCond.dbTbl.mixedTbl + " MP ON O.id = MP.order_id " +
+				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON MP.pay_type_id = PT.pay_type_id " +
+				  " WHERE 1 = 1 " +
+				  (extraCond != null ? extraCond.toString() : "") +
+				  " AND O.restaurant_id = " + staff.getRestaurantId() + 
+				  " AND O.pay_type_id = " + PayType.MIXED.getId() +
+				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+				  " AND (O.status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
+				  " GROUP BY MP.pay_type_id ";
+			
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
+				payType.setName(dbCon.rs.getString("pay_type_name"));
+				int amount = dbCon.rs.getInt("amount");
+				float total = dbCon.rs.getFloat("total_income");
+				float actual = dbCon.rs.getFloat("actual_income");
+				incomeByPay.addPaymentIncome(new IncomeByPay.PaymentIncome(payType, amount, total, actual));
+			}
+			dbCon.rs.close();
+			
+			//Append the designed and member payment type if NOT contained within the result.
+			for(PayType payType : PayTypeDao.getByCond(dbCon, staff, new PayTypeDao.ExtraCond().addType(PayType.Type.DESIGNED).addType(PayType.Type.MEMBER))){
+				incomeByPay.addPaymentIncome(new PaymentIncome(payType, 0, 0, 0));
+			}
 		}
 		
 		return incomeByPay;
@@ -779,6 +815,7 @@ public class CalcBillStatisticsDao {
 		return (
 			   " SELECT " +
 			   " OF.order_id, OF.food_id, " +
+			   " MAX(O.restaurant_id) AS restaurant_id, " +
  			   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
 			   " SUM(order_count) AS food_amount, " +
 			   " CASE WHEN OF.is_gift = 1 THEN ($(unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
@@ -1008,6 +1045,7 @@ public class CalcBillStatisticsDao {
 		//Get the gift, discount & total to each food during this period.
 		sql = " SELECT " +
 			  " TMP.food_id, " + 
+			  " MAX(R.restaurant_name) AS restaurant_name, " +
 			  " MAX(IFNULL(TMP2.unit_cost, 0)) AS unit_cost, " + 
 			  " ROUND(SUM(TMP.food_amount * IFNULL(TMP2.unit_cost, 0)), 2) AS food_cost, " +
 			  " MAX(TMP.food_name) AS food_name, MAX(TMP.food_status) AS food_status, " + 
@@ -1021,6 +1059,7 @@ public class CalcBillStatisticsDao {
 			  " FROM (" +
 			  makeSql4CalcFood(staff, range, extraCond) +
 			  " ) AS TMP " +
+			  " JOIN " + Params.dbName + ".restaurant R ON TMP.restaurant_id = R.id " +
 			  " LEFT JOIN " +
 			  	  " ( SELECT FM.food_id, M.price AS unit_cost" + 
 			  	   	 " FROM " + Params.dbName + ".food_material FM " +
@@ -1051,6 +1090,7 @@ public class CalcBillStatisticsDao {
 			food.setKitchen(kitchen);
 			
 			foodIncomes.add(new IncomeByFood(food,
+											 dbCon.rs.getString("restaurant_name"),
 											 dbCon.rs.getFloat("food_gift"),
 											 dbCon.rs.getFloat("food_discount"),
 											 dbCon.rs.getFloat("food_income"),
@@ -1257,59 +1297,87 @@ public class CalcBillStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws ParseException
 	 * 			throws if failed to parse the on or off duty string
+	 * @throws BusinessException 
 	 */
-	public static List<IncomeByEachDay> calcIncomeByEachDay(DBCon dbCon, Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException{
+	public static List<IncomeByEachDay> calcIncomeByEachDay(DBCon dbCon, Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		
-		List<IncomeByEachDay> result = new ArrayList<IncomeByEachDay>();
+		final List<IncomeByEachDay> result = new ArrayList<IncomeByEachDay>();
 		
-		Calendar c = Calendar.getInstance();
-		Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOnDutyFormat());
-		Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOffDutyFormat());
-		c.setTime(dateBegin);
-		while (dateBegin.compareTo(dateEnd) <= 0) {
-			c.add(Calendar.DATE, 1);
-			
-			DutyRange range = DutyRangeDao.exec(dbCon, staff, 
-												DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), 
-												DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
-			
-			IncomeByEachDay income = new IncomeByEachDay(DateUtil.format(dateBegin, DateUtil.Pattern.DATE));
-			if(range != null){
-				
-				//Calculate the customer amount
-				income.setCustomerAmount(calcCustomerAmount(dbCon, staff, range, extraCond));
-				
-				//Calculate the general income
-				income.setIncomeByPay(calcIncomeByPayType(dbCon, staff, range, extraCond));
-				
-				//Calculate the total & amount to erase price
-				income.setIncomeByErase(calcErasePrice(dbCon, staff, range, extraCond));
-				
-				//Get the total & amount to discount price
-				income.setIncomeByDiscount(calcDiscountPrice(dbCon, staff, range, extraCond));
-	
-				//Get the total & amount to gift price
-				income.setIncomeByGift(calcGiftPrice(dbCon, staff, range, extraCond));
-				
-				//Get the total & amount to cancel price
-				income.setIncomeByCancel(calcCancelPrice(dbCon, staff, range, extraCond));
-				
-				//Get the total & amount to coupon price
-				income.setIncomeByCoupon(calcCouponPrice(dbCon, staff, range, extraCond));
-				
-				//Get the total & amount to repaid order
-				income.setIncomeByRepaid(calcRepaidPrice(dbCon, staff, range, extraCond));
-				
-				//Get the total & amount to order with service
-				income.setIncomeByService(calcServicePrice(dbCon, staff, range, extraCond));
-				
-				//Get the charge income by both cash and credit card
-				income.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY).setStaff(extraCond.staffId)));
-				
+		if(extraCond.isChain()){
+			//Group by the kitchen name in case of chain.
+			//key : value - deptName + kitchenName : salesDetail
+			final Map<String, IncomeByEachDay> chainResult = new HashMap<>();
+			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
+			for(IncomeByEachDay groupIncome : calcIncomeByEachDay(dbCon, groupStaff, dutyRange, extraCond.setChain(false))){
+				chainResult.put(groupIncome.getDate(), groupIncome);
 			}
-			result.add(income);
 			
-			dateBegin = c.getTime();
+			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
+				for(IncomeByEachDay branchIncome : calcIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), dutyRange, extraCond.setChain(false))){
+					if(chainResult.containsKey(branchIncome.getDate())){
+						IncomeByEachDay incomeByEachDay = chainResult.get(branchIncome.getDate());
+						//Append the branch income.
+						incomeByEachDay.append(branchIncome);
+					}else{
+						chainResult.put(branchIncome.getDate(), branchIncome);
+					}
+				}
+			}
+			
+			result.addAll(chainResult.values());
+			
+			//Restore the chain status to extra condition.
+			extraCond.setChain(true);
+		}else{
+			Calendar c = Calendar.getInstance();
+			Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOnDutyFormat());
+			Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOffDutyFormat());
+			c.setTime(dateBegin);
+			while (dateBegin.compareTo(dateEnd) <= 0) {
+				c.add(Calendar.DATE, 1);
+				
+				DutyRange range = DutyRangeDao.exec(dbCon, staff, 
+													DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), 
+													DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
+				
+				IncomeByEachDay income = new IncomeByEachDay(DateUtil.format(dateBegin, DateUtil.Pattern.DATE));
+				if(range != null){
+					
+					//Calculate the customer amount
+					income.setCustomerAmount(calcCustomerAmount(dbCon, staff, range, extraCond));
+					
+					//Calculate the income by pay
+					income.setIncomeByPay(calcIncomeByPayType(dbCon, staff, range, extraCond));
+					
+					//Calculate the total & amount to erase price
+					income.setIncomeByErase(calcErasePrice(dbCon, staff, range, extraCond));
+					
+					//Get the total & amount to discount price
+					income.setIncomeByDiscount(calcDiscountPrice(dbCon, staff, range, extraCond));
+		
+					//Get the total & amount to gift price
+					income.setIncomeByGift(calcGiftPrice(dbCon, staff, range, extraCond));
+					
+					//Get the total & amount to cancel price
+					income.setIncomeByCancel(calcCancelPrice(dbCon, staff, range, extraCond));
+					
+					//Get the total & amount to coupon price
+					income.setIncomeByCoupon(calcCouponPrice(dbCon, staff, range, extraCond));
+					
+					//Get the total & amount to repaid order
+					income.setIncomeByRepaid(calcRepaidPrice(dbCon, staff, range, extraCond));
+					
+					//Get the total & amount to order with service
+					income.setIncomeByService(calcServicePrice(dbCon, staff, range, extraCond));
+					
+					//Get the charge income by both cash and credit card
+					income.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY).setStaff(extraCond.staffId)));
+					
+				}
+				result.add(income);
+				
+				dateBegin = c.getTime();
+			}
 		}
 		
 		return result;
@@ -1328,8 +1396,9 @@ public class CalcBillStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws ParseException
 	 * 			throws if failed to parse the on or off duty string
+	 * @throws BusinessException 
 	 */
-	public static List<IncomeByEachDay> calcIncomeByEachDay(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, ParseException{
+	public static List<IncomeByEachDay> calcIncomeByEachDay(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -1338,5 +1407,73 @@ public class CalcBillStatisticsDao {
 			dbCon.disconnect();
 		}
 	}
-	 
+
+	/**
+	 * calculate the sales income (营业统计) according to specific extra condition {@link ExtraCond}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to sales income {@link ShiftDetail}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the branches does NOT exist in case of chain
+	 */
+	public static ShiftDetail calcSalesIncome(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calcSalesIncome(dbCon, staff, range, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	
+	/**
+	 * calculate the sales income (营业统计) according to specific extra condition {@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to sales income {@link ShiftDetail}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the branches does NOT exist in case of chain
+	 */
+	public static ShiftDetail calcSalesIncome(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
+		final ShiftDetail result;
+		
+		if(extraCond.isChain()){
+			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
+			//Append the sales income to the group.
+			result = calcSalesIncome(dbCon, groupStaff, range, extraCond.setChain(false));
+			//Append the sales income to each branch.
+			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
+				result.append(calcSalesIncome(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), range, extraCond.setChain(false)));
+			}
+			
+			//Restore the chain status to extra condition.
+			extraCond.setChain(true);
+		}else{
+			final DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
+			if(dutyRange == null){
+				result = ShiftDao.getByRange(dbCon, staff, range, extraCond);
+			}else{
+				result = ShiftDao.getByRange(dbCon, staff, dutyRange, extraCond);
+			}
+		}
+		
+		return result;
+
+	}
+	
 }

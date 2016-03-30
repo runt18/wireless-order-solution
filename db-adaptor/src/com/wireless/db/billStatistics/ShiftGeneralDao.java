@@ -7,6 +7,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.shift.PaymentDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.PaymentGeneral;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
@@ -108,8 +109,9 @@ public class ShiftGeneralDao {
 	 * @return the list result {@link ShiftGeneral}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static List<ShiftGeneral> getToday(Staff staff) throws SQLException{
+	public static List<ShiftGeneral> getToday(Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -128,8 +130,9 @@ public class ShiftGeneralDao {
 	 * @return the list result {@link ShiftGeneral}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static List<ShiftGeneral> getToday(DBCon dbCon, Staff staff) throws SQLException{
+	public static List<ShiftGeneral> getToday(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		String sql;
 		
 		List<ShiftGeneral> result = getByCond(dbCon, staff, new ExtraCond(DateType.TODAY), null);
