@@ -599,6 +599,12 @@ function comboFoodTasteUnitLoad(){
 	
 	initComboFoodGroupCmp();
 	
+	 if($("#orderPinyinCmp").is(":hidden") && $("#orderHandCmp").is(":hidden")){
+		 $('#divComboFoodFloat').css({top : 'initial', bottom : '90px'});
+	 }else{
+		 $('#divComboFoodFloat').css({top : 'initial', bottom : '48.5%'});
+	 }
+	
 	$('#divComboFoodFloat').show();
 	
 	//关闭可能的动态口味
@@ -1042,12 +1048,51 @@ of.ot.saveOrderFoodTaste = function(){
 			//用唯一标示替代id
 			if(of.newFood[i].unique == of.selectedOrderFood.unique){
 				//是否为子菜
-				if((of.newFood[i].status & 1 << 5) != 0  && chooseOrderFoodCommonTaste.curComboFoodId){
+				if(of.newFood[i].isCombo() && chooseOrderFoodCommonTaste.curComboFoodId){
 					for (var j = 0; j < of.newFood[i].combo.length; j++) {
 						var comboOrderFood = of.newFood[i].combo[j];
 						if(chooseOrderFoodCommonTaste.curComboFoodId == comboOrderFood.comboFood.id){
 							//获取子菜的tasteGroup
 							comboOrderFood.tasteGroup = tasteGroup;
+							//遍历子菜口味加入主菜口味中
+//							tasteGroup.normalTasteContent.forEach(function(taste, index){
+//								of.newFood[i].tasteGroup.normalTasteContent.push(taste);
+//							});
+							if(typeof of.newFood[i].tasteGroup === 'undefined'){
+								of.newFood[i].tasteGroup = {
+									normalTaste : {}
+								};
+							}
+
+							if(typeof of.newFood[i].tasteGroup.normalTaste === 'undefined'){
+								of.newFood[i].tasteGroup.normalTaste = {};
+							}
+							
+							if(typeof of.newFood[i].tasteGroup.normalTaste.name === 'undefined'){
+								of.newFood[i].tasteGroup.normalTaste.name = '';
+							}
+							
+							if(typeof of.newFood[i].tasteGroup.normalTaste.price === 'undefined'){
+								of.newFood[i].tasteGroup.normalTaste.price = 0;
+							}
+							
+							if(typeof of.newFood[i].tasteGroup.normalTasteContent === 'undefined'){
+								of.newFood[i].tasteGroup.normalTasteContent = [];
+							}
+							
+							
+							comboOrderFood.tasteGroup.normalTasteContent.forEach(function(temp, index){
+								of.newFood[i].tasteGroup.normalTasteContent.push(temp);
+								of.newFood[i].tasteGroup.normalTaste.name += (of.newFood[i].tasteGroup.normalTaste.name.length > 0 ? ',' + temp.name : temp.name);
+								if(temp.cateStatusValue == 2){
+									of.newFood[i].tasteGroup.normalTaste.price += temp.price;
+								}else if(temp.cateStatusValue == 1){
+									of.newFood[i].tasteGroup.normalTaste.price += of.selectedOrderFood.unitPrice * temp.rate;
+								}
+							});
+							
+							of.newFood[i].tasteGroup.tastePref = of.newFood[i].tasteGroup.normalTaste.name;
+							of.newFood[i].tasteGroup.price = of.newFood[i].tasteGroup.normalTaste.price;
 						}
 					}				
 				}else{
@@ -1869,7 +1914,7 @@ $(function(){
 		}
 
 
-b		/**
+		/**
 		 * 初始化分厨选择
 		 * @param c
 		 */
