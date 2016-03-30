@@ -1,7 +1,9 @@
 package com.wireless.pojo.billStatistics;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -45,6 +47,184 @@ public class ShiftDetail implements Jsonable{
 	public ShiftDetail(DutyRange range){
 		this.onDuty = range.getOnDutyFormat();
 		this.offDuty = range.getOffDutyFormat();
+	}
+	
+	public void append(ShiftDetail appendDetail){
+		//Append the customer amount.
+		this.customerAmount += appendDetail.customerAmount;
+		
+		//Append the income by pay.
+		for(IncomeByPay.PaymentIncome payIncome : appendDetail.getIncomeByPay().getPaymentIncomes()){
+			this.incomeByPay.addIncome4Chain(payIncome);
+		}
+		
+		//Append the total & amount to erase price.
+		append(appendDetail.incomeByErase);
+		
+		//Append the total & amount to discount price.
+		append(appendDetail.incomeByDiscount);
+		
+		//Append the total & amount to gift price.
+		append(appendDetail.incomeByGift);
+		
+		//Append the total & amount to cancel price.
+		append(appendDetail.incomeByCancel);
+		
+		//Append the total & amount to coupon price.
+		append(appendDetail.incomeByCoupon);
+		
+		//Append the total & amount to repaid order.
+		append(appendDetail.incomeByRepaid);
+		
+		//Append the total & amount to order with service
+		append(appendDetail.incomeByService);
+		
+		//Append the total & amount to round price.
+		append(appendDetail.incomeByRound);
+		
+		//Append the income by charge.
+		append(appendDetail.incomeByCharge);
+		
+		//Append the income by book.
+		append(appendDetail.incomeByBook);
+		
+		//Append the coupon usage.
+		append(appendDetail.couponUsage);
+		
+		//Append the gift, discount & total to each department during this period.
+		append(appendDetail.deptIncome);
+	}
+	
+	private void append(List<IncomeByDept> appendDeptIncome){
+		if(this.deptIncome != null){
+			//Group by the department name.
+			Map<String, IncomeByDept> result = new HashMap<String, IncomeByDept>();
+			for(IncomeByDept eachIncome : this.deptIncome){
+				result.put(eachIncome.getDept().getName(), eachIncome);
+			}
+			for(IncomeByDept eachAppendDeptIncome : appendDeptIncome){
+				if(result.containsKey(eachAppendDeptIncome.getDept().getName())){
+					IncomeByDept income = result.get(eachAppendDeptIncome.getDept().getName());
+					income.setDiscount(income.getDiscount() + eachAppendDeptIncome.getDiscount());
+					income.setGift(income.getGift() + eachAppendDeptIncome.getGift());
+					income.setIncome(income.getIncome() + eachAppendDeptIncome.getIncome());
+				}else{
+					result.put(eachAppendDeptIncome.getDept().getName(), eachAppendDeptIncome);
+				}
+			}
+			this.deptIncome.clear();
+			this.deptIncome.addAll(result.values());
+		}else{
+			this.deptIncome = appendDeptIncome;
+		}
+	}
+	
+	private void append(CouponUsage couponUsage){
+		if(this.couponUsage != null){
+			for(CouponUsage.Usage used : couponUsage.getUsed()){
+				this.couponUsage.addUse(used.getName(), used.getAmount(), used.getPrice());
+			}
+			for(CouponUsage.Usage issued : couponUsage.getIssued()){
+				this.couponUsage.addIssue(issued.getName(), issued.getAmount(), issued.getPrice());
+			}
+		}else{
+			this.couponUsage = couponUsage;
+		}
+	}
+	
+	private void append(IncomeByBook bookIncome){
+		if(this.incomeByBook != null){
+			this.incomeByBook.setAmount(this.incomeByBook.getAmount() + bookIncome.getAmount());
+			this.incomeByBook.setIncome(this.incomeByBook.getIncome() + bookIncome.getIncome());
+		}else{
+			this.incomeByBook = bookIncome;
+		}
+	}
+	
+	private void append(IncomeByCoupon couponIncome){
+		if(this.incomeByCoupon != null){
+			this.incomeByCoupon.setCouponAmount(this.incomeByCoupon.getCouponAmount() + couponIncome.getCouponAmount());
+			this.incomeByCoupon.setTotalCoupon(this.incomeByCoupon.getTotalCoupon() + couponIncome.getTotalCoupon());
+		}else{
+			this.incomeByCoupon = couponIncome;
+		}
+	}
+	
+	private void append(IncomeByCharge chargeIncome){
+		if(this.incomeByCharge != null){
+			this.incomeByCharge.setActualCashCharge(this.incomeByCharge.getActualCashCharge() + chargeIncome.getActualCashCharge());
+			this.incomeByCharge.setActualCreditCardCharge(this.incomeByCharge.getActualCreditCardCharge() + chargeIncome.getActualCreditCardCharge());
+			this.incomeByCharge.setChargeAmount(this.incomeByCharge.getChargeAmount() + chargeIncome.getChargeAmount());
+			this.incomeByCharge.setRefundAmount(this.incomeByCharge.getRefundAmount() + chargeIncome.getRefundAmount());
+			this.incomeByCharge.setTotalAccountCharge(this.incomeByCharge.getTotalAccountCharge() + chargeIncome.getTotalAccountCharge());
+			this.incomeByCharge.setTotalAccountRefund(this.incomeByCharge.getTotalAccountRefund() + chargeIncome.getTotalAccountRefund());
+			this.incomeByCharge.setTotalActualRefund(this.incomeByCharge.getTotalActualRefund() + chargeIncome.getTotalActualRefund());
+		}else{
+			this.incomeByCharge = chargeIncome;
+		}
+	}
+	
+	private void append(IncomeByRound roundIncome){
+		if(this.incomeByRound != null){
+			this.incomeByRound.setAmount(this.incomeByRound.getAmount() + roundIncome.getAmount());
+			this.incomeByRound.setTotal(this.incomeByRound.getTotal() + roundIncome.getTotal());
+		}else{
+			this.incomeByRound = roundIncome;
+		}
+	}
+	
+	private void append(IncomeByErase eraseIncome){
+		if(this.incomeByErase != null){
+			this.incomeByErase.setEraseAmount(this.incomeByErase.getEraseAmount() + eraseIncome.getEraseAmount());
+			this.incomeByErase.setErasePrice(this.incomeByErase.getTotalErase() + eraseIncome.getTotalErase());
+		}else{
+			this.incomeByErase = eraseIncome;
+		}
+	}
+	
+	private void append(IncomeByDiscount discountIncome){
+		if(this.incomeByDiscount != null){
+			this.incomeByDiscount.setDiscountAmount(this.incomeByDiscount.getDiscountAmount() + discountIncome.getDiscountAmount());
+			this.incomeByDiscount.setTotalDiscount(this.incomeByDiscount.getTotalDiscount() + discountIncome.getTotalDiscount());
+		}else{
+			this.incomeByDiscount = discountIncome;
+		}
+	}
+	
+	private void append(IncomeByGift giftIncome){
+		if(this.incomeByGift != null){
+			this.incomeByGift.setGiftAmount(this.incomeByGift.getGiftAmount() + giftIncome.getGiftAmount());
+			this.incomeByGift.setTotalGift(this.incomeByGift.getTotalGift() + giftIncome.getTotalGift());
+		}else{
+			this.incomeByGift = giftIncome;
+		}
+	}
+	
+	private void append(IncomeByCancel cancelIncome){
+		if(this.incomeByCancel != null){
+			this.incomeByCancel.setCancelAmount(this.incomeByCancel.getCancelAmount() + cancelIncome.getCancelAmount());
+			this.incomeByCancel.setTotalCancel(this.incomeByCancel.getTotalCancel() + cancelIncome.getTotalCancel());
+		}else{
+			this.incomeByCancel = cancelIncome;
+		}
+	}
+	
+	private void append(IncomeByService serviceIncome){
+		if(this.incomeByService != null){
+			this.incomeByService.setServiceAmount(this.incomeByService.getServiceAmount() + serviceIncome.getServiceAmount());
+			this.incomeByService.setTotalService(this.incomeByService.getTotalService() + serviceIncome.getTotalService());
+		}else{
+			this.incomeByService = serviceIncome;
+		}
+	}
+	
+	private void append(IncomeByRepaid repaidIncome){
+		if(this.incomeByRepaid != null){
+			this.incomeByRepaid.setRepaidAmount(this.incomeByRepaid.getRepaidAmount() + repaidIncome.getRepaidAmount());
+			this.incomeByRepaid.setTotalRepaid(this.incomeByRepaid.getTotalRepaid() + repaidIncome.getTotalRepaid());
+		}else{
+			this.incomeByRepaid = repaidIncome;
+		}
 	}
 	
 	public String getOnDuty() {

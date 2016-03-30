@@ -85,6 +85,26 @@ public class IncomeByPay implements Jsonable{
 		return Collections.unmodifiableList(paymentIncomes);
 	}
 	
+	public void addIncome4Chain(PaymentIncome income){
+		if(income != null){
+			boolean isExist = false;
+			for(int i = 0; i < paymentIncomes.size(); i++){
+				if(paymentIncomes.get(i).payType.getName().equals(income.getPayType().getName())){
+					PaymentIncome original = paymentIncomes.get(i);
+					paymentIncomes.set(i, new PaymentIncome(income.payType, 
+						    								original.amount + income.amount, 
+						    								original.total + income.total, 
+						    								original.actual + income.actual));
+					isExist = true;
+					break;
+				}
+			}
+			if(!isExist){
+				paymentIncomes.add(income);
+			}
+		}
+	}
+	
 	public void addPaymentIncome(PaymentIncome paymentIncome){
 		if(paymentIncome != null){
 			int index = paymentIncomes.indexOf(paymentIncome);

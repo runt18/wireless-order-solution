@@ -12,9 +12,9 @@ public class SalesDetail implements Jsonable{
 		
 	}
 	
-	public SalesDetail(Food pt){
-		this.food = new Food(pt);
-		this.kitchen = pt.getKitchen();
+	public SalesDetail(Food food){
+		this.food = food;
+		this.kitchen = food.getKitchen();
 	}
 	
 	public SalesDetail(Kitchen kitchen){
@@ -28,6 +28,7 @@ public class SalesDetail implements Jsonable{
 	
 	private Department dept;	//部门信息
 	private Kitchen kitchen;	//厨房信息
+	private String restaurant;	//门店信息
 	private Food food;			//菜品信息
 	private float income;		//营业额
 	private float tasteIncome;	//口味营业额
@@ -40,6 +41,17 @@ public class SalesDetail implements Jsonable{
 	private float salesAmount;	//销量
 	private float avgPrice;		//均价
 	private float avgCost;		//单位成本
+	
+	public String getRestaurant(){
+		if(this.restaurant == null){
+			return "";
+		}
+		return this.restaurant;
+	}
+	
+	public void setResturant(String restaurant){
+		this.restaurant = restaurant;
+	}
 	
 	public Department getDept() {
 		return dept;
@@ -157,6 +169,7 @@ public class SalesDetail implements Jsonable{
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putFloat("income", this.income);
+		jm.putString("restaurant", this.restaurant);
 		jm.putFloat("tasteIncome", this.tasteIncome);
 		jm.putFloat("discount", this.discount);
 		jm.putFloat("gifted", this.gifted);

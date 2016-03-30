@@ -12,8 +12,16 @@ public class IncomeByBook {
 		this.amount = amount;
 	}
 	
+	public void setIncome(float income){
+		this.income = income;
+	}
+	
 	public float getIncome(){
 		return this.income;
+	}
+	
+	public void setAmount(int amount){
+		this.amount = amount;
 	}
 	
 	public int getAmount(){
