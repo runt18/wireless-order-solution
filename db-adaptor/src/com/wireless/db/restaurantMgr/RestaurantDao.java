@@ -14,6 +14,7 @@ import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.member.MemberCondDao;
 import com.wireless.db.member.MemberTypeDao;
+import com.wireless.db.member.represent.RepresentDao;
 import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
@@ -35,6 +36,7 @@ import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.member.MemberType;
+import com.wireless.pojo.member.represent.Represent;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.printScheme.PStyle;
@@ -545,6 +547,9 @@ public class RestaurantDao {
 			//Insert the 'exception' weixin keyword
 			initWxKeyword(dbCon, staff);
 			
+			//Insert the represent
+			initRepresent(dbCon, staff);
+			
 			return restaurant.getId();
 			
 		}catch(Exception e){
@@ -554,6 +559,10 @@ public class RestaurantDao {
 			throw new SQLException(e);
 		}
 
+	}
+	
+	private static void initRepresent(DBCon dbCon, Staff staff) throws SQLException{
+		RepresentDao.insert(dbCon, staff, new Represent.InsertBuilder());
 	}
 	
 	private static void initWxKeyword(DBCon dbCon, Staff staff) throws SQLException{

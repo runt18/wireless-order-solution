@@ -19,6 +19,7 @@ import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.member.MemberCondDao;
 import com.wireless.db.member.MemberTypeDao;
+import com.wireless.db.member.represent.RepresentDao;
 import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
@@ -154,6 +155,9 @@ public class TestRestaurantDao {
 			//Compare the member condition
 			compareMemberCond(staff);
 			
+			//Compare the represent
+			compareRepresent(staff, restaurantId);
+			
 			//Update a restaurant
 			Restaurant.UpdateBuilder updateBuilder = new Restaurant.UpdateBuilder(restaurantId)
 																   .setAccount("test2")
@@ -220,6 +224,10 @@ public class TestRestaurantDao {
 		}finally{
 			RestaurantDao.deleteById(restaurantId);
 		}
+	}
+	
+	private void compareRepresent(Staff staff, int restaurantId) throws SQLException{
+		Assert.assertTrue("failed to init represent", RepresentDao.getByCond(staff, new RepresentDao.ExtraCond()).size() == 1);
 	}
 	
 	private void compareMemberCond(Staff staff) throws SQLException{
