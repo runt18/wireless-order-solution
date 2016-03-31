@@ -1,5 +1,7 @@
 package com.wireless.Actions.regionMgr.tableMgr;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -39,33 +41,29 @@ public class OperateTableAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward insert(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward insert(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		
-		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String name = request.getParameter("name");
+		final String alias = request.getParameter("alias");
+		final String minimumCost = request.getParameter("minimumCost");
+		final String regionId = request.getParameter("regionId");		
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String name = request.getParameter("name");
-			String alias = request.getParameter("alias");
-			String minimumCost = request.getParameter("minimumCost");
-			String regionId = request.getParameter("regionId");
-			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			Table.InsertBuilder builder = new Table.InsertBuilder(Integer.parseInt(alias), Region.RegionId.valueOf(Short.parseShort(regionId)))
-					.setMiniCost(Integer.valueOf(minimumCost))
-					.setTableName(name);
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Table.InsertBuilder builder = new Table.InsertBuilder(Integer.parseInt(alias), Region.RegionId.valueOf(Short.parseShort(regionId)))
+														 .setMiniCost(Integer.valueOf(minimumCost))
+														 .setTableName(name);
 			TableDao.insert(staff, builder);
-			jobject.initTip(true, "操作成功, 已添加新餐台信息.");
-		}catch(BusinessException e){
+			jObject.initTip(true, "操作成功, 已添加新餐台信息.");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -79,32 +77,39 @@ public class OperateTableAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward update(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward update(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		
-		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String id = request.getParameter("id");
+		final String name = request.getParameter("name");
+		final String regionId = request.getParameter("regionId"); 
+		final String minimumCost = request.getParameter("minimumCost");		
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String id = request.getParameter("id");
-			String name = request.getParameter("name");
-			String regionId = request.getParameter("regionId"); 
-			String minimumCost = request.getParameter("minimumCost");
+
+			final Table.UpdateBuilder builder = new Table.UpdateBuilder(Integer.valueOf(id));
+			if(minimumCost != null && !minimumCost.isEmpty()){
+				builder.setMiniCost(Integer.valueOf(minimumCost));
+			}
 			
-			Table.UpdateBuilder builder = new Table.UpdateBuilder(Integer.valueOf(id)).setMiniCost(Integer.valueOf(minimumCost))
-												   .setRegionId(Region.RegionId.valueOf(Short.valueOf(regionId)))
-												   .setTableName(name);
+			if(regionId != null && !regionId.isEmpty()){
+				builder.setRegionId(Region.RegionId.valueOf(Short.valueOf(regionId)));
+			}
+												  
+			if(name != null && !name.isEmpty()){
+				builder.setTableName(name);
+			}
+												   
 			TableDao.update(StaffDao.verify(Integer.parseInt(pin)), builder);
-			jobject.initTip(true, "操作成功, 已修改餐台信息.");
-		}catch(BusinessException e){
+			jObject.initTip(true, "操作成功, 已修改餐台信息.");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -118,25 +123,23 @@ public class OperateTableAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward delete(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward delete(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		
-		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String id = request.getParameter("id");
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String id = request.getParameter("id");
+
 			TableDao.deleteById(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(id));
-			jobject.initTip(true, "操作成功, 已删除餐台信息.");
-		}catch(BusinessException e){
+			jObject.initTip(true, "操作成功, 已删除餐台信息.");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -150,42 +153,39 @@ public class OperateTableAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward batch(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward batch(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		
-		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String beginAlias = request.getParameter("beginAlias");
+		final String endAlias = request.getParameter("endAlias");
+		final String skips = request.getParameter("skips");
+		final String regionId = request.getParameter("regionId");
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String beginAlias = request.getParameter("beginAlias");
-			String endAlias = request.getParameter("endAlias");
-			String skips = request.getParameter("skips");
-			String regionId = request.getParameter("regionId");
-			
-			Table.BatchInsertBuilder insertBuilder = new Table.BatchInsertBuilder(Integer.parseInt(beginAlias), Integer.parseInt(endAlias), Region.RegionId.valueOf(Integer.parseInt(regionId)));
+
+			final Table.BatchInsertBuilder batchBuilder = new Table.BatchInsertBuilder(Integer.parseInt(beginAlias), Integer.parseInt(endAlias), Region.RegionId.valueOf(Integer.parseInt(regionId)));
 			if(skips != null && !skips.isEmpty()){
 				String skipNum[] = skips.split(","); 
 				for (String num : skipNum) {
 					if(num.equals("4")){
-						insertBuilder.setSkip4(true);
+						batchBuilder.setSkip4(true);
 					}else if(num.equals("7")){
-						insertBuilder.setSkip7(true);
+						batchBuilder.setSkip7(true);
 					}
 				}
 			}
 			
-			TableDao.insert(StaffDao.verify(Integer.parseInt(pin)), insertBuilder);
+			TableDao.insert(StaffDao.verify(Integer.parseInt(pin)), batchBuilder);
 			
-			jobject.initTip(true, "操作成功, 已批量添加餐台信息.");
-		}catch(BusinessException e){
+			jObject.initTip(true, "操作成功, 已批量添加餐台信息.");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -200,23 +200,27 @@ public class OperateTableAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward transTable(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
+		
+		final int srcTblId = Integer.parseInt(request.getParameter("oldTableId"));
+		final int destTblId = Integer.parseInt(request.getParameter("newTableId"));
+		final JObject jObject = new JObject();
 		try {
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			
-			int srcTblId = Integer.parseInt(request.getParameter("oldTableId"));
-			int destTblId = Integer.parseInt(request.getParameter("newTableId"));
 
 			// print the transfer table receipt
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(staff, new Table.TransferBuilder(new Table.Builder(srcTblId), new Table.Builder(destTblId))));
 			if(resp.header.type == Type.ACK){
-				jobject.initTip(true, "转台成功.");
+				jObject.initTip(true, "转台成功.");
 			}else{
-				jobject.initTip(false, new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
+				jObject.initTip(false, new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
 			}
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
 			
 		} finally {
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -246,7 +250,7 @@ public class OperateTableAction extends DispatchAction{
 				throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 				
 			}
-		} catch(BusinessException e){
+		} catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 
@@ -269,25 +273,25 @@ public class OperateTableAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward cancelTable(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try {
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			
-			int tableId = Integer.parseInt(request.getParameter("tableId"));
+			final int tableId = Integer.parseInt(request.getParameter("tableId"));
 
 			// print the transfer table receipt
 			OrderDao.cancel(staff, new Table.Builder(tableId));
-			jobject.initTip(true, "撤台成功.");
+			jObject.initTip(true, "撤台成功.");
 			
-		} catch(BusinessException e){
+		} catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		} finally {
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -302,14 +306,15 @@ public class OperateTableAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward mergeTable(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
+		
+		final String tables = request.getParameter("tables");
+		final JObject jObject = new JObject();
 		try {
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
-			String tables = request.getParameter("tables");
 			
-			String[] tablesArray = tables.split(",");
+			final String[] tablesArray = tables.split(",");
 			
-			Order.MergeBuilder builder = new Order.MergeBuilder(Integer.parseInt(tablesArray[0]));
+			final Order.MergeBuilder builder = new Order.MergeBuilder(Integer.parseInt(tablesArray[0]));
 			
 			if(tablesArray.length > 1){
 				for (int i = 1; i < tablesArray.length; i++) {
@@ -319,7 +324,7 @@ public class OperateTableAction extends DispatchAction{
 			
 			final int mergeTable = OrderDao.merge(staff, builder);
 			
-			jobject.setExtra(new Jsonable() {
+			jObject.setExtra(new Jsonable() {
 				
 				@Override
 				public JsonMap toJsonMap(int flag) {
@@ -334,17 +339,17 @@ public class OperateTableAction extends DispatchAction{
 				}
 			});
 			
-			jobject.initTip(true, "并台成功.");
+			jObject.initTip(true, "并台成功.");
 			
-		} catch(BusinessException e){
+		} catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		} finally {
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}	
