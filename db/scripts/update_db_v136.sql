@@ -7,93 +7,58 @@ SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
--- Add the field 'payment_template' & 'coupon_draw_template' & 'coupon_timeout_template' to table 'weixin_restaurant'
+-- Table `wireless_order_db`.`represent`
 -- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`weixin_restaurant` 
-ADD COLUMN `payment_template` VARCHAR(100) NULL DEFAULT NULL COMMENT '' AFTER `refresh_token`,
-ADD COLUMN `coupon_draw_template` VARCHAR(100) NULL DEFAULT NULL COMMENT '' AFTER `payment_template`,
-ADD COLUMN `coupon_timeout_template` VARCHAR(100) NULL DEFAULT NULL COMMENT '' AFTER `coupon_draw_template`;
+DROP TABLE IF EXISTS `wireless_order_db`.`represent` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`represent` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+  `restaurant_id` INT NULL COMMENT '',
+  `finish_date` DATETIME NULL COMMENT '',
+  `title` VARCHAR(45) NULL DEFAULT NULL COMMENT '',
+  `slogon` VARCHAR(45) NULL DEFAULT NULL COMMENT '',
+  `body` VARCHAR(500) NULL COMMENT '',
+  `recommend_point` INT NULL DEFAULT NULL COMMENT '',
+  `recommend_money` FLOAT NULL DEFAULT NULL COMMENT '',
+  `subscribe_point` INT NULL DEFAULT NULL COMMENT '',
+  `subscribe_money` FLOAT NULL DEFAULT NULL COMMENT '',
+  PRIMARY KEY (`id`)  COMMENT '',
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC)  COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 -- -----------------------------------------------------
--- Add the field 'table_id' to table 'weixin_order'
+-- Table `wireless_order_db`.`represent_chain`
 -- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`weixin_order` 
-ADD COLUMN `table_id` INT NULL DEFAULT NULL COMMENT '' AFTER `address`;
+DROP TABLE IF EXISTS `wireless_order_db`.`represent_chain` ;
 
--- -----------------------------------------------------
--- Add the field 'min_last_consumption' & 'max_last_consumption' to table 'member_cond'
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`member_cond` 
-ADD COLUMN `min_last_consumption` INT NULL DEFAULT NULL COMMENT '' AFTER `max_balance`,
-ADD COLUMN `max_last_consumption` INT NULL DEFAULT NULL COMMENT '' AFTER `min_last_consumption`;
-
-
--- -----------------------------------------------------
--- Add the field 'food_unit_id' to table 'weixin_order_food'
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`weixin_order_food` 
-ADD COLUMN `food_unit_id` INT NULL DEFAULT NULL COMMENT '' AFTER `food_count`;
-
--- -----------------------------------------------------
--- Add the field 'member_id' to table 'weixin_order'
--- Drop the field 'weixin_serial_crc' & 'weixin_serial' from table 'weixin_order'
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`weixin_order` 
-DROP COLUMN `weixin_serial_crc`,
-DROP COLUMN `weixin_serial`,
-ADD COLUMN `member_id` INT NOT NULL DEFAULT 0 COMMENT '' AFTER `restaurant_id`,
-ADD INDEX `ix_member_id` (`member_id` ASC)  COMMENT '',
-DROP INDEX `ix_weixin_serial_crc` ;
-
--- -----------------------------------------------------
--- Add the field 'wx_order_amount' to table 'member'
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`member` 
-ADD COLUMN `wx_order_amount` INT NULL DEFAULT NULL COMMENT '' AFTER `referrer_id`;
-
--- -----------------------------------------------------
--- Add the field 'comment' to table 'weixin_order'
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`weixin_order` 
-ADD COLUMN `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT '' AFTER `table_id`;
-
--- -----------------------------------------------------
--- Add the field 'charge_template' to table 'weixin_restaurant'
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`weixin_restaurant` 
-ADD COLUMN `charge_template` VARCHAR(100) NULL DEFAULT NULL COMMENT '' AFTER `coupon_timeout_template`;
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`order_food_price`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`order_food_price` ;
-
-CREATE TABLE IF NOT EXISTS `wireless_order_db`.`order_food_price` (
-  `order_food_id` INT NOT NULL COMMENT '',
-  `food_unit` VARCHAR(45) NULL DEFAULT NULL COMMENT '',
-  `food_unit_price` FLOAT NULL DEFAULT NULL COMMENT '',
-  `plan_price` FLOAT NULL DEFAULT NULL COMMENT '',
-  PRIMARY KEY (`order_food_id`)  COMMENT '')
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`represent_chain` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+  `restaurant_id` INT NULL COMMENT '',
+  `subscribe_date` DATETIME NULL COMMENT '',
+  `recommend_member_id` INT NULL COMMENT '',
+  `recommend_member` VARCHAR(45) NULL COMMENT '',
+  `recommend_point` INT NULL COMMENT '',
+  `recommend_money` FLOAT NULL COMMENT '',
+  `subscribe_member_id` INT NULL COMMENT '',
+  `subscribe_member` VARCHAR(45) NULL COMMENT '',
+  `subscribe_point` INT NULL COMMENT '',
+  `subscribe_money` FLOAT NULL COMMENT '',
+  PRIMARY KEY (`id`)  COMMENT '',
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC)  COMMENT '',
+  INDEX `ix_recommend_member_id` (`recommend_member_id` ASC) COMMENT '',
+  INDEX `ix_subscribe_member_id` (`subscribe_member_id` ASC) COMMENT ''
+  )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
--- Add the field 'plan_price' to table 'order_food'
+-- Insert the represent to each restaurant
 -- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`order_food` 
-ADD COLUMN `plan_price` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `commission`;
-
--- -----------------------------------------------------
--- Add the field 'plan_price' to table 'order_food_history'
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`order_food_history` 
-ADD COLUMN `plan_price` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `order_date`;
-
--- -----------------------------------------------------
--- Add the field 'plan_price' to table 'order_food_archive'
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`order_food_archive` 
-ADD COLUMN `plan_price` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `order_date`;
+INSERT INTO `wireless_order_db`.`represent`
+(`restaurant_id`)
+SELECT id FROM `wireless_order_db`.`restaurant` WHERE id > 10;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
