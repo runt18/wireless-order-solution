@@ -222,7 +222,7 @@ public class Page{
 		ACTIVE("activeMgr", "优惠活动管理", "Client_Module/ActiveManagement.html", "../../images/memberMgr.png"),
 		WX_STEPS_BIND("WXBind", "微信公众号设置", "Client_Module/WeixinAuth.html", "../../images/discountStatistics.png"),
 		MEMBER_MENU_SET("WxMenu", "微信菜单设置", "MgrCenter_Module/weixinMenuMgr.html", "../../images/memberMgr.png"),
-		DEPUTY_MENU_SET("deputyMenu", "我要代言设置", "MgrCenter_Module/weixinDeputyMgr.html", "../../images/memberMgr.png");
+		DEPUTY_MENU_SET("deputyMenu", "我要代言设置", "MgrCenter_Module/weixinRepresent.html", "../../images/memberMgr.png");
 //		MEMBER_LEVEL("memberLevel", "会员等级", "Client_Module/MemberLevelManagement.html", "../../images/memberLevel.png");
 //		COUPON("coupon", "优惠劵管理", "Client_Module/CouponManagement.html", "../../images/book.png" );
 		
