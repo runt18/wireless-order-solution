@@ -52,7 +52,6 @@ $(function(){
 			type : 'post',
 			dataType : 'json',
 			success : function(data, status, xhr){
-				console.log(data);
 				if(data.success){
 					fastFoodWaiterData._tableAlias = data.root[0].tableAlias;
 					///赋值账单号
@@ -172,13 +171,20 @@ $(function(){
 			$('#orderList_div_waiter').prepend(html.join(''));
 		}
 		
+		var hasFoods = false;
 		//标前缀
 		$('#orderList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
 			element.innerHTML = index + 1;
-			if(index >= 0){
-				$('#tips_span_waiter').html('');
-			}
+			$('#tips_span_waiter').html('');
+			$('#tips_span_waiter').css('margin', '0');
+			hasFoods = true;
 		});
+		
+		if(!hasFoods){
+			$('#tips_span_waiter').css({
+				'margin' : '40% 0px',
+			});
+		}
 	}
 	
 	
