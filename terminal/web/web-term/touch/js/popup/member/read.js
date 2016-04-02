@@ -248,6 +248,8 @@ define(function(require, exports, module){
 		WX_CARD : { val : 2, desc : '按微信卡号' },
 		CARD : { val : 3, desc : '按卡号' }
 	};
+
+	exports.SearchType = MemberReadPopup.SearchType;
 	
 	exports.newInstance = function(param){
 		return new MemberReadPopup(param);

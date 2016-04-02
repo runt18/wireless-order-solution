@@ -132,10 +132,12 @@ define(function(require, exports, module){
 	}
 
 
-	exports.UseMode = {
+	UseCouponPopup.UseMode = {
 		FAST : { mode : 20, desc : '快速' },
 		ORDER : { mode : 21, desc : '账单' }
 	};
+	
+	exports.UseMode = UseCouponPopup.UseMode;
 	
 	exports.newInstance = function(param){
 		return new UseCouponPopup(param);

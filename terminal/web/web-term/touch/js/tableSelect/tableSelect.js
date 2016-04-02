@@ -659,35 +659,16 @@ $(function(){
 		$('#fastIssue_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-//				var fastIssuePopup = null;
-//				fastIssuePopup = new MemberReadPopup({
-//					confirm : function(member){
-//						if(member){
-//							fastIssuePopup.close(function(){
-//								var issueCouponPopup = new IssueCouponPopup({
-//									title : '快速发放优惠券',
-//									memberName : member.name,
-//									issueMode : IssueCouponPopup.IssueMode.FAST,
-//									issueTo : member.id
-//								});
-//								issueCouponPopup.open();
-//							}, 200);
-//						}else{
-//							Util.msg.tip('请注入会员!');
-//						}
-//					}
-//				});
-//				fastIssuePopup.open();
-				seajs.use(['./js/popup/member/read','./js/popup/coupon/issuePopup'], function(readPopup, usePopup){
+				seajs.use(['read', 'issue'], function(readPopup, issuePopup){
 					var fastIssuePopup = null;
 					fastIssuePopup = readPopup.newInstance({
 						confirm : function(member){
 							if(member){
 								fastIssuePopup.close(function(){
-									var issueCouponPopup = usePopup.newInstance({
+									var issueCouponPopup = issuePopup.newInstance({
 										title : '快速发放优惠券',
 										memberName : member.name,
-										issueMode : usePopup.IssueMode.FAST,
+										issueMode : issuePopup.IssueMode.FAST,
 										issueTo : member.id
 									});
 									issueCouponPopup.open();
@@ -707,7 +688,7 @@ $(function(){
 		$('#fastUse_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				seajs.use(['./js/popup/member/read','./js/popup/coupon/usePopup'], function(readPopup, usePopup){
+				seajs.use(['read','use'], function(readPopup, usePopup){
 					var fastUsePopup = null;
 					fastUsePopup = readPopup.newInstance({
 						confirm : function(member){
@@ -752,7 +733,7 @@ $(function(){
 		$('#addMember_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				seajs.use('./js/popup/member/add', function(popup){
+				seajs.use('add', function(popup){
 					popup.newInstance().open();
 				});
 			}, 200);
@@ -762,7 +743,7 @@ $(function(){
 		$('#memberWxBind_li_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				seajs.use(['./js/popup/member/read', './js/popup/member/perfect'], function(readPopup, prefectPopup){
+				seajs.use(['read', 'perfect'], function(readPopup, prefectPopup){
 					var memberWxReadPopup = null;
 					memberWxReadPopup = readPopup.newInstance({
 						confirm : function(member){
@@ -784,34 +765,13 @@ $(function(){
 					});
 					memberWxReadPopup.open();
 				});
-//				var memberWxReadPopup = null;
-//				memberWxReadPopup = new MemberReadPopup({
-//					confirm : function(member){
-//						if(member && member.isRaw){
-//							memberWxReadPopup.close(function(){
-//								var memberWxBindPopup = null;
-//								memberWxBindPopup = new PerfectMemberPopup({
-//									memberName : member.name,
-//									selectedMember : member.id,
-//									postBound : function(){
-//										memberWxBindPopup.close();
-//									}
-//								});
-//								memberWxBindPopup.open();
-//							}, 200);
-//						}else{
-//							Util.msg.tip('会员资料已完善');
-//						}
-//					}
-//				});
-//				memberWxReadPopup.open();
 			}, 200);
 		});
 		
 		
 		//打印机诊断
 		$('#diagPrinter_a_tableSelect').click(function(){
-			seajs.use('./js/popup/diagPrinter/diagPrinter', function(popup){
+			seajs.use('diagPrinter', function(popup){
 				popup.newInstance().open();
 			});
 		});
@@ -832,7 +792,7 @@ $(function(){
 		$('#consumeDetail_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				seajs.use('./js/popup/consumeDetail/consumeDetail', function(popup){
+				seajs.use('consumeDetail', function(popup){
 					popup.newInstance().open();
 				});
 			},300);
@@ -916,7 +876,7 @@ $(function(){
 		$('#searchMember_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				seajs.use('./js/popup/member/read', function(popup){
+				seajs.use('read', function(popup){
 					var readPopup = null;
 					readPopup = popup.newInstance({
 						confirm : function(){
@@ -932,7 +892,7 @@ $(function(){
 		$('#memberRecharge_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				seajs.use('./js/popup/member/recharge', function(popup){
+				seajs.use('recharge', function(popup){
 					popup.newInstance().open();
 				});
 			},300);
@@ -944,7 +904,7 @@ $(function(){
 			setTimeout(function(){
 //				var patchCardPopup = new PatchCardPopup();
 //				patchCardPopup.open();
-				seajs.use('./js/popup/member/patchCard', function(popup){
+				seajs.use('patchCard', function(popup){
 					popup.newInstance().open();
 				});
 			},300);
@@ -956,7 +916,7 @@ $(function(){
 			setTimeout(function(){
 //				var patchWxCardPopup = new PatchWxCardPopup();
 //				patchWxCardPopup.open();
-				seajs.use('./js/popup/member/patchWxCard', function(popup){
+				seajs.use('patchWxCard', function(popup){
 					popup.newInstance().open();
 				});
 			},300);
@@ -1470,7 +1430,8 @@ $(function(){
 								
 								ts.renderToCreateOrder(ts.table.alias, customNum, comment);
 								customerPopup.close();
-							}
+							},
+						hasComment : true
 					});
 					
 					customerPopup.open(function(self){
@@ -1488,12 +1449,6 @@ $(function(){
 							'height' : '10%',
 							'float' : 'left'
 						});
-						
-						var remark = '<div>'+
-									'<input id="inputTableOpenCommon" placeholder="开台备注" data-type="num" class="countInputStyle" >'+
-								'</div>';
-						self.find('[id=content_div_numKbPopup]').append(remark);
-						self.find('[id=content_div_numKbPopup]').trigger('create');
 						
 						setTimeout(function(){
 							self.find('[id=input_input_numKbPopup]').select();
@@ -1578,7 +1533,8 @@ $(function(){
 								
 								ts.renderToCreateOrder(ts.table.alias, customNum, comment);
 								customerPopup.close();
-							}
+							},
+						hasComment : true
 					});
 					
 					customerPopup.open(function(self){
@@ -1596,12 +1552,6 @@ $(function(){
 							'height' : '10%',
 							'float' : 'left'
 						});
-						
-						var remark = '<div>'+
-									'<input id="inputTableOpenCommon" placeholder="开台备注" data-type="num" class="countInputStyle" >'+
-								'</div>';
-						self.find('[id=content_div_numKbPopup]').append(remark);
-						self.find('[id=content_div_numKbPopup]').trigger('create');
 						
 						setTimeout(function(){
 							self.find('[id=input_input_numKbPopup]').select();

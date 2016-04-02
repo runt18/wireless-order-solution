@@ -127,11 +127,12 @@ define(function(require, exports, module){
 		};
 	}
 
-	exports.IssueMode = {
+	IssueCouponPopup.IssueMode = {
 		FAST : { mode : 1, desc : '快速' },
 		ORDER : { mode : 2, desc : '账单' }
 	};
 	
+	exports.IssueMode = IssueCouponPopup.IssueMode;
 	
 	exports.newInstance = function(param){
 		return new IssueCouponPopup(param);

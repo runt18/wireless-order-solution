@@ -207,8 +207,18 @@ var NumKeyBoardAttacher = (function(){
 })();
 
 function NumKeyBoardPopup(param){
+	var _param = param || {
+		header : '',
+		rightText : '',
+		right : function(){},
+		leftText : '',
+		left : function(){},
+		middleText : '',
+		middle : function(){},
+		last : function(){},
+		hasComment : false
+	};
 	//创建数字键盘
-	//TODO
 	function createNumberKeyBoard(input){
 		//createNumKeyBoard一声明就执行
 		 new NumKeyBoard({
@@ -254,50 +264,60 @@ function NumKeyBoardPopup(param){
 		});
 	}
 
-	
+	var _self;
 	var numberPopup = null;
 	numberPopup = new JqmPopup({
 		loadUrl : './popup/keyboard/number.html',
 		pageInit : function(self){
+			_self = self;
 			//创建数字键盘
 			//createNumKeyBoard一声明就执行
 			createNumberKeyBoard(self.find('[id = input_input_numKbPopup]'));
 			
-			self.find('[id=header_div_numKbPopup] h3').html(param.header);
-			
-			if(param.rightText){
-				self.find('[id=right_a_numKbPopup] span span').text(param.rightText);
+			if(_param.hasComment === true){
+				var remark = '<div>'+
+								'<input id="inputTableOpenCommon" placeholder="开台备注" data-type="num" class="countInputStyle" >'+
+							'</div>';
+				self.find('[id=content_div_numKbPopup]').append(remark);
+				self.find('[id=content_div_numKbPopup]').trigger('create');
+				NumKeyBoardAttacher.instance().attach(self.find('[id=inputTableOpenCommon]')[0]);
 			}
 			
-			if(param.middleText){
-				self.find('[id=middle_a_numKbPopup] span span').text(param.middleText);
+			self.find('[id=header_div_numKbPopup] h3').html(_param.header);
+			
+			if(_param.rightText){
+				self.find('[id=right_a_numKbPopup] span span').text(_param.rightText);
 			}
 			
-			if(param.leftText){
-				self.find('[id=left_a_numKbPopup] span span').text(param.leftText);
+			if(_param.middleText){
+				self.find('[id=middle_a_numKbPopup] span span').text(_param.middleText);
+			}
+			
+			if(_param.leftText){
+				self.find('[id=left_a_numKbPopup] span span').text(_param.leftText);
 			}
 			
 			//绑定取消按钮
 			$('#right_a_numKbPopup').click(function(){
-				 param.right(); 
+				 _param.right(); 
 			 });
 			 
 			 //绑定确定按钮
 			 self.find('[id=left_a_numKbPopup]').click(function(){
-				 param.left();
+				 _param.left();
 			 });
 			 
-			 if(param.middle){
+			 if(_param.middle){
 				 //绑定点菜按钮
 				 self.find('[id=middle_a_numKbPopup]').click(function(){
-					 param.middle();
+					 _param.middle();
 				 });
 			 }
 			 
-			 if(param.last){
+			 if(_param.last){
 				//绑定查看预订按钮
 				 self.find('[id=last_a_numKbPopup]').click(function(){
-					 param.last();
+					 _param.last();
 				 });  
 			 }
 			
@@ -309,6 +329,9 @@ function NumKeyBoardPopup(param){
 	};
 	
 	this.close = function(afterOpen, timeout){
+		if(_param.hasComment === true){
+			NumKeyBoardAttacher.instance().detach(_self.find('[id=inputTableOpenCommon]')[0]);
+		}
 		numberPopup.close(afterOpen, timeout);
 	};
 }

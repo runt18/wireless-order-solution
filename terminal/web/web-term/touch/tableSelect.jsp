@@ -44,6 +44,24 @@
 	    };
 	});
 </script>
+<!-- seajs导包 -->
+<script type="text/javascript" src="./js/common/sea.js"></script>
+<script type="text/javascript">
+	seajs.config({
+		alias : {
+			'diagPrinter' : './js/popup/diagPrinter/diagPrinter',
+			'read' : './js/popup/member/read',
+			'add' : './js/popup/member/add',
+			'recharge' : './js/popup/member/recharge',
+			'consumeDetail' : './js/popup/consumeDetail/consumeDetail',
+			'patchCard' : './js/popup/member/patchCard',
+			'patchWxCard' : './js/popup/member/patchWxCard',
+			'perfect' : './js/popup/member/perfect',
+			'issue' : './js/popup/coupon/issuePopup',
+			'use' : './js/popup/coupon/usePopup'
+		}
+	});
+</script>
 <script type="text/javascript" src="js/common/jquery.mobile-1.3.2.min.js"></script>
 <!-- 日期插件.js -->
 <script type="text/javascript" src="js/common/datebox.core.js"></script>
@@ -103,15 +121,13 @@
 <script type="text/javascript" src="./js/runHorse/runHorse.js"></script>
 <!-- 重连socket -->
 <script type="text/javascript" src="./js/socket/reconnecting-websocket.js"></script>
-<!-- seajs导包 -->
-<script type="text/javascript" src="./js/runHorse/sea.js"></script>
+
 
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
 		return false;	
 	} 
-
 </script>
 
 </head>
