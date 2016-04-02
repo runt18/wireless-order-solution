@@ -202,17 +202,29 @@ $(function(){
 					
 					$('#memberInfo_span_payment').html(memberSpan);
 					
+					
 					//会员绑定
 					$('#memberBind_span_payment').click(function(){
-						var perfectMemberPopup = new PerfectMemberPopup({
-							selectedMember : orderMsg.memberId,
-							selectedOrder : orderMsg.id,
-							memberName : orderMsg.member.name,
-							postBound : function(){
-								refreshOrderData();
-							}
+						seajs.use('./js/popup/member/perfect', function(perfectPopup){
+							var perfectMemberPopup = perfectPopup.newInstance({
+								selectedMember : orderMsg.memberId,
+								selectedOrder : orderMsg.id,
+								memberName : orderMsg.member.name,
+								postBound : function(){
+									refreshOrderData();
+								}
+							});
+							perfectMemberPopup.open();
 						});
-						perfectMemberPopup.open();
+//						var perfectMemberPopup = new PerfectMemberPopup({
+//							selectedMember : orderMsg.memberId,
+//							selectedOrder : orderMsg.id,
+//							memberName : orderMsg.member.name,
+//							postBound : function(){
+//								refreshOrderData();
+//							}
+//						});
+//						perfectMemberPopup.open();
 					});
 				}
 			}, 'json');
@@ -499,7 +511,7 @@ $(function(){
 	  				pay : function(inputValue){
 		  				paySubmit({
 						  	submitType : PayTypeEnum.WX,
-						  	authCode :　inputValue,
+						  	authCode : inputValue,
 						  	postPayment : function(resultJSON){
 					  			if(resultJSON.success){
 					  				var elapsed = 0;   //逝去的时间
@@ -874,41 +886,78 @@ $(function(){
 		
 		//会员
 		$('#memberRead_a_payment').click(function(){
-			var memberReadPopup = null;
-			memberReadPopup = new MemberReadPopup({
-				confirm : function(member, discount, pricePlan){
-					Util.LM.show();
-					
-					$.post('../OperateDiscount.do', {
-						dataSource : 'setDiscount',
-						orderId : orderMsg.id,
-						memberId : member.id,
-						discountId : discount.id,
-						pricePlan : pricePlan.id
+			seajs.use('./js/popup/member/read', function(readPopup){
+				var memberReadPopup = null;
+				memberReadPopup = readPopup.newInstance({
+					confirm : function(member, discount, pricePlan){
+						Util.LM.show();
 						
-					}, function(data){
-						Util.LM.hide();
-						if(data.success){
+						$.post('../OperateDiscount.do', {
+							dataSource : 'setDiscount',
+							orderId : orderMsg.id,
+							memberId : member.id,
+							discountId : discount.id,
+							pricePlan : pricePlan.id
 							
-							//刷新账单
-							refreshOrderData();
-							
-							Util.msg.alert({topTip : true, msg : '会员注入成功'});	
-							
-							//关闭会员读取Popup
-							memberReadPopup.close();
-							
-						}else{
-							Util.msg.alert({
-								msg : '使用会员失败</br>' + data.msg, 
-								topTip : true
-							});					
-						}
-					}, 'json');		
-				}
+						}, function(data){
+							Util.LM.hide();
+							if(data.success){
+								
+								//刷新账单
+								refreshOrderData();
+								
+								Util.msg.alert({topTip : true, msg : '会员注入成功'});	
+								
+								//关闭会员读取Popup
+								memberReadPopup.close();
+								
+							}else{
+								Util.msg.alert({
+									msg : '使用会员失败</br>' + data.msg, 
+									topTip : true
+								});					
+							}
+						}, 'json');		
+					}
+				});
+				//打开会员读取Popup
+				memberReadPopup.open();
 			});
-			//打开会员读取Popup
-			memberReadPopup.open();
+//			var memberReadPopup = null;
+//			memberReadPopup = new MemberReadPopup({
+//				confirm : function(member, discount, pricePlan){
+//					Util.LM.show();
+//					
+//					$.post('../OperateDiscount.do', {
+//						dataSource : 'setDiscount',
+//						orderId : orderMsg.id,
+//						memberId : member.id,
+//						discountId : discount.id,
+//						pricePlan : pricePlan.id
+//						
+//					}, function(data){
+//						Util.LM.hide();
+//						if(data.success){
+//							
+//							//刷新账单
+//							refreshOrderData();
+//							
+//							Util.msg.alert({topTip : true, msg : '会员注入成功'});	
+//							
+//							//关闭会员读取Popup
+//							memberReadPopup.close();
+//							
+//						}else{
+//							Util.msg.alert({
+//								msg : '使用会员失败</br>' + data.msg, 
+//								topTip : true
+//							});					
+//						}
+//					}, 'json');		
+//				}
+//			});
+//			//打开会员读取Popup
+//			memberReadPopup.open();
 		});
 		
 		//读取会员&会员余额

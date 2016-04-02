@@ -310,15 +310,28 @@ uo.showDescForUpdateOrder = function(){
 	
 	//绑定会元完善资料
 	$('#memberBind_span_checkout').click(function(){
-		var perfectMemberPopup = new PerfectMemberPopup({
-			selectedMember : uo.order.memberId,
-			selectedOrder : uo.order.id,
-			memberName : uo.orderMember.name,
-			postBound : function(){
-				initOrderData({order : uo.order});
-			}
+		seajs.use('./js/popup/member/perfect', function(perfectPopup){
+			var perfectMemberPopup = perfectPopup.newInstance({
+				selectedMember : uo.order.memberId,
+				selectedOrder : uo.order.id,
+				memberName : uo.orderMember.name,
+				postBound : function(){
+					initOrderData({order : uo.order});
+				}
+			});
+			perfectMemberPopup.open();
+			
 		});
-		perfectMemberPopup.open();
+		
+//		var perfectMemberPopup = new PerfectMemberPopup({
+//			selectedMember : uo.order.memberId,
+//			selectedOrder : uo.order.id,
+//			memberName : uo.orderMember.name,
+//			postBound : function(){
+//				initOrderData({order : uo.order});
+//			}
+//		});
+//		perfectMemberPopup.open();
 	});
 	
 };
@@ -1235,38 +1248,72 @@ $(function(){
 	$('#orderFoodListMgr').on('pageinit', function(){
 		//会员
 		$('#memberRead_a_orderFood').click(function(){
-			var memberReadPopup = null;
-			memberReadPopup = new MemberReadPopup({
-				confirm : function(member, discount, pricePlan){
-					Util.LM.show();
-					
-					$.post('../OperateDiscount.do', {
-						dataSource : 'setDiscount',
-						orderId : uo.order.id,
-						memberId : member.id,
-						discountId : discount.id,
-						pricePlan : pricePlan.id
+			seajs.use('./js/popup/member/read', function(readPopup){
+				var memberReadPopup = null;
+				memberReadPopup = readPopup.newInstance({
+					confirm : function(member, discount, pricePlan){
+						Util.LM.show();
 						
-					}, function(data){
-						Util.LM.hide();
-						if(data.success){
+						$.post('../OperateDiscount.do', {
+							dataSource : 'setDiscount',
+							orderId : uo.order.id,
+							memberId : member.id,
+							discountId : discount.id,
+							pricePlan : pricePlan.id
 							
-							//异步刷新账单
-							initOrderData({order : uo.order});
-							
-							Util.msg.alert({topTip : true, msg : '会员注入成功'});	
-							
-							//关闭会员读取Popup
-							memberReadPopup.close();
-							
-						}else{
-							Util.msg.tip('使用会员失败</br>' + data.msg);					
-						}
-					}, 'json');		
-				}
+						}, function(data){
+							Util.LM.hide();
+							if(data.success){
+								
+								//异步刷新账单
+								initOrderData({order : uo.order});
+								
+								Util.msg.alert({topTip : true, msg : '会员注入成功'});	
+								
+								//关闭会员读取Popup
+								memberReadPopup.close();
+								
+							}else{
+								Util.msg.tip('使用会员失败</br>' + data.msg);					
+							}
+						}, 'json');		
+					}
+				});
+				//打开会员读取Popup
+				memberReadPopup.open();
 			});
-			//打开会员读取Popup
-			memberReadPopup.open();
+//			var memberReadPopup = null;
+//			memberReadPopup = new MemberReadPopup({
+//				confirm : function(member, discount, pricePlan){
+//					Util.LM.show();
+//					
+//					$.post('../OperateDiscount.do', {
+//						dataSource : 'setDiscount',
+//						orderId : uo.order.id,
+//						memberId : member.id,
+//						discountId : discount.id,
+//						pricePlan : pricePlan.id
+//						
+//					}, function(data){
+//						Util.LM.hide();
+//						if(data.success){
+//							
+//							//异步刷新账单
+//							initOrderData({order : uo.order});
+//							
+//							Util.msg.alert({topTip : true, msg : '会员注入成功'});	
+//							
+//							//关闭会员读取Popup
+//							memberReadPopup.close();
+//							
+//						}else{
+//							Util.msg.tip('使用会员失败</br>' + data.msg);					
+//						}
+//					}, 'json');		
+//				}
+//			});
+//			//打开会员读取Popup
+//			memberReadPopup.open();
 		});
 		
 		//转台

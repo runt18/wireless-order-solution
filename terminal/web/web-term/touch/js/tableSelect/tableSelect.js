@@ -659,25 +659,47 @@ $(function(){
 		$('#fastIssue_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				var fastIssuePopup = null;
-				fastIssuePopup = new MemberReadPopup({
-					confirm : function(member){
-						if(member){
-							fastIssuePopup.close(function(){
-								var issueCouponPopup = new IssueCouponPopup({
-									title : '快速发放优惠券',
-									memberName : member.name,
-									issueMode : IssueCouponPopup.IssueMode.FAST,
-									issueTo : member.id
-								});
-								issueCouponPopup.open();
-							}, 200);
-						}else{
-							Util.msg.tip('请注入会员!');
+//				var fastIssuePopup = null;
+//				fastIssuePopup = new MemberReadPopup({
+//					confirm : function(member){
+//						if(member){
+//							fastIssuePopup.close(function(){
+//								var issueCouponPopup = new IssueCouponPopup({
+//									title : '快速发放优惠券',
+//									memberName : member.name,
+//									issueMode : IssueCouponPopup.IssueMode.FAST,
+//									issueTo : member.id
+//								});
+//								issueCouponPopup.open();
+//							}, 200);
+//						}else{
+//							Util.msg.tip('请注入会员!');
+//						}
+//					}
+//				});
+//				fastIssuePopup.open();
+				seajs.use(['./js/popup/member/read','./js/popup/coupon/issuePopup'], function(readPopup, usePopup){
+					var fastIssuePopup = null;
+					fastIssuePopup = readPopup.newInstance({
+						confirm : function(member){
+							if(member){
+								fastIssuePopup.close(function(){
+									var issueCouponPopup = usePopup.newInstance({
+										title : '快速发放优惠券',
+										memberName : member.name,
+										issueMode : usePopup.IssueMode.FAST,
+										issueTo : member.id
+									});
+									issueCouponPopup.open();
+								}, 200);
+							}else{
+								Util.msg.tip('请注入会员!');
+							}
 						}
-					}
+					});
+					fastIssuePopup.open();
+					
 				});
-				fastIssuePopup.open();
 			}, 100);
 		});
 		
@@ -685,50 +707,54 @@ $(function(){
 		$('#fastUse_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				var fastUsePopup = null;
-				fastUsePopup = new MemberReadPopup({
-					confirm : function(member){
-						if(member){
-							fastUsePopup.close(function(){
-								var useCouponPopup = null;
-								useCouponPopup = new UseCouponPopup({
-									title : '快速使用优惠券',
-									memberName : member.name,
-									issueMode : UseCouponPopup.UseMode.FAST,
-									useTo  : member.id,
-									useCuoponMethod : function(coupons){
-										$.post('../OperateCoupon.do', {
-												dataSource : 'coupon', 
-												coupons : coupons.join(','), 
-												useTo : member.id, 
-												useMode : UseCouponPopup.UseMode.FAST.mode 
-											}, function(response, status,xhr){
-												if(response.success){
-													Util.msg.tip('使用成功!');
-													useCouponPopup.close();
-												}else{
-													Util.msg.tip(response.msg);
-												}
-										}, 'json');
-									}
-								});
-								useCouponPopup.open();
-							}, 200);
-						}else{
-							Util.msg.tip('请注入会员!');
+				seajs.use(['./js/popup/member/read','./js/popup/coupon/usePopup'], function(readPopup, usePopup){
+					var fastUsePopup = null;
+					fastUsePopup = readPopup.newInstance({
+						confirm : function(member){
+							if(member){
+								fastUsePopup.close(function(){
+									var useCouponPopup = null;
+									useCouponPopup = usePopup.newInstance({
+										title : '快速使用优惠券',
+										memberName : member.name,
+										issueMode : usePopup.UseMode.FAST,
+										useTo  : member.id,
+										useCuoponMethod : function(coupons){
+											$.post('../OperateCoupon.do', {
+													dataSource : 'coupon', 
+													coupons : coupons.join(','), 
+													useTo : member.id, 
+													useMode : UseCouponPopup.UseMode.FAST.mode 
+												}, function(response, status,xhr){
+													if(response.success){
+														Util.msg.tip('使用成功!');
+														useCouponPopup.close();
+													}else{
+														Util.msg.tip(response.msg);
+													}
+											}, 'json');
+										}
+									});
+									useCouponPopup.open();
+								}, 200);
+							}else{
+								Util.msg.tip('请注入会员!');
+							}
 						}
-					}
+					});
+					
+					fastUsePopup.open();
 				});
-				fastUsePopup.open();
-			}, 100);
+			}, 300);
 		});
 		
 		//添加会员
 		$('#addMember_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				var addMemberPopup = new  AddMemberPopup();
-				addMemberPopup.open();
+				seajs.use('./js/popup/member/add', function(popup){
+					popup.newInstance().open();
+				});
 			}, 200);
 		});
 		
@@ -736,35 +762,58 @@ $(function(){
 		$('#memberWxBind_li_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				var memberWxReadPopup = null;
-				memberWxReadPopup = new MemberReadPopup({
-					confirm : function(member){
-						if(member && member.isRaw){
-							memberWxReadPopup.close(function(){
-								var memberWxBindPopup = null;
-								memberWxBindPopup = new PerfectMemberPopup({
-									memberName : member.name,
-									selectedMember : member.id,
-									postBound : function(){
-										memberWxBindPopup.close();
-									}
-								});
-								memberWxBindPopup.open();
-							}, 200);
-						}else{
-							Util.msg.tip('会员资料已完善');
+				seajs.use(['./js/popup/member/read', './js/popup/member/perfect'], function(readPopup, prefectPopup){
+					var memberWxReadPopup = null;
+					memberWxReadPopup = readPopup.newInstance({
+						confirm : function(member){
+							if(member && member.isRaw){
+								memberWxReadPopup.close(function(){
+									var memberWxBindePopup = null;
+									memberWxBindPopup = prefectPopup.newInstance({
+										memberName : member.name,
+										selectedMember : member.id,
+										postBound : function(){
+											memberWxBindPopup.close();
+										}
+									});
+									memberWxBindPopup.open();
+								}, 200);
+							}
 						}
-					}
+						
+					});
+					memberWxReadPopup.open();
 				});
-				memberWxReadPopup.open();
+//				var memberWxReadPopup = null;
+//				memberWxReadPopup = new MemberReadPopup({
+//					confirm : function(member){
+//						if(member && member.isRaw){
+//							memberWxReadPopup.close(function(){
+//								var memberWxBindPopup = null;
+//								memberWxBindPopup = new PerfectMemberPopup({
+//									memberName : member.name,
+//									selectedMember : member.id,
+//									postBound : function(){
+//										memberWxBindPopup.close();
+//									}
+//								});
+//								memberWxBindPopup.open();
+//							}, 200);
+//						}else{
+//							Util.msg.tip('会员资料已完善');
+//						}
+//					}
+//				});
+//				memberWxReadPopup.open();
 			}, 200);
 		});
 		
 		
 		//打印机诊断
 		$('#diagPrinter_a_tableSelect').click(function(){
-			var diagPrinterPopup = new DiagPrinterPopup();
-			diagPrinterPopup.open();
+			seajs.use('./js/popup/diagPrinter/diagPrinter', function(popup){
+				popup.newInstance().open();
+			});
 		});
 		
 		
@@ -782,10 +831,11 @@ $(function(){
 		//消费明细
 		$('#consumeDetail_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
-			var consumeDetail = new ConsumeDetailPopup();
 			setTimeout(function(){
-				consumeDetail.open();
-			}, 300);
+				seajs.use('./js/popup/consumeDetail/consumeDetail', function(popup){
+					popup.newInstance().open();
+				});
+			},300);
 		});
 		
 		
@@ -866,13 +916,15 @@ $(function(){
 		$('#searchMember_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				var searchMemberPopup = null;
-				searchMemberPopup = new MemberReadPopup({
-					confirm : function(){
-						searchMemberPopup.close();
-					}
+				seajs.use('./js/popup/member/read', function(popup){
+					var readPopup = null;
+					readPopup = popup.newInstance({
+						confirm : function(){
+							readPopup.close();
+						}
+					});
+					readPopup.open();
 				});
-				searchMemberPopup.open();
 			}, 300);
 		});
 		
@@ -880,8 +932,9 @@ $(function(){
 		$('#memberRecharge_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				var memberRecharge = new MemberRechargePopup();
-				memberRecharge.open();
+				seajs.use('./js/popup/member/recharge', function(popup){
+					popup.newInstance().open();
+				});
 			},300);
 		});
 		
@@ -889,8 +942,11 @@ $(function(){
 		$('#patchCard_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				var patchCardPopup = new PatchCardPopup();
-				patchCardPopup.open();
+//				var patchCardPopup = new PatchCardPopup();
+//				patchCardPopup.open();
+				seajs.use('./js/popup/member/patchCard', function(popup){
+					popup.newInstance().open();
+				});
 			},300);
 		});
 
@@ -898,8 +954,11 @@ $(function(){
 		$('#patchWxCard_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				var patchWxCardPopup = new PatchWxCardPopup();
-				patchWxCardPopup.open();
+//				var patchWxCardPopup = new PatchWxCardPopup();
+//				patchWxCardPopup.open();
+				seajs.use('./js/popup/member/patchWxCard', function(popup){
+					popup.newInstance().open();
+				});
 			},300);
 		});
 		

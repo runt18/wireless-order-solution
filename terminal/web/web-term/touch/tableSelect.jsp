@@ -79,16 +79,6 @@
 <script type="text/javascript" src="./js/popup/jqmPopup.js?v=<%=v %>"></script>
 <!-- JqmPopupDiv弹出控件 -->
 <script type="text/javascript" src="./js/popup/jqmPopupDiv.js?v=<%=v %>"></script>
-<!-- issuePopup弹出控件 -->
-<script type="text/javascript" src="./js/popup/coupon/issuePopup.js?v=<%=v %>"></script>
-<!-- usepopup弹出控件 -->
-<script type="text/javascript" src="./js/popup/coupon/usePopup.js?v=<%=v %>"></script>
-<!-- 会员读取弹出控件 -->
-<script type="text/javascript" src="./js/popup/member/read.js?v=<%=v %>"></script>
-<!--添加会员弹出控件 -->
-<script type="text/javascript" src="./js/popup/member/add.js?v=<%=v %>"></script>
-<!-- 完善会员资料 -->
-<script type="text/javascript" src="./js/popup/member/perfect.js?v=<%=v %>"></script>
 <!-- 打印机绑定 -->
 <script type="text/javascript" src="./js/popup/print/print.js?v=<%=v %>"></script>
 <!-- 查台等控件绑定 -->
@@ -109,20 +99,12 @@
 <script type="text/javascript" src="./js/popup/handlerTable/handlerTable.js?v=<%=v %>"></script>
 <!-- 酒席入账 -->
 <script type="text/javascript" src="./js/popup/feastPay/feastPay.js?v=<%=v %>"></script>
-<!-- 会员充值 -->
-<script type="text/javascript" src="./js/popup/member/recharge.js?v=<%=v %>"></script>
-<!-- 补发实体卡 -->
-<script type="text/javascript" src="./js/popup/member/patchCard.js?v=<%= v %>"></script>
-<!-- 补发电子卡 -->
-<script type="text/javascript" src="./js/popup/member/patchWxCard.js?v=<%= v %>"></script>
-<!-- 打印机诊断 -->
-<script type="text/javascript" src="./js/popup/diagPrinter/diagPrinter.js?v=<%= v %>"></script>
-<!-- 消费明细 -->
-<script type="text/javascript" src="./js/popup/consumeDetail/consumeDetail.js?v=<%= v %>"></script>
 <!-- 跑马灯 -->
 <script type="text/javascript" src="./js/runHorse/runHorse.js"></script>
 <!-- 重连socket -->
 <script type="text/javascript" src="./js/socket/reconnecting-websocket.js"></script>
+<!-- seajs导包 -->
+<script type="text/javascript" src="./js/runHorse/sea.js"></script>
 
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
@@ -164,7 +146,6 @@
 			<li class="popupButtonList" id="addMember_a_tableSelect"><a >添加会员</a></li>
 			<li class="popupButtonList" id="memberRecharge_a_tableSelect"><a >会员充值</a></li>
 			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
-			<!-- onclick="ts.member.openMemberConsumeDetailWin()" -->
 			<li class="popupButtonList" id="consumeDetail_a_tableSelect"><a >消费明细</a></li>
 			<li class="popupButtonList" id="patchCard_a_tableSelect"><a>补发实体卡</a></li>
 			<li class="popupButtonList" id="patchWxCard_a_tableSelect"><a>补发电子卡</a></li>
