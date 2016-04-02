@@ -659,7 +659,7 @@ $(function(){
 		$('#fastIssue_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				seajs.use(['read', 'issue'], function(readPopup, issuePopup){
+				seajs.use(['readMember', 'issueCoupon'], function(readPopup, issuePopup){
 					var fastIssuePopup = null;
 					fastIssuePopup = readPopup.newInstance({
 						confirm : function(member){
@@ -688,7 +688,7 @@ $(function(){
 		$('#fastUse_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				seajs.use(['read','use'], function(readPopup, usePopup){
+				seajs.use(['readMember','useCoupon'], function(readPopup, usePopup){
 					var fastUsePopup = null;
 					fastUsePopup = readPopup.newInstance({
 						confirm : function(member){
@@ -733,7 +733,7 @@ $(function(){
 		$('#addMember_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				seajs.use('add', function(popup){
+				seajs.use('addMember', function(popup){
 					popup.newInstance().open();
 				});
 			}, 200);
@@ -743,7 +743,7 @@ $(function(){
 		$('#memberWxBind_li_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				seajs.use(['read', 'perfect'], function(readPopup, prefectPopup){
+				seajs.use(['readMember', 'perfectMemberMsg'], function(readPopup, prefectPopup){
 					var memberWxReadPopup = null;
 					memberWxReadPopup = readPopup.newInstance({
 						confirm : function(member){
@@ -876,7 +876,7 @@ $(function(){
 		$('#searchMember_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-				seajs.use('read', function(popup){
+				seajs.use('readMember', function(popup){
 					var readPopup = null;
 					readPopup = popup.newInstance({
 						confirm : function(){

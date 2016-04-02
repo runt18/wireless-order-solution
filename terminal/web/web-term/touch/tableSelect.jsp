@@ -50,15 +50,15 @@
 	seajs.config({
 		alias : {
 			'diagPrinter' : './js/popup/diagPrinter/diagPrinter',
-			'read' : './js/popup/member/read',
-			'add' : './js/popup/member/add',
+			'readMember' : './js/popup/member/read',
+			'addMember' : './js/popup/member/add',
 			'recharge' : './js/popup/member/recharge',
 			'consumeDetail' : './js/popup/consumeDetail/consumeDetail',
 			'patchCard' : './js/popup/member/patchCard',
 			'patchWxCard' : './js/popup/member/patchWxCard',
-			'perfect' : './js/popup/member/perfect',
-			'issue' : './js/popup/coupon/issuePopup',
-			'use' : './js/popup/coupon/usePopup'
+			'perfectMemberMsg' : './js/popup/member/perfect',
+			'issueCoupon' : './js/popup/coupon/issuePopup',
+			'useCoupon' : './js/popup/coupon/usePopup'
 		}
 	});
 </script>
