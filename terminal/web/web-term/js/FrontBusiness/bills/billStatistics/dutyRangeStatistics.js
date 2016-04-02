@@ -188,15 +188,22 @@ function dutyRangePanelInit(c){
         	click : function(e){
         		var treeNode = Ext.ux.getSelNode(dutyRangeStatTree);
         		if(typeof treeNode.attributes.onDuty != 'undefined'){
-        			//跨域调用
-        			loadPaymentGeneral({
-        				onDuty : treeNode.attributes.onDuty,
-        				offDuty : treeNode.attributes.offDuty,
-        				dataSource : treeNode.isLeaf()? 'paymentToday' : 'today',
-        				queryPattern : 5,
-        				businessStatic : treeNode.isLeaf()? 2 : 1,
-        				staffId : treeNode.isLeaf()?treeNode.attributes.staffId : ''
-        			});	
+        			dutyRangeStatGeneral.load({
+						autoLoad : false,
+						url : '../window/history/businessStatistics.jsp',
+						scripts : true,
+						nocache : true,
+						text : '功能加载中, 请稍后......'
+					});	
+        			
+        			dutyRangeWin.d = '_' + new Date().getTime();
+					dutyRangeWin.dataSource =  treeNode.isLeaf()? 'paymentToday' : 'today';
+					dutyRangeWin.queryPattern = 5;
+					dutyRangeWin.onDuty = treeNode.attributes.onDuty;
+					dutyRangeWin.offDuty = treeNode.attributes.offDuty;
+					dutyRangeWin.businessStatic = treeNode.isLeaf()? 2 : 1;
+					dutyRangeWin.staffId = treeNode.isLeaf()?treeNode.attributes.staffId : '';
+					
         		}else{
         			dutyRangeStatGeneral.load({
 						autoLoad : false,
@@ -206,13 +213,12 @@ function dutyRangePanelInit(c){
 						text : '功能加载中, 请稍后......'
 					});	
         			
-					dutyRangeStatGeneral.d = '_' + new Date().getTime();
-					dutyRangeStatGeneral.dataSource = 'today';
-					dutyRangeStatGeneral.queryPattern = 6;
-					dutyRangeStatGeneral.onDuty = reeNode.attributes['onDutyFormat'];
-					dutyRangeStatGeneral.offDuty = treeNode.attributes['offDutyFormat'];
-					dutyRangeStatGeneral.businessStatic = statType;
-					
+					dutyRangeWin.d = '_' + new Date().getTime();
+					dutyRangeWin.dataSource = 'today';
+					dutyRangeWin.queryPattern = 6;
+					dutyRangeWin.onDuty = treeNode.attributes['onDutyFormat'];
+					dutyRangeWin.offDuty = treeNode.attributes['offDutyFormat'];
+					dutyRangeWin.businessStatic = statType;
 					
         		}
         		if(typeof treeNode.attributes.onDuty != 'undefined' && treeNode.isLeaf()){
@@ -255,7 +261,7 @@ function dutyRangePanelInit(c){
 				thiz.dataSource = 'today';
 				thiz.queryPattern = 5;
 				thiz.onDuty = treeNode.attributes['onDutyFormat'];
-				tihz.offDuty = treeNode.attributes['offDutyFormat'];
+				thiz.offDuty = treeNode.attributes['offDutyFormat'];
 				thiz.businessStatic = statType;
 			}
 		}

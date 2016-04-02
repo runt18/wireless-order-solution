@@ -8,7 +8,7 @@ Ext.onReady(function(){
 	};
 	
 	var dataSource; 
-	if(Ext.WindowMgr.getActive().dataSource != 'null' && Ext.WindowMgr.getActive().dataSource != ''){
+	if(typeof Ext.WindowMgr.getActive().dataSource != 'undefined' && Ext.WindowMgr.getActive().dataSource != ''){
 		dataSource = Ext.WindowMgr.getActive().dataSource;
 	}else{
 		dataSource = 'today';
@@ -384,8 +384,6 @@ Ext.onReady(function(){
 					beginDate.clearInvalid();
 					endDate.clearInvalid();
 					
-					Ext.getCmp('btnSearchForBusinessStatisticsSummaryInformation').handler();
-					
 					dateCombo.setDisabled(true);
 					beginDate.setDisabled(true);
 					endDate.setDisabled(true);
@@ -395,7 +393,10 @@ Ext.onReady(function(){
 					}
 				}else if(queryPattern == 6){
 					Ext.getCmp('businessStatisticTbar').hide();
+					
 				}
+				
+				Ext.getCmp('btnSearchForBusinessStatisticsSummaryInformation').handler();
 			}
 		}
 	});
@@ -410,14 +411,4 @@ function getDutyRange(){
 	dutyRangeForPrinter.onDutyFormat = business.paramsOnDuty;
 	dutyRangeForPrinter.offDutyFormat = business.paramsOffDuty;
 	return dutyRangeForPrinter;
-}
-
-function loadPaymentGeneral(c){
-	onDuty = c.onDuty;
-	offDuty = c.offDuty;
-	dataSource = c.dataSource;
-	queryPattern = c.queryPattern;
-	businessStatic = c.businessStatic;
-	staffId = c.staffId;
-	Ext.getCmp('btnSearchForBusinessStatisticsSummaryInformation').handler();
 }
