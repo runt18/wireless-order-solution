@@ -302,6 +302,19 @@ public class Represent implements Jsonable {
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		if(this.finishDate != 0){
+			jm.putString("finish", DateUtil.format(this.finishDate, DateUtil.Pattern.DATE));
+		}
+		jm.putBoolean("isProgress", this.isProgress());
+		jm.putString("title", this.title);
+		jm.putString("slogon", this.slogon);
+		jm.putLong("finishDate", this.finishDate);
+		jm.putString("body", this.body);
+		jm.putInt("reconmendPoint", this.recommendPoint);
+		jm.putInt("subscribePoint", this.subscribePoint);
+		jm.putFloat("recommendMoney", this.recommentMoney);
+		jm.putFloat("subscribeMoney", this.subscribeMoney);
 		return jm;
 	}
 

@@ -47,7 +47,7 @@ public class SalesSubStatisticsChartAction extends Action {
 				HourRange hr = new HourRange(opening, ending, Pattern.HOUR);
 				extraCond.setHourRange(hr);
 			}
-			if(region != null && !region.equals("-1")){
+			if(region != null && !region.isEmpty() && !region.equals("-1")){
 				extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
 				
 			}

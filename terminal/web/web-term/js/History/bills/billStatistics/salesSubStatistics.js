@@ -25,7 +25,6 @@ $(function(){
 			mode : 'local',
 			triggerAction : 'all',
 			selectOnFocus : true,
-			allowBlank : false,
 			readOnly : false,
 			listeners : {
 				render : function(thiz){
@@ -175,7 +174,8 @@ $(function(){
 			}
 		});
 		
-		var branch_combo_foodstatistics = new Ext.form.ComboBox({
+		var branch_combo_foodstatistics;
+		branch_combo_foodstatistics = new Ext.form.ComboBox({
 			id : 'branch_combo_foodstatistics',
 			readOnly : false,
 			forceSelection : true,
@@ -192,8 +192,8 @@ $(function(){
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-					//var data = [[-1, '全部']];
-					var data = [];
+					var data = [[-1, '全部']];
+//					var data = [];
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
 						params : {
@@ -214,93 +214,126 @@ $(function(){
 							}
 							
 							thiz.store.loadData(data);
-							thiz.setValue(jr.root[0].id);
-							//thiz.setValue(-1);
+//							thiz.setValue(jr.root[0].id);
+							thiz.setValue(-1);
+							thiz.fireEvent('select');
 						},
 						failure : function(res, opt){
 							thiz.store.loadData([-1, '全部']);
 							thiz.setValue(-1);
 						}
 					});
+					
 				},
 				select : function(){
-					//加载区域
-					var region = [[-1,'全部']];
-					Ext.Ajax.request({
-						url : '../../OperateRegion.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branch_combo_foodstatistics.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							for(var i = 0; i < jr.root.length; i++){
-								region.push([jr.root[i]['id'], jr.root[i]['name']]);
+					
+					if(branch_combo_foodstatistics.getValue() == -1){
+						var data = [];
+						//区域
+						Ext.getCmp('foodStatistic_comboRegion').store.loadData(data);
+						Ext.getCmp('foodStatistic_comboRegion').setValue('');
+						Ext.getCmp('foodStatistic_comboRegion').setDisabled(true);
+						//市别
+						Ext.getCmp('foodStatistic_comboBusinessHour').store.loadData(data);
+						Ext.getCmp('foodStatistic_comboBusinessHour').setValue('');
+						Ext.getCmp('foodStatistic_comboBusinessHour').setDisabled(true);
+						//员工
+						Ext.getCmp('foodSale_combo_staffs').store.loadData(data);
+						Ext.getCmp('foodSale_combo_staffs').setValue('');
+						Ext.getCmp('foodSale_combo_staffs').setDisabled(true);
+						//部门
+						var root = new Ext.tree.TreeNode({expanded : true, text : '全部', leaf : false, deptID : '-1'});
+						orderFoodStatPanelDeptTree.setRootNode(root);
+						orderFoodStatPanelDeptTree.setDisabled(true);
+						
+						Ext.getDom('lab_salesSubDept_food').innerHTML = '----';
+					}else{
+						//加载区域
+						var region = [[-1,'全部']];
+						Ext.Ajax.request({
+							url : '../../OperateRegion.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_foodstatistics.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								for(var i = 0; i < jr.root.length; i++){
+									region.push([jr.root[i]['id'], jr.root[i]['name']]);
+								}
+								Ext.getCmp('foodStatistic_comboRegion').store.loadData(region);
+								Ext.getCmp('foodStatistic_comboRegion').setValue(-1);
+								Ext.getCmp('foodStatistic_comboRegion').setDisabled(false);
 							}
-							Ext.getCmp('foodStatistic_comboRegion').store.loadData(region);
-							Ext.getCmp('foodStatistic_comboRegion').setValue(-1);
-						}
-					});
-					
-					
-					//加载市别
-					var hour = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../OperateBusinessHour.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branch_combo_foodstatistics.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							
-							for(var i = 0; i < jr.root.length; i++){
-								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+						});
+						
+						
+						//加载市别
+						var hour = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperateBusinessHour.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_foodstatistics.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+								}
+								
+								hour.push([-2, '自定义']);
+								
+								Ext.getCmp('foodStatistic_comboBusinessHour').store.loadData(hour);
+								Ext.getCmp('foodStatistic_comboBusinessHour').setValue(-1);
+								Ext.getCmp('foodStatistic_comboBusinessHour').setDisabled(false);
 							}
-							
-							hour.push([-2, '自定义']);
-							
-							Ext.getCmp('foodStatistic_comboBusinessHour').store.loadData(hour);
-							Ext.getCmp('foodStatistic_comboBusinessHour').setValue(-1);
-						}
-					});
-					
-					//加载员工
-					var staff = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../QueryStaff.do',
-						params : {
-							branchId : branch_combo_foodstatistics.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							
-							for(var i = 0; i < jr.root.length; i++){
-								staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+						});
+						
+						//加载员工
+						var staff = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../QueryStaff.do',
+							params : {
+								branchId : branch_combo_foodstatistics.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+								}
+								
+								Ext.getCmp('foodSale_combo_staffs').store.loadData(staff);
+								Ext.getCmp('foodSale_combo_staffs').setValue(-1);
+								Ext.getCmp('foodSale_combo_staffs').setDisabled(false);
+								
 							}
-							
-							Ext.getCmp('foodSale_combo_staffs').store.loadData(staff);
-							Ext.getCmp('foodSale_combo_staffs').setValue(-1);
-						}
+						});
+						
+						Ext.Ajax.request({
+							url : '../../QueryDeptTree.do',
+							params : {
+								branchId : branch_combo_foodstatistics.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								 var root = new Ext.tree.TreeNode({expanded : true, text : '全部', leaf : false, deptID : '-1'});   
+								 
+								 root.appendChild(jr);
+								orderFoodStatPanelDeptTree.setRootNode(root);
+								orderFoodStatPanelDeptTree.setDisabled(false);
+							}
+						});
+					}
+					
+					
+					var store = Ext.getCmp('foodSale_combo_staffs').getStore();
+					store.on('load', function(){
+//						Ext.getCmp('foodSale_combo_staffs').fireEvent('select');
+						Ext.getCmp('foodStatistic_btnSearch').handler();
 					});
-					
-					Ext.Ajax.request({
-						url : '../../QueryDeptTree.do',
-						params : {
-							branchId : branch_combo_foodstatistics.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							 var root = new Ext.tree.TreeNode({expanded : true, text : '全部', leaf : false, deptID : '-1'});   
-							 
-							 root.appendChild(jr);
-							orderFoodStatPanelDeptTree.setRootNode(root);
-						}
-					});
-					
-					
-					
-					Ext.getCmp('foodStatistic_btnSearch').handler();
 					
 				}
 			}
@@ -340,12 +373,12 @@ $(function(){
 				var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'foodStatistic_'}).data;
 				gs.baseParams['dateBeg'] = beginDate.getRawValue();
 				gs.baseParams['dateEnd'] = endDate.getRawValue();
-				gs.baseParams['deptID'] = salesSubDeptId;
+				gs.baseParams['deptID'] = branch_combo_foodstatistics.getValue() == -1 ? -1 : salesSubDeptId;
 				gs.baseParams['foodName'] = foodName.getValue();
 				gs.baseParams['region'] = Ext.getCmp("foodStatistic_comboRegion").getValue();
 				gs.baseParams['staffId'] = foodSale_combo_staffs.getValue();
-				gs.baseParams['opening'] = data.opening;
-				gs.baseParams['ending'] = data.ending;
+				gs.baseParams['opening'] = branch_combo_foodstatistics.getValue() == -1 ? '' : data.opening;
+				gs.baseParams['ending'] = branch_combo_foodstatistics.getValue() == -1 ? '' : data.ending;
 				gs.baseParams['branchId'] = branch_combo_foodstatistics.getValue();
 				gs.load({
 					params : {
@@ -402,6 +435,7 @@ $(function(){
 			items : orderFoodStatPanelGridTbarItem.concat()
 		});
 		
+		
 		orderFoodStatPanelGrid = createGridPanel(
 			'',
 			'',
@@ -409,6 +443,7 @@ $(function(){
 			'',
 			'../../SalesSubStatistics.do',
 			[[true, false, false, true], 
+			 ['门店名称', 'restaurant', 150],
 	         ['菜品', 'food.name', 150], 
 	         ['销量', 'salesAmount', '', 'right', Ext.ux.txtFormat.gridDou], 
 	         ['营业额', 'income', null, 'right', Ext.ux.txtFormat.gridDou], 
@@ -420,9 +455,9 @@ $(function(){
 	         ['成本率', 'costRate', '', 'right', Ext.ux.txtFormat.gridDou], 
 	         ['毛利', 'profit', '', 'right', Ext.ux.txtFormat.gridDou], 
 	         ['毛利率', 'profitRate', '', 'right', Ext.ux.txtFormat.gridDou]
-	         //['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], 
+			//['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], 
 			],
-			SalesSubStatRecord.getKeys().concat(['food', 'food.name']),
+			SalesSubStatRecord.getKeys().concat(['food', 'food.name', 'restaurant']),
 			[ ['isPaging', true], ['dataType', 1], ['queryType', 1]],
 			SALESSUB_PAGE_LIMIT,
 			'',
@@ -503,7 +538,8 @@ $(function(){
 		});
 		
 		//分厨统计的区域
-		var branch_combo_kitchenStatistics = new  Ext.form.ComboBox({
+		var branch_combo_kitchenStatistics;
+		branch_combo_kitchenStatistics = new  Ext.form.ComboBox({
 			readOnly : false,
 			forceSelection : true,
 			width : 123,
@@ -519,8 +555,8 @@ $(function(){
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-					//var data = [[-1, '全部']];
-					var data = [];
+					var data = [[-1, '全部']];
+//					var data = [];
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
 						params : {
@@ -541,8 +577,8 @@ $(function(){
 							}
 							
 							thiz.store.loadData(data);
-							thiz.setValue(jr.root[0].id);
-							//thiz.setValue(-1);
+//							thiz.setValue(jr.root[0].id);
+							thiz.setValue(-1);
 							thiz.fireEvent('select');
 						},
 						failure : function(res, opt){
@@ -550,49 +586,69 @@ $(function(){
 							thiz.setValue(-1);
 						}
 					});
+					dateCombo.setValue(1);
 				},
 				select : function(){
-					//加载区域
-					var region = [[-1,'全部']];
-					Ext.Ajax.request({
-						url : '../../OperateRegion.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branch_combo_kitchenStatistics.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							for(var i = 0; i < jr.root.length; i++){
-								region.push([jr.root[i]['id'], jr.root[i]['name']]);
-							}
-							Ext.getCmp('kitchenStatistic_comboRegion').store.loadData(region);
-							Ext.getCmp('kitchenStatistic_comboRegion').setValue(-1);
-						}
-					});
 					
-					//加载市别
-					var hour = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../OperateBusinessHour.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branch_combo_kitchenStatistics.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							
-							for(var i = 0; i < jr.root.length; i++){
-								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+					if(branch_combo_kitchenStatistics.getValue() == -1){
+						var data = [];
+						Ext.getCmp('kitchenStatistic_comboRegion').store.loadData(data);
+						Ext.getCmp('kitchenStatistic_comboRegion').setValue('');
+						Ext.getCmp('kitchenStatistic_comboRegion').setDisabled(true);
+						
+						Ext.getCmp('kitchenStatistic_comboBusinessHour').store.loadData(data);
+						Ext.getCmp('kitchenStatistic_comboBusinessHour').setValue('');
+						Ext.getCmp('kitchenStatistic_comboBusinessHour').setDisabled(true);
+					}else{
+						//加载区域
+						var region = [[-1,'全部']];
+						Ext.Ajax.request({
+							url : '../../OperateRegion.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_kitchenStatistics.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								for(var i = 0; i < jr.root.length; i++){
+									region.push([jr.root[i]['id'], jr.root[i]['name']]);
+								}
+								
+								Ext.getCmp('kitchenStatistic_comboRegion').setDisabled(false);
+								Ext.getCmp('kitchenStatistic_comboRegion').store.loadData(region);
+								Ext.getCmp('kitchenStatistic_comboRegion').setValue(-1);
 							}
-							
-							hour.push([-2, '自定义']);
-							
-							Ext.getCmp('kitchenStatistic_comboBusinessHour').store.loadData(hour);
-							Ext.getCmp('kitchenStatistic_comboBusinessHour').setValue(-1);
-						}
-					});
+						});
+						
+						//加载市别
+						var hour = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperateBusinessHour.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_kitchenStatistics.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+								}
+								
+								hour.push([-2, '自定义']);
+								
+								Ext.getCmp('kitchenStatistic_comboBusinessHour').store.loadData(hour);
+								Ext.getCmp('kitchenStatistic_comboBusinessHour').setValue(-1);
+								Ext.getCmp('kitchenStatistic_comboBusinessHour').setDisabled(false);
+							}
+						});
+			
+					}			
 					
-					Ext.getCmp('kitchenStatistic_btnSearch').handler();
+					var store = Ext.getCmp('kitchenStatistic_comboBusinessHour').getStore();
+					store.on('load', function(){
+						Ext.getCmp('kitchenStatistic_btnSearch').handler();
+					});
 				}
 			}
 		});
@@ -629,8 +685,8 @@ $(function(){
 					gs.baseParams['dateBeg'] = beginDate.getRawValue();
 					gs.baseParams['dateEnd'] = endDate.getRawValue();
 					gs.baseParams['region'] = Ext.getCmp("kitchenStatistic_comboRegion").getValue();
-					gs.baseParams['opening'] = data.opening;
-					gs.baseParams['ending'] = data.ending;
+					gs.baseParams['opening'] = branch_combo_kitchenStatistics.getValue() == -1 ? '' : data.opening;
+					gs.baseParams['ending'] = branch_combo_kitchenStatistics.getValue() == -1 ? '' : data.ending;
 					gs.baseParams['branchId'] = branch_combo_kitchenStatistics.getValue();
 					gs.load();
 					kitchenStatPanelGrid.getView().expandAllGroups();
@@ -897,8 +953,8 @@ $(function(){
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-					//var data = [[-1, '全部']];
-					var data = [];
+					var data = [[-1, '全部']];
+//					var data = [];
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
 						params : {
@@ -919,52 +975,66 @@ $(function(){
 							}
 							
 							thiz.store.loadData(data)
-							thiz.setValue(jr.root[0].id);
-							//thiz.setValue(-1);
+//							thiz.setValue(jr.root[0].id);
+							thiz.setValue(-1);
 							thiz.fireEvent('select')
 						}
 					});
 				},
 				select : function(isJump){
-					//加载区域
-					var region = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../OperateRegion.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branch_combo_deptStatistics.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							for(var i = 0; i < jr.root.length; i++){
-								region.push([jr.root[i]['id'], jr.root[i]['name']]);
-							}	
-							Ext.getCmp('deptStatistic_comboRegion').store.loadData(region);
-							Ext.getCmp('deptStatistic_comboRegion').setValue(-1);
-						}
-					});
-					
-					//加载市别
-					var hour = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../OperateBusinessHour.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branch_combo_deptStatistics.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							
-							for(var i = 0; i < jr.root.length; i++){
-								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+					if(branch_combo_deptStatistics.getValue() == -1){
+						var data = [];
+						
+						Ext.getCmp('deptStatistic_comboRegion').store.loadData(data);
+						Ext.getCmp('deptStatistic_comboRegion').setValue('');
+						Ext.getCmp('deptStatistic_comboRegion').setDisabled(true);
+						
+						Ext.getCmp('deptStatistic_comboBusinessHour').store.loadData(data);
+						Ext.getCmp('deptStatistic_comboBusinessHour').setValue('');
+						Ext.getCmp('deptStatistic_comboBusinessHour').setDisabled(true);
+					}else{
+						//加载区域
+						var region = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperateRegion.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_deptStatistics.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								for(var i = 0; i < jr.root.length; i++){
+									region.push([jr.root[i]['id'], jr.root[i]['name']]);
+								}	
+								Ext.getCmp('deptStatistic_comboRegion').store.loadData(region);
+								Ext.getCmp('deptStatistic_comboRegion').setValue(-1);
+								Ext.getCmp('deptStatistic_comboRegion').setDisabled(false);
 							}
-							
-							hour.push([-2, '自定义']);
-							
-							Ext.getCmp('deptStatistic_comboBusinessHour').store.loadData(hour);
-							Ext.getCmp('deptStatistic_comboBusinessHour').setValue(-1);
-						}
-					});
+						});
+						
+						//加载市别
+						var hour = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperateBusinessHour.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_deptStatistics.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+								}
+								
+								hour.push([-2, '自定义']);
+								
+								Ext.getCmp('deptStatistic_comboBusinessHour').store.loadData(hour);
+								Ext.getCmp('deptStatistic_comboBusinessHour').setValue(-1);
+								Ext.getCmp('deptStatistic_comboBusinessHour').setDisabled(false);
+							}
+						});
+					}
 					
 					if(!isJump){
 						Ext.getCmp('deptStatistic_btnSearch').handler();	
@@ -1032,8 +1102,8 @@ $(function(){
 						gs.baseParams['dateBeg'] = beginDate.getRawValue();
 						gs.baseParams['dateEnd'] = endDate.getRawValue();
 						gs.baseParams['region'] = Ext.getCmp("deptStatistic_comboRegion").getValue();
-						gs.baseParams['opening'] = data.opening;
-						gs.baseParams['ending'] = data.ending;
+						gs.baseParams['opening'] = branch_combo_deptStatistics.getValue() == -1 ? '' : data.opening;
+						gs.baseParams['ending'] = branch_combo_deptStatistics.getValue() == -1 ? '' : data.ending;
 						gs.baseParams['branchId'] = branch_combo_deptStatistics.getValue();
 						
 						gs.load();			

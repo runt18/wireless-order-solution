@@ -125,7 +125,7 @@ public class SalesSubStatisticsAction extends Action {
 			
 			final DutyRange dutyRange = new DutyRange(dateBeg, dateEnd);
 			
-			if(region != null && !region.equals("-1")){
+			if(region != null && !region.isEmpty() && !region.equals("-1")){
 				extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
 			}
 			

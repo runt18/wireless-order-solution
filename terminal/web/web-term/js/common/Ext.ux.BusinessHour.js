@@ -53,7 +53,6 @@ Ext.ux.initTimeBar = function(c){
 					mode : 'local',
 					triggerAction : 'all',
 					selectOnFocus : true,
-					allowBlank : false,
 					readOnly : false,
 					listeners : {
 						render : function(thiz){
@@ -115,7 +114,6 @@ Ext.ux.initTimeBar = function(c){
 					mode : 'local',
 					triggerAction : 'all',
 					selectOnFocus : true,
-					allowBlank : false,
 					readOnly : false,
 					listeners : {
 						render : function(thiz){

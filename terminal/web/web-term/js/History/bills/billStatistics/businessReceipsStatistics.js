@@ -412,8 +412,8 @@ $(function(){
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-					//var data = [[-1, '全部']];
-					var data = [];
+					var data = [[-1, '全部']];
+//					var data = [];
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
 						params : {
@@ -435,8 +435,8 @@ $(function(){
 							
 							
 							thiz.store.loadData(data);
-							thiz.setValue(jr.root[0].id);
-							//thiz.setValue(-1);
+//							thiz.setValue(jr.root[0].id);
+							thiz.setValue(-1);
 							thiz.fireEvent('select');
 						},
 						failure : function(res, opt){
@@ -447,52 +447,65 @@ $(function(){
 				},
 				select : function(isJump){
 					
-//					/加载区域
-					var data = [[-1,'全部']];
-					Ext.Ajax.request({
-						url : '../../OperateRegion.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branchSelect_combo_businessReceips.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							for(var i = 0; i < jr.root.length; i++){
-								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+					if(branchSelect_combo_businessReceips.getValue() == -1){
+						var data = [];
+						
+						regionSelect_combo_businessReceips.store.loadData(data);
+						regionSelect_combo_businessReceips.setValue('');
+						regionSelect_combo_businessReceips.setDisabled(true);
+						
+						Ext.getCmp('businessReceipt_comboBusinessHour').store.loadData(data);
+						Ext.getCmp('businessReceipt_comboBusinessHour').setValue('');
+						Ext.getCmp('businessReceipt_comboBusinessHour').setDisabled(true);
+						
+					}else{
+						//加载区域
+						var data = [[-1,'全部']];
+						Ext.Ajax.request({
+							url : '../../OperateRegion.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branchSelect_combo_businessReceips.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								for(var i = 0; i < jr.root.length; i++){
+									data.push([jr.root[i]['id'], jr.root[i]['name']]);
+								}
+								regionSelect_combo_businessReceips.store.loadData(data);
+								regionSelect_combo_businessReceips.setValue(-1);
+								regionSelect_combo_businessReceips.setDisabled(false);
+								
 							}
-							regionSelect_combo_businessReceips.store.loadData(data);
-							regionSelect_combo_businessReceips.setValue(-1);
-							
-						}
-					});
-					
-					//加载市别
-					var hour = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../OperateBusinessHour.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branchSelect_combo_businessReceips.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							
-							for(var i = 0; i < jr.root.length; i++){
-								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+						});
+						
+						//加载市别
+						var hour = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperateBusinessHour.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branchSelect_combo_businessReceips.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+								}
+								
+								hour.push([-2, '自定义']);
+								
+								Ext.getCmp('businessReceipt_comboBusinessHour').store.loadData(hour);
+								Ext.getCmp('businessReceipt_comboBusinessHour').setValue(-1);
+								Ext.getCmp('businessReceipt_comboBusinessHour').setDisabled(false);
 							}
-							
-							hour.push([-2, '自定义']);
-							
-							Ext.getCmp('businessReceipt_comboBusinessHour').store.loadData(hour);
-							Ext.getCmp('businessReceipt_comboBusinessHour').setValue(-1);
-						}
-					});
-					
+						});
+					}
 					
 					if(!isJump){
 						Ext.getCmp('businessReceipt_btnSearch').handler();	
 					}
-					
 					
 				}
 			}
@@ -540,8 +553,8 @@ $(function(){
 				initBusinessReceipsData({
 					dateBegin : Ext.util.Format.date(dateBegin.getValue(), 'Y-m-d 00:00:00'), 
 					dateEnd :Ext.util.Format.date(dateEnd.getValue(), 'Y-m-d 23:59:59'),
-					opening : data.opening,
-					ending : data.ending,
+					opening : branchId == -1 ? '' : data.opening,
+					ending : branchId == -1 ? '' : data.ending,
 					regionId : regionId,
 					branchId : branchId
 				});
