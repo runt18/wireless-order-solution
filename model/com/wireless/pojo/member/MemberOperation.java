@@ -53,7 +53,9 @@ public class MemberOperation implements Jsonable {
 		BALANCE_ADJUST(OperationCate.BALANCE_ADJUST_TYPE, 5, "金额调整", "CZTZ"), 
 		REFUND(OperationCate.CHARGE_TYPE, 6, "取款", "QK"),
 		RE_CONSUME(OperationCate.CONSUME_TYPE, 7, "反结账(消费)", "FJZ"),
-		RE_CONSUME_RESTORE(OperationCate.CONSUME_TYPE, 8, "反结账(退款)", "FJZTK");
+		RE_CONSUME_RESTORE(OperationCate.CONSUME_TYPE, 8, "反结账(退款)", "FJZTK"),
+		POINT_SUBSCRIBE(OperationCate.POINT_ADJUST_TYPE, 9, "关注赠送", "JF"),
+		POINT_RECOMMEND(OperationCate.POINT_ADJUST_TYPE, 9, "推荐赠送", "TJ");
 
 		private final OperationCate cate;
 		private final int value; //
@@ -115,7 +117,10 @@ public class MemberOperation implements Jsonable {
 	 */
 	public static enum ChargeType {
 
-		CASH(1, "现金", "XJ"), CREDIT_CARD(2, "刷卡", "SK");
+		CASH(1, "现金", "XJ"),
+		CREDIT_CARD(2, "刷卡", "SK"),
+		SUBSCRIBE(3, "关注赠送", "GZ"),
+		RECOMMEND(4, "推荐赠送", "TJ");
 
 		private final int value;
 		private final String name;

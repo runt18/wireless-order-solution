@@ -5,12 +5,15 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.member.represent.RepresentChainDao;
+import com.wireless.db.member.represent.RepresentDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -35,6 +38,7 @@ import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.member.WxMember;
+import com.wireless.pojo.member.represent.Represent;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -1720,6 +1724,137 @@ public class MemberDao {
 		}finally{
 			dbCon.disconnect();
 		}
+	}
+
+	/**
+	 * Perform the represent chain to both subscriber and referrer in case of represent.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to represent chain {@link Member#ChainBuilder}
+	 * @return the member operations to both subscribe point & money
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the member to subscribe does NOT exist
+	 * 			<li>the member to recommend does NOT exist
+	 * 			<li>the represent does NOT exist
+	 */
+	public static Map<Member, MemberOperation[]> chain(Staff staff, Member.ChainBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			Map<Member, MemberOperation[]> result = chain(dbCon, staff, builder);
+			dbCon.conn.commit();
+			return result;
+		}catch(BusinessException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform the represent chain to both subscriber and referrer in case of represent.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to represent chain {@link Member#ChainBuilder}
+	 * @return the member operations to both subscriber & referrer
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the member to subscribe does NOT exist
+	 * 			<li>the member to recommend does NOT exist
+	 * 			<li>the represent does NOT exist
+	 */
+	public static Map<Member, MemberOperation[]> chain(DBCon dbCon, Staff staff, Member.ChainBuilder builder) throws SQLException, BusinessException{
+		
+		if(builder.getSubscriber() == builder.getReferrer()){
+			throw new BusinessException("推荐与关注不能是相同的会员");
+		}
+
+		if(!RepresentChainDao.getByCond(dbCon, staff, new RepresentChainDao.ExtraCond().setReferrerId(builder.getReferrer()).setSubscriberId(builder.getSubscriber())).isEmpty()){
+			throw new BusinessException("对不起, 您之前已经被推荐过");
+		}
+		
+		final Represent represent = RepresentDao.getByCond(dbCon, staff, null).get(0);
+
+		if(!represent.isProgress()){
+			throw new BusinessException("对不起, 代言活动已经结束");
+		}
+		
+		final Map<Member, MemberOperation[]> result = new HashMap<>();
+		
+		final Member subscriber = getById(dbCon, staff, builder.getSubscriber());
+		
+		//Perform the chain to subscriber.
+		final MemberOperation[] mo2Subscirber = subscriber.subscribe(represent);
+		
+		result.put(subscriber, mo2Subscirber);
+		
+		//Insert the member operation to subscriber.
+		for(MemberOperation mo : mo2Subscirber){
+			MemberOperationDao.insert(dbCon, staff, mo);
+		}
+		
+		//Update the base & extra balance and point to subscriber.
+		String sql = " UPDATE " + Params.dbName + ".member SET" +
+					 " point = " + subscriber.getPoint() + "," + 
+					 " base_balance = " + subscriber.getBaseBalance() + ", " +
+					 " extra_balance = " + subscriber.getExtraBalance() + "," + 
+					 " total_charge = " + subscriber.getTotalCharge() + 
+					 " WHERE member_id = " + subscriber.getId();
+		dbCon.stmt.executeUpdate(sql);
+		
+		final Member referrer = getById(dbCon, staff, builder.getReferrer());
+		
+		//Perform the chain to referrer.
+		final MemberOperation[] mo2Referrer = referrer.recommend(represent);
+		
+		result.put(referrer, mo2Referrer);
+		
+		//Insert the member operation to referrer.
+		for(MemberOperation mo : mo2Referrer){
+			MemberOperationDao.insert(dbCon, staff, mo);
+		}
+		
+		//Update the base & extra balance and point to referrer.
+		sql = " UPDATE " + Params.dbName + ".member SET" +
+			  " point = " + referrer.getPoint() + "," + 
+			  " base_balance = " + referrer.getBaseBalance() + ", " +
+			  " extra_balance = " + referrer.getExtraBalance() + "," + 
+			  " total_charge = " + referrer.getTotalCharge() + 
+			  " WHERE member_id = " + referrer.getId();
+		dbCon.stmt.executeUpdate(sql);
+		
+//		//Insert the represent chain.
+		sql = " INSERT INTO " + Params.dbName + ".represent_chain ( " +
+			  " `restaurant_id`, `subscribe_date`, " + 
+			  " `recommend_member_id`, `recommend_member`, `recommend_point`, `recommend_money`, `subscribe_member_id`, `subscribe_member`, `subscribe_point`, `subscribe_money` ) VALUES ( " +
+			  staff.getRestaurantId() + "," +
+			  " NOW(), " +
+			  referrer.getId() + "," +
+			  "'" + referrer.getName() + "'," +
+			  represent.getRecommendPoint() + "," +
+			  represent.getRecommentMoney() + "," +
+			  subscriber.getId() + "," +
+			  "'" + subscriber.getName() + "'," +
+			  represent.getSubscribePoint() + "," +
+			  represent.getSubscribeMoney() + 
+			  " ) ";
+		
+		dbCon.stmt.executeUpdate(sql);
+		
+		return result;
 	}
 	
 	/**

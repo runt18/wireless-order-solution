@@ -13,6 +13,7 @@ import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberOperation.OperationType;
+import com.wireless.pojo.member.represent.Represent;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
@@ -408,6 +409,28 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}
 	}
 	
+	public static class ChainBuilder{
+		private final int subscriber;
+		private final int referrer;
+		
+		public ChainBuilder(int subscriber, int referrer){
+			this.subscriber = subscriber;
+			this.referrer = referrer;
+		}
+		
+		public ChainBuilder(Member subscriber, Member referrer){
+			this(subscriber.getId(), referrer.getId());
+		}
+		
+		public int getSubscriber(){
+			return this.subscriber;
+		}
+		
+		public int getReferrer(){
+			return this.referrer;
+		}
+	}
+	
 	private int id;
 	private int restaurantId;
 	private int branchId;
@@ -639,6 +662,97 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		mo.setRemainingPoint(point);
 		
 		return mo;
+	}
+	
+	/**
+	 * Recommend the member in case of represent.
+	 * @param represent
+	 * 			the represent associated with this member
+	 * @return the member operation including both subscribe money & point
+	 */
+	public MemberOperation[] recommend(Represent represent){
+		List<MemberOperation> result = new ArrayList<MemberOperation>();
+		
+		if(represent.getRecommentMoney() > 0){
+			MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+			mo.setOperationType(OperationType.CHARGE);
+			mo.setChargeMoney(represent.getRecommentMoney());
+			mo.setChargeType(ChargeType.RECOMMEND);
+			
+			this.totalCharge += represent.getRecommentMoney();
+			this.extraBalance += represent.getRecommentMoney();
+			
+			mo.setDeltaBaseMoney(0);
+			mo.setDeltaExtraMoney(represent.getRecommentMoney());
+			
+			mo.setRemainingBaseMoney(this.baseBalance);
+			mo.setRemainingExtraMoney(this.extraBalance);
+			mo.setRemainingPoint(this.point);
+			
+			result.add(mo);
+		}
+		
+		if(represent.getRecommendPoint() > 0){
+			
+			this.point += represent.getRecommendPoint();
+			
+			MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+			mo.setOperationType(OperationType.POINT_RECOMMEND);
+			
+			mo.setDeltaPoint(represent.getRecommendPoint());
+			mo.setRemainingPoint(point);
+			
+			result.add(mo);
+		}
+
+		
+		return result.toArray(new MemberOperation[result.size()]);
+	}
+	
+	/**
+	 * Subscribe the weixin in case of represent.
+	 * @param represent
+	 * 			the represent associated with this member
+	 * @return the member operation including both subscribe money & point
+	 */
+	public MemberOperation[] subscribe(Represent represent){
+
+		List<MemberOperation> result = new ArrayList<MemberOperation>();
+		
+		if(represent.getSubscribeMoney() > 0){
+			MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+			mo.setOperationType(OperationType.CHARGE);
+			mo.setChargeMoney(represent.getSubscribeMoney());
+			mo.setChargeType(ChargeType.SUBSCRIBE);
+			
+			this.totalCharge += represent.getSubscribeMoney();
+			this.extraBalance += represent.getSubscribeMoney();
+			
+			mo.setDeltaBaseMoney(0);
+			mo.setDeltaExtraMoney(represent.getSubscribeMoney());
+			
+			mo.setRemainingBaseMoney(this.baseBalance);
+			mo.setRemainingExtraMoney(this.extraBalance);
+			mo.setRemainingPoint(this.point);
+			
+			result.add(mo);
+		}
+		
+		if(represent.getSubscribePoint() > 0){
+			
+			this.point += represent.getSubscribePoint();
+			
+			MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+			mo.setOperationType(OperationType.POINT_SUBSCRIBE);
+			
+			mo.setDeltaPoint(represent.getSubscribePoint());
+			mo.setRemainingPoint(point);
+			
+			result.add(mo);
+		}
+
+		
+		return result.toArray(new MemberOperation[result.size()]);
 	}
 	
 	/**

@@ -36,16 +36,18 @@ public class Msg4Image extends Msg {
 		return this.picUrl;
 	}
 
-	public void setPicUrl(String picUrl) {
+	public Msg4Image setPicUrl(String picUrl) {
 		this.picUrl = picUrl;
+		return this;
 	}
 
 	public String getMsgId() {
 		return this.msgId;
 	}
 
-	public void setMsgId(String msgId) {
+	public Msg4Image setMsgId(String msgId) {
 		this.msgId = msgId;
+		return this;
 	}
 
 	public String getMediaId() {
