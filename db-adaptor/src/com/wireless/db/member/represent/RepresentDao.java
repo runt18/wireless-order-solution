@@ -182,7 +182,7 @@ public class RepresentDao {
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".represent " +
 			  " WHERE 1 = 1 " +
-			  " AND restaurant_id = " + staff.getRestaurantId() + 
+			  " AND restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) + 
 			  (extraCond != null ? extraCond.toString() : "");
 		
 		final List<Represent> result = new ArrayList<>();

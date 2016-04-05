@@ -56,7 +56,7 @@ public abstract class Msg implements Jsonable{
 		return this.head;
 	}
 
-	public void setHead(Msg4Head head) {
+	void setHead(Msg4Head head) {
 		this.head = head;
 	}
 
@@ -64,7 +64,7 @@ public abstract class Msg implements Jsonable{
 		return this.head.getToUserName();
 	}
 
-	public void setToUserName(String toUserName) {
+	void setToUserName(String toUserName) {
 		this.head.setToUserName(toUserName);
 	}
 
@@ -72,7 +72,7 @@ public abstract class Msg implements Jsonable{
 		return this.head.getFromUserName();
 	}
 
-	public void setFromUserName(String fromUserName) {
+	void setFromUserName(String fromUserName) {
 		this.head.setFromUserName(fromUserName);
 	}
 
@@ -80,7 +80,7 @@ public abstract class Msg implements Jsonable{
 		return this.head.getCreateTime();
 	}
 
-	public void setCreateTime(String createTime) {
+	void setCreateTime(String createTime) {
 		this.head.setCreateTime(createTime);
 	}
 	
