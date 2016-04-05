@@ -1,6 +1,7 @@
 Ext.onReady(function(){
 	
 	var  _representId;
+	var centerPanel;
 	function initRepresentMsg(){
 		Ext.Ajax.request({
 			url : '../../OperateRepresent.do',
@@ -19,6 +20,12 @@ Ext.onReady(function(){
     			Ext.getCmp('appenderPoint_textfield_weixinRepresent').setValue(jr.root[0].subscribePoint);
     			Ext.getCmp('appenderExtraBalance_textfield_weixinRepresent').setValue(jr.root[0].subscribeMoney);
     			
+    			//FIXME
+    			var progressText = jr.root[0].isProgress ? '<span style="color:green;font-weight:bold;display:inline-block;margin-right:10px;">进行中</span>' : '<span style="color:red;font-weight:bold;display:inline-block;margin-right:10px;">已结束</span>'
+    			var activeTitle = '<span style="font-weight:bold;display:inline-block;margin-right:10px;">活动名称：' + jr.root[0].title + '</span>';
+    			var reperesenterReceive = '<span style="font-weight:bold;display:inline-block;margin-right:10px;">推荐人获得：' + jr.root[0].recommendMoney + '(元),' + jr.root[0].reconmendPoint + '(积分);</span>';
+    			var appenderReceive = '<span style="font-weight:bold;display:inline-block;margin-right:10px;">关注人获得：' + jr.root[0].subscribeMoney + '(元),' + jr.root[0].subscribePoint + '(积分);</span>';
+    			centerPanel.setTitle(progressText + activeTitle + reperesenterReceive + appenderReceive);
     			
     			var isChooseGivePoint = (jr.root[0].reconmendPoint || jr.root[0].subscribePoint) ? true : false;
     			var isChooseGiveMoney = (jr.root[0].recommendMoney || jr.root[0].subscribeMoney) ? true : false;
@@ -125,8 +132,6 @@ Ext.onReady(function(){
  			}, 2000);
 
  			
- 			//FIXME
-// 			console.log(Ext.getCmp('memberPoint_fieldset_weixinRepresent').collapsed);
  			
  		}
  	});
@@ -305,7 +310,7 @@ Ext.onReady(function(){
  	});
  	
  	
- 	var centerPanel = new Ext.Panel({
+ 	centerPanel = new Ext.Panel({
  		title : '设置',
  	    region:'center',
  	    frame : true,
