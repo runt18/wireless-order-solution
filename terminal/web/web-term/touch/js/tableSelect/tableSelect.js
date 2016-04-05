@@ -705,7 +705,7 @@ $(function(){
 													dataSource : 'coupon', 
 													coupons : coupons.join(','), 
 													useTo : member.id, 
-													useMode : UseCouponPopup.UseMode.FAST.mode 
+													useMode : usePopup.UseMode.FAST.mode 
 												}, function(response, status,xhr){
 													if(response.success){
 														Util.msg.tip('使用成功!');
@@ -902,8 +902,6 @@ $(function(){
 		$('#patchCard_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-//				var patchCardPopup = new PatchCardPopup();
-//				patchCardPopup.open();
 				seajs.use('patchCard', function(popup){
 					popup.newInstance().open();
 				});
@@ -914,8 +912,6 @@ $(function(){
 		$('#patchWxCard_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){
-//				var patchWxCardPopup = new PatchWxCardPopup();
-//				patchWxCardPopup.open();
 				seajs.use('patchWxCard', function(popup){
 					popup.newInstance().open();
 				});

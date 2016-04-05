@@ -80,7 +80,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			if(region != null && !region.equals("-1")){
+			if(region != null && !region.isEmpty() && !region.equals("-1")){
 				extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
 			}
 			
