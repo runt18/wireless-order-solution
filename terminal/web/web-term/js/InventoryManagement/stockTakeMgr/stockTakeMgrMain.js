@@ -482,7 +482,13 @@ function initGrid(){
 			['货品类型', 'materialCate.name'],
 			['盘点状态', 'statusText'],
 			['审核人', 'approver'],
-			['审核时间', 'finishDateFormat',,,'function(v, m, r, ri, ci, s){if(r.get("statusValue")==2){return r.get("finishDateFormat")}else{return "";}}'],
+			['审核时间', 'finishDateFormat', null, null, function(v, m, r, ri, ci, s){
+				if(r.get("statusValue") == 2){
+					return r.get("finishDateFormat")
+				}else{
+					return "";
+				}}
+			],
 			['备注', 'comment'],
 			['操作', 'operate', ,'center', 'stockTakeGridOperateRenderer']
 		],
