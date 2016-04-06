@@ -412,7 +412,6 @@ $(function(){
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-					var data = [[-1, '全部']];
 //					var data = [];
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
@@ -424,8 +423,10 @@ $(function(){
 							var jr = Ext.decode(res.responseText);
 							
 							if(jr.root[0].typeVal != '2'){
+								var data = [];
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
 							}else{
+								var data = [[-1, '全部']];
 								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 								
 								for(var i = 0; i < jr.root[0].branches.length; i++){
