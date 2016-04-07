@@ -425,6 +425,9 @@ $(function(){
 							if(jr.root[0].typeVal != '2'){
 								var data = [];
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+								
+								thiz.store.loadData(data);
+								thiz.setValue(jr.root[0].id);
 							}else{
 								var data = [[-1, '全部']];
 								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
@@ -432,12 +435,12 @@ $(function(){
 								for(var i = 0; i < jr.root[0].branches.length; i++){
 									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
 								}
+								
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
 							}
 							
 							
-							thiz.store.loadData(data);
-//							thiz.setValue(jr.root[0].id);
-							thiz.setValue(-1);
 							thiz.fireEvent('select');
 						},
 						failure : function(res, opt){

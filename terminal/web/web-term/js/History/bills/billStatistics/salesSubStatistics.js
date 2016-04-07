@@ -192,7 +192,6 @@ $(function(){
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-					var data = [[-1, '全部']];
 //					var data = [];
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
@@ -204,19 +203,25 @@ $(function(){
 							var jr = Ext.decode(res.responseText);
 							
 							if(jr.root[0].typeVal != '2'){
+								var data = [];
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+								
+								thiz.store.loadData(data);
+								thiz.setValue(jr.root[0].id);
 							}else{
+								var data = [[-1, '全部']];
 								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 								
 								for(var i = 0; i < jr.root[0].branches.length; i++){
 									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
 								}
+								
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
 							}
 							
-							thiz.store.loadData(data);
-//							thiz.setValue(jr.root[0].id);
-							thiz.setValue(-1);
-							thiz.fireEvent('select');
+							thiz.fireEvent('select')
+							
 						},
 						failure : function(res, opt){
 							thiz.store.loadData([-1, '全部']);
@@ -568,6 +573,9 @@ $(function(){
 							if(jr.root[0].typeVal != '2'){
 								var data = [];
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+								
+								thiz.store.loadData(data);
+								thiz.setValue(jr.root[0].id);
 							}else{
 								var data = [[-1, '全部']];
 								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
@@ -575,12 +583,13 @@ $(function(){
 								for(var i = 0; i < jr.root[0].branches.length; i++){
 									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
 								}
+								
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
 							}
 							
-							thiz.store.loadData(data);
-//							thiz.setValue(jr.root[0].id);
-							thiz.setValue(-1);
-							thiz.fireEvent('select');
+							thiz.fireEvent('select')
+							
 						},
 						failure : function(res, opt){
 							thiz.store.loadData([-1, '全部']);
@@ -954,8 +963,6 @@ $(function(){
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-					var data = [[-1, '全部']];
-//					var data = [];
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
 						params : {
@@ -966,19 +973,25 @@ $(function(){
 							var jr = Ext.decode(res.responseText);
 							
 							if(jr.root[0].typeVal != '2'){
+								var data = [];
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+
+								thiz.store.loadData(data)
+								thiz.setValue(jr.root[0].id);
 							}else{
+								var data = [[-1, '全部']];
 								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 								
 								for(var i = 0; i < jr.root[0].branches.length; i++){
 									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
 								}
+								
+								thiz.store.loadData(data)
+								thiz.setValue(-1);
 							}
 							
-							thiz.store.loadData(data)
-//							thiz.setValue(jr.root[0].id);
-							thiz.setValue(-1);
 							thiz.fireEvent('select')
+							
 						}
 					});
 				},
@@ -1117,8 +1130,8 @@ $(function(){
 							loadDeptStatisticChartData({dateBeg : beginDate.getRawValue() + ' 00:00:00', 
 								dateEnd : endDate.getRawValue() + ' 23:59:59', 
 								region : Ext.getCmp("deptStatistic_comboRegion").getValue(),
-								opening : data.opening,
-								ending : data.ending,
+								opening : branch_combo_deptStatistics.getValue() == -1 ? '' : data.opening,
+								ending : branch_combo_deptStatistics.getValue() == -1 ? '' : data.ending,
 								deptId : selectDeptId});						
 						}else{
 							Ext.getCmp('southDeptChartPanel').collapse();
