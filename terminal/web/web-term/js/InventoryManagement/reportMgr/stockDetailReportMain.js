@@ -1,273 +1,277 @@
-var stockForm = new Ext.form.FormPanel({  
-	height : 200,
-    region : 'north',
-    id : 'stockForm',
-    labelAlign : 'center',
-    bodyStyle :'padding:5px',
-    frame : true,
-    layout : 'column',   //定义该元素为布局为列布局方式
-    border : false,
-	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-         {name : 'oriStockId'},
-         {name : 'oriStockDateFormat'},
-         {name : 'operatorName'},
-         {name : 'birthDateFormat'},
-         {name : 'typeText'},
-         {name : 'amount'},
-         {name : 'stockInName'},
-         {name : 'supplierName'},
-         {name : 'approverName'},
-         {name : 'subTypeText'},
-         {name : 'price'},
-         {name : 'stockOutName'},
-         {name : 'approverDateFormat'}
-	]),
-    items: [{  
-        columnWidth :.4,  //该列占用的宽度，标识为50％
-        layout : 'form',
-        border :false,
-        defaults : {anchor: '95%'},  
-        // 第一列中的表项
-        items :[  
-                {xtype: 'textfield',fieldLabel: '原始货单',name: 'oriStockId',disabled:true},  
-                {xtype: 'textfield',fieldLabel: '操作人',name: 'operatorName',disabled:true},  
-                {xtype: 'textfield',fieldLabel: '货单大类',name: 'typeText',disabled:true},
-                {xtype: 'textfield',fieldLabel: '总数量',name: 'amount',disabled:true},
-                {xtype: 'textfield',fieldLabel: '入货部门',name: 'stockInName',disabled:true},
-                {xtype: 'textfield',fieldLabel: '供应商',name: 'supplierName',disabled:true},
-                {xtype: 'textfield',fieldLabel: '审核人',name: 'approverName',disabled:true}
-         ]},
-    {
-         columnWidth : .4,  
-         layout : 'form',  
-         border :false,
-         defaults : {anchor: '95%'},  
-         // 第二列中的表项
-         items :[  
-             {xtype:'textfield', fieldLabel:'原始日期', name:'oriStockDateFormat', disabled:true},  
-             {xtype:'textfield', fieldLabel:'操作时间', name:'birthDateFormat', disabled:true},  
-             {xtype:'textfield', fieldLabel:'货单小类', name:'subTypeText', disabled:true},
-             {xtype:'textfield', fieldLabel:'总金额', name:'price', disabled:true},
-             {xtype:'textfield', fieldLabel:'出货部门', name:'stockOutName', disabled:true},
-             {xtype:'textfield', fieldLabel:'审核时间', name:'approverDateFormat', disabled:true}
-         ]
-    }]	
-});
-
-
-
-
-
-var stockDetail = new Ext.grid.ColumnModel([
-	 new Ext.grid.RowNumberer(),
-	 {header:'品项名称', dataIndex:'materialName', width:160},
-	 {header:'数量', dataIndex:'amount', width:140, align:'right'},
-	 {header:'单价', dataIndex:'price', width:120, align:'right', renderer : renderFormat},
-	 {header:'结存数量', dataIndex:'remaining', width:140, align:'right'}
-]);
-
-stockDetail.defaultSortable = true;
-
-var stockDetailStore = new Ext.data.Store({
-	//proxy : new Ext.data.MemoryProxy(data),
-	proxy : new Ext.data.HttpProxy({url:'../../QueryStockActionDetail.do'}),
-	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-         {name : 'materialName'},
-         {name : 'amount'},
-         {name : 'price'},
-         {name : 'remaining'}
-	])
-});
-
-var stockDetailGrid = new Ext.grid.GridPanel({
-	title : '库存明细',
-	id : 'detailGrid',
-	region : 'center', 
-	border : true,
-	frame : true,
-	store : stockDetailStore,
-	//ds : ds,
-	cm : stockDetail
-
-});
-//stockDetailStore.load();
-var billDetailWin = new Ext.Window({
-	layout : 'border',
-	width : 650,
-	//autoHeight: true,
-	height : 500,
-	closable : false,
-	resizable : false,
-	modal : true,
-	items : [stockForm, stockDetailGrid],
-	bbar : ['->', {
-		text : '关闭',
-		iconCls : 'btn_close',
-		handler : function() {
-			billDetailWin.hide();
-		}
-	}]
-});
-
-function stockDetailHandler(orderID) {
-	billDetailWin.show();
-	billDetailWin.setTitle('库存单 ');
-	billDetailWin.center();
-};
-
-var materialTypeDate = [[-1,'全部'],[1,'商品'],[2,'原料']];
-var materialTypeComb = new Ext.form.ComboBox({
-	forceSelection : true,
-	width : 90,
-	id : 'materialType',
-	value : -1,
-	store : new Ext.data.SimpleStore({
-		fields : [ 'value', 'text' ],
-		data : materialTypeDate
-	}),
-	valueField : 'value',
-	displayField : 'text',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	readOnly : false	,
-	listeners : {
-        select : function(combo, record, index){  
-        	materialCateComb.reset();
-        	materialComb.allowBlank = true;
-        	materialComb.reset();
-        	sDetail_materialCateStore.load({  
-	            params: {  
-	            	type : combo.value,  
-	            	dataSource : 'normal'
-	            }  
-            });     
-        	sDetail_materialStore.load({
-        		params: {
-        			cateType : combo.value,
-        			dataSource : 'normal'
-        		}
-        	});
-        	
-        	Ext.getCmp('stockDetail_btnSearch').handler();		
-		}  
-	}
+Ext.onReady(function(){
 	
-});
-var sDetail_materialCateStore = new Ext.data.Store({
-	//proxy : new Ext.data.MemoryProxy(data),
-	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do?restaurantID=' + restaurantID}),
-	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-	         {name : 'id'},
-	         {name : 'name'}
-	])
-});
-sDetail_materialCateStore.load({  
-    params: {  
-    	type : materialTypeComb.value,  
-    	dataSource : 'normal'
-    }
-}); 
-var materialCateComb = new Ext.form.ComboBox({
-	forceSelection : true,
-	width : 90,
-	id : 'materialCate',
-	store : sDetail_materialCateStore,
-	valueField : 'id',
-	displayField : 'name',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	//blankText: '不能为空', 
-	readOnly : false,
-	listeners : {
-        select : function(combo, record, index){ 
-        	materialComb.allowBlank = true;
-        	materialComb.reset();
-        	sDetail_materialStore.load({  
-	            params: {  
-	            	cateType : materialTypeComb.value,
-	            	cateId : combo.value,  
-	            	dataSource : 'normal'
-	            }  
-            });     
-        	
-        	Ext.getCmp('stockDetail_btnSearch').handler();		
-		}
-
-	}
+	var limitCount = 18;
 	
-});
-var sDetail_materialStore = new Ext.data.Store({
-	//proxy : new Ext.data.MemoryProxy(data),
-	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
-	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-         {name : 'id'},
-         {name : 'name'},
-         {name : 'pinyin'}
-	])
-});
-sDetail_materialStore.load({  
-    params: { 
-    	cateType : materialTypeComb.value,
-    	dataSource : 'normal'
-    }  
-}); 
-var materialComb = new Ext.form.ComboBox({
-	forceSelection : true,
-	width : 100,
-	listWidth : 250,
-	maxheight : 300,
-	id : 'materialId',
-	store : sDetail_materialStore,
-	valueField : 'id',
-	displayField : 'name',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	tpl:'<tpl for=".">' 
-		+ '<div class="x-combo-list-item" style="height:18px;">'
-		+ '{id} -- {name} -- {pinyin}'
-		+ '</div>'
-		+ '</tpl>',
-	listeners : {
-		beforequery : function(e){
-			var combo = e.combo;
-			if(!e.forceAll){
-				var value = e.query;
-				combo.store.filterBy(function(record){
-					return record.get('name').indexOf(value) != -1
-							|| (record.get('id')+'').indexOf(value) != -1
-							|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
-				});
-				combo.expand();
-				combo.select(0, true);
-				return false;
-			
+	var stockForm = new Ext.form.FormPanel({  
+		height : 200,
+	    region : 'north',
+	    id : 'stockForm',
+	    labelAlign : 'center',
+	    bodyStyle :'padding:5px',
+	    frame : true,
+	    layout : 'column',   //定义该元素为布局为列布局方式
+	    border : false,
+		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+	         {name : 'oriStockId'},
+	         {name : 'oriStockDateFormat'},
+	         {name : 'operatorName'},
+	         {name : 'birthDateFormat'},
+	         {name : 'typeText'},
+	         {name : 'amount'},
+	         {name : 'stockInName'},
+	         {name : 'supplierName'},
+	         {name : 'approverName'},
+	         {name : 'subTypeText'},
+	         {name : 'price'},
+	         {name : 'stockOutName'},
+	         {name : 'approverDateFormat'}
+		]),
+	    items: [{  
+	        columnWidth :.4,  //该列占用的宽度，标识为50％
+	        layout : 'form',
+	        border :false,
+	        defaults : {anchor: '95%'},  
+	        // 第一列中的表项
+	        items :[  
+	                {xtype: 'textfield',fieldLabel: '原始货单',name: 'oriStockId',disabled:true},  
+	                {xtype: 'textfield',fieldLabel: '操作人',name: 'operatorName',disabled:true},  
+	                {xtype: 'textfield',fieldLabel: '货单大类',name: 'typeText',disabled:true},
+	                {xtype: 'textfield',fieldLabel: '总数量',name: 'amount',disabled:true},
+	                {xtype: 'textfield',fieldLabel: '入货部门',name: 'stockInName',disabled:true},
+	                {xtype: 'textfield',fieldLabel: '供应商',name: 'supplierName',disabled:true},
+	                {xtype: 'textfield',fieldLabel: '审核人',name: 'approverName',disabled:true}
+	         ]},
+	    {
+	         columnWidth : .4,  
+	         layout : 'form',  
+	         border :false,
+	         defaults : {anchor: '95%'},  
+	         // 第二列中的表项
+	         items :[  
+	             {xtype:'textfield', fieldLabel:'原始日期', name:'oriStockDateFormat', disabled:true},  
+	             {xtype:'textfield', fieldLabel:'操作时间', name:'birthDateFormat', disabled:true},  
+	             {xtype:'textfield', fieldLabel:'货单小类', name:'subTypeText', disabled:true},
+	             {xtype:'textfield', fieldLabel:'总金额', name:'price', disabled:true},
+	             {xtype:'textfield', fieldLabel:'出货部门', name:'stockOutName', disabled:true},
+	             {xtype:'textfield', fieldLabel:'审核时间', name:'approverDateFormat', disabled:true}
+	         ]
+	    }]	
+	});
+
+
+
+
+
+	var stockDetail = new Ext.grid.ColumnModel([
+		 new Ext.grid.RowNumberer(),
+		 {header:'品项名称', dataIndex:'materialName', width:160},
+		 {header:'数量', dataIndex:'amount', width:140, align:'right'},
+		 {header:'单价', dataIndex:'price', width:120, align:'right', renderer : renderFormat},
+		 {header:'结存数量', dataIndex:'remaining', width:140, align:'right'}
+	]);
+
+	stockDetail.defaultSortable = true;
+	
+	var stockDetailStore = new Ext.data.Store({
+		//proxy : new Ext.data.MemoryProxy(data),
+		proxy : new Ext.data.HttpProxy({url:'../../QueryStockActionDetail.do'}),
+		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+	         {name : 'materialName'},
+	         {name : 'amount'},
+	         {name : 'price'},
+	         {name : 'remaining'}
+		])
+	});
+	
+	var stockDetailGrid = new Ext.grid.GridPanel({
+		title : '库存明细',
+		id : 'detailGrid',
+		region : 'center', 
+		border : true,
+		frame : true,
+		store : stockDetailStore,
+		//ds : ds,
+		cm : stockDetail
+	
+	});
+	//stockDetailStore.load();
+	var billDetailWin = new Ext.Window({
+		layout : 'border',
+		width : 650,
+		//autoHeight: true,
+		height : 500,
+		closable : false,
+		resizable : false,
+		modal : true,
+		items : [stockForm, stockDetailGrid],
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function() {
+				billDetailWin.hide();
 			}
-		},
-		select : function(){
-			Ext.getCmp('stockDetail_btnSearch').handler();		
+		}]
+	});
+
+	function stockDetailHandler(orderID) {
+		billDetailWin.show();
+		billDetailWin.setTitle('库存单 ');
+		billDetailWin.center();
+	};
+
+	var materialTypeDate = [[-1,'全部'],[1,'商品'],[2,'原料']];
+	var materialTypeComb = new Ext.form.ComboBox({
+		forceSelection : true,
+		width : 90,
+		id : 'materialType',
+		value : -1,
+		store : new Ext.data.SimpleStore({
+			fields : [ 'value', 'text' ],
+			data : materialTypeDate
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		readOnly : false	,
+		listeners : {
+	        select : function(combo, record, index){  
+	        	materialCateComb.reset();
+	        	materialComb.allowBlank = true;
+	        	materialComb.reset();
+	        	sDetail_materialCateStore.load({  
+		            params: {  
+		            	type : combo.value,  
+		            	dataSource : 'normal'
+		            }  
+	            });     
+	        	sDetail_materialStore.load({
+	        		params: {
+	        			cateType : combo.value,
+	        			dataSource : 'normal'
+	        		}
+	        	});
+	        	
+	        	Ext.getCmp('stockDetail_btnSearch').handler();		
+			}  
 		}
 		
+	});
+	var sDetail_materialCateStore = new Ext.data.Store({
+		//proxy : new Ext.data.MemoryProxy(data),
+		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do?restaurantID=' + restaurantID}),
+		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+		         {name : 'id'},
+		         {name : 'name'}
+		])
+	});
+	sDetail_materialCateStore.load({  
+	    params: {  
+	    	type : materialTypeComb.value,  
+	    	dataSource : 'normal'
+	    }
+	}); 
+	var materialCateComb = new Ext.form.ComboBox({
+		forceSelection : true,
+		width : 90,
+		id : 'materialCate',
+		store : sDetail_materialCateStore,
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		//blankText: '不能为空', 
+		readOnly : false,
+		listeners : {
+	        select : function(combo, record, index){ 
+	        	materialComb.allowBlank = true;
+	        	materialComb.reset();
+	        	sDetail_materialStore.load({  
+		            params: {  
+		            	cateType : materialTypeComb.value,
+		            	cateId : combo.value,  
+		            	dataSource : 'normal'
+		            }  
+	            });     
+	        	
+	        	Ext.getCmp('stockDetail_btnSearch').handler();		
+			}
+	
+		}
+		
+	});
+	var sDetail_materialStore = new Ext.data.Store({
+		//proxy : new Ext.data.MemoryProxy(data),
+		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
+		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+	         {name : 'id'},
+	         {name : 'name'},
+	         {name : 'pinyin'}
+		])
+	});
+	sDetail_materialStore.load({  
+	    params: { 
+	    	cateType : materialTypeComb.value,
+	    	dataSource : 'normal'
+	    }  
+	}); 
+	var materialComb = new Ext.form.ComboBox({
+		forceSelection : true,
+		width : 100,
+		listWidth : 250,
+		maxheight : 300,
+		id : 'materialId',
+		store : sDetail_materialStore,
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		tpl:'<tpl for=".">' 
+			+ '<div class="x-combo-list-item" style="height:18px;">'
+			+ '{id} -- {name} -- {pinyin}'
+			+ '</div>'
+			+ '</tpl>',
+		listeners : {
+			beforequery : function(e){
+				var combo = e.combo;
+				if(!e.forceAll){
+					var value = e.query;
+					combo.store.filterBy(function(record){
+						return record.get('name').indexOf(value) != -1
+								|| (record.get('id')+'').indexOf(value) != -1
+								|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
+					});
+					combo.expand();
+					combo.select(0, true);
+					return false;
+				
+				}
+			},
+			select : function(){
+				Ext.getCmp('stockDetail_btnSearch').handler();		
+			}
+			
+		}
+	});
+	
+	function renderFormat(v){
+		if(typeof(v) != 'string'){
+			v = Ext.ux.txtFormat.gridDou(v);
+		}
+		return v;
 	}
-});
+	
+	var stockDetailReportTree;	
+	var stockInDate = [[1, '采购'], [2, '入库调拨'], [3, '报溢'], [7, '盘盈']];
+	var stockOutDate = [[4, '退货'], [5, '出库调拨'], [6, '报损'], [8, '盘亏'], [9, '消耗']];
+	var stock = [[-1, '全部'], [1, '入库'], [2, '出库']];
 
-function renderFormat(v){
-	if(typeof(v) != 'string'){
-		v = Ext.ux.txtFormat.gridDou(v);
-	}
-	return v;
-}
-
-var stockDetailReportTree;	
-var stockInDate = [[1, '采购'], [2, '入库调拨'], [3, '报溢'], [7, '盘盈']];
-var stockOutDate = [[4, '退货'], [5, '出库调拨'], [6, '报损'], [8, '盘亏'], [9, '消耗']];
-var stock = [[-1, '全部'], [1, '入库'], [2, '出库']];
-Ext.onReady(function(){
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 	//定义列模型
@@ -554,7 +558,7 @@ Ext.onReady(function(){
 	        	load : function(){
 	        		var treeRoot = stockDetailReportTree.getRootNode().childNodes;
 	        		if(treeRoot.length > 0){
-	        			deptData = [];
+	        			var deptData = [];
 	        			for(var i = (treeRoot.length - 1); i >= 0; i--){
 	    					if(treeRoot[i].attributes.deptID == 255 || treeRoot[i].attributes.deptID == 253){
 	    						stockDetailReportTree.getRootNode().removeChild(treeRoot[i]);

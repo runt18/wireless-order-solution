@@ -1,148 +1,148 @@
-
-var materialTypeDate = [[-1,'全部'],[1,'商品'],[2,'原料']];
-var materialTypeComb = new Ext.form.ComboBox({
-	fidldLabel : '类型:',
-	forceSelection : true,
-	width : 110,
-	id : 'sdir_materialType',
-	value : -1,
-	store : new Ext.data.SimpleStore({
-		fields : [ 'value', 'text' ],
-		data : materialTypeDate
-	}),
-	valueField : 'value',
-	displayField : 'text',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	readOnly : false,
-	listeners : {
-        select : function(combo, record, index){  
-        	materialCateComb.reset();
-        	materialComb.allowBlank = true;
-        	materialComb.reset();
-        	materialCateStore.load({  
-	            params: {  
-	            	type : combo.value,  
-	            	dataSource : 'normal'
-	            }  
-            });     
-        	materialStore.load({
-        		params: {
-        			cateType : combo.value,
-        			dataSource : 'normal'
-        		}
-        	});
-        	Ext.getCmp('btnStockDistributionSearch').handler();
-		}  
-	}
-	
-});
-var materialCateStore = new Ext.data.Store({
-	//proxy : new Ext.data.MemoryProxy(data),
-	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do'}),
-	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-         {name : 'id'},
-         {name : 'name'}
-	])
-});
-materialCateStore.load({  
-    params: {  
-    	type : materialTypeComb.value,  
-    	dataSource : 'normal'
-    }
-}); 
-var materialCateComb = new Ext.form.ComboBox({
-	fidldLabel : '类别:',
-	forceSelection : true,
-	width : 110,
-	id : 'sdir_materialCate',
-	store : materialCateStore,
-	valueField : 'id',
-	displayField : 'name',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	//blankText: '不能为空', 
-	readOnly : false,
-	listeners : {
-        select : function(combo, record, index){ 
-        	materialComb.allowBlank = true;
-        	materialComb.reset();
-        	materialStore.load({  
-	            params: {  
-	            	cateType : materialTypeComb.value,
-	            	cateId : combo.value,  
-	            	dataSource : 'normal'
-	            }  
-            });   
-        	Ext.getCmp('btnStockDistributionSearch').handler();
-		}
-
-	}
-	
-});
-var materialStore = new Ext.data.Store({
-	//proxy : new Ext.data.MemoryProxy(data),
-	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?contentAll=true'}),
-	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-		{name : 'id'},
-		{name : 'name'},
-		{name : 'pinyin'}
-	])
-});
-materialStore.load({  
-    params: { 
-    	cateType : materialTypeComb.value,
-    	dataSource : 'normal'
-    }  
-}); 
-var materialComb = new Ext.form.ComboBox({
-	fidldLabel : '货品:',
-	forceSelection : true,
-	width : 110,
-	listWidth : 250,
-	height : 200,
-	maxHeight : 300,
-	id : 'sdir_materialId',
-	store : materialStore,
-	valueField : 'id',
-	displayField : 'name',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	tpl:'<tpl for=".">' 
-		+ '<div class="x-combo-list-item" style="height:18px;">'
-		+ '{id} -- {name} -- {pinyin}'
-		+ '</div>'
-		+ '</tpl>',
-	listeners : {
-		beforequery : function(e){
-			var combo = e.combo; 
-			if(!e.forceAll){
-				var value = e.query; 
-				combo.store.filterBy(function(record,id){
-					return record.get('name').indexOf(value) != -1 
-							|| (record.get('id')+'').indexOf(value) != -1 
-							|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
-				});  
-				combo.expand(); 
-				combo.select(0, true);
-				return false; 
-			}
-		},
-		select : function(combo, record, index){
-			Ext.getCmp('btnStockDistributionSearch').handler();
-		}
-	}
-	
-});
-var stockDistributionDeptTree;
-var stockDistributionGrid;
 Ext.onReady(function(){
+	var materialTypeDate = [[-1,'全部'],[1,'商品'],[2,'原料']];
+	var materialTypeComb = new Ext.form.ComboBox({
+		fidldLabel : '类型:',
+		forceSelection : true,
+		width : 110,
+		id : 'sdir_materialType',
+		value : -1,
+		store : new Ext.data.SimpleStore({
+			fields : [ 'value', 'text' ],
+			data : materialTypeDate
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		readOnly : false,
+		listeners : {
+	        select : function(combo, record, index){  
+	        	materialCateComb.reset();
+	        	materialComb.allowBlank = true;
+	        	materialComb.reset();
+	        	materialCateStore.load({  
+		            params: {  
+		            	type : combo.value,  
+		            	dataSource : 'normal'
+		            }  
+	            });     
+	        	materialStore.load({
+	        		params: {
+	        			cateType : combo.value,
+	        			dataSource : 'normal'
+	        		}
+	        	});
+	        	Ext.getCmp('btnStockDistributionSearch').handler();
+			}  
+		}
+		
+	});
+	var materialCateStore = new Ext.data.Store({
+		//proxy : new Ext.data.MemoryProxy(data),
+		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do'}),
+		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+	         {name : 'id'},
+	         {name : 'name'}
+		])
+	});
+	materialCateStore.load({  
+	    params: {  
+	    	type : materialTypeComb.value,  
+	    	dataSource : 'normal'
+	    }
+	}); 
+	var materialCateComb = new Ext.form.ComboBox({
+		fidldLabel : '类别:',
+		forceSelection : true,
+		width : 110,
+		id : 'sdir_materialCate',
+		store : materialCateStore,
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		//blankText: '不能为空', 
+		readOnly : false,
+		listeners : {
+	        select : function(combo, record, index){ 
+	        	materialComb.allowBlank = true;
+	        	materialComb.reset();
+	        	materialStore.load({  
+		            params: {  
+		            	cateType : materialTypeComb.value,
+		            	cateId : combo.value,  
+		            	dataSource : 'normal'
+		            }  
+	            });   
+	        	Ext.getCmp('btnStockDistributionSearch').handler();
+			}
+	
+		}
+		
+	});
+	var materialStore = new Ext.data.Store({
+		//proxy : new Ext.data.MemoryProxy(data),
+		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?contentAll=true'}),
+		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+			{name : 'id'},
+			{name : 'name'},
+			{name : 'pinyin'}
+		])
+	});
+	materialStore.load({  
+	    params: { 
+	    	cateType : materialTypeComb.value,
+	    	dataSource : 'normal'
+	    }  
+	}); 
+	var materialComb = new Ext.form.ComboBox({
+		fidldLabel : '货品:',
+		forceSelection : true,
+		width : 110,
+		listWidth : 250,
+		height : 200,
+		maxHeight : 300,
+		id : 'sdir_materialId',
+		store : materialStore,
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		tpl:'<tpl for=".">' 
+			+ '<div class="x-combo-list-item" style="height:18px;">'
+			+ '{id} -- {name} -- {pinyin}'
+			+ '</div>'
+			+ '</tpl>',
+		listeners : {
+			beforequery : function(e){
+				var combo = e.combo; 
+				if(!e.forceAll){
+					var value = e.query; 
+					combo.store.filterBy(function(record,id){
+						return record.get('name').indexOf(value) != -1 
+								|| (record.get('id')+'').indexOf(value) != -1 
+								|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
+					});  
+					combo.expand(); 
+					combo.select(0, true);
+					return false; 
+				}
+			},
+			select : function(combo, record, index){
+				Ext.getCmp('btnStockDistributionSearch').handler();
+			}
+		}
+		
+	});
+	var stockDistributionDeptTree;
+	var stockDistributionGrid;
+
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 	stockDistributionDeptTree = new Ext.tree.TreePanel({
