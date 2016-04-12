@@ -14,7 +14,9 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockInitDao;
@@ -23,6 +25,7 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.MonthlyBalance;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
@@ -65,7 +68,10 @@ public class OperateMaterialInitlAction extends DispatchAction{
  */
 			
 			jobject.setRoot(ms);
-		}catch(BusinessException | SQLException e){
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch(Exception e){
@@ -78,8 +84,10 @@ public class OperateMaterialInitlAction extends DispatchAction{
 		return null;
 	}
 
-	public ActionForward updateDeptStock(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jObject = new JObject();
+	public ActionForward updateDeptStock(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
 		String pin = (String) request.getAttribute("pin");
 		String deptId = request.getParameter("deptId");
 		String editData = request.getParameter("editData");
@@ -111,72 +119,80 @@ public class OperateMaterialInitlAction extends DispatchAction{
 						.setOperatorId(staff.getId()).setOperator(staff.getName())
 						.setComment("")
 						.setCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)))
-						.setDeptIn(Short.parseShort(deptId));
+						.setDeptIn(Short.valueOf(deptId));
 				
-				for (String md : editData.split("<li>")) {
+				
+				
+				String[] mds = editData.split("<li>");
+				for (String md : mds) {
 					String[] m = md.split(",");
 					
-//					List<MaterialDept> list = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + m[0] + " AND MD.dept_id = " + deptId, null);
-//					Material material = MaterialDao.getById(staff, Integer.parseInt(m[0]));
-//					if(list.isEmpty()){
-//						material.setStock(material.getStock() + Float.parseFloat(m[1]));
-//						
-//						MaterialDept mDept = new MaterialDept();
-//						mDept.setMaterial(material);
-//						mDept.setStock(Float.parseFloat(m[1]));
-//						mDept.setDeptId(Integer.parseInt(deptId));
-//						mDept.setRestaurantId(staff.getRestaurantId());
-//						MaterialDeptDao.insertMaterialDept(staff, mDept);	
-//						
-//						MaterialDao.update(material);
-//					}else{
-//						MaterialDept mDept = list.get(0);
-//						float delta = Float.parseFloat(m[1]) - mDept.getStock();
-//						material.setStock(material.getStock() + delta);
-//						MaterialDao.update(material);
-//						
-//						mDept.setStock(Float.parseFloat(m[1]));
-//						MaterialDeptDao.updateMaterialDept(staff, mDept);
-//					}
+					List<MaterialDept> list = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + m[0] + " AND MD.dept_id = " + deptId, null);
+					Material material = MaterialDao.getById(staff, Integer.parseInt(m[0]));
+					if(list.isEmpty()){
+						material.setStock(material.getStock() + Float.parseFloat(m[1]));
+						
+						MaterialDept mDept = new MaterialDept();
+						mDept.setMaterial(material);
+						mDept.setStock(Float.parseFloat(m[1]));
+						mDept.setDeptId(Integer.parseInt(deptId));
+						mDept.setRestaurantId(staff.getRestaurantId());
+						MaterialDeptDao.insertMaterialDept(staff, mDept);	
+						
+						MaterialDao.update(material);
+					}else{
+						MaterialDept mDept = list.get(0);
+						float delta = Float.parseFloat(m[1]) - mDept.getStock();
+						material.setStock(material.getStock() + delta);
+						MaterialDao.update(material);
+						
+						mDept.setStock(Float.parseFloat(m[1]));
+						MaterialDeptDao.updateMaterialDept(staff, mDept);
+					}
 					
-					builder.addDetail(new StockActionDetail(Integer.parseInt(m[0]), Float.parseFloat(m[2]), Float.parseFloat(m[1])));
+					builder.addDetail(new StockActionDetail(material.getId(), Float.parseFloat(m[2]), Float.valueOf(m[1])));
 
 				}
 				//设置总额
 				builder.setInitActualPrice(builder.getTotalPrice());
 				
 				//添加并审核
-				int stockActionId = StockActionDao.insert(dbCon, staff, builder);
-				StockActionDao.audit(dbCon, staff, StockAction.AuditBuilder.newStockActionAudit(stockActionId).setStockInitApproverDate());
+				int stockActionId = StockActionDao.insertStockAction(dbCon, staff, builder);
+				StockActionDao.auditStockAction(dbCon, staff, StockAction.AuditBuilder.newStockActionAudit(stockActionId).setStockInitApproverDate());
 				
 				MonthlyBalance.InsertBuilder monthBuild = new MonthlyBalance.InsertBuilder(staff.getRestaurantId(), staff.getName());
 
 				MonthlyBalanceDao.insert(monthBuild, staff);
-				jObject.initTip(true, "保存成功");				
+				jobject.initTip(true, "保存成功");				
 			}
 
-		}catch(BusinessException | SQLException e){
+		}catch(BusinessException e){
 			e.printStackTrace();
-			jObject.initTip(e);
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jObject.initTip4Exception(e);
+			jobject.initTip4Exception(e);
 		}finally{
 			dbCon.disconnect();
-			response.getWriter().print(jObject.toString());
+			response.getWriter().print(jobject.toString());
 		}
 
 		return null;
 	}
 	
-	public ActionForward init(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+	public ActionForward init(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 		JObject jobject = new JObject();
 		String pin = (String) request.getAttribute("pin");
 		try{
 			StockInitDao.initStock(StaffDao.verify(Integer.parseInt(pin)));
 			
 			jobject.initTip(true, "初始化成功");			
-		}catch(SQLException | BusinessException	e){
+		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch(Exception e){
@@ -185,6 +201,7 @@ public class OperateMaterialInitlAction extends DispatchAction{
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
+		
 		
 		return null;
 	}	

@@ -1,8 +1,6 @@
 package com.wireless.Actions.inventoryMgr.material;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,8 +19,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.inventoryMgr.Material;
-import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
@@ -31,136 +27,153 @@ import com.wireless.util.DataPaging;
 public class QueryMaterialDeptAction extends Action{
 
 	@Override
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 		
-		final String start = request.getParameter("start");
-		final String limit = request.getParameter("limit");
-		final String pin = (String)request.getAttribute("pin");
-		final String deptId = request.getParameter("deptId");
-		final String cateType = request.getParameter("cateType");
-		final String cateId = request.getParameter("cateId");
-		final String materialId = request.getParameter("materialId");
-		final JObject jObject = new JObject();
+		
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		JObject jobject = new JObject();
+		List<MaterialDept> mds = new ArrayList<>();
+		List<Jsonable> result = new ArrayList<>();
 		try{
-
+			String pin = (String)request.getAttribute("pin");
+			String deptId = request.getParameter("deptId");
+			String cateType = request.getParameter("cateType");
+			String cateId = request.getParameter("cateId");
+			String materialId = request.getParameter("materialId");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			final MaterialDeptDao.ExtraCond extraCond = new MaterialDeptDao.ExtraCond();
-			if(deptId != null && !deptId.trim().isEmpty()){
-				extraCond.setDeptId(Integer.parseInt(deptId));
+			String extraCond = "";
+			if(deptId != null && !deptId.trim().isEmpty() && Integer.valueOf(deptId) >= 0){
+				extraCond += " AND MD.dept_id = " + deptId;
 			}
 			if(materialId != null && !materialId.trim().isEmpty() && !materialId.equals("-1")){
-				extraCond.setMaterial(Integer.parseInt(materialId));
-			}
-			
-			if(cateId != null && !cateId.trim().isEmpty()){
-				extraCond.setMaterialCate(Integer.parseInt(cateId));
-			}
-			
-			if (cateType != null && !cateType.trim().isEmpty() && !cateType.equals("-1")){
-				extraCond.setMaterialCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)));
-			}
-			
-			final List<MaterialDept> root = MaterialDeptDao.getByCond(staff, extraCond, null);
-			
-			final Map<Material, Map<Department, Float>> result1 = new HashMap<>();
-			
-			for(MaterialDept materialDept : root){
-				Map<Department, Float> deptStocks = result1.get(materialDept.getMaterial());
-				if(deptStocks != null){
-					deptStocks.put(materialDept.getDept(), materialDept.getStock());
-				}else{
-					deptStocks = new HashMap<>();
-					deptStocks.put(materialDept.getDept(), materialDept.getStock());
-					result1.put(materialDept.getMaterial(), deptStocks);
+				extraCond += " AND M.material_id = " + materialId;
+			}else{
+				if(cateId != null && !cateId.trim().isEmpty()){
+					extraCond += " AND MC.cate_id = " + cateId;
+				}
+				if (cateType != null && !cateType.trim().isEmpty() && !cateType.equals("-1")){
+					extraCond += " AND MC.type = " + cateType;
 				}
 			}
+			final List<MaterialDept> root = MaterialDeptDao.getMaterialDeptState(staff, extraCond, null);
+			//系统现用部门
+			final List<Department> deptProperty = DepartmentDao.getDepartments4Inventory(staff);
 			
-			//获取所有库存分布的部门
-			final List<Department> dept4Inventory = DepartmentDao.getDepartments4Inventory(staff);
-			//库存分布中没有库存的数据用0补齐
-			for(Map<Department, Float> deptStocks : result1.values()){
-				for(Department dept : dept4Inventory){
-					if(!deptStocks.containsKey(dept)){
-						deptStocks.put(dept, 0f);
-					}
-				}
-			}
-			
-			List<Jsonable> result = new ArrayList<>();
-			float summaryStock = 0;
-			float summaryCost = 0;
-			for(final Map.Entry<Material, Map<Department, Float>> entry : result1.entrySet()){
-				for (Map.Entry<Department, Float> entry4EachDept : entry.getValue().entrySet()) {
-					summaryStock += entry4EachDept.getValue();
-					summaryCost += entry.getKey().getPrice() * entry4EachDept.getValue();
-				}
+			int lastMaterial = -1;
+			float sum = 0;
+			int index = 0;
+			for (int i = 0; i < root.size(); i++) {
 				
-				result.add(new Jsonable(){
+				if(lastMaterial != root.get(i).getMaterialId()){
+					lastMaterial = root.get(i).getMaterialId();
+					index = i;
+					sum = 0;
+					MaterialDept item = root.get(i);
+					//动态设置部门属性和库存
+					for (int k = 0; k < deptProperty.size(); k++) {
+						if(item.getDeptId() == deptProperty.get(k).getId()){
+							item.getDeptStock().put(deptProperty.get(k), item.getStock());
+							
+						}else{
+							item.getDeptStock().put(deptProperty.get(k), 0f);
+						}
+					}
+					item.setCost(item.getStock() * item.getMaterial().getPrice());	
+					mds.add(item);
+				}else{
+					MaterialDept item = root.get(index);
+					//对应部门库存
+					for (Map.Entry<Department, Float> ds : item.getDeptStock().entrySet()) {
+						if(root.get(i).getDeptId() == ds.getKey().getId()){
+							ds.setValue(root.get(i).getStock());
+							sum += item.getStock();
+						}
+					}
+					item.setStock(sum);
+					item.setCost(sum * item.getMaterial().getPrice());	
+				}
 
+			}
+			
+			if(!mds.isEmpty()){
+				float sumStock = 0, sumCost = 0;
+				for (int i = 0; i < mds.size(); i++) {
+					final MaterialDept item = mds.get(i);
+					sumStock += item.getStock();
+					sumCost += item.getCost();
+					
+					Jsonable j = new Jsonable() {
+						@Override
+						public JsonMap toJsonMap(int flag) {
+							JsonMap jm = new JsonMap();
+							jm.putString("materialName", item.getMaterial().getName());
+							
+							for (Map.Entry<Department, Float> entry : item.getDeptStock().entrySet()) {
+								jm.putFloat("dept"+entry.getKey().getId(), entry.getValue());
+							}
+							jm.putFloat("price", item.getMaterial().getPrice());
+							jm.putFloat("stock", item.getStock());
+							jm.putFloat("cost", item.getCost());
+							return jm;
+						}
+						
+						@Override
+						public void fromJsonMap(JsonMap jm, int flag) {
+						}
+					};		
+					result.add(j);
+				}	
+				
+				final MaterialDept sumMT = mds.get(0);
+				final float totalStock = sumStock, totalCost = sumCost;
+				Jsonable j = new Jsonable() {
 					@Override
 					public JsonMap toJsonMap(int flag) {
 						JsonMap jm = new JsonMap();
-						jm.putString("materialName", entry.getKey().getName());
+						jm.putString("materialName", "汇总");
 						
-						//数量合计
-						float totalStock = 0;
-						//成本合计
-						float totalCost = 0;
-						for (Map.Entry<Department, Float> entry4EachDept : entry.getValue().entrySet()) {
-							jm.putFloat("dept" + entry4EachDept.getKey().getId(), entry4EachDept.getValue());
-							totalStock += entry4EachDept.getValue();
-							totalCost += entry.getKey().getPrice() * entry4EachDept.getValue();
+						for (Map.Entry<Department, Float> entry : sumMT.getDeptStock().entrySet()) {
+							jm.putFloat("dept"+entry.getKey().getId(), 0);
 						}
-						jm.putFloat("price", entry.getKey().getPrice());
+						jm.putFloat("price", 0);
 						jm.putFloat("stock", totalStock);
 						jm.putFloat("cost", totalCost);
 						return jm;
 					}
-
+					
 					@Override
 					public void fromJsonMap(JsonMap jm, int flag) {
-						
 					}
-					
-				});
-			}
-			result = DataPaging.getPagingData(result, true, start, limit);
-			
-			//增加最后一条汇总
-			final float totalStock = summaryStock;
-			final float totalCost = summaryCost;
-			result.add(new Jsonable(){
-
-				@Override
-				public JsonMap toJsonMap(int flag) {
-					JsonMap jm = new JsonMap();
-					jm.putString("materialName", "汇总");
-					jm.putFloat("stock", totalStock);
-					jm.putFloat("cost", totalCost);
-					return jm;
-				}
-
-				@Override
-				public void fromJsonMap(JsonMap jm, int flag) {
-					
-				}
+				};
+				result.add(j);
 				
-			});
+			}
 			
-			jObject.setRoot(result);
-			jObject.setTotalProperty(result.size());
+
+			
+/*			if(!root.isEmpty()){
+				for (MaterialDept m : root) {
+					if(m.getStock() > 0){
+						mds.add(m);
+					}
+				}
+			}*/
 			
 			
-		}catch(BusinessException | SQLException e){
-			jObject.initTip(e);
+		}catch(BusinessException e){
+			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			e.printStackTrace();
 			
 		}catch(Exception e){
-			jObject.initTip4Exception(e);
+			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-
-			response.getWriter().print(jObject.toString());
+			jobject.setTotalProperty(result.size());
+			jobject.setRoot(DataPaging.getPagingData(result, "true", start, limit));
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}

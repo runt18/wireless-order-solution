@@ -84,7 +84,7 @@ public class QueryMaterialAction extends DispatchAction{
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
-				root = DataPaging.getPagingData(root, Boolean.parseBoolean(isPaging), start, limit);
+				root = DataPaging.getPagingData(root, isPaging, start, limit);
 				//添加全部
 				if(contentAll != null){
 					Material all = new Material();
@@ -263,7 +263,7 @@ public class QueryMaterialAction extends DispatchAction{
 			
 			if(!foods.isEmpty()){
 				jobject.setTotalProperty(foods.size());
-				foods = DataPaging.getPagingData(foods, Boolean.parseBoolean(isPaging), start, limit);
+				foods = DataPaging.getPagingData(foods, isPaging, start, limit);
 			}			
 			jobject.setRoot(foods);	
 		}catch(BusinessException e){

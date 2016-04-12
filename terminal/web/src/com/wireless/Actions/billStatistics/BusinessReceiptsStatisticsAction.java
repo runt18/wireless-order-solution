@@ -89,7 +89,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 			}else{
 				
 				jObject.setTotalProperty(incomesByEachDay.size());
-				incomesByEachDay = DataPaging.getPagingData(incomesByEachDay, Boolean.parseBoolean(isPaging), start, limit);
+				incomesByEachDay = DataPaging.getPagingData(incomesByEachDay, isPaging, start, limit);
 				
 //				incomesByEachDay.add(total);
 				jObject.setRoot(incomesByEachDay);

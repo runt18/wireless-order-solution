@@ -1976,7 +1976,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String id = request.getParameter("id");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		StockAction stockAction = StockActionDao.getById(staff, Integer.parseInt(id), true);
+		StockAction stockAction = StockActionDao.getStockAndDetailById(staff, Integer.parseInt(id));
 		
 		String title = stockAction.getType().getDesc() + " -- " + stockAction.getCateType().getText() +  stockAction.getSubType().getText() + "单";
 		//标题
@@ -4354,19 +4354,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		return null;
 	}
 	
-	/**
-	 * 进销存汇总导出excel
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 * @throws Exception
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
 	public ActionForward stockCollect(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
+		
 		
 		response.setContentType("application/vnd.ms-excel;");
 		
@@ -4374,29 +4363,48 @@ public class HistoryStatisticsAction extends DispatchAction{
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		String beginDate = request.getParameter("beginDate");
+		String endDate;
+		String cateType = request.getParameter("cateType");
+		String cateId = request.getParameter("cateId");
 		String materialId = request.getParameter("materialId");
 		String deptId = request.getParameter("deptId");
 		
-		final StockReportDao.ExtraCond extraCond = new StockReportDao.ExtraCond();
-		
-		if(beginDate != null){
-			extraCond.setRange(beginDate);
-		}else{
+		List<StockReport> stockReports = null ;
+		String extra = "";
+		extra += " AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") ";
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		if(beginDate == null || cateType == null){
+				
 			Calendar c = Calendar.getInstance();
 			c.setTime(new Date());
 			c.add(Calendar.MONTH, -1);
-			extraCond.setRange(new SimpleDateFormat("yyyy-MM").format(c.getTime()));
+			beginDate = sdf.format(c.getTime());
+			endDate = sdf.format(new Date());
+			stockReports = StockReportDao.getStockCollectByTime(staff, beginDate, endDate, extra, null);
+			
+		}else{
+			endDate = beginDate + "-31";
+			beginDate += "-01";
+			
+			if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
+				extra += " AND M.material_id = " + materialId;
+			}
+			if(cateType.trim().isEmpty() && cateId.trim().isEmpty()){
+				
+			}else if(!cateType.trim().isEmpty() && cateId.trim().isEmpty()){
+				extra += " AND S.cate_type = " + cateType;
+			}else{
+				extra += " AND M.cate_id = " + cateId; 
+			}
+			
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extra += " AND (S.dept_in = " + deptId +" OR S.dept_out = " + deptId + ")";
+				stockReports = StockReportDao.getStockCollectByDept(staff, beginDate, endDate, extra, null, Integer.parseInt(deptId));
+			}else{
+				stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
+			}
 		}
-		
-		if(materialId != null && !materialId.equals("-1") && !materialId.trim().isEmpty()){
-			extraCond.setMaterial(Integer.parseInt(materialId));
-		}
-		
-		if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
-			extraCond.setDept(Integer.parseInt(deptId));
-		}
-		
-		List<StockReport> stockReports = StockReportDao.getByCond(staff, extraCond);
+
 		
 		String title = "进销存汇总";
 		
@@ -4436,7 +4444,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(0);
 		
-		cell.setCellValue("日期: " + beginDate + "         物料个数: " + stockReports.size());
+		cell.setCellValue("日期: " + beginDate + "  至  " + endDate +  "         物料个数: " + stockReports.size());
 //		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
@@ -4453,67 +4461,67 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("品行编号");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("品行名称");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("期初数量");
 		cell.setCellStyle(headerStyle);
 
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("入库采购");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("入库调拨");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("入库报溢");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("入库盘盈");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("入库小计");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("出库退货");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("出库调拨");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("出库报损");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("出库盘亏");
 		cell.setCellStyle(headerStyle);
 
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("出库消耗");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("出库小计");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("期末数量");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("期末单价");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("期末金额");
 		cell.setCellStyle(headerStyle);
 		
@@ -4527,82 +4535,82 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell.setCellStyle(strStyle);
 			
 			//品行名称
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getMaterial().getName());
 			cell.setCellStyle(strStyle);
 			
 			//期初数量
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getPrimeAmount());
 			cell.setCellStyle(numStyle);
 			
 			//入库采购
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getStockIn());
 			cell.setCellStyle(numStyle);
 			
 			//入库调拨
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getStockInTransfer());
 			cell.setCellStyle(numStyle);
 			
 			//入库报溢
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getStockSpill());
 			cell.setCellStyle(numStyle);
 			
 			//入库盘盈
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getStockTakeMore());
 			cell.setCellStyle(numStyle);
 			
 			//入库小计
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getStockInAmount());
 			cell.setCellStyle(numStyle);
 			
 			//出库退货
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getStockOut());
 			cell.setCellStyle(numStyle);
 			
 			//出库调拨
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getStockOutTransfer());
 			cell.setCellStyle(numStyle);
 			
 			//出库报损
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getStockDamage());
 			cell.setCellStyle(numStyle);
 			
 			//出库盘亏
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getStockTakeLess());
 			cell.setCellStyle(numStyle);
 
 			//出库消耗
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getUseUp());
 			cell.setCellStyle(numStyle);
 			
 			//出库小计
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getStockOutAmount());
 			cell.setCellStyle(numStyle);
 			
 			//期末数量
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getFinalAmount());
 			cell.setCellStyle(numStyle);
 			
 			//期末单价
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getFinalPrice());
 			cell.setCellStyle(numStyle);
 			
 			//期末金额
-			cell = row.createCell((int)row.getLastCellNum());
+			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(s.getFinalMoney());
 			cell.setCellStyle(numStyle);
 		}

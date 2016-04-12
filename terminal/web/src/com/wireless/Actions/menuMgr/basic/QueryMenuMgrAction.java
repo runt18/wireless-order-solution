@@ -120,7 +120,7 @@ public class QueryMenuMgrAction extends Action {
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
-				root = DataPaging.getPagingData(root, Boolean.parseBoolean(isPaging), start, limit);
+				root = DataPaging.getPagingData(root, isPaging, start, limit);
 				jobject.setRoot(root);
 			}
 			response.getWriter().print(jobject.toString());

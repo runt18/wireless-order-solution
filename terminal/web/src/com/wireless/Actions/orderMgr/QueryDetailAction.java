@@ -77,7 +77,7 @@ public class QueryDetailAction extends Action {
 			
 			if(list != null){
 				if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
-					list = DataPaging.getPagingData(list, Boolean.parseBoolean(isPaging), start, limit);
+					list = DataPaging.getPagingData(list, isPaging, start, limit);
 				}
 				jObject.setRoot(list);
 			}

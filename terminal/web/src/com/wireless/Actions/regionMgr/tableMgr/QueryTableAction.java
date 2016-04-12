@@ -64,7 +64,7 @@ public class QueryTableAction extends Action {
 		}finally{
 			if(tables != null){
 				jobject.setTotalProperty(tables.size());
-				tables = DataPaging.getPagingData(tables, Boolean.parseBoolean(isPaging), start, limit);
+				tables = DataPaging.getPagingData(tables, isPaging, start, limit);
 				jobject.setRoot(tables);
 			}
 			response.getWriter().print(jobject.toString());
