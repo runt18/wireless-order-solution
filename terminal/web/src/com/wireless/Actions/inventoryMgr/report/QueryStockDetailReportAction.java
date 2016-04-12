@@ -1,5 +1,6 @@
 package com.wireless.Actions.inventoryMgr.report;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,28 +12,31 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.stockMgr.StockActionDetailDao;
 import com.wireless.db.stockMgr.StockDetailReportDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockDetailReport;
+import com.wireless.util.DataPaging;
 
 public class QueryStockDetailReportAction extends Action{
+	
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		
-		JObject jobject = new JObject();
-		List<StockDetailReport> stockDetailReports = null;
+		JObject jObject = new JObject();
 		//String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
-		int roots = 0;
 		try{
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String beginDate = request.getParameter("beginDate");
-			String endDate = "";
 			String materialId = request.getParameter("materialId");
 			String materialCateId = request.getParameter("materialCateId");
 			String cateType = request.getParameter("cateType");
@@ -41,69 +45,78 @@ public class QueryStockDetailReportAction extends Action{
 			//String stockType = request.getParameter("stockType");
 			String subType = request.getParameter("subType");
 			
-			endDate = beginDate + "-31";
-			beginDate += "-01";
+			final StockActionDetailDao.ExtraCond extraCond = new StockActionDetailDao.ExtraCond();
 			
-			String extra = " AND S.ori_stock_date BETWEEN '" + beginDate + "' AND '" + endDate + " 23:59:59'";
+			extraCond.setOriDate(beginDate + "-01", beginDate + "-31");
 			
-			if(materialId == null || materialId.isEmpty()){
-				materialId = "-1";
+			//String extra = " AND S.ori_stock_date BETWEEN '" + beginDate + "' AND '" + endDate + " 23:59:59'";
+			
+			if(materialId != null && !materialId.isEmpty()){
+				//materialId = "-1";
+				extraCond.setMaterial(Integer.parseInt(materialId));
 			}
 			
 			if(materialCateId != null && !materialCateId.isEmpty()){
-				extra += " AND MC.cate_id = " + materialCateId;
+				//extra += " AND MC.cate_id = " + materialCateId;
+				extraCond.setMaterialCate(Integer.parseInt(materialCateId));
 			}
 			
 			if(cateType != null && !cateType.isEmpty() && !cateType.equals("-1")){
-				extra += " AND MC.type = " + cateType;
+				//extra += " AND MC.type = " + cateType;
+				extraCond.setMaterialCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)));
 			}
 			
 			if(subType != null && !subType.isEmpty()){
-				extra += " AND S.sub_type = " + subType;
+				//extra += " AND S.sub_type = " + subType;
+				extraCond.addSubType(StockAction.SubType.valueOf(Integer.parseInt(subType)));
 			}
 				
 			if(supplier != null && !supplier.isEmpty() && !supplier.equals("-1")){
-				extra += " AND S.supplier_id = " + supplier;
+				//extra += " AND S.supplier_id = " + supplier;
+				extraCond.setSupplier(Integer.parseInt(supplier));
 			}
 			
-			if(deptId.equals("-1")){
-				stockDetailReports = StockDetailReportDao.getStockDetailReport(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
-			}else{
-				extra += " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")";
-				stockDetailReports = StockDetailReportDao.getStockDetailReportByDept(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit), Integer.parseInt(deptId));
-			}
+			//FIXME
+//			if(deptId.equals("-1")){
+//				stockDetailReports = StockDetailReportDao.getStockDetailReport(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
+//			}else{
+//				extra += " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")";
+//				stockDetailReports = StockDetailReportDao.getStockDetailReportByDept(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit), Integer.parseInt(deptId));
+//			}
 			
-			if(!stockDetailReports.isEmpty()){
-				StockDetailReport sum = new StockDetailReport();
-				float totalMoney = 0, stockActionCount = 0, remaining = 0;
-				for (StockDetailReport s : stockDetailReports) {
-					totalMoney += s.totalMoney();
-					stockActionCount += s.getStockActionAmount();
-					remaining += s.getRemaining();
-				}
-				sum.setStockActionAmount(stockActionCount);
-				sum.setTotalMoney(totalMoney);
-				sum.setRemaining(remaining);
-				
-				sum.setStockActionSubType(stockDetailReports.get(0).getStockActionSubType());
-				
-				stockDetailReports.add(sum);				
-			}
+			List<StockDetailReport> result = StockDetailReportDao.getByCond(staff, extraCond);
+			jObject.setTotalProperty(result.size());
 
+			StockDetailReport summary = new StockDetailReport();
+			StockActionDetail summary4ActionDetail = new StockActionDetail();
+			StockAction summary4StockAction = new StockAction(0);
+			for (StockDetailReport s : result) {
+				summary4ActionDetail.setRemaining(s.getStockActionDetail().getRemaining() + summary4ActionDetail.getRemaining());
+				summary4ActionDetail.setAmount(s.getStockActionDetail().getAmount() + summary4ActionDetail.getAmount());
+			}
+			summary.setStockAction(summary4StockAction);
+			summary.setStockActonDetail(summary4ActionDetail);
+			//FIXME
+			//summary.setTotalMoney(0);
+				
+
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				result = DataPaging.getPagingData(result, true, Integer.parseInt(start), Integer.parseInt(limit));
+			}
 			
-			roots = StockDetailReportDao.getStockDetailReportCount(staff, Integer.parseInt(materialId), extra, null);
-		}catch(BusinessException e){
+			result.add(summary);
+			
+			jObject.setRoot(result);
+			
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			if(stockDetailReports != null){
-				jobject.setTotalProperty(roots);
-				jobject.setRoot(stockDetailReports);
-			}
-			response.getWriter().print(jobject.toString());
+
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;

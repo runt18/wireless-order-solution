@@ -136,15 +136,15 @@ public class OperateStockActionAction extends DispatchAction{
 					builder.addDetail(new StockActionDetail(Integer.valueOf(item[0]), Float.valueOf(item[1]), Float.valueOf(item[2])));
 				}
 			}
-			int id = StockActionDao.insertStockAction(staff, builder);
+			int id = StockActionDao.insert(staff, builder);
 			List<StockAction> root = new ArrayList<StockAction>();
 			StockAction stockAction = new StockAction(builder);
 			stockAction.setId(id);
 			root.add(stockAction);
 			jobject.setRoot(root);
 			jobject.initTip(true, "操作成功, 已录入新库存单信息.");
-		}catch(BusinessException e){
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+		}catch(BusinessException | SQLException e){
+			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
 			jobject.initTip4Exception(e);
@@ -258,7 +258,7 @@ public class OperateStockActionAction extends DispatchAction{
 				String[] item = temp.split("<spst>");
 				builder.addDetail(new StockActionDetail(Integer.valueOf(item[0]), Float.valueOf(item[1]), Float.valueOf(item[2])));
 			}
-			StockActionDao.updateStockAction(staff, Integer.valueOf(id), builder);
+			StockActionDao.update(staff, Integer.valueOf(id), builder);
 			jobject.initTip(true, "操作成功, 已修改库存单信息.");
 		}catch(BusinessException e){
 			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
@@ -450,7 +450,7 @@ public class OperateStockActionAction extends DispatchAction{
 			AuditBuilder builder = StockAction.AuditBuilder.newStockActionAudit(Integer.valueOf(id))
 					.setApprover(staff.getName())
 					.setApproverId((int) staff.getId());
-			StockActionDao.auditStockAction(staff, builder);
+			StockActionDao.audit(staff, builder);
 			jobject.initTip(true, "操作成功, 已审核库存单信息.");
 		}catch(BusinessException e){
 			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
@@ -506,39 +506,37 @@ public class OperateStockActionAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward checkReAudit(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward checkReAudit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		
-		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String stockActionId = request.getParameter("stockActionId");
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String stockActionId = request.getParameter("stockActionId");
+
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			StockAction sa = StockActionDao.getStockAndDetailById(staff, Integer.parseInt(stockActionId));
+			StockAction sa = StockActionDao.getById(staff, Integer.parseInt(stockActionId), true);
 			
 			long dateTime = StockActionDao.getStockActionInsertTime(staff);
 			
 			if(dateTime == 0){//没有盘点或者日结
-				jobject.initTip(true, "");
+				jObject.initTip(true, "");
 			}else{
 				if(dateTime < sa.getApproverDate()){//审核时间在盘点或日结之后
-					jobject.initTip(true, "");
+					jObject.initTip(true, "");
 				}else{
-					jobject.initTip(false, "");
+					jObject.initTip(false, "");
 				}				
 			}
 			
 		}catch(BusinessException e){
-			jobject.initTip(e);
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

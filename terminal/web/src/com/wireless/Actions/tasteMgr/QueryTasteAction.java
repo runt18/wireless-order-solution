@@ -82,7 +82,7 @@ public class QueryTasteAction extends Action {
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
-				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+				jobject.setRoot(DataPaging.getPagingData(root, Boolean.parseBoolean(isPaging), start, limit));
 			}
 			response.getWriter().print(jobject.toString());
 		}

@@ -1,5 +1,6 @@
 package com.wireless.Actions.inventoryMgr.stockAction;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,36 +20,35 @@ import com.wireless.pojo.stockMgr.StockActionDetail;
 
 public class QueryStockActionDetailAction extends Action{
 	@Override
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		final String pin = (String)request.getAttribute("pin");
+		final String id = request.getParameter("id");
 		
-		JObject jobject = new JObject();
-		List<StockActionDetail> root = null;
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String id = request.getParameter("id");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String  orderClause = "";
+			final StockActionDetailDao.ExtraCond extraCond = new StockActionDetailDao.ExtraCond();
 			if(id != null){
-				root = StockActionDetailDao.getStockActionDetails(staff, " AND stock_action_id = " + Integer.parseInt(id), orderClause);
+				extraCond.setStockAction(Integer.parseInt(id));
 			}
 
-		}catch(BusinessException e){
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			List<StockActionDetail> root = StockActionDetailDao.getByCond(staff, new StockActionDetailDao.ExtraCond().setStockAction(Integer.parseInt(id)), null);
+
+			jObject.setTotalProperty(root.size());
+			jObject.setRoot(root);
+			
+		}catch(BusinessException  | SQLException e){
+			jObject.initTip(e);
 			e.printStackTrace();
 			
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-			if(root != null){
-				jobject.setTotalProperty(root.size());
-				jobject.setRoot(root);
-			}
-			response.getWriter().print(jobject.toString());
+
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

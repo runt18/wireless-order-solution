@@ -1,6 +1,6 @@
 package com.wireless.Actions.inventoryMgr.stockAction;
 
-import java.text.SimpleDateFormat;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,10 +12,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.util.DataPaging;
@@ -25,97 +25,101 @@ public class QueryStockActionAction extends Action{
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		
-		JObject jobject = new JObject();
-		List<StockAction> root = null;
-		String isHistory = request.getParameter("isHistory");
-		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
+		final String pin = (String)request.getAttribute("pin");
+		final String id = request.getParameter("id");
+		final String stockType = request.getParameter("stockType");
+		final String cateType = request.getParameter("cateType");
+		final String dept = request.getParameter("dept");
+		final String oriStockId = request.getParameter("oriStockId");
+		final String status = request.getParameter("status");
+		final String supplier = request.getParameter("supplier");
+		final String subType = request.getParameter("subType");
+		final String beginDate = request.getParameter("beginDate");
+		final String endDate = request.getParameter("endDate");
+		final String isHistory = request.getParameter("isHistory");
+		final String isPaging = request.getParameter("isPaging");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String id = request.getParameter("id");
-			String stockType = request.getParameter("stockType");
-			String cateType = request.getParameter("cateType");
-			String dept = request.getParameter("dept");
-			String oriStockId = request.getParameter("oriStockId");
-			String status = request.getParameter("status");
-			String supplier = request.getParameter("supplier");
-			String subType = request.getParameter("subType");
-			String beginDate = request.getParameter("beginDate");
-			String endDate = request.getParameter("endDate");
+
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String extraCond = "", orderClause = "";
-			long monthly = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
-			String curmonth = new SimpleDateFormat("yyyy-MM").format(monthly);
-			if(isHistory == null || !Boolean.valueOf(isHistory)){
-				// 只能查询当前会计月份数据
-				extraCond += (" AND S.ori_stock_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31 23:59:59' ");
+			final StockActionDao.ExtraCond extraCond = new StockActionDao.ExtraCond();
+//			long monthly = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
+//			String curmonth = new SimpleDateFormat("yyyy-MM").format(monthly);
+			if(isHistory != null && !isHistory.isEmpty() && Boolean.parseBoolean(isHistory)){
+				extraCond.setHistory(true);
+				if(beginDate != null && !beginDate.trim().isEmpty() && endDate != null && !endDate.isEmpty()){
+					//extraCond += (" AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date < '" + endDate + "'");
+					extraCond.setOriDate(beginDate, endDate);
+				}
 			}else{
-				extraCond += (" AND S.ori_stock_date < '" + curmonth + "'" );
+				// 只能查询当前会计月份数据
+				//extraCond += (" AND S.ori_stock_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31 23:59:59' ");
+				extraCond.setCurrentMonth(true);
 			}
-			if(beginDate != null && !beginDate.trim().isEmpty()){
-				extraCond += (" AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date < '" + endDate + "'");
-			}
+
 			if(id != null && !id.trim().isEmpty()){
-				extraCond += (" AND S.id = " + id);
+				//extraCond += (" AND S.id = " + id);
+				extraCond.setId(Integer.parseInt(id));
 			}
 			if(stockType != null && !stockType.trim().isEmpty() && !stockType.equals("-1")){
-				extraCond += (" AND S.type = " + stockType);
+				//extraCond += (" AND S.type = " + stockType);
+				extraCond.setType(StockAction.Type.valueOf(Integer.parseInt(stockType)));
 				if(dept != null && !dept.trim().isEmpty() && !dept.equals("-1")){
-					if(stockType.equals("1")){
-						extraCond += (" AND S.dept_in = " + dept);
-					}else if(stockType.equals("2")){
-						extraCond += (" AND S.dept_out = " + dept);
+					if(Integer.parseInt(stockType) == StockAction.Type.STOCK_IN.getVal()){
+						//extraCond += (" AND S.dept_in = " + dept);
+						extraCond.setDeptIn(Integer.parseInt(dept));
+					}else if(Integer.parseInt(stockType) == StockAction.Type.STOCK_OUT.getVal()){
+						//extraCond += (" AND S.dept_out = " + dept);
+						extraCond.setDeptOut(Integer.parseInt(dept));
 					}
 				}
 			}else{
 				if(dept != null && !dept.trim().isEmpty() && !dept.equals("-1")){
-					extraCond += (" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")");
+					//extraCond += (" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")");
+					extraCond.setDept(Integer.parseInt(dept));
 				}
 			}
 
 			if(cateType != null && !cateType.trim().isEmpty() && !cateType.equals("-1")){
-				extraCond += (" AND S.cate_type = " + cateType);
+				//extraCond += (" AND S.cate_type = " + cateType);
+				extraCond.setMaterialCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)));
 			}
 			if(oriStockId != null && !oriStockId.trim().isEmpty()){
-				extraCond += (" AND (S.ori_stock_id LIKE '%" + oriStockId.trim() + "%' OR S.id = '" + oriStockId.trim() + "')");
+				//extraCond += (" AND (S.ori_stock_id LIKE '%" + oriStockId.trim() + "%' OR S.id = '" + oriStockId.trim() + "')");
+				extraCond.setOriId(oriStockId);
 			}
 			if(status != null && !status.trim().isEmpty()){
-				extraCond += (" AND S.status = " + status.trim());
+				//extraCond += (" AND S.status = " + status.trim());
+				extraCond.addStatus(StockAction.Status.valueOf(Integer.parseInt(status)));
 			}
 			if(supplier != null && !supplier.trim().equals("-1") && !supplier.trim().isEmpty() ){
-				extraCond += (" AND S.supplier_id = " + supplier.trim());
+				//extraCond += (" AND S.supplier_id = " + supplier.trim());
+				extraCond.setSupplier(Integer.parseInt(supplier));
 			}
 			if(subType != null && !subType.trim().isEmpty() && !subType.equals("-1")){
-				extraCond += (" AND S.sub_type = " + subType.trim());
+				//extraCond += (" AND S.sub_type = " + subType.trim());
+				extraCond.addSubType(StockAction.SubType.valueOf(Integer.parseInt(subType)));
 			}
-			orderClause += (" ORDER BY S.status, S.ori_stock_date ");
-			root = StockActionDao.getStockAndDetail(staff, extraCond, orderClause);
+			
+			List<StockAction> root = StockActionDao.getByCond(staff, extraCond.setContainsDetail(true), " ORDER BY S.status, S.ori_stock_date ");
 			
 			//设置是否可反审核
 			//最近盘点或月结时间
 			long stockTakeOrBalanceTime = StockActionDao.getStockActionInsertTime(staff);
 			for (StockAction stockAction : root) {
-				if(stockAction.getStatus() == StockAction.Status.AUDIT || stockAction.getStatus() == StockAction.Status.DELETE){
+				if(stockAction.getStatus() == StockAction.Status.AUDIT || stockAction.getStatus() == StockAction.Status.RE_AUDIT){
 					if(stockTakeOrBalanceTime > stockAction.getApproverDate()){
 						stockAction.setStatus(StockAction.Status.FINAL);
 					}
 				}
 			}
 
-		}catch(BusinessException e){
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
-			e.printStackTrace();
-			
-		}catch(Exception e){
-			jobject.initTip4Exception(e);
-			e.printStackTrace();
-		}finally{
 			if(!root.isEmpty()){
-				jobject.setTotalProperty(root.size());
+				jObject.setTotalProperty(root.size());
 				float price = 0, actualPrice = 0;
 				for (StockAction stockAction : root) {
 					price += stockAction.getPrice();
@@ -131,11 +135,21 @@ public class QueryStockActionAction extends Action{
 				totalStockAction.setActualPrice(actualPrice);
 				totalStockAction.setPrice(price);
 				
-				root = DataPaging.getPagingData(root, isPaging, start, limit);
+				root = DataPaging.getPagingData(root, Boolean.parseBoolean(isPaging), start, limit);
 				root.add(totalStockAction);
 			}
-			jobject.setRoot(root);
-			response.getWriter().print(jobject.toString());
+			jObject.setRoot(root);
+			
+		}catch(BusinessException | SQLException e){
+			jObject.initTip(e);
+			e.printStackTrace();
+			
+		}catch(Exception e){
+			jObject.initTip4Exception(e);
+			e.printStackTrace();
+		}finally{
+
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

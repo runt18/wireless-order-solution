@@ -185,7 +185,7 @@ public class SalesSubStatisticsAction extends Action {
 				}
 				
 			}
-			salesDetailList = DataPaging.getPagingData(salesDetailList, isPaging, start, limit);
+			salesDetailList = DataPaging.getPagingData(salesDetailList, Boolean.parseBoolean(isPaging), start, limit);
 			if(summary != null){
 				salesDetailList.add(summary);
 			}

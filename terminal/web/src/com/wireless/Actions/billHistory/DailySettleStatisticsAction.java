@@ -44,7 +44,7 @@ public class DailySettleStatisticsAction extends Action {
 			List<ShiftGeneral> list = DailyGeneralDao.getByRange(staff, onDuty, offDuty);
 			if(list != null){
 				jObject.setTotalProperty(list.size());
-				jObject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
+				jObject.setRoot(DataPaging.getPagingData(list, Boolean.parseBoolean(isPaging), start, limit));
 			}
 			
 		}catch(BusinessException | SQLException e){

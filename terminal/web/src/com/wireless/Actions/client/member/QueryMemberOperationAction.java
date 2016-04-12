@@ -110,8 +110,6 @@ public class QueryMemberOperationAction extends Action{
 				}
 			}
 			
-			String orderClause = " ORDER BY MO.id DESC " ;
-			
 			if(isPaging != null && isPaging.trim().equals("true")){
 				if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
 					extraCond.setOperateDate(new DutyRange(onDuty, offDuty));
@@ -121,7 +119,7 @@ public class QueryMemberOperationAction extends Action{
 //				orderClause += " LIMIT " + start + "," + limit;
 			}
 			
-			List<MemberOperation> list = MemberOperationDao.getByCond(staff, extraCond, orderClause);
+			List<MemberOperation> list = MemberOperationDao.getByCond(staff, extraCond, null);
 			
 			if(!list.isEmpty()){
 				MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
