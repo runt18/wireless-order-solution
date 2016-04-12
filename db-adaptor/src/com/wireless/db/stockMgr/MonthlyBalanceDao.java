@@ -260,7 +260,7 @@ public class MonthlyBalanceDao {
 				//Restaurant r = RestaurantDao.getById(dbCon, restaurant);
 				Staff staff = new Staff();
 				staff.setRestaurantId(restaurant);
-				List<StockAction> list = StockActionDao.getByCond(dbCon, staff, new StockActionDao.ExtraCond().addExceptSubType(StockAction.SubType.CONSUMPTION), " ORDER BY S.birth_date LIMIT 0,1");
+				List<StockAction> list = StockActionDao.getStockActions(dbCon, staff, " AND sub_type <> " + StockAction.SubType.USE_UP.getVal() , " ORDER BY birth_date LIMIT 0,1");
 				if(list.isEmpty()){
 					return new Date().getTime();
 				}else{

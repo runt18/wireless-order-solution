@@ -221,7 +221,7 @@ public class TestStockTake {
 			//库存分布对比
 			for (int stockActionId : stockActionIds) {
 				//获得对应的库单
-				StockAction stockAction = StockActionDao.getById(mStaff, stockActionId, true);
+				StockAction stockAction = StockActionDao.getStockAndDetailById(mStaff, stockActionId);
 				//对比盘点后的数据
 				for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
 					for (StockActionDetail stockActionDetail : stockAction.getStockDetails()) {
@@ -311,7 +311,7 @@ public class TestStockTake {
 		
 			for (int stockActionId : stockActionIds) {	
 				//通过返回的id获取库单
-				StockAction actualStockAction = StockActionDao.getById(mStaff, stockActionId, true);
+				StockAction actualStockAction = StockActionDao.getStockAndDetailById(mStaff, stockActionId);
 				for (StockAction expectedStockAction : lists) {
 					if(expectedStockAction.getSubType() == actualStockAction.getSubType()){
 						expectedStockAction.setId(stockActionId);

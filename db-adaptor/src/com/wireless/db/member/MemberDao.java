@@ -1816,7 +1816,7 @@ public class MemberDao {
 			throw new BusinessException("推荐与关注不能是相同的会员");
 		}
 
-		if(!RepresentChainDao.getByCond(dbCon, staff, new RepresentChainDao.ExtraCond().setSubscriberId(builder.getSubscriber())).isEmpty()){
+		if(!RepresentChainDao.getByCond(dbCon, staff, new RepresentChainDao.ExtraCond().setReferrerId(builder.getReferrer()).setSubscriberId(builder.getSubscriber())).isEmpty()){
 			throw new BusinessException("对不起, 您之前已经被推荐过");
 		}
 		

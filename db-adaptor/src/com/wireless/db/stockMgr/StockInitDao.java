@@ -286,7 +286,7 @@ public class StockInitDao {
 //		dbCon.rs.close();
 		//初始化和消耗不算入库存数
 		String sql = "SELECT COUNT(*) FROM stock_action WHERE restaurant_id = "+ staff.getRestaurantId() 
-				+ " AND sub_type NOT IN("+ StockAction.SubType.CONSUMPTION.getVal() +", "+ StockAction.SubType.INIT.getVal() +")";
+				+ " AND sub_type NOT IN("+ StockAction.SubType.USE_UP.getVal() +", "+ StockAction.SubType.INIT.getVal() +")";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		

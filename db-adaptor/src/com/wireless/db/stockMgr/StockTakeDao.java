@@ -70,12 +70,20 @@ public class StockTakeDao {
 		return stockTakeId;
 	}
 	
-	private static boolean isUnauditStockAction(Staff staff) throws SQLException{
-		return !StockActionDao.getByCond(staff, new StockActionDao.ExtraCond().addStatus(StockAction.Status.UNAUDIT).addExceptSubType(StockAction.SubType.CONSUMPTION), null).isEmpty();
+	public static boolean isUnauditStockAction(Staff term) throws SQLException{
+		List<StockAction> list = StockActionDao.getStockActions(term, 
+			    " AND status = " + StockAction.Status.UNAUDIT.getVal() + 
+				" AND sub_type <> " + SubType.USE_UP.getVal(), 
+				null);
+		if(!list.isEmpty()){
+			return true ;
+		}else{
+			return false;
+		}
 	}
 	
-	public static void checkStockAction(Staff staff) throws SQLException, BusinessException{
-		if(isUnauditStockAction(staff)){
+	public static void checkStockAction(Staff term) throws SQLException, BusinessException{
+		if(isUnauditStockAction(term)){
 			throw new BusinessException(StockError.STOCKACTION_UNAUDIT);
 		}
 	}
@@ -870,10 +878,10 @@ public class StockTakeDao {
 		if(!insertBuilders.isEmpty()){
 			result = new ArrayList<Integer>();
 			for (InsertBuilder InsertBuild : insertBuilders.values()) {
-				stockActionId = StockActionDao.insert(dbCon, staff, InsertBuild);
+				stockActionId = StockActionDao.insertStockAction(dbCon, staff, InsertBuild);
 				AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(stockActionId)
 											.setApproverId(staff.getId()).setApprover(staff.getName());
-				StockActionDao.audit(dbCon, staff, updateBuilder);
+				StockActionDao.auditStockAction(dbCon, staff, updateBuilder);
 				result.add(stockActionId);
 			}
 			
@@ -883,12 +891,12 @@ public class StockTakeDao {
 		//当所有盘点任务结束后, 对消耗单进行处理
 		if(!StockActionDao.isStockTakeChecking(dbCon, staff)){
 			//判断是否有消耗类型的库单未审核,有则变成审核通过
-			List<StockAction> list = StockActionDao.getByCond(dbCon, staff, new StockActionDao.ExtraCond().addSubType(SubType.CONSUMPTION).addStatus(StockAction.Status.UNAUDIT), null);
+			List<StockAction> list = StockActionDao.getStockActions(dbCon, staff, " AND sub_type = " + SubType.USE_UP.getVal() + " AND status = " + StockAction.Status.UNAUDIT.getVal(), null);
 			if(!list.isEmpty()){
 				for (StockAction useUpStockAction : list) {
 					AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(useUpStockAction.getId())
 												.setApprover(useUpStockAction.getOperator()).setApproverId(useUpStockAction.getOperatorId());
-					StockActionDao.audit(dbCon, staff, updateBuilder);
+					StockActionDao.auditStockAction(dbCon, staff, updateBuilder);
 				}
 			}
 		}
