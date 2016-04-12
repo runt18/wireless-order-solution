@@ -45,7 +45,7 @@ public class QueryMaterialDeptAction extends Action{
 			String materialId = request.getParameter("materialId");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extraCond = "";
-			if(deptId != null && !deptId.trim().isEmpty()){
+			if(deptId != null && !deptId.trim().isEmpty() && Integer.valueOf(deptId) >= 0){
 				extraCond += " AND MD.dept_id = " + deptId;
 			}
 			if(materialId != null && !materialId.trim().isEmpty() && !materialId.equals("-1")){
