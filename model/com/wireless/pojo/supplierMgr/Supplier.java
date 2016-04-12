@@ -14,7 +14,7 @@ public class Supplier implements Jsonable{
 	private String comment;
 	
 	
-	public int getId() {
+	public int getSupplierId() {
 		return supplierId;
 	}
 

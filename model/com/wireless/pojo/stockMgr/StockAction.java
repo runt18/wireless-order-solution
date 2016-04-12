@@ -106,7 +106,7 @@ public class StockAction implements Jsonable{
 		//消耗
 		public static InsertBuilder newUseUp(int restaurantId, Department deptOut, MaterialCate.Type cateType){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_OUT).setSubType(SubType.CONSUMPTION)
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.USE_UP)
 			       .setDeptOut(deptOut.getId()).setDeptOutName(deptOut.getName())
 			       .setCateType(cateType)
 			       .setOriStockDate(new Date().getTime())
@@ -291,7 +291,7 @@ public class StockAction implements Jsonable{
 		
 		public float getTotalPrice(){
 			float sum = 0;
-			if(this.subType == SubType.INIT || this.subType == SubType.STOCK_IN || this.subType == SubType.STOCK_OUT || this.subType == SubType.CONSUMPTION){
+			if(this.subType == SubType.INIT || this.subType == SubType.STOCK_IN || this.subType == SubType.STOCK_OUT || this.subType == SubType.USE_UP){
 				for (StockActionDetail sDetail : this.stockActionDetails) {
 					sum += sDetail.getAmount() * sDetail.getPrice();
 				}
@@ -402,12 +402,12 @@ public class StockAction implements Jsonable{
 	
 	/**
 	 * 库单状态
-	 * 1 - 未审核，2 - 审核通过， 3 - 反审核，4 - 审核通过
+	 * 1 - 未审核，2 - 审核通过， 3 - 冲红
 	 */
 	public static enum Status{
 		UNAUDIT(1, "未审核"), 
 		AUDIT(2, "审核通过"),
-		RE_AUDIT(3, "反审核"),
+		DELETE(3, "反审核"),
 		FINAL(4, "审核通过");
 		
 		private final int val;
@@ -503,7 +503,7 @@ public class StockAction implements Jsonable{
 		DAMAGE(6, "报损"),
 		MORE(7, "盘盈"),
 		LESS(8, "盘亏"),
-		CONSUMPTION(9, "消耗"),
+		USE_UP(9, "消耗"),
 		INIT(10, "初始化");
 			
 		private final int val;
@@ -603,7 +603,7 @@ public class StockAction implements Jsonable{
 		return stockDetails;
 	}
 
-	public void setDetails(List<StockActionDetail> stockDetails) {
+	public void setStockDetails(List<StockActionDetail> stockDetails) {
 		if(stockDetails != null){
 			this.stockDetails.clear();
 			this.stockDetails.addAll(stockDetails);
@@ -611,8 +611,8 @@ public class StockAction implements Jsonable{
 		
 	}
 	
-	public void addDetail(StockActionDetail detail){
-		this.stockDetails.add(detail);
+	public void addStockDetail(StockActionDetail sDetail){
+		this.stockDetails.add(sDetail);
 	}
 
 	public int getId() {
@@ -630,6 +630,7 @@ public class StockAction implements Jsonable{
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
+	
 	
 	public long getBirthDate() {
 		return birthDate;
@@ -802,7 +803,7 @@ public class StockAction implements Jsonable{
 		setSupplier(build.getSupplier());
 		setOperatorId(build.getOperatorId());
 		setOperator(build.getOperator());
-		setDetails(build.getStockActionDetails());
+		setStockDetails(build.getStockActionDetails());
 		setCateType(build.getCateType());
 		setType(build.getType());
 		setSubType(build.getSubType());
@@ -832,7 +833,7 @@ public class StockAction implements Jsonable{
 	
 	public float getTotalPrice(){
 		float sum = 0;
-		if(this.subType == SubType.INIT || this.subType == SubType.STOCK_IN || this.subType == SubType.STOCK_OUT || this.subType == SubType.CONSUMPTION){
+		if(this.subType == SubType.INIT || this.subType == SubType.STOCK_IN || this.subType == SubType.STOCK_OUT || this.subType == SubType.USE_UP){
 			for (StockActionDetail sDetail : this.stockDetails) {
 				sum += sDetail.getAmount() * sDetail.getPrice();
 			}

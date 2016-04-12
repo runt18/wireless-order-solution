@@ -59,12 +59,7 @@ public class Material implements Jsonable {
 		this.lastModDate = lastModDate;
 		this.status = status;
 	}
-	
 	public Material(){}
-
-	public Material(int id){
-		this.id = id;
-	}
 	
 	/**
 	 * update basic model
@@ -201,7 +196,7 @@ public class Material implements Jsonable {
 		this.pinyin = pinyin;
 	}
 	
-	public void addStock(float count){
+	public void plusStock(float count){
 		this.stock = stock + count;
 	}
 	
