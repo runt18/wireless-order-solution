@@ -50,6 +50,8 @@ public class OperateMemberCondAction extends DispatchAction{
 		final String isRaw = request.getParameter("isRaw");
 		final String minCharge = request.getParameter("memberCondMinCharge");
 		final String maxCharge = request.getParameter("memberCondMaxCharge");
+		final String minFansAmount = request.getParameter("minFansAmount");
+		final String maxFansAmount = request.getParameter("maxFansAmount");
 		final JObject jObject = new JObject(); 
 		
 		try{
@@ -68,6 +70,13 @@ public class OperateMemberCondAction extends DispatchAction{
 			if(rangeType == RangeType.USER_DEFINE){
 				builder.setRange(memberCondBeginDate, memberCondEndDate);
 			}
+			
+			//设置粉丝数
+			if(minFansAmount != null && !minFansAmount.isEmpty() && maxFansAmount != null && !maxFansAmount.isEmpty()){
+				builder.setMinFansAmount(Integer.valueOf(minFansAmount));
+				builder.setMaxFansAmount(Integer.valueOf(maxFansAmount));
+			}
+			
 			//会员类型
 			if(memberType != null && !memberType.isEmpty() && !memberType.equals("-1")){
 				builder.setMemberType(new MemberType(Integer.parseInt(memberType)));
@@ -157,6 +166,8 @@ public class OperateMemberCondAction extends DispatchAction{
 		final String isRaw = request.getParameter("isRaw");
 		final String minCharge = request.getParameter("memberCondMinCharge");
 		final String maxCharge = request.getParameter("memberCondMaxCharge");
+		final String minFansAmount = request.getParameter("minFansAmount");
+		final String maxFansAmount = request.getParameter("maxFansAmount");
 		final JObject jObject = new JObject(); 
 		
 		try{
@@ -176,7 +187,9 @@ public class OperateMemberCondAction extends DispatchAction{
 				builder.setRangeType(null);
 			}
 			
-
+			if(minFansAmount != null && !minFansAmount.isEmpty() && maxFansAmount != null && !maxFansAmount.isEmpty()){
+				builder.setFansRange(Integer.valueOf(minFansAmount), Integer.valueOf(maxFansAmount));
+			}
 			
 			if(memberType != null && !memberType.isEmpty()){
 				if(memberType.equals("-1")){

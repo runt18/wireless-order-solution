@@ -125,7 +125,6 @@ public class WXOperateMemberAction extends DispatchAction {
 			final Restaurant restaurant = RestaurantDao.getById(rid);
 			
 			final Member member = MemberDao.getByWxSerial(staff, openId);
-			member.setMemberType(MemberTypeDao.getById(staff, member.getMemberType().getId()));
 			
 			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getAdminByRestaurant(rid), member.getId());
 			

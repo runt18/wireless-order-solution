@@ -1,6 +1,10 @@
 package com.wireless.pojo.member.represent;
 
-public class RepresentChain {
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
+import com.wireless.pojo.util.DateUtil;
+
+public class RepresentChain implements Jsonable{
 	
 	private int id;
 	private int restaurantId;
@@ -110,5 +114,29 @@ public class RepresentChain {
 	
 	public void setSubscribeMoney(float subscribeMoney) {
 		this.subscribeMoney = subscribeMoney;
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("restaurantId", this.restaurantId);
+		jm.putString("subscribeDate", DateUtil.format(this.subscribeDate, DateUtil.Pattern.DATE_TIME));
+		jm.putInt("recommendMemberId", this.recommendMemberId);
+		jm.putString("recommendMember", this.recommendMember);
+		jm.putInt("recommendPoint", this.recommendPoint);
+		jm.putFloat("recommendMoney", this.recommendMoney);
+		jm.putInt("subscribeMemberId", this.subscribeMemberId);
+		jm.putString("subscribeMember",  this.subscribeMember);
+		jm.putInt("subscribePoint", this.subscribePoint);
+		jm.putFloat("subscribeMoney", this.subscribeMoney);
+		
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jm, int flag) {
+		// TODO Auto-generated method stub
+		
 	}
 }

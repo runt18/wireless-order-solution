@@ -43,7 +43,9 @@ public class TestMemberCond {
 																   .addAge(Member.Age.AGE_80)
 																   .addAge(Member.Age.AGE_70)
 																   .setCharge(5,  10)
-																   .setRaw(false);
+																   .setRaw(false)
+																   .setMinFansAmount(10)
+																   .setMaxFansAmount(20);
 			id = MemberCondDao.insert(mStaff, insertBuilder);
 			
 			MemberCond expected = insertBuilder.build();
@@ -61,7 +63,8 @@ public class TestMemberCond {
 																   .setSex(Member.Sex.MALE)
 																   .clearAge()
 																   .setCharge(10, 20)
-																   .setRaw(true);
+																   .setRaw(true)
+																   .setFansRange(20, 30);
 			MemberCondDao.update(mStaff, updateBuilder);
 			if(updateBuilder.isNameChanged()){
 				expected.setName(updateBuilder.build().getName());
@@ -104,6 +107,10 @@ public class TestMemberCond {
 			if(updateBuilder.isRawChanged()){
 				expected.setRaw(updateBuilder.build().isRaw());
 			}
+			if(updateBuilder.isFansChanged()){
+				expected.setMinFansAmount(updateBuilder.build().getMinFansAmount());
+				expected.setMaxFansAmount(updateBuilder.build().getMaxFansAmount());
+			}
 			actual = MemberCondDao.getById(mStaff, id);
 			compare(expected, actual);
 		}finally{
@@ -137,5 +144,7 @@ public class TestMemberCond {
 		Assert.assertEquals("member condition sex", expected.getSex(), actual.getSex());
 		Assert.assertEquals("member condition ages", expected.getAges(), actual.getAges());
 		Assert.assertEquals("member condition raw", expected.isRaw(), actual.isRaw());
+		Assert.assertEquals("member condition minFansAmount", expected.getMinFansAmount(), actual.getMinFansAmount());
+		Assert.assertEquals("member condition maxFansAmount", expected.getMaxFansAmount(), actual.getMaxFansAmount());
 	}
 }

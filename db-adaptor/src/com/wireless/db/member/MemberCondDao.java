@@ -76,7 +76,7 @@ public class MemberCondDao {
 		sql = " INSERT INTO " + Params.dbName + ".member_cond" +
 			  " ( restaurant_id, name, member_type_id, range_type, begin_date, end_date" +
 			  " ,min_consume_money, max_consume_money, min_consume_amount, max_consume_amount, min_balance, max_balance, min_last_consumption, max_last_consumption " +
-			  " ,min_charge, max_charge, sex, age, raw " + 
+			  " ,min_charge, max_charge, sex, age, raw, min_fans_amount, max_fans_amount " + 
 			  " ) VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + cond.getName() + "'" + "," +
@@ -96,7 +96,9 @@ public class MemberCondDao {
 			  cond.getMaxCharge() + "," +
 			  (cond.hasSex() ? cond.getSex().getVal() : " NULL ") + "," +
 			  (!cond.getAges().isEmpty() ? "'" + cond.getAgesString() + "'" : " NULL ") + "," +
-			  (cond.hasRaw() ? (cond.isRaw() ? "1" : "0") : " NULL ") +
+			  (cond.hasRaw() ? (cond.isRaw() ? "1" : "0") : " NULL ") + "," +
+			  cond.getMinFansAmount() + "," + 
+			  cond.getMaxFansAmount() +
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -164,6 +166,8 @@ public class MemberCondDao {
 			  (builder.isChargeChanged() ? " ,min_charge = " + cond.getMinCharge() + " ,max_charge = " + cond.getMaxCharge() : "") +
 			  (builder.isAgeChanged() ? " ,age = " + (!cond.getAges().isEmpty() ? "'" + cond.getAgesString() + "'" : " NULL ") : "") +
 			  (builder.isRawChanged() ? " ,raw = " + (cond.hasRaw() ? (cond.isRaw() ? "1" : "0") : " NULL"): "") +
+			  (builder.isFansChanged() ? " ,min_fans_amount = " + cond.getMinFansAmount() : "") +
+			  (builder.isFansChanged() ? " ,max_fans_amount = " + cond.getMaxFansAmount() : "") +
 			  " WHERE id = " + cond.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -300,6 +304,8 @@ public class MemberCondDao {
 			memberCond.setMaxLastConsumption(dbCon.rs.getInt("max_last_consumption"));
 			memberCond.setMinCharge(dbCon.rs.getFloat("min_charge"));
 			memberCond.setMaxCharge(dbCon.rs.getFloat("max_charge"));
+			memberCond.setMaxFansAmount(dbCon.rs.getInt("max_fans_amount"));
+			memberCond.setMinFansAmount(dbCon.rs.getInt("min_fans_amount"));
 			if(dbCon.rs.getInt("cond_sex") >= 0){
 				memberCond.setSex(Member.Sex.valueOf(dbCon.rs.getInt("sex")));
 			}

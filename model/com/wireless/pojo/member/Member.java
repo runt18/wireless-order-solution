@@ -466,6 +466,8 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private final List<Food> favorFoods = new ArrayList<Food>();
 	//向Ta推荐的菜品
 	private final List<Food> recommendFoods = new ArrayList<Food>();
+	//【我要代言】的粉丝数
+	private int fansAmount;
 	
 	private Member(){
 		
@@ -1028,6 +1030,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.putFloat("extraBalance", this.extraBalance);
 		jm.putFloat("totalBalance", this.getTotalBalance());
 		jm.putFloat("usedBalance", this.usedBalance);
+		jm.putInt("fansAmount", this.fansAmount);
 		jm.putInt("point", this.point);
 		jm.putInt("usedPoint", this.usedPoint);
 		if(this.sex != null){
@@ -1242,6 +1245,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	public void setCompany(String company) {
 		this.company = company;
+	}
+	
+	public void setFansAmount(int fansAmount){
+		this.fansAmount = fansAmount;
+	}
+	
+	public int getFansAmount(){
+		return this.fansAmount;
 	}
 	
 	public String getContactAddress() {

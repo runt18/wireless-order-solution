@@ -495,6 +495,20 @@
 		    		    		Ext.getCmp('minCharge_numField_memberCond').setValue(jr.root[0].minCharge > 0 ? jr.root[0].minCharge : '');
 		    		    		Ext.getCmp('maxCharge_numField_memberCond').setValue(jr.root[0].maxCharge > 0 ? jr.root[0].maxCharge : '');
 		    		    		
+		    		    		var maxFansAmount = jr.root[0].maxFansAmount;
+		    		    		var minFansAmount = jr.root[0].minFansAmount;
+		    		    		if(maxFansAmount > 0 && minFansAmount > 0){
+		    		    			Ext.getCmp('showFansAmountConfig_combo_memberCond').setValue('between');
+		    		    		}else if(maxFansAmount > 0 && minFansAmount <= 0){
+		    		    			Ext.getCmp('showFansAmountConfig_combo_memberCond').setValue('max');
+		    		    		}else if(maxFansAmount <= 0 && minFansAmount > 0){
+		    		    			Ext.getCmp('showFansAmountConfig_combo_memberCond').setValue('min');
+		    		    		}else{
+		    		    			Ext.getCmp('showFansAmountConfig_combo_memberCond').setValue('null');
+		    		    		}
+		    		    		Ext.getCmp('showFansAmountMax_numberfield_memberCond').setValue(maxFansAmount > 0 ? maxFansAmount : '');
+		    		    		Ext.getCmp('showFansAmountMin_numberfield_memberCond').setValue(minFansAmount > 0 ? minFansAmount : '');
+		    		    		
 		    		    		if(typeof jr.root[0].isRaw == 'undefined'){
 		    		    			Ext.getDom('isBind_tbtext_memberCond').innerHTML  = '无设定';
 		    		    		}else{
@@ -1004,15 +1018,48 @@
 						id : 'maxCharge_numField_memberCond',
 						disabled : true,
 						width : 50
-					}
-			]
+					},
+					{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+					{
+						xtype : 'label',
+						text : '粉丝数:'
+					},
+					{	//TODO
+						xtype : 'combo',
+						store : new Ext.data.SimpleStore({
+							fields : ['value', 'text'],
+							data : [['max', '小于'], ['min', '大于'], ['between', '介于'], ['null', '无设定']]
+						}),
+						valueField : 'value',
+						displayField : 'text',
+						id : 'showFansAmountConfig_combo_memberCond',
+						disabled : true,
+						typeAhead : true,
+						mode : 'local',
+						triggerAction : 'all',
+						width: 80
+					},
+					{
+						id : 'showFansAmountMin_numberfield_memberCond',
+						xtype : 'numberfield',
+						width: 50,
+						disabled : true
+					},{
+						xtype : 'label',
+						text : '-'
+					},{
+						id : 'showFansAmountMax_numberfield_memberCond',
+						xtype : 'numberfield',
+						width : 50,
+						disabled : true
+					}]
 		});	
 		
 		memberCondBasicGrid = createGridPanel(
 			'memberCondBasicGrid',
 			'会员信息',
 			'',
-			'',
+			'',	
 			'../../QueryMember.do',
 			[
 				[true, false, false, true],
@@ -1020,6 +1067,7 @@
 				['类型', 'memberType.name'],
 				['年龄段','ageText'],
 				['性别','sexText'],
+				['粉丝数', 'fansAmount'],
 				['创建时间','createDateFormat'],
 				['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
 				['最近消费','lastConsumption',150],
@@ -1059,6 +1107,7 @@
  */
 	function showMemberCondWin(data){
 		data = data || {};
+		//修改时候显示会员原来设置的条件
 		Ext.getCmp('condId_hidden_memberCond').setValue(data.id);
 		Ext.getCmp('txtMemberCondName').setValue(data.name);
 		Ext.getCmp('memberCondByType').setValue(data.memberType ? data.memberType : -1);
@@ -1068,6 +1117,21 @@
 		Ext.getCmp('maxAmount4CondWin').setValue(data.maxConsumeAmount && data.maxConsumeAmount > 0 ? data.maxConsumeAmount : "");
 		Ext.getCmp('minBalance4CondWin').setValue(data.minBalance && data.minBalance > 0 ? data.minBalance : "");
 		Ext.getCmp('maxBalance4CondWin').setValue(data.maxBalance && data.maxBalance > 0 ? data.maxBalance : "");
+		
+		//根据数据设置选择条件
+		if(data.maxFansAmount > 0 && data.minFansAmount > 0){
+			Ext.getCmp('fansAmount_combo_memberCond').setValue('between');
+		}else if(data.maxFansAmount > 0 && data.minFansAmount <= 0){
+			Ext.getCmp('fansAmount_combo_memberCond').setValue('max');
+		}else if(data.maxFansAmount <= 0 && data.minFansAmount > 0){
+			Ext.getCmp('fansAmount_combo_memberCond').setValue('min');
+		}else{
+			Ext.getCmp('fansAmount_combo_memberCond').setValue('null');
+		}
+		Ext.getCmp('fansAmount_combo_memberCond').fireEvent('select');
+		Ext.getCmp('fansAmountMin_numberField_memberCond').setValue(data.minFansAmount > 0 ? data.minFansAmount : '');
+		Ext.getCmp('fansAmountMax_numberField_memberCond').setValue(data.maxFansAmount > 0 ? data.maxFansAmount : '');
+		
 		if(data.rangeType == null){
 			Ext.getCmp('memberCondDateRegion').setValue(null);
 		}else{
@@ -1403,6 +1467,78 @@
 		},{
 			columnWidth : 0.2,
 			xtype : 'label',
+			text : '粉丝数:'
+		},{
+			columnWidth : 0.2,
+			id : 'fansAmount_combo_memberCond',
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			width : 80,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text']
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					thiz.store.loadData([['min', '大于'], ['max', '小于'], ['between', '介于'], ['null', '无设定']]);
+					thiz.setValue('null');
+					thiz.fireEvent('select');
+				},
+				select : function(){
+					if(Ext.getCmp('fansAmount_combo_memberCond').getValue() == 'null'){
+						Ext.getCmp('fansAmountMin_numberField_memberCond').show();
+						Ext.getCmp('fansAmountMax_numberField_memberCond').show();
+						Ext.getCmp('fansAmountMin_numberField_memberCond').disable();
+						Ext.getCmp('fansAmountMax_numberField_memberCond').disable();
+						Ext.getCmp('fansAmount_label_memberCond').show();
+					}else if(Ext.getCmp('fansAmount_combo_memberCond').getValue() == 'min'){
+						Ext.getCmp('fansAmountMin_numberField_memberCond').enable();
+						Ext.getCmp('fansAmountMin_numberField_memberCond').show();
+						Ext.getCmp('fansAmountMax_numberField_memberCond').hide();
+						Ext.getCmp('fansAmount_label_memberCond').hide();
+					}else if(Ext.getCmp('fansAmount_combo_memberCond').getValue() == 'max'){
+						Ext.getCmp('fansAmountMax_numberField_memberCond').enable();
+						Ext.getCmp('fansAmountMin_numberField_memberCond').hide();
+						Ext.getCmp('fansAmountMax_numberField_memberCond').show();
+						Ext.getCmp('fansAmount_label_memberCond').hide();
+					}else{
+						Ext.getCmp('fansAmountMin_numberField_memberCond').enable();
+						Ext.getCmp('fansAmountMax_numberField_memberCond').enable();
+						Ext.getCmp('fansAmountMin_numberField_memberCond').show();
+						Ext.getCmp('fansAmountMax_numberField_memberCond').show();
+						Ext.getCmp('fansAmount_label_memberCond').show();
+					}
+					
+					Ext.getCmp('fansAmountMin_numberField_memberCond').setValue('');
+					Ext.getCmp('fansAmountMax_numberField_memberCond').setValue('');
+					
+				}
+			}
+		},{
+			columnWidth : 0.3,
+			xtype : 'numberfield',
+			id : 'fansAmountMin_numberField_memberCond'
+		},{
+			xtype : 'label',
+			text : '~',
+			id : 'fansAmount_label_memberCond'
+		},{
+			columnWidth : 0.3,
+			xtype : 'numberfield',
+			id : 'fansAmountMax_numberField_memberCond'
+		},{
+			columnWidth : 1,
+			style :'margin-bottom:5px;',
+			border : false		
+		},{
+			columnWidth : 0.2,
+			xtype : 'label',
 			text : '消费次数:'
 		},{
 			columnWidth : 0.2,
@@ -1582,7 +1718,7 @@
 					
 				}
 			}
-		}, {
+		},{
 			columnWidth : 0.3,
 			xtype : 'numberfield',
 			id : 'costDay_numberField_memeberCond'
@@ -1719,6 +1855,23 @@
 					maxAmount = 0;
 				}
 				
+				//粉丝数设定
+				var setFansConfig = Ext.getCmp('fansAmount_combo_memberCond').getValue();
+				var minFansAmount = Ext.getCmp('fansAmountMin_numberField_memberCond').getValue();
+				var maxFansAmount = Ext.getCmp('fansAmountMax_numberField_memberCond').getValue();
+				var fansMinData;
+				var fansMaxData;
+				if(setFansConfig == 'min'){
+					fansMinData = minFansAmount;
+					fansMaxData = 0;
+				}else if(setFansConfig == 'max'){
+					fansMinData = 0;
+					fansMaxData = maxFansAmount;
+				}else if(setFansConfig == 'between'){
+					fansMinData = minFansAmount;
+					fansMaxData = maxFansAmount;
+				}
+				
 				
 				var minBalance4CondWin = Ext.getCmp('minBalance4CondWin').getValue();
 				var maxBalance4CondWin = Ext.getCmp('maxBalance4CondWin').getValue();
@@ -1796,7 +1949,9 @@
 						age : age,
 						memberCondMinCharge : minCharge,
 						memberCondMaxCharge : maxCharge,
-						isRaw : isRaw
+						isRaw : isRaw,
+						minFansAmount : fansMinData,
+						maxFansAmount : fansMaxData
 					},
 					success : function(response, options) {
 						var jr = Ext.util.JSON.decode(response.responseText);

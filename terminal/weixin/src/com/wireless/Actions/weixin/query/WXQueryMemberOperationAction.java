@@ -19,9 +19,11 @@ import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberLevelDao;
 import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.member.MemberTypeDao;
+import com.wireless.db.member.represent.RepresentChainDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -30,6 +32,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.member.MemberLevel;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberType;
+import com.wireless.pojo.member.represent.RepresentChain;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.staffMgr.Staff;
@@ -38,6 +41,56 @@ import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.SQLUtil;
 
 public class WXQueryMemberOperationAction extends DispatchAction{
+	
+	/**
+	 *  近期5条代言记录
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward recommendDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		final String fid = request.getParameter("fid");
+		final String oid = request.getParameter("oid");
+		final JObject jObject = new JObject();
+		
+		try{
+			final RepresentChainDao.ExtraCond extraCond = new RepresentChainDao.ExtraCond();
+			final Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(fid));
+			
+			if(oid != null && !oid.isEmpty()){
+				int recommendFuzzyId = WxMemberDao.getBySerial(staff, oid).getMemberId();
+				extraCond.setRecommendFuzzy(MemberDao.getById(staff, recommendFuzzyId).getName());
+			}
+			
+			List<RepresentChain> representChainList = RepresentChainDao.getByCond(staff, extraCond.setIsSort(true));
+			
+			if(representChainList.size() > 5){
+				List<RepresentChain> returnList = new ArrayList<>();
+				for(RepresentChain chain : representChainList){
+					returnList.add(chain);
+					if(returnList.size() == 5){
+						break;
+					}else{
+						continue;
+					}
+				}
+				jObject.setRoot(returnList);
+			}else{
+				jObject.setRoot(representChainList);
+			}
+			
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		
+		return null;
+	}
 	
 	/**
 	 * 近5条消费记录
@@ -119,27 +172,19 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 	 * @return
 	 */
 	private JObject getData(int type, String restaurantSerial, String memberSerial){
-		JObject jobject = new JObject();
-		// 
-		if(type != 1 && type != 2 && type != 3){
-			jobject.initTip(false, "操作失败, 数据请求类型未知.");
-			return jobject;
-		}
+		final JObject jObject = new JObject();
 		
-		DBCon dbCon = null;
 		try{
-			dbCon = new DBCon();
-			dbCon.connect();
 			
 			List<MemberOperation> details = new ArrayList<MemberOperation>();
 			Map<Object, Object> params = new HashMap<Object, Object>();
 			
 			// 获取餐厅编号
-			int rid = WxRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
+			int rid = WxRestaurantDao.getRestaurantIdByWeixin(restaurantSerial);
 			//
-			Staff staff = StaffDao.getAdminByRestaurant(dbCon, rid);
+			Staff staff = StaffDao.getAdminByRestaurant(rid);
 			// 获取会员编号
-			int mid = MemberDao.getByWxSerial(dbCon, staff, memberSerial).getId();
+			int mid = MemberDao.getByWxSerial(staff, memberSerial).getId();
 			
 			MemberOperationDao.ExtraCond extraCond4Today = new MemberOperationDao.ExtraCond(DateType.TODAY);
 			MemberOperationDao.ExtraCond extraCond4History = new MemberOperationDao.ExtraCond(DateType.HISTORY);
@@ -173,19 +218,15 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 				orderClause = " ORDER BY MO.operate_date DESC " + " LIMIT " + 0 + "," + (queryCount - details.size());
 				details.addAll(MemberOperationDao.getByCond(staff, extraCond4History, orderClause));
 			}
-			jobject.setRoot(details);
-		}catch(BusinessException e){	
+			jObject.setRoot(details);
+		}catch(BusinessException | SQLException e){	
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
-		}finally{
-			if(dbCon != null){
-				dbCon.disconnect();
-			}
+			jObject.initTip4Exception(e);
 		}
-		return jobject;
+		return jObject;
 	}
 	
 	private JObject getGeneral(String restaurantSerial, String memberSerial){
@@ -225,11 +266,11 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			
 			//
 			chargeDetail = MemberOperationDao.getByCond(staff, extraCond4Today, orderClause);
+
 			// 当日数据不足查询记录数时, 获取历史数据填充满
 			if(chargeDetail.size() < 1){
 				chargeDetail.addAll(MemberOperationDao.getByCond(staff, extraCond4History, orderClause));
 			}
-			
 			
 			//查询消费记录
 			extraCond4Today.clearOperationType().addOperationType(MemberOperation.OperationType.CONSUME);

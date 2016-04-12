@@ -105,7 +105,8 @@ public class Page{
 //		MEMBE_RPRICE_STATISTICS("memberPriceStatistics", "会员价统计 ", "History_Module/memberPriceStatictics.html", "../../images/giftStatistics.png"),
 		COUPON_STATISTICS("couponStatistics", "优惠券统计 ", "History_Module/CouponStatistics.html", "../../images/giftStatistics.png"),
 //		PASSENGERFLOWSTATISTICS("passengerFlowStatistics", "History_Module/PassengerFliwStatistics.html", "../../images/giftStatistics.png");
-		PASSENGERFLOW_STATISTICS("passengerFlowStatistics", "客流统计", "History_Module/PassengerFlowStatistics.html", "../../images/giftStatistics.png");
+		PASSENGERFLOW_STATISTICS("passengerFlowStatistics", "客流统计", "History_Module/PassengerFlowStatistics.html", "../../images/giftStatistics.png"),
+		REPRESENT_STATISTICS("representStatistics", "代言统计", "History_Module/RepresentStatistics.html", "../../images/memberMgr.png");
 		
 		
 		
