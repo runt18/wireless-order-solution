@@ -258,7 +258,7 @@ public class DailySettleDao {
 				
 				//如果存在出库消耗单则插入
 				if(!builder.getStockActionDetails().isEmpty()){
-					auditBuilders.add(StockAction.AuditBuilder.newStockActionAudit(StockActionDao.insertStockAction(dbCon, staff, builder)));
+					auditBuilders.add(StockAction.AuditBuilder.newStockActionAudit(StockActionDao.insert(dbCon, staff, builder)));
 				}
 			}
 			
@@ -267,7 +267,7 @@ public class DailySettleDao {
 		//如果有盘点任务正在进行，则不审核出入库消耗单
 		if(!StockActionDao.isStockTakeChecking(dbCon, staff)){
 			for(AuditBuilder auditBuilder : auditBuilders){
-				StockActionDao.auditStockAction(dbCon, staff, auditBuilder);
+				StockActionDao.audit(dbCon, staff, auditBuilder);
 			}
 		}
 	}

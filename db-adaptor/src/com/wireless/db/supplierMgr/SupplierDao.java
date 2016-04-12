@@ -200,7 +200,7 @@ public class SupplierDao {
 			  " contact = '" + supplier.getContact() + "', " +
 			  " comment = '" + supplier.getComment() + "' " +
 			  " WHERE restaurant_id = " + term.getRestaurantId() +
-			  " AND supplier_id = " + supplier.getSupplierId();
+			  " AND supplier_id = " + supplier.getId();
 			  
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){

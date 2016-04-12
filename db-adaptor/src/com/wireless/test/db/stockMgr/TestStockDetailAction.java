@@ -52,24 +52,24 @@ public class TestStockDetailAction {
 		StockActionDetail expected = new StockActionDetail(materials.get(0).getId(), 1.5f, 100f);
 		expected.setStockActionId(8);
 		
-		final int id = StockActionDetailDao.insertStockActionDetail(mStaff, expected);
+		final int id = StockActionDetailDao.insert(mStaff, expected);
 		expected.setId(id);
-		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mStaff, id);
+		StockActionDetail actual = StockActionDetailDao.getByCond(mStaff, new StockActionDetailDao.ExtraCond().setId(id), null).get(0);
 		
 		compare(expected, actual);
 		
-		expected = StockActionDetailDao.getStockActionDetailById(mStaff, id) ;
+		expected = StockActionDetailDao.getByCond(mStaff, new StockActionDetailDao.ExtraCond().setId(id), null).get(0);
 		expected.setPrice(80);
 		
-		StockActionDetailDao.updateStockDetail(expected);
+		StockActionDetailDao.update(expected);
 		
-		actual = StockActionDetailDao.getStockActionDetailById(mStaff, expected.getId());
+		actual = StockActionDetailDao.getByCond(mStaff, new StockActionDetailDao.ExtraCond().setId(id), null).get(0);
 		
 		compare(expected, actual);
 		
-		StockActionDetailDao.deleteStockDetailById(mStaff, id);
+		StockActionDetailDao.deleteById(mStaff, id);
 		try{
-			StockActionDetailDao.getStockActionDetailById(mStaff, id);
+			StockActionDetailDao.getByCond(mStaff, new StockActionDetailDao.ExtraCond().setId(id), null).get(0);
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -92,32 +92,23 @@ public class TestStockDetailAction {
 		StockActionDetail expected = new StockActionDetail(materials.get(0).getId(), 1.5f, 100f);
 		expected.setStockActionId(8);
 		
-		int id = StockActionDetailDao.insertStockActionDetail(mStaff, expected);
+		int id = StockActionDetailDao.insert(mStaff, expected);
 		expected.setId(id);
-		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mStaff, id);
+		StockActionDetail actual = StockActionDetailDao.getByCond(mStaff, new StockActionDetailDao.ExtraCond().setId(id), null).get(0);
 		
 		compare(expected, actual);
 	}
 	@Test 
 	public void updateStockDetail() throws SQLException, BusinessException{
-		StockActionDetail expected = StockActionDetailDao.getStockActionDetailById(mStaff, 1) ;
+		StockActionDetail expected = StockActionDetailDao.getByCond(mStaff, new StockActionDetailDao.ExtraCond().setId(1), null).get(0);
 		expected.setStockActionId(116);
 		
-		StockActionDetailDao.updateStockDetail(expected);
+		StockActionDetailDao.update(expected);
 		
-		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mStaff, expected.getId());
+		StockActionDetail actual = StockActionDetailDao.getByCond(mStaff, new StockActionDetailDao.ExtraCond().setId(expected.getId()), null).get(0);
 		
 		compare(expected, actual);
 	}
-	@Test
-	public void deleteStockDetail() throws BusinessException, SQLException{
-		StockActionDetailDao.deleteStockDetailById(mStaff, 5);
-		try{
-			StockActionDetailDao.getStockActionDetailById(mStaff, 5);
-			
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
+	
 	
 }

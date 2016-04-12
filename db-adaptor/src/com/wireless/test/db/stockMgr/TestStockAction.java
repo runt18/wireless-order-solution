@@ -71,8 +71,8 @@ public class TestStockAction {
 			Assert.assertEquals("deptOut", expected.getDeptOut().getId(), actual.getDeptOut().getId());
 			Assert.assertEquals("deptOutName", expected.getDeptOut().getName(), actual.getDeptOut().getName());
 		}
-		if(actual.getSupplier().getSupplierId() !=0){
-			Assert.assertEquals("supplierId", expected.getSupplier().getSupplierId(), actual.getSupplier().getSupplierId());
+		if(actual.getSupplier().getId() !=0){
+			Assert.assertEquals("supplierId", expected.getSupplier().getId(), actual.getSupplier().getId());
 			Assert.assertEquals("supplierName",expected.getSupplier().getName(), actual.getSupplier().getName());
 		}
 		Assert.assertEquals("operatorId", expected.getOperatorId(), actual.getOperatorId());
@@ -105,18 +105,18 @@ public class TestStockAction {
 
 		//添加一张入库存单
 	
-		final int stockActionId = StockActionDao.insertStockAction(mStaff, builder);
+		final int stockActionId = StockActionDao.insert(mStaff, builder);
 		
 		StockAction expected = builder.build();
 		//根据不同类型获取供应商或部门
 		if(builder.getSubType() == SubType.STOCK_IN ){
 			Department deptIn = DepartmentDao.getById(mStaff, builder.getDeptIn().getId());
-			Supplier supplier = SupplierDao.getSupplierById(mStaff, builder.getSupplier().getSupplierId());
+			Supplier supplier = SupplierDao.getSupplierById(mStaff, builder.getSupplier().getId());
 			expected.setDeptIn(deptIn);
 			expected.setSupplier(supplier);
 		}else if(builder.getSubType() == SubType.STOCK_OUT){
 			Department deptOut = DepartmentDao.getById(mStaff, builder.getDeptOut().getId());
-			Supplier supplier = SupplierDao.getSupplierById(mStaff, builder.getSupplier().getSupplierId());
+			Supplier supplier = SupplierDao.getSupplierById(mStaff, builder.getSupplier().getId());
 			expected.setDeptOut(deptOut);
 			expected.setSupplier(supplier);
 		}else if(builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER){
@@ -131,7 +131,7 @@ public class TestStockAction {
 		expected.setId(stockActionId);
 
 		
-		StockAction actual = StockActionDao.getStockAndDetailById(mStaff, stockActionId);
+		StockAction actual = StockActionDao.getById(mStaff, stockActionId, true);
 		compare(expected, actual, true);
 		
 		//TODO 要修改的话解注释
@@ -168,9 +168,9 @@ public class TestStockAction {
 		expected.setOriStockIdDate(DateUtil.parseDate("2013-09-29 12:12:12"));*/
 		
 		//审核
-		StockActionDao.auditStockAction(mStaff, uBuilder);
+		StockActionDao.audit(mStaff, uBuilder);
 		
-		actual = StockActionDao.getStockAndDetailById(mStaff, uBuilder.getId());
+		actual = StockActionDao.getById(mStaff, uBuilder.getId(), true);
 		//对比审核后期望与真实值
 		compare(expected, actual, false);	
 
@@ -199,7 +199,7 @@ public class TestStockAction {
 				}else{
 					throw new BusinessException(MaterialError.MATERIAL_NOT_EXIST);
 				}
-			}else if(actual.getSubType() == SubType.SPILL || actual.getSubType() == SubType.DAMAGE || actual.getSubType() == SubType.USE_UP){
+			}else if(actual.getSubType() == SubType.SPILL || actual.getSubType() == SubType.DAMAGE || actual.getSubType() == SubType.CONSUMPTION){
 				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mStaff, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
 				index = beforeMaterialDepts.indexOf(afterMaterialDept);
 				if(index >= 0){
@@ -301,7 +301,7 @@ public class TestStockAction {
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(MaterialCate.Type.GOOD)
-				   .setSupplierId(supplier.getSupplierId())
+				   .setSupplierId(supplier.getId())
 				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 30))
 				   .addDetail(new StockActionDetail(materials.get(1).getId(), 1.5f, 30));
 		
@@ -401,7 +401,7 @@ public class TestStockAction {
 				   .setComment("good...")
 				   .setDeptOut(deptOut.getId())
 				   .setCateType(MaterialCate.Type.GOOD)
-				   .setSupplierId(supplier.getSupplierId())
+				   .setSupplierId(supplier.getId())
 				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 12))
 				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 12));
 		
@@ -476,7 +476,7 @@ public class TestStockAction {
 	//消耗
 	@Test
 	public void testUseUp() throws BusinessException, SQLException{
-		StockActionDao.getStockAndDetail(mStaff, null, null);
+		StockActionDao.getByCond(mStaff, new StockActionDao.ExtraCond().setContainsDetail(true), null);
 		Department deptIn;
 		List<Department> depts = DepartmentDao.getDepartments4Inventory(mStaff);
 		if(depts.isEmpty()){

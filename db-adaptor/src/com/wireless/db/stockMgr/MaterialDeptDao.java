@@ -8,12 +8,70 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
+import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.util.PinyinUtil;
 
 public class MaterialDeptDao {
+	
+	public static class ExtraCond{
+		private int deptId = -1;
+		private int materialId;
+		private int materialCateId;
+		private MaterialCate.Type materialCateType;
+		
+		public ExtraCond setDeptId(int deptId){
+			this.deptId = deptId;
+			return this;
+		}
+		
+		public ExtraCond setMaterialCateType(MaterialCate.Type type){
+			this.materialCateType = type;
+			return this;
+		}
+		
+		public ExtraCond setMaterialCate(MaterialCate materialCate){
+			this.materialCateId = materialCate.getId();
+			return this;
+		}
+		
+		public ExtraCond setMaterialCate(int materialCateId){
+			this.materialCateId = materialCateId;
+			return this;
+		}
+		
+		public ExtraCond setMaterial(Material material){
+			this.materialId = material.getId();
+			return this;
+		}
+		
+		public ExtraCond setMaterial(int materialId){
+			this.materialId = materialId;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			final StringBuilder extraCond = new StringBuilder();
+			if(deptId != -1){
+				extraCond.append(" AND MD.dept_id = " + deptId);
+			}
+			if(materialId != 0){
+				extraCond.append(" AND M.material_id = " + materialId);
+			}
+			if(materialCateId != 0){
+				extraCond.append(" AND MC.cate_id = " + materialCateId);
+			}
+			if(materialCateType != null){
+				extraCond.append(" AND MC.type = " + materialCateType.getValue());
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	/**
 	 * Insert a new MaterialDept.
 	 * @param term
@@ -174,48 +232,77 @@ public class MaterialDeptDao {
 		}
 		return mDepts;
 	}
-	
-	
-	public static List<MaterialDept> getMaterialDeptState(Staff term, String extraCond, String orderClause)throws SQLException, BusinessException{
+
+	/**
+	 * Get the material department to extra condition {@link ExtraCond}.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the result to material department
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<MaterialDept> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getMaterialDeptState(dbCon, term, extraCond, orderClause);
+			return getByCond(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
-	public static List<MaterialDept> getMaterialDeptState(DBCon dbCon, Staff term, String extraCond, String orderClause)throws SQLException, BusinessException{
-		List<MaterialDept> mDepts = new ArrayList<MaterialDept>();
+	
+	/**
+	 * Get the material department to extra condition {@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the result to material department
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<MaterialDept> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
-		sql = "SELECT MD.material_id, MD.dept_id, MD.restaurant_id, MD.stock, M.price, M.name, M.stock as m_stock, D.name as d_name" +
-				" FROM ((" + Params.dbName + ".material_dept as MD INNER JOIN " + Params.dbName + ".material as M ON MD.material_id = M.material_id )" +
-				" INNER JOIN " + Params.dbName + ".material_cate as MC ON M.cate_id = MC.cate_id) " + 
-				" INNER JOIN " + Params.dbName + ".department as D ON MD.dept_id = D.dept_id AND MD.restaurant_id = D.restaurant_id " +
-				" WHERE MD.restaurant_id = " + term.getRestaurantId() +
-				(extraCond == null ? "" : extraCond) +
-				(orderClause == null ? "" : orderClause);
+		sql = " SELECT MD.material_id, MD.dept_id, MD.restaurant_id, MD.stock, M.price, M.name, M.stock AS m_stock, D.name AS d_name " +
+			  " FROM " + Params.dbName + ".material_dept AS MD " +
+			  " JOIN " + Params.dbName + ".material AS M ON MD.material_id = M.material_id " +
+			  " JOIN " + Params.dbName + ".material_cate AS MC ON M.cate_id = MC.cate_id " + 
+			  " JOIN " + Params.dbName + ".department as D ON MD.dept_id = D.dept_id AND MD.restaurant_id = D.restaurant_id " +
+			  " WHERE MD.restaurant_id = " + staff.getRestaurantId() +
+			  (extraCond == null ? "" : extraCond) +
+			  (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			MaterialDept mDept = new MaterialDept();
-			
-			mDept.setMaterialId(dbCon.rs.getInt("material_id"));
-			mDept.getMaterial().setName(dbCon.rs.getString("name"));
-			mDept.getMaterial().setPrice(dbCon.rs.getFloat("price"));
-			mDept.getMaterial().setStock(dbCon.rs.getFloat("m_stock"));
-			mDept.getMaterial().setPinyin(PinyinUtil.cn2FirstSpell(dbCon.rs.getString("name")));
-			
-			mDept.setDeptId(dbCon.rs.getInt("dept_id"));
-			mDept.getDept().setName(dbCon.rs.getString("d_name"));
-			
-			mDept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			mDept.setStock(dbCon.rs.getFloat("stock"));
-			
-			mDepts.add(mDept);
-		}
-		return mDepts;
 		
+		final List<MaterialDept> result = new ArrayList<MaterialDept>();
+		while(dbCon.rs.next()){
+			MaterialDept materialDept = new MaterialDept();
+			
+			materialDept.setMaterialId(dbCon.rs.getInt("material_id"));
+			materialDept.getMaterial().setName(dbCon.rs.getString("name"));
+			materialDept.getMaterial().setPrice(dbCon.rs.getFloat("price"));
+			materialDept.getMaterial().setStock(dbCon.rs.getFloat("m_stock"));
+			materialDept.getMaterial().setPinyin(PinyinUtil.cn2FirstSpell(dbCon.rs.getString("name")));
+			
+			materialDept.setDeptId(dbCon.rs.getInt("dept_id"));
+			materialDept.getDept().setName(dbCon.rs.getString("d_name"));
+			materialDept.getDept().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			
+			materialDept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			materialDept.setStock(dbCon.rs.getFloat("stock"));
+			
+			result.add(materialDept);
+		}
+		return result;
 	}
+	
 	public static List<StockTakeDetail> getStockTakeDetails(Staff term, int deptId,int type, int cateId, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
