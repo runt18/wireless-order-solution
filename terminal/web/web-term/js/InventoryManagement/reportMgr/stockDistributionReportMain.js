@@ -145,70 +145,6 @@ var stockDistributionGrid;
 Ext.onReady(function(){
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
-	stockDistributionDeptTree = new Ext.tree.TreePanel({
-		title : '部门信息',
-		id : 'stockDistributionDeptTree',   
-		region : 'west',
-		width : 200,
-		border : false,
-		rootVisible : true,
-		autoScroll : true,
-		frame : true,
-		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
-		loader : new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryDeptTree.do?time=' + new Date(),
-			baseParams : {
-				'restaurantID' : restaurantID,
-				warehouse : true
-			}
-		}),
-		root : new Ext.tree.AsyncTreeNode({
-			expanded : true,
-			text : '全部部门',
-	        leaf : false,
-	        border : true,
-	        deptID : ' ',
-	        listeners : {
-	        	load : function(){
-	        		var treeRoot = stockDistributionDeptTree.getRootNode().childNodes;
-	        		if(treeRoot.length > 0){
-	        			deptData = [];
-	        			for(var i = (treeRoot.length - 1); i >= 0; i--){
-	    					if(treeRoot[i].attributes.deptID == 255 || treeRoot[i].attributes.deptID == 253){
-	    						stockDistributionDeptTree.getRootNode().removeChild(treeRoot[i]);
-	    					}
-	    				}
-	        		}else{
-	        			stockDistributionDeptTree.getRootNode().getUI().hide();
-	        			Ext.Msg.show({
-	        				title : '提示',
-	        				msg : '加载部门信息失败.',
-	        				buttons : Ext.MessageBox.OK
-	        			});
-	        		}
-	        	}
-	        }
-		}),
-		listeners : {
-			click : function(e){
-				Ext.getDom('dept').innerHTML = e.text;
-				Ext.getCmp('btnStockDistributionSearch').handler();
-			}
-		},
-		tbar :	[
-		     '->',
-		     {
-				text : '刷新',
-				iconCls : 'btn_refresh',
-				handler : function(){
-					stockDistributionDeptTree.getRootNode().reload();
-				}
-			}
-		 ]
-			
-
-	});
-	
 	var deptProperty = [];
 	$.ajax({
 		url : '../../OperateDept.do',
@@ -260,15 +196,56 @@ Ext.onReady(function(){
 	});
 	var date = new Date();
 	date.setMonth(date.getMonth()-1);
+	
+	//部门combo
+	var deptComb = new Ext.form.ComboBox({
+		id : 'deptComb_comboBox_stockDistributionReport',
+		forceSelection : true,
+		width : 110,
+		maxheight : 300,
+		store : new Ext.data.SimpleStore({
+			fields : ['id', 'name']
+		}),
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [[-1,'全部']];
+				Ext.Ajax.request({
+					url : '../../OperateDept.do',
+					params: { 
+				    	dataSource : 'getByCond',
+				    	inventory : true
+				    }, 
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						for(var i = 0; i < jr.root.length; i++){
+							data.push([jr.root[i]['id'], jr.root[i]['name']]);
+						}
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					},
+					fialure : function(res, opt){
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					}
+				});
+			},
+			select : function(){
+				Ext.getCmp('btnStockDistributionSearch').handler();	
+			}
+			
+		}
+	});
+	
 	var distributionReportBar = new Ext.Toolbar({
 		items : [
- 		{
-			xtype : 'tbtext',
-			text : String.format(
-				Ext.ux.txtFormat.typeName,
-				'部门','dept','全部部门'
-			)
-		},
+ 		{xtype : 'label', text : '部门:'},
+ 		deptComb,
 		{xtype : 'tbtext', text : '&nbsp;'},
 		{xtype : 'tbtext', text : '类型:'},
 		materialTypeComb,
@@ -293,10 +270,9 @@ Ext.onReady(function(){
 			iconCls : 'btn_search',
 			handler : function(){
 				var deptID = '';
-					var sn = stockDistributionDeptTree.getSelectionModel().getSelectedNode();
 					
 					var stockds = stockDistributionGrid.getStore();
-					stockds.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
+					stockds.baseParams['deptId'] = Ext.getCmp('deptComb_comboBox_stockDistributionReport').getStore().getCount() > 0 ? Ext.getCmp('deptComb_comboBox_stockDistributionReport').getValue() : '-1';
 					stockds.baseParams['cateType'] = Ext.getCmp('sdir_materialType').getValue();
 					stockds.baseParams['cateId'] = Ext.getCmp('sdir_materialCate').getValue();
 					stockds.baseParams['materialId'] = Ext.getCmp('sdir_materialId').getValue();
@@ -320,11 +296,15 @@ Ext.onReady(function(){
 	stockDistributionGrid = new Ext.grid.GridPanel({
 		title : '库存分布明细',
 		id : 'grid',
-		region : 'center',
-		height : '500',
+//		region : 'center',
+		height : parseInt(Ext.getDom('divStockDistribution').parentElement.style.height.replace(/px/g,'')),
 		border : true,
 		frame : true,
+		loadMask : {
+			msg : '正在加载数据中...'
+		},
         animCollapse: false,
+        autoScroll : true,
 		store : ds,
 		cm : stockDetail,
 /*		view : new Ext.grid.GroupingView({
@@ -364,10 +344,7 @@ Ext.onReady(function(){
 		renderTo : 'divStockDistribution',
 		width : parseInt(Ext.getDom('divStockDistribution').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divStockDistribution').parentElement.style.height.replace(/px/g,'')),
-		layout : 'border',//布局
-		//margins : '5 5 5 5',
-		//子集
-		items : [stockDistributionDeptTree, stockDistributionGrid]
+		items : [stockDistributionGrid]
 	});
 });
 
