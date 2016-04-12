@@ -131,10 +131,19 @@ public class WxMember {
 	private long bindDate;
 	private String weixinMemberSerial;
 	private Status status;
+	private int fansAmount;
 	
 	private WxMember(InsertBuilder builder){
 		setWeixinMemberSerial(builder.serial);
 		setStatus(Status.BOUND);
+	}
+	
+	public void setFansAmount(int fansAmount){
+		this.fansAmount = fansAmount;
+	}
+	
+	public int getFansAmount(){
+		return this.fansAmount;
 	}
 	
 	public WxMember(int card){

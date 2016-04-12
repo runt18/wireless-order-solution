@@ -474,6 +474,7 @@ public class OrderDao {
 		for(WxOrder wxOrder : WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setOrder(order), null)){
 			order.addWxOrder(wxOrder);
 		}
+		
 	}
 	
 	

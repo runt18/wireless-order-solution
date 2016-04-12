@@ -29,6 +29,8 @@ public class MemberCond implements Jsonable{
 		private final List<Member.Age> ages = new ArrayList<Member.Age>();
 		private Member.Sex sex;
 		private boolean isRaw;
+		private int minFansAmount;
+		private int maxFansAmount;
 		
 		public InsertBuilder(String name){
 			this.name = name;
@@ -111,6 +113,16 @@ public class MemberCond implements Jsonable{
 			return this;
 		}
 		
+		public InsertBuilder setMinFansAmount(int minFansAmount){
+			this.minFansAmount = minFansAmount;
+			return this;
+		}
+		
+		public InsertBuilder setMaxFansAmount(int maxFansAmount){
+			this.maxFansAmount = maxFansAmount;
+			return this;
+		}
+		
 		public MemberCond build(){
 			return new MemberCond(this);
 		}
@@ -139,9 +151,24 @@ public class MemberCond implements Jsonable{
 		private List<Member.Age> ages;
 		private boolean isRawChanged = false;
 		private Boolean isRaw;
+		private Integer minFansAmount;
+		private Integer maxFansAmount;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
+		}
+		
+		public UpdateBuilder setFansRange(int min, int max){
+			if(max > 0 && max < min){
+				throw new IllegalArgumentException("最大粉丝数不能小于最小粉丝数");
+			}
+			this.minFansAmount = min;
+			this.maxFansAmount = max;
+			return this;
+		}
+		
+		public boolean isFansChanged(){
+			return this.minFansAmount != null || this.maxFansAmount != null;
 		}
 		
 		public UpdateBuilder setRaw(Boolean onOff){
@@ -347,6 +374,8 @@ public class MemberCond implements Jsonable{
 	private final List<Member.Age> ages = new ArrayList<Member.Age>();
 	private float minCharge;
 	private float maxCharge;
+	private int minFansAmount;
+	private int maxFansAmount;
 	private Boolean isRaw;
 	
 	private MemberCond(UpdateBuilder builder){
@@ -365,6 +394,8 @@ public class MemberCond implements Jsonable{
 		setMaxLastConsumption(builder.maxLastConsumption);
 		setMinCharge(builder.minCharge != null ? builder.minCharge : 0);
 		setMaxCharge(builder.maxCharge != null ? builder.maxCharge : 0);
+		setMinFansAmount(builder.minFansAmount != null ? builder.minFansAmount : 0);
+		setMaxFansAmount(builder.maxFansAmount != null ? builder.maxFansAmount : 0);
 		setSex(builder.sex);
 		setAges(builder.ages);
 		if(builder.isRaw != null){
@@ -390,10 +421,29 @@ public class MemberCond implements Jsonable{
 		setMinCharge(builder.minTotalCharge);
 		setMaxCharge(builder.maxTotalCharge);
 		setRaw(builder.isRaw);
+		setMinFansAmount(builder.minFansAmount);
+		setMaxFansAmount(builder.maxFansAmount);
+		
 	}
 	
 	public MemberCond(int id){
 		this.id = id;
+	}
+	
+	public void setMaxFansAmount(int max){
+		this.maxFansAmount = max;
+	}
+	
+	public int getMaxFansAmount(){
+		return this.maxFansAmount;
+	}
+	
+	public void setMinFansAmount(int min){
+		this.minFansAmount = min;
+	}
+	
+	public int getMinFansAmount(){
+		return this.minFansAmount;
 	}
 	
 	public int getId() {
@@ -623,6 +673,8 @@ public class MemberCond implements Jsonable{
 		}
 		jm.putFloat("minCharge", this.minCharge);
 		jm.putFloat("maxCharge", this.maxCharge);
+		jm.putInt("minFansAmount", this.minFansAmount);
+		jm.putInt("maxFansAmount", this.maxFansAmount);
 		if(!this.ages.isEmpty()){
 			final StringBuilder ageText = new StringBuilder();
 			for(Member.Age age : ages){

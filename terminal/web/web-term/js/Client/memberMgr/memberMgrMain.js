@@ -1132,6 +1132,12 @@ Ext.onReady(function(){
 						disabled : true
 					}] 
 				}, {
+					items : [{
+						id : 'fansAmount_tbtext_memberMgrMain',
+						fieldLabel : '粉丝数量',
+						disabled : true
+					}]
+				},{
 					columnWidth : 1,
 					items : [{
 						id : 'cm_txtMemberContactAddress',
@@ -1395,6 +1401,7 @@ Ext.onReady(function(){
 		var point = Ext.getCmp('cm_numberMmeberPoint');
 		var usedPoint = Ext.getCmp('cm_numberUserPoint');
 		var referrer = Ext.getCmp('memberReferrer_numfield_mmm');
+		var fansAmount = Ext.getCmp('fansAmount_tbtext_memberMgrMain');
 		
 		var branchBelong = Ext.getCmp('branch_tbtext_memberMgrMain');
 		firstCharge.setValue();
@@ -1409,6 +1416,7 @@ Ext.onReady(function(){
 			memberType.store.loadData(c.data.memberTypeData);
 			
 			data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
+
 			memberID.setValue(data['id']);
 			name.setValue(data['name']);
 			mobile.setValue(data['mobile']);
@@ -1419,7 +1427,21 @@ Ext.onReady(function(){
 			birthday.setValue(data['birthdayFormat']);
 			
 			
-			
+			$.ajax({
+				url : '../../QueryMember.do',
+				type : 'post',
+				data : {
+					dataSource : 'normal',
+					memberCardOrMobileOrName : data['mobile']
+				},
+				datatype : 'json',
+				success : function(data, status, req){
+					fansAmount.setValue(data.root[0].fansAmount);
+				},
+				error : function(req, status, err){
+					alert(err.msg);
+				}
+			});
 			
 			$.ajax({
 				url : '../../OperateRestaurant.do',

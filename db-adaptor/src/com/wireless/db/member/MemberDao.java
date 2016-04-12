@@ -142,6 +142,8 @@ public class MemberDao {
 		private Member.Sex sex;
 		private final List<Member.Age> ages = new ArrayList<Member.Age>();
 		private Boolean isRaw;
+		private int minFansAmount;
+		private int maxFansAmount;
 		
 		public ExtraCond(MemberCond memberCond){
 			setRange(memberCond.getRange());
@@ -162,6 +164,8 @@ public class MemberDao {
 			this.maxTotalCharge = memberCond.getMaxCharge();
 			this.isRaw = memberCond.isRaw();
 			this.ages.addAll(memberCond.getAges());
+			this.minFansAmount = memberCond.getMinFansAmount();
+			this.maxFansAmount = memberCond.getMaxFansAmount();
 			
 		}
 		
@@ -376,6 +380,12 @@ public class MemberDao {
 			return this;
 		}
 		
+		public ExtraCond setFansRange(int min, int max){
+			this.minFansAmount = min;
+			this.maxFansAmount = max;
+			return this;
+		}
+		
 		private String cond4Card(String card){
 			if(card != null){
 				String cardExcludeZero = card.replaceFirst("^(0+)", "");
@@ -543,6 +553,27 @@ public class MemberDao {
 			//门店
 			if(branchId != 0){
 				extraCond.append(" AND M.branch_id = " + branchId);
+			}
+			
+			//设置粉丝数
+			if(maxFansAmount > 0 || minFansAmount > 0){
+				String sql;
+				if(maxFansAmount > 0){
+					sql = " SELECT member_id FROM " + Params.dbName + ".member" + 
+						  " WHERE restaurant_id = " + restaurantId + " AND member_id " +
+						  " NOT IN ( " + 
+						  		" SELECT recommend_member_id " + 
+						  		" FROM " + Params.dbName + ".represent_chain GROUP BY recommend_member_id " + " HAVING COUNT(*) > " + maxFansAmount +
+						  " ) ";
+					extraCond.append(" AND M.member_id IN ( " + sql + " ) ");	
+				}
+				if(minFansAmount > 0){
+					sql = " SELECT recommend_member_id FROM " + Params.dbName + ".represent_chain" +
+						  " WHERE restaurant_id = " + restaurantId + " GROUP BY recommend_member_id " + 
+						  " HAVING COUNT(*) >= " + minFansAmount;
+					extraCond.append(" AND M.member_id IN (" + sql +")");
+				}
+				
 			}
 			
 			return extraCond.toString();
@@ -743,6 +774,9 @@ public class MemberDao {
 //				}
 //			}
 //			dbCon.rs.close();
+			
+			//Get the fans amount to each member.
+			eachMember.setFansAmount(RepresentChainDao.getByCond(dbCon, staff, new RepresentChainDao.ExtraCond().setReferrerId(eachMember.getId()).setOnlyAmount(true)).size());
 			
 			//Get the favor foods to each member
 			sql = " SELECT " +
@@ -1003,7 +1037,7 @@ public class MemberDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static Member getByWxSerial(DBCon dbCon, Staff staff, String weixinSerial) throws SQLException, BusinessException{
-		List<Member> result = getByCond(dbCon, staff, new ExtraCond().setWeixinSerial(weixinSerial), null);
+		List<Member> result = getDetail(dbCon, staff, new ExtraCond().setWeixinSerial(weixinSerial), null);
 		if(result.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{

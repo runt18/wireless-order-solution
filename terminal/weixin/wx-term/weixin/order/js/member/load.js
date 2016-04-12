@@ -56,6 +56,9 @@ $(function(){
 					//手机号已绑定状态
 					$('#phone_div_member').show();
 					$('#bind_div_member').hide();
+					
+					$('#fansAmount_span_member').html(data.other.member.fansAmount);
+					$('#divMemberRecommendHistory').css('display', 'block');
 				}else if(data.other.status == 1){
 					//手机号码未绑定状态
 					$('#bind_div_member').show();
@@ -72,15 +75,17 @@ $(function(){
 					},
 					dataType : 'json',
 					success : function(data, status, xhr){
+						
 						if(data.other.nearByCharge >= 0){
 							$('#spanNearByCharge').html(data.other.nearByCharge);
 							$('#divMemberBalanceContent').css('display', 'block');
 						}
+						
 						if(data.other.nearByConsume >= 0){
 							$('#spanNearByCost').html(data.other.nearByConsume);
 							$('#divMemberPointContent').css('display', 'block');
 						}
-						if(data.other.couponConsume >= 0){
+						if(data.other.couponConsume >= 0){ 
 							$('#couponDetails_div_member').css('display', 'block');
 						}							
 					},
@@ -495,6 +500,55 @@ $(function(){
 			}
 		});
 	});
+	
+	
+	//代言记录
+	$('#recommendAmount_li_member').click(function(){
+		$('#recommendDetails_div_member').fadeToggle();
+		showRecommendDetail();
+	});
+	
+	function showRecommendDetail(){
+		var mainView = $('recommendDetails_div_member');
+		var tbody = mainView.find('table > tbody');
+		Util.lm.show();
+		$.ajax({
+			url : '../../WXQueryMemberOperation.do',
+			type : 'post',
+			data : {
+				dataSource : 'recommendDetail',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			datatype : 'josn',
+			success : function(data, status, res){
+				Util.lm.hide();
+				var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
+									'<td style="width:39%;text-align: center;line-height:20px;">{subscribeDate}</td>' + 
+									'<td style="width:20%;text-align:center;line-height:30px;">{subscribeMember}</td>' +
+									'<td style="width:20%;text-align:center;line-height:30px;">{recommendMoney}元</td>' +
+									'<td style="width:20%;text-align:center;line-height:30px;">{recommendPoint}分</td>' +
+								'</tr>';
+				
+				var html = [], temp = null;
+				for(var i = 0; i < data.root.length; i++){
+					temp = data.root[i];
+					html.push(template.format({
+						subscribeDate : temp.subscribeDate,
+						subscribeMember : temp.subscribeMember,
+						recommendMoney : temp.recommendMoney,
+						recommendPoint : temp.recommendPoint
+					}));
+				}
+				
+				$('#table_recommendDetails').find('tbody')[0].innerHTML = html.join('');
+			},
+			error : function(req, status, error){
+				Util.lm.hide();
+				Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+			}
+		});
+	}
 	
 	
 	 //自助点餐

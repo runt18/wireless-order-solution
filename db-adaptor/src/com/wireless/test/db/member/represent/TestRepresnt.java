@@ -169,6 +169,10 @@ public class TestRepresnt {
 			Assert.assertEquals("subscriber money to represent chain", subscribeMoney, actualChain.getSubscribeMoney(), 0.01);
 			Assert.assertEquals("subscriber point to represent chain", subscribePoint, actualChain.getSubscribePoint());
 			Assert.assertTrue("subscriber date to represent chain", Math.abs(System.currentTimeMillis() - actualChain.getSubscribeDate()) < 5000);
+			
+			//int fansAmount = RepresentChainDao.getByCond(mStaff, new RepresentChainDao.ExtraCond().setReferrerId(referrer.getId()).setOnlyAmount(true)).size();
+			Assert.assertEquals("fans to represent chain", referrer.getFansAmount(), actualReferrer.getFansAmount());
+			
 		}finally{
 			//Delete the represent chain.
 			RepresentChainDao.deleteByCond(mStaff, new RepresentChainDao.ExtraCond().setReferrerId(referrer.getId()).setSubscriberId(subscriber.getId()));

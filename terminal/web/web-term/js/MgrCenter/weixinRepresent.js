@@ -358,8 +358,9 @@ Ext.onReady(function(){
         			Ext.Ajax.request({
         				url : '../../OperateRepresent.do',
         				params : params,
-        				sucess : function(res, opt){
-        					Ext.MessageBox.tip('修改成功');
+        				success : function(res, opt){
+//        					var jr = Ext.decode(res.responseText);
+        					Ext.ux.showMsg('提示', '修改成功');
         				},
         				failure : function(res, opt){
         					Ext.ux.showMsg(Ext.decode(res.responseText));
