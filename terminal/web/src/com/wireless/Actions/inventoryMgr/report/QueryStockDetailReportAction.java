@@ -40,7 +40,9 @@ public class QueryStockDetailReportAction extends Action{
 			String materialId = request.getParameter("materialId");
 			String materialCateId = request.getParameter("materialCateId");
 			String cateType = request.getParameter("cateType");
-			String deptId = request.getParameter("deptId");
+			//TODO
+			String deptOut = request.getParameter("deptOut");
+			String deptIn = request.getParameter("deptIn");
 			String supplier = request.getParameter("supplier");
 			//String stockType = request.getParameter("stockType");
 			String subType = request.getParameter("subType");
