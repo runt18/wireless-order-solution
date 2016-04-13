@@ -215,7 +215,7 @@ public class StockReportDao {
 			for(Department deptIn : depts){
 				List<StockActionDetail> primeDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
 																		  .addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
-																		  .setOriStockDate(null, extraCond.range.getOpeningFormat())
+																		  .setOriDate(null, extraCond.range.getOpeningFormat())
 																		  .setMaterial(report.getMaterial()) 
 																		  .setDeptIn(deptIn), " ORDER BY D.id DESC LIMIT 0, 1 ");
 				if(!primeDetail.isEmpty()){
@@ -228,7 +228,7 @@ public class StockReportDao {
 				
 				List<StockActionDetail> finalDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
 										.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
-										.setOriStockDate(null, extraCond.range.getEndingFormat() + " 23:59:59 ")
+										.setOriDate(null, extraCond.range.getEndingFormat() + " 23:59:59 ")
 										.setMaterial(report.getMaterial()), " ORDER BY D.id DESC LIMIT 0, 1 ");
 				
 				if(finalDetail.isEmpty()){

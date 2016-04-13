@@ -22,19 +22,17 @@ public class StockActionDetailDao {
 
 	public static class ExtraCond{
 		private int id;
-		private int materialId;
-		private String minOriStockDate;
-		private String maxOriStockDate;
-		private List<StockAction.SubType> subTypes = new ArrayList<StockAction.SubType>();
-		private List<StockAction.Status> status = new ArrayList<StockAction.Status>();
-		private int stockActionId;
-		private int deptIn = -1;
-		private int deptOut = -1;
-		private int materialCateId;
-		private MaterialCate.Type materialCateType;
-		private int supplierId;
+		private int materialId;								//商品或原料Id
+		private List<StockAction.SubType> subTypes = new ArrayList<StockAction.SubType>();	//库单操作子类型
+		private List<StockAction.Status> status = new ArrayList<StockAction.Status>();		//库单状态
+		private int stockActionId;							//库单Id
+		private int deptIn = -1;							//入库部门
+		private int deptOut = -1;							//出库部门
+		private int materialCateId;							//商品或原料类型
+		private MaterialCate.Type materialCateType;			//商品或原料大类
+		private int supplierId;								//供应商
 		private Staff staff;
-		private String minOriDate;
+		private String minOriDate;							//原始库单时间
 		private String maxOriDate;
 		
 		ExtraCond setStaff(Staff staff){
@@ -128,12 +126,6 @@ public class StockActionDetailDao {
 			return this;
 		}
 		
-		public ExtraCond setOriStockDate(String min, String max){
-			this.minOriStockDate = min;
-			this.maxOriStockDate = max;
-			return this;
-		}
-		
 		@Override
 		public String toString(){
 			final StringBuilder extraCond = new StringBuilder();
@@ -142,13 +134,6 @@ public class StockActionDetailDao {
 			}
 			if(materialId != 0){
 				extraCond.append(" AND D.material_id = " + materialId);
-			}
-			if(minOriStockDate != null && maxOriStockDate != null){
-				extraCond.append(" AND S.ori_stock_date BETWEEN '" + minOriStockDate + "' AND '" + maxOriStockDate + "'");
-			}else if(minOriStockDate != null && maxOriStockDate == null){
-				extraCond.append(" AND S.ori_stock_date >= '" + minOriStockDate + "'");
-			}else if(minOriStockDate == null && maxOriStockDate != null){
-				extraCond.append(" AND S.ori_stock_date <= '" + maxOriStockDate + "'");
 			}
 			final StringBuilder statusCond = new StringBuilder();
 			for(StockAction.Status eachStatus : status){
