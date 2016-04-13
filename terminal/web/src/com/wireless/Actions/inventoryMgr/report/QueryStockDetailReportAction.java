@@ -27,52 +27,44 @@ public class QueryStockDetailReportAction extends Action{
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
-		
-		JObject jObject = new JObject();
-		//String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
+		final String pin = (String)request.getAttribute("pin");
+		final String beginDate = request.getParameter("beginDate");
+		final String materialId = request.getParameter("materialId");
+		final String materialCateId = request.getParameter("materialCateId");
+		final String cateType = request.getParameter("cateType");
+		final String deptOut = request.getParameter("deptOut");
+		final String deptIn = request.getParameter("deptIn");
+		final String supplier = request.getParameter("supplier");
+		//String stockType = request.getParameter("stockType");
+		final String subType = request.getParameter("subType");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
+
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			String beginDate = request.getParameter("beginDate");
-			String materialId = request.getParameter("materialId");
-			String materialCateId = request.getParameter("materialCateId");
-			String cateType = request.getParameter("cateType");
-			String deptOut = request.getParameter("deptOut");
-			String deptIn = request.getParameter("deptIn");
-			String supplier = request.getParameter("supplier");
-			//String stockType = request.getParameter("stockType");
-			String subType = request.getParameter("subType");
 			
 			final StockActionDetailDao.ExtraCond extraCond = new StockActionDetailDao.ExtraCond();
 			
 			extraCond.setOriDate(beginDate + "-01", beginDate + "-31");
 			
-			//String extra = " AND S.ori_stock_date BETWEEN '" + beginDate + "' AND '" + endDate + " 23:59:59'";
-			
 			if(materialId != null && !materialId.isEmpty()){
-				//materialId = "-1";
 				extraCond.setMaterial(Integer.parseInt(materialId));
 			}
 			
 			if(materialCateId != null && !materialCateId.isEmpty()){
-				//extra += " AND MC.cate_id = " + materialCateId;
 				extraCond.setMaterialCate(Integer.parseInt(materialCateId));
 			}
 			
 			if(cateType != null && !cateType.isEmpty() && !cateType.equals("-1")){
-				//extra += " AND MC.type = " + cateType;
 				extraCond.setMaterialCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)));
 			}
 			
 			if(subType != null && !subType.isEmpty()){
-				//extra += " AND S.sub_type = " + subType;
 				extraCond.addSubType(StockAction.SubType.valueOf(Integer.parseInt(subType)));
 			}
 				
 			if(supplier != null && !supplier.isEmpty() && !supplier.equals("-1")){
-				//extra += " AND S.supplier_id = " + supplier;
 				extraCond.setSupplier(Integer.parseInt(supplier));
 			}
 			
@@ -106,9 +98,6 @@ public class QueryStockDetailReportAction extends Action{
 			summary.setTotalStockOutAmount(totalStockOutAmount);
 			summary.setTotalStockOutMoney(totalStockOutMoney);
 			summary.setTotalRemaining(totalRemaining);
-			//FIXME
-			//summary.setTotalMoney(0);
-				
 
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				result = DataPaging.getPagingData(result, true, Integer.parseInt(start), Integer.parseInt(limit));
