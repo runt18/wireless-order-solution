@@ -601,7 +601,7 @@ Ext.onReady(function(){
 	});	
 	
 	
-	
+	var limitCount = 20;
 	var pagingBar = new Ext.PagingToolbar({
 		pageSize : limitCount,
 		store : ds,
