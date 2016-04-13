@@ -2,7 +2,6 @@ package com.wireless.pojo.stockMgr;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.util.DateUtil;
 
 public class StockDetailReport implements Jsonable {
